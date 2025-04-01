@@ -2,6 +2,7 @@
 using Editors.Shared.Core.Common.BaseControl;
 using Editors.Shared.Core.Common.ReferenceModel;
 using Editors.Shared.Core.Services;
+using GameWorld.Core.Services;
 using Microsoft.Xna.Framework;
 using Shared.Core.Events;
 using Shared.Core.PackFiles;
@@ -16,7 +17,7 @@ namespace Editors.Shared.Core.Common
         private readonly IMetaDataFactory _metaDataFactory;
         private readonly SceneObjectEditor _sceneObjectEditor;
         private readonly IPackFileService _pfs;
-        private readonly SkeletonAnimationLookUpHelper _skeletonHelper;
+        private readonly ISkeletonAnimationLookUpHelper _skeletonHelper;
         private readonly IUiCommandFactory _uiCommandFactory;
         private readonly IStandardDialogs _packFileUiProvider;
         private readonly MetaDataTagDeSerializer _metaDataTagDeSerializer;
@@ -25,8 +26,8 @@ namespace Editors.Shared.Core.Common
             AnimationPlayerViewModel animationPlayerViewModel, 
             IMetaDataFactory metaDataFactory,
             SceneObjectEditor assetViewModelBuilder,
-            IPackFileService pfs, 
-            SkeletonAnimationLookUpHelper skeletonHelper, 
+            IPackFileService pfs,
+            ISkeletonAnimationLookUpHelper skeletonHelper, 
             IUiCommandFactory uiCommandFactory,
             IStandardDialogs packFileUiProvider,
             MetaDataTagDeSerializer metaDataTagDeSerializer)

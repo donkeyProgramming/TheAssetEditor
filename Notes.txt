@@ -1,16 +1,51 @@
+Move capability serializers to own files 
+Move SkeletonAnimationLookUpHelper behind interface 
+Move SkeletonAnimationLookUpHelper to gameWorld
+Move saving/loading to own project, with tests and what not.
+
+
+Keep expanders open in node editor when selecting different 
+Fix skeleton tool https://github.com/donkeyProgramming/TheAssetEditor/issues/166
+Allow lod0 to be reduced 
+
+---
+Lazy load tabs - selection delay is boring!
+
+ogre_contracts
+ui\campaign ui\cathay_compass.twui.xml
+ui\campaign ui\character_information.twui.xml
+ui\campaign ui\dlc25_nurgle_plagues.twui.xml
+ui\campaign ui\elector_counts.twui.xml
+ui\campaign ui\ikit_workshop.twui.xml
+ui\campaign ui\hud_campaign.twui.xml  
 
 
 
+public CommonVertex Read(RmvVersionEnum rmvVersion, byte[] buffer, int offset, int vertexSize) => Reading vertex 1 by 1 is dumb. Read them all
+
+KitbashTool: Manual vertex editor for weights (new editor or reuse debug view)
+Keep expanders open in node editor when selecting different 
 
 
-Fixes for v060
+Create a file database 
 
 
-	[Bugfix]: General: Close console window (and any other windows) on application close 
-	
-	
-	[Internal] Changed animationMetadDataParser to be a singlenton with lazy init - To speed up loading and testing when the class is not needed
 
+Must do:
+	https://discord.com/channels/373745291289034763/795235087352201226/1343171986695782490 => Bugfix 
+	Geometry matrix test 
+	WsModel saving test, not all wisible
+
+	Allow lod0 to be redusced - make sure number can be change. On exit event 
+
+
+----
+
+ 
+
+	ErrorFiles
+		Command history
+		Dump to file  
 
 
 
@@ -26,7 +61,7 @@ Fixes for v060
 	
 	Create ogre test
 	AnimBin test
-	WsModel saving test, not all wisible
+	
 	Speed up system tests 
 	
 	Damping and root node handling 
@@ -34,11 +69,8 @@ Fixes for v060
 	Rendering window - disbale backface culling 
 	Superview - default scene content to be expanded. Allow select meshes
 	Move Editors.Shared.Core into shared? Maybe under UI?
+	Create a save/load component! Returns a object of some type 
 
-	ErrorFiles
-		Command history
-		Dump to file 
-	Change how metadata parsing is handled. need to be lazy! Slow slow
 	KitbashTOol Materiul - warning for not supported material! 
 
 Unit test:
@@ -47,6 +79,8 @@ Unit test:
 	Create unit test for SuperView
 		
 Bugs:
+	General: right click packfile and "expor to system folder" does not work on packfile, just sub folders
+
 	KitbashTool: Manual vertex editor for weights (new editor or reuse debug view)
 	KitbashTool: Reduce icon size?
 	KitbashTool: when loading material - if not supported show message
@@ -76,6 +110,7 @@ Important tests:
 
 	
 Improvements:
+	General: Move complex save/load to its own dll
 	General: Print scope - special handling for eventhub. Include registred callbacks 
 	General: Show hisotry of commands in exceptions
 	GameWorld: Move bloomeffect to resourcelib
@@ -138,10 +173,37 @@ New features:
 	
 Interesting links:
 	https://github.com/kikipoulet/SukiUI/blob/main/SukiUI/Controls/PropertyGrid/InstanceViewModel.cs	-> Auto generate views for property gird. Also good docking in same lib 
+	https://www.youtube.com/watch?v=7cmBlwGXELs Moonbreaker painting
+	Silk.Net.Assimp
+	https://doc.stride3d.net/latest/en/releasenotes/
 	
 	
+Fixes for v063:
+	[Bugfix]: KitbashTool: Skin_dirt mesh issue reported by Cemmen
 	
-Finished for v058
+	[Feature]: KitbashTool: Decreased loading times for meshes 
+
+Fixes for v062
+	[Bugfix]: KitbashTool: Fixed incorrect saving of meshes with only skin attribute set 
+	[Bugfix]: KitbashTool: Fixed issues in the vertex info tool and added a statistics button
+	
+Fixes for v061
+	[Bugfix]: KitbashTool: Fixed incorrect saving of meshes with only skin attribute set 
+	[Feature]: KitbashTool: Custom attachmentpoints are kept and saved. 
+	[Feature]: KitbashTool: Possible to set animation matrix, for things such as building animations. 
+	
+Fixes for v060
+	[Bugfix]: General: Close console window (and any other windows) on application close 
+	[Bugfix]: General: Improved the error handling when loading game files without manifest file with custom mods in the same folder. (Please dont do this!)
+	[BugFix]: KitbashTool: Fixed issue that caused props to animate incorrectly in game due to Incorrect matrix and attachmentpoint for static meshes.
+	[BugFix]: KitbashTool: Fixed and improved decal, dirt and skin material handling for older games 
+	[BugFix]: KitbashTool: Allowed 2 and 3 number of lods 
+	
+	[Feature]: KitbashTool: Second UV channel correctly handled for static meshes 
+	
+	[Internal] Changed animationMetadDataParser to be a singlenton with lazy init - To speed up loa ding and testing when the class is not needed
+	
+Finished for v059
 	[Feature] Support for reading encrypted packfiles
 	
 	[Bugfix] Kitbash: Fixed issue when generating WsModel for only visible meshes 

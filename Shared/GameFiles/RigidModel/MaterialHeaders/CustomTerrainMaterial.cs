@@ -58,7 +58,7 @@ namespace Shared.GameFormats.RigidModel.MaterialHeaders
             return new List<RmvTexture>();
         }
 
-        public void EnrichDataBeforeSaving(string[] boneNames)
+        public void EnrichDataBeforeSaving(List<RmvAttachmentPoint> attachmentPoints, int matrixOverride)
         {
             throw new NotImplementedException();
         }

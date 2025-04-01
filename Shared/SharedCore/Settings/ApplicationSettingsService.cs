@@ -28,6 +28,8 @@ namespace Shared.Core.Settings
 
         public ApplicationSettings()
         {
+
+            // TODO: Need a way to get the right wwise path according to the game or instead just have several settings for the wwise CLI according tot he version
             var wwiseRoot = Environment.GetEnvironmentVariable("WWISEROOT") ?? "";
             if (!string.IsNullOrEmpty(wwiseRoot))
             {

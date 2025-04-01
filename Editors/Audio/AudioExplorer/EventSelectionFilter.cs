@@ -32,11 +32,11 @@ namespace Editors.Audio.AudioExplorer
             if (showDialogueEvents)
                 typesToShow.Add(AkBkHircType.Dialogue_Event);
 
-            var allEvents = _repository.HircObjects.SelectMany(x => x.Value)
+            var allEvents = _repository.HircLookupByID.SelectMany(x => x.Value)
                 .Where(x => typesToShow.Contains(x.HircType))
                 .ToList();
 
-            var selectedableList = allEvents.Select(x => new SelectedHircItem() { HircItem = x, DisplayName = _repository.GetNameFromHash(x.Id), Id = x.Id, PackFile = x.OwnerFile, IndexInFile = x.ByteIndexInFile }).OrderBy(x => x.DisplayName).ToList();
+            var selectedableList = allEvents.Select(x => new SelectedHircItem() { HircItem = x, DisplayName = _repository.GetNameFromID(x.ID), ID = x.ID, PackFile = x.OwnerFilePath, IndexInFile = x.ByteIndexInFile }).OrderBy(x => x.DisplayName).ToList();
             EventList.Filter = "";
             EventList.UpdatePossibleValues(selectedableList);
         }

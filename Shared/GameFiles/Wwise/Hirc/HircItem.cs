@@ -10,8 +10,9 @@ namespace Shared.GameFormats.Wwise.Hirc
         readonly ILogger _logger = Logging.Create<HircItem>();
 
         public static readonly uint HircHeaderSize = 4; // 2x uint. Type is not included for some reason
-        public string OwnerFile { get; set; } = "OwnerFile Not Set";
+        public string OwnerFilePath { get; set; } = "OwnerFile Not Set";
         public bool IsCaHircItem { get; set; }
+        public uint LanguageID { get; set; } 
         public uint ByteIndexInFile { get; set; }
         public uint IndexInFile { get; set; }
         public bool HasError { get; set; } = true;
@@ -19,7 +20,7 @@ namespace Shared.GameFormats.Wwise.Hirc
         // Wwise object properties
         public AkBkHircType HircType { get; set; }
         public uint SectionSize { get; set; }
-        public uint Id { get; set; }
+        public uint ID { get; set; }
 
         public void Parse(ByteChunk chunk)
         {
@@ -30,7 +31,7 @@ namespace Shared.GameFormats.Wwise.Hirc
 
                 HircType = (AkBkHircType)chunk.ReadByte();
                 SectionSize = chunk.ReadUInt32();
-                Id = chunk.ReadUInt32();
+                ID = chunk.ReadUInt32();
                 ReadData(chunk);
 
                 var currentIndex = chunk.Index;
@@ -41,7 +42,7 @@ namespace Shared.GameFormats.Wwise.Hirc
 
             catch (Exception e)
             {
-                _logger.Here().Error($"Failed to parse object {Id} of type {HircType} in {OwnerFile} at index {IndexInFile} - " + e.Message);
+                _logger.Here().Error($"Failed to parse object {ID} of type {HircType} in {OwnerFilePath} at index {IndexInFile} - " + e.Message);
                 throw;
             }
         }
@@ -51,7 +52,7 @@ namespace Shared.GameFormats.Wwise.Hirc
             var memStream = new MemoryStream();
             memStream.Write(ByteParsers.Byte.EncodeValue((byte)HircType, out _));
             memStream.Write(ByteParsers.UInt32.EncodeValue(SectionSize, out _));
-            memStream.Write(ByteParsers.UInt32.EncodeValue(Id, out _));
+            memStream.Write(ByteParsers.UInt32.EncodeValue(ID, out _));
             return memStream;
         }
 

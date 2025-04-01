@@ -73,7 +73,7 @@ namespace Shared.Core.PackFiles
             return packFileList.Select(x=>x.PackFile).ToList();
         }
 
-        public static List<PackFile> LoadFilesFromDisk(IPackFileService pfs, FileRef fileRef) => LoadFilesFromDisk(pfs, new FileRef[] { fileRef });
+        public static List<PackFile> LoadFileFromDisk(IPackFileService pfs, FileRef fileRef) => LoadFilesFromDisk(pfs, new FileRef[] { fileRef });
 
         public class FileRef
         {

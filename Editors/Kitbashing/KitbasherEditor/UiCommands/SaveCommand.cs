@@ -1,4 +1,5 @@
-﻿using Editors.KitbasherEditor.Core.MenuBarViews;
+﻿using System.Runtime;
+using Editors.KitbasherEditor.Core.MenuBarViews;
 using Editors.KitbasherEditor.ViewModels.SaveDialog;
 using GameWorld.Core.Components;
 using GameWorld.Core.SceneNodes;
@@ -23,7 +24,7 @@ namespace Editors.KitbasherEditor.UiCommands
             _saveWindowFactory = saveWindowFactory;
         }
 
-        protected void Save(bool forceShowDialog)
+        protected SaveResult? Save(bool forceShowDialog)
         {
             if (_settings.IsUserInitialized == false || forceShowDialog)
             {
@@ -31,11 +32,14 @@ namespace Editors.KitbasherEditor.UiCommands
                 window.Initialize(_settings);
                 var saveScene = window.ShowDialog();
                 if (saveScene != true)
-                    return;
+                    return null;
             }
 
+
             var mainNode = _sceneManager.GetNodeByName<MainEditableNode>(SpecialNodes.EditableModel);
-            _saveService.Save(mainNode, _settings);
+            _settings.AttachmentPoints = mainNode.AttachmentPoints; // Bit of a hack, clean up at some point
+            var res = _saveService.Save(mainNode, _settings);
+            return res;
         }
     }
 
@@ -51,6 +55,7 @@ namespace Editors.KitbasherEditor.UiCommands
         }
 
         public void Execute() => Save(false);
+        public SaveResult? ExecuteWithResult() => Save(false);
     }
 
     public class SaveAsCommand : SaveCommandBase, ITransientKitbasherUiCommand

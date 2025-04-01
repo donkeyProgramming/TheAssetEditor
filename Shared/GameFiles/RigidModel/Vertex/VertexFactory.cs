@@ -1,4 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
+using Shared.Core.ByteParsing;
 using Shared.GameFormats.RigidModel.Vertex.Formats;
 
 namespace Shared.GameFormats.RigidModel.Vertex
@@ -6,7 +7,8 @@ namespace Shared.GameFormats.RigidModel.Vertex
     public interface IVertexCreator
     {
         VertexFormat Type { get; }
-        CommonVertex Read(RmvVersionEnum rmvVersion, byte[] buffer, int offset, int vertexSize);
+        //CommonVertex Read(RmvVersionEnum rmvVersion, byte[] buffer, int offset, int vertexSize);
+        CommonVertex[] ReadArray(RmvVersionEnum rmvVersion, byte[] buffer, int offset, int vertexSize, int vertexCount);
         byte[] Write(RmvVersionEnum rmvVersion, CommonVertex vertex);
         uint GetVertexSize(RmvVersionEnum rmvVersion);
         bool ForceComputeNormals { get; }
@@ -19,10 +21,11 @@ namespace Shared.GameFormats.RigidModel.Vertex
         public Vector3 BiNormal { get; set; }
         public Vector3 Tangent { get; set; }
         public Vector2 Uv { get; set; }
+        public Vector2 Uv1 { get; set; }
         public Vector4 Colour { get; set; }
 
-        public byte[] BoneIndex;
-        public float[] BoneWeight;
+        public byte[] BoneIndex { get; set; }
+        public float[] BoneWeight { get; set; }
         public int WeightCount { get; set; } = 0;
 
         public Vector3 GetPosistionAsVec3() => new Vector3(Position.X, Position.Y, Position.Z);
@@ -49,10 +52,17 @@ namespace Shared.GameFormats.RigidModel.Vertex
         {
             var creator = _vertexCreators[format];
 
-            var vertexList = new CommonVertex[vertexCount];
-            for (var i = 0; i < vertexCount; i++)
-                vertexList[i] = creator.Read(rmvVersion, buffer, vertexStart + i * vertexSize, vertexSize);
-            return vertexList;
+            //if (format == VertexFormat.Cinematic)
+            //{
+            //    var verts = ByteHelper.P<Weighted4VertexCreator.DataWithColour2>(buffer, vertexStart, vertexSize * vertexCount);
+            //    var processedVerts = Weighted4VertexCreator.Process(verts, rmvVersion);
+            //    return processedVerts;
+            //}
+            //else
+            {
+                var vertexList = creator.ReadArray(rmvVersion, buffer, vertexStart, vertexSize, vertexCount);
+                return vertexList;
+            }
         }
 
         public uint GetVertexSize(VertexFormat format, RmvVersionEnum rmvVersion) => _vertexCreators[format].GetVertexSize(rmvVersion);

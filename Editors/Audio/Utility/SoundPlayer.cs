@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using Editors.Audio.Storage;
 using Serilog;
-using Shared.Core.ByteParsing;
 using Shared.Core.ErrorHandling;
+using Shared.Core.Misc;
 using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
 using static Editors.Audio.GameSettings.Warhammer3.Languages;
@@ -13,100 +14,122 @@ namespace Editors.Audio.Utility
 {
     public class SoundPlayer
     {
-        private static readonly ILogger s_logger = Logging.Create<SoundPlayer>();
-        private readonly IPackFileService _pfs;
+        private readonly ILogger _logger = Logging.Create<SoundPlayer>();
+        private readonly IPackFileService _packFileService;
+        private readonly IAudioRepository _audioRepository;
         private readonly VgStreamWrapper _vgStreamWrapper;
 
-        public SoundPlayer(IPackFileService pfs, VgStreamWrapper vgStreamWrapper)
+        private static string AudioFolderName => $"{DirectoryHelper.Temp}\\Audio";
+
+        public SoundPlayer(IPackFileService packFileService, IAudioRepository audioRepository, VgStreamWrapper vgStreamWrapper)
         {
-            _pfs = pfs;
+            _packFileService = packFileService;
+            _audioRepository = audioRepository;
             _vgStreamWrapper = vgStreamWrapper;
         }
 
-        public bool ConvertWemToWav(string wemFileName)
+        public void PlayStreamedWem(string wemFileName)
         {
             if (wemFileName == null || wemFileName == string.Empty)
-            {
-                s_logger.Here().Warning("Invalid wem file; input is empty.");
-                return false;
-            }
+                _logger.Here().Warning("Invalid wem file; input is empty.");
 
-            var audioFile = FindWemFile(wemFileName, _pfs);
+            var audioFile = FindWemFile(wemFileName);
             if (audioFile == null)
-            {
-                s_logger.Here().Error($"Unable to find wem file '{wemFileName}'.");
-                return true;
-            }
+                _logger.Here().Error($"Unable to find wem file '{wemFileName}'.");
 
-            return ConvertWemToWav(wemFileName, audioFile.DataSource.ReadData());
-        }
-
-        public bool ConvertWemToWav(string wemFileName, byte[] wemBytes)
-        {
-            var result = _vgStreamWrapper.ConvertWemToWav(wemFileName, wemBytes);
+            var result = ConvertWemToWav(wemFileName, audioFile.DataSource.ReadData());
             if (result.IsSuccess)
             {
-                s_logger.Here().Information($"Wem file converted to wav.");
-                PlayWavFile(result.Item);
+                _logger.Here().Information($"Playing wav file.");
+                PlayWav(result.Item);
             }
             else
-                s_logger.Here().Error("Unable to export wav file.");
-
-            return result.IsSuccess;
+                _logger.Here().Error("Unable to play wav file.");
         }
 
-        public bool ConvertWemToWav(IAudioRepository audioRepository, uint sourceId, uint dataSoundbankId, int fileOffset, int byteCount)
+        public void PlayDataWem(uint sourceId, uint dataSoundbankId, int fileOffset, int byteCount)
         {
-            string dataSoundbankNameWithoutExtension = audioRepository.GetNameFromHash(dataSoundbankId, out bool found);
+            var dataSoundbankNameWithoutExtension = _audioRepository.GetNameFromID(dataSoundbankId, out var found);
             if (!found)
-            {
-                s_logger.Here().Warning($"Unable to find a name from hash '{dataSoundbankId}'.");
-                return false;
-            }
+                _logger.Here().Warning($"Unable to find a name from hash '{dataSoundbankId}'.");
 
-            string dataSoundbankFileName = $"{dataSoundbankNameWithoutExtension}.bnk";
-            PackFile packFile = audioRepository.PackFileMap[dataSoundbankFileName];
+            var dataSoundbankFileName = $"{dataSoundbankNameWithoutExtension}.bnk";
+            var packFile = _audioRepository.BnkPackFileLookupByName[dataSoundbankFileName];
             if (packFile == null)
-            {
-                s_logger.Here().Warning($"Unable to find packfile with name '{dataSoundbankFileName}'.");
-                return false;
-            }
+                _logger.Here().Warning($"Unable to find packfile with name '{dataSoundbankFileName}'.");
 
-            ByteChunk byteChunk = packFile.DataSource.ReadDataAsChunk();
+            var byteChunk = packFile.DataSource.ReadDataAsChunk();
             byteChunk.Advance(fileOffset);
-            byte[] wemBytes = byteChunk.ReadBytes(byteCount);
+            var wemBytes = byteChunk.ReadBytes(byteCount);
 
-            string outputFileName = $"{sourceId} - {dataSoundbankNameWithoutExtension} extract";
-            return ConvertWemToWav(outputFileName, wemBytes);
+            var outputFileName = $"{sourceId} - {dataSoundbankNameWithoutExtension} extract";
+            
+            var result = ConvertWemToWav(outputFileName, wemBytes);
+            if (result.IsSuccess)
+            {
+                _logger.Here().Information($"Playing wav file.");
+                PlayWav(result.Item);
+            }
+            else
+                _logger.Here().Error("Unable to play wav file.");
         }
 
-        public static void PlayWavFile(string audioFile)
+        private Result<string> ConvertWemToWav(string sourceID, byte[] wemBytes)
         {
-            s_logger.Here().Information($"Playing: {audioFile}");
+            _logger.Here().Information($"Trying to export '{sourceID}.wem' - {wemBytes.Length} bytes");
+
+            var wemFileName = $"{sourceID}.wem";
+            var wavFileName = $"{sourceID}.wav";
+            var wemFilePath = $"{AudioFolderName}\\{wemFileName}";
+            var wavFilePath = $"{AudioFolderName}\\{wavFileName}";
+
+            ExportFileToAEFolder(wemFileName, wemBytes);
+
+            return _vgStreamWrapper.ConvertFileUsingVgStream(wemFilePath, wavFilePath);
+        }
+
+        public void PlayWav(string wavFilePath)
+        {
+            _logger.Here().Information($"Playing: {wavFilePath}");
 
             using var process = new Process();
-            process.StartInfo = new ProcessStartInfo(audioFile)
+            process.StartInfo = new ProcessStartInfo(wavFilePath)
             {
                 UseShellExecute = true
             };
             process.Start();
         }
 
-        public static PackFile FindWemFile(string soundId, IPackFileService pfs)
+        private PackFile FindWemFile(string soundId)
         {
-            var audioFile = pfs.FindFile($"audio\\wwise\\{soundId}.wem");
+            var wemFile = _packFileService.FindFile($"audio\\wwise\\{soundId}.wem");
 
             foreach (var languageEnum in Enum.GetValues<GameLanguage>().Cast<GameLanguage>())
             {
-                var language = GameLanguageToStringMap[languageEnum];
+                var language = GameLanguageStringLookup[languageEnum];
 
-                if (audioFile == null)
-                    audioFile = pfs.FindFile($"audio\\wwise\\{language}\\{soundId}.wem");
+                if (wemFile == null)
+                    wemFile = _packFileService.FindFile($"audio\\wwise\\{language}\\{soundId}.wem");
                 else break;
             }
 
-            audioFile ??= pfs.FindFile($"audio\\{soundId}.wem");
-            return audioFile;
+            wemFile ??= _packFileService.FindFile($"audio\\{soundId}.wem");
+            return wemFile;
+        }
+
+        public void ExportFileToAEFolder(string fileName, byte[] bytes)
+        {
+            try
+            {
+                var wemFilePath = $"{AudioFolderName}\\{fileName}";
+                DirectoryHelper.EnsureFileFolderCreated(wemFilePath);
+                File.WriteAllBytes(wemFilePath, bytes);
+                _logger.Here().Information($"All bytes written to file at {wemFilePath}");
+            }
+            catch (Exception e)
+            {
+                _logger.Here().Error(e.Message);
+            }
         }
     }
 }

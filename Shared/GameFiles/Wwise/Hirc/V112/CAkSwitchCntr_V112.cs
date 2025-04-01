@@ -36,7 +36,7 @@ namespace Shared.GameFormats.Wwise.Hirc.V112
 
         public override byte[] WriteData() => throw new NotSupportedException("Users probably don't need this complexity.");
         public override void UpdateSectionSize() => throw new NotSupportedException("Users probably don't need this complexity.");
-        public uint GetDirectParentId() => NodeBaseParams.DirectParentId;
+        public uint GetDirectParentID() => NodeBaseParams.DirectParentId;
 
         public class CAkSwitchPackage_V112 : ICAkSwitchPackage
         {

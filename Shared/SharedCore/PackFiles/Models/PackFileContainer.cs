@@ -7,10 +7,10 @@ namespace Shared.Core.PackFiles.Models
         public string Name { get; set; }
         public PFHeader Header { get; set; }
         public bool IsCaPackFile { get; set; } = false;
-        public string SystemFilePath { get; set; }
+        public string SystemFilePath { get; set; } 
         public long OriginalLoadByteSize { get; set; } = -1;
 
-        public Dictionary<string, PackFile> FileList { get; set; } = new Dictionary<string, PackFile>();
+        public Dictionary<string, PackFile> FileList { get; set; } = [];
 
         public PackFileContainer(string name)
         {

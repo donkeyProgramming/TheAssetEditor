@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+﻿using System.Collections.Generic;
+using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Text;
 using Shared.Core.ByteParsing;
@@ -54,5 +55,30 @@ namespace Shared.GameFormats.RigidModel.Types
                 _boneIndex = _boneIndex,
             };
         }
+    }
+
+
+
+    public static class AttachmentPointHelper
+    {
+        public static List<RmvAttachmentPoint> CreateFromBoneList(List<string> boneNames)
+        {
+            var boneNamesUpdated = boneNames.Select(x => x.Replace("bn_", "")).ToList();
+
+            var output = new List<RmvAttachmentPoint >();
+            for (var i = 0; i < boneNamesUpdated.Count; i++)
+            {
+                var newPoint = new RmvAttachmentPoint
+                {
+                    BoneIndex = i,
+                    Name = boneNamesUpdated[i],
+                    Matrix = RmvMatrix3x4.Identity()
+                };
+                output.Add(newPoint);
+            }
+
+            return output;
+        }
+
     }
 }

@@ -35,17 +35,17 @@ namespace Editors.Reports.Audio
 
         public void PrintInfo()
         {
-            var allHircItems = _audioRepository.GetAllOfType<HircItem>();
-            foreach (var item in allHircItems)
-            {
-                if (item is ICAkDialogueEvent or ICAkEvent)
-                    ProcessItem(item);
-            }
+            var itemsToProcess = _audioRepository.GetHircItemsByType<HircItem>()
+                .Where(item => item is ICAkDialogueEvent or ICAkEvent)
+                .ToList();
+
+            foreach (var item in itemsToProcess)
+                ProcessItem(item);
         }
 
         private void ProcessItem(HircItem item)
         {
-            var itemName = _audioRepository.GetNameFromHash(item.Id);
+            var itemName = _audioRepository.GetNameFromID(item.ID);
             Console.WriteLine(itemName);
 
             var filePath = $"{DirectoryHelper.ReportsDirectory}\\dialogue_event_and_event_names.txt";

@@ -5,18 +5,18 @@ namespace Shared.GameFormats.Wwise.Hirc.V136.Shared
     public class AkDecisionTree_V136
     {
         public Node_V136 DecisionTree { get; set; } = new Node_V136(); // Root node of the decision tree in hierarchical form
-        public List<Node_V136> Nodes { get; set; } = []; // Flattened list of all nodes in the decision tree in sequential order  for read / write
+        public List<Node_V136> Nodes { get; set; } = []; // Flattened list of all nodes in the decision tree in sequential order for read / write
 
         public void ReadData(ByteChunk chunk, uint uTreeDataSize, uint maxTreeDepth)
         {
             Nodes = new List<Node_V136>();
             uint currentDepth = 0;
-            var countMax = uTreeDataSize / Node_V136.GetSize();
 
+            var countMax = uTreeDataSize / new Node_V136().GetSize();
             for (var i = 0; i < countMax; i++)
             {
                 Nodes.Add(Node_V136.ReadData(chunk, countMax, currentDepth, maxTreeDepth));
-                currentDepth ++;
+                currentDepth++;
             }
 
             ushort childrenCount = 1;
@@ -55,9 +55,9 @@ namespace Shared.GameFormats.Wwise.Hirc.V136.Shared
             {
                 memStream.Write(ByteParsers.UInt32.EncodeValue(node.Key ?? 0, out _), 0, 4);
 
-                if (node.AudioNodeId != 0)
+                if (node.AudioNodeID != 0)
                 {
-                    memStream.Write(ByteParsers.UInt32.EncodeValue(node.AudioNodeId, out _), 0, 4);
+                    memStream.Write(ByteParsers.UInt32.EncodeValue(node.AudioNodeID, out _), 0, 4);
                 }
                 else
                 {
@@ -93,7 +93,7 @@ namespace Shared.GameFormats.Wwise.Hirc.V136.Shared
         public class Node_V136
         {
             public uint? Key { get; set; }
-            public uint AudioNodeId { get; set; }
+            public uint AudioNodeID { get; set; }
             public ushort ChildrenIdx { get; set; }
             public ushort ChildrenCount { get; set; }
             public ushort Weight { get; set; }
@@ -112,7 +112,7 @@ namespace Shared.GameFormats.Wwise.Hirc.V136.Shared
                 var isAudioNode = node.ChildrenIdx > countMax || node.ChildrenCount > countMax;
                 var isMax = currentDepth == maxDepth;
                 if (isAudioNode || isMax)
-                    node.AudioNodeId = chunk.ReadUInt32();
+                    node.AudioNodeID = chunk.ReadUInt32();
                 else
                 {
                     node.ChildrenIdx = chunk.ReadUShort();
@@ -124,7 +124,16 @@ namespace Shared.GameFormats.Wwise.Hirc.V136.Shared
                 return node;
             }
 
-            public static uint GetSize() => 12;
+            public uint GetSize()
+            {
+                // Either ChildrenIdx and ChildrenCoun are used or AudioNodeID is used but in either case the same amount of bytes are used so doesn't matter which one is used to calculate the size here
+                var idSize = ByteHelper.GetPropertyTypeSize(Key);
+                var childrenIdxSize = ByteHelper.GetPropertyTypeSize(ChildrenIdx);
+                var childrenCountSize = ByteHelper.GetPropertyTypeSize(ChildrenCount);
+                var weightSize = ByteHelper.GetPropertyTypeSize(Weight);
+                var probabilitySize = ByteHelper.GetPropertyTypeSize(Probability);
+                return idSize + childrenIdxSize + childrenCountSize + weightSize + probabilitySize;
+            }
         }
     }
 }

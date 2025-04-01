@@ -15,7 +15,7 @@ namespace Shared.Ui.BaseDialogs.PackFileTree.ContextMenu
 
         protected override void Create(ContextMenuItem2 rootNode, TreeNode selectedNode)
         {
-            var nodeType = selectedNode.GetNodeType();
+            var nodeType = selectedNode.NodeType;
             switch (nodeType)
             {
                 case NodeType.File:
@@ -60,7 +60,7 @@ namespace Shared.Ui.BaseDialogs.PackFileTree.ContextMenu
             var isCaPack = selectedNode.FileOwner.IsCaPackFile;
             var isCurrentEditable = _packFileService.GetEditablePack() == selectedNode.FileOwner;
 
-            if (selectedNode.GetNodeType() == NodeType.Root)
+            if (selectedNode.NodeType == NodeType.Root)
             {
                 // Close
                 Add<ClosePackContainerFileCommand>(selectedNode, rootNode);

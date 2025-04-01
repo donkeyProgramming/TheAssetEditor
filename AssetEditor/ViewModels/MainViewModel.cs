@@ -25,11 +25,14 @@ namespace AssetEditor.ViewModels
         public MenuBarViewModel MenuBar { get; set; }
         public IEditorDatabase ToolsFactory { get; set; }
 
-        [ObservableProperty] IEditorManager _editorManager;
-        [ObservableProperty] private bool _isClosingWithoutPrompt;
-        [ObservableProperty] private string _applicationTitle;
-        [ObservableProperty] private string _currentGame;
-        [ObservableProperty] private string _editablePackFile;
+        [ObservableProperty] public partial IEditorManager EditorManager { get; set; }
+        [ObservableProperty] public partial bool IsClosingWithoutPrompt { get; set; }
+        [ObservableProperty] public partial string ApplicationTitle { get; set; }
+        [ObservableProperty] public partial string CurrentGame { get; set; }
+        [ObservableProperty] public partial string EditablePackFile { get; set; }
+        [ObservableProperty] public partial bool IsPackFileExplorerVisible { get; set; } = true;
+        [ObservableProperty] public partial GridLength FileTreeColumnWidth { get; set; } = new GridLength(0.28, GridUnitType.Star);
+
 
         public MainViewModel(
                 IEditorManager editorManager,
@@ -43,7 +46,7 @@ namespace AssetEditor.ViewModels
         {
             MenuBar = menuViewModel;
 
-            _editorManager = editorManager;
+            EditorManager = editorManager;
             _uiCommandFactory = uiCommandFactory;
 
             eventHub.Register<PackFileContainerSetAsMainEditableEvent>(this, SetStatusBarEditablePackFile);
@@ -62,7 +65,7 @@ namespace AssetEditor.ViewModels
         [RelayCommand] private void Closing(IEditorInterface editor) 
         {
             var hasUnsavedPackFiles = FileTree.Files.Any(node => node.UnsavedChanged);
-            if (_editorManager.ShouldBlockCloseCommand(editor, hasUnsavedPackFiles))
+            if (EditorManager.ShouldBlockCloseCommand(editor, hasUnsavedPackFiles))
             {
                 IsClosingWithoutPrompt = true;
                 return;
@@ -74,14 +77,15 @@ namespace AssetEditor.ViewModels
                 MessageBoxButton.YesNo) == MessageBoxResult.Yes;
         }
 
-        [RelayCommand] void CloseTool(IEditorInterface tool) => _editorManager.CloseTool(tool);
-        [RelayCommand] void CloseOtherTools(IEditorInterface tool) => _editorManager.CloseOtherTools(tool);
-        [RelayCommand] void CloseAllTools(IEditorInterface tool) => _editorManager.CloseAllTools(tool);
-        [RelayCommand] void CloseToolsToLeft(IEditorInterface tool) => _editorManager.CloseToolsToLeft(tool);
-        [RelayCommand] void CloseToolsToRight(IEditorInterface tool) => _editorManager.CloseToolsToRight(tool);
+        [RelayCommand] void CloseTool(IEditorInterface tool) => EditorManager.CloseTool(tool);
+      
+        [RelayCommand] void CloseOtherTools(IEditorInterface tool) => EditorManager.CloseOtherTools(tool);
+        [RelayCommand] void CloseAllTools(IEditorInterface tool) => EditorManager.CloseAllTools(tool);
+        [RelayCommand] void CloseToolsToLeft(IEditorInterface tool) => EditorManager.CloseToolsToLeft(tool);
+        [RelayCommand] void CloseToolsToRight(IEditorInterface tool) => EditorManager.CloseToolsToRight(tool);
 
         public bool AllowDrop(IEditorInterface node, IEditorInterface targetNode = default, bool insertAfterTargetNode = default) => true;
-        public bool Drop(IEditorInterface node, IEditorInterface targetNode = default, bool insertAfterTargetNode = default) => _editorManager.Drop(node, targetNode, insertAfterTargetNode);
+        public bool Drop(IEditorInterface node, IEditorInterface targetNode = default, bool insertAfterTargetNode = default) => EditorManager.Drop(node, targetNode, insertAfterTargetNode);
 
         private void SetStatusBarEditablePackFile(PackFileContainerSetAsMainEditableEvent e)
         {

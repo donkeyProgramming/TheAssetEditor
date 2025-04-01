@@ -30,7 +30,7 @@ namespace Editors.KitbasherEditor.ViewModels.SceneExplorer.Nodes.MeshSubViews
 
         [ObservableProperty] MetalRoughViewModel? _metalRough;
         [ObservableProperty] SpecGlossViewModel? _specGloss;
-        [ObservableProperty] DirtAndDecalViewModel? _decalAndDirt;
+        [ObservableProperty] AdvancedRmvMaterialViewModel? _advanceRvmMaterial;
         [ObservableProperty] BloodViewModel? _blood;
         [ObservableProperty] EmissiveViewModel? _emissive;
         [ObservableProperty] TintViewModel? _tint;
@@ -54,7 +54,7 @@ namespace Editors.KitbasherEditor.ViewModels.SceneExplorer.Nodes.MeshSubViews
 
             MetalRough = CreateCapabilityView<MetalRoughCapability, MetalRoughViewModel>(material, (cap) => new MetalRoughViewModel(cap, _uiCommandFactory, _packFileService, _resourceLibrary, _packFileUiProvider));
             SpecGloss = CreateCapabilityView<SpecGlossCapability, SpecGlossViewModel>(material, (cap) => new SpecGlossViewModel(cap, _uiCommandFactory, _packFileService, _resourceLibrary, _packFileUiProvider));
-            DecalAndDirt = CreateCapabilityView<DirtAndDecalCapability, DirtAndDecalViewModel>(material, (cap) => new DirtAndDecalViewModel(cap, _uiCommandFactory, _packFileService, _resourceLibrary, _packFileUiProvider));
+            AdvanceRvmMaterial = CreateCapabilityView<AdvancedMaterialCapability, AdvancedRmvMaterialViewModel>(material, (cap) => new AdvancedRmvMaterialViewModel(cap, _uiCommandFactory, _packFileService, _resourceLibrary, _packFileUiProvider));
             Blood = CreateCapabilityView<BloodCapability, BloodViewModel>(material, (cap) => new BloodViewModel(cap, _uiCommandFactory, _packFileService, _resourceLibrary, _packFileUiProvider));
             Emissive = CreateCapabilityView<EmissiveCapability, EmissiveViewModel>(material, (cap) => new EmissiveViewModel(cap, _uiCommandFactory, _packFileService, _resourceLibrary, _packFileUiProvider));
             Tint = CreateCapabilityView<TintCapability, TintViewModel>(material, (cap) => new TintViewModel(cap));

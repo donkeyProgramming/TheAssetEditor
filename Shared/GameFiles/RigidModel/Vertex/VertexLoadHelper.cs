@@ -1,9 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Shared.Core.ByteParsing;
 using Shared.GameFormats.RigidModel.Transforms;
-
 using Half = SharpDX.Half;
-
 namespace Shared.GameFormats.RigidModel.Vertex
 {
     public static class VertexLoadHelper
@@ -29,6 +27,25 @@ namespace Shared.GameFormats.RigidModel.Vertex
                 Y = y,
                 Z = z,
                 W = w
+            };
+        }
+
+        static public Vector4 CreatVector4HalfFloat2(Half x, Half y, Half z, Half w)
+        {
+            if (w != 0.0f)
+            {
+                x *= w;
+                y *= w;
+                z *= w;
+                w = 0;
+            }
+
+            return new Vector4()
+            {
+                X = x,
+                Y = y,
+                Z = z,
+                W = 1
             };
         }
 
@@ -78,6 +95,54 @@ namespace Shared.GameFormats.RigidModel.Vertex
             return v;
         }
 
+
+        static public Vector3 CreatVector3_FromByte(ByteVector4 vector)
+        {
+            var w = ByteToNormal(vector.W);
+            var v = new Vector3()
+            {
+                X = ByteToNormal(vector.X),
+                Y = ByteToNormal(vector.Y),
+                Z = ByteToNormal(vector.Z),
+               
+            };
+
+            if (w > 0.0f)
+            {
+                v.X *= w;
+                v.Y *= w;
+                v.Z *= w;
+            }
+
+            return v;
+        }
+
+        static public Vector4 CreatVector4_FromByte(ByteVector4 vector)
+        {
+  
+            var v = new Vector4()
+            {
+                X = ByteToNormal(vector.X),
+                Y = ByteToNormal(vector.Y),
+                Z = ByteToNormal(vector.Z),
+                W = ByteToNormal(vector.W)
+
+            };
+
+            if (v.W > 0.0f)
+            {
+                v.X *= v.W;
+                v.Y *= v.W;
+                v.Z *= v.W;
+            }
+
+            return v;
+        }
+
+
+
+
+
         static public RmvVector2 CreatVector2HalfFloat(byte[] data)
         {
             ByteParsers.Float16.TryDecodeValue(data, 0, out var x, out _, out _);
@@ -88,6 +153,11 @@ namespace Shared.GameFormats.RigidModel.Vertex
                 Y = y
             };
         }
+
+
+
+
+
 
         static public float ByteToNormal(byte b)
         {
@@ -229,6 +299,18 @@ namespace Shared.GameFormats.RigidModel.Vertex
             return output;
         }
 
+        static public HalfVector4 CreatePositionVector4ExtraPrecision_v2(Microsoft.Xna.Framework.Vector4 vector)
+        {
+            var v = ConvertertVertexToHalfExtraPrecision(vector);
+            return new HalfVector4()
+            {
+                X = v.X,
+                Y = v.Y,
+                Z = v.Z,
+                W = v.W,
+            };
+        }
+
         static public byte[] CreatePositionVector2(Microsoft.Xna.Framework.Vector2 vector)
         {
             var output = new byte[4];
@@ -253,6 +335,17 @@ namespace Shared.GameFormats.RigidModel.Vertex
             return output;
         }
 
+        static public ByteVector4 CreateNormalVector3_v2(Microsoft.Xna.Framework.Vector3 vector)
+        {
+            return new ByteVector4()
+            {
+                X = NormalToByte(vector.X),
+                Y = NormalToByte(vector.Y),
+                Z = NormalToByte(vector.Z),
+                W = NormalToByte(-1),
+            };
+        }
+
 
         static public byte[] Create4BytesFromVector4(Microsoft.Xna.Framework.Vector4 vector)
         {
@@ -262,6 +355,17 @@ namespace Shared.GameFormats.RigidModel.Vertex
             output[2] = NormalToByte(vector.Z);
             output[3] = NormalToByte(vector.W);
             return output;            
+        }
+
+        static public ByteVector4 Create4BytesFromVector4_v2(Microsoft.Xna.Framework.Vector4 vector)
+        {
+            return new ByteVector4()
+            {
+                X = NormalToByte(vector.X),
+                Y = NormalToByte(vector.Y),
+                Z = NormalToByte(vector.Z),
+                W = NormalToByte(vector.W),
+            };
         }
     }
 }

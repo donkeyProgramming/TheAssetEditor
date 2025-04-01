@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using GameWorld.Core.Components;
+﻿using GameWorld.Core.Components;
 using GameWorld.Core.Components.Selection;
 using GameWorld.Core.SceneNodes;
 
@@ -7,10 +6,10 @@ namespace GameWorld.Core.Services
 {
     public class ViewOnlySelectedService
     {
-        SceneManager _sceneManager;
-        SelectionManager _selectionManager;
+        private readonly SceneManager _sceneManager;
+        private readonly SelectionManager _selectionManager;
 
-        Dictionary<ISceneNode, bool> _visMap;
+        Dictionary<ISceneNode, bool>? _visMap;
 
         public ViewOnlySelectedService(SceneManager sceneManager, SelectionManager selectionManager)
         {

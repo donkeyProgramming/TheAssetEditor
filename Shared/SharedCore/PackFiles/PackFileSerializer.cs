@@ -51,6 +51,9 @@ namespace Shared.Core.PackFiles
                     FilePath = packFileSystemPath,
                 };
 
+
+                //var buffer = reader.ReadBytes((int)output.Header.DataStart - 28);
+
                 var offset = output.Header.DataStart;
                 var headerVersion = output.Header.Version;
                 for (var i = 0; i < output.Header.FileCount; i++)
@@ -87,14 +90,13 @@ namespace Shared.Core.PackFiles
                         }
                         else
                         {
-                            output.FileList.Add(fullPackedFileName, fileContent);
+                            output.FileList[fullPackedFileName] = fileContent;
                         }
                     }
                     else
                     {
-                        output.FileList.Add(fullPackedFileName, fileContent);
+                        output.FileList[fullPackedFileName] = fileContent;
                     }
-
 
                     offset += size;
                 }

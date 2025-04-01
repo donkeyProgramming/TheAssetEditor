@@ -42,7 +42,7 @@ namespace Shared.GameFormats.Wwise.Hirc.V136
         public override void UpdateSectionSize() => throw new NotSupportedException("Users probably don't need this complexity.");
         public override byte[] WriteData() => throw new NotSupportedException("Users probably don't need this complexity.");
 
-        public List<uint> GetChildren() => SourceList.Select(x => x.AkMediaInformation.SourceId).ToList();
+        public List<uint> GetChildren() => SourceList.Select(x => x.AkMediaInformation.SourceID).ToList();
 
         public class AkTrackSrcInfo_V136
         {

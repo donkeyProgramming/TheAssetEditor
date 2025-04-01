@@ -100,6 +100,14 @@ namespace GameWorld.Core.Components
             return output;
         }
 
+        public ISelectable? GetByIndex(int index)
+        {
+            var allNodes = SceneNodeHelper.GetChildrenOfType<ISelectable>(RootNode);
+            if(allNodes.Count == 0 || allNodes.Count < index)
+                return null;
+            return allNodes[index];
+        }
+
         void SelectObjectsHirarchy(ISceneNode root, BoundingFrustum frustrum, List<ISelectable> output_selectedNodes)
         {
             if (root.IsVisible)

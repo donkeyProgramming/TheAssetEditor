@@ -12,11 +12,11 @@ namespace Shared.Ui.BaseDialogs.PackFileTree.ValueConverters
         {
             if (value is TreeNode node)
             {
-                if (node.GetNodeType() == NodeType.Root)
+                if (node.NodeType == NodeType.Root)
                     return IconLibrary.CollectionIcon;
-                else if (node.GetNodeType() == NodeType.Directory)
+                else if (node.NodeType == NodeType.Directory)
                     return IconLibrary.FolderIcon;
-                if (node.GetNodeType() == NodeType.File)
+                if (node.NodeType == NodeType.File)
                     return IconLibrary.FileIcon;
             }
 

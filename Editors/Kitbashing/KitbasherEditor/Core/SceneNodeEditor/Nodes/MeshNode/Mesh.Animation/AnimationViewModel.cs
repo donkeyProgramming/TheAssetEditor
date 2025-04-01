@@ -1,7 +1,8 @@
 ﻿using System.Windows;
 using CommunityToolkit.Mvvm.ComponentModel;
-using Editors.Shared.Core.Services;
+using Editors.KitbasherEditor.Core;
 using GameWorld.Core.SceneNodes;
+using GameWorld.Core.Services;
 using GameWorld.Core.Utility;
 using Shared.Ui.Common;
 using Shared.Ui.Editors.BoneMapping;
@@ -11,14 +12,15 @@ namespace Editors.KitbasherEditor.ViewModels.SceneExplorer.Nodes.Rmv2
     public partial class AnimationViewModel : ObservableObject, IDisposable
     {
         private readonly KitbasherRootScene _kitbasherRootScene;
-        private readonly SkeletonAnimationLookUpHelper _animLookUp;
-        Rmv2MeshNode _meshNode;
+        private readonly ISkeletonAnimationLookUpHelper _animLookUp;
+        Rmv2MeshNode? _meshNode;
 
-        [ObservableProperty] string _skeletonName = string.Empty;
-        [ObservableProperty] List<AnimatedBone> _animatedBones;
-        [ObservableProperty] FilterCollection<AnimatedBone> _attachableBones = new(null);
+        [ObservableProperty] public partial string SkeletonName { get; set; } = string.Empty;
+        [ObservableProperty] public partial List<AnimatedBone> AnimatedBones  { get; set; }
+        [ObservableProperty] public partial FilterCollection<AnimatedBone> AttachableBones { get; set; } = new(null);
+        [ObservableProperty] public partial int AnimationMatrixOverride { get; set; } = -1;
 
-        public AnimationViewModel(KitbasherRootScene kitbasherRootScene, SkeletonAnimationLookUpHelper animLookUp)
+        public AnimationViewModel(KitbasherRootScene kitbasherRootScene, ISkeletonAnimationLookUpHelper animLookUp)
         {
             _kitbasherRootScene = kitbasherRootScene;
             _animLookUp = animLookUp;
@@ -28,6 +30,7 @@ namespace Editors.KitbasherEditor.ViewModels.SceneExplorer.Nodes.Rmv2
         {
             _meshNode = meshNode;
 
+            AnimationMatrixOverride = _meshNode.AnimationMatrixOverride;
             SkeletonName = _meshNode.Geometry.SkeletonName;
 
             var skeletonFile = _animLookUp.GetSkeletonFileFromName(SkeletonName);
@@ -86,6 +89,13 @@ namespace Editors.KitbasherEditor.ViewModels.SceneExplorer.Nodes.Rmv2
                 _meshNode.AttachmentPointName = null;
                 _meshNode.AttachmentBoneResolver = null;
             }
+        }
+
+        partial void OnAnimationMatrixOverrideChanged(int value)
+        {
+            if(_meshNode==null) 
+                return;
+            _meshNode.AnimationMatrixOverride = value;
         }
 
         public void Dispose()

@@ -69,7 +69,7 @@ namespace Editors.Audio.Utility
             }
             else
             {
-                var unknownNode = new HircTreeItem() { DisplayName = $"Unknown node type {item.HircType} for Id {item.Id} in {item.OwnerFile}", Item = item };
+                var unknownNode = new HircTreeItem() { DisplayName = $"Unknown node type {item.HircType} for Id {item.ID} in {item.OwnerFilePath}", Item = item };
                 parent.Children.Add(unknownNode);
             }
         }
@@ -97,7 +97,7 @@ namespace Editors.Audio.Utility
 
         protected virtual string GetDisplayId(uint id, string fileName, bool hidenNameIfMissing)
         {
-            var name = _repository.GetNameFromHash(id, out var found);
+            var name = _repository.GetNameFromID(id, out var found);
             if (hidenNameIfMissing)
                 name = "";
             if (found == true && _showId)
@@ -107,13 +107,13 @@ namespace Editors.Audio.Utility
             return name;
         }
 
-        protected string GetDisplayId(HircItem item, bool hidenNameIfMissing) => GetDisplayId(item.Id, item.OwnerFile, hidenNameIfMissing);
+        protected string GetDisplayId(HircItem item, bool hidenNameIfMissing) => GetDisplayId(item.ID, item.OwnerFilePath, hidenNameIfMissing);
 
         protected Wanted GetAsType<Wanted>(HircItem instance) where Wanted : class
         {
             var wanted = instance as Wanted;
             if (wanted == null)
-                throw new Exception($"HircItem with ID {instance.Id} is of type {instance.GetType().Name} and cannot be converted to {typeof(Wanted).Name}.");
+                throw new Exception($"HircItem with ID {instance.ID} is of type {instance.GetType().Name} and cannot be converted to {typeof(Wanted).Name}.");
             return wanted;
         }
     }

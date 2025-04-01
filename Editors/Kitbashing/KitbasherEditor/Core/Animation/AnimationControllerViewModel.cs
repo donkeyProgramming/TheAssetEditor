@@ -2,16 +2,16 @@
 using System.IO;
 using System.Windows.Input;
 using CommunityToolkit.Mvvm.Input;
+using Editors.KitbasherEditor.Core;
 using Editors.KitbasherEditor.Events;
-using Editors.Shared.Core.Services;
 using GameWorld.Core.Animation;
+using GameWorld.Core.Services;
 using Shared.Core.Events;
 using Shared.Core.Misc;
 using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
 using Shared.GameFormats.Animation;
 using static CommonControls.FilterDialog.FilterUserControl;
-using static Editors.Shared.Core.Services.SkeletonAnimationLookUpHelper;
 
 namespace Editors.KitbasherEditor.ViewModels
 {
@@ -22,7 +22,7 @@ namespace Editors.KitbasherEditor.ViewModels
         PackFile _skeletonPackFile;
         PackFile Animation;
 
-        private readonly SkeletonAnimationLookUpHelper _skeletonAnimationLookUpHelper;
+        private readonly ISkeletonAnimationLookUpHelper _skeletonAnimationLookUpHelper;
         private readonly KitbasherRootScene _kitbasherRootScene;
         private readonly AnimationPlayer _player;
 
@@ -62,8 +62,8 @@ namespace Editors.KitbasherEditor.ViewModels
         bool _isEnabled;
         public bool IsEnabled { get { return _isEnabled; } set { SetAndNotify(ref _isEnabled, value); OnEnableChanged(IsEnabled); } }
 
-        public AnimationControllerViewModel(IPackFileService pf, 
-            SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper,
+        public AnimationControllerViewModel(IPackFileService pf,
+            ISkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper,
             IEventHub eventHub,
             KitbasherRootScene kitbasherRootScene)
         {

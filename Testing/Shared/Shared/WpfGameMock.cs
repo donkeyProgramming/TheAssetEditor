@@ -9,31 +9,39 @@ namespace Test.TestingUtility.Shared
 {
     public class WpfGameMock : IWpfGame
     {
+        static GraphicsDeviceServiceMock? s_instance;
+        static ContentManager? s_contentManager;
+
         public ContentManager Content { get; set; }
         public GraphicsDevice GraphicsDevice { get; private set; }
 
         public WpfGameMock()
         {
-            var test = new GraphicsDeviceServiceMock();
-            GraphicsDevice = test.GraphicsDevice;
-
-            var services = new GameServiceContainer();
-            services.AddService(typeof(IGraphicsDeviceService), test);
-            var fullPath = PathHelper.GetDataFolder("GameWorld\\ContentProject\\bin\\Debug\\net9.0-windows\\Content");
-
-            //var fullPath = Path.GetFullPath(@"..\..\..\..\..\GameWorld\ContentProject\bin\Debug\net9.0-windows\Content");
-            if (Directory.Exists(fullPath) == false)
+            if (s_instance == null)
             {
-                
-                throw new Exception("Unable to determine full path of content folder");
-            }
-                
+                var mock = new GraphicsDeviceServiceMock();
+                var services = new GameServiceContainer();
+                services.AddService<IGraphicsDeviceService>(mock);
+                var fullPath = PathHelper.GetDataFolder("GameWorld\\ContentProject\\bin\\Debug\\net9.0-windows\\Content");
 
-            Content = new ContentManager(services, fullPath);
+                //var fullPath = Path.GetFullPath(@"..\..\..\..\..\GameWorld\ContentProject\bin\Debug\net9.0-windows\Content");
+                if (Directory.Exists(fullPath) == false)
+                {
+                    throw new Exception("Unable to determine full path of content folder");
+                }
+
+                s_instance = mock;
+                s_contentManager = new ContentManager(services, fullPath);
+            }
+
+
+            GraphicsDevice = s_instance.GraphicsDevice;
+            Content = s_contentManager!;
         }
 
         public T AddComponent<T>(T comp) where T : IGameComponent
         {
+            comp.Initialize();
             return comp;
         }
 

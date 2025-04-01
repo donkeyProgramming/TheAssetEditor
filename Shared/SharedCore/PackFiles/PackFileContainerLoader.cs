@@ -95,10 +95,21 @@ namespace Shared.Core.PackFiles
             try
             {
                 _logger.Here().Information($"Loading pack files for {gameName} located in {gameDataFolder}");
-                var allCaPackFiles = ManifestHelper.GetPackFilesFromManifest(gameDataFolder);
-           
+                var allCaPackFiles = ManifestHelper.GetPackFilesFromManifest(gameDataFolder, out var manifestFileFound);
+
+                // When loading ca pack packs, we want to use the CA resolver as its faster. 
+                // If there is no manifest file, we need to use the duplicate resolver as it loads all file in the folder.
+                // There might be custom mods in there that does not follow the rules! 
+                IDuplicatePackFileResolver packfileResolver = new CaPackDuplicatePackFileResolver();
+                if (manifestFileFound == false)
+                {
+                    _logger.Here().Warning($"Loading pack files for {gameName}, which does not uses manifest.txt. If there are MODs in the game folder, this might cause issues!");
+                    packfileResolver = new CustomPackDuplicatePackFileResolver();
+                }
 
                 var packList = new List<PackFileContainer>();
+                
+                //foreach(var packFilePath in allCaPackFiles)
                 Parallel.ForEach(allCaPackFiles, packFilePath =>
                 {
                     var path = gameDataFolder + "\\" + packFilePath;
@@ -107,14 +118,15 @@ namespace Shared.Core.PackFiles
                         using var fileStram = File.OpenRead(path);
                         using var reader = new BinaryReader(fileStram, Encoding.ASCII);
 
-                        var pack = PackFileSerializer.Load(path, reader, new CaPackDuplicatePackFileResolver());
+                        var pack = PackFileSerializer.Load(path, reader, packfileResolver);
                         packList.Add(pack);
                     }
                     else
                     {
                         _logger.Here().Warning($"{gameName} pack file '{path}' not found, loading skipped");
                     }
-                });
+                }
+                );
 
                 var caPackFileContainer = new PackFileContainer($"All Game Packs - {gameName}");
                 caPackFileContainer.IsCaPackFile = true;

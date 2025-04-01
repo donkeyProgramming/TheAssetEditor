@@ -1,6 +1,4 @@
-﻿using System.Windows.Controls;
-using Newtonsoft.Json.Linq;
-using Shared.Core.ByteParsing;
+﻿using Shared.Core.ByteParsing;
 using Shared.GameFormats.RigidModel.Transforms;
 
 namespace Shared.GameFormats.RigidModel.MaterialHeaders

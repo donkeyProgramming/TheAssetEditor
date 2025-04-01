@@ -3,6 +3,7 @@ using Editors.KitbasherEditor.ChildEditors.PinTool;
 using Editors.KitbasherEditor.ChildEditors.PinTool.Commands;
 using Editors.KitbasherEditor.ChildEditors.ReRiggingTool;
 using Editors.KitbasherEditor.ChildEditors.VertexDebugger;
+using Editors.KitbasherEditor.Core;
 using Editors.KitbasherEditor.Core.MenuBarViews;
 using Editors.KitbasherEditor.EventHandlers;
 using Editors.KitbasherEditor.Services;

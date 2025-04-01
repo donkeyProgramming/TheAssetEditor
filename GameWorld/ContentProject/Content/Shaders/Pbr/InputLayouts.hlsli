@@ -12,6 +12,8 @@ struct VertexInputType
 
     float4 Weights : COLOR;
     float4 BoneIndices : BLENDINDICES0;
+    
+    float2 tex1 : TEXCOORD0;
 };
 
 struct PixelInputType

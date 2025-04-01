@@ -1,4 +1,5 @@
-﻿using Shared.Core.Events;
+﻿using System.Diagnostics;
+using Shared.Core.Events;
 using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
 using Shared.Core.ToolCreation;
@@ -20,6 +21,14 @@ namespace Shared.Ui.Events.UiCommands
         {
             var editor = _editorCreator.CreateFromFile(file, preferedEditor);
             return editor;
+        }
+
+        public IEditorInterface Execute(string file, EditorEnums? preferedEditor = null)
+        {
+            var packFile = _packFileService.FindFile(file);
+            Debug.Assert(packFile != null, "File not found: " + file);
+            
+            return Execute(packFile, preferedEditor);
         }
 
         public IEditorInterface Execute(EditorEnums editorEnum)

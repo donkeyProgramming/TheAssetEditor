@@ -5,7 +5,7 @@ namespace Shared.GameFormats.Wwise.Hirc.V112.Shared
     public class PositioningParams_V112
     {
         public byte ByVector { get; set; }
-        public byte Bits3d { get; set; }
+        public byte Bits3D { get; set; }
         public uint AttenuationId { get; set; }
         public byte PathMode { get; set; }
         public float TransitionTime { get; set; }
@@ -22,10 +22,10 @@ namespace Shared.GameFormats.Wwise.Hirc.V112.Shared
 
             if (bPositioningInfoOverrideParent && cbIs3DPositioningAvailable)
             {
-                Bits3d = chunk.ReadByte();
+                Bits3D = chunk.ReadByte();
                 AttenuationId = chunk.ReadUInt32();
 
-                if ((Bits3d >> 0 & 1) == 0)
+                if ((Bits3D >> 0 & 1) == 0)
                 {
                     PathMode = chunk.ReadByte();
                     TransitionTime = chunk.ReadSingle();
@@ -46,7 +46,7 @@ namespace Shared.GameFormats.Wwise.Hirc.V112.Shared
 
         public byte[] WriteData()
         {
-            if (ByVector == 0x03 && Bits3d == 0x08)
+            if (ByVector == 0x03 && Bits3D == 0x08)
                 return [0x03, 0x08];
             else if (ByVector == 0x00)
                 return [0x00];
@@ -56,7 +56,7 @@ namespace Shared.GameFormats.Wwise.Hirc.V112.Shared
 
         public uint GetSize()
         {
-            if (ByVector == 0x03 && Bits3d == 0x08)
+            if (ByVector == 0x03 && Bits3D == 0x08)
                 return 2;
             else if (ByVector == 0x00)
                 return 1;

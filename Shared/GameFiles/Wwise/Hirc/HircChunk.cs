@@ -8,10 +8,10 @@ namespace Shared.GameFormats.Wwise.Hirc
         public uint NumHircItems { get; set; }
         public List<HircItem> HircItems { get; set; } = [];
 
-        public void SetFromHircList(List<HircItem> hircList)
+        public void WriteData(List<HircItem> hircList)
         {
             HircItems.AddRange(hircList);
-            ChunkHeader.ChunkSize = (uint)(hircList.Sum(x => x.SectionSize) + hircList.Count * 5 + 4);
+            ChunkHeader.ChunkSize = (uint)(hircList.Sum(x => x.SectionSize) + hircList.Count * 5 + 4); //TODO: Replace these numbers with actual variables for what they represent
             NumHircItems = (uint)hircList.Count;
         }
     }

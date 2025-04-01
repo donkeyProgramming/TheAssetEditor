@@ -8,7 +8,10 @@
         xmlns:datatemplates="clr-namespace:Shared.Ui.Common.DataTemplates;assembly=Shared.Ui"
         xmlns:behaviors="clr-namespace:Shared.Ui.Common.Behaviors;assembly=Shared.Ui" 
         xmlns:common="clr-namespace:Shared.Ui.Common;assembly=Shared.Ui"
-        xmlns:local="clr-namespace:AssetEditor" xmlns:materialIcons="clr-namespace:Material.Icons.WPF;assembly=Material.Icons.WPF"
+        xmlns:local="clr-namespace:AssetEditor" 
+        xmlns:materialIcons="clr-namespace:Material.Icons.WPF;assembly=Material.Icons.WPF" 
+        xmlns:viewmodels="clr-namespace:AssetEditor.ViewModels" 
+        d:DataContext="{d:DesignInstance Type=viewmodels:MainViewModel}"
         mc:Ignorable="d"
         behaviors:WindowCancellableClosingBehavior.Closing="{Binding ClosingCommand}"
         behaviors:WindowCancellableClosingBehavior.IsClosingWithoutPrompt="{Binding IsClosingWithoutPrompt}"
@@ -39,6 +42,7 @@
 
     <Window.Resources>
         <datatemplates:EditorTemplateSelector x:Key="EditorSelector" />
+        <BooleanToVisibilityConverter x:Key="BoolToVisibilityConverter" />
     </Window.Resources>
 
     <Grid x:Name="rootGrid">
@@ -128,35 +132,43 @@
         <Border Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3">
             <Grid>
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="0.28*" MinWidth="30"/>
+                    <ColumnDefinition Width="{Binding FileTreeColumnWidth}"/>
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
 
-                <views:FileTreeView Grid.Row="1" Grid.Column="0" DataContext="{Binding FileTree}" Padding="10, 0, 10, 5" BorderBrush="{DynamicResource App.Border}" BorderThickness="0, 1, 1, 0"/>
+                <views:FileTreeView  
+                    Grid.Row="1" 
+                    Grid.Column="0" 
+                    DataContext="{Binding FileTree}" 
+                    Padding="10, 0, 10, 5" 
+                    BorderBrush="{DynamicResource App.Border}" 
+                    BorderThickness="0, 1, 1, 0" 
+                    Visibility="{Binding IsPackFileExplorerVisible, Converter={StaticResource BoolToVisibilityConverter}}"/>
 
-                <GridSplitter Grid.Row="1" Grid.RowSpan="1" Grid.Column="1" Width="2.9" HorizontalAlignment="Stretch" Background="{DynamicResource App.Border}"/>
+                <GridSplitter Grid.Row="1" Grid.RowSpan="1" Grid.Column="1" Width="2.9" HorizontalAlignment="Stretch" Background="{DynamicResource App.Border}" 
+                              Visibility="{Binding IsPackFileExplorerVisible, Converter={StaticResource BoolToVisibilityConverter}}"/>
 
                 <TabControl Grid.Row="1" Grid.Column="2" ItemsSource="{Binding EditorManager.CurrentEditorsList, UpdateSourceTrigger=PropertyChanged}" 
-                            SelectedIndex="{Binding EditorManager.SelectedEditorIndex, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" 
-                            ContentTemplateSelector="{StaticResource EditorSelector}" viewFactory:ToolFactoryParameter.ViewFactory="{Binding ToolsFactory}"
-                            Name="EditorsTabControl" BorderThickness="1, 1, 0, 0" >
+                        SelectedIndex="{Binding EditorManager.SelectedEditorIndex, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" 
+                        ContentTemplateSelector="{StaticResource EditorSelector}" viewFactory:ToolFactoryParameter.ViewFactory="{Binding ToolsFactory}"
+                        Name="EditorsTabControl" BorderThickness="1, 1, 0, 0" >
 
-                    <TabControl.Resources>
-                        <common:BindingProxy x:Key="Proxy" Data="{Binding}" />
-                    </TabControl.Resources>
+                <TabControl.Resources>
+                    <common:BindingProxy x:Key="Proxy" Data="{Binding}" />
+                </TabControl.Resources>
 
-                    <TabControl.ItemContainerStyle>
-                        <Style TargetType="TabItem" BasedOn="{StaticResource {x:Type TabItem}}">
-                            <EventSetter Event="Drop" Handler="TabItem_Drop"/>
-                            <EventSetter Event="PreviewMouseMove" Handler="TabItem_MouseMove"/>
-                            <EventSetter Event="PreviewMouseDown" Handler="TabItem_MouseDown"/>
-                            <Setter Property="AllowDrop" Value="True"/>
-                            <Setter Property="Focusable" Value="False"/>
-                            <Setter Property="behaviors:MouseMiddleClick.Command" Value="{Binding Source={StaticResource Proxy}, Path=Data.CloseToolCommand}"/>
-                            <Setter Property="behaviors:MouseMiddleClick.CommandParameter" Value="{Binding}"/>
-                        </Style>
-                    </TabControl.ItemContainerStyle>
+                <TabControl.ItemContainerStyle>
+                    <Style TargetType="TabItem" BasedOn="{StaticResource {x:Type TabItem}}">
+                        <EventSetter Event="Drop" Handler="TabItem_Drop"/>
+                        <EventSetter Event="PreviewMouseMove" Handler="TabItem_MouseMove"/>
+                        <EventSetter Event="PreviewMouseDown" Handler="TabItem_MouseDown"/>
+                        <Setter Property="AllowDrop" Value="True"/>
+                        <Setter Property="Focusable" Value="False"/>
+                        <Setter Property="behaviors:MouseMiddleClick.Command" Value="{Binding Source={StaticResource Proxy}, Path=Data.CloseToolCommand}"/>
+                        <Setter Property="behaviors:MouseMiddleClick.CommandParameter" Value="{Binding}"/>
+                    </Style>
+                </TabControl.ItemContainerStyle>
 
                     <TabControl.ItemTemplate>
                         <DataTemplate>
@@ -173,21 +185,21 @@
                                 <Grid.ContextMenu>
                                     <ContextMenu>
                                         <MenuItem Header="Close"
-                                              Command="{Binding Source={StaticResource Proxy}, Path=Data.CloseToolCommand}"
-                                              CommandParameter="{Binding Source={StaticResource GridProxy}, Path=Data}" />
+                                            Command="{Binding Source={StaticResource Proxy}, Path=Data.CloseToolCommand}"
+                                            CommandParameter="{Binding Source={StaticResource GridProxy}, Path=Data}" />
                                         <MenuItem Header="Close Multiple">
                                             <MenuItem Header="Close Other Tabs"
-                                                  Command="{Binding Source={StaticResource Proxy}, Path=Data.CloseOtherToolsCommand}"
-                                                  CommandParameter="{Binding Source={StaticResource GridProxy}, Path=Data}"/>
+                                                Command="{Binding Source={StaticResource Proxy}, Path=Data.CloseOtherToolsCommand}"
+                                                CommandParameter="{Binding Source={StaticResource GridProxy}, Path=Data}"/>
                                             <MenuItem Header="Close All Tabs"
-                                                  Command="{Binding Source={StaticResource Proxy}, Path=Data.CloseAllToolsCommand}"
-                                                  CommandParameter="{Binding Source={StaticResource GridProxy}, Path=Data}"/>
+                                                Command="{Binding Source={StaticResource Proxy}, Path=Data.CloseAllToolsCommand}"
+                                                CommandParameter="{Binding Source={StaticResource GridProxy}, Path=Data}"/>
                                             <MenuItem Header="Close Tabs To Left"
-                                                  Command="{Binding Source={StaticResource Proxy}, Path=Data.CloseToolsToLeftCommand}"
-                                                  CommandParameter="{Binding Source={StaticResource GridProxy}, Path=Data}"/>
+                                                Command="{Binding Source={StaticResource Proxy}, Path=Data.CloseToolsToLeftCommand}"
+                                                CommandParameter="{Binding Source={StaticResource GridProxy}, Path=Data}"/>
                                             <MenuItem Header="Close Tabs To Right"
-                                                  Command="{Binding Source={StaticResource Proxy}, Path=Data.CloseToolsToRightCommand}"
-                                                  CommandParameter="{Binding Source={StaticResource GridProxy}, Path=Data}"/>
+                                                Command="{Binding Source={StaticResource Proxy}, Path=Data.CloseToolsToRightCommand}"
+                                                CommandParameter="{Binding Source={StaticResource GridProxy}, Path=Data}"/>
                                         </MenuItem>
                                     </ContextMenu>
                                 </Grid.ContextMenu>
@@ -204,14 +216,14 @@
                                     </TextBlock.Style>
                                 </TextBlock>
                                 <Button Margin="4,0,-4,0"  Grid.Column="1" 
-                                    Command="{Binding DataContext.CloseToolCommand, RelativeSource={RelativeSource FindAncestor, AncestorType=TabControl}}" 
-                                    CommandParameter="{Binding}"
-                                    HorizontalContentAlignment="Right"
-                                    Content="{materialIcons:MaterialIconExt Kind=CloseThick, Size=13 }">
-                                        
-                                  
-                                    
-                                   
+                                Command="{Binding DataContext.CloseToolCommand, RelativeSource={RelativeSource FindAncestor, AncestorType=TabControl}}" 
+                                CommandParameter="{Binding}"
+                                HorizontalContentAlignment="Right"
+                                Content="{materialIcons:MaterialIconExt Kind=CloseThick, Size=13 }">
+
+
+
+
                                 </Button>
                             </Grid>
                         </DataTemplate>

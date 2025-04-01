@@ -1,4 +1,5 @@
-﻿using Editors.Twui.Editor;
+﻿using System.Diagnostics;
+using Editors.Twui.Editor;
 using Editors.Twui.Editor.ComponentEditor;
 using Editors.Twui.Editor.Presentation;
 using Editors.Twui.Editor.Rendering;
@@ -25,10 +26,13 @@ namespace Editors.Twui
 
         public override void RegisterTools(IEditorDatabase editorDatabase)
         {
-            EditorInfoBuilder
-                .Create<TwuiEditor, TwuiMainView>(EditorEnums.Twui_Editor)
-                .AddExtention(".twui.xml", EditorPriorites.High)
-                .Build(editorDatabase);
+            if (Debugger.IsAttached)
+            {
+                EditorInfoBuilder
+                    .Create<TwuiEditor, TwuiMainView>(EditorEnums.Twui_Editor)
+                    .AddExtention(".twui.xml", EditorPriorites.High)
+                    .Build(editorDatabase);
+            }
         }
     }
 }

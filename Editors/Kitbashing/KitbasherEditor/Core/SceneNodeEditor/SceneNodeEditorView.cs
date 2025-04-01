@@ -44,7 +44,7 @@ namespace Editors.KitbasherEditor.ViewModels.SceneNodeEditor
             CurrentEditor = CreateNodeEditor(selectedNode);
         }
 
-        public ISceneNodeEditor? CreateNodeEditor(ISceneNode node)
+        ISceneNodeEditor? CreateNodeEditor(ISceneNode node)
         {
             if (node is GroupNode groupNode)
             {

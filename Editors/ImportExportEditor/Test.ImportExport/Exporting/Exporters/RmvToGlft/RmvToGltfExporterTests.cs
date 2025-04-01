@@ -2,7 +2,7 @@
 using Editors.ImportExport.Exporting.Exporters.DdsToNormalPng;
 using Editors.ImportExport.Exporting.Exporters.RmvToGltf;
 using Editors.ImportExport.Exporting.Exporters.RmvToGltf.Helpers;
-using Editors.Shared.Core.Services;
+using GameWorld.Core.Services;
 using Moq;
 using Shared.Core.Events;
 using Shared.TestUtility;

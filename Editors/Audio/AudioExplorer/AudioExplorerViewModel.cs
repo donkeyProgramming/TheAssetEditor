@@ -15,6 +15,7 @@ using Shared.GameFormats.Wwise.Hirc.V136;
 
 namespace Editors.Audio.AudioExplorer
 {
+    // TODO: Add a language selection ComboBox
     public class AudioExplorerViewModel : NotifyPropertyChangedImpl, IEditorInterface
     {
         public EventSelectionFilter EventFilter { get; set; }
@@ -61,7 +62,7 @@ namespace Editors.Audio.AudioExplorer
 
         private void OnEventSelected(SelectedHircItem newValue)
         {
-            if (newValue?.Id == _selectedNode?.Item?.Id)
+            if (newValue?.ID == _selectedNode?.Item?.ID)
                 return;
 
             if (newValue != null)
@@ -115,31 +116,26 @@ namespace Editors.Audio.AudioExplorer
 
                     if (cakSound_V112 != null)
                     {
-                        _soundPlayer.ConvertWemToWav(
-                            _audioRepository,
+                        _soundPlayer.PlayDataWem(
                             cakSound_V112.AkBankSourceData.AkMediaInformation.SourceId,
                             cakSound_V112.AkBankSourceData.AkMediaInformation.FileId,
                             (int)cakSound_V112.AkBankSourceData.AkMediaInformation.FileOffset,
                             (int)cakSound_V112.AkBankSourceData.AkMediaInformation.InMemoryMediaSize
                         );
-
-                        return;
                     }
                 }
-
-                _soundPlayer.ConvertWemToWav(sound.GetSourceId().ToString());
-                return;
+                else
+                    _soundPlayer.PlayStreamedWem(sound.GetSourceID().ToString());
             }
-
-            if (_selectedNode.Item is ICAkMusicTrack musicTrack)
+            else if (_selectedNode.Item is ICAkMusicTrack musicTrack)
             {
                 // Only seems to have one child in practice 
-                var musicTrackId = musicTrack.GetChildren().FirstOrDefault(); 
-                _soundPlayer.ConvertWemToWav(musicTrackId.ToString());
+                var musicTrackID = musicTrack.GetChildren().FirstOrDefault(); 
+                _soundPlayer.PlayStreamedWem(musicTrackID.ToString());
             }
         }
 
-        public void LoadHircFromIdAction()
+        public void LoadHircFromIDAction()
         {
             var window = new TextInputWindow("Hirc Input", "Hirc ID", true);
             if (window.ShowDialog() == true)
@@ -151,16 +147,16 @@ namespace Editors.Audio.AudioExplorer
                     return;
                 }
 
-                if (uint.TryParse(hircStr, out var hircId) == false)
+                if (uint.TryParse(hircStr, out var hircID) == false)
                 {
                     MessageBox.Show("Not a valid ID");
                     return;
                 }
 
-                var foundHircItems = _audioRepository.GetHircObject(hircId);
+                var foundHircItems = _audioRepository.GetHircObject(hircID);
                 if (foundHircItems.Count == 0)
                 {
-                    MessageBox.Show($"No hirc items found with id {hircId}");
+                    MessageBox.Show($"No hirc items found with id {hircID}");
                     return;
                 }
 

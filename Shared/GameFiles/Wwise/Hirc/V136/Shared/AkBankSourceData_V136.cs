@@ -53,13 +53,13 @@ namespace Shared.GameFormats.Wwise.Hirc.V136.Shared
 
         public class AkMediaInformation_V136
         {
-            public uint SourceId { get; set; }
+            public uint SourceID { get; set; }
             public uint InMemoryMediaSize { get; set; }
             public byte SourceBits { get; set; }
 
             public void ReadData(ByteChunk chunk)
             {
-                SourceId = chunk.ReadUInt32();
+                SourceID = chunk.ReadUInt32();
                 InMemoryMediaSize = chunk.ReadUInt32();
                 SourceBits = chunk.ReadByte();
             }
@@ -67,7 +67,7 @@ namespace Shared.GameFormats.Wwise.Hirc.V136.Shared
             public byte[] WriteData()
             {
                 using var memStream = new MemoryStream();
-                memStream.Write(ByteParsers.UInt32.EncodeValue(SourceId, out _));
+                memStream.Write(ByteParsers.UInt32.EncodeValue(SourceID, out _));
                 memStream.Write(ByteParsers.UInt32.EncodeValue(InMemoryMediaSize, out _));
                 memStream.Write(ByteParsers.Byte.EncodeValue(SourceBits, out _));
                 return memStream.ToArray();
@@ -75,7 +75,7 @@ namespace Shared.GameFormats.Wwise.Hirc.V136.Shared
 
             public uint GetSize()
             {
-                var sourceIdSize = ByteHelper.GetPropertyTypeSize(SourceId);
+                var sourceIdSize = ByteHelper.GetPropertyTypeSize(SourceID);
                 var mediaSizeSize = ByteHelper.GetPropertyTypeSize(InMemoryMediaSize);
                 var sourceBitsSize = ByteHelper.GetPropertyTypeSize(SourceBits);
                 return sourceIdSize + mediaSizeSize + sourceBitsSize;

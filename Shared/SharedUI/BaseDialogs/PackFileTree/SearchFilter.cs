@@ -95,7 +95,7 @@ namespace Shared.Ui.BaseDialogs.PackFileTree
 
         private static int CountVisibleNodes(TreeNode file)
         {
-            if (file.GetNodeType() == NodeType.File && file.IsVisible)
+            if (file.NodeType == NodeType.File && file.IsVisible)
                 return 1;
 
             var count = 0;
@@ -113,13 +113,13 @@ namespace Shared.Ui.BaseDialogs.PackFileTree
 
         private bool HasChildWithFilterMatch(TreeNode file, Regex expression)
         {
-            if (file.GetNodeType() == NodeType.Root && file.Children.Count == 0)
+            if (file.NodeType == NodeType.Root && file.Children.Count == 0)
             {
                 file.IsVisible = true;
                 return true;
             }
 
-            if (file.GetNodeType() == NodeType.File)
+            if (file.NodeType == NodeType.File)
             {
                 var hasValidExtention = true;
                 if (_extensionFilter != null)

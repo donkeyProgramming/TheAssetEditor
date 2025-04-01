@@ -14,19 +14,6 @@
     <None Remove="Resources\AnimationSlots\Warhammer3AnimationSlots.txt" />
     <None Remove="Resources\AnimationSlots\Warhammer3AnimationSlots_dlc23.txt" />
     <None Remove="Resources\AnimationSlots\Warhammer3AnimationSlots_dlc24.txt" />
-    <None Remove="Resources\AudioTemplates\Audio_Template_Ability.json" />
-    <None Remove="Resources\AudioTemplates\Audio_Template_Campaign_Advisor.json" />
-    <None Remove="Resources\AudioTemplates\Audio_Template_Diplomacy_Line.json" />
-    <None Remove="Resources\AudioTemplates\Audio_Template_Event_Narration.json" />
-    <None Remove="Resources\AudioTemplates\Audio_Template_Magic.json" />
-    <None Remove="Resources\AudioTemplates\Audio_Template_Movie.json" />
-    <None Remove="Resources\AudioTemplates\Audio_Template_Quest_Battle.json" />
-    <None Remove="Resources\AudioTemplates\Audio_Template_UI.json" />
-    <None Remove="Resources\AudioTemplates\Audio_Template_Vocalisation.json" />
-    <None Remove="Resources\AudioTemplates\Template_Dilemma_&amp;_Incident_Narration.json" />
-    <None Remove="Resources\AudioTemplates\Template_Movie_Project.json" />
-    <None Remove="Resources\AudioTemplates\Template_Quest_Battle_Speech_Project.json" />
-    <None Remove="Resources\AudioTemplates\Template_UI_Project.json" />
     <None Remove="Resources\Icons\Copy.png" />
     <None Remove="Resources\Icons\Cut.png" />
     <None Remove="Resources\Icons\Delete.png" />
@@ -99,6 +86,7 @@
     <None Remove="Resources\Icons\Redo.png" />
     <None Remove="Resources\Icons\Save.png" />
     <None Remove="Resources\Icons\Undo.png" />
+    <None Remove="Resources\Icons\Wav-File.png" />
     <None Remove="Resources\Icons\WordWrap.png" />
     <None Remove="Resources\OptionalRadioButtonStyle.xaml" />
     <None Remove="Resources\AudioConversion\vgstream\avcodec-vgmstream-58.dll" />
@@ -145,15 +133,6 @@
     <EmbeddedResource Include="Resources\AnimationSlots\Warhammer3AnimationSlots_dlc24.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="Resources\AudioTemplates\Audio_Template_Event_Narration.json" />
-    <EmbeddedResource Include="Resources\AudioTemplates\Audio_Template_Campaign_Advisor.json" />
-    <EmbeddedResource Include="Resources\AudioTemplates\Audio_Template_Ability.json" />
-    <EmbeddedResource Include="Resources\AudioTemplates\Audio_Template_Vocalisation.json" />
-    <EmbeddedResource Include="Resources\AudioTemplates\Audio_Template_Diplomacy_Line.json" />
-    <EmbeddedResource Include="Resources\AudioTemplates\Audio_Template_Magic.json" />
-    <EmbeddedResource Include="Resources\AudioTemplates\Audio_Template_Movie.json" />
-    <EmbeddedResource Include="Resources\AudioTemplates\Audio_Template_Quest_Battle.json" />
-    <EmbeddedResource Include="Resources\AudioTemplates\Audio_Template_UI.json" />
     <EmbeddedResource Include="Resources\AudioConversion\vgstream\avcodec-vgmstream-58.dll" />
     <EmbeddedResource Include="Resources\AudioConversion\vgstream\avformat-vgmstream-58.dll" />
     <EmbeddedResource Include="Resources\AudioConversion\vgstream\avutil-vgmstream-56.dll" />
@@ -173,6 +152,7 @@
     <EmbeddedResource Include="Resources\AudioConversion\vgstream\vgstream.exe" />
     <EmbeddedResource Include="Resources\AudioConversion\vgstream\xmp-vgmstream.dll" />
     <EmbeddedResource Include="Resources\AudioConversion\WavToWemWwiseProject\WavToWemWwiseProject.zip" />
+    <EmbeddedResource Include="Resources\Icons\Wav-File.png" />
     <EmbeddedResource Include="Resources\WsModelTemplates\MaterialTemplate_pharaoh_default.xml" />
     <EmbeddedResource Include="Resources\WsModelTemplates\MaterialTemplate_wh2_default.xml" />
     <EmbeddedResource Include="Resources\WsModelTemplates\MaterialTemplate_wh3_default.xml" />

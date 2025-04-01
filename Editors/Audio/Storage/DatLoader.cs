@@ -16,10 +16,10 @@ namespace Editors.Audio.Storage
     {
         public class LoadResult
         {
-            public Dictionary<uint, string> NameLookUpTable { get; set; } = [];
-            public Dictionary<string, List<string>> DialogueEventsWithStateGroups { get; set; } = [];
-            public Dictionary<string, Dictionary<string, string>> DialogueEventsWithStateGroupsWithQualifiersAndStateGroups { get; set; } = [];
-            public Dictionary<string, List<string>> StateGroupsWithStates { get; set; } = [];
+            public Dictionary<uint, string> NameLookupByID { get; set; } = [];
+            public Dictionary<string, List<string>> StateGroupsLookupByDialogueEvent { get; set; } = [];
+            public Dictionary<string, Dictionary<string, string>> QualifiedStateGroupLookupByStateGroupByDialogueEvent { get; set; } = [];
+            public Dictionary<string, List<string>> StatesLookupByStateGroup { get; set; } = [];
         }
 
         private readonly IPackFileService _pfs;
@@ -49,10 +49,10 @@ namespace Editors.Audio.Storage
 
             return new LoadResult
             {
-                NameLookUpTable = nameLookUp,
-                DialogueEventsWithStateGroups = processedDialogueEventsWithStateGroups,
-                DialogueEventsWithStateGroupsWithQualifiersAndStateGroups = dialogueEventsWithStateGroupsWithQualifiersAndStateGroups,
-                StateGroupsWithStates = processedStateGroupsWithStates
+                NameLookupByID = nameLookUp,
+                StateGroupsLookupByDialogueEvent = processedDialogueEventsWithStateGroups,
+                QualifiedStateGroupLookupByStateGroupByDialogueEvent = dialogueEventsWithStateGroupsWithQualifiersAndStateGroups,
+                StatesLookupByStateGroup = processedStateGroupsWithStates
             };
         }
 
@@ -137,6 +137,9 @@ namespace Editors.Audio.Storage
             var bnkFiles = PackFileServiceUtility.FindAllWithExtention(_pfs, ".bnk");
             var bnkNames = bnkFiles.Select(x => x.Name.Replace(".bnk", "")).ToArray();
             AddNames(bnkNames, nameLookUp);
+
+            var languageIDStrings = new List<string> { "sfx", "chinese", "english(uk)", "french(france)", "german", "italian", "polish", "russian", "spanish(spain)" }.ToArray();
+            AddNames(languageIDStrings, nameLookUp);
 
             var wwiseIdFiles = PackFileServiceUtility.FindAllWithExtention(_pfs, ".wwiseids");
             foreach (var item in wwiseIdFiles)

@@ -6,6 +6,8 @@ using GameWorld.Core.Rendering;
 using GameWorld.Core.Rendering.Geometry;
 using GameWorld.Core.SceneNodes;
 using Microsoft.Xna.Framework;
+using Serilog;
+using Shared.Core.ErrorHandling;
 using Shared.Core.Events;
 using Shared.Ui.BaseDialogs.MathViews;
 
@@ -29,10 +31,10 @@ namespace Editors.KitbasherEditor.ChildEditors.VertexDebugger
             set { SetAndNotify(ref _debugScale, value); }
         }
 
-
         private readonly RenderEngineComponent _renderEngineComponent;
         private readonly SelectionManager _selectionManager;
         private readonly IEventHub _eventHub;
+        private readonly ILogger _logger = Logging.Create<VertexDebuggerViewModel>();
 
         public VertexDebuggerViewModel(
             RenderEngineComponent renderEngineComponent,
@@ -80,7 +82,10 @@ namespace Editors.KitbasherEditor.ChildEditors.VertexDebugger
                         Tangent = vertexInfo.Tangent,
                         TangentLength = vertexInfo.Tangent.Length(),
 
-                        Position = vertexInfo.Position
+                        Position = vertexInfo.Position,
+
+                        Uv0 = vertexInfo.TextureCoordinate,
+                        Uv1 = vertexInfo.TextureCoordinate1,
                     });
                 }
             }
@@ -125,5 +130,34 @@ namespace Editors.KitbasherEditor.ChildEditors.VertexDebugger
         }
 
         void OnSelectionChanged(SelectionChangedEvent notification) => Refresh();
+
+        internal void ShowStatistics()
+        {
+            var minUv0 = new Vector2(10000, 10000);
+            var maxUv0 = new Vector2(-10000, -10000);
+            var minUv1 = new Vector2(10000, 10000);
+            var maxUv1 = new Vector2(-10000, -10000);
+
+            foreach (var vert in VertexList)
+            {
+                minUv0 = Vector2.Min(vert.Uv0, minUv0);
+                maxUv0 = Vector2.Max(vert.Uv0, maxUv0);
+
+                minUv1 = Vector2.Min(vert.Uv1, minUv1);
+                maxUv1 = Vector2.Max(vert.Uv1, maxUv1);
+            }
+
+            var str = "Mesh statistics\n";
+            str += $"   Vertex count = {VertexList.Count}\n";
+            str += $"   Uv0 = Min[{minUv0}] Max[{maxUv0}] \n";
+            str += $"   Uv1 = Min[{minUv1}] Max[{maxUv1}] \n";
+
+            _logger.Here().Information(str);    
+        }
+
+        void GetMinMaxUv()
+        { 
+        
+        }
     }
 }

@@ -6,19 +6,20 @@
         // For more info on chunk types see: https://github.com/bnnm/wwiser/blob/master/doc/WWISER.md
         public const string BKHD = "BKHD"; // The BKHD (Bank Header) section contains the Bank version and some global config stuff like Bank name.
         public const string HIRC = "HIRC"; // The HIRC (Hierarchy) section contains most Wwise objects.
-        public const string STID = "STID"; // The DIDX (Data Index) section contains the references to the .wem files embedded in the SoundBank.
-        public const string DIDX = "DIDX"; // The DATA section contains the .wem files data, not encoded, and immediately following each other or alternatively pre-fetch data for streaming.
-        public const string DATA = "DATA"; // The STID (String Table ID) section contains a list of all project Banks referenced in the HIRC section (including the current SoundBank) with info on their IDs and file names.
+        public const string STID = "STID"; // The STID (String Table ID) section contains a list of all project Banks referenced in the HIRC section (including the current SoundBank) with info on their IDs and file names. 
+        public const string DIDX = "DIDX"; // The DIDX (Data Index) section contains the references to the .wem files embedded in the SoundBank.
+        public const string DATA = "DATA"; // The DATA section contains the .wem files data, not encoded, and immediately following each other or alternatively pre-fetch data for streaming.
+        public const string INIT = "INIT"; // The INIT (Initialisation) section contains the game's global config such as busses, states, plugins etc.
     }
 
-    // need to account for the different hirc types in different versions, hmm
+    // TODO: need to account for the different hirc types in different versions, hmm
     public enum AkBkHircType : byte
     {
         State = 0x01,
         Sound = 0x02,
         Action = 0x03,
         Event = 0x04,
-        SequenceContainer = 0x05,
+        RandomSequenceContainer = 0x05,
         SwitchContainer = 0x06,
         ActorMixer = 0x07,
         Audio_Bus = 0x08,

@@ -1,4 +1,5 @@
-﻿using System.Runtime.InteropServices;
+﻿using System.Diagnostics;
+using System.Runtime.InteropServices;
 using System.Text;
 using Shared.Core.ByteParsing;
 using Shared.Core.Misc;
@@ -32,6 +33,7 @@ namespace Shared.GameFormats.RigidModel.Types
 
     [Serializable]
     [StructLayout(LayoutKind.Sequential)]
+    [DebuggerDisplay("{TexureType} - {Path}")]
     public struct RmvTexture
     {
         public TextureType TexureType;

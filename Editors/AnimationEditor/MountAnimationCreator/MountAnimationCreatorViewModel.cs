@@ -7,7 +7,6 @@ using AnimationEditor.AnimationKeyframeEditor;
 using System.Windows.Forms;
 using AnimationEditor.MountAnimationCreator.Services;
 using AnimationEditor.MountAnimationCreator.ViewModels;
-using Editors.Shared.Core.Services;
 using Microsoft.Xna.Framework;
 using Newtonsoft.Json;
 using Shared.Core.Misc;
@@ -26,6 +25,7 @@ using Editors.Shared.Core.Common;
 using Editors.Shared.Core.Common.AnimationPlayer;
 using Editors.Shared.Core.Common.ReferenceModel;
 using Editors.AnimationVisualEditors.MountAnimationCreator.Services;
+using GameWorld.Core.Services;
 
 
 namespace AnimationEditor.MountAnimationCreator
@@ -40,7 +40,7 @@ namespace AnimationEditor.MountAnimationCreator
         private readonly AnimationPlayerViewModel _animationPlayerViewModel;
         private readonly IPackFileService _pfs;
         private readonly SelectionManager _selectionManager;
-        private readonly SkeletonAnimationLookUpHelper _skeletonAnimationLookUpHelper;
+        private readonly ISkeletonAnimationLookUpHelper _skeletonAnimationLookUpHelper;
 
         SceneObject _mount;
         SceneObject _rider;
@@ -75,8 +75,8 @@ namespace AnimationEditor.MountAnimationCreator
         public FilterCollection<IAnimationBinGenericFormat> ActiveOutputFragment { get; set; }
         public FilterCollection<AnimationBinEntryGenericFormat> ActiveFragmentSlot { get; set; }
 
-        public MountAnimationCreatorViewModel(IPackFileService pfs, 
-            SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper, 
+        public MountAnimationCreatorViewModel(IPackFileService pfs,
+            ISkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper, 
             SelectionManager selectionManager,
             SceneObjectViewModelBuilder sceneObjectViewModelBuilder,
             AnimationPlayerViewModel animationPlayerViewModel,

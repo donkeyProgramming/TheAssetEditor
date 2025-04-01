@@ -16,8 +16,11 @@ namespace Editors.KitbasherEditor.ChildEditors.VertexDebugger
         public float BiNormalLength { get; set; }
         public Vector3 Tangent { get; set; }
         public float TangentLength { get; set; }
-
         public Vector4 Position { get; set; }
+
+        public Vector2 Uv0 { get; set; }
+        public Vector2 Uv1 { get; set; }
+        public Vector4 Colour { get; set; }
 
     }
 

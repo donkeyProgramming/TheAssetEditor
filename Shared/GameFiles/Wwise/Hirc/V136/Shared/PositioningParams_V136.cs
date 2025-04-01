@@ -5,7 +5,7 @@ namespace Shared.GameFormats.Wwise.Hirc.V136.Shared
     public class PositioningParams_V136
     {
         public byte BitsPositioning { get; set; }
-        public byte Bits3d { get; set; }
+        public byte Bits3D { get; set; }
         public byte PathMode { get; set; }
         public float TransitionTime { get; set; }
         public uint NumVertexes { get; set; }
@@ -21,7 +21,7 @@ namespace Shared.GameFormats.Wwise.Hirc.V136.Shared
             var has_3d = (BitsPositioning >> 1 & 1) == 1;
             if (has_positioning && has_3d)
             {
-                Bits3d = chunk.ReadByte();
+                Bits3D = chunk.ReadByte();
 
                 var e3DPositionType = BitsPositioning >> 5 & 3;
                 var has_automation = e3DPositionType != 0;
@@ -45,7 +45,7 @@ namespace Shared.GameFormats.Wwise.Hirc.V136.Shared
 
         public byte[] WriteData()
         {
-            if (BitsPositioning == 0x03 && Bits3d == 0x08)
+            if (BitsPositioning == 0x03 && Bits3D == 0x08)
                 return [0x03, 0x08];
             else if (BitsPositioning == 0x00)
                 return [0x00];
@@ -55,7 +55,7 @@ namespace Shared.GameFormats.Wwise.Hirc.V136.Shared
 
         public uint GetSize()
         {
-            if (BitsPositioning == 0x03 && Bits3d == 0x08)
+            if (BitsPositioning == 0x03 && Bits3D == 0x08)
                 return 2;
             else if (BitsPositioning == 0x00)
                 return 1;

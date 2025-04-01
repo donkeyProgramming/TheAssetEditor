@@ -14,6 +14,7 @@ using Shared.Core.ErrorHandling;
 using Shared.Core.PackFiles;
 using Shared.GameFormats.RigidModel;
 using Shared.GameFormats.RigidModel.LodHeader;
+using Shared.GameFormats.RigidModel.Types;
 
 namespace GameWorld.Core.Services.SceneSaving.Geometry
 {
@@ -29,21 +30,28 @@ namespace GameWorld.Core.Services.SceneSaving.Geometry
             _meshBuilderService = meshBuilderService;
         }
 
-        public void Save(string outputPath, Rmv2ModelNode mainNode, GameSkeleton? skeleton, RmvVersionEnum rmvVersionEnum, GeometrySaveSettings saveSettings)
+        public RmvFile? Save(string outputPath, Rmv2ModelNode mainNode, GameSkeleton? skeleton, RmvVersionEnum rmvVersionEnum, GeometrySaveSettings saveSettings)
         {
             try
             {
-                var bytes = GenerateBytes(mainNode, rmvVersionEnum, skeleton, saveSettings, true);
+                var rmvFile = GenerateBytes(mainNode, rmvVersionEnum, skeleton, saveSettings);
+                var bytes = ModelFactory.Create().Save(rmvFile);
+                _logger.Here().Information($"Model generated correctly");
+
                 _packFileSaveService.Save(outputPath, bytes, false);
+
+                return rmvFile;
             }
             catch (Exception e)
             {
                 _logger.Here().Error("Error saving model - " + e.ToString());
                 MessageBox.Show($"Saving failed!\n{e.Message}" );
+
+                return null;
             }
         }
 
-        byte[] GenerateBytes(Rmv2ModelNode modelNode, RmvVersionEnum version, GameSkeleton? skeleton, GeometrySaveSettings saveSettings, bool enrichModel = true)
+        RmvFile GenerateBytes(Rmv2ModelNode modelNode, RmvVersionEnum version, GameSkeleton? skeleton, GeometrySaveSettings saveSettings)
         {
             _logger.Here().Information($"Starting to save model. Skeleton = {skeleton}, Version = {version}");
 
@@ -72,19 +80,17 @@ namespace GameWorld.Core.Services.SceneSaving.Geometry
                 for (var meshIndex = 0; meshIndex < meshes.Count; meshIndex++)
                 {
                     var modelname = meshes[meshIndex].Name;
-                    rmvFile.ModelList[lodIndex][meshIndex] = CreateRmvModel(modelname, meshes[meshIndex].PivotPoint, meshes[meshIndex].Material, meshes[meshIndex].Geometry, skeleton, enrichModel);
+                    rmvFile.ModelList[lodIndex][meshIndex] = CreateRmvModel(modelname, meshes[meshIndex].PivotPoint, meshes[meshIndex].Material, meshes[meshIndex].Geometry, skeleton, saveSettings.AttachmentPoints, meshes[meshIndex].AnimationMatrixOverride);
                 }
             }
 
             // Update data in the header and reCalc offset
             rmvFile.RecalculateOffsets();
-            var outputBytes = ModelFactory.Create().Save(rmvFile);
-            _logger.Here().Information($"Model generated correctly");
 
-            return outputBytes;
+            return rmvFile;
         }
 
-        RmvModel CreateRmvModel(string modelName, Vector3 pivotPoint, CapabilityMaterial capabilityMaterial, MeshObject geometry, GameSkeleton? skeleton, bool addBonesAsAttachmentPoints)
+        RmvModel CreateRmvModel(string modelName, Vector3 pivotPoint, CapabilityMaterial capabilityMaterial, MeshObject geometry, GameSkeleton? skeleton, List<RmvAttachmentPoint> attachmentPoints, int animationMatrixOverride)
         {
             var newRmvMaterial = new MaterialToRmvSerializer().CreateMaterialFromCapabilityMaterial(capabilityMaterial);
             newRmvMaterial.UpdateInternalState(geometry.VertexFormat);
@@ -101,11 +107,9 @@ namespace GameWorld.Core.Services.SceneSaving.Geometry
             newModel.UpdateBoundingBox(geometry.BoundingBox);
             newModel.UpdateModelTypeFlag(newModel.Material.MaterialId);
 
-            if (addBonesAsAttachmentPoints && skeleton != null)
-            {
-                var boneNames = skeleton.BoneNames.Select(x => x.Replace("bn_", "")).ToArray();
-                newModel.Material.EnrichDataBeforeSaving(boneNames);
-            }
+     
+            newModel.Material.EnrichDataBeforeSaving(attachmentPoints, animationMatrixOverride);
+            
 
             return newModel;
         }

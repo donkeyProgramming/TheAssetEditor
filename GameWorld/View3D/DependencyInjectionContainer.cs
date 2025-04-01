@@ -22,11 +22,10 @@ using GameWorld.Core.Services.SceneSaving.Lod.Strategies;
 using GameWorld.Core.Services.SceneSaving.Material;
 using GameWorld.Core.Services.SceneSaving.Material.Strategies;
 using GameWorld.Core.Utility;
+using GameWorld.Core.WpfWindow;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Xna.Framework;
 using Shared.Core.DependencyInjection;
 using Shared.Core.Services;
-using GameWorld.Core.WpfWindow;
 
 namespace GameWorld.Core
 {
@@ -46,6 +45,7 @@ namespace GameWorld.Core
             serviceCollection.AddScoped<SceneRenderParametersStore>();
 
             // Services
+            serviceCollection.AddSingleton<ISkeletonAnimationLookUpHelper, SkeletonAnimationLookUpHelper>();
             serviceCollection.AddScoped<MeshBuilderService>();
             serviceCollection.AddScoped<ViewOnlySelectedService>();
             serviceCollection.AddScoped<FocusSelectableObjectService>();

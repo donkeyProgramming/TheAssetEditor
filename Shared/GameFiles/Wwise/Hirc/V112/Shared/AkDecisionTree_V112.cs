@@ -11,7 +11,7 @@ namespace Shared.GameFormats.Wwise.Hirc.V112.Shared
         {
             Nodes = new List<Node_V112>();
             uint currentDepth = 0;
-            var countMax = uTreeDataSize / Node_V112.GetSize();
+            var countMax = uTreeDataSize / new Node_V112().GetSize();
 
             for (var i = 0; i < countMax; i++)
             {
@@ -124,7 +124,16 @@ namespace Shared.GameFormats.Wwise.Hirc.V112.Shared
                 return node;
             }
 
-            public static uint GetSize() => 12;
+            public uint GetSize()
+            {
+                // Either ChildrenIdx and ChildrenCoun are used or AudioNodeID is used but in either case the same amount of bytes are used so doesn't matter which one is used to calculate the size here
+                var idSize = ByteHelper.GetPropertyTypeSize(Key);
+                var childrenIdxSize = ByteHelper.GetPropertyTypeSize(ChildrenIdx);
+                var childrenCountSize = ByteHelper.GetPropertyTypeSize(ChildrenCount);
+                var weightSize = ByteHelper.GetPropertyTypeSize(Weight);
+                var probabilitySize = ByteHelper.GetPropertyTypeSize(Probability);
+                return idSize + childrenIdxSize + childrenCountSize + weightSize + probabilitySize;
+            }
         }
     }
 }
