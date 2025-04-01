@@ -27,7 +27,7 @@ namespace Editors.ImportExport.Exporting
 
             foreach (var exporter in _exporterViewModels)
             {
-                if (exporter.CanExportFile(packFile) != ImportExportSupportEnum.NotSupported)
+                if (exporter.CanExportFile(packFile) != ExportSupportEnum.NotSupported)
                     return true;
             }
             return false;

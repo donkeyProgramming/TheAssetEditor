@@ -34,13 +34,13 @@ namespace Editors.ImportExport.Exporting.Exporters.RmvToGltf
             _skeletonLookUpHelper = skeletonLookUpHelper;
         }
 
-        internal ImportExportSupportEnum CanExportFile(PackFile file)
+        internal ExportSupportEnum CanExportFile(PackFile file)
         {
             if (FileExtensionHelper.IsRmvFile(file.Name))
-                return ImportExportSupportEnum.HighPriority;
+                return ExportSupportEnum.HighPriority;
             if (FileExtensionHelper.IsWsModelFile(file.Name))
-                return ImportExportSupportEnum.NotSupported;  // This should be supported in the future
-            return ImportExportSupportEnum.NotSupported;
+                return ExportSupportEnum.NotSupported;  // This should be supported in the future
+            return ExportSupportEnum.NotSupported;
         }
 
         public void Export(RmvToGltfExporterSettings settings)

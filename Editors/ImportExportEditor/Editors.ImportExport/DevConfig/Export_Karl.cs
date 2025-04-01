@@ -39,7 +39,7 @@ namespace Editors.ImportExport.DevConfig
 
            Directory.CreateDirectory(destPath);
 
-           var settings = new RmvToGltfExporterSettings(meshPackFile, new List<PackFile>() { animPackFile },  destPath + "myKarl.gltf", true, true, true, true);
+           var settings = new RmvToGltfExporterSettings(meshPackFile, new List<PackFile>() { animPackFile },  destPath + "myKarl.gltf", true, true, true, true, true);
            _exporter.Export(settings);
        }
 
