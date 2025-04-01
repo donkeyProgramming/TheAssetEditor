@@ -67,9 +67,10 @@ namespace Editors.ImportExport.Exporting.Exporters.RmvToGltf
                     gltfSkeleton = _gltfSkeletonBuilder.CreateSkeleton(skeletonAnimFile, outputScene, settings);
                     _gltfAnimationBuilder.Build(skeletonAnimFile, settings, gltfSkeleton, outputScene);
                 }
-            }
-
-            var textures = _gltfTextureHandler.HandleTextures(rmv2, settings);
+            }                       
+            
+            var textures = _gltfTextureHandler.HandleTextures(rmv2, settings);            
+            
             var meshes = _gltfMeshBuilder.Build(rmv2, textures, settings);
 
             _logger.Here().Information($"MeshCount={meshes.Count()} TextureCount={textures.Count()} Skeleton={gltfSkeleton?.Data.Count}");

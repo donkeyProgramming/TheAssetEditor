@@ -7,6 +7,7 @@ namespace Editors.ImportExport.Exporting.Exporters.RmvToGltf
         PackFile InputModelFile,
         List<PackFile> InputAnimationFiles,
         string OutputPath,
+        bool ExportMaterials, 
         bool ConvertMaterialTextureToBlender,
         bool ConvertNormalTextureToBlue,
         bool ExportAnimations,

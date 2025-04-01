@@ -5,7 +5,6 @@ using Editors.ImportExport.Importing.Importers.GltfToRmv.Helper;
 using Editors.ImportExport.Misc;
 using Editors.Shared.Core.Services;
 using GameWorld.Core.SceneNodes;
-using GameWorld.Core.Services;
 using Octokit;
 using Serilog;
 using Shared.Core.ErrorHandling;

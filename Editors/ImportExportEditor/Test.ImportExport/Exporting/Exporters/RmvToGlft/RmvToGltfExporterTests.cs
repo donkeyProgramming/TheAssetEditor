@@ -34,7 +34,7 @@ namespace Test.ImportExport.Exporting.Exporters.RmvToGlft
             // Act
             var mesh = pfs.FindFile(_rmvFilePathKarl);
             var exporter = new RmvToGltfExporter(sceneSaver, meshBuilder, textureHandler, skeletontonBuilder, animationBuilder, skeletontonLookupHelper);
-            var settings = new RmvToGltfExporterSettings(mesh!, [], @"C:\test\myExport.gltf", true, true, true, true);
+            var settings = new RmvToGltfExporterSettings(mesh!, [], @"C:\test\myExport.gltf", true, true, true, true, true);
             exporter.Export(settings);
 
             // Assert
