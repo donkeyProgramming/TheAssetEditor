@@ -21,14 +21,14 @@ namespace Editors.ImportExport.Exporting.Exporters.RmvToGltf.Helpers
 
         public GltfSkeletonBuilder(IPackFileService packFileService)
         {
-            _packFileService = packFileService;            
+            _packFileService = packFileService;
         }
 
         public ProcessedGltfSkeleton CreateSkeleton(AnimationFile skeletonAnimFile, ModelRoot outputScene, RmvToGltfExporterSettings settings)
-        {           
+        {
             var gltfSkeleton = CreateSkeleton(outputScene, skeletonAnimFile, settings.MirrorMesh);
-                        
-            return gltfSkeleton;            
+
+            return gltfSkeleton;
         }
 
         ProcessedGltfSkeleton CreateSkeleton(ModelRoot outputScene, AnimationFile animSkeletonFil, bool doMirror)
@@ -47,8 +47,8 @@ namespace Editors.ImportExport.Exporting.Exporters.RmvToGltf.Helpers
             var outputGltfBindings = new List<(Node node, Matrix4x4 invMatrix)>();
 
             var scene = outputScene.UseScene("default");
-
-            scene.CreateNode($"//skeleton//{animSkeletonFil.Header.SkeletonName.ToLower()}");
+            
+            AddSkeletonIdNodeToScene(animSkeletonFil, scene);
 
             var parentIdToGltfNode = new Dictionary<int, Node>();
             parentIdToGltfNode[-1] = scene.CreateNode(""); // bones with no parent will be children of the scene
@@ -57,7 +57,7 @@ namespace Editors.ImportExport.Exporting.Exporters.RmvToGltf.Helpers
             {
                 var parentNode = parentIdToGltfNode[animSkeletonFil.Bones[boneIndex].ParentId];
                 if (parentNode == null)
-                    throw new Exception($"Parent Node not found for boneIndex={boneIndex}");
+                    throw new Exception($"Parent Node cannot be null. boneIndex={boneIndex}");
 
                 parentIdToGltfNode[boneIndex] = parentNode.CreateNode(animSkeletonFil.Bones[boneIndex].Name);
 
@@ -73,7 +73,10 @@ namespace Editors.ImportExport.Exporting.Exporters.RmvToGltf.Helpers
 
             return new ProcessedGltfSkeleton() { Data = outputGltfBindings };
         }
-
-
+       
+        private static void AddSkeletonIdNodeToScene(AnimationFile animSkeletonFil, Scene scene)
+        {
+            scene.CreateNode($"//skeleton//{animSkeletonFil.Header.SkeletonName.ToLower()}");
+        }
     }
 }
