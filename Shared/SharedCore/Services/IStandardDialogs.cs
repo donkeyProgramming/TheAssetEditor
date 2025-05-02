@@ -28,5 +28,4 @@ namespace Shared.Core.Services
         OK,
         Cancel,
     }
-
 }

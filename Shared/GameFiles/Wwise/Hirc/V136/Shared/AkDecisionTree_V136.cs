@@ -8,12 +8,12 @@ namespace Shared.GameFormats.Wwise.Hirc.V136.Shared
         public Node_V136 DecisionTree { get; set; } = new Node_V136(); // Root node of the decision tree in hierarchical form
         public List<Node_V136> Nodes { get; set; } = []; // Flattened list of all nodes in the decision tree in sequential order for read / write
 
-        public void ReadData(ByteChunk chunk, uint uTreeDataSize, uint maxTreeDepth)
+        public void ReadData(ByteChunk chunk, uint treeDataSize, uint maxTreeDepth)
         {
-            Nodes = new List<Node_V136>();
+            Nodes = [];
             uint currentDepth = 0;
+            var countMax = treeDataSize / new Node_V136().GetSize();
 
-            var countMax = uTreeDataSize / new Node_V136().GetSize();
             for (var i = 0; i < countMax; i++)
             {
                 Nodes.Add(Node_V136.ReadData(chunk, countMax, currentDepth, maxTreeDepth));
@@ -21,24 +21,27 @@ namespace Shared.GameFormats.Wwise.Hirc.V136.Shared
             }
 
             ushort childrenCount = 1;
-            DecisionTree = BuildDecisionTree(Nodes, 0, maxTreeDepth, 0, ref childrenCount, (ushort)countMax);
+            var startIndex = 0;
+            uint startDepth = 0;
+            DecisionTree = ReadDecisionTree(Nodes, startIndex, maxTreeDepth, startDepth, ref childrenCount, (ushort)countMax);
         }
 
-        private static Node_V136 BuildDecisionTree(List<Node_V136> nodes, int index, uint maxDepth, uint currentDepth, ref ushort count, ushort countMax)
+        private static Node_V136 ReadDecisionTree(List<Node_V136> nodes, int index, uint maxDepth, uint currentDepth, ref ushort count, ushort countMax)
         {
             if (index >= nodes.Count)
                 return null;
 
             var node = nodes[index];
 
-            var isAudioNode = node.ChildrenIdx > countMax || node.ChildrenCount > countMax;
+            var isOver = node.ChildrenIdx + node.ChildrenCount > countMax;
+            var isAudioNode = node.ChildrenIdx > countMax || node.ChildrenCount > countMax || isOver;
             var isMax = currentDepth == maxDepth;
-            if (!(isAudioNode || isMax)) //|| treeNode.ChildrenCount == 0))
+            if (!(isAudioNode || isMax))
             {
                 var treeNodeChildren = new List<Node_V136>();
                 for (var i = 0; i < node.ChildrenCount; i++)
                 {
-                    var childNode = BuildDecisionTree(nodes, node.ChildrenIdx + i, maxDepth, currentDepth + 1, ref count, countMax);
+                    var childNode = ReadDecisionTree(nodes, node.ChildrenIdx + i, maxDepth, currentDepth + 1, ref count, countMax);
                     if (childNode != null)
                         treeNodeChildren.Add(childNode);
                 }
@@ -57,9 +60,7 @@ namespace Shared.GameFormats.Wwise.Hirc.V136.Shared
                 memStream.Write(ByteParsers.UInt32.EncodeValue(node.Key ?? 0, out _), 0, 4);
 
                 if (node.AudioNodeID != 0)
-                {
                     memStream.Write(ByteParsers.UInt32.EncodeValue(node.AudioNodeID, out _), 0, 4);
-                }
                 else
                 {
                     memStream.Write(ByteParsers.UShort.EncodeValue(node.ChildrenIdx, out _), 0, 2);
@@ -70,25 +71,6 @@ namespace Shared.GameFormats.Wwise.Hirc.V136.Shared
                 memStream.Write(ByteParsers.UShort.EncodeValue(node.Probability, out _), 0, 2);
             }
             return memStream.ToArray();
-        }
-
-        // Recursively traverses the decision tree, flattening it into a list so nodes can be read sequentially
-        // Should initially be supplied with the root node which is the first node in the DecisionTree property
-        public static List<Node_V136> TraverseAndFlatten(Node_V136 rootNode)
-        {
-            var nodes = new List<Node_V136>();
-            InternalTraverseAndFlatten(nodes, rootNode);
-            return nodes;
-        }
-
-        public static void InternalTraverseAndFlatten(List<Node_V136> nodes, Node_V136 node)
-        {
-            if (node == null)
-                return;
-
-            nodes.Add(node);
-            foreach (var child_node in node.Nodes)
-                InternalTraverseAndFlatten(nodes, child_node);
         }
 
         public class Node_V136
@@ -110,7 +92,8 @@ namespace Shared.GameFormats.Wwise.Hirc.V136.Shared
                 node.ChildrenIdx = (ushort)((idChildrenPeek >> 0) & 0xFFFF);
                 node.ChildrenCount = (ushort)((idChildrenPeek >> 16) & 0xFFFF);
 
-                var isAudioNode = node.ChildrenIdx > countMax || node.ChildrenCount > countMax;
+                var isOver = node.ChildrenIdx + node.ChildrenCount > countMax;
+                var isAudioNode = node.ChildrenIdx > countMax || node.ChildrenCount > countMax || isOver;
                 var isMax = currentDepth == maxDepth;
                 if (isAudioNode || isMax)
                     node.AudioNodeID = chunk.ReadUInt32();
@@ -127,7 +110,7 @@ namespace Shared.GameFormats.Wwise.Hirc.V136.Shared
 
             public uint GetSize()
             {
-                // Either ChildrenIdx and ChildrenCoun are used or AudioNodeID is used but in either case the same amount of bytes are used so doesn't matter which one is used to calculate the size here
+                // Either ChildrenIdx and ChildrenCount are used or AudioNodeID is used but in either case the same amount of bytes are used so doesn't matter which one is used to calculate the size here
                 var idSize = ByteHelper.GetPropertyTypeSize(Key);
                 var childrenIdxSize = ByteHelper.GetPropertyTypeSize(ChildrenIdx);
                 var childrenCountSize = ByteHelper.GetPropertyTypeSize(ChildrenCount);
