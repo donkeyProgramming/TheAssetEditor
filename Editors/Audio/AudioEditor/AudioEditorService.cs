@@ -144,8 +144,8 @@ namespace Editors.Audio.AudioEditor
             var audioProjectFileName = audioProject.FileName.Replace(" ", "_");
             _compilerDataProcessor.SetSoundBankData(audioProject);
 
-            // We set the data from the bottom up, so Sounds, then Actions, then Events to ensure that IDs are generated before they're referenced.
-            // For example IDs set in Sounds / Sound Containers are used in Actions, and IDs set in Actions are used in Events.
+            // We set the data from the bottom up, so Sounds, then Actions, then Events to ensure that Ids are generated before they're referenced.
+            // For example Ids set in Sounds / Sound Containers are used in Actions, and Ids set in Actions are used in Events.
             _compilerDataProcessor.SetInitialSourceData(audioProject);
 
             if (audioProject.SoundBanks.Any(soundBank => soundBank.ActionEvents != null))

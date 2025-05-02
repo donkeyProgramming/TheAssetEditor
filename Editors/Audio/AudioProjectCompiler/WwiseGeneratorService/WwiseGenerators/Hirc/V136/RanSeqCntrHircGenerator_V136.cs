@@ -90,7 +90,7 @@ namespace Editors.Audio.AudioProjectCompiler.WwiseGeneratorService.WwiseGenerato
         {
             return new CAkRanSeqCntr_V136()
             {
-                ID = audioProjectRandomSequenceContainer.ID,
+                Id = audioProjectRandomSequenceContainer.Id,
                 HircType = audioProjectRandomSequenceContainer.HircType,
             };
         }
@@ -104,8 +104,8 @@ namespace Editors.Audio.AudioProjectCompiler.WwiseGeneratorService.WwiseGenerato
                 NumFx = 0,
             };
             nodeBaseParams.OverrideAttachmentParams = 0;
-            nodeBaseParams.OverrideBusID = audioProjectRandomSequenceContainer.OverrideBusID;
-            nodeBaseParams.DirectParentID = audioProjectRandomSequenceContainer.DirectParentID;
+            nodeBaseParams.OverrideBusId = audioProjectRandomSequenceContainer.OverrideBusId;
+            nodeBaseParams.DirectParentId = audioProjectRandomSequenceContainer.DirectParentId;
             nodeBaseParams.BitVector = 0;
             nodeBaseParams.NodeInitialParams = new NodeInitialParams_V136()
             {
@@ -137,7 +137,7 @@ namespace Editors.Audio.AudioProjectCompiler.WwiseGeneratorService.WwiseGenerato
         private static Children_V136 CreateChildrenList(List<Sound> sounds)
         {
             var childIds = sounds
-                .Select(sound => sound.ID)
+                .Select(sound => sound.Id)
                 .ToList();
 
             return new Children_V136
@@ -153,7 +153,7 @@ namespace Editors.Audio.AudioProjectCompiler.WwiseGeneratorService.WwiseGenerato
             {
                 var playlistItem = new AkPlaylistItem_V136
                 {
-                    PlayId = sound.ID,
+                    PlayId = sound.Id,
                     Weight = 50000
                 };
                 playlist.Add(playlistItem);

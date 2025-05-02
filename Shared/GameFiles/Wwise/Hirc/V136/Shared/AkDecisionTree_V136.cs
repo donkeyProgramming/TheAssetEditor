@@ -59,8 +59,8 @@ namespace Shared.GameFormats.Wwise.Hirc.V136.Shared
             {
                 memStream.Write(ByteParsers.UInt32.EncodeValue(node.Key ?? 0, out _), 0, 4);
 
-                if (node.AudioNodeID != 0)
-                    memStream.Write(ByteParsers.UInt32.EncodeValue(node.AudioNodeID, out _), 0, 4);
+                if (node.AudioNodeId != 0)
+                    memStream.Write(ByteParsers.UInt32.EncodeValue(node.AudioNodeId, out _), 0, 4);
                 else
                 {
                     memStream.Write(ByteParsers.UShort.EncodeValue(node.ChildrenIdx, out _), 0, 2);
@@ -76,7 +76,7 @@ namespace Shared.GameFormats.Wwise.Hirc.V136.Shared
         public class Node_V136
         {
             public uint? Key { get; set; }
-            public uint AudioNodeID { get; set; }
+            public uint AudioNodeId { get; set; }
             public ushort ChildrenIdx { get; set; }
             public ushort ChildrenCount { get; set; }
             public ushort Weight { get; set; }
@@ -96,7 +96,7 @@ namespace Shared.GameFormats.Wwise.Hirc.V136.Shared
                 var isAudioNode = node.ChildrenIdx > countMax || node.ChildrenCount > countMax || isOver;
                 var isMax = currentDepth == maxDepth;
                 if (isAudioNode || isMax)
-                    node.AudioNodeID = chunk.ReadUInt32();
+                    node.AudioNodeId = chunk.ReadUInt32();
                 else
                 {
                     node.ChildrenIdx = chunk.ReadUShort();
@@ -110,7 +110,7 @@ namespace Shared.GameFormats.Wwise.Hirc.V136.Shared
 
             public uint GetSize()
             {
-                // Either ChildrenIdx and ChildrenCount are used or AudioNodeID is used but in either case the same amount of bytes are used so doesn't matter which one is used to calculate the size here
+                // Either ChildrenIdx and ChildrenCount are used or AudioNodeId is used but in either case the same amount of bytes are used so doesn't matter which one is used to calculate the size here
                 var idSize = ByteHelper.GetPropertyTypeSize(Key);
                 var childrenIdxSize = ByteHelper.GetPropertyTypeSize(ChildrenIdx);
                 var childrenCountSize = ByteHelper.GetPropertyTypeSize(ChildrenCount);

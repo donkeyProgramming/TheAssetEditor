@@ -43,7 +43,7 @@
         public const string QuestBattlesDisplayString = "Quest Battles";
         public const string QuestBattlesSoundBankName = "battle_vo_generals_speech";
         //public const string RitualsDisplayString = "Rituals";
-        //public const string UIDisplayString = "UI";
+        //public const string UIdisplayString = "UI";
         //public const string VocalisationDisplayString = "Vocalisation";
         public const string FrontendMusicDisplayString = "Frontend Music";
         public const string FrontendMusicSoundBankName = "global_music_frontend";
@@ -102,7 +102,7 @@
                 Wh3SoundBankSubtype.Movies => MoviesDisplayString,
                 Wh3SoundBankSubtype.QuestBattles => QuestBattlesDisplayString,
                 //Wh3SoundBankSubtype.Rituals => RitualsDisplayString,
-                //Wh3SoundBankSubtype.UI => UIDisplayString,
+                //Wh3SoundBankSubtype.UI => UIdisplayString,
                 //Wh3SoundBankSubtype.Vocalisation => VocalisationDisplayString,
                 Wh3SoundBankSubtype.FrontendMusic => FrontendMusicDisplayString,
                 //Wh3SoundBankSubtype.CampaignMusic => CampaignMusicDisplayString,
@@ -129,7 +129,7 @@
                 MoviesDisplayString => Wh3SoundBankSubtype.Movies,
                 //QuestBattlesDisplayString => Wh3SoundBankSubtype.QuestBattles,
                 //RitualsDisplayString => Wh3SoundBankSubtype.Rituals,
-                //UIDisplayString => Wh3SoundBankSubtype.UI,
+                //UIdisplayString => Wh3SoundBankSubtype.UI,
                 //VocalisationDisplayString => Wh3SoundBankSubtype.Vocalisation,
                 FrontendMusicDisplayString => Wh3SoundBankSubtype.FrontendMusic,
                 //CampaignMusicDisplayString => Wh3SoundBankSubtype.CampaignMusic,

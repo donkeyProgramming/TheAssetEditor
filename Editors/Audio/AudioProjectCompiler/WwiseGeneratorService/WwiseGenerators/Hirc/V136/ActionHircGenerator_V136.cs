@@ -30,17 +30,17 @@ namespace Editors.Audio.AudioProjectCompiler.WwiseGeneratorService.WwiseGenerato
         {
             var action = new CAkAction_V136
             {
-                ID = audioProjectActionEvent.ID,
+                Id = audioProjectActionEvent.Id,
                 HircType = audioProjectActionEvent.HircType,
                 ActionType = audioProjectActionEvent.ActionType,
-                IdExt = audioProjectActionEvent.IDExt
+                IdExt = audioProjectActionEvent.IdExt
             };
 
             if (soundBankSubType == Wh3SoundBankSubtype.FrontendMusic)
             {
                 action.AkPropBundle0.PropsList.Add(new PropBundleInstance_V136
                 {
-                    ID = AkPropId_V136.TransitionTime,
+                    Id = AkPropId_V136.TransitionTime,
                     Value = 1000
                 });
             }
@@ -53,7 +53,7 @@ namespace Editors.Audio.AudioProjectCompiler.WwiseGeneratorService.WwiseGenerato
             return new CAkAction_V136.PlayActionParams_V136
             {
                 BitVector = 4,
-                BankId = soundBank.ID
+                BankId = soundBank.Id
             };
         }
 

@@ -20,11 +20,11 @@ namespace Editors.Audio.Storage
     {
         public class LoadResult
         {
-            public Dictionary<uint, Dictionary<uint, List<HircItem>>> HircLookupByLanguageIDByID { get; internal set; } = [];
-            public Dictionary<uint, Dictionary<uint, List<ICAkSound>>> SoundHircLookupByLanguageIDBySourceID { get; internal set; } = [];
-            public Dictionary<uint, Dictionary<uint, List<DidxAudio>>> DidxAudioLookupByLanguageIDByID { get; internal set; } = [];
-            public Dictionary<uint, List<HircItem>> HircLookupByID { get; internal set; } = [];
-            public Dictionary<uint, List<DidxAudio>> DidxAudioLookupByID { get; internal set; } = [];
+            public Dictionary<uint, Dictionary<uint, List<HircItem>>> HircLookupByLanguageIdById { get; internal set; } = [];
+            public Dictionary<uint, Dictionary<uint, List<ICAkSound>>> SoundHircLookupByLanguageIdBySourceId { get; internal set; } = [];
+            public Dictionary<uint, Dictionary<uint, List<DidxAudio>>> DidxAudioLookupByLanguageIdById { get; internal set; } = [];
+            public Dictionary<uint, List<HircItem>> HircLookupById { get; internal set; } = [];
+            public Dictionary<uint, List<DidxAudio>> DidxAudioLookupById { get; internal set; } = [];
             public Dictionary<string, PackFile> BnkPackFileLookupByName { get; internal set; } = [];
         }
 
@@ -91,31 +91,31 @@ namespace Editors.Audio.Storage
             // Combine the data
             foreach (var parsedBnk in parsedBnkList)
             {
-                // Build DIDX Audio Items from DIDX and DATA
+                // Build DIdX Audio Items from DIdX and DATA
                 if (parsedBnk.DataChunk is not null && parsedBnk.DidxChunk is not null)
                 {
                     foreach (var didx in parsedBnk.DidxChunk.MediaList)
                     {
                         var didxAudio = new DidxAudio()
                         {
-                            ID = didx.ID,
+                            Id = didx.Id,
                             ByteArray = parsedBnk.DataChunk.GetBytesFromBuffer((int)didx.Offset, (int)didx.Size),
                             OwnerFilePath = parsedBnk.BkhdChunk.OwnerFilePath,
-                            LanguageID = parsedBnk.BkhdChunk.AkBankHeader.LanguageID
+                            LanguageId = parsedBnk.BkhdChunk.AkBankHeader.LanguageId
                         };
 
-                        if (output.DidxAudioLookupByID.ContainsKey(didx.ID) is false)
-                            output.DidxAudioLookupByID[didx.ID] = new List<DidxAudio>();
-                        output.DidxAudioLookupByID[didx.ID].Add(didxAudio);
+                        if (output.DidxAudioLookupById.ContainsKey(didx.Id) is false)
+                            output.DidxAudioLookupById[didx.Id] = new List<DidxAudio>();
+                        output.DidxAudioLookupById[didx.Id].Add(didxAudio);
                     }
                 }
 
                 foreach (var item in parsedBnk.HircChunk.HircItems)
                 {
-                    if (output.HircLookupByID.ContainsKey(item.ID) == false)
-                        output.HircLookupByID[item.ID] = new List<HircItem>();
+                    if (output.HircLookupById.ContainsKey(item.Id) == false)
+                        output.HircLookupById[item.Id] = new List<HircItem>();
 
-                    output.HircLookupByID[item.ID].Add(item);
+                    output.HircLookupById[item.Id].Add(item);
                 }
             }
 
@@ -127,41 +127,41 @@ namespace Editors.Audio.Storage
                 _logger.Here().Error($"{failedBnks.Count} banks failed: {string.Join("\n", failedBnks)}");
 
             // Construct language based Hirc Item data
-            output.HircLookupByLanguageIDByID = output.HircLookupByID
+            output.HircLookupByLanguageIdById = output.HircLookupById
                 .SelectMany(kvp => kvp.Value)
-                .GroupBy(item => item.LanguageID)
+                .GroupBy(item => item.LanguageId)
                 .ToDictionary(
                     langGroup => langGroup.Key,
                     langGroup => langGroup
-                        .GroupBy(item => item.ID)
+                        .GroupBy(item => item.Id)
                         .ToDictionary(
                             idGroup => idGroup.Key,
                             idGroup => idGroup.ToList()
                         )
                 );
 
-            // Construct language Sound Source ID data
-            output.SoundHircLookupByLanguageIDBySourceID = output.HircLookupByLanguageIDByID.ToDictionary(
+            // Construct language Sound Source Id data
+            output.SoundHircLookupByLanguageIdBySourceId = output.HircLookupByLanguageIdById.ToDictionary(
                 language => language.Key,
                 language => language.Value.Values
                     .SelectMany(itemList => itemList)
                     .Where(hircItem => hircItem is ICAkSound)
                     .Cast<ICAkSound>()
-                    .GroupBy(sound => sound.GetSourceID())
+                    .GroupBy(sound => sound.GetSourceId())
                     .ToDictionary(
                         sourceGroup => sourceGroup.Key,
                         sourceGroup => sourceGroup.ToList()
                     )
             );
 
-            // Construct language DIDX Audio ID
-            output.DidxAudioLookupByLanguageIDByID = output.DidxAudioLookupByID
+            // Construct language DIdX Audio Id
+            output.DidxAudioLookupByLanguageIdById = output.DidxAudioLookupById
                 .SelectMany(kvp => kvp.Value)
-                .GroupBy(item => item.LanguageID)
+                .GroupBy(item => item.LanguageId)
                 .ToDictionary(
                     langGroup => langGroup.Key,
                     langGroup => langGroup
-                        .GroupBy(item => item.ID)
+                        .GroupBy(item => item.Id)
                         .ToDictionary(
                             idGroup => idGroup.Key,
                             idGroup => idGroup.ToList()
@@ -169,7 +169,7 @@ namespace Editors.Audio.Storage
                 );
 
             // TODO: Temporary solution to limit what the Audio Explorer uses to english language stuff before I rework the audio explorer
-            foreach (var id in output.HircLookupByID)
+            foreach (var id in output.HircLookupById)
                 id.Value.RemoveAll(item => languages.Any(language => item.OwnerFilePath.Contains(language)));
 
             return output;

@@ -10,16 +10,16 @@ namespace Shared.GameFormats.Wwise.Hirc
 
     public interface ICAkSound
     {
-        public uint GetDirectParentID();
-        public uint GetSourceID();
+        public uint GetDirectParentId();
+        public uint GetSourceId();
         public AKBKSourceType GetStreamType();
     }
 
     public interface ICAkAction
     {
         public AkActionType GetActionType();
-        public uint GetChildID();
-        public uint GetStateGroupID();
+        public uint GetChildId();
+        public uint GetStateGroupId();
     }
 
     public interface ICAkDialogueEvent
@@ -29,7 +29,7 @@ namespace Shared.GameFormats.Wwise.Hirc
 
         public interface IAkGameSync
         {
-            public uint GroupID { get; set;  }
+            public uint GroupId { get; set;  }
             public AkGroupType GroupType { get; set; }
             public uint GetSize();
         }
@@ -44,22 +44,22 @@ namespace Shared.GameFormats.Wwise.Hirc
     public interface ICAkActorMixer
     {
         public List<uint> GetChildren();
-        public uint GetDirectParentID();
+        public uint GetDirectParentId();
     }
 
     public interface ICAkSwitchCntr
     {
-        public uint GroupID { get; }
+        public uint GroupId { get; }
         public uint DefaultSwitch { get; }
         public List<ICAkSwitchPackage> SwitchList { get; }
 
         public interface ICAkSwitchPackage
         {
-            public uint SwitchID { get; }
+            public uint SwitchId { get; }
             public List<uint> NodeIdList { get; }
         }
 
-        public uint GetDirectParentID();
+        public uint GetDirectParentId();
     }
 
     public interface ICAkMusicTrack
@@ -70,12 +70,12 @@ namespace Shared.GameFormats.Wwise.Hirc
     public interface ICAkLayerCntr
     {
         public List<uint> GetChildren();
-        public uint GetDirectParentID();
+        public uint GetDirectParentId();
     }
 
     public interface ICAkRanSeqCntr
     {
-        public uint GetDirectParentID();
+        public uint GetDirectParentId();
         public List<uint> GetChildren();
     }
 }

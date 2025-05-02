@@ -249,7 +249,7 @@ namespace Editors.Audio.AudioEditor.AudioProjectData
     public abstract class AudioProjectItem
     {
         public string Name { get; set; }
-        public uint ID { get; set; }
+        public uint Id { get; set; }
     }
 
     public abstract class AudioProjectHircItem : AudioProjectItem
@@ -282,7 +282,7 @@ namespace Editors.Audio.AudioEditor.AudioProjectData
     {
         public override AkBkHircType HircType { get; set; } = AkBkHircType.Action;
         public AkActionType ActionType { get; set; } = AkActionType.Play;
-        public uint IDExt { get; set; }
+        public uint IdExt { get; set; }
     }
 
     public class DialogueEvent : AudioProjectHircItem
@@ -314,8 +314,8 @@ namespace Editors.Audio.AudioEditor.AudioProjectData
     public class RandomSequenceContainer : AudioProjectHircItem
     {
         public override AkBkHircType HircType { get; set; } = AkBkHircType.RandomSequenceContainer;
-        public uint OverrideBusID { get; set; }
-        public uint DirectParentID { get; set; }
+        public uint OverrideBusId { get; set; }
+        public uint DirectParentId { get; set; }
         public RanSeqContainerSettings AudioSettings { get; set; }
         public List<Sound> Sounds { get; set; }
         public string Language { get; set; }
@@ -324,9 +324,9 @@ namespace Editors.Audio.AudioEditor.AudioProjectData
     public class Sound : AudioProjectHircItem
     {
         public override AkBkHircType HircType { get; set; } = AkBkHircType.Sound;
-        public uint OverrideBusID { get; set; }
-        public uint DirectParentID { get; set; }
-        public uint SourceID { get; set; }
+        public uint OverrideBusId { get; set; }
+        public uint DirectParentId { get; set; }
+        public uint SourceId { get; set; }
         public string WavFileName { get; set; }
         public string WavFilePath { get; set; }
         public string WemFileName { get; set; }

@@ -44,12 +44,12 @@ namespace Editors.Reports.Audio
             var hircItem = dialogueEvent as HircItem;
 
             var stateGroups = dialogueEvent.Arguments
-                .Select(argument => _audioRepository.GetNameFromID(argument.GroupID))
+                .Select(argument => _audioRepository.GetNameFromId(argument.GroupId))
                 .ToList();
 
             var stateGroupsJoined = string.Join(", ", stateGroups);
 
-            var info = $"{_audioRepository.GetNameFromID(hircItem.ID)} : {stateGroupsJoined}";
+            var info = $"{_audioRepository.GetNameFromId(hircItem.Id)} : {stateGroupsJoined}";
             Console.WriteLine(info);
 
             var filePath = $"{DirectoryHelper.ReportsDirectory}\\dialogue_event_info.txt";

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Editors.Audio.AudioEditor.AudioProjectData;
-using Editors.Audio.AudioProjectCompiler.WwiseIDService;
+using Editors.Audio.AudioProjectCompiler.WwiseIdService;
 using Editors.Audio.GameSettings.Warhammer3;
 using Editors.Audio.Storage;
 using Editors.Audio.Utility;
@@ -20,8 +20,8 @@ namespace Editors.Audio.AudioProjectCompiler
         private readonly ApplicationSettingsService _applicationSettingsService;
         private readonly IAudioRepository _audioRepository;
 
-        private Dictionary<uint, HashSet<uint>> UsedHircIdsByLanguageIDLookup { get; set; } = [];
-        private Dictionary<uint, HashSet<uint>> UsedSourceIdsByLanguageIDLookup { get; set; } = [];
+        private Dictionary<uint, HashSet<uint>> UsedHircIdsByLanguageIdLookup { get; set; } = [];
+        private Dictionary<uint, HashSet<uint>> UsedSourceIdsByLanguageIdLookup { get; set; } = [];
 
         public CompilerDataProcessor(
             ApplicationSettingsService applicationSettingsService,
@@ -30,13 +30,13 @@ namespace Editors.Audio.AudioProjectCompiler
             _applicationSettingsService = applicationSettingsService;
             _audioRepository = audioRepository;
 
-            UsedHircIdsByLanguageIDLookup = _audioRepository.HircLookupByLanguageIDByID
+            UsedHircIdsByLanguageIdLookup = _audioRepository.HircLookupByLanguageIdById
                 .ToDictionary(
                     outer => outer.Key,
                     outer => outer.Value.Keys.ToHashSet()
                 );
 
-            UsedSourceIdsByLanguageIDLookup = _audioRepository.SoundHircLookupByLanguageIDBySourceID
+            UsedSourceIdsByLanguageIdLookup = _audioRepository.SoundHircLookupByLanguageIdBySourceId
                 .ToDictionary(
                     outer => outer.Key,
                     outer => outer.Value.Keys.ToHashSet()
@@ -58,14 +58,14 @@ namespace Editors.Audio.AudioProjectCompiler
                 else
                     soundBank.SoundBankFilePath = $"{basePath}\\{soundBank.Language}\\{soundBank.SoundBankFileName}";
 
-                soundBank.ID = WwiseHashRename.Compute(soundBank.SoundBankFileName.Replace(".bnk", string.Empty));
+                soundBank.Id = WwiseHash.Compute(soundBank.SoundBankFileName.Replace(".bnk", string.Empty));
             }
         }
 
         public void SetInitialSourceData(AudioProject audioProject)
         {
-            var wwiseIDService = WwiseIDServiceFactory.GetWwiseIDService(_applicationSettingsService.CurrentSettings.CurrentGame);
-            var sourceIDByWavFilePathLookup = new Dictionary<string, uint>();
+            var wwiseIdService = WwiseIdServiceFactory.GetWwiseIdService(_applicationSettingsService.CurrentSettings.CurrentGame);
+            var sourceIdByWavFilePathLookup = new Dictionary<string, uint>();
 
             foreach (var soundBank in audioProject.SoundBanks)
             {
@@ -78,16 +78,16 @@ namespace Editors.Audio.AudioProjectCompiler
                                 audioProject.FileName,
                                 actionEvent.Sound,
                                 soundBank,
-                                sourceIDByWavFilePathLookup,
-                                wwiseIDService);
+                                sourceIdByWavFilePathLookup,
+                                wwiseIdService);
                         else
                         {
                             SetRandomSequenceContainerData(
                                 audioProject.FileName,
                                 actionEvent.RandomSequenceContainer,
                                 soundBank,
-                                sourceIDByWavFilePathLookup,
-                                wwiseIDService,
+                                sourceIdByWavFilePathLookup,
+                                wwiseIdService,
                                 actionEventName: actionEvent.Name);
                         }
 
@@ -105,15 +105,15 @@ namespace Editors.Audio.AudioProjectCompiler
                                     audioProject.FileName,
                                     statePath.Sound,
                                     soundBank,
-                                    sourceIDByWavFilePathLookup,
-                                    wwiseIDService);
+                                    sourceIdByWavFilePathLookup,
+                                    wwiseIdService);
                             else
                                 SetRandomSequenceContainerData(
                                     audioProject.FileName,
                                     statePath.RandomSequenceContainer,
                                     soundBank,
-                                    sourceIDByWavFilePathLookup,
-                                    wwiseIDService,
+                                    sourceIdByWavFilePathLookup,
+                                    wwiseIdService,
                                     dialogueEventName: dialogueEvent.Name,
                                     statePath: statePath);
                         }
@@ -127,7 +127,7 @@ namespace Editors.Audio.AudioProjectCompiler
             var soundsWithUniqueSourceIds = AudioProjectCompilerHelpers.GetAllUniqueSounds(audioProject);
             foreach (var sound in soundsWithUniqueSourceIds)
             {
-                sound.WemFileName = $"{sound.SourceID}.wem";
+                sound.WemFileName = $"{sound.SourceId}.wem";
 
                 var basePath = $"audio\\wwise";
                 if (string.IsNullOrEmpty(sound.Language))
@@ -148,31 +148,31 @@ namespace Editors.Audio.AudioProjectCompiler
             Sound sound,
             SoundBank soundBank,
             Dictionary<string, uint> sourceLookup,
-            IWwiseIDService wwiseIDService)
+            IWwiseIdService wwiseIdService)
         {
             sound.Language = soundBank.Language;
 
-            var usedHircIds = UsedHircIdsByLanguageIDLookup[WwiseHash.Compute(soundBank.Language)];
+            var usedHircIds = UsedHircIdsByLanguageIdLookup[WwiseHash.Compute(soundBank.Language)];
             var soundFileNameWithoutExtension = Path.GetFileNameWithoutExtension(sound.WavFileName);
-            var soundIDResult = IDGenerator.GenerateSoundHircID(usedHircIds, audioProjectFileName, soundFileNameWithoutExtension);
-            sound.ID = soundIDResult.ID;
+            var soundIdResult = IdGenerator.GenerateSoundHircId(usedHircIds, audioProjectFileName, soundFileNameWithoutExtension);
+            sound.Id = soundIdResult.Id;
 
-            if (wwiseIDService.OverrideBusIds.TryGetValue(soundBank.SoundBankSubtype, out var overrideBusID))
-                sound.OverrideBusID = overrideBusID;
+            if (wwiseIdService.OverrideBusIds.TryGetValue(soundBank.SoundBankSubtype, out var overrideBusId))
+                sound.OverrideBusId = overrideBusId;
             else
-                sound.OverrideBusID = 0;
+                sound.OverrideBusId = 0;
 
-            if (wwiseIDService.ActorMixerIds.TryGetValue(soundBank.SoundBankSubtype, out var actorMixerID))
-                sound.DirectParentID = actorMixerID;
+            if (wwiseIdService.ActorMixerIds.TryGetValue(soundBank.SoundBankSubtype, out var actorMixerId))
+                sound.DirectParentId = actorMixerId;
 
-            if (!sourceLookup.TryGetValue(sound.WavFilePath, out var sourceID))
+            if (!sourceLookup.TryGetValue(sound.WavFilePath, out var sourceId))
             {
-                var usedSourceIds = UsedSourceIdsByLanguageIDLookup[WwiseHash.Compute(soundBank.Language)];
-                var sourceIDResult = IDGenerator.GenerateWemID(usedSourceIds, audioProjectFileName, soundFileNameWithoutExtension);
-                sourceID = sourceIDResult.ID;
-                sourceLookup[sound.WavFilePath] = sourceID;
+                var usedSourceIds = UsedSourceIdsByLanguageIdLookup[WwiseHash.Compute(soundBank.Language)];
+                var sourceIdResult = IdGenerator.GenerateWemId(usedSourceIds, audioProjectFileName, soundFileNameWithoutExtension);
+                sourceId = sourceIdResult.Id;
+                sourceLookup[sound.WavFilePath] = sourceId;
             }
-            sound.SourceID = sourceID;
+            sound.SourceId = sourceId;
         }
 
         private void SetRandomSequenceContainerData(
@@ -180,42 +180,42 @@ namespace Editors.Audio.AudioProjectCompiler
             RandomSequenceContainer container,
             SoundBank soundBank,
             Dictionary<string, uint> sourceLookup,
-            IWwiseIDService wwiseIDService,
+            IWwiseIdService wwiseIdService,
             string actionEventName = null,
             string dialogueEventName = null,
             StatePath statePath = null)
         {
             container.Language = soundBank.Language;
 
-            var usedHircIds = UsedHircIdsByLanguageIDLookup[WwiseHash.Compute(soundBank.Language)];
-            IDGenerator.Result containerIDResult;
+            var usedHircIds = UsedHircIdsByLanguageIdLookup[WwiseHash.Compute(soundBank.Language)];
+            IdGenerator.Result containerIdResult;
 
             if (actionEventName != null)
             {
-                containerIDResult = IDGenerator.GenerateRanSeqCntrActionEventHircID(usedHircIds, audioProjectFileName, actionEventName);
-                container.ID = containerIDResult.ID;
+                containerIdResult = IdGenerator.GenerateRanSeqCntrActionEventHircId(usedHircIds, audioProjectFileName, actionEventName);
+                container.Id = containerIdResult.Id;
             }
             else if (dialogueEventName != null)
             {
-                containerIDResult = IDGenerator.GenerateRanSeqCntrDialogueEventHircID(usedHircIds, audioProjectFileName, actionEventName, statePath);
-                container.ID = containerIDResult.ID;
+                containerIdResult = IdGenerator.GenerateRanSeqCntrDialogueEventHircId(usedHircIds, audioProjectFileName, actionEventName, statePath);
+                container.Id = containerIdResult.Id;
             }
 
-            if (wwiseIDService.OverrideBusIds.TryGetValue(soundBank.SoundBankSubtype, out var overrideBusID))
-                container.OverrideBusID = overrideBusID;
+            if (wwiseIdService.OverrideBusIds.TryGetValue(soundBank.SoundBankSubtype, out var overrideBusId))
+                container.OverrideBusId = overrideBusId;
             else
-                container.OverrideBusID = 0;
+                container.OverrideBusId = 0;
 
-            if (wwiseIDService.ActorMixerIds.TryGetValue(soundBank.SoundBankSubtype, out var actorMixerID))
-                container.DirectParentID = actorMixerID;
+            if (wwiseIdService.ActorMixerIds.TryGetValue(soundBank.SoundBankSubtype, out var actorMixerId))
+                container.DirectParentId = actorMixerId;
 
             foreach (var sound in container.Sounds)
             {
-                SetSoundData(audioProjectFileName, sound, soundBank, sourceLookup, wwiseIDService);
-                sound.DirectParentID = container.ID;
+                SetSoundData(audioProjectFileName, sound, soundBank, sourceLookup, wwiseIdService);
+                sound.DirectParentId = container.Id;
             }
 
-            container.Sounds = container.Sounds.OrderBy(sound => sound.ID).ToList();
+            container.Sounds = container.Sounds.OrderBy(sound => sound.Id).ToList();
         }
 
         public void CreateStopActionEvents(AudioProject audioProject)
@@ -232,7 +232,7 @@ namespace Editors.Audio.AudioProjectCompiler
                         var stopEvent = new ActionEvent
                         {
                             Name = stopEventName,
-                            ID = WwiseHashRename.Compute(stopEventName),
+                            Id = WwiseHash.Compute(stopEventName),
                             HircType = actionEvent.HircType,
                             RandomSequenceContainer = actionEvent.RandomSequenceContainer,
                             Sound = actionEvent.Sound
@@ -256,19 +256,19 @@ namespace Editors.Audio.AudioProjectCompiler
                     if (actionEvent.Name.StartsWith("Stop_"))
                         action.ActionType = AkActionType.Stop_E_O;
 
-                    var usedHircIds = UsedHircIdsByLanguageIDLookup[WwiseHash.Compute(soundBank.Language)];
+                    var usedHircIds = UsedHircIdsByLanguageIdLookup[WwiseHash.Compute(soundBank.Language)];
 
                     if (actionEvent.Sound != null)
                     {
-                        var actionIDResult = IDGenerator.GenerateActionHircID(usedHircIds, audioProject.FileName, actionEvent.Name);
-                        action.ID = actionIDResult.ID;
-                        action.IDExt = actionEvent.Sound.ID;
+                        var actionIdResult = IdGenerator.GenerateActionHircId(usedHircIds, audioProject.FileName, actionEvent.Name);
+                        action.Id = actionIdResult.Id;
+                        action.IdExt = actionEvent.Sound.Id;
                     } 
                     else
                     {
-                        var actionIDResult = IDGenerator.GenerateActionHircID(usedHircIds, audioProject.FileName, actionEvent.Name);
-                        action.ID = actionIDResult.ID; 
-                        action.IDExt = actionEvent.RandomSequenceContainer.ID;
+                        var actionIdResult = IdGenerator.GenerateActionHircId(usedHircIds, audioProject.FileName, actionEvent.Name);
+                        action.Id = actionIdResult.Id; 
+                        action.IdExt = actionEvent.RandomSequenceContainer.Id;
                     }
 
                     actionEvent.Actions = [action];
@@ -277,7 +277,7 @@ namespace Editors.Audio.AudioProjectCompiler
                         throw new NotSupportedException("We're not set up to handle multiple actions.");
 
                     actionEvent.Actions = actionEvent.Actions
-                        .OrderBy(action => action.ID)
+                        .OrderBy(action => action.Id)
                         .ToList();
                 }
             }
@@ -289,14 +289,14 @@ namespace Editors.Audio.AudioProjectCompiler
             {
                 foreach (var actionEvent in soundBank.ActionEvents)
                 {
-                    actionEvent.ID = WwiseHashRename.Compute(actionEvent.Name);
+                    actionEvent.Id = WwiseHash.Compute(actionEvent.Name);
 
-                    if (UsedHircIdsByLanguageIDLookup[WwiseHashRename.Compute(soundBank.Language)].Contains(actionEvent.ID))
-                        throw new NotSupportedException($"Action Event ID {actionEvent.ID} for {actionEvent.Name} in {soundBank.Language} is already in use, the Event needs a different name.");
+                    if (UsedHircIdsByLanguageIdLookup[WwiseHash.Compute(soundBank.Language)].Contains(actionEvent.Id))
+                        throw new NotSupportedException($"Action Event Id {actionEvent.Id} for {actionEvent.Name} in {soundBank.Language} is already in use, the Event needs a different name.");
                 }
 
                 soundBank.ActionEvents = soundBank.ActionEvents
-                    .OrderBy(actionEvent => actionEvent.ID)
+                    .OrderBy(actionEvent => actionEvent.Id)
                     .ToList();
             }
         }
@@ -305,14 +305,14 @@ namespace Editors.Audio.AudioProjectCompiler
         {
             foreach (var stateGroup in audioProject.StateGroups)
             {
-                stateGroup.ID = WwiseHashRename.Compute(stateGroup.Name);
+                stateGroup.Id = WwiseHash.Compute(stateGroup.Name);
 
                 foreach (var state in stateGroup.States)
                 {
                     if (state.Name == "Any")
-                        state.ID = 0;
+                        state.Id = 0;
                     else
-                        state.ID = WwiseHashRename.Compute(state.Name);
+                        state.Id = WwiseHash.Compute(state.Name);
                 }
             }
         }
@@ -324,11 +324,11 @@ namespace Editors.Audio.AudioProjectCompiler
                 foreach (var dialogueEvent in soundBank.DialogueEvents)
                 {
                     foreach (var statePath in dialogueEvent.StatePaths)
-                        dialogueEvent.ID = WwiseHashRename.Compute(dialogueEvent.Name);
+                        dialogueEvent.Id = WwiseHash.Compute(dialogueEvent.Name);
                 }
 
                 soundBank.DialogueEvents = soundBank.DialogueEvents
-                    .OrderBy(dialogueEvent => dialogueEvent.ID)
+                    .OrderBy(dialogueEvent => dialogueEvent.Id)
                     .ToList();
             }
         }

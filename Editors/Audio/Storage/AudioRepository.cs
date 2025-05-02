@@ -12,42 +12,42 @@ namespace Editors.Audio.Storage
 {
     public interface IAudioRepository
     {
-        Dictionary<uint, Dictionary<uint, List<HircItem>>> HircLookupByLanguageIDByID { get; }
-        Dictionary<uint, Dictionary<uint, List<ICAkSound>>> SoundHircLookupByLanguageIDBySourceID { get; }
-        Dictionary<uint, Dictionary<uint, List<DidxAudio>>> DidxAudioLookupByLanguageIDByID { get; }
-        Dictionary<uint, List<HircItem>> HircLookupByID { get; }
-        Dictionary<uint, List<DidxAudio>> DidxAudioLookupByID { get; }
+        Dictionary<uint, Dictionary<uint, List<HircItem>>> HircLookupByLanguageIdById { get; }
+        Dictionary<uint, Dictionary<uint, List<ICAkSound>>> SoundHircLookupByLanguageIdBySourceId { get; }
+        Dictionary<uint, Dictionary<uint, List<DidxAudio>>> DidxAudioLookupByLanguageIdById { get; }
+        Dictionary<uint, List<HircItem>> HircLookupById { get; }
+        Dictionary<uint, List<DidxAudio>> DidxAudioLookupById { get; }
         Dictionary<string, PackFile> BnkPackFileLookupByName { get; }
-        Dictionary<uint, string> NameLookupByID { get; }
+        Dictionary<uint, string> NameLookupById { get; }
         Dictionary<string, List<string>> StateGroupsLookupByDialogueEvent { get; }
         Dictionary<string, Dictionary<string, string>> QualifiedStateGroupLookupByStateGroupByDialogueEvent { get; }
         Dictionary<string, List<string>> StatesLookupByStateGroup { get; }
-        Dictionary<string, Dictionary<uint, string>> StatesLookupByStateGroupByStateID { get; }
+        Dictionary<string, Dictionary<uint, string>> StatesLookupByStateGroupByStateId { get; }
 
         void ExportNameListToFile(string outputDirectory, bool includeIds = false);
         List<T> GetHircItemsByType<T>() where T : class;
         List<HircItem> GetHircObject(uint id);
         List<HircItem> GetHircObject(uint id, string owningFileName);
-        string GetNameFromID(uint value);
-        string GetNameFromID(uint value, out bool found);
-        string GetNameFromID(uint? key);
+        string GetNameFromId(uint value);
+        string GetNameFromId(uint value, out bool found);
+        string GetNameFromId(uint? key);
         string GetOwnerFileFromDialogueEvent(uint id);
         string GetStateGroupFromStateGroupWithQualifier(string dialogueEvent, string stateGroupWithQualifier);
     }
 
     public class AudioRepository : IAudioRepository
     {
-        public Dictionary<uint, Dictionary<uint, List<HircItem>>> HircLookupByLanguageIDByID { get; set; }
-        public Dictionary<uint, Dictionary<uint, List<ICAkSound>>> SoundHircLookupByLanguageIDBySourceID { get; set; }
-        public Dictionary<uint, Dictionary<uint, List<DidxAudio>>> DidxAudioLookupByLanguageIDByID { get; set; }
-        public Dictionary<uint, List<HircItem>> HircLookupByID { get; set; }
-        public Dictionary<uint, List<DidxAudio>> DidxAudioLookupByID { get; set; }
+        public Dictionary<uint, Dictionary<uint, List<HircItem>>> HircLookupByLanguageIdById { get; set; }
+        public Dictionary<uint, Dictionary<uint, List<ICAkSound>>> SoundHircLookupByLanguageIdBySourceId { get; set; }
+        public Dictionary<uint, Dictionary<uint, List<DidxAudio>>> DidxAudioLookupByLanguageIdById { get; set; }
+        public Dictionary<uint, List<HircItem>> HircLookupById { get; set; }
+        public Dictionary<uint, List<DidxAudio>> DidxAudioLookupById { get; set; }
         public Dictionary<string, PackFile> BnkPackFileLookupByName { get; set; }
-        public Dictionary<uint, string> NameLookupByID { get; set; }
+        public Dictionary<uint, string> NameLookupById { get; set; }
         public Dictionary<string, List<string>> StateGroupsLookupByDialogueEvent { get; set; }
         public Dictionary<string, Dictionary<string, string>> QualifiedStateGroupLookupByStateGroupByDialogueEvent { get; set; }
         public Dictionary<string, List<string>> StatesLookupByStateGroup { get; set; }
-        public Dictionary<string, Dictionary<uint, string>> StatesLookupByStateGroupByStateID { get; set; }
+        public Dictionary<string, Dictionary<uint, string>> StatesLookupByStateGroupByStateId { get; set; }
 
         public AudioRepository(RepositoryProvider provider, ApplicationSettingsService applicationSettingsService)
         {
@@ -61,23 +61,23 @@ namespace Editors.Audio.Storage
                 provider.LoadBnkData(audioData);
             }
 
-            HircLookupByLanguageIDByID = audioData.HircLookupByLanguageIDByID ?? [];
-            SoundHircLookupByLanguageIDBySourceID = audioData.SoundHircLookupByLanguageIDBySourceID ?? [];
-            DidxAudioLookupByLanguageIDByID = audioData.DidxAudioLookupByLanguageIDByID ?? [];
-            HircLookupByID = audioData.HircLookupByID ?? [];
-            DidxAudioLookupByID = audioData.DidxAudioLookupByID ?? [];
+            HircLookupByLanguageIdById = audioData.HircLookupByLanguageIdById ?? [];
+            SoundHircLookupByLanguageIdBySourceId = audioData.SoundHircLookupByLanguageIdBySourceId ?? [];
+            DidxAudioLookupByLanguageIdById = audioData.DidxAudioLookupByLanguageIdById ?? [];
+            HircLookupById = audioData.HircLookupById ?? [];
+            DidxAudioLookupById = audioData.DidxAudioLookupById ?? [];
             BnkPackFileLookupByName = audioData.BnkPackFileLookupByName ?? [];
-            NameLookupByID = audioData.NameLookupByID ?? [];
+            NameLookupById = audioData.NameLookupById ?? [];
             StateGroupsLookupByDialogueEvent = audioData.StateGroupsLookupByDialogueEvent ?? [];
             QualifiedStateGroupLookupByStateGroupByDialogueEvent = audioData.QualifiedStateGroupLookupByStateGroupByDialogueEvent ?? [];
             StatesLookupByStateGroup = audioData.StatesLookupByStateGroup ?? [];
-            StatesLookupByStateGroupByStateID = audioData.StatesLookupByStateGroupByStateID ?? [];
+            StatesLookupByStateGroupByStateId = audioData.StatesLookupByStateGroupByStateId ?? [];
         }
 
         public List<HircItem> GetHircObject(uint id)
         {
-            if (HircLookupByID.ContainsKey(id))
-                return HircLookupByID[id];
+            if (HircLookupById.ContainsKey(id))
+                return HircLookupById[id];
             return [];
         }
 
@@ -87,29 +87,29 @@ namespace Editors.Audio.Storage
             return hircItems;
         }
 
-        public string GetNameFromID(uint value, out bool found)
+        public string GetNameFromId(uint value, out bool found)
         {
-            found = NameLookupByID.ContainsKey(value);
+            found = NameLookupById.ContainsKey(value);
             if (found)
-                return NameLookupByID[value];
+                return NameLookupById[value];
             return value.ToString();
         }
 
         public List<T> GetHircItemsByType<T>() where T : class
         {
-            return HircLookupByID.Values
+            return HircLookupById.Values
                 .SelectMany(items => items)
                 .OfType<T>()
                 .ToList();
         }
 
-        public string GetNameFromID(uint value) => GetNameFromID(value, out var _);
+        public string GetNameFromId(uint value) => GetNameFromId(value, out var _);
 
         public void ExportNameListToFile(string outputDirectory, bool includeIds = false)
         {
             var ss = new StringBuilder();
 
-            foreach (var item in NameLookupByID)
+            foreach (var item in NameLookupById)
             {
                 if (includeIds)
                     ss.AppendLine($"{item.Key}\t\t{item.Value}");
@@ -121,21 +121,21 @@ namespace Editors.Audio.Storage
             File.WriteAllText(path, ss.ToString());
         }
 
-        public string GetNameFromID(uint? key)
+        public string GetNameFromId(uint? key)
         {
             if (key.HasValue)
-                return GetNameFromID(key.Value);
+                return GetNameFromId(key.Value);
             else
                 throw new System.NotImplementedException();
         }
 
         public string GetOwnerFileFromDialogueEvent(uint id)
         {
-            if (HircLookupByID.TryGetValue(id, out var hircItemList))
+            if (HircLookupById.TryGetValue(id, out var hircItemList))
             {
                 foreach (var hircItem in hircItemList)
                 {
-                    if (hircItem.HircType == AkBkHircType.Dialogue_Event && hircItem.ID == id && hircItem.IsCaHircItem)
+                    if (hircItem.HircType == AkBkHircType.Dialogue_Event && hircItem.Id == id && hircItem.IsCaHircItem)
                     {
                         var file = Path.GetFileName(hircItem.OwnerFilePath);
                         file = Path.GetFileNameWithoutExtension(file);

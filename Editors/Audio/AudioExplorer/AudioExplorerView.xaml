@@ -37,7 +37,7 @@
                 <MenuItem Header="Load all bnks" Click="{s:MethodBinding LoadAllBnksAction}" IsEnabled="False"/>
                 <MenuItem Header="Load one bnks" Click="{s:MethodBinding BrowseBnkAction}" IsEnabled="False"/>
                 <MenuItem Header="Export id list" Click="{s:MethodBinding ExportIdListAction}"/>
-                <MenuItem Header="Load Hirc From ID" Click="{s:MethodBinding LoadHircFromIdAction}"/>
+                <MenuItem Header="Load Hirc From Id" Click="{s:MethodBinding LoadHircFromIdAction}"/>
             </MenuItem>
         </Menu>
 
@@ -69,7 +69,7 @@
                                 <ColumnDefinition/>
                             </Grid.ColumnDefinitions>
                             <DockPanel Grid.Column="0">
-                                <CheckBox DockPanel.Dock="Top" Content="Show ID" IsChecked="{Binding ShowIds.Value, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" IsEnabled="false"/>
+                                <CheckBox DockPanel.Dock="Top" Content="Show Id" IsChecked="{Binding ShowIds.Value, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" IsEnabled="false"/>
                                 <CheckBox DockPanel.Dock="Top" Content="Show File Name" IsChecked="{Binding ShowBnkName.Value, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" IsEnabled="false"/>
                                 <CheckBox DockPanel.Dock="Top" Content="Use bnk name ref" IsChecked="{Binding UseBnkNameWhileParsing.Value, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" IsEnabled="false"/>
                             </DockPanel>

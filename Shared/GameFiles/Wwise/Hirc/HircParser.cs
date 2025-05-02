@@ -14,7 +14,7 @@ namespace Shared.GameFormats.Wwise.Hirc
             return HircFactory.CreateFactory(bnkVersion);
         }
 
-        public HircChunk Parse(string filePath, ByteChunk chunk, uint bnkVersion, uint languageID, bool isCaHircItem)
+        public HircChunk Parse(string filePath, ByteChunk chunk, uint bnkVersion, uint languageId, bool isCaHircItem)
         {
             var hircChunk = new HircChunk
             {
@@ -36,7 +36,7 @@ namespace Shared.GameFormats.Wwise.Hirc
                     hircItem.IndexInFile = itemIndex;
                     hircItem.ByteIndexInFile = itemIndex;
                     hircItem.OwnerFilePath = filePath;
-                    hircItem.LanguageID = languageID;
+                    hircItem.LanguageId = languageId;
                     hircItem.IsCaHircItem = isCaHircItem;
                     hircItem.Parse(chunk);
                     hircChunk.HircItems.Add(hircItem);

@@ -25,7 +25,7 @@ namespace Editors.Audio.Utility
         public class DecisionPath
         {
             public List<DecisionPathItem> Items { get; set; } = new List<DecisionPathItem>();
-            public uint ChildNodeID { get; set; }
+            public uint ChildNodeId { get; set; }
 
             public string GetAsString(string separator = ".") => string.Join(separator, Items.Select(x => x.DisplayName));
         }
@@ -57,10 +57,10 @@ namespace Editors.Audio.Utility
             var decisionPath = new List<DecisionPath>();
             foreach (var path in paths)
             {
-                var currentPath = new DecisionPath() { ChildNodeID = path.Item2 };
+                var currentPath = new DecisionPath() { ChildNodeId = path.Item2 };
                 foreach (var item in path.Item1.Skip(1))
                 {
-                    var name = _audioRepository.GetNameFromID(item.Key);
+                    var name = _audioRepository.GetNameFromId(item.Key);
                     if (item.Key == 0)
                         name = "Any";
                     currentPath.Items.Add(new DecisionPathItem() { DisplayName = name, Value = (uint)item.Key });
@@ -72,13 +72,13 @@ namespace Editors.Audio.Utility
             var arguments = argumentsList
                 .Select(x =>
                 {
-                    var name = _audioRepository.GetNameFromID(x.GroupID);
-                    return new { Name = name, x.GroupID };
+                    var name = _audioRepository.GetNameFromId(x.GroupId);
+                    return new { Name = name, x.GroupId };
                 }).ToList();
 
             var decisionPathCollection = new DecisionPathCollection()
             {
-                Header = new DecisionPath() { Items = arguments.Select(x => new DecisionPathItem() { DisplayName = x.Name, Value = x.GroupID }).ToList() },
+                Header = new DecisionPath() { Items = arguments.Select(x => new DecisionPathItem() { DisplayName = x.Name, Value = x.GroupId }).ToList() },
                 Paths = decisionPath
             };
 
@@ -91,10 +91,10 @@ namespace Editors.Audio.Utility
             var decisionPath = new List<DecisionPath>();
             foreach (var path in paths)
             {
-                var currentPath = new DecisionPath() { ChildNodeID = path.Item2 };
+                var currentPath = new DecisionPath() { ChildNodeId = path.Item2 };
                 foreach (var item in path.Item1.Skip(1))
                 {
-                    var name = _audioRepository.GetNameFromID(item.Key);
+                    var name = _audioRepository.GetNameFromId(item.Key);
                     if (item.Key == 0)
                         name = "Any";
                     currentPath.Items.Add(new DecisionPathItem() { DisplayName = name, Value = (uint)item.Key });
@@ -106,13 +106,13 @@ namespace Editors.Audio.Utility
             var arguments = argumentsList
                 .Select(x =>
                 {
-                    var name = _audioRepository.GetNameFromID(x.GroupID);
-                    return new { Name = name, x.GroupID };
+                    var name = _audioRepository.GetNameFromId(x.GroupId);
+                    return new { Name = name, x.GroupId };
                 }).ToList();
 
             var decisionPathCollection = new DecisionPathCollection()
             {
-                Header = new DecisionPath() { Items = arguments.Select(x => new DecisionPathItem() { DisplayName = x.Name, Value = x.GroupID }).ToList() },
+                Header = new DecisionPath() { Items = arguments.Select(x => new DecisionPathItem() { DisplayName = x.Name, Value = x.GroupId }).ToList() },
                 Paths = decisionPath
             };
 
@@ -143,7 +143,7 @@ namespace Editors.Audio.Utility
         {
             var peek = stack.Peek();
             if (peek.Nodes.Count == 0)
-                decisionPaths.Add((stack.Select(e => e).Reverse().ToArray(), peek.AudioNodeID));
+                decisionPaths.Add((stack.Select(e => e).Reverse().ToArray(), peek.AudioNodeId));
 
             peek.Nodes.ForEach(e =>
             {

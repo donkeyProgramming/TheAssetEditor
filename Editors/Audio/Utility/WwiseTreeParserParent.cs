@@ -22,71 +22,71 @@ namespace Editors.Audio.Utility
         private void FindParentLayerContainer(HircItem item, HircTreeItem parent)
         {
             var layerContainer = GetAsType<ICAkLayerCntr>(item);
-            var layerNode = new HircTreeItem() { DisplayName = $"Layer Container {GetDisplayId(item.ID, item.OwnerFilePath, false)} {GetParentInfo(layerContainer.GetDirectParentID())}", Item = item };
+            var layerNode = new HircTreeItem() { DisplayName = $"Layer Container {GetDisplayId(item.Id, item.OwnerFilePath, false)} {GetParentInfo(layerContainer.GetDirectParentId())}", Item = item };
             parent.Children.Add(layerNode);
-            ProcessNext(layerContainer.GetDirectParentID(), layerNode);
+            ProcessNext(layerContainer.GetDirectParentId(), layerNode);
         }
 
         private void FindParentSwitchControl(HircItem item, HircTreeItem parent)
         {
             var wwiseObject = GetAsType<ICAkSwitchCntr>(item);
-            var switchNode = new HircTreeItem() { DisplayName = $"Switch Container {GetDisplayId(item.ID, item.OwnerFilePath, false)} {GetParentInfo(wwiseObject.GetDirectParentID())}", Item = item };
+            var switchNode = new HircTreeItem() { DisplayName = $"Switch Container {GetDisplayId(item.Id, item.OwnerFilePath, false)} {GetParentInfo(wwiseObject.GetDirectParentId())}", Item = item };
             parent.Children.Add(switchNode);
-            ProcessNext(wwiseObject.GetDirectParentID(), switchNode);
+            ProcessNext(wwiseObject.GetDirectParentId(), switchNode);
         }
 
         private void FindParentRandContainer(HircItem item, HircTreeItem parent)
         {
             var sqtContainer = GetAsType<ICAkRanSeqCntr>(item);
-            var node = new HircTreeItem() { DisplayName = $"Rand Container {GetDisplayId(item.ID, item.OwnerFilePath, false)} {GetParentInfo(sqtContainer.GetDirectParentID())}", Item = item };
+            var node = new HircTreeItem() { DisplayName = $"Rand Container {GetDisplayId(item.Id, item.OwnerFilePath, false)} {GetParentInfo(sqtContainer.GetDirectParentId())}", Item = item };
             parent.Children.Add(node);
-            ProcessNext(sqtContainer.GetDirectParentID(), node);
+            ProcessNext(sqtContainer.GetDirectParentId(), node);
         }
 
         private void FindParentActorMixer(HircItem item, HircTreeItem parent)
         {
             var actorMixer = GetAsType<ICAkActorMixer>(item);
-            var node = new HircTreeItem() { DisplayName = $"Actor Mixer {GetDisplayId(item.ID, item.OwnerFilePath, false)} {GetParentInfo(actorMixer.GetDirectParentID())}", Item = item };
+            var node = new HircTreeItem() { DisplayName = $"Actor Mixer {GetDisplayId(item.Id, item.OwnerFilePath, false)} {GetParentInfo(actorMixer.GetDirectParentId())}", Item = item };
             parent.Children.Add(node);
-            ProcessNext(actorMixer.GetDirectParentID(), node);
+            ProcessNext(actorMixer.GetDirectParentId(), node);
         }
 
         private void FindParentFxShareSet(HircItem item, HircTreeItem parent)
         {
-            var node = new HircTreeItem() { DisplayName = $"FxShareSet {GetDisplayId(item.ID, item.OwnerFilePath, false)} cant have parents", Item = item };
+            var node = new HircTreeItem() { DisplayName = $"FxShareSet {GetDisplayId(item.Id, item.OwnerFilePath, false)} cant have parents", Item = item };
             parent.Children.Add(node);
         }
 
         private void FindParentFxCustom(HircItem item, HircTreeItem parent)
         {
-            var node = new HircTreeItem() { DisplayName = $"Fx custom {GetDisplayId(item.ID, item.OwnerFilePath, false)} cant have parents", Item = item };
+            var node = new HircTreeItem() { DisplayName = $"Fx custom {GetDisplayId(item.Id, item.OwnerFilePath, false)} cant have parents", Item = item };
             parent.Children.Add(node);
         }
 
         private void FindParentSound(HircItem item, HircTreeItem parent)
         {
             var sound = GetAsType<ICAkSound>(item);
-            var node = new HircTreeItem() { DisplayName = $"Sound {GetDisplayId(item.ID, item.OwnerFilePath, false)} cant have parents", Item = item };
+            var node = new HircTreeItem() { DisplayName = $"Sound {GetDisplayId(item.Id, item.OwnerFilePath, false)} cant have parents", Item = item };
             parent.Children.Add(node);
-            ProcessNext(sound.GetDirectParentID(), node);
+            ProcessNext(sound.GetDirectParentId(), node);
         }
 
         protected override string GetDisplayId(uint id, string fileName, bool hidenNameIfMissing)
         {
-            var name = _repository.GetNameFromID(id, out var found);
+            var name = _repository.GetNameFromId(id, out var found);
             if (found)
-                return $"'{name}' with ID[{id}] in {fileName}";
+                return $"'{name}' with Id[{id}] in {fileName}";
             else
-                return $"with ID[{id}] in {fileName}";
+                return $"with Id[{id}] in {fileName}";
         }
 
         string GetParentInfo(uint id)
         {
-            var name = _repository.GetNameFromID(id, out var found);
+            var name = _repository.GetNameFromId(id, out var found);
             if (found)
-                return $"has parent '{name}' with ID[{id}]";
+                return $"has parent '{name}' with Id[{id}]";
             else
-                return $"has parent with ID[{id}]";
+                return $"has parent with Id[{id}]";
         }
     }
 }

@@ -10,44 +10,44 @@ namespace Editors.Audio.AudioProjectCompiler
 {
     public static class AudioProjectCompilerHelpers
     {
-        public static uint GenerateUnusedHircID(Dictionary<uint, List<uint>> usedHircIdsByLanguageLookup, string language)
+        public static uint GenerateUnusedHircId(Dictionary<uint, List<uint>> usedHircIdsByLanguageLookup, string language)
         {
-            var languageID = WwiseHashRename.Compute(language);
-            var usedHircIds = usedHircIdsByLanguageLookup[languageID];
-            var unusedHircID = GenerateUnusedID(usedHircIds);
-            var index = usedHircIds.BinarySearch(unusedHircID);
+            var languageId = WwiseHash.Compute(language);
+            var usedHircIds = usedHircIdsByLanguageLookup[languageId];
+            var unusedHircId = GenerateUnusedId(usedHircIds);
+            var index = usedHircIds.BinarySearch(unusedHircId);
             if (index < 0)
                 index = ~index;
-            usedHircIds.Insert(index, unusedHircID);
-            return unusedHircID;
+            usedHircIds.Insert(index, unusedHircId);
+            return unusedHircId;
         }
 
-        public static uint GenerateUnusedSourceID(Dictionary<uint, List<uint>> usedSourceIdsByLanguageLookup, string language)
+        public static uint GenerateUnusedSourceId(Dictionary<uint, List<uint>> usedSourceIdsByLanguageLookup, string language)
         {
-            var languageID = WwiseHashRename.Compute(language);
-            var usedSourceIds = usedSourceIdsByLanguageLookup[languageID];
-            var unusedSourceID = GenerateUnusedID(usedSourceIds);
-            var index = usedSourceIds.BinarySearch(unusedSourceID);
+            var languageId = WwiseHash.Compute(language);
+            var usedSourceIds = usedSourceIdsByLanguageLookup[languageId];
+            var unusedSourceId = GenerateUnusedId(usedSourceIds);
+            var index = usedSourceIds.BinarySearch(unusedSourceId);
             if (index < 0)
                 index = ~index;
-            usedSourceIds.Insert(index, unusedSourceID);
-            return unusedSourceID;
+            usedSourceIds.Insert(index, unusedSourceId);
+            return unusedSourceId;
         }
 
-        private static uint GenerateUnusedID(List<uint> usedIds)
+        private static uint GenerateUnusedId(List<uint> usedIds)
         {
-            uint minID = 1;
-            uint maxID = 99999999;
+            uint minId = 1;
+            uint maxId = 99999999;
 
-            var usedIDSet = new HashSet<uint>(usedIds);
+            var usedIdSet = new HashSet<uint>(usedIds);
 
-            for (var candidateID = minID; candidateID <= maxID; candidateID++)
+            for (var candidateId = minId; candidateId <= maxId; candidateId++)
             {
-                if (!usedIDSet.Contains(candidateID))
-                    return candidateID;
+                if (!usedIdSet.Contains(candidateId))
+                    return candidateId;
             }
 
-            throw new InvalidOperationException("Houston we have a problem - no unused IDs available.");
+            throw new InvalidOperationException("Houston we have a problem - no unused Ids available.");
         }
 
         public static string GetCorrectSoundBankLanguage(AudioProject audioProject)
@@ -82,10 +82,10 @@ namespace Editors.Audio.AudioProjectCompiler
                             : statePath.RandomSequenceContainer?.Sounds ?? Enumerable.Empty<Sound>())
                     ?? Enumerable.Empty<Sound>());
 
-            // Combine both lists and filter unique sounds based on SourceID.
+            // Combine both lists and filter unique sounds based on SourceId.
             var allUniqueSounds = actionSounds
                 .Concat(dialogueSounds)
-                .DistinctBy(sound => sound.SourceID)
+                .DistinctBy(sound => sound.SourceId)
                 .ToList();
 
             return allUniqueSounds;

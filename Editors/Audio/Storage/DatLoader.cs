@@ -17,11 +17,11 @@ namespace Editors.Audio.Storage
     {
         public class LoadResult
         {
-            public Dictionary<uint, string> NameLookupByID { get; set; } = [];
+            public Dictionary<uint, string> NameLookupById { get; set; } = [];
             public Dictionary<string, List<string>> StateGroupsLookupByDialogueEvent { get; set; } = [];
             public Dictionary<string, Dictionary<string, string>> QualifiedStateGroupLookupByStateGroupByDialogueEvent { get; set; } = [];
             public Dictionary<string, List<string>> StatesLookupByStateGroup { get; set; } = [];
-            public Dictionary<string, Dictionary<uint, string>> StatesLookupByStateGroupByStateID { get; set; }
+            public Dictionary<string, Dictionary<uint, string>> StatesLookupByStateGroupByStateId { get; set; }
         }
 
         private readonly IPackFileService _pfs;
@@ -49,38 +49,38 @@ namespace Editors.Audio.Storage
             var unprocessedStateGroupsWithStates = stateGroupsWithStates0.Concat(stateGroupsWithStates1).ToList();
             var processedStateGroupsWithStates = ProcessStateGroups(unprocessedStateGroupsWithStates);
 
-            var statesLookupByStateGroupByStateID = BuildStateLookupByStateGroupByStateID(unprocessedStateGroupsWithStates);
+            var statesLookupByStateGroupByStateId = BuildStateLookupByStateGroupByStateId(unprocessedStateGroupsWithStates);
 
             return new LoadResult
             {
-                NameLookupByID = nameLookUp,
+                NameLookupById = nameLookUp,
                 StateGroupsLookupByDialogueEvent = processedDialogueEventsWithStateGroups,
                 QualifiedStateGroupLookupByStateGroupByDialogueEvent = dialogueEventsWithStateGroupsWithQualifiersAndStateGroups,
                 StatesLookupByStateGroup = processedStateGroupsWithStates,
-                StatesLookupByStateGroupByStateID = statesLookupByStateGroupByStateID
+                StatesLookupByStateGroupByStateId = statesLookupByStateGroupByStateId
             };
         }
 
-        private static new Dictionary<string, Dictionary<uint, string>> BuildStateLookupByStateGroupByStateID(List<DatStateGroupsWithStates> unprocessedStateGroupsWithStates)
+        private static new Dictionary<string, Dictionary<uint, string>> BuildStateLookupByStateGroupByStateId(List<DatStateGroupsWithStates> unprocessedStateGroupsWithStates)
         {
-            var statesLookupByStateGroupByStateID = new Dictionary<string, Dictionary<uint, string>>();
+            var statesLookupByStateGroupByStateId = new Dictionary<string, Dictionary<uint, string>>();
             foreach (var unprocessedStateGroupWithStates in unprocessedStateGroupsWithStates)
             {
                 var stateGroup = unprocessedStateGroupWithStates.StateGroup;
                 
-                if (!statesLookupByStateGroupByStateID.TryGetValue(stateGroup, out var stateLookupByStateID))
+                if (!statesLookupByStateGroupByStateId.TryGetValue(stateGroup, out var stateLookupByStateId))
                 {
-                    stateLookupByStateID = [];
-                    statesLookupByStateGroupByStateID[stateGroup] = stateLookupByStateID;
+                    stateLookupByStateId = [];
+                    statesLookupByStateGroupByStateId[stateGroup] = stateLookupByStateId;
                 }
 
                 foreach (var state in unprocessedStateGroupWithStates.States)
                 {
                     var stateHash = WwiseHash.Compute(state);
-                    stateLookupByStateID.TryAdd(stateHash, state);
+                    stateLookupByStateId.TryAdd(stateHash, state);
                 }
             }
-            return statesLookupByStateGroupByStateID;
+            return statesLookupByStateGroupByStateId;
         }
 
         private static Dictionary<string, List<string>> ProcessDialogueEvents(List<DatDialogueEventsWithStateGroups> dialogueEvents, Dictionary<uint, string> nameLookup)

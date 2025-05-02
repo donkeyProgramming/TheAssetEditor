@@ -33,7 +33,7 @@ namespace Shared.GameFormats.Wwise.Hirc.V136
 
         public override void UpdateSectionSize()
         {
-            var idSize = ByteHelper.GetPropertyTypeSize(ID);
+            var idSize = ByteHelper.GetPropertyTypeSize(Id);
             var actionListSizeSize = ByteHelper.GetPropertyTypeSize(ActionListSize);
 
             uint actionListSize = 0;
@@ -43,30 +43,30 @@ namespace Shared.GameFormats.Wwise.Hirc.V136
             SectionSize = idSize + actionListSizeSize + actionListSize;
         }
 
-        public List<uint> GetActionIds() => Actions.Select(x => x.ActionID).ToList();
+        public List<uint> GetActionIds() => Actions.Select(x => x.ActionId).ToList();
 
         public class Action_V136
         {
-            public uint ActionID { get; set; }
+            public uint ActionId { get; set; }
             
             public static Action_V136 ReadData(ByteChunk chunk)
             {
                 return new Action_V136()
                 {
-                    ActionID = chunk.ReadUInt32()
+                    ActionId = chunk.ReadUInt32()
                 };
             }
 
             public byte[] WriteData()
             {
                 using var memStream = new MemoryStream();
-                memStream.Write(ByteParsers.UInt32.EncodeValue(ActionID, out _));
+                memStream.Write(ByteParsers.UInt32.EncodeValue(ActionId, out _));
                 return memStream.ToArray();
             }
 
             public uint GetSize()
             {
-                var actionIdSize = ByteHelper.GetPropertyTypeSize(ActionID);
+                var actionIdSize = ByteHelper.GetPropertyTypeSize(ActionId);
                 return actionIdSize;
             }
         }

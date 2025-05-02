@@ -61,8 +61,8 @@ namespace Shared.GameFormats.Wwise
         private HircChunk LoadHircChunk(string fullName, ByteChunk chunk, uint chunkHeaderSize, AkBankHeader akBankHeader, bool isCaHircItem)
         {
             var bnkVersion = akBankHeader.BankGeneratorVersion;
-            var languageID = akBankHeader.LanguageID;
-            var hircData = _hircParser.Parse(fullName, chunk, bnkVersion, languageID, isCaHircItem);
+            var languageId = akBankHeader.LanguageId;
+            var hircData = _hircParser.Parse(fullName, chunk, bnkVersion, languageId, isCaHircItem);
 
             var hircSizes = hircData.HircItems.Sum(x => x.SectionSize);
             var expectedHircChunkSize = hircSizes + hircData.NumHircItems * 5 + 4;

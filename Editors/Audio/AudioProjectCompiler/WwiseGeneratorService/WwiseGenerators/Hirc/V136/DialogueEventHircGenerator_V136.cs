@@ -21,7 +21,7 @@ namespace Editors.Audio.AudioProjectCompiler.WwiseGeneratorService.WwiseGenerato
         private static CAkDialogueEvent_V136 CreateDialogueEvent(DialogueEvent audioProjectDialogueEvent)
         {
             var dialogueEventHirc = new CAkDialogueEvent_V136();
-            dialogueEventHirc.ID = audioProjectDialogueEvent.ID;
+            dialogueEventHirc.Id = audioProjectDialogueEvent.Id;
             dialogueEventHirc.HircType = AkBkHircType.Dialogue_Event;
             dialogueEventHirc.Probability = 100;
             dialogueEventHirc.Arguments = CreateArguments(audioProjectDialogueEvent, dialogueEventHirc);
@@ -44,7 +44,7 @@ namespace Editors.Audio.AudioProjectCompiler.WwiseGeneratorService.WwiseGenerato
             {
                 var argument = new AkGameSync_V136
                 {
-                    GroupID = statePathNode.StateGroup.ID,
+                    GroupId = statePathNode.StateGroup.Id,
                     GroupType = AkGroupType.State
                 };
                 arguments.Add(argument);
@@ -61,7 +61,7 @@ namespace Editors.Audio.AudioProjectCompiler.WwiseGeneratorService.WwiseGenerato
                 for (var i = 0; i < statePath.Nodes.Count; i++)
                 {
                     var statePathNode = statePath.Nodes[i];
-                    var stateKey = statePathNode.State.ID;
+                    var stateKey = statePathNode.State.Id;
 
                     var existingChild = currentNode.Nodes.FirstOrDefault(n => n.Key == stateKey);
                     if (existingChild != null)
@@ -70,7 +70,7 @@ namespace Editors.Audio.AudioProjectCompiler.WwiseGeneratorService.WwiseGenerato
                     {
                         uint audioNodeId;
                         if (i == statePath.Nodes.Count - 1)
-                            audioNodeId = statePath.RandomSequenceContainer.ID;
+                            audioNodeId = statePath.RandomSequenceContainer.Id;
                         else
                             audioNodeId = 0;
 
@@ -121,7 +121,7 @@ namespace Editors.Audio.AudioProjectCompiler.WwiseGeneratorService.WwiseGenerato
             return new AkDecisionTree_V136.Node_V136
             {
                 Key = key,
-                AudioNodeID = audioNodeId,
+                AudioNodeId = audioNodeId,
                 ChildrenIdx = childrenUIdx,
                 ChildrenCount = childrenUCount,
                 Weight = weight,

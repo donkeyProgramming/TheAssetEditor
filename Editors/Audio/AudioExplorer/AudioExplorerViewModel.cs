@@ -62,7 +62,7 @@ namespace Editors.Audio.AudioExplorer
 
         private void OnEventSelected(SelectedHircItem newValue)
         {
-            if (newValue?.ID == _selectedNode?.Item?.ID)
+            if (newValue?.Id == _selectedNode?.Item?.Id)
                 return;
 
             if (newValue != null)
@@ -114,7 +114,7 @@ namespace Editors.Audio.AudioExplorer
                 {
                     if (sound is CAkSound_V136) // For some reason some V136 sounds say they're in data but they're actually streamed
                     {
-                        _soundPlayer.PlayStreamedWem(sound.GetSourceID().ToString());
+                        _soundPlayer.PlayStreamedWem(sound.GetSourceId().ToString());
                     }
                     else if (sound is CAkSound_V112 sound_V112)
                     {
@@ -127,19 +127,19 @@ namespace Editors.Audio.AudioExplorer
                     }
                 }
                 else
-                    _soundPlayer.PlayStreamedWem(sound.GetSourceID().ToString());
+                    _soundPlayer.PlayStreamedWem(sound.GetSourceId().ToString());
             }
             else if (_selectedNode.Item is ICAkMusicTrack musicTrack)
             {
                 // Only seems to have one child in practice 
-                var musicTrackID = musicTrack.GetChildren().FirstOrDefault(); 
-                _soundPlayer.PlayStreamedWem(musicTrackID.ToString());
+                var musicTrackId = musicTrack.GetChildren().FirstOrDefault(); 
+                _soundPlayer.PlayStreamedWem(musicTrackId.ToString());
             }
         }
 
-        public void LoadHircFromIDAction()
+        public void LoadHircFromIdAction()
         {
-            var window = new TextInputWindow("Hirc Input", "Hirc ID", true);
+            var window = new TextInputWindow("Hirc Input", "Hirc Id", true);
             if (window.ShowDialog() == true)
             {
                 var hircStr = window.TextValue;
@@ -149,16 +149,16 @@ namespace Editors.Audio.AudioExplorer
                     return;
                 }
 
-                if (uint.TryParse(hircStr, out var hircID) == false)
+                if (uint.TryParse(hircStr, out var hircId) == false)
                 {
-                    MessageBox.Show("Not a valid ID");
+                    MessageBox.Show("Not a valid Id");
                     return;
                 }
 
-                var foundHircItems = _audioRepository.GetHircObject(hircID);
+                var foundHircItems = _audioRepository.GetHircObject(hircId);
                 if (foundHircItems.Count == 0)
                 {
-                    MessageBox.Show($"No hirc items found with id {hircID}");
+                    MessageBox.Show($"No hirc items found with id {hircId}");
                     return;
                 }
 

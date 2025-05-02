@@ -13,10 +13,10 @@ namespace Editors.Audio.AudioProjectCompiler.WwiseGeneratorService.WwiseGenerato
             var akBankHeader = new AkBankHeader()
             {
                 BankGeneratorVersion = bankGeneratorVersion,
-                SoundBankID = soundBank.ID,
-                LanguageID = WwiseHashRename.Compute(audioProject.Language),
+                SoundBankId = soundBank.Id,
+                LanguageId = WwiseHash.Compute(audioProject.Language),
                 FeedbackInBank = 0x10,
-                ProjectID = 2361, // TODO: Need a way to get the project ID via a factory and service.
+                ProjectId = 2361, // TODO: Need a way to get the project Id via a factory and service.
                 Padding = BitConverter.GetBytes(0x04)
             };
             bkhdChunk.AkBankHeader = akBankHeader;

@@ -9,7 +9,7 @@ namespace Shared.GameFormats.Wwise.Hirc.V112
     {
         public NodeBaseParams_V112 NodeBaseParams { get; set; } = new NodeBaseParams_V112();
         public AkGroupType GroupType { get; set; }
-        public uint GroupID { get; set; }
+        public uint GroupId { get; set; }
         public uint DefaultSwitch { get; set; }
         public byte IsContinuousValidation { get; set; }
         public Children_V112 Children { get; set; } = new Children_V112();
@@ -20,7 +20,7 @@ namespace Shared.GameFormats.Wwise.Hirc.V112
         {
             NodeBaseParams.ReadData(chunk);
             GroupType = (AkGroupType)chunk.ReadByte();
-            GroupID = chunk.ReadUInt32();
+            GroupId = chunk.ReadUInt32();
             DefaultSwitch = chunk.ReadUInt32();
             IsContinuousValidation = chunk.ReadByte();
             Children.ReadData(chunk);
@@ -36,17 +36,17 @@ namespace Shared.GameFormats.Wwise.Hirc.V112
 
         public override byte[] WriteData() => throw new NotSupportedException("Users probably don't need this complexity.");
         public override void UpdateSectionSize() => throw new NotSupportedException("Users probably don't need this complexity.");
-        public uint GetDirectParentID() => NodeBaseParams.DirectParentId;
+        public uint GetDirectParentId() => NodeBaseParams.DirectParentId;
 
         public class CAkSwitchPackage_V112 : ICAkSwitchPackage
         {
-            public uint SwitchID { get; set; }
+            public uint SwitchId { get; set; }
             public List<uint> NodeIdList { get; set; } = [];
 
             public static ICAkSwitchPackage ReadData(ByteChunk chunk)
             {
                 var instance = new CAkSwitchPackage_V112();
-                instance.SwitchID = chunk.ReadUInt32();
+                instance.SwitchId = chunk.ReadUInt32();
                 var numChildren = chunk.ReadUInt32();
                 for (var i = 0; i < numChildren; i++)
                     instance.NodeIdList.Add(chunk.ReadUInt32());

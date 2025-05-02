@@ -66,7 +66,7 @@ namespace Shared.GameFormats.Wwise.Hirc.V112
 
         public override void UpdateSectionSize()
         {
-            var idSize = ByteHelper.GetPropertyTypeSize(ID);
+            var idSize = ByteHelper.GetPropertyTypeSize(Id);
             var nodeBaseParamsSize = NodeBaseParams.GetSize();
             var loopCountSize = ByteHelper.GetPropertyTypeSize(LoopCount);
             var loopModMinSize = ByteHelper.GetPropertyTypeSize(LoopModMin);
@@ -86,7 +86,7 @@ namespace Shared.GameFormats.Wwise.Hirc.V112
                 transitionTimeModMaxSize + avoidRepeatCountSize + transitionModeSize + randomModeSize + modeSize + bitVectorSize + childrenSize + playListSize;
         }
 
-        public uint GetDirectParentID() => NodeBaseParams.DirectParentId;
+        public uint GetDirectParentId() => NodeBaseParams.DirectParentId;
         public List<uint> GetChildren() => CAkPlayList.Playlist.Select(x => x.PlayId).ToList();
 
         public class CAkPlayList_V112

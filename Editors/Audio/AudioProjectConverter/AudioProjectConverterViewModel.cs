@@ -27,7 +27,7 @@ namespace Editors.Audio.AudioProjectConverter
     {
         public string FileName { get; set; }
         public string FilePath { get; set; }
-        public uint WemID { get; set; }
+        public uint WemId { get; set; }
         public string DialogueEvent { get; set; }
     }
 
@@ -95,8 +95,8 @@ namespace Editors.Audio.AudioProjectConverter
             if (Directory.Exists(BnksDirectoryPath))
                 soundBankPaths = Directory.GetFiles(BnksDirectoryPath, "*.bnk", SearchOption.TopDirectoryOnly).ToList();
 
-            var statesLookupByStateGroupByStateID = new Dictionary<string, Dictionary<uint, string>>();
-            var dialogueEventsLookupByWemID = new Dictionary<uint, List<string>>();
+            var statesLookupByStateGroupByStateId = new Dictionary<string, Dictionary<uint, string>>();
+            var dialogueEventsLookupByWemId = new Dictionary<uint, List<string>>();
             var statePathsLookupByDialogueEvent = new Dictionary<string, List<StatePathInfo>>();
             var dialogueEventsToProcess = new List<ICAkDialogueEvent>();
             var moddedStateGroups = new Dictionary<string, List<string>>();
@@ -104,17 +104,17 @@ namespace Editors.Audio.AudioProjectConverter
             var globalBaseNameUsage = new Dictionary<string, int>();
 
             var hircItems = GetHircItems(soundBankPaths);
-            var hircLookupByID = BuildHircLookupByID(hircItems);
+            var hircLookupById = BuildHircLookupById(hircItems);
 
             if (!string.IsNullOrEmpty(SoundbanksInfoXmlPath))
-                BuildStateGroupStateLookup(statesLookupByStateGroupByStateID);
+                BuildStateGroupStateLookup(statesLookupByStateGroupByStateId);
 
             var dialogueEvents = hircItems.OfType<ICAkDialogueEvent>().ToList();
             foreach (var dialogueEvent in dialogueEvents)
-                PrepareDialogueEventProcessing(dialogueEvent, dialogueEventsLookupByWemID, statePathsLookupByDialogueEvent, statesLookupByStateGroupByStateID, hircLookupByID, dialogueEventsToProcess, moddedStateGroups);
+                PrepareDialogueEventProcessing(dialogueEvent, dialogueEventsLookupByWemId, statePathsLookupByDialogueEvent, statesLookupByStateGroupByStateId, hircLookupById, dialogueEventsToProcess, moddedStateGroups);
 
             foreach (var dialogueEvent in dialogueEventsToProcess)
-                ProcessDialogueEvent(audioProject, dialogueEvent, processedWems, dialogueEventsLookupByWemID, statePathsLookupByDialogueEvent, globalBaseNameUsage);
+                ProcessDialogueEvent(audioProject, dialogueEvent, processedWems, dialogueEventsLookupByWemId, statePathsLookupByDialogueEvent, globalBaseNameUsage);
 
             ProcessModdedStateGroups(audioProject, moddedStateGroups);
 
@@ -124,20 +124,20 @@ namespace Editors.Audio.AudioProjectConverter
             CloseWindowAction();
         }
 
-        private static Dictionary<uint, List<HircItem>> BuildHircLookupByID(List<HircItem> hircItems)
+        private static Dictionary<uint, List<HircItem>> BuildHircLookupById(List<HircItem> hircItems)
         {
-            var hircLookupByID = new Dictionary<uint, List<HircItem>>();
+            var hircLookupById = new Dictionary<uint, List<HircItem>>();
             foreach (var hircItem in hircItems)
             {
-                if (!hircLookupByID.TryGetValue(hircItem.ID, out var hircItemList))
+                if (!hircLookupById.TryGetValue(hircItem.Id, out var hircItemList))
                 {
                     hircItemList = [];
-                    hircLookupByID.TryAdd(hircItem.ID, hircItemList);
+                    hircLookupById.TryAdd(hircItem.Id, hircItemList);
                 }
                 hircItemList.Add(hircItem);
             }
 
-            return hircLookupByID;
+            return hircLookupById;
         }
 
         private List<HircItem> GetHircItems(List<string> soundBankPaths)
@@ -169,10 +169,10 @@ namespace Editors.Audio.AudioProjectConverter
                 if (string.IsNullOrEmpty(stateGroupName))
                     continue;
 
-                if (!stateLookupByStateGroup.TryGetValue(stateGroupName, out var stateLookupByStateID))
+                if (!stateLookupByStateGroup.TryGetValue(stateGroupName, out var stateLookupByStateId))
                 {
-                    stateLookupByStateID = [];
-                    stateLookupByStateGroup.TryAdd(stateGroupName, stateLookupByStateID);
+                    stateLookupByStateId = [];
+                    stateLookupByStateGroup.TryAdd(stateGroupName, stateLookupByStateId);
                 }
 
                 foreach (var state in stateGroup.Element("States")?.Elements("State") ?? [])
@@ -181,7 +181,7 @@ namespace Editors.Audio.AudioProjectConverter
                     if (!string.IsNullOrEmpty(stateName))
                     {
                         var stateHash = WwiseHash.Compute(stateName);
-                        stateLookupByStateID.TryAdd(stateHash, stateName);
+                        stateLookupByStateId.TryAdd(stateHash, stateName);
                     }
                 }
             }
@@ -191,18 +191,18 @@ namespace Editors.Audio.AudioProjectConverter
 
         private void PrepareDialogueEventProcessing(
             ICAkDialogueEvent dialogueEvent,
-            Dictionary<uint, List<string>> dialogueEventsLookupByWemID,
+            Dictionary<uint, List<string>> dialogueEventsLookupByWemId,
             Dictionary<string, List<StatePathInfo>> statePathsLookupByDialogueEvent,
-            Dictionary<string, Dictionary<uint, string>> statesLookupByStateGroupByStateID,
-            Dictionary<uint, List<HircItem>> hircLookupByID,
+            Dictionary<string, Dictionary<uint, string>> statesLookupByStateGroupByStateId,
+            Dictionary<uint, List<HircItem>> hircLookupById,
             List<ICAkDialogueEvent> dialogueEventsToProcess,
             Dictionary<string, List<string>> moddedStateGroups)
         {
             var stateGroup = "VO_Actor";
-            var statesLookupByStateID = GetStatesLookupByStateID(statesLookupByStateGroupByStateID, stateGroup);
+            var statesLookupByStateId = GetStatesLookupByStateId(statesLookupByStateGroupByStateId, stateGroup);
 
             var dialogueEventHirc = dialogueEvent as HircItem;
-            var dialogueEventName = _audioRepository.GetNameFromID(dialogueEventHirc.ID);
+            var dialogueEventName = _audioRepository.GetNameFromId(dialogueEventHirc.Id);
 
             var decisionPathHelper = new DecisionPathHelper(_audioRepository);
             var decisionPathCollection = decisionPathHelper.GetDecisionPaths(dialogueEvent);
@@ -214,7 +214,7 @@ namespace Editors.Audio.AudioProjectConverter
 
             var anyStatePathsContainRequiredPattern = decisionPathCollection.Paths
                 .Any(statePath => statePath.Items.Any(state =>
-                    statesLookupByStateID.TryGetValue(state.Value, out var stateName) &&
+                    statesLookupByStateId.TryGetValue(state.Value, out var stateName) &&
                     voActorSubstrings.Any(substring => stateName.Contains(substring, StringComparison.CurrentCultureIgnoreCase))));
 
             if (!anyStatePathsContainRequiredPattern)
@@ -226,7 +226,7 @@ namespace Editors.Audio.AudioProjectConverter
             foreach (var statePath in decisionPathCollection.Paths)
             {
                 var statePathContainsRequiredPattern = statePath.Items.Any(state =>
-                    statesLookupByStateID.TryGetValue(state.Value, out var stateName) &&
+                    statesLookupByStateId.TryGetValue(state.Value, out var stateName) &&
                     voActorSubstrings.Any(substring => stateName.Contains(substring, StringComparison.CurrentCultureIgnoreCase)));
 
                 if (!statePathContainsRequiredPattern)
@@ -235,40 +235,40 @@ namespace Editors.Audio.AudioProjectConverter
                 var wavFiles = new List<WavFile>();
                 var statePathNodes = new List<StatePathNode>();
 
-                StoreStateGroupAndStateInfo(dialogueEvent, statesLookupByStateID, statesLookupByStateGroupByStateID, statePath, statePathNodes, moddedStateGroups);
+                StoreStateGroupAndStateInfo(dialogueEvent, statesLookupByStateId, statesLookupByStateGroupByStateId, statePath, statePathNodes, moddedStateGroups);
 
-                StoreDialogueEventsLookupByWemID(dialogueEventsLookupByWemID, hircLookupByID, wavFiles, dialogueEventName, statePath);
+                StoreDialogueEventsLookupByWemId(dialogueEventsLookupByWemId, hircLookupById, wavFiles, dialogueEventName, statePath);
 
                 StoreStatePathInfo(statePathsLookupByDialogueEvent, wavFiles, dialogueEventName, statePathNodes);
             }
         }
 
-        private Dictionary<uint, string> GetStatesLookupByStateID(Dictionary<string, Dictionary<uint, string>> statesLookupByStateGroupByStateID, string stateGroupLookup)
+        private Dictionary<uint, string> GetStatesLookupByStateId(Dictionary<string, Dictionary<uint, string>> statesLookupByStateGroupByStateId, string stateGroupLookup)
         {
-            statesLookupByStateGroupByStateID.TryGetValue(stateGroupLookup, out var statesInfoFromWwiseProject);
-            _audioRepository.StatesLookupByStateGroupByStateID.TryGetValue(stateGroupLookup, out var statesInfoFromGame);
+            statesLookupByStateGroupByStateId.TryGetValue(stateGroupLookup, out var statesInfoFromWwiseProject);
+            _audioRepository.StatesLookupByStateGroupByStateId.TryGetValue(stateGroupLookup, out var statesInfoFromGame);
 
-            var statesLookupByStateID = new Dictionary<uint, string>();
+            var statesLookupByStateId = new Dictionary<uint, string>();
 
             if (statesInfoFromWwiseProject != null)
             {
                 foreach (var stateInfo in statesInfoFromWwiseProject)
-                    statesLookupByStateID.TryAdd(stateInfo.Key, stateInfo.Value);
+                    statesLookupByStateId.TryAdd(stateInfo.Key, stateInfo.Value);
             }
 
             if (statesInfoFromGame != null)
             {
                 foreach (var stateInfo in statesInfoFromGame)
-                    statesLookupByStateID.TryAdd(stateInfo.Key, stateInfo.Value);
+                    statesLookupByStateId.TryAdd(stateInfo.Key, stateInfo.Value);
             }
 
-            return statesLookupByStateID;
+            return statesLookupByStateId;
         }
 
         private void StoreStateGroupAndStateInfo(
             ICAkDialogueEvent dialogueEvent,
-            Dictionary<uint, string> wwiseStatesIDLookup,
-            Dictionary<string, Dictionary<uint, string>> statesLookupByStateGroupByStateID,
+            Dictionary<uint, string> wwiseStatesIdLookup,
+            Dictionary<string, Dictionary<uint, string>> statesLookupByStateGroupByStateId,
             DecisionPathHelper.DecisionPath statePath,
             List<StatePathNode> statePathNodes,
             Dictionary<string, List<string>> moddedStateGroups)
@@ -277,15 +277,15 @@ namespace Editors.Audio.AudioProjectConverter
 
             foreach (var statePathItem in statePath.Items)
             {
-                var stateGroup = _audioRepository.GetNameFromID(dialogueEvent.Arguments[stateGroupIndex].GroupID);
-                var statesLookupByStateID = GetStatesLookupByStateID(statesLookupByStateGroupByStateID, stateGroup);
+                var stateGroup = _audioRepository.GetNameFromId(dialogueEvent.Arguments[stateGroupIndex].GroupId);
+                var statesLookupByStateId = GetStatesLookupByStateId(statesLookupByStateGroupByStateId, stateGroup);
                 var state = string.Empty;
 
                 if (statePathItem.Value == 0)
                     state = "Any";
                 else
                 {
-                    if (statesLookupByStateID.TryGetValue(statePathItem.Value, out var unhashedState))
+                    if (statesLookupByStateId.TryGetValue(statePathItem.Value, out var unhashedState))
                         state = unhashedState;
                 }
 
@@ -296,7 +296,7 @@ namespace Editors.Audio.AudioProjectConverter
                 });
 
                 // Store modded states info
-                if (state != "Any" && !_audioRepository.NameLookupByID.ContainsValue(state))
+                if (state != "Any" && !_audioRepository.NameLookupById.ContainsValue(state))
                 {
                     if (moddedStateGroups.TryGetValue(stateGroup, out var stateList))
                     {
@@ -311,24 +311,24 @@ namespace Editors.Audio.AudioProjectConverter
             }
         }
 
-        private static void StoreDialogueEventsLookupByWemID(
-            Dictionary<uint, List<string>> dialogueEventsLookupByWemID,
-            Dictionary<uint, List<HircItem>> hircLookupByID,
+        private static void StoreDialogueEventsLookupByWemId(
+            Dictionary<uint, List<string>> dialogueEventsLookupByWemId,
+            Dictionary<uint, List<HircItem>> hircLookupById,
             List<WavFile> wavFiles,
             string dialogueEventName,
             DecisionPathHelper.DecisionPath statePath)
         {
-            ProcessHircItem(statePath.ChildNodeID, dialogueEventsLookupByWemID, hircLookupByID, wavFiles, dialogueEventName);
+            ProcessHircItem(statePath.ChildNodeId, dialogueEventsLookupByWemId, hircLookupById, wavFiles, dialogueEventName);
         }
 
         private static void ProcessHircItem(
-            uint childNodeID,
-            Dictionary<uint, List<string>> dialogueEventsLookupByWemID,
-            Dictionary<uint, List<HircItem>> hircLookupByID,
+            uint childNodeId,
+            Dictionary<uint, List<string>> dialogueEventsLookupByWemId,
+            Dictionary<uint, List<HircItem>> hircLookupById,
             List<WavFile> wavFiles,
             string dialogueEventName)
         {
-            if (!hircLookupByID.TryGetValue(childNodeID, out var hircItems) || hircItems.Count == 0)
+            if (!hircLookupById.TryGetValue(childNodeId, out var hircItems) || hircItems.Count == 0)
                 return;
 
             var hircItem = hircItems.First();
@@ -337,23 +337,23 @@ namespace Editors.Audio.AudioProjectConverter
             {
                 var wavFile = new WavFile()
                 {
-                    WemID = soundHirc.GetSourceID(),
+                    WemId = soundHirc.GetSourceId(),
                     DialogueEvent = dialogueEventName
                 };
                 wavFiles.Add(wavFile);
 
-                if (dialogueEventsLookupByWemID.TryGetValue(wavFile.WemID, out var dialogueEventList))
+                if (dialogueEventsLookupByWemId.TryGetValue(wavFile.WemId, out var dialogueEventList))
                 {
                     if (!dialogueEventList.Contains(dialogueEventName))
                         dialogueEventList.Add(dialogueEventName);
                 }
                 else
-                    dialogueEventsLookupByWemID.TryAdd(wavFile.WemID, [dialogueEventName]);
+                    dialogueEventsLookupByWemId.TryAdd(wavFile.WemId, [dialogueEventName]);
             }
             else if (hircItem is ICAkRanSeqCntr ranSeqCntr)
             {
                 foreach (var childId in ranSeqCntr.GetChildren())
-                    ProcessHircItem(childId, dialogueEventsLookupByWemID, hircLookupByID, wavFiles, dialogueEventName);
+                    ProcessHircItem(childId, dialogueEventsLookupByWemId, hircLookupById, wavFiles, dialogueEventName);
             }
         }
 
@@ -382,12 +382,12 @@ namespace Editors.Audio.AudioProjectConverter
             AudioProject audioProject,
             ICAkDialogueEvent dialogueEvent,
             Dictionary<uint, AudioFile> processedWems,
-            Dictionary<uint, List<string>> dialogueEventsLookupByWemID,
+            Dictionary<uint, List<string>> dialogueEventsLookupByWemId,
             Dictionary<string, List<StatePathInfo>> statePathsLookupByDialogueEvent,
             Dictionary<string, int> globalBaseNameUsage)
         {
             var dialogueEventHirc = dialogueEvent as HircItem;
-            var dialogueEventName = _audioRepository.GetNameFromID(dialogueEventHirc.ID);
+            var dialogueEventName = _audioRepository.GetNameFromId(dialogueEventHirc.Id);
 
             _logger.Here().Information($"Processing Dialogue Event: {dialogueEventName}");
 
@@ -417,7 +417,7 @@ namespace Editors.Audio.AudioProjectConverter
                 if (!voActorSubstrings.Any(substring => voActor.Contains(substring, StringComparison.CurrentCultureIgnoreCase)))
                     continue;
 
-                ProcessWavFiles(statePathWavs, processedWems, audioFiles, dialogueEventsLookupByWemID, globalBaseNameUsage, dialogueEventName, voActor);
+                ProcessWavFiles(statePathWavs, processedWems, audioFiles, dialogueEventsLookupByWemId, globalBaseNameUsage, dialogueEventName, voActor);
 
                 var audioProjectStatePath = AudioProjectHelpers.CreateStatePathFromStatePathNodes(_audioRepository, statePath.StatePathNodes, audioFiles);
                 AudioProjectHelpers.InsertStatePathAlphabetically(audioProjectDialogueEvent, audioProjectStatePath);
@@ -432,7 +432,7 @@ namespace Editors.Audio.AudioProjectConverter
             List<WavFile> statePathWavs,
             Dictionary<uint, AudioFile> processedWems,
             List<AudioFile> audioFiles,
-            Dictionary<uint, List<string>> dialogueEventsLookupByWemID,
+            Dictionary<uint, List<string>> dialogueEventsLookupByWemId,
             Dictionary<string, int> globalBaseNameUsage,
             string dialogueEventName,
             string voActor)
@@ -442,13 +442,13 @@ namespace Editors.Audio.AudioProjectConverter
             foreach (var wavFile in statePathWavs)
             {
                 // Check for already processed files
-                if (processedWems.TryGetValue(wavFile.WemID, out var processedAudioFile))
+                if (processedWems.TryGetValue(wavFile.WemId, out var processedAudioFile))
                 {
                     audioFiles.Add(processedAudioFile);
                     continue;
                 }
 
-                var chosenDialogueEventName = GetPreferredDialogueEventName(wavFile.WemID, dialogueEventName, dialogueEventsLookupByWemID).ToLower();
+                var chosenDialogueEventName = GetPreferredDialogueEventName(wavFile.WemId, dialogueEventName, dialogueEventsLookupByWemId).ToLower();
                 var baseFileName = $"{voActorSegment}_{chosenDialogueEventName}".ToLower();
 
                 // Ensure unique numbering across events globally
@@ -466,10 +466,10 @@ namespace Editors.Audio.AudioProjectConverter
                     FileName = wavFile.FileName,
                     FilePath = wavFile.FilePath
                 };
-                processedWems.Add(wavFile.WemID, processedAudioFile);
+                processedWems.Add(wavFile.WemId, processedAudioFile);
                 audioFiles.Add(processedAudioFile);
 
-                var wemFilePath = $"{WemsDirectoryPath}\\{wavFile.WemID}.wem";
+                var wemFilePath = $"{WemsDirectoryPath}\\{wavFile.WemId}.wem";
                 var wavTempFilePath = $"{DirectoryHelper.Temp}\\Audio\\{wavFile.FileName}";
                 var wavPackOutputPath = $"{OutputDirectoryPath}\\audio\\vo\\{voActorSegment}\\{wavFile.FileName}";
 
@@ -499,9 +499,9 @@ namespace Editors.Audio.AudioProjectConverter
             }
         }
 
-        private static string GetPreferredDialogueEventName(uint wemID, string fallbackDialogueEventName, Dictionary<uint, List<string>> dialogueEventsLookupByWemID)
+        private static string GetPreferredDialogueEventName(uint wemId, string fallbackDialogueEventName, Dictionary<uint, List<string>> dialogueEventsLookupByWemId)
         {
-            if (dialogueEventsLookupByWemID.TryGetValue(wemID, out var dialogueEvents) && dialogueEvents != null && dialogueEvents.Count > 0)
+            if (dialogueEventsLookupByWemId.TryGetValue(wemId, out var dialogueEvents) && dialogueEvents != null && dialogueEvents.Count > 0)
             {
                 // A list of Dialogue Events whose names I want to prioritise as the name of wems if they appear in them
                 var priorityList = new List<string>

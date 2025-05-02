@@ -45,7 +45,7 @@ namespace Editors.Reports.Audio
 
         private void ProcessItem(HircItem item)
         {
-            var itemName = _audioRepository.GetNameFromID(item.ID);
+            var itemName = _audioRepository.GetNameFromId(item.Id);
             Console.WriteLine(itemName);
 
             var filePath = $"{DirectoryHelper.ReportsDirectory}\\dialogue_event_and_event_names.txt";

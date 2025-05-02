@@ -25,7 +25,7 @@ namespace Editors.Audio.AudioProjectCompiler.WwiseGeneratorService.WwiseGenerato
         {
             return new CAkSound_V136()
             {
-                ID = audioProjectSound.ID,
+                Id = audioProjectSound.Id,
                 HircType = audioProjectSound.HircType,
             };
         }
@@ -38,7 +38,7 @@ namespace Editors.Audio.AudioProjectCompiler.WwiseGeneratorService.WwiseGenerato
                 StreamType = AKBKSourceType.Streaming,
                 AkMediaInformation = new AkMediaInformation_V136()
                 {
-                    SourceID = audioProjectSound.SourceID,
+                    SourceId = audioProjectSound.SourceId,
                     InMemoryMediaSize = (uint)audioProjectSound.InMemoryMediaSize,
                     SourceBits = 0x01, //TODO: Update this to include a reference to the language i.e. if it's sfx 
                 }
@@ -57,8 +57,8 @@ namespace Editors.Audio.AudioProjectCompiler.WwiseGeneratorService.WwiseGenerato
                 NumFx = 0,
             };
             nodeBaseParams.OverrideAttachmentParams = 0;
-            nodeBaseParams.OverrideBusID = soundIsTarget ? audioProjectSound.OverrideBusID : 0;
-            nodeBaseParams.DirectParentID = audioProjectSound.DirectParentID;
+            nodeBaseParams.OverrideBusId = soundIsTarget ? audioProjectSound.OverrideBusId : 0;
+            nodeBaseParams.DirectParentId = audioProjectSound.DirectParentId;
             nodeBaseParams.BitVector = 0;
             nodeBaseParams.NodeInitialParams = new NodeInitialParams_V136();
 
@@ -70,7 +70,7 @@ namespace Editors.Audio.AudioProjectCompiler.WwiseGeneratorService.WwiseGenerato
                 {
                     new AkPropBundle_V136.PropBundleInstance_V136
                     {
-                        ID = AkPropId_V136.Loop,
+                        Id = AkPropId_V136.Loop,
                         Value = audioProjectSound.AudioSettings.NumberOfLoops
                     }
                 }
@@ -84,7 +84,7 @@ namespace Editors.Audio.AudioProjectCompiler.WwiseGeneratorService.WwiseGenerato
                 {
                     new AkPropBundle_V136.PropBundleInstance_V136
                     {
-                        ID = AkPropId_V136.Loop,
+                        Id = AkPropId_V136.Loop,
                         Value = 0
                     }
                 }

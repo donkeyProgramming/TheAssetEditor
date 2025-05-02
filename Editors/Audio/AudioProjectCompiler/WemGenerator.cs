@@ -36,14 +36,14 @@ namespace Editors.Audio.AudioProjectCompiler
             foreach (var sound in soundsWithUniqueSourceIds)
             {
                 var wavFile = _packFileService.FindFile(sound.WavFilePath);
-                var wavFileName = $"{sound.SourceID}.wav";
+                var wavFileName = $"{sound.SourceId}.wav";
                 _soundPlayer.ExportFileToAEFolder(wavFileName, wavFile.DataSource.ReadData());
             }
 
             _wSourcesWrapper.InitialiseWwiseProject();
 
             var wavFileNames = soundsWithUniqueSourceIds
-                .Select(sound => $"{sound.SourceID}.wav")
+                .Select(sound => $"{sound.SourceId}.wav")
                 .ToList();
 
             DirectoryHelper.EnsureCreated(_wavToWemFolderPath);

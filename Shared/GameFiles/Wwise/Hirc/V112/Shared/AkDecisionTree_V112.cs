@@ -127,7 +127,7 @@ namespace Shared.GameFormats.Wwise.Hirc.V112.Shared
 
             public uint GetSize()
             {
-                // Either ChildrenIdx and ChildrenCoun are used or AudioNodeID is used but in either case the same amount of bytes are used so doesn't matter which one is used to calculate the size here
+                // Either ChildrenIdx and ChildrenCoun are used or AudioNodeId is used but in either case the same amount of bytes are used so doesn't matter which one is used to calculate the size here
                 var idSize = ByteHelper.GetPropertyTypeSize(Key);
                 var childrenIdxSize = ByteHelper.GetPropertyTypeSize(ChildrenIdx);
                 var childrenCountSize = ByteHelper.GetPropertyTypeSize(ChildrenCount);

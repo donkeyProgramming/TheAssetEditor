@@ -6,12 +6,12 @@ namespace Shared.GameFormats.Wwise.Hirc.V112.Shared
 {
     public class AkGameSync_V112 : IAkGameSync
     {
-        public uint GroupID { get; set; }
+        public uint GroupId { get; set; }
         public AkGroupType GroupType { get; set; }
 
         public uint GetSize()
         {
-            var groupIdSize = ByteHelper.GetPropertyTypeSize(GroupID);
+            var groupIdSize = ByteHelper.GetPropertyTypeSize(GroupId);
             var groupTypeSize = ByteHelper.GetPropertyTypeSize(GroupType);
             return groupIdSize + groupTypeSize;
         }

@@ -49,7 +49,7 @@ namespace Editors.Audio.Utility
 
         public void PlayDataWem(uint sourceId, uint dataSoundbankId, int fileOffset, int byteCount)
         {
-            var dataSoundbankNameWithoutExtension = _audioRepository.GetNameFromID(dataSoundbankId, out var found);
+            var dataSoundbankNameWithoutExtension = _audioRepository.GetNameFromId(dataSoundbankId, out var found);
             if (!found)
                 _logger.Here().Warning($"Unable to find a name from hash '{dataSoundbankId}'.");
 
@@ -74,12 +74,12 @@ namespace Editors.Audio.Utility
                 _logger.Here().Error("Unable to play wav file.");
         }
 
-        private Result<string> ConvertWemToWav(string sourceID, byte[] wemBytes)
+        private Result<string> ConvertWemToWav(string sourceId, byte[] wemBytes)
         {
-            _logger.Here().Information($"Trying to export '{sourceID}.wem' - {wemBytes.Length} bytes");
+            _logger.Here().Information($"Trying to export '{sourceId}.wem' - {wemBytes.Length} bytes");
 
-            var wemFileName = $"{sourceID}.wem";
-            var wavFileName = $"{sourceID}.wav";
+            var wemFileName = $"{sourceId}.wem";
+            var wavFileName = $"{sourceId}.wav";
             var wemFilePath = $"{AudioFolderName}\\{wemFileName}";
             var wavFilePath = $"{AudioFolderName}\\{wavFileName}";
 
@@ -100,20 +100,20 @@ namespace Editors.Audio.Utility
             process.Start();
         }
 
-        private PackFile FindWemFile(string wemID)
+        private PackFile FindWemFile(string wemId)
         {
-            var wemFile = _packFileService.FindFile($"audio\\wwise\\{wemID}.wem");
+            var wemFile = _packFileService.FindFile($"audio\\wwise\\{wemId}.wem");
 
             foreach (var languageEnum in Enum.GetValues<GameLanguage>().Cast<GameLanguage>())
             {
                 var language = GameLanguageStringLookup[languageEnum];
 
                 if (wemFile == null)
-                    wemFile = _packFileService.FindFile($"audio\\wwise\\{language}\\{wemID}.wem");
+                    wemFile = _packFileService.FindFile($"audio\\wwise\\{language}\\{wemId}.wem");
                 else break;
             }
 
-            wemFile ??= _packFileService.FindFile($"audio\\{wemID}.wem");
+            wemFile ??= _packFileService.FindFile($"audio\\{wemId}.wem");
             return wemFile;
         }
 

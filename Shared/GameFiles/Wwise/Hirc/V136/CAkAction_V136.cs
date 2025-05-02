@@ -57,7 +57,7 @@ namespace Shared.GameFormats.Wwise.Hirc.V136
 
         public override void UpdateSectionSize()
         {
-            var idSize = ByteHelper.GetPropertyTypeSize(ID);
+            var idSize = ByteHelper.GetPropertyTypeSize(Id);
             var actionTypeSize = ByteHelper.GetPropertyTypeSize(ActionType);
             var idExtSize = ByteHelper.GetPropertyTypeSize(IdExt);
             var idExt4Size = ByteHelper.GetPropertyTypeSize(IdExt4);
@@ -77,8 +77,8 @@ namespace Shared.GameFormats.Wwise.Hirc.V136
         }
 
         public AkActionType GetActionType() => ActionType;
-        public uint GetChildID() => IdExt;
-        public uint GetStateGroupID() => StateActionParams!.StateGroupId;
+        public uint GetChildId() => IdExt;
+        public uint GetStateGroupId() => StateActionParams!.StateGroupId;
 
         public class PlayActionParams_V136
         {
@@ -207,14 +207,14 @@ namespace Shared.GameFormats.Wwise.Hirc.V136
 
             public class Exception_V136
             {
-                public uint ID { get; set; }
+                public uint Id { get; set; }
                 public byte IsBus { get; set; }
 
                 public static Exception_V136 ReadData(ByteChunk chunk)
                 {
                     return new Exception_V136
                     {
-                        ID = chunk.ReadUInt32(),
+                        Id = chunk.ReadUInt32(),
                         IsBus = chunk.ReadByte()
                     };
                 }
@@ -222,14 +222,14 @@ namespace Shared.GameFormats.Wwise.Hirc.V136
                 public byte[] WriteData()
                 {
                     using var memStream = new MemoryStream();
-                    memStream.Write(ByteParsers.UInt32.EncodeValue(ID, out _));
+                    memStream.Write(ByteParsers.UInt32.EncodeValue(Id, out _));
                     memStream.Write(ByteParsers.Byte.EncodeValue(IsBus, out _));
                     return memStream.ToArray();
                 }
 
                 public uint GetSize()
                 {
-                    return ByteHelper.GetPropertyTypeSize(ID) +
+                    return ByteHelper.GetPropertyTypeSize(Id) +
                            ByteHelper.GetPropertyTypeSize(IsBus);
                 }
             }

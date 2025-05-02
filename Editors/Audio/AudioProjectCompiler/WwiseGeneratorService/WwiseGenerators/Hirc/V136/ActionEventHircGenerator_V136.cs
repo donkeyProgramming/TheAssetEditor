@@ -19,15 +19,15 @@ namespace Editors.Audio.AudioProjectCompiler.WwiseGeneratorService.WwiseGenerato
         {
             return new CAkEvent_V136()
             {
-                ID = audioProjectActionEvent.ID,
+                Id = audioProjectActionEvent.Id,
                 HircType = audioProjectActionEvent.HircType,
-                Actions = audioProjectActionEvent.Actions.Select(action => CreateAction(action.ID)).OrderBy(action => action.ActionID).ToList()
+                Actions = audioProjectActionEvent.Actions.Select(action => CreateAction(action.Id)).OrderBy(action => action.ActionId).ToList()
             };
         }
 
         private static CAkEvent_V136.Action_V136 CreateAction(uint actionId)
         {
-            return new CAkEvent_V136.Action_V136() { ActionID = actionId };
+            return new CAkEvent_V136.Action_V136() { ActionId = actionId };
         }
     }
 }

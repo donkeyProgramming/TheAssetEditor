@@ -1,12 +1,12 @@
 ﻿using System.Collections.Generic;
 using static Editors.Audio.GameSettings.Warhammer3.SoundBanks;
 
-namespace Editors.Audio.AudioProjectCompiler.WwiseIDService.Warhammer3
+namespace Editors.Audio.AudioProjectCompiler.WwiseIdService.Warhammer3
 {
-    // TODO: Add missing IDs
-    public class Wh3WwiseIDService : IWwiseIDService
+    // TODO: Add missing Ids
+    public class Wh3WwiseIdService : IWwiseIdService
     {
-        // Finding Actor Mixer IDs:
+        // Finding Actor Mixer Ids:
         // Click on a sound in the Audio Explorer and refer to the lowest ActorMixer in the Graph Structure of a given sound (top level mixer).
         public Dictionary<Wh3SoundBankSubtype, uint> ActorMixerIds { get; } = new()
         {

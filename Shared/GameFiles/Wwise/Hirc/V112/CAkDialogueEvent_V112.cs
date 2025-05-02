@@ -24,7 +24,7 @@ namespace Shared.GameFormats.Wwise.Hirc.V112
 
             // First read all the group ids
             for (var i = 0; i < TreeDepth; i++)
-                Arguments[i].GroupID = chunk.ReadUInt32();
+                Arguments[i].GroupId = chunk.ReadUInt32();
 
             // Then read all the group types
             for (var i = 0; i < TreeDepth; i++)

@@ -30,11 +30,11 @@ namespace Shared.GameFormats.Wwise.Hirc.V136
 
         public override void UpdateSectionSize()
         {
-            var idSize = ByteHelper.GetPropertyTypeSize(ID);
+            var idSize = ByteHelper.GetPropertyTypeSize(Id);
             SectionSize = idSize + Children.GetSize() + NodeBaseParams.GetSize();
         }
 
         public List<uint> GetChildren() => Children.ChildIds;
-        public uint GetDirectParentID() => NodeBaseParams.DirectParentID;
+        public uint GetDirectParentId() => NodeBaseParams.DirectParentId;
     }
 }

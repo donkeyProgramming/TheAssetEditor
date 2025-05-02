@@ -1,15 +1,15 @@
-﻿using Editors.Audio.AudioProjectCompiler.WwiseIDService.Warhammer3;
+﻿using Editors.Audio.AudioProjectCompiler.WwiseIdService.Warhammer3;
 using Shared.Core.Settings;
 
-namespace Editors.Audio.AudioProjectCompiler.WwiseIDService
+namespace Editors.Audio.AudioProjectCompiler.WwiseIdService
 {
-    public class WwiseIDServiceFactory
+    public class WwiseIdServiceFactory
     {
-        public static IWwiseIDService GetWwiseIDService(GameTypeEnum game)
+        public static IWwiseIdService GetWwiseIdService(GameTypeEnum game)
         {
             return game switch
             {
-                GameTypeEnum.Warhammer3 => new Wh3WwiseIDService()
+                GameTypeEnum.Warhammer3 => new Wh3WwiseIdService()
             };
         }
     }
