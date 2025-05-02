@@ -33,7 +33,7 @@ namespace Editors.Audio.AudioProjectCompiler
             var soundDatFile = new SoundDatFile();
 
             foreach (var actionEvent in soundBank.ActionEvents)
-                soundDatFile.EventWithStateGroup.Add(new SoundDatFile.DatEventWithStateGroup() { EventName = actionEvent.Name, Value = 400 });
+                soundDatFile.EventWithStateGroup.Add(new SoundDatFile.DatEventWithStateGroup() { Event = actionEvent.Name, Value = 400 });
 
             var datFileName = $"event_data__{soundBank.SoundBankFileName.Replace(".bnk", ".dat")}";
             var datFilePath = $"audio\\wwise\\{datFileName}";
@@ -47,7 +47,7 @@ namespace Editors.Audio.AudioProjectCompiler
             foreach (var stateGroup in audioProject.StateGroups)
             {
                 foreach (var state in stateGroup.States)
-                    stateDatFile.EventWithStateGroup.Add(new SoundDatFile.DatEventWithStateGroup() { EventName = state.Name, Value = 400 });
+                    stateDatFile.EventWithStateGroup.Add(new SoundDatFile.DatEventWithStateGroup() { Event = state.Name, Value = 400 });
             }
 
             var datFileName = $"states_data__{audioProjectFileName}.dat";

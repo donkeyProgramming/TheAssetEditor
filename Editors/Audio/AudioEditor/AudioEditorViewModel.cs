@@ -84,6 +84,11 @@ namespace Editors.Audio.AudioEditor
             _audioEditorService.CompileAudioProject();
         }
 
+        [RelayCommand] public void OpenAudioProjectConverter()
+        {
+            _uiCommandFactory.Create<OpenAudioProjectConverterWindowCommand>().Execute();
+        }
+
         public void InitialiseAudioEditorData()
         {
             AudioProjectEditorViewModel.AudioProjectEditorDataGrid = new();

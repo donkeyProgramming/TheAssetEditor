@@ -12,6 +12,7 @@ using Editors.Audio.AudioEditor.AudioSettings;
 using Editors.Audio.AudioEditor.NewAudioProject;
 using Editors.Audio.AudioExplorer;
 using Editors.Audio.AudioProjectCompiler;
+using Editors.Audio.AudioProjectConverter;
 using Editors.Audio.Storage;
 using Editors.Audio.UICommands;
 using Editors.Audio.Utility;
@@ -40,6 +41,10 @@ namespace Editors.Audio
             serviceCollection.AddTransient<NewAudioProjectViewModel>();
             serviceCollection.AddTransient<NewAudioProjectWindow>();
             serviceCollection.AddScoped<OpenNewAudioProjectWindowCommand>();
+
+            serviceCollection.AddTransient<AudioProjectConverterViewModel>();
+            serviceCollection.AddTransient<AudioProjectConverterWindow>();
+            serviceCollection.AddScoped<OpenAudioProjectConverterWindowCommand>();
 
             serviceCollection.AddScoped<IAudioEditorService, AudioEditorService>();
             serviceCollection.AddScoped<IntegrityChecker>();

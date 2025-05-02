@@ -39,7 +39,7 @@
                 Grid.Row="0" 
                 Margin="0, 5, 5, 0">
                 <MenuItem 
-                    Header="_File" 
+                    Header="File" 
                     HorizontalAlignment="Left">
                     <MenuItem 
                         Header="New Audio Project" 
@@ -53,6 +53,13 @@
                     <MenuItem 
                         Header="Compile Audio Project" 
                         Command="{Binding CompileAudioProjectCommand}"/>
+                </MenuItem>
+                <MenuItem 
+                    Header="Tools" 
+                    HorizontalAlignment="Left">
+                    <MenuItem 
+                        Header="Audio Project Converter" 
+                        Command="{Binding OpenAudioProjectConverterCommand}"/>
                 </MenuItem>
             </Menu>
         </Grid>

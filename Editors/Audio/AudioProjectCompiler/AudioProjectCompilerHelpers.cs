@@ -39,11 +39,11 @@ namespace Editors.Audio.AudioProjectCompiler
             uint minID = 1;
             uint maxID = 99999999;
 
-            var usedIdSet = new HashSet<uint>(usedIds);
+            var usedIDSet = new HashSet<uint>(usedIds);
 
             for (var candidateID = minID; candidateID <= maxID; candidateID++)
             {
-                if (!usedIdSet.Contains(candidateID))
+                if (!usedIDSet.Contains(candidateID))
                     return candidateID;
             }
 

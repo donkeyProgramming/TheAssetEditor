@@ -76,7 +76,7 @@ namespace Editors.Audio.Storage
 
                 foreach (var state in unprocessedStateGroupWithStates.States)
                 {
-                    var stateHash = WwiseHashRename.Compute(state);
+                    var stateHash = WwiseHash.Compute(state);
                     stateLookupByStateID.TryAdd(stateHash, state);
                 }
             }
@@ -218,7 +218,7 @@ namespace Editors.Audio.Storage
         {
             foreach (var name in names)
             {
-                var hashVal = WwiseHashRename.Compute(name.Trim());
+                var hashVal = WwiseHash.Compute(name.Trim());
                 nameLookUp[hashVal] = name;
             }
         }

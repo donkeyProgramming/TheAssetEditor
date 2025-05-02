@@ -2,7 +2,7 @@
 
 namespace Editors.Audio.Utility
 {
-    public static class WwiseHashRename
+    public static class WwiseHash
     {
         public static uint Compute(string key)
         {
