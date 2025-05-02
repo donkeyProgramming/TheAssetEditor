@@ -1,6 +1,4 @@
-﻿using System.Linq;
-using Editors.Audio.AudioEditor.DataGrids;
-using Editors.Audio.Storage;
+﻿using Editors.Audio.Storage;
 
 namespace Editors.Audio.AudioEditor.AudioProjectData
 {
@@ -17,8 +15,8 @@ namespace Editors.Audio.AudioEditor.AudioProjectData
 
         public void AddToAudioProject()
         {
-            var audioProjectEditorRow = DataGridHelpers.GetAudioProjectEditorDataGridRow(_audioEditorService);
-            var state = AudioProjectHelpers.CreateStateFromDataGridRow(audioProjectEditorRow);
+            var editorRow = _audioEditorService.GetEditorDataGrid().Rows[0];
+            var state = AudioProjectHelpers.CreateStateFromDataGridRow(editorRow);
             var stateGroup = AudioProjectHelpers.GetStateGroupFromName(_audioEditorService, _audioEditorService.GetSelectedExplorerNode().Name);
             AudioProjectHelpers.InsertStateAlphabetically(stateGroup, state);
         }
@@ -26,12 +24,13 @@ namespace Editors.Audio.AudioEditor.AudioProjectData
         public void RemoveFromAudioProject()
         {
             var stateGroup = AudioProjectHelpers.GetStateGroupFromName(_audioEditorService, _audioEditorService.GetSelectedExplorerNode().Name);
-            var dataGridRowsCopy = _audioEditorService.GetSelectedViewerRows().ToList(); // Create a copy to prevent an error where dataGridRows is modified while being iterated over
-            foreach (var dataGridRow in dataGridRowsCopy)
+
+            var selectedRows = _audioEditorService.GetSelectedViewerRows();
+            foreach (var row in selectedRows)
             {
-                var state = AudioProjectHelpers.GetStateFromDataGridRow(dataGridRow, stateGroup);
+                var state = AudioProjectHelpers.GetStateFromDataGridRow(row, stateGroup);
                 stateGroup.States.Remove(state);
-                _audioEditorService.GetViewerDataGrid().Remove(dataGridRow);
+                _audioEditorService.GetViewerDataGrid().Rows.Remove(row);
             }
         }
     }

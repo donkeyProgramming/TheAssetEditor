@@ -12,7 +12,7 @@ namespace Editors.Audio.AudioProjectCompiler
     {
         public static uint GenerateUnusedHircID(Dictionary<uint, List<uint>> usedHircIdsByLanguageLookup, string language)
         {
-            var languageID = WwiseHash.Compute(language);
+            var languageID = WwiseHashRename.Compute(language);
             var usedHircIds = usedHircIdsByLanguageLookup[languageID];
             var unusedHircID = GenerateUnusedID(usedHircIds);
             var index = usedHircIds.BinarySearch(unusedHircID);
@@ -24,7 +24,7 @@ namespace Editors.Audio.AudioProjectCompiler
 
         public static uint GenerateUnusedSourceID(Dictionary<uint, List<uint>> usedSourceIdsByLanguageLookup, string language)
         {
-            var languageID = WwiseHash.Compute(language);
+            var languageID = WwiseHashRename.Compute(language);
             var usedSourceIds = usedSourceIdsByLanguageLookup[languageID];
             var unusedSourceID = GenerateUnusedID(usedSourceIds);
             var index = usedSourceIds.BinarySearch(unusedSourceID);

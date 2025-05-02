@@ -13,6 +13,7 @@ using Editors.Audio.AudioEditor.NewAudioProject;
 using Editors.Audio.AudioExplorer;
 using Editors.Audio.AudioProjectCompiler;
 using Editors.Audio.Storage;
+using Editors.Audio.UICommands;
 using Editors.Audio.Utility;
 using Microsoft.Extensions.DependencyInjection;
 using Shared.Core.DependencyInjection;
@@ -35,8 +36,10 @@ namespace Editors.Audio
             serviceCollection.AddScoped<AudioProjectEditorViewModel>();
             serviceCollection.AddScoped<AudioProjectViewerViewModel>();
             serviceCollection.AddScoped<AudioSettingsViewModel>();
-            serviceCollection.AddScoped<NewAudioProjectViewModel>();
-            serviceCollection.AddScoped<NewAudioProjectWindow>();
+
+            serviceCollection.AddTransient<NewAudioProjectViewModel>();
+            serviceCollection.AddTransient<NewAudioProjectWindow>();
+            serviceCollection.AddScoped<OpenNewAudioProjectWindowCommand>();
 
             serviceCollection.AddScoped<IAudioEditorService, AudioEditorService>();
             serviceCollection.AddScoped<IntegrityChecker>();

@@ -38,11 +38,11 @@ namespace Editors.Audio.Storage
             _bnkParser = bnkParser;
         }
 
-        public ParsedBnkFile LoadBnkFile(PackFile bnkFile, string bnkFileName, bool isCaHircItem, bool printData = false)
+        public ParsedBnkFile LoadBnkFile(PackFile bnkFile, string bnkFilePath, bool isCaHircItem, bool printData = false)
         {
-            var soundDb = _bnkParser.Parse(bnkFile, bnkFileName, isCaHircItem);
+            var soundDb = _bnkParser.Parse(bnkFile, bnkFilePath, isCaHircItem);
             if (printData)
-                PrintHircList(soundDb.HircChunk.HircItems, bnkFileName);
+                PrintHircList(soundDb.HircChunk.HircItems, bnkFilePath);
             return soundDb;
         }
 
@@ -68,23 +68,23 @@ namespace Editors.Audio.Storage
 
             Parallel.ForEach(wantedBnkFiles, bnkFile =>
             {
-                var name = bnkFile.Key;
+                var filePath = bnkFile.Key;
                 var file = bnkFile.Value;
                 var filePack = _packFileService.GetPackFileContainer(file);
-                _logger.Here().Information($"{counter++}/{wantedBnkFiles.Count} - {name}");
+                _logger.Here().Information($"{counter++}/{wantedBnkFiles.Count} - {filePath}");
                 output.BnkPackFileLookupByName.TryAdd(file.Name, file);
 
                 try
                 {
-                    var parsedBnk = LoadBnkFile(file, name, filePack.IsCaPackFile);
+                    var parsedBnk = LoadBnkFile(file, filePath, filePack.IsCaPackFile);
                     if (parsedBnk.HircChunk.HircItems.Any(y => y is UnknownHirc == true || y.HasError))
-                        banksWithUnknowns.Add(name);
+                        banksWithUnknowns.Add(filePath);
 
                     parsedBnkList.Add(parsedBnk);
                 }
                 catch (Exception e)
                 {
-                    failedBnks.Add((name, e.Message));
+                    failedBnks.Add((filePath, e.Message));
                 }
             });
 

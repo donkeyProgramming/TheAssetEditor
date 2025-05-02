@@ -109,6 +109,11 @@ namespace Editors.Audio.AudioEditor.DataGrids
                         // When text changes, filter asynchronously
                         textBox.TextChanged += async (s, e) =>
                         {
+                            audioEditorViewModel.AudioProjectEditorViewModel.SetAddRowButtonEnablement();
+
+                            if (audioEditorViewModel.AudioSettingsViewModel.ShowSettingsFromAudioProjectViewer)
+                                audioEditorViewModel.AudioSettingsViewModel.ResetShowSettingsFromAudioProjectViewer();
+
                             if (suppressTextChanged)
                             {
                                 // Clear selection after an item is selected so text isn't highlighted
@@ -120,11 +125,6 @@ namespace Editors.Audio.AudioEditor.DataGrids
                                 suppressTextChanged = false;
                                 return;
                             }
-
-                            audioEditorViewModel.AudioProjectEditorViewModel.SetAddRowButtonEnablement();
-
-                            if (audioEditorViewModel.AudioSettingsViewModel.ShowSettingsFromAudioProjectViewer)
-                                audioEditorViewModel.AudioSettingsViewModel.ResetShowSettingsFromAudioProjectViewer();
 
                             var filterText = textBox.Text;
                             var filteredItems = await Task.Run(() =>
@@ -354,7 +354,6 @@ namespace Editors.Audio.AudioEditor.DataGrids
             template.VisualTree = factory;
             return template;
         }
-
 
         public static DataTemplate CreateReadOnlyTextBlockTemplate(string columnHeader)
         {

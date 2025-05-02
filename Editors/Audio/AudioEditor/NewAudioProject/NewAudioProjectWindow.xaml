@@ -47,7 +47,6 @@
                     Height="Auto"/>
             </Grid.RowDefinitions>
 
-            <!-- Audio Project Name -->
             <Grid 
                 Grid.Row="0">
                 
@@ -70,7 +69,6 @@
                     Padding="2, 0, 0, 0"/>
             </Grid>
 
-            <!-- Audio Project Location -->
             <Grid 
                 Grid.Row="1" 
                 Margin="0, 5, 0, 0">
@@ -104,7 +102,6 @@
                     Command="{Binding SetNewFileLocationCommand}"/>
             </Grid>
 
-            <!-- Language Selection -->
             <Grid 
                 Grid.Row="2"
                 Margin="0, 5, 0, 0">
@@ -129,7 +126,6 @@
             </Grid>
         </Grid>
 
-        <!-- Buttons -->
         <StackPanel 
             Grid.Row="2" 
             Orientation="Horizontal" 

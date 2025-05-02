@@ -1,5 +1,7 @@
 ﻿using System.Collections.Generic;
+using System.Data;
 using System.Windows.Controls;
+using System.Windows.Documents;
 using Editors.Audio.AudioEditor.AudioProjectData;
 using Editors.Audio.AudioEditor.DataGrids;
 
@@ -27,32 +29,37 @@ namespace Editors.Audio.AudioEditor.AudioProjectViewer.DataGrid
             var columnsCount = 2;
             var columnWidth = 1.0 / columnsCount;
 
+            var table = _audioEditorService.GetViewerDataGrid();
+            if (!table.Columns.Contains(DataGridConfiguration.EventNameColumn))
+                table.Columns.Add(new DataColumn(DataGridConfiguration.EventNameColumn, typeof(string)));
+
             var eventColumn = DataGridConfiguration.CreateColumn(_audioEditorService.AudioEditorViewModel, DataGridConfiguration.EventNameColumn, columnWidth, DataGridColumnType.ReadOnlyTextBlock);
             dataGrid.Columns.Add(eventColumn);
         }
 
         public void SetDataGridData()
         {
+            var table = _audioEditorService.GetViewerDataGrid();
+
             var soundBank = AudioProjectHelpers.GetSoundBankFromName(_audioEditorService, _audioEditorService.GetSelectedExplorerNode().Name);
             foreach (var actionEvent in soundBank.ActionEvents)
             {
-                var rowData = new Dictionary<string, string>
-                {
-                    { DataGridConfiguration.EventNameColumn, actionEvent.Name }
-                };
-                _audioEditorService.GetViewerDataGrid().Add(rowData);
+                var row = table.NewRow();
+                row[DataGridConfiguration.EventNameColumn] = actionEvent.Name;
+                _audioEditorService.GetViewerDataGrid().Rows.Add(row);
             }
         }
 
         public void InsertDataGridRow()
         {
-            var editorRow = _audioEditorService.GetEditorDataGrid()[0];
-            var rowData = new Dictionary<string, string>
-            {
-                { DataGridConfiguration.EventNameColumn, AudioProjectHelpers.GetActionEventName(editorRow) }
-            };
+            var table = _audioEditorService.GetEditorDataGrid();
 
-            DataGridHelpers.InsertRowAlphabetically(_audioEditorService.GetViewerDataGrid(), rowData);
+            var editorRow = _audioEditorService.GetEditorDataGrid().Rows[0];
+            var value = AudioProjectHelpers.GetActionEventNameFromDataRow(editorRow);
+
+            var row = table.NewRow();
+            row[DataGridConfiguration.EventNameColumn] = value;
+            DataGridHelpers.InsertRowAlphabetically(_audioEditorService.GetViewerDataGrid(), row);
         }
     }
 }

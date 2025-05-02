@@ -52,31 +52,8 @@ namespace Editors.Audio.AudioEditor
         public void CheckAudioProjectDialogueEventIntegrity(IAudioEditorService audioEditorService)
         {
             var audioProjectDialogueEventsWithStateGroups = new Dictionary<string, List<string>>();
-
-            foreach (var soundBank in audioEditorService.AudioProject.SoundBanks)
-            {
-                if (soundBank.SoundBankType == Wh3SoundBankType.DialogueEventSoundBank)
-                    foreach (var dialogueEvent in soundBank.DialogueEvents)
-                    {
-                        var firstStatePath = dialogueEvent.StatePaths.FirstOrDefault();
-                        if (firstStatePath != null)
-                        {
-                            var stateGroups = firstStatePath.Nodes.Select(node => node.StateGroup.Name).ToList();
-                            audioProjectDialogueEventsWithStateGroups[dialogueEvent.Name] = stateGroups;
-                        }
-                    }
-            }
-
-            foreach (var dialogueEvent in audioProjectDialogueEventsWithStateGroups)
-            {
-                var gameDialogueEventStateGroups = _audioRepository.StateGroupsLookupByDialogueEvent[dialogueEvent.Key];
-                var audioProjectDialogueEventStateGroups = dialogueEvent.Value;
-                if (!gameDialogueEventStateGroups.SequenceEqual(audioProjectDialogueEventStateGroups))
-                    audioEditorService.DialogueEventsWithStateGroupsWithIntegrityError[dialogueEvent.Key] = audioProjectDialogueEventStateGroups;
-            }
-
-            if (audioEditorService.DialogueEventsWithStateGroupsWithIntegrityError.Count == 0)
-                return;
+            var dialogueEventsWithStateGroupsWithIntegrityError = new Dictionary<string, List<string>>();
+            var hasIntegrityError = false;
 
             var message = $"Dialogue Events State Groups integrity check failed." +
                 $"\n\nThis is likely due to a change in the State Groups by a recent update to the game or you've done something silly with the file." +
@@ -84,20 +61,37 @@ namespace Editors.Audio.AudioEditor
                 $" The new State Group(s) will have no State set in them so you need to click Update Row and add the State(s). " +
                 $"\n\nAffected Dialogue Events:";
 
-            foreach (var dialogueEvent in audioEditorService.DialogueEventsWithStateGroupsWithIntegrityError)
+            foreach (var soundBank in audioEditorService.AudioProject.SoundBanks)
             {
-                message += $"\n\nDialogue Event: {dialogueEvent.Key}";
+                if (soundBank.SoundBankType == Wh3SoundBankType.DialogueEventSoundBank)
+                {
+                    foreach (var dialogueEvent in soundBank.DialogueEvents)
+                    {
+                        var firstStatePath = dialogueEvent.StatePaths.FirstOrDefault();
+                        if (firstStatePath != null)
+                        {
+                            var gameDialogueEventStateGroups = _audioRepository.StateGroupsLookupByDialogueEvent[dialogueEvent.Name];
+                            var audioProjectDialogueEventStateGroups = firstStatePath.Nodes.Select(node => node.StateGroup.Name).ToList();
+                            if (!gameDialogueEventStateGroups.SequenceEqual(audioProjectDialogueEventStateGroups))
+                            {
+                                if (!hasIntegrityError)
+                                    hasIntegrityError = true;
 
-                var audioProjectDialogueEventStateGroups = dialogueEvent.Value;
-                var audioProjectDialogueEventStateGroupsText = string.Join("-->", audioProjectDialogueEventStateGroups);
-                message += $"\n\nOld State Groups: {audioProjectDialogueEventStateGroupsText}";
+                                message += $"\n\nDialogue Event: {dialogueEvent.Name}";
 
-                var gameDialogueEventStateGroups = _audioRepository.StateGroupsLookupByDialogueEvent[dialogueEvent.Key];
-                var gameDialogueEventStateGroupsText = string.Join("-->", gameDialogueEventStateGroups);
-                message += $"\n\nNew State Groups: {gameDialogueEventStateGroupsText}";
+                                var audioProjectDialogueEventStateGroupsText = string.Join("-->", audioProjectDialogueEventStateGroups);
+                                message += $"\n\nOld State Groups: {audioProjectDialogueEventStateGroupsText}";
+
+                                var gameDialogueEventStateGroupsText = string.Join("-->", gameDialogueEventStateGroups);
+                                message += $"\n\nNew State Groups: {gameDialogueEventStateGroupsText}";
+                            }
+                        }
+                    }
+                }
             }
 
-            MessageBox.Show(message, "Error");
+            if (hasIntegrityError)
+                MessageBox.Show(message, "Error");
         }
     }
 }

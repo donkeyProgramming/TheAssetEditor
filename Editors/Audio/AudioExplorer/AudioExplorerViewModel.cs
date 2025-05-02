@@ -112,15 +112,17 @@ namespace Editors.Audio.AudioExplorer
             {
                 if (sound.GetStreamType() == AKBKSourceType.Data_BNK)
                 {
-                    CAkSound_V112 cakSound_V112 = _selectedNode.Item as CAkSound_V112;
-
-                    if (cakSound_V112 != null)
+                    if (sound is CAkSound_V136) // For some reason some V136 sounds say they're in data but they're actually streamed
+                    {
+                        _soundPlayer.PlayStreamedWem(sound.GetSourceID().ToString());
+                    }
+                    else if (sound is CAkSound_V112 sound_V112)
                     {
                         _soundPlayer.PlayDataWem(
-                            cakSound_V112.AkBankSourceData.AkMediaInformation.SourceId,
-                            cakSound_V112.AkBankSourceData.AkMediaInformation.FileId,
-                            (int)cakSound_V112.AkBankSourceData.AkMediaInformation.FileOffset,
-                            (int)cakSound_V112.AkBankSourceData.AkMediaInformation.InMemoryMediaSize
+                            sound_V112.AkBankSourceData.AkMediaInformation.SourceId,
+                            sound_V112.AkBankSourceData.AkMediaInformation.FileId,
+                            (int)sound_V112.AkBankSourceData.AkMediaInformation.FileOffset,
+                            (int)sound_V112.AkBankSourceData.AkMediaInformation.InMemoryMediaSize
                         );
                     }
                 }

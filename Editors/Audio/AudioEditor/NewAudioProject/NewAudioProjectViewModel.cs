@@ -2,16 +2,16 @@
 using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Editors.Audio.AudioEditor.AudioProjectData;
 using Serilog;
 using Shared.Core.ErrorHandling;
 using Shared.Core.PackFiles;
 using Shared.Core.Services;
-using Shared.Core.ToolCreation;
 using static Editors.Audio.GameSettings.Warhammer3.Languages;
 
 namespace Editors.Audio.AudioEditor.NewAudioProject
 {
-    public partial class NewAudioProjectViewModel : ObservableObject, IEditorInterface
+    public partial class NewAudioProjectViewModel : ObservableObject
     {
         readonly ILogger _logger = Logging.Create<NewAudioProjectViewModel>();
 
@@ -19,9 +19,7 @@ namespace Editors.Audio.AudioEditor.NewAudioProject
         private readonly IAudioEditorService _audioEditorService;
         private readonly IStandardDialogs _standardDialogs;
 
-        private Action _closeAction;
-
-        public string DisplayName { get; set; } = "New Audio Project";
+        private System.Action _closeAction;
 
         // Settings properties
         [ObservableProperty] private string _audioProjectFileName;
@@ -41,7 +39,7 @@ namespace Editors.Audio.AudioEditor.NewAudioProject
             _audioEditorService = audioEditorService;
             _standardDialogs = standardDialogs;
 
-            AudioProjectDirectory = "AudioProjects";
+            AudioProjectDirectory = "audio_projects";
             SelectedLanguage = GameLanguage.EnglishUK;
         }
 
@@ -96,32 +94,20 @@ namespace Editors.Audio.AudioEditor.NewAudioProject
             _audioEditorService.InitialiseAudioProject(AudioProjectFileName, AudioProjectDirectory, GameLanguageStringLookup[SelectedLanguage]);
 
             // Add the Audio Project to the PackFile
-            _audioEditorService.SaveAudioProject();
+            var audioProject = AudioProject.GetAudioProject(_audioEditorService.AudioProject);
+            _audioEditorService.SaveAudioProject(audioProject, audioProject.FileName, audioProject.DirectoryPath);
 
             CloseWindowAction();
-        }
-
-        public void ResetNewAudioProjectViewModelData()
-        {
-            AudioProjectFileName = null;
-            AudioProjectDirectory = null;
-            IsAudioProjectFileNameSet = false;
-            IsAudioProjectDirectorySet = false;
-            IsLanguageSelected = false;
-            IsOkButtonEnabled = false;
         }
 
         [RelayCommand] public void CloseWindowAction()
         {
             _closeAction?.Invoke();
-            ResetNewAudioProjectViewModelData();
         }
 
-        public void SetCloseAction(Action closeAction)
+        public void SetCloseAction(System.Action closeAction)
         {
             _closeAction = closeAction;
         }
-
-        public void Close() { }
     }
 }

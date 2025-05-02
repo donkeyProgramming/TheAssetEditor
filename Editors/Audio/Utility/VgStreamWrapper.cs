@@ -12,8 +12,8 @@ namespace Editors.Audio.Utility
     {
         readonly ILogger _logger = Logging.Create<VgStreamWrapper>();
 
-        private static string VgStreamFolderName => $"{DirectoryHelper.Temp}\\VgStream";
-        private static string AudioFolderName => $"{DirectoryHelper.Temp}\\Audio";
+        private static string VgStreamFolder => $"{DirectoryHelper.Temp}\\VgStream";
+        private static string AudioFolder => $"{DirectoryHelper.Temp}\\Audio";
         static void EnsureCreated() => GetCliPath();
 
         public VgStreamWrapper()
@@ -55,7 +55,7 @@ namespace Editors.Audio.Utility
                 var doesFileExist = File.Exists(outputSoundFilePath);
                 _logger.Here().Information($"File readback result for converted file {outputSoundFilePath} is : {doesFileExist}");
                 if (doesFileExist == false)
-                    return Result<string>.FromError("VgSteam", $"Failed to convert file - File {outputSoundFilePath} no found on disk");
+                    return Result<string>.FromError("VgSteam", $"Failed to convert file - File {outputSoundFilePath} not found on disk");
                 return Result<string>.FromOk(outputSoundFilePath);
             }
 
@@ -68,10 +68,10 @@ namespace Editors.Audio.Utility
 
         private static string GetCliPath()
         {
-            DirectoryHelper.EnsureCreated(VgStreamFolderName);
-            DirectoryHelper.EnsureCreated(AudioFolderName);
+            DirectoryHelper.EnsureCreated(VgStreamFolder);
+            DirectoryHelper.EnsureCreated(AudioFolder);
 
-            var vgStreamCli = Path.Combine(VgStreamFolderName, "vgstream.exe");
+            var vgStreamCli = Path.Combine(VgStreamFolder, "vgstream.exe");
             if (File.Exists(vgStreamCli))
                 return vgStreamCli;
 
@@ -85,7 +85,7 @@ namespace Editors.Audio.Utility
             foreach (var file in vgStreamFiles)
             {
                 var fileName = file.Substring(resourceRootNamespace.Length + 1);
-                var outputFileName = $"{VgStreamFolderName}\\{fileName}";
+                var outputFileName = $"{VgStreamFolder}\\{fileName}";
 
                 using var resourceStream = assembly.GetManifestResourceStream(file);
                 if (resourceStream == null)

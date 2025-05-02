@@ -100,20 +100,20 @@ namespace Editors.Audio.Utility
             process.Start();
         }
 
-        private PackFile FindWemFile(string soundId)
+        private PackFile FindWemFile(string wemID)
         {
-            var wemFile = _packFileService.FindFile($"audio\\wwise\\{soundId}.wem");
+            var wemFile = _packFileService.FindFile($"audio\\wwise\\{wemID}.wem");
 
             foreach (var languageEnum in Enum.GetValues<GameLanguage>().Cast<GameLanguage>())
             {
                 var language = GameLanguageStringLookup[languageEnum];
 
                 if (wemFile == null)
-                    wemFile = _packFileService.FindFile($"audio\\wwise\\{language}\\{soundId}.wem");
+                    wemFile = _packFileService.FindFile($"audio\\wwise\\{language}\\{wemID}.wem");
                 else break;
             }
 
-            wemFile ??= _packFileService.FindFile($"audio\\{soundId}.wem");
+            wemFile ??= _packFileService.FindFile($"audio\\{wemID}.wem");
             return wemFile;
         }
 

@@ -1,6 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
+﻿using System.Collections.Generic;
+using System.Data;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -14,14 +13,11 @@ using Editors.Audio.AudioEditor.AudioProjectViewer;
 using Editors.Audio.AudioEditor.AudioSettings;
 using Editors.Audio.AudioEditor.DataGrids;
 using Editors.Audio.AudioProjectCompiler;
-using Editors.Audio.GameSettings.Warhammer3;
 using Serilog;
 using Shared.Core.ErrorHandling;
 using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
 using Shared.Core.Services;
-using static Editors.Audio.GameSettings.Warhammer3.DialogueEvents;
-using static Editors.Audio.GameSettings.Warhammer3.StateGroups;
 using TreeNode = Editors.Audio.AudioEditor.AudioProjectExplorer.TreeNode;
 
 namespace Editors.Audio.AudioEditor
@@ -60,34 +56,29 @@ namespace Editors.Audio.AudioEditor
         }
 
         public AudioProject AudioProject { get; set; }
-        public string AudioProjectFileName { get; set; }
-        public string AudioProjectDirectory { get; set; }
         public AudioEditorViewModel AudioEditorViewModel { get; set; }
         public AudioProjectExplorerViewModel AudioProjectExplorerViewModel { get; set; }
         public AudioFilesExplorerViewModel AudioFilesExplorerViewModel { get; set; }
         public AudioProjectEditorViewModel AudioProjectEditorViewModel { get; set; }
         public AudioProjectViewerViewModel AudioProjectViewerViewModel { get; set; }
         public AudioSettingsViewModel AudioSettingsViewModel { get; set; }
-        public Dictionary<string, List<string>> ModdedStatesByStateGroupLookup { get; set; } = [];
-        public Dictionary<string, List<string>> DialogueEventsWithStateGroupsWithIntegrityError { get; set; } = [];
-        public Dictionary<string, DialogueEventPreset?> DialogueEventSoundBankFiltering { get; set; } = []; // TODO: Check if unused? Also check for other unused functions.
+        public Dictionary<string, List<string>> ModdedStatesByStateGroupLookup { get; set; } = []; // TODO Replace this as it can just be extracted from the audio project directly when needed.
 
-        public void SaveAudioProject()
+        public void SaveAudioProject(AudioProject audioProject, string audioProjectFileName, string audioProjectDirectoryPath)
         {
-            var audioProject = GetAudioProjectWithoutUnusedObjects();
-
             var options = new JsonSerializerOptions
             {
                 DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
                 WriteIndented = true
             };
             var audioProjectJson = JsonSerializer.Serialize(audioProject, options);
-            var audioProjectFileName = $"{AudioProjectFileName}.aproj";
-            var audioProjectFilePath = $"{AudioProjectDirectory}\\{audioProjectFileName}";
+
+            audioProjectFileName = $"{audioProjectFileName}.aproj";
+            var audioProjectFilePath = $"{audioProjectDirectoryPath}\\{audioProjectFileName}";
             var packFile = PackFile.CreateFromASCII(audioProjectFileName, audioProjectJson);
             _fileSaveService.Save(audioProjectFilePath, packFile.DataSource.ReadData(), true);
 
-            _logger.Here().Information($"Saved Audio Project file: {AudioProjectDirectory}\\{AudioProjectFileName}.aproj");
+            _logger.Here().Information($"Saved Audio Project file: {audioProjectFilePath}");
         }
 
         public void LoadAudioProject(AudioEditorViewModel audioEditorViewModel)
@@ -109,13 +100,13 @@ namespace Editors.Audio.AudioEditor
                 ResetAudioProject();
 
                 // Set the AudioProject
-                var savedProject = JsonSerializer.Deserialize<AudioProject>(audioProjectJson);
-                AudioProjectFileName = fileName.Replace(fileType, string.Empty);
-                AudioProjectDirectory = filePath.Replace($"\\{fileName}", string.Empty);
+                var loadedAudioProject = JsonSerializer.Deserialize<AudioProject>(audioProjectJson);
+                loadedAudioProject.FileName = fileName.Replace(fileType, string.Empty);
+                loadedAudioProject.DirectoryPath = filePath.Replace($"\\{fileName}", string.Empty);
 
-                // Initialise a full Audio Project and merge the saved Audio Project with it
-                InitialiseAudioProject(AudioProjectFileName, AudioProjectDirectory, savedProject.Language);
-                MergeSavedAudioProjectIntoAudioProjectWithUnusedItems(savedProject);
+                // Initialise a 'full' Audio Project to include unused stuff
+                InitialiseAudioProject(loadedAudioProject.FileName, loadedAudioProject.DirectoryPath, loadedAudioProject.Language);
+                MergeSavedAudioProjectIntoAudioProjectWithUnusedItems(loadedAudioProject);
 
                 // Initialise data after AudioProject is set so it uses the correct instance
                 audioEditorViewModel.InitialiseAudioEditorData();
@@ -133,30 +124,25 @@ namespace Editors.Audio.AudioEditor
         {
             AudioEditorViewModel.AudioProjectExplorerViewModel.AudioProjectExplorerLabel = $"Audio Project Explorer - {DataGridHelpers.AddExtraUnderscoresToString(fileName)}";
 
-            AudioProjectFileName = fileName;
-            AudioProjectDirectory = directory;
+            AudioProject = AudioProject.CreateAudioProject();
+            AudioProject.FileName = fileName;
+            AudioProject.DirectoryPath = directory;
             AudioProject.Language = language;
-
-            InitialiseSoundBanks();
-
-            InitialiseModdedStatesGroups();
-
-            SortSoundBanksAlphabetically();
 
             AudioEditorViewModel.AudioProjectExplorerViewModel.CreateAudioProjectTree();
         }
 
         public void CompileAudioProject()
         {
-            var audioProject = GetAudioProjectWithoutUnusedObjects();
+            var audioProject = AudioProject.GetAudioProject(AudioProject);
 
-            SaveAudioProject();
+            SaveAudioProject(audioProject, audioProject.FileName, audioProject.DirectoryPath);
 
             if (audioProject.SoundBanks == null)
                 return;
 
-            var audioProjectFileName = AudioProjectFileName.Replace(" ", "_");
-            _compilerDataProcessor.SetSoundBankData(audioProject, audioProjectFileName);
+            var audioProjectFileName = audioProject.FileName.Replace(" ", "_");
+            _compilerDataProcessor.SetSoundBankData(audioProject);
 
             // We set the data from the bottom up, so Sounds, then Actions, then Events to ensure that IDs are generated before they're referenced.
             // For example IDs set in Sounds / Sound Containers are used in Actions, and IDs set in Actions are used in Events.
@@ -188,75 +174,10 @@ namespace Editors.Audio.AudioEditor
             SaveCompiledAudioProjectToPack(audioProject);
         }
 
-        private void InitialiseSoundBanks()
-        {
-            var soundBanks = Enum.GetValues<SoundBanks.Wh3SoundBankSubtype>()
-                .Select(soundBankSubtype => new SoundBank
-                {
-                    Name = SoundBanks.GetSoundBankSubTypeString(soundBankSubtype),
-                    SoundBankType = SoundBanks.GetSoundBankSubType(soundBankSubtype)
-                })
-                .ToList();
-
-            AudioProject.SoundBanks = [];
-
-            foreach (var soundBankSubtype in Enum.GetValues<SoundBanks.Wh3SoundBankSubtype>())
-            {
-                var soundBank = new SoundBank
-                {
-                    Name = SoundBanks.GetSoundBankSubTypeString(soundBankSubtype),
-                    SoundBankType = SoundBanks.GetSoundBankSubType(soundBankSubtype)
-                };
-
-                if (soundBank.SoundBankType == SoundBanks.Wh3SoundBankType.ActionEventSoundBank)
-                    soundBank.ActionEvents = [];
-                else
-                {
-                    soundBank.DialogueEvents = [];
-
-                    var filteredDialogueEvents = DialogueEventData
-                        .Where(dialogueEvent => dialogueEvent.SoundBank == SoundBanks.GetSoundBankSubtype(soundBank.Name));
-
-                    foreach (var dialogueData in filteredDialogueEvents)
-                    {
-                        var dialogueEvent = new DialogueEvent
-                        {
-                            Name = dialogueData.Name,
-                            StatePaths = []
-                        };
-                        soundBank.DialogueEvents.Add(dialogueEvent);
-                    }
-                }
-
-                AudioProject.SoundBanks.Add(soundBank);
-            }
-        }
-
-        private void InitialiseModdedStatesGroups()
-        {
-            AudioProject.StateGroups = [];
-
-            foreach (var moddedStateGroup in ModdedStateGroups)
-            {
-                var stateGroup = new StateGroup { Name = moddedStateGroup, States = [] };
-                AudioProject.StateGroups.Add(stateGroup);
-            }
-        }
-
-        public void SortSoundBanksAlphabetically()
-        {
-            var sortedSoundBanks = AudioProject.SoundBanks.OrderBy(soundBank => soundBank.Name).ToList();
-
-            AudioProject.SoundBanks.Clear();
-
-            foreach (var soundBank in sortedSoundBanks)
-                AudioProject.SoundBanks.Add(soundBank);
-        }
-
         public void BuildModdedStatesByStateGroupLookup(List<StateGroup> moddedStateGroups, Dictionary<string, List<string>> moddedStatesByStateGroupLookup)
         {
             if (moddedStatesByStateGroupLookup == null)
-                moddedStatesByStateGroupLookup = new Dictionary<string, List<string>>();
+                moddedStatesByStateGroupLookup = [];
             else
                 moddedStatesByStateGroupLookup.Clear();
 
@@ -275,55 +196,7 @@ namespace Editors.Audio.AudioEditor
             }
         }
 
-        private AudioProject GetAudioProjectWithoutUnusedObjects()
-        {
-            var usedSoundBanksList = AudioProject.SoundBanks
-                .Where(soundBank => soundBank != null)
-                .Select(soundBank =>
-                {
-                    var dialogueEvents = (soundBank.DialogueEvents ?? Enumerable.Empty<DialogueEvent>())
-                        .Where(dialogueEvent => dialogueEvent.StatePaths != null && dialogueEvent.StatePaths.Count != 0)
-                        .ToList();
-
-                    var actionEvents = (soundBank.ActionEvents ?? Enumerable.Empty<ActionEvent>())
-                        .Where(actionEvent => actionEvent.Sound != null || actionEvent.RandomSequenceContainer != null)
-                        .ToList();
-
-                    return new SoundBank
-                    {
-                        Name = soundBank.Name,
-                        SoundBankType = soundBank.SoundBankType,
-                        DialogueEvents = dialogueEvents.Count != 0
-                            ? new List<DialogueEvent>(dialogueEvents)
-                            : null,
-                        ActionEvents = actionEvents.Count != 0
-                            ? new List<ActionEvent>(actionEvents)
-                            : null
-                    };
-                })
-                .Where(soundBank => soundBank.DialogueEvents != null && soundBank.DialogueEvents.Any() || soundBank.ActionEvents != null && soundBank.ActionEvents.Any())
-                .ToList();
-
-            var soundBanksResult = usedSoundBanksList.Count != 0
-                ? new List<SoundBank>(usedSoundBanksList)
-                : null;
-
-            var usedStateGroupsList = (AudioProject.StateGroups ?? new List<StateGroup>())
-                .Where(stateGroup => stateGroup.States != null && stateGroup.States.Count != 0)
-                .ToList();
-
-            var stateGroupsResult = usedStateGroupsList.Count != 0
-                ? new List<StateGroup>(usedStateGroupsList)
-                : null;
-
-            return new AudioProject
-            {
-                Language = AudioProject.Language,
-                SoundBanks = soundBanksResult,
-                StateGroups = stateGroupsResult
-            };
-        }
-
+        // The Audio Project Explorer displays the entire Audio Project including unused items, but we only save the used items to the Audio Project file
         private void MergeSavedAudioProjectIntoAudioProjectWithUnusedItems(AudioProject savedProject)
         {
             if (savedProject == null)
@@ -397,8 +270,8 @@ namespace Editors.Audio.AudioEditor
                 WriteIndented = true
             };
             var audioProjectJson = JsonSerializer.Serialize(audioProject, options);
-            var audioProjectFileName = $"{AudioProjectFileName}_compiled.json";
-            var audioProjectFilePath = $"{AudioProjectDirectory}\\{audioProjectFileName}";
+            var audioProjectFileName = $"{audioProject.FileName}_compiled.json";
+            var audioProjectFilePath = $"{audioProject.DirectoryPath}\\{audioProjectFileName}";
             var packFile = PackFile.CreateFromASCII(audioProjectFileName, audioProjectJson);
             _fileSaveService.Save(audioProjectFilePath, packFile.DataSource.ReadData(), true);
         }
@@ -413,19 +286,19 @@ namespace Editors.Audio.AudioEditor
             return AudioProjectExplorerViewModel._selectedAudioProjectTreeNode;
         }
 
-        public ObservableCollection<Dictionary<string, string>> GetEditorDataGrid()
+        public DataTable GetEditorDataGrid()
         {
             return AudioProjectEditorViewModel.AudioProjectEditorDataGrid;
         }
 
-        public ObservableCollection<Dictionary<string, string>> GetViewerDataGrid()
+        public DataTable GetViewerDataGrid()
         {
             return AudioProjectViewerViewModel.AudioProjectViewerDataGrid;
         }
 
-        public ObservableCollection<Dictionary<string, string>> GetSelectedViewerRows()
+        public List<DataRow> GetSelectedViewerRows()
         {
-            return AudioProjectViewerViewModel.SelectedDataGridRows;
+            return AudioProjectViewerViewModel._selectedDataGridRows;
         }
     }
 }

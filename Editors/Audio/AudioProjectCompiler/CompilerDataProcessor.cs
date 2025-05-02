@@ -58,7 +58,7 @@ namespace Editors.Audio.AudioProjectCompiler
                 else
                     soundBank.SoundBankFilePath = $"{basePath}\\{soundBank.Language}\\{soundBank.SoundBankFileName}";
 
-                soundBank.ID = WwiseHash.Compute(soundBank.SoundBankFileName.Replace(".bnk", string.Empty));
+                soundBank.ID = WwiseHashRename.Compute(soundBank.SoundBankFileName.Replace(".bnk", string.Empty));
             }
         }
 
@@ -174,7 +174,7 @@ namespace Editors.Audio.AudioProjectCompiler
                         var stopEvent = new ActionEvent
                         {
                             Name = stopEventName,
-                            ID = WwiseHash.Compute(stopEventName),
+                            ID = WwiseHashRename.Compute(stopEventName),
                             HircType = actionEvent.HircType,
                             RandomSequenceContainer = actionEvent.RandomSequenceContainer,
                             Sound = actionEvent.Sound
@@ -227,9 +227,9 @@ namespace Editors.Audio.AudioProjectCompiler
             {
                 foreach (var actionEvent in soundBank.ActionEvents)
                 {
-                    actionEvent.ID = WwiseHash.Compute(actionEvent.Name);
+                    actionEvent.ID = WwiseHashRename.Compute(actionEvent.Name);
 
-                    if (UsedHircIdsByLanguageIDLookup[WwiseHash.Compute(soundBank.Language)].Contains(actionEvent.ID))
+                    if (UsedHircIdsByLanguageIDLookup[WwiseHashRename.Compute(soundBank.Language)].Contains(actionEvent.ID))
                         throw new NotSupportedException($"Action Event ID {actionEvent.ID} for {actionEvent.Name} in {soundBank.Language} is already in use, the Event needs a different name.");
                 }
 
@@ -243,14 +243,14 @@ namespace Editors.Audio.AudioProjectCompiler
         {
             foreach (var stateGroup in audioProject.StateGroups)
             {
-                stateGroup.ID = WwiseHash.Compute(stateGroup.Name);
+                stateGroup.ID = WwiseHashRename.Compute(stateGroup.Name);
 
                 foreach (var state in stateGroup.States)
                 {
                     if (state.Name == "Any")
                         state.ID = 0;
                     else
-                        state.ID = WwiseHash.Compute(state.Name);
+                        state.ID = WwiseHashRename.Compute(state.Name);
                 }
             }
         }
@@ -262,7 +262,7 @@ namespace Editors.Audio.AudioProjectCompiler
                 foreach (var dialogueEvent in soundBank.DialogueEvents)
                 {
                     foreach (var statePath in dialogueEvent.StatePaths)
-                        dialogueEvent.ID = WwiseHash.Compute(dialogueEvent.Name);
+                        dialogueEvent.ID = WwiseHashRename.Compute(dialogueEvent.Name);
                 }
 
                 soundBank.DialogueEvents = soundBank.DialogueEvents

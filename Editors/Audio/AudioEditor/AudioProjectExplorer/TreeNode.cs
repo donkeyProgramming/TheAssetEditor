@@ -6,12 +6,12 @@ namespace Editors.Audio.AudioEditor.AudioProjectExplorer
 {
     public enum NodeType
     {
-        ActionEvents,
+        ActionEventsContainer,
         ActionEventSoundBank,
-        DialogueEvents,
+        DialogueEventsContainer,
         DialogueEventSoundBank,
         DialogueEvent,
-        StateGroups,
+        StateGroupsContainer,
         StateGroup
     }
 

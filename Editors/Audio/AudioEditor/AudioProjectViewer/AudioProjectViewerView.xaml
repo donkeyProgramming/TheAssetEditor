@@ -67,7 +67,7 @@
             VerticalScrollBarVisibility="Auto" 
             SelectionChanged="AudioEditorDataGrid_SelectionChanged"
             CanUserAddRows="False"
-            ItemsSource="{Binding AudioProjectViewerDataGrid}"
+            ItemsSource="{Binding AudioProjectViewerDataGrid.DefaultView}"
             EnableRowVirtualization="True" 
             EnableColumnVirtualization="True"
             ScrollViewer.HorizontalScrollBarVisibility="Disabled">

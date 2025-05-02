@@ -1,4 +1,8 @@
-﻿using System.ComponentModel;
+﻿using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
+using System.Diagnostics;
+using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using Editors.Audio.AudioEditor.DataGrids;
@@ -29,7 +33,7 @@ namespace Editors.Audio.AudioEditor.AudioProjectViewer
         private void AudioEditorDataGrid_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             var dataGrid = sender as System.Windows.Controls.DataGrid;
-            var selectedItems = dataGrid.SelectedItems;
+            var selectedItems = dataGrid.SelectedItems.Cast<DataRowView>().Select(dataRowView => dataRowView.Row).ToList();
             if (ViewModel != null && selectedItems != null)
                 ViewModel.OnDataGridSelectionChanged(selectedItems);
         }

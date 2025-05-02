@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using Editors.Audio.Utility;
 using Shared.Core.Misc;
@@ -20,6 +21,7 @@ namespace Editors.Audio.Storage
             public Dictionary<string, List<string>> StateGroupsLookupByDialogueEvent { get; set; } = [];
             public Dictionary<string, Dictionary<string, string>> QualifiedStateGroupLookupByStateGroupByDialogueEvent { get; set; } = [];
             public Dictionary<string, List<string>> StatesLookupByStateGroup { get; set; } = [];
+            public Dictionary<string, Dictionary<uint, string>> StatesLookupByStateGroupByStateID { get; set; }
         }
 
         private readonly IPackFileService _pfs;
@@ -47,13 +49,38 @@ namespace Editors.Audio.Storage
             var unprocessedStateGroupsWithStates = stateGroupsWithStates0.Concat(stateGroupsWithStates1).ToList();
             var processedStateGroupsWithStates = ProcessStateGroups(unprocessedStateGroupsWithStates);
 
+            var statesLookupByStateGroupByStateID = BuildStateLookupByStateGroupByStateID(unprocessedStateGroupsWithStates);
+
             return new LoadResult
             {
                 NameLookupByID = nameLookUp,
                 StateGroupsLookupByDialogueEvent = processedDialogueEventsWithStateGroups,
                 QualifiedStateGroupLookupByStateGroupByDialogueEvent = dialogueEventsWithStateGroupsWithQualifiersAndStateGroups,
-                StatesLookupByStateGroup = processedStateGroupsWithStates
+                StatesLookupByStateGroup = processedStateGroupsWithStates,
+                StatesLookupByStateGroupByStateID = statesLookupByStateGroupByStateID
             };
+        }
+
+        private static new Dictionary<string, Dictionary<uint, string>> BuildStateLookupByStateGroupByStateID(List<DatStateGroupsWithStates> unprocessedStateGroupsWithStates)
+        {
+            var statesLookupByStateGroupByStateID = new Dictionary<string, Dictionary<uint, string>>();
+            foreach (var unprocessedStateGroupWithStates in unprocessedStateGroupsWithStates)
+            {
+                var stateGroup = unprocessedStateGroupWithStates.StateGroup;
+                
+                if (!statesLookupByStateGroupByStateID.TryGetValue(stateGroup, out var stateLookupByStateID))
+                {
+                    stateLookupByStateID = [];
+                    statesLookupByStateGroupByStateID[stateGroup] = stateLookupByStateID;
+                }
+
+                foreach (var state in unprocessedStateGroupWithStates.States)
+                {
+                    var stateHash = WwiseHashRename.Compute(state);
+                    stateLookupByStateID.TryAdd(stateHash, state);
+                }
+            }
+            return statesLookupByStateGroupByStateID;
         }
 
         private static Dictionary<string, List<string>> ProcessDialogueEvents(List<DatDialogueEventsWithStateGroups> dialogueEvents, Dictionary<uint, string> nameLookup)
@@ -62,13 +89,13 @@ namespace Editors.Audio.Storage
 
             foreach (var dialogueEvent in dialogueEvents)
             {
-                if (!processedDialogueEventsWithStateGroups.ContainsKey(dialogueEvent.EventName))
-                    processedDialogueEventsWithStateGroups[dialogueEvent.EventName] = new List<string>();
+                if (!processedDialogueEventsWithStateGroups.ContainsKey(dialogueEvent.Event))
+                    processedDialogueEventsWithStateGroups[dialogueEvent.Event] = new List<string>();
 
                 foreach (var stateGroupId in dialogueEvent.StateGroups)
                 {
                     if (nameLookup.TryGetValue(stateGroupId, out var stateGroup))
-                        processedDialogueEventsWithStateGroups[dialogueEvent.EventName].Add(stateGroup);
+                        processedDialogueEventsWithStateGroups[dialogueEvent.Event].Add(stateGroup);
                 }
             }
             return processedDialogueEventsWithStateGroups;
@@ -81,10 +108,10 @@ namespace Editors.Audio.Storage
             var stateGroups = ChangeNoneStatesToAny(unprocessedStateGroupsWithStates);
             foreach (var stateGroup in stateGroups)
             {
-                if (!processedStateGroupsWithStates.ContainsKey(stateGroup.StateGroupName))
-                    processedStateGroupsWithStates[stateGroup.StateGroupName] = new List<string>();
+                if (!processedStateGroupsWithStates.ContainsKey(stateGroup.StateGroup))
+                    processedStateGroupsWithStates[stateGroup.StateGroup] = new List<string>();
 
-                processedStateGroupsWithStates[stateGroup.StateGroupName].AddRange(stateGroup.States);
+                processedStateGroupsWithStates[stateGroup.StateGroup].AddRange(stateGroup.States);
             }
 
             return processedStateGroupsWithStates;
@@ -138,8 +165,8 @@ namespace Editors.Audio.Storage
             var bnkNames = bnkFiles.Select(x => x.Name.Replace(".bnk", "")).ToArray();
             AddNames(bnkNames, nameLookUp);
 
-            var languageIDStrings = new List<string> { "sfx", "chinese", "english(uk)", "french(france)", "german", "italian", "polish", "russian", "spanish(spain)" }.ToArray();
-            AddNames(languageIDStrings, nameLookUp);
+            var languages = new List<string> { "sfx", "chinese", "english(uk)", "french(france)", "german", "italian", "polish", "russian", "spanish(spain)" }.ToArray();
+            AddNames(languages, nameLookUp);
 
             var wwiseIdFiles = PackFileServiceUtility.FindAllWithExtention(_pfs, ".wwiseids");
             foreach (var item in wwiseIdFiles)
@@ -191,7 +218,7 @@ namespace Editors.Audio.Storage
         {
             foreach (var name in names)
             {
-                var hashVal = WwiseHash.Compute(name.Trim());
+                var hashVal = WwiseHashRename.Compute(name.Trim());
                 nameLookUp[hashVal] = name;
             }
         }

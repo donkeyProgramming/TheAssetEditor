@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using Editors.Audio.AudioEditor.AudioSettings;
 using Editors.Audio.AudioEditor.DataGrids;
@@ -31,9 +32,9 @@ namespace Editors.Audio.AudioEditor.AudioProjectData
                 .FirstOrDefault(stateGroup => stateGroup.Name == stateGroupName);
         }
 
-        public static ActionEvent GetActionEventFromDataGridRow(Dictionary<string, string> dataGridRow, SoundBank actionEventSoundBank)
+        public static ActionEvent GetActionEventFromDataGridRow(DataRow row, SoundBank actionEventSoundBank)
         {
-            var eventName = GetActionEventName(dataGridRow);
+            var eventName = GetActionEventNameFromDataRow(row);
 
             foreach (var actionEvent in actionEventSoundBank.ActionEvents)
             {                    
@@ -44,23 +45,31 @@ namespace Editors.Audio.AudioEditor.AudioProjectData
             return null;
         }
 
-        public static string GetActionEventName(Dictionary<string, string> dataGridRow)
+        public static string GetActionEventNameFromDataRow(DataRow row)
         {
-            if (dataGridRow.TryGetValue(DataGridConfiguration.EventNameColumn, out var eventName))
-                return eventName.ToString();
-            else
+            if (row == null)
                 return string.Empty;
+
+            // Ensure the column exists in the row’s table (defensive check).
+            if (!row.Table.Columns.Contains(DataGridConfiguration.EventNameColumn))
+                return string.Empty;
+
+            var value = row[DataGridConfiguration.EventNameColumn];
+            return value == DBNull.Value ? string.Empty : value?.ToString() ?? string.Empty;
         }
 
-        public static ActionEvent CreateActionEventFromDataGridRow(AudioSettingsViewModel audioSettingsViewModel, Dictionary<string, string> dataGridRow)
+        public static ActionEvent CreateActionEventFromDataGridRow(AudioSettingsViewModel audioSettingsViewModel, DataRow row)
         {
             var actionEvent = new ActionEvent();
 
-            actionEvent.Name = GetActionEventName(dataGridRow);
+            actionEvent.Name = GetActionEventNameFromDataRow(row);
 
             var audioFiles = audioSettingsViewModel.AudioFiles;
             if (audioFiles.Count == 1)
-                actionEvent.Sound = CreateSound(audioSettingsViewModel, audioFiles[0], isInContainer: false);
+            {
+                actionEvent.Sound = CreateSound(audioFiles[0]);
+                actionEvent.Sound.AudioSettings = BuildSoundSettings(audioSettingsViewModel);
+            }
             else
             {
                 actionEvent.RandomSequenceContainer = new RandomSequenceContainer
@@ -71,7 +80,7 @@ namespace Editors.Audio.AudioEditor.AudioProjectData
 
                 foreach (var audioFile in audioFiles)
                 {
-                    var sound = CreateSound(audioSettingsViewModel, audioFile);
+                    var sound = CreateSound(audioFile);
                     actionEvent.RandomSequenceContainer.Sounds.Add(sound);
                 }
             }
@@ -79,9 +88,19 @@ namespace Editors.Audio.AudioEditor.AudioProjectData
             return actionEvent;
         }
 
-        public static StatePath GetStatePathFromDataGridRow(IAudioRepository audioRepository, Dictionary<string, string> dataGridRow, DialogueEvent selectedDialogueEvent)
+        public static StatePath GetStatePathFromDataGridRow(IAudioRepository audioRepository, DataRow row, DialogueEvent selectedDialogueEvent)
         {
-            var dataGridRowStatePathNodes = GetStatePathNodes(audioRepository, dataGridRow, selectedDialogueEvent);
+            // Remove any rows with empty values due to a new CA state group being added to still allow the user to edit the out of date state path
+            var filteredRow = row.Table.Columns
+                .Cast<DataColumn>()
+                .Where(column =>
+                {
+                    var cell = row[column];
+                    return cell != DBNull.Value && !string.IsNullOrEmpty(cell.ToString());
+                })
+                .ToDictionary(column => column.ColumnName, column => row[column].ToString());
+
+            var dataGridRowStatePathNodes = GetStatePathNodes(audioRepository, filteredRow, selectedDialogueEvent);
 
             foreach (var statePath in selectedDialogueEvent.StatePaths)
             {
@@ -92,10 +111,10 @@ namespace Editors.Audio.AudioEditor.AudioProjectData
             return null;
         }
 
-        public static List<StatePathNode> GetStatePathNodes(IAudioRepository audioRepository, Dictionary<string, string> dataGridRow, DialogueEvent selectedDialogueEvent)
+        public static List<StatePathNode> GetStatePathNodes(IAudioRepository audioRepository, Dictionary<string, string> row, DialogueEvent selectedDialogueEvent)
         {
             var statePath = new StatePath();
-            foreach (var kvp in dataGridRow)
+            foreach (var kvp in row)
             {
                 var columnName = DataGridHelpers.RemoveExtraUnderscoresFromString(kvp.Key);
                 var columnValue = kvp.Value;
@@ -109,33 +128,74 @@ namespace Editors.Audio.AudioEditor.AudioProjectData
             return statePath.Nodes;
         }
 
-        public static StatePath CreateStatePathFromDataGridRow(IAudioRepository audioRepository, AudioSettingsViewModel audioSettingsViewModel, Dictionary<string, string> dataGridRow, DialogueEvent selectedDialogueEvent)
+        public static StatePath CreateStatePathFromDataGridRow(IAudioRepository audioRepository, AudioSettingsViewModel audioSettingsViewModel, DataRow row, DialogueEvent selectedDialogueEvent)
         {
             var statePath = new StatePath();
-            foreach (var kvp in dataGridRow)
+
+            foreach (DataColumn column in row.Table.Columns)
             {
-                var columnName = DataGridHelpers.RemoveExtraUnderscoresFromString(kvp.Key);
-                var columnValue = kvp.Value;
+                var value = row[column].ToString();
+                var columnName = DataGridHelpers.RemoveExtraUnderscoresFromString(column.ColumnName);
+
                 statePath.Nodes.Add(new StatePathNode
                 {
-                    StateGroup = new StateGroup { Name = audioRepository.GetStateGroupFromStateGroupWithQualifier(selectedDialogueEvent.Name, columnName) },
-                    State = new State { Name = columnValue }
+                    StateGroup = new StateGroup
+                    {
+                        Name = audioRepository.GetStateGroupFromStateGroupWithQualifier(selectedDialogueEvent.Name, columnName)
+                    },
+                    State = new State { Name = value }
+                });
+            }
+
+            var audioFiles = audioSettingsViewModel.AudioFiles;
+            if (audioFiles.Count == 1)
+            {
+                statePath.Sound = CreateSound(audioFiles[0]);
+                statePath.Sound.AudioSettings = BuildSoundSettings(audioSettingsViewModel);
+            }
+            else
+            {
+                statePath.RandomSequenceContainer = new RandomSequenceContainer
+                {
+                    Sounds = [],
+                    AudioSettings = BuildRanSeqContainerSettings(audioSettingsViewModel)
+                };
+
+                foreach (var audioFile in audioFiles)
+                    statePath.RandomSequenceContainer.Sounds.Add(CreateSound(audioFile));
+            }
+
+            return statePath;
+        }
+
+        public static StatePath CreateStatePathFromStatePathNodes(IAudioRepository audioRepository, List<StatePathNode> statePathNodes, List<AudioFile> audioFiles)
+        {
+            var statePath = new StatePath();
+
+            foreach (var statePathNode in statePathNodes)
+            {
+                statePath.Nodes.Add(new StatePathNode
+                {
+                    StateGroup = new StateGroup { Name = statePathNode.StateGroup.Name },
+                    State = new State { Name = statePathNode.State.Name }
                 });
 
-                var audioFiles = audioSettingsViewModel.AudioFiles;
                 if (audioFiles.Count == 1)
-                    statePath.Sound = CreateSound(audioSettingsViewModel, audioFiles[0], isInContainer: false);
+                {
+                    statePath.Sound = CreateSound(audioFiles[0]);
+                    statePath.Sound.AudioSettings = new SoundSettings();
+                }    
                 else
                 {
                     statePath.RandomSequenceContainer = new RandomSequenceContainer
                     {
                         Sounds = [],
-                        AudioSettings = BuildRanSeqContainerSettings(audioSettingsViewModel)
+                        AudioSettings = BuildRecommendedRanSeqContainerSettings(audioFiles)
                     };
 
                     foreach (var audioFile in audioFiles)
                     {
-                        var sound = CreateSound(audioSettingsViewModel, audioFile);
+                        var sound = CreateSound(audioFile);
                         statePath.RandomSequenceContainer.Sounds.Add(sound);
                     }
                 }
@@ -163,7 +223,7 @@ namespace Editors.Audio.AudioEditor.AudioProjectData
             }
         }
 
-        private static Sound CreateSound(AudioSettingsViewModel audioSettingsViewModel, AudioFile audioFile, bool isInContainer = true)
+        private static Sound CreateSound(AudioFile audioFile)
         {
             var sound = new Sound()
             {
@@ -171,29 +231,30 @@ namespace Editors.Audio.AudioEditor.AudioProjectData
                 WavFilePath = audioFile.FilePath,
             };
 
-            if (!isInContainer)
-                sound.AudioSettings = BuildSoundSettings(audioSettingsViewModel);
-
             return sound;
         }
 
-        public static State GetStateFromDataGridRow(Dictionary<string, string> dataGridRow, StateGroup moddedStateGroup)
+        public static State GetStateFromDataGridRow(DataRow row, StateGroup moddedStateGroup)
         {
-            var dataGridRowState = CreateStateFromDataGridRow(dataGridRow);
-
-            foreach (var state in moddedStateGroup.States)
-            {                    
-                if (state.Name == dataGridRowState.Name)
-                    return state;
-            }
-
-            return null;
+            var dataRowState = CreateStateFromDataGridRow(row);
+            return moddedStateGroup.States.FirstOrDefault(state => state.Name == dataRowState.Name);
         }
 
-        public static State CreateStateFromDataGridRow(Dictionary<string, string> dataGridRow)
+        public static State CreateStateFromDataGridRow(DataRow row)
         {
             var state = new State();
-            state.Name = dataGridRow.First().Value.ToString();
+
+            foreach (DataColumn column in row.Table.Columns)
+            {
+                var value = row[column];
+
+                if (value != DBNull.Value && !string.IsNullOrEmpty(value.ToString()))
+                {
+                    state.Name = value.ToString();
+                    break;
+                }
+            }
+
             return state;
         }
 
@@ -329,6 +390,22 @@ namespace Editors.Audio.AudioEditor.AudioProjectData
                 }
             }
 
+            return audioSettings;
+        }
+
+        public static RanSeqContainerSettings BuildRecommendedRanSeqContainerSettings(List<AudioFile> audioFiles)
+        {
+            var audioSettings = new RanSeqContainerSettings();
+            audioSettings.PlaylistType = PlaylistType.RandomExhaustive;
+            audioSettings.EnableRepetitionInterval = true;
+            audioSettings.RepetitionInterval = (uint)Math.Ceiling(audioFiles.Count / 2.0);
+            audioSettings.EndBehaviour = EndBehaviour.Restart;
+            audioSettings.AlwaysResetPlaylist = true;
+            audioSettings.PlaylistMode = PlaylistMode.Step;
+            audioSettings.LoopingType = LoopingType.Disabled;
+            audioSettings.NumberOfLoops = 1;
+            audioSettings.TransitionType = TransitionType.Disabled;
+            audioSettings.TransitionDuration = 1;
             return audioSettings;
         }
 

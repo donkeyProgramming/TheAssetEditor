@@ -14,16 +14,17 @@ namespace Editors.Audio.Storage
 
     public class AudioData
     {
-        public Dictionary<uint, Dictionary<uint, List<HircItem>>> HircLookupByLanguageIDByID { get; internal set; }
-        public Dictionary<uint, Dictionary<uint, List<ICAkSound>>> SoundHircLookupByLanguageIDBySourceID { get; internal set; }
-        public Dictionary<uint, Dictionary<uint, List<DidxAudio>>> DidxAudioLookupByLanguageIDByID { get; internal set; }
-        public Dictionary<uint, List<HircItem>> HircLookupByID { get; internal set; }
-        public Dictionary<uint, List<DidxAudio>> DidxAudioLookupByID { get; internal set; }
-        public Dictionary<string, PackFile> BnkPackFileLookupByName { get; internal set; }
-        public Dictionary<uint, string> NameLookupByID { get; internal set; }
+        public Dictionary<uint, Dictionary<uint, List<HircItem>>> HircLookupByLanguageIDByID { get; set; }
+        public Dictionary<uint, Dictionary<uint, List<ICAkSound>>> SoundHircLookupByLanguageIDBySourceID { get; set; }
+        public Dictionary<uint, Dictionary<uint, List<DidxAudio>>> DidxAudioLookupByLanguageIDByID { get; set; }
+        public Dictionary<uint, List<HircItem>> HircLookupByID { get; set; }
+        public Dictionary<uint, List<DidxAudio>> DidxAudioLookupByID { get; set; }
+        public Dictionary<string, PackFile> BnkPackFileLookupByName { get; set; }
+        public Dictionary<uint, string> NameLookupByID { get; set; }
         public Dictionary<string, List<string>> StateGroupsLookupByDialogueEvent { get; set; }
         public Dictionary<string, Dictionary<string, string>> QualifiedStateGroupLookupByStateGroupByDialogueEvent { get; set; }
         public Dictionary<string, List<string>> StatesLookupByStateGroup { get; set; }
+        public Dictionary<string, Dictionary<uint, string>> StatesLookupByStateGroupByStateID { get; set; }
     }
 
     public class CreateRepositoryFromAllPackFiles : RepositoryProvider
@@ -44,6 +45,7 @@ namespace Editors.Audio.Storage
             audioData.StateGroupsLookupByDialogueEvent = loadResult.StateGroupsLookupByDialogueEvent;
             audioData.QualifiedStateGroupLookupByStateGroupByDialogueEvent = loadResult.QualifiedStateGroupLookupByStateGroupByDialogueEvent;
             audioData.StatesLookupByStateGroup = loadResult.StatesLookupByStateGroup;
+            audioData.StatesLookupByStateGroupByStateID = loadResult.StatesLookupByStateGroupByStateID;
         }
 
         public void LoadBnkData(AudioData audioData)

@@ -5,6 +5,7 @@ using System.Collections.Specialized;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 using System.Windows.Media;
 
@@ -16,6 +17,9 @@ namespace Editors.Audio.AudioEditor.AudioFilesExplorer
         public static readonly DependencyProperty IsMultiSelectedProperty = DependencyProperty.RegisterAttached("IsMultiSelected", typeof(bool), typeof(MultiSelectTreeView), new PropertyMetadata(false));
 
         private TreeNode _anchorItem;
+        private Point _dragStartPoint;
+        private bool _suppressSelectionChange;
+        private List<TreeNode> _preDragSelectedNodes;
 
         public IList SelectedItems
         {
@@ -29,6 +33,7 @@ namespace Editors.Audio.AudioEditor.AudioFilesExplorer
                 collection.CollectionChanged += OnSelectedItemsCollectionChanged;
 
             PreviewMouseDown += MultiSelectTreeView_PreviewMouseDown;
+            PreviewMouseMove += MultiSelectTreeView_PreviewMouseMove;
         }
 
         private static void OnSelectedItemsChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
@@ -54,29 +59,52 @@ namespace Editors.Audio.AudioEditor.AudioFilesExplorer
 
         private void MultiSelectTreeView_PreviewMouseDown(object sender, MouseButtonEventArgs e)
         {
-            if (Keyboard.IsKeyDown(Key.LeftCtrl) || Keyboard.IsKeyDown(Key.RightCtrl))
+            _dragStartPoint = e.GetPosition(this);
+            _preDragSelectedNodes = SelectedItems.OfType<TreeNode>().ToList();
+
+            var itemUnderMouse = GetTreeViewItemUnderMouse(e);
+            if (itemUnderMouse != null)
             {
-                var clickedItem = GetTreeViewItemUnderMouse(e);
-                if (clickedItem?.DataContext is TreeNode clickedNode)
+                // Only suppress selection if already selected and we're not clicking the expander
+                var clickTarget = e.OriginalSource as DependencyObject;
+                var clickedExpander = IsClickOnExpander(clickTarget);
+
+                if (!clickedExpander && itemUnderMouse.DataContext is TreeNode clickedNode && SelectedItems.Contains(clickedNode))
                 {
-                    if (SelectedItems.Contains(clickedNode))
-                    {
-                        SelectedItems.Remove(clickedNode);
-
-                        if (_anchorItem == clickedNode)
-                        {
-                            _anchorItem = null;
-                            clickedItem.IsSelected = false;
-                        }
-                    }
-                    else
-                    {
-                        SelectedItems.Add(clickedNode);
-                        _anchorItem ??= clickedNode;
-                    }
-
-                    UpdateSelectionStates();
+                    itemUnderMouse.IsSelected = false;
                     e.Handled = true;
+                }
+            }
+        }
+
+        private void MultiSelectTreeView_PreviewMouseMove(object sender, MouseEventArgs e)
+        {
+            var currentPos = e.GetPosition(this);
+            var diff = _dragStartPoint - currentPos;
+
+            if (e.LeftButton == MouseButtonState.Pressed &&
+                (Math.Abs(diff.X) > SystemParameters.MinimumHorizontalDragDistance ||
+                 Math.Abs(diff.Y) > SystemParameters.MinimumVerticalDragDistance))
+            {
+                if (_preDragSelectedNodes?.Count > 0)
+                {
+                    _suppressSelectionChange = true;
+
+                    try
+                    {
+                        var data = new DataObject(typeof(IEnumerable<TreeNode>), _preDragSelectedNodes);
+                        DragDrop.DoDragDrop(this, data, DragDropEffects.Copy);
+                    }
+                    finally
+                    {
+                        _suppressSelectionChange = false;
+
+                        // Refresh visual selection states after drag completes
+                        Dispatcher.BeginInvoke(new Action(() =>
+                        {
+                            UpdateSelectionStates();
+                        }), System.Windows.Threading.DispatcherPriority.Input);
+                    }
                 }
             }
         }
@@ -84,6 +112,9 @@ namespace Editors.Audio.AudioEditor.AudioFilesExplorer
         protected override void OnSelectedItemChanged(RoutedPropertyChangedEventArgs<object> e)
         {
             base.OnSelectedItemChanged(e);
+
+            if (_suppressSelectionChange)
+                return;
 
             if (e.NewValue is TreeNode currentSelectedItem)
             {
@@ -98,7 +129,9 @@ namespace Editors.Audio.AudioEditor.AudioFilesExplorer
                         SelectedItems.Add(_anchorItem);
                     }
                     else
+                    {
                         SelectRangeFromAnchor(_anchorItem, currentSelectedItem);
+                    }
                 }
                 else if (!Keyboard.IsKeyDown(Key.LeftCtrl) && !Keyboard.IsKeyDown(Key.RightCtrl))
                 {
@@ -167,6 +200,19 @@ namespace Editors.Audio.AudioEditor.AudioFilesExplorer
             while (current != null && current is not TreeViewItem)
                 current = VisualTreeHelper.GetParent(current);
             return current as TreeViewItem;
+        }
+
+        private static bool IsClickOnExpander(DependencyObject source)
+        {
+            while (source != null)
+            {
+                if (source is ToggleButton toggle && toggle.Name == "Expander")
+                    return true;
+
+                source = VisualTreeHelper.GetParent(source);
+            }
+
+            return false;
         }
 
         private static IEnumerable<TreeViewItem> GetTreeViewItems(ItemsControl parent)

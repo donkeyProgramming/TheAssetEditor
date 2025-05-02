@@ -1,6 +1,4 @@
-﻿using System.Linq;
-using Editors.Audio.AudioEditor.DataGrids;
-using Editors.Audio.Storage;
+﻿using Editors.Audio.Storage;
 
 namespace Editors.Audio.AudioEditor.AudioProjectData
 {
@@ -17,8 +15,8 @@ namespace Editors.Audio.AudioEditor.AudioProjectData
 
         public void AddToAudioProject()
         {
-            var audioProjectEditorRow = DataGridHelpers.GetAudioProjectEditorDataGridRow(_audioEditorService);
-            var actionEvent = AudioProjectHelpers.CreateActionEventFromDataGridRow(_audioEditorService.AudioSettingsViewModel, audioProjectEditorRow);
+            var editorRow = _audioEditorService.GetEditorDataGrid().Rows[0];
+            var actionEvent = AudioProjectHelpers.CreateActionEventFromDataGridRow(_audioEditorService.AudioSettingsViewModel, editorRow);
             var soundBank = AudioProjectHelpers.GetSoundBankFromName(_audioEditorService, _audioEditorService.GetSelectedExplorerNode().Name);
             AudioProjectHelpers.InsertActionEventAlphabetically(soundBank, actionEvent);
         }
@@ -26,12 +24,15 @@ namespace Editors.Audio.AudioEditor.AudioProjectData
         public void RemoveFromAudioProject()
         {
             var soundBank = AudioProjectHelpers.GetSoundBankFromName(_audioEditorService, _audioEditorService.GetSelectedExplorerNode().Name);
-            var dataGridRowsCopy = _audioEditorService.GetSelectedViewerRows().ToList(); // Create a copy to prevent an error where dataGridRows is modified while being iterated over
-            foreach (var dataGridRow in dataGridRowsCopy)
+
+            var selectedRows = _audioEditorService.GetSelectedViewerRows();
+            foreach (var row in selectedRows)
             {
-                var actionEvent = AudioProjectHelpers.GetActionEventFromDataGridRow(dataGridRow, soundBank);
+                var actionEvent = AudioProjectHelpers.GetActionEventFromDataGridRow(row, soundBank);
                 soundBank.ActionEvents.Remove(actionEvent);
-                _audioEditorService.GetViewerDataGrid().Remove(dataGridRow);
+
+                var viewerTable = _audioEditorService.GetViewerDataGrid();
+                viewerTable.Rows.Remove(row);
             }
         }
     }

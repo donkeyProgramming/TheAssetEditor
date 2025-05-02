@@ -23,7 +23,7 @@ namespace Editors.Audio.AudioEditor.AudioProjectExplorer
             var soundBanksNode = new TreeNode
             {
                 Name = "Action Events",
-                NodeType = NodeType.ActionEvents,
+                NodeType = NodeType.ActionEventsContainer,
                 Children = new ObservableCollection<TreeNode>()
             };
             audioProjectTree.Add(soundBanksNode);
@@ -36,7 +36,7 @@ namespace Editors.Audio.AudioEditor.AudioProjectExplorer
             var dialogueEventsNode = new TreeNode
             {
                 Name = "Dialogue Events",
-                NodeType = NodeType.DialogueEvents,
+                NodeType = NodeType.DialogueEventsContainer,
                 Children = new ObservableCollection<TreeNode>()
             };
             audioProjectTree.Add(dialogueEventsNode);
@@ -49,7 +49,7 @@ namespace Editors.Audio.AudioEditor.AudioProjectExplorer
             var stateGroupsNode = new TreeNode
             {
                 Name = "State Groups",
-                NodeType = NodeType.StateGroups,
+                NodeType = NodeType.StateGroupsContainer,
                 Children = new ObservableCollection<TreeNode>()
             };
             audioProjectTree.Add(stateGroupsNode);
@@ -195,7 +195,7 @@ namespace Editors.Audio.AudioEditor.AudioProjectExplorer
                 {
                     FilterEditedAudioProjectItemsInner(audioEditorService, audioProjectExplorerViewModel, childNode.Children, showEditedAudioProjectItemsOnly);
 
-                    if (!childNode.Children.Any(c => c.IsVisible))
+                    if (!childNode.Children.Any(childNode => childNode.IsVisible))
                     {
                         childNode.IsVisible = false;
                         continue;
@@ -210,9 +210,7 @@ namespace Editors.Audio.AudioEditor.AudioProjectExplorer
 
                 switch (childNode.NodeType)
                 {
-                    case NodeType.ActionEvents:
-                    case NodeType.DialogueEvents:
-                    case NodeType.StateGroups:
+                    case NodeType.StateGroupsContainer:
                         childNode.IsVisible = childNode.Children.Any();
                         break;
 
@@ -228,18 +226,20 @@ namespace Editors.Audio.AudioEditor.AudioProjectExplorer
                         childNode.IsVisible = audioEditorService.AudioProject.StateGroups.Any(stateGroup => stateGroup.Name == childNode.Name && stateGroup.States.Count > 0);
                         break;
 
+                    case NodeType.DialogueEvent:
+                        childNode.IsVisible = audioEditorService.AudioProject.SoundBanks.Any(soundBank => soundBank.Name == childNode.Parent.Name && soundBank.DialogueEvents.Any(dialogueEvent => dialogueEvent.Name == childNode.Name && dialogueEvent.StatePaths.Count > 0));
+                        break;
+
                     default:
                         childNode.IsVisible = true;
                         break;
                 }
             }
 
-            if (!node.Any(n => n.IsVisible))
+            if (!node.Any(node => node.IsVisible))
             {
                 foreach (var parentNode in node)
-                {
                     parentNode.IsVisible = false;
-                }
             }
         }
 

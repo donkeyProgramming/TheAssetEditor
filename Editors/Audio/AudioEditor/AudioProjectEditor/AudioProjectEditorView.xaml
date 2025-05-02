@@ -67,9 +67,9 @@
             Grid.Row="2" 
             Tag="{Binding AudioProjectEditorDataGridTag}" 
             Margin="0, 0, 0, 0"
-            AutoGenerateColumns="False"
+            AutoGenerateColumns="True"
             CanUserAddRows="False" 
-            ItemsSource="{Binding AudioProjectEditorDataGrid}"
+            ItemsSource="{Binding AudioProjectEditorDataGrid.DefaultView}"
             EnableRowVirtualization="True" 
             EnableColumnVirtualization="True"
             ScrollViewer.HorizontalScrollBarVisibility="Disabled"/>

@@ -14,7 +14,7 @@ namespace Editors.Audio.AudioProjectCompiler.WwiseGeneratorService.WwiseGenerato
             {
                 BankGeneratorVersion = bankGeneratorVersion,
                 SoundBankID = soundBank.ID,
-                LanguageID = WwiseHash.Compute(audioProject.Language),
+                LanguageID = WwiseHashRename.Compute(audioProject.Language),
                 FeedbackInBank = 0x10,
                 ProjectID = 2361, // TODO: Need a way to get the project ID via a factory and service.
                 Padding = BitConverter.GetBytes(0x04)

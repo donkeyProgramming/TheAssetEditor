@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+﻿using System.Data;
 using Editors.Audio.AudioEditor.AudioProjectData;
 using Editors.Audio.AudioEditor.DataGrids;
 
@@ -23,24 +23,35 @@ namespace Editors.Audio.AudioEditor.AudioProjectViewer.DataGrid
         {
             var dataGrid = DataGridConfiguration.InitialiseDataGrid(_audioEditorService.AudioProjectViewerViewModel.AudioProjectViewerDataGridTag);
             var stateGroup = AudioProjectHelpers.GetStateGroupFromName(_audioEditorService, _audioEditorService.GetSelectedExplorerNode().Name);
-            var stateGroupColumn = DataGridConfiguration.CreateColumn(_audioEditorService.AudioEditorViewModel, DataGridHelpers.AddExtraUnderscoresToString(stateGroup.Name), 1.0, DataGridColumnType.ReadOnlyTextBlock);
+
+            var columnHeader = DataGridHelpers.AddExtraUnderscoresToString(stateGroup.Name);
+
+            var table = _audioEditorService.GetViewerDataGrid();
+            if (!table.Columns.Contains(columnHeader))
+                table.Columns.Add(new DataColumn(columnHeader, typeof(string)));
+
+            var stateGroupColumn = DataGridConfiguration.CreateColumn(_audioEditorService.AudioEditorViewModel, columnHeader, 1.0, DataGridColumnType.ReadOnlyTextBlock);
             dataGrid.Columns.Add(stateGroupColumn);
         }
 
         public void SetDataGridData()
         {
+            var table = _audioEditorService.GetViewerDataGrid();
+
             var stateGroup = AudioProjectHelpers.GetStateGroupFromName(_audioEditorService, _audioEditorService.GetSelectedExplorerNode().Name);
+            var columnHeader = DataGridHelpers.AddExtraUnderscoresToString(stateGroup.Name);
+
             foreach (var state in stateGroup.States)
             {
-                var dataGridRow = new Dictionary<string, string>();
-                dataGridRow[DataGridHelpers.AddExtraUnderscoresToString(stateGroup.Name)] = state.Name;
-                _audioEditorService.GetViewerDataGrid().Add(dataGridRow);
+                var row = table.NewRow();
+                row[columnHeader] = state.Name;
+                table.Rows.Add(row);
             }
         }
 
         public void InsertDataGridRow()
         {
-            DataGridHelpers.InsertRowAlphabetically(_audioEditorService.GetViewerDataGrid(), _audioEditorService.GetEditorDataGrid()[0]);
+            DataGridHelpers.InsertRowAlphabetically(_audioEditorService.GetViewerDataGrid(), _audioEditorService.GetEditorDataGrid().Rows[0]);
         }
     }
 }

@@ -7,8 +7,6 @@ using Shared.Core.Settings;
 using Shared.GameFormats.Wwise.Didx;
 using Shared.GameFormats.Wwise.Enums;
 using Shared.GameFormats.Wwise.Hirc;
-using Shared.GameFormats.Wwise.Hirc.V136;
-using SharpDX.DXGI;
 
 namespace Editors.Audio.Storage
 {
@@ -24,6 +22,7 @@ namespace Editors.Audio.Storage
         Dictionary<string, List<string>> StateGroupsLookupByDialogueEvent { get; }
         Dictionary<string, Dictionary<string, string>> QualifiedStateGroupLookupByStateGroupByDialogueEvent { get; }
         Dictionary<string, List<string>> StatesLookupByStateGroup { get; }
+        Dictionary<string, Dictionary<uint, string>> StatesLookupByStateGroupByStateID { get; }
 
         void ExportNameListToFile(string outputDirectory, bool includeIds = false);
         List<T> GetHircItemsByType<T>() where T : class;
@@ -38,16 +37,17 @@ namespace Editors.Audio.Storage
 
     public class AudioRepository : IAudioRepository
     {
-        public Dictionary<uint, Dictionary<uint, List<HircItem>>> HircLookupByLanguageIDByID { get; private set; }
-        public Dictionary<uint, Dictionary<uint, List<ICAkSound>>> SoundHircLookupByLanguageIDBySourceID { get; private set; }
-        public Dictionary<uint, Dictionary<uint, List<DidxAudio>>> DidxAudioLookupByLanguageIDByID { get; private set; }
-        public Dictionary<uint, List<HircItem>> HircLookupByID { get; private set; }
-        public Dictionary<uint, List<DidxAudio>> DidxAudioLookupByID { get; private set; }
-        public Dictionary<string, PackFile> BnkPackFileLookupByName { get; private set; }
-        public Dictionary<uint, string> NameLookupByID { get; private set; }
-        public Dictionary<string, List<string>> StateGroupsLookupByDialogueEvent { get; private set; }
+        public Dictionary<uint, Dictionary<uint, List<HircItem>>> HircLookupByLanguageIDByID { get; set; }
+        public Dictionary<uint, Dictionary<uint, List<ICAkSound>>> SoundHircLookupByLanguageIDBySourceID { get; set; }
+        public Dictionary<uint, Dictionary<uint, List<DidxAudio>>> DidxAudioLookupByLanguageIDByID { get; set; }
+        public Dictionary<uint, List<HircItem>> HircLookupByID { get; set; }
+        public Dictionary<uint, List<DidxAudio>> DidxAudioLookupByID { get; set; }
+        public Dictionary<string, PackFile> BnkPackFileLookupByName { get; set; }
+        public Dictionary<uint, string> NameLookupByID { get; set; }
+        public Dictionary<string, List<string>> StateGroupsLookupByDialogueEvent { get; set; }
         public Dictionary<string, Dictionary<string, string>> QualifiedStateGroupLookupByStateGroupByDialogueEvent { get; set; }
-        public Dictionary<string, List<string>> StatesLookupByStateGroup { get; private set; }
+        public Dictionary<string, List<string>> StatesLookupByStateGroup { get; set; }
+        public Dictionary<string, Dictionary<uint, string>> StatesLookupByStateGroupByStateID { get; set; }
 
         public AudioRepository(RepositoryProvider provider, ApplicationSettingsService applicationSettingsService)
         {
@@ -71,6 +71,7 @@ namespace Editors.Audio.Storage
             StateGroupsLookupByDialogueEvent = audioData.StateGroupsLookupByDialogueEvent ?? [];
             QualifiedStateGroupLookupByStateGroupByDialogueEvent = audioData.QualifiedStateGroupLookupByStateGroupByDialogueEvent ?? [];
             StatesLookupByStateGroup = audioData.StatesLookupByStateGroup ?? [];
+            StatesLookupByStateGroupByStateID = audioData.StatesLookupByStateGroupByStateID ?? [];
         }
 
         public List<HircItem> GetHircObject(uint id)

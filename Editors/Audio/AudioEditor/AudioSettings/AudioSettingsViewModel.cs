@@ -8,20 +8,15 @@ using Editors.Audio.AudioEditor.AudioProjectExplorer;
 using Editors.Audio.AudioEditor.Events;
 using Editors.Audio.Storage;
 using Shared.Core.Events;
-using Shared.Core.ToolCreation;
 using static Editors.Audio.AudioEditor.AudioSettings.AudioSettings;
 
 namespace Editors.Audio.AudioEditor.AudioSettings
 {
-    // TODO: Add visibility to all settings to hide or show them according to the type of thing.
-    // TODO: Add a way for single sounds to loop.
-    public partial class AudioSettingsViewModel : ObservableObject, IEditorInterface
+    public partial class AudioSettingsViewModel : ObservableObject
     {
         private readonly IEventHub _eventHub;
         private readonly IAudioEditorService _audioEditorService;
         private readonly IAudioRepository _audioRepository;
-
-        public string DisplayName { get; set; } = "Audio Settings";
 
         // Playlist Type
         [ObservableProperty] private bool _isPlaylistTypeSectionVisible = false;
@@ -262,7 +257,7 @@ namespace Editors.Audio.AudioEditor.AudioSettings
         public void SetAudioSettingsEnablementAndVisibility()
         {
             var selectedNode = _audioEditorService.GetSelectedExplorerNode();
-            if (selectedNode.NodeType != NodeType.ActionEventSoundBank && selectedNode.NodeType != NodeType.DialogueEvent)
+            if (selectedNode == null || selectedNode.NodeType != NodeType.ActionEventSoundBank && selectedNode.NodeType != NodeType.DialogueEvent)
                 return;
 
             IsAudioSettingsVisible = true;
@@ -374,12 +369,7 @@ namespace Editors.Audio.AudioEditor.AudioSettings
 
                 IsLoopingTypeEnabled = true;
                 if (LoopingType == LoopingType.FiniteLooping)
-                {
                     IsNumberOfLoopsEnabled = true;
-
-                    if (NumberOfLoops == null)
-                        NumberOfLoops = 1;
-                }
                 else
                     IsNumberOfLoopsEnabled = false;
             }
@@ -394,7 +384,6 @@ namespace Editors.Audio.AudioEditor.AudioSettings
                 RepetitionInterval = (uint)Math.Ceiling(AudioFiles.Count / 2.0);
                 EndBehaviour = EndBehaviour.Restart;
                 AlwaysResetPlaylist = true;
-
                 PlaylistMode = PlaylistMode.Step;
                 LoopingType = LoopingType.Disabled;
                 NumberOfLoops = 1;
@@ -456,7 +445,5 @@ namespace Editors.Audio.AudioEditor.AudioSettings
         {
             ShowSettingsFromAudioProjectViewer = false;
         }
-
-        public void Close() {}
     }
 }

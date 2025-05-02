@@ -1,6 +1,4 @@
 ﻿using System.Windows;
-using Shared.Core.PackFiles;
-using Shared.Core.Services;
 
 namespace Editors.Audio.AudioEditor.NewAudioProject
 {
@@ -9,22 +7,13 @@ namespace Editors.Audio.AudioEditor.NewAudioProject
         public NewAudioProjectWindow()
         {
             InitializeComponent();
+            Loaded += NewAudioProjectWindow_Loaded;
         }
 
-        public static void Show(IPackFileService packFileService, IAudioEditorService audioEditorService, IStandardDialogs packFileUiProvider)
+        private void NewAudioProjectWindow_Loaded(object sender, RoutedEventArgs e)
         {
-            var window = new NewAudioProjectWindow();
-            var newAudioProjectViewModel = new NewAudioProjectViewModel(packFileService, audioEditorService, packFileUiProvider);
-
-            // Set the close action for the ViewModel
-            newAudioProjectViewModel.SetCloseAction(() =>
-            {
-                window.Close();
-            });
-
-            window.DataContext = newAudioProjectViewModel;
-
-            window.ShowDialog();
+            if (DataContext is NewAudioProjectViewModel viewModel)
+                viewModel.SetCloseAction(this.Close);
         }
     }
 }

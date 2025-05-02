@@ -66,10 +66,10 @@
 
             <Button 
                 Grid.Column="0"
-                Content="Reset Audio Settings" 
+                Content="Reset Settings" 
                 ToolTip="PLACEHOLDER"
                 Margin="5, 0, 0, 5" 
-                Width="130" 
+                Width="95" 
                 VerticalAlignment="Center" 
                 HorizontalAlignment="Left"
                 Command="{Binding ResetAudioSettingsCommand}"/>
@@ -77,10 +77,10 @@
             <Button 
                 Grid.Column="1"
                 ToolTip="PLACEHOLDER" 
-                Width="200" 
+                Width="165" 
                 Margin="5, 0, 0, 5" 
                 VerticalAlignment="Center"
-                Content="Set Recommended Audio Settings"
+                Content="Set Recommended Settings"
                 Command="{Binding SetRecommendedAudioSettingsCommand}"/>
 
             <CheckBox 
@@ -136,7 +136,10 @@
                     <ListView
                         ItemsSource="{Binding AudioFiles}"
                         Height="135"
-                        MaxHeight="135">
+                        MaxHeight="135"
+                        AllowDrop="True"
+                        Drop="ListView_Drop"
+                        DragOver="ListView_DragOver">
                         <ListView.View>
                             <GridView>
                                 <GridViewColumn 

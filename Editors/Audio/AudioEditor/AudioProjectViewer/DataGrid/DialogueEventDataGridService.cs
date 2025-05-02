@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using Editors.Audio.AudioEditor.AudioProjectData;
 using Editors.Audio.AudioEditor.DataGrids;
@@ -33,11 +34,17 @@ namespace Editors.Audio.AudioEditor.AudioProjectViewer.DataGrid
             var stateGroupsCount = _audioRepository.StateGroupsLookupByDialogueEvent[dialogueEvent.Name].Count;
             var columnWidth = 1.0 / (1 + stateGroupsCount);
 
+            var table = _audioEditorService.GetViewerDataGrid();
+
             var stateGroupsWithQualifiers = _audioRepository.QualifiedStateGroupLookupByStateGroupByDialogueEvent[dialogueEvent.Name];
             foreach (var stateGroupWithQualifier in stateGroupsWithQualifiers)
             {
-                var stateGroupColumnHeader = DataGridHelpers.AddExtraUnderscoresToString(stateGroupWithQualifier.Key);
-                var stateGroupColumn = DataGridConfiguration.CreateColumn(_audioEditorService.AudioEditorViewModel, stateGroupColumnHeader, columnWidth, DataGridColumnType.ReadOnlyTextBlock);
+                var columnHeader = DataGridHelpers.AddExtraUnderscoresToString(stateGroupWithQualifier.Key);
+
+                if (!table.Columns.Contains(columnHeader))
+                    table.Columns.Add(new DataColumn(columnHeader, typeof(string)));
+
+                var stateGroupColumn = DataGridConfiguration.CreateColumn(_audioEditorService.AudioEditorViewModel, columnHeader, columnWidth, DataGridColumnType.ReadOnlyTextBlock);
                 dataGrid.Columns.Add(stateGroupColumn);
             }
         }
@@ -53,24 +60,25 @@ namespace Editors.Audio.AudioEditor.AudioProjectViewer.DataGrid
 
         private void ProcessStatePathData(Dictionary<string, string> stateGroupsWithQualifiers, StatePath statePath)
         {
-            var rowData = new Dictionary<string, string>();
+            var table = _audioEditorService.GetViewerDataGrid();
+            var row = table.NewRow();
 
             foreach (var stateGroupWithQualifier in stateGroupsWithQualifiers)
             {
-                var stateGroupColumnHeader = DataGridHelpers.AddExtraUnderscoresToString(stateGroupWithQualifier.Key);
+                var columnHeader = DataGridHelpers.AddExtraUnderscoresToString(stateGroupWithQualifier.Key);
                 var node = statePath.Nodes.FirstOrDefault(node => node.StateGroup.Name == stateGroupWithQualifier.Value);
                 if (node != null)
-                    rowData[stateGroupColumnHeader] = node.State.Name;
+                    row[columnHeader] = node.State.Name;
                 else
-                    rowData[stateGroupColumnHeader] = string.Empty;
+                    row[columnHeader] = string.Empty;
             }
 
-            _audioEditorService.GetViewerDataGrid().Add(rowData);
+            table.Rows.Add(row);
         }
 
         public void InsertDataGridRow()
         {
-            DataGridHelpers.InsertRowAlphabetically(_audioEditorService.GetViewerDataGrid(), _audioEditorService.GetEditorDataGrid()[0]);
+            DataGridHelpers.InsertRowAlphabetically(_audioEditorService.GetViewerDataGrid(), _audioEditorService.GetEditorDataGrid().Rows[0]);
         }
     }
 }

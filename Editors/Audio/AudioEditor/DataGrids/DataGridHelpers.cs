@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
+using System.Data;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
@@ -12,11 +12,6 @@ namespace Editors.Audio.AudioEditor.DataGrids
 {
     internal static class DataGridHelpers
     {
-        public static void ClearDataGrid(ObservableCollection<Dictionary<string, string>> dataGrid)
-        {
-            dataGrid.Clear();
-        }
-
         public static void ClearDataGridColumns(DataGrid dataGrid)
         {
             dataGrid.Columns.Clear();
@@ -54,46 +49,33 @@ namespace Editors.Audio.AudioEditor.DataGrids
             return FindVisualChild<DataGrid>(mainWindow, dataGridTag);
         }
 
-        public static Dictionary<string, string> GetAudioProjectEditorDataGridRow(IAudioEditorService audioEditorService)
+        public static void InsertRowAlphabetically(
+            DataTable viewerTable,
+            DataRow editorRow)
         {
-            var newRow = new Dictionary<string, string>();
+            var newValue = editorRow[0]?.ToString() ?? string.Empty;
 
-            foreach (var kvp in audioEditorService.GetEditorDataGrid()[0])
-            {
-                var columnName = kvp.Key;
-                var cellValue = kvp.Value;
-
-                if (cellValue == null)
-                    cellValue = string.Empty;
-
-                newRow[columnName] = cellValue.ToString();
-            }
-
-            return newRow;
-        }
-
-        public static void InsertRowAlphabetically(ObservableCollection<Dictionary<string, string>> audioProjectViewerDataGrid, Dictionary<string, string> audioProjectEditorRow)
-        {
             var insertIndex = 0;
-            var newValue = audioProjectEditorRow.First().Value.ToString();
 
-            for (var i = 0; i < audioProjectViewerDataGrid.Count; i++)
+            for (var i = 0; i < viewerTable.Rows.Count; i++)
             {
-                var currentValue = audioProjectViewerDataGrid[i].First().Value.ToString();
+                var currentValue = viewerTable.Rows[i][0]?.ToString() ?? string.Empty;
                 var comparison = string.Compare(newValue, currentValue, StringComparison.Ordinal);
+
                 if (comparison < 0)
                 {
                     insertIndex = i;
                     break;
                 }
-                else if (comparison == 0)
-                    insertIndex = i + 1;
-                else
-                    insertIndex = i + 1;
+
+                insertIndex = i + 1;
             }
 
-            audioProjectViewerDataGrid.Insert(insertIndex, audioProjectEditorRow);
+            var newRow = viewerTable.NewRow();
+            newRow.ItemArray = editorRow.ItemArray;
+            viewerTable.Rows.InsertAt(newRow, insertIndex);
         }
+
 
         public static List<string> GetStatesForStateGroupColumn(AudioEditorViewModel audioEditorViewModel, IAudioRepository audioRepository, IAudioEditorService audioEditorService, string stateGroup)
         {

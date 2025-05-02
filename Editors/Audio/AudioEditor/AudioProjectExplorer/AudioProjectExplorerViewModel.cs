@@ -7,20 +7,17 @@ using Editors.Audio.AudioEditor.Events;
 using Serilog;
 using Shared.Core.ErrorHandling;
 using Shared.Core.Events;
-using Shared.Core.ToolCreation;
 using Xceed.Wpf.Toolkit;
 using static Editors.Audio.GameSettings.Warhammer3.DialogueEvents;
 
 namespace Editors.Audio.AudioEditor.AudioProjectExplorer
 {
-    public partial class AudioProjectExplorerViewModel : ObservableObject, IEditorInterface
+    public partial class AudioProjectExplorerViewModel : ObservableObject
     {
         private readonly IEventHub _eventHub;
         private readonly IAudioEditorService _audioEditorService;
 
         private readonly ILogger _logger = Logging.Create<AudioProjectExplorerViewModel>();
-
-        public string DisplayName { get; set; } = "Audio Project Explorer";
 
         [ObservableProperty] private string _audioProjectExplorerLabel;
         [ObservableProperty] private bool _showEditedAudioProjectItemsOnly;
@@ -37,7 +34,7 @@ namespace Editors.Audio.AudioEditor.AudioProjectExplorer
             _eventHub = eventHub;
             _audioEditorService = audioEditorService;
 
-            AudioProjectExplorerLabel = $"{DisplayName}";
+            AudioProjectExplorerLabel = $"Audio Project Explorer";
         }
 
         public void OnSelectedNodeChanged(TreeNode value)
@@ -164,7 +161,5 @@ namespace Editors.Audio.AudioEditor.AudioProjectExplorer
         {
             IsDialogueEventPresetFilterEnabled = false;
         }
-
-        public void Close() { }
     }
 }
