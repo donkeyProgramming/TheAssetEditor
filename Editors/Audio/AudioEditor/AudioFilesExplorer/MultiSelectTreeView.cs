@@ -17,7 +17,9 @@ namespace Editors.Audio.AudioEditor.AudioFilesExplorer
         public static readonly DependencyProperty IsMultiSelectedProperty = DependencyProperty.RegisterAttached("IsMultiSelected", typeof(bool), typeof(MultiSelectTreeView), new PropertyMetadata(false));
 
         private TreeNode _anchorItem;
+        private TreeNode _pendingClickItem;
         private Point _dragStartPoint;
+        private bool _isDragOperation;
         private bool _suppressSelectionChange;
         private List<TreeNode> _preDragSelectedNodes;
 
@@ -44,6 +46,9 @@ namespace Editors.Audio.AudioEditor.AudioFilesExplorer
 
         private void OnSelectedItemsCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
+            if (_suppressSelectionChange)
+                return;
+
             UpdateSelectionStates();
         }
 
@@ -61,18 +66,23 @@ namespace Editors.Audio.AudioEditor.AudioFilesExplorer
         {
             _dragStartPoint = e.GetPosition(this);
             _preDragSelectedNodes = SelectedItems.OfType<TreeNode>().ToList();
+            _isDragOperation = false;
+            _pendingClickItem = null;
 
             var itemUnderMouse = GetTreeViewItemUnderMouse(e);
             if (itemUnderMouse != null)
             {
-                // Only suppress selection if already selected and we're not clicking the expander
                 var clickTarget = e.OriginalSource as DependencyObject;
                 var clickedExpander = IsClickOnExpander(clickTarget);
 
-                if (!clickedExpander && itemUnderMouse.DataContext is TreeNode clickedNode && SelectedItems.Contains(clickedNode))
+                if (!clickedExpander &&
+                    itemUnderMouse.DataContext is TreeNode clickedNode &&
+                    SelectedItems.Contains(clickedNode) &&
+                    !Keyboard.Modifiers.HasFlag(ModifierKeys.Control) &&
+                    !Keyboard.Modifiers.HasFlag(ModifierKeys.Shift))
                 {
-                    itemUnderMouse.IsSelected = false;
-                    e.Handled = true;
+                    _pendingClickItem = clickedNode;
+                    e.Handled = true; 
                 }
             }
         }
@@ -88,6 +98,8 @@ namespace Editors.Audio.AudioEditor.AudioFilesExplorer
             {
                 if (_preDragSelectedNodes?.Count > 0)
                 {
+                    _isDragOperation = true;
+                    _pendingClickItem = null;
                     _suppressSelectionChange = true;
 
                     try
@@ -98,25 +110,47 @@ namespace Editors.Audio.AudioEditor.AudioFilesExplorer
                     finally
                     {
                         _suppressSelectionChange = false;
-
-                        // Refresh visual selection states after drag completes
-                        Dispatcher.BeginInvoke(new Action(() =>
-                        {
-                            UpdateSelectionStates();
-                        }), System.Windows.Threading.DispatcherPriority.Input);
+                        Dispatcher.BeginInvoke((Action)UpdateSelectionStates, System.Windows.Threading.DispatcherPriority.Input);
                     }
                 }
             }
+        }
+
+        protected override void OnPreviewMouseUp(MouseButtonEventArgs e)
+        {
+            base.OnPreviewMouseUp(e);
+
+            if (_pendingClickItem != null && !_isDragOperation)
+            {
+                // Treat it as a normal single click
+                _suppressSelectionChange = true;
+                try
+                {
+                    SelectedItems.Clear();
+                    SelectedItems.Add(_pendingClickItem);
+                    _anchorItem = _pendingClickItem;
+                }
+                finally
+                {
+                    _suppressSelectionChange = false;
+                    UpdateSelectionStates();
+                }
+            }
+
+            // Reset state for the next cycle
+            _pendingClickItem = null;
+            _isDragOperation = false;
         }
 
         protected override void OnSelectedItemChanged(RoutedPropertyChangedEventArgs<object> e)
         {
             base.OnSelectedItemChanged(e);
 
-            if (_suppressSelectionChange)
+            if (_suppressSelectionChange || e.NewValue is not TreeNode current)
                 return;
 
-            if (e.NewValue is TreeNode currentSelectedItem)
+            _suppressSelectionChange = true;
+            try
             {
                 SelectedItems ??= new ArrayList();
 
@@ -124,63 +158,103 @@ namespace Editors.Audio.AudioEditor.AudioFilesExplorer
                 {
                     if (_anchorItem == null)
                     {
-                        _anchorItem = currentSelectedItem;
+                        _anchorItem = current;
                         SelectedItems.Clear();
                         SelectedItems.Add(_anchorItem);
                     }
                     else
                     {
-                        SelectRangeFromAnchor(_anchorItem, currentSelectedItem);
+                        SelectRangeFromAnchor(_anchorItem, current);
                     }
                 }
-                else if (!Keyboard.IsKeyDown(Key.LeftCtrl) && !Keyboard.IsKeyDown(Key.RightCtrl))
+                else if (Keyboard.IsKeyDown(Key.LeftCtrl) || Keyboard.IsKeyDown(Key.RightCtrl))
+                {
+                    if (SelectedItems.Contains(current))
+                        SelectedItems.Remove(current);
+                    else
+                        SelectedItems.Add(current);
+
+                    _anchorItem ??= current;
+                }
+                else
                 {
                     SelectedItems.Clear();
-                    SelectedItems.Add(currentSelectedItem);
-                    _anchorItem = currentSelectedItem;
+                    SelectedItems.Add(current);
+                    _anchorItem = current;
                 }
-
-                UpdateSelectionStates();
             }
+            finally
+            {
+                _suppressSelectionChange = false;
+            }
+
+            UpdateSelectionStates();
         }
 
         private void SelectRangeFromAnchor(TreeNode anchor, TreeNode target)
         {
-            var items = GetTreeViewItems(this).Where(item => item.DataContext is TreeNode).ToList();
-            var anchorIndex = items.FindIndex(item => item.DataContext == anchor);
-            var targetIndex = items.FindIndex(item => item.DataContext == target);
+            var items = GetTreeViewItems(this).Where(i => i.DataContext is TreeNode)
+                                              .ToList();
+            var a = items.FindIndex(i => i.DataContext == anchor);
+            var t = items.FindIndex(i => i.DataContext == target);
+            if (a < 0 || t < 0) return;
 
-            if (anchorIndex == -1 || targetIndex == -1)
-                return;
+            var start = Math.Min(a, t);
+            var end = Math.Max(a, t);
 
-            var startIndex = Math.Min(anchorIndex, targetIndex);
-            var endIndex = Math.Max(anchorIndex, targetIndex);
-
-            for (var i = 0; i < items.Count; i++)
+            _suppressSelectionChange = true;
+            try
             {
-                var node = (TreeNode)items[i].DataContext;
+                for (var i = 0; i < items.Count; i++)
+                {
+                    var node = (TreeNode)items[i].DataContext;
+                    var shouldBeSelected = i >= start && i <= end;
 
-                if (i < startIndex || i > endIndex)
-                    SelectedItems.Remove(node);
-                else if (!SelectedItems.Contains(node))
-                    SelectedItems.Add(node);
+                    if (shouldBeSelected && !SelectedItems.Contains(node))
+                        SelectedItems.Add(node);
+                    else if (!shouldBeSelected && SelectedItems.Contains(node))
+                        SelectedItems.Remove(node);
+                }
             }
+            finally
+            {
+                _suppressSelectionChange = false;
+            }
+
+            UpdateSelectionStates();
         }
+
 
         private void UpdateSelectionStates()
         {
-            foreach (var item in GetTreeViewItems(this))
-            {
-                if (item.DataContext is TreeNode node)
-                {
-                    var isSelected = SelectedItems.Contains(node);
-                    SetIsMultiSelected(item, isSelected);
+            if (_suppressSelectionChange)
+                return;
 
-                    if (isSelected)
+            _suppressSelectionChange = true;
+            try
+            {
+                foreach (var item in GetTreeViewItems(this))
+                {
+                    if (item.DataContext is not TreeNode node)
+                        continue;
+
+                    var shouldBeSelected = SelectedItems.Contains(node);
+
+                    //  If an item is not part of our multi-selection but happens to be WPF’s lead item, turn its flag off so the highlight disappears.
+                    //  Don't set IsSelected = true here otherwise we re-enter the single-selection process
+                    if (!shouldBeSelected && item.IsSelected)
+                        item.IsSelected = false;
+
+                    SetIsMultiSelected(item, shouldBeSelected);
+
+                    if (shouldBeSelected)
                     {
-                        item.Background = (Brush)Application.Current.Resources["TreeViewItem.Selected.Background"];
-                        item.BorderBrush = (Brush)Application.Current.Resources["TreeViewItem.Selected.Border"];
-                        item.Foreground = (Brush)Application.Current.Resources["ABrush.Foreground.Deeper"];
+                        item.Background =
+                            (Brush)Application.Current.Resources["TreeViewItem.Selected.Background"];
+                        item.BorderBrush =
+                            (Brush)Application.Current.Resources["TreeViewItem.Selected.Border"];
+                        item.Foreground =
+                            (Brush)Application.Current.Resources["ABrush.Foreground.Deeper"];
                     }
                     else
                     {
@@ -190,7 +264,12 @@ namespace Editors.Audio.AudioEditor.AudioFilesExplorer
                     }
                 }
             }
+            finally
+            {
+                _suppressSelectionChange = false;
+            }
         }
+
 
         private TreeViewItem GetTreeViewItemUnderMouse(MouseButtonEventArgs e)
         {
