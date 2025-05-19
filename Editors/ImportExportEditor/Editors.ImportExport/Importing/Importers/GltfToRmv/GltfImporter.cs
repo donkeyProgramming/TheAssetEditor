@@ -87,16 +87,8 @@ namespace Editors.ImportExport.Importing.Importers.GltfToRmv
 
         public void Import(GltfImporterSettings settings)
         {
-            ModelRoot? modelRoot = null;
-            try
-            {
-                modelRoot = ModelRoot.Load(settings.InputGltfFile);
-            }
-            catch (Exception ex)
-            {
-                _exceptionService.ShowExceptionWindow(ex);
+            if (!CreateModelRoot(settings, out var modelRoot))
                 return;
-            }
 
             var skeletonData = GetSkeletonData(modelRoot);
 
@@ -113,6 +105,27 @@ namespace Editors.ImportExport.Importing.Importers.GltfToRmv
             if (settings.ImportMeshes)
                 SaveRmvFileToPack(settings, GetImportedPackFileName(settings), rmv2File);
 
+        }
+
+        private static bool CreateModelRoot(GltfImporterSettings settings, out ModelRoot? outModelRoot)
+        {
+            ModelRoot? modelRoot = null;
+            try // use GLTF api to verify that all needed files are present
+            {
+                var result = ModelRoot.Validate(settings.InputGltfFile);
+                modelRoot = ModelRoot.Load(settings.InputGltfFile);
+            }
+            catch (Exception ex)
+            {
+                var errorList = new ErrorList();
+                errorList.Error("GLTF Load Error, might not be valid GLTF file.", ex.Message);
+                ErrorListWindow.ShowDialog("Advanced Import Error", errorList, false);
+                outModelRoot = null;                
+                return false;
+            }
+
+            outModelRoot = modelRoot;
+            return true;
         }
 
         private (string? skeletonName, AnimationFile? skeletonAnimFile) GetSkeletonData(ModelRoot? modelRoot)
