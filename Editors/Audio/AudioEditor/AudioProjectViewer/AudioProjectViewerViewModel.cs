@@ -15,7 +15,6 @@ using Editors.Audio.Storage;
 using Serilog;
 using Shared.Core.ErrorHandling;
 using Shared.Core.Events;
-using static System.ComponentModel.Design.ObjectSelectorEditor;
 
 namespace Editors.Audio.AudioEditor.AudioProjectViewer
 {
@@ -58,16 +57,24 @@ namespace Editors.Audio.AudioEditor.AudioProjectViewer
 
             AudioProjectViewerLabel = $"Audio Project Viewer";
 
-            _eventHub.Register<NodeSelectedEvent>(this, OnSelectedNodeChanged);
-            _eventHub.Register<ItemAddedEvent>(this, OnItemAdded);
+            _eventHub.Register<AddRowEvent>(this, AddRow);
+            _eventHub.Register<RemoveRowEvent>(this, RemoveRow);
 
-            _eventHub.Register<RemoveRowEvent>(this, OnRowRemoved);
+
+
+            _eventHub.Register<NodeSelectedEvent>(this, OnSelectedNodeChanged);
         }
 
-        public void OnRowRemoved(RemoveRowEvent removeRowEvent)
+        public void AddRow(AddRowEvent itemAddedEvent)
         {
-            var row = removeRowEvent.row;
-            AudioProjectViewerDataGrid.Rows.Remove(row);
+            DataGridHelpers.InsertRowAlphabetically(AudioProjectViewerDataGrid, itemAddedEvent.Row);
+            _logger.Here().Information($"Added {_audioEditorService.SelectedExplorerNode.NodeType} row to: {_audioEditorService.SelectedExplorerNode.Name}");
+        }
+
+        public void RemoveRow(RemoveRowEvent removeRowEvent)
+        {
+            AudioProjectViewerDataGrid.Rows.Remove(removeRowEvent.Row);
+            _logger.Here().Information($"Removed {_audioEditorService.SelectedExplorerNode.NodeType} row from: {_audioEditorService.SelectedExplorerNode.Name}");
         }
 
         public void OnDataGridSelectionChanged(List<DataRow> selectedItems)
@@ -125,18 +132,6 @@ namespace Editors.Audio.AudioEditor.AudioProjectViewer
         {
             var dataGridService = _audioProjectViewerDataGridServiceFactory.GetService(selectedNodeType);
             dataGridService.LoadDataGrid();
-        }
-
-        public void OnItemAdded(ItemAddedEvent itemAddedEvent)
-        {
-            var selectedNode = _audioEditorService.SelectedExplorerNode;
-            if (selectedNode.NodeType != NodeType.ActionEventSoundBank && selectedNode.NodeType != NodeType.DialogueEvent && selectedNode.NodeType != NodeType.StateGroup)
-                return;
-
-            var dataGridService = _audioProjectViewerDataGridServiceFactory.GetService(selectedNode.NodeType);
-            dataGridService.InsertDataGridRow();
-
-            _logger.Here().Information($"Added {selectedNode.NodeType} item in: {selectedNode.Name}");
         }
 
         private void SetSelectedDataGridRows(List<DataRow> selectedItems)
@@ -209,7 +204,7 @@ namespace Editors.Audio.AudioEditor.AudioProjectViewer
 
             RemoveData(selectedNode.NodeType);
 
-            _logger.Here().Information($"Edited {selectedNode.NodeType} item in: {selectedNode.Name}");
+            _logger.Here().Information($"Edited {selectedNode.NodeType} row in: {selectedNode.Name}");
         }
 
         [RelayCommand] public void RemoveAudioProjectViewerDataGridRow()

@@ -12,6 +12,16 @@ namespace Editors.Audio.AudioEditor.DataGrids
 {
     internal static class DataGridHelpers
     {
+        public static string AddExtraUnderscoresToString(string wtfWpf)
+        {
+            return wtfWpf.Replace("_", "__");
+        }
+
+        public static string RemoveExtraUnderscoresFromString(string wtfWpf)
+        {
+            return wtfWpf.Replace("__", "_");
+        }
+
         public static void ClearDataGridColumns(DataGrid dataGrid)
         {
             dataGrid.Columns.Clear();
@@ -49,17 +59,15 @@ namespace Editors.Audio.AudioEditor.DataGrids
             return FindVisualChild<DataGrid>(mainWindow, dataGridTag);
         }
 
-        public static void InsertRowAlphabetically(
-            DataTable viewerTable,
-            DataRow editorRow)
+        public static void InsertRowAlphabetically(DataTable table, DataRow row)
         {
-            var newValue = editorRow[0]?.ToString() ?? string.Empty;
+            var newValue = row[0]?.ToString() ?? string.Empty;
 
             var insertIndex = 0;
 
-            for (var i = 0; i < viewerTable.Rows.Count; i++)
+            for (var i = 0; i < table.Rows.Count; i++)
             {
-                var currentValue = viewerTable.Rows[i][0]?.ToString() ?? string.Empty;
+                var currentValue = table.Rows[i][0]?.ToString() ?? string.Empty;
                 var comparison = string.Compare(newValue, currentValue, StringComparison.Ordinal);
 
                 if (comparison < 0)
@@ -71,11 +79,10 @@ namespace Editors.Audio.AudioEditor.DataGrids
                 insertIndex = i + 1;
             }
 
-            var newRow = viewerTable.NewRow();
-            newRow.ItemArray = editorRow.ItemArray;
-            viewerTable.Rows.InsertAt(newRow, insertIndex);
+            var newRow = table.NewRow();
+            newRow.ItemArray = row.ItemArray;
+            table.Rows.InsertAt(newRow, insertIndex);
         }
-
 
         public static List<string> GetStatesForStateGroupColumn(AudioEditorViewModel audioEditorViewModel, IAudioRepository audioRepository, IAudioEditorService audioEditorService, string stateGroup)
         {
@@ -112,16 +119,6 @@ namespace Editors.Audio.AudioEditor.DataGrids
             }
 
             return moddedStates;
-        }
-
-        public static string AddExtraUnderscoresToString(string wtfWpf)
-        {
-            return wtfWpf.Replace("_", "__");
-        }
-
-        public static string RemoveExtraUnderscoresFromString(string wtfWpf)
-        {
-            return wtfWpf.Replace("__", "_");
         }
     }
 }

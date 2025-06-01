@@ -56,10 +56,13 @@ namespace Editors.Audio.AudioEditor.AudioProjectEditor
 
             AudioProjectEditorLabel = $"Audio Project Editor";
 
+            _eventHub.Register<AudioFilesSetEvent>(this, OnAudioFilesSet);
+
+
+
             _eventHub.Register<NodeSelectedEvent>(this, OnSelectedNodeChanged);
             _eventHub.Register<ItemEditedEvent>(this, OnItemEdited);
             _eventHub.Register<SetEnablementEvent>(this, SetItemEnablementAfterRemoval);
-            _eventHub.Register<AudioFilesSetEvent>(this, OnAudioFilesSet);
         }
 
         public void OnSelectedNodeChanged(NodeSelectedEvent nodeSelectedEvent)
@@ -112,7 +115,7 @@ namespace Editors.Audio.AudioEditor.AudioProjectEditor
                 return;
 
             // Clear data grid to ensure there's only one row in the editor
-            _audioEditorService.GetEditorDataGrid().Clear();
+            AudioProjectEditorDataGrid.Clear();
 
             var dataGridService = _audioProjectEditorDataGridServiceFactory.GetService(selectedNode.NodeType);
             dataGridService.SetDataGridData();
@@ -129,8 +132,7 @@ namespace Editors.Audio.AudioEditor.AudioProjectEditor
                 selectedNode.Name != SoundBanks.MoviesDisplayString &&
                 audioFiles.Count == 1)
             {
-                var editorTable = _audioEditorService.GetEditorDataGrid();
-                var row = editorTable.Rows[0];
+                var row = AudioProjectEditorDataGrid.Rows[0];
                 var wavFileName = Path.GetFileNameWithoutExtension(audioFiles[0].Name);
                 var eventName = $"Play_{wavFileName}";
                 row[DataGridConfiguration.EventNameColumn] = eventName;
@@ -142,7 +144,7 @@ namespace Editors.Audio.AudioEditor.AudioProjectEditor
             var selectedNode = _audioEditorService.SelectedExplorerNode;
             if (selectedNode.NodeType == NodeType.DialogueEvent)
             {
-                _audioEditorService.GetEditorDataGrid().Clear();
+                AudioProjectEditorDataGrid.Clear();
                 LoadDataGrid(selectedNode.NodeType);
             }
         }
@@ -157,9 +159,12 @@ namespace Editors.Audio.AudioEditor.AudioProjectEditor
                 return;
 
             var editorRow = AudioProjectEditorDataGrid.Rows[0];
+
+            // Store the row data in the Audio Project
             _audioProjectUICommandFactory.Create(AudioProjectCommandAction.AddToAudioProject, selectedNode.NodeType).Execute(editorRow);
 
-            _eventHub.Publish(new ItemAddedEvent()); // Publish after the data is added to the AudioProject so it can be loaded when the data grid loading functions are called
+            // Display the row data in the viewer
+            _eventHub.Publish(new AddRowEvent(editorRow)); 
 
             // Clear data grid to ensure there's only one row in the editor
             AudioProjectEditorDataGrid.Clear();
@@ -177,13 +182,13 @@ namespace Editors.Audio.AudioEditor.AudioProjectEditor
         {
             ResetAddRowButtonEnablement();
 
-            if (_audioEditorService.GetEditorDataGrid().Rows.Count == 0)
+            if (AudioProjectEditorDataGrid.Rows.Count == 0)
                 return;
 
             var selectedNode = _audioEditorService.SelectedExplorerNode;
             if (selectedNode.NodeType != NodeType.StateGroup)
             {
-                if (_audioEditorService.AudioSettingsViewModel.AudioFiles.Count == 0)
+                if (_audioEditorService.AudioFiles.Count == 0)
                     return;
             }
 
@@ -225,8 +230,7 @@ namespace Editors.Audio.AudioEditor.AudioProjectEditor
 
         private bool CheckIfAudioProjectViewerRowExists()
         {
-            var editorTable = _audioEditorService.GetEditorDataGrid();
-            var editorRow = editorTable.Rows[0];
+            var editorRow = AudioProjectEditorDataGrid.Rows[0];
             var viewerTable = _audioEditorService.GetViewerDataGrid();
             return viewerTable.AsEnumerable()
                 .Any(viewerRow => viewerRow.ItemArray.SequenceEqual(editorRow.ItemArray)); ;
@@ -234,9 +238,8 @@ namespace Editors.Audio.AudioEditor.AudioProjectEditor
 
         private bool CheckIfAnyEmptyCells()
         {
-            var editorTable = _audioEditorService.GetEditorDataGrid();
-            var row = editorTable.Rows[0];
-            return editorTable.Columns
+            var row = AudioProjectEditorDataGrid.Rows[0];
+            return AudioProjectEditorDataGrid.Columns
                 .Cast<DataColumn>()
                 .Any(column => 
                     row.IsNull(column) 
@@ -250,8 +253,7 @@ namespace Editors.Audio.AudioEditor.AudioProjectEditor
             {
                 var movieFilePath = _packFileService.GetFullPath(result.File);
 
-                var editorTable = _audioEditorService.GetEditorDataGrid();
-                var row = editorTable.Rows[0];
+                var row = AudioProjectEditorDataGrid.Rows[0];
 
                 var eventName = ConvertMovieFilePath(movieFilePath);
                 row[DataGridConfiguration.EventNameColumn] = eventName;

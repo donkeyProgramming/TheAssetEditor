@@ -1,6 +1,6 @@
 ﻿namespace Editors.Audio.AudioEditor.Events
 {
-    public class ItemAddedEvent
+    public class SetEnablementEvent
     {
     }
 }

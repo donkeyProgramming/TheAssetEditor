@@ -1,7 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Data;
-using System.Windows.Controls;
-using System.Windows.Documents;
+﻿using System.Data;
 using Editors.Audio.AudioEditor.AudioProjectData;
 using Editors.Audio.AudioEditor.DataGrids;
 
@@ -48,18 +45,6 @@ namespace Editors.Audio.AudioEditor.AudioProjectViewer.DataGrid
                 row[DataGridConfiguration.EventNameColumn] = actionEvent.Name;
                 _audioEditorService.GetViewerDataGrid().Rows.Add(row);
             }
-        }
-
-        public void InsertDataGridRow()
-        {
-            var table = _audioEditorService.GetEditorDataGrid();
-
-            var editorRow = _audioEditorService.GetEditorDataGrid().Rows[0];
-            var value = AudioProjectHelpers.GetActionEventNameFromRow(editorRow);
-
-            var row = table.NewRow();
-            row[DataGridConfiguration.EventNameColumn] = value;
-            DataGridHelpers.InsertRowAlphabetically(_audioEditorService.GetViewerDataGrid(), row);
         }
     }
 }

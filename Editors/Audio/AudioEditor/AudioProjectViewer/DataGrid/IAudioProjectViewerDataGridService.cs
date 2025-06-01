@@ -5,6 +5,5 @@
         public void LoadDataGrid();
         public void ConfigureDataGrid();
         public void SetDataGridData();
-        public void InsertDataGridRow();
     }
 }

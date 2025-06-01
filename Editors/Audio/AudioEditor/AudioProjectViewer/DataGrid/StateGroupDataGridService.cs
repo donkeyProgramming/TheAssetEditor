@@ -48,10 +48,5 @@ namespace Editors.Audio.AudioEditor.AudioProjectViewer.DataGrid
                 table.Rows.Add(row);
             }
         }
-
-        public void InsertDataGridRow()
-        {
-            DataGridHelpers.InsertRowAlphabetically(_audioEditorService.GetViewerDataGrid(), _audioEditorService.GetEditorDataGrid().Rows[0]);
-        }
     }
 }

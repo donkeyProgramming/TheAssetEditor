@@ -55,19 +55,6 @@ namespace Editors.Audio.AudioEditor.AudioProjectData
             return null;
         }
 
-        public static string GetActionEventNameFromRow(DataRow row)
-        {
-            if (row == null)
-                return string.Empty;
-
-            // Ensure the column exists in the row’s table (defensive check).
-            if (!row.Table.Columns.Contains(DataGridConfiguration.EventNameColumn))
-                return string.Empty;
-
-            var value = row[DataGridConfiguration.EventNameColumn];
-            return value == DBNull.Value ? string.Empty : value?.ToString() ?? string.Empty;
-        }
-
         public static ActionEvent CreateActionEventFromRow(ObservableCollection<AudioFile> audioFiles, IAudioSettings audioSettings, DataRow row)
         {
             var actionEvent = new ActionEvent();
@@ -97,6 +84,11 @@ namespace Editors.Audio.AudioEditor.AudioProjectData
             }
 
             return actionEvent;
+        }
+
+        public static string GetActionEventNameFromRow(DataRow row)
+        {
+            return row[DataGridConfiguration.EventNameColumn].ToString();
         }
 
         public static StatePath GetStatePathFromRow(IAudioRepository audioRepository, DataRow row, DialogueEvent selectedDialogueEvent)
