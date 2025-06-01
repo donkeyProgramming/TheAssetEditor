@@ -309,7 +309,7 @@ namespace Editors.Audio.AudioEditor.AudioFilesExplorer
         {
             IsPlayAudioButtonEnabled = SelectedTreeNodes.Count == 1;
 
-            var selectedNode = _audioEditorService.GetSelectedExplorerNode();
+            var selectedNode = _audioEditorService.SelectedExplorerNode;
             if (selectedNode == null)
                 return;
 

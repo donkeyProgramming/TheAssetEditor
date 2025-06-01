@@ -23,9 +23,7 @@ namespace Editors.Audio.AudioProjectCompiler
         private Dictionary<uint, HashSet<uint>> UsedHircIdsByLanguageIdLookup { get; set; } = [];
         private Dictionary<uint, HashSet<uint>> UsedSourceIdsByLanguageIdLookup { get; set; } = [];
 
-        public CompilerDataProcessor(
-            ApplicationSettingsService applicationSettingsService,
-            IAudioRepository audioRepository)
+        public CompilerDataProcessor(ApplicationSettingsService applicationSettingsService, IAudioRepository audioRepository)
         {
             _applicationSettingsService = applicationSettingsService;
             _audioRepository = audioRepository;
@@ -48,7 +46,7 @@ namespace Editors.Audio.AudioProjectCompiler
             foreach (var soundBank in audioProject.SoundBanks)
             {
                 soundBank.SoundBankSubtype = GetSoundBankSubtype(soundBank.Name);
-                soundBank.Language = AudioProjectCompilerHelpers.GetCorrectSoundBankLanguage(audioProject); // TODO: Music should be SFX.
+                soundBank.Language = AudioProjectCompilerHelpers.GetCorrectSoundBankLanguage(audioProject);
 
                 soundBank.SoundBankFileName = $"{GetSoundBankName(soundBank.SoundBankSubtype)}_{audioProject.FileName}.bnk";
 
@@ -132,8 +130,10 @@ namespace Editors.Audio.AudioProjectCompiler
                 var basePath = $"audio\\wwise";
                 if (string.IsNullOrEmpty(sound.Language))
                     sound.WemFilePath = $"{basePath}\\{sound.WemFileName}";
+                else if (sound.Language == Languages.Sfx)
+                    sound.WemFilePath = $"{basePath}\\{sound.WemFileName}";
                 else
-                    sound.WemFilePath = $"{basePath}\\{audioProject.Language}\\{sound.WemFileName}";
+                    sound.WemFilePath = $"{basePath}\\{sound.Language}\\{sound.WemFileName}";
 
                 sound.WemDiskFilePath = $"{DirectoryHelper.Temp}\\Audio\\{sound.WemFileName}";
 

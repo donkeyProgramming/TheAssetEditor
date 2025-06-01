@@ -3,7 +3,7 @@ using Editors.Audio.AudioEditor.NewAudioProject;
 using Microsoft.Extensions.DependencyInjection;
 using Shared.Core.Events;
 
-namespace Editors.Audio.UICommands
+namespace Editors.Audio.AudioEditor.UICommands
 {
     public class OpenNewAudioProjectWindowCommand : IUiCommand
     {

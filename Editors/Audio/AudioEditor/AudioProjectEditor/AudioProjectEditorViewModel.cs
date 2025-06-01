@@ -4,11 +4,11 @@ using System.IO;
 using System.Linq;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using Editors.Audio.AudioEditor.AudioProjectData;
 using Editors.Audio.AudioEditor.AudioProjectEditor.DataGrid;
 using Editors.Audio.AudioEditor.AudioProjectExplorer;
 using Editors.Audio.AudioEditor.DataGrids;
 using Editors.Audio.AudioEditor.Events;
+using Editors.Audio.AudioEditor.UICommands;
 using Editors.Audio.GameSettings.Warhammer3;
 using Serilog;
 using Shared.Core.ErrorHandling;
@@ -20,12 +20,12 @@ namespace Editors.Audio.AudioEditor.AudioProjectEditor
 {
     public partial class AudioProjectEditorViewModel : ObservableObject
     {
+        private readonly IAudioProjectUICommandFactory _audioProjectUICommandFactory;
         private readonly IEventHub _eventHub;
         private readonly IAudioEditorService _audioEditorService;
         private readonly IPackFileService _packFileService;
         private readonly IStandardDialogs _standardDialogs;
         private readonly AudioProjectEditorDataGridServiceFactory _audioProjectEditorDataGridServiceFactory;
-        private readonly AudioProjectDataServiceFactory _audioProjectDataServiceFactory;
 
         private readonly ILogger _logger = Logging.Create<AudioProjectEditorViewModel>();
 
@@ -40,19 +40,19 @@ namespace Editors.Audio.AudioEditor.AudioProjectEditor
         [ObservableProperty] private bool _isShowModdedStatesCheckBoxVisible = false;
 
         public AudioProjectEditorViewModel (
+            IAudioProjectUICommandFactory audioProjectUICommandFactory,
             IEventHub eventHub,
             IAudioEditorService audioEditorService,
             IPackFileService packFileService,
             IStandardDialogs standardDialogs,
-            AudioProjectEditorDataGridServiceFactory audioProjectEditorDataGridServiceFactory,
-            AudioProjectDataServiceFactory audioProjectDataServiceFactory)
+            AudioProjectEditorDataGridServiceFactory audioProjectEditorDataGridServiceFactory)
         {
+            _audioProjectUICommandFactory = audioProjectUICommandFactory;
             _eventHub = eventHub;
             _audioEditorService = audioEditorService;
             _packFileService = packFileService;
             _standardDialogs = standardDialogs;
             _audioProjectEditorDataGridServiceFactory = audioProjectEditorDataGridServiceFactory;
-            _audioProjectDataServiceFactory = audioProjectDataServiceFactory;
 
             AudioProjectEditorLabel = $"Audio Project Editor";
 
@@ -68,7 +68,7 @@ namespace Editors.Audio.AudioEditor.AudioProjectEditor
             ResetButtonEnablement();
             ResetDataGrid();
 
-            var selectedNode = _audioEditorService.GetSelectedExplorerNode();
+            var selectedNode = _audioEditorService.SelectedExplorerNode;
             if (selectedNode.NodeType == NodeType.ActionEventSoundBank)
             {
                 SetAudioProjectEditorLabel(selectedNode.Name);
@@ -107,7 +107,7 @@ namespace Editors.Audio.AudioEditor.AudioProjectEditor
 
         public void OnItemEdited(ItemEditedEvent itemEditedEvent)
         {
-            var selectedNode = _audioEditorService.GetSelectedExplorerNode();
+            var selectedNode = _audioEditorService.SelectedExplorerNode;
             if (selectedNode.NodeType != NodeType.ActionEventSoundBank && selectedNode.NodeType != NodeType.DialogueEvent && selectedNode.NodeType != NodeType.StateGroup)
                 return;
 
@@ -123,7 +123,7 @@ namespace Editors.Audio.AudioEditor.AudioProjectEditor
         public void OnAudioFilesSet(AudioFilesSetEvent audioFilesSetEvent)
         {
             var audioFiles = audioFilesSetEvent.AudioFiles;
-            var selectedNode = _audioEditorService.GetSelectedExplorerNode();
+            var selectedNode = _audioEditorService.SelectedExplorerNode;
 
             if (selectedNode.NodeType == NodeType.ActionEventSoundBank &&
                 selectedNode.Name != SoundBanks.MoviesDisplayString &&
@@ -139,7 +139,7 @@ namespace Editors.Audio.AudioEditor.AudioProjectEditor
 
         partial void OnShowModdedStatesOnlyChanged(bool value)
         {
-            var selectedNode = _audioEditorService.GetSelectedExplorerNode();
+            var selectedNode = _audioEditorService.SelectedExplorerNode;
             if (selectedNode.NodeType == NodeType.DialogueEvent)
             {
                 _audioEditorService.GetEditorDataGrid().Clear();
@@ -149,21 +149,20 @@ namespace Editors.Audio.AudioEditor.AudioProjectEditor
 
         [RelayCommand] public void AddRowFromAudioProjectEditorDataGridToFullDataGrid()
         {
-            var editorTable = _audioEditorService.GetEditorDataGrid();
-            if (editorTable.Rows.Count == 0)
+            if (AudioProjectEditorDataGrid.Rows.Count == 0)
                 return;
 
-            var selectedNode = _audioEditorService.GetSelectedExplorerNode();
+            var selectedNode = _audioEditorService.SelectedExplorerNode;
             if (selectedNode.NodeType != NodeType.ActionEventSoundBank && selectedNode.NodeType != NodeType.DialogueEvent && selectedNode.NodeType != NodeType.StateGroup)
                 return;
 
-            var dataService = _audioProjectDataServiceFactory.GetService(selectedNode.NodeType);
-            dataService.AddToAudioProject();
+            var editorRow = AudioProjectEditorDataGrid.Rows[0];
+            _audioProjectUICommandFactory.Create(AudioProjectCommandAction.AddToAudioProject, selectedNode.NodeType).Execute(editorRow);
 
             _eventHub.Publish(new ItemAddedEvent()); // Publish after the data is added to the AudioProject so it can be loaded when the data grid loading functions are called
 
             // Clear data grid to ensure there's only one row in the editor
-            _audioEditorService.GetEditorDataGrid().Clear();
+            AudioProjectEditorDataGrid.Clear();
 
             // Reset the data grid row
             var dataGridService = _audioProjectEditorDataGridServiceFactory.GetService(selectedNode.NodeType);
@@ -181,7 +180,7 @@ namespace Editors.Audio.AudioEditor.AudioProjectEditor
             if (_audioEditorService.GetEditorDataGrid().Rows.Count == 0)
                 return;
 
-            var selectedNode = _audioEditorService.GetSelectedExplorerNode();
+            var selectedNode = _audioEditorService.SelectedExplorerNode;
             if (selectedNode.NodeType != NodeType.StateGroup)
             {
                 if (_audioEditorService.AudioSettingsViewModel.AudioFiles.Count == 0)
@@ -210,7 +209,7 @@ namespace Editors.Audio.AudioEditor.AudioProjectEditor
 
         public void SetShowModdedStatesOnlyButtonEnablementAndVisibility()
         {
-            var selectedNode = _audioEditorService.GetSelectedExplorerNode();
+            var selectedNode = _audioEditorService.SelectedExplorerNode;
             if (selectedNode.NodeType == NodeType.DialogueEvent)
             {
                 IsShowModdedStatesCheckBoxVisible = true;

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Editors.Audio.AudioEditor.AudioProjectData;
+using Editors.Audio.GameSettings.Warhammer3;
 using Editors.Audio.Utility;
 using Shared.Core.Misc;
 
@@ -52,13 +53,12 @@ namespace Editors.Audio.AudioProjectCompiler
 
         public static string GetCorrectSoundBankLanguage(AudioProject audioProject)
         {
-            // TODO: implement game version into this check
             foreach (var soundBank in audioProject.SoundBanks)
             {
-                //if (soundBank.SoundBankSubType == SoundBanks.Wh3SoundBankSubtype.BattleIndividualMelee) // TODO: This isn't necessarily the right subtype, get the right ones
-                    //return Languages.Sfx;
+                // TODO: Add other subtypes as needed
+                if (soundBank.SoundBankSubtype == SoundBanks.Wh3SoundBankSubtype.FrontendMusic)
+                    return Languages.Sfx;
             }
-
             return audioProject.Language;
         }
 

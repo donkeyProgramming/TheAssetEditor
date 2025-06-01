@@ -22,7 +22,7 @@ namespace Editors.Audio.AudioEditor.AudioProjectViewer.DataGrid
         public void ConfigureDataGrid()
         {
             var dataGrid = DataGridConfiguration.InitialiseDataGrid(_audioEditorService.AudioProjectViewerViewModel.AudioProjectViewerDataGridTag);
-            var stateGroup = AudioProjectHelpers.GetStateGroupFromName(_audioEditorService, _audioEditorService.GetSelectedExplorerNode().Name);
+            var stateGroup = AudioProjectHelpers.GetStateGroupFromName(_audioEditorService.AudioProject, _audioEditorService.SelectedExplorerNode.Name);
 
             var columnHeader = DataGridHelpers.AddExtraUnderscoresToString(stateGroup.Name);
 
@@ -38,7 +38,7 @@ namespace Editors.Audio.AudioEditor.AudioProjectViewer.DataGrid
         {
             var table = _audioEditorService.GetViewerDataGrid();
 
-            var stateGroup = AudioProjectHelpers.GetStateGroupFromName(_audioEditorService, _audioEditorService.GetSelectedExplorerNode().Name);
+            var stateGroup = AudioProjectHelpers.GetStateGroupFromName(_audioEditorService.AudioProject, _audioEditorService.SelectedExplorerNode.Name);
             var columnHeader = DataGridHelpers.AddExtraUnderscoresToString(stateGroup.Name);
 
             foreach (var state in stateGroup.States)

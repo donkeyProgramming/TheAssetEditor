@@ -6,7 +6,7 @@ using Editors.Audio.AudioEditor.AudioProjectEditor;
 using Editors.Audio.AudioEditor.AudioProjectExplorer;
 using Editors.Audio.AudioEditor.AudioProjectViewer;
 using Editors.Audio.AudioEditor.AudioSettings;
-using Editors.Audio.UICommands;
+using Editors.Audio.AudioEditor.UICommands;
 using Shared.Core.Events;
 using Shared.Core.PackFiles;
 using Shared.Core.Services;

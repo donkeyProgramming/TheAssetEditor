@@ -84,7 +84,7 @@ namespace Editors.Audio.AudioProjectConverter
             _bnkParser = bnkParser;
             _vgStreamWrapper = vgStreamWrapper;
 
-            OutputDirectoryPath = "audio_projects";
+            OutputDirectoryPath = "audio\\audio_projects";
         }
 
         [RelayCommand] public void ProcessAudioProjectConversion()
@@ -471,7 +471,7 @@ namespace Editors.Audio.AudioProjectConverter
 
                 var wemFilePath = $"{WemsDirectoryPath}\\{wavFile.WemId}.wem";
                 var wavTempFilePath = $"{DirectoryHelper.Temp}\\Audio\\{wavFile.FileName}";
-                var wavPackOutputPath = $"{OutputDirectoryPath}\\audio\\vo\\{voActorSegment}\\{wavFile.FileName}";
+                var wavPackOutputPath = $"{OutputDirectoryPath}\\vo\\{voActorSegment}\\{wavFile.FileName}";
 
                 var conversionResult = _vgStreamWrapper.ConvertFileUsingVgStream(wemFilePath, wavTempFilePath);
                 if (conversionResult.Failed)

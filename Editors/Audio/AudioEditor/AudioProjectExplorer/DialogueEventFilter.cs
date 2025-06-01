@@ -13,7 +13,7 @@ namespace Editors.Audio.AudioEditor.AudioProjectExplorer
             var audioProjectTreeNode = audioEditorViewModel.AudioProjectExplorerViewModel._selectedAudioProjectTreeNode;
             if (audioProjectTreeNode.NodeType == NodeType.DialogueEventSoundBank)
             {
-                var soundBank = AudioProjectHelpers.GetSoundBankFromName(audioEditorService, audioEditorService.GetSelectedExplorerNode().Name);
+                var soundBank = AudioProjectHelpers.GetSoundBankFromName(audioEditorService.AudioProject, audioEditorService.SelectedExplorerNode.Name);
 
                 var presetFilter = audioEditorViewModel.AudioProjectExplorerViewModel.SelectedDialogueEventPreset;
 
@@ -54,7 +54,7 @@ namespace Editors.Audio.AudioEditor.AudioProjectExplorer
 
         private static void SetSelectedDialogueEventPreset(AudioProjectExplorerViewModel audioProjectExplorerViewModel, IAudioEditorService audioEditorService)
         {
-            var soundBank = TreeNode.GetAudioProjectTreeNodeFromName(audioProjectExplorerViewModel.AudioProjectTree, audioEditorService.GetSelectedExplorerNode().Name);
+            var soundBank = TreeNode.GetAudioProjectTreeNodeFromName(audioProjectExplorerViewModel.AudioProjectTree, audioEditorService.SelectedExplorerNode.Name);
             if (soundBank.PresetFilter != DialogueEventPreset.ShowAll && soundBank.PresetFilter != null)
                 audioProjectExplorerViewModel.SelectedDialogueEventPreset = soundBank.PresetFilter;
             else

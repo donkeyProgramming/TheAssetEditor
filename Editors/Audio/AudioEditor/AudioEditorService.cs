@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Data;
 using System.IO;
 using System.Linq;
@@ -56,6 +57,14 @@ namespace Editors.Audio.AudioEditor
         }
 
         public AudioProject AudioProject { get; set; }
+        public TreeNode SelectedExplorerNode { get; set; }
+        public ObservableCollection<AudioFile> AudioFiles { get; set; } = [];
+        public IAudioSettings AudioSettings { get; set; }
+
+
+
+
+
         public AudioEditorViewModel AudioEditorViewModel { get; set; }
         public AudioProjectExplorerViewModel AudioProjectExplorerViewModel { get; set; }
         public AudioFilesExplorerViewModel AudioFilesExplorerViewModel { get; set; }
@@ -103,6 +112,9 @@ namespace Editors.Audio.AudioEditor
                 var loadedAudioProject = JsonSerializer.Deserialize<AudioProject>(audioProjectJson);
                 loadedAudioProject.FileName = fileName.Replace(fileType, string.Empty);
                 loadedAudioProject.DirectoryPath = filePath.Replace($"\\{fileName}", string.Empty);
+
+                if (loadedAudioProject.Language == null)
+                    loadedAudioProject.Language = "english(uk)"; // TODO: maybe replace this with the selected language in the app settings
 
                 // Initialise a 'full' Audio Project to include unused stuff
                 InitialiseAudioProject(loadedAudioProject.FileName, loadedAudioProject.DirectoryPath, loadedAudioProject.Language);
@@ -279,11 +291,6 @@ namespace Editors.Audio.AudioEditor
         public void ResetAudioProject()
         {
             AudioProject = new AudioProject();
-        }
-
-        public TreeNode GetSelectedExplorerNode()
-        {
-            return AudioProjectExplorerViewModel._selectedAudioProjectTreeNode;
         }
 
         public DataTable GetEditorDataGrid()

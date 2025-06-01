@@ -27,7 +27,7 @@ namespace Editors.Audio.AudioEditor.AudioProjectEditor.DataGrid
         {
             var dataGrid = DataGridConfiguration.InitialiseDataGrid(_audioEditorService.AudioProjectEditorViewModel.AudioProjectEditorDataGridTag);
 
-            var dialogueEvent = AudioProjectHelpers.GetDialogueEventFromName(_audioEditorService, _audioEditorService.GetSelectedExplorerNode().Name);
+            var dialogueEvent = AudioProjectHelpers.GetDialogueEventFromName(_audioEditorService.AudioProject, _audioEditorService.SelectedExplorerNode.Name);
 
             var stateGroupsCount = _audioRepository.StateGroupsLookupByDialogueEvent[dialogueEvent.Name].Count;
             var columnWidth = 1.0 / (1 + stateGroupsCount);
@@ -57,13 +57,13 @@ namespace Editors.Audio.AudioEditor.AudioProjectEditor.DataGrid
                 .Where(stateGroupColumn => stateGroupColumn.Value.Contains("Any"))
                 .ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
 
-            var dialogueEvent = AudioProjectHelpers.GetDialogueEventFromName(_audioEditorService, _audioEditorService.GetSelectedExplorerNode().Name);
+            var dialogueEvent = AudioProjectHelpers.GetDialogueEventFromName(_audioEditorService.AudioProject, _audioEditorService.SelectedExplorerNode.Name);
 
             var stateGroupsWithQualifiers = _audioRepository.QualifiedStateGroupLookupByStateGroupByDialogueEvent[dialogueEvent.Name];
             foreach (var stateGroupWithQualifier in stateGroupsWithQualifiers)
             {
                 var columnName = DataGridHelpers.AddExtraUnderscoresToString(stateGroupWithQualifier.Key);
-                var stateGroup = _audioRepository.GetStateGroupFromStateGroupWithQualifier(dialogueEvent.Name, DataGridHelpers.RemoveExtraUnderscoresFromString(columnName));
+                var stateGroup = AudioProjectHelpers.GetStateGroupFromStateGroupWithQualifier(_audioRepository, dialogueEvent.Name, DataGridHelpers.RemoveExtraUnderscoresFromString(columnName));
 
                 if (stateGroupsWithAnyState.ContainsKey(stateGroup))
                     row[columnName] = "Any"; // Set the cell value to Any as the default value

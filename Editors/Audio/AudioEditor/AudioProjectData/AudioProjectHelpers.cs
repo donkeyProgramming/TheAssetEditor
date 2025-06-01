@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Data;
 using System.Linq;
 using Editors.Audio.AudioEditor.AudioSettings;
@@ -12,32 +13,41 @@ namespace Editors.Audio.AudioEditor.AudioProjectData
 {
     public class AudioProjectHelpers
     {
-        public static SoundBank GetSoundBankFromName(IAudioEditorService audioEditorService, string soundBankName)
+        public static string GetStateGroupFromStateGroupWithQualifier(IAudioRepository audioRepository, string dialogueEvent, string stateGroupWithQualifier)
         {
-            return audioEditorService.AudioProject.SoundBanks
+            if (audioRepository.QualifiedStateGroupLookupByStateGroupByDialogueEvent.TryGetValue(dialogueEvent, out var stateGroupDictionary))
+                if (stateGroupDictionary.TryGetValue(stateGroupWithQualifier, out var stateGroup))
+                    return stateGroup;
+
+            return null;
+        }
+
+        public static SoundBank GetSoundBankFromName(AudioProject audioProject, string soundBankName)
+        {
+            return audioProject.SoundBanks
                 .FirstOrDefault(soundBank => soundBank.Name == soundBankName);
         }
 
-        public static DialogueEvent GetDialogueEventFromName(IAudioEditorService audioEditorService, string dialogueEventName)
+        public static DialogueEvent GetDialogueEventFromName(AudioProject audioProject, string dialogueEventName)
         {
-            return audioEditorService.AudioProject.SoundBanks
+            return audioProject.SoundBanks
                 .Where(soundBank => soundBank.SoundBankType == SoundBanks.Wh3SoundBankType.DialogueEventSoundBank)
                 .SelectMany(soundBank => soundBank.DialogueEvents)
                 .FirstOrDefault(dialogueEvent => dialogueEvent.Name == dialogueEventName);
         }
 
-        public static StateGroup GetStateGroupFromName(IAudioEditorService audioEditorService, string stateGroupName)
+        public static StateGroup GetStateGroupFromName(AudioProject audioProject, string stateGroupName)
         {
-            return audioEditorService.AudioProject.StateGroups
+            return audioProject.StateGroups
                 .FirstOrDefault(stateGroup => stateGroup.Name == stateGroupName);
         }
 
-        public static ActionEvent GetActionEventFromDataGridRow(DataRow row, SoundBank actionEventSoundBank)
+        public static ActionEvent GetActionEventFromRow(DataRow row, SoundBank actionEventSoundBank)
         {
-            var eventName = GetActionEventNameFromDataRow(row);
+            var eventName = GetActionEventNameFromRow(row);
 
             foreach (var actionEvent in actionEventSoundBank.ActionEvents)
-            {                    
+            {
                 if (actionEvent.Name == eventName)
                     return actionEvent;
             }
@@ -45,7 +55,7 @@ namespace Editors.Audio.AudioEditor.AudioProjectData
             return null;
         }
 
-        public static string GetActionEventNameFromDataRow(DataRow row)
+        public static string GetActionEventNameFromRow(DataRow row)
         {
             if (row == null)
                 return string.Empty;
@@ -58,24 +68,25 @@ namespace Editors.Audio.AudioEditor.AudioProjectData
             return value == DBNull.Value ? string.Empty : value?.ToString() ?? string.Empty;
         }
 
-        public static ActionEvent CreateActionEventFromDataGridRow(AudioSettingsViewModel audioSettingsViewModel, DataRow row)
+        public static ActionEvent CreateActionEventFromRow(ObservableCollection<AudioFile> audioFiles, IAudioSettings audioSettings, DataRow row)
         {
             var actionEvent = new ActionEvent();
 
-            actionEvent.Name = GetActionEventNameFromDataRow(row);
+            actionEvent.Name = GetActionEventNameFromRow(row);
 
-            var audioFiles = audioSettingsViewModel.AudioFiles;
             if (audioFiles.Count == 1)
             {
+                var storedSoundSettings = audioSettings as SoundSettings;
                 actionEvent.Sound = CreateSound(audioFiles[0]);
-                actionEvent.Sound.AudioSettings = BuildSoundSettings(audioSettingsViewModel);
+                actionEvent.Sound.AudioSettings = BuildSoundSettings(storedSoundSettings);
             }
             else
             {
+                var storedRanSeqContainerSettings = audioSettings as RanSeqContainerSettings;
                 actionEvent.RandomSequenceContainer = new RandomSequenceContainer
                 {
                     Sounds = [],
-                    AudioSettings = BuildRanSeqContainerSettings(audioSettingsViewModel)
+                    AudioSettings = BuildRanSeqContainerSettings(storedRanSeqContainerSettings)
                 };
 
                 foreach (var audioFile in audioFiles)
@@ -88,7 +99,7 @@ namespace Editors.Audio.AudioEditor.AudioProjectData
             return actionEvent;
         }
 
-        public static StatePath GetStatePathFromDataGridRow(IAudioRepository audioRepository, DataRow row, DialogueEvent selectedDialogueEvent)
+        public static StatePath GetStatePathFromRow(IAudioRepository audioRepository, DataRow row, DialogueEvent selectedDialogueEvent)
         {
             // Remove any rows with empty values due to a new CA state group being added to still allow the user to edit the out of date state path
             var filteredRow = row.Table.Columns
@@ -120,7 +131,7 @@ namespace Editors.Audio.AudioEditor.AudioProjectData
                 var columnValue = kvp.Value;
                 statePath.Nodes.Add(new StatePathNode
                 {
-                    StateGroup = new StateGroup { Name = audioRepository.GetStateGroupFromStateGroupWithQualifier(selectedDialogueEvent.Name, columnName) },
+                    StateGroup = new StateGroup { Name = GetStateGroupFromStateGroupWithQualifier(audioRepository, selectedDialogueEvent.Name, columnName) },
                     State = new State { Name = columnValue }
                 });
             }
@@ -128,7 +139,7 @@ namespace Editors.Audio.AudioEditor.AudioProjectData
             return statePath.Nodes;
         }
 
-        public static StatePath CreateStatePathFromDataGridRow(IAudioRepository audioRepository, AudioSettingsViewModel audioSettingsViewModel, DataRow row, DialogueEvent selectedDialogueEvent)
+        public static StatePath CreateStatePathFromRow(IAudioRepository audioRepository, ObservableCollection<AudioFile> audioFiles, IAudioSettings audioSettings, DataRow row, DialogueEvent selectedDialogueEvent)
         {
             var statePath = new StatePath();
 
@@ -141,24 +152,25 @@ namespace Editors.Audio.AudioEditor.AudioProjectData
                 {
                     StateGroup = new StateGroup
                     {
-                        Name = audioRepository.GetStateGroupFromStateGroupWithQualifier(selectedDialogueEvent.Name, columnName)
+                        Name = GetStateGroupFromStateGroupWithQualifier(audioRepository, selectedDialogueEvent.Name, columnName)
                     },
                     State = new State { Name = value }
                 });
             }
 
-            var audioFiles = audioSettingsViewModel.AudioFiles;
             if (audioFiles.Count == 1)
             {
+                var storedSoundSettings = audioSettings as SoundSettings;
                 statePath.Sound = CreateSound(audioFiles[0]);
-                statePath.Sound.AudioSettings = BuildSoundSettings(audioSettingsViewModel);
+                statePath.Sound.AudioSettings = BuildSoundSettings(storedSoundSettings);
             }
             else
             {
+                var storedRanSeqContainerSettings = audioSettings as RanSeqContainerSettings;
                 statePath.RandomSequenceContainer = new RandomSequenceContainer
                 {
                     Sounds = [],
-                    AudioSettings = BuildRanSeqContainerSettings(audioSettingsViewModel)
+                    AudioSettings = BuildRanSeqContainerSettings(storedRanSeqContainerSettings)
                 };
 
                 foreach (var audioFile in audioFiles)
@@ -184,7 +196,7 @@ namespace Editors.Audio.AudioEditor.AudioProjectData
                 {
                     statePath.Sound = CreateSound(audioFiles[0]);
                     statePath.Sound.AudioSettings = new SoundSettings();
-                }    
+                }
                 else
                 {
                     statePath.RandomSequenceContainer = new RandomSequenceContainer
@@ -234,7 +246,7 @@ namespace Editors.Audio.AudioEditor.AudioProjectData
             return sound;
         }
 
-        public static State GetStateFromDataGridRow(DataRow row, StateGroup moddedStateGroup)
+        public static State GetStateFromRow(DataRow row, StateGroup moddedStateGroup)
         {
             var dataRowState = CreateStateFromDataGridRow(row);
             return moddedStateGroup.States.FirstOrDefault(state => state.Name == dataRowState.Name);
@@ -258,12 +270,12 @@ namespace Editors.Audio.AudioEditor.AudioProjectData
             return state;
         }
 
-        public static IAudioSettings GetAudioSettingsFromAudioProjectViewerActionEvent(IAudioEditorService audioEditorService)
+        public static IAudioSettings GetAudioSettingsFromActionEvent(IAudioEditorService audioEditorService)
         {
-            var selectedNode = audioEditorService.GetSelectedExplorerNode();
+            var selectedNode = audioEditorService.SelectedExplorerNode;
             var selectedAudioProjectViewerDataGridRow = audioEditorService.GetSelectedViewerRows()[0];
-            var soundBank = GetSoundBankFromName(audioEditorService, selectedNode.Name);
-            var actionEvent = GetActionEventFromDataGridRow(selectedAudioProjectViewerDataGridRow, soundBank);
+            var soundBank = GetSoundBankFromName(audioEditorService.AudioProject, selectedNode.Name);
+            var actionEvent = GetActionEventFromRow(selectedAudioProjectViewerDataGridRow, soundBank);
 
             if (actionEvent.RandomSequenceContainer != null)
                 return actionEvent.RandomSequenceContainer.AudioSettings;
@@ -271,12 +283,12 @@ namespace Editors.Audio.AudioEditor.AudioProjectData
                 return actionEvent.Sound.AudioSettings;
         }
 
-        public static IAudioSettings GetAudioSettingsFromAudioProjectViewerStatePath(AudioEditorViewModel audioEditorViewModel, IAudioEditorService audioEditorService, IAudioRepository audioRepository)
+        public static IAudioSettings GetAudioSettingsFromStatePath(AudioEditorViewModel audioEditorViewModel, IAudioEditorService audioEditorService, IAudioRepository audioRepository)
         {
             var audioProjectItem = audioEditorViewModel.AudioProjectExplorerViewModel._selectedAudioProjectTreeNode;
             var selectedAudioProjectViewerDataGridRow = audioEditorService.GetSelectedViewerRows()[0];
-            var dialogueEvent = GetDialogueEventFromName(audioEditorService, audioProjectItem.Name);
-            var statePath = GetStatePathFromDataGridRow(audioRepository, selectedAudioProjectViewerDataGridRow, dialogueEvent);
+            var dialogueEvent = GetDialogueEventFromName(audioEditorService.AudioProject, audioProjectItem.Name);
+            var statePath = GetStatePathFromRow(audioRepository, selectedAudioProjectViewerDataGridRow, dialogueEvent);
 
             if (statePath.RandomSequenceContainer != null)
                 return statePath.RandomSequenceContainer.AudioSettings;
@@ -357,67 +369,62 @@ namespace Editors.Audio.AudioEditor.AudioProjectData
             states.Insert(insertIndex, newState);
         }
 
-        public static RanSeqContainerSettings BuildRanSeqContainerSettings(AudioSettingsViewModel audioSettingsViewModel)
+        public static SoundSettings BuildSoundSettings(SoundSettings storedSoundSettings)
         {
-            var audioSettings = new RanSeqContainerSettings();
+            var soundSettings = new SoundSettings();
+            soundSettings.LoopingType = storedSoundSettings.LoopingType;
+            if (storedSoundSettings.LoopingType == LoopingType.FiniteLooping)
+                soundSettings.NumberOfLoops = storedSoundSettings.NumberOfLoops;
+            return soundSettings;
+        }
 
-            if (audioSettingsViewModel.AudioFiles.Count > 1)
+        public static RanSeqContainerSettings BuildRanSeqContainerSettings(RanSeqContainerSettings storedRanSeqContainerSettings)
+        {
+            var ranSeqContainerSettings = new RanSeqContainerSettings();
+
+            ranSeqContainerSettings.PlaylistType = storedRanSeqContainerSettings.PlaylistType;
+
+            if (storedRanSeqContainerSettings.PlaylistType == PlaylistType.Sequence)
+                ranSeqContainerSettings.EndBehaviour = storedRanSeqContainerSettings.EndBehaviour;
+            else
             {
-                audioSettings.PlaylistType = audioSettingsViewModel.PlaylistType;
+                ranSeqContainerSettings.EnableRepetitionInterval = storedRanSeqContainerSettings.EnableRepetitionInterval;
 
-                if (audioSettingsViewModel.PlaylistType == PlaylistType.Sequence)
-                    audioSettings.EndBehaviour = audioSettingsViewModel.EndBehaviour;
-                else
-                {
-                    audioSettings.EnableRepetitionInterval = audioSettingsViewModel.EnableRepetitionInterval;
-
-                    if (audioSettingsViewModel.EnableRepetitionInterval)
-                        audioSettings.RepetitionInterval = audioSettingsViewModel.RepetitionInterval;
-                }
-
-                audioSettings.AlwaysResetPlaylist = audioSettingsViewModel.AlwaysResetPlaylist;
-
-                audioSettings.PlaylistMode = audioSettingsViewModel.PlaylistMode;
-                audioSettings.LoopingType = audioSettingsViewModel.LoopingType;
-
-                if (audioSettingsViewModel.LoopingType == LoopingType.FiniteLooping)
-                    audioSettings.NumberOfLoops = audioSettingsViewModel.NumberOfLoops;
-
-                if (audioSettingsViewModel.TransitionType != TransitionType.Disabled)
-                {
-                    audioSettings.TransitionType = audioSettingsViewModel.TransitionType;
-                    audioSettings.TransitionDuration = audioSettingsViewModel.TransitionDuration;
-                }
+                if (storedRanSeqContainerSettings.EnableRepetitionInterval)
+                    ranSeqContainerSettings.RepetitionInterval = storedRanSeqContainerSettings.RepetitionInterval;
             }
 
-            return audioSettings;
+            ranSeqContainerSettings.AlwaysResetPlaylist = storedRanSeqContainerSettings.AlwaysResetPlaylist;
+
+            ranSeqContainerSettings.PlaylistMode = storedRanSeqContainerSettings.PlaylistMode;
+            ranSeqContainerSettings.LoopingType = storedRanSeqContainerSettings.LoopingType;
+
+            if (storedRanSeqContainerSettings.LoopingType == LoopingType.FiniteLooping)
+                ranSeqContainerSettings.NumberOfLoops = storedRanSeqContainerSettings.NumberOfLoops;
+
+            if (storedRanSeqContainerSettings.TransitionType != TransitionType.Disabled)
+            {
+                ranSeqContainerSettings.TransitionType = storedRanSeqContainerSettings.TransitionType;
+                ranSeqContainerSettings.TransitionDuration = storedRanSeqContainerSettings.TransitionDuration;
+            }
+
+            return ranSeqContainerSettings;
         }
 
         public static RanSeqContainerSettings BuildRecommendedRanSeqContainerSettings(List<AudioFile> audioFiles)
         {
-            var audioSettings = new RanSeqContainerSettings();
-            audioSettings.PlaylistType = PlaylistType.RandomExhaustive;
-            audioSettings.EnableRepetitionInterval = true;
-            audioSettings.RepetitionInterval = (uint)Math.Ceiling(audioFiles.Count / 2.0);
-            audioSettings.EndBehaviour = EndBehaviour.Restart;
-            audioSettings.AlwaysResetPlaylist = true;
-            audioSettings.PlaylistMode = PlaylistMode.Step;
-            audioSettings.LoopingType = LoopingType.Disabled;
-            audioSettings.NumberOfLoops = 1;
-            audioSettings.TransitionType = TransitionType.Disabled;
-            audioSettings.TransitionDuration = 1;
-            return audioSettings;
-        }
-
-        public static SoundSettings BuildSoundSettings(AudioSettingsViewModel audioSettingsViewModel)
-        {
-            var audioSettings = new SoundSettings();
-
-            audioSettings.LoopingType = audioSettingsViewModel.LoopingType;
-            if (audioSettingsViewModel.LoopingType == LoopingType.FiniteLooping)
-                audioSettings.NumberOfLoops = audioSettingsViewModel.NumberOfLoops;
-
-            return audioSettings;
+            var ranSeqContainerSettings = new RanSeqContainerSettings();
+            ranSeqContainerSettings.PlaylistType = PlaylistType.RandomExhaustive;
+            ranSeqContainerSettings.EnableRepetitionInterval = true;
+            ranSeqContainerSettings.RepetitionInterval = (uint)Math.Ceiling(audioFiles.Count / 2.0);
+            ranSeqContainerSettings.EndBehaviour = EndBehaviour.Restart;
+            ranSeqContainerSettings.AlwaysResetPlaylist = true;
+            ranSeqContainerSettings.PlaylistMode = PlaylistMode.Step;
+            ranSeqContainerSettings.LoopingType = LoopingType.Disabled;
+            ranSeqContainerSettings.NumberOfLoops = 1;
+            ranSeqContainerSettings.TransitionType = TransitionType.Disabled;
+            ranSeqContainerSettings.TransitionDuration = 1;
+            return ranSeqContainerSettings;
         }
     }
 }

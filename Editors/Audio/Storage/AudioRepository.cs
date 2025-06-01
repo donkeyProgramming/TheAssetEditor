@@ -32,7 +32,6 @@ namespace Editors.Audio.Storage
         string GetNameFromId(uint value, out bool found);
         string GetNameFromId(uint? key);
         string GetOwnerFileFromDialogueEvent(uint id);
-        string GetStateGroupFromStateGroupWithQualifier(string dialogueEvent, string stateGroupWithQualifier);
     }
 
     public class AudioRepository : IAudioRepository
@@ -145,15 +144,6 @@ namespace Editors.Audio.Storage
                     }
                 }
             }
-            return null;
-        }
-
-        public string GetStateGroupFromStateGroupWithQualifier(string dialogueEvent, string stateGroupWithQualifier)
-        {
-            if (QualifiedStateGroupLookupByStateGroupByDialogueEvent.TryGetValue(dialogueEvent, out var stateGroupDictionary))
-                if (stateGroupDictionary.TryGetValue(stateGroupWithQualifier, out var stateGroup))
-                    return stateGroup;
-
             return null;
         }
     }

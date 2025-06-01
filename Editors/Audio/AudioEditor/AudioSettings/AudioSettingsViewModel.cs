@@ -60,7 +60,7 @@ namespace Editors.Audio.AudioEditor.AudioSettings
         [ObservableProperty] private bool _isAudioSettingsVisible = false;
         [ObservableProperty] private bool _showSettingsFromAudioProjectViewer = false;
 
-        public ObservableCollection<AudioFile> AudioFiles { get; set; } = [];
+        public ObservableCollection<AudioFile> AudioFiles => _audioEditorService.AudioFiles;
 
         public AudioSettingsViewModel(IEventHub eventHub, IAudioEditorService audioEditorService, IAudioRepository audioRepository)
         {
@@ -72,11 +72,17 @@ namespace Editors.Audio.AudioEditor.AudioSettings
 
             _eventHub.Register<NodeSelectedEvent>(this, OnSelectedNodeChanged);
             _eventHub.Register<ItemEditedEvent>(this, OnItemEdited);
+            _eventHub.Register<AudioFilesSetEvent>(this, OnAudioFilesSet);
+        }
+
+        public void OnAudioFilesSet(AudioFilesSetEvent audioFilesSetEvent)
+        {
+            StoreAudioSettings();
         }
 
         public void OnItemEdited(ItemEditedEvent itemEditedEvent)
         {
-            var selectedNode = _audioEditorService.GetSelectedExplorerNode();
+            var selectedNode = _audioEditorService.SelectedExplorerNode;
             if (selectedNode.NodeType != NodeType.ActionEventSoundBank && selectedNode.NodeType != NodeType.DialogueEvent && selectedNode.NodeType != NodeType.StateGroup)
                 return;
 
@@ -102,41 +108,107 @@ namespace Editors.Audio.AudioEditor.AudioSettings
         partial void OnPlaylistTypeChanged(PlaylistType oldValue, PlaylistType newValue)
         {
             SetAudioSettingsEnablementAndVisibility();
+            StoreAudioSettings();
         }
 
         partial void OnPlaylistModeChanged(PlaylistMode oldValue, PlaylistMode newValue)
         {
             SetAudioSettingsEnablementAndVisibility();
+            StoreAudioSettings();
         }
 
         partial void OnLoopingTypeChanged(LoopingType oldValue, LoopingType newValue)
         {
             SetAudioSettingsEnablementAndVisibility();
+            StoreAudioSettings();
         }
 
         partial void OnNumberOfLoopsChanged(uint oldValue, uint newValue)
         {
             SetAudioSettingsEnablementAndVisibility();
+            StoreAudioSettings();
         }
 
         partial void OnTransitionTypeChanged(TransitionType oldValue, TransitionType newValue)
         {
             SetAudioSettingsEnablementAndVisibility();
+            StoreAudioSettings();
         }
+
+        partial void OnEnableRepetitionIntervalChanged(bool oldValue, bool newValue)
+        {
+            StoreAudioSettings();
+        }
+
+        partial void OnRepetitionIntervalChanged(uint oldValue, uint newValue)
+        {
+            StoreAudioSettings();
+        }
+
+        partial void OnEndBehaviourChanged(EndBehaviour oldValue, EndBehaviour newValue)
+        {
+            StoreAudioSettings();
+        }
+
+        partial void OnAlwaysResetPlaylistChanged(bool oldValue, bool newValue)
+        {
+            StoreAudioSettings();
+        }
+
+        partial void OnTransitionDurationChanged(decimal oldValue, decimal newValue)
+        {
+            StoreAudioSettings();
+        }
+
+        private SoundSettings BuildSoundSettings()
+        {
+            return new SoundSettings
+            {
+                LoopingType = LoopingType,
+                NumberOfLoops = LoopingType == LoopingType.FiniteLooping ? NumberOfLoops : 1
+            };
+        }
+
+        private RanSeqContainerSettings BuildRanSeqContainerSettings()
+        {
+            return new RanSeqContainerSettings
+            {
+                PlaylistType = PlaylistType,
+                EnableRepetitionInterval = EnableRepetitionInterval,
+                RepetitionInterval = RepetitionInterval,
+                EndBehaviour = EndBehaviour,
+                AlwaysResetPlaylist = AlwaysResetPlaylist,
+                PlaylistMode = PlaylistMode,
+                LoopingType = LoopingType,
+                NumberOfLoops = LoopingType == LoopingType.FiniteLooping ? NumberOfLoops : 1,
+                TransitionType = TransitionType,
+                TransitionDuration = TransitionType != TransitionType.Disabled ? TransitionDuration : 1
+            };
+        }
+
+        private IAudioSettings BuildAudioSettings()
+        {
+            if (AudioFiles.Count > 1)
+                return BuildRanSeqContainerSettings();
+            else
+                return BuildSoundSettings();
+        }
+
+        public void StoreAudioSettings() => _audioEditorService.AudioSettings = BuildAudioSettings();
 
         public void ShowSettingsFromAudioProjectViewerItem()
         {
             IAudioSettings audioSettings = null;
             var audioFiles = new List<AudioFile>();
 
-            var audioProjectItem = _audioEditorService.GetSelectedExplorerNode();
+            var audioProjectItem = _audioEditorService.SelectedExplorerNode;
             if (audioProjectItem.NodeType == NodeType.ActionEventSoundBank)
             {
-                audioSettings = AudioProjectHelpers.GetAudioSettingsFromAudioProjectViewerActionEvent(_audioEditorService);
+                audioSettings = AudioProjectHelpers.GetAudioSettingsFromActionEvent(_audioEditorService);
 
                 var selectedAudioProjectViewerDataGridRow = _audioEditorService.GetSelectedViewerRows()[0];
-                var soundBank = AudioProjectHelpers.GetSoundBankFromName(_audioEditorService, audioProjectItem.Name);
-                var actionEvent = AudioProjectHelpers.GetActionEventFromDataGridRow(selectedAudioProjectViewerDataGridRow, soundBank);
+                var soundBank = AudioProjectHelpers.GetSoundBankFromName(_audioEditorService.AudioProject, audioProjectItem.Name);
+                var actionEvent = AudioProjectHelpers.GetActionEventFromRow(selectedAudioProjectViewerDataGridRow, soundBank);
 
                 if (actionEvent.Sound != null)
                 {
@@ -160,10 +232,10 @@ namespace Editors.Audio.AudioEditor.AudioSettings
             }
             else if (audioProjectItem.NodeType == NodeType.DialogueEvent)
             {
-                audioSettings = AudioProjectHelpers.GetAudioSettingsFromAudioProjectViewerStatePath(_audioEditorService.AudioEditorViewModel, _audioEditorService, _audioRepository);
+                audioSettings = AudioProjectHelpers.GetAudioSettingsFromStatePath(_audioEditorService.AudioEditorViewModel, _audioEditorService, _audioRepository);
 
-                var dialogueEvent = AudioProjectHelpers.GetDialogueEventFromName(_audioEditorService, _audioEditorService.GetSelectedExplorerNode().Name);
-                var statePath = AudioProjectHelpers.GetStatePathFromDataGridRow(_audioRepository, _audioEditorService.GetSelectedViewerRows()[0], dialogueEvent);
+                var dialogueEvent = AudioProjectHelpers.GetDialogueEventFromName(_audioEditorService.AudioProject, _audioEditorService.SelectedExplorerNode.Name);
+                var statePath = AudioProjectHelpers.GetStatePathFromRow(_audioRepository, _audioEditorService.GetSelectedViewerRows()[0], dialogueEvent);
 
                 if (statePath.Sound != null)
                 {
@@ -256,7 +328,7 @@ namespace Editors.Audio.AudioEditor.AudioSettings
 
         public void SetAudioSettingsEnablementAndVisibility()
         {
-            var selectedNode = _audioEditorService.GetSelectedExplorerNode();
+            var selectedNode = _audioEditorService.SelectedExplorerNode;
             if (selectedNode == null || selectedNode.NodeType != NodeType.ActionEventSoundBank && selectedNode.NodeType != NodeType.DialogueEvent)
                 return;
 

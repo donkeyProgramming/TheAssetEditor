@@ -10,11 +10,11 @@ using Editors.Audio.AudioEditor.AudioProjectViewer;
 using Editors.Audio.AudioEditor.AudioProjectViewer.DataGrid;
 using Editors.Audio.AudioEditor.AudioSettings;
 using Editors.Audio.AudioEditor.NewAudioProject;
+using Editors.Audio.AudioEditor.UICommands;
 using Editors.Audio.AudioExplorer;
 using Editors.Audio.AudioProjectCompiler;
 using Editors.Audio.AudioProjectConverter;
 using Editors.Audio.Storage;
-using Editors.Audio.UICommands;
 using Editors.Audio.Utility;
 using Microsoft.Extensions.DependencyInjection;
 using Shared.Core.DependencyInjection;
@@ -50,7 +50,14 @@ namespace Editors.Audio
             serviceCollection.AddScoped<IntegrityChecker>();
             serviceCollection.AddScoped<AudioProjectEditorDataGridServiceFactory>();
             serviceCollection.AddScoped<AudioProjectViewerDataGridServiceFactory>();
-            serviceCollection.AddScoped<AudioProjectDataServiceFactory>();
+
+            serviceCollection.AddScoped<IAudioProjectUICommandFactory, AudioProjectUICommandFactory>();
+            serviceCollection.AddTransient<IAudioProjectUICommand, AddActionEventToAudioProjectCommand>();
+            serviceCollection.AddTransient<IAudioProjectUICommand, AddDialogueEventToAudioProjectCommand>();
+            serviceCollection.AddTransient<IAudioProjectUICommand, AddStateToAudioProjectCommand>();
+            serviceCollection.AddTransient<IAudioProjectUICommand, RemoveActionEventFromAudioProjectCommand>();
+            serviceCollection.AddTransient<IAudioProjectUICommand, RemoveDialogueEventFromAudioProjectCommand>();
+            serviceCollection.AddTransient<IAudioProjectUICommand, RemoveStateFromAudioProjectCommand>();
 
             serviceCollection.AddScoped<CompilerDataProcessor>();
             serviceCollection.AddScoped<SoundBankGenerator>();

@@ -41,7 +41,7 @@ namespace Editors.Audio.AudioEditor.AudioProjectViewer.DataGrid
         {
             var table = _audioEditorService.GetViewerDataGrid();
 
-            var soundBank = AudioProjectHelpers.GetSoundBankFromName(_audioEditorService, _audioEditorService.GetSelectedExplorerNode().Name);
+            var soundBank = AudioProjectHelpers.GetSoundBankFromName(_audioEditorService.AudioProject, _audioEditorService.SelectedExplorerNode.Name);
             foreach (var actionEvent in soundBank.ActionEvents)
             {
                 var row = table.NewRow();
@@ -55,7 +55,7 @@ namespace Editors.Audio.AudioEditor.AudioProjectViewer.DataGrid
             var table = _audioEditorService.GetEditorDataGrid();
 
             var editorRow = _audioEditorService.GetEditorDataGrid().Rows[0];
-            var value = AudioProjectHelpers.GetActionEventNameFromDataRow(editorRow);
+            var value = AudioProjectHelpers.GetActionEventNameFromRow(editorRow);
 
             var row = table.NewRow();
             row[DataGridConfiguration.EventNameColumn] = value;

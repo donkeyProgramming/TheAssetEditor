@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Data;
 using Editors.Audio.AudioEditor.AudioFilesExplorer;
 using Editors.Audio.AudioEditor.AudioProjectData;
@@ -12,23 +13,30 @@ namespace Editors.Audio.AudioEditor
 {
     public interface IAudioEditorService
     {
-        public AudioProject AudioProject { get; set; }
-        public AudioEditorViewModel AudioEditorViewModel { get; set; }
-        public AudioProjectExplorerViewModel AudioProjectExplorerViewModel { get; set; }
-        public AudioFilesExplorerViewModel AudioFilesExplorerViewModel { get; set; }
-        public AudioProjectEditorViewModel AudioProjectEditorViewModel { get; set; }
-        public AudioProjectViewerViewModel AudioProjectViewerViewModel { get; set; }
-        public AudioSettingsViewModel AudioSettingsViewModel { get; set; }
-        public Dictionary<string, List<string>> ModdedStatesByStateGroupLookup { get; set; }
-        public void SaveAudioProject(AudioProject audioProject, string audioProjectFileName, string audioProjectDirectoryPath);
-        public void LoadAudioProject(AudioEditorViewModel audioEditorViewModel);
-        public void InitialiseAudioProject(string fileName, string directory, string language);
-        public void CompileAudioProject();
-        public void BuildModdedStatesByStateGroupLookup(List<StateGroup> moddedStateGroups, Dictionary<string, List<string>> moddedStatesByStateGroupLookup);
-        public void ResetAudioProject();
-        public TreeNode GetSelectedExplorerNode();
-        public DataTable GetEditorDataGrid();
-        public DataTable GetViewerDataGrid();
-        public List<DataRow> GetSelectedViewerRows();
+        AudioProject AudioProject { get; set; }
+        TreeNode SelectedExplorerNode { get; set; }
+        ObservableCollection<AudioFile> AudioFiles { get; set; }
+        IAudioSettings AudioSettings { get; set; }
+
+
+
+
+
+        AudioEditorViewModel AudioEditorViewModel { get; set; }
+        AudioProjectExplorerViewModel AudioProjectExplorerViewModel { get; set; }
+        AudioFilesExplorerViewModel AudioFilesExplorerViewModel { get; set; }
+        AudioProjectEditorViewModel AudioProjectEditorViewModel { get; set; }
+        AudioProjectViewerViewModel AudioProjectViewerViewModel { get; set; }
+        AudioSettingsViewModel AudioSettingsViewModel { get; set; }
+        Dictionary<string, List<string>> ModdedStatesByStateGroupLookup { get; set; }
+        void SaveAudioProject(AudioProject audioProject, string audioProjectFileName, string audioProjectDirectoryPath);
+        void LoadAudioProject(AudioEditorViewModel audioEditorViewModel);
+        void InitialiseAudioProject(string fileName, string directory, string language);
+        void CompileAudioProject();
+        void BuildModdedStatesByStateGroupLookup(List<StateGroup> moddedStateGroups, Dictionary<string, List<string>> moddedStatesByStateGroupLookup);
+        void ResetAudioProject();
+        DataTable GetEditorDataGrid();
+        DataTable GetViewerDataGrid();
+        List<DataRow> GetSelectedViewerRows();
     }
 }

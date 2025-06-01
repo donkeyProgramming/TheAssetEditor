@@ -31,7 +31,7 @@ namespace Editors.Audio.AudioEditor.AudioProjectEditor.DataGrid
             if (!table.Columns.Contains(DataGridConfiguration.EventNameColumn))
                 table.Columns.Add(new DataColumn(DataGridConfiguration.EventNameColumn, typeof(string)));
 
-            var selectedNode = _audioEditorService.GetSelectedExplorerNode();
+            var selectedNode = _audioEditorService.SelectedExplorerNode;
             if (selectedNode.Name == SoundBanks.MoviesDisplayString)
             {
                 var fileSelectColumn = DataGridConfiguration.CreateColumn(_audioEditorService.AudioEditorViewModel, DataGridConfiguration.BrowseMovieColumn, 85, DataGridColumnType.FileSelectButton, useAbsoluteWidth: true);
@@ -52,7 +52,7 @@ namespace Editors.Audio.AudioEditor.AudioProjectEditor.DataGrid
             var table = _audioEditorService.GetEditorDataGrid();
 
             var eventName = string.Empty;
-            var selectedNode = _audioEditorService.GetSelectedExplorerNode();
+            var selectedNode = _audioEditorService.SelectedExplorerNode;
             if (selectedNode.Name != SoundBanks.MoviesDisplayString)
                 eventName = "Play_";
 
