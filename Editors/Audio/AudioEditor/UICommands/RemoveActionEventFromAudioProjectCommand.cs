@@ -8,11 +8,11 @@ namespace Editors.Audio.AudioEditor.UICommands
 {
     public class RemoveActionEventFromAudioProjectCommand : IAudioProjectUICommand
     {
-        public AudioProjectCommandAction Action => AudioProjectCommandAction.RemoveFromAudioProject;
-        public NodeType NodeType => NodeType.ActionEventSoundBank;
-
         private readonly IAudioEditorService _audioEditorService;
         private readonly IEventHub _eventHub;
+
+        public AudioProjectCommandAction Action => AudioProjectCommandAction.RemoveFromAudioProject;
+        public NodeType NodeType => NodeType.ActionEventSoundBank;
 
         public RemoveActionEventFromAudioProjectCommand(IAudioEditorService audioEditorService, IEventHub eventHub)
         {
@@ -25,7 +25,7 @@ namespace Editors.Audio.AudioEditor.UICommands
             var soundBank = AudioProjectHelpers.GetSoundBankFromName(_audioEditorService.AudioProject, _audioEditorService.SelectedExplorerNode.Name);
             var actionEvent = AudioProjectHelpers.GetActionEventFromRow(row, soundBank);
             soundBank.ActionEvents.Remove(actionEvent);
-            _eventHub.Publish(new RemoveRowEvent(row));
+            _eventHub.Publish(new RemoveViewerTableRowEvent(row));
         }
     }
 }

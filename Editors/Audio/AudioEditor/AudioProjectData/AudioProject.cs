@@ -115,8 +115,8 @@ namespace Editors.Audio.AudioEditor.AudioProjectData
                 .Where(soundBank => soundBank != null)
                 .Select(ProcessSoundBank)
                 .Where(soundBank => 
-                    (soundBank.DialogueEvents != null && soundBank.DialogueEvents.Count != 0) || 
-                    (soundBank.ActionEvents != null && soundBank.ActionEvents.Count != 0))
+                    soundBank.DialogueEvents != null && soundBank.DialogueEvents.Count != 0 || 
+                    soundBank.ActionEvents != null && soundBank.ActionEvents.Count != 0)
                 .ToList();
 
             return processedBanks.Count != 0 ? processedBanks : null;

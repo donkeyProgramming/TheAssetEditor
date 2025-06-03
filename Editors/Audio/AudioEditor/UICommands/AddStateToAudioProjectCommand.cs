@@ -6,10 +6,10 @@ namespace Editors.Audio.AudioEditor.UICommands
 {
     public class AddStateToAudioProjectCommand : IAudioProjectUICommand
     {
+        private readonly IAudioEditorService _audioEditorService;
+
         public AudioProjectCommandAction Action => AudioProjectCommandAction.AddToAudioProject;
         public NodeType NodeType => NodeType.StateGroup;
-
-        private readonly IAudioEditorService _audioEditorService;
 
         public AddStateToAudioProjectCommand(IAudioEditorService audioEditorService)
         {

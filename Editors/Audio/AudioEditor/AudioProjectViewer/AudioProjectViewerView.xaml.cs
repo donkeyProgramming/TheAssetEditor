@@ -25,7 +25,7 @@ namespace Editors.Audio.AudioEditor.AudioProjectViewer
                 return;
 
             var dataGridTag = ViewModel?.AudioProjectViewerDataGridTag;
-            var dataGrid = DataGridHelpers.GetDataGridByTag(dataGridTag);
+            var dataGrid = DataGridHelpers.GetDataGridFromTag(dataGridTag);
             dataGrid.SelectionChanged += AudioEditorDataGrid_SelectionChanged;
         }
 

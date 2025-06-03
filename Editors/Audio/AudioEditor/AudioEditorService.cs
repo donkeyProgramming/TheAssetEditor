@@ -60,8 +60,8 @@ namespace Editors.Audio.AudioEditor
         public TreeNode SelectedExplorerNode { get; set; }
         public ObservableCollection<AudioFile> AudioFiles { get; set; } = [];
         public IAudioSettings AudioSettings { get; set; }
-
-
+        public string AudioProjectEditorDataGridTag { get; set; } = "AudioProjectEditorDataGrid";
+        public string AudioProjectViewerDataGridTag { get; set; } = "AudioProjectViewerDataGrid";
 
 
 

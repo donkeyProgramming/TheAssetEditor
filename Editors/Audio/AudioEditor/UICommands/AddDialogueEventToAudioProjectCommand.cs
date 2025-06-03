@@ -7,11 +7,11 @@ namespace Editors.Audio.AudioEditor.UICommands
 {
     public class AddDialogueEventToAudioProjectCommand : IAudioProjectUICommand
     {
-        public AudioProjectCommandAction Action => AudioProjectCommandAction.AddToAudioProject;
-        public NodeType NodeType => NodeType.DialogueEvent;
-
         private readonly IAudioEditorService _audioEditorService;
         private readonly IAudioRepository _audioRepository;
+
+        public AudioProjectCommandAction Action => AudioProjectCommandAction.AddToAudioProject;
+        public NodeType NodeType => NodeType.DialogueEvent;
 
         public AddDialogueEventToAudioProjectCommand(IAudioEditorService audioEditorService, IAudioRepository audioRepository)
         {

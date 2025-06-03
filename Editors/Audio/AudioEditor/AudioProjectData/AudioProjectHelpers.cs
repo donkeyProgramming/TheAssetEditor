@@ -88,7 +88,7 @@ namespace Editors.Audio.AudioEditor.AudioProjectData
 
         public static string GetActionEventNameFromRow(DataRow row)
         {
-            return row[DataGridConfiguration.EventNameColumn].ToString();
+            return row[DataGridTemplates.EventNameColumn].ToString();
         }
 
         public static StatePath GetStatePathFromRow(IAudioRepository audioRepository, DataRow row, DialogueEvent selectedDialogueEvent)

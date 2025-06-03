@@ -2,13 +2,11 @@
 using Audio.AudioExplorer;
 using Editors.Audio.AudioEditor;
 using Editors.Audio.AudioEditor.AudioFilesExplorer;
-using Editors.Audio.AudioEditor.AudioProjectData;
 using Editors.Audio.AudioEditor.AudioProjectEditor;
-using Editors.Audio.AudioEditor.AudioProjectEditor.DataGrid;
 using Editors.Audio.AudioEditor.AudioProjectExplorer;
 using Editors.Audio.AudioEditor.AudioProjectViewer;
-using Editors.Audio.AudioEditor.AudioProjectViewer.DataGrid;
 using Editors.Audio.AudioEditor.AudioSettings;
+using Editors.Audio.AudioEditor.DataGrids;
 using Editors.Audio.AudioEditor.NewAudioProject;
 using Editors.Audio.AudioEditor.UICommands;
 using Editors.Audio.AudioExplorer;
@@ -30,26 +28,23 @@ namespace Editors.Audio
         {
             serviceCollection.AddScoped<AudioExplorerView>();
             serviceCollection.AddScoped<AudioExplorerViewModel>();
-
+            
+            serviceCollection.AddScoped<IAudioEditorService, AudioEditorService>();
             serviceCollection.AddScoped<AudioEditorViewModel>();
             serviceCollection.AddScoped<AudioProjectExplorerViewModel>();
             serviceCollection.AddScoped<AudioFilesExplorerViewModel>();
             serviceCollection.AddScoped<AudioProjectEditorViewModel>();
             serviceCollection.AddScoped<AudioProjectViewerViewModel>();
             serviceCollection.AddScoped<AudioSettingsViewModel>();
-
-            serviceCollection.AddTransient<NewAudioProjectViewModel>();
-            serviceCollection.AddTransient<NewAudioProjectWindow>();
-            serviceCollection.AddScoped<OpenNewAudioProjectWindowCommand>();
-
-            serviceCollection.AddTransient<AudioProjectConverterViewModel>();
-            serviceCollection.AddTransient<AudioProjectConverterWindow>();
-            serviceCollection.AddScoped<OpenAudioProjectConverterWindowCommand>();
-
-            serviceCollection.AddScoped<IAudioEditorService, AudioEditorService>();
             serviceCollection.AddScoped<IntegrityChecker>();
-            serviceCollection.AddScoped<AudioProjectEditorDataGridServiceFactory>();
-            serviceCollection.AddScoped<AudioProjectViewerDataGridServiceFactory>();
+
+            serviceCollection.AddScoped<IDataGridServiceFactory, DataGridServiceFactory>();
+            serviceCollection.AddTransient<IDataGridService, EditorActionEventDataGridService>();
+            serviceCollection.AddTransient<IDataGridService, EditorDialogueEventDataGridService>();
+            serviceCollection.AddTransient<IDataGridService, EditorStateGroupDataGridService>();
+            serviceCollection.AddTransient<IDataGridService, ViewerActionEventDataGridService>();
+            serviceCollection.AddTransient<IDataGridService, ViewerDialogueEventDataGridService>();
+            serviceCollection.AddTransient<IDataGridService, ViewerStateGroupDataGridService>();
 
             serviceCollection.AddScoped<IAudioProjectUICommandFactory, AudioProjectUICommandFactory>();
             serviceCollection.AddTransient<IAudioProjectUICommand, AddActionEventToAudioProjectCommand>();
@@ -58,6 +53,14 @@ namespace Editors.Audio
             serviceCollection.AddTransient<IAudioProjectUICommand, RemoveActionEventFromAudioProjectCommand>();
             serviceCollection.AddTransient<IAudioProjectUICommand, RemoveDialogueEventFromAudioProjectCommand>();
             serviceCollection.AddTransient<IAudioProjectUICommand, RemoveStateFromAudioProjectCommand>();
+
+            serviceCollection.AddTransient<NewAudioProjectViewModel>();
+            serviceCollection.AddTransient<NewAudioProjectWindow>();
+            serviceCollection.AddScoped<OpenNewAudioProjectWindowCommand>();
+
+            serviceCollection.AddTransient<AudioProjectConverterViewModel>();
+            serviceCollection.AddTransient<AudioProjectConverterWindow>();
+            serviceCollection.AddScoped<OpenAudioProjectConverterWindowCommand>();
 
             serviceCollection.AddScoped<CompilerDataProcessor>();
             serviceCollection.AddScoped<SoundBankGenerator>();

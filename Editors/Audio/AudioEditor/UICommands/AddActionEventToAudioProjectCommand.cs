@@ -6,10 +6,10 @@ namespace Editors.Audio.AudioEditor.UICommands
 {
     public class AddActionEventToAudioProjectCommand : IAudioProjectUICommand
     {
+        private readonly IAudioEditorService _audioEditorService;
+
         public AudioProjectCommandAction Action => AudioProjectCommandAction.AddToAudioProject;
         public NodeType NodeType => NodeType.ActionEventSoundBank;
-
-        private readonly IAudioEditorService _audioEditorService;
 
         public AddActionEventToAudioProjectCommand(IAudioEditorService audioEditorService)
         {

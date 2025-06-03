@@ -5,7 +5,6 @@ using System.Collections.Specialized;
 using System.Linq;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using Editors.Audio.AudioEditor.AudioSettings;
 using Editors.Audio.AudioEditor.DataGrids;
 using Editors.Audio.AudioEditor.Events;
 using Editors.Audio.Utility;
@@ -265,21 +264,6 @@ namespace Editors.Audio.AudioEditor.AudioFilesExplorer
 
         [RelayCommand] public void SetAudioFiles()
         {
-            _audioEditorService.AudioSettingsViewModel.AudioFiles.Clear();
-
-            foreach (var wavFile in SelectedTreeNodes)
-            {
-                _audioEditorService.AudioEditorViewModel.AudioSettingsViewModel.AudioFiles.Add(new AudioFile
-                {
-                    FileName = wavFile.Name,
-                    FilePath = wavFile.FilePath
-                });
-            }
-
-            _audioEditorService.AudioSettingsViewModel.SetAudioSettingsEnablementAndVisibility();
-            _audioEditorService.AudioSettingsViewModel.ResetShowSettingsFromAudioProjectViewer();
-            _audioEditorService.AudioProjectEditorViewModel.SetAddRowButtonEnablement();
-
             _eventHub.Publish(new AudioFilesSetEvent(SelectedTreeNodes.ToList()));
         }
 

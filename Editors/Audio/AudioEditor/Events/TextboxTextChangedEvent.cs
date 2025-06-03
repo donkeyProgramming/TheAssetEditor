@@ -1,6 +1,4 @@
 ﻿namespace Editors.Audio.AudioEditor.Events
 {
-    public class ItemEditedEvent
-    {
-    }
+    public record TextboxTextChangedEvent();
 }

@@ -9,12 +9,12 @@ namespace Editors.Audio.AudioEditor.UICommands
 {
     public class RemoveDialogueEventFromAudioProjectCommand : IAudioProjectUICommand
     {
-        public AudioProjectCommandAction Action => AudioProjectCommandAction.RemoveFromAudioProject;
-        public NodeType NodeType => NodeType.DialogueEvent;
-
         private readonly IAudioEditorService _audioEditorService;
         private readonly IAudioRepository _audioRepository;
         private readonly IEventHub _eventHub;
+
+        public AudioProjectCommandAction Action => AudioProjectCommandAction.RemoveFromAudioProject;
+        public NodeType NodeType => NodeType.DialogueEvent;
 
         public RemoveDialogueEventFromAudioProjectCommand(IAudioEditorService audioEditorService, IAudioRepository audioRepository, IEventHub eventHub)
         {
@@ -30,7 +30,7 @@ namespace Editors.Audio.AudioEditor.UICommands
             if (statePath != null)
             {
                 dialogueEvent.StatePaths.Remove(statePath);
-                _eventHub.Publish(new RemoveRowEvent(row));
+                _eventHub.Publish(new RemoveViewerTableRowEvent(row));
             }
         }
     }

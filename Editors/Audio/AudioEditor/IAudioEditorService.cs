@@ -17,7 +17,8 @@ namespace Editors.Audio.AudioEditor
         TreeNode SelectedExplorerNode { get; set; }
         ObservableCollection<AudioFile> AudioFiles { get; set; }
         IAudioSettings AudioSettings { get; set; }
-
+        string AudioProjectEditorDataGridTag { get; set; }
+        string AudioProjectViewerDataGridTag { get; set; }
 
 
 

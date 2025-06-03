@@ -38,7 +38,6 @@ namespace Editors.Audio.AudioEditor.UICommands
         {
             if (!_uiCommands.TryGetValue((action, nodeType), out var uiCommand))
                 throw new InvalidOperationException($"No UICommand registered for {nodeType}.");
-
             return uiCommand;
         }
     }

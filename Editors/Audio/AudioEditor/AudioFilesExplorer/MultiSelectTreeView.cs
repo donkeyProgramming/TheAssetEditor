@@ -110,7 +110,7 @@ namespace Editors.Audio.AudioEditor.AudioFilesExplorer
                     finally
                     {
                         _suppressSelectionChange = false;
-                        Dispatcher.BeginInvoke((Action)UpdateSelectionStates, System.Windows.Threading.DispatcherPriority.Input);
+                        Dispatcher.BeginInvoke(UpdateSelectionStates, System.Windows.Threading.DispatcherPriority.Input);
                     }
                 }
             }

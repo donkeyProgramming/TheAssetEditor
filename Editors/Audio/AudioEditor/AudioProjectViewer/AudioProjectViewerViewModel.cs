@@ -3,11 +3,13 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Data;
 using System.Linq;
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Data;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Editors.Audio.AudioEditor.AudioProjectData;
 using Editors.Audio.AudioEditor.AudioProjectExplorer;
-using Editors.Audio.AudioEditor.AudioProjectViewer.DataGrid;
 using Editors.Audio.AudioEditor.DataGrids;
 using Editors.Audio.AudioEditor.Events;
 using Editors.Audio.AudioEditor.UICommands;
@@ -24,13 +26,13 @@ namespace Editors.Audio.AudioEditor.AudioProjectViewer
         private readonly IEventHub _eventHub;
         private readonly IAudioRepository _audioRepository;
         private readonly IAudioEditorService _audioEditorService;
-        private readonly AudioProjectViewerDataGridServiceFactory _audioProjectViewerDataGridServiceFactory;
+        private readonly IDataGridServiceFactory _audioProjectViewerDataGridServiceFactory;
 
         private readonly ILogger _logger = Logging.Create<AudioProjectViewerViewModel>();
 
         [ObservableProperty] private string _audioProjectViewerLabel;
 
-        [ObservableProperty] private string _audioProjectViewerDataGridTag = "AudioProjectViewerDataGrid";
+        [ObservableProperty] private string _audioProjectViewerDataGridTag;
         [ObservableProperty] private DataTable _audioProjectViewerDataGrid;
 
         public List<DataRow> _selectedDataGridRows;
@@ -47,34 +49,113 @@ namespace Editors.Audio.AudioEditor.AudioProjectViewer
             IEventHub eventHub,
             IAudioRepository audioRepository,
             IAudioEditorService audioEditorService,
-            AudioProjectViewerDataGridServiceFactory audioProjectViewerDataGridServiceFactory)
+            IDataGridServiceFactory audioEditorDataGridServiceFactory)
         {
             _audioProjectUICommandFactory = audioProjectUICommandFactory;
             _eventHub = eventHub;
             _audioRepository = audioRepository;
             _audioEditorService = audioEditorService;
-            _audioProjectViewerDataGridServiceFactory = audioProjectViewerDataGridServiceFactory;
+            _audioProjectViewerDataGridServiceFactory = audioEditorDataGridServiceFactory;
 
             AudioProjectViewerLabel = $"Audio Project Viewer";
+            AudioProjectViewerDataGridTag = _audioEditorService.AudioProjectViewerDataGridTag;
 
-            _eventHub.Register<AddRowEvent>(this, AddRow);
-            _eventHub.Register<RemoveRowEvent>(this, RemoveRow);
+            _eventHub.Register<AddViewerTableColumnEvent>(this, AddTableColumn);
+            _eventHub.Register<AddViewerTableRowEvent>(this, AddTableRow);
+            _eventHub.Register<RemoveViewerTableRowEvent>(this, RemoveTableRow);
+            _eventHub.Register<SetDataGridContextMenuEvent>(this, SetDataGridContextMenu);
+
+
 
 
 
             _eventHub.Register<NodeSelectedEvent>(this, OnSelectedNodeChanged);
         }
 
-        public void AddRow(AddRowEvent itemAddedEvent)
+        public void AddTableColumn(AddViewerTableColumnEvent addTableColumnEvent)
         {
-            DataGridHelpers.InsertRowAlphabetically(AudioProjectViewerDataGrid, itemAddedEvent.Row);
-            _logger.Here().Information($"Added {_audioEditorService.SelectedExplorerNode.NodeType} row to: {_audioEditorService.SelectedExplorerNode.Name}");
+            var column = addTableColumnEvent.Column;
+            if (!AudioProjectViewerDataGrid.Columns.Contains(column.ColumnName))
+            {
+                AudioProjectViewerDataGrid.Columns.Add(column);
+                _logger.Here().Information($"Added {_audioEditorService.SelectedExplorerNode.NodeType} column to Audio Project Viewer table for {_audioEditorService.SelectedExplorerNode.Name} ");
+            }
         }
 
-        public void RemoveRow(RemoveRowEvent removeRowEvent)
+        public void AddTableRow(AddViewerTableRowEvent addViewerTableRowEvent)
         {
-            AudioProjectViewerDataGrid.Rows.Remove(removeRowEvent.Row);
-            _logger.Here().Information($"Removed {_audioEditorService.SelectedExplorerNode.NodeType} row from: {_audioEditorService.SelectedExplorerNode.Name}");
+            DataTableHelpers.InsertRowAlphabetically(AudioProjectViewerDataGrid, addViewerTableRowEvent.Row);
+            _logger.Here().Information($"Added {_audioEditorService.SelectedExplorerNode.NodeType} row to Audio Project Viewer table for {_audioEditorService.SelectedExplorerNode.Name}");
+        }
+
+        public void RemoveTableRow(RemoveViewerTableRowEvent removeViewerTableRowEvent)
+        {
+            AudioProjectViewerDataGrid.Rows.Remove(removeViewerTableRowEvent.Row);
+            _logger.Here().Information($"Removed {_audioEditorService.SelectedExplorerNode.NodeType} row from Audio Project Viewer table for {_audioEditorService.SelectedExplorerNode.Name}");
+        }
+
+        [RelayCommand] public void RemoveAudioProjectViewerDataGridRow()
+        {
+            var selectedNode = _audioEditorService.SelectedExplorerNode;
+            if (selectedNode.NodeType != NodeType.ActionEventSoundBank && selectedNode.NodeType != NodeType.DialogueEvent && selectedNode.NodeType != NodeType.StateGroup)
+                return;
+
+            RemoveDataFromAudioProject(selectedNode.NodeType);
+        }
+
+        private void RemoveDataFromAudioProject(NodeType nodeType)
+        {
+            var selectedRows = _audioEditorService.GetSelectedViewerRows();
+            foreach (var row in selectedRows)
+                _audioProjectUICommandFactory.Create(AudioProjectCommandAction.RemoveFromAudioProject, nodeType).Execute(row);
+
+            _eventHub.Publish(new SetEnablementEvent()); // Publish after removing to ensure that the enablement uses the update data
+        }
+
+        [RelayCommand] public void EditAudioProjectViewerDataGridRow()
+        {
+            _eventHub.Publish(new EditViewerRowEvent(_selectedDataGridRows[0])); // Publish before removing to ensure that an item is still selected
+
+            var selectedNode = _audioEditorService.SelectedExplorerNode;
+            RemoveDataFromAudioProject(selectedNode.NodeType);
+
+            _logger.Here().Information($"Editing {selectedNode.NodeType} row in Audio Project Viewer table for {selectedNode.Name}");
+        }
+
+        public void SetDataGridContextMenu(SetDataGridContextMenuEvent setDataGridContextMenuEvent)
+        {
+            var contextMenu = new ContextMenu();
+
+            var copyMenuItem = new MenuItem
+            {
+                Header = "Copy",
+                Command = CopyRowsCommand
+            };
+
+            BindingOperations.SetBinding(copyMenuItem, UIElement.IsEnabledProperty,
+                new Binding("IsCopyEnabled")
+                {
+                    Source = this,
+                    Mode = BindingMode.OneWay
+                });
+
+            var pasteMenuItem = new MenuItem
+            {
+                Header = "Paste",
+                Command = PasteRowsCommand
+            };
+
+            BindingOperations.SetBinding(pasteMenuItem, UIElement.IsEnabledProperty,
+                new Binding("IsPasteEnabled")
+                {
+                    Source = this,
+                    Mode = BindingMode.OneWay
+                });
+
+            contextMenu.Items.Add(copyMenuItem);
+            contextMenu.Items.Add(pasteMenuItem);
+
+            setDataGridContextMenuEvent.DataGrid.ContextMenu = contextMenu;
         }
 
         public void OnDataGridSelectionChanged(List<DataRow> selectedItems)
@@ -130,8 +211,8 @@ namespace Editors.Audio.AudioEditor.AudioProjectViewer
 
         private void LoadDataGrid(NodeType selectedNodeType)
         {
-            var dataGridService = _audioProjectViewerDataGridServiceFactory.GetService(selectedNodeType);
-            dataGridService.LoadDataGrid();
+            var dataGridService = _audioProjectViewerDataGridServiceFactory.GetService(AudioProjectDataGrid.Viewer, selectedNodeType);
+            dataGridService.LoadDataGrid(AudioProjectViewerDataGrid);
         }
 
         private void SetSelectedDataGridRows(List<DataRow> selectedItems)
@@ -192,37 +273,6 @@ namespace Editors.Audio.AudioEditor.AudioProjectViewer
 
                 IsPasteEnabled = areStateGroupsEqual && !areAnyCopiedRowsInDataGrid;
             }
-        }
-
-        [RelayCommand] public void EditAudioProjectViewerDataGridRow()
-        {
-            var selectedNode = _audioEditorService.SelectedExplorerNode;
-            if (selectedNode.NodeType != NodeType.ActionEventSoundBank && selectedNode.NodeType != NodeType.DialogueEvent && selectedNode.NodeType != NodeType.StateGroup)
-                return;
-
-            _eventHub.Publish(new ItemEditedEvent()); // Publish before removing to ensure that an item is still selected
-
-            RemoveData(selectedNode.NodeType);
-
-            _logger.Here().Information($"Edited {selectedNode.NodeType} row in: {selectedNode.Name}");
-        }
-
-        [RelayCommand] public void RemoveAudioProjectViewerDataGridRow()
-        {
-            var selectedNode = _audioEditorService.SelectedExplorerNode;
-            if (selectedNode.NodeType != NodeType.ActionEventSoundBank && selectedNode.NodeType != NodeType.DialogueEvent && selectedNode.NodeType != NodeType.StateGroup)
-                return;
-
-            RemoveData(selectedNode.NodeType);
-        }
-
-        private void RemoveData(NodeType nodeType)
-        {
-            var selectedRows = _audioEditorService.GetSelectedViewerRows();
-            foreach (var row in selectedRows)
-                _audioProjectUICommandFactory.Create(AudioProjectCommandAction.RemoveFromAudioProject, nodeType).Execute(row);
-
-            _eventHub.Publish(new SetEnablementEvent()); // Publish after removing to ensure that the enablement uses the update data
         }
 
         [RelayCommand] public void CopyRows()
@@ -300,7 +350,7 @@ namespace Editors.Audio.AudioEditor.AudioProjectViewer
         public void ResetDataGrid()
         {
             AudioProjectViewerDataGrid = new DataTable();
-            DataGridHelpers.ClearDataGridColumns(DataGridHelpers.GetDataGridByTag(AudioProjectViewerDataGridTag));
+            DataGridHelpers.ClearDataGridColumns(DataGridHelpers.GetDataGridFromTag(AudioProjectViewerDataGridTag));
         }
     }
 }

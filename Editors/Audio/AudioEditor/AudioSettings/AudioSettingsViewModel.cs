@@ -10,6 +10,7 @@ using Editors.Audio.Storage;
 using Shared.Core.Events;
 using static Editors.Audio.AudioEditor.AudioSettings.AudioSettings;
 
+// TODO: Some bug where the audio settings aren't updating right after multiple sounds are set after single previously being set
 namespace Editors.Audio.AudioEditor.AudioSettings
 {
     public partial class AudioSettingsViewModel : ObservableObject
@@ -70,22 +71,42 @@ namespace Editors.Audio.AudioEditor.AudioSettings
 
             SetInitialAudioSettings();
 
-            _eventHub.Register<NodeSelectedEvent>(this, OnSelectedNodeChanged);
-            _eventHub.Register<ItemEditedEvent>(this, OnItemEdited);
+            _eventHub.Register<ShowSettingsFromAudioProjectViewerCheckEvent>(this, CheckShowSettingsFromAudioProjectViewer);
             _eventHub.Register<AudioFilesSetEvent>(this, OnAudioFilesSet);
+
+            _eventHub.Register<NodeSelectedEvent>(this, OnSelectedNodeChanged);
+            _eventHub.Register<EditViewerRowEvent>(this, OnViewerRowEdited);
+        }
+
+        public void CheckShowSettingsFromAudioProjectViewer(ShowSettingsFromAudioProjectViewerCheckEvent resetAudioSettingsEvent)
+        {
+            if (ShowSettingsFromAudioProjectViewer)
+                ResetShowSettingsFromAudioProjectViewer();
         }
 
         public void OnAudioFilesSet(AudioFilesSetEvent audioFilesSetEvent)
         {
+            var audioFiles = audioFilesSetEvent.AudioFiles;
+            AudioFiles.Clear();
+
+            foreach (var wavFile in audioFiles)
+            {
+                _audioEditorService.AudioEditorViewModel.AudioSettingsViewModel.AudioFiles.Add(new AudioFile
+                {
+                    FileName = wavFile.Name,
+                    FilePath = wavFile.FilePath
+                });
+            }
+
+            SetAudioSettingsEnablementAndVisibility();
+            ResetShowSettingsFromAudioProjectViewer();
             StoreAudioSettings();
         }
 
-        public void OnItemEdited(ItemEditedEvent itemEditedEvent)
-        {
-            var selectedNode = _audioEditorService.SelectedExplorerNode;
-            if (selectedNode.NodeType != NodeType.ActionEventSoundBank && selectedNode.NodeType != NodeType.DialogueEvent && selectedNode.NodeType != NodeType.StateGroup)
-                return;
+        public void SetAudioFilesViaDrop(List<AudioFilesExplorer.TreeNode> audioFiles) => _eventHub.Publish(new AudioFilesSetEvent(audioFiles));
 
+        public void OnViewerRowEdited(EditViewerRowEvent itemEditedEvent)
+        {
             ShowSettingsFromAudioProjectViewerItem();
             SetAudioSettingsEnablementAndVisibility();
         }

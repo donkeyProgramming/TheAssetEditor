@@ -1,56 +1,71 @@
 ﻿using System.Data;
 using System.Linq;
 using Editors.Audio.AudioEditor.AudioProjectData;
-using Editors.Audio.AudioEditor.DataGrids;
+using Editors.Audio.AudioEditor.AudioProjectExplorer;
+using Editors.Audio.AudioEditor.Events;
 using Editors.Audio.Storage;
+using Shared.Core.Events;
 
-namespace Editors.Audio.AudioEditor.AudioProjectEditor.DataGrid
+namespace Editors.Audio.AudioEditor.DataGrids
 {
-    public class DialogueEventDataGridService : IAudioProjectEditorDataGridService
+    public class EditorDialogueEventDataGridService : IDataGridService
     {
+        private readonly IEventHub _eventHub;
         private readonly IAudioEditorService _audioEditorService;
         private readonly IAudioRepository _audioRepository;
 
-        public DialogueEventDataGridService(IAudioEditorService audioEditorService, IAudioRepository audioRepository)
+        public AudioProjectDataGrid DataGrid => AudioProjectDataGrid.Editor;
+        public NodeType NodeType => NodeType.DialogueEvent;
+
+        public EditorDialogueEventDataGridService(IEventHub eventHub, IAudioEditorService audioEditorService, IAudioRepository audioRepository)
         {
+            _eventHub = eventHub;
             _audioEditorService = audioEditorService;
             _audioRepository = audioRepository;
         }
 
-        public void LoadDataGrid()
+        public void LoadDataGrid(DataTable table)
         {
+            SetTableSchema();
             ConfigureDataGrid();
-            InitialiseDataGridData();
+            SetInitialDataGridData(table);
         }
 
-        public void ConfigureDataGrid()
+        public void SetTableSchema()
         {
-            var dataGrid = DataGridConfiguration.InitialiseDataGrid(_audioEditorService.AudioProjectEditorViewModel.AudioProjectEditorDataGridTag);
-
             var dialogueEvent = AudioProjectHelpers.GetDialogueEventFromName(_audioEditorService.AudioProject, _audioEditorService.SelectedExplorerNode.Name);
-
-            var stateGroupsCount = _audioRepository.StateGroupsLookupByDialogueEvent[dialogueEvent.Name].Count;
-            var columnWidth = 1.0 / (1 + stateGroupsCount);
-
-            var table = _audioEditorService.GetEditorDataGrid();
-
             var stateGroupsWithQualifiers = _audioRepository.QualifiedStateGroupLookupByStateGroupByDialogueEvent[dialogueEvent.Name];
             foreach (var stateGroupWithQualifier in stateGroupsWithQualifiers)
             {
                 var columnHeader = DataGridHelpers.AddExtraUnderscoresToString(stateGroupWithQualifier.Key);
-
-                if (!table.Columns.Contains(columnHeader))
-                    table.Columns.Add(new DataColumn(columnHeader, typeof(string)));
-
-                var states = DataGridHelpers.GetStatesForStateGroupColumn(_audioEditorService.AudioEditorViewModel, _audioRepository, _audioEditorService, stateGroupWithQualifier.Value);
-                var stateGroupColumn = DataGridConfiguration.CreateColumn(_audioEditorService.AudioEditorViewModel, columnHeader, columnWidth, DataGridColumnType.StateGroupEditableComboBox, states);
-                dataGrid.Columns.Add(stateGroupColumn);
+                var column = new DataColumn(columnHeader, typeof(string));
+                _eventHub.Publish(new AddEditorTableColumnEvent(column));
             }
         }
 
-        public void InitialiseDataGridData()
+        public void ConfigureDataGrid()
         {
-            var table = _audioEditorService.GetEditorDataGrid();
+            var dataGrid = DataGridHelpers.GetDataGridFromTag(_audioEditorService.AudioProjectEditorViewModel.AudioProjectEditorDataGridTag);
+            DataGridHelpers.ClearDataGridColumns(dataGrid);
+            DataGridHelpers.ClearDataGridContextMenu(dataGrid);
+
+            var dialogueEvent = AudioProjectHelpers.GetDialogueEventFromName(_audioEditorService.AudioProject, _audioEditorService.SelectedExplorerNode.Name);
+            var stateGroupsCount = _audioRepository.StateGroupsLookupByDialogueEvent[dialogueEvent.Name].Count;
+            var columnWidth = 1.0 / (1 + stateGroupsCount);
+
+            var stateGroupsWithQualifiers = _audioRepository.QualifiedStateGroupLookupByStateGroupByDialogueEvent[dialogueEvent.Name];
+            foreach (var stateGroupWithQualifier in stateGroupsWithQualifiers)
+            {
+                var states = DataGridHelpers.GetStatesForStateGroupColumn(_audioEditorService.AudioEditorViewModel, _audioRepository, _audioEditorService, stateGroupWithQualifier.Value);
+                var columnHeader = DataGridHelpers.AddExtraUnderscoresToString(stateGroupWithQualifier.Key);
+                var column = DataGridTemplates.CreateColumnTemplate(columnHeader, columnWidth);
+                column.CellTemplate = DataGridTemplates.CreateStatesComboBoxTemplate(_eventHub, columnHeader, states);
+                dataGrid.Columns.Add(column);
+            }
+        }
+
+        public void SetInitialDataGridData(DataTable table)
+        {
             var row = table.NewRow();
 
             var stateGroupsWithAnyState = _audioRepository.StatesLookupByStateGroup
@@ -58,8 +73,8 @@ namespace Editors.Audio.AudioEditor.AudioProjectEditor.DataGrid
                 .ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
 
             var dialogueEvent = AudioProjectHelpers.GetDialogueEventFromName(_audioEditorService.AudioProject, _audioEditorService.SelectedExplorerNode.Name);
-
             var stateGroupsWithQualifiers = _audioRepository.QualifiedStateGroupLookupByStateGroupByDialogueEvent[dialogueEvent.Name];
+
             foreach (var stateGroupWithQualifier in stateGroupsWithQualifiers)
             {
                 var columnName = DataGridHelpers.AddExtraUnderscoresToString(stateGroupWithQualifier.Key);
@@ -69,14 +84,7 @@ namespace Editors.Audio.AudioEditor.AudioProjectEditor.DataGrid
                     row[columnName] = "Any"; // Set the cell value to Any as the default value
             }
 
-            table.Rows.Add(row);
-        }
-
-        public void SetDataGridData()
-        {
-            var row = _audioEditorService.GetSelectedViewerRows()[0];
-            var table = _audioEditorService.GetEditorDataGrid();
-            table.ImportRow(row);
+            _eventHub.Publish(new AddEditorTableRowEvent(row));
         }
     }
 }

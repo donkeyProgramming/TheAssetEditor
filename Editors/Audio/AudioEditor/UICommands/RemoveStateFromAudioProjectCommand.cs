@@ -8,11 +8,11 @@ namespace Editors.Audio.AudioEditor.UICommands
 {
     public class RemoveStateFromAudioProjectCommand : IAudioProjectUICommand
     {
-        public AudioProjectCommandAction Action => AudioProjectCommandAction.RemoveFromAudioProject;
-        public NodeType NodeType => NodeType.StateGroup;
-
         private readonly IAudioEditorService _audioEditorService;
         private readonly IEventHub _eventHub;
+
+        public AudioProjectCommandAction Action => AudioProjectCommandAction.RemoveFromAudioProject;
+        public NodeType NodeType => NodeType.StateGroup;
 
         public RemoveStateFromAudioProjectCommand(IAudioEditorService audioEditorService, IEventHub eventHub)
         {
@@ -25,7 +25,7 @@ namespace Editors.Audio.AudioEditor.UICommands
             var stateGroup = AudioProjectHelpers.GetStateGroupFromName(_audioEditorService.AudioProject, _audioEditorService.SelectedExplorerNode.Name);
             var state = AudioProjectHelpers.GetStateFromRow(row, stateGroup);
             stateGroup.States.Remove(state);
-            _eventHub.Publish(new RemoveRowEvent(row));
+            _eventHub.Publish(new RemoveViewerTableRowEvent(row));
         }
     }
 }
