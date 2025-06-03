@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using Editors.Audio.AudioEditor.AudioProjectData;
+using Editors.Audio.AudioEditor;
 using Shared.GameFormats.Wwise.Enums;
 using Shared.GameFormats.Wwise.Hirc;
 using Shared.GameFormats.Wwise.Hirc.V136;

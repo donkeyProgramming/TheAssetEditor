@@ -7,7 +7,7 @@ using static Editors.Audio.GameSettings.Warhammer3.DialogueEvents;
 using static Editors.Audio.GameSettings.Warhammer3.SoundBanks;
 using static Editors.Audio.GameSettings.Warhammer3.StateGroups;
 
-namespace Editors.Audio.AudioEditor.AudioProjectData
+namespace Editors.Audio.AudioEditor
 {
     public class AudioProject
     {

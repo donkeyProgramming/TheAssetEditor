@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using Editors.Audio.AudioEditor.AudioProjectData;
+using Editors.Audio.AudioEditor;
 using Editors.Audio.Utility;
 
 namespace Editors.Audio.AudioProjectCompiler

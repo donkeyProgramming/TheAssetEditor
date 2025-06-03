@@ -9,7 +9,7 @@ using Editors.Audio.GameSettings.Warhammer3;
 using Editors.Audio.Storage;
 using static Editors.Audio.AudioEditor.AudioSettings.AudioSettings;
 
-namespace Editors.Audio.AudioEditor.AudioProjectData
+namespace Editors.Audio.AudioEditor
 {
     public class AudioProjectHelpers
     {
