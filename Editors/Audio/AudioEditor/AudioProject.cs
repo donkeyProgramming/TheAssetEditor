@@ -7,6 +7,8 @@ using static Editors.Audio.GameSettings.Warhammer3.DialogueEvents;
 using static Editors.Audio.GameSettings.Warhammer3.SoundBanks;
 using static Editors.Audio.GameSettings.Warhammer3.StateGroups;
 
+// TODO: Should these be split into multiple files?
+
 namespace Editors.Audio.AudioEditor
 {
     public class AudioProject

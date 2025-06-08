@@ -12,6 +12,7 @@ namespace Editors.Audio.AudioEditor.DataGrids
 
         public AudioProjectDataGrid DataGrid => AudioProjectDataGrid.Editor;
         public NodeType NodeType => NodeType.StateGroup;
+
         public EditorStateGroupDataGridService(IEventHub eventHub, IAudioEditorService audioEditorService)
         {
             _eventHub = eventHub;
@@ -27,21 +28,18 @@ namespace Editors.Audio.AudioEditor.DataGrids
 
         public void SetTableSchema()
         {
-            var stateGroup = AudioProjectHelpers.GetStateGroupFromName(_audioEditorService.AudioProject, _audioEditorService.SelectedExplorerNode.Name);
-            var columnHeader = DataGridHelpers.AddExtraUnderscoresToString(stateGroup.Name);
+            var columnHeader = DataGridTemplates.StateColumn;
             var column = new DataColumn(columnHeader, typeof(string));
             _eventHub.Publish(new AddEditorTableColumnEvent(column));
         }
 
         public void ConfigureDataGrid()
         {
-            var dataGrid = DataGridHelpers.GetDataGridFromTag(_audioEditorService.AudioProjectEditorViewModel.AudioProjectEditorDataGridTag);
+            var dataGrid = DataGridHelpers.GetDataGridFromTag(_audioEditorService.AudioProjectEditorDataGridTag);
             DataGridHelpers.ClearDataGridColumns(dataGrid);
             DataGridHelpers.ClearDataGridContextMenu(dataGrid);
 
-            var stateGroup = AudioProjectHelpers.GetStateGroupFromName(_audioEditorService.AudioProject, _audioEditorService.SelectedExplorerNode.Name);
-            var columnHeader = DataGridHelpers.AddExtraUnderscoresToString(stateGroup.Name);
-
+            var columnHeader = DataGridTemplates.StateColumn;
             var column = DataGridTemplates.CreateColumnTemplate(columnHeader, 1.0);
             column.CellTemplate = DataGridTemplates.CreateEditableTextBoxTemplate(_eventHub, columnHeader);
             dataGrid.Columns.Add(column);
@@ -49,9 +47,7 @@ namespace Editors.Audio.AudioEditor.DataGrids
 
         public void SetInitialDataGridData(DataTable table)
         {
-            var stateGroup = AudioProjectHelpers.GetStateGroupFromName(_audioEditorService.AudioProject, _audioEditorService.SelectedExplorerNode.Name);
-            var columnHeader = DataGridHelpers.AddExtraUnderscoresToString(stateGroup.Name);
-
+            var columnHeader = DataGridTemplates.StateColumn;
             var row = table.NewRow();
             row[columnHeader] = string.Empty;
             _eventHub.Publish(new AddEditorTableRowEvent(row));

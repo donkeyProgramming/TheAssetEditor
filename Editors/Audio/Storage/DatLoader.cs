@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using Editors.Audio.Utility;
-using Shared.Core.Misc;
 using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
 using Shared.Core.Settings;
@@ -61,7 +59,7 @@ namespace Editors.Audio.Storage
             };
         }
 
-        private static new Dictionary<string, Dictionary<uint, string>> BuildStateLookupByStateGroupByStateId(List<DatStateGroupsWithStates> unprocessedStateGroupsWithStates)
+        private static Dictionary<string, Dictionary<uint, string>> BuildStateLookupByStateGroupByStateId(List<DatStateGroupsWithStates> unprocessedStateGroupsWithStates)
         {
             var statesLookupByStateGroupByStateId = new Dictionary<string, Dictionary<uint, string>>();
             foreach (var unprocessedStateGroupWithStates in unprocessedStateGroupsWithStates)

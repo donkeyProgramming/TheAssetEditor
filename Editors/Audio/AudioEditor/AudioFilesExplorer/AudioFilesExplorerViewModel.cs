@@ -5,6 +5,7 @@ using System.Collections.Specialized;
 using System.Linq;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Editors.Audio.AudioEditor.AudioSettings;
 using Editors.Audio.AudioEditor.DataGrids;
 using Editors.Audio.AudioEditor.Events;
 using Editors.Audio.Utility;
@@ -57,16 +58,10 @@ namespace Editors.Audio.AudioEditor.AudioFilesExplorer
 
             CreateAudioFilesTree(editablePack);
 
-            _eventHub.Register<NodeSelectedEvent>(this, OnSelectedNodeChanged);
             _globalEventHub.Register<PackFileContainerFilesAddedEvent>(this, x => AudioFilesRefresh(x.Container));
             _globalEventHub.Register<PackFileContainerFilesRemovedEvent>(this, x => AudioFilesRefresh(x.Container));
             _globalEventHub.Register<PackFileContainerFolderRemovedEvent>(this, x => AudioFilesRefresh(x.Container));
-        }
-
-        private void OnSelectedNodeChanged(NodeSelectedEvent nodeSelectedEvent)
-        {
-            ResetButtonEnablement();
-            SetButtonEnablement();
+            _eventHub.Register<ExplorerNodeSelectedEvent>(this, OnSelectedExplorerNodeChanged);
         }
 
         private void AudioFilesRefresh(PackFileContainer packFileContainer)
@@ -74,6 +69,8 @@ namespace Editors.Audio.AudioEditor.AudioFilesExplorer
             AudioFilesTree.Clear();
             CreateAudioFilesTree(packFileContainer);
         }
+
+        private void OnSelectedExplorerNodeChanged(ExplorerNodeSelectedEvent e) => ResetButtonEnablement();
 
         private void OnSelectedTreeNodesChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
@@ -264,7 +261,18 @@ namespace Editors.Audio.AudioEditor.AudioFilesExplorer
 
         [RelayCommand] public void SetAudioFiles()
         {
-            _eventHub.Publish(new AudioFilesSetEvent(SelectedTreeNodes.ToList()));
+            var audioFiles = new ObservableCollection<AudioFile>();
+            foreach (var wavFile in SelectedTreeNodes)
+            {
+                audioFiles.Add(new AudioFile
+                {
+                    FileName = wavFile.Name,
+                    FilePath = wavFile.FilePath
+                });
+            }
+
+            _audioEditorService.AudioFiles = audioFiles;
+            _eventHub.Publish(new AudioFilesSetEvent(audioFiles));
         }
 
         [RelayCommand] public void PlayWavFile()

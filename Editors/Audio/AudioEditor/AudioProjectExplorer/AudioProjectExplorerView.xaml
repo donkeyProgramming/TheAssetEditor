@@ -77,7 +77,7 @@
                         ItemTemplate="{StaticResource EnumToStringTemplate}"
                         ItemsSource="{Binding DialogueEventPresets}" 
                         SelectedItem="{Binding SelectedDialogueEventPreset, Mode=TwoWay}"
-                        SelectionChanged="WatermarkComboBox_SelectionChanged"
+                        SelectionChanged="OnWatermarkComboBoxSelectionChanged"
                         IsEnabled="{Binding IsDialogueEventPresetFilterEnabled}"
                         Watermark="Select Dialogue Event Preset Filter" 
                         ToolTip="PLACEHOLDER"/>
@@ -175,7 +175,7 @@
 
             <TreeView 
                 ItemsSource="{Binding AudioProjectTree}"
-                SelectedItemChanged="TreeView_SelectedItemChanged"
+                SelectedItemChanged="OnTreeViewSelectedItemChanged"
                 Padding="0, 5, 0, 5">
 
                 <TreeView.Resources>

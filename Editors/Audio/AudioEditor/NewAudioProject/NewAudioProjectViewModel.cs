@@ -2,8 +2,10 @@
 using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Editors.Audio.AudioEditor.Events;
 using Serilog;
 using Shared.Core.ErrorHandling;
+using Shared.Core.Events;
 using Shared.Core.PackFiles;
 using Shared.Core.Services;
 using static Editors.Audio.GameSettings.Warhammer3.Languages;
@@ -14,6 +16,7 @@ namespace Editors.Audio.AudioEditor.NewAudioProject
     {
         readonly ILogger _logger = Logging.Create<NewAudioProjectViewModel>();
 
+        private readonly IEventHub _eventHub;
         private readonly IPackFileService _packFileService;
         private readonly IAudioEditorService _audioEditorService;
         private readonly IStandardDialogs _standardDialogs;
@@ -32,8 +35,9 @@ namespace Editors.Audio.AudioEditor.NewAudioProject
         [ObservableProperty] private bool _isLanguageSelected;
         [ObservableProperty] private bool _isOkButtonEnabled;
 
-        public NewAudioProjectViewModel(IPackFileService packFileService, IAudioEditorService audioEditorService, IStandardDialogs standardDialogs)
+        public NewAudioProjectViewModel(IEventHub eventHub, IPackFileService packFileService, IAudioEditorService audioEditorService, IStandardDialogs standardDialogs)
         {
+            _eventHub = eventHub;
             _packFileService = packFileService;
             _audioEditorService = audioEditorService;
             _standardDialogs = standardDialogs;
@@ -85,12 +89,14 @@ namespace Editors.Audio.AudioEditor.NewAudioProject
             }
 
             // Reset and initialise data
-            _audioEditorService.AudioEditorViewModel.ResetAudioEditorData();
+            _eventHub.Publish(new ResetViewModelDataEvent());
             _audioEditorService.ResetAudioProject();
-            _audioEditorService.AudioEditorViewModel.InitialiseAudioEditorData();
+            _eventHub.Publish(new InitialiseViewModelDataEvent());
+
+            _eventHub.Publish(new CreateAudioProjectTreeEvent());
 
             // Initialise AudioProject according to the Audio Project settings selected
-            _audioEditorService.InitialiseAudioProject(AudioProjectFileName, AudioProjectDirectory, GameLanguageStringLookup[SelectedLanguage]);
+            _audioEditorService.InitialiseAudioProject(_eventHub, AudioProjectFileName, AudioProjectDirectory, GameLanguageStringLookup[SelectedLanguage]);
 
             // Add the Audio Project to the PackFile
             var audioProject = AudioProject.GetAudioProject(_audioEditorService.AudioProject);

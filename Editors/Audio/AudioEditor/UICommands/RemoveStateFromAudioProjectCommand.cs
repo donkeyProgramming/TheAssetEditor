@@ -22,7 +22,7 @@ namespace Editors.Audio.AudioEditor.UICommands
         public void Execute(DataRow row)
         {
             var stateGroup = AudioProjectHelpers.GetStateGroupFromName(_audioEditorService.AudioProject, _audioEditorService.SelectedExplorerNode.Name);
-            var state = AudioProjectHelpers.GetStateFromRow(row, stateGroup);
+            var state = AudioProjectHelpers.GetStateFromRow(stateGroup, row);
             stateGroup.States.Remove(state);
             _eventHub.Publish(new RemoveViewerTableRowEvent(row));
         }

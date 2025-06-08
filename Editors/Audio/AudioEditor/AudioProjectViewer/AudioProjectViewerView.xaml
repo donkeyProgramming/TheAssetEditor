@@ -65,7 +65,7 @@
             Tag="{Binding AudioProjectViewerDataGridTag}" 
             AutoGenerateColumns="False" 
             VerticalScrollBarVisibility="Auto" 
-            SelectionChanged="AudioEditorDataGrid_SelectionChanged"
+            SelectionChanged="OnDataGridSelectionChanged"
             CanUserAddRows="False"
             ItemsSource="{Binding AudioProjectViewerDataGrid.DefaultView}"
             EnableRowVirtualization="True" 

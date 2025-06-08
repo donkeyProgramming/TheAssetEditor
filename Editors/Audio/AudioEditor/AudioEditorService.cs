@@ -6,18 +6,17 @@ using System.Linq;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using Editors.Audio.AudioEditor.AudioFilesExplorer;
-using Editors.Audio.AudioEditor.AudioProjectEditor;
-using Editors.Audio.AudioEditor.AudioProjectExplorer;
-using Editors.Audio.AudioEditor.AudioProjectViewer;
 using Editors.Audio.AudioEditor.AudioSettings;
 using Editors.Audio.AudioEditor.DataGrids;
+using Editors.Audio.AudioEditor.Events;
 using Editors.Audio.AudioProjectCompiler;
 using Serilog;
 using Shared.Core.ErrorHandling;
+using Shared.Core.Events;
 using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
 using Shared.Core.Services;
+using static Editors.Audio.GameSettings.Warhammer3.DialogueEvents;
 using TreeNode = Editors.Audio.AudioEditor.AudioProjectExplorer.TreeNode;
 
 namespace Editors.Audio.AudioEditor
@@ -25,31 +24,24 @@ namespace Editors.Audio.AudioEditor
     public interface IAudioEditorService
     {
         AudioProject AudioProject { get; set; }
+
+        ObservableCollection<TreeNode> AudioProjectTree { get; set; }
         TreeNode SelectedExplorerNode { get; set; }
-        ObservableCollection<AudioFile> AudioFiles { get; set; }
-        IAudioSettings AudioSettings { get; set; }
+        DialogueEventPreset? SelectedDialogueEventPreset { get; set; }
+
         string AudioProjectEditorDataGridTag { get; set; }
+        bool ShowModdedStatesOnly { get; set; }
+        IAudioSettings AudioSettings { get; set; }
+        ObservableCollection<AudioFile> AudioFiles { get; set; }
+
         string AudioProjectViewerDataGridTag { get; set; }
+        List<DataRow> SelectedViewerRows { get; set; }
 
-
-
-
-        AudioEditorViewModel AudioEditorViewModel { get; set; }
-        AudioProjectExplorerViewModel AudioProjectExplorerViewModel { get; set; }
-        AudioFilesExplorerViewModel AudioFilesExplorerViewModel { get; set; }
-        AudioProjectEditorViewModel AudioProjectEditorViewModel { get; set; }
-        AudioProjectViewerViewModel AudioProjectViewerViewModel { get; set; }
-        AudioSettingsViewModel AudioSettingsViewModel { get; set; }
-        Dictionary<string, List<string>> ModdedStatesByStateGroupLookup { get; set; }
         void SaveAudioProject(AudioProject audioProject, string audioProjectFileName, string audioProjectDirectoryPath);
-        void LoadAudioProject(AudioEditorViewModel audioEditorViewModel);
-        void InitialiseAudioProject(string fileName, string directory, string language);
+        void LoadAudioProject(IEventHub eventHub, AudioEditorViewModel audioEditorViewModel);
+        void InitialiseAudioProject(IEventHub eventHub, string fileName, string directory, string language);
         void CompileAudioProject();
-        void BuildModdedStatesByStateGroupLookup(List<StateGroup> moddedStateGroups, Dictionary<string, List<string>> moddedStatesByStateGroupLookup);
         void ResetAudioProject();
-        DataTable GetEditorDataGrid();
-        DataTable GetViewerDataGrid();
-        List<DataRow> GetSelectedViewerRows();
     }
 
     public class AudioEditorService : IAudioEditorService
@@ -86,21 +78,18 @@ namespace Editors.Audio.AudioEditor
         }
 
         public AudioProject AudioProject { get; set; }
+
+        public ObservableCollection<TreeNode> AudioProjectTree { get; set; }
         public TreeNode SelectedExplorerNode { get; set; }
-        public ObservableCollection<AudioFile> AudioFiles { get; set; } = [];
-        public IAudioSettings AudioSettings { get; set; }
+        public DialogueEventPreset? SelectedDialogueEventPreset { get; set; }
+
         public string AudioProjectEditorDataGridTag { get; set; } = "AudioProjectEditorDataGrid";
+        public bool ShowModdedStatesOnly { get; set; }
+        public IAudioSettings AudioSettings { get; set; }
+        public ObservableCollection<AudioFile> AudioFiles { get; set; } = [];
+
         public string AudioProjectViewerDataGridTag { get; set; } = "AudioProjectViewerDataGrid";
-
-
-
-        public AudioEditorViewModel AudioEditorViewModel { get; set; }
-        public AudioProjectExplorerViewModel AudioProjectExplorerViewModel { get; set; }
-        public AudioFilesExplorerViewModel AudioFilesExplorerViewModel { get; set; }
-        public AudioProjectEditorViewModel AudioProjectEditorViewModel { get; set; }
-        public AudioProjectViewerViewModel AudioProjectViewerViewModel { get; set; }
-        public AudioSettingsViewModel AudioSettingsViewModel { get; set; }
-        public Dictionary<string, List<string>> ModdedStatesByStateGroupLookup { get; set; } = []; // TODO Replace this as it can just be extracted from the audio project directly when needed.
+        public List<DataRow> SelectedViewerRows { get; set; }
 
         public void SaveAudioProject(AudioProject audioProject, string audioProjectFileName, string audioProjectDirectoryPath)
         {
@@ -119,7 +108,7 @@ namespace Editors.Audio.AudioEditor
             _logger.Here().Information($"Saved Audio Project file: {audioProjectFilePath}");
         }
 
-        public void LoadAudioProject(AudioEditorViewModel audioEditorViewModel)
+        public void LoadAudioProject(IEventHub eventHub, AudioEditorViewModel audioEditorViewModel)
         {
             var result = _standardDialogs.DisplayBrowseDialog([".aproj"]);
             if (result.Result)
@@ -131,10 +120,8 @@ namespace Editors.Audio.AudioEditor
                 var bytes = file.DataSource.ReadData();
                 var audioProjectJson = Encoding.UTF8.GetString(bytes);
 
-                audioEditorViewModel.AudioProjectExplorerViewModel.AudioProjectExplorerLabel = $"Audio Project Explorer - {DataGridHelpers.AddExtraUnderscoresToString(fileName)}";
-
                 // Reset data
-                audioEditorViewModel.ResetAudioEditorData();
+                eventHub.Publish(new ResetViewModelDataEvent());
                 ResetAudioProject();
 
                 // Set the AudioProject
@@ -146,14 +133,11 @@ namespace Editors.Audio.AudioEditor
                     loadedAudioProject.Language = "english(uk)"; // TODO: maybe replace this with the selected language in the app settings
 
                 // Initialise a 'full' Audio Project to include unused stuff
-                InitialiseAudioProject(loadedAudioProject.FileName, loadedAudioProject.DirectoryPath, loadedAudioProject.Language);
+                InitialiseAudioProject(eventHub, loadedAudioProject.FileName, loadedAudioProject.DirectoryPath, loadedAudioProject.Language);
                 MergeSavedAudioProjectIntoAudioProjectWithUnusedItems(loadedAudioProject);
 
                 // Initialise data after AudioProject is set so it uses the correct instance
-                audioEditorViewModel.InitialiseAudioEditorData();
-
-                // Get the Modded States and prepare them for being added to the DataGrid ComboBoxes
-                BuildModdedStatesByStateGroupLookup(AudioProject.StateGroups, ModdedStatesByStateGroupLookup);
+                eventHub.Publish(new InitialiseViewModelDataEvent());
 
                 _integrityChecker.CheckAudioProjectDialogueEventIntegrity(this);
 
@@ -161,16 +145,17 @@ namespace Editors.Audio.AudioEditor
             }
         }
 
-        public void InitialiseAudioProject(string fileName, string directory, string language)
+        public void InitialiseAudioProject(IEventHub eventHub, string fileName, string directory, string language)
         {
-            AudioEditorViewModel.AudioProjectExplorerViewModel.AudioProjectExplorerLabel = $"Audio Project Explorer - {DataGridHelpers.AddExtraUnderscoresToString(fileName)}";
-
             AudioProject = AudioProject.CreateAudioProject();
             AudioProject.FileName = fileName;
             AudioProject.DirectoryPath = directory;
             AudioProject.Language = language;
 
-            AudioEditorViewModel.AudioProjectExplorerViewModel.CreateAudioProjectTree();
+            var label = $"Audio Project Explorer - {DataGridHelpers.AddExtraUnderscoresToString(fileName)}";
+            eventHub.Publish(new SetAudioProjectExplorerLabelEvent(label));
+
+            eventHub.Publish(new CreateAudioProjectTreeEvent());
         }
 
         public void CompileAudioProject()
@@ -213,28 +198,6 @@ namespace Editors.Audio.AudioEditor
             _datGenerator.GenerateDatFiles(audioProject, audioProjectFileName);
 
             SaveCompiledAudioProjectToPack(audioProject);
-        }
-
-        public void BuildModdedStatesByStateGroupLookup(List<StateGroup> moddedStateGroups, Dictionary<string, List<string>> moddedStatesByStateGroupLookup)
-        {
-            if (moddedStatesByStateGroupLookup == null)
-                moddedStatesByStateGroupLookup = [];
-            else
-                moddedStatesByStateGroupLookup.Clear();
-
-            foreach (var stateGroup in moddedStateGroups)
-            {
-                if (stateGroup.States != null && stateGroup.States.Count > 0)
-                {
-                    foreach (var state in stateGroup.States)
-                    {
-                        if (!moddedStatesByStateGroupLookup.ContainsKey(stateGroup.Name))
-                            moddedStatesByStateGroupLookup[stateGroup.Name] = new List<string>();
-
-                        moddedStatesByStateGroupLookup[stateGroup.Name].Add(state.Name);
-                    }
-                }
-            }
         }
 
         // The Audio Project Explorer displays the entire Audio Project including unused items, but we only save the used items to the Audio Project file
@@ -320,21 +283,6 @@ namespace Editors.Audio.AudioEditor
         public void ResetAudioProject()
         {
             AudioProject = new AudioProject();
-        }
-
-        public DataTable GetEditorDataGrid()
-        {
-            return AudioProjectEditorViewModel.AudioProjectEditorDataGrid;
-        }
-
-        public DataTable GetViewerDataGrid()
-        {
-            return AudioProjectViewerViewModel.AudioProjectViewerDataGrid;
-        }
-
-        public List<DataRow> GetSelectedViewerRows()
-        {
-            return AudioProjectViewerViewModel._selectedDataGridRows;
         }
     }
 }

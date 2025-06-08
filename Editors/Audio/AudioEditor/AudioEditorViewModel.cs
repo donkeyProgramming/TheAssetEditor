@@ -1,14 +1,14 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
+﻿using System.Windows.Input;
+using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Editors.Audio.AudioEditor.AudioFilesExplorer;
 using Editors.Audio.AudioEditor.AudioProjectEditor;
 using Editors.Audio.AudioEditor.AudioProjectExplorer;
 using Editors.Audio.AudioEditor.AudioProjectViewer;
 using Editors.Audio.AudioEditor.AudioSettings;
+using Editors.Audio.AudioEditor.Events;
 using Editors.Audio.AudioEditor.UICommands;
 using Shared.Core.Events;
-using Shared.Core.PackFiles;
-using Shared.Core.Services;
 using Shared.Core.ToolCreation;
 using static Editors.Audio.GameSettings.Warhammer3.DialogueEvents;
 
@@ -24,28 +24,28 @@ namespace Editors.Audio.AudioEditor
         public AudioSettingsViewModel AudioSettingsViewModel { get; }
 
         private readonly IUiCommandFactory _uiCommandFactory;
-        private readonly IPackFileService _packFileService;
-        private readonly IStandardDialogs _standardDialogs;
+        private readonly IAudioProjectUICommandFactory _audioProjectUICommandFactory;
+        private readonly IEventHub _eventHub;
         private readonly IAudioEditorService _audioEditorService;
         private readonly IntegrityChecker _integrityChecker;
 
         public string DisplayName { get; set; } = "Audio Editor";
 
         public AudioEditorViewModel(
-            IUiCommandFactory uiCommandFactory,
             AudioProjectExplorerViewModel audioProjectExplorerViewModel,
             AudioFilesExplorerViewModel audioFilesExplorerViewModel,
             AudioProjectEditorViewModel audioProjectEditorViewModel,
             AudioProjectViewerViewModel audioProjectViewerViewModel,
             AudioSettingsViewModel audioSettingsViewModel,
-            IPackFileService packFileService,
-            IStandardDialogs standardDialogs,
+            IUiCommandFactory uiCommandFactory,
+            IAudioProjectUICommandFactory audioProjectUICommandFactory,
+            IEventHub eventHub,
             IAudioEditorService audioEditorService,
             IntegrityChecker integrityChecker)
         {
             _uiCommandFactory = uiCommandFactory;
-            _packFileService = packFileService;
-            _standardDialogs = standardDialogs;
+            _audioProjectUICommandFactory = audioProjectUICommandFactory;
+            _eventHub = eventHub;
             _audioEditorService = audioEditorService;
             _integrityChecker = integrityChecker;
 
@@ -55,9 +55,7 @@ namespace Editors.Audio.AudioEditor
             AudioProjectViewerViewModel = audioProjectViewerViewModel;
             AudioSettingsViewModel = audioSettingsViewModel;
 
-            InitialiseAudioEditorData();
-
-            InitialiseAudioEditorService();
+            _eventHub.Publish(new InitialiseViewModelDataEvent());
 
             _integrityChecker.CheckDialogueEventIntegrity(DialogueEventData);
         }
@@ -75,7 +73,7 @@ namespace Editors.Audio.AudioEditor
 
         [RelayCommand] public void LoadAudioProject()
         {
-            _audioEditorService.LoadAudioProject(this);
+            _audioEditorService.LoadAudioProject(_eventHub, this);
         }
 
         [RelayCommand] public void CompileAudioProject()
@@ -88,38 +86,34 @@ namespace Editors.Audio.AudioEditor
             _uiCommandFactory.Create<OpenAudioProjectConverterWindowCommand>().Execute();
         }
 
-        public void InitialiseAudioEditorData()
+        public void OnPreviewKeyDown(KeyEventArgs e)
         {
-            AudioProjectEditorViewModel.AudioProjectEditorDataGrid = new();
-            AudioProjectViewerViewModel.AudioProjectViewerDataGrid = new();
-            AudioProjectViewerViewModel._selectedDataGridRows = [];
-            AudioProjectViewerViewModel._copiedRows = [];
-            AudioProjectExplorerViewModel.DialogueEventPresets = [];
-        }
+            if (Keyboard.Modifiers == ModifierKeys.Control)
+            {
+                if (e.Key == Key.C)
+                {
+                    _uiCommandFactory.Create<CopyRowsCommand>().Execute();
+                    e.Handled = true;
+                }
+                else if (e.Key == Key.V)
+                {
+                    _uiCommandFactory.Create<PasteRowsCommand>().Execute();
+                    e.Handled = true;
+                }
+            }
 
-        private void InitialiseAudioEditorService()
-        {
-            _audioEditorService.AudioEditorViewModel = this;
-            _audioEditorService.AudioProjectExplorerViewModel = AudioProjectExplorerViewModel;
-            _audioEditorService.AudioFilesExplorerViewModel = AudioFilesExplorerViewModel;
-            _audioEditorService.AudioProjectEditorViewModel = AudioProjectEditorViewModel;
-            _audioEditorService.AudioProjectViewerViewModel = AudioProjectViewerViewModel;
-            _audioEditorService.AudioSettingsViewModel = AudioSettingsViewModel;
-        }
+            if (e.Key == Key.Delete)
+            {
+                foreach (var row in _audioEditorService.SelectedViewerRows)
+                    _audioProjectUICommandFactory.Create(AudioProjectCommandAction.RemoveFromAudioProject, AudioProjectExplorer.NodeType.DialogueEvent).Execute(row);
 
-        public void ResetAudioEditorData()
-        {
-            AudioProjectEditorViewModel.AudioProjectEditorDataGrid = null;
-            AudioProjectViewerViewModel.AudioProjectViewerDataGrid = null;
-            AudioProjectViewerViewModel._selectedDataGridRows = null;
-            AudioProjectViewerViewModel._copiedRows = null;
-            AudioProjectExplorerViewModel._selectedAudioProjectTreeNode = null;
-            AudioProjectExplorerViewModel.AudioProjectTree.Clear();
+                e.Handled = true;
+            }
         }
 
         public void Close()
         {
-            ResetAudioEditorData();
+            _eventHub.Publish(new ResetViewModelDataEvent());
             _audioEditorService.ResetAudioProject();
         }
     }

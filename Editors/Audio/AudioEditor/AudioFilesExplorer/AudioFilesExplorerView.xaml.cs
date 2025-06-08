@@ -10,7 +10,7 @@ namespace Editors.Audio.AudioEditor.AudioFilesExplorer
             InitializeComponent();
         }
 
-        private void ClearButtonClick(object sender, RoutedEventArgs e)
+        private void OnClearButtonClick(object sender, RoutedEventArgs e)
         {
             FilterTextBoxItem.Focus();
         }

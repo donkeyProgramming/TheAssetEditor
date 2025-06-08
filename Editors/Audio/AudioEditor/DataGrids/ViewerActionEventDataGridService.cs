@@ -28,7 +28,7 @@ namespace Editors.Audio.AudioEditor.DataGrids
 
         public void SetTableSchema()
         {
-            var columnHeader = DataGridTemplates.EventNameColumn;
+            var columnHeader = DataGridTemplates.EventColumn;
             var column = new DataColumn(columnHeader, typeof(string));
             _eventHub.Publish(new AddViewerTableColumnEvent(column));
         }
@@ -39,7 +39,7 @@ namespace Editors.Audio.AudioEditor.DataGrids
             DataGridHelpers.ClearDataGridColumns(dataGrid);
             DataGridHelpers.ClearDataGridContextMenu(dataGrid);
 
-            var columnHeader = DataGridTemplates.EventNameColumn;
+            var columnHeader = DataGridTemplates.EventColumn;
             var columnsCount = 2;
             var columnWidth = 1.0 / columnsCount;
 
@@ -54,7 +54,7 @@ namespace Editors.Audio.AudioEditor.DataGrids
             foreach (var actionEvent in soundBank.ActionEvents)
             {
                 var row = table.NewRow();
-                row[DataGridTemplates.EventNameColumn] = actionEvent.Name;
+                row[DataGridTemplates.EventColumn] = actionEvent.Name;
                 _eventHub.Publish(new AddViewerTableRowEvent(row));
             }
         }

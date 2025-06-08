@@ -22,7 +22,7 @@ namespace Editors.Audio.AudioEditor.UICommands
         public void Execute(DataRow row)
         {
             var soundBank = AudioProjectHelpers.GetSoundBankFromName(_audioEditorService.AudioProject, _audioEditorService.SelectedExplorerNode.Name);
-            var actionEvent = AudioProjectHelpers.GetActionEventFromRow(row, soundBank);
+            var actionEvent = AudioProjectHelpers.GetActionEventFromRow(_audioEditorService.AudioProject, row);
             soundBank.ActionEvents.Remove(actionEvent);
             _eventHub.Publish(new RemoveViewerTableRowEvent(row));
         }

@@ -58,14 +58,16 @@ namespace Editors.Audio.AudioEditor.DataGrids
                 dataGrid.ContextMenu.Items.Clear();
         }
 
-        public static List<string> GetStatesForStateGroupColumn(AudioEditorViewModel audioEditorViewModel, IAudioRepository audioRepository, IAudioEditorService audioEditorService, string stateGroup)
+        public static List<string> GetStatesForStateGroupColumn(IAudioEditorService audioEditorService, IAudioRepository audioRepository, string stateGroup)
         {
             var states = new List<string>();
-            var moddedStates = GetModdedStates(audioEditorService, stateGroup);
+            var moddedStates = audioEditorService.AudioProject.StateGroups
+                .SelectMany(stateGroup => stateGroup.States)
+                .Select(state => state.Name);
             var vanillaStates = audioRepository.StatesLookupByStateGroup[stateGroup];
 
             // Display the required states in the ComboBox
-            if (audioEditorViewModel.AudioProjectEditorViewModel.ShowModdedStatesOnly && StateGroups.ModdedStateGroups.Contains(stateGroup))
+            if (audioEditorService.ShowModdedStatesOnly && StateGroups.ModdedStateGroups.Contains(stateGroup))
             {
                 states.Add("Any"); // We still want the "Any" state to show so add it in manually.
                 states.AddRange(moddedStates);
@@ -80,19 +82,6 @@ namespace Editors.Audio.AudioEditor.DataGrids
             }
 
             return states;
-        }
-
-        private static List<string> GetModdedStates(IAudioEditorService audioEditorService, string stateGroup)
-        {
-            var moddedStates = new List<string>();
-
-            if (audioEditorService.ModdedStatesByStateGroupLookup.TryGetValue(stateGroup, out var audioProjectModdedStates))
-            {
-                moddedStates.AddRange(audioProjectModdedStates);
-                return moddedStates;
-            }
-
-            return moddedStates;
         }
     }
 }

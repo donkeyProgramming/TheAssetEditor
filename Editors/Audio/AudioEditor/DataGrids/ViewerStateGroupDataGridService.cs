@@ -27,8 +27,7 @@ namespace Editors.Audio.AudioEditor.DataGrids
 
         public void SetTableSchema()
         {
-            var stateGroup = AudioProjectHelpers.GetStateGroupFromName(_audioEditorService.AudioProject, _audioEditorService.SelectedExplorerNode.Name);
-            var columnHeader = DataGridHelpers.AddExtraUnderscoresToString(stateGroup.Name);
+            var columnHeader = DataGridTemplates.StateColumn;
             var column = new DataColumn(columnHeader, typeof(string));
             _eventHub.Publish(new AddViewerTableColumnEvent(column));
         }
@@ -39,9 +38,7 @@ namespace Editors.Audio.AudioEditor.DataGrids
             DataGridHelpers.ClearDataGridColumns(dataGrid);
             DataGridHelpers.ClearDataGridContextMenu(dataGrid);
 
-            var stateGroup = AudioProjectHelpers.GetStateGroupFromName(_audioEditorService.AudioProject, _audioEditorService.SelectedExplorerNode.Name);
-            var columnHeader = DataGridHelpers.AddExtraUnderscoresToString(stateGroup.Name);
-
+            var columnHeader = DataGridTemplates.StateColumn;
             var column = DataGridTemplates.CreateColumnTemplate(columnHeader, 1.0);
             column.CellTemplate = DataGridTemplates.CreateReadOnlyTextBlockTemplate(columnHeader);
             dataGrid.Columns.Add(column);
@@ -50,7 +47,7 @@ namespace Editors.Audio.AudioEditor.DataGrids
         public void SetInitialDataGridData(DataTable table)
         {
             var stateGroup = AudioProjectHelpers.GetStateGroupFromName(_audioEditorService.AudioProject, _audioEditorService.SelectedExplorerNode.Name);
-            var columnHeader = DataGridHelpers.AddExtraUnderscoresToString(stateGroup.Name);
+            var columnHeader = DataGridTemplates.StateColumn;
 
             foreach (var state in stateGroup.States)
             {

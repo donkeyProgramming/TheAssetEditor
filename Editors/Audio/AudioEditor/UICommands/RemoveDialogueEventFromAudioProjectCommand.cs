@@ -25,7 +25,7 @@ namespace Editors.Audio.AudioEditor.UICommands
         public void Execute(DataRow row)
         {
             var dialogueEvent = AudioProjectHelpers.GetDialogueEventFromName(_audioEditorService.AudioProject, _audioEditorService.SelectedExplorerNode.Name);
-            var statePath = AudioProjectHelpers.GetStatePathFromRow(_audioRepository, row, dialogueEvent);
+            var statePath = AudioProjectHelpers.GetStatePathFromRow(_audioRepository, dialogueEvent, row);
             if (statePath != null)
             {
                 dialogueEvent.StatePaths.Remove(statePath);

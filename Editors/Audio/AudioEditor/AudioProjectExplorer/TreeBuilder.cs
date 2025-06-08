@@ -132,7 +132,7 @@ namespace Editors.Audio.AudioEditor.AudioProjectExplorer
             }
         }
 
-        public static void AddFilteredDialogueEventsToSoundBankTreeViewItems(IAudioEditorService audioEditorService, AudioProjectExplorerViewModel audioProjectExplorerViewModel, string soundBankName, DialogueEventPreset? dialogueEventPreset)
+        public static void AddFilteredDialogueEventsToSoundBankTreeViewItems(IAudioEditorService audioEditorService, string soundBankName, DialogueEventPreset? dialogueEventPreset)
         {
             var filteredDialogueEventNames = DialogueEventData
                 .Where(dialogueEvent => GetSoundBankSubTypeString(dialogueEvent.SoundBank) == audioEditorService.SelectedExplorerNode.Name
@@ -140,8 +140,7 @@ namespace Editors.Audio.AudioEditor.AudioProjectExplorer
                 .Select(dialogueEvent => dialogueEvent.Name)
                 .ToHashSet();
 
-            var soundBank = TreeNode.GetAudioProjectTreeNodeFromName(audioProjectExplorerViewModel.AudioProjectTree, soundBankName);
-
+            var soundBank = TreeNode.GetNodeFromName(audioEditorService.AudioProjectTree, soundBankName);
             foreach (var dialogueEvent in soundBank.Children)
             {
                 if (filteredDialogueEventNames.Contains(dialogueEvent.Name))
@@ -157,7 +156,7 @@ namespace Editors.Audio.AudioEditor.AudioProjectExplorer
 
             if (!showEditedAudioProjectItemsOnly)
             {
-                var dialogueEventsNode = TreeNode.GetAudioProjectTreeNodeFromName(audioProjectTree, "Dialogue Events");
+                var dialogueEventsNode = TreeNode.GetNodeFromName(audioProjectTree, "Dialogue Events");
 
                 if (dialogueEventsNode == null)
                     return;
@@ -241,6 +240,8 @@ namespace Editors.Audio.AudioEditor.AudioProjectExplorer
                     parentNode.IsVisible = false;
             }
         }
+
+        // Move GetSoundBanks and GetStates into the helpers class / their relating classes in the data model.
 
         private static List<SoundBank> GetSoundBanks(IAudioEditorService audioEditorService, bool showEditedAudioProjectItemsOnly, Wh3SoundBankType gameSoundBankType)
         {

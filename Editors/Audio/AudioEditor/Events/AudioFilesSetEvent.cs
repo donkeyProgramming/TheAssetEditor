@@ -1,7 +1,7 @@
-﻿using System.Collections.Generic;
-using Editors.Audio.AudioEditor.AudioFilesExplorer;
+﻿using System.Collections.ObjectModel;
+using Editors.Audio.AudioEditor.AudioSettings;
 
 namespace Editors.Audio.AudioEditor.Events
 {
-    public record AudioFilesSetEvent(List<TreeNode> AudioFiles);
+    public record AudioFilesSetEvent(ObservableCollection<AudioFile> AudioFiles);
 }

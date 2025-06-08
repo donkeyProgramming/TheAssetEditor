@@ -4,6 +4,7 @@ using static Editors.Audio.GameSettings.Warhammer3.DialogueEvents;
 
 namespace Editors.Audio.AudioEditor.AudioProjectExplorer
 {
+    // TODO: Change these to DialogueEventSoundBanksContainer and ActionEventSoundBanksContainer
     public enum NodeType
     {
         ActionEventsContainer,
@@ -26,19 +27,47 @@ namespace Editors.Audio.AudioEditor.AudioProjectExplorer
         [ObservableProperty] public string _presetFilterDisplayText;
         [ObservableProperty] public DialogueEventPreset? _presetFilter = DialogueEventPreset.ShowAll;
 
-        public static TreeNode GetAudioProjectTreeNodeFromName(ObservableCollection<TreeNode> audioProjectTree, string nodeName)
+        public static TreeNode GetNodeFromName(ObservableCollection<TreeNode> audioProjectTree, string nodeName)
         {
             foreach (var node in audioProjectTree)
             {
                 if (node.Name == nodeName)
                     return node;
 
-                var childNode = GetAudioProjectTreeNodeFromName(node.Children, nodeName);
+                var childNode = GetNodeFromName(node.Children, nodeName);
                 if (childNode != null)
                     return childNode;
             }
 
             return null;
+        }
+
+        public bool IsActionEventSoundBank()
+        {
+            if (NodeType == NodeType.ActionEventSoundBank)
+                return true;
+            return false;
+        }
+
+        public bool IsDialogueEventSoundBank()
+        {
+            if (NodeType == NodeType.DialogueEventSoundBank)
+                return true;
+            return false;
+        }
+
+        public bool IsDialogueEvent()
+        {
+            if (NodeType == NodeType.DialogueEvent)
+                return true;
+            return false;
+        }
+
+        public bool IsStateGroup()
+        {
+            if (NodeType == NodeType.StateGroup)
+                return true;
+            return false;
         }
     }
 }

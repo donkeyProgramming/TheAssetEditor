@@ -113,7 +113,7 @@
                         VerticalContentAlignment="Center"
                         HorizontalContentAlignment="Center"
                         VerticalAlignment="Center"
-                        Click="ClearButtonClick" 
+                        Click="OnClearButtonClick" 
                         Command="{Binding ClearTextCommand}">
                         
                         <Button.Template>

@@ -1,7 +1,5 @@
-﻿using System.Collections.Generic;
-using System.ComponentModel;
+﻿using System.ComponentModel;
 using System.Data;
-using System.Diagnostics;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
@@ -16,26 +14,25 @@ namespace Editors.Audio.AudioEditor.AudioProjectViewer
         public AudioProjectViewerView()
         {
             InitializeComponent();
-            Loaded += AudioProjectViewerView_Loaded;
+            Loaded += OnLoaded;
         }
 
-        private void AudioProjectViewerView_Loaded(object sender, RoutedEventArgs e)
+        private void OnLoaded(object sender, RoutedEventArgs e)
         {
             if (DesignerProperties.GetIsInDesignMode(new DependencyObject()))
                 return;
 
             var dataGridTag = ViewModel?.AudioProjectViewerDataGridTag;
             var dataGrid = DataGridHelpers.GetDataGridFromTag(dataGridTag);
-            dataGrid.SelectionChanged += AudioEditorDataGrid_SelectionChanged;
+            dataGrid.SelectionChanged += OnDataGridSelectionChanged;
         }
 
-        // Detects when a row in the DataGrid is selected
-        private void AudioEditorDataGrid_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        private void OnDataGridSelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            var dataGrid = sender as System.Windows.Controls.DataGrid;
-            var selectedItems = dataGrid.SelectedItems.Cast<DataRowView>().Select(dataRowView => dataRowView.Row).ToList();
-            if (ViewModel != null && selectedItems != null)
-                ViewModel.OnDataGridSelectionChanged(selectedItems);
+            var dataGrid = sender as DataGrid;
+            var selectedViewerRows = dataGrid.SelectedItems.Cast<DataRowView>().Select(dataRowView => dataRowView.Row).ToList();
+            if (ViewModel != null && selectedViewerRows != null)
+                ViewModel.SelectedRows = selectedViewerRows;
         }
     }
 }

@@ -138,8 +138,8 @@
                         Height="135"
                         MaxHeight="135"
                         AllowDrop="True"
-                        Drop="ListView_Drop"
-                        DragOver="ListView_DragOver">
+                        Drop="OnListViewDrop"
+                        DragOver="OnListViewDragOver">
                         <ListView.View>
                             <GridView>
                                 <GridViewColumn 

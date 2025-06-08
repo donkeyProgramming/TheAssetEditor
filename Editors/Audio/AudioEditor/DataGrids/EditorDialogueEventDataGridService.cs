@@ -44,7 +44,7 @@ namespace Editors.Audio.AudioEditor.DataGrids
 
         public void ConfigureDataGrid()
         {
-            var dataGrid = DataGridHelpers.GetDataGridFromTag(_audioEditorService.AudioProjectEditorViewModel.AudioProjectEditorDataGridTag);
+            var dataGrid = DataGridHelpers.GetDataGridFromTag(_audioEditorService.AudioProjectEditorDataGridTag);
             DataGridHelpers.ClearDataGridColumns(dataGrid);
             DataGridHelpers.ClearDataGridContextMenu(dataGrid);
 
@@ -55,7 +55,7 @@ namespace Editors.Audio.AudioEditor.DataGrids
             var stateGroupsWithQualifiers = _audioRepository.QualifiedStateGroupLookupByStateGroupByDialogueEvent[dialogueEvent.Name];
             foreach (var stateGroupWithQualifier in stateGroupsWithQualifiers)
             {
-                var states = DataGridHelpers.GetStatesForStateGroupColumn(_audioEditorService.AudioEditorViewModel, _audioRepository, _audioEditorService, stateGroupWithQualifier.Value);
+                var states = DataGridHelpers.GetStatesForStateGroupColumn(_audioEditorService, _audioRepository, stateGroupWithQualifier.Value);
                 var columnHeader = DataGridHelpers.AddExtraUnderscoresToString(stateGroupWithQualifier.Key);
                 var column = DataGridTemplates.CreateColumnTemplate(columnHeader, columnWidth);
                 column.CellTemplate = DataGridTemplates.CreateStatesComboBoxTemplate(_eventHub, columnHeader, states);

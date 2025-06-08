@@ -17,6 +17,7 @@ using Editors.Audio.Utility;
 using Microsoft.Extensions.DependencyInjection;
 using Shared.Core.DependencyInjection;
 using Shared.Core.DevConfig;
+using Shared.Core.Events;
 using Shared.Core.ToolCreation;
 using Shared.GameFormats.Wwise;
 
@@ -52,7 +53,9 @@ namespace Editors.Audio
             serviceCollection.AddTransient<IAudioProjectUICommand, AddStateToAudioProjectCommand>();
             serviceCollection.AddTransient<IAudioProjectUICommand, RemoveActionEventFromAudioProjectCommand>();
             serviceCollection.AddTransient<IAudioProjectUICommand, RemoveDialogueEventFromAudioProjectCommand>();
-            serviceCollection.AddTransient<IAudioProjectUICommand, RemoveStateFromAudioProjectCommand>();
+            serviceCollection.AddScoped<CopyRowsCommand>();
+            serviceCollection.AddScoped<PasteRowsCommand>();
+            serviceCollection.AddScoped<SelectMovieFileCommand>();
 
             serviceCollection.AddTransient<NewAudioProjectViewModel>();
             serviceCollection.AddTransient<NewAudioProjectWindow>();

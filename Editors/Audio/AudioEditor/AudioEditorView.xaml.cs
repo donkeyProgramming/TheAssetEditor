@@ -10,31 +10,10 @@ namespace Editors.Audio.AudioEditor
         public AudioEditorView()
         {
             InitializeComponent();
-            PreviewKeyDown += AudioProjectViewerView_PreviewKeyDown;
-
+            PreviewKeyDown += OnPreviewKeyDown;
         }
 
-        private void AudioProjectViewerView_PreviewKeyDown(object sender, KeyEventArgs e)
-        {
-            if (Keyboard.Modifiers == ModifierKeys.Control)
-            {
-                if (e.Key == Key.C)
-                {
-                    ViewModel?.AudioProjectViewerViewModel.CopyRows();
-                    e.Handled = true;
-                }
-                else if (e.Key == Key.V)
-                {
-                    ViewModel?.AudioProjectViewerViewModel.PasteRows();
-                    e.Handled = true;
-                }
-            }
-
-            if (e.Key == Key.Delete)
-            {
-                ViewModel?.AudioProjectViewerViewModel.RemoveAudioProjectViewerDataGridRow();
-                e.Handled = true;
-            }
-        }
+        // This is here rather than the Viewer because the viewer only recognises key presses when you're clicked on the grid itself whereas this recognises them anywhere 
+        private void OnPreviewKeyDown(object sender, KeyEventArgs e) => ViewModel.OnPreviewKeyDown(e);
     }
 }

@@ -13,13 +13,13 @@ namespace Editors.Audio.AudioEditor.AudioProjectExplorer
             InitializeComponent();
         }
 
-        private void TreeView_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
+        private void OnTreeViewSelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
         {
             if (e.NewValue is TreeNode selectedNode)
-                ViewModel.OnSelectedNodeChanged(selectedNode);
+                ViewModel.SelectedNode = selectedNode;
         }
 
-        private void WatermarkComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        private void OnWatermarkComboBoxSelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             if (DialogueEventFilterComboBox?.SelectedItem is DialogueEventPreset selectedPreset && selectedPreset == DialogueEventPreset.ShowAll)
                 ViewModel.ResetDialogueEventFilterComboBoxSelectedItem(DialogueEventFilterComboBox);

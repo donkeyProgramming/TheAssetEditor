@@ -15,8 +15,9 @@ namespace Editors.Audio.AudioEditor.DataGrids
 {
     public class DataGridTemplates
     {
-        public static string EventNameColumn { get; } = "Event Name";
+        public static string EventColumn { get; } = "Event";
         public static string BrowseMovieColumn { get; } = "Browse Movie";
+        public static string StateColumn { get; } = "State";
 
         public static DataGridTemplateColumn CreateColumnTemplate(string columnHeader, double columnWidth, bool isReadOnly = false, bool useAbsoluteWidth = false)
         {

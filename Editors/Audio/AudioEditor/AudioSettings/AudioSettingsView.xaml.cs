@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
@@ -13,7 +14,7 @@ namespace Editors.Audio.AudioEditor.AudioSettings
             InitializeComponent();
         }
 
-        private void ListView_DragOver(object sender, DragEventArgs e)
+        private void OnListViewDragOver(object sender, DragEventArgs e)
         {
             if (e.Data.GetDataPresent(typeof(IEnumerable<TreeNode>)))
                 e.Effects = DragDropEffects.Copy;
@@ -23,7 +24,7 @@ namespace Editors.Audio.AudioEditor.AudioSettings
             e.Handled = true;
         }
 
-        private void ListView_Drop(object sender, DragEventArgs e)
+        private void OnListViewDrop(object sender, DragEventArgs e)
         {
             if (e.Data.GetDataPresent(typeof(IEnumerable<TreeNode>)))
             {
@@ -31,7 +32,18 @@ namespace Editors.Audio.AudioEditor.AudioSettings
                     return;
 
                 if (DataContext is AudioSettingsViewModel viewModel)
-                    viewModel.SetAudioFilesViaDrop(droppedNodes.ToList());
+                {
+                    var audioFiles = new ObservableCollection<AudioFile>();
+                    foreach (var wavFile in droppedNodes)
+                    {
+                        audioFiles.Add(new AudioFile
+                        {
+                            FileName = wavFile.Name,
+                            FilePath = wavFile.FilePath
+                        });
+                    }
+                    viewModel.SetAudioFilesViaDrop(audioFiles);
+                }
             }
         }
     }

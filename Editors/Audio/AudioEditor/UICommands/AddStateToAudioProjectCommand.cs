@@ -17,7 +17,7 @@ namespace Editors.Audio.AudioEditor.UICommands
 
         public void Execute(DataRow row)
         {
-            var state = AudioProjectHelpers.CreateStateFromDataGridRow(row);
+            var state = AudioProjectHelpers.CreateStateFromRow(row);
             var stateGroup = AudioProjectHelpers.GetStateGroupFromName(_audioEditorService.AudioProject, _audioEditorService.SelectedExplorerNode.Name);
             AudioProjectHelpers.InsertStateAlphabetically(stateGroup, state);
         }
