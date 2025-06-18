@@ -7,7 +7,7 @@ namespace Shared.Core.PackFiles.Models
         public string Name { get; set; }
         public PFHeader Header { get; set; }
         public bool IsCaPackFile { get; set; } = false;
-        public string SystemFilePath { get; set; } 
+        public string SystemFilePath { get; set; }
         public long OriginalLoadByteSize { get; set; } = -1;
 
         public Dictionary<string, PackFile> FileList { get; set; } = [];
@@ -86,7 +86,7 @@ namespace Shared.Core.PackFiles.Models
                 var offset = writer.BaseStream.Position;
                 var dataLength = data.Length;
                 var isEncrypted = Header.HasEncryptedData;
-                file.Value.DataSource = new PackedFileSource(packedFileSourceParent, offset, dataLength, isEncrypted);
+                file.Value.DataSource = new PackedFileSource(packedFileSourceParent, offset, dataLength, isEncrypted, false);
                 writer.Write(data);
             }
         }

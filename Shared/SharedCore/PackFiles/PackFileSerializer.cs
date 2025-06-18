@@ -75,7 +75,7 @@ namespace Shared.Core.PackFiles
 
                     var packFileName = Path.GetFileName(fullPackedFileName);
                     var isEncrypted = output.Header.HasEncryptedData;
-                    var fileContent = new PackFile(packFileName, new PackedFileSource(packedFileSourceParent, offset, size, isEncrypted));
+                    var fileContent = new PackFile(packFileName, new PackedFileSource(packedFileSourceParent, offset, size, isEncrypted, isCompressed == 1));
 
                     if (dubplicatePackFileResolver.CheckForDuplicates)
                     {
