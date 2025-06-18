@@ -80,12 +80,13 @@ namespace GameWorld.Core.Services
             for (var i = 0; i < allAnimations.Count; i++)
             {
                 var currentAnimFile = allAnimations[i].Pack.DataSource as PackedFileSource;
-                if (currentAnimFile != null)
+                //if (currentAnimFile != null)
+                if (false)
                     allAnimsInSavedPackedFiles.Add((allAnimations[i].FileName, currentAnimFile));
                 else
                     allAnimsOtherFiles.Add((allAnimations[i].FileName, allAnimations[i].Pack.DataSource));
             }
-
+            /*
             // Handle packfile which are stored in a saved file.
             // This is done for performance reasons. Opening all the animations files from disk is very slow
             // creating stream which is reused goes a lot faster!
@@ -103,9 +104,9 @@ namespace GameWorld.Core.Services
                 foreach (var file in groupedAnims[index])
                 {
                     RandomAccess.Read(handle, buffer, file.DataSource.Offset);
-                    FileDiscovered(buffer, packFileContainer, file.FullPath, ref skeletonFileNameList, ref animationList);
+                    //FileDiscovered(buffer, packFileContainer, file.FullPath, ref skeletonFileNameList, ref animationList);
                 }
-            });
+            });*/
 
             // Handle all in memory files 
             Parallel.For(0, allAnimsOtherFiles.Count, index =>
@@ -145,6 +146,10 @@ namespace GameWorld.Core.Services
 
             try
             {
+                if (byteChunk.Length == 0)
+                {
+                    throw new Exception("File empty.");
+                }
                 var animationSkeletonName = AnimationFile.GetAnimationName(byteChunk);
 
                 lock (_threadLock)

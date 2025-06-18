@@ -1,5 +1,6 @@
 ﻿using Shared.Core.ByteParsing;
 using static Shared.Core.PackFiles.PackFileDecrypter;
+using static Shared.Core.PackFiles.PackFileDecompressor;
 
 namespace Shared.Core.PackFiles.Models
 {
@@ -89,16 +90,18 @@ namespace Shared.Core.PackFiles.Models
         public long Offset { get; private set; }
         public long Size { get; private set; }
         public bool IsEncrypted { get; private set; }
+        public bool IsCompressed { get; private set; }
         public PackedFileSourceParent Parent { get => _parent; }
 
         private readonly PackedFileSourceParent _parent;
 
-        public PackedFileSource(PackedFileSourceParent parent, long offset, long length, bool isEncrypted)
+        public PackedFileSource(PackedFileSourceParent parent, long offset, long length, bool isEncrypted, bool isCompressed)
         {
             Offset = offset;
             _parent = parent;
             Size = length;
             IsEncrypted = isEncrypted;
+            IsCompressed = isCompressed;
         }
 
         public byte[] ReadData()
@@ -112,20 +115,26 @@ namespace Shared.Core.PackFiles.Models
 
             if (IsEncrypted)
                 data = Decrypt(data);
+
+            if (IsCompressed)
+                data = Decompress(data);
             return data;
         }
 
         public byte[] ReadData(int size)
         {
-            var data = new byte[size];
+            var data = new byte[Size];
             using (Stream stream = File.Open(_parent.FilePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
             {
-            stream.Seek(Offset, SeekOrigin.Begin);
-                stream.Read(data, 0, size);
+                stream.Seek(Offset, SeekOrigin.Begin);
+                stream.Read(data, 0, data.Length);
             }
 
             if (IsEncrypted)
                 data = Decrypt(data);
+            if (IsCompressed)
+                data = Decompress(data);
+
             return data;
         }
 
@@ -137,6 +146,8 @@ namespace Shared.Core.PackFiles.Models
 
             if (IsEncrypted)
                 data = Decrypt(data);
+            if (IsCompressed)
+                data = Decompress(data);
             return data;
         }
 
