@@ -1,4 +1,5 @@
-﻿using Shared.Core.Settings;
+﻿using System.Text;
+using Shared.Core.Settings;
 
 namespace Shared.Core.PackFiles.Models
 {
@@ -24,7 +25,7 @@ namespace Shared.Core.PackFiles.Models
             return;
         }
 
-        public void SaveToByteArray(BinaryWriter writer)
+        public void SaveToByteArray(BinaryWriter writer, GameInformation gameInformation)
         {
             long fileNamesOffset = 0;
             var sortedFiles = FileList.OrderBy(x => x.Key, StringComparer.Ordinal).ToList();
@@ -51,24 +52,42 @@ namespace Shared.Core.PackFiles.Models
                 fileNamesOffset2 += fileSize + headerSpesificBytes + strLength;
             }
 
-            Header.FileCount = (uint)FileList.Count();
+            Header.FileCount = (uint)FileList.Count;
             PackFileSerializer.WriteHeader(Header, (uint)fileNamesOffset, writer);
 
             // Save all the files
             foreach (var file in sortedFiles)
             {
-                var fileSize = (int)file.Value.DataSource.Size;
+                var packFile = file.Value;
+                var packedFileSource = (PackedFileSource)file.Value.DataSource;
+                var data = packedFileSource.ReadData();
+
+                var fileExtension = packFile.Extension;
+
+                var segments = file.Key.Split(['\\', '/'], StringSplitOptions.RemoveEmptyEntries);
+                var rootFolder = segments.First();
+
+                packedFileSource.SetCompressionInfo(gameInformation, rootFolder, fileExtension);
+
+                var fileSize = data.Length;
+                if (packedFileSource.IsCompressed)
+                {
+                    var compressedData = PackFileCompression.Compress(data, packedFileSource.CompressionFormat);
+                    fileSize = compressedData.Length;
+                }
                 writer.Write(fileSize);
 
+                // Timestamp
                 if (Header.HasIndexWithTimeStamp)
-                    writer.Write(0);   // timestamp
+                    writer.Write(0);
 
+                // Compression
                 if (Header.Version == PackFileVersion.PFH5)
-                    writer.Write((byte)0);  // Compression
+                    writer.Write(packedFileSource.IsCompressed);
 
                 // Filename
-                foreach (byte c in file.Key)
-                    writer.Write(c);
+                var fileNameBytes = Encoding.UTF8.GetBytes(file.Key);
+                writer.Write(fileNameBytes);
 
                 // Zero terminator
                 writer.Write((byte)0);
@@ -82,11 +101,23 @@ namespace Shared.Core.PackFiles.Models
             // Write the files
             foreach (var file in sortedFiles)
             {
-                var data = file.Value.DataSource.ReadData();
+                var packFile = file.Value;
+                var packedFileSource = (PackedFileSource)packFile.DataSource;
+
                 var offset = writer.BaseStream.Position;
-                var dataLength = data.Length;
-                var isEncrypted = Header.HasEncryptedData;
-                file.Value.DataSource = new PackedFileSource(packedFileSourceParent, offset, dataLength, isEncrypted, false);
+                var data = packedFileSource.ReadData();
+                if (packedFileSource.IsCompressed)
+                    data = PackFileCompression.Compress(data, packedFileSource.CompressionFormat);
+
+                packFile.DataSource = new PackedFileSource(
+                    packedFileSourceParent,
+                    offset,
+                    data.Length,
+                    packedFileSource.IsEncrypted,
+                    packedFileSource.IsCompressed,
+                    packedFileSource.CompressionFormat,
+                    packedFileSource.UncompressedSize);
+
                 writer.Write(data);
             }
         }

@@ -7,7 +7,7 @@ namespace Shared.Core.PackFiles.Models
     {
         public IDataSource DataSource { get; set; }
         public string Name { get; set; }
-        public string Extention { get => Path.GetExtension(Name); }
+        public string Extension { get => Path.GetExtension(Name); }
 
         public PackFile(string name, IDataSource dataSource)
         {

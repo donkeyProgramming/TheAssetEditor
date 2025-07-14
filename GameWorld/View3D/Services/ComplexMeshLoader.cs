@@ -45,7 +45,7 @@ namespace GameWorld.Core.Services
 
                 _logger.Here().Information($"Attempting to load file {file.Name}");
 
-                switch (file.Extention)
+                switch (file.Extension)
                 {
                     case ".variantmeshdefinition":
                         LoadVariantMesh(file, ref parent, player, attachmentPointName, onlyLoadRootNode, onlyLoadFirstMesh);

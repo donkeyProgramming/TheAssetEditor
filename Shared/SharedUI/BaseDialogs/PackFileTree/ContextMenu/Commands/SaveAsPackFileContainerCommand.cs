@@ -1,12 +1,12 @@
 ﻿using System.Windows.Forms;
 using Shared.Core.PackFiles;
+using Shared.Core.Settings;
 using Shared.Ui.Common;
 
 namespace Shared.Ui.BaseDialogs.PackFileTree.ContextMenu.Commands
 {
-    public class SaveAsPackFileContainerCommand(IPackFileService packFileService) : IContextMenuCommand
+    public class SaveAsPackFileContainerCommand(IPackFileService packFileService, ApplicationSettingsService applicationSettingsService) : IContextMenuCommand
     {
-        //private readonly ILogger _logger = Logging.Create<SavePackFileCommand>();
         public string GetDisplayName(TreeNode node) => "Save As";
         public bool IsEnabled(TreeNode node) => true;
 
@@ -21,7 +21,8 @@ namespace Shared.Ui.BaseDialogs.PackFileTree.ContextMenu.Commands
 
             using (new WaitCursor())
             {
-                packFileService.SavePackContainer(_selectedNode.FileOwner, saveFileDialog.FileName, false);
+                var gameInformation = GameInformationDatabase.GetGameById(applicationSettingsService.CurrentSettings.CurrentGame);
+                packFileService.SavePackContainer(_selectedNode.FileOwner, saveFileDialog.FileName, false, gameInformation);
                 _selectedNode.UnsavedChanged = false;
                 _selectedNode.ForeachNode((node) => node.UnsavedChanged = false);
             }

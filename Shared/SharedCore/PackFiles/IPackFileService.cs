@@ -1,4 +1,5 @@
 ﻿using Shared.Core.PackFiles.Models;
+using Shared.Core.Settings;
 
 namespace Shared.Core.PackFiles
 {
@@ -22,9 +23,8 @@ namespace Shared.Core.PackFiles
         void RenameDirectory(PackFileContainer pf, string currentNodeName, string newName);
         void RenameFile(PackFileContainer pf, PackFile file, string newName);
         void SaveFile(PackFile file, byte[] data);
-        void SavePackContainer(PackFileContainer pf, string path, bool createBackup);
+        void SavePackContainer(PackFileContainer pf, string path, bool createBackup, GameInformation gameInformation);
         void SetEditablePack(PackFileContainer? pf);
         void UnloadPackContainer(PackFileContainer pf);
     }
-
 }

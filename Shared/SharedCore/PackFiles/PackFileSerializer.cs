@@ -2,7 +2,6 @@
 using Shared.Core.ErrorHandling;
 using Shared.Core.PackFiles.Models;
 using Shared.Core.Settings;
-using static Shared.Core.PackFiles.PackFileDecrypter;
 
 namespace Shared.Core.PackFiles
 {
@@ -26,7 +25,7 @@ namespace Shared.Core.PackFiles
     {
         static readonly ILogger _logger = Logging.CreateStatic(typeof(PackFileSerializer));
 
-        public static PackFileContainer Load(string packFileSystemPath, BinaryReader reader, IDuplicatePackFileResolver dubplicatePackFileResolver)
+        public static PackFileContainer Load(string packFileSystemPath, BinaryReader reader, IDuplicatePackFileResolver duplicatePackFileResolver)
         {
             try
             {
@@ -51,7 +50,6 @@ namespace Shared.Core.PackFiles
                     FilePath = packFileSystemPath,
                 };
 
-
                 //var buffer = reader.ReadBytes((int)output.Header.DataStart - 28);
 
                 var offset = output.Header.DataStart;
@@ -60,43 +58,52 @@ namespace Shared.Core.PackFiles
                 {
                     uint size;
                     if (output.Header.HasEncryptedIndex)
-                        size = DecryptAndReadU32(reader, (uint)(output.Header.FileCount - i - 1));
+                        size = PackFileEncryption.DecryptAndReadU32(reader, (uint)(output.Header.FileCount - i - 1));
                     else
                         size = reader.ReadUInt32();
 
                     if (output.Header.HasIndexWithTimeStamp)
                         reader.ReadUInt32();
 
-                    byte isCompressed = 0;
+                    var isCompressed = false;
                     if (headerVersion == PackFileVersion.PFH5)
-                        isCompressed = reader.ReadByte();   // Is the file actually compressed, or is it just a compressed format?
+                        isCompressed = reader.ReadBoolean();
 
                     var fullPackedFileName = IOFunctions.ReadZeroTerminatedAscii(reader, fileNameBuffer).ToLower();
-
                     var packFileName = Path.GetFileName(fullPackedFileName);
                     var isEncrypted = output.Header.HasEncryptedData;
-                    var fileContent = new PackFile(packFileName, new PackedFileSource(packedFileSourceParent, offset, size, isEncrypted, isCompressed == 1));
 
-                    if (dubplicatePackFileResolver.CheckForDuplicates)
+                    var compressionFormat = CompressionFormat.None;
+                    uint uncompressedSize = 0;
+                    if (isCompressed)
+                    {
+                        var fileHeader = DetectCompressionInfo(reader, offset, size, isEncrypted);
+                        using var compressionStream = new MemoryStream(fileHeader, false);
+                        using var compressionReader = new BinaryReader(compressionStream);
+                        uncompressedSize = compressionReader.ReadUInt32();
+                        var magicNumber = compressionReader.ReadUInt32();
+                        compressionFormat = PackFileCompression.GetCompressionFormat(magicNumber);
+                    }
+
+                    var packedFileSource = new PackedFileSource(packedFileSourceParent, offset, size, isEncrypted, isCompressed, compressionFormat, uncompressedSize);
+                    var fileContent = new PackFile(packFileName, packedFileSource);
+
+                    if (duplicatePackFileResolver.CheckForDuplicates)
                     {
                         var containsKey = output.FileList.ContainsKey(fullPackedFileName);
                         if (containsKey)
                         {
-                            if (dubplicatePackFileResolver.KeepDuplicateFile(fullPackedFileName))
+                            if (duplicatePackFileResolver.KeepDuplicateFile(fullPackedFileName))
                             {
                                 _logger.Here().Warning($"Duplicate file found {fullPackedFileName}");
                                 output.FileList.Add(fullPackedFileName + Guid.NewGuid().ToString(), fileContent);
                             }
                         }
                         else
-                        {
                             output.FileList[fullPackedFileName] = fileContent;
-                        }
                     }
                     else
-                    {
                         output.FileList[fullPackedFileName] = fileContent;
-                    }
 
                     offset += size;
                 }
@@ -127,7 +134,7 @@ namespace Shared.Core.PackFiles
             if (header.HasEncryptedIndex)
             {
                 var filesRemaining = header.ReferenceFileCount;
-                packed_file_index_size = DecryptAndReadU32(reader, filesRemaining);
+                packed_file_index_size = PackFileEncryption.DecryptAndReadU32(reader, filesRemaining);
             }
 
             // Read the buffer of data stuff
@@ -216,6 +223,26 @@ namespace Shared.Core.PackFiles
                     writer.Write(c);
                 writer.Write((byte)0);
             }
+        }
+
+        private static byte[] DetectCompressionInfo(BinaryReader reader, long dataOffset, uint entrySize, bool isEncrypted)
+        {
+            if (entrySize <= 8 || !isEncrypted && entrySize == 0)
+                return [];
+
+            var headerLen = 8;
+            var header = new byte[headerLen];
+
+            var savedPos = reader.BaseStream.Position; 
+
+            reader.BaseStream.Seek(dataOffset, SeekOrigin.Begin);
+            reader.Read(header, 0, headerLen);
+            reader.BaseStream.Seek(savedPos, SeekOrigin.Begin);
+
+            if (isEncrypted)
+                PackFileEncryption.DecryptInPlace(header, entrySize);
+
+            return header;
         }
     }
 }

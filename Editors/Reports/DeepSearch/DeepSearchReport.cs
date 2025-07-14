@@ -77,7 +77,7 @@ namespace Editors.Reports.DeepSearch
                               {
                                   var pf = packFile;
                                   var ds = pf.DataSource as PackedFileSource;
-                                  var bytes = ds.ReadDataForFastSearch(fileStram);
+                                  var bytes = ds.ReadData(fileStram);
                                   var str = Encoding.ASCII.GetString(bytes);
 
                                   if (str.Contains(searchStr, StringComparison.InvariantCultureIgnoreCase))

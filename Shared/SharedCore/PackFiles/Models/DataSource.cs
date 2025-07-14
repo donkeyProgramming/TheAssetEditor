@@ -1,6 +1,5 @@
 ﻿using Shared.Core.ByteParsing;
-using static Shared.Core.PackFiles.PackFileDecrypter;
-using static Shared.Core.PackFiles.PackFileDecompressor;
+using Shared.Core.Settings;
 
 namespace Shared.Core.PackFiles.Models
 {
@@ -90,18 +89,29 @@ namespace Shared.Core.PackFiles.Models
         public long Offset { get; private set; }
         public long Size { get; private set; }
         public bool IsEncrypted { get; private set; }
-        public bool IsCompressed { get; private set; }
+        public bool IsCompressed { get; set; }
+        public CompressionFormat CompressionFormat { get; set; }
+        public uint UncompressedSize { get; set; }
         public PackedFileSourceParent Parent { get => _parent; }
 
         private readonly PackedFileSourceParent _parent;
 
-        public PackedFileSource(PackedFileSourceParent parent, long offset, long length, bool isEncrypted, bool isCompressed)
+        public PackedFileSource(
+            PackedFileSourceParent parent,
+            long offset,
+            long length,
+            bool isEncrypted,
+            bool isCompressed,
+            CompressionFormat compressionFormat,
+            uint uncompressedSize)
         {
             Offset = offset;
             _parent = parent;
             Size = length;
             IsEncrypted = isEncrypted;
             IsCompressed = isCompressed;
+            CompressionFormat = compressionFormat;
+            UncompressedSize = uncompressedSize;
         }
 
         public byte[] ReadData()
@@ -114,16 +124,15 @@ namespace Shared.Core.PackFiles.Models
             }
 
             if (IsEncrypted)
-                data = Decrypt(data);
-
+                data = PackFileEncryption.Decrypt(data);
             if (IsCompressed)
-                data = Decompress(data);
+                data = PackFileCompression.Decompress(data);
             return data;
         }
 
         public byte[] ReadData(int size)
         {
-            var data = new byte[Size];
+            var data = new byte[size];
             using (Stream stream = File.Open(_parent.FilePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
             {
                 stream.Seek(Offset, SeekOrigin.Begin);
@@ -131,29 +140,81 @@ namespace Shared.Core.PackFiles.Models
             }
 
             if (IsEncrypted)
-                data = Decrypt(data);
+                data = PackFileEncryption.Decrypt(data);
             if (IsCompressed)
-                data = Decompress(data);
-
+                data = PackFileCompression.Decompress(data);
             return data;
         }
 
-        public byte[] ReadDataForFastSearch(Stream knownStream)
+        public byte[] ReadData(Stream knownStream)
         {
             var data = new byte[Size];
             knownStream.Seek(Offset, SeekOrigin.Begin);
             knownStream.Read(data, 0, (int)Size);
 
             if (IsEncrypted)
-                data = Decrypt(data);
+                data = PackFileEncryption.Decrypt(data);
             if (IsCompressed)
-                data = Decompress(data);
+                data = PackFileCompression.Decompress(data);
             return data;
         }
 
         public ByteChunk ReadDataAsChunk()
         {
             return new ByteChunk(ReadData());
+        }
+
+        public void SetCompressionInfo(GameInformation gameInformation, string rootFolder, string extension)
+        {
+            // Check if the game supports any compression at all
+            if (gameInformation.CompressionFormats.All(compressionFormat => compressionFormat == CompressionFormat.None))
+                return;
+
+            // We use isTable because non-loc tables don't have an extension
+            var isTable = rootFolder == "db" || extension == ".loc";
+            var hasExtension = !string.IsNullOrEmpty(extension);
+
+            // Don't compress files that aren't tables and don't have extensions
+            if (!isTable && !hasExtension)
+            {
+                CompressionFormat = CompressionFormat.None;
+                IsCompressed = false;
+                return;
+            }
+
+            // Only in WH3 (and newer games?) is the table compression bug fixed
+            if (isTable && gameInformation.CompressionFormats.Contains(CompressionFormat.Zstd) && gameInformation.Type == GameTypeEnum.Warhammer3)
+            {
+                CompressionFormat = CompressionFormat.Zstd;
+                IsCompressed = true;
+                return;
+            }
+
+            // Games that support the other formats won't use Lzma1 as it's legacy so if it's set then it's for a game that only uses it so keep it
+            if (CompressionFormat == CompressionFormat.Lzma1 && gameInformation.CompressionFormats.Contains(CompressionFormat.Lzma1))
+                return;
+
+            // Anything that shouldn't be None or Lz4 is set to Zstd unless the game doesn't support that in which case use None
+            if (PackFileCompression.NoneFileTypes.Contains(extension))
+            {
+                CompressionFormat = CompressionFormat.None;
+                IsCompressed = false;
+            }
+            else if (PackFileCompression.Lz4FileTypes.Contains(extension) && gameInformation.CompressionFormats.Contains(CompressionFormat.Lz4))
+            {
+                CompressionFormat = CompressionFormat.Lz4;
+                IsCompressed = true;
+            }
+            else if (gameInformation.CompressionFormats.Contains(CompressionFormat.Zstd))
+            {
+                CompressionFormat = CompressionFormat.Zstd;
+                IsCompressed = true;
+            }
+            else
+            {
+                CompressionFormat = CompressionFormat.None;
+                IsCompressed = false;
+            }
         }
     }
 

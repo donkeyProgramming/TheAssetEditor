@@ -4,12 +4,10 @@ using Shared.Core.Events;
 using Shared.Core.Events.Global;
 using Shared.Core.Misc;
 using Shared.Core.PackFiles.Models;
+using Shared.Core.Settings;
 
 namespace Shared.Core.PackFiles
 {
-
-
-
     public class PackFileService : IPackFileService
     {
         private readonly ILogger _logger = Logging.Create<PackFileService>();
@@ -254,7 +252,7 @@ namespace Shared.Core.PackFiles
             _globalEventHub?.PublishGlobalEvent(new PackFileSavedEvent(file));
         }
 
-        public void SavePackContainer(PackFileContainer pf, string path, bool createBackup)
+        public void SavePackContainer(PackFileContainer pf, string path, bool createBackup, GameInformation gameInformation)
         {
             if (File.Exists(path) && DirectoryHelper.IsFileLocked(path))
             {
@@ -279,7 +277,7 @@ namespace Shared.Core.PackFiles
             using (var memoryStream = new FileStream(path + "_temp", FileMode.OpenOrCreate))
             {
                 using var writer = new BinaryWriter(memoryStream);
-                pf.SaveToByteArray(writer);
+                pf.SaveToByteArray(writer, gameInformation);
             }
 
             File.Delete(path);
@@ -366,5 +364,4 @@ namespace Shared.Core.PackFiles
     {
         public void ShowDialogBox(string message, string title) => MessageBox.Show(message, title);
     }
-
 }

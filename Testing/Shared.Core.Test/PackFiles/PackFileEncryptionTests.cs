@@ -36,7 +36,7 @@ namespace Test.Shared.Core.PackFiles
             foreach (var file in _container.FileList)
             {
                 var originalData = file.Value.DataSource.ReadData();
-                var encryptedData = PackFileEncrypter.Encrypt(originalData);
+                var encryptedData = PackFileEncryption.Encrypt(originalData);
                 file.Value.DataSource = new MemorySource(encryptedData);
             }
 
@@ -47,7 +47,7 @@ namespace Test.Shared.Core.PackFiles
             foreach (var file in _container.FileList)
             {
                 var encryptedData = file.Value.DataSource.ReadData();
-                var decryptedContent = PackFileDecrypter.Decrypt(encryptedData);
+                var decryptedContent = PackFileEncryption.Decrypt(encryptedData);
                 var originalContent = Encoding.UTF8.GetString(decryptedContent);
 
                 switch (file.Value.Name)

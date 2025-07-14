@@ -80,33 +80,33 @@ namespace GameWorld.Core.Services
             for (var i = 0; i < allAnimations.Count; i++)
             {
                 var currentAnimFile = allAnimations[i].Pack.DataSource as PackedFileSource;
-                //if (currentAnimFile != null)
-                if (false)
+                if (currentAnimFile != null)
                     allAnimsInSavedPackedFiles.Add((allAnimations[i].FileName, currentAnimFile));
                 else
                     allAnimsOtherFiles.Add((allAnimations[i].FileName, allAnimations[i].Pack.DataSource));
             }
-            /*
+
             // Handle packfile which are stored in a saved file.
             // This is done for performance reasons. Opening all the animations files from disk is very slow
             // creating stream which is reused goes a lot faster!
+            // https://www.jacksondunstan.com/articles/3568
             var groupedAnims = allAnimsInSavedPackedFiles
                 .GroupBy(x => x.DataSource.Parent.FilePath)
                 .ToList();
 
             Parallel.For(0, groupedAnims.Count, index =>
             {
-                using var handle = File.OpenHandle(groupedAnims[index].Key);
-
-                //https://www.jacksondunstan.com/articles/3568
-                var buffer = new byte[100];
-
+                using var stream = new FileStream(groupedAnims[index].Key, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+                
                 foreach (var file in groupedAnims[index])
                 {
-                    RandomAccess.Read(handle, buffer, file.DataSource.Offset);
-                    //FileDiscovered(buffer, packFileContainer, file.FullPath, ref skeletonFileNameList, ref animationList);
+                    var bytes = file.DataSource.ReadData(stream);
+                    if (bytes.Length > 100)
+                        Array.Resize(ref bytes, 100);
+
+                    FileDiscovered(bytes, packFileContainer, file.FullPath, ref skeletonFileNameList, ref animationList);
                 }
-            });*/
+            });
 
             // Handle all in memory files 
             Parallel.For(0, allAnimsOtherFiles.Count, index =>
@@ -135,7 +135,11 @@ namespace GameWorld.Core.Services
                 var brokenAnims = new string[]
                 {
                      "rigidmodels\\buildings\\roman_aqueduct_straight\\roman_aqueduct_straight_piece01_destruct01_anim.anim",
-                     "animations\\battle\\raptor02\\subset\\colossal_squig\\deaths\\rp2_colossalsquig_death_01.anim"
+                     "animations\\battle\\raptor02\\subset\\colossal_squig\\deaths\\rp2_colossalsquig_death_01.anim",
+                     "animations\\battle\\humanoid13b\\golgfag\\docking\\hu13b_golgfag_docking_armed_02.anim",
+                     "animations\\battle\\humanoid13\\ogre\\rider\\hq3b_stonehorn_wb\\sword_and_crossbow\\missile_action\\crossbow\\hu13_hq3b_swc_rider1_shoot_back_crossbow_01.anim",
+                     "animations\\battle\\humanoid13\\ogre\\rider\\hq3b_stonehorn_wb\\sword_and_crossbow\\missile_action\\crossbow\\hu13_hq3b_swc_rider1_reload_crossbow_01.anim",
+                     "animations\\battle\\humanoid13\\ogre\\rider\\hq3b_stonehorn_wb\\sword_and_crossbow\\missile_action\\crossbow\\hu13_hq3b_sp_rider1_shoot_ready_crossbow_01.anim"
                 };
                 if (brokenAnims.Contains(fullPath))
                 {
