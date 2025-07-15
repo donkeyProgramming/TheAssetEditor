@@ -4,11 +4,15 @@ using Serilog;
 using Shared.Core.ErrorHandling;
 using Shared.Core.PackFiles;
 using Shared.Core.Services;
+using Shared.Core.Settings;
 using Shared.Ui.Common;
 
 namespace Shared.Ui.BaseDialogs.PackFileTree.ContextMenu.Commands
 {
-    public class SavePackFileContainerCommand(IPackFileService packFileService, IStandardDialogs standardDialogs) : IContextMenuCommand
+    public class SavePackFileContainerCommand(
+        IPackFileService packFileService,
+        IStandardDialogs standardDialogs,
+        ApplicationSettingsService applicationSettingsService) : IContextMenuCommand
     {
         private readonly ILogger _logger = Logging.Create<SavePackFileContainerCommand>();
         public string GetDisplayName(TreeNode node) => "Save";
@@ -32,7 +36,8 @@ namespace Shared.Ui.BaseDialogs.PackFileTree.ContextMenu.Commands
             {
                 try
                 {
-                    packFileService.SavePackContainer(_selectedNode.FileOwner, systemPath, false);
+                    var gameInformation = GameInformationDatabase.GetGameById(applicationSettingsService.CurrentSettings.CurrentGame);
+                    packFileService.SavePackContainer(_selectedNode.FileOwner, systemPath, false, gameInformation);
                 }
                 catch (Exception e)
                 {
@@ -67,7 +72,8 @@ namespace Shared.Ui.BaseDialogs.PackFileTree.ContextMenu.Commands
             {
                 try
                 {
-                    packFileService.SavePackContainer(pack, systemPath, false);
+                    var gameInformation = GameInformationDatabase.GetGameById(applicationSettingsService.CurrentSettings.CurrentGame);
+                    packFileService.SavePackContainer(pack, systemPath, false, gameInformation);
                 }
                 catch (Exception e)
                 {

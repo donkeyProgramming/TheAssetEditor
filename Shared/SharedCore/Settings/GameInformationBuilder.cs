@@ -41,7 +41,7 @@
         {
             return new GameInformationBuilder()
             {
-                _instance = new GameInformation(type, displayName, Settings.PackFileVersion.PFH5, Settings.GameBnkVersion.Unsupported, Settings.WsModelVersion.Unknown)
+                _instance = new GameInformation(type, displayName, Settings.PackFileVersion.PFH5, Settings.GameBnkVersion.Unsupported, Settings.WsModelVersion.Unknown, [])
             };
         }
 

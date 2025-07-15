@@ -1,4 +1,6 @@
-﻿namespace Shared.Core.Settings
+﻿using Shared.Core.PackFiles;
+
+namespace Shared.Core.Settings
 {
     public enum GameTypeEnum
     {
@@ -46,13 +48,14 @@
 
     //RmvVersionEnum
 
-    public class GameInformation(GameTypeEnum gameType, string displayName, PackFileVersion packFileVersion, GameBnkVersion bankGeneratorVersion, WsModelVersion wsModelVersion)
+    public class GameInformation(GameTypeEnum gameType, string displayName, PackFileVersion packFileVersion, GameBnkVersion bankGeneratorVersion, WsModelVersion wsModelVersion, List<CompressionFormat> CompressionFormats)
     {
         public GameTypeEnum Type { get; } = gameType;
         public string DisplayName { get; } = displayName;
         public PackFileVersion PackFileVersion { get; } = packFileVersion;
         public GameBnkVersion BankGeneratorVersion { get; } = bankGeneratorVersion;
         public WsModelVersion WsModelVersion { get; } = wsModelVersion;
+        public List<CompressionFormat> CompressionFormats { get; } = CompressionFormats;
     }
 
     public static class GameInformationDatabase
@@ -61,14 +64,14 @@
 
         static GameInformationDatabase()
         {
-            var warhammer = new GameInformation(GameTypeEnum.Warhammer, "Warhammer", PackFileVersion.PFH4, GameBnkVersion.Unsupported, WsModelVersion.Unknown );
-            var warhammer2 = new GameInformation(GameTypeEnum.Warhammer2, "Warhammer II", PackFileVersion.PFH5, GameBnkVersion.Unsupported, WsModelVersion.Version1 );
-            var warhammer3 = new GameInformation(GameTypeEnum.Warhammer3, "Warhammer III", PackFileVersion.PFH5, GameBnkVersion.Warhammer3, WsModelVersion.Version3);
-            var troy = new GameInformation(GameTypeEnum.Troy, "Troy", PackFileVersion.PFH5, GameBnkVersion.Unsupported, WsModelVersion.Unknown);
-            var threeKingdoms = new GameInformation( GameTypeEnum.ThreeKingdoms, "Three Kingdoms", PackFileVersion.PFH5, GameBnkVersion.Unsupported, WsModelVersion.Version1 );
-            var rome2 = new GameInformation(GameTypeEnum.Rome2, "Rome II", PackFileVersion.PFH5, GameBnkVersion.Unsupported, WsModelVersion.Unknown);
-            var attila = new GameInformation(GameTypeEnum.Attila, "Attila", PackFileVersion.PFH5, GameBnkVersion.Attila, WsModelVersion.Unknown);
-            var pharaoh = new GameInformation(GameTypeEnum.Pharaoh, "Pharaoh", PackFileVersion.PFH5, GameBnkVersion.Unsupported, WsModelVersion.Unknown);
+            var warhammer = new GameInformation(GameTypeEnum.Warhammer, "Warhammer", PackFileVersion.PFH4, GameBnkVersion.Unsupported, WsModelVersion.Unknown, [CompressionFormat.None]);
+            var warhammer2 = new GameInformation(GameTypeEnum.Warhammer2, "Warhammer II", PackFileVersion.PFH5, GameBnkVersion.Unsupported, WsModelVersion.Version1, [CompressionFormat.Lzma1]);
+            var warhammer3 = new GameInformation(GameTypeEnum.Warhammer3, "Warhammer III", PackFileVersion.PFH5, GameBnkVersion.Warhammer3, WsModelVersion.Version3, [CompressionFormat.Lzma1, CompressionFormat.Lz4, CompressionFormat.Zstd]);
+            var troy = new GameInformation(GameTypeEnum.Troy, "Troy", PackFileVersion.PFH5, GameBnkVersion.Unsupported, WsModelVersion.Unknown, [CompressionFormat.Lzma1]);
+            var threeKingdoms = new GameInformation( GameTypeEnum.ThreeKingdoms, "Three Kingdoms", PackFileVersion.PFH5, GameBnkVersion.Unsupported, WsModelVersion.Version1, [CompressionFormat.Lzma1]);
+            var rome2 = new GameInformation(GameTypeEnum.Rome2, "Rome II", PackFileVersion.PFH4, GameBnkVersion.Unsupported, WsModelVersion.Unknown, [CompressionFormat.None]);
+            var attila = new GameInformation(GameTypeEnum.Attila, "Attila", PackFileVersion.PFH4, GameBnkVersion.Attila, WsModelVersion.Unknown, [CompressionFormat.None]);
+            var pharaoh = new GameInformation(GameTypeEnum.Pharaoh, "Pharaoh", PackFileVersion.PFH5, GameBnkVersion.Unsupported, WsModelVersion.Unknown, [CompressionFormat.Lzma1]);
 
             Games = [warhammer, warhammer2, warhammer3, troy, threeKingdoms, rome2, attila, pharaoh];
         }
