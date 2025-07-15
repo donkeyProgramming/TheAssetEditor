@@ -85,6 +85,5 @@ namespace Shared.Core.ByteParsing
 
             return (uint)Marshal.SizeOf(property);
         }
-
     }
 }

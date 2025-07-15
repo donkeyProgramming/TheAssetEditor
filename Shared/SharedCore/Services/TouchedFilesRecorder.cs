@@ -1,9 +1,9 @@
-﻿using Serilog;
-using Shared.Core.ErrorHandling;
+﻿using Shared.Core.ErrorHandling;
 using Shared.Core.Events;
 using Shared.Core.Events.Global;
 using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
+using Shared.Core.Settings;
 
 namespace Shared.Core.Services
 {
@@ -13,12 +13,14 @@ namespace Shared.Core.Services
         readonly List<(string FilePath, PackFileContainer Container)> _files = new();
         readonly IPackFileService _pfs;
         private readonly IGlobalEventHub _eventHub;
+        private readonly ApplicationSettingsService _applicationSettingsService;
         bool _isStarted = false;
 
-        public TouchedFilesRecorder(IPackFileService pfs, IGlobalEventHub eventHub)
+        public TouchedFilesRecorder(IPackFileService pfs, IGlobalEventHub eventHub, ApplicationSettingsService applicationSettingsService)
         {
             _pfs = pfs;
             _eventHub = eventHub;
+            _applicationSettingsService = applicationSettingsService;
         }
 
         public void Start()
@@ -49,7 +51,8 @@ namespace Shared.Core.Services
             foreach (var item in _files)
                 _pfs.CopyFileFromOtherPackFile(item.Container, item.FilePath, newPack);
 
-            _pfs.SavePackContainer(newPack, path, false);
+            var gameInformation = GameInformationDatabase.GetGameById(_applicationSettingsService.CurrentSettings.CurrentGame);
+            _pfs.SavePackContainer(newPack, path, false, gameInformation);
         }
 
         public void Stop()

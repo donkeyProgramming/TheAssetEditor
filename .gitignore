@@ -340,3 +340,5 @@ ASALocalRun/
 # BeatPulse healthcheck temp database
 healthchecksdb
 
+# MonoGame build outputs
+/GameWorld/ContentProject/Content/bin/

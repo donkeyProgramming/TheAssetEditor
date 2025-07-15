@@ -1,4 +1,5 @@
-﻿using System.Reflection;
+﻿using System.Collections.Concurrent;
+using System.Reflection;
 using System.Text;
 using Shared.Core.ErrorHandling;
 using Shared.Core.PackFiles.Models;
@@ -42,7 +43,7 @@ namespace Shared.Core.PackFiles
             return container;
         }
 
-        void AddFolderContentToPackFile(PackFileContainer container, string folderPath, string rootPath)
+        private static void AddFolderContentToPackFile(PackFileContainer container, string folderPath, string rootPath)
         {
             var files = Directory.GetFiles(folderPath);
             foreach (var filePath in files)
@@ -73,9 +74,10 @@ namespace Shared.Core.PackFiles
                 using var fileStream = File.OpenRead(packFileSystemPath);
                 using var reader = new BinaryReader(fileStream, Encoding.ASCII);
 
-                var container = PackFileSerializer.Load(packFileSystemPath, reader, new CustomPackDuplicatePackFileResolver());
+                var pack = PackFileSerializer.Load(packFileSystemPath, reader, new CustomPackDuplicatePackFileResolver());
+                PackFileLog.LogPackCompression(pack);
 
-                return container;
+                return pack;
             }
             catch (Exception e)
             {
@@ -108,25 +110,35 @@ namespace Shared.Core.PackFiles
                 }
 
                 var packList = new List<PackFileContainer>();
-                
-                //foreach(var packFilePath in allCaPackFiles)
+                var packsCompressionStats = new ConcurrentDictionary<CompressionFormat, CompressionStats>();
+
                 Parallel.ForEach(allCaPackFiles, packFilePath =>
                 {
                     var path = gameDataFolder + "\\" + packFilePath;
                     if (File.Exists(path))
                     {
-                        using var fileStram = File.OpenRead(path);
-                        using var reader = new BinaryReader(fileStram, Encoding.ASCII);
+                        using var fileStream = File.OpenRead(path);
+                        using var reader = new BinaryReader(fileStream, Encoding.ASCII);
 
                         var pack = PackFileSerializer.Load(path, reader, packfileResolver);
                         packList.Add(pack);
+
+                        PackFileLog.LogPackCompression(pack);
+                        var packCompressionStats = PackFileLog.GetCompressionStats(pack);
+                        foreach (var kvp in packCompressionStats)
+                        {
+                            if (!packsCompressionStats.TryGetValue(kvp.Key, out var existingStats))
+                                packsCompressionStats[kvp.Key] = new CompressionStats(kvp.Value.DiskSize, kvp.Value.UncompressedSize);
+                            else
+                                existingStats.Add(kvp.Value);
+                        }
                     }
                     else
-                    {
                         _logger.Here().Warning($"{gameName} pack file '{path}' not found, loading skipped");
-                    }
                 }
                 );
+
+                PackFileLog.LogPacksCompression(packsCompressionStats);
 
                 var caPackFileContainer = new PackFileContainer($"All Game Packs - {gameName}");
                 caPackFileContainer.IsCaPackFile = true;
@@ -147,6 +159,6 @@ namespace Shared.Core.PackFiles
                 _logger.Here().Error($"Trying to get all CA packs in {gameDataFolder}. Error : {e.ToString()}");
                 return null;
             }
-        } // 2000
+        }
     }
 }
