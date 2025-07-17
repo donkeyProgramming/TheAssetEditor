@@ -9,6 +9,7 @@ using System.Windows.Data;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Editors.Audio.AudioEditor.AudioProjectExplorer;
+using Editors.Audio.AudioEditor.Models;
 using Editors.Audio.AudioEditor.DataGrids;
 using Editors.Audio.AudioEditor.Events;
 using Editors.Audio.AudioEditor.UICommands;

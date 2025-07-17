@@ -5,7 +5,7 @@ using Editors.Audio.AudioEditor.AudioFilesExplorer;
 using Editors.Audio.AudioEditor.AudioProjectEditor;
 using Editors.Audio.AudioEditor.AudioProjectExplorer;
 using Editors.Audio.AudioEditor.AudioProjectViewer;
-using Editors.Audio.AudioEditor.AudioSettings;
+using Editors.Audio.AudioEditor.Settings;
 using Editors.Audio.AudioEditor.DataGrids;
 using Editors.Audio.AudioEditor.NewAudioProject;
 using Editors.Audio.AudioEditor.UICommands;
@@ -36,7 +36,7 @@ namespace Editors.Audio
             serviceCollection.AddScoped<AudioFilesExplorerViewModel>();
             serviceCollection.AddScoped<AudioProjectEditorViewModel>();
             serviceCollection.AddScoped<AudioProjectViewerViewModel>();
-            serviceCollection.AddScoped<AudioSettingsViewModel>();
+            serviceCollection.AddScoped<SettingsViewModel>();
             serviceCollection.AddScoped<IntegrityChecker>();
 
             serviceCollection.AddScoped<IDataGridServiceFactory, DataGridServiceFactory>();

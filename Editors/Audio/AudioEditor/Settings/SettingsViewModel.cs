@@ -3,15 +3,16 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Editors.Audio.AudioEditor.Models;
 using Editors.Audio.AudioEditor.Events;
 using Editors.Audio.Storage;
 using Shared.Core.Events;
-using static Editors.Audio.AudioEditor.AudioSettings.AudioSettings;
+using static Editors.Audio.AudioEditor.Settings.Settings;
 
 // TODO: Some bug where the audio settings aren't updating right after multiple sounds are set after single previously being set
-namespace Editors.Audio.AudioEditor.AudioSettings
+namespace Editors.Audio.AudioEditor.Settings
 {
-    public partial class AudioSettingsViewModel : ObservableObject
+    public partial class SettingsViewModel : ObservableObject
     {
         private readonly IEventHub _eventHub;
         private readonly IAudioEditorService _audioEditorService;
@@ -58,16 +59,16 @@ namespace Editors.Audio.AudioEditor.AudioSettings
         [ObservableProperty] private decimal _transitionDuration = 1;
         [ObservableProperty] private bool _isTransitionDurationEnabled = false;
         [ObservableProperty] private bool _isTransitionDurationVisible = false;
-        [ObservableProperty] private bool _isAudioSettingsVisible = false;
+        [ObservableProperty] private bool _isSettingsVisible = false;
         [ObservableProperty] private bool _showSettingsFromAudioProjectViewer = false;
 
-        public AudioSettingsViewModel(IEventHub eventHub, IAudioEditorService audioEditorService, IAudioRepository audioRepository)
+        public SettingsViewModel(IEventHub eventHub, IAudioEditorService audioEditorService, IAudioRepository audioRepository)
         {
             _eventHub = eventHub;
             _audioEditorService = audioEditorService;
             _audioRepository = audioRepository;
 
-            SetInitialAudioSettings();
+            SetInitialSettings();
 
             _eventHub.Register<ShowSettingsFromAudioProjectViewerCheckEvent>(this, CheckShowSettingsFromAudioProjectViewer);
             _eventHub.Register<AudioFilesSetEvent>(this, OnAudioFilesSet);
@@ -77,7 +78,7 @@ namespace Editors.Audio.AudioEditor.AudioSettings
             _eventHub.Register<EditViewerRowEvent>(this, OnViewerRowEdited);
         }
 
-        public void CheckShowSettingsFromAudioProjectViewer(ShowSettingsFromAudioProjectViewerCheckEvent resetAudioSettingsEvent)
+        public void CheckShowSettingsFromAudioProjectViewer(ShowSettingsFromAudioProjectViewerCheckEvent resetSettingsEvent)
         {
             if (ShowSettingsFromAudioProjectViewer)
                 ResetShowSettingsFromAudioProjectViewer();
@@ -88,9 +89,9 @@ namespace Editors.Audio.AudioEditor.AudioSettings
             AudioFiles.Clear();
             AudioFiles = audioFilesSetEvent.AudioFiles;
 
-            SetAudioSettingsEnablementAndVisibility();
+            SetSettingsEnablementAndVisibility();
             ResetShowSettingsFromAudioProjectViewer();
-            StoreAudioSettings();
+            StoreSettings();
         }
 
         public void OnViewerRowSelectionChanged(ViewerRowSelectionChangedEvent viewerRowSelectionChangedEvent)
@@ -98,7 +99,7 @@ namespace Editors.Audio.AudioEditor.AudioSettings
             if (ShowSettingsFromAudioProjectViewer)
             {
                 ShowSettingsFromAudioProjectViewerItem();
-                DisableAllAudioSettings();
+                DisableAllSettings();
             }
         }
 
@@ -116,77 +117,77 @@ namespace Editors.Audio.AudioEditor.AudioSettings
         public void OnViewerRowEdited(EditViewerRowEvent itemEditedEvent)
         {
             ShowSettingsFromAudioProjectViewerItem();
-            SetAudioSettingsEnablementAndVisibility();
+            SetSettingsEnablementAndVisibility();
         }
 
         public void OnSelectedExplorerNodeChanged(ExplorerNodeSelectedEvent e)
         {
-            ResetAudioSettingsView();
-            SetAudioSettingsEnablementAndVisibility();
+            ResetSettingsView();
+            SetSettingsEnablementAndVisibility();
         }
 
         partial void OnShowSettingsFromAudioProjectViewerChanged(bool oldValue, bool newValue)
         {
             if (ShowSettingsFromAudioProjectViewer == false)
             {
-                SetInitialAudioSettings();
-                SetAudioSettingsEnablementAndVisibility();
+                SetInitialSettings();
+                SetSettingsEnablementAndVisibility();
             }
         }
 
         partial void OnPlaylistTypeChanged(PlaylistType oldValue, PlaylistType newValue)
         {
-            SetAudioSettingsEnablementAndVisibility();
-            StoreAudioSettings();
+            SetSettingsEnablementAndVisibility();
+            StoreSettings();
         }
 
         partial void OnPlaylistModeChanged(PlaylistMode oldValue, PlaylistMode newValue)
         {
-            SetAudioSettingsEnablementAndVisibility();
-            StoreAudioSettings();
+            SetSettingsEnablementAndVisibility();
+            StoreSettings();
         }
 
         partial void OnLoopingTypeChanged(LoopingType oldValue, LoopingType newValue)
         {
-            SetAudioSettingsEnablementAndVisibility();
-            StoreAudioSettings();
+            SetSettingsEnablementAndVisibility();
+            StoreSettings();
         }
 
         partial void OnNumberOfLoopsChanged(uint oldValue, uint newValue)
         {
-            SetAudioSettingsEnablementAndVisibility();
-            StoreAudioSettings();
+            SetSettingsEnablementAndVisibility();
+            StoreSettings();
         }
 
         partial void OnTransitionTypeChanged(TransitionType oldValue, TransitionType newValue)
         {
-            SetAudioSettingsEnablementAndVisibility();
-            StoreAudioSettings();
+            SetSettingsEnablementAndVisibility();
+            StoreSettings();
         }
 
         partial void OnEnableRepetitionIntervalChanged(bool oldValue, bool newValue)
         {
-            StoreAudioSettings();
+            StoreSettings();
         }
 
         partial void OnRepetitionIntervalChanged(uint oldValue, uint newValue)
         {
-            StoreAudioSettings();
+            StoreSettings();
         }
 
         partial void OnEndBehaviourChanged(EndBehaviour oldValue, EndBehaviour newValue)
         {
-            StoreAudioSettings();
+            StoreSettings();
         }
 
         partial void OnAlwaysResetPlaylistChanged(bool oldValue, bool newValue)
         {
-            StoreAudioSettings();
+            StoreSettings();
         }
 
         partial void OnTransitionDurationChanged(decimal oldValue, decimal newValue)
         {
-            StoreAudioSettings();
+            StoreSettings();
         }
 
         private SoundSettings BuildSoundSettings()
@@ -198,9 +199,9 @@ namespace Editors.Audio.AudioEditor.AudioSettings
             };
         }
 
-        private RanSeqContainerSettings BuildRanSeqContainerSettings()
+        private RandomSequenceContainerSettings BuildRanSeqContainerSettings()
         {
-            return new RanSeqContainerSettings
+            return new RandomSequenceContainerSettings
             {
                 PlaylistType = PlaylistType,
                 EnableRepetitionInterval = EnableRepetitionInterval,
@@ -215,7 +216,7 @@ namespace Editors.Audio.AudioEditor.AudioSettings
             };
         }
 
-        private IAudioSettings BuildAudioSettings()
+        private ISettings BuildSettings()
         {
             if (AudioFiles.Count > 1)
                 return BuildRanSeqContainerSettings();
@@ -223,18 +224,18 @@ namespace Editors.Audio.AudioEditor.AudioSettings
                 return BuildSoundSettings();
         }
 
-        public void StoreAudioSettings() => _audioEditorService.AudioSettings = BuildAudioSettings();
+        public void StoreSettings() => _audioEditorService.Settings = BuildSettings();
 
         public void ShowSettingsFromAudioProjectViewerItem()
         {
-            IAudioSettings audioSettings = null;
+            ISettings settings = null;
             var audioFiles = new List<AudioFile>();
 
             var audioProjectItem = _audioEditorService.SelectedExplorerNode;
             if (audioProjectItem.IsActionEventSoundBank())
             {
                 var selectedViewerRow = _audioEditorService.SelectedViewerRows[0];
-                audioSettings = AudioProjectHelpers.GetAudioSettingsFromActionEvent(_audioEditorService.AudioProject, selectedViewerRow);
+                settings = AudioProjectHelpers.GetSettingsFromActionEvent(_audioEditorService.AudioProject, selectedViewerRow);
                 var actionEvent = AudioProjectHelpers.GetActionEventFromRow(_audioEditorService.AudioProject, selectedViewerRow);
 
                 if (actionEvent.Sound != null)
@@ -259,7 +260,7 @@ namespace Editors.Audio.AudioEditor.AudioSettings
             }
             else if (audioProjectItem.IsDialogueEvent())
             {
-                audioSettings = AudioProjectHelpers.GetAudioSettingsFromStatePath(_audioEditorService, _audioRepository);
+                settings = AudioProjectHelpers.GetSettingsFromStatePath(_audioEditorService, _audioRepository);
 
                 var selectedViewerRow = _audioEditorService.SelectedViewerRows[0];
                 var dialogueEvent = AudioProjectHelpers.GetDialogueEventFromName(_audioEditorService.AudioProject, _audioEditorService.SelectedExplorerNode.Name);
@@ -287,18 +288,18 @@ namespace Editors.Audio.AudioEditor.AudioSettings
 
             }
 
-            SetAudioSettingsFromAudioProjectItemAudioSettings(audioSettings, audioFiles);
+            SetSettingsFromAudioProjectItemSettings(settings, audioFiles);
         }
 
-        public void SetAudioSettingsFromAudioProjectItemAudioSettings(IAudioSettings audioSettings, List<AudioFile> audioFiles)
+        public void SetSettingsFromAudioProjectItemSettings(ISettings settings, List<AudioFile> audioFiles)
         {
             ResetAudioFiles();
-            ResetAudioSettingsPlaylistType();
-            ResetAudioSettingsPlaylistMode();
+            ResetSettingsPlaylistType();
+            ResetSettingsPlaylistMode();
 
             SetAudioFiles(audioFiles);
 
-            if (audioSettings is RanSeqContainerSettings ranSeqContainerSettings)
+            if (settings is RandomSequenceContainerSettings ranSeqContainerSettings)
             {
                 PlaylistType = ranSeqContainerSettings.PlaylistType;
 
@@ -324,14 +325,14 @@ namespace Editors.Audio.AudioEditor.AudioSettings
                 if (TransitionType != TransitionType.Disabled)
                     TransitionDuration = ranSeqContainerSettings.TransitionDuration;
             }
-            else if (audioSettings is SoundSettings soundSettings)
+            else if (settings is SoundSettings soundSettings)
             {
                 LoopingType = soundSettings.LoopingType;
                 if (LoopingType == LoopingType.FiniteLooping)
                     NumberOfLoops = soundSettings.NumberOfLoops;
             }
 
-            SetAudioSettingsEnablementAndVisibility();
+            SetSettingsEnablementAndVisibility();
         }
 
         public void SetAudioFiles(List<AudioFile> audioFiles)
@@ -340,7 +341,7 @@ namespace Editors.Audio.AudioEditor.AudioSettings
                 AudioFiles.Add(audioFile);
         }
 
-        public void SetInitialAudioSettings()
+        public void SetInitialSettings()
         {
             PlaylistType = PlaylistType.Random;
             RepetitionInterval = 1;
@@ -354,9 +355,9 @@ namespace Editors.Audio.AudioEditor.AudioSettings
             TransitionDuration = 1;
         }
 
-        public void SetAudioSettingsEnablementAndVisibility()
+        public void SetSettingsEnablementAndVisibility()
         {
-            IsAudioSettingsVisible = true;
+            IsSettingsVisible = true;
 
             if (AudioFiles.Count > 1)
             {
@@ -471,7 +472,7 @@ namespace Editors.Audio.AudioEditor.AudioSettings
             }
         }
 
-        [RelayCommand] public void SetRecommendedAudioSettings()
+        [RelayCommand] public void SetRecommendedSettings()
         {
             if (AudioFiles.Count > 1)
             {
@@ -488,7 +489,7 @@ namespace Editors.Audio.AudioEditor.AudioSettings
             }
         }
 
-        public void DisableAllAudioSettings()
+        public void DisableAllSettings()
         {
             IsPlaylistTypeEnabled = false;
             IsEnableRepetitionIntervalEnabled = false;
@@ -502,11 +503,11 @@ namespace Editors.Audio.AudioEditor.AudioSettings
             IsTransitionDurationEnabled = false;
         }
 
-        [RelayCommand] public void ResetAudioSettings()
+        [RelayCommand] public void ResetSettings()
         {
-            SetInitialAudioSettings();
+            SetInitialSettings();
             ResetAudioFiles();
-            SetAudioSettingsEnablementAndVisibility();
+            SetSettingsEnablementAndVisibility();
         }
 
         private void ResetAudioFiles()
@@ -514,7 +515,7 @@ namespace Editors.Audio.AudioEditor.AudioSettings
             AudioFiles.Clear();
         }
 
-        private void ResetAudioSettingsPlaylistType()
+        private void ResetSettingsPlaylistType()
         {
             PlaylistType = PlaylistType.Random;
             EnableRepetitionInterval = false;
@@ -523,7 +524,7 @@ namespace Editors.Audio.AudioEditor.AudioSettings
             AlwaysResetPlaylist = false;
         }
 
-        private void ResetAudioSettingsPlaylistMode()
+        private void ResetSettingsPlaylistMode()
         {
             PlaylistMode = PlaylistMode.Step;
             LoopingType = LoopingType.Disabled;
@@ -532,9 +533,9 @@ namespace Editors.Audio.AudioEditor.AudioSettings
             TransitionDuration = 1;
         }
 
-        public void ResetAudioSettingsView()
+        public void ResetSettingsView()
         {
-            IsAudioSettingsVisible = false;
+            IsSettingsVisible = false;
         }
 
         public void ResetShowSettingsFromAudioProjectViewer()

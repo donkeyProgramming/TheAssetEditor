@@ -1,5 +1,5 @@
 ﻿<UserControl 
-    x:Class="Editors.Audio.AudioEditor.AudioSettings.AudioSettingsView"
+    x:Class="Editors.Audio.AudioEditor.Settings.SettingsView"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -7,8 +7,8 @@
     xmlns:sys="clr-namespace:System;assembly=netstandard"
     xmlns:extendedwpftoolkit="clr-namespace:Xceed.Wpf.Toolkit;assembly=Xceed.Wpf.Toolkit"
     xmlns:converters="clr-namespace:Editors.Audio.AudioEditor.Converters"
-    xmlns:audiosettings="clr-namespace:Editors.Audio.AudioEditor.AudioSettings"
-    d:DataContext="{d:DesignInstance Type=audiosettings:AudioSettingsViewModel}"
+    xmlns:settings="clr-namespace:Editors.Audio.AudioEditor.Settings"
+    d:DataContext="{d:DesignInstance Type=settings:SettingsViewModel}"
     mc:Ignorable="d"
     d:DesignHeight="550"
     d:DesignWidth="960">
@@ -26,7 +26,7 @@
     </UserControl.Resources>
 
     <Grid 
-        Visibility="{Binding IsAudioSettingsVisible, Converter={StaticResource BoolToVisibilityConverter}}">
+        Visibility="{Binding IsSettingsVisible, Converter={StaticResource BoolToVisibilityConverter}}">
 
         <Grid.RowDefinitions>
             <RowDefinition 
@@ -72,7 +72,7 @@
                 Width="95" 
                 VerticalAlignment="Center" 
                 HorizontalAlignment="Left"
-                Command="{Binding ResetAudioSettingsCommand}"/>
+                Command="{Binding ResetSettingsCommand}"/>
 
             <Button 
                 Grid.Column="1"
@@ -81,7 +81,7 @@
                 Margin="5, 0, 0, 5" 
                 VerticalAlignment="Center"
                 Content="Set Recommended Settings"
-                Command="{Binding SetRecommendedAudioSettingsCommand}"/>
+                Command="{Binding SetRecommendedSettingsCommand}"/>
 
             <CheckBox 
                 Grid.Column="2"

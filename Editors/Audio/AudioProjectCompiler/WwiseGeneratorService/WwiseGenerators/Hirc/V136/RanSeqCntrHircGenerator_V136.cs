@@ -1,10 +1,10 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using Editors.Audio.AudioEditor;
+using Editors.Audio.AudioEditor.Models;
 using Shared.GameFormats.Wwise.Hirc;
 using Shared.GameFormats.Wwise.Hirc.V136;
 using Shared.GameFormats.Wwise.Hirc.V136.Shared;
-using static Editors.Audio.AudioEditor.AudioSettings.AudioSettings;
+using static Editors.Audio.AudioEditor.Settings.Settings;
 using static Shared.GameFormats.Wwise.Hirc.V136.CAkRanSeqCntr_V136.CAkPlayList_V136;
 
 namespace Editors.Audio.AudioProjectCompiler.WwiseGeneratorService.WwiseGenerators.Hirc.V136
@@ -18,37 +18,37 @@ namespace Editors.Audio.AudioProjectCompiler.WwiseGeneratorService.WwiseGenerato
             var randomSequenceContainerHirc = CreateRandomSequenceContainerHirc(audioProjectRandomSequenceContainer);
             randomSequenceContainerHirc.NodeBaseParams = CreateNodeBaseParams(audioProjectRandomSequenceContainer);
 
-            if (audioProjectRandomSequenceContainer.AudioSettings.LoopingType == LoopingType.FiniteLooping)
-                randomSequenceContainerHirc.LoopCount = (ushort)audioProjectRandomSequenceContainer.AudioSettings.NumberOfLoops;
-            else if (audioProjectRandomSequenceContainer.AudioSettings.LoopingType == LoopingType.InfiniteLooping)
+            if (audioProjectRandomSequenceContainer.Settings.LoopingType == LoopingType.FiniteLooping)
+                randomSequenceContainerHirc.LoopCount = (ushort)audioProjectRandomSequenceContainer.Settings.NumberOfLoops;
+            else if (audioProjectRandomSequenceContainer.Settings.LoopingType == LoopingType.InfiniteLooping)
                 randomSequenceContainerHirc.LoopCount = 0;
-            else if (audioProjectRandomSequenceContainer.AudioSettings.LoopingType == LoopingType.Disabled)
+            else if (audioProjectRandomSequenceContainer.Settings.LoopingType == LoopingType.Disabled)
                 randomSequenceContainerHirc.LoopCount = 1;
 
             randomSequenceContainerHirc.LoopModMin = 0;
             randomSequenceContainerHirc.LoopModMax = 0;
 
-            if (audioProjectRandomSequenceContainer.AudioSettings.TransitionDuration != 1)
-                randomSequenceContainerHirc.TransitionTime = (ushort)audioProjectRandomSequenceContainer.AudioSettings.TransitionDuration * 1000;
+            if (audioProjectRandomSequenceContainer.Settings.TransitionDuration != 1)
+                randomSequenceContainerHirc.TransitionTime = (ushort)audioProjectRandomSequenceContainer.Settings.TransitionDuration * 1000;
             else
                 randomSequenceContainerHirc.TransitionTime = 1 * 1000;
 
             randomSequenceContainerHirc.TransitionTimeModMin = 0;
             randomSequenceContainerHirc.TransitionTimeModMax = 0;
 
-            if (audioProjectRandomSequenceContainer.AudioSettings.RepetitionInterval != 1)
-                randomSequenceContainerHirc.AvoidRepeatCount = (ushort)audioProjectRandomSequenceContainer.AudioSettings.RepetitionInterval;
+            if (audioProjectRandomSequenceContainer.Settings.RepetitionInterval != 1)
+                randomSequenceContainerHirc.AvoidRepeatCount = (ushort)audioProjectRandomSequenceContainer.Settings.RepetitionInterval;
             else
                 randomSequenceContainerHirc.AvoidRepeatCount = 1;
 
-            randomSequenceContainerHirc.TransitionMode = (byte)audioProjectRandomSequenceContainer.AudioSettings.TransitionType;
+            randomSequenceContainerHirc.TransitionMode = (byte)audioProjectRandomSequenceContainer.Settings.TransitionType;
 
-            if (audioProjectRandomSequenceContainer.AudioSettings.PlaylistType == PlaylistType.RandomExhaustive)
+            if (audioProjectRandomSequenceContainer.Settings.PlaylistType == PlaylistType.RandomExhaustive)
                 randomSequenceContainerHirc.RandomMode = 1; // Shuffle
             else
                 randomSequenceContainerHirc.RandomMode = 0; // Normal
 
-            if (audioProjectRandomSequenceContainer.AudioSettings.PlaylistType == PlaylistType.Sequence)
+            if (audioProjectRandomSequenceContainer.Settings.PlaylistType == PlaylistType.Sequence)
                 randomSequenceContainerHirc.Mode = 1; // Sequence
             else
                 randomSequenceContainerHirc.Mode = 0; // Random
@@ -56,15 +56,15 @@ namespace Editors.Audio.AudioProjectCompiler.WwiseGeneratorService.WwiseGenerato
             var isUsingWeight = 0;
 
             var resetPlaylistAtEachPlay = 0;
-            if (audioProjectRandomSequenceContainer.AudioSettings.AlwaysResetPlaylist)
+            if (audioProjectRandomSequenceContainer.Settings.AlwaysResetPlaylist)
                 resetPlaylistAtEachPlay = 1;
 
             var isRestartBackwards = 0;
-            if (audioProjectRandomSequenceContainer.AudioSettings.EndBehaviour == EndBehaviour.PlayInReverseOrder)
+            if (audioProjectRandomSequenceContainer.Settings.EndBehaviour == EndBehaviour.PlayInReverseOrder)
                 isRestartBackwards = 1;
 
             var isContinous = 0;
-            if (audioProjectRandomSequenceContainer.AudioSettings.PlaylistMode == PlaylistMode.Continuous)
+            if (audioProjectRandomSequenceContainer.Settings.PlaylistMode == PlaylistMode.Continuous)
                 isContinous = 1;
 
             var isGlobal = 1;

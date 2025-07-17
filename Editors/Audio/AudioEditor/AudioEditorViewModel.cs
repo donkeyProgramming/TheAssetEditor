@@ -4,8 +4,9 @@ using CommunityToolkit.Mvvm.Input;
 using Editors.Audio.AudioEditor.AudioFilesExplorer;
 using Editors.Audio.AudioEditor.AudioProjectEditor;
 using Editors.Audio.AudioEditor.AudioProjectExplorer;
+using Editors.Audio.AudioEditor.Models;
 using Editors.Audio.AudioEditor.AudioProjectViewer;
-using Editors.Audio.AudioEditor.AudioSettings;
+using Editors.Audio.AudioEditor.Settings;
 using Editors.Audio.AudioEditor.Events;
 using Editors.Audio.AudioEditor.UICommands;
 using Shared.Core.Events;
@@ -21,7 +22,7 @@ namespace Editors.Audio.AudioEditor
         public AudioFilesExplorerViewModel AudioFilesExplorerViewModel { get; }
         public AudioProjectEditorViewModel AudioProjectEditorViewModel { get; }
         public AudioProjectViewerViewModel AudioProjectViewerViewModel { get; }
-        public AudioSettingsViewModel AudioSettingsViewModel { get; }
+        public SettingsViewModel SettingsViewModel { get; }
 
         private readonly IUiCommandFactory _uiCommandFactory;
         private readonly IAudioProjectUICommandFactory _audioProjectUICommandFactory;
@@ -36,7 +37,7 @@ namespace Editors.Audio.AudioEditor
             AudioFilesExplorerViewModel audioFilesExplorerViewModel,
             AudioProjectEditorViewModel audioProjectEditorViewModel,
             AudioProjectViewerViewModel audioProjectViewerViewModel,
-            AudioSettingsViewModel audioSettingsViewModel,
+            SettingsViewModel settingsViewModel,
             IUiCommandFactory uiCommandFactory,
             IAudioProjectUICommandFactory audioProjectUICommandFactory,
             IEventHub eventHub,
@@ -53,7 +54,7 @@ namespace Editors.Audio.AudioEditor
             AudioFilesExplorerViewModel = audioFilesExplorerViewModel;
             AudioProjectEditorViewModel = audioProjectEditorViewModel;
             AudioProjectViewerViewModel = audioProjectViewerViewModel;
-            AudioSettingsViewModel = audioSettingsViewModel;
+            SettingsViewModel = settingsViewModel;
 
             _eventHub.Publish(new InitialiseViewModelDataEvent());
 

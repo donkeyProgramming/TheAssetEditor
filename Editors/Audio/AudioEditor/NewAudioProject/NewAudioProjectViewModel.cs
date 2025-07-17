@@ -2,6 +2,7 @@
 using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Editors.Audio.AudioEditor.Models;
 using Editors.Audio.AudioEditor.Events;
 using Serilog;
 using Shared.Core.ErrorHandling;

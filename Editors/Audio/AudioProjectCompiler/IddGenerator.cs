@@ -1,10 +1,10 @@
 ﻿using System.Collections.Generic;
-using Editors.Audio.AudioEditor;
+using Editors.Audio.AudioEditor.Models;
 using Editors.Audio.Utility;
 
 namespace Editors.Audio.AudioProjectCompiler
 {
-    public static class IdGenerator
+    public static class IddGenerator
     {
         public record Result(uint Id, string FinalKey, string OriginalKey, int Collisions);
 

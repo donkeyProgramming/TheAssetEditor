@@ -1,6 +1,6 @@
 ﻿using System.IO;
 using System.Linq;
-using Editors.Audio.AudioEditor;
+using Editors.Audio.AudioEditor.Models;
 using Editors.Audio.Utility;
 using Shared.Core.Misc;
 using Shared.Core.PackFiles;

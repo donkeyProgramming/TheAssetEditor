@@ -1,15 +1,14 @@
 ﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using Editors.Audio.AudioEditor.AudioFilesExplorer;
 
-namespace Editors.Audio.AudioEditor.AudioSettings
+namespace Editors.Audio.AudioEditor.Settings
 {
-    public partial class AudioSettingsView : UserControl
+    public partial class SettingsView : UserControl
     {
-        public AudioSettingsView()
+        public SettingsView()
         {
             InitializeComponent();
         }
@@ -31,7 +30,7 @@ namespace Editors.Audio.AudioEditor.AudioSettings
                 if (e.Data.GetData(typeof(IEnumerable<TreeNode>)) is not IEnumerable<TreeNode> droppedNodes)
                     return;
 
-                if (DataContext is AudioSettingsViewModel viewModel)
+                if (DataContext is SettingsViewModel viewModel)
                 {
                     var audioFiles = new ObservableCollection<AudioFile>();
                     foreach (var wavFile in droppedNodes)

@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
 
-namespace Editors.Audio.AudioEditor.AudioSettings
+namespace Editors.Audio.AudioEditor.Settings
 {
-    public class AudioSettings
+    public class Settings
     {
         public enum PlaylistType
         {

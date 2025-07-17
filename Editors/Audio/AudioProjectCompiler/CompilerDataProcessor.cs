@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using Editors.Audio.AudioEditor;
+using Editors.Audio.AudioEditor.Models;
 using Editors.Audio.AudioProjectCompiler.WwiseIdService;
 using Editors.Audio.GameSettings.Warhammer3;
 using Editors.Audio.Storage;
@@ -11,7 +11,7 @@ using Shared.Core.Misc;
 using Shared.Core.Settings;
 using Shared.GameFormats.Wwise.Enums;
 using static Editors.Audio.GameSettings.Warhammer3.SoundBanks;
-using Action = Editors.Audio.AudioEditor.Action;
+using Action = Editors.Audio.AudioEditor.Models.Action;
 
 namespace Editors.Audio.AudioProjectCompiler
 {
@@ -154,7 +154,7 @@ namespace Editors.Audio.AudioProjectCompiler
 
             var usedHircIds = UsedHircIdsByLanguageIdLookup[WwiseHash.Compute(soundBank.Language)];
             var soundFileNameWithoutExtension = Path.GetFileNameWithoutExtension(sound.WavFileName);
-            var soundIdResult = IdGenerator.GenerateSoundHircId(usedHircIds, audioProjectFileName, soundFileNameWithoutExtension);
+            var soundIdResult = IddGenerator.GenerateSoundHircId(usedHircIds, audioProjectFileName, soundFileNameWithoutExtension);
             sound.Id = soundIdResult.Id;
 
             if (wwiseIdService.OverrideBusIds.TryGetValue(soundBank.SoundBankSubtype, out var overrideBusId))
@@ -168,7 +168,7 @@ namespace Editors.Audio.AudioProjectCompiler
             if (!sourceLookup.TryGetValue(sound.WavFilePath, out var sourceId))
             {
                 var usedSourceIds = UsedSourceIdsByLanguageIdLookup[WwiseHash.Compute(soundBank.Language)];
-                var sourceIdResult = IdGenerator.GenerateWemId(usedSourceIds, audioProjectFileName, soundFileNameWithoutExtension);
+                var sourceIdResult = IddGenerator.GenerateWemId(usedSourceIds, audioProjectFileName, soundFileNameWithoutExtension);
                 sourceId = sourceIdResult.Id;
                 sourceLookup[sound.WavFilePath] = sourceId;
             }
@@ -188,16 +188,16 @@ namespace Editors.Audio.AudioProjectCompiler
             container.Language = soundBank.Language;
 
             var usedHircIds = UsedHircIdsByLanguageIdLookup[WwiseHash.Compute(soundBank.Language)];
-            IdGenerator.Result containerIdResult;
+            IddGenerator.Result containerIdResult;
 
             if (actionEventName != null)
             {
-                containerIdResult = IdGenerator.GenerateRanSeqCntrActionEventHircId(usedHircIds, audioProjectFileName, actionEventName);
+                containerIdResult = IddGenerator.GenerateRanSeqCntrActionEventHircId(usedHircIds, audioProjectFileName, actionEventName);
                 container.Id = containerIdResult.Id;
             }
             else if (dialogueEventName != null)
             {
-                containerIdResult = IdGenerator.GenerateRanSeqCntrDialogueEventHircId(usedHircIds, audioProjectFileName, actionEventName, statePath);
+                containerIdResult = IddGenerator.GenerateRanSeqCntrDialogueEventHircId(usedHircIds, audioProjectFileName, actionEventName, statePath);
                 container.Id = containerIdResult.Id;
             }
 
@@ -260,13 +260,13 @@ namespace Editors.Audio.AudioProjectCompiler
 
                     if (actionEvent.Sound != null)
                     {
-                        var actionIdResult = IdGenerator.GenerateActionHircId(usedHircIds, audioProject.FileName, actionEvent.Name);
+                        var actionIdResult = IddGenerator.GenerateActionHircId(usedHircIds, audioProject.FileName, actionEvent.Name);
                         action.Id = actionIdResult.Id;
                         action.IdExt = actionEvent.Sound.Id;
                     } 
                     else
                     {
-                        var actionIdResult = IdGenerator.GenerateActionHircId(usedHircIds, audioProject.FileName, actionEvent.Name);
+                        var actionIdResult = IddGenerator.GenerateActionHircId(usedHircIds, audioProject.FileName, actionEvent.Name);
                         action.Id = actionIdResult.Id; 
                         action.IdExt = actionEvent.RandomSequenceContainer.Id;
                     }

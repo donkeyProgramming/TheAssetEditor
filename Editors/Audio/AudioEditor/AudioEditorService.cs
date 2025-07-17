@@ -6,7 +6,8 @@ using System.Linq;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using Editors.Audio.AudioEditor.AudioSettings;
+using Editors.Audio.AudioEditor.Models;
+using Editors.Audio.AudioEditor.Settings;
 using Editors.Audio.AudioEditor.DataGrids;
 using Editors.Audio.AudioEditor.Events;
 using Editors.Audio.AudioProjectCompiler;
@@ -31,7 +32,7 @@ namespace Editors.Audio.AudioEditor
 
         string AudioProjectEditorDataGridTag { get; set; }
         bool ShowModdedStatesOnly { get; set; }
-        IAudioSettings AudioSettings { get; set; }
+        ISettings Settings { get; set; }
         ObservableCollection<AudioFile> AudioFiles { get; set; }
 
         string AudioProjectViewerDataGridTag { get; set; }
@@ -85,7 +86,7 @@ namespace Editors.Audio.AudioEditor
 
         public string AudioProjectEditorDataGridTag { get; set; } = "AudioProjectEditorDataGrid";
         public bool ShowModdedStatesOnly { get; set; }
-        public IAudioSettings AudioSettings { get; set; }
+        public ISettings Settings { get; set; }
         public ObservableCollection<AudioFile> AudioFiles { get; set; } = [];
 
         public string AudioProjectViewerDataGridTag { get; set; } = "AudioProjectViewerDataGrid";

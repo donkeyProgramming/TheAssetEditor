@@ -1,5 +1,5 @@
 ﻿using System.Collections.ObjectModel;
-using Editors.Audio.AudioEditor.AudioSettings;
+using Editors.Audio.AudioEditor.Settings;
 
 namespace Editors.Audio.AudioEditor.Events
 {

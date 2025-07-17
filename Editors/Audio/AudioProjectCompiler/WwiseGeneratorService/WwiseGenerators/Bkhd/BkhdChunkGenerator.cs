@@ -1,5 +1,5 @@
 ﻿using System;
-using Editors.Audio.AudioEditor;
+using Editors.Audio.AudioEditor.Models;
 using Editors.Audio.Utility;
 using Shared.GameFormats.Wwise.Bkhd;
 

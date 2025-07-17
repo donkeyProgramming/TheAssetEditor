@@ -1,5 +1,5 @@
 ﻿using System.Linq;
-using Editors.Audio.AudioEditor;
+using Editors.Audio.AudioEditor.Models;
 using Shared.GameFormats.Wwise.Hirc;
 using Shared.GameFormats.Wwise.Hirc.V136;
 

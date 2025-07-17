@@ -1,6 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 
-namespace Editors.Audio.AudioEditor.AudioSettings
+namespace Editors.Audio.AudioEditor.Settings
 {
     public partial class AudioFile : ObservableObject
     {

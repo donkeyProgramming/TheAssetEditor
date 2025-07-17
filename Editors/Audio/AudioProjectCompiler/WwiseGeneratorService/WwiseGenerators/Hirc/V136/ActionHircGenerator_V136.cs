@@ -1,4 +1,4 @@
-﻿using Editors.Audio.AudioEditor;
+﻿using Editors.Audio.AudioEditor.Models;
 using Editors.Audio.Utility;
 using Shared.GameFormats.Wwise.Enums;
 using Shared.GameFormats.Wwise.Hirc;

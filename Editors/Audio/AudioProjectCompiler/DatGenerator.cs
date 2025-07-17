@@ -1,5 +1,5 @@
 ﻿using System.Linq;
-using Editors.Audio.AudioEditor;
+using Editors.Audio.AudioEditor.Models;
 using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
 using Shared.GameFormats.Dat;

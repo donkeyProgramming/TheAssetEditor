@@ -3,11 +3,12 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Data;
 using System.Linq;
-using Editors.Audio.AudioEditor.AudioSettings;
+using Editors.Audio.AudioEditor.Models;
+using Editors.Audio.AudioEditor.Settings;
 using Editors.Audio.AudioEditor.DataGrids;
 using Editors.Audio.GameSettings.Warhammer3;
 using Editors.Audio.Storage;
-using static Editors.Audio.AudioEditor.AudioSettings.AudioSettings;
+using static Editors.Audio.AudioEditor.Settings.Settings;
 
 // TODO: Should these be split into multiple files?
 
@@ -80,14 +81,19 @@ namespace Editors.Audio.AudioEditor
             return stateGroup.States.FirstOrDefault(state => state.Name == stateName);
         }
 
+        public static string GetValueFromRow(DataRow row, string columnName)
+        {
+            return row[columnName].ToString();
+        }
+
         public static string GetActionEventNameFromRow(DataRow row)
         {
-            return row[DataGridTemplates.EventColumn].ToString();
+            return GetValueFromRow(row, DataGridTemplates.EventColumn);
         }
 
         public static string GetStateNameFromRow(DataRow row)
         {
-            return row[DataGridTemplates.StateColumn].ToString();
+            return GetValueFromRow(row, DataGridTemplates.StateColumn);
         }
 
         public static List<StatePathNode> GetStatePathNodes(IAudioRepository audioRepository, Dictionary<string, string> row, DialogueEvent selectedDialogueEvent)
@@ -107,38 +113,7 @@ namespace Editors.Audio.AudioEditor
             return statePath.Nodes;
         }
 
-        public static ActionEvent CreateActionEventFromRow(ObservableCollection<AudioFile> audioFiles, IAudioSettings audioSettings, DataRow row)
-        {
-            var actionEvent = new ActionEvent();
-
-            actionEvent.Name = GetActionEventNameFromRow(row);
-
-            if (audioFiles.Count == 1)
-            {
-                var storedSoundSettings = audioSettings as SoundSettings;
-                actionEvent.Sound = CreateSound(audioFiles[0]);
-                actionEvent.Sound.AudioSettings = BuildSoundSettings(storedSoundSettings);
-            }
-            else
-            {
-                var storedRanSeqContainerSettings = audioSettings as RanSeqContainerSettings;
-                actionEvent.RandomSequenceContainer = new RandomSequenceContainer
-                {
-                    Sounds = [],
-                    AudioSettings = BuildRanSeqContainerSettings(storedRanSeqContainerSettings)
-                };
-
-                foreach (var audioFile in audioFiles)
-                {
-                    var sound = CreateSound(audioFile);
-                    actionEvent.RandomSequenceContainer.Sounds.Add(sound);
-                }
-            }
-
-            return actionEvent;
-        }
-
-        public static StatePath CreateStatePathFromRow(IAudioRepository audioRepository, ObservableCollection<AudioFile> audioFiles, IAudioSettings audioSettings, DataRow row, DialogueEvent selectedDialogueEvent)
+        public static StatePath CreateStatePathFromRow(IAudioRepository audioRepository, ObservableCollection<AudioFile> audioFiles, ISettings settings, DataRow row, DialogueEvent selectedDialogueEvent)
         {
             var statePath = new StatePath();
 
@@ -159,17 +134,17 @@ namespace Editors.Audio.AudioEditor
 
             if (audioFiles.Count == 1)
             {
-                var storedSoundSettings = audioSettings as SoundSettings;
+                var storedSoundSettings = settings as SoundSettings;
                 statePath.Sound = CreateSound(audioFiles[0]);
-                statePath.Sound.AudioSettings = BuildSoundSettings(storedSoundSettings);
+                statePath.Sound.Settings = BuildSoundSettings(storedSoundSettings);
             }
             else
             {
-                var storedRanSeqContainerSettings = audioSettings as RanSeqContainerSettings;
+                var storedRanSeqContainerSettings = settings as RandomSequenceContainerSettings;
                 statePath.RandomSequenceContainer = new RandomSequenceContainer
                 {
                     Sounds = [],
-                    AudioSettings = BuildRanSeqContainerSettings(storedRanSeqContainerSettings)
+                    Settings = BuildRanSeqContainerSettings(storedRanSeqContainerSettings)
                 };
 
                 foreach (var audioFile in audioFiles)
@@ -194,14 +169,14 @@ namespace Editors.Audio.AudioEditor
                 if (audioFiles.Count == 1)
                 {
                     statePath.Sound = CreateSound(audioFiles[0]);
-                    statePath.Sound.AudioSettings = new SoundSettings();
+                    statePath.Sound.Settings = new SoundSettings();
                 }
                 else
                 {
                     statePath.RandomSequenceContainer = new RandomSequenceContainer
                     {
                         Sounds = [],
-                        AudioSettings = BuildRecommendedRanSeqContainerSettings(audioFiles)
+                        Settings = BuildRecommendedRanSeqContainerSettings(audioFiles)
                     };
 
                     foreach (var audioFile in audioFiles)
@@ -253,17 +228,17 @@ namespace Editors.Audio.AudioEditor
             return sound;
         }
 
-        public static IAudioSettings GetAudioSettingsFromActionEvent(AudioProject audioProject, DataRow row)
+        public static ISettings GetSettingsFromActionEvent(AudioProject audioProject, DataRow row)
         {
             var actionEvent = GetActionEventFromRow(audioProject, row);
 
             if (actionEvent.RandomSequenceContainer != null)
-                return actionEvent.RandomSequenceContainer.AudioSettings;
+                return actionEvent.RandomSequenceContainer.Settings;
             else
-                return actionEvent.Sound.AudioSettings;
+                return actionEvent.Sound.Settings;
         }
 
-        public static IAudioSettings GetAudioSettingsFromStatePath(IAudioEditorService audioEditorService, IAudioRepository audioRepository)
+        public static ISettings GetSettingsFromStatePath(IAudioEditorService audioEditorService, IAudioRepository audioRepository)
         {
             var audioProjectItem = audioEditorService.SelectedExplorerNode;
             var selectedViewerRow = audioEditorService.SelectedViewerRows[0];
@@ -271,9 +246,9 @@ namespace Editors.Audio.AudioEditor
             var statePath = GetStatePathFromRow(audioRepository, dialogueEvent, selectedViewerRow);
 
             if (statePath.RandomSequenceContainer != null)
-                return statePath.RandomSequenceContainer.AudioSettings;
+                return statePath.RandomSequenceContainer.Settings;
             else
-                return statePath.Sound.AudioSettings;
+                return statePath.Sound.Settings;
         }
 
         public static void InsertStatePathAlphabetically(DialogueEvent selectedDialogueEvent, StatePath statePath)
@@ -358,9 +333,9 @@ namespace Editors.Audio.AudioEditor
             return soundSettings;
         }
 
-        public static RanSeqContainerSettings BuildRanSeqContainerSettings(RanSeqContainerSettings storedRanSeqContainerSettings)
+        public static RandomSequenceContainerSettings BuildRanSeqContainerSettings(RandomSequenceContainerSettings storedRanSeqContainerSettings)
         {
-            var ranSeqContainerSettings = new RanSeqContainerSettings();
+            var ranSeqContainerSettings = new RandomSequenceContainerSettings();
 
             ranSeqContainerSettings.PlaylistType = storedRanSeqContainerSettings.PlaylistType;
 
@@ -391,9 +366,9 @@ namespace Editors.Audio.AudioEditor
             return ranSeqContainerSettings;
         }
 
-        public static RanSeqContainerSettings BuildRecommendedRanSeqContainerSettings(List<AudioFile> audioFiles)
+        public static RandomSequenceContainerSettings BuildRecommendedRanSeqContainerSettings(List<AudioFile> audioFiles)
         {
-            var ranSeqContainerSettings = new RanSeqContainerSettings();
+            var ranSeqContainerSettings = new RandomSequenceContainerSettings();
             ranSeqContainerSettings.PlaylistType = PlaylistType.RandomExhaustive;
             ranSeqContainerSettings.EnableRepetitionInterval = true;
             ranSeqContainerSettings.RepetitionInterval = (uint)Math.Ceiling(audioFiles.Count / 2.0);

@@ -2,6 +2,7 @@
 using System.Data;
 using System.Linq;
 using Editors.Audio.AudioEditor.AudioProjectExplorer;
+using Editors.Audio.AudioEditor.Models;
 using Editors.Audio.AudioEditor.Events;
 using Editors.Audio.Storage;
 using Shared.Core.Events;

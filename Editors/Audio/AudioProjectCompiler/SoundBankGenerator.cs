@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using Editors.Audio.AudioEditor;
+using Editors.Audio.AudioEditor.Models;
 using Editors.Audio.AudioProjectCompiler.WwiseGeneratorService;
 using Editors.Audio.AudioProjectCompiler.WwiseGeneratorService.WwiseGenerators.Bkhd;
 using Shared.Core.PackFiles;
