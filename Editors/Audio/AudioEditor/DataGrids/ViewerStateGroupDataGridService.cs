@@ -46,9 +46,9 @@ namespace Editors.Audio.AudioEditor.DataGrids
 
         public void SetInitialDataGridData(DataTable table)
         {
-            var stateGroup = AudioProjectHelpers.GetStateGroupFromName(_audioEditorService.AudioProject, _audioEditorService.SelectedExplorerNode.Name);
             var columnHeader = DataGridTemplates.StateColumn;
-
+            var stateGroupName = _audioEditorService.SelectedExplorerNode.Name;
+            var stateGroup = _audioEditorService.AudioProject.GetStateGroup(stateGroupName);
             foreach (var state in stateGroup.States)
             {
                 var row = table.NewRow();

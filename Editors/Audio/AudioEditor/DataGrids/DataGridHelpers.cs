@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Windows;
@@ -11,12 +12,12 @@ namespace Editors.Audio.AudioEditor.DataGrids
 {
     internal static class DataGridHelpers
     {
-        public static string AddExtraUnderscoresToString(string wtfWpf)
+        public static string DuplicateUnderscores(string wtfWpf)
         {
             return wtfWpf.Replace("_", "__");
         }
 
-        public static string RemoveExtraUnderscoresFromString(string wtfWpf)
+        public static string DeduplicateUnderscores(string wtfWpf)
         {
             return wtfWpf.Replace("__", "_");
         }
@@ -82,6 +83,55 @@ namespace Editors.Audio.AudioEditor.DataGrids
             }
 
             return states;
+        }
+
+        public static string GetStateGroupFromStateGroupWithQualifier(IAudioRepository audioRepository, string dialogueEvent, string stateGroupWithQualifier)
+        {
+            if (audioRepository.QualifiedStateGroupLookupByStateGroupByDialogueEvent.TryGetValue(dialogueEvent, out var stateGroupDictionary))
+                if (stateGroupDictionary.TryGetValue(stateGroupWithQualifier, out var stateGroup))
+                    return stateGroup;
+
+            return null;
+        }
+
+        public static string GetValueFromRow(DataRow row, string columnName)
+        {
+            return row[columnName].ToString();
+        }
+
+        public static string GetActionEventNameFromRow(DataRow row)
+        {
+            return GetValueFromRow(row, DataGridTemplates.EventColumn);
+        }
+
+        public static string GetStateNameFromRow(DataRow row)
+        {
+            return GetValueFromRow(row, DataGridTemplates.StateColumn);
+        }
+
+        public static void InsertRowAlphabetically(DataTable table, DataRow row)
+        {
+            var newValue = row[0]?.ToString() ?? string.Empty;
+
+            var insertIndex = 0;
+
+            for (var i = 0; i < table.Rows.Count; i++)
+            {
+                var currentValue = table.Rows[i][0]?.ToString() ?? string.Empty;
+                var comparison = string.Compare(newValue, currentValue, StringComparison.Ordinal);
+
+                if (comparison < 0)
+                {
+                    insertIndex = i;
+                    break;
+                }
+
+                insertIndex = i + 1;
+            }
+
+            var newRow = table.NewRow();
+            newRow.ItemArray = row.ItemArray;
+            table.Rows.InsertAt(newRow, insertIndex);
         }
     }
 }

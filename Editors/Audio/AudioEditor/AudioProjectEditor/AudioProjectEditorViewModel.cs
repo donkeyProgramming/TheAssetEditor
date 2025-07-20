@@ -154,7 +154,7 @@ namespace Editors.Audio.AudioEditor.AudioProjectEditor
             }
             else if (selectedNode.IsDialogueEvent())
             {
-                SetAudioProjectEditorLabel(DataGridHelpers.AddExtraUnderscoresToString(selectedNode.Name));
+                SetAudioProjectEditorLabel(DataGridHelpers.DuplicateUnderscores(selectedNode.Name));
                 LoadDataGrid(selectedNode.NodeType);
 
                 var moddedStatesCount = _audioEditorService.AudioProject.StateGroups.SelectMany(stateGroup => stateGroup.States).Count();
@@ -163,7 +163,7 @@ namespace Editors.Audio.AudioEditor.AudioProjectEditor
             }
             else if (selectedNode.IsStateGroup())
             {
-                SetAudioProjectEditorLabel(DataGridHelpers.AddExtraUnderscoresToString(selectedNode.Name));
+                SetAudioProjectEditorLabel(DataGridHelpers.DuplicateUnderscores(selectedNode.Name));
                 LoadDataGrid(selectedNode.NodeType);
             }
             else
@@ -264,27 +264,27 @@ namespace Editors.Audio.AudioEditor.AudioProjectEditor
 
         private bool DoesRowExist()
         {
-            var audioProject = _audioEditorService.AudioProject;
             var editorRow = AudioProjectEditorDataGrid.Rows[0];
-            var selectedNode = _audioEditorService.SelectedExplorerNode;
-
-            if (selectedNode.IsActionEventSoundBank())
+            var selectedExplorerNode = _audioEditorService.SelectedExplorerNode;
+            if (selectedExplorerNode.IsActionEventSoundBank())
             {
-                var actionEvent = AudioProjectHelpers.GetActionEventFromRow(_audioEditorService.AudioProject, editorRow);
+                var actionEventName = DataGridHelpers.GetActionEventNameFromRow(editorRow);
+                var actionEvent = _audioEditorService.AudioProject.GetActionEvent(actionEventName);
                 if (actionEvent != null)
                     return true;
             }
-            else if (selectedNode.IsDialogueEvent())
+            else if (selectedExplorerNode.IsDialogueEvent())
             {
-                var dialogueEvent = AudioProjectHelpers.GetDialogueEventFromName(_audioEditorService.AudioProject, _audioEditorService.SelectedExplorerNode.Name);
-                var statePath = AudioProjectHelpers.GetStatePathFromRow(_audioRepository, dialogueEvent, editorRow);
+                var dialogueEvent = _audioEditorService.AudioProject.GetDialogueEvent(_audioEditorService.SelectedExplorerNode.Name);
+                var statePath = dialogueEvent.GetStatePath(_audioRepository, editorRow);
                 if (statePath != null)
                     return true;
             }
-            else if (selectedNode.IsStateGroup())
+            else if (selectedExplorerNode.IsStateGroup())
             {
-                var stateGroup = AudioProjectHelpers.GetStateGroupFromName(audioProject, _audioEditorService.SelectedExplorerNode.Name);
-                var state = AudioProjectHelpers.GetStateFromRow(stateGroup, editorRow);
+                var stateGroup = _audioEditorService.AudioProject.GetStateGroup(selectedExplorerNode.Name);
+                var stateName = DataGridHelpers.GetStateNameFromRow(editorRow);
+                var state = stateGroup.GetState(stateName);
                 if (state != null)
                     return true;
             }

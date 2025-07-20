@@ -41,5 +41,4 @@ namespace Editors.Audio.AudioEditor.UICommands
             return uiCommand;
         }
     }
-
 }

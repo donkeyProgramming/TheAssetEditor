@@ -1,4 +1,5 @@
-﻿using Shared.GameFormats.Wwise.Enums;
+﻿using Editors.Audio.AudioEditor.Settings;
+using Shared.GameFormats.Wwise.Enums;
 
 namespace Editors.Audio.AudioEditor.Models
 {
@@ -15,6 +16,34 @@ namespace Editors.Audio.AudioEditor.Models
         public string WemDiskFilePath { get; set; }
         public long InMemoryMediaSize { get; set; }
         public string Language { get; set; }
-        public SoundSettings Settings { get; set; }
+        public AudioSettings AudioSettings { get; set; }
+
+        public static Sound Create(string fileName, string filePath, AudioSettings audioSettings)
+        {
+            return new Sound()
+            {
+                WavFileName = fileName,
+                WavFilePath = filePath,
+                AudioSettings = audioSettings
+            };
+        }
+
+        public static Sound Create(string fileName, string filePath)
+        {
+            return new Sound()
+            {
+                WavFileName = fileName,
+                WavFilePath = filePath
+            };
+        }
+
+        public static Sound Create(AudioFile audioFile)
+        {
+            return new Sound()
+            {
+                WavFileName = audioFile.FileName,
+                WavFilePath = audioFile.FilePath,
+            };
+        }
     }
 }

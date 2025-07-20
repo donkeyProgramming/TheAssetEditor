@@ -16,6 +16,7 @@ using static Editors.Audio.GameSettings.Warhammer3.DialogueEvents;
 namespace Editors.Audio.AudioEditor
 {
     // TODO: Resolve TOOLTIP PLACEHOLDER instances
+    // TODO: Implement something where the compiler is greyed out until you have a wwise path set
     public partial class AudioEditorViewModel : ObservableObject, IEditorInterface
     {
         public AudioProjectExplorerViewModel AudioProjectExplorerViewModel { get; }

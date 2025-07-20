@@ -12,8 +12,6 @@ namespace Editors.Audio.AudioEditor.AudioProjectExplorer
             var selectedExplorerNode = audioEditorService.SelectedExplorerNode;
             if (selectedExplorerNode.IsDialogueEventSoundBank())
             {
-                var soundBank = AudioProjectHelpers.GetSoundBankFromName(audioEditorService.AudioProject, audioEditorService.SelectedExplorerNode.Name);
-
                 var presetFilter = audioEditorService.SelectedDialogueEventPreset;
 
                 if (presetFilter != null)
@@ -26,7 +24,8 @@ namespace Editors.Audio.AudioEditor.AudioProjectExplorer
                         selectedExplorerNode.PresetFilterDisplayText = null;
                 }
 
-                TreeBuilder.AddFilteredDialogueEventsToSoundBankTreeViewItems(audioEditorService, soundBank.Name, presetFilter);
+                var soundBankName = audioEditorService.SelectedExplorerNode.Name;
+                TreeBuilder.AddFilteredDialogueEventsToSoundBankTreeViewItems(audioEditorService, soundBankName, presetFilter);
             }
         }
 

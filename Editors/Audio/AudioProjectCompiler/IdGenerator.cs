@@ -4,7 +4,7 @@ using Editors.Audio.Utility;
 
 namespace Editors.Audio.AudioProjectCompiler
 {
-    public static class IddGenerator
+    public static class IdGenerator
     {
         public record Result(uint Id, string FinalKey, string OriginalKey, int Collisions);
 

@@ -7,11 +7,12 @@ using System.Xml.Linq;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Editors.Audio.AudioEditor;
-using Editors.Audio.AudioEditor.Models;
 using Editors.Audio.AudioEditor.AudioProjectViewer;
+using Editors.Audio.AudioEditor.Models;
 using Editors.Audio.AudioEditor.Settings;
 using Editors.Audio.Storage;
 using Editors.Audio.Utility;
+using Microsoft.Xna.Framework.Media;
 using Serilog;
 using Shared.Core.ErrorHandling;
 using Shared.Core.Misc;
@@ -419,8 +420,23 @@ namespace Editors.Audio.AudioProjectConverter
 
                 ProcessWavFiles(statePathWavs, processedWems, audioFiles, dialogueEventsLookupByWemId, globalBaseNameUsage, dialogueEventName, voActor);
 
-                var audioProjectStatePath = AudioProjectHelpers.CreateStatePathFromStatePathNodes(_audioRepository, statePath.StatePathNodes, audioFiles);
-                AudioProjectHelpers.InsertStatePathAlphabetically(audioProjectDialogueEvent, audioProjectStatePath);
+                StatePath audioProjectStatePath;
+                if (audioFiles.Count > 1)
+                {
+                    var sounds = audioFiles
+                        .Select(audioFile => Sound.Create(audioFile.FileName, audioFile.FilePath))
+                        .ToList();
+                    var randomSequenceContainerSettings = AudioSettings.CreateRecommendedRandomSequenceContainerSettings(audioFiles.Count);
+                    var randomSequenceContainer = RandomSequenceContainer.Create(randomSequenceContainerSettings, sounds);
+                    audioProjectStatePath = StatePath.Create(statePath.StatePathNodes, randomSequenceContainer);
+                }
+                else
+                {
+                    var sound = Sound.Create(audioFiles[0]);
+                    audioProjectStatePath = StatePath.Create(statePath.StatePathNodes, sound);
+                }
+
+                audioProjectDialogueEvent.InsertAlphabetically(audioProjectStatePath);
 
                 // Remove the processed statePath from the original list as if we're processing multiple bnks
                 // as Dialogue Events can occur several times but so it would add duplicates of the same state path
@@ -494,7 +510,7 @@ namespace Editors.Audio.AudioProjectConverter
                         Name = moddedState
                     };
                     var audioProjectStateGroup = audioProject.StateGroups.FirstOrDefault(stateGroup => stateGroup.Name == moddedStateGroup.Key);
-                    AudioProjectHelpers.InsertStateAlphabetically(audioProjectStateGroup, audioProjectModdedState);
+                    audioProjectStateGroup.InsertAlphabetically(audioProjectModdedState);
                 }
             }
         }

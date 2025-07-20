@@ -5,9 +5,10 @@ using Editors.Audio.AudioEditor.AudioFilesExplorer;
 using Editors.Audio.AudioEditor.AudioProjectEditor;
 using Editors.Audio.AudioEditor.AudioProjectExplorer;
 using Editors.Audio.AudioEditor.AudioProjectViewer;
-using Editors.Audio.AudioEditor.Settings;
 using Editors.Audio.AudioEditor.DataGrids;
+using Editors.Audio.AudioEditor.Factories;
 using Editors.Audio.AudioEditor.NewAudioProject;
+using Editors.Audio.AudioEditor.Settings;
 using Editors.Audio.AudioEditor.UICommands;
 using Editors.Audio.AudioExplorer;
 using Editors.Audio.AudioProjectCompiler;
@@ -17,7 +18,6 @@ using Editors.Audio.Utility;
 using Microsoft.Extensions.DependencyInjection;
 using Shared.Core.DependencyInjection;
 using Shared.Core.DevConfig;
-using Shared.Core.Events;
 using Shared.Core.ToolCreation;
 using Shared.GameFormats.Wwise;
 
@@ -56,6 +56,11 @@ namespace Editors.Audio
             serviceCollection.AddScoped<CopyRowsCommand>();
             serviceCollection.AddScoped<PasteRowsCommand>();
             serviceCollection.AddScoped<SelectMovieFileCommand>();
+
+            serviceCollection.AddSingleton<ISoundFactory, SoundFactory>();
+            serviceCollection.AddSingleton<IRandomSequenceContainerFactory, RandomSequenceContainerFactory>();
+            serviceCollection.AddSingleton<IActionEventFactory, ActionEventFactory>();
+            serviceCollection.AddSingleton<IStatePathFactory, StatePathFactory>();
 
             serviceCollection.AddTransient<NewAudioProjectViewModel>();
             serviceCollection.AddTransient<NewAudioProjectWindow>();

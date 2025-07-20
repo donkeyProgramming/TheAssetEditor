@@ -9,18 +9,33 @@ using static Editors.Audio.GameSettings.Warhammer3.StateGroups;
 
 namespace Editors.Audio.AudioEditor.Models
 {
-    public abstract class AudioProjectItem
+    // TODO: Reevaluate the use of AudioProjectItem, AudioProjectHircItem etc.
+    public abstract class AudioProjectItem : IComparable, IComparable<AudioProjectItem>, IEquatable<AudioProjectItem>
     {
         public string Name { get; set; }
         public uint Id { get; set; }
+
+        public int CompareTo(object? obj) => CompareTo(obj as AudioProjectItem);
+        public int CompareTo(AudioProjectItem? other) => string.Compare(Name, other?.Name, StringComparison.Ordinal);
+        public bool Equals(AudioProjectItem? other) => string.Equals(Name, other?.Name, StringComparison.Ordinal);
+        public override bool Equals(object? obj) => Equals(obj as AudioProjectItem);
+        public override int GetHashCode() => StringComparer.Ordinal.GetHashCode(Name);
+
+        public static bool InsertAlphabeticallyUnique<T>(List<T> list, T item) where T : IComparable<T>
+        {
+            var index = list.BinarySearch(item);
+            if (index >= 0) 
+                return false; // Don't add duplicates
+
+            list.Insert(~index, item);
+            return true;
+        }
     }
 
     public abstract class AudioProjectHircItem : AudioProjectItem
     {
         public abstract AkBkHircType HircType { get; set; }
     }
-
-    public interface ISettings { }
 
     public class AudioProject
     {
@@ -220,7 +235,7 @@ namespace Editors.Audio.AudioEditor.Models
                 if (mergedDialogueEvent != null)
                 {
                     foreach (var statePathToMerge in newDialogue.StatePaths)
-                        AudioProjectHelpers.InsertStatePathAlphabetically(mergedDialogueEvent, statePathToMerge);
+                        mergedDialogueEvent.InsertAlphabetically(statePathToMerge);
                 }
                 else
                 {
@@ -237,7 +252,7 @@ namespace Editors.Audio.AudioEditor.Models
                 return;
 
             foreach (var newAction in newBank.ActionEvents)
-                AudioProjectHelpers.InsertActionEventAlphabetically(baseBank, newAction);
+                baseBank.InsertAlphabetically(newAction);
         }
 
         private static void MergeStateGroups(AudioProject mergedAudioProject, AudioProject audioProjectToMerge)
@@ -251,11 +266,37 @@ namespace Editors.Audio.AudioEditor.Models
                 if (baseGroup != null)
                 {
                     foreach (var newState in stateGroupToMerge.States)
-                        AudioProjectHelpers.InsertStateAlphabetically(baseGroup, newState);
+                        baseGroup.InsertAlphabetically(newState);
                 }
                 else
                     mergedAudioProject.StateGroups.Add(stateGroupToMerge);
             }
+        }
+
+        public SoundBank GetSoundBank(string soundBankName)
+        {
+            return SoundBanks.FirstOrDefault(soundBank => soundBank.Name == soundBankName);
+        }
+
+        public ActionEvent GetActionEvent(string actionEventName)
+        {
+            return SoundBanks
+                .Where(soundBank => soundBank.SoundBankType == Wh3SoundBankType.ActionEventSoundBank)
+                .SelectMany(soundBank => soundBank.ActionEvents)
+                .FirstOrDefault(actionEvent => actionEvent.Name == actionEventName);
+        }
+
+        public DialogueEvent GetDialogueEvent(string dialogueEventName)
+        {
+            return SoundBanks
+                .Where(soundBank => soundBank.SoundBankType == Wh3SoundBankType.DialogueEventSoundBank)
+                .SelectMany(soundBank => soundBank.DialogueEvents)
+                .FirstOrDefault(dialogueEvent => dialogueEvent.Name == dialogueEventName);
+        }
+
+        public StateGroup GetStateGroup(string stateGroupName)
+        {
+            return StateGroups.FirstOrDefault(stateGroup => stateGroup.Name == stateGroupName);
         }
     }
 }

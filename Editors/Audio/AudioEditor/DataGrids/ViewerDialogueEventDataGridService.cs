@@ -34,11 +34,11 @@ namespace Editors.Audio.AudioEditor.DataGrids
 
         public void SetTableSchema()
         {
-            var dialogueEvent = AudioProjectHelpers.GetDialogueEventFromName(_audioEditorService.AudioProject, _audioEditorService.SelectedExplorerNode.Name);
-            var stateGroupsWithQualifiers = _audioRepository.QualifiedStateGroupLookupByStateGroupByDialogueEvent[dialogueEvent.Name];
+            var dialogueEventName = _audioEditorService.SelectedExplorerNode;
+            var stateGroupsWithQualifiers = _audioRepository.QualifiedStateGroupLookupByStateGroupByDialogueEvent[dialogueEventName.Name];
             foreach (var stateGroupWithQualifier in stateGroupsWithQualifiers)
             {
-                var columnHeader = DataGridHelpers.AddExtraUnderscoresToString(stateGroupWithQualifier.Key);
+                var columnHeader = DataGridHelpers.DuplicateUnderscores(stateGroupWithQualifier.Key);
                 var column = new DataColumn(columnHeader, typeof(string));
                 _eventHub.Publish(new AddViewerTableColumnEvent(column));
             }
@@ -51,14 +51,14 @@ namespace Editors.Audio.AudioEditor.DataGrids
             DataGridHelpers.ClearDataGridContextMenu(dataGrid);
             _eventHub.Publish(new SetDataGridContextMenuEvent(dataGrid));
 
-            var dialogueEvent = AudioProjectHelpers.GetDialogueEventFromName(_audioEditorService.AudioProject, _audioEditorService.SelectedExplorerNode.Name);
-            var stateGroupsCount = _audioRepository.StateGroupsLookupByDialogueEvent[dialogueEvent.Name].Count;
+            var dialogueEventName = _audioEditorService.SelectedExplorerNode.Name;
+            var stateGroupsCount = _audioRepository.StateGroupsLookupByDialogueEvent[dialogueEventName].Count;
             var columnWidth = 1.0 / (1 + stateGroupsCount);
             
-            var stateGroupsWithQualifiers = _audioRepository.QualifiedStateGroupLookupByStateGroupByDialogueEvent[dialogueEvent.Name];
+            var stateGroupsWithQualifiers = _audioRepository.QualifiedStateGroupLookupByStateGroupByDialogueEvent[dialogueEventName];
             foreach (var stateGroupWithQualifier in stateGroupsWithQualifiers)
             {
-                var columnHeader = DataGridHelpers.AddExtraUnderscoresToString(stateGroupWithQualifier.Key);
+                var columnHeader = DataGridHelpers.DuplicateUnderscores(stateGroupWithQualifier.Key);
                 var column = DataGridTemplates.CreateColumnTemplate(columnHeader, columnWidth);
                 column.CellTemplate = DataGridTemplates.CreateReadOnlyTextBlockTemplate(columnHeader);
                 dataGrid.Columns.Add(column);
@@ -67,7 +67,7 @@ namespace Editors.Audio.AudioEditor.DataGrids
 
         public void SetInitialDataGridData(DataTable table)
         {
-            var dialogueEvent = AudioProjectHelpers.GetDialogueEventFromName(_audioEditorService.AudioProject, _audioEditorService.SelectedExplorerNode.Name);
+            var dialogueEvent = _audioEditorService.AudioProject.GetDialogueEvent(_audioEditorService.SelectedExplorerNode.Name);
             var stateGroupsWithQualifiers = _audioRepository.QualifiedStateGroupLookupByStateGroupByDialogueEvent[dialogueEvent.Name];
             foreach (var statePath in dialogueEvent.StatePaths)
                 ProcessStatePathData(table, stateGroupsWithQualifiers, statePath);
@@ -79,7 +79,7 @@ namespace Editors.Audio.AudioEditor.DataGrids
 
             foreach (var stateGroupWithQualifier in stateGroupsWithQualifiers)
             {
-                var columnHeader = DataGridHelpers.AddExtraUnderscoresToString(stateGroupWithQualifier.Key);
+                var columnHeader = DataGridHelpers.DuplicateUnderscores(stateGroupWithQualifier.Key);
                 var node = statePath.Nodes.FirstOrDefault(node => node.StateGroup.Name == stateGroupWithQualifier.Value);
                 if (node != null)
                     row[columnHeader] = node.State.Name;

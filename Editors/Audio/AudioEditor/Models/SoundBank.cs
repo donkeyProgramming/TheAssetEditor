@@ -1,5 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using System.Linq;
 using static Editors.Audio.GameSettings.Warhammer3.SoundBanks;
 
 namespace Editors.Audio.AudioEditor.Models
@@ -13,5 +13,12 @@ namespace Editors.Audio.AudioEditor.Models
         public string Language { get; set; }
         public string SoundBankFileName { get; set; }
         public string SoundBankFilePath { get; set; }
+
+        public ActionEvent GetActionEvent(string actionEventName)
+        {
+            return ActionEvents.FirstOrDefault(actionEvent => actionEvent.Name == actionEventName);
+        }
+
+        public void InsertAlphabetically(ActionEvent actionEvent) => InsertAlphabeticallyUnique(ActionEvents, actionEvent);
     }
 }

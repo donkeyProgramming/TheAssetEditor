@@ -50,7 +50,8 @@ namespace Editors.Audio.AudioEditor.DataGrids
 
         public void SetInitialDataGridData(DataTable table)
         {
-            var soundBank = AudioProjectHelpers.GetSoundBankFromName(_audioEditorService.AudioProject, _audioEditorService.SelectedExplorerNode.Name);
+            var soundBankName = _audioEditorService.SelectedExplorerNode.Name;
+            var soundBank = _audioEditorService.AudioProject.GetSoundBank(soundBankName);
             foreach (var actionEvent in soundBank.ActionEvents)
             {
                 var row = table.NewRow();

@@ -54,7 +54,7 @@ namespace Editors.Audio.AudioEditor.AudioFilesExplorer
             if (editablePack == null)
                 return;
 
-            AudioFilesExplorerLabel = $"Audio Files Explorer - {DataGridHelpers.AddExtraUnderscoresToString(editablePack.Name)}";
+            AudioFilesExplorerLabel = $"Audio Files Explorer - {DataGridHelpers.DuplicateUnderscores(editablePack.Name)}";
 
             CreateAudioFilesTree(editablePack);
 
@@ -271,7 +271,7 @@ namespace Editors.Audio.AudioEditor.AudioFilesExplorer
                 });
             }
 
-            _audioEditorService.AudioFiles = audioFiles;
+            _audioEditorService.AudioFiles = audioFiles.ToList();
             _eventHub.Publish(new AudioFilesSetEvent(audioFiles));
         }
 

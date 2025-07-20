@@ -1,5 +1,7 @@
 ﻿using System.Data;
 using Editors.Audio.AudioEditor.AudioProjectExplorer;
+using Editors.Audio.AudioEditor.DataGrids;
+using Editors.Audio.AudioEditor.Models;
 
 namespace Editors.Audio.AudioEditor.UICommands
 {
@@ -17,9 +19,13 @@ namespace Editors.Audio.AudioEditor.UICommands
 
         public void Execute(DataRow row)
         {
-            var state = AudioProjectHelpers.CreateStateFromRow(row);
-            var stateGroup = AudioProjectHelpers.GetStateGroupFromName(_audioEditorService.AudioProject, _audioEditorService.SelectedExplorerNode.Name);
-            AudioProjectHelpers.InsertStateAlphabetically(stateGroup, state);
+            var stateName = DataGridHelpers.GetStateNameFromRow(row);
+            var state = State.Create(stateName);
+
+            var stateGroupName = _audioEditorService.SelectedExplorerNode.Name;
+            var stateGroup = _audioEditorService.AudioProject.GetStateGroup(stateGroupName);
+
+            stateGroup.InsertAlphabetically(state);
         }
     }
 }

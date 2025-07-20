@@ -24,8 +24,11 @@ namespace Editors.Audio.AudioEditor.UICommands
 
         public void Execute(DataRow row)
         {
-            var dialogueEvent = AudioProjectHelpers.GetDialogueEventFromName(_audioEditorService.AudioProject, _audioEditorService.SelectedExplorerNode.Name);
-            var statePath = AudioProjectHelpers.GetStatePathFromRow(_audioRepository, dialogueEvent, row);
+            var dialogueEventName = _audioEditorService.SelectedExplorerNode.Name;
+            var dialogueEvent = _audioEditorService.AudioProject.GetDialogueEvent(dialogueEventName);
+
+            // TODO: Do we need to then display a message to the user saying we can't do this until they fix the state path?
+            var statePath = dialogueEvent.GetStatePath(_audioRepository, row);
             if (statePath != null)
             {
                 dialogueEvent.StatePaths.Remove(statePath);

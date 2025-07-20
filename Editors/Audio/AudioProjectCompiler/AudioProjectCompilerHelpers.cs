@@ -9,6 +9,7 @@ using Shared.Core.Misc;
 
 namespace Editors.Audio.AudioProjectCompiler
 {
+    // TODO check what we don't need here.
     public static class AudioProjectCompilerHelpers
     {
         public static uint GenerateUnusedHircId(Dictionary<uint, List<uint>> usedHircIdsByLanguageLookup, string language)

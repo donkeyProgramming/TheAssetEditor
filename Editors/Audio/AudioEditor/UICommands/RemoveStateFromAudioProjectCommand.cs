@@ -1,5 +1,6 @@
 ﻿using System.Data;
 using Editors.Audio.AudioEditor.AudioProjectExplorer;
+using Editors.Audio.AudioEditor.DataGrids;
 using Editors.Audio.AudioEditor.Events;
 using Shared.Core.Events;
 
@@ -21,8 +22,12 @@ namespace Editors.Audio.AudioEditor.UICommands
 
         public void Execute(DataRow row)
         {
-            var stateGroup = AudioProjectHelpers.GetStateGroupFromName(_audioEditorService.AudioProject, _audioEditorService.SelectedExplorerNode.Name);
-            var state = AudioProjectHelpers.GetStateFromRow(stateGroup, row);
+            var stateGroupName = _audioEditorService.SelectedExplorerNode.Name;
+            var stateGroup = _audioEditorService.AudioProject.GetStateGroup(stateGroupName);
+
+            var stateName = DataGridHelpers.GetStateNameFromRow(row);
+            var state = stateGroup.GetState(stateName);
+
             stateGroup.States.Remove(state);
             _eventHub.Publish(new RemoveViewerTableRowEvent(row));
         }
