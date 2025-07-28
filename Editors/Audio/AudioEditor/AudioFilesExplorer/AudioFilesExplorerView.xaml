@@ -101,7 +101,7 @@
                         BorderThickness="0"
                         KeyboardNavigation.IsTabStop="True"
                         HorizontalAlignment="Stretch" Padding="2.5, 0, 0, 0"  Height="24" VerticalContentAlignment="Center" 
-                        Text="{Binding SearchQuery, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay, Delay=350}"
+                        Text="{Binding FilterQuery, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay, Delay=350}"
                         Tag="Search Audio Files Explorer">
                     </TextBox>
 
@@ -185,7 +185,7 @@
 
             <audiofilesexplorer:MultiSelectTreeView.ItemTemplate>
                 <HierarchicalDataTemplate 
-                    DataType="{x:Type audiofilesexplorer:TreeNode}" 
+                    DataType="{x:Type audiofilesexplorer:AudioFilesTreeNode}" 
                     ItemsSource="{Binding Children}">
                     <Grid>
                         <Grid.ColumnDefinitions>

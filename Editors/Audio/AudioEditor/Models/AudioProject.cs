@@ -15,10 +15,10 @@ namespace Editors.Audio.AudioEditor.Models
         public string Name { get; set; }
         public uint Id { get; set; }
 
-        public int CompareTo(object? obj) => CompareTo(obj as AudioProjectItem);
-        public int CompareTo(AudioProjectItem? other) => string.Compare(Name, other?.Name, StringComparison.Ordinal);
-        public bool Equals(AudioProjectItem? other) => string.Equals(Name, other?.Name, StringComparison.Ordinal);
-        public override bool Equals(object? obj) => Equals(obj as AudioProjectItem);
+        public int CompareTo(object obj) => CompareTo(obj as AudioProjectItem);
+        public int CompareTo(AudioProjectItem other) => string.Compare(Name, other?.Name, StringComparison.Ordinal);
+        public bool Equals(AudioProjectItem other) => string.Equals(Name, other?.Name, StringComparison.Ordinal);
+        public override bool Equals(object obj) => Equals(obj as AudioProjectItem);
         public override int GetHashCode() => StringComparer.Ordinal.GetHashCode(Name);
 
         public static bool InsertAlphabeticallyUnique<T>(List<T> list, T item) where T : IComparable<T>
@@ -271,6 +271,49 @@ namespace Editors.Audio.AudioEditor.Models
                 else
                     mergedAudioProject.StateGroups.Add(stateGroupToMerge);
             }
+        }
+
+
+
+
+
+
+
+        public List<SoundBank> GetActionEventSoundBanks()
+        {
+            return SoundBanks
+                .Where(soundBank => soundBank.SoundBankType == Wh3SoundBankType.ActionEventSoundBank)
+                .ToList();
+        }
+
+        public List<SoundBank> GetDialogueEventSoundBanks()
+        {
+            return SoundBanks
+                .Where(soundBank => soundBank.SoundBankType == Wh3SoundBankType.DialogueEventSoundBank)
+                .ToList();
+        }
+
+        public List<SoundBank> GetEditedActionEventSoundBanks()
+        {
+            return SoundBanks
+                .Where(soundBank => soundBank.SoundBankType == Wh3SoundBankType.ActionEventSoundBank 
+                    && soundBank.ActionEvents.Count > 0)
+                .ToList();
+        }
+
+        public List<SoundBank> GetEditedDialogueEventSoundBanks()
+        {
+            return SoundBanks
+                .Where(soundBank => soundBank.SoundBankType == Wh3SoundBankType.DialogueEventSoundBank 
+                    && soundBank.DialogueEvents.Any(dialogueEvent => dialogueEvent.StatePaths.Count > 0))
+                .ToList();
+        }
+
+        public List<StateGroup> GetEditedStateGroups()
+        {
+            return StateGroups
+                .Where(state => state.States.Count > 0)
+                .ToList();
         }
 
         public SoundBank GetSoundBank(string soundBankName)

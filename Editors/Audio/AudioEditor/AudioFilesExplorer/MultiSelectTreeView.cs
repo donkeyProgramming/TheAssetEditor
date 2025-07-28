@@ -16,12 +16,12 @@ namespace Editors.Audio.AudioEditor.AudioFilesExplorer
         public static readonly DependencyProperty SelectedItemsProperty = DependencyProperty.Register("SelectedItems", typeof(IList), typeof(MultiSelectTreeView), new PropertyMetadata(new ArrayList(), OnSelectedItemsChanged));
         public static readonly DependencyProperty IsMultiSelectedProperty = DependencyProperty.RegisterAttached("IsMultiSelected", typeof(bool), typeof(MultiSelectTreeView), new PropertyMetadata(false));
 
-        private TreeNode _anchorItem;
-        private TreeNode _pendingClickItem;
+        private AudioFilesTreeNode _anchorItem;
+        private AudioFilesTreeNode _pendingClickItem;
         private Point _dragStartPoint;
         private bool _isDragOperation;
         private bool _suppressSelectionChange;
-        private List<TreeNode> _preDragSelectedNodes;
+        private List<AudioFilesTreeNode> _preDragSelectedNodes;
 
         public IList SelectedItems
         {
@@ -65,7 +65,7 @@ namespace Editors.Audio.AudioEditor.AudioFilesExplorer
         private void MultiSelectTreeView_PreviewMouseDown(object sender, MouseButtonEventArgs e)
         {
             _dragStartPoint = e.GetPosition(this);
-            _preDragSelectedNodes = SelectedItems.OfType<TreeNode>().ToList();
+            _preDragSelectedNodes = SelectedItems.OfType<AudioFilesTreeNode>().ToList();
             _isDragOperation = false;
             _pendingClickItem = null;
 
@@ -76,7 +76,7 @@ namespace Editors.Audio.AudioEditor.AudioFilesExplorer
                 var clickedExpander = IsClickOnExpander(clickTarget);
 
                 if (!clickedExpander &&
-                    itemUnderMouse.DataContext is TreeNode clickedNode &&
+                    itemUnderMouse.DataContext is AudioFilesTreeNode clickedNode &&
                     SelectedItems.Contains(clickedNode) &&
                     !Keyboard.Modifiers.HasFlag(ModifierKeys.Control) &&
                     !Keyboard.Modifiers.HasFlag(ModifierKeys.Shift))
@@ -104,7 +104,7 @@ namespace Editors.Audio.AudioEditor.AudioFilesExplorer
 
                     try
                     {
-                        var data = new DataObject(typeof(IEnumerable<TreeNode>), _preDragSelectedNodes);
+                        var data = new DataObject(typeof(IEnumerable<AudioFilesTreeNode>), _preDragSelectedNodes);
                         DragDrop.DoDragDrop(this, data, DragDropEffects.Copy);
                     }
                     finally
@@ -146,7 +146,7 @@ namespace Editors.Audio.AudioEditor.AudioFilesExplorer
         {
             base.OnSelectedItemChanged(e);
 
-            if (_suppressSelectionChange || e.NewValue is not TreeNode current)
+            if (_suppressSelectionChange || e.NewValue is not AudioFilesTreeNode current)
                 return;
 
             _suppressSelectionChange = true;
@@ -191,9 +191,9 @@ namespace Editors.Audio.AudioEditor.AudioFilesExplorer
             UpdateSelectionStates();
         }
 
-        private void SelectRangeFromAnchor(TreeNode anchor, TreeNode target)
+        private void SelectRangeFromAnchor(AudioFilesTreeNode anchor, AudioFilesTreeNode target)
         {
-            var items = GetTreeViewItems(this).Where(i => i.DataContext is TreeNode)
+            var items = GetTreeViewItems(this).Where(i => i.DataContext is AudioFilesTreeNode)
                                               .ToList();
             var a = items.FindIndex(i => i.DataContext == anchor);
             var t = items.FindIndex(i => i.DataContext == target);
@@ -207,7 +207,7 @@ namespace Editors.Audio.AudioEditor.AudioFilesExplorer
             {
                 for (var i = 0; i < items.Count; i++)
                 {
-                    var node = (TreeNode)items[i].DataContext;
+                    var node = (AudioFilesTreeNode)items[i].DataContext;
                     var shouldBeSelected = i >= start && i <= end;
 
                     if (shouldBeSelected && !SelectedItems.Contains(node))
@@ -235,7 +235,7 @@ namespace Editors.Audio.AudioEditor.AudioFilesExplorer
             {
                 foreach (var item in GetTreeViewItems(this))
                 {
-                    if (item.DataContext is not TreeNode node)
+                    if (item.DataContext is not AudioFilesTreeNode node)
                         continue;
 
                     var shouldBeSelected = SelectedItems.Contains(node);

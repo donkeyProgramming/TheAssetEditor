@@ -9,16 +9,10 @@ namespace Editors.Audio.AudioEditor.Factories
         StatePath Create(Dictionary<string, string> stateLookupByStateGroup, List<AudioFile> audioFiles, AudioSettings audioSettings);
     }
 
-    public class StatePathFactory : IStatePathFactory
+    public class StatePathFactory(ISoundFactory soundFactory, IRandomSequenceContainerFactory randomSequenceContainerFactory) : IStatePathFactory
     {
-        private readonly ISoundFactory _soundFactory;
-        private readonly IRandomSequenceContainerFactory _randomSequenceContainerFactory;
-
-        public StatePathFactory(ISoundFactory soundFactory, IRandomSequenceContainerFactory randomSequenceContainerFactory)
-        {
-            _soundFactory = soundFactory;
-            _randomSequenceContainerFactory = randomSequenceContainerFactory;
-        }
+        private readonly ISoundFactory _soundFactory = soundFactory;
+        private readonly IRandomSequenceContainerFactory _randomSequenceContainerFactory = randomSequenceContainerFactory;
 
         public StatePath Create(Dictionary<string, string> stateLookupByStateGroup, List<AudioFile> audioFiles, AudioSettings audioSettings)
         {
@@ -47,6 +41,7 @@ namespace Editors.Audio.AudioEditor.Factories
                 var randomSequenceContainer = _randomSequenceContainerFactory.Create(audioSettings, audioFiles); 
                 statePath = StatePath.Create(statePathNodes, randomSequenceContainer);
             }
+
             return statePath;
         }
     }

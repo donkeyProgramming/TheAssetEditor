@@ -9,16 +9,10 @@ namespace Editors.Audio.AudioEditor.Factories
         ActionEvent Create(string actionEventName, List<AudioFile> audioFiles, AudioSettings audioSettings);
     }
 
-    public class ActionEventFactory : IActionEventFactory
+    public class ActionEventFactory(ISoundFactory soundFactory, IRandomSequenceContainerFactory randomSequenceContainerFactory) : IActionEventFactory
     {
-        private readonly ISoundFactory _soundFactory;
-        private readonly IRandomSequenceContainerFactory _randomSequenceContainerFactory;
-
-        public ActionEventFactory(ISoundFactory soundFactory, IRandomSequenceContainerFactory randomSequenceContainerFactory)
-        {
-            _soundFactory = soundFactory;
-            _randomSequenceContainerFactory = randomSequenceContainerFactory;
-        }
+        private readonly ISoundFactory _soundFactory = soundFactory;
+        private readonly IRandomSequenceContainerFactory _randomSequenceContainerFactory = randomSequenceContainerFactory;
 
         public ActionEvent Create(string actionEventName, List<AudioFile> audioFiles, AudioSettings audioSettings)
         {

@@ -29,9 +29,9 @@ namespace Editors.Audio.AudioEditor.Models
             }; ;
         }
 
-        private static string BuildName(IEnumerable<StatePathNode> nodes)
+        public static string BuildName(List<StatePathNode> nodes)
         {
-            return string.Join('.', nodes.Select(node => $"{node.StateGroup.Name}[{node.State.Name}]"));
+            return string.Join('.', nodes.Select(node => $"[{node.StateGroup.Name}]{node.State.Name}"));
         }
 
         public AudioSettings GetAudioSettings()

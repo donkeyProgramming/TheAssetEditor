@@ -19,6 +19,11 @@ namespace Editors.Audio.AudioEditor.Models
             return ActionEvents.FirstOrDefault(actionEvent => actionEvent.Name == actionEventName);
         }
 
+        public List<DialogueEvent> GetEditedDialogueEvents()
+        {
+            return DialogueEvents.Where(dialogueEvent => dialogueEvent.StatePaths.Count != 0).ToList();
+        }
+
         public void InsertAlphabetically(ActionEvent actionEvent) => InsertAlphabeticallyUnique(ActionEvents, actionEvent);
     }
 }

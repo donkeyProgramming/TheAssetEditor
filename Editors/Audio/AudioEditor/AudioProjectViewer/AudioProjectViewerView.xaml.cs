@@ -3,7 +3,6 @@ using System.Data;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
-using Editors.Audio.AudioEditor.DataGrids;
 
 namespace Editors.Audio.AudioEditor.AudioProjectViewer
 {
@@ -22,9 +21,7 @@ namespace Editors.Audio.AudioEditor.AudioProjectViewer
             if (DesignerProperties.GetIsInDesignMode(new DependencyObject()))
                 return;
 
-            var dataGridTag = ViewModel?.AudioProjectViewerDataGridTag;
-            var dataGrid = DataGridHelpers.GetDataGridFromTag(dataGridTag);
-            dataGrid.SelectionChanged += OnDataGridSelectionChanged;
+            AudioProjectEditorDataGrid.SelectionChanged += OnDataGridSelectionChanged;
         }
 
         private void OnDataGridSelectionChanged(object sender, SelectionChangedEventArgs e)

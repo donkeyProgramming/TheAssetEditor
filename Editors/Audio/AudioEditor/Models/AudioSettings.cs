@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using Editors.Audio.AudioEditor.Settings;
 using static Editors.Audio.AudioEditor.Settings.Settings;
 
 namespace Editors.Audio.AudioEditor.Models

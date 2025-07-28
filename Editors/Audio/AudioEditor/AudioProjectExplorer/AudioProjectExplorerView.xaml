@@ -5,9 +5,9 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:sys="clr-namespace:System;assembly=netstandard"
-    xmlns:audioprojectexplorer="clr-namespace:Editors.Audio.AudioEditor.AudioProjectExplorer"
     xmlns:converters="clr-namespace:Editors.Audio.AudioEditor.Converters"
     xmlns:extendedwpftoolkit="clr-namespace:Xceed.Wpf.Toolkit;assembly=Xceed.Wpf.Toolkit"
+    xmlns:audioprojectexplorer="clr-namespace:Editors.Audio.AudioEditor.AudioProjectExplorer"
     d:DataContext="{d:DesignInstance Type=audioprojectexplorer:AudioProjectExplorerViewModel}"
     mc:Ignorable="d" 
     d:DesignHeight="550" d:DesignWidth="800">
@@ -120,7 +120,7 @@
                             HorizontalContentAlignment="Center"
                             VerticalAlignment="Center"
                             Click="ClearButtonClick" 
-                            Command="{Binding ClearTextCommand}">
+                            Command="{Binding ClearFilterCommand}">
 
                             <Button.Template>
                                 <ControlTemplate 
@@ -180,7 +180,7 @@
 
                 <TreeView.Resources>
                     <HierarchicalDataTemplate 
-                        DataType="{x:Type audioprojectexplorer:TreeNode}" 
+                        DataType="{x:Type audioprojectexplorer:AudioProjectExplorerTreeNode}" 
                         ItemsSource="{Binding Children}">
                         <TextBlock>
                             <TextBlock.Inlines>

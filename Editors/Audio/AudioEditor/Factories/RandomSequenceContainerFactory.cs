@@ -9,15 +9,9 @@ namespace Editors.Audio.AudioEditor.Factories
         RandomSequenceContainer Create(AudioSettings audioSettings, List<AudioFile> audioFiles);
     }
 
-    public class RandomSequenceContainerFactory : IRandomSequenceContainerFactory
+    public class RandomSequenceContainerFactory(ISoundFactory soundFactory) : IRandomSequenceContainerFactory
     {
-
-        private readonly ISoundFactory _soundFactory;
-
-        public RandomSequenceContainerFactory(ISoundFactory soundFactory)
-        {
-            _soundFactory = soundFactory;
-        }
+        private readonly ISoundFactory _soundFactory = soundFactory;
 
         public RandomSequenceContainer Create(AudioSettings audioSettings, List<AudioFile> audioFiles)
         {

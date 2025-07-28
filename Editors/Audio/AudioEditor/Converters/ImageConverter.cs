@@ -6,16 +6,16 @@ using Shared.EmbeddedResources;
 
 namespace Editors.Audio.AudioEditor.Converters
 {
-    [ValueConversion(typeof(TreeNode), typeof(BitmapImage))]
+    [ValueConversion(typeof(AudioFilesTreeNode), typeof(BitmapImage))]
     public class ImageConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
         {
-            if (value is TreeNode node)
+            if (value is AudioFilesTreeNode node)
             {
-                if (node.NodeType == NodeType.Directory)
+                if (node.NodeType == AudioFilesTreeNodeType.Directory)
                     return IconLibrary.FolderIcon;
-                else if (node.NodeType == NodeType.WavFile)
+                else if (node.NodeType == AudioFilesTreeNodeType.WavFile)
                     return IconLibrary.WavFileIcon;
             }
 

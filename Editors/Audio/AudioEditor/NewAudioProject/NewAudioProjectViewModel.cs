@@ -3,7 +3,6 @@ using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Editors.Audio.AudioEditor.Models;
-using Editors.Audio.AudioEditor.Events;
 using Serilog;
 using Shared.Core.ErrorHandling;
 using Shared.Core.Events;
@@ -89,12 +88,8 @@ namespace Editors.Audio.AudioEditor.NewAudioProject
                 return;
             }
 
-            // Reset and initialise data
-            _eventHub.Publish(new ResetViewModelDataEvent());
+            // Reset data
             _audioEditorService.ResetAudioProject();
-            _eventHub.Publish(new InitialiseViewModelDataEvent());
-
-            _eventHub.Publish(new CreateAudioProjectTreeEvent());
 
             // Initialise AudioProject according to the Audio Project settings selected
             _audioEditorService.InitialiseAudioProject(_eventHub, AudioProjectFileName, AudioProjectDirectory, GameLanguageStringLookup[SelectedLanguage]);

@@ -15,7 +15,7 @@ namespace Editors.Audio.AudioEditor.Settings
 
         private void OnListViewDragOver(object sender, DragEventArgs e)
         {
-            if (e.Data.GetDataPresent(typeof(IEnumerable<TreeNode>)))
+            if (e.Data.GetDataPresent(typeof(IEnumerable<AudioFilesTreeNode>)))
                 e.Effects = DragDropEffects.Copy;
             else
                 e.Effects = DragDropEffects.None;
@@ -25,9 +25,9 @@ namespace Editors.Audio.AudioEditor.Settings
 
         private void OnListViewDrop(object sender, DragEventArgs e)
         {
-            if (e.Data.GetDataPresent(typeof(IEnumerable<TreeNode>)))
+            if (e.Data.GetDataPresent(typeof(IEnumerable<AudioFilesTreeNode>)))
             {
-                if (e.Data.GetData(typeof(IEnumerable<TreeNode>)) is not IEnumerable<TreeNode> droppedNodes)
+                if (e.Data.GetData(typeof(IEnumerable<AudioFilesTreeNode>)) is not IEnumerable<AudioFilesTreeNode> droppedNodes)
                     return;
 
                 if (DataContext is SettingsViewModel viewModel)

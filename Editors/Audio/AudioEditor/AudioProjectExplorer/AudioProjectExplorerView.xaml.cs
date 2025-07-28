@@ -15,7 +15,7 @@ namespace Editors.Audio.AudioEditor.AudioProjectExplorer
 
         private void OnTreeViewSelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
         {
-            if (e.NewValue is TreeNode selectedNode)
+            if (e.NewValue is AudioProjectExplorerTreeNode selectedNode)
                 ViewModel.SelectedNode = selectedNode;
         }
 

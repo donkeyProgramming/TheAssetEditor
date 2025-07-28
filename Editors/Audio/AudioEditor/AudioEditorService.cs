@@ -7,9 +7,8 @@ using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Editors.Audio.AudioEditor.Models;
+using Editors.Audio.AudioEditor.Presentation.Table;
 using Editors.Audio.AudioEditor.Settings;
-using Editors.Audio.AudioEditor.DataGrids;
-using Editors.Audio.AudioEditor.Events;
 using Editors.Audio.AudioProjectCompiler;
 using Serilog;
 using Shared.Core.ErrorHandling;
@@ -18,7 +17,8 @@ using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
 using Shared.Core.Services;
 using static Editors.Audio.GameSettings.Warhammer3.DialogueEvents;
-using TreeNode = Editors.Audio.AudioEditor.AudioProjectExplorer.TreeNode;
+using AudioProjectExplorerTreeNode = Editors.Audio.AudioEditor.AudioProjectExplorer.AudioProjectExplorerTreeNode;
+using Editors.Audio.AudioEditor.Events;
 
 namespace Editors.Audio.AudioEditor
 {
@@ -26,16 +26,14 @@ namespace Editors.Audio.AudioEditor
     {
         AudioProject AudioProject { get; set; }
 
-        ObservableCollection<TreeNode> AudioProjectTree { get; set; }
-        TreeNode SelectedExplorerNode { get; set; }
+        ObservableCollection<AudioProjectExplorerTreeNode> AudioProjectTree { get; set; }
+        AudioProjectExplorerTreeNode SelectedAudioProjectExplorerNode { get; set; }
         DialogueEventPreset? SelectedDialogueEventPreset { get; set; }
 
-        string AudioProjectEditorDataGridTag { get; set; }
         bool ShowModdedStatesOnly { get; set; }
         AudioSettings AudioSettings { get; set; }
         List<AudioFile> AudioFiles { get; set; }
 
-        string AudioProjectViewerDataGridTag { get; set; }
         List<DataRow> SelectedViewerRows { get; set; }
 
         void SaveAudioProject(AudioProject audioProject, string audioProjectFileName, string audioProjectDirectoryPath);
@@ -80,16 +78,14 @@ namespace Editors.Audio.AudioEditor
 
         public AudioProject AudioProject { get; set; }
 
-        public ObservableCollection<TreeNode> AudioProjectTree { get; set; }
-        public TreeNode SelectedExplorerNode { get; set; }
+        public ObservableCollection<AudioProjectExplorerTreeNode> AudioProjectTree { get; set; }
+        public AudioProjectExplorerTreeNode SelectedAudioProjectExplorerNode { get; set; }
         public DialogueEventPreset? SelectedDialogueEventPreset { get; set; }
 
-        public string AudioProjectEditorDataGridTag { get; set; } = "AudioProjectEditorDataGrid";
         public bool ShowModdedStatesOnly { get; set; }
         public AudioSettings AudioSettings { get; set; }
         public List<AudioFile> AudioFiles { get; set; } = [];
 
-        public string AudioProjectViewerDataGridTag { get; set; } = "AudioProjectViewerDataGrid";
         public List<DataRow> SelectedViewerRows { get; set; }
 
         public void SaveAudioProject(AudioProject audioProject, string audioProjectFileName, string audioProjectDirectoryPath)
@@ -122,7 +118,6 @@ namespace Editors.Audio.AudioEditor
                 var audioProjectJson = Encoding.UTF8.GetString(bytes);
 
                 // Reset data
-                eventHub.Publish(new ResetViewModelDataEvent());
                 ResetAudioProject();
 
                 // Set the AudioProject
@@ -137,9 +132,6 @@ namespace Editors.Audio.AudioEditor
                 InitialiseAudioProject(eventHub, loadedAudioProject.FileName, loadedAudioProject.DirectoryPath, loadedAudioProject.Language);
                 MergeSavedAudioProjectIntoAudioProjectWithUnusedItems(loadedAudioProject);
 
-                // Initialise data after AudioProject is set so it uses the correct instance
-                eventHub.Publish(new InitialiseViewModelDataEvent());
-
                 _integrityChecker.CheckAudioProjectDialogueEventIntegrity(this);
 
                 _logger.Here().Information($"Loaded Audio Project: {fileName}");
@@ -153,10 +145,8 @@ namespace Editors.Audio.AudioEditor
             AudioProject.DirectoryPath = directory;
             AudioProject.Language = language;
 
-            var label = $"Audio Project Explorer - {DataGridHelpers.DuplicateUnderscores(fileName)}";
-            eventHub.Publish(new SetAudioProjectExplorerLabelEvent(label));
-
-            eventHub.Publish(new CreateAudioProjectTreeEvent());
+            var label = $"Audio Project Explorer - {TableHelpers.DuplicateUnderscores(fileName)}";
+            eventHub.Publish(new AudioProjectInitialisedEvent(label));
         }
 
         public void CompileAudioProject()

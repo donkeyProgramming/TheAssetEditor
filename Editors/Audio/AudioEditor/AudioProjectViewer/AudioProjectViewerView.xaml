@@ -4,12 +4,18 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+    xmlns:behaviors="clr-namespace:Shared.Ui.Common.Behaviors;assembly=Shared.Ui"
     xmlns:audioprojectviewer="clr-namespace:Editors.Audio.AudioEditor.AudioProjectViewer" 
     d:DataContext="{d:DesignInstance Type=audioprojectviewer:AudioProjectViewerViewModel}"
     mc:Ignorable="d" 
     d:DesignHeight="450" d:DesignWidth="800">
     
-    <Grid>
+    <UserControl.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolToVisibilityConverter"/>
+    </UserControl.Resources>
+    
+    <Grid
+        Visibility="{Binding IsViewerVisible, Converter={StaticResource BoolToVisibilityConverter}}">
 
         <Grid.RowDefinitions>
             <RowDefinition 
@@ -22,7 +28,7 @@
         
         <Label 
             Grid.Row="0"
-            Content="{Binding AudioProjectViewerLabel}"/>
+            Content="{Binding ViewerLabel}"/>
 
         <Grid 
             Grid.Row="1" 
@@ -40,7 +46,7 @@
                 Grid.Column="0"
                 Content="Edit Item" 
                 ToolTip="PLACEHOLDER" 
-                Command="{Binding EditAudioProjectViewerDataGridRowCommand}" 
+                Command="{Binding EditRowCommand}" 
                 Margin="5, 0, 0, 0" 
                 Width="70" 
                 VerticalAlignment="Center" 
@@ -51,7 +57,7 @@
                 Grid.Column="1"
                 Content="Remove From Audio Project" 
                 ToolTip="PLACEHOLDER" 
-                Command="{Binding RemoveAudioProjectViewerDataGridRowCommand}" 
+                Command="{Binding RemoveRowCommand}" 
                 Margin="5, 0, 0, 0" 
                 Width="170" 
                 VerticalAlignment="Center" 
@@ -62,15 +68,33 @@
         <!-- Setting CanUserAddRows to false ensures that data won't go missing from the last row when a new row is added. Wtf WPF. -->
         <DataGrid 
             Grid.Row="2"
-            Tag="{Binding AudioProjectViewerDataGridTag}" 
+            x:Name="AudioProjectEditorDataGrid"
+            Tag="{Binding DataGridTag}" 
             AutoGenerateColumns="False" 
             VerticalScrollBarVisibility="Auto" 
             SelectionChanged="OnDataGridSelectionChanged"
+            behaviors:DataGridColumnsBehavior.Columns ="{Binding DataGridColumns}"
             CanUserAddRows="False"
-            ItemsSource="{Binding AudioProjectViewerDataGrid.DefaultView}"
+            ItemsSource="{Binding Table.DefaultView}"
             EnableRowVirtualization="True" 
             EnableColumnVirtualization="True"
             ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+            
+            <DataGrid.ContextMenu>
+                <ContextMenu
+                    DataContext="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource Self}}">
+
+                    <MenuItem
+                        Header="Copy"
+                        Command="{Binding CopyRowsCommand}"
+                        Visibility="{Binding IsContextMenuCopyVisible, Converter={StaticResource BoolToVisibilityConverter}}" />
+
+                    <MenuItem
+                        Header="Paste"
+                        Command="{Binding PasteRowsCommand}"
+                        Visibility="{Binding IsContextMenuPasteVisible, Converter={StaticResource BoolToVisibilityConverter}}" />
+                </ContextMenu>
+            </DataGrid.ContextMenu>
         </DataGrid>
     </Grid>
 </UserControl>

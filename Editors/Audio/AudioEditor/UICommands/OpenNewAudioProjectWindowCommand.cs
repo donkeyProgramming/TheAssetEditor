@@ -5,14 +5,9 @@ using Shared.Core.Events;
 
 namespace Editors.Audio.AudioEditor.UICommands
 {
-    public class OpenNewAudioProjectWindowCommand : IUiCommand
+    public class OpenNewAudioProjectWindowCommand(IServiceProvider serviceProvider) : IUiCommand
     {
-        private readonly IServiceProvider _serviceProvider;
-
-        public OpenNewAudioProjectWindowCommand(IServiceProvider serviceProvider)
-        {
-            _serviceProvider = serviceProvider;
-        }
+        private readonly IServiceProvider _serviceProvider = serviceProvider;
 
         public void Execute()
         {

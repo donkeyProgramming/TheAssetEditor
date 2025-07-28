@@ -4,12 +4,12 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using Editors.Audio.AudioEditor.DataGrids;
-using Editors.Audio.AudioEditor.Events;
 using Editors.Audio.AudioEditor.Models;
+using Editors.Audio.AudioEditor.Presentation.Table;
 using Editors.Audio.Storage;
 using Shared.Core.Events;
 using static Editors.Audio.AudioEditor.Settings.Settings;
+using Editors.Audio.AudioEditor.Events;
 
 // TODO: Some bug where the audio settings aren't updating right after multiple sounds are set after single previously being set
 namespace Editors.Audio.AudioEditor.Settings
@@ -72,31 +72,33 @@ namespace Editors.Audio.AudioEditor.Settings
 
             SetInitialSettings();
 
-            _eventHub.Register<ShowSettingsFromAudioProjectViewerCheckEvent>(this, CheckShowSettingsFromAudioProjectViewer);
-            _eventHub.Register<AudioFilesSetEvent>(this, OnAudioFilesSet);
-            _eventHub.Register<ViewerRowSelectionChangedEvent>(this, OnViewerRowSelectionChanged);
+            _eventHub.Register<EditorDataGridTextboxTextChangedEvent>(this, OnEditorDataGridTextboxTextChanged);
+            _eventHub.Register<AudioFilesChangedEvent>(this, OnAudioFilesChanged);
+            _eventHub.Register<ViewerTableRowSelectionChangedEvent>(this, OnViewerTableRowSelectionChanged);
 
-            _eventHub.Register<ExplorerNodeSelectedEvent>(this, OnSelectedExplorerNodeChanged);
-            _eventHub.Register<EditViewerRowEvent>(this, OnViewerRowEdited);
+            _eventHub.Register<AudioProjectExplorerNodeSelectedEvent>(this, OnAudioProjectExplorerNodeSelected);
+            _eventHub.Register<ViewerTableRowEditedEvent>(this, OnViewerRowEdited);
         }
 
-        public void CheckShowSettingsFromAudioProjectViewer(ShowSettingsFromAudioProjectViewerCheckEvent resetSettingsEvent)
+        private void OnEditorDataGridTextboxTextChanged(EditorDataGridTextboxTextChangedEvent e) => CheckShowSettingsFromAudioProjectViewer();
+
+        private void CheckShowSettingsFromAudioProjectViewer()
         {
             if (ShowSettingsFromAudioProjectViewer)
                 ResetShowSettingsFromAudioProjectViewer();
         }
 
-        public void OnAudioFilesSet(AudioFilesSetEvent audioFilesSetEvent)
+        public void OnAudioFilesChanged(AudioFilesChangedEvent e)
         {
             AudioFiles.Clear();
-            AudioFiles = audioFilesSetEvent.AudioFiles;
+            AudioFiles = e.AudioFiles;
 
             SetSettingsEnablementAndVisibility();
             ResetShowSettingsFromAudioProjectViewer();
             StoreSettings();
         }
 
-        public void OnViewerRowSelectionChanged(ViewerRowSelectionChangedEvent viewerRowSelectionChangedEvent)
+        public void OnViewerTableRowSelectionChanged(ViewerTableRowSelectionChangedEvent e)
         {
             if (ShowSettingsFromAudioProjectViewer)
             {
@@ -113,16 +115,16 @@ namespace Editors.Audio.AudioEditor.Settings
         public void SetAudioFilesViaDrop(ObservableCollection<AudioFile> audioFiles)
         {
             _audioEditorService.AudioFiles = audioFiles.ToList();
-            _eventHub.Publish(new AudioFilesSetEvent(audioFiles));
+            _eventHub.Publish(new AudioFilesChangedEvent(audioFiles));
         }
 
-        public void OnViewerRowEdited(EditViewerRowEvent itemEditedEvent)
+        public void OnViewerRowEdited(ViewerTableRowEditedEvent itemEditedEvent)
         {
             ShowSettingsFromAudioProjectViewerItem();
             SetSettingsEnablementAndVisibility();
         }
 
-        public void OnSelectedExplorerNodeChanged(ExplorerNodeSelectedEvent e)
+        public void OnAudioProjectExplorerNodeSelected(AudioProjectExplorerNodeSelectedEvent e)
         {
             ResetSettingsView();
             SetSettingsEnablementAndVisibility();
@@ -214,11 +216,11 @@ namespace Editors.Audio.AudioEditor.Settings
             AudioSettings settings = null;
             var audioFiles = new List<AudioFile>();
 
-            var selectedExplorerNode = _audioEditorService.SelectedExplorerNode;
-            if (selectedExplorerNode.IsActionEventSoundBank())
+            var selectedAudioProjectExplorerNode = _audioEditorService.SelectedAudioProjectExplorerNode;
+            if (selectedAudioProjectExplorerNode.IsActionEventSoundBank())
             {
                 var selectedViewerRow = _audioEditorService.SelectedViewerRows[0];
-                var actionEventName = DataGridHelpers.GetActionEventNameFromRow(selectedViewerRow);
+                var actionEventName = TableHelpers.GetActionEventNameFromRow(selectedViewerRow);
                 var actionEvent = _audioEditorService.AudioProject.GetActionEvent(actionEventName);
                 settings = actionEvent.GetAudioSettings();
 
@@ -242,11 +244,12 @@ namespace Editors.Audio.AudioEditor.Settings
                     }
                 }
             }
-            else if (selectedExplorerNode.IsDialogueEvent())
+            else if (selectedAudioProjectExplorerNode.IsDialogueEvent())
             {
                 var selectedViewerRow = _audioEditorService.SelectedViewerRows[0];
-                var dialogueEvent = _audioEditorService.AudioProject.GetDialogueEvent(selectedExplorerNode.Name);
-                var statePath = dialogueEvent.GetStatePath(_audioRepository, selectedViewerRow);
+                var dialogueEvent = _audioEditorService.AudioProject.GetDialogueEvent(selectedAudioProjectExplorerNode.Name);
+                var statePathName = TableHelpers.GetStatePathNameFromRow(selectedViewerRow, _audioRepository, selectedAudioProjectExplorerNode.Name);
+                var statePath = dialogueEvent.GetStatePath(statePathName);
                 settings = statePath.GetAudioSettings();
 
                 if (statePath.Sound != null)
@@ -270,6 +273,8 @@ namespace Editors.Audio.AudioEditor.Settings
                 }
 
             }
+            else if (selectedAudioProjectExplorerNode.IsStateGroup())
+                return;
 
             SetSettingsFromAudioProjectItemSettings(settings, audioFiles);
         }
@@ -340,6 +345,10 @@ namespace Editors.Audio.AudioEditor.Settings
 
         public void SetSettingsEnablementAndVisibility()
         {
+            var selectedAudioProjectExplorerNode = _audioEditorService.SelectedAudioProjectExplorerNode; 
+            if (!selectedAudioProjectExplorerNode.IsDialogueEvent() && !selectedAudioProjectExplorerNode.IsActionEventSoundBank())
+                return;
+
             IsSettingsVisible = true;
 
             if (AudioFiles.Count > 1)
