@@ -13,6 +13,7 @@
     <UserControl.Resources>
         <converters:ImageConverter 
             x:Key="ImageValueConverter"/>
+        <BooleanToVisibilityConverter x:Key="BoolToVisibilityConverter"/>
     </UserControl.Resources>
 
     <Grid>
@@ -60,7 +61,7 @@
                 Width="75" 
                 Content="Play Audio" 
                 ToolTip="Play the selected audio file." 
-                Command="{Binding PlayWavFileCommand}" 
+                Command="{Binding PlayWavCommand}" 
                 VerticalAlignment="Center" 
                 HorizontalAlignment="Left"
                 IsEnabled="{Binding IsPlayAudioButtonEnabled}"/>
@@ -180,6 +181,14 @@
                     <Setter 
                         Property="IsExpanded" 
                         Value="{Binding IsNodeExpanded, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
+                    <Setter 
+                        Property="Visibility">
+                        <Setter.Value>
+                            <Binding 
+                                Path="IsVisible" 
+                                Converter="{StaticResource BoolToVisibilityConverter}" />
+                        </Setter.Value>
+                    </Setter>
                 </Style>
             </audiofilesexplorer:MultiSelectTreeView.ItemContainerStyle>
 

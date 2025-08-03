@@ -11,7 +11,7 @@ namespace Editors.Audio.AudioEditor.UICommands
         private readonly IActionEventService _actionEventService = actionEventService;
 
         public MutationType Action => MutationType.Add;
-        public AudioProjectExplorerTreeNodeType NodeType => AudioProjectExplorerTreeNodeType.ActionEventSoundBank;
+        public AudioProjectTreeNodeType NodeType => AudioProjectTreeNodeType.ActionEventSoundBank;
 
         public void Execute(DataRow row)
         {

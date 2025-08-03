@@ -20,7 +20,7 @@ namespace Editors.Audio.AudioEditor.UICommands
         private readonly IEventHub _eventHub = eventHub;
 
         public MutationType Action => MutationType.Remove;
-        public AudioProjectExplorerTreeNodeType NodeType => AudioProjectExplorerTreeNodeType.DialogueEvent;
+        public AudioProjectTreeNodeType NodeType => AudioProjectTreeNodeType.DialogueEvent;
 
         public void Execute(DataRow row)
         {
@@ -31,7 +31,7 @@ namespace Editors.Audio.AudioEditor.UICommands
             // TODO: Do we need to then display a message to the user saying we can't do this until they fix the state path?
             var result = false;
             if (result == false)
-                _eventHub.Publish(new ViewerTableRowRemovedEvent(row));
+                _eventHub.Publish(new ViewerTableRowRemoveRequestedEvent(row));
         }
     }
 }

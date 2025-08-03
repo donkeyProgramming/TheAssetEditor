@@ -2,5 +2,5 @@
 
 namespace Editors.Audio.AudioEditor.Events
 {
-    public record ViewerTableColumnAddedEvent(DataColumn Column);
+    public record ViewerTableRowRemoveRequestedEvent(DataRow Row);
 }

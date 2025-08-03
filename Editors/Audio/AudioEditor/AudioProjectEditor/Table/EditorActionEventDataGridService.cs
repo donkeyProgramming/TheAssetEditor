@@ -1,10 +1,10 @@
 ﻿using System.Collections.Generic;
 using System.Data;
 using Editors.Audio.AudioEditor.AudioProjectExplorer;
+using Editors.Audio.AudioEditor.Events;
 using Editors.Audio.AudioEditor.Presentation.Table;
 using Editors.Audio.GameSettings.Warhammer3;
 using Shared.Core.Events;
-using Editors.Audio.AudioEditor.Events;
 
 namespace Editors.Audio.AudioEditor.AudioProjectEditor.Table
 {
@@ -17,7 +17,7 @@ namespace Editors.Audio.AudioEditor.AudioProjectEditor.Table
         private readonly IEventHub _eventHub = eventHub;
         private readonly IAudioEditorService _audioEditorService = audioEditorService;
 
-        public AudioProjectExplorerTreeNodeType NodeType => AudioProjectExplorerTreeNodeType.ActionEventSoundBank;
+        public AudioProjectTreeNodeType NodeType => AudioProjectTreeNodeType.ActionEventSoundBank;
 
         public void Load(DataTable table)
         {
@@ -40,7 +40,7 @@ namespace Editors.Audio.AudioEditor.AudioProjectEditor.Table
             foreach (var columnName in schema)
             {
                 var column = new DataColumn(columnName, typeof(string));
-                _eventHub.Publish(new EditorTableColumnAddedEvent(column));
+                _eventHub.Publish(new EditorTableColumnAddRequestedEvent(column));
             }
         }
 
@@ -55,13 +55,13 @@ namespace Editors.Audio.AudioEditor.AudioProjectEditor.Table
                 var fileSelectColumnHeader = TableInfo.BrowseMovieColumnName;
                 var fileSelectColumn = DataGridTemplates.CreateColumnTemplate(fileSelectColumnHeader, 85, useAbsoluteWidth: true);
                 fileSelectColumn.CellTemplate = DataGridTemplates.CreateFileSelectButtonCellTemplate(_uiCommandFactory);
-                _eventHub.Publish(new EditorDataGridColumnAddedEvent(fileSelectColumn));
+                _eventHub.Publish(new EditorDataGridColumnAddRequestedEvent(fileSelectColumn));
 
                 foreach (var columnName in schema)
                 {
                     var eventColumn = DataGridTemplates.CreateColumnTemplate(columnName, columnWidth, isReadOnly: true);
                     eventColumn.CellTemplate = DataGridTemplates.CreateReadOnlyTextBlockTemplate(columnName);
-                    _eventHub.Publish(new EditorDataGridColumnAddedEvent(eventColumn));
+                    _eventHub.Publish(new EditorDataGridColumnAddRequestedEvent(eventColumn));
                 }
             }
             else
@@ -70,7 +70,7 @@ namespace Editors.Audio.AudioEditor.AudioProjectEditor.Table
                 {
                     var eventColumn = DataGridTemplates.CreateColumnTemplate(columnName, columnWidth, isReadOnly: true);
                     eventColumn.CellTemplate = DataGridTemplates.CreateEditableEventTextBoxTemplate(_eventHub, columnName);
-                    _eventHub.Publish(new EditorDataGridColumnAddedEvent(eventColumn));
+                    _eventHub.Publish(new EditorDataGridColumnAddRequestedEvent(eventColumn));
                 }
             }
         }
@@ -86,7 +86,7 @@ namespace Editors.Audio.AudioEditor.AudioProjectEditor.Table
             var row = editorTable.NewRow();
             row[TableInfo.EventColumnName] = eventName;
 
-            _eventHub.Publish(new EditorTableRowAddedEvent(row));
+            _eventHub.Publish(new EditorTableRowAddRequestedEvent(row));
         }
     }
 }

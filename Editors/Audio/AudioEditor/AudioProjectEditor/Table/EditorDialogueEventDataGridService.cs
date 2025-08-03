@@ -2,10 +2,10 @@
 using System.Data;
 using System.Linq;
 using Editors.Audio.AudioEditor.AudioProjectExplorer;
+using Editors.Audio.AudioEditor.Events;
 using Editors.Audio.AudioEditor.Presentation.Table;
 using Editors.Audio.Storage;
 using Shared.Core.Events;
-using Editors.Audio.AudioEditor.Events;
 
 namespace Editors.Audio.AudioEditor.AudioProjectEditor.Table
 {
@@ -18,7 +18,7 @@ namespace Editors.Audio.AudioEditor.AudioProjectEditor.Table
         private readonly IAudioEditorService _audioEditorService = audioEditorService;
         private readonly IAudioRepository _audioRepository = audioRepository;
 
-        public AudioProjectExplorerTreeNodeType NodeType => AudioProjectExplorerTreeNodeType.DialogueEvent;
+        public AudioProjectTreeNodeType NodeType => AudioProjectTreeNodeType.DialogueEvent;
 
         public void Load(DataTable table)
         {
@@ -46,7 +46,7 @@ namespace Editors.Audio.AudioEditor.AudioProjectEditor.Table
             foreach (var columnName in schema)
             {
                 var column = new DataColumn(columnName, typeof(string));
-                _eventHub.Publish(new EditorTableColumnAddedEvent(column));
+                _eventHub.Publish(new EditorTableColumnAddRequestedEvent(column));
             }
         }
 
@@ -64,7 +64,7 @@ namespace Editors.Audio.AudioEditor.AudioProjectEditor.Table
                 var column = DataGridTemplates.CreateColumnTemplate(columnName, columnWidth);
                 var states = TableHelpers.GetStatesForStateGroupColumn(_audioEditorService, _audioRepository, stateGroupName);
                 column.CellTemplate = DataGridTemplates.CreateStatesComboBoxTemplate(_eventHub, columnName, states);
-                _eventHub.Publish(new EditorDataGridColumnAddedEvent(column));
+                _eventHub.Publish(new EditorDataGridColumnAddRequestedEvent(column));
             }
         }
 
@@ -88,7 +88,7 @@ namespace Editors.Audio.AudioEditor.AudioProjectEditor.Table
                     row[columnName] = "Any"; // Set the cell value to Any as the default value
             }
 
-            _eventHub.Publish(new EditorTableRowAddedEvent(row));
+            _eventHub.Publish(new EditorTableRowAddRequestedEvent(row));
         }
     }
 }

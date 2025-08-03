@@ -13,7 +13,7 @@ namespace Editors.Audio.AudioProjectConverter
         private void AudioProjectConverterWindow_Loaded(object sender, RoutedEventArgs e)
         {
             if (DataContext is AudioProjectConverterViewModel viewModel)
-                viewModel.SetCloseAction(this.Close);
+                viewModel.SetCloseAction(Close);
         }
     }
 }

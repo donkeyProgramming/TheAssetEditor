@@ -6,24 +6,23 @@ using System.Linq;
 using System.Windows.Controls;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Editors.Audio.AudioEditor.AudioProjectEditor.Table;
 using Editors.Audio.AudioEditor.AudioProjectExplorer;
+using Editors.Audio.AudioEditor.Events;
 using Editors.Audio.AudioEditor.Presentation.Table;
 using Editors.Audio.AudioEditor.Settings;
+using Editors.Audio.AudioEditor.UICommands;
 using Editors.Audio.GameSettings.Warhammer3;
 using Editors.Audio.Storage;
 using Serilog;
 using Shared.Core.ErrorHandling;
 using Shared.Core.Events;
-using Editors.Audio.AudioEditor.Events;
-using Editors.Audio.AudioEditor.AudioProjectEditor.Table;
-using Editors.Audio.AudioEditor.AudioProjectEditor;
-using Editors.Audio.AudioEditor.UICommands;
 
 namespace Editors.Audio.AudioEditor.AudioProjectEditor
 {
     public partial class AudioProjectEditorViewModel : ObservableObject
     {
-        private readonly IAudioProjectMutationUICommandFactory _audioProjectMutationUICommandFactory;
+        private readonly IUiCommandFactory _uiCommandFactory;
         private readonly IEventHub _eventHub;
         private readonly IAudioEditorService _audioEditorService;
         private readonly IEditorTableServiceFactory _tableServiceFactory;
@@ -42,13 +41,13 @@ namespace Editors.Audio.AudioEditor.AudioProjectEditor
         [ObservableProperty] private bool _isEditorVisible = false;
 
         public AudioProjectEditorViewModel (
-            IAudioProjectMutationUICommandFactory audioProjectMutationUICommandFactory,
+            IUiCommandFactory uiCommandFactory,
             IEventHub eventHub,
             IAudioEditorService audioEditorService,
             IEditorTableServiceFactory tableServiceFactory,
             IAudioRepository audioRepository)
         {
-            _audioProjectMutationUICommandFactory = audioProjectMutationUICommandFactory;
+            _uiCommandFactory = uiCommandFactory;
             _eventHub = eventHub;
             _audioEditorService = audioEditorService;
             _tableServiceFactory = tableServiceFactory;
@@ -59,85 +58,19 @@ namespace Editors.Audio.AudioEditor.AudioProjectEditor
 
             _audioEditorService.ShowModdedStatesOnly = _showModdedStatesOnly;
 
-            _eventHub.Register<EditorTableColumnAddedEvent>(this, OnEditorTableColumnAdded);
-            _eventHub.Register<EditorTableRowAddedEvent>(this, OnEditorTableRowAdded);
-            _eventHub.Register<ViewerTableRowEditedEvent>(this, OnViewerRowEdited);
+            _eventHub.Register<AudioProjectExplorerNodeSelectedEvent>(this, OnAudioProjectExplorerNodeSelected);
+            _eventHub.Register<EditorTableColumnAddRequestedEvent>(this, OnEditorTableColumnAddRequested);
+            _eventHub.Register<EditorTableRowAddRequestedEvent>(this, OnEditorTableRowAddRequested);
+            _eventHub.Register<EditorDataGridColumnAddRequestedEvent>(this, OnEditorDataGridColumnAddRequested);
+            _eventHub.Register<EditorTableRowAddedToViewerEvent>(this, OnEditorTableRowAddedToViewer);
+            _eventHub.Register<ViewerTableRowEditedEvent>(this, OnViewerTableRowEdited);
             _eventHub.Register<AudioFilesChangedEvent>(this, OnAudioFilesChanged);
             _eventHub.Register<EditorDataGridTextboxTextChangedEvent>(this, OnEditorDataGridTextboxTextChanged);
             _eventHub.Register<MovieFileChangedEvent>(this, OnMovieFileChanged);
-            _eventHub.Register<AudioProjectExplorerNodeSelectedEvent>(this, OnAudioProjectExplorerNodeSelected);
-            _eventHub.Register<EditorAddRowButtonEnablementChangedEvent>(this, OnEditorAddRowButtonEnablementChanged);
-            _eventHub.Register<EditorDataGridColumnAddedEvent>(this, OnEditorDataGridColumnAdded);
+            _eventHub.Register<EditorAddRowButtonEnablementUpdateRequestedEvent>(this, OnEditorAddRowButtonEnablementUpdateRequested);
         }
 
-        private void OnEditorTableColumnAdded(EditorTableColumnAddedEvent e) => AddTableColumn(e.Column);
-
-        private void AddTableColumn(DataColumn column)
-        {
-            if (!Table.Columns.Contains(column.ColumnName))
-                Table.Columns.Add(column);
-        }
-
-        public void OnEditorTableRowAdded(EditorTableRowAddedEvent e) => AddTableRow(e.Row);
-
-        private void AddTableRow(DataRow row)
-        {
-            if (row.Table == Table)
-                Table.Rows.Add(row);
-            else
-                Table.ImportRow(row);
-
-            var selectedAudioProjectExplorerNode = _audioEditorService.SelectedAudioProjectExplorerNode;
-            _logger.Here().Information($"Added {selectedAudioProjectExplorerNode.NodeType} row to Audio Project Editor table for {selectedAudioProjectExplorerNode.Name} ");
-        }
-
-        public void OnViewerRowEdited(ViewerTableRowEditedEvent e)
-        {
-            // Clear table to ensure there's only one row
-            Table.Clear();
-
-            _eventHub.Publish(new EditorTableRowAddedEvent(e.Row));
-        }
-
-        private void OnAudioFilesChanged(AudioFilesChangedEvent e) => SetAudioFiles(e.AudioFiles);
-
-        public void SetAudioFiles(ObservableCollection<AudioFile> audioFiles)
-        {
-            var selectedAudioProjectExplorerNode = _audioEditorService.SelectedAudioProjectExplorerNode;
-
-            if (selectedAudioProjectExplorerNode.IsActionEventSoundBank() &&
-                selectedAudioProjectExplorerNode.Name != SoundBanks.MoviesDisplayString &&
-                audioFiles.Count == 1)
-            {
-                var row = Table.Rows[0];
-                var wavFileName = Path.GetFileNameWithoutExtension(audioFiles[0].FileName);
-                var eventName = $"Play_{wavFileName}";
-                row[TableInfo.EventColumnName] = eventName;
-            }
-
-            SetAddRowButtonEnablement();
-        }
-
-        public void OnEditorDataGridTextboxTextChanged(EditorDataGridTextboxTextChangedEvent e) => SetAddRowButtonEnablement();
-
-        private void OnMovieFileChanged(MovieFileChangedEvent e) => SetMovieFilePath(e.MovieFilePath);
-
-        private void SetMovieFilePath(string movieFilePath)
-        {
-            var row = Table.Rows[0];
-            var eventName = ConvertMovieFilePath(movieFilePath);
-            row[TableInfo.EventColumnName] = eventName;
-        }
-
-        public static string ConvertMovieFilePath(string filePath)
-        {
-            filePath = filePath.Replace("movies\\", string.Empty);
-            filePath = filePath.Replace(Path.GetExtension(filePath), string.Empty);
-            filePath = filePath.Replace("\\", "_");
-            return $"Play_Movie_{filePath}";
-        }
-
-        public void OnAudioProjectExplorerNodeSelected(AudioProjectExplorerNodeSelectedEvent e)
+        private void OnAudioProjectExplorerNodeSelected(AudioProjectExplorerNodeSelectedEvent e)
         {
             ResetEditorVisibility();
             ResetEditorLabel();
@@ -176,15 +109,28 @@ namespace Editors.Audio.AudioEditor.AudioProjectEditor
             SetShowModdedStatesOnlyButtonEnablementAndVisibility();
         }
 
-        private void Load(AudioProjectExplorerTreeNodeType selectedNodeType)
+        private void OnEditorTableColumnAddRequested(EditorTableColumnAddRequestedEvent e) => AddTableColumn(e.Column);
+
+        private void AddTableColumn(DataColumn column)
         {
-            var tableService = _tableServiceFactory.GetService(selectedNodeType);
-            tableService.Load(Table);
+            if (!Table.Columns.Contains(column.ColumnName))
+                Table.Columns.Add(column);
         }
 
-        public void OnEditorAddRowButtonEnablementChanged(EditorAddRowButtonEnablementChangedEvent e) => SetAddRowButtonEnablement();
+        private void OnEditorTableRowAddRequested(EditorTableRowAddRequestedEvent e) => AddTableRow(e.Row);
 
-        private void OnEditorDataGridColumnAdded(EditorDataGridColumnAddedEvent e) => AddDataGridColumns(e.Column);
+        private void AddTableRow(DataRow row)
+        {
+            if (row.Table == Table)
+                Table.Rows.Add(row);
+            else
+                Table.ImportRow(row);
+
+            var selectedAudioProjectExplorerNode = _audioEditorService.SelectedAudioProjectExplorerNode;
+            _logger.Here().Information($"Added {selectedAudioProjectExplorerNode.NodeType} row to Audio Project Editor table for {selectedAudioProjectExplorerNode.Name} ");
+        }
+
+        private void OnEditorDataGridColumnAddRequested(EditorDataGridColumnAddRequestedEvent e) => AddDataGridColumns(e.Column);
 
         private void AddDataGridColumns(DataGridColumn column)
         {
@@ -196,6 +142,72 @@ namespace Editors.Audio.AudioEditor.AudioProjectEditor
                 DataGridColumns.Add(column);
         }
 
+        private void OnEditorTableRowAddedToViewer(EditorTableRowAddedToViewerEvent e)
+        {
+            // Clear table to ensure there's only one row
+            Table.Clear();
+
+            // Re-initialise table
+            var selectedAudioProjectExplorerNode = _audioEditorService.SelectedAudioProjectExplorerNode;
+            var dataGridService = _tableServiceFactory.GetService(selectedAudioProjectExplorerNode.NodeType);
+            dataGridService.InitialiseTable(Table);
+
+            // Handle enablement last because the row needs to be cleared before being checked
+            SetAddRowButtonEnablement();
+        }
+
+        private void OnViewerTableRowEdited(ViewerTableRowEditedEvent e)
+        {
+            // Clear table to ensure there's only one row
+            Table.Clear();
+
+            _eventHub.Publish(new EditorTableRowAddRequestedEvent(e.Row));
+        }
+
+        private void OnAudioFilesChanged(AudioFilesChangedEvent e) => SetAudioFiles(e.AudioFiles);
+
+        private void SetAudioFiles(ObservableCollection<AudioFile> audioFiles)
+        {
+            var selectedAudioProjectExplorerNode = _audioEditorService.SelectedAudioProjectExplorerNode;
+
+            if (selectedAudioProjectExplorerNode.IsActionEventSoundBank() 
+                && selectedAudioProjectExplorerNode.Name != SoundBanks.MoviesDisplayString 
+                && audioFiles.Count == 1)
+            {
+                var row = Table.Rows[0];
+                var wavFileName = Path.GetFileNameWithoutExtension(audioFiles[0].FileName);
+                var eventName = $"Play_{wavFileName}";
+                row[TableInfo.EventColumnName] = eventName;
+            }
+
+            SetAddRowButtonEnablement();
+        }
+
+        private void OnEditorDataGridTextboxTextChanged(EditorDataGridTextboxTextChangedEvent e) => SetAddRowButtonEnablement();
+
+        private void OnMovieFileChanged(MovieFileChangedEvent e) => SetMovieFilePath(e.MovieFilePath);
+
+        private void SetMovieFilePath(string movieFilePath)
+        {
+            var relativePath = Path.GetRelativePath("movies", movieFilePath);
+            var withoutExtension = Path.ChangeExtension(relativePath, null);
+            var slashesToUnderscores = withoutExtension.Replace("\\", "_");
+            var eventName = $"Play_Movie_{slashesToUnderscores}";
+
+            var row = Table.Rows[0];
+            row[TableInfo.EventColumnName] = eventName;
+        }
+
+        public void OnEditorAddRowButtonEnablementUpdateRequested(EditorAddRowButtonEnablementUpdateRequestedEvent e) => SetAddRowButtonEnablement();
+
+        private void Load(AudioProjectTreeNodeType selectedNodeType)
+        {
+            var tableService = _tableServiceFactory.GetService(selectedNodeType);
+            tableService.Load(Table);
+        }
+
+        [RelayCommand] public void AddRowToViewer() => _uiCommandFactory.Create<AddEditorRowToViewerCommand>().Execute(Table.Rows[0]);
+
         partial void OnShowModdedStatesOnlyChanged(bool value)
         {
             var selectedAudioProjectExplorerNode = _audioEditorService.SelectedAudioProjectExplorerNode;
@@ -206,34 +218,9 @@ namespace Editors.Audio.AudioEditor.AudioProjectEditor
             }
         }
 
-        [RelayCommand] public void AddRowToViewer()
+        private void SetAddRowButtonEnablement()
         {
-            if (Table.Rows.Count == 0)
-                return;
-
-            var selectedAudioProjectExplorerNode = _audioEditorService.SelectedAudioProjectExplorerNode;
-            var row = Table.Rows[0];
-
-            // Store the row data in the Audio Project
-            _audioProjectMutationUICommandFactory.Create(MutationType.Add, selectedAudioProjectExplorerNode.NodeType).Execute(row);
-
-            // Display the row data in the Viewer
-            _eventHub.Publish(new ViewerTableRowAddedEvent(row));
-
-            // Clear table to ensure there's only one row
-            Table.Clear();
-
-            // Re-initialise table
-            var dataGridService = _tableServiceFactory.GetService(selectedAudioProjectExplorerNode.NodeType);
-            dataGridService.InitialiseTable(Table);
-
-            // Handle enablement last because the row needs to be cleared before being checked
-            SetAddRowButtonEnablement();
-        }
-
-        public void SetAddRowButtonEnablement()
-        {
-            ResetAddRowButtonEnablement();
+            IsAddRowButtonEnabled = false;
 
             if (Table.Rows.Count == 0)
                 return;
@@ -314,7 +301,7 @@ namespace Editors.Audio.AudioEditor.AudioProjectEditor
                     && (string.IsNullOrEmpty(value) || value == "Play_")));
         }
 
-        public void SetShowModdedStatesOnlyButtonEnablementAndVisibility()
+        private void SetShowModdedStatesOnlyButtonEnablementAndVisibility()
         {
             var selectedAudioProjectExplorerNode = _audioEditorService.SelectedAudioProjectExplorerNode;
             if (selectedAudioProjectExplorerNode.IsDialogueEvent())
@@ -333,46 +320,24 @@ namespace Editors.Audio.AudioEditor.AudioProjectEditor
                 IsShowModdedStatesCheckBoxVisible = false;
         }
 
-        public void SetEditorLabel(string label)
-        {
-            EditorLabel = $"Audio Project Editor - {label}";
-        }
-
-        public void ResetEditorLabel()
-        {
-            EditorLabel = $"Audio Project Editor";
-        }
-
-        public void ResetButtonEnablement()
-        {
-            ResetAddRowButtonEnablement();
-            ResetShowModdedStatesCheckBoxEnablement();
-        }
-
-        public void ResetAddRowButtonEnablement()
-        {
-            IsAddRowButtonEnabled = false;
-        }
-
-        public void ResetShowModdedStatesCheckBoxEnablement()
-        {
-            IsShowModdedStatesCheckBoxEnabled = false;
-        }
-
-        public void ResetTable()
+        private void ResetTable()
         {
             Table = new DataTable();
             DataGridColumns.Clear();
         }
 
-        public void MakeEditorVisible()
+        private void ResetButtonEnablement()
         {
-            IsEditorVisible = true;
+            IsAddRowButtonEnabled = false;
+            IsShowModdedStatesCheckBoxEnabled = false;
         }
 
-        public void ResetEditorVisibility()
-        {
-            IsEditorVisible = false;
-        }
+        private void SetEditorLabel(string label) => EditorLabel = $"Audio Project Editor - {label}";
+
+        private void ResetEditorLabel() => EditorLabel = $"Audio Project Editor";
+
+        private void MakeEditorVisible() => IsEditorVisible = true;
+
+        private void ResetEditorVisibility() => IsEditorVisible = false;
     }
 }

@@ -17,14 +17,14 @@ namespace Editors.Audio.AudioEditor.UICommands
         private readonly IEventHub _eventHub = eventHub;
 
         public MutationType Action => MutationType.Remove;
-        public AudioProjectExplorerTreeNodeType NodeType => AudioProjectExplorerTreeNodeType.StateGroup;
+        public AudioProjectTreeNodeType NodeType => AudioProjectTreeNodeType.StateGroup;
 
         public void Execute(DataRow row)
         {
             var stateGroupName = _audioEditorService.SelectedAudioProjectExplorerNode.Name;
             var stateName = TableHelpers.GetStateNameFromRow(row);
             _stateService.RemoveState(stateGroupName, stateName);
-            _eventHub.Publish(new ViewerTableRowRemovedEvent(row));
+            _eventHub.Publish(new ViewerTableRowRemoveRequestedEvent(row));
         }
     }
 }

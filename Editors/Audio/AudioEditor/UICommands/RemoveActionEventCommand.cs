@@ -17,7 +17,7 @@ namespace Editors.Audio.AudioEditor.UICommands
         private readonly IEventHub _eventHub = eventHub;
 
         public MutationType Action => MutationType.Remove;
-        public AudioProjectExplorerTreeNodeType NodeType => AudioProjectExplorerTreeNodeType.ActionEventSoundBank;
+        public AudioProjectTreeNodeType NodeType => AudioProjectTreeNodeType.ActionEventSoundBank;
 
         public void Execute(DataRow row)
         {
@@ -25,7 +25,7 @@ namespace Editors.Audio.AudioEditor.UICommands
             var actionEventName = TableHelpers.GetActionEventNameFromRow(row);
             _actionEventService.RemoveActionEvent(soundBankName, actionEventName);
 
-            _eventHub.Publish(new ViewerTableRowRemovedEvent(row));
+            _eventHub.Publish(new ViewerTableRowRemoveRequestedEvent(row));
         }
     }
 }

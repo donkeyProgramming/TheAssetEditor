@@ -2,6 +2,6 @@
 
 namespace Editors.Audio.AudioEditor.Events
 {
-    public record EditorDataGridColumnAddedEvent(DataGridColumn Column);
+    public record EditorDataGridColumnAddRequestedEvent(DataGridColumn Column);
 }
 

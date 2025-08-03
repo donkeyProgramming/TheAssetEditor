@@ -57,7 +57,7 @@ namespace Editors.Audio.AudioEditor.AudioFilesExplorer
             return (bool)obj.GetValue(IsMultiSelectedProperty);
         }
 
-        public static void SetIsMultiSelected(DependencyObject obj, bool value)
+        private static void SetIsMultiSelected(DependencyObject obj, bool value)
         {
             obj.SetValue(IsMultiSelectedProperty, value);
         }

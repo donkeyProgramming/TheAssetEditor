@@ -6,7 +6,7 @@ namespace Editors.Audio.AudioEditor.Presentation.Table
 {
     public interface ITableService
     {
-        AudioProjectExplorerTreeNodeType NodeType { get; }
+        AudioProjectTreeNodeType NodeType { get; }
         void Load(DataTable table);
         List<string> DefineSchema();
         void ConfigureTable(List<string> schema);

@@ -17,7 +17,7 @@ namespace Editors.Audio.AudioEditor.UICommands
         private readonly IDialogueEventService _dialogueEventService = dialogueEventService;
 
         public MutationType Action => MutationType.Add;
-        public AudioProjectExplorerTreeNodeType NodeType => AudioProjectExplorerTreeNodeType.DialogueEvent;
+        public AudioProjectTreeNodeType NodeType => AudioProjectTreeNodeType.DialogueEvent;
 
         public void Execute(DataRow row)
         {

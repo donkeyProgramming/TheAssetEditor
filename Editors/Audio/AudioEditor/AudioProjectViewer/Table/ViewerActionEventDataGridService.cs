@@ -12,7 +12,7 @@ namespace Editors.Audio.AudioEditor.AudioProjectViewer.Table
         private readonly IEventHub _eventHub = eventHub;
         private readonly IAudioEditorService _audioEditorService = audioEditorService;
 
-        public AudioProjectExplorerTreeNodeType NodeType => AudioProjectExplorerTreeNodeType.ActionEventSoundBank;
+        public AudioProjectTreeNodeType NodeType => AudioProjectTreeNodeType.ActionEventSoundBank;
 
         public void Load(DataTable table)
         {
@@ -35,7 +35,7 @@ namespace Editors.Audio.AudioEditor.AudioProjectViewer.Table
             foreach (var columnName in schema)
             {
                 var column = new DataColumn(columnName, typeof(string));
-                _eventHub.Publish(new ViewerTableColumnAddedEvent(column));
+                _eventHub.Publish(new ViewerTableColumnAddRequestedEvent(column));
             }
         }
 
@@ -60,7 +60,7 @@ namespace Editors.Audio.AudioEditor.AudioProjectViewer.Table
             {
                 var row = table.NewRow();
                 row[TableInfo.EventColumnName] = actionEvent.Name;
-                _eventHub.Publish(new ViewerTableRowAddedEvent(row));
+                _eventHub.Publish(new ViewerTableRowAddRequestedEvent(row));
             }
         }
     }

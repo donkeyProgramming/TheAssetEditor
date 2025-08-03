@@ -4,43 +4,31 @@ using static Editors.Audio.GameSettings.Warhammer3.DialogueEvents;
 
 namespace Editors.Audio.AudioEditor.AudioProjectExplorer
 {
-    // TODO: Change these to DialogueEventSoundBanksContainer and ActionEventSoundBanksContainer
-    public enum AudioProjectExplorerTreeNodeType
+    public enum AudioProjectTreeNodeType
     {
-        ActionEventsContainer,
+        ActionEventSoundBanksContainer,
         ActionEventSoundBank,
-        DialogueEventsContainer,
+        DialogueEventSoundBanksContainer,
         DialogueEventSoundBank,
         DialogueEvent,
         StateGroupsContainer,
         StateGroup
     }
 
-    public partial class AudioProjectExplorerTreeNode : ObservableObject
+    public partial class AudioProjectTreeNode : ObservableObject
     {
         public string Name { get; set; }
-        [ObservableProperty] public AudioProjectExplorerTreeNodeType _nodeType;
-        [ObservableProperty] public AudioProjectExplorerTreeNode _parent;
-        [ObservableProperty] public ObservableCollection<AudioProjectExplorerTreeNode> _children = [];
+        public AudioProjectTreeNodeType NodeType { get; set; }
+        public AudioProjectTreeNode Parent { get; set; }
+        public ObservableCollection<AudioProjectTreeNode> Children { get; set; } = [];
         [ObservableProperty] bool _isNodeExpanded = false;
         [ObservableProperty] bool _isVisible = true;
         [ObservableProperty] public string _presetFilterDisplayText;
         [ObservableProperty] public DialogueEventPreset? _presetFilter = DialogueEventPreset.ShowAll;
 
-        public static AudioProjectExplorerTreeNode CreateContainer(string name, AudioProjectExplorerTreeNodeType nodeType, AudioProjectExplorerTreeNode parent = null)
+        public static AudioProjectTreeNode CreateContainerNode(string name, AudioProjectTreeNodeType nodeType, AudioProjectTreeNode parent = null)
         {
-            return new AudioProjectExplorerTreeNode
-            {
-                Name = name,
-                NodeType = nodeType,
-                Parent = parent,
-                Children = []
-            };
-        }
-
-        public static AudioProjectExplorerTreeNode CreateChildNode(string name, AudioProjectExplorerTreeNodeType nodeType, AudioProjectExplorerTreeNode parent)
-        {
-            return new AudioProjectExplorerTreeNode
+            return new AudioProjectTreeNode
             {
                 Name = name,
                 NodeType = nodeType,
@@ -48,7 +36,17 @@ namespace Editors.Audio.AudioEditor.AudioProjectExplorer
             };
         }
 
-        public static AudioProjectExplorerTreeNode GetNode(ObservableCollection<AudioProjectExplorerTreeNode> audioProjectTree, string nodeName)
+        public static AudioProjectTreeNode CreateChildNode(string name, AudioProjectTreeNodeType nodeType, AudioProjectTreeNode parent)
+        {
+            return new AudioProjectTreeNode
+            {
+                Name = name,
+                NodeType = nodeType,
+                Parent = parent
+            };
+        }
+
+        public static AudioProjectTreeNode GetNode(ObservableCollection<AudioProjectTreeNode> audioProjectTree, string nodeName)
         {
             foreach (var node in audioProjectTree)
             {
@@ -65,28 +63,28 @@ namespace Editors.Audio.AudioEditor.AudioProjectExplorer
 
         public bool IsActionEventSoundBank()
         {
-            if (NodeType == AudioProjectExplorerTreeNodeType.ActionEventSoundBank)
+            if (NodeType == AudioProjectTreeNodeType.ActionEventSoundBank)
                 return true;
             return false;
         }
 
         public bool IsDialogueEventSoundBank()
         {
-            if (NodeType == AudioProjectExplorerTreeNodeType.DialogueEventSoundBank)
+            if (NodeType == AudioProjectTreeNodeType.DialogueEventSoundBank)
                 return true;
             return false;
         }
 
         public bool IsDialogueEvent()
         {
-            if (NodeType == AudioProjectExplorerTreeNodeType.DialogueEvent)
+            if (NodeType == AudioProjectTreeNodeType.DialogueEvent)
                 return true;
             return false;
         }
 
         public bool IsStateGroup()
         {
-            if (NodeType == AudioProjectExplorerTreeNodeType.StateGroup)
+            if (NodeType == AudioProjectTreeNodeType.StateGroup)
                 return true;
             return false;
         }

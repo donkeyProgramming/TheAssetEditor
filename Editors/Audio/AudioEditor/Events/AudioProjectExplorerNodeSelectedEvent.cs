@@ -2,5 +2,5 @@
 
 namespace Editors.Audio.AudioEditor.Events
 {
-    public record AudioProjectExplorerNodeSelectedEvent(AudioProjectExplorerTreeNode TreeNode);
+    public record AudioProjectExplorerNodeSelectedEvent(AudioProjectTreeNode TreeNode);
 }

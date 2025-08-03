@@ -2,5 +2,5 @@
 
 namespace Editors.Audio.AudioEditor.Events
 {
-    public record EditorTableRowAddedEvent(DataRow Row);
+    public record EditorTableRowAddRequestedEvent(DataRow Row);
 }

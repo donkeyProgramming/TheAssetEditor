@@ -21,7 +21,7 @@ namespace Editors.Audio.AudioEditor.AudioProjectViewer
 {
     public partial class AudioProjectViewerViewModel : ObservableObject
     {
-        private readonly IAudioProjectMutationUICommandFactory _audioProjectMutationUICommandFactory;
+        private readonly IUiCommandFactory _uiCommandFactory;
         private readonly IEventHub _eventHub;
         private readonly IAudioEditorService _audioEditorService;
         private readonly IViewerTableServiceFactory _tableServiceFactory;
@@ -46,13 +46,13 @@ namespace Editors.Audio.AudioEditor.AudioProjectViewer
         private List<DataRow> _copiedRows = [];
 
         public AudioProjectViewerViewModel(
-            IAudioProjectMutationUICommandFactory audioProjectMutationUICommandFactory,
+            IUiCommandFactory uiCommandFactory,
             IEventHub eventHub,
             IAudioEditorService audioEditorService,
             IViewerTableServiceFactory tableServiceFactory,
             IAudioRepository audioRepository)
         {
-            _audioProjectMutationUICommandFactory = audioProjectMutationUICommandFactory;
+            _uiCommandFactory = uiCommandFactory;
             _eventHub = eventHub;
             _audioEditorService = audioEditorService;
             _tableServiceFactory = tableServiceFactory;
@@ -61,41 +61,13 @@ namespace Editors.Audio.AudioEditor.AudioProjectViewer
             ViewerLabel = $"Audio Project Viewer";
             DataGridTag = TableInfo.ViewerDataGridTag;
 
-            _eventHub.Register<ViewerTableColumnAddedEvent>(this, OnViewerTableColumnAdded);
-            _eventHub.Register<ViewerTableRowAddedEvent>(this, OnViewerTableRowAdded);
-            _eventHub.Register<ViewerTableRowRemovedEvent>(this, OnViewerTableRowRemoved);
             _eventHub.Register<AudioProjectExplorerNodeSelectedEvent>(this, OnAudioProjectExplorerNodeSelected);
-            _eventHub.Register<ViewerTableRowsCopiedEvent>(this, OnViewerTableRowsCopied);
-            _eventHub.Register<ViewerTableRowsPastedEvent>(this, OnViewerTableRowsPasted);
+            _eventHub.Register<ViewerTableColumnAddRequestedEvent>(this, OnViewerTableColumnAddRequested);
+            _eventHub.Register<ViewerTableRowAddRequestedEvent>(this, OnViewerTableRowAddRequested);
+            _eventHub.Register<ViewerTableRowRemoveRequestedEvent>(this, OnViewerTableRowRemoveRequested);
+            _eventHub.Register<CopyRowsShortcutActivatedEvent>(this, OnCopyRowsShortcutActivated);
+            _eventHub.Register<PasteRowsShortcutActivatedEvent>(this, OnPasteRowsShortcutActivated);
             _eventHub.Register<ViewerDataGridColumnAddedEvent>(this, OnViewerDataGridColumnAdded);
-        }
-
-        private void OnViewerTableColumnAdded(ViewerTableColumnAddedEvent e) => AddTableColumn(e.Column);
-
-        public void AddTableColumn(DataColumn column)
-        {
-            if (!Table.Columns.Contains(column.ColumnName))
-                Table.Columns.Add(column);
-        }
-
-        private void OnViewerTableRowAdded(ViewerTableRowAddedEvent e) => AddTableRow(e.Row);
-
-        public void AddTableRow(DataRow row)
-        {
-            TableHelpers.InsertRowAlphabetically(Table, row);
-
-            var selectedAudioProjectExplorerNode = _audioEditorService.SelectedAudioProjectExplorerNode;
-            _logger.Here().Information($"Added {selectedAudioProjectExplorerNode.NodeType} row to Audio Project Viewer table for {selectedAudioProjectExplorerNode.Name}");
-        }
-
-        private void OnViewerTableRowRemoved(ViewerTableRowRemovedEvent e) => RemoveTableRow(e.Row);
-
-        public void RemoveTableRow(DataRow row)
-        {
-            Table.Rows.Remove(row);
-
-            var selectedAudioProjectExplorerNode = _audioEditorService.SelectedAudioProjectExplorerNode;
-            _logger.Here().Information($"Removed {selectedAudioProjectExplorerNode.NodeType} row from Audio Project Viewer table for {selectedAudioProjectExplorerNode.Name}");
         }
 
         public void OnAudioProjectExplorerNodeSelected(AudioProjectExplorerNodeSelectedEvent e)
@@ -104,7 +76,7 @@ namespace Editors.Audio.AudioEditor.AudioProjectViewer
             ResetViewerLabel();
             ResetButtonEnablement();
             ResetContextMenuVisibility();
-            ResetTable();         
+            ResetTable();
 
             var selectedExplorerNode = e.TreeNode;
             if (selectedExplorerNode.IsActionEventSoundBank())
@@ -135,10 +107,37 @@ namespace Editors.Audio.AudioEditor.AudioProjectViewer
             _logger.Here().Information($"Loaded {selectedExplorerNode.NodeType}: {selectedExplorerNode.Name}");
         }
 
-        public void OnViewerTableRowsCopied(ViewerTableRowsCopiedEvent e) => CopyRows();
+        private void OnViewerTableColumnAddRequested(ViewerTableColumnAddRequestedEvent e) => AddTableColumn(e.Column);
 
-        [RelayCommand]
-        public void CopyRows()
+        public void AddTableColumn(DataColumn column)
+        {
+            if (!Table.Columns.Contains(column.ColumnName))
+                Table.Columns.Add(column);
+        }
+
+        private void OnViewerTableRowAddRequested(ViewerTableRowAddRequestedEvent e) => AddTableRow(e.Row);
+
+        public void AddTableRow(DataRow row)
+        {
+            TableHelpers.InsertRowAlphabetically(Table, row);
+
+            var selectedAudioProjectExplorerNode = _audioEditorService.SelectedAudioProjectExplorerNode;
+            _logger.Here().Information($"Added {selectedAudioProjectExplorerNode.NodeType} row to Audio Project Viewer table for {selectedAudioProjectExplorerNode.Name}");
+        }
+
+        private void OnViewerTableRowRemoveRequested(ViewerTableRowRemoveRequestedEvent e) => RemoveTableRow(e.Row);
+
+        public void RemoveTableRow(DataRow row)
+        {
+            Table.Rows.Remove(row);
+
+            var selectedAudioProjectExplorerNode = _audioEditorService.SelectedAudioProjectExplorerNode;
+            _logger.Here().Information($"Removed {selectedAudioProjectExplorerNode.NodeType} row from Audio Project Viewer table for {selectedAudioProjectExplorerNode.Name}");
+        }
+
+        public void OnCopyRowsShortcutActivated(CopyRowsShortcutActivatedEvent e) => CopyRows();
+
+        [RelayCommand] public void CopyRows()
         {
             if (!IsCopyEnabled)
                 return;
@@ -147,21 +146,14 @@ namespace Editors.Audio.AudioEditor.AudioProjectViewer
             SetPasteEnablement();
         }
 
-        public void OnViewerTableRowsPasted(ViewerTableRowsPastedEvent e) => PasteRows();
+        public void OnPasteRowsShortcutActivated(PasteRowsShortcutActivatedEvent e) => PasteRows();
 
-        [RelayCommand]
-        public void PasteRows()
+        [RelayCommand] public void PasteRows()
         {
             if (!IsPasteEnabled)
                 return;
 
-            foreach (var row in _copiedRows)
-            {
-                var selectedAudioProjectExplorerNode = _audioEditorService.SelectedAudioProjectExplorerNode;
-                _audioProjectMutationUICommandFactory.Create(MutationType.Add, selectedAudioProjectExplorerNode.NodeType).Execute(row);
-                _eventHub.Publish(new ViewerTableRowAddedEvent(row));
-                _eventHub.Publish(new EditorAddRowButtonEnablementChangedEvent());
-            }
+            _uiCommandFactory.Create<PasteViewerRowsCommand>().Execute(_copiedRows);
 
             SetPasteEnablement();
         }
@@ -190,31 +182,11 @@ namespace Editors.Audio.AudioEditor.AudioProjectViewer
                 SetCopyEnablement();
         }
 
-        [RelayCommand]
-        public void RemoveRow()
-        {
-            var selectedAudioProjectExplorerNode = _audioEditorService.SelectedAudioProjectExplorerNode;
-            var selectedViewerRows = _audioEditorService.SelectedViewerRows;
-            foreach (var row in selectedViewerRows)
-                _audioProjectMutationUICommandFactory.Create(MutationType.Remove, selectedAudioProjectExplorerNode.NodeType).Execute(row);
+        [RelayCommand] public void RemoveRow() => _uiCommandFactory.Create<RemoveViewerRowsCommand>().Execute(SelectedRows);
 
-            // Publish after removing to ensure that the enablement uses the update data
-            _eventHub.Publish(new EditorAddRowButtonEnablementChangedEvent());
-        }
+        [RelayCommand] public void EditRow() => _uiCommandFactory.Create<EditViewerRowCommand>().Execute(SelectedRows);
 
-        [RelayCommand]
-        public void EditRow()
-        {
-            // Publish before removing to ensure that an item is still selected
-            _eventHub.Publish(new ViewerTableRowEditedEvent(SelectedRows[0]));
-
-            RemoveRow();
-
-            var selectedAudioProjectExplorerNode = _audioEditorService.SelectedAudioProjectExplorerNode;
-            _logger.Here().Information($"Editing {selectedAudioProjectExplorerNode.NodeType} row in Audio Project Viewer table for {selectedAudioProjectExplorerNode.Name}");
-        }
-
-        private void Load(AudioProjectExplorerTreeNodeType selectedNodeType)
+        private void Load(AudioProjectTreeNodeType selectedNodeType)
         {
             var tableService = _tableServiceFactory.GetService(selectedNodeType);
             tableService.Load(Table);
@@ -272,8 +244,8 @@ namespace Editors.Audio.AudioEditor.AudioProjectViewer
 
             var areAnyCopiedRowsInDataGrid = _copiedRows
                 .Any(copied => Table.AsEnumerable()
-                    .Any(viewer => viewerColumns.All(
-                        column => Equals(copied[column], viewer[column]))));
+                    .Any(viewer => viewerColumns
+                    .All(column => Equals(copied[column], viewer[column]))));
 
             var selectedAudioProjectExplorerNodeName = _audioEditorService.SelectedAudioProjectExplorerNode.Name;
             var dialogueEventStateGroups = _audioRepository
@@ -304,16 +276,6 @@ namespace Editors.Audio.AudioEditor.AudioProjectViewer
                 IsRemoveRowButtonEnabled = true;
         }
 
-        public void SetViewerLabel(string label)
-        {
-            ViewerLabel = $"Audio Project Viewer - {label}";
-        }
-
-        public void ResetViewerLabel()
-        {
-            ViewerLabel = $"Audio Project Viewer";
-        }
-
         public void ResetButtonEnablement()
         {
             IsUpdateRowButtonEnabled = false;
@@ -333,14 +295,12 @@ namespace Editors.Audio.AudioEditor.AudioProjectViewer
             SelectedRows = [];
         }
 
-        public void MakeViewerVisible()
-        {
-            IsViewerVisible = true;
-        }
+        public void SetViewerLabel(string label) => ViewerLabel = $"Audio Project Viewer - {label}";
 
-        public void ResetViewerVisibility()
-        {
-            IsViewerVisible = false;
-        }
+        public void ResetViewerLabel() => ViewerLabel = $"Audio Project Viewer";
+
+        public void MakeViewerVisible() => IsViewerVisible = true;
+
+        public void ResetViewerVisibility() => IsViewerVisible = false;
     }
 }

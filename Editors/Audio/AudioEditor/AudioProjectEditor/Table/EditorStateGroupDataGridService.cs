@@ -1,9 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Data;
 using Editors.Audio.AudioEditor.AudioProjectExplorer;
+using Editors.Audio.AudioEditor.Events;
 using Editors.Audio.AudioEditor.Presentation.Table;
 using Shared.Core.Events;
-using Editors.Audio.AudioEditor.Events;
 
 namespace Editors.Audio.AudioEditor.AudioProjectEditor.Table
 {
@@ -11,7 +11,7 @@ namespace Editors.Audio.AudioEditor.AudioProjectEditor.Table
     {
         private readonly IEventHub _eventHub = eventHub;
 
-        public AudioProjectExplorerTreeNodeType NodeType => AudioProjectExplorerTreeNodeType.StateGroup;
+        public AudioProjectTreeNodeType NodeType => AudioProjectTreeNodeType.StateGroup;
 
         public void Load(DataTable table)
         {
@@ -34,7 +34,7 @@ namespace Editors.Audio.AudioEditor.AudioProjectEditor.Table
             foreach (var columnName in schema)
             {
                 var column = new DataColumn(columnName, typeof(string));
-                _eventHub.Publish(new EditorTableColumnAddedEvent(column));
+                _eventHub.Publish(new EditorTableColumnAddRequestedEvent(column));
             }
         }
 
@@ -46,7 +46,7 @@ namespace Editors.Audio.AudioEditor.AudioProjectEditor.Table
             {
                 var column = DataGridTemplates.CreateColumnTemplate(columnName, columnWidth);
                 column.CellTemplate = DataGridTemplates.CreateEditableTextBoxTemplate(_eventHub, columnName);
-                _eventHub.Publish(new EditorDataGridColumnAddedEvent(column));
+                _eventHub.Publish(new EditorDataGridColumnAddRequestedEvent(column));
             }
         }
 
@@ -55,7 +55,7 @@ namespace Editors.Audio.AudioEditor.AudioProjectEditor.Table
             var columnHeader = TableInfo.StateColumnName;
             var row = table.NewRow();
             row[columnHeader] = string.Empty;
-            _eventHub.Publish(new EditorTableRowAddedEvent(row));
+            _eventHub.Publish(new EditorTableRowAddRequestedEvent(row));
         }
     }
 }

@@ -11,7 +11,7 @@ namespace Editors.Audio.AudioEditor.UICommands
         private readonly IStateService _stateService = stateService;
 
         public MutationType Action => MutationType.Add;
-        public AudioProjectExplorerTreeNodeType NodeType => AudioProjectExplorerTreeNodeType.StateGroup;
+        public AudioProjectTreeNodeType NodeType => AudioProjectTreeNodeType.StateGroup;
 
         public void Execute(DataRow row)
         {
