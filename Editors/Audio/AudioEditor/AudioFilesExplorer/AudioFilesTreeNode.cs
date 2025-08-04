@@ -11,11 +11,11 @@ namespace Editors.Audio.AudioEditor.AudioFilesExplorer
 
     public partial class AudioFilesTreeNode : ObservableObject
     {
-        public string Name { get; set; }
+        public string FileName { get; set; }
+        public string FilePath { get; set; }
         public AudioFilesTreeNodeType NodeType { get; set; }
         public AudioFilesTreeNode Parent { get; set; }
         public ObservableCollection<AudioFilesTreeNode> Children { get; set; } = [];
-        public string FilePath { get; set; }
         [ObservableProperty] bool _isNodeExpanded = false;
         [ObservableProperty] bool _isVisible = true;
 
@@ -23,7 +23,7 @@ namespace Editors.Audio.AudioEditor.AudioFilesExplorer
         {
             return new AudioFilesTreeNode
             {
-                Name = name,
+                FileName = name,
                 NodeType = nodeType,
                 Parent = parent,
             };
@@ -33,7 +33,7 @@ namespace Editors.Audio.AudioEditor.AudioFilesExplorer
         {
             return new AudioFilesTreeNode
             {
-                Name = name,
+                FileName = name,
                 NodeType = nodeType,
                 Parent = parent
             };

@@ -18,6 +18,7 @@ namespace Editors.Audio.AudioEditor.Settings
     public partial class SettingsViewModel : ObservableObject
     {
         private readonly IEventHub _eventHub;
+        private readonly IUiCommandFactory _uiCommandFactory;
         private readonly IAudioEditorStateService _audioEditorStateService;
         private readonly IAudioRepository _audioRepository;
 
@@ -66,9 +67,10 @@ namespace Editors.Audio.AudioEditor.Settings
         [ObservableProperty] private bool _isTransitionDurationEnabled = false;
         [ObservableProperty] private bool _isTransitionDurationVisible = false;
 
-        public SettingsViewModel(IEventHub eventHub, IAudioEditorStateService audioEditorStateService, IAudioRepository audioRepository)
+        public SettingsViewModel(IEventHub eventHub, IUiCommandFactory uiCommandFactory, IAudioEditorStateService audioEditorStateService, IAudioRepository audioRepository)
         {
             _eventHub = eventHub;
+            _uiCommandFactory = uiCommandFactory;
             _audioEditorStateService = audioEditorStateService;
             _audioRepository = audioRepository;
 
@@ -416,6 +418,11 @@ namespace Editors.Audio.AudioEditor.Settings
         {
             foreach (var audioFile in audioFiles)
                 AudioFiles.Add(audioFile);
+        }
+
+        [RelayCommand] public void PlayWav(AudioFile audioFile)
+        {
+            _uiCommandFactory.Create<PlayAudioFileCommand>().Execute(audioFile.FileName, audioFile.FilePath);
         }
 
         private void SetInitialSettings()

@@ -41,8 +41,6 @@
                     Width="Auto"/>
                 <ColumnDefinition 
                     Width="Auto"/>
-                <ColumnDefinition 
-                    Width="Auto"/>
             </Grid.ColumnDefinitions>
 
             <Button 
@@ -57,17 +55,6 @@
 
             <Button 
                 Grid.Column="1"
-                Margin="5, 0, 0, 0" 
-                Width="75" 
-                Content="Play Audio" 
-                ToolTip="Play the selected audio file." 
-                Command="{Binding PlayWavCommand}" 
-                VerticalAlignment="Center" 
-                HorizontalAlignment="Left"
-                IsEnabled="{Binding IsPlayAudioButtonEnabled}"/>
-
-            <Button 
-                Grid.Column="2"
                 Margin="5, 0, 0, 0" 
                 Width="100" 
                 Content="Set Audio Files" 
@@ -164,6 +151,7 @@
         </Grid>
 
         <audiofilesexplorer:MultiSelectTreeView
+            x:Name="AudioFilesTreeView"
             Grid.Row="3"
             Grid.ColumnSpan="2"
             Margin="0, 5, 0, 0"
@@ -172,6 +160,7 @@
             Background="{DynamicResource TreeView.Static.Background}"
             BorderBrush="Transparent"
             SelectedItems="{Binding SelectedTreeNodes, Mode=TwoWay}"
+            PreviewMouseDoubleClick="OnNodeDoubleClick"
             Style="{StaticResource {x:Type TreeView}}">
 
             <audiofilesexplorer:MultiSelectTreeView.ItemContainerStyle>

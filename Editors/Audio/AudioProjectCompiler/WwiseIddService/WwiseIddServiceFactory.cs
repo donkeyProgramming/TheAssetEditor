@@ -3,13 +3,13 @@ using Shared.Core.Settings;
 
 namespace Editors.Audio.AudioProjectCompiler.WwiseIdService
 {
-    public class WwiseIdServiceFactory
+    public class WwiseIddServiceFactory
     {
-        public static IWwiseIdService GetWwiseIdService(GameTypeEnum game)
+        public static IWwiseIddService GetWwiseIdService(GameTypeEnum game)
         {
             return game switch
             {
-                GameTypeEnum.Warhammer3 => new Wh3WwiseIdService()
+                GameTypeEnum.Warhammer3 => new Wh3WwiseIddService()
             };
         }
     }

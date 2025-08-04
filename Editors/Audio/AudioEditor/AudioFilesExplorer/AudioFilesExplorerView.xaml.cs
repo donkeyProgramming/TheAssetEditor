@@ -1,5 +1,6 @@
 ﻿using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 
 namespace Editors.Audio.AudioEditor.AudioFilesExplorer
 {
@@ -13,6 +14,12 @@ namespace Editors.Audio.AudioEditor.AudioFilesExplorer
         private void OnClearButtonClick(object sender, RoutedEventArgs e)
         {
             FilterTextBoxItem.Focus();
+        }
+
+        private void OnNodeDoubleClick(object sender, MouseButtonEventArgs e)
+        {
+            if (DataContext is AudioFilesExplorerViewModel viewModel)
+                viewModel.PlayWav();
         }
     }
 }

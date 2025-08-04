@@ -1,5 +1,4 @@
-﻿using Editors.Audio.AudioEditor.AudioFilesExplorer;
-using Editors.Audio.Utility;
+﻿using Editors.Audio.Utility;
 using Shared.Core.Events;
 using Shared.Core.Misc;
 using Shared.Core.PackFiles;
@@ -11,15 +10,14 @@ namespace Editors.Audio.AudioEditor.UICommands
         private readonly IPackFileService _packFileService = packFileService;
         private readonly SoundPlayer _soundPlayer = soundPlyer;
 
-        public void Execute(AudioFilesTreeNode selectedAudioFile)
+        public void Execute(string fileName, string filePath)
         {
-            var wavFile = _packFileService.FindFile(selectedAudioFile.FilePath);
-            var wavFileName = $"{selectedAudioFile.Name}";
+            var wavFile = _packFileService.FindFile(filePath);
 
-            _soundPlayer.ExportFileToAEFolder(wavFileName, wavFile.DataSource.ReadData());
+            _soundPlayer.ExportFileToAEFolder(fileName, wavFile.DataSource.ReadData());
 
             var audioFolderName = $"{DirectoryHelper.Temp}\\Audio";
-            var wavFilePath = $"{audioFolderName}\\{wavFileName}";
+            var wavFilePath = $"{audioFolderName}\\{fileName}";
 
             _soundPlayer.PlayWav(wavFilePath);
         }

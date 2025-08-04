@@ -2,6 +2,7 @@
 using System.Collections.ObjectModel;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 using Editors.Audio.AudioEditor.AudioFilesExplorer;
 
 namespace Editors.Audio.AudioEditor.Settings
@@ -37,12 +38,21 @@ namespace Editors.Audio.AudioEditor.Settings
                     {
                         audioFiles.Add(new AudioFile
                         {
-                            FileName = wavFile.Name,
+                            FileName = wavFile.FileName,
                             FilePath = wavFile.FilePath
                         });
                     }
                     viewModel.SetAudioFilesViaDrop(audioFiles);
                 }
+            }
+        }
+
+        private void OnAudioFileDoubleClick(object sender, MouseButtonEventArgs e)
+        {
+            if (DataContext is SettingsViewModel viewModel)
+            {
+                if (AudioFilesListView.SelectedItem is AudioFile audioFile)
+                    viewModel.PlayWav(audioFile);
             }
         }
     }

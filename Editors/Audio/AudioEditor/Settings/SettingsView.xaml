@@ -134,12 +134,14 @@
                     </Expander.Header>
 
                     <ListView
+                        x:Name="AudioFilesListView"
                         ItemsSource="{Binding AudioFiles}"
                         Height="135"
                         MaxHeight="135"
                         AllowDrop="True"
                         Drop="OnListViewDrop"
-                        DragOver="OnListViewDragOver">
+                        DragOver="OnListViewDragOver"
+                        MouseDoubleClick="OnAudioFileDoubleClick">
                         <ListView.View>
                             <GridView>
                                 <GridViewColumn 

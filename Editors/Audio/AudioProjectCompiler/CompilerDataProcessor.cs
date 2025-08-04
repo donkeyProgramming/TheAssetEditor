@@ -62,7 +62,7 @@ namespace Editors.Audio.AudioProjectCompiler
 
         public void SetInitialSourceData(AudioProject audioProject)
         {
-            var wwiseIdService = WwiseIdServiceFactory.GetWwiseIdService(_applicationSettingsService.CurrentSettings.CurrentGame);
+            var wwiseIdService = WwiseIddServiceFactory.GetWwiseIdService(_applicationSettingsService.CurrentSettings.CurrentGame);
             var sourceIdByWavFilePathLookup = new Dictionary<string, uint>();
 
             foreach (var soundBank in audioProject.SoundBanks)
@@ -143,7 +143,7 @@ namespace Editors.Audio.AudioProjectCompiler
             Sound sound,
             SoundBank soundBank,
             Dictionary<string, uint> sourceLookup,
-            IWwiseIdService wwiseIdService)
+            IWwiseIddService wwiseIdService)
         {
             sound.Language = soundBank.Language;
 
@@ -174,7 +174,7 @@ namespace Editors.Audio.AudioProjectCompiler
             RandomSequenceContainer container,
             SoundBank soundBank,
             Dictionary<string, uint> sourceLookup,
-            IWwiseIdService wwiseIdService,
+            IWwiseIddService wwiseIdService,
             string actionEventName = null,
             string dialogueEventName = null,
             StatePath statePath = null)

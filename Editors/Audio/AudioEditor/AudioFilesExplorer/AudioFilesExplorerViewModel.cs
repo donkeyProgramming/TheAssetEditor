@@ -133,7 +133,7 @@ namespace Editors.Audio.AudioEditor.AudioFilesExplorer
                 return;
 
             var selectedAudioFile = SelectedTreeNodes[0];
-            _uiCommandFactory.Create<PlayAudioFileCommand>().Execute(selectedAudioFile);
+            _uiCommandFactory.Create<PlayAudioFileCommand>().Execute(selectedAudioFile.FileName, selectedAudioFile.FilePath);
         }
 
         [RelayCommand] public void ClearText() => FilterQuery = string.Empty;
