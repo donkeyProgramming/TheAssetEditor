@@ -4,7 +4,7 @@ using static Editors.Audio.GameSettings.Warhammer3.SoundBanks;
 namespace Editors.Audio.AudioProjectCompiler.WwiseIdService.Warhammer3
 {
     // TODO: Add missing Ids
-    public class Wh3WwiseIddService : IWwiseIddService
+    public class Wh3WwiseIdService : IWwiseIdService
     {
         // Finding Actor Mixer Ids:
         // Click on a sound in the Audio Explorer and refer to the lowest ActorMixer in the Graph Structure of a given sound (top level mixer).
