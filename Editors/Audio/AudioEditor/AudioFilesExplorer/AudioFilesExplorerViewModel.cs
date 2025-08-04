@@ -20,7 +20,7 @@ namespace Editors.Audio.AudioEditor.AudioFilesExplorer
         private readonly IEventHub _eventHub;
         private readonly IUiCommandFactory _uiCommandFactory;
         private readonly IPackFileService _packFileService;
-        private readonly IAudioEditorService _audioEditorService;
+        private readonly IAudioEditorStateService _audioEditorStateService;
         private readonly IAudioFilesTreeBuilderService _audioFilesTreeBuilder;
         private readonly IAudioFilesTreeSearchFilterService _audioFilesTreeFilter;
 
@@ -37,7 +37,7 @@ namespace Editors.Audio.AudioEditor.AudioFilesExplorer
             IEventHub eventHub,
             IUiCommandFactory uiCommandFactory,
             IPackFileService packFileService,
-            IAudioEditorService audioEditorService,
+            IAudioEditorStateService audioEditorStateService,
             IAudioFilesTreeBuilderService audioFilesTreeBuilder,
             IAudioFilesTreeSearchFilterService audioFilesTreeFilter)
         {
@@ -45,7 +45,7 @@ namespace Editors.Audio.AudioEditor.AudioFilesExplorer
             _eventHub = eventHub;
             _uiCommandFactory = uiCommandFactory;
             _packFileService = packFileService;
-            _audioEditorService = audioEditorService;
+            _audioEditorStateService = audioEditorStateService;
             _audioFilesTreeBuilder = audioFilesTreeBuilder;
             _audioFilesTreeFilter = audioFilesTreeFilter;
 
@@ -90,7 +90,7 @@ namespace Editors.Audio.AudioEditor.AudioFilesExplorer
         {
             IsPlayAudioButtonEnabled = SelectedTreeNodes.Count == 1;
 
-            var selectedAudioProjectExplorerNode = _audioEditorService.SelectedAudioProjectExplorerNode;
+            var selectedAudioProjectExplorerNode = _audioEditorStateService.SelectedAudioProjectExplorerNode;
             if (selectedAudioProjectExplorerNode == null)
                 return;
 

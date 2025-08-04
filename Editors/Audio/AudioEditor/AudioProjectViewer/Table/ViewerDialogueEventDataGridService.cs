@@ -11,11 +11,11 @@ namespace Editors.Audio.AudioEditor.AudioProjectViewer.Table
 {
     public class ViewerDialogueEventDataGridService(
         IEventHub eventHub,
-        IAudioEditorService audioEditorService,
+        IAudioEditorStateService audioEditorStateService,
         IAudioRepository audioRepository) : IViewerTableService
     {
         private readonly IEventHub _eventHub = eventHub;
-        private readonly IAudioEditorService _audioEditorService = audioEditorService;
+        private readonly IAudioEditorStateService _audioEditorStateService = audioEditorStateService;
         private readonly IAudioRepository _audioRepository = audioRepository;
 
         public AudioProjectTreeNodeType NodeType => AudioProjectTreeNodeType.DialogueEvent;
@@ -31,7 +31,7 @@ namespace Editors.Audio.AudioEditor.AudioProjectViewer.Table
         public List<string> DefineSchema()
         {
             var schema = new List<string>();
-            var dialogueEventName = _audioEditorService.SelectedAudioProjectExplorerNode.Name;
+            var dialogueEventName = _audioEditorStateService.SelectedAudioProjectExplorerNode.Name;
             var stateGroupsWithQualifiers = _audioRepository.QualifiedStateGroupLookupByStateGroupByDialogueEvent[dialogueEventName];
             foreach (var stateGroupWithQualifier in stateGroupsWithQualifiers)
             {
@@ -52,7 +52,7 @@ namespace Editors.Audio.AudioEditor.AudioProjectViewer.Table
 
         public void ConfigureDataGrid(List<string> schema)
         {
-            var dialogueEventName = _audioEditorService.SelectedAudioProjectExplorerNode.Name;
+            var dialogueEventName = _audioEditorStateService.SelectedAudioProjectExplorerNode.Name;
             var stateGroupsCount = _audioRepository.StateGroupsLookupByDialogueEvent[dialogueEventName].Count;
             var columnWidth = 1.0 / (1 + stateGroupsCount);
 
@@ -66,7 +66,7 @@ namespace Editors.Audio.AudioEditor.AudioProjectViewer.Table
 
         public void InitialiseTable(DataTable table)
         {
-            var dialogueEvent = _audioEditorService.AudioProject.GetDialogueEvent(_audioEditorService.SelectedAudioProjectExplorerNode.Name);
+            var dialogueEvent = _audioEditorStateService.AudioProject.GetDialogueEvent(_audioEditorStateService.SelectedAudioProjectExplorerNode.Name);
             var stateGroupsWithQualifiers = _audioRepository.QualifiedStateGroupLookupByStateGroupByDialogueEvent[dialogueEvent.Name];
             foreach (var statePath in dialogueEvent.StatePaths)
             {

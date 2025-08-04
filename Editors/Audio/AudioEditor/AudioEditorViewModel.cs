@@ -9,6 +9,7 @@ using Editors.Audio.AudioEditor.Events;
 using Editors.Audio.AudioEditor.Models;
 using Editors.Audio.AudioEditor.Settings;
 using Editors.Audio.AudioEditor.UICommands;
+using Editors.Audio.AudioProjectCompiler;
 using Shared.Core.Events;
 using Shared.Core.ToolCreation;
 using static Editors.Audio.GameSettings.Warhammer3.DialogueEvents;
@@ -27,7 +28,9 @@ namespace Editors.Audio.AudioEditor
 
         private readonly IUiCommandFactory _uiCommandFactory;
         private readonly IEventHub _eventHub;
-        private readonly IAudioEditorService _audioEditorService;
+        private readonly IAudioEditorStateService _audioEditorStateService;
+        private readonly IAudioProjectFileService _audioProjectFileService;
+        private readonly IAudioProjectCompilerService _audioProjectCompilerService;
         private readonly IntegrityChecker _integrityChecker;
 
         public string DisplayName { get; set; } = "Audio Editor";
@@ -40,12 +43,16 @@ namespace Editors.Audio.AudioEditor
             SettingsViewModel settingsViewModel,
             IUiCommandFactory uiCommandFactory,
             IEventHub eventHub,
-            IAudioEditorService audioEditorService,
+            IAudioEditorStateService audioEditorStateService,
+            IAudioProjectFileService audioProjectFileService,
+            IAudioProjectCompilerService audioProjectCompilerService,
             IntegrityChecker integrityChecker)
         {
             _uiCommandFactory = uiCommandFactory;
             _eventHub = eventHub;
-            _audioEditorService = audioEditorService;
+            _audioEditorStateService = audioEditorStateService;
+            _audioProjectFileService = audioProjectFileService;
+            _audioProjectCompilerService = audioProjectCompilerService;
             _integrityChecker = integrityChecker;
 
             AudioProjectExplorerViewModel = audioProjectExplorerViewModel;
@@ -61,13 +68,23 @@ namespace Editors.Audio.AudioEditor
 
         [RelayCommand] public void SaveAudioProject()
         {
-            var audioProject = AudioProject.GetAudioProject(_audioEditorService.AudioProject);
-            _audioEditorService.SaveAudioProject(audioProject, audioProject.FileName, audioProject.DirectoryPath);
+            var audioProject = _audioEditorStateService.AudioProject;
+            var fileName = _audioEditorStateService.AudioProjectFileName;
+            var filePath = _audioEditorStateService.AudioProjectFilePath;
+            _audioProjectFileService.Save(audioProject, fileName, filePath);
         }
 
-        [RelayCommand] public void LoadAudioProject() => _audioEditorService.LoadAudioProject(_eventHub, this);
+        [RelayCommand] public void LoadAudioProject() => _audioProjectFileService.Load();
 
-        [RelayCommand] public void CompileAudioProject() => _audioEditorService.CompileAudioProject();
+        [RelayCommand] public void CompileAudioProject()
+        {
+            SaveAudioProject();
+
+            var cleanAudioProject = AudioProject.Clean(_audioEditorStateService.AudioProject);
+            var fileName = _audioEditorStateService.AudioProjectFileName;
+            var filePath = _audioEditorStateService.AudioProjectFilePath;
+            _audioProjectCompilerService.Compile(cleanAudioProject, fileName, filePath);
+        }
 
         [RelayCommand] public void OpenAudioProjectConverter() => _uiCommandFactory.Create<OpenAudioProjectConverterWindowCommand>().Execute();
 
@@ -89,11 +106,11 @@ namespace Editors.Audio.AudioEditor
 
             if (e.Key == Key.Delete)
             {
-                _uiCommandFactory.Create<RemoveViewerRowsCommand>().Execute(_audioEditorService.SelectedViewerRows);
+                _uiCommandFactory.Create<RemoveViewerRowsCommand>().Execute(_audioEditorStateService.SelectedViewerRows);
                 e.Handled = true;
             }
         }
 
-        public void Close() => _audioEditorService.ResetAudioProject();
+        public void Close() => _audioEditorStateService.Reset();
     }
 }

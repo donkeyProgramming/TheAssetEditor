@@ -8,11 +8,11 @@ using Editors.Audio.Storage;
 namespace Editors.Audio.AudioEditor.UICommands
 {
     public class AddDialogueEventCommand(
-        IAudioEditorService audioEditorService,
+        IAudioEditorStateService audioEditorStateService,
         IAudioRepository audioRepository,
         IDialogueEventService dialogueEventService) : IAudioProjectMutationUICommand
     {
-        private readonly IAudioEditorService _audioEditorService = audioEditorService;
+        private readonly IAudioEditorStateService _audioEditorStateService = audioEditorStateService;
         private readonly IAudioRepository _audioRepository = audioRepository;
         private readonly IDialogueEventService _dialogueEventService = dialogueEventService;
 
@@ -21,9 +21,9 @@ namespace Editors.Audio.AudioEditor.UICommands
 
         public void Execute(DataRow row)
         {
-            var dialogueEventName = _audioEditorService.SelectedAudioProjectExplorerNode.Name;
-            var audioFiles = _audioEditorService.AudioFiles;
-            var audioSettings = _audioEditorService.AudioSettings;
+            var dialogueEventName = _audioEditorStateService.SelectedAudioProjectExplorerNode.Name;
+            var audioFiles = _audioEditorStateService.AudioFiles;
+            var audioSettings = _audioEditorStateService.AudioSettings;
 
             var stateLookupByStateGroup = new Dictionary<string, string>();
             var stateGroupsWithQualifiers = _audioRepository.QualifiedStateGroupLookupByStateGroupByDialogueEvent[dialogueEventName];

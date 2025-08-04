@@ -24,7 +24,7 @@ namespace Editors.Audio.AudioEditor.AudioProjectEditor
     {
         private readonly IUiCommandFactory _uiCommandFactory;
         private readonly IEventHub _eventHub;
-        private readonly IAudioEditorService _audioEditorService;
+        private readonly IAudioEditorStateService _audioEditorStateService;
         private readonly IEditorTableServiceFactory _tableServiceFactory;
         private readonly IAudioRepository _audioRepository;
 
@@ -43,20 +43,18 @@ namespace Editors.Audio.AudioEditor.AudioProjectEditor
         public AudioProjectEditorViewModel (
             IUiCommandFactory uiCommandFactory,
             IEventHub eventHub,
-            IAudioEditorService audioEditorService,
+            IAudioEditorStateService audioEditorStateService,
             IEditorTableServiceFactory tableServiceFactory,
             IAudioRepository audioRepository)
         {
             _uiCommandFactory = uiCommandFactory;
             _eventHub = eventHub;
-            _audioEditorService = audioEditorService;
+            _audioEditorStateService = audioEditorStateService;
             _tableServiceFactory = tableServiceFactory;
             _audioRepository = audioRepository;
 
             EditorLabel = $"Audio Project Editor";
             DataGridTag = TableInfo.EditorDataGridTag;
-
-            _audioEditorService.ShowModdedStatesOnly = _showModdedStatesOnly;
 
             _eventHub.Register<AudioProjectExplorerNodeSelectedEvent>(this, OnAudioProjectExplorerNodeSelected);
             _eventHub.Register<EditorTableColumnAddRequestedEvent>(this, OnEditorTableColumnAddRequested);
@@ -90,7 +88,7 @@ namespace Editors.Audio.AudioEditor.AudioProjectEditor
                 SetEditorLabel(TableHelpers.DuplicateUnderscores(selectedAudioProjectExplorerNode.Name));
                 Load(selectedAudioProjectExplorerNode.NodeType);
 
-                var moddedStatesCount = _audioEditorService.AudioProject.StateGroups.SelectMany(stateGroup => stateGroup.States).Count();
+                var moddedStatesCount = _audioEditorStateService.AudioProject.StateGroups.SelectMany(stateGroup => stateGroup.States).Count();
                 if (moddedStatesCount > 0)
                     IsShowModdedStatesCheckBoxEnabled = true;
             }
@@ -126,7 +124,7 @@ namespace Editors.Audio.AudioEditor.AudioProjectEditor
             else
                 Table.ImportRow(row);
 
-            var selectedAudioProjectExplorerNode = _audioEditorService.SelectedAudioProjectExplorerNode;
+            var selectedAudioProjectExplorerNode = _audioEditorStateService.SelectedAudioProjectExplorerNode;
             _logger.Here().Information($"Added {selectedAudioProjectExplorerNode.NodeType} row to Audio Project Editor table for {selectedAudioProjectExplorerNode.Name} ");
         }
 
@@ -148,7 +146,7 @@ namespace Editors.Audio.AudioEditor.AudioProjectEditor
             Table.Clear();
 
             // Re-initialise table
-            var selectedAudioProjectExplorerNode = _audioEditorService.SelectedAudioProjectExplorerNode;
+            var selectedAudioProjectExplorerNode = _audioEditorStateService.SelectedAudioProjectExplorerNode;
             var dataGridService = _tableServiceFactory.GetService(selectedAudioProjectExplorerNode.NodeType);
             dataGridService.InitialiseTable(Table);
 
@@ -168,7 +166,7 @@ namespace Editors.Audio.AudioEditor.AudioProjectEditor
 
         private void SetAudioFiles(ObservableCollection<AudioFile> audioFiles)
         {
-            var selectedAudioProjectExplorerNode = _audioEditorService.SelectedAudioProjectExplorerNode;
+            var selectedAudioProjectExplorerNode = _audioEditorStateService.SelectedAudioProjectExplorerNode;
 
             if (selectedAudioProjectExplorerNode.IsActionEventSoundBank() 
                 && selectedAudioProjectExplorerNode.Name != SoundBanks.MoviesDisplayString 
@@ -210,7 +208,9 @@ namespace Editors.Audio.AudioEditor.AudioProjectEditor
 
         partial void OnShowModdedStatesOnlyChanged(bool value)
         {
-            var selectedAudioProjectExplorerNode = _audioEditorService.SelectedAudioProjectExplorerNode;
+            _audioEditorStateService.ShowModdedStatesOnly = ShowModdedStatesOnly;
+
+            var selectedAudioProjectExplorerNode = _audioEditorStateService.SelectedAudioProjectExplorerNode;
             if (selectedAudioProjectExplorerNode.IsDialogueEvent())
             {
                 Table.Clear();
@@ -251,10 +251,10 @@ namespace Editors.Audio.AudioEditor.AudioProjectEditor
 
         private bool AreAudioFilesSet()
         {
-            var selectedAudioProjectExplorerNode = _audioEditorService.SelectedAudioProjectExplorerNode;
+            var selectedAudioProjectExplorerNode = _audioEditorStateService.SelectedAudioProjectExplorerNode;
             if (!selectedAudioProjectExplorerNode.IsStateGroup())
             {
-                if (_audioEditorService.AudioFiles.Count == 0)
+                if (_audioEditorStateService.AudioFiles.Count == 0)
                     return false;
             }
 
@@ -264,17 +264,17 @@ namespace Editors.Audio.AudioEditor.AudioProjectEditor
         private bool DoesRowExist()
         {
             var row = Table.Rows[0];
-            var selectedAudioProjectExplorerNode = _audioEditorService.SelectedAudioProjectExplorerNode;
+            var selectedAudioProjectExplorerNode = _audioEditorStateService.SelectedAudioProjectExplorerNode;
             if (selectedAudioProjectExplorerNode.IsActionEventSoundBank())
             {
                 var actionEventName = TableHelpers.GetActionEventNameFromRow(row);
-                var actionEvent = _audioEditorService.AudioProject.GetActionEvent(actionEventName);
+                var actionEvent = _audioEditorStateService.AudioProject.GetActionEvent(actionEventName);
                 if (actionEvent != null)
                     return true;
             }
             else if (selectedAudioProjectExplorerNode.IsDialogueEvent())
             {
-                var dialogueEvent = _audioEditorService.AudioProject.GetDialogueEvent(selectedAudioProjectExplorerNode.Name);
+                var dialogueEvent = _audioEditorStateService.AudioProject.GetDialogueEvent(selectedAudioProjectExplorerNode.Name);
                 var statePathName = TableHelpers.GetStatePathNameFromRow(row, _audioRepository, dialogueEvent.Name);
                 var statePath = dialogueEvent.GetStatePath(statePathName);
                 if (statePath != null)
@@ -282,7 +282,7 @@ namespace Editors.Audio.AudioEditor.AudioProjectEditor
             }
             else if (selectedAudioProjectExplorerNode.IsStateGroup())
             {
-                var stateGroup = _audioEditorService.AudioProject.GetStateGroup(selectedAudioProjectExplorerNode.Name);
+                var stateGroup = _audioEditorStateService.AudioProject.GetStateGroup(selectedAudioProjectExplorerNode.Name);
                 var stateName = TableHelpers.GetStateNameFromRow(row);
                 var state = stateGroup.GetState(stateName);
                 if (state != null)
@@ -303,12 +303,12 @@ namespace Editors.Audio.AudioEditor.AudioProjectEditor
 
         private void SetShowModdedStatesOnlyButtonEnablementAndVisibility()
         {
-            var selectedAudioProjectExplorerNode = _audioEditorService.SelectedAudioProjectExplorerNode;
+            var selectedAudioProjectExplorerNode = _audioEditorStateService.SelectedAudioProjectExplorerNode;
             if (selectedAudioProjectExplorerNode.IsDialogueEvent())
             {
                 IsShowModdedStatesCheckBoxVisible = true;
 
-                var moddedStatesCount = _audioEditorService.AudioProject.StateGroups
+                var moddedStatesCount = _audioEditorStateService.AudioProject.StateGroups
                     .SelectMany(stateGroup => stateGroup.States)
                     .Count();
                 if (moddedStatesCount > 0)

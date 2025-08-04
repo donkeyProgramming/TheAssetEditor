@@ -11,11 +11,11 @@ namespace Editors.Audio.AudioEditor.AudioProjectEditor.Table
     public class EditorActionEventDataGridService(
         IUiCommandFactory uiCommandFactory,
         IEventHub eventHub,
-        IAudioEditorService audioEditorService) : IEditorTableService
+        IAudioEditorStateService audioEditorStateService) : IEditorTableService
     {
         private readonly IUiCommandFactory _uiCommandFactory = uiCommandFactory;
         private readonly IEventHub _eventHub = eventHub;
-        private readonly IAudioEditorService _audioEditorService = audioEditorService;
+        private readonly IAudioEditorStateService _audioEditorStateService = audioEditorStateService;
 
         public AudioProjectTreeNodeType NodeType => AudioProjectTreeNodeType.ActionEventSoundBank;
 
@@ -49,7 +49,7 @@ namespace Editors.Audio.AudioEditor.AudioProjectEditor.Table
             var columnsCount = 1;
             var columnWidth = 1.0 / columnsCount;
 
-            var selectedAudioProjectExplorerNode = _audioEditorService.SelectedAudioProjectExplorerNode;
+            var selectedAudioProjectExplorerNode = _audioEditorStateService.SelectedAudioProjectExplorerNode;
             if (selectedAudioProjectExplorerNode.Name == SoundBanks.MoviesDisplayString)
             {
                 var fileSelectColumnHeader = TableInfo.BrowseMovieColumnName;
@@ -79,7 +79,7 @@ namespace Editors.Audio.AudioEditor.AudioProjectEditor.Table
         {
             var eventName = string.Empty;
 
-            var selectedAudioProjectExplorerNode = _audioEditorService.SelectedAudioProjectExplorerNode.Name;
+            var selectedAudioProjectExplorerNode = _audioEditorStateService.SelectedAudioProjectExplorerNode.Name;
             if (selectedAudioProjectExplorerNode != SoundBanks.MoviesDisplayString)
                 eventName = "Play_";
 

@@ -30,8 +30,10 @@ namespace Editors.Audio
     {
         public override void Register(IServiceCollection serviceCollection)
         {
-            // Audio Explorer
-            serviceCollection.AddScoped<AudioExplorerViewModel>();
+            // Audio Editor stuff
+            serviceCollection.AddScoped<IAudioEditorStateService, AudioEditorStateService>();
+            serviceCollection.AddScoped<IAudioProjectFileService, AudioProjectFileService>();
+            serviceCollection.AddScoped<IntegrityChecker>();
 
             // Audio Editor View Models
             serviceCollection.AddScoped<AudioEditorViewModel>();
@@ -54,8 +56,14 @@ namespace Editors.Audio
             serviceCollection.AddScoped<OpenNewAudioProjectWindowCommand>();
             serviceCollection.AddScoped<OpenAudioProjectConverterWindowCommand>();
             serviceCollection.AddScoped<SetAudioFilesCommand>();
+            serviceCollection.AddScoped<PlayAudioFileCommand>();
+            serviceCollection.AddScoped<AddEditorRowToViewerCommand>();
+            serviceCollection.AddScoped<RemoveViewerRowsCommand>();
+            serviceCollection.AddScoped<EditViewerRowCommand>();
+            serviceCollection.AddScoped<PasteViewerRowsCommand>();
             serviceCollection.AddScoped<IAudioProjectMutationUICommandFactory, AudioProjectMutationUICommandFactory>();
-            RegisterAllAsOriginalType<IAudioProjectMutationUICommand>(serviceCollection, ServiceLifetime.Transient);
+            RegisterAllAsInterface<IAudioProjectMutationUICommand>(serviceCollection, ServiceLifetime.Transient);
+
 
             // Audio Files Explorer services
             serviceCollection.AddSingleton<IAudioFilesTreeBuilderService, AudioFilesTreeBuilderService>();
@@ -86,15 +94,15 @@ namespace Editors.Audio
             serviceCollection.AddScoped<IDialogueEventService, DialogueEventService>();
             serviceCollection.AddScoped<IStateService, StateService>();
 
-            // Audio Editor stuff
-            serviceCollection.AddScoped<IAudioEditorService, AudioEditorService>();
-            serviceCollection.AddScoped<IntegrityChecker>();
-
             // Audio Project Compiler
+            serviceCollection.AddScoped<IAudioProjectCompilerService, AudioProjectCompilerService>();
             serviceCollection.AddScoped<CompilerDataProcessor>();
             serviceCollection.AddScoped<SoundBankGenerator>();
             serviceCollection.AddScoped<WemGenerator>();
             serviceCollection.AddScoped<DatGenerator>();
+
+            // Audio Explorer
+            serviceCollection.AddScoped<AudioExplorerViewModel>();
 
             // Shared audio stuff 
             serviceCollection.AddScoped<RepositoryProvider, CreateRepositoryFromAllPackFiles>();

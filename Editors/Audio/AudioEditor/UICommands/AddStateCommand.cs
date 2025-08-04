@@ -5,9 +5,9 @@ using Editors.Audio.AudioEditor.Services;
 
 namespace Editors.Audio.AudioEditor.UICommands
 {
-    public class AddStateCommand(IAudioEditorService audioEditorService, IStateService stateService) : IAudioProjectMutationUICommand
+    public class AddStateCommand(IAudioEditorStateService audioEditorStateService, IStateService stateService) : IAudioProjectMutationUICommand
     {
-        private readonly IAudioEditorService _audioEditorService = audioEditorService;
+        private readonly IAudioEditorStateService _audioEditorStateService = audioEditorStateService;
         private readonly IStateService _stateService = stateService;
 
         public MutationType Action => MutationType.Add;
@@ -16,7 +16,7 @@ namespace Editors.Audio.AudioEditor.UICommands
         public void Execute(DataRow row)
         {
             var stateName = TableHelpers.GetStateNameFromRow(row);
-            var stateGroupName = _audioEditorService.SelectedAudioProjectExplorerNode.Name;
+            var stateGroupName = _audioEditorStateService.SelectedAudioProjectExplorerNode.Name;
             _stateService.AddState(stateGroupName, stateName);
         }
     }

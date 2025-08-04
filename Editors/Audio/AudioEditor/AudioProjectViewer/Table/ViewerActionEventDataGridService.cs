@@ -7,10 +7,10 @@ using Editors.Audio.AudioEditor.Events;
 
 namespace Editors.Audio.AudioEditor.AudioProjectViewer.Table
 {
-    public class ViewerActionEventDataGridService(IEventHub eventHub, IAudioEditorService audioEditorService) : IViewerTableService
+    public class ViewerActionEventDataGridService(IEventHub eventHub, IAudioEditorStateService audioEditorStateService) : IViewerTableService
     {
         private readonly IEventHub _eventHub = eventHub;
-        private readonly IAudioEditorService _audioEditorService = audioEditorService;
+        private readonly IAudioEditorStateService _audioEditorStateService = audioEditorStateService;
 
         public AudioProjectTreeNodeType NodeType => AudioProjectTreeNodeType.ActionEventSoundBank;
 
@@ -54,8 +54,8 @@ namespace Editors.Audio.AudioEditor.AudioProjectViewer.Table
 
         public void InitialiseTable(DataTable table)
         {
-            var soundBankName = _audioEditorService.SelectedAudioProjectExplorerNode.Name;
-            var soundBank = _audioEditorService.AudioProject.GetSoundBank(soundBankName);
+            var soundBankName = _audioEditorStateService.SelectedAudioProjectExplorerNode.Name;
+            var soundBank = _audioEditorStateService.AudioProject.GetSoundBank(soundBankName);
             foreach (var actionEvent in soundBank.ActionEvents)
             {
                 var row = table.NewRow();

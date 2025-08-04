@@ -22,7 +22,10 @@ namespace Editors.Audio.AudioEditor.AudioProjectExplorer
         private void OnWatermarkComboBoxSelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             if (DialogueEventFilterComboBox?.SelectedItem is DialogueEventPreset selectedPreset && selectedPreset == DialogueEventPreset.ShowAll)
-                ViewModel.ResetDialogueEventFilterComboBoxSelectedItem(DialogueEventFilterComboBox);
+            {
+                DialogueEventFilterComboBox.SelectedItem = null;
+                ViewModel.ResetDialogueEventFilterComboBoxSelectedItem();
+            }
         }
 
         private void ClearButtonClick(object sender, RoutedEventArgs e)

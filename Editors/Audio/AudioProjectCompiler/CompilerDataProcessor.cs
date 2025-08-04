@@ -41,14 +41,14 @@ namespace Editors.Audio.AudioProjectCompiler
                 );
         }
 
-        public void SetSoundBankData(AudioProject audioProject)
+        public void SetSoundBankData(AudioProject audioProject, string audioProjectFileName)
         {
             foreach (var soundBank in audioProject.SoundBanks)
             {
                 soundBank.SoundBankSubtype = GetSoundBankSubtype(soundBank.Name);
                 soundBank.Language = AudioProjectCompilerHelpers.GetCorrectSoundBankLanguage(audioProject);
 
-                soundBank.SoundBankFileName = $"{GetSoundBankName(soundBank.SoundBankSubtype)}_{audioProject.FileName}.bnk";
+                soundBank.SoundBankFileName = $"{GetSoundBankName(soundBank.SoundBankSubtype)}_{audioProjectFileName}.bnk";
 
                 var basePath = $"audio\\wwise";
                 if (soundBank.Language == Languages.Sfx)
@@ -73,7 +73,6 @@ namespace Editors.Audio.AudioProjectCompiler
                     {
                         if (actionEvent.Sound != null)
                             SetSoundData(
-                                audioProject.FileName,
                                 actionEvent.Sound,
                                 soundBank,
                                 sourceIdByWavFilePathLookup,
@@ -81,7 +80,6 @@ namespace Editors.Audio.AudioProjectCompiler
                         else
                         {
                             SetRandomSequenceContainerData(
-                                audioProject.FileName,
                                 actionEvent.RandomSequenceContainer,
                                 soundBank,
                                 sourceIdByWavFilePathLookup,
@@ -100,14 +98,12 @@ namespace Editors.Audio.AudioProjectCompiler
                         {
                             if (statePath.Sound != null)
                                 SetSoundData(
-                                    audioProject.FileName,
                                     statePath.Sound,
                                     soundBank,
                                     sourceIdByWavFilePathLookup,
                                     wwiseIdService);
                             else
                                 SetRandomSequenceContainerData(
-                                    audioProject.FileName,
                                     statePath.RandomSequenceContainer,
                                     soundBank,
                                     sourceIdByWavFilePathLookup,
@@ -144,7 +140,6 @@ namespace Editors.Audio.AudioProjectCompiler
         }
 
         private void SetSoundData(
-            string audioProjectFileName,
             Sound sound,
             SoundBank soundBank,
             Dictionary<string, uint> sourceLookup,
@@ -154,7 +149,7 @@ namespace Editors.Audio.AudioProjectCompiler
 
             var usedHircIds = UsedHircIdsByLanguageIdLookup[WwiseHash.Compute(soundBank.Language)];
             var soundFileNameWithoutExtension = Path.GetFileNameWithoutExtension(sound.WavFileName);
-            var soundIdResult = IdGenerator.GenerateSoundHircId(usedHircIds, audioProjectFileName, soundFileNameWithoutExtension);
+            var soundIdResult = IdGenerator.GenerateSoundHircId(usedHircIds, soundFileNameWithoutExtension);
             sound.Id = soundIdResult.Id;
 
             if (wwiseIdService.OverrideBusIds.TryGetValue(soundBank.SoundBankSubtype, out var overrideBusId))
@@ -168,7 +163,7 @@ namespace Editors.Audio.AudioProjectCompiler
             if (!sourceLookup.TryGetValue(sound.WavFilePath, out var sourceId))
             {
                 var usedSourceIds = UsedSourceIdsByLanguageIdLookup[WwiseHash.Compute(soundBank.Language)];
-                var sourceIdResult = IdGenerator.GenerateWemId(usedSourceIds, audioProjectFileName, soundFileNameWithoutExtension);
+                var sourceIdResult = IdGenerator.GenerateWemId(usedSourceIds, soundFileNameWithoutExtension);
                 sourceId = sourceIdResult.Id;
                 sourceLookup[sound.WavFilePath] = sourceId;
             }
@@ -176,7 +171,6 @@ namespace Editors.Audio.AudioProjectCompiler
         }
 
         private void SetRandomSequenceContainerData(
-            string audioProjectFileName,
             RandomSequenceContainer container,
             SoundBank soundBank,
             Dictionary<string, uint> sourceLookup,
@@ -192,13 +186,13 @@ namespace Editors.Audio.AudioProjectCompiler
 
             if (actionEventName != null)
             {
-                containerIdResult = IdGenerator.GenerateRanSeqCntrActionEventHircId(usedHircIds, audioProjectFileName, actionEventName);
+                containerIdResult = IdGenerator.GenerateRanSeqCntrActionEventHircId(usedHircIds, actionEventName);
                 container.Id = containerIdResult.Id;
             }
             else if (dialogueEventName != null)
             {
                 // TODO are we using the right name here we check dialogueeventname but use actioneventname
-                containerIdResult = IdGenerator.GenerateRanSeqCntrDialogueEventHircId(usedHircIds, audioProjectFileName, actionEventName, statePath);
+                containerIdResult = IdGenerator.GenerateRanSeqCntrDialogueEventHircId(usedHircIds, actionEventName, statePath);
                 container.Id = containerIdResult.Id;
             }
 
@@ -212,7 +206,7 @@ namespace Editors.Audio.AudioProjectCompiler
 
             foreach (var sound in container.Sounds)
             {
-                SetSoundData(audioProjectFileName, sound, soundBank, sourceLookup, wwiseIdService);
+                SetSoundData(sound, soundBank, sourceLookup, wwiseIdService);
                 sound.DirectParentId = container.Id;
             }
 
@@ -261,13 +255,13 @@ namespace Editors.Audio.AudioProjectCompiler
 
                     if (actionEvent.Sound != null)
                     {
-                        var actionIdResult = IdGenerator.GenerateActionHircId(usedHircIds, audioProject.FileName, actionEvent.Name);
+                        var actionIdResult = IdGenerator.GenerateActionHircId(usedHircIds, actionEvent.Name);
                         action.Id = actionIdResult.Id;
                         action.IdExt = actionEvent.Sound.Id;
                     } 
                     else
                     {
-                        var actionIdResult = IdGenerator.GenerateActionHircId(usedHircIds, audioProject.FileName, actionEvent.Name);
+                        var actionIdResult = IdGenerator.GenerateActionHircId(usedHircIds, actionEvent.Name);
                         action.Id = actionIdResult.Id; 
                         action.IdExt = actionEvent.RandomSequenceContainer.Id;
                     }

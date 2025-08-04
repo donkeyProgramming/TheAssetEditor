@@ -14,6 +14,15 @@ namespace Editors.Audio.AudioEditor.Models
         public string SoundBankFileName { get; set; }
         public string SoundBankFilePath { get; set; }
 
+        public static SoundBank Create(string name, Wh3SoundBankType type)
+        {
+            return new SoundBank
+            {
+                Name = name,
+                SoundBankType = type
+            };
+        }
+
         public ActionEvent GetActionEvent(string actionEventName)
         {
             return ActionEvents.FirstOrDefault(actionEvent => actionEvent.Name == actionEventName);

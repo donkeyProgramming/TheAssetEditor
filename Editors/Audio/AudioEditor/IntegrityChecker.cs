@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
+using Editors.Audio.AudioEditor.Models;
 using Editors.Audio.Storage;
 using static Editors.Audio.GameSettings.Warhammer3.DialogueEvents;
 using static Editors.Audio.GameSettings.Warhammer3.SoundBanks;
@@ -49,7 +50,7 @@ namespace Editors.Audio.AudioEditor
             }
         }
 
-        public void CheckAudioProjectDialogueEventIntegrity(IAudioEditorService audioEditorService)
+        public void CheckAudioProjectDialogueEventIntegrity(AudioProject audioProject)
         {
             var audioProjectDialogueEventsWithStateGroups = new Dictionary<string, List<string>>();
             var dialogueEventsWithStateGroupsWithIntegrityError = new Dictionary<string, List<string>>();
@@ -61,7 +62,7 @@ namespace Editors.Audio.AudioEditor
                 $" The new State Group(s) will have no State set in them so you need to click Update Row and add the State(s). " +
                 $"\n\nAffected Dialogue Events:";
 
-            foreach (var soundBank in audioEditorService.AudioProject.SoundBanks)
+            foreach (var soundBank in audioProject.SoundBanks)
             {
                 if (soundBank.SoundBankType == Wh3SoundBankType.DialogueEventSoundBank)
                 {

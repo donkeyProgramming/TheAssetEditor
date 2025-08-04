@@ -7,7 +7,15 @@ namespace Editors.Audio.AudioEditor.Models
     public class DialogueEvent : AudioProjectHircItem
     {
         public override AkBkHircType HircType { get; set; } = AkBkHircType.Dialogue_Event;
-        public List<StatePath> StatePaths { get; set; }
+        public List<StatePath> StatePaths { get; set; } = [];
+
+        public static DialogueEvent Create(string name)
+        {
+            return new DialogueEvent
+            {
+                Name = name
+            };
+        }
 
         public StatePath GetStatePath(string statePathName)
         {

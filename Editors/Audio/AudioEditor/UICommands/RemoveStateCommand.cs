@@ -8,11 +8,11 @@ using Editors.Audio.AudioEditor.Services;
 namespace Editors.Audio.AudioEditor.UICommands
 {
     public class RemoveStateCommand(
-        IAudioEditorService audioEditorService,
+        IAudioEditorStateService audioEditorStateService,
         IStateService stateService,
         IEventHub eventHub) : IAudioProjectMutationUICommand
     {
-        private readonly IAudioEditorService _audioEditorService = audioEditorService;
+        private readonly IAudioEditorStateService _audioEditorStateService = audioEditorStateService;
         private readonly IStateService _stateService = stateService;
         private readonly IEventHub _eventHub = eventHub;
 
@@ -21,7 +21,7 @@ namespace Editors.Audio.AudioEditor.UICommands
 
         public void Execute(DataRow row)
         {
-            var stateGroupName = _audioEditorService.SelectedAudioProjectExplorerNode.Name;
+            var stateGroupName = _audioEditorStateService.SelectedAudioProjectExplorerNode.Name;
             var stateName = TableHelpers.GetStateNameFromRow(row);
             _stateService.RemoveState(stateGroupName, stateName);
             _eventHub.Publish(new ViewerTableRowRemoveRequestedEvent(row));

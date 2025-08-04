@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using Shared.Core.Settings;
 using Shared.GameFormats.Wwise.Enums;
 using static Editors.Audio.GameSettings.Warhammer3.DialogueEvents;
 using static Editors.Audio.GameSettings.Warhammer3.SoundBanks;
@@ -39,40 +40,34 @@ namespace Editors.Audio.AudioEditor.Models
 
     public class AudioProject
     {
-        public string FileName { get; set; }
-        public string DirectoryPath { get; set; }
         public string Language { get; set; }
         public List<SoundBank> SoundBanks { get; set; }
         public List<StateGroup> StateGroups { get; set; }
 
-        public static AudioProject CreateAudioProject()
+        public static AudioProject Create(GameTypeEnum currentGame, string language)
         {
-            // TODO: Add abstraction for other games
-            var audioProject = new AudioProject();
-            InitialiseSoundBanks(audioProject);
-            InitialiseModdedStatesGroups(audioProject);
-            return audioProject;
+            if (currentGame == GameTypeEnum.Warhammer3)
+            {
+                return new AudioProject
+                {
+                    Language = language,
+                    SoundBanks = CreateSoundBanks(),
+                    StateGroups = CreateStateGroups()
+                };
+            }
+
+            return null;
         }
 
-        private static void InitialiseSoundBanks(AudioProject audioProject)
+        private static List<SoundBank> CreateSoundBanks()
         {
-            var soundBanks = Enum.GetValues<Wh3SoundBankSubtype>()
-                .Select(soundBankSubtype => new SoundBank
-                {
-                    Name = GetSoundBankSubTypeString(soundBankSubtype),
-                    SoundBankType = GetSoundBankSubType(soundBankSubtype)
-                })
-                .ToList();
-
-            audioProject.SoundBanks = [];
+            var soundBanks = new List<SoundBank>();
 
             foreach (var soundBankSubtype in Enum.GetValues<Wh3SoundBankSubtype>())
             {
-                var soundBank = new SoundBank
-                {
-                    Name = GetSoundBankSubTypeString(soundBankSubtype),
-                    SoundBankType = GetSoundBankSubType(soundBankSubtype)
-                };
+                var soundBankName = GetSoundBankSubTypeString(soundBankSubtype);
+                var soundBankType = GetSoundBankSubType(soundBankSubtype);
+                var soundBank = SoundBank.Create(soundBankName, soundBankType);
 
                 if (soundBank.SoundBankType == Wh3SoundBankType.ActionEventSoundBank)
                     soundBank.ActionEvents = [];
@@ -83,58 +78,107 @@ namespace Editors.Audio.AudioEditor.Models
                     var filteredDialogueEvents = DialogueEventData
                         .Where(dialogueEvent => dialogueEvent.SoundBank == GetSoundBankSubtype(soundBank.Name));
 
-                    foreach (var dialogueData in filteredDialogueEvents)
+                    foreach (var filteredDialogueEvent in filteredDialogueEvents)
                     {
-                        var dialogueEvent = new DialogueEvent
-                        {
-                            Name = dialogueData.Name,
-                            StatePaths = []
-                        };
+                        var dialogueEvent = DialogueEvent.Create(filteredDialogueEvent.Name);
                         soundBank.DialogueEvents.Add(dialogueEvent);
                     }
                 }
 
-                audioProject.SoundBanks.Add(soundBank);
+                soundBanks.Add(soundBank);
             }
 
-            SortSoundBanksAlphabetically(audioProject);
+            soundBanks = soundBanks.OrderBy(soundBank => soundBank.Name).ToList();
+            return soundBanks;
         }
 
-        private static void InitialiseModdedStatesGroups(AudioProject audioProject)
+        private static List<StateGroup> CreateStateGroups()
         {
-            audioProject.StateGroups = [];
-
+            var stateGroups = new List<StateGroup>();
             foreach (var moddedStateGroup in ModdedStateGroups)
             {
-                var stateGroup = new StateGroup { Name = moddedStateGroup, States = [] };
-                audioProject.StateGroups.Add(stateGroup);
+                var stateGroup = StateGroup.Create(moddedStateGroup, []);
+                stateGroups.Add(stateGroup);
+            }
+            return stateGroups;
+        }
+
+        public static AudioProject Create(AudioProject cleanAudioProject, GameTypeEnum currentGame)
+        {
+            var dirtyAudioProject = Create(currentGame, cleanAudioProject.Language);
+            MergeSoundBanks(dirtyAudioProject.SoundBanks, cleanAudioProject.SoundBanks);
+            MergeStateGroups(dirtyAudioProject.StateGroups, cleanAudioProject.StateGroups);
+            return dirtyAudioProject;
+        }
+
+        private static void MergeSoundBanks(List<SoundBank> dirtySoundBanks, List<SoundBank> cleanSoundBanks)
+        {
+            if (cleanSoundBanks == null)
+                return;
+
+            foreach (var cleanSoundBank in cleanSoundBanks)
+            {
+                if (cleanSoundBank == null) 
+                    continue;
+
+                var dirtySoundBank = dirtySoundBanks.FirstOrDefault(soundBank => soundBank.Name == cleanSoundBank.Name);
+                if (dirtySoundBank != null)
+                    MergeSoundBank(dirtySoundBank, cleanSoundBank);
             }
         }
 
-        private static void SortSoundBanksAlphabetically(AudioProject audioProject)
+        private static void MergeSoundBank(SoundBank dirtySoundBank, SoundBank cleanSoundBank)
         {
-            var sortedSoundBanks = audioProject.SoundBanks.OrderBy(soundBank => soundBank.Name).ToList();
-
-            audioProject.SoundBanks.Clear();
-
-            foreach (var soundBank in sortedSoundBanks)
-                audioProject.SoundBanks.Add(soundBank);
+            MergeDialogueEvents(dirtySoundBank.DialogueEvents, cleanSoundBank.DialogueEvents);
+            MergeActionEvents(dirtySoundBank.ActionEvents, cleanSoundBank.ActionEvents);
         }
 
-        // Gets the audio project with only the used data, unused data is removed
-        public static AudioProject GetAudioProject(AudioProject audioProject)
+        private static void MergeDialogueEvents(List<DialogueEvent> dirtyDialogueEvents, List<DialogueEvent> cleanDialogueEvents)
+        {
+            if (cleanDialogueEvents == null) 
+                return;
+
+            foreach (var cleanDialogueEvent in cleanDialogueEvents)
+            {
+                var dirtyDialogueEvent = dirtyDialogueEvents.FirstOrDefault(dialogueEvent => dialogueEvent.Name == cleanDialogueEvent.Name);
+                if (dirtyDialogueEvent != null)
+                    dirtyDialogueEvent.StatePaths = cleanDialogueEvent.StatePaths;
+            }
+        }
+
+        private static void MergeActionEvents(List<ActionEvent> dirtyActionEvents, List<ActionEvent> cleanActionEvents)
+        {
+            if (cleanActionEvents == null) 
+                return;
+
+            foreach (var cleanActionEvent in cleanActionEvents)
+                dirtyActionEvents.Add(cleanActionEvent);
+        }
+
+        private static void MergeStateGroups(List<StateGroup> dirtyStateGroups, List<StateGroup> cleanStateGroups)
+        {
+            if (cleanStateGroups == null) 
+                return;
+
+            foreach (var cleanStateGroup in cleanStateGroups)
+            {
+                var dirtyStateGroup = dirtyStateGroups.FirstOrDefault(stateGroup => stateGroup.Name == cleanStateGroup.Name);
+                if (dirtyStateGroup != null)
+                    dirtyStateGroup.States = cleanStateGroup.States;
+            }
+        }
+
+        public static AudioProject Clean(AudioProject audioProject)
         {
             return new AudioProject
             {
-                FileName = audioProject.FileName,
-                DirectoryPath = audioProject.DirectoryPath,
                 Language = audioProject.Language,
-                SoundBanks = FilterSoundBanks(audioProject.SoundBanks),
-                StateGroups = FilterStateGroups(audioProject.StateGroups)
+                SoundBanks = CleanSoundBanks(audioProject.SoundBanks),
+                StateGroups = CleanStateGroups(audioProject.StateGroups)
             };
         }
 
-        private static List<SoundBank> FilterSoundBanks(IEnumerable<SoundBank> soundBanks)
+        private static List<SoundBank> CleanSoundBanks(IEnumerable<SoundBank> soundBanks)
         {
             if (soundBanks == null)
                 return null;
@@ -169,7 +213,7 @@ namespace Editors.Audio.AudioEditor.Models
             };
         }
 
-        private static List<StateGroup> FilterStateGroups(List<StateGroup> stateGroups)
+        private static List<StateGroup> CleanStateGroups(List<StateGroup> stateGroups)
         {
             if (stateGroups == null)
                 return null;
@@ -180,104 +224,6 @@ namespace Editors.Audio.AudioEditor.Models
 
             return filteredStateGroups.Count != 0 ? filteredStateGroups : null;
         }
-
-        public static AudioProject MergeAudioProjects(List<AudioProject> audioProjectsToMerge)
-        {
-            var mergedAudioProject = CreateAudioProject();
-
-            foreach (var audioProjectToMerge in audioProjectsToMerge)
-                mergedAudioProject = MergeAudioProject(mergedAudioProject, audioProjectToMerge);
-
-            mergedAudioProject = GetAudioProject(mergedAudioProject);
-            return mergedAudioProject;
-        }
-
-        private static AudioProject MergeAudioProject(AudioProject mergedAudioProject, AudioProject audioProjectToMerge)
-        {
-            if (string.IsNullOrEmpty(mergedAudioProject.Language))
-                mergedAudioProject.Language = audioProjectToMerge.Language;
-
-            MergeSoundBanks(mergedAudioProject, audioProjectToMerge);
-            MergeStateGroups(mergedAudioProject, audioProjectToMerge);
-
-            return mergedAudioProject;
-        }
-
-        private static void MergeSoundBanks(AudioProject mergedAudioProject, AudioProject audioProjectToMerge)
-        {
-            if (audioProjectToMerge.SoundBanks == null)
-                return;
-
-            foreach (var soundBankToMerge in audioProjectToMerge.SoundBanks)
-            {
-                var mergedSoundBank = mergedAudioProject.SoundBanks.FirstOrDefault(mergedSoundBank => mergedSoundBank.Name == soundBankToMerge.Name);
-                if (mergedSoundBank != null)
-                {
-                    MergeDialogueEvents(mergedSoundBank, soundBankToMerge);
-                    MergeActionEvents(mergedSoundBank, soundBankToMerge);
-                }
-                else
-                {
-                    mergedAudioProject.SoundBanks.Add(soundBankToMerge);
-                    mergedAudioProject.SoundBanks = mergedAudioProject.SoundBanks.OrderBy(sb => sb.Name).ToList();
-                }
-            }
-        }
-
-        private static void MergeDialogueEvents(SoundBank mergedSoundBank, SoundBank soundBankToMerge)
-        {
-            if (soundBankToMerge.DialogueEvents == null)
-                return;
-
-            foreach (var newDialogue in soundBankToMerge.DialogueEvents)
-            {
-                var mergedDialogueEvent = mergedSoundBank.DialogueEvents?.FirstOrDefault(mergedDialogueEvent => mergedDialogueEvent.Name == newDialogue.Name);
-                if (mergedDialogueEvent != null)
-                {
-                    foreach (var statePathToMerge in newDialogue.StatePaths)
-                        mergedDialogueEvent.InsertAlphabetically(statePathToMerge);
-                }
-                else
-                {
-                    mergedSoundBank.DialogueEvents ??= [];
-                    mergedSoundBank.DialogueEvents.Add(newDialogue);
-                    mergedSoundBank.DialogueEvents = mergedSoundBank.DialogueEvents.OrderBy(mergedDialogueEvent => mergedDialogueEvent.Name).ToList();
-                }
-            }
-        }
-
-        private static void MergeActionEvents(SoundBank baseBank, SoundBank newBank)
-        {
-            if (newBank.ActionEvents == null)
-                return;
-
-            foreach (var newAction in newBank.ActionEvents)
-                baseBank.InsertAlphabetically(newAction);
-        }
-
-        private static void MergeStateGroups(AudioProject mergedAudioProject, AudioProject audioProjectToMerge)
-        {
-            if (audioProjectToMerge.StateGroups == null)
-                return;
-
-            foreach (var stateGroupToMerge in audioProjectToMerge.StateGroups)
-            {
-                var baseGroup = mergedAudioProject.StateGroups.FirstOrDefault(mergedStateGroup => mergedStateGroup.Name == stateGroupToMerge.Name);
-                if (baseGroup != null)
-                {
-                    foreach (var newState in stateGroupToMerge.States)
-                        baseGroup.InsertAlphabetically(newState);
-                }
-                else
-                    mergedAudioProject.StateGroups.Add(stateGroupToMerge);
-            }
-        }
-
-
-
-
-
-
 
         public List<SoundBank> GetActionEventSoundBanks()
         {

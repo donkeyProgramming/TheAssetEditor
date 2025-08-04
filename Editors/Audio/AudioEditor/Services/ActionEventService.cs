@@ -11,21 +11,21 @@ namespace Editors.Audio.AudioEditor.Services
         void RemoveActionEvent(string soundBankName, string actionEventName);
     }
 
-    public class ActionEventService(IAudioEditorService audioEditorService, IActionEventFactory actionEventFactory) : IActionEventService
+    public class ActionEventService(IAudioEditorStateService audioEditorStateService, IActionEventFactory actionEventFactory) : IActionEventService
     {
-        private readonly IAudioEditorService _audioEditorService = audioEditorService;
+        private readonly IAudioEditorStateService _audioEditorStateService = audioEditorStateService;
         private readonly IActionEventFactory _actionEventFactory = actionEventFactory;
 
         public void AddActionEvent(string actionEventName, List<AudioFile> audioFiles, AudioSettings audioSettings, string soundBankName)
         {
             var actionEvent = _actionEventFactory.Create(actionEventName, audioFiles, audioSettings);
-            var soundBank = _audioEditorService.AudioProject.GetSoundBank(soundBankName);
+            var soundBank = _audioEditorStateService.AudioProject.GetSoundBank(soundBankName);
             soundBank.InsertAlphabetically(actionEvent);
         }
 
         public void RemoveActionEvent(string soundBankName, string actionEventName)
         {
-            var soundBank = _audioEditorService.AudioProject.GetSoundBank(soundBankName);
+            var soundBank = _audioEditorStateService.AudioProject.GetSoundBank(soundBankName);
             var actionEvent = soundBank.GetActionEvent(actionEventName);
             soundBank.ActionEvents.Remove(actionEvent);
         }

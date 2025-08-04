@@ -3,11 +3,11 @@ using System.Linq;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Editors.Audio.AudioEditor.Events;
+using Editors.Audio.AudioEditor.Presentation.Table;
 using Editors.Audio.GameSettings.Warhammer3;
 using Serilog;
 using Shared.Core.ErrorHandling;
 using Shared.Core.Events;
-using Xceed.Wpf.Toolkit;
 using static Editors.Audio.GameSettings.Warhammer3.DialogueEvents;
 
 namespace Editors.Audio.AudioEditor.AudioProjectExplorer
@@ -15,7 +15,7 @@ namespace Editors.Audio.AudioEditor.AudioProjectExplorer
     public partial class AudioProjectExplorerViewModel : ObservableObject
     {
         private readonly IEventHub _eventHub;
-        private readonly IAudioEditorService _audioEditorService;
+        private readonly IAudioEditorStateService _audioEditorStateService;
         private readonly IAudioProjectTreeBuilderService _audioProjectTreeBuilder;
         private readonly IAudioProjectTreeFilterService _audioProjectTreeFilterService;
 
@@ -32,32 +32,32 @@ namespace Editors.Audio.AudioEditor.AudioProjectExplorer
 
         public AudioProjectExplorerViewModel(
             IEventHub eventHub,
-            IAudioEditorService audioEditorService,
+            IAudioEditorStateService audioEditorStateService,
             IAudioProjectTreeBuilderService audioProjectTreeBuilder,
             IAudioProjectTreeFilterService audioProjectTreeFilterService)
         {
             _eventHub = eventHub;
-            _audioEditorService = audioEditorService;
+            _audioEditorStateService = audioEditorStateService;
             _audioProjectTreeBuilder = audioProjectTreeBuilder;
             _audioProjectTreeFilterService = audioProjectTreeFilterService;
 
             AudioProjectExplorerLabel = $"Audio Project Explorer";
-
-            _audioEditorService.SelectedDialogueEventPreset = _selectedDialogueEventPreset;
-            _audioEditorService.AudioProjectTree = _audioProjectTree;
 
             _eventHub.Register<AudioProjectInitialisedEvent>(this, OnAudioProjectInitialised);
         }
 
         private void OnAudioProjectInitialised(AudioProjectInitialisedEvent e)
         {
-            AudioProjectTree = _audioProjectTreeBuilder.BuildTree(_audioEditorService.AudioProject, ShowEditedAudioProjectItemsOnly);
-            AudioProjectExplorerLabel = e.Label;
+            var audioProject = _audioEditorStateService.AudioProject;
+            AudioProjectTree = _audioProjectTreeBuilder.BuildTree(audioProject, ShowEditedAudioProjectItemsOnly);
+
+            var audioProjectFileName = _audioEditorStateService.AudioProjectFileName.Replace(".aproj", string.Empty);
+            AudioProjectExplorerLabel = $"Audio Project Explorer - {TableHelpers.DuplicateUnderscores(audioProjectFileName)}";
         }
 
         partial void OnSelectedNodeChanged(AudioProjectTreeNode value)
         {
-            _audioEditorService.SelectedAudioProjectExplorerNode = SelectedNode;
+            _audioEditorStateService.SelectedAudioProjectExplorerNode = SelectedNode;
 
             _eventHub.Publish(new AudioProjectExplorerNodeSelectedEvent(SelectedNode));
 
@@ -78,7 +78,7 @@ namespace Editors.Audio.AudioEditor.AudioProjectExplorer
             var filterSettings = new AudioProjectTreeFilterSettings(
                 SearchQuery,
                 ShowEditedAudioProjectItemsOnly,
-                _audioEditorService.AudioProject);
+                _audioEditorStateService.AudioProject);
 
             _audioProjectTreeFilterService.FilterTree(AudioProjectTree, filterSettings);
         }
@@ -140,10 +140,6 @@ namespace Editors.Audio.AudioEditor.AudioProjectExplorer
             IsDialogueEventPresetFilterEnabled = true;
         }
 
-        public void ResetDialogueEventFilterComboBoxSelectedItem(WatermarkComboBox watermarkComboBox)
-        {
-            watermarkComboBox.SelectedItem = null;
-            SelectedDialogueEventPreset = null;
-        }
+        public void ResetDialogueEventFilterComboBoxSelectedItem() => SelectedDialogueEventPreset = null;
     }
 }

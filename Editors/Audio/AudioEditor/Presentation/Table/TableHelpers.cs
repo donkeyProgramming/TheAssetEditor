@@ -20,16 +20,16 @@ namespace Editors.Audio.AudioEditor.Presentation.Table
             return wtfWpf.Replace("__", "_");
         }
 
-        public static List<string> GetStatesForStateGroupColumn(IAudioEditorService audioEditorService, IAudioRepository audioRepository, string stateGroup)
+        public static List<string> GetStatesForStateGroupColumn(IAudioEditorStateService audioEditorStateService, IAudioRepository audioRepository, string stateGroup)
         {
             var states = new List<string>();
-            var moddedStates = audioEditorService.AudioProject.StateGroups
+            var moddedStates = audioEditorStateService.AudioProject.StateGroups
                 .SelectMany(stateGroup => stateGroup.States)
                 .Select(state => state.Name);
             var vanillaStates = audioRepository.StatesLookupByStateGroup[stateGroup];
 
             // Display the required states in the ComboBox
-            if (audioEditorService.ShowModdedStatesOnly && StateGroups.ModdedStateGroups.Contains(stateGroup))
+            if (audioEditorStateService.ShowModdedStatesOnly && StateGroups.ModdedStateGroups.Contains(stateGroup))
             {
                 states.Add("Any"); // We still want the "Any" state to show so add it in manually
                 states.AddRange(moddedStates);

@@ -7,9 +7,9 @@ using Shared.Core.Events;
 
 namespace Editors.Audio.AudioEditor.UICommands
 {
-    public class SetAudioFilesCommand(IAudioEditorService audioEditorService, IEventHub eventHub) : IUiCommand
+    public class SetAudioFilesCommand(IAudioEditorStateService audioEditorStateService, IEventHub eventHub) : IUiCommand
     {
-        private readonly IAudioEditorService _audioEditorService = audioEditorService;
+        private readonly IAudioEditorStateService _audioEditorStateService = audioEditorStateService;
         private readonly IEventHub _eventHub = eventHub;
 
         public void Execute(ObservableCollection<AudioFilesTreeNode> selectedAudioFiles)
@@ -19,12 +19,12 @@ namespace Editors.Audio.AudioEditor.UICommands
             {
                 audioFiles.Add(new AudioFile
                 {
-                    FileName = wavFile.Name,
+                    FileName = wavFile.FileName,
                     FilePath = wavFile.FilePath
                 });
             }
 
-            _audioEditorService.AudioFiles = audioFiles.ToList();
+            _audioEditorStateService.AudioFiles = audioFiles.ToList();
             _eventHub.Publish(new AudioFilesChangedEvent(audioFiles));
         }
     }

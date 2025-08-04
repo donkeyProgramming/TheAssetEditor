@@ -15,6 +15,15 @@ namespace Editors.Audio.AudioEditor.Models
             };
         }
 
+        public static StateGroup Create(string name, List<State> states)
+        {
+            return new StateGroup
+            {
+                Name = name,
+                States = states
+            };
+        }
+
         public State GetState(string stateName)
         {
             return States.FirstOrDefault(state => state.Name == stateName);

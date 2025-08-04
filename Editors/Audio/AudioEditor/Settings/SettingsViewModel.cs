@@ -7,6 +7,7 @@ using CommunityToolkit.Mvvm.Input;
 using Editors.Audio.AudioEditor.Events;
 using Editors.Audio.AudioEditor.Models;
 using Editors.Audio.AudioEditor.Presentation.Table;
+using Editors.Audio.AudioEditor.UICommands;
 using Editors.Audio.Storage;
 using Shared.Core.Events;
 using static Editors.Audio.AudioEditor.Settings.Settings;
@@ -17,7 +18,7 @@ namespace Editors.Audio.AudioEditor.Settings
     public partial class SettingsViewModel : ObservableObject
     {
         private readonly IEventHub _eventHub;
-        private readonly IAudioEditorService _audioEditorService;
+        private readonly IAudioEditorStateService _audioEditorStateService;
         private readonly IAudioRepository _audioRepository;
 
         [ObservableProperty] public ObservableCollection<AudioFile> _audioFiles = [];
@@ -65,10 +66,10 @@ namespace Editors.Audio.AudioEditor.Settings
         [ObservableProperty] private bool _isTransitionDurationEnabled = false;
         [ObservableProperty] private bool _isTransitionDurationVisible = false;
 
-        public SettingsViewModel(IEventHub eventHub, IAudioEditorService audioEditorService, IAudioRepository audioRepository)
+        public SettingsViewModel(IEventHub eventHub, IAudioEditorStateService audioEditorStateService, IAudioRepository audioRepository)
         {
             _eventHub = eventHub;
-            _audioEditorService = audioEditorService;
+            _audioEditorStateService = audioEditorStateService;
             _audioRepository = audioRepository;
 
             SetInitialSettings();
@@ -112,7 +113,7 @@ namespace Editors.Audio.AudioEditor.Settings
             }
         }
 
-        partial void OnAudioFilesChanged(ObservableCollection<AudioFile> value) => _audioEditorService.AudioFiles = AudioFiles.ToList();
+        partial void OnAudioFilesChanged(ObservableCollection<AudioFile> value) => _audioEditorStateService.AudioFiles = AudioFiles.ToList();
 
         private void OnViewerRowEdited(ViewerTableRowEditedEvent e)
         {
@@ -122,7 +123,7 @@ namespace Editors.Audio.AudioEditor.Settings
 
         public void SetAudioFilesViaDrop(ObservableCollection<AudioFile> audioFiles)
         {
-            _audioEditorService.AudioFiles = audioFiles.ToList();
+            _audioEditorStateService.AudioFiles = audioFiles.ToList();
             _eventHub.Publish(new AudioFilesChangedEvent(audioFiles));
         }
 
@@ -163,7 +164,7 @@ namespace Editors.Audio.AudioEditor.Settings
 
         private void SetSettingsUsability()
         {
-            var selectedAudioProjectExplorerNode = _audioEditorService.SelectedAudioProjectExplorerNode;
+            var selectedAudioProjectExplorerNode = _audioEditorStateService.SelectedAudioProjectExplorerNode;
             if (!selectedAudioProjectExplorerNode.IsDialogueEvent() && !selectedAudioProjectExplorerNode.IsActionEventSoundBank())
                 return;
 
@@ -284,7 +285,7 @@ namespace Editors.Audio.AudioEditor.Settings
 
         private void StoreSettings()
         {
-            _audioEditorService.AudioSettings = new AudioSettings
+            _audioEditorStateService.AudioSettings = new AudioSettings
             {
                 PlaylistType = PlaylistType,
                 EnableRepetitionInterval = EnableRepetitionInterval,
@@ -304,12 +305,12 @@ namespace Editors.Audio.AudioEditor.Settings
             AudioSettings settings = null;
             var audioFiles = new List<AudioFile>();
 
-            var selectedAudioProjectExplorerNode = _audioEditorService.SelectedAudioProjectExplorerNode;
+            var selectedAudioProjectExplorerNode = _audioEditorStateService.SelectedAudioProjectExplorerNode;
             if (selectedAudioProjectExplorerNode.IsActionEventSoundBank())
             {
-                var selectedViewerRow = _audioEditorService.SelectedViewerRows[0];
+                var selectedViewerRow = _audioEditorStateService.SelectedViewerRows[0];
                 var actionEventName = TableHelpers.GetActionEventNameFromRow(selectedViewerRow);
-                var actionEvent = _audioEditorService.AudioProject.GetActionEvent(actionEventName);
+                var actionEvent = _audioEditorStateService.AudioProject.GetActionEvent(actionEventName);
                 settings = actionEvent.GetAudioSettings();
 
                 if (actionEvent.Sound != null)
@@ -334,8 +335,8 @@ namespace Editors.Audio.AudioEditor.Settings
             }
             else if (selectedAudioProjectExplorerNode.IsDialogueEvent())
             {
-                var selectedViewerRow = _audioEditorService.SelectedViewerRows[0];
-                var dialogueEvent = _audioEditorService.AudioProject.GetDialogueEvent(selectedAudioProjectExplorerNode.Name);
+                var selectedViewerRow = _audioEditorStateService.SelectedViewerRows[0];
+                var dialogueEvent = _audioEditorStateService.AudioProject.GetDialogueEvent(selectedAudioProjectExplorerNode.Name);
                 var statePathName = TableHelpers.GetStatePathNameFromRow(selectedViewerRow, _audioRepository, selectedAudioProjectExplorerNode.Name);
                 var statePath = dialogueEvent.GetStatePath(statePathName);
                 settings = statePath.GetAudioSettings();

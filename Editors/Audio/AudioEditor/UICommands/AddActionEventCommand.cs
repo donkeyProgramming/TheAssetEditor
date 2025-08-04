@@ -5,9 +5,9 @@ using Editors.Audio.AudioEditor.Services;
 
 namespace Editors.Audio.AudioEditor.UICommands
 {
-    public class AddActionEventCommand(IAudioEditorService audioEditorService, IActionEventService actionEventService) : IAudioProjectMutationUICommand
+    public class AddActionEventCommand(IAudioEditorStateService audioEditorStateService, IActionEventService actionEventService) : IAudioProjectMutationUICommand
     {
-        private readonly IAudioEditorService _audioEditorService = audioEditorService;
+        private readonly IAudioEditorStateService _audioEditorStateService = audioEditorStateService;
         private readonly IActionEventService _actionEventService = actionEventService;
 
         public MutationType Action => MutationType.Add;
@@ -15,10 +15,10 @@ namespace Editors.Audio.AudioEditor.UICommands
 
         public void Execute(DataRow row)
         {
-            var audioFiles = _audioEditorService.AudioFiles;
-            var audioSettings = _audioEditorService.AudioSettings;
+            var audioFiles = _audioEditorStateService.AudioFiles;
+            var audioSettings = _audioEditorStateService.AudioSettings;
             var actionEventName = TableHelpers.GetActionEventNameFromRow(row);
-            var soundBankName = _audioEditorService.SelectedAudioProjectExplorerNode.Name;
+            var soundBankName = _audioEditorStateService.SelectedAudioProjectExplorerNode.Name;
             _actionEventService.AddActionEvent(actionEventName, audioFiles, audioSettings, soundBankName);
         }
     }

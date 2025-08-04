@@ -23,7 +23,7 @@ namespace Editors.Audio.AudioEditor.AudioProjectViewer
     {
         private readonly IUiCommandFactory _uiCommandFactory;
         private readonly IEventHub _eventHub;
-        private readonly IAudioEditorService _audioEditorService;
+        private readonly IAudioEditorStateService _audioEditorStateService;
         private readonly IViewerTableServiceFactory _tableServiceFactory;
         private readonly IAudioRepository _audioRepository;
 
@@ -48,13 +48,13 @@ namespace Editors.Audio.AudioEditor.AudioProjectViewer
         public AudioProjectViewerViewModel(
             IUiCommandFactory uiCommandFactory,
             IEventHub eventHub,
-            IAudioEditorService audioEditorService,
+            IAudioEditorStateService audioEditorStateService,
             IViewerTableServiceFactory tableServiceFactory,
             IAudioRepository audioRepository)
         {
             _uiCommandFactory = uiCommandFactory;
             _eventHub = eventHub;
-            _audioEditorService = audioEditorService;
+            _audioEditorStateService = audioEditorStateService;
             _tableServiceFactory = tableServiceFactory;
             _audioRepository = audioRepository;
 
@@ -121,7 +121,7 @@ namespace Editors.Audio.AudioEditor.AudioProjectViewer
         {
             TableHelpers.InsertRowAlphabetically(Table, row);
 
-            var selectedAudioProjectExplorerNode = _audioEditorService.SelectedAudioProjectExplorerNode;
+            var selectedAudioProjectExplorerNode = _audioEditorStateService.SelectedAudioProjectExplorerNode;
             _logger.Here().Information($"Added {selectedAudioProjectExplorerNode.NodeType} row to Audio Project Viewer table for {selectedAudioProjectExplorerNode.Name}");
         }
 
@@ -131,7 +131,7 @@ namespace Editors.Audio.AudioEditor.AudioProjectViewer
         {
             Table.Rows.Remove(row);
 
-            var selectedAudioProjectExplorerNode = _audioEditorService.SelectedAudioProjectExplorerNode;
+            var selectedAudioProjectExplorerNode = _audioEditorStateService.SelectedAudioProjectExplorerNode;
             _logger.Here().Information($"Removed {selectedAudioProjectExplorerNode.NodeType} row from Audio Project Viewer table for {selectedAudioProjectExplorerNode.Name}");
         }
 
@@ -172,7 +172,7 @@ namespace Editors.Audio.AudioEditor.AudioProjectViewer
 
         partial void OnSelectedRowsChanged(List<DataRow> value)
         {
-            _audioEditorService.SelectedViewerRows = SelectedRows;
+            _audioEditorStateService.SelectedViewerRows = SelectedRows;
 
             _eventHub.Publish(new ViewerTableRowSelectionChangedEvent());
 
@@ -247,7 +247,7 @@ namespace Editors.Audio.AudioEditor.AudioProjectViewer
                     .Any(viewer => viewerColumns
                     .All(column => Equals(copied[column], viewer[column]))));
 
-            var selectedAudioProjectExplorerNodeName = _audioEditorService.SelectedAudioProjectExplorerNode.Name;
+            var selectedAudioProjectExplorerNodeName = _audioEditorStateService.SelectedAudioProjectExplorerNode.Name;
             var dialogueEventStateGroups = _audioRepository
                 .QualifiedStateGroupLookupByStateGroupByDialogueEvent[selectedAudioProjectExplorerNodeName]
                 .Select(kvp => TableHelpers.DuplicateUnderscores(kvp.Key))

@@ -18,7 +18,7 @@ namespace Editors.Audio.AudioEditor.AudioFilesExplorer
 
         private static bool FilterTreeNode(AudioFilesTreeNode node, string query)
         {
-            var doesNodeContainQuery = node.Name.Contains(query, StringComparison.OrdinalIgnoreCase);
+            var doesNodeContainQuery = node.FileName.Contains(query, StringComparison.OrdinalIgnoreCase);
 
             var isAnyChildVisible = false;
             foreach (var child in node.Children)

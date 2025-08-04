@@ -105,7 +105,7 @@ namespace Editors.Audio.AudioEditor.AudioFilesExplorer
 
         private static void SortNodes(ObservableCollection<AudioFilesTreeNode> nodes)
         {
-            var sortedNodes = nodes.OrderBy(node => node.Name).ToList();
+            var sortedNodes = nodes.OrderBy(node => node.FileName).ToList();
             nodes.Clear();
 
             foreach (var node in sortedNodes)

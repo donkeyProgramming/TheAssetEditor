@@ -2,12 +2,14 @@
 using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Editors.Audio.AudioEditor.Events;
 using Editors.Audio.AudioEditor.Models;
 using Serilog;
 using Shared.Core.ErrorHandling;
 using Shared.Core.Events;
 using Shared.Core.PackFiles;
 using Shared.Core.Services;
+using Shared.Core.Settings;
 using static Editors.Audio.GameSettings.Warhammer3.Languages;
 
 namespace Editors.Audio.AudioEditor.NewAudioProject
@@ -18,7 +20,9 @@ namespace Editors.Audio.AudioEditor.NewAudioProject
 
         private readonly IEventHub _eventHub;
         private readonly IPackFileService _packFileService;
-        private readonly IAudioEditorService _audioEditorService;
+        private readonly IAudioEditorStateService _audioEditorStateService;
+        private readonly IAudioProjectFileService _audioProjectFileService;
+        private readonly ApplicationSettingsService _applicationSettingsService;
         private readonly IStandardDialogs _standardDialogs;
 
         private System.Action _closeAction;
@@ -35,11 +39,19 @@ namespace Editors.Audio.AudioEditor.NewAudioProject
         [ObservableProperty] private bool _isLanguageSelected;
         [ObservableProperty] private bool _isOkButtonEnabled;
 
-        public NewAudioProjectViewModel(IEventHub eventHub, IPackFileService packFileService, IAudioEditorService audioEditorService, IStandardDialogs standardDialogs)
+        public NewAudioProjectViewModel(
+            IEventHub eventHub,
+            IPackFileService packFileService,
+            IAudioEditorStateService audioEditorStateService,
+            IAudioProjectFileService audioProjectFileService,
+            ApplicationSettingsService applicationSettingsService,
+            IStandardDialogs standardDialogs)
         {
             _eventHub = eventHub;
             _packFileService = packFileService;
-            _audioEditorService = audioEditorService;
+            _audioEditorStateService = audioEditorStateService;
+            _audioProjectFileService = audioProjectFileService;
+            _applicationSettingsService = applicationSettingsService;
             _standardDialogs = standardDialogs;
 
             AudioProjectDirectory = "audio_projects";
@@ -88,27 +100,25 @@ namespace Editors.Audio.AudioEditor.NewAudioProject
                 return;
             }
 
-            // Reset data
-            _audioEditorService.ResetAudioProject();
+            var currentGame = _applicationSettingsService.CurrentSettings.CurrentGame;
+            var fileName = $"{AudioProjectFileName}.aproj";
+            var filePath = $"{AudioProjectDirectory}\\{fileName}";
+            var language = GameLanguageStringLookup[SelectedLanguage];
 
-            // Initialise AudioProject according to the Audio Project settings selected
-            _audioEditorService.InitialiseAudioProject(_eventHub, AudioProjectFileName, AudioProjectDirectory, GameLanguageStringLookup[SelectedLanguage]);
+            var audioProject = AudioProject.Create(currentGame, language);
+            _audioProjectFileService.Save(audioProject, fileName, filePath);
 
-            // Add the Audio Project to the PackFile
-            var audioProject = AudioProject.GetAudioProject(_audioEditorService.AudioProject);
-            _audioEditorService.SaveAudioProject(audioProject, audioProject.FileName, audioProject.DirectoryPath);
+            _audioEditorStateService.AudioProject = audioProject;
+            _audioEditorStateService.AudioProjectFileName = fileName;
+            _audioEditorStateService.AudioProjectFilePath = filePath;
+
+            _eventHub.Publish(new AudioProjectInitialisedEvent());
 
             CloseWindowAction();
         }
 
-        [RelayCommand] public void CloseWindowAction()
-        {
-            _closeAction?.Invoke();
-        }
+        [RelayCommand] public void CloseWindowAction() => _closeAction?.Invoke();
 
-        public void SetCloseAction(System.Action closeAction)
-        {
-            _closeAction = closeAction;
-        }
+        public void SetCloseAction(System.Action closeAction) => _closeAction = closeAction;
     }
 }

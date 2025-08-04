@@ -7,9 +7,9 @@ using Editors.Audio.AudioEditor.Events;
 
 namespace Editors.Audio.AudioEditor.AudioProjectViewer.Table
 {
-    public class ViewerStateGroupDataGridService(IEventHub eventHub, IAudioEditorService audioEditorService) : IViewerTableService
+    public class ViewerStateGroupDataGridService(IEventHub eventHub, IAudioEditorStateService audioEditorStateService) : IViewerTableService
     {
-        private readonly IAudioEditorService _audioEditorService = audioEditorService;
+        private readonly IAudioEditorStateService _audioEditorStateService = audioEditorStateService;
         private readonly IEventHub _eventHub = eventHub;
 
         public AudioProjectTreeNodeType NodeType => AudioProjectTreeNodeType.StateGroup;
@@ -54,8 +54,8 @@ namespace Editors.Audio.AudioEditor.AudioProjectViewer.Table
         public void InitialiseTable(DataTable table)
         {
             var columnHeader = TableInfo.StateColumnName;
-            var stateGroupName = _audioEditorService.SelectedAudioProjectExplorerNode.Name;
-            var stateGroup = _audioEditorService.AudioProject.GetStateGroup(stateGroupName);
+            var stateGroupName = _audioEditorStateService.SelectedAudioProjectExplorerNode.Name;
+            var stateGroup = _audioEditorStateService.AudioProject.GetStateGroup(stateGroupName);
             foreach (var state in stateGroup.States)
             {
                 var row = table.NewRow();

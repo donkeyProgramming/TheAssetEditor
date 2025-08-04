@@ -12,13 +12,13 @@ using Editors.Audio.AudioEditor.Models;
 using Editors.Audio.AudioEditor.Settings;
 using Editors.Audio.Storage;
 using Editors.Audio.Utility;
-using Microsoft.Xna.Framework.Media;
 using Serilog;
 using Shared.Core.ErrorHandling;
 using Shared.Core.Misc;
 using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
 using Shared.Core.Services;
+using Shared.Core.Settings;
 using Shared.GameFormats.Wwise;
 using Shared.GameFormats.Wwise.Hirc;
 
@@ -44,7 +44,9 @@ namespace Editors.Audio.AudioProjectConverter
         private readonly IStandardDialogs _standardDialogs;
         private readonly IFileSaveService _fileSaveService;
         private readonly IAudioRepository _audioRepository;
-        private readonly IAudioEditorService _audioEditorService;
+        private readonly IAudioEditorStateService _audioEditorStateService;
+        private readonly IAudioProjectFileService _audioProjectFileService;
+        private readonly ApplicationSettingsService _applicationSettingsService;
         private readonly BnkParser _bnkParser;
         private readonly VgStreamWrapper _vgStreamWrapper;
 
@@ -74,14 +76,18 @@ namespace Editors.Audio.AudioProjectConverter
             IStandardDialogs standardDialogs,
             IFileSaveService fileSaveService,
             IAudioRepository audioRepository,
-            IAudioEditorService audioEditorService,
+            IAudioEditorStateService audioEditorStateService,
+            IAudioProjectFileService audioProjectFileService,
+            ApplicationSettingsService applicationSettingsService,
             BnkParser bnkParser,
             VgStreamWrapper vgStreamWrapper)
         {
             _standardDialogs = standardDialogs;
             _fileSaveService = fileSaveService;
             _audioRepository = audioRepository;
-            _audioEditorService = audioEditorService;
+            _audioEditorStateService = audioEditorStateService;
+            _audioProjectFileService = audioProjectFileService;
+            _applicationSettingsService = applicationSettingsService;
             _bnkParser = bnkParser;
             _vgStreamWrapper = vgStreamWrapper;
 
@@ -90,7 +96,11 @@ namespace Editors.Audio.AudioProjectConverter
 
         [RelayCommand] public void ProcessAudioProjectConversion()
         {
-            var audioProject = AudioProject.CreateAudioProject();
+            var currentGame = _applicationSettingsService.CurrentSettings.CurrentGame;
+            var fileName = $"{AudioProjectName}.aproj";
+            var filePath = $"{OutputDirectoryPath}\\{fileName}";
+            var language = "english(uk)";
+            var audioProject = AudioProject.Create(currentGame, language);
 
             var soundBankPaths = new List<string>();
             if (Directory.Exists(BnksDirectoryPath))
@@ -119,8 +129,7 @@ namespace Editors.Audio.AudioProjectConverter
 
             ProcessModdedStateGroups(audioProject, moddedStateGroups);
 
-            audioProject = AudioProject.GetAudioProject(audioProject);
-            _audioEditorService.SaveAudioProject(audioProject, AudioProjectName, OutputDirectoryPath);
+            _audioProjectFileService.Save(audioProject, fileName, filePath);
 
             CloseWindowAction();
         }

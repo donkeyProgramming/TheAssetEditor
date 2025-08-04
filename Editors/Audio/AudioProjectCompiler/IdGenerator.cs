@@ -31,14 +31,14 @@ namespace Editors.Audio.AudioProjectCompiler
             }
         }
 
-        public static Result GenerateWemId(HashSet<uint> usedHircIds, string audioProjectName, string wavFilename)
+        public static Result GenerateWemId(HashSet<uint> usedHircIds, string wavFilename)
         {
             var key = $"{wavFilename}";
             var idGenerationResult = GenerateUniqueId(usedHircIds, key);
             return idGenerationResult;
         }
 
-        public static Result GenerateSoundHircId(HashSet<uint> usedHircIds, string audioProjectName, string wavFilename)
+        public static Result GenerateSoundHircId(HashSet<uint> usedHircIds, string wavFilename)
         {
             var hirc = "sound_hirc";
             var key = $"{hirc}_{wavFilename}";
@@ -46,7 +46,7 @@ namespace Editors.Audio.AudioProjectCompiler
             return idGenerationResult;
         }
 
-        public static Result GenerateActionHircId(HashSet<uint> usedHircIds, string audioProjectName, string actionEventName)
+        public static Result GenerateActionHircId(HashSet<uint> usedHircIds, string actionEventName)
         {
             var hirc = "action_hirc";
             var key = $"{hirc}_{actionEventName}";
@@ -54,7 +54,7 @@ namespace Editors.Audio.AudioProjectCompiler
             return idGenerationResult;
         }
 
-        public static Result GenerateRanSeqCntrActionEventHircId(HashSet<uint> usedHircIds, string audioProjectName, string actionEventName)
+        public static Result GenerateRanSeqCntrActionEventHircId(HashSet<uint> usedHircIds, string actionEventName)
         {
             var hirc = "ran_seq_cntr_action_event_hirc";
             var key = $"{hirc}_{actionEventName}";
@@ -62,7 +62,7 @@ namespace Editors.Audio.AudioProjectCompiler
             return idGenerationResult;
         }
 
-        public static Result GenerateRanSeqCntrDialogueEventHircId(HashSet<uint> usedHircIds, string audioProjectName, string dialogueEventName, StatePath statePath)
+        public static Result GenerateRanSeqCntrDialogueEventHircId(HashSet<uint> usedHircIds, string dialogueEventName, StatePath statePath)
         {
             var hirc = "ran_seq_cntr_dialogue_event_hirc";
             var joinedStatePath = string.Empty;

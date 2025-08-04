@@ -9,12 +9,12 @@ using Editors.Audio.AudioEditor.Services;
 namespace Editors.Audio.AudioEditor.UICommands
 {
     public class RemoveDialogueEventCommand(
-        IAudioEditorService audioEditorService,
+        IAudioEditorStateService audioEditorStateService,
         IDialogueEventService dialogueEventService,
         IAudioRepository audioRepository,
         IEventHub eventHub) : IAudioProjectMutationUICommand
     {
-        private readonly IAudioEditorService _audioEditorService = audioEditorService;
+        private readonly IAudioEditorStateService _audioEditorStateService = audioEditorStateService;
         private readonly IDialogueEventService _dialogueEventService = dialogueEventService;
         private readonly IAudioRepository _audioRepository = audioRepository;
         private readonly IEventHub _eventHub = eventHub;
@@ -24,7 +24,7 @@ namespace Editors.Audio.AudioEditor.UICommands
 
         public void Execute(DataRow row)
         {
-            var dialogueEventName = _audioEditorService.SelectedAudioProjectExplorerNode.Name;
+            var dialogueEventName = _audioEditorStateService.SelectedAudioProjectExplorerNode.Name;
             var statePathName = TableHelpers.GetStatePathNameFromRow(row, _audioRepository, dialogueEventName);
             _dialogueEventService.RemoveStatePath(dialogueEventName, statePathName);
 
