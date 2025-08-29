@@ -17,7 +17,7 @@ namespace Editors.Audio.AudioEditor.UICommands
         {
             // Store the row data in the Audio Project
             var selectedAudioProjectExplorerNode = _audioEditorStateService.SelectedAudioProjectExplorerNode;
-            _audioProjectMutationUICommandFactory.Create(MutationType.Add, selectedAudioProjectExplorerNode.NodeType).Execute(row);
+            _audioProjectMutationUICommandFactory.Create(MutationType.Add, selectedAudioProjectExplorerNode.Type).Execute(row);
 
             // Display the row in the Viewer
             _eventHub.Publish(new ViewerTableRowAddRequestedEvent(row));

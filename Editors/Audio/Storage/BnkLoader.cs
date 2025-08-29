@@ -3,8 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Editors.Audio.GameSettings.Warhammer3;
-using Editors.Audio.Utility;
 using Serilog;
 using Shared.Core.ErrorHandling;
 using Shared.Core.PackFiles;

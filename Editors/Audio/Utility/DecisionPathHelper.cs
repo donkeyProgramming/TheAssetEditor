@@ -41,13 +41,15 @@ namespace Editors.Audio.Utility
             _audioRepository = audioRepository;
         }
 
-        public DecisionPathCollection GetDecisionPaths(ICAkDialogueEvent dialogueEvent) =>
-            dialogueEvent switch
+        public DecisionPathCollection GetDecisionPaths(ICAkDialogueEvent dialogueEvent)
+        {
+            return dialogueEvent switch
             {
                 CAkDialogueEvent_V136 event136 => GetDecisionPaths((AkDecisionTree_V136)event136.AkDecisionTree, event136.Arguments.Cast<AkGameSync_V136>().ToList()),
                 CAkDialogueEvent_V112 event112 => GetDecisionPaths((AkDecisionTree_V112)event112.AkDecisionTree, event112.Arguments.Cast<AkGameSync_V112>().ToList()),
-                _ => throw new NotImplementedException(),
+                _ => throw new NotImplementedException()
             };
+        }
 
         public DecisionPathCollection GetDecisionPaths(CAkMusicSwitchCntr_V136 musicSwitch) => GetDecisionPaths(musicSwitch.AkDecisionTree, musicSwitch.Arguments);
         

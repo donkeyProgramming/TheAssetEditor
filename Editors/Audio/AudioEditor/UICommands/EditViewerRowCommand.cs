@@ -26,7 +26,7 @@ namespace Editors.Audio.AudioEditor.UICommands
             _uiCommandFactory.Create<RemoveViewerRowsCommand>().Execute(selectedViewerRows);
 
             var selectedAudioProjectExplorerNode = _audioEditorStateService.SelectedAudioProjectExplorerNode;
-            _logger.Here().Information($"Editing {selectedAudioProjectExplorerNode.NodeType} row in Audio Project Viewer table for {selectedAudioProjectExplorerNode.Name}");
+            _logger.Here().Information($"Editing {selectedAudioProjectExplorerNode.Type} row in Audio Project Viewer table for {selectedAudioProjectExplorerNode.Name}");
         }
     }
 }

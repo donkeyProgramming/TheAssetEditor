@@ -7,12 +7,11 @@ namespace Shared.Ui.Common.Behaviors
 {
     public static class DataGridColumnsBehavior
     {
-        public static readonly DependencyProperty ColumnsProperty =
-            DependencyProperty.RegisterAttached(
-                "Columns",
-                typeof(IEnumerable<DataGridColumn>),
-                typeof(DataGridColumnsBehavior),
-                new PropertyMetadata(null, OnColumnsChanged));
+        public static readonly DependencyProperty ColumnsProperty = DependencyProperty.RegisterAttached(
+            "Columns",
+            typeof(IEnumerable<DataGridColumn>),
+            typeof(DataGridColumnsBehavior),
+            new PropertyMetadata(null, OnColumnsChanged));
 
         public static void SetColumns(DependencyObject obj, IEnumerable<DataGridColumn> value) => obj.SetValue(ColumnsProperty, value);
 

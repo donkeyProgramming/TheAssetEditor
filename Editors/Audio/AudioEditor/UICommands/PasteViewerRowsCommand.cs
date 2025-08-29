@@ -19,7 +19,7 @@ namespace Editors.Audio.AudioEditor.UICommands
             var selectedAudioProjectExplorerNode = _audioEditorStateService.SelectedAudioProjectExplorerNode;
             foreach (var row in copiedRows)
             {
-                _audioProjectMutationUICommandFactory.Create(MutationType.Add, selectedAudioProjectExplorerNode.NodeType).Execute(row);
+                _audioProjectMutationUICommandFactory.Create(MutationType.Add, selectedAudioProjectExplorerNode.Type).Execute(row);
                 _eventHub.Publish(new ViewerTableRowAddRequestedEvent(row));
                 _eventHub.Publish(new EditorAddRowButtonEnablementUpdateRequestedEvent());
             }

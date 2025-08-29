@@ -1,47 +1,42 @@
 ﻿using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
-using static Editors.Audio.GameSettings.Warhammer3.DialogueEvents;
+using Editors.Audio.GameInformation.Warhammer3;
+using static Editors.Audio.AudioEditor.AudioProjectExplorer.AudioProjectTreeNodeType;
 
 namespace Editors.Audio.AudioEditor.AudioProjectExplorer
 {
     public enum AudioProjectTreeNodeType
     {
-        ActionEventSoundBanksContainer,
-        ActionEventSoundBank,
-        DialogueEventSoundBanksContainer,
-        DialogueEventSoundBank,
+        SoundBanks,
+        SoundBank,
+        ActionEvents,
+        DialogueEvents,
+        ActionEventType,
         DialogueEvent,
-        StateGroupsContainer,
+        StateGroups,
         StateGroup
     }
 
     public partial class AudioProjectTreeNode : ObservableObject
     {
         public string Name { get; set; }
-        public AudioProjectTreeNodeType NodeType { get; set; }
+        public AudioProjectTreeNodeType Type { get; set; }
+        public Wh3SoundBank GameSoundBank { get; set; }
         public AudioProjectTreeNode Parent { get; set; }
         public ObservableCollection<AudioProjectTreeNode> Children { get; set; } = [];
         [ObservableProperty] bool _isNodeExpanded = false;
         [ObservableProperty] bool _isVisible = true;
-        [ObservableProperty] public string _presetFilterDisplayText;
-        [ObservableProperty] public DialogueEventPreset? _presetFilter = DialogueEventPreset.ShowAll;
+        [ObservableProperty] public string _dialogueEventFilterDisplayText;
+        [ObservableProperty] public Wh3DialogueEventType? _dialogueEventTypeFilter = Wh3DialogueEventType.TypeShowAll;
+        [ObservableProperty] public Wh3DialogueEventUnitProfile? _dialogueEventProfileFilter = Wh3DialogueEventUnitProfile.ProfileShowAll;
 
-        public static AudioProjectTreeNode CreateContainerNode(string name, AudioProjectTreeNodeType nodeType, AudioProjectTreeNode parent = null)
+        public static AudioProjectTreeNode CreateNode(string name, AudioProjectTreeNodeType nodeType, Wh3SoundBank gameSoundBank = Wh3SoundBank.None, AudioProjectTreeNode parent = null)
         {
             return new AudioProjectTreeNode
             {
                 Name = name,
-                NodeType = nodeType,
-                Parent = parent
-            };
-        }
-
-        public static AudioProjectTreeNode CreateChildNode(string name, AudioProjectTreeNodeType nodeType, AudioProjectTreeNode parent)
-        {
-            return new AudioProjectTreeNode
-            {
-                Name = name,
-                NodeType = nodeType,
+                Type = nodeType,
+                GameSoundBank = gameSoundBank,
                 Parent = parent
             };
         }
@@ -61,30 +56,30 @@ namespace Editors.Audio.AudioEditor.AudioProjectExplorer
             return null;
         }
 
-        public bool IsActionEventSoundBank()
+        public bool IsActionEvent()
         {
-            if (NodeType == AudioProjectTreeNodeType.ActionEventSoundBank)
+            if (Type == ActionEventType)
                 return true;
             return false;
         }
 
-        public bool IsDialogueEventSoundBank()
+        public bool IsDialogueEvents()
         {
-            if (NodeType == AudioProjectTreeNodeType.DialogueEventSoundBank)
+            if (Name == AudioProjectTreeBuilderService.DialogueEventsNodeName)
                 return true;
             return false;
         }
 
         public bool IsDialogueEvent()
         {
-            if (NodeType == AudioProjectTreeNodeType.DialogueEvent)
+            if (Type == DialogueEvent)
                 return true;
             return false;
         }
 
         public bool IsStateGroup()
         {
-            if (NodeType == AudioProjectTreeNodeType.StateGroup)
+            if (Type == StateGroup)
                 return true;
             return false;
         }

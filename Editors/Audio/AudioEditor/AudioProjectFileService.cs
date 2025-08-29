@@ -25,7 +25,7 @@ namespace Editors.Audio.AudioEditor
         IFileSaveService fileSaveService,
         IStandardDialogs standardDialogs,
         ApplicationSettingsService applicationSettingsService,
-        IntegrityChecker integrityChecker) : IAudioProjectFileService
+        IAudioProjectIntegrityService audioProjectIntegrityService) : IAudioProjectFileService
     {
         private readonly IEventHub _eventHub = eventHub;
         private readonly IAudioEditorStateService _audioEditorStateService = audioEditorStateService;
@@ -33,7 +33,7 @@ namespace Editors.Audio.AudioEditor
         private readonly IFileSaveService _fileSaveService = fileSaveService;
         private readonly IStandardDialogs _standardDialogs = standardDialogs;
         private readonly ApplicationSettingsService _applicationSettingsService = applicationSettingsService;
-        private readonly IntegrityChecker _integrityChecker = integrityChecker;
+        private readonly IAudioProjectIntegrityService _audioProjectIntegrityService = audioProjectIntegrityService;
 
         public void Save(AudioProject audioProject, string fileName, string filePath)
         {
@@ -73,7 +73,7 @@ namespace Editors.Audio.AudioEditor
 
                 _eventHub.Publish(new AudioProjectInitialisedEvent());
 
-                _integrityChecker.CheckAudioProjectDialogueEventIntegrity(dirtyAudioProject);
+                _audioProjectIntegrityService.CheckAudioProjectDialogueEventIntegrity(dirtyAudioProject);
             }
         }
     }

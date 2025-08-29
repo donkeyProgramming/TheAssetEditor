@@ -13,7 +13,7 @@ namespace Editors.Audio.AudioEditor.AudioFilesExplorer
     {
         public string FileName { get; set; }
         public string FilePath { get; set; }
-        public AudioFilesTreeNodeType NodeType { get; set; }
+        public AudioFilesTreeNodeType Type { get; set; }
         public AudioFilesTreeNode Parent { get; set; }
         public ObservableCollection<AudioFilesTreeNode> Children { get; set; } = [];
         [ObservableProperty] bool _isNodeExpanded = false;
@@ -24,7 +24,7 @@ namespace Editors.Audio.AudioEditor.AudioFilesExplorer
             return new AudioFilesTreeNode
             {
                 FileName = name,
-                NodeType = nodeType,
+                Type = nodeType,
                 Parent = parent,
             };
         }
@@ -34,7 +34,7 @@ namespace Editors.Audio.AudioEditor.AudioFilesExplorer
             return new AudioFilesTreeNode
             {
                 FileName = name,
-                NodeType = nodeType,
+                Type = nodeType,
                 Parent = parent
             };
         }

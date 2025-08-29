@@ -1,9 +1,10 @@
 ﻿using System.Collections.Generic;
 using System.Data;
 using Editors.Audio.AudioEditor.AudioProjectExplorer;
-using Editors.Audio.AudioEditor.Presentation.Table;
-using Shared.Core.Events;
 using Editors.Audio.AudioEditor.Events;
+using Editors.Audio.AudioEditor.Presentation.Table;
+using Editors.Audio.GameInformation.Warhammer3;
+using Shared.Core.Events;
 
 namespace Editors.Audio.AudioEditor.AudioProjectViewer.Table
 {
@@ -12,7 +13,7 @@ namespace Editors.Audio.AudioEditor.AudioProjectViewer.Table
         private readonly IEventHub _eventHub = eventHub;
         private readonly IAudioEditorStateService _audioEditorStateService = audioEditorStateService;
 
-        public AudioProjectTreeNodeType NodeType => AudioProjectTreeNodeType.ActionEventSoundBank;
+        public AudioProjectTreeNodeType NodeType => AudioProjectTreeNodeType.ActionEventType;
 
         public void Load(DataTable table)
         {
@@ -54,7 +55,8 @@ namespace Editors.Audio.AudioEditor.AudioProjectViewer.Table
 
         public void InitialiseTable(DataTable table)
         {
-            var soundBankName = _audioEditorStateService.SelectedAudioProjectExplorerNode.Name;
+            var actionEventName = _audioEditorStateService.SelectedAudioProjectExplorerNode.Name;
+            var soundBankName = Wh3SoundBankInformation.GetName(Wh3ActionEventInformation.GetSoundBank(actionEventName));
             var soundBank = _audioEditorStateService.AudioProject.GetSoundBank(soundBankName);
             foreach (var actionEvent in soundBank.ActionEvents)
             {

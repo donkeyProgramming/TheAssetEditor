@@ -2,10 +2,10 @@
 using System.Data;
 using System.Linq;
 using Editors.Audio.AudioEditor.AudioProjectExplorer;
+using Editors.Audio.AudioEditor.Events;
 using Editors.Audio.AudioEditor.Presentation.Table;
 using Editors.Audio.Storage;
 using Shared.Core.Events;
-using Editors.Audio.AudioEditor.Events;
 
 namespace Editors.Audio.AudioEditor.AudioProjectViewer.Table
 {
@@ -66,7 +66,8 @@ namespace Editors.Audio.AudioEditor.AudioProjectViewer.Table
 
         public void InitialiseTable(DataTable table)
         {
-            var dialogueEvent = _audioEditorStateService.AudioProject.GetDialogueEvent(_audioEditorStateService.SelectedAudioProjectExplorerNode.Name);
+            var dialogueEventName = _audioEditorStateService.SelectedAudioProjectExplorerNode.Name;
+            var dialogueEvent = _audioEditorStateService.AudioProject.GetDialogueEvent(dialogueEventName);
             var stateGroupsWithQualifiers = _audioRepository.QualifiedStateGroupLookupByStateGroupByDialogueEvent[dialogueEvent.Name];
             foreach (var statePath in dialogueEvent.StatePaths)
             {

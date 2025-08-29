@@ -33,11 +33,9 @@
         </GridSplitter>
 
         <Menu Grid.ColumnSpan="3">
-            <MenuItem Header="_File">
-                <MenuItem Header="Load all bnks" Click="{s:MethodBinding LoadAllBnksAction}" IsEnabled="False"/>
-                <MenuItem Header="Load one bnks" Click="{s:MethodBinding BrowseBnkAction}" IsEnabled="False"/>
-                <MenuItem Header="Export id list" Click="{s:MethodBinding ExportIdListAction}"/>
+            <MenuItem Header="File">
                 <MenuItem Header="Load Hirc From Id" Click="{s:MethodBinding LoadHircFromIdAction}"/>
+                <MenuItem Header="Export Dialogue Events Using State" Click="{s:MethodBinding ExportStatePathsUsingState}" IsEnabled="True"/>
             </MenuItem>
         </Menu>
 

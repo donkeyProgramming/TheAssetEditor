@@ -4,13 +4,13 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Editors.Audio.AudioEditor.Events;
 using Editors.Audio.AudioEditor.Models;
+using Editors.Audio.GameInformation.Warhammer3;
 using Serilog;
 using Shared.Core.ErrorHandling;
 using Shared.Core.Events;
 using Shared.Core.PackFiles;
 using Shared.Core.Services;
 using Shared.Core.Settings;
-using static Editors.Audio.GameSettings.Warhammer3.Languages;
 
 namespace Editors.Audio.AudioEditor.NewAudioProject
 {
@@ -30,8 +30,8 @@ namespace Editors.Audio.AudioEditor.NewAudioProject
         // Settings properties
         [ObservableProperty] private string _audioProjectFileName;
         [ObservableProperty] private string _audioProjectDirectory;
-        [ObservableProperty] private GameLanguage _selectedLanguage;
-        [ObservableProperty] private ObservableCollection<GameLanguage> _languages = new(Enum.GetValues<GameLanguage>());
+        [ObservableProperty] private Wh3GameLanguage _selectedLanguage;
+        [ObservableProperty] private ObservableCollection<Wh3GameLanguage> _languages = new(Enum.GetValues<Wh3GameLanguage>());
 
         // Ok button enablement
         [ObservableProperty] private bool _isAudioProjectFileNameSet;
@@ -55,7 +55,7 @@ namespace Editors.Audio.AudioEditor.NewAudioProject
             _standardDialogs = standardDialogs;
 
             AudioProjectDirectory = "audio_projects";
-            SelectedLanguage = GameLanguage.EnglishUK;
+            SelectedLanguage = Wh3GameLanguage.EnglishUK;
         }
 
         partial void OnAudioProjectFileNameChanged(string value)
@@ -70,7 +70,7 @@ namespace Editors.Audio.AudioEditor.NewAudioProject
             UpdateOkButtonIsEnabled();
         }
 
-        partial void OnSelectedLanguageChanged(GameLanguage value)
+        partial void OnSelectedLanguageChanged(Wh3GameLanguage value)
         {
             IsLanguageSelected = !string.IsNullOrEmpty(value.ToString());
             UpdateOkButtonIsEnabled();
@@ -103,7 +103,7 @@ namespace Editors.Audio.AudioEditor.NewAudioProject
             var currentGame = _applicationSettingsService.CurrentSettings.CurrentGame;
             var fileName = $"{AudioProjectFileName}.aproj";
             var filePath = $"{AudioProjectDirectory}\\{fileName}";
-            var language = GameLanguageStringLookup[SelectedLanguage];
+            var language = Wh3LanguageInformation.GetGameLanguageAsString(SelectedLanguage);
 
             var audioProject = AudioProject.Create(currentGame, language);
             _audioProjectFileService.Save(audioProject, fileName, filePath);

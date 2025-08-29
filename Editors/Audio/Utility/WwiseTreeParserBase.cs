@@ -15,15 +15,15 @@ namespace Editors.Audio.Utility
         protected ILogger _logger = Logging.Create<WwiseTreeParserBase>();
 
         protected Dictionary<AkBkHircType, Action<HircItem, HircTreeItem>> _hircProcessChildMap = [];
-        protected readonly IAudioRepository _repository;
+        protected readonly IAudioRepository _audioRepository;
 
         protected readonly bool _showId;
         protected readonly bool _showOwningBnkFile;
         protected readonly bool _filterByBnkName;
 
-        public WwiseTreeParserBase(IAudioRepository repository, bool showId, bool showOwningBnkFile, bool filterByBnkName)
+        public WwiseTreeParserBase(IAudioRepository audioRepository, bool showId, bool showOwningBnkFile, bool filterByBnkName)
         {
-            _repository = repository;
+            _audioRepository = audioRepository;
             _showId = showId;
             _showOwningBnkFile = showOwningBnkFile;
             _filterByBnkName = filterByBnkName;
@@ -44,7 +44,6 @@ namespace Editors.Audio.Utility
             var rootNode = BuildHierarchy(item);
 
             var flatList = GetHircParents(rootNode);
-            //flatList.Reverse();
             return flatList;
         }
 
@@ -79,7 +78,7 @@ namespace Editors.Audio.Utility
             if (hircId == 0)
                 return;
 
-            var instances = _repository.GetHircObject(hircId);
+            var instances = _audioRepository.GetHircObject(hircId);
             var hircItem = instances.FirstOrDefault();
             if (hircItem == null)
                 parent.Children.Add(new HircTreeItem() { DisplayName = $"Error: Unable to find Id {hircId}" });
@@ -96,7 +95,7 @@ namespace Editors.Audio.Utility
 
         protected virtual string GetDisplayId(uint id, string fileName, bool hidenNameIfMissing)
         {
-            var name = _repository.GetNameFromId(id, out var found);
+            var name = _audioRepository.GetNameFromId(id, out var found);
             if (hidenNameIfMissing)
                 name = "";
             if (found == true && _showId)

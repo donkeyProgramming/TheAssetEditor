@@ -3,52 +3,22 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
 using Editors.Audio.AudioEditor.Models;
+using Editors.Audio.GameInformation.Warhammer3;
 using Editors.Audio.Storage;
-using static Editors.Audio.GameSettings.Warhammer3.DialogueEvents;
-using static Editors.Audio.GameSettings.Warhammer3.SoundBanks;
 
 namespace Editors.Audio.AudioEditor
 {
     // TODO: Probably need something to check all audio files in the project are where they say they are
-    public class IntegrityChecker
+    public interface IAudioProjectIntegrityService
     {
-        private readonly IAudioRepository _audioRepository;
+        void CheckAudioProjectDialogueEventIntegrity(AudioProject audioProject);
 
-        public IntegrityChecker(IAudioRepository audioRepository)
-        {
-            _audioRepository = audioRepository;
-        }
+        void CheckDialogueEventInformationIntegrity(List<Wh3DialogueEventDefinition> dialogueEventData);
+    }
 
-        public void CheckDialogueEventIntegrity(List<(string Name, Wh3SoundBankSubtype SoundBank, DialogueEventPreset[] DialogueEventPreset, bool Recommended)> dialogueEventData)
-        {
-            var gameDialogueEvents = _audioRepository.StateGroupsLookupByDialogueEvent.Keys.ToList();
-            var audioEditorDialogueEvents = dialogueEventData.Select(data => data.Name).ToList();
-
-            var areGameAndAudioEditorDialogueEventsMatching = new HashSet<string>(gameDialogueEvents).SetEquals(audioEditorDialogueEvents);
-
-            if (!areGameAndAudioEditorDialogueEventsMatching)
-            {
-                var dialogueEventsOnlyInGame = gameDialogueEvents.Except(audioEditorDialogueEvents).ToList();
-                var dialogueEventsOnlyInAudioEditor = audioEditorDialogueEvents.Except(gameDialogueEvents).ToList();
-
-                var dialogueEventsOnlyInGameText = string.Join("\n - ", dialogueEventsOnlyInGame);
-                var dialogueEventsOnlyInAudioEditorText = string.Join("\n - ", dialogueEventsOnlyInAudioEditor);
-
-                var message = $"Dialogue Event integrity check failed." +
-                    $"\n\nThis is due to a change in the game's Dialogue Events by CA." +
-                    $"\n\nPlease report this error to the AssetEditor development team.";
-                var dialogueEventsOnlyInGameMessage = $"\n\nGame Dialogue Events not in the Audio Editor:\n - {dialogueEventsOnlyInGameText}";
-                var dialogueEventsOnlyInAudioEditorMessage = $"\n\nAudio Editor Dialogue Events not in the game:\n - {dialogueEventsOnlyInAudioEditorText}";
-
-                if (dialogueEventsOnlyInGame.Count > 0)
-                    message += dialogueEventsOnlyInGameMessage;
-
-                if (dialogueEventsOnlyInAudioEditor.Count > 0)
-                    message += dialogueEventsOnlyInAudioEditorMessage;
-
-                MessageBox.Show(message, "Error");
-            }
-        }
+    public class AudioProjectIntegrityService(IAudioRepository audioRepository) : IAudioProjectIntegrityService
+    {
+        private readonly IAudioRepository _audioRepository = audioRepository;
 
         public void CheckAudioProjectDialogueEventIntegrity(AudioProject audioProject)
         {
@@ -64,7 +34,7 @@ namespace Editors.Audio.AudioEditor
 
             foreach (var soundBank in audioProject.SoundBanks)
             {
-                if (soundBank.SoundBankType == Wh3SoundBankType.DialogueEventSoundBank)
+                if (Wh3DialogueEventInformation.Contains(soundBank.GameSoundBank))
                 {
                     foreach (var dialogueEvent in soundBank.DialogueEvents)
                     {
@@ -93,6 +63,36 @@ namespace Editors.Audio.AudioEditor
 
             if (hasIntegrityError)
                 MessageBox.Show(message, "Error");
+        }
+
+        public void CheckDialogueEventInformationIntegrity(List<Wh3DialogueEventDefinition> information)
+        {
+            var exclusions = new List<string>{"New_Dialogue_Event", "Battle_Individual_Melee_Weapon_Hit"};
+            var gameDialogueEvents = _audioRepository.StateGroupsLookupByDialogueEvent.Keys.Except(exclusions).ToList();
+            var audioEditorDialogueEvents = information.Select(item => item.Name).ToList();
+            var areGameAndAudioEditorDialogueEventsMatching = new HashSet<string>(gameDialogueEvents).SetEquals(audioEditorDialogueEvents);
+            if (!areGameAndAudioEditorDialogueEventsMatching)
+            {
+                var dialogueEventsOnlyInGame = gameDialogueEvents.Except(audioEditorDialogueEvents).ToList();
+                var dialogueEventsOnlyInAudioEditor = audioEditorDialogueEvents.Except(gameDialogueEvents).ToList();
+
+                var dialogueEventsOnlyInGameText = string.Join("\n - ", dialogueEventsOnlyInGame);
+                var dialogueEventsOnlyInAudioEditorText = string.Join("\n - ", dialogueEventsOnlyInAudioEditor);
+
+                var message = $"Dialogue Event integrity check failed." +
+                    $"\n\nThis is due to a change in the game's Dialogue Events by CA." +
+                    $"\n\nPlease report this error to the AssetEditor development team.";
+                var dialogueEventsOnlyInGameMessage = $"\n\nGame Dialogue Events not in the Audio Editor:\n - {dialogueEventsOnlyInGameText}";
+                var dialogueEventsOnlyInAudioEditorMessage = $"\n\nAudio Editor Dialogue Events not in the game:\n - {dialogueEventsOnlyInAudioEditorText}";
+
+                if (dialogueEventsOnlyInGame.Count > 0)
+                    message += dialogueEventsOnlyInGameMessage;
+
+                if (dialogueEventsOnlyInAudioEditor.Count > 0)
+                    message += dialogueEventsOnlyInAudioEditorMessage;
+
+                MessageBox.Show(message, "Error");
+            }
         }
     }
 }

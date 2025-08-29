@@ -12,7 +12,7 @@ using Editors.Audio.AudioEditor.Events;
 using Editors.Audio.AudioEditor.Presentation.Table;
 using Editors.Audio.AudioEditor.Settings;
 using Editors.Audio.AudioEditor.UICommands;
-using Editors.Audio.GameSettings.Warhammer3;
+using Editors.Audio.GameInformation.Warhammer3;
 using Editors.Audio.Storage;
 using Serilog;
 using Shared.Core.ErrorHandling;
@@ -76,17 +76,17 @@ namespace Editors.Audio.AudioEditor.AudioProjectEditor
             ResetTable();
 
             var selectedAudioProjectExplorerNode = e.TreeNode;
-            if (selectedAudioProjectExplorerNode.IsActionEventSoundBank())
+            if (selectedAudioProjectExplorerNode.IsActionEvent())
             {
                 MakeEditorVisible();
                 SetEditorLabel(selectedAudioProjectExplorerNode.Name);
-                Load(selectedAudioProjectExplorerNode.NodeType);
+                Load(selectedAudioProjectExplorerNode.Type);
             }
             else if (selectedAudioProjectExplorerNode.IsDialogueEvent())
             {
                 MakeEditorVisible();
                 SetEditorLabel(TableHelpers.DuplicateUnderscores(selectedAudioProjectExplorerNode.Name));
-                Load(selectedAudioProjectExplorerNode.NodeType);
+                Load(selectedAudioProjectExplorerNode.Type);
 
                 var moddedStatesCount = _audioEditorStateService.AudioProject.StateGroups.SelectMany(stateGroup => stateGroup.States).Count();
                 if (moddedStatesCount > 0)
@@ -96,12 +96,12 @@ namespace Editors.Audio.AudioEditor.AudioProjectEditor
             {
                 MakeEditorVisible();
                 SetEditorLabel(TableHelpers.DuplicateUnderscores(selectedAudioProjectExplorerNode.Name));
-                Load(selectedAudioProjectExplorerNode.NodeType);
+                Load(selectedAudioProjectExplorerNode.Type);
             }
             else
                 return;
 
-            _logger.Here().Information($"Loaded {selectedAudioProjectExplorerNode.NodeType}: {selectedAudioProjectExplorerNode.Name}");
+            _logger.Here().Information($"Loaded {selectedAudioProjectExplorerNode.Type}: {selectedAudioProjectExplorerNode.Name}");
 
             SetAddRowButtonEnablement();
             SetShowModdedStatesOnlyButtonEnablementAndVisibility();
@@ -125,7 +125,7 @@ namespace Editors.Audio.AudioEditor.AudioProjectEditor
                 Table.ImportRow(row);
 
             var selectedAudioProjectExplorerNode = _audioEditorStateService.SelectedAudioProjectExplorerNode;
-            _logger.Here().Information($"Added {selectedAudioProjectExplorerNode.NodeType} row to Audio Project Editor table for {selectedAudioProjectExplorerNode.Name} ");
+            _logger.Here().Information($"Added {selectedAudioProjectExplorerNode.Type} row to Audio Project Editor table for {selectedAudioProjectExplorerNode.Name} ");
         }
 
         private void OnEditorDataGridColumnAddRequested(EditorDataGridColumnAddRequestedEvent e) => AddDataGridColumns(e.Column);
@@ -147,12 +147,12 @@ namespace Editors.Audio.AudioEditor.AudioProjectEditor
 
             // Re-initialise table
             var selectedAudioProjectExplorerNode = _audioEditorStateService.SelectedAudioProjectExplorerNode;
-            var dataGridService = _tableServiceFactory.GetService(selectedAudioProjectExplorerNode.NodeType);
+            var dataGridService = _tableServiceFactory.GetService(selectedAudioProjectExplorerNode.Type);
             dataGridService.InitialiseTable(Table);
 
             // Handle enablement last because the row needs to be cleared before being checked
             SetAddRowButtonEnablement();
-        }
+        }   
 
         private void OnViewerTableRowEdited(ViewerTableRowEditedEvent e)
         {
@@ -167,9 +167,8 @@ namespace Editors.Audio.AudioEditor.AudioProjectEditor
         private void SetAudioFiles(ObservableCollection<AudioFile> audioFiles)
         {
             var selectedAudioProjectExplorerNode = _audioEditorStateService.SelectedAudioProjectExplorerNode;
-
-            if (selectedAudioProjectExplorerNode.IsActionEventSoundBank() 
-                && selectedAudioProjectExplorerNode.Name != SoundBanks.MoviesDisplayString 
+            if (selectedAudioProjectExplorerNode.IsActionEvent() 
+                && selectedAudioProjectExplorerNode.Name != Wh3ActionEventInformation.GetName(Wh3ActionEventType.Movies)
                 && audioFiles.Count == 1)
             {
                 var row = Table.Rows[0];
@@ -214,7 +213,7 @@ namespace Editors.Audio.AudioEditor.AudioProjectEditor
             if (selectedAudioProjectExplorerNode.IsDialogueEvent())
             {
                 Table.Clear();
-                Load(selectedAudioProjectExplorerNode.NodeType);
+                Load(selectedAudioProjectExplorerNode.Type);
             }
         }
 
@@ -265,7 +264,7 @@ namespace Editors.Audio.AudioEditor.AudioProjectEditor
         {
             var row = Table.Rows[0];
             var selectedAudioProjectExplorerNode = _audioEditorStateService.SelectedAudioProjectExplorerNode;
-            if (selectedAudioProjectExplorerNode.IsActionEventSoundBank())
+            if (selectedAudioProjectExplorerNode.IsActionEvent())
             {
                 var actionEventName = TableHelpers.GetActionEventNameFromRow(row);
                 var actionEvent = _audioEditorStateService.AudioProject.GetActionEvent(actionEventName);

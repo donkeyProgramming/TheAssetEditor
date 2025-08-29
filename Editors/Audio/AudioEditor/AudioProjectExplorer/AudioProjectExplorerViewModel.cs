@@ -1,14 +1,15 @@
-﻿using System.Collections.ObjectModel;
+﻿using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.IO;
 using System.Linq;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Editors.Audio.AudioEditor.Events;
 using Editors.Audio.AudioEditor.Presentation.Table;
-using Editors.Audio.GameSettings.Warhammer3;
+using Editors.Audio.GameInformation.Warhammer3;
 using Serilog;
 using Shared.Core.ErrorHandling;
 using Shared.Core.Events;
-using static Editors.Audio.GameSettings.Warhammer3.DialogueEvents;
 
 namespace Editors.Audio.AudioEditor.AudioProjectExplorer
 {
@@ -22,10 +23,14 @@ namespace Editors.Audio.AudioEditor.AudioProjectExplorer
         private readonly ILogger _logger = Logging.Create<AudioProjectExplorerViewModel>();
 
         [ObservableProperty] private string _audioProjectExplorerLabel;
-        [ObservableProperty] private bool _showEditedAudioProjectItemsOnly;
-        [ObservableProperty] private bool _isDialogueEventPresetFilterEnabled = false;
-        [ObservableProperty] private DialogueEventPreset? _selectedDialogueEventPreset;
-        [ObservableProperty] private ObservableCollection<DialogueEventPreset> _dialogueEventPresets = [];
+        [ObservableProperty] private bool _showEditedItemsOnly;
+        [ObservableProperty] private bool _showActionEvents = true;
+        [ObservableProperty] private bool _showDialogueEvents = true;
+        [ObservableProperty] private bool _isDialogueEventFilterEnabled = false;
+        [ObservableProperty] private ObservableCollection<Wh3DialogueEventType> _dialogueEventTypes = [];
+        [ObservableProperty] private Wh3DialogueEventType? _selectedDialogueEventType;
+        [ObservableProperty] private ObservableCollection<Wh3DialogueEventUnitProfile> _dialogueEventProfiles = [];
+        [ObservableProperty] private Wh3DialogueEventUnitProfile? _selectedDialogueEventProfile;
         [ObservableProperty] private string _searchQuery;
         [ObservableProperty] public ObservableCollection<AudioProjectTreeNode> _audioProjectTree = [];
         [ObservableProperty] public AudioProjectTreeNode _selectedNode;
@@ -49,9 +54,9 @@ namespace Editors.Audio.AudioEditor.AudioProjectExplorer
         private void OnAudioProjectInitialised(AudioProjectInitialisedEvent e)
         {
             var audioProject = _audioEditorStateService.AudioProject;
-            AudioProjectTree = _audioProjectTreeBuilder.BuildTree(audioProject, ShowEditedAudioProjectItemsOnly);
+            AudioProjectTree = _audioProjectTreeBuilder.BuildTree(audioProject, ShowEditedItemsOnly);
 
-            var audioProjectFileName = _audioEditorStateService.AudioProjectFileName.Replace(".aproj", string.Empty);
+            var audioProjectFileName = Path.GetFileNameWithoutExtension(_audioEditorStateService.AudioProjectFileName);
             AudioProjectExplorerLabel = $"Audio Project Explorer - {TableHelpers.DuplicateUnderscores(audioProjectFileName)}";
         }
 
@@ -61,11 +66,11 @@ namespace Editors.Audio.AudioEditor.AudioProjectExplorer
 
             _eventHub.Publish(new AudioProjectExplorerNodeSelectedEvent(SelectedNode));
 
-            IsDialogueEventPresetFilterEnabled = false;
+            IsDialogueEventFilterEnabled = false;
 
-            if (SelectedNode.IsDialogueEventSoundBank())
+            if (SelectedNode.IsDialogueEvents())
             {
-                InitialiseDialogueEventPresetFilter();
+                InitialiseDialogueEventFilters();
                 _logger.Here().Information($"Loaded Dialogue Event SoundBank: {SelectedNode.Name}");
             }
         }
@@ -75,71 +80,133 @@ namespace Editors.Audio.AudioEditor.AudioProjectExplorer
             if (AudioProjectTree is null)
                 return;
 
-            var filterSettings = new AudioProjectTreeFilterSettings(
-                SearchQuery,
-                ShowEditedAudioProjectItemsOnly,
-                _audioEditorStateService.AudioProject);
-
+            var filterSettings = new AudioProjectTreeFilterSettings(SearchQuery, ShowEditedItemsOnly, ShowActionEvents, ShowDialogueEvents);
             _audioProjectTreeFilterService.FilterTree(AudioProjectTree, filterSettings);
         }
 
-        partial void OnSelectedDialogueEventPresetChanged(DialogueEventPreset? value)
+        partial void OnSelectedDialogueEventTypeChanged(Wh3DialogueEventType? value)
         {
-            if (SelectedNode?.IsDialogueEventSoundBank() != true)
-                return;
-
-            SelectedNode.PresetFilter = value ?? DialogueEventPreset.ShowAll;
-
-            // Set the filtered by text
-            SelectedNode.PresetFilterDisplayText = value.HasValue && value.Value != DialogueEventPreset.ShowAll
-                ? $" (Filtered by {GetDialogueEventPresetDisplayString(value.Value)} preset)"
-                : null;
-
+            SelectedNode.DialogueEventTypeFilter = value ?? Wh3DialogueEventType.TypeShowAll;
+            SetDialogueEventFilterDisplayText();
             FilterAudioProjectTree();
+        }
+
+        partial void OnSelectedDialogueEventProfileChanged(Wh3DialogueEventUnitProfile? value)
+        {
+            SelectedNode.DialogueEventProfileFilter = value ?? Wh3DialogueEventUnitProfile.ProfileShowAll;
+            SetDialogueEventFilterDisplayText();
+            FilterAudioProjectTree();
+        }
+
+        private void SetDialogueEventFilterDisplayText()
+        {
+            var setTypeFilterText = SelectedDialogueEventType != null && SelectedDialogueEventType != Wh3DialogueEventType.TypeShowAll;
+            var setProfileFilterText = SelectedDialogueEventProfile != null && SelectedDialogueEventProfile != Wh3DialogueEventUnitProfile.ProfileShowAll;
+            if (setTypeFilterText && setProfileFilterText)
+            {
+                var typeFilterText = $"Type: {Wh3DialogueEventInformation.GetDialogueEventTypeDisplayName(SelectedDialogueEventType)}";
+                var profileFilterText = $"Profile: {Wh3DialogueEventInformation.GetDialogueEventProfileDisplayName(SelectedDialogueEventProfile)}";
+                SelectedNode.DialogueEventFilterDisplayText = $"({typeFilterText}, {profileFilterText})";
+            }
+            else if (setTypeFilterText)
+            {
+                var typeFilterText = $"Type: {Wh3DialogueEventInformation.GetDialogueEventTypeDisplayName(SelectedDialogueEventType)}";
+                SelectedNode.DialogueEventFilterDisplayText = $"({typeFilterText})";
+            }
+            else if (setProfileFilterText)
+            {
+                var profileFilterText = $"Profile: {Wh3DialogueEventInformation.GetDialogueEventProfileDisplayName(SelectedDialogueEventProfile)}";
+                SelectedNode.DialogueEventFilterDisplayText = $"({profileFilterText})";
+            }
+            else
+                SelectedNode.DialogueEventFilterDisplayText = null;
         }
 
         partial void OnSearchQueryChanged(string value) => FilterAudioProjectTree();
 
-        partial void OnShowEditedAudioProjectItemsOnlyChanged(bool value) => FilterAudioProjectTree();
+        partial void OnShowEditedItemsOnlyChanged(bool value) => FilterAudioProjectTree();
 
-        [RelayCommand] public void CollapseOrExpandAudioProjectTree() => CollapseAndExpandNodes();
+        partial void OnShowActionEventsChanged(bool value) => FilterAudioProjectTree();
 
-        private void CollapseAndExpandNodes()
+        partial void OnShowDialogueEventsChanged(bool value) => FilterAudioProjectTree();
+
+        [RelayCommand] public void CollapseOrExpandTree()
         {
-            foreach (var node in AudioProjectTree)
+            var isExpanded = AudioProjectTree.Any(node => node.IsNodeExpanded);
+            foreach (var rootNode in AudioProjectTree)
+                ToggleNodeExpansion(rootNode, !isExpanded);
+        }
+
+        private static void ToggleNodeExpansion(AudioProjectTreeNode node, bool shouldExpand)
+        {
+            node.IsNodeExpanded = shouldExpand;
+            foreach (var child in node.Children)
+                ToggleNodeExpansion(child, shouldExpand);
+        }
+
+        private void InitialiseDialogueEventFilters()
+        {
+            var soundBankName = Wh3SoundBankInformation.GetName(SelectedNode.GameSoundBank);
+            var soundBank = Wh3SoundBankInformation.GetSoundBank(soundBankName);
+
+            DialogueEventTypes = new ObservableCollection<Wh3DialogueEventType>(Wh3DialogueEventInformation.Information
+                .Where(dialogueEventDefinition => dialogueEventDefinition.SoundBank == soundBank)
+                .SelectMany(dialogueEventDefinition => dialogueEventDefinition.DialogueEventTypes)
+                .Distinct()
+                .OrderBy(type => (int)type)); //Order by enum order
+
+            DialogueEventProfiles = new ObservableCollection<Wh3DialogueEventUnitProfile>(Wh3DialogueEventInformation.Information
+                .Where(dialogueEventDefinition => dialogueEventDefinition.SoundBank == soundBank)
+                .SelectMany(dialogueEventDefinition => dialogueEventDefinition.UnitProfiles)
+                .Distinct()
+                .OrderBy(profile => (int)profile)); //Order by enum order
+
+            if (SelectedNode.DialogueEventTypeFilter != null && SelectedNode.DialogueEventTypeFilter != Wh3DialogueEventType.TypeShowAll)
+                SelectedDialogueEventType = SelectedNode.DialogueEventTypeFilter;
+            else
+                ResetDialogueEventTypeFilterComboBoxSelectedItem();
+
+            if (SelectedNode.DialogueEventProfileFilter != null && SelectedNode.DialogueEventProfileFilter != Wh3DialogueEventUnitProfile.ProfileShowAll)
+                SelectedDialogueEventProfile = SelectedNode.DialogueEventProfileFilter;
+            else
+                ResetDialogueEventProfileFilterComboBoxSelectedItem();
+
+            IsDialogueEventFilterEnabled = true;
+        }
+
+        [RelayCommand] public void ResetFilters()
+        {
+            ShowEditedItemsOnly = false;
+            ShowActionEvents = true;
+            ShowDialogueEvents = true;
+            ResetSearchQuery();
+
+            var dialogueEventNodes = FlattenAudioProjectTree(AudioProjectTree)
+                .Where(node => node.Name == AudioProjectTreeBuilderService.DialogueEventsNodeName)
+                .ToList();
+            foreach (var dialogueEventNode in dialogueEventNodes)
             {
-                node.IsNodeExpanded = !node.IsNodeExpanded;
-                CollapseAndExpandNodesInner(node);
+                dialogueEventNode.DialogueEventTypeFilter = Wh3DialogueEventType.TypeShowAll;
+                dialogueEventNode.DialogueEventProfileFilter = Wh3DialogueEventUnitProfile.ProfileShowAll;
+                dialogueEventNode.DialogueEventFilterDisplayText = null;
             }
         }
 
-        private static void CollapseAndExpandNodesInner(AudioProjectTreeNode parentNode)
+        private static IEnumerable<AudioProjectTreeNode> FlattenAudioProjectTree(IEnumerable<AudioProjectTreeNode> nodes)
         {
-            foreach (var node in parentNode.Children)
+            foreach (var node in nodes)
             {
-                node.IsNodeExpanded = !node.IsNodeExpanded;
-                CollapseAndExpandNodesInner(node);
+                yield return node;
+
+                foreach (var child in FlattenAudioProjectTree(node.Children))
+                    yield return child;
             }
         }
 
-        [RelayCommand] public void ClearFilterText() => SearchQuery = "";
+        [RelayCommand] public void ResetSearchQuery() => SearchQuery = "";
 
-        private void InitialiseDialogueEventPresetFilter()
-        {
-            var soundBankSubtype = SoundBanks.GetSoundBankSubtype(SelectedNode.Name);
+        public void ResetDialogueEventTypeFilterComboBoxSelectedItem() => SelectedDialogueEventType = null;
 
-            DialogueEventPresets = new ObservableCollection<DialogueEventPreset>(DialogueEventData
-                .Where(dialogueEvent => dialogueEvent.SoundBank == soundBankSubtype)
-                .SelectMany(dialogueEvent => dialogueEvent.DialogueEventPreset)
-                .Distinct());
-
-            SelectedDialogueEventPreset = SelectedNode.PresetFilter != DialogueEventPreset.ShowAll
-                    ? SelectedNode.PresetFilter
-                    : null;
-
-            IsDialogueEventPresetFilterEnabled = true;
-        }
-
-        public void ResetDialogueEventFilterComboBoxSelectedItem() => SelectedDialogueEventPreset = null;
+        public void ResetDialogueEventProfileFilterComboBoxSelectedItem() => SelectedDialogueEventProfile = null;
     }
 }

@@ -3,7 +3,7 @@ using System.Data;
 using Editors.Audio.AudioEditor.AudioProjectExplorer;
 using Editors.Audio.AudioEditor.Events;
 using Editors.Audio.AudioEditor.Presentation.Table;
-using Editors.Audio.GameSettings.Warhammer3;
+using Editors.Audio.GameInformation.Warhammer3;
 using Shared.Core.Events;
 
 namespace Editors.Audio.AudioEditor.AudioProjectEditor.Table
@@ -17,7 +17,7 @@ namespace Editors.Audio.AudioEditor.AudioProjectEditor.Table
         private readonly IEventHub _eventHub = eventHub;
         private readonly IAudioEditorStateService _audioEditorStateService = audioEditorStateService;
 
-        public AudioProjectTreeNodeType NodeType => AudioProjectTreeNodeType.ActionEventSoundBank;
+        public AudioProjectTreeNodeType NodeType => AudioProjectTreeNodeType.ActionEventType;
 
         public void Load(DataTable table)
         {
@@ -50,7 +50,7 @@ namespace Editors.Audio.AudioEditor.AudioProjectEditor.Table
             var columnWidth = 1.0 / columnsCount;
 
             var selectedAudioProjectExplorerNode = _audioEditorStateService.SelectedAudioProjectExplorerNode;
-            if (selectedAudioProjectExplorerNode.Name == SoundBanks.MoviesDisplayString)
+            if (selectedAudioProjectExplorerNode.Name == Wh3ActionEventInformation.GetName(Wh3ActionEventType.Movies))
             {
                 var fileSelectColumnHeader = TableInfo.BrowseMovieColumnName;
                 var fileSelectColumn = DataGridTemplates.CreateColumnTemplate(fileSelectColumnHeader, 85, useAbsoluteWidth: true);
@@ -80,7 +80,7 @@ namespace Editors.Audio.AudioEditor.AudioProjectEditor.Table
             var eventName = string.Empty;
 
             var selectedAudioProjectExplorerNode = _audioEditorStateService.SelectedAudioProjectExplorerNode.Name;
-            if (selectedAudioProjectExplorerNode != SoundBanks.MoviesDisplayString)
+            if (selectedAudioProjectExplorerNode != Wh3ActionEventInformation.GetName(Wh3ActionEventType.Movies))
                 eventName = "Play_";
 
             var row = editorTable.NewRow();

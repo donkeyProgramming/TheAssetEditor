@@ -1,4 +1,6 @@
-﻿using System.Collections.ObjectModel;
+﻿using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.IO;
 using System.Linq;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -164,6 +166,38 @@ namespace Editors.Audio.AudioExplorer
 
                 var hircAsString = JsonSerializer.Serialize<object[]>(foundHircItems.ToArray(), new JsonSerializerOptions() { Converters = { new JsonStringEnumConverter() }, WriteIndented = true });
                 SelectedNodeText.Value = hircAsString;
+            }
+        }
+
+        public void ExportStatePathsUsingState()
+        {
+            var outputPath = @"C:\Users\george\Desktop\state_paths_using_state.txt";
+            using var writer = new StreamWriter(outputPath, false);
+
+            var helper = new DecisionPathHelper(_audioRepository);
+            var dialogueEvents = _audioRepository.GetHircItemsByType<ICAkDialogueEvent>();
+            foreach (var dialogueEvent in dialogueEvents)
+            {
+                var asHirc = dialogueEvent as HircItem;
+                var dialogueEventName = _audioRepository.GetNameFromId(asHirc.Id);
+
+                var decisionPathCollection = helper.GetDecisionPaths(dialogueEvent);
+                var stateGroups = decisionPathCollection.Header.GetAsString();
+                var processedDialogueEvents = new List<string>();
+
+                foreach (var statePath in decisionPathCollection.Paths)
+                {
+                    var statePathString = statePath.GetAsString();
+                    if (statePathString.Contains("wh3_dlc26_vo_actor_Ogres_Bragg_the_Gutsman"))
+                    {
+                        if (!processedDialogueEvents.Contains(dialogueEventName))
+                        {
+                            processedDialogueEvents.Add(dialogueEventName);
+                            writer.WriteLine($"{dialogueEventName} [{stateGroups}]");
+                            writer.WriteLine($"    {statePathString}");
+                        }
+                    }
+                }
             }
         }
     }

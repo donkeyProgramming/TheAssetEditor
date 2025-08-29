@@ -167,7 +167,7 @@ namespace Editors.Audio.AudioEditor.Settings
         private void SetSettingsUsability()
         {
             var selectedAudioProjectExplorerNode = _audioEditorStateService.SelectedAudioProjectExplorerNode;
-            if (!selectedAudioProjectExplorerNode.IsDialogueEvent() && !selectedAudioProjectExplorerNode.IsActionEventSoundBank())
+            if (!selectedAudioProjectExplorerNode.IsDialogueEvent() && !selectedAudioProjectExplorerNode.IsActionEvent())
                 return;
 
             IsSettingsVisible = true;
@@ -308,7 +308,7 @@ namespace Editors.Audio.AudioEditor.Settings
             var audioFiles = new List<AudioFile>();
 
             var selectedAudioProjectExplorerNode = _audioEditorStateService.SelectedAudioProjectExplorerNode;
-            if (selectedAudioProjectExplorerNode.IsActionEventSoundBank())
+            if (selectedAudioProjectExplorerNode.IsActionEvent())
             {
                 var selectedViewerRow = _audioEditorStateService.SelectedViewerRows[0];
                 var actionEventName = TableHelpers.GetActionEventNameFromRow(selectedViewerRow);

@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Globalization;
 using System.Windows.Data;
+using Editors.Audio.GameInformation.Warhammer3;
 using static Editors.Audio.AudioEditor.Settings.Settings;
-using static Editors.Audio.GameSettings.Warhammer3.DialogueEvents;
-using static Editors.Audio.GameSettings.Warhammer3.Languages;
-using static Editors.Audio.GameSettings.Warhammer3.SoundBanks;
 
 namespace Editors.Audio.AudioEditor.Converters
 {
@@ -14,12 +12,12 @@ namespace Editors.Audio.AudioEditor.Converters
         {
             if (value == null)
                 return value;
-            else if (value is GameLanguage language)
-                return GameLanguageStringLookup[language];
-            else if (value is Wh3SoundBankSubtype soundBank)
-                return GetSoundBankSubTypeString(soundBank);
-            else if (value is DialogueEventPreset dialogueEventSubtype)
-                return GetDialogueEventPresetDisplayString(dialogueEventSubtype);
+            else if (value is Wh3GameLanguage language)
+                return Wh3LanguageInformation.GetGameLanguageAsString(language);
+            else if (value is Wh3DialogueEventType dialogueEventType)
+                return Wh3DialogueEventInformation.GetDialogueEventTypeDisplayName(dialogueEventType);
+            else if (value is Wh3DialogueEventUnitProfile dialogueEventProfile)
+                return Wh3DialogueEventInformation.GetDialogueEventProfileDisplayName(dialogueEventProfile);
             else if (value is PlaylistType playlistType)
                 return PlaylistTypeStringLookup[playlistType];
             else if (value is PlaylistMode playlistMode)

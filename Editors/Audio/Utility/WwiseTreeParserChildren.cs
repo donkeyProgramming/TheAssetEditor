@@ -30,10 +30,10 @@ namespace Editors.Audio.Utility
         {
             var hirc = GetAsType<ICAkDialogueEvent>(item);
 
-            var helper = new DecisionPathHelper(_repository);
+            var helper = new DecisionPathHelper(_audioRepository);
             var paths = helper.GetDecisionPaths(hirc);
 
-            var dialogueEventNode = new HircTreeItem() { DisplayName = $"Dialogue Event {_repository.GetNameFromId(item.Id)} - [{paths.Header.GetAsString()}]", Item = item };
+            var dialogueEventNode = new HircTreeItem() { DisplayName = $"Dialogue Event {_audioRepository.GetNameFromId(item.Id)} - [{paths.Header.GetAsString()}]", Item = item };
             parent.Children.Add(dialogueEventNode);
 
             foreach (var path in paths.Paths)
@@ -44,17 +44,17 @@ namespace Editors.Audio.Utility
             }
         }
 
-        void ProcessEvent(HircItem item, HircTreeItem parent)
+        private void ProcessEvent(HircItem item, HircTreeItem parent)
         {
             var actionHirc = GetAsType<ICAkEvent>(item);
-            var actionTreeNode = new HircTreeItem() { DisplayName = $"Action Event {_repository.GetNameFromId(item.Id)}", Item = item };
+            var actionTreeNode = new HircTreeItem() { DisplayName = $"Action Event {_audioRepository.GetNameFromId(item.Id)}", Item = item };
             parent.Children.Add(actionTreeNode);
 
             var actions = actionHirc.GetActionIds();
             ProcessNext(actions, actionTreeNode);
         }
 
-        void ProcessAction(HircItem item, HircTreeItem parent)
+        private void ProcessAction(HircItem item, HircTreeItem parent)
         {
             var actionHirc = GetAsType<ICAkAction>(item);
             var actionTreeNode = new HircTreeItem() { DisplayName = $"Action {actionHirc.GetActionType()}", Item = item };
@@ -65,7 +65,7 @@ namespace Editors.Audio.Utility
             if (actionHirc.GetActionType() == AkActionType.SetState)
             {
                 var stateGroupId = actionHirc.GetStateGroupId();
-                var musicSwitches = _repository.HircLookupById
+                var musicSwitches = _audioRepository.HircLookupById
                    .SelectMany(x => x.Value)
                    .Where(X => X.HircType == AkBkHircType.Music_Switch)
                    .DistinctBy(x => x.Id)
@@ -79,7 +79,7 @@ namespace Editors.Audio.Utility
                         ProcessNext(musicSwitch.Id, actionTreeNode);
                 }
 
-                var normalSwitches = _repository.HircLookupById
+                var normalSwitches = _audioRepository.HircLookupById
                    .SelectMany(x => x.Value)
                    .Where(X => X.HircType == AkBkHircType.SwitchContainer)
                    .DistinctBy(x => x.Id)
@@ -108,23 +108,23 @@ namespace Editors.Audio.Utility
         public void ProcessActorMixer(HircItem item, HircTreeItem parent)
         {
             var actorMixer = GetAsType<ICAkActorMixer>(item);
-            var actorMixerNode = new HircTreeItem() { DisplayName = $"ActorMixer {_repository.GetNameFromId(item.Id)}", Item = item };
+            var actorMixerNode = new HircTreeItem() { DisplayName = $"ActorMixer {_audioRepository.GetNameFromId(item.Id)}", Item = item };
             parent.Children.Add(actorMixerNode);
 
             ProcessNext(actorMixer.GetChildren(), actorMixerNode);
         }
 
-        void ProcessSwitchControl(HircItem item, HircTreeItem parent)
+        private void ProcessSwitchControl(HircItem item, HircTreeItem parent)
         {
             var switchControl = GetAsType<ICAkSwitchCntr>(item);
-            var switchType = _repository.GetNameFromId(switchControl.GroupId);
-            var defaultValue = _repository.GetNameFromId(switchControl.DefaultSwitch);
+            var switchType = _audioRepository.GetNameFromId(switchControl.GroupId);
+            var defaultValue = _audioRepository.GetNameFromId(switchControl.DefaultSwitch);
             var switchControlNode = new HircTreeItem() { DisplayName = $"Switch {switchType} DefaultValue: {defaultValue}", Item = item };
             parent.Children.Add(switchControlNode);
 
             foreach (var switchCase in switchControl.SwitchList)
             {
-                var switchValue = _repository.GetNameFromId(switchCase.SwitchId);
+                var switchValue = _audioRepository.GetNameFromId(switchCase.SwitchId);
                 var switchValueNode = new HircTreeItem() { DisplayName = $"SwitchValue: {switchValue}", Item = item, IsMetaNode = true };
                 switchControlNode.Children.Add(switchValueNode);
 
@@ -176,10 +176,10 @@ namespace Editors.Audio.Utility
         {
             var hirc = GetAsType<CAkMusicSwitchCntr_V136>(item);
 
-            var helper = new DecisionPathHelper(_repository);
+            var helper = new DecisionPathHelper(_audioRepository);
             var paths = helper.GetDecisionPaths(hirc);
 
-            var dialogueEventNode = new HircTreeItem() { DisplayName = $"Music Switch {_repository.GetNameFromId(item.Id)} - [{paths.Header.GetAsString()}]", Item = item };
+            var dialogueEventNode = new HircTreeItem() { DisplayName = $"Music Switch {_audioRepository.GetNameFromId(item.Id)} - [{paths.Header.GetAsString()}]", Item = item };
             parent.Children.Add(dialogueEventNode);
 
             foreach (var path in paths.Paths)

@@ -1,6 +1,6 @@
 ﻿using System.Windows;
 using System.Windows.Controls;
-using static Editors.Audio.GameSettings.Warhammer3.DialogueEvents;
+using Editors.Audio.GameInformation.Warhammer3;
 
 namespace Editors.Audio.AudioEditor.AudioProjectExplorer
 {
@@ -21,10 +21,16 @@ namespace Editors.Audio.AudioEditor.AudioProjectExplorer
 
         private void OnWatermarkComboBoxSelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            if (DialogueEventFilterComboBox?.SelectedItem is DialogueEventPreset selectedPreset && selectedPreset == DialogueEventPreset.ShowAll)
+            if (DialogueEventTypeFilterComboBox?.SelectedItem is Wh3DialogueEventType type && type == Wh3DialogueEventType.TypeShowAll)
             {
-                DialogueEventFilterComboBox.SelectedItem = null;
-                ViewModel.ResetDialogueEventFilterComboBoxSelectedItem();
+                DialogueEventTypeFilterComboBox.SelectedItem = null;
+                ViewModel.ResetDialogueEventTypeFilterComboBoxSelectedItem();
+            }
+
+            if (DialogueEventProfileFilterComboBox?.SelectedItem is Wh3DialogueEventUnitProfile target && target == Wh3DialogueEventUnitProfile.ProfileShowAll)
+            {
+                DialogueEventProfileFilterComboBox.SelectedItem = null;
+                ViewModel.ResetDialogueEventProfileFilterComboBoxSelectedItem();
             }
         }
 

@@ -14,6 +14,7 @@ using Shared.Core.PackFiles.Models;
 
 namespace Editors.Audio.AudioEditor.AudioFilesExplorer
 {
+    // TODO: Change xaml commands to methods - see audio explorer
     public partial class AudioFilesExplorerViewModel : ObservableObject
     {
         private readonly IGlobalEventHub _globalEventHub;
@@ -78,7 +79,7 @@ namespace Editors.Audio.AudioEditor.AudioFilesExplorer
             {
                 foreach (AudioFilesTreeNode addedNode in e.NewItems)
                 {
-                    if (addedNode.NodeType != AudioFilesTreeNodeType.WavFile)
+                    if (addedNode.Type != AudioFilesTreeNodeType.WavFile)
                         SelectedTreeNodes.Remove(addedNode);
                 }
             }
@@ -96,8 +97,8 @@ namespace Editors.Audio.AudioEditor.AudioFilesExplorer
 
             if (SelectedTreeNodes.Count > 0)
             {
-                if (selectedAudioProjectExplorerNode.NodeType == AudioProjectTreeNodeType.ActionEventSoundBank 
-                    || selectedAudioProjectExplorerNode.NodeType == AudioProjectTreeNodeType.DialogueEvent)
+                if (selectedAudioProjectExplorerNode.Type == AudioProjectTreeNodeType.ActionEventType 
+                    || selectedAudioProjectExplorerNode.Type == AudioProjectTreeNodeType.DialogueEvent)
                     IsAddAudioFilesButtonEnabled = true;
             }
             else
@@ -106,13 +107,12 @@ namespace Editors.Audio.AudioEditor.AudioFilesExplorer
 
         partial void OnFilterQueryChanged(string value) => _audioFilesTreeFilter.FilterTree(AudioFilesTree, FilterQuery);
 
-        [RelayCommand] public void CollapseOrExpandAudioFilesTree()
+        [RelayCommand] public void CollapseOrExpandTree()
         {
             if (AudioFilesTree == null || AudioFilesTree.Count == 0)
                 return;
 
             var isExpanded = AudioFilesTree.Any(node => node.IsNodeExpanded);
-
             foreach (var rootNode in AudioFilesTree)
                 ToggleNodeExpansion(rootNode, !isExpanded);
         }
@@ -120,7 +120,6 @@ namespace Editors.Audio.AudioEditor.AudioFilesExplorer
         private static void ToggleNodeExpansion(AudioFilesTreeNode node, bool shouldExpand)
         {
             node.IsNodeExpanded = shouldExpand;
-
             foreach (var child in node.Children)
                 ToggleNodeExpansion(child, shouldExpand);
         }

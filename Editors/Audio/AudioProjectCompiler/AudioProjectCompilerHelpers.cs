@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Editors.Audio.AudioEditor.Models;
-using Editors.Audio.GameSettings.Warhammer3;
+using Editors.Audio.GameInformation.Warhammer3;
 using Editors.Audio.Utility;
 using Shared.Core.Misc;
 
@@ -57,8 +57,8 @@ namespace Editors.Audio.AudioProjectCompiler
             foreach (var soundBank in audioProject.SoundBanks)
             {
                 // TODO: Add other subtypes as needed
-                if (soundBank.SoundBankSubtype == SoundBanks.Wh3SoundBankSubtype.FrontendMusic)
-                    return Languages.Sfx;
+                if (soundBank.GameSoundBank == Wh3SoundBank.GlobalMusic)
+                    return Wh3LanguageInformation.GetGameLanguageAsString(Wh3GameLanguage.Sfx);
             }
             return audioProject.Language;
         }

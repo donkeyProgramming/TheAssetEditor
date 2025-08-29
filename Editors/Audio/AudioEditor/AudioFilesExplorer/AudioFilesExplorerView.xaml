@@ -31,6 +31,7 @@
         <Label 
             Grid.Row="0"
             Grid.ColumnSpan="2"
+            Margin="0, 0, 0, 5"
             Content="{Binding AudioFilesExplorerLabel}"/>
 
         <Grid
@@ -45,13 +46,13 @@
 
             <Button 
                 Grid.Column="0"
-                Margin="5, 0, 0, 0" 
+                Margin="5, 0, 0, 0"
                 Width="180" 
                 VerticalAlignment="Center" 
                 HorizontalAlignment="Left"
                 Content="Toggle Collapse / Expand Tree" 
-                ToolTip="Collapse / expand the file tree." 
-                Command="{Binding CollapseOrExpandAudioFilesTreeCommand}"/>
+                ToolTip="Collapse / expand the tree." 
+                Command="{Binding CollapseOrExpandTreeCommand}"/>
 
             <Button 
                 Grid.Column="1"

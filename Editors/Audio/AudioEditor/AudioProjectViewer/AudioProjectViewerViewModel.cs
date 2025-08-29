@@ -79,17 +79,17 @@ namespace Editors.Audio.AudioEditor.AudioProjectViewer
             ResetTable();
 
             var selectedExplorerNode = e.TreeNode;
-            if (selectedExplorerNode.IsActionEventSoundBank())
+            if (selectedExplorerNode.IsActionEvent())
             {
                 MakeViewerVisible();
                 SetViewerLabel(selectedExplorerNode.Name);
-                Load(selectedExplorerNode.NodeType);
+                Load(selectedExplorerNode.Type);
             }
             else if (selectedExplorerNode.IsDialogueEvent())
             {
                 MakeViewerVisible();
                 SetViewerLabel(TableHelpers.DuplicateUnderscores(selectedExplorerNode.Name));
-                Load(selectedExplorerNode.NodeType);
+                Load(selectedExplorerNode.Type);
 
                 SetContextMenuVisibility();
                 SetCopyEnablement();
@@ -99,12 +99,12 @@ namespace Editors.Audio.AudioEditor.AudioProjectViewer
             {
                 MakeViewerVisible();
                 SetViewerLabel(TableHelpers.DuplicateUnderscores(selectedExplorerNode.Name));
-                Load(selectedExplorerNode.NodeType);
+                Load(selectedExplorerNode.Type);
             }
             else
                 return;
 
-            _logger.Here().Information($"Loaded {selectedExplorerNode.NodeType}: {selectedExplorerNode.Name}");
+            _logger.Here().Information($"Loaded {selectedExplorerNode.Type}: {selectedExplorerNode.Name}");
         }
 
         private void OnViewerTableColumnAddRequested(ViewerTableColumnAddRequestedEvent e) => AddTableColumn(e.Column);
@@ -122,7 +122,7 @@ namespace Editors.Audio.AudioEditor.AudioProjectViewer
             TableHelpers.InsertRowAlphabetically(Table, row);
 
             var selectedAudioProjectExplorerNode = _audioEditorStateService.SelectedAudioProjectExplorerNode;
-            _logger.Here().Information($"Added {selectedAudioProjectExplorerNode.NodeType} row to Audio Project Viewer table for {selectedAudioProjectExplorerNode.Name}");
+            _logger.Here().Information($"Added {selectedAudioProjectExplorerNode.Type} row to Audio Project Viewer table for {selectedAudioProjectExplorerNode.Name}");
         }
 
         private void OnViewerTableRowRemoveRequested(ViewerTableRowRemoveRequestedEvent e) => RemoveTableRow(e.Row);
@@ -132,7 +132,7 @@ namespace Editors.Audio.AudioEditor.AudioProjectViewer
             Table.Rows.Remove(row);
 
             var selectedAudioProjectExplorerNode = _audioEditorStateService.SelectedAudioProjectExplorerNode;
-            _logger.Here().Information($"Removed {selectedAudioProjectExplorerNode.NodeType} row from Audio Project Viewer table for {selectedAudioProjectExplorerNode.Name}");
+            _logger.Here().Information($"Removed {selectedAudioProjectExplorerNode.Type} row from Audio Project Viewer table for {selectedAudioProjectExplorerNode.Name}");
         }
 
         public void OnCopyRowsShortcutActivated(CopyRowsShortcutActivatedEvent e) => CopyRows();

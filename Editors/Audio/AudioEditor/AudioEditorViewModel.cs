@@ -10,9 +10,9 @@ using Editors.Audio.AudioEditor.Models;
 using Editors.Audio.AudioEditor.Settings;
 using Editors.Audio.AudioEditor.UICommands;
 using Editors.Audio.AudioProjectCompiler;
+using Editors.Audio.GameInformation.Warhammer3;
 using Shared.Core.Events;
 using Shared.Core.ToolCreation;
-using static Editors.Audio.GameSettings.Warhammer3.DialogueEvents;
 
 namespace Editors.Audio.AudioEditor
 {
@@ -31,7 +31,7 @@ namespace Editors.Audio.AudioEditor
         private readonly IAudioEditorStateService _audioEditorStateService;
         private readonly IAudioProjectFileService _audioProjectFileService;
         private readonly IAudioProjectCompilerService _audioProjectCompilerService;
-        private readonly IntegrityChecker _integrityChecker;
+        private readonly IAudioProjectIntegrityService _audioProjectIntegrityService;
 
         public string DisplayName { get; set; } = "Audio Editor";
 
@@ -46,14 +46,14 @@ namespace Editors.Audio.AudioEditor
             IAudioEditorStateService audioEditorStateService,
             IAudioProjectFileService audioProjectFileService,
             IAudioProjectCompilerService audioProjectCompilerService,
-            IntegrityChecker integrityChecker)
+            IAudioProjectIntegrityService audioProjectIntegrityService)
         {
             _uiCommandFactory = uiCommandFactory;
             _eventHub = eventHub;
             _audioEditorStateService = audioEditorStateService;
             _audioProjectFileService = audioProjectFileService;
             _audioProjectCompilerService = audioProjectCompilerService;
-            _integrityChecker = integrityChecker;
+            _audioProjectIntegrityService = audioProjectIntegrityService;
 
             AudioProjectExplorerViewModel = audioProjectExplorerViewModel;
             AudioFilesExplorerViewModel = audioFilesExplorerViewModel;
@@ -61,7 +61,7 @@ namespace Editors.Audio.AudioEditor
             AudioProjectViewerViewModel = audioProjectViewerViewModel;
             SettingsViewModel = settingsViewModel;
 
-            _integrityChecker.CheckDialogueEventIntegrity(DialogueEventData);
+            _audioProjectIntegrityService.CheckDialogueEventInformationIntegrity(Wh3DialogueEventInformation.Information);
         }
 
         [RelayCommand] public void NewAudioProject() => _uiCommandFactory.Create<OpenNewAudioProjectWindowCommand>().Execute();

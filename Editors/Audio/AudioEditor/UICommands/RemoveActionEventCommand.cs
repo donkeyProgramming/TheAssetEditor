@@ -17,7 +17,7 @@ namespace Editors.Audio.AudioEditor.UICommands
         private readonly IEventHub _eventHub = eventHub;
 
         public MutationType Action => MutationType.Remove;
-        public AudioProjectTreeNodeType NodeType => AudioProjectTreeNodeType.ActionEventSoundBank;
+        public AudioProjectTreeNodeType NodeType => AudioProjectTreeNodeType.ActionEventType;
 
         public void Execute(DataRow row)
         {

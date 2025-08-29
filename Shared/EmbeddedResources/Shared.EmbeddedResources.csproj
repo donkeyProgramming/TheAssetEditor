@@ -14,6 +14,7 @@
     <None Remove="Resources\AnimationSlots\Warhammer3AnimationSlots.txt" />
     <None Remove="Resources\AnimationSlots\Warhammer3AnimationSlots_dlc23.txt" />
     <None Remove="Resources\AnimationSlots\Warhammer3AnimationSlots_dlc24.txt" />
+    <None Remove="Resources\Icons\audio_file.png" />
     <None Remove="Resources\Icons\Copy.png" />
     <None Remove="Resources\Icons\Cut.png" />
     <None Remove="Resources\Icons\Delete.png" />
@@ -86,7 +87,6 @@
     <None Remove="Resources\Icons\Redo.png" />
     <None Remove="Resources\Icons\Save.png" />
     <None Remove="Resources\Icons\Undo.png" />
-    <None Remove="Resources\Icons\Wav-File.png" />
     <None Remove="Resources\Icons\WordWrap.png" />
     <None Remove="Resources\OptionalRadioButtonStyle.xaml" />
     <None Remove="Resources\AudioConversion\vgstream\avcodec-vgmstream-58.dll" />
@@ -152,7 +152,7 @@
     <EmbeddedResource Include="Resources\AudioConversion\vgstream\vgstream.exe" />
     <EmbeddedResource Include="Resources\AudioConversion\vgstream\xmp-vgmstream.dll" />
     <EmbeddedResource Include="Resources\AudioConversion\WavToWemWwiseProject\WavToWemWwiseProject.zip" />
-    <EmbeddedResource Include="Resources\Icons\Wav-File.png" />
+    <EmbeddedResource Include="Resources\Icons\audio_file.png" />
     <EmbeddedResource Include="Resources\WsModelTemplates\MaterialTemplate_pharaoh_default.xml" />
     <EmbeddedResource Include="Resources\WsModelTemplates\MaterialTemplate_wh2_default.xml" />
     <EmbeddedResource Include="Resources\WsModelTemplates\MaterialTemplate_wh3_default.xml" />

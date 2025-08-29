@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using Editors.Audio.AudioEditor.Models;
-using Editors.Audio.GameSettings.Warhammer3;
+using Editors.Audio.GameInformation.Warhammer3;
 using Editors.Audio.Storage;
 
 namespace Editors.Audio.AudioEditor.Presentation.Table
@@ -29,7 +29,7 @@ namespace Editors.Audio.AudioEditor.Presentation.Table
             var vanillaStates = audioRepository.StatesLookupByStateGroup[stateGroup];
 
             // Display the required states in the ComboBox
-            if (audioEditorStateService.ShowModdedStatesOnly && StateGroups.ModdedStateGroups.Contains(stateGroup))
+            if (audioEditorStateService.ShowModdedStatesOnly && Wh3StateGroupInformation.ModdableStateGroups.Contains(stateGroup))
             {
                 states.Add("Any"); // We still want the "Any" state to show so add it in manually
                 states.AddRange(moddedStates);

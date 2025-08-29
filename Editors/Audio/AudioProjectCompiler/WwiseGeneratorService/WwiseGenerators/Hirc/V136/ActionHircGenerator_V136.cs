@@ -1,9 +1,8 @@
 ﻿using Editors.Audio.AudioEditor.Models;
-using Editors.Audio.Utility;
+using Editors.Audio.GameInformation.Warhammer3;
 using Shared.GameFormats.Wwise.Enums;
 using Shared.GameFormats.Wwise.Hirc;
 using Shared.GameFormats.Wwise.Hirc.V136;
-using static Editors.Audio.GameSettings.Warhammer3.SoundBanks;
 using static Shared.GameFormats.Wwise.Hirc.V136.Shared.AkPropBundle_V136;
 
 namespace Editors.Audio.AudioProjectCompiler.WwiseGeneratorService.WwiseGenerators.Hirc.V136
@@ -14,7 +13,7 @@ namespace Editors.Audio.AudioProjectCompiler.WwiseGeneratorService.WwiseGenerato
         {
             var audioProjectActionEvent = audioProjectItem as Action;
 
-            var actionHirc = CreateAction(audioProjectActionEvent, soundBank.SoundBankSubtype);
+            var actionHirc = CreateAction(audioProjectActionEvent, soundBank.GameSoundBank);
 
             if (audioProjectActionEvent.ActionType == AkActionType.Play)
                 actionHirc.PlayActionParams = CreatePlayActionParams(soundBank);
@@ -26,7 +25,7 @@ namespace Editors.Audio.AudioProjectCompiler.WwiseGeneratorService.WwiseGenerato
             return actionHirc;
         }
 
-        private static CAkAction_V136 CreateAction(Action audioProjectActionEvent, Wh3SoundBankSubtype soundBankSubType)
+        private static CAkAction_V136 CreateAction(Action audioProjectActionEvent, Wh3SoundBank soundBankSubType)
         {
             var action = new CAkAction_V136
             {
@@ -36,7 +35,7 @@ namespace Editors.Audio.AudioProjectCompiler.WwiseGeneratorService.WwiseGenerato
                 IdExt = audioProjectActionEvent.IdExt
             };
 
-            if (soundBankSubType == Wh3SoundBankSubtype.FrontendMusic)
+            if (soundBankSubType == Wh3SoundBank.GlobalMusic)
             {
                 action.AkPropBundle0.PropsList.Add(new PropBundleInstance_V136
                 {

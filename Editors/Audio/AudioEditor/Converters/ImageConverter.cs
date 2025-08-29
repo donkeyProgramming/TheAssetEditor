@@ -13,10 +13,10 @@ namespace Editors.Audio.AudioEditor.Converters
         {
             if (value is AudioFilesTreeNode node)
             {
-                if (node.NodeType == AudioFilesTreeNodeType.Directory)
+                if (node.Type == AudioFilesTreeNodeType.Directory)
                     return IconLibrary.FolderIcon;
-                else if (node.NodeType == AudioFilesTreeNodeType.WavFile)
-                    return IconLibrary.WavFileIcon;
+                else if (node.Type == AudioFilesTreeNodeType.WavFile)
+                    return IconLibrary.AudioFileIcon;
             }
 
             throw new Exception("Unknown type " + value.GetType().FullName);

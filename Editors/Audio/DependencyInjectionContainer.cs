@@ -33,7 +33,7 @@ namespace Editors.Audio
             // Audio Editor stuff
             serviceCollection.AddScoped<IAudioEditorStateService, AudioEditorStateService>();
             serviceCollection.AddScoped<IAudioProjectFileService, AudioProjectFileService>();
-            serviceCollection.AddScoped<IntegrityChecker>();
+            serviceCollection.AddScoped<IAudioProjectIntegrityService, AudioProjectIntegrityService>();
 
             // Audio Editor View Models
             serviceCollection.AddScoped<AudioEditorViewModel>();
@@ -64,14 +64,13 @@ namespace Editors.Audio
             serviceCollection.AddScoped<IAudioProjectMutationUICommandFactory, AudioProjectMutationUICommandFactory>();
             RegisterAllAsInterface<IAudioProjectMutationUICommand>(serviceCollection, ServiceLifetime.Transient);
 
+            // Audio Project Explorer services
+            serviceCollection.AddScoped<IAudioProjectTreeBuilderService, AudioProjectTreeBuilderService>();
+            serviceCollection.AddScoped<IAudioProjectTreeFilterService, AudioProjectTreeFilterService>();
 
             // Audio Files Explorer services
             serviceCollection.AddSingleton<IAudioFilesTreeBuilderService, AudioFilesTreeBuilderService>();
             serviceCollection.AddSingleton<IAudioFilesTreeSearchFilterService, AudioFilesTreeFilterService>();
-
-            // Audio Project Explorer services
-            serviceCollection.AddSingleton<IAudioProjectTreeBuilderService, AudioProjectTreeBuilderService>();
-            serviceCollection.AddSingleton<IAudioProjectTreeFilterService, AudioProjectTreeFilterService>();
 
             // Audio Project Editor table
             serviceCollection.AddScoped<IEditorTableServiceFactory, EditorTableServiceFactory>();

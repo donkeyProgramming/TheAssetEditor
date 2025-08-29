@@ -11,15 +11,15 @@ namespace Editors.Audio.AudioEditor.UICommands
         private readonly IActionEventService _actionEventService = actionEventService;
 
         public MutationType Action => MutationType.Add;
-        public AudioProjectTreeNodeType NodeType => AudioProjectTreeNodeType.ActionEventSoundBank;
+        public AudioProjectTreeNodeType NodeType => AudioProjectTreeNodeType.ActionEventType;
 
         public void Execute(DataRow row)
         {
+            var actionEventGroupName = _audioEditorStateService.SelectedAudioProjectExplorerNode.Name;
             var audioFiles = _audioEditorStateService.AudioFiles;
             var audioSettings = _audioEditorStateService.AudioSettings;
             var actionEventName = TableHelpers.GetActionEventNameFromRow(row);
-            var soundBankName = _audioEditorStateService.SelectedAudioProjectExplorerNode.Name;
-            _actionEventService.AddActionEvent(actionEventName, audioFiles, audioSettings, soundBankName);
+            _actionEventService.AddActionEvent(actionEventGroupName, actionEventName, audioFiles, audioSettings);
         }
     }
 }

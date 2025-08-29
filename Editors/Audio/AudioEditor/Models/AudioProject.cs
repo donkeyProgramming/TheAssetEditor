@@ -2,19 +2,19 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using System.Text.Json.Serialization;
+using Editors.Audio.GameInformation.Warhammer3;
 using Shared.Core.Settings;
 using Shared.GameFormats.Wwise.Enums;
-using static Editors.Audio.GameSettings.Warhammer3.DialogueEvents;
-using static Editors.Audio.GameSettings.Warhammer3.SoundBanks;
-using static Editors.Audio.GameSettings.Warhammer3.StateGroups;
+using static Editors.Audio.GameInformation.Warhammer3.Wh3StateGroupInformation;
 
 namespace Editors.Audio.AudioEditor.Models
 {
     // TODO: Reevaluate the use of AudioProjectItem, AudioProjectHircItem etc.
     public abstract class AudioProjectItem : IComparable, IComparable<AudioProjectItem>, IEquatable<AudioProjectItem>
     {
-        public string Name { get; set; }
-        public uint Id { get; set; }
+        [JsonPropertyOrder(-2)] public string Name { get; set; }
+        [JsonPropertyOrder(-1)] public uint Id { get; set; }
 
         public int CompareTo(object obj) => CompareTo(obj as AudioProjectItem);
         public int CompareTo(AudioProjectItem other) => string.Compare(Name, other?.Name, StringComparison.Ordinal);
@@ -63,21 +63,21 @@ namespace Editors.Audio.AudioEditor.Models
         {
             var soundBanks = new List<SoundBank>();
 
-            foreach (var soundBankSubtype in Enum.GetValues<Wh3SoundBankSubtype>())
+            foreach (var soundBankDefinition in Wh3SoundBankInformation.Information)
             {
-                var soundBankName = GetSoundBankSubTypeString(soundBankSubtype);
-                var soundBankType = GetSoundBankSubType(soundBankSubtype);
-                var soundBank = SoundBank.Create(soundBankName, soundBankType);
+                var gameSoundBank = soundBankDefinition.GameSoundBank;
+                var soundBankName = Wh3SoundBankInformation.GetName(gameSoundBank);
+                var soundBank = SoundBank.Create(soundBankName, gameSoundBank);
 
-                if (soundBank.SoundBankType == Wh3SoundBankType.ActionEventSoundBank)
+                if (Wh3ActionEventInformation.Contains(gameSoundBank))
                     soundBank.ActionEvents = [];
-                else
+                
+                if (Wh3DialogueEventInformation.Contains(gameSoundBank))
                 {
                     soundBank.DialogueEvents = [];
 
-                    var filteredDialogueEvents = DialogueEventData
-                        .Where(dialogueEvent => dialogueEvent.SoundBank == GetSoundBankSubtype(soundBank.Name));
-
+                    var filteredDialogueEvents = Wh3DialogueEventInformation.Information
+                        .Where(dialogueEvent => dialogueEvent.SoundBank == Wh3SoundBankInformation.GetSoundBank(soundBankName));
                     foreach (var filteredDialogueEvent in filteredDialogueEvents)
                     {
                         var dialogueEvent = DialogueEvent.Create(filteredDialogueEvent.Name);
@@ -95,9 +95,9 @@ namespace Editors.Audio.AudioEditor.Models
         private static List<StateGroup> CreateStateGroups()
         {
             var stateGroups = new List<StateGroup>();
-            foreach (var moddedStateGroup in ModdedStateGroups)
+            foreach (var moddableStateGroup in ModdableStateGroups)
             {
-                var stateGroup = StateGroup.Create(moddedStateGroup, []);
+                var stateGroup = StateGroup.Create(moddableStateGroup, []);
                 stateGroups.Add(stateGroup);
             }
             return stateGroups;
@@ -207,7 +207,6 @@ namespace Editors.Audio.AudioEditor.Models
             return new SoundBank
             {
                 Name = soundBank.Name,
-                SoundBankType = soundBank.SoundBankType,
                 DialogueEvents = dialogueEvents.Count != 0 ? dialogueEvents : null,
                 ActionEvents = actionEvents.Count != 0 ? actionEvents : null
             };
@@ -225,34 +224,29 @@ namespace Editors.Audio.AudioEditor.Models
             return filteredStateGroups.Count != 0 ? filteredStateGroups : null;
         }
 
-        public List<SoundBank> GetActionEventSoundBanks()
-        {
-            return SoundBanks
-                .Where(soundBank => soundBank.SoundBankType == Wh3SoundBankType.ActionEventSoundBank)
-                .ToList();
-        }
-
-        public List<SoundBank> GetDialogueEventSoundBanks()
-        {
-            return SoundBanks
-                .Where(soundBank => soundBank.SoundBankType == Wh3SoundBankType.DialogueEventSoundBank)
-                .ToList();
-        }
-
         public List<SoundBank> GetEditedActionEventSoundBanks()
         {
             return SoundBanks
-                .Where(soundBank => soundBank.SoundBankType == Wh3SoundBankType.ActionEventSoundBank 
-                    && soundBank.ActionEvents.Count > 0)
+                .Where(soundBank => Wh3ActionEventInformation.Contains(soundBank.GameSoundBank) && soundBank.ActionEvents.Count > 0)
                 .ToList();
         }
 
         public List<SoundBank> GetEditedDialogueEventSoundBanks()
         {
             return SoundBanks
-                .Where(soundBank => soundBank.SoundBankType == Wh3SoundBankType.DialogueEventSoundBank 
+                .Where(soundBank => Wh3DialogueEventInformation.Contains(soundBank.GameSoundBank)
                     && soundBank.DialogueEvents.Any(dialogueEvent => dialogueEvent.StatePaths.Count > 0))
                 .ToList();
+        }
+
+        public List<SoundBank> GetEditedSoundBanks()
+        {
+            var editedActionEventSoundBanks = GetEditedActionEventSoundBanks();
+            var editedDialogueEventSoundBanks = GetEditedDialogueEventSoundBanks();
+            var editedSoundBanks = editedActionEventSoundBanks
+                .Union(editedDialogueEventSoundBanks)
+                .ToList();
+            return editedSoundBanks;
         }
 
         public List<StateGroup> GetEditedStateGroups()
@@ -270,7 +264,7 @@ namespace Editors.Audio.AudioEditor.Models
         public ActionEvent GetActionEvent(string actionEventName)
         {
             return SoundBanks
-                .Where(soundBank => soundBank.SoundBankType == Wh3SoundBankType.ActionEventSoundBank)
+                .Where(soundBank => Wh3ActionEventInformation.Contains(soundBank.GameSoundBank))
                 .SelectMany(soundBank => soundBank.ActionEvents)
                 .FirstOrDefault(actionEvent => actionEvent.Name == actionEventName);
         }
@@ -278,7 +272,7 @@ namespace Editors.Audio.AudioEditor.Models
         public DialogueEvent GetDialogueEvent(string dialogueEventName)
         {
             return SoundBanks
-                .Where(soundBank => soundBank.SoundBankType == Wh3SoundBankType.DialogueEventSoundBank)
+                .Where(soundBank => Wh3DialogueEventInformation.Contains(soundBank.GameSoundBank))
                 .SelectMany(soundBank => soundBank.DialogueEvents)
                 .FirstOrDefault(dialogueEvent => dialogueEvent.Name == dialogueEventName);
         }

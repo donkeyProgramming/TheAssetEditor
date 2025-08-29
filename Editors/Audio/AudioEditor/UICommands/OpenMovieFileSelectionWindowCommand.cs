@@ -1,7 +1,7 @@
-﻿using Shared.Core.Events;
+﻿using Editors.Audio.AudioEditor.Events;
+using Shared.Core.Events;
 using Shared.Core.PackFiles;
 using Shared.Core.Services;
-using Editors.Audio.AudioEditor.Events;
 
 namespace Editors.Audio.AudioEditor.UICommands
 {
@@ -18,6 +18,7 @@ namespace Editors.Audio.AudioEditor.UICommands
             {
                 var movieFilePath = _packFileService.GetFullPath(result.File);
                 _eventHub.Publish(new MovieFileChangedEvent(movieFilePath));
+                _eventHub.Publish(new EditorAddRowButtonEnablementUpdateRequestedEvent());
             }
         }
     }

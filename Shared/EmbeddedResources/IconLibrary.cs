@@ -1,7 +1,7 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
-using System.Windows.Interop;
 using System.Windows;
+using System.Windows.Interop;
 using System.Windows.Media.Imaging;
 
 namespace Shared.EmbeddedResources
@@ -56,7 +56,7 @@ namespace Shared.EmbeddedResources
 
         [AllowNull] public static BitmapSource InformationIcon { get; private set; }
 
-        [AllowNull] public static BitmapImage WavFileIcon { get; private set; }
+        [AllowNull] public static BitmapImage AudioFileIcon { get; private set; }
 
         public static void Load()
         {
@@ -108,7 +108,7 @@ namespace Shared.EmbeddedResources
 
             InformationIcon = BitmapToImageSource(SystemIcons.Information);
 
-            WavFileIcon = BitmapToImageSource("Wav-File.png");
+            AudioFileIcon = BitmapToImageSource("audio_file.png");
 
         }
 

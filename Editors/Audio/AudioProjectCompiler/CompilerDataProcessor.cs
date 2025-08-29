@@ -3,14 +3,12 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Editors.Audio.AudioEditor.Models;
-using Editors.Audio.AudioProjectCompiler.WwiseIdService;
-using Editors.Audio.GameSettings.Warhammer3;
+using Editors.Audio.GameInformation.Warhammer3;
 using Editors.Audio.Storage;
 using Editors.Audio.Utility;
 using Shared.Core.Misc;
 using Shared.Core.Settings;
 using Shared.GameFormats.Wwise.Enums;
-using static Editors.Audio.GameSettings.Warhammer3.SoundBanks;
 using Action = Editors.Audio.AudioEditor.Models.Action;
 
 namespace Editors.Audio.AudioProjectCompiler
@@ -45,13 +43,12 @@ namespace Editors.Audio.AudioProjectCompiler
         {
             foreach (var soundBank in audioProject.SoundBanks)
             {
-                soundBank.SoundBankSubtype = GetSoundBankSubtype(soundBank.Name);
+                soundBank.GameSoundBank = Wh3SoundBankInformation.GetSoundBank(soundBank.Name);
                 soundBank.Language = AudioProjectCompilerHelpers.GetCorrectSoundBankLanguage(audioProject);
-
-                soundBank.SoundBankFileName = $"{GetSoundBankName(soundBank.SoundBankSubtype)}_{audioProjectFileName}.bnk";
+                soundBank.SoundBankFileName = $"{Wh3SoundBankInformation.GetName(soundBank.GameSoundBank)}_{audioProjectFileName}.bnk";
 
                 var basePath = $"audio\\wwise";
-                if (soundBank.Language == Languages.Sfx)
+                if (soundBank.Language == Wh3LanguageInformation.GetGameLanguageAsString(Wh3GameLanguage.Sfx))
                     soundBank.SoundBankFilePath = $"{basePath}\\{soundBank.SoundBankFileName}";
                 else
                     soundBank.SoundBankFilePath = $"{basePath}\\{soundBank.Language}\\{soundBank.SoundBankFileName}";
@@ -62,7 +59,6 @@ namespace Editors.Audio.AudioProjectCompiler
 
         public void SetInitialSourceData(AudioProject audioProject)
         {
-            var wwiseIdService = WwiseIdServiceFactory.GetWwiseIdService(_applicationSettingsService.CurrentSettings.CurrentGame);
             var sourceIdByWavFilePathLookup = new Dictionary<string, uint>();
 
             foreach (var soundBank in audioProject.SoundBanks)
@@ -71,19 +67,22 @@ namespace Editors.Audio.AudioProjectCompiler
                 {
                     foreach (var actionEvent in soundBank.ActionEvents)
                     {
+                        var actorMixerId = Wh3ActionEventInformation.GetActorMixerId(actionEvent.ActionEventType);
+                        var overrideBusId = Wh3ActionEventInformation.GetOverrideBusId(actionEvent.ActionEventType);
+
                         if (actionEvent.Sound != null)
                             SetSoundData(
                                 actionEvent.Sound,
                                 soundBank,
                                 sourceIdByWavFilePathLookup,
-                                wwiseIdService);
+                                actorMixerId,
+                                overrideBusId);
                         else
                         {
                             SetRandomSequenceContainerData(
                                 actionEvent.RandomSequenceContainer,
                                 soundBank,
                                 sourceIdByWavFilePathLookup,
-                                wwiseIdService,
                                 actionEventName: actionEvent.Name);
                         }
 
@@ -94,20 +93,22 @@ namespace Editors.Audio.AudioProjectCompiler
                 {
                     foreach (var dialogueEvent in soundBank.DialogueEvents)
                     {
+                        var actorMixerId = Wh3DialogueEventInformation.GetActorMixerId(dialogueEvent.Name);
+
                         foreach (var statePath in dialogueEvent.StatePaths)
                         {
+
                             if (statePath.Sound != null)
                                 SetSoundData(
                                     statePath.Sound,
                                     soundBank,
                                     sourceIdByWavFilePathLookup,
-                                    wwiseIdService);
+                                    actorMixerId);
                             else
                                 SetRandomSequenceContainerData(
                                     statePath.RandomSequenceContainer,
                                     soundBank,
                                     sourceIdByWavFilePathLookup,
-                                    wwiseIdService,
                                     dialogueEventName: dialogueEvent.Name,
                                     statePath: statePath);
                         }
@@ -126,7 +127,7 @@ namespace Editors.Audio.AudioProjectCompiler
                 var basePath = $"audio\\wwise";
                 if (string.IsNullOrEmpty(sound.Language))
                     sound.WemFilePath = $"{basePath}\\{sound.WemFileName}";
-                else if (sound.Language == Languages.Sfx)
+                else if (sound.Language == Wh3LanguageInformation.GetGameLanguageAsString(Wh3GameLanguage.Sfx))
                     sound.WemFilePath = $"{basePath}\\{sound.WemFileName}";
                 else
                     sound.WemFilePath = $"{basePath}\\{sound.Language}\\{sound.WemFileName}";
@@ -143,22 +144,18 @@ namespace Editors.Audio.AudioProjectCompiler
             Sound sound,
             SoundBank soundBank,
             Dictionary<string, uint> sourceLookup,
-            IWwiseIdService wwiseIdService)
+            uint directParentId = 0,
+            uint overrideBusId = 0)
         {
             sound.Language = soundBank.Language;
 
             var usedHircIds = UsedHircIdsByLanguageIdLookup[WwiseHash.Compute(soundBank.Language)];
             var soundFileNameWithoutExtension = Path.GetFileNameWithoutExtension(sound.WavFileName);
             var soundIdResult = IdGenerator.GenerateSoundHircId(usedHircIds, soundFileNameWithoutExtension);
+
             sound.Id = soundIdResult.Id;
-
-            if (wwiseIdService.OverrideBusIds.TryGetValue(soundBank.SoundBankSubtype, out var overrideBusId))
-                sound.OverrideBusId = overrideBusId;
-            else
-                sound.OverrideBusId = 0;
-
-            if (wwiseIdService.ActorMixerIds.TryGetValue(soundBank.SoundBankSubtype, out var actorMixerId))
-                sound.DirectParentId = actorMixerId;
+            sound.OverrideBusId = overrideBusId;
+            sound.DirectParentId = directParentId;
 
             if (!sourceLookup.TryGetValue(sound.WavFilePath, out var sourceId))
             {
@@ -174,10 +171,11 @@ namespace Editors.Audio.AudioProjectCompiler
             RandomSequenceContainer container,
             SoundBank soundBank,
             Dictionary<string, uint> sourceLookup,
-            IWwiseIdService wwiseIdService,
             string actionEventName = null,
             string dialogueEventName = null,
-            StatePath statePath = null)
+            StatePath statePath = null,
+            uint directParentId = 0,
+            uint overrideBusId = 0)
         {
             container.Language = soundBank.Language;
 
@@ -196,19 +194,11 @@ namespace Editors.Audio.AudioProjectCompiler
                 container.Id = containerIdResult.Id;
             }
 
-            if (wwiseIdService.OverrideBusIds.TryGetValue(soundBank.SoundBankSubtype, out var overrideBusId))
-                container.OverrideBusId = overrideBusId;
-            else
-                container.OverrideBusId = 0;
-
-            if (wwiseIdService.ActorMixerIds.TryGetValue(soundBank.SoundBankSubtype, out var actorMixerId))
-                container.DirectParentId = actorMixerId;
+            container.OverrideBusId = overrideBusId;
+            container.DirectParentId = directParentId;
 
             foreach (var sound in container.Sounds)
-            {
-                SetSoundData(sound, soundBank, sourceLookup, wwiseIdService);
-                sound.DirectParentId = container.Id;
-            }
+                SetSoundData(sound, soundBank, sourceLookup, container.Id);
 
             container.Sounds = container.Sounds.OrderBy(sound => sound.Id).ToList();
         }
@@ -217,7 +207,7 @@ namespace Editors.Audio.AudioProjectCompiler
         {
             foreach (var soundBank in audioProject.SoundBanks)
             {
-                if (soundBank.SoundBankSubtype == Wh3SoundBankSubtype.FrontendMusic)
+                if (soundBank.GameSoundBank == Wh3SoundBank.GlobalMusic)
                 {
                     for (var i = 0; i < soundBank.ActionEvents.Count; i++)
                     {

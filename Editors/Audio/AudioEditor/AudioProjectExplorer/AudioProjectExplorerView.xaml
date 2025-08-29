@@ -56,10 +56,14 @@
                         Height="Auto"/>
                     <RowDefinition 
                         Height="Auto"/>
+                    <RowDefinition 
+                        Height="Auto"/>
+                    <RowDefinition 
+                        Height="Auto"/>
                 </Grid.RowDefinitions>
 
                 <Grid
-                    Grid.Row="0">
+                    Grid.Row="1">
 
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition 
@@ -68,31 +72,142 @@
                             Width="Auto"/>
                     </Grid.ColumnDefinitions>
 
+                    <Grid.RowDefinitions>
+                        <RowDefinition 
+                            Height="Auto"/>
+                        <RowDefinition 
+                            Height="Auto"/>
+                    </Grid.RowDefinitions>
+
+                    <Label 
+                        Grid.Row="0"
+                        Grid.ColumnSpan="2"
+                        Margin="-5, 0, 0, 0"
+                        Content="Dialogue Event Filters"/>
+
                     <extendedwpftoolkit:WatermarkComboBox 
-                        x:Name ="DialogueEventFilterComboBox"
-                        Grid.Column="0" 
+                        x:Name ="DialogueEventTypeFilterComboBox"
+                        Grid.Column="0"
+                        Grid.Row="1"
                         Width="210"
                         VerticalAlignment="Center"
                         Height="{StaticResource DefaultHeight}"
                         ItemTemplate="{StaticResource EnumToStringTemplate}"
-                        ItemsSource="{Binding DialogueEventPresets}" 
-                        SelectedItem="{Binding SelectedDialogueEventPreset, Mode=TwoWay}"
+                        ItemsSource="{Binding DialogueEventTypes}" 
+                        SelectedItem="{Binding SelectedDialogueEventType, Mode=TwoWay}"
                         SelectionChanged="OnWatermarkComboBoxSelectionChanged"
-                        IsEnabled="{Binding IsDialogueEventPresetFilterEnabled}"
-                        Watermark="Select Dialogue Event Preset Filter" 
+                        IsEnabled="{Binding IsDialogueEventFilterEnabled}"
+                        Watermark="Select Dialogue Event Type Filter" 
                         ToolTip="PLACEHOLDER"/>
 
-                    <CheckBox 
-                        Grid.Column="1"
+                    <extendedwpftoolkit:WatermarkComboBox 
+                        x:Name ="DialogueEventProfileFilterComboBox"
+                        Grid.Column="1" 
+                        Grid.Row="1"
                         Margin="5, 0, 0, 0"
+                        Width="210"
+                        VerticalAlignment="Center"
+                        Height="{StaticResource DefaultHeight}"
+                        ItemTemplate="{StaticResource EnumToStringTemplate}"
+                        ItemsSource="{Binding DialogueEventProfiles}" 
+                        SelectedItem="{Binding SelectedDialogueEventProfile, Mode=TwoWay}"
+                        SelectionChanged="OnWatermarkComboBoxSelectionChanged"
+                        IsEnabled="{Binding IsDialogueEventFilterEnabled}"
+                        Watermark="Select Dialogue Event Profile Filter" 
+                        ToolTip="PLACEHOLDER"/>
+                </Grid>
+
+                <Grid
+                    Grid.Row="0"
+                    Margin="0, 5, 0, 0">
+
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition 
+                            Width="Auto"/>
+                        <ColumnDefinition 
+                            Width="Auto"/>
+                        <ColumnDefinition 
+                            Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <Grid.RowDefinitions>
+                        <RowDefinition 
+                            Height="Auto"/>
+                        <RowDefinition 
+                            Height="Auto"/>
+                    </Grid.RowDefinitions>
+
+                    <Label 
+                        Grid.Row="0"
+                        Grid.ColumnSpan="2"
+                        Margin="-5, -5, 0, 0"
+                        Content="General Filters"/>
+                    
+                    <CheckBox 
+                        Grid.Column="0"
+                        Grid.Row="1"
+                        Margin="0, 0, 0, 0"
                         Content="Show Edited Items Only"
                         ToolTip="PLACEHOLDER"
                         VerticalAlignment="Center"
-                        IsChecked="{Binding ShowEditedAudioProjectItemsOnly, Mode=TwoWay}"/>
+                        IsChecked="{Binding ShowEditedItemsOnly, Mode=TwoWay}"/>
+                    
+                    <CheckBox 
+                        Grid.Column="1"
+                        Grid.Row="1"
+                        Margin="5, 0, 0, 0"
+                        Content="Show Action Events"
+                        ToolTip="PLACEHOLDER"
+                        VerticalAlignment="Center"
+                        IsChecked="{Binding ShowActionEvents, Mode=TwoWay}"/>
+                    
+                    <CheckBox 
+                        Grid.Column="2"
+                        Grid.Row="1"
+                        Margin="5, 0, 0, 0"
+                        Content="Show Dialogue Events"
+                        ToolTip="PLACEHOLDER"
+                        VerticalAlignment="Center"
+                        IsChecked="{Binding ShowDialogueEvents, Mode=TwoWay}"/>
+                </Grid>
+
+                <Grid
+                    Grid.Row="2">
+
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition 
+                            Width="Auto"/>
+                        <ColumnDefinition 
+                            Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <Grid.RowDefinitions>
+                        <RowDefinition 
+                            Height="Auto"/>
+                    </Grid.RowDefinitions>
+
+                    <Button
+                        Margin="0, 5, 0, 0"
+                        Width="180" 
+                        VerticalAlignment="Center" 
+                        HorizontalAlignment="Left"
+                        Content="Toggle Collapse / Expand Tree" 
+                        ToolTip="Collapse / expand the tree." 
+                        Command="{Binding CollapseOrExpandTreeCommand}"/>
+                    
+                    <Button
+                        Grid.Column="1"
+                        Margin="5, 5, 0, 0"
+                        Width="85" 
+                        VerticalAlignment="Center" 
+                        HorizontalAlignment="Left"
+                        Content="Reset Filters" 
+                        ToolTip="Collapse / expand the tree." 
+                        Command="{Binding ResetFiltersCommand}"/>
                 </Grid>
 
                 <Border 
-                    Grid.Row="1"
+                    Grid.Row="3"
                     Margin="0, 5, 5, 0"
                     SnapsToDevicePixels="True" 
                     BorderBrush="{DynamicResource TextBox.Static.Border}" 
@@ -120,7 +235,7 @@
                             HorizontalContentAlignment="Center"
                             VerticalAlignment="Center"
                             Click="ClearButtonClick" 
-                            Command="{Binding ClearFilterTextCommand}">
+                            Command="{Binding ResetSearchQueryCommand}">
 
                             <Button.Template>
                                 <ControlTemplate 
@@ -187,7 +302,7 @@
                                 <Run 
                                     Text="{Binding Name}" />
                                 <Run 
-                                    Text="{Binding PresetFilterDisplayText}" 
+                                    Text="{Binding DialogueEventFilterDisplayText}" 
                                     Foreground="{DynamicResource ABrush.Foreground.Disabled}"/>
                             </TextBlock.Inlines>
                         </TextBlock>

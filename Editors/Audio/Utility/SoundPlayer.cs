@@ -2,13 +2,13 @@
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using Editors.Audio.GameInformation.Warhammer3;
 using Editors.Audio.Storage;
 using Serilog;
 using Shared.Core.ErrorHandling;
 using Shared.Core.Misc;
 using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
-using static Editors.Audio.GameSettings.Warhammer3.Languages;
 
 namespace Editors.Audio.Utility
 {
@@ -104,13 +104,13 @@ namespace Editors.Audio.Utility
         {
             var wemFile = _packFileService.FindFile($"audio\\wwise\\{wemId}.wem");
 
-            foreach (var languageEnum in Enum.GetValues<GameLanguage>().Cast<GameLanguage>())
+            foreach (var languageEnum in Enum.GetValues<Wh3GameLanguage>().Cast<Wh3GameLanguage>())
             {
-                var language = GameLanguageStringLookup[languageEnum];
-
+                var language = Wh3LanguageInformation.GetGameLanguageAsString(languageEnum);
                 if (wemFile == null)
                     wemFile = _packFileService.FindFile($"audio\\wwise\\{language}\\{wemId}.wem");
-                else break;
+                else 
+                    break;
             }
 
             wemFile ??= _packFileService.FindFile($"audio\\{wemId}.wem");
