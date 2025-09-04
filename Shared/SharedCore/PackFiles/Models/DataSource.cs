@@ -1,5 +1,4 @@
 ﻿using Shared.Core.ByteParsing;
-using Shared.Core.Settings;
 
 namespace Shared.Core.PackFiles.Models
 {
@@ -159,62 +158,23 @@ namespace Shared.Core.PackFiles.Models
             return data;
         }
 
+        public byte[] ReadDataWithoutDecompressing()
+        {
+            var data = new byte[Size];
+            using (Stream stream = File.Open(_parent.FilePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
+            {
+                stream.Seek(Offset, SeekOrigin.Begin);
+                stream.Read(data, 0, data.Length);
+            }
+
+            if (IsEncrypted)
+                data = PackFileEncryption.Decrypt(data);
+            return data;
+        }
+
         public ByteChunk ReadDataAsChunk()
         {
             return new ByteChunk(ReadData());
-        }
-
-        public void SetCompressionInfo(GameInformation gameInformation, string rootFolder, string extension)
-        {
-            // Check if the game supports any compression at all
-            if (gameInformation.CompressionFormats.All(compressionFormat => compressionFormat == CompressionFormat.None))
-                return;
-
-            // We use isTable because non-loc tables don't have an extension
-            var isTable = rootFolder == "db" || extension == ".loc";
-            var hasExtension = !string.IsNullOrEmpty(extension);
-
-            // Don't compress files that aren't tables and don't have extensions
-            if (!isTable && !hasExtension)
-            {
-                CompressionFormat = CompressionFormat.None;
-                IsCompressed = false;
-                return;
-            }
-
-            // Only in WH3 (and newer games?) is the table compression bug fixed
-            if (isTable && gameInformation.CompressionFormats.Contains(CompressionFormat.Zstd) && gameInformation.Type == GameTypeEnum.Warhammer3)
-            {
-                CompressionFormat = CompressionFormat.Zstd;
-                IsCompressed = true;
-                return;
-            }
-
-            // Games that support the other formats won't use Lzma1 as it's legacy so if it's set then it's for a game that only uses it so keep it
-            if (CompressionFormat == CompressionFormat.Lzma1 && gameInformation.CompressionFormats.Contains(CompressionFormat.Lzma1))
-                return;
-
-            // Anything that shouldn't be None or Lz4 is set to Zstd unless the game doesn't support that in which case use None
-            if (PackFileCompression.NoneFileTypes.Contains(extension))
-            {
-                CompressionFormat = CompressionFormat.None;
-                IsCompressed = false;
-            }
-            else if (PackFileCompression.Lz4FileTypes.Contains(extension) && gameInformation.CompressionFormats.Contains(CompressionFormat.Lz4))
-            {
-                CompressionFormat = CompressionFormat.Lz4;
-                IsCompressed = true;
-            }
-            else if (gameInformation.CompressionFormats.Contains(CompressionFormat.Zstd))
-            {
-                CompressionFormat = CompressionFormat.Zstd;
-                IsCompressed = true;
-            }
-            else
-            {
-                CompressionFormat = CompressionFormat.None;
-                IsCompressed = false;
-            }
         }
     }
 
