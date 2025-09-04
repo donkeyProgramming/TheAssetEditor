@@ -5,8 +5,10 @@ namespace Shared.GameFormats.Wwise.Hirc.V136.Shared
 {
     public class AkDecisionTree_V136 : IAkDecisionTree
     {
-        public Node_V136 DecisionTree { get; set; } = new Node_V136(); // Root node of the decision tree in hierarchical form
-        public List<Node_V136> Nodes { get; set; } = []; // Flattened list of all nodes in the decision tree in sequential order for read / write
+        // Root node of the decision tree in hierarchical form
+        public Node_V136 DecisionTree { get; set; } = new Node_V136(); 
+        // Flattened list of all nodes in the decision tree in sequential order for read / write
+        public List<Node_V136> Nodes { get; set; } = []; 
 
         public void ReadData(ByteChunk chunk, uint treeDataSize, uint maxTreeDepth)
         {
@@ -110,7 +112,8 @@ namespace Shared.GameFormats.Wwise.Hirc.V136.Shared
 
             public uint GetSize()
             {
-                // Either ChildrenIdx and ChildrenCount are used or AudioNodeId is used but in either case the same amount of bytes are used so doesn't matter which one is used to calculate the size here
+                // Either ChildrenIdx and ChildrenCount are used or AudioNodeId is used but in either case the
+                // same amount of bytes are used so doesn't matter which one is used to calculate the size here
                 var idSize = ByteHelper.GetPropertyTypeSize(Key);
                 var childrenIdxSize = ByteHelper.GetPropertyTypeSize(ChildrenIdx);
                 var childrenCountSize = ByteHelper.GetPropertyTypeSize(ChildrenCount);

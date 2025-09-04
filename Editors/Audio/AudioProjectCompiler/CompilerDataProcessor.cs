@@ -18,25 +18,10 @@ namespace Editors.Audio.AudioProjectCompiler
         private readonly ApplicationSettingsService _applicationSettingsService;
         private readonly IAudioRepository _audioRepository;
 
-        private Dictionary<uint, HashSet<uint>> UsedHircIdsByLanguageIdLookup { get; set; } = [];
-        private Dictionary<uint, HashSet<uint>> UsedSourceIdsByLanguageIdLookup { get; set; } = [];
-
         public CompilerDataProcessor(ApplicationSettingsService applicationSettingsService, IAudioRepository audioRepository)
         {
             _applicationSettingsService = applicationSettingsService;
             _audioRepository = audioRepository;
-
-            UsedHircIdsByLanguageIdLookup = _audioRepository.HircLookupByLanguageIdById
-                .ToDictionary(
-                    outer => outer.Key,
-                    outer => outer.Value.Keys.ToHashSet()
-                );
-
-            UsedSourceIdsByLanguageIdLookup = _audioRepository.SoundHircLookupByLanguageIdBySourceId
-                .ToDictionary(
-                    outer => outer.Key,
-                    outer => outer.Value.Keys.ToHashSet()
-                );
         }
 
         public void SetSoundBankData(AudioProject audioProject, string audioProjectFileName)
@@ -149,7 +134,8 @@ namespace Editors.Audio.AudioProjectCompiler
         {
             sound.Language = soundBank.Language;
 
-            var usedHircIds = UsedHircIdsByLanguageIdLookup[WwiseHash.Compute(soundBank.Language)];
+            var languageId = WwiseHash.Compute(soundBank.Language);
+            var usedHircIds = _audioRepository.GetUsedHircIdsByLanguageId(languageId);
             var soundFileNameWithoutExtension = Path.GetFileNameWithoutExtension(sound.WavFileName);
             var soundIdResult = IdGenerator.GenerateSoundHircId(usedHircIds, soundFileNameWithoutExtension);
 
@@ -159,7 +145,7 @@ namespace Editors.Audio.AudioProjectCompiler
 
             if (!sourceLookup.TryGetValue(sound.WavFilePath, out var sourceId))
             {
-                var usedSourceIds = UsedSourceIdsByLanguageIdLookup[WwiseHash.Compute(soundBank.Language)];
+                var usedSourceIds = _audioRepository.GetUsedSourceIdsByLanguageId(languageId);
                 var sourceIdResult = IdGenerator.GenerateWemId(usedSourceIds, soundFileNameWithoutExtension);
                 sourceId = sourceIdResult.Id;
                 sourceLookup[sound.WavFilePath] = sourceId;
@@ -179,7 +165,8 @@ namespace Editors.Audio.AudioProjectCompiler
         {
             container.Language = soundBank.Language;
 
-            var usedHircIds = UsedHircIdsByLanguageIdLookup[WwiseHash.Compute(soundBank.Language)];
+            var languageId = WwiseHash.Compute(soundBank.Language);
+            var usedHircIds = _audioRepository.GetUsedHircIdsByLanguageId(languageId);
             IdGenerator.Result containerIdResult;
 
             if (actionEventName != null)
@@ -241,7 +228,8 @@ namespace Editors.Audio.AudioProjectCompiler
                     if (actionEvent.Name.StartsWith("Stop_"))
                         action.ActionType = AkActionType.Stop_E_O;
 
-                    var usedHircIds = UsedHircIdsByLanguageIdLookup[WwiseHash.Compute(soundBank.Language)];
+                    var languageId = WwiseHash.Compute(soundBank.Language);
+                    var usedHircIds = _audioRepository.GetUsedHircIdsByLanguageId(languageId);
 
                     if (actionEvent.Sound != null)
                     {
@@ -276,7 +264,10 @@ namespace Editors.Audio.AudioProjectCompiler
                 {
                     actionEvent.Id = WwiseHash.Compute(actionEvent.Name);
 
-                    if (UsedHircIdsByLanguageIdLookup[WwiseHash.Compute(soundBank.Language)].Contains(actionEvent.Id))
+                    // TODO: Figure out how to handle things when you have a bnk already made and sound files etc. and you save it again but it throws this error.
+                    var languageId = WwiseHash.Compute(soundBank.Language);
+                    var usedHircIds = _audioRepository.GetUsedHircIdsByLanguageId(languageId);
+                    if (usedHircIds.Contains(actionEvent.Id))
                         throw new NotSupportedException($"Action Event Id {actionEvent.Id} for {actionEvent.Name} in {soundBank.Language} is already in use, the Event needs a different name.");
                 }
 

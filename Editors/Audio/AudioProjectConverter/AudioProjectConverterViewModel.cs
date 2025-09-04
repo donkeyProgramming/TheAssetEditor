@@ -158,7 +158,7 @@ namespace Editors.Audio.AudioProjectConverter
             {
                 var soundBankDataBytes = File.ReadAllBytes(soundBankPath);
                 var soundBankPackFile = PackFile.CreateFromBytes(soundBankPath, soundBankDataBytes);
-                var parsedSoundBank = _bnkParser.Parse(soundBankPackFile, soundBankPath, false);
+                var parsedSoundBank = BnkParser.Parse(soundBankPackFile, soundBankPath, false);
                 parsedSoundBanks.Add(parsedSoundBank);
             }
 

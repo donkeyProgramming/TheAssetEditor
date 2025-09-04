@@ -47,7 +47,7 @@ namespace Editors.Audio.AudioProjectCompiler
                 hircChunk.WriteData(hircItems);
 
                 var headerBytes = BkhdParser.WriteData(bkhdChunk);
-                var hircBytes = new HircParser().WriteData(hircChunk, bankGeneratorVersion);
+                var hircBytes = HircParser.WriteData(hircChunk, bankGeneratorVersion);
 
                 // Write
                 using var memStream = new MemoryStream();
@@ -57,8 +57,7 @@ namespace Editors.Audio.AudioProjectCompiler
 
                 // Convert to output and parse for sanity
                 var bnkPackFile = new PackFile(soundBank.SoundBankFileName, new MemorySource(bytes));
-                var parser = new BnkParser();
-                var reparsedSanityFile = parser.Parse(bnkPackFile, "test\\fakefilename.bnk", true);
+                var reparsedSanityFile = BnkParser.Parse(bnkPackFile, "test\\fakefilename.bnk", true);
 
                 _fileSaveService.Save(soundBank.SoundBankFilePath, bnkPackFile.DataSource.ReadData(), true);
             }

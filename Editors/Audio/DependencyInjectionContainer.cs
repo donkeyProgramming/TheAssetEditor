@@ -104,14 +104,13 @@ namespace Editors.Audio
             serviceCollection.AddScoped<AudioExplorerViewModel>();
 
             // Shared audio stuff 
-            serviceCollection.AddScoped<RepositoryProvider, CreateRepositoryFromAllPackFiles>();
-            serviceCollection.AddScoped<IAudioRepository, AudioRepository>();
+            serviceCollection.AddSingleton<IAudioRepository, AudioRepository>();
+            serviceCollection.AddSingleton<BnkLoader>();
+            serviceCollection.AddSingleton<DatLoader>();
+            serviceCollection.AddSingleton<BnkParser>();
+            serviceCollection.AddScoped<SoundPlayer>();
             serviceCollection.AddScoped<VgStreamWrapper>();
             serviceCollection.AddScoped<WSourcesWrapper>();
-            serviceCollection.AddScoped<BnkLoader>();
-            serviceCollection.AddScoped<DatLoader>();
-            serviceCollection.AddScoped<BnkParser>();
-            serviceCollection.AddScoped<SoundPlayer>();
 
             RegisterAllAsInterface<IDeveloperConfiguration>(serviceCollection, ServiceLifetime.Transient);
         }

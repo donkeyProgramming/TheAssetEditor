@@ -181,7 +181,7 @@ namespace Editors.Audio.Storage
         private SoundDatFile LoadDatFiles(IPackFileService pfs, out List<string> failedFiles)
         {
             var datFiles = PackFileServiceUtility.FindAllWithExtention(pfs, ".dat");
-            datFiles = PackFileUtil.FilterUnvantedFiles(pfs, datFiles, new[] { "bank_splits.dat", "campaign_music.dat", "battle_music.dat", "icudt61l.dat" }, out var removedFiles);
+            datFiles = PackFileUtil.FilterUnvantedFiles(pfs, datFiles, ["bank_splits.dat", "campaign_music.dat", "battle_music.dat", "icudt61l.dat"], out var removedFiles);
 
             var failedDatParsing = new List<(string, string)>();
             var masterDat = new SoundDatFile();

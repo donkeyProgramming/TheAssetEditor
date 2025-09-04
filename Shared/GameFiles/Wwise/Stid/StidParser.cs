@@ -4,7 +4,7 @@ namespace Shared.GameFormats.Wwise.Stid
 {
     public class StidParser
     {
-        public static BnkChunkHeader Parse(string fileName, ByteChunk chunk, ParsedBnkFile soundDb)
+        public static BnkChunkHeader Parse(string fileName, ByteChunk chunk)
         {
             var chunkHeader = BnkChunkHeader.ReadData(chunk);
             chunk.Index += (int)chunkHeader.ChunkSize;

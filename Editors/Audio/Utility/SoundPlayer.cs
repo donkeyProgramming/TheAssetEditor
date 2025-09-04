@@ -54,7 +54,7 @@ namespace Editors.Audio.Utility
                 _logger.Here().Warning($"Unable to find a name from hash '{dataSoundbankId}'.");
 
             var dataSoundbankFileName = $"{dataSoundbankNameWithoutExtension}.bnk";
-            var packFile = _audioRepository.BnkPackFileLookupByName[dataSoundbankFileName];
+            var packFile = _audioRepository.PackFileLookupByBnkName[dataSoundbankFileName];
             if (packFile == null)
                 _logger.Here().Warning($"Unable to find packfile with name '{dataSoundbankFileName}'.");
 

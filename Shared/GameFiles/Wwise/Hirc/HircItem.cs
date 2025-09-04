@@ -9,15 +9,13 @@ namespace Shared.GameFormats.Wwise.Hirc
     {
         readonly ILogger _logger = Logging.Create<HircItem>();
 
-        public static readonly uint HircHeaderSize = 4; // 2x uint. Type is not included for some reason
+        public static readonly uint HircHeaderSize = 4; 
         public string OwnerFilePath { get; set; } = "OwnerFile Not Set";
         public bool IsCaHircItem { get; set; }
         public uint LanguageId { get; set; } 
         public uint ByteIndexInFile { get; set; }
         public uint IndexInFile { get; set; }
         public bool HasError { get; set; } = true;
-
-        // Wwise object properties
         public AkBkHircType HircType { get; set; }
         public uint SectionSize { get; set; }
         public uint Id { get; set; }

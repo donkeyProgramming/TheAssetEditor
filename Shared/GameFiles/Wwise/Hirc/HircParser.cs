@@ -5,16 +5,7 @@ namespace Shared.GameFormats.Wwise.Hirc
 {
     public class HircParser
     {
-        public HircParser()
-        {
-        }
-
-        private static HircFactory GetHircFactory(uint bnkVersion)
-        {
-            return HircFactory.CreateFactory(bnkVersion);
-        }
-
-        public HircChunk Parse(string filePath, ByteChunk chunk, uint bnkVersion, uint languageId, bool isCaHircItem)
+        public static HircChunk Parse(string filePath, ByteChunk chunk, uint bnkVersion, uint languageId, bool isCaHircItem)
         {
             var hircChunk = new HircChunk
             {
@@ -23,7 +14,7 @@ namespace Shared.GameFormats.Wwise.Hirc
             };
 
             var failedItems = new List<uint>();
-            var factory = GetHircFactory(bnkVersion);
+            var factory = HircFactory.CreateFactory(bnkVersion);
 
             for (uint itemIndex = 0; itemIndex < hircChunk.NumHircItems; itemIndex++)
             {
@@ -46,16 +37,21 @@ namespace Shared.GameFormats.Wwise.Hirc
                     failedItems.Add(itemIndex);
                     chunk.Index = start;
 
-                    var unkInstance = new UnknownHirc() { ErrorMsg = e.Message, ByteIndexInFile = itemIndex, OwnerFilePath = filePath };
-                    unkInstance.Parse(chunk);
-                    hircChunk.HircItems.Add(unkInstance);
+                    var unknownHirc = new UnknownHirc
+                    {
+                        ErrorMsg = e.Message,
+                        ByteIndexInFile = itemIndex,
+                        OwnerFilePath = filePath
+                    };
+                    unknownHirc.Parse(chunk);
+                    hircChunk.HircItems.Add(unknownHirc);
                 }
             }
 
             return hircChunk;
         }
 
-        public byte[] WriteData(HircChunk hircChunk, uint gameBankGeneratorVersion)
+        public static byte[] WriteData(HircChunk hircChunk, uint gameBankGeneratorVersion)
         {
             using var memStream = new MemoryStream();
             memStream.Write(BnkChunkHeader.WriteData(hircChunk.ChunkHeader));

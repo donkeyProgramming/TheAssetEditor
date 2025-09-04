@@ -11,20 +11,14 @@ namespace Shared.GameFormats.Wwise
 {
     public class BnkParser
     {
-        readonly HircParser _hircParser = new();
-
-        public BnkParser()
+        public static ParsedBnkFile Parse(PackFile packFile, string filePath, bool isCaHircItem)
         {
-        }
-
-        public ParsedBnkFile Parse(PackFile file, string filePath, bool isCaHircItem)
-        {
-            var chunk = file.DataSource.ReadDataAsChunk();
             var parsedBnkFile = new ParsedBnkFile();
+            var chunk = packFile.DataSource.ReadDataAsChunk();
 
             while (chunk.BytesLeft != 0)
             {
-                if (file.Name == "init.bnk")
+                if (packFile.Name == "init.bnk")
                     continue;
 
                 var chunkHeader = BnkChunkHeader.PeekFromBytes(chunk);
@@ -40,7 +34,7 @@ namespace Shared.GameFormats.Wwise
                 else if (BankChunkTypes.DATA == chunkHeader.Tag)
                     parsedBnkFile.DataChunk = LoadDataChunk(filePath, chunk);
                 else if (BankChunkTypes.STID == chunkHeader.Tag)
-                    LoadStidChunk(filePath, chunk); // We never care about this. Discard after loading
+                    LoadStidChunk(filePath, chunk); 
                 else
                     throw new ArgumentException($"Unknown data block '{chunkHeader.Tag}' while parsing bnk file '{filePath}'");
 
@@ -58,11 +52,11 @@ namespace Shared.GameFormats.Wwise
 
         private static BkhdChunk LoadBkhdChunk(string fullName, ByteChunk chunk) => BkhdParser.Parse(fullName, chunk);
 
-        private HircChunk LoadHircChunk(string fullName, ByteChunk chunk, uint chunkHeaderSize, AkBankHeader akBankHeader, bool isCaHircItem)
+        private static HircChunk LoadHircChunk(string fullName, ByteChunk chunk, uint chunkHeaderSize, AkBankHeader akBankHeader, bool isCaHircItem)
         {
             var bnkVersion = akBankHeader.BankGeneratorVersion;
             var languageId = akBankHeader.LanguageId;
-            var hircData = _hircParser.Parse(fullName, chunk, bnkVersion, languageId, isCaHircItem);
+            var hircData = HircParser.Parse(fullName, chunk, bnkVersion, languageId, isCaHircItem);
 
             var hircSizes = hircData.HircItems.Sum(x => x.SectionSize);
             var expectedHircChunkSize = hircSizes + hircData.NumHircItems * 5 + 4;
@@ -73,8 +67,8 @@ namespace Shared.GameFormats.Wwise
             return hircData;
         }
 
-        private static DidxChunk LoadDidxChunk(string fullName, ByteChunk chunk) => DidxParser.Parse(fullName, chunk, null);
-        private static ByteChunk LoadDataChunk(string fullName, ByteChunk chunk) => DataParser.Parse(fullName, chunk, null);
-        static void LoadStidChunk(string fullName, ByteChunk chunk) => StidParser.Parse(fullName, chunk, null);
+        private static DidxChunk LoadDidxChunk(string fullName, ByteChunk chunk) => DidxParser.Parse(fullName, chunk);
+        private static ByteChunk LoadDataChunk(string fullName, ByteChunk chunk) => DataParser.Parse(fullName, chunk);
+        private static void LoadStidChunk(string fullName, ByteChunk chunk) => StidParser.Parse(fullName, chunk);
     }
 }

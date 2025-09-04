@@ -6,11 +6,10 @@ namespace Shared.GameFormats.Dat
 {
     public class DatFileParser
     {
-        public static SoundDatFile Parse(PackFile file, bool isAtilla)
+        public static SoundDatFile Parse(PackFile packFile, bool isAtilla)
         {
-            var chunk = file.DataSource.ReadDataAsChunk();
-
             var output = new SoundDatFile();
+            var chunk = packFile.DataSource.ReadDataAsChunk();
 
             var sectionZeroCount = chunk.ReadUInt32();
             for (var i = 0; i < sectionZeroCount; i++)
