@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
       <TargetFramework>net9.0-windows</TargetFramework>
   </PropertyGroup>
@@ -23,7 +23,6 @@
     <ItemGroup>
       <ProjectReference Include="..\..\Shared\SharedCore\Shared.Core.csproj" />
     </ItemGroup>
-
 
     <Target Name="RestoreDotnetTools" BeforeTargets="Restore">
         <Message Text="Restoring dotnet tools" Importance="High" />

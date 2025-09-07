@@ -3,6 +3,12 @@ using Shared.Core.Settings;
 
 namespace Shared.Core.PackFiles.Models
 {
+    public record PackFileWriteInfo(
+        PackFile PackFile,
+        long FileSizeMetadataPosition,
+        CompressionFormat CurrentCompressionFormat,
+        CompressionFormat IntendedCompressionFormat);
+
     public class PackFileContainer
     {
         public string Name { get; set; }
@@ -55,27 +61,25 @@ namespace Shared.Core.PackFiles.Models
             Header.FileCount = (uint)FileList.Count;
             PackFileSerializer.WriteHeader(Header, (uint)fileNamesOffset, writer);
 
-            // Save all the files
+            var filesToWrite = new List<PackFileWriteInfo>();
+
+            // Write file metadata
             foreach (var file in sortedFiles)
             {
                 var packFile = file.Value;
-                var packedFileSource = (PackedFileSource)file.Value.DataSource;
-                var data = packedFileSource.ReadData();
+                var fileSize = (int)packFile.DataSource.Size;
 
-                var fileExtension = packFile.Extension;
+                // Determine compression info
+                var currentCompressionFormat = CompressionFormat.None;
+                if (packFile.DataSource is PackedFileSource packedFileSource)
+                    currentCompressionFormat = packedFileSource.CompressionFormat;
+                var firstFilePathPart = file.Key.Split(['\\', '/'], StringSplitOptions.RemoveEmptyEntries).First();
+                var intendedCompressionFormat = PackFileCompression.GetCompressionFormat(gameInformation, firstFilePathPart, packFile.Extension);
+                var shouldCompress = intendedCompressionFormat != CompressionFormat.None;
 
-                var segments = file.Key.Split(['\\', '/'], StringSplitOptions.RemoveEmptyEntries);
-                var rootFolder = segments.First();
-
-                packedFileSource.SetCompressionInfo(gameInformation, rootFolder, fileExtension);
-
-                var fileSize = data.Length;
-                if (packedFileSource.IsCompressed)
-                {
-                    var compressedData = PackFileCompression.Compress(data, packedFileSource.CompressionFormat);
-                    fileSize = compressedData.Length;
-                }
-                writer.Write(fileSize);
+                // File size placeholder (rewritten later)
+                var fileSizePosition = writer.BaseStream.Position;
+                writer.Write(0);
 
                 // Timestamp
                 if (Header.HasIndexWithTimeStamp)
@@ -83,7 +87,7 @@ namespace Shared.Core.PackFiles.Models
 
                 // Compression
                 if (Header.Version == PackFileVersion.PFH5)
-                    writer.Write(packedFileSource.IsCompressed);
+                    writer.Write(shouldCompress);
 
                 // Filename
                 var fileNameBytes = Encoding.UTF8.GetBytes(file.Key);
@@ -91,34 +95,71 @@ namespace Shared.Core.PackFiles.Models
 
                 // Zero terminator
                 writer.Write((byte)0);
+
+                filesToWrite.Add(new PackFileWriteInfo(
+                    packFile,
+                    fileSizePosition,
+                    currentCompressionFormat,
+                    intendedCompressionFormat));
             }
 
-            var packedFileSourceParent = new PackedFileSourceParent()
-            {
-                FilePath = SystemFilePath,
-            };
+            var packedFileSourceParent = new PackedFileSourceParent { FilePath = SystemFilePath };
 
             // Write the files
-            foreach (var file in sortedFiles)
+            foreach (var file in filesToWrite)
             {
-                var packFile = file.Value;
-                var packedFileSource = (PackedFileSource)packFile.DataSource;
+                var packFile = file.PackFile;
+                byte[] data;
+                var fileSize = 0;
+                uint uncompressedFileSize = 0;
 
+                // Read the data
+                var shouldCompress = file.IntendedCompressionFormat != CompressionFormat.None;
+                var isCorrectCompressionFormat = file.CurrentCompressionFormat == file.IntendedCompressionFormat;
+                if (shouldCompress && !isCorrectCompressionFormat)
+                {
+                    // Decompress the data 
+                    var uncompressedData = packFile.DataSource.ReadData();
+                    uncompressedFileSize = (uint)uncompressedData.Length;
+
+                    // Compress the data into the right format
+                    var compressedData = PackFileCompression.Compress(uncompressedData, file.IntendedCompressionFormat);
+                    data = compressedData;
+                    fileSize = compressedData.Length;
+                }
+                else if (packFile.DataSource is PackedFileSource packedFileSource && isCorrectCompressionFormat)
+                {
+                    // The data is already in the right format so just get the compressed data
+                    uncompressedFileSize = packedFileSource.UncompressedSize;
+                    var compressedData = packedFileSource.ReadDataWithoutDecompressing();
+                    data = compressedData;
+                    fileSize = data.Length;
+                }
+                else
+                {
+                    data = packFile.DataSource.ReadData();
+                    fileSize = data.Length;
+                }
+
+                // Write the data
                 var offset = writer.BaseStream.Position;
-                var data = packedFileSource.ReadData();
-                if (packedFileSource.IsCompressed)
-                    data = PackFileCompression.Compress(data, packedFileSource.CompressionFormat);
+                writer.Write(data);
 
+                // Patch the file size metadata placeholder 
+                var currentPosition = writer.BaseStream.Position;
+                writer.BaseStream.Position = file.FileSizeMetadataPosition;
+                writer.Write(fileSize);
+                writer.BaseStream.Position = currentPosition;
+
+                // Update DataSource
                 packFile.DataSource = new PackedFileSource(
                     packedFileSourceParent,
                     offset,
-                    data.Length,
-                    packedFileSource.IsEncrypted,
-                    packedFileSource.IsCompressed,
-                    packedFileSource.CompressionFormat,
-                    packedFileSource.UncompressedSize);
-
-                writer.Write(data);
+                    fileSize,
+                    Header.HasEncryptedData,
+                    shouldCompress,
+                    file.IntendedCompressionFormat,
+                    uncompressedFileSize);
             }
         }
     }
