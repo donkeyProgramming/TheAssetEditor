@@ -178,7 +178,7 @@ namespace Editors.Audio.AudioEditor.Models
             };
         }
 
-        private static List<SoundBank> CleanSoundBanks(IEnumerable<SoundBank> soundBanks)
+        private static List<SoundBank> CleanSoundBanks(List<SoundBank> soundBanks)
         {
             if (soundBanks == null)
                 return null;
@@ -201,12 +201,13 @@ namespace Editors.Audio.AudioEditor.Models
                 .ToList();
 
             var actionEvents = (soundBank.ActionEvents ?? [])
-                .Where(actionEvent => actionEvent.Sound != null || actionEvent.RandomSequenceContainer != null)
+                .Where(actionEvent => actionEvent.Actions != null && actionEvent.Actions.Count != 0)
                 .ToList();
 
             return new SoundBank
             {
                 Name = soundBank.Name,
+                GameSoundBank = soundBank.GameSoundBank,
                 DialogueEvents = dialogueEvents.Count != 0 ? dialogueEvents : null,
                 ActionEvents = actionEvents.Count != 0 ? actionEvents : null
             };

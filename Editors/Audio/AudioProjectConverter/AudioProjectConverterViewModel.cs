@@ -44,10 +44,8 @@ namespace Editors.Audio.AudioProjectConverter
         private readonly IStandardDialogs _standardDialogs;
         private readonly IFileSaveService _fileSaveService;
         private readonly IAudioRepository _audioRepository;
-        private readonly IAudioEditorStateService _audioEditorStateService;
         private readonly IAudioProjectFileService _audioProjectFileService;
         private readonly ApplicationSettingsService _applicationSettingsService;
-        private readonly BnkParser _bnkParser;
         private readonly VgStreamWrapper _vgStreamWrapper;
 
         private readonly ILogger _logger = Logging.Create<AudioProjectViewerViewModel>();
@@ -76,19 +74,15 @@ namespace Editors.Audio.AudioProjectConverter
             IStandardDialogs standardDialogs,
             IFileSaveService fileSaveService,
             IAudioRepository audioRepository,
-            IAudioEditorStateService audioEditorStateService,
             IAudioProjectFileService audioProjectFileService,
             ApplicationSettingsService applicationSettingsService,
-            BnkParser bnkParser,
             VgStreamWrapper vgStreamWrapper)
         {
             _standardDialogs = standardDialogs;
             _fileSaveService = fileSaveService;
             _audioRepository = audioRepository;
-            _audioEditorStateService = audioEditorStateService;
             _audioProjectFileService = audioProjectFileService;
             _applicationSettingsService = applicationSettingsService;
-            _bnkParser = bnkParser;
             _vgStreamWrapper = vgStreamWrapper;
 
             OutputDirectoryPath = "audio\\audio_projects";
@@ -122,7 +116,14 @@ namespace Editors.Audio.AudioProjectConverter
 
             var dialogueEvents = hircItems.OfType<ICAkDialogueEvent>().ToList();
             foreach (var dialogueEvent in dialogueEvents)
-                PrepareDialogueEventProcessing(dialogueEvent, dialogueEventsLookupByWemId, statePathsLookupByDialogueEvent, statesLookupByStateGroupByStateId, hircLookupById, dialogueEventsToProcess, moddedStateGroups);
+                SetDialogueEventData(
+                    dialogueEvent,
+                    dialogueEventsLookupByWemId,
+                    statePathsLookupByDialogueEvent,
+                    statesLookupByStateGroupByStateId,
+                    hircLookupById,
+                    dialogueEventsToProcess,
+                    moddedStateGroups);
 
             foreach (var dialogueEvent in dialogueEventsToProcess)
                 ProcessDialogueEvent(audioProject, dialogueEvent, processedWems, dialogueEventsLookupByWemId, statePathsLookupByDialogueEvent, globalBaseNameUsage);
@@ -199,7 +200,7 @@ namespace Editors.Audio.AudioProjectConverter
             return stateLookupByStateGroup;
         }
 
-        private void PrepareDialogueEventProcessing(
+        private void SetDialogueEventData(
             ICAkDialogueEvent dialogueEvent,
             Dictionary<uint, List<string>> dialogueEventsLookupByWemId,
             Dictionary<string, List<StatePathInfo>> statePathsLookupByDialogueEvent,
@@ -447,8 +448,8 @@ namespace Editors.Audio.AudioProjectConverter
 
                 audioProjectDialogueEvent.InsertAlphabetically(audioProjectStatePath);
 
-                // Remove the processed statePath from the original list as if we're processing multiple bnks
-                // as Dialogue Events can occur several times but so it would add duplicates of the same state path
+                // Remove the processed StatePath from the original list as, if we're processing multiple bnks,
+                // Dialogue Events can occur several times so it would add duplicates of the same StatePath
                 statePathsLookupByDialogueEvent[dialogueEventName].Remove(statePath);
             }
         }

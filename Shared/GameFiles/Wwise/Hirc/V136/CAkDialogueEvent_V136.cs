@@ -45,7 +45,7 @@ namespace Shared.GameFormats.Wwise.Hirc.V136
             memStream.Write(ByteParsers.Byte.EncodeValue(Probability, out _));
             memStream.Write(ByteParsers.UInt32.EncodeValue(TreeDepth, out _));
 
-            // Write all the Ids first
+            // Write all the IDs first
             for (var i = 0; i < TreeDepth; i++)
                 memStream.Write(ByteParsers.UInt32.EncodeValue(Arguments[i].GroupId, out _));
 
@@ -63,7 +63,7 @@ namespace Shared.GameFormats.Wwise.Hirc.V136
 
             // Reload the object to ensure sanity
             var sanityReload = new CAkDialogueEvent_V136();
-            sanityReload.Parse(new ByteChunk(byteArray));
+            sanityReload.ReadHirc(new ByteChunk(byteArray));
 
             return byteArray;
         }

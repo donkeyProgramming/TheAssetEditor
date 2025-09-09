@@ -68,7 +68,7 @@ namespace Editors.Audio.Utility
             }
             else
             {
-                var unknownNode = new HircTreeItem() { DisplayName = $"Unknown node type {item.HircType} for Id {item.Id} in {item.OwnerFilePath}", Item = item };
+                var unknownNode = new HircTreeItem() { DisplayName = $"Unknown node type {item.HircType} for Id {item.Id} in {item.BnkFilePath}", Item = item };
                 parent.Children.Add(unknownNode);
             }
         }
@@ -105,7 +105,7 @@ namespace Editors.Audio.Utility
             return name;
         }
 
-        protected string GetDisplayId(HircItem item, bool hidenNameIfMissing) => GetDisplayId(item.Id, item.OwnerFilePath, hidenNameIfMissing);
+        protected string GetDisplayId(HircItem item, bool hidenNameIfMissing) => GetDisplayId(item.Id, item.BnkFilePath, hidenNameIfMissing);
 
         protected Wanted GetAsType<Wanted>(HircItem instance) where Wanted : class
         {

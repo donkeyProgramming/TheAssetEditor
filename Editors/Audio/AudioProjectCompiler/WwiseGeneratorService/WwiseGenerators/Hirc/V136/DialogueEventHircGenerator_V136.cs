@@ -32,8 +32,8 @@ namespace Editors.Audio.AudioProjectCompiler.WwiseGeneratorService.WwiseGenerato
             dialogueEventHirc.TreeDataSize = (uint)decisionTree.Nodes.Count * new AkDecisionTree_V136.Node_V136().GetSize();
 
             dialogueEventHirc.Mode = (byte)AkMode.BestMatch;
-            dialogueEventHirc.AkPropBundle0 = new AkPropBundle_V136() { PropsList = new List<AkPropBundle_V136.PropBundleInstance_V136>() };
-            dialogueEventHirc.AkPropBundle1 = new AkPropBundleMinMax_V136() { PropsList = new List<AkPropBundleMinMax_V136.AkPropBundleInstance_V136>() };
+            dialogueEventHirc.AkPropBundle0 = new AkPropBundle_V136() { PropsList = [] };
+            dialogueEventHirc.AkPropBundle1 = new AkPropBundleMinMax_V136() { PropsList = [] };
             return dialogueEventHirc;
         }
 
@@ -63,14 +63,20 @@ namespace Editors.Audio.AudioProjectCompiler.WwiseGeneratorService.WwiseGenerato
                     var statePathNode = statePath.Nodes[i];
                     var stateKey = statePathNode.State.Id;
 
-                    var existingChild = currentNode.Nodes.FirstOrDefault(n => n.Key == stateKey);
+                    var existingChild = currentNode.Nodes.FirstOrDefault(node => node.Key == stateKey);
                     if (existingChild != null)
                         currentNode = existingChild;
                     else
                     {
                         uint audioNodeId;
                         if (i == statePath.Nodes.Count - 1)
-                            audioNodeId = statePath.RandomSequenceContainer.Id;
+                        {
+                            if (statePath.Sound != null)
+                                audioNodeId = statePath.Sound.Id;
+                            else
+                                audioNodeId = statePath.RandomSequenceContainer.Id;
+                        }
+
                         else
                             audioNodeId = 0;
 
@@ -91,8 +97,7 @@ namespace Editors.Audio.AudioProjectCompiler.WwiseGeneratorService.WwiseGenerato
 
         private static List<AkDecisionTree_V136.Node_V136> FlattenDecisionTree(AkDecisionTree_V136.Node_V136 rootNode)
         {
-            var flattenedDecisionTree = new List<AkDecisionTree_V136.Node_V136>();
-            flattenedDecisionTree.Add(rootNode);
+            var flattenedDecisionTree = new List<AkDecisionTree_V136.Node_V136> { rootNode };
             FlattenChildren(rootNode, flattenedDecisionTree);
             return flattenedDecisionTree;
         }
@@ -106,12 +111,18 @@ namespace Editors.Audio.AudioProjectCompiler.WwiseGeneratorService.WwiseGenerato
                 return;
             }
 
+            // Sort siblings in ascending order
+            node.Nodes = node.Nodes.OrderBy(child => child.Key).ToList();
+
+            // Sibling first, depth second indexing:
             node.ChildrenIdx = (ushort)flattenedDecisionTree.Count;
             node.ChildrenCount = (ushort)node.Nodes.Count;
 
+            // Append children first
             foreach (var child in node.Nodes)
                 flattenedDecisionTree.Add(child);
 
+            // Recurse into each child in the same order
             foreach (var child in node.Nodes)
                 FlattenChildren(child, flattenedDecisionTree);
         }
@@ -126,7 +137,7 @@ namespace Editors.Audio.AudioProjectCompiler.WwiseGeneratorService.WwiseGenerato
                 ChildrenCount = childrenUCount,
                 Weight = weight,
                 Probability = probability,
-                Nodes = new List<AkDecisionTree_V136.Node_V136>()
+                Nodes = []
             };
         }
     }

@@ -304,6 +304,9 @@ namespace Editors.Audio.AudioEditor.Settings
 
         private void ShowSettingsFromViewerItem()
         {
+            if (_audioEditorStateService.SelectedViewerRows.Count == 0)
+                return;
+
             AudioSettings settings = null;
             var audioFiles = new List<AudioFile>();
 
@@ -313,27 +316,36 @@ namespace Editors.Audio.AudioEditor.Settings
                 var selectedViewerRow = _audioEditorStateService.SelectedViewerRows[0];
                 var actionEventName = TableHelpers.GetActionEventNameFromRow(selectedViewerRow);
                 var actionEvent = _audioEditorStateService.AudioProject.GetActionEvent(actionEventName);
-                settings = actionEvent.GetAudioSettings();
 
-                if (actionEvent.Sound != null)
+                var playActions = actionEvent.GetPlayActions();
+                if (playActions.Count > 1)
+                    throw new NotSupportedException("Multiple Actions are not supported");
+
+                foreach (var playAction in playActions)
                 {
-                    audioFiles.Add(new AudioFile()
-                    {
-                        FileName = actionEvent.Sound.WavFileName,
-                        FilePath = actionEvent.Sound.WavFilePath,
-                    });
-                }
-                else
-                {
-                    foreach (var sound in actionEvent.RandomSequenceContainer.Sounds)
+                    settings = playAction.GetAudioSettings();
+
+                    if (playAction.Sound != null)
                     {
                         audioFiles.Add(new AudioFile()
                         {
-                            FileName = sound.WavFileName,
-                            FilePath = sound.WavFilePath,
+                            FileName = playAction.Sound.WavPackFileName,
+                            FilePath = playAction.Sound.WavPackFilePath,
                         });
                     }
+                    else
+                    {
+                        foreach (var sound in playAction.RandomSequenceContainer.Sounds)
+                        {
+                            audioFiles.Add(new AudioFile()
+                            {
+                                FileName = sound.WavPackFileName,
+                                FilePath = sound.WavPackFilePath,
+                            });
+                        }
+                    }
                 }
+                
             }
             else if (selectedAudioProjectExplorerNode.IsDialogueEvent())
             {
@@ -347,8 +359,8 @@ namespace Editors.Audio.AudioEditor.Settings
                 {
                     audioFiles.Add(new AudioFile()
                     {
-                        FileName = statePath.Sound.WavFileName,
-                        FilePath = statePath.Sound.WavFilePath,
+                        FileName = statePath.Sound.WavPackFileName,
+                        FilePath = statePath.Sound.WavPackFilePath,
                     });
                 }
                 else
@@ -357,8 +369,8 @@ namespace Editors.Audio.AudioEditor.Settings
                     {
                         audioFiles.Add(new AudioFile()
                         {
-                            FileName = sound.WavFileName,
-                            FilePath = sound.WavFilePath,
+                            FileName = sound.WavPackFileName,
+                            FilePath = sound.WavPackFilePath,
                         });
                     }
                 }

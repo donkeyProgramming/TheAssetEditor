@@ -1,26 +1,26 @@
 ﻿using System;
-using Editors.Audio.AudioEditor.Models;
-using Editors.Audio.Utility;
 using Shared.GameFormats.Wwise.Bkhd;
+using Shared.GameFormats.Wwise.Enums;
 
 namespace Editors.Audio.AudioProjectCompiler.WwiseGeneratorService.WwiseGenerators.Bkhd
 {
     class BkhdChunkGenerator
     {
-        public static BkhdChunk GenerateBkhdChunk(AudioProject audioProject, uint bankGeneratorVersion, SoundBank soundBank)
+        public static BkhdChunk GenerateBkhdChunk(uint bankGeneratorVersion, uint soundBankId, uint language, uint wwiseProjectId)
         {
-            var bkhdChunk = new BkhdChunk();
-            var akBankHeader = new AkBankHeader()
+            return new BkhdChunk
             {
-                BankGeneratorVersion = bankGeneratorVersion,
-                SoundBankId = soundBank.Id,
-                LanguageId = WwiseHash.Compute(audioProject.Language),
-                FeedbackInBank = 0x10,
-                ProjectId = 2361, // TODO: Need a way to get the project Id via a factory and service.
-                Padding = BitConverter.GetBytes(0x04)
+                ChunkHeader = ChunkHeaderGenerator.GenerateChunkHeader(BankChunkTypes.BKHD, 0x18),
+                AkBankHeader = new AkBankHeader()
+                {
+                    BankGeneratorVersion = bankGeneratorVersion,
+                    SoundBankId = soundBankId,
+                    LanguageId = language,
+                    AltValues = 0x10,
+                    ProjectId = wwiseProjectId,
+                    Padding = BitConverter.GetBytes(0x04)
+                }
             };
-            bkhdChunk.AkBankHeader = akBankHeader;
-            return bkhdChunk;
         }
     }
 }

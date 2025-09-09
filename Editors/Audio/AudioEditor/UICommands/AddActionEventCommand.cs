@@ -15,11 +15,11 @@ namespace Editors.Audio.AudioEditor.UICommands
 
         public void Execute(DataRow row)
         {
-            var actionEventGroupName = _audioEditorStateService.SelectedAudioProjectExplorerNode.Name;
+            var actionEventTypeName = _audioEditorStateService.SelectedAudioProjectExplorerNode.Name;
             var audioFiles = _audioEditorStateService.AudioFiles;
             var audioSettings = _audioEditorStateService.AudioSettings;
             var actionEventName = TableHelpers.GetActionEventNameFromRow(row);
-            _actionEventService.AddActionEvent(actionEventGroupName, actionEventName, audioFiles, audioSettings);
+            _actionEventService.AddActionEvent(actionEventTypeName, actionEventName, audioFiles, audioSettings);
         }
     }
 }

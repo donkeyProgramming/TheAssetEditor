@@ -2,11 +2,11 @@
 
 namespace Shared.GameFormats.Wwise.Stid
 {
-    public class StidParser
+    public class StidChunk
     {
-        public static BnkChunkHeader Parse(string fileName, ByteChunk chunk)
+        public static ChunkHeader ReadData(string fileName, ByteChunk chunk)
         {
-            var chunkHeader = BnkChunkHeader.ReadData(chunk);
+            var chunkHeader = ChunkHeader.ReadData(chunk);
             chunk.Index += (int)chunkHeader.ChunkSize;
             return chunkHeader;
         }

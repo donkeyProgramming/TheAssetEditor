@@ -22,7 +22,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Shared.Core.DependencyInjection;
 using Shared.Core.DevConfig;
 using Shared.Core.ToolCreation;
-using Shared.GameFormats.Wwise;
 
 namespace Editors.Audio
 {
@@ -95,19 +94,18 @@ namespace Editors.Audio
 
             // Audio Project Compiler
             serviceCollection.AddScoped<IAudioProjectCompilerService, AudioProjectCompilerService>();
-            serviceCollection.AddScoped<CompilerDataProcessor>();
-            serviceCollection.AddScoped<SoundBankGenerator>();
-            serviceCollection.AddScoped<WemGenerator>();
-            serviceCollection.AddScoped<DatGenerator>();
+            serviceCollection.AddScoped<ISoundBankGeneratorService, SoundBankGeneratorService>();
+            serviceCollection.AddScoped<IWemGeneratorService, WemGeneratorService>();
+            serviceCollection.AddScoped<IDatGeneratorService, DatGeneratorService>();
+            serviceCollection.AddScoped<IIdGeneratorService, IdGeneratorService>();
 
             // Audio Explorer
             serviceCollection.AddScoped<AudioExplorerViewModel>();
 
             // Shared audio stuff 
-            serviceCollection.AddSingleton<IAudioRepository, AudioRepository>();
+            serviceCollection.AddScoped<IAudioRepository, AudioRepository>();
             serviceCollection.AddSingleton<BnkLoader>();
             serviceCollection.AddSingleton<DatLoader>();
-            serviceCollection.AddSingleton<BnkParser>();
             serviceCollection.AddScoped<SoundPlayer>();
             serviceCollection.AddScoped<VgStreamWrapper>();
             serviceCollection.AddScoped<WSourcesWrapper>();

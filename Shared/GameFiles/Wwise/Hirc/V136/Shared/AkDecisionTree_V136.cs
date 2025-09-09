@@ -61,7 +61,8 @@ namespace Shared.GameFormats.Wwise.Hirc.V136.Shared
             {
                 memStream.Write(ByteParsers.UInt32.EncodeValue(node.Key ?? 0, out _), 0, 4);
 
-                if (node.AudioNodeId != 0)
+                var hasChildren = node.Nodes != null && node.Nodes.Count > 0;
+                if (!hasChildren)
                     memStream.Write(ByteParsers.UInt32.EncodeValue(node.AudioNodeId, out _), 0, 4);
                 else
                 {
@@ -73,6 +74,12 @@ namespace Shared.GameFormats.Wwise.Hirc.V136.Shared
                 memStream.Write(ByteParsers.UShort.EncodeValue(node.Probability, out _), 0, 2);
             }
             return memStream.ToArray();
+        }
+
+        public uint GetSize()
+        {
+            var nodeSize = new Node_V136().GetSize();
+            return (uint)Nodes.Count * nodeSize;
         }
 
         public class Node_V136

@@ -10,8 +10,15 @@ namespace Editors.Audio.AudioEditor.Models
         public List<ActionEvent> ActionEvents { get; set; }
         public List<DialogueEvent> DialogueEvents { get; set; }
         public string Language { get; set; }
-        public string SoundBankFileName { get; set; }
-        public string SoundBankFilePath { get; set; }
+        public uint LanguageId { get; set; }
+        public string FileName { get; set; }
+        public string FilePath { get; set; }
+        public uint DialogueEventsSplitTestingId { get; set; }
+        public string DialogueEventsSplitTestingFileName { get; set; }
+        public string DialogueEventsSplitTestingFilePath { get; set; }
+        public uint DialogueEventsSplitMergingId { get; set; }
+        public string DialogueEventsSplitMergingFileName { get; set; }
+        public string DialogueEventsSplitMergingFilePath { get; set; }
 
         public static SoundBank Create(string name, Wh3SoundBank gameSoundBank)
         {
@@ -47,5 +54,19 @@ namespace Editors.Audio.AudioEditor.Models
         }
 
         public void InsertAlphabetically(ActionEvent actionEvent) => InsertAlphabeticallyUnique(ActionEvents, actionEvent);
+
+        public List<ActionEvent> GetPlayActionEvents()
+        {
+            return ActionEvents
+                .Where(actionEvent => actionEvent.GetPlayActions().Count != 0 && actionEvent.GetStopActions().Count == 0)
+                .ToList();
+        }
+
+        public List<ActionEvent> GetStopActionEvents()
+        {
+            return ActionEvents
+                .Where(actionEvent => actionEvent.GetStopActions().Count != 0 && actionEvent.GetPlayActions().Count == 0)
+                .ToList();
+        }
     }
 }

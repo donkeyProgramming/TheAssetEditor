@@ -16,7 +16,7 @@ namespace Shared.GameFormats.Wwise.Hirc
             if (_itemList.TryGetValue(type, out var functor))
                 return functor();
 
-            return new UnknownHirc();
+            return new UnknownHircItem();
         }
 
         // Each major release of Wwise has a bank generator version

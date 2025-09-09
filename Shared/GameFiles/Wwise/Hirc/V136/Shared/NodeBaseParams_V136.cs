@@ -48,7 +48,7 @@ namespace Shared.GameFormats.Wwise.Hirc.V136.Shared
             return memStream.ToArray();
         }
 
-        internal uint GetSize()
+        public uint GetSize()
         {
             var overrideAttachmentSize = ByteHelper.GetPropertyTypeSize(OverrideAttachmentParams);
             var overrideBusIdSize = ByteHelper.GetPropertyTypeSize(OverrideBusId);

@@ -1,8 +1,8 @@
-﻿using Editors.Audio.Storage;
+﻿using System.Collections.Generic;
+using System.Linq;
+using Editors.Audio.Storage;
 using Shared.GameFormats.Wwise.Enums;
 using Shared.Ui.Common;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace Editors.Audio.AudioExplorer
 {
@@ -36,7 +36,7 @@ namespace Editors.Audio.AudioExplorer
                 .Where(x => typesToShow.Contains(x.HircType))
                 .ToList();
 
-            var selectedableList = allEvents.Select(x => new SelectedHircItem() { HircItem = x, DisplayName = _repository.GetNameFromId(x.Id), Id = x.Id, PackFile = x.OwnerFilePath, IndexInFile = x.ByteIndexInFile }).OrderBy(x => x.DisplayName).ToList();
+            var selectedableList = allEvents.Select(x => new SelectedHircItem() { HircItem = x, DisplayName = _repository.GetNameFromId(x.Id), Id = x.Id, PackFile = x.BnkFilePath, IndexInFile = x.ByteIndexInFile }).OrderBy(x => x.DisplayName).ToList();
             EventList.Filter = "";
             EventList.UpdatePossibleValues(selectedableList);
         }

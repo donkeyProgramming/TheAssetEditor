@@ -26,7 +26,7 @@ namespace Shared.GameFormats.Wwise.Hirc.V136
             // Reload the object to ensure sanity
             var sanityReload = new CAkEvent_V136();
             var chunk = new ByteChunk(byteArray);
-            sanityReload.Parse(chunk);
+            sanityReload.ReadHirc(chunk);
 
             return byteArray;
         }

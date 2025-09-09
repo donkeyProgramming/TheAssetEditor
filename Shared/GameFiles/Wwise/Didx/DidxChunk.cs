@@ -1,24 +1,21 @@
-﻿using Shared.Core.ByteParsing;
+﻿using System.Text;
+using Shared.Core.ByteParsing;
 
 namespace Shared.GameFormats.Wwise.Didx
 {
-    public class DidxChunk
+    public partial class DidxChunk
     {
         public List<MediaHeader> MediaList { get; set; } = [];
 
-        public class MediaHeader
+        public static DidxChunk ReadData(string fileName, ByteChunk chunk)
         {
-            public static uint ByteSize => 12;
-            public uint Id { get; set; }
-            public uint Offset { get; set; }
-            public uint Size { get; set; }
-
-            public MediaHeader(ByteChunk chunk)
-            {
-                Id = chunk.ReadUInt32();
-                Offset = chunk.ReadUInt32();
-                Size = chunk.ReadUInt32();
-            }
+            var tag = Encoding.UTF8.GetString(chunk.ReadBytes(4));
+            var chunkSize = chunk.ReadUInt32();
+            var numItems = chunkSize / MediaHeader.ByteSize;
+            var mediaList = Enumerable.Range(0, (int)numItems)
+                .Select(item => MediaHeader.ReadData(chunk))
+                .ToList();
+            return new DidxChunk { MediaList = mediaList };
         }
     }
 }

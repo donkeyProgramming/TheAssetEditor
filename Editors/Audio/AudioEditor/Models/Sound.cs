@@ -9,10 +9,10 @@ namespace Editors.Audio.AudioEditor.Models
         public uint OverrideBusId { get; set; }
         public uint DirectParentId { get; set; }
         public uint SourceId { get; set; }
-        public string WavFileName { get; set; }
-        public string WavFilePath { get; set; }
-        public string WemFileName { get; set; }
-        public string WemFilePath { get; set; }
+        public string WavPackFileName { get; set; }
+        public string WavPackFilePath { get; set; }
+        public string WemPackFileName { get; set; }
+        public string WemPackFilePath { get; set; }
         public string WemDiskFilePath { get; set; }
         public long InMemoryMediaSize { get; set; }
         public string Language { get; set; }
@@ -22,8 +22,8 @@ namespace Editors.Audio.AudioEditor.Models
         {
             return new Sound()
             {
-                WavFileName = fileName,
-                WavFilePath = filePath,
+                WavPackFileName = fileName,
+                WavPackFilePath = filePath,
                 AudioSettings = audioSettings
             };
         }
@@ -32,8 +32,8 @@ namespace Editors.Audio.AudioEditor.Models
         {
             return new Sound()
             {
-                WavFileName = fileName,
-                WavFilePath = filePath
+                WavPackFileName = fileName,
+                WavPackFilePath = filePath
             };
         }
 
@@ -41,9 +41,15 @@ namespace Editors.Audio.AudioEditor.Models
         {
             return new Sound()
             {
-                WavFileName = audioFile.FileName,
-                WavFilePath = audioFile.FilePath,
+                WavPackFileName = audioFile.FileName,
+                WavPackFilePath = audioFile.FilePath,
             };
+        }
+
+        public string GetAsString()
+        {
+            var audioSettings = AudioSettings?.GetAsString() ?? "null";
+            return $"{OverrideBusId}_{DirectParentId}_{audioSettings}";
         }
     }
 }

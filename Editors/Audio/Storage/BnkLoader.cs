@@ -30,9 +30,9 @@ namespace Editors.Audio.Storage
             _packFileService = packFileService;
         }
 
-        public ParsedBnkFile LoadBnkFile(PackFile bnkFile, string bnkFilePath, bool isCaHircItem, bool printData = false)
+        public ParsedBnkFile LoadBnkFile(PackFile bnkFile, string bnkFilePath, bool isCAHircItem, bool printData = false)
         {
-            var soundDb = BnkParser.Parse(bnkFile, bnkFilePath, isCaHircItem);
+            var soundDb = BnkParser.Parse(bnkFile, bnkFilePath, isCAHircItem);
             if (printData)
                 PrintHircList(soundDb.HircChunk.HircItems, bnkFilePath);
             return soundDb;
@@ -68,7 +68,7 @@ namespace Editors.Audio.Storage
                 try
                 {
                     var parsedBnk = LoadBnkFile(packFile, filePath, packFileContainer.IsCaPackFile);
-                    if (parsedBnk.HircChunk.HircItems.Any(hicItem => hicItem is UnknownHirc == true || hicItem.HasError))
+                    if (parsedBnk.HircChunk.HircItems.Any(hicItem => hicItem is UnknownHircItem == true || hicItem.HasError))
                         bnksWithUnknownHircs.Add(filePath);
 
                     parsedBnks.Add(parsedBnk);
@@ -111,13 +111,13 @@ namespace Editors.Audio.Storage
         {
             var stringBuilder = new StringBuilder();
             stringBuilder.AppendLine($"\n Result: {header}");
-            var unknownHirc = hircItems.Where(hircItem => hircItem is UnknownHirc).Count();
+            var unknownHirc = hircItems.Where(hircItem => hircItem is UnknownHircItem).Count();
             var errorHirc = hircItems.Where(hircItem => hircItem.HasError).Count();
             stringBuilder.AppendLine($"\t Total Hirc Items: {hircItems.Count()} Unknown: {unknownHirc} Decoding Errors:{errorHirc}");
 
             var grouped = hircItems.GroupBy(hircItem => hircItem.HircType);
-            var groupedWithError = grouped.Where(groupedHircItems => groupedHircItems.Any(y => y is UnknownHirc == true || y.HasError));
-            var groupedWithoutError = grouped.Where(groupedHircItems => groupedHircItems.Any(y => y is UnknownHirc == false && y.HasError == false));
+            var groupedWithError = grouped.Where(groupedHircItems => groupedHircItems.Any(y => y is UnknownHircItem == true || y.HasError));
+            var groupedWithoutError = grouped.Where(groupedHircItems => groupedHircItems.Any(y => y is UnknownHircItem == false && y.HasError == false));
 
             stringBuilder.AppendLine("\t\t Succeeded:");
             foreach (var group in groupedWithoutError)
@@ -127,7 +127,7 @@ namespace Editors.Audio.Storage
             {
                 stringBuilder.AppendLine("\t\t Failed:");
                 foreach (var group in groupedWithError)
-                    stringBuilder.AppendLine($"\t\t\t {group.Key}: {group.Where(x => x is UnknownHirc == true || x.HasError).Count()}/{group.Count()} Failed");
+                    stringBuilder.AppendLine($"\t\t\t {group.Key}: {group.Where(x => x is UnknownHircItem == true || x.HasError).Count()}/{group.Count()} Failed");
             }
 
             _logger.Here().Information(stringBuilder.ToString());

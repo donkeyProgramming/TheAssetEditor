@@ -68,7 +68,7 @@ namespace Editors.Audio.GameInformation.Warhammer3
             //new(Wh3SoundBankSubtype.Vocalisation, "vocalisation", "Vocalisation", Wh3SoundBankEventType.ActionEvent),
         ];
 
-        public static Wh3ActionEventType GetActionEventGroup(string name) => Information.First(definition => definition.Name == name).ActionEventType;
+        public static Wh3ActionEventType GetActionEventType(string name) => Information.First(definition => definition.Name == name).ActionEventType;
 
         public static string GetName(Wh3ActionEventType actionEventType) => Information.First(definition => definition.ActionEventType == actionEventType).Name;
 

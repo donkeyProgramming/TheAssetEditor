@@ -1,51 +1,35 @@
 ﻿using Shared.Core.ByteParsing;
-using Shared.GameFormats.Wwise.Enums;
 
 namespace Shared.GameFormats.Wwise.Bkhd
 {
     public class BkhdChunk
     {
         public string OwnerFilePath { get; set; }
-        public BnkChunkHeader ChunkHeader { get; set; } = new BnkChunkHeader() { Tag = BankChunkTypes.BKHD, ChunkSize = 0x18 };
+        public ChunkHeader ChunkHeader { get; set; } = new ChunkHeader();
         public AkBankHeader AkBankHeader { get; set; } = new AkBankHeader();
-    }
 
-    public class AkBankHeader
-    {
-        public uint BankGeneratorVersion { get; set; }
-        public uint SoundBankId { get; set; }
-        public uint LanguageId { get; set; }
-        public uint FeedbackInBank { get; set; }
-        public uint ProjectId { get; set; }
-        public byte[] Padding { get; set; }
-
-        public void ReadData(ByteChunk chunk, uint chunkSize)
+        public static BkhdChunk ReadData(string fileName, ByteChunk chunk)
         {
-            BankGeneratorVersion = chunk.ReadUInt32();
-            SoundBankId = chunk.ReadUInt32();
-            LanguageId = chunk.ReadUInt32();
-            FeedbackInBank = chunk.ReadUInt32();
-            ProjectId = chunk.ReadUInt32();
-
-            var headerDiff = (int)chunkSize - 20;
-            if (headerDiff > 0)
-                Padding = chunk.ReadBytes(headerDiff);
+            var bkdh = new BkhdChunk()
+            {
+                OwnerFilePath = fileName,
+                ChunkHeader = ChunkHeader.ReadData(chunk),
+            };
+            bkdh.AkBankHeader.ReadData(chunk, bkdh.ChunkHeader.ChunkSize);
+            return bkdh;
         }
 
-        public byte[] WriteData()
+        public static byte[] WriteData(BkhdChunk bkhdChunk)
         {
             using var memStream = new MemoryStream();
+            memStream.Write(ChunkHeader.WriteData(bkhdChunk.ChunkHeader));
+            memStream.Write(bkhdChunk.AkBankHeader.WriteData());
+            var byteArray = memStream.ToArray();
 
-            memStream.Write(ByteParsers.UInt32.EncodeValue(BankGeneratorVersion, out _));
-            memStream.Write(ByteParsers.UInt32.EncodeValue(SoundBankId, out _));
-            memStream.Write(ByteParsers.UInt32.EncodeValue(LanguageId, out _));
-            memStream.Write(ByteParsers.UInt32.EncodeValue(FeedbackInBank, out _));
-            memStream.Write(ByteParsers.UInt32.EncodeValue(ProjectId, out _));
+            // Reload the object to ensure sanity
+            ReadData("name", new ByteChunk(byteArray));
 
-            if (Padding != null && Padding.Length > 0)
-                memStream.Write(Padding, 0, Padding.Length);
-
-            return memStream.ToArray();
+            return byteArray;
         }
     }
 }

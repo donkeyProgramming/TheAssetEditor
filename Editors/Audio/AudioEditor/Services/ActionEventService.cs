@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Editors.Audio.AudioEditor.Factories;
 using Editors.Audio.AudioEditor.Models;
 using Editors.Audio.AudioEditor.Settings;
@@ -17,13 +18,19 @@ namespace Editors.Audio.AudioEditor.Services
         private readonly IAudioEditorStateService _audioEditorStateService = audioEditorStateService;
         private readonly IActionEventFactory _actionEventFactory = actionEventFactory;
 
-        public void AddActionEvent(string actionEventGroupName, string actionEventName, List<AudioFile> audioFiles, AudioSettings audioSettings)
+        public void AddActionEvent(string actionEventTypeName, string actionEventName, List<AudioFile> audioFiles, AudioSettings audioSettings)
         {
-            var soundBankName = Wh3SoundBankInformation.GetName(Wh3ActionEventInformation.GetSoundBank(actionEventGroupName));
+            var soundBankName = Wh3SoundBankInformation.GetName(Wh3ActionEventInformation.GetSoundBank(actionEventTypeName));
             var soundBank = _audioEditorStateService.AudioProject.GetSoundBank(soundBankName);
-            var actionEventGroup = Wh3ActionEventInformation.GetActionEventGroup(actionEventGroupName);
-            var actionEvent = _actionEventFactory.Create(actionEventGroup, actionEventName, audioFiles, audioSettings);
+            var actionEventType = Wh3ActionEventInformation.GetActionEventType(actionEventTypeName);
+            var actionEvent = _actionEventFactory.CreatePlayActionEvent(actionEventType, actionEventName, audioFiles, audioSettings);
             soundBank.InsertAlphabetically(actionEvent);
+
+            if (soundBank.GameSoundBank == Wh3SoundBank.GlobalMusic)
+            {
+                var stopActionEvent = _actionEventFactory.CreateStopActionEvent(actionEvent);
+                soundBank.InsertAlphabetically(stopActionEvent);
+            }
         }
 
         public void RemoveActionEvent(string actionEventNodeName, string actionEventName)
@@ -32,6 +39,13 @@ namespace Editors.Audio.AudioEditor.Services
             var soundBank = _audioEditorStateService.AudioProject.GetSoundBank(soundBankName);
             var actionEvent = soundBank.GetActionEvent(actionEventName);
             soundBank.ActionEvents.Remove(actionEvent);
+
+            if (soundBank.GameSoundBank == Wh3SoundBank.GlobalMusic)
+            {
+                var stopActionEventName = string.Concat("Stop_", actionEvent.Name.AsSpan("Play_".Length));
+                var stopActionEvent = soundBank.GetActionEvent(stopActionEventName);
+                soundBank.ActionEvents.Remove(stopActionEvent);
+            }
         }
     }
 }

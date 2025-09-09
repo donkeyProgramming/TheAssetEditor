@@ -9,23 +9,25 @@ namespace Shared.GameFormats.Wwise.Hirc
     {
         readonly ILogger _logger = Logging.Create<HircItem>();
 
-        public static readonly uint HircHeaderSize = 4; 
-        public string OwnerFilePath { get; set; } = "OwnerFile Not Set";
-        public bool IsCaHircItem { get; set; }
+        public static uint HircHeaderSize { get => 5; }
+        public string BnkFilePath { get; set; } = "Not Set";
+        public bool IsCAHircItem { get; set; }
         public uint LanguageId { get; set; } 
         public uint ByteIndexInFile { get; set; }
         public uint IndexInFile { get; set; }
         public bool HasError { get; set; } = true;
+        public bool IsTarget { get; set; }
+        public List<HircItem>? HircChildren { get; set; }
         public AkBkHircType HircType { get; set; }
         public uint SectionSize { get; set; }
         public uint Id { get; set; }
 
-        public void Parse(ByteChunk chunk)
+        public void ReadHirc(ByteChunk chunk)
         {
             try
             {
-                var objectStartIndex = chunk.Index;
-                ByteIndexInFile = (uint)objectStartIndex;
+                var indexBeforeRead = chunk.Index;
+                ByteIndexInFile = (uint)indexBeforeRead;
 
                 HircType = (AkBkHircType)chunk.ReadByte();
                 SectionSize = chunk.ReadUInt32();
@@ -33,14 +35,14 @@ namespace Shared.GameFormats.Wwise.Hirc
                 ReadData(chunk);
 
                 var currentIndex = chunk.Index;
-                var computedIndex = (int)(objectStartIndex + 5 + SectionSize);
-                chunk.Index = computedIndex;
+                var indexAfterRead = (int)(indexBeforeRead + HircHeaderSize + SectionSize);
+                chunk.Index = indexAfterRead;
                 HasError = false;
             }
 
             catch (Exception e)
             {
-                _logger.Here().Error($"Failed to parse object {Id} of type {HircType} in {OwnerFilePath} at index {IndexInFile} - " + e.Message);
+                _logger.Here().Error($"Failed to parse object {Id} of type {HircType} in {BnkFilePath} at index {IndexInFile} - " + e.Message);
                 throw;
             }
         }

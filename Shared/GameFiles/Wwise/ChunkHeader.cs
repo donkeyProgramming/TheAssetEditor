@@ -3,27 +3,28 @@ using Shared.Core.ByteParsing;
 
 namespace Shared.GameFormats.Wwise
 {
-    public class BnkChunkHeader
+    public class ChunkHeader
     {
-        public static uint HeaderByteSize { get => 8; }
+        public static uint ChunkHeaderSize { get => 8; }
         public string Tag { get; set; }
         public uint ChunkSize { get; set; }
 
-        public static BnkChunkHeader ReadData(ByteChunk chunk)
+        public static ChunkHeader ReadData(ByteChunk chunk)
         {
-            var instance = new BnkChunkHeader();
-            instance.Tag = Encoding.UTF8.GetString(chunk.ReadBytes(4));
-            instance.ChunkSize = chunk.ReadUInt32();
-            return instance;
+            return new ChunkHeader
+            {
+                Tag = Encoding.UTF8.GetString(chunk.ReadBytes(4)),
+                ChunkSize = chunk.ReadUInt32()
+            };
         }
 
-        public static BnkChunkHeader PeekFromBytes(ByteChunk chunk)
+        public static ChunkHeader PeekFromBytes(ByteChunk chunk)
         {
             var peakBytes = chunk.PeekChunk(8);
             return ReadData(peakBytes);
         }
 
-        public static byte[] WriteData(BnkChunkHeader header)
+        public static byte[] WriteData(ChunkHeader header)
         {
             if (header.Tag.Length != 4)
                 throw new Exception($"Header not valid {header.Tag}");

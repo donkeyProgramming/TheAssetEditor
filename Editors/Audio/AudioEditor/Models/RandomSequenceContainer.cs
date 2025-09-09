@@ -10,7 +10,6 @@ namespace Editors.Audio.AudioEditor.Models
         public uint DirectParentId { get; set; }
         public AudioSettings AudioSettings { get; set; }
         public List<Sound> Sounds { get; set; }
-        public string Language { get; set; }
 
         public static RandomSequenceContainer Create(AudioSettings audioSettings, List<Sound> sounds)
         {

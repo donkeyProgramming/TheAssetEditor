@@ -1,10 +1,12 @@
 ﻿using System.Collections.Generic;
 using System.Data;
+using System.Linq;
 using Editors.Audio.AudioEditor.AudioProjectExplorer;
 using Editors.Audio.AudioEditor.Events;
 using Editors.Audio.AudioEditor.Presentation.Table;
 using Editors.Audio.GameInformation.Warhammer3;
 using Shared.Core.Events;
+using Shared.GameFormats.Wwise.Enums;
 
 namespace Editors.Audio.AudioEditor.AudioProjectViewer.Table
 {
@@ -60,6 +62,10 @@ namespace Editors.Audio.AudioEditor.AudioProjectViewer.Table
             var soundBank = _audioEditorStateService.AudioProject.GetSoundBank(soundBankName);
             foreach (var actionEvent in soundBank.ActionEvents)
             {
+                // We don't want them visible as we currently force all Action Events to start with "Play_" so showing "Stop_" events would confuse things
+                if (actionEvent.Actions.Any(action => action.ActionType == AkActionType.Stop_E_O))
+                    continue;
+
                 var row = table.NewRow();
                 row[TableInfo.EventColumnName] = actionEvent.Name;
                 _eventHub.Publish(new ViewerTableRowAddRequestedEvent(row));

@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using Editors.Audio.GameInformation.Warhammer3;
 using Shared.GameFormats.Wwise.Enums;
 
@@ -7,42 +8,38 @@ namespace Editors.Audio.AudioEditor.Models
     public class ActionEvent : AudioProjectHircItem
     {
         public override AkBkHircType HircType { get; set; } = AkBkHircType.Event;
-        // TODO: Refactor Actions to include the random sequence contains and sound
-        // Actions is a List because in Wwise an Action Event can have multiple actions but making multiple Actions
-        // for an ActionEvent isn't supported by the tool as it's unlikely to be used. If it were supported Actions
-        // should be refactored to contain the Sound / RandomSequenceContainer rather than the ActionEvent as each
-        // Action would then target its own audio.
+        // Actions is a List because in Wwise an Action Event can have multiple actions but
+        // making multiple Actions isn't supported by the tool as it's unlikely to be needed
+        // so really there will only ever be one Action in the list
         public List<Action> Actions { get; set; }
-        public Sound Sound { get; set; }
-        public RandomSequenceContainer RandomSequenceContainer { get; set; }
         public Wh3ActionEventType ActionEventType { get; set; }
 
-        public static ActionEvent Create(string name, Sound sound, Wh3ActionEventType actionEventType)
+        public static ActionEvent Create(string name, List<Action> actions, Wh3ActionEventType actionEventType)
         {
             return new ActionEvent
             {
                 Name = name,
-                Sound = sound,
+                Actions = actions,
                 ActionEventType = actionEventType,
             };
         }
 
-        public static ActionEvent Create(string name, RandomSequenceContainer randomSequenceContainer, Wh3ActionEventType actionEventGroup)
+        public List<Action> GetPlayActions()
         {
-            return new ActionEvent
-            {
-                Name = name,
-                RandomSequenceContainer = randomSequenceContainer,
-                ActionEventType = actionEventGroup,
-            };
+            return Actions.
+                Select(action => action)
+                .Where(action => action.ActionType == AkActionType.Play)
+                .ToList();
         }
 
-        public AudioSettings GetAudioSettings()
+        public List<Action> GetStopActions()
         {
-            if (RandomSequenceContainer != null)
-                return RandomSequenceContainer.AudioSettings;
-            else
-                return Sound.AudioSettings;
+            return Actions.
+                Select(action => action)
+                .Where(action => action.ActionType == AkActionType.Stop_E_O)
+                .ToList();
         }
+
+        public Action GetAction(string actionName) => Actions.FirstOrDefault(action => action.Name.StartsWith(actionName));
     }
 }
