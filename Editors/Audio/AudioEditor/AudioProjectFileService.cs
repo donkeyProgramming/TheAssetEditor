@@ -47,7 +47,7 @@ namespace Editors.Audio.AudioEditor
             var audioProjectJson = JsonSerializer.Serialize(cleanedAudioProject, options);
 
             var packFile = PackFile.CreateFromASCII(fileName, audioProjectJson);
-            _fileSaveService.Save(filePath, packFile.DataSource.ReadData(), true);
+            _fileSaveService.Save(filePath, packFile.DataSource.ReadData(), false);
         }
 
         public void Load()

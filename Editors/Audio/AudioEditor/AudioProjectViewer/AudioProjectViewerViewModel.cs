@@ -249,7 +249,7 @@ namespace Editors.Audio.AudioEditor.AudioProjectViewer
 
             var selectedAudioProjectExplorerNodeName = _audioEditorStateService.SelectedAudioProjectExplorerNode.Name;
             var dialogueEventStateGroups = _audioRepository
-                .QualifiedStateGroupLookupByStateGroupByDialogueEvent[selectedAudioProjectExplorerNodeName]
+                .QualifiedStateGroupByStateGroupByDialogueEvent[selectedAudioProjectExplorerNodeName]
                 .Select(kvp => TableHelpers.DuplicateUnderscores(kvp.Key))
                 .ToList();
 

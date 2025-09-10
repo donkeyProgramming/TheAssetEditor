@@ -2,14 +2,13 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Data;
-using Shared.Core.Events;
 using Editors.Audio.AudioEditor.Events;
 using Editors.Audio.AudioEditor.UICommands;
+using Shared.Core.Events;
 
 namespace Editors.Audio.AudioEditor.Presentation.Table
 {
@@ -27,7 +26,6 @@ namespace Editors.Audio.AudioEditor.Presentation.Table
             return column;
         }
 
-        // TODO: Add ctrl + v and ctrl + c shortcuts for the combo boxes.
         public static DataTemplate CreateStatesComboBoxTemplate(IEventHub eventHub, string stateGroupWithQualifierWithExtraUnderscores, List<string> states)
         {
             var template = new DataTemplate();
@@ -49,59 +47,71 @@ namespace Editors.Audio.AudioEditor.Presentation.Table
             factory.SetValue(ComboBox.IsEditableProperty, true);
             factory.SetValue(ItemsControl.IsTextSearchEnabledProperty, false); // Changed to false to disable the built-in text search so filtering works correctly
 
-            // Setting the SelectedItem and Text bindings allows us to determine control them elsewhere, for example to show a specific value by default
-            factory.SetBinding(Selector.SelectedItemProperty, new Binding($"[{stateGroupWithQualifierWithExtraUnderscores}]")
-            {
-                Mode = BindingMode.TwoWay,
-                UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged
-            });
+            // Setting the Text binding allows us to control it elsewhere, for example to show a specific value by default
             factory.SetBinding(ComboBox.TextProperty, new Binding($"[{stateGroupWithQualifierWithExtraUnderscores}]")
             {
                 Mode = BindingMode.TwoWay,
                 UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged
             });
 
-            // Add SelectionChanged handler to set a flag that will suppress refiltering when an item is selected
-            var suppressTextChanged = false;
-            factory.AddHandler(Selector.SelectionChangedEvent, new SelectionChangedEventHandler((sender, e) =>
-            {
-                suppressTextChanged = true;
-            }));
+            // NOTE: Do not bind SelectedItem. Text is the single source of truth to avoid feedback loops that erase the first keystroke.
 
             factory.AddHandler(FrameworkElement.LoadedEvent, new RoutedEventHandler((sender, args) =>
             {
                 if (sender is ComboBox comboBox)
                 {
+                    var view = CollectionViewSource.GetDefaultView(observableValues);
+                    if (view != null)
+                        view.Filter = _ => true;
+
+                    // Ensure a default value of "Any"
+                    if (string.IsNullOrEmpty(comboBox.Text) && states.Contains("Any"))
+                        comboBox.Text = "Any";
+
                     if (comboBox.Template.FindName("PART_EditableTextBox", comboBox) is TextBox textBox)
                     {
-                        // When text changes, filter asynchronously
-                        textBox.TextChanged += async (s, e) =>
+                        // Ensure clicking into the box doesn’t select-all and swallow the first key
+                        textBox.PreviewMouseLeftButtonDown += (s2, e2) =>
+                        {
+                            if (!textBox.IsKeyboardFocusWithin)
+                            {
+                                e2.Handled = true;
+                                textBox.Focus();
+                            }
+                        };
+
+                        // On focus, place caret at end and clear selection to avoid highlight flash
+                        textBox.GotKeyboardFocus += (s2, e2) =>
+                        {
+                            textBox.SelectionStart = textBox.Text.Length;
+                            textBox.SelectionLength = 0;
+                        };
+
+                        // When text changes, filter and keep caret behavior stable
+                        textBox.TextChanged += (s, e) =>
                         {
                             eventHub.Publish(new EditorDataGridTextboxTextChangedEvent());
 
-                            if (suppressTextChanged)
+                            // If the user edits the text and it no longer matches the selected item, clear selection
+                            if (comboBox.SelectedItem != null &&
+                                !string.Equals(comboBox.SelectedItem.ToString(), textBox.Text, StringComparison.Ordinal))
                             {
-                                // Clear selection after an item is selected so text isn't highlighted
-                                _ = textBox.Dispatcher.BeginInvoke(() =>
-                                {
-                                    textBox.SelectionStart = textBox.Text.Length;
-                                    textBox.SelectionLength = 0;
-                                }, System.Windows.Threading.DispatcherPriority.Background);
-                                suppressTextChanged = false;
-                                return;
+                                comboBox.SelectedItem = null;
                             }
 
                             var filterText = textBox.Text;
-                            var filteredItems = await Task.Run(() =>
-                            {
-                                if (string.IsNullOrWhiteSpace(filterText))
-                                    return observableValues.ToList();
-                                else
-                                    return observableValues.Where(item =>
-                                        item.Contains(filterText, StringComparison.OrdinalIgnoreCase)).ToList();
-                            });
 
-                            comboBox.ItemsSource = filteredItems;
+                            if (view != null)
+                            {
+                                view.Filter = item =>
+                                {
+                                    if (string.IsNullOrWhiteSpace(filterText))
+                                        return true;
+                                    var str = (string)item;
+                                    return str.Contains(filterText, StringComparison.OrdinalIgnoreCase);
+                                };
+                                view.Refresh();
+                            }
 
                             // Clear selection after text change to prevent a bug where the first character was being overridden by the second if the first is highlighted
                             _ = textBox.Dispatcher.BeginInvoke(() =>
@@ -111,11 +121,21 @@ namespace Editors.Audio.AudioEditor.Presentation.Table
                             }, System.Windows.Threading.DispatcherPriority.Background);
 
                             // Open the drop-down to display the results if the text does not exactly match the selected item
-                            if (comboBox.SelectedItem == null ||
-                                !string.Equals(comboBox.SelectedItem.ToString(), textBox.Text, StringComparison.Ordinal))
+                            if (comboBox.SelectedItem == null || !string.Equals(comboBox.SelectedItem?.ToString(), textBox.Text, StringComparison.Ordinal))
                             {
                                 if (!comboBox.IsDropDownOpen)
                                     comboBox.IsDropDownOpen = true;
+                            }
+                        };
+
+
+                        // When an item is picked from the list, copy it into Text so the TwoWay Text binding updates the VM
+                        comboBox.SelectionChanged += (s, e) =>
+                        {
+                            if (comboBox.SelectedItem is string picked &&
+                                !string.Equals(comboBox.Text, picked, StringComparison.Ordinal))
+                            {
+                                comboBox.Text = picked; // updates VM via the Text two-way binding
                             }
                         };
 
@@ -127,7 +147,8 @@ namespace Editors.Audio.AudioEditor.Presentation.Table
                             {
                                 if (states.Contains("Any"))
                                 {
-                                    comboBox.SelectedItem = "Any";
+                                    // keep selection clear while using text as source of truth
+                                    comboBox.SelectedItem = null; 
                                     comboBox.Text = "Any";
                                 }
                                 else

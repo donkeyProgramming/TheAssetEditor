@@ -41,7 +41,7 @@ namespace Editors.Audio.AudioEditor
                         var firstStatePath = dialogueEvent.StatePaths.FirstOrDefault();
                         if (firstStatePath != null)
                         {
-                            var gameDialogueEventStateGroups = _audioRepository.StateGroupsLookupByDialogueEvent[dialogueEvent.Name];
+                            var gameDialogueEventStateGroups = _audioRepository.StateGroupsByDialogueEvent[dialogueEvent.Name];
                             var audioProjectDialogueEventStateGroups = firstStatePath.Nodes.Select(node => node.StateGroup.Name).ToList();
                             if (!gameDialogueEventStateGroups.SequenceEqual(audioProjectDialogueEventStateGroups))
                             {
@@ -68,7 +68,7 @@ namespace Editors.Audio.AudioEditor
         public void CheckDialogueEventInformationIntegrity(List<Wh3DialogueEventDefinition> information)
         {
             var exclusions = new List<string>{"New_Dialogue_Event", "Battle_Individual_Melee_Weapon_Hit"};
-            var gameDialogueEvents = _audioRepository.StateGroupsLookupByDialogueEvent.Keys.Except(exclusions).ToList();
+            var gameDialogueEvents = _audioRepository.StateGroupsByDialogueEvent.Keys.Except(exclusions).ToList();
             var audioEditorDialogueEvents = information.Select(item => item.Name).ToList();
             var areGameAndAudioEditorDialogueEventsMatching = new HashSet<string>(gameDialogueEvents).SetEquals(audioEditorDialogueEvents);
             if (!areGameAndAudioEditorDialogueEventsMatching)

@@ -66,7 +66,7 @@ namespace Editors.Audio.AudioProjectCompiler
 
         public IdGeneratorResult GenerateWemId(uint languageId, string bnkFilePath, HashSet<uint> usedCompilerSourceIds, string wavFilename)
         {
-            var usedIdsLookupByBnkFilePath = _audioRepository.GetUsedSourceIdsLookupByBnkFilePathByLanguageId(languageId);
+            var usedIdsLookupByBnkFilePath = _audioRepository.GetUsedSourceIdsByBnkFilePathByLanguageId(languageId);
             if (usedIdsLookupByBnkFilePath.TryGetValue(bnkFilePath, out var bnkUsedIds))
                 bnkUsedIds.UnionWith(usedCompilerSourceIds);
 
@@ -77,7 +77,7 @@ namespace Editors.Audio.AudioProjectCompiler
 
         public IdGeneratorResult GenerateSoundHircId(uint languageId, string bnkFilePath, HashSet<uint> usedCompilerHircIds, string wavFilename)
         {
-            var usedIdsLookupByBnkFilePath = _audioRepository.GetUsedHircIdsLookupByBnkFilePathByLanguageId(languageId);
+            var usedIdsLookupByBnkFilePath = _audioRepository.GetUsedHircIdsByBnkFilePathByLanguageId(languageId);
             if (usedIdsLookupByBnkFilePath.TryGetValue(bnkFilePath, out var bnkUsedIds))
                 bnkUsedIds.UnionWith(usedCompilerHircIds);
 
@@ -88,7 +88,7 @@ namespace Editors.Audio.AudioProjectCompiler
 
         public IdGeneratorResult GenerateActionEventHircId(uint languageId, string bnkFilePath, HashSet<uint> usedCompilerHircIds, string actionEventName)
         {
-            var usedIdsLookupByBnkFilePath = _audioRepository.GetUsedHircIdsLookupByBnkFilePathByLanguageId(languageId);
+            var usedIdsLookupByBnkFilePath = _audioRepository.GetUsedHircIdsByBnkFilePathByLanguageId(languageId);
             if (usedIdsLookupByBnkFilePath.TryGetValue(bnkFilePath, out var bnkUsedIds))
                 bnkUsedIds.UnionWith(usedCompilerHircIds);
 
@@ -98,7 +98,7 @@ namespace Editors.Audio.AudioProjectCompiler
 
         public IdGeneratorResult GenerateActionHircId(uint languageId, string bnkFilePath, HashSet<uint> usedCompilerHircIds, string actionName, int actionIndex)
         {
-            var usedIdsLookupByBnkFilePath = _audioRepository.GetUsedHircIdsLookupByBnkFilePathByLanguageId(languageId);
+            var usedIdsLookupByBnkFilePath = _audioRepository.GetUsedHircIdsByBnkFilePathByLanguageId(languageId);
             if (usedIdsLookupByBnkFilePath.TryGetValue(bnkFilePath, out var bnkUsedIds))
                 bnkUsedIds.UnionWith(usedCompilerHircIds);
 
@@ -109,7 +109,7 @@ namespace Editors.Audio.AudioProjectCompiler
 
         public IdGeneratorResult GenerateRanSeqCntrActionEventHircId(uint languageId, string bnkFilePath, HashSet<uint> usedCompilerHircIds, string actionEventName)
         {
-            var usedIdsLookupByBnkFilePath = _audioRepository.GetUsedHircIdsLookupByBnkFilePathByLanguageId(languageId);
+            var usedIdsLookupByBnkFilePath = _audioRepository.GetUsedHircIdsByBnkFilePathByLanguageId(languageId);
             if (usedIdsLookupByBnkFilePath.TryGetValue(bnkFilePath, out var bnkUsedIds))
                 bnkUsedIds.UnionWith(usedCompilerHircIds);
 
@@ -120,7 +120,7 @@ namespace Editors.Audio.AudioProjectCompiler
 
         public IdGeneratorResult GenerateRanSeqCntrDialogueEventHircId(uint languageId, string bnkFilePath, HashSet<uint> usedCompilerHircIds, string dialogueEventName, StatePath statePath)
         {
-            var usedIdsLookupByBnkFilePath = _audioRepository.GetUsedHircIdsLookupByBnkFilePathByLanguageId(languageId);
+            var usedIdsLookupByBnkFilePath = _audioRepository.GetUsedHircIdsByBnkFilePathByLanguageId(languageId);
             if (usedIdsLookupByBnkFilePath.TryGetValue(bnkFilePath, out var bnkUsedIds))
                 bnkUsedIds.UnionWith(usedCompilerHircIds);
 

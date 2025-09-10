@@ -65,7 +65,7 @@ namespace Editors.Audio.Utility
             if (actionHirc.GetActionType() == AkActionType.SetState)
             {
                 var stateGroupId = actionHirc.GetStateGroupId();
-                var musicSwitches = _audioRepository.HircLookupById
+                var musicSwitches = _audioRepository.HircsById
                    .SelectMany(x => x.Value)
                    .Where(X => X.HircType == AkBkHircType.Music_Switch)
                    .DistinctBy(x => x.Id)
@@ -79,7 +79,7 @@ namespace Editors.Audio.Utility
                         ProcessNext(musicSwitch.Id, actionTreeNode);
                 }
 
-                var normalSwitches = _audioRepository.HircLookupById
+                var normalSwitches = _audioRepository.HircsById
                    .SelectMany(x => x.Value)
                    .Where(X => X.HircType == AkBkHircType.SwitchContainer)
                    .DistinctBy(x => x.Id)

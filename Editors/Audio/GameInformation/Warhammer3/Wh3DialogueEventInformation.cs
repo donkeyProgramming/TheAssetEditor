@@ -46,7 +46,7 @@ namespace Editors.Audio.GameInformation.Warhammer3
         [Display(Name = "Mechanic - Gork and Mork Dedications")] GorkAndMorkDedicationsMechanic,
         [Display(Name = "Mechanic - Scrap")] ScrapMechanic,
         [Display(Name = "Mechanic - Skull Throne")] SkullThroneMechanic,
-        [Display(Name = "Dilemma - Monster Pens")] MonsterPensDilemma,
+        [Display(Name = "Mechanic - Monster Pens")] MonsterPensMechanic,
         [Display(Name = "Unit Movement")] UnitMovement,
         [Display(Name = "Unit Attack")] UnitAttack,
         [Display(Name = "Unit Selection")] UnitSelection,
@@ -263,6 +263,8 @@ namespace Editors.Audio.GameInformation.Warhammer3
             new("campaign_vo_skull_throne_tier3", CampaignVO, [SkullThroneMechanic], [ProfileShowAll, LordComplete]),
             new("campaign_vo_skull_throne_tier4", CampaignVO, [SkullThroneMechanic], [ProfileShowAll, LordComplete]),
 
+            new("campaign_vo_def_recruit_monster_pens", CampaignVO, [MonsterPensMechanic], [ProfileShowAll, LordComplete]),
+
             new("campaign_vo_mounted_creature", CampaignVO, [TypeShowAll, Creature], [ProfileShowAll]),
         ];
 
@@ -343,11 +345,11 @@ namespace Editors.Audio.GameInformation.Warhammer3
             new("campaign_vo_cs_hellforge_customisation_category",  CampaignVOConversational, [TypeShowAll, HellforgeMechanic], [ProfileShowAll, LordComplete]),
             new("campaign_vo_cs_hellforge_customisation_unit", CampaignVOConversational, [TypeShowAll, HellforgeMechanic], [ProfileShowAll, LordComplete]),
 
-            new("campaign_vo_cs_monster_pens_dilemma_ghrond", CampaignVOConversational, [TypeShowAll, MonsterPensDilemma], [ProfileShowAll, LordComplete]),
-            new("campaign_vo_cs_monster_pens_dilemma_lustria", CampaignVOConversational, [TypeShowAll, MonsterPensDilemma], [ProfileShowAll, LordComplete]),
-            new("campaign_vo_cs_monster_pens_dilemma_naggaroth", CampaignVOConversational, [TypeShowAll, MonsterPensDilemma], [ProfileShowAll, LordComplete]),
-            new("campaign_vo_cs_monster_pens_dilemma_old_world", CampaignVOConversational, [TypeShowAll, MonsterPensDilemma], [ProfileShowAll, LordComplete]),
-            new("campaign_vo_cs_monster_pens_event", CampaignVOConversational, [TypeShowAll, MonsterPensDilemma], [ProfileShowAll, LordComplete]),
+            new("campaign_vo_cs_monster_pens_dilemma_ghrond", CampaignVOConversational, [TypeShowAll, MonsterPensMechanic], [ProfileShowAll, LordComplete]),
+            new("campaign_vo_cs_monster_pens_dilemma_lustria", CampaignVOConversational, [TypeShowAll, MonsterPensMechanic], [ProfileShowAll, LordComplete]),
+            new("campaign_vo_cs_monster_pens_dilemma_naggaroth", CampaignVOConversational, [TypeShowAll, MonsterPensMechanic], [ProfileShowAll, LordComplete]),
+            new("campaign_vo_cs_monster_pens_dilemma_old_world", CampaignVOConversational, [TypeShowAll, MonsterPensMechanic], [ProfileShowAll, LordComplete]),
+            new("campaign_vo_cs_monster_pens_event", CampaignVOConversational, [TypeShowAll, MonsterPensMechanic], [ProfileShowAll, LordComplete]),
 
             new("campaign_vo_cs_tzarkan_calls_and_taunts", CampaignVOConversational, [TypeShowAll, TzArkanMechanic], [ProfileShowAll, LordComplete]),
             new("campaign_vo_cs_tzarkan_whispers", CampaignVOConversational, [TypeShowAll, TzArkanMechanic], [ProfileShowAll, LordComplete]),

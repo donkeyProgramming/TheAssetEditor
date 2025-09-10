@@ -17,9 +17,9 @@ namespace Editors.Audio.Storage
     {
         public class LoadResult
         {
-            public Dictionary<uint, List<HircItem>> HircLookupById { get; internal set; } = [];
-            public Dictionary<uint, List<DidxAudio>> DidxAudioLookupById { get; internal set; } = [];
-            public Dictionary<string, PackFile> BnkPackFileLookupByName { get; internal set; } = [];
+            public Dictionary<uint, List<HircItem>> HircsById { get; internal set; } = [];
+            public Dictionary<uint, List<DidxAudio>> DidxAudioListById { get; internal set; } = [];
+            public Dictionary<string, PackFile> PackFileByBnkName { get; internal set; } = [];
         }
 
         private readonly IPackFileService _packFileService;
@@ -63,7 +63,7 @@ namespace Editors.Audio.Storage
 
                 var packFile = bnkFile.Value;
                 var packFileContainer = _packFileService.GetPackFileContainer(packFile);
-                output.BnkPackFileLookupByName.TryAdd(packFile.Name, packFile);
+                output.PackFileByBnkName.TryAdd(packFile.Name, packFile);
 
                 try
                 {
@@ -84,14 +84,14 @@ namespace Editors.Audio.Storage
             if (failedBnks.Count != 0)
                 _logger.Here().Error($"{failedBnks.Count} banks failed: {string.Join("\n", failedBnks)}");
 
-            output.HircLookupById = parsedBnks
+            output.HircsById = parsedBnks
                 .Where(parsedBnk => parsedBnk.HircChunk is not null)
                 .SelectMany(parsedBnk => parsedBnk.HircChunk.HircItems)
                 .GroupBy(item => item.Id)
                 .ToDictionary(group => group.Key, group => group.ToList());
 
 
-            output.DidxAudioLookupById = parsedBnks
+            output.DidxAudioListById = parsedBnks
                 .Where(parsedBnk => parsedBnk.DataChunk is not null && parsedBnk.DidxChunk is not null)
                 .SelectMany(parsedBnk =>
                     parsedBnk.DidxChunk.MediaList.Select(didx => new DidxAudio()

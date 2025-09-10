@@ -257,7 +257,7 @@ namespace Editors.Audio.AudioProjectConverter
         private Dictionary<uint, string> GetStatesLookupByStateId(Dictionary<string, Dictionary<uint, string>> statesLookupByStateGroupByStateId, string stateGroupLookup)
         {
             statesLookupByStateGroupByStateId.TryGetValue(stateGroupLookup, out var statesInfoFromWwiseProject);
-            _audioRepository.StatesLookupByStateGroupByStateId.TryGetValue(stateGroupLookup, out var statesInfoFromGame);
+            _audioRepository.StatesByStateGroupByStateId.TryGetValue(stateGroupLookup, out var statesInfoFromGame);
 
             var statesLookupByStateId = new Dictionary<uint, string>();
 
@@ -307,7 +307,7 @@ namespace Editors.Audio.AudioProjectConverter
                 });
 
                 // Store modded states info
-                if (state != "Any" && !_audioRepository.NameLookupById.ContainsValue(state))
+                if (state != "Any" && !_audioRepository.NameById.ContainsValue(state))
                 {
                     if (moddedStateGroups.TryGetValue(stateGroup, out var stateList))
                     {

@@ -26,7 +26,7 @@ namespace Editors.Audio.AudioEditor.UICommands
             var audioSettings = _audioEditorStateService.AudioSettings;
 
             var stateLookupByStateGroup = new Dictionary<string, string>();
-            var stateGroupsWithQualifiers = _audioRepository.QualifiedStateGroupLookupByStateGroupByDialogueEvent[dialogueEventName];
+            var stateGroupsWithQualifiers = _audioRepository.QualifiedStateGroupByStateGroupByDialogueEvent[dialogueEventName];
             foreach (var stateGroupWithQualifier in stateGroupsWithQualifiers)
             {
                 var stateGroupName = TableHelpers.GetStateGroupFromStateGroupWithQualifier(_audioRepository, dialogueEventName, stateGroupWithQualifier.Key);

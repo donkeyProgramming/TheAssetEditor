@@ -15,7 +15,8 @@ namespace Editors.Audio.GameInformation.Warhammer3
         [Display(Name = "polish")] Polish,
         [Display(Name = "russian")] Russian,
         [Display(Name = "spanish(spain)")] SpanishSpain,
-        [Display(Name = "sfx")] Sfx // SoundBanks with sfx as the language are stored directly in the wwise folder as they're used by all languages
+        // SoundBanks with sfx as the language are stored directly in the wwise folder as they're used by all languages
+        [Display(Name = "sfx")] Sfx 
     }
 
     public static class Wh3LanguageInformation

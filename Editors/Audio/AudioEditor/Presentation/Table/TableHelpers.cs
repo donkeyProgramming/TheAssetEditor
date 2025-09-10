@@ -26,12 +26,13 @@ namespace Editors.Audio.AudioEditor.Presentation.Table
             var moddedStates = audioEditorStateService.AudioProject.StateGroups
                 .SelectMany(stateGroup => stateGroup.States)
                 .Select(state => state.Name);
-            var vanillaStates = audioRepository.StatesLookupByStateGroup[stateGroup];
+            var vanillaStates = audioRepository.StatesByStateGroup[stateGroup];
 
             // Display the required states in the ComboBox
             if (audioEditorStateService.ShowModdedStatesOnly && Wh3StateGroupInformation.ModdableStateGroups.Contains(stateGroup))
             {
-                states.Add("Any"); // We still want the "Any" state to show so add it in manually
+                // We still want the "Any" state to show so add it in manually
+                states.Add("Any"); 
                 states.AddRange(moddedStates);
             }
             else
@@ -48,7 +49,7 @@ namespace Editors.Audio.AudioEditor.Presentation.Table
 
         public static string GetStateGroupFromStateGroupWithQualifier(IAudioRepository audioRepository, string dialogueEvent, string stateGroupNameWithQualifier)
         {
-            if (audioRepository.QualifiedStateGroupLookupByStateGroupByDialogueEvent.TryGetValue(dialogueEvent, out var stateGroupDictionary))
+            if (audioRepository.QualifiedStateGroupByStateGroupByDialogueEvent.TryGetValue(dialogueEvent, out var stateGroupDictionary))
                 if (stateGroupDictionary.TryGetValue(stateGroupNameWithQualifier, out var stateGroup))
                     return stateGroup;
 

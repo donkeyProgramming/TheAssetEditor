@@ -21,12 +21,14 @@ namespace Editors.Audio.AudioEditor.AudioProjectExplorer
         private HashSet<string> _editedSoundBanks;
         private HashSet<string> _editedStateGroups;
         private readonly Dictionary<AudioProjectTreeNode, HashSet<string>> _allowedDialogueEventsLookup = [];
+        private HashSet<string> _editedDialogueEventsWithStatePaths;
 
         public void FilterTree(ObservableCollection<AudioProjectTreeNode> audioProjectTree, AudioProjectTreeFilterSettings filterSettings)
         {
             _filterSettings = filterSettings;
             _editedSoundBanks = null;
             _editedStateGroups = null;
+            _editedDialogueEventsWithStatePaths = null;
 
             if (_filterSettings.ShowEditedItemsOnly && _audioEditorStateService.AudioProject is not null)
             {
@@ -38,6 +40,13 @@ namespace Editors.Audio.AudioEditor.AudioProjectExplorer
                 _editedStateGroups = _audioEditorStateService.AudioProject
                     .GetEditedStateGroups()
                     .Select(soundBank => soundBank.Name)
+                    .ToHashSet();
+
+                _editedDialogueEventsWithStatePaths = _audioEditorStateService.AudioProject
+                    .GetEditedDialogueEventSoundBanks()
+                    .SelectMany(soundBank => soundBank.GetEditedDialogueEvents())
+                    .Where(dialogueEvent => dialogueEvent.StatePaths is { Count: > 0 })
+                    .Select(dialogueEvent => dialogueEvent.Name)
                     .ToHashSet();
             }
 
@@ -119,7 +128,9 @@ namespace Editors.Audio.AudioEditor.AudioProjectExplorer
                 AudioProjectTreeNodeType.ActionEventType => _editedSoundBanks?.Contains(Wh3SoundBankInformation.GetName(node.GameSoundBank)) == true,
 
                 AudioProjectTreeNodeType.DialogueEvents => _editedSoundBanks?.Contains(Wh3SoundBankInformation.GetName(node.GameSoundBank)) == true,
-                AudioProjectTreeNodeType.DialogueEvent => _editedSoundBanks?.Contains(Wh3SoundBankInformation.GetName(node.GameSoundBank)) == true,
+                AudioProjectTreeNodeType.DialogueEvent => _filterSettings.ShowEditedItemsOnly
+                    ? _editedDialogueEventsWithStatePaths?.Contains(node.Name) == true
+                    : _editedSoundBanks?.Contains(Wh3SoundBankInformation.GetName(node.GameSoundBank)) == true,
 
                 AudioProjectTreeNodeType.StateGroups => _editedStateGroups?.Count > 0 == true,
                 AudioProjectTreeNodeType.StateGroup => _editedStateGroups?.Contains(node.Name) == true,

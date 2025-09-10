@@ -35,7 +35,7 @@
         <Menu Grid.ColumnSpan="3">
             <MenuItem Header="File">
                 <MenuItem Header="Load Hirc From Id" Click="{s:MethodBinding LoadHircFromIdAction}"/>
-                <MenuItem Header="Export Dialogue Events Using State" Click="{s:MethodBinding ExportStatePathsUsingState}" IsEnabled="True"/>
+                <MenuItem Header="Export Dialogue Events Using State" Click="{s:MethodBinding ExportStatePathsUsingState}" IsEnabled="False"/>
             </MenuItem>
         </Menu>
 

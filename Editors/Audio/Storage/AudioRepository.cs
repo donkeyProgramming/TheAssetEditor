@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime;
+using Shared.Core.Misc;
 using Shared.Core.PackFiles.Models;
 using Shared.Core.Settings;
 using Shared.GameFormats.Wwise.Didx;
@@ -11,14 +11,14 @@ namespace Editors.Audio.Storage
 {
     public interface IAudioRepository
     {
-        Dictionary<uint, List<HircItem>> HircLookupById { get; }
-        Dictionary<uint, List<DidxAudio>> DidxAudioLookupById { get; }
-        Dictionary<string, PackFile> PackFileLookupByBnkName { get; }
-        Dictionary<uint, string> NameLookupById { get; }
-        Dictionary<string, List<string>> StateGroupsLookupByDialogueEvent { get; }
-        Dictionary<string, Dictionary<string, string>> QualifiedStateGroupLookupByStateGroupByDialogueEvent { get; }
-        Dictionary<string, List<string>> StatesLookupByStateGroup { get; }
-        Dictionary<string, Dictionary<uint, string>> StatesLookupByStateGroupByStateId { get; }
+        Dictionary<uint, List<HircItem>> HircsById { get; }
+        Dictionary<uint, List<DidxAudio>> DidxAudioListById { get; }
+        Dictionary<string, PackFile> PackFileByBnkName { get; }
+        Dictionary<uint, string> NameById { get; }
+        Dictionary<string, List<string>> StateGroupsByDialogueEvent { get; }
+        Dictionary<string, Dictionary<string, string>> QualifiedStateGroupByStateGroupByDialogueEvent { get; }
+        Dictionary<string, List<string>> StatesByStateGroup { get; }
+        Dictionary<string, Dictionary<uint, string>> StatesByStateGroupByStateId { get; }
 
         List<T> GetHircItemsByType<T>() where T : class;
         List<HircItem> GetHircObject(uint id);
@@ -26,28 +26,30 @@ namespace Editors.Audio.Storage
         string GetNameFromId(uint value);
         string GetNameFromId(uint value, out bool found);
         string GetNameFromId(uint? key);
-        Dictionary<string, HashSet<uint>> GetUsedHircIdsLookupByBnkFilePathByLanguageId(uint languageId);
-        Dictionary<string, HashSet<uint>> GetUsedSourceIdsLookupByBnkFilePathByLanguageId(uint languageId);
+        Dictionary<string, HashSet<uint>> GetUsedHircIdsByBnkFilePathByLanguageId(uint languageId);
+        Dictionary<string, HashSet<uint>> GetUsedSourceIdsByBnkFilePathByLanguageId(uint languageId);
     }
 
-    public class AudioRepository : IAudioRepository
+    public class AudioRepository : IAudioRepository, IDisposable
     {
         private readonly BnkLoader _bnkLoader;
         private readonly DatLoader _datLoader;
 
-        public Dictionary<uint, List<HircItem>> HircLookupById { get; set; }
-        public Dictionary<uint, List<DidxAudio>> DidxAudioLookupById { get; set; }
-        public Dictionary<string, PackFile> PackFileLookupByBnkName { get; set; }
-        public Dictionary<uint, string> NameLookupById { get; set; }
-        public Dictionary<string, List<string>> StateGroupsLookupByDialogueEvent { get; set; }
-        public Dictionary<string, Dictionary<string, string>> QualifiedStateGroupLookupByStateGroupByDialogueEvent { get; set; }
-        public Dictionary<string, List<string>> StatesLookupByStateGroup { get; set; }
-        public Dictionary<string, Dictionary<uint, string>> StatesLookupByStateGroupByStateId { get; set; }
+        public Dictionary<uint, List<HircItem>> HircsById { get; set; }
+        public Dictionary<uint, List<DidxAudio>> DidxAudioListById { get; set; }
+        public Dictionary<string, PackFile> PackFileByBnkName { get; set; }
+        public Dictionary<uint, string> NameById { get; set; }
+        public Dictionary<string, List<string>> StateGroupsByDialogueEvent { get; set; }
+        public Dictionary<string, Dictionary<string, string>> QualifiedStateGroupByStateGroupByDialogueEvent { get; set; }
+        public Dictionary<string, List<string>> StatesByStateGroup { get; set; }
+        public Dictionary<string, Dictionary<uint, string>> StatesByStateGroupByStateId { get; set; }
 
         public AudioRepository(ApplicationSettingsService applicationSettingsService, BnkLoader bnkLoader, DatLoader datLoader)
         {
             _bnkLoader = bnkLoader;
             _datLoader = datLoader;
+
+            MemoryOptimiser.LogMemory("Before loading AudioRepository");
 
             var gameInformation = GameInformationDatabase.GetGameById(applicationSettingsService.CurrentSettings.CurrentGame);
             var gameBankGeneratorVersion = gameInformation.BankGeneratorVersion;
@@ -57,33 +59,32 @@ namespace Editors.Audio.Storage
                 LoadBnkData();
             }
 
-            // Run garbage collection to free up memory no longer in use
-            GCSettings.LargeObjectHeapCompactionMode = GCLargeObjectHeapCompactionMode.CompactOnce;
-            GC.Collect(GC.MaxGeneration, GCCollectionMode.Forced, blocking: true, compacting: true);
+            MemoryOptimiser.Optimise();
+            MemoryOptimiser.LogMemory("After loading AudioRepository");
         }
 
         private void LoadDatData()
         {
             var loadResult = _datLoader.LoadDatData();
-            NameLookupById = loadResult.NameLookupById ?? [];
-            StateGroupsLookupByDialogueEvent = loadResult.StateGroupsLookupByDialogueEvent ?? [];
-            QualifiedStateGroupLookupByStateGroupByDialogueEvent = loadResult.QualifiedStateGroupLookupByStateGroupByDialogueEvent ?? [];
-            StatesLookupByStateGroup = loadResult.StatesLookupByStateGroup ?? [];
-            StatesLookupByStateGroupByStateId = loadResult.StatesLookupByStateGroupByStateId ?? [];
+            NameById = loadResult.NameById ?? [];
+            StateGroupsByDialogueEvent = loadResult.StateGroupsByDialogueEvent ?? [];
+            QualifiedStateGroupByStateGroupByDialogueEvent = loadResult.QualifiedStateGroupByStateGroupByDialogueEvent ?? [];
+            StatesByStateGroup = loadResult.StatesByStateGroup ?? [];
+            StatesByStateGroupByStateId = loadResult.StatesByStateGroupByStateId ?? [];
         }
 
         private void LoadBnkData()
         {
             var loadResult = _bnkLoader.LoadBnkFiles();
-            HircLookupById = loadResult.HircLookupById ?? [];
-            DidxAudioLookupById = loadResult.DidxAudioLookupById ?? [];
-            PackFileLookupByBnkName = loadResult.BnkPackFileLookupByName ?? [];
+            HircsById = loadResult.HircsById ?? [];
+            DidxAudioListById = loadResult.DidxAudioListById ?? [];
+            PackFileByBnkName = loadResult.PackFileByBnkName ?? [];
         }
 
         public List<HircItem> GetHircObject(uint id)
         {
-            if (HircLookupById.ContainsKey(id))
-                return HircLookupById[id];
+            if (HircsById.ContainsKey(id))
+                return HircsById[id];
             return [];
         }
 
@@ -95,15 +96,15 @@ namespace Editors.Audio.Storage
 
         public string GetNameFromId(uint value, out bool found)
         {
-            found = NameLookupById.ContainsKey(value);
+            found = NameById.ContainsKey(value);
             if (found)
-                return NameLookupById[value];
+                return NameById[value];
             return value.ToString();
         }
 
         public List<T> GetHircItemsByType<T>() where T : class
         {
-            return HircLookupById.Values
+            return HircsById.Values
                 .SelectMany(items => items)
                 .OfType<T>()
                 .ToList();
@@ -119,9 +120,9 @@ namespace Editors.Audio.Storage
                 throw new Exception("Cannot get name from ID");
         }
 
-        public Dictionary<string, HashSet<uint>> GetUsedHircIdsLookupByBnkFilePathByLanguageId(uint languageId)
+        public Dictionary<string, HashSet<uint>> GetUsedHircIdsByBnkFilePathByLanguageId(uint languageId)
         {
-            return HircLookupById
+            return HircsById
                 .Where(hircLookupEntry => hircLookupEntry.Value.Any(hircItem => hircItem.LanguageId == languageId))
                 .SelectMany(hircLookupEntry => hircLookupEntry.Value
                     .Where(hircItem => hircItem.LanguageId == languageId)
@@ -131,14 +132,51 @@ namespace Editors.Audio.Storage
                 );
         }
 
-        public Dictionary<string, HashSet<uint>> GetUsedSourceIdsLookupByBnkFilePathByLanguageId(uint languageId)
+        public Dictionary<string, HashSet<uint>> GetUsedSourceIdsByBnkFilePathByLanguageId(uint languageId)
         {
-            return HircLookupById
+            return HircsById
                 .SelectMany(hircLookupEntry => hircLookupEntry.Value
                     .Where(hircItem => hircItem.LanguageId == languageId && hircItem is ICAkSound)
                     .Select(hircItem => new { hircItem.BnkFilePath, SourceId = ((ICAkSound)hircItem).GetSourceId() }))
                 .GroupBy(hircItem => hircItem.BnkFilePath)
                 .ToDictionary(group => group.Key, group => group.Select(x => x.SourceId).ToHashSet());
+        }
+
+        public void Dispose()
+        {
+            MemoryOptimiser.LogMemory("Before disposing of AudioRepository");
+
+            if (HircsById != null)
+            {
+                foreach (var list in HircsById.Values)
+                {
+                    list?.Clear();
+                    list?.TrimExcess();
+                }
+                HircsById.Clear();
+                HircsById = null;
+            }
+
+            if (DidxAudioListById != null)
+            {
+                foreach (var list in DidxAudioListById.Values)
+                {
+                    list?.Clear();
+                    list?.TrimExcess();
+                }
+                DidxAudioListById.Clear();
+                DidxAudioListById = null;
+            }
+
+            PackFileByBnkName?.Clear(); PackFileByBnkName = null;
+            NameById?.Clear(); NameById = null;
+            StateGroupsByDialogueEvent?.Clear(); StateGroupsByDialogueEvent = null;
+            QualifiedStateGroupByStateGroupByDialogueEvent?.Clear(); QualifiedStateGroupByStateGroupByDialogueEvent = null;
+            StatesByStateGroup?.Clear(); StatesByStateGroup = null;
+            StatesByStateGroupByStateId?.Clear(); StatesByStateGroupByStateId = null;
+
+            MemoryOptimiser.Optimise();
+            MemoryOptimiser.LogMemory("After disposing of AudioRepository");
         }
     }
 }

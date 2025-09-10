@@ -32,7 +32,7 @@ namespace Editors.Audio.AudioEditor.AudioProjectViewer.Table
         {
             var schema = new List<string>();
             var dialogueEventName = _audioEditorStateService.SelectedAudioProjectExplorerNode.Name;
-            var stateGroupsWithQualifiers = _audioRepository.QualifiedStateGroupLookupByStateGroupByDialogueEvent[dialogueEventName];
+            var stateGroupsWithQualifiers = _audioRepository.QualifiedStateGroupByStateGroupByDialogueEvent[dialogueEventName];
             foreach (var stateGroupWithQualifier in stateGroupsWithQualifiers)
             {
                 var columnName = TableHelpers.DuplicateUnderscores(stateGroupWithQualifier.Key);
@@ -53,7 +53,7 @@ namespace Editors.Audio.AudioEditor.AudioProjectViewer.Table
         public void ConfigureDataGrid(List<string> schema)
         {
             var dialogueEventName = _audioEditorStateService.SelectedAudioProjectExplorerNode.Name;
-            var stateGroupsCount = _audioRepository.StateGroupsLookupByDialogueEvent[dialogueEventName].Count;
+            var stateGroupsCount = _audioRepository.StateGroupsByDialogueEvent[dialogueEventName].Count;
             var columnWidth = 1.0 / (1 + stateGroupsCount);
 
             foreach (var columnName in schema)
@@ -68,7 +68,7 @@ namespace Editors.Audio.AudioEditor.AudioProjectViewer.Table
         {
             var dialogueEventName = _audioEditorStateService.SelectedAudioProjectExplorerNode.Name;
             var dialogueEvent = _audioEditorStateService.AudioProject.GetDialogueEvent(dialogueEventName);
-            var stateGroupsWithQualifiers = _audioRepository.QualifiedStateGroupLookupByStateGroupByDialogueEvent[dialogueEvent.Name];
+            var stateGroupsWithQualifiers = _audioRepository.QualifiedStateGroupByStateGroupByDialogueEvent[dialogueEvent.Name];
             foreach (var statePath in dialogueEvent.StatePaths)
             {
                 var row = table.NewRow();

@@ -82,6 +82,7 @@ namespace Editors.Audio.AudioProjectCompiler
             var compiledAudioProjectFilePath = audioProjectFilePath.Replace(".aproj", "_compiled.json");
             _audioProjectFileService.Save(audioProject, compiledAudioProjectFileName, compiledAudioProjectFilePath);
 
+            MemoryOptimiser.Optimise();
         }
 
         private static void SetSoundBankData(AudioProject audioProject, string audioProjectNameFileWithoutExtension)
@@ -116,7 +117,7 @@ namespace Editors.Audio.AudioProjectCompiler
                     {
                         soundBank.DialogueEventsSplitTestingFilePath = $"audio\\wwise\\{soundBank.Language}\\{soundBank.DialogueEventsSplitTestingFileName}";
                         soundBank.DialogueEventsSplitMergingFilePath = $"audio\\wwise\\{soundBank.Language}\\{soundBank.DialogueEventsSplitMergingFileName}";
-        }
+                    }
                     soundBank.DialogueEventsSplitTestingId = WwiseHash.Compute(soundBank.DialogueEventsSplitTestingFileName.Replace(".bnk", string.Empty));
                     soundBank.DialogueEventsSplitMergingId = WwiseHash.Compute(soundBank.DialogueEventsSplitMergingFileName.Replace(".bnk", string.Empty));
                 }

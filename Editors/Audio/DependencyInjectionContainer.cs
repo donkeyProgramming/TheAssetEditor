@@ -1,5 +1,4 @@
-﻿using System.Diagnostics;
-using Audio.AudioExplorer;
+﻿using Audio.AudioExplorer;
 using Editors.Audio.AudioEditor;
 using Editors.Audio.AudioEditor.AudioFilesExplorer;
 using Editors.Audio.AudioEditor.AudioProjectEditor;
@@ -116,17 +115,13 @@ namespace Editors.Audio
         public override void RegisterTools(IEditorDatabase factory)
         {
             EditorInfoBuilder
-                .Create<AudioExplorerViewModel, AudioExplorerView>(EditorEnums.AudioExplorer_Editor)
-                .AddToToolbar("Audio Explorer")
+                .Create<AudioEditorViewModel, AudioEditorView>(EditorEnums.Audio_Editor)
+                .AddToToolbar("Audio Editor")
                 .Build(factory);
 
-
-            var enableAudioEditor = false;
-            if(Debugger.IsAttached)
-                enableAudioEditor = true;
             EditorInfoBuilder
-                .Create<AudioEditorViewModel, AudioEditorView>(EditorEnums.Audio_Editor)
-                .AddToToolbar("Audio Editor", enableAudioEditor)
+                .Create<AudioExplorerViewModel, AudioExplorerView>(EditorEnums.AudioExplorer_Editor)
+                .AddToToolbar("Audio Explorer")
                 .Build(factory);
         }
     }

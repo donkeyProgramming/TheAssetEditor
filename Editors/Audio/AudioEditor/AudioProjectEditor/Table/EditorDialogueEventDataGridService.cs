@@ -32,7 +32,7 @@ namespace Editors.Audio.AudioEditor.AudioProjectEditor.Table
         {
             var schema = new List<string>();
             var dialogueEventName = _audioEditorStateService.SelectedAudioProjectExplorerNode.Name;
-            var stateGroupsWithQualifiers = _audioRepository.QualifiedStateGroupLookupByStateGroupByDialogueEvent[dialogueEventName];
+            var stateGroupsWithQualifiers = _audioRepository.QualifiedStateGroupByStateGroupByDialogueEvent[dialogueEventName];
             foreach (var stateGroupWithQualifier in stateGroupsWithQualifiers)
             {
                 var columnName = TableHelpers.DuplicateUnderscores(stateGroupWithQualifier.Key);
@@ -53,7 +53,7 @@ namespace Editors.Audio.AudioEditor.AudioProjectEditor.Table
         public void ConfigureDataGrid(List<string> schema)
         {
             var dialogueEventName = _audioEditorStateService.SelectedAudioProjectExplorerNode.Name;
-            var stateGroupsCount = _audioRepository.StateGroupsLookupByDialogueEvent[dialogueEventName].Count;
+            var stateGroupsCount = _audioRepository.StateGroupsByDialogueEvent[dialogueEventName].Count;
             var columnWidth = 1.0 / (1 + stateGroupsCount);
 
             foreach (var columnName in schema)
@@ -72,13 +72,13 @@ namespace Editors.Audio.AudioEditor.AudioProjectEditor.Table
         {
             var row = table.NewRow();
 
-            var stateGroupsWithAnyState = _audioRepository.StatesLookupByStateGroup
+            var stateGroupsWithAnyState = _audioRepository.StatesByStateGroup
                 .Where(stateGroupColumn => stateGroupColumn.Value.Contains("Any"))
                 .ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
 
             var selectedAudioProjectExplorerNodeName = _audioEditorStateService.SelectedAudioProjectExplorerNode.Name;
             var dialogueEvent = _audioEditorStateService.AudioProject.GetDialogueEvent(selectedAudioProjectExplorerNodeName);
-            var stateGroupsWithQualifiers = _audioRepository.QualifiedStateGroupLookupByStateGroupByDialogueEvent[dialogueEvent.Name];
+            var stateGroupsWithQualifiers = _audioRepository.QualifiedStateGroupByStateGroupByDialogueEvent[dialogueEvent.Name];
             foreach (var stateGroupWithQualifier in stateGroupsWithQualifiers)
             {
                 var columnName = TableHelpers.DuplicateUnderscores(stateGroupWithQualifier.Key);

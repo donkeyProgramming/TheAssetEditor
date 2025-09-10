@@ -15,11 +15,11 @@ namespace Editors.Audio.Storage
     {
         public class LoadResult
         {
-            public Dictionary<uint, string> NameLookupById { get; set; } = [];
-            public Dictionary<string, List<string>> StateGroupsLookupByDialogueEvent { get; set; } = [];
-            public Dictionary<string, Dictionary<string, string>> QualifiedStateGroupLookupByStateGroupByDialogueEvent { get; set; } = [];
-            public Dictionary<string, List<string>> StatesLookupByStateGroup { get; set; } = [];
-            public Dictionary<string, Dictionary<uint, string>> StatesLookupByStateGroupByStateId { get; set; }
+            public Dictionary<uint, string> NameById { get; set; } = [];
+            public Dictionary<string, List<string>> StateGroupsByDialogueEvent { get; set; } = [];
+            public Dictionary<string, Dictionary<string, string>> QualifiedStateGroupByStateGroupByDialogueEvent { get; set; } = [];
+            public Dictionary<string, List<string>> StatesByStateGroup { get; set; } = [];
+            public Dictionary<string, Dictionary<uint, string>> StatesByStateGroupByStateId { get; set; }
         }
 
         private readonly IPackFileService _pfs;
@@ -51,11 +51,11 @@ namespace Editors.Audio.Storage
 
             return new LoadResult
             {
-                NameLookupById = nameLookUp,
-                StateGroupsLookupByDialogueEvent = processedDialogueEventsWithStateGroups,
-                QualifiedStateGroupLookupByStateGroupByDialogueEvent = dialogueEventsWithStateGroupsWithQualifiersAndStateGroups,
-                StatesLookupByStateGroup = processedStateGroupsWithStates,
-                StatesLookupByStateGroupByStateId = statesLookupByStateGroupByStateId
+                NameById = nameLookUp,
+                StateGroupsByDialogueEvent = processedDialogueEventsWithStateGroups,
+                QualifiedStateGroupByStateGroupByDialogueEvent = dialogueEventsWithStateGroupsWithQualifiersAndStateGroups,
+                StatesByStateGroup = processedStateGroupsWithStates,
+                StatesByStateGroupByStateId = statesLookupByStateGroupByStateId
             };
         }
 
