@@ -1,5 +1,4 @@
 ﻿using Editors.Audio.AudioEditor.Models;
-using Editors.Audio.GameInformation.Warhammer3;
 using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
 using Shared.GameFormats.Dat;
@@ -12,7 +11,7 @@ namespace Editors.Audio.AudioProjectCompiler
         void GenerateStatesDatFile(AudioProject audioProject, string audioProjectNameFileWithoutExtension);
     }
 
-    public class DatGeneratorService (IFileSaveService fileSaveService) : IDatGeneratorService
+    public class DatGeneratorService(IFileSaveService fileSaveService) : IDatGeneratorService
     {
         private readonly IFileSaveService _fileSaveService = fileSaveService;
 
@@ -23,13 +22,7 @@ namespace Editors.Audio.AudioProjectCompiler
             foreach (var soundBank in audioProject.SoundBanks)
             {
                 foreach (var actionEvent in soundBank.ActionEvents)
-                {
-                    // TODO: Check what other types of Action Event need a dat file
-                    if (actionEvent.ActionEventType != Wh3ActionEventType.Movies)
-                        continue;
-
                     soundDatFile.EventWithStateGroup.Add(new SoundDatFile.DatEventWithStateGroup() { Event = actionEvent.Name, Value = 400 });
-                }
             }
 
             var datFileName = $"event_data__{audioProjectNameFileWithoutExtension}.dat";
@@ -58,7 +51,7 @@ namespace Editors.Audio.AudioProjectCompiler
             var packFile = new PackFile(datFileName, new MemorySource(bytes));
 
             var reparsedSanityFile = DatFileParser.Parse(packFile, false);
-            
+
             _fileSaveService.Save(datFilePath, packFile.DataSource.ReadData(), false);
         }
     }

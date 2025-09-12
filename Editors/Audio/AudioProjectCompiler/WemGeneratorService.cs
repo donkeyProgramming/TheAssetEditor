@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.IO;
+using Editors.Audio.AudioEditor.Models;
 using Editors.Audio.Utility;
 using Shared.Core.Misc;
 using Shared.Core.PackFiles;
@@ -8,7 +9,7 @@ namespace Editors.Audio.AudioProjectCompiler
 {
     public interface IWemGeneratorService
     {
-        void GenerateWem(string wavPackFilePath, uint sourceId);
+        void GenerateWems(List<Sound> sounds);
         void SaveWemToPack(string wemDiskFilePath, string wemPackFilePath);
     }
 
@@ -18,22 +19,26 @@ namespace Editors.Audio.AudioProjectCompiler
         private readonly WSourcesWrapper _wSourcesWrapper = wSourcesWrapper;
         private readonly SoundPlayer _soundPlayer = soundPlayer;
 
-        public void GenerateWem(string wavPackFilePath, uint sourceId)
+        public void GenerateWems(List<Sound> sounds)
         {
             var wavToWemFolderPath = $"{DirectoryHelper.Temp}\\WavToWem";
             var audioFolderPath = $"{DirectoryHelper.Temp}\\Audio";
             var wprojPath = $"{DirectoryHelper.Temp}\\WavToWem\\WavToWemWwiseProject\\WavToWem.wproj";
             var wsourcesPath = $"{DirectoryHelper.Temp}\\WavToWem\\wav_to_wem.wsources";
 
-            var wavFile = _packFileService.FindFile(wavPackFilePath);
-            var wavFileName = $"{sourceId}.wav";
-            _soundPlayer.ExportFileToAEFolder(wavFileName, wavFile.DataSource.ReadData());
+            var wavFileNames = new List<string>();
+            foreach (var sound in sounds)
+            {
+                var wavFile = _packFileService.FindFile(sound.WavPackFilePath);
+                var wavFileName = $"{sound.SourceId}.wav";
+                _soundPlayer.ExportFileToAEFolder(wavFileName, wavFile.DataSource.ReadData());
+                wavFileNames.Add(wavFileName);
+            }
 
             _wSourcesWrapper.InitialiseWwiseProject();
 
             DirectoryHelper.EnsureCreated(wavToWemFolderPath);
 
-            var wavFileNames = new List<string> { wavFileName };
             _wSourcesWrapper.CreateWsourcesFile(wavFileNames);
 
             var arguments = $"\"{wprojPath}\" -ConvertExternalSources \"{wsourcesPath}\" -ExternalSourcesOutput \"{audioFolderPath}\"";

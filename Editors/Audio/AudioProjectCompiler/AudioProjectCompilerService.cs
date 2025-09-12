@@ -33,22 +33,23 @@ namespace Editors.Audio.AudioProjectCompiler
             if (audioProject.SoundBanks == null)
                 return;
 
+            var usedCompilerHircIds = new HashSet<uint>();
+            var sourceIdByWavFilePath = new Dictionary<string, uint>();
+            var soundsToGenerateWemsFrom = new List<Sound>();
+
             var audioProjectFileNameWithoutSpaces = audioProjectFileName.Replace(" ", "_");
             var audioProjectNameFileWithoutExtension = Path.GetFileNameWithoutExtension(audioProjectFileNameWithoutSpaces);
 
             AudioProjectCompilerHelpers.ClearTempAudioFiles();
 
-            var usedCompilerHircIds = new HashSet<uint>();
-            var sourceIdByWavFilePath = new Dictionary<string, uint>();
-
             // We set the data from the bottom up, so Sounds, then Actions, then Events to ensure that IDs are generated before
-            // they're referenced e.g. Sounds / Random Sequence Container IDs are used in Actions, and Action IDs are used in Events
+            // they're referenced e.g. Sounds / Random Sequence Container IDs are used in Actions, and Action IDs are used in Events.
             SetSoundBankData(audioProject, audioProjectNameFileWithoutExtension);
 
             if (audioProject.SoundBanks.Any(soundBank => soundBank.ActionEvents != null))
             {
                 SetPlayActionEventData(audioProject, usedCompilerHircIds);
-                SetPlayActionTargetData(audioProject, usedCompilerHircIds, sourceIdByWavFilePath);
+                SetPlayActionTargetData(audioProject, usedCompilerHircIds, sourceIdByWavFilePath, soundsToGenerateWemsFrom);
                 SetPlayActionData(audioProject, usedCompilerHircIds);
                 SetStopActionEventData(audioProject, usedCompilerHircIds);
                 SetStopActionData(audioProject, usedCompilerHircIds);
@@ -57,7 +58,7 @@ namespace Editors.Audio.AudioProjectCompiler
             if (audioProject.SoundBanks.Any(soundBank => soundBank.DialogueEvents != null))
             {
                 SetDialogueEventData(audioProject);
-                SetDialogueEventSourceData(audioProject, usedCompilerHircIds, sourceIdByWavFilePath);
+                SetDialogueEventSourceData(audioProject, usedCompilerHircIds, sourceIdByWavFilePath, soundsToGenerateWemsFrom);
             }
 
             if (audioProject.StateGroups != null)
@@ -71,10 +72,17 @@ namespace Editors.Audio.AudioProjectCompiler
                     _soundBankGeneratorService.GenerateDialogueEventSplitSoundBanks(soundBank);
             }
 
+            var wemsToGenerate = soundsToGenerateWemsFrom.DistinctBy(sound => sound.SourceId).ToList();
+            _wemGeneratorService.GenerateWems(wemsToGenerate);
+            SaveWemsToPack(soundsToGenerateWemsFrom);
+            UpdateSoundMemoryMediaSize(soundsToGenerateWemsFrom);
+
+            // The .dat file is seems to only necessary for playing movie Action Events and any triggered via common.trigger_soundevent()
+            // but without testing all the different types of Action Event sounds it's safer to just make a .dat for all as it's little overhead.
             if (audioProject.SoundBanks.Any(soundBank => soundBank.ActionEvents != null))
                 _datGeneratorService.GenerateEventDatFile(audioProject, audioProjectNameFileWithoutExtension);
 
-            // The states dat file is only used for showing modded states in the Audio Explorer, it isn't necessary for the game
+            // We create the states .dat file so we can see the modded states in the Audio Explorer, it isn't necessary for the game.
             if (audioProject.StateGroups != null)
                 _datGeneratorService.GenerateStatesDatFile(audioProject, audioProjectFileNameWithoutSpaces);
 
@@ -102,10 +110,13 @@ namespace Editors.Audio.AudioProjectCompiler
 
                 if (soundBank.DialogueEvents != null)
                 {
-                    // In Wh3 .bnk files are loaded in descending order
-                    // When a .bnk is loaded it overrides hircs with the same ID in .bnks loaded before it so the .bnk with the lowest alphanumeric name takes priority
-                    // e.g.campaign_vo_0_project_dialogue_events_for_testing.bnk overrides campaign_vo_1_project_dialogue_events_for_testing.bnk which overrides campaign_vo__core.bnk
-                    // so the dialogue events from campaign_vo_0_test will be what run
+                    // In WH3 .bnk files are loaded in descending name order. When a .bnk is loaded it overrides hircs with the same ID in .bnks loaded
+                    // before it so the .bnk with the lowest alphanumeric name takes priority.
+                    // Example load order:
+                    // 1) campaign_vo__core.bnk
+                    // 2) campaign_vo_1_project_dialogue_events_for_merging.bnk
+                    // 3) campaign_vo_0_project_dialogue_events_for_testing.bnk
+                    // So the dialogue events from campaign_vo_0_project_dialogue_events_for_testing.bnk will be what take priority as they're loaded last.
                     soundBank.DialogueEventsSplitTestingFileName = $"{soundBank.Name}_0_{audioProjectNameFileWithoutExtension}_dialogue_events_for_testing.bnk";
                     soundBank.DialogueEventsSplitMergingFileName = $"{soundBank.Name}_{audioProjectNameFileWithoutExtension}_dialogue_events_for_merging.bnk";
                     if (soundBank.Language == Wh3LanguageInformation.GetGameLanguageAsString(Wh3GameLanguage.Sfx))
@@ -138,7 +149,7 @@ namespace Editors.Audio.AudioProjectCompiler
             }
         }
 
-        private void SetPlayActionTargetData(AudioProject audioProject, HashSet<uint> usedCompilerHircIds, Dictionary<string, uint> sourceIdByWavFilePath)
+        private void SetPlayActionTargetData(AudioProject audioProject, HashSet<uint> usedCompilerHircIds, Dictionary<string, uint> sourceIdByWavFilePath, List<Sound> soundsToGenerateWemsFrom)
         {
             foreach (var soundBank in audioProject.SoundBanks)
             {
@@ -160,6 +171,7 @@ namespace Editors.Audio.AudioProjectCompiler
                                 soundBank,
                                 usedCompilerHircIds,
                                 sourceIdByWavFilePath,
+                                soundsToGenerateWemsFrom,
                                 actorMixerId,
                                 overrideBusId,
                                 isSource: true);
@@ -171,6 +183,7 @@ namespace Editors.Audio.AudioProjectCompiler
                                 soundBank,
                                 usedCompilerHircIds,
                                 sourceIdByWavFilePath,
+                                soundsToGenerateWemsFrom,
                                 actionEventName: playActionEvent.Name,
                                 directParentId: actorMixerId,
                                 overrideBusId: overrideBusId);
@@ -283,7 +296,7 @@ namespace Editors.Audio.AudioProjectCompiler
             }
         }
 
-        private void SetDialogueEventData(AudioProject audioProject)
+        private static void SetDialogueEventData(AudioProject audioProject)
         {
             foreach (var soundBank in audioProject.SoundBanks)
             {
@@ -307,7 +320,11 @@ namespace Editors.Audio.AudioProjectCompiler
             }
         }
 
-        private void SetDialogueEventSourceData(AudioProject audioProject, HashSet<uint> usedCompilerHircIds, Dictionary<string, uint> sourceIdByWavFilePath)
+        private void SetDialogueEventSourceData(
+            AudioProject audioProject,
+            HashSet<uint> usedCompilerHircIds,
+            Dictionary<string, uint> sourceIdByWavFilePath,
+            List<Sound> soundsToGenerateWemsFrom)
         {
             foreach (var soundBank in audioProject.SoundBanks)
             {
@@ -323,7 +340,8 @@ namespace Editors.Audio.AudioProjectCompiler
                                 soundBank,
                                 usedCompilerHircIds,
                                 sourceIdByWavFilePath,
-                                actorMixerId,
+                                soundsToGenerateWemsFrom,
+                                directParentId: actorMixerId,
                                 isSource: true);
                         else
                             SetRandomSequenceContainerData(
@@ -331,6 +349,7 @@ namespace Editors.Audio.AudioProjectCompiler
                                 soundBank,
                                 usedCompilerHircIds,
                                 sourceIdByWavFilePath,
+                                soundsToGenerateWemsFrom,
                                 dialogueEventName: dialogueEvent.Name,
                                 statePath: statePath,
                                 directParentId: actorMixerId);
@@ -360,6 +379,7 @@ namespace Editors.Audio.AudioProjectCompiler
             SoundBank soundBank,
             HashSet<uint> usedCompilerHircIds,
             Dictionary<string, uint> sourceIdByWavFilePath,
+            List<Sound> soundsToGenerateWemsFrom,
             string actionEventName = null,
             string dialogueEventName = null,
             StatePath statePath = null,
@@ -385,7 +405,7 @@ namespace Editors.Audio.AudioProjectCompiler
             container.DirectParentId = directParentId;
 
             foreach (var sound in container.Sounds)
-                SetSoundData(sound, soundBank, usedCompilerHircIds, sourceIdByWavFilePath, container.Id);
+                SetSoundData(sound, soundBank, usedCompilerHircIds, sourceIdByWavFilePath, soundsToGenerateWemsFrom, directParentId: container.Id);
 
             container.Sounds = container.Sounds.OrderBy(sound => sound.Id).ToList();
         }
@@ -395,6 +415,7 @@ namespace Editors.Audio.AudioProjectCompiler
             SoundBank soundBank,
             HashSet<uint> usedCompilerHircIds,
             Dictionary<string, uint> sourceIdByWavFilePath,
+            List<Sound> soundsToGenerateWemsFrom,
             uint directParentId = 0,
             uint overrideBusId = 0,
             bool isSource = false)
@@ -402,7 +423,7 @@ namespace Editors.Audio.AudioProjectCompiler
             sound.Language = soundBank.Language;
             var soundFileNameWithoutExtension = Path.GetFileNameWithoutExtension(sound.WavPackFileName);
 
-            // Set these before we get the ID as these form part of the soundKey
+            // Set these before we get the ID as these form part of the soundKey.
             sound.OverrideBusId = overrideBusId;
             sound.DirectParentId = directParentId;
 
@@ -428,15 +449,24 @@ namespace Editors.Audio.AudioProjectCompiler
             else
                 sound.WemPackFilePath = $"audio\\wwise\\{sound.Language}\\{sound.WemPackFileName}";
 
-            if (!File.Exists(sound.WemDiskFilePath))
-            {
-                _wemGeneratorService.GenerateWem(sound.WavPackFilePath, sourceId);
-                _wemGeneratorService.SaveWemToPack(sound.WemDiskFilePath, sound.WemPackFilePath);
-            }
+            // Store sounds for batch .wem generation.
+            soundsToGenerateWemsFrom.Add(sound);
+        }
 
-            var wemFileInfo = new FileInfo(sound.WemDiskFilePath);
-            var fileSizeInBytes = wemFileInfo.Length;
-            sound.InMemoryMediaSize = fileSizeInBytes;
+        public void SaveWemsToPack(List<Sound> soundsToGenerateWemsFrom)
+        {
+            foreach (var sound in soundsToGenerateWemsFrom)
+                _wemGeneratorService.SaveWemToPack(sound.WemDiskFilePath, sound.WemPackFilePath);
+        }
+
+        public static void UpdateSoundMemoryMediaSize(List<Sound> soundsToGenerateWemsFrom)
+        {
+            foreach (var sound in soundsToGenerateWemsFrom)
+            {
+                var wemFileInfo = new FileInfo(sound.WemDiskFilePath);
+                var fileSizeInBytes = wemFileInfo.Length;
+                sound.InMemoryMediaSize = fileSizeInBytes;
+            }
         }
     }
 }

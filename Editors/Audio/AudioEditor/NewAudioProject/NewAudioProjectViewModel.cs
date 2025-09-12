@@ -54,7 +54,7 @@ namespace Editors.Audio.AudioEditor.NewAudioProject
             _applicationSettingsService = applicationSettingsService;
             _standardDialogs = standardDialogs;
 
-            AudioProjectDirectory = "audio_projects";
+            AudioProjectDirectory = "audio\\audio_projects";
             SelectedLanguage = Wh3GameLanguage.EnglishUK;
         }
 
@@ -81,7 +81,8 @@ namespace Editors.Audio.AudioEditor.NewAudioProject
             IsOkButtonEnabled = IsAudioProjectFileNameSet && IsAudioProjectDirectorySet && IsLanguageSelected;
         }
 
-        [RelayCommand] public void SetNewFileLocation()
+        [RelayCommand]
+        public void SetNewFileLocation()
         {
             var result = _standardDialogs.DisplayBrowseFolderDialog();
             if (result.Result)
@@ -92,7 +93,8 @@ namespace Editors.Audio.AudioEditor.NewAudioProject
             }
         }
 
-        [RelayCommand] public void CreateAudioProject()
+        [RelayCommand]
+        public void CreateAudioProject()
         {
             if (_packFileService.GetEditablePack() == null)
             {
