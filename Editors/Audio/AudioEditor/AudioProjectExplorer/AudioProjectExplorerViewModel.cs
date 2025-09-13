@@ -1,7 +1,11 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
+using System.Windows;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Editors.Audio.AudioEditor.Events;
@@ -34,6 +38,7 @@ namespace Editors.Audio.AudioEditor.AudioProjectExplorer
         [ObservableProperty] private string _searchQuery;
         [ObservableProperty] public ObservableCollection<AudioProjectTreeNode> _audioProjectTree = [];
         [ObservableProperty] public AudioProjectTreeNode _selectedNode;
+        private CancellationTokenSource _searchQueryDebounceCancellationTokenSource;
 
         public AudioProjectExplorerViewModel(
             IEventHub eventHub,
@@ -122,7 +127,31 @@ namespace Editors.Audio.AudioEditor.AudioProjectExplorer
                 SelectedNode.DialogueEventFilterDisplayText = null;
         }
 
-        partial void OnSearchQueryChanged(string value) => FilterAudioProjectTree();
+        partial void OnSearchQueryChanged(string value) => DebounceFilterAudioProjectTreeForSearchQuery();
+
+        private void DebounceFilterAudioProjectTreeForSearchQuery()
+        {
+            _searchQueryDebounceCancellationTokenSource?.Cancel();
+            _searchQueryDebounceCancellationTokenSource?.Dispose();
+
+            _searchQueryDebounceCancellationTokenSource = new CancellationTokenSource();
+            var cancellationToken = _searchQueryDebounceCancellationTokenSource.Token;
+
+            Task.Run(async () =>
+            {
+                try
+                {
+                    await Task.Delay(250, cancellationToken);
+
+                    var app = Application.Current;
+                    if (app is not null && app.Dispatcher is not null)
+                        app.Dispatcher.Invoke(FilterAudioProjectTree);
+                    else
+                        FilterAudioProjectTree();
+                }
+                catch (OperationCanceledException) { }
+            }, cancellationToken);
+        }
 
         partial void OnShowEditedItemsOnlyChanged(bool value) => FilterAudioProjectTree();
 
@@ -132,14 +161,14 @@ namespace Editors.Audio.AudioEditor.AudioProjectExplorer
 
         [RelayCommand] public void CollapseOrExpandTree()
         {
-            var isExpanded = AudioProjectTree.Any(node => node.IsNodeExpanded);
+            var isExpanded = AudioProjectTree.Any(node => node.IsExpanded);
             foreach (var rootNode in AudioProjectTree)
                 ToggleNodeExpansion(rootNode, !isExpanded);
         }
 
         private static void ToggleNodeExpansion(AudioProjectTreeNode node, bool shouldExpand)
         {
-            node.IsNodeExpanded = shouldExpand;
+            node.IsExpanded = shouldExpand;
             foreach (var child in node.Children)
                 ToggleNodeExpansion(child, shouldExpand);
         }

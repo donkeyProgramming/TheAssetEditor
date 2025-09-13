@@ -170,7 +170,7 @@
                     BasedOn="{StaticResource {x:Type TreeViewItem}}">
                     <Setter 
                         Property="IsExpanded" 
-                        Value="{Binding IsNodeExpanded, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
+                        Value="{Binding IsExpanded, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
                     <Setter 
                         Property="Visibility">
                         <Setter.Value>

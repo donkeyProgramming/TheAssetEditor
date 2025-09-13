@@ -6,6 +6,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Data;
+using System.Windows.Input;
 using Editors.Audio.AudioEditor.Events;
 using Editors.Audio.AudioEditor.UICommands;
 using Shared.Core.Events;
@@ -45,7 +46,9 @@ namespace Editors.Audio.AudioEditor.Presentation.Table
             factory.SetValue(ItemsControl.ItemsSourceProperty, observableValues);
 
             factory.SetValue(ComboBox.IsEditableProperty, true);
-            factory.SetValue(ItemsControl.IsTextSearchEnabledProperty, false); // Changed to false to disable the built-in text search so filtering works correctly
+
+            // Set to false to disable the built-in text search so filtering works correctly
+            factory.SetValue(ItemsControl.IsTextSearchEnabledProperty, false); 
 
             // Setting the Text binding allows us to control it elsewhere, for example to show a specific value by default
             factory.SetBinding(ComboBox.TextProperty, new Binding($"[{stateGroupWithQualifierWithExtraUnderscores}]")
@@ -54,8 +57,7 @@ namespace Editors.Audio.AudioEditor.Presentation.Table
                 UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged
             });
 
-            // NOTE: Do not bind SelectedItem. Text is the single source of truth to avoid feedback loops that erase the first keystroke.
-
+            // Do not bind SelectedItem. Text is the single source of truth to avoid feedback loops that erase the first keystroke.
             factory.AddHandler(FrameworkElement.LoadedEvent, new RoutedEventHandler((sender, args) =>
             {
                 if (sender is ComboBox comboBox)
@@ -224,6 +226,23 @@ namespace Editors.Audio.AudioEditor.Presentation.Table
                 }
             }));
 
+            factory.AddHandler(UIElement.PreviewKeyDownEvent, new KeyEventHandler((sender, e) =>
+            {
+                if (Keyboard.Modifiers == ModifierKeys.Control && e.Key == Key.V)
+                {
+                    if (sender is TextBox textBox)
+                    {
+                        var clipboardText = string.Empty;
+                        if (Clipboard.ContainsText())
+                            clipboardText = Clipboard.GetText(TextDataFormat.UnicodeText);
+
+                        _ = textBox.Dispatcher.BeginInvoke(new Action(() =>
+                        {
+                            eventHub.Publish(new EditorDataGridTextboxPastedEvent(clipboardText));
+                        }), System.Windows.Threading.DispatcherPriority.Background);
+                    }
+                }
+            }), handledEventsToo: true);
 
             template.VisualTree = factory;
             return template;

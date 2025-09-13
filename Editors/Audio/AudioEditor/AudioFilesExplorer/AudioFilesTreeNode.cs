@@ -16,7 +16,7 @@ namespace Editors.Audio.AudioEditor.AudioFilesExplorer
         public AudioFilesTreeNodeType Type { get; set; }
         public AudioFilesTreeNode Parent { get; set; }
         public ObservableCollection<AudioFilesTreeNode> Children { get; set; } = [];
-        [ObservableProperty] bool _isNodeExpanded = false;
+        [ObservableProperty] bool _isExpanded = false;
         [ObservableProperty] bool _isVisible = true;
 
         public static AudioFilesTreeNode CreateContainerNode(string name, AudioFilesTreeNodeType nodeType, AudioFilesTreeNode parent = null)

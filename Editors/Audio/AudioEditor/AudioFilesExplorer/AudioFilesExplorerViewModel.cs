@@ -112,14 +112,14 @@ namespace Editors.Audio.AudioEditor.AudioFilesExplorer
             if (AudioFilesTree == null || AudioFilesTree.Count == 0)
                 return;
 
-            var isExpanded = AudioFilesTree.Any(node => node.IsNodeExpanded);
+            var isExpanded = AudioFilesTree.Any(node => node.IsExpanded);
             foreach (var rootNode in AudioFilesTree)
                 ToggleNodeExpansion(rootNode, !isExpanded);
         }
 
         private static void ToggleNodeExpansion(AudioFilesTreeNode node, bool shouldExpand)
         {
-            node.IsNodeExpanded = shouldExpand;
+            node.IsExpanded = shouldExpand;
             foreach (var child in node.Children)
                 ToggleNodeExpansion(child, shouldExpand);
         }

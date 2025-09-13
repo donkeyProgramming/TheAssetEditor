@@ -44,7 +44,7 @@
 
             <Button 
                 Grid.Column="0"
-                Content="Add To Audio Project"
+                Content="Add to Audio Project"
                 ToolTip="PLACEHOLDER" 
                 Command="{Binding AddRowToViewerCommand}" 
                 Margin="5, 0, 0, 0" 

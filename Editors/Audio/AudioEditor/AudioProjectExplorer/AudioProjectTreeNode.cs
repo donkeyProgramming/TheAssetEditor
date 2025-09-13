@@ -24,7 +24,7 @@ namespace Editors.Audio.AudioEditor.AudioProjectExplorer
         public Wh3SoundBank GameSoundBank { get; set; }
         public AudioProjectTreeNode Parent { get; set; }
         public ObservableCollection<AudioProjectTreeNode> Children { get; set; } = [];
-        [ObservableProperty] bool _isNodeExpanded = false;
+        [ObservableProperty] bool _isExpanded = false;
         [ObservableProperty] bool _isVisible = true;
         [ObservableProperty] public string _dialogueEventFilterDisplayText;
         [ObservableProperty] public Wh3DialogueEventType? _dialogueEventTypeFilter = Wh3DialogueEventType.TypeShowAll;

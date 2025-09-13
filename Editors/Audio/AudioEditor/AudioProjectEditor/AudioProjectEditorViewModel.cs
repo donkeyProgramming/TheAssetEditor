@@ -61,6 +61,7 @@ namespace Editors.Audio.AudioEditor.AudioProjectEditor
             _eventHub.Register<EditorTableRowAddRequestedEvent>(this, OnEditorTableRowAddRequested);
             _eventHub.Register<EditorDataGridColumnAddRequestedEvent>(this, OnEditorDataGridColumnAddRequested);
             _eventHub.Register<EditorTableRowAddedToViewerEvent>(this, OnEditorTableRowAddedToViewer);
+            _eventHub.Register<EditorDataGridTextboxPastedEvent>(this, OnEditorDataGridTextboxPastedEvent);
             _eventHub.Register<ViewerTableRowEditedEvent>(this, OnViewerTableRowEdited);
             _eventHub.Register<AudioFilesChangedEvent>(this, OnAudioFilesChanged);
             _eventHub.Register<EditorDataGridTextboxTextChangedEvent>(this, OnEditorDataGridTextboxTextChanged);
@@ -153,6 +154,14 @@ namespace Editors.Audio.AudioEditor.AudioProjectEditor
             SetAddRowButtonEnablement();
         }   
 
+        private void OnEditorDataGridTextboxPastedEvent(EditorDataGridTextboxPastedEvent e) => PasteText(e.PastedText);
+
+        private void PasteText(string pastedText)
+        {
+            var row = Table.Rows[0];
+            row[TableInfo.EventColumnName] = pastedText;
+        }
+
         private void OnViewerTableRowEdited(ViewerTableRowEditedEvent e)
         {
             // Clear table to ensure there's only one row
@@ -234,8 +243,8 @@ namespace Editors.Audio.AudioEditor.AudioProjectEditor
                 return;
             }
 
-            var areViewerCellsEmpty = AreViewerCellsEmpty();
-            if (areViewerCellsEmpty)
+            var areEditorCellsEmpty = AreEditorCellsEmpty();
+            if (areEditorCellsEmpty)
             {
                 IsAddRowButtonEnabled = false;
                 return;
@@ -289,7 +298,7 @@ namespace Editors.Audio.AudioEditor.AudioProjectEditor
             return false;
         }
 
-        private bool AreViewerCellsEmpty()
+        private bool AreEditorCellsEmpty()
         {
             var row = Table.Rows[0];
             return Table.Columns

@@ -7,6 +7,7 @@ using Editors.Audio.GameInformation.Warhammer3;
 namespace Editors.Audio.AudioEditor.AudioProjectExplorer
 {
     public record AudioProjectTreeFilterSettings(string SearchQuery = null, bool ShowEditedItemsOnly = false, bool ShowActionEvents = false, bool ShowDialogueEvents = false);
+    public record NodeState(bool IsVisible, bool IsExpanded);
 
     public interface IAudioProjectTreeFilterService
     {
@@ -18,17 +19,28 @@ namespace Editors.Audio.AudioEditor.AudioProjectExplorer
         private readonly IAudioEditorStateService _audioEditorStateService = audioEditorStateService;
 
         private AudioProjectTreeFilterSettings _filterSettings;
+        private bool _hasSearchQuery;
+        private bool _wasSearching;
         private HashSet<string> _editedSoundBanks;
         private HashSet<string> _editedStateGroups;
         private readonly Dictionary<AudioProjectTreeNode, HashSet<string>> _allowedDialogueEventsLookup = [];
         private HashSet<string> _editedDialogueEventsWithStatePaths;
+        private readonly Dictionary<AudioProjectTreeNode, NodeState> _preSearchNodeState = [];
+        private bool _preSearchStateSaved;
+
 
         public void FilterTree(ObservableCollection<AudioProjectTreeNode> audioProjectTree, AudioProjectTreeFilterSettings filterSettings)
         {
+            var previousHasSearchQuery = _hasSearchQuery;
             _filterSettings = filterSettings;
+            _hasSearchQuery = !string.IsNullOrWhiteSpace(_filterSettings.SearchQuery);
+            _wasSearching = previousHasSearchQuery;
             _editedSoundBanks = null;
             _editedStateGroups = null;
             _editedDialogueEventsWithStatePaths = null;
+
+            if (_hasSearchQuery && !_wasSearching && !_preSearchStateSaved)
+                SavePreSearchState(audioProjectTree);
 
             if (_filterSettings.ShowEditedItemsOnly && _audioEditorStateService.AudioProject is not null)
             {
@@ -55,8 +67,52 @@ namespace Editors.Audio.AudioEditor.AudioProjectExplorer
             foreach (var root in audioProjectTree)
                 RegisterFilteredDialogueEvents(root);
 
+            if (!_hasSearchQuery && _wasSearching && _preSearchStateSaved)
+            {
+                RestorePreSearchState(audioProjectTree);
+                ClearSavedPreSearchState();
+            }
+
             foreach (var root in audioProjectTree)
                 FilterNode(root);
+        }
+        private void SavePreSearchState(ObservableCollection<AudioProjectTreeNode> roots)
+        {
+            _preSearchNodeState.Clear();
+            foreach (var root in roots)
+                SavePreSearchStateRecursive(root);
+            _preSearchStateSaved = true;
+        }
+
+        private void SavePreSearchStateRecursive(AudioProjectTreeNode node)
+        {
+            _preSearchNodeState[node] = new NodeState(node.IsVisible, node.IsExpanded);
+            foreach (var child in node.Children)
+                SavePreSearchStateRecursive(child);
+        }
+
+        private void RestorePreSearchState(ObservableCollection<AudioProjectTreeNode> roots)
+        {
+            foreach (var root in roots)
+                RestorePreSearchStateRecursive(root);
+        }
+
+        private void RestorePreSearchStateRecursive(AudioProjectTreeNode node)
+        {
+            if (_preSearchNodeState.TryGetValue(node, out var state))
+            {
+                node.IsVisible = state.IsVisible;
+                node.IsExpanded = state.IsExpanded;
+            }
+
+            foreach (var child in node.Children)
+                RestorePreSearchStateRecursive(child);
+        }
+
+        private void ClearSavedPreSearchState()
+        {
+            _preSearchNodeState.Clear();
+            _preSearchStateSaved = false;
         }
 
         private void RegisterFilteredDialogueEvents(AudioProjectTreeNode node)
@@ -114,6 +170,9 @@ namespace Editors.Audio.AudioEditor.AudioProjectExplorer
                 }
             }
 
+            if (_hasSearchQuery)
+                node.IsExpanded = (matchesSearch && node.Children.Any()) || anyChildVisible;
+
             return node.IsVisible;
         }
 
@@ -157,6 +216,13 @@ namespace Editors.Audio.AudioEditor.AudioProjectExplorer
 
                 _ => true,
             };
+        }
+
+        private static void CollapseAll(AudioProjectTreeNode node)
+        {
+            node.IsExpanded = false;
+            foreach (var child in node.Children)
+                CollapseAll(child);
         }
     }
 }
