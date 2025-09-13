@@ -42,6 +42,8 @@
                     Width="Auto"/>
                 <ColumnDefinition 
                     Width="Auto"/>
+                <ColumnDefinition 
+                    Width="Auto"/>
             </Grid.ColumnDefinitions>
 
             <Button 
@@ -59,8 +61,19 @@
                 Margin="5, 0, 0, 0" 
                 Width="100" 
                 Content="Set Audio Files" 
-                ToolTip="Set the selected audio file(s) as the audio file(s) for the item in the Audio Project Editor." 
+                ToolTip="Set the selected audio file(s) as the audio file(s) in the Audio Project Editor." 
                 Command="{Binding SetAudioFilesCommand}" 
+                VerticalAlignment="Center" 
+                HorizontalAlignment="Left"
+                IsEnabled="{Binding IsSetAudioFilesButtonEnabled}"/>
+            
+            <Button 
+                Grid.Column="2"
+                Margin="5, 0, 0, 0" 
+                Width="120" 
+                Content="Add to Audio Files" 
+                ToolTip="Add the selected audio file(s) to the audio file(s) already set in the Audio Project Editor." 
+                Command="{Binding AddToAudioFilesCommand}" 
                 VerticalAlignment="Center" 
                 HorizontalAlignment="Left"
                 IsEnabled="{Binding IsAddAudioFilesButtonEnabled}"/>

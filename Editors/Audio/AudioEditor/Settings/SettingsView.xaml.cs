@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -9,6 +10,8 @@ namespace Editors.Audio.AudioEditor.Settings
 {
     public partial class SettingsView : UserControl
     {
+        public SettingsViewModel ViewModel => DataContext as SettingsViewModel;
+
         public SettingsView()
         {
             InitializeComponent();
@@ -31,19 +34,16 @@ namespace Editors.Audio.AudioEditor.Settings
                 if (e.Data.GetData(typeof(IEnumerable<AudioFilesTreeNode>)) is not IEnumerable<AudioFilesTreeNode> droppedNodes)
                     return;
 
-                if (DataContext is SettingsViewModel viewModel)
+                var audioFiles = new ObservableCollection<AudioFile>();
+                foreach (var wavFile in droppedNodes)
                 {
-                    var audioFiles = new ObservableCollection<AudioFile>();
-                    foreach (var wavFile in droppedNodes)
+                    audioFiles.Add(new AudioFile
                     {
-                        audioFiles.Add(new AudioFile
-                        {
-                            FileName = wavFile.FileName,
-                            FilePath = wavFile.FilePath
-                        });
-                    }
-                    viewModel.SetAudioFilesViaDrop(audioFiles);
+                        FileName = wavFile.FileName,
+                        FilePath = wavFile.FilePath
+                    });
                 }
+                ViewModel.SetAudioFilesViaDrop(audioFiles);
             }
         }
 
@@ -53,6 +53,27 @@ namespace Editors.Audio.AudioEditor.Settings
             {
                 if (AudioFilesListView.SelectedItem is AudioFile audioFile)
                     viewModel.PlayWav(audioFile);
+            }
+        }
+
+        private void OnAudioFilesListViewPreviewKeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Delete || e.Key == Key.Back)
+            {
+                if (ViewModel.ShowSettingsFromAudioProjectViewer)
+                    return;
+
+                var selectedAudioFiles = AudioFilesListView.SelectedItems
+                    .Cast<AudioFile>()
+                    .Where(audioFile => audioFile != null)
+                    .ToList();
+
+                if (selectedAudioFiles.Count == 0)
+                    return;
+
+                ViewModel.RemoveAudioFiles(selectedAudioFiles);
+
+                e.Handled = true;
             }
         }
     }

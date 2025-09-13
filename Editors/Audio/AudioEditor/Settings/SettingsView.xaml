@@ -142,7 +142,8 @@
                         AllowDrop="True"
                         Drop="OnListViewDrop"
                         DragOver="OnListViewDragOver"
-                        MouseDoubleClick="OnAudioFileDoubleClick">
+                        MouseDoubleClick="OnAudioFileDoubleClick"
+                        PreviewKeyDown="OnAudioFilesListViewPreviewKeyDown">
                         <ListView.View>
                             <GridView>
                                 <GridViewColumn 

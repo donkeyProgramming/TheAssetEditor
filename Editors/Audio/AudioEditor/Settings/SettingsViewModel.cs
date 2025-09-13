@@ -99,8 +99,17 @@ namespace Editors.Audio.AudioEditor.Settings
 
         private void OnAudioFilesChanged(AudioFilesChangedEvent e)
         {
-            AudioFiles.Clear();
-            AudioFiles = e.AudioFiles;
+            if (e.AddToExistingAudioFiles)
+            {
+                foreach (var audioFile in e.AudioFiles)
+                    AudioFiles.Add(audioFile);
+            }
+            else
+            {
+                AudioFiles.Clear();
+                AudioFiles = e.AudioFiles;
+            }
+
             _audioEditorStateService.StoreAudioFiles(AudioFiles.ToList());
 
             ShowSettingsFromAudioProjectViewer = false;
@@ -127,8 +136,25 @@ namespace Editors.Audio.AudioEditor.Settings
         public void SetAudioFilesViaDrop(ObservableCollection<AudioFile> audioFiles)
         {
             _audioEditorStateService.StoreAudioFiles(audioFiles.ToList());
-            _eventHub.Publish(new AudioFilesChangedEvent(audioFiles));
+            _eventHub.Publish(new AudioFilesChangedEvent(audioFiles, false));
         }
+
+        public void RemoveAudioFiles(List<AudioFile> audioFilesToRemove)
+        {
+            if (audioFilesToRemove == null || audioFilesToRemove.Count == 0)
+                return;
+
+            var audioFiles = AudioFiles.ToList();
+            foreach (var audioFileToRemove in audioFilesToRemove.ToList())
+                audioFiles.Remove(audioFileToRemove);
+
+            _audioEditorStateService.StoreAudioFiles(audioFiles);
+
+            var newAudioFiles = new ObservableCollection<AudioFile>(audioFiles);
+            _eventHub.Publish(new AudioFilesChangedEvent(newAudioFiles, false));
+        }
+
+
 
         partial void OnShowSettingsFromAudioProjectViewerChanged(bool value)
         {

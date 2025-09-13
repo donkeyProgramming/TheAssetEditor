@@ -26,6 +26,7 @@ namespace Editors.Audio.AudioEditor.AudioFilesExplorer
         private readonly IAudioFilesTreeSearchFilterService _audioFilesTreeFilter;
 
         [ObservableProperty] private string _audioFilesExplorerLabel;
+        [ObservableProperty] private bool _isSetAudioFilesButtonEnabled = false;
         [ObservableProperty] private bool _isAddAudioFilesButtonEnabled = false;
         [ObservableProperty] private bool _isPlayAudioButtonEnabled = false;
         [ObservableProperty] private string _filterQuery;
@@ -68,6 +69,7 @@ namespace Editors.Audio.AudioEditor.AudioFilesExplorer
 
         private void OnAudioProjectExplorerNodeSelected(AudioProjectExplorerNodeSelectedEvent e)
         {
+            IsSetAudioFilesButtonEnabled = false;
             IsAddAudioFilesButtonEnabled = false;
         }
 
@@ -99,10 +101,16 @@ namespace Editors.Audio.AudioEditor.AudioFilesExplorer
             {
                 if (selectedAudioProjectExplorerNode.Type == AudioProjectTreeNodeType.ActionEventType 
                     || selectedAudioProjectExplorerNode.Type == AudioProjectTreeNodeType.DialogueEvent)
+                {
+                    IsSetAudioFilesButtonEnabled = true;
                     IsAddAudioFilesButtonEnabled = true;
+                }
             }
             else
+            {
+                IsSetAudioFilesButtonEnabled = false;
                 IsAddAudioFilesButtonEnabled = false;
+            }
         }
 
         partial void OnFilterQueryChanged(string value) => _audioFilesTreeFilter.FilterTree(AudioFilesTree, FilterQuery);
@@ -124,7 +132,9 @@ namespace Editors.Audio.AudioEditor.AudioFilesExplorer
                 ToggleNodeExpansion(child, shouldExpand);
         }
 
-        [RelayCommand] public void SetAudioFiles() => _uiCommandFactory.Create<SetAudioFilesCommand>().Execute(SelectedTreeNodes);
+        [RelayCommand] public void SetAudioFiles() => _uiCommandFactory.Create<SetAudioFilesCommand>().Execute(SelectedTreeNodes, false);
+
+        [RelayCommand] public void AddToAudioFiles() => _uiCommandFactory.Create<SetAudioFilesCommand>().Execute(SelectedTreeNodes, true);
 
         [RelayCommand] public void PlayWav()
         {

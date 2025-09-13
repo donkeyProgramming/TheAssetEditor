@@ -12,7 +12,7 @@ namespace Editors.Audio.AudioEditor.UICommands
         private readonly IAudioEditorStateService _audioEditorStateService = audioEditorStateService;
         private readonly IEventHub _eventHub = eventHub;
 
-        public void Execute(ObservableCollection<AudioFilesTreeNode> selectedAudioFiles)
+        public void Execute(ObservableCollection<AudioFilesTreeNode> selectedAudioFiles, bool addToExistingAudioFiles)
         {
             var audioFiles = new ObservableCollection<AudioFile>();
             foreach (var wavFile in selectedAudioFiles)
@@ -25,7 +25,7 @@ namespace Editors.Audio.AudioEditor.UICommands
             }
 
             _audioEditorStateService.StoreAudioFiles(audioFiles.ToList());
-            _eventHub.Publish(new AudioFilesChangedEvent(audioFiles));
+            _eventHub.Publish(new AudioFilesChangedEvent(audioFiles, addToExistingAudioFiles));
         }
     }
 }

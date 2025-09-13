@@ -106,7 +106,9 @@ namespace Editors.Audio.AudioEditor
 
             if (e.Key == Key.Delete)
             {
-                _uiCommandFactory.Create<RemoveViewerRowsCommand>().Execute(_audioEditorStateService.SelectedViewerRows);
+                if (_audioEditorStateService.SelectedViewerRows != null && _audioEditorStateService.SelectedViewerRows.Count > 0)
+                    _uiCommandFactory.Create<RemoveViewerRowsCommand>().Execute(_audioEditorStateService.SelectedViewerRows);
+
                 e.Handled = true;
             }
         }

@@ -161,17 +161,20 @@ namespace Editors.Audio.AudioEditor.AudioProjectExplorer
 
         [RelayCommand] public void CollapseOrExpandTree()
         {
-            var isExpanded = AudioProjectTree.Any(node => node.IsExpanded);
+            var isExpanded = AudioProjectTree.Any(node => node.IsVisible && node.IsExpanded);
             foreach (var rootNode in AudioProjectTree)
                 ToggleNodeExpansion(rootNode, !isExpanded);
         }
 
         private static void ToggleNodeExpansion(AudioProjectTreeNode node, bool shouldExpand)
         {
-            node.IsExpanded = shouldExpand;
+            if (node.IsVisible)
+                node.IsExpanded = shouldExpand;
+
             foreach (var child in node.Children)
                 ToggleNodeExpansion(child, shouldExpand);
         }
+
 
         private void InitialiseDialogueEventFilters()
         {

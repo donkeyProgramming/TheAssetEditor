@@ -3,5 +3,5 @@ using Editors.Audio.AudioEditor.Settings;
 
 namespace Editors.Audio.AudioEditor.Events
 {
-    public record AudioFilesChangedEvent(ObservableCollection<AudioFile> AudioFiles);
+    public record AudioFilesChangedEvent(ObservableCollection<AudioFile> AudioFiles, bool AddToExistingAudioFiles);
 }
