@@ -172,7 +172,7 @@ namespace Editors.Audio.AudioEditor.AudioProjectViewer
 
         partial void OnSelectedRowsChanged(List<DataRow> value)
         {
-            _audioEditorStateService.SelectedViewerRows = SelectedRows;
+            _audioEditorStateService.StoreSelectedViewerRows(SelectedRows);
 
             _eventHub.Publish(new ViewerTableRowSelectionChangedEvent());
 

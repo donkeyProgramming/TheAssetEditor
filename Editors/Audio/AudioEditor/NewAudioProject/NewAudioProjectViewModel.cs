@@ -110,9 +110,9 @@ namespace Editors.Audio.AudioEditor.NewAudioProject
             var audioProject = AudioProject.Create(currentGame, language);
             _audioProjectFileService.Save(audioProject, fileName, filePath);
 
-            _audioEditorStateService.AudioProject = audioProject;
-            _audioEditorStateService.AudioProjectFileName = fileName;
-            _audioEditorStateService.AudioProjectFilePath = filePath;
+            _audioEditorStateService.StoreAudioProject(audioProject);
+            _audioEditorStateService.StoreAudioProjectFileName(fileName);
+            _audioEditorStateService.StoreAudioProjectFilePath(filePath);
 
             _eventHub.Publish(new AudioProjectInitialisedEvent());
 

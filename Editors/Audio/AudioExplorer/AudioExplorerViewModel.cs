@@ -26,9 +26,7 @@ namespace Editors.Audio.AudioExplorer
         private readonly SoundPlayer _soundPlayer;
 
         HircTreeItem _selectedNode;
-
-        // Public attributes
-        public ObservableCollection<HircTreeItem> TreeList { get; set; } = new ObservableCollection<HircTreeItem>();
+        public ObservableCollection<HircTreeItem> TreeList { get; set; } = [];
         public HircTreeItem SelectedNode { get => _selectedNode; set { SetAndNotify(ref _selectedNode, value); OnNodeSelected(_selectedNode); } }
         public NotifyAttr<bool> ShowIds { get; set; }
         public NotifyAttr<bool> ShowBnkName { get; set; }
@@ -114,26 +112,25 @@ namespace Editors.Audio.AudioExplorer
             {
                 if (sound.GetStreamType() == AKBKSourceType.Data_BNK)
                 {
-                    if (sound is CAkSound_V136) // For some reason some V136 sounds say they're in data but they're actually streamed
+                    if (sound is CAkSound_V136)
                     {
+                        // For some reason some V136 sounds say they're in data but they're actually streamed
                         _soundPlayer.PlayStreamedWem(sound.GetSourceId().ToString());
                     }
                     else if (sound is CAkSound_V112 sound_V112)
-                    {
                         _soundPlayer.PlayDataWem(
                             sound_V112.AkBankSourceData.AkMediaInformation.SourceId,
                             sound_V112.AkBankSourceData.AkMediaInformation.FileId,
                             (int)sound_V112.AkBankSourceData.AkMediaInformation.FileOffset,
                             (int)sound_V112.AkBankSourceData.AkMediaInformation.InMemoryMediaSize
                         );
-                    }
                 }
                 else
                     _soundPlayer.PlayStreamedWem(sound.GetSourceId().ToString());
             }
             else if (_selectedNode.Item is ICAkMusicTrack musicTrack)
             {
-                // Only seems to have one child in practice 
+                // Music tracks seems to have one child in practice so can just get first
                 var musicTrackId = musicTrack.GetChildren().FirstOrDefault(); 
                 _soundPlayer.PlayStreamedWem(musicTrackId.ToString());
             }

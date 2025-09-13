@@ -206,7 +206,7 @@ namespace Editors.Audio.AudioEditor.AudioProjectEditor
 
         partial void OnShowModdedStatesOnlyChanged(bool value)
         {
-            _audioEditorStateService.ShowModdedStatesOnly = ShowModdedStatesOnly;
+            _audioEditorStateService.StoreModdedStatesOnly(ShowModdedStatesOnly);
 
             var selectedAudioProjectExplorerNode = _audioEditorStateService.SelectedAudioProjectExplorerNode;
             if (selectedAudioProjectExplorerNode.IsDialogueEvent())

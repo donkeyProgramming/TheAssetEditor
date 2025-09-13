@@ -24,7 +24,7 @@ namespace Editors.Audio.AudioEditor.UICommands
                 });
             }
 
-            _audioEditorStateService.AudioFiles = audioFiles.ToList();
+            _audioEditorStateService.StoreAudioFiles(audioFiles.ToList());
             _eventHub.Publish(new AudioFilesChangedEvent(audioFiles));
         }
     }

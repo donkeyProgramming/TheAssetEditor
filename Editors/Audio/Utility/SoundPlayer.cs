@@ -33,11 +33,11 @@ namespace Editors.Audio.Utility
             if (wemFileName == null || wemFileName == string.Empty)
                 _logger.Here().Warning("Invalid wem file; input is empty.");
 
-            var audioFile = FindWemFile(wemFileName);
-            if (audioFile == null)
+            var wemFile = FindWemFile(wemFileName);
+            if (wemFile == null)
                 _logger.Here().Error($"Unable to find wem file '{wemFileName}'.");
 
-            var result = ConvertWemToWav(wemFileName, audioFile.DataSource.ReadData());
+            var result = ConvertWemToWav(wemFileName, wemFile.DataSource.ReadData());
             if (result.IsSuccess)
             {
                 _logger.Here().Information($"Playing wav file.");

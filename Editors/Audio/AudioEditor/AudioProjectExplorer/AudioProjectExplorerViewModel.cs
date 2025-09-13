@@ -62,7 +62,7 @@ namespace Editors.Audio.AudioEditor.AudioProjectExplorer
 
         partial void OnSelectedNodeChanged(AudioProjectTreeNode value)
         {
-            _audioEditorStateService.SelectedAudioProjectExplorerNode = SelectedNode;
+            _audioEditorStateService.StoreSelectedAudioProjectExplorerNode(SelectedNode);
 
             _eventHub.Publish(new AudioProjectExplorerNodeSelectedEvent(SelectedNode));
 

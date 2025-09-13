@@ -26,6 +26,14 @@ namespace Editors.Audio.AudioEditor
         // Audio Project Viewer
         List<DataRow> SelectedViewerRows { get; set; }
 
+        public void StoreAudioProject(AudioProject audioProject);
+        public void StoreAudioProjectFileName(string audioProjectFileName);
+        public void StoreAudioProjectFilePath(string audioProjectFilePath);
+        void StoreSelectedAudioProjectExplorerNode(AudioProjectTreeNode node);
+        void StoreModdedStatesOnly(bool moddedStatesOnly);
+        void StoreAudioSettings(AudioSettings audioSettings);
+        void StoreAudioFiles(List<AudioFile> audioFiles); 
+        void StoreSelectedViewerRows(List<DataRow> selectedViewerRows);
         void Reset();
     }
 
@@ -39,6 +47,22 @@ namespace Editors.Audio.AudioEditor
         public AudioSettings AudioSettings { get; set; }
         public List<AudioFile> AudioFiles { get; set; } = [];
         public List<DataRow> SelectedViewerRows { get; set; }
+
+        public void StoreAudioProject(AudioProject audioProject) => AudioProject = audioProject;
+
+        public void StoreAudioProjectFileName(string audioProjectFileName) => AudioProjectFileName = audioProjectFileName;
+
+        public void StoreAudioProjectFilePath(string audioProjectFilePath) => AudioProjectFilePath = audioProjectFilePath;
+
+        public void StoreSelectedAudioProjectExplorerNode(AudioProjectTreeNode node) => SelectedAudioProjectExplorerNode = node;
+
+        public void StoreModdedStatesOnly(bool showModdedStatesOnly) => ShowModdedStatesOnly = showModdedStatesOnly;
+
+        public void StoreAudioSettings(AudioSettings audioSettings) => AudioSettings = audioSettings;
+
+        public void StoreAudioFiles(List<AudioFile> audioFiles) => AudioFiles = audioFiles;
+
+        public void StoreSelectedViewerRows(List<DataRow> selectedViewerRows) => SelectedViewerRows = selectedViewerRows;
 
         public void Reset()
         {

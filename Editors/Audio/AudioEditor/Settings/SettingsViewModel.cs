@@ -101,6 +101,7 @@ namespace Editors.Audio.AudioEditor.Settings
         {
             AudioFiles.Clear();
             AudioFiles = e.AudioFiles;
+            _audioEditorStateService.StoreAudioFiles(AudioFiles.ToList());
 
             ShowSettingsFromAudioProjectViewer = false;
             SetSettingsUsabilityAndStore();
@@ -115,7 +116,7 @@ namespace Editors.Audio.AudioEditor.Settings
             }
         }
 
-        partial void OnAudioFilesChanged(ObservableCollection<AudioFile> value) => _audioEditorStateService.AudioFiles = AudioFiles.ToList();
+        partial void OnAudioFilesChanged(ObservableCollection<AudioFile> value) => _audioEditorStateService.StoreAudioFiles(AudioFiles.ToList());
 
         private void OnViewerRowEdited(ViewerTableRowEditedEvent e)
         {
@@ -125,7 +126,7 @@ namespace Editors.Audio.AudioEditor.Settings
 
         public void SetAudioFilesViaDrop(ObservableCollection<AudioFile> audioFiles)
         {
-            _audioEditorStateService.AudioFiles = audioFiles.ToList();
+            _audioEditorStateService.StoreAudioFiles(audioFiles.ToList());
             _eventHub.Publish(new AudioFilesChangedEvent(audioFiles));
         }
 
@@ -287,7 +288,7 @@ namespace Editors.Audio.AudioEditor.Settings
 
         private void StoreSettings()
         {
-            _audioEditorStateService.AudioSettings = new AudioSettings
+            var audioSettings = new AudioSettings
             {
                 PlaylistType = PlaylistType,
                 EnableRepetitionInterval = EnableRepetitionInterval,
@@ -300,6 +301,7 @@ namespace Editors.Audio.AudioEditor.Settings
                 TransitionType = TransitionType,
                 TransitionDuration = TransitionType != TransitionType.Disabled ? TransitionDuration : 1
             };
+            _audioEditorStateService.StoreAudioSettings(audioSettings);
         }
 
         private void ShowSettingsFromViewerItem()
@@ -430,6 +432,8 @@ namespace Editors.Audio.AudioEditor.Settings
         {
             foreach (var audioFile in audioFiles)
                 AudioFiles.Add(audioFile);
+
+            _audioEditorStateService.StoreAudioFiles(audioFiles);
         }
 
         [RelayCommand] public void PlayWav(AudioFile audioFile)
