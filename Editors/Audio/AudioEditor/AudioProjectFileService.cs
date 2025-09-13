@@ -74,6 +74,7 @@ namespace Editors.Audio.AudioEditor
                 _eventHub.Publish(new AudioProjectInitialisedEvent());
 
                 _audioProjectIntegrityService.CheckAudioProjectDialogueEventIntegrity(dirtyAudioProject);
+                _audioProjectIntegrityService.CheckAudioProjectWavFilesIntegrity(dirtyAudioProject);
             }
         }
     }

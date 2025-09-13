@@ -5,20 +5,51 @@ using System.Windows;
 using Editors.Audio.AudioEditor.Models;
 using Editors.Audio.GameInformation.Warhammer3;
 using Editors.Audio.Storage;
+using Shared.Core.PackFiles;
 
 namespace Editors.Audio.AudioEditor
 {
-    // TODO: Probably need something to check all audio files in the project are where they say they are
     public interface IAudioProjectIntegrityService
     {
-        void CheckAudioProjectDialogueEventIntegrity(AudioProject audioProject);
-
         void CheckDialogueEventInformationIntegrity(List<Wh3DialogueEventDefinition> dialogueEventData);
+        void CheckAudioProjectDialogueEventIntegrity(AudioProject audioProject);
+        void CheckAudioProjectWavFilesIntegrity(AudioProject audioProject);
     }
 
-    public class AudioProjectIntegrityService(IAudioRepository audioRepository) : IAudioProjectIntegrityService
+    public class AudioProjectIntegrityService(IPackFileService packFileService, IAudioRepository audioRepository) : IAudioProjectIntegrityService
     {
+        private readonly IPackFileService _packFileService = packFileService;
         private readonly IAudioRepository _audioRepository = audioRepository;
+
+        public void CheckDialogueEventInformationIntegrity(List<Wh3DialogueEventDefinition> information)
+        {
+            var exclusions = new List<string> { "New_Dialogue_Event", "Battle_Individual_Melee_Weapon_Hit" };
+            var gameDialogueEvents = _audioRepository.StateGroupsByDialogueEvent.Keys.Except(exclusions).ToList();
+            var audioEditorDialogueEvents = information.Select(item => item.Name).ToList();
+            var areGameAndAudioEditorDialogueEventsMatching = new HashSet<string>(gameDialogueEvents).SetEquals(audioEditorDialogueEvents);
+            if (!areGameAndAudioEditorDialogueEventsMatching)
+            {
+                var dialogueEventsOnlyInGame = gameDialogueEvents.Except(audioEditorDialogueEvents).ToList();
+                var dialogueEventsOnlyInAudioEditor = audioEditorDialogueEvents.Except(gameDialogueEvents).ToList();
+
+                var dialogueEventsOnlyInGameText = string.Join("\n - ", dialogueEventsOnlyInGame);
+                var dialogueEventsOnlyInAudioEditorText = string.Join("\n - ", dialogueEventsOnlyInAudioEditor);
+
+                var message = $"Dialogue Event integrity check failed." +
+                    $"\n\nThis is due to a change in the game's Dialogue Events by CA." +
+                    $"\n\nPlease report this error to the AssetEditor development team.";
+                var dialogueEventsOnlyInGameMessage = $"\n\nGame Dialogue Events not in the Audio Editor:\n - {dialogueEventsOnlyInGameText}";
+                var dialogueEventsOnlyInAudioEditorMessage = $"\n\nAudio Editor Dialogue Events not in the game:\n - {dialogueEventsOnlyInAudioEditorText}";
+
+                if (dialogueEventsOnlyInGame.Count > 0)
+                    message += dialogueEventsOnlyInGameMessage;
+
+                if (dialogueEventsOnlyInAudioEditor.Count > 0)
+                    message += dialogueEventsOnlyInAudioEditorMessage;
+
+                MessageBox.Show(message, "Error");
+            }
+        }
 
         public void CheckAudioProjectDialogueEventIntegrity(AudioProject audioProject)
         {
@@ -65,31 +96,32 @@ namespace Editors.Audio.AudioEditor
                 MessageBox.Show(message, "Error");
         }
 
-        public void CheckDialogueEventInformationIntegrity(List<Wh3DialogueEventDefinition> information)
+        public void CheckAudioProjectWavFilesIntegrity(AudioProject audioProject)
         {
-            var exclusions = new List<string>{"New_Dialogue_Event", "Battle_Individual_Melee_Weapon_Hit"};
-            var gameDialogueEvents = _audioRepository.StateGroupsByDialogueEvent.Keys.Except(exclusions).ToList();
-            var audioEditorDialogueEvents = information.Select(item => item.Name).ToList();
-            var areGameAndAudioEditorDialogueEventsMatching = new HashSet<string>(gameDialogueEvents).SetEquals(audioEditorDialogueEvents);
-            if (!areGameAndAudioEditorDialogueEventsMatching)
+            var missingWavFiles = new List<string>();
+            var sounds = audioProject.GetSounds();
+            var distinctSounds = sounds.DistinctBy(sound => sound.WavPackFilePath);
+            foreach (var sound in distinctSounds)
             {
-                var dialogueEventsOnlyInGame = gameDialogueEvents.Except(audioEditorDialogueEvents).ToList();
-                var dialogueEventsOnlyInAudioEditor = audioEditorDialogueEvents.Except(gameDialogueEvents).ToList();
+                var wavPath = sound.WavPackFilePath;
+                if (string.IsNullOrWhiteSpace(wavPath))
+                    continue;
 
-                var dialogueEventsOnlyInGameText = string.Join("\n - ", dialogueEventsOnlyInGame);
-                var dialogueEventsOnlyInAudioEditorText = string.Join("\n - ", dialogueEventsOnlyInAudioEditor);
+                var packFile = _packFileService.FindFile(wavPath);
+                if (packFile == null)
+                    missingWavFiles.Add(wavPath);
+            }
 
-                var message = $"Dialogue Event integrity check failed." +
-                    $"\n\nThis is due to a change in the game's Dialogue Events by CA." +
-                    $"\n\nPlease report this error to the AssetEditor development team.";
-                var dialogueEventsOnlyInGameMessage = $"\n\nGame Dialogue Events not in the Audio Editor:\n - {dialogueEventsOnlyInGameText}";
-                var dialogueEventsOnlyInAudioEditorMessage = $"\n\nAudio Editor Dialogue Events not in the game:\n - {dialogueEventsOnlyInAudioEditorText}";
+            if (missingWavFiles.Count > 0)
+            {
+                var sortedMissingWavFiles = missingWavFiles.OrderBy(wavFilePath => wavFilePath).ToList();
+                var missingWavFilesText = string.Join("\n - ", sortedMissingWavFiles);
 
-                if (dialogueEventsOnlyInGame.Count > 0)
-                    message += dialogueEventsOnlyInGameMessage;
-
-                if (dialogueEventsOnlyInAudioEditor.Count > 0)
-                    message += dialogueEventsOnlyInAudioEditorMessage;
+                var message =
+                    $"Wav files integrity check failed." +
+                    $"\n\nThe following wav files could not be found:" +
+                    $"\n - {missingWavFilesText}" +
+                    $"\n\nEnsure all wav files are in the correct location or update their usage in the Audio Project to the correct path.";
 
                 MessageBox.Show(message, "Error");
             }
