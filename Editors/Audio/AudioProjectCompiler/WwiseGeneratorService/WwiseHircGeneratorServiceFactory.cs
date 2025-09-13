@@ -24,12 +24,12 @@ namespace Editors.Audio.AudioProjectCompiler.WwiseGeneratorService
             return null;
         }
 
-        public HircItem GenerateHirc(AudioProjectHircItem audioProjectHircItem, SoundBank soundBank)
+        public HircItem GenerateHirc(AudioProjectItem audioProjectItem, SoundBank soundBank)
         {
-            var generator = CreateInstance(audioProjectHircItem.HircType);
+            var generator = CreateInstance(audioProjectItem.HircType);
             if (generator == null)
-                throw new Exception($"No Hirc generator registered for type {audioProjectHircItem.HircType}");
-            return generator.GenerateHirc(audioProjectHircItem, soundBank);
+                throw new Exception($"No Hirc generator registered for type {audioProjectItem.HircType}");
+            return generator.GenerateHirc(audioProjectItem, soundBank);
         }
 
         public static WwiseHircGeneratorServiceFactory CreateFactory(uint bankGeneratorVersion)

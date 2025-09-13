@@ -5,14 +5,17 @@ using Shared.GameFormats.Wwise.Enums;
 
 namespace Editors.Audio.AudioEditor.Models
 {
-    public class ActionEvent : AudioProjectHircItem
+    public class ActionEvent : AudioProjectItem
     {
-        public override AkBkHircType HircType { get; set; } = AkBkHircType.Event;
-        // Actions is a List because in Wwise an Action Event can have multiple actions but
-        // making multiple Actions isn't supported by the tool as it's unlikely to be needed
-        // so really there will only ever be one Action in the list
+        // Actions is a List because in Wwise an Action Event can have multiple actions but making multiple Actions isn't
+        // supported by the tool as it's unlikely to be needed so really there will only ever be one Action in the list.
         public List<Action> Actions { get; set; }
         public Wh3ActionEventType ActionEventType { get; set; }
+
+        public ActionEvent()
+        {
+            HircType = AkBkHircType.Event;
+        }
 
         public static ActionEvent Create(string name, List<Action> actions, Wh3ActionEventType actionEventType)
         {
@@ -20,7 +23,7 @@ namespace Editors.Audio.AudioEditor.Models
             {
                 Name = name,
                 Actions = actions,
-                ActionEventType = actionEventType,
+                ActionEventType = actionEventType
             };
         }
 

@@ -4,10 +4,14 @@ using Shared.GameFormats.Wwise.Enums;
 
 namespace Editors.Audio.AudioEditor.Models
 {
-    public class DialogueEvent : AudioProjectHircItem
+    public class DialogueEvent : AudioProjectItem
     {
-        public override AkBkHircType HircType { get; set; } = AkBkHircType.Dialogue_Event;
         public List<StatePath> StatePaths { get; set; } = [];
+
+        public DialogueEvent()
+        {
+            HircType = AkBkHircType.Dialogue_Event;
+        }
 
         public static DialogueEvent Create(string name)
         {

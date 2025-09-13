@@ -68,5 +68,46 @@ namespace Editors.Audio.AudioEditor.Models
                 .Where(actionEvent => actionEvent.GetStopActions().Count != 0 && actionEvent.GetPlayActions().Count == 0)
                 .ToList();
         }
+
+        public List<Action> GetActions()
+        {
+            return (ActionEvents ?? [])
+                .Where(actionEvent => actionEvent?.Actions != null)
+                .SelectMany(actionEvent => actionEvent.Actions)
+                .ToList();
+        }
+
+        public List<StatePath> GetStatePaths()
+        {
+            return (DialogueEvents ?? [])
+                .Where(dialogueEvent => dialogueEvent?.StatePaths != null)
+                .SelectMany(dialogueEvent => dialogueEvent.StatePaths)
+                .ToList();
+        }
+
+        public List<Sound> GetActionSounds()
+        {
+            var actions = GetActions();
+            var actionSounds = actions.Select(action => action.Sound).ToList();
+            var statePaths = GetStatePaths();
+            var statePathSounds = statePaths.Select(statePath => statePath.Sound).ToList();
+            return [..actionSounds, ..statePathSounds];
+        }
+
+        public List<Sound> GetRandomSequenceContainerSounds()
+        {
+            var actions = GetActions();
+            var actionSounds = actions.SelectMany(action => action.RandomSequenceContainer.Sounds);
+            var statePaths = GetStatePaths();
+            var statePathSounds = statePaths.SelectMany(statePath => statePath.RandomSequenceContainer.Sounds);
+            return [..actionSounds, ..statePathSounds];
+        }
+
+        public List<Sound> GetSounds()
+        {
+            var actionSounds = GetActionSounds();
+            var statePathSounds = GetRandomSequenceContainerSounds();
+            return [..actionSounds, ..statePathSounds];
+        }
     }
 }

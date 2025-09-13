@@ -2,13 +2,17 @@
 
 namespace Editors.Audio.AudioEditor.Models
 {
-    public class Action : AudioProjectHircItem
+    public class Action : AudioProjectItem
     {
-        public override AkBkHircType HircType { get; set; } = AkBkHircType.Action;
         public Sound Sound { get; set; }
         public RandomSequenceContainer RandomSequenceContainer { get; set; }
         public AkActionType ActionType { get; set; }
         public uint IdExt { get; set; }
+
+        public Action()
+        {
+            HircType = AkBkHircType.Action;
+        }
 
         public static Action Create(Sound sound, AkActionType actionType)
         {

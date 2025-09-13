@@ -3,9 +3,8 @@ using Shared.GameFormats.Wwise.Enums;
 
 namespace Editors.Audio.AudioEditor.Models
 {
-    public class Sound : AudioProjectHircItem
+    public class Sound : AudioProjectItem
     {
-        public override AkBkHircType HircType { get; set; } = AkBkHircType.Sound;
         public uint OverrideBusId { get; set; }
         public uint DirectParentId { get; set; }
         public uint SourceId { get; set; }
@@ -17,6 +16,11 @@ namespace Editors.Audio.AudioEditor.Models
         public long InMemoryMediaSize { get; set; }
         public string Language { get; set; }
         public AudioSettings AudioSettings { get; set; }
+
+        public Sound()
+        {
+            HircType = AkBkHircType.Sound;
+        }
 
         public static Sound Create(string fileName, string filePath, AudioSettings audioSettings)
         {

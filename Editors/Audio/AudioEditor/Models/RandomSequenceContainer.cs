@@ -3,13 +3,17 @@ using Shared.GameFormats.Wwise.Enums;
 
 namespace Editors.Audio.AudioEditor.Models
 {
-    public class RandomSequenceContainer : AudioProjectHircItem
+    public class RandomSequenceContainer : AudioProjectItem
     {
-        public override AkBkHircType HircType { get; set; } = AkBkHircType.RandomSequenceContainer;
         public uint OverrideBusId { get; set; }
         public uint DirectParentId { get; set; }
         public AudioSettings AudioSettings { get; set; }
         public List<Sound> Sounds { get; set; }
+
+        public RandomSequenceContainer()
+        {
+            HircType = AkBkHircType.RandomSequenceContainer;
+        }
 
         public static RandomSequenceContainer Create(AudioSettings audioSettings, List<Sound> sounds)
         {
