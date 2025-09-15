@@ -94,10 +94,10 @@ namespace Editors.Audio.AudioEditor.AudioProjectExplorer
         private void RestorePreSearchState(ObservableCollection<AudioProjectTreeNode> roots)
         {
             foreach (var root in roots)
-                RestorePreSearchStateRecursive(root);
+                RestorePreSearchStateInner(root);
         }
 
-        private void RestorePreSearchStateRecursive(AudioProjectTreeNode node)
+        private void RestorePreSearchStateInner(AudioProjectTreeNode node)
         {
             if (_preSearchNodeState.TryGetValue(node, out var state))
             {
@@ -106,7 +106,7 @@ namespace Editors.Audio.AudioEditor.AudioProjectExplorer
             }
 
             foreach (var child in node.Children)
-                RestorePreSearchStateRecursive(child);
+                RestorePreSearchStateInner(child);
         }
 
         private void ClearSavedPreSearchState()
@@ -152,7 +152,10 @@ namespace Editors.Audio.AudioEditor.AudioProjectExplorer
 
             var anyChildVisible = false;
             foreach (var child in node.Children)
-                anyChildVisible |= FilterNode(child);
+            {
+                if (FilterNode(child))
+                    anyChildVisible = true;
+            }
 
             if (!node.Children.Any())
             {
@@ -173,8 +176,12 @@ namespace Editors.Audio.AudioEditor.AudioProjectExplorer
             if (_hasSearchQuery)
                 node.IsExpanded = (matchesSearch && node.Children.Any()) || anyChildVisible;
 
+            if (_filterSettings.ShowEditedItemsOnly && !_hasSearchQuery)
+                node.IsExpanded = node.Children.Any() && anyChildVisible;
+
             return node.IsVisible;
         }
+
 
         private bool IsNodeEdited(AudioProjectTreeNode node)
         {

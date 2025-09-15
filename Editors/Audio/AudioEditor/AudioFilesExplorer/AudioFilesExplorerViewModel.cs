@@ -1,6 +1,11 @@
-﻿using System.Collections.ObjectModel;
+﻿using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
+using System.Windows;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Editors.Audio.AudioEditor.AudioProjectExplorer;
@@ -33,6 +38,7 @@ namespace Editors.Audio.AudioEditor.AudioFilesExplorer
         [ObservableProperty] private ObservableCollection<AudioFilesTreeNode> _audioFilesTree;
 
         public ObservableCollection<AudioFilesTreeNode> SelectedTreeNodes { get; set; } = [];
+        private CancellationTokenSource _filterQueryDebounceCancellationTokenSource;
 
         public AudioFilesExplorerViewModel(
             IGlobalEventHub globalEventHub,
@@ -113,21 +119,47 @@ namespace Editors.Audio.AudioEditor.AudioFilesExplorer
             }
         }
 
-        partial void OnFilterQueryChanged(string value) => _audioFilesTreeFilter.FilterTree(AudioFilesTree, FilterQuery);
+        partial void OnFilterQueryChanged(string value) => DebounceFilterAudioFilesTreeForFilterQuery();
+
+        private void DebounceFilterAudioFilesTreeForFilterQuery()
+        {
+            _filterQueryDebounceCancellationTokenSource?.Cancel();
+            _filterQueryDebounceCancellationTokenSource?.Dispose();
+
+            _filterQueryDebounceCancellationTokenSource = new CancellationTokenSource();
+            var cancellationToken = _filterQueryDebounceCancellationTokenSource.Token;
+
+            _ = Task.Run(async () =>
+            {
+                try
+                {
+                    await Task.Delay(250, cancellationToken);
+
+                    var application = Application.Current;
+                    if (application is not null && application.Dispatcher is not null)
+                        application.Dispatcher.Invoke(() => _audioFilesTreeFilter.FilterTree(AudioFilesTree, FilterQuery));
+                    else
+                        _audioFilesTreeFilter.FilterTree(AudioFilesTree, FilterQuery);
+                }
+                catch (OperationCanceledException) { }
+            }, cancellationToken);
+        }
 
         [RelayCommand] public void CollapseOrExpandTree()
         {
             if (AudioFilesTree == null || AudioFilesTree.Count == 0)
                 return;
 
-            var isExpanded = AudioFilesTree.Any(node => node.IsExpanded);
+            var isVisibleAndExpanded = AudioFilesTree.Any(node => node.IsVisible && node.IsExpanded);
             foreach (var rootNode in AudioFilesTree)
-                ToggleNodeExpansion(rootNode, !isExpanded);
+                ToggleNodeExpansion(rootNode, !isVisibleAndExpanded);
         }
 
         private static void ToggleNodeExpansion(AudioFilesTreeNode node, bool shouldExpand)
         {
+            if (node.IsVisible)
             node.IsExpanded = shouldExpand;
+
             foreach (var child in node.Children)
                 ToggleNodeExpansion(child, shouldExpand);
         }

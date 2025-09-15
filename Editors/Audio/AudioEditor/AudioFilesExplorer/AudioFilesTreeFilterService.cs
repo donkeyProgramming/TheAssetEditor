@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 
 namespace Editors.Audio.AudioEditor.AudioFilesExplorer
@@ -8,27 +9,97 @@ namespace Editors.Audio.AudioEditor.AudioFilesExplorer
         void FilterTree(ObservableCollection<AudioFilesTreeNode> audioFilesTree, string query);
     }
 
+    public record AudioFilesNodeState(bool IsVisible, bool IsExpanded);
+
     public class AudioFilesTreeFilterService : IAudioFilesTreeSearchFilterService
     {
+        private string _query;
+        private bool _hasSearchQuery;
+        private bool _wasSearching;
+
+        private readonly Dictionary<AudioFilesTreeNode, AudioFilesNodeState> _preSearchNodeState = [];
+        private bool _preSearchStateSaved;
+
         public void FilterTree(ObservableCollection<AudioFilesTreeNode> audioFilesTree, string query)
         {
-            foreach (var rootNode in audioFilesTree)
-                FilterTreeNode(rootNode, query);
-        }
+            _query = query ?? string.Empty;
+            var previousHasSearchQuery = _hasSearchQuery;
+            _hasSearchQuery = !string.IsNullOrWhiteSpace(_query);
+            _wasSearching = previousHasSearchQuery;
 
-        private static bool FilterTreeNode(AudioFilesTreeNode node, string query)
-        {
-            var doesNodeContainQuery = node.FileName.Contains(query, StringComparison.OrdinalIgnoreCase);
+            if (_hasSearchQuery && !_wasSearching && !_preSearchStateSaved)
+                SavePreSearchState(audioFilesTree);
 
-            var isAnyChildVisible = false;
-            foreach (var child in node.Children)
+            if (!_hasSearchQuery && _wasSearching && _preSearchStateSaved)
             {
-                var childVisible = FilterTreeNode(child, query);
-                if (childVisible)
-                    isAnyChildVisible = true;
+                RestorePreSearchState(audioFilesTree);
+                ClearSavedPreSearchState();
+                return; 
             }
 
-            node.IsVisible = doesNodeContainQuery || isAnyChildVisible;
+            foreach (var root in audioFilesTree)
+                FilterNode(root);
+        }
+
+        private void SavePreSearchState(ObservableCollection<AudioFilesTreeNode> roots)
+        {
+            _preSearchNodeState.Clear();
+            foreach (var root in roots)
+                SavePreSearchStateRecursive(root);
+
+            _preSearchStateSaved = true;
+        }
+
+        private void SavePreSearchStateRecursive(AudioFilesTreeNode node)
+        {
+            _preSearchNodeState[node] = new AudioFilesNodeState(node.IsVisible, node.IsExpanded);
+            foreach (var child in node.Children)
+                SavePreSearchStateRecursive(child);
+        }
+
+        private void RestorePreSearchState(ObservableCollection<AudioFilesTreeNode> roots)
+        {
+            foreach (var root in roots)
+                RestorePreSearchStateInner(root);
+        }
+
+        private void RestorePreSearchStateInner(AudioFilesTreeNode node)
+        {
+            if (_preSearchNodeState.TryGetValue(node, out var state))
+            {
+                node.IsVisible = state.IsVisible;
+                node.IsExpanded = state.IsExpanded;
+            }
+
+            foreach (var child in node.Children)
+                RestorePreSearchStateInner(child);
+        }
+
+        private void ClearSavedPreSearchState()
+        {
+            _preSearchNodeState.Clear();
+            _preSearchStateSaved = false;
+        }
+
+        private bool FilterNode(AudioFilesTreeNode node)
+        {
+            var matchesSearch = string.IsNullOrWhiteSpace(_query) || node.FileName.Contains(_query, StringComparison.OrdinalIgnoreCase);
+
+            var anyChildVisible = false;
+            foreach (var child in node.Children)
+            {
+                if (FilterNode(child))
+                    anyChildVisible = true;
+            }
+
+            if (node.Children.Count == 0)
+                node.IsVisible = matchesSearch;
+            else
+                node.IsVisible = matchesSearch || anyChildVisible;
+
+            if (_hasSearchQuery)
+                node.IsExpanded = (matchesSearch && node.Children.Count > 0) || anyChildVisible;
+
             return node.IsVisible;
         }
     }

@@ -137,15 +137,15 @@ namespace Editors.Audio.AudioEditor.AudioProjectExplorer
             _searchQueryDebounceCancellationTokenSource = new CancellationTokenSource();
             var cancellationToken = _searchQueryDebounceCancellationTokenSource.Token;
 
-            Task.Run(async () =>
+            _ = Task.Run(async () =>
             {
                 try
                 {
                     await Task.Delay(250, cancellationToken);
 
-                    var app = Application.Current;
-                    if (app is not null && app.Dispatcher is not null)
-                        app.Dispatcher.Invoke(FilterAudioProjectTree);
+                    var application = Application.Current;
+                    if (application is not null && application.Dispatcher is not null)
+                        application.Dispatcher.Invoke(FilterAudioProjectTree);
                     else
                         FilterAudioProjectTree();
                 }
@@ -161,9 +161,9 @@ namespace Editors.Audio.AudioEditor.AudioProjectExplorer
 
         [RelayCommand] public void CollapseOrExpandTree()
         {
-            var isExpanded = AudioProjectTree.Any(node => node.IsVisible && node.IsExpanded);
+            var isVisibleAndExpanded = AudioProjectTree.Any(node => node.IsVisible && node.IsExpanded);
             foreach (var rootNode in AudioProjectTree)
-                ToggleNodeExpansion(rootNode, !isExpanded);
+                ToggleNodeExpansion(rootNode, !isVisibleAndExpanded);
         }
 
         private static void ToggleNodeExpansion(AudioProjectTreeNode node, bool shouldExpand)
@@ -174,7 +174,6 @@ namespace Editors.Audio.AudioEditor.AudioProjectExplorer
             foreach (var child in node.Children)
                 ToggleNodeExpansion(child, shouldExpand);
         }
-
 
         private void InitialiseDialogueEventFilters()
         {
