@@ -181,7 +181,7 @@
                             <TextBlock 
                                 Text="Playlist Type"
                                 VerticalAlignment="Center"
-                                Margin="-5, 0, 10, 0" />
+                                Margin="-5, 0, 10, 0"/>
                         </DockPanel>
                     </Expander.Header>
 
@@ -209,6 +209,7 @@
                             Grid.Column="0"
                             Margin="10, 0, 5, 5"
                             Text="Playlist Type"
+                            ToolTip="PLACEHOLDER"
                             Visibility="{Binding IsPlaylistTypeVisible, Converter={StaticResource BoolToVisibilityConverter}}"/>
 
                         <ComboBox
@@ -226,6 +227,7 @@
                             Grid.Column="0"
                             Margin="10, 0, 5, 5"
                             Content="Repetition Interval"
+                            ToolTip="PLACEHOLDER"
                             IsChecked="{Binding EnableRepetitionInterval, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
                             IsEnabled="{Binding IsEnableRepetitionIntervalEnabled}"
                             Visibility="{Binding IsRepetitionIntervalVisible, Converter={StaticResource BoolToVisibilityConverter}}"/>
@@ -246,6 +248,7 @@
                             Grid.Column="0"
                             Margin="10, 0, 5, 5"
                             Text="Playlist End Behaviour"
+                            ToolTip="PLACEHOLDER"
                             Visibility="{Binding IsEndBehaviourVisible, Converter={StaticResource BoolToVisibilityConverter}}"/>
 
                         <ComboBox
@@ -317,6 +320,7 @@
                             Grid.Column="0"
                             Margin="10, 0, 5, 5"
                             Text="Playlist Mode"
+                            ToolTip="PLACEHOLDER"
                             Visibility="{Binding IsPlaylistModeVisible, Converter={StaticResource BoolToVisibilityConverter}}"/>
 
                         <ComboBox
@@ -334,6 +338,7 @@
                             Grid.Column="0"
                             Margin="10, 0, 5, 5"
                             Text="Always Reset Playlist"
+                            ToolTip="PLACEHOLDER"
                             Visibility="{Binding IsAlwaysResetPlaylistVisible, Converter={StaticResource BoolToVisibilityConverter}}"/>
 
                         <CheckBox
@@ -349,6 +354,7 @@
                             Grid.Column="0"
                             Margin="10, 1, 5, 5"
                             Text="Looping Type"
+                            ToolTip="PLACEHOLDER"
                             Visibility="{Binding IsLoopingTypeVisible, Converter={StaticResource BoolToVisibilityConverter}}"/>
 
                         <ComboBox
@@ -366,6 +372,7 @@
                             Grid.Column="0"
                             Margin="10, 1, 5, 5"
                             Text="Number of Loops"
+                            ToolTip="PLACEHOLDER"
                             Visibility="{Binding IsNumberOfLoopsVisible, Converter={StaticResource BoolToVisibilityConverter}}"/>
 
                         <extendedwpftoolkit:IntegerUpDown
@@ -384,6 +391,7 @@
                             Grid.Column="0"
                             Margin="10, 1, 5, 5"
                             Text="Transition Type"
+                            ToolTip="PLACEHOLDER"
                             Visibility="{Binding IsTransitionTypeVisible, Converter={StaticResource BoolToVisibilityConverter}}"/>
 
                         <ComboBox
@@ -401,6 +409,7 @@
                             Grid.Column="0"
                             Margin="10, 1, 5, 5"
                             Text="Transition Duration"
+                            ToolTip="PLACEHOLDER"
                             Visibility="{Binding IsTransitionDurationVisible, Converter={StaticResource BoolToVisibilityConverter}}"/>
 
                         <extendedwpftoolkit:DecimalUpDown  

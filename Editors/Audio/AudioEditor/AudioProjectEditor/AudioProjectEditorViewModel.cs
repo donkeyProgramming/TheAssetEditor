@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Data;
 using System.IO;
@@ -170,14 +171,19 @@ namespace Editors.Audio.AudioEditor.AudioProjectEditor
             _eventHub.Publish(new EditorTableRowAddRequestedEvent(e.Row));
         }
 
-        private void OnAudioFilesChanged(AudioFilesChangedEvent e) => SetAudioFiles(e.AudioFiles);
+        private void OnAudioFilesChanged(AudioFilesChangedEvent e) => SetEventNameFromAudioFile(e.AudioFiles, e.AddToExistingAudioFiles);
 
-        private void SetAudioFiles(ObservableCollection<AudioFile> audioFiles)
+        private void SetEventNameFromAudioFile(List<AudioFile> audioFiles, bool addToExistingAudioFiles)
         {
             var selectedAudioProjectExplorerNode = _audioEditorStateService.SelectedAudioProjectExplorerNode;
-            if (selectedAudioProjectExplorerNode.IsActionEvent() 
-                && selectedAudioProjectExplorerNode.Name != Wh3ActionEventInformation.GetName(Wh3ActionEventType.Movies)
-                && audioFiles.Count == 1)
+            var isActionEvent = selectedAudioProjectExplorerNode.IsActionEvent();
+            var isNotMoviesActionEvent = selectedAudioProjectExplorerNode.Name != Wh3ActionEventInformation.GetName(Wh3ActionEventType.Movies);
+            var hasExistingAudioFiles = _audioEditorStateService.AudioFiles.Count > 0;
+
+            if (isActionEvent
+                && isNotMoviesActionEvent
+                && audioFiles.Count == 1
+                && ((hasExistingAudioFiles && !addToExistingAudioFiles) || (!hasExistingAudioFiles && addToExistingAudioFiles)))
             {
                 var row = Table.Rows[0];
                 var wavFileName = Path.GetFileNameWithoutExtension(audioFiles[0].FileName);
@@ -303,9 +309,7 @@ namespace Editors.Audio.AudioEditor.AudioProjectEditor
             var row = Table.Rows[0];
             return Table.Columns
                 .Cast<DataColumn>()
-                .Any(column => row.IsNull(column)
-                    || (row[column] is string value 
-                    && (string.IsNullOrEmpty(value) || value == "Play_")));
+                .Any(column => row.IsNull(column) || (row[column] is string value && (string.IsNullOrEmpty(value) || value == "Play_")));
         }
 
         private void SetShowModdedStatesOnlyButtonEnablementAndVisibility()

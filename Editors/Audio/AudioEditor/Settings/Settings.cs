@@ -12,6 +12,9 @@ namespace Editors.Audio.AudioEditor.Settings
         }
 
         public const string Random = "Random";
+        // Random Exhaustive is equivalent to Wwise's Shuffle setting under the Random Play Type.
+        // In Wwise Shuffle 'exhausts' items in the list before adding them back to the pool.
+        // So we use Random Exhaustive as Shuffle doesn't convey the meaning well. 
         public const string RandomExhaustive = "Random Exhaustive";
         public const string Sequence = "Sequence";
 

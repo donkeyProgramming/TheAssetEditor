@@ -107,14 +107,18 @@ namespace Editors.Audio.AudioEditor.Settings
             else
             {
                 AudioFiles.Clear();
-                AudioFiles = e.AudioFiles;
+                AudioFiles = new ObservableCollection<AudioFile>(e.AudioFiles);
             }
 
             _audioEditorStateService.StoreAudioFiles(AudioFiles.ToList());
 
-            ShowSettingsFromAudioProjectViewer = false;
+            if (e.IsSetFromViewerItem == false)
+                ShowSettingsFromAudioProjectViewer = false;
+
             SetSettingsUsabilityAndStore();
         }
+
+        partial void OnAudioFilesChanged(ObservableCollection<AudioFile> value) => _audioEditorStateService.StoreAudioFiles(AudioFiles.ToList());
 
         private void OnViewerTableRowSelectionChanged(ViewerTableRowSelectionChangedEvent e)
         {
@@ -125,18 +129,16 @@ namespace Editors.Audio.AudioEditor.Settings
             }
         }
 
-        partial void OnAudioFilesChanged(ObservableCollection<AudioFile> value) => _audioEditorStateService.StoreAudioFiles(AudioFiles.ToList());
-
         private void OnViewerRowEdited(ViewerTableRowEditedEvent e)
         {
             ShowSettingsFromViewerItem();
             SetSettingsUsability();
         }
 
-        public void SetAudioFilesViaDrop(ObservableCollection<AudioFile> audioFiles)
+        public void SetAudioFilesViaDrop(List<AudioFile> audioFiles)
         {
-            _audioEditorStateService.StoreAudioFiles(audioFiles.ToList());
-            _eventHub.Publish(new AudioFilesChangedEvent(audioFiles, false));
+            _audioEditorStateService.StoreAudioFiles(audioFiles);
+            _eventHub.Publish(new AudioFilesChangedEvent(audioFiles, false, false));
         }
 
         public void RemoveAudioFiles(List<AudioFile> audioFilesToRemove)
@@ -150,11 +152,9 @@ namespace Editors.Audio.AudioEditor.Settings
 
             _audioEditorStateService.StoreAudioFiles(audioFiles);
 
-            var newAudioFiles = new ObservableCollection<AudioFile>(audioFiles);
-            _eventHub.Publish(new AudioFilesChangedEvent(newAudioFiles, false));
+            var newAudioFiles = new List<AudioFile>(audioFiles);
+            _eventHub.Publish(new AudioFilesChangedEvent(newAudioFiles, false, false));
         }
-
-
 
         partial void OnShowSettingsFromAudioProjectViewerChanged(bool value)
         {
@@ -412,7 +412,7 @@ namespace Editors.Audio.AudioEditor.Settings
 
         private void SetSettingsFromViewerItem(AudioSettings settings, List<AudioFile> audioFiles)
         {
-            ResetAudioFiles();
+            ResetAudioFiles(true);
             ResetSettingsPlaylistType();
             ResetSettingsPlaylistMode();
 
@@ -460,6 +460,7 @@ namespace Editors.Audio.AudioEditor.Settings
                 AudioFiles.Add(audioFile);
 
             _audioEditorStateService.StoreAudioFiles(audioFiles);
+            _eventHub.Publish(new AudioFilesChangedEvent(audioFiles, false, true));
         }
 
         [RelayCommand] public void PlayWav(AudioFile audioFile)
@@ -515,11 +516,16 @@ namespace Editors.Audio.AudioEditor.Settings
         [RelayCommand] public void ResetSettings()
         {
             SetInitialSettings();
-            ResetAudioFiles();
+            ResetAudioFiles(false);
             SetSettingsUsability();
         }
 
-        private void ResetAudioFiles() => AudioFiles.Clear();
+        private void ResetAudioFiles(bool resetForViewerItem)
+        {
+            AudioFiles.Clear();
+            _audioEditorStateService.StoreAudioFiles(AudioFiles.ToList());
+            _eventHub.Publish(new AudioFilesChangedEvent(AudioFiles.ToList(), false, resetForViewerItem));
+        }
 
         private void ResetSettingsPlaylistType()
         {

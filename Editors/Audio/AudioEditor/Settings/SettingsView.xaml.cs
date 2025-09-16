@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
@@ -34,7 +33,7 @@ namespace Editors.Audio.AudioEditor.Settings
                 if (e.Data.GetData(typeof(IEnumerable<AudioFilesTreeNode>)) is not IEnumerable<AudioFilesTreeNode> droppedNodes)
                     return;
 
-                var audioFiles = new ObservableCollection<AudioFile>();
+                var audioFiles = new List<AudioFile>();
                 foreach (var wavFile in droppedNodes)
                 {
                     audioFiles.Add(new AudioFile

@@ -1,5 +1,5 @@
-﻿using System.Collections.ObjectModel;
-using System.Linq;
+﻿using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using Editors.Audio.AudioEditor.AudioFilesExplorer;
 using Editors.Audio.AudioEditor.Events;
 using Editors.Audio.AudioEditor.Settings;
@@ -14,7 +14,7 @@ namespace Editors.Audio.AudioEditor.UICommands
 
         public void Execute(ObservableCollection<AudioFilesTreeNode> selectedAudioFiles, bool addToExistingAudioFiles)
         {
-            var audioFiles = new ObservableCollection<AudioFile>();
+            var audioFiles = new List<AudioFile>();
             foreach (var wavFile in selectedAudioFiles)
             {
                 audioFiles.Add(new AudioFile
@@ -24,8 +24,8 @@ namespace Editors.Audio.AudioEditor.UICommands
                 });
             }
 
-            _audioEditorStateService.StoreAudioFiles(audioFiles.ToList());
-            _eventHub.Publish(new AudioFilesChangedEvent(audioFiles, addToExistingAudioFiles));
+            _audioEditorStateService.StoreAudioFiles(audioFiles);
+            _eventHub.Publish(new AudioFilesChangedEvent(audioFiles, addToExistingAudioFiles, false));
         }
     }
 }

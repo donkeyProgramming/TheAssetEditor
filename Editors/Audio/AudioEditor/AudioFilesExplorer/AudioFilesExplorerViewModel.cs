@@ -60,6 +60,7 @@ namespace Editors.Audio.AudioEditor.AudioFilesExplorer
             SelectedTreeNodes.CollectionChanged += OnSelectedTreeNodesChanged;
 
             _eventHub.Register<AudioProjectExplorerNodeSelectedEvent>(this, OnAudioProjectExplorerNodeSelected);
+            _eventHub.Register<AudioFilesChangedEvent>(this, OnAudioFilesChanged);
             _globalEventHub.Register<PackFileContainerFilesAddedEvent>(this, x => RefreshAudioFilesTree(x.Container));
             _globalEventHub.Register<PackFileContainerFilesRemovedEvent>(this, x => RefreshAudioFilesTree(x.Container));
             _globalEventHub.Register<PackFileContainerFolderRemovedEvent>(this, x => RefreshAudioFilesTree(x.Container));
@@ -79,7 +80,7 @@ namespace Editors.Audio.AudioEditor.AudioFilesExplorer
             IsAddAudioFilesButtonEnabled = false;
         }
 
-        private void RefreshAudioFilesTree(PackFileContainer packFileContainer) => AudioFilesTree = _audioFilesTreeBuilder.BuildTree(packFileContainer);
+        private void OnAudioFilesChanged(AudioFilesChangedEvent e) => SetButtonEnablement();
 
         private void OnSelectedTreeNodesChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
@@ -109,7 +110,11 @@ namespace Editors.Audio.AudioEditor.AudioFilesExplorer
                     || selectedAudioProjectExplorerNode.Type == AudioProjectTreeNodeType.DialogueEvent)
                 {
                     IsSetAudioFilesButtonEnabled = true;
+
+                    if (_audioEditorStateService.AudioFiles.Count > 0)
                     IsAddAudioFilesButtonEnabled = true;
+                    else
+                        IsAddAudioFilesButtonEnabled = false;
                 }
             }
             else
