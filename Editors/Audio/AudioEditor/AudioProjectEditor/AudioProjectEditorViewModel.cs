@@ -57,6 +57,7 @@ namespace Editors.Audio.AudioEditor.AudioProjectEditor
             EditorLabel = $"Audio Project Editor";
             DataGridTag = TableInfo.EditorDataGridTag;
 
+            _eventHub.Register<AudioProjectInitialisedEvent>(this, OnAudioProjectInitialised);
             _eventHub.Register<AudioProjectExplorerNodeSelectedEvent>(this, OnAudioProjectExplorerNodeSelected);
             _eventHub.Register<EditorTableColumnAddRequestedEvent>(this, OnEditorTableColumnAddRequested);
             _eventHub.Register<EditorTableRowAddRequestedEvent>(this, OnEditorTableRowAddRequested);
@@ -68,6 +69,14 @@ namespace Editors.Audio.AudioEditor.AudioProjectEditor
             _eventHub.Register<EditorDataGridTextboxTextChangedEvent>(this, OnEditorDataGridTextboxTextChanged);
             _eventHub.Register<MovieFileChangedEvent>(this, OnMovieFileChanged);
             _eventHub.Register<EditorAddRowButtonEnablementUpdateRequestedEvent>(this, OnEditorAddRowButtonEnablementUpdateRequested);
+        }
+
+        private void OnAudioProjectInitialised(AudioProjectInitialisedEvent e)
+        {
+            ResetEditorVisibility();
+            ResetEditorLabel();
+            ResetButtonEnablement();
+            ResetTable();
         }
 
         private void OnAudioProjectExplorerNodeSelected(AudioProjectExplorerNodeSelectedEvent e)

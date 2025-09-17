@@ -68,6 +68,9 @@ namespace Editors.Audio.AudioEditor
 
         [RelayCommand] public void SaveAudioProject()
         {
+            if (_audioEditorStateService.AudioProject == null)
+                return;
+
             var audioProject = _audioEditorStateService.AudioProject;
             var fileName = _audioEditorStateService.AudioProjectFileName;
             var filePath = _audioEditorStateService.AudioProjectFilePath;
@@ -78,12 +81,17 @@ namespace Editors.Audio.AudioEditor
 
         [RelayCommand] public void CompileAudioProject()
         {
+            if (_audioEditorStateService.AudioProject == null)
+                return;
+
             SaveAudioProject();
 
             var cleanAudioProject = AudioProject.Clean(_audioEditorStateService.AudioProject);
             var fileName = _audioEditorStateService.AudioProjectFileName;
             var filePath = _audioEditorStateService.AudioProjectFilePath;
             _audioProjectCompilerService.Compile(cleanAudioProject, fileName, filePath);
+
+            _eventHub.Publish(new AudioProjectInitialisedEvent());
         }
 
         [RelayCommand] public void OpenAudioProjectConverter() => _uiCommandFactory.Create<OpenAudioProjectConverterWindowCommand>().Execute();

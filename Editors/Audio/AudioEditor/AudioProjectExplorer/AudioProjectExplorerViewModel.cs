@@ -11,8 +11,6 @@ using CommunityToolkit.Mvvm.Input;
 using Editors.Audio.AudioEditor.Events;
 using Editors.Audio.AudioEditor.Presentation.Table;
 using Editors.Audio.GameInformation.Warhammer3;
-using Serilog;
-using Shared.Core.ErrorHandling;
 using Shared.Core.Events;
 
 namespace Editors.Audio.AudioEditor.AudioProjectExplorer
@@ -23,8 +21,6 @@ namespace Editors.Audio.AudioEditor.AudioProjectExplorer
         private readonly IAudioEditorStateService _audioEditorStateService;
         private readonly IAudioProjectTreeBuilderService _audioProjectTreeBuilder;
         private readonly IAudioProjectTreeFilterService _audioProjectTreeFilterService;
-
-        private readonly ILogger _logger = Logging.Create<AudioProjectExplorerViewModel>();
 
         [ObservableProperty] private string _audioProjectExplorerLabel;
         [ObservableProperty] private bool _showEditedItemsOnly;
@@ -58,6 +54,8 @@ namespace Editors.Audio.AudioEditor.AudioProjectExplorer
 
         private void OnAudioProjectInitialised(AudioProjectInitialisedEvent e)
         {
+            ResetFilters();
+
             var audioProject = _audioEditorStateService.AudioProject;
             AudioProjectTree = _audioProjectTreeBuilder.BuildTree(audioProject, ShowEditedItemsOnly);
 
@@ -74,10 +72,7 @@ namespace Editors.Audio.AudioEditor.AudioProjectExplorer
             IsDialogueEventFilterEnabled = false;
 
             if (SelectedNode.IsDialogueEvents())
-            {
                 InitialiseDialogueEventFilters();
-                _logger.Here().Information($"Loaded Dialogue Event SoundBank: {SelectedNode.Name}");
-            }
         }
 
         private void FilterAudioProjectTree()

@@ -45,11 +45,11 @@ namespace Editors.Audio.AudioProjectCompiler.WwiseGeneratorService
         private static WwiseHircGeneratorServiceFactory CreateFactory_V136()
         {
             var instance = new WwiseHircGeneratorServiceFactory();
-            instance.RegisterGenerator(AkBkHircType.Sound, () => new SoundHircGenerator_V136());
-            instance.RegisterGenerator(AkBkHircType.RandomSequenceContainer, () => new RanSeqCntrHircGenerator_V136());
+            instance.RegisterGenerator(AkBkHircType.Sound, () => new CAkSoundGenerator_V136());
+            instance.RegisterGenerator(AkBkHircType.RandomSequenceContainer, () => new CAkRanSeqCntrGenerator_V136());
             instance.RegisterGenerator(AkBkHircType.Action, () => new ActionHircGenerator_V136());
-            instance.RegisterGenerator(AkBkHircType.Event, () => new ActionEventHircGenerator_V136());
-            instance.RegisterGenerator(AkBkHircType.Dialogue_Event, () => new DialogueEventHircGenerator_V136());
+            instance.RegisterGenerator(AkBkHircType.Event, () => new CAkEventGenerator_V136());
+            instance.RegisterGenerator(AkBkHircType.Dialogue_Event, () => new CAkDialogueEventGenerator_V136());
             return instance;
         }
     }

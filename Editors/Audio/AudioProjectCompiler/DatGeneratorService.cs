@@ -1,4 +1,5 @@
-﻿using Editors.Audio.AudioEditor.Models;
+﻿using System.Collections.Generic;
+using Editors.Audio.AudioEditor.Models;
 using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
 using Shared.GameFormats.Dat;
@@ -7,34 +8,31 @@ namespace Editors.Audio.AudioProjectCompiler
 {
     public interface IDatGeneratorService
     {
-        void GenerateEventDatFile(AudioProject audioProject, string audioProjectNameFileWithoutExtension);
-        void GenerateStatesDatFile(AudioProject audioProject, string audioProjectNameFileWithoutExtension);
+        void GenerateEventDatFile(List<ActionEvent> actionEvents, string audioProjectNameFileWithoutExtension);
+        void GenerateStatesDatFile(List<StateGroup> stateGroups, string audioProjectNameFileWithoutExtension);
     }
 
     public class DatGeneratorService(IFileSaveService fileSaveService) : IDatGeneratorService
     {
         private readonly IFileSaveService _fileSaveService = fileSaveService;
 
-        public void GenerateEventDatFile(AudioProject audioProject, string audioProjectNameFileWithoutExtension)
+        public void GenerateEventDatFile(List<ActionEvent> actionEvents, string audioProjectNameFileWithoutExtension)
         {
             var soundDatFile = new SoundDatFile();
 
-            foreach (var soundBank in audioProject.SoundBanks)
-            {
-                foreach (var actionEvent in soundBank.ActionEvents)
-                    soundDatFile.EventWithStateGroup.Add(new SoundDatFile.DatEventWithStateGroup() { Event = actionEvent.Name, Value = 400 });
-            }
+            foreach (var actionEvent in actionEvents)
+                soundDatFile.EventWithStateGroup.Add(new SoundDatFile.DatEventWithStateGroup() { Event = actionEvent.Name, Value = 400 });
 
             var datFileName = $"event_data__{audioProjectNameFileWithoutExtension}.dat";
             var datFilePath = $"audio\\wwise\\{datFileName}";
             SaveDatFileToPack(soundDatFile, datFileName, datFilePath);
         }
 
-        public void GenerateStatesDatFile(AudioProject audioProject, string audioProjectNameFileWithoutExtension)
+        public void GenerateStatesDatFile(List<StateGroup> stateGroups, string audioProjectNameFileWithoutExtension)
         {
             var stateDatFile = new SoundDatFile();
 
-            foreach (var stateGroup in audioProject.StateGroups)
+            foreach (var stateGroup in stateGroups)
             {
                 foreach (var state in stateGroup.States)
                     stateDatFile.EventWithStateGroup.Add(new SoundDatFile.DatEventWithStateGroup() { Event = state.Name, Value = 400 });

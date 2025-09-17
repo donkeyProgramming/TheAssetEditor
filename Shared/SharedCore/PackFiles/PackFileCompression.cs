@@ -9,51 +9,46 @@ namespace Shared.Core.PackFiles
 {
     public enum CompressionFormat
     {
-        /// Dummy variant to disable compression.
+        // Dummy variant to disable compression.
         None,
 
-        /// Legacy format. Supported by all PFH5 games (all Post-WH2 games).
-        ///
-        /// Specifically, Total War games use the Non-Streamed LZMA1 format with the following custom header:
-        ///
-        /// | Bytes | Type  | Data                                                                                |
-        /// | ----- | ----- | ----------------------------------------------------------------------------------- |
-        /// |  4    | [u32] | Uncompressed size (as u32, max at 4GB).                                             |
-        /// |  1    | [u8]  | LZMA model properties (lc, lp, pb) in encoded form... I think. Usually it's `0x5D`. |
-        /// |  4    | [u32] | Dictionary size (as u32)... I think. It's usually `[0x00, 0x00, 0x40, 0x00]`.       |
-        ///
-        /// For reference, a normal Non-Streamed LZMA1 header (from the original spec) contains:
-        ///
-        /// | Bytes | Type          | Data                                                        |
-        /// | ----- | ------------- | ----------------------------------------------------------- |
-        /// |  1    | [u8]          | LZMA model properties (lc, lp, pb) in encoded form.         |
-        /// |  4    | [u32]         | Dictionary size (32-bit unsigned integer, little-endian).   |
-        /// |  8    | [prim@u64]    | Uncompressed size (64-bit unsigned integer, little-endian). |
-        ///
-        /// This means one has to move the uncompressed size to the correct place in order for a compressed file to be readable,
-        /// and one has to remove the uncompressed size and prepend it to the file in order for the game to read the compressed file.
+        // Legacy format. Supported by all PFH5 games (all Post-WH2 games).
+
+        // Specifically, Total War games use the Non-Streamed LZMA1 format with the following custom header:
+        // | Bytes | Type  | Data                                                                                |
+        // | ----- | ----- | ----------------------------------------------------------------------------------- |
+        // |  4    | [u32] | Uncompressed size (as u32, max at 4GB).                                             |
+        // |  1    | [u8]  | LZMA model properties (lc, lp, pb) in encoded form... I think. Usually it's `0x5D`. |
+        // |  4    | [u32] | Dictionary size (as u32)... I think. It's usually `[0x00, 0x00, 0x40, 0x00]`.       |
+
+        // For reference, a normal Non-Streamed LZMA1 header (from the original spec) contains:
+        // | Bytes | Type          | Data                                                        |
+        // | ----- | ------------- | ----------------------------------------------------------- |
+        // |  1    | [u8]          | LZMA model properties (lc, lp, pb) in encoded form.         |
+        // |  4    | [u32]         | Dictionary size (32-bit unsigned integer, little-endian).   |
+        // |  8    | [prim@u64]    | Uncompressed size (64-bit unsigned integer, little-endian). |
+
+        // This means one has to move the uncompressed size to the correct place in order for a compressed file to be readable,
+        // and one has to remove the uncompressed size and prepend it to the file in order for the game to read the compressed file.
         Lzma1,
 
-        /// New format introduced in WH3 6.2.
-        ///
-        /// This is a standard Lz4 implementation, with the following tweaks:
-        ///
-        /// | Bytes | Type      | Data                                          |
-        /// | ----- | --------- | --------------------------------------------- |
-        /// |  4    | [u32]     | Uncompressed size (as u32, max at 4GB).       |
-        /// |  *    | &[[`u8`]] | Lz4 data, starting with the Lz4 Magic Number. |
+        // New format introduced in WH3 6.2.
+        // This is a standard Lz4 implementation, with the following tweaks:
+        // | Bytes | Type      | Data                                          |
+        // | ----- | --------- | --------------------------------------------- |
+        // |  4    | [u32]     | Uncompressed size (as u32, max at 4GB).       |
+        // |  *    | &[[`u8`]] | Lz4 data, starting with the Lz4 Magic Number. |
         Lz4,
 
-        /// New format introduced in WH3 6.2.
-        ///
-        /// This is a standard Zstd implementation, with the following tweaks:
-        ///
-        /// | Bytes | Type      | Data                                            |
-        /// | ----- | --------- | ----------------------------------------------- |
-        /// |  4    | [u32]     | Uncompressed size (as u32, max at 4GB).         |
-        /// |  *    | &[[`u8`]] | Zstd data, starting with the Zstd Magic Number. |
-        ///
-        /// By default the Zstd compression is done with the checksum and content size flags enabled.
+        // New format introduced in WH3 6.2.
+
+        // This is a standard Zstd implementation, with the following tweaks:
+        // | Bytes | Type      | Data                                            |
+        // | ----- | --------- | ----------------------------------------------- |
+        // |  4    | [u32]     | Uncompressed size (as u32, max at 4GB).         |
+        // |  *    | &[[`u8`]] | Zstd data, starting with the Zstd Magic Number. |
+
+        // By default the Zstd compression is done with the checksum and content size flags enabled.
         Zstd
     }
 
@@ -92,11 +87,15 @@ namespace Shared.Core.PackFiles
             ".wem",
             
             // In CA packs these files are mostly in this format
-            ".dat",
             ".rigid_model_v2",
+            // Action Events don't play if the .dat file their names are stored in is compressed
+            ".dat",
 
             // How RPFM formats these files
             ".rpfm_reserved",
+
+             // .wav files aren't? in CA packs but probably better not to compress them
+            ".wav",
         ];
 
         public static List<string> Lz4FileTypes { get; } =

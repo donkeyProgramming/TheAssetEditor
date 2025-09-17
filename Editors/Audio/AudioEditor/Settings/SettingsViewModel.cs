@@ -131,8 +131,8 @@ namespace Editors.Audio.AudioEditor.Settings
 
         private void OnViewerRowEdited(ViewerTableRowEditedEvent e)
         {
+            ShowSettingsFromAudioProjectViewer = false;
             ShowSettingsFromViewerItem();
-            SetSettingsUsability();
         }
 
         public void SetAudioFilesViaDrop(List<AudioFile> audioFiles)
@@ -456,9 +456,7 @@ namespace Editors.Audio.AudioEditor.Settings
 
         private void SetAudioFilesFromViewerItem(List<AudioFile> audioFiles)
         {
-            foreach (var audioFile in audioFiles)
-                AudioFiles.Add(audioFile);
-
+            AudioFiles = new ObservableCollection<AudioFile>(audioFiles);
             _audioEditorStateService.StoreAudioFiles(audioFiles);
             _eventHub.Publish(new AudioFilesChangedEvent(audioFiles, false, true));
         }

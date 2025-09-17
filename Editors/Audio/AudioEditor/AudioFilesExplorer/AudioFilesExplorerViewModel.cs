@@ -36,7 +36,6 @@ namespace Editors.Audio.AudioEditor.AudioFilesExplorer
         [ObservableProperty] private bool _isPlayAudioButtonEnabled = false;
         [ObservableProperty] private string _filterQuery;
         [ObservableProperty] private ObservableCollection<AudioFilesTreeNode> _audioFilesTree;
-
         public ObservableCollection<AudioFilesTreeNode> SelectedTreeNodes { get; set; } = [];
         private CancellationTokenSource _filterQueryDebounceCancellationTokenSource;
 

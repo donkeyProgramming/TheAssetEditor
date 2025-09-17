@@ -35,6 +35,8 @@ namespace Editors.Audio.AudioEditor.Models
                 EndBehaviour = audioSettings.EndBehaviour,
                 AlwaysResetPlaylist = audioSettings.AlwaysResetPlaylist,
                 PlaylistMode = audioSettings.PlaylistMode,
+                LoopingType = audioSettings.LoopingType,
+                NumberOfLoops = audioSettings.NumberOfLoops,
                 TransitionType = audioSettings.TransitionType,
                 TransitionDuration = audioSettings.TransitionDuration
             };

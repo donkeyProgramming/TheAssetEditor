@@ -229,8 +229,9 @@ namespace Editors.Audio.Storage
                 {
                     if (item.States[i] == "None")
                     {
-                        // Replace States equal to "None" with "Any". In Wwise when no state is selected in a State Group it sets the State to "Any", for some reason CA's dat has that State called "None" which doesn't make sense.
-                        // It's not as if no state is applied, what actually happens is the State Path uses 'any' State from the State Group, or in other words 'all' States not 'none'... Confusing I know.
+                        // In Wwise when no State is selected in a state group it displays this as "Any" state, i.e. the path continues for any State.
+                        // CA call that "Any" State "None" according to the .dat file.
+                        // "Any" makes more sense than "None" so we replace states equal to "None" with "Any".
                         item.States[i] = "Any";
                     }
                 }

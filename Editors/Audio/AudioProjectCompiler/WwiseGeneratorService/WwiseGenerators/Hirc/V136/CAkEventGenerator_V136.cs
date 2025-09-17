@@ -5,7 +5,7 @@ using Shared.GameFormats.Wwise.Hirc.V136;
 
 namespace Editors.Audio.AudioProjectCompiler.WwiseGeneratorService.WwiseGenerators.Hirc.V136
 {
-    public class ActionEventHircGenerator_V136 : IWwiseHircGeneratorService
+    public class CAkEventGenerator_V136 : IWwiseHircGeneratorService
     {
         public HircItem GenerateHirc(AudioProjectItem audioProjectItem, SoundBank soundBank)
         {

@@ -140,6 +140,23 @@ namespace Editors.Audio.AudioEditor.Models
                 .ToList();
         }
 
+        public List<SoundBank> GetSoundBanksWithActionEvents()
+        {
+            return SoundBanks.Where(soundBank => soundBank.ActionEvents != null).ToList();
+        }
+
+        public List<SoundBank> GetSoundBanksWithDialogueEvents()
+        {
+            return SoundBanks.Where(soundBank => soundBank.DialogueEvents != null).ToList();
+        }
+
+        public List<ActionEvent> GetActionEvents()
+        {
+            return SoundBanks
+                .SelectMany(soundBank => soundBank.ActionEvents)
+                .ToList();
+        }
+
         private static List<SoundBank> CreateSoundBanks()
         {
             var soundBanks = new List<SoundBank>();

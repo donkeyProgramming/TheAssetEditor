@@ -46,31 +46,31 @@ namespace Editors.Audio.AudioProjectCompiler
             // they're referenced e.g. Sounds / Random Sequence Container IDs are used in Actions, and Action IDs are used in Events.
             SetSoundBankData(audioProject, audioProjectNameFileWithoutExtension);
 
-            if (audioProject.SoundBanks.Any(soundBank => soundBank.ActionEvents != null))
+            var soundBanksWithActionEvents = audioProject.GetSoundBanksWithActionEvents();
+            if (soundBanksWithActionEvents != null)
             {
-                SetPlayActionEventData(audioProject, usedCompilerHircIds);
-                SetPlayActionTargetData(audioProject, usedCompilerHircIds, sourceIdByWavFilePath, soundsToGenerateWemsFrom);
-                SetPlayActionData(audioProject, usedCompilerHircIds);
-                SetStopActionEventData(audioProject, usedCompilerHircIds);
-                SetStopActionData(audioProject, usedCompilerHircIds);
+                SetPlayActionEventData(soundBanksWithActionEvents, usedCompilerHircIds);
+                SetPlayActionTargetData(soundBanksWithActionEvents, usedCompilerHircIds, sourceIdByWavFilePath, soundsToGenerateWemsFrom);
+                SetPlayActionData(soundBanksWithActionEvents, usedCompilerHircIds);
+                SetStopActionEventData(soundBanksWithActionEvents, usedCompilerHircIds);
+                SetStopActionData(soundBanksWithActionEvents, usedCompilerHircIds);
             }
 
-            if (audioProject.SoundBanks.Any(soundBank => soundBank.DialogueEvents != null))
+            var soundBanksWithDialogueEvents = audioProject.GetSoundBanksWithDialogueEvents();
+            if (soundBanksWithDialogueEvents != null)
             {
-                SetDialogueEventData(audioProject);
-                SetDialogueEventSourceData(audioProject, usedCompilerHircIds, sourceIdByWavFilePath, soundsToGenerateWemsFrom);
+                SetDialogueEventData(soundBanksWithDialogueEvents);
+                SetDialogueEventSourceData(soundBanksWithDialogueEvents, usedCompilerHircIds, sourceIdByWavFilePath, soundsToGenerateWemsFrom);
             }
 
             if (audioProject.StateGroups != null)
-                SetStateGroupData(audioProject);
+                SetStateGroupData(audioProject.StateGroups);
 
-            foreach (var soundBank in audioProject.SoundBanks)
-            {
+            foreach (var soundBank in soundBanksWithActionEvents)
                 _soundBankGeneratorService.GenerateSoundBank(soundBank);
 
-                if (audioProject.SoundBanks.Any(soundBank => soundBank.DialogueEvents != null))
-                    _soundBankGeneratorService.GenerateDialogueEventSplitSoundBanks(soundBank);
-            }
+            foreach (var soundBank in soundBanksWithDialogueEvents)
+                _soundBankGeneratorService.GenerateDialogueEventSplitSoundBanks(soundBank);
 
             var wemsToGenerate = soundsToGenerateWemsFrom.DistinctBy(sound => sound.SourceId).ToList();
             _wemGeneratorService.GenerateWems(wemsToGenerate);
@@ -79,12 +79,13 @@ namespace Editors.Audio.AudioProjectCompiler
 
             // The .dat file is seems to only necessary for playing movie Action Events and any triggered via common.trigger_soundevent()
             // but without testing all the different types of Action Event sounds it's safer to just make a .dat for all as it's little overhead.
-            if (audioProject.SoundBanks.Any(soundBank => soundBank.ActionEvents != null))
-                _datGeneratorService.GenerateEventDatFile(audioProject, audioProjectNameFileWithoutExtension);
+            var actionEvents = audioProject.GetActionEvents();
+            if (actionEvents != null)
+                _datGeneratorService.GenerateEventDatFile(actionEvents, audioProjectNameFileWithoutExtension);
 
             // We create the states .dat file so we can see the modded states in the Audio Explorer, it isn't necessary for the game.
             if (audioProject.StateGroups != null)
-                _datGeneratorService.GenerateStatesDatFile(audioProject, audioProjectFileNameWithoutSpaces);
+                _datGeneratorService.GenerateStatesDatFile(audioProject.StateGroups, audioProjectFileNameWithoutSpaces);
 
             var compiledAudioProjectFileName = audioProjectFileName.Replace(".aproj", "_compiled.json");
             var compiledAudioProjectFilePath = audioProjectFilePath.Replace(".aproj", "_compiled.json");
@@ -135,9 +136,9 @@ namespace Editors.Audio.AudioProjectCompiler
             }
         }
 
-        private void SetPlayActionEventData(AudioProject audioProject, HashSet<uint> usedCompilerHircIds)
+        private void SetPlayActionEventData(List<SoundBank> soundBanks, HashSet<uint> usedCompilerHircIds)
         {
-            foreach (var soundBank in audioProject.SoundBanks)
+            foreach (var soundBank in soundBanks)
             {
                 var playActionEvents = soundBank.GetPlayActionEvents();
                 foreach (var playActionEvent in playActionEvents)
@@ -149,9 +150,9 @@ namespace Editors.Audio.AudioProjectCompiler
             }
         }
 
-        private void SetPlayActionTargetData(AudioProject audioProject, HashSet<uint> usedCompilerHircIds, Dictionary<string, uint> sourceIdByWavFilePath, List<Sound> soundsToGenerateWemsFrom)
+        private void SetPlayActionTargetData(List<SoundBank> soundBanks, HashSet<uint> usedCompilerHircIds, Dictionary<string, uint> sourceIdByWavFilePath, List<Sound> soundsToGenerateWemsFrom)
         {
-            foreach (var soundBank in audioProject.SoundBanks)
+            foreach (var soundBank in soundBanks)
             {
                 var playActionEvents = soundBank.GetPlayActionEvents();
                 foreach (var playActionEvent in playActionEvents)
@@ -193,9 +194,9 @@ namespace Editors.Audio.AudioProjectCompiler
             }
         }
 
-        private void SetPlayActionData(AudioProject audioProject, HashSet<uint> usedCompilerHircIds)
+        private void SetPlayActionData(List<SoundBank> soundBanks, HashSet<uint> usedCompilerHircIds)
         {
-            foreach (var soundBank in audioProject.SoundBanks)
+            foreach (var soundBank in soundBanks)
             {
                 var playActionEvents = soundBank.GetPlayActionEvents();
                 foreach (var playActionEvent in playActionEvents)
@@ -232,9 +233,9 @@ namespace Editors.Audio.AudioProjectCompiler
             }
         }
 
-        private void SetStopActionEventData(AudioProject audioProject, HashSet<uint> usedCompilerHircIds)
+        private void SetStopActionEventData(List<SoundBank> soundBanks, HashSet<uint> usedCompilerHircIds)
         {
-            foreach (var soundBank in audioProject.SoundBanks)
+            foreach (var soundBank in soundBanks)
             {
                 var stopActionEvents = soundBank.GetStopActionEvents();
                 foreach (var stopActionEvent in stopActionEvents)
@@ -246,9 +247,9 @@ namespace Editors.Audio.AudioProjectCompiler
             }
         }
 
-        private void SetStopActionData(AudioProject audioProject, HashSet<uint> usedCompilerHircIds)
+        private void SetStopActionData(List<SoundBank> soundBanks, HashSet<uint> usedCompilerHircIds)
         {
-            foreach (var soundBank in audioProject.SoundBanks)
+            foreach (var soundBank in soundBanks)
             {
                 var stopActionEvents = soundBank.GetStopActionEvents();
                 foreach (var stopActionEvent in stopActionEvents)
@@ -296,9 +297,9 @@ namespace Editors.Audio.AudioProjectCompiler
             }
         }
 
-        private static void SetDialogueEventData(AudioProject audioProject)
+        private static void SetDialogueEventData(List<SoundBank> soundBanks)
         {
-            foreach (var soundBank in audioProject.SoundBanks)
+            foreach (var soundBank in soundBanks)
             {
                 foreach (var dialogueEvent in soundBank.DialogueEvents)
                 {
@@ -321,12 +322,12 @@ namespace Editors.Audio.AudioProjectCompiler
         }
 
         private void SetDialogueEventSourceData(
-            AudioProject audioProject,
+            List<SoundBank> soundBanks,
             HashSet<uint> usedCompilerHircIds,
             Dictionary<string, uint> sourceIdByWavFilePath,
             List<Sound> soundsToGenerateWemsFrom)
         {
-            foreach (var soundBank in audioProject.SoundBanks)
+            foreach (var soundBank in soundBanks)
             {
                 foreach (var dialogueEvent in soundBank.DialogueEvents)
                 {
@@ -358,9 +359,9 @@ namespace Editors.Audio.AudioProjectCompiler
             }
         }
 
-        private static void SetStateGroupData(AudioProject audioProject)
+        private static void SetStateGroupData(List<StateGroup> stateGroups)
         {
-            foreach (var stateGroup in audioProject.StateGroups)
+            foreach (var stateGroup in stateGroups)
             {
                 stateGroup.Id = WwiseHash.Compute(stateGroup.Name);
 

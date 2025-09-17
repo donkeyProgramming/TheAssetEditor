@@ -1,22 +1,18 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using Editors.Audio.AudioEditor.Models;
+﻿using Editors.Audio.AudioEditor.Models;
 using Shared.GameFormats.Wwise.Hirc;
 using Shared.GameFormats.Wwise.Hirc.V136;
-using Shared.GameFormats.Wwise.Hirc.V136.Shared;
 using static Editors.Audio.AudioEditor.Settings.Settings;
-using static Shared.GameFormats.Wwise.Hirc.V136.CAkRanSeqCntr_V136.CAkPlayList_V136;
 
 namespace Editors.Audio.AudioProjectCompiler.WwiseGeneratorService.WwiseGenerators.Hirc.V136
 {
-    public class RanSeqCntrHircGenerator_V136 : IWwiseHircGeneratorService
+    public class CAkRanSeqCntrGenerator_V136 : IWwiseHircGeneratorService
     {
         public HircItem GenerateHirc(AudioProjectItem audioProjectItem, SoundBank soundBank)
         {
             var audioProjectRandomSequenceContainer = audioProjectItem as RandomSequenceContainer;
 
             var randomSequenceContainerHirc = CreateRandomSequenceContainerHirc(audioProjectRandomSequenceContainer);
-            randomSequenceContainerHirc.NodeBaseParams = CreateNodeBaseParams(audioProjectRandomSequenceContainer);
+            randomSequenceContainerHirc.NodeBaseParams = NodeBaseParamsGenerator_V136.CreateNodeBaseParams(audioProjectRandomSequenceContainer);
 
             if (audioProjectRandomSequenceContainer.AudioSettings.LoopingType == LoopingType.FiniteLooping)
                 randomSequenceContainerHirc.LoopCount = (ushort)audioProjectRandomSequenceContainer.AudioSettings.NumberOfLoops;
@@ -44,14 +40,14 @@ namespace Editors.Audio.AudioProjectCompiler.WwiseGeneratorService.WwiseGenerato
             randomSequenceContainerHirc.TransitionMode = (byte)audioProjectRandomSequenceContainer.AudioSettings.TransitionType;
 
             if (audioProjectRandomSequenceContainer.AudioSettings.PlaylistType == PlaylistType.RandomExhaustive)
-                randomSequenceContainerHirc.RandomMode = 1; // Shuffle
+                randomSequenceContainerHirc.RandomMode = 1;
             else
-                randomSequenceContainerHirc.RandomMode = 0; // Normal
+                randomSequenceContainerHirc.RandomMode = 0;
 
             if (audioProjectRandomSequenceContainer.AudioSettings.PlaylistType == PlaylistType.Sequence)
-                randomSequenceContainerHirc.Mode = 1; // Sequence
+                randomSequenceContainerHirc.Mode = 1;
             else
-                randomSequenceContainerHirc.Mode = 0; // Random
+                randomSequenceContainerHirc.Mode = 0;
 
             var isUsingWeight = 0;
 
@@ -78,8 +74,8 @@ namespace Editors.Audio.AudioProjectCompiler.WwiseGeneratorService.WwiseGenerato
                 isUsingWeight
             );
 
-            randomSequenceContainerHirc.Children = CreateChildrenList(audioProjectRandomSequenceContainer.Sounds);
-            randomSequenceContainerHirc.CAkPlayList.Playlist = CreateAkPlaylistItem(audioProjectRandomSequenceContainer.Sounds);
+            randomSequenceContainerHirc.Children = ChildrenGenerator_V136.CreateChildrenList(audioProjectRandomSequenceContainer.Sounds);
+            randomSequenceContainerHirc.CAkPlayList.Playlist = AkPlaylistItemGenerator_V136.CreateAkPlaylistItem(audioProjectRandomSequenceContainer.Sounds);
 
             randomSequenceContainerHirc.UpdateSectionSize();
 
@@ -93,72 +89,6 @@ namespace Editors.Audio.AudioProjectCompiler.WwiseGeneratorService.WwiseGenerato
                 Id = audioProjectRandomSequenceContainer.Id,
                 HircType = audioProjectRandomSequenceContainer.HircType,
             };
-        }
-
-        private static NodeBaseParams_V136 CreateNodeBaseParams(RandomSequenceContainer audioProjectRandomSequenceContainer)
-        {
-            var nodeBaseParams = new NodeBaseParams_V136();
-            nodeBaseParams.NodeInitialFxParams = new NodeInitialFxParams_V136()
-            {
-                IsOverrideParentFx = 0,
-                NumFx = 0,
-            };
-            nodeBaseParams.OverrideAttachmentParams = 0;
-            nodeBaseParams.OverrideBusId = audioProjectRandomSequenceContainer.OverrideBusId;
-            nodeBaseParams.DirectParentId = audioProjectRandomSequenceContainer.DirectParentId;
-            nodeBaseParams.BitVector = 0;
-            nodeBaseParams.NodeInitialParams = new NodeInitialParams_V136()
-            {
-                AkPropBundle0 = new AkPropBundle_V136() { PropsList = new List<AkPropBundle_V136.PropBundleInstance_V136>() },
-                AkPropBundle1 = new AkPropBundleMinMax_V136() { PropsList = new List<AkPropBundleMinMax_V136.AkPropBundleInstance_V136>() }
-            };
-            nodeBaseParams.PositioningParams = new PositioningParams_V136()
-            {
-                BitsPositioning = 0x00,
-            };
-            nodeBaseParams.AuxParams = new AuxParams_V136()
-            {
-                BitVector = 0,
-                ReflectionsAuxBus = 0
-            };
-            nodeBaseParams.AdvSettingsParams = new AdvSettingsParams_V136()
-            {
-                BitVector = 0x00,
-                VirtualQueueBehavior = 0x01,
-                MaxNumInstance = 0,
-                BelowThresholdBehavior = 0,
-                BitVector2 = 0x00
-            };
-            nodeBaseParams.StateChunk = new StateChunk_V136();
-            nodeBaseParams.InitialRtpc = new InitialRtpc_V136();
-            return nodeBaseParams;
-        }
-
-        private static Children_V136 CreateChildrenList(List<Sound> sounds)
-        {
-            var childIds = sounds
-                .Select(sound => sound.Id)
-                .ToList();
-
-            return new Children_V136
-            {
-                ChildIds = childIds
-            };
-        }
-
-        private static List<AkPlaylistItem_V136> CreateAkPlaylistItem(List<Sound> sounds)
-        {
-            var playlist = new List<AkPlaylistItem_V136>();
-            foreach (var sound in sounds)
-            {
-                var playlistItem = new AkPlaylistItem_V136
-                {
-                    PlayId = sound.Id,
-                    Weight = 50000
-                };
-                playlist.Add(playlistItem);
-            }
-            return playlist;
         }
     }
 }

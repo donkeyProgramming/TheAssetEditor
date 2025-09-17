@@ -1,7 +1,7 @@
-﻿using System.Collections.ObjectModel;
+﻿using System.Collections.Generic;
 using Editors.Audio.AudioEditor.Settings;
 
 namespace Editors.Audio.AudioEditor.Events
 {
-    public record AudioFilesChangedEvent(ObservableCollection<AudioFile> AudioFiles, bool AddToExistingAudioFiles);
+    public record AudioFilesChangedEvent(List<AudioFile> AudioFiles, bool AddToExistingAudioFiles, bool IsSetFromViewerItem);
 }

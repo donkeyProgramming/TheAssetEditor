@@ -61,6 +61,7 @@ namespace Editors.Audio.AudioEditor.AudioProjectViewer
             ViewerLabel = $"Audio Project Viewer";
             DataGridTag = TableInfo.ViewerDataGridTag;
 
+            _eventHub.Register<AudioProjectInitialisedEvent>(this, OnAudioProjectInitialised);
             _eventHub.Register<AudioProjectExplorerNodeSelectedEvent>(this, OnAudioProjectExplorerNodeSelected);
             _eventHub.Register<ViewerTableColumnAddRequestedEvent>(this, OnViewerTableColumnAddRequested);
             _eventHub.Register<ViewerTableRowAddRequestedEvent>(this, OnViewerTableRowAddRequested);
@@ -68,6 +69,15 @@ namespace Editors.Audio.AudioEditor.AudioProjectViewer
             _eventHub.Register<CopyRowsShortcutActivatedEvent>(this, OnCopyRowsShortcutActivated);
             _eventHub.Register<PasteRowsShortcutActivatedEvent>(this, OnPasteRowsShortcutActivated);
             _eventHub.Register<ViewerDataGridColumnAddedEvent>(this, OnViewerDataGridColumnAdded);
+        }
+
+        private void OnAudioProjectInitialised(AudioProjectInitialisedEvent e)
+        {
+            ResetViewerVisibility();
+            ResetViewerLabel();
+            ResetButtonEnablement();
+            ResetContextMenuVisibility();
+            ResetTable();
         }
 
         public void OnAudioProjectExplorerNodeSelected(AudioProjectExplorerNodeSelectedEvent e)
