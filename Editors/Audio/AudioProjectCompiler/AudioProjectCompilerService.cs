@@ -52,6 +52,13 @@ namespace Editors.Audio.AudioProjectCompiler
                 SetPlayActionEventData(soundBanksWithActionEvents, usedCompilerHircIds);
                 SetPlayActionTargetData(soundBanksWithActionEvents, usedCompilerHircIds, sourceIdByWavFilePath, soundsToGenerateWemsFrom);
                 SetPlayActionData(soundBanksWithActionEvents, usedCompilerHircIds);
+
+                SetPauseActionEventData(soundBanksWithActionEvents, usedCompilerHircIds);
+                SetPauseActionData(soundBanksWithActionEvents, usedCompilerHircIds);
+
+                SetResumeActionEventData(soundBanksWithActionEvents, usedCompilerHircIds);
+                SetResumeActionData(soundBanksWithActionEvents, usedCompilerHircIds);
+
                 SetStopActionEventData(soundBanksWithActionEvents, usedCompilerHircIds);
                 SetStopActionData(soundBanksWithActionEvents, usedCompilerHircIds);
             }
@@ -233,6 +240,34 @@ namespace Editors.Audio.AudioProjectCompiler
             }
         }
 
+        private void SetPauseActionEventData(List<SoundBank> soundBanks, HashSet<uint> usedCompilerHircIds)
+        {
+            foreach (var soundBank in soundBanks)
+            {
+                var pauseActionEvents = soundBank.GetPauseActionEvents();
+                foreach (var pauseActionEvent in pauseActionEvents)
+                {
+                    var actionEventIdResult = _idGeneratorService.GenerateActionEventHircId(soundBank.LanguageId, soundBank.FilePath, usedCompilerHircIds, pauseActionEvent.Name);
+                    AudioProjectCompilerHelpers.StoreUsedId(usedCompilerHircIds, actionEventIdResult.Id);
+                    pauseActionEvent.Id = actionEventIdResult.Id;
+                }
+            }
+        }
+
+        private void SetResumeActionEventData(List<SoundBank> soundBanks, HashSet<uint> usedCompilerHircIds)
+        {
+            foreach (var soundBank in soundBanks)
+            {
+                var resumeActionEvents = soundBank.GetResumeActionEvents();
+                foreach (var resumeActionEvent in resumeActionEvents)
+                {
+                    var actionEventIdResult = _idGeneratorService.GenerateActionEventHircId(soundBank.LanguageId, soundBank.FilePath, usedCompilerHircIds, resumeActionEvent.Name);
+                    AudioProjectCompilerHelpers.StoreUsedId(usedCompilerHircIds, actionEventIdResult.Id);
+                    resumeActionEvent.Id = actionEventIdResult.Id;
+                }
+            }
+        }
+
         private void SetStopActionEventData(List<SoundBank> soundBanks, HashSet<uint> usedCompilerHircIds)
         {
             foreach (var soundBank in soundBanks)
@@ -243,6 +278,106 @@ namespace Editors.Audio.AudioProjectCompiler
                     var actionEventIdResult = _idGeneratorService.GenerateActionEventHircId(soundBank.LanguageId, soundBank.FilePath, usedCompilerHircIds, stopActionEvent.Name);
                     AudioProjectCompilerHelpers.StoreUsedId(usedCompilerHircIds, actionEventIdResult.Id);
                     stopActionEvent.Id = actionEventIdResult.Id;
+                }
+            }
+        }
+
+        private void SetPauseActionData(List<SoundBank> soundBanks, HashSet<uint> usedCompilerHircIds)
+        {
+            foreach (var soundBank in soundBanks)
+            {
+                var pauseActionEvents = soundBank.GetPauseActionEvents();
+                foreach (var pauseActionEvent in pauseActionEvents)
+                {
+                    if (pauseActionEvent.Actions.Count > 1)
+                        throw new NotSupportedException("Multiple Actions are not supported.");
+
+                    var actionIndex = 0;
+                    var actorMixerId = Wh3ActionEventInformation.GetActorMixerId(pauseActionEvent.ActionEventType);
+                    var overrideBusId = Wh3ActionEventInformation.GetOverrideBusId(pauseActionEvent.ActionEventType);
+
+                    var pauseActions = pauseActionEvent.GetPauseActions();
+                    foreach (var pauseAction in pauseActions)
+                    {
+                        actionIndex++;
+
+                        if (pauseAction.Sound != null)
+                        {
+                            var actionIdResult = _idGeneratorService.GenerateActionHircId(soundBank.LanguageId, soundBank.FilePath, usedCompilerHircIds, pauseActionEvent.Name, actionIndex);
+                            AudioProjectCompilerHelpers.StoreUsedId(usedCompilerHircIds, actionIdResult.Id);
+                            pauseAction.Name = actionIdResult.FinalKey;
+                            pauseAction.Id = actionIdResult.Id;
+
+                            var playActionEvent = AudioProjectCompilerHelpers.GetPlayActionEventFromPauseActionEventName(soundBank, pauseActionEvent.Name);
+                            var actionNameStart = $"action_hirc_{playActionEvent.Name}";
+                            var playAction = playActionEvent.GetAction(actionNameStart);
+                            pauseAction.IdExt = playAction.Sound.Id;
+                            pauseAction.Sound = playAction.Sound;
+                        }
+                        else
+                        {
+                            var actionIdResult = _idGeneratorService.GenerateActionHircId(soundBank.LanguageId, soundBank.FilePath, usedCompilerHircIds, pauseActionEvent.Name, actionIndex);
+                            AudioProjectCompilerHelpers.StoreUsedId(usedCompilerHircIds, actionIdResult.Id);
+                            pauseAction.Name = actionIdResult.FinalKey;
+                            pauseAction.Id = actionIdResult.Id;
+
+                            var playActionEvent = AudioProjectCompilerHelpers.GetPlayActionEventFromPauseActionEventName(soundBank, pauseActionEvent.Name);
+                            var actionNameStart = $"action_hirc_{playActionEvent.Name}";
+                            var playAction = playActionEvent.GetAction(actionNameStart);
+                            pauseAction.IdExt = playAction.RandomSequenceContainer.Id;
+                            pauseAction.RandomSequenceContainer = playAction.RandomSequenceContainer;
+                        }
+                    }
+                }
+            }
+        }
+
+        private void SetResumeActionData(List<SoundBank> soundBanks, HashSet<uint> usedCompilerHircIds)
+        {
+            foreach (var soundBank in soundBanks)
+            {
+                var resumeActionEvents = soundBank.GetResumeActionEvents();
+                foreach (var resumeActionEvent in resumeActionEvents)
+                {
+                    if (resumeActionEvent.Actions.Count > 1)
+                        throw new NotSupportedException("Multiple Actions are not supported.");
+
+                    var actionIndex = 0;
+                    var actorMixerId = Wh3ActionEventInformation.GetActorMixerId(resumeActionEvent.ActionEventType);
+                    var overrideBusId = Wh3ActionEventInformation.GetOverrideBusId(resumeActionEvent.ActionEventType);
+
+                    var resumeActions = resumeActionEvent.GetResumeActions();
+                    foreach (var resumeAction in resumeActions)
+                    {
+                        actionIndex++;
+
+                        if (resumeAction.Sound != null)
+                        {
+                            var actionIdResult = _idGeneratorService.GenerateActionHircId(soundBank.LanguageId, soundBank.FilePath, usedCompilerHircIds, resumeActionEvent.Name, actionIndex);
+                            AudioProjectCompilerHelpers.StoreUsedId(usedCompilerHircIds, actionIdResult.Id);
+                            resumeAction.Name = actionIdResult.FinalKey;
+                            resumeAction.Id = actionIdResult.Id;
+
+                            var playActionEvent = AudioProjectCompilerHelpers.GetPlayActionEventFromResumeActionEventName(soundBank, resumeActionEvent.Name);
+                            var actionNameStart = $"action_hirc_{playActionEvent.Name}";
+                            var playAction = playActionEvent.GetAction(actionNameStart);
+                            resumeAction.IdExt = playAction.Sound.Id;
+                            resumeAction.Sound = playAction.Sound;
+                        }
+                        else
+                        {
+                            var actionIdResult = _idGeneratorService.GenerateActionHircId(soundBank.LanguageId, soundBank.FilePath, usedCompilerHircIds, resumeActionEvent.Name, actionIndex);
+                            AudioProjectCompilerHelpers.StoreUsedId(usedCompilerHircIds, actionIdResult.Id);
+                            resumeAction.Name = actionIdResult.FinalKey;
+                            resumeAction.Id = actionIdResult.Id;
+
+                            var playActionEvent = AudioProjectCompilerHelpers.GetPlayActionEventFromResumeActionEventName(soundBank, resumeActionEvent.Name);
+                            var actionNameStart = $"action_hirc_{playActionEvent.Name}";
+                            var playAction = playActionEvent.GetAction(actionNameStart);
+                            resumeAction.IdExt = playAction.RandomSequenceContainer.Id;
+                            resumeAction.RandomSequenceContainer = playAction.RandomSequenceContainer;
+                        }
+                    }
                 }
             }
         }

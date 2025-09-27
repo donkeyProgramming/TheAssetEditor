@@ -25,13 +25,13 @@ namespace Shared.GameFormats.Wwise.Hirc
         // Wwiser adds 1 to that for internal use to create a pseudo version called 136 but really it's 2147483784
         public static HircFactory CreateFactory(uint bankGeneratorVersion)
         {
-            switch (bankGeneratorVersion)
+            return bankGeneratorVersion switch
             {
-                case 112: return CreateFactory_v112();
-                case 2147483784: return CreateFactory_v136();
-            }
-
-            throw new Exception($"Unknown Bank Generator Version: {bankGeneratorVersion}");
+                112 => CreateFactory_v112(),
+                135 => CreateFactory_v136(),
+                2147483784 => CreateFactory_v136(),
+                _ => throw new Exception($"Unknown Bank Generator Version: {bankGeneratorVersion}"),
+            };
         }
 
         private static HircFactory CreateFactory_v112()

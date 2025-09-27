@@ -62,8 +62,10 @@ namespace Editors.Audio.AudioEditor.AudioProjectViewer.Table
             var soundBank = _audioEditorStateService.AudioProject.GetSoundBank(soundBankName);
             foreach (var actionEvent in soundBank.ActionEvents)
             {
-                // We don't want them visible as we currently force all Action Events to start with "Play_" so showing "Stop_" events would confuse things
-                if (actionEvent.Actions.Any(action => action.ActionType == AkActionType.Stop_E_O))
+                // We don't want them visible as we only show "Play_" Action Events as we force all Action Events to start with "Play_"
+                if (actionEvent.Actions.Any(action => action.ActionType == AkActionType.Pause_E_O 
+                    && action.ActionType == AkActionType.Resume_E_O
+                    && action.ActionType == AkActionType.Stop_E_O))
                     continue;
 
                 var row = table.NewRow();

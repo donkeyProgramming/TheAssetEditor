@@ -11,6 +11,8 @@ namespace Editors.Audio.AudioEditor.Factories
     public interface IActionEventFactory
     {
         ActionEvent CreatePlayActionEvent(Wh3ActionEventType actionEventGroup, string actionEventName, List<AudioFile> audioFiles, AudioSettings audioSettings);
+        ActionEvent CreateResumeActionEvent(ActionEvent playActionEvent);
+        ActionEvent CreatePauseActionEvent(ActionEvent playActionEvent);
         ActionEvent CreateStopActionEvent(ActionEvent playActionEvent);
     }
 
@@ -37,6 +39,54 @@ namespace Editors.Audio.AudioEditor.Factories
             }
 
             var actionEvent = ActionEvent.Create(actionEventName, actions, actionEventType);
+            return actionEvent;
+        }
+
+        public ActionEvent CreateResumeActionEvent(ActionEvent playActionEvent)
+        {
+            var resumeActions = new List<Action>();
+
+            var playActions = playActionEvent.GetPlayActions();
+            foreach (var playAction in playActions)
+            {
+                if (playAction.Sound != null)
+                {
+                    var resumeAction = Action.Create(playAction.Sound, AkActionType.Resume_E_O);
+                    resumeActions.Add(resumeAction);
+                }
+                else if (playAction.RandomSequenceContainer != null)
+                {
+                    var resumeAction = Action.Create(playAction.RandomSequenceContainer, AkActionType.Resume_E_O);
+                    resumeActions.Add(resumeAction);
+                }
+            }
+
+            var resumeActionEventName = string.Concat("Resume_", playActionEvent.Name.AsSpan("Play_".Length));
+            var actionEvent = ActionEvent.Create(resumeActionEventName, resumeActions, playActionEvent.ActionEventType);
+            return actionEvent;
+        }
+
+        public ActionEvent CreatePauseActionEvent(ActionEvent playActionEvent)
+        {
+            var pauseActions = new List<Action>();
+
+            var playActions = playActionEvent.GetPlayActions();
+            foreach (var playAction in playActions)
+            {
+                if (playAction.Sound != null)
+                {
+                    var pauseAction = Action.Create(playAction.Sound, AkActionType.Pause_E_O);
+                    pauseActions.Add(pauseAction);
+                }
+                else if (playAction.RandomSequenceContainer != null)
+                {
+                    var pauseAction = Action.Create(playAction.RandomSequenceContainer, AkActionType.Pause_E_O);
+                    pauseActions.Add(pauseAction);
+                }
+            }
+
+            var pauseActionEventName = string.Concat("Pause_", playActionEvent.Name.AsSpan("Play_".Length));
+            var actionEvent = ActionEvent.Create(pauseActionEventName, pauseActions, playActionEvent.ActionEventType);
             return actionEvent;
         }
 

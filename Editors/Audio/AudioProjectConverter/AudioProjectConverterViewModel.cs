@@ -220,7 +220,7 @@ namespace Editors.Audio.AudioProjectConverter
 
             var voActorSubstrings = VOActorSubstring
                 .Split([','], StringSplitOptions.RemoveEmptyEntries)
-                .Select(substring => substring.Trim().ToLower())
+                .Select(substring => substring.Trim())
                 .ToArray();
 
             var anyStatePathsContainRequiredPattern = decisionPathCollection.Paths
@@ -424,11 +424,17 @@ namespace Editors.Audio.AudioProjectConverter
                     .Where(statePathNode => statePathNode.StateGroup.Name == "VO_Actor")
                     .FirstOrDefault()?.State.Name;
 
+                if (voActor == null)
+                    continue;
+
                 // Stop if not containing the thing we're after
                 if (!voActorSubstrings.Any(substring => voActor.Contains(substring, StringComparison.CurrentCultureIgnoreCase)))
                     continue;
 
                 ProcessWavFiles(statePathWavs, processedWems, audioFiles, dialogueEventsLookupByWemId, globalBaseNameUsage, dialogueEventName, voActor);
+
+                if (audioFiles.Count == 0)
+                    continue;
 
                 StatePath audioProjectStatePath;
                 if (audioFiles.Count > 1)
@@ -442,6 +448,7 @@ namespace Editors.Audio.AudioProjectConverter
                 }
                 else
                 {
+                    var soundSettings = AudioSettings.CreateSoundSettings();
                     var sound = Sound.Create(audioFiles[0]);
                     audioProjectStatePath = StatePath.Create(statePath.StatePathNodes, sound);
                 }
@@ -484,7 +491,7 @@ namespace Editors.Audio.AudioProjectConverter
                 globalBaseNameUsage[baseFileName] = count;
 
                 wavFile.FileName = $"{baseFileName}_{count}.wav".ToLower();
-                wavFile.FilePath = $"audio_projects\\audio\\vo\\{voActorSegment}\\{wavFile.FileName}".ToLower();
+                wavFile.FilePath = $"{OutputDirectoryPath}\\vo\\{voActorSegment}\\{wavFile.FileName}".ToLower();
 
                 // Create and store the processed AudioFile
                 processedAudioFile = new AudioFile
@@ -505,7 +512,7 @@ namespace Editors.Audio.AudioProjectConverter
 
                 var wavFileBytes = File.ReadAllBytes(wavTempFilePath);
                 var packFile = PackFile.CreateFromBytes(AudioProjectName, wavFileBytes);
-                _fileSaveService.Save(wavPackOutputPath, packFile.DataSource.ReadData(), true);
+                _fileSaveService.Save(wavPackOutputPath, packFile.DataSource.ReadData(), false);
             }
         }
 

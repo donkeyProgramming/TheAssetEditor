@@ -1,7 +1,6 @@
 ﻿using Shared.Core.ByteParsing;
 using Shared.GameFormats.Wwise.Enums;
 using Shared.GameFormats.Wwise.Hirc.V136.Shared;
-using SharpDX.Win32;
 
 namespace Shared.GameFormats.Wwise.Hirc.V136
 {
@@ -26,8 +25,12 @@ namespace Shared.GameFormats.Wwise.Hirc.V136
 
             if (ActionType == AkActionType.Play)
                 PlayActionParams = PlayActionParams_V136.ReadData(chunk);
+            else if (ActionType == AkActionType.Pause_E_O)
+                ActiveActionParams = ActiveActionParams_V136.ReadData(chunk, ActionType);
+            else if (ActionType == AkActionType.Resume_E_O)
+                ActiveActionParams = ActiveActionParams_V136.ReadData(chunk, ActionType);
             else if (ActionType == AkActionType.Stop_E_O)
-                ActiveActionParams = ActiveActionParams_V136.ReadData(chunk);
+                ActiveActionParams = ActiveActionParams_V136.ReadData(chunk, ActionType);
             else if (ActionType == AkActionType.SetState)
                 StateActionParams = StateActionParams_V136.ReadData(chunk);
         }
@@ -43,8 +46,12 @@ namespace Shared.GameFormats.Wwise.Hirc.V136
 
             if (ActionType == AkActionType.Play)
                 memStream.Write(PlayActionParams!.WriteData());
+            else if (ActionType == AkActionType.Pause_E_O)
+                memStream.Write(ActiveActionParams!.WriteData(ActionType));
+            else if (ActionType == AkActionType.Resume_E_O)
+                memStream.Write(ActiveActionParams!.WriteData(ActionType));
             else if (ActionType == AkActionType.Stop_E_O)
-                memStream.Write(ActiveActionParams!.WriteData());
+                memStream.Write(ActiveActionParams!.WriteData(ActionType));
 
             var byteArray = memStream.ToArray();
 
@@ -69,9 +76,19 @@ namespace Shared.GameFormats.Wwise.Hirc.V136
                 var playActionParamsSize = PlayActionParams!.GetSize();
                 SectionSize = (ushort)(idSize + actionTypeSize + idExtSize + idExt4Size + akPropBundle0Size + akPropBundle1Size + playActionParamsSize);
             }
+            else if (ActionType == AkActionType.Pause_E_O)
+            {
+                var pauseActionParamsSize = ActiveActionParams!.GetSize(AkActionType.Pause_E_O);
+                SectionSize = (ushort)(idSize + actionTypeSize + idExtSize + idExt4Size + akPropBundle0Size + akPropBundle1Size + pauseActionParamsSize);
+            }
+            else if (ActionType == AkActionType.Resume_E_O)
+            {
+                var resumeActionParamsSize = ActiveActionParams!.GetSize(AkActionType.Resume_E_O);
+                SectionSize = (ushort)(idSize + actionTypeSize + idExtSize + idExt4Size + akPropBundle0Size + akPropBundle1Size + resumeActionParamsSize);
+            }
             else if (ActionType == AkActionType.Stop_E_O)
             {
-                var stopActionParamsSize = ActiveActionParams!.GetSize();
+                var stopActionParamsSize = ActiveActionParams!.GetSize(AkActionType.Stop_E_O);
                 SectionSize = (ushort)(idSize + actionTypeSize + idExtSize + idExt4Size + akPropBundle0Size + akPropBundle1Size + stopActionParamsSize);
             }
         }
@@ -113,34 +130,103 @@ namespace Shared.GameFormats.Wwise.Hirc.V136
         public class ActiveActionParams_V136
         {
             public byte BitVector { get; set; }
+            public PauseActionSpecificParams_V136 PauseActionSpecificParams { get; set; } = new PauseActionSpecificParams_V136();
+            public ResumeActionSpecificParams_V136 ResumeActionSpecificParams { get; set; } = new ResumeActionSpecificParams_V136();
             public StopActionSpecificParams_V136 StopActionSpecificParams { get; set; } = new StopActionSpecificParams_V136();
             public ExceptParams_V136 ExceptParams { get; set; } = new ExceptParams_V136();
 
-            public static ActiveActionParams_V136 ReadData(ByteChunk chunk)
+            public static ActiveActionParams_V136 ReadData(ByteChunk chunk, AkActionType actionType)
             {
-                return new ActiveActionParams_V136()
-                {
-                    BitVector = chunk.ReadByte(),
-                    StopActionSpecificParams = StopActionSpecificParams_V136.ReadData(chunk),
-                    ExceptParams = ExceptParams_V136.ReadData(chunk)
-                };
+                var activeActionParams = new ActiveActionParams_V136();
+                activeActionParams.BitVector = chunk.ReadByte();
+
+                if (actionType == AkActionType.Pause_E_O)
+                    activeActionParams.PauseActionSpecificParams = PauseActionSpecificParams_V136.ReadData(chunk);
+                else if(actionType == AkActionType.Resume_E_O)
+                    activeActionParams.ResumeActionSpecificParams = ResumeActionSpecificParams_V136.ReadData(chunk);
+                else if (actionType == AkActionType.Stop_E_O)
+                    activeActionParams.StopActionSpecificParams = StopActionSpecificParams_V136.ReadData(chunk);
+
+                activeActionParams.ExceptParams = ExceptParams_V136.ReadData(chunk);
+                return activeActionParams;
             }
 
-            public byte[] WriteData()
+            public byte[] WriteData(AkActionType actionType)
             {
                 using var memStream = new MemoryStream();
                 memStream.Write(ByteParsers.Byte.EncodeValue(BitVector, out _));
-                memStream.Write(StopActionSpecificParams.WriteData());
+
+                if (actionType == AkActionType.Pause_E_O)
+                    memStream.Write(PauseActionSpecificParams.WriteData());
+                else if (actionType == AkActionType.Resume_E_O)
+                    memStream.Write(ResumeActionSpecificParams.WriteData());
+                else if (actionType == AkActionType.Stop_E_O)
+                    memStream.Write(StopActionSpecificParams.WriteData());
+
                 memStream.Write(ExceptParams.WriteData());
                 return memStream.ToArray();
             }
 
-            public uint GetSize()
+            public uint GetSize(AkActionType actionType)
             {
                 var bitVectorSize = ByteHelper.GetPropertyTypeSize(BitVector);
-                var stopActionSpecificParamsSize = StopActionSpecificParams.GetSize();
+
+                uint actionSpecificParamsSize = 0;
+                if(actionType == AkActionType.Pause_E_O)
+                    actionSpecificParamsSize = PauseActionSpecificParams.GetSize();
+                else if(actionType == AkActionType.Resume_E_O)
+                    actionSpecificParamsSize = ResumeActionSpecificParams.GetSize();
+                else if (actionType == AkActionType.Stop_E_O)
+                    actionSpecificParamsSize = StopActionSpecificParams.GetSize();
+
                 var exceptParamsSize = ExceptParams.GetSize();
-                return bitVectorSize + stopActionSpecificParamsSize + exceptParamsSize;
+                return bitVectorSize + actionSpecificParamsSize + exceptParamsSize;
+            }
+
+            public class PauseActionSpecificParams_V136
+            {
+                public byte BitVector { get; set; }
+
+                public static PauseActionSpecificParams_V136 ReadData(ByteChunk chunk)
+                {
+                    return new PauseActionSpecificParams_V136()
+                    {
+                        BitVector = chunk.ReadByte()
+                    };
+                }
+
+                public byte[] WriteData()
+                {
+                    return ByteParsers.Byte.EncodeValue(BitVector, out _);
+                }
+
+                public uint GetSize()
+                {
+                    return ByteHelper.GetPropertyTypeSize(BitVector);
+                }
+            }
+
+            public class ResumeActionSpecificParams_V136
+            {
+                public byte BitVector { get; set; }
+
+                public static ResumeActionSpecificParams_V136 ReadData(ByteChunk chunk)
+                {
+                    return new ResumeActionSpecificParams_V136()
+                    {
+                        BitVector = chunk.ReadByte()
+                    };
+                }
+
+                public byte[] WriteData()
+                {
+                    return ByteParsers.Byte.EncodeValue(BitVector, out _);
+                }
+
+                public uint GetSize()
+                {
+                    return ByteHelper.GetPropertyTypeSize(BitVector);
+                }
             }
 
             public class StopActionSpecificParams_V136

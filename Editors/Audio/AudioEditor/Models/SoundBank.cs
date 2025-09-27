@@ -58,14 +58,40 @@ namespace Editors.Audio.AudioEditor.Models
         public List<ActionEvent> GetPlayActionEvents()
         {
             return ActionEvents
-                .Where(actionEvent => actionEvent.GetPlayActions().Count != 0 && actionEvent.GetStopActions().Count == 0)
+                .Where(actionEvent => actionEvent.GetPlayActions().Count != 0 
+                    && actionEvent.GetResumeActions().Count == 0 
+                    && actionEvent.GetPauseActions().Count == 0 
+                    && actionEvent.GetStopActions().Count == 0)
+                .ToList();
+        }
+
+        public List<ActionEvent> GetPauseActionEvents()
+        {
+            return ActionEvents
+                .Where(actionEvent => actionEvent.GetPauseActions().Count != 0
+                    && actionEvent.GetPlayActions().Count == 0
+                    && actionEvent.GetResumeActions().Count == 0 
+                    && actionEvent.GetStopActions().Count == 0)
+                .ToList();
+        }
+
+        public List<ActionEvent> GetResumeActionEvents()
+        {
+            return ActionEvents
+                .Where(actionEvent => actionEvent.GetResumeActions().Count != 0
+                    && actionEvent.GetPlayActions().Count == 0
+                    && actionEvent.GetPauseActions().Count == 0
+                    && actionEvent.GetStopActions().Count == 0)
                 .ToList();
         }
 
         public List<ActionEvent> GetStopActionEvents()
         {
             return ActionEvents
-                .Where(actionEvent => actionEvent.GetStopActions().Count != 0 && actionEvent.GetPlayActions().Count == 0)
+                .Where(actionEvent => actionEvent.GetStopActions().Count != 0
+                    && actionEvent.GetPlayActions().Count == 0
+                    && actionEvent.GetResumeActions().Count == 0 
+                    && actionEvent.GetPauseActions().Count == 0)
                 .ToList();
         }
 
@@ -97,10 +123,16 @@ namespace Editors.Audio.AudioEditor.Models
         public List<Sound> GetRandomSequenceContainerSounds()
         {
             var actions = GetActions();
-            var actionSounds = actions.SelectMany(action => action.RandomSequenceContainer.Sounds);
+            var actionSounds = actions
+                .Where(action => action?.RandomSequenceContainer?.Sounds != null)
+                .SelectMany(action => action.RandomSequenceContainer.Sounds);
+
             var statePaths = GetStatePaths();
-            var statePathSounds = statePaths.SelectMany(statePath => statePath.RandomSequenceContainer.Sounds);
-            return [..actionSounds, ..statePathSounds];
+            var statePathSounds = statePaths
+                .Where(statePath => statePath?.RandomSequenceContainer?.Sounds != null)
+                .SelectMany(statePath => statePath.RandomSequenceContainer.Sounds);
+
+            return [.. actionSounds, .. statePathSounds];
         }
 
         public List<Sound> GetSounds()

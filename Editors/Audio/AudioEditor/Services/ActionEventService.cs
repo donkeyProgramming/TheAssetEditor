@@ -28,6 +28,12 @@ namespace Editors.Audio.AudioEditor.Services
 
             if (soundBank.GameSoundBank == Wh3SoundBank.GlobalMusic)
             {
+                var pauseActionEvent = _actionEventFactory.CreatePauseActionEvent(actionEvent);
+                soundBank.InsertAlphabetically(pauseActionEvent);
+
+                var resumeActionEvent = _actionEventFactory.CreateResumeActionEvent(actionEvent);
+                soundBank.InsertAlphabetically(resumeActionEvent);
+
                 var stopActionEvent = _actionEventFactory.CreateStopActionEvent(actionEvent);
                 soundBank.InsertAlphabetically(stopActionEvent);
             }
@@ -42,6 +48,14 @@ namespace Editors.Audio.AudioEditor.Services
 
             if (soundBank.GameSoundBank == Wh3SoundBank.GlobalMusic)
             {
+                var pauseActionEventName = string.Concat("Pause_", actionEvent.Name.AsSpan("Play_".Length));
+                var pauseActionEvent = soundBank.GetActionEvent(pauseActionEventName);
+                soundBank.ActionEvents.Remove(pauseActionEvent);
+
+                var resumeActionEventName = string.Concat("Resume_", actionEvent.Name.AsSpan("Play_".Length));
+                var resumeActionEvent = soundBank.GetActionEvent(resumeActionEventName);
+                soundBank.ActionEvents.Remove(resumeActionEvent);
+
                 var stopActionEventName = string.Concat("Stop_", actionEvent.Name.AsSpan("Play_".Length));
                 var stopActionEvent = soundBank.GetActionEvent(stopActionEventName);
                 soundBank.ActionEvents.Remove(stopActionEvent);

@@ -59,6 +59,18 @@ namespace Editors.Audio.AudioProjectCompiler
             }
         }
 
+        public static ActionEvent GetPlayActionEventFromPauseActionEventName(SoundBank soundBank, string pauseActionEventName)
+        {
+            var playActionEventName = string.Concat("Play_", pauseActionEventName.AsSpan("Pause_".Length));
+            return soundBank.GetActionEvent(playActionEventName);
+        }
+
+        public static ActionEvent GetPlayActionEventFromResumeActionEventName(SoundBank soundBank, string resumeActionEventName)
+        {
+            var playActionEventName = string.Concat("Play_", resumeActionEventName.AsSpan("Resume_".Length));
+            return soundBank.GetActionEvent(playActionEventName);
+        }
+
         public static ActionEvent GetPlayActionEventFromStopActionEventName(SoundBank soundBank, string stopActionEventName)
         {
             var playActionEventName = string.Concat("Play_", stopActionEventName.AsSpan("Stop_".Length));

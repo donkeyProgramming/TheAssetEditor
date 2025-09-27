@@ -17,6 +17,10 @@ namespace Editors.Audio.AudioProjectCompiler.WwiseGeneratorService.WwiseGenerato
 
             if (audioProjectActionEvent.ActionType == AkActionType.Play)
                 actionHirc.PlayActionParams = CreatePlayActionParams(soundBank);
+            else if (audioProjectActionEvent.ActionType == AkActionType.Pause_E_O)
+                actionHirc.ActiveActionParams = CreatePauseActionParams(soundBank);
+            else if (audioProjectActionEvent.ActionType == AkActionType.Resume_E_O)
+                actionHirc.ActiveActionParams = CreateResumeActionParams(soundBank);
             else if (audioProjectActionEvent.ActionType == AkActionType.Stop_E_O)
                 actionHirc.ActiveActionParams = CreateStopActionParams(soundBank);
 
@@ -53,6 +57,38 @@ namespace Editors.Audio.AudioProjectCompiler.WwiseGeneratorService.WwiseGenerato
             {
                 BitVector = 4,
                 BankId = soundBank.Id
+            };
+        }
+
+        private static CAkAction_V136.ActiveActionParams_V136 CreatePauseActionParams(SoundBank soundBank)
+        {
+            return new CAkAction_V136.ActiveActionParams_V136
+            {
+                BitVector = 4,
+                PauseActionSpecificParams = new CAkAction_V136.ActiveActionParams_V136.PauseActionSpecificParams_V136
+                {
+                    BitVector = 7
+                },
+                ExceptParams = new CAkAction_V136.ActiveActionParams_V136.ExceptParams_V136
+                {
+                    ExceptionListSize = 0
+                }
+            };
+        }
+
+        private static CAkAction_V136.ActiveActionParams_V136 CreateResumeActionParams(SoundBank soundBank)
+        {
+            return new CAkAction_V136.ActiveActionParams_V136
+            {
+                BitVector = 0,
+                ResumeActionSpecificParams = new CAkAction_V136.ActiveActionParams_V136.ResumeActionSpecificParams_V136
+                {
+                    BitVector = 7
+                },
+                ExceptParams = new CAkAction_V136.ActiveActionParams_V136.ExceptParams_V136
+                {
+                    ExceptionListSize = 0
+                }
             };
         }
 

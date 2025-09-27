@@ -25,6 +25,15 @@ namespace Editors.Audio.AudioEditor.Models
             };
         }
 
+        public static AudioSettings CreateSoundSettings()
+        {
+            return new AudioSettings
+            {
+                LoopingType = LoopingType.Disabled,
+                NumberOfLoops = 1,
+            };
+        }
+
         public static AudioSettings CreateRandomSequenceContainerSettings(AudioSettings audioSettings)
         {
             return new AudioSettings
