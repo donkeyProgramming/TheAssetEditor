@@ -26,7 +26,7 @@ namespace Editors.Audio.GameInformation.Warhammer3
         DialogueEvent
     }
 
-    public record Wh3SoundBankDefinition(string Name, Wh3SoundBank GameSoundBank);
+    public record Wh3SoundBankDefinition(string Name, Wh3SoundBank GameSoundBank, Wh3GameLanguage? RequiredLanguage = null);
 
     public class Wh3SoundBankInformation
     {
@@ -38,7 +38,7 @@ namespace Editors.Audio.GameInformation.Warhammer3
             new("campaign_advice", Wh3SoundBank.CampaignAdvice),
             new("campaign_diplomacy", Wh3SoundBank.CampaignDiplomacy),
             new("global_movies", Wh3SoundBank.GlobalMovies),
-            new("global_music", Wh3SoundBank.GlobalMusic),
+            new("global_music", Wh3SoundBank.GlobalMusic, Wh3GameLanguage.Sfx),
             new("frontend_vo", Wh3SoundBank.FrontendVO),
             new("campaign_vo", Wh3SoundBank.CampaignVO),
             new("campaign_vo_conversational", Wh3SoundBank.CampaignVOConversational),
@@ -49,5 +49,7 @@ namespace Editors.Audio.GameInformation.Warhammer3
         public static Wh3SoundBank GetSoundBank(string name) => Information.First(definition => definition.Name == name).GameSoundBank;
 
         public static string GetName(Wh3SoundBank soundBank) => Information.First(definition => definition.GameSoundBank == soundBank).Name;
+
+        public static Wh3GameLanguage? GetRequiredLanguage(Wh3SoundBank soundBank) => Information.First(definition => definition.GameSoundBank == soundBank).RequiredLanguage;
     }
 }

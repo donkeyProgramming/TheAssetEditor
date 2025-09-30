@@ -17,10 +17,11 @@ namespace Editors.Audio.AudioEditor.Models
             HircType = AkBkHircType.Event;
         }
 
-        public static ActionEvent Create(string name, List<Action> actions, Wh3ActionEventType actionEventType)
+        public static ActionEvent Create(uint id, string name, List<Action> actions, Wh3ActionEventType actionEventType)
         {
             return new ActionEvent
             {
+                Id = id,
                 Name = name,
                 Actions = actions,
                 ActionEventType = actionEventType
@@ -59,6 +60,6 @@ namespace Editors.Audio.AudioEditor.Models
                 .ToList();
         }
 
-        public Action GetAction(string actionName) => Actions.FirstOrDefault(action => action.Name.StartsWith(actionName));
+        public Action GetAction(string actionName) => Actions.FirstOrDefault(action => action.Name == actionName);
     }
 }

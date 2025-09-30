@@ -1,4 +1,4 @@
-﻿using Editors.Audio.AudioEditor.Settings;
+﻿using System;
 using Shared.GameFormats.Wwise.Enums;
 
 namespace Editors.Audio.AudioEditor.Models
@@ -22,31 +22,31 @@ namespace Editors.Audio.AudioEditor.Models
             HircType = AkBkHircType.Sound;
         }
 
-        public static Sound Create(string fileName, string filePath, AudioSettings audioSettings)
+        public static Sound Create(Guid guid, uint id, uint overrideBusId, uint directParentId, uint sourceId, string fileName, string filePath, AudioSettings audioSettings)
         {
             return new Sound()
             {
+                Guid = guid,
+                Id = id,
+                OverrideBusId = overrideBusId,
+                DirectParentId = directParentId,
+                SourceId = sourceId,
                 WavPackFileName = fileName,
                 WavPackFilePath = filePath,
                 AudioSettings = audioSettings
             };
         }
 
-        public static Sound Create(string fileName, string filePath)
+        public static Sound Create(Guid guid, uint id, uint directParentId, uint sourceId, string fileName, string filePath)
         {
             return new Sound()
             {
+                Guid = guid,
+                Id = id,
+                DirectParentId = directParentId,
+                SourceId = sourceId,
                 WavPackFileName = fileName,
                 WavPackFilePath = filePath
-            };
-        }
-
-        public static Sound Create(AudioFile audioFile)
-        {
-            return new Sound()
-            {
-                WavPackFileName = audioFile.FileName,
-                WavPackFilePath = audioFile.FilePath,
             };
         }
 

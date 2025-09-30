@@ -14,10 +14,11 @@ namespace Editors.Audio.Utility
 {
     public class SoundPlayer
     {
-        private readonly ILogger _logger = Logging.Create<SoundPlayer>();
         private readonly IPackFileService _packFileService;
         private readonly IAudioRepository _audioRepository;
         private readonly VgStreamWrapper _vgStreamWrapper;
+
+        private readonly ILogger _logger = Logging.Create<SoundPlayer>();
 
         private static string AudioFolderName => $"{DirectoryHelper.Temp}\\Audio";
 
@@ -124,7 +125,6 @@ namespace Editors.Audio.Utility
                 var wemFilePath = $"{AudioFolderName}\\{fileName}";
                 DirectoryHelper.EnsureFileFolderCreated(wemFilePath);
                 File.WriteAllBytes(wemFilePath, bytes);
-                _logger.Here().Information($"All bytes written to file at {wemFilePath}");
             }
             catch (Exception e)
             {

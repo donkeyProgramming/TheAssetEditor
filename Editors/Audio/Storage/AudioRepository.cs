@@ -26,8 +26,8 @@ namespace Editors.Audio.Storage
         string GetNameFromId(uint value);
         string GetNameFromId(uint value, out bool found);
         string GetNameFromId(uint? key);
-        Dictionary<string, HashSet<uint>> GetUsedHircIdsByBnkFilePathByLanguageId(uint languageId);
-        Dictionary<string, HashSet<uint>> GetUsedSourceIdsByBnkFilePathByLanguageId(uint languageId);
+        HashSet<uint> GetUsedHircIdsByLanguageId(uint languageId);
+        HashSet<uint> GetUsedSourceIdsByLanguageId(uint languageId);
     }
 
     public class AudioRepository : IAudioRepository, IDisposable
@@ -120,26 +120,22 @@ namespace Editors.Audio.Storage
                 throw new Exception("Cannot get name from ID");
         }
 
-        public Dictionary<string, HashSet<uint>> GetUsedHircIdsByBnkFilePathByLanguageId(uint languageId)
+        public HashSet<uint> GetUsedHircIdsByLanguageId(uint languageId)
         {
             return HircsById
-                .Where(hircLookupEntry => hircLookupEntry.Value.Any(hircItem => hircItem.LanguageId == languageId))
                 .SelectMany(hircLookupEntry => hircLookupEntry.Value
-                    .Where(hircItem => hircItem.LanguageId == languageId)
-                    .Select(hircItem => new { hircItem.BnkFilePath, Id = hircLookupEntry.Key }))
-                .GroupBy(hircItem => hircItem.BnkFilePath)
-                .ToDictionary(group => group.Key, group => group.Select(x => x.Id).ToHashSet()
-                );
+                    .Where(hircItem => hircItem.LanguageId == languageId && hircItem.IsCAHircItem == true)
+                    .Select(_ => hircLookupEntry.Key))
+                .ToHashSet();
         }
 
-        public Dictionary<string, HashSet<uint>> GetUsedSourceIdsByBnkFilePathByLanguageId(uint languageId)
+        public HashSet<uint> GetUsedSourceIdsByLanguageId(uint languageId)
         {
             return HircsById
                 .SelectMany(hircLookupEntry => hircLookupEntry.Value
-                    .Where(hircItem => hircItem.LanguageId == languageId && hircItem is ICAkSound)
-                    .Select(hircItem => new { hircItem.BnkFilePath, SourceId = ((ICAkSound)hircItem).GetSourceId() }))
-                .GroupBy(hircItem => hircItem.BnkFilePath)
-                .ToDictionary(group => group.Key, group => group.Select(x => x.SourceId).ToHashSet());
+                    .Where(hircItem => hircItem.LanguageId == languageId && hircItem is ICAkSound && hircItem.IsCAHircItem == true)
+                    .Select(hircItem => ((ICAkSound)hircItem).GetSourceId()))
+                .ToHashSet();
         }
 
         public void Dispose()

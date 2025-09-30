@@ -107,7 +107,7 @@ namespace Editors.Audio.AudioEditor.NewAudioProject
             var filePath = $"{AudioProjectDirectory}\\{fileName}";
             var language = Wh3LanguageInformation.GetGameLanguageAsString(SelectedLanguage);
 
-            var audioProject = AudioProject.Create(currentGame, language);
+            var audioProject = AudioProject.Create(currentGame, language, AudioProjectFileName);
             _audioProjectFileService.Save(audioProject, fileName, filePath);
 
             _audioEditorStateService.StoreAudioProject(audioProject);

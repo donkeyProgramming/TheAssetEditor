@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using Editors.Audio.Utility;
 using Shared.GameFormats.Wwise.Enums;
 
 namespace Editors.Audio.AudioEditor.Models
@@ -17,6 +18,7 @@ namespace Editors.Audio.AudioEditor.Models
         {
             return new DialogueEvent
             {
+                Id = WwiseHash.Compute(name),
                 Name = name
             };
         }

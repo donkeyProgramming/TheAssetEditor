@@ -72,7 +72,7 @@ namespace Editors.Audio.GameInformation.Warhammer3
     // DialogueEventUnitProfile is an interpretation of how much a Dialogue Event is needed in order to have a 'functioning' unit
     // Minimum: The Dialogue Events a unit should use in order to have basic functioning audio
     // Recommended: The Dialogue Events a unit should use in order to have a good level of audio
-    // Compelte: All the Dialogue Events a unit can use
+    // Complete: All the Dialogue Events a unit can use
     public enum Wh3DialogueEventUnitProfile
     {
         [Display(Name = "Show All")] ProfileShowAll,

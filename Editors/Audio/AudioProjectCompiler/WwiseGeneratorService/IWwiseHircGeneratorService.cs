@@ -5,6 +5,6 @@ namespace Editors.Audio.AudioProjectCompiler.WwiseGeneratorService
 {
     public interface IWwiseHircGeneratorService
     {
-        public HircItem GenerateHirc(AudioProjectItem audioProjectItem, SoundBank soundBank);
+        public HircItem GenerateHirc(AudioProjectItem audioProjectItem);
     }
 }

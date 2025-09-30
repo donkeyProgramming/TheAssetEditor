@@ -15,6 +15,7 @@
     // TODO: need to account for the different hirc types in different versions, hmm
     public enum AkBkHircType : byte
     {
+        None = 0x00,
         State = 0x01,
         Sound = 0x02,
         Action = 0x03,

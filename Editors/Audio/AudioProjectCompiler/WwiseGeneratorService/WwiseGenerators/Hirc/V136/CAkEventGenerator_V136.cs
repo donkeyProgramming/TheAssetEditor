@@ -7,7 +7,7 @@ namespace Editors.Audio.AudioProjectCompiler.WwiseGeneratorService.WwiseGenerato
 {
     public class CAkEventGenerator_V136 : IWwiseHircGeneratorService
     {
-        public HircItem GenerateHirc(AudioProjectItem audioProjectItem, SoundBank soundBank)
+        public HircItem GenerateHirc(AudioProjectItem audioProjectItem)
         {
             var audioProjectActionEvent = audioProjectItem as ActionEvent;
             var actionEventHirc = CreateActionEvent(audioProjectActionEvent);

@@ -9,20 +9,20 @@ namespace Editors.Audio.AudioProjectCompiler.WwiseGeneratorService.WwiseGenerato
 {
     public class ActionHircGenerator_V136 : IWwiseHircGeneratorService
     {
-        public HircItem GenerateHirc(AudioProjectItem audioProjectItem, SoundBank soundBank)
+        public HircItem GenerateHirc(AudioProjectItem audioProjectItem)
         {
             var audioProjectActionEvent = audioProjectItem as Action;
 
-            var actionHirc = CreateAction(audioProjectActionEvent, soundBank.GameSoundBank);
+            var actionHirc = CreateAction(audioProjectActionEvent, audioProjectActionEvent.GameSoundBank);
 
             if (audioProjectActionEvent.ActionType == AkActionType.Play)
-                actionHirc.PlayActionParams = CreatePlayActionParams(soundBank);
+                actionHirc.PlayActionParams = CreatePlayActionParams(audioProjectActionEvent.BankId);
             else if (audioProjectActionEvent.ActionType == AkActionType.Pause_E_O)
-                actionHirc.ActiveActionParams = CreatePauseActionParams(soundBank);
+                actionHirc.ActiveActionParams = CreatePauseActionParams();
             else if (audioProjectActionEvent.ActionType == AkActionType.Resume_E_O)
-                actionHirc.ActiveActionParams = CreateResumeActionParams(soundBank);
+                actionHirc.ActiveActionParams = CreateResumeActionParams();
             else if (audioProjectActionEvent.ActionType == AkActionType.Stop_E_O)
-                actionHirc.ActiveActionParams = CreateStopActionParams(soundBank);
+                actionHirc.ActiveActionParams = CreateStopActionParams();
 
             actionHirc.UpdateSectionSize();
 
@@ -51,16 +51,16 @@ namespace Editors.Audio.AudioProjectCompiler.WwiseGeneratorService.WwiseGenerato
             return action;
         }
 
-        private static CAkAction_V136.PlayActionParams_V136 CreatePlayActionParams(SoundBank soundBank)
+        private static CAkAction_V136.PlayActionParams_V136 CreatePlayActionParams(uint bankId)
         {
             return new CAkAction_V136.PlayActionParams_V136
             {
                 BitVector = 4,
-                BankId = soundBank.Id
+                BankId = bankId
             };
         }
 
-        private static CAkAction_V136.ActiveActionParams_V136 CreatePauseActionParams(SoundBank soundBank)
+        private static CAkAction_V136.ActiveActionParams_V136 CreatePauseActionParams()
         {
             return new CAkAction_V136.ActiveActionParams_V136
             {
@@ -76,7 +76,7 @@ namespace Editors.Audio.AudioProjectCompiler.WwiseGeneratorService.WwiseGenerato
             };
         }
 
-        private static CAkAction_V136.ActiveActionParams_V136 CreateResumeActionParams(SoundBank soundBank)
+        private static CAkAction_V136.ActiveActionParams_V136 CreateResumeActionParams()
         {
             return new CAkAction_V136.ActiveActionParams_V136
             {
@@ -92,7 +92,7 @@ namespace Editors.Audio.AudioProjectCompiler.WwiseGeneratorService.WwiseGenerato
             };
         }
 
-        private static CAkAction_V136.ActiveActionParams_V136 CreateStopActionParams(SoundBank soundBank)
+        private static CAkAction_V136.ActiveActionParams_V136 CreateStopActionParams()
         {
             return new CAkAction_V136.ActiveActionParams_V136
             {

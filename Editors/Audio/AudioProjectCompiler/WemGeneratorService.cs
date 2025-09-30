@@ -1,7 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using Editors.Audio.AudioEditor.Models;
 using Editors.Audio.Utility;
+using Serilog;
+using Shared.Core.ErrorHandling;
 using Shared.Core.Misc;
 using Shared.Core.PackFiles;
 
@@ -10,14 +13,15 @@ namespace Editors.Audio.AudioProjectCompiler
     public interface IWemGeneratorService
     {
         void GenerateWems(List<Sound> sounds);
-        void SaveWemToPack(string wemDiskFilePath, string wemPackFilePath);
+        void SaveWemsToPack(List<Sound> sounds);
     }
 
-    public class WemGeneratorService(IPackFileService packFileService, WSourcesWrapper wSourcesWrapper, SoundPlayer soundPlayer) : IWemGeneratorService
+    public class WemGeneratorService(IPackFileService packFileService, WSourcesWrapper wSourcesWrapper) : IWemGeneratorService
     {
         private readonly IPackFileService _packFileService = packFileService;
         private readonly WSourcesWrapper _wSourcesWrapper = wSourcesWrapper;
-        private readonly SoundPlayer _soundPlayer = soundPlayer;
+
+        private readonly ILogger _logger = Logging.Create<WemGeneratorService>();
 
         public void GenerateWems(List<Sound> sounds)
         {
@@ -31,7 +35,10 @@ namespace Editors.Audio.AudioProjectCompiler
             {
                 var wavFile = _packFileService.FindFile(sound.WavPackFilePath);
                 var wavFileName = $"{sound.SourceId}.wav";
-                _soundPlayer.ExportFileToAEFolder(wavFileName, wavFile.DataSource.ReadData());
+                var wavFilePath = $"{audioFolderPath}\\{wavFileName}";
+
+                ExportWav(wavFilePath, wavFile.DataSource.ReadData());
+
                 wavFileNames.Add(wavFileName);
             }
 
@@ -46,9 +53,26 @@ namespace Editors.Audio.AudioProjectCompiler
             _wSourcesWrapper.DeleteExcessStuff();
         }
 
-        public void SaveWemToPack(string wemDiskFilePath, string wemPackFilePath)
+        public void SaveWemsToPack(List<Sound> sounds)
         {
-            PackFileUtil.LoadFileFromDisk(_packFileService, new PackFileUtil.FileRef(wemDiskFilePath, Path.GetDirectoryName(wemPackFilePath)));
+            var wemFiles = new List<PackFileUtil.FileRef>();
+            foreach (var sound in sounds)
+                wemFiles.Add(new PackFileUtil.FileRef(sound.WemDiskFilePath, Path.GetDirectoryName(sound.WemPackFilePath)));
+
+            PackFileUtil.LoadFilesFromDisk(_packFileService, wemFiles);
+        }
+
+        private void ExportWav(string filePath, byte[] bytes)
+        {
+            try
+            {
+                DirectoryHelper.EnsureFileFolderCreated(filePath);
+                File.WriteAllBytes(filePath, bytes);
+            }
+            catch (Exception e)
+            {
+                _logger.Here().Error(e.Message);
+            }
         }
     }
 }

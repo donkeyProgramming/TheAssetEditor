@@ -29,7 +29,7 @@ namespace Editors.Audio.AudioProjectCompiler.WwiseGeneratorService
             var generator = CreateInstance(audioProjectItem.HircType);
             if (generator == null)
                 throw new Exception($"No Hirc generator registered for type {audioProjectItem.HircType}");
-            return generator.GenerateHirc(audioProjectItem, soundBank);
+            return generator.GenerateHirc(audioProjectItem);
         }
 
         public static WwiseHircGeneratorServiceFactory CreateFactory(uint bankGeneratorVersion)

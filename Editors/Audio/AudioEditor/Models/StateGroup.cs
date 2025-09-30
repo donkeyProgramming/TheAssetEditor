@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using Editors.Audio.Utility;
 
 namespace Editors.Audio.AudioEditor.Models
 {
@@ -11,6 +12,7 @@ namespace Editors.Audio.AudioEditor.Models
         {
             return new StateGroup
             {
+                Id = WwiseHash.Compute(name),
                 Name = name
             };
         }
@@ -19,6 +21,7 @@ namespace Editors.Audio.AudioEditor.Models
         {
             return new StateGroup
             {
+                Id = WwiseHash.Compute(name),
                 Name = name,
                 States = states
             };

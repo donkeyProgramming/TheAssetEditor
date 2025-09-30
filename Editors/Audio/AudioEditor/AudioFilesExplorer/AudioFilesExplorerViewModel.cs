@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Linq;
@@ -15,7 +14,6 @@ using Editors.Audio.AudioEditor.UICommands;
 using Shared.Core.Events;
 using Shared.Core.Events.Global;
 using Shared.Core.PackFiles;
-using Shared.Core.PackFiles.Models;
 
 namespace Editors.Audio.AudioEditor.AudioFilesExplorer
 {
@@ -60,9 +58,9 @@ namespace Editors.Audio.AudioEditor.AudioFilesExplorer
 
             _eventHub.Register<AudioProjectExplorerNodeSelectedEvent>(this, OnAudioProjectExplorerNodeSelected);
             _eventHub.Register<AudioFilesChangedEvent>(this, OnAudioFilesChanged);
-            _globalEventHub.Register<PackFileContainerFilesAddedEvent>(this, x => RefreshAudioFilesTree(x.Container));
-            _globalEventHub.Register<PackFileContainerFilesRemovedEvent>(this, x => RefreshAudioFilesTree(x.Container));
-            _globalEventHub.Register<PackFileContainerFolderRemovedEvent>(this, x => RefreshAudioFilesTree(x.Container));
+            _globalEventHub.Register<PackFileContainerFilesAddedEvent>(this, x => _audioFilesTreeBuilder.BuildTree(x.Container));
+            _globalEventHub.Register<PackFileContainerFilesRemovedEvent>(this, x => _audioFilesTreeBuilder.BuildTree(x.Container));
+            _globalEventHub.Register<PackFileContainerFolderRemovedEvent>(this, x => _audioFilesTreeBuilder.BuildTree(x.Container));
 
             var editablePack = _packFileService.GetEditablePack();
             if (editablePack == null)

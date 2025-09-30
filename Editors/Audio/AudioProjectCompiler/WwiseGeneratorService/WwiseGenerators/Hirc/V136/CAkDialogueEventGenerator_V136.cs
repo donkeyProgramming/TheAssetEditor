@@ -10,7 +10,7 @@ namespace Editors.Audio.AudioProjectCompiler.WwiseGeneratorService.WwiseGenerato
 {
     public class CAkDialogueEventGenerator_V136 : IWwiseHircGeneratorService
     {
-        public HircItem GenerateHirc(AudioProjectItem audioProjectItem, SoundBank soundBank)
+        public HircItem GenerateHirc(AudioProjectItem audioProjectItem)
         {
             var audioProjectDialogueEvent = audioProjectItem as DialogueEvent;
             var dialogueEventHirc = CreateDialogueEvent(audioProjectDialogueEvent);

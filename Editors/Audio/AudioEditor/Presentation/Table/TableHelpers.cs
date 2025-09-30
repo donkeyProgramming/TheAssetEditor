@@ -68,7 +68,7 @@ namespace Editors.Audio.AudioEditor.Presentation.Table
 
         public static string GetStatePathNameFromRow(DataRow row, IAudioRepository audioRepository, string dialogueEventName)
         {
-            var statePathNodes = new List<StatePathNode>();
+            var statePathNodes = new List<StatePath.StatePathNode>();
             foreach (DataColumn column in row.Table.Columns)
             {
                 // CA sometimes add new State Groups into a Dialogue Event
@@ -85,7 +85,7 @@ namespace Editors.Audio.AudioEditor.Presentation.Table
                 var stateGroupNameWithQualifier = DeduplicateUnderscores(column.ColumnName);
                 var stateGroupName = GetStateGroupFromStateGroupWithQualifier(audioRepository, dialogueEventName, stateGroupNameWithQualifier);
 
-                var statePathNode = new StatePathNode
+                var statePathNode = new StatePath.StatePathNode
                 {
                     StateGroup = new StateGroup { Name = stateGroupName },
                     State = new State { Name = stateName }

@@ -21,7 +21,7 @@ namespace Editors.Audio.GameInformation.Warhammer3
 
     public static class Wh3LanguageInformation
     {
-        public static string GetGameLanguageAsString(this Wh3GameLanguage language)
+        public static string GetGameLanguageAsString(Wh3GameLanguage language)
         {
             var member = typeof(Wh3GameLanguage)
                 .GetMember(language.ToString())

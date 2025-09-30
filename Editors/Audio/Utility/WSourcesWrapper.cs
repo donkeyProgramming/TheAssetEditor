@@ -6,14 +6,19 @@ using System.IO.Compression;
 using System.Linq;
 using System.Reflection;
 using System.Xml.Linq;
+using Serilog;
+using Shared.Core.ErrorHandling;
 using Shared.Core.Misc;
 using Shared.Core.Settings;
+
 
 namespace Editors.Audio.Utility
 {
     public class WSourcesWrapper
     {
         private readonly ApplicationSettingsService _applicationSettingsService;
+
+        private readonly ILogger _logger = Logging.Create<WSourcesWrapper>();
 
         private readonly string _wavToWemFolderPath = $"{DirectoryHelper.Temp}\\WavToWem";
         private readonly string _audioFolderPath = $"{DirectoryHelper.Temp}\\Audio";
@@ -29,25 +34,24 @@ namespace Editors.Audio.Utility
 
         public void CreateWsourcesFile(List<string> wavFilesNames)
         {
-            var sources = from wavFileName in wavFilesNames
-                          select new XElement("Source",
-                              new XAttribute("Path", wavFileName),
-                              new XAttribute("Conversion", "Vorbis Quality High"));
+            var sources = from wavFileName in wavFilesNames 
+                          select new XElement("Source", new XAttribute("Path", wavFileName), new XAttribute("Conversion", "Vorbis Quality High"));
 
             var document = new XDocument(
-                new XDeclaration("1.0", "UTF-8", null),
-                new XElement("ExternalSourcesList",
-                    new XAttribute("SchemaVersion", "1"),
-                    new XAttribute("Root", _audioFolderPath),
-                    sources));
+                new XDeclaration("1.0", "UTF-8", null), 
+                new XElement("ExternalSourcesList", 
+                new XAttribute("SchemaVersion", "1"), 
+                new XAttribute("Root", _audioFolderPath), 
+                sources));
 
             document.Save(_wsourcesPath);
 
-            Console.WriteLine($"Saved WSources file to {_wsourcesPath}");
+            _logger.Here().Information($"Saved WSources file to {_wsourcesPath}");
         }
 
         public void RunExternalCommand(string arguments)
         {
+            _logger.Here().Information($"Running WwiseCLI.exe with arguments: {arguments}");
             try
             {
                 var startInfo = new ProcessStartInfo()
@@ -66,15 +70,13 @@ namespace Editors.Audio.Utility
                 var output = process.StandardOutput.ReadToEnd();
                 var error = process.StandardError.ReadToEnd();
 
-                Console.WriteLine(output);
+                _logger.Here().Information($"{output}");
                 if (!string.IsNullOrEmpty(error))
-                {
-                    Console.Error.WriteLine(error);
-                }
+                    _logger.Here().Error($"{error}");
             }
-            catch (Exception ex)
+            catch (Exception e)
             {
-                Console.WriteLine($"Error running command: {ex.Message}");
+                throw new InvalidOperationException($"Error running command: {e.Message}");
             }
         }
 
@@ -83,42 +85,31 @@ namespace Editors.Audio.Utility
             if (Directory.Exists(_excessFilesFolderPath))
             {
                 var wemFiles = Directory.GetFiles(_excessFilesFolderPath, "*.wem");
-
                 foreach (var file in wemFiles)
                 {
                     var fileName = Path.GetFileName(file);
                     var fileDestination = Path.Combine(_audioFolderPath, fileName);
 
                     if (!File.Exists(fileDestination))
-                    {
                         File.Move(file, fileDestination);
-                        Console.WriteLine($"Moved {file} to {fileDestination}");
-                    }
-                    else
-                        Console.WriteLine($"File {fileName} already exists at the destination. Skipping move.");
                 }
 
                 var remainingFiles = Directory.GetFiles(_excessFilesFolderPath);
-
                 foreach (var file in remainingFiles)
-                {
                     File.Delete(file);
-                    Console.WriteLine($"Deleted {file}");
-                }
 
                 try
                 {
-                    Directory.Delete(_excessFilesFolderPath, true); // The true parameter allows for recursive deletion
-                    Console.WriteLine($"Deleted directory {_excessFilesFolderPath}");
+                    Directory.Delete(_excessFilesFolderPath, true);
                 }
                 catch (IOException e)
                 {
-                    Console.WriteLine($"The directory could not be deleted or another error occurred: {e.Message}");
+                    throw new InvalidOperationException($"The directory could not be deleted or another error occurred: {e.Message}");
                 }
             }
             else
             {
-                Console.WriteLine($"The directory {_excessFilesFolderPath} does not exist.");
+                _logger.Here().Information($"The directory {_excessFilesFolderPath} does not exist.");
             }
         }
 

@@ -10,6 +10,8 @@ using Editors.Audio.AudioEditor;
 using Editors.Audio.AudioEditor.AudioProjectViewer;
 using Editors.Audio.AudioEditor.Models;
 using Editors.Audio.AudioEditor.Settings;
+using Editors.Audio.AudioProjectCompiler;
+using Editors.Audio.GameInformation.Warhammer3;
 using Editors.Audio.Storage;
 using Editors.Audio.Utility;
 using Serilog;
@@ -35,7 +37,7 @@ namespace Editors.Audio.AudioProjectConverter
     public class StatePathInfo
     {
         public string JoinedStatePath { get; set; }
-        public List<StatePathNode> StatePathNodes { get; set; }
+        public List<StatePath.StatePathNode> StatePathNodes { get; set; }
         public List<WavFile> WavFiles { get; set; }
     }
 
@@ -94,7 +96,7 @@ namespace Editors.Audio.AudioProjectConverter
             var fileName = $"{AudioProjectName}.aproj";
             var filePath = $"{OutputDirectoryPath}\\{fileName}";
             var language = "english(uk)";
-            var audioProject = AudioProject.Create(currentGame, language);
+            var audioProject = AudioProject.Create(currentGame, language, AudioProjectName);
 
             var soundBankPaths = new List<string>();
             if (Directory.Exists(BnksDirectoryPath))
@@ -125,8 +127,31 @@ namespace Editors.Audio.AudioProjectConverter
                     dialogueEventsToProcess,
                     moddedStateGroups);
 
+            var usedHircIds = new HashSet<uint>();
+            var usedSourceIds = new HashSet<uint>();
+
+            var audioProjectGeneratableItemIds = audioProject.GetGeneratableItemIds();
+            var audioProjectSourceIds = audioProject.GetSourceIds();
+
+            var languageId = WwiseHash.Compute(audioProject.Language);
+            var gameLanguageHircIds = _audioRepository.GetUsedHircIdsByLanguageId(languageId);
+            var gameLanguageSourceIds = _audioRepository.GetUsedSourceIdsByLanguageId(languageId);
+
+            usedHircIds.UnionWith(audioProjectGeneratableItemIds);
+            usedHircIds.UnionWith(gameLanguageHircIds);
+            usedSourceIds.UnionWith(audioProjectSourceIds);
+            usedSourceIds.UnionWith(gameLanguageSourceIds);
+
             foreach (var dialogueEvent in dialogueEventsToProcess)
-                ProcessDialogueEvent(audioProject, dialogueEvent, processedWems, dialogueEventsLookupByWemId, statePathsLookupByDialogueEvent, globalBaseNameUsage);
+                ProcessDialogueEvent(
+                    audioProject,
+                    dialogueEvent,
+                    processedWems,
+                    dialogueEventsLookupByWemId,
+                    statePathsLookupByDialogueEvent,
+                    globalBaseNameUsage,
+                    usedHircIds,
+                    usedSourceIds);
 
             ProcessModdedStateGroups(audioProject, moddedStateGroups);
 
@@ -244,7 +269,7 @@ namespace Editors.Audio.AudioProjectConverter
                     continue;
 
                 var wavFiles = new List<WavFile>();
-                var statePathNodes = new List<StatePathNode>();
+                var statePathNodes = new List<StatePath.StatePathNode>();
 
                 StoreStateGroupAndStateInfo(dialogueEvent, statesLookupByStateId, statesLookupByStateGroupByStateId, statePath, statePathNodes, moddedStateGroups);
 
@@ -281,7 +306,7 @@ namespace Editors.Audio.AudioProjectConverter
             Dictionary<uint, string> wwiseStatesIdLookup,
             Dictionary<string, Dictionary<uint, string>> statesLookupByStateGroupByStateId,
             DecisionPathHelper.DecisionPath statePath,
-            List<StatePathNode> statePathNodes,
+            List<StatePath.StatePathNode> statePathNodes,
             Dictionary<string, List<string>> moddedStateGroups)
         {
             var stateGroupIndex = 0;
@@ -300,7 +325,7 @@ namespace Editors.Audio.AudioProjectConverter
                         state = unhashedState;
                 }
 
-                statePathNodes.Add(new StatePathNode
+                statePathNodes.Add(new StatePath.StatePathNode
                 {
                     StateGroup = new StateGroup { Name = stateGroup },
                     State = new State { Name = state }
@@ -368,7 +393,7 @@ namespace Editors.Audio.AudioProjectConverter
             }
         }
 
-        private static void StoreStatePathInfo(Dictionary<string, List<StatePathInfo>> statePathsLookupByDialogueEvent, List<WavFile> wavFiles, string dialogueEventName, List<StatePathNode> statePathNodes)
+        private static void StoreStatePathInfo(Dictionary<string, List<StatePathInfo>> statePathsLookupByDialogueEvent, List<WavFile> wavFiles, string dialogueEventName, List<StatePath.StatePathNode> statePathNodes)
         {
             var joinedStatePath = string.Join(".", statePathNodes.Select(statePathNode => statePathNode.State.Name));
 
@@ -395,10 +420,13 @@ namespace Editors.Audio.AudioProjectConverter
             Dictionary<uint, AudioFile> processedWems,
             Dictionary<uint, List<string>> dialogueEventsLookupByWemId,
             Dictionary<string, List<StatePathInfo>> statePathsLookupByDialogueEvent,
-            Dictionary<string, int> globalBaseNameUsage)
+            Dictionary<string, int> globalBaseNameUsage,
+            HashSet<uint> usedHircIds,
+            HashSet<uint> usedSourceIds)
         {
             var dialogueEventHirc = dialogueEvent as HircItem;
             var dialogueEventName = _audioRepository.GetNameFromId(dialogueEventHirc.Id);
+            var actorMixerId = Wh3DialogueEventInformation.GetActorMixerId(dialogueEventName);
 
             _logger.Here().Information($"Processing Dialogue Event: {dialogueEventName}");
 
@@ -439,17 +467,27 @@ namespace Editors.Audio.AudioProjectConverter
                 StatePath audioProjectStatePath;
                 if (audioFiles.Count > 1)
                 {
-                    var sounds = audioFiles
-                        .Select(audioFile => Sound.Create(audioFile.FileName, audioFile.FilePath))
-                        .ToList();
+                    var randomSequenceContainerIds = IdGenerator.GenerateAudioProjectGeneratableItemIds(usedHircIds);
+                    var sounds = new List<Sound>();
+                    foreach (var audioFile in audioFiles)
+                    {
+                        var soundIds = IdGenerator.GenerateAudioProjectGeneratableItemIds(usedHircIds);
+                        var sourceId = IdGenerator.GenerateSourceId(usedHircIds, audioFile.FilePath, false);
+                        var sound = Sound.Create(soundIds.Guid, soundIds.Id, randomSequenceContainerIds.Id, sourceId, audioFile.FileName, audioFile.FilePath);
+                        sounds.Add(sound);
+                    }
+
                     var randomSequenceContainerSettings = AudioSettings.CreateRecommendedRandomSequenceContainerSettings(audioFiles.Count);
-                    var randomSequenceContainer = RandomSequenceContainer.Create(randomSequenceContainerSettings, sounds);
+                    var randomSequenceContainer = RandomSequenceContainer.Create(randomSequenceContainerIds.Guid, randomSequenceContainerIds.Id, randomSequenceContainerSettings, sounds, directParentId: actorMixerId);
                     audioProjectStatePath = StatePath.Create(statePath.StatePathNodes, randomSequenceContainer);
                 }
                 else
                 {
+                    var audioFile = audioFiles[0];
+                    var soundIds = IdGenerator.GenerateAudioProjectGeneratableItemIds(usedHircIds);
+                    var sourceId = IdGenerator.GenerateSourceId(usedHircIds, audioFile.FilePath, false);
                     var soundSettings = AudioSettings.CreateSoundSettings();
-                    var sound = Sound.Create(audioFiles[0]);
+                    var sound = Sound.Create(soundIds.Guid, soundIds.Id, actorMixerId, sourceId, audioFile.FileName, audioFile.FilePath);
                     audioProjectStatePath = StatePath.Create(statePath.StatePathNodes, sound);
                 }
 

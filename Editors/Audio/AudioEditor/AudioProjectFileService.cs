@@ -24,16 +24,16 @@ namespace Editors.Audio.AudioEditor
         IPackFileService packFileService,
         IFileSaveService fileSaveService,
         IStandardDialogs standardDialogs,
-        ApplicationSettingsService applicationSettingsService,
-        IAudioProjectIntegrityService audioProjectIntegrityService) : IAudioProjectFileService
+        IAudioEditorIntegrityService audioEditorIntegrityService,
+        ApplicationSettingsService applicationSettingsService) : IAudioProjectFileService
     {
         private readonly IEventHub _eventHub = eventHub;
         private readonly IAudioEditorStateService _audioEditorStateService = audioEditorStateService;
         private readonly IPackFileService _packFileService = packFileService;
         private readonly IFileSaveService _fileSaveService = fileSaveService;
         private readonly IStandardDialogs _standardDialogs = standardDialogs;
+        private readonly IAudioEditorIntegrityService _audioEditorIntegrityService = audioEditorIntegrityService;
         private readonly ApplicationSettingsService _applicationSettingsService = applicationSettingsService;
-        private readonly IAudioProjectIntegrityService _audioProjectIntegrityService = audioProjectIntegrityService;
 
         public void Save(AudioProject audioProject, string fileName, string filePath)
         {
@@ -57,24 +57,26 @@ namespace Editors.Audio.AudioEditor
             {
                 var filePath = _packFileService.GetFullPath(result.File);
                 var fileName = Path.GetFileName(filePath);
+                var fileNameWithoutExtension = Path.GetFileNameWithoutExtension(fileName);
                 var packFile = _packFileService.FindFile(filePath);
                 var bytes = packFile.DataSource.ReadData();
                 var audioProjectJson = Encoding.UTF8.GetString(bytes);
                 var audioProject = JsonSerializer.Deserialize<AudioProject>(audioProjectJson);
 
+                _audioEditorIntegrityService.CheckAudioProjectDialogueEventIntegrity(audioProject);
+                _audioEditorIntegrityService.CheckAudioProjectWavFilesIntegrity(audioProject);
+                _audioEditorIntegrityService.CheckAudioProjectIdsIntegrity(audioProject, fileNameWithoutExtension);
+
                 // We create a 'dirty' Audio Project to display the whole model in the Audio Project Explorer rather than
                 // just the clean data from the loaded Audio Project as when it's saved any unused parts are removed.
                 var currentGame = _applicationSettingsService.CurrentSettings.CurrentGame;
-                var dirtyAudioProject = AudioProject.Create(audioProject, currentGame);
+                var dirtyAudioProject = AudioProject.Create(audioProject, currentGame, fileNameWithoutExtension);
 
                 _audioEditorStateService.StoreAudioProject(dirtyAudioProject);
                 _audioEditorStateService.StoreAudioProjectFileName(fileName);
                 _audioEditorStateService.StoreAudioProjectFilePath(filePath);
 
                 _eventHub.Publish(new AudioProjectInitialisedEvent());
-
-                _audioProjectIntegrityService.CheckAudioProjectDialogueEventIntegrity(dirtyAudioProject);
-                _audioProjectIntegrityService.CheckAudioProjectWavFilesIntegrity(dirtyAudioProject);
             }
         }
     }

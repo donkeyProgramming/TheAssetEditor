@@ -31,7 +31,7 @@ namespace Editors.Audio.AudioEditor
         private readonly IAudioEditorStateService _audioEditorStateService;
         private readonly IAudioProjectFileService _audioProjectFileService;
         private readonly IAudioProjectCompilerService _audioProjectCompilerService;
-        private readonly IAudioProjectIntegrityService _audioProjectIntegrityService;
+        private readonly IAudioEditorIntegrityService _audioEditorIntegrityService;
 
         public string DisplayName { get; set; } = "Audio Editor";
 
@@ -46,14 +46,14 @@ namespace Editors.Audio.AudioEditor
             IAudioEditorStateService audioEditorStateService,
             IAudioProjectFileService audioProjectFileService,
             IAudioProjectCompilerService audioProjectCompilerService,
-            IAudioProjectIntegrityService audioProjectIntegrityService)
+            IAudioEditorIntegrityService audioEditorIntegrityService)
         {
             _uiCommandFactory = uiCommandFactory;
             _eventHub = eventHub;
             _audioEditorStateService = audioEditorStateService;
             _audioProjectFileService = audioProjectFileService;
             _audioProjectCompilerService = audioProjectCompilerService;
-            _audioProjectIntegrityService = audioProjectIntegrityService;
+            _audioEditorIntegrityService = audioEditorIntegrityService;
 
             AudioProjectExplorerViewModel = audioProjectExplorerViewModel;
             AudioFilesExplorerViewModel = audioFilesExplorerViewModel;
@@ -61,7 +61,7 @@ namespace Editors.Audio.AudioEditor
             AudioProjectViewerViewModel = audioProjectViewerViewModel;
             SettingsViewModel = settingsViewModel;
 
-            _audioProjectIntegrityService.CheckDialogueEventInformationIntegrity(Wh3DialogueEventInformation.Information);
+            _audioEditorIntegrityService.CheckDialogueEventInformationIntegrity(Wh3DialogueEventInformation.Information);
         }
 
         [RelayCommand] public void NewAudioProject() => _uiCommandFactory.Create<OpenNewAudioProjectWindowCommand>().Execute();

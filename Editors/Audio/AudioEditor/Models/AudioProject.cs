@@ -12,9 +12,21 @@ namespace Editors.Audio.AudioEditor.Models
 {
     public abstract class AudioProjectItem : IComparable, IComparable<AudioProjectItem>, IEquatable<AudioProjectItem>
     {
-        [JsonPropertyOrder(-3)] public string Name { get; set; }
-        [JsonPropertyOrder(-2)] public uint Id { get; set; }
-        [JsonPropertyOrder(-1)] public AkBkHircType HircType { get; set; }
+        [JsonPropertyOrder(-4)]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+        public string Name { get; set; }
+
+        [JsonPropertyOrder(-3)] 
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)] 
+        public Guid Guid { get; set; }
+
+        [JsonPropertyOrder(-2)]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)] 
+        public uint Id { get; set; }
+
+        [JsonPropertyOrder(-1)]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)] 
+        public AkBkHircType HircType { get; set; }
 
         public int CompareTo(object obj) => CompareTo(obj as AudioProjectItem);
         public int CompareTo(AudioProjectItem other) => string.Compare(Name, other?.Name, StringComparison.Ordinal);
@@ -41,24 +53,22 @@ namespace Editors.Audio.AudioEditor.Models
         public List<SoundBank> SoundBanks { get; set; }
         public List<StateGroup> StateGroups { get; set; }
 
-        public static AudioProject Create(GameTypeEnum currentGame, string language)
+        public static AudioProject Create(GameTypeEnum currentGame, string language, string nameWithoutExtension)
         {
             if (currentGame == GameTypeEnum.Warhammer3)
-            {
                 return new AudioProject
                 {
                     Language = language,
-                    SoundBanks = CreateSoundBanks(),
+                    SoundBanks = CreateSoundBanks(nameWithoutExtension, language),
                     StateGroups = CreateStateGroups()
                 };
-            }
 
             return null;
         }
 
-        public static AudioProject Create(AudioProject cleanAudioProject, GameTypeEnum currentGame)
+        public static AudioProject Create(AudioProject cleanAudioProject, GameTypeEnum currentGame, string nameWithoutExtension)
         {
-            var dirtyAudioProject = Create(currentGame, cleanAudioProject.Language);
+            var dirtyAudioProject = Create(currentGame, cleanAudioProject.Language, nameWithoutExtension);
             MergeSoundBanks(dirtyAudioProject.SoundBanks, cleanAudioProject.SoundBanks);
             MergeStateGroups(dirtyAudioProject.StateGroups, cleanAudioProject.StateGroups);
             return dirtyAudioProject;
@@ -142,30 +152,120 @@ namespace Editors.Audio.AudioEditor.Models
 
         public List<SoundBank> GetSoundBanksWithActionEvents()
         {
-            return SoundBanks.Where(soundBank => soundBank.ActionEvents != null).ToList();
+            return SoundBanks.Where(soundBank => soundBank.ActionEvents != null && soundBank.ActionEvents.Count != 0).ToList();
         }
 
         public List<SoundBank> GetSoundBanksWithDialogueEvents()
         {
-            return SoundBanks.Where(soundBank => soundBank.DialogueEvents != null).ToList();
+            return SoundBanks.Where(soundBank => soundBank.DialogueEvents != null && soundBank.DialogueEvents.Count != 0).ToList();
         }
 
         public List<ActionEvent> GetActionEvents()
         {
-            return SoundBanks
+            return SoundBanks?
+                .Where(soundBank => soundBank?.ActionEvents != null)
                 .SelectMany(soundBank => soundBank.ActionEvents)
-                .ToList();
+                .ToList()
+                ?? [];
         }
 
-        private static List<SoundBank> CreateSoundBanks()
+        public List<AudioProjectItem> GetGeneratableItems()
+        {
+            var audioProjectItems = new List<AudioProjectItem>();
+
+            if (SoundBanks != null)
+            {
+                foreach (var soundBank in SoundBanks)
+                {
+                    if (soundBank == null) 
+                        continue;
+                    audioProjectItems.Add(soundBank);
+
+                    if (soundBank.ActionEvents != null)
+                    {
+                        foreach (var actionEvent in soundBank.ActionEvents)
+                        {
+                            if (actionEvent == null) 
+                                continue;
+                            audioProjectItems.Add(actionEvent);
+
+                            if (actionEvent.Actions != null)
+                            {
+                                foreach (var action in actionEvent.Actions)
+                                {
+                                    if (action == null) 
+                                        continue;
+
+                                    audioProjectItems.Add(action);
+
+                                    if (action.Sound != null)
+                                        audioProjectItems.Add(action.Sound);
+
+                                    if (action.RandomSequenceContainer != null)
+                                    {
+                                        audioProjectItems.Add(action.RandomSequenceContainer);
+                                        if (action.RandomSequenceContainer.Sounds != null)
+                                            audioProjectItems.AddRange(action.RandomSequenceContainer.Sounds);
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    if (soundBank.DialogueEvents != null)
+                    {
+                        foreach (var dialogueEvent in soundBank.DialogueEvents)
+                        {
+                            if (dialogueEvent == null) 
+                                continue;
+
+                            audioProjectItems.Add(dialogueEvent);
+
+                            if (dialogueEvent.StatePaths != null)
+                            {
+                                foreach (var statePath in dialogueEvent.StatePaths)
+                                {
+                                    if (statePath == null) 
+                                        continue;
+
+                                    if (statePath.Sound != null)
+                                        audioProjectItems.Add(statePath.Sound);
+
+                                    if (statePath.RandomSequenceContainer != null)
+                                    {
+                                        audioProjectItems.Add(statePath.RandomSequenceContainer);
+                                        if (statePath.RandomSequenceContainer.Sounds != null)
+                                            audioProjectItems.AddRange(statePath.RandomSequenceContainer.Sounds);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            return audioProjectItems;
+        }
+
+        public HashSet<uint> GetGeneratableItemIds() => GetGeneratableItems().Select(item => item.Id).ToHashSet();
+
+        public HashSet<uint> GetSourceIds() => GetSounds().Select(item => item.SourceId).ToHashSet();
+
+        private static List<SoundBank> CreateSoundBanks(string audioProjectNameWithoutExtension, string audioProjectLanguage)
         {
             var soundBanks = new List<SoundBank>();
 
             foreach (var soundBankDefinition in Wh3SoundBankInformation.Information)
             {
                 var gameSoundBank = soundBankDefinition.GameSoundBank;
-                var soundBankName = Wh3SoundBankInformation.GetName(gameSoundBank);
-                var soundBank = SoundBank.Create(soundBankName, gameSoundBank);
+                var soundBankInformationName = Wh3SoundBankInformation.GetName(gameSoundBank);
+                var soundBankName = $"{soundBankInformationName}_{audioProjectNameWithoutExtension}";
+
+                var language = audioProjectLanguage;
+                var requiredLanguage = Wh3SoundBankInformation.GetRequiredLanguage(gameSoundBank);
+                if (requiredLanguage != null)
+                    language = Wh3LanguageInformation.GetGameLanguageAsString((Wh3GameLanguage)requiredLanguage);
+                var soundBank = SoundBank.Create(soundBankName, gameSoundBank, language);
 
                 if (Wh3ActionEventInformation.Contains(gameSoundBank))
                     soundBank.ActionEvents = [];
@@ -175,7 +275,7 @@ namespace Editors.Audio.AudioEditor.Models
                     soundBank.DialogueEvents = [];
 
                     var filteredDialogueEvents = Wh3DialogueEventInformation.Information
-                        .Where(dialogueEvent => dialogueEvent.SoundBank == Wh3SoundBankInformation.GetSoundBank(soundBankName));
+                        .Where(dialogueEvent => dialogueEvent.SoundBank == gameSoundBank);
                     foreach (var filteredDialogueEvent in filteredDialogueEvents)
                     {
                         var dialogueEvent = DialogueEvent.Create(filteredDialogueEvent.Name);
@@ -219,6 +319,11 @@ namespace Editors.Audio.AudioEditor.Models
 
         private static void MergeSoundBank(SoundBank dirtySoundBank, SoundBank cleanSoundBank)
         {
+            dirtySoundBank.Id = cleanSoundBank.Id;
+            dirtySoundBank.GameSoundBank = cleanSoundBank.GameSoundBank;
+            dirtySoundBank.Language = cleanSoundBank.Language;
+            dirtySoundBank.LanguageId = cleanSoundBank.LanguageId;
+
             MergeDialogueEvents(dirtySoundBank.DialogueEvents, cleanSoundBank.DialogueEvents);
             MergeActionEvents(dirtySoundBank.ActionEvents, cleanSoundBank.ActionEvents);
         }
@@ -232,7 +337,10 @@ namespace Editors.Audio.AudioEditor.Models
             {
                 var dirtyDialogueEvent = dirtyDialogueEvents.FirstOrDefault(dialogueEvent => dialogueEvent.Name == cleanDialogueEvent.Name);
                 if (dirtyDialogueEvent != null)
-                    dirtyDialogueEvent.StatePaths = cleanDialogueEvent.StatePaths;
+                {
+                    dirtyDialogueEvents.Remove(dirtyDialogueEvent);
+                    dirtyDialogueEvents.Add(cleanDialogueEvent);
+                }
             }
         }
 
@@ -276,22 +384,17 @@ namespace Editors.Audio.AudioEditor.Models
 
         private static SoundBank ProcessSoundBank(SoundBank soundBank)
         {
-            var dialogueEvents = (soundBank.DialogueEvents ?? [])
+            soundBank.DialogueEvents = (soundBank.DialogueEvents ?? [])
                 .Where(dialogueEvent => dialogueEvent.StatePaths != null && dialogueEvent.StatePaths.Count != 0)
                 .ToList();
 
-            var actionEvents = (soundBank.ActionEvents ?? [])
+            soundBank.ActionEvents = (soundBank.ActionEvents ?? [])
                 .Where(actionEvent => actionEvent.Actions != null && actionEvent.Actions.Count != 0)
                 .ToList();
 
-            return new SoundBank
-            {
-                Name = soundBank.Name,
-                GameSoundBank = soundBank.GameSoundBank,
-                DialogueEvents = dialogueEvents.Count != 0 ? dialogueEvents : null,
-                ActionEvents = actionEvents.Count != 0 ? actionEvents : null
-            };
+            return soundBank;
         }
+
 
         private static List<StateGroup> CleanStateGroups(List<StateGroup> stateGroups)
         {

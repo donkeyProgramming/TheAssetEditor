@@ -1,6 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Editors.Audio.GameInformation.Warhammer3;
+using Editors.Audio.Utility;
 
 namespace Editors.Audio.AudioEditor.Models
 {
@@ -20,12 +22,15 @@ namespace Editors.Audio.AudioEditor.Models
         public string DialogueEventsSplitMergingFileName { get; set; }
         public string DialogueEventsSplitMergingFilePath { get; set; }
 
-        public static SoundBank Create(string name, Wh3SoundBank gameSoundBank)
+        public static SoundBank Create(string name, Wh3SoundBank gameSoundBank, string language)
         {
             return new SoundBank
             {
+                Id = WwiseHash.Compute(name),
                 Name = name,
-                GameSoundBank = gameSoundBank
+                GameSoundBank = gameSoundBank,
+                Language = language,
+                LanguageId = WwiseHash.Compute(language)
             };
         }
 
@@ -62,7 +67,8 @@ namespace Editors.Audio.AudioEditor.Models
                     && actionEvent.GetResumeActions().Count == 0 
                     && actionEvent.GetPauseActions().Count == 0 
                     && actionEvent.GetStopActions().Count == 0)
-                .ToList();
+                .ToList()
+                ?? [];
         }
 
         public List<ActionEvent> GetPauseActionEvents()
@@ -70,9 +76,10 @@ namespace Editors.Audio.AudioEditor.Models
             return ActionEvents
                 .Where(actionEvent => actionEvent.GetPauseActions().Count != 0
                     && actionEvent.GetPlayActions().Count == 0
-                    && actionEvent.GetResumeActions().Count == 0 
+                    && actionEvent.GetResumeActions().Count == 0
                     && actionEvent.GetStopActions().Count == 0)
-                .ToList();
+                .ToList()
+                ?? [];
         }
 
         public List<ActionEvent> GetResumeActionEvents()
@@ -82,7 +89,8 @@ namespace Editors.Audio.AudioEditor.Models
                     && actionEvent.GetPlayActions().Count == 0
                     && actionEvent.GetPauseActions().Count == 0
                     && actionEvent.GetStopActions().Count == 0)
-                .ToList();
+                .ToList()
+                ?? [];
         }
 
         public List<ActionEvent> GetStopActionEvents()
@@ -92,7 +100,8 @@ namespace Editors.Audio.AudioEditor.Models
                     && actionEvent.GetPlayActions().Count == 0
                     && actionEvent.GetResumeActions().Count == 0 
                     && actionEvent.GetPauseActions().Count == 0)
-                .ToList();
+                .ToList()
+                ?? [];
         }
 
         public List<Action> GetActions()
@@ -140,6 +149,24 @@ namespace Editors.Audio.AudioEditor.Models
             var actionSounds = GetActionSounds();
             var statePathSounds = GetRandomSequenceContainerSounds();
             return [..actionSounds, ..statePathSounds];
+        }
+
+        public ActionEvent GetPlayActionEventFromPauseActionEventName(string pauseActionEventName)
+        {
+            var playActionEventName = string.Concat("Play_", pauseActionEventName.AsSpan("Pause_".Length));
+            return GetActionEvent(playActionEventName);
+        }
+
+        public ActionEvent GetPlayActionEventFromResumeActionEventName(string resumeActionEventName)
+        {
+            var playActionEventName = string.Concat("Play_", resumeActionEventName.AsSpan("Resume_".Length));
+            return GetActionEvent(playActionEventName);
+        }
+
+        public ActionEvent GetPlayActionEventFromStopActionEventName(string stopActionEventName)
+        {
+            var playActionEventName = string.Concat("Play_", stopActionEventName.AsSpan("Stop_".Length));
+            return GetActionEvent(playActionEventName);
         }
     }
 }

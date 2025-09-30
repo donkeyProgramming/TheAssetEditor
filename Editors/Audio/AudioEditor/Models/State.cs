@@ -1,4 +1,6 @@
-﻿namespace Editors.Audio.AudioEditor.Models
+﻿using Editors.Audio.Utility;
+
+namespace Editors.Audio.AudioEditor.Models
 {
     public class State : AudioProjectItem
     {
@@ -6,6 +8,7 @@
         {
             return new State
             {
+                Id = name != "Any" ? WwiseHash.Compute(name) : 0,
                 Name = name
             };
         }

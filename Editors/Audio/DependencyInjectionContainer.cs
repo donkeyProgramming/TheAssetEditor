@@ -31,7 +31,7 @@ namespace Editors.Audio
             // Audio Editor stuff
             serviceCollection.AddScoped<IAudioEditorStateService, AudioEditorStateService>();
             serviceCollection.AddScoped<IAudioProjectFileService, AudioProjectFileService>();
-            serviceCollection.AddScoped<IAudioProjectIntegrityService, AudioProjectIntegrityService>();
+            serviceCollection.AddScoped<IAudioEditorIntegrityService, AudioEditorIntegrityService>();
 
             // Audio Editor View Models
             serviceCollection.AddScoped<AudioEditorViewModel>();
@@ -96,7 +96,6 @@ namespace Editors.Audio
             serviceCollection.AddScoped<ISoundBankGeneratorService, SoundBankGeneratorService>();
             serviceCollection.AddScoped<IWemGeneratorService, WemGeneratorService>();
             serviceCollection.AddScoped<IDatGeneratorService, DatGeneratorService>();
-            serviceCollection.AddScoped<IIdGeneratorService, IdGeneratorService>();
 
             // Audio Explorer
             serviceCollection.AddScoped<AudioExplorerViewModel>();

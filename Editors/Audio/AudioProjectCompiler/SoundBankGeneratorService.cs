@@ -23,6 +23,7 @@ namespace Editors.Audio.AudioProjectCompiler
     {
         void GenerateSoundBank(SoundBank soundBank);
         void GenerateDialogueEventSplitSoundBanks(SoundBank soundBank);
+        void GenerateMergedDialogueEventSoundBanks();
     }
 
     public class SoundBankGeneratorService : ISoundBankGeneratorService
@@ -115,6 +116,22 @@ namespace Editors.Audio.AudioProjectCompiler
             SortHircs(hircItems);
 
             WriteSoundBank(soundBank.DialogueEventsSplitTestingId, soundBank.LanguageId, soundBank.DialogueEventsSplitTestingFileName, soundBank.DialogueEventsSplitTestingFilePath, hircItems);
+        }
+
+        public void GenerateMergedDialogueEventSoundBanks()
+        {
+            var vanillaDialogueEvents = _audioRepository.GetHircItemsByType<ICAkDialogueEvent>()
+                .Select(hircItem => hircItem as HircItem)
+                .Where(hircItem => hircItem.IsCAHircItem == true);
+
+            var moddedDialogueEvents = _audioRepository.GetHircItemsByType<ICAkDialogueEvent>()
+                .Select(hircItem => hircItem as HircItem)
+                .Where(hircItem => hircItem.IsCAHircItem == false);
+
+            foreach (var hircItem in moddedDialogueEvents)
+            {
+
+            }
         }
 
         private void GenerateDialogueEventsSoundBankForMerging(SoundBank soundBank)
