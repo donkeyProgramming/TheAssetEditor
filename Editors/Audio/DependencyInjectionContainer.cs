@@ -15,6 +15,7 @@ using Editors.Audio.AudioEditor.UICommands;
 using Editors.Audio.AudioExplorer;
 using Editors.Audio.AudioProjectCompiler;
 using Editors.Audio.AudioProjectConverter;
+using Editors.Audio.DialogueEventMerger;
 using Editors.Audio.Storage;
 using Editors.Audio.Utility;
 using Microsoft.Extensions.DependencyInjection;
@@ -49,10 +50,15 @@ namespace Editors.Audio
             serviceCollection.AddTransient<AudioProjectConverterViewModel>();
             serviceCollection.AddTransient<AudioProjectConverterWindow>();
 
+            // Dialogue Event Merger tool
+            serviceCollection.AddTransient<DialogueEventMergerViewModel>();
+            serviceCollection.AddTransient<DialogueEventMergerWindow>();
+
             // Audio Editor Commands
             serviceCollection.AddScoped<OpenMovieFileSelectionWindowCommand>();
             serviceCollection.AddScoped<OpenNewAudioProjectWindowCommand>();
             serviceCollection.AddScoped<OpenAudioProjectConverterWindowCommand>();
+            serviceCollection.AddScoped<OpenDialogueEventMergerWindowCommand>();
             serviceCollection.AddScoped<SetAudioFilesCommand>();
             serviceCollection.AddScoped<PlayAudioFileCommand>();
             serviceCollection.AddScoped<AddEditorRowToViewerCommand>();

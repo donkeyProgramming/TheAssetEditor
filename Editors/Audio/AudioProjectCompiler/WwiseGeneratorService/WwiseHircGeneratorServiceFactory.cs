@@ -24,7 +24,7 @@ namespace Editors.Audio.AudioProjectCompiler.WwiseGeneratorService
             return null;
         }
 
-        public HircItem GenerateHirc(AudioProjectItem audioProjectItem, SoundBank soundBank)
+        public HircItem GenerateHirc(AudioProjectItem audioProjectItem)
         {
             var generator = CreateInstance(audioProjectItem.HircType);
             if (generator == null)

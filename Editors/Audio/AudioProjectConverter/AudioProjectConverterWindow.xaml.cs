@@ -7,10 +7,10 @@ namespace Editors.Audio.AudioProjectConverter
         public AudioProjectConverterWindow()
         {
             InitializeComponent();
-            Loaded += AudioProjectConverterWindow_Loaded;
+            Loaded += AudioProjectConverterWindowLoaded;
         }
 
-        private void AudioProjectConverterWindow_Loaded(object sender, RoutedEventArgs e)
+        private void AudioProjectConverterWindowLoaded(object sender, RoutedEventArgs e)
         {
             if (DataContext is AudioProjectConverterViewModel viewModel)
                 viewModel.SetCloseAction(Close);

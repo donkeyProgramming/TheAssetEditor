@@ -73,7 +73,7 @@ namespace Shared.GameFormats.Wwise.Hirc.V136
             var idSize = ByteHelper.GetPropertyTypeSize(Id);
             var probabilitySize = ByteHelper.GetPropertyTypeSize(Probability);
             var treeDepthSize = ByteHelper.GetPropertyTypeSize(TreeDepth);
-            
+
             uint arugumentsSize = 0;
             foreach (var argument in Arguments)
                 arugumentsSize += argument.GetSize();
@@ -81,6 +81,25 @@ namespace Shared.GameFormats.Wwise.Hirc.V136
             var treeDataSizeSize = ByteHelper.GetPropertyTypeSize(TreeDataSize);
             var modeSize = ByteHelper.GetPropertyTypeSize(Mode);
             SectionSize = idSize + probabilitySize + treeDepthSize + arugumentsSize + treeDataSizeSize + modeSize + TreeDataSize + AkPropBundle0.GetSize() + AkPropBundle1.GetSize();
+        }
+
+        public CAkDialogueEvent_V136 Clone()
+        {
+            return new CAkDialogueEvent_V136
+            {
+                LanguageId = LanguageId,
+                HircType = HircType,
+                SectionSize = SectionSize,
+                Id = Id,
+                Probability = Probability,
+                TreeDepth = TreeDepth,
+                TreeDataSize = TreeDataSize,
+                Mode = Mode,
+                Arguments = Arguments.Select(argument => argument is AkGameSync_V136 gameSync ? gameSync.Clone() : argument).Cast<IAkGameSync>().ToList(),
+                AkDecisionTree = AkDecisionTree is AkDecisionTree_V136 decisionTree ? decisionTree.Clone() : AkDecisionTree,
+                AkPropBundle0 = AkPropBundle0.Clone(),
+                AkPropBundle1 = AkPropBundle1.Clone()
+            };
         }
     }
 }

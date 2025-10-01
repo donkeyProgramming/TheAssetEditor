@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Editors.Audio.AudioEditor.Events;
@@ -16,8 +15,6 @@ namespace Editors.Audio.AudioEditor.NewAudioProject
 {
     public partial class NewAudioProjectViewModel : ObservableObject
     {
-        readonly ILogger _logger = Logging.Create<NewAudioProjectViewModel>();
-
         private readonly IEventHub _eventHub;
         private readonly IPackFileService _packFileService;
         private readonly IAudioEditorStateService _audioEditorStateService;
@@ -25,15 +22,14 @@ namespace Editors.Audio.AudioEditor.NewAudioProject
         private readonly ApplicationSettingsService _applicationSettingsService;
         private readonly IStandardDialogs _standardDialogs;
 
+        readonly ILogger _logger = Logging.Create<NewAudioProjectViewModel>();
         private System.Action _closeAction;
 
-        // Settings properties
         [ObservableProperty] private string _audioProjectFileName;
         [ObservableProperty] private string _audioProjectDirectory;
         [ObservableProperty] private Wh3GameLanguage _selectedLanguage;
-        [ObservableProperty] private ObservableCollection<Wh3GameLanguage> _languages = new(Enum.GetValues<Wh3GameLanguage>());
+        [ObservableProperty] private ObservableCollection<Wh3GameLanguage> _languages = new([Wh3GameLanguage.EnglishUK]); //new (Enum.GetValues<Wh3GameLanguage>());
 
-        // Ok button enablement
         [ObservableProperty] private bool _isAudioProjectFileNameSet;
         [ObservableProperty] private bool _isAudioProjectDirectorySet;
         [ObservableProperty] private bool _isLanguageSelected;
@@ -60,7 +56,9 @@ namespace Editors.Audio.AudioEditor.NewAudioProject
 
         partial void OnAudioProjectFileNameChanged(string value)
         {
-            IsAudioProjectFileNameSet = !string.IsNullOrEmpty(value);
+            var audioProjectFileNameWithoutSpaces = value.Replace(" ", "_");
+            AudioProjectFileName = audioProjectFileNameWithoutSpaces;
+            IsAudioProjectFileNameSet = !string.IsNullOrEmpty(AudioProjectFileName);
             UpdateOkButtonIsEnabled();
         }
 
@@ -81,8 +79,7 @@ namespace Editors.Audio.AudioEditor.NewAudioProject
             IsOkButtonEnabled = IsAudioProjectFileNameSet && IsAudioProjectDirectorySet && IsLanguageSelected;
         }
 
-        [RelayCommand]
-        public void SetNewFileLocation()
+        [RelayCommand] public void SetNewFileLocation()
         {
             var result = _standardDialogs.DisplayBrowseFolderDialog();
             if (result.Result)
@@ -93,8 +90,7 @@ namespace Editors.Audio.AudioEditor.NewAudioProject
             }
         }
 
-        [RelayCommand]
-        public void CreateAudioProject()
+        [RelayCommand] public void CreateAudioProject()
         {
             if (_packFileService.GetEditablePack() == null)
             {
@@ -103,11 +99,12 @@ namespace Editors.Audio.AudioEditor.NewAudioProject
             }
 
             var currentGame = _applicationSettingsService.CurrentSettings.CurrentGame;
-            var fileName = $"{AudioProjectFileName}.aproj";
+            var audioProjectFileNameWithoutSpaces = AudioProjectFileName.Replace(" ", "_");
+            var fileName = $"{audioProjectFileNameWithoutSpaces}.aproj";
             var filePath = $"{AudioProjectDirectory}\\{fileName}";
             var language = Wh3LanguageInformation.GetGameLanguageAsString(SelectedLanguage);
 
-            var audioProject = AudioProject.Create(currentGame, language, AudioProjectFileName);
+            var audioProject = AudioProject.Create(currentGame, language, audioProjectFileNameWithoutSpaces);
             _audioProjectFileService.Save(audioProject, fileName, filePath);
 
             _audioEditorStateService.StoreAudioProject(audioProject);

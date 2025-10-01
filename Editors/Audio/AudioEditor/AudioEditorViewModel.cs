@@ -20,12 +20,6 @@ namespace Editors.Audio.AudioEditor
     // TODO: Implement something where the compiler is greyed out until you have a wwise path set
     public partial class AudioEditorViewModel : ObservableObject, IEditorInterface
     {
-        public AudioProjectExplorerViewModel AudioProjectExplorerViewModel { get; }
-        public AudioFilesExplorerViewModel AudioFilesExplorerViewModel { get; }
-        public AudioProjectEditorViewModel AudioProjectEditorViewModel { get; }
-        public AudioProjectViewerViewModel AudioProjectViewerViewModel { get; }
-        public SettingsViewModel SettingsViewModel { get; }
-
         private readonly IUiCommandFactory _uiCommandFactory;
         private readonly IEventHub _eventHub;
         private readonly IAudioEditorStateService _audioEditorStateService;
@@ -33,20 +27,25 @@ namespace Editors.Audio.AudioEditor
         private readonly IAudioProjectCompilerService _audioProjectCompilerService;
         private readonly IAudioEditorIntegrityService _audioEditorIntegrityService;
 
+        public AudioProjectExplorerViewModel AudioProjectExplorerViewModel { get; }
+        public AudioFilesExplorerViewModel AudioFilesExplorerViewModel { get; }
+        public AudioProjectEditorViewModel AudioProjectEditorViewModel { get; }
+        public AudioProjectViewerViewModel AudioProjectViewerViewModel { get; }
+        public SettingsViewModel SettingsViewModel { get; }
         public string DisplayName { get; set; } = "Audio Editor";
 
         public AudioEditorViewModel(
-            AudioProjectExplorerViewModel audioProjectExplorerViewModel,
-            AudioFilesExplorerViewModel audioFilesExplorerViewModel,
-            AudioProjectEditorViewModel audioProjectEditorViewModel,
-            AudioProjectViewerViewModel audioProjectViewerViewModel,
-            SettingsViewModel settingsViewModel,
             IUiCommandFactory uiCommandFactory,
             IEventHub eventHub,
             IAudioEditorStateService audioEditorStateService,
             IAudioProjectFileService audioProjectFileService,
             IAudioProjectCompilerService audioProjectCompilerService,
-            IAudioEditorIntegrityService audioEditorIntegrityService)
+            IAudioEditorIntegrityService audioEditorIntegrityService,
+            AudioProjectExplorerViewModel audioProjectExplorerViewModel,
+            AudioFilesExplorerViewModel audioFilesExplorerViewModel,
+            AudioProjectEditorViewModel audioProjectEditorViewModel,
+            AudioProjectViewerViewModel audioProjectViewerViewModel,
+            SettingsViewModel settingsViewModel)
         {
             _uiCommandFactory = uiCommandFactory;
             _eventHub = eventHub;
@@ -93,6 +92,8 @@ namespace Editors.Audio.AudioEditor
 
             _eventHub.Publish(new AudioProjectInitialisedEvent());
         }
+
+        [RelayCommand] public void OpenDialogueEventMerger() => _uiCommandFactory.Create<OpenDialogueEventMergerWindowCommand>().Execute();
 
         [RelayCommand] public void OpenAudioProjectConverter() => _uiCommandFactory.Create<OpenAudioProjectConverterWindowCommand>().Execute();
 

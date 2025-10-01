@@ -32,18 +32,19 @@ namespace Editors.Audio.AudioProjectCompiler
             if (audioProject.SoundBanks == null)
                 return;
 
-            var audioProjectFileNameWithoutSpaces = audioProjectFileName.Replace(" ", "_");
-            _logger.Here().Information($"Compiling {audioProjectFileNameWithoutSpaces}");
+            _logger.Here().Information($"Compiling {audioProjectFileName}");
+
+            var audioProjectFileNameWithoutExtension = Path.GetFileNameWithoutExtension(audioProjectFileName);
 
             ClearTempAudioFiles();
 
-            SetSoundBankData(audioProject);
+            SetSoundBankData(audioProject, audioProjectFileNameWithoutExtension);
 
             GenerateWems(audioProject);
 
             GenerateSoundBanks(audioProject);
 
-            GenerateDatFiles(audioProject, audioProjectFileNameWithoutSpaces);
+            GenerateDatFiles(audioProject, audioProjectFileNameWithoutExtension);
 
             MemoryOptimiser.Optimise();
         }
@@ -61,7 +62,7 @@ namespace Editors.Audio.AudioProjectCompiler
             }
         }
 
-        private void SetSoundBankData(AudioProject audioProject)
+        private void SetSoundBankData(AudioProject audioProject, string audioProjectFileNameWithoutExtension)
         {
             _logger.Here().Information($"Setting SoundBank data");
 
@@ -79,23 +80,27 @@ namespace Editors.Audio.AudioProjectCompiler
                     // before it so the .bnk with the lowest alphanumeric name takes priority.
                     // Example load order:
                     // 1) campaign_vo__core.bnk
-                    // 2) campaign_vo_1_project_dialogue_events_for_merging.bnk
-                    // 3) campaign_vo_0_project_dialogue_events_for_testing.bnk
-                    // So the dialogue events from campaign_vo_0_project_dialogue_events_for_testing.bnk will be what take priority as they're loaded last.
-                    soundBank.DialogueEventsSplitTestingFileName = $"{soundBank.Name}_0_dialogue_events_for_testing.bnk";
-                    soundBank.DialogueEventsSplitMergingFileName = $"{soundBank.Name}_dialogue_events_for_merging.bnk";
+                    // 3) campaign_vo_01_project_name_for_testing.bnk
+                    // 3) campaign_vo_0_audio_mixer.bnk
+                    // So the dialogue events from campaign_vo_0_audio_mixer.bnk will be what take priority as they're loaded last.
+
+                    var soundBankNameBase = soundBank.Name.Replace($"_{audioProjectFileNameWithoutExtension}", string.Empty);
+                    soundBank.TestingFileName = $"{soundBankNameBase}_01_{audioProjectFileNameWithoutExtension}_for_testing.bnk";
+                    soundBank.MergingFileName = $"{soundBank.Name}_for_merging.bnk";
+
                     if (soundBank.Language == Wh3LanguageInformation.GetGameLanguageAsString(Wh3GameLanguage.Sfx))
                     {
-                        soundBank.DialogueEventsSplitTestingFilePath = $"audio\\wwise\\{soundBank.DialogueEventsSplitTestingFileName}";
-                        soundBank.DialogueEventsSplitMergingFilePath = $"audio\\wwise\\{soundBank.DialogueEventsSplitMergingFileName}";
+                        soundBank.TestingFilePath = $"audio\\wwise\\{soundBank.TestingFileName}";
+                        soundBank.MergingFilePath = $"audio\\wwise\\{soundBank.MergingFileName}";
                     }
                     else
                     {
-                        soundBank.DialogueEventsSplitTestingFilePath = $"audio\\wwise\\{soundBank.Language}\\{soundBank.DialogueEventsSplitTestingFileName}";
-                        soundBank.DialogueEventsSplitMergingFilePath = $"audio\\wwise\\{soundBank.Language}\\{soundBank.DialogueEventsSplitMergingFileName}";
+                        soundBank.TestingFilePath = $"audio\\wwise\\{soundBank.Language}\\{soundBank.TestingFileName}";
+                        soundBank.MergingFilePath = $"audio\\wwise\\{soundBank.Language}\\{soundBank.MergingFileName}";
                     }
-                    soundBank.DialogueEventsSplitTestingId = WwiseHash.Compute(soundBank.DialogueEventsSplitTestingFileName.Replace(".bnk", string.Empty));
-                    soundBank.DialogueEventsSplitMergingId = WwiseHash.Compute(soundBank.DialogueEventsSplitMergingFileName.Replace(".bnk", string.Empty));
+
+                    soundBank.TestingId = WwiseHash.Compute(soundBank.TestingFileName.Replace(".bnk", string.Empty));
+                    soundBank.MergingId = WwiseHash.Compute(soundBank.MergingFileName.Replace(".bnk", string.Empty));
                 }
 
                 if (soundBank.ActionEvents != null)
@@ -178,33 +183,37 @@ namespace Editors.Audio.AudioProjectCompiler
                 if (soundBank.ActionEvents != null || soundBank.DialogueEvents != null)
                 {
                     _logger.Here().Information($"Generating SoundBank {soundBank.FilePath}");
-                    _soundBankGeneratorService.GenerateSoundBank(soundBank);
+
+                    // Create the .bnk that modders should keep
+                    _soundBankGeneratorService.GenerateSoundBankWithoutDialogueEvents(soundBank);
+
+                    // Create the .bnk that modders should give to the merger
+                    _soundBankGeneratorService.GenerateMergingSoundBank(soundBank);
 
                     if (soundBank.DialogueEvents != null)
                     {
-                        _logger.Here().Information($"Generating SoundBank {soundBank.DialogueEventsSplitTestingFilePath} and {soundBank.DialogueEventsSplitMergingFilePath}");
-                        _soundBankGeneratorService.GenerateDialogueEventSplitSoundBanks(soundBank);
+                        // Create a .bnk of the compiled Dialogue Events merged with vanilla Dialogue Events for modders to test
+                        _logger.Here().Information($"Generating SoundBank {soundBank.TestingFilePath} and {soundBank.MergingFilePath}");
+                        _soundBankGeneratorService.GenerateDialogueEventsForTestingSoundBank(soundBank);
                     }
                 }
 
             }
         }
 
-        private void GenerateDatFiles(AudioProject audioProject, string audioProjectFileNameWithoutSpaces)
+        private void GenerateDatFiles(AudioProject audioProject, string audioProjectFileNameWithoutExtension)
         {
-            var audioProjectFileNameWithoutExtension = Path.GetFileNameWithoutExtension(audioProjectFileNameWithoutSpaces);
-
             // The .dat file is seems to only necessary for playing movie Action Events and any triggered via common.trigger_soundevent()
             // but without testing all the different types of Action Event sounds it's safer to just make a .dat for all as it's little overhead.
             var actionEvents = audioProject.GetActionEvents();
-            if (actionEvents != null)
+            if (actionEvents != null && actionEvents.Count != 0)
             {
                 _logger.Here().Information($"Generating Event .dat");
                 _datGeneratorService.GenerateEventDatFile(actionEvents, audioProjectFileNameWithoutExtension);
             }
 
             // We create the states .dat file so we can see the modded states in the Audio Explorer, it isn't necessary for the game
-            if (audioProject.StateGroups != null)
+            if (audioProject.StateGroups != null && audioProject.StateGroups.Count != 0)
             {
                 _logger.Here().Information($"Generating States .dat");
                 _datGeneratorService.GenerateStatesDatFile(audioProject.StateGroups, audioProjectFileNameWithoutExtension);

@@ -93,8 +93,6 @@ namespace Editors.Audio.AudioEditor.Presentation.Table
                 };
 
                 statePathNodes.Add(statePathNode);
-
-
             }
             var statePathName = StatePath.BuildName(statePathNodes);
             return statePathName;

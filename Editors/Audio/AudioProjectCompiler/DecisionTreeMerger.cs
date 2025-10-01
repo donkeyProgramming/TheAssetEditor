@@ -6,43 +6,42 @@ namespace Editors.Audio.AudioProjectCompiler
 {
     public static class DecisionTreeMerger
     {
-        public static AkDecisionTree_V136.Node_V136 MergeDecisionTrees(AkDecisionTree_V136.Node_V136 decisionTree1, AkDecisionTree_V136.Node_V136 decisionTree2)
+        public static AkDecisionTree_V136.Node_V136 MergeDecisionTrees(AkDecisionTree_V136.Node_V136 target,  AkDecisionTree_V136.Node_V136 source)
         {
-            if (decisionTree1 == null)
-                return CloneNode(decisionTree2);
-            if (decisionTree2 == null)
-                return CloneNode(decisionTree1);
+            if (target == null) 
+                return CloneNode(source);
+            if (source == null) 
+                return CloneNode(target);
 
-            var children1 = decisionTree1.Nodes ?? [];
-            var children2 = decisionTree2.Nodes ?? [];
+            var targetIsLeaf = target.Nodes == null || target.Nodes.Count == 0 || target.AudioNodeId != 0;
+            if (targetIsLeaf)
+                return CloneNode(target);
 
-            var keys = children1.Select(child => child.Key)
-                .Concat(children2.Select(child => child.Key))
-                .Distinct();
+            var mergedChildren = new List<AkDecisionTree_V136.Node_V136>(target.Nodes);
+            var index = target.Nodes.ToDictionary(n => n.Key);
 
-            var mergedChildren = new List<AkDecisionTree_V136.Node_V136>();
-            foreach (var key in keys)
+            foreach (var sourceChild in source.Nodes ?? [])
             {
-                var tree1Child = children1.FirstOrDefault(child => child.Key == key);
-                var tree2Child = children2.FirstOrDefault(child => child.Key == key);
-
-                if (tree1Child != null && tree2Child != null)
-                    mergedChildren.Add(MergeDecisionTrees(tree1Child, tree2Child));
+                if (index.TryGetValue(sourceChild.Key, out var targetChild))
+                {
+                    var merged = MergeDecisionTrees(targetChild, sourceChild);
+                    if (!ReferenceEquals(targetChild, merged))
+                        mergedChildren[mergedChildren.FindIndex(node => node.Key == targetChild.Key)] = merged;
+                }
                 else
-                    mergedChildren.Add(CloneNode(tree1Child ?? tree2Child));
+                    mergedChildren.Add(CloneNode(sourceChild));
             }
 
-            mergedChildren = SortChildren(mergedChildren).ToList();
+            mergedChildren = SortChildren(mergedChildren);
 
             return new AkDecisionTree_V136.Node_V136
             {
-                Key = GetMergedKey(decisionTree1, decisionTree2),
-                AudioNodeId = GetMergedAudioNodeId(decisionTree1, decisionTree2, mergedChildren.Count),
-                Weight = GetMergedWeight(decisionTree1, decisionTree2),
-                Probability = GetMergedProbability(decisionTree1, decisionTree2),
+                Key = target.Key ?? source.Key,
+                AudioNodeId = 0,
+                Weight = target.Weight == 0 ? source.Weight : target.Weight,
+                Probability = target.Probability == 0 ? source.Probability : target.Probability,
                 Nodes = mergedChildren
             };
-
         }
 
         public static List<AkDecisionTree_V136.Node_V136> FlattenDecisionTree(AkDecisionTree_V136.Node_V136 rootNode)
@@ -66,7 +65,7 @@ namespace Editors.Audio.AudioProjectCompiler
             }
 
             node.AudioNodeId = 0;
-            node.Nodes = SortChildren(node.Nodes).ToList();
+            node.Nodes = SortChildren(node.Nodes);
 
             node.ChildrenIdx = (ushort)flattened.Count;
             node.ChildrenCount = (ushort)node.Nodes.Count;
@@ -80,7 +79,7 @@ namespace Editors.Audio.AudioProjectCompiler
 
         private static AkDecisionTree_V136.Node_V136 CloneNode(AkDecisionTree_V136.Node_V136 node)
         {
-            if (node == null) 
+            if (node == null)
                 return null;
 
             var clonedNodes = new List<AkDecisionTree_V136.Node_V136>();
@@ -108,42 +107,6 @@ namespace Editors.Audio.AudioProjectCompiler
                 .OrderBy(node => node.Key.HasValue ? 0 : 1)
                 .ThenBy(node => node.Key ?? 0U)
                 .ToList();
-        }
-
-        private static uint? GetMergedKey(AkDecisionTree_V136.Node_V136 decisionTree1, AkDecisionTree_V136.Node_V136 decisionTree2)
-        {
-            if (decisionTree1.Key != null)
-                return decisionTree1.Key;
-
-            return decisionTree2.Key;
-        }
-
-        private static uint GetMergedAudioNodeId(AkDecisionTree_V136.Node_V136 decisionTree1, AkDecisionTree_V136.Node_V136 decisionTree2, int mergedChildrenCount)
-        {
-            var isLeaf = mergedChildrenCount == 0;
-            if (!isLeaf)
-                return 0;
-
-            if (decisionTree1.AudioNodeId != 0)
-                return decisionTree1.AudioNodeId;
-
-            return decisionTree2.AudioNodeId;
-        }
-
-        private static ushort GetMergedWeight(AkDecisionTree_V136.Node_V136 decisionTree1, AkDecisionTree_V136.Node_V136 decisionTree2)
-        {
-            if (decisionTree1.Weight != 0)
-                return decisionTree1.Weight;
-
-            return decisionTree2.Weight;
-        }
-
-        private static ushort GetMergedProbability(AkDecisionTree_V136.Node_V136 decisionTree1, AkDecisionTree_V136.Node_V136 decisionTree2)
-        {
-            if (decisionTree1.Probability != 0)
-                return decisionTree1.Probability;
-
-            return decisionTree2.Probability;
         }
     }
 }

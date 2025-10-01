@@ -546,6 +546,8 @@ namespace Editors.Audio.GameInformation.Warhammer3
                 return profile.Value.ToString();
         }
 
+        public static Wh3SoundBank GetSoundBank(string dialogueEventName) => Information.First(definition => definition.Name == dialogueEventName).SoundBank;
+
         public static uint GetActorMixerId(string dialogueEventName) => Information.First(definition => definition.Name == dialogueEventName).ActorMixerId;
 
         public static bool Contains(Wh3SoundBank soundBank) => Information.Any(definition => definition.SoundBank == soundBank);

@@ -82,6 +82,15 @@ namespace Shared.GameFormats.Wwise.Hirc.V136.Shared
             return (uint)Nodes.Count * nodeSize;
         }
 
+        public AkDecisionTree_V136 Clone()
+        {
+            return new AkDecisionTree_V136
+            {
+                DecisionTree = DecisionTree.Clone(),
+                Nodes = Nodes.Select(node => node.CloneFlatNode()).ToList()
+            };
+        }
+
         public class Node_V136
         {
             public uint? Key { get; set; }
@@ -127,6 +136,27 @@ namespace Shared.GameFormats.Wwise.Hirc.V136.Shared
                 var weightSize = ByteHelper.GetPropertyTypeSize(Weight);
                 var probabilitySize = ByteHelper.GetPropertyTypeSize(Probability);
                 return idSize + childrenIdxSize + childrenCountSize + weightSize + probabilitySize;
+            }
+
+            public Node_V136 Clone()
+            {
+                var clonedNode = CloneFlatNode();
+                clonedNode.Nodes = Nodes.Select(child => child.Clone()).ToList();
+                return clonedNode;
+            }
+
+            public Node_V136 CloneFlatNode()
+            {
+                return new Node_V136
+                {
+                    Key = Key,
+                    AudioNodeId = AudioNodeId,
+                    ChildrenIdx = ChildrenIdx,
+                    ChildrenCount = ChildrenCount,
+                    Weight = Weight,
+                    Probability = Probability,
+                    Nodes = []
+                };
             }
         }
     }

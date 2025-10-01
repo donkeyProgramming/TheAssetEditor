@@ -9,9 +9,9 @@
     d:DataContext="{d:DesignInstance Type=audioprojectconverter:AudioProjectConverterViewModel}"
     Style="{StaticResource CustomWindowStyle}"
     mc:Ignorable="d"
-    Width="600"
-    Height="355"
-    Title="Dialogue Event Converter">
+    Width="850"
+    SizeToContent="Height"
+    Title="Audio Project Converter">
 
     <Grid>
         <Grid.RowDefinitions>
@@ -25,7 +25,7 @@
 
         <TextBlock  
             Grid.Row="0"  
-            Text="The Dialogue Event Converter is a tool for creating an Audio Project out of Dialogue Events in the provided .bnk files. It takes the VO Actor substring(s) and searches the Dialogue Events in the supplied .bnk files for their usage and converts that to the Audio Project format. Read the tooltips for more information."  
+            Text="The Audio Project Converter is a tool for creating an Audio Project out of Dialogue Events in the provided .bnk files. It takes the VO Actor substring(s) and searches the Dialogue Events in the supplied .bnk files for their usage and converts that to the Audio Project format. Read the tooltips for more information."  
             HorizontalAlignment="Left"
             Margin="10, 10, 10, 0"
             TextWrapping="Wrap"/>
@@ -208,7 +208,7 @@
                 
                 <Label 
                     Grid.Column="0" 
-                    Content="Converting Soundbanks From Wwise Project"
+                    Content="Converting Soundbanks from Wwise Project"
                     ToolTip="Tick this box if you need to get the States used in the soundbank from the Wwise project. There's no need to tick if you're converting a vanilla .bnk or the pack has a states_data.dat in the pack for the .bnk you're converting as that contains the States data for a or .bnk made by the Audio Editor."/>
                 
                 <CheckBox 

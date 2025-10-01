@@ -7,7 +7,6 @@ using System.Xml.Linq;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Editors.Audio.AudioEditor;
-using Editors.Audio.AudioEditor.AudioProjectViewer;
 using Editors.Audio.AudioEditor.Models;
 using Editors.Audio.AudioEditor.Settings;
 using Editors.Audio.AudioProjectCompiler;
@@ -50,11 +49,9 @@ namespace Editors.Audio.AudioProjectConverter
         private readonly ApplicationSettingsService _applicationSettingsService;
         private readonly VgStreamWrapper _vgStreamWrapper;
 
-        private readonly ILogger _logger = Logging.Create<AudioProjectViewerViewModel>();
-
+        private readonly ILogger _logger = Logging.Create<AudioProjectConverterViewModel>();
         private System.Action _closeAction;
 
-        // Settings properties
         [ObservableProperty] private string _audioProjectName;
         [ObservableProperty] private string _outputDirectoryPath;
         [ObservableProperty] private string _wemsDirectoryPath;
@@ -63,7 +60,6 @@ namespace Editors.Audio.AudioProjectConverter
         [ObservableProperty] private string _soundbanksInfoXmlPath;
         [ObservableProperty] private bool _isUsingWwiseProject;
 
-        // Ok button enablement
         [ObservableProperty] private bool _isAudioProjectNameSet;
         [ObservableProperty] private bool _isOutputDirectoryPathSet;
         [ObservableProperty] private bool _isWemsDirectoryPathSet; 
@@ -176,7 +172,7 @@ namespace Editors.Audio.AudioProjectConverter
             return hircLookupById;
         }
 
-        private List<HircItem> GetHircItems(List<string> soundBankPaths)
+        private static List<HircItem> GetHircItems(List<string> soundBankPaths)
         {
             var parsedSoundBanks = new List<ParsedBnkFile>();
 
@@ -325,11 +321,10 @@ namespace Editors.Audio.AudioProjectConverter
                         state = unhashedState;
                 }
 
-                statePathNodes.Add(new StatePath.StatePathNode
-                {
-                    StateGroup = new StateGroup { Name = stateGroup },
-                    State = new State { Name = state }
-                });
+                var audioProjectstateGroup = StateGroup.Create(stateGroup);
+                var audioProjectstate = State.Create(state);
+                var statePathNode = StatePath.StatePathNode.Create(audioProjectstateGroup, audioProjectstate);
+                statePathNodes.Add(statePathNode);
 
                 // Store modded states info
                 if (state != "Any" && !_audioRepository.NameById.ContainsValue(state))
@@ -393,7 +388,11 @@ namespace Editors.Audio.AudioProjectConverter
             }
         }
 
-        private static void StoreStatePathInfo(Dictionary<string, List<StatePathInfo>> statePathsLookupByDialogueEvent, List<WavFile> wavFiles, string dialogueEventName, List<StatePath.StatePathNode> statePathNodes)
+        private static void StoreStatePathInfo(
+            Dictionary<string, List<StatePathInfo>> statePathsLookupByDialogueEvent,
+            List<WavFile> wavFiles,
+            string dialogueEventName,
+            List<StatePath.StatePathNode> statePathNodes)
         {
             var joinedStatePath = string.Join(".", statePathNodes.Select(statePathNode => statePathNode.State.Name));
 
@@ -478,7 +477,12 @@ namespace Editors.Audio.AudioProjectConverter
                     }
 
                     var randomSequenceContainerSettings = AudioSettings.CreateRecommendedRandomSequenceContainerSettings(audioFiles.Count);
-                    var randomSequenceContainer = RandomSequenceContainer.Create(randomSequenceContainerIds.Guid, randomSequenceContainerIds.Id, randomSequenceContainerSettings, sounds, directParentId: actorMixerId);
+                    var randomSequenceContainer = RandomSequenceContainer.Create(
+                        randomSequenceContainerIds.Guid,
+                        randomSequenceContainerIds.Id,
+                        randomSequenceContainerSettings,
+                        sounds,
+                        directParentId: actorMixerId);
                     audioProjectStatePath = StatePath.Create(statePath.StatePathNodes, randomSequenceContainer);
                 }
                 else
@@ -560,10 +564,7 @@ namespace Editors.Audio.AudioProjectConverter
             {
                 foreach (var moddedState in moddedStateGroup.Value)
                 {
-                    var audioProjectModdedState = new State
-                    {
-                        Name = moddedState
-                    };
+                    var audioProjectModdedState = State.Create(moddedState);
                     var audioProjectStateGroup = audioProject.StateGroups.FirstOrDefault(stateGroup => stateGroup.Name == moddedStateGroup.Key);
                     audioProjectStateGroup.InsertAlphabetically(audioProjectModdedState);
                 }
@@ -646,7 +647,12 @@ namespace Editors.Audio.AudioProjectConverter
 
         private void UpdateOkButtonIsEnabled()
         {
-            IsOkButtonEnabled = IsAudioProjectNameSet && IsOutputDirectoryPathSet && IsWemsDirectoryPathSet && IsBnksDirectoryPathSet && IsVOActorSubstringSet && ((IsUsingWwiseProject && IsSoundbanksInfoXmlSet) || !IsUsingWwiseProject);
+            IsOkButtonEnabled = IsAudioProjectNameSet
+                && IsOutputDirectoryPathSet
+                && IsWemsDirectoryPathSet
+                && IsBnksDirectoryPathSet
+                && IsVOActorSubstringSet
+                && ((IsUsingWwiseProject && IsSoundbanksInfoXmlSet) || !IsUsingWwiseProject);
         }
 
         [RelayCommand] public void SetOutputDirectoryPath()
@@ -686,14 +692,8 @@ namespace Editors.Audio.AudioProjectConverter
                 SoundbanksInfoXmlPath = openFileDialog.FileName;
         }
 
-        [RelayCommand] public void CloseWindowAction()
-        {
-            _closeAction?.Invoke();
-        }
+        [RelayCommand] public void CloseWindowAction() => _closeAction?.Invoke();
 
-        public void SetCloseAction(System.Action closeAction)
-        {
-            _closeAction = closeAction;
-        }
+        public void SetCloseAction(System.Action closeAction) => _closeAction = closeAction;
     }
 }

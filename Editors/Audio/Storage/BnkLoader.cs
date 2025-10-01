@@ -38,14 +38,15 @@ namespace Editors.Audio.Storage
             return soundDb;
         }
 
-        public LoadResult LoadBnkFiles()
+        public LoadResult LoadBnkFiles(bool loadEnglishLanguageOnly)
         {
             var bankFiles = PackFileServiceUtility.FindAllWithExtentionIncludePaths(_packFileService, ".bnk");
             var bankFilesAsDictionary = bankFiles.GroupBy(f => f.FileName).ToDictionary(g => g.Key, g => g.Last().Pack);
 
             var removeFilter = new List<string>() { "media", "init.bnk", "animation_blood_data.bnk" };
             var removeLanguages = new List<string>() { "chinese", "french(france)", "german", "italian", "polish", "russian", "spanish(spain)" };
-            removeFilter.AddRange(removeLanguages);
+            if (loadEnglishLanguageOnly)
+                removeFilter.AddRange(removeLanguages);
 
             var wantedBnkFiles = PackFileUtil.FilterUnvantedFiles(bankFilesAsDictionary, removeFilter.ToArray(), out var removedFiles); ;
             _logger.Here().Information($"Parsing game sounds. {bankFiles.Count} bnk files found. {wantedBnkFiles.Count} after filtering");

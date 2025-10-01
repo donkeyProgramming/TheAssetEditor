@@ -34,7 +34,7 @@ namespace Editors.Reports.Audio
 
         public void PrintDialogueEventInfo()
         {
-            var dialogueEvents = _audioRepository.GetHircItemsByType<ICAkDialogueEvent>();
+            var dialogueEvents = _audioRepository.GetHircsByType<ICAkDialogueEvent>();
             foreach (var dialogueEvent in dialogueEvents)
                 PrintDialogueEventInfo(dialogueEvent);
         }

@@ -78,7 +78,7 @@ namespace Editors.Audio.Utility
             if (hircId == 0)
                 return;
 
-            var instances = _audioRepository.GetHircObject(hircId);
+            var instances = _audioRepository.GetHircs(hircId);
             var hircItem = instances.FirstOrDefault();
             if (hircItem == null)
                 parent.Children.Add(new HircTreeItem() { DisplayName = $"Error: Unable to find Id {hircId}" });

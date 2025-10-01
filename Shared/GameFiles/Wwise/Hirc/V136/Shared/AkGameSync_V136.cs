@@ -15,5 +15,14 @@ namespace Shared.GameFormats.Wwise.Hirc.V136.Shared
             var groupTypeSize = ByteHelper.GetPropertyTypeSize(GroupType);
             return groupIdSize + groupTypeSize;
         }
+
+        public AkGameSync_V136 Clone()
+        {
+            return new AkGameSync_V136
+            {
+                GroupId = GroupId,
+                GroupType = GroupType
+            };
+        }
     }
 }

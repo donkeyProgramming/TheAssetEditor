@@ -2,6 +2,7 @@
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using System.Windows;
 using Editors.Audio.AudioEditor.Events;
 using Editors.Audio.AudioEditor.Models;
 using Shared.Core.Events;
@@ -58,6 +59,13 @@ namespace Editors.Audio.AudioEditor
                 var filePath = _packFileService.GetFullPath(result.File);
                 var fileName = Path.GetFileName(filePath);
                 var fileNameWithoutExtension = Path.GetFileNameWithoutExtension(fileName);
+
+                if (fileName.Contains(' '))
+                {
+                    MessageBox.Show("You must rename the Audio Project as its name contains spaces which is not allowed.", "Error");
+                    return;
+                }
+
                 var packFile = _packFileService.FindFile(filePath);
                 var bytes = packFile.DataSource.ReadData();
                 var audioProjectJson = Encoding.UTF8.GetString(bytes);

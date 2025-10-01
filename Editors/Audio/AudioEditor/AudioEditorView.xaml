@@ -58,6 +58,9 @@
                     Header="Tools" 
                     HorizontalAlignment="Left">
                     <MenuItem 
+                        Header="Dialogue Event Merger" 
+                        Command="{Binding OpenDialogueEventMergerCommand}"/>
+                    <MenuItem 
                         Header="Audio Project Converter" 
                         Command="{Binding OpenAudioProjectConverterCommand}"/>
                 </MenuItem>

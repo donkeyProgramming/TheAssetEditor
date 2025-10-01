@@ -154,7 +154,7 @@ namespace Editors.Audio.AudioExplorer
                     return;
                 }
 
-                var foundHircItems = _audioRepository.GetHircObject(hircId);
+                var foundHircItems = _audioRepository.GetHircs(hircId);
                 if (foundHircItems.Count == 0)
                 {
                     MessageBox.Show($"No hirc items found with id {hircId}");
@@ -172,7 +172,7 @@ namespace Editors.Audio.AudioExplorer
             using var writer = new StreamWriter(outputPath, false);
 
             var helper = new DecisionPathHelper(_audioRepository);
-            var dialogueEvents = _audioRepository.GetHircItemsByType<ICAkDialogueEvent>();
+            var dialogueEvents = _audioRepository.GetHircsByType<ICAkDialogueEvent>();
             foreach (var dialogueEvent in dialogueEvents)
             {
                 var asHirc = dialogueEvent as HircItem;

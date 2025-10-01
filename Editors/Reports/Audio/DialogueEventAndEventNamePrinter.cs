@@ -35,7 +35,7 @@ namespace Editors.Reports.Audio
 
         public void PrintInfo()
         {
-            var itemsToProcess = _audioRepository.GetHircItemsByType<HircItem>()
+            var itemsToProcess = _audioRepository.GetHircsByType<HircItem>()
                 .Where(item => item is ICAkDialogueEvent or ICAkEvent)
                 .ToList();
 

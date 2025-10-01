@@ -48,6 +48,15 @@ namespace Shared.GameFormats.Wwise.Hirc.V136.Shared
             return propsSize + propsListSize;
         }
 
+        public AkPropBundle_V136 Clone()
+        {
+            return new AkPropBundle_V136
+            {
+                Props = Props,
+                PropsList = PropsList.Select(prop => prop.Clone()).ToList()
+            };
+        }
+
         public class PropBundleInstance_V136
         {
             public AkPropId_V136 Id { get; set; }
@@ -58,6 +67,15 @@ namespace Shared.GameFormats.Wwise.Hirc.V136.Shared
                 var idSize = ByteHelper.GetPropertyTypeSize(Id);
                 var valueSize = ByteHelper.GetPropertyTypeSize(Value);
                 return idSize + valueSize;
+            }
+
+            public PropBundleInstance_V136 Clone()
+            {
+                return new PropBundleInstance_V136
+                {
+                    Id = Id,
+                    Value = Value
+                };
             }
         }
     }

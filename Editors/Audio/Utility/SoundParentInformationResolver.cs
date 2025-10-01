@@ -103,7 +103,7 @@ namespace Editors.Audio.Utility
             {
                 output.Add(new ParentStructure() { Description = $"AudioBus graph for {currentBusItem.SourceDescription}:" });
 
-                var firstBus = audioRepository.GetHircObject(currentBusItem.BusId)
+                var firstBus = audioRepository.GetHircs(currentBusItem.BusId)
                     .Where(x => x.HircType == AkBkHircType.Audio_Bus)
                     .Cast<CAkBus_V136>()
                     .First();
@@ -111,7 +111,7 @@ namespace Editors.Audio.Utility
                 var item = firstBus;
                 while (item.OverrideBusId != 0)
                 {
-                    item = audioRepository.GetHircObject(item.OverrideBusId)
+                    item = audioRepository.GetHircs(item.OverrideBusId)
                             .Where(x => x.HircType == AkBkHircType.Audio_Bus)
                             .Cast<CAkBus_V136>()
                             .First();

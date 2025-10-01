@@ -8,19 +8,19 @@ namespace Editors.Audio.AudioEditor.Models
 {
     public partial class SoundBank : AudioProjectItem
     {
-        public Wh3SoundBank GameSoundBank { get; set; }
-        public List<ActionEvent> ActionEvents { get; set; }
-        public List<DialogueEvent> DialogueEvents { get; set; }
         public string Language { get; set; }
         public uint LanguageId { get; set; }
         public string FileName { get; set; }
         public string FilePath { get; set; }
-        public uint DialogueEventsSplitTestingId { get; set; }
-        public string DialogueEventsSplitTestingFileName { get; set; }
-        public string DialogueEventsSplitTestingFilePath { get; set; }
-        public uint DialogueEventsSplitMergingId { get; set; }
-        public string DialogueEventsSplitMergingFileName { get; set; }
-        public string DialogueEventsSplitMergingFilePath { get; set; }
+        public uint TestingId { get; set; }
+        public string TestingFileName { get; set; }
+        public string TestingFilePath { get; set; }
+        public uint MergingId { get; set; }
+        public string MergingFileName { get; set; }
+        public string MergingFilePath { get; set; }
+        public Wh3SoundBank GameSoundBank { get; set; }
+        public List<ActionEvent> ActionEvents { get; set; }
+        public List<DialogueEvent> DialogueEvents { get; set; }
 
         public static SoundBank Create(string name, Wh3SoundBank gameSoundBank, string language)
         {

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Windows;
 using Editors.Audio.AudioEditor.Models;
 using Editors.Audio.AudioProjectCompiler;
@@ -8,6 +9,7 @@ using Editors.Audio.GameInformation.Warhammer3;
 using Editors.Audio.Storage;
 using Editors.Audio.Utility;
 using Shared.Core.PackFiles;
+using Shared.GameFormats.Wwise.Hirc;
 
 namespace Editors.Audio.AudioEditor
 {
@@ -17,6 +19,7 @@ namespace Editors.Audio.AudioEditor
         void CheckAudioProjectDialogueEventIntegrity(AudioProject audioProject);
         void CheckAudioProjectWavFilesIntegrity(AudioProject audioProject);
         void CheckAudioProjectIdsIntegrity(AudioProject audioProject, string audioProjectFileNameWithoutExtension);
+        void CheckMergingSoundBanksIdIntegrity();
     }
 
     public class AudioEditorIntegrityService(IPackFileService packFileService, IAudioRepository audioRepository) : IAudioEditorIntegrityService
@@ -608,6 +611,92 @@ namespace Editors.Audio.AudioEditor
                 else
                     sound.SourceId = sourceId;
             }
+        }
+
+        public void CheckMergingSoundBanksIdIntegrity()
+        {
+            var moddedHircsByBnkByLanguage = _audioRepository.GetModdedHircsByBnkByLanguage();
+
+            var hasClashes = false;
+            var messageBuilder = new StringBuilder()
+                .AppendLine("Merging SoundBanks ID Integrity Check failed.")
+                .AppendLine()
+                .AppendLine("The following Hirc IDs are used by multiple SoundBanks within the same language.")
+                .AppendLine("For each source SoundBank, the IDs listed also exist in the listed other SounBanks.")
+                .AppendLine();
+
+            foreach (var languageEntry in moddedHircsByBnkByLanguage)
+            {
+                var languageName = languageEntry.Key;
+                var hircsByBnkDictionary = languageEntry.Value;
+
+                var idsByBnk = new Dictionary<string, HashSet<uint>>(StringComparer.OrdinalIgnoreCase);
+                var bnksById = new Dictionary<uint, HashSet<string>>();
+
+                foreach (var bnkEntry in hircsByBnkDictionary)
+                {
+                    var bnkName = bnkEntry.Key;
+                    if (!idsByBnk.TryGetValue(bnkName, out var idSet))
+                    {
+                        idSet = [];
+                        idsByBnk[bnkName] = idSet;
+                    }
+
+                    foreach (var hirc in bnkEntry.Value)
+                    {
+                        if (hirc is ICAkDialogueEvent)
+                            continue;
+
+                        var id = hirc.Id;
+                        if (!idSet.Add(id))
+                            continue;
+
+                        if (!bnksById.TryGetValue(id, out var bnksContainingThisId))
+                        {
+                            bnksContainingThisId = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+                            bnksById[id] = bnksContainingThisId;
+                        }
+
+                        bnksContainingThisId.Add(bnkName);
+                    }
+                }
+
+                var clashingIdsById = bnksById
+                    .Where(pair => pair.Value.Count > 1)
+                    .ToDictionary(pair => pair.Key, pair => pair.Value);
+
+                if (clashingIdsById.Count == 0)
+                    continue;
+
+                hasClashes = true;
+                messageBuilder.AppendLine($"Language: {languageName}");
+
+                foreach (var sourceBnk in idsByBnk.Keys.OrderBy(name => name, StringComparer.OrdinalIgnoreCase))
+                {
+                    var conflictingIdsFromThisBnk = idsByBnk[sourceBnk]
+                        .Where(clashingIdsById.ContainsKey)
+                        .OrderBy(id => id);
+
+                    var anyConflicts = false;
+                    foreach (var id in conflictingIdsFromThisBnk)
+                    {
+                        anyConflicts = true;
+                        var otherBnks = clashingIdsById[id]
+                            .Where(other => !string.Equals(other, sourceBnk, StringComparison.OrdinalIgnoreCase))
+                            .OrderBy(name => name, StringComparer.OrdinalIgnoreCase);
+
+                        messageBuilder.AppendLine($"Id {id} also in: {string.Join(", ", otherBnks)}");
+                    }
+
+                    if (anyConflicts)
+                        messageBuilder.AppendLine();
+                }
+
+                messageBuilder.AppendLine();
+            }
+
+            if (hasClashes)
+                MessageBox.Show(messageBuilder.ToString(), "Error");
         }
     }
 }
