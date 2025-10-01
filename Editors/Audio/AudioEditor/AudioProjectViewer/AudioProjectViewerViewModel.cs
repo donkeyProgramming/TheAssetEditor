@@ -129,10 +129,15 @@ namespace Editors.Audio.AudioEditor.AudioProjectViewer
 
         public void AddTableRow(DataRow row)
         {
-            TableHelpers.InsertRowAlphabetically(Table, row);
+            var selectedExplorerNode = _audioEditorStateService.SelectedAudioProjectExplorerNode;
+            if (selectedExplorerNode.IsActionEvent())
+                TableHelpers.InsertRowAlphabeticallyByActionEventName(Table, row);
+            else if (selectedExplorerNode.IsDialogueEvent())
+                TableHelpers.InsertRowAlphabeticallyByStatePathName(Table, row, _audioRepository, selectedExplorerNode.Name);
+            else if (selectedExplorerNode.IsStateGroup())
+                TableHelpers.InsertRowAlphabeticallyByStateName(Table, row);
 
-            var selectedAudioProjectExplorerNode = _audioEditorStateService.SelectedAudioProjectExplorerNode;
-            _logger.Here().Information($"Added {selectedAudioProjectExplorerNode.Type} row to Audio Project Viewer table for {selectedAudioProjectExplorerNode.Name}");
+            _logger.Here().Information($"Added {selectedExplorerNode.Type} row to Audio Project Viewer table for {selectedExplorerNode.Name}");
         }
 
         private void OnViewerTableRowRemoveRequested(ViewerTableRowRemoveRequestedEvent e) => RemoveTableRow(e.Row);

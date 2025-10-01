@@ -24,8 +24,9 @@ namespace Editors.Audio.AudioEditor.Presentation.Table
         {
             var states = new List<string>();
             var moddedStates = audioEditorStateService.AudioProject.StateGroups
-                .SelectMany(stateGroup => stateGroup.States)
-                .Select(state => state.Name);
+                .Where(moddedStateGroup => moddedStateGroup.Name == stateGroup)
+                .SelectMany(moddedStateGroup => moddedStateGroup.States)
+                .Select(moddedState => moddedState.Name);
             var vanillaStates = audioRepository.StatesByStateGroup[stateGroup];
 
             // Display the required states in the ComboBox
@@ -104,29 +105,71 @@ namespace Editors.Audio.AudioEditor.Presentation.Table
             return GetValueFromRow(row, TableInfo.StateColumnName);
         }
 
-        public static void InsertRowAlphabetically(DataTable table, DataRow row)
+        public static void InsertRowAlphabeticallyByStatePathName(DataTable table, DataRow sourceRow, IAudioRepository audioRepository, string dialogueEventName)
         {
-            var newValue = row[0]?.ToString() ?? string.Empty;
+            var newKey = GetStatePathNameFromRow(sourceRow, audioRepository, dialogueEventName);
+            var comparer = StringComparer.OrdinalIgnoreCase;
 
-            var insertIndex = 0;
-
+            var insertAt = table.Rows.Count;
             for (var i = 0; i < table.Rows.Count; i++)
             {
-                var currentValue = table.Rows[i][0]?.ToString() ?? string.Empty;
-                var comparison = string.Compare(newValue, currentValue, StringComparison.Ordinal);
+                var existingKey = GetStatePathNameFromRow(table.Rows[i], audioRepository, dialogueEventName);
 
-                if (comparison < 0)
+                var comparisonResult = comparer.Compare(newKey, existingKey);
+
+                if (comparisonResult == 0)
+                    return;
+
+                if (comparisonResult < 0)
                 {
-                    insertIndex = i;
+                    insertAt = i;
                     break;
                 }
-
-                insertIndex = i + 1;
             }
 
             var newRow = table.NewRow();
-            newRow.ItemArray = row.ItemArray;
-            table.Rows.InsertAt(newRow, insertIndex);
+            newRow.ItemArray = (object[])sourceRow.ItemArray.Clone();
+            table.Rows.InsertAt(newRow, insertAt);
+        }
+
+        public static void InsertRowAlphabeticallyByStateName(DataTable table, DataRow sourceRow)
+        {
+            var newKey = GetStateNameFromRow(sourceRow);
+            var comparer = StringComparer.OrdinalIgnoreCase;
+            var insertAt = table.Rows.Count;
+
+            for (var i = 0; i < table.Rows.Count; i++)
+            {
+                var existingKey = GetStateNameFromRow(table.Rows[i]);
+                var comparisonResult  = comparer.Compare(newKey, existingKey);
+
+                if (comparisonResult  == 0) return;
+                if (comparisonResult  < 0) { insertAt = i; break; }
+            }
+
+            var newRow = table.NewRow();
+            newRow.ItemArray = (object[])sourceRow.ItemArray.Clone();
+            table.Rows.InsertAt(newRow, insertAt);
+        }
+
+        public static void InsertRowAlphabeticallyByActionEventName(DataTable table, DataRow sourceRow)
+        {
+            var newKey = GetActionEventNameFromRow(sourceRow);
+            var comparer = StringComparer.OrdinalIgnoreCase;
+            var insertAt = table.Rows.Count;
+
+            for (var i = 0; i < table.Rows.Count; i++)
+            {
+                var existingKey = GetActionEventNameFromRow(table.Rows[i]);
+                var comparisonResult  = comparer.Compare(newKey, existingKey);
+
+                if (comparisonResult  == 0) return;
+                if (comparisonResult  < 0) { insertAt = i; break; }
+            }
+
+            var newRow = table.NewRow();
+            newRow.ItemArray = (object[])sourceRow.ItemArray.Clone();
+            table.Rows.InsertAt(newRow, insertAt);
         }
     }
 }

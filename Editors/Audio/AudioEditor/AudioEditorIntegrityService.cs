@@ -505,7 +505,7 @@ namespace Editors.Audio.AudioEditor
 
                         if (statePathNode.State.Name == "Any" && statePathNode.State.Id != 0)
                             statePathNode.State.Id = 0;
-                        else if (statePathNode.State.Id == 0)
+                        else if (statePathNode.State.Name != "Any" && statePathNode.State.Id == 0)
                             statePathNode.State.Id = WwiseHash.Compute(statePathNode.State.Name);
                     }
 
@@ -542,7 +542,7 @@ namespace Editors.Audio.AudioEditor
                     {
                         if (state.Name == "Any" && state.Id != 0)
                             state.Id = 0;
-                        else if (state.Id == 0)
+                        else if (state.Name != "Any" && state.Id == 0)
                             state.Id = WwiseHash.Compute(state.Name);
                     }
                 }

@@ -173,7 +173,7 @@ namespace Editors.Audio.AudioEditor.AudioProjectExplorer
         private void InitialiseDialogueEventFilters()
         {
             var soundBankName = Wh3SoundBankInformation.GetName(SelectedNode.GameSoundBank);
-            var soundBank = Wh3SoundBankInformation.GetSoundBank(SelectedNode.Name);
+            var soundBank = Wh3SoundBankInformation.GetSoundBank(soundBankName);
 
             DialogueEventTypes = new ObservableCollection<Wh3DialogueEventType>(Wh3DialogueEventInformation.Information
                 .Where(dialogueEventDefinition => dialogueEventDefinition.SoundBank == soundBank)

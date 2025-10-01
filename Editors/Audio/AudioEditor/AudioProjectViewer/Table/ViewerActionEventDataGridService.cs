@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Data;
+using System.IO;
 using System.Linq;
 using Editors.Audio.AudioEditor.AudioProjectExplorer;
 using Editors.Audio.AudioEditor.Events;
@@ -58,14 +59,16 @@ namespace Editors.Audio.AudioEditor.AudioProjectViewer.Table
         public void InitialiseTable(DataTable table)
         {
             var actionEventName = _audioEditorStateService.SelectedAudioProjectExplorerNode.Name;
-            var soundBankName = Wh3SoundBankInformation.GetName(Wh3ActionEventInformation.GetSoundBank(actionEventName));
+            var gameSoundBank = Wh3SoundBankInformation.GetName(Wh3ActionEventInformation.GetSoundBank(actionEventName));
+            var audioProjectFileNameWithoutExtension = Path.GetFileNameWithoutExtension(_audioEditorStateService.AudioProjectFileName);
+            var soundBankName = $"{gameSoundBank}_{audioProjectFileNameWithoutExtension}";
             var soundBank = _audioEditorStateService.AudioProject.GetSoundBank(soundBankName);
             foreach (var actionEvent in soundBank.ActionEvents)
             {
                 // We don't want them visible as we only show "Play_" Action Events as we force all Action Events to start with "Play_"
                 if (actionEvent.Actions.Any(action => action.ActionType == AkActionType.Pause_E_O 
-                    && action.ActionType == AkActionType.Resume_E_O
-                    && action.ActionType == AkActionType.Stop_E_O))
+                    || action.ActionType == AkActionType.Resume_E_O
+                    || action.ActionType == AkActionType.Stop_E_O))
                     continue;
 
                 var row = table.NewRow();

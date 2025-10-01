@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using Editors.Audio.AudioEditor.Factories;
 using Editors.Audio.AudioEditor.Models;
 using Editors.Audio.AudioEditor.Settings;
@@ -23,7 +24,9 @@ namespace Editors.Audio.AudioEditor.Services
 
         public void AddActionEvent(string actionEventTypeName, string actionEventName, List<AudioFile> audioFiles, AudioSettings audioSettings)
         {
-            var soundBankName = Wh3SoundBankInformation.GetName(Wh3ActionEventInformation.GetSoundBank(actionEventTypeName));
+            var gameSoundBankName = Wh3SoundBankInformation.GetName(Wh3ActionEventInformation.GetSoundBank(actionEventTypeName)); 
+            var audioProjectFileNameWithoutExtension = Path.GetFileNameWithoutExtension(_audioEditorStateService.AudioProjectFileName);
+            var soundBankName = $"{gameSoundBankName}_{audioProjectFileNameWithoutExtension}";
             var soundBank = _audioEditorStateService.AudioProject.GetSoundBank(soundBankName);
             var actionEventType = Wh3ActionEventInformation.GetActionEventType(actionEventTypeName);
 
@@ -62,7 +65,10 @@ namespace Editors.Audio.AudioEditor.Services
 
         public void RemoveActionEvent(string actionEventNodeName, string actionEventName)
         {
-            var soundBankName = Wh3SoundBankInformation.GetName(Wh3ActionEventInformation.GetSoundBank(actionEventNodeName));
+            var gameSoundBankName = Wh3SoundBankInformation.GetName(Wh3ActionEventInformation.GetSoundBank(actionEventNodeName));
+            var audioProjectFileNameWithoutExtension = Path.GetFileNameWithoutExtension(_audioEditorStateService.AudioProjectFileName);
+            var soundBankName = $"{gameSoundBankName}_{audioProjectFileNameWithoutExtension}";
+
             var soundBank = _audioEditorStateService.AudioProject.GetSoundBank(soundBankName);
             var actionEvent = soundBank.GetActionEvent(actionEventName);
             soundBank.ActionEvents.Remove(actionEvent);
