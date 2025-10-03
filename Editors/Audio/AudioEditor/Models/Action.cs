@@ -17,25 +17,27 @@ namespace Editors.Audio.AudioEditor.Models
             HircType = AkBkHircType.Action;
         }
 
-        public static Action Create(uint id, string name, Sound sound, AkActionType actionType)
+        public static Action Create(uint id, string name, Sound sound, AkActionType actionType, uint idExt)
         {
             return new Action
             {
                 Id = id,
                 Name = name,
                 Sound = sound,
-                ActionType = actionType
+                ActionType = actionType,
+                IdExt = idExt
             };
         }
 
-        public static Action Create(uint id, string name, RandomSequenceContainer randomSequenceContainer, AkActionType actionType)
+        public static Action Create(uint id, string name, RandomSequenceContainer randomSequenceContainer, AkActionType actionType, uint idExt)
         {
             return new Action
             {
                 Id = id,
                 Name = name,
                 RandomSequenceContainer = randomSequenceContainer,
-                ActionType = actionType
+                ActionType = actionType,
+                IdExt = idExt
             };
         }
 

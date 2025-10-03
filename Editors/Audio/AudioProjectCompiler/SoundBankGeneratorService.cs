@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.IO;
 using System.Linq;
 using Editors.Audio.AudioEditor;
@@ -10,6 +11,8 @@ using Editors.Audio.AudioProjectCompiler.WwiseGeneratorService.WwiseGenerators.H
 using Editors.Audio.GameInformation.Warhammer3;
 using Editors.Audio.Storage;
 using Editors.Audio.Utility;
+using Serilog;
+using Shared.Core.ErrorHandling;
 using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
 using Shared.Core.Settings;
@@ -27,7 +30,7 @@ namespace Editors.Audio.AudioProjectCompiler
         void GenerateSoundBankWithoutDialogueEvents(SoundBank soundBank);
         void GenerateDialogueEventsForTestingSoundBank(SoundBank soundBank);
         void GenerateMergingSoundBank(SoundBank soundBank);
-        void GenerateMergedDialogueEventSoundBanks(List<string> moddedSoundBanks);
+        void GenerateMergedDialogueEventSoundBanks(List<string> moddedSoundBanks, string soundBankSuffix);
     }
 
     public class SoundBankGeneratorService : ISoundBankGeneratorService
@@ -37,6 +40,8 @@ namespace Editors.Audio.AudioProjectCompiler
         private readonly IAudioRepository _audioRepository;
         private readonly WwiseHircGeneratorServiceFactory _wwiseHircGeneratorServiceFactory;
         private readonly IAudioEditorIntegrityService _audioEditorIntegrityService;
+
+        private readonly ILogger _logger = Logging.Create<SoundBankGeneratorService>();
 
         public SoundBankGeneratorService(
             IFileSaveService fileSaveService,
@@ -58,7 +63,7 @@ namespace Editors.Audio.AudioProjectCompiler
             var actionEventToHircLookup = new Dictionary<ActionEvent, HircItem>();
             var hircItems = new List<HircItem>();
 
-            if (soundBank.ActionEvents != null)
+            if (soundBank.ActionEvents.Count != 0)
             {
                 var actionEventHircs = GenerateActionEventHircs(soundBank, actionEventToHircLookup);
                 hircItems.AddRange(actionEventHircs);
@@ -70,7 +75,7 @@ namespace Editors.Audio.AudioProjectCompiler
                 hircItems.AddRange(sourceHircsFromPlay);
             }
 
-            if (soundBank.DialogueEvents != null)
+            if (soundBank.DialogueEvents.Count != 0)
             {
                 // We don't generate the Dialogue Events in this .bnk, we keep them in the merging SoundBank instead
                 var sourceHircsFromDialogue = GenerateSourceHircsFromDialogueEvents(soundBank);
@@ -102,8 +107,8 @@ namespace Editors.Audio.AudioProjectCompiler
                 var compilerDecisionTree = compilerDialogueEvent.AkDecisionTree as AkDecisionTree_V136;
 
                 // Merge the vanilla decision tree into the compiled decision tree so the compiled decision tree takes priority
-                var decisionTree = DecisionTreeMerger.MergeDecisionTrees(compilerDecisionTree.DecisionTree, vanillaDecisionTree.DecisionTree);
-                var nodes = DecisionTreeMerger.FlattenDecisionTree(decisionTree);
+                var decisionTree = AkDecisionTree_V136.MergeDecisionTrees(compilerDecisionTree.DecisionTree, vanillaDecisionTree.DecisionTree);
+                var nodes = AkDecisionTree_V136.FlattenDecisionTree(decisionTree);
                 var mergedDecisionTree = new AkDecisionTree_V136
                 {
                     DecisionTree = decisionTree,
@@ -125,7 +130,7 @@ namespace Editors.Audio.AudioProjectCompiler
             var actionEventToHircLookup = new Dictionary<ActionEvent, HircItem>();
             var hircItems = new List<HircItem>();
 
-            if (soundBank.ActionEvents != null)
+            if (soundBank.ActionEvents.Count != 0)
             {
                 var actionEventHircs = GenerateActionEventHircs(soundBank, actionEventToHircLookup);
                 hircItems.AddRange(actionEventHircs);
@@ -137,7 +142,7 @@ namespace Editors.Audio.AudioProjectCompiler
                 hircItems.AddRange(sourceHircsFromPlay);
             }
 
-            if (soundBank.DialogueEvents != null)
+            if (soundBank.DialogueEvents.Count != 0)
             {
                 var dialogueEventHircs = GenerateDialogueEventHircs(soundBank);
                 hircItems.AddRange(dialogueEventHircs);
@@ -151,7 +156,7 @@ namespace Editors.Audio.AudioProjectCompiler
             WriteSoundBank(soundBank.MergingId, soundBank.LanguageId, soundBank.MergingFileName, soundBank.MergingFilePath, hircItems);
         }
 
-        public void GenerateMergedDialogueEventSoundBanks(List<string> moddedSoundBanks)
+        public void GenerateMergedDialogueEventSoundBanks(List<string> moddedSoundBanks, string soundBankSuffix)
         {
             _audioEditorIntegrityService.CheckMergingSoundBanksIdIntegrity();
 
@@ -181,7 +186,9 @@ namespace Editors.Audio.AudioProjectCompiler
                     if (!soundBanksToGenerate.Contains(currentSoundBank))
                         continue;
 
-                    GenerateMergedDialogueEventSoundBank(hircsByBnk.Value, moddedDialogueEventsByLanguage, language, currentSoundBank);
+                    _logger.Here().Information($"Merging SoundBanks for language {language}");
+
+                    GenerateMergedDialogueEventSoundBank(hircsByBnk.Value, moddedDialogueEventsByLanguage, language, currentSoundBank, soundBankSuffix);
                 }
             }
         }
@@ -308,12 +315,27 @@ namespace Editors.Audio.AudioProjectCompiler
             List<HircItem> vanillaHircs,
             Dictionary<string, List<HircItem>> moddedDialogueEventsByLanguage,
             string language,
-            Wh3SoundBank currentSoundBank)
+            Wh3SoundBank currentSoundBank, 
+            string soundBankSuffix)
         {
             var dialogueEvents = new List<HircItem>();
 
+            var soundBankNameBase = Wh3SoundBankInformation.GetName(currentSoundBank);
+            var soundBankNameWithoutExtension = $"{soundBankNameBase}_0_{soundBankSuffix}";
+            var soundBankFileName = $"{soundBankNameWithoutExtension}.bnk";
+
+            var soundBankFilePath = $"audio\\wwise\\{language}\\{soundBankFileName}";
+            if (language == Wh3LanguageInformation.GetGameLanguageAsString(Wh3GameLanguage.Sfx))
+                soundBankFilePath = $"audio\\wwise\\{soundBankFileName}";
+
+            var soundBankId = WwiseHash.Compute(soundBankNameWithoutExtension);
+            var languageId = WwiseHash.Compute(language);
+
+            _logger.Here().Information($"Merging Dialogue Events for SoundBank {soundBankFilePath}");
+
             foreach (var vanillaHirc in vanillaHircs)
             {
+                // Clone it as we shouldn't modify the original
                 var vanillaDialogueEvent = vanillaHirc as CAkDialogueEvent_V136;
                 var mergedDialogueEvent = vanillaDialogueEvent.Clone();
 
@@ -324,16 +346,19 @@ namespace Editors.Audio.AudioProjectCompiler
                 if (matchingModdedDialogueEvents.Count == 0)
                     continue;
 
+                _logger.Here().Information($"Merging Dialogue Event {_audioRepository.GetNameFromId(vanillaHirc.Id)}");
+
                 foreach (var moddedDialogueEventHirc in matchingModdedDialogueEvents)
                 {
-                    var currentDecisionTree = mergedDialogueEvent.AkDecisionTree as AkDecisionTree_V136;
+                    _logger.Here().Information($"Merging decision tree from {Path.GetFileName(moddedDialogueEventHirc.BnkFilePath)}");
 
+                    var currentDecisionTree = mergedDialogueEvent.AkDecisionTree as AkDecisionTree_V136;
                     var moddedDialogueEvent = moddedDialogueEventHirc as CAkDialogueEvent_V136;
                     var moddedDecisionTree = moddedDialogueEvent.AkDecisionTree as AkDecisionTree_V136;
 
                     var mergedDecisionTree = new AkDecisionTree_V136();
-                    mergedDecisionTree.DecisionTree = DecisionTreeMerger.MergeDecisionTrees(currentDecisionTree.DecisionTree, moddedDecisionTree.DecisionTree);
-                    mergedDecisionTree.Nodes = DecisionTreeMerger.FlattenDecisionTree(mergedDecisionTree.DecisionTree);
+                    mergedDecisionTree.DecisionTree = AkDecisionTree_V136.MergeDecisionTrees(currentDecisionTree.DecisionTree, moddedDecisionTree.DecisionTree);
+                    mergedDecisionTree.Nodes = AkDecisionTree_V136.FlattenDecisionTree(mergedDecisionTree.DecisionTree);
 
                     mergedDialogueEvent.AkDecisionTree = mergedDecisionTree;
                     mergedDialogueEvent.TreeDataSize = mergedDecisionTree.GetSize();
@@ -344,17 +369,6 @@ namespace Editors.Audio.AudioProjectCompiler
             }
 
             SortHircs(dialogueEvents);
-
-            var soundBankNameBase = Wh3SoundBankInformation.GetName(currentSoundBank);
-            var soundBankNameWithoutExtension = $"{soundBankNameBase}_0_audio_mixer";
-            var soundBankFileName = $"{soundBankNameWithoutExtension}.bnk";
-
-            var soundBankFilePath = $"audio\\wwise\\{language}\\{soundBankFileName}";
-            if (language == Wh3LanguageInformation.GetGameLanguageAsString(Wh3GameLanguage.Sfx))
-                soundBankFilePath = $"audio\\wwise\\{soundBankFileName}";
-
-            var soundBankId = WwiseHash.Compute(soundBankNameWithoutExtension);
-            var languageId = WwiseHash.Compute(language);
 
             WriteSoundBank(soundBankId, languageId, soundBankFileName, soundBankFilePath, dialogueEvents);
         }

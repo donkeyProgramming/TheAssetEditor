@@ -8,7 +8,7 @@ namespace Editors.Audio.AudioEditor.Factories
     public interface ISoundFactory
     {
         Sound Create(HashSet<uint> usedHircIds, HashSet<uint> usedSourceIds, AudioFile audioFile, AudioSettings audioSettings, uint overrideBusId = 0, uint directParentId = 0);
-        Sound Create(HashSet<uint> usedHircIds, HashSet<uint> usedSourceIds, AudioFile audioFile, uint directParentId);
+        Sound Create(HashSet<uint> usedHircIds, HashSet<uint> usedSourceIds, AudioFile audioFile, uint directParentId, int playlistOrder);
     }
 
     public class SoundFactory : ISoundFactory
@@ -23,13 +23,13 @@ namespace Editors.Audio.AudioEditor.Factories
             return Sound.Create(soundIds.Guid, soundIds.Id, overrideBusId, directParentId, sourceId, fileName, filePath, soundSettings);
         }
 
-        public Sound Create(HashSet<uint> usedHircIds, HashSet<uint> usedSourceIds, AudioFile audioFile, uint directParentId)
+        public Sound Create(HashSet<uint> usedHircIds, HashSet<uint> usedSourceIds, AudioFile audioFile, uint directParentId, int playlistOrder)
         {
             var fileName = audioFile.FileName;
             var filePath = audioFile.FilePath;
             var soundIds = IdGenerator.GenerateAudioProjectGeneratableItemIds(usedHircIds);
             var sourceId = IdGenerator.GenerateSourceId(usedHircIds, filePath);
-            return Sound.Create(soundIds.Guid, soundIds.Id, directParentId, sourceId, fileName, filePath);
+            return Sound.Create(soundIds.Guid, soundIds.Id, directParentId, sourceId, playlistOrder, fileName, filePath);
         }
     }
 }

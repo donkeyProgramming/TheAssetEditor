@@ -31,7 +31,7 @@ namespace Shared.GameFormats.Wwise.Hirc.V136.Shared
         private static Node_V136 ReadDecisionTree(List<Node_V136> nodes, int index, uint maxDepth, uint currentDepth, ref ushort count, ushort countMax)
         {
             if (index >= nodes.Count)
-                return null;
+                throw new ArgumentOutOfRangeException("Something went wrong with the number of Decision Tree nodes");
 
             var node = nodes[index];
 
@@ -59,7 +59,7 @@ namespace Shared.GameFormats.Wwise.Hirc.V136.Shared
             using var memStream = new MemoryStream();
             foreach (var node in Nodes)
             {
-                memStream.Write(ByteParsers.UInt32.EncodeValue(node.Key ?? 0, out _), 0, 4);
+                memStream.Write(ByteParsers.UInt32.EncodeValue(node.Key, out _), 0, 4);
 
                 var hasChildren = node.Nodes != null && node.Nodes.Count > 0;
                 if (!hasChildren)
@@ -87,13 +87,121 @@ namespace Shared.GameFormats.Wwise.Hirc.V136.Shared
             return new AkDecisionTree_V136
             {
                 DecisionTree = DecisionTree.Clone(),
-                Nodes = Nodes.Select(node => node.CloneFlatNode()).ToList()
+                Nodes = Nodes.Select(node => node.CloneWithoutChildren()).ToList()
+            };
+        }
+
+        public static Node_V136 MergeDecisionTrees(Node_V136 baseDecisionTree, Node_V136 mergingDecisionTree)
+        {
+            if (baseDecisionTree == null)
+                return mergingDecisionTree.Clone();
+
+            if (mergingDecisionTree == null)
+                return baseDecisionTree.Clone();
+
+            var targetIsLeaf = baseDecisionTree.Nodes == null || baseDecisionTree.Nodes.Count == 0 || baseDecisionTree.AudioNodeId != 0;
+            if (targetIsLeaf)
+                return baseDecisionTree.Clone();
+
+            var mergedNodes = new List<Node_V136>(baseDecisionTree.Nodes!);
+            var index = baseDecisionTree.Nodes!.ToDictionary(node => node.Key);
+
+            foreach (var mergingChild in mergingDecisionTree.Nodes ?? [])
+            {
+                if (index.TryGetValue(mergingChild.Key, out var baseChild))
+                {
+                    var mergedDecisionTree = MergeDecisionTrees(baseChild, mergingChild);
+                    if (!ReferenceEquals(baseChild, mergedDecisionTree))
+                        mergedNodes[mergedNodes.FindIndex(node => node.Key == baseChild.Key)] = mergedDecisionTree;
+                }
+                else
+                    mergedNodes.Add(mergingChild.Clone());
+            }
+
+            mergedNodes = SortNodes(mergedNodes);
+
+            return CreateMergedNode(baseDecisionTree, mergingDecisionTree, mergedNodes);
+        }
+
+        private static uint GetKey(Node_V136 baseDecisionTree, Node_V136 mergingDecisionTree)
+        {
+            if (baseDecisionTree.Key != 0)
+                return baseDecisionTree.Key;
+
+            return mergingDecisionTree.Key;
+        }
+
+        private static ushort GetWeight(Node_V136 baseDecisionTree, Node_V136 mergingDecisionTree)
+        {
+            if (baseDecisionTree.Weight != 0)
+                return baseDecisionTree.Weight;
+
+            return mergingDecisionTree.Weight;
+        }
+
+        private static ushort GetProbability(Node_V136 baseDecisionTree, Node_V136 mergingDecisionTree)
+        {
+            if (baseDecisionTree.Probability != 0)
+                return baseDecisionTree.Probability;
+
+            return mergingDecisionTree.Probability;
+        }
+
+        public static List<Node_V136> FlattenDecisionTree(Node_V136 rootNode)
+        {
+            if (rootNode == null)
+                return [];
+
+            var flattenedDecisionTree = new List<Node_V136> { rootNode };
+            PrepareAndFlattenChildren(rootNode, flattenedDecisionTree);
+            return flattenedDecisionTree;
+        }
+
+        private static void PrepareAndFlattenChildren(Node_V136 node, List<Node_V136> flattened)
+        {
+            var hasChildren = node.Nodes != null && node.Nodes.Count > 0;
+            if (!hasChildren)
+            {
+                node.ChildrenIdx = 0;
+                node.ChildrenCount = 0;
+                return;
+            }
+
+            node.AudioNodeId = 0;
+            node.Nodes = SortNodes(node.Nodes!);
+
+            node.ChildrenIdx = (ushort)flattened.Count;
+            node.ChildrenCount = (ushort)node.Nodes.Count;
+
+            foreach (var child in node.Nodes)
+                flattened.Add(child);
+
+            foreach (var child in node.Nodes)
+                PrepareAndFlattenChildren(child, flattened);
+        }
+
+        private static List<Node_V136> SortNodes(IEnumerable<Node_V136> nodes)
+        {
+            return nodes
+                .OrderBy(node => node.Key)
+                .ToList();
+        }
+
+        private static Node_V136 CreateMergedNode(Node_V136 baseDecisionTree, Node_V136 mergingDecisionTree, List<Node_V136> mergedNodes)
+        {
+            return new Node_V136
+            {
+                Key = GetKey(baseDecisionTree, mergingDecisionTree),
+                AudioNodeId = 0,
+                Weight = GetWeight(baseDecisionTree, mergingDecisionTree),
+                Probability = GetProbability(baseDecisionTree, mergingDecisionTree),
+                Nodes = mergedNodes
             };
         }
 
         public class Node_V136
         {
-            public uint? Key { get; set; }
+            public uint Key { get; set; }
             public uint AudioNodeId { get; set; }
             public ushort ChildrenIdx { get; set; }
             public ushort ChildrenCount { get; set; }
@@ -140,12 +248,12 @@ namespace Shared.GameFormats.Wwise.Hirc.V136.Shared
 
             public Node_V136 Clone()
             {
-                var clonedNode = CloneFlatNode();
-                clonedNode.Nodes = Nodes.Select(child => child.Clone()).ToList();
+                var clonedNode = CloneWithoutChildren();
+                clonedNode.Nodes = (Nodes != null) ? Nodes.Select(child => child.Clone()).ToList() : [];
                 return clonedNode;
             }
 
-            public Node_V136 CloneFlatNode()
+            public Node_V136 CloneWithoutChildren()
             {
                 return new Node_V136
                 {

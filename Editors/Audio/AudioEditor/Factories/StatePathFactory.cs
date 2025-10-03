@@ -29,7 +29,7 @@ namespace Editors.Audio.AudioEditor.Factories
             uint actorMixerId = 0)
         {
             var statePath = new StatePath();
-            var statePathNodes = new List<StatePath.StatePathNode>();
+            var statePathNodes = new List<StatePath.Node>();
 
             foreach (var kvp in stateLookupByStateGroup)
             {
@@ -39,7 +39,7 @@ namespace Editors.Audio.AudioEditor.Factories
                 var stateName = kvp.Value;
                 var state = State.Create(stateName);
 
-                var statePathNode = StatePath.StatePathNode.Create(stateGroup, state);
+                var statePathNode = StatePath.Node.Create(stateGroup, state);
                 statePathNodes.Add(statePathNode);
             }
 

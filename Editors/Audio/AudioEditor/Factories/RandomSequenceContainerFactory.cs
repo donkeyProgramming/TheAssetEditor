@@ -19,9 +19,11 @@ namespace Editors.Audio.AudioEditor.Factories
             var randomSequenceContainerIds = IdGenerator.GenerateAudioProjectGeneratableItemIds(usedHircIds);
 
             var sounds = new List<Sound>();
+            var playlistOrder = 0;
             foreach (var audioFile in audioFiles)
             {
-                var sound = _soundFactory.Create(usedHircIds, usedSourceIds, audioFile, randomSequenceContainerIds.Id);
+                playlistOrder++;
+                var sound = _soundFactory.Create(usedHircIds, usedSourceIds, audioFile, randomSequenceContainerIds.Id, playlistOrder);
                 sounds.Add(sound);
             }
 

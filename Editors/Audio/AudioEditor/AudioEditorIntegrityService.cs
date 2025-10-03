@@ -18,7 +18,7 @@ namespace Editors.Audio.AudioEditor
         void CheckDialogueEventInformationIntegrity(List<Wh3DialogueEventDefinition> dialogueEventData);
         void CheckAudioProjectDialogueEventIntegrity(AudioProject audioProject);
         void CheckAudioProjectWavFilesIntegrity(AudioProject audioProject);
-        void CheckAudioProjectIdsIntegrity(AudioProject audioProject, string audioProjectFileNameWithoutExtension);
+        void CheckAudioProjectDataIntegrity(AudioProject audioProject, string audioProjectFileNameWithoutExtension);
         void CheckMergingSoundBanksIdIntegrity();
     }
 
@@ -133,7 +133,7 @@ namespace Editors.Audio.AudioEditor
             }
         }
 
-        public void CheckAudioProjectIdsIntegrity(AudioProject audioProject, string audioProjectFileNameWithoutExtension)
+        public void CheckAudioProjectDataIntegrity(AudioProject audioProject, string audioProjectFileNameWithoutExtension)
         {
             var usedHircIds = new HashSet<uint>();
             var usedSourceIds = new HashSet<uint>();
@@ -222,15 +222,18 @@ namespace Editors.Audio.AudioEditor
 
         private static void ResolveSoundBankDataIntegrity(AudioProject audioProject, string audioProjectFileNameWithoutExtension, SoundBank soundBank)
         {
-            var soundBankNameWithoutAudioProject = soundBank.Name.Replace($"_{audioProjectFileNameWithoutExtension}", "");
-            if (soundBank.Name == Wh3SoundBankInformation.GetName(soundBank.GameSoundBank))
-                soundBank.Name = $"{soundBank.Name}_{audioProjectFileNameWithoutExtension}";
+            var gameSoundBankName = Wh3SoundBankInformation.GetSoundBankNameFromPrefix(soundBank.Name);
+            var gameSoundBank = Wh3SoundBankInformation.GetSoundBank(gameSoundBankName);
+            var correctSoundBankName = $"{gameSoundBankName}_{audioProjectFileNameWithoutExtension}";
+
+            if (soundBank.Name != correctSoundBankName)
+                soundBank.Name = correctSoundBankName;
 
             if (soundBank.Id == 0)
                 soundBank.Id = WwiseHash.Compute(soundBank.Name);
 
-            if (soundBank.GameSoundBank == Wh3SoundBank.None)
-                soundBank.GameSoundBank = Wh3SoundBankInformation.GetSoundBank(soundBankNameWithoutAudioProject);
+            if (soundBank.GameSoundBank != gameSoundBank)
+                soundBank.GameSoundBank = gameSoundBank;
 
             if (soundBank.Language == null)
             {
@@ -279,8 +282,7 @@ namespace Editors.Audio.AudioEditor
                             usedHircIds,
                             usedSourceIds,
                             overrideBusId: overrideBusId,
-                            directParentId: actorMixerId,
-                            isSource: true);
+                            directParentId: actorMixerId);
                     }
                     else
                     {
@@ -518,8 +520,7 @@ namespace Editors.Audio.AudioEditor
                             soundBank,
                             usedHircIds,
                             usedSourceIds,
-                            directParentId: actorMixerId,
-                            isSource: true);
+                            directParentId: actorMixerId);
                     else
                         ResolveRandomSequenceContainerDataIntegrity(
                             statePath.RandomSequenceContainer,
@@ -574,8 +575,12 @@ namespace Editors.Audio.AudioEditor
             if (randomSequenceContainer.DirectParentId == 0 && directParentId != 0)
                 randomSequenceContainer.DirectParentId = directParentId;
 
+            var playlistOrder = 0;
             foreach (var sound in randomSequenceContainer.Sounds)
-                ResolveSoundDataIntegrity(sound, soundBank, usedHircIds, usedSourceIds, directParentId: randomSequenceContainer.Id);
+            {
+                playlistOrder++;
+                ResolveSoundDataIntegrity(sound, soundBank, usedHircIds, usedSourceIds, directParentId: randomSequenceContainer.Id, playlistOrder: playlistOrder);
+            }
         }
 
         private static void ResolveSoundDataIntegrity(
@@ -585,7 +590,7 @@ namespace Editors.Audio.AudioEditor
             HashSet<uint> usedSourceIds,
             uint overrideBusId = 0,
             uint directParentId = 0,
-            bool isSource = false)
+            int playlistOrder = 0)
         {
             var idGeneratorResult = IdGenerator.GenerateAudioProjectGeneratableItemIds(usedHircIds);
             if (sound.Guid == Guid.Empty || sound.Id == 0)
@@ -611,6 +616,9 @@ namespace Editors.Audio.AudioEditor
                 else
                     sound.SourceId = sourceId;
             }
+
+            if (sound.PlaylistOrder == 0)
+                sound.PlaylistOrder = playlistOrder;
         }
 
         public void CheckMergingSoundBanksIdIntegrity()

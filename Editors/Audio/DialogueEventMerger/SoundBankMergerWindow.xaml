@@ -4,7 +4,6 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-    xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
     xmlns:sys="clr-namespace:System;assembly=netstandard"
     xmlns:dialgueeventmerger="clr-namespace:Editors.Audio.DialogueEventMerger"
     d:DataContext="{d:DesignInstance Type=dialgueeventmerger:DialogueEventMergerViewModel}"
@@ -81,11 +80,12 @@
                     Grid.Row="1" 
                     Grid.Column="1"
                     Margin="0, 10, 0, 0"
+                    MaxHeight="500"
                     ItemsSource="{Binding ModdedSoundBanks}"
                     SelectionMode="Extended"
                     VerticalAlignment="Stretch"
-                    ScrollViewer.VerticalScrollBarVisibility="Auto"
-                    ToolTip="Hold Ctrl or Shift to select multiple banks.">
+                    ScrollViewer.VerticalScrollBarVisibility="Auto">
+
                     <ListBox.ItemTemplate>
                         <DataTemplate>
                             <CheckBox 
@@ -109,7 +109,7 @@
                 Content="OK"
                 Width="75"
                 Margin="0, 0, 5, 0"
-                Command="{Binding GenerateMergedDialogueEventsSoundBankCommand}" 
+                Command="{Binding GenerateMergedDialogueEventSoundBankCommand}" 
                 IsEnabled="{Binding IsOkButtonEnabled}"/>
 
             <Button 

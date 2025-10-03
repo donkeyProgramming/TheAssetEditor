@@ -5,11 +5,11 @@ namespace Editors.Audio.AudioEditor.Models
 {
     public class StatePath : AudioProjectItem
     {
-        public List<StatePathNode> Nodes { get; set; } = [];
+        public List<Node> Nodes { get; set; } = [];
         public RandomSequenceContainer RandomSequenceContainer { get; set; }
         public Sound Sound { get; set; }
 
-        public static StatePath Create(List<StatePathNode> nodes, Sound sound)
+        public static StatePath Create(List<Node> nodes, Sound sound)
         {
             return new StatePath
             {
@@ -19,7 +19,7 @@ namespace Editors.Audio.AudioEditor.Models
             };
         }
 
-        public static StatePath Create(List<StatePathNode> nodes, RandomSequenceContainer randomSequenceContainer)
+        public static StatePath Create(List<Node> nodes, RandomSequenceContainer randomSequenceContainer)
         {
             return new StatePath
             {
@@ -29,7 +29,7 @@ namespace Editors.Audio.AudioEditor.Models
             };
         }
 
-        public static string BuildName(List<StatePathNode> nodes)
+        public static string BuildName(List<Node> nodes)
         {
             return string.Join('.', nodes.Select(node => $"[{node.StateGroup.Name}]{node.State.Name}"));
         }
@@ -42,14 +42,14 @@ namespace Editors.Audio.AudioEditor.Models
                 return Sound.AudioSettings;
         }
 
-        public class StatePathNode
+        public class Node
         {
             public StateGroup StateGroup { get; set; }
             public State State { get; set; }
 
-            public static StatePathNode Create(StateGroup stateGroup, State state)
+            public static Node Create(StateGroup stateGroup, State state)
             {
-                return new StatePathNode
+                return new Node
                 {
                     StateGroup = stateGroup,
                     State = state

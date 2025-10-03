@@ -34,14 +34,14 @@ namespace Editors.Audio.AudioEditor.Factories
             {
                 var sound = _soundFactory.Create(usedHircIds, usedSourceIds, audioFiles[0], audioSettings, overrideBusId: overrideBusId, directParentId: actorMixerId);
                 var id = IdGenerator.GenerateActionId(usedHircIds, actionName, actionEventName);
-                var playAction = Action.Create(id, actionName, sound, AkActionType.Play);
+                var playAction = Action.Create(id, actionName, sound, AkActionType.Play, sound.Id);
                 actions.Add(playAction);
             }
             else if (audioFiles.Count > 1)
             {
                 var randomSequenceContainer = _randomSequenceContainerFactory.Create(usedHircIds, usedSourceIds, audioSettings, audioFiles, overrideBusId, actorMixerId);
                 var id = IdGenerator.GenerateActionId(usedHircIds, actionName, actionEventName);
-                var playAction = Action.Create(id, actionName, randomSequenceContainer, AkActionType.Play);
+                var playAction = Action.Create(id, actionName, randomSequenceContainer, AkActionType.Play, randomSequenceContainer.Id);
                 actions.Add(playAction);
             }
 
@@ -60,13 +60,13 @@ namespace Editors.Audio.AudioEditor.Factories
                 if (playAction.Sound != null)
                 {
                     var id = IdGenerator.GenerateActionId(usedHircIds, actionName, playActionEvent.Name);
-                    var resumeAction = Action.Create(id, actionName, playAction.Sound, AkActionType.Resume_E_O);
+                    var resumeAction = Action.Create(id, actionName, playAction.Sound, AkActionType.Resume_E_O, playAction.Sound.Id);
                     resumeActions.Add(resumeAction);
                 }
                 else if (playAction.RandomSequenceContainer != null)
                 {
                     var id = IdGenerator.GenerateActionId(usedHircIds, actionName, playActionEvent.Name);
-                    var resumeAction = Action.Create(id, actionName, playAction.RandomSequenceContainer, AkActionType.Resume_E_O);
+                    var resumeAction = Action.Create(id, actionName, playAction.RandomSequenceContainer, AkActionType.Resume_E_O, playAction.RandomSequenceContainer.Id);
                     resumeActions.Add(resumeAction);
                 }
             }
@@ -88,13 +88,13 @@ namespace Editors.Audio.AudioEditor.Factories
                 if (playAction.Sound != null)
                 {
                     var id = IdGenerator.GenerateActionId(usedHircIds, actionName, playActionEvent.Name);
-                    var pauseAction = Action.Create(id, actionName, playAction.Sound, AkActionType.Pause_E_O);
+                    var pauseAction = Action.Create(id, actionName, playAction.Sound, AkActionType.Pause_E_O, playAction.Sound.Id);
                     pauseActions.Add(pauseAction);
                 }
                 else if (playAction.RandomSequenceContainer != null)
                 {
                     var id = IdGenerator.GenerateActionId(usedHircIds, actionName, playActionEvent.Name);
-                    var pauseAction = Action.Create(id, actionName, playAction.RandomSequenceContainer, AkActionType.Pause_E_O);
+                    var pauseAction = Action.Create(id, actionName, playAction.RandomSequenceContainer, AkActionType.Pause_E_O, playAction.RandomSequenceContainer.Id);
                     pauseActions.Add(pauseAction);
                 }
             }
@@ -116,13 +116,13 @@ namespace Editors.Audio.AudioEditor.Factories
                 if (playAction.Sound != null)
                 {
                     var id = IdGenerator.GenerateActionId(usedHircIds, actionName, playActionEvent.Name);
-                    var stopAction = Action.Create(id, actionName, playAction.Sound, AkActionType.Stop_E_O);
+                    var stopAction = Action.Create(id, actionName, playAction.Sound, AkActionType.Stop_E_O, playAction.Sound.Id);
                     stopActions.Add(stopAction);
                 }
                 else if (playAction.RandomSequenceContainer != null)
                 {
                     var id = IdGenerator.GenerateActionId(usedHircIds, actionName, playActionEvent.Name);
-                    var stopAction = Action.Create(id, actionName, playAction.RandomSequenceContainer, AkActionType.Stop_E_O);
+                    var stopAction = Action.Create(id, actionName, playAction.RandomSequenceContainer, AkActionType.Stop_E_O, playAction.RandomSequenceContainer.Id);
                     stopActions.Add(stopAction);
                 }
             }

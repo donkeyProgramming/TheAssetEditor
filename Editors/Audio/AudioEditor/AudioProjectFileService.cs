@@ -71,14 +71,14 @@ namespace Editors.Audio.AudioEditor
                 var audioProjectJson = Encoding.UTF8.GetString(bytes);
                 var audioProject = JsonSerializer.Deserialize<AudioProject>(audioProjectJson);
 
-                _audioEditorIntegrityService.CheckAudioProjectDialogueEventIntegrity(audioProject);
-                _audioEditorIntegrityService.CheckAudioProjectWavFilesIntegrity(audioProject);
-                _audioEditorIntegrityService.CheckAudioProjectIdsIntegrity(audioProject, fileNameWithoutExtension);
-
                 // We create a 'dirty' Audio Project to display the whole model in the Audio Project Explorer rather than
                 // just the clean data from the loaded Audio Project as when it's saved any unused parts are removed.
                 var currentGame = _applicationSettingsService.CurrentSettings.CurrentGame;
                 var dirtyAudioProject = AudioProject.Create(audioProject, currentGame, fileNameWithoutExtension);
+
+                _audioEditorIntegrityService.CheckAudioProjectDialogueEventIntegrity(dirtyAudioProject);
+                _audioEditorIntegrityService.CheckAudioProjectWavFilesIntegrity(dirtyAudioProject);
+                _audioEditorIntegrityService.CheckAudioProjectDataIntegrity(dirtyAudioProject, fileNameWithoutExtension);
 
                 _audioEditorStateService.StoreAudioProject(dirtyAudioProject);
                 _audioEditorStateService.StoreAudioProjectFileName(fileName);

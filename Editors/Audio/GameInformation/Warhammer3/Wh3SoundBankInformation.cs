@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace Editors.Audio.GameInformation.Warhammer3
@@ -51,5 +52,18 @@ namespace Editors.Audio.GameInformation.Warhammer3
         public static string GetName(Wh3SoundBank soundBank) => Information.First(definition => definition.GameSoundBank == soundBank).Name;
 
         public static Wh3GameLanguage? GetRequiredLanguage(Wh3SoundBank soundBank) => Information.First(definition => definition.GameSoundBank == soundBank).RequiredLanguage;
+
+        public static string GetSoundBankNameFromPrefix(string value)
+        {
+            if (string.IsNullOrWhiteSpace(value))
+                return null;
+
+            var matchingDefinition = Wh3SoundBankInformation.Information
+                .OrderByDescending(soundBankDefinition => soundBankDefinition.Name.Length)
+                .FirstOrDefault(soundBankDefinition =>
+                    value.StartsWith(soundBankDefinition.Name, StringComparison.OrdinalIgnoreCase));
+
+            return matchingDefinition?.Name;
+        }
     }
 }

@@ -1,10 +1,13 @@
-﻿using System.Collections;
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
+using System.Collections.Specialized;
+using System.ComponentModel;
 using System.Linq;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Editors.Audio.AudioProjectCompiler;
 using Editors.Audio.Storage;
+using Serilog;
+using Shared.Core.ErrorHandling;
 
 namespace Editors.Audio.DialogueEventMerger
 {
@@ -22,6 +25,7 @@ namespace Editors.Audio.DialogueEventMerger
         private readonly IAudioRepository _audioRepository;
         private readonly ISoundBankGeneratorService _soundBankGeneratorService;
 
+        private readonly ILogger _logger = Logging.Create<AudioProjectCompilerService>();
         private System.Action _closeAction;
 
         [ObservableProperty] private string _soundBankSuffix;
@@ -39,6 +43,10 @@ namespace Editors.Audio.DialogueEventMerger
                 .Select(path => new ModdedSoundBank(path, isChecked: true))
             );
 
+            ModdedSoundBanks.CollectionChanged += OnModdedSoundBanksCollectionChanged;
+            foreach (var item in ModdedSoundBanks)
+                item.PropertyChanged += OnModdedSoundBankPropertyChanged;
+
             SelectedModdedSoundBanks = new ObservableCollection<string>(ModdedSoundBanks.Select(x => x.FilePath));
         }
 
@@ -53,16 +61,40 @@ namespace Editors.Audio.DialogueEventMerger
             IsOkButtonEnabled = IsSoundBankSuffixSet && SelectedModdedSoundBanks.Any();
         }
 
-        [RelayCommand] private void ModdedSoundBanksSelectionChanged(IList selectedItems)
+        private void OnModdedSoundBanksCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
-            SelectedModdedSoundBanks = new ObservableCollection<string>(selectedItems.Cast<string>());
+            if (e.NewItems != null)
+            {
+                foreach (ModdedSoundBank item in e.NewItems)
+                    item.PropertyChanged += OnModdedSoundBankPropertyChanged;
+            }
 
+            if (e.OldItems != null)
+            {
+                foreach (ModdedSoundBank item in e.OldItems)
+                    item.PropertyChanged -= OnModdedSoundBankPropertyChanged;
+            }
+
+            SetSelectedModdedSoundBanks();
+        }
+
+        private void OnModdedSoundBankPropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == nameof(ModdedSoundBank.IsChecked))
+                SetSelectedModdedSoundBanks();
+        }
+
+        private void SetSelectedModdedSoundBanks()
+        {
+            SelectedModdedSoundBanks = new ObservableCollection<string>(ModdedSoundBanks.Where(x => x.IsChecked).Select(x => x.FilePath));
             UpdateOkButtonIsEnabled();
         }
 
-        [RelayCommand] public void GenerateMergedDialogueEventsSoundBank()
+        [RelayCommand] public void GenerateMergedDialogueEventSoundBank()
         {
-            _soundBankGeneratorService.GenerateMergedDialogueEventSoundBanks(SelectedModdedSoundBanks.ToList());
+            _logger.Here().Information($"Generating merged Dialogue Event SoundBanks");
+
+            _soundBankGeneratorService.GenerateMergedDialogueEventSoundBanks(SelectedModdedSoundBanks.ToList(), SoundBankSuffix);
 
             CloseWindowAction();
         }

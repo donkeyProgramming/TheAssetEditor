@@ -51,7 +51,7 @@ namespace Editors.Audio.Utility
 
         public void RunExternalCommand(string arguments)
         {
-            _logger.Here().Information($"Running WwiseCLI.exe with arguments: {arguments}");
+            _logger.Here().Information($"Running WwiseCLI.exe with arguments {arguments}");
             try
             {
                 var startInfo = new ProcessStartInfo()

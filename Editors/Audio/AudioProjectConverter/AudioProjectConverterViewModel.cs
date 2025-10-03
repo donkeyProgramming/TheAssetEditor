@@ -36,7 +36,7 @@ namespace Editors.Audio.AudioProjectConverter
     public class StatePathInfo
     {
         public string JoinedStatePath { get; set; }
-        public List<StatePath.StatePathNode> StatePathNodes { get; set; }
+        public List<StatePath.Node> StatePathNodes { get; set; }
         public List<WavFile> WavFiles { get; set; }
     }
 
@@ -265,7 +265,7 @@ namespace Editors.Audio.AudioProjectConverter
                     continue;
 
                 var wavFiles = new List<WavFile>();
-                var statePathNodes = new List<StatePath.StatePathNode>();
+                var statePathNodes = new List<StatePath.Node>();
 
                 StoreStateGroupAndStateInfo(dialogueEvent, statesLookupByStateId, statesLookupByStateGroupByStateId, statePath, statePathNodes, moddedStateGroups);
 
@@ -302,7 +302,7 @@ namespace Editors.Audio.AudioProjectConverter
             Dictionary<uint, string> wwiseStatesIdLookup,
             Dictionary<string, Dictionary<uint, string>> statesLookupByStateGroupByStateId,
             DecisionPathHelper.DecisionPath statePath,
-            List<StatePath.StatePathNode> statePathNodes,
+            List<StatePath.Node> statePathNodes,
             Dictionary<string, List<string>> moddedStateGroups)
         {
             var stateGroupIndex = 0;
@@ -323,7 +323,7 @@ namespace Editors.Audio.AudioProjectConverter
 
                 var audioProjectstateGroup = StateGroup.Create(stateGroup);
                 var audioProjectstate = State.Create(state);
-                var statePathNode = StatePath.StatePathNode.Create(audioProjectstateGroup, audioProjectstate);
+                var statePathNode = StatePath.Node.Create(audioProjectstateGroup, audioProjectstate);
                 statePathNodes.Add(statePathNode);
 
                 // Store modded states info
@@ -392,7 +392,7 @@ namespace Editors.Audio.AudioProjectConverter
             Dictionary<string, List<StatePathInfo>> statePathsLookupByDialogueEvent,
             List<WavFile> wavFiles,
             string dialogueEventName,
-            List<StatePath.StatePathNode> statePathNodes)
+            List<StatePath.Node> statePathNodes)
         {
             var joinedStatePath = string.Join(".", statePathNodes.Select(statePathNode => statePathNode.State.Name));
 
@@ -468,11 +468,14 @@ namespace Editors.Audio.AudioProjectConverter
                 {
                     var randomSequenceContainerIds = IdGenerator.GenerateAudioProjectGeneratableItemIds(usedHircIds);
                     var sounds = new List<Sound>();
+
+                    var playlistOrder = 0;
                     foreach (var audioFile in audioFiles)
                     {
+                        playlistOrder++;
                         var soundIds = IdGenerator.GenerateAudioProjectGeneratableItemIds(usedHircIds);
-                        var sourceId = IdGenerator.GenerateSourceId(usedHircIds, audioFile.FilePath, false);
-                        var sound = Sound.Create(soundIds.Guid, soundIds.Id, randomSequenceContainerIds.Id, sourceId, audioFile.FileName, audioFile.FilePath);
+                        var sourceId = IdGenerator.GenerateSourceId(usedSourceIds, audioFile.FilePath, false);
+                        var sound = Sound.Create(soundIds.Guid, soundIds.Id, randomSequenceContainerIds.Id, sourceId, playlistOrder, audioFile.FileName, audioFile.FilePath);
                         sounds.Add(sound);
                     }
 
@@ -489,9 +492,9 @@ namespace Editors.Audio.AudioProjectConverter
                 {
                     var audioFile = audioFiles[0];
                     var soundIds = IdGenerator.GenerateAudioProjectGeneratableItemIds(usedHircIds);
-                    var sourceId = IdGenerator.GenerateSourceId(usedHircIds, audioFile.FilePath, false);
+                    var sourceId = IdGenerator.GenerateSourceId(usedSourceIds, audioFile.FilePath, false);
                     var soundSettings = AudioSettings.CreateSoundSettings();
-                    var sound = Sound.Create(soundIds.Guid, soundIds.Id, actorMixerId, sourceId, audioFile.FileName, audioFile.FilePath);
+                    var sound = Sound.Create(soundIds.Guid, soundIds.Id, 0, actorMixerId, sourceId, audioFile.FileName, audioFile.FilePath, soundSettings);
                     audioProjectStatePath = StatePath.Create(statePath.StatePathNodes, sound);
                 }
 

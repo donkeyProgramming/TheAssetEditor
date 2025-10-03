@@ -8,6 +8,7 @@ namespace Editors.Audio.AudioEditor.Models
         public uint OverrideBusId { get; set; }
         public uint DirectParentId { get; set; }
         public uint SourceId { get; set; }
+        public int PlaylistOrder { get; set; }
         public string WavPackFileName { get; set; }
         public string WavPackFilePath { get; set; }
         public string WemPackFileName { get; set; }
@@ -37,7 +38,7 @@ namespace Editors.Audio.AudioEditor.Models
             };
         }
 
-        public static Sound Create(Guid guid, uint id, uint directParentId, uint sourceId, string fileName, string filePath)
+        public static Sound Create(Guid guid, uint id, uint directParentId, uint sourceId, int playlistOrder, string fileName, string filePath)
         {
             return new Sound()
             {
@@ -45,15 +46,10 @@ namespace Editors.Audio.AudioEditor.Models
                 Id = id,
                 DirectParentId = directParentId,
                 SourceId = sourceId,
+                PlaylistOrder = playlistOrder,
                 WavPackFileName = fileName,
                 WavPackFilePath = filePath
             };
-        }
-
-        public string GetAsString()
-        {
-            var audioSettings = AudioSettings?.GetAsString() ?? "null";
-            return $"{OverrideBusId}_{DirectParentId}_{audioSettings}";
         }
     }
 }

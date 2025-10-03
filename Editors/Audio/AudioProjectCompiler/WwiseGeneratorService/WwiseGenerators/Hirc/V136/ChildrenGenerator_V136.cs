@@ -7,11 +7,11 @@ namespace Editors.Audio.AudioProjectCompiler.WwiseGeneratorService.WwiseGenerato
 {
     public class ChildrenGenerator_V136
     {
-
         public static Children_V136 CreateChildrenList(List<Sound> sounds)
         {
             var childIds = sounds
                 .Select(sound => sound.Id)
+                .OrderByDescending(id => id)
                 .ToList();
 
             return new Children_V136

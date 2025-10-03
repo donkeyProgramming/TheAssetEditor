@@ -363,6 +363,9 @@ namespace Editors.Audio.AudioEditor.Settings
                     }
                     else
                     {
+                        var orderedSounds = playAction.RandomSequenceContainer.Sounds
+                        .OrderBy(sound => sound.PlaylistOrder)
+                        .ToList();
                         foreach (var sound in playAction.RandomSequenceContainer.Sounds)
                         {
                             audioFiles.Add(new AudioFile()
@@ -393,7 +396,10 @@ namespace Editors.Audio.AudioEditor.Settings
                 }
                 else
                 {
-                    foreach (var sound in statePath.RandomSequenceContainer.Sounds)
+                    var orderedSounds = statePath.RandomSequenceContainer.Sounds
+                        .OrderBy(sound => sound.PlaylistOrder)
+                        .ToList();
+                    foreach (var sound in orderedSounds)
                     {
                         audioFiles.Add(new AudioFile()
                         {

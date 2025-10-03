@@ -67,19 +67,5 @@ namespace Editors.Audio.AudioEditor.Models
                 TransitionDuration = 1
             };
         }
-
-        public string GetAsString()
-        {
-            return $"{PlaylistType}_" + 
-                $"{EnableRepetitionInterval}_" +
-                $"{RepetitionInterval}_" +
-                $"{EndBehaviour}_" +
-                $"{AlwaysResetPlaylist}_" +
-                $"{PlaylistMode}_" +
-                $"{LoopingType}_" +
-                $"{NumberOfLoops}_" +
-                $"{TransitionType}_" +
-                $"{TransitionDuration}";
-        }
     }
 }
