@@ -1,4 +1,5 @@
-﻿using System.Collections.ObjectModel;
+﻿using System;
+using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 
 namespace Editors.Audio.AudioEditor.AudioFilesExplorer
@@ -19,6 +20,8 @@ namespace Editors.Audio.AudioEditor.AudioFilesExplorer
         [ObservableProperty] bool _isExpanded = false;
         [ObservableProperty] bool _isVisible = true;
 
+        public event EventHandler<bool> NodeIsExpandedChanged;
+
         public static AudioFilesTreeNode CreateContainerNode(string name, AudioFilesTreeNodeType nodeType, AudioFilesTreeNode parent = null)
         {
             return new AudioFilesTreeNode
@@ -38,5 +41,7 @@ namespace Editors.Audio.AudioEditor.AudioFilesExplorer
                 Parent = parent
             };
         }
+
+        partial void OnIsExpandedChanged(bool value) => NodeIsExpandedChanged?.Invoke(this, value);
     }
 }

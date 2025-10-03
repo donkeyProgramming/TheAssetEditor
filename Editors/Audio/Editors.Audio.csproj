@@ -6,6 +6,12 @@
 		<UseWPF>true</UseWPF>
 	</PropertyGroup>
 
+
+	<ItemGroup>
+	  <PackageReference Include="NAudio" Version="2.2.1" />
+	  <PackageReference Include="NAudio.WaveFormRenderer" Version="2.0.0" />
+	</ItemGroup>
+
   <ItemGroup>
     <ProjectReference Include="..\..\Shared\SharedCore\Shared.Core.csproj" />
     <ProjectReference Include="..\..\Shared\SharedUI\Shared.Ui.csproj" />

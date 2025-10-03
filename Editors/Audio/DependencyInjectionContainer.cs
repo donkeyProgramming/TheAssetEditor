@@ -12,6 +12,7 @@ using Editors.Audio.AudioEditor.Presentation.Table;
 using Editors.Audio.AudioEditor.Services;
 using Editors.Audio.AudioEditor.Settings;
 using Editors.Audio.AudioEditor.UICommands;
+using Editors.Audio.AudioEditor.WaveformVisualiser;
 using Editors.Audio.AudioExplorer;
 using Editors.Audio.AudioProjectCompiler;
 using Editors.Audio.AudioProjectConverter;
@@ -41,6 +42,7 @@ namespace Editors.Audio
             serviceCollection.AddScoped<AudioProjectEditorViewModel>();
             serviceCollection.AddScoped<AudioProjectViewerViewModel>();
             serviceCollection.AddScoped<SettingsViewModel>();
+            serviceCollection.AddScoped<WaveformVisualiserViewModel>();
 
             // New Audio Project
             serviceCollection.AddTransient<NewAudioProjectViewModel>();
@@ -87,6 +89,10 @@ namespace Editors.Audio
             serviceCollection.AddScoped<IViewerTableService, ViewerActionEventDataGridService>();
             serviceCollection.AddScoped<IViewerTableService, ViewerDialogueEventDataGridService>();
             serviceCollection.AddScoped<IViewerTableService, ViewerStateGroupDataGridService>();
+
+            // Waveform Visualiser services
+            //serviceCollection.AddSingleton<IWaveformRenderingService, WaveformRenderingService>();
+            //serviceCollection.AddSingleton<IAudioPlayerService, AudioPlayerService>();
 
             // Audio Project mutation
             serviceCollection.AddSingleton<ISoundFactory, SoundFactory>();

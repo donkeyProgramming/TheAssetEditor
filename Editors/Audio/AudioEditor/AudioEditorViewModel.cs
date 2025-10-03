@@ -9,6 +9,7 @@ using Editors.Audio.AudioEditor.Events;
 using Editors.Audio.AudioEditor.Models;
 using Editors.Audio.AudioEditor.Settings;
 using Editors.Audio.AudioEditor.UICommands;
+using Editors.Audio.AudioEditor.WaveformVisualiser;
 using Editors.Audio.AudioProjectCompiler;
 using Editors.Audio.GameInformation.Warhammer3;
 using Shared.Core.Events;
@@ -32,6 +33,8 @@ namespace Editors.Audio.AudioEditor
         public AudioProjectEditorViewModel AudioProjectEditorViewModel { get; }
         public AudioProjectViewerViewModel AudioProjectViewerViewModel { get; }
         public SettingsViewModel SettingsViewModel { get; }
+        public WaveformVisualiserViewModel WaveformVisualiserViewModel { get; }
+
         public string DisplayName { get; set; } = "Audio Editor";
 
         public AudioEditorViewModel(
@@ -45,7 +48,8 @@ namespace Editors.Audio.AudioEditor
             AudioFilesExplorerViewModel audioFilesExplorerViewModel,
             AudioProjectEditorViewModel audioProjectEditorViewModel,
             AudioProjectViewerViewModel audioProjectViewerViewModel,
-            SettingsViewModel settingsViewModel)
+            SettingsViewModel settingsViewModel,
+            WaveformVisualiserViewModel waveformVisualiserViewModel)
         {
             _uiCommandFactory = uiCommandFactory;
             _eventHub = eventHub;
@@ -59,6 +63,7 @@ namespace Editors.Audio.AudioEditor
             AudioProjectEditorViewModel = audioProjectEditorViewModel;
             AudioProjectViewerViewModel = audioProjectViewerViewModel;
             SettingsViewModel = settingsViewModel;
+            WaveformVisualiserViewModel = waveformVisualiserViewModel;
 
             _audioEditorIntegrityService.CheckDialogueEventInformationIntegrity(Wh3DialogueEventInformation.Information);
         }

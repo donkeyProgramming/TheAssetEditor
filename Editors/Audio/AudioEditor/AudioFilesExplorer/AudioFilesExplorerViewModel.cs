@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Linq;
@@ -14,6 +15,7 @@ using Editors.Audio.AudioEditor.UICommands;
 using Shared.Core.Events;
 using Shared.Core.Events.Global;
 using Shared.Core.PackFiles;
+using Shared.Core.PackFiles.Models;
 
 namespace Editors.Audio.AudioEditor.AudioFilesExplorer
 {
@@ -58,9 +60,9 @@ namespace Editors.Audio.AudioEditor.AudioFilesExplorer
 
             _eventHub.Register<AudioProjectExplorerNodeSelectedEvent>(this, OnAudioProjectExplorerNodeSelected);
             _eventHub.Register<AudioFilesChangedEvent>(this, OnAudioFilesChanged);
-            _globalEventHub.Register<PackFileContainerFilesAddedEvent>(this, x => _audioFilesTreeBuilder.BuildTree(x.Container));
-            _globalEventHub.Register<PackFileContainerFilesRemovedEvent>(this, x => _audioFilesTreeBuilder.BuildTree(x.Container));
-            _globalEventHub.Register<PackFileContainerFolderRemovedEvent>(this, x => _audioFilesTreeBuilder.BuildTree(x.Container));
+            _globalEventHub.Register<PackFileContainerFilesAddedEvent>(this, x => RefreshAudioFilesTree(x.Container));
+            _globalEventHub.Register<PackFileContainerFilesRemovedEvent>(this, x => RefreshAudioFilesTree(x.Container));
+            _globalEventHub.Register<PackFileContainerFolderRemovedEvent>(this, x => RefreshAudioFilesTree(x.Container));
 
             var editablePack = _packFileService.GetEditablePack();
             if (editablePack == null)
@@ -68,7 +70,57 @@ namespace Editors.Audio.AudioEditor.AudioFilesExplorer
 
             AudioFilesExplorerLabel = $"Audio Files Explorer - {TableHelpers.DuplicateUnderscores(editablePack.Name)}";
 
-            AudioFilesTree = _audioFilesTreeBuilder.BuildTree(editablePack); ;
+            AudioFilesTree = _audioFilesTreeBuilder.BuildTree(editablePack);
+            SetupIsExpandedHandlers(AudioFilesTree);
+
+            CacheRootWavFilesInWaveformVisualiser();
+        }
+
+        private void SetupIsExpandedHandlers(ObservableCollection<AudioFilesTreeNode> nodes)
+        {
+            foreach (var node in nodes)
+            {
+                node.NodeIsExpandedChanged -= OnNodeIsExpandedChanged;
+                node.NodeIsExpandedChanged += OnNodeIsExpandedChanged;
+
+                if (node.Children is { Count: > 0 })
+                    SetupIsExpandedHandlers(node.Children);
+            }
+        }
+
+        private void CacheRootWavFilesInWaveformVisualiser()
+        {
+            var wavFilePaths = new List<string>();
+            foreach (var node in AudioFilesTree)
+            {
+                if (node.Parent == null && node.Type == AudioFilesTreeNodeType.WavFile)
+                    wavFilePaths.Add(node.FilePath);
+            }
+
+            if (wavFilePaths.Count > 0)
+                _eventHub.Publish(new AddToWaveformCacheRequestedEvent(wavFilePaths));
+        }
+
+        private void OnNodeIsExpandedChanged(object sender, bool isExpanded)
+        {
+            var node = sender as AudioFilesTreeNode;
+            if (node.Children != null)
+            {
+                var wavFilePaths = new List<string>();
+                foreach (var child in node.Children)
+                {
+                    if (child.Type == AudioFilesTreeNodeType.WavFile)
+                        wavFilePaths.Add(child.FilePath);
+                }
+
+                if (wavFilePaths.Count == 0)
+                    return;
+
+                if (isExpanded)
+                    _eventHub.Publish(new AddToWaveformCacheRequestedEvent(wavFilePaths));
+                else
+                    _eventHub.Publish(new RemoveFromWaveformCacheRequestedEvent(wavFilePaths));
+            }
         }
 
         private void OnAudioProjectExplorerNodeSelected(AudioProjectExplorerNodeSelectedEvent e)
@@ -79,7 +131,31 @@ namespace Editors.Audio.AudioEditor.AudioFilesExplorer
 
         private void OnAudioFilesChanged(AudioFilesChangedEvent e) => SetButtonEnablement();
 
+        private void RefreshAudioFilesTree(PackFileContainer packFileContainer)
+        {
+            AudioFilesTree = _audioFilesTreeBuilder.BuildTree(packFileContainer);
+
+            CacheRootWavFilesInWaveformVisualiser();
+        }
+
         private void OnSelectedTreeNodesChanged(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            SetSelectedTreeNodes(e);
+
+            if (SelectedTreeNodes.Count == 1)
+            {
+                var selectedNode = e.NewItems[0] as AudioFilesTreeNode;
+                if (selectedNode.Type == AudioFilesTreeNodeType.WavFile)
+                {
+                    var selectedAudioFile = SelectedTreeNodes[0];
+                    _eventHub.Publish(new DisplayWaveformVisualiserRequestedEvent(selectedAudioFile.FilePath));
+                }
+            }
+
+            SetButtonEnablement();
+        }
+
+        private void SetSelectedTreeNodes(NotifyCollectionChangedEventArgs e)
         {
             if (e.Action == NotifyCollectionChangedAction.Add)
             {
@@ -89,8 +165,6 @@ namespace Editors.Audio.AudioEditor.AudioFilesExplorer
                         SelectedTreeNodes.Remove(addedNode);
                 }
             }
-
-            SetButtonEnablement();
         }
 
         private void SetButtonEnablement()
@@ -103,13 +177,13 @@ namespace Editors.Audio.AudioEditor.AudioFilesExplorer
 
             if (SelectedTreeNodes.Count > 0)
             {
-                if (selectedAudioProjectExplorerNode.Type == AudioProjectTreeNodeType.ActionEventType 
+                if (selectedAudioProjectExplorerNode.Type == AudioProjectTreeNodeType.ActionEventType
                     || selectedAudioProjectExplorerNode.Type == AudioProjectTreeNodeType.DialogueEvent)
                 {
                     IsSetAudioFilesButtonEnabled = true;
 
                     if (_audioEditorStateService.AudioFiles.Count > 0)
-                    IsAddAudioFilesButtonEnabled = true;
+                        IsAddAudioFilesButtonEnabled = true;
                     else
                         IsAddAudioFilesButtonEnabled = false;
                 }
@@ -160,7 +234,7 @@ namespace Editors.Audio.AudioEditor.AudioFilesExplorer
         private static void ToggleNodeExpansion(AudioFilesTreeNode node, bool shouldExpand)
         {
             if (node.IsVisible)
-            node.IsExpanded = shouldExpand;
+                node.IsExpanded = shouldExpand;
 
             foreach (var child in node.Children)
                 ToggleNodeExpansion(child, shouldExpand);

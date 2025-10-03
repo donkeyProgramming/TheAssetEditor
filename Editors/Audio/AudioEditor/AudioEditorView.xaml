@@ -12,6 +12,7 @@
     xmlns:audioprojecteditor="clr-namespace:Editors.Audio.AudioEditor.AudioProjectEditor"
     xmlns:settings="clr-namespace:Editors.Audio.AudioEditor.Settings"
     xmlns:audioprojectviewer="clr-namespace:Editors.Audio.AudioEditor.AudioProjectViewer"
+    xmlns:waveformvisualiser="clr-namespace:Editors.Audio.AudioEditor.WaveformVisualiser"
     d:DataContext="{d:DesignInstance Type=audioeditor:AudioEditorViewModel}"
     mc:Ignorable="d" 
     d:DesignWidth="1200" d:DesignHeight="700">
@@ -102,6 +103,8 @@
                             Height="Auto"/>
                         <RowDefinition 
                             Height="*"/>
+                        <RowDefinition 
+                            Height="Auto"/>
                     </Grid.RowDefinitions>
 
                     <audioprojectexplorer:AudioProjectExplorerView
@@ -122,6 +125,12 @@
                         Grid.Row="2"
                         Grid.Column="0"
                         DataContext="{Binding AudioFilesExplorerViewModel}"/>
+
+                    <waveformvisualiser:WaveformVisualiserView 
+                        Grid.Row="3"
+                        Grid.Column="0"
+                        DataContext="{Binding WaveformVisualiserViewModel}"
+                        Visibility="Hidden"/>
                 </Grid>
             </Grid>
 
