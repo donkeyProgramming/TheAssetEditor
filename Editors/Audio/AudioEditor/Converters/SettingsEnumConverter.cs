@@ -12,8 +12,8 @@ namespace Editors.Audio.AudioEditor.Converters
         {
             if (value == null)
                 return value;
-            else if (value is Wh3GameLanguage language)
-                return Wh3LanguageInformation.GetGameLanguageAsString(language);
+            else if (value is Wh3Language language)
+                return Wh3LanguageInformation.GetLanguageAsString(language);
             else if (value is Wh3DialogueEventType dialogueEventType)
                 return Wh3DialogueEventInformation.GetDialogueEventTypeDisplayName(dialogueEventType);
             else if (value is Wh3DialogueEventUnitProfile dialogueEventProfile)

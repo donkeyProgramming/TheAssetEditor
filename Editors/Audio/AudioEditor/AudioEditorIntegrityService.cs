@@ -4,7 +4,6 @@ using System.Linq;
 using System.Text;
 using System.Windows;
 using Editors.Audio.AudioEditor.Models;
-using Editors.Audio.AudioProjectCompiler;
 using Editors.Audio.GameInformation.Warhammer3;
 using Editors.Audio.Storage;
 using Editors.Audio.Utility;
@@ -140,10 +139,10 @@ namespace Editors.Audio.AudioEditor
             var audioProjectSourceIds = audioProject.GetAudioFileIds();
 
             var languageId = WwiseHash.Compute(audioProject.Language);
-            var gameLanguageHircIds = _audioRepository.GetUsedVanillaHircIdsByLanguageId(languageId);
-            var gameLanguageSourceIds = _audioRepository.GetUsedVanillaSourceIdsByLanguageId(languageId);
+            var languageHircIds = _audioRepository.GetUsedVanillaHircIdsByLanguageId(languageId);
+            var languageSourceIds = _audioRepository.GetUsedVanillaSourceIdsByLanguageId(languageId);
 
-            // Reset and remove any AudioProjectItem IDs used in vanilla so we can update them
+            // Reset and remove any AudioProjectItem IDs used in vanilla so we can handle them
             var hircIdConflicts = new List<uint>();
             var generatableItems = audioProject.GetGeneratableItems();
             foreach (var generatableItem in generatableItems)
@@ -151,7 +150,7 @@ namespace Editors.Audio.AudioEditor
                 if (generatableItem.Id == 0)
                     continue;
 
-                if (gameLanguageHircIds.Contains(generatableItem.Id) && generatableItem is not DialogueEvent)
+                if (languageHircIds.Contains(generatableItem.Id) && generatableItem is not DialogueEvent)
                 {
                     hircIdConflicts.Add(generatableItem.Id);
                     audioProjectGeneratableItemIds.Remove(generatableItem.Id);
@@ -163,13 +162,13 @@ namespace Editors.Audio.AudioEditor
             if (hircIdConflicts.Count > 0)
             {
                 MessageBox.Show(
-                    "Detected ID conflicts with vanilla for the following Hirc IDs:\n" + 
+                    "Detected ID conflicts with vanilla for the following Hirc IDs:\n" +
                     string.Join(", ", hircIdConflicts),
                     "Error"
                 );
             }
 
-            // Reset and remove any Source IDs used in vanilla so we can update them
+            // Reset and remove any Source IDs used in vanilla so we can handle them
             var sourceIdConflicts = new List<uint>();
             var audioProjectSounds = audioProject.GetSounds();
             foreach (var sound in audioProjectSounds)
@@ -177,7 +176,7 @@ namespace Editors.Audio.AudioEditor
                 if (sound.SourceId == 0)
                     continue;
 
-                if (gameLanguageSourceIds.Contains(sound.SourceId))
+                if (languageSourceIds.Contains(sound.SourceId))
                 {
                     sourceIdConflicts.Add(sound.Id);
                     audioProjectSourceIds.Remove(sound.SourceId);
@@ -195,9 +194,9 @@ namespace Editors.Audio.AudioEditor
             }
 
             usedHircIds.UnionWith(audioProjectGeneratableItemIds);
-            usedHircIds.UnionWith(gameLanguageHircIds);
+            usedHircIds.UnionWith(languageHircIds);
             usedSourceIds.UnionWith(audioProjectSourceIds);
-            usedSourceIds.UnionWith(gameLanguageSourceIds);
+            usedSourceIds.UnionWith(languageSourceIds);
 
             foreach (var soundBank in audioProject.SoundBanks)
             {
@@ -210,47 +209,57 @@ namespace Editors.Audio.AudioEditor
                     ResolveDialogueEventDataIntegrity(usedHircIds, usedSourceIds, soundBank);
             }
 
+            foreach (var audioFile in audioProject.AudioFiles)
+                ResolveAudioFileDataIntegrity(audioFile);
+
             ResolveStateGroupDataIntegrity(audioProject);
         }
 
         private static void ResolveSoundBankDataIntegrity(AudioProject audioProject, string audioProjectFileNameWithoutExtension, SoundBank soundBank)
         {
+            if (soundBank == null)
+                throw new InvalidOperationException("SoundBank should not be null.");
+
+            if (string.IsNullOrWhiteSpace(soundBank.Name))
+                throw new InvalidOperationException("SoundBank.Name should not be null or empty.");
+
             var gameSoundBankName = Wh3SoundBankInformation.GetSoundBankNameFromPrefix(soundBank.Name);
             var gameSoundBank = Wh3SoundBankInformation.GetSoundBank(gameSoundBankName);
             var correctSoundBankName = $"{gameSoundBankName}_{audioProjectFileNameWithoutExtension}";
 
             if (soundBank.Name != correctSoundBankName)
-                soundBank.Name = correctSoundBankName;
+                throw new InvalidOperationException($"SoundBank.Name is incorrect. Expected '{correctSoundBankName}'.");
 
             if (soundBank.Id == 0)
-                soundBank.Id = WwiseHash.Compute(soundBank.Name);
+                throw new InvalidOperationException("SoundBank.Id should not be 0.");
 
             if (soundBank.GameSoundBank != gameSoundBank)
-                soundBank.GameSoundBank = gameSoundBank;
+                throw new InvalidOperationException($"SoundBank.GameSoundBank is incorrect for '{soundBank.Name}'.");
 
-            if (soundBank.Language == null)
+            if (string.IsNullOrWhiteSpace(soundBank.Language))
+                throw new InvalidOperationException("SoundBank.Language should not be null or empty.");
+
+            var requiredLanguage = Wh3SoundBankInformation.GetRequiredLanguage(soundBank.GameSoundBank);
+            if (requiredLanguage != null)
             {
-                var language = audioProject.Language;
-                var requiredLanguage = Wh3SoundBankInformation.GetRequiredLanguage(soundBank.GameSoundBank);
-                if (requiredLanguage != null)
-                    language = Wh3LanguageInformation.GetGameLanguageAsString((Wh3GameLanguage)requiredLanguage);
-                soundBank.Language = language;
+                var requiredLanguageAsString = Wh3LanguageInformation.GetLanguageAsString((Wh3Language)requiredLanguage);
+                if (!string.Equals(soundBank.Language, requiredLanguageAsString, StringComparison.Ordinal))
+                    throw new InvalidOperationException($"SoundBank.Language should be '{requiredLanguageAsString}'.");
             }
 
             if (soundBank.LanguageId == 0)
-                soundBank.LanguageId = WwiseHash.Compute(soundBank.Language);
+                throw new InvalidOperationException("SoundBank.LanguageId should not be 0.");
         }
 
         private static void ResolveActionEventDataIntegrity(HashSet<uint> usedHircIds, HashSet<uint> usedSourceIds, SoundBank soundBank)
         {
-            var actionEvents = soundBank.GetPlayActionEvents();
-            foreach (var actionEvent in actionEvents)
+            foreach (var actionEvent in soundBank.ActionEvents)
             {
-                if (actionEvent.Name != actionEvent.Name)
+                if (string.IsNullOrWhiteSpace(actionEvent.Name))
                     throw new InvalidOperationException("The Action Event should have a name. Check for Action Events without names.");
 
                 if (actionEvent.Id == 0)
-                    actionEvent.Id = IdGenerator.GenerateActionEventId(usedHircIds, actionEvent.Name);
+                    throw new InvalidOperationException($"ActionEvent.Id should not be 0 for '{actionEvent.Name}'.");
 
                 if (actionEvent.Actions.Count > 1)
                     throw new NotSupportedException("Multiple Actions are not supported.");
@@ -260,34 +269,45 @@ namespace Editors.Audio.AudioEditor
 
                 foreach (var action in actionEvent.Actions)
                 {
-                    var actionName = $"{actionEvent.Name}_action";
-                    if (action.Name != actionName)
-                        action.Name = actionName;
-
                     if (action.Id == 0)
-                    {
-                        var actionIds = IdGenerator.GenerateIds(usedHircIds);
-                        action.Id = actionIds.Id;
-                    }
+                        throw new InvalidOperationException($"Action.Id should not be 0.");
 
                     if (action.BankId == 0)
-                        action.BankId = soundBank.Id;
+                        throw new InvalidOperationException($"Action.BankId should not be 0.");
 
                     if (action.TargetHircTypeIsSound())
                     {
                         var sound = soundBank.GetSound(action.TargetHircId);
-                        if (action.IdExt == 0)
-                            action.IdExt = sound.Id;
+                        if (sound == null)
+                            throw new InvalidOperationException($"Action target Sound not found.");
 
-                        ResolveSoundDataIntegrity(sound, soundBank, usedHircIds, usedSourceIds, overrideBusId, actorMixerId);
+                        if (action.IdExt == 0)
+                            throw new InvalidOperationException($"Action.IdExt should not be 0.");
+
+                        if (overrideBusId != 0 && sound.OverrideBusId == 0)
+                            throw new InvalidOperationException($"Sound.OverrideBusId should not be 0 when OverrideBusId is required.");
+
+                        if (actorMixerId != 0 && sound.DirectParentId == 0)
+                            throw new InvalidOperationException($"Sound.DirectParentId should not be 0 when DirectParentId is required.");
+
+                        ResolveSoundDataIntegrity(sound, soundBank, usedHircIds, usedSourceIds);
                     }
                     else if (action.TargetHircTypeIsRandomSequenceContainer())
                     {
                         var randomSequenceContainer = soundBank.GetRandomSequenceContainer(action.TargetHircId);
-                        if (action.IdExt == 0)
-                            action.IdExt = randomSequenceContainer.Id;
+                        if (randomSequenceContainer == null)
+                            throw new InvalidOperationException($"Action target RandomSequenceContainer not found.");
 
-                        ResolveRandomSequenceContainerDataIntegrity(randomSequenceContainer, soundBank, usedHircIds, usedSourceIds, overrideBusId: overrideBusId, directParentId: actorMixerId);
+                        if (action.IdExt == 0)
+                            throw new InvalidOperationException($"Action.IdExt should not be 0.");
+
+                        if (overrideBusId != 0 && randomSequenceContainer.OverrideBusId == 0)
+                            throw new InvalidOperationException("RandomSequenceContainer.OverrideBusId should not be 0 when OverrideBusId is required.");
+
+                        if (actorMixerId != 0 && randomSequenceContainer.DirectParentId == 0)
+                            throw new InvalidOperationException("RandomSequenceContainer.DirectParentId should not be 0 when DirectParentId is required.");
+
+                        ResolveRandomSequenceContainerDataIntegrity(randomSequenceContainer, soundBank, usedHircIds, usedSourceIds);
                     }
                 }
             }
@@ -297,8 +317,11 @@ namespace Editors.Audio.AudioEditor
         {
             foreach (var dialogueEvent in soundBank.DialogueEvents)
             {
+                if (string.IsNullOrWhiteSpace(dialogueEvent.Name))
+                    throw new InvalidOperationException("DialogueEvent.Name should not be null or empty.");
+
                 if (dialogueEvent.Id == 0)
-                    dialogueEvent.Id = WwiseHash.Compute(dialogueEvent.Name);
+                    throw new InvalidOperationException($"DialogueEvent.Id should not be 0 for '{dialogueEvent.Name}'.");
 
                 var actorMixerId = Wh3DialogueEventInformation.GetActorMixerId(dialogueEvent.Name);
 
@@ -306,23 +329,38 @@ namespace Editors.Audio.AudioEditor
                 {
                     foreach (var statePathNode in statePath.Nodes)
                     {
-                        statePathNode.StateGroup.Id = WwiseHash.Compute(statePathNode.StateGroup.Name);
+                        if (string.IsNullOrWhiteSpace(statePathNode.StateGroup.Name))
+                            throw new InvalidOperationException("StateGroup.Name should not be null or empty.");
+                        if (statePathNode.StateGroup.Id == 0)
+                            throw new InvalidOperationException($"StateGroup.Id should not be 0 for '{statePathNode.StateGroup.Name}'.");
 
                         if (statePathNode.State.Name == "Any" && statePathNode.State.Id != 0)
                             statePathNode.State.Id = 0;
                         else if (statePathNode.State.Name != "Any" && statePathNode.State.Id == 0)
-                            statePathNode.State.Id = WwiseHash.Compute(statePathNode.State.Name);
+                            throw new InvalidOperationException($"State.Id should not be 0 for '{statePathNode.State.Name}'.");
                     }
 
                     if (statePath.TargetHircTypeIsSound())
                     {
                         var sound = soundBank.GetSound(statePath.TargetHircId);
-                        ResolveSoundDataIntegrity(sound, soundBank, usedHircIds, usedSourceIds, directParentId: actorMixerId);
+                        if (sound == null)
+                            throw new InvalidOperationException($"StatePath target Sound not found for '{dialogueEvent.Name}'.");
+
+                        if (actorMixerId != 0 && sound.DirectParentId == 0)
+                            throw new InvalidOperationException($"Sound.DirectParentId should not be 0 for '{sound.Name}'.");
+
+                        ResolveSoundDataIntegrity(sound, soundBank, usedHircIds, usedSourceIds);
                     }
                     else if (statePath.TargetHircTypeIsRandomSequenceContainer())
                     {
                         var randomSequenceContainer = soundBank.GetRandomSequenceContainer(statePath.TargetHircId);
-                        ResolveRandomSequenceContainerDataIntegrity(randomSequenceContainer, soundBank, usedHircIds, usedSourceIds, statePath: statePath, directParentId: actorMixerId);
+                        if (randomSequenceContainer == null)
+                            throw new InvalidOperationException($"StatePath target RandomSequenceContainer not found for '{dialogueEvent.Name}'.");
+
+                        if (actorMixerId != 0 && randomSequenceContainer.DirectParentId == 0)
+                            throw new InvalidOperationException("RandomSequenceContainer.DirectParentId should not be 0.");
+
+                        ResolveRandomSequenceContainerDataIntegrity(randomSequenceContainer, soundBank, usedHircIds, usedSourceIds);
                     }
                 }
             }
@@ -334,15 +372,17 @@ namespace Editors.Audio.AudioEditor
             {
                 foreach (var stateGroup in audioProject.StateGroups)
                 {
+                    if (string.IsNullOrWhiteSpace(stateGroup.Name))
+                        throw new InvalidOperationException("StateGroup.Name should not be null or empty.");
                     if (stateGroup.Id == 0)
-                        stateGroup.Id = WwiseHash.Compute(stateGroup.Name);
+                        throw new InvalidOperationException($"StateGroup.Id should not be 0 for '{stateGroup.Name}'.");
 
                     foreach (var state in stateGroup.States)
                     {
                         if (state.Name == "Any" && state.Id != 0)
                             state.Id = 0;
                         else if (state.Name != "Any" && state.Id == 0)
-                            state.Id = WwiseHash.Compute(state.Name);
+                            throw new InvalidOperationException($"State.Id should not be 0 for '{state.Name}'.");
                     }
                 }
             }
@@ -357,25 +397,33 @@ namespace Editors.Audio.AudioEditor
             uint overrideBusId = 0,
             uint directParentId = 0)
         {
-            var randomSequenceContainerIds = IdGenerator.GenerateIds(usedHircIds);
-            if (randomSequenceContainer.Guid == Guid.Empty || randomSequenceContainer.Id == 0)
-            {
-                randomSequenceContainer.Guid = randomSequenceContainerIds.Guid;
-                randomSequenceContainer.Id = randomSequenceContainerIds.Id;
-            }
+            if (randomSequenceContainer == null)
+                throw new InvalidOperationException("RandomSequenceContainer should not be null.");
 
-            if (randomSequenceContainer.OverrideBusId == 0 && overrideBusId != 0)
-                randomSequenceContainer.OverrideBusId = overrideBusId;
+            if (randomSequenceContainer.Guid == Guid.Empty)
+                throw new InvalidOperationException("RandomSequenceContainer.Guid should not be empty.");
 
-            if (randomSequenceContainer.DirectParentId == 0 && directParentId != 0)
-                randomSequenceContainer.DirectParentId = directParentId;
+            if (randomSequenceContainer.Id == 0)
+                throw new InvalidOperationException("RandomSequenceContainer.Id should not be 0.");
+
+            if (overrideBusId != 0 && randomSequenceContainer.OverrideBusId == 0)
+                throw new InvalidOperationException("RandomSequenceContainer.OverrideBusId should not be 0 when OverrideBusId is required.");
+
+            if (directParentId != 0 && randomSequenceContainer.DirectParentId == 0)
+                throw new InvalidOperationException("RandomSequenceContainer.DirectParentId should not be 0 when DirectParentId is required.");
 
             var playlistOrder = 0;
             var sounds = soundBank.GetSounds(randomSequenceContainer.SoundReferences);
             foreach (var sound in sounds)
             {
                 playlistOrder++;
-                ResolveSoundDataIntegrity(sound, soundBank, usedHircIds, usedSourceIds, directParentId: randomSequenceContainer.Id, playlistOrder: playlistOrder);
+                ResolveSoundDataIntegrity(sound, soundBank, usedHircIds, usedSourceIds);
+
+                if (sound.DirectParentId == 0)
+                    throw new InvalidOperationException($"Sound.DirectParentId should not be 0 for '{sound?.Name}'.");
+
+                if (sound.PlaylistOrder == 0)
+                    throw new InvalidOperationException($"Sound.PlaylistOrder should not be 0 for '{sound?.Name}'. Expected '{playlistOrder}'.");
             }
         }
 
@@ -388,27 +436,53 @@ namespace Editors.Audio.AudioEditor
             uint directParentId = 0,
             int playlistOrder = 0)
         {
-            var soundIds = IdGenerator.GenerateIds(usedHircIds);
-            if (sound.Guid == Guid.Empty || sound.Id == 0)
-            {
-                sound.Guid = soundIds.Guid;
-                sound.Id = soundIds.Id;
-            }
+            if (sound == null)
+                throw new InvalidOperationException("Sound should not be null.");
 
-            if (sound.Language == null)
-                sound.Language = soundBank.Language;
+            if (sound.Guid == Guid.Empty)
+                throw new InvalidOperationException("Sound.Guid should not be empty.");
 
-            if (sound.OverrideBusId == 0 && overrideBusId != 0)
-                sound.OverrideBusId = overrideBusId;
+            if (sound.Id == 0)
+                throw new InvalidOperationException("Sound.Id should not be 0.");
 
-            if (sound.DirectParentId == 0 && directParentId != 0)
-                sound.DirectParentId = directParentId;
+            if (string.IsNullOrWhiteSpace(sound.Language))
+                throw new InvalidOperationException("Sound.Language should not be null or empty.");
+
+            if (overrideBusId != 0 && sound.OverrideBusId == 0)
+                throw new InvalidOperationException($"Sound.OverrideBusId should not be 0 for '{sound.Name}'.");
+
+            if (directParentId != 0 && sound.DirectParentId == 0)
+                throw new InvalidOperationException($"Sound.DirectParentId should not be 0 for '{sound.Name}'.");
 
             if (sound.SourceId == 0)
-                throw new InvalidOperationException($"SourceId should not be 0.");
+                throw new InvalidOperationException("SourceId should not be 0.");
 
-            if (sound.PlaylistOrder == 0)
-                sound.PlaylistOrder = playlistOrder;
+            if (playlistOrder != 0 && sound.PlaylistOrder == 0)
+                throw new InvalidOperationException($"Sound.PlaylistOrder should not be 0 for '{sound.Name}'.");
+        }
+
+        private static void ResolveAudioFileDataIntegrity(AudioFile audioFile)
+        {
+            if (audioFile == null)
+                throw new InvalidOperationException("AudioFile should not be null.");
+
+            if (audioFile.Id == 0)
+                throw new InvalidOperationException("AudioFile.Id should not be 0.");
+
+            if (audioFile.Guid == Guid.Empty)
+                throw new InvalidOperationException("AudioFile.Guid should not be empty.");
+
+            if (string.IsNullOrWhiteSpace(audioFile.WavPackFilePath))
+                throw new InvalidOperationException("AudioFile.WavPackFilePath should not be null or empty.");
+
+            if (string.IsNullOrWhiteSpace(audioFile.WavPackFileName))
+                throw new InvalidOperationException("AudioFile.WavPackFileName should not be null or empty.");
+
+            if (audioFile.SoundReferences == null)
+                throw new InvalidOperationException("AudioFile.SoundReferences should not be null.");
+
+            if (audioFile.SoundReferences.Count == 0)
+                throw new InvalidOperationException("AudioFile.SoundReferences should not be empty.");
         }
 
         public void CheckMergingSoundBanksIdIntegrity()

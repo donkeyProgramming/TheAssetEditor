@@ -8,6 +8,7 @@ using Action = Editors.Audio.AudioEditor.Models.Action;
 
 namespace Editors.Audio.AudioEditor.Factories
 {
+    //TODO Move inside and rename to Result
     public record ActionEventFactoryResult
     {
         public ActionEvent ActionEvent { get; set; }
@@ -25,7 +26,9 @@ namespace Editors.Audio.AudioEditor.Factories
             Wh3ActionEventType actionEventGroup,
             string actionEventName,
             List<AudioFile> audioFiles,
-            AudioSettings audioSettings);
+            AudioSettings audioSettings,
+            uint soundBankId,
+            string language);
         ActionEventFactoryResult CreatePauseActionEvent(HashSet<uint> usedHircIds, ActionEvent playActionEvent);
         ActionEventFactoryResult CreateResumeActionEvent(HashSet<uint> usedHircIds, ActionEvent playActionEvent);
         ActionEventFactoryResult CreateStopActionEvent(HashSet<uint> usedHircIds, ActionEvent playActionEvent);
@@ -42,34 +45,35 @@ namespace Editors.Audio.AudioEditor.Factories
             Wh3ActionEventType actionEventType,
             string actionEventName,
             List<AudioFile> audioFiles,
-            AudioSettings audioSettings)
+            AudioSettings audioSettings,
+            uint soundBankId,
+            string language)
         {
             var actionEventFactoryResult = new ActionEventFactoryResult();
             var actions = new List<Action>();
 
-            var actionName = $"{actionEventName}_action";
             var actionEventId = IdGenerator.GenerateActionEventId(usedHircIds, actionEventName);
             var overrideBusId = Wh3ActionEventInformation.GetOverrideBusId(actionEventType);
             var actorMixerId = Wh3ActionEventInformation.GetActorMixerId(actionEventType);
 
             if (audioFiles.Count == 1)
             {
-                var sound = _soundFactory.Create(usedHircIds, usedSourceIds, audioFiles[0], audioSettings, overrideBusId: overrideBusId, directParentId: actorMixerId);
+                var sound = _soundFactory.Create(usedHircIds, usedSourceIds, audioFiles[0], audioSettings, language, overrideBusId: overrideBusId, directParentId: actorMixerId);
                 actionEventFactoryResult.SoundTarget = sound;
 
                 var actionIds = IdGenerator.GenerateIds(usedHircIds);
-                var playAction = Action.Create(actionIds.Id, actionName, AkBkHircType.Sound, AkActionType.Play, sound.Id);
+                var playAction = Action.Create(actionIds.Id, AkBkHircType.Sound, AkActionType.Play, sound.Id, soundBankId);
 
                 actions.Add(playAction);
             }
             else if (audioFiles.Count > 1)
             {
-                var randomSequenceContainerResult = _randomSequenceContainerFactory.Create(usedHircIds, usedSourceIds, audioSettings, audioFiles, overrideBusId, actorMixerId);
+                var randomSequenceContainerResult = _randomSequenceContainerFactory.Create(usedHircIds, usedSourceIds, audioSettings, audioFiles, language, overrideBusId, actorMixerId);
                 actionEventFactoryResult.RandomSequenceContainerTarget = randomSequenceContainerResult.RandomSequenceContainer;
                 actionEventFactoryResult.RandomSequenceContainerSounds.AddRange(randomSequenceContainerResult.RandomSequenceContainerSounds);
 
                 var actionIds = IdGenerator.GenerateIds(usedHircIds);
-                var playAction = Action.Create(actionIds.Id, actionName, AkBkHircType.RandomSequenceContainer, AkActionType.Play, actionEventFactoryResult.RandomSequenceContainerTarget.Id);
+                var playAction = Action.Create(actionIds.Id, AkBkHircType.RandomSequenceContainer, AkActionType.Play, actionEventFactoryResult.RandomSequenceContainerTarget.Id, soundBankId);
                 actions.Add(playAction);
             }
 
@@ -86,17 +90,16 @@ namespace Editors.Audio.AudioEditor.Factories
             var playActions = playActionEvent.GetPlayActions();
             foreach (var playAction in playActions)
             {
-                var actionName = $"{playAction.Name}_action";
                 if (playAction.TargetHircTypeIsSound())
                 {
                     var actionIds = IdGenerator.GenerateIds(usedHircIds);
-                    var pauseAction = Action.Create(actionIds.Id, actionName, playAction.TargetHircType, AkActionType.Pause_E_O, playAction.IdExt);
+                    var pauseAction = Action.Create(actionIds.Id, playAction.TargetHircType, AkActionType.Pause_E_O, playAction.IdExt, playAction.BankId);
                     pauseActions.Add(pauseAction);
                 }
                 else if (playAction.TargetHircTypeIsRandomSequenceContainer())
                 {
                     var actionIds = IdGenerator.GenerateIds(usedHircIds);
-                    var pauseAction = Action.Create(actionIds.Id, actionName, playAction.TargetHircType, AkActionType.Pause_E_O, playAction.IdExt);
+                    var pauseAction = Action.Create(actionIds.Id, playAction.TargetHircType, AkActionType.Pause_E_O, playAction.IdExt, playAction.BankId);
                     pauseActions.Add(pauseAction);
                 }
             }
@@ -115,17 +118,16 @@ namespace Editors.Audio.AudioEditor.Factories
             var playActions = playActionEvent.GetPlayActions();
             foreach (var playAction in playActions)
             {
-                var actionName = $"{playAction.Name}_action";
                 if (playAction.TargetHircTypeIsSound())
                 {
                     var actionIds = IdGenerator.GenerateIds(usedHircIds);
-                    var resumeAction = Action.Create(actionIds.Id, actionName, playAction.TargetHircType, AkActionType.Resume_E_O, playAction.IdExt);
+                    var resumeAction = Action.Create(actionIds.Id, playAction.TargetHircType, AkActionType.Resume_E_O, playAction.IdExt, playAction.BankId);
                     resumeActions.Add(resumeAction);
                 }
                 else if (playAction.TargetHircTypeIsRandomSequenceContainer())
                 {
                     var actionIds = IdGenerator.GenerateIds(usedHircIds);
-                    var resumeAction = Action.Create(actionIds.Id, actionName, playAction.TargetHircType, AkActionType.Resume_E_O, playAction.IdExt);
+                    var resumeAction = Action.Create(actionIds.Id, playAction.TargetHircType, AkActionType.Resume_E_O, playAction.IdExt, playAction.BankId);
                     resumeActions.Add(resumeAction);
                 }
             }
@@ -143,17 +145,16 @@ namespace Editors.Audio.AudioEditor.Factories
             var playActions = playActionEvent.GetPlayActions();
             foreach (var playAction in playActions)
             {
-                var actionName = $"{playAction.Name}_action";
                 if (playAction.TargetHircTypeIsSound())
                 {
                     var actionIds = IdGenerator.GenerateIds(usedHircIds);
-                    var stopAction = Action.Create(actionIds.Id, actionName, playAction.TargetHircType, AkActionType.Stop_E_O, playAction.IdExt);
+                    var stopAction = Action.Create(actionIds.Id, playAction.TargetHircType, AkActionType.Stop_E_O, playAction.IdExt, playAction.BankId);
                     stopActions.Add(stopAction);
                 }
                 else if (playAction.TargetHircTypeIsRandomSequenceContainer())
                 {
                     var actionIds = IdGenerator.GenerateIds(usedHircIds);
-                    var stopAction = Action.Create(actionIds.Id, actionName, playAction.TargetHircType, AkActionType.Stop_E_O, playAction.IdExt);
+                    var stopAction = Action.Create(actionIds.Id, playAction.TargetHircType, AkActionType.Stop_E_O, playAction.IdExt, playAction.BankId);
                     stopActions.Add(stopAction);
                 }
             }

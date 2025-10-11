@@ -20,6 +20,7 @@ namespace Editors.Audio.AudioEditor.Factories
             AudioSettings audioSettings,
             HashSet<uint> usedHircIds,
             HashSet<uint> usedSourceIds,
+            string language,
             uint actorMixerId = 0);
     }
 
@@ -34,6 +35,7 @@ namespace Editors.Audio.AudioEditor.Factories
             AudioSettings audioSettings,
             HashSet<uint> usedHircIds,
             HashSet<uint> usedSourceIds,
+            string language,
             uint actorMixerId = 0)
         {
             var statePathFactoryResult = new StatePathFactoryResult();
@@ -53,7 +55,7 @@ namespace Editors.Audio.AudioEditor.Factories
 
             if (audioFiles.Count == 1)
             {
-                var sound = _soundFactory.Create(usedHircIds, usedSourceIds, audioFiles[0], audioSettings, directParentId: actorMixerId);
+                var sound = _soundFactory.Create(usedHircIds, usedSourceIds, audioFiles[0], audioSettings, language, directParentId: actorMixerId);
                 statePathFactoryResult.SoundTarget = sound;
 
                 var statePath = StatePath.Create(statePathNodes, sound.Id, AkBkHircType.Sound);
@@ -61,7 +63,7 @@ namespace Editors.Audio.AudioEditor.Factories
             }
             else if (audioFiles.Count > 1)
             {
-                var randomSequenceContainerResult = _randomSequenceContainerFactory.Create(usedHircIds, usedSourceIds, audioSettings, audioFiles, directParentId: actorMixerId);
+                var randomSequenceContainerResult = _randomSequenceContainerFactory.Create(usedHircIds, usedSourceIds, audioSettings, audioFiles, language, directParentId: actorMixerId);
                 statePathFactoryResult.RandomSequenceContainerTarget = randomSequenceContainerResult.RandomSequenceContainer;
                 statePathFactoryResult.RandomSequenceContainerSounds.AddRange(randomSequenceContainerResult.RandomSequenceContainerSounds);
 

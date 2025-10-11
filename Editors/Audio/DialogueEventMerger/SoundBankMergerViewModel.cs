@@ -5,6 +5,7 @@ using System.Linq;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Editors.Audio.AudioProjectCompiler;
+using Editors.Audio.GameInformation.Warhammer3;
 using Editors.Audio.Storage;
 using Serilog;
 using Shared.Core.ErrorHandling;
@@ -38,6 +39,9 @@ namespace Editors.Audio.DialogueEventMerger
         {
             _audioRepository = audioRepository;
             _soundBankGeneratorService = soundBankGeneratorService;
+
+            var languages = Wh3LanguageInformation.GetAllLanguages();
+            _audioRepository.Load(languages);
 
             ModdedSoundBanks = new ObservableCollection<ModdedSoundBank>(_audioRepository.GetModdedSoundBankFilePaths("for_merging")
                 .Select(path => new ModdedSoundBank(path, isChecked: true))

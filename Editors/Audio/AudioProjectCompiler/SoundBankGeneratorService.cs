@@ -343,7 +343,7 @@ namespace Editors.Audio.AudioProjectCompiler
             var soundBankFileName = $"{soundBankNameWithoutExtension}.bnk";
 
             var soundBankFilePath = $"audio\\wwise\\{language}\\{soundBankFileName}";
-            if (language == Wh3LanguageInformation.GetGameLanguageAsString(Wh3GameLanguage.Sfx))
+            if (language == Wh3LanguageInformation.GetLanguageAsString(Wh3Language.Sfx))
                 soundBankFilePath = $"audio\\wwise\\{soundBankFileName}";
 
             var soundBankId = WwiseHash.Compute(soundBankNameWithoutExtension);

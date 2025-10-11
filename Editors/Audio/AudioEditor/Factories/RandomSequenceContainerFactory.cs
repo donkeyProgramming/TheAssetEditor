@@ -17,6 +17,7 @@ namespace Editors.Audio.AudioEditor.Factories
             HashSet<uint> usedSourceIds,
             AudioSettings audioSettings,
             List<AudioFile> audioFiles,
+            string language,
             uint overrideBusId = 0,
             uint directParentId = 0);
     }
@@ -30,6 +31,7 @@ namespace Editors.Audio.AudioEditor.Factories
             HashSet<uint> usedSourceIds,
             AudioSettings audioSettings,
             List<AudioFile> audioFiles,
+            string language,
             uint overrideBusId = 0,
             uint actorMixerId = 0)
         {
@@ -41,7 +43,7 @@ namespace Editors.Audio.AudioEditor.Factories
             foreach (var audioFile in audioFiles)
             {
                 playlistOrder++;
-                var sound = _soundFactory.Create(usedHircIds, usedSourceIds, audioFile, randomSequenceContainerIds.Id, playlistOrder);
+                var sound = _soundFactory.Create(usedHircIds, usedSourceIds, audioFile, randomSequenceContainerIds.Id, playlistOrder, language);
                 soundReferences.Add(sound.Id);
                 result.RandomSequenceContainerSounds.Add(sound);
             }

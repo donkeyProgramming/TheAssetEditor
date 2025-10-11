@@ -11,9 +11,9 @@ using static Shared.GameFormats.Dat.SoundDatFile;
 
 namespace Editors.Audio.Storage
 {
-    public class DatLoader
+    public class DatLoader(IPackFileService pfs, ApplicationSettingsService applicationSettingsService)
     {
-        public class LoadResult
+        public class Result
         {
             public Dictionary<uint, string> NameById { get; set; } = [];
             public Dictionary<string, List<string>> StateGroupsByDialogueEvent { get; set; } = [];
@@ -22,16 +22,10 @@ namespace Editors.Audio.Storage
             public Dictionary<string, Dictionary<uint, string>> StatesByStateGroupByStateId { get; set; }
         }
 
-        private readonly IPackFileService _pfs;
-        private readonly ApplicationSettingsService _applicationSettingsService;
+        private readonly IPackFileService _pfs = pfs;
+        private readonly ApplicationSettingsService _applicationSettingsService = applicationSettingsService;
 
-        public DatLoader(IPackFileService pfs, ApplicationSettingsService applicationSettingsService)
-        {
-            _pfs = pfs;
-            _applicationSettingsService = applicationSettingsService;
-        }
-
-        public LoadResult LoadDatData()
+        public Result LoadDatData()
         {
             var datDb = LoadDatFiles(_pfs, out var _);
             var nameLookUp = BuildNameHelper(datDb);
@@ -49,7 +43,7 @@ namespace Editors.Audio.Storage
 
             var statesLookupByStateGroupByStateId = BuildStateLookupByStateGroupByStateId(unprocessedStateGroupsWithStates);
 
-            return new LoadResult
+            return new Result
             {
                 NameById = nameLookUp,
                 StateGroupsByDialogueEvent = processedDialogueEventsWithStateGroups,

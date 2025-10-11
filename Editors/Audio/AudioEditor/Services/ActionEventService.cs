@@ -31,14 +31,14 @@ namespace Editors.Audio.AudioEditor.Services
             var languageId = WwiseHash.Compute(audioProject.Language);
 
             var audioProjectGeneratableItemIds = audioProject.GetGeneratableItemIds();
-            var gameLanguageHircIds = _audioRepository.GetUsedVanillaHircIdsByLanguageId(languageId);
+            var languageHircIds = _audioRepository.GetUsedVanillaHircIdsByLanguageId(languageId);
             usedHircIds.UnionWith(audioProjectGeneratableItemIds);
-            usedHircIds.UnionWith(gameLanguageHircIds);
+            usedHircIds.UnionWith(languageHircIds);
 
             var audioProjectSourceIds = audioProject.GetAudioFileIds();
-            var gameLanguageSourceIds = _audioRepository.GetUsedVanillaSourceIdsByLanguageId(languageId);
+            var languageSourceIds = _audioRepository.GetUsedVanillaSourceIdsByLanguageId(languageId);
             usedSourceIds.UnionWith(audioProjectSourceIds);
-            usedSourceIds.UnionWith(gameLanguageSourceIds);
+            usedSourceIds.UnionWith(languageSourceIds);
 
             var gameSoundBankName = Wh3SoundBankInformation.GetName(Wh3ActionEventInformation.GetSoundBank(actionEventTypeName));
             var audioProjectFileNameWithoutExtension = Path.GetFileNameWithoutExtension(_audioEditorStateService.AudioProjectFileName);
@@ -46,7 +46,7 @@ namespace Editors.Audio.AudioEditor.Services
             var soundBank = _audioEditorStateService.AudioProject.GetSoundBank(soundBankName);
 
             var actionEventType = Wh3ActionEventInformation.GetActionEventType(actionEventTypeName);
-            var playActionEventResult = _actionEventFactory.CreatePlayActionEvent(usedHircIds, usedSourceIds, actionEventType, actionEventName, audioFiles, audioSettings);
+            var playActionEventResult = _actionEventFactory.CreatePlayActionEvent(usedHircIds, usedSourceIds, actionEventType, actionEventName, audioFiles, audioSettings, soundBank.Id, soundBank.Language);
             soundBank.InsertAlphabetically(playActionEventResult.ActionEvent);
 
             if (playActionEventResult.Actions.Count > 1)

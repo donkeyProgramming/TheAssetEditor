@@ -243,7 +243,7 @@ namespace Editors.Audio.AudioEditor.Models
                 var language = audioProjectLanguage;
                 var requiredLanguage = Wh3SoundBankInformation.GetRequiredLanguage(gameSoundBank);
                 if (requiredLanguage != null)
-                    language = Wh3LanguageInformation.GetGameLanguageAsString((Wh3GameLanguage)requiredLanguage);
+                    language = Wh3LanguageInformation.GetLanguageAsString((Wh3Language)requiredLanguage);
 
                 var soundBank = SoundBank.Create(soundBankName, gameSoundBank, language);
 

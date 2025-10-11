@@ -1,10 +1,13 @@
-﻿using System.IO;
+﻿using System.Collections.Generic;
+using System.IO;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Windows;
 using Editors.Audio.AudioEditor.Events;
 using Editors.Audio.AudioEditor.Models;
+using Editors.Audio.GameInformation.Warhammer3;
+using Editors.Audio.Storage;
 using Shared.Core.Events;
 using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
@@ -25,6 +28,7 @@ namespace Editors.Audio.AudioEditor
         IPackFileService packFileService,
         IFileSaveService fileSaveService,
         IStandardDialogs standardDialogs,
+        IAudioRepository audioRepository,
         IAudioEditorIntegrityService audioEditorIntegrityService,
         ApplicationSettingsService applicationSettingsService) : IAudioProjectFileService
     {
@@ -33,6 +37,7 @@ namespace Editors.Audio.AudioEditor
         private readonly IPackFileService _packFileService = packFileService;
         private readonly IFileSaveService _fileSaveService = fileSaveService;
         private readonly IStandardDialogs _standardDialogs = standardDialogs;
+        private readonly IAudioRepository _audioRepository = audioRepository;
         private readonly IAudioEditorIntegrityService _audioEditorIntegrityService = audioEditorIntegrityService;
         private readonly ApplicationSettingsService _applicationSettingsService = applicationSettingsService;
 
@@ -76,6 +81,10 @@ namespace Editors.Audio.AudioEditor
                 var currentGame = _applicationSettingsService.CurrentSettings.CurrentGame;
                 var dirtyAudioProject = AudioProject.Create(audioProject, currentGame, fileNameWithoutExtension);
 
+                var languages = new List<string> { audioProject.Language };
+                _audioRepository.Load(languages);
+
+                _audioEditorIntegrityService.CheckDialogueEventInformationIntegrity(Wh3DialogueEventInformation.Information);
                 _audioEditorIntegrityService.CheckAudioProjectDialogueEventIntegrity(dirtyAudioProject);
                 _audioEditorIntegrityService.CheckAudioProjectWavFilesIntegrity(dirtyAudioProject);
                 _audioEditorIntegrityService.CheckAudioProjectDataIntegrity(dirtyAudioProject, fileNameWithoutExtension);

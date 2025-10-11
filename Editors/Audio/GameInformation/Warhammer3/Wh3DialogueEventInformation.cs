@@ -505,45 +505,29 @@ namespace Editors.Audio.GameInformation.Warhammer3
             ..Battle,
             ..BattleConversational,
         ];
-        
-        public static string GetDialogueEventTypeDisplayName(this Wh3DialogueEventType? type)
+
+        public static string GetDialogueEventTypeDisplayName(this Wh3DialogueEventType? dialogueEventType)
         {
-            if (type == null)
+            if (dialogueEventType == null)
                 return null;
 
-            var member = type.Value
-                .GetType()
-                .GetMember(type.Value.ToString())
-                .FirstOrDefault();
-
-            if (member == null)
-                return type.Value.ToString();
-
-            var displayAttribute = member.GetCustomAttribute<DisplayAttribute>();
-            if (displayAttribute != null)
-                return displayAttribute.GetName();
-            else
-                return type.Value.ToString();
+            var field = typeof(Wh3DialogueEventType).GetField(dialogueEventType.Value.ToString());
+            var display = field?.GetCustomAttribute<DisplayAttribute>();
+            if (display != null)
+                return display.GetName();
+            return dialogueEventType.Value.ToString();
         }
 
-        public static string GetDialogueEventProfileDisplayName(this Wh3DialogueEventUnitProfile? profile)
+        public static string GetDialogueEventProfileDisplayName(this Wh3DialogueEventUnitProfile? dialogueEventUnitProfile)
         {
-            if (profile == null)
+            if (dialogueEventUnitProfile == null)
                 return null;
 
-            var member = profile.Value
-                .GetType()
-                .GetMember(profile.Value.ToString())
-                .FirstOrDefault();
-
-            if (member == null)
-                return profile.Value.ToString();
-
-            var displayAttribute = member.GetCustomAttribute<DisplayAttribute>();
-            if (displayAttribute != null)
-                return displayAttribute.GetName();
-            else
-                return profile.Value.ToString();
+            var field = typeof(Wh3DialogueEventUnitProfile).GetField(dialogueEventUnitProfile.Value.ToString());
+            var display = field?.GetCustomAttribute<DisplayAttribute>();
+            if (display != null)
+                return display.GetName();
+            return dialogueEventUnitProfile.Value.ToString();
         }
 
         public static Wh3SoundBank GetSoundBank(string dialogueEventName) => Information.First(definition => definition.Name == dialogueEventName).SoundBank;

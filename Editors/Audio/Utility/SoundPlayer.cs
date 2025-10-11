@@ -105,9 +105,9 @@ namespace Editors.Audio.Utility
         {
             var wemFile = _packFileService.FindFile($"audio\\wwise\\{wemId}.wem");
 
-            foreach (var languageEnum in Enum.GetValues<Wh3GameLanguage>().Cast<Wh3GameLanguage>())
+            foreach (var languageEnum in Enum.GetValues<Wh3Language>().Cast<Wh3Language>())
             {
-                var language = Wh3LanguageInformation.GetGameLanguageAsString(languageEnum);
+                var language = Wh3LanguageInformation.GetLanguageAsString(languageEnum);
                 if (wemFile == null)
                     wemFile = _packFileService.FindFile($"audio\\wwise\\{language}\\{wemId}.wem");
                 else 

@@ -1,6 +1,5 @@
-﻿using Editors.Audio.Storage;
-using Editors.Audio.Utility;
-using Octokit;
+﻿using Editors.Audio.GameInformation.Warhammer3;
+using Editors.Audio.Storage;
 using Shared.Core.Events;
 using Shared.Core.Misc;
 using Shared.GameFormats.Wwise.Hirc;
@@ -19,18 +18,15 @@ namespace Editors.Reports.Audio
         public DialogueEventAndEventNamePrinter(IAudioRepository audioRepository)
         {
             _audioRepository = audioRepository;
-        }
-
-        public static void Generate(IAudioRepository audioRepository)
-        {
-            var instance = new DialogueEventAndEventNamePrinter(audioRepository);
-            instance.Create();
+            var languages = Wh3LanguageInformation.GetAllLanguages();
+            _audioRepository.Load(languages);
         }
 
         public void Create()
         {
             var printer = new DialogueEventAndEventNamePrinter(_audioRepository);
             printer.PrintInfo();
+            _audioRepository.Clear();
         }
 
         public void PrintInfo()

@@ -17,7 +17,7 @@ namespace Editors.Audio.AudioProjectCompiler.WwiseGeneratorService.WwiseGenerato
                 {
                     SourceId = audioProjectSound.SourceId,
                     InMemoryMediaSize = (uint)audioProjectSound.InMemoryMediaSize,
-                    SourceBits = (byte)(audioProjectSound.Language == Wh3LanguageInformation.GetGameLanguageAsString(Wh3GameLanguage.Sfx) ? 0x00 : 0x01)
+                    SourceBits = (byte)(audioProjectSound.Language == Wh3LanguageInformation.GetLanguageAsString(Wh3Language.Sfx) ? 0x00 : 0x01)
                 }
             };
         }

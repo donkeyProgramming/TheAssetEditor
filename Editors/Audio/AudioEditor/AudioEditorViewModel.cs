@@ -11,7 +11,6 @@ using Editors.Audio.AudioEditor.Settings;
 using Editors.Audio.AudioEditor.UICommands;
 using Editors.Audio.AudioEditor.WaveformVisualiser;
 using Editors.Audio.AudioProjectCompiler;
-using Editors.Audio.GameInformation.Warhammer3;
 using Shared.Core.Events;
 using Shared.Core.ToolCreation;
 
@@ -64,8 +63,6 @@ namespace Editors.Audio.AudioEditor
             AudioProjectViewerViewModel = audioProjectViewerViewModel;
             SettingsViewModel = settingsViewModel;
             WaveformVisualiserViewModel = waveformVisualiserViewModel;
-
-            _audioEditorIntegrityService.CheckDialogueEventInformationIntegrity(Wh3DialogueEventInformation.Information);
         }
 
         [RelayCommand] public void NewAudioProject() => _uiCommandFactory.Create<OpenNewAudioProjectWindowCommand>().Execute();

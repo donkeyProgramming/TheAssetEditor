@@ -27,8 +27,8 @@ namespace Editors.Audio.AudioEditor.NewAudioProject
 
         [ObservableProperty] private string _audioProjectFileName;
         [ObservableProperty] private string _audioProjectDirectory;
-        [ObservableProperty] private Wh3GameLanguage _selectedLanguage;
-        [ObservableProperty] private ObservableCollection<Wh3GameLanguage> _languages = new([Wh3GameLanguage.EnglishUK]); //new (Enum.GetValues<Wh3GameLanguage>());
+        [ObservableProperty] private Wh3Language _selectedLanguage;
+        [ObservableProperty] private ObservableCollection<Wh3Language> _languages = new([Wh3Language.EnglishUK]); //new (Enum.GetValues<Wh3GameLanguage>());
 
         [ObservableProperty] private bool _isAudioProjectFileNameSet;
         [ObservableProperty] private bool _isAudioProjectDirectorySet;
@@ -51,7 +51,7 @@ namespace Editors.Audio.AudioEditor.NewAudioProject
             _standardDialogs = standardDialogs;
 
             AudioProjectDirectory = "audio\\audio_projects";
-            SelectedLanguage = Wh3GameLanguage.EnglishUK;
+            SelectedLanguage = Wh3Language.EnglishUK;
         }
 
         partial void OnAudioProjectFileNameChanged(string value)
@@ -68,7 +68,7 @@ namespace Editors.Audio.AudioEditor.NewAudioProject
             UpdateOkButtonIsEnabled();
         }
 
-        partial void OnSelectedLanguageChanged(Wh3GameLanguage value)
+        partial void OnSelectedLanguageChanged(Wh3Language value)
         {
             IsLanguageSelected = !string.IsNullOrEmpty(value.ToString());
             UpdateOkButtonIsEnabled();
@@ -102,7 +102,7 @@ namespace Editors.Audio.AudioEditor.NewAudioProject
             var audioProjectFileNameWithoutSpaces = AudioProjectFileName.Replace(" ", "_");
             var fileName = $"{audioProjectFileNameWithoutSpaces}.aproj";
             var filePath = $"{AudioProjectDirectory}\\{fileName}";
-            var language = Wh3LanguageInformation.GetGameLanguageAsString(SelectedLanguage);
+            var language = Wh3LanguageInformation.GetLanguageAsString(SelectedLanguage);
 
             var audioProject = AudioProject.Create(currentGame, language, audioProjectFileNameWithoutSpaces);
 

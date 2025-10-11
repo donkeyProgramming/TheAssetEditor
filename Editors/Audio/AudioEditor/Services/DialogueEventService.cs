@@ -30,24 +30,24 @@ namespace Editors.Audio.AudioEditor.Services
             var languageId = WwiseHash.Compute(audioProject.Language);
 
             var audioProjectGeneratableItemIds = audioProject.GetGeneratableItemIds();
-            var gameLanguageHircIds = _audioRepository.GetUsedVanillaHircIdsByLanguageId(languageId);
+            var languageHircIds = _audioRepository.GetUsedVanillaHircIdsByLanguageId(languageId);
             usedHircIds.UnionWith(audioProjectGeneratableItemIds);
-            usedHircIds.UnionWith(gameLanguageHircIds);
+            usedHircIds.UnionWith(languageHircIds);
 
             var audioProjectSourceIds = audioProject.GetAudioFileIds();
-            var gameLanguageSourceIds = _audioRepository.GetUsedVanillaSourceIdsByLanguageId(languageId);
+            var languageSourceIds = _audioRepository.GetUsedVanillaSourceIdsByLanguageId(languageId);
             usedSourceIds.UnionWith(audioProjectSourceIds);
-            usedSourceIds.UnionWith(gameLanguageSourceIds);
-
-            var dialogueEvent = _audioEditorStateService.AudioProject.GetDialogueEvent(dialogueEventName);
-            var actorMixerId = Wh3DialogueEventInformation.GetActorMixerId(dialogueEvent.Name);
-            var statePathFactoryResult = _statePathFactory.Create(stateLookupByStateGroup, audioFiles, audioSettings, usedHircIds, usedSourceIds, actorMixerId);
-            dialogueEvent.InsertAlphabetically(statePathFactoryResult.StatePath);
+            usedSourceIds.UnionWith(languageSourceIds);
 
             var gameSoundBankName = Wh3SoundBankInformation.GetName(Wh3DialogueEventInformation.GetSoundBank(dialogueEventName));
             var audioProjectFileNameWithoutExtension = Path.GetFileNameWithoutExtension(_audioEditorStateService.AudioProjectFileName);
             var soundBankName = $"{gameSoundBankName}_{audioProjectFileNameWithoutExtension}";
             var soundBank = _audioEditorStateService.AudioProject.GetSoundBank(soundBankName);
+
+            var dialogueEvent = _audioEditorStateService.AudioProject.GetDialogueEvent(dialogueEventName);
+            var actorMixerId = Wh3DialogueEventInformation.GetActorMixerId(dialogueEvent.Name);
+            var statePathFactoryResult = _statePathFactory.Create(stateLookupByStateGroup, audioFiles, audioSettings, usedHircIds, usedSourceIds, soundBank.Language, actorMixerId: actorMixerId);
+            dialogueEvent.InsertAlphabetically(statePathFactoryResult.StatePath);
 
             if (statePathFactoryResult.StatePath.TargetHircTypeIsSound())
             {

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Editors.Audio.GameInformation.Warhammer3;
 using Shared.Core.Misc;
 using Shared.Core.PackFiles.Models;
 using Shared.Core.Settings;
@@ -20,6 +21,8 @@ namespace Editors.Audio.Storage
         Dictionary<string, List<string>> StatesByStateGroup { get; }
         Dictionary<string, Dictionary<uint, string>> StatesByStateGroupByStateId { get; }
 
+        void Load(List<string> languages); 
+        void Clear();
         List<T> GetHircsByType<T>() where T : class;
         List<HircItem> GetHircs(uint id);
         List<HircItem> GetHircs(uint id, string owningFileName);
@@ -34,10 +37,14 @@ namespace Editors.Audio.Storage
         List<string> GetModdedSoundBankFilePaths(string bnkNameSubstring);
     }
 
-    public class AudioRepository : IAudioRepository, IDisposable
+    public class AudioRepository(ApplicationSettingsService applicationSettingsService, BnkLoader bnkLoader, DatLoader datLoader) : IAudioRepository, IDisposable
     {
-        private readonly BnkLoader _bnkLoader;
-        private readonly DatLoader _datLoader;
+        private readonly ApplicationSettingsService _applicationSettingsService = applicationSettingsService;
+        private readonly BnkLoader _bnkLoader = bnkLoader;
+        private readonly DatLoader _datLoader = datLoader;
+
+        private readonly List<string> _loadedBnkDataLanguages = [];
+        private bool _isDatDataLoaded = false;
 
         public Dictionary<uint, List<HircItem>> HircsById { get; set; }
         public Dictionary<uint, List<DidxAudio>> DidxAudioListById { get; set; }
@@ -48,47 +55,71 @@ namespace Editors.Audio.Storage
         public Dictionary<string, List<string>> StatesByStateGroup { get; set; }
         public Dictionary<string, Dictionary<uint, string>> StatesByStateGroupByStateId { get; set; }
 
-        public AudioRepository(ApplicationSettingsService applicationSettingsService, BnkLoader bnkLoader, DatLoader datLoader)
+        public void Load(List<string> languages)
         {
-            _bnkLoader = bnkLoader;
-            _datLoader = datLoader;
+            var loadedData = false;
 
-            MemoryOptimiser.LogMemory("Before loading AudioRepository");
-
-            var gameInformation = GameInformationDatabase.GetGameById(applicationSettingsService.CurrentSettings.CurrentGame);
+            var gameInformation = GameInformationDatabase.GetGameById(_applicationSettingsService.CurrentSettings.CurrentGame);
             var gameBankGeneratorVersion = gameInformation.BankGeneratorVersion;
+
             if (gameBankGeneratorVersion != GameBnkVersion.Unsupported)
             {
-                LoadDatData();
-                LoadBnkData();
+                var loadDatData = !_isDatDataLoaded;
+                var loadBnkData = !languages.All(language => _loadedBnkDataLanguages.Contains(language, StringComparer.OrdinalIgnoreCase));
+
+                if (loadDatData || loadBnkData)
+                    MemoryOptimiser.LogMemory("Before loading AudioRepository");
+
+                if (loadDatData)
+                {
+                    LoadDatData();
+                    loadedData = true;
+                }
+
+                if (loadBnkData)
+                {
+                    LoadBnkData(languages);
+                    loadedData = true;
+                }
             }
 
-            MemoryOptimiser.Optimise();
-            MemoryOptimiser.LogMemory("After loading AudioRepository");
+            if (loadedData)
+            {
+                MemoryOptimiser.Optimise();
+                MemoryOptimiser.LogMemory("After loading AudioRepository");
+            }
         }
 
         private void LoadDatData()
         {
-            var loadResult = _datLoader.LoadDatData();
-            NameById = loadResult.NameById ?? [];
-            StateGroupsByDialogueEvent = loadResult.StateGroupsByDialogueEvent ?? [];
-            QualifiedStateGroupByStateGroupByDialogueEvent = loadResult.QualifiedStateGroupByStateGroupByDialogueEvent ?? [];
-            StatesByStateGroup = loadResult.StatesByStateGroup ?? [];
-            StatesByStateGroupByStateId = loadResult.StatesByStateGroupByStateId ?? [];
+            var result = _datLoader.LoadDatData();
+            NameById = result.NameById ?? [];
+            StateGroupsByDialogueEvent = result.StateGroupsByDialogueEvent ?? [];
+            QualifiedStateGroupByStateGroupByDialogueEvent = result.QualifiedStateGroupByStateGroupByDialogueEvent ?? [];
+            StatesByStateGroup = result.StatesByStateGroup ?? [];
+            StatesByStateGroupByStateId = result.StatesByStateGroupByStateId ?? [];
+
+            _isDatDataLoaded = true;
         }
 
-        private void LoadBnkData()
+        private void LoadBnkData(List<string> languages)
         {
-            var loadResult = _bnkLoader.LoadBnkFiles(true);
-            HircsById = loadResult.HircsById ?? [];
-            DidxAudioListById = loadResult.DidxAudioListById ?? [];
-            PackFileByBnkName = loadResult.PackFileByBnkName ?? [];
+            var allLanguages = Wh3LanguageInformation.GetAllLanguages();
+            var languageToFilterOut = allLanguages
+                .Where(language => !languages.Contains(language))
+                .ToList();
+            var result = _bnkLoader.LoadBnkFiles(languageToFilterOut);
+            HircsById = result.HircsById ?? [];
+            DidxAudioListById = result.DidxAudioListById ?? [];
+            PackFileByBnkName = result.PackFileByBnkName ?? [];
+
+            _loadedBnkDataLanguages.AddRange(languages);
         }
 
         public List<HircItem> GetHircs(uint id)
         {
-            if (HircsById.ContainsKey(id))
-                return HircsById[id];
+            if (HircsById.TryGetValue(id, out var value))
+                return value;
             return [];
         }
 
@@ -190,9 +221,9 @@ namespace Editors.Audio.Storage
                 .ToList();
         }
 
-        public void Dispose()
+        public void Clear()
         {
-            MemoryOptimiser.LogMemory("Before disposing of AudioRepository");
+            MemoryOptimiser.LogMemory("Before clearing AudioRepository");
 
             if (HircsById != null)
             {
@@ -216,15 +247,25 @@ namespace Editors.Audio.Storage
                 DidxAudioListById = null;
             }
 
-            PackFileByBnkName?.Clear(); PackFileByBnkName = null;
-            NameById?.Clear(); NameById = null;
-            StateGroupsByDialogueEvent?.Clear(); StateGroupsByDialogueEvent = null;
-            QualifiedStateGroupByStateGroupByDialogueEvent?.Clear(); QualifiedStateGroupByStateGroupByDialogueEvent = null;
-            StatesByStateGroup?.Clear(); StatesByStateGroup = null;
-            StatesByStateGroupByStateId?.Clear(); StatesByStateGroupByStateId = null;
+            _loadedBnkDataLanguages?.Clear();
+            _isDatDataLoaded = false;
+            PackFileByBnkName?.Clear();
+            PackFileByBnkName = null;
+            NameById?.Clear();
+            NameById = null;
+            StateGroupsByDialogueEvent?.Clear();
+            StateGroupsByDialogueEvent = null;
+            QualifiedStateGroupByStateGroupByDialogueEvent?.Clear();
+            QualifiedStateGroupByStateGroupByDialogueEvent = null;
+            StatesByStateGroup?.Clear();
+            StatesByStateGroup = null;
+            StatesByStateGroupByStateId?.Clear();
+            StatesByStateGroupByStateId = null;
 
             MemoryOptimiser.Optimise();
-            MemoryOptimiser.LogMemory("After disposing of AudioRepository");
+            MemoryOptimiser.LogMemory("After clearing AudioRepository");
         }
+
+        public void Dispose() => Clear();
     }
 }

@@ -7,8 +7,8 @@ namespace Editors.Audio.Utility
 {
     public class WwiseTreeParserParent : WwiseTreeParserBase
     {
-        public WwiseTreeParserParent(IAudioRepository repository, bool showId, bool showOwningBnkFile, bool filterByBnkName)
-            : base(repository, showId, showOwningBnkFile, filterByBnkName)
+        public WwiseTreeParserParent(IAudioRepository audioRepository, bool showId, bool showOwningBnkFile, bool filterByBnkName)
+            : base(audioRepository, showId, showOwningBnkFile, filterByBnkName)
         {
             _hircProcessChildMap.Add(AkBkHircType.SwitchContainer, FindParentSwitchControl);
             _hircProcessChildMap.Add(AkBkHircType.LayerContainer, FindParentLayerContainer);

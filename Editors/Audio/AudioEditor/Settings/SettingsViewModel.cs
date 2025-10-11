@@ -144,10 +144,10 @@ namespace Editors.Audio.AudioEditor.Settings
 
             var audioProjectSourceIds = audioProject.GetAudioFileIds();
             var languageId = WwiseHash.Compute(audioProject.Language);
-            var gameLanguageSourceIds = _audioRepository.GetUsedVanillaSourceIdsByLanguageId(languageId);
+            var languageSourceIds = _audioRepository.GetUsedVanillaSourceIdsByLanguageId(languageId);
 
             usedSourceIds.UnionWith(audioProjectSourceIds);
-            usedSourceIds.UnionWith(gameLanguageSourceIds);
+            usedSourceIds.UnionWith(languageSourceIds);
 
             var audioFiles = new List<AudioFile>();
             foreach (var node in audioFilesTreeNodes)

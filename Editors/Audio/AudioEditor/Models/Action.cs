@@ -15,16 +15,16 @@ namespace Editors.Audio.AudioEditor.Models
             HircType = AkBkHircType.Action;
         }
 
-        public static Action Create(uint id, string name, AkBkHircType targetHircType, AkActionType actionType, uint idExt)
+        public static Action Create(uint id, AkBkHircType targetHircType, AkActionType actionType, uint idExt, uint bankId)
         {
             return new Action
             {
                 Id = id,
-                Name = name,
                 TargetHircId = idExt,
                 TargetHircType = targetHircType,
                 ActionType = actionType,
-                IdExt = idExt
+                IdExt = idExt,
+                BankId = bankId
             };
         }
 

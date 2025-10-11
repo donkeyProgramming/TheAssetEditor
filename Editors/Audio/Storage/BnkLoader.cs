@@ -13,22 +13,17 @@ using Shared.GameFormats.Wwise.Hirc;
 
 namespace Editors.Audio.Storage
 {
-    public class BnkLoader
+    public class BnkLoader(IPackFileService packFileService)
     {
-        public class LoadResult
+        public class Result
         {
             public Dictionary<uint, List<HircItem>> HircsById { get; internal set; } = [];
             public Dictionary<uint, List<DidxAudio>> DidxAudioListById { get; internal set; } = [];
             public Dictionary<string, PackFile> PackFileByBnkName { get; internal set; } = [];
         }
 
-        private readonly IPackFileService _packFileService;
+        private readonly IPackFileService _packFileService = packFileService;
         readonly ILogger _logger = Logging.Create<BnkLoader>();
-
-        public BnkLoader(IPackFileService packFileService)
-        {
-            _packFileService = packFileService;
-        }
 
         public ParsedBnkFile LoadBnkFile(PackFile bnkFile, string bnkFilePath, bool isCAHircItem, bool printData = false)
         {
@@ -38,15 +33,13 @@ namespace Editors.Audio.Storage
             return soundDb;
         }
 
-        public LoadResult LoadBnkFiles(bool loadEnglishLanguageOnly)
+        public Result LoadBnkFiles(List<string> languageToFilterOut)
         {
             var bankFiles = PackFileServiceUtility.FindAllWithExtentionIncludePaths(_packFileService, ".bnk");
             var bankFilesAsDictionary = bankFiles.GroupBy(f => f.FileName).ToDictionary(g => g.Key, g => g.Last().Pack);
 
             var removeFilter = new List<string>() { "media", "init.bnk", "animation_blood_data.bnk" };
-            var removeLanguages = new List<string>() { "chinese", "french(france)", "german", "italian", "polish", "russian", "spanish(spain)" };
-            if (loadEnglishLanguageOnly)
-                removeFilter.AddRange(removeLanguages);
+            removeFilter.AddRange(languageToFilterOut);
 
             var wantedBnkFiles = PackFileUtil.FilterUnvantedFiles(bankFilesAsDictionary, removeFilter.ToArray(), out var removedFiles); ;
             _logger.Here().Information($"Parsing game sounds. {bankFiles.Count} bnk files found. {wantedBnkFiles.Count} after filtering");
@@ -54,7 +47,7 @@ namespace Editors.Audio.Storage
             var parsedBnks = new List<ParsedBnkFile>();
             var bnksWithUnknownHircs = new List<string>();
             var failedBnks = new List<(string bnkFile, string Error)>();
-            var output = new LoadResult();
+            var result = new Result();
             var counter = 1;
 
             Parallel.ForEach(wantedBnkFiles, bnkFile =>
@@ -64,7 +57,7 @@ namespace Editors.Audio.Storage
 
                 var packFile = bnkFile.Value;
                 var packFileContainer = _packFileService.GetPackFileContainer(packFile);
-                output.PackFileByBnkName.TryAdd(packFile.Name, packFile);
+                result.PackFileByBnkName.TryAdd(packFile.Name, packFile);
 
                 try
                 {
@@ -85,14 +78,14 @@ namespace Editors.Audio.Storage
             if (failedBnks.Count != 0)
                 _logger.Here().Error($"{failedBnks.Count} banks failed: {string.Join("\n", failedBnks)}");
 
-            output.HircsById = parsedBnks
+            result.HircsById = parsedBnks
                 .Where(parsedBnk => parsedBnk.HircChunk is not null)
                 .SelectMany(parsedBnk => parsedBnk.HircChunk.HircItems)
                 .GroupBy(item => item.Id)
                 .ToDictionary(group => group.Key, group => group.ToList());
 
 
-            output.DidxAudioListById = parsedBnks
+            result.DidxAudioListById = parsedBnks
                 .Where(parsedBnk => parsedBnk.DataChunk is not null && parsedBnk.DidxChunk is not null)
                 .SelectMany(parsedBnk =>
                     parsedBnk.DidxChunk.MediaList.Select(didx => new DidxAudio()
@@ -105,7 +98,7 @@ namespace Editors.Audio.Storage
                 .GroupBy(didxAudio => didxAudio.Id)
                 .ToDictionary(group => group.Key, group => group.ToList());
 
-            return output;
+            return result;
         }
 
         void PrintHircList(IEnumerable<HircItem> hircItems, string header)

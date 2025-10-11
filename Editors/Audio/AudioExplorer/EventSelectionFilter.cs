@@ -9,13 +9,13 @@ namespace Editors.Audio.AudioExplorer
 {
     public class EventSelectionFilter
     {
-        private readonly IAudioRepository _repository;
+        private readonly IAudioRepository _audioRepository;
 
         public FilterCollection<SelectedHircItem> EventList { get; set; }
 
-        public EventSelectionFilter(IAudioRepository repository, bool showEvents, bool showDialogueEvents)
+        public EventSelectionFilter(IAudioRepository audioRepository, bool showEvents, bool showDialogueEvents)
         {
-            _repository = repository;
+            _audioRepository = audioRepository;
 
             EventList = new FilterCollection<SelectedHircItem>(new List<SelectedHircItem>())
             {
@@ -33,7 +33,7 @@ namespace Editors.Audio.AudioExplorer
             if (showDialogueEvents)
                 typesToShow.Add(AkBkHircType.Dialogue_Event);
 
-            var allEvents = _repository.HircsById.SelectMany(x => x.Value)
+            var allEvents = _audioRepository.HircsById.SelectMany(x => x.Value)
                 .Where(x => typesToShow.Contains(x.HircType))
                 .ToList();
 
@@ -41,7 +41,7 @@ namespace Editors.Audio.AudioExplorer
                 .Select(x => new SelectedHircItem() 
                     { 
                         HircItem = x, 
-                        DisplayName = $"{_repository.GetNameFromId(x.Id)} ({Path.GetFileName(x.BnkFilePath)})", 
+                        DisplayName = $"{_audioRepository.GetNameFromId(x.Id)} ({Path.GetFileName(x.BnkFilePath)})", 
                         Id = x.Id, 
                         PackFile = x.BnkFilePath, 
                         IndexInFile = x.ByteIndexInFile 

@@ -83,6 +83,10 @@ namespace Editors.Audio.AudioProjectConverter
             _applicationSettingsService = applicationSettingsService;
             _vgStreamWrapper = vgStreamWrapper;
 
+            var englishUK = Wh3LanguageInformation.GetLanguageAsString(Wh3Language.EnglishUK);
+            var languages = new List<string> { englishUK };
+            _audioRepository.Load(languages);
+
             OutputDirectoryPath = "audio\\audio_projects";
         }
 
@@ -129,13 +133,13 @@ namespace Editors.Audio.AudioProjectConverter
             var audioProjectSourceIds = audioProject.GetAudioFileIds();
 
             var languageId = WwiseHash.Compute(audioProject.Language);
-            var gameLanguageHircIds = _audioRepository.GetUsedVanillaHircIdsByLanguageId(languageId);
-            var gameLanguageSourceIds = _audioRepository.GetUsedVanillaSourceIdsByLanguageId(languageId);
+            var languageHircIds = _audioRepository.GetUsedVanillaHircIdsByLanguageId(languageId);
+            var languageSourceIds = _audioRepository.GetUsedVanillaSourceIdsByLanguageId(languageId);
 
             usedHircIds.UnionWith(audioProjectGeneratableItemIds);
-            usedHircIds.UnionWith(gameLanguageHircIds);
+            usedHircIds.UnionWith(languageHircIds);
             usedSourceIds.UnionWith(audioProjectSourceIds);
-            usedSourceIds.UnionWith(gameLanguageSourceIds);
+            usedSourceIds.UnionWith(languageSourceIds);
 
             foreach (var dialogueEvent in dialogueEventsToProcess)
                 ProcessDialogueEvent(
@@ -478,7 +482,7 @@ namespace Editors.Audio.AudioProjectConverter
                     {
                         playlistOrder++;
                         var soundIds = IdGenerator.GenerateIds(usedHircIds);
-                        var sound = Sound.Create(soundIds.Guid, soundIds.Id, randomSequenceContainerIds.Id, playlistOrder, audioFile.Id);
+                        var sound = Sound.Create(soundIds.Guid, soundIds.Id, randomSequenceContainerIds.Id, playlistOrder, audioFile.Id, audioProject.Language);
 
                         usedHircIds.Add(soundIds.Id);
                         audioFile.SoundReferences.Add(sound.Id);
@@ -504,7 +508,7 @@ namespace Editors.Audio.AudioProjectConverter
                     usedHircIds.Add(soundIds.Id);
 
                     var soundSettings = AudioSettings.CreateSoundSettings();
-                    var sound = Sound.Create(soundIds.Guid, soundIds.Id, 0, actorMixerId, audioFile.Id, soundSettings);
+                    var sound = Sound.Create(soundIds.Guid, soundIds.Id, 0, actorMixerId, audioFile.Id, audioProject.Language, soundSettings);
                     audioFile.SoundReferences.Add(sound.Id);
 
                     audioProjectStatePath = StatePath.Create(statePath.StatePathNodes, sound.Id, AkBkHircType.Sound);
@@ -707,6 +711,6 @@ namespace Editors.Audio.AudioProjectConverter
 
         [RelayCommand] public void CloseWindowAction() => _closeAction?.Invoke();
 
-        public void SetCloseAction(System.Action closeAction) => _closeAction = closeAction;
+        public void SetCloseAction(System.Action closeAction) =>_closeAction = closeAction;
     }
 }

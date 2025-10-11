@@ -67,7 +67,7 @@ namespace Editors.Audio.AudioProjectCompiler
             foreach (var soundBank in audioProject.SoundBanks)
             {
                 soundBank.FileName = $"{soundBank.Name}.bnk";
-                if (soundBank.Language == Wh3LanguageInformation.GetGameLanguageAsString(Wh3GameLanguage.Sfx))
+                if (soundBank.Language == Wh3LanguageInformation.GetLanguageAsString(Wh3Language.Sfx))
                     soundBank.FilePath = $"audio\\wwise\\{soundBank.FileName}";
                 else
                     soundBank.FilePath = $"audio\\wwise\\{soundBank.Language}\\{soundBank.FileName}";
@@ -86,7 +86,7 @@ namespace Editors.Audio.AudioProjectCompiler
                     soundBank.TestingFileName = $"{soundBankNameBase}_1_{audioProjectFileNameWithoutExtension}_for_testing.bnk";
                     soundBank.MergingFileName = $"{soundBank.Name}_for_merging.bnk";
 
-                    if (soundBank.Language == Wh3LanguageInformation.GetGameLanguageAsString(Wh3GameLanguage.Sfx))
+                    if (soundBank.Language == Wh3LanguageInformation.GetLanguageAsString(Wh3Language.Sfx))
                     {
                         soundBank.TestingFilePath = $"audio\\wwise\\{soundBank.TestingFileName}";
                         soundBank.MergingFilePath = $"audio\\wwise\\{soundBank.MergingFileName}";
@@ -180,7 +180,7 @@ namespace Editors.Audio.AudioProjectCompiler
             audioFile.WemPackFileName = $"{audioFile.Id}.wem";
             audioFile.WemDiskFilePath = $"{DirectoryHelper.Temp}\\Audio\\{audioFile.WemPackFileName}";
             
-            if (soundBank.Language == Wh3LanguageInformation.GetGameLanguageAsString(Wh3GameLanguage.Sfx))
+            if (soundBank.Language == Wh3LanguageInformation.GetLanguageAsString(Wh3Language.Sfx))
                 audioFile.WemPackFilePath = $"audio\\wwise\\{audioFile.WemPackFileName}";
             else
                 audioFile.WemPackFilePath = $"audio\\wwise\\{soundBank.Language}\\{audioFile.WemPackFileName}";

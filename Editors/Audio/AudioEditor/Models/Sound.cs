@@ -18,7 +18,7 @@ namespace Editors.Audio.AudioEditor.Models
             HircType = AkBkHircType.Sound;
         }
 
-        public static Sound Create(Guid guid, uint id, uint overrideBusId, uint directParentId, uint sourceId, AudioSettings audioSettings)
+        public static Sound Create(Guid guid, uint id, uint overrideBusId, uint directParentId, uint sourceId, string language, AudioSettings audioSettings)
         {
             return new Sound()
             {
@@ -27,11 +27,12 @@ namespace Editors.Audio.AudioEditor.Models
                 OverrideBusId = overrideBusId,
                 DirectParentId = directParentId,
                 SourceId = sourceId,
+                Language = language,
                 AudioSettings = audioSettings
             };
         }
 
-        public static Sound Create(Guid guid, uint id, uint directParentId, int playlistOrder, uint sourceId)
+        public static Sound Create(Guid guid, uint id, uint directParentId, int playlistOrder, uint sourceId, string language)
         {
             return new Sound()
             {
@@ -40,6 +41,7 @@ namespace Editors.Audio.AudioEditor.Models
                 DirectParentId = directParentId,
                 SourceId = sourceId,
                 PlaylistOrder = playlistOrder,
+                Language = language
             };
         }
     }
