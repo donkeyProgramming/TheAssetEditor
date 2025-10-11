@@ -4,6 +4,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using Editors.Audio.AudioEditor.AudioFilesExplorer;
+using Editors.Audio.AudioEditor.Models;
 
 namespace Editors.Audio.AudioEditor.Settings
 {
@@ -33,16 +34,7 @@ namespace Editors.Audio.AudioEditor.Settings
                 if (e.Data.GetData(typeof(IEnumerable<AudioFilesTreeNode>)) is not IEnumerable<AudioFilesTreeNode> droppedNodes)
                     return;
 
-                var audioFiles = new List<AudioFile>();
-                foreach (var wavFile in droppedNodes)
-                {
-                    audioFiles.Add(new AudioFile
-                    {
-                        FileName = wavFile.FileName,
-                        FilePath = wavFile.FilePath
-                    });
-                }
-                ViewModel.SetAudioFilesViaDrop(audioFiles);
+                ViewModel.SetAudioFilesViaDrop(droppedNodes);
             }
         }
 

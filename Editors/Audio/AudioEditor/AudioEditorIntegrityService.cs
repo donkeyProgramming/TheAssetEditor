@@ -105,17 +105,15 @@ namespace Editors.Audio.AudioEditor
         public void CheckAudioProjectWavFilesIntegrity(AudioProject audioProject)
         {
             var missingWavFiles = new List<string>();
-            var sounds = audioProject.GetSounds();
-            var distinctSounds = sounds.DistinctBy(sound => sound.WavPackFilePath);
-            foreach (var sound in distinctSounds)
+
+            foreach (var audioFile in audioProject.AudioFiles)
             {
-                var wavPath = sound.WavPackFilePath;
-                if (string.IsNullOrWhiteSpace(wavPath))
+                if (string.IsNullOrWhiteSpace(audioFile.WavPackFilePath))
                     continue;
 
-                var packFile = _packFileService.FindFile(wavPath);
+                var packFile = _packFileService.FindFile(audioFile.WavPackFilePath);
                 if (packFile == null)
-                    missingWavFiles.Add(wavPath);
+                    missingWavFiles.Add(audioFile.WavPackFilePath);
             }
 
             if (missingWavFiles.Count > 0)
@@ -139,11 +137,11 @@ namespace Editors.Audio.AudioEditor
             var usedSourceIds = new HashSet<uint>();
 
             var audioProjectGeneratableItemIds = audioProject.GetGeneratableItemIds();
-            var audioProjectSourceIds = audioProject.GetSourceIds();
+            var audioProjectSourceIds = audioProject.GetAudioFileIds();
 
             var languageId = WwiseHash.Compute(audioProject.Language);
-            var gameLanguageHircIds = _audioRepository.GetUsedHircIdsByLanguageId(languageId);
-            var gameLanguageSourceIds = _audioRepository.GetUsedSourceIdsByLanguageId(languageId);
+            var gameLanguageHircIds = _audioRepository.GetUsedVanillaHircIdsByLanguageId(languageId);
+            var gameLanguageSourceIds = _audioRepository.GetUsedVanillaSourceIdsByLanguageId(languageId);
 
             // Reset and remove any AudioProjectItem IDs used in vanilla so we can update them
             var hircIdConflicts = new List<uint>();
@@ -206,12 +204,7 @@ namespace Editors.Audio.AudioEditor
                 ResolveSoundBankDataIntegrity(audioProject, audioProjectFileNameWithoutExtension, soundBank);
 
                 if (soundBank.ActionEvents != null)
-                {
-                    ResolvePlayActionEventDataIntegrity(usedHircIds, usedSourceIds, soundBank);
-                    ResolvePauseActionEventDataIntegrity(usedHircIds, soundBank);
-                    ResolveResumeActionEventDataIntegrity(usedHircIds, soundBank);
-                    ResolveStopActionEventDataIntegrity(usedHircIds, soundBank);
-                }
+                    ResolveActionEventDataIntegrity(usedHircIds, usedSourceIds, soundBank);
 
                 if (soundBank.DialogueEvents != null)
                     ResolveDialogueEventDataIntegrity(usedHircIds, usedSourceIds, soundBank);
@@ -248,247 +241,54 @@ namespace Editors.Audio.AudioEditor
                 soundBank.LanguageId = WwiseHash.Compute(soundBank.Language);
         }
 
-        private static void ResolvePlayActionEventDataIntegrity(HashSet<uint> usedHircIds, HashSet<uint> usedSourceIds, SoundBank soundBank)
+        private static void ResolveActionEventDataIntegrity(HashSet<uint> usedHircIds, HashSet<uint> usedSourceIds, SoundBank soundBank)
         {
-            var playActionEvents = soundBank.GetPlayActionEvents();
-            foreach (var playActionEvent in playActionEvents)
+            var actionEvents = soundBank.GetPlayActionEvents();
+            foreach (var actionEvent in actionEvents)
             {
-                if (playActionEvent.Name != playActionEvent.Name)
-                    throw new InvalidOperationException("The Play Action Event should have a name. Check for Action Events without names.");
+                if (actionEvent.Name != actionEvent.Name)
+                    throw new InvalidOperationException("The Action Event should have a name. Check for Action Events without names.");
 
-                if (playActionEvent.Id == 0)
-                    playActionEvent.Id = IdGenerator.GenerateActionEventId(usedHircIds, playActionEvent.Name);
+                if (actionEvent.Id == 0)
+                    actionEvent.Id = IdGenerator.GenerateActionEventId(usedHircIds, actionEvent.Name);
 
-                if (playActionEvent.Actions.Count > 1)
+                if (actionEvent.Actions.Count > 1)
                     throw new NotSupportedException("Multiple Actions are not supported.");
 
-                var overrideBusId = Wh3ActionEventInformation.GetOverrideBusId(playActionEvent.ActionEventType);
-                var actorMixerId = Wh3ActionEventInformation.GetActorMixerId(playActionEvent.ActionEventType);
+                var overrideBusId = Wh3ActionEventInformation.GetOverrideBusId(actionEvent.ActionEventType);
+                var actorMixerId = Wh3ActionEventInformation.GetActorMixerId(actionEvent.ActionEventType);
 
-                foreach (var playAction in playActionEvent.Actions)
+                foreach (var action in actionEvent.Actions)
                 {
-                    var playActionName = $"{playActionEvent.Name}_action";
-                    if (playAction.Name != playActionName)
-                        playAction.Name = playActionName;
+                    var actionName = $"{actionEvent.Name}_action";
+                    if (action.Name != actionName)
+                        action.Name = actionName;
 
-                    if (playAction.Id == 0)
-                        playAction.Id = IdGenerator.GenerateActionId(usedHircIds, playAction.Name, playActionEvent.Name);
-
-                    if (playAction.Sound != null)
+                    if (action.Id == 0)
                     {
-                        ResolveSoundDataIntegrity(
-                            playAction.Sound,
-                            soundBank,
-                            usedHircIds,
-                            usedSourceIds,
-                            overrideBusId: overrideBusId,
-                            directParentId: actorMixerId);
-                    }
-                    else
-                    {
-                        ResolveRandomSequenceContainerDataIntegrity(
-                            playAction.RandomSequenceContainer,
-                            soundBank,
-                            usedHircIds,
-                            usedSourceIds,
-                            overrideBusId: overrideBusId,
-                            directParentId: actorMixerId);
-                    }
-                }
-
-                foreach (var playAction in playActionEvent.Actions)
-                {
-                    var idGeneratorResult = IdGenerator.GenerateAudioProjectGeneratableItemIds(usedHircIds);
-                    if (playAction.Guid == Guid.Empty || playAction.Id == 0)
-                    {
-                        playAction.Guid = idGeneratorResult.Guid;
-                        playAction.Id = idGeneratorResult.Id;
+                        var actionIds = IdGenerator.GenerateIds(usedHircIds);
+                        action.Id = actionIds.Id;
                     }
 
-                    if (playAction.Sound != null)
+                    if (action.BankId == 0)
+                        action.BankId = soundBank.Id;
+
+                    if (action.TargetHircTypeIsSound())
                     {
-                        if (playAction.IdExt == 0)
-                            playAction.IdExt = playAction.Sound.Id;
+                        var sound = soundBank.GetSound(action.TargetHircId);
+                        if (action.IdExt == 0)
+                            action.IdExt = sound.Id;
+
+                        ResolveSoundDataIntegrity(sound, soundBank, usedHircIds, usedSourceIds, overrideBusId, actorMixerId);
                     }
-                    else if (playAction.IdExt == 0)
-                        playAction.IdExt = playAction.RandomSequenceContainer.Id;
-
-                    if (playAction.GameSoundBank == Wh3SoundBank.None)
-                        playAction.GameSoundBank = soundBank.GameSoundBank;
-
-                    if (playAction.BankId == 0)
-                        playAction.BankId = soundBank.Id;
-                }
-            }
-        }
-
-        private static void ResolvePauseActionEventDataIntegrity(HashSet<uint> usedHircIds, SoundBank soundBank)
-        {
-            var pauseActionEvents = soundBank.GetPauseActionEvents();
-            foreach (var pauseActionEvent in pauseActionEvents)
-            {
-                var playActionEvent = soundBank.GetPlayActionEventFromPauseActionEventName(pauseActionEvent.Name);
-                var playActionName = $"{playActionEvent.Name}_action";
-                var playAction = playActionEvent.GetAction(playActionName);
-
-                if (pauseActionEvent.Name == null)
-                    pauseActionEvent.Name = string.Concat("Pause_", playActionEvent.Name.AsSpan("Play_".Length));
-
-                if (pauseActionEvent.Id == 0)
-                    pauseActionEvent.Id = IdGenerator.GenerateActionEventId(usedHircIds, pauseActionEvent.Name);
-
-                if (pauseActionEvent.Actions.Count > 1)
-                    throw new NotSupportedException("Multiple Actions are not supported.");
-
-                var pauseActions = pauseActionEvent.GetPauseActions();
-                foreach (var pauseAction in pauseActions)
-                {
-                    var idGeneratorResult = IdGenerator.GenerateAudioProjectGeneratableItemIds(usedHircIds);
-                    if (pauseAction.Guid == Guid.Empty || pauseAction.Id == 0)
+                    else if (action.TargetHircTypeIsRandomSequenceContainer())
                     {
-                        pauseAction.Guid = idGeneratorResult.Guid;
-                        pauseAction.Id = idGeneratorResult.Id;
+                        var randomSequenceContainer = soundBank.GetRandomSequenceContainer(action.TargetHircId);
+                        if (action.IdExt == 0)
+                            action.IdExt = randomSequenceContainer.Id;
+
+                        ResolveRandomSequenceContainerDataIntegrity(randomSequenceContainer, soundBank, usedHircIds, usedSourceIds, overrideBusId: overrideBusId, directParentId: actorMixerId);
                     }
-
-                    if (pauseAction.Name != playActionName)
-                        pauseAction.Name = string.Concat("Pause_", playActionName.AsSpan("Play_".Length));
-
-                    if (pauseAction.Id == 0)
-                        playAction.Id = IdGenerator.GenerateActionId(usedHircIds, pauseAction.Name, playActionEvent.Name);
-
-                    if (pauseAction.Sound != null)
-                    {
-                        if (pauseAction.IdExt == 0)
-                            pauseAction.IdExt = playAction.Sound.Id;
-
-                        if (pauseAction.Sound == null)
-                            pauseAction.Sound = playAction.Sound;
-                    }
-                    else
-                    {
-                        if (pauseAction.IdExt == 0)
-                            pauseAction.IdExt = playAction.RandomSequenceContainer.Id;
-
-                        if (pauseAction.RandomSequenceContainer == null)
-                            pauseAction.RandomSequenceContainer = playAction.RandomSequenceContainer;
-                    }
-
-                    if (pauseAction.GameSoundBank == Wh3SoundBank.None)
-                        pauseAction.GameSoundBank = soundBank.GameSoundBank;
-                }
-            }
-        }
-
-        private static void ResolveResumeActionEventDataIntegrity(HashSet<uint> usedHircIds, SoundBank soundBank)
-        {
-            var resumeActionEvents = soundBank.GetResumeActionEvents();
-            foreach (var resumeActionEvent in resumeActionEvents)
-            {
-                var playActionEvent = soundBank.GetPlayActionEventFromResumeActionEventName(resumeActionEvent.Name);
-                var playActionName = $"{playActionEvent.Name}_action";
-                var playAction = playActionEvent.GetAction(playActionName);
-
-                if (resumeActionEvent.Name == null)
-                    resumeActionEvent.Name = string.Concat("Resume_", playActionEvent.Name.AsSpan("Play_".Length));
-
-                if (resumeActionEvent.Id == 0)
-                    resumeActionEvent.Id = IdGenerator.GenerateActionEventId(usedHircIds, resumeActionEvent.Name);
-
-                if (resumeActionEvent.Actions.Count > 1)
-                    throw new NotSupportedException("Multiple Actions are not supported.");
-
-                var resumeActions = resumeActionEvent.GetResumeActions();
-                foreach (var resumeAction in resumeActions)
-                {
-                    var idGeneratorResult = IdGenerator.GenerateAudioProjectGeneratableItemIds(usedHircIds);
-                    if (resumeAction.Guid == Guid.Empty || resumeAction.Id == 0)
-                    {
-                        resumeAction.Guid = idGeneratorResult.Guid;
-                        resumeAction.Id = idGeneratorResult.Id;
-                    }
-
-                    if (resumeAction.Name != playActionName)
-                        resumeAction.Name = string.Concat("Resume_", playActionName.AsSpan("Play_".Length));
-
-                    if (resumeAction.Id == 0)
-                        playAction.Id = IdGenerator.GenerateActionId(usedHircIds, resumeAction.Name, playActionEvent.Name);
-
-                    if (resumeAction.Sound != null)
-                    {
-                        if (resumeAction.IdExt == 0)
-                            resumeAction.IdExt = playAction.Sound.Id;
-
-                        if (resumeAction.Sound == null)
-                            resumeAction.Sound = playAction.Sound;
-                    }
-                    else
-                    {
-                        if (resumeAction.IdExt == 0)
-                            resumeAction.IdExt = playAction.RandomSequenceContainer.Id;
-
-                        if (resumeAction.RandomSequenceContainer == null)
-                            resumeAction.RandomSequenceContainer = playAction.RandomSequenceContainer;
-                    }
-
-                    if (resumeAction.GameSoundBank == Wh3SoundBank.None)
-                        resumeAction.GameSoundBank = soundBank.GameSoundBank;
-                }
-            }
-        }
-
-        private static void ResolveStopActionEventDataIntegrity(HashSet<uint> usedHircIds, SoundBank soundBank)
-        {
-            var stopActionEvents = soundBank.GetStopActionEvents();
-            foreach (var stopActionEvent in stopActionEvents)
-            {
-                var playActionEvent = soundBank.GetPlayActionEventFromStopActionEventName(stopActionEvent.Name);
-                var playActionName = $"{playActionEvent.Name}_action";
-                var playAction = playActionEvent.GetAction(playActionName);
-
-                if (stopActionEvent.Name == null)
-                    stopActionEvent.Name = string.Concat("Stop_", playActionEvent.Name.AsSpan("Play_".Length));
-
-                if (stopActionEvent.Id == 0)
-                    stopActionEvent.Id = IdGenerator.GenerateActionEventId(usedHircIds, stopActionEvent.Name);
-
-                if (stopActionEvent.Actions.Count > 1)
-                    throw new NotSupportedException("Multiple Actions are not supported.");
-
-                var stopActions = stopActionEvent.GetStopActions();
-                foreach (var stopAction in stopActions)
-                {
-                    var idGeneratorResult = IdGenerator.GenerateAudioProjectGeneratableItemIds(usedHircIds);
-                    if (stopAction.Guid == Guid.Empty || stopAction.Id == 0)
-                    {
-                        stopAction.Guid = idGeneratorResult.Guid;
-                        stopAction.Id = idGeneratorResult.Id;
-                    }
-
-                    if (stopAction.Name != playActionName)
-                        stopAction.Name = string.Concat("Stop_", playActionName.AsSpan("Play_".Length));
-
-                    if (stopAction.Id == 0)
-                        playAction.Id = IdGenerator.GenerateActionId(usedHircIds, stopAction.Name, playActionEvent.Name);
-
-                    if (stopAction.Sound != null)
-                    {
-                        if (stopAction.IdExt == 0)
-                            stopAction.IdExt = playAction.Sound.Id;
-
-                        if (stopAction.Sound == null)
-                            stopAction.Sound = playAction.Sound;
-                    }
-                    else
-                    {
-                        if (stopAction.IdExt == 0)
-                            stopAction.IdExt = playAction.RandomSequenceContainer.Id;
-
-                        if (stopAction.RandomSequenceContainer == null)
-                            stopAction.RandomSequenceContainer = playAction.RandomSequenceContainer;
-                    }
-
-                    if (stopAction.GameSoundBank == Wh3SoundBank.None)
-                        stopAction.GameSoundBank = soundBank.GameSoundBank;
                 }
             }
         }
@@ -514,21 +314,16 @@ namespace Editors.Audio.AudioEditor
                             statePathNode.State.Id = WwiseHash.Compute(statePathNode.State.Name);
                     }
 
-                    if (statePath.Sound != null)
-                        ResolveSoundDataIntegrity(
-                            statePath.Sound,
-                            soundBank,
-                            usedHircIds,
-                            usedSourceIds,
-                            directParentId: actorMixerId);
-                    else
-                        ResolveRandomSequenceContainerDataIntegrity(
-                            statePath.RandomSequenceContainer,
-                            soundBank,
-                            usedHircIds,
-                            usedSourceIds,
-                            statePath: statePath,
-                            directParentId: actorMixerId);
+                    if (statePath.TargetHircTypeIsSound())
+                    {
+                        var sound = soundBank.GetSound(statePath.TargetHircId);
+                        ResolveSoundDataIntegrity(sound, soundBank, usedHircIds, usedSourceIds, directParentId: actorMixerId);
+                    }
+                    else if (statePath.TargetHircTypeIsRandomSequenceContainer())
+                    {
+                        var randomSequenceContainer = soundBank.GetRandomSequenceContainer(statePath.TargetHircId);
+                        ResolveRandomSequenceContainerDataIntegrity(randomSequenceContainer, soundBank, usedHircIds, usedSourceIds, statePath: statePath, directParentId: actorMixerId);
+                    }
                 }
             }
         }
@@ -562,11 +357,11 @@ namespace Editors.Audio.AudioEditor
             uint overrideBusId = 0,
             uint directParentId = 0)
         {
-            var idGeneratorResult = IdGenerator.GenerateAudioProjectGeneratableItemIds(usedHircIds);
+            var randomSequenceContainerIds = IdGenerator.GenerateIds(usedHircIds);
             if (randomSequenceContainer.Guid == Guid.Empty || randomSequenceContainer.Id == 0)
             {
-                randomSequenceContainer.Guid = idGeneratorResult.Guid;
-                randomSequenceContainer.Id = idGeneratorResult.Id;
+                randomSequenceContainer.Guid = randomSequenceContainerIds.Guid;
+                randomSequenceContainer.Id = randomSequenceContainerIds.Id;
             }
 
             if (randomSequenceContainer.OverrideBusId == 0 && overrideBusId != 0)
@@ -576,7 +371,8 @@ namespace Editors.Audio.AudioEditor
                 randomSequenceContainer.DirectParentId = directParentId;
 
             var playlistOrder = 0;
-            foreach (var sound in randomSequenceContainer.Sounds)
+            var sounds = soundBank.GetSounds(randomSequenceContainer.SoundReferences);
+            foreach (var sound in sounds)
             {
                 playlistOrder++;
                 ResolveSoundDataIntegrity(sound, soundBank, usedHircIds, usedSourceIds, directParentId: randomSequenceContainer.Id, playlistOrder: playlistOrder);
@@ -592,11 +388,11 @@ namespace Editors.Audio.AudioEditor
             uint directParentId = 0,
             int playlistOrder = 0)
         {
-            var idGeneratorResult = IdGenerator.GenerateAudioProjectGeneratableItemIds(usedHircIds);
+            var soundIds = IdGenerator.GenerateIds(usedHircIds);
             if (sound.Guid == Guid.Empty || sound.Id == 0)
             {
-                sound.Guid = idGeneratorResult.Guid;
-                sound.Id = idGeneratorResult.Id;
+                sound.Guid = soundIds.Guid;
+                sound.Id = soundIds.Id;
             }
 
             if (sound.Language == null)
@@ -609,13 +405,7 @@ namespace Editors.Audio.AudioEditor
                 sound.DirectParentId = directParentId;
 
             if (sound.SourceId == 0)
-            {
-                var sourceId = WwiseHash.Compute(sound.WavPackFilePath);
-                if (usedSourceIds.Contains(sourceId))
-                    throw new InvalidOperationException($"SourceId is already used. Change the name of {sound.WavPackFilePath}.");
-                else
-                    sound.SourceId = sourceId;
-            }
+                throw new InvalidOperationException($"SourceId should not be 0.");
 
             if (sound.PlaylistOrder == 0)
                 sound.PlaylistOrder = playlistOrder;
@@ -629,8 +419,8 @@ namespace Editors.Audio.AudioEditor
             var messageBuilder = new StringBuilder()
                 .AppendLine("Merging SoundBanks ID Integrity Check failed.")
                 .AppendLine()
-                .AppendLine("The following Hirc IDs are used by multiple SoundBanks within the same language.")
-                .AppendLine("For each source SoundBank, the IDs listed also exist in the listed other SounBanks.")
+                .AppendLine("The following Hirc Ids or SourceIds are used by multiple SoundBanks within the same language.")
+                .AppendLine("For each source SoundBank, listed Ids also exist in the listed other SoundBanks.")
                 .AppendLine();
 
             foreach (var languageEntry in moddedHircsByBnkByLanguage)
@@ -641,13 +431,23 @@ namespace Editors.Audio.AudioEditor
                 var idsByBnk = new Dictionary<string, HashSet<uint>>(StringComparer.OrdinalIgnoreCase);
                 var bnksById = new Dictionary<uint, HashSet<string>>();
 
+                var sourceIdsByBnk = new Dictionary<string, HashSet<uint>>(StringComparer.OrdinalIgnoreCase);
+                var bnksBySourceId = new Dictionary<uint, HashSet<string>>();
+
                 foreach (var bnkEntry in hircsByBnkDictionary)
                 {
                     var bnkName = bnkEntry.Key;
+
                     if (!idsByBnk.TryGetValue(bnkName, out var idSet))
                     {
                         idSet = [];
                         idsByBnk[bnkName] = idSet;
+                    }
+
+                    if (!sourceIdsByBnk.TryGetValue(bnkName, out var sourceIdSet))
+                    {
+                        sourceIdSet = [];
+                        sourceIdsByBnk[bnkName] = sourceIdSet;
                     }
 
                     foreach (var hirc in bnkEntry.Value)
@@ -656,16 +456,32 @@ namespace Editors.Audio.AudioEditor
                             continue;
 
                         var id = hirc.Id;
-                        if (!idSet.Add(id))
-                            continue;
-
-                        if (!bnksById.TryGetValue(id, out var bnksContainingThisId))
+                        if (idSet.Add(id))
                         {
-                            bnksContainingThisId = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-                            bnksById[id] = bnksContainingThisId;
+                            if (!bnksById.TryGetValue(id, out var bnksContainingThisId))
+                            {
+                                bnksContainingThisId = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+                                bnksById[id] = bnksContainingThisId;
+                            }
+
+                            bnksContainingThisId.Add(bnkName);
                         }
 
-                        bnksContainingThisId.Add(bnkName);
+                        if (hirc is ICAkSound sound)
+                        {
+                            var sourceId = sound.GetSourceId();
+
+                            if (sourceIdSet.Add(sourceId))
+                            {
+                                if (!bnksBySourceId.TryGetValue(sourceId, out var bnksContainingThisSourceId))
+                                {
+                                    bnksContainingThisSourceId = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+                                    bnksBySourceId[sourceId] = bnksContainingThisSourceId;
+                                }
+
+                                bnksContainingThisSourceId.Add(bnkName);
+                            }
+                        }
                     }
                 }
 
@@ -673,27 +489,54 @@ namespace Editors.Audio.AudioEditor
                     .Where(pair => pair.Value.Count > 1)
                     .ToDictionary(pair => pair.Key, pair => pair.Value);
 
-                if (clashingIdsById.Count == 0)
+                var clashingSourceIdsById = bnksBySourceId
+                    .Where(pair => pair.Value.Count > 1)
+                    .ToDictionary(pair => pair.Key, pair => pair.Value);
+
+                if (clashingIdsById.Count == 0 && clashingSourceIdsById.Count == 0)
                     continue;
 
                 hasClashes = true;
                 messageBuilder.AppendLine($"Language: {languageName}");
 
-                foreach (var sourceBnk in idsByBnk.Keys.OrderBy(name => name, StringComparer.OrdinalIgnoreCase))
+                foreach (var sourceBnk in idsByBnk.Keys
+                             .Union(sourceIdsByBnk.Keys, StringComparer.OrdinalIgnoreCase)
+                             .OrderBy(name => name, StringComparer.OrdinalIgnoreCase))
                 {
-                    var conflictingIdsFromThisBnk = idsByBnk[sourceBnk]
-                        .Where(clashingIdsById.ContainsKey)
-                        .OrderBy(id => id);
-
                     var anyConflicts = false;
-                    foreach (var id in conflictingIdsFromThisBnk)
-                    {
-                        anyConflicts = true;
-                        var otherBnks = clashingIdsById[id]
-                            .Where(other => !string.Equals(other, sourceBnk, StringComparison.OrdinalIgnoreCase))
-                            .OrderBy(name => name, StringComparer.OrdinalIgnoreCase);
 
-                        messageBuilder.AppendLine($"Id {id} also in: {string.Join(", ", otherBnks)}");
+                    if (idsByBnk.TryGetValue(sourceBnk, out var idsFromThisBnk))
+                    {
+                        var conflictingIdsFromThisBnk = idsFromThisBnk
+                            .Where(clashingIdsById.ContainsKey)
+                            .OrderBy(value => value);
+
+                        foreach (var id in conflictingIdsFromThisBnk)
+                        {
+                            anyConflicts = true;
+                            var otherBnks = clashingIdsById[id]
+                                .Where(other => !string.Equals(other, sourceBnk, StringComparison.OrdinalIgnoreCase))
+                                .OrderBy(name => name, StringComparer.OrdinalIgnoreCase);
+
+                            messageBuilder.AppendLine($"Hirc Id {id} also in: {string.Join(", ", otherBnks)}");
+                        }
+                    }
+
+                    if (sourceIdsByBnk.TryGetValue(sourceBnk, out var sourceIdsFromThisBnk))
+                    {
+                        var conflictingSourceIdsFromThisBnk = sourceIdsFromThisBnk
+                            .Where(clashingSourceIdsById.ContainsKey)
+                            .OrderBy(value => value);
+
+                        foreach (var sourceId in conflictingSourceIdsFromThisBnk)
+                        {
+                            anyConflicts = true;
+                            var otherBnks = clashingSourceIdsById[sourceId]
+                                .Where(other => !string.Equals(other, sourceBnk, StringComparison.OrdinalIgnoreCase))
+                                .OrderBy(name => name, StringComparer.OrdinalIgnoreCase);
+
+                            messageBuilder.AppendLine($"SourceId {sourceId} also in: {string.Join(", ", otherBnks)}");
+                        }
                     }
 
                     if (anyConflicts)

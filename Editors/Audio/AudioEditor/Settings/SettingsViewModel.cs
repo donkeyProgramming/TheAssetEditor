@@ -4,15 +4,17 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Editors.Audio.AudioEditor.AudioFilesExplorer;
 using Editors.Audio.AudioEditor.Events;
 using Editors.Audio.AudioEditor.Models;
 using Editors.Audio.AudioEditor.Presentation.Table;
 using Editors.Audio.AudioEditor.UICommands;
+using Editors.Audio.AudioProjectCompiler;
 using Editors.Audio.Storage;
+using Editors.Audio.Utility;
 using Shared.Core.Events;
 using static Editors.Audio.AudioEditor.Settings.Settings;
 
-// TODO: Some bug where the audio settings aren't updating right after multiple sounds are set after single previously being set
 namespace Editors.Audio.AudioEditor.Settings
 {
     public partial class SettingsViewModel : ObservableObject
@@ -135,8 +137,30 @@ namespace Editors.Audio.AudioEditor.Settings
             ShowSettingsFromViewerItem();
         }
 
-        public void SetAudioFilesViaDrop(List<AudioFile> audioFiles)
+        public void SetAudioFilesViaDrop(IEnumerable<AudioFilesTreeNode> audioFilesTreeNodes)
         {
+            var usedSourceIds = new HashSet<uint>();
+            var audioProject = _audioEditorStateService.AudioProject;
+
+            var audioProjectSourceIds = audioProject.GetAudioFileIds();
+            var languageId = WwiseHash.Compute(audioProject.Language);
+            var gameLanguageSourceIds = _audioRepository.GetUsedVanillaSourceIdsByLanguageId(languageId);
+
+            usedSourceIds.UnionWith(audioProjectSourceIds);
+            usedSourceIds.UnionWith(gameLanguageSourceIds);
+
+            var audioFiles = new List<AudioFile>();
+            foreach (var node in audioFilesTreeNodes)
+            {
+                var audioFile = audioProject.GetAudioFile(node.FilePath);
+                if (audioFile == null)
+                {
+                    var audioFileIds = IdGenerator.GenerateIds(usedSourceIds);
+                    audioFile = AudioFile.Create(audioFileIds.Guid, audioFileIds.Id, node.FileName, node.FilePath);
+                }
+                audioFiles.Add(audioFile);
+            }
+
             _audioEditorStateService.StoreAudioFiles(audioFiles);
             _eventHub.Publish(new AudioFilesChangedEvent(audioFiles, false, false));
         }
@@ -335,6 +359,7 @@ namespace Editors.Audio.AudioEditor.Settings
             if (_audioEditorStateService.SelectedViewerRows.Count == 0)
                 return;
 
+            var audioProject = _audioEditorStateService.AudioProject;
             AudioSettings settings = null;
             var audioFiles = new List<AudioFile>();
 
@@ -344,6 +369,7 @@ namespace Editors.Audio.AudioEditor.Settings
                 var selectedViewerRow = _audioEditorStateService.SelectedViewerRows[0];
                 var actionEventName = TableHelpers.GetActionEventNameFromRow(selectedViewerRow);
                 var actionEvent = _audioEditorStateService.AudioProject.GetActionEvent(actionEventName);
+                var soundBank = _audioEditorStateService.AudioProject.GetSoundBank(selectedAudioProjectExplorerNode.Parent.Parent.Name);
 
                 var playActions = actionEvent.GetPlayActions();
                 if (playActions.Count > 1)
@@ -351,28 +377,27 @@ namespace Editors.Audio.AudioEditor.Settings
 
                 foreach (var playAction in playActions)
                 {
-                    settings = playAction.GetAudioSettings();
+                    if (playAction.TargetHircTypeIsSound())
+                    {
+                        var sound = soundBank.GetSound(playAction.TargetHircId);
+                        settings = sound.AudioSettings;
 
-                    if (playAction.Sound != null)
-                    {
-                        audioFiles.Add(new AudioFile()
-                        {
-                            FileName = playAction.Sound.WavPackFileName,
-                            FilePath = playAction.Sound.WavPackFilePath,
-                        });
+                        var audioFile = audioProject.GetAudioFile(sound.SourceId);
+                        audioFiles.Add(audioFile);
                     }
-                    else
+                    else if (playAction.TargetHircTypeIsRandomSequenceContainer())
                     {
-                        var orderedSounds = playAction.RandomSequenceContainer.Sounds
-                        .OrderBy(sound => sound.PlaylistOrder)
-                        .ToList();
-                        foreach (var sound in playAction.RandomSequenceContainer.Sounds)
+                        var randomSequenceContainer = soundBank.GetRandomSequenceContainer(playAction.TargetHircId);
+                        settings = randomSequenceContainer.AudioSettings;
+
+                        var sounds = soundBank.GetSounds(randomSequenceContainer.SoundReferences);
+                        var orderedSounds = sounds
+                            .OrderBy(sound => sound.PlaylistOrder)
+                            .ToList();
+                        foreach (var orderedSound in orderedSounds)
                         {
-                            audioFiles.Add(new AudioFile()
-                            {
-                                FileName = sound.WavPackFileName,
-                                FilePath = sound.WavPackFilePath,
-                            });
+                            var audioFile = audioProject.GetAudioFile(orderedSound.SourceId);
+                            audioFiles.Add(audioFile);
                         }
                     }
                 }
@@ -384,28 +409,29 @@ namespace Editors.Audio.AudioEditor.Settings
                 var dialogueEvent = _audioEditorStateService.AudioProject.GetDialogueEvent(selectedAudioProjectExplorerNode.Name);
                 var statePathName = TableHelpers.GetStatePathNameFromRow(selectedViewerRow, _audioRepository, selectedAudioProjectExplorerNode.Name);
                 var statePath = dialogueEvent.GetStatePath(statePathName);
-                settings = statePath.GetAudioSettings();
+                var soundBank = _audioEditorStateService.AudioProject.GetSoundBank(selectedAudioProjectExplorerNode.Parent.Parent.Name);
 
-                if (statePath.Sound != null)
+                if (statePath.TargetHircTypeIsSound())
                 {
-                    audioFiles.Add(new AudioFile()
-                    {
-                        FileName = statePath.Sound.WavPackFileName,
-                        FilePath = statePath.Sound.WavPackFilePath,
-                    });
+                    var sound = soundBank.GetSound(statePath.TargetHircId);
+                    settings = sound.AudioSettings;
+
+                    var audioFile = audioProject.GetAudioFile(sound.SourceId);
+                    audioFiles.Add(audioFile);
                 }
-                else
+                else if (statePath.TargetHircTypeIsRandomSequenceContainer())
                 {
-                    var orderedSounds = statePath.RandomSequenceContainer.Sounds
+                    var randomSequenceContainer = soundBank.GetRandomSequenceContainer(statePath.TargetHircId);
+                    settings = randomSequenceContainer.AudioSettings;
+
+                    var sounds = soundBank.GetSounds(randomSequenceContainer.SoundReferences);
+                    var orderedSounds = sounds
                         .OrderBy(sound => sound.PlaylistOrder)
                         .ToList();
-                    foreach (var sound in orderedSounds)
+                    foreach (var orderedSound in orderedSounds)
                     {
-                        audioFiles.Add(new AudioFile()
-                        {
-                            FileName = sound.WavPackFileName,
-                            FilePath = sound.WavPackFilePath,
-                        });
+                        var audioFile = audioProject.GetAudioFile(orderedSound.SourceId);
+                        audioFiles.Add(audioFile);
                     }
                 }
 
@@ -469,7 +495,7 @@ namespace Editors.Audio.AudioEditor.Settings
 
         [RelayCommand] public void PlayWav(AudioFile audioFile)
         {
-            _uiCommandFactory.Create<PlayAudioFileCommand>().Execute(audioFile.FileName, audioFile.FilePath);
+            _uiCommandFactory.Create<PlayAudioFileCommand>().Execute(audioFile.WavPackFileName, audioFile.WavPackFilePath);
         }
 
         private void SetInitialSettings()

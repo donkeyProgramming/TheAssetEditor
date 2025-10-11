@@ -1,12 +1,20 @@
 ﻿using System.Collections.Generic;
 using Editors.Audio.AudioEditor.Models;
-using Editors.Audio.AudioEditor.Settings;
+using Shared.GameFormats.Wwise.Enums;
 
 namespace Editors.Audio.AudioEditor.Factories
 {
+    public record StatePathFactoryResult
+    {
+        public StatePath StatePath { get; set; }
+        public Sound SoundTarget { get; set; }
+        public RandomSequenceContainer RandomSequenceContainerTarget { get; set; }
+        public List<Sound> RandomSequenceContainerSounds { get; set; } = [];
+    }
+
     public interface IStatePathFactory
     {
-        StatePath Create(
+        StatePathFactoryResult Create(
             Dictionary<string, string> stateLookupByStateGroup,
             List<AudioFile> audioFiles,
             AudioSettings audioSettings,
@@ -20,7 +28,7 @@ namespace Editors.Audio.AudioEditor.Factories
         private readonly ISoundFactory _soundFactory = soundFactory;
         private readonly IRandomSequenceContainerFactory _randomSequenceContainerFactory = randomSequenceContainerFactory;
 
-        public StatePath Create(
+        public StatePathFactoryResult Create(
             Dictionary<string, string> stateLookupByStateGroup, 
             List<AudioFile> audioFiles, 
             AudioSettings audioSettings,
@@ -28,7 +36,7 @@ namespace Editors.Audio.AudioEditor.Factories
             HashSet<uint> usedSourceIds,
             uint actorMixerId = 0)
         {
-            var statePath = new StatePath();
+            var statePathFactoryResult = new StatePathFactoryResult();
             var statePathNodes = new List<StatePath.Node>();
 
             foreach (var kvp in stateLookupByStateGroup)
@@ -46,15 +54,22 @@ namespace Editors.Audio.AudioEditor.Factories
             if (audioFiles.Count == 1)
             {
                 var sound = _soundFactory.Create(usedHircIds, usedSourceIds, audioFiles[0], audioSettings, directParentId: actorMixerId);
-                statePath = StatePath.Create(statePathNodes, sound);
+                statePathFactoryResult.SoundTarget = sound;
+
+                var statePath = StatePath.Create(statePathNodes, sound.Id, AkBkHircType.Sound);
+                statePathFactoryResult.StatePath = statePath;
             }
             else if (audioFiles.Count > 1)
             {
-                var randomSequenceContainer = _randomSequenceContainerFactory.Create(usedHircIds, usedSourceIds, audioSettings, audioFiles, directParentId: actorMixerId);
-                statePath = StatePath.Create(statePathNodes, randomSequenceContainer);
+                var randomSequenceContainerResult = _randomSequenceContainerFactory.Create(usedHircIds, usedSourceIds, audioSettings, audioFiles, directParentId: actorMixerId);
+                statePathFactoryResult.RandomSequenceContainerTarget = randomSequenceContainerResult.RandomSequenceContainer;
+                statePathFactoryResult.RandomSequenceContainerSounds.AddRange(randomSequenceContainerResult.RandomSequenceContainerSounds);
+
+                var statePath = StatePath.Create(statePathNodes, statePathFactoryResult.RandomSequenceContainerTarget.Id, AkBkHircType.RandomSequenceContainer);
+                statePathFactoryResult.StatePath = statePath;
             }
 
-            return statePath;
+            return statePathFactoryResult;
         }
     }
 }

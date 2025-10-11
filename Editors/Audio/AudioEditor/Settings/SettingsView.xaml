@@ -148,11 +148,11 @@
                             <GridView>
                                 <GridViewColumn 
                                     Header="File Name" 
-                                    DisplayMemberBinding="{Binding FileName}"
+                                    DisplayMemberBinding="{Binding WavPackFileName}"
                                     Width="Auto"/>
                                 <GridViewColumn 
                                     Header="File Path" 
-                                    DisplayMemberBinding="{Binding FilePath}"
+                                    DisplayMemberBinding="{Binding WavPackFilePath}"
                                     Width="Auto"/>
                             </GridView>
                         </ListView.View>

@@ -9,11 +9,11 @@ namespace Editors.Audio.AudioProjectCompiler.WwiseGeneratorService.WwiseGenerato
 {
     public class ActionHircGenerator_V136 : IWwiseHircGeneratorService
     {
-        public HircItem GenerateHirc(AudioProjectItem audioProjectItem)
+        public HircItem GenerateHirc(AudioProjectItem audioProjectItem, SoundBank soundBank = null)
         {
             var audioProjectActionEvent = audioProjectItem as Action;
 
-            var actionHirc = CreateAction(audioProjectActionEvent, audioProjectActionEvent.GameSoundBank);
+            var actionHirc = CreateAction(audioProjectActionEvent, soundBank.GameSoundBank);
 
             if (audioProjectActionEvent.ActionType == AkActionType.Play)
                 actionHirc.PlayActionParams = CreatePlayActionParams(audioProjectActionEvent.BankId);

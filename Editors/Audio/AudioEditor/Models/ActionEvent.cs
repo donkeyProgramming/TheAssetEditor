@@ -35,31 +35,5 @@ namespace Editors.Audio.AudioEditor.Models
                 .Where(action => action.ActionType == AkActionType.Play)
                 .ToList();
         }
-
-        public List<Action> GetPauseActions()
-        {
-            return Actions.
-                Select(action => action)
-                .Where(action => action.ActionType == AkActionType.Pause_E_O)
-                .ToList();
-        }
-
-        public List<Action> GetResumeActions()
-        {
-            return Actions.
-                Select(action => action)
-                .Where(action => action.ActionType == AkActionType.Resume_E_O)
-                .ToList();
-        }
-
-        public List<Action> GetStopActions()
-        {
-            return Actions.
-                Select(action => action)
-                .Where(action => action.ActionType == AkActionType.Stop_E_O)
-                .ToList();
-        }
-
-        public Action GetAction(string actionName) => Actions.FirstOrDefault(action => action.Name == actionName);
     }
 }

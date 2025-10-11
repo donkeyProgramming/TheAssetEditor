@@ -6,7 +6,7 @@ namespace Editors.Audio.AudioProjectCompiler.WwiseGeneratorService.WwiseGenerato
 {
     public class CAkSoundGenerator_V136 : IWwiseHircGeneratorService
     {
-        public HircItem GenerateHirc(AudioProjectItem audioProjectItem)
+        public HircItem GenerateHirc(AudioProjectItem audioProjectItem, SoundBank soundBank = null)
         {
             var audioProjectSound = audioProjectItem as Sound;
             var soundHirc = CreateSoundHirc(audioProjectSound);

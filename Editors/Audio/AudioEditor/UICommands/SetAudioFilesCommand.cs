@@ -2,26 +2,42 @@
 using System.Collections.ObjectModel;
 using Editors.Audio.AudioEditor.AudioFilesExplorer;
 using Editors.Audio.AudioEditor.Events;
-using Editors.Audio.AudioEditor.Settings;
+using Editors.Audio.AudioEditor.Models;
+using Editors.Audio.AudioProjectCompiler;
+using Editors.Audio.Storage;
+using Editors.Audio.Utility;
 using Shared.Core.Events;
 
 namespace Editors.Audio.AudioEditor.UICommands
 {
-    public class SetAudioFilesCommand(IAudioEditorStateService audioEditorStateService, IEventHub eventHub) : IUiCommand
+    public class SetAudioFilesCommand(IAudioEditorStateService audioEditorStateService, IEventHub eventHub, IAudioRepository audioRepository) : IUiCommand
     {
         private readonly IAudioEditorStateService _audioEditorStateService = audioEditorStateService;
         private readonly IEventHub _eventHub = eventHub;
+        private readonly IAudioRepository _audioRepository = audioRepository;
 
         public void Execute(ObservableCollection<AudioFilesTreeNode> selectedAudioFiles, bool addToExistingAudioFiles)
         {
+            var usedSourceIds = new HashSet<uint>();
+            var audioProject = _audioEditorStateService.AudioProject;
+
+            var audioProjectSourceIds = audioProject.GetAudioFileIds();
+            var languageId = WwiseHash.Compute(audioProject.Language);
+            var gameLanguageSourceIds = _audioRepository.GetUsedVanillaSourceIdsByLanguageId(languageId);
+
+            usedSourceIds.UnionWith(audioProjectSourceIds);
+            usedSourceIds.UnionWith(gameLanguageSourceIds);
+
             var audioFiles = new List<AudioFile>();
             foreach (var wavFile in selectedAudioFiles)
             {
-                audioFiles.Add(new AudioFile
+                var audioFile = audioProject.GetAudioFile(wavFile.FilePath);
+                if (audioFile == null)
                 {
-                    FileName = wavFile.FileName,
-                    FilePath = wavFile.FilePath
-                });
+                    var audioFileIds = IdGenerator.GenerateIds(usedSourceIds);
+                    audioFile = AudioFile.Create(audioFileIds.Guid, audioFileIds.Id, wavFile.FileName, wavFile.FilePath);
+                }
+                audioFiles.Add(audioFile);
             }
 
             _audioEditorStateService.StoreAudioFiles(audioFiles);

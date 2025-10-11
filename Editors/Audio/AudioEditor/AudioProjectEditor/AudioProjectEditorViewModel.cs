@@ -10,8 +10,8 @@ using CommunityToolkit.Mvvm.Input;
 using Editors.Audio.AudioEditor.AudioProjectEditor.Table;
 using Editors.Audio.AudioEditor.AudioProjectExplorer;
 using Editors.Audio.AudioEditor.Events;
+using Editors.Audio.AudioEditor.Models;
 using Editors.Audio.AudioEditor.Presentation.Table;
-using Editors.Audio.AudioEditor.Settings;
 using Editors.Audio.AudioEditor.UICommands;
 using Editors.Audio.GameInformation.Warhammer3;
 using Editors.Audio.Storage;
@@ -195,7 +195,7 @@ namespace Editors.Audio.AudioEditor.AudioProjectEditor
                 && ((hasExistingAudioFiles && !addToExistingAudioFiles) || (!hasExistingAudioFiles && addToExistingAudioFiles)))
             {
                 var row = Table.Rows[0];
-                var wavFileName = Path.GetFileNameWithoutExtension(audioFiles[0].FileName);
+                var wavFileName = Path.GetFileNameWithoutExtension(audioFiles[0].WavPackFileName);
                 var eventName = $"Play_{wavFileName}";
                 row[TableInfo.EventColumnName] = eventName;
             }

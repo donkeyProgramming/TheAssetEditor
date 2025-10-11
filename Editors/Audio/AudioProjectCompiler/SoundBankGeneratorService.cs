@@ -218,7 +218,7 @@ namespace Editors.Audio.AudioProjectCompiler
 
                 foreach (var action in actionEvent.Actions)
                 {
-                    var actionHirc = _wwiseHircGeneratorServiceFactory.GenerateHirc(action);
+                    var actionHirc = _wwiseHircGeneratorServiceFactory.GenerateHirc(action, soundBank);
                     hircItems.Add(actionHirc);
 
                     if (actionEventHirc.HircChildren == null)
@@ -240,11 +240,18 @@ namespace Editors.Audio.AudioProjectCompiler
                 {
                     if (action.ActionType == AkActionType.Play)
                     {
-                        var sound = action.Sound;
-                        var randomSequenceContainer = action.RandomSequenceContainer;
-
-                        var sourceHircs = GenerateSourceHircs(soundBank, sound, randomSequenceContainer);
-                        hircItems.AddRange(sourceHircs);
+                        if (action.TargetHircTypeIsSound())
+                        {
+                            var sound = soundBank.GetSound(action.TargetHircId);
+                            var soundTargetHircs = GenerateSoundTargetHircs(soundBank, sound);
+                            hircItems.AddRange(soundTargetHircs);
+                        }
+                        else if (action.TargetHircTypeIsRandomSequenceContainer())
+                        {
+                            var randomSequenceContainer = soundBank.GetRandomSequenceContainer(action.TargetHircId);
+                            var randomSequenceContainerTargetHircs = GenerateRandomSequenceContainerTargetHircs(soundBank, randomSequenceContainer);
+                            hircItems.AddRange(randomSequenceContainerTargetHircs);
+                        }
                     }
                 }
             }
@@ -271,39 +278,50 @@ namespace Editors.Audio.AudioProjectCompiler
             {
                 foreach (var statePath in dialogueEvent.StatePaths)
                 {
-                    var sound = statePath.Sound;
-                    var randomSequenceContainer = statePath.RandomSequenceContainer;
 
-                    var sourceHircs = GenerateSourceHircs(soundBank, sound, randomSequenceContainer);
-                    hircItems.AddRange(sourceHircs);
+                    if (statePath.TargetHircTypeIsSound())
+                    {
+                        var sound = soundBank.GetSound(statePath.TargetHircId);
+                        var soundTargetHircs = GenerateSoundTargetHircs(soundBank, sound);
+                        hircItems.AddRange(soundTargetHircs);
+                    }
+                    else if (statePath.TargetHircTypeIsRandomSequenceContainer())
+                    {
+                        var randomSequenceContainer = soundBank.GetRandomSequenceContainer(statePath.TargetHircId);
+                        var randomSequenceContainerTargetHircs = GenerateRandomSequenceContainerTargetHircs(soundBank, randomSequenceContainer);
+                        hircItems.AddRange(randomSequenceContainerTargetHircs);
+                    }
                 }
             }
 
             return hircItems;
         }
 
-        private List<HircItem> GenerateSourceHircs(SoundBank soundBank, Sound sound = null, RandomSequenceContainer randomSequenceContainer = null)
+        private List<HircItem> GenerateSoundTargetHircs(SoundBank soundBank, Sound sound)
         {
             var hircItems = new List<HircItem>();
 
-            if (sound != null)
-            {
-                var soundHirc = _wwiseHircGeneratorServiceFactory.GenerateHirc(sound);
-                soundHirc.IsTarget = true;
-                hircItems.Add(soundHirc);
-                return hircItems;
-            }
+            var soundHirc = _wwiseHircGeneratorServiceFactory.GenerateHirc(sound);
+            soundHirc.IsTarget = true;
+            hircItems.Add(soundHirc);
+            return hircItems;
+        }
 
-            var randomSequenceContainerHirc = _wwiseHircGeneratorServiceFactory.GenerateHirc(randomSequenceContainer);
+        private List<HircItem> GenerateRandomSequenceContainerTargetHircs(SoundBank soundBank, RandomSequenceContainer randomSequenceContainer)
+        {
+            var hircItems = new List<HircItem>();
+
+            var randomSequenceContainerHirc = _wwiseHircGeneratorServiceFactory.GenerateHirc(randomSequenceContainer, soundBank);
             hircItems.Add(randomSequenceContainerHirc);
 
             randomSequenceContainerHirc.IsTarget = true;
             if (randomSequenceContainerHirc.HircChildren == null)
                 randomSequenceContainerHirc.HircChildren = [];
 
-            foreach (var randomSequenceContainerSound in randomSequenceContainer.Sounds)
+            var sounds = soundBank.GetSounds(randomSequenceContainer.SoundReferences);
+            foreach (var sound in sounds)
             {
-                var soundHirc = _wwiseHircGeneratorServiceFactory.GenerateHirc(randomSequenceContainerSound);
+                var soundHirc = _wwiseHircGeneratorServiceFactory.GenerateHirc(sound);
                 hircItems.Add(soundHirc);
                 randomSequenceContainerHirc.HircChildren.Add(soundHirc);
             }

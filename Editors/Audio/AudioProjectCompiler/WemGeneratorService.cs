@@ -12,8 +12,8 @@ namespace Editors.Audio.AudioProjectCompiler
 {
     public interface IWemGeneratorService
     {
-        void GenerateWems(List<Sound> sounds);
-        void SaveWemsToPack(List<Sound> sounds);
+        void GenerateWems(List<AudioFile> audioFiles);
+        void SaveWemsToPack(List<AudioFile> audioFiles);
     }
 
     public class WemGeneratorService(IPackFileService packFileService, WSourcesWrapper wSourcesWrapper) : IWemGeneratorService
@@ -23,7 +23,7 @@ namespace Editors.Audio.AudioProjectCompiler
 
         private readonly ILogger _logger = Logging.Create<WemGeneratorService>();
 
-        public void GenerateWems(List<Sound> sounds)
+        public void GenerateWems(List<AudioFile> audioFiles)
         {
             var wavToWemFolderPath = $"{DirectoryHelper.Temp}\\WavToWem";
             var audioFolderPath = $"{DirectoryHelper.Temp}\\Audio";
@@ -31,10 +31,10 @@ namespace Editors.Audio.AudioProjectCompiler
             var wsourcesPath = $"{DirectoryHelper.Temp}\\WavToWem\\wav_to_wem.wsources";
 
             var wavFileNames = new List<string>();
-            foreach (var sound in sounds)
+            foreach (var audioFile in audioFiles)
             {
-                var wavFile = _packFileService.FindFile(sound.WavPackFilePath);
-                var wavFileName = $"{sound.SourceId}.wav";
+                var wavFile = _packFileService.FindFile(audioFile.WavPackFilePath);
+                var wavFileName = $"{audioFile.Id}.wav";
                 var wavFilePath = $"{audioFolderPath}\\{wavFileName}";
 
                 ExportWav(wavFilePath, wavFile.DataSource.ReadData());
@@ -53,11 +53,11 @@ namespace Editors.Audio.AudioProjectCompiler
             _wSourcesWrapper.DeleteExcessStuff();
         }
 
-        public void SaveWemsToPack(List<Sound> sounds)
+        public void SaveWemsToPack(List<AudioFile> audioFiles)
         {
             var wemFiles = new List<PackFileUtil.FileRef>();
-            foreach (var sound in sounds)
-                wemFiles.Add(new PackFileUtil.FileRef(sound.WemDiskFilePath, Path.GetDirectoryName(sound.WemPackFilePath)));
+            foreach (var audioFile in audioFiles)
+                wemFiles.Add(new PackFileUtil.FileRef(audioFile.WemDiskFilePath, Path.GetDirectoryName(audioFile.WemPackFilePath)));
 
             PackFileUtil.LoadFilesFromDisk(_packFileService, wemFiles);
         }

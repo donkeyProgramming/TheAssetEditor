@@ -1,31 +1,23 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using Shared.GameFormats.Wwise.Enums;
 
 namespace Editors.Audio.AudioEditor.Models
 {
     public class StatePath : AudioProjectItem
     {
+        public uint TargetHircId { get; set; }
+        public AkBkHircType TargetHircType { get; set; }
         public List<Node> Nodes { get; set; } = [];
-        public RandomSequenceContainer RandomSequenceContainer { get; set; }
-        public Sound Sound { get; set; }
 
-        public static StatePath Create(List<Node> nodes, Sound sound)
+        public static StatePath Create(List<Node> nodes, uint targetHircId, AkBkHircType targetHircType)
         {
             return new StatePath
             {
                 Name = BuildName(nodes),
                 Nodes = nodes,
-                Sound = sound
-            };
-        }
-
-        public static StatePath Create(List<Node> nodes, RandomSequenceContainer randomSequenceContainer)
-        {
-            return new StatePath
-            {
-                Name = BuildName(nodes),
-                Nodes = nodes,
-                RandomSequenceContainer = randomSequenceContainer
+                TargetHircId = targetHircId,
+                TargetHircType = targetHircType
             };
         }
 
@@ -34,12 +26,20 @@ namespace Editors.Audio.AudioEditor.Models
             return string.Join('.', nodes.Select(node => $"[{node.StateGroup.Name}]{node.State.Name}"));
         }
 
-        public AudioSettings GetAudioSettings()
+        public bool TargetHircTypeIsSound()
         {
-            if (RandomSequenceContainer != null)
-                return RandomSequenceContainer.AudioSettings;
+            if (TargetHircType == AkBkHircType.Sound)
+                return true;
             else
-                return Sound.AudioSettings;
+                return false;
+        }
+
+        public bool TargetHircTypeIsRandomSequenceContainer()
+        {
+            if (TargetHircType == AkBkHircType.RandomSequenceContainer)
+                return true;
+            else
+                return false;
         }
 
         public class Node

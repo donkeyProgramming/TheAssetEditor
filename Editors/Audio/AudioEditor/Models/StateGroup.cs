@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Editors.Audio.Utility;
 
@@ -32,6 +33,30 @@ namespace Editors.Audio.AudioEditor.Models
             return States.FirstOrDefault(state => state.Name == stateName);
         }
 
-        public void InsertAlphabetically(State state) => InsertAlphabeticallyUnique(States, state);
+        public void InsertAlphabetically(State state)
+        {
+            if (state == null) 
+                return;
+
+            States ??= [];
+
+            var index = States.BinarySearch(state, StateNameComparer.Instance);
+            if (index >= 0) 
+                return;
+
+            States.Insert(~index, state);
+        }
+
+        private sealed class StateNameComparer : IComparer<State>
+        {
+            public static readonly StateNameComparer Instance = new();
+
+            public int Compare(State left, State right)
+            {
+                var leftName = left?.Name ?? string.Empty;
+                var rightName = right?.Name ?? string.Empty;
+                return StringComparer.OrdinalIgnoreCase.Compare(leftName, rightName);
+            }
+        }
     }
 }

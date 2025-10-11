@@ -10,7 +10,7 @@ namespace Editors.Audio.AudioProjectCompiler.WwiseGeneratorService.WwiseGenerato
 {
     public class CAkDialogueEventGenerator_V136 : IWwiseHircGeneratorService
     {
-        public HircItem GenerateHirc(AudioProjectItem audioProjectItem)
+        public HircItem GenerateHirc(AudioProjectItem audioProjectItem, SoundBank soundBank = null)
         {
             var audioProjectDialogueEvent = audioProjectItem as DialogueEvent;
             var dialogueEventHirc = CreateDialogueEvent(audioProjectDialogueEvent);
@@ -70,13 +70,7 @@ namespace Editors.Audio.AudioProjectCompiler.WwiseGeneratorService.WwiseGenerato
                     {
                         uint audioNodeId;
                         if (i == statePath.Nodes.Count - 1)
-                        {
-                            if (statePath.Sound != null)
-                                audioNodeId = statePath.Sound.Id;
-                            else
-                                audioNodeId = statePath.RandomSequenceContainer.Id;
-                        }
-
+                            audioNodeId = statePath.TargetHircId;
                         else
                             audioNodeId = 0;
 

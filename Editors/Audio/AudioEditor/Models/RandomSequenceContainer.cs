@@ -9,14 +9,14 @@ namespace Editors.Audio.AudioEditor.Models
         public uint OverrideBusId { get; set; }
         public uint DirectParentId { get; set; }
         public AudioSettings AudioSettings { get; set; }
-        public List<Sound> Sounds { get; set; }
+        public List<uint> SoundReferences { get; set; }
 
         public RandomSequenceContainer()
         {
             HircType = AkBkHircType.RandomSequenceContainer;
         }
 
-        public static RandomSequenceContainer Create(Guid guid, uint id, AudioSettings audioSettings, List<Sound> sounds, uint overrideBusId = 0, uint directParentId = 0)
+        public static RandomSequenceContainer Create(Guid guid, uint id, AudioSettings audioSettings, List<uint> soundReferences, uint overrideBusId = 0, uint directParentId = 0)
         {
             return new RandomSequenceContainer
             {
@@ -25,7 +25,7 @@ namespace Editors.Audio.AudioEditor.Models
                 OverrideBusId = overrideBusId,
                 DirectParentId = directParentId,
                 AudioSettings = audioSettings,
-                Sounds = sounds
+                SoundReferences = soundReferences
             };
         }
     }

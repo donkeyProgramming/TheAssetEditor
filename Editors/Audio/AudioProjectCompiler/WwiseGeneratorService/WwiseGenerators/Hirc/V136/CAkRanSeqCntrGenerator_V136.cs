@@ -7,7 +7,7 @@ namespace Editors.Audio.AudioProjectCompiler.WwiseGeneratorService.WwiseGenerato
 {
     public class CAkRanSeqCntrGenerator_V136 : IWwiseHircGeneratorService
     {
-        public HircItem GenerateHirc(AudioProjectItem audioProjectItem)
+        public HircItem GenerateHirc(AudioProjectItem audioProjectItem, SoundBank soundBank = null)
         {
             var audioProjectRandomSequenceContainer = audioProjectItem as RandomSequenceContainer;
 
@@ -74,8 +74,9 @@ namespace Editors.Audio.AudioProjectCompiler.WwiseGeneratorService.WwiseGenerato
                 isUsingWeight
             );
 
-            randomSequenceContainerHirc.Children = ChildrenGenerator_V136.CreateChildrenList(audioProjectRandomSequenceContainer.Sounds);
-            randomSequenceContainerHirc.CAkPlayList.Playlist = AkPlaylistItemGenerator_V136.CreateAkPlaylistItem(audioProjectRandomSequenceContainer.Sounds);
+            var sounds = soundBank.GetSounds(audioProjectRandomSequenceContainer.SoundReferences);
+            randomSequenceContainerHirc.Children = ChildrenGenerator_V136.CreateChildrenList(sounds);
+            randomSequenceContainerHirc.CAkPlayList.Playlist = AkPlaylistItemGenerator_V136.CreateAkPlaylistItem(sounds);
 
             randomSequenceContainerHirc.UpdateSectionSize();
 

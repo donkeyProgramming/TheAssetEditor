@@ -2,7 +2,6 @@
 using System.Data;
 using Editors.Audio.AudioEditor.AudioProjectExplorer;
 using Editors.Audio.AudioEditor.Models;
-using Editors.Audio.AudioEditor.Settings;
 
 namespace Editors.Audio.AudioEditor
 {

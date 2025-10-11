@@ -8,7 +8,6 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Editors.Audio.AudioEditor;
 using Editors.Audio.AudioEditor.Models;
-using Editors.Audio.AudioEditor.Settings;
 using Editors.Audio.AudioProjectCompiler;
 using Editors.Audio.GameInformation.Warhammer3;
 using Editors.Audio.Storage;
@@ -21,6 +20,7 @@ using Shared.Core.PackFiles.Models;
 using Shared.Core.Services;
 using Shared.Core.Settings;
 using Shared.GameFormats.Wwise;
+using Shared.GameFormats.Wwise.Enums;
 using Shared.GameFormats.Wwise.Hirc;
 
 namespace Editors.Audio.AudioProjectConverter
@@ -103,7 +103,6 @@ namespace Editors.Audio.AudioProjectConverter
             var statePathsLookupByDialogueEvent = new Dictionary<string, List<StatePathInfo>>();
             var dialogueEventsToProcess = new List<ICAkDialogueEvent>();
             var moddedStateGroups = new Dictionary<string, List<string>>();
-            var processedWems = new Dictionary<uint, AudioFile>();
             var globalBaseNameUsage = new Dictionary<string, int>();
 
             var hircItems = GetHircItems(soundBankPaths);
@@ -127,11 +126,11 @@ namespace Editors.Audio.AudioProjectConverter
             var usedSourceIds = new HashSet<uint>();
 
             var audioProjectGeneratableItemIds = audioProject.GetGeneratableItemIds();
-            var audioProjectSourceIds = audioProject.GetSourceIds();
+            var audioProjectSourceIds = audioProject.GetAudioFileIds();
 
             var languageId = WwiseHash.Compute(audioProject.Language);
-            var gameLanguageHircIds = _audioRepository.GetUsedHircIdsByLanguageId(languageId);
-            var gameLanguageSourceIds = _audioRepository.GetUsedSourceIdsByLanguageId(languageId);
+            var gameLanguageHircIds = _audioRepository.GetUsedVanillaHircIdsByLanguageId(languageId);
+            var gameLanguageSourceIds = _audioRepository.GetUsedVanillaSourceIdsByLanguageId(languageId);
 
             usedHircIds.UnionWith(audioProjectGeneratableItemIds);
             usedHircIds.UnionWith(gameLanguageHircIds);
@@ -142,7 +141,6 @@ namespace Editors.Audio.AudioProjectConverter
                 ProcessDialogueEvent(
                     audioProject,
                     dialogueEvent,
-                    processedWems,
                     dialogueEventsLookupByWemId,
                     statePathsLookupByDialogueEvent,
                     globalBaseNameUsage,
@@ -416,7 +414,6 @@ namespace Editors.Audio.AudioProjectConverter
         private void ProcessDialogueEvent(
             AudioProject audioProject,
             ICAkDialogueEvent dialogueEvent,
-            Dictionary<uint, AudioFile> processedWems,
             Dictionary<uint, List<string>> dialogueEventsLookupByWemId,
             Dictionary<string, List<StatePathInfo>> statePathsLookupByDialogueEvent,
             Dictionary<string, int> globalBaseNameUsage,
@@ -429,10 +426,15 @@ namespace Editors.Audio.AudioProjectConverter
 
             _logger.Here().Information($"Processing Dialogue Event: {dialogueEventName}");
 
-            var audioProjectDialogueEvent = audioProject.SoundBanks
+            var dialogueEventAndSoundBank = audioProject.SoundBanks
                 .Where(soundBank => soundBank.DialogueEvents != null)
-                .SelectMany(soundBank => soundBank.DialogueEvents)
-                .FirstOrDefault(dialogueEvent => dialogueEvent.Name == dialogueEventName);
+                .SelectMany(
+                    soundBank => soundBank.DialogueEvents,
+                    (soundBank, dialogueEventItem) => new { SoundBank = soundBank, DialogueEvent = dialogueEventItem })
+                .FirstOrDefault(pair => pair.DialogueEvent.Name == dialogueEventName);
+
+            var audioProjectDialogueEvent = dialogueEventAndSoundBank.DialogueEvent;
+            var audioProjectDialogueEventSoundBank = dialogueEventAndSoundBank.SoundBank;
 
             var voActorSubstrings = VOActorSubstring
                 .Split([','], StringSplitOptions.RemoveEmptyEntries)
@@ -458,7 +460,7 @@ namespace Editors.Audio.AudioProjectConverter
                 if (!voActorSubstrings.Any(substring => voActor.Contains(substring, StringComparison.CurrentCultureIgnoreCase)))
                     continue;
 
-                ProcessWavFiles(statePathWavs, processedWems, audioFiles, dialogueEventsLookupByWemId, globalBaseNameUsage, dialogueEventName, voActor);
+                ProcessWavFiles(audioProject, statePathWavs, audioFiles, dialogueEventsLookupByWemId, globalBaseNameUsage, dialogueEventName, voActor, usedSourceIds);
 
                 if (audioFiles.Count == 0)
                     continue;
@@ -466,17 +468,22 @@ namespace Editors.Audio.AudioProjectConverter
                 StatePath audioProjectStatePath;
                 if (audioFiles.Count > 1)
                 {
-                    var randomSequenceContainerIds = IdGenerator.GenerateAudioProjectGeneratableItemIds(usedHircIds);
-                    var sounds = new List<Sound>();
+                    var soundReferences = new List<uint>();
+
+                    var randomSequenceContainerIds = IdGenerator.GenerateIds(usedHircIds);
+                    usedHircIds.Add(randomSequenceContainerIds.Id);
 
                     var playlistOrder = 0;
                     foreach (var audioFile in audioFiles)
                     {
                         playlistOrder++;
-                        var soundIds = IdGenerator.GenerateAudioProjectGeneratableItemIds(usedHircIds);
-                        var sourceId = IdGenerator.GenerateSourceId(usedSourceIds, audioFile.FilePath, false);
-                        var sound = Sound.Create(soundIds.Guid, soundIds.Id, randomSequenceContainerIds.Id, sourceId, playlistOrder, audioFile.FileName, audioFile.FilePath);
-                        sounds.Add(sound);
+                        var soundIds = IdGenerator.GenerateIds(usedHircIds);
+                        var sound = Sound.Create(soundIds.Guid, soundIds.Id, randomSequenceContainerIds.Id, playlistOrder, audioFile.Id);
+
+                        usedHircIds.Add(soundIds.Id);
+                        audioFile.SoundReferences.Add(sound.Id);
+                        soundReferences.Add(sound.Id);
+                        audioProjectDialogueEventSoundBank.Sounds.Add(sound);
                     }
 
                     var randomSequenceContainerSettings = AudioSettings.CreateRecommendedRandomSequenceContainerSettings(audioFiles.Count);
@@ -484,18 +491,25 @@ namespace Editors.Audio.AudioProjectConverter
                         randomSequenceContainerIds.Guid,
                         randomSequenceContainerIds.Id,
                         randomSequenceContainerSettings,
-                        sounds,
+                        soundReferences,
                         directParentId: actorMixerId);
-                    audioProjectStatePath = StatePath.Create(statePath.StatePathNodes, randomSequenceContainer);
+                    audioProjectStatePath = StatePath.Create(statePath.StatePathNodes, randomSequenceContainer.Id, AkBkHircType.RandomSequenceContainer);
+
+                    audioProjectDialogueEventSoundBank.RandomSequenceContainers.Add(randomSequenceContainer);
                 }
                 else
                 {
                     var audioFile = audioFiles[0];
-                    var soundIds = IdGenerator.GenerateAudioProjectGeneratableItemIds(usedHircIds);
-                    var sourceId = IdGenerator.GenerateSourceId(usedSourceIds, audioFile.FilePath, false);
+                    var soundIds = IdGenerator.GenerateIds(usedHircIds);
+                    usedHircIds.Add(soundIds.Id);
+
                     var soundSettings = AudioSettings.CreateSoundSettings();
-                    var sound = Sound.Create(soundIds.Guid, soundIds.Id, 0, actorMixerId, sourceId, audioFile.FileName, audioFile.FilePath, soundSettings);
-                    audioProjectStatePath = StatePath.Create(statePath.StatePathNodes, sound);
+                    var sound = Sound.Create(soundIds.Guid, soundIds.Id, 0, actorMixerId, audioFile.Id, soundSettings);
+                    audioFile.SoundReferences.Add(sound.Id);
+
+                    audioProjectStatePath = StatePath.Create(statePath.StatePathNodes, sound.Id, AkBkHircType.Sound);
+
+                    audioProjectDialogueEventSoundBank.Sounds.Add(sound);
                 }
 
                 audioProjectDialogueEvent.InsertAlphabetically(audioProjectStatePath);
@@ -507,25 +521,19 @@ namespace Editors.Audio.AudioProjectConverter
         }
 
         private void ProcessWavFiles(
+            AudioProject audioProject,
             List<WavFile> statePathWavs,
-            Dictionary<uint, AudioFile> processedWems,
             List<AudioFile> audioFiles,
             Dictionary<uint, List<string>> dialogueEventsLookupByWemId,
             Dictionary<string, int> globalBaseNameUsage,
             string dialogueEventName,
-            string voActor)
+            string voActor,
+            HashSet<uint> usedSourceIds)
         {
             var voActorSegment = voActor.Substring(voActor.IndexOf("vo_actor_") + "vo_actor_".Length).ToLower();
 
             foreach (var wavFile in statePathWavs)
             {
-                // Check for already processed files
-                if (processedWems.TryGetValue(wavFile.WemId, out var processedAudioFile))
-                {
-                    audioFiles.Add(processedAudioFile);
-                    continue;
-                }
-
                 var chosenDialogueEventName = GetPreferredDialogueEventName(wavFile.WemId, dialogueEventName, dialogueEventsLookupByWemId).ToLower();
                 var baseFileName = $"{voActorSegment}_{chosenDialogueEventName}".ToLower();
 
@@ -538,14 +546,16 @@ namespace Editors.Audio.AudioProjectConverter
                 wavFile.FileName = $"{baseFileName}_{count}.wav".ToLower();
                 wavFile.FilePath = $"{OutputDirectoryPath}\\vo\\{voActorSegment}\\{wavFile.FileName}".ToLower();
 
-                // Create and store the processed AudioFile
-                processedAudioFile = new AudioFile
+                var audioFile = audioProject.GetAudioFile(wavFile.FilePath);
+                if (audioFile == null)
                 {
-                    FileName = wavFile.FileName,
-                    FilePath = wavFile.FilePath
-                };
-                processedWems.Add(wavFile.WemId, processedAudioFile);
-                audioFiles.Add(processedAudioFile);
+                    var audioFileIds = IdGenerator.GenerateIds(usedSourceIds);
+                    audioFile = AudioFile.Create(audioFileIds.Guid, audioFileIds.Id, wavFile.FileName, wavFile.FilePath);
+
+                    usedSourceIds.Add(audioFile.Id);
+                    audioProject.AudioFiles.TryAdd(audioFile);
+                }
+                audioFiles.Add(audioFile);
 
                 var wemFilePath = $"{WemsDirectoryPath}\\{wavFile.WemId}.wem";
                 var wavTempFilePath = $"{DirectoryHelper.Temp}\\Audio\\{wavFile.FileName}";

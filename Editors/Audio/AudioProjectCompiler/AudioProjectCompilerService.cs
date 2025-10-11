@@ -34,17 +34,14 @@ namespace Editors.Audio.AudioProjectCompiler
 
             _logger.Here().Information($"Compiling {audioProjectFileName}");
 
+            var audioFiles = new List<AudioFile>();
+            var sounds = new List<Sound>();
             var audioProjectFileNameWithoutExtension = Path.GetFileNameWithoutExtension(audioProjectFileName);
 
             ClearTempAudioFiles();
-
-            var soundsToGenerateIntoWemsIntoWems = new List<Sound>();
-            SetSoundBankData(audioProject, audioProjectFileNameWithoutExtension, soundsToGenerateIntoWemsIntoWems);
-
-            GenerateWems(audioProject, soundsToGenerateIntoWemsIntoWems);
-
+            SetSoundBankData(audioProject, audioProjectFileNameWithoutExtension, audioFiles, sounds);
+            GenerateWems(audioProject, audioFiles, sounds);
             GenerateSoundBanks(audioProject);
-
             GenerateDatFiles(audioProject, audioProjectFileNameWithoutExtension);
 
             MemoryOptimiser.Optimise();
@@ -63,7 +60,7 @@ namespace Editors.Audio.AudioProjectCompiler
             }
         }
 
-        private void SetSoundBankData(AudioProject audioProject, string audioProjectFileNameWithoutExtension, List<Sound> soundsToGenerateIntoWems)
+        private void SetSoundBankData(AudioProject audioProject, string audioProjectFileNameWithoutExtension, List<AudioFile> audioFiles, List<Sound> sounds)
         {
             _logger.Here().Information($"Setting SoundBank data");
 
@@ -111,10 +108,26 @@ namespace Editors.Audio.AudioProjectCompiler
                     {
                         foreach (var playAction in playActionEvent.Actions)
                         {
-                            if (playAction.Sound != null)
-                                SetSoundData(playAction.Sound, soundBank, soundsToGenerateIntoWems);
-                            else
-                                SetRandomSequenceContainerData(playAction.RandomSequenceContainer, soundBank, soundsToGenerateIntoWems);
+                            if (playAction.TargetHircTypeIsSound())
+                            {
+                                var sound = soundBank.GetSound(playAction.TargetHircId);
+                                var audioFile = audioProject.GetAudioFile(sound.SourceId);
+
+                                SetSoundData(audioFile, soundBank);
+
+                                audioFiles.Add(audioFile);
+                                sounds.Add(sound);
+                            }
+                            else if (playAction.TargetHircTypeIsRandomSequenceContainer())
+                            {
+                                var randomSequenceContainer = soundBank.GetRandomSequenceContainer(playAction.TargetHircId);
+
+                                SetRandomSequenceContainerData(audioProject, randomSequenceContainer, soundBank);
+
+                                var randomSequenceContainerSounds = soundBank.GetSounds(randomSequenceContainer.SoundReferences);
+                                audioFiles.AddRange(randomSequenceContainerSounds.Select(sound => audioProject.GetAudioFile(sound.SourceId)).ToList());
+                                sounds.AddRange(randomSequenceContainerSounds);
+                            }
                         }
                     }
                 }
@@ -125,53 +138,68 @@ namespace Editors.Audio.AudioProjectCompiler
                     {
                         foreach (var statePath in dialogueEvent.StatePaths)
                         {
-                            if (statePath.Sound != null)
-                                SetSoundData(statePath.Sound, soundBank, soundsToGenerateIntoWems);
-                            else
-                                SetRandomSequenceContainerData(statePath.RandomSequenceContainer, soundBank, soundsToGenerateIntoWems);
+                            if (statePath.TargetHircTypeIsSound())
+                            {
+                                var sound = soundBank.GetSound(statePath.TargetHircId);
+                                var audioFile = audioProject.GetAudioFile(sound.SourceId);
+
+                                SetSoundData(audioFile, soundBank);
+
+                                audioFiles.Add(audioFile);
+                                sounds.Add(sound);
+                            }
+                            else if (statePath.TargetHircTypeIsRandomSequenceContainer())
+                            {
+                                var randomSequenceContainer = soundBank.GetRandomSequenceContainer(statePath.TargetHircId);
+
+                                SetRandomSequenceContainerData(audioProject, randomSequenceContainer, soundBank);
+
+                                var randomSequenceContainerSounds = soundBank.GetSounds(randomSequenceContainer.SoundReferences);
+                                audioFiles.AddRange(randomSequenceContainerSounds.Select(sound => audioProject.GetAudioFile(sound.SourceId)).ToList());
+                                sounds.AddRange(randomSequenceContainerSounds);
+                            }
                         }
                     }
                 }
             }
         }
 
-        private static void SetRandomSequenceContainerData(RandomSequenceContainer randomSequenceContainer, SoundBank soundBank, List<Sound> soundsToGenerateIntoWems)
+        private static void SetRandomSequenceContainerData(AudioProject audioProject, RandomSequenceContainer randomSequenceContainer, SoundBank soundBank)
         {
-            foreach (var sound in randomSequenceContainer.Sounds)
-                SetSoundData(sound, soundBank, soundsToGenerateIntoWems);
-
-            randomSequenceContainer.Sounds = randomSequenceContainer.Sounds.OrderBy(sound => sound.Id).ToList();
+            var sounds = soundBank.GetSounds(randomSequenceContainer.SoundReferences);
+            foreach (var sound in sounds)
+            {
+                var audioFile = audioProject.GetAudioFile(sound.SourceId);
+                SetSoundData(audioFile, soundBank);
+            }
+            randomSequenceContainer.SoundReferences = randomSequenceContainer.SoundReferences.OrderBy(soundId => soundId).ToList();
         }
 
-        private static void SetSoundData(Sound sound, SoundBank soundBank, List<Sound> soundsToGenerateIntoWems)
+        private static void SetSoundData(AudioFile audioFile, SoundBank soundBank)
         {
-            sound.WemPackFileName = $"{sound.SourceId}.wem";
-            sound.WemDiskFilePath = $"{DirectoryHelper.Temp}\\Audio\\{sound.WemPackFileName}";
+            audioFile.WemPackFileName = $"{audioFile.Id}.wem";
+            audioFile.WemDiskFilePath = $"{DirectoryHelper.Temp}\\Audio\\{audioFile.WemPackFileName}";
             
             if (soundBank.Language == Wh3LanguageInformation.GetGameLanguageAsString(Wh3GameLanguage.Sfx))
-                sound.WemPackFilePath = $"audio\\wwise\\{sound.WemPackFileName}";
+                audioFile.WemPackFilePath = $"audio\\wwise\\{audioFile.WemPackFileName}";
             else
-                sound.WemPackFilePath = $"audio\\wwise\\{sound.Language}\\{sound.WemPackFileName}";
-
-            soundsToGenerateIntoWems.Add(sound);
+                audioFile.WemPackFilePath = $"audio\\wwise\\{soundBank.Language}\\{audioFile.WemPackFileName}";
         }
 
-        private void GenerateWems(AudioProject audioProject, List<Sound> soundsToGenerateIntoWems)
+        private void GenerateWems(AudioProject audioProject, List<AudioFile> audioFiles, List<Sound> sounds)
         {
-            _logger.Here().Information($"Generating {soundsToGenerateIntoWems.Count} WEMs");
-
-            _wemGeneratorService.GenerateWems(soundsToGenerateIntoWems);
-
-            _wemGeneratorService.SaveWemsToPack(soundsToGenerateIntoWems);
-
-            UpdateSoundInMemoryMediaSize(soundsToGenerateIntoWems);
+            _logger.Here().Information($"Generating {audioFiles.Count} WEMs");
+            _wemGeneratorService.GenerateWems(audioFiles);
+            _wemGeneratorService.SaveWemsToPack(audioFiles);
+            UpdateSoundInMemoryMediaSize(audioProject, sounds);
         }
 
-        private static void UpdateSoundInMemoryMediaSize(List<Sound> sounds)
+        private static void UpdateSoundInMemoryMediaSize(AudioProject audioProject, List<Sound> sounds)
         {
             foreach (var sound in sounds)
             {
-                var wemFileInfo = new FileInfo(sound.WemDiskFilePath);
+                var audioFile = audioProject.GetAudioFile(sound.SourceId);
+                var wemFileInfo = new FileInfo(audioFile.WemDiskFilePath);
                 var fileSizeInBytes = wemFileInfo.Length;
                 sound.InMemoryMediaSize = fileSizeInBytes;
             }

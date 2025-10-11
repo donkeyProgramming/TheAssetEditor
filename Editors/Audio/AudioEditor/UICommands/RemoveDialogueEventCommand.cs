@@ -1,10 +1,10 @@
 ﻿using System.Data;
 using Editors.Audio.AudioEditor.AudioProjectExplorer;
+using Editors.Audio.AudioEditor.Events;
 using Editors.Audio.AudioEditor.Presentation.Table;
+using Editors.Audio.AudioEditor.Services;
 using Editors.Audio.Storage;
 using Shared.Core.Events;
-using Editors.Audio.AudioEditor.Events;
-using Editors.Audio.AudioEditor.Services;
 
 namespace Editors.Audio.AudioEditor.UICommands
 {
@@ -24,9 +24,9 @@ namespace Editors.Audio.AudioEditor.UICommands
 
         public void Execute(DataRow row)
         {
-            var dialogueEventName = _audioEditorStateService.SelectedAudioProjectExplorerNode.Name;
-            var statePathName = TableHelpers.GetStatePathNameFromRow(row, _audioRepository, dialogueEventName);
-            _dialogueEventService.RemoveStatePath(dialogueEventName, statePathName);
+            var dialogueEventNodeName = _audioEditorStateService.SelectedAudioProjectExplorerNode.Name;
+            var statePathName = TableHelpers.GetStatePathNameFromRow(row, _audioRepository, dialogueEventNodeName);
+            _dialogueEventService.RemoveStatePath(dialogueEventNodeName, statePathName);
 
             // TODO: Do we need to then display a message to the user saying we can't do this until they fix the state path?
             var result = false;

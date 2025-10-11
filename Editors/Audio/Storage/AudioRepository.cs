@@ -26,8 +26,8 @@ namespace Editors.Audio.Storage
         string GetNameFromId(uint value);
         string GetNameFromId(uint value, out bool found);
         string GetNameFromId(uint? key);
-        HashSet<uint> GetUsedHircIdsByLanguageId(uint languageId);
-        HashSet<uint> GetUsedSourceIdsByLanguageId(uint languageId);
+        HashSet<uint> GetUsedVanillaHircIdsByLanguageId(uint languageId);
+        HashSet<uint> GetUsedVanillaSourceIdsByLanguageId(uint languageId);
         Dictionary<string, Dictionary<string, List<HircItem>>> GetVanillaDialogueEventsByBnkByLanguage();
         Dictionary<string, Dictionary<string, List<HircItem>>> GetModdedHircsByBnkByLanguage();
         Dictionary<string, List<HircItem>> GetModdedDialogueEventsByLanguage(List<string> moddedSoundBanks);
@@ -124,7 +124,7 @@ namespace Editors.Audio.Storage
                 throw new Exception("Cannot get name from ID");
         }
 
-        public HashSet<uint> GetUsedHircIdsByLanguageId(uint languageId)
+        public HashSet<uint> GetUsedVanillaHircIdsByLanguageId(uint languageId)
         {
             return HircsById
                 .SelectMany(hircLookupEntry => hircLookupEntry.Value
@@ -133,7 +133,7 @@ namespace Editors.Audio.Storage
                 .ToHashSet();
         }
 
-        public HashSet<uint> GetUsedSourceIdsByLanguageId(uint languageId)
+        public HashSet<uint> GetUsedVanillaSourceIdsByLanguageId(uint languageId)
         {
             return HircsById
                 .SelectMany(hircLookupEntry => hircLookupEntry.Value
