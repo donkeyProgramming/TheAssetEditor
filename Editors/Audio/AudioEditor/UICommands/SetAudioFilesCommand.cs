@@ -41,7 +41,7 @@ namespace Editors.Audio.AudioEditor.UICommands
             }
 
             _audioEditorStateService.StoreAudioFiles(audioFiles);
-            _eventHub.Publish(new AudioFilesChangedEvent(audioFiles, addToExistingAudioFiles, false));
+            _eventHub.Publish(new AudioFilesChangedEvent(audioFiles, addToExistingAudioFiles, false, false));
         }
     }
 }

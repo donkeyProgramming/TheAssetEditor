@@ -123,8 +123,9 @@ namespace Editors.Audio.Utility
             if (Directory.Exists(wavToWemWwiseProjectPath))
                 return;
 
-            var resourceFolderPath = $"{resourceRootNamespace}.WavToWemWwiseProject.WavToWemWwiseProject.zip";
-            var tempZipPath = Path.Combine(Path.GetTempPath(), "WavToWemWwiseProject.zip");
+            // TODO: Update this for game abstraction, currently it's set to the WH3 Wwise Project resource but for future games will need abstraction.
+            var resourceFolderPath = $"{resourceRootNamespace}.Wh3WavToWemWwiseProject.Wh3WavToWemWwiseProject.zip";
+            var tempZipPath = Path.Combine(Path.GetTempPath(), "Wh3WavToWemWwiseProject.zip");
 
             using (var resourceStream = assembly.GetManifestResourceStream(resourceFolderPath))
             {

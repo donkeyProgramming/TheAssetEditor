@@ -1,5 +1,7 @@
-﻿using System.Collections.ObjectModel;
+﻿using System;
+using System.Collections.ObjectModel;
 using System.IO;
+using System.Linq;
 using Editors.Audio.AudioEditor.Models;
 using Editors.Audio.GameInformation.Warhammer3;
 
@@ -64,7 +66,8 @@ namespace Editors.Audio.AudioEditor.AudioProjectExplorer
                         ? soundBank.GetEditedDialogueEvents()
                         : soundBank.DialogueEvents;
 
-                    foreach (var dialogueEvent in dialogueEvents)
+                    var sortedDialogueEvents = dialogueEvents.OrderBy(dialogueEvent => dialogueEvent.Name, StringComparer.OrdinalIgnoreCase);
+                    foreach (var dialogueEvent in sortedDialogueEvents)
                     {
                         var dialogueEventNode = AudioProjectTreeNode.CreateNode(dialogueEvent.Name, AudioProjectTreeNodeType.DialogueEvent, gameSoundBank: soundBank.GameSoundBank, parent: dialogueEventsNode);
                         dialogueEventsNode.Children.Add(dialogueEventNode);
