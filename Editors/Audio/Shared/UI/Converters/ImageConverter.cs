@@ -4,7 +4,7 @@ using System.Windows.Media.Imaging;
 using Editors.Audio.AudioEditor.AudioFilesExplorer;
 using Shared.EmbeddedResources;
 
-namespace Editors.Audio.AudioEditor.Converters
+namespace Editors.Audio.Shared.UI.Converters
 {
     [ValueConversion(typeof(AudioFilesTreeNode), typeof(BitmapImage))]
     public class ImageConverter : IValueConverter

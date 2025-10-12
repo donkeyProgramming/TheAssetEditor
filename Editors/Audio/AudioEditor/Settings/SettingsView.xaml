@@ -6,7 +6,7 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:sys="clr-namespace:System;assembly=netstandard"
     xmlns:extendedwpftoolkit="clr-namespace:Xceed.Wpf.Toolkit;assembly=Xceed.Wpf.Toolkit"
-    xmlns:converters="clr-namespace:Editors.Audio.AudioEditor.Converters"
+    xmlns:converters="clr-namespace:Editors.Audio.Shared.UI.Converters"
     xmlns:settings="clr-namespace:Editors.Audio.AudioEditor.Settings"
     d:DataContext="{d:DesignInstance Type=settings:SettingsViewModel}"
     mc:Ignorable="d"

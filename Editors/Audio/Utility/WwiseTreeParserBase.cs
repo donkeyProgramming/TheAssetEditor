@@ -3,8 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using Editors.Audio.AudioExplorer;
 using Editors.Audio.Storage;
-using Serilog;
-using Shared.Core.ErrorHandling;
 using Shared.GameFormats.Wwise.Enums;
 using Shared.GameFormats.Wwise.Hirc;
 
@@ -12,21 +10,12 @@ namespace Editors.Audio.Utility
 {
     public abstract class WwiseTreeParserBase
     {
-        protected ILogger _logger = Logging.Create<WwiseTreeParserBase>();
+        public readonly Dictionary<AkBkHircType, Action<HircItem, HircTreeItem>> _hircProcessChildMap = [];
+        public readonly IAudioRepository _audioRepository;
 
-        protected Dictionary<AkBkHircType, Action<HircItem, HircTreeItem>> _hircProcessChildMap = [];
-        protected readonly IAudioRepository _audioRepository;
-
-        protected readonly bool _showId;
-        protected readonly bool _showOwningBnkFile;
-        protected readonly bool _filterByBnkName;
-
-        public WwiseTreeParserBase(IAudioRepository audioRepository, bool showId, bool showOwningBnkFile, bool filterByBnkName)
+        public WwiseTreeParserBase(IAudioRepository audioRepository)
         {
             _audioRepository = audioRepository;
-            _showId = showId;
-            _showOwningBnkFile = showOwningBnkFile;
-            _filterByBnkName = filterByBnkName;
         }
 
         public HircTreeItem BuildHierarchy(HircItem item)
@@ -47,7 +36,7 @@ namespace Editors.Audio.Utility
             return flatList;
         }
 
-        private List<HircTreeItem> GetHircParents(HircTreeItem root)
+        private static List<HircTreeItem> GetHircParents(HircTreeItem root)
         {
             var childData = new List<HircTreeItem>();
             if (root.Children != null)
@@ -63,9 +52,7 @@ namespace Editors.Audio.Utility
         private void ProcessHircObject(HircItem item, HircTreeItem parent)
         {
             if (_hircProcessChildMap.TryGetValue(item.HircType, out var func))
-            {
                 func(item, parent);
-            }
             else
             {
                 var unknownNode = new HircTreeItem() { DisplayName = $"Unknown node type {item.HircType} for Id {item.Id} in {item.BnkFilePath}", Item = item };
@@ -98,19 +85,14 @@ namespace Editors.Audio.Utility
             var name = _audioRepository.GetNameFromId(id, out var found);
             if (hidenNameIfMissing)
                 name = "";
-            if (found == true && _showId)
-                name += " " + id;
-            if (_showOwningBnkFile && string.IsNullOrWhiteSpace(fileName) == false)
-                name += " " + fileName;
             return name;
         }
 
         protected string GetDisplayId(HircItem item, bool hidenNameIfMissing) => GetDisplayId(item.Id, item.BnkFilePath, hidenNameIfMissing);
 
-        protected Wanted GetAsType<Wanted>(HircItem instance) where Wanted : class
+        protected static Wanted GetAsType<Wanted>(HircItem instance) where Wanted : class
         {
-            var wanted = instance as Wanted;
-            if (wanted == null)
+            if (instance is not Wanted wanted)
                 throw new Exception($"HircItem with Id {instance.Id} is of type {instance.GetType().Name} and cannot be converted to {typeof(Wanted).Name}.");
             return wanted;
         }

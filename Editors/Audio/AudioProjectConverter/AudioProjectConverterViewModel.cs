@@ -83,9 +83,7 @@ namespace Editors.Audio.AudioProjectConverter
             _applicationSettingsService = applicationSettingsService;
             _vgStreamWrapper = vgStreamWrapper;
 
-            var englishUK = Wh3LanguageInformation.GetLanguageAsString(Wh3Language.EnglishUK);
-            var languages = new List<string> { englishUK };
-            _audioRepository.Load(languages);
+            _audioRepository.Load([Wh3LanguageInformation.GetLanguageAsString(Wh3Language.EnglishUK)]);
 
             OutputDirectoryPath = "audio\\audio_projects";
         }

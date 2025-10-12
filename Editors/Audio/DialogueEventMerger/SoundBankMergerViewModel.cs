@@ -40,8 +40,7 @@ namespace Editors.Audio.DialogueEventMerger
             _audioRepository = audioRepository;
             _soundBankGeneratorService = soundBankGeneratorService;
 
-            var languages = Wh3LanguageInformation.GetAllLanguages();
-            _audioRepository.Load(languages);
+            _audioRepository.Load(Wh3LanguageInformation.GetAllLanguages());
 
             ModdedSoundBanks = new ObservableCollection<ModdedSoundBank>(_audioRepository.GetModdedSoundBankFilePaths("for_merging")
                 .Select(path => new ModdedSoundBank(path, isChecked: true))

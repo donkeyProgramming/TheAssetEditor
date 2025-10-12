@@ -18,8 +18,7 @@ namespace Editors.Reports.Audio
         public DialogueEventInfoPrinter(IAudioRepository audioRepository)
         {
             _audioRepository = audioRepository;
-            var languages = Wh3LanguageInformation.GetAllLanguages();
-            _audioRepository.Load(languages);
+            _audioRepository.Load(Wh3LanguageInformation.GetAllLanguages());
         }
 
         public void Create()

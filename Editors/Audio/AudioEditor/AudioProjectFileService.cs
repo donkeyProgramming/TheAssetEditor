@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using System.IO;
+﻿using System.IO;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -87,8 +86,7 @@ namespace Editors.Audio.AudioEditor
             var currentGame = _applicationSettingsService.CurrentSettings.CurrentGame;
             var dirtyAudioProject = AudioProject.Create(audioProject, currentGame, fileNameWithoutExtension);
 
-            var languages = new List<string> { audioProject.Language };
-            _audioRepository.Load(languages);
+            _audioRepository.Load([audioProject.Language]);
 
             _audioEditorIntegrityService.CheckDialogueEventInformationIntegrity(Wh3DialogueEventInformation.Information);
             _audioEditorIntegrityService.CheckAudioProjectDialogueEventIntegrity(dirtyAudioProject);

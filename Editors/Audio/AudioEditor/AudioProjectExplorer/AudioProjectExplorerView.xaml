@@ -5,7 +5,7 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:sys="clr-namespace:System;assembly=netstandard"
-    xmlns:converters="clr-namespace:Editors.Audio.AudioEditor.Converters"
+    xmlns:converters="clr-namespace:Editors.Audio.Shared.UI.Converters"
     xmlns:extendedwpftoolkit="clr-namespace:Xceed.Wpf.Toolkit;assembly=Xceed.Wpf.Toolkit"
     xmlns:audioprojectexplorer="clr-namespace:Editors.Audio.AudioEditor.AudioProjectExplorer"
     d:DataContext="{d:DesignInstance Type=audioprojectexplorer:AudioProjectExplorerViewModel}"

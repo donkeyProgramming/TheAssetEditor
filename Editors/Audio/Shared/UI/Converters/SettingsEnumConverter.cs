@@ -4,7 +4,7 @@ using System.Windows.Data;
 using Editors.Audio.GameInformation.Warhammer3;
 using static Editors.Audio.AudioEditor.Settings.Settings;
 
-namespace Editors.Audio.AudioEditor.Converters
+namespace Editors.Audio.Shared.UI.Converters
 {
     public class SettingsEnumConverter : IValueConverter
     {

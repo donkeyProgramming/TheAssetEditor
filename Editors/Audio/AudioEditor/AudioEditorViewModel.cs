@@ -18,52 +18,33 @@ namespace Editors.Audio.AudioEditor
 {
     // TODO: Resolve TOOLTIP PLACEHOLDER instances
     // TODO: Implement something where the compiler is greyed out until you have a wwise path set
-    public partial class AudioEditorViewModel : ObservableObject, IEditorInterface
+    public partial class AudioEditorViewModel(
+        IUiCommandFactory uiCommandFactory,
+        IEventHub eventHub,
+        IAudioEditorStateService audioEditorStateService,
+        IAudioProjectFileService audioProjectFileService,
+        IAudioProjectCompilerService audioProjectCompilerService,
+        AudioProjectExplorerViewModel audioProjectExplorerViewModel,
+        AudioFilesExplorerViewModel audioFilesExplorerViewModel,
+        AudioProjectEditorViewModel audioProjectEditorViewModel,
+        AudioProjectViewerViewModel audioProjectViewerViewModel,
+        SettingsViewModel settingsViewModel,
+        WaveformVisualiserViewModel waveformVisualiserViewModel) : ObservableObject, IEditorInterface
     {
-        private readonly IUiCommandFactory _uiCommandFactory;
-        private readonly IEventHub _eventHub;
-        private readonly IAudioEditorStateService _audioEditorStateService;
-        private readonly IAudioProjectFileService _audioProjectFileService;
-        private readonly IAudioProjectCompilerService _audioProjectCompilerService;
-        private readonly IAudioEditorIntegrityService _audioEditorIntegrityService;
+        private readonly IUiCommandFactory _uiCommandFactory = uiCommandFactory;
+        private readonly IEventHub _eventHub = eventHub;
+        private readonly IAudioEditorStateService _audioEditorStateService = audioEditorStateService;
+        private readonly IAudioProjectFileService _audioProjectFileService = audioProjectFileService;
+        private readonly IAudioProjectCompilerService _audioProjectCompilerService = audioProjectCompilerService;
 
-        public AudioProjectExplorerViewModel AudioProjectExplorerViewModel { get; }
-        public AudioFilesExplorerViewModel AudioFilesExplorerViewModel { get; }
-        public AudioProjectEditorViewModel AudioProjectEditorViewModel { get; }
-        public AudioProjectViewerViewModel AudioProjectViewerViewModel { get; }
-        public SettingsViewModel SettingsViewModel { get; }
-        public WaveformVisualiserViewModel WaveformVisualiserViewModel { get; }
+        public AudioProjectExplorerViewModel AudioProjectExplorerViewModel { get; } = audioProjectExplorerViewModel;
+        public AudioFilesExplorerViewModel AudioFilesExplorerViewModel { get; } = audioFilesExplorerViewModel;
+        public AudioProjectEditorViewModel AudioProjectEditorViewModel { get; } = audioProjectEditorViewModel;
+        public AudioProjectViewerViewModel AudioProjectViewerViewModel { get; } = audioProjectViewerViewModel;
+        public SettingsViewModel SettingsViewModel { get; } = settingsViewModel;
+        public WaveformVisualiserViewModel WaveformVisualiserViewModel { get; } = waveformVisualiserViewModel;
 
         public string DisplayName { get; set; } = "Audio Editor";
-
-        public AudioEditorViewModel(
-            IUiCommandFactory uiCommandFactory,
-            IEventHub eventHub,
-            IAudioEditorStateService audioEditorStateService,
-            IAudioProjectFileService audioProjectFileService,
-            IAudioProjectCompilerService audioProjectCompilerService,
-            IAudioEditorIntegrityService audioEditorIntegrityService,
-            AudioProjectExplorerViewModel audioProjectExplorerViewModel,
-            AudioFilesExplorerViewModel audioFilesExplorerViewModel,
-            AudioProjectEditorViewModel audioProjectEditorViewModel,
-            AudioProjectViewerViewModel audioProjectViewerViewModel,
-            SettingsViewModel settingsViewModel,
-            WaveformVisualiserViewModel waveformVisualiserViewModel)
-        {
-            _uiCommandFactory = uiCommandFactory;
-            _eventHub = eventHub;
-            _audioEditorStateService = audioEditorStateService;
-            _audioProjectFileService = audioProjectFileService;
-            _audioProjectCompilerService = audioProjectCompilerService;
-            _audioEditorIntegrityService = audioEditorIntegrityService;
-
-            AudioProjectExplorerViewModel = audioProjectExplorerViewModel;
-            AudioFilesExplorerViewModel = audioFilesExplorerViewModel;
-            AudioProjectEditorViewModel = audioProjectEditorViewModel;
-            AudioProjectViewerViewModel = audioProjectViewerViewModel;
-            SettingsViewModel = settingsViewModel;
-            WaveformVisualiserViewModel = waveformVisualiserViewModel;
-        }
 
         [RelayCommand] public void NewAudioProject() => _uiCommandFactory.Create<OpenNewAudioProjectWindowCommand>().Execute();
 

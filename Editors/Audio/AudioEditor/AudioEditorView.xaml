@@ -103,8 +103,11 @@
                             Height="Auto"/>
                         <RowDefinition 
                             Height="*"/>
+                        <!--
+                        Commented out until Waveform visuliser is intended to be displayed
                         <RowDefinition 
                             Height="Auto"/>
+                        -->
                     </Grid.RowDefinitions>
 
                     <audioprojectexplorer:AudioProjectExplorerView

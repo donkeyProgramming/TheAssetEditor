@@ -1,11 +1,17 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Collections.Specialized;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Windows;
 using CommonControls.BaseDialogs;
+using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
+using Editors.Audio.GameInformation.Warhammer3;
 using Editors.Audio.Storage;
 using Editors.Audio.Utility;
 using Shared.Core.Misc;
@@ -17,185 +23,261 @@ using Shared.GameFormats.Wwise.Hirc.V136;
 
 namespace Editors.Audio.AudioExplorer
 {
-    // TODO: Add a language selection ComboBox
-    public class AudioExplorerViewModel : NotifyPropertyChangedImpl, IEditorInterface
+    public partial class AudioLanguage(Wh3Language language, bool isChecked = false) : ObservableObject
     {
-        public EventSelectionFilter EventFilter { get; set; }
+        public Wh3Language Language { get; } = language;
+        [ObservableProperty] private bool _isChecked = isChecked;
+    }
 
+    public partial class AudioExplorerViewModel : ObservableObject, IEditorInterface
+    {
         private readonly IAudioRepository _audioRepository;
         private readonly SoundPlayer _soundPlayer;
 
-        HircTreeItem _selectedNode;
-        public ObservableCollection<HircTreeItem> TreeList { get; set; } = [];
-        public HircTreeItem SelectedNode { get => _selectedNode; set { SetAndNotify(ref _selectedNode, value); OnNodeSelected(_selectedNode); } }
-        public NotifyAttr<bool> ShowIds { get; set; }
-        public NotifyAttr<bool> ShowBnkName { get; set; }
-        public NotifyAttr<bool> UseBnkNameWhileParsing { get; set; }
-        public NotifyAttr<bool> ShowEvents { get; set; }
-        public NotifyAttr<bool> ShowDialogueEvents { get; set; }
-        public NotifyAttr<bool> IsPlaySoundButtonEnabled { get; set; } = new NotifyAttr<bool>(false);
-        public NotifyAttr<bool> CanExportCurrrentDialogueEventAsCsvAction { get; set; } = new NotifyAttr<bool>(false);
+        [ObservableProperty] private EventSelectionFilter _eventFilter;
+        [ObservableProperty] private ObservableCollection<HircTreeItem> _treeList = [];
+        [ObservableProperty] private HircTreeItem _selectedNode;
+        [ObservableProperty] private string _selectedNodeText = string.Empty;
+        [ObservableProperty] private ObservableCollection<AudioLanguage> _languages = [];
+        [ObservableProperty] private ObservableCollection<Wh3Language> _selectedLanguages = [];
+        [ObservableProperty] private bool _showEvents = true;
+        [ObservableProperty] private bool _showDialogueEvents = true;
+        [ObservableProperty] private bool _isPlaySoundButtonEnabled = false;
+
         public string DisplayName { get; set; } = "Audio Explorer";
-        public NotifyAttr<string> SelectedNodeText { get; set; } = new NotifyAttr<string>("");
 
         public AudioExplorerViewModel(IAudioRepository audioRepository, SoundPlayer soundPlayer)
         {
             _audioRepository = audioRepository;
             _soundPlayer = soundPlayer;
 
-            ShowIds = new NotifyAttr<bool>(false, RefreshList);
-            ShowBnkName = new NotifyAttr<bool>(false, RefreshList);
-            UseBnkNameWhileParsing = new NotifyAttr<bool>(false, RefreshList);
-            ShowEvents = new NotifyAttr<bool>(true, RefreshList);
-            ShowDialogueEvents = new NotifyAttr<bool>(true, RefreshList);
+            // Remove SFX as we don't allow for filtering it out in the AudioRepository so we don't need to display it
+            var languages = Enum.GetValues<Wh3Language>()
+                .Where(language => language != Wh3Language.Sfx)
+                .ToArray();
+            Languages = new ObservableCollection<AudioLanguage>(
+                languages.Select(language => new AudioLanguage(language, language == Wh3Language.EnglishUK))
+            );
+
+            Languages.CollectionChanged += OnLanguagesCollectionChanged;
+            foreach (var language in Languages)
+                language.PropertyChanged += OnAudioLanguageChanged;
+
+            SetSelectedLanguages();
+            LoadAudioRepositoryForSelectedLanguages();
 
             EventFilter = new EventSelectionFilter(_audioRepository, true, true);
             EventFilter.EventList.SelectedItemChanged += OnEventSelected;
         }
 
-        public void Close()
+        partial void OnShowEventsChanged(bool value) => RefreshList();
+
+        partial void OnShowDialogueEventsChanged(bool value) => RefreshList();
+
+        partial void OnSelectedNodeChanged(HircTreeItem value) => OnNodeSelected(value);
+
+        private void OnLanguagesCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
-            EventFilter.EventList.SelectedItemChanged -= OnEventSelected;
-        }
-
-        void RefreshList(bool newValue) => EventFilter.Refresh(ShowEvents.Value, ShowDialogueEvents.Value);
-
-        private void OnEventSelected(SelectedHircItem newValue)
-        {
-            if (newValue?.Id == _selectedNode?.Item?.Id)
-                return;
-
-            if (newValue != null)
+            if (e.NewItems != null)
             {
-                _selectedNode = null;
-                TreeList.Clear();
-
-                var parser = new WwiseTreeParserChildren(_audioRepository, ShowIds.Value, ShowBnkName.Value, UseBnkNameWhileParsing.Value);
-                var rootNode = parser.BuildHierarchy(newValue.HircItem);
-                TreeList.Add(rootNode);
+                foreach (AudioLanguage item in e.NewItems)
+                    item.PropertyChanged += OnAudioLanguageChanged;
             }
+
+            if (e.OldItems != null)
+            {
+                foreach (AudioLanguage item in e.OldItems)
+                    item.PropertyChanged -= OnAudioLanguageChanged;
+            }
+
+            SetSelectedLanguages();
         }
 
-        void OnNodeSelected(HircTreeItem selectedNode)
+        private void OnAudioLanguageChanged(object sender, PropertyChangedEventArgs e)
         {
-            IsPlaySoundButtonEnabled.Value = _selectedNode?.Item is ICAkSound or ICAkMusicTrack;
-            CanExportCurrrentDialogueEventAsCsvAction.Value = _selectedNode?.Item is CAkDialogueEvent_V136;
+            if (e.PropertyName == nameof(AudioLanguage.IsChecked))
+                SetSelectedLanguages();
+        }
 
-            SelectedNodeText.Value = "";
+        private void OnNodeSelected(HircTreeItem selectedNode)
+        {
+            IsPlaySoundButtonEnabled = selectedNode?.Item is ICAkSound or ICAkMusicTrack;
+
+            SelectedNodeText = string.Empty;
 
             if (selectedNode == null || selectedNode.Item == null)
                 return;
 
-            var hircAsString = JsonSerializer.Serialize((object)selectedNode.Item, new JsonSerializerOptions() { Converters = { new JsonStringEnumConverter() }, WriteIndented = true });
-            SelectedNodeText.Value = hircAsString;
+            var hircAsString = JsonSerializer.Serialize((object)selectedNode.Item, new JsonSerializerOptions { Converters = { new JsonStringEnumConverter() }, WriteIndented = true });
+            SelectedNodeText = hircAsString;
 
             if (selectedNode.Item.HircType == AkBkHircType.Sound)
             {
                 var findAudioParentStructureHelper = new FindAudioParentStructureHelper();
                 var parentStructs = findAudioParentStructureHelper.Compute(selectedNode.Item, _audioRepository);
 
-                SelectedNodeText.Value += "\n\nParent structure:\n";
+                SelectedNodeText += "\n\nParent structure:\n";
                 foreach (var parentStruct in parentStructs)
                 {
-                    SelectedNodeText.Value += "\t" + parentStruct.Description + "\n";
+                    SelectedNodeText += "\t" + parentStruct.Description + "\n";
                     foreach (var graphItem in parentStruct.GraphItems)
-                        SelectedNodeText.Value += "\t\t" + graphItem.Description + "\n";
+                        SelectedNodeText += "\t\t" + graphItem.Description + "\n";
 
-                    SelectedNodeText.Value += "\n";
+                    SelectedNodeText += "\n";
                 }
             }
         }
 
-        public void PlaySelectedSoundAction()
+        private void RefreshList() => EventFilter.Refresh(ShowEvents, ShowDialogueEvents);
+
+        private void SetSelectedLanguages()
         {
-            if (_selectedNode.Item is ICAkSound sound)
+            SelectedLanguages = new ObservableCollection<Wh3Language>(
+                Languages.Where(audioLanguage => audioLanguage.IsChecked).Select(audioLanguage => audioLanguage.Language)
+            );
+        }
+
+        [RelayCommand] public void LoadAudioRepositoryForSelectedLanguages()
+        {
+            var languages = SelectedLanguages
+                .Select(Wh3LanguageInformation.GetLanguageAsString)
+                .ToList();
+            _audioRepository.Load(languages);
+        }
+
+        private void OnEventSelected(SelectedHircItem newValue)
+        {
+            if (newValue?.Id == SelectedNode?.Item?.Id)
+                return;
+
+            if (newValue != null)
+            {
+                SelectedNode = null;
+                TreeList.Clear();
+
+                var parser = new WwiseTreeParserChildren(_audioRepository);
+                var rootNode = parser.BuildHierarchy(newValue.HircItem);
+                TreeList.Add(rootNode);
+            }
+        }
+
+        [RelayCommand] public void PlaySelectedSoundAction()
+        {
+            if (SelectedNode?.Item is ICAkSound sound)
             {
                 if (sound.GetStreamType() == AKBKSourceType.Data_BNK)
                 {
                     if (sound is CAkSound_V136)
-                    {
-                        // For some reason some V136 sounds say they're in data but they're actually streamed
                         _soundPlayer.PlayStreamedWem(sound.GetSourceId().ToString());
-                    }
                     else if (sound is CAkSound_V112 sound_V112)
+                    {
                         _soundPlayer.PlayDataWem(
                             sound_V112.AkBankSourceData.AkMediaInformation.SourceId,
                             sound_V112.AkBankSourceData.AkMediaInformation.FileId,
                             (int)sound_V112.AkBankSourceData.AkMediaInformation.FileOffset,
                             (int)sound_V112.AkBankSourceData.AkMediaInformation.InMemoryMediaSize
                         );
+                    }
                 }
                 else
                     _soundPlayer.PlayStreamedWem(sound.GetSourceId().ToString());
             }
-            else if (_selectedNode.Item is ICAkMusicTrack musicTrack)
+            else if (SelectedNode?.Item is ICAkMusicTrack musicTrack)
             {
-                // Music tracks seems to have one child in practice so can just get first
-                var musicTrackId = musicTrack.GetChildren().FirstOrDefault(); 
+                var musicTrackId = musicTrack.GetChildren().FirstOrDefault();
                 _soundPlayer.PlayStreamedWem(musicTrackId.ToString());
             }
         }
 
-        public void LoadHircFromIdAction()
+        [RelayCommand] public void LoadHircFromIdAction()
         {
-            var window = new TextInputWindow("Hirc Input", "Hirc Id", true);
+            var window = new TextInputWindow("Hirc Input", "Hirc ID", true);
             if (window.ShowDialog() == true)
             {
-                var hircStr = window.TextValue;
-                if (string.IsNullOrEmpty(hircStr))
+                var input = window.TextValue;
+                if (string.IsNullOrEmpty(input))
+                {
+                    MessageBox.Show("No ID provided");
+                    return;
+                }
+
+                if (uint.TryParse(input, out var hircId) == false)
+                {
+                    MessageBox.Show("Not a valid ID");
+                    return;
+                }
+
+                var foundHircs = _audioRepository.GetHircs(hircId);
+                if (foundHircs.Count == 0)
+                {
+                    MessageBox.Show($"No Hircs found with ID {hircId}");
+                    return;
+                }
+
+                var options = new JsonSerializerOptions { Converters = { new JsonStringEnumConverter() }, WriteIndented = true };
+                var hircAsString = JsonSerializer.Serialize<object[]>(foundHircs.ToArray(), options);
+                SelectedNodeText = hircAsString;
+            }
+        }
+
+        // TODO: Should probably move this to Reports
+        [RelayCommand] public void ExportStatePathsUsingState()
+        {
+            var window = new TextInputWindow("State Input", "State", true);
+            if (window.ShowDialog() == true)
+            {
+                var input = window.TextValue;
+                if (string.IsNullOrEmpty(input))
                 {
                     MessageBox.Show("No id provided");
                     return;
                 }
 
-                if (uint.TryParse(hircStr, out var hircId) == false)
+                if (!_audioRepository.NameById.ContainsKey(WwiseHash.Compute(input)))
                 {
-                    MessageBox.Show("Not a valid Id");
+                    MessageBox.Show($"State {input} does not exist.");
                     return;
                 }
 
-                var foundHircItems = _audioRepository.GetHircs(hircId);
-                if (foundHircItems.Count == 0)
+                var filePath = $"{DirectoryHelper.ReportsDirectory}\\state_paths_using_{input}.txt";
+
+                using var writer = new StreamWriter(filePath, false);
+
+                var helper = new DecisionPathHelper(_audioRepository);
+                var dialogueEvents = _audioRepository.GetHircsByType<ICAkDialogueEvent>();
+                foreach (var dialogueEvent in dialogueEvents)
                 {
-                    MessageBox.Show($"No hirc items found with id {hircId}");
-                    return;
-                }
+                    var hircItem = dialogueEvent as HircItem;
+                    var dialogueEventName = _audioRepository.GetNameFromId(hircItem.Id);
 
-                var hircAsString = JsonSerializer.Serialize<object[]>(foundHircItems.ToArray(), new JsonSerializerOptions() { Converters = { new JsonStringEnumConverter() }, WriteIndented = true });
-                SelectedNodeText.Value = hircAsString;
-            }
-        }
+                    var decisionPathCollection = helper.GetDecisionPaths(dialogueEvent);
+                    var stateGroups = decisionPathCollection.Header.GetAsString();
+                    var processedDialogueEvents = new List<string>();
 
-        public void ExportStatePathsUsingState()
-        {
-            var outputPath = @"C:\Users\george\Desktop\state_paths_using_state.txt";
-            using var writer = new StreamWriter(outputPath, false);
-
-            var helper = new DecisionPathHelper(_audioRepository);
-            var dialogueEvents = _audioRepository.GetHircsByType<ICAkDialogueEvent>();
-            foreach (var dialogueEvent in dialogueEvents)
-            {
-                var asHirc = dialogueEvent as HircItem;
-                var dialogueEventName = _audioRepository.GetNameFromId(asHirc.Id);
-
-                var decisionPathCollection = helper.GetDecisionPaths(dialogueEvent);
-                var stateGroups = decisionPathCollection.Header.GetAsString();
-                var processedDialogueEvents = new List<string>();
-
-                foreach (var statePath in decisionPathCollection.Paths)
-                {
-                    var statePathString = statePath.GetAsString();
-                    if (statePathString.Contains("wh3_dlc26_vo_actor_Ogres_Bragg_the_Gutsman"))
+                    foreach (var statePath in decisionPathCollection.Paths)
                     {
-                        if (!processedDialogueEvents.Contains(dialogueEventName))
+                        var statePathString = statePath.GetAsString();
+                        if (statePathString.Contains(input))
                         {
-                            processedDialogueEvents.Add(dialogueEventName);
-                            writer.WriteLine($"{dialogueEventName} [{stateGroups}]");
-                            writer.WriteLine($"    {statePathString}");
+                            if (!processedDialogueEvents.Contains(dialogueEventName))
+                            {
+                                processedDialogueEvents.Add(dialogueEventName);
+                                writer.WriteLine($"{dialogueEventName} [{stateGroups}]");
+                                writer.WriteLine($"    {statePathString}");
+                            }
                         }
                     }
                 }
             }
+        }
+
+        public void Close()
+        {
+            EventFilter.EventList.SelectedItemChanged -= OnEventSelected;
+
+            Languages.CollectionChanged -= OnLanguagesCollectionChanged;
+            foreach (var item in Languages)
+                item.PropertyChanged -= OnAudioLanguageChanged;
         }
     }
 }

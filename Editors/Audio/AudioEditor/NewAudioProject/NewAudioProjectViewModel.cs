@@ -1,11 +1,11 @@
-﻿using System.Collections.ObjectModel;
+﻿using System;
+using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Editors.Audio.AudioEditor.Models;
 using Editors.Audio.GameInformation.Warhammer3;
 using Serilog;
 using Shared.Core.ErrorHandling;
-using Shared.Core.Events;
 using Shared.Core.PackFiles;
 using Shared.Core.Services;
 using Shared.Core.Settings;
@@ -14,7 +14,6 @@ namespace Editors.Audio.AudioEditor.NewAudioProject
 {
     public partial class NewAudioProjectViewModel : ObservableObject
     {
-        private readonly IEventHub _eventHub;
         private readonly IPackFileService _packFileService;
         private readonly IAudioEditorStateService _audioEditorStateService;
         private readonly IAudioProjectFileService _audioProjectFileService;
@@ -27,7 +26,7 @@ namespace Editors.Audio.AudioEditor.NewAudioProject
         [ObservableProperty] private string _audioProjectFileName;
         [ObservableProperty] private string _audioProjectDirectory;
         [ObservableProperty] private Wh3Language _selectedLanguage;
-        [ObservableProperty] private ObservableCollection<Wh3Language> _languages = new([Wh3Language.EnglishUK]); //new (Enum.GetValues<Wh3GameLanguage>());
+        [ObservableProperty] private ObservableCollection<Wh3Language> _languages = new (Enum.GetValues<Wh3Language>());
 
         [ObservableProperty] private bool _isAudioProjectFileNameSet;
         [ObservableProperty] private bool _isAudioProjectDirectorySet;
@@ -35,14 +34,12 @@ namespace Editors.Audio.AudioEditor.NewAudioProject
         [ObservableProperty] private bool _isOkButtonEnabled;
 
         public NewAudioProjectViewModel(
-            IEventHub eventHub,
             IPackFileService packFileService,
             IAudioEditorStateService audioEditorStateService,
             IAudioProjectFileService audioProjectFileService,
             ApplicationSettingsService applicationSettingsService,
             IStandardDialogs standardDialogs)
         {
-            _eventHub = eventHub;
             _packFileService = packFileService;
             _audioEditorStateService = audioEditorStateService;
             _audioProjectFileService = audioProjectFileService;

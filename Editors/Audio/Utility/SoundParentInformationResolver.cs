@@ -1,10 +1,10 @@
-﻿using CommunityToolkit.Diagnostics;
+﻿using System.Collections.Generic;
+using System.Linq;
+using CommunityToolkit.Diagnostics;
 using Editors.Audio.Storage;
 using Shared.GameFormats.Wwise.Enums;
 using Shared.GameFormats.Wwise.Hirc;
 using Shared.GameFormats.Wwise.Hirc.V136;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace Editors.Audio.Utility
 {
@@ -49,7 +49,7 @@ namespace Editors.Audio.Utility
                 Description = "Graph structure:"
             };
 
-            var parser = new WwiseTreeParserParent(audioRepository, true, true, true);
+            var parser = new WwiseTreeParserParent(audioRepository);
             var nodes = parser.BuildHierarchyAsFlatList(sound);
             nodes.Reverse();
 

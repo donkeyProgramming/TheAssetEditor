@@ -9,8 +9,7 @@ namespace Editors.Audio.Utility
 {
     public class WwiseTreeParserChildren : WwiseTreeParserBase
     {
-        public WwiseTreeParserChildren(IAudioRepository audioRepository, bool showId, bool showOwningBnkFile, bool filterByBnkName)
-            : base(audioRepository, showId, showOwningBnkFile, filterByBnkName)
+        public WwiseTreeParserChildren(IAudioRepository audioRepository) : base(audioRepository)
         {
             _hircProcessChildMap.Add(AkBkHircType.Event, ProcessEvent);
             _hircProcessChildMap.Add(AkBkHircType.Action, ProcessAction);
