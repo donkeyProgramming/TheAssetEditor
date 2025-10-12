@@ -1,4 +1,5 @@
-﻿using System.Windows;
+﻿using System;
+using System.Windows;
 
 namespace Editors.Audio.AudioProjectConverter
 {
@@ -14,6 +15,12 @@ namespace Editors.Audio.AudioProjectConverter
         {
             if (DataContext is AudioProjectConverterViewModel viewModel)
                 viewModel.SetCloseAction(Close);
+        }
+
+        private void OnClosed(object sender, EventArgs e)
+        {
+            if (DataContext is AudioProjectConverterViewModel viewModel)
+                viewModel.CloseWindowAction();
         }
     }
 }

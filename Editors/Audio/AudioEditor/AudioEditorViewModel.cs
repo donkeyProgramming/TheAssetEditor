@@ -78,7 +78,7 @@ namespace Editors.Audio.AudioEditor
             _audioProjectFileService.Save(audioProject, fileName, filePath);
         }
 
-        [RelayCommand] public void LoadAudioProject() => _audioProjectFileService.Load();
+        [RelayCommand] public void LoadAudioProject() => _audioProjectFileService.LoadFromDialog();
 
         [RelayCommand] public void CompileAudioProject()
         {

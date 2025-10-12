@@ -1,7 +1,6 @@
 ﻿using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using Editors.Audio.AudioEditor.Events;
 using Editors.Audio.AudioEditor.Models;
 using Editors.Audio.GameInformation.Warhammer3;
 using Serilog;
@@ -111,8 +110,7 @@ namespace Editors.Audio.AudioEditor.NewAudioProject
             _audioEditorStateService.StoreAudioProjectFilePath(filePath);
 
             _audioProjectFileService.Save(audioProject, fileName, filePath);
-
-            _eventHub.Publish(new AudioProjectInitialisedEvent());
+            _audioProjectFileService.Load(fileName, filePath);
 
             CloseWindowAction();
         }

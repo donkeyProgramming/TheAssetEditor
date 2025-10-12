@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using Editors.Audio.AudioEditor.AudioProjectExplorer;
@@ -68,17 +69,36 @@ namespace Editors.Audio.AudioEditor.AudioProjectViewer.Table
         {
             var dialogueEventName = _audioEditorStateService.SelectedAudioProjectExplorerNode.Name;
             var dialogueEvent = _audioEditorStateService.AudioProject.GetDialogueEvent(dialogueEventName);
+
             var stateGroupsWithQualifiers = _audioRepository.QualifiedStateGroupByStateGroupByDialogueEvent[dialogueEvent.Name];
+            var orderedStateGroupsWithQualifiers = stateGroupsWithQualifiers.ToList();
+
             foreach (var statePath in dialogueEvent.StatePaths)
             {
                 var row = table.NewRow();
 
-                foreach (var stateGroupWithQualifier in stateGroupsWithQualifiers)
+                // We get the State Group by occurance as a State Group can appear multiple times in a State Path so we want to access the right one
+                var occurrenceIndexByStateGroupName = new Dictionary<string, int>(StringComparer.Ordinal);
+
+                foreach (var stateGroupWithQualifier in orderedStateGroupsWithQualifiers)
                 {
                     var columnHeader = TableHelpers.DuplicateUnderscores(stateGroupWithQualifier.Key);
-                    var node = statePath.Nodes.FirstOrDefault(node => node.StateGroup.Name == stateGroupWithQualifier.Value);
-                    if (node != null)
-                        row[columnHeader] = node.State.Name;
+                    var stateGroupName = stateGroupWithQualifier.Value;
+
+                    if (!occurrenceIndexByStateGroupName.TryGetValue(stateGroupName, out var currentOccurrenceIndex))
+                        currentOccurrenceIndex = 0;
+                    else
+                        currentOccurrenceIndex += 1;
+
+                    occurrenceIndexByStateGroupName[stateGroupName] = currentOccurrenceIndex;
+
+                    var nodeForThisOccurrence = statePath.Nodes
+                        .Where(candidateNode => candidateNode.StateGroup.Name == stateGroupName)
+                        .Skip(currentOccurrenceIndex)
+                        .FirstOrDefault();
+
+                    if (nodeForThisOccurrence != null)
+                        row[columnHeader] = nodeForThisOccurrence.State.Name;
                     else
                         row[columnHeader] = string.Empty;
                 }
@@ -86,5 +106,6 @@ namespace Editors.Audio.AudioEditor.AudioProjectViewer.Table
                 _eventHub.Publish(new ViewerTableRowAddRequestedEvent(row));
             }
         }
+
     }
 }

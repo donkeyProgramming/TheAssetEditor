@@ -259,9 +259,8 @@ namespace Editors.Audio.AudioProjectConverter
 
             foreach (var statePath in decisionPathCollection.Paths)
             {
-                var statePathContainsRequiredPattern = statePath.Items.Any(state =>
-                    statesLookupByStateId.TryGetValue(state.Value, out var stateName) &&
-                    voActorSubstrings.Any(substring => stateName.Contains(substring, StringComparison.CurrentCultureIgnoreCase)));
+                var statePathContainsRequiredPattern = statePath.Items.Any(state => statesLookupByStateId.TryGetValue(state.Value, out var stateName) 
+                    && voActorSubstrings.Any(substring => stateName.Contains(substring, StringComparison.CurrentCultureIgnoreCase)));
 
                 if (!statePathContainsRequiredPattern)
                     continue;
@@ -280,7 +279,6 @@ namespace Editors.Audio.AudioProjectConverter
         private Dictionary<uint, string> GetStatesLookupByStateId(Dictionary<string, Dictionary<uint, string>> statesLookupByStateGroupByStateId, string stateGroupLookup)
         {
             statesLookupByStateGroupByStateId.TryGetValue(stateGroupLookup, out var statesInfoFromWwiseProject);
-            _audioRepository.StatesByStateGroupByStateId.TryGetValue(stateGroupLookup, out var statesInfoFromGame);
 
             var statesLookupByStateId = new Dictionary<uint, string>();
 
@@ -290,11 +288,9 @@ namespace Editors.Audio.AudioProjectConverter
                     statesLookupByStateId.TryAdd(stateInfo.Key, stateInfo.Value);
             }
 
-            if (statesInfoFromGame != null)
-            {
-                foreach (var stateInfo in statesInfoFromGame)
-                    statesLookupByStateId.TryAdd(stateInfo.Key, stateInfo.Value);
-            }
+            // Not all names are States but that doesn't matter
+            foreach (var stateInfo in _audioRepository.NameById)
+                statesLookupByStateId.TryAdd(stateInfo.Key, stateInfo.Value);
 
             return statesLookupByStateId;
         }

@@ -11,6 +11,7 @@
     mc:Ignorable="d"
     Width="700"
     SizeToContent="Height"
+    Closed="OnClosed"
     Title="Dialogue Event Merger">
 
     <Grid>

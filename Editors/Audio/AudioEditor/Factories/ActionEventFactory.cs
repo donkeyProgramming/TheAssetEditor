@@ -8,7 +8,6 @@ using Action = Editors.Audio.AudioEditor.Models.Action;
 
 namespace Editors.Audio.AudioEditor.Factories
 {
-    //TODO Move inside and rename to Result
     public record ActionEventFactoryResult
     {
         public ActionEvent ActionEvent { get; set; }

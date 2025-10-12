@@ -1,4 +1,5 @@
-﻿using System.Windows;
+﻿using System;
+using System.Windows;
 
 namespace Editors.Audio.DialogueEventMerger
 {
@@ -14,6 +15,12 @@ namespace Editors.Audio.DialogueEventMerger
         {
             if (DataContext is DialogueEventMergerViewModel viewModel)
                 viewModel.SetCloseAction(Close);
+        }
+
+        private void OnClosed(object sender, EventArgs e)
+        {
+            if (DataContext is DialogueEventMergerViewModel viewModel)
+                viewModel.CloseWindowAction();
         }
     }
 }

@@ -19,7 +19,6 @@ namespace Editors.Audio.Storage
         Dictionary<string, List<string>> StateGroupsByDialogueEvent { get; }
         Dictionary<string, Dictionary<string, string>> QualifiedStateGroupByStateGroupByDialogueEvent { get; }
         Dictionary<string, List<string>> StatesByStateGroup { get; }
-        Dictionary<string, Dictionary<uint, string>> StatesByStateGroupByStateId { get; }
 
         void Load(List<string> languages); 
         void Clear();
@@ -53,7 +52,6 @@ namespace Editors.Audio.Storage
         public Dictionary<string, List<string>> StateGroupsByDialogueEvent { get; set; }
         public Dictionary<string, Dictionary<string, string>> QualifiedStateGroupByStateGroupByDialogueEvent { get; set; }
         public Dictionary<string, List<string>> StatesByStateGroup { get; set; }
-        public Dictionary<string, Dictionary<uint, string>> StatesByStateGroupByStateId { get; set; }
 
         public void Load(List<string> languages)
         {
@@ -97,7 +95,6 @@ namespace Editors.Audio.Storage
             StateGroupsByDialogueEvent = result.StateGroupsByDialogueEvent ?? [];
             QualifiedStateGroupByStateGroupByDialogueEvent = result.QualifiedStateGroupByStateGroupByDialogueEvent ?? [];
             StatesByStateGroup = result.StatesByStateGroup ?? [];
-            StatesByStateGroupByStateId = result.StatesByStateGroupByStateId ?? [];
 
             _isDatDataLoaded = true;
         }
@@ -259,8 +256,6 @@ namespace Editors.Audio.Storage
             QualifiedStateGroupByStateGroupByDialogueEvent = null;
             StatesByStateGroup?.Clear();
             StatesByStateGroup = null;
-            StatesByStateGroupByStateId?.Clear();
-            StatesByStateGroupByStateId = null;
 
             MemoryOptimiser.Optimise();
             MemoryOptimiser.LogMemory("After clearing AudioRepository");

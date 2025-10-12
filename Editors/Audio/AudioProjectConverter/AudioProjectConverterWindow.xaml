@@ -11,6 +11,7 @@
     mc:Ignorable="d"
     Width="850"
     SizeToContent="Height"
+    Closed="OnClosed"
     Title="Audio Project Converter">
 
     <Grid>

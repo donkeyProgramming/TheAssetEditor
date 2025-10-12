@@ -19,7 +19,8 @@ namespace Editors.Audio.AudioEditor
     public interface IAudioProjectFileService
     {
         void Save(AudioProject audioProject, string fileName, string filePath);
-        void Load();
+        void LoadFromDialog();
+        void Load(string fileName, string filePath);
     }
 
     public class AudioProjectFileService(
@@ -56,45 +57,49 @@ namespace Editors.Audio.AudioEditor
             _fileSaveService.Save(filePath, packFile.DataSource.ReadData(), false);
         }
 
-        public void Load()
+        public void LoadFromDialog()
         {
             var result = _standardDialogs.DisplayBrowseDialog([".aproj"]);
             if (result.Result)
             {
                 var filePath = _packFileService.GetFullPath(result.File);
                 var fileName = Path.GetFileName(filePath);
-                var fileNameWithoutExtension = Path.GetFileNameWithoutExtension(fileName);
-
-                if (fileName.Contains(' '))
-                {
-                    MessageBox.Show("You must rename the Audio Project as its name contains spaces which is not allowed.", "Error");
-                    return;
-                }
-
-                var packFile = _packFileService.FindFile(filePath);
-                var bytes = packFile.DataSource.ReadData();
-                var audioProjectJson = Encoding.UTF8.GetString(bytes);
-                var audioProject = JsonSerializer.Deserialize<AudioProject>(audioProjectJson);
-
-                // We create a 'dirty' Audio Project to display the whole model in the Audio Project Explorer rather than
-                // just the clean data from the loaded Audio Project as when it's saved any unused parts are removed.
-                var currentGame = _applicationSettingsService.CurrentSettings.CurrentGame;
-                var dirtyAudioProject = AudioProject.Create(audioProject, currentGame, fileNameWithoutExtension);
-
-                var languages = new List<string> { audioProject.Language };
-                _audioRepository.Load(languages);
-
-                _audioEditorIntegrityService.CheckDialogueEventInformationIntegrity(Wh3DialogueEventInformation.Information);
-                _audioEditorIntegrityService.CheckAudioProjectDialogueEventIntegrity(dirtyAudioProject);
-                _audioEditorIntegrityService.CheckAudioProjectWavFilesIntegrity(dirtyAudioProject);
-                _audioEditorIntegrityService.CheckAudioProjectDataIntegrity(dirtyAudioProject, fileNameWithoutExtension);
-
-                _audioEditorStateService.StoreAudioProject(dirtyAudioProject);
-                _audioEditorStateService.StoreAudioProjectFileName(fileName);
-                _audioEditorStateService.StoreAudioProjectFilePath(filePath);
-
-                _eventHub.Publish(new AudioProjectInitialisedEvent());
+                Load(fileName, filePath);
             }
+        }
+
+        public void Load(string fileName, string filePath)
+        {
+            if (fileName.Contains(' '))
+            {
+                MessageBox.Show("You must rename the Audio Project as its name contains spaces which is not allowed.", "Error");
+                return;
+            }
+
+            var fileNameWithoutExtension = Path.GetFileNameWithoutExtension(fileName);
+            var packFile = _packFileService.FindFile(filePath);
+            var bytes = packFile.DataSource.ReadData();
+            var audioProjectJson = Encoding.UTF8.GetString(bytes);
+            var audioProject = JsonSerializer.Deserialize<AudioProject>(audioProjectJson);
+
+            // We create a 'dirty' Audio Project to display the whole model in the Audio Project Explorer rather than
+            // just the clean data from the loaded Audio Project as when it's saved any unused parts are removed.
+            var currentGame = _applicationSettingsService.CurrentSettings.CurrentGame;
+            var dirtyAudioProject = AudioProject.Create(audioProject, currentGame, fileNameWithoutExtension);
+
+            var languages = new List<string> { audioProject.Language };
+            _audioRepository.Load(languages);
+
+            _audioEditorIntegrityService.CheckDialogueEventInformationIntegrity(Wh3DialogueEventInformation.Information);
+            _audioEditorIntegrityService.CheckAudioProjectDialogueEventIntegrity(dirtyAudioProject);
+            _audioEditorIntegrityService.CheckAudioProjectWavFilesIntegrity(dirtyAudioProject);
+            _audioEditorIntegrityService.CheckAudioProjectDataIntegrity(dirtyAudioProject, fileNameWithoutExtension);
+
+            _audioEditorStateService.StoreAudioProject(dirtyAudioProject);
+            _audioEditorStateService.StoreAudioProjectFileName(fileName);
+            _audioEditorStateService.StoreAudioProjectFilePath(filePath);
+
+            _eventHub.Publish(new AudioProjectInitialisedEvent());
         }
     }
 }
