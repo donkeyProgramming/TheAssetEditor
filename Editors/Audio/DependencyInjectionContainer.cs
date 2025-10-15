@@ -1,24 +1,29 @@
 ﻿using Audio.AudioExplorer;
 using Editors.Audio.AudioEditor;
-using Editors.Audio.AudioEditor.AudioFilesExplorer;
-using Editors.Audio.AudioEditor.AudioProjectEditor;
-using Editors.Audio.AudioEditor.AudioProjectEditor.Table;
-using Editors.Audio.AudioEditor.AudioProjectExplorer;
-using Editors.Audio.AudioEditor.AudioProjectViewer;
-using Editors.Audio.AudioEditor.AudioProjectViewer.Table;
-using Editors.Audio.AudioEditor.Factories;
-using Editors.Audio.AudioEditor.NewAudioProject;
-using Editors.Audio.AudioEditor.Presentation.Table;
-using Editors.Audio.AudioEditor.Services;
-using Editors.Audio.AudioEditor.Settings;
-using Editors.Audio.AudioEditor.UICommands;
-using Editors.Audio.AudioEditor.WaveformVisualiser;
+using Editors.Audio.AudioEditor.Commands;
+using Editors.Audio.AudioEditor.Core;
+using Editors.Audio.AudioEditor.Core.AudioProjectMutation;
+using Editors.Audio.AudioEditor.Presentation;
+using Editors.Audio.AudioEditor.Presentation.AudioFilesExplorer;
+using Editors.Audio.AudioEditor.Presentation.AudioProjectEditor;
+using Editors.Audio.AudioEditor.Presentation.AudioProjectEditor.Table;
+using Editors.Audio.AudioEditor.Presentation.AudioProjectExplorer;
+using Editors.Audio.AudioEditor.Presentation.AudioProjectViewer;
+using Editors.Audio.AudioEditor.Presentation.AudioProjectViewer.Table;
+using Editors.Audio.AudioEditor.Presentation.HircSettings;
+using Editors.Audio.AudioEditor.Presentation.NewAudioProject;
+using Editors.Audio.AudioEditor.Presentation.Shared.Table;
+using Editors.Audio.AudioEditor.Presentation.WaveformVisualiser;
 using Editors.Audio.AudioExplorer;
-using Editors.Audio.AudioProjectCompiler;
 using Editors.Audio.AudioProjectConverter;
 using Editors.Audio.DialogueEventMerger;
-using Editors.Audio.Storage;
-using Editors.Audio.Utility;
+using Editors.Audio.Shared.AudioProject.Compiler;
+using Editors.Audio.Shared.AudioProject.Factories;
+using Editors.Audio.Shared.Dat;
+using Editors.Audio.Shared.Storage;
+using Editors.Audio.Shared.Utilities;
+using Editors.Audio.Shared.Wwise;
+using Editors.Audio.Shared.Wwise.Generators;
 using Microsoft.Extensions.DependencyInjection;
 using Shared.Core.DependencyInjection;
 using Shared.Core.DevConfig;
@@ -41,7 +46,7 @@ namespace Editors.Audio
             serviceCollection.AddScoped<AudioFilesExplorerViewModel>();
             serviceCollection.AddScoped<AudioProjectEditorViewModel>();
             serviceCollection.AddScoped<AudioProjectViewerViewModel>();
-            serviceCollection.AddScoped<SettingsViewModel>();
+            serviceCollection.AddScoped<HircSettingsViewModel>();
             serviceCollection.AddScoped<WaveformVisualiserViewModel>();
 
             // New Audio Project
@@ -80,15 +85,15 @@ namespace Editors.Audio
 
             // Audio Project Editor table
             serviceCollection.AddScoped<IEditorTableServiceFactory, EditorTableServiceFactory>();
-            serviceCollection.AddScoped<IEditorTableService, EditorActionEventDataGridService>();
-            serviceCollection.AddScoped<IEditorTableService, EditorDialogueEventDataGridService>();
-            serviceCollection.AddScoped<IEditorTableService, EditorStateGroupDataGridService>();
+            serviceCollection.AddScoped<IEditorTableService, EditorActionEventTableService>();
+            serviceCollection.AddScoped<IEditorTableService, EditorDialogueEventTableService>();
+            serviceCollection.AddScoped<IEditorTableService, EditorStateGroupTableService>();
 
             // Audio Project Viewer services
             serviceCollection.AddScoped<IViewerTableServiceFactory, ViewerTableServiceFactory>();
-            serviceCollection.AddScoped<IViewerTableService, ViewerActionEventDataGridService>();
-            serviceCollection.AddScoped<IViewerTableService, ViewerDialogueEventDataGridService>();
-            serviceCollection.AddScoped<IViewerTableService, ViewerStateGroupDataGridService>();
+            serviceCollection.AddScoped<IViewerTableService, ViewerActionEventTableService>();
+            serviceCollection.AddScoped<IViewerTableService, ViewerDialogueEventTableService>();
+            serviceCollection.AddScoped<IViewerTableService, ViewerStateGroupTableService>();
 
             // Waveform Visualiser services
             //serviceCollection.AddSingleton<IWaveformRenderingService, WaveformRenderingService>();

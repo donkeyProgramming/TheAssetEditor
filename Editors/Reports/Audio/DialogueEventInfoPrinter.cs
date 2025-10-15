@@ -1,5 +1,5 @@
-﻿using Editors.Audio.GameInformation.Warhammer3;
-using Editors.Audio.Storage;
+﻿using Editors.Audio.Shared.GameInformation.Warhammer3;
+using Editors.Audio.Shared.Storage;
 using Shared.Core.Events;
 using Shared.Core.Misc;
 using Shared.GameFormats.Wwise.Hirc;

@@ -14,12 +14,12 @@
     d:DesignHeight="450" d:DesignWidth="800">
 
     <UserControl.Resources>
-        <converters:SettingsEnumConverter 
-            x:Key="SettingsEnumConverter"/>
+        <converters:EnumConverter 
+            x:Key="EnumConverter"/>
         <DataTemplate 
             x:Key="EnumToStringTemplate">
             <TextBlock 
-                Text="{Binding Converter={StaticResource SettingsEnumConverter}}"/>
+                Text="{Binding Converter={StaticResource EnumConverter}}"/>
         </DataTemplate>
     </UserControl.Resources>
 

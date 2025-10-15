@@ -1,4 +1,4 @@
-﻿using Editors.Audio.AudioEditor.AudioProjectExplorer;
+﻿using Editors.Audio.AudioEditor.Presentation.Shared;
 
 namespace Editors.Audio.AudioEditor.Events
 {

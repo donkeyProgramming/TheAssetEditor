@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Windows.Data;
 using System.Windows.Media.Imaging;
-using Editors.Audio.AudioEditor.AudioFilesExplorer;
 using Shared.EmbeddedResources;
+using Editors.Audio.AudioEditor.Presentation.Shared;
 
 namespace Editors.Audio.Shared.UI.Converters
 {

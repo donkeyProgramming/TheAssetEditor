@@ -6,12 +6,13 @@ using System.Windows.Forms;
 using System.Xml.Linq;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using Editors.Audio.AudioEditor;
-using Editors.Audio.AudioEditor.Models;
-using Editors.Audio.AudioProjectCompiler;
-using Editors.Audio.GameInformation.Warhammer3;
-using Editors.Audio.Storage;
-using Editors.Audio.Utility;
+using Editors.Audio.AudioEditor.Core;
+using Editors.Audio.Shared.AudioProject.Compiler;
+using Editors.Audio.Shared.AudioProject.Models;
+using Editors.Audio.Shared.GameInformation.Warhammer3;
+using Editors.Audio.Shared.Storage;
+using Editors.Audio.Shared.Utilities;
+using Editors.Audio.Shared.Wwise;
 using Serilog;
 using Shared.Core.ErrorHandling;
 using Shared.Core.Misc;
@@ -25,21 +26,6 @@ using Shared.GameFormats.Wwise.Hirc;
 
 namespace Editors.Audio.AudioProjectConverter
 {
-    public class WavFile
-    {
-        public string FileName { get; set; }
-        public string FilePath { get; set; }
-        public uint WemId { get; set; }
-        public string DialogueEvent { get; set; }
-    }
-
-    public class StatePathInfo
-    {
-        public string JoinedStatePath { get; set; }
-        public List<StatePath.Node> StatePathNodes { get; set; }
-        public List<WavFile> WavFiles { get; set; }
-    }
-
     public partial class AudioProjectConverterViewModel : ObservableObject
     {
         private readonly IStandardDialogs _standardDialogs;
@@ -94,7 +80,7 @@ namespace Editors.Audio.AudioProjectConverter
             var fileName = $"{AudioProjectName}.aproj";
             var filePath = $"{OutputDirectoryPath}\\{fileName}";
             var language = "english(uk)";
-            var audioProject = AudioProject.Create(currentGame, language, AudioProjectName);
+            var audioProject = AudioProjectFile.Create(currentGame, language, AudioProjectName);
 
             var soundBankPaths = new List<string>();
             if (Directory.Exists(BnksDirectoryPath))
@@ -410,7 +396,7 @@ namespace Editors.Audio.AudioProjectConverter
         }
 
         private void ProcessDialogueEvent(
-            AudioProject audioProject,
+            AudioProjectFile audioProject,
             ICAkDialogueEvent dialogueEvent,
             Dictionary<uint, List<string>> dialogueEventsLookupByWemId,
             Dictionary<string, List<StatePathInfo>> statePathsLookupByDialogueEvent,
@@ -519,7 +505,7 @@ namespace Editors.Audio.AudioProjectConverter
         }
 
         private void ProcessWavFiles(
-            AudioProject audioProject,
+            AudioProjectFile audioProject,
             List<WavFile> statePathWavs,
             List<AudioFile> audioFiles,
             Dictionary<uint, List<string>> dialogueEventsLookupByWemId,
@@ -569,7 +555,7 @@ namespace Editors.Audio.AudioProjectConverter
             }
         }
 
-        private static void ProcessModdedStateGroups(AudioProject audioProject, Dictionary<string, List<string>> moddedStateGroups)
+        private static void ProcessModdedStateGroups(AudioProjectFile audioProject, Dictionary<string, List<string>> moddedStateGroups)
         {
             foreach (var moddedStateGroup in moddedStateGroups)
             {
