@@ -1,7 +1,6 @@
 ﻿using System.Linq;
 using Editors.Audio.AudioExplorer;
 using Editors.Audio.Shared.Storage;
-using Editors.Audio.Shared.Utilities;
 using Shared.GameFormats.Wwise.Enums;
 using Shared.GameFormats.Wwise.Hirc;
 using Shared.GameFormats.Wwise.Hirc.V136;
@@ -66,9 +65,9 @@ namespace Editors.Audio.Shared.Wwise
             {
                 var stateGroupId = actionHirc.GetStateGroupId();
                 var musicSwitches = _audioRepository.HircsById
-                   .SelectMany(x => x.Value)
-                   .Where(X => X.HircType == AkBkHircType.Music_Switch)
-                   .DistinctBy(x => x.Id)
+                   .SelectMany(kvp => kvp.Value)
+                   .Where(hirc => hirc.HircType == AkBkHircType.Music_Switch)
+                   .DistinctBy(hirc => hirc.Id)
                    .Cast<CAkMusicSwitchCntr_V136>()
                    .ToList();
 
@@ -80,9 +79,9 @@ namespace Editors.Audio.Shared.Wwise
                 }
 
                 var normalSwitches = _audioRepository.HircsById
-                   .SelectMany(x => x.Value)
-                   .Where(X => X.HircType == AkBkHircType.SwitchContainer)
-                   .DistinctBy(x => x.Id)
+                   .SelectMany(kvp => kvp.Value)
+                   .Where(hirc => hirc.HircType == AkBkHircType.SwitchContainer)
+                   .DistinctBy(hirc => hirc.Id)
                    .Cast<CAkSwitchCntr_V136>()
                    .ToList();
 
@@ -97,7 +96,7 @@ namespace Editors.Audio.Shared.Wwise
         {
             var soundHirc = GetAsType<ICAkSound>(item);
 
-            string displayName = soundHirc.GetStreamType() == AKBKSourceType.Data_BNK
+            var displayName = soundHirc.GetStreamType() == AKBKSourceType.Data_BNK
                 ? $"Sound {soundHirc.GetSourceId()}.wem (stream type: {soundHirc.GetStreamType()})"
                 : $"Sound {soundHirc.GetSourceId()}.wem";
 
@@ -108,7 +107,7 @@ namespace Editors.Audio.Shared.Wwise
         public void ProcessActorMixer(HircItem item, HircTreeItem parent)
         {
             var actorMixer = GetAsType<ICAkActorMixer>(item);
-            var actorMixerNode = new HircTreeItem() { DisplayName = $"ActorMixer {_audioRepository.GetNameFromId(item.Id)}", Item = item };
+            var actorMixerNode = new HircTreeItem() { DisplayName = $"Actor Mixer {_audioRepository.GetNameFromId(item.Id)}", Item = item };
             parent.Children.Add(actorMixerNode);
 
             ProcessNext(actorMixer.GetChildren(), actorMixerNode);
@@ -119,13 +118,13 @@ namespace Editors.Audio.Shared.Wwise
             var switchControl = GetAsType<ICAkSwitchCntr>(item);
             var switchType = _audioRepository.GetNameFromId(switchControl.GroupId);
             var defaultValue = _audioRepository.GetNameFromId(switchControl.DefaultSwitch);
-            var switchControlNode = new HircTreeItem() { DisplayName = $"Switch {switchType} DefaultValue: {defaultValue}", Item = item };
+            var switchControlNode = new HircTreeItem() { DisplayName = $"Switch {switchType} Default Value: {defaultValue}", Item = item };
             parent.Children.Add(switchControlNode);
 
             foreach (var switchCase in switchControl.SwitchList)
             {
                 var switchValue = _audioRepository.GetNameFromId(switchCase.SwitchId);
-                var switchValueNode = new HircTreeItem() { DisplayName = $"SwitchValue: {switchValue}", Item = item, IsMetaNode = true };
+                var switchValueNode = new HircTreeItem() { DisplayName = $"Switch Value: {switchValue}", Item = item, IsMetaNode = true };
                 switchControlNode.Children.Add(switchValueNode);
 
                 ProcessNext(switchCase.NodeIdList, switchValueNode);
@@ -145,7 +144,7 @@ namespace Editors.Audio.Shared.Wwise
         private void ProcessSequenceContainer(HircItem item, HircTreeItem parent)
         {
             var layerContainer = GetAsType<ICAkRanSeqCntr>(item);
-            var layerNode = new HircTreeItem() { DisplayName = $"Rand Container", Item = item };
+            var layerNode = new HircTreeItem() { DisplayName = $"Random Sequence Container", Item = item };
             parent.Children.Add(layerNode);
 
             ProcessNext(layerContainer.GetChildren(), layerNode);
@@ -193,7 +192,7 @@ namespace Editors.Audio.Shared.Wwise
         private void ProcessRandMusicContainer(HircItem item, HircTreeItem parent)
         {
             var hirc = GetAsType<CAkMusicRanSeqCntr_V136>(item);
-            var node = new HircTreeItem() { DisplayName = $"Music Rand Container", Item = item };
+            var node = new HircTreeItem() { DisplayName = $"Music Random Container", Item = item };
             parent.Children.Add(node);
 
             if (hirc.PlayList.Count != 0)

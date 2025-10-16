@@ -45,8 +45,8 @@
             </Grid.RowDefinitions>
 
             <Label 
-                 Grid.Row="0"
-                 Content="{Binding AudioProjectExplorerLabel}"/>
+                Grid.Row="0"
+                Content="{Binding AudioProjectExplorerLabel}"/>
 
             <Grid 
                 Grid.Row="1" 

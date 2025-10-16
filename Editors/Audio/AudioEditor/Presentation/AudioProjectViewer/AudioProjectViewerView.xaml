@@ -70,7 +70,6 @@
         <DataGrid 
             Grid.Row="2"
             x:Name="AudioProjectEditorDataGrid"
-            Tag="{Binding DataGridTag}" 
             AutoGenerateColumns="False" 
             VerticalScrollBarVisibility="Auto" 
             SelectionChanged="OnDataGridSelectionChanged"

@@ -1,42 +1,39 @@
 ﻿using System.IO;
-using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Windows;
 using Editors.Audio.AudioEditor.Events;
+using Editors.Audio.Shared.AudioProject;
 using Editors.Audio.Shared.AudioProject.Models;
 using Editors.Audio.Shared.GameInformation.Warhammer3;
 using Editors.Audio.Shared.Storage;
 using Shared.Core.Events;
 using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
-using Shared.Core.Services;
 using Shared.Core.Settings;
 
 namespace Editors.Audio.AudioEditor.Core
 {
-    public interface IAudioProjectFileService
+    public interface IAudioEditorFileService
     {
         void Save(AudioProjectFile audioProject, string fileName, string filePath);
+        void Load(AudioProjectFile audioProject, string fileName, string filePath, bool isNotLoadedFromDialog = true);
         void LoadFromDialog();
-        void Load(string fileName, string filePath);
     }
 
-    public class AudioProjectFileService(
+    public class AudioEditorFileService(
         IEventHub eventHub,
+        IAudioProjectFileService audioProjectFileService,
         IAudioEditorStateService audioEditorStateService,
-        IPackFileService packFileService,
         IFileSaveService fileSaveService,
-        IStandardDialogs standardDialogs,
         IAudioRepository audioRepository,
         IAudioEditorIntegrityService audioEditorIntegrityService,
-        ApplicationSettingsService applicationSettingsService) : IAudioProjectFileService
+        ApplicationSettingsService applicationSettingsService) : IAudioEditorFileService
     {
         private readonly IEventHub _eventHub = eventHub;
+        private readonly IAudioProjectFileService _audioProjectFileService = audioProjectFileService;
         private readonly IAudioEditorStateService _audioEditorStateService = audioEditorStateService;
-        private readonly IPackFileService _packFileService = packFileService;
         private readonly IFileSaveService _fileSaveService = fileSaveService;
-        private readonly IStandardDialogs _standardDialogs = standardDialogs;
         private readonly IAudioRepository _audioRepository = audioRepository;
         private readonly IAudioEditorIntegrityService _audioEditorIntegrityService = audioEditorIntegrityService;
         private readonly ApplicationSettingsService _applicationSettingsService = applicationSettingsService;
@@ -58,16 +55,11 @@ namespace Editors.Audio.AudioEditor.Core
 
         public void LoadFromDialog()
         {
-            var result = _standardDialogs.DisplayBrowseDialog([".aproj"]);
-            if (result.Result)
-            {
-                var filePath = _packFileService.GetFullPath(result.File);
-                var fileName = Path.GetFileName(filePath);
-                Load(fileName, filePath);
-            }
+            var result = _audioProjectFileService.LoadFromDialog();
+            Load(result.AudioProject, result.FileName, result.FilePath, false);
         }
 
-        public void Load(string fileName, string filePath)
+        public void Load(AudioProjectFile audioProject, string fileName, string filePath, bool isNotLoadedFromDialog = true)
         {
             if (fileName.Contains(' '))
             {
@@ -75,11 +67,13 @@ namespace Editors.Audio.AudioEditor.Core
                 return;
             }
 
+            if (isNotLoadedFromDialog)
+            {
+                var result = _audioProjectFileService.Load(fileName, filePath);
+                audioProject = result.AudioProject;
+            }
+
             var fileNameWithoutExtension = Path.GetFileNameWithoutExtension(fileName);
-            var packFile = _packFileService.FindFile(filePath);
-            var bytes = packFile.DataSource.ReadData();
-            var audioProjectJson = Encoding.UTF8.GetString(bytes);
-            var audioProject = JsonSerializer.Deserialize<AudioProjectFile>(audioProjectJson);
 
             // We create a 'dirty' Audio Project to display the whole model in the Audio Project Explorer rather than
             // just the clean data from the loaded Audio Project as when it's saved any unused parts are removed.

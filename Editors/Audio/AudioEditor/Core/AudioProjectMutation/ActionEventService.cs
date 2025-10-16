@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using Editors.Audio.AudioEditor.Core;
 using Editors.Audio.Shared.AudioProject.Factories;
 using Editors.Audio.Shared.AudioProject.Models;
 using Editors.Audio.Shared.GameInformation.Warhammer3;
@@ -48,7 +47,7 @@ namespace Editors.Audio.AudioEditor.Core.AudioProjectMutation
 
             var actionEventType = Wh3ActionEventInformation.GetActionEventType(actionEventTypeName);
             var playActionEventResult = _actionEventFactory.CreatePlayActionEvent(usedHircIds, usedSourceIds, actionEventType, actionEventName, audioFiles, audioSettings, soundBank.Id, soundBank.Language);
-            soundBank.InsertAlphabetically(playActionEventResult.ActionEvent);
+            soundBank.ActionEvents.InsertAlphabetically(playActionEventResult.ActionEvent);
 
             if (playActionEventResult.Actions.Count > 1)
                 throw new NotSupportedException("Multiple Actions are not supported.");
@@ -56,7 +55,7 @@ namespace Editors.Audio.AudioEditor.Core.AudioProjectMutation
             var action = playActionEventResult.Actions.FirstOrDefault();
             if (action.TargetHircTypeIsSound())
             {
-                soundBank.Sounds.Add(playActionEventResult.SoundTarget);
+                soundBank.Sounds.TryAdd(playActionEventResult.SoundTarget);
 
                 var audioFile = audioProject.GetAudioFile(playActionEventResult.SoundTarget.SourceId);
                 if (audioFile == null)
@@ -70,7 +69,7 @@ namespace Editors.Audio.AudioEditor.Core.AudioProjectMutation
             }
             else if (action.TargetHircTypeIsRandomSequenceContainer())
             {
-                soundBank.RandomSequenceContainers.Add(playActionEventResult.RandomSequenceContainerTarget);
+                soundBank.RandomSequenceContainers.TryAdd(playActionEventResult.RandomSequenceContainerTarget);
                 soundBank.Sounds.AddRange(playActionEventResult.RandomSequenceContainerSounds);
 
                 foreach (var sound in playActionEventResult.RandomSequenceContainerSounds)
@@ -90,13 +89,13 @@ namespace Editors.Audio.AudioEditor.Core.AudioProjectMutation
             if (soundBank.GameSoundBank == Wh3SoundBank.GlobalMusic)
             {
                 var pauseActionEventResult = _actionEventFactory.CreatePauseActionEvent(usedHircIds, playActionEventResult.ActionEvent);
-                soundBank.InsertAlphabetically(pauseActionEventResult.ActionEvent);
+                soundBank.ActionEvents.InsertAlphabetically(pauseActionEventResult.ActionEvent);
 
                 var resumeActionEventResult = _actionEventFactory.CreateResumeActionEvent(usedHircIds, playActionEventResult.ActionEvent);
-                soundBank.InsertAlphabetically(resumeActionEventResult.ActionEvent);
+                soundBank.ActionEvents.InsertAlphabetically(resumeActionEventResult.ActionEvent);
 
                 var stopActionEventResult = _actionEventFactory.CreateStopActionEvent(usedHircIds, playActionEventResult.ActionEvent);
-                soundBank.InsertAlphabetically(stopActionEventResult.ActionEvent);
+                soundBank.ActionEvents.InsertAlphabetically(stopActionEventResult.ActionEvent);
             }
         }
 

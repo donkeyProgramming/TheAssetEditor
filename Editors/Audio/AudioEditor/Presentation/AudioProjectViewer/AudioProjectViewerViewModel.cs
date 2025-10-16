@@ -60,7 +60,6 @@ namespace Editors.Audio.AudioEditor.Presentation.AudioProjectViewer
             _audioRepository = audioRepository;
 
             ViewerLabel = $"Audio Project Viewer";
-            DataGridTag = TableInfo.ViewerDataGridTag;
 
             _eventHub.Register<AudioProjectInitialisedEvent>(this, OnAudioProjectInitialised);
             _eventHub.Register<AudioProjectExplorerNodeSelectedEvent>(this, OnAudioProjectExplorerNodeSelected);

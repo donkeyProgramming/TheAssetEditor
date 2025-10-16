@@ -4,23 +4,6 @@ using System.Linq;
 
 namespace Editors.Audio.Shared.AudioProject.Models
 {
-    public static class AudioFileListExtensions
-    {
-        public static void TryAdd(this List<AudioFile> audioFiles, AudioFile audioFile)
-        {
-            ArgumentNullException.ThrowIfNull(audioFiles);
-            ArgumentNullException.ThrowIfNull(audioFile);
-
-            if (audioFiles.Any(x => x.Id == audioFile.Id))
-                throw new ArgumentException($"Cannot add AudioFile with Id {audioFile.Id} as it already exists.");
-
-            var i = audioFiles.BinarySearch(audioFile, AudioFile.WavPackFileNameComparer);
-            if (i < 0) 
-                i = ~i;
-            audioFiles.Insert(i, audioFile);
-        }
-    }
-
     public partial class AudioFile : AudioProjectItem
     {
         public string WavPackFileName { get; set; }
@@ -40,8 +23,11 @@ namespace Editors.Audio.Shared.AudioProject.Models
                 WavPackFilePath = filePath
             };
         }
+    }
 
-        public static readonly IComparer<AudioFile> WavPackFileNameComparer = new FileNameComparer();
+    public static class AudioFileListExtensions
+    {
+        private static readonly IComparer<AudioFile> s_wavPackFileNameComparer = new FileNameComparer();
 
         private sealed class FileNameComparer : IComparer<AudioFile>
         {
@@ -51,6 +37,21 @@ namespace Editors.Audio.Shared.AudioProject.Models
                 var rightName = right?.WavPackFileName ?? string.Empty;
                 return StringComparer.OrdinalIgnoreCase.Compare(leftName, rightName);
             }
+        }
+
+        public static void TryAdd(this List<AudioFile> audioFiles, AudioFile audioFile)
+        {
+            ArgumentNullException.ThrowIfNull(audioFiles);
+            ArgumentNullException.ThrowIfNull(audioFile);
+
+            if (audioFiles.Any(x => x.Id == audioFile.Id))
+                throw new ArgumentException($"Cannot add AudioFile with Id {audioFile.Id} as it already exists.");
+
+            var index = audioFiles.BinarySearch(audioFile, s_wavPackFileNameComparer);
+            if (index < 0)
+                index = ~index;
+
+            audioFiles.Insert(index, audioFile);
         }
     }
 }

@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using Editors.Audio.Shared.GameInformation.Warhammer3;
 using Editors.Audio.Shared.Wwise;
@@ -79,31 +78,5 @@ namespace Editors.Audio.Shared.AudioProject.Models
         }
 
         public RandomSequenceContainer GetRandomSequenceContainer(uint id) => RandomSequenceContainers.FirstOrDefault(randomSequenceContainer => randomSequenceContainer.Id == id);
-
-        public void InsertAlphabetically(ActionEvent actionEvent)
-        {
-            if (actionEvent == null) 
-                return;
-
-            ActionEvents ??= [];
-
-            var index = ActionEvents.BinarySearch(actionEvent, ActionEventNameComparer.Instance);
-            if (index >= 0) 
-                return;
-
-            ActionEvents.Insert(~index, actionEvent);
-        }
-
-        private sealed class ActionEventNameComparer : IComparer<ActionEvent>
-        {
-            public static readonly ActionEventNameComparer Instance = new();
-            
-            public int Compare(ActionEvent left, ActionEvent right)
-            {
-                var leftName = left?.Name ?? string.Empty;
-                var rightName = right?.Name ?? string.Empty;
-                return StringComparer.OrdinalIgnoreCase.Compare(leftName, rightName);
-            }
-        }
     }
 }

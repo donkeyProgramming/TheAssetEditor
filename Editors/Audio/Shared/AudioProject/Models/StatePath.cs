@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Shared.GameFormats.Wwise.Enums;
 
@@ -55,6 +56,36 @@ namespace Editors.Audio.Shared.AudioProject.Models
                     State = state
                 };
             }
+        }
+    }
+
+    public static class StatePathListExtensions
+    {
+        private static readonly IComparer<StatePath> s_nameComparerIgnoreCase = new NameComparer();
+
+        private sealed class NameComparer : IComparer<StatePath>
+        {
+            public int Compare(StatePath left, StatePath right)
+            {
+                var leftName = left?.Name ?? string.Empty;
+                var rightName = right?.Name ?? string.Empty;
+                return StringComparer.OrdinalIgnoreCase.Compare(leftName, rightName);
+            }
+        }
+
+        public static void InsertAlphabetically(this List<StatePath> statePaths, StatePath statePath)
+        {
+            ArgumentNullException.ThrowIfNull(statePaths);
+            ArgumentNullException.ThrowIfNull(statePath);
+
+            if (statePaths.Any(statePath => StringComparer.OrdinalIgnoreCase.Equals(statePath?.Name ?? string.Empty, statePath.Name ?? string.Empty)))
+                throw new ArgumentException($"Cannot add StatePath with Name {statePath.Name} as it already exists.");
+
+            var index = statePaths.BinarySearch(statePath, s_nameComparerIgnoreCase);
+            if (index < 0)
+                index = ~index;
+
+            statePaths.Insert(index, statePath);
         }
     }
 }

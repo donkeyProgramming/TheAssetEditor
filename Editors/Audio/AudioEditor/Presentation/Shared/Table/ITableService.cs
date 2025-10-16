@@ -1,7 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Data;
-using Editors.Audio.AudioEditor.Presentation.AudioProjectExplorer;
-using Editors.Audio.AudioEditor.Presentation.Shared;
 
 namespace Editors.Audio.AudioEditor.Presentation.Shared.Table
 {
@@ -16,5 +14,6 @@ namespace Editors.Audio.AudioEditor.Presentation.Shared.Table
     }
 
     public interface IEditorTableService : ITableService { }
+
     public interface IViewerTableService : ITableService { }
 }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
+using System.IO;
 using System.Linq;
 using Editors.Audio.Shared.GameInformation.Warhammer3;
 using Shared.Core.Settings;
@@ -35,6 +36,57 @@ namespace Editors.Audio.Shared.AudioProject.Models
             MergeCleanIntoDirtySoundBanks(dirtyAudioProject.SoundBanks, cleanAudioProject.SoundBanks);
             AddCleanToDirtyStateGroups(dirtyAudioProject.StateGroups, cleanAudioProject.StateGroups);
             return dirtyAudioProject;
+        }
+
+        public void Merge(AudioProjectFile mergingAudioProject, string baseAudioProjectFileName, string mergingAudioProjectFileName)
+        {
+            foreach (var mergingSoundBank in mergingAudioProject.SoundBanks)
+            {
+                if (mergingSoundBank == null)
+                    continue;
+
+                var baseAudioProjectFileNameWithoutExtension = Path.GetFileNameWithoutExtension(baseAudioProjectFileName);
+                var mergingAudioProjectFileNameWithoutExtension = Path.GetFileNameWithoutExtension(mergingAudioProjectFileName);
+                var mergingSoundBankBaseName = mergingSoundBank.Name.Replace($"_{mergingAudioProjectFileNameWithoutExtension}", string.Empty);
+                var baseSoundBank = SoundBanks.FirstOrDefault(soundBank => soundBank.Name.Replace($"_{baseAudioProjectFileNameWithoutExtension}", string.Empty) == mergingSoundBankBaseName);
+
+                if (baseSoundBank != null)
+                {
+                    foreach (var mergingDialogueEvent in mergingSoundBank.DialogueEvents)
+                    {
+                        var baseDialogueEvent = baseSoundBank.DialogueEvents.FirstOrDefault(dialogueEvent => dialogueEvent.Name == mergingDialogueEvent.Name);
+                        if (baseDialogueEvent != null)
+                        {
+                            baseDialogueEvent.StatePaths.AddRange(baseDialogueEvent.StatePaths);
+                            var sortedStatePaths = baseDialogueEvent.StatePaths
+                                .OrderBy(statePath => statePath.Name, StringComparer.OrdinalIgnoreCase)
+                                .ToList();
+                            baseDialogueEvent.StatePaths.Clear();
+                            baseDialogueEvent.StatePaths.AddRange(sortedStatePaths);
+                            baseSoundBank.DialogueEvents.Add(mergingDialogueEvent);
+                        }
+                        else
+                            baseSoundBank.DialogueEvents.Add(mergingDialogueEvent);
+                    }
+
+                    foreach (var mergingActionEvent in mergingSoundBank.ActionEvents)
+                        baseSoundBank.ActionEvents.Add(mergingActionEvent);
+
+                    var sortedActionEvents = baseSoundBank.ActionEvents
+                        .OrderBy(actionEvent => actionEvent.Name, StringComparer.OrdinalIgnoreCase)
+                        .ToList();
+                    baseSoundBank.ActionEvents.Clear();
+                    baseSoundBank.ActionEvents.AddRange(sortedActionEvents);
+                }
+
+                var baseSoundBankIds = GetSoundBankSoundIds(baseSoundBank.Name);
+
+                foreach (var sound in mergingSoundBank.Sounds)
+                    baseSoundBank.Sounds.TryAdd(sound);
+
+                foreach (var randomSequenceContainer in mergingSoundBank.RandomSequenceContainers)
+                    baseSoundBank.RandomSequenceContainers.TryAdd(randomSequenceContainer);
+            }
         }
 
         public static AudioProjectFile Clean(AudioProjectFile audioProject)
@@ -114,6 +166,11 @@ namespace Editors.Audio.Shared.AudioProject.Models
                 .ToList();
         }
 
+        public HashSet<uint> GetSoundBankSoundIds(string soundBankName)
+        {
+            var soundBank = SoundBanks.FirstOrDefault(soundBank => soundBank.Name == soundBankName);
+            return soundBank.Sounds.Select(sound => sound.Id).ToHashSet();
+        }
 
         public HashSet<uint> GetAudioFileIds() => AudioFiles.Select(audioFile => audioFile.Id).ToHashSet();
 

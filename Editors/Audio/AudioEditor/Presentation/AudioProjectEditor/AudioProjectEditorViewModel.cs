@@ -56,7 +56,6 @@ namespace Editors.Audio.AudioEditor.Presentation.AudioProjectEditor
             _audioRepository = audioRepository;
 
             EditorLabel = $"Audio Project Editor";
-            DataGridTag = TableInfo.EditorDataGridTag;
 
             _eventHub.Register<AudioProjectInitialisedEvent>(this, OnAudioProjectInitialised);
             _eventHub.Register<AudioProjectExplorerNodeSelectedEvent>(this, OnAudioProjectExplorerNodeSelected);

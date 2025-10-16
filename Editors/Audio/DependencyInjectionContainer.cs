@@ -16,7 +16,9 @@ using Editors.Audio.AudioEditor.Presentation.Shared.Table;
 using Editors.Audio.AudioEditor.Presentation.WaveformVisualiser;
 using Editors.Audio.AudioExplorer;
 using Editors.Audio.AudioProjectConverter;
+using Editors.Audio.AudioProjectMerger;
 using Editors.Audio.DialogueEventMerger;
+using Editors.Audio.Shared.AudioProject;
 using Editors.Audio.Shared.AudioProject.Compiler;
 using Editors.Audio.Shared.AudioProject.Factories;
 using Editors.Audio.Shared.Dat;
@@ -37,7 +39,7 @@ namespace Editors.Audio
         {
             // Audio Editor stuff
             serviceCollection.AddScoped<IAudioEditorStateService, AudioEditorStateService>();
-            serviceCollection.AddScoped<IAudioProjectFileService, AudioProjectFileService>();
+            serviceCollection.AddScoped<IAudioEditorFileService, AudioEditorFileService>();
             serviceCollection.AddScoped<IAudioEditorIntegrityService, AudioEditorIntegrityService>();
 
             // Audio Editor View Models
@@ -53,25 +55,30 @@ namespace Editors.Audio
             serviceCollection.AddTransient<NewAudioProjectViewModel>();
             serviceCollection.AddTransient<NewAudioProjectWindow>();
 
-            // Audio Project Converter tool
-            serviceCollection.AddTransient<AudioProjectConverterViewModel>();
-            serviceCollection.AddTransient<AudioProjectConverterWindow>();
+            // Audio Project Merger
+            serviceCollection.AddTransient<AudioProjectMergerViewModel>();
+            serviceCollection.AddTransient<AudioProjectMergerWindow>();
 
-            // Dialogue Event Merger tool
+            // Dialogue Event Merger
             serviceCollection.AddTransient<DialogueEventMergerViewModel>();
             serviceCollection.AddTransient<DialogueEventMergerWindow>();
 
+            // Audio Project Converter
+            serviceCollection.AddTransient<AudioProjectConverterViewModel>();
+            serviceCollection.AddTransient<AudioProjectConverterWindow>();
+
             // Audio Editor Commands
+            serviceCollection.AddScoped<AddEditorRowToViewerCommand>();
+            serviceCollection.AddScoped<EditViewerRowCommand>();
+            serviceCollection.AddScoped<OpenAudioProjectConverterWindowCommand>();
+            serviceCollection.AddScoped<OpenAudioProjectMergerWindowCommand>();
+            serviceCollection.AddScoped<OpenDialogueEventMergerWindowCommand>();
             serviceCollection.AddScoped<OpenMovieFileSelectionWindowCommand>();
             serviceCollection.AddScoped<OpenNewAudioProjectWindowCommand>();
-            serviceCollection.AddScoped<OpenAudioProjectConverterWindowCommand>();
-            serviceCollection.AddScoped<OpenDialogueEventMergerWindowCommand>();
-            serviceCollection.AddScoped<SetAudioFilesCommand>();
-            serviceCollection.AddScoped<PlayAudioFileCommand>();
-            serviceCollection.AddScoped<AddEditorRowToViewerCommand>();
-            serviceCollection.AddScoped<RemoveViewerRowsCommand>();
-            serviceCollection.AddScoped<EditViewerRowCommand>();
             serviceCollection.AddScoped<PasteViewerRowsCommand>();
+            serviceCollection.AddScoped<PlayAudioFileCommand>();
+            serviceCollection.AddScoped<RemoveViewerRowsCommand>();
+            serviceCollection.AddScoped<SetAudioFilesCommand>();
             serviceCollection.AddScoped<IAudioProjectMutationUICommandFactory, AudioProjectMutationUICommandFactory>();
             RegisterAllAsInterface<IAudioProjectMutationUICommand>(serviceCollection, ServiceLifetime.Transient);
 
@@ -99,7 +106,8 @@ namespace Editors.Audio
             //serviceCollection.AddSingleton<IWaveformRenderingService, WaveformRenderingService>();
             //serviceCollection.AddSingleton<IAudioPlayerService, AudioPlayerService>();
 
-            // Audio Project mutation
+            // Audio Project
+            serviceCollection.AddScoped<IAudioProjectFileService, AudioProjectFileService>();
             serviceCollection.AddSingleton<ISoundFactory, SoundFactory>();
             serviceCollection.AddSingleton<IRandomSequenceContainerFactory, RandomSequenceContainerFactory>();
             serviceCollection.AddSingleton<IActionEventFactory, ActionEventFactory>();

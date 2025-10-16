@@ -1,19 +1,19 @@
 ﻿using System.Windows.Input;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Editors.Audio.AudioEditor.Commands;
+using Editors.Audio.AudioEditor.Core;
+using Editors.Audio.AudioEditor.Events;
+using Editors.Audio.AudioEditor.Presentation.AudioFilesExplorer;
 using Editors.Audio.AudioEditor.Presentation.AudioProjectEditor;
 using Editors.Audio.AudioEditor.Presentation.AudioProjectExplorer;
 using Editors.Audio.AudioEditor.Presentation.AudioProjectViewer;
-using Editors.Audio.AudioEditor.Commands;
-using Editors.Audio.AudioEditor.Events;
 using Editors.Audio.AudioEditor.Presentation.HircSettings;
 using Editors.Audio.AudioEditor.Presentation.WaveformVisualiser;
 using Editors.Audio.Shared.AudioProject.Compiler;
 using Editors.Audio.Shared.AudioProject.Models;
 using Shared.Core.Events;
 using Shared.Core.ToolCreation;
-using Editors.Audio.AudioEditor.Presentation.AudioFilesExplorer;
-using Editors.Audio.AudioEditor.Core;
 
 namespace Editors.Audio.AudioEditor
 {
@@ -23,7 +23,7 @@ namespace Editors.Audio.AudioEditor
         IUiCommandFactory uiCommandFactory,
         IEventHub eventHub,
         IAudioEditorStateService audioEditorStateService,
-        IAudioProjectFileService audioProjectFileService,
+        IAudioEditorFileService audioEditorFileService,
         IAudioProjectCompilerService audioProjectCompilerService,
         AudioProjectExplorerViewModel audioProjectExplorerViewModel,
         AudioFilesExplorerViewModel audioFilesExplorerViewModel,
@@ -35,7 +35,7 @@ namespace Editors.Audio.AudioEditor
         private readonly IUiCommandFactory _uiCommandFactory = uiCommandFactory;
         private readonly IEventHub _eventHub = eventHub;
         private readonly IAudioEditorStateService _audioEditorStateService = audioEditorStateService;
-        private readonly IAudioProjectFileService _audioProjectFileService = audioProjectFileService;
+        private readonly IAudioEditorFileService _audioEditorFileService = audioEditorFileService;
         private readonly IAudioProjectCompilerService _audioProjectCompilerService = audioProjectCompilerService;
 
         public AudioProjectExplorerViewModel AudioProjectExplorerViewModel { get; } = audioProjectExplorerViewModel;
@@ -57,10 +57,10 @@ namespace Editors.Audio.AudioEditor
             var audioProject = _audioEditorStateService.AudioProject;
             var fileName = _audioEditorStateService.AudioProjectFileName;
             var filePath = _audioEditorStateService.AudioProjectFilePath;
-            _audioProjectFileService.Save(audioProject, fileName, filePath);
+            _audioEditorFileService.Save(audioProject, fileName, filePath);
         }
 
-        [RelayCommand] public void LoadAudioProject() => _audioProjectFileService.LoadFromDialog();
+        [RelayCommand] public void LoadAudioProject() => _audioEditorFileService.LoadFromDialog();
 
         [RelayCommand] public void CompileAudioProject()
         {
@@ -78,6 +78,8 @@ namespace Editors.Audio.AudioEditor
         }
 
         [RelayCommand] public void OpenDialogueEventMerger() => _uiCommandFactory.Create<OpenDialogueEventMergerWindowCommand>().Execute();
+
+        [RelayCommand] public void OpenAudioProjectMerger() => _uiCommandFactory.Create<OpenAudioProjectMergerWindowCommand>().Execute();
 
         [RelayCommand] public void OpenAudioProjectConverter() => _uiCommandFactory.Create<OpenAudioProjectConverterWindowCommand>().Execute();
 

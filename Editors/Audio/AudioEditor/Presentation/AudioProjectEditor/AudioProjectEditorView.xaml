@@ -68,8 +68,7 @@
         
         <!-- Setting CanUserAddRows to false ensures that data won't go missing from the last row when a new row is added. Wtf WPF. -->
         <DataGrid 
-            Grid.Row="2" 
-            Tag="{Binding DataGridTag}" 
+            Grid.Row="2"
             Margin="0, 0, 0, 0"
             AutoGenerateColumns="True"
             Behaviors:DataGridColumnsBehavior.Columns ="{Binding DataGridColumns}"

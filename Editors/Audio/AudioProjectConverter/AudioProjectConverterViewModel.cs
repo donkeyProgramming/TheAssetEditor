@@ -31,7 +31,7 @@ namespace Editors.Audio.AudioProjectConverter
         private readonly IStandardDialogs _standardDialogs;
         private readonly IFileSaveService _fileSaveService;
         private readonly IAudioRepository _audioRepository;
-        private readonly IAudioProjectFileService _audioProjectFileService;
+        private readonly IAudioEditorFileService _audioEditorFileService;
         private readonly ApplicationSettingsService _applicationSettingsService;
         private readonly VgStreamWrapper _vgStreamWrapper;
 
@@ -58,14 +58,14 @@ namespace Editors.Audio.AudioProjectConverter
             IStandardDialogs standardDialogs,
             IFileSaveService fileSaveService,
             IAudioRepository audioRepository,
-            IAudioProjectFileService audioProjectFileService,
+            IAudioEditorFileService audioEditorFileService,
             ApplicationSettingsService applicationSettingsService,
             VgStreamWrapper vgStreamWrapper)
         {
             _standardDialogs = standardDialogs;
             _fileSaveService = fileSaveService;
             _audioRepository = audioRepository;
-            _audioProjectFileService = audioProjectFileService;
+            _audioEditorFileService = audioEditorFileService;
             _applicationSettingsService = applicationSettingsService;
             _vgStreamWrapper = vgStreamWrapper;
 
@@ -137,7 +137,7 @@ namespace Editors.Audio.AudioProjectConverter
 
             ProcessModdedStateGroups(audioProject, moddedStateGroups);
 
-            _audioProjectFileService.Save(audioProject, fileName, filePath);
+            _audioEditorFileService.Save(audioProject, fileName, filePath);
 
             CloseWindowAction();
         }
@@ -467,7 +467,7 @@ namespace Editors.Audio.AudioProjectConverter
                         usedHircIds.Add(soundIds.Id);
                         audioFile.SoundReferences.Add(sound.Id);
                         soundReferences.Add(sound.Id);
-                        audioProjectDialogueEventSoundBank.Sounds.Add(sound);
+                        audioProjectDialogueEventSoundBank.Sounds.TryAdd(sound);
                     }
 
                     var randomSequenceContainerSettings = AudioSettings.CreateRecommendedRandomSequenceContainerSettings(audioFiles.Count);
@@ -479,7 +479,7 @@ namespace Editors.Audio.AudioProjectConverter
                         directParentId: actorMixerId);
                     audioProjectStatePath = StatePath.Create(statePath.StatePathNodes, randomSequenceContainer.Id, AkBkHircType.RandomSequenceContainer);
 
-                    audioProjectDialogueEventSoundBank.RandomSequenceContainers.Add(randomSequenceContainer);
+                    audioProjectDialogueEventSoundBank.RandomSequenceContainers.TryAdd(randomSequenceContainer);
                 }
                 else
                 {
@@ -493,10 +493,10 @@ namespace Editors.Audio.AudioProjectConverter
 
                     audioProjectStatePath = StatePath.Create(statePath.StatePathNodes, sound.Id, AkBkHircType.Sound);
 
-                    audioProjectDialogueEventSoundBank.Sounds.Add(sound);
+                    audioProjectDialogueEventSoundBank.Sounds.TryAdd(sound);
                 }
 
-                audioProjectDialogueEvent.InsertAlphabetically(audioProjectStatePath);
+                audioProjectDialogueEvent.StatePaths.InsertAlphabetically(audioProjectStatePath);
 
                 // Remove the processed StatePath from the original list as, if we're processing multiple bnks,
                 // Dialogue Events can occur several times so it would add duplicates of the same StatePath
@@ -563,7 +563,7 @@ namespace Editors.Audio.AudioProjectConverter
                 {
                     var audioProjectModdedState = State.Create(moddedState);
                     var audioProjectStateGroup = audioProject.StateGroups.FirstOrDefault(stateGroup => stateGroup.Name == moddedStateGroup.Key);
-                    audioProjectStateGroup.InsertAlphabetically(audioProjectModdedState);
+                    audioProjectStateGroup.States.InsertAlphabetically(audioProjectModdedState);
                 }
             }
         }

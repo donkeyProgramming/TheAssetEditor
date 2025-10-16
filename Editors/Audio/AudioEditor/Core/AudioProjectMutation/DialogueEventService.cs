@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using Editors.Audio.AudioEditor.Core;
 using Editors.Audio.Shared.AudioProject.Factories;
 using Editors.Audio.Shared.AudioProject.Models;
 using Editors.Audio.Shared.GameInformation.Warhammer3;
@@ -48,11 +47,11 @@ namespace Editors.Audio.AudioEditor.Core.AudioProjectMutation
             var dialogueEvent = _audioEditorStateService.AudioProject.GetDialogueEvent(dialogueEventName);
             var actorMixerId = Wh3DialogueEventInformation.GetActorMixerId(dialogueEvent.Name);
             var statePathFactoryResult = _statePathFactory.Create(stateLookupByStateGroup, audioFiles, audioSettings, usedHircIds, usedSourceIds, soundBank.Language, actorMixerId: actorMixerId);
-            dialogueEvent.InsertAlphabetically(statePathFactoryResult.StatePath);
+            dialogueEvent.StatePaths.InsertAlphabetically(statePathFactoryResult.StatePath);
 
             if (statePathFactoryResult.StatePath.TargetHircTypeIsSound())
             {
-                soundBank.Sounds.Add(statePathFactoryResult.SoundTarget);
+                soundBank.Sounds.TryAdd(statePathFactoryResult.SoundTarget);
 
                 var audioFile = audioProject.GetAudioFile(statePathFactoryResult.SoundTarget.SourceId);
                 if (audioFile == null)
@@ -66,7 +65,7 @@ namespace Editors.Audio.AudioEditor.Core.AudioProjectMutation
             }
             else if (statePathFactoryResult.StatePath.TargetHircTypeIsRandomSequenceContainer())
             {
-                soundBank.RandomSequenceContainers.Add(statePathFactoryResult.RandomSequenceContainerTarget);
+                soundBank.RandomSequenceContainers.TryAdd(statePathFactoryResult.RandomSequenceContainerTarget);
                 soundBank.Sounds.AddRange(statePathFactoryResult.RandomSequenceContainerSounds);
 
                 foreach (var sound in statePathFactoryResult.RandomSequenceContainerSounds)

@@ -12,22 +12,15 @@ using Shared.Core.PackFiles.Models;
 
 namespace Editors.Audio.Shared.Utilities
 {
-    public class SoundPlayer
+    public class SoundPlayer(IPackFileService packFileService, IAudioRepository audioRepository, VgStreamWrapper vgStreamWrapper)
     {
-        private readonly IPackFileService _packFileService;
-        private readonly IAudioRepository _audioRepository;
-        private readonly VgStreamWrapper _vgStreamWrapper;
+        private readonly IPackFileService _packFileService = packFileService;
+        private readonly IAudioRepository _audioRepository = audioRepository;
+        private readonly VgStreamWrapper _vgStreamWrapper = vgStreamWrapper;
 
         private readonly ILogger _logger = Logging.Create<SoundPlayer>();
 
         private static string AudioFolderName => $"{DirectoryHelper.Temp}\\Audio";
-
-        public SoundPlayer(IPackFileService packFileService, IAudioRepository audioRepository, VgStreamWrapper vgStreamWrapper)
-        {
-            _packFileService = packFileService;
-            _audioRepository = audioRepository;
-            _vgStreamWrapper = vgStreamWrapper;
-        }
 
         public void PlayStreamedWem(string wemFileName)
         {

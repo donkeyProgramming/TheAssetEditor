@@ -1,5 +1,4 @@
-﻿using Editors.Audio.AudioEditor.Core;
-using Editors.Audio.Shared.AudioProject.Models;
+﻿using Editors.Audio.Shared.AudioProject.Models;
 
 namespace Editors.Audio.AudioEditor.Core.AudioProjectMutation
 {
@@ -17,7 +16,7 @@ namespace Editors.Audio.AudioEditor.Core.AudioProjectMutation
         {
             var stateGroup = _audioEditorStateService.AudioProject.GetStateGroup(stateGroupName);
             var state = State.Create(stateName);
-            stateGroup.InsertAlphabetically(state);
+            stateGroup.States.InsertAlphabetically(state);
         }
 
         public void RemoveState(string stateGroupName, string stateName)

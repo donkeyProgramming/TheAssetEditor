@@ -20,7 +20,6 @@ using Shared.Core.PackFiles.Models;
 
 namespace Editors.Audio.AudioEditor.Presentation.AudioFilesExplorer
 {
-    // TODO: Change xaml commands to methods - see audio explorer
     public partial class AudioFilesExplorerViewModel : ObservableObject
     {
         private readonly IGlobalEventHub _globalEventHub;

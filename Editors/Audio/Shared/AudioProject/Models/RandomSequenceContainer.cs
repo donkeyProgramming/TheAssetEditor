@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Shared.GameFormats.Wwise.Enums;
 
 namespace Editors.Audio.Shared.AudioProject.Models
@@ -27,6 +28,24 @@ namespace Editors.Audio.Shared.AudioProject.Models
                 AudioSettings = audioSettings,
                 SoundReferences = soundReferences
             };
+        }
+    }
+
+    public static class RandomSequenceContainerListExtensions
+    {
+        public static void TryAdd(this List<RandomSequenceContainer> randomSequenceContainers, RandomSequenceContainer randomSequenceContainer)
+        {
+            ArgumentNullException.ThrowIfNull(randomSequenceContainers);
+            ArgumentNullException.ThrowIfNull(randomSequenceContainer);
+
+            if (randomSequenceContainers.Any(x => x.Id == randomSequenceContainer.Id))
+                throw new ArgumentException($"Cannot add RandomSequenceContainer with Id {randomSequenceContainer.Id} as it already exists.");
+
+            var i = randomSequenceContainers.BinarySearch(randomSequenceContainer, AudioProjectItem.IdComparer);
+            if (i < 0)
+                i = ~i;
+
+            randomSequenceContainers.Insert(i, randomSequenceContainer);
         }
     }
 }

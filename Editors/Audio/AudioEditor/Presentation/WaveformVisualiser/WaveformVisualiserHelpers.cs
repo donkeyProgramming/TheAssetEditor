@@ -66,7 +66,6 @@ namespace Editors.Audio.AudioEditor.Presentation.WaveformVisualiser
             return fileExtension switch
             {
                 ".wav" => new WaveFileReader(stream),
-                ".mp3" => new Mp3FileReader(stream),
                 _ => throw new NotSupportedException("File type not supported."),
             };
         }

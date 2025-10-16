@@ -17,7 +17,7 @@ namespace Editors.Audio.AudioEditor.Presentation.NewAudioProject
     {
         private readonly IPackFileService _packFileService;
         private readonly IAudioEditorStateService _audioEditorStateService;
-        private readonly IAudioProjectFileService _audioProjectFileService;
+        private readonly IAudioEditorFileService _audioEditorFileService;
         private readonly ApplicationSettingsService _applicationSettingsService;
         private readonly IStandardDialogs _standardDialogs;
 
@@ -37,13 +37,13 @@ namespace Editors.Audio.AudioEditor.Presentation.NewAudioProject
         public NewAudioProjectViewModel(
             IPackFileService packFileService,
             IAudioEditorStateService audioEditorStateService,
-            IAudioProjectFileService audioProjectFileService,
+            IAudioEditorFileService audioEditorFileService,
             ApplicationSettingsService applicationSettingsService,
             IStandardDialogs standardDialogs)
         {
             _packFileService = packFileService;
             _audioEditorStateService = audioEditorStateService;
-            _audioProjectFileService = audioProjectFileService;
+            _audioEditorFileService = audioEditorFileService;
             _applicationSettingsService = applicationSettingsService;
             _standardDialogs = standardDialogs;
 
@@ -107,8 +107,8 @@ namespace Editors.Audio.AudioEditor.Presentation.NewAudioProject
             _audioEditorStateService.StoreAudioProjectFileName(fileName);
             _audioEditorStateService.StoreAudioProjectFilePath(filePath);
 
-            _audioProjectFileService.Save(audioProject, fileName, filePath);
-            _audioProjectFileService.Load(fileName, filePath);
+            _audioEditorFileService.Save(audioProject, fileName, filePath);
+            _audioEditorFileService.Load(audioProject, fileName, filePath);
 
             CloseWindowAction();
         }

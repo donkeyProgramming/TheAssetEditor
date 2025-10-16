@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using Editors.Audio.Shared.Wwise;
 using Shared.GameFormats.Wwise.Enums;
@@ -27,33 +26,6 @@ namespace Editors.Audio.Shared.AudioProject.Models
         public StatePath GetStatePath(string statePathName)
         {
             return StatePaths.FirstOrDefault(statePath => statePath.Name.Equals(statePathName));
-        }
-
-
-        public void InsertAlphabetically(StatePath statePath)
-        {
-            if (statePath == null) 
-                return;
-
-            StatePaths ??= [];
-
-            var index = StatePaths.BinarySearch(statePath, StatePathNameComparer.Instance);
-            if (index >= 0) 
-                return;
-
-            StatePaths.Insert(~index, statePath);
-        }
-
-        private sealed class StatePathNameComparer : IComparer<StatePath>
-        {
-            public static readonly StatePathNameComparer Instance = new();
-
-            public int Compare(StatePath left, StatePath right)
-            {
-                var leftName = left?.Name ?? string.Empty;
-                var rightName = right?.Name ?? string.Empty;
-                return StringComparer.OrdinalIgnoreCase.Compare(leftName, rightName);
-            }
         }
     }
 }
