@@ -6,9 +6,8 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Data;
-using System.Windows.Input;
-using Editors.Audio.AudioEditor.Events;
 using Editors.Audio.AudioEditor.Commands;
+using Editors.Audio.AudioEditor.Events;
 using Shared.Core.Events;
 
 namespace Editors.Audio.AudioEditor.Presentation.Shared.Table
@@ -92,7 +91,7 @@ namespace Editors.Audio.AudioEditor.Presentation.Shared.Table
                         // When text changes, filter and keep caret behavior stable
                         textBox.TextChanged += (s, e) =>
                         {
-                            eventHub.Publish(new EditorDataGridTextboxTextChangedEvent());
+                            eventHub.Publish(new EditorDataGridTextboxTextChangedEvent(textBox.Text));
 
                             // If the user edits the text and it no longer matches the selected item, clear selection
                             if (comboBox.SelectedItem != null &&
@@ -181,9 +180,10 @@ namespace Editors.Audio.AudioEditor.Presentation.Shared.Table
 
             factory.SetValue(Control.PaddingProperty, new Thickness(5, 2.5, 5, 2.5));
 
-            factory.AddHandler(TextBoxBase.TextChangedEvent, new TextChangedEventHandler((s, e) =>
+            factory.AddHandler(TextBoxBase.TextChangedEvent, new TextChangedEventHandler((sender, args) =>
             {
-                eventHub.Publish(new EditorDataGridTextboxTextChangedEvent());
+                var textBox = (TextBox)sender;
+                eventHub.Publish(new EditorDataGridTextboxTextChangedEvent(textBox.Text));
             }));
 
             template.VisualTree = factory;
@@ -209,40 +209,40 @@ namespace Editors.Audio.AudioEditor.Presentation.Shared.Table
                 {
                     if (!textBox.Text.StartsWith("Play_"))
                     {
-                        var caretPos = textBox.SelectionStart;
+                        var caretPosition = textBox.SelectionStart;
                         if (textBox.Text.StartsWith("Play"))
                         {
                             textBox.Text = string.Concat("Play_", textBox.Text.AsSpan("Play".Length));
-                            textBox.SelectionStart = caretPos + 1;
+                            textBox.SelectionStart = caretPosition + 1;
                         }
                         else
                         {
                             textBox.Text = "Play_" + textBox.Text;
-                            textBox.SelectionStart = caretPos + "Play_".Length;
+                            textBox.SelectionStart = caretPosition + "Play_".Length;
                         }
                     }
 
-                    eventHub.Publish(new EditorDataGridTextboxTextChangedEvent());
+                    eventHub.Publish(new EditorDataGridTextboxTextChangedEvent(textBox.Text));
                 }
             }));
 
-            factory.AddHandler(UIElement.PreviewKeyDownEvent, new KeyEventHandler((sender, e) =>
-            {
-                if (Keyboard.Modifiers == ModifierKeys.Control && e.Key == Key.V)
-                {
-                    if (sender is TextBox textBox)
-                    {
-                        var clipboardText = string.Empty;
-                        if (Clipboard.ContainsText())
-                            clipboardText = Clipboard.GetText(TextDataFormat.UnicodeText);
+            //factory.AddHandler(UIElement.PreviewKeyDownEvent, new KeyEventHandler((sender, e) =>
+            //{
+            //    if (Keyboard.Modifiers == ModifierKeys.Control && e.Key == Key.V)
+            //    {
+            //        if (sender is TextBox textBox)
+            //        {
+            //            var clipboardText = string.Empty;
+            //            if (Clipboard.ContainsText())
+            //                clipboardText = Clipboard.GetText(TextDataFormat.UnicodeText);
 
-                        _ = textBox.Dispatcher.BeginInvoke(new Action(() =>
-                        {
-                            eventHub.Publish(new EditorDataGridTextboxPastedEvent(clipboardText));
-                        }), System.Windows.Threading.DispatcherPriority.Background);
-                    }
-                }
-            }), handledEventsToo: true);
+            //            _ = textBox.Dispatcher.BeginInvoke(new Action(() =>
+            //            {
+            //                eventHub.Publish(new EditorDataGridTextboxPastedEvent(clipboardText));
+            //            }), System.Windows.Threading.DispatcherPriority.Background);
+            //        }
+            //    }
+            //}), handledEventsToo: true);
 
             template.VisualTree = factory;
             return template;

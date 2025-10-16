@@ -31,19 +31,19 @@ namespace Editors.Audio.Shared.AudioProject.Models
             }
         }
 
-        public static void InsertAlphabetically(this List<State> states, State state)
+        public static void InsertAlphabetically(this List<State> existingStates, State state)
         {
-            ArgumentNullException.ThrowIfNull(states);
+            ArgumentNullException.ThrowIfNull(existingStates);
             ArgumentNullException.ThrowIfNull(state);
 
-            if (states.Any(state => StringComparer.OrdinalIgnoreCase.Equals(state?.Name ?? string.Empty, state.Name ?? string.Empty)))
+            if (existingStates.Any(existingState => StringComparer.OrdinalIgnoreCase.Equals(existingState.Name, state.Name)))
                 throw new ArgumentException($"Cannot add State with Name {state.Name} as it already exists.");
 
-            var index = states.BinarySearch(state, s_nameComparerIgnoreCase);
+            var index = existingStates.BinarySearch(state, s_nameComparerIgnoreCase);
             if (index < 0)
                 index = ~index;
 
-            states.Insert(index, state);
+            existingStates.Insert(index, state);
         }
     }
 }

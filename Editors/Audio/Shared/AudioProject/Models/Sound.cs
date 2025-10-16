@@ -50,19 +50,19 @@ namespace Editors.Audio.Shared.AudioProject.Models
 
     public static class SoundListExtensions
     {
-        public static void TryAdd(this List<Sound> sounds, Sound sound)
+        public static void TryAdd(this List<Sound> existingSounds, Sound sound)
         {
-            ArgumentNullException.ThrowIfNull(sounds);
+            ArgumentNullException.ThrowIfNull(existingSounds);
             ArgumentNullException.ThrowIfNull(sound);
 
-            if (sounds.Any(x => x.Id == sound.Id))
+            if (existingSounds.Any(existingSound => existingSound.Id == sound.Id))
                 throw new ArgumentException($"Cannot add Sound with Id {sound.Id} as it already exists.");
 
-            var i = sounds.BinarySearch(sound, AudioProjectItem.IdComparer);
+            var i = existingSounds.BinarySearch(sound, AudioProjectItem.IdComparer);
             if (i < 0)
                 i = ~i;
 
-            sounds.Insert(i, sound);
+            existingSounds.Insert(i, sound);
         }
     }
 }

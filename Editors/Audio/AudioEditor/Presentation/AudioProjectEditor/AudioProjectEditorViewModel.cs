@@ -63,7 +63,6 @@ namespace Editors.Audio.AudioEditor.Presentation.AudioProjectEditor
             _eventHub.Register<EditorTableRowAddRequestedEvent>(this, OnEditorTableRowAddRequested);
             _eventHub.Register<EditorDataGridColumnAddRequestedEvent>(this, OnEditorDataGridColumnAddRequested);
             _eventHub.Register<EditorTableRowAddedToViewerEvent>(this, OnEditorTableRowAddedToViewer);
-            _eventHub.Register<EditorDataGridTextboxPastedEvent>(this, OnEditorDataGridTextboxPastedEvent);
             _eventHub.Register<ViewerTableRowEditedEvent>(this, OnViewerTableRowEdited);
             _eventHub.Register<AudioFilesChangedEvent>(this, OnAudioFilesChanged);
             _eventHub.Register<EditorDataGridTextboxTextChangedEvent>(this, OnEditorDataGridTextboxTextChanged);
@@ -163,14 +162,6 @@ namespace Editors.Audio.AudioEditor.Presentation.AudioProjectEditor
             // Handle enablement last because the row needs to be cleared before being checked
             SetAddRowButtonEnablement();
         }   
-
-        private void OnEditorDataGridTextboxPastedEvent(EditorDataGridTextboxPastedEvent e) => PasteText(e.PastedText);
-
-        private void PasteText(string pastedText)
-        {
-            var row = Table.Rows[0];
-            row[TableInfo.EventColumnName] = pastedText;
-        }
 
         private void OnViewerTableRowEdited(ViewerTableRowEditedEvent e)
         {

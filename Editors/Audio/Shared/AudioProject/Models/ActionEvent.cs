@@ -52,20 +52,19 @@ namespace Editors.Audio.Shared.AudioProject.Models
             }
         }
 
-        public static void InsertAlphabetically(this List<ActionEvent> actionEvents, ActionEvent actionEvent)
+        public static void InsertAlphabetically(this List<ActionEvent> existingActionEvents, ActionEvent actionEvent)
         {
-            ArgumentNullException.ThrowIfNull(actionEvents);
+            ArgumentNullException.ThrowIfNull(existingActionEvents);
             ArgumentNullException.ThrowIfNull(actionEvent);
 
-            if (actionEvents.Any(actionEvent => StringComparer.OrdinalIgnoreCase.Equals(actionEvent?.Name ?? string.Empty, actionEvent.Name ?? string.Empty)))
+            if (existingActionEvents.Any(existingActionEvent => StringComparer.OrdinalIgnoreCase.Equals(existingActionEvent.Name, actionEvent.Name)))
                 throw new ArgumentException($"Cannot add ActionEvent with Name {actionEvent.Name} as it already exists.");
 
-            var index = actionEvents.BinarySearch(actionEvent, s_nameComparerIgnoreCase);
+            var index = existingActionEvents.BinarySearch(actionEvent, s_nameComparerIgnoreCase);
             if (index < 0)
                 index = ~index;
 
-            actionEvents.Insert(index, actionEvent);
+            existingActionEvents.Insert(index, actionEvent);
         }
-
     }
 }

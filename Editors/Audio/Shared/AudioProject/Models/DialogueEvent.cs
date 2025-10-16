@@ -23,9 +23,6 @@ namespace Editors.Audio.Shared.AudioProject.Models
             };
         }
 
-        public StatePath GetStatePath(string statePathName)
-        {
-            return StatePaths.FirstOrDefault(statePath => statePath.Name.Equals(statePathName));
-        }
+        public StatePath GetStatePath(string statePathName) => StatePaths.FirstOrDefault(statePath => statePath.Name.Equals(statePathName));
     }
 }

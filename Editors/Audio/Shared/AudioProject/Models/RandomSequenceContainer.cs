@@ -33,19 +33,19 @@ namespace Editors.Audio.Shared.AudioProject.Models
 
     public static class RandomSequenceContainerListExtensions
     {
-        public static void TryAdd(this List<RandomSequenceContainer> randomSequenceContainers, RandomSequenceContainer randomSequenceContainer)
+        public static void TryAdd(this List<RandomSequenceContainer> existingRandomSequenceContainers, RandomSequenceContainer randomSequenceContainer)
         {
-            ArgumentNullException.ThrowIfNull(randomSequenceContainers);
+            ArgumentNullException.ThrowIfNull(existingRandomSequenceContainers);
             ArgumentNullException.ThrowIfNull(randomSequenceContainer);
 
-            if (randomSequenceContainers.Any(x => x.Id == randomSequenceContainer.Id))
+            if (existingRandomSequenceContainers.Any(existingRandomSequenceContainer => existingRandomSequenceContainer.Id == randomSequenceContainer.Id))
                 throw new ArgumentException($"Cannot add RandomSequenceContainer with Id {randomSequenceContainer.Id} as it already exists.");
 
-            var i = randomSequenceContainers.BinarySearch(randomSequenceContainer, AudioProjectItem.IdComparer);
+            var i = existingRandomSequenceContainers.BinarySearch(randomSequenceContainer, AudioProjectItem.IdComparer);
             if (i < 0)
                 i = ~i;
 
-            randomSequenceContainers.Insert(i, randomSequenceContainer);
+            existingRandomSequenceContainers.Insert(i, randomSequenceContainer);
         }
     }
 }

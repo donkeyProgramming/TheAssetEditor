@@ -39,19 +39,19 @@ namespace Editors.Audio.Shared.AudioProject.Models
             }
         }
 
-        public static void TryAdd(this List<AudioFile> audioFiles, AudioFile audioFile)
+        public static void TryAdd(this List<AudioFile> existingAudioFiles, AudioFile audioFile)
         {
-            ArgumentNullException.ThrowIfNull(audioFiles);
+            ArgumentNullException.ThrowIfNull(existingAudioFiles);
             ArgumentNullException.ThrowIfNull(audioFile);
 
-            if (audioFiles.Any(x => x.Id == audioFile.Id))
+            if (existingAudioFiles.Any(existingAudioFile => existingAudioFile.Id == audioFile.Id))
                 throw new ArgumentException($"Cannot add AudioFile with Id {audioFile.Id} as it already exists.");
 
-            var index = audioFiles.BinarySearch(audioFile, s_wavPackFileNameComparer);
+            var index = existingAudioFiles.BinarySearch(audioFile, s_wavPackFileNameComparer);
             if (index < 0)
                 index = ~index;
 
-            audioFiles.Insert(index, audioFile);
+            existingAudioFiles.Insert(index, audioFile);
         }
     }
 }

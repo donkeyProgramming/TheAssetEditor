@@ -3,6 +3,8 @@ using System.Data;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
+
 
 namespace Editors.Audio.AudioEditor.Presentation.AudioProjectViewer
 {
@@ -14,7 +16,10 @@ namespace Editors.Audio.AudioEditor.Presentation.AudioProjectViewer
         {
             InitializeComponent();
             Loaded += OnLoaded;
+            PreviewKeyDown += OnPreviewKeyDown;
         }
+
+        private void OnPreviewKeyDown(object sender, KeyEventArgs e) => ViewModel.OnPreviewKeyDown(e);
 
         private void OnLoaded(object sender, RoutedEventArgs e)
         {

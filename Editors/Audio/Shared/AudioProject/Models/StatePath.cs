@@ -73,19 +73,19 @@ namespace Editors.Audio.Shared.AudioProject.Models
             }
         }
 
-        public static void InsertAlphabetically(this List<StatePath> statePaths, StatePath statePath)
+        public static void InsertAlphabetically(this List<StatePath> existingStatePaths, StatePath statePath)
         {
-            ArgumentNullException.ThrowIfNull(statePaths);
+            ArgumentNullException.ThrowIfNull(existingStatePaths);
             ArgumentNullException.ThrowIfNull(statePath);
 
-            if (statePaths.Any(statePath => StringComparer.OrdinalIgnoreCase.Equals(statePath?.Name ?? string.Empty, statePath.Name ?? string.Empty)))
+            if (existingStatePaths.Any(existingStatePath => StringComparer.OrdinalIgnoreCase.Equals(existingStatePath, statePath.Name)))
                 throw new ArgumentException($"Cannot add StatePath with Name {statePath.Name} as it already exists.");
 
-            var index = statePaths.BinarySearch(statePath, s_nameComparerIgnoreCase);
+            var index = existingStatePaths.BinarySearch(statePath, s_nameComparerIgnoreCase);
             if (index < 0)
                 index = ~index;
 
-            statePaths.Insert(index, statePath);
+            existingStatePaths.Insert(index, statePath);
         }
     }
 }

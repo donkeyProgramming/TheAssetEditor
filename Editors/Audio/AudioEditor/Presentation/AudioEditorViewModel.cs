@@ -1,4 +1,5 @@
-﻿using System.Windows.Input;
+﻿using System.Windows.Controls;
+using System.Windows.Input;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Editors.Audio.AudioEditor.Commands;
@@ -85,26 +86,19 @@ namespace Editors.Audio.AudioEditor
 
         public void OnPreviewKeyDown(KeyEventArgs e)
         {
-            if (Keyboard.Modifiers == ModifierKeys.Control)
+            // This allows us to still paste into for example the Audio Project Editor ComboBoxes 
+            if (Keyboard.FocusedElement is ComboBox comboBox && comboBox.IsEditable)
+                return;
+
+            // This is here rather than the Audio Project Viewer because the the Viewer DataGrid only recognises key presses when
+            // you're focussed on the DataGrid and if you delete an item it loses focus whereas this recognises them anywhere.
+            if (_audioEditorStateService.CopiedViewerRows != null && _audioEditorStateService.CopiedViewerRows.Count != 0 )
             {
-                if (e.Key == Key.C)
+                if (Keyboard.Modifiers == ModifierKeys.Control && e.Key == Key.V)
                 {
-                    _eventHub.Publish(new CopyRowsShortcutActivatedEvent());
+                    _eventHub.Publish(new PasteViewerRowsShortcutActivatedEvent());
                     e.Handled = true;
                 }
-                else if (e.Key == Key.V)
-                {
-                    _eventHub.Publish(new PasteRowsShortcutActivatedEvent());
-                    e.Handled = true;
-                }
-            }
-
-            if (e.Key == Key.Delete)
-            {
-                if (_audioEditorStateService.SelectedViewerRows != null && _audioEditorStateService.SelectedViewerRows.Count > 0)
-                    _uiCommandFactory.Create<RemoveViewerRowsCommand>().Execute(_audioEditorStateService.SelectedViewerRows);
-
-                e.Handled = true;
             }
         }
 

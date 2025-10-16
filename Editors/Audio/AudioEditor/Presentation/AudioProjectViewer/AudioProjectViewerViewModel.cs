@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using System.Data;
 using System.Linq;
 using System.Windows.Controls;
+using System.Windows.Input;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Editors.Audio.AudioEditor.Commands;
@@ -35,6 +36,7 @@ namespace Editors.Audio.AudioEditor.Presentation.AudioProjectViewer
         [ObservableProperty] private DataTable _table = new();
         [ObservableProperty] private ObservableCollection<DataGridColumn> _dataGridColumns = [];
         [ObservableProperty] public ObservableCollection<SoundBank> _soundBanks;
+        [ObservableProperty] public List<DataRow> _selectedRows = [];
         [ObservableProperty] private bool _isUpdateRowButtonEnabled = false;
         [ObservableProperty] private bool _isRemoveRowButtonEnabled = false;
         [ObservableProperty] private bool _isCopyEnabled = false;
@@ -42,9 +44,6 @@ namespace Editors.Audio.AudioEditor.Presentation.AudioProjectViewer
         [ObservableProperty] private bool _isContextMenuPasteVisible = false;
         [ObservableProperty] private bool _isContextMenuCopyVisible = false;
         [ObservableProperty] private bool _isViewerVisible = false;
-
-        [ObservableProperty] public List<DataRow> _selectedRows = [];
-        private List<DataRow> _copiedRows = [];
 
         public AudioProjectViewerViewModel(
             IUiCommandFactory uiCommandFactory,
@@ -66,8 +65,7 @@ namespace Editors.Audio.AudioEditor.Presentation.AudioProjectViewer
             _eventHub.Register<ViewerTableColumnAddRequestedEvent>(this, OnViewerTableColumnAddRequested);
             _eventHub.Register<ViewerTableRowAddRequestedEvent>(this, OnViewerTableRowAddRequested);
             _eventHub.Register<ViewerTableRowRemoveRequestedEvent>(this, OnViewerTableRowRemoveRequested);
-            _eventHub.Register<CopyRowsShortcutActivatedEvent>(this, OnCopyRowsShortcutActivated);
-            _eventHub.Register<PasteRowsShortcutActivatedEvent>(this, OnPasteRowsShortcutActivated);
+            _eventHub.Register<PasteViewerRowsShortcutActivatedEvent>(this, OnPasteViewerRowsShortcutActivated);
             _eventHub.Register<ViewerDataGridColumnAddedEvent>(this, OnViewerDataGridColumnAdded);
         }
 
@@ -150,25 +148,37 @@ namespace Editors.Audio.AudioEditor.Presentation.AudioProjectViewer
             _logger.Here().Information($"Removed {selectedAudioProjectExplorerNode.Type} row from Audio Project Viewer table for {selectedAudioProjectExplorerNode.Name}");
         }
 
-        public void OnCopyRowsShortcutActivated(CopyRowsShortcutActivatedEvent e) => CopyRows();
+        public void OnPreviewKeyDown(KeyEventArgs e)
+        {
+            if (_audioEditorStateService.SelectedViewerRows != null && _audioEditorStateService.SelectedViewerRows.Count > 0)
+            {
+                if (Keyboard.Modifiers == ModifierKeys.Control && e.Key == Key.C)
+                    CopyRows();
+
+                if (e.Key == Key.Delete || e.Key == Key.Back)
+                    _uiCommandFactory.Create<RemoveViewerRowsCommand>().Execute(_audioEditorStateService.SelectedViewerRows);
+
+                e.Handled = true;
+            }
+        }
 
         [RelayCommand] public void CopyRows()
         {
             if (!IsCopyEnabled)
                 return;
 
-            _copiedRows = SelectedRows;
+            _audioEditorStateService.StoreCopiedViewerRows(SelectedRows);
             SetPasteEnablement();
         }
 
-        public void OnPasteRowsShortcutActivated(PasteRowsShortcutActivatedEvent e) => PasteRows();
+        public void OnPasteViewerRowsShortcutActivated(PasteViewerRowsShortcutActivatedEvent e) => PasteRows();
 
         [RelayCommand] public void PasteRows()
         {
             if (!IsPasteEnabled)
                 return;
 
-            _uiCommandFactory.Create<PasteViewerRowsCommand>().Execute(_copiedRows);
+            _uiCommandFactory.Create<PasteViewerRowsCommand>().Execute(_audioEditorStateService.CopiedViewerRows);
 
             SetPasteEnablement();
         }
@@ -233,7 +243,7 @@ namespace Editors.Audio.AudioEditor.Presentation.AudioProjectViewer
                 return;
             }
 
-            if (_copiedRows.Count == 0)
+            if (_audioEditorStateService.CopiedViewerRows == null || _audioEditorStateService.CopiedViewerRows.Count == 0)
             {
                 IsPasteEnabled = false;
                 return;
@@ -244,7 +254,7 @@ namespace Editors.Audio.AudioEditor.Presentation.AudioProjectViewer
                 .Select(col => col.ColumnName)
                 .ToList();
 
-            var firstRow = _copiedRows[0];
+            var firstRow = _audioEditorStateService.CopiedViewerRows[0];
             var rowColumns = firstRow.Table.Columns
                 .Cast<DataColumn>()
                 .Select(col => col.ColumnName)
@@ -257,7 +267,7 @@ namespace Editors.Audio.AudioEditor.Presentation.AudioProjectViewer
                 return;
             }
 
-            var areAnyCopiedRowsInDataGrid = _copiedRows
+            var areAnyCopiedRowsInDataGrid = _audioEditorStateService.CopiedViewerRows
                 .Any(copied => Table.AsEnumerable()
                     .Any(viewer => viewerColumns
                     .All(column => Equals(copied[column], viewer[column]))));
