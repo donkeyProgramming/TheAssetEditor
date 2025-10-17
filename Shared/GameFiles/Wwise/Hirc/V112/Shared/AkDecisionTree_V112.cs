@@ -21,24 +21,25 @@ namespace Shared.GameFormats.Wwise.Hirc.V112.Shared
             }
 
             ushort childrenCount = 1;
-            DecisionTree = BuildDecisionTree(Nodes, 0, maxTreeDepth, 0, ref childrenCount, (ushort)countMax);
+            DecisionTree = ReadDecisionTree(Nodes, 0, maxTreeDepth, 0, ref childrenCount, (ushort)countMax);
         }
 
-        private static Node_V112 BuildDecisionTree(List<Node_V112> nodes, int index, uint maxDepth, uint currentDepth, ref ushort count, ushort countMax)
+        private static Node_V112 ReadDecisionTree(List<Node_V112> nodes, int index, uint maxDepth, uint currentDepth, ref ushort count, ushort countMax)
         {
             if (index >= nodes.Count)
-                return null;
+                throw new ArgumentOutOfRangeException("Something went wrong with the number of Decision Tree nodes");
 
             var node = nodes[index];
 
-            var isAudioNode = node.ChildrenIdx > countMax || node.ChildrenCount > countMax;
+            var isOver = node.ChildrenIdx + node.ChildrenCount > countMax;
+            var isAudioNode = node.ChildrenIdx > countMax || node.ChildrenCount > countMax || isOver;
             var isMax = currentDepth == maxDepth;
-            if (!(isAudioNode || isMax)) //|| treeNode.ChildrenCount == 0))
+            if (!(isAudioNode || isMax))
             {
                 var treeNodeChildren = new List<Node_V112>();
                 for (var i = 0; i < node.ChildrenCount; i++)
                 {
-                    var childNode = BuildDecisionTree(nodes, node.ChildrenIdx + i, maxDepth, currentDepth + 1, ref count, countMax);
+                    var childNode = ReadDecisionTree(nodes, node.ChildrenIdx + i, maxDepth, currentDepth + 1, ref count, countMax);
                     if (childNode != null)
                         treeNodeChildren.Add(childNode);
                 }
@@ -54,12 +55,11 @@ namespace Shared.GameFormats.Wwise.Hirc.V112.Shared
             using var memStream = new MemoryStream();
             foreach (var node in Nodes)
             {
-                memStream.Write(ByteParsers.UInt32.EncodeValue(node.Key ?? 0, out _), 0, 4);
+                memStream.Write(ByteParsers.UInt32.EncodeValue(node.Key, out _), 0, 4);
 
-                if (node.AudioNodeId != 0)
-                {
+                var hasChildren = node.Nodes != null && node.Nodes.Count > 0;
+                if (!hasChildren)
                     memStream.Write(ByteParsers.UInt32.EncodeValue(node.AudioNodeId, out _), 0, 4);
-                }
                 else
                 {
                     memStream.Write(ByteParsers.UShort.EncodeValue(node.ChildrenIdx, out _), 0, 2);
@@ -72,28 +72,11 @@ namespace Shared.GameFormats.Wwise.Hirc.V112.Shared
             return memStream.ToArray();
         }
 
-        // Recursively traverses the decision tree, flattening it into a list so nodes can be read sequentially
-        // Should initially be supplied with the root node which is the first node in the DecisionTree property
-        public static List<Node_V112> TraverseAndFlatten(Node_V112 rootNode)
-        {
-            var nodes = new List<Node_V112>();
-            InternalTraverseAndFlatten(nodes, rootNode);
-            return nodes;
-        }
+        public IAkDecisionNode GetDecisionTree() => DecisionTree;
 
-        public static void InternalTraverseAndFlatten(List<Node_V112> nodes, Node_V112 node)
+        public class Node_V112 : IAkDecisionNode
         {
-            if (node == null)
-                return;
-
-            nodes.Add(node);
-            foreach (var child_node in node.Nodes)
-                InternalTraverseAndFlatten(nodes, child_node);
-        }
-
-        public class Node_V112
-        {
-            public uint? Key { get; set; }
+            public uint Key { get; set; }
             public uint AudioNodeId { get; set; }
             public ushort ChildrenIdx { get; set; }
             public ushort ChildrenCount { get; set; }
@@ -135,6 +118,11 @@ namespace Shared.GameFormats.Wwise.Hirc.V112.Shared
                 var probabilitySize = ByteHelper.GetPropertyTypeSize(Probability);
                 return idSize + childrenIdxSize + childrenCountSize + weightSize + probabilitySize;
             }
+
+            public uint GetKey() => Key;
+            public uint GetAudioNodeId() => AudioNodeId;
+            public int GetChildrenCount() => Nodes.Count;
+            public IAkDecisionNode GetChildAtIndex(int index) => Nodes[index];
         }
     }
 }

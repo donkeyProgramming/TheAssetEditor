@@ -6,6 +6,7 @@ using Shared.Core.Misc;
 using Shared.Core.PackFiles.Models;
 using Shared.Core.Settings;
 using Shared.GameFormats.Wwise.Didx;
+using Shared.GameFormats.Wwise.Enums;
 using Shared.GameFormats.Wwise.Hirc;
 
 namespace Editors.Audio.Shared.Storage
@@ -23,6 +24,7 @@ namespace Editors.Audio.Shared.Storage
         void Load(List<string> languages); 
         void Clear();
         List<T> GetHircsByType<T>() where T : class;
+        List<HircItem> GetHircsByHircType(AkBkHircType type);
         List<HircItem> GetHircs(uint id);
         List<HircItem> GetHircs(uint id, string owningFileName);
         string GetNameFromId(uint value);
@@ -113,6 +115,21 @@ namespace Editors.Audio.Shared.Storage
             _loadedBnkDataLanguages.AddRange(languages);
         }
 
+        public List<T> GetHircsByType<T>() where T : class
+        {
+            return HircsById.Values
+                .SelectMany(items => items)
+                .OfType<T>()
+                .ToList();
+        }
+
+        public List<HircItem> GetHircsByHircType(AkBkHircType hircType)
+        {
+            return HircsById.SelectMany(x => x.Value)
+                .Where(hirc => hirc.HircType == hircType)
+                .ToList();
+        }
+
         public List<HircItem> GetHircs(uint id)
         {
             if (HircsById.TryGetValue(id, out var value))
@@ -120,11 +137,7 @@ namespace Editors.Audio.Shared.Storage
             return [];
         }
 
-        public List<HircItem> GetHircs(uint id, string owningFileName)
-        {
-            var hircItems = GetHircs(id).Where(x => x.BnkFilePath == owningFileName).ToList();
-            return hircItems;
-        }
+        public List<HircItem> GetHircs(uint id, string owningFileName) => GetHircs(id).Where(x => x.BnkFilePath == owningFileName).ToList();
 
         public string GetNameFromId(uint value, out bool found)
         {
@@ -132,14 +145,6 @@ namespace Editors.Audio.Shared.Storage
             if (found)
                 return NameById[value];
             return value.ToString();
-        }
-
-        public List<T> GetHircsByType<T>() where T : class
-        {
-            return HircsById.Values
-                .SelectMany(items => items)
-                .OfType<T>()
-                .ToList();
         }
 
         public string GetNameFromId(uint value) => GetNameFromId(value, out var _);

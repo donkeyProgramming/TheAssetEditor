@@ -6,21 +6,16 @@ using Editors.Audio.Shared.Storage;
 using Shared.GameFormats.Wwise.Enums;
 using Shared.GameFormats.Wwise.Hirc;
 
-namespace Editors.Audio.Shared.Wwise
+namespace Editors.Audio.Shared.Wwise.HircExploration
 {
-    public abstract class WwiseTreeParserBase
+    public abstract class HircTreeBaseParser(IAudioRepository audioRepository)
     {
-        public readonly Dictionary<AkBkHircType, Action<HircItem, HircTreeItem>> _hircProcessChildMap = [];
-        public readonly IAudioRepository _audioRepository;
+        public readonly IAudioRepository AudioRepository = audioRepository;
+        public readonly Dictionary<AkBkHircType, Action<HircItem, HircTreeNode>> HircProcessChildMap = [];
 
-        public WwiseTreeParserBase(IAudioRepository audioRepository)
+        public HircTreeNode BuildHierarchy(HircItem item)
         {
-            _audioRepository = audioRepository;
-        }
-
-        public HircTreeItem BuildHierarchy(HircItem item)
-        {
-            var root = new HircTreeItem();
+            var root = new HircTreeNode();
             ProcessHircObject(item, root);
             var actualRoot = root.Children.FirstOrDefault();
             actualRoot.Parent = null;
@@ -28,17 +23,16 @@ namespace Editors.Audio.Shared.Wwise
             return actualRoot;
         }
 
-        public List<HircTreeItem> BuildHierarchyAsFlatList(HircItem item)
+        public List<HircTreeNode> BuildHierarchyAsFlatList(HircItem item)
         {
             var rootNode = BuildHierarchy(item);
-
             var flatList = GetHircParents(rootNode);
             return flatList;
         }
 
-        private static List<HircTreeItem> GetHircParents(HircTreeItem root)
+        private static List<HircTreeNode> GetHircParents(HircTreeNode root)
         {
-            var childData = new List<HircTreeItem>();
+            var childData = new List<HircTreeNode>();
             if (root.Children != null)
             {
                 foreach (var child in root.Children)
@@ -49,32 +43,31 @@ namespace Editors.Audio.Shared.Wwise
             return childData;
         }
 
-        private void ProcessHircObject(HircItem item, HircTreeItem parent)
+        private void ProcessHircObject(HircItem item, HircTreeNode parent)
         {
-            if (_hircProcessChildMap.TryGetValue(item.HircType, out var func))
+            if (HircProcessChildMap.TryGetValue(item.HircType, out var func))
                 func(item, parent);
             else
             {
-                var unknownNode = new HircTreeItem() { DisplayName = $"Unknown node type {item.HircType} for Id {item.Id} in {item.BnkFilePath}", Item = item };
+                var unknownNode = new HircTreeNode() { DisplayName = $"Unknown node type {item.HircType} for ID {item.Id} in {item.BnkFilePath}", Item = item };
                 parent.Children.Add(unknownNode);
             }
         }
 
-        protected void ProcessNext(uint hircId, HircTreeItem parent)
+        protected void ProcessNext(uint hircId, HircTreeNode parent)
         {
             if (hircId == 0)
                 return;
 
-            var instances = _audioRepository.GetHircs(hircId);
-            var hircItem = instances.FirstOrDefault();
-            if (hircItem == null)
-                parent.Children.Add(new HircTreeItem() { DisplayName = $"Error: Unable to find Id {hircId}" });
+            var hircs = AudioRepository.GetHircs(hircId);
+            var hirc = hircs.FirstOrDefault();
+            if (hirc == null)
+                parent.Children.Add(new HircTreeNode() { DisplayName = $"Error: Unable to find Hirc with ID {hircId}" });
             else
-                ProcessHircObject(hircItem, parent);
+                ProcessHircObject(hirc, parent);
         }
 
-
-        protected void ProcessNext(List<uint> ids, HircTreeItem parent)
+        protected void ProcessNext(List<uint> ids, HircTreeNode parent)
         {
             foreach (var id in ids)
                 ProcessNext(id, parent);
@@ -82,13 +75,11 @@ namespace Editors.Audio.Shared.Wwise
 
         protected virtual string GetDisplayId(uint id, string fileName, bool hidenNameIfMissing)
         {
-            var name = _audioRepository.GetNameFromId(id, out var found);
+            var name = AudioRepository.GetNameFromId(id, out var found);
             if (hidenNameIfMissing)
                 name = "";
             return name;
         }
-
-        protected string GetDisplayId(HircItem item, bool hidenNameIfMissing) => GetDisplayId(item.Id, item.BnkFilePath, hidenNameIfMissing);
 
         protected static Wanted GetAsType<Wanted>(HircItem instance) where Wanted : class
         {

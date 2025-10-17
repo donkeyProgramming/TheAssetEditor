@@ -199,7 +199,9 @@ namespace Shared.GameFormats.Wwise.Hirc.V136.Shared
             };
         }
 
-        public class Node_V136
+        public IAkDecisionNode GetDecisionTree() => DecisionTree;
+
+        public class Node_V136 : IAkDecisionNode
         {
             public uint Key { get; set; }
             public uint AudioNodeId { get; set; }
@@ -266,6 +268,11 @@ namespace Shared.GameFormats.Wwise.Hirc.V136.Shared
                     Nodes = []
                 };
             }
+
+            public uint GetKey() => Key;
+            public uint GetAudioNodeId() => AudioNodeId;
+            public int GetChildrenCount() => Nodes.Count;
+            public IAkDecisionNode GetChildAtIndex(int index) => Nodes[index];
         }
     }
 }

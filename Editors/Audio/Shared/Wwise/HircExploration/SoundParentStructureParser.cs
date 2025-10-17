@@ -6,9 +6,9 @@ using Shared.GameFormats.Wwise.Enums;
 using Shared.GameFormats.Wwise.Hirc;
 using Shared.GameFormats.Wwise.Hirc.V136;
 
-namespace Editors.Audio.Shared.Wwise
+namespace Editors.Audio.Shared.Wwise.HircExploration
 {
-    public class FindAudioParentStructureHelper
+    public class SoundParentStructureParser
     {
         public class ParentStructure
         {
@@ -29,7 +29,7 @@ namespace Editors.Audio.Shared.Wwise
             public uint BusId { get; set; }
         }
 
-        public List<ParentStructure> Compute(HircItem sound, IAudioRepository audioRepository)
+        public static List<ParentStructure> Compute(HircItem sound, IAudioRepository audioRepository)
         {
             Guard.IsNotNull(sound);
             Guard.IsNotNull(sound as ICAkSound);
@@ -41,7 +41,7 @@ namespace Editors.Audio.Shared.Wwise
             return output;
         }
 
-        private ParentStructure GetAudioParentStructure(HircItem sound, IAudioRepository audioRepository, out List<BusItem> busses)
+        private static ParentStructure GetAudioParentStructure(HircItem sound, IAudioRepository audioRepository, out List<BusItem> busses)
         {
             busses = new List<BusItem>();
             var output = new ParentStructure()
@@ -49,7 +49,7 @@ namespace Editors.Audio.Shared.Wwise
                 Description = "Graph structure:"
             };
 
-            var parser = new WwiseTreeParserParent(audioRepository);
+            var parser = new HircTreeParentParser(audioRepository);
             var nodes = parser.BuildHierarchyAsFlatList(sound);
             nodes.Reverse();
 
@@ -59,27 +59,27 @@ namespace Editors.Audio.Shared.Wwise
 
                 if (node.Item is CAkActorMixer_V136 mixerInstance && mixerInstance.NodeBaseParams.OverrideBusId != 0)
                 {
-                    busInfo = $" - With AudioBus [{mixerInstance.NodeBaseParams.OverrideBusId}]";
+                    busInfo = $" - With Audio Bus [{mixerInstance.NodeBaseParams.OverrideBusId}]";
                     busses.Add(new BusItem() { SourceDescription = $"{node.Item.HircType}[{node.Item.Id}]", BusId = mixerInstance.NodeBaseParams.OverrideBusId });
                 }
                 else if (node.Item is CAkSound_V136 soundInstance && soundInstance.NodeBaseParams.OverrideBusId != 0)
                 {
-                    busInfo = $" - With AudioBus [{soundInstance.NodeBaseParams.OverrideBusId}]";
+                    busInfo = $" - With Audio Bus [{soundInstance.NodeBaseParams.OverrideBusId}]";
                     busses.Add(new BusItem() { SourceDescription = $"{node.Item.HircType}[{node.Item.Id}]", BusId = soundInstance.NodeBaseParams.OverrideBusId });
                 }
                 else if (node.Item is CAkRanSeqCntr_V136 randInstance && randInstance.NodeBaseParams.OverrideBusId != 0)
                 {
-                    busInfo = $" - With AudioBus [{randInstance.NodeBaseParams.OverrideBusId}]";
+                    busInfo = $" - With Audio Bus [{randInstance.NodeBaseParams.OverrideBusId}]";
                     busses.Add(new BusItem() { SourceDescription = $"{node.Item.HircType}[{node.Item.Id}]", BusId = randInstance.NodeBaseParams.OverrideBusId });
                 }
                 else if (node.Item is CAkLayerCntr_V136 layerInstance && layerInstance.NodeBaseParams.OverrideBusId != 0)
                 {
-                    busInfo = $" - With AudioBus [{layerInstance.NodeBaseParams.OverrideBusId}]";
+                    busInfo = $" - With Audio Bus [{layerInstance.NodeBaseParams.OverrideBusId}]";
                     busses.Add(new BusItem() { SourceDescription = $"{node.Item.HircType}[{node.Item.Id}]", BusId = layerInstance.NodeBaseParams.OverrideBusId });
                 }
                 else if (node.Item is CAkSwitchCntr_V136 switchInstance && switchInstance.NodeBaseParams.OverrideBusId != 0)
                 {
-                    busInfo = $" - With AudioBus [{switchInstance.NodeBaseParams.OverrideBusId}]";
+                    busInfo = $" - With Audio Bus [{switchInstance.NodeBaseParams.OverrideBusId}]";
                     busses.Add(new BusItem() { SourceDescription = $"{node.Item.HircType}[{node.Item.Id}]", BusId = switchInstance.NodeBaseParams.OverrideBusId });
                 }
 
@@ -101,7 +101,7 @@ namespace Editors.Audio.Shared.Wwise
 
             foreach (var currentBusItem in busItems)
             {
-                output.Add(new ParentStructure() { Description = $"AudioBus graph for {currentBusItem.SourceDescription}:" });
+                output.Add(new ParentStructure() { Description = $"Audio Bus graph for {currentBusItem.SourceDescription}:" });
 
                 var firstBus = audioRepository.GetHircs(currentBusItem.BusId)
                     .Where(x => x.HircType == AkBkHircType.Audio_Bus)

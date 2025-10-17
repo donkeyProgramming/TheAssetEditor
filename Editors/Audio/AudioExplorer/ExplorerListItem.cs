@@ -2,7 +2,7 @@
 
 namespace Editors.Audio.AudioExplorer
 {
-    public class SelectedHircItem
+    public class ExplorerListItem
     {
         public string DisplayName { get; set; }
         public uint Id { get; set; }

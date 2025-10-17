@@ -35,52 +35,11 @@
 
         <Grid.RowDefinitions>
             <RowDefinition 
-                Height="Auto"/>
-            <RowDefinition 
-                Height="Auto"/>
-            <RowDefinition 
                 Height="*"/>
-            <RowDefinition 
-                Height="Auto"/>
         </Grid.RowDefinitions>
 
-        <Grid
-            Grid.Row="0"
-            Grid.Column="0">
-
-            <Grid.RowDefinitions>
-                <RowDefinition 
-                    Height="Auto"/>
-            </Grid.RowDefinitions>
-
-            <Menu 
-                Grid.Row="0" 
-                Margin="0, 5, 5, 0">
-                <MenuItem 
-                    Header="File" 
-                    HorizontalAlignment="Left">
-                    <MenuItem 
-                        Header="Load Audio Languages" 
-                        Command="{Binding LoadAudioRepositoryForSelectedLanguagesCommand}"/>
-                    <MenuItem 
-                        Header="Load Hirc From ID" 
-                        Command="{Binding LoadHircFromIdActionCommand}"/>
-                    <MenuItem 
-                        Header="Export State Paths Using State" 
-                        Command="{Binding ExportStatePathsUsingStateCommand}"/>
-                </MenuItem>
-            </Menu>
-        </Grid>
-
-        <Border 
-            Grid.Row="1"
-            Grid.ColumnSpan="3"
-            Height="1" 
-            Background="{DynamicResource App.Border}" 
-            Margin="0, 5, 0, 0"/>
-
         <GridSplitter
-            Grid.Row="2"
+            Grid.Row="0"
             Grid.Column="1" 
             Width="5" 
             Background="{DynamicResource App.Border}" 
@@ -90,10 +49,12 @@
             ResizeDirection="Columns"/>
 
         <Grid 
-            Grid.Row="2" 
+            Grid.Row="0" 
             Grid.Column="0">
 
             <Grid.RowDefinitions>
+                <RowDefinition
+                    Height="Auto"/>
                 <RowDefinition
                     Height="Auto"/>
                 <RowDefinition
@@ -108,7 +69,7 @@
 
             <Grid
                 Grid.Row="0"
-                Margin="5, 0, 5, 0">
+                Margin="5, 5, 5, 5">
 
                 <Grid.RowDefinitions>
                     <RowDefinition
@@ -117,20 +78,14 @@
                         Height="Auto"/>
                 </Grid.RowDefinitions>
 
-                <Label
-                    Grid.Row="0"
-                    Margin="-5, 0, 0, 0"
-                    Content="Events"/>
-
                 <ComboBox
                     Grid.Row="1"
                     IsEditable="True"
                     IsTextSearchEnabled="true"
                     DisplayMemberPath="DisplayName"
-                    Text="{Binding EventFilter.EventList.Filter, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
-                    ItemsSource="{Binding EventFilter.EventList.Values}"
-                    SelectedItem="{Binding EventFilter.EventList.SelectedItem, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">
-
+                    Text="{Binding ExplorerFilter.ExplorerList.Filter, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                    ItemsSource="{Binding ExplorerFilter.ExplorerList.Values}"
+                    SelectedItem="{Binding ExplorerFilter.ExplorerList.SelectedItem, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
                     <ComboBox.ItemsPanel>
                         <ItemsPanelTemplate>
                             <VirtualizingStackPanel/>
@@ -141,67 +96,104 @@
 
             <Grid
                 Grid.Row="1"
-                Margin="5, 5, 0, 0">
+                Margin="5, 0, 0, 0">
+
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition 
                         Width="Auto"/>
                     <ColumnDefinition
                         Width="Auto"/>
+                    <ColumnDefinition
+                        Width="Auto"/>
+                    <ColumnDefinition
+                        Width="Auto"/>
                 </Grid.ColumnDefinitions>
 
-                <CheckBox 
+                <CheckBox
                     Grid.Column="0"
                     DockPanel.Dock="Top" 
-                    Content="Show Events" 
-                    IsChecked="{Binding ShowEvents, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
+                    Content="Search by Action Event" 
+                    IsChecked="{Binding SearchByActionEvent, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
 
-                <CheckBox
+                <CheckBox 
                     Grid.Column="1"
                     Margin="5, 0, 0, 0"
                     DockPanel.Dock="Top" 
-                    Content="Show Dialogs Events" 
-                    IsChecked="{Binding ShowDialogueEvents, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
+                    Content="Search By Dialogue Event" 
+                    IsChecked="{Binding SearchByDialogueEvent, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                
+                <CheckBox 
+                    Grid.Column="2"
+                    Margin="5, 0, 0, 0"
+                    DockPanel.Dock="Top" 
+                    Content="Search By VO Actor" 
+                    IsChecked="{Binding SearchByVOActor, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                
+                <CheckBox 
+                    Grid.Column="3"
+                    Margin="5, 0, 5, 0"
+                    DockPanel.Dock="Top" 
+                    Content="Search By Hirc ID" 
+                    IsChecked="{Binding SearchByHircId, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
             </Grid>
 
             <Expander
-                Grid.Row="2"
-                Margin="5, 5, 5, 0"
+                Grid.Row="3"
+                Margin="4, 5, 4, 0"
                 Header="Audio Languages">
-                <ListBox
-                    Margin="0,10,0,0"
-                    MaxHeight="500"
-                    ItemsSource="{Binding Languages}"
-                    SelectionMode="Extended"
-                    VerticalAlignment="Stretch"
-                    ScrollViewer.VerticalScrollBarVisibility="Auto">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition
+                            Height="Auto"/>
+                        <RowDefinition
+                            Height="Auto"/>
+                    </Grid.RowDefinitions>
 
-                    <ListBox.ItemTemplate>
-                        <DataTemplate>
-                            <CheckBox
-                                IsChecked="{Binding IsChecked, Mode=TwoWay}">
-                                <ContentPresenter
-                                    Content="{Binding Language}"
-                                    ContentTemplate="{StaticResource EnumToStringTemplate}"/>
-                            </CheckBox>
-                        </DataTemplate>
-                    </ListBox.ItemTemplate>
-                </ListBox>
+                    <Button
+                        Margin="0, 5, 0, 0"
+                        Grid.Row="0"
+                        Content="Load Audio Languages"
+                        Height="25"
+                        Command="{Binding LoadAudioRepositoryForSelectedLanguagesCommand}"/>
+                    
+                    <ListBox
+                        Grid.Row="1"
+                        Margin="0, 5, 0, 0"
+                        MaxHeight="500"
+                        ItemsSource="{Binding Languages}"
+                        SelectionMode="Extended"
+                        VerticalAlignment="Stretch"
+                        ScrollViewer.VerticalScrollBarVisibility="Auto">
+
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <CheckBox
+                                    IsChecked="{Binding IsChecked, Mode=TwoWay}">
+                                    <ContentPresenter
+                                        Content="{Binding Language}"
+                                        ContentTemplate="{StaticResource EnumToStringTemplate}"/>
+                                </CheckBox>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+                </Grid>
             </Expander>
 
             <Button
-                Grid.Row="3"
+                Grid.Row="4"
                 Margin="5, 5, 5, 5"
                 Content="Play Audio"
-                Height="20"
+                Height="25"
                 Command="{Binding PlaySelectedSoundActionCommand}" 
                 IsEnabled="{Binding IsPlaySoundButtonEnabled, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
-            
+
             <TreeView
-                Grid.Row="4"
-                ItemsSource="{Binding TreeList, UpdateSourceTrigger=PropertyChanged}" 
+                Grid.Row="5"
+                ItemsSource="{Binding TreeList, UpdateSourceTrigger=PropertyChanged}"
                 VirtualizingPanel.IsVirtualizing="True"
                 VirtualizingPanel.VirtualizationMode="Recycling"
-                VirtualizingPanel.IsVirtualizingWhenGrouping="True">
+                VirtualizingPanel.IsVirtualizingWhenGrouping="True"
+                PreviewMouseDoubleClick="OnNodeDoubleClick">
 
                 <TreeView.ItemContainerStyle>
                     <Style 
@@ -322,21 +314,17 @@
                 </TreeView.ItemContainerStyle>
 
                 <b:Interaction.Behaviors>
-                    <behaviors:BindableSelectedItemBehavior 
+                    <behaviors:BindableSelectedItemBehavior
                         SelectedItem="{Binding SelectedNode, Mode=TwoWay}"/>
                 </b:Interaction.Behaviors>
 
                 <TreeView.ItemTemplate>
-                    <HierarchicalDataTemplate 
+                    <HierarchicalDataTemplate
                         ItemsSource="{Binding Path=Children, UpdateSourceTrigger=PropertyChanged}">
                         <StackPanel 
                             Orientation="Horizontal">
-                            <TextBlock 
+                            <TextBlock
                                 Text="{Binding DisplayName, UpdateSourceTrigger=PropertyChanged}"/>
-                            <TextBlock 
-                                Text=""/>
-                            <TextBlock 
-                                Text=""/>
                         </StackPanel>
                     </HierarchicalDataTemplate>
                 </TreeView.ItemTemplate>
@@ -344,7 +332,7 @@
         </Grid>
 
         <Grid 
-            Grid.Row="2" 
+            Grid.Row="0" 
             Grid.Column="3">
 
             <Grid.RowDefinitions>

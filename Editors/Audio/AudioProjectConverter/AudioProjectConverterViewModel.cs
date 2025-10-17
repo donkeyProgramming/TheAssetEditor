@@ -13,6 +13,7 @@ using Editors.Audio.Shared.GameInformation.Warhammer3;
 using Editors.Audio.Shared.Storage;
 using Editors.Audio.Shared.Utilities;
 using Editors.Audio.Shared.Wwise;
+using Editors.Audio.Shared.Wwise.HircExploration;
 using Serilog;
 using Shared.Core.ErrorHandling;
 using Shared.Core.Misc;
@@ -222,15 +223,15 @@ namespace Editors.Audio.AudioProjectConverter
             var dialogueEventHirc = dialogueEvent as HircItem;
             var dialogueEventName = _audioRepository.GetNameFromId(dialogueEventHirc.Id);
 
-            var decisionPathHelper = new DecisionPathHelper(_audioRepository);
-            var decisionPathCollection = decisionPathHelper.GetDecisionPaths(dialogueEvent);
+            var statePathParser = new StatePathParser(_audioRepository);
+            var result = statePathParser.GetStatePaths(dialogueEvent);
 
             var voActorSubstrings = VOActorSubstring
                 .Split([','], StringSplitOptions.RemoveEmptyEntries)
                 .Select(substring => substring.Trim())
                 .ToArray();
 
-            var anyStatePathsContainRequiredPattern = decisionPathCollection.Paths
+            var anyStatePathsContainRequiredPattern = result.StatePaths
                 .Any(statePath => statePath.Items.Any(state =>
                     statesLookupByStateId.TryGetValue(state.Value, out var stateName) &&
                     voActorSubstrings.Any(substring => stateName.Contains(substring, StringComparison.CurrentCultureIgnoreCase))));
@@ -241,7 +242,7 @@ namespace Editors.Audio.AudioProjectConverter
             // Store the dialogue event for use later
             dialogueEventsToProcess.Add(dialogueEvent);
 
-            foreach (var statePath in decisionPathCollection.Paths)
+            foreach (var statePath in result.StatePaths)
             {
                 var statePathContainsRequiredPattern = statePath.Items.Any(state => statesLookupByStateId.TryGetValue(state.Value, out var stateName) 
                     && voActorSubstrings.Any(substring => stateName.Contains(substring, StringComparison.CurrentCultureIgnoreCase)));
@@ -283,7 +284,7 @@ namespace Editors.Audio.AudioProjectConverter
             ICAkDialogueEvent dialogueEvent,
             Dictionary<uint, string> wwiseStatesIdLookup,
             Dictionary<string, Dictionary<uint, string>> statesLookupByStateGroupByStateId,
-            DecisionPathHelper.DecisionPath statePath,
+            StatePathParser.StatePath statePath,
             List<StatePath.Node> statePathNodes,
             Dictionary<string, List<string>> moddedStateGroups)
         {
@@ -329,7 +330,7 @@ namespace Editors.Audio.AudioProjectConverter
             Dictionary<uint, List<HircItem>> hircLookupById,
             List<WavFile> wavFiles,
             string dialogueEventName,
-            DecisionPathHelper.DecisionPath statePath)
+            StatePathParser.StatePath statePath)
         {
             ProcessHircItem(statePath.ChildNodeId, dialogueEventsLookupByWemId, hircLookupById, wavFiles, dialogueEventName);
         }
