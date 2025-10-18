@@ -142,12 +142,25 @@ namespace Editors.Audio.AudioEditor.Presentation.AudioProjectEditor
 
         private void AddDataGridColumns(DataGridColumn column)
         {
+            if (column is null)
+                return;
+
+            // Prevent the same instance being added twice
+            if (DataGridColumns.Contains(column))
+                return;
+
             var headerName = column.Header?.ToString() ?? string.Empty;
-            var existingColumn = DataGridColumns.FirstOrDefault(column => string.Equals(column.Header?.ToString(), headerName, StringComparison.Ordinal));
+
+            // Prevent two different instances with the same header text
+            var existingColumn = DataGridColumns
+                .FirstOrDefault(col => string.Equals(col.Header?.ToString(), headerName, StringComparison.Ordinal));
+
             if (existingColumn != null)
                 DataGridColumns.Remove(existingColumn);
+
             DataGridColumns.Add(column);
         }
+
 
         private void OnEditorTableRowAddedToViewer(EditorTableRowAddedToViewerEvent e)
         {

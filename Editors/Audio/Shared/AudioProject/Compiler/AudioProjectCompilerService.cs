@@ -190,10 +190,15 @@ namespace Editors.Audio.Shared.AudioProject.Compiler
 
         private void GenerateWems(AudioProjectFile audioProject, List<AudioFile> audioFiles, List<Sound> sounds)
         {
-            _logger.Here().Information($"Generating {audioFiles.Count} WEMs");
-            _wemGeneratorService.GenerateWems(audioFiles);
-            _wemGeneratorService.SaveWemsToPack(audioFiles);
-            UpdateSoundInMemoryMediaSize(audioProject, sounds);
+            _wemGeneratorService.RemoveExistingAudioFilesAndSounds(audioFiles, sounds);
+
+            if (audioFiles.Count > 0)
+            {
+                _logger.Here().Information($"Generating {audioFiles.Count} WEMs");
+                _wemGeneratorService.GenerateWems(audioFiles);
+                _wemGeneratorService.SaveWemsToPack(audioFiles);
+                UpdateSoundInMemoryMediaSize(audioProject, sounds);
+            }
         }
 
         private static void UpdateSoundInMemoryMediaSize(AudioProjectFile audioProject, List<Sound> sounds)

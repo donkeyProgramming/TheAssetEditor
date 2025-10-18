@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using Editors.Audio.Shared.AudioProject.Models;
-using Editors.Audio.Shared.Wwise;
 using Serilog;
 using Shared.Core.ErrorHandling;
 using Shared.Core.Misc;
@@ -12,6 +12,7 @@ namespace Editors.Audio.Shared.Wwise.Generators
 {
     public interface IWemGeneratorService
     {
+        void RemoveExistingAudioFilesAndSounds(List<AudioFile> audioFiles, List<Sound> sounds);
         void GenerateWems(List<AudioFile> audioFiles);
         void SaveWemsToPack(List<AudioFile> audioFiles);
     }
@@ -23,6 +24,19 @@ namespace Editors.Audio.Shared.Wwise.Generators
 
         private readonly ILogger _logger = Logging.Create<WemGeneratorService>();
 
+        public void RemoveExistingAudioFilesAndSounds(List<AudioFile> audioFiles, List<Sound> sounds)
+        {
+            // Make a copy so we remove from the original
+            foreach (var audioFile in audioFiles.ToList())
+            {
+                var wemFile = _packFileService.FindFile(audioFile.WemPackFilePath);
+                if (wemFile != null)
+                {
+                    audioFiles.Remove(audioFile);
+                    sounds.Remove(sounds.FirstOrDefault(sound => sound.SourceId == audioFile.Id));
+                }
+            }
+        }
         public void GenerateWems(List<AudioFile> audioFiles)
         {
             var wavToWemFolderPath = $"{DirectoryHelper.Temp}\\WavToWem";
