@@ -57,7 +57,7 @@ namespace Editors.Audio.AudioEditor.Presentation.AudioProjectEditor
 
             EditorLabel = $"Audio Project Editor";
 
-            _eventHub.Register<AudioProjectInitialisedEvent>(this, OnAudioProjectInitialised);
+            _eventHub.Register<AudioProjectLoadedEvent>(this, OnAudioProjectInitialised);
             _eventHub.Register<AudioProjectExplorerNodeSelectedEvent>(this, OnAudioProjectExplorerNodeSelected);
             _eventHub.Register<EditorTableColumnAddRequestedEvent>(this, OnEditorTableColumnAddRequested);
             _eventHub.Register<EditorTableRowAddRequestedEvent>(this, OnEditorTableRowAddRequested);
@@ -70,7 +70,7 @@ namespace Editors.Audio.AudioEditor.Presentation.AudioProjectEditor
             _eventHub.Register<EditorAddRowButtonEnablementUpdateRequestedEvent>(this, OnEditorAddRowButtonEnablementUpdateRequested);
         }
 
-        private void OnAudioProjectInitialised(AudioProjectInitialisedEvent e)
+        private void OnAudioProjectInitialised(AudioProjectLoadedEvent e)
         {
             ResetEditorVisibility();
             ResetEditorLabel();

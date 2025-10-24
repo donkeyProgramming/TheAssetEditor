@@ -45,24 +45,24 @@
 
             <Button 
                 Grid.Column="0"
-                Content="Edit Item" 
-                ToolTip="PLACEHOLDER" 
-                Command="{Binding EditRowCommand}" 
                 Margin="5, 0, 0, 0" 
                 Width="70" 
                 VerticalAlignment="Center" 
                 HorizontalAlignment="Left"
+                Content="Edit Item" 
+                ToolTip="Removes the selected row from the Audio Project and adds it to the Audio Project Editor" 
+                Command="{Binding EditRowCommand}" 
                 IsEnabled="{Binding IsUpdateRowButtonEnabled}"/>
 
             <Button 
                 Grid.Column="1"
-                Content="Remove From Audio Project" 
-                ToolTip="PLACEHOLDER" 
-                Command="{Binding RemoveRowCommand}" 
                 Margin="5, 0, 0, 0" 
-                Width="170" 
+                Width="90" 
                 VerticalAlignment="Center" 
                 HorizontalAlignment="Left"
+                Content="Remove Row" 
+                ToolTip="Removes the selected row(s) from the Audio Project." 
+                Command="{Binding RemoveRowCommand}" 
                 IsEnabled="{Binding IsRemoveRowButtonEnabled}"/>
         </Grid>
 

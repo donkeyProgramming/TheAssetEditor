@@ -51,10 +51,10 @@ namespace Editors.Audio.AudioEditor.Presentation.AudioProjectExplorer
 
             AudioProjectExplorerLabel = $"Audio Project Explorer";
 
-            _eventHub.Register<AudioProjectInitialisedEvent>(this, OnAudioProjectInitialised);
+            _eventHub.Register<AudioProjectLoadedEvent>(this, OnAudioProjectInitialised);
         }
 
-        private void OnAudioProjectInitialised(AudioProjectInitialisedEvent e)
+        private void OnAudioProjectInitialised(AudioProjectLoadedEvent e)
         {
             ResetFilters();
 

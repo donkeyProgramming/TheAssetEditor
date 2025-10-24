@@ -23,7 +23,8 @@
             <TextBlock 
                 Text="{Binding Converter={StaticResource EnumConverter}}"/>
         </DataTemplate>
-        <BooleanToVisibilityConverter x:Key="BoolToVisibilityConverter"/>
+        <BooleanToVisibilityConverter 
+            x:Key="BoolToVisibilityConverter"/>
     </UserControl.Resources>
 
     <Grid>
@@ -99,7 +100,7 @@
                         SelectionChanged="OnWatermarkComboBoxSelectionChanged"
                         IsEnabled="{Binding IsDialogueEventFilterEnabled}"
                         Watermark="Select Dialogue Event Type Filter" 
-                        ToolTip="PLACEHOLDER"/>
+                        ToolTip="Dialogue Event Type refers to the type of action or trigger in game that the Dialogue Event relates to. Select the Dialogue Event type to filter by that."/>
 
                     <ExtendedWpfToolkit:WatermarkComboBox 
                         x:Name ="DialogueEventProfileFilterComboBox"
@@ -115,7 +116,7 @@
                         SelectionChanged="OnWatermarkComboBoxSelectionChanged"
                         IsEnabled="{Binding IsDialogueEventFilterEnabled}"
                         Watermark="Select Dialogue Event Profile Filter" 
-                        ToolTip="PLACEHOLDER"/>
+                        ToolTip="The Dialogue Event profile refers to the Select the Dialogue Event profile to filter by that"/>
                 </Grid>
 
                 <Grid
@@ -148,27 +149,27 @@
                         Grid.Column="0"
                         Grid.Row="1"
                         Margin="0, 0, 0, 0"
-                        Content="Show Edited Items Only"
-                        ToolTip="PLACEHOLDER"
                         VerticalAlignment="Center"
+                        Content="Show Edited Items Only"
+                        ToolTip="Filters the Audio Project Explorer tree to show only items that have been edited."
                         IsChecked="{Binding ShowEditedItemsOnly, Mode=TwoWay}"/>
                     
                     <CheckBox 
                         Grid.Column="1"
                         Grid.Row="1"
                         Margin="5, 0, 0, 0"
-                        Content="Show Action Events"
-                        ToolTip="PLACEHOLDER"
                         VerticalAlignment="Center"
+                        Content="Show Action Events"
+                        ToolTip="Filters the Audio Project Explorer tree to show or hide Action Events."
                         IsChecked="{Binding ShowActionEvents, Mode=TwoWay}"/>
                     
                     <CheckBox 
                         Grid.Column="2"
                         Grid.Row="1"
                         Margin="5, 0, 0, 0"
-                        Content="Show Dialogue Events"
-                        ToolTip="PLACEHOLDER"
                         VerticalAlignment="Center"
+                        Content="Show Dialogue Events"
+                        ToolTip="Filters the Audio Project Explorer Tree to show or hide Dialogue Events."
                         IsChecked="{Binding ShowDialogueEvents, Mode=TwoWay}"/>
                 </Grid>
 

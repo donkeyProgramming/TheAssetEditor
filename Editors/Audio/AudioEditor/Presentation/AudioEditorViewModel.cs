@@ -18,43 +18,59 @@ using Shared.Core.ToolCreation;
 
 namespace Editors.Audio.AudioEditor
 {
-    // TODO: Resolve TOOLTIP PLACEHOLDER instances
-    // TODO: Implement something where the compiler is greyed out until you have a wwise path set
-    public partial class AudioEditorViewModel(
-        IUiCommandFactory uiCommandFactory,
-        IEventHub eventHub,
-        IAudioEditorStateService audioEditorStateService,
-        IAudioEditorFileService audioEditorFileService,
-        IAudioProjectCompilerService audioProjectCompilerService,
-        AudioProjectExplorerViewModel audioProjectExplorerViewModel,
-        AudioFilesExplorerViewModel audioFilesExplorerViewModel,
-        AudioProjectEditorViewModel audioProjectEditorViewModel,
-        AudioProjectViewerViewModel audioProjectViewerViewModel,
-        HircSettingsViewModel settingsViewModel,
-        WaveformVisualiserViewModel waveformVisualiserViewModel) : ObservableObject, IEditorInterface
+    public partial class AudioEditorViewModel : ObservableObject, IEditorInterface
     {
-        private readonly IUiCommandFactory _uiCommandFactory = uiCommandFactory;
-        private readonly IEventHub _eventHub = eventHub;
-        private readonly IAudioEditorStateService _audioEditorStateService = audioEditorStateService;
-        private readonly IAudioEditorFileService _audioEditorFileService = audioEditorFileService;
-        private readonly IAudioProjectCompilerService _audioProjectCompilerService = audioProjectCompilerService;
+        private readonly IUiCommandFactory _uiCommandFactory;
+        private readonly IEventHub _eventHub;
+        private readonly IAudioEditorStateService _audioEditorStateService;
+        private readonly IAudioEditorFileService _audioEditorFileService;
+        private readonly IAudioProjectCompilerService _audioProjectCompilerService;
 
-        public AudioProjectExplorerViewModel AudioProjectExplorerViewModel { get; } = audioProjectExplorerViewModel;
-        public AudioFilesExplorerViewModel AudioFilesExplorerViewModel { get; } = audioFilesExplorerViewModel;
-        public AudioProjectEditorViewModel AudioProjectEditorViewModel { get; } = audioProjectEditorViewModel;
-        public AudioProjectViewerViewModel AudioProjectViewerViewModel { get; } = audioProjectViewerViewModel;
-        public HircSettingsViewModel SettingsViewModel { get; } = settingsViewModel;
-        public WaveformVisualiserViewModel WaveformVisualiserViewModel { get; } = waveformVisualiserViewModel;
+        [ObservableProperty] private bool _isAudioProjectLoaded = false;
+
+        public AudioEditorViewModel(
+            IUiCommandFactory uiCommandFactory,
+            IEventHub eventHub,
+            IAudioEditorStateService audioEditorStateService,
+            IAudioEditorFileService audioEditorFileService,
+            IAudioProjectCompilerService audioProjectCompilerService,
+            AudioProjectExplorerViewModel audioProjectExplorerViewModel,
+            AudioFilesExplorerViewModel audioFilesExplorerViewModel,
+            AudioProjectEditorViewModel audioProjectEditorViewModel,
+            AudioProjectViewerViewModel audioProjectViewerViewModel,
+            HircSettingsViewModel settingsViewModel,
+            WaveformVisualiserViewModel waveformVisualiserViewModel)
+        {
+            _uiCommandFactory = uiCommandFactory;
+            _eventHub = eventHub;
+            _audioEditorStateService = audioEditorStateService;
+            _audioEditorFileService = audioEditorFileService;
+            _audioProjectCompilerService = audioProjectCompilerService;
+            AudioProjectExplorerViewModel = audioProjectExplorerViewModel;
+            AudioFilesExplorerViewModel = audioFilesExplorerViewModel;
+            AudioProjectEditorViewModel = audioProjectEditorViewModel;
+            AudioProjectViewerViewModel = audioProjectViewerViewModel;
+            SettingsViewModel = settingsViewModel;
+            WaveformVisualiserViewModel = waveformVisualiserViewModel;
+
+            _eventHub.Register<AudioProjectLoadedEvent>(this, OnAudioProjectLoaded);
+        }
+
+        public AudioProjectExplorerViewModel AudioProjectExplorerViewModel { get; }
+        public AudioFilesExplorerViewModel AudioFilesExplorerViewModel { get; }
+        public AudioProjectEditorViewModel AudioProjectEditorViewModel { get; }
+        public AudioProjectViewerViewModel AudioProjectViewerViewModel { get; }
+        public HircSettingsViewModel SettingsViewModel { get; }
+        public WaveformVisualiserViewModel WaveformVisualiserViewModel { get; }
 
         public string DisplayName { get; set; } = "Audio Editor";
+
+        private void OnAudioProjectLoaded(AudioProjectLoadedEvent e) => IsAudioProjectLoaded = true;
 
         [RelayCommand] public void NewAudioProject() => _uiCommandFactory.Create<OpenNewAudioProjectWindowCommand>().Execute();
 
         [RelayCommand] public void SaveAudioProject()
         {
-            if (_audioEditorStateService.AudioProject == null)
-                return;
-
             var audioProject = _audioEditorStateService.AudioProject;
             var fileName = _audioEditorStateService.AudioProjectFileName;
             var filePath = _audioEditorStateService.AudioProjectFilePath;
@@ -65,17 +81,11 @@ namespace Editors.Audio.AudioEditor
 
         [RelayCommand] public void CompileAudioProject()
         {
-            if (_audioEditorStateService.AudioProject == null)
-                return;
-
             SaveAudioProject();
-
             var cleanAudioProject = AudioProjectFile.Clean(_audioEditorStateService.AudioProject);
             var fileName = _audioEditorStateService.AudioProjectFileName;
             var filePath = _audioEditorStateService.AudioProjectFilePath;
             _audioProjectCompilerService.Compile(cleanAudioProject, fileName, filePath);
-
-            _eventHub.Publish(new AudioProjectInitialisedEvent());
         }
 
         [RelayCommand] public void OpenDialogueEventMerger() => _uiCommandFactory.Create<OpenDialogueEventMergerWindowCommand>().Execute();

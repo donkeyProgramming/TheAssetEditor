@@ -56,7 +56,8 @@ namespace Editors.Audio.AudioEditor.Core
         public void LoadFromDialog()
         {
             var result = _audioProjectFileService.LoadFromDialog();
-            Load(result.AudioProject, result.FileName, result.FilePath, false);
+            if (result != null)
+                Load(result.AudioProject, result.FileName, result.FilePath, false);
         }
 
         public void Load(AudioProjectFile audioProject, string fileName, string filePath, bool isNotLoadedFromDialog = true)
@@ -91,7 +92,7 @@ namespace Editors.Audio.AudioEditor.Core
             _audioEditorStateService.StoreAudioProjectFileName(fileName);
             _audioEditorStateService.StoreAudioProjectFilePath(filePath);
 
-            _eventHub.Publish(new AudioProjectInitialisedEvent());
+            _eventHub.Publish(new AudioProjectLoadedEvent());
         }
     }
 }

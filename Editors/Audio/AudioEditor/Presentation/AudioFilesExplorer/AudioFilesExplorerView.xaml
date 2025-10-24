@@ -14,7 +14,8 @@
     <UserControl.Resources>
         <Converters:ImageConverter 
             x:Key="ImageValueConverter"/>
-        <BooleanToVisibilityConverter x:Key="BoolToVisibilityConverter"/>
+        <BooleanToVisibilityConverter 
+            x:Key="BoolToVisibilityConverter"/>
     </UserControl.Resources>
 
     <Grid>

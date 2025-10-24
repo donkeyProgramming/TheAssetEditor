@@ -45,11 +45,11 @@
 
             <Button 
                 Grid.Column="0"
-                Content="Add to Audio Project"
-                ToolTip="PLACEHOLDER" 
+                Content="Add Row"
+                ToolTip="Adds the row to the Audio Project." 
                 Command="{Binding AddRowToViewerCommand}" 
                 Margin="5, 0, 0, 0" 
-                Width="130" 
+                Width="70" 
                 VerticalAlignment="Center" 
                 HorizontalAlignment="Left"
                 IsEnabled="{Binding IsAddRowButtonEnabled}"/>
@@ -57,7 +57,7 @@
             <CheckBox 
                 Grid.Column="1"
                 Content="Show Modded States Only"
-                ToolTip="PLACEHOLDER" 
+                ToolTip="Shows only modded states in the drop downs rather than modded states and vanilla states." 
                 Margin="5, 0, 0, 0" 
                 VerticalAlignment="Center" 
                 IsChecked="{Binding ShowModdedStatesOnly, Mode=TwoWay}" 

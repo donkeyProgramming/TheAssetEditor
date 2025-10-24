@@ -25,7 +25,6 @@ namespace Editors.Audio.AudioEditor.Commands
             var soundBankName = _audioEditorStateService.SelectedAudioProjectExplorerNode.Name;
             var actionEventName = TableHelpers.GetActionEventNameFromRow(row);
             _actionEventService.RemoveActionEvent(soundBankName, actionEventName);
-
             _eventHub.Publish(new ViewerTableRowRemoveRequestedEvent(row));
         }
     }

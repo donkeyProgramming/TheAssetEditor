@@ -64,7 +64,7 @@
                 <TextBox 
                     Grid.Column="1"
                     Text="{Binding AudioProjectFileName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                    ToolTip="PLACEHOLDER TOOLTIP"
+                    ToolTip="The name of the Audio Project."
                     VerticalContentAlignment="Center"
                     Padding="2, 0, 0, 0"/>
             </Grid>
@@ -89,7 +89,7 @@
                 <TextBox 
                     Grid.Column="1"
                     Text="{Binding AudioProjectDirectory, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                    ToolTip="PLACEHOLDER TOOLTIP"
+                    ToolTip="The folder location in the Pack the Audio Project should go."
                     IsReadOnly="True"
                     VerticalContentAlignment="Center"
                     Padding="2, 0, 0, 0"/>
@@ -119,7 +119,7 @@
 
                 <ComboBox 
                     Grid.Column="1" 
-                    ToolTip="PLACEHOLDER TOOLTIP"
+                    ToolTip="The game language of your Audio Project."
                     ItemsSource="{Binding Languages}" 
                     SelectedItem="{Binding SelectedLanguage}" 
                     ItemTemplate="{StaticResource EnumToStringTemplate}"/>

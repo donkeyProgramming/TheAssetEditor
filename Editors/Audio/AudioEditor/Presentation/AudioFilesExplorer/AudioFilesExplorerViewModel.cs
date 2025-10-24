@@ -60,8 +60,10 @@ namespace Editors.Audio.AudioEditor.Presentation.AudioFilesExplorer
 
             _eventHub.Register<AudioProjectExplorerNodeSelectedEvent>(this, OnAudioProjectExplorerNodeSelected);
             _eventHub.Register<AudioFilesChangedEvent>(this, OnAudioFilesChanged);
+            _globalEventHub.Register<PackFileContainerSetAsMainEditableEvent>(this, x => OnPackFileContainerSetAsMainEditable(x.Container));
             _globalEventHub.Register<PackFileContainerFilesAddedEvent>(this, x => RefreshAudioFilesTree(x.Container));
             _globalEventHub.Register<PackFileContainerFilesRemovedEvent>(this, x => RefreshAudioFilesTree(x.Container));
+            _globalEventHub.Register<PackFileContainerFilesUpdatedEvent>(this, x => RefreshAudioFilesTree(x.Container));
             _globalEventHub.Register<PackFileContainerFolderRemovedEvent>(this, x => RefreshAudioFilesTree(x.Container));
 
             var editablePack = _packFileService.GetEditablePack();
@@ -131,10 +133,18 @@ namespace Editors.Audio.AudioEditor.Presentation.AudioFilesExplorer
 
         private void OnAudioFilesChanged(AudioFilesChangedEvent e) => SetButtonEnablement();
 
+        private void OnPackFileContainerSetAsMainEditable(PackFileContainer packFileContainer)
+        {
+            if (packFileContainer == null)
+                return;
+
+            AudioFilesExplorerLabel = $"Audio Files Explorer - {TableHelpers.DuplicateUnderscores(packFileContainer.Name)}";
+            RefreshAudioFilesTree(packFileContainer);
+        }
+
         private void RefreshAudioFilesTree(PackFileContainer packFileContainer)
         {
             AudioFilesTree = _audioFilesTreeBuilder.BuildTree(packFileContainer);
-
             CacheRootWavFilesInWaveformVisualiser();
         }
 

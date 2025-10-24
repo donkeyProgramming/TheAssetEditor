@@ -1,4 +1,4 @@
 ﻿namespace Editors.Audio.AudioEditor.Events
 {
-    public record AudioProjectInitialisedEvent();
+    public record AudioProjectLoadedEvent();
 }

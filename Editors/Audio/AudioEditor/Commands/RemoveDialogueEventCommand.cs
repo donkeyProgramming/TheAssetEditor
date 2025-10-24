@@ -1,4 +1,5 @@
 ﻿using System.Data;
+using System.Windows;
 using Editors.Audio.AudioEditor.Core;
 using Editors.Audio.AudioEditor.Core.AudioProjectMutation;
 using Editors.Audio.AudioEditor.Events;
@@ -27,12 +28,15 @@ namespace Editors.Audio.AudioEditor.Commands
         {
             var dialogueEventNodeName = _audioEditorStateService.SelectedAudioProjectExplorerNode.Name;
             var statePathName = TableHelpers.GetStatePathNameFromRow(row, _audioRepository, dialogueEventNodeName);
-            _dialogueEventService.RemoveStatePath(dialogueEventNodeName, statePathName);
-
-            // TODO: Do we need to then display a message to the user saying we can't do this until they fix the state path?
-            var result = false;
-            if (result == false)
+            var result = _dialogueEventService.RemoveStatePath(dialogueEventNodeName, statePathName);
+            if (result)
                 _eventHub.Publish(new ViewerTableRowRemoveRequestedEvent(row));
+            else
+            {
+                var message = "State Path is incomplete probably due to a change to the Dialogue Event by CA. Add the missing State(s).";
+                MessageBox.Show(message, "Error");
+            }
+
         }
     }
 }

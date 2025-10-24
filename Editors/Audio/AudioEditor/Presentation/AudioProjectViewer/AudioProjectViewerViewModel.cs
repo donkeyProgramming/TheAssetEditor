@@ -60,7 +60,7 @@ namespace Editors.Audio.AudioEditor.Presentation.AudioProjectViewer
 
             ViewerLabel = $"Audio Project Viewer";
 
-            _eventHub.Register<AudioProjectInitialisedEvent>(this, OnAudioProjectInitialised);
+            _eventHub.Register<AudioProjectLoadedEvent>(this, OnAudioProjectInitialised);
             _eventHub.Register<AudioProjectExplorerNodeSelectedEvent>(this, OnAudioProjectExplorerNodeSelected);
             _eventHub.Register<ViewerTableColumnAddRequestedEvent>(this, OnViewerTableColumnAddRequested);
             _eventHub.Register<ViewerTableRowAddRequestedEvent>(this, OnViewerTableRowAddRequested);
@@ -69,7 +69,7 @@ namespace Editors.Audio.AudioEditor.Presentation.AudioProjectViewer
             _eventHub.Register<ViewerDataGridColumnAddedEvent>(this, OnViewerDataGridColumnAdded);
         }
 
-        private void OnAudioProjectInitialised(AudioProjectInitialisedEvent e)
+        private void OnAudioProjectInitialised(AudioProjectLoadedEvent e)
         {
             ResetViewerVisibility();
             ResetViewerLabel();

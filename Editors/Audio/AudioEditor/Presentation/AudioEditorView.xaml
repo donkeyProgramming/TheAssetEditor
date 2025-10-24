@@ -50,10 +50,12 @@
                         Command="{Binding LoadAudioProjectCommand}"/>
                     <MenuItem 
                         Header="Save Audio Project" 
-                        Command="{Binding SaveAudioProjectCommand}"/>
+                        Command="{Binding SaveAudioProjectCommand}"
+                        IsEnabled="{Binding IsAudioProjectLoaded}"/>
                     <MenuItem 
                         Header="Compile Audio Project" 
-                        Command="{Binding CompileAudioProjectCommand}"/>
+                        Command="{Binding CompileAudioProjectCommand}"
+                        IsEnabled="{Binding IsAudioProjectLoaded}"/>
                 </MenuItem>
                 <MenuItem 
                     Header="Tools" 
