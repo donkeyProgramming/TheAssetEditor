@@ -453,7 +453,7 @@ namespace Editors.Audio.AudioProjectConverter
                 StatePath audioProjectStatePath;
                 if (audioFiles.Count > 1)
                 {
-                    var soundReferences = new List<uint>();
+                    var children = new List<uint>();
 
                     var randomSequenceContainerIds = IdGenerator.GenerateIds(usedHircIds);
                     usedHircIds.Add(randomSequenceContainerIds.Id);
@@ -466,17 +466,17 @@ namespace Editors.Audio.AudioProjectConverter
                         var sound = Sound.Create(soundIds.Guid, soundIds.Id, randomSequenceContainerIds.Id, playlistOrder, audioFile.Id, audioProject.Language);
 
                         usedHircIds.Add(soundIds.Id);
-                        audioFile.SoundReferences.Add(sound.Id);
-                        soundReferences.Add(sound.Id);
+                        audioFile.Sounds.Add(sound.Id);
+                        children.Add(sound.Id);
                         audioProjectDialogueEventSoundBank.Sounds.TryAdd(sound);
                     }
 
-                    var randomSequenceContainerSettings = AudioSettings.CreateRecommendedRandomSequenceContainerSettings(audioFiles.Count);
+                    var randomSequenceContainerSettings = Shared.AudioProject.Models.HircSettings.CreateRecommendedRandomSequenceContainerSettings(audioFiles.Count);
                     var randomSequenceContainer = RandomSequenceContainer.Create(
                         randomSequenceContainerIds.Guid,
                         randomSequenceContainerIds.Id,
                         randomSequenceContainerSettings,
-                        soundReferences,
+                        children,
                         directParentId: actorMixerId);
                     audioProjectStatePath = StatePath.Create(statePath.StatePathNodes, randomSequenceContainer.Id, AkBkHircType.RandomSequenceContainer);
 
@@ -488,9 +488,9 @@ namespace Editors.Audio.AudioProjectConverter
                     var soundIds = IdGenerator.GenerateIds(usedHircIds);
                     usedHircIds.Add(soundIds.Id);
 
-                    var soundSettings = AudioSettings.CreateSoundSettings();
+                    var soundSettings = Shared.AudioProject.Models.HircSettings.CreateSoundSettings();
                     var sound = Sound.Create(soundIds.Guid, soundIds.Id, 0, actorMixerId, audioFile.Id, audioProject.Language, soundSettings);
-                    audioFile.SoundReferences.Add(sound.Id);
+                    audioFile.Sounds.Add(sound.Id);
 
                     audioProjectStatePath = StatePath.Create(statePath.StatePathNodes, sound.Id, AkBkHircType.Sound);
 

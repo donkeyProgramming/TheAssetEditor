@@ -6,12 +6,13 @@ using Editors.Audio.Shared.AudioProject.Models;
 using Editors.Audio.Shared.GameInformation.Warhammer3;
 using Editors.Audio.Shared.Storage;
 using Editors.Audio.Shared.Wwise;
+using HircSettings = Editors.Audio.Shared.AudioProject.Models.HircSettings;
 
 namespace Editors.Audio.AudioEditor.Core.AudioProjectMutation
 {
     public interface IDialogueEventService
     {
-        void AddStatePath(string dialogueEventName, List<AudioFile> audioFiles, AudioSettings audioSettings, Dictionary<string, string> stateLookupByStateGroup);
+        void AddStatePath(string dialogueEventName, List<AudioFile> audioFiles, HircSettings hircSettings, Dictionary<string, string> stateLookupByStateGroup);
         bool RemoveStatePath(string dialogueEventName, string statePathName);
     }
 
@@ -21,7 +22,7 @@ namespace Editors.Audio.AudioEditor.Core.AudioProjectMutation
         private readonly IAudioRepository _audioRepository = audioRepository;
         private readonly IStatePathFactory _statePathFactory = statePathFactory;
 
-        public void AddStatePath(string dialogueEventName, List<AudioFile> audioFiles, AudioSettings audioSettings, Dictionary<string, string> stateLookupByStateGroup)
+        public void AddStatePath(string dialogueEventName, List<AudioFile> audioFiles, HircSettings hircSettings, Dictionary<string, string> stateLookupByStateGroup)
         {
             var usedHircIds = new HashSet<uint>();
             var usedSourceIds = new HashSet<uint>();
@@ -46,7 +47,7 @@ namespace Editors.Audio.AudioEditor.Core.AudioProjectMutation
 
             var dialogueEvent = _audioEditorStateService.AudioProject.GetDialogueEvent(dialogueEventName);
             var actorMixerId = Wh3DialogueEventInformation.GetActorMixerId(dialogueEvent.Name);
-            var statePathFactoryResult = _statePathFactory.Create(stateLookupByStateGroup, audioFiles, audioSettings, usedHircIds, usedSourceIds, soundBank.Language, actorMixerId: actorMixerId);
+            var statePathFactoryResult = _statePathFactory.Create(stateLookupByStateGroup, audioFiles, hircSettings, usedHircIds, usedSourceIds, soundBank.Language, actorMixerId: actorMixerId);
             dialogueEvent.StatePaths.InsertAlphabetically(statePathFactoryResult.StatePath);
 
             if (statePathFactoryResult.StatePath.TargetHircTypeIsSound())
@@ -60,8 +61,8 @@ namespace Editors.Audio.AudioEditor.Core.AudioProjectMutation
                     audioProject.AudioFiles.TryAdd(audioFile);
                 }
                 
-                if (!audioFile.SoundReferences.Contains(statePathFactoryResult.SoundTarget.Id))
-                    audioFile.SoundReferences.Add(statePathFactoryResult.SoundTarget.Id);
+                if (!audioFile.Sounds.Contains(statePathFactoryResult.SoundTarget.Id))
+                    audioFile.Sounds.Add(statePathFactoryResult.SoundTarget.Id);
             }
             else if (statePathFactoryResult.StatePath.TargetHircTypeIsRandomSequenceContainer())
             {
@@ -77,8 +78,8 @@ namespace Editors.Audio.AudioEditor.Core.AudioProjectMutation
                         audioProject.AudioFiles.TryAdd(audioFile);
                     }
 
-                    if (!audioFile.SoundReferences.Contains(sound.Id))
-                        audioFile.SoundReferences.Add(sound.Id);
+                    if (!audioFile.Sounds.Contains(sound.Id))
+                        audioFile.Sounds.Add(sound.Id);
                 }
             }
         }
@@ -102,26 +103,26 @@ namespace Editors.Audio.AudioEditor.Core.AudioProjectMutation
                 {
                     var sound = soundBank.GetSound(statePath.TargetHircId);
                     var audioFile = audioProject.GetAudioFile(sound.SourceId);
-                    audioFile.SoundReferences.Remove(sound.Id);
+                    audioFile.Sounds.Remove(sound.Id);
 
                     soundBank.Sounds.Remove(sound);
-                    audioFile.SoundReferences.Remove(sound.Id);
+                    audioFile.Sounds.Remove(sound.Id);
 
-                    if (audioFile.SoundReferences.Count == 0)
+                    if (audioFile.Sounds.Count == 0)
                         audioProject.AudioFiles.Remove(audioFile);
                 }
                 else if (statePath.TargetHircTypeIsRandomSequenceContainer())
                 {
                     var randomSequenceContainer = soundBank.GetRandomSequenceContainer(statePath.TargetHircId);
-                    var sounds = soundBank.GetSounds(randomSequenceContainer.SoundReferences);
+                    var sounds = soundBank.GetSounds(randomSequenceContainer.Children);
                     foreach (var sound in sounds)
                     {
                         var audioFile = audioProject.GetAudioFile(sound.SourceId);
 
                         soundBank.Sounds.Remove(sound);
-                        audioFile.SoundReferences.Remove(sound.Id);
+                        audioFile.Sounds.Remove(sound.Id);
 
-                        if (audioFile.SoundReferences.Count == 0)
+                        if (audioFile.Sounds.Count == 0)
                             audioProject.AudioFiles.Remove(audioFile);
                     }
 

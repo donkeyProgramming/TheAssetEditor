@@ -7,12 +7,13 @@ using Editors.Audio.Shared.AudioProject.Models;
 using Editors.Audio.Shared.GameInformation.Warhammer3;
 using Editors.Audio.Shared.Storage;
 using Editors.Audio.Shared.Wwise;
+using HircSettings = Editors.Audio.Shared.AudioProject.Models.HircSettings;
 
 namespace Editors.Audio.AudioEditor.Core.AudioProjectMutation
 {
     public interface IActionEventService
     {
-        void AddActionEvent(string actionEventGroupName, string actionEventName, List<AudioFile> audioFiles, AudioSettings audioSettings);
+        void AddActionEvent(string actionEventGroupName, string actionEventName, List<AudioFile> audioFiles, HircSettings hircSettings);
         void RemoveActionEvent(string actionEventNodeName, string actionEventName);
     }
 
@@ -22,7 +23,7 @@ namespace Editors.Audio.AudioEditor.Core.AudioProjectMutation
         private readonly IAudioRepository _audioRepository = audioRepository;
         private readonly IActionEventFactory _actionEventFactory = actionEventFactory;
 
-        public void AddActionEvent(string actionEventTypeName, string actionEventName, List<AudioFile> audioFiles, AudioSettings audioSettings)
+        public void AddActionEvent(string actionEventTypeName, string actionEventName, List<AudioFile> audioFiles, HircSettings hircSettings)
         {
             var usedHircIds = new HashSet<uint>();
             var usedSourceIds = new HashSet<uint>();
@@ -46,7 +47,7 @@ namespace Editors.Audio.AudioEditor.Core.AudioProjectMutation
             var soundBank = _audioEditorStateService.AudioProject.GetSoundBank(soundBankName);
 
             var actionEventType = Wh3ActionEventInformation.GetActionEventType(actionEventTypeName);
-            var playActionEventResult = _actionEventFactory.CreatePlayActionEvent(usedHircIds, usedSourceIds, actionEventType, actionEventName, audioFiles, audioSettings, soundBank.Id, soundBank.Language);
+            var playActionEventResult = _actionEventFactory.CreatePlayActionEvent(usedHircIds, usedSourceIds, actionEventType, actionEventName, audioFiles, hircSettings, soundBank.Id, soundBank.Language);
             soundBank.ActionEvents.InsertAlphabetically(playActionEventResult.ActionEvent);
 
             if (playActionEventResult.Actions.Count > 1)
@@ -64,8 +65,8 @@ namespace Editors.Audio.AudioEditor.Core.AudioProjectMutation
                     audioProject.AudioFiles.TryAdd(audioFile);
                 }
 
-                if (!audioFile.SoundReferences.Contains(playActionEventResult.SoundTarget.Id))
-                    audioFile.SoundReferences.Add(playActionEventResult.SoundTarget.Id);
+                if (!audioFile.Sounds.Contains(playActionEventResult.SoundTarget.Id))
+                    audioFile.Sounds.Add(playActionEventResult.SoundTarget.Id);
             }
             else if (action.TargetHircTypeIsRandomSequenceContainer())
             {
@@ -81,8 +82,8 @@ namespace Editors.Audio.AudioEditor.Core.AudioProjectMutation
                         audioProject.AudioFiles.TryAdd(audioFile);
                     }
 
-                    if (!audioFile.SoundReferences.Contains(sound.Id))
-                        audioFile.SoundReferences.Add(sound.Id);
+                    if (!audioFile.Sounds.Contains(sound.Id))
+                        audioFile.Sounds.Add(sound.Id);
                 }
             }
 
@@ -133,23 +134,23 @@ namespace Editors.Audio.AudioEditor.Core.AudioProjectMutation
                     var audioFile = audioProject.GetAudioFile(sound.SourceId);
 
                     soundBank.Sounds.Remove(sound);
-                    audioFile.SoundReferences.Remove(sound.Id);
+                    audioFile.Sounds.Remove(sound.Id);
 
-                    if (audioFile.SoundReferences.Count == 0)
+                    if (audioFile.Sounds.Count == 0)
                         audioProject.AudioFiles.Remove(audioFile);
                 }
                 else if (action.TargetHircTypeIsRandomSequenceContainer())
                 {
                     var randomSequenceContainer = soundBank.GetRandomSequenceContainer(action.TargetHircId);
-                    var sounds = soundBank.GetSounds(randomSequenceContainer.SoundReferences);
+                    var sounds = soundBank.GetSounds(randomSequenceContainer.Children);
                     foreach (var sound in sounds)
                     {
                         var audioFile = audioProject.GetAudioFile(sound.SourceId);
 
                         soundBank.Sounds.Remove(sound);
-                        audioFile.SoundReferences.Remove(sound.Id);
+                        audioFile.Sounds.Remove(sound.Id);
 
-                        if (audioFile.SoundReferences.Count == 0)
+                        if (audioFile.Sounds.Count == 0)
                             audioProject.AudioFiles.Remove(audioFile);
                     }
 

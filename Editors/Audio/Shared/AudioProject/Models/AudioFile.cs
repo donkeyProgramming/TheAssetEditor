@@ -11,7 +11,7 @@ namespace Editors.Audio.Shared.AudioProject.Models
         public string WemPackFileName { get; set; }
         public string WemPackFilePath { get; set; }
         public string WemDiskFilePath { get; set; }
-        public List<uint> SoundReferences { get; set; } = [];
+        public List<uint> Sounds { get; set; } = [];
 
         public static AudioFile Create(Guid guid, uint id, string fileName, string filePath)
         {

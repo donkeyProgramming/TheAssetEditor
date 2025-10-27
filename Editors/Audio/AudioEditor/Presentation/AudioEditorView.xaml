@@ -10,7 +10,7 @@
     xmlns:AudioProjectExplorer="clr-namespace:Editors.Audio.AudioEditor.Presentation.AudioProjectExplorer"
     xmlns:AudioFilesExplorer="clr-namespace:Editors.Audio.AudioEditor.Presentation.AudioFilesExplorer"
     xmlns:AudioProjectEditor="clr-namespace:Editors.Audio.AudioEditor.Presentation.AudioProjectEditor"
-    xmlns:HircSettings="clr-namespace:Editors.Audio.AudioEditor.Presentation.HircSettings"
+    xmlns:Settings="clr-namespace:Editors.Audio.AudioEditor.Presentation.Settings"
     xmlns:AudioProjectViewer="clr-namespace:Editors.Audio.AudioEditor.Presentation.AudioProjectViewer"
     xmlns:WaveformVisualiser="clr-namespace:Editors.Audio.AudioEditor.Presentation.WaveformVisualiser" 
     d:DataContext="{d:DesignInstance Type=Local:AudioEditorViewModel}"
@@ -175,7 +175,7 @@
                     Height="5" 
                     Background="{DynamicResource App.Border}"/>
 
-                <HircSettings:HircSettingsView 
+                <Settings:SettingsView 
                     Grid.Row="2"
                     Grid.Column="0"
                     DataContext="{Binding SettingsViewModel}"/>

@@ -6,13 +6,13 @@ using System.Windows.Input;
 using Editors.Audio.AudioEditor.Presentation.Shared;
 using Editors.Audio.Shared.AudioProject.Models;
 
-namespace Editors.Audio.AudioEditor.Presentation.HircSettings
+namespace Editors.Audio.AudioEditor.Presentation.Settings
 {
-    public partial class HircSettingsView : UserControl
+    public partial class SettingsView : UserControl
     {
-        public HircSettingsViewModel ViewModel => DataContext as HircSettingsViewModel;
+        public SettingsViewModel ViewModel => DataContext as SettingsViewModel;
 
-        public HircSettingsView()
+        public SettingsView()
         {
             InitializeComponent();
         }
@@ -40,7 +40,7 @@ namespace Editors.Audio.AudioEditor.Presentation.HircSettings
 
         private void OnAudioFileDoubleClick(object sender, MouseButtonEventArgs e)
         {
-            if (DataContext is HircSettingsViewModel viewModel)
+            if (DataContext is SettingsViewModel viewModel)
             {
                 if (AudioFilesListView.SelectedItem is AudioFile audioFile)
                     viewModel.PlayWav(audioFile);

@@ -9,7 +9,7 @@ using Editors.Audio.AudioEditor.Presentation.AudioFilesExplorer;
 using Editors.Audio.AudioEditor.Presentation.AudioProjectEditor;
 using Editors.Audio.AudioEditor.Presentation.AudioProjectExplorer;
 using Editors.Audio.AudioEditor.Presentation.AudioProjectViewer;
-using Editors.Audio.AudioEditor.Presentation.HircSettings;
+using Editors.Audio.AudioEditor.Presentation.Settings;
 using Editors.Audio.AudioEditor.Presentation.WaveformVisualiser;
 using Editors.Audio.Shared.AudioProject.Compiler;
 using Editors.Audio.Shared.AudioProject.Models;
@@ -38,7 +38,7 @@ namespace Editors.Audio.AudioEditor
             AudioFilesExplorerViewModel audioFilesExplorerViewModel,
             AudioProjectEditorViewModel audioProjectEditorViewModel,
             AudioProjectViewerViewModel audioProjectViewerViewModel,
-            HircSettingsViewModel settingsViewModel,
+            SettingsViewModel settingsViewModel,
             WaveformVisualiserViewModel waveformVisualiserViewModel)
         {
             _uiCommandFactory = uiCommandFactory;
@@ -60,7 +60,7 @@ namespace Editors.Audio.AudioEditor
         public AudioFilesExplorerViewModel AudioFilesExplorerViewModel { get; }
         public AudioProjectEditorViewModel AudioProjectEditorViewModel { get; }
         public AudioProjectViewerViewModel AudioProjectViewerViewModel { get; }
-        public HircSettingsViewModel SettingsViewModel { get; }
+        public SettingsViewModel SettingsViewModel { get; }
         public WaveformVisualiserViewModel WaveformVisualiserViewModel { get; }
 
         public string DisplayName { get; set; } = "Audio Editor";

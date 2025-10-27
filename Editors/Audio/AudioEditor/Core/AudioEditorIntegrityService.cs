@@ -413,7 +413,7 @@ namespace Editors.Audio.AudioEditor.Core
                 throw new InvalidOperationException("RandomSequenceContainer.DirectParentId should not be 0 when DirectParentId is required.");
 
             var playlistOrder = 0;
-            var sounds = soundBank.GetSounds(randomSequenceContainer.SoundReferences);
+            var sounds = soundBank.GetSounds(randomSequenceContainer.Children);
             foreach (var sound in sounds)
             {
                 playlistOrder++;
@@ -478,10 +478,10 @@ namespace Editors.Audio.AudioEditor.Core
             if (string.IsNullOrWhiteSpace(audioFile.WavPackFileName))
                 throw new InvalidOperationException("AudioFile.WavPackFileName should not be null or empty.");
 
-            if (audioFile.SoundReferences == null)
+            if (audioFile.Sounds == null)
                 throw new InvalidOperationException("AudioFile.SoundReferences should not be null.");
 
-            if (audioFile.SoundReferences.Count == 0)
+            if (audioFile.Sounds.Count == 0)
                 throw new InvalidOperationException("AudioFile.SoundReferences should not be empty.");
         }
 

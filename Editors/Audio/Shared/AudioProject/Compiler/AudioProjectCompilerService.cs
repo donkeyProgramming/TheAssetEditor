@@ -126,7 +126,7 @@ namespace Editors.Audio.Shared.AudioProject.Compiler
 
                                 SetRandomSequenceContainerData(audioProject, randomSequenceContainer, soundBank);
 
-                                var randomSequenceContainerSounds = soundBank.GetSounds(randomSequenceContainer.SoundReferences);
+                                var randomSequenceContainerSounds = soundBank.GetSounds(randomSequenceContainer.Children);
                                 audioFiles.AddRange(randomSequenceContainerSounds.Select(sound => audioProject.GetAudioFile(sound.SourceId)).ToList());
                                 sounds.AddRange(randomSequenceContainerSounds);
                             }
@@ -156,7 +156,7 @@ namespace Editors.Audio.Shared.AudioProject.Compiler
 
                                 SetRandomSequenceContainerData(audioProject, randomSequenceContainer, soundBank);
 
-                                var randomSequenceContainerSounds = soundBank.GetSounds(randomSequenceContainer.SoundReferences);
+                                var randomSequenceContainerSounds = soundBank.GetSounds(randomSequenceContainer.Children);
                                 audioFiles.AddRange(randomSequenceContainerSounds.Select(sound => audioProject.GetAudioFile(sound.SourceId)).ToList());
                                 sounds.AddRange(randomSequenceContainerSounds);
                             }
@@ -168,13 +168,13 @@ namespace Editors.Audio.Shared.AudioProject.Compiler
 
         private static void SetRandomSequenceContainerData(AudioProjectFile audioProject, RandomSequenceContainer randomSequenceContainer, SoundBank soundBank)
         {
-            var sounds = soundBank.GetSounds(randomSequenceContainer.SoundReferences);
+            var sounds = soundBank.GetSounds(randomSequenceContainer.Children);
             foreach (var sound in sounds)
             {
                 var audioFile = audioProject.GetAudioFile(sound.SourceId);
                 SetSoundData(audioFile, soundBank);
             }
-            randomSequenceContainer.SoundReferences = randomSequenceContainer.SoundReferences.OrderBy(soundId => soundId).ToList();
+            randomSequenceContainer.Children = randomSequenceContainer.Children.OrderBy(soundId => soundId).ToList();
         }
 
         private static void SetSoundData(AudioFile audioFile, SoundBank soundBank)

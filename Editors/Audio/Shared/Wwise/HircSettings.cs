@@ -1,103 +1,68 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.Reflection;
 
 namespace Editors.Audio.Shared.Wwise
 {
+    public enum ContainerType
+    {
+        [Display(Name = "Random")] Random,
+        [Display(Name = "Sequence")] Sequence
+    }
+
+    public enum RandomType
+    {
+        [Display(Name = "Standard")] Standard,
+        [Display(Name = "Shuffle")] Shuffle
+    }
+
+    public enum PlayMode
+    {
+        [Display(Name = "Step")] Step,
+        [Display(Name = "Continuous")] Continuous
+    }
+
+    public enum PlaylistEndBehaviour
+    {
+        [Display(Name = "Restart")] Restart,
+        [Display(Name = "Play In Reverse Order")] PlayInReverseOrder
+    }
+
+    public enum LoopingType
+    {
+        [Display(Name = "Disabled")] Disabled,
+        [Display(Name = "Finite Looping")] FiniteLooping,
+        [Display(Name = "Infinite Looping")] InfiniteLooping,
+    }
+
+    public enum TransitionType
+    {
+        [Display(Name = "Disabled")] Disabled,
+        [Display(Name = "Xfade (amp)")] XfadeAmp,
+        [Display(Name = "Xfade (power)")] XfadePower,
+        [Display(Name = "Delay")] Delay,
+        [Display(Name = "Sample Accurate")] SampleAccurate,
+        [Display(Name = "Trigger Rate")] TriggerRate
+    }
+
     public class HircSettings
     {
-        public enum PlaylistType
+        public static string GetEnumDisplayName<TEnum>(TEnum value) where TEnum : struct, Enum
         {
-            Random,
-            RandomExhaustive,
-            Sequence
+            var field = typeof(TEnum).GetField(value.ToString());
+            var display = field?.GetCustomAttribute<DisplayAttribute>();
+            if (display != null)
+                return display.GetName();
+            return value.ToString();
         }
 
-        public const string Random = "Random";
-        // Random Exhaustive is equivalent to Wwise's Shuffle setting under the Random Play Type.
-        // In Wwise Shuffle 'exhausts' items in the list before adding them back to the pool.
-        // So we use Random Exhaustive as Shuffle doesn't convey the meaning well. 
-        public const string RandomExhaustive = "Random Exhaustive";
-        public const string Sequence = "Sequence";
-
-        public static Dictionary<PlaylistType, string> PlaylistTypeStringLookup { get; } = new()
+        public static List<string> GetAllDisplayNamesFor<TEnum>() where TEnum : struct, Enum
         {
-            { PlaylistType.Random, Random },
-            { PlaylistType.RandomExhaustive, RandomExhaustive },
-            { PlaylistType.Sequence, Sequence }
-        };
-
-        public enum PlaylistMode
-        {
-            Step,
-            Continuous
+            var names = new List<string>();
+            foreach (var enumValue in Enum.GetValues<TEnum>())
+                names.Add(GetEnumDisplayName(enumValue));
+            return names;
         }
-
-        public const string Step = "Step";
-        public const string Continous = "Continuous";
-
-        public static Dictionary<PlaylistMode, string> PlaylistModeStringLookup { get; } = new()
-        {
-            { PlaylistMode.Continuous, Continous },
-            { PlaylistMode.Step, Step }
-        };
-
-        public enum EndBehaviour
-        {
-            Restart,
-            PlayInReverseOrder
-        }
-
-        public const string Restart = "Restart";
-        public const string PlayInReverseOrder = "Play In Reverse Order";
-
-        public static Dictionary<EndBehaviour, string> EndBehaviourStringLookup { get; } = new()
-        {
-            { EndBehaviour.Restart, Restart },
-            { EndBehaviour.PlayInReverseOrder, PlayInReverseOrder}
-        };
-
-        public enum LoopingType
-        {
-            Disabled,
-            FiniteLooping,
-            InfiniteLooping,
-        }
-
-        public const string LoopingTypeDisabled = "Disabled";
-        public const string FiniteLooping = "Finite Looping";
-        public const string InfiniteLooping = "Infinite Looping";
-
-        public static Dictionary<LoopingType, string> LoopingTypeStringLookup { get; } = new()
-        {
-            { LoopingType.Disabled, LoopingTypeDisabled },
-            { LoopingType.FiniteLooping, FiniteLooping },
-            { LoopingType.InfiniteLooping, InfiniteLooping }
-        };
-
-        public enum TransitionType
-        {
-            Disabled,
-            XfadeAmp,
-            XfadePower,
-            Delay,
-            SampleAccurate,
-            TriggerRate
-        }
-
-        public const string TransitionTypeDisabled = "Disabled";
-        public const string XfadeAmp = "Xfade (amp)";
-        public const string XfadePower = "Xfade (power)";
-        public const string Delay = "Delay";
-        public const string SampleAccurate = "Sample Accurate";
-        public const string TriggerRate = "Trigger Rate";
-
-        public static Dictionary<TransitionType, string> TransitionTypeStringLookup { get; } = new()
-        {
-            { TransitionType.Disabled, TransitionTypeDisabled },
-            { TransitionType.XfadeAmp, XfadeAmp },
-            { TransitionType.XfadePower, XfadePower },
-            { TransitionType.Delay, Delay },
-            { TransitionType.SampleAccurate, SampleAccurate },
-            { TransitionType.TriggerRate, TriggerRate }
-        };
     }
 }

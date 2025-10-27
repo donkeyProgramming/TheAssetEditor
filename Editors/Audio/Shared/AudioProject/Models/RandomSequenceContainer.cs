@@ -9,15 +9,15 @@ namespace Editors.Audio.Shared.AudioProject.Models
     {
         public uint OverrideBusId { get; set; }
         public uint DirectParentId { get; set; }
-        public AudioSettings AudioSettings { get; set; }
-        public List<uint> SoundReferences { get; set; }
+        public HircSettings HircSettings { get; set; }
+        public List<uint> Children { get; set; }
 
         public RandomSequenceContainer()
         {
             HircType = AkBkHircType.RandomSequenceContainer;
         }
 
-        public static RandomSequenceContainer Create(Guid guid, uint id, AudioSettings audioSettings, List<uint> soundReferences, uint overrideBusId = 0, uint directParentId = 0)
+        public static RandomSequenceContainer Create(Guid guid, uint id, HircSettings hircSettings, List<uint> children, uint overrideBusId = 0, uint directParentId = 0)
         {
             return new RandomSequenceContainer
             {
@@ -25,8 +25,8 @@ namespace Editors.Audio.Shared.AudioProject.Models
                 Id = id,
                 OverrideBusId = overrideBusId,
                 DirectParentId = directParentId,
-                AudioSettings = audioSettings,
-                SoundReferences = soundReferences
+                HircSettings = hircSettings,
+                Children = children
             };
         }
     }

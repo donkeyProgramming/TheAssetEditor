@@ -17,7 +17,7 @@ namespace Editors.Audio.Shared.AudioProject.Factories
         StatePathFactoryResult Create(
             Dictionary<string, string> stateLookupByStateGroup,
             List<AudioFile> audioFiles,
-            AudioSettings audioSettings,
+            HircSettings hircSettings,
             HashSet<uint> usedHircIds,
             HashSet<uint> usedSourceIds,
             string language,
@@ -32,7 +32,7 @@ namespace Editors.Audio.Shared.AudioProject.Factories
         public StatePathFactoryResult Create(
             Dictionary<string, string> stateLookupByStateGroup, 
             List<AudioFile> audioFiles, 
-            AudioSettings audioSettings,
+            HircSettings hircSettings,
             HashSet<uint> usedHircIds,
             HashSet<uint> usedSourceIds,
             string language,
@@ -55,7 +55,7 @@ namespace Editors.Audio.Shared.AudioProject.Factories
 
             if (audioFiles.Count == 1)
             {
-                var sound = _soundFactory.Create(usedHircIds, usedSourceIds, audioFiles[0], audioSettings, language, directParentId: actorMixerId);
+                var sound = _soundFactory.Create(usedHircIds, usedSourceIds, audioFiles[0], hircSettings, language, directParentId: actorMixerId);
                 statePathFactoryResult.SoundTarget = sound;
 
                 var statePath = StatePath.Create(statePathNodes, sound.Id, AkBkHircType.Sound);
@@ -63,7 +63,7 @@ namespace Editors.Audio.Shared.AudioProject.Factories
             }
             else if (audioFiles.Count > 1)
             {
-                var randomSequenceContainerResult = _randomSequenceContainerFactory.Create(usedHircIds, usedSourceIds, audioSettings, audioFiles, language, directParentId: actorMixerId);
+                var randomSequenceContainerResult = _randomSequenceContainerFactory.Create(usedHircIds, usedSourceIds, hircSettings, audioFiles, language, directParentId: actorMixerId);
                 statePathFactoryResult.RandomSequenceContainerTarget = randomSequenceContainerResult.RandomSequenceContainer;
                 statePathFactoryResult.RandomSequenceContainerSounds.AddRange(randomSequenceContainerResult.RandomSequenceContainerSounds);
 

@@ -10,8 +10,8 @@ using Editors.Audio.AudioEditor.Presentation.AudioProjectEditor.Table;
 using Editors.Audio.AudioEditor.Presentation.AudioProjectExplorer;
 using Editors.Audio.AudioEditor.Presentation.AudioProjectViewer;
 using Editors.Audio.AudioEditor.Presentation.AudioProjectViewer.Table;
-using Editors.Audio.AudioEditor.Presentation.HircSettings;
 using Editors.Audio.AudioEditor.Presentation.NewAudioProject;
+using Editors.Audio.AudioEditor.Presentation.Settings;
 using Editors.Audio.AudioEditor.Presentation.Shared.Table;
 using Editors.Audio.AudioEditor.Presentation.WaveformVisualiser;
 using Editors.Audio.AudioExplorer;
@@ -48,8 +48,8 @@ namespace Editors.Audio
             serviceCollection.AddScoped<AudioFilesExplorerViewModel>();
             serviceCollection.AddScoped<AudioProjectEditorViewModel>();
             serviceCollection.AddScoped<AudioProjectViewerViewModel>();
-            serviceCollection.AddScoped<HircSettingsViewModel>();
-            serviceCollection.AddScoped<WaveformVisualiserViewModel>();
+            serviceCollection.AddScoped<SettingsViewModel>();
+            var serviceCollection1 = serviceCollection.AddScoped<WaveformVisualiserViewModel>();
 
             // New Audio Project
             serviceCollection.AddTransient<NewAudioProjectViewModel>();

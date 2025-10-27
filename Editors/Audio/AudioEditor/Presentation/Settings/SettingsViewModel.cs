@@ -14,11 +14,11 @@ using Editors.Audio.Shared.AudioProject.Models;
 using Editors.Audio.Shared.Storage;
 using Editors.Audio.Shared.Wwise;
 using Shared.Core.Events;
-using static Editors.Audio.Shared.Wwise.HircSettings;
+using HircSettings = Editors.Audio.Shared.AudioProject.Models.HircSettings;
 
-namespace Editors.Audio.AudioEditor.Presentation.HircSettings
+namespace Editors.Audio.AudioEditor.Presentation.Settings
 {
-    public partial class HircSettingsViewModel : ObservableObject
+    public partial class SettingsViewModel : ObservableObject
     {
         private readonly IEventHub _eventHub;
         private readonly IUiCommandFactory _uiCommandFactory;
@@ -30,28 +30,27 @@ namespace Editors.Audio.AudioEditor.Presentation.HircSettings
         [ObservableProperty] private bool _isSettingsVisible = false;
         [ObservableProperty] private bool _showSettingsFromAudioProjectViewer = false;
 
-        // Playlist Type
-        [ObservableProperty] private bool _isPlaylistTypeSectionVisible = false;
-        [ObservableProperty] private PlaylistType _playlistType;
-        [ObservableProperty] private ObservableCollection<PlaylistType> _playlistTypes = new(Enum.GetValues<PlaylistType>());
-        [ObservableProperty] private bool _isPlaylistTypeEnabled = false;
-        [ObservableProperty] private bool _isPlaylistTypeVisible = false;
+        [ObservableProperty] private ContainerType _containerType;
+        [ObservableProperty] private ObservableCollection<ContainerType> _containerTypes = new(Enum.GetValues<ContainerType>());
+        [ObservableProperty] private bool _isContainerTypeEnabled = false;
+        [ObservableProperty] private bool _isContainerTypeVisible = false;
+        [ObservableProperty] private RandomType _randomType;
+        [ObservableProperty] private ObservableCollection<RandomType> _randomTypes = new(Enum.GetValues<RandomType>());
+        [ObservableProperty] private bool _isRandomTypeEnabled = false;
+        [ObservableProperty] private bool _isRandomTypeVisible = false;
         [ObservableProperty] private bool _enableRepetitionInterval = false;
         [ObservableProperty] private bool _isEnableRepetitionIntervalEnabled = false;
         [ObservableProperty] private uint _repetitionInterval = 1;
         [ObservableProperty] private bool _isRepetitionIntervalEnabled = false;
         [ObservableProperty] private bool _isRepetitionIntervalVisible = false;
-        [ObservableProperty] private EndBehaviour _endBehaviour = EndBehaviour.Restart;
-        [ObservableProperty] private ObservableCollection<EndBehaviour> _endBehaviours = new(Enum.GetValues<EndBehaviour>());
-        [ObservableProperty] private bool _isEndBehaviourEnabled = false;
-        [ObservableProperty] private bool _isEndBehaviourVisible = false;
-
-        // Playlist Mode
-        [ObservableProperty] private bool _isPlaylistModeSectionVisible = false;
-        [ObservableProperty] private PlaylistMode _playlistMode;
-        [ObservableProperty] private ObservableCollection<PlaylistMode> _playlistModes = new(Enum.GetValues<PlaylistMode>());
-        [ObservableProperty] private bool _isPlaylistModeEnabled = false;
-        [ObservableProperty] private bool _isPlaylistModeVisible = false;
+        [ObservableProperty] private PlaylistEndBehaviour _playlistEndBehaviour = PlaylistEndBehaviour.Restart;
+        [ObservableProperty] private ObservableCollection<PlaylistEndBehaviour> _playlistEndBehaviours = new(Enum.GetValues<PlaylistEndBehaviour>());
+        [ObservableProperty] private bool _isPlaylistEndBehaviourEnabled = false;
+        [ObservableProperty] private bool _isPlaylistEndBehaviourVisible = false;
+        [ObservableProperty] private PlayMode _playMode;
+        [ObservableProperty] private ObservableCollection<PlayMode> _playModes = new(Enum.GetValues<PlayMode>());
+        [ObservableProperty] private bool _IsPlayModeEnabled = false;
+        [ObservableProperty] private bool _IsPlayModeVisible = false;
         [ObservableProperty] private bool _alwaysResetPlaylist;
         [ObservableProperty] private bool _isAlwaysResetPlaylistEnabled;
         [ObservableProperty] private bool _isAlwaysResetPlaylistVisible = false;
@@ -70,7 +69,7 @@ namespace Editors.Audio.AudioEditor.Presentation.HircSettings
         [ObservableProperty] private bool _isTransitionDurationEnabled = false;
         [ObservableProperty] private bool _isTransitionDurationVisible = false;
 
-        public HircSettingsViewModel(IEventHub eventHub, IUiCommandFactory uiCommandFactory, IAudioEditorStateService audioEditorStateService, IAudioRepository audioRepository)
+        public SettingsViewModel(IEventHub eventHub, IUiCommandFactory uiCommandFactory, IAudioEditorStateService audioEditorStateService, IAudioRepository audioRepository)
         {
             _eventHub = eventHub;
             _uiCommandFactory = uiCommandFactory;
@@ -190,9 +189,9 @@ namespace Editors.Audio.AudioEditor.Presentation.HircSettings
             }
         }
 
-        partial void OnPlaylistTypeChanged(PlaylistType value) => SetSettingsUsabilityAndStore();
+        partial void OnContainerTypeChanged(ContainerType value) => SetSettingsUsabilityAndStore();
 
-        partial void OnPlaylistModeChanged(PlaylistMode value) => SetSettingsUsabilityAndStore();
+        partial void OnPlayModeChanged(PlayMode value) => SetSettingsUsabilityAndStore();
 
         partial void OnLoopingTypeChanged(LoopingType value) => SetSettingsUsabilityAndStore();
 
@@ -204,7 +203,7 @@ namespace Editors.Audio.AudioEditor.Presentation.HircSettings
 
         partial void OnRepetitionIntervalChanged(uint value) => StoreSettings();
 
-        partial void OnEndBehaviourChanged(EndBehaviour value) => StoreSettings();
+        partial void OnPlaylistEndBehaviourChanged(PlaylistEndBehaviour value) => StoreSettings();
 
         partial void OnAlwaysResetPlaylistChanged(bool value) => StoreSettings();
 
@@ -226,109 +225,119 @@ namespace Editors.Audio.AudioEditor.Presentation.HircSettings
 
             if (AudioFiles.Count > 1)
             {
-                IsPlaylistTypeSectionVisible = true;
-                IsPlaylistModeSectionVisible = true;
+                IsContainerTypeVisible = true;
+                IsContainerTypeEnabled = true;
 
-                IsPlaylistTypeEnabled = true;
-                IsPlaylistModeEnabled = true;
+                IsPlayModeVisible = true;
+                IsPlayModeEnabled = true;
 
-                IsPlaylistTypeVisible = true;
-                IsPlaylistModeVisible = true;
-
-                if (PlaylistType == PlaylistType.Sequence)
+                if (ContainerType == ContainerType.Sequence)
                 {
-                    IsEndBehaviourEnabled = true;
-                    IsEnableRepetitionIntervalEnabled = false;
-                    IsRepetitionIntervalEnabled = false;
-                    IsAlwaysResetPlaylistEnabled = true;
+                    IsRandomTypeVisible = false;
+                    IsRandomTypeEnabled = false;
 
-                    IsEndBehaviourVisible = true;
+                    IsPlaylistEndBehaviourVisible = true;
+                    IsPlaylistEndBehaviourEnabled = true;
+
                     IsRepetitionIntervalVisible = false;
+                    IsRepetitionIntervalEnabled = false;
+                    IsEnableRepetitionIntervalEnabled = false;
+
+                    IsAlwaysResetPlaylistEnabled = true;
                     IsAlwaysResetPlaylistVisible = true;
                 }
                 else
                 {
-                    IsEnableRepetitionIntervalEnabled = true;
-                    IsRepetitionIntervalEnabled = true;
-                    IsEndBehaviourEnabled = false;
-                    IsAlwaysResetPlaylistEnabled = false;
+                    IsRandomTypeVisible = true;
+                    IsRandomTypeEnabled = true;
 
-                    IsEndBehaviourVisible = false;
+                    IsPlaylistEndBehaviourVisible = false;
+                    IsPlaylistEndBehaviourEnabled = false;
+
                     IsRepetitionIntervalVisible = true;
+                    IsRepetitionIntervalEnabled = true;
+                    IsEnableRepetitionIntervalEnabled = true;
+
                     IsAlwaysResetPlaylistVisible = false;
+                    IsAlwaysResetPlaylistEnabled = false;
                 }
 
-                if (PlaylistMode == PlaylistMode.Continuous)
+                if (PlayMode == PlayMode.Continuous)
                 {
                     IsLoopingTypeVisible = true;
-                    IsTransitionTypeVisible = true;
-
                     IsLoopingTypeEnabled = true;
                     if (LoopingType == LoopingType.FiniteLooping)
                     {
-                        IsNumberOfLoopsEnabled = true;
                         IsNumberOfLoopsVisible = true;
+                        IsNumberOfLoopsEnabled = true;
                     }
                     else
                     {
-                        IsNumberOfLoopsEnabled = false;
                         IsNumberOfLoopsVisible = false;
+                        IsNumberOfLoopsEnabled = false;
                     }
 
+                    IsTransitionTypeVisible = true;
                     IsTransitionTypeEnabled = true;
                     if (TransitionType == TransitionType.Disabled)
                     {
-                        IsTransitionDurationEnabled = false;
                         IsTransitionDurationVisible = false;
+                        IsTransitionDurationEnabled = false;
                     }
                     else
                     {
-                        IsTransitionDurationEnabled = true;
                         IsTransitionDurationVisible = true;
+                        IsTransitionDurationEnabled = true;
                     }
                 }
                 else
                 {
-                    IsAlwaysResetPlaylistEnabled = false;
-                    IsLoopingTypeEnabled = false;
-                    IsNumberOfLoopsEnabled = false;
-                    IsTransitionTypeEnabled = false;
-                    IsTransitionDurationEnabled = false;
-
                     IsAlwaysResetPlaylistVisible = false;
+                    IsAlwaysResetPlaylistEnabled = false;
+
                     IsLoopingTypeVisible = false;
+                    IsLoopingTypeEnabled = false;
+
                     IsNumberOfLoopsVisible = false;
+                    IsNumberOfLoopsEnabled = false;
+
                     IsTransitionTypeVisible = false;
+                    IsTransitionTypeEnabled = false;
+
+                    IsTransitionDurationEnabled = false;
                     IsTransitionDurationVisible = false;
                 }
             }
             else
             {
-                IsPlaylistTypeSectionVisible = false;
+                IsContainerTypeVisible = false;
+                IsContainerTypeEnabled = false;
 
-                IsPlaylistTypeEnabled = false;
-                IsRepetitionIntervalEnabled = false;
-                IsEndBehaviourEnabled = false;
+                IsRandomTypeVisible = false;
+                IsRandomTypeEnabled = false;
 
-                IsPlaylistTypeVisible = false;
                 IsRepetitionIntervalVisible = false;
-                IsEndBehaviourVisible = false;
+                IsRepetitionIntervalEnabled = false;
 
-                IsPlaylistModeSectionVisible = true;
+                IsPlaylistEndBehaviourVisible = false;
+                IsPlaylistEndBehaviourEnabled = false;
 
-                IsPlaylistModeEnabled = false;
+                IsPlayModeVisible = false;
+                IsPlayModeEnabled = false;
+
+                IsAlwaysResetPlaylistVisible = false;
                 IsAlwaysResetPlaylistEnabled = false;
+
+                IsNumberOfLoopsVisible = true;
                 IsNumberOfLoopsEnabled = true;
+
+                IsTransitionTypeVisible = false;
                 IsTransitionTypeEnabled = false;
+
+                IsTransitionDurationVisible = false;
                 IsTransitionDurationEnabled = false;
 
-                IsPlaylistModeVisible = false;
-                IsAlwaysResetPlaylistVisible = false;
                 IsLoopingTypeVisible = true;
-                IsNumberOfLoopsVisible = true;
-                IsTransitionTypeVisible = false;
-                IsTransitionDurationVisible = false;
-
                 IsLoopingTypeEnabled = true;
                 if (LoopingType == LoopingType.FiniteLooping)
                     IsNumberOfLoopsEnabled = true;
@@ -339,20 +348,21 @@ namespace Editors.Audio.AudioEditor.Presentation.HircSettings
 
         private void StoreSettings()
         {
-            var audioSettings = new AudioSettings
+            var hircSettings = new HircSettings
             {
-                PlaylistType = PlaylistType,
+                ContainerType = ContainerType,
+                RandomType = RandomType,
                 EnableRepetitionInterval = EnableRepetitionInterval,
                 RepetitionInterval = RepetitionInterval,
-                EndBehaviour = EndBehaviour,
+                PlaylistEndBehaviour = PlaylistEndBehaviour,
                 AlwaysResetPlaylist = AlwaysResetPlaylist,
-                PlaylistMode = PlaylistMode,
+                PlayMode = PlayMode,
                 LoopingType = LoopingType,
                 NumberOfLoops = LoopingType == LoopingType.FiniteLooping ? NumberOfLoops : 1,
                 TransitionType = TransitionType,
                 TransitionDuration = TransitionType != TransitionType.Disabled ? TransitionDuration : 1
             };
-            _audioEditorStateService.StoreAudioSettings(audioSettings);
+            _audioEditorStateService.StoreHircSettings(hircSettings);
         }
 
         private void SetSettingsFromViewerItem(bool isRowEdited)
@@ -361,7 +371,7 @@ namespace Editors.Audio.AudioEditor.Presentation.HircSettings
                 return;
 
             var audioProject = _audioEditorStateService.AudioProject;
-            AudioSettings settings = null;
+            HircSettings hircSettings = null;
             var audioFiles = new List<AudioFile>();
 
             var selectedAudioProjectExplorerNode = _audioEditorStateService.SelectedAudioProjectExplorerNode;
@@ -381,7 +391,7 @@ namespace Editors.Audio.AudioEditor.Presentation.HircSettings
                     if (playAction.TargetHircTypeIsSound())
                     {
                         var sound = soundBank.GetSound(playAction.TargetHircId);
-                        settings = sound.AudioSettings;
+                        hircSettings = sound.HircSettings;
 
                         var audioFile = audioProject.GetAudioFile(sound.SourceId);
                         audioFiles.Add(audioFile);
@@ -389,9 +399,9 @@ namespace Editors.Audio.AudioEditor.Presentation.HircSettings
                     else if (playAction.TargetHircTypeIsRandomSequenceContainer())
                     {
                         var randomSequenceContainer = soundBank.GetRandomSequenceContainer(playAction.TargetHircId);
-                        settings = randomSequenceContainer.AudioSettings;
+                        hircSettings = randomSequenceContainer.HircSettings;
 
-                        var sounds = soundBank.GetSounds(randomSequenceContainer.SoundReferences);
+                        var sounds = soundBank.GetSounds(randomSequenceContainer.Children);
                         var orderedSounds = sounds
                             .OrderBy(sound => sound.PlaylistOrder)
                             .ToList();
@@ -415,7 +425,7 @@ namespace Editors.Audio.AudioEditor.Presentation.HircSettings
                 if (statePath.TargetHircTypeIsSound())
                 {
                     var sound = soundBank.GetSound(statePath.TargetHircId);
-                    settings = sound.AudioSettings;
+                    hircSettings = sound.HircSettings;
 
                     var audioFile = audioProject.GetAudioFile(sound.SourceId);
                     audioFiles.Add(audioFile);
@@ -423,9 +433,9 @@ namespace Editors.Audio.AudioEditor.Presentation.HircSettings
                 else if (statePath.TargetHircTypeIsRandomSequenceContainer())
                 {
                     var randomSequenceContainer = soundBank.GetRandomSequenceContainer(statePath.TargetHircId);
-                    settings = randomSequenceContainer.AudioSettings;
+                    hircSettings = randomSequenceContainer.HircSettings;
 
-                    var sounds = soundBank.GetSounds(randomSequenceContainer.SoundReferences);
+                    var sounds = soundBank.GetSounds(randomSequenceContainer.Children);
                     var orderedSounds = sounds
                         .OrderBy(sound => sound.PlaylistOrder)
                         .ToList();
@@ -440,48 +450,59 @@ namespace Editors.Audio.AudioEditor.Presentation.HircSettings
             else if (selectedAudioProjectExplorerNode.IsStateGroup())
                 return;
 
-            SetSettingsFromViewerItem(settings, audioFiles, isRowEdited);
+            SetSettingsFromViewerItem(hircSettings, audioFiles, isRowEdited);
         }
 
-        private void SetSettingsFromViewerItem(AudioSettings settings, List<AudioFile> audioFiles, bool isRowEdited)
+        private void SetSettingsFromViewerItem(HircSettings hircSettings, List<AudioFile> audioFiles, bool isRowEdited)
         {
             ResetAudioFiles(true);
-            ResetSettingsPlaylistType();
-            ResetSettingsPlaylistMode();
+
+            ContainerType = ContainerType.Random;
+            RandomType = RandomType.Standard;
+            PlaylistEndBehaviour = PlaylistEndBehaviour.Restart;
+            PlayMode = PlayMode.Step;
+            EnableRepetitionInterval = false;
+            RepetitionInterval = 1;
+            AlwaysResetPlaylist = false;
+            LoopingType = LoopingType.Disabled;
+            NumberOfLoops = 1;
+            TransitionType = TransitionType.Disabled;
+            TransitionDuration = 1;
 
             SetAudioFilesFromViewerItem(audioFiles, isRowEdited);
 
             if (audioFiles.Count > 1)
             {
-                PlaylistType = settings.PlaylistType;
+                ContainerType = hircSettings.ContainerType;
 
-                if (settings.PlaylistType == PlaylistType.Sequence)
-                    EndBehaviour = settings.EndBehaviour;
+                if (hircSettings.ContainerType == ContainerType.Sequence)
+                    PlaylistEndBehaviour = hircSettings.PlaylistEndBehaviour;
                 else
                 {
-                    EnableRepetitionInterval = settings.EnableRepetitionInterval;
+                    RandomType = hircSettings.RandomType;
+                    EnableRepetitionInterval = hircSettings.EnableRepetitionInterval;
 
                     if (EnableRepetitionInterval)
-                        RepetitionInterval = settings.RepetitionInterval;
+                        RepetitionInterval = hircSettings.RepetitionInterval;
                 }
 
-                AlwaysResetPlaylist = settings.AlwaysResetPlaylist;
+                AlwaysResetPlaylist = hircSettings.AlwaysResetPlaylist;
 
-                PlaylistMode = settings.PlaylistMode;
+                PlayMode = hircSettings.PlayMode;
 
-                LoopingType = settings.LoopingType;
+                LoopingType = hircSettings.LoopingType;
                 if (LoopingType == LoopingType.FiniteLooping)
-                    NumberOfLoops = settings.NumberOfLoops;
+                    NumberOfLoops = hircSettings.NumberOfLoops;
 
-                TransitionType = settings.TransitionType;
+                TransitionType = hircSettings.TransitionType;
                 if (TransitionType != TransitionType.Disabled)
-                    TransitionDuration = settings.TransitionDuration;
+                    TransitionDuration = hircSettings.TransitionDuration;
             }
             else
             {
-                LoopingType = settings.LoopingType;
+                LoopingType = hircSettings.LoopingType;
                 if (LoopingType == LoopingType.FiniteLooping)
-                    NumberOfLoops = settings.NumberOfLoops;
+                    NumberOfLoops = hircSettings.NumberOfLoops;
             }
 
             SetSettingsUsability();
@@ -501,12 +522,12 @@ namespace Editors.Audio.AudioEditor.Presentation.HircSettings
 
         private void SetInitialSettings()
         {
-            PlaylistType = PlaylistType.Random;
+            ContainerType = ContainerType.Random;
+            RandomType = RandomType.Standard;
             RepetitionInterval = 1;
-            EndBehaviour = EndBehaviour.Restart;
+            PlaylistEndBehaviour = PlaylistEndBehaviour.Restart;
             AlwaysResetPlaylist = false;
-
-            PlaylistMode = PlaylistMode.Step;
+            PlayMode = PlayMode.Step;
             LoopingType = LoopingType.Disabled;
             NumberOfLoops = 1;
             TransitionType = TransitionType.Disabled;
@@ -517,12 +538,13 @@ namespace Editors.Audio.AudioEditor.Presentation.HircSettings
         {
             if (AudioFiles.Count > 1)
             {
-                PlaylistType = PlaylistType.RandomExhaustive;
+                ContainerType = ContainerType.Random;
+                RandomType = RandomType.Shuffle;
                 EnableRepetitionInterval = true;
                 RepetitionInterval = (uint)Math.Ceiling(AudioFiles.Count / 2.0);
-                EndBehaviour = EndBehaviour.Restart;
+                PlaylistEndBehaviour = PlaylistEndBehaviour.Restart;
                 AlwaysResetPlaylist = true;
-                PlaylistMode = PlaylistMode.Step;
+                PlayMode = PlayMode.Step;
                 LoopingType = LoopingType.Disabled;
                 NumberOfLoops = 1;
                 TransitionType = TransitionType.Disabled;
@@ -532,11 +554,13 @@ namespace Editors.Audio.AudioEditor.Presentation.HircSettings
 
         private void DisableAllSettings()
         {
-            IsPlaylistTypeEnabled = false;
+            IsContainerTypeEnabled = false;
+            IsRandomTypeEnabled = false;
             IsEnableRepetitionIntervalEnabled = false;
             IsRepetitionIntervalEnabled = false;
-            IsEndBehaviourEnabled = false;
-            IsPlaylistModeEnabled = false;
+            EnableRepetitionInterval = false;
+            IsPlaylistEndBehaviourEnabled = false;
+            IsPlayModeEnabled = false;
             IsAlwaysResetPlaylistEnabled = false;
             IsLoopingTypeEnabled = false;
             IsNumberOfLoopsEnabled = false;
@@ -556,24 +580,6 @@ namespace Editors.Audio.AudioEditor.Presentation.HircSettings
             AudioFiles.Clear();
             _audioEditorStateService.StoreAudioFiles(AudioFiles.ToList());
             _eventHub.Publish(new AudioFilesChangedEvent(AudioFiles.ToList(), false, resetForViewerItem, true));
-        }
-
-        private void ResetSettingsPlaylistType()
-        {
-            PlaylistType = PlaylistType.Random;
-            EnableRepetitionInterval = false;
-            RepetitionInterval = 1;
-            EndBehaviour = EndBehaviour.Restart;
-            AlwaysResetPlaylist = false;
-        }
-
-        private void ResetSettingsPlaylistMode()
-        {
-            PlaylistMode = PlaylistMode.Step;
-            LoopingType = LoopingType.Disabled;
-            NumberOfLoops = 1;
-            TransitionType = TransitionType.Disabled;
-            TransitionDuration = 1;
         }
     }
 }

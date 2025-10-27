@@ -10,7 +10,7 @@ namespace Editors.Audio.Shared.AudioProject.Factories
             HashSet<uint> usedHircIds,
             HashSet<uint> usedSourceIds,
             AudioFile audioFile,
-            AudioSettings audioSettings,
+            HircSettings hircSettings,
             string language,
             uint overrideBusId = 0,
             uint directParentId = 0);
@@ -29,13 +29,13 @@ namespace Editors.Audio.Shared.AudioProject.Factories
             HashSet<uint> usedHircIds,
             HashSet<uint> usedSourceIds,
             AudioFile audioFile,
-            AudioSettings audioSettings,
+            HircSettings hircSettings,
             string language,
             uint overrideBusId = 0,
             uint directParentId = 0)
         {
             var soundIds = IdGenerator.GenerateIds(usedHircIds);
-            var soundSettings = AudioSettings.CreateSoundSettings(audioSettings);
+            var soundSettings = HircSettings.CreateSoundSettings(hircSettings);
             return Sound.Create(soundIds.Guid, soundIds.Id, overrideBusId, directParentId, audioFile.Id, language, soundSettings);
         }
 

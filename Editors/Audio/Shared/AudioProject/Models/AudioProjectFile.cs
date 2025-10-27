@@ -239,7 +239,7 @@ namespace Editors.Audio.Shared.AudioProject.Models
                                         var randomSequenceContainer = soundBank.GetRandomSequenceContainer(action.TargetHircId);
                                         audioProjectItems.Add(randomSequenceContainer);
 
-                                        var sounds = soundBank.GetSounds(randomSequenceContainer.SoundReferences);
+                                        var sounds = soundBank.GetSounds(randomSequenceContainer.Children);
                                         audioProjectItems.AddRange(sounds);
                                     }
                                 }
@@ -274,7 +274,7 @@ namespace Editors.Audio.Shared.AudioProject.Models
                                         var randomSequenceContainer = soundBank.GetRandomSequenceContainer(statePath.TargetHircId);
                                         audioProjectItems.Add(randomSequenceContainer);
 
-                                        var sounds = soundBank.GetSounds(randomSequenceContainer.SoundReferences);
+                                        var sounds = soundBank.GetSounds(randomSequenceContainer.Children);
                                         audioProjectItems.AddRange(sounds);
                                     }
                                 }

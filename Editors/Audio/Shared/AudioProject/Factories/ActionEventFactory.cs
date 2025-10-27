@@ -25,7 +25,7 @@ namespace Editors.Audio.Shared.AudioProject.Factories
             Wh3ActionEventType actionEventGroup,
             string actionEventName,
             List<AudioFile> audioFiles,
-            AudioSettings audioSettings,
+            HircSettings hircSettings,
             uint soundBankId,
             string language);
         ActionEventFactoryResult CreatePauseActionEvent(HashSet<uint> usedHircIds, ActionEvent playActionEvent);
@@ -44,7 +44,7 @@ namespace Editors.Audio.Shared.AudioProject.Factories
             Wh3ActionEventType actionEventType,
             string actionEventName,
             List<AudioFile> audioFiles,
-            AudioSettings audioSettings,
+            HircSettings hircSettings,
             uint soundBankId,
             string language)
         {
@@ -57,7 +57,7 @@ namespace Editors.Audio.Shared.AudioProject.Factories
 
             if (audioFiles.Count == 1)
             {
-                var sound = _soundFactory.Create(usedHircIds, usedSourceIds, audioFiles[0], audioSettings, language, overrideBusId: overrideBusId, directParentId: actorMixerId);
+                var sound = _soundFactory.Create(usedHircIds, usedSourceIds, audioFiles[0], hircSettings, language, overrideBusId: overrideBusId, directParentId: actorMixerId);
                 actionEventFactoryResult.SoundTarget = sound;
 
                 var actionIds = IdGenerator.GenerateIds(usedHircIds);
@@ -67,7 +67,7 @@ namespace Editors.Audio.Shared.AudioProject.Factories
             }
             else if (audioFiles.Count > 1)
             {
-                var randomSequenceContainerResult = _randomSequenceContainerFactory.Create(usedHircIds, usedSourceIds, audioSettings, audioFiles, language, overrideBusId, actorMixerId);
+                var randomSequenceContainerResult = _randomSequenceContainerFactory.Create(usedHircIds, usedSourceIds, hircSettings, audioFiles, language, overrideBusId, actorMixerId);
                 actionEventFactoryResult.RandomSequenceContainerTarget = randomSequenceContainerResult.RandomSequenceContainer;
                 actionEventFactoryResult.RandomSequenceContainerSounds.AddRange(randomSequenceContainerResult.RandomSequenceContainerSounds);
 

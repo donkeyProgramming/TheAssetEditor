@@ -317,7 +317,7 @@ namespace Editors.Audio.Shared.Wwise.Generators
             if (randomSequenceContainerHirc.HircChildren == null)
                 randomSequenceContainerHirc.HircChildren = [];
 
-            var sounds = soundBank.GetSounds(randomSequenceContainer.SoundReferences);
+            var sounds = soundBank.GetSounds(randomSequenceContainer.Children);
             foreach (var sound in sounds)
             {
                 var soundHirc = _hircGeneratorServiceFactory.GenerateHirc(sound);

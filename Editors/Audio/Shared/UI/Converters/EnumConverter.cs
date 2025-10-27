@@ -2,7 +2,7 @@
 using System.Globalization;
 using System.Windows.Data;
 using Editors.Audio.Shared.GameInformation.Warhammer3;
-using static Editors.Audio.Shared.Wwise.HircSettings;
+using Editors.Audio.Shared.Wwise;
 
 namespace Editors.Audio.Shared.UI.Converters
 {
@@ -18,16 +18,18 @@ namespace Editors.Audio.Shared.UI.Converters
                 return Wh3DialogueEventInformation.GetDialogueEventTypeDisplayName(dialogueEventType);
             else if (value is Wh3DialogueEventUnitProfile dialogueEventProfile)
                 return Wh3DialogueEventInformation.GetDialogueEventProfileDisplayName(dialogueEventProfile);
-            else if (value is PlaylistType playlistType)
-                return PlaylistTypeStringLookup[playlistType];
-            else if (value is PlaylistMode playlistMode)
-                return PlaylistModeStringLookup[playlistMode];
-            else if (value is EndBehaviour endBehaviour)
-                return EndBehaviourStringLookup[endBehaviour];
+            else if (value is ContainerType containerType)
+                return HircSettings.GetEnumDisplayName(containerType);
+            else if (value is RandomType randomType)
+                return HircSettings.GetEnumDisplayName(randomType);
+            else if (value is PlayMode containerMode)
+                return HircSettings.GetEnumDisplayName(containerMode);
+            else if (value is PlaylistEndBehaviour endBehaviour)
+                return HircSettings.GetEnumDisplayName(endBehaviour);
             else if (value is LoopingType loopingType)
-                return LoopingTypeStringLookup[loopingType];
+                return HircSettings.GetEnumDisplayName(loopingType);
             else if (value is TransitionType transitionType)
-                return TransitionTypeStringLookup[transitionType];
+                return HircSettings.GetEnumDisplayName(transitionType);
             else
                 return null;
         }

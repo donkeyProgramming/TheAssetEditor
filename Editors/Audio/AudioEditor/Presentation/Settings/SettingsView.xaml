@@ -1,5 +1,5 @@
 ﻿<UserControl 
-    x:Class="Editors.Audio.AudioEditor.Presentation.HircSettings.HircSettingsView"
+    x:Class="Editors.Audio.AudioEditor.Presentation.Settings.SettingsView"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -7,8 +7,8 @@
     xmlns:sys="clr-namespace:System;assembly=netstandard"
     xmlns:ExtendedWpfToolkit="clr-namespace:Xceed.Wpf.Toolkit;assembly=Xceed.Wpf.Toolkit"
     xmlns:Converters="clr-namespace:Editors.Audio.Shared.UI.Converters"
-    xmlns:Settings="clr-namespace:Editors.Audio.AudioEditor.Presentation.HircSettings"
-    d:DataContext="{d:DesignInstance Type=Settings:HircSettingsViewModel}"
+    xmlns:Settings="clr-namespace:Editors.Audio.AudioEditor.Presentation.Settings"
+    d:DataContext="{d:DesignInstance Type=Settings:SettingsViewModel}"
     mc:Ignorable="d"
     d:DesignHeight="550"
     d:DesignWidth="960">
@@ -49,7 +49,7 @@
             Grid.Column="0"
             Grid.ColumnSpan="2"
             Margin="0, 0, 0, 5"
-            Content="Hirc Settings"/>
+            Content="Settings"/>
 
         <Grid
             Grid.Row="1"
@@ -100,8 +100,6 @@
             Margin="0, 0, 0, 0">
 
             <Grid.RowDefinitions>
-                <RowDefinition 
-                    Height="Auto"/>
                 <RowDefinition 
                     Height="Auto"/>
                 <RowDefinition 
@@ -163,10 +161,9 @@
             <Border 
                 Grid.Row="1"
                 Grid.Column="0"
-                BorderBrush="{DynamicResource Button.Static.Border}"
-                Visibility="{Binding IsPlaylistTypeSectionVisible, Converter={StaticResource BoolToVisibilityConverter}}">
+                BorderBrush="{DynamicResource Button.Static.Border}">
 
-            <Expander 
+                <Expander 
                     Style="{StaticResource ExpanderWithBorderBackground}"
                     IsExpanded="True"
                     Padding="5,0,0,0"
@@ -179,7 +176,7 @@
                             Margin="10, 5, 10, 5">
 
                             <TextBlock 
-                                Text="Container Type"
+                                Text="Hirc Settings"
                                 VerticalAlignment="Center"
                                 Margin="-5, 0, 10, 0"/>
                         </DockPanel>
@@ -187,8 +184,22 @@
 
                     <Grid
                         Margin="0, 5, 0, 0">
-                        
+
                         <Grid.RowDefinitions>
+                            <RowDefinition 
+                                Height="Auto"/>
+                            <RowDefinition 
+                                Height="Auto"/>
+                            <RowDefinition 
+                                Height="Auto"/>
+                            <RowDefinition 
+                                Height="Auto"/>
+                            <RowDefinition 
+                                Height="Auto"/>
+                            <RowDefinition 
+                                Height="Auto"/>
+                            <RowDefinition 
+                                Height="Auto"/>
                             <RowDefinition 
                                 Height="Auto"/>
                             <RowDefinition 
@@ -209,7 +220,7 @@
                             Grid.Column="0"
                             Margin="10, 0, 5, 5"
                             Text="Container Type"
-                            Visibility="{Binding IsPlaylistTypeVisible, Converter={StaticResource BoolToVisibilityConverter}}">
+                            Visibility="{Binding IsContainerTypeVisible, Converter={StaticResource BoolToVisibilityConverter}}">
                             <TextBlock.ToolTip>
                                 <ToolTip>
                                     <TextBlock TextWrapping="Wrap">
@@ -217,8 +228,6 @@
                                         <LineBreak/>
                                         <LineBreak/>
                                         <Run Text="Random - Plays objects at random."/>
-                                        <LineBreak/>
-                                        <Run Text="Random Exhaustive - Plays objects at random without repeating a Sound until the entire playlist is exhausted."/>
                                         <LineBreak/>
                                         <Run Text="Sequence - Plays objects in the sequence in which they were added."/>
                                     </TextBlock>
@@ -230,14 +239,44 @@
                             Grid.Row="0"
                             Grid.Column="1"
                             Margin="10, 0, 5, 5"
-                            ItemsSource="{Binding PlaylistTypes}" 
-                            SelectedItem="{Binding PlaylistType}" 
+                            ItemsSource="{Binding ContainerTypes}" 
+                            SelectedItem="{Binding ContainerType}" 
                             ItemTemplate="{StaticResource EnumToStringTemplate}"
-                            IsEnabled="{Binding IsPlaylistTypeEnabled}"
-                            Visibility="{Binding IsPlaylistTypeVisible, Converter={StaticResource BoolToVisibilityConverter}}"/>
+                            IsEnabled="{Binding IsContainerTypeEnabled}"
+                            Visibility="{Binding IsContainerTypeVisible, Converter={StaticResource BoolToVisibilityConverter}}"/>
+
+                        <TextBlock 
+                            Grid.Row="1"
+                            Grid.Column="0"
+                            Margin="10, 0, 5, 5"
+                            Text="Random Type"
+                            Visibility="{Binding IsRandomTypeVisible, Converter={StaticResource BoolToVisibilityConverter}}">
+                            <TextBlock.ToolTip>
+                                <ToolTip>
+                                    <TextBlock TextWrapping="Wrap">
+                                        <Run Text="The Container Type determines the order in which objects are played."/>
+                                        <LineBreak/>
+                                        <LineBreak/>
+                                        <Run Text="Standard - Plays objects at random."/>
+                                        <LineBreak/>
+                                        <Run Text="Shuffle Exhaustive - Plays objects at random without repeating an object until the entire pool of objects has been played."/>
+                                    </TextBlock>
+                                </ToolTip>
+                            </TextBlock.ToolTip>
+                        </TextBlock>
+
+                        <ComboBox
+                            Grid.Row="1"
+                            Grid.Column="1"
+                            Margin="10, 0, 5, 5"
+                            ItemsSource="{Binding RandomTypes}" 
+                            SelectedItem="{Binding RandomType}" 
+                            ItemTemplate="{StaticResource EnumToStringTemplate}"
+                            IsEnabled="{Binding IsRandomTypeEnabled}"
+                            Visibility="{Binding IsRandomTypeVisible, Converter={StaticResource BoolToVisibilityConverter}}"/>
 
                         <CheckBox
-                            Grid.Row="1"
+                            Grid.Row="2"
                             Grid.Column="0"
                             Margin="10, 0, 5, 5"
                             Content="Repetition Interval"
@@ -250,18 +289,18 @@
                                         <Run Text="Repitition Interval determines how many other objects must be played before an object can be repeated."/>
                                         <LineBreak/>
                                         <LineBreak/>
-                                        <Run Text="If the selected Container Type is Random, the object played is selected completely randomly, but the last n objects played are excluded from the list."/>
+                                        <Run Text="If Random Type is Standard, the object played is selected completely randomly, but the last n objects played are excluded from the list."/>
                                         <LineBreak/>
-                                        <Run Text="If the selected Container Type is Random Exhaustive, when the container is looped, the last n objects played will be excluded from the list."/>
+                                        <Run Text="If Random Type is Shuffle, when the container is looped, the last n objects played will be excluded from the list."/>
                                         <LineBreak/>
-                                        <Run Text="If the selected Container Type is Random Exhaustive that is non-looping and continuous, the Repetition Interval has no effect on the playback of the container."/>
+                                        <Run Text="If Random Type is Shuffle, non-looping and Play Mode continuous, the Repetition Interval has no effect on the playback of the container."/>
                                     </TextBlock>
                                 </ToolTip>
                             </CheckBox.ToolTip>
                         </CheckBox>
 
                         <ExtendedWpfToolkit:IntegerUpDown 
-                            Grid.Row="1"
+                            Grid.Row="2"
                             Grid.Column="1"
                             Minimum="1"
                             Maximum="999"
@@ -272,11 +311,11 @@
                             Visibility="{Binding IsRepetitionIntervalVisible, Converter={StaticResource BoolToVisibilityConverter}}"/>
 
                         <TextBlock 
-                            Grid.Row="2"
+                            Grid.Row="3"
                             Grid.Column="0"
                             Margin="10, 0, 5, 5"
                             Text="Playlist End Behaviour"
-                            Visibility="{Binding IsEndBehaviourVisible, Converter={StaticResource BoolToVisibilityConverter}}">
+                            Visibility="{Binding IsPlaylistEndBehaviourVisible, Converter={StaticResource BoolToVisibilityConverter}}">
                             <TextBlock.ToolTip>
                                 <ToolTip>
                                     <TextBlock TextWrapping="Wrap">
@@ -292,79 +331,25 @@
                         </TextBlock>
 
                         <ComboBox
-                            Grid.Row="2"
+                            Grid.Row="3"
                             Grid.Column="1"
                             Margin="10, 0, 5, 5"
-                            ItemsSource="{Binding EndBehaviours}" 
-                            SelectedItem="{Binding EndBehaviour}" 
+                            ItemsSource="{Binding PlaylistEndBehaviours}" 
+                            SelectedItem="{Binding PlaylistEndBehaviour}" 
                             ItemTemplate="{StaticResource EnumToStringTemplate}"
-                            IsEnabled="{Binding IsEndBehaviourEnabled}"
-                            Visibility="{Binding IsEndBehaviourVisible, Converter={StaticResource BoolToVisibilityConverter}}"/>
-                    </Grid>
-                </Expander>
-            </Border>
-
-            <Border 
-                Grid.Row="2"
-                Grid.Column="0"
-                BorderBrush="{DynamicResource Button.Static.Border}"
-                BorderThickness="0, 0, 0, 0"
-                Visibility="{Binding IsPlaylistModeSectionVisible, Converter={StaticResource BoolToVisibilityConverter}}">
-
-                <Expander 
-                    Style="{StaticResource ExpanderWithBorderBackground}"
-                    IsExpanded="True"
-                    Padding="5,0,0,0"
-                    BorderBrush="{DynamicResource Button.Static.Border}">
-
-                    <Expander.Header>
-                        <DockPanel 
-                            VerticalAlignment="Center" 
-                            LastChildFill="True" 
-                            Margin="10, 5, 10, 5">
-
-                            <TextBlock 
-                                Text="Container Mode"
-                                VerticalAlignment="Center"
-                                Margin="-5, 0, 10, 0" />
-                        </DockPanel>
-                    </Expander.Header>
-
-                    <Grid
-                        Margin="0, 5, 0, 0">
+                            IsEnabled="{Binding IsPlaylistEndBehaviourEnabled}"
+                            Visibility="{Binding IsPlaylistEndBehaviourVisible, Converter={StaticResource BoolToVisibilityConverter}}"/>
                         
-                        <Grid.RowDefinitions>
-                            <RowDefinition 
-                                Height="Auto"/>
-                            <RowDefinition 
-                                Height="Auto"/>
-                            <RowDefinition 
-                                Height="Auto"/>
-                            <RowDefinition 
-                                Height="Auto"/>
-                            <RowDefinition 
-                                Height="Auto"/>
-                            <RowDefinition 
-                                Height="Auto"/>
-                        </Grid.RowDefinitions>
-
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition 
-                                Width="150"/>
-                            <ColumnDefinition 
-                                Width="200"/>
-                        </Grid.ColumnDefinitions>
-
                         <TextBlock 
-                            Grid.Row="0"
+                            Grid.Row="4"
                             Grid.Column="0"
                             Margin="10, 0, 5, 5"
-                            Text="Container Mode"
-                            Visibility="{Binding IsPlaylistModeVisible, Converter={StaticResource BoolToVisibilityConverter}}">
+                            Text="Play Mode"
+                            Visibility="{Binding IsPlayModeVisible, Converter={StaticResource BoolToVisibilityConverter}}">
                             <TextBlock.ToolTip>
                                 <ToolTip>
                                     <TextBlock TextWrapping="Wrap">
-                                        <Run Text="The Container Mode determines whether a single sound or the full playlist is played when triggered."/>
+                                        <Run Text="The Play Mode determines whether a single object or the full playlist is played when triggered."/>
                                         <LineBreak/>
                                         <LineBreak/>
                                         <Run Text="Step - Plays one object in the playlist when triggered."/>
@@ -376,17 +361,17 @@
                         </TextBlock>
 
                         <ComboBox
-                            Grid.Row="0"
+                            Grid.Row="4"
                             Grid.Column="1"
                             Margin="10, 0, 5, 5"
-                            ItemsSource="{Binding PlaylistModes}" 
-                            SelectedItem="{Binding PlaylistMode}" 
+                            ItemsSource="{Binding PlayModes}" 
+                            SelectedItem="{Binding PlayMode}" 
                             ItemTemplate="{StaticResource EnumToStringTemplate}"
-                            IsEnabled="{Binding IsPlaylistModeEnabled}"
-                            Visibility="{Binding IsPlaylistModeVisible, Converter={StaticResource BoolToVisibilityConverter}}"/>
+                            IsEnabled="{Binding IsPlayModeEnabled}"
+                            Visibility="{Binding IsPlayModeVisible, Converter={StaticResource BoolToVisibilityConverter}}"/>
 
                         <TextBlock 
-                            Grid.Row="1"
+                            Grid.Row="5"
                             Grid.Column="0"
                             Margin="10, 0, 5, 5"
                             Text="Always Reset Container"
@@ -394,7 +379,7 @@
                             Visibility="{Binding IsAlwaysResetPlaylistVisible, Converter={StaticResource BoolToVisibilityConverter}}"/>
 
                         <CheckBox
-                            Grid.Row="1"
+                            Grid.Row="5"
                             Grid.Column="1"
                             Margin="10, 0, 5, 5"
                             IsChecked="{Binding AlwaysResetPlaylist, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
@@ -402,7 +387,7 @@
                             Visibility="{Binding IsAlwaysResetPlaylistVisible, Converter={StaticResource BoolToVisibilityConverter}}"/>
 
                         <TextBlock 
-                            Grid.Row="2"
+                            Grid.Row="6"
                             Grid.Column="0"
                             Margin="10, 1, 5, 5"
                             Text="Looping Type"
@@ -424,7 +409,7 @@
                         </TextBlock>
 
                         <ComboBox
-                            Grid.Row="2"
+                            Grid.Row="6"
                             Grid.Column="1"
                             Margin="10, 0, 5, 5"
                             ItemsSource="{Binding LoopingTypes}" 
@@ -434,7 +419,7 @@
                             Visibility="{Binding IsLoopingTypeVisible, Converter={StaticResource BoolToVisibilityConverter}}"/>
 
                         <TextBlock 
-                            Grid.Row="3"
+                            Grid.Row="7"
                             Grid.Column="0"
                             Margin="10, 1, 5, 5"
                             Text="Number of Loops"
@@ -442,7 +427,7 @@
                             Visibility="{Binding IsNumberOfLoopsVisible, Converter={StaticResource BoolToVisibilityConverter}}"/>
 
                         <ExtendedWpfToolkit:IntegerUpDown
-                            Grid.Row="3"
+                            Grid.Row="7"
                             Grid.Column="1"
                             Margin="10, 0, 5, 5"
                             Minimum="1"
@@ -453,7 +438,7 @@
                             Visibility="{Binding IsNumberOfLoopsVisible, Converter={StaticResource BoolToVisibilityConverter}}"/>
 
                         <TextBlock 
-                            Grid.Row="4"
+                            Grid.Row="8"
                             Grid.Column="0"
                             Margin="10, 1, 5, 5"
                             Text="Transition Type"
@@ -481,7 +466,7 @@
                         </TextBlock>
 
                         <ComboBox
-                            Grid.Row="4"
+                            Grid.Row="8"
                             Grid.Column="1"
                             Margin="10, 0, 5, 5"
                             ItemsSource="{Binding TransitionTypes}" 
@@ -491,7 +476,7 @@
                             Visibility="{Binding IsTransitionTypeVisible, Converter={StaticResource BoolToVisibilityConverter}}"/>
 
                         <TextBlock 
-                            Grid.Row="5"
+                            Grid.Row="9"
                             Grid.Column="0"
                             Margin="10, 1, 5, 5"
                             Text="Transition Duration"
@@ -510,7 +495,7 @@
                         </TextBlock>
 
                         <ExtendedWpfToolkit:DecimalUpDown  
-                            Grid.Row="5"
+                            Grid.Row="9"
                             Grid.Column="1"
                             Margin="10, 0, 5, 5"
                             Minimum="0"

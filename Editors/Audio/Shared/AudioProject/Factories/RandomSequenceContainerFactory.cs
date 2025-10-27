@@ -15,7 +15,7 @@ namespace Editors.Audio.Shared.AudioProject.Factories
         RandomSequenceContainerFactoryResult Create(
             HashSet<uint> usedHircIds,
             HashSet<uint> usedSourceIds,
-            AudioSettings audioSettings,
+            HircSettings hircSettings,
             List<AudioFile> audioFiles,
             string language,
             uint overrideBusId = 0,
@@ -29,7 +29,7 @@ namespace Editors.Audio.Shared.AudioProject.Factories
         public RandomSequenceContainerFactoryResult Create(
             HashSet<uint> usedHircIds,
             HashSet<uint> usedSourceIds,
-            AudioSettings audioSettings,
+            HircSettings hircSettings,
             List<AudioFile> audioFiles,
             string language,
             uint overrideBusId = 0,
@@ -38,22 +38,22 @@ namespace Editors.Audio.Shared.AudioProject.Factories
             var result = new RandomSequenceContainerFactoryResult();
             var randomSequenceContainerIds = IdGenerator.GenerateIds(usedHircIds);
 
-            var soundReferences = new List<uint>();
+            var children = new List<uint>();
             var playlistOrder = 0;
             foreach (var audioFile in audioFiles)
             {
                 playlistOrder++;
                 var sound = _soundFactory.Create(usedHircIds, usedSourceIds, audioFile, randomSequenceContainerIds.Id, playlistOrder, language);
-                soundReferences.Add(sound.Id);
+                children.Add(sound.Id);
                 result.RandomSequenceContainerSounds.Add(sound);
             }
 
-            var randomSequenceContainerSettings = AudioSettings.CreateRandomSequenceContainerSettings(audioSettings);
+            var randomSequenceContainerSettings = HircSettings.CreateRandomSequenceContainerSettings(hircSettings);
             var randomSequenceContainer = RandomSequenceContainer.Create(
                 randomSequenceContainerIds.Guid,
                 randomSequenceContainerIds.Id,
                 randomSequenceContainerSettings,
-                soundReferences,
+                children,
                 overrideBusId,
                 actorMixerId);
             result.RandomSequenceContainer = randomSequenceContainer;

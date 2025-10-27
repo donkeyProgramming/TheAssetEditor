@@ -2,7 +2,6 @@
 using Editors.Audio.Shared.AudioProject.Models;
 using Shared.GameFormats.Wwise.Enums;
 using Shared.GameFormats.Wwise.Hirc.V136.Shared;
-using static Editors.Audio.Shared.Wwise.HircSettings;
 
 namespace Editors.Audio.Shared.Wwise.Generators.Hirc.V136
 {
@@ -10,7 +9,7 @@ namespace Editors.Audio.Shared.Wwise.Generators.Hirc.V136
     {
         public static NodeBaseParams_V136 CreateNodeBaseParams(Sound audioProjectSound)
         {
-            var soundIsTarget = audioProjectSound.AudioSettings != null;
+            var soundIsTarget = audioProjectSound.HircSettings != null;
 
             var nodeBaseParams = new NodeBaseParams_V136();
             nodeBaseParams.NodeInitialFxParams = new NodeInitialFxParams_V136()
@@ -24,7 +23,7 @@ namespace Editors.Audio.Shared.Wwise.Generators.Hirc.V136
             nodeBaseParams.BitVector = 0;
             nodeBaseParams.NodeInitialParams = new NodeInitialParams_V136();
 
-            if (soundIsTarget && audioProjectSound.AudioSettings.LoopingType == LoopingType.FiniteLooping)
+            if (soundIsTarget && audioProjectSound.HircSettings.LoopingType == LoopingType.FiniteLooping)
             {
                 nodeBaseParams.NodeInitialParams.AkPropBundle0 = new AkPropBundle_V136()
                 {
@@ -33,12 +32,12 @@ namespace Editors.Audio.Shared.Wwise.Generators.Hirc.V136
                         new AkPropBundle_V136.PropBundleInstance_V136
                         {
                             Id = AkPropId_V136.Loop,
-                            Value = audioProjectSound.AudioSettings.NumberOfLoops
+                            Value = audioProjectSound.HircSettings.NumberOfLoops
                         }
                     }
                 };
             }
-            else if (soundIsTarget && audioProjectSound.AudioSettings.LoopingType == LoopingType.InfiniteLooping)
+            else if (soundIsTarget && audioProjectSound.HircSettings.LoopingType == LoopingType.InfiniteLooping)
             {
                 nodeBaseParams.NodeInitialParams.AkPropBundle0 = new AkPropBundle_V136()
                 {

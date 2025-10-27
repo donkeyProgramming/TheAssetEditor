@@ -13,14 +13,14 @@ namespace Editors.Audio.Shared.AudioProject.Models
         public int PlaylistOrder { get; set; }
         public long InMemoryMediaSize { get; set; }
         public string Language { get; set; }
-        public AudioSettings AudioSettings { get; set; }
+        public HircSettings HircSettings { get; set; }
 
         public Sound()
         {
             HircType = AkBkHircType.Sound;
         }
 
-        public static Sound Create(Guid guid, uint id, uint overrideBusId, uint directParentId, uint sourceId, string language, AudioSettings audioSettings)
+        public static Sound Create(Guid guid, uint id, uint overrideBusId, uint directParentId, uint sourceId, string language, HircSettings hircSettings)
         {
             return new Sound()
             {
@@ -30,7 +30,7 @@ namespace Editors.Audio.Shared.AudioProject.Models
                 DirectParentId = directParentId,
                 SourceId = sourceId,
                 Language = language,
-                AudioSettings = audioSettings
+                HircSettings = hircSettings
             };
         }
 

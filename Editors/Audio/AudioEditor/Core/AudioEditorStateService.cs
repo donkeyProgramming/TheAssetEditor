@@ -18,8 +18,8 @@ namespace Editors.Audio.AudioEditor.Core
         // Audio Project Editor
         bool ShowModdedStatesOnly { get; set; }
 
-        // Audio Project Settings
-        AudioSettings AudioSettings { get; set; }
+        // Settings
+        HircSettings HircSettings { get; set; }
         List<AudioFile> AudioFiles { get; set; }
 
         // Audio Project Viewer
@@ -31,7 +31,7 @@ namespace Editors.Audio.AudioEditor.Core
         public void StoreAudioProjectFilePath(string audioProjectFilePath);
         void StoreSelectedAudioProjectExplorerNode(AudioProjectTreeNode node);
         void StoreModdedStatesOnly(bool moddedStatesOnly);
-        void StoreAudioSettings(AudioSettings audioSettings);
+        void StoreHircSettings(HircSettings hircSettings);
         void StoreAudioFiles(List<AudioFile> audioFiles); 
         void StoreSelectedViewerRows(List<DataRow> selectedViewerRows);
         void StoreCopiedViewerRows(List<DataRow> copiedViewerRows);
@@ -45,7 +45,7 @@ namespace Editors.Audio.AudioEditor.Core
         public string AudioProjectFilePath { get; set; }
         public AudioProjectTreeNode SelectedAudioProjectExplorerNode { get; set; }
         public bool ShowModdedStatesOnly { get; set; }
-        public AudioSettings AudioSettings { get; set; }
+        public HircSettings HircSettings { get; set; }
         public List<AudioFile> AudioFiles { get; set; } = [];
         public List<DataRow> SelectedViewerRows { get; set; }
         public List<DataRow> CopiedViewerRows { get; set; }
@@ -60,7 +60,7 @@ namespace Editors.Audio.AudioEditor.Core
 
         public void StoreModdedStatesOnly(bool showModdedStatesOnly) => ShowModdedStatesOnly = showModdedStatesOnly;
 
-        public void StoreAudioSettings(AudioSettings audioSettings) => AudioSettings = audioSettings;
+        public void StoreHircSettings(HircSettings hircSettings) => HircSettings = hircSettings;
 
         public void StoreAudioFiles(List<AudioFile> audioFiles) => AudioFiles = audioFiles;
 
@@ -75,7 +75,7 @@ namespace Editors.Audio.AudioEditor.Core
             AudioProjectFilePath = null;
             SelectedAudioProjectExplorerNode = null;
             ShowModdedStatesOnly = false;
-            AudioSettings = null;
+            HircSettings = null;
             AudioFiles.Clear();
             SelectedViewerRows = null;
         }
