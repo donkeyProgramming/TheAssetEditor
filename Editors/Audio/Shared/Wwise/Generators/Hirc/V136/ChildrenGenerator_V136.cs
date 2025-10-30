@@ -11,7 +11,7 @@ namespace Editors.Audio.Shared.Wwise.Generators.Hirc.V136
         {
             var childIds = sounds
                 .Select(sound => sound.Id)
-                .OrderByDescending(id => id)
+                .OrderBy(id => id)
                 .ToList();
 
             return new Children_V136

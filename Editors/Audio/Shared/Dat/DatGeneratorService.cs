@@ -34,8 +34,11 @@ namespace Editors.Audio.Shared.Dat
 
             foreach (var stateGroup in stateGroups)
             {
+                var states = new List<string>();
                 foreach (var state in stateGroup.States)
-                    stateDatFile.EventWithStateGroup.Add(new SoundDatFile.DatEventWithStateGroup() { Event = state.Name, Value = 400 });
+                    states.Add(state.Name);
+
+                stateDatFile.StateGroupsWithStates1.Add(new SoundDatFile.DatStateGroupsWithStates() { StateGroup = stateGroup.Name, States = states });
             }
 
             var datFileName = $"states_data__{audioProjectFileNameWithoutExtension}.dat";

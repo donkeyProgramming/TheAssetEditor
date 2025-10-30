@@ -70,7 +70,7 @@
         <DataGrid 
             Grid.Row="2"
             Margin="0, 0, 0, 0"
-            AutoGenerateColumns="True"
+            AutoGenerateColumns="False"
             Behaviors:DataGridColumnsBehavior.Columns ="{Binding DataGridColumns}"
             CanUserAddRows="False" 
             ItemsSource="{Binding Table.DefaultView}"

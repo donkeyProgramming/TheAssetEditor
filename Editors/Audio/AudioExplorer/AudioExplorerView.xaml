@@ -84,7 +84,6 @@
                     IsEditable="True"
                     IsTextSearchEnabled="true"
                     DisplayMemberPath="DisplayName"
-                    Text="{Binding ExplorerFilter.ExplorerList.Filter, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                     ItemsSource="{Binding ExplorerFilter.ExplorerList.Values}"
                     SelectedItem="{Binding ExplorerFilter.ExplorerList.SelectedItem, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
                     <ComboBox.ItemsPanel>

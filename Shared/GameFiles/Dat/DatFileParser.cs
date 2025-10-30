@@ -87,7 +87,7 @@ namespace Shared.GameFormats.Dat
                 memStream.Write(ByteParsers.UInt32.EncodeValue((uint)enumType.States.Count(), out _));
 
                 foreach (var enumValue in enumType.States)
-                    memStream.Write(WriteStr32(enumType.StateGroup));
+                    memStream.Write(WriteStr32(enumValue));
             }
 
             memStream.Write(ByteParsers.UInt32.EncodeValue((uint)file.StateGroupsWithStates1.Count(), out _));
@@ -97,7 +97,7 @@ namespace Shared.GameFormats.Dat
                 memStream.Write(ByteParsers.UInt32.EncodeValue((uint)enumType.States.Count(), out _));
 
                 foreach (var enumValue in enumType.States)
-                    memStream.Write(WriteStr32(enumType.StateGroup));
+                    memStream.Write(WriteStr32(enumValue));
             }
 
             memStream.Write(ByteParsers.UInt32.EncodeValue((uint)file.DialogueEventsWithStateGroups.Count(), out _));
@@ -109,7 +109,6 @@ namespace Shared.GameFormats.Dat
                 foreach (var value in voiceEvent.StateGroups)
                     memStream.Write(ByteParsers.UInt32.EncodeValue(value, out _));
             }
-
 
             memStream.Write(ByteParsers.UInt32.EncodeValue((uint)file.SettingValues.Count(), out _));
             foreach (var value in file.SettingValues)
