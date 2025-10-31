@@ -8,42 +8,39 @@ namespace Editors.Audio.Shared.Dat
 {
     public interface IDatGeneratorService
     {
-        void GenerateEventDatFile(List<ActionEvent> actionEvents, string audioProjectFileNameWithoutExtension);
-        void GenerateStatesDatFile(List<StateGroup> stateGroups, string audioProjectFileNameWithoutExtension);
+        void GenerateEventDatFile(string audioProjectFileNameWithoutExtension, List<ActionEvent> actionEvents = null, List<StateGroup> stateGroups = null);
     }
 
     public class DatGeneratorService(IFileSaveService fileSaveService) : IDatGeneratorService
     {
         private readonly IFileSaveService _fileSaveService = fileSaveService;
 
-        public void GenerateEventDatFile(List<ActionEvent> actionEvents, string audioProjectFileNameWithoutExtension)
+        public void GenerateEventDatFile(string audioProjectFileNameWithoutExtension, List<ActionEvent> actionEvents = null, List<StateGroup> stateGroups = null)
         {
-            var soundDatFile = new SoundDatFile();
+            var datFile = new SoundDatFile();
 
-            foreach (var actionEvent in actionEvents)
-                soundDatFile.EventWithStateGroup.Add(new SoundDatFile.DatEventWithStateGroup() { Event = actionEvent.Name, Value = 400 });
+            if (actionEvents != null && actionEvents.Count > 0)
+            {
+                foreach (var actionEvent in actionEvents)
+                    datFile.EventWithStateGroup.Add(new SoundDatFile.DatEventWithStateGroup() { Event = actionEvent.Name, Value = 400 });
+            }
+
+            if (stateGroups != null && stateGroups.Count > 0)
+            {
+
+                foreach (var stateGroup in stateGroups)
+                {
+                    var states = new List<string>();
+                    foreach (var state in stateGroup.States)
+                        states.Add(state.Name);
+
+                    datFile.StateGroupsWithStates1.Add(new SoundDatFile.DatStateGroupsWithStates() { StateGroup = stateGroup.Name, States = states });
+                }
+            }
 
             var datFileName = $"event_data__{audioProjectFileNameWithoutExtension}.dat";
             var datFilePath = $"audio\\wwise\\{datFileName}";
-            SaveDatFileToPack(soundDatFile, datFileName, datFilePath);
-        }
-
-        public void GenerateStatesDatFile(List<StateGroup> stateGroups, string audioProjectFileNameWithoutExtension)
-        {
-            var stateDatFile = new SoundDatFile();
-
-            foreach (var stateGroup in stateGroups)
-            {
-                var states = new List<string>();
-                foreach (var state in stateGroup.States)
-                    states.Add(state.Name);
-
-                stateDatFile.StateGroupsWithStates1.Add(new SoundDatFile.DatStateGroupsWithStates() { StateGroup = stateGroup.Name, States = states });
-            }
-
-            var datFileName = $"states_data__{audioProjectFileNameWithoutExtension}.dat";
-            var datFilePath = $"audio\\wwise\\{datFileName}";
-            SaveDatFileToPack(stateDatFile, datFileName, datFilePath);
+            SaveDatFileToPack(datFile, datFileName, datFilePath);
         }
 
         private void SaveDatFileToPack(SoundDatFile datFile, string datFileName, string datFilePath)

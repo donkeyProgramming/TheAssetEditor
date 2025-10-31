@@ -239,20 +239,24 @@ namespace Editors.Audio.Shared.AudioProject.Compiler
 
         private void GenerateDatFiles(AudioProjectFile audioProject, string audioProjectFileNameWithoutExtension)
         {
-            // The .dat file is seems to only necessary for playing movie Action Events and any triggered via common.trigger_soundevent()
-            // but without testing all the different types of Action Event sounds it's safer to just make a .dat for all as it's little overhead.
+            // The .dat file is seems to only necessary for Action Events for movies, quest battles or anything triggered via common.trigger_soundevent()
+            // but without testing all the different types of Action Event sounds it's safer to just make a .dat for all.
+            // We store States in there so we can display them in the Audio Explorer.
             var actionEvents = audioProject.GetActionEvents();
-            if (actionEvents.Count != 0)
+            if (actionEvents.Count != 0 && audioProject.StateGroups != null && audioProject.StateGroups.Count != 0)
             {
-                _logger.Here().Information($"Generating Event .dat");
-                _datGeneratorService.GenerateEventDatFile(actionEvents, audioProjectFileNameWithoutExtension);
+                _logger.Here().Information($"Generating event data .dat");
+                _datGeneratorService.GenerateEventDatFile(audioProjectFileNameWithoutExtension, actionEvents, audioProject.StateGroups);
             }
-
-            // We create the states .dat file so we can see the modded states in the Audio Explorer, it isn't necessary for the game
-            if (audioProject.StateGroups != null && audioProject.StateGroups.Count != 0)
+            else if (actionEvents.Count != 0 && audioProject.StateGroups == null)
             {
-                _logger.Here().Information($"Generating States .dat");
-                _datGeneratorService.GenerateStatesDatFile(audioProject.StateGroups, audioProjectFileNameWithoutExtension);
+                _logger.Here().Information($"Generating event data .dat");
+                _datGeneratorService.GenerateEventDatFile(audioProjectFileNameWithoutExtension, actionEvents: actionEvents);
+            }
+            else if (actionEvents.Count == 0 && audioProject.StateGroups != null && audioProject.StateGroups.Count != 0)
+            {
+                _logger.Here().Information($"Generating event data .dat");
+                _datGeneratorService.GenerateEventDatFile(audioProjectFileNameWithoutExtension, stateGroups: audioProject.StateGroups);
             }
         }
     }
