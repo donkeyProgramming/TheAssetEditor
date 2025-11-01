@@ -1,152 +1,310 @@
-﻿<UserControl x:Class="Audio.AudioExplorer.AudioExplorerView"
-             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:b="http://schemas.microsoft.com/xaml/behaviors" 
-             xmlns:s="http://schemas.singulink.com/xaml" 
-             xmlns:behaviors="clr-namespace:Shared.Ui.Common.Behaviors;assembly=Shared.Ui"
-             mc:Ignorable="d" 
-             d:DesignHeight="450" d:DesignWidth="800">
+﻿<UserControl 
+    x:Class="Audio.AudioExplorer.AudioExplorerView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
+    xmlns:s="http://schemas.singulink.com/xaml"
+    xmlns:behaviors="clr-namespace:Shared.Ui.Common.Behaviors;assembly=Shared.Ui" 
+    xmlns:converters="clr-namespace:Editors.Audio.Shared.UI.Converters" 
+    xmlns:audioexplorer="clr-namespace:Editors.Audio.AudioExplorer" 
+    d:DataContext="{d:DesignInstance Type=audioexplorer:AudioExplorerViewModel}"
+    mc:Ignorable="d" 
+    d:DesignHeight="450" d:DesignWidth="800">
+
+    <UserControl.Resources>
+        <converters:EnumConverter 
+            x:Key="EnumConverter"/>
+        <DataTemplate 
+            x:Key="EnumToStringTemplate">
+            <TextBlock 
+                Text="{Binding Converter={StaticResource EnumConverter}}"/>
+        </DataTemplate>
+    </UserControl.Resources>
 
     <Grid>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="0.6*"/>
-            <ColumnDefinition Width="auto"/>
-            <ColumnDefinition/>
+            <ColumnDefinition 
+                Width="0.6*"/>
+            <ColumnDefinition 
+                Width="Auto"/>
+            <ColumnDefinition
+                Width="*"/>
         </Grid.ColumnDefinitions>
+
         <Grid.RowDefinitions>
-            <RowDefinition Height="auto"/>
-            <RowDefinition Height="*"/>
-            <RowDefinition Height="auto"/>
+            <RowDefinition 
+                Height="*"/>
         </Grid.RowDefinitions>
 
-        <GridSplitter Grid.Row="1" Grid.RowSpan="3" Grid.Column="1"  HorizontalAlignment="Stretch">
-            <GridSplitter.Template>
-                <ControlTemplate TargetType="{x:Type GridSplitter}">
-                    <Grid>
-                        <Button Content="⁞" />
-                        <Rectangle Fill="#00FFFFFF" />
-                    </Grid>
-                </ControlTemplate>
-            </GridSplitter.Template>
-        </GridSplitter>
+        <GridSplitter
+            Grid.Row="0"
+            Grid.Column="1" 
+            Width="5" 
+            Background="{DynamicResource App.Border}" 
+            VerticalAlignment="Stretch" 
+            HorizontalAlignment="Center"
+            ResizeBehavior="PreviousAndNext" 
+            ResizeDirection="Columns"/>
 
-        <Menu Grid.ColumnSpan="3">
-            <MenuItem Header="_File">
-                <MenuItem Header="Load all bnks" Click="{s:MethodBinding LoadAllBnksAction}" IsEnabled="False"/>
-                <MenuItem Header="Load one bnks" Click="{s:MethodBinding BrowseBnkAction}" IsEnabled="False"/>
-                <MenuItem Header="Export id list" Click="{s:MethodBinding ExportIdListAction}"/>
-                <MenuItem Header="Load Hirc From ID" Click="{s:MethodBinding LoadHircFromIdAction}"/>
-            </MenuItem>
-        </Menu>
+        <Grid 
+            Grid.Row="0" 
+            Grid.Column="0">
 
+            <Grid.RowDefinitions>
+                <RowDefinition
+                    Height="Auto"/>
+                <RowDefinition
+                    Height="Auto"/>
+                <RowDefinition
+                    Height="Auto"/>
+                <RowDefinition
+                    Height="Auto"/>
+                <RowDefinition
+                    Height="Auto"/>
+                <RowDefinition
+                    Height="*"/>
+            </Grid.RowDefinitions>
 
-        <DockPanel Grid.Row="1" Grid.Column="0">
-            <DockPanel DockPanel.Dock="Top">
-                <Label DockPanel.Dock="Left" Content="Events:"/>
-                <ComboBox DockPanel.Dock="Top"
-                          IsEditable="True"
-                          IsTextSearchEnabled="true"
-                          DisplayMemberPath="DisplayName"
-                          Text="{Binding EventFilter.EventList.Filter, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" 
-                          ItemsSource="{Binding EventFilter.EventList.Values}" 
-                          SelectedItem="{Binding EventFilter.EventList.SelectedItem, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">
+            <Grid
+                Grid.Row="0"
+                Margin="5, 5, 5, 5">
+
+                <Grid.RowDefinitions>
+                    <RowDefinition
+                        Height="Auto"/>
+                    <RowDefinition
+                        Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <ComboBox
+                    Grid.Row="1"
+                    Height="25"
+                    IsEditable="True"
+                    IsTextSearchEnabled="true"
+                    DisplayMemberPath="DisplayName"
+                    ItemsSource="{Binding ExplorerFilter.ExplorerList.Values}"
+                    SelectedItem="{Binding ExplorerFilter.ExplorerList.SelectedItem, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
                     <ComboBox.ItemsPanel>
                         <ItemsPanelTemplate>
-                            <VirtualizingStackPanel />
+                            <VirtualizingStackPanel/>
                         </ItemsPanelTemplate>
                     </ComboBox.ItemsPanel>
                 </ComboBox>
+            </Grid>
 
-            </DockPanel>
-            <DockPanel DockPanel.Dock="Top">
-                <Expander DockPanel.Dock="Top" Header="Extra:">
-                    <DockPanel>
-                        <Grid DockPanel.Dock="Top">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition/>
-                                <ColumnDefinition/>
-                            </Grid.ColumnDefinitions>
-                            <DockPanel Grid.Column="0">
-                                <CheckBox DockPanel.Dock="Top" Content="Show ID" IsChecked="{Binding ShowIds.Value, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" IsEnabled="false"/>
-                                <CheckBox DockPanel.Dock="Top" Content="Show File Name" IsChecked="{Binding ShowBnkName.Value, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" IsEnabled="false"/>
-                                <CheckBox DockPanel.Dock="Top" Content="Use bnk name ref" IsChecked="{Binding UseBnkNameWhileParsing.Value, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" IsEnabled="false"/>
-                            </DockPanel>
+            <Grid
+                Grid.Row="1"
+                Margin="5, 0, 0, 0">
 
-                            <DockPanel Grid.Column="1">
-                                <CheckBox DockPanel.Dock="Top" Content="Show Events" IsChecked="{Binding ShowEvents.Value, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
-                                <CheckBox DockPanel.Dock="Top" Content="Show Dialogs Events" IsChecked="{Binding ShowDialogueEvents.Value, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
-                            </DockPanel>
-                        </Grid>
-                        <DockPanel DockPanel.Dock="Top" IsEnabled="false">
-                            <Label Content="Find by id:" Width="75"/>
-                            <Button DockPanel.Dock="Right" Content="Find" Margin="3"/>
-                            <TextBox Margin="3"></TextBox>
-                        </DockPanel>
-                        <DockPanel DockPanel.Dock="Top" IsEnabled="false">
-                            <Label Content="Event count:"/>
-                            <TextBox Margin="3" IsReadOnly="True"/>
-                        </DockPanel>
-                        <DockPanel DockPanel.Dock="Top">
-                            <Button Content="Export Dialog Event as CSV" Click="{s:MethodBinding ExportCurrrentDialogueEventAsCsvAction}" IsEnabled="{Binding CanExportCurrrentDialogueEventAsCsvAction.Value, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
-                        </DockPanel>
-                    </DockPanel>
-                </Expander>
-            </DockPanel>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition 
+                        Width="Auto"/>
+                    <ColumnDefinition
+                        Width="Auto"/>
+                    <ColumnDefinition
+                        Width="Auto"/>
+                    <ColumnDefinition
+                        Width="Auto"/>
+                </Grid.ColumnDefinitions>
 
-            <TreeView ItemsSource="{Binding TreeList, UpdateSourceTrigger=PropertyChanged}" VirtualizingPanel.IsVirtualizing="True" 
-                      VirtualizingPanel.VirtualizationMode="Recycling"  VirtualizingPanel.IsVirtualizingWhenGrouping="True">
+                <CheckBox
+                    Grid.Column="0"
+                    DockPanel.Dock="Top" 
+                    Content="Search by Action Event" 
+                    IsChecked="{Binding SearchByActionEvent, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
+
+                <CheckBox 
+                    Grid.Column="1"
+                    Margin="5, 0, 0, 0"
+                    DockPanel.Dock="Top" 
+                    Content="Search By Dialogue Event" 
+                    IsChecked="{Binding SearchByDialogueEvent, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                
+                <CheckBox 
+                    Grid.Column="2"
+                    Margin="5, 0, 0, 0"
+                    DockPanel.Dock="Top" 
+                    Content="Search By VO Actor" 
+                    IsChecked="{Binding SearchByVOActor, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                
+                <CheckBox 
+                    Grid.Column="3"
+                    Margin="5, 0, 5, 0"
+                    DockPanel.Dock="Top" 
+                    Content="Search By Hirc ID" 
+                    IsChecked="{Binding SearchByHircId, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+            </Grid>
+
+            <Expander
+                Grid.Row="3"
+                Margin="4, 5, 4, 0"
+                Header="Audio Languages">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition
+                            Height="Auto"/>
+                        <RowDefinition
+                            Height="Auto"/>
+                    </Grid.RowDefinitions>
+
+                    <Button
+                        Margin="0, 5, 0, 0"
+                        Grid.Row="0"
+                        Content="Load Audio Languages"
+                        Height="25"
+                        Command="{Binding LoadAudioRepositoryForSelectedLanguagesCommand}"/>
+                    
+                    <ListBox
+                        Grid.Row="1"
+                        Margin="0, 5, 0, 0"
+                        MaxHeight="500"
+                        ItemsSource="{Binding Languages}"
+                        SelectionMode="Extended"
+                        VerticalAlignment="Stretch"
+                        ScrollViewer.VerticalScrollBarVisibility="Auto">
+
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <CheckBox
+                                    IsChecked="{Binding IsChecked, Mode=TwoWay}">
+                                    <ContentPresenter
+                                        Content="{Binding Language}"
+                                        ContentTemplate="{StaticResource EnumToStringTemplate}"/>
+                                </CheckBox>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+                </Grid>
+            </Expander>
+
+            <Button
+                Grid.Row="4"
+                Margin="5, 5, 5, 5"
+                Content="Play Audio"
+                Height="25"
+                Command="{Binding PlaySelectedSoundActionCommand}" 
+                IsEnabled="{Binding IsPlaySoundButtonEnabled, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
+
+            <TreeView
+                Grid.Row="5"
+                ItemsSource="{Binding TreeList, UpdateSourceTrigger=PropertyChanged}"
+                VirtualizingPanel.IsVirtualizing="True"
+                VirtualizingPanel.VirtualizationMode="Recycling"
+                VirtualizingPanel.IsVirtualizingWhenGrouping="True"
+                PreviewMouseDoubleClick="OnNodeDoubleClick">
+
                 <TreeView.ItemContainerStyle>
-                    <Style TargetType="{x:Type TreeViewItem}">
-                        <Setter Property="IsExpanded" Value="{Binding IsExpanded}"/>
-                        <Setter Property="Template">
+                    <Style 
+                        TargetType="{x:Type TreeViewItem}">
+                        <Setter 
+                            Property="IsExpanded" 
+                            Value="{Binding IsExpanded}"/>
+                        <Setter 
+                            Property="Template">
                             <Setter.Value>
-                                <ControlTemplate TargetType="{x:Type TreeViewItem}">
+                                <ControlTemplate 
+                                    TargetType="{x:Type TreeViewItem}">
                                     <Grid>
                                         <Grid.ColumnDefinitions>
-                                            <ColumnDefinition MinWidth="19" Width="Auto"/>
-                                            <ColumnDefinition Width="Auto"/>
-                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition 
+                                                MinWidth="19" 
+                                                Width="Auto"/>
+                                            <ColumnDefinition 
+                                                Width="Auto"/>
+                                            <ColumnDefinition 
+                                                Width="*"/>
                                         </Grid.ColumnDefinitions>
                                         <Grid.RowDefinitions>
-                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition 
+                                                Height="Auto"/>
                                             <RowDefinition/>
                                         </Grid.RowDefinitions>
-                                        <ToggleButton x:Name="Expander" ClickMode="Press" 
-                                                      IsChecked="{Binding IsExpanded, RelativeSource={RelativeSource TemplatedParent}}"
-                                                      Style="{StaticResource ExpandCollapseToggleStyle}"/>
-                                        <Border x:Name="Bd" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" 
-                                                Background="{TemplateBinding Background}" Grid.Column="1"
-                                                Padding="{TemplateBinding Padding}" SnapsToDevicePixels="true">
-                                            <ContentPresenter x:Name="PART_Header" ContentSource="Header" VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
-                                                              HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"/>
+                                        <ToggleButton 
+                                            x:Name="Expander" 
+                                            ClickMode="Press" 
+                                            IsChecked="{Binding IsExpanded, RelativeSource={RelativeSource TemplatedParent}}"
+                                            Style="{StaticResource ExpandCollapseToggleStyle}"/>
+                                        <Border 
+                                            x:Name="Bd"
+                                            BorderBrush="{TemplateBinding BorderBrush}" 
+                                            BorderThickness="{TemplateBinding BorderThickness}" 
+                                            Background="{TemplateBinding Background}" 
+                                            Grid.Column="1"
+                                            Padding="{TemplateBinding Padding}" 
+                                            SnapsToDevicePixels="true">
+                                            <ContentPresenter 
+                                                x:Name="PART_Header" 
+                                                ContentSource="Header" 
+                                                VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                                                HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" 
+                                                SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"/>
                                         </Border>
-                                        <ItemsPresenter x:Name="ItemsHost" Grid.ColumnSpan="2" Grid.Column="1" Grid.Row="1"/>
+                                        <ItemsPresenter 
+                                            x:Name="ItemsHost" Grid.ColumnSpan="2" 
+                                            Grid.Column="1" 
+                                            Grid.Row="1"/>
                                     </Grid>
                                     <ControlTemplate.Triggers>
-                                        <Trigger Property="IsExpanded" Value="false">
-                                            <Setter Property="Visibility" TargetName="ItemsHost" Value="Collapsed"/>
+                                        <Trigger 
+                                            Property="IsExpanded" 
+                                            Value="false">
+                                            <Setter 
+                                                Property="Visibility" 
+                                                TargetName="ItemsHost" 
+                                                Value="Collapsed"/>
                                         </Trigger>
-                                        <Trigger Property="HasItems" Value="false">
-                                            <Setter Property="Visibility" TargetName="Expander" Value="Hidden"/>
+                                        <Trigger 
+                                            Property="HasItems" 
+                                            Value="false">
+                                            <Setter 
+                                                Property="Visibility" 
+                                                TargetName="Expander" 
+                                                Value="Hidden"/>
                                         </Trigger>
-                                        <Trigger Property="IsSelected" Value="true">
-                                            <Setter Property="Background" TargetName="Bd" Value="{DynamicResource TreeViewItem.Selected.Background}"/>
-                                            <Setter Property="BorderBrush" TargetName="Bd" Value="{DynamicResource TreeViewItem.Selected.Border}"/>
-                                            <Setter Property="Foreground" Value="{DynamicResource ABrush.Foreground.Deeper}"/>
+                                        <Trigger 
+                                            Property="IsSelected" 
+                                            Value="true">
+                                            <Setter 
+                                                Property="Background" 
+                                                TargetName="Bd" 
+                                                Value="{DynamicResource TreeViewItem.Selected.Background}"/>
+                                            <Setter 
+                                                Property="BorderBrush" 
+                                                TargetName="Bd" 
+                                                Value="{DynamicResource TreeViewItem.Selected.Border}"/>
+                                            <Setter 
+                                                Property="Foreground" 
+                                                Value="{DynamicResource ABrush.Foreground.Deeper}"/>
                                         </Trigger>
                                         <MultiTrigger>
                                             <MultiTrigger.Conditions>
-                                                <Condition Property="IsSelected" Value="true"/>
-                                                <Condition Property="IsSelectionActive" Value="false"/>
+                                                <Condition 
+                                                    Property="IsSelected" 
+                                                    Value="true"/>
+                                                <Condition 
+                                                    Property="IsSelectionActive" 
+                                                    Value="false"/>
                                             </MultiTrigger.Conditions>
-                                            <Setter Property="Background" TargetName="Bd" Value="{DynamicResource TreeViewItem.Selected.Inactive.Background}"/>
-                                            <Setter Property="BorderBrush" TargetName="Bd" Value="{DynamicResource TreeViewItem.Selected.Inactive.Border}"/>
-                                            <Setter Property="Foreground" Value="{DynamicResource ABrush.Foreground.Disabled}"/>
+                                            <Setter 
+                                                Property="Background" 
+                                                TargetName="Bd" 
+                                                Value="{DynamicResource TreeViewItem.Selected.Inactive.Background}"/>
+                                            <Setter 
+                                                Property="BorderBrush" 
+                                                TargetName="Bd" 
+                                                Value="{DynamicResource TreeViewItem.Selected.Inactive.Border}"/>
+                                            <Setter 
+                                                Property="Foreground" 
+                                                Value="{DynamicResource ABrush.Foreground.Disabled}"/>
                                         </MultiTrigger>
-                                        <Trigger Property="IsEnabled" Value="false">
-                                            <Setter Property="Foreground" Value="{DynamicResource ABrush.Foreground.Disabled}"/>
+                                        <Trigger 
+                                            Property="IsEnabled" 
+                                            Value="false">
+                                            <Setter 
+                                                Property="Foreground" 
+                                                Value="{DynamicResource ABrush.Foreground.Disabled}"/>
                                         </Trigger>
                                     </ControlTemplate.Triggers>
                                 </ControlTemplate>
@@ -156,26 +314,39 @@
                 </TreeView.ItemContainerStyle>
 
                 <b:Interaction.Behaviors>
-                    <behaviors:BindableSelectedItemBehavior SelectedItem="{Binding SelectedNode, Mode=TwoWay}" />
+                    <behaviors:BindableSelectedItemBehavior
+                        SelectedItem="{Binding SelectedNode, Mode=TwoWay}"/>
                 </b:Interaction.Behaviors>
 
                 <TreeView.ItemTemplate>
-                    <HierarchicalDataTemplate ItemsSource="{Binding Path=Children, UpdateSourceTrigger=PropertyChanged}">
-                        <StackPanel Orientation="Horizontal">
-                            <TextBlock Text="{Binding DisplayName, UpdateSourceTrigger=PropertyChanged}" />
-                            <TextBlock Text=""></TextBlock>
-                            <TextBlock Text=""></TextBlock>
+                    <HierarchicalDataTemplate
+                        ItemsSource="{Binding Path=Children, UpdateSourceTrigger=PropertyChanged}">
+                        <StackPanel 
+                            Orientation="Horizontal">
+                            <TextBlock
+                                Text="{Binding DisplayName, UpdateSourceTrigger=PropertyChanged}"/>
                         </StackPanel>
                     </HierarchicalDataTemplate>
                 </TreeView.ItemTemplate>
             </TreeView>
+        </Grid>
 
-        </DockPanel>
-        <DockPanel Grid.Row="1" Grid.Column="3" LastChildFill="True">
-            <Button DockPanel.Dock="Bottom" Content="Play Audio" Height="20" Margin="5" Click="{s:MethodBinding PlaySelectedSoundAction}" IsEnabled="{Binding IsPlaySoundButtonEnabled.Value, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
-            <ScrollViewer>
-                <TextBox  DockPanel.Dock="Top" IsReadOnly="True" Text="{Binding SelectedNodeText.Value, UpdateSourceTrigger=PropertyChanged}" />
+        <Grid 
+            Grid.Row="0" 
+            Grid.Column="3">
+
+            <Grid.RowDefinitions>
+                <RowDefinition
+                    Height="*"/>
+            </Grid.RowDefinitions>
+
+            <ScrollViewer
+                Grid.Row="0">
+                <TextBox 
+                    DockPanel.Dock="Top" 
+                    IsReadOnly="True" 
+                    Text="{Binding SelectedNodeText, UpdateSourceTrigger=PropertyChanged}"/>
             </ScrollViewer>
-        </DockPanel>
+        </Grid>
     </Grid>
 </UserControl>

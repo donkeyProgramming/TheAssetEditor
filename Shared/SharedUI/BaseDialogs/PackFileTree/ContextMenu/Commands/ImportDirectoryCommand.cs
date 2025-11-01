@@ -23,29 +23,38 @@ namespace Shared.Ui.BaseDialogs.PackFileTree.ContextMenu.Commands
             var dialog = new FolderBrowserDialog();
             if (dialog.ShowDialog() == DialogResult.OK)
             {
-                var parentPath = _selectedNode.GetFullPath();
-                var originalFilePaths = Directory.GetFiles(parentPath, "*", SearchOption.AllDirectories);
-                var filePaths = originalFilePaths.Select(x => x.Replace(dialog.SelectedPath + "\\", "")).ToList();
-                if (!string.IsNullOrWhiteSpace(parentPath))
-                    parentPath += "\\";
+                var folderPath = dialog.SelectedPath;
+                var folderName = new DirectoryInfo(folderPath).Name;
+                var originalFilePaths = Directory.GetFiles(folderPath, "*", SearchOption.AllDirectories);
+                var filePaths = originalFilePaths.Select(x => x.Replace($"{folderPath}\\", "")).ToList();
+
+                var packNodeParentPath = _selectedNode.GetFullPath();
+                if (!string.IsNullOrWhiteSpace(packNodeParentPath))
+                    packNodeParentPath += "\\";
 
                 var filesAdded = new List<NewPackFileEntry>();
                 for (var i = 0; i < filePaths.Count; i++)
                 {
                     var currentPath = filePaths[i];
-                    var filename = Path.GetFileName(currentPath);
+                    var fileName = Path.GetFileName(currentPath);
+
+                    var packDirectoryPath = $"{packNodeParentPath.ToLower()}{folderName}";
+
+                    var directoryPath = string.Empty;
+                    if (currentPath != fileName)
+                    {
+                        directoryPath = currentPath.Replace($"\\{fileName}", string.Empty).ToLower();
+                        packDirectoryPath = $"{packDirectoryPath}\\{directoryPath}";
+                    }
 
                     var source = MemorySource.FromFile(originalFilePaths[i]);
-                    var file = new PackFile(filename, source);
-                    filesAdded.Add(new NewPackFileEntry(parentPath.ToLower(), file));
+                    var file = new PackFile(fileName, source);
 
+                    filesAdded.Add(new NewPackFileEntry(packDirectoryPath, file));
                 }
 
                 packFileService.AddFilesToPack(_selectedNode.FileOwner, filesAdded);
             }
         }
     }
-
-
-
 }

@@ -8,21 +8,21 @@ namespace Shared.GameFormats.Dat
         [DebuggerDisplay("EventWithValue {EventName} {Value}")]
         public class DatEventWithStateGroup
         {
-            public string EventName { get; set; }
+            public string Event { get; set; }
             public float Value { get; set; }
         }
 
         [DebuggerDisplay("EventWithValues {EventName} [{Values.Count}]")]
         public class DatDialogueEventsWithStateGroups
         {
-            public string EventName { get; set; }
+            public string Event { get; set; }
             public List<uint> StateGroups { get; set; } = new List<uint>();
         }
 
         [DebuggerDisplay("SettingValue {EventName} [{MinValue}-{MaxValue}]")]
         public class DatSettingValues
         {
-            public string EventName { get; set; }
+            public string Event { get; set; }
             public float MinValue { get; set; }
             public float MaxValue { get; set; }
         }
@@ -31,7 +31,7 @@ namespace Shared.GameFormats.Dat
         [DebuggerDisplay("EventTypeEnums {EnumName} [{EnumValues.Count}]")]
         public class DatStateGroupsWithStates
         {
-            public string StateGroupName { get; set; }
+            public string StateGroup { get; set; }
             public List<string> States { get; set; } = [];
         }
 
@@ -48,23 +48,23 @@ namespace Shared.GameFormats.Dat
 
             builder.AppendLine($"Section 1 -{EventWithStateGroup.Count}");
             foreach (var item in EventWithStateGroup)
-                builder.AppendLine($"{item.EventName}, {item.Value}");
+                builder.AppendLine($"{item.Event}, {item.Value}");
 
             builder.AppendLine($"Section 2 -{StateGroupsWithStates0.Count}");
             foreach (var item in StateGroupsWithStates0)
-                builder.AppendLine($"{item.StateGroupName}, [{string.Join(",", item.States)}]");
+                builder.AppendLine($"{item.StateGroup}, [{string.Join(",", item.States)}]");
 
             builder.AppendLine($"Section 3 -{StateGroupsWithStates1.Count}");
             foreach (var item in StateGroupsWithStates1)
-                builder.AppendLine($"{item.StateGroupName}, [{string.Join(",", item.States)}]");
+                builder.AppendLine($"{item.StateGroup}, [{string.Join(",", item.States)}]");
 
             builder.AppendLine($"Section 4 -{DialogueEventsWithStateGroups.Count}");
             foreach (var item in DialogueEventsWithStateGroups)
-                builder.AppendLine($"{item.EventName}, [{string.Join(",", item.StateGroups)}]");
+                builder.AppendLine($"{item.Event}, [{string.Join(",", item.StateGroups)}]");
 
             builder.AppendLine($"Section 5 -{SettingValues.Count}");
             foreach (var item in SettingValues)
-                builder.AppendLine($"{item.EventName}, {item.MinValue}, {item.MaxValue}");
+                builder.AppendLine($"{item.Event}, {item.MinValue}, {item.MaxValue}");
 
             builder.AppendLine($"Section 6 -{Unknown.Count}");
             foreach (var item in Unknown)
@@ -88,16 +88,16 @@ namespace Shared.GameFormats.Dat
         public string[] CreateFileNameList()
         {
             var output = new List<string>();
-            output.AddRange(EventWithStateGroup.Select(x => x.EventName));
+            output.AddRange(EventWithStateGroup.Select(x => x.Event));
 
-            output.AddRange(StateGroupsWithStates0.Select(x => x.StateGroupName));
+            output.AddRange(StateGroupsWithStates0.Select(x => x.StateGroup));
             output.AddRange(StateGroupsWithStates0.SelectMany(x => x.States));
 
-            output.AddRange(StateGroupsWithStates1.Select(x => x.StateGroupName));
+            output.AddRange(StateGroupsWithStates1.Select(x => x.StateGroup));
             output.AddRange(StateGroupsWithStates1.SelectMany(x => x.States));
 
-            output.AddRange(DialogueEventsWithStateGroups.Select(x => x.EventName));
-            output.AddRange(SettingValues.Select(x => x.EventName));
+            output.AddRange(DialogueEventsWithStateGroups.Select(x => x.Event));
+            output.AddRange(SettingValues.Select(x => x.Event));
             output.AddRange(Unknown.Select(x => x));
 
             return output.ToArray();

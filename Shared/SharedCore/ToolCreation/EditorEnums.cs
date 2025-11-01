@@ -19,7 +19,6 @@
         CampaginAnimation_Editor,
         AnimationPack_Editor,
         AudioExplorer_Editor,
-        AudioCompiler_Editor,
         Audio_Editor,
         Twui_Editor,
         None,

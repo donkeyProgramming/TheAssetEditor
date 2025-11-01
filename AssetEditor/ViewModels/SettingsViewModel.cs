@@ -37,12 +37,12 @@ namespace AssetEditor.ViewModels
             RenderEngineBackgroundColours = new ObservableCollection<BackgroundColour>((BackgroundColour[])Enum.GetValues(typeof(BackgroundColour)));
             CurrentRenderEngineBackgroundColour = _settingsService.CurrentSettings.RenderEngineBackgroundColour;
             StartMaximised = _settingsService.CurrentSettings.StartMaximised;
-            Games = new ObservableCollection<GameTypeEnum>(GameInformationDatabase.Games.OrderBy(g => g.DisplayName).Select(g => g.Type));
+            Games = new ObservableCollection<GameTypeEnum>(GameInformationDatabase.Games.Values.OrderBy(game => game.DisplayName).Select(game => game.Type));
             CurrentGame = _settingsService.CurrentSettings.CurrentGame;
             LoadCaPacksByDefault = _settingsService.CurrentSettings.LoadCaPacksByDefault;
             ShowCAWemFiles = _settingsService.CurrentSettings.ShowCAWemFiles;
             OnlyLoadLod0ForReferenceMeshes = _settingsService.CurrentSettings.OnlyLoadLod0ForReferenceMeshes;
-            foreach (var game in GameInformationDatabase.Games.OrderBy(g => g.DisplayName))
+            foreach (var game in GameInformationDatabase.Games.Values.OrderBy(game => game.DisplayName))
             {
                 GameDirectores.Add(
                     new GamePathItem()
@@ -56,7 +56,8 @@ namespace AssetEditor.ViewModels
         }
 
 
-        [RelayCommand] private void Save()
+        [RelayCommand]
+        private void Save()
         {
             _settingsService.CurrentSettings.Theme = CurrentTheme;
             _settingsService.CurrentSettings.RenderEngineBackgroundColour = CurrentRenderEngineBackgroundColour;
@@ -73,7 +74,8 @@ namespace AssetEditor.ViewModels
             MessageBox.Show("Please restart the tool after updating settings!");
         }
 
-        [RelayCommand] private void Browse()
+        [RelayCommand]
+        private void Browse()
         {
             var dialog = new OpenFileDialog();
             dialog.Filter = "Executable files (*.exe)|*.exe";

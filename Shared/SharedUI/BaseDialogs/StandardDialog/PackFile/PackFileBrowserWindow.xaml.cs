@@ -54,10 +54,21 @@ namespace Shared.Ui.BaseDialogs.StandardDialog.PackFile
             SelectedFile = ViewModel.SelectedItem?.Item;
 
             if (ViewModel.SelectedItem?.NodeType == NodeType.Directory)
-                SelectedFolder = ViewModel.SelectedItem?.Name;
+                SelectedFolder = GetFolderPath(ViewModel.SelectedItem, ViewModel.SelectedItem?.Name);
 
             DialogResult = true;
             Close();
+        }
+
+        private static string GetFolderPath(TreeNode node, string folderPath)
+        {
+            if (node.Parent?.NodeType == NodeType.Root)
+                return folderPath;
+            else
+            {
+                folderPath = $"{node.Parent.Name}\\{folderPath}";
+                return GetFolderPath(node.Parent, folderPath);
+            }
         }
 
         public void Dispose()

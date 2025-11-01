@@ -24,21 +24,21 @@ namespace Shared.GameFormats.Wwise.Hirc.V112
 
             // Reload the object to ensure sanity
             var sanityReload = new CAkSound_V112();
-            sanityReload.Parse(new ByteChunk(byteArray));
+            sanityReload.ReadHirc(new ByteChunk(byteArray));
 
             return byteArray;
         }
 
         public override void UpdateSectionSize()
         {
-            var idSize = ByteHelper.GetPropertyTypeSize(ID);
+            var idSize = ByteHelper.GetPropertyTypeSize(Id);
             var akBankSourceDataSize = AkBankSourceData.GetSize();
             var nodeBaseParamsSize = NodeBaseParams.GetSize();
             SectionSize = idSize + akBankSourceDataSize + nodeBaseParamsSize;
         }
 
-        public uint GetDirectParentID() => NodeBaseParams.DirectParentId;
-        public uint GetSourceID() => AkBankSourceData.AkMediaInformation.SourceId;
+        public uint GetDirectParentId() => NodeBaseParams.DirectParentId;
+        public uint GetSourceId() => AkBankSourceData.AkMediaInformation.SourceId;
         public AKBKSourceType GetStreamType() => AkBankSourceData.StreamType;
     }
 }

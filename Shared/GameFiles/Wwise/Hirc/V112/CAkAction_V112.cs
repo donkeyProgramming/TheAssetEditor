@@ -46,14 +46,14 @@ namespace Shared.GameFormats.Wwise.Hirc.V112
 
             // Reload the object to ensure sanity
             var sanityReload = new CAkAction_V112();
-            sanityReload.Parse(new ByteChunk(byteArray));
+            sanityReload.ReadHirc(new ByteChunk(byteArray));
 
             return byteArray;
         }
 
         public override void UpdateSectionSize()
         {
-            var idSize = ByteHelper.GetPropertyTypeSize(ID);
+            var idSize = ByteHelper.GetPropertyTypeSize(Id);
             var actionTypeSize = ByteHelper.GetPropertyTypeSize(ActionType);
             var idExtSize = ByteHelper.GetPropertyTypeSize(IdExt);
             var idExt4Size = ByteHelper.GetPropertyTypeSize(IdExt4);
@@ -70,8 +70,8 @@ namespace Shared.GameFormats.Wwise.Hirc.V112
         }
 
         public AkActionType GetActionType() => ActionType;
-        public uint GetChildID() => IdExt;
-        public uint GetStateGroupID() => StateActionParams.StateGroupId;
+        public uint GetChildId() => IdExt;
+        public uint GetStateGroupId() => StateActionParams.StateGroupId;
 
         public class PlayActionParams_V112
         {

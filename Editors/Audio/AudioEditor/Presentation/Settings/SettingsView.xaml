@@ -1,0 +1,519 @@
+﻿<UserControl 
+    x:Class="Editors.Audio.AudioEditor.Presentation.Settings.SettingsView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:sys="clr-namespace:System;assembly=netstandard"
+    xmlns:ExtendedWpfToolkit="clr-namespace:Xceed.Wpf.Toolkit;assembly=Xceed.Wpf.Toolkit"
+    xmlns:Converters="clr-namespace:Editors.Audio.Shared.UI.Converters"
+    xmlns:Settings="clr-namespace:Editors.Audio.AudioEditor.Presentation.Settings"
+    d:DataContext="{d:DesignInstance Type=Settings:SettingsViewModel}"
+    mc:Ignorable="d"
+    d:DesignHeight="550"
+    d:DesignWidth="960">
+
+    <UserControl.Resources>
+        <BooleanToVisibilityConverter 
+            x:Key="BoolToVisibilityConverter"/>
+        <Converters:EnumConverter 
+            x:Key="EnumConverter"/>
+        <DataTemplate 
+            x:Key="EnumToStringTemplate">
+            <TextBlock 
+                Text="{Binding Converter={StaticResource EnumConverter}}"/>
+        </DataTemplate>
+    </UserControl.Resources>
+
+    <Grid 
+        Visibility="{Binding IsSettingsVisible, Converter={StaticResource BoolToVisibilityConverter}}">
+
+        <Grid.RowDefinitions>
+            <RowDefinition 
+                Height="Auto"/>
+            <RowDefinition 
+                Height="Auto"/>
+            <RowDefinition 
+                Height="Auto"/>
+            <RowDefinition 
+                Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition
+                Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <Label 
+            Grid.Row="0" 
+            Grid.Column="0"
+            Grid.ColumnSpan="2"
+            Margin="0, 0, 0, 5"
+            Content="Settings"/>
+
+        <Grid
+            Grid.Row="1"
+            Grid.ColumnSpan="2"
+            Margin="0, 0, 0, 0">
+
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition
+                    Width="Auto"/>
+                <ColumnDefinition
+                    Width="Auto"/>
+                <ColumnDefinition
+                    Width="Auto"/>
+            </Grid.ColumnDefinitions>
+
+            <Button 
+                Grid.Column="0"
+                Margin="5, 0, 0, 5" 
+                Width="95" 
+                VerticalAlignment="Center" 
+                HorizontalAlignment="Left"
+                Content="Reset Settings" 
+                ToolTip="Resets all settings to default."
+                Command="{Binding ResetSettingsCommand}"/>
+
+            <Button 
+                Grid.Column="1"
+                Width="165" 
+                Margin="5, 0, 0, 5" 
+                VerticalAlignment="Center"
+                Content="Set Recommended Settings"
+                ToolTip="Sets the settings to what is recommended for the number of audio files selected. For example if multiple audio files are set it will set the recommended Random Sequence Container settings, and if a single audio file is set it will set the recommended settings for the Sound." 
+                Command="{Binding SetRecommendedSettingsCommand}"/>
+
+            <CheckBox 
+                Grid.Column="2"
+                Content="Show Settings from Audio Project Viewer"
+                ToolTip="When selecting items in the Audio Project Viewer with the selected the settings displayed will be that item's settings. When this is not selected the settings displayed will be the settings of the item in the Audio Project Editor." 
+                Margin="5, 0, 0, 5" 
+                VerticalAlignment="Center" 
+                IsChecked="{Binding ShowSettingsFromAudioProjectViewer, Mode=TwoWay}" 
+                HorizontalAlignment="Left"/>
+        </Grid>
+
+        <Grid
+            Grid.Row="2"
+            Grid.Column="0"
+            Margin="0, 0, 0, 0">
+
+            <Grid.RowDefinitions>
+                <RowDefinition 
+                    Height="Auto"/>
+                <RowDefinition 
+                    Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <Border 
+                Grid.Row="0"
+                Grid.Column="1"
+                BorderBrush="{DynamicResource Button.Static.Border}"
+                BorderThickness="0, 0, 0, 0">
+
+                <Expander 
+                    x:Name="ExpanderAudioFiles"
+                    Style="{StaticResource ExpanderWithBorderBackground}"
+                    IsExpanded="True"
+                    Padding="0,0,0,0"
+                    BorderBrush="{DynamicResource Button.Static.Border}">
+
+                    <Expander.Header>
+                        <DockPanel 
+                            VerticalAlignment="Center" 
+                            LastChildFill="True" 
+                            Margin="10, 5, 10, 5">
+
+                            <TextBlock 
+                                Text="Audio Files"
+                                VerticalAlignment="Center"
+                                Margin="-5, 0, 10, 0" />
+                        </DockPanel>
+                    </Expander.Header>
+
+                    <ListView
+                        x:Name="AudioFilesListView"
+                        ItemsSource="{Binding AudioFiles}"
+                        Height="135"
+                        MaxHeight="135"
+                        AllowDrop="True"
+                        Drop="OnListViewDrop"
+                        DragOver="OnListViewDragOver"
+                        MouseDoubleClick="OnAudioFileDoubleClick"
+                        PreviewKeyDown="OnAudioFilesListViewPreviewKeyDown">
+                        <ListView.View>
+                            <GridView>
+                                <GridViewColumn 
+                                    Header="File Name" 
+                                    DisplayMemberBinding="{Binding WavPackFileName}"
+                                    Width="Auto"/>
+                                <GridViewColumn 
+                                    Header="File Path" 
+                                    DisplayMemberBinding="{Binding WavPackFilePath}"
+                                    Width="Auto"/>
+                            </GridView>
+                        </ListView.View>
+                    </ListView>
+                </Expander>
+            </Border>
+
+            <Border 
+                Grid.Row="1"
+                Grid.Column="0"
+                BorderBrush="{DynamicResource Button.Static.Border}">
+
+                <Expander 
+                    Style="{StaticResource ExpanderWithBorderBackground}"
+                    IsExpanded="True"
+                    Padding="5,0,0,0"
+                    BorderBrush="{DynamicResource Button.Static.Border}">
+
+                    <Expander.Header>
+                        <DockPanel 
+                            VerticalAlignment="Center"    
+                            LastChildFill="True"      
+                            Margin="10, 5, 10, 5">
+
+                            <TextBlock 
+                                Text="Hirc Settings"
+                                VerticalAlignment="Center"
+                                Margin="-5, 0, 10, 0"/>
+                        </DockPanel>
+                    </Expander.Header>
+
+                    <Grid
+                        Margin="0, 5, 0, 0">
+
+                        <Grid.RowDefinitions>
+                            <RowDefinition 
+                                Height="Auto"/>
+                            <RowDefinition 
+                                Height="Auto"/>
+                            <RowDefinition 
+                                Height="Auto"/>
+                            <RowDefinition 
+                                Height="Auto"/>
+                            <RowDefinition 
+                                Height="Auto"/>
+                            <RowDefinition 
+                                Height="Auto"/>
+                            <RowDefinition 
+                                Height="Auto"/>
+                            <RowDefinition 
+                                Height="Auto"/>
+                            <RowDefinition 
+                                Height="Auto"/>
+                            <RowDefinition 
+                                Height="Auto"/>
+                        </Grid.RowDefinitions>
+
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition 
+                                Width="150"/>
+                            <ColumnDefinition 
+                                Width="200"/>
+                        </Grid.ColumnDefinitions>
+
+                        <TextBlock 
+                            Grid.Row="0"
+                            Grid.Column="0"
+                            Margin="10, 0, 5, 5"
+                            Text="Container Type"
+                            Visibility="{Binding IsContainerTypeVisible, Converter={StaticResource BoolToVisibilityConverter}}">
+                            <TextBlock.ToolTip>
+                                <ToolTip>
+                                    <TextBlock TextWrapping="Wrap">
+                                        <Run Text="The Container Type determines the order in which objects are played."/>
+                                        <LineBreak/>
+                                        <LineBreak/>
+                                        <Run Text="Random - Plays objects at random."/>
+                                        <LineBreak/>
+                                        <Run Text="Sequence - Plays objects in the sequence in which they were added."/>
+                                    </TextBlock>
+                                </ToolTip>
+                            </TextBlock.ToolTip>
+                        </TextBlock>
+
+                        <ComboBox
+                            Grid.Row="0"
+                            Grid.Column="1"
+                            Margin="10, 0, 5, 5"
+                            ItemsSource="{Binding ContainerTypes}" 
+                            SelectedItem="{Binding ContainerType}" 
+                            ItemTemplate="{StaticResource EnumToStringTemplate}"
+                            IsEnabled="{Binding IsContainerTypeEnabled}"
+                            Visibility="{Binding IsContainerTypeVisible, Converter={StaticResource BoolToVisibilityConverter}}"/>
+
+                        <TextBlock 
+                            Grid.Row="1"
+                            Grid.Column="0"
+                            Margin="10, 0, 5, 5"
+                            Text="Random Type"
+                            Visibility="{Binding IsRandomTypeVisible, Converter={StaticResource BoolToVisibilityConverter}}">
+                            <TextBlock.ToolTip>
+                                <ToolTip>
+                                    <TextBlock TextWrapping="Wrap">
+                                        <Run Text="The Container Type determines the order in which objects are played."/>
+                                        <LineBreak/>
+                                        <LineBreak/>
+                                        <Run Text="Standard - Plays objects at random."/>
+                                        <LineBreak/>
+                                        <Run Text="Shuffle Exhaustive - Plays objects at random without repeating an object until the entire pool of objects has been played."/>
+                                    </TextBlock>
+                                </ToolTip>
+                            </TextBlock.ToolTip>
+                        </TextBlock>
+
+                        <ComboBox
+                            Grid.Row="1"
+                            Grid.Column="1"
+                            Margin="10, 0, 5, 5"
+                            ItemsSource="{Binding RandomTypes}" 
+                            SelectedItem="{Binding RandomType}" 
+                            ItemTemplate="{StaticResource EnumToStringTemplate}"
+                            IsEnabled="{Binding IsRandomTypeEnabled}"
+                            Visibility="{Binding IsRandomTypeVisible, Converter={StaticResource BoolToVisibilityConverter}}"/>
+
+                        <CheckBox
+                            Grid.Row="2"
+                            Grid.Column="0"
+                            Margin="10, 0, 5, 5"
+                            Content="Repetition Interval"
+                            IsChecked="{Binding EnableRepetitionInterval, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                            IsEnabled="{Binding IsEnableRepetitionIntervalEnabled}"
+                            Visibility="{Binding IsRepetitionIntervalVisible, Converter={StaticResource BoolToVisibilityConverter}}">
+                            <CheckBox.ToolTip>
+                                <ToolTip>
+                                    <TextBlock TextWrapping="Wrap">
+                                        <Run Text="Repitition Interval determines how many other objects must be played before an object can be repeated."/>
+                                        <LineBreak/>
+                                        <LineBreak/>
+                                        <Run Text="If Random Type is Standard, the object played is selected completely randomly, but the last n objects played are excluded from the list."/>
+                                        <LineBreak/>
+                                        <Run Text="If Random Type is Shuffle, when the container is looped, the last n objects played will be excluded from the list."/>
+                                        <LineBreak/>
+                                        <Run Text="If Random Type is Shuffle, non-looping and Play Mode continuous, the Repetition Interval has no effect on the playback of the container."/>
+                                    </TextBlock>
+                                </ToolTip>
+                            </CheckBox.ToolTip>
+                        </CheckBox>
+
+                        <ExtendedWpfToolkit:IntegerUpDown 
+                            Grid.Row="2"
+                            Grid.Column="1"
+                            Minimum="1"
+                            Maximum="999"
+                            ClipValueToMinMax="True"
+                            Margin="10, 0, 5, 5"
+                            Value="{Binding RepetitionInterval, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                            IsEnabled="{Binding EnableRepetitionInterval}"
+                            Visibility="{Binding IsRepetitionIntervalVisible, Converter={StaticResource BoolToVisibilityConverter}}"/>
+
+                        <TextBlock 
+                            Grid.Row="3"
+                            Grid.Column="0"
+                            Margin="10, 0, 5, 5"
+                            Text="Playlist End Behaviour"
+                            Visibility="{Binding IsPlaylistEndBehaviourVisible, Converter={StaticResource BoolToVisibilityConverter}}">
+                            <TextBlock.ToolTip>
+                                <ToolTip>
+                                    <TextBlock TextWrapping="Wrap">
+                                        <Run Text="Playlist End Behaviour determines how the container behaves after it has played the last object in the playlist."/>
+                                        <LineBreak/>
+                                        <LineBreak/>
+                                        <Run Text="Restart - Plays the playlist in the same order."/>
+                                        <LineBreak/>
+                                        <Run Text="Play In Reverse Order - Plays the playlist in reverse order."/>
+                                    </TextBlock>
+                                </ToolTip>
+                            </TextBlock.ToolTip>
+                        </TextBlock>
+
+                        <ComboBox
+                            Grid.Row="3"
+                            Grid.Column="1"
+                            Margin="10, 0, 5, 5"
+                            ItemsSource="{Binding PlaylistEndBehaviours}" 
+                            SelectedItem="{Binding PlaylistEndBehaviour}" 
+                            ItemTemplate="{StaticResource EnumToStringTemplate}"
+                            IsEnabled="{Binding IsPlaylistEndBehaviourEnabled}"
+                            Visibility="{Binding IsPlaylistEndBehaviourVisible, Converter={StaticResource BoolToVisibilityConverter}}"/>
+                        
+                        <TextBlock 
+                            Grid.Row="4"
+                            Grid.Column="0"
+                            Margin="10, 0, 5, 5"
+                            Text="Play Mode"
+                            Visibility="{Binding IsPlayModeVisible, Converter={StaticResource BoolToVisibilityConverter}}">
+                            <TextBlock.ToolTip>
+                                <ToolTip>
+                                    <TextBlock TextWrapping="Wrap">
+                                        <Run Text="The Play Mode determines whether a single object or the full playlist is played when triggered."/>
+                                        <LineBreak/>
+                                        <LineBreak/>
+                                        <Run Text="Step - Plays one object in the playlist when triggered."/>
+                                        <LineBreak/>
+                                        <Run Text="Continuous - Plays the complete playlist when triggered."/>
+                                    </TextBlock>
+                                </ToolTip>
+                            </TextBlock.ToolTip>
+                        </TextBlock>
+
+                        <ComboBox
+                            Grid.Row="4"
+                            Grid.Column="1"
+                            Margin="10, 0, 5, 5"
+                            ItemsSource="{Binding PlayModes}" 
+                            SelectedItem="{Binding PlayMode}" 
+                            ItemTemplate="{StaticResource EnumToStringTemplate}"
+                            IsEnabled="{Binding IsPlayModeEnabled}"
+                            Visibility="{Binding IsPlayModeVisible, Converter={StaticResource BoolToVisibilityConverter}}"/>
+
+                        <TextBlock 
+                            Grid.Row="5"
+                            Grid.Column="0"
+                            Margin="10, 0, 5, 5"
+                            Text="Always Reset Container"
+                            ToolTip="Always Reset Container determines whether playback continues or returns to the start of the playlist when a container is replayed after being stopped during playback."
+                            Visibility="{Binding IsAlwaysResetPlaylistVisible, Converter={StaticResource BoolToVisibilityConverter}}"/>
+
+                        <CheckBox
+                            Grid.Row="5"
+                            Grid.Column="1"
+                            Margin="10, 0, 5, 5"
+                            IsChecked="{Binding AlwaysResetPlaylist, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                            IsEnabled="{Binding IsAlwaysResetPlaylistEnabled}"
+                            Visibility="{Binding IsAlwaysResetPlaylistVisible, Converter={StaticResource BoolToVisibilityConverter}}"/>
+
+                        <TextBlock 
+                            Grid.Row="6"
+                            Grid.Column="0"
+                            Margin="10, 1, 5, 5"
+                            Text="Looping Type"
+                            Visibility="{Binding IsLoopingTypeVisible, Converter={StaticResource BoolToVisibilityConverter}}">
+                            <TextBlock.ToolTip>
+                                <ToolTip>
+                                    <TextBlock TextWrapping="Wrap">
+                                        <Run Text="The Looping Type handles how many times a container is played."/>
+                                        <LineBreak/>
+                                        <LineBreak/>
+                                        <Run Text="Disabled - The container does not loop playback."/>
+                                        <LineBreak/>
+                                        <Run Text="Finite Looping - The container playback loops according to the Number of Loops."/>
+                                        <LineBreak/>
+                                        <Run Text="Infinite Looping - The container playback loops infinitely."/>
+                                    </TextBlock>
+                                </ToolTip>
+                            </TextBlock.ToolTip>
+                        </TextBlock>
+
+                        <ComboBox
+                            Grid.Row="6"
+                            Grid.Column="1"
+                            Margin="10, 0, 5, 5"
+                            ItemsSource="{Binding LoopingTypes}" 
+                            SelectedItem="{Binding LoopingType}" 
+                            ItemTemplate="{StaticResource EnumToStringTemplate}"
+                            IsEnabled="{Binding IsLoopingTypeEnabled}"
+                            Visibility="{Binding IsLoopingTypeVisible, Converter={StaticResource BoolToVisibilityConverter}}"/>
+
+                        <TextBlock 
+                            Grid.Row="7"
+                            Grid.Column="0"
+                            Margin="10, 1, 5, 5"
+                            Text="Number of Loops"
+                            ToolTip="The Number of Loops determines how many times a container is played if Looping Type is set to Finite Looping."
+                            Visibility="{Binding IsNumberOfLoopsVisible, Converter={StaticResource BoolToVisibilityConverter}}"/>
+
+                        <ExtendedWpfToolkit:IntegerUpDown
+                            Grid.Row="7"
+                            Grid.Column="1"
+                            Margin="10, 0, 5, 5"
+                            Minimum="1"
+                            Maximum="32767"
+                            ClipValueToMinMax="True"
+                            Value="{Binding NumberOfLoops, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                            IsEnabled="{Binding IsNumberOfLoopsEnabled}"
+                            Visibility="{Binding IsNumberOfLoopsVisible, Converter={StaticResource BoolToVisibilityConverter}}"/>
+
+                        <TextBlock 
+                            Grid.Row="8"
+                            Grid.Column="0"
+                            Margin="10, 1, 5, 5"
+                            Text="Transition Type"
+                            Visibility="{Binding IsTransitionTypeVisible, Converter={StaticResource BoolToVisibilityConverter}}">
+                            <TextBlock.ToolTip>
+                                <ToolTip>
+                                    <TextBlock TextWrapping="Wrap">
+                                        <Run Text="The Transition Type handles the transition between objects in the container."/>
+                                        <LineBreak/>
+                                        <LineBreak/>
+                                        <Run Text="Disabled - No transition between objects."/>
+                                        <LineBreak/>
+                                        <Run Text="Xfade (amp) - Adds a crossfade between two objects using constant amplitude."/>
+                                        <LineBreak/>
+                                        <Run Text="Xfade (power) - Adds a crossfade between two objects using constant power."/>
+                                        <LineBreak/>
+                                        <Run Text="Delay - Adds a silence between two objects."/>
+                                        <LineBreak/>
+                                        <Run Text="Sample accurate - Creates seamless transitions with no latency between objects."/>
+                                        <LineBreak/>
+                                        <Run Text="Trigger rate - Determines the rate at which new objects within the container will be played. This option is useful for simulating rapid gun fire."/>
+                                    </TextBlock>
+                                </ToolTip>
+                            </TextBlock.ToolTip>
+                        </TextBlock>
+
+                        <ComboBox
+                            Grid.Row="8"
+                            Grid.Column="1"
+                            Margin="10, 0, 5, 5"
+                            ItemsSource="{Binding TransitionTypes}" 
+                            SelectedItem="{Binding TransitionType}" 
+                            ItemTemplate="{StaticResource EnumToStringTemplate}"
+                            IsEnabled="{Binding IsTransitionTypeEnabled}"
+                            Visibility="{Binding IsTransitionTypeVisible, Converter={StaticResource BoolToVisibilityConverter}}"/>
+
+                        <TextBlock 
+                            Grid.Row="9"
+                            Grid.Column="0"
+                            Margin="10, 1, 5, 5"
+                            Text="Transition Duration"
+                            Visibility="{Binding IsTransitionDurationVisible, Converter={StaticResource BoolToVisibilityConverter}}">
+                            <TextBlock.ToolTip>
+                                <ToolTip>
+                                    <TextBlock TextWrapping="Wrap">
+                                        <Run Text="Transition Duration is the length of the crossfades or delay between clips. If Trigger rate is selected as the transition type, the duration defines the amount of time that will pass before the next sound is triggered."/>
+                                        <LineBreak/><LineBreak/>
+                                        <Run Text="The Duration slider is unavailable when the Sample Accurate option is selected."/>
+                                        <LineBreak/><LineBreak/>
+                                        <Run Text="The range is between 0 and 3600 seconds. The maximum duration of a crossfade is equal to half the duration of the sound. In cases where the crossfade time is longer than half the duration of the sound, the crossfade duration is automatically adjusted to the maximum allowed. This automatic adjustment is performed by the sound engine at run time. Wwise does not limit or indicate that the crossfade time is too long for some of the sounds in the container."/>
+                                    </TextBlock>
+                                </ToolTip>
+                            </TextBlock.ToolTip>
+                        </TextBlock>
+
+                        <ExtendedWpfToolkit:DecimalUpDown  
+                            Grid.Row="9"
+                            Grid.Column="1"
+                            Margin="10, 0, 5, 5"
+                            Minimum="0"
+                            Maximum="3600"
+                            Increment="0.05"
+                            ClipValueToMinMax="True"
+                            Value="{Binding TransitionDuration, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                            IsEnabled="{Binding IsTransitionDurationEnabled}"
+                            Visibility="{Binding IsTransitionDurationVisible, Converter={StaticResource BoolToVisibilityConverter}}"/>
+                    </Grid>
+                </Expander>
+            </Border>
+        </Grid>
+
+        <Border 
+            Grid.Row="3"
+            Grid.ColumnSpan="2"
+            Height="5" 
+            Background="{DynamicResource App.Border}"/>
+    </Grid>
+</UserControl>

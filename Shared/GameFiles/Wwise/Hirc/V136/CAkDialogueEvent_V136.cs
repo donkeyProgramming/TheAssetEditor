@@ -1,6 +1,7 @@
 ﻿using Shared.Core.ByteParsing;
 using Shared.GameFormats.Wwise.Enums;
 using Shared.GameFormats.Wwise.Hirc.V136.Shared;
+using static Shared.GameFormats.Wwise.Hirc.ICAkDialogueEvent;
 
 namespace Shared.GameFormats.Wwise.Hirc.V136
 {
@@ -8,10 +9,10 @@ namespace Shared.GameFormats.Wwise.Hirc.V136
     {
         public byte Probability { get; set; }
         public uint TreeDepth { get; set; }
-        public List<AkGameSync_V136> Arguments { get; set; } = [];
+        public List<IAkGameSync> Arguments { get; set; } = [];
         public uint TreeDataSize { get; set; }
         public byte Mode { get; set; }
-        public AkDecisionTree_V136 AkDecisionTree { get; set; } = new AkDecisionTree_V136();
+        public IAkDecisionTree AkDecisionTree { get; set; } = new AkDecisionTree_V136();
         public AkPropBundle_V136 AkPropBundle0 { get; set; } = new AkPropBundle_V136();
         public AkPropBundleMinMax_V136 AkPropBundle1 { get; set; } = new AkPropBundleMinMax_V136();
 
@@ -25,7 +26,7 @@ namespace Shared.GameFormats.Wwise.Hirc.V136
 
             // First read all the group ids
             for (var i = 0; i < TreeDepth; i++)
-                Arguments[i].GroupID = chunk.ReadUInt32();
+                Arguments[i].GroupId = chunk.ReadUInt32();
 
             // Then read all the group types
             for (var i = 0; i < TreeDepth; i++)
@@ -44,9 +45,9 @@ namespace Shared.GameFormats.Wwise.Hirc.V136
             memStream.Write(ByteParsers.Byte.EncodeValue(Probability, out _));
             memStream.Write(ByteParsers.UInt32.EncodeValue(TreeDepth, out _));
 
-            // Write all the Ids first
+            // Write all the IDs first
             for (var i = 0; i < TreeDepth; i++)
-                memStream.Write(ByteParsers.UInt32.EncodeValue(Arguments[i].GroupID, out _));
+                memStream.Write(ByteParsers.UInt32.EncodeValue(Arguments[i].GroupId, out _));
 
             // Then write all the values
             for (var i = 0; i < TreeDepth; i++)
@@ -62,17 +63,17 @@ namespace Shared.GameFormats.Wwise.Hirc.V136
 
             // Reload the object to ensure sanity
             var sanityReload = new CAkDialogueEvent_V136();
-            sanityReload.Parse(new ByteChunk(byteArray));
+            sanityReload.ReadHirc(new ByteChunk(byteArray));
 
             return byteArray;
         }
 
         public override void UpdateSectionSize()
         {
-            var idSize = ByteHelper.GetPropertyTypeSize(ID);
+            var idSize = ByteHelper.GetPropertyTypeSize(Id);
             var probabilitySize = ByteHelper.GetPropertyTypeSize(Probability);
             var treeDepthSize = ByteHelper.GetPropertyTypeSize(TreeDepth);
-            
+
             uint arugumentsSize = 0;
             foreach (var argument in Arguments)
                 arugumentsSize += argument.GetSize();
@@ -82,7 +83,23 @@ namespace Shared.GameFormats.Wwise.Hirc.V136
             SectionSize = idSize + probabilitySize + treeDepthSize + arugumentsSize + treeDataSizeSize + modeSize + TreeDataSize + AkPropBundle0.GetSize() + AkPropBundle1.GetSize();
         }
 
-        List<object> ICAkDialogueEvent.Arguments => Arguments.Cast<object>().ToList();
-        object ICAkDialogueEvent.AkDecisionTree => AkDecisionTree;
+        public CAkDialogueEvent_V136 Clone()
+        {
+            return new CAkDialogueEvent_V136
+            {
+                LanguageId = LanguageId,
+                HircType = HircType,
+                SectionSize = SectionSize,
+                Id = Id,
+                Probability = Probability,
+                TreeDepth = TreeDepth,
+                TreeDataSize = TreeDataSize,
+                Mode = Mode,
+                Arguments = Arguments.Select(argument => argument is AkGameSync_V136 gameSync ? gameSync.Clone() : argument).Cast<IAkGameSync>().ToList(),
+                AkDecisionTree = AkDecisionTree is AkDecisionTree_V136 decisionTree ? decisionTree.Clone() : AkDecisionTree,
+                AkPropBundle0 = AkPropBundle0.Clone(),
+                AkPropBundle1 = AkPropBundle1.Clone()
+            };
+        }
     }
 }

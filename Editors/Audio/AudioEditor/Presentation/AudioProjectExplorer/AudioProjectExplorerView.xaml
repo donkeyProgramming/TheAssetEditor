@@ -1,0 +1,332 @@
+<UserControl 
+    x:Class="Editors.Audio.AudioEditor.Presentation.AudioProjectExplorer.AudioProjectExplorerView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:sys="clr-namespace:System;assembly=netstandard"
+    xmlns:Converters="clr-namespace:Editors.Audio.Shared.UI.Converters"
+    xmlns:ExtendedWpfToolkit="clr-namespace:Xceed.Wpf.Toolkit;assembly=Xceed.Wpf.Toolkit"
+    xmlns:Shared="clr-namespace:Editors.Audio.AudioEditor.Presentation.Shared" 
+    xmlns:AudioProjectExplorer="clr-namespace:Editors.Audio.AudioEditor.Presentation.AudioProjectExplorer" 
+    d:DataContext="{d:DesignInstance Type=AudioProjectExplorer:AudioProjectExplorerViewModel}"
+    mc:Ignorable="d" 
+    d:DesignHeight="550" d:DesignWidth="800">
+
+    <UserControl.Resources>
+        <sys:Double 
+            x:Key="DefaultHeight">23</sys:Double>
+        <Converters:EnumConverter 
+            x:Key="EnumConverter"/>
+        <DataTemplate 
+            x:Key="EnumToStringTemplate">
+            <TextBlock 
+                Text="{Binding Converter={StaticResource EnumConverter}}"/>
+        </DataTemplate>
+        <BooleanToVisibilityConverter 
+            x:Key="BoolToVisibilityConverter"/>
+    </UserControl.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition 
+                Height="Auto"/>
+            <RowDefinition 
+                Height="*"/>
+        </Grid.RowDefinitions>
+
+        <Grid 
+            Grid.Row="0">
+
+            <Grid.RowDefinitions>
+                <RowDefinition 
+                    Height="Auto"/>
+                <RowDefinition 
+                    Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <Label 
+                Grid.Row="0"
+                Content="{Binding AudioProjectExplorerLabel}"/>
+
+            <Grid 
+                Grid.Row="1" 
+                Margin="5, 0, 0, 0">
+
+                <Grid.RowDefinitions>
+                    <RowDefinition 
+                        Height="Auto"/>
+                    <RowDefinition 
+                        Height="Auto"/>
+                    <RowDefinition 
+                        Height="Auto"/>
+                    <RowDefinition 
+                        Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <Grid
+                    Grid.Row="1">
+
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition 
+                            Width="Auto"/>
+                        <ColumnDefinition 
+                            Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <Grid.RowDefinitions>
+                        <RowDefinition 
+                            Height="Auto"/>
+                        <RowDefinition 
+                            Height="Auto"/>
+                    </Grid.RowDefinitions>
+
+                    <Label 
+                        Grid.Row="0"
+                        Grid.ColumnSpan="2"
+                        Margin="-5, 0, 0, 0"
+                        Content="Dialogue Event Filters"/>
+
+                    <ExtendedWpfToolkit:WatermarkComboBox 
+                        x:Name ="DialogueEventTypeFilterComboBox"
+                        Grid.Column="0"
+                        Grid.Row="1"
+                        Width="210"
+                        VerticalAlignment="Center"
+                        Height="{StaticResource DefaultHeight}"
+                        ItemTemplate="{StaticResource EnumToStringTemplate}"
+                        ItemsSource="{Binding DialogueEventTypes}" 
+                        SelectedItem="{Binding SelectedDialogueEventType, Mode=TwoWay}"
+                        SelectionChanged="OnWatermarkComboBoxSelectionChanged"
+                        IsEnabled="{Binding IsDialogueEventFilterEnabled}"
+                        Watermark="Select Dialogue Event Type Filter" 
+                        ToolTip="Dialogue Event Type refers to the type of action or trigger in game that the Dialogue Event relates to. Select the Dialogue Event type to filter by that."/>
+
+                    <ExtendedWpfToolkit:WatermarkComboBox 
+                        x:Name ="DialogueEventProfileFilterComboBox"
+                        Grid.Column="1" 
+                        Grid.Row="1"
+                        Margin="5, 0, 0, 0"
+                        Width="210"
+                        VerticalAlignment="Center"
+                        Height="{StaticResource DefaultHeight}"
+                        ItemTemplate="{StaticResource EnumToStringTemplate}"
+                        ItemsSource="{Binding DialogueEventProfiles}" 
+                        SelectedItem="{Binding SelectedDialogueEventProfile, Mode=TwoWay}"
+                        SelectionChanged="OnWatermarkComboBoxSelectionChanged"
+                        IsEnabled="{Binding IsDialogueEventFilterEnabled}"
+                        Watermark="Select Dialogue Event Profile Filter" 
+                        ToolTip="The Dialogue Event profile refers to the Select the Dialogue Event profile to filter by that"/>
+                </Grid>
+
+                <Grid
+                    Grid.Row="0"
+                    Margin="0, 5, 0, 0">
+
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition 
+                            Width="Auto"/>
+                        <ColumnDefinition 
+                            Width="Auto"/>
+                        <ColumnDefinition 
+                            Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <Grid.RowDefinitions>
+                        <RowDefinition 
+                            Height="Auto"/>
+                        <RowDefinition 
+                            Height="Auto"/>
+                    </Grid.RowDefinitions>
+
+                    <Label 
+                        Grid.Row="0"
+                        Grid.ColumnSpan="2"
+                        Margin="-5, -5, 0, 0"
+                        Content="General Filters"/>
+                    
+                    <CheckBox 
+                        Grid.Column="0"
+                        Grid.Row="1"
+                        Margin="0, 0, 0, 0"
+                        VerticalAlignment="Center"
+                        Content="Show Edited Items Only"
+                        ToolTip="Filters the Audio Project Explorer tree to show only items that have been edited."
+                        IsChecked="{Binding ShowEditedItemsOnly, Mode=TwoWay}"/>
+                    
+                    <CheckBox 
+                        Grid.Column="1"
+                        Grid.Row="1"
+                        Margin="5, 0, 0, 0"
+                        VerticalAlignment="Center"
+                        Content="Show Action Events"
+                        ToolTip="Filters the Audio Project Explorer tree to show or hide Action Events."
+                        IsChecked="{Binding ShowActionEvents, Mode=TwoWay}"/>
+                    
+                    <CheckBox 
+                        Grid.Column="2"
+                        Grid.Row="1"
+                        Margin="5, 0, 0, 0"
+                        VerticalAlignment="Center"
+                        Content="Show Dialogue Events"
+                        ToolTip="Filters the Audio Project Explorer Tree to show or hide Dialogue Events."
+                        IsChecked="{Binding ShowDialogueEvents, Mode=TwoWay}"/>
+                </Grid>
+
+                <Grid
+                    Grid.Row="2">
+
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition 
+                            Width="Auto"/>
+                        <ColumnDefinition 
+                            Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <Grid.RowDefinitions>
+                        <RowDefinition 
+                            Height="Auto"/>
+                    </Grid.RowDefinitions>
+
+                    <Button
+                        Margin="0, 5, 0, 0"
+                        Width="180" 
+                        VerticalAlignment="Center" 
+                        HorizontalAlignment="Left"
+                        Content="Toggle Collapse / Expand Tree" 
+                        ToolTip="Collapse / expand the tree." 
+                        Command="{Binding CollapseOrExpandTreeCommand}"/>
+                    
+                    <Button
+                        Grid.Column="1"
+                        Margin="5, 5, 0, 0"
+                        Width="85" 
+                        VerticalAlignment="Center" 
+                        HorizontalAlignment="Left"
+                        Content="Reset Filters" 
+                        ToolTip="Collapse / expand the tree." 
+                        Command="{Binding ResetFiltersCommand}"/>
+                </Grid>
+
+                <Border 
+                    Grid.Row="3"
+                    Margin="0, 5, 5, 0"
+                    SnapsToDevicePixels="True" 
+                    BorderBrush="{DynamicResource TextBox.Static.Border}" 
+                    BorderThickness="1">
+
+                    <Grid>
+                        <TextBox 
+                            x:Name="FilterTextBoxItem" 
+                            Style="{StaticResource HintedTextBox}" 
+                            KeyboardNavigation.TabIndex="0" 
+                            FontSize="12" 
+                            BorderThickness="0"
+                            KeyboardNavigation.IsTabStop="True"
+                            HorizontalAlignment="Stretch" Padding="2.5, 0, 0, 0"  Height="24" VerticalContentAlignment="Center" 
+                            Text="{Binding SearchQuery, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay, Delay=350}"
+                            Tag="Search Audio Project Explorer">
+                        </TextBox>
+
+                        <Button 
+                            Padding="2" 
+                            Width="24" 
+                            Height="24" 
+                            HorizontalAlignment="Right"
+                            VerticalContentAlignment="Center"
+                            HorizontalContentAlignment="Center"
+                            VerticalAlignment="Center"
+                            Click="ClearButtonClick" 
+                            Command="{Binding ResetSearchQueryCommand}">
+
+                            <Button.Template>
+                                <ControlTemplate 
+                                    TargetType="Button">
+
+                                    <Grid 
+                                        SnapsToDevicePixels="true" 
+                                        Background="{DynamicResource TextBox.Static.Background}">
+
+                                        <Path 
+                                            Data="M0,0 L8,8 M8,0 L0,8" 
+                                            StrokeThickness="1.5" 
+                                            VerticalAlignment="Center" 
+                                            HorizontalAlignment="Center">
+
+                                            <Path.Style>
+                                                <Style 
+                                                    TargetType="{x:Type Path}">
+
+                                                    <Style.Triggers>
+                                                        <Trigger 
+                                                            Property="IsMouseOver" 
+                                                            Value="False">
+                                                            <Setter
+                                                                Property="Stroke" 
+                                                                Value="{DynamicResource Button.Disabled.Foreground}" />
+                                                        </Trigger>
+
+                                                        <Trigger 
+                                                            Property="IsMouseOver" 
+                                                            Value="True">
+                                                            <Setter 
+                                                                Property="Stroke" 
+                                                                Value="{DynamicResource Button.Static.Foreground}" />
+                                                        </Trigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </Path.Style>
+                                        </Path>
+                                    </Grid>
+                                </ControlTemplate>
+                            </Button.Template>
+                        </Button>
+                    </Grid>
+                </Border>
+            </Grid>
+        </Grid>
+
+        <Grid 
+            Grid.Row="1" 
+            Margin="0, 5, 0, 0">
+
+            <TreeView 
+                ItemsSource="{Binding AudioProjectTree}"
+                SelectedItemChanged="OnTreeViewSelectedItemChanged"
+                Padding="0, 5, 0, 5">
+
+                <TreeView.Resources>
+                    <HierarchicalDataTemplate 
+                        DataType="{x:Type Shared:AudioProjectTreeNode}" 
+                        ItemsSource="{Binding Children}">
+                        <TextBlock>
+                            <TextBlock.Inlines>
+                                <Run 
+                                    Text="{Binding Name}" />
+                                <Run 
+                                    Text="{Binding DialogueEventFilterDisplayText}" 
+                                    Foreground="{DynamicResource ABrush.Foreground.Disabled}"/>
+                            </TextBlock.Inlines>
+                        </TextBlock>
+                    </HierarchicalDataTemplate>
+
+                    <Style 
+                        TargetType="{x:Type TreeViewItem}" 
+                        BasedOn="{StaticResource {x:Type TreeViewItem}}">
+                        <Setter 
+                            Property="IsExpanded" 
+                            Value="{Binding IsExpanded, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
+                        <Setter 
+                            Property="Visibility">
+                            <Setter.Value>
+                                <Binding 
+                                    Path="IsVisible" 
+                                    Converter="{StaticResource BoolToVisibilityConverter}" />
+                            </Setter.Value>
+                        </Setter>
+                    </Style>
+                </TreeView.Resources>
+            </TreeView>
+        </Grid>
+    </Grid>
+</UserControl>

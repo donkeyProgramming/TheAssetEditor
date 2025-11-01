@@ -3,7 +3,7 @@ using Shared.GameFormats.Wwise.Hirc.V136.Shared;
 
 namespace Shared.GameFormats.Wwise.Hirc.V136
 {
-    public class CAkRanSeqCntr_V136 : HircItem, ICAkRanSeqCnt
+    public class CAkRanSeqCntr_V136 : HircItem, ICAkRanSeqCntr
     {
         public NodeBaseParams_V136 NodeBaseParams { get; set; } = new NodeBaseParams_V136();
         public ushort LoopCount { get; set; }
@@ -59,14 +59,14 @@ namespace Shared.GameFormats.Wwise.Hirc.V136
 
             // Reload the object to ensure sanity
             var sanityReload = new CAkRanSeqCntr_V136();
-            sanityReload.Parse(new ByteChunk(byteArray));
+            sanityReload.ReadHirc(new ByteChunk(byteArray));
 
             return byteArray;
         }
 
         public override void UpdateSectionSize()
         {
-            var idSize = ByteHelper.GetPropertyTypeSize(ID);
+            var idSize = ByteHelper.GetPropertyTypeSize(Id);
             var nodeBaseParamsSize = NodeBaseParams.GetSize();
             var loopCountSize = ByteHelper.GetPropertyTypeSize(LoopCount);
             var loopModMinSize = ByteHelper.GetPropertyTypeSize(LoopModMin);
@@ -86,7 +86,7 @@ namespace Shared.GameFormats.Wwise.Hirc.V136
                 transitionTimeModMaxSize + avoidRepeatCountSize + transitionModeSize + randomModeSize + modeSize + bitVectorSize + childrenSize + playListSize;
         }
 
-        public uint GetDirectParentID() => NodeBaseParams.DirectParentID;
+        public uint GetDirectParentId() => NodeBaseParams.DirectParentId;
         public List<uint> GetChildren() => CAkPlayList.Playlist.Select(x => x.PlayId).ToList();
 
         public class CAkPlayList_V136

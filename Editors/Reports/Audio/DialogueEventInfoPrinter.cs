@@ -1,5 +1,5 @@
-﻿using Editors.Audio.Storage;
-using Editors.Audio.Utility;
+﻿using Editors.Audio.Shared.GameInformation.Warhammer3;
+using Editors.Audio.Shared.Storage;
 using Shared.Core.Events;
 using Shared.Core.Misc;
 using Shared.GameFormats.Wwise.Hirc;
@@ -18,48 +18,36 @@ namespace Editors.Reports.Audio
         public DialogueEventInfoPrinter(IAudioRepository audioRepository)
         {
             _audioRepository = audioRepository;
-        }
-
-        public static void Generate(IAudioRepository audioRepository)
-        {
-            var instance = new DialogueEventInfoPrinter(audioRepository);
-            instance.Create();
+            _audioRepository.Load(Wh3LanguageInformation.GetAllLanguages());
         }
 
         public void Create()
         {
             var printer = new DialogueEventInfoPrinter(_audioRepository);
-            printer.PrintDialogEventInfo();
+            printer.PrintDialogueEventInfo();
+            _audioRepository.Clear();
         }
 
-        public void PrintDialogEventInfo()
+        public void PrintDialogueEventInfo()
         {
-            var dialogueEvents = _audioRepository.GetHircItemsByType<ICAkDialogueEvent>();
+            var dialogueEvents = _audioRepository.GetHircsByType<ICAkDialogueEvent>();
             foreach (var dialogueEvent in dialogueEvents)
-                PrintDialogEventInfo(dialogueEvent);
+                PrintDialogueEventInfo(dialogueEvent);
         }
 
-        private void PrintDialogEventInfo(ICAkDialogueEvent dialogueEvent)
+        private void PrintDialogueEventInfo(ICAkDialogueEvent dialogueEvent)
         {
-            // Assuming HircItem is the base type with an Id.
-            if (dialogueEvent is not HircItem hircItem)
-                throw new InvalidCastException("dialogueEvent is not a HircItem.");
+            var hircItem = dialogueEvent as HircItem;
 
-            var helper = new DecisionPathHelper(_audioRepository);
-            var paths = helper.GetDecisionPaths(dialogueEvent);
+            var stateGroups = dialogueEvent.Arguments
+                .Select(argument => _audioRepository.GetNameFromId(argument.GroupId))
+                .ToList();
 
-            // Splitting the string by '.' and enclosing each part in quotes.
-            var splitPaths = paths.Header.GetAsString().Split(new[] { '.' }, StringSplitOptions.RemoveEmptyEntries)
-                              .Select(part => $"\"{part}\"")
-                              .ToArray();
+            var stateGroupsJoined = string.Join(", ", stateGroups);
 
-            // Joining the quoted strings with a comma and a space, and enclosing the result in brackets.
-            var formattedPaths = "[" + string.Join(", ", splitPaths) + "]";
-
-            // Format the information with quotes around the dialog event and the modified path string.
-            var info = $"\"{_audioRepository.GetNameFromID(hircItem.ID)}\" : {formattedPaths}";
-
+            var info = $"{_audioRepository.GetNameFromId(hircItem.Id)} : {stateGroupsJoined}";
             Console.WriteLine(info);
+
             var filePath = $"{DirectoryHelper.ReportsDirectory}\\dialogue_event_info.txt";
             File.AppendAllText(filePath, info + Environment.NewLine);
         }

@@ -5,7 +5,7 @@ namespace Shared.GameFormats.Wwise.Hirc.V136
 {
     public class CAkBus_V136 : HircItem
     {
-        public uint OverrideBusID { get; set; }
+        public uint OverrideBusId { get; set; }
         public uint IdDeviceShareset { get; set; }
         public BusInitialParams_V136 BusInitialParams { get; set; } = new BusInitialParams_V136();
         public float RecoveryTime { get; set; }
@@ -18,8 +18,8 @@ namespace Shared.GameFormats.Wwise.Hirc.V136
 
         protected override void ReadData(ByteChunk chunk)
         {
-            OverrideBusID = chunk.ReadUInt32();
-            if (OverrideBusID == 0)
+            OverrideBusId = chunk.ReadUInt32();
+            if (OverrideBusId == 0)
                 IdDeviceShareset = chunk.ReadUInt32();
             BusInitialParams.ReadData(chunk);
             RecoveryTime = chunk.ReadSingle();

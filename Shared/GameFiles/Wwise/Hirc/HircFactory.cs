@@ -16,22 +16,22 @@ namespace Shared.GameFormats.Wwise.Hirc
             if (_itemList.TryGetValue(type, out var functor))
                 return functor();
 
-            return new UnknownHirc();
+            return new UnknownHircItem();
         }
 
-        // Each major release of Wwise has a bank generator version.
-        // CA sometimes use in-house compiled version of Wwise which is based on a public release with custom modifications to some Wwise objects.
-        // The bank generator version of the closest public release (2019.2.15.7667) to that used in Wh3 (2147483784) is 135.
-        // Wwiser adds 1 to that for internal use to create a pseudo version called 136 but really it's 2147483784.
+        // Each major release of Wwise has a bank generator version
+        // CA sometimes use an in-house compiled version of Wwise which is based on a public release with custom modifications to some Wwise objects
+        // The bank generator version of the closest public release (2019.2.15.7667) to that used in Wh3 (2147483784) is 135
+        // Wwiser adds 1 to that for internal use to create a pseudo version called 136 but really it's 2147483784
         public static HircFactory CreateFactory(uint bankGeneratorVersion)
         {
-            switch (bankGeneratorVersion)
+            return bankGeneratorVersion switch
             {
-                case 112: return CreateFactory_v112();
-                case 2147483784: return CreateFactory_v136();
-            }
-
-            throw new Exception($"Unknown Bank Generator Version: {bankGeneratorVersion}");
+                112 => CreateFactory_v112(),
+                135 => CreateFactory_v136(),
+                2147483784 => CreateFactory_v136(),
+                _ => throw new Exception($"Unknown Bank Generator Version: {bankGeneratorVersion}"),
+            };
         }
 
         private static HircFactory CreateFactory_v112()

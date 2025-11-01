@@ -26,14 +26,14 @@ namespace Shared.GameFormats.Wwise.Hirc.V112
             // Reload the object to ensure sanity
             var sanityReload = new CAkEvent_V112();
             var chunk = new ByteChunk(byteArray);
-            sanityReload.Parse(chunk);
+            sanityReload.ReadHirc(chunk);
 
             return byteArray;
         }
 
         public override void UpdateSectionSize()
         {
-            var idSize = ByteHelper.GetPropertyTypeSize(ID);
+            var idSize = ByteHelper.GetPropertyTypeSize(Id);
             var actionListSizeSize = ByteHelper.GetPropertyTypeSize(ActionListSize);
 
             uint actionListSize = 0;

@@ -1,0 +1,190 @@
+<UserControl 
+    x:Class="Editors.Audio.AudioEditor.Presentation.AudioEditorView"
+    x:Name="AudioEditor"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+    xmlns:s="http://schemas.singulink.com/xaml" 
+    xmlns:Local="clr-namespace:Editors.Audio.AudioEditor.Presentation"
+    xmlns:AudioProjectExplorer="clr-namespace:Editors.Audio.AudioEditor.Presentation.AudioProjectExplorer"
+    xmlns:AudioFilesExplorer="clr-namespace:Editors.Audio.AudioEditor.Presentation.AudioFilesExplorer"
+    xmlns:AudioProjectEditor="clr-namespace:Editors.Audio.AudioEditor.Presentation.AudioProjectEditor"
+    xmlns:Settings="clr-namespace:Editors.Audio.AudioEditor.Presentation.Settings"
+    xmlns:AudioProjectViewer="clr-namespace:Editors.Audio.AudioEditor.Presentation.AudioProjectViewer"
+    xmlns:WaveformVisualiser="clr-namespace:Editors.Audio.AudioEditor.Presentation.WaveformVisualiser" 
+    d:DataContext="{d:DesignInstance Type=Local:AudioEditorViewModel}"
+    mc:Ignorable="d" 
+    d:DesignWidth="1200" d:DesignHeight="700">
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition 
+                Height="Auto"/>
+            <RowDefinition 
+                Height="Auto"/>
+            <RowDefinition 
+                Height="*"/>
+        </Grid.RowDefinitions>
+
+        <Grid
+            Grid.Row="0"
+            Grid.Column="0">
+            
+            <Grid.RowDefinitions>
+                <RowDefinition 
+                    Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <Menu 
+                Grid.Row="0" 
+                Margin="0, 5, 5, 0">
+                <MenuItem 
+                    Header="File" 
+                    HorizontalAlignment="Left">
+                    <MenuItem 
+                        Header="New Audio Project" 
+                        Command="{Binding NewAudioProjectCommand}"/>
+                    <MenuItem 
+                        Header="Open Audio Project" 
+                        Command="{Binding LoadAudioProjectCommand}"/>
+                    <MenuItem 
+                        Header="Save Audio Project" 
+                        Command="{Binding SaveAudioProjectCommand}"
+                        IsEnabled="{Binding IsAudioProjectLoaded}"/>
+                    <MenuItem 
+                        Header="Compile Audio Project" 
+                        Command="{Binding CompileAudioProjectCommand}"
+                        IsEnabled="{Binding IsAudioProjectLoaded}"/>
+                </MenuItem>
+                <MenuItem 
+                    Header="Tools" 
+                    HorizontalAlignment="Left">
+                    <MenuItem 
+                        Header="Dialogue Event Merger" 
+                        Command="{Binding OpenDialogueEventMergerCommand}"/>
+                    <MenuItem
+                        Header="Audio Project Merger"
+                        Command="{Binding OpenAudioProjectMergerCommand}"/>
+                    <MenuItem 
+                        Header="Audio Project Converter" 
+                        Command="{Binding OpenAudioProjectConverterCommand}"/>
+                </MenuItem>
+            </Menu>
+        </Grid>
+
+        <Border 
+            Grid.Row="1" 
+            Height="1" 
+            Background="{DynamicResource App.Border}" 
+            Margin="0, 5, 0, 0"/>
+
+        <Grid 
+            Grid.Row="2">
+            
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition 
+                    Width="490"/>
+                <ColumnDefinition 
+                    Width="Auto"/>
+                <ColumnDefinition 
+                    Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <Grid 
+                Grid.Column="0">
+                <Grid.RowDefinitions>
+                    <RowDefinition 
+                        Height="*"/>
+                </Grid.RowDefinitions>
+
+                <Grid 
+                    Grid.Row="1">
+
+                    <Grid.RowDefinitions>
+                        <RowDefinition 
+                            Height="*"/>
+                        <RowDefinition 
+                            Height="Auto"/>
+                        <RowDefinition 
+                            Height="*"/>
+                        <!--
+                        Commented out until Waveform visuliser is intended to be displayed
+                        <RowDefinition 
+                            Height="Auto"/>
+                        -->
+                    </Grid.RowDefinitions>
+
+                    <AudioProjectExplorer:AudioProjectExplorerView
+                        Grid.Row="0"
+                        Grid.Column="0"
+                        DataContext="{Binding AudioProjectExplorerViewModel}"/>
+
+                    <GridSplitter
+                        Grid.Row="1"
+                        Height="5"
+                        Background="{DynamicResource App.Border}"
+                        VerticalAlignment="Center"
+                        HorizontalAlignment="Stretch"
+                        ResizeBehavior="PreviousAndNext"
+                        ResizeDirection="Rows"/>
+
+                    <AudioFilesExplorer:AudioFilesExplorerView 
+                        Grid.Row="2"
+                        Grid.Column="0"
+                        DataContext="{Binding AudioFilesExplorerViewModel}"/>
+
+                    <WaveformVisualiser:WaveformVisualiserView 
+                        Grid.Row="3"
+                        Grid.Column="0"
+                        DataContext="{Binding WaveformVisualiserViewModel}"
+                        Visibility="Hidden"/>
+                </Grid>
+            </Grid>
+
+            <GridSplitter 
+                Grid.Column="1" 
+                Width="5" 
+                Background="{DynamicResource App.Border}" 
+                VerticalAlignment="Stretch" 
+                HorizontalAlignment="Center"
+                ResizeBehavior="PreviousAndNext" 
+                ResizeDirection="Columns"/>
+            
+            <Grid 
+                Grid.Column="2">
+
+                <Grid.RowDefinitions>
+                    <RowDefinition 
+                        Height="Auto"/>
+                    <RowDefinition 
+                        Height="Auto"/>
+                    <RowDefinition 
+                        Height="Auto"/>
+                    <RowDefinition 
+                        Height="*"/>
+                </Grid.RowDefinitions>
+
+                <AudioProjectEditor:AudioProjectEditorView
+                    Grid.Row="0"
+                    Grid.Column="0"
+                    DataContext="{Binding AudioProjectEditorViewModel}"/>
+
+                <Border 
+                    Grid.Row="1"
+                    Height="5" 
+                    Background="{DynamicResource App.Border}"/>
+
+                <Settings:SettingsView 
+                    Grid.Row="2"
+                    Grid.Column="0"
+                    DataContext="{Binding SettingsViewModel}"/>
+
+                <AudioProjectViewer:AudioProjectViewerView 
+                    Grid.Row="3"
+                    Grid.Column="0"
+                    DataContext="{Binding AudioProjectViewerViewModel}"/>
+            </Grid>
+        </Grid>
+    </Grid>
+</UserControl>

@@ -23,18 +23,18 @@ namespace Shared.GameFormats.Wwise.Hirc.V136
 
             // Reload the object to ensure sanity
             var sanityReload = new CAkActorMixer_V136();
-            sanityReload.Parse(new ByteChunk(byteArray));
+            sanityReload.ReadHirc(new ByteChunk(byteArray));
 
             return byteArray;
         }
 
         public override void UpdateSectionSize()
         {
-            var idSize = ByteHelper.GetPropertyTypeSize(ID);
+            var idSize = ByteHelper.GetPropertyTypeSize(Id);
             SectionSize = idSize + Children.GetSize() + NodeBaseParams.GetSize();
         }
 
         public List<uint> GetChildren() => Children.ChildIds;
-        public uint GetDirectParentID() => NodeBaseParams.DirectParentID;
+        public uint GetDirectParentId() => NodeBaseParams.DirectParentId;
     }
 }

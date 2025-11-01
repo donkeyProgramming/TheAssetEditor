@@ -1,6 +1,7 @@
 ﻿using Shared.Core.ByteParsing;
 using Shared.GameFormats.Wwise.Enums;
 using Shared.GameFormats.Wwise.Hirc.V112.Shared;
+using static Shared.GameFormats.Wwise.Hirc.ICAkDialogueEvent;
 
 namespace Shared.GameFormats.Wwise.Hirc.V112
 {
@@ -8,10 +9,10 @@ namespace Shared.GameFormats.Wwise.Hirc.V112
     {
         public byte Probability { get; set; }
         public uint TreeDepth { get; set; }
-        public List<AkGameSync_V112> Arguments { get; set; } = [];
+        public List<IAkGameSync> Arguments { get; set; } = [];
         public uint TreeDataSize { get; set; }
         public byte Mode { get; set; }
-        public AkDecisionTree_V112 AkDecisionTree { get; set; } = new AkDecisionTree_V112();
+        public IAkDecisionTree AkDecisionTree { get; set; } = new AkDecisionTree_V112();
 
         protected override void ReadData(ByteChunk chunk)
         {
@@ -36,8 +37,5 @@ namespace Shared.GameFormats.Wwise.Hirc.V112
 
         public override void UpdateSectionSize() => throw new NotImplementedException();
         public override byte[] WriteData() => throw new NotImplementedException();
-
-        List<object> ICAkDialogueEvent.Arguments => Arguments.Cast<object>().ToList();
-        object ICAkDialogueEvent.AkDecisionTree => AkDecisionTree;
     }
 }

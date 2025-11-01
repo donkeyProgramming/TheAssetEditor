@@ -1,43 +1,66 @@
-﻿using Shared.GameFormats.Wwise.Enums;
+﻿using Shared.Core.ByteParsing;
+using Shared.GameFormats.Wwise.Enums;
 
 namespace Shared.GameFormats.Wwise.Hirc
 {
     public interface ICAkEvent
     {
-        public List<uint> GetActionIds();
+        List<uint> GetActionIds();
     }
 
     public interface ICAkSound
     {
-        public uint GetDirectParentID();
-        public uint GetSourceID();
-        public AKBKSourceType GetStreamType();
+        uint GetDirectParentId();
+        uint GetSourceId();
+        AKBKSourceType GetStreamType();
     }
 
     public interface ICAkAction
     {
-        public AkActionType GetActionType();
-        public uint GetChildID();
-        public uint GetStateGroupID();
+        AkActionType GetActionType();
+        uint GetChildId();
+        uint GetStateGroupId();
     }
 
     public interface ICAkDialogueEvent
     {
-        List<object> Arguments { get; }
-        object AkDecisionTree { get; }
+        List<IAkGameSync> Arguments { get; }
+        IAkDecisionTree AkDecisionTree { get; }
+
+        public interface IAkGameSync
+        {
+            uint GroupId { get; set;  }
+            AkGroupType GroupType { get; set; }
+            uint GetSize();
+        }
+
+        public interface IAkDecisionTree
+        {
+            void ReadData(ByteChunk chunk, uint treeDataSize, uint treeDepth);
+            byte[] WriteData();
+            IAkDecisionNode GetDecisionTree();
+        }
+
+        public interface IAkDecisionNode
+        {
+            uint GetKey();
+            uint GetAudioNodeId();
+            int GetChildrenCount();
+            IAkDecisionNode GetChildAtIndex(int index);
+        }
     }
 
     public interface ICAkActorMixer
     {
-        public List<uint> GetChildren();
-        public uint GetDirectParentID();
+        List<uint> GetChildren();
+        uint GetDirectParentId();
     }
 
     public interface ICAkSwitchCntr
     {
         uint GroupId { get; }
         uint DefaultSwitch { get; }
-        public List<ICAkSwitchPackage> SwitchList { get; }
+        List<ICAkSwitchPackage> SwitchList { get; }
 
         public interface ICAkSwitchPackage
         {
@@ -45,23 +68,23 @@ namespace Shared.GameFormats.Wwise.Hirc
             List<uint> NodeIdList { get; }
         }
 
-        public uint GetDirectParentID();
+        uint GetDirectParentId();
     }
 
     public interface ICAkMusicTrack
     {
-        public List<uint> GetChildren();
+        List<uint> GetChildren();
     }
 
     public interface ICAkLayerCntr
     {
-        public List<uint> GetChildren();
-        public uint GetDirectParentID();
+        List<uint> GetChildren();
+        uint GetDirectParentId();
     }
 
-    public interface ICAkRanSeqCnt
+    public interface ICAkRanSeqCntr
     {
-        public uint GetDirectParentID();
-        public List<uint> GetChildren();
+        uint GetDirectParentId();
+        List<uint> GetChildren();
     }
 }

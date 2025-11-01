@@ -1,0 +1,276 @@
+﻿<Window 
+    x:Class="Editors.Audio.AudioProjectConverter.AudioProjectConverterWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:sys="clr-namespace:System;assembly=netstandard"
+    xmlns:AudioProjectConverter="clr-namespace:Editors.Audio.AudioProjectConverter"
+    d:DataContext="{d:DesignInstance Type=AudioProjectConverter:AudioProjectConverterViewModel}"
+    Style="{StaticResource CustomWindowStyle}"
+    mc:Ignorable="d"
+    Width="850"
+    SizeToContent="Height"
+    Closed="OnClosed"
+    Title="Audio Project Converter">
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition 
+                Height="Auto"/>
+            <RowDefinition 
+                Height="Auto"/>
+            <RowDefinition 
+                Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <TextBlock  
+            Grid.Row="0"  
+            Text="The Audio Project Converter is a tool for creating an Audio Project out of Dialogue Events in the provided .bnk files. It takes the VO Actor substring(s) and searches the Dialogue Events in the supplied .bnk files for their usage and converts that to the Audio Project format. Read the tooltips for more information."  
+            HorizontalAlignment="Left"
+            Margin="10, 10, 10, 0"
+            TextWrapping="Wrap"/>
+
+        <Grid 
+            Grid.Row="1" 
+            Margin="10">
+
+            <Grid.RowDefinitions>
+                <RowDefinition 
+                    Height="Auto"/>
+                <RowDefinition 
+                    Height="Auto"/>
+                <RowDefinition 
+                    Height="Auto"/>
+                <RowDefinition 
+                    Height="Auto"/>
+                <RowDefinition
+                    Height="Auto"/>
+                <RowDefinition
+                    Height="Auto"/>
+                <RowDefinition
+                    Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <Grid 
+                Grid.Row="0">
+
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition 
+                        Width="130"/>
+                    <ColumnDefinition 
+                        Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <Label
+                    Grid.Column="0" 
+                    Content="Audio Project Name"
+                    ToolTip="The name of your converted Audio Project."/>
+
+                <TextBox 
+                    Grid.Column="1"
+                    Text="{Binding AudioProjectName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                    VerticalContentAlignment="Center"
+                    Padding="2, 0, 0, 0"/>
+            </Grid>
+
+            <Grid 
+                Grid.Row="1" 
+                Margin="0, 5, 0, 0">
+
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition 
+                        Width="130"/>
+                    <ColumnDefinition 
+                        Width="*"/>
+                    <ColumnDefinition 
+                        Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <Label 
+                    Grid.Column="0"
+                    Content="Output Directory Path"
+                    ToolTip="The pack directory where the converted Audio Project is output to. There needs to be a file in the directory for it to show."/>
+
+                <TextBox 
+                    Grid.Column="1"
+                    Text="{Binding OutputDirectoryPath, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                    IsReadOnly="True"
+                    VerticalContentAlignment="Center"
+                    Padding="2, 0, 0, 0"/>
+
+                <Button 
+                    Grid.Column="2" 
+                    Content="..."
+                    Width="30"
+                    Margin="5, 0, 0, 0" 
+                    Command="{Binding SetOutputDirectoryPathCommand}"/>
+            </Grid>
+
+            <Grid 
+                Grid.Row="2"
+                Margin="0, 5, 0, 0">
+
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition 
+                        Width="130"/>
+                    <ColumnDefinition 
+                        Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <Label
+                    Grid.Column="0" 
+                    Content="VO Actor Substring"
+                    ToolTip="A substring common to all the VO Actor keys whose usage you want converted to the Audio Project format. You can include multiple substrings using a comma to separate them e.g. &quot;ovn_vo_actor_Araby, ovn_vo_actor_Albion&quot;."/>
+
+                <TextBox 
+                    Grid.Column="1"
+                    Text="{Binding VOActorSubstring, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                    VerticalContentAlignment="Center"
+                    Padding="2, 0, 0, 0"/>
+            </Grid>
+
+            <Grid 
+                Grid.Row="3" 
+                Margin="0, 5, 0, 0">
+
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition 
+                        Width="130"/>
+                    <ColumnDefinition 
+                        Width="*"/>
+                    <ColumnDefinition 
+                        Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <Label 
+                    Grid.Column="0"
+                    Content="Wems Directory Path"
+                    ToolTip="A directory on your computer containing all the .wem files used in the soundbank (just use all wem files if you don't know which are used)."/>
+
+                <TextBox 
+                    Grid.Column="1"
+                    Text="{Binding WemsDirectoryPath, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                    IsReadOnly="True"
+                    VerticalContentAlignment="Center"
+                    Padding="2, 0, 0, 0"/>
+
+                <Button 
+                    Grid.Column="2" 
+                    Content="..."
+                    Width="30"
+                    Margin="5, 0, 0, 0" 
+                    Command="{Binding SetWemsDirectoryPathCommand}"/>
+            </Grid>
+
+            <Grid 
+                Grid.Row="4"
+                Margin="0, 5, 0, 0">
+
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition 
+                        Width="130"/>
+                    <ColumnDefinition 
+                        Width="*"/>
+                    <ColumnDefinition 
+                        Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <Label 
+                    Grid.Column="0"
+                    Content="Bnks Directory Path"
+                    ToolTip="A directory on your computer containing all the .bnk files to be searched."/>
+
+                <TextBox 
+                    Grid.Column="1"
+                    Text="{Binding BnksDirectoryPath, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                    IsReadOnly="True"
+                    VerticalContentAlignment="Center"
+                    Padding="2, 0, 0, 0"/>
+
+                <Button 
+                    Grid.Column="2" 
+                    Content="..."
+                    Width="30"
+                    Margin="5, 0, 0, 0" 
+                    Command="{Binding SetBnksDirectoryPathCommand}"/>
+            </Grid>
+
+            <Grid 
+                Grid.Row="5" 
+                  Margin="0,5,0,0">
+                
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition 
+                        Width="250"/>
+                    <ColumnDefinition 
+                        Width="*"/>
+                </Grid.ColumnDefinitions>
+                
+                <Label 
+                    Grid.Column="0" 
+                    Content="Converting Soundbanks from Wwise Project"
+                    ToolTip="Tick this box if you need to get the States used in the soundbank from the Wwise project. There's no need to tick if you're converting a vanilla .bnk or the pack has a states_data.dat in the pack for the .bnk you're converting as that contains the States data for a or .bnk made by the Audio Editor."/>
+                
+                <CheckBox 
+                    Grid.Column="1"
+                    IsChecked="{Binding IsUsingWwiseProject, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                    VerticalAlignment="Center"/>
+            </Grid>
+
+            <Grid 
+                Grid.Row="6" 
+                Margin="0, 5, 0, 0"
+                IsEnabled="{Binding IsUsingWwiseProject}">
+
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition 
+                        Width="130"/>
+                    <ColumnDefinition 
+                        Width="*"/>
+                    <ColumnDefinition 
+                        Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <Label 
+                    Grid.Column="0"
+                    Content="SoundbanksInfo.xml"
+                    ToolTip="The path to the SoundbanksInfo.xml should be &quot;your_wwise_project_folder\GeneratedSoundBanks\Windows\SoundbanksInfo.xml&quot;. This contains the States data for the Wwise project."/>
+
+                <TextBox 
+                    Grid.Column="1"
+                    Text="{Binding SoundbanksInfoXmlPath, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                    IsReadOnly="True"
+                    VerticalContentAlignment="Center"
+                    Padding="2, 0, 0, 0"/>
+
+                <Button 
+                    Grid.Column="2" 
+                    Content="..."
+                    Width="30"
+                    Margin="5, 0, 0, 0" 
+                    Command="{Binding SetSoundbanksInfoXmlPathCommand}"/>
+            </Grid>
+        </Grid>
+
+        <StackPanel 
+            Grid.Row="2" 
+            Orientation="Horizontal" 
+            HorizontalAlignment="Right" 
+            Margin="10, 0, 10, 10">
+
+            <Button 
+                Content="OK"
+                Width="75"
+                Margin="0, 0, 5, 0"
+                Command="{Binding ProcessAudioProjectConversionCommand}" 
+                IsEnabled="{Binding IsOkButtonEnabled}"/>
+
+            <Button 
+                Content="Cancel" 
+                Width="75"
+                Margin="5, 0, 0, 0" 
+                Command="{Binding CloseWindowActionCommand}"/>
+        </StackPanel>
+    </Grid>
+</Window>

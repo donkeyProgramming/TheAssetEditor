@@ -1,6 +1,5 @@
-﻿using Editors.Audio.Storage;
-using Editors.Audio.Utility;
-using Octokit;
+﻿using Editors.Audio.Shared.GameInformation.Warhammer3;
+using Editors.Audio.Shared.Storage;
 using Shared.Core.Events;
 using Shared.Core.Misc;
 using Shared.GameFormats.Wwise.Hirc;
@@ -19,23 +18,19 @@ namespace Editors.Reports.Audio
         public DialogueEventAndEventNamePrinter(IAudioRepository audioRepository)
         {
             _audioRepository = audioRepository;
-        }
-
-        public static void Generate(IAudioRepository audioRepository)
-        {
-            var instance = new DialogueEventAndEventNamePrinter(audioRepository);
-            instance.Create();
+            _audioRepository.Load(Wh3LanguageInformation.GetAllLanguages());
         }
 
         public void Create()
         {
             var printer = new DialogueEventAndEventNamePrinter(_audioRepository);
             printer.PrintInfo();
+            _audioRepository.Clear();
         }
 
         public void PrintInfo()
         {
-            var itemsToProcess = _audioRepository.GetHircItemsByType<HircItem>()
+            var itemsToProcess = _audioRepository.GetHircsByType<HircItem>()
                 .Where(item => item is ICAkDialogueEvent or ICAkEvent)
                 .ToList();
 
@@ -45,7 +40,7 @@ namespace Editors.Reports.Audio
 
         private void ProcessItem(HircItem item)
         {
-            var itemName = _audioRepository.GetNameFromID(item.ID);
+            var itemName = _audioRepository.GetNameFromId(item.Id);
             Console.WriteLine(itemName);
 
             var filePath = $"{DirectoryHelper.ReportsDirectory}\\dialogue_event_and_event_names.txt";

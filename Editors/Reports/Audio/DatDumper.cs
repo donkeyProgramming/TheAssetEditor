@@ -1,13 +1,9 @@
-﻿using Editors.Audio.Storage;
-using Editors.Audio.Utility;
-using Octokit;
-using Shared.Core.Events;
+﻿using Shared.Core.Events;
 using Shared.Core.Misc;
 using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
 using Shared.Core.Settings;
 using Shared.GameFormats.Dat;
-using Shared.GameFormats.Wwise.Hirc;
 
 namespace Editors.Reports.Audio
 {
