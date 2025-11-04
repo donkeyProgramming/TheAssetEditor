@@ -28,6 +28,9 @@ namespace Editors.ImportExport.Exporting.Exporters.RmvToGltf.Helpers
         {
             var output = new List<TextureResult>();
 
+            if (!settings.ExportMaterials)
+                return output;
+
             var exportedTextures = new Dictionary<string, string>();    // To avoid exporting same texture multiple times
 
             int lodICounnt = 1;

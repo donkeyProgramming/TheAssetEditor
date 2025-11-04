@@ -13,9 +13,11 @@ using Editors.ImportExport.Exporting.Presentation.RmvToGltf;
 using Editors.ImportExport.Importing;
 using Editors.ImportExport.Importing.Importers.GltfToRmv;
 using Editors.ImportExport.Importing.Importers.GltfToRmv.Helper;
+using Editors.ImportExport.Importing.Presentation;
 using Microsoft.Extensions.DependencyInjection;
 using Shared.Core.DependencyInjection;
 using Shared.Core.DevConfig;
+using Editors.ImportImport.Importing.Presentation.RmvToGltf;
 using Shared.Ui.BaseDialogs.PackFileTree.ContextMenu.External;
 
 namespace Editors.ImportExport
@@ -38,8 +40,14 @@ namespace Editors.ImportExport
             services.AddTransient<IDdsToNormalPngExporter, DdsToNormalPngExporter>();
             services.AddTransient<RmvToGltfExporter>();
 
+            // Importer ViewModels
+            RegisterWindow<ImportWindow>(services);
+            services.AddTransient<ImporterCoreViewModel>();
+            services.AddTransient<IImporterViewModel, RmvToGltfImporterViewModel>();
+
             // Importers
             services.AddTransient<GltfImporter>();
+            services.AddTransient<RmvMaterialBuilder>();
 
             // Image Save Helper
             services.AddScoped<IImageSaveHandler, SystemImageSaveHandler>();
@@ -57,7 +65,7 @@ namespace Editors.ImportExport
             services.AddTransient<IGltfSceneLoader, GltfSceneLoader>();
             services.AddTransient<GltfSkeletonBuilder>();
             services.AddTransient<GltfAnimationBuilder>();
-            
+
             RegisterAllAsInterface<IDeveloperConfiguration>(services, ServiceLifetime.Transient);
         }
     }

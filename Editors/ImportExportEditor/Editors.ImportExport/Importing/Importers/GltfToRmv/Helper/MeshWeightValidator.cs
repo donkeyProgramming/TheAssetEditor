@@ -24,7 +24,10 @@ namespace Editors.ImportExport.Importing.Importers.GltfToRmv.Helper
             return true;
         }
         static public void ValidateVertexWeighting(CommonVertex v)
-        {            
+        {
+            if (v.WeightCount == 0)
+                throw new Exception("Error: Invalid weights, 1 of more null weights in weighted mesh");
+
             if (v.WeightCount != v.BoneWeight.Length || v.WeightCount != v.BoneIndex.Length)
                 throw new Exception("Error: Invalid Vertex Weight State");            
 
@@ -38,10 +41,8 @@ namespace Editors.ImportExport.Importing.Importers.GltfToRmv.Helper
 
             const float tolerance = 0.05f;
             if (weightSum < (1.0f - tolerance) || weightSum > (1.0f + tolerance))
-                throw new Exception("Error: sum of weights not 1.0f");
+                throw new Exception("Error: sum of weights not 1.0f");                        
                         
-            if (v.WeightCount == 0)                          
-                   throw new Exception("Error: Invalid weights, 1 of more null weights in weighted mesh");
         }
     }
 }

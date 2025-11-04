@@ -87,7 +87,9 @@ namespace Shared.Ui.BaseDialogs.PackFileTree.ContextMenu
                 var importFolder = AddChildMenu("Import", rootNode);
                 Add<ImportFileCommand>(selectedNode, importFolder);
                 Add<ImportDirectoryCommand>(selectedNode, importFolder);
-                Add<AdvancedImportCommand>(selectedNode, importFolder);
+
+                if (selectedNode.NodeType != NodeType.Root)
+                    Add<AdvancedImportCommand>(selectedNode, importFolder);
 
                 var createMenu = AddChildMenu("Create", rootNode);
                 Add<CreateFolderCommand>(selectedNode, createMenu);
