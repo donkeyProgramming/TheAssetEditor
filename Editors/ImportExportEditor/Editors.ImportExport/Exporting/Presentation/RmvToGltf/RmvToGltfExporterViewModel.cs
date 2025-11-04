@@ -28,7 +28,7 @@ namespace Editors.ImportExport.Exporting.Presentation.RmvToGltf
 
         public void Execute(PackFile exportSource, string outputPath, bool generateImporter)
         {
-            var settings = new RmvToGltfExporterSettings(exportSource, [], outputPath, ConvertMaterialTextureToBlender, ConvertNormalTextureToBlue, ExportAnimations, true);
+            var settings = new RmvToGltfExporterSettings(exportSource, [], outputPath, ExportTextures, ConvertMaterialTextureToBlender, ConvertNormalTextureToBlue, ExportAnimations, true);
             _exporter.Export(settings);
         }
     }

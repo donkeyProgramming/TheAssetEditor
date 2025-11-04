@@ -24,7 +24,7 @@ namespace Editors.ImportExport.Importing.Importers.GltfToRmv.Helper
     /// </summary>
     public class RmvMeshBuilder
     {
-        public static RmvFile Build(GltfImporterSettings settings, ModelRoot modelRoot, AnimationFile? animSkeletonFile, string SkeletonName)
+        public static RmvFile? Build(GltfImporterSettings settings, ModelRoot modelRoot, AnimationFile? animSkeletonFile, string SkeletonName)
         {
             if (modelRoot == null)
                 throw new ArgumentNullException(nameof(modelRoot), "Invalid Scene: ModelRoot can't be null");
@@ -34,6 +34,11 @@ namespace Editors.ImportExport.Importing.Importers.GltfToRmv.Helper
 
             if (!modelRoot.LogicalNodes.Any())
                 throw new Exception("Invalid Scene: no (logical) nodes");
+
+            if (modelRoot.LogicalMeshes == null || !modelRoot.LogicalMeshes.Any())
+            {
+                return null; // no meshes to import
+            }
 
             List<string> boneNames = new List<string>();
             var test = boneNames?.Count;
@@ -45,7 +50,7 @@ namespace Editors.ImportExport.Importing.Importers.GltfToRmv.Helper
                 Header = new RmvFileHeader()
                 {
                     _fileType = Encoding.ASCII.GetBytes("RMV2"),
-                    SkeletonName = SkeletonName, // TODO: Store + get skeleton name from gltf
+                    SkeletonName = SkeletonName,
                     Version = RmvVersionEnum.RMV2_V7,
                     LodCount = lodCount
                 },
@@ -57,17 +62,20 @@ namespace Editors.ImportExport.Importing.Importers.GltfToRmv.Helper
             rmv2File.LodHeaders[0].MeshCount = (uint)modelRoot.LogicalMeshes.Count;
 
             var modelList = new List<RmvModel>();
-
-
             foreach (var mesh in modelRoot.LogicalMeshes)
-            {
+            {                                
+                // We use NODE name as mesh name, because users typically name the NODE in Blender/Maya/3dsMax, not the mesh
+                var meshNodeName =
+                    (mesh.VisualParents != null && mesh.VisualParents.Any()) ? 
+                    mesh.VisualParents.First().Name : mesh.Name;
+
                 var rmv2Mesh = GenerateRmvMesh(mesh, modelRoot, animSkeletonFile);
-                var rmvModel = CreateRmvModel(rmv2Mesh, mesh.Name,animSkeletonFile);
+                var rmvModel = CreateRmvModel(rmv2Mesh, meshNodeName, animSkeletonFile);
                 modelList.Add(rmvModel);
             }
 
             rmv2File.ModelList[0] = modelList.ToArray();
-            rmv2File.RecalculateOffsets();
+            rmv2File.RecalculateOffsets();            
 
             return rmv2File;
         }
@@ -129,26 +137,18 @@ namespace Editors.ImportExport.Importing.Importers.GltfToRmv.Helper
             rmv2Vertex.Normal = new XNA.Vector3(-vertexBuilder.Geometry.Normal.X, vertexBuilder.Geometry.Normal.Y, vertexBuilder.Geometry.Normal.Z);
             rmv2Vertex.Tangent = new XNA.Vector3(-vertexBuilder.Geometry.Tangent.X, vertexBuilder.Geometry.Tangent.Y, vertexBuilder.Geometry.Tangent.Z);
             rmv2Vertex.BiNormal = XNA.Vector3.Cross(rmv2Vertex.Normal, rmv2Vertex.Tangent) * vertexBuilder.Geometry.Tangent.W; // should produce th correct bitangent
-                      
-            if (animSkeletonFile == null)
-            {
-                rmv2Vertex.WeightCount = 0;
-                
-                return rmv2Vertex;
-            }
 
-            // TODO: check skeleton == null 
-            rmv2Vertex.WeightCount = vertexBuilder.Skinning.MaxBindings;
+            rmv2Vertex.WeightCount = (animSkeletonFile == null) ? 0 : 4;
+            
             rmv2Vertex.BoneIndex = new byte[rmv2Vertex.WeightCount];
             rmv2Vertex.BoneWeight = new float[rmv2Vertex.WeightCount];
-
-            // TODO: check skeleton == null 
-            for (var bindindIndex = 0; bindindIndex < rmv2Vertex.WeightCount; bindindIndex++)
+                        
+            for (var bindingIndex = 0; bindingIndex < rmv2Vertex.WeightCount; bindingIndex++)
             {
-                var boneTableIndex = GetMappedBoneTableIndex(vertexBuilder, modelRoot, animSkeletonFile, bindindIndex);
+                var boneTableIndex = GetMappedBoneTableIndex(vertexBuilder, modelRoot, animSkeletonFile, bindingIndex);
 
-                rmv2Vertex.BoneIndex[bindindIndex] = (byte)boneTableIndex;
-                rmv2Vertex.BoneWeight[bindindIndex] = vertexBuilder.Skinning.Weights[bindindIndex];
+                rmv2Vertex.BoneIndex[bindingIndex] = (byte)boneTableIndex;
+                rmv2Vertex.BoneWeight[bindingIndex] = vertexBuilder.Skinning.Weights[bindingIndex];
             }
 
             return rmv2Vertex;
@@ -156,7 +156,7 @@ namespace Editors.ImportExport.Importing.Importers.GltfToRmv.Helper
 
         /// <summary>
         /// Maps the gltf vertex joint index to th CA AnimationFile bone index
-        /// </summary>        
+        /// </summary>       
         private static int GetMappedBoneTableIndex(VertexBuilder<VertexPositionNormalTangent, VertexTexture1, VertexJoints4> vertexBuilder, ModelRoot modelRoot, AnimationFile animSkeletonFile, int bindingIndex)
         {
             var binding = vertexBuilder.Skinning.GetBinding(bindingIndex); // Get binding
@@ -174,17 +174,17 @@ namespace Editors.ImportExport.Importing.Importers.GltfToRmv.Helper
         private static RmvModel CreateRmvModel(RmvMesh rmv2Mesh, string modelName, AnimationFile? animSkeletonFile,  bool addBonesAsAttachmentPoints = false)
         {
             var materialHeader = new WeightedMaterial();
-
-            MeshWeightValidator.Validate(rmv2Mesh);
+                        
             if (animSkeletonFile != null)
             {
-                materialHeader.BinaryVertexFormat = VertexFormat.Cinematic;
                 materialHeader.MaterialId = ModelMaterialEnum.weighted;
+                materialHeader.BinaryVertexFormat = VertexFormat.Cinematic;
+                MeshWeightValidator.Validate(rmv2Mesh);
             }
             else
             {
-                materialHeader.BinaryVertexFormat = VertexFormat.Static;
                 materialHeader.MaterialId = ModelMaterialEnum.default_type;
+                materialHeader.BinaryVertexFormat = VertexFormat.Static;                
             }
 
             var newModel = new RmvModel()
