@@ -33,29 +33,24 @@ namespace Shared.Core.PackFiles.Models
 
         public void SaveToByteArray(BinaryWriter writer, GameInformation gameInformation)
         {
+            if (Header.HasEncryptedData || Header.HasEncryptedIndex)
+                throw new InvalidOperationException("Saving encrypted packs is not supported.");
+
+            long headerSpecificBytes = 0;
+            if (Header.HasIndexWithTimeStamp)
+                headerSpecificBytes += 4;
+            if (Header.Version == PackFileVersion.PFH5)
+                headerSpecificBytes += 1;
+
             long fileNamesOffset = 0;
+
             var sortedFiles = FileList.OrderBy(x => x.Key, StringComparer.Ordinal).ToList();
             foreach (var file in sortedFiles)
             {
-                if (Header.Version == PackFileVersion.PFH5)
-                    fileNamesOffset += 1;
-                if (Header.HasIndexWithTimeStamp)
-                    fileNamesOffset += 4;
-                fileNamesOffset += 4 + file.Key.Length + 1;    // Size + filename with zero terminator
-            }
-
-            long headerSpesificBytes = 0;
-            if (Header.HasIndexWithTimeStamp)
-                headerSpesificBytes += 4;
-            if (Header.Version == PackFileVersion.PFH5)
-                headerSpesificBytes += 1;
-
-            long fileNamesOffset2 = 0;
-            foreach (var file in sortedFiles)
-            {
                 var fileSize = 4;
-                var strLength = file.Key.Length + 1;
-                fileNamesOffset2 += fileSize + headerSpesificBytes + strLength;
+                var zeroTerminator = 1;
+                var fileNameBytes = Encoding.UTF8.GetByteCount(file.Key);
+                fileNamesOffset += fileSize + headerSpecificBytes + fileNameBytes + zeroTerminator;
             }
 
             Header.FileCount = (uint)FileList.Count;
@@ -110,7 +105,6 @@ namespace Shared.Core.PackFiles.Models
             {
                 var packFile = file.PackFile;
                 byte[] data;
-                var fileSize = 0;
                 uint uncompressedFileSize = 0;
 
                 // Read the data
@@ -125,7 +119,6 @@ namespace Shared.Core.PackFiles.Models
                     // Compress the data into the right format
                     var compressedData = PackFileCompression.Compress(uncompressedData, file.IntendedCompressionFormat);
                     data = compressedData;
-                    fileSize = compressedData.Length;
                 }
                 else if (packFile.DataSource is PackedFileSource packedFileSource && isCorrectCompressionFormat)
                 {
@@ -133,13 +126,11 @@ namespace Shared.Core.PackFiles.Models
                     uncompressedFileSize = packedFileSource.UncompressedSize;
                     var compressedData = packedFileSource.ReadDataWithoutDecompressing();
                     data = compressedData;
-                    fileSize = data.Length;
                 }
                 else
-                {
                     data = packFile.DataSource.ReadData();
-                    fileSize = data.Length;
-                }
+
+                var fileSize = (uint)data.Length;
 
                 // Write the data
                 var offset = writer.BaseStream.Position;
@@ -151,12 +142,15 @@ namespace Shared.Core.PackFiles.Models
                 writer.Write(fileSize);
                 writer.BaseStream.Position = currentPosition;
 
+                // We do not encrypt
+                var isEncrypted = false;
+
                 // Update DataSource
                 packFile.DataSource = new PackedFileSource(
                     packedFileSourceParent,
                     offset,
                     fileSize,
-                    Header.HasEncryptedData,
+                    isEncrypted,
                     shouldCompress,
                     file.IntendedCompressionFormat,
                     uncompressedFileSize);
