@@ -6,8 +6,8 @@
         <LangVersion>preview</LangVersion>
 	</PropertyGroup>
 	<ItemGroup>
-		<PackageReference Include="Material.Icons.WPF" Version="2.1.10" />
-		<PackageReference Include="Extended.Wpf.Toolkit" Version="4.6.1" />
+		<PackageReference Include="Material.Icons.WPF" Version="2.4.1" />
+		<PackageReference Include="Extended.Wpf.Toolkit" Version="5.0.0" />
 	</ItemGroup>
 
   <ItemGroup>

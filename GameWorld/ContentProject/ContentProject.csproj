@@ -17,7 +17,7 @@
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="MonoGame.Content.Builder.Task" Version="3.8.2.1105" />
+        <PackageReference Include="MonoGame.Content.Builder.Task" Version="3.8.4.1" />
     </ItemGroup>
 
     <ItemGroup>
