@@ -1,4 +1,5 @@
-﻿using System.Numerics;
+﻿using System.IO;
+using System.Numerics;
 using Editors.ImportExport.Common;
 using Shared.GameFormats.RigidModel;
 using Shared.GameFormats.RigidModel.Vertex;
@@ -120,7 +121,16 @@ namespace Editors.ImportExport.Exporting.Exporters.RmvToGltf.Helpers
                   .WithAlpha(AlphaMode.MASK);
 
             foreach (var texture in texturesForModel)
+            {
                 material.WithChannelImage(texture.GlftTexureType, texture.SystemFilePath);
+
+                var channel = material.UseChannel(texture.GlftTexureType);
+                if (channel?.Texture?.PrimaryImage != null) 
+                {
+                    // Set SharpGLTF to re-resave textures with specified paths, default behavior is texturePath = "{folder}\meshName{counter}.png"
+                    channel.Texture.PrimaryImage.AlternateWriteFileName = Path.GetFileName(texture.SystemFilePath);
+                }                               
+            }
 
             return material;
         }

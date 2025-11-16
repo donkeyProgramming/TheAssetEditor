@@ -1,0 +1,77 @@
+﻿<UserControl x:Class="Editors.ImportExport.Importing.Presentation.RmvToGltf.RmvToGltfImporterView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:Editors.ImportExport.Importing.Presentation.RmvToGltf"
+             mc:Ignorable="d"                           
+             VerticalAlignment="Stretch"
+                
+             >
+
+    <Grid VerticalAlignment="Stretch">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="auto"/>
+            <ColumnDefinition Width="auto" MinWidth="9.173"/>
+            <ColumnDefinition Width="auto" MinWidth="322.522"/>
+            <ColumnDefinition Width="auto"/>
+            <ColumnDefinition Width="auto" MinWidth="1"/>
+            <ColumnDefinition/>
+        </Grid.ColumnDefinitions>
+
+        <Grid.RowDefinitions>
+            <RowDefinition Height="25"/>
+            <RowDefinition Height="25"/>
+            <RowDefinition Height="25"/>
+            <RowDefinition Height="25"/>
+            <RowDefinition Height="25"/>
+            <RowDefinition Height="25"/>
+        </Grid.RowDefinitions>
+
+
+        <TextBlock Grid.Row="0" Grid.Column="0" Text="Import Meshes"/>
+        <CheckBox Grid.Column="2" Content="" HorizontalAlignment="Left" VerticalAlignment="Center" x:Name="ImportMeshes_CheckBox"
+                  IsChecked="{Binding ImportMeshes, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                  ToolTip="Make a TW WH3/3K compatible material from a Blender Material Map"/>
+        <TextBlock Grid.Column="1" Text=" : " VerticalAlignment="Center" Height="15"/>
+
+        <TextBlock Grid.Row="1" Grid.Column="0" HorizontalAlignment="Left" VerticalAlignment="Center" Text="Import Materials" Height="15" Width="88"/>
+        <TextBlock Grid.Row="1" Grid.Column="1" Text=" : " VerticalAlignment="Center" Height="15"/>
+        <CheckBox Grid.Row="1" Grid.Column="2" HorizontalAlignment="Left" x:Name = "ImportMaterialCheckBox"                  
+                  IsChecked="{Binding ImportMaterials, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" 
+                    ToolTip="Import Materials From RMV File, convert to TW material" >
+        </CheckBox>
+
+        <TextBlock Grid.Row="2" Grid.Column="1" Text="Convert Material Map From Blender To TW format" HorizontalAlignment="Left" VerticalAlignment="Center" Height="15" Width="265" Grid.ColumnSpan="2" Margin="9,0,0,0"/>
+        <TextBlock Grid.Row="2" Grid.Column="3" Text=" : " VerticalAlignment="Center" Height="15" Margin="0,0,1,0"/>
+        <CheckBox Grid.Row="2" Grid.Column="5" HorizontalAlignment="Left" 
+                  IsEnabled="{Binding ImportMaterials, UpdateSourceTrigger=PropertyChanged}" 
+                  IsChecked="{Binding ConvertFromBlenderMaterialMap, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                  ToolTip="Make a TW WH3/3K compatible material from a Blender Material Map"/>
+
+        <TextBlock Grid.Row="3" Grid.Column="2" Text="Convert Normal Map From Blue To Orange Type" HorizontalAlignment="Left" VerticalAlignment="Center" Height="15" Margin="4,0,0,0" Width="255"/>
+        <TextBlock Grid.Row="3" Grid.Column="3" Text=" : " VerticalAlignment="Top" Height="15" HorizontalAlignment="Center" Width="9"/>
+        <CheckBox Grid.Row="3" Grid.Column="5" HorizontalAlignment="Left" x:Name="ConvertNormalMapCheckbox"
+                  IsEnabled="{Binding ImportMaterials, UpdateSourceTrigger=PropertyChanged}" 
+                  IsChecked="{Binding ConvertNormalTextureToOrange, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">
+            <CheckBox.ToolTip>
+                Convert the normal map texture from blue type into to orange type. &#xD;&#xA;
+                - Blue type is used by most 3d software, including blender, substance painter. &#xD;&#xA;
+                - Orange type is a specialal "compressed" 2 channel type, used by TW, and some other games.
+            </CheckBox.ToolTip>
+        </CheckBox>
+        <TextBlock Grid.Row="4" Text="Import Animations   " HorizontalAlignment="Center" VerticalAlignment="Center" Height="15" Width="109"/>
+        <TextBlock Grid.Row="4" Grid.Column="1" Text=" : " VerticalAlignment="Center" Height="15"/>
+        <CheckBox Grid.Row="4" Grid.Column="2" HorizontalAlignment="Left" IsChecked="{Binding ImportAnimations, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">
+            <CheckBox.ToolTip>
+                Import Animations From GLTF File, convert to TW ANIM;
+            </CheckBox.ToolTip>
+        </CheckBox>
+        <TextBlock Grid.Row="5" Grid.Column="2" Text="Number of Key Samples Per Second "  HorizontalAlignment="Left" VerticalAlignment="Center" Height="15" Margin="4,0,0,0" Width="193"/>
+        <TextBlock Grid.Row="5" Grid.Column="3" Text=" : " HorizontalAlignment="Center" VerticalAlignment="Top" Height="16" Width="9" RenderTransformOrigin="8.147,0.333"/>
+        <TextBox Grid.Row="5" Grid.Column="5" HorizontalAlignment="Left" VerticalAlignment="Top" Width="28"
+                 Text="{Binding AnimationKeysPerSecond, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
+
+    </Grid>
+
+</UserControl>
