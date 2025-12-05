@@ -273,8 +273,7 @@ namespace Shared.Core.PackFiles
                     throw new Exception("File has been changed outside of AssetEditor. Can not save the file as it will cause corruptions");
             }
 
-            pf.SystemFilePath = path;
-            using (var memoryStream = new FileStream(path + "_temp", FileMode.OpenOrCreate))
+            using (var memoryStream = new FileStream(path + "_temp", FileMode.Create))
             {
                 using var writer = new BinaryWriter(memoryStream);
                 pf.SaveToByteArray(writer, gameInformation);
@@ -283,6 +282,7 @@ namespace Shared.Core.PackFiles
             File.Delete(path);
             File.Move(path + "_temp", path);
 
+            pf.SystemFilePath = path;
             pf.OriginalLoadByteSize = new FileInfo(path).Length;
 
             _globalEventHub?.PublishGlobalEvent(new PackFileContainerSavedEvent(pf));

@@ -9,14 +9,15 @@ namespace Shared.Ui.BaseDialogs.PackFileTree.ContextMenu.Commands
         public string GetDisplayName(TreeNode node) => "Export to system folder";
         public bool IsEnabled(TreeNode node) => true;
 
-        public void Execute(TreeNode _selectedNode)
+        public void Execute(TreeNode selectedNode)
         {
+            // TODO: Fix bug where if you export the packfilecontainer itself it doesn't export correctly.
             var dialog = new FolderBrowserDialog();
             if (dialog.ShowDialog() == DialogResult.OK)
             {
-                var nodeStartDir = Path.GetDirectoryName(_selectedNode.GetFullPath());
+                var nodeStartDir = Path.GetDirectoryName(selectedNode.GetFullPath());
                 var fileCounter = 0;
-                SaveSelfAndChildren(_selectedNode, dialog.SelectedPath, nodeStartDir, ref fileCounter);
+                SaveSelfAndChildren(selectedNode, dialog.SelectedPath, nodeStartDir, ref fileCounter);
                 MessageBox.Show($"{fileCounter} files exported!");
             }
         }
@@ -33,7 +34,7 @@ namespace Shared.Ui.BaseDialogs.PackFileTree.ContextMenu.Commands
                 var nodeOriginalPath = node.GetFullPath();
 
                 var nodePathWithoutRoot = nodeOriginalPath;
-                if (rootPath.Length != 0)
+                if (rootPath != null && rootPath.Length != 0)
                     nodePathWithoutRoot = nodeOriginalPath.Replace(rootPath, "");
 
                 if (nodePathWithoutRoot.StartsWith("\\") == false)
@@ -56,7 +57,3 @@ namespace Shared.Ui.BaseDialogs.PackFileTree.ContextMenu.Commands
     }
 
 }
-
-/*
-
- */
