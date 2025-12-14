@@ -252,23 +252,23 @@ namespace Utility.DatabaseSchemaGenerator.Examples
             {
                 try
                 {
-                    using (var copy = new SqlBulkCopy(sqlConnection.ConnectionString))
-                    {
+                    //using (var copy = new SqlBulkCopy(sqlConnection.ConnectionString))
+                    //{
 
 
-                        //var _ravi = dt.NewRow();
-                        //_ravi["Name"] = "ravi";
-                        //_ravi["Marks"] = "500";
-                        //dt.Rows.Add(_ravi);
-                        //
-                        ////copy.BatchSize
-                        //copy.DestinationTableName = "dbo.Customers";
-                        //copy.ColumnMappings.Add(nameof(Customer.Id), "Id");
-                        //copy.ColumnMappings.Add(nameof(Customer.FirstName), "FirstName");
+                    //    //var _ravi = dt.NewRow();
+                    //    //_ravi["Name"] = "ravi";
+                    //    //_ravi["Marks"] = "500";
+                    //    //dt.Rows.Add(_ravi);
+                    //    //
+                    //    ////copy.BatchSize
+                    //    //copy.DestinationTableName = "dbo.Customers";
+                    //    //copy.ColumnMappings.Add(nameof(Customer.Id), "Id");
+                    //    //copy.ColumnMappings.Add(nameof(Customer.FirstName), "FirstName");
 
 
-                       // copy.WriteToServer(dt);
-                    }
+                    //   // copy.WriteToServer(dt);
+                    //}
                  
                     Console.WriteLine($"{tableSchema.Name} - {parsedTables}/{tableSchemas.Count}");
 

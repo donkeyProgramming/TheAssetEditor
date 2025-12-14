@@ -225,7 +225,8 @@ namespace GameWorld.Core.WpfWindow
 
         public T AddComponent<T>(T comp) where T : IGameComponent
         {
-            Components.Add(comp);
+            if (!Components.Contains(comp))
+                Components.Add(comp);
             return comp;
         }
 
