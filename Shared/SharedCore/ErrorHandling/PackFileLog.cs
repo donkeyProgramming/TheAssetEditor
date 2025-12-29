@@ -3,21 +3,15 @@ using Shared.Core.PackFiles.Models;
 
 namespace Shared.Core.ErrorHandling
 {
-    public class CompressionStats
+    public class CompressionInformation(long diskSize = 0, long uncompressedSize = 0)
     {
-        public long DiskSize { get; set; }
-        public long UncompressedSize { get; set; }
+        public long DiskSize { get; set; } = diskSize;
+        public long UncompressedSize { get; set; } = uncompressedSize;
 
-        public CompressionStats(long diskSize = 0, long uncompressedSize = 0)
+        public void Add(CompressionInformation compressionInformation)
         {
-            DiskSize = diskSize;
-            UncompressedSize = uncompressedSize;
-        }
-
-        public void Add(CompressionStats stat)
-        {
-            DiskSize += stat.DiskSize;
-            UncompressedSize += stat.UncompressedSize;
+            DiskSize += compressionInformation.DiskSize;
+            UncompressedSize += compressionInformation.UncompressedSize;
         }
     }
 
@@ -25,22 +19,19 @@ namespace Shared.Core.ErrorHandling
     {
         private static readonly ILogger s_logger = Logging.CreateStatic(typeof(PackFileLog));
 
-        public static Dictionary<CompressionFormat, CompressionStats> GetCompressionStats(PackFileContainer container)
+        public static Dictionary<CompressionFormat, CompressionInformation> GetCompressionInformation(PackFileContainer container)
         {
-            var stats = new Dictionary<CompressionFormat, CompressionStats>();
+            var compressionInformation = new Dictionary<CompressionFormat, CompressionInformation>();
 
             foreach (var packFile in container.FileList.Values)
             {
                 if (packFile.DataSource is PackedFileSource source)
                 {
-                    var format = source.IsCompressed
-                        ? source.CompressionFormat
-                        : CompressionFormat.None;
-
-                    if (!stats.TryGetValue(format, out var totals))
+                    var compressionFormat = source.IsCompressed ? source.CompressionFormat : CompressionFormat.None;
+                    if (!compressionInformation.TryGetValue(compressionFormat, out var totals))
                     {
-                        totals = new CompressionStats();
-                        stats[format] = totals;
+                        totals = new CompressionInformation();
+                        compressionInformation[compressionFormat] = totals;
                     }
 
                     totals.DiskSize += source.Size;
@@ -48,77 +39,98 @@ namespace Shared.Core.ErrorHandling
                 }
             }
 
-            return stats;
+            return compressionInformation;
         }
 
         public static void LogPackCompression(PackFileContainer container)
         {
-            var stats = GetCompressionStats(container);
+            var compressionInformation = GetCompressionInformation(container);
             var totalFiles = container.FileList.Count;
-            var packSizeFmt = FormatSize(container.OriginalLoadByteSize);
+            var packSize = FormatSize(container.OriginalLoadByteSize);
 
-            var loadingPart = $"Loading {container.Name}.pack ({totalFiles} files, {packSizeFmt})";
+            var loadingPart = $"Loading {container.Name}.pack ({totalFiles} files, {packSize})";
 
-            var fileCounts = new Dictionary<CompressionFormat, int>();
-            foreach (var pf in container.FileList.Values)
+            var fileCountsByCompressionFormat = new Dictionary<CompressionFormat, int>();
+            var fileTypeCountsByCompressionFormat = new Dictionary<CompressionFormat, Dictionary<string, int>>();
+
+            foreach (var packFile in container.FileList.Values)
             {
-                if (pf.DataSource is PackedFileSource src)
-                {
-                    var fmt = src.IsCompressed
-                        ? src.CompressionFormat
-                        : CompressionFormat.None;
+                if (packFile.DataSource is not PackedFileSource packedFileSource)
+                    continue;
 
-                    if (!fileCounts.TryGetValue(fmt, out var cnt))
-                        fileCounts[fmt] = 1;
-                    else
-                        fileCounts[fmt] = cnt + 1;
+                var compressionFormat = packedFileSource.IsCompressed ? packedFileSource.CompressionFormat : CompressionFormat.None;
+
+                if (!fileCountsByCompressionFormat.TryGetValue(compressionFormat, out var fileCount))
+                    fileCountsByCompressionFormat[compressionFormat] = 1;
+                else
+                    fileCountsByCompressionFormat[compressionFormat] = fileCount + 1;
+
+                var fileType = string.IsNullOrWhiteSpace(packFile.Extension) ? "no_extension" : packFile.Extension;
+
+                if (!fileTypeCountsByCompressionFormat.TryGetValue(compressionFormat, out var fileTypeCounts))
+                {
+                    fileTypeCounts = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+                    fileTypeCountsByCompressionFormat[compressionFormat] = fileTypeCounts;
                 }
+
+                if (!fileTypeCounts.TryGetValue(fileType, out var fileTypeCount))
+                    fileTypeCounts[fileType] = 1;
+                else
+                    fileTypeCounts[fileType] = fileTypeCount + 1;
             }
 
-            var segments = stats
-                .OrderBy(kvp => kvp.Key)
-                .Select(kvp =>
+            var segments = new List<string>();
+
+            foreach (var compressionEntry in compressionInformation.OrderBy(compressionEntry => compressionEntry.Key))
+            {
+                var compressionFormat = compressionEntry.Key;
+                var count = fileCountsByCompressionFormat.TryGetValue(compressionFormat, out var fileCount)? fileCount : 0;
+                var diskSize = FormatSize(compressionEntry.Value.DiskSize);
+
+                var fileSizes = compressionFormat == CompressionFormat.None
+                    ? $"Disk Size: {diskSize}"
+                    : $"Disk Size: {diskSize}, Uncompressed Size: {FormatSize(compressionEntry.Value.UncompressedSize)}";
+
+                var fileTypes = string.Empty;
+                if (fileTypeCountsByCompressionFormat.TryGetValue(compressionFormat, out var fileTypeCounts) && fileTypeCounts.Count > 0)
                 {
-                    var fmt = kvp.Key;
-                    var count = fileCounts.TryGetValue(fmt, out var c) ? c : 0;
-                    var disk = FormatSize(kvp.Value.DiskSize);
+                    var fileTypeSegments = new List<string>();
 
-                    if (fmt == CompressionFormat.None)
-                        return $"{fmt}: {count} files, {disk} (Disk Size)";
+                    foreach (var fileTypeEntry in fileTypeCounts.OrderBy(fileTypeEntry => fileTypeEntry.Key, StringComparer.OrdinalIgnoreCase))
+                        fileTypeSegments.Add($"{fileTypeEntry.Key} ({fileTypeEntry.Value})");
 
-                    var unc = FormatSize(kvp.Value.UncompressedSize);
-                    return $"{fmt}: {count} files, {disk} (Disk Size), {unc} (Uncompressed Size)";
-                })
-                .ToList();
+                    fileTypes = $": {string.Join(", ", fileTypeSegments)}";
+                }
 
-            var compressionPart = $"File Compression – {string.Join(" | ", segments)}";
-            s_logger.Here().Information($"{loadingPart} | {compressionPart}");
+                segments.Add($"{compressionFormat} ({count} files, {fileSizes}){fileTypes}");
+            }
+
+            s_logger.Here().Information($"{loadingPart} | {string.Join(" | ", segments)}");
         }
 
-        public static void LogPacksCompression(IDictionary<CompressionFormat, CompressionStats> globalStats)
+        public static void LogPacksCompression(IDictionary<CompressionFormat, CompressionInformation> allCompressionInformation)
         {
-            var segments = globalStats
-                .OrderBy(kvp => kvp.Key)
-                .Select(kvp =>
+            var segments = new List<string>();
+
+            foreach (var compressionEntry in allCompressionInformation.OrderBy(compressionEntry => compressionEntry.Key))
+            {
+                var compressionFormat = compressionEntry.Key;
+                var diskSize = FormatSize(compressionEntry.Value.DiskSize);
+
+                if (compressionFormat == CompressionFormat.None)
                 {
-                    var format = kvp.Key;
-                    var diskFormatted = FormatSize(kvp.Value.DiskSize);
+                    segments.Add($"{compressionFormat}: {diskSize} (Disk Size)");
+                    continue;
+                }
 
-                    if (format == CompressionFormat.None)
-                        return $"{format}: {diskFormatted} (Disk Size)";
+                var uncompressedSize = FormatSize(compressionEntry.Value.UncompressedSize);
+                segments.Add($"{compressionFormat}: {diskSize} (Disk Size), {uncompressedSize} (Uncompressed Size)");
+            }
 
-                    var uncompressedFormatted = FormatSize(kvp.Value.UncompressedSize);
-                    return $"{format}: {diskFormatted} (Disk Size), {uncompressedFormatted} (Uncompressed Size)";
-                })
-                .ToList();
+            var totalDiskSize = FormatSize(allCompressionInformation.Values.Sum(compressionInformation => compressionInformation.DiskSize));
+            var totalUncompressedSize = FormatSize(allCompressionInformation.Values.Sum(compressionInformation => compressionInformation.UncompressedSize));
 
-            var totalDisk = globalStats.Values.Sum(stat => stat.DiskSize);
-            var totalUncompressed = globalStats.Values.Sum(stat => stat.UncompressedSize);
-
-            var totalDiskFormatted = FormatSize(totalDisk);
-            var totalUncompressedFormatted = FormatSize(totalUncompressed);
-
-            var totalSegment = $"Total: {totalDiskFormatted} (Disk Size), {totalUncompressedFormatted} (Uncompressed Size)";
+            var totalSegment = $"Total: {totalDiskSize} (Disk Size), {totalUncompressedSize} (Uncompressed Size)";
             var summary = string.Join(" | ", segments.Append(totalSegment));
 
             s_logger.Here().Information($"Size of compressed files in all packs by format - {summary}");
