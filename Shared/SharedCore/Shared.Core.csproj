@@ -34,10 +34,7 @@
 
         <!-- Libs to override stuff that gives error related to monogame-->
         <PackageReference Include="Libuv" Version="1.10.0" />
-        <PackageReference Include="System.IO.FileSystem" Version="4.3.0" />
-        <PackageReference Include="System.Net.NameResolution" Version="4.3.0" />
     </ItemGroup>
-
 
     <ItemGroup>
         <Using Include="Serilog" />
