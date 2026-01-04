@@ -42,8 +42,8 @@ namespace Editors.Audio.AudioEditor.Core.AudioProjectMutation
             usedSourceIds.UnionWith(languageSourceIds);
 
             var gameSoundBankName = Wh3SoundBankInformation.GetName(Wh3ActionEventInformation.GetSoundBank(actionEventTypeName));
-            var audioProjectFileNameWithoutExtension = Path.GetFileNameWithoutExtension(_audioEditorStateService.AudioProjectFileName);
-            var soundBankName = $"{gameSoundBankName}_{audioProjectFileNameWithoutExtension}";
+            var audioProjectNameWithoutExtension = Path.GetFileNameWithoutExtension(_audioEditorStateService.AudioProjectFileName);
+            var soundBankName = $"{gameSoundBankName}_{audioProjectNameWithoutExtension}";
             var soundBank = _audioEditorStateService.AudioProject.GetSoundBank(soundBankName);
 
             var actionEventType = Wh3ActionEventInformation.GetActionEventType(actionEventTypeName);
@@ -104,8 +104,8 @@ namespace Editors.Audio.AudioEditor.Core.AudioProjectMutation
         {
             var audioProject = _audioEditorStateService.AudioProject;
             var gameSoundBankName = Wh3SoundBankInformation.GetName(Wh3ActionEventInformation.GetSoundBank(actionEventNodeName));
-            var audioProjectFileNameWithoutExtension = Path.GetFileNameWithoutExtension(_audioEditorStateService.AudioProjectFileName);
-            var soundBankName = $"{gameSoundBankName}_{audioProjectFileNameWithoutExtension}";
+            var audioProjectNameWithoutExtension = Path.GetFileNameWithoutExtension(_audioEditorStateService.AudioProjectFileName);
+            var soundBankName = $"{gameSoundBankName}_{audioProjectNameWithoutExtension}";
 
             var soundBank = audioProject.GetSoundBank(soundBankName);
             var actionEvent = soundBank.GetActionEvent(actionEventName);

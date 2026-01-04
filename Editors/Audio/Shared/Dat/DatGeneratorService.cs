@@ -8,14 +8,14 @@ namespace Editors.Audio.Shared.Dat
 {
     public interface IDatGeneratorService
     {
-        void GenerateEventDatFile(string audioProjectFileNameWithoutExtension, List<ActionEvent> actionEvents = null, List<StateGroup> stateGroups = null);
+        void GenerateEventDatFile(string audioProjectNameWithoutExtension, List<ActionEvent> actionEvents = null, List<StateGroup> stateGroups = null);
     }
 
     public class DatGeneratorService(IFileSaveService fileSaveService) : IDatGeneratorService
     {
         private readonly IFileSaveService _fileSaveService = fileSaveService;
 
-        public void GenerateEventDatFile(string audioProjectFileNameWithoutExtension, List<ActionEvent> actionEvents = null, List<StateGroup> stateGroups = null)
+        public void GenerateEventDatFile(string audioProjectNameWithoutExtension, List<ActionEvent> actionEvents = null, List<StateGroup> stateGroups = null)
         {
             var datFile = new SoundDatFile();
 
@@ -38,7 +38,7 @@ namespace Editors.Audio.Shared.Dat
                 }
             }
 
-            var datFileName = $"event_data__{audioProjectFileNameWithoutExtension}.dat";
+            var datFileName = $"event_data__{audioProjectNameWithoutExtension}.dat";
             var datFilePath = $"audio\\wwise\\{datFileName}";
             SaveDatFileToPack(datFile, datFileName, datFilePath);
         }

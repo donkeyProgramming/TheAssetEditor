@@ -38,13 +38,13 @@ namespace Editors.Audio.Shared.AudioProject.Compiler
 
             var audioFiles = new List<AudioFile>();
             var sounds = new List<Sound>();
-            var audioProjectFileNameWithoutExtension = Path.GetFileNameWithoutExtension(audioProjectFileName);
+            var audioProjectNameWithoutExtension = Path.GetFileNameWithoutExtension(audioProjectFileName);
 
             ClearTempAudioFiles();
-            SetSoundBankData(audioProject, audioProjectFileNameWithoutExtension, audioFiles, sounds);
+            SetSoundBankData(audioProject, audioProjectNameWithoutExtension, audioFiles, sounds);
             GenerateWems(audioProject, audioFiles, sounds);
             GenerateSoundBanks(audioProject);
-            GenerateDatFiles(audioProject, audioProjectFileNameWithoutExtension);
+            GenerateDatFiles(audioProject, audioProjectNameWithoutExtension);
 
             MemoryOptimiser.Optimise();
         }
@@ -62,7 +62,7 @@ namespace Editors.Audio.Shared.AudioProject.Compiler
             }
         }
 
-        private void SetSoundBankData(AudioProjectFile audioProject, string audioProjectFileNameWithoutExtension, List<AudioFile> audioFiles, List<Sound> sounds)
+        private void SetSoundBankData(AudioProjectFile audioProject, string audioProjectNameWithoutExtension, List<AudioFile> audioFiles, List<Sound> sounds)
         {
             _logger.Here().Information($"Setting SoundBank data");
 
@@ -84,8 +84,8 @@ namespace Editors.Audio.Shared.AudioProject.Compiler
                     // 3) campaign_vo_0_audio_mixer.bnk
                     // So the dialogue events from campaign_vo_0_audio_mixer.bnk will be what take priority as they're loaded last.
 
-                    var soundBankNameBase = soundBank.Name.Replace($"_{audioProjectFileNameWithoutExtension}", string.Empty);
-                    soundBank.TestingFileName = $"{soundBankNameBase}_1_{audioProjectFileNameWithoutExtension}_for_testing.bnk";
+                    var soundBankNameBase = soundBank.Name.Replace($"_{audioProjectNameWithoutExtension}", string.Empty);
+                    soundBank.TestingFileName = $"{soundBankNameBase}_1_{audioProjectNameWithoutExtension}_for_testing.bnk";
                     soundBank.MergingFileName = $"{soundBank.Name}_for_merging.bnk";
 
                     if (soundBank.Language == Wh3LanguageInformation.GetLanguageAsString(Wh3Language.Sfx))
@@ -237,7 +237,7 @@ namespace Editors.Audio.Shared.AudioProject.Compiler
             }
         }
 
-        private void GenerateDatFiles(AudioProjectFile audioProject, string audioProjectFileNameWithoutExtension)
+        private void GenerateDatFiles(AudioProjectFile audioProject, string audioProjectNameWithoutExtension)
         {
             // The .dat file is seems to only necessary for Action Events for movies, quest battles or anything triggered via common.trigger_soundevent()
             // but without testing all the different types of Action Event sounds it's safer to just make a .dat for all.
@@ -246,17 +246,17 @@ namespace Editors.Audio.Shared.AudioProject.Compiler
             if (actionEvents.Count != 0 && audioProject.StateGroups != null && audioProject.StateGroups.Count != 0)
             {
                 _logger.Here().Information($"Generating event data .dat");
-                _datGeneratorService.GenerateEventDatFile(audioProjectFileNameWithoutExtension, actionEvents, audioProject.StateGroups);
+                _datGeneratorService.GenerateEventDatFile(audioProjectNameWithoutExtension, actionEvents, audioProject.StateGroups);
             }
             else if (actionEvents.Count != 0 && audioProject.StateGroups == null)
             {
                 _logger.Here().Information($"Generating event data .dat");
-                _datGeneratorService.GenerateEventDatFile(audioProjectFileNameWithoutExtension, actionEvents: actionEvents);
+                _datGeneratorService.GenerateEventDatFile(audioProjectNameWithoutExtension, actionEvents: actionEvents);
             }
             else if (actionEvents.Count == 0 && audioProject.StateGroups != null && audioProject.StateGroups.Count != 0)
             {
                 _logger.Here().Information($"Generating event data .dat");
-                _datGeneratorService.GenerateEventDatFile(audioProjectFileNameWithoutExtension, stateGroups: audioProject.StateGroups);
+                _datGeneratorService.GenerateEventDatFile(audioProjectNameWithoutExtension, stateGroups: audioProject.StateGroups);
             }
         }
     }

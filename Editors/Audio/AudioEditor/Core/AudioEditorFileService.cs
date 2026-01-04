@@ -76,8 +76,11 @@ namespace Editors.Audio.AudioEditor.Core
 
             var fileNameWithoutExtension = Path.GetFileNameWithoutExtension(fileName);
 
+            // We add the Audio Project name as a suffix to all SoundBank names so if the Audio Project name has changed we need to update them
+            _audioEditorIntegrityService.UpdateSoundBankNames(audioProject, fileNameWithoutExtension);
+
             // We create a 'dirty' Audio Project to display the whole model in the Audio Project Explorer rather than
-            // just the clean data from the loaded Audio Project as when it's saved any unused parts are removed.
+            // just the clean data from the loaded Audio Project as any unused parts are removed when it's saved
             var currentGame = _applicationSettingsService.CurrentSettings.CurrentGame;
             var dirtyAudioProject = AudioProjectFile.Create(audioProject, currentGame, fileNameWithoutExtension);
 

@@ -53,7 +53,7 @@ namespace Editors.Audio.Shared.GameInformation.Warhammer3
 
         public static Wh3Language? GetRequiredLanguage(Wh3SoundBank soundBank) => Information.First(definition => definition.GameSoundBank == soundBank).RequiredLanguage;
 
-        public static string GetSoundBankNameFromPrefix(string value)
+        public static string GetSoundBankNameFromSoundBankWithAudioProjectName(string value)
         {
             if (string.IsNullOrWhiteSpace(value))
                 return null;
@@ -65,5 +65,22 @@ namespace Editors.Audio.Shared.GameInformation.Warhammer3
 
             return matchingDefinition?.Name;
         }
+
+        public static string GetAudioProjectNameFromSoundBankWithAudioProjectName(string value)
+        {
+            if (string.IsNullOrWhiteSpace(value))
+                return null;
+
+            var matchingDefinition = Wh3SoundBankInformation.Information
+                .OrderByDescending(soundBankDefinition => soundBankDefinition.Name.Length)
+                .FirstOrDefault(soundBankDefinition =>
+                    value.StartsWith($"{soundBankDefinition.Name}_", StringComparison.OrdinalIgnoreCase));
+
+            if (matchingDefinition == null)
+                return null;
+
+            return value.Substring(matchingDefinition.Name.Length + 1);
+        }
+
     }
 }

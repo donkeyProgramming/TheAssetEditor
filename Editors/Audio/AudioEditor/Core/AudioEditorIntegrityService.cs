@@ -14,10 +14,11 @@ namespace Editors.Audio.AudioEditor.Core
 {
     public interface IAudioEditorIntegrityService
     {
+        void UpdateSoundBankNames(AudioProjectFile audioProject, string audioProjectNameWithoutExtension);
         void CheckDialogueEventInformationIntegrity(List<Wh3DialogueEventDefinition> dialogueEventData);
         void CheckAudioProjectDialogueEventIntegrity(AudioProjectFile audioProject);
         void CheckAudioProjectWavFilesIntegrity(AudioProjectFile audioProject);
-        void CheckAudioProjectDataIntegrity(AudioProjectFile audioProject, string audioProjectFileNameWithoutExtension);
+        void CheckAudioProjectDataIntegrity(AudioProjectFile audioProject, string audioProjectNameWithoutExtension);
         void CheckMergingSoundBanksIdIntegrity();
     }
 
@@ -25,6 +26,20 @@ namespace Editors.Audio.AudioEditor.Core
     {
         private readonly IPackFileService _packFileService = packFileService;
         private readonly IAudioRepository _audioRepository = audioRepository;
+
+        public void UpdateSoundBankNames(AudioProjectFile audioProject, string audioProjectNameWithoutExtension)
+        {
+            foreach (var soundBank in audioProject.SoundBanks)
+            {
+                var soundBankAudioProjectName = Wh3SoundBankInformation.GetAudioProjectNameFromSoundBankWithAudioProjectName(soundBank.Name);
+                if (audioProjectNameWithoutExtension != soundBankAudioProjectName)
+                {
+                    var gameSoundBankName = Wh3SoundBankInformation.GetSoundBankNameFromSoundBankWithAudioProjectName(soundBank.Name);
+                    var correctSoundBankName = $"{gameSoundBankName}_{audioProjectNameWithoutExtension}";
+                    soundBank.Name = correctSoundBankName;
+                }
+            }
+        }
 
         public void CheckDialogueEventInformationIntegrity(List<Wh3DialogueEventDefinition> information)
         {
@@ -130,7 +145,7 @@ namespace Editors.Audio.AudioEditor.Core
             }
         }
 
-        public void CheckAudioProjectDataIntegrity(AudioProjectFile audioProject, string audioProjectFileNameWithoutExtension)
+        public void CheckAudioProjectDataIntegrity(AudioProjectFile audioProject, string audioProjectNameWithoutExtension)
         {
             var usedHircIds = new HashSet<uint>();
             var usedSourceIds = new HashSet<uint>();
@@ -200,7 +215,7 @@ namespace Editors.Audio.AudioEditor.Core
 
             foreach (var soundBank in audioProject.SoundBanks)
             {
-                ResolveSoundBankDataIntegrity(audioProject, audioProjectFileNameWithoutExtension, soundBank);
+                ResolveSoundBankDataIntegrity(audioProject, audioProjectNameWithoutExtension, soundBank);
 
                 if (soundBank.ActionEvents != null)
                     ResolveActionEventDataIntegrity(usedHircIds, usedSourceIds, soundBank);
@@ -215,7 +230,7 @@ namespace Editors.Audio.AudioEditor.Core
             ResolveStateGroupDataIntegrity(audioProject);
         }
 
-        private static void ResolveSoundBankDataIntegrity(AudioProjectFile audioProject, string audioProjectFileNameWithoutExtension, SoundBank soundBank)
+        private static void ResolveSoundBankDataIntegrity(AudioProjectFile audioProject, string audioProjectNameWithoutExtension, SoundBank soundBank)
         {
             if (soundBank == null)
                 throw new InvalidOperationException("SoundBank should not be null.");
@@ -223,9 +238,9 @@ namespace Editors.Audio.AudioEditor.Core
             if (string.IsNullOrWhiteSpace(soundBank.Name))
                 throw new InvalidOperationException("SoundBank.Name should not be null or empty.");
 
-            var gameSoundBankName = Wh3SoundBankInformation.GetSoundBankNameFromPrefix(soundBank.Name);
+            var gameSoundBankName = Wh3SoundBankInformation.GetSoundBankNameFromSoundBankWithAudioProjectName(soundBank.Name);
             var gameSoundBank = Wh3SoundBankInformation.GetSoundBank(gameSoundBankName);
-            var correctSoundBankName = $"{gameSoundBankName}_{audioProjectFileNameWithoutExtension}";
+            var correctSoundBankName = $"{gameSoundBankName}_{audioProjectNameWithoutExtension}";
 
             if (soundBank.Name != correctSoundBankName)
                 throw new InvalidOperationException($"SoundBank.Name is incorrect. Expected '{correctSoundBankName}'.");
@@ -572,6 +587,17 @@ namespace Editors.Audio.AudioEditor.Core
 
                 hasClashes = true;
                 messageBuilder.AppendLine($"Language: {languageName}");
+
+                var conflictingBnks = clashingIdsById.Values
+                    .SelectMany(bnkNames => bnkNames)
+                    .Concat(clashingSourceIdsById.Values.SelectMany(bnkNames => bnkNames))
+                    .Distinct(StringComparer.OrdinalIgnoreCase)
+                    .OrderBy(name => name, StringComparer.OrdinalIgnoreCase);
+
+                foreach (var conflictingBnk in conflictingBnks)
+                    messageBuilder.AppendLine(conflictingBnk);
+
+                messageBuilder.AppendLine();
 
                 foreach (var sourceBnk in idsByBnk.Keys
                              .Union(sourceIdsByBnk.Keys, StringComparer.OrdinalIgnoreCase)
