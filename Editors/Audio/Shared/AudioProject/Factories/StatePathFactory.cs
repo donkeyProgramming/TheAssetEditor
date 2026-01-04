@@ -15,7 +15,7 @@ namespace Editors.Audio.Shared.AudioProject.Factories
     public interface IStatePathFactory
     {
         StatePathFactoryResult Create(
-            Dictionary<string, string> stateLookupByStateGroup,
+            List<KeyValuePair<string, string>> statePathList,
             List<AudioFile> audioFiles,
             HircSettings hircSettings,
             HashSet<uint> usedHircIds,
@@ -30,7 +30,7 @@ namespace Editors.Audio.Shared.AudioProject.Factories
         private readonly IRandomSequenceContainerFactory _randomSequenceContainerFactory = randomSequenceContainerFactory;
 
         public StatePathFactoryResult Create(
-            Dictionary<string, string> stateLookupByStateGroup, 
+            List<KeyValuePair<string, string>> statePathList, 
             List<AudioFile> audioFiles, 
             HircSettings hircSettings,
             HashSet<uint> usedHircIds,
@@ -41,7 +41,7 @@ namespace Editors.Audio.Shared.AudioProject.Factories
             var statePathFactoryResult = new StatePathFactoryResult();
             var statePathNodes = new List<StatePath.Node>();
 
-            foreach (var kvp in stateLookupByStateGroup)
+            foreach (var kvp in statePathList)
             {
                 var stateGroupName = kvp.Key;
                 var stateGroup = StateGroup.Create(stateGroupName);
