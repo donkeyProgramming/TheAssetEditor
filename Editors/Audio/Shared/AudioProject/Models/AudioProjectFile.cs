@@ -178,6 +178,20 @@ namespace Editors.Audio.Shared.AudioProject.Models
 
         public AudioFile GetAudioFile(uint sourceId) => AudioFiles.FirstOrDefault(audioFile => audioFile.Id == sourceId);
 
+        public List<AudioFile> GetAudioFiles(SoundBank soundBank, RandomSequenceContainer randomSequenceContainer)
+        {
+            var audioFiles = new List<AudioFile>();
+            var orderedSounds = soundBank.GetSounds(randomSequenceContainer.Children)
+                .OrderBy(sound => sound.PlaylistOrder)
+                .ToList();
+            foreach (var orderedSound in orderedSounds)
+            {
+                var audioFile = GetAudioFile(orderedSound.SourceId);
+                audioFiles.Add(audioFile);
+            }
+            return audioFiles;
+        }
+
         public List<SoundBank> GetSoundBanksWithActionEvents()
         {
             return SoundBanks.Where(soundBank => soundBank.ActionEvents != null && soundBank.ActionEvents.Count != 0).ToList();

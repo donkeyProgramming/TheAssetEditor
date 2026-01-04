@@ -10,6 +10,7 @@ namespace Editors.Audio.AudioEditor.Commands
     public enum MutationType
     {
         Add,
+        AddByPaste,
         Remove
     }
 

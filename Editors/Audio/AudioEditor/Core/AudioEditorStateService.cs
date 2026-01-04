@@ -14,6 +14,7 @@ namespace Editors.Audio.AudioEditor.Core
 
         // Audio Project Explorer
         AudioProjectTreeNode SelectedAudioProjectExplorerNode { get; set; }
+        AudioProjectTreeNode CopiedFromAudioProjectExplorerNode { get; set; }
 
         // Audio Project Editor
         bool ShowModdedStatesOnly { get; set; }
@@ -30,6 +31,7 @@ namespace Editors.Audio.AudioEditor.Core
         public void StoreAudioProjectFileName(string audioProjectFileName);
         public void StoreAudioProjectFilePath(string audioProjectFilePath);
         void StoreSelectedAudioProjectExplorerNode(AudioProjectTreeNode node);
+        void StoreCopiedFromAudioProjectExplorerNode(AudioProjectTreeNode node); 
         void StoreModdedStatesOnly(bool moddedStatesOnly);
         void StoreHircSettings(HircSettings hircSettings);
         void StoreAudioFiles(List<AudioFile> audioFiles); 
@@ -44,6 +46,7 @@ namespace Editors.Audio.AudioEditor.Core
         public string AudioProjectFileName { get; set; }
         public string AudioProjectFilePath { get; set; }
         public AudioProjectTreeNode SelectedAudioProjectExplorerNode { get; set; }
+        public AudioProjectTreeNode CopiedFromAudioProjectExplorerNode { get; set; }
         public bool ShowModdedStatesOnly { get; set; }
         public HircSettings HircSettings { get; set; }
         public List<AudioFile> AudioFiles { get; set; } = [];
@@ -57,6 +60,8 @@ namespace Editors.Audio.AudioEditor.Core
         public void StoreAudioProjectFilePath(string audioProjectFilePath) => AudioProjectFilePath = audioProjectFilePath;
 
         public void StoreSelectedAudioProjectExplorerNode(AudioProjectTreeNode node) => SelectedAudioProjectExplorerNode = node;
+
+        public void StoreCopiedFromAudioProjectExplorerNode(AudioProjectTreeNode node) => CopiedFromAudioProjectExplorerNode = node;
 
         public void StoreModdedStatesOnly(bool showModdedStatesOnly) => ShowModdedStatesOnly = showModdedStatesOnly;
 
@@ -74,6 +79,7 @@ namespace Editors.Audio.AudioEditor.Core
             AudioProjectFileName = null;
             AudioProjectFilePath = null;
             SelectedAudioProjectExplorerNode = null;
+            CopiedFromAudioProjectExplorerNode = null;
             ShowModdedStatesOnly = false;
             HircSettings = null;
             AudioFiles.Clear();
