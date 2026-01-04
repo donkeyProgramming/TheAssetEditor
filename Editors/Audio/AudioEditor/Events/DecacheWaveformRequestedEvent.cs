@@ -2,5 +2,5 @@
 
 namespace Editors.Audio.AudioEditor.Events
 {
-    public record AudioFileSelectedEvent(List<string> WavFilePaths);
+    public record DecacheWaveformRequestedEvent(List<string> FilePaths);
 }

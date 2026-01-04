@@ -63,10 +63,11 @@ namespace Editors.Audio.AudioEditor.Presentation.WaveformVisualiser
             _waveformRendererService = waveformRendererService;
             _waveformVisualisationCacheService = waveformVisualisationCacheService;
 
-            _eventHub.Register<AudioFileSelectedEvent>(this, OnAudioFileSelected);
+            _eventHub.Register<AudioFilesExplorerNodeSelectedEvent>(this, AudioFilesExplorerNodeSelected);
+            _eventHub.Register<AudioFilesChangedEvent>(this, OnAudioFilesChanged);
             _eventHub.Register<PlayAudioRequestedEvent>(this, OnPlayAudioRequested);
-            _eventHub.Register<AddToWaveformCacheRequestedEvent>(this, OnAddToWaveformCacheRequested);
-            _eventHub.Register<RemoveFromWaveformCacheRequestedEvent>(this, OnRemoveFromWaveformCacheRequested);
+            _eventHub.Register<CacheWaveformRequestedEvent>(this, OnCacheWaveformRequested);
+            _eventHub.Register<DecacheWaveformRequestedEvent>(this, OnDecacheWaveformRequested);
 
             _soundEngine.PlaybackStopped += OnPlaybackStopped;
 
@@ -75,23 +76,25 @@ namespace Editors.Audio.AudioEditor.Presentation.WaveformVisualiser
             UpdateWaveformVisualiserLabel();
         }
 
-        public void OnAudioFileSelected(AudioFileSelectedEvent e)
+        public void AudioFilesExplorerNodeSelected(AudioFilesExplorerNodeSelectedEvent e) => SetSelectedPlaylist(e.WavFilePaths);
+
+        public void OnAudioFilesChanged(AudioFilesChangedEvent e)
         {
-            SetSelectedPlaylist(e.WavFilePaths);
+            var wavFilePaths = e.AudioFiles
+                .Select(audioFile => audioFile.WavPackFilePath)
+                .Where(filePath => !string.IsNullOrWhiteSpace(filePath))
+                .ToList();
+            SetSelectedPlaylist(wavFilePaths);
         }
 
-        public void OnPlayAudioRequested(PlayAudioRequestedEvent e)
-        {
-            SetSelectedPlaylist(e.WavFilePaths);
-            PlayPause();
-        }
+        public void OnPlayAudioRequested(PlayAudioRequestedEvent e) => PlayPause();
 
-        public void OnAddToWaveformCacheRequested(AddToWaveformCacheRequestedEvent e)
+        public void OnCacheWaveformRequested(CacheWaveformRequestedEvent e)
         {
             LoadWaveformImagesIntoCacheForCurrentWidth(e.FilePaths);
         }
 
-        public void OnRemoveFromWaveformCacheRequested(RemoveFromWaveformCacheRequestedEvent e)
+        public void OnDecacheWaveformRequested(DecacheWaveformRequestedEvent e)
         {
             var filePathsInUse = new HashSet<string>(_currentPlaylistFilePaths, StringComparer.OrdinalIgnoreCase);
             if (!string.IsNullOrWhiteSpace(_currentFilePathKey))
@@ -182,15 +185,15 @@ namespace Editors.Audio.AudioEditor.Presentation.WaveformVisualiser
         {
             var targetWidth = GetTargetWidth();
 
-            var filePathssNeedingRebuild = _currentPlaylistFilePaths
-                .Where(filePath => !_waveformVisualisationCacheService.GetWaveformVisualisation(filePath, targetWidth, out _))
+            var filePathsNeedingRebuild = _currentPlaylistFilePaths
+                .Where(filePath => _waveformVisualisationCacheService.GetWaveformVisualisation(filePath, targetWidth) == null)
                 .Where(filePath => !string.Equals(filePath, _currentFilePathKey, StringComparison.OrdinalIgnoreCase))
                 .ToArray();
 
-            if (filePathssNeedingRebuild.Length == 0)
+            if (filePathsNeedingRebuild.Length == 0)
                 return;
 
-            LoadWaveformImagesIntoCacheForCurrentWidth(filePathssNeedingRebuild);
+            LoadWaveformImagesIntoCacheForCurrentWidth(filePathsNeedingRebuild);
         }
 
         [RelayCommand] private void PlayPause()
@@ -201,7 +204,10 @@ namespace Editors.Audio.AudioEditor.Presentation.WaveformVisualiser
             if (_soundEngine.PlaybackState == PlaybackState.Stopped)
             {
                 _soundEngine.LoadFromFilePath(_currentFilePathKey);
+
+                _visualSeconds = 0;
                 CurrentPlaybackTime = TimeSpan.Zero;
+                ResetWaveformPlayheadAndProgress();
             }
 
             _soundEngine.PlayPause();
@@ -231,10 +237,11 @@ namespace Editors.Audio.AudioEditor.Presentation.WaveformVisualiser
             {
                 var targetWidth = GetTargetWidth();
 
-                if (_waveformVisualisationCacheService.GetWaveformVisualisation(_currentFilePathKey, targetWidth, out var cached))
+                var cachedResult = _waveformVisualisationCacheService.GetWaveformVisualisation(_currentFilePathKey, targetWidth);
+                if (cachedResult != null)
                 {
-                    ApplyWaveformBitmaps(cached.Visualisation.BaseImage, cached.Visualisation.OverlayImage);
-                    TotalPlaybackTime = cached.TotalTime;
+                    ApplyWaveformBitmaps(cachedResult.Visualisation.BaseImage, cachedResult.Visualisation.OverlayImage);
+                    TotalPlaybackTime = cachedResult.TotalTime;
                     return;
                 }
 
@@ -244,7 +251,6 @@ namespace Editors.Audio.AudioEditor.Presentation.WaveformVisualiser
                 ApplyWaveformBitmaps(result.Visualisation.BaseImage, result.Visualisation.OverlayImage);
                 TotalPlaybackTime = result.TotalTime;
             }
-            catch (OperationCanceledException) { }
             finally
             {
                 _waveformRenderGate.Release();
@@ -392,10 +398,7 @@ namespace Editors.Audio.AudioEditor.Presentation.WaveformVisualiser
             });
         }
 
-        private void ResetWaveformPlayheadAndProgress()
-        {
-            AudioWaveformOverlayClip = new Rect(0, 0, 0, WaveformPixelHeight);
-        }
+        private void ResetWaveformPlayheadAndProgress() => AudioWaveformOverlayClip = new Rect(0, 0, 0, WaveformPixelHeight);
 
         private void LoadWaveformImagesIntoCacheForCurrentWidth(IEnumerable<string> filePaths)
         {
@@ -453,9 +456,6 @@ namespace Editors.Audio.AudioEditor.Presentation.WaveformVisualiser
             }
         }
 
-        public void SetSelectedHostWidth(double width)
-        {
-            HostWidth = width;
-        }
+        public void SetSelectedHostWidth(double width) => HostWidth = width;
     }
 }

@@ -4,7 +4,6 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using Editors.Audio.AudioEditor.Commands;
 using Editors.Audio.AudioEditor.Core;
 using Editors.Audio.AudioEditor.Events;
 using Editors.Audio.AudioEditor.Presentation.Shared;
@@ -517,7 +516,8 @@ namespace Editors.Audio.AudioEditor.Presentation.Settings
 
         [RelayCommand] public void PlayWav(AudioFile audioFile)
         {
-            _uiCommandFactory.Create<PlayAudioFileCommand>().Execute(audioFile.WavPackFileName, audioFile.WavPackFilePath);
+            var wavFilePaths = new List<string> { audioFile.WavPackFilePath };
+            _eventHub.Publish(new PlayAudioRequestedEvent(wavFilePaths));
         }
 
         private void SetInitialSettings()

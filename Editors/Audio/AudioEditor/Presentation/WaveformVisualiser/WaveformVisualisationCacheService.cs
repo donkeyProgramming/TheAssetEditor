@@ -9,7 +9,7 @@ namespace Editors.Audio.AudioEditor.Presentation.WaveformVisualiser
 {
     public interface IWaveformVisualisationCacheService
     {
-        bool GetWaveformVisualisation(string filePath, int targetWidth, out WaveformRenderResult waveformRenderResult);
+        WaveformRenderResult GetWaveformVisualisation(string filePath, int targetWidth);
         void Store(string filePath, WaveformRenderResult waveformRenderResult);
         void Remove(string filePath);
         Task PreloadWaveformVisualisationsAsync(IEnumerable<string> filePaths, int targetWidth, IWaveformRendererService renderService, CancellationToken cancellationToken);
@@ -21,16 +21,15 @@ namespace Editors.Audio.AudioEditor.Presentation.WaveformVisualiser
         private readonly ConcurrentDictionary<string, byte> _preloadInProgressByFilePath = new();
         private readonly ConcurrentDictionary<string, byte> _removedDuringPreloadByFilePath = new();
 
-        public bool GetWaveformVisualisation(string filePath, int targetWidth, out WaveformRenderResult waveformRenderResult)
+        public WaveformRenderResult GetWaveformVisualisation(string filePath, int targetWidth)
         {
-            if (_visualisationByFilePath.TryGetValue(filePath, out var cached) && cached.PixelWidth == targetWidth)
-            {
-                waveformRenderResult = cached;
-                return true;
-            }
+            if (string.IsNullOrWhiteSpace(filePath))
+                return null;
 
-            waveformRenderResult = null;
-            return false;
+            if (_visualisationByFilePath.TryGetValue(filePath, out var cached) && cached.PixelWidth == targetWidth)
+                return cached;
+
+            return null;
         }
 
         public void Store(string filePath, WaveformRenderResult waveformRenderResult)

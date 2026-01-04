@@ -76,7 +76,6 @@ namespace Editors.Audio
             serviceCollection.AddScoped<OpenMovieFileSelectionWindowCommand>();
             serviceCollection.AddScoped<OpenNewAudioProjectWindowCommand>();
             serviceCollection.AddScoped<PasteViewerRowsCommand>();
-            serviceCollection.AddScoped<PlayAudioFileCommand>();
             serviceCollection.AddScoped<RemoveViewerRowsCommand>();
             serviceCollection.AddScoped<SetAudioFilesCommand>();
             serviceCollection.AddScoped<IAudioProjectMutationUICommandFactory, AudioProjectMutationUICommandFactory>();

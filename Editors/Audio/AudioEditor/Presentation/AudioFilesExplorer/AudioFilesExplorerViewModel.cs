@@ -75,7 +75,7 @@ namespace Editors.Audio.AudioEditor.Presentation.AudioFilesExplorer
             AudioFilesTree = _audioFilesTreeBuilder.BuildTree(editablePack);
             SetupIsExpandedHandlers(AudioFilesTree);
 
-            CacheRootWavFilesInWaveformVisualiser();
+            CacheRootWaveformVisualisations();
         }
 
         private void SetupIsExpandedHandlers(ObservableCollection<AudioFilesTreeNode> nodes)
@@ -90,7 +90,7 @@ namespace Editors.Audio.AudioEditor.Presentation.AudioFilesExplorer
             }
         }
 
-        private void CacheRootWavFilesInWaveformVisualiser()
+        private void CacheRootWaveformVisualisations()
         {
             var wavFilePaths = new List<string>();
             foreach (var node in AudioFilesTree)
@@ -100,7 +100,7 @@ namespace Editors.Audio.AudioEditor.Presentation.AudioFilesExplorer
             }
 
             if (wavFilePaths.Count > 0)
-                _eventHub.Publish(new AddToWaveformCacheRequestedEvent(wavFilePaths));
+                _eventHub.Publish(new CacheWaveformRequestedEvent(wavFilePaths));
         }
 
         private void OnNodeIsExpandedChanged(object sender, bool isExpanded)
@@ -119,9 +119,9 @@ namespace Editors.Audio.AudioEditor.Presentation.AudioFilesExplorer
                     return;
 
                 if (isExpanded)
-                    _eventHub.Publish(new AddToWaveformCacheRequestedEvent(wavFilePaths));
+                    _eventHub.Publish(new CacheWaveformRequestedEvent(wavFilePaths));
                 else
-                    _eventHub.Publish(new RemoveFromWaveformCacheRequestedEvent(wavFilePaths));
+                    _eventHub.Publish(new DecacheWaveformRequestedEvent(wavFilePaths)); 
             }
         }
 
@@ -145,7 +145,7 @@ namespace Editors.Audio.AudioEditor.Presentation.AudioFilesExplorer
         private void RefreshAudioFilesTree(PackFileContainer packFileContainer)
         {
             AudioFilesTree = _audioFilesTreeBuilder.BuildTree(packFileContainer);
-            CacheRootWavFilesInWaveformVisualiser();
+            CacheRootWaveformVisualisations();
         }
 
         private void OnSelectedTreeNodesChanged(object sender, NotifyCollectionChangedEventArgs e)
@@ -155,7 +155,7 @@ namespace Editors.Audio.AudioEditor.Presentation.AudioFilesExplorer
             if (selectedWavNodes != null && selectedWavNodes.Count == 1)
             {
                 var wavFilePaths = new List<string> { selectedWavNodes[0].FilePath };
-                _eventHub.Publish(new AudioFileSelectedEvent(wavFilePaths));
+                _eventHub.Publish(new AudioFilesExplorerNodeSelectedEvent(wavFilePaths));
             }
 
             SetButtonEnablement();

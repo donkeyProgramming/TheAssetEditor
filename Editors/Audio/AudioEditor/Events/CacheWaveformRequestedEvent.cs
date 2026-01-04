@@ -2,5 +2,5 @@
 
 namespace Editors.Audio.AudioEditor.Events
 {
-    public record RemoveFromWaveformCacheRequestedEvent(List<string> FilePaths);
+    public record CacheWaveformRequestedEvent(List<string> FilePaths);
 }
