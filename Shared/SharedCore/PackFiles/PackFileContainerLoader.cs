@@ -110,7 +110,7 @@ namespace Shared.Core.PackFiles
                 }
 
                 var packList = new List<PackFileContainer>();
-                var packsCompressionStats = new ConcurrentDictionary<CompressionFormat, CompressionStats>();
+                var packsCompressionStats = new ConcurrentDictionary<CompressionFormat, CompressionInformation>();
 
                 Parallel.ForEach(allCaPackFiles, packFilePath =>
                 {
@@ -124,11 +124,11 @@ namespace Shared.Core.PackFiles
                         packList.Add(pack);
 
                         PackFileLog.LogPackCompression(pack);
-                        var packCompressionStats = PackFileLog.GetCompressionStats(pack);
+                        var packCompressionStats = PackFileLog.GetCompressionInformation(pack);
                         foreach (var kvp in packCompressionStats)
                         {
                             if (!packsCompressionStats.TryGetValue(kvp.Key, out var existingStats))
-                                packsCompressionStats[kvp.Key] = new CompressionStats(kvp.Value.DiskSize, kvp.Value.UncompressedSize);
+                                packsCompressionStats[kvp.Key] = new CompressionInformation(kvp.Value.DiskSize, kvp.Value.UncompressedSize);
                             else
                                 existingStats.Add(kvp.Value);
                         }
