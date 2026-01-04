@@ -9,33 +9,33 @@ namespace Editors.Audio.AudioEditor.Presentation.WaveformVisualiser
 {
     public interface IWaveformVisualisationCacheService
     {
-        bool GetWaveformVisualisation(string filePath, int targetWidth, out WaveformVisualisation visualisation);
-        void Store(string filePath, WaveformVisualisation visualisation);
+        bool GetWaveformVisualisation(string filePath, int targetWidth, out WaveformRenderResult waveformRenderResult);
+        void Store(string filePath, WaveformRenderResult waveformRenderResult);
         void Remove(string filePath);
         Task PreloadWaveformVisualisationsAsync(IEnumerable<string> filePaths, int targetWidth, IWaveformRendererService renderService, CancellationToken cancellationToken);
     }
 
     public sealed class WaveformVisualisationCacheService : IWaveformVisualisationCacheService
     {
-        private readonly ConcurrentDictionary<string, WaveformVisualisation> _visualisationByFilePath = new();
+        private readonly ConcurrentDictionary<string, WaveformRenderResult> _visualisationByFilePath = new();
         private readonly ConcurrentDictionary<string, byte> _preloadInProgressByFilePath = new();
         private readonly ConcurrentDictionary<string, byte> _removedDuringPreloadByFilePath = new();
 
-        public bool GetWaveformVisualisation(string filePath, int targetWidth, out WaveformVisualisation waveformVisualisation)
+        public bool GetWaveformVisualisation(string filePath, int targetWidth, out WaveformRenderResult waveformRenderResult)
         {
             if (_visualisationByFilePath.TryGetValue(filePath, out var cached) && cached.PixelWidth == targetWidth)
             {
-                waveformVisualisation = cached;
+                waveformRenderResult = cached;
                 return true;
             }
 
-            waveformVisualisation = null;
+            waveformRenderResult = null;
             return false;
         }
 
-        public void Store(string filePath, WaveformVisualisation visualisation)
+        public void Store(string filePath, WaveformRenderResult waveformRenderResult)
         {
-            _visualisationByFilePath[filePath] = visualisation;
+            _visualisationByFilePath[filePath] = waveformRenderResult;
         }
 
         public void Remove(string filePath)
@@ -71,12 +71,12 @@ namespace Editors.Audio.AudioEditor.Presentation.WaveformVisualiser
                     {
                         _removedDuringPreloadByFilePath.TryRemove(filePath, out _);
 
-                        var waveformVisualisation = await renderService.RenderAsync(filePath, targetWidth, cancellationToken).ConfigureAwait(false);
+                        var waveformRenderResult = await renderService.RenderAsync(filePath, targetWidth, cancellationToken).ConfigureAwait(false);
 
                         if (_removedDuringPreloadByFilePath.ContainsKey(filePath))
                             return;
 
-                        _visualisationByFilePath[filePath] = waveformVisualisation;
+                        _visualisationByFilePath[filePath] = waveformRenderResult;
                     }
                     finally
                     {

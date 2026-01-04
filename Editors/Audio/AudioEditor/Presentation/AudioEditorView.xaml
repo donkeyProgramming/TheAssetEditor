@@ -111,7 +111,7 @@
                         <RowDefinition 
                             Height="Auto"/>
                         <RowDefinition 
-                            Height="150"/>
+                            Height="161"/>
                     </Grid.RowDefinitions>
 
                     <AudioProjectExplorer:AudioProjectExplorerView

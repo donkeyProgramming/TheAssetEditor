@@ -13,15 +13,12 @@ namespace Editors.Audio.Shared.Wwise
         TimeSpan ReaderTimeAtLastPlayOrResume { get; }
         long DeviceBytesAtLastPlayOrResume { get; }
         PlaybackState PlaybackState { get; }
-
         void LoadFromFilePath(string filePath);
         void Stop();
         void PlayPause();
-
         TimeSpan GetDeviceAlignedTimeNow();
         int GetDeviceBytesPerSecond();
         long GetDeviceBytes();
-
         event EventHandler<StoppedEventArgs> PlaybackStopped;
     }
 
@@ -29,9 +26,9 @@ namespace Editors.Audio.Shared.Wwise
     {
         private readonly IPackFileService _packFileService = packFileService;
 
-        private IWavePlayer _audioWaveOutputDevice;
-        private WaveFileReader _waveReader;
-        private MemoryStream _audioDataStream;
+        private IWavePlayer _wavePlayer;
+        private WaveFileReader _waveFileReader;
+        private MemoryStream _memoryStream;
 
         public TimeSpan TotalPlaybackTime { get; private set; } = TimeSpan.Zero;
         public TimeSpan ReaderTimeAtLastPlayOrResume { get; private set; } = TimeSpan.Zero;
@@ -41,9 +38,9 @@ namespace Editors.Audio.Shared.Wwise
         {
             get
             {
-                if (_audioWaveOutputDevice == null)
+                if (_wavePlayer == null)
                     return PlaybackState.Stopped;
-                return _audioWaveOutputDevice.PlaybackState;
+                return _wavePlayer.PlaybackState;
             }
         }
 
@@ -59,66 +56,66 @@ namespace Editors.Audio.Shared.Wwise
             var packFile = _packFileService.FindFile(filePath);
             var data = packFile.DataSource.ReadData();
 
-            _audioDataStream = new MemoryStream(data, writable: false);
-            _waveReader = new WaveFileReader(_audioDataStream);
+            _memoryStream = new MemoryStream(data, writable: false);
+            _waveFileReader = new WaveFileReader(_memoryStream);
 
-            TotalPlaybackTime = _waveReader.TotalTime;
-            ReaderTimeAtLastPlayOrResume = _waveReader.CurrentTime;
+            TotalPlaybackTime = _waveFileReader.TotalTime;
+            ReaderTimeAtLastPlayOrResume = _waveFileReader.CurrentTime;
             DeviceBytesAtLastPlayOrResume = 0;
 
-            if (_audioWaveOutputDevice != null)
+            if (_wavePlayer != null)
             {
-                _audioWaveOutputDevice.PlaybackStopped -= OnPlaybackStoppedForward;
-                _audioWaveOutputDevice.Dispose();
-                _audioWaveOutputDevice = null;
+                _wavePlayer.PlaybackStopped -= OnPlaybackStoppedForward;
+                _wavePlayer.Dispose();
+                _wavePlayer = null;
             }
         }
 
         public void PlayPause()
         {
-            if (_audioWaveOutputDevice == null)
+            if (_wavePlayer == null)
             {
                 EnsureOutputDeviceCreated();
 
-                _audioWaveOutputDevice.Init(_waveReader);
-                _audioWaveOutputDevice.PlaybackStopped += OnPlaybackStoppedForward;
+                _wavePlayer.Init(_waveFileReader);
+                _wavePlayer.PlaybackStopped += OnPlaybackStoppedForward;
 
-                ReaderTimeAtLastPlayOrResume = _waveReader.CurrentTime;
+                ReaderTimeAtLastPlayOrResume = _waveFileReader.CurrentTime;
                 DeviceBytesAtLastPlayOrResume = GetDeviceBytes();
 
-                TotalPlaybackTime = _waveReader.TotalTime;
+                TotalPlaybackTime = _waveFileReader.TotalTime;
 
-                _audioWaveOutputDevice.Play();
+                _wavePlayer.Play();
                 return;
             }
 
-            if (_audioWaveOutputDevice.PlaybackState == PlaybackState.Playing)
+            if (_wavePlayer.PlaybackState == PlaybackState.Playing)
             {
                 ReaderTimeAtLastPlayOrResume = GetDeviceAlignedTimeNow();
-                _audioWaveOutputDevice.Pause();
+                _wavePlayer.Pause();
             }
-            else if (_audioWaveOutputDevice.PlaybackState == PlaybackState.Paused)
+            else if (_wavePlayer.PlaybackState == PlaybackState.Paused)
             {
                 DeviceBytesAtLastPlayOrResume = GetDeviceBytes();
-                _audioWaveOutputDevice.Play();
+                _wavePlayer.Play();
             }
-            else if (_audioWaveOutputDevice.PlaybackState == PlaybackState.Stopped)
+            else if (_wavePlayer.PlaybackState == PlaybackState.Stopped)
             {
-                _waveReader.Position = 0;
+                _waveFileReader.Position = 0;
                 ReaderTimeAtLastPlayOrResume = TimeSpan.Zero;
                 DeviceBytesAtLastPlayOrResume = GetDeviceBytes();
-                _audioWaveOutputDevice.Play();
+                _wavePlayer.Play();
             }
         }
 
         public void Stop()
         {
-            if (_audioWaveOutputDevice == null)
+            if (_wavePlayer == null)
                 return;
 
-            _audioWaveOutputDevice.Stop();
-            if (_waveReader != null)
-                _waveReader.Position = 0;
+            _wavePlayer.Stop();
+            if (_waveFileReader != null)
+                _waveFileReader.Position = 0;
 
             ReaderTimeAtLastPlayOrResume = TimeSpan.Zero;
             DeviceBytesAtLastPlayOrResume = 0;
@@ -134,32 +131,32 @@ namespace Editors.Audio.Shared.Wwise
 
         public long GetDeviceBytes()
         {
-            if (_audioWaveOutputDevice is IWavePosition position)
+            if (_wavePlayer is IWavePosition position)
                 return position.GetPosition();
             return 0L;
         }
 
         public int GetDeviceBytesPerSecond()
         {
-            if (_audioWaveOutputDevice is IWavePosition position)
+            if (_wavePlayer is IWavePosition position)
                 return position.OutputWaveFormat.AverageBytesPerSecond;
-            if (_waveReader != null)
-                return _waveReader.WaveFormat.AverageBytesPerSecond;
+            if (_waveFileReader != null)
+                return _waveFileReader.WaveFormat.AverageBytesPerSecond;
             return 1;
         }
 
         private void EnsureOutputDeviceCreated()
         {
-            if (_audioWaveOutputDevice != null)
+            if (_wavePlayer != null)
                 return;
 
             try
             {
-                _audioWaveOutputDevice = new WasapiOut(AudioClientShareMode.Shared, true, 100);
+                _wavePlayer = new WasapiOut(AudioClientShareMode.Shared, true, 100);
             }
             catch
             {
-                _audioWaveOutputDevice = new WaveOutEvent { DesiredLatency = 150, NumberOfBuffers = 3 };
+                _wavePlayer = new WaveOutEvent { DesiredLatency = 150, NumberOfBuffers = 3 };
             }
         }
 
@@ -174,27 +171,27 @@ namespace Editors.Audio.Shared.Wwise
 
         private void DisposeReaderOnly()
         {
-            if (_waveReader != null)
+            if (_waveFileReader != null)
             {
-                _waveReader.Dispose();
-                _waveReader = null;
+                _waveFileReader.Dispose();
+                _waveFileReader = null;
             }
 
-            if (_audioDataStream != null)
+            if (_memoryStream != null)
             {
-                _audioDataStream.Dispose();
-                _audioDataStream = null;
+                _memoryStream.Dispose();
+                _memoryStream = null;
             }
         }
 
         public void Dispose()
         {
-            if (_audioWaveOutputDevice != null)
+            if (_wavePlayer != null)
             {
-                _audioWaveOutputDevice.PlaybackStopped -= OnPlaybackStoppedForward;
-                _audioWaveOutputDevice.Stop();
-                _audioWaveOutputDevice.Dispose();
-                _audioWaveOutputDevice = null;
+                _wavePlayer.PlaybackStopped -= OnPlaybackStoppedForward;
+                _wavePlayer.Stop();
+                _wavePlayer.Dispose();
+                _wavePlayer = null;
             }
 
             DisposeReaderOnly();

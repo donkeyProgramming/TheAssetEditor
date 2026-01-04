@@ -12,9 +12,11 @@ using DrawingImage = System.Drawing.Image;
 
 namespace Editors.Audio.AudioEditor.Presentation.WaveformVisualiser
 {
+    public record WaveformRenderResult(WaveformVisualisation Visualisation, TimeSpan TotalTime, int PixelWidth);
+
     public interface IWaveformRendererService
     {
-        Task<WaveformVisualisation> RenderAsync(string filePathKey, int targetWidth, CancellationToken cancellationToken);
+        Task<WaveformRenderResult> RenderAsync(string filePathKey, int targetWidth, CancellationToken cancellationToken);
     }
 
     public sealed class WaveformRendererService(IPackFileService packFileService) : IWaveformRendererService
@@ -24,7 +26,7 @@ namespace Editors.Audio.AudioEditor.Presentation.WaveformVisualiser
         public static int DefaultPixelsPerPeak { get; set; } = 2;
         public static int DefaultSpacerPixels { get; set; } = 1;
 
-        public async Task<WaveformVisualisation> RenderAsync(string filePathKey, int targetWidth, CancellationToken cancellationToken)
+        public async Task<WaveformRenderResult> RenderAsync(string filePathKey, int targetWidth, CancellationToken cancellationToken)
         {
             if (string.IsNullOrWhiteSpace(filePathKey))
                 throw new ArgumentNullException(nameof(filePathKey));
@@ -38,7 +40,7 @@ namespace Editors.Audio.AudioEditor.Presentation.WaveformVisualiser
             return await Task.Run(() => RenderWaveformFromBytes(data, packFile.Extension, baseSettings, overlaySettings), cancellationToken).ConfigureAwait(false);
         }
 
-        private static WaveformVisualisation RenderWaveformFromBytes(byte[] data, string extension, WaveFormRendererSettings baseSettings, WaveFormRendererSettings overlaySettings)
+        private static WaveformRenderResult RenderWaveformFromBytes(byte[] data, string extension, WaveFormRendererSettings baseSettings, WaveFormRendererSettings overlaySettings)
         {
             using var memoryStream = new MemoryStream(data, writable: false);
             using var waveStream = new WaveFileReader(memoryStream);
@@ -53,7 +55,11 @@ namespace Editors.Audio.AudioEditor.Presentation.WaveformVisualiser
             var baseBitmap = ToBitmapImage(baseImageDrawing);
             var overlayBitmap = ToBitmapImage(overlayImageDrawing);
 
-            return WaveformVisualisation.Create(baseBitmap, overlayBitmap);
+            var waveformVisualisation = WaveformVisualisation.Create(baseBitmap, overlayBitmap);
+            var totalTime = waveStream.TotalTime;
+            var pixelWidth = baseBitmap.PixelWidth;
+
+            return new WaveformRenderResult(waveformVisualisation, totalTime, pixelWidth);
         }
 
         private static SoundCloudBlockWaveFormSettings CreateBaseWaveformSettings(int width)

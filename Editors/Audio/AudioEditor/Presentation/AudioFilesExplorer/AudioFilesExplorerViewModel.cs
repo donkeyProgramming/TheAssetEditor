@@ -151,17 +151,15 @@ namespace Editors.Audio.AudioEditor.Presentation.AudioFilesExplorer
         private void OnSelectedTreeNodesChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
             var selectedWavNodes = GetSelectedWavNodes();
-            var wavFilePaths = new List<string>();
 
-            foreach (var node in selectedWavNodes)
-                wavFilePaths.Add(node.FilePath);
-
-            if (wavFilePaths.Count > 0)
-                _eventHub.Publish(new DisplayWaveformVisualiserRequestedEvent(wavFilePaths));
+            if (selectedWavNodes != null && selectedWavNodes.Count == 1)
+            {
+                var wavFilePaths = new List<string> { selectedWavNodes[0].FilePath };
+                _eventHub.Publish(new AudioFileSelectedEvent(wavFilePaths));
+            }
 
             SetButtonEnablement();
         }
-
 
         private List<AudioFilesTreeNode> GetSelectedWavNodes()
         {
@@ -174,7 +172,6 @@ namespace Editors.Audio.AudioEditor.Presentation.AudioFilesExplorer
                     result.Add(node);
             return result;
         }
-
 
         private void SetButtonEnablement()
         {
@@ -199,7 +196,6 @@ namespace Editors.Audio.AudioEditor.Presentation.AudioFilesExplorer
             IsSetAudioFilesButtonEnabled = false;
             IsAddAudioFilesButtonEnabled = false;
         }
-
 
         partial void OnFilterQueryChanged(string value) => DebounceFilterAudioFilesTreeForFilterQuery();
 
@@ -251,6 +247,7 @@ namespace Editors.Audio.AudioEditor.Presentation.AudioFilesExplorer
             var selectedWavs = GetSelectedWavNodes();
             if (selectedWavs.Count == 0)
                 return;
+
             _uiCommandFactory.Create<SetAudioFilesCommand>().Execute(selectedWavs, false);
         }
 
@@ -259,17 +256,18 @@ namespace Editors.Audio.AudioEditor.Presentation.AudioFilesExplorer
             var selectedWavs = GetSelectedWavNodes();
             if (selectedWavs.Count == 0)
                 return;
+
             _uiCommandFactory.Create<SetAudioFilesCommand>().Execute(selectedWavs, true);
         }
 
         [RelayCommand] public void PlayWav()
         {
-            var selectedWavs = GetSelectedWavNodes();
-            if (selectedWavs.Count != 1)
+            var selectedWavNodes = GetSelectedWavNodes();
+            if (selectedWavNodes == null || selectedWavNodes.Count != 1)
                 return;
 
-            var selectedAudioFile = selectedWavs[0];
-            _uiCommandFactory.Create<PlayAudioFileCommand>().Execute(selectedAudioFile.FileName, selectedAudioFile.FilePath);
+            var wavFilePaths = new List<string> { selectedWavNodes[0].FilePath };
+            _eventHub.Publish(new PlayAudioRequestedEvent(wavFilePaths));
         }
 
         [RelayCommand] public void ClearText() => FilterQuery = string.Empty;
