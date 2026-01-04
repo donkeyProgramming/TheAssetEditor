@@ -7,77 +7,98 @@
              d:DataContext="{d:DesignInstance Type=local:WaveformVisualiserViewModel}"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
-    <Grid>
-        <Border
-            BorderBrush="{DynamicResource TextBox.Static.Border}"
-            BorderThickness="1"
-            Background="{DynamicResource TreeView.Static.Background}">
-            <Grid>
-                <Grid.RowDefinitions>
-                    <RowDefinition 
-                        Height="Auto"/>
-                    <RowDefinition 
-                        Height="180"/>
-                </Grid.RowDefinitions>
+    <Grid
+        Background="{DynamicResource TreeView.Static.Background}">
+        
+        <Grid.RowDefinitions>
+            <RowDefinition 
+                Height="Auto"/>
+            <RowDefinition 
+                Height="Auto"/>
+            <RowDefinition 
+                Height="180"/>
+        </Grid.RowDefinitions>
 
+        <Label 
+            Grid.Row="0" 
+            Margin="0, 0, 0, 5"
+            Content="Sound Engine"/>
+        
+        <Grid 
+            Grid.Row="1" 
+            Margin="4,4,4,0">
+
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition 
+                    Width="Auto"/>
+                <ColumnDefinition 
+                    Width="Auto"/>
+            </Grid.ColumnDefinitions>
+
+            <Button 
+                Grid.Column="0"
+                Width="70" 
+                Height="24" 
+                Content="Play" 
+                Command="{Binding PlayPauseCommand}"/>
+
+            <Button 
+                Grid.Column="1"
+                Width="70" 
+                Height="24" 
+                Margin="4,0,0,0" 
+                Content="Stop" 
+                Command="{Binding StopCommand}"/>
+        </Grid>
+
+        <Grid 
+            Grid.Row="2" 
+            x:Name="AudioWaveformGrid" 
+            ClipToBounds="True">
+            
+            <Image
+                Stretch="None"
+                SnapsToDevicePixels="True"
+                HorizontalAlignment="Left"
+                VerticalAlignment="Top"
+                Source="{Binding AudioWaveformBaseImageSource}"
+                Width="{Binding WaveformPixelWidth}"
+                Height="{Binding WaveformPixelHeight}"/>
+
+            <Image
+                Stretch="None"
+                SnapsToDevicePixels="True"
+                HorizontalAlignment="Left"
+                VerticalAlignment="Top"
+                Source="{Binding AudioWaveformOverlayImageSource}"
+                Width="{Binding WaveformPixelWidth}"
+                Height="{Binding WaveformPixelHeight}">
+                
+                <Image.Clip>
+                    <RectangleGeometry Rect="{Binding AudioWaveformOverlayClip}"/>
+                </Image.Clip>
+            </Image>
+
+            <Border
+                HorizontalAlignment="Left"
+                VerticalAlignment="Top"
+                Margin="2, 2, 0, 0"
+                Padding="4, 1, 0, 0"
+                Background="#AA1E1E1E"
+                BorderBrush="#33000000"
+                BorderThickness="1">
+                
                 <StackPanel 
-                    Grid.Row="0" 
-                    Orientation="Horizontal" 
-                    Margin="4,4,4,0">
-                    
-                    <Button 
-                        Width="70" 
-                        Height="24" 
-                        Content="Play" 
-                        Command="{Binding PlayPauseCommand}"/>
-                    <Button 
-                        Width="70" 
-                        Height="24" 
-                        Margin="4,0,0,0" 
-                        Content="Stop" 
-                        Command="{Binding StopCommand}"/>
+                    Orientation="Horizontal">
+                    <TextBlock 
+                        Text="{Binding CurrentPlaybackTime, StringFormat={}{0:mm\\:ss\\.ff}}"/>
+                    <TextBlock 
+                        Text=" / "/>
+                    <TextBlock 
+                        Text="{Binding TotalPlaybackTime, StringFormat={}{0:mm\\:ss\\.ff}}"/>
                 </StackPanel>
+            </Border>
 
-                <Grid Grid.Row="1" x:Name="AudioWaveformGrid" ClipToBounds="True">
-                    <Image
-                        Stretch="None"
-                        SnapsToDevicePixels="True"
-                        HorizontalAlignment="Left"
-                        VerticalAlignment="Top"
-                        Source="{Binding AudioWaveformBaseImageSource}"
-                        Width="{Binding WaveformPixelWidth}"
-                        Height="{Binding WaveformPixelHeight}"/>
-
-                    <Image
-                        Stretch="None"
-                        SnapsToDevicePixels="True"
-                        HorizontalAlignment="Left"
-                        VerticalAlignment="Top"
-                        Source="{Binding AudioWaveformOverlayImageSource}"
-                        Width="{Binding WaveformPixelWidth}"
-                        Height="{Binding WaveformPixelHeight}">
-                        <Image.Clip>
-                            <RectangleGeometry Rect="{Binding AudioWaveformOverlayClip}"/>
-                        </Image.Clip>
-                    </Image>
-
-                    <Border
-                        HorizontalAlignment="Left"
-                        VerticalAlignment="Top"
-                        Margin="2, 2, 0, 0"
-                        Padding="4, 1, 0, 0"
-                        Background="#AA1E1E1E"
-                        BorderBrush="#33000000"
-                        BorderThickness="1">
-                        <StackPanel Orientation="Horizontal">
-                            <TextBlock Text="{Binding CurrentPlaybackTime, StringFormat={}{0:mm\\:ss\\.ff}}"/>
-                            <TextBlock Text=" / "/>
-                            <TextBlock Text="{Binding TotalPlaybackTime, StringFormat={}{0:mm\\:ss\\.ff}}"/>
-                        </StackPanel>
-                    </Border>
-
-                </Grid>
-            </Grid>
-        </Border>
+        </Grid>
     </Grid>
 </UserControl>

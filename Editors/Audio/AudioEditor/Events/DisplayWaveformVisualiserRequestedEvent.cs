@@ -1,4 +1,6 @@
-﻿namespace Editors.Audio.AudioEditor.Events
+﻿using System.Collections.Generic;
+
+namespace Editors.Audio.AudioEditor.Events
 {
-    public record DisplayWaveformVisualiserRequestedEvent(string FilePath);
+    public record DisplayWaveformVisualiserRequestedEvent(List<string> WavFilePaths);
 }

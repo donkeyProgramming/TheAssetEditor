@@ -105,6 +105,10 @@ namespace Editors.Audio
             // Waveform Visualiser services
             //serviceCollection.AddSingleton<IWaveformRenderingService, WaveformRenderingService>();
             //serviceCollection.AddSingleton<IAudioPlayerService, AudioPlayerService>();
+            serviceCollection.AddSingleton<IWaveformVisualisationCacheService, WaveformVisualisationCacheService>();
+            serviceCollection.AddTransient<IWaveformRendererService, WaveformRendererService>();
+            serviceCollection.AddTransient<ISoundEngine, SoundEngine>();
+
 
             // Audio Project
             serviceCollection.AddScoped<IAudioProjectFileService, AudioProjectFileService>();

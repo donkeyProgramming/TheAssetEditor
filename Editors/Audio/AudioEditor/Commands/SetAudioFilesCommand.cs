@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using Editors.Audio.AudioEditor.Core;
 using Editors.Audio.AudioEditor.Events;
 using Editors.Audio.AudioEditor.Presentation.Shared;
@@ -17,7 +16,7 @@ namespace Editors.Audio.AudioEditor.Commands
         private readonly IEventHub _eventHub = eventHub;
         private readonly IAudioRepository _audioRepository = audioRepository;
 
-        public void Execute(ObservableCollection<AudioFilesTreeNode> selectedAudioFiles, bool addToExistingAudioFiles)
+        public void Execute(List<AudioFilesTreeNode> selectedAudioFiles, bool addToExistingAudioFiles)
         {
             var usedSourceIds = new HashSet<uint>();
             var audioProject = _audioEditorStateService.AudioProject;
