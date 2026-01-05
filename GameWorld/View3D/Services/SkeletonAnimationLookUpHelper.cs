@@ -111,7 +111,7 @@ namespace GameWorld.Core.Services
             Parallel.For(0, allAnimsOtherFiles.Count, index =>
             {
                 var animation = allAnimations[index];
-                FileDiscovered(animation.Pack.DataSource.ReadData(100), packFileContainer, animation.FileName, ref skeletonFileNameList, ref animationList);
+                FileDiscovered(animation.Pack.DataSource.ReadData(), packFileContainer, animation.FileName, ref skeletonFileNameList, ref animationList);
             });
 
             foreach (var skeleton in skeletonFileNameList)
@@ -135,7 +135,8 @@ namespace GameWorld.Core.Services
                 "animations\\battle\\humanoid13b\\golgfag\\docking\\hu13b_golgfag_docking_armed_02.anim",
                 "animations\\battle\\humanoid13\\ogre\\rider\\hq3b_stonehorn_wb\\sword_and_crossbow\\missile_action\\crossbow\\hu13_hq3b_swc_rider1_shoot_back_crossbow_01.anim",
                 "animations\\battle\\humanoid13\\ogre\\rider\\hq3b_stonehorn_wb\\sword_and_crossbow\\missile_action\\crossbow\\hu13_hq3b_swc_rider1_reload_crossbow_01.anim",
-                "animations\\battle\\humanoid13\\ogre\\rider\\hq3b_stonehorn_wb\\sword_and_crossbow\\missile_action\\crossbow\\hu13_hq3b_sp_rider1_shoot_ready_crossbow_01.anim"
+                "animations\\battle\\humanoid13\\ogre\\rider\\hq3b_stonehorn_wb\\sword_and_crossbow\\missile_action\\crossbow\\hu13_hq3b_sp_rider1_shoot_ready_crossbow_01.anim",
+                "animations\\battle\\humanoid01c\\sayl_staff_and_skull\\stand\\props\\hu1c_sayl_staff_and_skull_staff_stand_idle_02.anim"
             };
             if (brokenFiles.Contains(fullPath))
             {

@@ -62,7 +62,6 @@ namespace Shared.Core.PackFiles.Models
             foreach (var file in sortedFiles)
             {
                 var packFile = file.Value;
-                var fileSize = (int)packFile.DataSource.Size;
 
                 // Determine compression info
                 var currentCompressionFormat = CompressionFormat.None;
