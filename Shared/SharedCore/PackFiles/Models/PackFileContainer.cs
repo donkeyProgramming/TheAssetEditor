@@ -106,9 +106,11 @@ namespace Shared.Core.PackFiles.Models
                 byte[] data;
                 uint uncompressedFileSize = 0;
 
-                // Read the data
+                // Determine compression info
                 var shouldCompress = file.IntendedCompressionFormat != CompressionFormat.None;
                 var isCorrectCompressionFormat = file.CurrentCompressionFormat == file.IntendedCompressionFormat;
+
+                // Read the data
                 if (shouldCompress && !isCorrectCompressionFormat)
                 {
                     // Decompress the data 
@@ -118,13 +120,18 @@ namespace Shared.Core.PackFiles.Models
                     // Compress the data into the right format
                     var compressedData = PackFileCompression.Compress(uncompressedData, file.IntendedCompressionFormat);
                     data = compressedData;
+
+                    // Validate new compression
+                    var decompressedData = PackFileCompression.Decompress(compressedData);
+                    if (decompressedData.Length != uncompressedData.Length)
+                        throw new InvalidDataException($"Decompressed bytes {decompressedData.Length} does not match the expected uncompressed bytes {uncompressedData.Length}.");
+
                 }
                 else if (packFile.DataSource is PackedFileSource packedFileSource && isCorrectCompressionFormat)
                 {
-                    // The data is already in the right format so just get the compressed data
+                    // The data is already in the right format so just get the data as is
                     uncompressedFileSize = packedFileSource.UncompressedSize;
-                    var compressedData = packedFileSource.ReadDataWithoutDecompressing();
-                    data = compressedData;
+                    data = packedFileSource.ReadDataWithoutDecompressing();
                 }
                 else
                     data = packFile.DataSource.ReadData();

@@ -129,7 +129,11 @@ namespace Shared.Core.PackFiles.Models
             if (IsEncrypted)
                 data = PackFileEncryption.Decrypt(data);
             if (IsCompressed)
+            { 
                 data = PackFileCompression.Decompress(data);
+                if (data.Length != UncompressedSize)
+                    throw new InvalidDataException($"Decompressed bytes {data.Length} does not match the expected uncompressed bytes {UncompressedSize}.");
+            }
             return data;
         }
 
@@ -159,7 +163,11 @@ namespace Shared.Core.PackFiles.Models
             if (IsEncrypted)
                 data = PackFileEncryption.Decrypt(data);
             if (IsCompressed)
+            {
                 data = PackFileCompression.Decompress(data);
+                if (data.Length != UncompressedSize)
+                    throw new InvalidDataException($"Decompressed bytes {data.Length} does not match the expected uncompressed bytes {UncompressedSize}.");
+            }
             return data;
         }
 
