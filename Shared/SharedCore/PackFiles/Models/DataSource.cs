@@ -22,6 +22,7 @@ namespace Shared.Core.PackFiles.Models
         public long Size { get; private set; }
 
         protected string filepath;
+
         public FileSystemSource(string filepath)
             : base()
         {
@@ -55,11 +56,13 @@ namespace Shared.Core.PackFiles.Models
         public long Size { get; private set; }
 
         private byte[] data;
+
         public MemorySource(byte[] data)
         {
             Size = data.Length;
             this.data = data;
         }
+
         public byte[] ReadData()
         {
             return data;
@@ -77,6 +80,7 @@ namespace Shared.Core.PackFiles.Models
         {
             return new MemorySource(File.ReadAllBytes(path));
         }
+
         public ByteChunk ReadDataAsChunk()
         {
             return new ByteChunk(ReadData());
@@ -131,6 +135,9 @@ namespace Shared.Core.PackFiles.Models
 
         public byte[] ReadData(int size)
         {
+            if (IsCompressed)
+                throw new NotSupportedException("Partial reads are not supported because decompression requires the full compressed data.");
+
             var data = new byte[size];
             using (Stream stream = File.Open(_parent.FilePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
             {
@@ -140,8 +147,6 @@ namespace Shared.Core.PackFiles.Models
 
             if (IsEncrypted)
                 data = PackFileEncryption.Decrypt(data);
-            if (IsCompressed)
-                data = PackFileCompression.Decompress(data);
             return data;
         }
 
