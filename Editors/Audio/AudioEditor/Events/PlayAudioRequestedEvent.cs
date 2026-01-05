@@ -2,5 +2,5 @@
 
 namespace Editors.Audio.AudioEditor.Events
 {
-    public record AddToWaveformCacheRequestedEvent(List<string> FilePaths);
+    public record PlayAudioRequestedEvent(List<string> WavFilePaths);
 }

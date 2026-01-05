@@ -75,7 +75,7 @@ namespace Editors.Audio.AudioEditor.Presentation.AudioFilesExplorer
             AudioFilesTree = _audioFilesTreeBuilder.BuildTree(editablePack);
             SetupIsExpandedHandlers(AudioFilesTree);
 
-            CacheRootWavFilesInWaveformVisualiser();
+            CacheRootWaveformVisualisations();
         }
 
         private void SetupIsExpandedHandlers(ObservableCollection<AudioFilesTreeNode> nodes)
@@ -90,7 +90,7 @@ namespace Editors.Audio.AudioEditor.Presentation.AudioFilesExplorer
             }
         }
 
-        private void CacheRootWavFilesInWaveformVisualiser()
+        private void CacheRootWaveformVisualisations()
         {
             var wavFilePaths = new List<string>();
             foreach (var node in AudioFilesTree)
@@ -100,7 +100,7 @@ namespace Editors.Audio.AudioEditor.Presentation.AudioFilesExplorer
             }
 
             if (wavFilePaths.Count > 0)
-                _eventHub.Publish(new AddToWaveformCacheRequestedEvent(wavFilePaths));
+                _eventHub.Publish(new CacheWaveformRequestedEvent(wavFilePaths));
         }
 
         private void OnNodeIsExpandedChanged(object sender, bool isExpanded)
@@ -119,9 +119,9 @@ namespace Editors.Audio.AudioEditor.Presentation.AudioFilesExplorer
                     return;
 
                 if (isExpanded)
-                    _eventHub.Publish(new AddToWaveformCacheRequestedEvent(wavFilePaths));
+                    _eventHub.Publish(new CacheWaveformRequestedEvent(wavFilePaths));
                 else
-                    _eventHub.Publish(new RemoveFromWaveformCacheRequestedEvent(wavFilePaths));
+                    _eventHub.Publish(new DecacheWaveformRequestedEvent(wavFilePaths)); 
             }
         }
 
@@ -145,64 +145,56 @@ namespace Editors.Audio.AudioEditor.Presentation.AudioFilesExplorer
         private void RefreshAudioFilesTree(PackFileContainer packFileContainer)
         {
             AudioFilesTree = _audioFilesTreeBuilder.BuildTree(packFileContainer);
-            CacheRootWavFilesInWaveformVisualiser();
+            CacheRootWaveformVisualisations();
         }
 
         private void OnSelectedTreeNodesChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
-            SetSelectedTreeNodes(e);
+            var selectedWavNodes = GetSelectedWavNodes();
 
-            if (SelectedTreeNodes.Count == 1)
+            if (selectedWavNodes != null && selectedWavNodes.Count == 1)
             {
-                var selectedNode = e.NewItems[0] as AudioFilesTreeNode;
-                if (selectedNode.Type == AudioFilesTreeNodeType.WavFile)
-                {
-                    var selectedAudioFile = SelectedTreeNodes[0];
-                    _eventHub.Publish(new DisplayWaveformVisualiserRequestedEvent(selectedAudioFile.FilePath));
-                }
+                var wavFilePaths = new List<string> { selectedWavNodes[0].FilePath };
+                _eventHub.Publish(new AudioFilesExplorerNodeSelectedEvent(wavFilePaths));
             }
 
             SetButtonEnablement();
         }
 
-        private void SetSelectedTreeNodes(NotifyCollectionChangedEventArgs e)
+        private List<AudioFilesTreeNode> GetSelectedWavNodes()
         {
-            if (e.Action == NotifyCollectionChangedAction.Add)
-            {
-                foreach (AudioFilesTreeNode addedNode in e.NewItems)
-                {
-                    if (addedNode.Type != AudioFilesTreeNodeType.WavFile)
-                        SelectedTreeNodes.Remove(addedNode);
-                }
-            }
+            if (SelectedTreeNodes == null || SelectedTreeNodes.Count == 0)
+                return [];
+
+            var result = new List<AudioFilesTreeNode>();
+            foreach (var node in SelectedTreeNodes)
+                if (node.Type == AudioFilesTreeNodeType.WavFile)
+                    result.Add(node);
+            return result;
         }
 
         private void SetButtonEnablement()
         {
-            IsPlayAudioButtonEnabled = SelectedTreeNodes.Count == 1;
+            var selectedWavNodes = GetSelectedWavNodes();
+            IsPlayAudioButtonEnabled = selectedWavNodes.Count == 1;
 
             var selectedAudioProjectExplorerNode = _audioEditorStateService.SelectedAudioProjectExplorerNode;
             if (selectedAudioProjectExplorerNode == null)
                 return;
 
-            if (SelectedTreeNodes.Count > 0)
+            if (selectedWavNodes.Count > 0)
             {
                 if (selectedAudioProjectExplorerNode.Type == AudioProjectTreeNodeType.ActionEventType
                     || selectedAudioProjectExplorerNode.Type == AudioProjectTreeNodeType.DialogueEvent)
                 {
                     IsSetAudioFilesButtonEnabled = true;
-
-                    if (_audioEditorStateService.AudioFiles.Count > 0)
-                        IsAddAudioFilesButtonEnabled = true;
-                    else
-                        IsAddAudioFilesButtonEnabled = false;
+                    IsAddAudioFilesButtonEnabled = _audioEditorStateService.AudioFiles.Count > 0;
+                    return;
                 }
             }
-            else
-            {
-                IsSetAudioFilesButtonEnabled = false;
-                IsAddAudioFilesButtonEnabled = false;
-            }
+
+            IsSetAudioFilesButtonEnabled = false;
+            IsAddAudioFilesButtonEnabled = false;
         }
 
         partial void OnFilterQueryChanged(string value) => DebounceFilterAudioFilesTreeForFilterQuery();
@@ -250,17 +242,32 @@ namespace Editors.Audio.AudioEditor.Presentation.AudioFilesExplorer
                 ToggleNodeExpansion(child, shouldExpand);
         }
 
-        [RelayCommand] public void SetAudioFiles() => _uiCommandFactory.Create<SetAudioFilesCommand>().Execute(SelectedTreeNodes, false);
+        [RelayCommand] public void SetAudioFiles()
+        {
+            var selectedWavs = GetSelectedWavNodes();
+            if (selectedWavs.Count == 0)
+                return;
 
-        [RelayCommand] public void AddToAudioFiles() => _uiCommandFactory.Create<SetAudioFilesCommand>().Execute(SelectedTreeNodes, true);
+            _uiCommandFactory.Create<SetAudioFilesCommand>().Execute(selectedWavs, false);
+        }
+
+        [RelayCommand] public void AddToAudioFiles()
+        {
+            var selectedWavs = GetSelectedWavNodes();
+            if (selectedWavs.Count == 0)
+                return;
+
+            _uiCommandFactory.Create<SetAudioFilesCommand>().Execute(selectedWavs, true);
+        }
 
         [RelayCommand] public void PlayWav()
         {
-            if (!IsPlayAudioButtonEnabled)
+            var selectedWavNodes = GetSelectedWavNodes();
+            if (selectedWavNodes == null || selectedWavNodes.Count != 1)
                 return;
 
-            var selectedAudioFile = SelectedTreeNodes[0];
-            _uiCommandFactory.Create<PlayAudioFileCommand>().Execute(selectedAudioFile.FileName, selectedAudioFile.FilePath);
+            var wavFilePaths = new List<string> { selectedWavNodes[0].FilePath };
+            _eventHub.Publish(new PlayAudioRequestedEvent(wavFilePaths));
         }
 
         [RelayCommand] public void ClearText() => FilterQuery = string.Empty;

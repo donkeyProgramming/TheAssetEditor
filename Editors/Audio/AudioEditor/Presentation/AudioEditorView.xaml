@@ -108,11 +108,10 @@
                             Height="Auto"/>
                         <RowDefinition 
                             Height="*"/>
-                        <!--
-                        Commented out until Waveform visuliser is intended to be displayed
                         <RowDefinition 
                             Height="Auto"/>
-                        -->
+                        <RowDefinition 
+                            Height="161"/>
                     </Grid.RowDefinitions>
 
                     <AudioProjectExplorer:AudioProjectExplorerView
@@ -134,11 +133,19 @@
                         Grid.Column="0"
                         DataContext="{Binding AudioFilesExplorerViewModel}"/>
 
-                    <WaveformVisualiser:WaveformVisualiserView 
+                    <GridSplitter
                         Grid.Row="3"
+                        Height="5"
+                        Background="{DynamicResource App.Border}"
+                        VerticalAlignment="Center"
+                        HorizontalAlignment="Stretch"
+                        ResizeBehavior="PreviousAndNext"
+                        ResizeDirection="Rows"/>
+
+                    <WaveformVisualiser:WaveformVisualiserView 
+                        Grid.Row="4"
                         Grid.Column="0"
-                        DataContext="{Binding WaveformVisualiserViewModel}"
-                        Visibility="Hidden"/>
+                        DataContext="{Binding WaveformVisualiserViewModel}"/>
                 </Grid>
             </Grid>
 

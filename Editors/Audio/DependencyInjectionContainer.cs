@@ -76,7 +76,6 @@ namespace Editors.Audio
             serviceCollection.AddScoped<OpenMovieFileSelectionWindowCommand>();
             serviceCollection.AddScoped<OpenNewAudioProjectWindowCommand>();
             serviceCollection.AddScoped<PasteViewerRowsCommand>();
-            serviceCollection.AddScoped<PlayAudioFileCommand>();
             serviceCollection.AddScoped<RemoveViewerRowsCommand>();
             serviceCollection.AddScoped<SetAudioFilesCommand>();
             serviceCollection.AddScoped<IAudioProjectMutationUICommandFactory, AudioProjectMutationUICommandFactory>();
@@ -105,6 +104,10 @@ namespace Editors.Audio
             // Waveform Visualiser services
             //serviceCollection.AddSingleton<IWaveformRenderingService, WaveformRenderingService>();
             //serviceCollection.AddSingleton<IAudioPlayerService, AudioPlayerService>();
+            serviceCollection.AddSingleton<IWaveformVisualisationCacheService, WaveformVisualisationCacheService>();
+            serviceCollection.AddTransient<IWaveformRendererService, WaveformRendererService>();
+            serviceCollection.AddTransient<ISoundEngine, SoundEngine>();
+
 
             // Audio Project
             serviceCollection.AddScoped<IAudioProjectFileService, AudioProjectFileService>();
