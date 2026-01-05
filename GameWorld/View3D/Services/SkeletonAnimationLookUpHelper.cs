@@ -111,7 +111,7 @@ namespace GameWorld.Core.Services
             Parallel.For(0, allAnimsOtherFiles.Count, index =>
             {
                 var animation = allAnimations[index];
-                FileDiscovered(animation.Pack.DataSource.ReadData(100), packFileContainer, animation.FileName, ref skeletonFileNameList, ref animationList);
+                FileDiscovered(animation.Pack.DataSource.ReadData(), packFileContainer, animation.FileName, ref skeletonFileNameList, ref animationList);
             });
 
             foreach (var skeleton in skeletonFileNameList)
