@@ -1,6 +1,7 @@
-﻿using EasyCompressor;
-using K4os.Compression.LZ4.Encoders;
+﻿using K4os.Compression.LZ4.Encoders;
 using K4os.Compression.LZ4.Streams;
+using SevenZip;
+using SevenZip.Compression.LZMA;
 using Shared.Core.Settings;
 using ZstdSharp;
 using ZstdSharp.Unsafe;
@@ -54,19 +55,9 @@ namespace Shared.Core.PackFiles
 
     public static class PackFileCompression
     {
-        // LZMA alone doesn't have a defined magic number, but it always starts with one of these, depending on the compression level
-        private static readonly uint[] s_magicNumbersLzma = [
-            0x0100_005D,
-            0x1000_005D,
-            0x0800_005D,
-            0x2000_005D,
-            0x4000_005D,
-            0x8000_005D,
-            0x0000_005D,
-            0x0400_005D,
-        ];
-        private static readonly uint s_magicNumberLz4 = 0x184D_2204;
-        private static readonly uint s_magicNumberZstd = 0xfd2f_b528;
+        private const byte LzmaPropertiesIdentifier = 0x5D;
+        private const uint Lz4MagicNumber = 0x184D_2204;
+        private const uint ZstdMagicNumber = 0xfd2f_b528;
 
         // CA generally compress file types in specific formats, presumably because they compress better in that format.
         // Sometimes CA compress file types in various formats (though predominantly in one format), presumably by
@@ -114,90 +105,73 @@ namespace Shared.Core.PackFiles
             ".parsed",
         ];
 
-        public static byte[] Decompress(byte[] data)
+        public static byte[] Decompress(byte[] data, int outputSize, CompressionFormat compressionFormat)
         {
-            var result = Array.Empty<byte>();
-            if (data == null || data.Length == 0)
-                return result;
-
             using var stream = new MemoryStream(data, false);
             using var reader = new BinaryReader(stream);
 
-            // Read the header and get what we need
             var uncompressedSize = reader.ReadUInt32();
-            var magicNumber = reader.ReadUInt32();
-            var compressionFormat = GetCompressionFormat(magicNumber);
-            stream.Seek(-4, SeekOrigin.Current);
+            if (outputSize > uncompressedSize)
+                throw new InvalidDataException($"Output size {outputSize:N0} cannot be greater than the uncompressed size {uncompressedSize:N0}.");
 
             if (compressionFormat == CompressionFormat.Zstd)
-                return DecompressZstd(reader, uncompressedSize);
+                return DecompressZstd(reader.BaseStream, outputSize);
             if (compressionFormat == CompressionFormat.Lz4)
-                return DecompressLz4(reader, uncompressedSize);
+                return DecompressLz4(reader.BaseStream, outputSize);
             else if (compressionFormat == CompressionFormat.Lzma1)
-                result = DecompressLzma(data, uncompressedSize);
-            else if (compressionFormat == CompressionFormat.None)
-                return data;  
-
-            if (result.Length != uncompressedSize)
-                throw new InvalidDataException($"Expected {uncompressedSize:N0} bytes after decompression, but got {result.Length:N0}.");
-
-            return result;
+                return DecompressLzma(reader.BaseStream, outputSize);
+            else
+                throw new InvalidDataException("Uh oh, the data is either not compressed or has some unknown compression format.");
         }
 
-        private static byte[] DecompressZstd(BinaryReader reader, uint uncompressedSize)
+        private static byte[] DecompressZstd(Stream compressedDataStream, int outputSize)
         {
-            var buffer = new byte[uncompressedSize];
-            var output = new MemoryStream(buffer);
-            using var decompressionStream = new DecompressionStream(reader.BaseStream);
-            decompressionStream.CopyTo(output);
-            return output.ToArray();
+            var output = new byte[outputSize];
+            using var decompressionStream = new DecompressionStream(compressedDataStream);
+            ReadExactly(decompressionStream, output, 0, outputSize);
+            return output;
         }
 
-        private static byte[] DecompressLz4(BinaryReader reader, uint uncompressedSize)
+        private static byte[] DecompressLz4(Stream compressedDataStream, int outputSize)
         {
-            var buffer = new byte[uncompressedSize];
-            var output = new MemoryStream(buffer);
-            var decompressor = new LZ4DecoderStream(reader.BaseStream, i => new LZ4ChainDecoder(i.BlockSize, 0));
-            decompressor.CopyTo(output);
-            return output.ToArray();
+            var output = new byte[outputSize];
+            using var decompressionStream = new LZ4DecoderStream(compressedDataStream, i => new LZ4ChainDecoder(i.BlockSize, 0));
+            ReadExactly(decompressionStream, output, 0, outputSize);
+            return output;
         }
 
-        private static byte[] DecompressLzma(byte[] data, uint uncompressedSize)
+        private static byte[] DecompressLzma(Stream stream, int outputSize)
         {
-            var uncompressedSizeFieldSize = sizeof(uint);
-            var headerDataLength = 5;
-            var injectedSizeLength = sizeof(ulong);
+            // Read the property bytes
+            var lzmaPropertiesSize = 5;
+            var lzmaProperties = new byte[lzmaPropertiesSize];
+            ReadExactly(stream, lzmaProperties, 0, lzmaPropertiesSize);
 
-            // Compute all the offsets
-            var headerStart = uncompressedSizeFieldSize;
-            var headerEnd = headerStart + headerDataLength;
-            var footerStart = headerEnd;
-            var minTotalSize = footerStart;
+            var remainingInputSize = stream.Length - stream.Position;
 
-            // LZMA1 headers have 13 bytes, but we only have 9 due to using a u32 size
-            if (data.Length < minTotalSize)
-                throw new InvalidDataException("File too small to be valid LZMA.");
+            var output = new byte[outputSize];
+            using var outputStream = new MemoryStream(output, 0, outputSize, writable: true, publiclyVisible: true);
 
-            // Unlike other formats, in this one we need to inject the uncompressed size in the file header otherwise it won't be a valid lzma file
-            using var primary = new MemoryStream(data.Length + injectedSizeLength);
-            primary.Write(data, headerStart, headerDataLength);
-            primary.Write(BitConverter.GetBytes((ulong)uncompressedSize), 0, injectedSizeLength);
-            primary.Write(data, footerStart, data.Length - footerStart);
-            primary.Position = 0;
+            var decoder = new Decoder();
+            decoder.SetDecoderProperties(lzmaProperties);
+            decoder.Code(stream, outputStream, remainingInputSize, outputSize, null);
 
-            try
+            if (outputStream.Position != outputSize)
+                throw new InvalidDataException($"Expected uncompressed bytes {outputSize:N0} but only received {outputStream.Position:N0} decompressed bytes.");
+
+            return output;
+        }
+
+        private static void ReadExactly(Stream stream, byte[] buffer, int offset, int count)
+        {
+            var totalBytesRead = 0;
+            while (totalBytesRead < count)
             {
-                return LZMACompressor.Shared.Decompress(primary.ToArray());
-            }
-            catch
-            {
-                // Some files may still fail so fall back to a unknown size (u64::MAX) instead
-                using var fallback = new MemoryStream(data.Length + injectedSizeLength);
-                fallback.Write(data, headerStart, headerDataLength);
-                fallback.Write(BitConverter.GetBytes(ulong.MaxValue), 0, injectedSizeLength);
-                fallback.Write(data, footerStart, data.Length - footerStart);
-                fallback.Position = 0;
-                return LZMACompressor.Shared.Decompress(fallback.ToArray());
+                var bytesRead = stream.Read(buffer, offset + totalBytesRead, count - totalBytesRead);
+                if (bytesRead == 0)
+                    throw new InvalidDataException($"Requested {count:N0} bytes but only received {totalBytesRead:N0} bytes.");
+
+                totalBytesRead += bytesRead;
             }
         }
 
@@ -209,22 +183,20 @@ namespace Shared.Core.PackFiles
                 return CompressLz4(data);
             else if (compressionFormat == CompressionFormat.Lzma1)
                 return CompressLzma1(data);
-            return data;
+            else
+                throw new InvalidDataException("Uh oh, the data either cannot be compressed or has some unknown compression format.");
         }
 
         private static byte[] CompressZstd(byte[] data)
         {
             using var stream = new MemoryStream();
-            var uncompressedSize = data.Length;
-            stream.Write(BitConverter.GetBytes((uint)uncompressedSize));
+            stream.Write(BitConverter.GetBytes((uint)data.Length));
 
-            using (var compressor = new CompressionStream(stream, 3, leaveOpen: true))
-            {
-                compressor.SetParameter(ZSTD_cParameter.ZSTD_c_contentSizeFlag, 1);
-                compressor.SetParameter(ZSTD_cParameter.ZSTD_c_checksumFlag, 1);
-                compressor.SetPledgedSrcSize((ulong)uncompressedSize);
-                compressor.Write(data, 0, uncompressedSize);
-            }
+            using var compressor = new CompressionStream(stream, 3, leaveOpen: true);
+            compressor.SetParameter(ZSTD_cParameter.ZSTD_c_contentSizeFlag, 1);
+            compressor.SetParameter(ZSTD_cParameter.ZSTD_c_checksumFlag, 1);
+            compressor.SetPledgedSrcSize((ulong)data.Length);
+            compressor.Write(data, 0, data.Length);
 
             return stream.ToArray();
         }
@@ -232,39 +204,56 @@ namespace Shared.Core.PackFiles
         private static byte[] CompressLz4(byte[] data)
         {
             using var stream = new MemoryStream();
-            var uncompressedSize = data.Length;
-            stream.Write(BitConverter.GetBytes((uint)uncompressedSize));
+            stream.Write(BitConverter.GetBytes((uint)data.Length));
 
-            using (var encoder = LZ4Stream.Encode(stream, leaveOpen: true))
-                encoder.Write(data, 0, uncompressedSize);
+            using var encoder = LZ4Stream.Encode(stream, leaveOpen: true);
+            encoder.Write(data, 0, data.Length);
 
             return stream.ToArray();
         }
 
         private static byte[] CompressLzma1(byte[] data)
         {
-            var compressedData = LZMACompressor.Shared.Compress(data);
-            var compressedSize = compressedData.Length;
-            if (compressedSize < 13)
-                throw new InvalidDataException("Data cannot be compressed");
-
             using var stream = new MemoryStream();
-            var uncompressedSize = data.Length;
-            stream.Write(BitConverter.GetBytes(uncompressedSize), 0, 4);
-            stream.Write(compressedData, 0, 5);
-            stream.Write(compressedData, 13, compressedSize - 13);
+            stream.Write(BitConverter.GetBytes(data.Length), 0, 4);
+
+            var encoder = new Encoder();
+            encoder.SetCoderProperties(
+                [
+                    CoderPropID.DictionarySize,
+                    CoderPropID.PosStateBits,
+                    CoderPropID.LitContextBits,
+                    CoderPropID.LitPosBits
+                ],
+                [
+                    0x0040_0000,
+                    2,
+                    3,
+                    0
+                ]);
+
+            // Read the property bytes
+            encoder.WriteCoderProperties(stream);
+
+            // Write the payload
+            using var input = new MemoryStream(data, writable: false);
+            encoder.Code(input, stream, input.Length, -1, null);
 
             return stream.ToArray();
         }
 
-        public static CompressionFormat GetCompressionFormat(uint magicNumber)
+        public static CompressionFormat GetCompressionFormat(byte[] compressionFormatBytes)
         {
-            if (magicNumber == s_magicNumberZstd)
-                return CompressionFormat.Zstd;
-            else if (magicNumber == s_magicNumberLz4)
-                return CompressionFormat.Lz4;
-            else if (s_magicNumbersLzma.Contains(magicNumber))
+            // Lzma1 is identified by the properties
+            if (compressionFormatBytes[0] == LzmaPropertiesIdentifier)
                 return CompressionFormat.Lzma1;
+
+            // Zstd and Lz4 are identified by their magic numbers
+            var magicNumber = BitConverter.ToUInt32(compressionFormatBytes);
+            if (magicNumber == ZstdMagicNumber)
+                return CompressionFormat.Zstd;
+            else if (magicNumber == Lz4MagicNumber)
+                return CompressionFormat.Lz4;
             else
                 return CompressionFormat.None;
         }
@@ -277,7 +266,7 @@ namespace Shared.Core.PackFiles
             if (compressionFormats.All(compressionFormat => compressionFormat == CompressionFormat.None))
                 return CompressionFormat.None;
 
-            // We use rootFolder for normal db tables because they don't have an extension
+            // We use the root folder for db tables because they don't have an extension
             var isTable = firstFilePathPart == "db" || extension == ".loc";
             var hasExtension = !string.IsNullOrEmpty(extension);
 
@@ -285,7 +274,7 @@ namespace Shared.Core.PackFiles
             if (!isTable && !hasExtension)
                 return CompressionFormat.None;
 
-            // Only compress tables in WH3 (and newer games?) as compresse tables are bugged in older games
+            // Only compress tables in WH3 (and newer games?) as compressed tables are bugged in older games
             if (isTable && compressionFormats.Contains(CompressionFormat.Zstd) && gameInformation.Type == GameTypeEnum.Warhammer3)
                 return CompressionFormat.Zstd;
             else if (isTable)
