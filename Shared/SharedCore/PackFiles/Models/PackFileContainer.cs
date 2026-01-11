@@ -3,9 +3,9 @@ using Shared.Core.Settings;
 
 namespace Shared.Core.PackFiles.Models
 {
-    public record PackFileWriteInfo(
+    public record PackFileWriteInformation(
         PackFile PackFile,
-        long FileSizeMetadataPosition,
+        long SizePosition,
         CompressionFormat CurrentCompressionFormat,
         CompressionFormat IntendedCompressionFormat);
 
@@ -56,13 +56,12 @@ namespace Shared.Core.PackFiles.Models
             Header.FileCount = (uint)FileList.Count;
             PackFileSerializer.WriteHeader(Header, (uint)fileNamesOffset, writer);
 
-            var filesToWrite = new List<PackFileWriteInfo>();
+            var filesToWrite = new List<PackFileWriteInformation>();
 
             // Write file metadata
             foreach (var file in sortedFiles)
             {
                 var packFile = file.Value;
-                var fileSize = (int)packFile.DataSource.Size;
 
                 // Determine compression info
                 var currentCompressionFormat = CompressionFormat.None;
@@ -73,7 +72,7 @@ namespace Shared.Core.PackFiles.Models
                 var shouldCompress = intendedCompressionFormat != CompressionFormat.None;
 
                 // File size placeholder (rewritten later)
-                var fileSizePosition = writer.BaseStream.Position;
+                var sizePosition = writer.BaseStream.Position;
                 writer.Write(0);
 
                 // Timestamp
@@ -91,11 +90,7 @@ namespace Shared.Core.PackFiles.Models
                 // Zero terminator
                 writer.Write((byte)0);
 
-                filesToWrite.Add(new PackFileWriteInfo(
-                    packFile,
-                    fileSizePosition,
-                    currentCompressionFormat,
-                    intendedCompressionFormat));
+                filesToWrite.Add(new PackFileWriteInformation(packFile, sizePosition, currentCompressionFormat, intendedCompressionFormat));
             }
 
             var packedFileSourceParent = new PackedFileSourceParent { FilePath = SystemFilePath };
@@ -105,41 +100,45 @@ namespace Shared.Core.PackFiles.Models
             {
                 var packFile = file.PackFile;
                 byte[] data;
-                uint uncompressedFileSize = 0;
+                uint uncompressedSize = 0;
 
-                // Read the data
+                // Determine compression info
                 var shouldCompress = file.IntendedCompressionFormat != CompressionFormat.None;
                 var isCorrectCompressionFormat = file.CurrentCompressionFormat == file.IntendedCompressionFormat;
+
+                // Read the data
                 if (shouldCompress && !isCorrectCompressionFormat)
                 {
                     // Decompress the data 
                     var uncompressedData = packFile.DataSource.ReadData();
-                    uncompressedFileSize = (uint)uncompressedData.Length;
+                    uncompressedSize = (uint)uncompressedData.Length;
 
                     // Compress the data into the right format
                     var compressedData = PackFileCompression.Compress(uncompressedData, file.IntendedCompressionFormat);
                     data = compressedData;
+
+                    // Validate new compression
+                    var decompressedData = PackFileCompression.Decompress(compressedData, uncompressedData.Length, file.IntendedCompressionFormat);
+                    if (decompressedData.Length != uncompressedData.Length)
+                        throw new InvalidDataException($"Decompressed bytes {decompressedData.Length:N0} does not match the expected uncompressed bytes {uncompressedData.Length:N0}.");
                 }
                 else if (packFile.DataSource is PackedFileSource packedFileSource && isCorrectCompressionFormat)
                 {
-                    // The data is already in the right format so just get the compressed data
-                    uncompressedFileSize = packedFileSource.UncompressedSize;
-                    var compressedData = packedFileSource.ReadDataWithoutDecompressing();
-                    data = compressedData;
+                    // The data is already in the right format so just get the data as is
+                    uncompressedSize = packedFileSource.UncompressedSize;
+                    data = packedFileSource.ReadDataWithoutDecompressing();
                 }
                 else
                     data = packFile.DataSource.ReadData();
-
-                var fileSize = (uint)data.Length;
 
                 // Write the data
                 var offset = writer.BaseStream.Position;
                 writer.Write(data);
 
-                // Patch the file size metadata placeholder 
+                // Patch the size from the position stored earlier
                 var currentPosition = writer.BaseStream.Position;
-                writer.BaseStream.Position = file.FileSizeMetadataPosition;
-                writer.Write(fileSize);
+                writer.BaseStream.Position = file.SizePosition;
+                writer.Write(data.Length);
                 writer.BaseStream.Position = currentPosition;
 
                 // We do not encrypt
@@ -149,11 +148,11 @@ namespace Shared.Core.PackFiles.Models
                 packFile.DataSource = new PackedFileSource(
                     packedFileSourceParent,
                     offset,
-                    fileSize,
+                    data.Length,
                     isEncrypted,
                     shouldCompress,
                     file.IntendedCompressionFormat,
-                    uncompressedFileSize);
+                    uncompressedSize);
             }
         }
     }

@@ -128,7 +128,7 @@ namespace Shared.GameFormats.Animation
 
         public static AnimationHeader GetAnimationHeader(PackFile file)
         {
-            var data = file.DataSource.ReadData(100);
+            var data = file.DataSource.PeekData(100);
             try
             {
                 return GetAnimationHeader(new ByteChunk(data));

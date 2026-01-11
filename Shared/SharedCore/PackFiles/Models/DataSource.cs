@@ -13,7 +13,7 @@ namespace Shared.Core.PackFiles.Models
     {
         long Size { get; }
         byte[] ReadData();
-        byte[] ReadData(int size);
+        byte[] PeekData(int size);
         ByteChunk ReadDataAsChunk();
     }
 
@@ -22,19 +22,25 @@ namespace Shared.Core.PackFiles.Models
         public long Size { get; private set; }
 
         protected string filepath;
+
         public FileSystemSource(string filepath)
             : base()
         {
-            Size = new FileInfo(filepath).Length;
+            var size = new FileInfo(filepath).Length;
+            if (size > uint.MaxValue)
+                throw new InvalidOperationException($"This file's size ({size:N0}) is too large. The maximum file size {uint.MaxValue:N0}.");
+
+            Size = (uint)size;
             this.filepath = filepath;
         }
+        
 
         public byte[] ReadData()
         {
             return File.ReadAllBytes(filepath);
         }
 
-        public byte[] ReadData(int size)
+        public byte[] PeekData(int size)
         {
             using (var reader = new BinaryReader(new FileStream(filepath, FileMode.Open)))
             {
@@ -55,17 +61,19 @@ namespace Shared.Core.PackFiles.Models
         public long Size { get; private set; }
 
         private byte[] data;
+
         public MemorySource(byte[] data)
         {
             Size = data.Length;
             this.data = data;
         }
+
         public byte[] ReadData()
         {
             return data;
         }
 
-        public byte[] ReadData(int size)
+        public byte[] PeekData(int size)
         {
             var output = new byte[size];
             Array.Copy(data, 0, output, 0, size);
@@ -77,6 +85,7 @@ namespace Shared.Core.PackFiles.Models
         {
             return new MemorySource(File.ReadAllBytes(path));
         }
+
         public ByteChunk ReadDataAsChunk()
         {
             return new ByteChunk(ReadData());
@@ -116,32 +125,56 @@ namespace Shared.Core.PackFiles.Models
         public byte[] ReadData()
         {
             var data = new byte[Size];
-            using (Stream stream = File.Open(_parent.FilePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
+
+            using (var stream = File.Open(_parent.FilePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
             {
                 stream.Seek(Offset, SeekOrigin.Begin);
-                stream.Read(data, 0, data.Length);
+                stream.ReadExactly(data);
             }
 
             if (IsEncrypted)
                 data = PackFileEncryption.Decrypt(data);
+
             if (IsCompressed)
-                data = PackFileCompression.Decompress(data);
+            {
+                data = PackFileCompression.Decompress(data, (int)UncompressedSize, CompressionFormat);
+                if (data.Length != UncompressedSize)
+                    throw new InvalidDataException($"Decompressed bytes {data.Length:N0} does not match the expected uncompressed bytes {UncompressedSize:N0}.");
+            }
+
             return data;
         }
 
-        public byte[] ReadData(int size)
+        public byte[] PeekData(int size)
         {
-            var data = new byte[size];
-            using (Stream stream = File.Open(_parent.FilePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
+            byte[] data;
+
+            using (var stream = File.Open(_parent.FilePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
             {
                 stream.Seek(Offset, SeekOrigin.Begin);
-                stream.Read(data, 0, data.Length);
-            }
 
-            if (IsEncrypted)
-                data = PackFileEncryption.Decrypt(data);
-            if (IsCompressed)
-                data = PackFileCompression.Decompress(data);
+                if (!IsEncrypted && !IsCompressed)
+                {
+                    data = new byte[size];
+                    stream.ReadExactly(data);
+                }
+                else
+                {
+                    data = new byte[Size];
+                    stream.ReadExactly(data);
+
+                    if (IsEncrypted)
+                        data = PackFileEncryption.Decrypt(data);
+
+                    if (IsCompressed)
+                    {
+                        data = PackFileCompression.Decompress(data, size, CompressionFormat);
+                        if (data.Length != size)
+                            throw new InvalidDataException($"Decompressed bytes {data.Length:N0} does not match the expected uncompressed bytes {size:N0}.");
+                    }
+                }
+            }           
+
             return data;
         }
 
@@ -149,26 +182,34 @@ namespace Shared.Core.PackFiles.Models
         {
             var data = new byte[Size];
             knownStream.Seek(Offset, SeekOrigin.Begin);
-            knownStream.Read(data, 0, (int)Size);
+            knownStream.ReadExactly(data, 0, (int)Size);
 
             if (IsEncrypted)
                 data = PackFileEncryption.Decrypt(data);
+
             if (IsCompressed)
-                data = PackFileCompression.Decompress(data);
+            {
+                data = PackFileCompression.Decompress(data, (int)UncompressedSize, CompressionFormat);
+                if (data.Length != UncompressedSize)
+                    throw new InvalidDataException($"Decompressed bytes {data.Length:N0} does not match the expected uncompressed bytes {UncompressedSize:N0}.");
+            }
+
             return data;
         }
 
         public byte[] ReadDataWithoutDecompressing()
         {
             var data = new byte[Size];
-            using (Stream stream = File.Open(_parent.FilePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
+
+            using (var stream = File.Open(_parent.FilePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
             {
                 stream.Seek(Offset, SeekOrigin.Begin);
-                stream.Read(data, 0, data.Length);
+                stream.ReadExactly(data);
             }
 
             if (IsEncrypted)
                 data = PackFileEncryption.Decrypt(data);
+
             return data;
         }
 

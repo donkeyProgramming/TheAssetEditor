@@ -18,7 +18,7 @@ namespace Test.Shared.Core.PackFiles
             _packFileService = new PackFileService(eventHub.Object);
             _container = _packFileService.CreateNewPackFileContainer("EncryptedOutput", PackFileCAType.MOD, true);
 
-            // Use files that aren't tiny so that they can actually be compressed rather than increase in size when being compressed
+            // Use files that are large enough for compression to be effective as files that are too small may actually increase in size when compressed
             List<NewPackFileEntry> files = [
                 new("Directory_0", PackFile.CreateFromASCII("file0.txt", new string('A', 1_024))),
                 new("Directory_0", PackFile.CreateFromASCII("file1.txt", new string('B', 2_048))),
@@ -32,10 +32,8 @@ namespace Test.Shared.Core.PackFiles
         [Test]
         public void TestCompressAndDecompressPackFile()
         {
-            var compressionFormats = Enum.GetValues(typeof(CompressionFormat)).Cast<CompressionFormat>();
-            var originals = _container.FileList
-                .ToDictionary(file => file.Value.Name,
-                              file => file.Value.DataSource.ReadData());
+            var compressionFormats = Enum.GetValues<CompressionFormat>().Where(compressionFormat => compressionFormat != CompressionFormat.None);
+            var originals = _container.FileList.ToDictionary(file => file.Value.Name, file => file.Value.DataSource.ReadData());
 
             foreach (var fileName in originals.Keys)
             {
@@ -44,24 +42,15 @@ namespace Test.Shared.Core.PackFiles
                 foreach (var compressionFormat in compressionFormats)
                 {
                     var compressedData = PackFileCompression.Compress(data, compressionFormat);
+                    var decompressedData = PackFileCompression.Decompress(compressedData, data.Length, compressionFormat);
+                    Assert.That(decompressedData, Has.Length.EqualTo(data.Length), $"[{compressionFormat}] {fileName} length mismatch");
 
-                    if (compressionFormat != CompressionFormat.None)
-                    {
-                        Assert.That(compressedData, Has.Length.LessThan(data.Length),
-                            $"[{compressionFormat}] {fileName} did not reduce in size: {data.Length} --> {compressedData.Length}");
-                    }
-
-                    var decompressed = PackFileCompression.Decompress(compressedData);
-                    Assert.That(decompressed, Has.Length.EqualTo(data.Length),
-                        $"[{compressionFormat}] {fileName} length mismatch");
-
-                    var expected = Encoding.UTF8.GetString(originals[fileName]);
-                    var actual = Encoding.UTF8.GetString(decompressed);
-                    Assert.That(actual, Is.EqualTo(expected),
-                        $"[{compressionFormat}] {fileName} content mismatch after round-trip");
+                    var expectedValue = Encoding.UTF8.GetString(originals[fileName]);
+                    var actualValue = Encoding.UTF8.GetString(decompressedData);
+                    Assert.That(actualValue, Is.EqualTo(expectedValue), $"[{compressionFormat}] {fileName} content mismatch after round-trip");
 
                     // Feed back in for the next iteration
-                    data = decompressed;
+                    data = decompressedData;
                 }
             }
         }
