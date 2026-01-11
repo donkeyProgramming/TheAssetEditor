@@ -1,7 +1,5 @@
 ﻿using System.Data;
-using System.Data.SqlClient;
 using System.Data.SQLite;
-using System.Linq;
 using Editors.DatabaseEditor.FileFormats;
 using Shared.Core.ByteParsing;
 using Shared.Core.PackFiles;
@@ -252,9 +250,9 @@ namespace Utility.DatabaseSchemaGenerator.Examples
             {
                 try
                 {
-                    using (var copy = new SqlBulkCopy(sqlConnection.ConnectionString))
-                    {
-
+                    //using (var copy = new SqlBulkCopy(sqlConnection.ConnectionString))
+                    //{
+                
 
                         //var _ravi = dt.NewRow();
                         //_ravi["Name"] = "ravi";
@@ -268,7 +266,7 @@ namespace Utility.DatabaseSchemaGenerator.Examples
 
 
                        // copy.WriteToServer(dt);
-                    }
+                    //}
                  
                     Console.WriteLine($"{tableSchema.Name} - {parsedTables}/{tableSchemas.Count}");
 
