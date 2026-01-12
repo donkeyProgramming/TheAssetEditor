@@ -81,8 +81,8 @@ namespace Shared.Core.PackFiles
                         using var compressionStream = new MemoryStream(fileHeader, false);
                         using var compressionReader = new BinaryReader(compressionStream);
                         uncompressedSize = compressionReader.ReadUInt32();
-                        var magicNumber = compressionReader.ReadUInt32();
-                        compressionFormat = PackFileCompression.GetCompressionFormat(magicNumber);
+                        var compressionFormatBytes = compressionReader.ReadBytes(4);
+                        compressionFormat = PackFileCompression.GetCompressionFormat(compressionFormatBytes);
                     }
 
                     var packedFileSource = new PackedFileSource(packedFileSourceParent, offset, size, isEncrypted, isCompressed, compressionFormat, uncompressedSize);
