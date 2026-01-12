@@ -26,17 +26,17 @@ namespace Editors.Audio.AudioEditor.Commands
             var audioFiles = _audioEditorStateService.AudioFiles;
             var settings = _audioEditorStateService.HircSettings;
 
-            var stateLookupByStateGroup = new Dictionary<string, string>();
+            var statePathList = new List<KeyValuePair<string, string>>();
             var stateGroupsWithQualifiers = _audioRepository.QualifiedStateGroupByStateGroupByDialogueEvent[dialogueEventName];
             foreach (var stateGroupWithQualifier in stateGroupsWithQualifiers)
             {
                 var stateGroupName = TableHelpers.GetStateGroupFromStateGroupWithQualifier(_audioRepository, dialogueEventName, stateGroupWithQualifier.Key);
                 var columnName = TableHelpers.DuplicateUnderscores(stateGroupWithQualifier.Key);
                 var stateName = TableHelpers.GetValueFromRow(row, columnName);
-                stateLookupByStateGroup.Add(stateGroupName, stateName);
+                statePathList.Add(new KeyValuePair<string, string>(stateGroupName, stateName));
             }
 
-            _dialogueEventService.AddStatePath(dialogueEventName, audioFiles, settings, stateLookupByStateGroup);
+            _dialogueEventService.AddStatePath(dialogueEventName, audioFiles, settings, statePathList);
         }
     }
 }

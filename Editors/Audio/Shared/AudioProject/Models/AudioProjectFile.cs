@@ -16,13 +16,13 @@ namespace Editors.Audio.Shared.AudioProject.Models
         public List<StateGroup> StateGroups { get; set; }
         public List<AudioFile> AudioFiles { get; set; }
 
-        public static AudioProjectFile Create(GameTypeEnum currentGame, string language, string nameWithoutExtension, List<AudioFile> audioFiles = null)
+        public static AudioProjectFile Create(GameTypeEnum currentGame, string language, string audioProjectNameWithoutExtension, List<AudioFile> audioFiles = null)
         {
             if (currentGame == GameTypeEnum.Warhammer3)
                 return new AudioProjectFile
                 {
                     Language = language,
-                    SoundBanks = CreateSoundBanks(nameWithoutExtension, language),
+                    SoundBanks = CreateSoundBanks(audioProjectNameWithoutExtension, language),
                     StateGroups = CreateStateGroups(),
                     AudioFiles = audioFiles ?? []
                 };
@@ -30,9 +30,9 @@ namespace Editors.Audio.Shared.AudioProject.Models
             return null;
         }
 
-        public static AudioProjectFile Create(AudioProjectFile cleanAudioProject, GameTypeEnum currentGame, string nameWithoutExtension)
+        public static AudioProjectFile Create(AudioProjectFile cleanAudioProject, GameTypeEnum currentGame, string audioProjectNameWithoutExtension)
         {
-            var dirtyAudioProject = Create(currentGame, cleanAudioProject.Language, nameWithoutExtension, cleanAudioProject.AudioFiles);
+            var dirtyAudioProject = Create(currentGame, cleanAudioProject.Language, audioProjectNameWithoutExtension, cleanAudioProject.AudioFiles);
             MergeCleanIntoDirtySoundBanks(dirtyAudioProject.SoundBanks, cleanAudioProject.SoundBanks);
             AddCleanToDirtyStateGroups(dirtyAudioProject.StateGroups, cleanAudioProject.StateGroups);
             return dirtyAudioProject;
@@ -177,6 +177,20 @@ namespace Editors.Audio.Shared.AudioProject.Models
         public AudioFile GetAudioFile(string filePath) => AudioFiles.FirstOrDefault(audioFile => string.Equals(audioFile.WavPackFilePath, filePath, StringComparison.OrdinalIgnoreCase));
 
         public AudioFile GetAudioFile(uint sourceId) => AudioFiles.FirstOrDefault(audioFile => audioFile.Id == sourceId);
+
+        public List<AudioFile> GetAudioFiles(SoundBank soundBank, RandomSequenceContainer randomSequenceContainer)
+        {
+            var audioFiles = new List<AudioFile>();
+            var orderedSounds = soundBank.GetSounds(randomSequenceContainer.Children)
+                .OrderBy(sound => sound.PlaylistOrder)
+                .ToList();
+            foreach (var orderedSound in orderedSounds)
+            {
+                var audioFile = GetAudioFile(orderedSound.SourceId);
+                audioFiles.Add(audioFile);
+            }
+            return audioFiles;
+        }
 
         public List<SoundBank> GetSoundBanksWithActionEvents()
         {

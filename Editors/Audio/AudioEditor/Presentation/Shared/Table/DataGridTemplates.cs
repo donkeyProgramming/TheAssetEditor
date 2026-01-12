@@ -67,7 +67,11 @@ namespace Editors.Audio.AudioEditor.Presentation.Shared.Table
 
                     // Ensure a default value of "Any"
                     if (string.IsNullOrEmpty(comboBox.Text) && states.Contains("Any"))
+                    {
                         comboBox.Text = "Any";
+                        // Update the Add Row button again after we set the missing value to "Any"
+                        eventHub.Publish(new EditorAddRowButtonEnablementUpdateRequestedEvent());
+                    }
 
                     if (comboBox.Template.FindName("PART_EditableTextBox", comboBox) is TextBox textBox)
                     {

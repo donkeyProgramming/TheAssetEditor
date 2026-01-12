@@ -12,7 +12,7 @@ namespace Editors.Audio.AudioEditor.Core.AudioProjectMutation
 {
     public interface IDialogueEventService
     {
-        void AddStatePath(string dialogueEventName, List<AudioFile> audioFiles, HircSettings hircSettings, Dictionary<string, string> stateLookupByStateGroup);
+        void AddStatePath(string dialogueEventName, List<AudioFile> audioFiles, HircSettings hircSettings, List<KeyValuePair<string, string>> statePathList);
         bool RemoveStatePath(string dialogueEventName, string statePathName);
     }
 
@@ -22,7 +22,7 @@ namespace Editors.Audio.AudioEditor.Core.AudioProjectMutation
         private readonly IAudioRepository _audioRepository = audioRepository;
         private readonly IStatePathFactory _statePathFactory = statePathFactory;
 
-        public void AddStatePath(string dialogueEventName, List<AudioFile> audioFiles, HircSettings hircSettings, Dictionary<string, string> stateLookupByStateGroup)
+        public void AddStatePath(string dialogueEventName, List<AudioFile> audioFiles, HircSettings hircSettings, List<KeyValuePair<string, string>> statePathList)
         {
             var usedHircIds = new HashSet<uint>();
             var usedSourceIds = new HashSet<uint>();
@@ -41,13 +41,13 @@ namespace Editors.Audio.AudioEditor.Core.AudioProjectMutation
             usedSourceIds.UnionWith(languageSourceIds);
 
             var gameSoundBankName = Wh3SoundBankInformation.GetName(Wh3DialogueEventInformation.GetSoundBank(dialogueEventName));
-            var audioProjectFileNameWithoutExtension = Path.GetFileNameWithoutExtension(_audioEditorStateService.AudioProjectFileName);
-            var soundBankName = $"{gameSoundBankName}_{audioProjectFileNameWithoutExtension}";
+            var audioProjectNameWithoutExtension = Path.GetFileNameWithoutExtension(_audioEditorStateService.AudioProjectFileName);
+            var soundBankName = $"{gameSoundBankName}_{audioProjectNameWithoutExtension}";
             var soundBank = _audioEditorStateService.AudioProject.GetSoundBank(soundBankName);
 
             var dialogueEvent = _audioEditorStateService.AudioProject.GetDialogueEvent(dialogueEventName);
             var actorMixerId = Wh3DialogueEventInformation.GetActorMixerId(dialogueEvent.Name);
-            var statePathFactoryResult = _statePathFactory.Create(stateLookupByStateGroup, audioFiles, hircSettings, usedHircIds, usedSourceIds, soundBank.Language, actorMixerId: actorMixerId);
+            var statePathFactoryResult = _statePathFactory.Create(statePathList, audioFiles, hircSettings, usedHircIds, usedSourceIds, soundBank.Language, actorMixerId: actorMixerId);
             dialogueEvent.StatePaths.InsertAlphabetically(statePathFactoryResult.StatePath);
 
             if (statePathFactoryResult.StatePath.TargetHircTypeIsSound())
@@ -88,8 +88,8 @@ namespace Editors.Audio.AudioEditor.Core.AudioProjectMutation
         {
             var audioProject = _audioEditorStateService.AudioProject;
             var gameSoundBankName = Wh3SoundBankInformation.GetName(Wh3DialogueEventInformation.GetSoundBank(dialogueEventName));
-            var audioProjectFileNameWithoutExtension = Path.GetFileNameWithoutExtension(_audioEditorStateService.AudioProjectFileName);
-            var soundBankName = $"{gameSoundBankName}_{audioProjectFileNameWithoutExtension}";
+            var audioProjectNameWithoutExtension = Path.GetFileNameWithoutExtension(_audioEditorStateService.AudioProjectFileName);
+            var soundBankName = $"{gameSoundBankName}_{audioProjectNameWithoutExtension}";
 
             var soundBank = audioProject.GetSoundBank(soundBankName);
 

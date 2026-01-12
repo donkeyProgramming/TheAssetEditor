@@ -61,8 +61,8 @@ namespace Editors.Audio.AudioEditor.Presentation.AudioProjectViewer.Table
         {
             var actionEventName = _audioEditorStateService.SelectedAudioProjectExplorerNode.Name;
             var gameSoundBank = Wh3SoundBankInformation.GetName(Wh3ActionEventInformation.GetSoundBank(actionEventName));
-            var audioProjectFileNameWithoutExtension = Path.GetFileNameWithoutExtension(_audioEditorStateService.AudioProjectFileName);
-            var soundBankName = $"{gameSoundBank}_{audioProjectFileNameWithoutExtension}";
+            var audioProjectNameWithoutExtension = Path.GetFileNameWithoutExtension(_audioEditorStateService.AudioProjectFileName);
+            var soundBankName = $"{gameSoundBank}_{audioProjectNameWithoutExtension}";
             var soundBank = _audioEditorStateService.AudioProject.GetSoundBank(soundBankName);
             foreach (var actionEvent in soundBank.ActionEvents)
             {

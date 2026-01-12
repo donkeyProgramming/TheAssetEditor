@@ -168,6 +168,7 @@ namespace Editors.Audio.AudioEditor.Presentation.AudioProjectViewer
                 return;
 
             _audioEditorStateService.StoreCopiedViewerRows(SelectedRows);
+            _audioEditorStateService.StoreCopiedFromAudioProjectExplorerNode(_audioEditorStateService.SelectedAudioProjectExplorerNode);
             SetPasteEnablement();
         }
 
@@ -215,9 +216,17 @@ namespace Editors.Audio.AudioEditor.Presentation.AudioProjectViewer
                 SetCopyEnablement();
         }
 
-        [RelayCommand] public void RemoveRow() => _uiCommandFactory.Create<RemoveViewerRowsCommand>().Execute(SelectedRows);
+        [RelayCommand] public void RemoveRow()
+        {
+            _uiCommandFactory.Create<RemoveViewerRowsCommand>().Execute(SelectedRows);
+            SetPasteEnablement();
+        }
 
-        [RelayCommand] public void EditRow() => _uiCommandFactory.Create<EditViewerRowCommand>().Execute(SelectedRows);
+        [RelayCommand] public void EditRow()
+        {
+            _uiCommandFactory.Create<EditViewerRowCommand>().Execute(SelectedRows);
+            SetPasteEnablement();
+        }
 
         private void Load(AudioProjectTreeNodeType selectedNodeType)
         {
@@ -245,6 +254,7 @@ namespace Editors.Audio.AudioEditor.Presentation.AudioProjectViewer
 
         public void SetPasteEnablement()
         {
+            // We only set the Context Menu visible when the selected node is a Dialogue Event so unless it is we don't proceed
             if (!IsContextMenuPasteVisible)
             {
                 IsPasteEnabled = false;
@@ -257,15 +267,22 @@ namespace Editors.Audio.AudioEditor.Presentation.AudioProjectViewer
                 return;
             }
 
+            // Guard against cases where the copied row has been subsequently deleted
+            if (_audioEditorStateService.CopiedViewerRows.Any(copied => copied == null || copied.RowState == DataRowState.Detached || copied.Table == null))
+            {
+                IsPasteEnabled = false;
+                return;
+            }
+
             var viewerColumns = Table.Columns
                 .Cast<DataColumn>()
-                .Select(col => col.ColumnName)
+                .Select(column => column.ColumnName)
                 .ToList();
 
             var firstRow = _audioEditorStateService.CopiedViewerRows[0];
             var rowColumns = firstRow.Table.Columns
                 .Cast<DataColumn>()
-                .Select(col => col.ColumnName)
+                .Select(column => column.ColumnName)
                 .ToList();
 
             var schemaMatches = viewerColumns.Count == rowColumns.Count && viewerColumns.All(column => rowColumns.Contains(column));

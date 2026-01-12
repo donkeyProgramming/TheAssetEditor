@@ -40,7 +40,7 @@ namespace Editors.Audio.AudioEditor.Presentation.Shared.Table
                     .ToList();
             }
 
-            return states;
+            return states.Distinct().ToList();
         }
 
         public static string GetStateGroupFromStateGroupWithQualifier(IAudioRepository audioRepository, string dialogueEvent, string stateGroupNameWithQualifier)

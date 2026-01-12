@@ -60,6 +60,7 @@ namespace Editors.Audio.AudioEditor.Presentation.AudioProjectEditor.Table
 
                 foreach (var columnName in schema)
                 {
+                    // We don't allow editing because the Event name must match the path of the movie
                     var eventColumn = DataGridTemplates.CreateColumnTemplate(columnName, columnWidth, isReadOnly: true);
                     eventColumn.CellTemplate = DataGridTemplates.CreateReadOnlyTextBlockTemplate(columnName);
                     _eventHub.Publish(new EditorDataGridColumnAddRequestedEvent(eventColumn));
@@ -69,7 +70,7 @@ namespace Editors.Audio.AudioEditor.Presentation.AudioProjectEditor.Table
             {
                 foreach (var columnName in schema)
                 {
-                    var eventColumn = DataGridTemplates.CreateColumnTemplate(columnName, columnWidth, isReadOnly: true);
+                    var eventColumn = DataGridTemplates.CreateColumnTemplate(columnName, columnWidth);
                     eventColumn.CellTemplate = DataGridTemplates.CreateEditableEventTextBoxTemplate(_eventHub, columnName);
                     _eventHub.Publish(new EditorDataGridColumnAddRequestedEvent(eventColumn));
                 }
