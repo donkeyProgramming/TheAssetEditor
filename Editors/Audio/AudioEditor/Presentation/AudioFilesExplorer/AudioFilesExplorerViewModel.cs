@@ -68,6 +68,8 @@ namespace Editors.Audio.AudioEditor.Presentation.AudioFilesExplorer
             _globalEventHub.Register<PackFileContainerFilesUpdatedEvent>(this, x => RefreshAudioFilesTree(x.Container));
             _globalEventHub.Register<PackFileContainerFolderRemovedEvent>(this, x => RefreshAudioFilesTree(x.Container));
 
+            AudioFilesExplorerLabel = $"Audio Files Explorer";
+
             var editablePack = _packFileService.GetEditablePack();
             if (editablePack == null)
                 return;

@@ -4,6 +4,7 @@ using CommunityToolkit.Mvvm.Input;
 using Editors.Audio.AudioEditor.Commands.Dialogs;
 using Editors.Audio.AudioEditor.Core;
 using Editors.Audio.AudioEditor.Events;
+using Editors.Audio.AudioEditor.Events.AudioProjectExplorer;
 using Editors.Audio.AudioEditor.Presentation.AudioFilesExplorer;
 using Editors.Audio.AudioEditor.Presentation.AudioProjectEditor;
 using Editors.Audio.AudioEditor.Presentation.AudioProjectExplorer;
@@ -28,6 +29,7 @@ namespace Editors.Audio.AudioEditor.Presentation
         private readonly IShortcutService _shortcutService;
 
         [ObservableProperty] private bool _isAudioProjectLoaded = false;
+        [ObservableProperty] private bool _isSettingsBorderVisible = false;
 
         public AudioEditorViewModel(
             IUiCommandFactory uiCommandFactory,
@@ -60,6 +62,7 @@ namespace Editors.Audio.AudioEditor.Presentation
             WaveformVisualiserViewModel = waveformVisualiserViewModel;
 
             _eventHub.Register<AudioProjectLoadedEvent>(this, OnAudioProjectLoaded);
+            _eventHub.Register<AudioProjectExplorerNodeSelectedEvent>(this, OnAudioProjectExplorerNodeSelected);
         }
 
         public AudioProjectExplorerViewModel AudioProjectExplorerViewModel { get; }
@@ -72,6 +75,14 @@ namespace Editors.Audio.AudioEditor.Presentation
         public string DisplayName { get; set; } = "Audio Editor";
 
         private void OnAudioProjectLoaded(AudioProjectLoadedEvent e) => IsAudioProjectLoaded = true;
+
+        private void OnAudioProjectExplorerNodeSelected(AudioProjectExplorerNodeSelectedEvent e)
+        {
+            if (e.TreeNode.IsActionEvent() || e.TreeNode.IsDialogueEvent() || e.TreeNode.IsStateGroup())
+                IsSettingsBorderVisible = true;
+            else
+                IsSettingsBorderVisible = false;
+        }
 
         [RelayCommand] public void NewAudioProject() => _uiCommandFactory.Create<OpenNewAudioProjectWindowCommand>().Execute();
 
