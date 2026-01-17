@@ -6,7 +6,7 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:sys="clr-namespace:System;assembly=netstandard"
     xmlns:ExtendedWpfToolkit="clr-namespace:Xceed.Wpf.Toolkit;assembly=Xceed.Wpf.Toolkit"
-    xmlns:Converters="clr-namespace:Editors.Audio.Shared.UI.Converters"
+    xmlns:ValueConverters="clr-namespace:Editors.Audio.Shared.UI.ValueConverters"
     xmlns:Settings="clr-namespace:Editors.Audio.AudioEditor.Presentation.Settings"
     d:DataContext="{d:DesignInstance Type=Settings:SettingsViewModel}"
     mc:Ignorable="d"
@@ -16,7 +16,7 @@
     <UserControl.Resources>
         <BooleanToVisibilityConverter 
             x:Key="BoolToVisibilityConverter"/>
-        <Converters:EnumConverter 
+        <ValueConverters:EnumConverter 
             x:Key="EnumConverter"/>
         <DataTemplate 
             x:Key="EnumToStringTemplate">

@@ -1,7 +1,7 @@
 ﻿using System.Windows.Input;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using Editors.Audio.AudioEditor.Commands;
+using Editors.Audio.AudioEditor.Commands.Dialogs;
 using Editors.Audio.AudioEditor.Core;
 using Editors.Audio.AudioEditor.Events;
 using Editors.Audio.AudioEditor.Presentation.AudioFilesExplorer;
@@ -9,14 +9,13 @@ using Editors.Audio.AudioEditor.Presentation.AudioProjectEditor;
 using Editors.Audio.AudioEditor.Presentation.AudioProjectExplorer;
 using Editors.Audio.AudioEditor.Presentation.AudioProjectViewer;
 using Editors.Audio.AudioEditor.Presentation.Settings;
-using Editors.Audio.AudioEditor.Presentation.Shared.Services;
 using Editors.Audio.AudioEditor.Presentation.WaveformVisualiser;
 using Editors.Audio.Shared.AudioProject.Compiler;
 using Editors.Audio.Shared.AudioProject.Models;
 using Shared.Core.Events;
 using Shared.Core.ToolCreation;
 
-namespace Editors.Audio.AudioEditor
+namespace Editors.Audio.AudioEditor.Presentation
 {
     public partial class AudioEditorViewModel : ObservableObject, IEditorInterface
     {

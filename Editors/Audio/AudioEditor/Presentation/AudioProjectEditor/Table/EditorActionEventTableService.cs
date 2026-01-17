@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Data;
 using Editors.Audio.AudioEditor.Core;
-using Editors.Audio.AudioEditor.Events;
-using Editors.Audio.AudioEditor.Presentation.Shared;
+using Editors.Audio.AudioEditor.Events.AudioProjectEditor.Table;
+using Editors.Audio.AudioEditor.Presentation.Shared.Models;
 using Editors.Audio.AudioEditor.Presentation.Shared.Table;
 using Editors.Audio.Shared.GameInformation.Warhammer3;
 using Shared.Core.Events;
@@ -31,7 +31,7 @@ namespace Editors.Audio.AudioEditor.Presentation.AudioProjectEditor.Table
         public List<string> DefineSchema()
         {
             var schema = new List<string>();
-            var columnName = TableInfo.EventColumnName;
+            var columnName = TableInformation.EventColumnName;
             schema.Add(columnName);
             return schema;
         }
@@ -53,7 +53,7 @@ namespace Editors.Audio.AudioEditor.Presentation.AudioProjectEditor.Table
             var selectedAudioProjectExplorerNode = _audioEditorStateService.SelectedAudioProjectExplorerNode;
             if (selectedAudioProjectExplorerNode.Name == Wh3ActionEventInformation.GetName(Wh3ActionEventType.Movies))
             {
-                var fileSelectColumnHeader = TableInfo.BrowseMovieColumnName;
+                var fileSelectColumnHeader = TableInformation.BrowseMovieColumnName;
                 var fileSelectColumn = DataGridTemplates.CreateColumnTemplate(fileSelectColumnHeader, 85, useAbsoluteWidth: true);
                 fileSelectColumn.CellTemplate = DataGridTemplates.CreateFileSelectButtonCellTemplate(_uiCommandFactory);
                 _eventHub.Publish(new EditorDataGridColumnAddRequestedEvent(fileSelectColumn));
@@ -86,7 +86,7 @@ namespace Editors.Audio.AudioEditor.Presentation.AudioProjectEditor.Table
                 eventName = "Play_";
 
             var row = editorTable.NewRow();
-            row[TableInfo.EventColumnName] = eventName;
+            row[TableInformation.EventColumnName] = eventName;
 
             _eventHub.Publish(new EditorTableRowAddRequestedEvent(row));
         }

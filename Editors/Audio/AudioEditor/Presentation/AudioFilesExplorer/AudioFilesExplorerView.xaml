@@ -4,15 +4,17 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-    xmlns:Converters="clr-namespace:Editors.Audio.Shared.UI.Converters"
+    xmlns:ValueConverters="clr-namespace:Editors.Audio.Shared.UI.ValueConverters"
+    xmlns:Models="clr-namespace:Editors.Audio.AudioEditor.Presentation.Shared.Models"
+    xmlns:Controls="clr-namespace:Editors.Audio.AudioEditor.Presentation.Shared.Controls"
     xmlns:AudioFilesExplorer="clr-namespace:Editors.Audio.AudioEditor.Presentation.AudioFilesExplorer"
-    xmlns:Shared="clr-namespace:Editors.Audio.AudioEditor.Presentation.Shared"
     d:DataContext="{d:DesignInstance Type=AudioFilesExplorer:AudioFilesExplorerViewModel}"
     mc:Ignorable="d"
-    d:DesignHeight="250" d:DesignWidth="500">
+    d:DesignHeight="250" 
+    d:DesignWidth="500">
 
     <UserControl.Resources>
-        <Converters:ImageConverter 
+        <ValueConverters:ImageConverter 
             x:Key="ImageValueConverter"/>
         <BooleanToVisibilityConverter 
             x:Key="BoolToVisibilityConverter"/>
@@ -168,7 +170,7 @@
             </Border>
         </Grid>
 
-        <AudioFilesExplorer:MultiSelectTreeView
+        <Controls:MultiSelectTreeView
             x:Name="AudioFilesTreeView"
             Grid.Row="3"
             Grid.ColumnSpan="2"
@@ -178,10 +180,10 @@
             Background="{DynamicResource TreeView.Static.Background}"
             BorderBrush="Transparent"
             SelectedItems="{Binding SelectedTreeNodes, Mode=TwoWay}"
-            PreviewMouseDoubleClick="OnNodeDoubleClick"
+            MouseDoubleClick="OnMouseDoubleClick"
             Style="{StaticResource {x:Type TreeView}}">
 
-            <AudioFilesExplorer:MultiSelectTreeView.ItemContainerStyle>
+            <Controls:MultiSelectTreeView.ItemContainerStyle>
                 <Style 
                     TargetType="{x:Type TreeViewItem}" 
                     BasedOn="{StaticResource {x:Type TreeViewItem}}">
@@ -196,12 +198,27 @@
                                 Converter="{StaticResource BoolToVisibilityConverter}" />
                         </Setter.Value>
                     </Setter>
+                    <Style.Triggers>
+                        <Trigger 
+                            Property="Controls:MultiSelectTreeView.IsMultiSelected" 
+                            Value="True">
+                            <Setter 
+                                Property="Background" 
+                                Value="{DynamicResource TreeViewItem.Selected.Background}" />
+                            <Setter 
+                                Property="BorderBrush" 
+                                Value="{DynamicResource TreeViewItem.Selected.Border}" />
+                            <Setter 
+                                Property="Foreground" 
+                                Value="{DynamicResource ABrush.Foreground.Deeper}" />
+                        </Trigger>
+                    </Style.Triggers>
                 </Style>
-            </AudioFilesExplorer:MultiSelectTreeView.ItemContainerStyle>
+            </Controls:MultiSelectTreeView.ItemContainerStyle>
 
-            <AudioFilesExplorer:MultiSelectTreeView.ItemTemplate>
+            <Controls:MultiSelectTreeView.ItemTemplate>
                 <HierarchicalDataTemplate 
-                    DataType="{x:Type Shared:AudioFilesTreeNode}" 
+                    DataType="{x:Type Models:AudioFilesTreeNode}" 
                     ItemsSource="{Binding Children}">
                     <Grid>
                         <Grid.ColumnDefinitions>
@@ -222,7 +239,7 @@
                             Text="{Binding FileName}" />
                     </Grid>
                 </HierarchicalDataTemplate>
-            </AudioFilesExplorer:MultiSelectTreeView.ItemTemplate>
-        </AudioFilesExplorer:MultiSelectTreeView>
+            </Controls:MultiSelectTreeView.ItemTemplate>
+        </Controls:MultiSelectTreeView>
     </Grid>
 </UserControl>

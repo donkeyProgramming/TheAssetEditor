@@ -1,8 +1,7 @@
 ﻿using System.Windows.Controls;
 using System.Windows.Input;
-using Editors.Audio.AudioExplorer;
 
-namespace Audio.AudioExplorer
+namespace Editors.Audio.AudioExplorer
 {
     public partial class AudioExplorerView : UserControl
     {

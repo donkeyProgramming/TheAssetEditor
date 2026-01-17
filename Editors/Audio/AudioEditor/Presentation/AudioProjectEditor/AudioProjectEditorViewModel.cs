@@ -7,11 +7,18 @@ using System.Linq;
 using System.Windows.Controls;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using Editors.Audio.AudioEditor.Commands;
+using Editors.Audio.AudioEditor.Commands.AudioProjectEditor;
 using Editors.Audio.AudioEditor.Core;
 using Editors.Audio.AudioEditor.Events;
+using Editors.Audio.AudioEditor.Events.AudioFilesExplorer;
+using Editors.Audio.AudioEditor.Events.AudioProjectEditor;
+using Editors.Audio.AudioEditor.Events.AudioProjectEditor.Enablement;
+using Editors.Audio.AudioEditor.Events.AudioProjectEditor.Shortcuts;
+using Editors.Audio.AudioEditor.Events.AudioProjectEditor.Table;
+using Editors.Audio.AudioEditor.Events.AudioProjectExplorer;
+using Editors.Audio.AudioEditor.Events.AudioProjectViewer.Table;
 using Editors.Audio.AudioEditor.Presentation.AudioProjectEditor.Table;
-using Editors.Audio.AudioEditor.Presentation.Shared;
+using Editors.Audio.AudioEditor.Presentation.Shared.Models;
 using Editors.Audio.AudioEditor.Presentation.Shared.Table;
 using Editors.Audio.Shared.AudioProject.Models;
 using Editors.Audio.Shared.GameInformation.Warhammer3;
@@ -19,6 +26,7 @@ using Editors.Audio.Shared.Storage;
 using Serilog;
 using Shared.Core.ErrorHandling;
 using Shared.Core.Events;
+using Shared.Ui.Common;
 
 namespace Editors.Audio.AudioEditor.Presentation.AudioProjectEditor
 {
@@ -96,7 +104,7 @@ namespace Editors.Audio.AudioEditor.Presentation.AudioProjectEditor
             else if (selectedAudioProjectExplorerNode.IsDialogueEvent())
             {
                 MakeEditorVisible();
-                SetEditorLabel(TableHelpers.DuplicateUnderscores(selectedAudioProjectExplorerNode.Name));
+                SetEditorLabel(WpfHelpers.DuplicateUnderscores(selectedAudioProjectExplorerNode.Name));
                 Load(selectedAudioProjectExplorerNode.Type);
 
                 var moddedStatesCount = _audioEditorStateService.AudioProject.StateGroups.SelectMany(stateGroup => stateGroup.States).Count();
@@ -106,7 +114,7 @@ namespace Editors.Audio.AudioEditor.Presentation.AudioProjectEditor
             else if (selectedAudioProjectExplorerNode.IsStateGroup())
             {
                 MakeEditorVisible();
-                SetEditorLabel(TableHelpers.DuplicateUnderscores(selectedAudioProjectExplorerNode.Name));
+                SetEditorLabel(WpfHelpers.DuplicateUnderscores(selectedAudioProjectExplorerNode.Name));
                 Load(selectedAudioProjectExplorerNode.Type);
             }
             else
@@ -203,7 +211,7 @@ namespace Editors.Audio.AudioEditor.Presentation.AudioProjectEditor
                 var row = Table.Rows[0];
                 var wavFileName = Path.GetFileNameWithoutExtension(audioFiles[0].WavPackFileName);
                 var eventName = $"Play_{wavFileName}";
-                row[TableInfo.EventColumnName] = eventName;
+                row[TableInformation.EventColumnName] = eventName;
             }
 
             SetAddRowButtonEnablement();
@@ -221,7 +229,7 @@ namespace Editors.Audio.AudioEditor.Presentation.AudioProjectEditor
             var eventName = $"Play_Movie_{slashesToUnderscores}";
 
             var row = Table.Rows[0];
-            row[TableInfo.EventColumnName] = eventName;
+            row[TableInformation.EventColumnName] = eventName;
         }
 
         public void OnEditorAddRowButtonEnablementUpdateRequested(EditorAddRowButtonEnablementUpdateRequestedEvent e) => SetAddRowButtonEnablement();

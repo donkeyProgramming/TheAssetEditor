@@ -6,17 +6,21 @@ using System.Linq;
 using System.Windows.Controls;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using Editors.Audio.AudioEditor.Commands;
+using Editors.Audio.AudioEditor.Commands.AudioProjectViewer;
 using Editors.Audio.AudioEditor.Core;
 using Editors.Audio.AudioEditor.Events;
+using Editors.Audio.AudioEditor.Events.AudioProjectExplorer;
+using Editors.Audio.AudioEditor.Events.AudioProjectViewer.Shortcuts;
+using Editors.Audio.AudioEditor.Events.AudioProjectViewer.Table;
 using Editors.Audio.AudioEditor.Presentation.AudioProjectViewer.Table;
-using Editors.Audio.AudioEditor.Presentation.Shared;
+using Editors.Audio.AudioEditor.Presentation.Shared.Models;
 using Editors.Audio.AudioEditor.Presentation.Shared.Table;
 using Editors.Audio.Shared.AudioProject.Models;
 using Editors.Audio.Shared.Storage;
 using Serilog;
 using Shared.Core.ErrorHandling;
 using Shared.Core.Events;
+using Shared.Ui.Common;
 
 namespace Editors.Audio.AudioEditor.Presentation.AudioProjectViewer
 {
@@ -98,7 +102,7 @@ namespace Editors.Audio.AudioEditor.Presentation.AudioProjectViewer
             else if (selectedExplorerNode.IsDialogueEvent())
             {
                 SetViewerVisible();
-                SetViewerLabel(TableHelpers.DuplicateUnderscores(selectedExplorerNode.Name));
+                SetViewerLabel(WpfHelpers.DuplicateUnderscores(selectedExplorerNode.Name));
                 Load(selectedExplorerNode.Type);
 
                 SetContextMenuVisible();
@@ -108,7 +112,7 @@ namespace Editors.Audio.AudioEditor.Presentation.AudioProjectViewer
             else if (selectedExplorerNode.IsStateGroup())
             {
                 SetViewerVisible();
-                SetViewerLabel(TableHelpers.DuplicateUnderscores(selectedExplorerNode.Name));
+                SetViewerLabel(WpfHelpers.DuplicateUnderscores(selectedExplorerNode.Name));
                 Load(selectedExplorerNode.Type);
             }
             else
@@ -308,7 +312,7 @@ namespace Editors.Audio.AudioEditor.Presentation.AudioProjectViewer
             var selectedAudioProjectExplorerNodeName = _audioEditorStateService.SelectedAudioProjectExplorerNode.Name;
             var dialogueEventStateGroups = _audioRepository
                 .QualifiedStateGroupByStateGroupByDialogueEvent[selectedAudioProjectExplorerNodeName]
-                .Select(kvp => TableHelpers.DuplicateUnderscores(kvp.Key))
+                .Select(kvp => WpfHelpers.DuplicateUnderscores(kvp.Key))
                 .ToList();
 
             var copiedStateGroups = rowColumns;

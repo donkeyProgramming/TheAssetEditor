@@ -6,15 +6,12 @@ using Editors.Audio.AudioEditor.Core;
 using Editors.Audio.Shared.AudioProject.Models;
 using Editors.Audio.Shared.GameInformation.Warhammer3;
 using Editors.Audio.Shared.Storage;
+using Shared.Ui.Common;
 
 namespace Editors.Audio.AudioEditor.Presentation.Shared.Table
 {
-    internal static class TableHelpers
+    public static class TableHelpers
     {
-        public static string DuplicateUnderscores(string wtfWpf) => wtfWpf.Replace("_", "__");
-
-        public static string DeduplicateUnderscores(string wtfWpf) => wtfWpf.Replace("__", "_");
-
         public static List<string> GetStatesForStateGroupColumn(IAudioEditorStateService audioEditorStateService, IAudioRepository audioRepository, string stateGroup)
         {
             var states = new List<string>();
@@ -54,7 +51,7 @@ namespace Editors.Audio.AudioEditor.Presentation.Shared.Table
 
         public static string GetValueFromRow(DataRow row, string columnName) => row[columnName].ToString();
 
-        public static string GetActionEventNameFromRow(DataRow row) => GetValueFromRow(row, TableInfo.EventColumnName);
+        public static string GetActionEventNameFromRow(DataRow row) => GetValueFromRow(row, TableInformation.EventColumnName);
 
         public static string GetStatePathNameFromRow(DataRow row, IAudioRepository audioRepository, string dialogueEventName)
         {
@@ -72,7 +69,7 @@ namespace Editors.Audio.AudioEditor.Presentation.Shared.Table
                 if (string.IsNullOrEmpty(stateName))
                     continue;
 
-                var stateGroupNameWithQualifier = DeduplicateUnderscores(column.ColumnName);
+                var stateGroupNameWithQualifier = WpfHelpers.DeduplicateUnderscores(column.ColumnName);
                 var stateGroupName = GetStateGroupFromStateGroupWithQualifier(audioRepository, dialogueEventName, stateGroupNameWithQualifier);
 
                 var statePathNode = new StatePath.Node
@@ -87,7 +84,7 @@ namespace Editors.Audio.AudioEditor.Presentation.Shared.Table
             return statePathName;
         }
 
-        public static string GetStateNameFromRow(DataRow row) => GetValueFromRow(row, TableInfo.StateColumnName);
+        public static string GetStateNameFromRow(DataRow row) => GetValueFromRow(row, TableInformation.StateColumnName);
 
         public static void InsertRowAlphabeticallyByStatePathName(DataTable table, DataRow sourceRow, IAudioRepository audioRepository, string dialogueEventName)
         {

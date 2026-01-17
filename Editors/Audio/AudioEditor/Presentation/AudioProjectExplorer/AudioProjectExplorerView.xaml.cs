@@ -1,7 +1,7 @@
 ﻿using System.Windows;
 using System.Windows.Controls;
+using Editors.Audio.AudioEditor.Presentation.Shared.Models;
 using Editors.Audio.Shared.GameInformation.Warhammer3;
-using Editors.Audio.AudioEditor.Presentation.Shared;
 
 namespace Editors.Audio.AudioEditor.Presentation.AudioProjectExplorer
 {

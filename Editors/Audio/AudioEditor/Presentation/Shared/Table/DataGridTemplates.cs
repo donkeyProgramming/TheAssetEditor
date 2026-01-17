@@ -6,8 +6,9 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Data;
-using Editors.Audio.AudioEditor.Commands;
-using Editors.Audio.AudioEditor.Events;
+using Editors.Audio.AudioEditor.Commands.Dialogs;
+using Editors.Audio.AudioEditor.Events.AudioProjectEditor.Enablement;
+using Editors.Audio.AudioEditor.Events.AudioProjectEditor.Table;
 using Shared.Core.Events;
 
 namespace Editors.Audio.AudioEditor.Presentation.Shared.Table
