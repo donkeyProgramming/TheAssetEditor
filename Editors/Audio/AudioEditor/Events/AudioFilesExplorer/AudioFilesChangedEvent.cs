@@ -3,5 +3,5 @@ using Editors.Audio.Shared.AudioProject.Models;
 
 namespace Editors.Audio.AudioEditor.Events.AudioFilesExplorer
 {
-    public record AudioFilesChangedEvent(List<AudioFile> AudioFiles, bool AddToExistingAudioFiles, bool IsSetFromViewerItem, bool IsSetFromEditedItem);
+    public record AudioFilesChangedEvent(List<AudioFile> AudioFiles, bool AddToExistingAudioFiles, bool IsSetFromViewerItem, bool IsSetFromEditedViewerItem);
 }

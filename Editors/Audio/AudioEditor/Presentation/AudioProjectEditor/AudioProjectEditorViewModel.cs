@@ -193,9 +193,9 @@ namespace Editors.Audio.AudioEditor.Presentation.AudioProjectEditor
             _eventHub.Publish(new EditorTableRowAddRequestedEvent(e.Row));
         }
 
-        private void OnAudioFilesChanged(AudioFilesChangedEvent e) => SetEventNameFromAudioFile(e.AudioFiles, e.AddToExistingAudioFiles, e.IsSetFromEditedItem);
+        private void OnAudioFilesChanged(AudioFilesChangedEvent e) => SetEventNameFromAudioFile(e.AudioFiles, e.AddToExistingAudioFiles, e.IsSetFromEditedViewerItem);
 
-        private void SetEventNameFromAudioFile(List<AudioFile> audioFiles, bool addToExistingAudioFiles, bool isSetFromEditedItem)
+        private void SetEventNameFromAudioFile(List<AudioFile> audioFiles, bool addToExistingAudioFiles, bool isSetFromEditedViewerItem)
         {
             var selectedAudioProjectExplorerNode = _audioEditorStateService.SelectedAudioProjectExplorerNode;
             var isActionEvent = selectedAudioProjectExplorerNode.IsActionEvent();
@@ -203,7 +203,7 @@ namespace Editors.Audio.AudioEditor.Presentation.AudioProjectEditor
             var hasExistingAudioFiles = _audioEditorStateService.AudioFiles.Count > 0;
 
             if (isActionEvent
-                && !isSetFromEditedItem
+                && isSetFromEditedViewerItem
                 && isNotMoviesActionEvent
                 && audioFiles.Count == 1
                 && ((hasExistingAudioFiles && !addToExistingAudioFiles) || (!hasExistingAudioFiles && addToExistingAudioFiles)))
