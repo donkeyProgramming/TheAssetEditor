@@ -12,6 +12,7 @@ using Editors.Audio.AudioEditor.Presentation.AudioProjectViewer;
 using Editors.Audio.AudioEditor.Presentation.AudioProjectViewer.Table;
 using Editors.Audio.AudioEditor.Presentation.NewAudioProject;
 using Editors.Audio.AudioEditor.Presentation.Settings;
+using Editors.Audio.AudioEditor.Presentation.Shared.Services;
 using Editors.Audio.AudioEditor.Presentation.Shared.Table;
 using Editors.Audio.AudioEditor.Presentation.WaveformVisualiser;
 using Editors.Audio.AudioExplorer;
@@ -41,6 +42,7 @@ namespace Editors.Audio
             serviceCollection.AddScoped<IAudioEditorStateService, AudioEditorStateService>();
             serviceCollection.AddScoped<IAudioEditorFileService, AudioEditorFileService>();
             serviceCollection.AddScoped<IAudioEditorIntegrityService, AudioEditorIntegrityService>();
+            serviceCollection.AddScoped<IShortcutService, ShortcutService>();
 
             // Audio Editor View Models
             serviceCollection.AddScoped<AudioEditorViewModel>();
@@ -49,7 +51,7 @@ namespace Editors.Audio
             serviceCollection.AddScoped<AudioProjectEditorViewModel>();
             serviceCollection.AddScoped<AudioProjectViewerViewModel>();
             serviceCollection.AddScoped<SettingsViewModel>();
-            var serviceCollection1 = serviceCollection.AddScoped<WaveformVisualiserViewModel>();
+            serviceCollection.AddScoped<WaveformVisualiserViewModel>();
 
             // New Audio Project
             serviceCollection.AddTransient<NewAudioProjectViewModel>();
@@ -107,7 +109,6 @@ namespace Editors.Audio
             serviceCollection.AddSingleton<IWaveformVisualisationCacheService, WaveformVisualisationCacheService>();
             serviceCollection.AddTransient<IWaveformRendererService, WaveformRendererService>();
             serviceCollection.AddTransient<ISoundEngine, SoundEngine>();
-
 
             // Audio Project
             serviceCollection.AddScoped<IAudioProjectFileService, AudioProjectFileService>();

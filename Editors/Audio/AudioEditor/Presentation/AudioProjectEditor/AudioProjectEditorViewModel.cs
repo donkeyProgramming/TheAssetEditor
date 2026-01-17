@@ -68,6 +68,7 @@ namespace Editors.Audio.AudioEditor.Presentation.AudioProjectEditor
             _eventHub.Register<EditorDataGridTextboxTextChangedEvent>(this, OnEditorDataGridTextboxTextChanged);
             _eventHub.Register<MovieFileChangedEvent>(this, OnMovieFileChanged);
             _eventHub.Register<EditorAddRowButtonEnablementUpdateRequestedEvent>(this, OnEditorAddRowButtonEnablementUpdateRequested);
+            _eventHub.Register<EditorAddRowShortcutActivatedEvent>(this, OnEditorAddRowShortcutActivated);
         }
 
         private void OnAudioProjectInitialised(AudioProjectLoadedEvent e)
@@ -231,6 +232,12 @@ namespace Editors.Audio.AudioEditor.Presentation.AudioProjectEditor
             tableService.Load(Table);
         }
 
+        private void OnEditorAddRowShortcutActivated(EditorAddRowShortcutActivatedEvent e)
+        {
+            if (_audioEditorStateService.EditorRow != null)
+                AddRowToViewer();
+        }
+
         [RelayCommand] public void AddRowToViewer() => _uiCommandFactory.Create<AddEditorRowToViewerCommand>().Execute(Table.Rows[0]);
 
         partial void OnShowModdedStatesOnlyChanged(bool value)
@@ -272,6 +279,7 @@ namespace Editors.Audio.AudioEditor.Presentation.AudioProjectEditor
             else
             {
                 IsAddRowButtonEnabled = true;
+                _audioEditorStateService.StoreEditorRow(Table.Rows[0]);
                 return;
             }
         }

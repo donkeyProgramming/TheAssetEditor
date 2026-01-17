@@ -230,24 +230,6 @@ namespace Editors.Audio.AudioEditor.Presentation.Shared.Table
                 }
             }));
 
-            //factory.AddHandler(UIElement.PreviewKeyDownEvent, new KeyEventHandler((sender, e) =>
-            //{
-            //    if (Keyboard.Modifiers == ModifierKeys.Control && e.Key == Key.V)
-            //    {
-            //        if (sender is TextBox textBox)
-            //        {
-            //            var clipboardText = string.Empty;
-            //            if (Clipboard.ContainsText())
-            //                clipboardText = Clipboard.GetText(TextDataFormat.UnicodeText);
-
-            //            _ = textBox.Dispatcher.BeginInvoke(new Action(() =>
-            //            {
-            //                eventHub.Publish(new EditorDataGridTextboxPastedEvent(clipboardText));
-            //            }), System.Windows.Threading.DispatcherPriority.Background);
-            //        }
-            //    }
-            //}), handledEventsToo: true);
-
             template.VisualTree = factory;
             return template;
         }

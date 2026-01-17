@@ -38,34 +38,19 @@ namespace Editors.Audio.AudioEditor.Presentation.Settings
             }
         }
 
-        private void OnAudioFileDoubleClick(object sender, MouseButtonEventArgs e)
+        private void OnAudioFilesListViewMouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
-            if (DataContext is SettingsViewModel viewModel)
-            {
-                if (AudioFilesListView.SelectedItem is AudioFile audioFile)
-                    viewModel.PlayWav(audioFile);
-            }
+            if (AudioFilesListView.SelectedItem is AudioFile audioFile)
+                ViewModel.PlayWav(audioFile);
         }
 
-        private void OnAudioFilesListViewPreviewKeyDown(object sender, KeyEventArgs e)
+        private void OnAudioFilesListViewSelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            if (e.Key == Key.Delete || e.Key == Key.Back)
-            {
-                if (ViewModel.ShowSettingsFromAudioProjectViewer)
-                    return;
-
-                var selectedAudioFiles = AudioFilesListView.SelectedItems
-                    .Cast<AudioFile>()
-                    .Where(audioFile => audioFile != null)
-                    .ToList();
-
-                if (selectedAudioFiles.Count == 0)
-                    return;
-
-                ViewModel.RemoveAudioFiles(selectedAudioFiles);
-
-                e.Handled = true;
-            }
+            var selectedAudioFiles = AudioFilesListView.SelectedItems
+                .Cast<AudioFile>()
+                .Where(audioFile => audioFile != null)
+                .ToList();
+            ViewModel.OnSelectedAudioFilesChanged(selectedAudioFiles);
         }
     }
 }

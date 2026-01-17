@@ -46,18 +46,32 @@
             <Button 
                 Grid.Column="0"
                 Content="Add Row"
-                ToolTip="Adds the row to the Audio Project." 
+                ToolTipService.ShowOnDisabled="True"
                 Command="{Binding AddRowToViewerCommand}" 
                 Margin="5, 0, 0, 0" 
                 Width="70" 
                 VerticalAlignment="Center" 
                 HorizontalAlignment="Left"
-                IsEnabled="{Binding IsAddRowButtonEnabled}"/>
+                IsEnabled="{Binding IsAddRowButtonEnabled}">
+                
+                <Button.ToolTip>
+                    <ToolTip>
+                        <TextBlock TextWrapping="Wrap">
+                            <Run Text="Adds the row to the Audio Project."/>
+                            <LineBreak/>
+                            <LineBreak/>
+                            <Run Text="Shortcut: Ctrl + Q."/>
+                        </TextBlock>
+                    </ToolTip>
+                </Button.ToolTip>
+            </Button>
+
 
             <CheckBox 
                 Grid.Column="1"
                 Content="Show Modded States Only"
-                ToolTip="Shows only modded states in the drop downs rather than modded states and vanilla states." 
+                ToolTip="Shows only modded states in the drop downs rather than modded states and vanilla states."
+                ToolTipService.ShowOnDisabled="True"
                 Margin="5, 0, 0, 0" 
                 VerticalAlignment="Center" 
                 IsChecked="{Binding ShowModdedStatesOnly, Mode=TwoWay}" 

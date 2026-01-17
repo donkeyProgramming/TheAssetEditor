@@ -20,7 +20,6 @@ namespace Editors.Audio.AudioEditor.Presentation.Settings
     public partial class SettingsViewModel : ObservableObject
     {
         private readonly IEventHub _eventHub;
-        private readonly IUiCommandFactory _uiCommandFactory;
         private readonly IAudioEditorStateService _audioEditorStateService;
         private readonly IAudioRepository _audioRepository;
 
@@ -28,6 +27,8 @@ namespace Editors.Audio.AudioEditor.Presentation.Settings
 
         [ObservableProperty] private bool _isSettingsVisible = false;
         [ObservableProperty] private bool _showSettingsFromAudioProjectViewer = false;
+        [ObservableProperty] private bool _isSetRecommendedVOSettingsEnabled = false;
+        [ObservableProperty] private bool _isRemoveAudioFilesEnabled = false;
 
         [ObservableProperty] private ContainerType _containerType;
         [ObservableProperty] private ObservableCollection<ContainerType> _containerTypes = new(Enum.GetValues<ContainerType>());
@@ -68,10 +69,11 @@ namespace Editors.Audio.AudioEditor.Presentation.Settings
         [ObservableProperty] private bool _isTransitionDurationEnabled = false;
         [ObservableProperty] private bool _isTransitionDurationVisible = false;
 
-        public SettingsViewModel(IEventHub eventHub, IUiCommandFactory uiCommandFactory, IAudioEditorStateService audioEditorStateService, IAudioRepository audioRepository)
+        private List<AudioFile> _selectedAudioFiles = [];
+
+        public SettingsViewModel(IEventHub eventHub, IAudioEditorStateService audioEditorStateService, IAudioRepository audioRepository)
         {
             _eventHub = eventHub;
-            _uiCommandFactory = uiCommandFactory;
             _audioEditorStateService = audioEditorStateService;
             _audioRepository = audioRepository;
 
@@ -82,6 +84,8 @@ namespace Editors.Audio.AudioEditor.Presentation.Settings
             _eventHub.Register<AudioFilesChangedEvent>(this, OnAudioFilesChanged);
             _eventHub.Register<ViewerTableRowSelectionChangedEvent>(this, OnViewerTableRowSelectionChanged);
             _eventHub.Register<ViewerTableRowEditedEvent>(this, OnViewerRowEdited);
+            _eventHub.Register<SettingsRemoveSelectedAudioFilesShortcutActivatedEvent>(this, OnSettingsRemoveSelectedAudioFilesShortcutActivated);
+            _eventHub.Register<EditorSetRecommendedVOSettingsShortcutActivatedEvent>(this, OnEditorSetRecommendedVOSettingsShortcutActivated);
         }
 
         private void OnAudioProjectExplorerNodeSelected(AudioProjectExplorerNodeSelectedEvent e)
@@ -115,6 +119,11 @@ namespace Editors.Audio.AudioEditor.Presentation.Settings
 
             if (e.IsSetFromViewerItem == false)
                 ShowSettingsFromAudioProjectViewer = false;
+
+            if (AudioFiles.Count >= 1)
+                IsSetRecommendedVOSettingsEnabled = true;
+            else
+                IsSetRecommendedVOSettingsEnabled = false;
 
             SetSettingsUsabilityAndStore();
         }
@@ -164,14 +173,33 @@ namespace Editors.Audio.AudioEditor.Presentation.Settings
             _eventHub.Publish(new AudioFilesChangedEvent(audioFiles, false, false, false));
         }
 
-        public void RemoveAudioFiles(List<AudioFile> audioFilesToRemove)
+        public void OnSelectedAudioFilesChanged(List<AudioFile> selectedAudioFiles)
         {
-            if (audioFilesToRemove == null || audioFilesToRemove.Count == 0)
+            _selectedAudioFiles = selectedAudioFiles;
+
+            if (!ShowSettingsFromAudioProjectViewer && selectedAudioFiles.Count >=1)
+                IsRemoveAudioFilesEnabled = true;
+            else
+                IsRemoveAudioFilesEnabled = false;
+        }
+
+        private void OnSettingsRemoveSelectedAudioFilesShortcutActivated(SettingsRemoveSelectedAudioFilesShortcutActivatedEvent e)
+        {
+            if (!ShowSettingsFromAudioProjectViewer && _selectedAudioFiles.Count != 0)
+                RemoveSelectedAudioFiles();
+        }
+
+        [RelayCommand] public void RemoveSelectedAudioFiles()
+        {
+            if (_selectedAudioFiles == null || _selectedAudioFiles.Count == 0)
                 return;
 
             var audioFiles = AudioFiles.ToList();
-            foreach (var audioFileToRemove in audioFilesToRemove.ToList())
-                audioFiles.Remove(audioFileToRemove);
+            foreach (var audioFile in _selectedAudioFiles.ToList())
+            {
+                _selectedAudioFiles.Remove(audioFile);
+                audioFiles.Remove(audioFile);
+            }
 
             _audioEditorStateService.StoreAudioFiles(audioFiles);
 
@@ -369,17 +397,18 @@ namespace Editors.Audio.AudioEditor.Presentation.Settings
             if (_audioEditorStateService.SelectedViewerRows.Count == 0)
                 return;
 
-            var audioProject = _audioEditorStateService.AudioProject;
             HircSettings hircSettings = null;
             var audioFiles = new List<AudioFile>();
 
+            var audioProject = _audioEditorStateService.AudioProject;
             var selectedAudioProjectExplorerNode = _audioEditorStateService.SelectedAudioProjectExplorerNode;
+            var selectedViewerRow = _audioEditorStateService.SelectedViewerRows[0];
+            var soundBank = _audioEditorStateService.AudioProject.GetSoundBank(selectedAudioProjectExplorerNode.Parent.Parent.Name);
+
             if (selectedAudioProjectExplorerNode.IsActionEvent())
             {
-                var selectedViewerRow = _audioEditorStateService.SelectedViewerRows[0];
                 var actionEventName = TableHelpers.GetActionEventNameFromRow(selectedViewerRow);
                 var actionEvent = _audioEditorStateService.AudioProject.GetActionEvent(actionEventName);
-                var soundBank = _audioEditorStateService.AudioProject.GetSoundBank(selectedAudioProjectExplorerNode.Parent.Parent.Name);
 
                 var playActions = actionEvent.GetPlayActions();
                 if (playActions.Count > 1)
@@ -391,60 +420,34 @@ namespace Editors.Audio.AudioEditor.Presentation.Settings
                     {
                         var sound = soundBank.GetSound(playAction.TargetHircId);
                         hircSettings = sound.HircSettings;
-
-                        var audioFile = audioProject.GetAudioFile(sound.SourceId);
-                        audioFiles.Add(audioFile);
+                        audioFiles.Add(audioProject.GetAudioFile(sound.SourceId));
                     }
                     else if (playAction.TargetHircTypeIsRandomSequenceContainer())
                     {
                         var randomSequenceContainer = soundBank.GetRandomSequenceContainer(playAction.TargetHircId);
                         hircSettings = randomSequenceContainer.HircSettings;
-
-                        var sounds = soundBank.GetSounds(randomSequenceContainer.Children);
-                        var orderedSounds = sounds
-                            .OrderBy(sound => sound.PlaylistOrder)
-                            .ToList();
-                        foreach (var orderedSound in orderedSounds)
-                        {
-                            var audioFile = audioProject.GetAudioFile(orderedSound.SourceId);
-                            audioFiles.Add(audioFile);
-                        }
+                        audioFiles = audioProject.GetAudioFiles(soundBank, randomSequenceContainer);
                     }
                 }
-                
             }
             else if (selectedAudioProjectExplorerNode.IsDialogueEvent())
             {
-                var selectedViewerRow = _audioEditorStateService.SelectedViewerRows[0];
                 var dialogueEvent = _audioEditorStateService.AudioProject.GetDialogueEvent(selectedAudioProjectExplorerNode.Name);
                 var statePathName = TableHelpers.GetStatePathNameFromRow(selectedViewerRow, _audioRepository, selectedAudioProjectExplorerNode.Name);
                 var statePath = dialogueEvent.GetStatePath(statePathName);
-                var soundBank = _audioEditorStateService.AudioProject.GetSoundBank(selectedAudioProjectExplorerNode.Parent.Parent.Name);
 
                 if (statePath.TargetHircTypeIsSound())
                 {
                     var sound = soundBank.GetSound(statePath.TargetHircId);
                     hircSettings = sound.HircSettings;
-
-                    var audioFile = audioProject.GetAudioFile(sound.SourceId);
-                    audioFiles.Add(audioFile);
+                    audioFiles.Add(audioProject.GetAudioFile(sound.SourceId));
                 }
                 else if (statePath.TargetHircTypeIsRandomSequenceContainer())
                 {
                     var randomSequenceContainer = soundBank.GetRandomSequenceContainer(statePath.TargetHircId);
                     hircSettings = randomSequenceContainer.HircSettings;
-
-                    var sounds = soundBank.GetSounds(randomSequenceContainer.Children);
-                    var orderedSounds = sounds
-                        .OrderBy(sound => sound.PlaylistOrder)
-                        .ToList();
-                    foreach (var orderedSound in orderedSounds)
-                    {
-                        var audioFile = audioProject.GetAudioFile(orderedSound.SourceId);
-                        audioFiles.Add(audioFile);
-                    }
+                    audioFiles = audioProject.GetAudioFiles(soundBank, randomSequenceContainer);
                 }
-
             }
             else if (selectedAudioProjectExplorerNode.IsStateGroup())
                 return;
@@ -534,7 +537,13 @@ namespace Editors.Audio.AudioEditor.Presentation.Settings
             TransitionDuration = 1;
         }
 
-        [RelayCommand] public void SetRecommendedSettings()
+        private void OnEditorSetRecommendedVOSettingsShortcutActivated(EditorSetRecommendedVOSettingsShortcutActivatedEvent e)
+        {
+            if (_audioEditorStateService.EditorRow != null && _audioEditorStateService.AudioFiles.Count != 0 && !IsSetRecommendedVOSettingsEnabled)
+                SetRecommendedVOSettings();
+        }
+
+        [RelayCommand] public void SetRecommendedVOSettings()
         {
             if (AudioFiles.Count > 1)
             {

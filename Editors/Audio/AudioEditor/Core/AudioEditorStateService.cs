@@ -24,6 +24,7 @@ namespace Editors.Audio.AudioEditor.Core
         List<AudioFile> AudioFiles { get; set; }
 
         // Audio Project Viewer
+        DataRow EditorRow { get; set; }
         List<DataRow> SelectedViewerRows { get; set; }
         List<DataRow> CopiedViewerRows { get; set; }
 
@@ -34,7 +35,8 @@ namespace Editors.Audio.AudioEditor.Core
         void StoreCopiedFromAudioProjectExplorerNode(AudioProjectTreeNode node); 
         void StoreModdedStatesOnly(bool moddedStatesOnly);
         void StoreHircSettings(HircSettings hircSettings);
-        void StoreAudioFiles(List<AudioFile> audioFiles); 
+        void StoreAudioFiles(List<AudioFile> audioFiles);
+        void StoreEditorRow(DataRow row);
         void StoreSelectedViewerRows(List<DataRow> selectedViewerRows);
         void StoreCopiedViewerRows(List<DataRow> copiedViewerRows);
         void Reset();
@@ -50,6 +52,7 @@ namespace Editors.Audio.AudioEditor.Core
         public bool ShowModdedStatesOnly { get; set; }
         public HircSettings HircSettings { get; set; }
         public List<AudioFile> AudioFiles { get; set; } = [];
+        public DataRow EditorRow { get; set; }
         public List<DataRow> SelectedViewerRows { get; set; }
         public List<DataRow> CopiedViewerRows { get; set; }
 
@@ -69,6 +72,8 @@ namespace Editors.Audio.AudioEditor.Core
 
         public void StoreAudioFiles(List<AudioFile> audioFiles) => AudioFiles = audioFiles;
 
+        public void StoreEditorRow(DataRow row) => EditorRow = row;
+
         public void StoreSelectedViewerRows(List<DataRow> selectedViewerRows) => SelectedViewerRows = selectedViewerRows;
 
         public void StoreCopiedViewerRows(List<DataRow> copiedViewerRows) => CopiedViewerRows = copiedViewerRows;
@@ -83,7 +88,9 @@ namespace Editors.Audio.AudioEditor.Core
             ShowModdedStatesOnly = false;
             HircSettings = null;
             AudioFiles.Clear();
+            EditorRow = null;
             SelectedViewerRows = null;
+            CopiedViewerRows = null;
         }
     }
 }

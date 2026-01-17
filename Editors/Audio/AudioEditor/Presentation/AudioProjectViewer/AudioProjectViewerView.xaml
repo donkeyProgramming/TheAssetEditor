@@ -42,28 +42,52 @@
                 <ColumnDefinition 
                     Width="Auto"/>
             </Grid.ColumnDefinitions>
-
+            
             <Button 
                 Grid.Column="0"
                 Margin="5, 0, 0, 0" 
                 Width="70" 
                 VerticalAlignment="Center" 
                 HorizontalAlignment="Left"
-                Content="Edit Item" 
-                ToolTip="Removes the selected row from the Audio Project and adds it to the Audio Project Editor" 
+                Content="Edit Row"
+                ToolTipService.ShowOnDisabled="True"
                 Command="{Binding EditRowCommand}" 
-                IsEnabled="{Binding IsUpdateRowButtonEnabled}"/>
+                IsEnabled="{Binding IsUpdateRowButtonEnabled}">
 
+                <Button.ToolTip>
+                    <ToolTip>
+                        <TextBlock TextWrapping="Wrap">
+                            <Run Text="Removes the selected row from the Audio Project and adds it to the Audio Project Editor."/>
+                            <LineBreak/>
+                            <LineBreak/>
+                            <Run Text="Shortcut: Ctrl + E."/>
+                        </TextBlock>
+                    </ToolTip>
+                </Button.ToolTip>
+            </Button>
+            
             <Button 
                 Grid.Column="1"
                 Margin="5, 0, 0, 0" 
                 Width="90" 
                 VerticalAlignment="Center" 
                 HorizontalAlignment="Left"
-                Content="Remove Row" 
-                ToolTip="Removes the selected row(s) from the Audio Project." 
+                Content="Remove Row"
+                ToolTipService.ShowOnDisabled="True"
                 Command="{Binding RemoveRowCommand}" 
-                IsEnabled="{Binding IsRemoveRowButtonEnabled}"/>
+                IsEnabled="{Binding IsRemoveRowButtonEnabled}">
+
+                <Button.ToolTip>
+                    <ToolTip>
+                        <TextBlock TextWrapping="Wrap">
+                            <Run Text="Removes the selected row(s) from the Audio Project."/>
+                            <LineBreak/>
+                            <LineBreak/>
+                            <Run Text="Shortcuts: Delete / Backspace."/>
+                        </TextBlock>
+                    </ToolTip>
+                </Button.ToolTip>
+            </Button>
         </Grid>
 
         <!-- Setting CanUserAddRows to false ensures that data won't go missing from the last row when a new row is added. Wtf WPF. -->

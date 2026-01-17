@@ -63,12 +63,14 @@
                     Width="Auto"/>
                 <ColumnDefinition
                     Width="Auto"/>
+                <ColumnDefinition
+                    Width="Auto"/>
             </Grid.ColumnDefinitions>
 
             <Button 
                 Grid.Column="0"
                 Margin="5, 0, 0, 5" 
-                Width="95" 
+                Width="100" 
                 VerticalAlignment="Center" 
                 HorizontalAlignment="Left"
                 Content="Reset Settings" 
@@ -77,15 +79,40 @@
 
             <Button 
                 Grid.Column="1"
-                Width="165" 
+                Width="190" 
                 Margin="5, 0, 0, 5" 
                 VerticalAlignment="Center"
-                Content="Set Recommended Settings"
-                ToolTip="Sets the settings to what is recommended for the number of audio files selected. For example if multiple audio files are set it will set the recommended Random Sequence Container settings, and if a single audio file is set it will set the recommended settings for the Sound." 
-                Command="{Binding SetRecommendedSettingsCommand}"/>
+                Content="Set Recommended VO Settings"
+                ToolTipService.ShowOnDisabled="True"
+                Command="{Binding SetRecommendedVOSettingsCommand}"
+                IsEnabled="{Binding IsSetRecommendedVOSettingsEnabled}">
 
-            <CheckBox 
+                <Button.ToolTip>
+                    <ToolTip>
+                        <TextBlock TextWrapping="Wrap">
+                            <Run Text="When multiple audio files are set, this sets the container's settings to what is recommended for a container containing VO audio files."/>
+                            <LineBreak/>
+                            <LineBreak/>
+                            <Run Text="Shortcut: Ctrl + R."/>
+                        </TextBlock>
+                    </ToolTip>
+                </Button.ToolTip>
+            </Button>
+
+            <Button 
                 Grid.Column="2"
+                Width="130" 
+                Margin="5, 0, 0, 5" 
+                VerticalAlignment="Center"
+                Content="Remove Audio Files"
+                ToolTip="Remove the selected Audio Files from the Settings."
+                ToolTipService.ShowOnDisabled="True"
+                Command="{Binding RemoveSelectedAudioFilesCommand}"
+                IsEnabled="{Binding IsRemoveAudioFilesEnabled}">
+            </Button>
+            
+            <CheckBox 
+                Grid.Column="3"
                 Content="Show Settings from Audio Project Viewer"
                 ToolTip="When selecting items in the Audio Project Viewer with the selected the settings displayed will be that item's settings. When this is not selected the settings displayed will be the settings of the item in the Audio Project Editor." 
                 Margin="5, 0, 0, 5" 
@@ -140,8 +167,8 @@
                         AllowDrop="True"
                         Drop="OnListViewDrop"
                         DragOver="OnListViewDragOver"
-                        MouseDoubleClick="OnAudioFileDoubleClick"
-                        PreviewKeyDown="OnAudioFilesListViewPreviewKeyDown">
+                        MouseDoubleClick="OnAudioFilesListViewMouseDoubleClick"
+                        SelectionChanged="OnAudioFilesListViewSelectionChanged">
                         <ListView.View>
                             <GridView>
                                 <GridViewColumn 

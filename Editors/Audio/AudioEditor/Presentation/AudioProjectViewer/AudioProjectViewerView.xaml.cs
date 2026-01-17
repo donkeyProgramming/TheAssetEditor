@@ -3,8 +3,6 @@ using System.Data;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Input;
-
 
 namespace Editors.Audio.AudioEditor.Presentation.AudioProjectViewer
 {
@@ -16,10 +14,8 @@ namespace Editors.Audio.AudioEditor.Presentation.AudioProjectViewer
         {
             InitializeComponent();
             Loaded += OnLoaded;
-            PreviewKeyDown += OnPreviewKeyDown;
+            Unloaded += OnUnloaded;
         }
-
-        private void OnPreviewKeyDown(object sender, KeyEventArgs e) => ViewModel.OnPreviewKeyDown(e);
 
         private void OnLoaded(object sender, RoutedEventArgs e)
         {
@@ -27,6 +23,11 @@ namespace Editors.Audio.AudioEditor.Presentation.AudioProjectViewer
                 return;
 
             AudioProjectEditorDataGrid.SelectionChanged += OnDataGridSelectionChanged;
+        }
+
+        private void OnUnloaded(object sender, RoutedEventArgs e)
+        {
+            AudioProjectEditorDataGrid.SelectionChanged -= OnDataGridSelectionChanged;
         }
 
         private void OnDataGridSelectionChanged(object sender, SelectionChangedEventArgs e)

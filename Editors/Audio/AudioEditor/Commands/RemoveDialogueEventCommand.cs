@@ -36,7 +36,6 @@ namespace Editors.Audio.AudioEditor.Commands
                 var message = "State Path is incomplete probably due to a change to the Dialogue Event by CA. Add the missing State(s).";
                 MessageBox.Show(message, "Error");
             }
-
         }
     }
 }

@@ -100,7 +100,8 @@
                         SelectionChanged="OnWatermarkComboBoxSelectionChanged"
                         IsEnabled="{Binding IsDialogueEventFilterEnabled}"
                         Watermark="Select Dialogue Event Type Filter" 
-                        ToolTip="Dialogue Event Type refers to the type of action or trigger in game that the Dialogue Event relates to. Select the Dialogue Event type to filter by that."/>
+                        ToolTip="Dialogue Event Type refers to the type of action or trigger in game that the Dialogue Event relates to. Select the Dialogue Event type to filter by that."
+                        ToolTipService.ShowOnDisabled="True"/>
 
                     <ExtendedWpfToolkit:WatermarkComboBox 
                         x:Name ="DialogueEventProfileFilterComboBox"
@@ -116,7 +117,8 @@
                         SelectionChanged="OnWatermarkComboBoxSelectionChanged"
                         IsEnabled="{Binding IsDialogueEventFilterEnabled}"
                         Watermark="Select Dialogue Event Profile Filter" 
-                        ToolTip="The Dialogue Event profile refers to the Select the Dialogue Event profile to filter by that"/>
+                        ToolTip="The Dialogue Event profile refers to the Select the Dialogue Event profile to filter by that"
+                        ToolTipService.ShowOnDisabled="True"/>
                 </Grid>
 
                 <Grid

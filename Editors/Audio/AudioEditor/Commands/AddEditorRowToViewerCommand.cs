@@ -16,14 +16,9 @@ namespace Editors.Audio.AudioEditor.Commands
 
         public void Execute(DataRow row)
         {
-            // Store the row data in the Audio Project
             var selectedAudioProjectExplorerNode = _audioEditorStateService.SelectedAudioProjectExplorerNode;
             _audioProjectMutationUICommandFactory.Create(MutationType.Add, selectedAudioProjectExplorerNode.Type).Execute(row);
-
-            // Display the row in the Viewer
             _eventHub.Publish(new ViewerTableRowAddRequestedEvent(row));
-
-            // Reset the Editor
             _eventHub.Publish(new EditorTableRowAddedToViewerEvent());
         }
     }
