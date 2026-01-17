@@ -48,6 +48,7 @@
                     <MenuItem 
                         Header="Open Audio Project" 
                         Command="{Binding LoadAudioProjectCommand}"/>
+                    <Separator/>
                     <MenuItem 
                         Header="Save Audio Project" 
                         Command="{Binding SaveAudioProjectCommand}"
@@ -55,6 +56,11 @@
                     <MenuItem 
                         Header="Compile Audio Project" 
                         Command="{Binding CompileAudioProjectCommand}"
+                        IsEnabled="{Binding IsAudioProjectLoaded}"/>
+                    <Separator/>
+                    <MenuItem 
+                        Header="Refresh Source Ids" 
+                        Command="{Binding RefreshSourceIdsCommand}"
                         IsEnabled="{Binding IsAudioProjectLoaded}"/>
                 </MenuItem>
                 <MenuItem 

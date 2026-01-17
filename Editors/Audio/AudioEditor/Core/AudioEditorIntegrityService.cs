@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Windows;
+using Editors.Audio.Shared.AudioProject.Compiler;
 using Editors.Audio.Shared.AudioProject.Models;
 using Editors.Audio.Shared.GameInformation.Warhammer3;
 using Editors.Audio.Shared.Storage;
@@ -15,6 +16,7 @@ namespace Editors.Audio.AudioEditor.Core
     public interface IAudioEditorIntegrityService
     {
         void UpdateSoundBankNames(AudioProjectFile audioProject, string audioProjectNameWithoutExtension);
+        void RefreshSourceIds(AudioProjectFile audioProject);
         void CheckDialogueEventInformationIntegrity(List<Wh3DialogueEventDefinition> dialogueEventData);
         void CheckAudioProjectDialogueEventIntegrity(AudioProjectFile audioProject);
         void CheckAudioProjectWavFilesIntegrity(AudioProjectFile audioProject);
@@ -38,6 +40,31 @@ namespace Editors.Audio.AudioEditor.Core
                     var correctSoundBankName = $"{gameSoundBankName}_{audioProjectNameWithoutExtension}";
                     soundBank.Name = correctSoundBankName;
                 }
+            }
+        }
+
+        public void RefreshSourceIds(AudioProjectFile audioProject)
+        {
+            var audioProjectSourceIds = audioProject.GetAudioFileIds();
+            var languageId = WwiseHash.Compute(audioProject.Language);
+            var languageSourceIds = _audioRepository.GetUsedVanillaSourceIdsByLanguageId(languageId);
+
+            var usedSourceIds = new HashSet<uint>();
+            usedSourceIds.UnionWith(audioProjectSourceIds);
+            usedSourceIds.UnionWith(languageSourceIds);
+
+            var audioProjectSounds = audioProject.GetSounds();
+            foreach (var audioFile in audioProject.AudioFiles)
+            {
+                var audioFileIds = IdGenerator.GenerateIds(usedSourceIds);
+                usedSourceIds.Add(audioFile.Id);
+
+                foreach (var sound in audioProjectSounds.Where(sound => sound.SourceId == audioFile.Id))
+                {
+                    sound.SourceId = audioFileIds.Id;
+                }
+                audioFile.Guid = audioFileIds.Guid;
+                audioFile.Id = audioFileIds.Id;
             }
         }
 

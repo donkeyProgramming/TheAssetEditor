@@ -25,6 +25,7 @@ namespace Editors.Audio.AudioEditor
         private readonly IAudioEditorStateService _audioEditorStateService;
         private readonly IAudioEditorFileService _audioEditorFileService;
         private readonly IAudioProjectCompilerService _audioProjectCompilerService;
+        private readonly IAudioEditorIntegrityService _audioEditorIntegrityService;
         private readonly IShortcutService _shortcutService;
 
         [ObservableProperty] private bool _isAudioProjectLoaded = false;
@@ -35,6 +36,7 @@ namespace Editors.Audio.AudioEditor
             IAudioEditorStateService audioEditorStateService,
             IAudioEditorFileService audioEditorFileService,
             IAudioProjectCompilerService audioProjectCompilerService,
+            IAudioEditorIntegrityService audioEditorIntegrityService,
             IShortcutService shortcutService,
             AudioProjectExplorerViewModel audioProjectExplorerViewModel,
             AudioFilesExplorerViewModel audioFilesExplorerViewModel,
@@ -48,7 +50,9 @@ namespace Editors.Audio.AudioEditor
             _audioEditorStateService = audioEditorStateService;
             _audioEditorFileService = audioEditorFileService;
             _audioProjectCompilerService = audioProjectCompilerService;
+            _audioEditorIntegrityService = audioEditorIntegrityService;
             _shortcutService = shortcutService;
+
             AudioProjectExplorerViewModel = audioProjectExplorerViewModel;
             AudioFilesExplorerViewModel = audioFilesExplorerViewModel;
             AudioProjectEditorViewModel = audioProjectEditorViewModel;
@@ -96,6 +100,12 @@ namespace Editors.Audio.AudioEditor
         [RelayCommand] public void OpenAudioProjectMerger() => _uiCommandFactory.Create<OpenAudioProjectMergerWindowCommand>().Execute();
 
         [RelayCommand] public void OpenAudioProjectConverter() => _uiCommandFactory.Create<OpenAudioProjectConverterWindowCommand>().Execute();
+
+        [RelayCommand] public void RefreshSourceIds()
+        {
+            _audioEditorIntegrityService.RefreshSourceIds(_audioEditorStateService.AudioProject);
+            SaveAudioProject();
+        }
 
         public void OnPreviewKeyDown(KeyEventArgs e, bool isTextInputFocussed, bool isSettingsAudioFilesListViewFocussed)
         {
