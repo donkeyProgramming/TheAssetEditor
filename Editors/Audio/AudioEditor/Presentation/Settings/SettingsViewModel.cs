@@ -426,17 +426,7 @@ namespace Editors.Audio.AudioEditor.Presentation.Settings
 
         private void SetHircSettingsFromViewerItem(HircSettings hircSettings, List<AudioFile> audioFiles)
         {
-            ContainerType = ContainerType.Random;
-            RandomType = RandomType.Standard;
-            PlaylistEndBehaviour = PlaylistEndBehaviour.Restart;
-            PlayMode = PlayMode.Step;
-            EnableRepetitionInterval = false;
-            RepetitionInterval = 1;
-            AlwaysResetPlaylist = false;
-            LoopingType = LoopingType.Disabled;
-            NumberOfLoops = 1;
-            TransitionType = TransitionType.Disabled;
-            TransitionDuration = 1;
+            SetInitialSettings();
 
             if (audioFiles.Count > 1)
             {

@@ -25,7 +25,7 @@ namespace Editors.Audio.AudioEditor.Commands.AudioProjectMutation
         {
             var dialogueEventName = _audioEditorStateService.SelectedAudioProjectExplorerNode.Name;
             var audioFiles = _audioEditorStateService.AudioFiles;
-            var settings = _audioEditorStateService.HircSettings;
+            var hircSettings = _audioEditorStateService.HircSettings;
 
             var statePathList = new List<KeyValuePair<string, string>>();
             var stateGroupsWithQualifiers = _audioRepository.QualifiedStateGroupByStateGroupByDialogueEvent[dialogueEventName];
@@ -37,7 +37,7 @@ namespace Editors.Audio.AudioEditor.Commands.AudioProjectMutation
                 statePathList.Add(new KeyValuePair<string, string>(stateGroupName, stateName));
             }
 
-            _dialogueEventService.AddStatePath(dialogueEventName, audioFiles, settings, statePathList);
+            _dialogueEventService.AddStatePath(dialogueEventName, audioFiles, hircSettings, statePathList);
         }
     }
 }

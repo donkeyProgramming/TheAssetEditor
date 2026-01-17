@@ -40,6 +40,7 @@ namespace Editors.Audio.Shared.AudioProject.Models
             return new HircSettings
             {
                 ContainerType = hircSettings.ContainerType,
+                RandomType = hircSettings.RandomType,
                 EnableRepetitionInterval = hircSettings.EnableRepetitionInterval,
                 RepetitionInterval = hircSettings.RepetitionInterval,
                 PlaylistEndBehaviour = hircSettings.PlaylistEndBehaviour,

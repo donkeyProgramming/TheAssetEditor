@@ -286,7 +286,7 @@
                                         <LineBreak/>
                                         <Run Text="Standard - Plays objects at random."/>
                                         <LineBreak/>
-                                        <Run Text="Shuffle Exhaustive - Plays objects at random without repeating an object until the entire pool of objects has been played."/>
+                                        <Run Text="Shuffle - Plays objects at random without repeating an object until the entire pool of objects has been played."/>
                                     </TextBlock>
                                 </ToolTip>
                             </TextBlock.ToolTip>

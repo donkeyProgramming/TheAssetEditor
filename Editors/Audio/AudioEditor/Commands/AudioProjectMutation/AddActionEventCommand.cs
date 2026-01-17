@@ -18,9 +18,9 @@ namespace Editors.Audio.AudioEditor.Commands.AudioProjectMutation
         {
             var actionEventTypeName = _audioEditorStateService.SelectedAudioProjectExplorerNode.Name;
             var audioFiles = _audioEditorStateService.AudioFiles;
-            var settings = _audioEditorStateService.HircSettings;
+            var hircSettings = _audioEditorStateService.HircSettings;
             var actionEventName = TableHelpers.GetActionEventNameFromRow(row);
-            _actionEventService.AddActionEvent(actionEventTypeName, actionEventName, audioFiles, settings);
+            _actionEventService.AddActionEvent(actionEventTypeName, actionEventName, audioFiles, hircSettings);
         }
     }
 }
