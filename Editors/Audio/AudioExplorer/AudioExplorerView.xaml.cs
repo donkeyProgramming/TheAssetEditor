@@ -12,6 +12,6 @@ namespace Editors.Audio.AudioExplorer
             InitializeComponent();
         }
 
-        private void OnNodeDoubleClick(object sender, MouseButtonEventArgs e) => ViewModel.PlaySelectedSoundAction();
+        private void OnNodeDoubleClick(object sender, MouseButtonEventArgs e) => ViewModel.PlayAudio();
     }
 }
