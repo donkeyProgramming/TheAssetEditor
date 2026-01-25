@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using Editors.Audio.AudioEditor.Presentation.Shared;
+using Editors.Audio.AudioEditor.Presentation.Shared.Models;
 using Shared.Core.PackFiles.Models;
 
 namespace Editors.Audio.AudioEditor.Presentation.AudioFilesExplorer

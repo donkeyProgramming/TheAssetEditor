@@ -39,7 +39,7 @@ namespace Editors.Audio.Shared.GameInformation.Warhammer3
             new("Battle Advice", Wh3ActionEventType.BattleAdvice, Wh3SoundBank.BattleAdvice, ActorMixerId: 142435894),
 
             // Reference: Play_wh2_dlc13_camp_advice_emp_emperors_mandate_001_1
-            new("Battle Advice", Wh3ActionEventType.CampaignAdvice, Wh3SoundBank.CampaignAdvice, ActorMixerId: 517250292),
+            new("Campaign Advice", Wh3ActionEventType.CampaignAdvice, Wh3SoundBank.CampaignAdvice, ActorMixerId: 517250292),
 
             // Reference: Battle_Individual_Ability_Storm_Dragon_To_Human_Form_Transform
             new("Battle Abilities", BattleAbilities, BattleIndividualMagic, ActorMixerId: 140075115),

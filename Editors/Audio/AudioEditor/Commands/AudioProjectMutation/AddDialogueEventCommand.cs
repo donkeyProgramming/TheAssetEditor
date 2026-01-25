@@ -1,0 +1,43 @@
+﻿using System.Collections.Generic;
+using System.Data;
+using Editors.Audio.AudioEditor.Core;
+using Editors.Audio.AudioEditor.Core.AudioProjectMutation;
+using Editors.Audio.AudioEditor.Presentation.Shared.Models;
+using Editors.Audio.AudioEditor.Presentation.Shared.Table;
+using Editors.Audio.Shared.Storage;
+using Shared.Ui.Common;
+
+namespace Editors.Audio.AudioEditor.Commands.AudioProjectMutation
+{
+    public class AddDialogueEventCommand(
+        IAudioEditorStateService audioEditorStateService,
+        IAudioRepository audioRepository,
+        IDialogueEventService dialogueEventService) : IAudioProjectMutationUICommand
+    {
+        private readonly IAudioEditorStateService _audioEditorStateService = audioEditorStateService;
+        private readonly IAudioRepository _audioRepository = audioRepository;
+        private readonly IDialogueEventService _dialogueEventService = dialogueEventService;
+
+        public MutationType Action => MutationType.Add;
+        public AudioProjectTreeNodeType NodeType => AudioProjectTreeNodeType.DialogueEvent;
+
+        public void Execute(DataRow row)
+        {
+            var dialogueEventName = _audioEditorStateService.SelectedAudioProjectExplorerNode.Name;
+            var audioFiles = _audioEditorStateService.AudioFiles;
+            var hircSettings = _audioEditorStateService.HircSettings;
+
+            var statePathList = new List<KeyValuePair<string, string>>();
+            var stateGroupsWithQualifiers = _audioRepository.QualifiedStateGroupByStateGroupByDialogueEvent[dialogueEventName];
+            foreach (var stateGroupWithQualifier in stateGroupsWithQualifiers)
+            {
+                var stateGroupName = TableHelpers.GetStateGroupFromStateGroupWithQualifier(_audioRepository, dialogueEventName, stateGroupWithQualifier.Key);
+                var columnName = WpfHelpers.DuplicateUnderscores(stateGroupWithQualifier.Key);
+                var stateName = TableHelpers.GetValueFromRow(row, columnName);
+                statePathList.Add(new KeyValuePair<string, string>(stateGroupName, stateName));
+            }
+
+            _dialogueEventService.AddStatePath(dialogueEventName, audioFiles, hircSettings, statePathList);
+        }
+    }
+}

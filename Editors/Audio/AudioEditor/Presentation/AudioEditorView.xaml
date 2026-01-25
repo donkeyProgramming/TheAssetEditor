@@ -17,6 +17,10 @@
     mc:Ignorable="d" 
     d:DesignWidth="1200" d:DesignHeight="700">
 
+    <UserControl.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolToVisibilityConverter"/>
+    </UserControl.Resources>
+
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition 
@@ -48,6 +52,7 @@
                     <MenuItem 
                         Header="Open Audio Project" 
                         Command="{Binding LoadAudioProjectCommand}"/>
+                    <Separator/>
                     <MenuItem 
                         Header="Save Audio Project" 
                         Command="{Binding SaveAudioProjectCommand}"
@@ -55,6 +60,11 @@
                     <MenuItem 
                         Header="Compile Audio Project" 
                         Command="{Binding CompileAudioProjectCommand}"
+                        IsEnabled="{Binding IsAudioProjectLoaded}"/>
+                    <Separator/>
+                    <MenuItem 
+                        Header="Refresh Source Ids" 
+                        Command="{Binding RefreshSourceIdsCommand}"
                         IsEnabled="{Binding IsAudioProjectLoaded}"/>
                 </MenuItem>
                 <MenuItem 
@@ -180,7 +190,8 @@
                 <Border 
                     Grid.Row="1"
                     Height="5" 
-                    Background="{DynamicResource App.Border}"/>
+                    Background="{DynamicResource App.Border}"
+                    Visibility="{Binding IsSettingsBorderVisible, Converter={StaticResource BoolToVisibilityConverter}}"/>
 
                 <Settings:SettingsView 
                     Grid.Row="2"

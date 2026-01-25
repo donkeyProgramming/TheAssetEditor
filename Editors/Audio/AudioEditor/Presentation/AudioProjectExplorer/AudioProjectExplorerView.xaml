@@ -5,9 +5,9 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:sys="clr-namespace:System;assembly=netstandard"
-    xmlns:Converters="clr-namespace:Editors.Audio.Shared.UI.Converters"
+    xmlns:ValueConverters="clr-namespace:Editors.Audio.Shared.UI.ValueConverters"
     xmlns:ExtendedWpfToolkit="clr-namespace:Xceed.Wpf.Toolkit;assembly=Xceed.Wpf.Toolkit"
-    xmlns:Shared="clr-namespace:Editors.Audio.AudioEditor.Presentation.Shared" 
+    xmlns:Models="clr-namespace:Editors.Audio.AudioEditor.Presentation.Shared.Models" 
     xmlns:AudioProjectExplorer="clr-namespace:Editors.Audio.AudioEditor.Presentation.AudioProjectExplorer" 
     d:DataContext="{d:DesignInstance Type=AudioProjectExplorer:AudioProjectExplorerViewModel}"
     mc:Ignorable="d" 
@@ -16,7 +16,7 @@
     <UserControl.Resources>
         <sys:Double 
             x:Key="DefaultHeight">23</sys:Double>
-        <Converters:EnumConverter 
+        <ValueConverters:EnumConverter 
             x:Key="EnumConverter"/>
         <DataTemplate 
             x:Key="EnumToStringTemplate">
@@ -100,7 +100,8 @@
                         SelectionChanged="OnWatermarkComboBoxSelectionChanged"
                         IsEnabled="{Binding IsDialogueEventFilterEnabled}"
                         Watermark="Select Dialogue Event Type Filter" 
-                        ToolTip="Dialogue Event Type refers to the type of action or trigger in game that the Dialogue Event relates to. Select the Dialogue Event type to filter by that."/>
+                        ToolTip="Dialogue Event Type refers to the type of action or trigger in game that the Dialogue Event relates to. Select the Dialogue Event type to filter by that."
+                        ToolTipService.ShowOnDisabled="True"/>
 
                     <ExtendedWpfToolkit:WatermarkComboBox 
                         x:Name ="DialogueEventProfileFilterComboBox"
@@ -116,7 +117,8 @@
                         SelectionChanged="OnWatermarkComboBoxSelectionChanged"
                         IsEnabled="{Binding IsDialogueEventFilterEnabled}"
                         Watermark="Select Dialogue Event Profile Filter" 
-                        ToolTip="The Dialogue Event profile refers to the Select the Dialogue Event profile to filter by that"/>
+                        ToolTip="The Dialogue Event profile refers to the Select the Dialogue Event profile to filter by that"
+                        ToolTipService.ShowOnDisabled="True"/>
                 </Grid>
 
                 <Grid
@@ -297,7 +299,7 @@
 
                 <TreeView.Resources>
                     <HierarchicalDataTemplate 
-                        DataType="{x:Type Shared:AudioProjectTreeNode}" 
+                        DataType="{x:Type Models:AudioProjectTreeNode}" 
                         ItemsSource="{Binding Children}">
                         <TextBlock>
                             <TextBlock.Inlines>

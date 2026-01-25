@@ -1,10 +1,10 @@
-﻿using System.Windows.Controls;
-using System.Windows.Input;
+﻿using System.Windows.Input;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using Editors.Audio.AudioEditor.Commands;
+using Editors.Audio.AudioEditor.Commands.Dialogs;
 using Editors.Audio.AudioEditor.Core;
 using Editors.Audio.AudioEditor.Events;
+using Editors.Audio.AudioEditor.Events.AudioProjectExplorer;
 using Editors.Audio.AudioEditor.Presentation.AudioFilesExplorer;
 using Editors.Audio.AudioEditor.Presentation.AudioProjectEditor;
 using Editors.Audio.AudioEditor.Presentation.AudioProjectExplorer;
@@ -16,7 +16,7 @@ using Editors.Audio.Shared.AudioProject.Models;
 using Shared.Core.Events;
 using Shared.Core.ToolCreation;
 
-namespace Editors.Audio.AudioEditor
+namespace Editors.Audio.AudioEditor.Presentation
 {
     public partial class AudioEditorViewModel : ObservableObject, IEditorInterface
     {
@@ -25,8 +25,11 @@ namespace Editors.Audio.AudioEditor
         private readonly IAudioEditorStateService _audioEditorStateService;
         private readonly IAudioEditorFileService _audioEditorFileService;
         private readonly IAudioProjectCompilerService _audioProjectCompilerService;
+        private readonly IAudioEditorIntegrityService _audioEditorIntegrityService;
+        private readonly IShortcutService _shortcutService;
 
         [ObservableProperty] private bool _isAudioProjectLoaded = false;
+        [ObservableProperty] private bool _isSettingsBorderVisible = false;
 
         public AudioEditorViewModel(
             IUiCommandFactory uiCommandFactory,
@@ -34,6 +37,8 @@ namespace Editors.Audio.AudioEditor
             IAudioEditorStateService audioEditorStateService,
             IAudioEditorFileService audioEditorFileService,
             IAudioProjectCompilerService audioProjectCompilerService,
+            IAudioEditorIntegrityService audioEditorIntegrityService,
+            IShortcutService shortcutService,
             AudioProjectExplorerViewModel audioProjectExplorerViewModel,
             AudioFilesExplorerViewModel audioFilesExplorerViewModel,
             AudioProjectEditorViewModel audioProjectEditorViewModel,
@@ -46,6 +51,9 @@ namespace Editors.Audio.AudioEditor
             _audioEditorStateService = audioEditorStateService;
             _audioEditorFileService = audioEditorFileService;
             _audioProjectCompilerService = audioProjectCompilerService;
+            _audioEditorIntegrityService = audioEditorIntegrityService;
+            _shortcutService = shortcutService;
+
             AudioProjectExplorerViewModel = audioProjectExplorerViewModel;
             AudioFilesExplorerViewModel = audioFilesExplorerViewModel;
             AudioProjectEditorViewModel = audioProjectEditorViewModel;
@@ -54,6 +62,7 @@ namespace Editors.Audio.AudioEditor
             WaveformVisualiserViewModel = waveformVisualiserViewModel;
 
             _eventHub.Register<AudioProjectLoadedEvent>(this, OnAudioProjectLoaded);
+            _eventHub.Register<AudioProjectExplorerNodeSelectedEvent>(this, OnAudioProjectExplorerNodeSelected);
         }
 
         public AudioProjectExplorerViewModel AudioProjectExplorerViewModel { get; }
@@ -66,6 +75,14 @@ namespace Editors.Audio.AudioEditor
         public string DisplayName { get; set; } = "Audio Editor";
 
         private void OnAudioProjectLoaded(AudioProjectLoadedEvent e) => IsAudioProjectLoaded = true;
+
+        private void OnAudioProjectExplorerNodeSelected(AudioProjectExplorerNodeSelectedEvent e)
+        {
+            if (e.TreeNode.IsActionEvent() || e.TreeNode.IsDialogueEvent() || e.TreeNode.IsStateGroup())
+                IsSettingsBorderVisible = true;
+            else
+                IsSettingsBorderVisible = false;
+        }
 
         [RelayCommand] public void NewAudioProject() => _uiCommandFactory.Create<OpenNewAudioProjectWindowCommand>().Execute();
 
@@ -94,22 +111,15 @@ namespace Editors.Audio.AudioEditor
 
         [RelayCommand] public void OpenAudioProjectConverter() => _uiCommandFactory.Create<OpenAudioProjectConverterWindowCommand>().Execute();
 
-        public void OnPreviewKeyDown(KeyEventArgs e)
+        [RelayCommand] public void RefreshSourceIds()
         {
-            // This allows us to still paste into for example the Audio Project Editor ComboBoxes 
-            if (Keyboard.FocusedElement is ComboBox comboBox && comboBox.IsEditable)
-                return;
+            _audioEditorIntegrityService.RefreshSourceIds(_audioEditorStateService.AudioProject);
+            SaveAudioProject();
+        }
 
-            // This is here rather than the Audio Project Viewer because the the Viewer DataGrid only recognises key presses when
-            // you're focussed on the DataGrid and if you delete an item it loses focus whereas this recognises them anywhere.
-            if (_audioEditorStateService.CopiedViewerRows != null && _audioEditorStateService.CopiedViewerRows.Count != 0 )
-            {
-                if (Keyboard.Modifiers == ModifierKeys.Control && e.Key == Key.V)
-                {
-                    _eventHub.Publish(new PasteViewerRowsShortcutActivatedEvent());
-                    e.Handled = true;
-                }
-            }
+        public void OnPreviewKeyDown(KeyEventArgs e, bool isTextInputFocussed, bool isSettingsAudioFilesListViewFocussed)
+        {
+            _shortcutService.HandleShortcut(e, isTextInputFocussed, isSettingsAudioFilesListViewFocussed);
         }
 
         public void Close() => _audioEditorStateService.Reset();

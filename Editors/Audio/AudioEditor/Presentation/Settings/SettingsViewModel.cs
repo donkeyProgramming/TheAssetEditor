@@ -5,8 +5,14 @@ using System.Linq;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Editors.Audio.AudioEditor.Core;
-using Editors.Audio.AudioEditor.Events;
-using Editors.Audio.AudioEditor.Presentation.Shared;
+using Editors.Audio.AudioEditor.Events.AudioFilesExplorer;
+using Editors.Audio.AudioEditor.Events.AudioProjectEditor.Shortcuts;
+using Editors.Audio.AudioEditor.Events.AudioProjectEditor.Table;
+using Editors.Audio.AudioEditor.Events.AudioProjectExplorer;
+using Editors.Audio.AudioEditor.Events.AudioProjectViewer.Table;
+using Editors.Audio.AudioEditor.Events.Settings.Shortcuts;
+using Editors.Audio.AudioEditor.Events.WaveformVisualiser;
+using Editors.Audio.AudioEditor.Presentation.Shared.Models;
 using Editors.Audio.AudioEditor.Presentation.Shared.Table;
 using Editors.Audio.Shared.AudioProject.Compiler;
 using Editors.Audio.Shared.AudioProject.Models;
@@ -20,7 +26,6 @@ namespace Editors.Audio.AudioEditor.Presentation.Settings
     public partial class SettingsViewModel : ObservableObject
     {
         private readonly IEventHub _eventHub;
-        private readonly IUiCommandFactory _uiCommandFactory;
         private readonly IAudioEditorStateService _audioEditorStateService;
         private readonly IAudioRepository _audioRepository;
 
@@ -28,6 +33,8 @@ namespace Editors.Audio.AudioEditor.Presentation.Settings
 
         [ObservableProperty] private bool _isSettingsVisible = false;
         [ObservableProperty] private bool _showSettingsFromAudioProjectViewer = false;
+        [ObservableProperty] private bool _isSetRecommendedVOSettingsEnabled = false;
+        [ObservableProperty] private bool _isRemoveAudioFilesEnabled = false;
 
         [ObservableProperty] private ContainerType _containerType;
         [ObservableProperty] private ObservableCollection<ContainerType> _containerTypes = new(Enum.GetValues<ContainerType>());
@@ -68,10 +75,11 @@ namespace Editors.Audio.AudioEditor.Presentation.Settings
         [ObservableProperty] private bool _isTransitionDurationEnabled = false;
         [ObservableProperty] private bool _isTransitionDurationVisible = false;
 
-        public SettingsViewModel(IEventHub eventHub, IUiCommandFactory uiCommandFactory, IAudioEditorStateService audioEditorStateService, IAudioRepository audioRepository)
+        private List<AudioFile> _selectedAudioFiles = [];
+
+        public SettingsViewModel(IEventHub eventHub, IAudioEditorStateService audioEditorStateService, IAudioRepository audioRepository)
         {
             _eventHub = eventHub;
-            _uiCommandFactory = uiCommandFactory;
             _audioEditorStateService = audioEditorStateService;
             _audioRepository = audioRepository;
 
@@ -82,6 +90,8 @@ namespace Editors.Audio.AudioEditor.Presentation.Settings
             _eventHub.Register<AudioFilesChangedEvent>(this, OnAudioFilesChanged);
             _eventHub.Register<ViewerTableRowSelectionChangedEvent>(this, OnViewerTableRowSelectionChanged);
             _eventHub.Register<ViewerTableRowEditedEvent>(this, OnViewerRowEdited);
+            _eventHub.Register<SettingsRemoveSelectedAudioFilesShortcutActivatedEvent>(this, OnSettingsRemoveSelectedAudioFilesShortcutActivated);
+            _eventHub.Register<EditorSetRecommendedVOSettingsShortcutActivatedEvent>(this, OnEditorSetRecommendedVOSettingsShortcutActivated);
         }
 
         private void OnAudioProjectExplorerNodeSelected(AudioProjectExplorerNodeSelectedEvent e)
@@ -115,6 +125,11 @@ namespace Editors.Audio.AudioEditor.Presentation.Settings
 
             if (e.IsSetFromViewerItem == false)
                 ShowSettingsFromAudioProjectViewer = false;
+
+            if (AudioFiles.Count >= 1)
+                IsSetRecommendedVOSettingsEnabled = true;
+            else
+                IsSetRecommendedVOSettingsEnabled = false;
 
             SetSettingsUsabilityAndStore();
         }
@@ -164,14 +179,33 @@ namespace Editors.Audio.AudioEditor.Presentation.Settings
             _eventHub.Publish(new AudioFilesChangedEvent(audioFiles, false, false, false));
         }
 
-        public void RemoveAudioFiles(List<AudioFile> audioFilesToRemove)
+        public void OnSelectedAudioFilesChanged(List<AudioFile> selectedAudioFiles)
         {
-            if (audioFilesToRemove == null || audioFilesToRemove.Count == 0)
+            _selectedAudioFiles = selectedAudioFiles;
+
+            if (!ShowSettingsFromAudioProjectViewer && selectedAudioFiles.Count >=1)
+                IsRemoveAudioFilesEnabled = true;
+            else
+                IsRemoveAudioFilesEnabled = false;
+        }
+
+        private void OnSettingsRemoveSelectedAudioFilesShortcutActivated(SettingsRemoveSelectedAudioFilesShortcutActivatedEvent e)
+        {
+            if (!ShowSettingsFromAudioProjectViewer && _selectedAudioFiles.Count != 0)
+                RemoveSelectedAudioFiles();
+        }
+
+        [RelayCommand] public void RemoveSelectedAudioFiles()
+        {
+            if (_selectedAudioFiles == null || _selectedAudioFiles.Count == 0)
                 return;
 
             var audioFiles = AudioFiles.ToList();
-            foreach (var audioFileToRemove in audioFilesToRemove.ToList())
-                audioFiles.Remove(audioFileToRemove);
+            foreach (var audioFile in _selectedAudioFiles.ToList())
+            {
+                _selectedAudioFiles.Remove(audioFile);
+                audioFiles.Remove(audioFile);
+            }
 
             _audioEditorStateService.StoreAudioFiles(audioFiles);
 
@@ -182,10 +216,7 @@ namespace Editors.Audio.AudioEditor.Presentation.Settings
         partial void OnShowSettingsFromAudioProjectViewerChanged(bool value)
         {
             if (ShowSettingsFromAudioProjectViewer == false)
-            {
-                SetInitialSettings();
-                SetSettingsUsability();
-            }
+                ResetSettings();
         }
 
         partial void OnContainerTypeChanged(ContainerType value) => SetSettingsUsabilityAndStore();
@@ -369,106 +400,33 @@ namespace Editors.Audio.AudioEditor.Presentation.Settings
             if (_audioEditorStateService.SelectedViewerRows.Count == 0)
                 return;
 
-            var audioProject = _audioEditorStateService.AudioProject;
             HircSettings hircSettings = null;
             var audioFiles = new List<AudioFile>();
 
             var selectedAudioProjectExplorerNode = _audioEditorStateService.SelectedAudioProjectExplorerNode;
             if (selectedAudioProjectExplorerNode.IsActionEvent())
-            {
-                var selectedViewerRow = _audioEditorStateService.SelectedViewerRows[0];
-                var actionEventName = TableHelpers.GetActionEventNameFromRow(selectedViewerRow);
-                var actionEvent = _audioEditorStateService.AudioProject.GetActionEvent(actionEventName);
-                var soundBank = _audioEditorStateService.AudioProject.GetSoundBank(selectedAudioProjectExplorerNode.Parent.Parent.Name);
-
-                var playActions = actionEvent.GetPlayActions();
-                if (playActions.Count > 1)
-                    throw new NotSupportedException("Multiple Actions are not supported");
-
-                foreach (var playAction in playActions)
-                {
-                    if (playAction.TargetHircTypeIsSound())
-                    {
-                        var sound = soundBank.GetSound(playAction.TargetHircId);
-                        hircSettings = sound.HircSettings;
-
-                        var audioFile = audioProject.GetAudioFile(sound.SourceId);
-                        audioFiles.Add(audioFile);
-                    }
-                    else if (playAction.TargetHircTypeIsRandomSequenceContainer())
-                    {
-                        var randomSequenceContainer = soundBank.GetRandomSequenceContainer(playAction.TargetHircId);
-                        hircSettings = randomSequenceContainer.HircSettings;
-
-                        var sounds = soundBank.GetSounds(randomSequenceContainer.Children);
-                        var orderedSounds = sounds
-                            .OrderBy(sound => sound.PlaylistOrder)
-                            .ToList();
-                        foreach (var orderedSound in orderedSounds)
-                        {
-                            var audioFile = audioProject.GetAudioFile(orderedSound.SourceId);
-                            audioFiles.Add(audioFile);
-                        }
-                    }
-                }
-                
-            }
+                GetActionEventSettings(ref hircSettings, ref audioFiles);
             else if (selectedAudioProjectExplorerNode.IsDialogueEvent())
-            {
-                var selectedViewerRow = _audioEditorStateService.SelectedViewerRows[0];
-                var dialogueEvent = _audioEditorStateService.AudioProject.GetDialogueEvent(selectedAudioProjectExplorerNode.Name);
-                var statePathName = TableHelpers.GetStatePathNameFromRow(selectedViewerRow, _audioRepository, selectedAudioProjectExplorerNode.Name);
-                var statePath = dialogueEvent.GetStatePath(statePathName);
-                var soundBank = _audioEditorStateService.AudioProject.GetSoundBank(selectedAudioProjectExplorerNode.Parent.Parent.Name);
-
-                if (statePath.TargetHircTypeIsSound())
-                {
-                    var sound = soundBank.GetSound(statePath.TargetHircId);
-                    hircSettings = sound.HircSettings;
-
-                    var audioFile = audioProject.GetAudioFile(sound.SourceId);
-                    audioFiles.Add(audioFile);
-                }
-                else if (statePath.TargetHircTypeIsRandomSequenceContainer())
-                {
-                    var randomSequenceContainer = soundBank.GetRandomSequenceContainer(statePath.TargetHircId);
-                    hircSettings = randomSequenceContainer.HircSettings;
-
-                    var sounds = soundBank.GetSounds(randomSequenceContainer.Children);
-                    var orderedSounds = sounds
-                        .OrderBy(sound => sound.PlaylistOrder)
-                        .ToList();
-                    foreach (var orderedSound in orderedSounds)
-                    {
-                        var audioFile = audioProject.GetAudioFile(orderedSound.SourceId);
-                        audioFiles.Add(audioFile);
-                    }
-                }
-
-            }
+                GetDialogueEventSettings(ref hircSettings, ref audioFiles);
             else if (selectedAudioProjectExplorerNode.IsStateGroup())
                 return;
 
-            SetSettingsFromViewerItem(hircSettings, audioFiles, isRowEdited);
+            SetAudioFilesFromViewerItem(isRowEdited, audioFiles);
+            SetHircSettingsFromViewerItem(hircSettings, audioFiles);
+
+            SetSettingsUsability();
         }
 
-        private void SetSettingsFromViewerItem(HircSettings hircSettings, List<AudioFile> audioFiles, bool isRowEdited)
+        private void SetAudioFilesFromViewerItem(bool isRowEdited, List<AudioFile> audioFiles)
         {
-            ResetAudioFiles(true);
+            AudioFiles = new ObservableCollection<AudioFile>(audioFiles);
+            _audioEditorStateService.StoreAudioFiles(audioFiles);
+            _eventHub.Publish(new AudioFilesChangedEvent(audioFiles, false, true, isRowEdited));
+        }
 
-            ContainerType = ContainerType.Random;
-            RandomType = RandomType.Standard;
-            PlaylistEndBehaviour = PlaylistEndBehaviour.Restart;
-            PlayMode = PlayMode.Step;
-            EnableRepetitionInterval = false;
-            RepetitionInterval = 1;
-            AlwaysResetPlaylist = false;
-            LoopingType = LoopingType.Disabled;
-            NumberOfLoops = 1;
-            TransitionType = TransitionType.Disabled;
-            TransitionDuration = 1;
-
-            SetAudioFilesFromViewerItem(audioFiles, isRowEdited);
+        private void SetHircSettingsFromViewerItem(HircSettings hircSettings, List<AudioFile> audioFiles)
+        {
+            SetInitialSettings();
 
             if (audioFiles.Count > 1)
             {
@@ -503,15 +461,62 @@ namespace Editors.Audio.AudioEditor.Presentation.Settings
                 if (LoopingType == LoopingType.FiniteLooping)
                     NumberOfLoops = hircSettings.NumberOfLoops;
             }
-
-            SetSettingsUsability();
         }
 
-        private void SetAudioFilesFromViewerItem(List<AudioFile> audioFiles, bool isRowEdited)
+        private void GetActionEventSettings(ref HircSettings hircSettings, ref List<AudioFile> audioFiles)
         {
-            AudioFiles = new ObservableCollection<AudioFile>(audioFiles);
-            _audioEditorStateService.StoreAudioFiles(audioFiles);
-            _eventHub.Publish(new AudioFilesChangedEvent(audioFiles, false, true, isRowEdited));
+            var audioProject = _audioEditorStateService.AudioProject;
+            var selectedViewerRow = _audioEditorStateService.SelectedViewerRows[0];
+            var selectedAudioProjectExplorerNode = _audioEditorStateService.SelectedAudioProjectExplorerNode;
+            var soundBank = _audioEditorStateService.AudioProject.GetSoundBank(selectedAudioProjectExplorerNode.Parent.Parent.Name);
+
+            var actionEventName = TableHelpers.GetActionEventNameFromRow(selectedViewerRow);
+            var actionEvent = _audioEditorStateService.AudioProject.GetActionEvent(actionEventName);
+
+            var playActions = actionEvent.GetPlayActions();
+            if (playActions.Count > 1)
+                throw new NotSupportedException("Multiple Actions are not supported");
+
+            foreach (var playAction in playActions)
+            {
+                if (playAction.TargetHircTypeIsSound())
+                {
+                    var sound = soundBank.GetSound(playAction.TargetHircId);
+                    hircSettings = sound.HircSettings;
+                    audioFiles.Add(audioProject.GetAudioFile(sound.SourceId));
+                }
+                else if (playAction.TargetHircTypeIsRandomSequenceContainer())
+                {
+                    var randomSequenceContainer = soundBank.GetRandomSequenceContainer(playAction.TargetHircId);
+                    hircSettings = randomSequenceContainer.HircSettings;
+                    audioFiles = audioProject.GetAudioFiles(soundBank, randomSequenceContainer);
+                }
+            }
+        }
+
+        private void GetDialogueEventSettings(ref HircSettings hircSettings, ref List<AudioFile> audioFiles)
+        {
+            var audioProject = _audioEditorStateService.AudioProject;
+            var selectedViewerRow = _audioEditorStateService.SelectedViewerRows[0];
+            var selectedAudioProjectExplorerNode = _audioEditorStateService.SelectedAudioProjectExplorerNode;
+            var soundBank = _audioEditorStateService.AudioProject.GetSoundBank(selectedAudioProjectExplorerNode.Parent.Parent.Name);
+
+            var dialogueEvent = _audioEditorStateService.AudioProject.GetDialogueEvent(selectedAudioProjectExplorerNode.Name);
+            var statePathName = TableHelpers.GetStatePathNameFromRow(selectedViewerRow, _audioRepository, selectedAudioProjectExplorerNode.Name);
+            var statePath = dialogueEvent.GetStatePath(statePathName);
+
+            if (statePath.TargetHircTypeIsSound())
+            {
+                var sound = soundBank.GetSound(statePath.TargetHircId);
+                hircSettings = sound.HircSettings;
+                audioFiles.Add(audioProject.GetAudioFile(sound.SourceId));
+            }
+            else if (statePath.TargetHircTypeIsRandomSequenceContainer())
+            {
+                var randomSequenceContainer = soundBank.GetRandomSequenceContainer(statePath.TargetHircId);
+                hircSettings = randomSequenceContainer.HircSettings;
+                audioFiles = audioProject.GetAudioFiles(soundBank, randomSequenceContainer);
+            }
         }
 
         [RelayCommand] public void PlayWav(AudioFile audioFile)
@@ -534,7 +539,13 @@ namespace Editors.Audio.AudioEditor.Presentation.Settings
             TransitionDuration = 1;
         }
 
-        [RelayCommand] public void SetRecommendedSettings()
+        private void OnEditorSetRecommendedVOSettingsShortcutActivated(EditorSetRecommendedVOSettingsShortcutActivatedEvent e)
+        {
+            if (_audioEditorStateService.EditorRow != null && _audioEditorStateService.AudioFiles.Count != 0 && !IsSetRecommendedVOSettingsEnabled)
+                SetRecommendedVOSettings();
+        }
+
+        [RelayCommand] public void SetRecommendedVOSettings()
         {
             if (AudioFiles.Count > 1)
             {
@@ -571,15 +582,12 @@ namespace Editors.Audio.AudioEditor.Presentation.Settings
         [RelayCommand] public void ResetSettings()
         {
             SetInitialSettings();
-            ResetAudioFiles(false);
-            SetSettingsUsability();
-        }
 
-        private void ResetAudioFiles(bool resetForViewerItem)
-        {
             AudioFiles.Clear();
             _audioEditorStateService.StoreAudioFiles(AudioFiles.ToList());
-            _eventHub.Publish(new AudioFilesChangedEvent(AudioFiles.ToList(), false, resetForViewerItem, true));
+            _eventHub.Publish(new AudioFilesChangedEvent(_audioEditorStateService.AudioFiles, false, false, false));
+
+            SetSettingsUsability();
         }
     }
 }

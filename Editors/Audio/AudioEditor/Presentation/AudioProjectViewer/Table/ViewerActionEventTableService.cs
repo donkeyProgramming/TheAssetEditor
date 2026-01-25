@@ -3,8 +3,8 @@ using System.Data;
 using System.IO;
 using System.Linq;
 using Editors.Audio.AudioEditor.Core;
-using Editors.Audio.AudioEditor.Events;
-using Editors.Audio.AudioEditor.Presentation.Shared;
+using Editors.Audio.AudioEditor.Events.AudioProjectViewer.Table;
+using Editors.Audio.AudioEditor.Presentation.Shared.Models;
 using Editors.Audio.AudioEditor.Presentation.Shared.Table;
 using Editors.Audio.Shared.GameInformation.Warhammer3;
 using Shared.Core.Events;
@@ -30,7 +30,7 @@ namespace Editors.Audio.AudioEditor.Presentation.AudioProjectViewer.Table
         public List<string> DefineSchema()
         {
             var schema = new List<string>();
-            var columnName = TableInfo.EventColumnName;
+            var columnName = TableInformation.EventColumnName;
             schema.Add(columnName);
             return schema;
         }
@@ -73,7 +73,7 @@ namespace Editors.Audio.AudioEditor.Presentation.AudioProjectViewer.Table
                     continue;
 
                 var row = table.NewRow();
-                row[TableInfo.EventColumnName] = actionEvent.Name;
+                row[TableInformation.EventColumnName] = actionEvent.Name;
                 _eventHub.Publish(new ViewerTableRowAddRequestedEvent(row));
             }
         }

@@ -239,21 +239,24 @@ namespace Editors.Audio.Shared.AudioProject.Compiler
 
         private void GenerateDatFiles(AudioProjectFile audioProject, string audioProjectNameWithoutExtension)
         {
-            // The .dat file is seems to only necessary for Action Events for movies, quest battles or anything triggered via common.trigger_soundevent()
+            // In WH3 .dat files only seem necessary for Action Events for movies or anything triggered via common.trigger_soundevent()
             // but without testing all the different types of Action Event sounds it's safer to just make a .dat for all.
             // We store States in there so we can display them in the Audio Explorer.
             var actionEvents = audioProject.GetActionEvents();
-            if (actionEvents.Count != 0 && audioProject.StateGroups != null && audioProject.StateGroups.Count != 0)
+            var hasActionEvents = actionEvents != null && actionEvents.Count > 0;
+            var hasStateGroups = audioProject.StateGroups != null && audioProject.StateGroups.Count > 0;
+
+            if (hasActionEvents && hasStateGroups)
             {
                 _logger.Here().Information($"Generating event data .dat");
                 _datGeneratorService.GenerateEventDatFile(audioProjectNameWithoutExtension, actionEvents, audioProject.StateGroups);
             }
-            else if (actionEvents.Count != 0 && audioProject.StateGroups == null)
+            else if (hasActionEvents && !hasStateGroups)
             {
                 _logger.Here().Information($"Generating event data .dat");
                 _datGeneratorService.GenerateEventDatFile(audioProjectNameWithoutExtension, actionEvents: actionEvents);
             }
-            else if (actionEvents.Count == 0 && audioProject.StateGroups != null && audioProject.StateGroups.Count != 0)
+            else if (!hasActionEvents && hasStateGroups)
             {
                 _logger.Here().Information($"Generating event data .dat");
                 _datGeneratorService.GenerateEventDatFile(audioProjectNameWithoutExtension, stateGroups: audioProject.StateGroups);
