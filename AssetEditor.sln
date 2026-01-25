@@ -90,6 +90,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Shared.ByteParsing", "Share
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shared.ByteParsing", "Shared\ByteParsing\Shared.ByteParsing\Shared.ByteParsing.csproj", "{BE02D945-E70C-4A0E-A16D-8BFA3CB1A877}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shared.ByteParsingTest", "Shared\ByteParsing\Shared.ByteParsingTest\Shared.ByteParsingTest.csproj", "{328485AF-4B94-47CE-B9EF-5D267F9E3F74}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -212,6 +214,10 @@ Global
 		{BE02D945-E70C-4A0E-A16D-8BFA3CB1A877}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BE02D945-E70C-4A0E-A16D-8BFA3CB1A877}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BE02D945-E70C-4A0E-A16D-8BFA3CB1A877}.Release|Any CPU.Build.0 = Release|Any CPU
+		{328485AF-4B94-47CE-B9EF-5D267F9E3F74}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{328485AF-4B94-47CE-B9EF-5D267F9E3F74}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{328485AF-4B94-47CE-B9EF-5D267F9E3F74}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{328485AF-4B94-47CE-B9EF-5D267F9E3F74}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -253,6 +259,7 @@ Global
 		{4D35FFE2-8490-4694-8981-654016F2BD3D} = {07AC615B-A8FC-4E1A-BDD5-BC11452429A0}
 		{786DB586-5DF5-4CF9-A485-A20A7BC184F7} = {7070A990-1A62-46A9-ABDF-BE030E3A4336}
 		{BE02D945-E70C-4A0E-A16D-8BFA3CB1A877} = {786DB586-5DF5-4CF9-A485-A20A7BC184F7}
+		{328485AF-4B94-47CE-B9EF-5D267F9E3F74} = {786DB586-5DF5-4CF9-A485-A20A7BC184F7}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {AB5968F3-98ED-4AFF-98EA-0DBEDCACADF2}
