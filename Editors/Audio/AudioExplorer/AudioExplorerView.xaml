@@ -6,9 +6,9 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
     xmlns:s="http://schemas.singulink.com/xaml"
-    xmlns:behaviors="clr-namespace:Shared.Ui.Common.Behaviors;assembly=Shared.Ui" 
+    xmlns:Behaviors="clr-namespace:Shared.Ui.Common.Behaviors;assembly=Shared.Ui" 
     xmlns:ValueConverters="clr-namespace:Editors.Audio.Shared.UI.ValueConverters" 
-    xmlns:audioexplorer="clr-namespace:Editors.Audio.AudioExplorer" 
+    xmlns:AudioExplorer="clr-namespace:Editors.Audio.AudioExplorer" 
     d:DataContext="{d:DesignInstance Type=audioexplorer:AudioExplorerViewModel}"
     mc:Ignorable="d" 
     d:DesignHeight="450" d:DesignWidth="800">
@@ -26,7 +26,7 @@
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition 
-                Width="0.6*"/>
+                Width="1*"/>
             <ColumnDefinition 
                 Width="Auto"/>
             <ColumnDefinition
@@ -38,21 +38,15 @@
                 Height="*"/>
         </Grid.RowDefinitions>
 
-        <GridSplitter
-            Grid.Row="0"
-            Grid.Column="1" 
-            Width="5" 
-            Background="{DynamicResource App.Border}" 
-            VerticalAlignment="Stretch" 
-            HorizontalAlignment="Center"
-            ResizeBehavior="PreviousAndNext" 
-            ResizeDirection="Columns"/>
-
         <Grid 
             Grid.Row="0" 
             Grid.Column="0">
 
             <Grid.RowDefinitions>
+                <RowDefinition
+                    Height="Auto"/>
+                <RowDefinition
+                    Height="Auto"/>
                 <RowDefinition
                     Height="Auto"/>
                 <RowDefinition
@@ -110,6 +104,7 @@
                 </Grid.ColumnDefinitions>
 
                 <CheckBox
+                    Margin="0, 0, 5, 0"
                     Grid.Column="0"
                     DockPanel.Dock="Top" 
                     Content="Search by Action Event" 
@@ -117,30 +112,30 @@
 
                 <CheckBox 
                     Grid.Column="1"
-                    Margin="5, 0, 0, 0"
+                    Margin="5, 0, 5, 0"
                     DockPanel.Dock="Top" 
-                    Content="Search By Dialogue Event" 
+                    Content="Search by Dialogue Event" 
                     IsChecked="{Binding SearchByDialogueEvent, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
                 
                 <CheckBox 
                     Grid.Column="2"
-                    Margin="5, 0, 0, 0"
+                    Margin="5, 0, 5, 0"
                     DockPanel.Dock="Top" 
-                    Content="Search By VO Actor" 
+                    Content="Search by VO__Actor" 
                     IsChecked="{Binding SearchByVOActor, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
                 
                 <CheckBox 
                     Grid.Column="3"
                     Margin="5, 0, 5, 0"
                     DockPanel.Dock="Top" 
-                    Content="Search By Hirc ID" 
+                    Content="Search by ID" 
                     IsChecked="{Binding SearchByHircId, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
             </Grid>
 
             <Expander
                 Grid.Row="3"
                 Margin="4, 5, 4, 0"
-                Header="Audio Languages">
+                Header="Languages">
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition
@@ -149,15 +144,8 @@
                             Height="Auto"/>
                     </Grid.RowDefinitions>
 
-                    <Button
-                        Margin="0, 5, 0, 0"
-                        Grid.Row="0"
-                        Content="Load Audio Languages"
-                        Height="25"
-                        Command="{Binding LoadAudioRepositoryForSelectedLanguagesCommand}"/>
-                    
                     <ListBox
-                        Grid.Row="1"
+                        Grid.Row="0"
                         Margin="0, 5, 0, 0"
                         MaxHeight="500"
                         ItemsSource="{Binding Languages}"
@@ -176,6 +164,14 @@
                             </DataTemplate>
                         </ListBox.ItemTemplate>
                     </ListBox>
+                    
+                    <Button
+                        Margin="0, 5, 0, 0"
+                        Grid.Row="1"
+                        Content="Load Languages"
+                        Height="25"
+                        Command="{Binding LoadAudioRepositoryForSelectedLanguagesCommand}"/>
+                    
                 </Grid>
             </Expander>
 
@@ -184,11 +180,24 @@
                 Margin="5, 5, 5, 5"
                 Content="Play Audio"
                 Height="25"
-                Command="{Binding PlaySelectedSoundActionCommand}" 
-                IsEnabled="{Binding IsPlaySoundButtonEnabled, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
+                Command="{Binding PlayAudioCommand}" 
+                IsEnabled="{Binding IsPlayAudioButtonEnabled, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
+
+            <Border 
+                Grid.Row="5"
+                Height="5" 
+                Background="{DynamicResource App.Border}"/>
+
+            <Label 
+                Grid.Row="6" 
+                Margin="0, 0, 0, 0"
+                Content="Wwise Object Hierarchy Graph"/>
 
             <TreeView
-                Grid.Row="5"
+                Grid.Row="7"
+                Margin="0, 2, 0, 0"
+                Padding="0, 5, 0, 0"
+                BorderBrush="{DynamicResource App.Border}"
                 ItemsSource="{Binding TreeList, UpdateSourceTrigger=PropertyChanged}"
                 VirtualizingPanel.IsVirtualizing="True"
                 VirtualizingPanel.VirtualizationMode="Recycling"
@@ -314,7 +323,7 @@
                 </TreeView.ItemContainerStyle>
 
                 <b:Interaction.Behaviors>
-                    <behaviors:BindableSelectedItemBehavior
+                    <Behaviors:BindableSelectedItemBehavior
                         SelectedItem="{Binding SelectedNode, Mode=TwoWay}"/>
                 </b:Interaction.Behaviors>
 
@@ -331,20 +340,44 @@
             </TreeView>
         </Grid>
 
+        <GridSplitter
+            Grid.Row="0"
+            Grid.Column="1" 
+            Width="5" 
+            Background="{DynamicResource App.Border}" 
+            VerticalAlignment="Stretch" 
+            HorizontalAlignment="Center"
+            ResizeBehavior="PreviousAndNext" 
+            ResizeDirection="Columns"/>
+
         <Grid 
-            Grid.Row="0" 
-            Grid.Column="3">
+            Grid.Row="1" 
+            Grid.Column="2"
+            Background="{DynamicResource TreeView.Static.Background}">
 
             <Grid.RowDefinitions>
+                <RowDefinition
+                    Height="Auto"/>
                 <RowDefinition
                     Height="*"/>
             </Grid.RowDefinitions>
 
+            <Label 
+                Grid.Row="0"
+                Padding="5, 5, 5, 7"
+                Content="{Binding WwiseObjectLabel}"
+                Background="{DynamicResource Window.Static.Background}"
+                BorderBrush="{DynamicResource App.Border}"
+                BorderThickness="0, 0, 0, 1"/>
+            
             <ScrollViewer
-                Grid.Row="0">
+                Grid.Row="1"
+                Padding="10, 10, 10, 10">
                 <TextBox 
-                    DockPanel.Dock="Top" 
+                    DockPanel.Dock="Top"
                     IsReadOnly="True" 
+                    Background="{DynamicResource TreeView.Static.Background}"
+                    BorderThickness="0, 0, 0, 0"
                     Text="{Binding SelectedNodeText, UpdateSourceTrigger=PropertyChanged}"/>
             </ScrollViewer>
         </Grid>

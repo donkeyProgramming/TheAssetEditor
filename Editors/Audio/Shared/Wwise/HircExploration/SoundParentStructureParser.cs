@@ -57,37 +57,37 @@ namespace Editors.Audio.Shared.Wwise.HircExploration
             {
                 var busInfo = "";
 
-                if (node.Item is CAkActorMixer_V136 mixerInstance && mixerInstance.NodeBaseParams.OverrideBusId != 0)
+                if (node.Hirc is CAkActorMixer_V136 mixerInstance && mixerInstance.NodeBaseParams.OverrideBusId != 0)
                 {
                     busInfo = $" - With Audio Bus [{mixerInstance.NodeBaseParams.OverrideBusId}]";
-                    busses.Add(new BusItem() { SourceDescription = $"{node.Item.HircType}[{node.Item.Id}]", BusId = mixerInstance.NodeBaseParams.OverrideBusId });
+                    busses.Add(new BusItem() { SourceDescription = $"{node.Hirc.HircType}[{node.Hirc.Id}]", BusId = mixerInstance.NodeBaseParams.OverrideBusId });
                 }
-                else if (node.Item is CAkSound_V136 soundInstance && soundInstance.NodeBaseParams.OverrideBusId != 0)
+                else if (node.Hirc is CAkSound_V136 soundInstance && soundInstance.NodeBaseParams.OverrideBusId != 0)
                 {
                     busInfo = $" - With Audio Bus [{soundInstance.NodeBaseParams.OverrideBusId}]";
-                    busses.Add(new BusItem() { SourceDescription = $"{node.Item.HircType}[{node.Item.Id}]", BusId = soundInstance.NodeBaseParams.OverrideBusId });
+                    busses.Add(new BusItem() { SourceDescription = $"{node.Hirc.HircType}[{node.Hirc.Id}]", BusId = soundInstance.NodeBaseParams.OverrideBusId });
                 }
-                else if (node.Item is CAkRanSeqCntr_V136 randInstance && randInstance.NodeBaseParams.OverrideBusId != 0)
+                else if (node.Hirc is CAkRanSeqCntr_V136 randInstance && randInstance.NodeBaseParams.OverrideBusId != 0)
                 {
                     busInfo = $" - With Audio Bus [{randInstance.NodeBaseParams.OverrideBusId}]";
-                    busses.Add(new BusItem() { SourceDescription = $"{node.Item.HircType}[{node.Item.Id}]", BusId = randInstance.NodeBaseParams.OverrideBusId });
+                    busses.Add(new BusItem() { SourceDescription = $"{node.Hirc.HircType}[{node.Hirc.Id}]", BusId = randInstance.NodeBaseParams.OverrideBusId });
                 }
-                else if (node.Item is CAkLayerCntr_V136 layerInstance && layerInstance.NodeBaseParams.OverrideBusId != 0)
+                else if (node.Hirc is CAkLayerCntr_V136 layerInstance && layerInstance.NodeBaseParams.OverrideBusId != 0)
                 {
                     busInfo = $" - With Audio Bus [{layerInstance.NodeBaseParams.OverrideBusId}]";
-                    busses.Add(new BusItem() { SourceDescription = $"{node.Item.HircType}[{node.Item.Id}]", BusId = layerInstance.NodeBaseParams.OverrideBusId });
+                    busses.Add(new BusItem() { SourceDescription = $"{node.Hirc.HircType}[{node.Hirc.Id}]", BusId = layerInstance.NodeBaseParams.OverrideBusId });
                 }
-                else if (node.Item is CAkSwitchCntr_V136 switchInstance && switchInstance.NodeBaseParams.OverrideBusId != 0)
+                else if (node.Hirc is CAkSwitchCntr_V136 switchInstance && switchInstance.NodeBaseParams.OverrideBusId != 0)
                 {
                     busInfo = $" - With Audio Bus [{switchInstance.NodeBaseParams.OverrideBusId}]";
-                    busses.Add(new BusItem() { SourceDescription = $"{node.Item.HircType}[{node.Item.Id}]", BusId = switchInstance.NodeBaseParams.OverrideBusId });
+                    busses.Add(new BusItem() { SourceDescription = $"{node.Hirc.HircType}[{node.Hirc.Id}]", BusId = switchInstance.NodeBaseParams.OverrideBusId });
                 }
 
                 var graphItem = new ParentStructure.GraphItem()
                 {
-                    Description = $"{node.Item.HircType}[{node.Item.Id}]{busInfo}",
-                    Type = node.Item.HircType,
-                    Id = node.Item.Id,
+                    Description = $"{node.Hirc.HircType}[{node.Hirc.Id}]{busInfo}",
+                    Type = node.Hirc.HircType,
+                    Id = node.Hirc.Id,
                 };
                 output.GraphItems.Add(graphItem);
             }
