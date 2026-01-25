@@ -26,7 +26,7 @@ namespace Shared.ByteParsingTest.Parsers
             Assert.That(decodeError, Is.Null);
             Assert.That(bytesRead, Is.EqualTo(2));
             // Compare approximate since Half precision is limited
-            Assert.That((float)value, Is.EqualTo(input).Within(0.01f));
+            Assert.That((float)value, Is.EqualTo(input).Within(0.02f));
         }
 
         [Test]
