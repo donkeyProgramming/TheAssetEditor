@@ -318,7 +318,7 @@ namespace Shared.GameFormats.RigidModel.MaterialHeaders
             {
                 var param = typedMaterial.StringParams.Values[stringIndex];
                 writer.Write(ByteParsers.Int32.EncodeValue(param.Index, out _));
-                writer.Write(ByteParsers.String.Encode(param.Value, out _));
+                writer.Write(ByteParsers.String.EncodeValue(param.Value, out _));
             }
 
             for (var floatIndex = 0; floatIndex < typedMaterial.FloatParams.Values.Count; floatIndex++)

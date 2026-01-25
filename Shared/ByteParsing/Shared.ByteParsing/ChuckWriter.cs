@@ -4,7 +4,7 @@ namespace Shared.ByteParsing
 {
     public class ChuckWriter
     {
-        readonly List<byte> _bytes = new List<byte>();
+        readonly List<byte> _bytes = new();
 
         public void Write<T>(T value, SpesificByteParser<T> parser)
         {

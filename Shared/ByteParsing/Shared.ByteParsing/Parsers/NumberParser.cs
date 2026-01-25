@@ -28,7 +28,10 @@
         public virtual bool TryDecode(byte[] buffer, int index, out string value, out int bytesRead, out string? error)
         {
             var result = TryDecodeValue(buffer, index, out var temp, out bytesRead, out error);
-            value = temp?.ToString();
+            if (result == false)
+                value = "Null";
+            else
+                value = temp!.ToString();
             return result;
         }
 
@@ -48,7 +51,7 @@
                 throw new Exception(error);
 
             var value = Decode(buffer, index) as object;
-            return value;
+            return value!;
         }
     }
 }
