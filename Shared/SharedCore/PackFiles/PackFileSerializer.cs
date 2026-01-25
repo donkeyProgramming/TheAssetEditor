@@ -1,4 +1,4 @@
-﻿using Shared.Core.ByteParsing;
+﻿using Shared.ByteParsing;
 using Shared.Core.ErrorHandling;
 using Shared.Core.PackFiles.Models;
 using Shared.Core.Settings;

@@ -3,7 +3,7 @@ using System.Windows;
 using System.Xml;
 using System.Xml.Serialization;
 using CommonControls.BaseDialogs.ErrorListDialog;
-using Shared.Core.ByteParsing;
+using Shared.ByteParsing;
 using Shared.Core.ErrorHandling;
 using Shared.Core.ErrorHandling.Exceptions;
 using Shared.Core.PackFiles;

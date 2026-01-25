@@ -1,5 +1,5 @@
 ﻿using System.Text;
-using Shared.Core.ByteParsing;
+using Shared.ByteParsing;
 
 namespace Shared.GameFormats.Wwise
 {

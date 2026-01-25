@@ -1,6 +1,6 @@
 ﻿using System.Collections;
 using System.Diagnostics;
-using Shared.Core.ByteParsing;
+using Shared.ByteParsing;
 using Shared.Core.Misc;
 using Shared.Core.Settings;
 using Shared.GameFormats.DB;

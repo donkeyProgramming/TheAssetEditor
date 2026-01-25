@@ -36,6 +36,10 @@
         <PackageReference Include="Libuv" Version="1.10.0" />
     </ItemGroup>
 
+    <ItemGroup>
+      <ProjectReference Include="..\ByteParsing\Shared.ByteParsing\Shared.ByteParsing.csproj" />
+    </ItemGroup>
+
 
     <ItemGroup>
         <Using Include="Serilog" />

@@ -1,7 +1,7 @@
 ﻿using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Text;
-using Shared.Core.ByteParsing;
+using Shared.ByteParsing;
 using Shared.Core.Misc;
 
 namespace Shared.GameFormats.RigidModel.Types

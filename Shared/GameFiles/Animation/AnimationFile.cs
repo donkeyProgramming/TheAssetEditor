@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics;
 using System.Text;
-using Shared.Core.ByteParsing;
+using Shared.ByteParsing;
 using Shared.Core.ErrorHandling;
 using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;

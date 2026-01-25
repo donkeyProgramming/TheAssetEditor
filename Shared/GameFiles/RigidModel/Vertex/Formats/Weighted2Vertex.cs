@@ -1,5 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
-using Shared.Core.ByteParsing;
+using Shared.ByteParsing;
 using Shared.GameFormats.RigidModel.Transforms;
 
 namespace Shared.GameFormats.RigidModel.Vertex.Formats

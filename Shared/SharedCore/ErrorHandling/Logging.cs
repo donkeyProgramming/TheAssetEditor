@@ -1,5 +1,4 @@
 ﻿using System.Runtime.CompilerServices;
-using Serilog;
 using Serilog.Events;
 using Serilog.Sinks.SystemConsole.Themes;
 using Shared.Core.Misc;

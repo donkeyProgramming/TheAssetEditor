@@ -1,6 +1,6 @@
 ﻿using System.Text;
 using System.Windows;
-using Shared.Core.ByteParsing;
+using Shared.ByteParsing;
 using Shared.Core.PackFiles;
 using Shared.GameFormats.Animation;
 using Shared.Ui.Editors.TextEditor;

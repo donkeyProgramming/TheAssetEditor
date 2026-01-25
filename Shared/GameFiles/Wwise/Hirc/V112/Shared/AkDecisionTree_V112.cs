@@ -1,4 +1,4 @@
-﻿using Shared.Core.ByteParsing;
+﻿using Shared.ByteParsing;
 using static Shared.GameFormats.Wwise.Hirc.ICAkDialogueEvent;
 
 namespace Shared.GameFormats.Wwise.Hirc.V112.Shared

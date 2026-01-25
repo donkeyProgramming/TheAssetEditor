@@ -6,7 +6,8 @@ using System.Reflection;
 using CommunityToolkit.Mvvm.ComponentModel;
 using Microsoft.Xna.Framework;
 using Serilog;
-using Shared.Core.ByteParsing;
+using Shared.ByteParsing;
+using Shared.ByteParsing.Parsers;
 using Shared.Core.ErrorHandling;
 using Shared.GameFormats.AnimationMeta.Parsing;
 

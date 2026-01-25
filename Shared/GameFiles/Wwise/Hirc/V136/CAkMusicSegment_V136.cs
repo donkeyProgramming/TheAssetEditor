@@ -1,5 +1,5 @@
 ﻿using System.Text;
-using Shared.Core.ByteParsing;
+using Shared.ByteParsing;
 using Shared.GameFormats.Wwise.Hirc.V136.Shared;
 
 namespace Shared.GameFormats.Wwise.Hirc.V136

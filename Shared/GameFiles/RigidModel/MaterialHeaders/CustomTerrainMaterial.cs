@@ -1,7 +1,7 @@
 ﻿using System.Runtime.InteropServices;
 using System.Text;
 using Microsoft.Xna.Framework;
-using Shared.Core.ByteParsing;
+using Shared.ByteParsing;
 using Shared.Core.Misc;
 using Shared.GameFormats.RigidModel.Types;
 

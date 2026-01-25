@@ -1,0 +1,17 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net10.0-windows</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+    </PropertyGroup>
+
+
+    <ItemGroup>
+
+        <PackageReference Include="MonoGame.Framework.WindowsDX" Version="3.8.4.1" />
+        <!-- Libs to override stuff that gives error related to monogame-->
+        <PackageReference Include="Libuv" Version="1.10.0" />
+    </ItemGroup>
+
+</Project>

@@ -1,4 +1,4 @@
-﻿using Shared.Core.ByteParsing;
+﻿using Shared.ByteParsing;
 using Shared.GameFormats.RigidModel.LodHeader;
 using Shared.GameFormats.RigidModel.Vertex;
 

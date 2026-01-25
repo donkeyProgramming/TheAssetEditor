@@ -1,4 +1,4 @@
-﻿using Shared.Core.ByteParsing;
+﻿using Shared.ByteParsing;
 using Shared.Core.Misc;
 
 namespace Shared.GameFormats.AnimationPack.AnimPackFileTypes
