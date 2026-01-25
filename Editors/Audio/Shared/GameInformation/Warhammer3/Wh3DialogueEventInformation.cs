@@ -47,6 +47,12 @@ namespace Editors.Audio.Shared.GameInformation.Warhammer3
         [Display(Name = "Mechanic - Scrap")] ScrapMechanic,
         [Display(Name = "Mechanic - Skull Throne")] SkullThroneMechanic,
         [Display(Name = "Mechanic - Monster Pens")] MonsterPensMechanic,
+        [Display(Name = "Mechanic - Monstrous Arcanum")] MonstrousArcanumMechanic,
+        [Display(Name = "Mechanic - Daemonic Attraction")] DaemonicAttraction,
+        [Display(Name = "Mechanic - Pleasurable Act")] PleasurableActMechanic,
+        [Display(Name = "Mechanic - Bribe")] BribeMechanic,
+        [Display(Name = "Mechanic - Dark Ritual")] DarkRitualMechanic,
+        [Display(Name = "Mechanic - Slaanesh Misc")] SlaaneshMechanicsMisc,
         [Display(Name = "Unit Movement")] UnitMovement,
         [Display(Name = "Unit Attack")] UnitAttack,
         [Display(Name = "Unit Selection")] UnitSelection,
@@ -208,7 +214,8 @@ namespace Editors.Audio.Shared.GameInformation.Warhammer3
             new("campaign_vo_yes", CampaignVO, [TypeShowAll, CharacterMovement], [ProfileShowAll, ..LordHeroMinimumProfiles]),
             new("campaign_vo_yes_short", CampaignVO, [TypeShowAll, CharacterMovement], [ProfileShowAll, ..LordHeroMinimumProfiles]),
             new("campaign_vo_yes_short_aggressive", CampaignVO, [TypeShowAll, CharacterMovement], [ProfileShowAll, ..LordHeroMinimumProfiles]),
-            
+            new("campaign_vo_stance_disembark", CampaignVO, [TypeShowAll, CharacterMovement], [ProfileShowAll, ..LordHeroRecommendedProfiles]),
+
             new("campaign_vo_cam_skill_weapon_tree", CampaignVO, [TypeShowAll, CharacterSkillTree], [ProfileShowAll, ..LordHeroCompleteProfiles]),
             new("campaign_vo_cam_skill_weapon_tree_response", CampaignVO, [TypeShowAll, CharacterSkillTree], [ProfileShowAll, ..LordHeroCompleteProfiles]),
 
@@ -266,6 +273,23 @@ namespace Editors.Audio.Shared.GameInformation.Warhammer3
             new("campaign_vo_def_recruit_monster_pens", CampaignVO, [MonsterPensMechanic], [ProfileShowAll, LordComplete]),
 
             new("campaign_vo_mounted_creature", CampaignVO, [TypeShowAll, Creature], [ProfileShowAll]),
+
+            new("campaign_vo_nor_monstrous_arcanum_ceremony", CampaignVO, [TypeShowAll, MonstrousArcanumMechanic], [ProfileShowAll, LordComplete]),
+            new("campaign_vo_nor_monstrous_arcanum_hunt_killing", CampaignVO, [TypeShowAll, MonstrousArcanumMechanic], [ProfileShowAll, LordComplete]),
+            new("campaign_vo_nor_monstrous_arcanum_hunt_taming", CampaignVO, [TypeShowAll, MonstrousArcanumMechanic], [ProfileShowAll, LordComplete]),
+            new("campaign_vo_attack_monstrous_arcanum_hunt", CampaignVO, [TypeShowAll, MonstrousArcanumMechanic], [ProfileShowAll, LordComplete]),
+
+            new("campaign_vo_sla_daemonic_attraction_recruit", CampaignVO, [TypeShowAll, DaemonicAttraction], [ProfileShowAll, LordComplete]),
+            
+            new("campaign_vo_sla_pleasurable_act_arena", CampaignVO, [TypeShowAll, PleasurableActMechanic], [ProfileShowAll, LordComplete]),
+            new("campaign_vo_sla_pleasurable_act_hunt", CampaignVO, [TypeShowAll, PleasurableActMechanic], [ProfileShowAll, LordComplete]),
+            new("campaign_vo_sla_pleasurable_act_party", CampaignVO, [TypeShowAll, PleasurableActMechanic], [ProfileShowAll, LordComplete]),
+
+            // These are apparently campaign_vo even though they have campaign_vo_cs in the name, maybe CA put them in the wrong bnk?
+            new("campaign_vo_cs_dark_ritual_unlock_tier_1", CampaignVO, [TypeShowAll, DarkRitualMechanic], [ProfileShowAll, LordComplete]),
+            new("campaign_vo_cs_dark_ritual_unlock_tier_2", CampaignVO, [TypeShowAll, DarkRitualMechanic], [ProfileShowAll, LordComplete]),
+            new("campaign_vo_cs_dark_ritual_unlock_tier_3", CampaignVO, [TypeShowAll, DarkRitualMechanic], [ProfileShowAll, LordComplete]),
+            new("campaign_vo_cs_dark_ritual_unlock_tier_4", CampaignVO, [TypeShowAll, DarkRitualMechanic], [ProfileShowAll, LordComplete]),
         ];
 
         public static List<Wh3CampaignVOConversationalDefinition> CampaignConversational { get; } =
@@ -328,6 +352,23 @@ namespace Editors.Audio.Shared.GameInformation.Warhammer3
             new("campaign_vo_cs_post_battle_settlement_kho_blood_for_the_blood_god", CampaignVOConversational, [TypeShowAll, PostBattleSettlementAction], [ProfileShowAll, LordComplete]),
             new("campaign_vo_cs_post_battle_settlement_tze_parasitic", CampaignVOConversational, [TypeShowAll, PostBattleSettlementAction], [ProfileShowAll, LordComplete]),
             new("campaign_vo_cs_post_battle_settlement_tze_symbiotic", CampaignVOConversational, [TypeShowAll, PostBattleSettlementAction], [ProfileShowAll, LordComplete]),
+            new("campaign_vo_cs_post_battle_settlement_establish_colony", CampaignVOConversational, [TypeShowAll, PostBattleSettlementAction], [ProfileShowAll, LordComplete]),
+            new("campaign_vo_cs_post_battle_settlement_pleasure_palace", CampaignVOConversational, [TypeShowAll, PostBattleSettlementAction], [ProfileShowAll, LordComplete]),
+            new("campaign_vo_cs_post_battle_settlement_raze_ulthuan", CampaignVOConversational, [TypeShowAll, PostBattleSettlementAction], [ProfileShowAll, LordComplete]),
+            new("campaign_vo_cs_post_battle_settlement_reinstate_lord", CampaignVOConversational, [TypeShowAll, PostBattleSettlementAction], [ProfileShowAll, LordComplete]),
+            new("campaign_vo_cs_post_battle_settlement_sack_ulthuan", CampaignVOConversational, [TypeShowAll, PostBattleSettlementAction], [ProfileShowAll, LordComplete]),
+            new("campaign_vo_cs_post_battle_settlement_thrall_camp", CampaignVOConversational, [TypeShowAll, PostBattleSettlementAction], [ProfileShowAll, LordComplete]),
+            new("campaign_vo_cs_post_battle_settlement_war_pit", CampaignVOConversational, [TypeShowAll, PostBattleSettlementAction], [ProfileShowAll, LordComplete]),
+            new("campaign_vo_cs_post_battle_nor_crow", CampaignVOConversational, [TypeShowAll, PostBattleSettlementAction], [ProfileShowAll, LordComplete]),
+            new("campaign_vo_cs_post_battle_nor_eagle", CampaignVOConversational, [TypeShowAll, PostBattleSettlementAction], [ProfileShowAll, LordComplete]),
+            new("campaign_vo_cs_post_battle_nor_hound", CampaignVOConversational, [TypeShowAll, PostBattleSettlementAction], [ProfileShowAll, LordComplete]),
+            new("campaign_vo_cs_post_battle_nor_raise_altar", CampaignVOConversational, [TypeShowAll, PostBattleSettlementAction], [ProfileShowAll, LordComplete]),
+            new("campaign_vo_cs_post_battle_nor_serpent", CampaignVOConversational, [TypeShowAll, PostBattleSettlementAction], [ProfileShowAll, LordComplete]),
+            new("campaign_vo_cs_post_battle_nor_undivided", CampaignVOConversational, [TypeShowAll, PostBattleSettlementAction], [ProfileShowAll, LordComplete]),
+            new("campaign_vo_cs_post_battle_warlord_alliance", CampaignVOConversational, [TypeShowAll, PostBattleSettlementAction], [ProfileShowAll, LordComplete]),
+            new("campaign_vo_cs_post_battle_warlord_confederate", CampaignVOConversational, [TypeShowAll, PostBattleSettlementAction], [ProfileShowAll, LordComplete]),
+            new("campaign_vo_cs_post_battle_warlord_execute", CampaignVOConversational, [TypeShowAll, PostBattleSettlementAction], [ProfileShowAll, LordComplete]),
+            new("campaign_vo_cs_post_battle_warlord_release", CampaignVOConversational, [TypeShowAll, PostBattleSettlementAction], [ProfileShowAll, LordComplete]),
 
             new("campaign_vo_cs_other_character_details_panel_low_loyalty", CampaignVOConversational, [TypeShowAll, CharacterDetails], [ProfileShowAll, LordComplete]),
             new("campaign_vo_cs_other_character_details_panel_neutral", CampaignVOConversational, [TypeShowAll, CharacterDetails], [ProfileShowAll, LordComplete]),
@@ -370,6 +411,11 @@ namespace Editors.Audio.Shared.GameInformation.Warhammer3
             new("campaign_vo_cs_ogr_mercenary_contracts", CampaignVOConversational, [TypeShowAll, MercenaryContractsMechanic], [ProfileShowAll, LordComplete]),
 
             new("campaign_vo_cs_ogr_meat_status", CampaignVOConversational, [TypeShowAll, MeatMechanic], [ProfileShowAll, LordComplete]),
+
+            new("campaign_vo_cs_bribe", CampaignVOConversational, [TypeShowAll, SlaaneshMechanicsMisc], [ProfileShowAll, LordComplete]),
+            new("campaign_vo_cs_sla_disciple_army", CampaignVOConversational, [TypeShowAll, SlaaneshMechanicsMisc], [ProfileShowAll, LordComplete]),
+            new("campaign_vo_cs_sla_proliferate_cults", CampaignVOConversational, [TypeShowAll, SlaaneshMechanicsMisc], [ProfileShowAll, LordComplete]),
+            new("campaign_vo_cs_sla_corrupt_units", CampaignVOConversational, [TypeShowAll, SlaaneshMechanicsMisc], [ProfileShowAll, LordComplete]),
         ];
 
         public static List<Wh3BattleVOOrdersDefinition> Battle { get; } =

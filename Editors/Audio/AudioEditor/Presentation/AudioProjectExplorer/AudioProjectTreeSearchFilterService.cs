@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using Editors.Audio.AudioEditor.Core;
-using Editors.Audio.AudioEditor.Presentation.Shared;
+using Editors.Audio.AudioEditor.Presentation.Shared.Models;
 using Editors.Audio.Shared.GameInformation.Warhammer3;
 
 namespace Editors.Audio.AudioEditor.Presentation.AudioProjectExplorer

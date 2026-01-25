@@ -8,15 +8,17 @@ using System.Threading.Tasks;
 using System.Windows;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using Editors.Audio.AudioEditor.Commands;
+using Editors.Audio.AudioEditor.Commands.AudioFilesExplorer;
 using Editors.Audio.AudioEditor.Core;
-using Editors.Audio.AudioEditor.Events;
-using Editors.Audio.AudioEditor.Presentation.Shared;
-using Editors.Audio.AudioEditor.Presentation.Shared.Table;
+using Editors.Audio.AudioEditor.Events.AudioFilesExplorer;
+using Editors.Audio.AudioEditor.Events.AudioProjectExplorer;
+using Editors.Audio.AudioEditor.Events.WaveformVisualiser;
+using Editors.Audio.AudioEditor.Presentation.Shared.Models;
 using Shared.Core.Events;
 using Shared.Core.Events.Global;
 using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
+using Shared.Ui.Common;
 
 namespace Editors.Audio.AudioEditor.Presentation.AudioFilesExplorer
 {
@@ -36,7 +38,7 @@ namespace Editors.Audio.AudioEditor.Presentation.AudioFilesExplorer
         [ObservableProperty] private bool _isPlayAudioButtonEnabled = false;
         [ObservableProperty] private string _filterQuery;
         [ObservableProperty] private ObservableCollection<AudioFilesTreeNode> _audioFilesTree;
-        public ObservableCollection<AudioFilesTreeNode> SelectedTreeNodes { get; set; } = [];
+        [ObservableProperty] private ObservableCollection<AudioFilesTreeNode> _selectedTreeNodes = [];
         private CancellationTokenSource _filterQueryDebounceCancellationTokenSource;
 
         public AudioFilesExplorerViewModel(
@@ -66,11 +68,13 @@ namespace Editors.Audio.AudioEditor.Presentation.AudioFilesExplorer
             _globalEventHub.Register<PackFileContainerFilesUpdatedEvent>(this, x => RefreshAudioFilesTree(x.Container));
             _globalEventHub.Register<PackFileContainerFolderRemovedEvent>(this, x => RefreshAudioFilesTree(x.Container));
 
+            AudioFilesExplorerLabel = $"Audio Files Explorer";
+
             var editablePack = _packFileService.GetEditablePack();
             if (editablePack == null)
                 return;
 
-            AudioFilesExplorerLabel = $"Audio Files Explorer - {TableHelpers.DuplicateUnderscores(editablePack.Name)}";
+            AudioFilesExplorerLabel = $"Audio Files Explorer - {WpfHelpers.DuplicateUnderscores(editablePack.Name)}";
 
             AudioFilesTree = _audioFilesTreeBuilder.BuildTree(editablePack);
             SetupIsExpandedHandlers(AudioFilesTree);
@@ -138,7 +142,7 @@ namespace Editors.Audio.AudioEditor.Presentation.AudioFilesExplorer
             if (packFileContainer == null)
                 return;
 
-            AudioFilesExplorerLabel = $"Audio Files Explorer - {TableHelpers.DuplicateUnderscores(packFileContainer.Name)}";
+            AudioFilesExplorerLabel = $"Audio Files Explorer - {WpfHelpers.DuplicateUnderscores(packFileContainer.Name)}";
             RefreshAudioFilesTree(packFileContainer);
         }
 

@@ -1,6 +1,8 @@
-﻿using Audio.AudioExplorer;
-using Editors.Audio.AudioEditor;
-using Editors.Audio.AudioEditor.Commands;
+﻿using Editors.Audio.AudioEditor.Commands.AudioFilesExplorer;
+using Editors.Audio.AudioEditor.Commands.AudioProjectEditor;
+using Editors.Audio.AudioEditor.Commands.AudioProjectMutation;
+using Editors.Audio.AudioEditor.Commands.AudioProjectViewer;
+using Editors.Audio.AudioEditor.Commands.Dialogs;
 using Editors.Audio.AudioEditor.Core;
 using Editors.Audio.AudioEditor.Core.AudioProjectMutation;
 using Editors.Audio.AudioEditor.Presentation;
@@ -41,6 +43,7 @@ namespace Editors.Audio
             serviceCollection.AddScoped<IAudioEditorStateService, AudioEditorStateService>();
             serviceCollection.AddScoped<IAudioEditorFileService, AudioEditorFileService>();
             serviceCollection.AddScoped<IAudioEditorIntegrityService, AudioEditorIntegrityService>();
+            serviceCollection.AddScoped<IShortcutService, ShortcutService>();
 
             // Audio Editor View Models
             serviceCollection.AddScoped<AudioEditorViewModel>();
@@ -49,7 +52,7 @@ namespace Editors.Audio
             serviceCollection.AddScoped<AudioProjectEditorViewModel>();
             serviceCollection.AddScoped<AudioProjectViewerViewModel>();
             serviceCollection.AddScoped<SettingsViewModel>();
-            var serviceCollection1 = serviceCollection.AddScoped<WaveformVisualiserViewModel>();
+            serviceCollection.AddScoped<WaveformVisualiserViewModel>();
 
             // New Audio Project
             serviceCollection.AddTransient<NewAudioProjectViewModel>();
@@ -107,7 +110,6 @@ namespace Editors.Audio
             serviceCollection.AddSingleton<IWaveformVisualisationCacheService, WaveformVisualisationCacheService>();
             serviceCollection.AddTransient<IWaveformRendererService, WaveformRendererService>();
             serviceCollection.AddTransient<ISoundEngine, SoundEngine>();
-
 
             // Audio Project
             serviceCollection.AddScoped<IAudioProjectFileService, AudioProjectFileService>();

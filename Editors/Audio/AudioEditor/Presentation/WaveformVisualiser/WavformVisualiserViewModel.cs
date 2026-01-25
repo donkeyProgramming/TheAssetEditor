@@ -9,11 +9,12 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using Editors.Audio.AudioEditor.Events;
-using Editors.Audio.AudioEditor.Presentation.Shared.Table;
+using Editors.Audio.AudioEditor.Events.AudioFilesExplorer;
+using Editors.Audio.AudioEditor.Events.WaveformVisualiser;
 using Editors.Audio.Shared.Wwise;
 using NAudio.Wave;
 using Shared.Core.Events;
+using Shared.Ui.Common;
 
 namespace Editors.Audio.AudioEditor.Presentation.WaveformVisualiser
 {
@@ -415,7 +416,7 @@ namespace Editors.Audio.AudioEditor.Presentation.WaveformVisualiser
             else
             {
                 var fileName = Path.GetFileName(_currentFilePathKey);
-                WaveformVisualiserLabel = $"Sound Engine – {TableHelpers.DuplicateUnderscores(fileName)}";
+                WaveformVisualiserLabel = $"Sound Engine – {WpfHelpers.DuplicateUnderscores(fileName)}";
             }
         }
 

@@ -5,7 +5,7 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:sys="clr-namespace:System;assembly=netstandard"
-    xmlns:Converters="clr-namespace:Editors.Audio.Shared.UI.Converters"
+    xmlns:ValueConverters="clr-namespace:Editors.Audio.Shared.UI.ValueConverters"
     xmlns:Local="clr-namespace:Editors.Audio.AudioEditor.Presentation.NewAudioProject"
     Style="{StaticResource CustomWindowStyle}"
     d:DataContext="{d:DesignInstance Type=Local:NewAudioProjectViewModel}"
@@ -15,7 +15,7 @@
     Title="New Audio Project">
 
     <Window.Resources>
-        <Converters:EnumConverter 
+        <ValueConverters:EnumConverter 
             x:Key="EnumConverter"/>
         <DataTemplate 
             x:Key="EnumToStringTemplate">

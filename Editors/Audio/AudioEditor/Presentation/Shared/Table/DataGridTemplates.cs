@@ -6,8 +6,9 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Data;
-using Editors.Audio.AudioEditor.Commands;
-using Editors.Audio.AudioEditor.Events;
+using Editors.Audio.AudioEditor.Commands.Dialogs;
+using Editors.Audio.AudioEditor.Events.AudioProjectEditor.Enablement;
+using Editors.Audio.AudioEditor.Events.AudioProjectEditor.Table;
 using Shared.Core.Events;
 
 namespace Editors.Audio.AudioEditor.Presentation.Shared.Table
@@ -229,24 +230,6 @@ namespace Editors.Audio.AudioEditor.Presentation.Shared.Table
                     eventHub.Publish(new EditorDataGridTextboxTextChangedEvent(textBox.Text));
                 }
             }));
-
-            //factory.AddHandler(UIElement.PreviewKeyDownEvent, new KeyEventHandler((sender, e) =>
-            //{
-            //    if (Keyboard.Modifiers == ModifierKeys.Control && e.Key == Key.V)
-            //    {
-            //        if (sender is TextBox textBox)
-            //        {
-            //            var clipboardText = string.Empty;
-            //            if (Clipboard.ContainsText())
-            //                clipboardText = Clipboard.GetText(TextDataFormat.UnicodeText);
-
-            //            _ = textBox.Dispatcher.BeginInvoke(new Action(() =>
-            //            {
-            //                eventHub.Publish(new EditorDataGridTextboxPastedEvent(clipboardText));
-            //            }), System.Windows.Threading.DispatcherPriority.Background);
-            //        }
-            //    }
-            //}), handledEventsToo: true);
 
             template.VisualTree = factory;
             return template;
