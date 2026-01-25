@@ -11,13 +11,13 @@
             return BitConverter.ToInt16(buffer, index);
         }
 
-        public override byte[] EncodeValue(short value, out string? error)
+        public override byte[]? EncodeValue(short value, out string? error)
         {
             error = null;
             return BitConverter.GetBytes(value);
         }
 
-        public override byte[] Encode(string value, out string? error)
+        public override byte[]? Encode(string value, out string? error)
         {
             if (!short.TryParse(value, out var spesificValue))
             {

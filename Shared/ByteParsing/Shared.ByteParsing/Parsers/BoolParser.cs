@@ -30,7 +30,7 @@
             return true;
         }
 
-        public byte[] Encode(string value, out string? error)
+        public byte[]? Encode(string value, out string? error)
         {
             if (!bool.TryParse(value, out var _res))
             {
@@ -41,7 +41,7 @@
             return Write(_res);
         }
 
-        public byte[] EncodeValue(bool value, out string? error)
+        public byte[]? EncodeValue(bool value, out string? error)
         {
             error = null;
             return Write(value);

@@ -158,13 +158,13 @@ namespace Shared.ByteParsing.Parsers
             }
         }
 
-        public byte[] EncodeValue(string value, out string? error)
+        public byte[]? EncodeValue(string value, out string? error)
         {
             error = null;
             return WriteCaString(value);
         }
 
-        public byte[] Encode(string value, out string? error)
+        public byte[]? Encode(string value, out string? error)
         {
             return EncodeValue(value, out error);
         }

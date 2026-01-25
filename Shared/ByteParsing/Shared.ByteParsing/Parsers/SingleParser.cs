@@ -19,13 +19,13 @@
             return result;
         }
 
-        public override byte[] EncodeValue(float value, out string? error)
+        public override byte[]? EncodeValue(float value, out string? error)
         {
             error = null;
             return BitConverter.GetBytes(value);
         }
 
-        public override byte[] Encode(string value, out string? error)
+        public override byte[]? Encode(string value, out string? error)
         {
             if (!float.TryParse(value, out var spesificValue))
             {

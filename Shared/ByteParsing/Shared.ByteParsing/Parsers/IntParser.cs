@@ -12,13 +12,13 @@
             return BitConverter.ToInt32(buffer, index);
         }
 
-        public override byte[] EncodeValue(int value, out string? error)
+        public override byte[]? EncodeValue(int value, out string? error)
         {
             error = null;
             return BitConverter.GetBytes(value);
         }
 
-        public override byte[] Encode(string value, out string? error)
+        public override byte[]? Encode(string value, out string? error)
         {
             if (!int.TryParse(value, out var spesificValue))
             {

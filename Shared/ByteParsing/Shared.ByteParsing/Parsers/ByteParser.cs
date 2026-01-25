@@ -12,13 +12,13 @@
             return buffer[index];
         }
 
-        public override byte[] EncodeValue(byte value, out string? error)
+        public override byte[]? EncodeValue(byte value, out string? error)
         {
             error = null;
             return new byte[] { value };
         }
 
-        public override byte[] Encode(string value, out string? error)
+        public override byte[]? Encode(string value, out string? error)
         {
             if (!byte.TryParse(value, out var spesificValue))
             {

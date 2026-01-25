@@ -8,8 +8,8 @@
         public abstract string TypeName { get; }
 
         protected abstract T Decode(byte[] buffer, int index);
-        public abstract byte[] EncodeValue(T value, out string? error);
-        public abstract byte[] Encode(string value, out string? error);
+        public abstract byte[]? EncodeValue(T value, out string? error);
+        public abstract byte[]? Encode(string value, out string? error);
 
         public virtual bool CanDecode(byte[] buffer, int index, out int bytesRead, out string? _error)
         {

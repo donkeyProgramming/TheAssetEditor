@@ -21,14 +21,18 @@ namespace Shared.ByteParsing.Parsers
             return Encoding.Unicode.GetString(buffer, index, FieldSize);
         }
 
-        public override byte[] EncodeValue(string value, out string? error)
+        public override byte[]? EncodeValue(string value, out string? error)
         {
-            throw new NotImplementedException();
+            // Not supported for fixed-length parser without padding rules defined.
+            error = "EncodeValue not implemented for FixedStringParser";
+            return null;
         }
 
-        public override byte[] Encode(string value, out string? error)
+        public override byte[]? Encode(string value, out string? error)
         {
-            throw new NotImplementedException();
+            // Not supported for fixed-length parser without padding rules defined.
+            error = "Encode not implemented for FixedStringParser";
+            return null;
         }
     }
 }

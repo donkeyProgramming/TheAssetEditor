@@ -13,7 +13,7 @@ namespace Shared.ByteParsing.Parsers
             return TryDecodeValue(buffer, index, out var _, out bytesRead, out error);
         }
 
-        public byte[] Encode(string value, out string? error)
+        public byte[]? Encode(string value, out string? error)
         {
             var split = value.Split("|");
             if (split.Length != 3)
@@ -41,7 +41,7 @@ namespace Shared.ByteParsing.Parsers
             return combined;
         }
 
-        public byte[] EncodeValue(Vector3 value, out string? error)
+        public byte[]? EncodeValue(Vector3 value, out string? error)
         {
             var x = ByteParsers.Single.EncodeValue(value.X, out error);
             if (x == null)

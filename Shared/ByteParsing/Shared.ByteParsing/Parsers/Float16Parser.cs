@@ -14,13 +14,13 @@ namespace Shared.ByteParsing.Parsers
             return new Half(u);
         }
 
-        public override byte[] EncodeValue(Half value, out string? error)
+        public override byte[]? EncodeValue(Half value, out string? error)
         {
             error = null;
             return BitConverter.GetBytes(value.RawValue);
         }
 
-        public override byte[] Encode(string value, out string? error)
+        public override byte[]? Encode(string value, out string? error)
         {
 
             if (!float.TryParse(value, out var spesificValue))

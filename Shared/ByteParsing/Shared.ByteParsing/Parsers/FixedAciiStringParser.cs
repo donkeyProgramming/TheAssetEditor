@@ -21,14 +21,18 @@ namespace Shared.ByteParsing.Parsers
             return Encoding.ASCII.GetString(buffer, index, FieldSize);
         }
 
-        public override byte[] EncodeValue(string value, out string? error)
+        public override byte[]? EncodeValue(string value, out string? error)
         {
-            throw new NotImplementedException();
+            // Not supported for fixed-length parser without padding rules defined.
+            error = "EncodeValue not implemented for FixedAciiStringParser";
+            return null;
         }
 
-        public override byte[] Encode(string value, out string? error)
+        public override byte[]? Encode(string value, out string? error)
         {
-            throw new NotImplementedException();
+            // Not supported for fixed-length parser without padding rules defined.
+            error = "Encode not implemented for FixedAciiStringParser";
+            return null;
         }
 
         public override bool CanDecode(byte[] buffer, int index, out int bytesRead, out string? _error)
