@@ -5,14 +5,61 @@ using Shared.Core.Settings;
 
 namespace Shared.Core.PackFiles.Serialization
 {
-    public record PackFileWriteInformation(
+    record PackFileWriteInformation(
     PackFile PackFile,
     long SizePosition,
     CompressionFormat CurrentCompressionFormat,
     CompressionFormat IntendedCompressionFormat);
 
-    public static class PackFileSerializerWriter
+    static class PackFileSerializerWriter
     {
+        public static void WriteHeader(PFHeader header, uint fileContentSize, BinaryWriter writer)
+        {
+            var packFileTypeStr = PackFileVersionConverter.ToString(header.Version);        // 4
+            foreach (var c in packFileTypeStr)
+                writer.Write(c);
+
+            writer.Write(header.ByteMask);                                                  // 8
+            writer.Write(header.DependantFiles.Count);                                      // 12
+
+            var pack_file_index_size = 0;
+            foreach (var file in header.DependantFiles)
+                pack_file_index_size += file.Length + 1;
+
+            writer.Write(pack_file_index_size);                                             // 16
+            writer.Write(header.FileCount);                                                 // 20
+            writer.Write(fileContentSize);                                                  // 24
+
+            switch (header.Version)
+            {
+                case PackFileVersion.PFH0:
+                    break;// Nothing needed to do
+                case PackFileVersion.PFH2:
+                case PackFileVersion.PFH3:
+                    // 64 bit timestamp
+                    writer.Write(0);
+                    writer.Write(0);
+                    break;
+                case PackFileVersion.PFH4:
+                case PackFileVersion.PFH5:
+                    if (header.HasExtendedHeader)
+                        throw new Exception("Not supported packfile type");
+
+                    writer.Write(PFHeader.DefaultTimeStamp);
+                    break;
+
+                default:
+                    throw new Exception("Not supported packfile type");
+            }
+
+            foreach (var file in header.DependantFiles)
+            {
+                foreach (byte c in file)
+                    writer.Write(c);
+                writer.Write((byte)0);
+            }
+        }
+
         public static void SaveToByteArray(PackFileContainer container, BinaryWriter writer, GameInformation gameInformation)
         {
             if (container.Header.HasEncryptedData || container.Header.HasEncryptedIndex)
@@ -36,7 +83,7 @@ namespace Shared.Core.PackFiles.Serialization
             }
 
             container.Header.FileCount = (uint)container.FileList.Count;
-            PackFileSerializerLoader.WriteHeader(container.Header, (uint)fileNamesOffset, writer);
+            WriteHeader(container.Header, (uint)fileNamesOffset, writer);
 
             var filesToWrite = new List<PackFileWriteInformation>();
 

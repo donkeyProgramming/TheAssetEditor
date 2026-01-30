@@ -32,10 +32,12 @@ namespace Editors.Reports.DeepSearch
     {
         private readonly ILogger _logger = Logging.Create<DeepSearchReport>();
         private readonly IPackFileService _packFileService;
+        private readonly IPackFileContainerLoader _loader;
 
-        public DeepSearchReport(IPackFileService packFileService)
+        public DeepSearchReport(IPackFileService packFileService, IPackFileContainerLoader loader)
         {
             _packFileService = packFileService;
+            _loader = loader;
         }
 
         public List<string> DeepSearch(string searchStr, bool caseSensetive)
@@ -71,7 +73,7 @@ namespace Editors.Reports.DeepSearch
                       {
                           using (var reader = new BinaryReader(fileStram, Encoding.ASCII))
                           {
-                              var pfc = PackFileSerializerLoader.Load(packFilePath, reader, new CaPackDuplicateFileResolver());
+                              var pfc = _loader.Load(packFilePath);
 
                               _logger.Here().Information($"Searching through packfile {currentIndex}/{files.Count} -  {packFilePath} {pfc.FileList.Count} files");
 

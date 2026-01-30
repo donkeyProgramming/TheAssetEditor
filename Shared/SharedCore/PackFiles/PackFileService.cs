@@ -9,7 +9,7 @@ using Shared.Core.Settings;
 
 namespace Shared.Core.PackFiles
 {
-    public class PackFileService : IPackFileService
+    class PackFileService : IPackFileService
     {
         private readonly ILogger _logger = Logging.Create<PackFileService>();
         private readonly IGlobalEventHub? _globalEventHub;
