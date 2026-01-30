@@ -10,6 +10,7 @@ using GameWorld.Core.SceneNodes;
 using Serilog;
 using Shared.Core.ErrorHandling;
 using Shared.Core.PackFiles;
+using Shared.Core.Services;
 using Shared.GameFormats.RigidModel;
 
 namespace GameWorld.Core.Services.SceneSaving.Material

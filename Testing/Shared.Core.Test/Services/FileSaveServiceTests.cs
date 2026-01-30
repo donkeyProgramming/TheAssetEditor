@@ -5,7 +5,7 @@ using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
 using Shared.Core.Services;
 
-namespace Test.Shared.Core.PackFiles
+namespace Test.Shared.Core.Services
 {
     internal class FileSaveServiceTests
     {

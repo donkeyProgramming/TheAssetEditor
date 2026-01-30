@@ -6,7 +6,7 @@ using Shared.Core.Settings;
 using ZstdSharp;
 using ZstdSharp.Unsafe;
 
-namespace Shared.Core.PackFiles
+namespace Shared.Core.PackFiles.Utility
 {
     public enum CompressionFormat
     {
@@ -53,7 +53,7 @@ namespace Shared.Core.PackFiles
         Zstd
     }
 
-    public static class PackFileCompression
+    public static class FileCompression
     {
         private const byte LzmaPropertiesIdentifier = 0x5D;
         private const uint Lz4MagicNumber = 0x184D_2204;

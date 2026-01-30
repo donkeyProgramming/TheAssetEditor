@@ -1,4 +1,5 @@
-﻿using Shared.Core.Settings;
+﻿using Shared.Core.PackFiles.Serialization;
+using Shared.Core.Settings;
 
 namespace Shared.Core.PackFiles.Models
 {
@@ -28,14 +29,12 @@ namespace Shared.Core.PackFiles.Models
 
     public class PFHeader
     {
-        public static byte[] DefaultTimeStamp = new byte[] { 67, 205, 210, 95 };
+        public static byte[] DefaultTimeStamp { get; } = new byte[] { 67, 205, 210, 95 };
 
         /// Used to specify that the header of the PackFile is extended by 20 bytes. Used in Arena.
 
-
-
-        public string _strVersion { get; set; }
-        public PackFileVersion Version { get => PackFileVersionConverter.GetEnum(_strVersion); set => _strVersion = PackFileVersionConverter.ToString(value); }
+        public string StrVersion { get; set; }
+        public PackFileVersion Version { get => PackFileVersionConverter.GetEnum(StrVersion); set => StrVersion = PackFileVersionConverter.ToString(value); }
 
         public int ByteMask { get; set; }
 
@@ -54,7 +53,7 @@ namespace Shared.Core.PackFiles.Models
         public bool HasEncryptedIndex { get => (ByteMask & PFHFlags.HAS_ENCRYPTED_INDEX) != 0; }    // Used by Arena
         public PackFileCAType PackFileType { get { return (PackFileCAType)(ByteMask & 15); } }
 
-        public List<string> DependantFiles = new List<string>();
+        public List<string> DependantFiles { get; set; } = [];
 
 
         public PFHeader() { }
@@ -100,14 +99,15 @@ namespace Shared.Core.PackFiles.Models
 
         public PFHeader(string version, PackFileCAType type)
         {
-            _strVersion = version;
+            StrVersion = version;
             ByteMask = (int)type;
             Buffer = DefaultTimeStamp;
         }
 
-        public void Save(int fileCount, uint fileContentSize, BinaryWriter binaryWriter)
+       /* Delete later 
+        * public void Save(int fileCount, uint fileContentSize, BinaryWriter binaryWriter)
         {
-            foreach (byte c in _strVersion)
+            foreach (byte c in StrVersion)
                 binaryWriter.Write(c);
             binaryWriter.Write(ByteMask);
 
@@ -129,6 +129,6 @@ namespace Shared.Core.PackFiles.Models
                     binaryWriter.Write(c);
                 binaryWriter.Write((byte)0);
             }
-        }
+        }*/
     }
 }

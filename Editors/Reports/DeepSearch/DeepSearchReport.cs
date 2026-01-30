@@ -5,6 +5,8 @@ using Shared.Core.ErrorHandling;
 using Shared.Core.Events;
 using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
+using Shared.Core.PackFiles.Serialization;
+using Shared.Core.PackFiles.Utility;
 
 namespace Editors.Reports.DeepSearch
 {
@@ -69,7 +71,7 @@ namespace Editors.Reports.DeepSearch
                       {
                           using (var reader = new BinaryReader(fileStram, Encoding.ASCII))
                           {
-                              var pfc = PackFileSerializer.Load(packFilePath, reader, new CaPackDuplicatePackFileResolver());
+                              var pfc = PackFileSerializerLoader.Load(packFilePath, reader, new CaPackDuplicateFileResolver());
 
                               _logger.Here().Information($"Searching through packfile {currentIndex}/{files.Count} -  {packFilePath} {pfc.FileList.Count} files");
 

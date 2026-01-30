@@ -3,10 +3,11 @@ using Moq;
 using Shared.Core.Events;
 using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
+using Shared.Core.PackFiles.Utility;
 
-namespace Test.Shared.Core.PackFiles
+namespace Test.Shared.Core.PackFiles.Utility
 {
-    internal class PackFileCompressionTests
+    internal class FileCompressionTests
     {
         private IPackFileService _packFileService;
         private PackFileContainer _container;
@@ -41,8 +42,8 @@ namespace Test.Shared.Core.PackFiles
 
                 foreach (var compressionFormat in compressionFormats)
                 {
-                    var compressedData = PackFileCompression.Compress(data, compressionFormat);
-                    var decompressedData = PackFileCompression.Decompress(compressedData, data.Length, compressionFormat);
+                    var compressedData = FileCompression.Compress(data, compressionFormat);
+                    var decompressedData = FileCompression.Decompress(compressedData, data.Length, compressionFormat);
                     Assert.That(decompressedData, Has.Length.EqualTo(data.Length), $"[{compressionFormat}] {fileName} length mismatch");
 
                     var expectedValue = Encoding.UTF8.GetString(originals[fileName]);

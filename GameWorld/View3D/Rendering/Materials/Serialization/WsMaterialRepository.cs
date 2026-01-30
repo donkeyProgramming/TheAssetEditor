@@ -3,6 +3,7 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using Shared.Core.PackFiles;
+using Shared.Core.PackFiles.Utility;
 
 namespace GameWorld.Core.Rendering.Materials.Serialization
 {

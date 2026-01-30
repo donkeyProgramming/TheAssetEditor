@@ -17,7 +17,6 @@ using Editors.Audio.Shared.Wwise.HircExploration;
 using Serilog;
 using Shared.Core.ErrorHandling;
 using Shared.Core.Misc;
-using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
 using Shared.Core.Services;
 using Shared.Core.Settings;

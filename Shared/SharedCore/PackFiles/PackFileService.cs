@@ -4,6 +4,7 @@ using Shared.Core.Events;
 using Shared.Core.Events.Global;
 using Shared.Core.Misc;
 using Shared.Core.PackFiles.Models;
+using Shared.Core.PackFiles.Serialization;
 using Shared.Core.Settings;
 
 namespace Shared.Core.PackFiles
@@ -276,7 +277,7 @@ namespace Shared.Core.PackFiles
             using (var memoryStream = new FileStream(path + "_temp", FileMode.Create))
             {
                 using var writer = new BinaryWriter(memoryStream);
-                pf.SaveToByteArray(writer, gameInformation);
+                PackFileSerializerWriter.SaveToByteArray(pf, writer, gameInformation);
             }
 
             File.Delete(path);

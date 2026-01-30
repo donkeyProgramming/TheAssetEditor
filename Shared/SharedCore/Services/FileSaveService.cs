@@ -1,7 +1,7 @@
-﻿using Shared.Core.PackFiles.Models;
-using Shared.Core.Services;
+﻿using Shared.Core.PackFiles;
+using Shared.Core.PackFiles.Models;
 
-namespace Shared.Core.PackFiles
+namespace Shared.Core.Services
 {
     public interface IFileSaveService
     {
@@ -27,15 +27,17 @@ namespace Shared.Core.PackFiles
                 throw new Exception($"Unable to save file. No Editable PackFile selected");
 
             var saveDialogResult = _packFileUiProvider.DisplaySaveDialog(_packFileService, [extention]);
-            if (saveDialogResult.Result == false)
+            if (saveDialogResult.Result)
+                return null;
+
+            var fileName = Path.GetFileName(saveDialogResult.SelectedFilePath);
+            if (string.IsNullOrWhiteSpace(fileName))
                 return null;
 
             var isExistingFile = _packFileService.FindFile(saveDialogResult.SelectedFilePath!, editablePack);
             if (isExistingFile == null)
             {
-                var fileName = Path.GetFileName(saveDialogResult.SelectedFilePath);
                 var newPackFile = new PackFile(fileName, new MemorySource(content));
-  
                 var directoryPath = Path.GetDirectoryName(saveDialogResult.SelectedFilePath);
                 var item = new NewPackFileEntry(directoryPath!, newPackFile);
                 _packFileService.AddFilesToPack(editablePack, [item]);

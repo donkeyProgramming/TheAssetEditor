@@ -1,20 +1,20 @@
 ﻿using System.Windows;
 
-namespace Shared.Core.PackFiles.Models
+namespace Shared.Core.PackFiles.Utility
 {
-    public interface IDuplicatePackFileResolver
+    public interface IDuplicateFileResolver
     {
         bool CheckForDuplicates { get; }
         bool KeepDuplicateFile(string fileName);
     }
 
-    public class CaPackDuplicatePackFileResolver : IDuplicatePackFileResolver
+    public class CaPackDuplicateFileResolver : IDuplicateFileResolver
     {
         public bool CheckForDuplicates => false;
         public bool KeepDuplicateFile(string fileName) => false;
     }
 
-    public class CustomPackDuplicatePackFileResolver : IDuplicatePackFileResolver
+    public class CustomPackDuplicateFileResolver : IDuplicateFileResolver
     {
         public bool CheckForDuplicates => true;
         public bool KeepDuplicateFile(string fileName)

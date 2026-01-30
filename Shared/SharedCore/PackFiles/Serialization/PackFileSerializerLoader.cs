@@ -1,13 +1,14 @@
 ﻿using Shared.ByteParsing;
 using Shared.Core.ErrorHandling;
 using Shared.Core.PackFiles.Models;
+using Shared.Core.PackFiles.Utility;
 using Shared.Core.Settings;
 
-namespace Shared.Core.PackFiles
+namespace Shared.Core.PackFiles.Serialization
 {
     public static class PackFileVersionConverter
     {
-        static List<(PackFileVersion EnumValue, string StringValue)> _values = new List<(PackFileVersion EnumValue, string StringValue)>()
+        static List<(PackFileVersion EnumValue, string StringValue)> s_values = new List<(PackFileVersion EnumValue, string StringValue)>()
         {
             (PackFileVersion.PFH0,  "PFH0"),
             (PackFileVersion.PFH2,  "PFH2"),
@@ -17,15 +18,15 @@ namespace Shared.Core.PackFiles
             (PackFileVersion.PFH6,  "PFH6"),
         };
 
-        public static string ToString(PackFileVersion versionEnum) => _values.First(x => x.EnumValue == versionEnum).StringValue;
-        public static PackFileVersion GetEnum(string versionStr) => _values.First(x => x.StringValue == versionStr.ToUpper()).EnumValue;
+        public static string ToString(PackFileVersion versionEnum) => s_values.First(x => x.EnumValue == versionEnum).StringValue;
+        public static PackFileVersion GetEnum(string versionStr) => s_values.First(x => x.StringValue == versionStr.ToUpper()).EnumValue;
     }
 
-    public static class PackFileSerializer
+    public static class PackFileSerializerLoader
     {
-        static readonly ILogger _logger = Logging.CreateStatic(typeof(PackFileSerializer));
+        static readonly ILogger s_logger = Logging.CreateStatic(typeof(PackFileSerializerLoader));
 
-        public static PackFileContainer Load(string packFileSystemPath, BinaryReader reader, IDuplicatePackFileResolver duplicatePackFileResolver)
+        public static PackFileContainer Load(string packFileSystemPath, BinaryReader reader, IDuplicateFileResolver duplicatePackFileResolver)
         {
             try
             {
@@ -58,7 +59,7 @@ namespace Shared.Core.PackFiles
                 {
                     uint size;
                     if (output.Header.HasEncryptedIndex)
-                        size = PackFileEncryption.DecryptAndReadU32(reader, (uint)(output.Header.FileCount - i - 1));
+                        size = FileEncryption.DecryptAndReadU32(reader, (uint)(output.Header.FileCount - i - 1));
                     else
                         size = reader.ReadUInt32();
 
@@ -82,7 +83,7 @@ namespace Shared.Core.PackFiles
                         using var compressionReader = new BinaryReader(compressionStream);
                         uncompressedSize = compressionReader.ReadUInt32();
                         var compressionFormatBytes = compressionReader.ReadBytes(4);
-                        compressionFormat = PackFileCompression.GetCompressionFormat(compressionFormatBytes);
+                        compressionFormat = FileCompression.GetCompressionFormat(compressionFormatBytes);
                     }
 
                     var packedFileSource = new PackedFileSource(packedFileSourceParent, offset, size, isEncrypted, isCompressed, compressionFormat, uncompressedSize);
@@ -95,7 +96,7 @@ namespace Shared.Core.PackFiles
                         {
                             if (duplicatePackFileResolver.KeepDuplicateFile(fullPackedFileName))
                             {
-                                _logger.Here().Warning($"Duplicate file found {fullPackedFileName}");
+                                s_logger.Here().Warning($"Duplicate file found {fullPackedFileName}");
                                 output.FileList.Add(fullPackedFileName + Guid.NewGuid().ToString(), fileContent);
                             }
                         }
@@ -112,7 +113,7 @@ namespace Shared.Core.PackFiles
             }
             catch (Exception e)
             {
-                _logger.Here().Error($"Failed to load packfile {packFileSystemPath} - {e.Message}");
+                s_logger.Here().Error($"Failed to load packfile {packFileSystemPath} - {e.Message}");
                 throw;
             }
         }
@@ -122,7 +123,7 @@ namespace Shared.Core.PackFiles
             var fileNameBuffer = new byte[1024];
             var header = new PFHeader()
             {
-                _strVersion = new string(reader.ReadChars(4)),      // 4
+                StrVersion = new string(reader.ReadChars(4)),      // 4
                 ByteMask = reader.ReadInt32(),                      // 8
                 ReferenceFileCount = reader.ReadUInt32(),           // 12    
             };
@@ -134,7 +135,7 @@ namespace Shared.Core.PackFiles
             if (header.HasEncryptedIndex)
             {
                 var filesRemaining = header.ReferenceFileCount;
-                packed_file_index_size = PackFileEncryption.DecryptAndReadU32(reader, filesRemaining);
+                packed_file_index_size = FileEncryption.DecryptAndReadU32(reader, filesRemaining);
             }
 
             // Read the buffer of data stuff
@@ -240,7 +241,7 @@ namespace Shared.Core.PackFiles
             reader.BaseStream.Seek(savedPos, SeekOrigin.Begin);
 
             if (isEncrypted)
-                PackFileEncryption.DecryptInPlace(header, entrySize);
+                FileEncryption.DecryptInPlace(header, entrySize);
 
             return header;
         }

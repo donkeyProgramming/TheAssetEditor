@@ -7,6 +7,7 @@ using Shared.Core.ErrorHandling;
 using Shared.Core.Events;
 using Shared.Core.Misc;
 using Shared.Core.PackFiles;
+using Shared.Core.PackFiles.Utility;
 using Shared.Core.Settings;
 using Shared.GameFormats.Animation;
 using Shared.GameFormats.AnimationMeta.Parsing;

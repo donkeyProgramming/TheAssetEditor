@@ -3,9 +3,10 @@ using System.Reflection;
 using System.Text;
 using Shared.Core.ErrorHandling;
 using Shared.Core.PackFiles.Models;
+using Shared.Core.PackFiles.Serialization;
 using Shared.Core.Settings;
 
-namespace Shared.Core.PackFiles
+namespace Shared.Core.PackFiles.Utility
 {
     public interface IPackFileContainerLoader
     {
@@ -74,7 +75,7 @@ namespace Shared.Core.PackFiles
                 using var fileStream = File.OpenRead(packFileSystemPath);
                 using var reader = new BinaryReader(fileStream, Encoding.ASCII);
 
-                var pack = PackFileSerializer.Load(packFileSystemPath, reader, new CustomPackDuplicatePackFileResolver());
+                var pack = PackFileSerializerLoader.Load(packFileSystemPath, reader, new CustomPackDuplicateFileResolver());
                 PackFileLog.LogPackCompression(pack);
 
                 return pack;
@@ -102,11 +103,11 @@ namespace Shared.Core.PackFiles
                 // When loading ca pack packs, we want to use the CA resolver as its faster. 
                 // If there is no manifest file, we need to use the duplicate resolver as it loads all file in the folder.
                 // There might be custom mods in there that does not follow the rules! 
-                IDuplicatePackFileResolver packfileResolver = new CaPackDuplicatePackFileResolver();
+                IDuplicateFileResolver packfileResolver = new CaPackDuplicateFileResolver();
                 if (manifestFileFound == false)
                 {
                     _logger.Here().Warning($"Loading pack files for {gameName}, which does not uses manifest.txt. If there are MODs in the game folder, this might cause issues!");
-                    packfileResolver = new CustomPackDuplicatePackFileResolver();
+                    packfileResolver = new CustomPackDuplicateFileResolver();
                 }
 
                 var packList = new List<PackFileContainer>();
@@ -120,7 +121,7 @@ namespace Shared.Core.PackFiles
                         using var fileStream = File.OpenRead(path);
                         using var reader = new BinaryReader(fileStream, Encoding.ASCII);
 
-                        var pack = PackFileSerializer.Load(path, reader, packfileResolver);
+                        var pack = PackFileSerializerLoader.Load(path, reader, packfileResolver);
                         packList.Add(pack);
 
                         PackFileLog.LogPackCompression(pack);

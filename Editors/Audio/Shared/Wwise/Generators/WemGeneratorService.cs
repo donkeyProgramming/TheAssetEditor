@@ -7,6 +7,7 @@ using Serilog;
 using Shared.Core.ErrorHandling;
 using Shared.Core.Misc;
 using Shared.Core.PackFiles;
+using Shared.Core.PackFiles.Utility;
 
 namespace Editors.Audio.Shared.Wwise.Generators
 {

@@ -3,10 +3,11 @@ using Moq;
 using Shared.Core.Events;
 using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
+using Shared.Core.PackFiles.Utility;
 
-namespace Test.Shared.Core.PackFiles
+namespace Test.Shared.Core.PackFiles.Utility
 {
-    internal class PackFileEncryptionTests
+    internal class FileEncryptionTests
     {
         private IPackFileService _packFileService;
         private PackFileContainer _container;
@@ -36,7 +37,7 @@ namespace Test.Shared.Core.PackFiles
             foreach (var file in _container.FileList)
             {
                 var originalData = file.Value.DataSource.ReadData();
-                var encryptedData = PackFileEncryption.Encrypt(originalData);
+                var encryptedData = FileEncryption.Encrypt(originalData);
                 file.Value.DataSource = new MemorySource(encryptedData);
             }
 
@@ -47,7 +48,7 @@ namespace Test.Shared.Core.PackFiles
             foreach (var file in _container.FileList)
             {
                 var encryptedData = file.Value.DataSource.ReadData();
-                var decryptedContent = PackFileEncryption.Decrypt(encryptedData);
+                var decryptedContent = FileEncryption.Decrypt(encryptedData);
                 var originalContent = Encoding.UTF8.GetString(decryptedContent);
 
                 switch (file.Value.Name)

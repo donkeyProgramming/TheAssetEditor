@@ -6,6 +6,7 @@ using GameWorld.Core.Services;
 using Shared.Core.Events;
 using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
+using Shared.Core.PackFiles.Utility;
 using Shared.GameFormats.AnimationPack;
 using Shared.Ui.Common;
 using Shared.Ui.Events.UiCommands;

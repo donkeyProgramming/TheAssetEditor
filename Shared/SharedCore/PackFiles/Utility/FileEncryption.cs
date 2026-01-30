@@ -1,9 +1,9 @@
 ﻿using System.Buffers.Binary;
 using System.Text;
 
-namespace Shared.Core.PackFiles
+namespace Shared.Core.PackFiles.Utility
 {
-    public static class PackFileEncryption
+    public static class FileEncryption
     {
         private static readonly byte[] s_iNDEX_STRING_KEY = Encoding.ASCII.GetBytes("#:AhppdV-!PEfz&}[]Nv?6w4guU%dF5.fq:n*-qGuhBJJBm&?2tPy!geW/+k#pG?");
         private const uint INDEX_U32_KEY = 0xE10B_73F4;

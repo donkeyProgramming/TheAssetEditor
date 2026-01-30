@@ -1,4 +1,4 @@
-﻿namespace Shared.Core.PackFiles
+﻿namespace Shared.Core.PackFiles.Utility
 {
     static class ManifestHelper
     {

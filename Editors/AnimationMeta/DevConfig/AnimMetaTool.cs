@@ -1,5 +1,6 @@
 ﻿using Shared.Core.DevConfig;
 using Shared.Core.PackFiles;
+using Shared.Core.PackFiles.Utility;
 using Shared.Core.Settings;
 using Shared.Core.ToolCreation;
 using Shared.EmbeddedResources;

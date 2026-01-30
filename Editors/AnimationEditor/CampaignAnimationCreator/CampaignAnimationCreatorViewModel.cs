@@ -8,7 +8,7 @@ using Editors.Shared.Core.Services;
 using GameWorld.Core.Animation;
 using Microsoft.Xna.Framework;
 using Shared.Core.Misc;
-using Shared.Core.PackFiles;
+using Shared.Core.Services;
 using Shared.GameFormats.Animation;
 using Shared.Ui.Common;
 

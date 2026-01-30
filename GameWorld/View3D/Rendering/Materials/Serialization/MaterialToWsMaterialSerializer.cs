@@ -2,6 +2,7 @@
 using System.Text;
 using GameWorld.Core.Rendering.Materials.Shaders;
 using Shared.Core.PackFiles;
+using Shared.Core.Services;
 using Shared.Core.Settings;
 using Shared.GameFormats.RigidModel;
 

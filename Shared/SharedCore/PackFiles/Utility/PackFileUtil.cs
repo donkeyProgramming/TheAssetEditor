@@ -1,6 +1,6 @@
 ﻿using Shared.Core.PackFiles.Models;
 
-namespace Shared.Core.PackFiles
+namespace Shared.Core.PackFiles.Utility
 {
     public static class PackFileUtil
     {

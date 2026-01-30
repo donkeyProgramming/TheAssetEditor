@@ -8,6 +8,7 @@ using Shared.Core.ErrorHandling;
 using Shared.Core.Misc;
 using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
+using Shared.Core.PackFiles.Utility;
 using Shared.Core.ToolCreation;
 using Shared.GameFormats.Animation;
 using Shared.Ui.Common;
