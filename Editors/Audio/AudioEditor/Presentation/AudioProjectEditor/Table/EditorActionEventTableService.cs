@@ -31,7 +31,7 @@ namespace Editors.Audio.AudioEditor.Presentation.AudioProjectEditor.Table
         public List<string> DefineSchema()
         {
             var schema = new List<string>();
-            var columnName = TableInformation.EventColumnName;
+            var columnName = TableInformation.ActionEventColumnName;
             schema.Add(columnName);
             return schema;
         }
@@ -86,7 +86,7 @@ namespace Editors.Audio.AudioEditor.Presentation.AudioProjectEditor.Table
                 eventName = "Play_";
 
             var row = editorTable.NewRow();
-            row[TableInformation.EventColumnName] = eventName;
+            row[TableInformation.ActionEventColumnName] = eventName;
 
             _eventHub.Publish(new EditorTableRowAddRequestedEvent(row));
         }

@@ -211,7 +211,7 @@ namespace Editors.Audio.AudioEditor.Presentation.AudioProjectEditor
                 var row = Table.Rows[0];
                 var wavFileName = Path.GetFileNameWithoutExtension(audioFiles[0].WavPackFileName);
                 var eventName = $"Play_{wavFileName}";
-                row[TableInformation.EventColumnName] = eventName;
+                row[TableInformation.ActionEventColumnName] = eventName;
             }
 
             SetAddRowButtonEnablement();
@@ -229,7 +229,7 @@ namespace Editors.Audio.AudioEditor.Presentation.AudioProjectEditor
             var eventName = $"Play_Movie_{slashesToUnderscores}";
 
             var row = Table.Rows[0];
-            row[TableInformation.EventColumnName] = eventName;
+            row[TableInformation.ActionEventColumnName] = eventName;
         }
 
         public void OnEditorAddRowButtonEnablementUpdateRequested(EditorAddRowButtonEnablementUpdateRequestedEvent e) => SetAddRowButtonEnablement();

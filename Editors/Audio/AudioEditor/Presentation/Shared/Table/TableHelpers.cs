@@ -51,7 +51,7 @@ namespace Editors.Audio.AudioEditor.Presentation.Shared.Table
 
         public static string GetValueFromRow(DataRow row, string columnName) => row[columnName].ToString();
 
-        public static string GetActionEventNameFromRow(DataRow row) => GetValueFromRow(row, TableInformation.EventColumnName);
+        public static string GetActionEventNameFromRow(DataRow row) => GetValueFromRow(row, TableInformation.ActionEventColumnName);
 
         public static string GetStatePathNameFromRow(DataRow row, IAudioRepository audioRepository, string dialogueEventName)
         {
