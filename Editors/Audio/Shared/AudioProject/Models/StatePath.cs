@@ -87,5 +87,20 @@ namespace Editors.Audio.Shared.AudioProject.Models
 
             existingStatePaths.Insert(index, statePath);
         }
+
+        public static void TryAdd(this List<StatePath> existingStatePaths, StatePath statePath)
+        {
+            ArgumentNullException.ThrowIfNull(existingStatePaths);
+            ArgumentNullException.ThrowIfNull(statePath);
+
+            if (existingStatePaths.Any(existingStatePath => StringComparer.OrdinalIgnoreCase.Equals(existingStatePath.Name, statePath.Name)))
+                throw new ArgumentException($"Cannot add StatePath with Name {statePath.Name} as it already exists.");
+
+            var index = existingStatePaths.BinarySearch(statePath, s_nameComparerIgnoreCase);
+            if (index < 0)
+                index = ~index;
+
+            existingStatePaths.Insert(index, statePath);
+        }
     }
 }

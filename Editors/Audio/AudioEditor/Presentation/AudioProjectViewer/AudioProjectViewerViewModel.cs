@@ -247,6 +247,14 @@ namespace Editors.Audio.AudioEditor.Presentation.AudioProjectViewer
 
         private List<DataRow> GetRowsToRemove()
         {
+            if (_audioEditorStateService.SelectedAudioProjectExplorerNode.IsActionEvent())
+                return GetRelatedActionEventRows();
+            else
+                return _audioEditorStateService.SelectedViewerRows;
+        }
+
+        private List<DataRow> GetRelatedActionEventRows()
+        {
             var rowsToRemove = _audioEditorStateService.SelectedViewerRows;
             var actionEventsNamesWithoutSuffixes = rowsToRemove
                 .Select(TableHelpers.GetActionEventNameFromRow)

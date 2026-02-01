@@ -34,15 +34,15 @@ namespace Editors.Audio.AudioProjectMerger
 
         [RelayCommand] public void MergeAudioProjects()
         {
-            var baseAudioProjectFileName = Path.GetFileName(BaseAudioProjectPath);
+            var baseAudioProjectFileName = Path.GetFileNameWithoutExtension(BaseAudioProjectPath);
             var baseAudioProjectPackFile = _packFileService.FindFile(BaseAudioProjectPath);
             var baseAudioProject = _audioProjectFileService.DeserialiseAudioProject(baseAudioProjectPackFile);
 
-            var mergingAudioProjectFileName = Path.GetFileName(MergingAudioProjectPath);
+            var mergingAudioProjectFileName = Path.GetFileNameWithoutExtension(MergingAudioProjectPath);
             var mergingAudioProjectPackFile = _packFileService.FindFile(MergingAudioProjectPath);
             var mergingAudioProject = _audioProjectFileService.DeserialiseAudioProject(mergingAudioProjectPackFile);
 
-            baseAudioProject.Merge(mergingAudioProject, baseAudioProjectFileName, mergingAudioProjectFileName);
+            AudioProjectFileMerger.Merge(baseAudioProject, mergingAudioProject, baseAudioProjectFileName, mergingAudioProjectFileName);
 
             var mergedAudioProjectFileName = $"{MergedAudioProjectName}.aproj";
             var mergedAudioProjectFilePath = $"{OutputDirectoryPath}\\{mergedAudioProjectFileName}";

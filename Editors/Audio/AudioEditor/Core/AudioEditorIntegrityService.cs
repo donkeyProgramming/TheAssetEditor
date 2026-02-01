@@ -238,10 +238,10 @@ namespace Editors.Audio.AudioEditor.Core
             {
                 ResolveSoundBankDataIntegrity(audioProject, audioProjectNameWithoutExtension, soundBank);
 
-                if (soundBank.ActionEvents != null)
+                if (soundBank.ActionEvents.Count != 0)
                     ResolveActionEventDataIntegrity(usedHircIds, usedSourceIds, soundBank);
 
-                if (soundBank.DialogueEvents != null)
+                if (soundBank.DialogueEvents.Count != 0)
                     ResolveDialogueEventDataIntegrity(usedHircIds, usedSourceIds, soundBank);
             }
 

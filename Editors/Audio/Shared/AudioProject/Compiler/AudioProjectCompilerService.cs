@@ -31,7 +31,7 @@ namespace Editors.Audio.Shared.AudioProject.Compiler
 
         public void Compile(AudioProjectFile audioProject, string audioProjectFileName, string audioProjectFilePath)
         {
-            if (audioProject.SoundBanks == null)
+            if (audioProject.SoundBanks.Count == 0)
                 return;
 
             _logger.Here().Information($"Compiling {audioProjectFileName}");
@@ -244,7 +244,7 @@ namespace Editors.Audio.Shared.AudioProject.Compiler
             // We store States in there so we can display them in the Audio Explorer.
             var actionEvents = audioProject.GetActionEvents();
             var hasActionEvents = actionEvents != null && actionEvents.Count > 0;
-            var hasStateGroups = audioProject.StateGroups != null && audioProject.StateGroups.Count > 0;
+            var hasStateGroups = audioProject.StateGroups.Count != 0 && audioProject.StateGroups.Count > 0;
 
             if (hasActionEvents && hasStateGroups)
             {

@@ -10,7 +10,7 @@ namespace Editors.Audio.Shared.AudioProject.Models
         public uint OverrideBusId { get; set; }
         public uint DirectParentId { get; set; }
         public HircSettings HircSettings { get; set; }
-        public List<uint> Children { get; set; }
+        public List<uint> Children { get; set; } = [];
 
         public RandomSequenceContainer()
         {

@@ -399,7 +399,7 @@ namespace Editors.Audio.AudioProjectConverter
             _logger.Here().Information($"Processing Dialogue Event: {dialogueEventName}");
 
             var dialogueEventAndSoundBank = audioProject.SoundBanks
-                .Where(soundBank => soundBank.DialogueEvents != null)
+                .Where(soundBank => soundBank.DialogueEvents.Count != 0)
                 .SelectMany(
                     soundBank => soundBank.DialogueEvents,
                     (soundBank, dialogueEventItem) => new { SoundBank = soundBank, DialogueEvent = dialogueEventItem })

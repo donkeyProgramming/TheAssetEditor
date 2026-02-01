@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Editors.Audio.Shared.GameInformation.Warhammer3;
 using Editors.Audio.Shared.Wwise;
@@ -18,10 +19,10 @@ namespace Editors.Audio.Shared.AudioProject.Models
         public string MergingFileName { get; set; }
         public string MergingFilePath { get; set; }
         public Wh3SoundBank GameSoundBank { get; set; }
-        public List<ActionEvent> ActionEvents { get; set; }
-        public List<DialogueEvent> DialogueEvents { get; set; }
-        public List<Sound> Sounds { get; set; }
-        public List<RandomSequenceContainer> RandomSequenceContainers { get; set; }
+        public List<DialogueEvent> DialogueEvents { get; set; } = [];
+        public List<ActionEvent> ActionEvents { get; set; } = [];
+        public List<Sound> Sounds { get; set; } = [];
+        public List<RandomSequenceContainer> RandomSequenceContainers { get; set; } = [];
 
         public static SoundBank Create(string name, Wh3SoundBank gameSoundBank, string language)
         {
@@ -32,6 +33,42 @@ namespace Editors.Audio.Shared.AudioProject.Models
                 GameSoundBank = gameSoundBank,
                 Language = language,
                 LanguageId = WwiseHash.Compute(language)
+            };
+        }
+
+        public SoundBank Clean()
+        {
+            var cleanedDialogueEvents = DialogueEvents
+                .Where(dialogueEvent =>
+                    dialogueEvent.StatePaths != null && dialogueEvent.StatePaths.Count != 0)
+                .ToList();
+
+            var cleanedActionEvents = ActionEvents
+                .Where(actionEvent => actionEvent.Actions.Count != 0)
+                .ToList();
+
+            if (cleanedDialogueEvents.Count == 0 && cleanedActionEvents.Count == 0)
+                return null;
+
+            return new SoundBank
+            {
+                Id = Id,
+                Name = Name,
+                Language = Language,
+                LanguageId = LanguageId,
+                FileName = FileName,
+                FilePath = FilePath,
+                TestingId = TestingId,
+                TestingFileName = TestingFileName,
+                TestingFilePath = TestingFilePath,
+                MergingId = MergingId,
+                MergingFileName = MergingFileName,
+                MergingFilePath = MergingFilePath,
+                GameSoundBank = GameSoundBank,
+                DialogueEvents = cleanedDialogueEvents,
+                ActionEvents = cleanedActionEvents,
+                Sounds = Sounds,
+                RandomSequenceContainers = RandomSequenceContainers
             };
         }
 
@@ -47,8 +84,8 @@ namespace Editors.Audio.Shared.AudioProject.Models
                 .GetSoundBankActionEventTypes(GameSoundBank);
 
             return usedActionEventGroups
-                .Where(actionEventGroup => allowedActionEventGroups.Contains(actionEventGroup))
-                .OrderBy(actionEventGroup => allowedActionEventGroups.IndexOf(actionEventGroup))
+                .Where(allowedActionEventGroups.Contains)
+                .OrderBy(allowedActionEventGroups.IndexOf)
                 .ToList();
         }
 
@@ -78,5 +115,23 @@ namespace Editors.Audio.Shared.AudioProject.Models
         }
 
         public RandomSequenceContainer GetRandomSequenceContainer(uint id) => RandomSequenceContainers.FirstOrDefault(randomSequenceContainer => randomSequenceContainer.Id == id);
+    }
+
+    public static class SoundBankListExtensions
+    {
+        public static void TryAdd(this List<SoundBank> existingSoundBanks, SoundBank soundBank)
+        {
+            ArgumentNullException.ThrowIfNull(existingSoundBanks);
+            ArgumentNullException.ThrowIfNull(soundBank);
+
+            if (existingSoundBanks.Any(existingSoundBank => existingSoundBank.Id == soundBank.Id))
+                throw new ArgumentException($"Cannot add SoundBank with Id {soundBank.Id} as it already exists.");
+
+            var index = existingSoundBanks.BinarySearch(soundBank, AudioProjectItem.IdComparer);
+            if (index < 0)
+                index = ~index;
+
+            existingSoundBanks.Insert(index, soundBank);
+        }
     }
 }

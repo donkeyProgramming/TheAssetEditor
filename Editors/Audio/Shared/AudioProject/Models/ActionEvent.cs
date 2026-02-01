@@ -10,7 +10,7 @@ namespace Editors.Audio.Shared.AudioProject.Models
     {
         // Actions is a List because in Wwise an Action Event can have multiple actions but making multiple Actions isn't
         // supported by the tool as it's unlikely to be needed so really there will only ever be one Action in the list.
-        public List<Action> Actions { get; set; }
+        public List<Action> Actions { get; set; } = [];
         public Wh3ActionEventType ActionEventType { get; set; }
 
         public ActionEvent()
@@ -61,6 +61,21 @@ namespace Editors.Audio.Shared.AudioProject.Models
                 throw new ArgumentException($"Cannot add ActionEvent with Name {actionEvent.Name} as it already exists.");
 
             var index = existingActionEvents.BinarySearch(actionEvent, s_nameComparerIgnoreCase);
+            if (index < 0)
+                index = ~index;
+
+            existingActionEvents.Insert(index, actionEvent);
+        }
+
+        public static void TryAdd(this List<ActionEvent> existingActionEvents, ActionEvent actionEvent)
+        {
+            ArgumentNullException.ThrowIfNull(existingActionEvents);
+            ArgumentNullException.ThrowIfNull(actionEvent);
+
+            if (existingActionEvents.Any(existingActionEvent => existingActionEvent.Id == actionEvent.Id))
+                throw new ArgumentException($"Cannot add ActionEvent with Id {actionEvent.Id} as it already exists.");
+
+            var index = existingActionEvents.BinarySearch(actionEvent, AudioProjectItem.IdComparer);
             if (index < 0)
                 index = ~index;
 
