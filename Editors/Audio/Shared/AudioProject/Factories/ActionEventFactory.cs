@@ -109,7 +109,6 @@ namespace Editors.Audio.Shared.AudioProject.Factories
             return new ActionEventFactoryResult { ActionEvent = actionEvent };
         }
 
-
         public ActionEventFactoryResult CreateResumeActionEvent(HashSet<uint> usedHircIds, ActionEvent playActionEvent)
         {
             var resumeActions = new List<Action>();

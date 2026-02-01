@@ -6,12 +6,16 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
     xmlns:Behaviours="clr-namespace:Shared.Ui.Common.Behaviors;assembly=Shared.Ui"
     xmlns:AudioProjectViewer="clr-namespace:Editors.Audio.AudioEditor.Presentation.AudioProjectViewer" 
+    xmlns:ValueConverters="clr-namespace:Editors.Audio.AudioEditor.Presentation.AudioProjectViewer.ValueConverters" 
     d:DataContext="{d:DesignInstance Type=AudioProjectViewer:AudioProjectViewerViewModel}"
     mc:Ignorable="d" 
     d:DesignHeight="450" d:DesignWidth="800">
     
     <UserControl.Resources>
-        <BooleanToVisibilityConverter x:Key="BoolToVisibilityConverter"/>
+        <BooleanToVisibilityConverter 
+            x:Key="BoolToVisibilityConverter"/>
+        <ValueConverters:ActionEventRowEnablementConverter
+            x:Key="ActionEventRowEnablementConverter"/>
     </UserControl.Resources>
     
     <Grid
@@ -104,6 +108,55 @@
             EnableColumnVirtualization="True"
             ScrollViewer.HorizontalScrollBarVisibility="Disabled">
             
+            <DataGrid.RowStyle>
+                <Style 
+                    TargetType="DataGridRow">
+                    <Setter
+                        Property="ToolTipService.ShowOnDisabled"
+                        Value="True" />
+
+                    <Setter Property="ToolTip">
+                        <Setter.Value>
+                            <TextBlock TextWrapping="Wrap">
+                                <Run 
+                                    Text="To edit or remove rows select them."/>
+                                <LineBreak/>
+                                <LineBreak/>
+                                <Run 
+                                    Text="To copy and paste rows (Dialogue Events rows only) select them and right-click or use the shortcuts:"/>
+                                <LineBreak/>
+                                <Run 
+                                    Text="Copy: Ctrl + C"/>
+                                <LineBreak/>
+                                <Run 
+                                    Text="Paste: Ctrl + V"/>
+                            </TextBlock>
+                        </Setter.Value>
+                    </Setter>
+                    
+                    <Style.Triggers>
+                        <DataTrigger 
+                            Value="True">
+                            <DataTrigger.Binding>
+                                <MultiBinding 
+                                    Converter="{StaticResource ActionEventRowEnablementConverter}">
+                                    <Binding />
+                                    <Binding
+                                        Path="DataContext.SelectedAudioProjectExplorerNode"
+                                        RelativeSource="{RelativeSource AncestorType=UserControl}"/>
+                                </MultiBinding>
+                            </DataTrigger.Binding>
+                            <Setter 
+                                Property="IsEnabled" 
+                                Value="False" />
+                            <Setter 
+                                Property="ToolTip"
+                                Value="This row cannot be selected directly, it is controlled by the corresponding &quot;Play_...&quot; Action Event." />
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </DataGrid.RowStyle>
+
             <DataGrid.ContextMenu>
                 <ContextMenu
                     DataContext="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource Self}}">

@@ -246,7 +246,40 @@ namespace Editors.Audio.AudioEditor.Presentation.AudioProjectEditor
                 AddRowToViewer();
         }
 
-        [RelayCommand] public void AddRowToViewer() => _uiCommandFactory.Create<AddEditorRowToViewerCommand>().Execute(Table.Rows[0]);
+        [RelayCommand] public void AddRowToViewer()
+        {
+            var rows = new List<DataRow>();
+            var row = Table.Rows[0];
+            rows.Add(row);
+
+            // TODO: Add support for vocalisation Action Events when implemented
+            // To hide the complexity of creating Pause / Resume / Stop Action Events
+            // from the user we create them for them for the necessary types of audio
+            var selectedAudioProjectExplorerNode = _audioEditorStateService.SelectedAudioProjectExplorerNode;
+            if (selectedAudioProjectExplorerNode.IsActionEvent())
+            {
+                var actionEventName = TableHelpers.GetActionEventNameFromRow(row);
+                var actionEventSuffix = TableHelpers.RemoveActionEventPrefix(actionEventName);
+                if (selectedAudioProjectExplorerNode.IsMusicActionEvent())
+                {
+                    var pauseActionEventRow = TableHelpers.CreateRow(Table, $"Pause_{actionEventSuffix}");
+                    rows.Add(pauseActionEventRow);
+
+                    var resumeActionEventRow = TableHelpers.CreateRow(Table, $"Resume_{actionEventSuffix}");
+                    rows.Add(resumeActionEventRow);
+
+                    var stopActionEventRow = TableHelpers.CreateRow(Table, $"Stop_{actionEventSuffix}");
+                    rows.Add(stopActionEventRow);
+                }
+                else if (selectedAudioProjectExplorerNode.IsBattleAbilityActionEvent())
+                {
+                    var stopActionEventRow = TableHelpers.CreateRow(Table, $"Stop_{actionEventSuffix}");
+                    rows.Add(stopActionEventRow);
+                }
+            }
+
+            _uiCommandFactory.Create<AddRowsToViewerCommand>().Execute(rows);
+        }
 
         partial void OnShowModdedStatesOnlyChanged(bool value)
         {

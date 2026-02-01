@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Editors.Audio.AudioEditor.Presentation.Shared.Table;
 using Editors.Audio.Shared.AudioProject.Factories;
 using Editors.Audio.Shared.AudioProject.Models;
 using Editors.Audio.Shared.GameInformation.Warhammer3;
@@ -13,7 +14,8 @@ namespace Editors.Audio.AudioEditor.Core.AudioProjectMutation
 {
     public interface IActionEventService
     {
-        void AddActionEvent(string actionEventGroupName, string actionEventName, List<AudioFile> audioFiles, HircSettings hircSettings);
+        void AddPlayActionEvent(string actionEventTypeName, string actionEventName, List<AudioFile> audioFiles, HircSettings hircSettings);
+        void AddPauseResumeStopActionEvent(string actionEventTypeName, string actionEventName);
         void RemoveActionEvent(string actionEventNodeName, string actionEventName);
     }
 
@@ -23,23 +25,13 @@ namespace Editors.Audio.AudioEditor.Core.AudioProjectMutation
         private readonly IAudioRepository _audioRepository = audioRepository;
         private readonly IActionEventFactory _actionEventFactory = actionEventFactory;
 
-        public void AddActionEvent(string actionEventTypeName, string actionEventName, List<AudioFile> audioFiles, HircSettings hircSettings)
+        public void AddPlayActionEvent(string actionEventTypeName, string actionEventName, List<AudioFile> audioFiles, HircSettings hircSettings)
         {
-            var usedHircIds = new HashSet<uint>();
-            var usedSourceIds = new HashSet<uint>();
+            var usedHircIds = GetUsedHircIds();
+            var usedSourceIds = GetUsedSourceIds();
 
             var audioProject = _audioEditorStateService.AudioProject;
             var languageId = WwiseHash.Compute(audioProject.Language);
-
-            var audioProjectGeneratableItemIds = audioProject.GetGeneratableItemIds();
-            var languageHircIds = _audioRepository.GetUsedVanillaHircIdsByLanguageId(languageId);
-            usedHircIds.UnionWith(audioProjectGeneratableItemIds);
-            usedHircIds.UnionWith(languageHircIds);
-
-            var audioProjectSourceIds = audioProject.GetAudioFileIds();
-            var languageSourceIds = _audioRepository.GetUsedVanillaSourceIdsByLanguageId(languageId);
-            usedSourceIds.UnionWith(audioProjectSourceIds);
-            usedSourceIds.UnionWith(languageSourceIds);
 
             var gameSoundBankName = Wh3SoundBankInformation.GetName(Wh3ActionEventInformation.GetSoundBank(actionEventTypeName));
             var audioProjectNameWithoutExtension = Path.GetFileNameWithoutExtension(_audioEditorStateService.AudioProjectFileName);
@@ -86,16 +78,32 @@ namespace Editors.Audio.AudioEditor.Core.AudioProjectMutation
                         audioFile.Sounds.Add(sound.Id);
                 }
             }
+        }
 
-            if (soundBank.GameSoundBank == Wh3SoundBank.GlobalMusic)
+        public void AddPauseResumeStopActionEvent(string actionEventTypeName, string actionEventName)
+        {
+            var usedHircIds = GetUsedHircIds();
+            var gameSoundBankName = Wh3SoundBankInformation.GetName(Wh3ActionEventInformation.GetSoundBank(actionEventTypeName));
+            var audioProjectNameWithoutExtension = Path.GetFileNameWithoutExtension(_audioEditorStateService.AudioProjectFileName);
+            var soundBankName = $"{gameSoundBankName}_{audioProjectNameWithoutExtension}";
+            var soundBank = _audioEditorStateService.AudioProject.GetSoundBank(soundBankName);
+
+            var actionEventSuffix = TableHelpers.RemoveActionEventPrefix(actionEventName);
+            var playActionEvent = soundBank.GetActionEvent($"Play_{actionEventSuffix}");
+
+            if (actionEventName.StartsWith("Pause_"))
             {
-                var pauseActionEventResult = _actionEventFactory.CreatePauseActionEvent(usedHircIds, playActionEventResult.ActionEvent);
+                var pauseActionEventResult = _actionEventFactory.CreatePauseActionEvent(usedHircIds, playActionEvent);
                 soundBank.ActionEvents.InsertAlphabetically(pauseActionEventResult.ActionEvent);
-
-                var resumeActionEventResult = _actionEventFactory.CreateResumeActionEvent(usedHircIds, playActionEventResult.ActionEvent);
+            }
+            else if (actionEventName.StartsWith("Resume_"))
+            {
+                var resumeActionEventResult = _actionEventFactory.CreateResumeActionEvent(usedHircIds, playActionEvent);
                 soundBank.ActionEvents.InsertAlphabetically(resumeActionEventResult.ActionEvent);
-
-                var stopActionEventResult = _actionEventFactory.CreateStopActionEvent(usedHircIds, playActionEventResult.ActionEvent);
+            }
+            else if (actionEventName.StartsWith("Stop_"))
+            {
+                var stopActionEventResult = _actionEventFactory.CreateStopActionEvent(usedHircIds, playActionEvent);
                 soundBank.ActionEvents.InsertAlphabetically(stopActionEventResult.ActionEvent);
             }
         }
@@ -111,19 +119,21 @@ namespace Editors.Audio.AudioEditor.Core.AudioProjectMutation
             var actionEvent = soundBank.GetActionEvent(actionEventName);
             soundBank.ActionEvents.Remove(actionEvent);
 
-            if (soundBank.GameSoundBank == Wh3SoundBank.GlobalMusic)
+            // We let the Play Action Event remove the target objects rather than Pause / Resume / Stop Action Events as otherwise they'd
+            // be removing objects that the Play Action Event removal process has already removed.
+            if (TableHelpers.IsPauseResumeStopActionEvent(actionEventName))
             {
-                var pauseActionEventName = string.Concat("Pause_", actionEvent.Name.AsSpan("Play_".Length));
-                var pauseActionEvent = soundBank.GetActionEvent(pauseActionEventName);
-                soundBank.ActionEvents.Remove(pauseActionEvent);
+                var actionEventSuffix = TableHelpers.RemoveActionEventPrefix(actionEventName);
+                var playActionEventName = $"Play_{actionEventSuffix}";
+                var playActionEvent = soundBank.GetActionEvent(playActionEventName);
 
-                var resumeActionEventName = string.Concat("Resume_", actionEvent.Name.AsSpan("Play_".Length));
-                var resumeActionEvent = soundBank.GetActionEvent(resumeActionEventName);
-                soundBank.ActionEvents.Remove(resumeActionEvent);
-
-                var stopActionEventName = string.Concat("Stop_", actionEvent.Name.AsSpan("Play_".Length));
-                var stopActionEvent = soundBank.GetActionEvent(stopActionEventName);
-                soundBank.ActionEvents.Remove(stopActionEvent);
+                // To ensure the Play Action Event doesn't exist when it comes to handling the removal of Pause / Resume / Stop Action Events,
+                // in the View Model when we send the rows to remove to the command we put the Play Action Events at the top of the list
+                // so this should always be null but in case it somehow isn't we check here.
+                if (playActionEvent != null)
+                    throw new InvalidOperationException("Cannot remove Pause / Resume / Stop Action Event target objects while the Play Action Event still exists.");
+                
+                return;
             }
 
             foreach (var action in actionEvent.Actions)
@@ -157,6 +167,28 @@ namespace Editors.Audio.AudioEditor.Core.AudioProjectMutation
                     soundBank.RandomSequenceContainers.Remove(randomSequenceContainer);
                 }
             }
+        }
+
+        private HashSet<uint> GetUsedHircIds()
+        {
+            var usedHircIds = new HashSet<uint>();
+            var languageId = WwiseHash.Compute(_audioEditorStateService.AudioProject.Language);
+            var audioProjectGeneratableItemIds = _audioEditorStateService.AudioProject.GetGeneratableItemIds();
+            var languageHircIds = _audioRepository.GetUsedVanillaHircIdsByLanguageId(languageId);
+            usedHircIds.UnionWith(audioProjectGeneratableItemIds);
+            usedHircIds.UnionWith(languageHircIds);
+            return usedHircIds;
+        }
+
+        private HashSet<uint> GetUsedSourceIds()
+        {
+            var usedSourceIds = new HashSet<uint>();
+            var languageId = WwiseHash.Compute(_audioEditorStateService.AudioProject.Language);
+            var audioProjectSourceIds = _audioEditorStateService.AudioProject.GetAudioFileIds();
+            var languageSourceIds = _audioRepository.GetUsedVanillaSourceIdsByLanguageId(languageId);
+            usedSourceIds.UnionWith(audioProjectSourceIds);
+            usedSourceIds.UnionWith(languageSourceIds);
+            return usedSourceIds;
         }
     }
 }

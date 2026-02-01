@@ -16,10 +16,10 @@ namespace Editors.Audio.AudioEditor.Commands.AudioProjectViewer
         private readonly IAudioProjectMutationUICommandFactory _audioProjectMutationUICommandFactory = audioProjectMutationUICommandFactory;
         private readonly IEventHub _eventHub = eventHub;
 
-        public void Execute(List<DataRow> selectedViewerRows)
+        public void Execute(List<DataRow> rows)
         {
             var selectedAudioProjectExplorerNode = _audioEditorStateService.SelectedAudioProjectExplorerNode;
-            foreach (var row in selectedViewerRows)
+            foreach (var row in rows)
                 _audioProjectMutationUICommandFactory.Create(MutationType.Remove, selectedAudioProjectExplorerNode.Type).Execute(row);
 
             _eventHub.Publish(new EditorAddRowButtonEnablementUpdateRequestedEvent());

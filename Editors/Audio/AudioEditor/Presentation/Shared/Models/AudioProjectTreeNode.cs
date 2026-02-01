@@ -8,13 +8,24 @@ namespace Editors.Audio.AudioEditor.Presentation.Shared.Models
 {
     public enum AudioProjectTreeNodeType
     {
+        // The container node for SoundBanks
         SoundBanks,
+        // The SoundBank node
         SoundBank,
+
+        // The container node for ActionEvents
         ActionEvents,
-        DialogueEvents,
+        // The Action Event Type e.g. Movies or Music
         ActionEventType,
+
+        // The container node for Dialogue Events
+        DialogueEvents,
+        // The Dialogue Event node
         DialogueEvent,
+
+        // The container node for State Groups
         StateGroups,
+        // The State Group node
         StateGroup
     }
 
@@ -40,21 +51,6 @@ namespace Editors.Audio.AudioEditor.Presentation.Shared.Models
                 GameSoundBank = gameSoundBank,
                 Parent = parent
             };
-        }
-
-        public static AudioProjectTreeNode GetNode(ObservableCollection<AudioProjectTreeNode> audioProjectTree, string nodeName)
-        {
-            foreach (var node in audioProjectTree)
-            {
-                if (node.Name == nodeName)
-                    return node;
-
-                var childNode = GetNode(node.Children, nodeName);
-                if (childNode != null)
-                    return childNode;
-            }
-
-            return null;
         }
 
         public bool IsActionEvent()
@@ -83,6 +79,49 @@ namespace Editors.Audio.AudioEditor.Presentation.Shared.Models
             if (Type == StateGroup)
                 return true;
             return false;
+        }
+
+        public bool IsSoundBank()
+        {
+            if (Type == SoundBank)
+                return true;
+            return false;
+        }
+
+        public bool IsMusicActionEvent()
+        {
+            if (IsActionEvent() && Name == Wh3ActionEventInformation.GetName(Wh3ActionEventType.Music))
+                return true;
+            return false;
+        }
+
+        public bool IsBattleAbilityActionEvent()
+        {
+            if (IsActionEvent() && Name == Wh3ActionEventInformation.GetName(Wh3ActionEventType.BattleAbilities))
+                return true;
+            return false;
+        }
+
+        public bool IsMovieActionEvent()
+        {
+            if (IsActionEvent() && Name == Wh3ActionEventInformation.GetName(Wh3ActionEventType.Movies))
+                return true;
+            return false;
+        }
+
+        public AudioProjectTreeNode GetParentSoundBankNode()
+        {
+            var currentNode = Parent;
+
+            while (currentNode != null)
+            {
+                if (currentNode.IsSoundBank())
+                    return currentNode;
+
+                currentNode = currentNode.Parent;
+            }
+
+            return null;
         }
     }
 }
