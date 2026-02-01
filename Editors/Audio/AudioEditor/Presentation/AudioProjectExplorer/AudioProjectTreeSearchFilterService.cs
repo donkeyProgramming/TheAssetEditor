@@ -149,7 +149,7 @@ namespace Editors.Audio.AudioEditor.Presentation.AudioProjectExplorer
             var matchesEventType = MatchesEventType(node);
 
             var matchesDialogueEventFilters = true;
-            if (node.Type == AudioProjectTreeNodeType.DialogueEvent && _allowedDialogueEventsLookup.TryGetValue(node.Parent, out var allowedSet))
+            if (node.IsDialogueEvent() && _allowedDialogueEventsLookup.TryGetValue(node.Parent, out var allowedSet))
                 matchesDialogueEventFilters = allowedSet.Contains(node.Name);
 
             var anyChildVisible = false;

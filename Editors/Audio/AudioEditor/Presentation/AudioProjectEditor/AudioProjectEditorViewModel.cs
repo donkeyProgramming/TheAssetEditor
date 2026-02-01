@@ -21,7 +21,6 @@ using Editors.Audio.AudioEditor.Presentation.AudioProjectEditor.Table;
 using Editors.Audio.AudioEditor.Presentation.Shared.Models;
 using Editors.Audio.AudioEditor.Presentation.Shared.Table;
 using Editors.Audio.Shared.AudioProject.Models;
-using Editors.Audio.Shared.GameInformation.Warhammer3;
 using Editors.Audio.Shared.Storage;
 using Serilog;
 using Shared.Core.ErrorHandling;
@@ -99,13 +98,13 @@ namespace Editors.Audio.AudioEditor.Presentation.AudioProjectEditor
             {
                 MakeEditorVisible();
                 SetEditorLabel(selectedAudioProjectExplorerNode.Name);
-                Load(selectedAudioProjectExplorerNode.Type);
+                LoadTable(selectedAudioProjectExplorerNode.Type);
             }
             else if (selectedAudioProjectExplorerNode.IsDialogueEvent())
             {
                 MakeEditorVisible();
                 SetEditorLabel(WpfHelpers.DuplicateUnderscores(selectedAudioProjectExplorerNode.Name));
-                Load(selectedAudioProjectExplorerNode.Type);
+                LoadTable(selectedAudioProjectExplorerNode.Type);
 
                 var moddedStatesCount = _audioEditorStateService.AudioProject.StateGroups.SelectMany(stateGroup => stateGroup.States).Count();
                 if (moddedStatesCount > 0)
@@ -115,7 +114,7 @@ namespace Editors.Audio.AudioEditor.Presentation.AudioProjectEditor
             {
                 MakeEditorVisible();
                 SetEditorLabel(WpfHelpers.DuplicateUnderscores(selectedAudioProjectExplorerNode.Name));
-                Load(selectedAudioProjectExplorerNode.Type);
+                LoadTable(selectedAudioProjectExplorerNode.Type);
             }
             else
                 return;
@@ -198,13 +197,11 @@ namespace Editors.Audio.AudioEditor.Presentation.AudioProjectEditor
         private void SetEventNameFromAudioFile(List<AudioFile> audioFiles, bool addToExistingAudioFiles, bool isSetFromEditedViewerItem)
         {
             var selectedAudioProjectExplorerNode = _audioEditorStateService.SelectedAudioProjectExplorerNode;
-            var isActionEvent = selectedAudioProjectExplorerNode.IsActionEvent();
-            var isNotMoviesActionEvent = selectedAudioProjectExplorerNode.Name != Wh3ActionEventInformation.GetName(Wh3ActionEventType.Movies);
             var hasExistingAudioFiles = _audioEditorStateService.AudioFiles.Count > 0;
 
-            if (isActionEvent
+            if (selectedAudioProjectExplorerNode.IsActionEvent()
+                && !selectedAudioProjectExplorerNode.IsMovieActionEvent()
                 && isSetFromEditedViewerItem
-                && isNotMoviesActionEvent
                 && audioFiles.Count == 1
                 && ((hasExistingAudioFiles && !addToExistingAudioFiles) || (!hasExistingAudioFiles && addToExistingAudioFiles)))
             {
@@ -234,7 +231,7 @@ namespace Editors.Audio.AudioEditor.Presentation.AudioProjectEditor
 
         public void OnEditorAddRowButtonEnablementUpdateRequested(EditorAddRowButtonEnablementUpdateRequestedEvent e) => SetAddRowButtonEnablement();
 
-        private void Load(AudioProjectTreeNodeType selectedNodeType)
+        private void LoadTable(AudioProjectTreeNodeType selectedNodeType)
         {
             var tableService = _tableServiceFactory.GetService(selectedNodeType);
             tableService.Load(Table);
@@ -289,7 +286,7 @@ namespace Editors.Audio.AudioEditor.Presentation.AudioProjectEditor
             if (selectedAudioProjectExplorerNode.IsDialogueEvent())
             {
                 Table.Clear();
-                Load(selectedAudioProjectExplorerNode.Type);
+                LoadTable(selectedAudioProjectExplorerNode.Type);
             }
         }
 

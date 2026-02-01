@@ -153,20 +153,12 @@ namespace Editors.Audio.AudioEditor.Presentation.Settings
 
         public void SetAudioFilesViaDrop(IEnumerable<AudioFilesTreeNode> audioFilesTreeNodes)
         {
-            var usedSourceIds = new HashSet<uint>();
-            var audioProject = _audioEditorStateService.AudioProject;
-
-            var audioProjectSourceIds = audioProject.GetAudioFileIds();
-            var languageId = WwiseHash.Compute(audioProject.Language);
-            var languageSourceIds = _audioRepository.GetUsedVanillaSourceIdsByLanguageId(languageId);
-
-            usedSourceIds.UnionWith(audioProjectSourceIds);
-            usedSourceIds.UnionWith(languageSourceIds);
+            var usedSourceIds = IdGenerator.GetUsedSourceIds(_audioRepository, _audioEditorStateService.AudioProject);
 
             var audioFiles = new List<AudioFile>();
             foreach (var node in audioFilesTreeNodes)
             {
-                var audioFile = audioProject.GetAudioFile(node.FilePath);
+                var audioFile = _audioEditorStateService.AudioProject.GetAudioFile(node.FilePath);
                 if (audioFile == null)
                 {
                     var audioFileIds = IdGenerator.GenerateIds(usedSourceIds);
@@ -462,14 +454,11 @@ namespace Editors.Audio.AudioEditor.Presentation.Settings
                     NumberOfLoops = hircSettings.NumberOfLoops;
             }
         }
-
         private void GetActionEventSettings(ref HircSettings hircSettings, ref List<AudioFile> audioFiles)
         {
-            var audioProject = _audioEditorStateService.AudioProject;
             var selectedViewerRow = _audioEditorStateService.SelectedViewerRows[0];
-            var selectedAudioProjectExplorerNode = _audioEditorStateService.SelectedAudioProjectExplorerNode;
-            var soundBank = _audioEditorStateService.AudioProject.GetSoundBank(selectedAudioProjectExplorerNode.Parent.Parent.Name);
-
+            var soundBankName = _audioEditorStateService.SelectedAudioProjectExplorerNode.GetParentSoundBankNode().Name;
+            var soundBank = _audioEditorStateService.AudioProject.GetSoundBank(soundBankName);
             var actionEventName = TableHelpers.GetActionEventNameFromRow(selectedViewerRow);
             var actionEvent = _audioEditorStateService.AudioProject.GetActionEvent(actionEventName);
 
@@ -483,39 +472,39 @@ namespace Editors.Audio.AudioEditor.Presentation.Settings
                 {
                     var sound = soundBank.GetSound(playAction.TargetHircId);
                     hircSettings = sound.HircSettings;
-                    audioFiles.Add(audioProject.GetAudioFile(sound.SourceId));
+                    audioFiles.Add(_audioEditorStateService.AudioProject.GetAudioFile(sound.SourceId));
                 }
                 else if (playAction.TargetHircTypeIsRandomSequenceContainer())
                 {
                     var randomSequenceContainer = soundBank.GetRandomSequenceContainer(playAction.TargetHircId);
                     hircSettings = randomSequenceContainer.HircSettings;
-                    audioFiles = audioProject.GetAudioFiles(soundBank, randomSequenceContainer);
+                    audioFiles = _audioEditorStateService.AudioProject.GetAudioFiles(soundBank, randomSequenceContainer);
                 }
             }
         }
 
         private void GetDialogueEventSettings(ref HircSettings hircSettings, ref List<AudioFile> audioFiles)
         {
-            var audioProject = _audioEditorStateService.AudioProject;
             var selectedViewerRow = _audioEditorStateService.SelectedViewerRows[0];
-            var selectedAudioProjectExplorerNode = _audioEditorStateService.SelectedAudioProjectExplorerNode;
-            var soundBank = _audioEditorStateService.AudioProject.GetSoundBank(selectedAudioProjectExplorerNode.Parent.Parent.Name);
 
-            var dialogueEvent = _audioEditorStateService.AudioProject.GetDialogueEvent(selectedAudioProjectExplorerNode.Name);
-            var statePathName = TableHelpers.GetStatePathNameFromRow(selectedViewerRow, _audioRepository, selectedAudioProjectExplorerNode.Name);
+            var soundBankName = _audioEditorStateService.SelectedAudioProjectExplorerNode.GetParentSoundBankNode().Name;
+            var soundBank = _audioEditorStateService.AudioProject.GetSoundBank(soundBankName);
+
+            var dialogueEvent = _audioEditorStateService.AudioProject.GetDialogueEvent(_audioEditorStateService.SelectedAudioProjectExplorerNode.Name);
+            var statePathName = TableHelpers.GetStatePathNameFromRow(selectedViewerRow, _audioRepository, _audioEditorStateService.SelectedAudioProjectExplorerNode.Name);
             var statePath = dialogueEvent.GetStatePath(statePathName);
 
             if (statePath.TargetHircTypeIsSound())
             {
                 var sound = soundBank.GetSound(statePath.TargetHircId);
                 hircSettings = sound.HircSettings;
-                audioFiles.Add(audioProject.GetAudioFile(sound.SourceId));
+                audioFiles.Add(_audioEditorStateService.AudioProject.GetAudioFile(sound.SourceId));
             }
             else if (statePath.TargetHircTypeIsRandomSequenceContainer())
             {
                 var randomSequenceContainer = soundBank.GetRandomSequenceContainer(statePath.TargetHircId);
                 hircSettings = randomSequenceContainer.HircSettings;
-                audioFiles = audioProject.GetAudioFiles(soundBank, randomSequenceContainer);
+                audioFiles = _audioEditorStateService.AudioProject.GetAudioFiles(soundBank, randomSequenceContainer);
             }
         }
 

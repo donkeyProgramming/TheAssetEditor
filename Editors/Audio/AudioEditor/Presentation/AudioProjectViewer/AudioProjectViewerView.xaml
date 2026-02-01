@@ -5,19 +5,19 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
     xmlns:Behaviours="clr-namespace:Shared.Ui.Common.Behaviors;assembly=Shared.Ui"
-    xmlns:AudioProjectViewer="clr-namespace:Editors.Audio.AudioEditor.Presentation.AudioProjectViewer" 
+    xmlns:AudioProjectViewer="clr-namespace:Editors.Audio.AudioEditor.Presentation.AudioProjectViewer"
     xmlns:ValueConverters="clr-namespace:Editors.Audio.AudioEditor.Presentation.AudioProjectViewer.ValueConverters" 
     d:DataContext="{d:DesignInstance Type=AudioProjectViewer:AudioProjectViewerViewModel}"
     mc:Ignorable="d" 
     d:DesignHeight="450" d:DesignWidth="800">
-    
+
     <UserControl.Resources>
         <BooleanToVisibilityConverter 
             x:Key="BoolToVisibilityConverter"/>
         <ValueConverters:ActionEventRowEnablementConverter
             x:Key="ActionEventRowEnablementConverter"/>
     </UserControl.Resources>
-    
+
     <Grid
         Visibility="{Binding IsViewerVisible, Converter={StaticResource BoolToVisibilityConverter}}">
 
@@ -60,11 +60,14 @@
 
                 <Button.ToolTip>
                     <ToolTip>
-                        <TextBlock TextWrapping="Wrap">
-                            <Run Text="Removes the selected row from the Audio Project and adds it to the Audio Project Editor."/>
+                        <TextBlock 
+                            TextWrapping="Wrap">
+                            <Run 
+                                Text="Removes the selected row from the Audio Project and adds it to the Audio Project Editor."/>
                             <LineBreak/>
                             <LineBreak/>
-                            <Run Text="Shortcut: Ctrl + E."/>
+                            <Run 
+                                Text="Shortcut: Ctrl + E"/>
                         </TextBlock>
                     </ToolTip>
                 </Button.ToolTip>
@@ -73,8 +76,8 @@
             <Button 
                 Grid.Column="1"
                 Margin="5, 0, 0, 0" 
-                Width="90" 
-                VerticalAlignment="Center" 
+                Width="93" 
+                VerticalAlignment="Center"
                 HorizontalAlignment="Left"
                 Content="Remove Row"
                 ToolTipService.ShowOnDisabled="True"
@@ -84,10 +87,12 @@
                 <Button.ToolTip>
                     <ToolTip>
                         <TextBlock TextWrapping="Wrap">
-                            <Run Text="Removes the selected row(s) from the Audio Project."/>
+                            <Run 
+                                Text="Removes the selected row(s) from the Audio Project."/>
                             <LineBreak/>
                             <LineBreak/>
-                            <Run Text="Shortcuts: Delete / Backspace."/>
+                            <Run 
+                                Text="Shortcuts: Delete / Backspace"/>
                         </TextBlock>
                     </ToolTip>
                 </Button.ToolTip>
@@ -107,7 +112,7 @@
             EnableRowVirtualization="True" 
             EnableColumnVirtualization="True"
             ScrollViewer.HorizontalScrollBarVisibility="Disabled">
-            
+
             <DataGrid.RowStyle>
                 <Style 
                     TargetType="DataGridRow">

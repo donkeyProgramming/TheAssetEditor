@@ -45,13 +45,7 @@ namespace Editors.Audio.AudioEditor.Core
 
         public void RefreshSourceIds(AudioProjectFile audioProject)
         {
-            var audioProjectSourceIds = audioProject.GetAudioFileIds();
-            var languageId = WwiseHash.Compute(audioProject.Language);
-            var languageSourceIds = _audioRepository.GetUsedVanillaSourceIdsByLanguageId(languageId);
-
-            var usedSourceIds = new HashSet<uint>();
-            usedSourceIds.UnionWith(audioProjectSourceIds);
-            usedSourceIds.UnionWith(languageSourceIds);
+            var usedSourceIds = IdGenerator.GetUsedSourceIds(_audioRepository, audioProject);
 
             var audioProjectSounds = audioProject.GetSounds();
             foreach (var audioFile in audioProject.AudioFiles)

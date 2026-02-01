@@ -5,7 +5,6 @@ using Editors.Audio.AudioEditor.Presentation.Shared.Models;
 using Editors.Audio.Shared.AudioProject.Compiler;
 using Editors.Audio.Shared.AudioProject.Models;
 using Editors.Audio.Shared.Storage;
-using Editors.Audio.Shared.Wwise;
 using Shared.Core.Events;
 
 namespace Editors.Audio.AudioEditor.Commands.AudioFilesExplorer
@@ -18,20 +17,12 @@ namespace Editors.Audio.AudioEditor.Commands.AudioFilesExplorer
 
         public void Execute(List<AudioFilesTreeNode> selectedAudioFiles, bool addToExistingAudioFiles)
         {
-            var usedSourceIds = new HashSet<uint>();
-            var audioProject = _audioEditorStateService.AudioProject;
-
-            var audioProjectSourceIds = audioProject.GetAudioFileIds();
-            var languageId = WwiseHash.Compute(audioProject.Language);
-            var languageSourceIds = _audioRepository.GetUsedVanillaSourceIdsByLanguageId(languageId);
-
-            usedSourceIds.UnionWith(audioProjectSourceIds);
-            usedSourceIds.UnionWith(languageSourceIds);
+            var usedSourceIds = IdGenerator.GetUsedSourceIds(_audioRepository, _audioEditorStateService.AudioProject);
 
             var audioFiles = new List<AudioFile>();
             foreach (var wavFile in selectedAudioFiles)
             {
-                var audioFile = audioProject.GetAudioFile(wavFile.FilePath);
+                var audioFile = _audioEditorStateService.AudioProject.GetAudioFile(wavFile.FilePath);
                 if (audioFile == null)
                 {
                     var audioFileIds = IdGenerator.GenerateIds(usedSourceIds);

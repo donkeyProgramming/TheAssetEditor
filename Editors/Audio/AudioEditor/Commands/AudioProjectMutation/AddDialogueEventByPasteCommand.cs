@@ -25,29 +25,27 @@ namespace Editors.Audio.AudioEditor.Commands.AudioProjectMutation
 
         public void Execute(DataRow row)
         {
-            var audioProject = _audioEditorStateService.AudioProject;
-            var copiedFromAudioProjectExplorerNode = _audioEditorStateService.CopiedFromAudioProjectExplorerNode;
-
             HircSettings hircSettings = null;
             var audioFiles = new List<AudioFile>();
 
-            var dialogueEventName = copiedFromAudioProjectExplorerNode.Name;
+            var dialogueEventName = _audioEditorStateService.CopiedFromAudioProjectExplorerNode.Name;
             var dialogueEvent = _audioEditorStateService.AudioProject.GetDialogueEvent(dialogueEventName);
             var statePathName = TableHelpers.GetStatePathNameFromRow(row, _audioRepository, dialogueEventName);
             var statePath = dialogueEvent.GetStatePath(statePathName);
-            var soundBank = _audioEditorStateService.AudioProject.GetSoundBank(copiedFromAudioProjectExplorerNode.Parent.Parent.Name);
+            var soundBankName = _audioEditorStateService.CopiedFromAudioProjectExplorerNode.GetParentSoundBankNode().Name;
+            var soundBank = _audioEditorStateService.AudioProject.GetSoundBank(soundBankName);
 
             if (statePath.TargetHircTypeIsSound())
             {
                 var sound = soundBank.GetSound(statePath.TargetHircId);
                 hircSettings = sound.HircSettings;
-                audioFiles.Add(audioProject.GetAudioFile(sound.SourceId));
+                audioFiles.Add(_audioEditorStateService.AudioProject.GetAudioFile(sound.SourceId));
             }
             else if (statePath.TargetHircTypeIsRandomSequenceContainer())
             {
                 var randomSequenceContainer = soundBank.GetRandomSequenceContainer(statePath.TargetHircId);
                 hircSettings = randomSequenceContainer.HircSettings;
-                audioFiles = audioProject.GetAudioFiles(soundBank, randomSequenceContainer);
+                audioFiles = _audioEditorStateService.AudioProject.GetAudioFiles(soundBank, randomSequenceContainer);
             }
 
             var statePathList = new List<KeyValuePair<string, string>>();

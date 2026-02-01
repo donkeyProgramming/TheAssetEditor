@@ -60,7 +60,7 @@
                             <Run Text="Adds the row to the Audio Project."/>
                             <LineBreak/>
                             <LineBreak/>
-                            <Run Text="Shortcut: Ctrl + Q."/>
+                            <Run Text="Shortcut: Ctrl + Q"/>
                         </TextBlock>
                     </ToolTip>
                 </Button.ToolTip>
