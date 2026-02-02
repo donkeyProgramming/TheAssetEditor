@@ -13,20 +13,13 @@ namespace Editors.Audio.Shared.AudioProject.Models
         public List<Action> Actions { get; set; } = [];
         public Wh3ActionEventType ActionEventType { get; set; }
 
-        public ActionEvent()
+        public ActionEvent(uint id, string name, List<Action> actions, Wh3ActionEventType actionEventType)
         {
+            Id = id;
+            Name = name;
             HircType = AkBkHircType.Event;
-        }
-
-        public static ActionEvent Create(uint id, string name, List<Action> actions, Wh3ActionEventType actionEventType)
-        {
-            return new ActionEvent
-            {
-                Id = id,
-                Name = name,
-                Actions = actions,
-                ActionEventType = actionEventType
-            };
+            Actions = actions;
+            ActionEventType = actionEventType;
         }
 
         public List<Action> GetPlayActions()

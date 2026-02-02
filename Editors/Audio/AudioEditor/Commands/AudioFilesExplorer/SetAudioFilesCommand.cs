@@ -26,7 +26,7 @@ namespace Editors.Audio.AudioEditor.Commands.AudioFilesExplorer
                 if (audioFile == null)
                 {
                     var audioFileIds = IdGenerator.GenerateIds(usedSourceIds);
-                    audioFile = AudioFile.Create(audioFileIds.Guid, audioFileIds.Id, wavFile.FileName, wavFile.FilePath);
+                    audioFile = new AudioFile(audioFileIds.Guid, audioFileIds.Id, wavFile.FileName, wavFile.FilePath);
                 }
                 audioFiles.Add(audioFile);
             }

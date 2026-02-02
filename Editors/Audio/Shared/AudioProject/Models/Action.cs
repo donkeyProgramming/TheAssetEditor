@@ -10,22 +10,15 @@ namespace Editors.Audio.Shared.AudioProject.Models
         public uint IdExt { get; set; }
         public uint BankId { get; set; }
 
-        public Action()
+        public Action(uint id, AkBkHircType targetHircType, AkActionType actionType, uint idExt, uint bankId)
         {
+            Id = id;
             HircType = AkBkHircType.Action;
-        }
-
-        public static Action Create(uint id, AkBkHircType targetHircType, AkActionType actionType, uint idExt, uint bankId)
-        {
-            return new Action
-            {
-                Id = id,
-                TargetHircId = idExt,
-                TargetHircType = targetHircType,
-                ActionType = actionType,
-                IdExt = idExt,
-                BankId = bankId
-            };
+            TargetHircId = idExt;
+            TargetHircType = targetHircType;
+            ActionType = actionType;
+            IdExt = idExt;
+            BankId = bankId;
         }
 
         public bool TargetHircTypeIsSound()

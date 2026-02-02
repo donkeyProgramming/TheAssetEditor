@@ -13,15 +13,12 @@ namespace Editors.Audio.Shared.AudioProject.Models
         public string WemDiskFilePath { get; set; }
         public List<uint> Sounds { get; set; } = [];
 
-        public static AudioFile Create(Guid guid, uint id, string fileName, string filePath)
+        public AudioFile(Guid guid, uint id, string fileName, string filePath)
         {
-            return new AudioFile
-            {
-                Guid = guid,
-                Id = id,
-                WavPackFileName = fileName,
-                WavPackFilePath = filePath
-            };
+            Guid = guid;
+            Id = id;
+            WavPackFileName = fileName;
+            WavPackFilePath = filePath;
         }
     }
 

@@ -10,18 +10,11 @@ namespace Editors.Audio.Shared.AudioProject.Models
     {
         public List<StatePath> StatePaths { get; set; } = [];
 
-        public DialogueEvent()
+        public DialogueEvent(string name)
         {
+            Id = WwiseHash.Compute(name);
+            Name = name;
             HircType = AkBkHircType.Dialogue_Event;
-        }
-
-        public static DialogueEvent Create(string name)
-        {
-            return new DialogueEvent
-            {
-                Id = WwiseHash.Compute(name),
-                Name = name
-            };
         }
 
         public StatePath GetStatePath(string statePathName) => StatePaths.FirstOrDefault(statePath => statePath.Name.Equals(statePathName));

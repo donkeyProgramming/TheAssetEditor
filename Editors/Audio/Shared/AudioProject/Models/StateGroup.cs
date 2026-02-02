@@ -9,7 +9,7 @@ namespace Editors.Audio.Shared.AudioProject.Models
     {
         public List<State> States { get; set; } = [];
 
-        public static StateGroup Create(string name)
+        public static StateGroup CreateForStatePath(string name)
         {
             return new StateGroup
             {
@@ -18,7 +18,7 @@ namespace Editors.Audio.Shared.AudioProject.Models
             };
         }
 
-        public static StateGroup Create(string name, List<State> states)
+        public static StateGroup CreateForAudioProjectFileCollection(string name, List<State> states)
         {
             return new StateGroup
             {

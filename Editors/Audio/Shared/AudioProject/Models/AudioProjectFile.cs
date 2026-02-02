@@ -45,7 +45,7 @@ namespace Editors.Audio.Shared.AudioProject.Models
                 if (requiredLanguage != null)
                     language = Wh3LanguageInformation.GetLanguageAsString((Wh3Language)requiredLanguage);
 
-                var soundBank = SoundBank.Create(soundBankName, gameSoundBank, language);
+                var soundBank = new SoundBank(soundBankName, gameSoundBank, language);
 
                 if (Wh3DialogueEventInformation.Contains(gameSoundBank))
                     CreateDialogueEvents(gameSoundBank, soundBank);
@@ -66,7 +66,7 @@ namespace Editors.Audio.Shared.AudioProject.Models
             var filteredDialogueEvents = Wh3DialogueEventInformation.Information.Where(dialogueEvent => dialogueEvent.SoundBank == gameSoundBank);
             foreach (var filteredDialogueEvent in filteredDialogueEvents)
             {
-                var dialogueEvent = DialogueEvent.Create(filteredDialogueEvent.Name);
+                var dialogueEvent = new DialogueEvent(filteredDialogueEvent.Name);
                 soundBank.DialogueEvents.TryAdd(dialogueEvent);
             }
 
@@ -82,7 +82,7 @@ namespace Editors.Audio.Shared.AudioProject.Models
             var stateGroups = new List<StateGroup>();
             foreach (var moddableStateGroup in ModdableStateGroups)
             {
-                var stateGroup = StateGroup.Create(moddableStateGroup, []);
+                var stateGroup = StateGroup.CreateForAudioProjectFileCollection(moddableStateGroup, []);
                 stateGroups.TryAdd(stateGroup);
             }
             return stateGroups;

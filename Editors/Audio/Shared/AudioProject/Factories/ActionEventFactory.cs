@@ -57,11 +57,11 @@ namespace Editors.Audio.Shared.AudioProject.Factories
 
             if (audioFiles.Count == 1)
             {
-                var sound = _soundFactory.Create(usedHircIds, usedSourceIds, audioFiles[0], hircSettings, language, overrideBusId: overrideBusId, directParentId: actorMixerId);
+                var sound = _soundFactory.CreateTargetSound(usedHircIds, usedSourceIds, audioFiles[0], hircSettings, language, overrideBusId: overrideBusId, directParentId: actorMixerId);
                 actionEventFactoryResult.SoundTarget = sound;
 
                 var actionIds = IdGenerator.GenerateIds(usedHircIds);
-                var playAction = Action.Create(actionIds.Id, AkBkHircType.Sound, AkActionType.Play, sound.Id, soundBankId);
+                var playAction = new Action(actionIds.Id, AkBkHircType.Sound, AkActionType.Play, sound.Id, soundBankId);
 
                 actions.Add(playAction);
             }
@@ -72,11 +72,11 @@ namespace Editors.Audio.Shared.AudioProject.Factories
                 actionEventFactoryResult.RandomSequenceContainerSounds.AddRange(randomSequenceContainerResult.RandomSequenceContainerSounds);
 
                 var actionIds = IdGenerator.GenerateIds(usedHircIds);
-                var playAction = Action.Create(actionIds.Id, AkBkHircType.RandomSequenceContainer, AkActionType.Play, actionEventFactoryResult.RandomSequenceContainerTarget.Id, soundBankId);
+                var playAction = new Action(actionIds.Id, AkBkHircType.RandomSequenceContainer, AkActionType.Play, actionEventFactoryResult.RandomSequenceContainerTarget.Id, soundBankId);
                 actions.Add(playAction);
             }
 
-            var actionEvent = ActionEvent.Create(actionEventId, actionEventName, actions, actionEventType);
+            var actionEvent = new ActionEvent(actionEventId, actionEventName, actions, actionEventType);
             actionEventFactoryResult.ActionEvent = actionEvent;
             actionEventFactoryResult.Actions = actions;
             return actionEventFactoryResult;
@@ -92,20 +92,20 @@ namespace Editors.Audio.Shared.AudioProject.Factories
                 if (playAction.TargetHircTypeIsSound())
                 {
                     var actionIds = IdGenerator.GenerateIds(usedHircIds);
-                    var pauseAction = Action.Create(actionIds.Id, playAction.TargetHircType, AkActionType.Pause_E_O, playAction.IdExt, playAction.BankId);
+                    var pauseAction = new Action(actionIds.Id, playAction.TargetHircType, AkActionType.Pause_E_O, playAction.IdExt, playAction.BankId);
                     pauseActions.Add(pauseAction);
                 }
                 else if (playAction.TargetHircTypeIsRandomSequenceContainer())
                 {
                     var actionIds = IdGenerator.GenerateIds(usedHircIds);
-                    var pauseAction = Action.Create(actionIds.Id, playAction.TargetHircType, AkActionType.Pause_E_O, playAction.IdExt, playAction.BankId);
+                    var pauseAction = new Action(actionIds.Id, playAction.TargetHircType, AkActionType.Pause_E_O, playAction.IdExt, playAction.BankId);
                     pauseActions.Add(pauseAction);
                 }
             }
 
             var pauseActionEventName = string.Concat("Pause_", playActionEvent.Name.AsSpan("Play_".Length));
             var actionEventId = IdGenerator.GenerateActionEventId(usedHircIds, pauseActionEventName);
-            var actionEvent = ActionEvent.Create(actionEventId, pauseActionEventName, pauseActions, playActionEvent.ActionEventType);
+            var actionEvent = new ActionEvent(actionEventId, pauseActionEventName, pauseActions, playActionEvent.ActionEventType);
             return new ActionEventFactoryResult { ActionEvent = actionEvent };
         }
 
@@ -119,20 +119,20 @@ namespace Editors.Audio.Shared.AudioProject.Factories
                 if (playAction.TargetHircTypeIsSound())
                 {
                     var actionIds = IdGenerator.GenerateIds(usedHircIds);
-                    var resumeAction = Action.Create(actionIds.Id, playAction.TargetHircType, AkActionType.Resume_E_O, playAction.IdExt, playAction.BankId);
+                    var resumeAction = new Action(actionIds.Id, playAction.TargetHircType, AkActionType.Resume_E_O, playAction.IdExt, playAction.BankId);
                     resumeActions.Add(resumeAction);
                 }
                 else if (playAction.TargetHircTypeIsRandomSequenceContainer())
                 {
                     var actionIds = IdGenerator.GenerateIds(usedHircIds);
-                    var resumeAction = Action.Create(actionIds.Id, playAction.TargetHircType, AkActionType.Resume_E_O, playAction.IdExt, playAction.BankId);
+                    var resumeAction = new Action(actionIds.Id, playAction.TargetHircType, AkActionType.Resume_E_O, playAction.IdExt, playAction.BankId);
                     resumeActions.Add(resumeAction);
                 }
             }
 
             var resumeActionEventName = string.Concat("Resume_", playActionEvent.Name.AsSpan("Play_".Length));
             var actionEventId = IdGenerator.GenerateActionEventId(usedHircIds, resumeActionEventName);
-            var actionEvent = ActionEvent.Create(actionEventId, resumeActionEventName, resumeActions, playActionEvent.ActionEventType);
+            var actionEvent = new ActionEvent(actionEventId, resumeActionEventName, resumeActions, playActionEvent.ActionEventType);
             return new ActionEventFactoryResult { ActionEvent = actionEvent };
         }
 
@@ -146,20 +146,20 @@ namespace Editors.Audio.Shared.AudioProject.Factories
                 if (playAction.TargetHircTypeIsSound())
                 {
                     var actionIds = IdGenerator.GenerateIds(usedHircIds);
-                    var stopAction = Action.Create(actionIds.Id, playAction.TargetHircType, AkActionType.Stop_E_O, playAction.IdExt, playAction.BankId);
+                    var stopAction = new Action(actionIds.Id, playAction.TargetHircType, AkActionType.Stop_E_O, playAction.IdExt, playAction.BankId);
                     stopActions.Add(stopAction);
                 }
                 else if (playAction.TargetHircTypeIsRandomSequenceContainer())
                 {
                     var actionIds = IdGenerator.GenerateIds(usedHircIds);
-                    var stopAction = Action.Create(actionIds.Id, playAction.TargetHircType, AkActionType.Stop_E_O, playAction.IdExt, playAction.BankId);
+                    var stopAction = new Action(actionIds.Id, playAction.TargetHircType, AkActionType.Stop_E_O, playAction.IdExt, playAction.BankId);
                     stopActions.Add(stopAction);
                 }
             }
 
             var stopActionEventName = string.Concat("Stop_", playActionEvent.Name.AsSpan("Play_".Length));
             var actionEventId = IdGenerator.GenerateActionEventId(usedHircIds, stopActionEventName);
-            var actionEvent = ActionEvent.Create(actionEventId,stopActionEventName, stopActions, playActionEvent.ActionEventType);
+            var actionEvent = new ActionEvent(actionEventId,stopActionEventName, stopActions, playActionEvent.ActionEventType);
             return new ActionEventFactoryResult { ActionEvent = actionEvent };
         }
     }

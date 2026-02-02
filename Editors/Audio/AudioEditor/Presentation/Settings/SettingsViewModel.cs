@@ -162,7 +162,7 @@ namespace Editors.Audio.AudioEditor.Presentation.Settings
                 if (audioFile == null)
                 {
                     var audioFileIds = IdGenerator.GenerateIds(usedSourceIds);
-                    audioFile = AudioFile.Create(audioFileIds.Guid, audioFileIds.Id, node.FileName, node.FilePath);
+                    audioFile = new AudioFile(audioFileIds.Guid, audioFileIds.Id, node.FileName, node.FilePath);
                 }
                 audioFiles.Add(audioFile);
             }

@@ -11,15 +11,12 @@ namespace Editors.Audio.Shared.AudioProject.Models
         public AkBkHircType TargetHircType { get; set; }
         public List<Node> Nodes { get; set; } = [];
 
-        public static StatePath Create(List<Node> nodes, uint targetHircId, AkBkHircType targetHircType)
+        public StatePath(List<Node> nodes, uint targetHircId, AkBkHircType targetHircType)
         {
-            return new StatePath
-            {
-                Name = BuildName(nodes),
-                Nodes = nodes,
-                TargetHircId = targetHircId,
-                TargetHircType = targetHircType
-            };
+            Name = BuildName(nodes);
+            Nodes = nodes;
+            TargetHircId = targetHircId;
+            TargetHircType = targetHircType;
         }
 
         public static string BuildName(List<Node> nodes)
@@ -43,19 +40,10 @@ namespace Editors.Audio.Shared.AudioProject.Models
                 return false;
         }
 
-        public class Node
+        public class Node(StateGroup stateGroup, State state)
         {
-            public StateGroup StateGroup { get; set; }
-            public State State { get; set; }
-
-            public static Node Create(StateGroup stateGroup, State state)
-            {
-                return new Node
-                {
-                    StateGroup = stateGroup,
-                    State = state
-                };
-            }
+            public StateGroup StateGroup { get; set; } = stateGroup;
+            public State State { get; set; } = state;
         }
     }
 

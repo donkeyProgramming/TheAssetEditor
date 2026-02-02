@@ -8,6 +8,7 @@ namespace Editors.Audio.Shared.AudioProject.Models
 {
     public partial class SoundBank : AudioProjectItem
     {
+
         public string Language { get; set; }
         public uint LanguageId { get; set; }
         public string FileName { get; set; }
@@ -24,16 +25,13 @@ namespace Editors.Audio.Shared.AudioProject.Models
         public List<Sound> Sounds { get; set; } = [];
         public List<RandomSequenceContainer> RandomSequenceContainers { get; set; } = [];
 
-        public static SoundBank Create(string name, Wh3SoundBank gameSoundBank, string language)
+        public SoundBank(string name, Wh3SoundBank gameSoundBank, string language)
         {
-            return new SoundBank
-            {
-                Id = WwiseHash.Compute(name),
-                Name = name,
-                GameSoundBank = gameSoundBank,
-                Language = language,
-                LanguageId = WwiseHash.Compute(language)
-            };
+            Id = WwiseHash.Compute(name);
+            Name = name;
+            GameSoundBank = gameSoundBank;
+            Language = language;
+            LanguageId = WwiseHash.Compute(language);
         }
 
         public SoundBank Clean()
@@ -50,12 +48,8 @@ namespace Editors.Audio.Shared.AudioProject.Models
             if (cleanedDialogueEvents.Count == 0 && cleanedActionEvents.Count == 0)
                 return null;
 
-            return new SoundBank
+            return new SoundBank(Name, GameSoundBank, Language)
             {
-                Id = Id,
-                Name = Name,
-                Language = Language,
-                LanguageId = LanguageId,
                 FileName = FileName,
                 FilePath = FilePath,
                 TestingId = TestingId,
@@ -64,7 +58,6 @@ namespace Editors.Audio.Shared.AudioProject.Models
                 MergingId = MergingId,
                 MergingFileName = MergingFileName,
                 MergingFilePath = MergingFilePath,
-                GameSoundBank = GameSoundBank,
                 DialogueEvents = cleanedDialogueEvents,
                 ActionEvents = cleanedActionEvents,
                 Sounds = Sounds,

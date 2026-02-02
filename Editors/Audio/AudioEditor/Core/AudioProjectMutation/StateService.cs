@@ -15,7 +15,7 @@ namespace Editors.Audio.AudioEditor.Core.AudioProjectMutation
         public void AddState(string stateGroupName, string stateName)
         {
             var stateGroup = _audioEditorStateService.AudioProject.GetStateGroup(stateGroupName);
-            var state = State.Create(stateName);
+            var state = new State(stateName);
             stateGroup.States.InsertAlphabetically(state);
         }
 

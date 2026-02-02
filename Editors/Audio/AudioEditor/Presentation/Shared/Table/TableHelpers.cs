@@ -72,12 +72,9 @@ namespace Editors.Audio.AudioEditor.Presentation.Shared.Table
                 var stateGroupNameWithQualifier = WpfHelpers.DeduplicateUnderscores(column.ColumnName);
                 var stateGroupName = GetStateGroupFromStateGroupWithQualifier(audioRepository, dialogueEventName, stateGroupNameWithQualifier);
 
-                var statePathNode = new StatePath.Node
-                {
-                    StateGroup = new StateGroup { Name = stateGroupName },
-                    State = new State { Name = stateName }
-                };
-
+                var stateGroup = StateGroup.CreateForStatePath(stateGroupName);
+                var state = new State(stateName);
+                var statePathNode = new StatePath.Node(stateGroup, state);
                 statePathNodes.Add(statePathNode);
             }
             var statePathName = StatePath.BuildName(statePathNodes);

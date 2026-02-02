@@ -240,10 +240,10 @@ namespace Editors.Audio.AudioEditor.Presentation.AudioProjectEditor
         private void OnEditorAddRowShortcutActivated(EditorAddRowShortcutActivatedEvent e)
         {
             if (_audioEditorStateService.EditorRow != null)
-                AddRowToViewer();
+                AddRowsToViewer();
         }
 
-        [RelayCommand] public void AddRowToViewer()
+        [RelayCommand] public void AddRowsToViewer()
         {
             var rows = new List<DataRow>();
             var row = Table.Rows[0];
@@ -252,6 +252,7 @@ namespace Editors.Audio.AudioEditor.Presentation.AudioProjectEditor
             // TODO: Add support for vocalisation Action Events when implemented
             // To hide the complexity of creating Pause / Resume / Stop Action Events
             // from the user we create them for them for the necessary types of audio
+            // We put the Play Action Event first in the list so it's created before the others as they need to reference it
             var selectedAudioProjectExplorerNode = _audioEditorStateService.SelectedAudioProjectExplorerNode;
             if (selectedAudioProjectExplorerNode.IsActionEvent())
             {

@@ -47,7 +47,7 @@
                 Grid.Column="0"
                 Content="Add Row"
                 ToolTipService.ShowOnDisabled="True"
-                Command="{Binding AddRowToViewerCommand}" 
+                Command="{Binding AddRowsToViewerCommand}" 
                 Margin="5, 0, 0, 0" 
                 Width="70" 
                 VerticalAlignment="Center" 
