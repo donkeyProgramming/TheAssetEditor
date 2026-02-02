@@ -101,35 +101,35 @@ namespace Editors.Audio.Shared.GameInformation.Warhammer3
         Wh3SoundBank SoundBank,
         Wh3DialogueEventType[] DialogueEventTypes,
         Wh3DialogueEventUnitProfile[] UnitProfiles,
-        uint ActorMixerId = 745637913) : Wh3DialogueEventDefinition(Name, SoundBank, DialogueEventTypes, UnitProfiles, ActorMixerId);
+        uint ActorMixerId = Wh3ActorMixerInformation.FrontendVO) : Wh3DialogueEventDefinition(Name, SoundBank, DialogueEventTypes, UnitProfiles, ActorMixerId);
 
     public record Wh3CampaignVODefinition(
         string Name,
         Wh3SoundBank SoundBank,
         Wh3DialogueEventType[] DialogueEventTypes,
         Wh3DialogueEventUnitProfile[] UnitProfiles,
-        uint ActorMixerId = 306196174) : Wh3DialogueEventDefinition(Name, SoundBank, DialogueEventTypes, UnitProfiles, ActorMixerId);
+        uint ActorMixerId = Wh3ActorMixerInformation.CampaignVO) : Wh3DialogueEventDefinition(Name, SoundBank, DialogueEventTypes, UnitProfiles, ActorMixerId);
 
     public record Wh3CampaignVOConversationalDefinition(
         string Name,
         Wh3SoundBank SoundBank,
         Wh3DialogueEventType[] DialogueEventTypes,
         Wh3DialogueEventUnitProfile[] UnitProfiles,
-        uint ActorMixerId = 652491101) : Wh3DialogueEventDefinition(Name, SoundBank, DialogueEventTypes, UnitProfiles, ActorMixerId);
+        uint ActorMixerId = Wh3ActorMixerInformation.CampaignVOConversational) : Wh3DialogueEventDefinition(Name, SoundBank, DialogueEventTypes, UnitProfiles, ActorMixerId);
 
     public record Wh3BattleVOOrdersDefinition(
         string Name,
         Wh3SoundBank SoundBank,
         Wh3DialogueEventType[] DialogueEventTypes,
         Wh3DialogueEventUnitProfile[] UnitProfiles,
-        uint ActorMixerId = 1009314120) : Wh3DialogueEventDefinition(Name, SoundBank, DialogueEventTypes, UnitProfiles, ActorMixerId);
+        uint ActorMixerId = Wh3ActorMixerInformation.BattleVOOrders) : Wh3DialogueEventDefinition(Name, SoundBank, DialogueEventTypes, UnitProfiles, ActorMixerId);
 
     public record Wh3BattleVOConversationalDefinition(
         string Name,
         Wh3SoundBank SoundBank,
         Wh3DialogueEventType[] DialogueEventTypes,
         Wh3DialogueEventUnitProfile[] UnitProfiles,
-        uint ActorMixerId = 600762068) : Wh3DialogueEventDefinition(Name, SoundBank, DialogueEventTypes, UnitProfiles, ActorMixerId);
+        uint ActorMixerId = Wh3ActorMixerInformation.BattleVOConversational) : Wh3DialogueEventDefinition(Name, SoundBank, DialogueEventTypes, UnitProfiles, ActorMixerId);
 
     public static class Wh3DialogueEventInformation
     {
