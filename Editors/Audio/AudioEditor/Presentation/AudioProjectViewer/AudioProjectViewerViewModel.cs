@@ -40,6 +40,7 @@ namespace Editors.Audio.AudioEditor.Presentation.AudioProjectViewer
         [ObservableProperty] private ObservableCollection<DataGridColumn> _dataGridColumns = [];
         [ObservableProperty] public ObservableCollection<SoundBank> _soundBanks;
         [ObservableProperty] public List<DataRow> _selectedRows = [];
+        [ObservableProperty] private AudioProjectTreeNode _selectedAudioProjectExplorerNode;
         [ObservableProperty] private bool _isUpdateRowButtonEnabled = false;
         [ObservableProperty] private bool _isRemoveRowButtonEnabled = false;
         [ObservableProperty] private bool _isCopyEnabled = false;
@@ -87,6 +88,8 @@ namespace Editors.Audio.AudioEditor.Presentation.AudioProjectViewer
         public void OnAudioProjectExplorerNodeSelected(AudioProjectExplorerNodeSelectedEvent e)
         {
             var selectedAudioProjectExplorerNode = e.TreeNode;
+            SelectedAudioProjectExplorerNode = selectedAudioProjectExplorerNode;
+
             ResetViewerVisibility();
             ResetViewerLabel();
             ResetButtonEnablement();
@@ -224,7 +227,8 @@ namespace Editors.Audio.AudioEditor.Presentation.AudioProjectViewer
 
         [RelayCommand] public void RemoveRow()
         {
-            _uiCommandFactory.Create<RemoveViewerRowsCommand>().Execute(_audioEditorStateService.SelectedViewerRows);
+            var rowsToRemove = GetRowsToRemove();
+            _uiCommandFactory.Create<RemoveViewerRowsCommand>().Execute(rowsToRemove);
             SetPasteEnablement();
         }
 
@@ -236,11 +240,48 @@ namespace Editors.Audio.AudioEditor.Presentation.AudioProjectViewer
 
         [RelayCommand] public void EditRow()
         {
-            _uiCommandFactory.Create<EditViewerRowCommand>().Execute(_audioEditorStateService.SelectedViewerRows);
+            var rowsToRemove = GetRowsToRemove();
+            _uiCommandFactory.Create<EditViewerRowsCommand>().Execute(rowsToRemove);
             SetPasteEnablement();
         }
 
-        private void Load(AudioProjectTreeNodeType selectedNodeType)
+        private List<DataRow> GetRowsToRemove()
+        {
+            if (_audioEditorStateService.SelectedAudioProjectExplorerNode.IsActionEvent())
+                return GetRelatedActionEventRows();
+            else
+                return _audioEditorStateService.SelectedViewerRows;
+        }
+
+        private List<DataRow> GetRelatedActionEventRows()
+        {
+            var rowsToRemove = _audioEditorStateService.SelectedViewerRows;
+            var actionEventsNamesWithoutSuffixes = rowsToRemove
+                .Select(TableHelpers.GetActionEventNameFromRow)
+                .Select(TableHelpers.RemoveActionEventPrefix)
+                .ToList();
+
+            foreach (DataRow row in Table.Rows)
+            {
+                var actionEventName = TableHelpers.GetActionEventNameFromRow(row);
+                var actionEventWithoutActionPrefix = TableHelpers.RemoveActionEventPrefix(actionEventName);
+
+                if (rowsToRemove.Contains(row) || !actionEventsNamesWithoutSuffixes.Contains(actionEventWithoutActionPrefix))
+                    continue;
+
+                if (TableHelpers.IsPauseResumeStopActionEvent(actionEventName))
+                    rowsToRemove.Add(row);
+            }
+
+            // We put Play Action Events first so they're removed first to avoid issues with Pause / Resume / Stop
+            // Action Events trying to remove target objects that the Play Action Event has already removed.
+            var orderedRowsToRemove = rowsToRemove
+                .OrderByDescending(row => TableHelpers.GetActionEventNameFromRow(row).StartsWith("Play_", StringComparison.Ordinal))
+                .ToList();
+
+            return orderedRowsToRemove;
+        }
+
         private void LoadTable(AudioProjectTreeNodeType selectedNodeType)
         {
             var tableService = _tableServiceFactory.GetService(selectedNodeType);

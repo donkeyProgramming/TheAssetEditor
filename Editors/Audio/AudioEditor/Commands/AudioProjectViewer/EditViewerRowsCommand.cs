@@ -8,7 +8,7 @@ using Shared.Core.Events;
 
 namespace Editors.Audio.AudioEditor.Commands.AudioProjectViewer
 {
-    public class EditViewerRowCommand(
+    public class EditViewerRowsCommand(
         IAudioEditorStateService audioEditorStateService,
         IUiCommandFactory uiCommandFactory,
         IEventHub eventHub) : IUiCommand
@@ -17,14 +17,14 @@ namespace Editors.Audio.AudioEditor.Commands.AudioProjectViewer
         private readonly IUiCommandFactory _uiCommandFactory = uiCommandFactory;
         private readonly IEventHub _eventHub = eventHub;
 
-        private readonly ILogger _logger = Logging.Create<EditViewerRowCommand>();
+        private readonly ILogger _logger = Logging.Create<EditViewerRowsCommand>();
 
-        public void Execute(List<DataRow> selectedViewerRows)
+        public void Execute(List<DataRow> rows)
         {
             // Publish before removing to ensure that an item is still selected
-            _eventHub.Publish(new ViewerTableRowEditedEvent(selectedViewerRows[0]));
+            _eventHub.Publish(new ViewerTableRowEditedEvent(rows[0]));
 
-            _uiCommandFactory.Create<RemoveViewerRowsCommand>().Execute(selectedViewerRows);
+            _uiCommandFactory.Create<RemoveViewerRowsCommand>().Execute(rows);
 
             var selectedAudioProjectExplorerNode = _audioEditorStateService.SelectedAudioProjectExplorerNode;
             _logger.Here().Information($"Editing {selectedAudioProjectExplorerNode.Type} row in Audio Project Viewer table for {selectedAudioProjectExplorerNode.Name}");

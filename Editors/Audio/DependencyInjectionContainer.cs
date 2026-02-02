@@ -71,15 +71,15 @@ namespace Editors.Audio
             serviceCollection.AddTransient<AudioProjectConverterWindow>();
 
             // Audio Editor Commands
-            serviceCollection.AddScoped<AddEditorRowToViewerCommand>();
-            serviceCollection.AddScoped<EditViewerRowCommand>();
             serviceCollection.AddScoped<OpenAudioProjectConverterWindowCommand>();
             serviceCollection.AddScoped<OpenAudioProjectMergerWindowCommand>();
             serviceCollection.AddScoped<OpenDialogueEventMergerWindowCommand>();
             serviceCollection.AddScoped<OpenMovieFileSelectionWindowCommand>();
             serviceCollection.AddScoped<OpenNewAudioProjectWindowCommand>();
-            serviceCollection.AddScoped<PasteViewerRowsCommand>();
+            serviceCollection.AddScoped<AddRowsToViewerCommand>();
+            serviceCollection.AddScoped<EditViewerRowsCommand>();
             serviceCollection.AddScoped<RemoveViewerRowsCommand>();
+            serviceCollection.AddScoped<PasteViewerRowsCommand>();
             serviceCollection.AddScoped<SetAudioFilesCommand>();
             serviceCollection.AddScoped<IAudioProjectMutationUICommandFactory, AudioProjectMutationUICommandFactory>();
             RegisterAllAsInterface<IAudioProjectMutationUICommand>(serviceCollection, ServiceLifetime.Transient);

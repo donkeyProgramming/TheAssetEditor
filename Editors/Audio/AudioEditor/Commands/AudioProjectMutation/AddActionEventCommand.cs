@@ -20,7 +20,11 @@ namespace Editors.Audio.AudioEditor.Commands.AudioProjectMutation
             var audioFiles = _audioEditorStateService.AudioFiles;
             var hircSettings = _audioEditorStateService.HircSettings;
             var actionEventName = TableHelpers.GetActionEventNameFromRow(row);
-            _actionEventService.AddActionEvent(actionEventTypeName, actionEventName, audioFiles, hircSettings);
+
+            if (actionEventName.StartsWith("Play_"))
+                _actionEventService.AddPlayActionEvent(actionEventTypeName, actionEventName, audioFiles, hircSettings);
+            else if (actionEventName.StartsWith("Pause_") || actionEventName.StartsWith("Resume_") || actionEventName.StartsWith("Stop_"))
+                _actionEventService.AddPauseResumeStopActionEvent(actionEventTypeName, actionEventName);
         }
     }
 }

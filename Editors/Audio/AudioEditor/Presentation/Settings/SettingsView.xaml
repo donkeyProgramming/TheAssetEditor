@@ -89,11 +89,14 @@
 
                 <Button.ToolTip>
                     <ToolTip>
-                        <TextBlock TextWrapping="Wrap">
-                            <Run Text="When multiple audio files are set, this sets the container's settings to what is recommended for a container containing VO audio files."/>
+                        <TextBlock 
+                            TextWrapping="Wrap">
+                            <Run 
+                                Text="When multiple audio files are set, this sets the container's settings to what is recommended for a container containing VO audio files."/>
                             <LineBreak/>
                             <LineBreak/>
-                            <Run Text="Shortcut: Ctrl + R."/>
+                            <Run 
+                                Text="Shortcut: Ctrl + R"/>
                         </TextBlock>
                     </ToolTip>
                 </Button.ToolTip>

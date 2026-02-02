@@ -98,13 +98,13 @@ namespace Editors.Audio.AudioEditor.Presentation.AudioProjectEditor
             {
                 MakeEditorVisible();
                 SetEditorLabel(selectedAudioProjectExplorerNode.Name);
-                Load(selectedAudioProjectExplorerNode.Type);
+                LoadTable(selectedAudioProjectExplorerNode.Type);
             }
             else if (selectedAudioProjectExplorerNode.IsDialogueEvent())
             {
                 MakeEditorVisible();
                 SetEditorLabel(WpfHelpers.DuplicateUnderscores(selectedAudioProjectExplorerNode.Name));
-                Load(selectedAudioProjectExplorerNode.Type);
+                LoadTable(selectedAudioProjectExplorerNode.Type);
 
                 var moddedStatesCount = _audioEditorStateService.AudioProject.StateGroups.SelectMany(stateGroup => stateGroup.States).Count();
                 if (moddedStatesCount > 0)
@@ -114,7 +114,7 @@ namespace Editors.Audio.AudioEditor.Presentation.AudioProjectEditor
             {
                 MakeEditorVisible();
                 SetEditorLabel(WpfHelpers.DuplicateUnderscores(selectedAudioProjectExplorerNode.Name));
-                Load(selectedAudioProjectExplorerNode.Type);
+                LoadTable(selectedAudioProjectExplorerNode.Type);
             }
             else
                 return;
@@ -197,14 +197,11 @@ namespace Editors.Audio.AudioEditor.Presentation.AudioProjectEditor
         private void SetEventNameFromAudioFile(List<AudioFile> audioFiles, bool addToExistingAudioFiles, bool isSetFromEditedViewerItem)
         {
             var selectedAudioProjectExplorerNode = _audioEditorStateService.SelectedAudioProjectExplorerNode;
-            var isActionEvent = selectedAudioProjectExplorerNode.IsActionEvent();
-            var isNotMoviesActionEvent = selectedAudioProjectExplorerNode.Name != Wh3ActionEventInformation.GetName(Wh3ActionEventType.Movies);
             var hasExistingAudioFiles = _audioEditorStateService.AudioFiles.Count > 0;
 
             if (selectedAudioProjectExplorerNode.IsActionEvent()
                 && !selectedAudioProjectExplorerNode.IsMovieActionEvent()
                 && isSetFromEditedViewerItem
-                && isNotMoviesActionEvent
                 && audioFiles.Count == 1
                 && ((hasExistingAudioFiles && !addToExistingAudioFiles) || (!hasExistingAudioFiles && addToExistingAudioFiles)))
             {
@@ -234,7 +231,7 @@ namespace Editors.Audio.AudioEditor.Presentation.AudioProjectEditor
 
         public void OnEditorAddRowButtonEnablementUpdateRequested(EditorAddRowButtonEnablementUpdateRequestedEvent e) => SetAddRowButtonEnablement();
 
-        private void Load(AudioProjectTreeNodeType selectedNodeType)
+        private void LoadTable(AudioProjectTreeNodeType selectedNodeType)
         {
             var tableService = _tableServiceFactory.GetService(selectedNodeType);
             tableService.Load(Table);
@@ -243,10 +240,44 @@ namespace Editors.Audio.AudioEditor.Presentation.AudioProjectEditor
         private void OnEditorAddRowShortcutActivated(EditorAddRowShortcutActivatedEvent e)
         {
             if (_audioEditorStateService.EditorRow != null)
-                AddRowToViewer();
+                AddRowsToViewer();
         }
 
-        [RelayCommand] public void AddRowToViewer() => _uiCommandFactory.Create<AddEditorRowToViewerCommand>().Execute(Table.Rows[0]);
+        [RelayCommand] public void AddRowsToViewer()
+        {
+            var rows = new List<DataRow>();
+            var row = Table.Rows[0];
+            rows.Add(row);
+
+            // TODO: Add support for vocalisation Action Events when implemented
+            // To hide the complexity of creating Pause / Resume / Stop Action Events
+            // from the user we create them for them for the necessary types of audio
+            // We put the Play Action Event first in the list so it's created before the others as they need to reference it
+            var selectedAudioProjectExplorerNode = _audioEditorStateService.SelectedAudioProjectExplorerNode;
+            if (selectedAudioProjectExplorerNode.IsActionEvent())
+            {
+                var actionEventName = TableHelpers.GetActionEventNameFromRow(row);
+                var actionEventSuffix = TableHelpers.RemoveActionEventPrefix(actionEventName);
+                if (selectedAudioProjectExplorerNode.IsMusicActionEvent())
+                {
+                    var pauseActionEventRow = TableHelpers.CreateRow(Table, $"Pause_{actionEventSuffix}");
+                    rows.Add(pauseActionEventRow);
+
+                    var resumeActionEventRow = TableHelpers.CreateRow(Table, $"Resume_{actionEventSuffix}");
+                    rows.Add(resumeActionEventRow);
+
+                    var stopActionEventRow = TableHelpers.CreateRow(Table, $"Stop_{actionEventSuffix}");
+                    rows.Add(stopActionEventRow);
+                }
+                else if (selectedAudioProjectExplorerNode.IsBattleAbilityActionEvent())
+                {
+                    var stopActionEventRow = TableHelpers.CreateRow(Table, $"Stop_{actionEventSuffix}");
+                    rows.Add(stopActionEventRow);
+                }
+            }
+
+            _uiCommandFactory.Create<AddRowsToViewerCommand>().Execute(rows);
+        }
 
         partial void OnShowModdedStatesOnlyChanged(bool value)
         {
@@ -256,7 +287,7 @@ namespace Editors.Audio.AudioEditor.Presentation.AudioProjectEditor
             if (selectedAudioProjectExplorerNode.IsDialogueEvent())
             {
                 Table.Clear();
-                Load(selectedAudioProjectExplorerNode.Type);
+                LoadTable(selectedAudioProjectExplorerNode.Type);
             }
         }
 

@@ -1,4 +1,5 @@
-﻿using System.Data;
+﻿using System.Collections.Generic;
+using System.Data;
 using Editors.Audio.AudioEditor.Commands.AudioProjectMutation;
 using Editors.Audio.AudioEditor.Core;
 using Editors.Audio.AudioEditor.Events.AudioProjectEditor.Table;
@@ -7,7 +8,7 @@ using Shared.Core.Events;
 
 namespace Editors.Audio.AudioEditor.Commands.AudioProjectEditor
 {
-    public class AddEditorRowToViewerCommand(
+    public class AddRowsToViewerCommand(
     IAudioEditorStateService audioEditorStateService,
     IAudioProjectMutationUICommandFactory audioProjectMutationUICommandFactory,
     IEventHub eventHub) : IUiCommand
@@ -16,12 +17,14 @@ namespace Editors.Audio.AudioEditor.Commands.AudioProjectEditor
         private readonly IAudioProjectMutationUICommandFactory _audioProjectMutationUICommandFactory = audioProjectMutationUICommandFactory;
         private readonly IEventHub _eventHub = eventHub;
 
-        public void Execute(DataRow row)
+        public void Execute(List<DataRow> rows)
         {
-            var selectedAudioProjectExplorerNode = _audioEditorStateService.SelectedAudioProjectExplorerNode;
-            _audioProjectMutationUICommandFactory.Create(MutationType.Add, selectedAudioProjectExplorerNode.Type).Execute(row);
-            _eventHub.Publish(new ViewerTableRowAddRequestedEvent(row));
-            _eventHub.Publish(new EditorTableRowAddedToViewerEvent());
+            foreach (var row in rows)
+            {
+                _audioProjectMutationUICommandFactory.Create(MutationType.Add, _audioEditorStateService.SelectedAudioProjectExplorerNode.Type).Execute(row);
+                _eventHub.Publish(new ViewerTableRowAddRequestedEvent(row));
+                _eventHub.Publish(new EditorTableRowAddedToViewerEvent());
+            }
         }
     }
 }

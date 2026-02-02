@@ -9,7 +9,7 @@
     xmlns:Behaviors="clr-namespace:Shared.Ui.Common.Behaviors;assembly=Shared.Ui" 
     xmlns:ValueConverters="clr-namespace:Editors.Audio.Shared.UI.ValueConverters" 
     xmlns:AudioExplorer="clr-namespace:Editors.Audio.AudioExplorer" 
-    d:DataContext="{d:DesignInstance Type=audioexplorer:AudioExplorerViewModel}"
+    d:DataContext="{d:DesignInstance Type=AudioExplorer:AudioExplorerViewModel}"
     mc:Ignorable="d" 
     d:DesignHeight="450" d:DesignWidth="800">
 

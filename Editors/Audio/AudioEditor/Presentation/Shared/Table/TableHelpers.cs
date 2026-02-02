@@ -152,5 +152,33 @@ namespace Editors.Audio.AudioEditor.Presentation.Shared.Table
             newRow.ItemArray = (object[])sourceRow.ItemArray.Clone();
             table.Rows.InsertAt(newRow, insertAt);
         }
+
+        public static DataRow CreateRow(DataTable table, string actionEventName)
+        {
+            var pseudoTable = table.Clone();
+            var row = pseudoTable.NewRow();
+            row[TableInformation.ActionEventColumnName] = actionEventName;
+            return row;
+        }
+
+        public static string RemoveActionEventPrefix(string actionEventName)
+        {
+            if (actionEventName.StartsWith("Play_", StringComparison.Ordinal))
+                return actionEventName.Substring("Play_".Length);
+            if (actionEventName.StartsWith("Pause_", StringComparison.Ordinal))
+                return actionEventName.Substring("Pause_".Length);
+            if (actionEventName.StartsWith("Resume_", StringComparison.Ordinal))
+                return actionEventName.Substring("Resume_".Length);
+            if (actionEventName.StartsWith("Stop_", StringComparison.Ordinal))
+                return actionEventName.Substring("Stop_".Length);
+            return actionEventName;
+        }
+
+        public static bool IsPauseResumeStopActionEvent(string actionEventName)
+        {
+            return actionEventName.StartsWith("Pause_", StringComparison.Ordinal)
+                || actionEventName.StartsWith("Resume_", StringComparison.Ordinal)
+                || actionEventName.StartsWith("Stop_", StringComparison.Ordinal);
+        }
     }
 }
