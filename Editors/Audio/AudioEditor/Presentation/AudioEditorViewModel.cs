@@ -88,10 +88,9 @@ namespace Editors.Audio.AudioEditor.Presentation
 
         [RelayCommand] public void SaveAudioProject()
         {
-            var audioProject = _audioEditorStateService.AudioProject;
             var fileName = _audioEditorStateService.AudioProjectFileName;
             var filePath = _audioEditorStateService.AudioProjectFilePath;
-            _audioEditorFileService.Save(audioProject, fileName, filePath);
+            _audioEditorFileService.Save(_audioEditorStateService.AudioProject, fileName, filePath);
         }
 
         [RelayCommand] public void LoadAudioProject() => _audioEditorFileService.LoadFromDialog();

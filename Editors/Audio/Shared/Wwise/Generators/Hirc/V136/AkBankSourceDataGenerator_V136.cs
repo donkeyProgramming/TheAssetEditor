@@ -1,7 +1,7 @@
-﻿using Editors.Audio.Shared.GameInformation.Warhammer3;
+﻿using Editors.Audio.Shared.AudioProject.Models;
+using Editors.Audio.Shared.GameInformation.Warhammer3;
 using Shared.GameFormats.Wwise.Enums;
 using Shared.GameFormats.Wwise.Hirc.V136.Shared;
-using Editors.Audio.Shared.AudioProject.Models;
 
 namespace Editors.Audio.Shared.Wwise.Generators.Hirc.V136
 {

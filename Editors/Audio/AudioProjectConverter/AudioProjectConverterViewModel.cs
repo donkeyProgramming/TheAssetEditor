@@ -110,20 +110,8 @@ namespace Editors.Audio.AudioProjectConverter
                     dialogueEventsToProcess,
                     moddedStateGroups);
 
-            var usedHircIds = new HashSet<uint>();
-            var usedSourceIds = new HashSet<uint>();
-
-            var audioProjectGeneratableItemIds = audioProject.GetGeneratableItemIds();
-            var audioProjectSourceIds = audioProject.GetAudioFileIds();
-
-            var languageId = WwiseHash.Compute(audioProject.Language);
-            var languageHircIds = _audioRepository.GetUsedVanillaHircIdsByLanguageId(languageId);
-            var languageSourceIds = _audioRepository.GetUsedVanillaSourceIdsByLanguageId(languageId);
-
-            usedHircIds.UnionWith(audioProjectGeneratableItemIds);
-            usedHircIds.UnionWith(languageHircIds);
-            usedSourceIds.UnionWith(audioProjectSourceIds);
-            usedSourceIds.UnionWith(languageSourceIds);
+            var usedHircIds = IdGenerator.GetUsedHircIds(_audioRepository, audioProject);
+            var usedSourceIds = IdGenerator.GetUsedSourceIds(_audioRepository, audioProject);
 
             foreach (var dialogueEvent in dialogueEventsToProcess)
                 ProcessDialogueEvent(

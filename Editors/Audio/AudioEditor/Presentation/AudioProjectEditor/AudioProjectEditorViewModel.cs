@@ -21,7 +21,6 @@ using Editors.Audio.AudioEditor.Presentation.AudioProjectEditor.Table;
 using Editors.Audio.AudioEditor.Presentation.Shared.Models;
 using Editors.Audio.AudioEditor.Presentation.Shared.Table;
 using Editors.Audio.Shared.AudioProject.Models;
-using Editors.Audio.Shared.GameInformation.Warhammer3;
 using Editors.Audio.Shared.Storage;
 using Serilog;
 using Shared.Core.ErrorHandling;
@@ -202,7 +201,8 @@ namespace Editors.Audio.AudioEditor.Presentation.AudioProjectEditor
             var isNotMoviesActionEvent = selectedAudioProjectExplorerNode.Name != Wh3ActionEventInformation.GetName(Wh3ActionEventType.Movies);
             var hasExistingAudioFiles = _audioEditorStateService.AudioFiles.Count > 0;
 
-            if (isActionEvent
+            if (selectedAudioProjectExplorerNode.IsActionEvent()
+                && !selectedAudioProjectExplorerNode.IsMovieActionEvent()
                 && isSetFromEditedViewerItem
                 && isNotMoviesActionEvent
                 && audioFiles.Count == 1
@@ -211,7 +211,7 @@ namespace Editors.Audio.AudioEditor.Presentation.AudioProjectEditor
                 var row = Table.Rows[0];
                 var wavFileName = Path.GetFileNameWithoutExtension(audioFiles[0].WavPackFileName);
                 var eventName = $"Play_{wavFileName}";
-                row[TableInformation.EventColumnName] = eventName;
+                row[TableInformation.ActionEventColumnName] = eventName;
             }
 
             SetAddRowButtonEnablement();
@@ -229,7 +229,7 @@ namespace Editors.Audio.AudioEditor.Presentation.AudioProjectEditor
             var eventName = $"Play_Movie_{slashesToUnderscores}";
 
             var row = Table.Rows[0];
-            row[TableInformation.EventColumnName] = eventName;
+            row[TableInformation.ActionEventColumnName] = eventName;
         }
 
         public void OnEditorAddRowButtonEnablementUpdateRequested(EditorAddRowButtonEnablementUpdateRequestedEvent e) => SetAddRowButtonEnablement();

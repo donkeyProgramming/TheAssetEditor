@@ -2,7 +2,7 @@
 {
     public static class TableInformation
     {
-        public const string EventColumnName = "Event";
+        public const string ActionEventColumnName = "Action Event";
         public const string BrowseMovieColumnName = "Browse Movie";
         public const string StateColumnName = "State";
     }
