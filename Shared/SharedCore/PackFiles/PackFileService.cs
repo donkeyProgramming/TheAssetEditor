@@ -112,7 +112,8 @@ namespace Shared.Core.PackFiles
             if (source.FileList.ContainsKey(lowerPath))
             {
                 var file = source.FileList[lowerPath];
-                var newFile = new PackFile(file.Name, file.DataSource);
+                var data = file.DataSource.ReadData();
+                var newFile = new PackFile(file.Name, new MemorySource(data));
                 target.FileList[lowerPath] = newFile;
 
                 _globalEventHub?.PublishGlobalEvent(new PackFileContainerFilesAddedEvent(target, [newFile]));

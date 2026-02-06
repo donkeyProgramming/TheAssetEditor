@@ -1,4 +1,5 @@
 ﻿using Shared.ByteParsing;
+using Shared.Core.PackFiles.Utility;
 
 namespace Shared.Core.PackFiles.Models
 {
@@ -8,6 +9,8 @@ namespace Shared.Core.PackFiles.Models
         byte[] ReadData();
         byte[] PeekData(int size);
         ByteChunk ReadDataAsChunk();
+
+        CompressionFormat CompressionFormat { get; }
     }
 
 

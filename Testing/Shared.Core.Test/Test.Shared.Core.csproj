@@ -31,8 +31,4 @@
     <Using Include="NUnit.Framework" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="PackFiles\Serialization\" />
-  </ItemGroup>
-
 </Project>

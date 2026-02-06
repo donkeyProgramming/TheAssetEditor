@@ -26,7 +26,7 @@ namespace Shared.Core.PackFiles.Serialization
     {
         static readonly ILogger s_logger = Logging.CreateStatic(typeof(PackFileSerializerLoader));
 
-        public static PackFileContainer Load(string packFileSystemPath, BinaryReader reader, IDuplicateFileResolver duplicatePackFileResolver)
+        public static PackFileContainer Load(string packFileSystemPath, long packFileSize, BinaryReader reader, IDuplicateFileResolver duplicatePackFileResolver)
         {
             try
             {
@@ -37,7 +37,7 @@ namespace Shared.Core.PackFiles.Serialization
                     SystemFilePath = packFileSystemPath,
                     Name = Path.GetFileNameWithoutExtension(packFileSystemPath),
                     Header = ReadHeader(reader),
-                    OriginalLoadByteSize = new FileInfo(packFileSystemPath).Length,
+                    OriginalLoadByteSize = packFileSize,
                 };
 
                 // If larger then int.max throw error
@@ -50,8 +50,6 @@ namespace Shared.Core.PackFiles.Serialization
                 {
                     FilePath = packFileSystemPath,
                 };
-
-                //var buffer = reader.ReadBytes((int)output.Header.DataStart - 28);
 
                 var offset = output.Header.DataStart;
                 var headerVersion = output.Header.Version;

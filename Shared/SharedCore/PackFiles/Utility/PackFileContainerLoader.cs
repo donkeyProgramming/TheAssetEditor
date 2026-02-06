@@ -75,7 +75,8 @@ namespace Shared.Core.PackFiles.Utility
                 using var fileStream = File.OpenRead(packFileSystemPath);
                 using var reader = new BinaryReader(fileStream, Encoding.ASCII);
 
-                var pack = PackFileSerializerLoader.Load(packFileSystemPath, reader, new CustomPackDuplicateFileResolver());
+                var packFileSize = new FileInfo(packFileSystemPath).Length;
+                var pack = PackFileSerializerLoader.Load(packFileSystemPath, packFileSize, reader, new CustomPackDuplicateFileResolver());
                 PackFileLog.LogPackCompression(pack);
 
                 return pack;
@@ -121,7 +122,8 @@ namespace Shared.Core.PackFiles.Utility
                         using var fileStream = File.OpenRead(path);
                         using var reader = new BinaryReader(fileStream, Encoding.ASCII);
 
-                        var pack = PackFileSerializerLoader.Load(path, reader, packfileResolver);
+                        var packFileSize = new FileInfo(path).Length;
+                        var pack = PackFileSerializerLoader.Load(path, packFileSize, reader, packfileResolver);
                         packList.Add(pack);
 
                         PackFileLog.LogPackCompression(pack);

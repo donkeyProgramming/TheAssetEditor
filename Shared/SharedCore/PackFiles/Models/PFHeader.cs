@@ -55,47 +55,7 @@ namespace Shared.Core.PackFiles.Models
 
         public List<string> DependantFiles { get; set; } = [];
 
-
         public PFHeader() { }
-
-        //public PFHeader(BinaryReader reader)
-        //{
-        //   // var fileNameBuffer = new byte[1024];
-        //   // Version = new string(reader.ReadChars(4));
-        //   // ByteMask = reader.ReadInt32();
-        //   //
-        //   // ReferenceFileCount = reader.ReadInt32();
-        //   // var pack_file_index_size = reader.ReadInt32();
-        //   // FileCount = reader.ReadInt32();
-        //   // var packed_file_index_size = reader.ReadInt32();
-        //   //
-        //   // var headerOffset = 24;
-        //   // if (Version == "PFH0")
-        //   // {
-        //   //     _headerBuffer = new byte[0];
-        //   // }
-        //   // else if (Version == "PFH2" || Version == "PFH3")
-        //   // {
-        //   //     _headerBuffer = reader.ReadBytes(32 - headerOffset);
-        //   // }
-        //   // else if (Version == "PFH4" || Version == "PFH5")
-        //   // {
-        //   //     if ((ByteMask & HAS_EXTENDED_HEADER) != 0)
-        //   //         _headerBuffer = reader.ReadBytes(48 - headerOffset);
-        //   //     else
-        //   //         _headerBuffer = reader.ReadBytes(28 - headerOffset);  // 4 bytes for timestamp
-        //   // }
-        //   // else if (Version == "PFH6")
-        //   // {
-        //   //     _headerBuffer = reader.ReadBytes(308 - headerOffset);
-        //   // }
-        //   //
-        //   // for (int i = 0; i < ReferenceFileCount; i++)
-        //   //     _dependantFiles.Add(IOFunctions.ReadZeroTerminatedAscii(reader, fileNameBuffer));
-        //   //
-        //   // HasAdditionalInfo = (ByteMask & HAS_INDEX_WITH_TIMESTAMPS) != 0;
-        //   // DataStart = headerOffset + _headerBuffer.Length + pack_file_index_size + packed_file_index_size;
-        //}
 
         public PFHeader(string version, PackFileCAType type)
         {
@@ -103,32 +63,5 @@ namespace Shared.Core.PackFiles.Models
             ByteMask = (int)type;
             Buffer = DefaultTimeStamp;
         }
-
-       /* Delete later 
-        * public void Save(int fileCount, uint fileContentSize, BinaryWriter binaryWriter)
-        {
-            foreach (byte c in StrVersion)
-                binaryWriter.Write(c);
-            binaryWriter.Write(ByteMask);
-
-            binaryWriter.Write(DependantFiles.Count);
-
-            var pack_file_index_size = 0;
-            foreach (var file in DependantFiles)
-                pack_file_index_size += file.Length + 1;
-
-            binaryWriter.Write(pack_file_index_size);
-            binaryWriter.Write(fileCount);
-            binaryWriter.Write(fileContentSize);
-
-            binaryWriter.Write(Buffer);
-
-            foreach (var file in DependantFiles)
-            {
-                foreach (byte c in file)
-                    binaryWriter.Write(c);
-                binaryWriter.Write((byte)0);
-            }
-        }*/
     }
 }

@@ -1,7 +1,9 @@
-﻿using K4os.Compression.LZ4.Encoders;
+﻿using System.ComponentModel;
+using K4os.Compression.LZ4.Encoders;
 using K4os.Compression.LZ4.Streams;
 using SevenZip;
 using SevenZip.Compression.LZMA;
+using Shared.Core.PackFiles.Models;
 using Shared.Core.Settings;
 using ZstdSharp;
 using ZstdSharp.Unsafe;
@@ -261,8 +263,17 @@ namespace Shared.Core.PackFiles.Utility
                 return CompressionFormat.None;
         }
 
-        public static CompressionFormat GetCompressionFormat(GameInformation gameInformation, string firstFilePathPart, string extension)
+        public static bool DoesGameSupportCompression(GameInformation gameInformation)
         {
+            var doesGameFilesSupportCompression = !(gameInformation.CompressionFormats.Count == 1 && gameInformation.CompressionFormats.First() == CompressionFormat.None);
+            return doesGameFilesSupportCompression;
+        }
+
+        public static CompressionFormat GetCompressionFormat(GameInformation gameInformation, string fileName)
+        {
+            var extension = Path.GetExtension(fileName);
+            var firstFilePathPart = fileName.Split(['\\', '/'], StringSplitOptions.RemoveEmptyEntries).First();
+
             var compressionFormats = gameInformation.CompressionFormats;
 
             // Check if the game supports any compression at all

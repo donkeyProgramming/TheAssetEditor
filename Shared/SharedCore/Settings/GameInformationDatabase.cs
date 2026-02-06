@@ -52,8 +52,6 @@ namespace Shared.Core.Settings
         Version3,
     }
 
-    //RmvVersionEnum
-
     public class GameInformation(
         GameTypeEnum gameType,
         string displayName,

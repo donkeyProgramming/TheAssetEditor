@@ -45,8 +45,6 @@ namespace Editors.ImportExport.Importing.Presentation
             _packPath = packPath;
             SystemPath = diskFile;
 
-
-
             _inputFile = new PackFile(SystemPath, new FileSystemSource(SystemPath));
             FindImporter();
         }
