@@ -1,14 +1,12 @@
 ﻿using System.Collections.Generic;
 using System.Data;
 using System.IO;
-using System.Linq;
 using Editors.Audio.AudioEditor.Core;
 using Editors.Audio.AudioEditor.Events.AudioProjectViewer.Table;
 using Editors.Audio.AudioEditor.Presentation.Shared.Models;
 using Editors.Audio.AudioEditor.Presentation.Shared.Table;
 using Editors.Audio.Shared.GameInformation.Warhammer3;
 using Shared.Core.Events;
-using Shared.GameFormats.Wwise.Enums;
 
 namespace Editors.Audio.AudioEditor.Presentation.AudioProjectViewer.Table
 {
@@ -30,7 +28,7 @@ namespace Editors.Audio.AudioEditor.Presentation.AudioProjectViewer.Table
         public List<string> DefineSchema()
         {
             var schema = new List<string>();
-            var columnName = TableInformation.EventColumnName;
+            var columnName = TableInformation.ActionEventColumnName;
             schema.Add(columnName);
             return schema;
         }
@@ -66,14 +64,8 @@ namespace Editors.Audio.AudioEditor.Presentation.AudioProjectViewer.Table
             var soundBank = _audioEditorStateService.AudioProject.GetSoundBank(soundBankName);
             foreach (var actionEvent in soundBank.ActionEvents)
             {
-                // We don't want them visible as we only show "Play_" Action Events as we force all Action Events to start with "Play_"
-                if (actionEvent.Actions.Any(action => action.ActionType == AkActionType.Pause_E_O 
-                    || action.ActionType == AkActionType.Resume_E_O
-                    || action.ActionType == AkActionType.Stop_E_O))
-                    continue;
-
                 var row = table.NewRow();
-                row[TableInformation.EventColumnName] = actionEvent.Name;
+                row[TableInformation.ActionEventColumnName] = actionEvent.Name;
                 _eventHub.Publish(new ViewerTableRowAddRequestedEvent(row));
             }
         }

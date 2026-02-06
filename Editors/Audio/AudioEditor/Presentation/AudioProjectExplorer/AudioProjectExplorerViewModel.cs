@@ -59,8 +59,7 @@ namespace Editors.Audio.AudioEditor.Presentation.AudioProjectExplorer
         {
             ResetFilters();
 
-            var audioProject = _audioEditorStateService.AudioProject;
-            AudioProjectTree = _audioProjectTreeBuilder.BuildTree(audioProject, ShowEditedItemsOnly);
+            AudioProjectTree = _audioProjectTreeBuilder.BuildTree(_audioEditorStateService.AudioProject, ShowEditedItemsOnly);
 
             var audioProjectFileName = Path.GetFileNameWithoutExtension(_audioEditorStateService.AudioProjectFileName);
             AudioProjectExplorerLabel = $"Audio Project Explorer - {WpfHelpers.DuplicateUnderscores(audioProjectFileName)}";

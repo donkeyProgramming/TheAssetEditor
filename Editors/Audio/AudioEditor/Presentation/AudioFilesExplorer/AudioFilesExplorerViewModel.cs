@@ -188,8 +188,8 @@ namespace Editors.Audio.AudioEditor.Presentation.AudioFilesExplorer
 
             if (selectedWavNodes.Count > 0)
             {
-                if (selectedAudioProjectExplorerNode.Type == AudioProjectTreeNodeType.ActionEventType
-                    || selectedAudioProjectExplorerNode.Type == AudioProjectTreeNodeType.DialogueEvent)
+                if (selectedAudioProjectExplorerNode.IsActionEvent()
+                    || selectedAudioProjectExplorerNode.IsDialogueEvent())
                 {
                     IsSetAudioFilesButtonEnabled = true;
                     IsAddAudioFilesButtonEnabled = _audioEditorStateService.AudioFiles.Count > 0;

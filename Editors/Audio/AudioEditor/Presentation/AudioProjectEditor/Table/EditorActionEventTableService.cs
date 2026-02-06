@@ -4,7 +4,6 @@ using Editors.Audio.AudioEditor.Core;
 using Editors.Audio.AudioEditor.Events.AudioProjectEditor.Table;
 using Editors.Audio.AudioEditor.Presentation.Shared.Models;
 using Editors.Audio.AudioEditor.Presentation.Shared.Table;
-using Editors.Audio.Shared.GameInformation.Warhammer3;
 using Shared.Core.Events;
 
 namespace Editors.Audio.AudioEditor.Presentation.AudioProjectEditor.Table
@@ -31,7 +30,7 @@ namespace Editors.Audio.AudioEditor.Presentation.AudioProjectEditor.Table
         public List<string> DefineSchema()
         {
             var schema = new List<string>();
-            var columnName = TableInformation.EventColumnName;
+            var columnName = TableInformation.ActionEventColumnName;
             schema.Add(columnName);
             return schema;
         }
@@ -50,8 +49,7 @@ namespace Editors.Audio.AudioEditor.Presentation.AudioProjectEditor.Table
             var columnsCount = 1;
             var columnWidth = 1.0 / columnsCount;
 
-            var selectedAudioProjectExplorerNode = _audioEditorStateService.SelectedAudioProjectExplorerNode;
-            if (selectedAudioProjectExplorerNode.Name == Wh3ActionEventInformation.GetName(Wh3ActionEventType.Movies))
+            if (_audioEditorStateService.SelectedAudioProjectExplorerNode.IsMovieActionEvent())
             {
                 var fileSelectColumnHeader = TableInformation.BrowseMovieColumnName;
                 var fileSelectColumn = DataGridTemplates.CreateColumnTemplate(fileSelectColumnHeader, 85, useAbsoluteWidth: true);
@@ -81,12 +79,11 @@ namespace Editors.Audio.AudioEditor.Presentation.AudioProjectEditor.Table
         {
             var eventName = string.Empty;
 
-            var selectedAudioProjectExplorerNode = _audioEditorStateService.SelectedAudioProjectExplorerNode.Name;
-            if (selectedAudioProjectExplorerNode != Wh3ActionEventInformation.GetName(Wh3ActionEventType.Movies))
+            if (!_audioEditorStateService.SelectedAudioProjectExplorerNode.IsMovieActionEvent())
                 eventName = "Play_";
 
             var row = editorTable.NewRow();
-            row[TableInformation.EventColumnName] = eventName;
+            row[TableInformation.ActionEventColumnName] = eventName;
 
             _eventHub.Publish(new EditorTableRowAddRequestedEvent(row));
         }

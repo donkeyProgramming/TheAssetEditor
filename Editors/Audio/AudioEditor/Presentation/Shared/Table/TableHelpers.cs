@@ -51,7 +51,7 @@ namespace Editors.Audio.AudioEditor.Presentation.Shared.Table
 
         public static string GetValueFromRow(DataRow row, string columnName) => row[columnName].ToString();
 
-        public static string GetActionEventNameFromRow(DataRow row) => GetValueFromRow(row, TableInformation.EventColumnName);
+        public static string GetActionEventNameFromRow(DataRow row) => GetValueFromRow(row, TableInformation.ActionEventColumnName);
 
         public static string GetStatePathNameFromRow(DataRow row, IAudioRepository audioRepository, string dialogueEventName)
         {
@@ -72,12 +72,9 @@ namespace Editors.Audio.AudioEditor.Presentation.Shared.Table
                 var stateGroupNameWithQualifier = WpfHelpers.DeduplicateUnderscores(column.ColumnName);
                 var stateGroupName = GetStateGroupFromStateGroupWithQualifier(audioRepository, dialogueEventName, stateGroupNameWithQualifier);
 
-                var statePathNode = new StatePath.Node
-                {
-                    StateGroup = new StateGroup { Name = stateGroupName },
-                    State = new State { Name = stateName }
-                };
-
+                var stateGroup = StateGroup.CreateForStatePath(stateGroupName);
+                var state = new State(stateName);
+                var statePathNode = new StatePath.Node(stateGroup, state);
                 statePathNodes.Add(statePathNode);
             }
             var statePathName = StatePath.BuildName(statePathNodes);
@@ -151,6 +148,34 @@ namespace Editors.Audio.AudioEditor.Presentation.Shared.Table
             var newRow = table.NewRow();
             newRow.ItemArray = (object[])sourceRow.ItemArray.Clone();
             table.Rows.InsertAt(newRow, insertAt);
+        }
+
+        public static DataRow CreateRow(DataTable table, string actionEventName)
+        {
+            var pseudoTable = table.Clone();
+            var row = pseudoTable.NewRow();
+            row[TableInformation.ActionEventColumnName] = actionEventName;
+            return row;
+        }
+
+        public static string RemoveActionEventPrefix(string actionEventName)
+        {
+            if (actionEventName.StartsWith("Play_", StringComparison.Ordinal))
+                return actionEventName.Substring("Play_".Length);
+            if (actionEventName.StartsWith("Pause_", StringComparison.Ordinal))
+                return actionEventName.Substring("Pause_".Length);
+            if (actionEventName.StartsWith("Resume_", StringComparison.Ordinal))
+                return actionEventName.Substring("Resume_".Length);
+            if (actionEventName.StartsWith("Stop_", StringComparison.Ordinal))
+                return actionEventName.Substring("Stop_".Length);
+            return actionEventName;
+        }
+
+        public static bool IsPauseResumeStopActionEvent(string actionEventName)
+        {
+            return actionEventName.StartsWith("Pause_", StringComparison.Ordinal)
+                || actionEventName.StartsWith("Resume_", StringComparison.Ordinal)
+                || actionEventName.StartsWith("Stop_", StringComparison.Ordinal);
         }
     }
 }

@@ -40,6 +40,7 @@ namespace Editors.Audio.AudioEditor.Presentation.AudioProjectViewer
         [ObservableProperty] private ObservableCollection<DataGridColumn> _dataGridColumns = [];
         [ObservableProperty] public ObservableCollection<SoundBank> _soundBanks;
         [ObservableProperty] public List<DataRow> _selectedRows = [];
+        [ObservableProperty] private AudioProjectTreeNode _selectedAudioProjectExplorerNode;
         [ObservableProperty] private bool _isUpdateRowButtonEnabled = false;
         [ObservableProperty] private bool _isRemoveRowButtonEnabled = false;
         [ObservableProperty] private bool _isCopyEnabled = false;
@@ -86,39 +87,41 @@ namespace Editors.Audio.AudioEditor.Presentation.AudioProjectViewer
 
         public void OnAudioProjectExplorerNodeSelected(AudioProjectExplorerNodeSelectedEvent e)
         {
+            var selectedAudioProjectExplorerNode = e.TreeNode;
+            SelectedAudioProjectExplorerNode = selectedAudioProjectExplorerNode;
+
             ResetViewerVisibility();
             ResetViewerLabel();
             ResetButtonEnablement();
             ResetContextMenuVisibility();
             ResetTable();
 
-            var selectedExplorerNode = e.TreeNode;
-            if (selectedExplorerNode.IsActionEvent())
+            if (selectedAudioProjectExplorerNode.IsActionEvent())
             {
                 SetViewerVisible();
-                SetViewerLabel(selectedExplorerNode.Name);
-                Load(selectedExplorerNode.Type);
+                SetViewerLabel(selectedAudioProjectExplorerNode.Name);
+                LoadTable(selectedAudioProjectExplorerNode.Type);
             }
-            else if (selectedExplorerNode.IsDialogueEvent())
+            else if (selectedAudioProjectExplorerNode.IsDialogueEvent())
             {
                 SetViewerVisible();
-                SetViewerLabel(WpfHelpers.DuplicateUnderscores(selectedExplorerNode.Name));
-                Load(selectedExplorerNode.Type);
+                SetViewerLabel(WpfHelpers.DuplicateUnderscores(selectedAudioProjectExplorerNode.Name));
+                LoadTable(selectedAudioProjectExplorerNode.Type);
 
                 SetContextMenuVisible();
                 SetCopyEnablement();
                 SetPasteEnablement();
             }
-            else if (selectedExplorerNode.IsStateGroup())
+            else if (selectedAudioProjectExplorerNode.IsStateGroup())
             {
                 SetViewerVisible();
-                SetViewerLabel(WpfHelpers.DuplicateUnderscores(selectedExplorerNode.Name));
-                Load(selectedExplorerNode.Type);
+                SetViewerLabel(WpfHelpers.DuplicateUnderscores(selectedAudioProjectExplorerNode.Name));
+                LoadTable(selectedAudioProjectExplorerNode.Type);
             }
             else
                 return;
 
-            _logger.Here().Information($"Loaded {selectedExplorerNode.Type}: {selectedExplorerNode.Name}");
+            _logger.Here().Information($"Loaded {selectedAudioProjectExplorerNode.Type}: {selectedAudioProjectExplorerNode.Name}");
         }
 
         private void OnViewerTableColumnAddRequested(ViewerTableColumnAddRequestedEvent e) => AddTableColumn(e.Column);
@@ -133,15 +136,15 @@ namespace Editors.Audio.AudioEditor.Presentation.AudioProjectViewer
 
         public void AddTableRow(DataRow row)
         {
-            var selectedExplorerNode = _audioEditorStateService.SelectedAudioProjectExplorerNode;
-            if (selectedExplorerNode.IsActionEvent())
+            var selectedAudioProjectExplorerNode = _audioEditorStateService.SelectedAudioProjectExplorerNode;
+            if (selectedAudioProjectExplorerNode.IsActionEvent())
                 TableHelpers.InsertRowAlphabeticallyByActionEventName(Table, row);
-            else if (selectedExplorerNode.IsDialogueEvent())
-                TableHelpers.InsertRowAlphabeticallyByStatePathName(Table, row, _audioRepository, selectedExplorerNode.Name);
-            else if (selectedExplorerNode.IsStateGroup())
+            else if (selectedAudioProjectExplorerNode.IsDialogueEvent())
+                TableHelpers.InsertRowAlphabeticallyByStatePathName(Table, row, _audioRepository, selectedAudioProjectExplorerNode.Name);
+            else if (selectedAudioProjectExplorerNode.IsStateGroup())
                 TableHelpers.InsertRowAlphabeticallyByStateName(Table, row);
 
-            _logger.Here().Information($"Added {selectedExplorerNode.Type} row to Audio Project Viewer table for {selectedExplorerNode.Name}");
+            _logger.Here().Information($"Added {selectedAudioProjectExplorerNode.Type} row to Audio Project Viewer table for {selectedAudioProjectExplorerNode.Name}");
         }
 
         private void OnViewerTableRowRemoveRequested(ViewerTableRowRemoveRequestedEvent e) => RemoveTableRow(e.Row);
@@ -224,7 +227,8 @@ namespace Editors.Audio.AudioEditor.Presentation.AudioProjectViewer
 
         [RelayCommand] public void RemoveRow()
         {
-            _uiCommandFactory.Create<RemoveViewerRowsCommand>().Execute(_audioEditorStateService.SelectedViewerRows);
+            var rowsToRemove = GetRowsToRemove();
+            _uiCommandFactory.Create<RemoveViewerRowsCommand>().Execute(rowsToRemove);
             SetPasteEnablement();
         }
 
@@ -236,11 +240,49 @@ namespace Editors.Audio.AudioEditor.Presentation.AudioProjectViewer
 
         [RelayCommand] public void EditRow()
         {
-            _uiCommandFactory.Create<EditViewerRowCommand>().Execute(_audioEditorStateService.SelectedViewerRows);
+            var rowsToRemove = GetRowsToRemove();
+            _uiCommandFactory.Create<EditViewerRowsCommand>().Execute(rowsToRemove);
             SetPasteEnablement();
         }
 
-        private void Load(AudioProjectTreeNodeType selectedNodeType)
+        private List<DataRow> GetRowsToRemove()
+        {
+            if (_audioEditorStateService.SelectedAudioProjectExplorerNode.IsActionEvent())
+                return GetRelatedActionEventRows();
+            else
+                return _audioEditorStateService.SelectedViewerRows;
+        }
+
+        private List<DataRow> GetRelatedActionEventRows()
+        {
+            var rowsToRemove = _audioEditorStateService.SelectedViewerRows;
+            var actionEventsNamesWithoutSuffixes = rowsToRemove
+                .Select(TableHelpers.GetActionEventNameFromRow)
+                .Select(TableHelpers.RemoveActionEventPrefix)
+                .ToList();
+
+            foreach (DataRow row in Table.Rows)
+            {
+                var actionEventName = TableHelpers.GetActionEventNameFromRow(row);
+                var actionEventWithoutActionPrefix = TableHelpers.RemoveActionEventPrefix(actionEventName);
+
+                if (rowsToRemove.Contains(row) || !actionEventsNamesWithoutSuffixes.Contains(actionEventWithoutActionPrefix))
+                    continue;
+
+                if (TableHelpers.IsPauseResumeStopActionEvent(actionEventName))
+                    rowsToRemove.Add(row);
+            }
+
+            // We put Play Action Events first so they're removed first to avoid issues with Pause / Resume / Stop
+            // Action Events trying to remove target objects that the Play Action Event has already removed.
+            var orderedRowsToRemove = rowsToRemove
+                .OrderByDescending(row => TableHelpers.GetActionEventNameFromRow(row).StartsWith("Play_", StringComparison.Ordinal))
+                .ToList();
+
+            return orderedRowsToRemove;
+        }
+
+        private void LoadTable(AudioProjectTreeNodeType selectedNodeType)
         {
             var tableService = _tableServiceFactory.GetService(selectedNodeType);
             tableService.Load(Table);
@@ -352,7 +394,7 @@ namespace Editors.Audio.AudioEditor.Presentation.AudioProjectViewer
 
         public void ResetTable()
         {
-            Table = new DataTable();
+            Table.Clear();
             DataGridColumns.Clear();
             SelectedRows = [];
         }

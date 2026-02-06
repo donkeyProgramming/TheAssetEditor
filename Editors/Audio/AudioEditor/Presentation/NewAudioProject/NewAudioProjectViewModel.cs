@@ -96,12 +96,15 @@ namespace Editors.Audio.AudioEditor.Presentation.NewAudioProject
             }
 
             var currentGame = _applicationSettingsService.CurrentSettings.CurrentGame;
+            if (currentGame != GameTypeEnum.Warhammer3)
+                throw new NotImplementedException($"The Audio Editor does not support the selected game.");
+
             var audioProjectFileNameWithoutSpaces = AudioProjectFileName.Replace(" ", "_");
             var fileName = $"{audioProjectFileNameWithoutSpaces}.aproj";
             var filePath = $"{AudioProjectDirectory}\\{fileName}";
             var language = Wh3LanguageInformation.GetLanguageAsString(SelectedLanguage);
 
-            var audioProject = AudioProjectFile.Create(currentGame, language, audioProjectFileNameWithoutSpaces);
+            var audioProject = AudioProjectFile.CreateNew(language, audioProjectFileNameWithoutSpaces);
 
             _audioEditorStateService.StoreAudioProject(audioProject);
             _audioEditorStateService.StoreAudioProjectFileName(fileName);

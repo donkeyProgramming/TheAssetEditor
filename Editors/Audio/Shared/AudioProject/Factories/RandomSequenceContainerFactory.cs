@@ -43,19 +43,19 @@ namespace Editors.Audio.Shared.AudioProject.Factories
             foreach (var audioFile in audioFiles)
             {
                 playlistOrder++;
-                var sound = _soundFactory.Create(usedHircIds, usedSourceIds, audioFile, randomSequenceContainerIds.Id, playlistOrder, language);
+                var sound = _soundFactory.CreateContainerSound(usedHircIds, usedSourceIds, audioFile, randomSequenceContainerIds.Id, playlistOrder, language);
                 children.Add(sound.Id);
                 result.RandomSequenceContainerSounds.Add(sound);
             }
 
             var randomSequenceContainerSettings = HircSettings.CreateRandomSequenceContainerSettings(hircSettings);
-            var randomSequenceContainer = RandomSequenceContainer.Create(
+            var randomSequenceContainer = new RandomSequenceContainer(
                 randomSequenceContainerIds.Guid,
                 randomSequenceContainerIds.Id,
-                randomSequenceContainerSettings,
-                children,
                 overrideBusId,
-                actorMixerId);
+                actorMixerId,
+                randomSequenceContainerSettings,
+                children);
             result.RandomSequenceContainer = randomSequenceContainer;
             return result;
         }

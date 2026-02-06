@@ -8,13 +8,24 @@ namespace Editors.Audio.AudioEditor.Presentation.Shared.Models
 {
     public enum AudioProjectTreeNodeType
     {
+        // The container node for SoundBanks
         SoundBanks,
+        // The SoundBank node
         SoundBank,
+
+        // The container node for ActionEvents
         ActionEvents,
-        DialogueEvents,
+        // The Action Event Type e.g. Movies or Music
         ActionEventType,
+
+        // The container node for Dialogue Events
+        DialogueEvents,
+        // The Dialogue Event node
         DialogueEvent,
+
+        // The container node for State Groups
         StateGroups,
+        // The State Group node
         StateGroup
     }
 
@@ -42,47 +53,35 @@ namespace Editors.Audio.AudioEditor.Presentation.Shared.Models
             };
         }
 
-        public static AudioProjectTreeNode GetNode(ObservableCollection<AudioProjectTreeNode> audioProjectTree, string nodeName)
-        {
-            foreach (var node in audioProjectTree)
-            {
-                if (node.Name == nodeName)
-                    return node;
+        public bool IsActionEvent() => Type == ActionEventType;
 
-                var childNode = GetNode(node.Children, nodeName);
-                if (childNode != null)
-                    return childNode;
+        public bool IsDialogueEvents() => Name == AudioProjectTreeBuilderService.DialogueEventsNodeName;
+
+        public bool IsDialogueEvent() => Type == DialogueEvent;
+
+        public bool IsStateGroup() => Type == StateGroup;
+
+        public bool IsSoundBank() => Type == SoundBank;
+
+        public bool IsMusicActionEvent() => IsActionEvent() && Name == Wh3ActionEventInformation.GetName(Wh3ActionEventType.Music);
+
+        public bool IsBattleAbilityActionEvent() => IsActionEvent() && Name == Wh3ActionEventInformation.GetName(Wh3ActionEventType.BattleAbilities);
+
+        public bool IsMovieActionEvent() => IsActionEvent() && Name == Wh3ActionEventInformation.GetName(Wh3ActionEventType.Movies);
+
+        public AudioProjectTreeNode GetParentSoundBankNode()
+        {
+            var currentNode = Parent;
+
+            while (currentNode != null)
+            {
+                if (currentNode.IsSoundBank())
+                    return currentNode;
+
+                currentNode = currentNode.Parent;
             }
 
             return null;
-        }
-
-        public bool IsActionEvent()
-        {
-            if (Type == ActionEventType)
-                return true;
-            return false;
-        }
-
-        public bool IsDialogueEvents()
-        {
-            if (Name == AudioProjectTreeBuilderService.DialogueEventsNodeName)
-                return true;
-            return false;
-        }
-
-        public bool IsDialogueEvent()
-        {
-            if (Type == DialogueEvent)
-                return true;
-            return false;
-        }
-
-        public bool IsStateGroup()
-        {
-            if (Type == StateGroup)
-                return true;
-            return false;
         }
     }
 }

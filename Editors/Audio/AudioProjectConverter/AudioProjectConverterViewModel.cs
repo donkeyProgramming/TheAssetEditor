@@ -77,10 +77,13 @@ namespace Editors.Audio.AudioProjectConverter
         [RelayCommand] public void ProcessAudioProjectConversion()
         {
             var currentGame = _applicationSettingsService.CurrentSettings.CurrentGame;
+            if (currentGame != GameTypeEnum.Warhammer3)
+                throw new NotImplementedException($"The Audio Editor does not support the selected game.");
+
             var fileName = $"{AudioProjectName}.aproj";
             var filePath = $"{OutputDirectoryPath}\\{fileName}";
             var language = "english(uk)";
-            var audioProject = AudioProjectFile.Create(currentGame, language, AudioProjectName);
+            var audioProject = AudioProjectFile.CreateNew(language, AudioProjectName);
 
             var soundBankPaths = new List<string>();
             if (Directory.Exists(BnksDirectoryPath))
@@ -110,20 +113,8 @@ namespace Editors.Audio.AudioProjectConverter
                     dialogueEventsToProcess,
                     moddedStateGroups);
 
-            var usedHircIds = new HashSet<uint>();
-            var usedSourceIds = new HashSet<uint>();
-
-            var audioProjectGeneratableItemIds = audioProject.GetGeneratableItemIds();
-            var audioProjectSourceIds = audioProject.GetAudioFileIds();
-
-            var languageId = WwiseHash.Compute(audioProject.Language);
-            var languageHircIds = _audioRepository.GetUsedVanillaHircIdsByLanguageId(languageId);
-            var languageSourceIds = _audioRepository.GetUsedVanillaSourceIdsByLanguageId(languageId);
-
-            usedHircIds.UnionWith(audioProjectGeneratableItemIds);
-            usedHircIds.UnionWith(languageHircIds);
-            usedSourceIds.UnionWith(audioProjectSourceIds);
-            usedSourceIds.UnionWith(languageSourceIds);
+            var usedHircIds = IdGenerator.GetUsedHircIds(_audioRepository, audioProject);
+            var usedSourceIds = IdGenerator.GetUsedSourceIds(_audioRepository, audioProject);
 
             foreach (var dialogueEvent in dialogueEventsToProcess)
                 ProcessDialogueEvent(
@@ -303,9 +294,9 @@ namespace Editors.Audio.AudioProjectConverter
                         state = unhashedState;
                 }
 
-                var audioProjectstateGroup = StateGroup.Create(stateGroup);
-                var audioProjectstate = State.Create(state);
-                var statePathNode = StatePath.Node.Create(audioProjectstateGroup, audioProjectstate);
+                var audioProjectstateGroup = StateGroup.CreateForStatePath(stateGroup);
+                var audioProjectstate = new State(state);
+                var statePathNode = new StatePath.Node(audioProjectstateGroup, audioProjectstate);
                 statePathNodes.Add(statePathNode);
 
                 // Store modded states info
@@ -411,7 +402,7 @@ namespace Editors.Audio.AudioProjectConverter
             _logger.Here().Information($"Processing Dialogue Event: {dialogueEventName}");
 
             var dialogueEventAndSoundBank = audioProject.SoundBanks
-                .Where(soundBank => soundBank.DialogueEvents != null)
+                .Where(soundBank => soundBank.DialogueEvents.Count != 0)
                 .SelectMany(
                     soundBank => soundBank.DialogueEvents,
                     (soundBank, dialogueEventItem) => new { SoundBank = soundBank, DialogueEvent = dialogueEventItem })
@@ -462,7 +453,7 @@ namespace Editors.Audio.AudioProjectConverter
                     {
                         playlistOrder++;
                         var soundIds = IdGenerator.GenerateIds(usedHircIds);
-                        var sound = Sound.Create(soundIds.Guid, soundIds.Id, randomSequenceContainerIds.Id, playlistOrder, audioFile.Id, audioProject.Language);
+                        var sound = Sound.CreateContainerSound(soundIds.Guid, soundIds.Id, randomSequenceContainerIds.Id, playlistOrder, audioFile.Id, audioProject.Language);
 
                         usedHircIds.Add(soundIds.Id);
                         audioFile.Sounds.Add(sound.Id);
@@ -471,13 +462,14 @@ namespace Editors.Audio.AudioProjectConverter
                     }
 
                     var randomSequenceContainerSettings = Shared.AudioProject.Models.HircSettings.CreateRecommendedRandomSequenceContainerSettings(audioFiles.Count);
-                    var randomSequenceContainer = RandomSequenceContainer.Create(
+                    var randomSequenceContainer = new RandomSequenceContainer(
                         randomSequenceContainerIds.Guid,
                         randomSequenceContainerIds.Id,
+                        0,
+                        actorMixerId,
                         randomSequenceContainerSettings,
-                        children,
-                        directParentId: actorMixerId);
-                    audioProjectStatePath = StatePath.Create(statePath.StatePathNodes, randomSequenceContainer.Id, AkBkHircType.RandomSequenceContainer);
+                        children);
+                    audioProjectStatePath = new StatePath(statePath.StatePathNodes, randomSequenceContainer.Id, AkBkHircType.RandomSequenceContainer);
 
                     audioProjectDialogueEventSoundBank.RandomSequenceContainers.TryAdd(randomSequenceContainer);
                 }
@@ -487,11 +479,11 @@ namespace Editors.Audio.AudioProjectConverter
                     var soundIds = IdGenerator.GenerateIds(usedHircIds);
                     usedHircIds.Add(soundIds.Id);
 
-                    var soundSettings = Shared.AudioProject.Models.HircSettings.CreateSoundSettings();
-                    var sound = Sound.Create(soundIds.Guid, soundIds.Id, 0, actorMixerId, audioFile.Id, audioProject.Language, soundSettings);
+                    var soundSettings = Shared.AudioProject.Models.HircSettings.CreateDefaultSoundSettings();
+                    var sound = Sound.CreateTargetSound(soundIds.Guid, soundIds.Id, 0, actorMixerId, audioFile.Id, audioProject.Language, soundSettings);
                     audioFile.Sounds.Add(sound.Id);
 
-                    audioProjectStatePath = StatePath.Create(statePath.StatePathNodes, sound.Id, AkBkHircType.Sound);
+                    audioProjectStatePath = new StatePath(statePath.StatePathNodes, sound.Id, AkBkHircType.Sound);
 
                     audioProjectDialogueEventSoundBank.Sounds.TryAdd(sound);
                 }
@@ -534,7 +526,7 @@ namespace Editors.Audio.AudioProjectConverter
                 if (audioFile == null)
                 {
                     var audioFileIds = IdGenerator.GenerateIds(usedSourceIds);
-                    audioFile = AudioFile.Create(audioFileIds.Guid, audioFileIds.Id, wavFile.FileName, wavFile.FilePath);
+                    audioFile = new AudioFile(audioFileIds.Guid, audioFileIds.Id, wavFile.FileName, wavFile.FilePath);
 
                     usedSourceIds.Add(audioFile.Id);
                     audioProject.AudioFiles.TryAdd(audioFile);
@@ -561,7 +553,7 @@ namespace Editors.Audio.AudioProjectConverter
             {
                 foreach (var moddedState in moddedStateGroup.Value)
                 {
-                    var audioProjectModdedState = State.Create(moddedState);
+                    var audioProjectModdedState = new State(moddedState);
                     var audioProjectStateGroup = audioProject.StateGroups.FirstOrDefault(stateGroup => stateGroup.Name == moddedStateGroup.Key);
                     audioProjectStateGroup.States.InsertAlphabetically(audioProjectModdedState);
                 }

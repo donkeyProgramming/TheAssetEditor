@@ -31,7 +31,7 @@ namespace Editors.Audio.Shared.AudioProject.Compiler
 
         public void Compile(AudioProjectFile audioProject, string audioProjectFileName, string audioProjectFilePath)
         {
-            if (audioProject.SoundBanks == null)
+            if (audioProject.SoundBanks.Count == 0)
                 return;
 
             _logger.Here().Information($"Compiling {audioProjectFileName}");
@@ -104,63 +104,69 @@ namespace Editors.Audio.Shared.AudioProject.Compiler
                 }
 
                 if (soundBank.ActionEvents.Count != 0)
-                {
-                    var playActionEvents = soundBank.GetPlayActionEvents();
-                    foreach (var playActionEvent in playActionEvents)
-                    {
-                        foreach (var playAction in playActionEvent.Actions)
-                        {
-                            if (playAction.TargetHircTypeIsSound())
-                            {
-                                var sound = soundBank.GetSound(playAction.TargetHircId);
-                                var audioFile = audioProject.GetAudioFile(sound.SourceId);
-
-                                SetSoundData(audioFile, soundBank);
-
-                                audioFiles.Add(audioFile);
-                                sounds.Add(sound);
-                            }
-                            else if (playAction.TargetHircTypeIsRandomSequenceContainer())
-                            {
-                                var randomSequenceContainer = soundBank.GetRandomSequenceContainer(playAction.TargetHircId);
-
-                                SetRandomSequenceContainerData(audioProject, randomSequenceContainer, soundBank);
-
-                                var randomSequenceContainerSounds = soundBank.GetSounds(randomSequenceContainer.Children);
-                                audioFiles.AddRange(randomSequenceContainerSounds.Select(sound => audioProject.GetAudioFile(sound.SourceId)).ToList());
-                                sounds.AddRange(randomSequenceContainerSounds);
-                            }
-                        }
-                    }
-                }
+                    SetActionEventData(audioProject, audioFiles, sounds, soundBank);
 
                 if (soundBank.DialogueEvents.Count != 0)
+                    SetDialogueEventData(audioProject, audioFiles, sounds, soundBank);
+            }
+        }
+
+        private static void SetActionEventData(AudioProjectFile audioProject, List<AudioFile> audioFiles, List<Sound> sounds, SoundBank soundBank)
+        {
+            var playActionEvents = soundBank.GetPlayActionEvents();
+            foreach (var playActionEvent in playActionEvents)
+            {
+                foreach (var playAction in playActionEvent.Actions)
                 {
-                    foreach (var dialogueEvent in soundBank.DialogueEvents)
+                    if (playAction.TargetHircTypeIsSound())
                     {
-                        foreach (var statePath in dialogueEvent.StatePaths)
-                        {
-                            if (statePath.TargetHircTypeIsSound())
-                            {
-                                var sound = soundBank.GetSound(statePath.TargetHircId);
-                                var audioFile = audioProject.GetAudioFile(sound.SourceId);
+                        var sound = soundBank.GetSound(playAction.TargetHircId);
+                        var audioFile = audioProject.GetAudioFile(sound.SourceId);
 
-                                SetSoundData(audioFile, soundBank);
+                        SetSoundData(audioFile, soundBank);
 
-                                audioFiles.Add(audioFile);
-                                sounds.Add(sound);
-                            }
-                            else if (statePath.TargetHircTypeIsRandomSequenceContainer())
-                            {
-                                var randomSequenceContainer = soundBank.GetRandomSequenceContainer(statePath.TargetHircId);
+                        audioFiles.Add(audioFile);
+                        sounds.Add(sound);
+                    }
+                    else if (playAction.TargetHircTypeIsRandomSequenceContainer())
+                    {
+                        var randomSequenceContainer = soundBank.GetRandomSequenceContainer(playAction.TargetHircId);
 
-                                SetRandomSequenceContainerData(audioProject, randomSequenceContainer, soundBank);
+                        SetRandomSequenceContainerData(audioProject, randomSequenceContainer, soundBank);
 
-                                var randomSequenceContainerSounds = soundBank.GetSounds(randomSequenceContainer.Children);
-                                audioFiles.AddRange(randomSequenceContainerSounds.Select(sound => audioProject.GetAudioFile(sound.SourceId)).ToList());
-                                sounds.AddRange(randomSequenceContainerSounds);
-                            }
-                        }
+                        var randomSequenceContainerSounds = soundBank.GetSounds(randomSequenceContainer.Children);
+                        audioFiles.AddRange(randomSequenceContainerSounds.Select(sound => audioProject.GetAudioFile(sound.SourceId)).ToList());
+                        sounds.AddRange(randomSequenceContainerSounds);
+                    }
+                }
+            }
+        }
+
+        private static void SetDialogueEventData(AudioProjectFile audioProject, List<AudioFile> audioFiles, List<Sound> sounds, SoundBank soundBank)
+        {
+            foreach (var dialogueEvent in soundBank.DialogueEvents)
+            {
+                foreach (var statePath in dialogueEvent.StatePaths)
+                {
+                    if (statePath.TargetHircTypeIsSound())
+                    {
+                        var sound = soundBank.GetSound(statePath.TargetHircId);
+                        var audioFile = audioProject.GetAudioFile(sound.SourceId);
+
+                        SetSoundData(audioFile, soundBank);
+
+                        audioFiles.Add(audioFile);
+                        sounds.Add(sound);
+                    }
+                    else if (statePath.TargetHircTypeIsRandomSequenceContainer())
+                    {
+                        var randomSequenceContainer = soundBank.GetRandomSequenceContainer(statePath.TargetHircId);
+
+                        SetRandomSequenceContainerData(audioProject, randomSequenceContainer, soundBank);
+
+                        var randomSequenceContainerSounds = soundBank.GetSounds(randomSequenceContainer.Children);
+                        audioFiles.AddRange(randomSequenceContainerSounds.Select(sound => audioProject.GetAudioFile(sound.SourceId)).ToList());
+                        sounds.AddRange(randomSequenceContainerSounds);
                     }
                 }
             }
@@ -244,7 +250,7 @@ namespace Editors.Audio.Shared.AudioProject.Compiler
             // We store States in there so we can display them in the Audio Explorer.
             var actionEvents = audioProject.GetActionEvents();
             var hasActionEvents = actionEvents != null && actionEvents.Count > 0;
-            var hasStateGroups = audioProject.StateGroups != null && audioProject.StateGroups.Count > 0;
+            var hasStateGroups = audioProject.StateGroups.Count != 0 && audioProject.StateGroups.Count > 0;
 
             if (hasActionEvents && hasStateGroups)
             {

@@ -15,7 +15,7 @@ namespace Editors.Audio.AudioEditor.Core
 {
     public interface IAudioEditorIntegrityService
     {
-        void UpdateSoundBankNames(AudioProjectFile audioProject, string audioProjectNameWithoutExtension);
+        void EnsureCorrectSoundBankNames(AudioProjectFile audioProject, string audioProjectNameWithoutExtension);
         void RefreshSourceIds(AudioProjectFile audioProject);
         void CheckDialogueEventInformationIntegrity(List<Wh3DialogueEventDefinition> dialogueEventData);
         void CheckAudioProjectDialogueEventIntegrity(AudioProjectFile audioProject);
@@ -29,7 +29,7 @@ namespace Editors.Audio.AudioEditor.Core
         private readonly IPackFileService _packFileService = packFileService;
         private readonly IAudioRepository _audioRepository = audioRepository;
 
-        public void UpdateSoundBankNames(AudioProjectFile audioProject, string audioProjectNameWithoutExtension)
+        public void EnsureCorrectSoundBankNames(AudioProjectFile audioProject, string audioProjectNameWithoutExtension)
         {
             foreach (var soundBank in audioProject.SoundBanks)
             {
@@ -45,13 +45,7 @@ namespace Editors.Audio.AudioEditor.Core
 
         public void RefreshSourceIds(AudioProjectFile audioProject)
         {
-            var audioProjectSourceIds = audioProject.GetAudioFileIds();
-            var languageId = WwiseHash.Compute(audioProject.Language);
-            var languageSourceIds = _audioRepository.GetUsedVanillaSourceIdsByLanguageId(languageId);
-
-            var usedSourceIds = new HashSet<uint>();
-            usedSourceIds.UnionWith(audioProjectSourceIds);
-            usedSourceIds.UnionWith(languageSourceIds);
+            var usedSourceIds = IdGenerator.GetUsedSourceIds(_audioRepository, audioProject);
 
             var audioProjectSounds = audioProject.GetSounds();
             foreach (var audioFile in audioProject.AudioFiles)
@@ -66,6 +60,8 @@ namespace Editors.Audio.AudioEditor.Core
                 audioFile.Guid = audioFileIds.Guid;
                 audioFile.Id = audioFileIds.Id;
             }
+
+            MessageBox.Show("Delete all your existing WEMs and then recompile the Audio Project as all WEM IDs have now been updated.", "Warning");
         }
 
         public void CheckDialogueEventInformationIntegrity(List<Wh3DialogueEventDefinition> information)
@@ -240,14 +236,16 @@ namespace Editors.Audio.AudioEditor.Core
             usedSourceIds.UnionWith(audioProjectSourceIds);
             usedSourceIds.UnionWith(languageSourceIds);
 
+            // TODO: Implement a get all references by ID to then replace them all for the clashing IDs
+
             foreach (var soundBank in audioProject.SoundBanks)
             {
                 ResolveSoundBankDataIntegrity(audioProject, audioProjectNameWithoutExtension, soundBank);
 
-                if (soundBank.ActionEvents != null)
+                if (soundBank.ActionEvents.Count != 0)
                     ResolveActionEventDataIntegrity(usedHircIds, usedSourceIds, soundBank);
 
-                if (soundBank.DialogueEvents != null)
+                if (soundBank.DialogueEvents.Count != 0)
                     ResolveDialogueEventDataIntegrity(usedHircIds, usedSourceIds, soundBank);
             }
 
@@ -288,9 +286,6 @@ namespace Editors.Audio.AudioEditor.Core
                 if (!string.Equals(soundBank.Language, requiredLanguageAsString, StringComparison.Ordinal))
                     throw new InvalidOperationException($"SoundBank.Language should be '{requiredLanguageAsString}'.");
             }
-
-            if (soundBank.LanguageId == 0)
-                throw new InvalidOperationException("SoundBank.LanguageId should not be 0.");
         }
 
         private static void ResolveActionEventDataIntegrity(HashSet<uint> usedHircIds, HashSet<uint> usedSourceIds, SoundBank soundBank)
@@ -410,7 +405,7 @@ namespace Editors.Audio.AudioEditor.Core
 
         private static void ResolveStateGroupDataIntegrity(AudioProjectFile audioProject)
         {
-            if (audioProject.StateGroups != null)
+            if (audioProject.StateGroups.Count != 0)
             {
                 foreach (var stateGroup in audioProject.StateGroups)
                 {

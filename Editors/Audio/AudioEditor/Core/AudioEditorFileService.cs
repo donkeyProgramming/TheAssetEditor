@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Windows;
@@ -40,7 +41,7 @@ namespace Editors.Audio.AudioEditor.Core
 
         public void Save(AudioProjectFile audioProject, string fileName, string filePath)
         {
-            var cleanedAudioProject = AudioProjectFile.Clean(audioProject);
+            var cleanedAudioProject = audioProject.Clean();
 
             var options = new JsonSerializerOptions
             {
@@ -77,12 +78,16 @@ namespace Editors.Audio.AudioEditor.Core
             var fileNameWithoutExtension = Path.GetFileNameWithoutExtension(fileName);
 
             // We add the Audio Project name as a suffix to all SoundBank names so if the Audio Project name has changed we need to update them
-            _audioEditorIntegrityService.UpdateSoundBankNames(audioProject, fileNameWithoutExtension);
+            _audioEditorIntegrityService.EnsureCorrectSoundBankNames(audioProject, fileNameWithoutExtension);
+
+            var currentGame = _applicationSettingsService.CurrentSettings.CurrentGame;
+            if (currentGame != GameTypeEnum.Warhammer3)
+                throw new NotImplementedException($"The Audio Editor does not support the selected game.");
 
             // We create a 'dirty' Audio Project to display the whole model in the Audio Project Explorer rather than
             // just the clean data from the loaded Audio Project as any unused parts are removed when it's saved
-            var currentGame = _applicationSettingsService.CurrentSettings.CurrentGame;
-            var dirtyAudioProject = AudioProjectFile.Create(audioProject, currentGame, fileNameWithoutExtension);
+            var dirtyAudioProject = AudioProjectFile.CreateNew(audioProject.Language, fileNameWithoutExtension);
+            AudioProjectFileMerger.Merge(dirtyAudioProject, audioProject, fileNameWithoutExtension, fileNameWithoutExtension);
 
             _audioRepository.Load([audioProject.Language]);
 

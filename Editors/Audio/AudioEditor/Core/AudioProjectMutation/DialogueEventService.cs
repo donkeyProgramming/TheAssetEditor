@@ -1,11 +1,11 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Editors.Audio.Shared.AudioProject.Compiler;
 using Editors.Audio.Shared.AudioProject.Factories;
 using Editors.Audio.Shared.AudioProject.Models;
 using Editors.Audio.Shared.GameInformation.Warhammer3;
 using Editors.Audio.Shared.Storage;
-using Editors.Audio.Shared.Wwise;
 using HircSettings = Editors.Audio.Shared.AudioProject.Models.HircSettings;
 
 namespace Editors.Audio.AudioEditor.Core.AudioProjectMutation
@@ -24,21 +24,8 @@ namespace Editors.Audio.AudioEditor.Core.AudioProjectMutation
 
         public void AddStatePath(string dialogueEventName, List<AudioFile> audioFiles, HircSettings hircSettings, List<KeyValuePair<string, string>> statePathList)
         {
-            var usedHircIds = new HashSet<uint>();
-            var usedSourceIds = new HashSet<uint>();
-
-            var audioProject = _audioEditorStateService.AudioProject;
-            var languageId = WwiseHash.Compute(audioProject.Language);
-
-            var audioProjectGeneratableItemIds = audioProject.GetGeneratableItemIds();
-            var languageHircIds = _audioRepository.GetUsedVanillaHircIdsByLanguageId(languageId);
-            usedHircIds.UnionWith(audioProjectGeneratableItemIds);
-            usedHircIds.UnionWith(languageHircIds);
-
-            var audioProjectSourceIds = audioProject.GetAudioFileIds();
-            var languageSourceIds = _audioRepository.GetUsedVanillaSourceIdsByLanguageId(languageId);
-            usedSourceIds.UnionWith(audioProjectSourceIds);
-            usedSourceIds.UnionWith(languageSourceIds);
+            var usedHircIds = IdGenerator.GetUsedHircIds(_audioRepository, _audioEditorStateService.AudioProject);
+            var usedSourceIds = IdGenerator.GetUsedSourceIds(_audioRepository, _audioEditorStateService.AudioProject);
 
             var gameSoundBankName = Wh3SoundBankInformation.GetName(Wh3DialogueEventInformation.GetSoundBank(dialogueEventName));
             var audioProjectNameWithoutExtension = Path.GetFileNameWithoutExtension(_audioEditorStateService.AudioProjectFileName);
@@ -54,11 +41,11 @@ namespace Editors.Audio.AudioEditor.Core.AudioProjectMutation
             {
                 soundBank.Sounds.TryAdd(statePathFactoryResult.SoundTarget);
 
-                var audioFile = audioProject.GetAudioFile(statePathFactoryResult.SoundTarget.SourceId);
+                var audioFile = _audioEditorStateService.AudioProject.GetAudioFile(statePathFactoryResult.SoundTarget.SourceId);
                 if (audioFile == null)
                 {
                     audioFile = audioFiles.FirstOrDefault(audioFile => audioFile.Id == statePathFactoryResult.SoundTarget.SourceId);
-                    audioProject.AudioFiles.TryAdd(audioFile);
+                    _audioEditorStateService.AudioProject.AudioFiles.TryAdd(audioFile);
                 }
                 
                 if (!audioFile.Sounds.Contains(statePathFactoryResult.SoundTarget.Id))
@@ -71,11 +58,11 @@ namespace Editors.Audio.AudioEditor.Core.AudioProjectMutation
 
                 foreach (var sound in statePathFactoryResult.RandomSequenceContainerSounds)
                 {
-                    var audioFile = audioProject.GetAudioFile(sound.SourceId);
+                    var audioFile = _audioEditorStateService.AudioProject.GetAudioFile(sound.SourceId);
                     if (audioFile == null)
                     {
                         audioFile = audioFiles.FirstOrDefault(audioFile => audioFile.Id == sound.SourceId);
-                        audioProject.AudioFiles.TryAdd(audioFile);
+                        _audioEditorStateService.AudioProject.AudioFiles.TryAdd(audioFile);
                     }
 
                     if (!audioFile.Sounds.Contains(sound.Id))
@@ -86,12 +73,11 @@ namespace Editors.Audio.AudioEditor.Core.AudioProjectMutation
 
         public bool RemoveStatePath(string dialogueEventName, string statePathName)
         {
-            var audioProject = _audioEditorStateService.AudioProject;
             var gameSoundBankName = Wh3SoundBankInformation.GetName(Wh3DialogueEventInformation.GetSoundBank(dialogueEventName));
             var audioProjectNameWithoutExtension = Path.GetFileNameWithoutExtension(_audioEditorStateService.AudioProjectFileName);
             var soundBankName = $"{gameSoundBankName}_{audioProjectNameWithoutExtension}";
 
-            var soundBank = audioProject.GetSoundBank(soundBankName);
+            var soundBank = _audioEditorStateService.AudioProject.GetSoundBank(soundBankName);
 
             var dialogueEvent = _audioEditorStateService.AudioProject.GetDialogueEvent(dialogueEventName);
             var statePath = dialogueEvent.GetStatePath(statePathName);
@@ -102,14 +88,14 @@ namespace Editors.Audio.AudioEditor.Core.AudioProjectMutation
                 if (statePath.TargetHircTypeIsSound())
                 {
                     var sound = soundBank.GetSound(statePath.TargetHircId);
-                    var audioFile = audioProject.GetAudioFile(sound.SourceId);
+                    var audioFile = _audioEditorStateService.AudioProject.GetAudioFile(sound.SourceId);
                     audioFile.Sounds.Remove(sound.Id);
 
                     soundBank.Sounds.Remove(sound);
                     audioFile.Sounds.Remove(sound.Id);
 
                     if (audioFile.Sounds.Count == 0)
-                        audioProject.AudioFiles.Remove(audioFile);
+                        _audioEditorStateService.AudioProject.AudioFiles.Remove(audioFile);
                 }
                 else if (statePath.TargetHircTypeIsRandomSequenceContainer())
                 {
@@ -117,13 +103,13 @@ namespace Editors.Audio.AudioEditor.Core.AudioProjectMutation
                     var sounds = soundBank.GetSounds(randomSequenceContainer.Children);
                     foreach (var sound in sounds)
                     {
-                        var audioFile = audioProject.GetAudioFile(sound.SourceId);
+                        var audioFile = _audioEditorStateService.AudioProject.GetAudioFile(sound.SourceId);
 
                         soundBank.Sounds.Remove(sound);
                         audioFile.Sounds.Remove(sound.Id);
 
                         if (audioFile.Sounds.Count == 0)
-                            audioProject.AudioFiles.Remove(audioFile);
+                            _audioEditorStateService.AudioProject.AudioFiles.Remove(audioFile);
                     }
 
                     soundBank.RandomSequenceContainers.Remove(randomSequenceContainer);

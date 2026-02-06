@@ -11,14 +11,9 @@ namespace Editors.Audio.AudioEditor.Presentation.AudioProjectEditor.Table
         IEditorTableService GetService(AudioProjectTreeNodeType nodeType);
     }
 
-    public class EditorTableServiceFactory : IEditorTableServiceFactory
+    public class EditorTableServiceFactory(IEnumerable<IEditorTableService> services) : IEditorTableServiceFactory
     {
-        private readonly Dictionary<AudioProjectTreeNodeType, IEditorTableService> _services;
-
-        public EditorTableServiceFactory(IEnumerable<IEditorTableService> services)
-        {
-            _services = services.ToDictionary(service => service.NodeType);
-        }
+        private readonly Dictionary<AudioProjectTreeNodeType, IEditorTableService> _services = services.ToDictionary(service => service.NodeType);
 
         public IEditorTableService GetService(AudioProjectTreeNodeType nodeType)
         {
