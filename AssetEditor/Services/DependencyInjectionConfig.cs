@@ -23,7 +23,7 @@ namespace AssetEditor.Services
 
                 // Domains
                 new Editors.Shared.Core.DependencyInjectionContainer(),
-                new Editors.AnimationTextEditors.DependencyInjectionContainer(),
+                new Editors.AnimationFragmentEditor.DependencyInjectionContainer(),
                 new Editors.Reports.DependencyInjectionContainer(),
                 new Editors.KitbasherEditor.DependencyInjectionContainer(),
                 new Editors.AnimationMeta.DependencyInjectionContainer(),

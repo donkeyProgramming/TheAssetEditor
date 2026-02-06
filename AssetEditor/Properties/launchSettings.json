@@ -9,6 +9,11 @@
       "commandLineArgs": "-devcfg Kitbash_Karl",
       "nativeDebugging": false
     },
+    "AE-AnimPack_Wh3": {
+      "commandName": "Project",
+      "commandLineArgs": "-devcfg AnimPack_WH3",
+      "nativeDebugging": false
+    },
     "AE-KitbashRat": {
       "commandName": "Project",
       "commandLineArgs": "-devcfg Kitbash_Rat",

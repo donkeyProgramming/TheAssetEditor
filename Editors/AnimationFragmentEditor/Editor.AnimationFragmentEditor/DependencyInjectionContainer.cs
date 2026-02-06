@@ -1,14 +1,15 @@
 ﻿using CommonControls.Editors.AnimationBatchExporter;
-using CommonControls.Editors.AnimationFilePreviewEditor;
 using CommonControls.Editors.AnimationPack;
-using CommonControls.Editors.CampaignAnimBin;
 using CommonControls.Editors.TextEditor;
+using Editors.AnimationFragmentEditor.AnimationFilePreviewEditor;
+using Editors.AnimationFragmentEditor.CampaignAnimBin;
 using Microsoft.Extensions.DependencyInjection;
 using Shared.Core.DependencyInjection;
+using Shared.Core.DevConfig;
 using Shared.Core.ToolCreation;
 using Shared.Ui.Editors.TextEditor;
 
-namespace Editors.AnimationTextEditors
+namespace Editors.AnimationFragmentEditor
 {
     public class DependencyInjectionContainer : DependencyContainer
     {
@@ -22,6 +23,8 @@ namespace Editors.AnimationTextEditors
             RegisterCampaignAnimBin(services);
             RegisterAnimFileViewer(services);
             RegisterBatchConverter(services);
+
+            RegisterAllAsInterface<IDeveloperConfiguration>(services, ServiceLifetime.Transient);
         }
 
         public override void RegisterTools(IEditorDatabase database)

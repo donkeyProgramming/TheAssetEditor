@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics;
 using System.Windows;
-using Editors.AnimationTextEditors.AnimationPack.Converters;
+using Editors.AnimationFragmentEditor.AnimationPack.Converters.AnimationBinWh3Converter;
 using Newtonsoft.Json;
 using Serilog;
 using Shared.Core.ErrorHandling;

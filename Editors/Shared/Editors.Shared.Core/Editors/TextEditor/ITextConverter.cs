@@ -18,6 +18,20 @@ namespace Shared.Ui.Editors.TextEditor
         string GetSyntaxType();
         bool CanSaveOnError();
         byte[] ToBytes(string text, string filePath, IPackFileService pfs, out SaveError error);
+
+
+        public static ITextConverter.SaveError GenerateError(string wholeText, int lastIndex, string errorMessage)
+        {
+            var array = wholeText.ToCharArray();
+            var lineCount = 0;
+            for (var strIndex = 0; strIndex < lastIndex; strIndex++)
+            {
+                if (array[strIndex] == '\n')
+                    lineCount++;
+            }
+
+            return new ITextConverter.SaveError() { ErrorLength = 40, ErrorPosition = 0, ErrorLineNumber = lineCount, Text = errorMessage };
+        }
     }
 
 

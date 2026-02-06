@@ -3,9 +3,11 @@ using System.Text;
 using System.Windows;
 using System.Windows.Input;
 using CommonControls.BaseDialogs;
-using CommonControls.Editors.AnimationPack.Converters;
 using CommunityToolkit.Mvvm.Input;
-using Editors.AnimationTextEditors.AnimationPack.Converters;
+using Editors.AnimationFragmentEditor.AnimationPack;
+using Editors.AnimationFragmentEditor.AnimationPack.Converters.AnimationBinConverter;
+using Editors.AnimationFragmentEditor.AnimationPack.Converters.AnimationBinWh3Converter;
+using Editors.AnimationFragmentEditor.AnimationPack.Converters.AnimationFragmentConverter;
 using GameWorld.Core.Services;
 using Shared.Core.Misc;
 using Shared.Core.PackFiles;
@@ -142,10 +144,10 @@ namespace CommonControls.Editors.AnimationPack
             _activeConverter = null;
             if (seletedFile is AnimationFragmentFile typedFragment)
                 _activeConverter = new AnimationFragmentFileToXmlConverter(_skeletonAnimationLookUpHelper, _appSettings.CurrentSettings.CurrentGame);
-            else if (seletedFile is Shared.GameFormats.AnimationPack.AnimPackFileTypes.AnimationBin typedBin)
+            else if (seletedFile is AnimationBin typedBin)
                 _activeConverter = new AnimationBinFileToXmlConverter();
             else if (seletedFile is AnimationBinWh3 wh3Bin)
-                _activeConverter = new AnimationBinWh3FileToXmlConverter(_skeletonAnimationLookUpHelper, _metaDataTagDeSerializer);
+                _activeConverter = new AnimationBinWh3FileToXmlConverter(_skeletonAnimationLookUpHelper, _metaDataTagDeSerializer, CurrentFile);
 
             if (seletedFile == null || _activeConverter == null || seletedFile.IsUnknownFile)
             {
@@ -179,9 +181,7 @@ namespace CommonControls.Editors.AnimationPack
                 MessageBox.Show("Can not save in this mode - Open the file normally");
                 return false;
             }
-            var converter = (AnimationBinWh3FileToXmlConverter)_activeConverter;
-            converter.AnimPackToValidate = _packFile;
-
+      
             var fileName = AnimationPackItems.SelectedItem.FileName;
             var bytes = _activeConverter.ToBytes(SelectedItemViewModel.Text, fileName, _pfs, out var error);
 
@@ -197,7 +197,7 @@ namespace CommonControls.Editors.AnimationPack
             seletedFile.IsChanged.Value = true;
 
             SelectedItemViewModel.ResetChangeLog();
-            HasUnsavedChanges = true;
+            HasUnsavedChanges = false;
 
 
             return true;
@@ -236,46 +236,7 @@ namespace CommonControls.Editors.AnimationPack
             return true;
         }
 
-        public bool ViewSelectedAsTable()
-        {
-            throw new System.Exception("TODO");
-            //var selectedItem = AnimationPackItems.SelectedItem;
-            //if (selectedItem == null)
-            //    return false;
-            //
-            //if (_animPack.GetFileType(selectedItem) == AnimationPackFile.AnimationPackFileType.Bin)
-            //{
-            //    var data = new ObservableCollection<AnimationBinEntry>();
-            //
-            //    var bin = _animPack.GetAnimBin(selectedItem);
-            //    foreach (var item in bin.AnimationTableEntries)
-            //        data.Add(item);
-            //
-            //    AnimTablePreviewWindow window = new AnimTablePreviewWindow()
-            //    {
-            //        DataContext = data
-            //    };
-            //
-            //    window.ShowDialog();
-            //}
-            //else
-            //{
-            //    var data = new ObservableCollection<AnimationFragmentEntry>();
-            //
-            //    var frag = _animPack.GetAnimFragment(selectedItem);
-            //    foreach (var item in frag.Fragments)
-            //        data.Add(item);
-            //
-            //    AnimTablePreviewWindow window = new AnimTablePreviewWindow()
-            //    {
-            //        DataContext = data
-            //    };
-            //
-            //    window.ShowDialog();
-            //}
-            //
-            //return true;
-        }
+      
 
         public void ExportAnimationSlotsWh3Action()
         {
@@ -303,34 +264,6 @@ namespace CommonControls.Editors.AnimationPack
 
             File.WriteAllText(path, sb.ToString());
         }
-
-       //public static void ShowPreviewWinodow(PackFile animationPackFile, PackFileService pfs, SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper, string selectedFileName, ApplicationSettingsService applicationSettings)
-       //{
-       //    if (animationPackFile == null)
-       //    {
-       //        MessageBox.Show("Unable to resolve packfile");
-       //        return;
-       //    }
-       //
-       //    var controller = new AnimPackViewModel(pfs, skeletonAnimationLookUpHelper, applicationSettings);
-       //    controller._packFile = animationPackFile;
-       //    controller.Load();
-       //
-       //    var containingWindow = new Window();
-       //    containingWindow.Title = animationPackFile.Name;
-       //
-       //
-       //    containingWindow.DataContext = controller;
-       //    containingWindow.Content = new AnimationPackView();
-       //
-       //    containingWindow.Width = 1200;
-       //    containingWindow.Height = 1100;
-       //
-       //
-       //    containingWindow.Loaded += (sender, e) => controller.SetSelectedFile(selectedFileName);
-       //
-       //    containingWindow.ShowDialog();
-       //}
 
         public void LoadFile(PackFile file)
         {

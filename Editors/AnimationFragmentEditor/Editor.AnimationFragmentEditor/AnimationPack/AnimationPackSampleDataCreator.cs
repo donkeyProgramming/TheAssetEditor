@@ -7,20 +7,22 @@ using Shared.Core.Services;
 using Shared.GameFormats.AnimationPack;
 using Shared.GameFormats.AnimationPack.AnimPackFileTypes;
 using Shared.GameFormats.AnimationPack.AnimPackFileTypes.Wh3;
+using static Shared.GameFormats.AnimationPack.AnimPackFileTypes.Wh3.AnimationBinEntry;
+using AnimationBinEntry = Shared.GameFormats.AnimationPack.AnimPackFileTypes.Wh3.AnimationBinEntry;
 
-namespace CommonControls.Editors.AnimationPack
+namespace Editors.AnimationFragmentEditor.AnimationPack
 {
     public class AnimationPackSampleDataCreator
     {
         public static PackFile? CreateAnimationDbWarhammer3(IFileSaveService saveHelper, IPackFileService pfs)
         {
-            TextInputWindow window = new TextInputWindow("New AnimPack name", "");
+            var window = new TextInputWindow("New AnimPack name", "");
             if (window.ShowDialog() == true)
                 return CreateAnimationDbWarhammer3(saveHelper, pfs, window.TextValue);
             return null;
         }
 
-        public static string GenerateWh3AnimPackName(string name)
+        static string GenerateWh3AnimPackName(string name)
         {
             var fileName = SaveUtility.EnsureEnding(name, ".animpack");
             var filePath = @"animations/database/battle/bin/" + fileName;
@@ -43,7 +45,7 @@ namespace CommonControls.Editors.AnimationPack
 
         public static void CreateAnimationDb3k(IPackFileService pfs, IFileSaveService saveHelper)
         {
-            TextInputWindow window = new TextInputWindow("New AnimPack name", "");
+            var window = new TextInputWindow("New AnimPack name", "");
             if (window.ShowDialog() == true)
             {
                 var fileName = SaveUtility.EnsureEnding(window.TextValue, ".animpack");
@@ -77,7 +79,7 @@ namespace CommonControls.Editors.AnimationPack
                 UnknownValue1 = 0,
             };
 
-            outputFile.AnimationTableEntries.Add(new Shared.GameFormats.AnimationPack.AnimPackFileTypes.Wh3.AnimationBinEntry()
+            outputFile.AnimationTableEntries.Add(new AnimationBinEntry()
             {
                 AnimationId = 1, // STAND
                 BlendIn = 0.5f,
@@ -85,9 +87,9 @@ namespace CommonControls.Editors.AnimationPack
                 WeaponBools = 1,
                 Unk = false,
 
-                AnimationRefs = new List<Shared.GameFormats.AnimationPack.AnimPackFileTypes.Wh3.AnimationBinEntry.AnimationRef>()
+                AnimationRefs = new List<AnimationRef>()
                 {
-                    new Shared.GameFormats.AnimationPack.AnimPackFileTypes.Wh3.AnimationBinEntry.AnimationRef()
+                    new AnimationRef()
                     {
                         AnimationFile = @"animations/battle/humanoid01/sword_and_shield/stand/hu1_sws_stand_01.anim",
                         AnimationMetaFile = @"",
@@ -96,7 +98,7 @@ namespace CommonControls.Editors.AnimationPack
                 }
             });
 
-            outputFile.AnimationTableEntries.Add(new Shared.GameFormats.AnimationPack.AnimPackFileTypes.Wh3.AnimationBinEntry()
+            outputFile.AnimationTableEntries.Add(new AnimationBinEntry()
             {
                 AnimationId = 453,// Attack_1
                 BlendIn = 0.3f,
@@ -104,15 +106,15 @@ namespace CommonControls.Editors.AnimationPack
                 WeaponBools = 1,
                 Unk = false,
 
-                AnimationRefs = new List<Shared.GameFormats.AnimationPack.AnimPackFileTypes.Wh3.AnimationBinEntry.AnimationRef>()
+                AnimationRefs = new List<AnimationRef>()
                 {
-                    new Shared.GameFormats.AnimationPack.AnimPackFileTypes.Wh3.AnimationBinEntry.AnimationRef()
+                    new AnimationRef()
                     {
                         AnimationFile = @"animations/battle/humanoid01/sword_and_shield/attacks/hu1_sws_attack_01.anim",
                         AnimationMetaFile = @"animations/battle/humanoid01/sword_and_shield/attacks/hu1_sws_attack_01.meta",
                         AnimationSoundMetaFile = @"animations/audio/battle/humanoid01/sword_and_shield/attacks/hu1_sws_attack_01.{27tsfy}.snd.meta",
                     },
-                    new Shared.GameFormats.AnimationPack.AnimPackFileTypes.Wh3.AnimationBinEntry.AnimationRef()
+                    new AnimationRef()
                     {
                           AnimationFile = @"animations/battle/humanoid01/sword_and_shield/attacks/hu1_sws_attack_02.anim",
                         AnimationMetaFile = @"animations/battle/humanoid01/sword_and_shield/attacks/hu1_sws_attack_02.anm.meta",
