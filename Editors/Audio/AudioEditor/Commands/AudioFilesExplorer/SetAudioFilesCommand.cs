@@ -5,7 +5,6 @@ using Editors.Audio.AudioEditor.Presentation.Shared.Models;
 using Editors.Audio.Shared.AudioProject.Compiler;
 using Editors.Audio.Shared.AudioProject.Models;
 using Editors.Audio.Shared.Storage;
-using Editors.Audio.Shared.Wwise;
 using Shared.Core.Events;
 
 namespace Editors.Audio.AudioEditor.Commands.AudioFilesExplorer
@@ -27,7 +26,7 @@ namespace Editors.Audio.AudioEditor.Commands.AudioFilesExplorer
                 if (audioFile == null)
                 {
                     var audioFileIds = IdGenerator.GenerateIds(usedSourceIds);
-                    audioFile = AudioFile.Create(audioFileIds.Guid, audioFileIds.Id, wavFile.FileName, wavFile.FilePath);
+                    audioFile = new AudioFile(audioFileIds.Guid, audioFileIds.Id, wavFile.FileName, wavFile.FilePath);
                 }
                 audioFiles.Add(audioFile);
             }

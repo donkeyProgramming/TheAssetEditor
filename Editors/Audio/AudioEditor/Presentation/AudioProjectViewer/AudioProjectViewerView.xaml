@@ -115,7 +115,8 @@
 
             <DataGrid.RowStyle>
                 <Style 
-                    TargetType="DataGridRow">
+                    TargetType="{x:Type DataGridRow}"
+                    BasedOn="{StaticResource {x:Type DataGridRow}}">
                     <Setter
                         Property="ToolTipService.ShowOnDisabled"
                         Value="True" />

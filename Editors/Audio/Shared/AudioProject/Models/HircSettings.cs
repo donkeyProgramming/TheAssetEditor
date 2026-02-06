@@ -26,15 +26,6 @@ namespace Editors.Audio.Shared.AudioProject.Models
             };
         }
 
-        public static HircSettings CreateSoundSettings()
-        {
-            return new HircSettings
-            {
-                LoopingType = LoopingType.Disabled,
-                NumberOfLoops = 1,
-            };
-        }
-
         public static HircSettings CreateRandomSequenceContainerSettings(HircSettings hircSettings)
         {
             return new HircSettings
@@ -50,6 +41,15 @@ namespace Editors.Audio.Shared.AudioProject.Models
                 NumberOfLoops = hircSettings.NumberOfLoops,
                 TransitionType = hircSettings.TransitionType,
                 TransitionDuration = hircSettings.TransitionDuration
+            };
+        }
+
+        public static HircSettings CreateDefaultSoundSettings()
+        {
+            return new HircSettings
+            {
+                LoopingType = LoopingType.Disabled,
+                NumberOfLoops = 1,
             };
         }
 

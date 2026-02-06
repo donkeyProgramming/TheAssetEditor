@@ -1,27 +1,25 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json.Serialization;
 
 namespace Editors.Audio.Shared.AudioProject.Models
 {
-    public partial class AudioFile : AudioProjectItem
+    public class AudioFile : AudioProjectItem
     {
         public string WavPackFileName { get; set; }
         public string WavPackFilePath { get; set; }
-        public string WemPackFileName { get; set; }
-        public string WemPackFilePath { get; set; }
-        public string WemDiskFilePath { get; set; }
+        [JsonIgnore] public string WemPackFileName { get; set; }
+        [JsonIgnore] public string WemPackFilePath { get; set; }
+        [JsonIgnore] public string WemDiskFilePath { get; set; }
         public List<uint> Sounds { get; set; } = [];
 
-        public static AudioFile Create(Guid guid, uint id, string fileName, string filePath)
+        public AudioFile(Guid guid, uint id, string wavPackFileName, string wavPackFilePath)
         {
-            return new AudioFile
-            {
-                Guid = guid,
-                Id = id,
-                WavPackFileName = fileName,
-                WavPackFilePath = filePath
-            };
+            Guid = guid;
+            Id = id;
+            WavPackFileName = wavPackFileName;
+            WavPackFilePath = wavPackFilePath;
         }
     }
 

@@ -7,13 +7,10 @@ namespace Editors.Audio.Shared.AudioProject.Models
 {
     public class State : AudioProjectItem
     {
-        public static State Create(string name)
+        public State(string name)
         {
-            return new State
-            {
-                Id = name != "Any" ? WwiseHash.Compute(name) : 0,
-                Name = name
-            };
+            Id = name != "Any" ? WwiseHash.Compute(name) : 0;
+            Name = name;
         }
     }
 
@@ -44,6 +41,17 @@ namespace Editors.Audio.Shared.AudioProject.Models
                 index = ~index;
 
             existingStates.Insert(index, state);
+        }
+
+        public static void TryAdd(this List<State> existingStates, State state)
+        {
+            ArgumentNullException.ThrowIfNull(existingStates);
+            ArgumentNullException.ThrowIfNull(state);
+
+            if (existingStates.Any(existingState => StringComparer.OrdinalIgnoreCase.Equals(existingState.Name, state.Name)))
+                throw new ArgumentException($"Cannot add State with Name {state.Name} as it already exists.");
+
+            existingStates.InsertAlphabetically(state);
         }
     }
 }

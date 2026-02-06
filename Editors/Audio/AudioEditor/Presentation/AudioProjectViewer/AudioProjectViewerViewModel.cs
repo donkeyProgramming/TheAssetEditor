@@ -394,7 +394,7 @@ namespace Editors.Audio.AudioEditor.Presentation.AudioProjectViewer
 
         public void ResetTable()
         {
-            Table = new DataTable();
+            Table.Clear();
             DataGridColumns.Clear();
             SelectedRows = [];
         }

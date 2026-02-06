@@ -44,21 +44,21 @@ namespace Editors.Audio.Shared.AudioProject.Factories
             foreach (var kvp in statePathList)
             {
                 var stateGroupName = kvp.Key;
-                var stateGroup = StateGroup.Create(stateGroupName);
+                var stateGroup = StateGroup.CreateForStatePath(stateGroupName);
 
                 var stateName = kvp.Value;
-                var state = State.Create(stateName);
+                var state = new State(stateName);
 
-                var statePathNode = StatePath.Node.Create(stateGroup, state);
+                var statePathNode = new StatePath.Node(stateGroup, state);
                 statePathNodes.Add(statePathNode);
             }
 
             if (audioFiles.Count == 1)
             {
-                var sound = _soundFactory.Create(usedHircIds, usedSourceIds, audioFiles[0], hircSettings, language, directParentId: actorMixerId);
+                var sound = _soundFactory.CreateTargetSound(usedHircIds, usedSourceIds, audioFiles[0], hircSettings, language, directParentId: actorMixerId);
                 statePathFactoryResult.SoundTarget = sound;
 
-                var statePath = StatePath.Create(statePathNodes, sound.Id, AkBkHircType.Sound);
+                var statePath = new StatePath(statePathNodes, sound.Id, AkBkHircType.Sound);
                 statePathFactoryResult.StatePath = statePath;
             }
             else if (audioFiles.Count > 1)
@@ -67,7 +67,7 @@ namespace Editors.Audio.Shared.AudioProject.Factories
                 statePathFactoryResult.RandomSequenceContainerTarget = randomSequenceContainerResult.RandomSequenceContainer;
                 statePathFactoryResult.RandomSequenceContainerSounds.AddRange(randomSequenceContainerResult.RandomSequenceContainerSounds);
 
-                var statePath = StatePath.Create(statePathNodes, statePathFactoryResult.RandomSequenceContainerTarget.Id, AkBkHircType.RandomSequenceContainer);
+                var statePath = new StatePath(statePathNodes, statePathFactoryResult.RandomSequenceContainerTarget.Id, AkBkHircType.RandomSequenceContainer);
                 statePathFactoryResult.StatePath = statePath;
             }
 

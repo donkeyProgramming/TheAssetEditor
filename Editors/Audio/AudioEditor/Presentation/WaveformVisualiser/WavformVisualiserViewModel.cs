@@ -88,7 +88,11 @@ namespace Editors.Audio.AudioEditor.Presentation.WaveformVisualiser
             SetSelectedPlaylist(wavFilePaths);
         }
 
-        public void OnPlayAudioRequested(PlayAudioRequestedEvent e) => PlayPause();
+        public void OnPlayAudioRequested(PlayAudioRequestedEvent e)
+        {
+            SetSelectedPlaylist(e.WavFilePaths);
+            PlayPause();
+        }
 
         public void OnCacheWaveformRequested(CacheWaveformRequestedEvent e)
         {

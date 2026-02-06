@@ -57,11 +57,11 @@ namespace Editors.Audio.Shared.AudioProject.Factories
 
             if (audioFiles.Count == 1)
             {
-                var sound = _soundFactory.Create(usedHircIds, usedSourceIds, audioFiles[0], hircSettings, language, overrideBusId: overrideBusId, directParentId: actorMixerId);
+                var sound = _soundFactory.CreateTargetSound(usedHircIds, usedSourceIds, audioFiles[0], hircSettings, language, overrideBusId: overrideBusId, directParentId: actorMixerId);
                 actionEventFactoryResult.SoundTarget = sound;
 
                 var actionIds = IdGenerator.GenerateIds(usedHircIds);
-                var playAction = Action.Create(actionIds.Id, AkBkHircType.Sound, AkActionType.Play, sound.Id, soundBankId);
+                var playAction = Action.CreatePlay(actionIds.Id, AkBkHircType.Sound, sound.Id, soundBankId);
 
                 actions.Add(playAction);
             }
@@ -72,11 +72,11 @@ namespace Editors.Audio.Shared.AudioProject.Factories
                 actionEventFactoryResult.RandomSequenceContainerSounds.AddRange(randomSequenceContainerResult.RandomSequenceContainerSounds);
 
                 var actionIds = IdGenerator.GenerateIds(usedHircIds);
-                var playAction = Action.Create(actionIds.Id, AkBkHircType.RandomSequenceContainer, AkActionType.Play, actionEventFactoryResult.RandomSequenceContainerTarget.Id, soundBankId);
+                var playAction = Action.CreatePlay(actionIds.Id, AkBkHircType.RandomSequenceContainer, actionEventFactoryResult.RandomSequenceContainerTarget.Id, soundBankId);
                 actions.Add(playAction);
             }
 
-            var actionEvent = ActionEvent.Create(actionEventId, actionEventName, actions, actionEventType);
+            var actionEvent = new ActionEvent(actionEventId, actionEventName, actions, actionEventType);
             actionEventFactoryResult.ActionEvent = actionEvent;
             actionEventFactoryResult.Actions = actions;
             return actionEventFactoryResult;
@@ -84,83 +84,41 @@ namespace Editors.Audio.Shared.AudioProject.Factories
 
         public ActionEventFactoryResult CreatePauseActionEvent(HashSet<uint> usedHircIds, ActionEvent playActionEvent)
         {
-            var pauseActions = new List<Action>();
-
-            var playActions = playActionEvent.GetPlayActions();
-            foreach (var playAction in playActions)
-            {
-                if (playAction.TargetHircTypeIsSound())
-                {
-                    var actionIds = IdGenerator.GenerateIds(usedHircIds);
-                    var pauseAction = Action.Create(actionIds.Id, playAction.TargetHircType, AkActionType.Pause_E_O, playAction.IdExt, playAction.BankId);
-                    pauseActions.Add(pauseAction);
-                }
-                else if (playAction.TargetHircTypeIsRandomSequenceContainer())
-                {
-                    var actionIds = IdGenerator.GenerateIds(usedHircIds);
-                    var pauseAction = Action.Create(actionIds.Id, playAction.TargetHircType, AkActionType.Pause_E_O, playAction.IdExt, playAction.BankId);
-                    pauseActions.Add(pauseAction);
-                }
-            }
-
-            var pauseActionEventName = string.Concat("Pause_", playActionEvent.Name.AsSpan("Play_".Length));
-            var actionEventId = IdGenerator.GenerateActionEventId(usedHircIds, pauseActionEventName);
-            var actionEvent = ActionEvent.Create(actionEventId, pauseActionEventName, pauseActions, playActionEvent.ActionEventType);
-            return new ActionEventFactoryResult { ActionEvent = actionEvent };
+            return CreateActionEventFromSource(usedHircIds, playActionEvent, "Pause_", Action.CreatePauseFromSource);
         }
-
 
         public ActionEventFactoryResult CreateResumeActionEvent(HashSet<uint> usedHircIds, ActionEvent playActionEvent)
         {
-            var resumeActions = new List<Action>();
-
-            var playActions = playActionEvent.GetPlayActions();
-            foreach (var playAction in playActions)
-            {
-                if (playAction.TargetHircTypeIsSound())
-                {
-                    var actionIds = IdGenerator.GenerateIds(usedHircIds);
-                    var resumeAction = Action.Create(actionIds.Id, playAction.TargetHircType, AkActionType.Resume_E_O, playAction.IdExt, playAction.BankId);
-                    resumeActions.Add(resumeAction);
-                }
-                else if (playAction.TargetHircTypeIsRandomSequenceContainer())
-                {
-                    var actionIds = IdGenerator.GenerateIds(usedHircIds);
-                    var resumeAction = Action.Create(actionIds.Id, playAction.TargetHircType, AkActionType.Resume_E_O, playAction.IdExt, playAction.BankId);
-                    resumeActions.Add(resumeAction);
-                }
-            }
-
-            var resumeActionEventName = string.Concat("Resume_", playActionEvent.Name.AsSpan("Play_".Length));
-            var actionEventId = IdGenerator.GenerateActionEventId(usedHircIds, resumeActionEventName);
-            var actionEvent = ActionEvent.Create(actionEventId, resumeActionEventName, resumeActions, playActionEvent.ActionEventType);
-            return new ActionEventFactoryResult { ActionEvent = actionEvent };
+            return CreateActionEventFromSource(usedHircIds, playActionEvent, "Resume_", Action.CreateResumeFromSource);
         }
 
         public ActionEventFactoryResult CreateStopActionEvent(HashSet<uint> usedHircIds, ActionEvent playActionEvent)
         {
-            var stopActions = new List<Action>();
+            return CreateActionEventFromSource(usedHircIds, playActionEvent, "Stop_", Action.CreateStopFromSource);
+        }
 
+        private static ActionEventFactoryResult CreateActionEventFromSource(
+            HashSet<uint> usedHircIds,
+            ActionEvent playActionEvent,
+            string namePrefix,
+            Func<uint, Action, Action> createAction)
+        {
+            var actions = new List<Action>();
             var playActions = playActionEvent.GetPlayActions();
+
             foreach (var playAction in playActions)
             {
-                if (playAction.TargetHircTypeIsSound())
+                if (playAction.TargetHircTypeIsSound() || playAction.TargetHircTypeIsRandomSequenceContainer())
                 {
                     var actionIds = IdGenerator.GenerateIds(usedHircIds);
-                    var stopAction = Action.Create(actionIds.Id, playAction.TargetHircType, AkActionType.Stop_E_O, playAction.IdExt, playAction.BankId);
-                    stopActions.Add(stopAction);
-                }
-                else if (playAction.TargetHircTypeIsRandomSequenceContainer())
-                {
-                    var actionIds = IdGenerator.GenerateIds(usedHircIds);
-                    var stopAction = Action.Create(actionIds.Id, playAction.TargetHircType, AkActionType.Stop_E_O, playAction.IdExt, playAction.BankId);
-                    stopActions.Add(stopAction);
+                    var action = createAction(actionIds.Id, playAction);
+                    actions.Add(action);
                 }
             }
 
-            var stopActionEventName = string.Concat("Stop_", playActionEvent.Name.AsSpan("Play_".Length));
-            var actionEventId = IdGenerator.GenerateActionEventId(usedHircIds, stopActionEventName);
-            var actionEvent = ActionEvent.Create(actionEventId,stopActionEventName, stopActions, playActionEvent.ActionEventType);
+            var actionEventName = string.Concat(namePrefix, playActionEvent.Name.AsSpan("Play_".Length));
+            var actionEventId = IdGenerator.GenerateActionEventId(usedHircIds, actionEventName);
+            var actionEvent = new ActionEvent(actionEventId, actionEventName, actions, playActionEvent.ActionEventType);
             return new ActionEventFactoryResult { ActionEvent = actionEvent };
         }
     }

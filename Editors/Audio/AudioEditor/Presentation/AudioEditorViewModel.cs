@@ -12,7 +12,6 @@ using Editors.Audio.AudioEditor.Presentation.AudioProjectViewer;
 using Editors.Audio.AudioEditor.Presentation.Settings;
 using Editors.Audio.AudioEditor.Presentation.WaveformVisualiser;
 using Editors.Audio.Shared.AudioProject.Compiler;
-using Editors.Audio.Shared.AudioProject.Models;
 using Shared.Core.Events;
 using Shared.Core.ToolCreation;
 
@@ -98,7 +97,7 @@ namespace Editors.Audio.AudioEditor.Presentation
         [RelayCommand] public void CompileAudioProject()
         {
             SaveAudioProject();
-            var cleanAudioProject = AudioProjectFile.Clean(_audioEditorStateService.AudioProject);
+            var cleanAudioProject = _audioEditorStateService.AudioProject.Clean();
             var fileName = _audioEditorStateService.AudioProjectFileName;
             var filePath = _audioEditorStateService.AudioProjectFilePath;
             _audioProjectCompilerService.Compile(cleanAudioProject, fileName, filePath);

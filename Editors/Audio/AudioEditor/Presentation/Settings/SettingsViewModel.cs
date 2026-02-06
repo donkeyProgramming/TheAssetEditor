@@ -162,7 +162,7 @@ namespace Editors.Audio.AudioEditor.Presentation.Settings
                 if (audioFile == null)
                 {
                     var audioFileIds = IdGenerator.GenerateIds(usedSourceIds);
-                    audioFile = AudioFile.Create(audioFileIds.Guid, audioFileIds.Id, node.FileName, node.FilePath);
+                    audioFile = new AudioFile(audioFileIds.Guid, audioFileIds.Id, node.FileName, node.FilePath);
                 }
                 audioFiles.Add(audioFile);
             }
@@ -454,10 +454,8 @@ namespace Editors.Audio.AudioEditor.Presentation.Settings
                     NumberOfLoops = hircSettings.NumberOfLoops;
             }
         }
-
         private void GetActionEventSettings(ref HircSettings hircSettings, ref List<AudioFile> audioFiles)
         {
-            var audioProject = _audioEditorStateService.AudioProject;
             var selectedViewerRow = _audioEditorStateService.SelectedViewerRows[0];
             var soundBankName = _audioEditorStateService.SelectedAudioProjectExplorerNode.GetParentSoundBankNode().Name;
             var soundBank = _audioEditorStateService.AudioProject.GetSoundBank(soundBankName);
