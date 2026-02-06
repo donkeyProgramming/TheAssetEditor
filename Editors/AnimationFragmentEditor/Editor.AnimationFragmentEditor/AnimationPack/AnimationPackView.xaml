@@ -23,12 +23,12 @@
         <DockPanel Grid.Column="0" Grid.ColumnSpan="3" Grid.Row="0">
             <Menu DockPanel.Dock="Top">
                 <MenuItem Header="_File">
-                    <MenuItem Header="Save" Click="{s:MethodBinding Save}"/>
+                    <MenuItem Header="Save" Command="{Binding Save}"/>
                     <Separator/>
-                    <MenuItem Header="New AnimationSet (Wh3/3K)"  Click="{s:MethodBinding CreateEmptyWarhammer3AnimSetFile}" />
+                    <MenuItem Header="New AnimationSet (Wh3/3K)"  Command="{Binding CreateEmptyWarhammer3AnimSetFileActionCommand}" />
                     <Separator/>
-                    <MenuItem Header="Export animation slots (Wh3)"  Click="{s:MethodBinding ExportAnimationSlotsWh3Action}" />
-                    <MenuItem Header="Export animation slots (Wh2)"  Click="{s:MethodBinding ExportAnimationSlotsWh2Action}" />
+                    <MenuItem Header="Export animation slots (Wh3)"  Command="{Binding ExportAnimationSlotsWh3ActionCommand}" />
+                    <MenuItem Header="Export animation slots (Wh2)"  Command="{Binding ExportAnimationSlotsWh2ActionCommand}" />
                 </MenuItem>
             </Menu>
         </DockPanel>
@@ -70,9 +70,9 @@
 
                 <ListView.ContextMenu>
                     <ContextMenu>
-                        <MenuItem Header="Rename" Command="{Binding RenameCommand}" />
-                        <MenuItem Header="Remove" Command="{Binding RemoveCommand}"/>
-                        <MenuItem Header="Copy Full Path" Command="{Binding CopyFullPathCommand}"/>
+                        <MenuItem Header="Rename" Command="{Binding RenameActionCommand}" />
+                        <MenuItem Header="Remove" Command="{Binding RemoveActionCommand}"/>
+                        <MenuItem Header="Copy Full Path" Command="{Binding CopyFullPathActionCommand}"/>
                     </ContextMenu>
                 </ListView.ContextMenu>
 

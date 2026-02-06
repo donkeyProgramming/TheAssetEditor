@@ -6,7 +6,7 @@ using System.Linq;
 using AssetEditor.UiCommands;
 using CommonControls.BaseDialogs;
 using CommunityToolkit.Mvvm.Input;
-using Editors.AnimationFragmentEditor.AnimationPack;
+using Editors.AnimationFragmentEditor.AnimationPack.Commands;
 using Editors.Reports.Animation;
 using Editors.Reports.Audio;
 using Editors.Reports.DeepSearch;
@@ -79,9 +79,9 @@ namespace AssetEditor.ViewModels
                 _packfileService.SetEditablePack(newPackFile);
             }
         }
-
-        [RelayCommand] private void CreateAnimPackWarhammer3() => AnimationPackSampleDataCreator.CreateAnimationDbWarhammer3(_packFileSaveService, _packfileService);
-        [RelayCommand] private void CreateAnimPack3k() => AnimationPackSampleDataCreator.CreateAnimationDb3k(_packfileService, _packFileSaveService);
+        
+        [RelayCommand] private void CreateAnimPackWarhammer3() => _uiCommandFactory.Create<CreateExampleAnimationDbCommand>().CreateAnimationDbWarhammer3();
+        [RelayCommand] private void CreateAnimPack3k() => _uiCommandFactory.Create<CreateExampleAnimationDbCommand>().CreateAnimationDb3k();
         [RelayCommand] private void SaveActivePack() => _uiCommandFactory.Create<SavePackFileContainerCommand>().Execute();
         [RelayCommand] private void OpenWh2AnimpackUpdater() => new AnimPackUpdaterService(_packfileService).Process();
         [RelayCommand] private void GenerateRmv2Report() => _uiCommandFactory.Create<Rmv2ReportCommand>().Execute();

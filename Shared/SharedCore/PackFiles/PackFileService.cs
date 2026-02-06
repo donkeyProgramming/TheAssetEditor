@@ -278,7 +278,7 @@ namespace Shared.Core.PackFiles
             using (var memoryStream = new FileStream(path + "_temp", FileMode.Create))
             {
                 using var writer = new BinaryWriter(memoryStream);
-                PackFileSerializerWriter.SaveToByteArray(pf, writer, gameInformation);
+                PackFileSerializerWriter.SaveToByteArray(path, pf, writer, gameInformation);
             }
 
             File.Delete(path);

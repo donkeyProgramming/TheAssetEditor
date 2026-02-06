@@ -1,4 +1,5 @@
-﻿using GameWorld.Core.Services;
+﻿using Editors.Shared.Core.Editors.TextEditor;
+using GameWorld.Core.Services;
 using Shared.Core.PackFiles;
 using Shared.Core.Settings;
 using Shared.GameFormats.AnimationPack;

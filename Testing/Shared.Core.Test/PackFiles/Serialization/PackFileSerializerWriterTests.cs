@@ -52,6 +52,7 @@ namespace Test.Shared.Core.PackFiles.Serialization
             };
 
             // Create packfile with the above files
+            var outputContainerName = @"c:\fullpath\to\packfile.pack";
             var packFileHeader = PackFileVersionConverter.ToString(outputPackFileVersion);
             var container = new PackFileContainer("test")
             {
@@ -64,25 +65,35 @@ namespace Test.Shared.Core.PackFiles.Serialization
 
             using var writeMs = new MemoryStream();
             using var writer = new BinaryWriter(writeMs);
-            PackFileSerializerWriter.SaveToByteArray(container, writer, gameInfo);
+            PackFileSerializerWriter.SaveToByteArray(outputContainerName, container, writer, gameInfo);
             var data = writeMs.ToArray();
 
+            // Asser that the internal file references have been updated
+            foreach (var fileInfo in expectedFileInfo)
+            {
+                var dataSourceInstance = container.FileList[fileInfo.FilePath].DataSource as PackedFileSource;
+                Assert.That(dataSourceInstance, Is.Not.Null);
+                Assert.That(dataSourceInstance.Parent.FilePath, Is.EqualTo(outputContainerName));
+            }
 
-            //  Assert
+            //  Load the file and assert
             using var readBackMs = new MemoryStream(data);
             var reader = new BinaryReader(readBackMs);
-            var loadedPackFile = PackFileSerializerLoader.Load("testpackfile.pack", data.LongLength, reader, new CaPackDuplicateFileResolver());
+            var loadedPackFile = PackFileSerializerLoader.Load(outputContainerName, data.LongLength, reader, new CaPackDuplicateFileResolver());
 
-            for (int i = 0; i < expectedFileInfo.Count; i++)
+            for (var i = 0; i < expectedFileInfo.Count; i++)
             {
                 var expectedFileInfoInstance = expectedFileInfo[i];
                 var packFile = loadedPackFile.FileList[expectedFileInfoInstance.FilePath.ToLower()];
 
                 // Bypass the filesystem lookup and go directly to stream
                 var packFileConentet = (packFile.DataSource as PackedFileSource).ReadData(readBackMs);
-                //
-                //
-                //// Assert content is correct
+                var parentName = (packFile.DataSource as PackedFileSource).Parent.FilePath;
+
+                // Assert that parent file has been updated correctly
+                Assert.That(parentName.ToLower(), Is.EqualTo(outputContainerName.ToLower()));
+
+                // Assert content is correct
                 Assert.That(packFileConentet.Length, Is.EqualTo(expectedFileInfoInstance.Length));
                 Assert.That(packFileConentet, Is.EqualTo(new string(expectedFileInfoInstance.Content, expectedFileInfoInstance.Length)));
 

@@ -6,7 +6,7 @@ using Shared.Core.ErrorHandling.Exceptions;
 using Shared.Core.PackFiles;
 using Shared.Ui.Editors.TextEditor;
 
-namespace Editors.AnimationFragmentEditor.AnimationPack.Converters
+namespace Editors.Shared.Core.Editors.TextEditor
 {
     public abstract class XmlToBinaryConverter<XmlType, BinaryType> : ITextConverter
         where BinaryType : class

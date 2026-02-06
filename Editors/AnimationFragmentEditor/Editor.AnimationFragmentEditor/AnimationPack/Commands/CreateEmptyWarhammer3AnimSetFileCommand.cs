@@ -1,69 +1,40 @@
-﻿using System.Windows;
-using CommonControls.BaseDialogs;
+﻿using CommonControls.BaseDialogs;
+using CommonControls.Editors.AnimationPack;
+using Shared.Core.Events;
 using Shared.Core.Misc;
-using Shared.Core.PackFiles;
-using Shared.Core.PackFiles.Models;
-using Shared.Core.Services;
-using Shared.GameFormats.AnimationPack;
 using Shared.GameFormats.AnimationPack.AnimPackFileTypes;
 using Shared.GameFormats.AnimationPack.AnimPackFileTypes.Wh3;
 using static Shared.GameFormats.AnimationPack.AnimPackFileTypes.Wh3.AnimationBinEntry;
 using AnimationBinEntry = Shared.GameFormats.AnimationPack.AnimPackFileTypes.Wh3.AnimationBinEntry;
 
-namespace Editors.AnimationFragmentEditor.AnimationPack
+namespace Editors.AnimationFragmentEditor.AnimationPack.Commands
 {
-    public class AnimationPackSampleDataCreator
+    public class CreateEmptyWarhammer3AnimSetFileCommand : IUiCommand
     {
-        public static PackFile? CreateAnimationDbWarhammer3(IFileSaveService saveHelper, IPackFileService pfs)
+        public void Execute(AnimPackViewModel editor)
         {
-            var window = new TextInputWindow("New AnimPack name", "");
+            var fileName = GetAnimSetFileName();
+            if (fileName == null)
+                return;
+
+            var animSet = CreateExampleWarhammer3AnimSet(fileName);
+            editor.AnimationPackItems.PossibleValues.Add(animSet);
+            editor.AnimationPackItems.UpdatePossibleValues(editor.AnimationPackItems.PossibleValues);
+        }
+
+        string? GetAnimSetFileName()
+        {
+            var window = new TextInputWindow("Fragment name", "");
             if (window.ShowDialog() == true)
-                return CreateAnimationDbWarhammer3(saveHelper, pfs, window.TextValue);
+            {
+                var filename = SaveUtility.EnsureEnding(window.TextValue, ".frg");
+                return filename;
+            }
+
             return null;
         }
 
-        static string GenerateWh3AnimPackName(string name)
-        {
-            var fileName = SaveUtility.EnsureEnding(name, ".animpack");
-            var filePath = @"animations/database/battle/bin/" + fileName;
-            return filePath;
-        }
-
-        public static PackFile? CreateAnimationDbWarhammer3(IFileSaveService saveHelper, IPackFileService pfs, string name)
-        {
-            var filePath = GenerateWh3AnimPackName(name);
-
-            if (!SaveUtility.IsFilenameUnique(pfs, filePath))
-            {
-                MessageBox.Show("Filename is not unique");
-                return null;
-            }
-
-            var animPack = new AnimationPackFile("Placeholder");
-            return saveHelper.Save(filePath, AnimationPackSerializer.ConvertToBytes(animPack), false);
-        }
-
-        public static void CreateAnimationDb3k(IPackFileService pfs, IFileSaveService saveHelper)
-        {
-            var window = new TextInputWindow("New AnimPack name", "");
-            if (window.ShowDialog() == true)
-            {
-                var fileName = SaveUtility.EnsureEnding(window.TextValue, ".animpack");
-                var filePath = @"animations/database/battle/bin/" + fileName;
-                if (!SaveUtility.IsFilenameUnique(pfs, filePath))
-                {
-                    MessageBox.Show("Filename is not unique");
-                    return;
-                }
-
-                // Create dummy data
-                var animPack = new AnimationPackFile("Placeholder");
-                saveHelper.Save(filePath, AnimationPackSerializer.ConvertToBytes(animPack), false);
-            }
-        }
-
-
-        public static IAnimationPackFile CreateExampleWarhammer3AnimSet(string binName)
+        static IAnimationPackFile CreateExampleWarhammer3AnimSet(string binName)
         {
             var filename = SaveUtility.EnsureEnding(binName, ".bin");
             var filePath = @"animations/database/battle/bin/" + filename;
@@ -125,5 +96,7 @@ namespace Editors.AnimationFragmentEditor.AnimationPack
 
             return outputFile;
         }
+
     }
+
 }

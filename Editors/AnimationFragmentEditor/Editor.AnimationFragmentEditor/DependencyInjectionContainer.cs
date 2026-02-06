@@ -2,6 +2,7 @@
 using CommonControls.Editors.AnimationPack;
 using CommonControls.Editors.TextEditor;
 using Editors.AnimationFragmentEditor.AnimationFilePreviewEditor;
+using Editors.AnimationFragmentEditor.AnimationPack.Commands;
 using Editors.AnimationFragmentEditor.CampaignAnimBin;
 using Microsoft.Extensions.DependencyInjection;
 using Shared.Core.DependencyInjection;
@@ -19,6 +20,12 @@ namespace Editors.AnimationFragmentEditor
 
         public override void Register(IServiceCollection services)
         {
+            services.AddTransient<CreateEmptyWarhammer3AnimSetFileCommand>();
+            services.AddTransient<CreateExampleAnimationDbCommand>();
+            services.AddTransient<ExportAnimationSlotCommand>();
+            services.AddTransient<RemoveSelectedFileCommand>();
+            services.AddTransient<RenameSelectedFileCommand>();
+
             RegisterAnimPack(services);
             RegisterCampaignAnimBin(services);
             RegisterAnimFileViewer(services);

@@ -1,4 +1,5 @@
-﻿using Shared.Core.PackFiles;
+﻿using Editors.Shared.Core.Editors.TextEditor;
+using Shared.Core.PackFiles;
 using Shared.GameFormats.AnimationPack.AnimPackFileTypes;
 using Shared.Ui.Editors.TextEditor;
 

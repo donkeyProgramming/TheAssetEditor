@@ -1,14 +1,11 @@
-﻿using System.IO;
-using System.Text;
-using System.Windows;
-using System.Windows.Input;
-using CommonControls.BaseDialogs;
+﻿using System.Windows;
 using CommunityToolkit.Mvvm.Input;
-using Editors.AnimationFragmentEditor.AnimationPack;
+using Editors.AnimationFragmentEditor.AnimationPack.Commands;
 using Editors.AnimationFragmentEditor.AnimationPack.Converters.AnimationBinConverter;
 using Editors.AnimationFragmentEditor.AnimationPack.Converters.AnimationBinWh3Converter;
 using Editors.AnimationFragmentEditor.AnimationPack.Converters.AnimationFragmentConverter;
 using GameWorld.Core.Services;
+using Shared.Core.Events;
 using Shared.Core.Misc;
 using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
@@ -24,11 +21,12 @@ using Shared.Ui.Editors.TextEditor;
 
 namespace CommonControls.Editors.AnimationPack
 {
-    public class AnimPackViewModel : NotifyPropertyChangedImpl, IEditorInterface, ISaveableEditor, IFileEditor
+    public partial class AnimPackViewModel : NotifyPropertyChangedImpl, IEditorInterface, ISaveableEditor, IFileEditor
     {
+        private readonly IUiCommandFactory _uiCommandFactory;
         private readonly IPackFileService _pfs;
         private readonly ISkeletonAnimationLookUpHelper _skeletonAnimationLookUpHelper;
-        private ITextConverter _activeConverter;
+        private ITextConverter? _activeConverter;
         private readonly ApplicationSettingsService _appSettings;
         private readonly IFileSaveService _packFileSaveService;
         private readonly MetaDataTagDeSerializer _metaDataTagDeSerializer;
@@ -42,92 +40,28 @@ namespace CommonControls.Editors.AnimationPack
         SimpleTextEditorViewModel _selectedItemViewModel;
         public SimpleTextEditorViewModel SelectedItemViewModel { get => _selectedItemViewModel; set => SetAndNotify(ref _selectedItemViewModel, value); }
 
-
-        public ICommand RemoveCommand { get; set; }
-        public ICommand RenameCommand { get; set; }
-        public ICommand CopyFullPathCommand { get; set; }
-
-        public AnimPackViewModel(IPackFileService pfs, ISkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper, ApplicationSettingsService appSettings, IFileSaveService packFileSaveService, MetaDataTagDeSerializer metaDataTagDeSerializer)
+        public AnimPackViewModel(IUiCommandFactory uiCommandFactory, IPackFileService pfs, ISkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper, ApplicationSettingsService appSettings, IFileSaveService packFileSaveService, MetaDataTagDeSerializer metaDataTagDeSerializer)
         {
+            _uiCommandFactory = uiCommandFactory;
             _pfs = pfs;
             _skeletonAnimationLookUpHelper = skeletonAnimationLookUpHelper;
             _appSettings = appSettings;
             _packFileSaveService = packFileSaveService;
             _metaDataTagDeSerializer = metaDataTagDeSerializer;
 
-            AnimationPackItems = new FilterCollection<IAnimationPackFile>(new List<IAnimationPackFile>(), ItemSelected, BeforeItemSelected)
+            AnimationPackItems = new FilterCollection<IAnimationPackFile>(new List<IAnimationPackFile>(), OnItemSelected, BeforeItemSelected)
             {
                 SearchFilter = (value, rx) => { return rx.Match(value.FileName).Success; }
             };
-
-            RemoveCommand = new RelayCommand(Remove);
-            RenameCommand = new RelayCommand(Rename);
-            CopyFullPathCommand = new RelayCommand(CopyFullPath);
         }
 
-        private void Rename()
-        {
-            var animFile = AnimationPackItems.PossibleValues.FirstOrDefault(file => file == AnimationPackItems.SelectedItem);
-            if (animFile == null)
-                return;
-
-            var window = new TextInputWindow("Rename Anim File", animFile.FileName);
-            if (window.ShowDialog() == true)
-                animFile.FileName = window.TextValue;
-
-            // way to refresh the view
-            AnimationPackItems.RefreshFilter();
-        }
-
-        private void Remove()
-        {
-            AnimationPackItems.PossibleValues.Remove(AnimationPackItems.SelectedItem);
-
-            // way to refresh the view
-            AnimationPackItems.RefreshFilter();
-        }
-
-        private void CopyFullPath()
-        {
-            Clipboard.SetText(AnimationPackItems.SelectedItem.FileName);
-        }
-
-        public void Load()
-        {
-            var animPack = AnimationPackSerializer.Load(_packFile, _pfs);
-            var itemNames = animPack.Files.ToList();
-            AnimationPackItems.UpdatePossibleValues(itemNames);
-            DisplayName = animPack.FileName;
-        }
-
-        string? GetAnimSetFileName()
-        {
-            var window = new TextInputWindow("Fragment name", "");
-            if (window.ShowDialog() == true)
-            {
-                var filename = SaveUtility.EnsureEnding(window.TextValue, ".frg");
-                return filename;
-            }
-
-            return null;
-        }
-
-        public void CreateEmptyWarhammer3AnimSetFile()
-        {
-            var fileName = GetAnimSetFileName();
-            if (fileName == null)
-                return;
-
-            var animSet = AnimationPackSampleDataCreator.CreateExampleWarhammer3AnimSet(fileName);
-            AnimationPackItems.PossibleValues.Add(animSet);
-            AnimationPackItems.UpdatePossibleValues(AnimationPackItems.PossibleValues);
-        }
-
-        public void SetSelectedFile(string path)
-        {
-            AnimationPackItems.SelectedItem = AnimationPackItems.PossibleValues.FirstOrDefault(x => x.FileName == path);
-        }
-
+        [RelayCommand] private void RenameAction() => _uiCommandFactory.Create<RenameSelectedFileCommand>().Execute(this);
+        [RelayCommand] private void RemoveAction() => _uiCommandFactory.Create<RemoveSelectedFileCommand>().Execute(this);
+        [RelayCommand] private void CopyFullPathAction() => Clipboard.SetText(AnimationPackItems.SelectedItem.FileName);
+        [RelayCommand] private void CreateEmptyWarhammer3AnimSetFileAction() => _uiCommandFactory.Create<CreateEmptyWarhammer3AnimSetFileCommand>().Execute(this);
+        [RelayCommand] private void ExportAnimationSlotsWh3Action() => _uiCommandFactory.Create<ExportAnimationSlotCommand>().Warhammer3();
+        [RelayCommand] private void ExportAnimationSlotsWh2Action() => _uiCommandFactory.Create<ExportAnimationSlotCommand>().Warhammer2();
+ 
         bool BeforeItemSelected(IAnimationPackFile item)
         {
             if (SelectedItemViewModel != null && SelectedItemViewModel.HasUnsavedChanges())
@@ -139,7 +73,7 @@ namespace CommonControls.Editors.AnimationPack
             return true;
         }
 
-        void ItemSelected(IAnimationPackFile seletedFile)
+        void OnItemSelected(IAnimationPackFile seletedFile)
         {
             _activeConverter = null;
             if (seletedFile is AnimationFragmentFile typedFragment)
@@ -197,8 +131,7 @@ namespace CommonControls.Editors.AnimationPack
             seletedFile.IsChanged.Value = true;
 
             SelectedItemViewModel.ResetChangeLog();
-            HasUnsavedChanges = false;
-
+            HasUnsavedChanges = true;
 
             return true;
         }
@@ -236,39 +169,14 @@ namespace CommonControls.Editors.AnimationPack
             return true;
         }
 
-      
-
-        public void ExportAnimationSlotsWh3Action()
-        {
-            var slots = AnimationSlotTypeHelperWh3.Values.Select(x => x.Id + "\t\t" + x.Value).ToList();
-            SaveAnimationSlotsToFile(slots);
-        }
-
-        public void ExportAnimationSlotsWh2Action()
-        {
-            var slots = DefaultAnimationSlotTypeHelper.Values.Select(x => x.Id + "\t\t" + x.Value).ToList();
-            SaveAnimationSlotsToFile(slots);
-        }
-
-        void SaveAnimationSlotsToFile(List<string> slots)
-        {
-            using var dlg = new System.Windows.Forms.SaveFileDialog();
-            dlg.Filter = "Text files(*.txt) | *.txt | All files(*.*) | *.* ";
-            if (dlg.ShowDialog() != System.Windows.Forms.DialogResult.OK)
-                return;
-            string path = dlg.FileName;
-
-            StringBuilder sb = new StringBuilder();
-            foreach (var slot in slots)
-                sb.AppendLine(slot);
-
-            File.WriteAllText(path, sb.ToString());
-        }
 
         public void LoadFile(PackFile file)
         {
             _packFile = file;
-            Load();
+            var animPack = AnimationPackSerializer.Load(_packFile, _pfs);
+            var itemNames = animPack.Files.ToList();
+            AnimationPackItems.UpdatePossibleValues(itemNames);
+            DisplayName = animPack.FileName;
         }
     }
 }

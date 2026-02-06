@@ -65,7 +65,7 @@ namespace Editors.Reports.Animation
             var animPack = packFileContainer[0].FileList["animations\\database\\battle\\bin\\animation_tables.animpack"];
             var animPackFile = AnimationPackSerializer.Load(animPack, _pfs);
 
-            var converter = new AnimationBinWh3FileToXmlConverter(null, _metaDataTagDeSerializer);
+            var converter = new AnimationBinWh3FileToXmlConverter(null, _metaDataTagDeSerializer, null);
             foreach (var animFile in animPackFile.Files)
             {
                 if (animFile is AnimationBinWh3)
