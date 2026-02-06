@@ -1,4 +1,5 @@
 ﻿using Shared.ByteParsing;
+using Shared.Core.PackFiles.Utility;
 
 namespace Shared.Core.PackFiles.Models
 {
@@ -24,18 +25,13 @@ namespace Shared.Core.PackFiles.Models
             var output = new byte[size];
             Array.Copy(_data, 0, output, 0, size);
             return output;
-
         }
 
-        public static MemorySource FromFile(string path)
-        {
-            return new MemorySource(File.ReadAllBytes(path));
-        }
+        public ByteChunk ReadDataAsChunk() => new ByteChunk(ReadData());
 
-        public ByteChunk ReadDataAsChunk()
-        {
-            return new ByteChunk(ReadData());
-        }
+        public CompressionFormat CompressionFormat { get => CompressionFormat.None; }
+
+        public static MemorySource FromFile(string path) => new MemorySource(File.ReadAllBytes(path));
     }
 
 

@@ -1,7 +1,10 @@
 ﻿using Shared.ByteParsing;
+using Shared.Core.PackFiles.Utility;
 
 namespace Shared.Core.PackFiles.Models
 {
+
+    // This should only be used for unit tests - move to test project later
     public class FileSystemSource : IDataSource
     {
         public long Size { get; private set; } = 0;
@@ -20,10 +23,7 @@ namespace Shared.Core.PackFiles.Models
         }
         
 
-        public byte[] ReadData()
-        {
-            return File.ReadAllBytes(_filepath);
-        }
+        public byte[] ReadData() => File.ReadAllBytes(_filepath);
 
         public byte[] PeekData(int size)
         {
@@ -35,10 +35,9 @@ namespace Shared.Core.PackFiles.Models
             }
         }
 
-        public ByteChunk ReadDataAsChunk()
-        {
-            return new ByteChunk(ReadData());
-        }
+        public ByteChunk ReadDataAsChunk() => new ByteChunk(ReadData());
+
+        public CompressionFormat CompressionFormat { get => CompressionFormat.None; }
     }
 
 

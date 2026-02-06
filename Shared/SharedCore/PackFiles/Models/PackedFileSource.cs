@@ -38,13 +38,15 @@ namespace Shared.Core.PackFiles.Models
 
         public byte[] ReadData()
         {
-            var data = new byte[Size];
+            using var stream = File.Open(Parent.FilePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+            return ReadData(stream);
+        }
 
-            using (var stream = File.Open(Parent.FilePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
-            {
-                stream.Seek(Offset, SeekOrigin.Begin);
-                stream.ReadExactly(data);
-            }
+        public byte[] ReadData(Stream knownStream)
+        {
+            var data = new byte[Size];
+            knownStream.Seek(Offset, SeekOrigin.Begin);
+            knownStream.ReadExactly(data, 0, (int)Size);
 
             if (IsEncrypted)
                 data = FileEncryption.Decrypt(data);
@@ -58,6 +60,7 @@ namespace Shared.Core.PackFiles.Models
 
             return data;
         }
+
 
         public byte[] PeekData(int size)
         {
@@ -92,24 +95,7 @@ namespace Shared.Core.PackFiles.Models
             return data;
         }
 
-        public byte[] ReadData(Stream knownStream)
-        {
-            var data = new byte[Size];
-            knownStream.Seek(Offset, SeekOrigin.Begin);
-            knownStream.ReadExactly(data, 0, (int)Size);
-
-            if (IsEncrypted)
-                data = FileEncryption.Decrypt(data);
-
-            if (IsCompressed)
-            {
-                data = FileCompression.Decompress(data, (int)UncompressedSize, CompressionFormat);
-                if (data.Length != UncompressedSize)
-                    throw new InvalidDataException($"Decompressed bytes {data.Length:N0} does not match the expected uncompressed bytes {UncompressedSize:N0}.");
-            }
-
-            return data;
-        }
+       
 
         public byte[] ReadDataWithoutDecompressing()
         {
