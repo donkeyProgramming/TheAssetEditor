@@ -46,7 +46,7 @@ namespace Editors.AnimationFragmentEditor.AnimationPack.Commands
                 return null;
             }
 
-            var animPack = new AnimationPackFile("Placeholder");
+            var animPack = new AnimationPackFileDatabase("Placeholder");
             return _saveHelper.Save(filePath, AnimationPackSerializer.ConvertToBytes(animPack), false);
         }
 
@@ -64,7 +64,7 @@ namespace Editors.AnimationFragmentEditor.AnimationPack.Commands
                 }
 
                 // Create dummy data
-                var animPack = new AnimationPackFile("Placeholder");
+                var animPack = new AnimationPackFileDatabase("Placeholder");
                 _saveHelper.Save(filePath, AnimationPackSerializer.ConvertToBytes(animPack), false);
             }
         }

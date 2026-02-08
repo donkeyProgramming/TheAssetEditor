@@ -30,7 +30,7 @@ namespace Editors.AnimationVisualEditors.MountAnimationCreator.Services
         IAnimationBinGenericFormat _riderFragment;
 
         uint _animationOutputFormat;
-        AnimationPackFile _outAnimPack;
+        AnimationPackFileDatabase _outAnimPack;
         AnimationBinWh3 _riderOutputBin;
 
 
@@ -204,7 +204,7 @@ namespace Editors.AnimationVisualEditors.MountAnimationCreator.Services
 
         void CreateAnimPackFile()
         {
-            _outAnimPack = new AnimationPackFile("Placeholder");
+            _outAnimPack = new AnimationPackFileDatabase("Placeholder");
             _riderOutputBin = new AnimationBinWh3(@"animations/database/battle/bin/" + _animBinName)
             {
                 SkeletonName = _riderFragment.SkeletonName,

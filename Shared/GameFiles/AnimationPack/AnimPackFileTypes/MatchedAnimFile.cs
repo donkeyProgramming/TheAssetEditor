@@ -6,7 +6,7 @@ namespace Shared.GameFormats.AnimationPack.AnimPackFileTypes
 {
     public class MatchedAnimFile : IAnimationPackFile
     {
-        public AnimationPackFile Parent { get; set; }
+        public AnimationPackFileDatabase Parent { get; set; }
         public string FileName { get; set; }
         public bool IsUnknownFile { get; set; } = false;
         public NotifyAttr<bool> IsChanged { get; set; } = new NotifyAttr<bool>(false);

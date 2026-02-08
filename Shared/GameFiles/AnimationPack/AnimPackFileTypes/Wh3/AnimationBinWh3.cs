@@ -6,7 +6,7 @@ namespace Shared.GameFormats.AnimationPack.AnimPackFileTypes.Wh3
     public class AnimationBinWh3 : IAnimationPackFile, IAnimationBinGenericFormat
     {
         public string FileName { get; set; }
-        public AnimationPackFile Parent { get; set; }
+        public AnimationPackFileDatabase Parent { get; set; }
         public bool IsUnknownFile { get; set; } = false;
         public NotifyAttr<bool> IsChanged { get; set; } = new NotifyAttr<bool>(false);
         public List<AnimationBinEntry> AnimationTableEntries { get; set; } = new List<AnimationBinEntry>();
@@ -193,7 +193,7 @@ namespace Shared.GameFormats.AnimationPack.AnimPackFileTypes.Wh3
 
         string IAnimationBinGenericFormat.FullPath => FileName;
 
-        AnimationPackFile IAnimationBinGenericFormat.PackFileReference => Parent;
+        AnimationPackFileDatabase IAnimationBinGenericFormat.PackFileReference => Parent;
     }
 
     public class AnimationBinEntry
