@@ -1,7 +1,5 @@
-﻿using System.Xml;
-using System.Xml.Serialization;
-using CommonControls.BaseDialogs.ErrorListDialog;
-using CommonControls.Editors.AnimationPack.Converters;
+﻿using CommonControls.BaseDialogs.ErrorListDialog;
+using Editors.Shared.Core.Editors.TextEditor;
 using GameWorld.Core.Services;
 using Shared.Core.ErrorHandling;
 using Shared.Core.PackFiles;
@@ -13,9 +11,9 @@ using Shared.GameFormats.AnimationPack;
 using Shared.GameFormats.AnimationPack.AnimPackFileTypes.Wh3;
 using Shared.Ui.Editors.TextEditor;
 
-namespace Editors.AnimationTextEditors.AnimationPack.Converters
+namespace Editors.AnimationFragmentEditor.AnimationPack.Converters.AnimationBinWh3Converter
 {
-    public class AnimationBinWh3FileToXmlConverter : BaseAnimConverter<AnimationBinWh3FileToXmlConverter.XmlFormat, AnimationBinWh3>
+    public class AnimationBinWh3FileToXmlConverter : XmlToBinaryConverter<XmlFormat, AnimationBinWh3>
     {
         private readonly ISkeletonAnimationLookUpHelper _skeletonAnimationLookUpHelper;
         private readonly MetaDataTagDeSerializer _metaDataTagDeSerializer;
@@ -23,10 +21,13 @@ namespace Editors.AnimationTextEditors.AnimationPack.Converters
         private string _animationPersistanceMetaFileName = "";
         private readonly Dictionary<string, uint> _animationsVersionFoundInPersistenceMeta = [];
 
-        public AnimationBinWh3FileToXmlConverter(ISkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper, MetaDataTagDeSerializer metaDataTagDeSerializer)
+        private readonly PackFile _animPackToValidate;
+
+        public AnimationBinWh3FileToXmlConverter(ISkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper, MetaDataTagDeSerializer metaDataTagDeSerializer, PackFile animPackToValidate)
         {
             _skeletonAnimationLookUpHelper = skeletonAnimationLookUpHelper;
             _metaDataTagDeSerializer = metaDataTagDeSerializer;
+            _animPackToValidate = animPackToValidate;
         }
 
         protected override string CleanUpXml(string xmlText)
@@ -37,7 +38,7 @@ namespace Editors.AnimationTextEditors.AnimationPack.Converters
             return xmlText;
         }
 
-        protected override XmlFormat ConvertBytesToXmlClass(byte[] bytes)
+        protected override XmlFormat ConvertBinaryToXml(byte[] bytes)
         {
             var binFile = new AnimationBinWh3("", bytes);
             var outputBin = new XmlFormat();
@@ -69,7 +70,7 @@ namespace Editors.AnimationTextEditors.AnimationPack.Converters
                     BlendId = animation.BlendIn,
                     BlendOut = animation.SelectionWeight,
                     Unk = animation.Unk,
-                    WeaponBone = ConvertIntToBoolArray((int)animation.WeaponBools),
+                    WeaponBone = ValueConverterHelper.ConvertIntToBoolArray((int)animation.WeaponBools),
                 });
 
                 foreach (var animationRef in animation.AnimationRefs)
@@ -86,7 +87,7 @@ namespace Editors.AnimationTextEditors.AnimationPack.Converters
             return outputBin;
         }
 
-        protected override byte[] ConvertToAnimClassBytes(XmlFormat xmlBin, string fileName)
+        protected override byte[] ConvertXmlToBinary(XmlFormat xmlBin, string fileName)
         {
             var binFile = new AnimationBinWh3("", null);
 
@@ -108,7 +109,7 @@ namespace Editors.AnimationTextEditors.AnimationPack.Converters
                     AnimationId = (uint)slotHelper.GetfromValue(animationEntry.Slot).Id,
                     BlendIn = animationEntry.BlendId,
                     SelectionWeight = animationEntry.BlendOut,
-                    WeaponBools = CreateWeaponFlagInt(animationEntry.WeaponBone),
+                    WeaponBools = ValueConverterHelper.CreateWeaponFlagInt(animationEntry.WeaponBone),
                     Unk = animationEntry.Unk,
                 });
 
@@ -208,7 +209,7 @@ namespace Editors.AnimationTextEditors.AnimationPack.Converters
                     }
 
                     var mountBin = type.Data.MountBin;
-                    CheckForRiderAndHisMountAnimationsVersion(mountBin, AnimPackToValidate, animation.Slot, animationRef.File, pfs, errorList);
+                    CheckForRiderAndHisMountAnimationsVersion(mountBin, _animPackToValidate, animation.Slot, animationRef.File, pfs, errorList);
 
                     if (pfs.FindFile(animationRef.Sound) == null)
                         errorList.Warning(animation.Slot, $"Sound file {animationRef.Sound} is not found");
@@ -409,7 +410,7 @@ namespace Editors.AnimationTextEditors.AnimationPack.Converters
 
             var mountBinBytes = findMountBinReference.ToByteArray();
 
-            var parsedBin = ConvertBytesToXmlClass(mountBinBytes);
+            var parsedBin = ConvertBinaryToXml(mountBinBytes);
             var animations = parsedBin.Animations;
 
             var riderAnimationSlotWithoutPrefix = animationSlot.Substring(6);
@@ -503,59 +504,5 @@ namespace Editors.AnimationTextEditors.AnimationPack.Converters
 
 
 
-        [XmlRoot(ElementName = "Instance")]
-        public class Instance
-        {
-            [XmlAttribute(AttributeName = "File")]
-            public string File { get; set; }
-            [XmlAttribute(AttributeName = "Meta")]
-            public string Meta { get; set; }
-            [XmlAttribute(AttributeName = "Sound")]
-            public string Sound { get; set; }
-        }
-
-        [XmlRoot(ElementName = "Animation")]
-        public class Animation
-        {
-            [XmlElement(ElementName = "Instance")]
-            public List<Instance> Ref { get; set; } = new List<Instance>();
-            [XmlAttribute(AttributeName = "Slot")]
-            public string Slot { get; set; }
-            [XmlAttribute(AttributeName = "BlendId")]
-            public float BlendId { get; set; }
-            [XmlAttribute(AttributeName = "SelectionWeight")]
-            public float BlendOut { get; set; }
-            [XmlAttribute(AttributeName = "WeaponBone")]
-            public string WeaponBone { get; set; }
-            [XmlAttribute(AttributeName = "Unk")]
-            public bool Unk { get; set; }
-        }
-
-
-        [XmlRoot(ElementName = "GeneralBinData")]
-        public class GeneralBinData
-        {
-            public uint TableVersion { get; set; }
-            public uint TableSubVersion { get; set; }
-
-            public string Name { get; set; }
-            public string MountBin { get; set; }
-            public string SkeletonName { get; set; }
-            public string LocomotionGraph { get; set; }
-            public short UnknownValue1_RelatedToFlight { get; set; }
-        }
-
-        [XmlRoot(ElementName = "Bin")]
-        public class XmlFormat
-        {
-            [XmlElement(ElementName = "Version")]
-            public string Version { get; set; }
-
-            [XmlElement(ElementName = "GeneralBinData")]
-            public GeneralBinData Data { get; set; }
-
-            [XmlElement(ElementName = "Animation")]
-            public List<Animation> Animations { get; set; } = new List<Animation>();
-        }
     }
 }

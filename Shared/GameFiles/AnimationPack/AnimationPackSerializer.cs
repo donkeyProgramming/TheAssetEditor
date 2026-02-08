@@ -67,9 +67,9 @@ namespace Shared.GameFormats.AnimationPack
             return new UnknownAnimFileSerializer();
         }
 
-        public static AnimationPackFile Load(PackFile pf, IPackFileService pfs, GameTypeEnum preferedGame = GameTypeEnum.Unknown)
+        public static AnimationPackFileDatabase Load(PackFile pf, IPackFileService pfs, GameTypeEnum preferedGame = GameTypeEnum.Unknown)
         {
-            var output = new AnimationPackFile(pfs.GetFullPath(pf));
+            var output = new AnimationPackFileDatabase(pfs.GetFullPath(pf));
 
             var dataChunk = pf.DataSource.ReadDataAsChunk();
             var files = FindAllSubFiles(dataChunk);
@@ -84,7 +84,7 @@ namespace Shared.GameFormats.AnimationPack
             return output;
         }
 
-        public static byte[] ConvertToBytes(AnimationPackFile animPack)
+        public static byte[] ConvertToBytes(AnimationPackFileDatabase animPack)
         {
             using var memStream = new MemoryStream();
 

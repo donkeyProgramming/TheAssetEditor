@@ -43,7 +43,7 @@ namespace Editors.Shared.Core.Services
 
             foreach (var animPack in animPacks)
             {
-                var outputWh3AnimPack = new AnimationPackFile("Placeholder");
+                var outputWh3AnimPack = new AnimationPackFileDatabase("Placeholder");
 
                 var unknownFilesCount = animPack.Files.Count(x => x is IMatchedCombatBin || x is UnknownAnimFile);
                 if (unknownFilesCount != 0)

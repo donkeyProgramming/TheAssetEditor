@@ -24,6 +24,7 @@ namespace AssetEditor
         protected override void OnStartup(StartupEventArgs e)
         {
             ApplicationStateRecorder.Initialize();
+            PackFileLog.IsLoggingEnabled = false;
 
             ShutdownMode = ShutdownMode.OnExplicitShutdown;
             VersionChecker.CheckVersion();

@@ -1,9 +1,5 @@
-﻿using Shared.Core.PackFiles.Utility;
-
-namespace Shared.Core.PackFiles.Models
+﻿namespace Shared.Core.PackFiles.Models
 {
-
-
     public class PackFileContainer
     {
         public string Name { get; set; }

@@ -17,7 +17,7 @@ namespace Shared.Core.PackFiles.Serialization
 
     static class PackFileSerializerWriter
     {
-        public static void SaveToByteArray(PackFileContainer container, BinaryWriter writer, GameInformation currentGameInformation)
+        public static void SaveToByteArray(string outputFileName, PackFileContainer container, BinaryWriter writer, GameInformation currentGameInformation)
         {
             if (container.Header.HasEncryptedData || container.Header.HasEncryptedIndex)
                 throw new InvalidOperationException("Saving encrypted packs is not supported.");
@@ -33,7 +33,7 @@ namespace Shared.Core.PackFiles.Serialization
             // Write the core of the file
             var fileMetaDataTable = BuildMetaDataTable(sortedFiles, container, currentGameInformation);
             SerializeFileTable(fileMetaDataTable, container, writer);
-            SerializeFileBlob(fileMetaDataTable, container, writer);    
+            SerializeFileBlob(outputFileName, fileMetaDataTable, container, writer);    
         }
 
         public static void WriteHeader(PFHeader header, uint fileContentSize, BinaryWriter writer)
@@ -193,7 +193,7 @@ namespace Shared.Core.PackFiles.Serialization
             }
         }
 
-        public static void SerializeFileBlob(List<PackFileWriteInformation> fileMetaDataTabel, PackFileContainer container, BinaryWriter writer)
+        public static void SerializeFileBlob(string outputFileName, List<PackFileWriteInformation> fileMetaDataTabel, PackFileContainer container, BinaryWriter writer)
         {
             foreach (var fileMetaData in fileMetaDataTabel)
             {
@@ -235,7 +235,7 @@ namespace Shared.Core.PackFiles.Serialization
                 writer.BaseStream.Position = currentPosition;
 
                 // Update DataSource
-                var packedFileSourceParent = new PackedFileSourceParent { FilePath = container.SystemFilePath };
+                var packedFileSourceParent = new PackedFileSourceParent { FilePath = outputFileName };
                 packFile.DataSource = new PackedFileSource(
                     packedFileSourceParent,
                     offset,

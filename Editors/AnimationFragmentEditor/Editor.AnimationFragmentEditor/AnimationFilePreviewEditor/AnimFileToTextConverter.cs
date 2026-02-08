@@ -5,7 +5,7 @@ using Shared.Core.PackFiles;
 using Shared.GameFormats.Animation;
 using Shared.Ui.Editors.TextEditor;
 
-namespace CommonControls.Editors.AnimationFilePreviewEditor
+namespace Editors.AnimationFragmentEditor.AnimationFilePreviewEditor
 {
     class AnimFileToTextConverter : ITextConverter
     {

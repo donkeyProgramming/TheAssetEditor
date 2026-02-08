@@ -18,10 +18,14 @@ namespace Shared.Core.ErrorHandling
     public static class PackFileLog
     {
         private static readonly ILogger s_logger = Logging.CreateStatic(typeof(PackFileLog));
+        public static bool IsLoggingEnabled { get; set; } = true;
 
         public static Dictionary<CompressionFormat, CompressionInformation> GetCompressionInformation(PackFileContainer container)
         {
             var compressionInformation = new Dictionary<CompressionFormat, CompressionInformation>();
+            if(IsLoggingEnabled == false)
+                return compressionInformation;
+
 
             foreach (var packFile in container.FileList.Values)
             {
@@ -44,6 +48,9 @@ namespace Shared.Core.ErrorHandling
 
         public static void LogPackCompression(PackFileContainer container)
         {
+            if (IsLoggingEnabled == false)
+                return;
+
             var compressionInformation = GetCompressionInformation(container);
             var totalFiles = container.FileList.Count;
             var packSize = FormatSize(container.OriginalLoadByteSize);
@@ -110,6 +117,9 @@ namespace Shared.Core.ErrorHandling
 
         public static void LogPacksCompression(IDictionary<CompressionFormat, CompressionInformation> allCompressionInformation)
         {
+            if (IsLoggingEnabled == false)
+                return;
+
             var segments = new List<string>();
 
             foreach (var compressionEntry in allCompressionInformation.OrderBy(compressionEntry => compressionEntry.Key))

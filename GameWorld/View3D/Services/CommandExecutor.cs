@@ -2,20 +2,18 @@
 using Serilog;
 using Shared.Core.ErrorHandling;
 using Shared.Core.Events;
-using System;
-using System.Collections.Generic;
 
 namespace GameWorld.Core.Services
 {
     public class CommandStackChangedEvent
     {
-        public string HintText { get; internal set; }
+        public string HintText { get; internal set; } = "";
         public bool IsMutation { get; internal set; }
     }
 
     public class CommandStackUndoEvent
     {
-        public string HintText { get; set; }
+        public string HintText { get; set; } = "";
     }
 
     public class CommandExecutor

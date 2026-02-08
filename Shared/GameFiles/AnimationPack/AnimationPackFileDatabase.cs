@@ -2,14 +2,14 @@
 
 namespace Shared.GameFormats.AnimationPack
 {
-    public class AnimationPackFile
+    public class AnimationPackFileDatabase
     {
         public string FileName { get; private set; }
         private readonly List<IAnimationPackFile> _files = new();
 
         public IEnumerable<IAnimationPackFile> Files { get => _files; }
 
-        public AnimationPackFile(string fileName)
+        public AnimationPackFileDatabase(string fileName)
         {
             FileName = fileName;
         }
