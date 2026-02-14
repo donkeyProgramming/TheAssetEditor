@@ -12,10 +12,10 @@ namespace Editors.ImportExport.Exporting.Exporters.RmvToGltf.Helpers
 {
     public class GltfMeshBuilder
     {
-        public List<IMeshBuilder<MaterialBuilder>> Build(RmvFile rmv2, List<TextureResult> textures, RmvToGltfExporterSettings settings)
+        public List<IMeshBuilder<MaterialBuilder>> Build(RmvFile rmv2, List<TextureResult> textures, RmvToGltfExporterSettings settings, bool willHaveSkeleton = true)
         {
             var lodLevel = rmv2.ModelList.First();
-            var hasSkeleton = string.IsNullOrWhiteSpace(rmv2.Header.SkeletonName) == false;
+            var hasSkeleton = willHaveSkeleton && string.IsNullOrWhiteSpace(rmv2.Header.SkeletonName) == false;
 
             var meshes = new List<IMeshBuilder<MaterialBuilder>>();
             for(var i = 0; i < lodLevel.Length; i++)
@@ -32,7 +32,9 @@ namespace Editors.ImportExport.Exporting.Exporters.RmvToGltf.Helpers
         MeshBuilder<VertexPositionNormalTangent, VertexTexture1, VertexJoints4> GenerateMesh(RmvMesh rmvMesh, string modelName, MaterialBuilder material, bool hasSkeleton, bool doMirror)
         {
             var mesh = new MeshBuilder<VertexPositionNormalTangent, VertexTexture1, VertexJoints4>(modelName);
-            if (hasSkeleton)
+            // Only enable skinning validation if the model has a skeleton and this mesh actually contains weight data
+            var hasAnyWeights = rmvMesh.VertexList.Any(v => v.WeightCount > 0);
+            if (hasSkeleton && hasAnyWeights)
                 mesh.VertexPreprocessor.SetValidationPreprocessors();
 
             var prim = mesh.UsePrimitive(material);
@@ -53,12 +55,25 @@ namespace Editors.ImportExport.Exporting.Exporters.RmvToGltf.Helpers
 
                 if (hasSkeleton)
                 {
-                    glTfvertex = SetVertexInfluences(vertex, glTfvertex);
+                    if (vertex.WeightCount > 0)
+                    {
+                        glTfvertex = SetVertexInfluences(vertex, glTfvertex);
+                    }
+                    else if (hasAnyWeights)
+                    {
+                        // If some vertices have weights in this mesh we enabled validation.
+                        // Ensure vertices without weights get a default binding so validation passes.
+                        glTfvertex.Skinning.SetBindings((0, 1), (0, 0), (0, 0), (0, 0));
+                    }
                 }
-                else
+                else if (hasAnyWeights)
                 {
+                    // Model has weight data but no skeleton is available.
+                    // Set default binding to prevent validation errors.
                     glTfvertex.Skinning.SetBindings((0, 1), (0, 0), (0, 0), (0, 0));
                 }
+
+                // For static meshes or vertices handled above, add the vertex
                 vertexList.Add(glTfvertex);
             }
 
@@ -88,27 +103,62 @@ namespace Editors.ImportExport.Exporting.Exporters.RmvToGltf.Helpers
 
         VertexBuilder<VertexPositionNormalTangent, VertexTexture1, VertexJoints4> SetVertexInfluences(CommonVertex vertex, VertexBuilder<VertexPositionNormalTangent, VertexTexture1, VertexJoints4> glTfvertex)
         {
-            if (vertex.WeightCount == 2)
+            // Support 1,2,3,4 weight counts and normalize/handle degenerate cases so SharpGLTF validation won't fail.
+            var weights = new float[4];
+            var indices = new int[4];
+
+            var count = Math.Clamp(vertex.WeightCount, 0, 4);
+            for (int i = 0; i < count; ++i)
             {
-                var rigging = new (int, float)[2] {
-                        (vertex.BoneIndex[0], vertex.BoneWeight[0]),
-                        (vertex.BoneIndex[1], 1.0f - vertex.BoneWeight[0])
-                        };
-
-                glTfvertex.Skinning.SetBindings(rigging);
-
+                indices[i] = vertex.BoneIndex[i];
+                weights[i] = vertex.BoneWeight[i];
+                // guard against negative weights from malformed data
+                if (weights[i] < 0) weights[i] = 0f;
             }
-            else if (vertex.WeightCount == 4)
+
+            // If there are fewer than 4 influences, remaining indices default to 0 and weights to 0
+            for (int i = count; i < 4; ++i)
             {
-                var rigging = new (int, float)[4] {
-                        (vertex.BoneIndex[0], vertex.BoneWeight[0]),
-                        (vertex.BoneIndex[1], vertex.BoneWeight[1]),
-                        (vertex.BoneIndex[2], vertex.BoneWeight[2]),
-                        (vertex.BoneIndex[3], 1.0f - (vertex.BoneWeight[0] + vertex.BoneWeight[1] + vertex.BoneWeight[2]))
-                        };
-
-                glTfvertex.Skinning.SetBindings(rigging);
+                indices[i] = 0;
+                weights[i] = 0f;
             }
+
+            float sum = weights[0] + weights[1] + weights[2] + weights[3];
+
+            if (sum <= float.Epsilon)
+            {
+                // Degenerate: no meaningful weights. Fall back to binding to the first available bone or to bone 0.
+                if (count > 0)
+                {
+                    indices[0] = vertex.BoneIndex[0];
+                    weights[0] = 1f;
+                    weights[1] = weights[2] = weights[3] = 0f;
+                }
+                else
+                {
+                    indices[0] = 0;
+                    weights[0] = 1f;
+                    weights[1] = weights[2] = weights[3] = 0f;
+                }
+            }
+            else
+            {
+                // Normalize weights so they sum to 1
+                weights[0] /= sum;
+                weights[1] /= sum;
+                weights[2] /= sum;
+                weights[3] /= sum;
+            }
+
+            var rigging = new (int, float)[4]
+            {
+                (indices[0], weights[0]),
+                (indices[1], weights[1]),
+                (indices[2], weights[2]),
+                (indices[3], weights[3])
+            };
+
+            glTfvertex.Skinning.SetBindings(rigging);
 
             return glTfvertex;
         }

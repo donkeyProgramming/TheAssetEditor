@@ -1,0 +1,113 @@
+﻿using System.IO;
+using Editors.ImportExport.Common;
+using Editors.ImportExport.Exporting.Exporters.RmvToGltf.Helpers;
+using Editors.ImportExport.Misc;
+using GameWorld.Core.Services;
+using Serilog;
+using Shared.Core.ErrorHandling;
+using Shared.Core.PackFiles.Models;
+using Shared.GameFormats.RigidModel;
+using SharpGLTF.Geometry;
+using SharpGLTF.Materials;
+using SharpGLTF.Schema2;
+
+namespace Editors.ImportExport.Exporting.Exporters.RmvToGltf
+{
+    public class RmvToGltfStaticExporter
+    {
+        private readonly ILogger _logger = Logging.Create<RmvToGltfStaticExporter>();
+        private readonly IGltfSceneSaver _gltfSaver;
+        private readonly GltfStaticMeshBuilder _gltfMeshBuilder;
+        private readonly IGltfTextureHandler _gltfTextureHandler;
+
+        public RmvToGltfStaticExporter(IGltfSceneSaver gltfSaver, GltfStaticMeshBuilder gltfMeshBuilder, IGltfTextureHandler gltfTextureHandler)
+        {
+            _gltfSaver = gltfSaver;
+            _gltfMeshBuilder = gltfMeshBuilder;
+            _gltfTextureHandler = gltfTextureHandler;
+        }
+
+        internal ExportSupportEnum CanExportFile(PackFile file)
+        {
+            if (FileExtensionHelper.IsRmvFile(file.Name))
+                return ExportSupportEnum.Supported;
+            if (FileExtensionHelper.IsWsModelFile(file.Name))
+                return ExportSupportEnum.NotSupported;
+            return ExportSupportEnum.NotSupported;
+        }
+
+        public void Export(RmvToGltfExporterSettings settings, bool generateDisplacementMaps = false)
+        {
+            LogSettings(settings);
+
+            var rmv2 = new ModelFactory().Load(settings.InputModelFile.DataSource.ReadData());
+            var outputScene = ModelRoot.CreateModel();
+
+            var textures = _gltfTextureHandler.HandleTextures(rmv2, settings);
+            var meshes = _gltfMeshBuilder.Build(rmv2, textures, settings);
+
+            _logger.Here().Information($"Static Export - MeshCount={meshes.Count()} TextureCount={textures.Count()}");
+            BuildGltfScene(meshes, settings, outputScene);
+
+            // Generate displacement maps if requested
+            if (generateDisplacementMaps)
+            {
+                GenerateDisplacementMapsForTextures(settings, textures);
+            }
+        }
+
+        void BuildGltfScene(List<IMeshBuilder<MaterialBuilder>> meshBuilders, RmvToGltfExporterSettings settings, ModelRoot outputScene)
+        {
+            var scene = outputScene.UseScene("default");
+            foreach (var meshBuilder in meshBuilders)
+            {
+                var mesh = outputScene.CreateMesh(meshBuilder);
+                scene.CreateNode(mesh.Name).WithMesh(mesh);
+            }
+
+            _gltfSaver.Save(outputScene, settings.OutputPath);
+        }
+
+        void GenerateDisplacementMapsForTextures(RmvToGltfExporterSettings settings, List<TextureResult> textures)
+        {
+            try
+            {
+                var outputDir = Path.GetDirectoryName(settings.OutputPath);
+                if (string.IsNullOrEmpty(outputDir))
+                    return;
+
+                // Find normal map textures and generate displacement maps
+                var normalMaps = textures.Where(t => t.GlftTexureType.ToString().Contains("Normal")).ToList();
+                
+                foreach (var texture in normalMaps)
+                {
+                    try
+                    {
+                        _displacementMapExporter.Export(texture.SystemFilePath, outputDir);
+                        _logger.Here().Information($"Generated displacement map for: {Path.GetFileName(texture.SystemFilePath)}");
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.Here().Warning($"Failed to generate displacement map for {texture.SystemFilePath}: {ex.Message}");
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.Here().Warning($"Error generating displacement maps: {ex.Message}");
+            }
+        }
+
+        void LogSettings(RmvToGltfExporterSettings settings)
+        {
+            var str = $"Exporting using {nameof(RmvToGltfStaticExporter)} (Static Mesh Export)\n";
+            str += $"\tInputModelFile:{settings.InputModelFile?.Name}\n";
+            str += $"\tOutputPath:{settings.OutputPath}\n";
+            str += $"\tConvertMaterialTextureToBlender:{settings.ConvertMaterialTextureToBlender}\n";
+            str += $"\tConvertNormalTextureToBlue:{settings.ConvertNormalTextureToBlue}\n";
+            str += $"\tMirrorMesh:{settings.MirrorMesh}\n";
+
+            _logger.Here().Information(str);
+        }
+    }
+}

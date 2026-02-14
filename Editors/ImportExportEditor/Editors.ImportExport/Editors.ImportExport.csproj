@@ -22,4 +22,10 @@
     <PackageReference Include="SharpGLTF.Toolkit" Version="1.0.6" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Exporting\Exporters\RmvToObj\" />
+    <Folder Include="Exporting\Presentation\DdsToDisplacementMap\" />
+    <Folder Include="Exporting\Presentation\RmvToObj\" />
+  </ItemGroup>
+
 </Project>
