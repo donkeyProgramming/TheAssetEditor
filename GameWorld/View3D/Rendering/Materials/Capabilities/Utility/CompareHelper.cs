@@ -4,7 +4,7 @@ namespace GameWorld.Core.Rendering.Materials.Capabilities.Utility
 {
     public static class CompareHelper
     {
-
+        public const float FloatComparisonTolerance = 0.001f;
         static public bool Compare(bool self, bool other, string attributeName, out (bool Result, string Message) result)
         {
             if (self != other)
@@ -19,7 +19,7 @@ namespace GameWorld.Core.Rendering.Materials.Capabilities.Utility
 
         static public bool Compare(float self, float other, string attributeName, out (bool Result, string Message) result)
         {
-            if (self != other)
+            if (Math.Abs(self - other) > FloatComparisonTolerance)
             {
                 result = (false, $"{attributeName} - Different values ({self} vs {other})");
                 return false;
@@ -43,7 +43,8 @@ namespace GameWorld.Core.Rendering.Materials.Capabilities.Utility
 
         static public bool Compare(Vector2 self, Vector2 other, string attributeName, out (bool Result, string Message) result)
         {
-            if (self != other)
+            if (Math.Abs(self.X - other.X) > FloatComparisonTolerance || 
+                Math.Abs(self.Y - other.Y) > FloatComparisonTolerance)
             {
                 result = (false, $"{attributeName} - Different values ({self} vs {other})");
                 return false;
@@ -55,7 +56,9 @@ namespace GameWorld.Core.Rendering.Materials.Capabilities.Utility
 
         static public bool Compare(Vector3 self, Vector3 other, string attributeName, out (bool Result, string Message) result)
         {
-            if (self != other)
+            if (Math.Abs(self.X - other.X) > FloatComparisonTolerance || 
+                Math.Abs(self.Y - other.Y) > FloatComparisonTolerance || 
+                Math.Abs(self.Z - other.Z) > FloatComparisonTolerance)
             {
                 result = (false, $"{attributeName} - Different values ({self} vs {other})");
                 return false;
@@ -67,7 +70,10 @@ namespace GameWorld.Core.Rendering.Materials.Capabilities.Utility
 
         static public bool Compare(Vector4 self, Vector4 other, string attributeName, out (bool Result, string Message) result)
         {
-            if (self != other)
+            if (Math.Abs(self.X - other.X) > FloatComparisonTolerance || 
+                Math.Abs(self.Y - other.Y) > FloatComparisonTolerance ||
+                Math.Abs(self.Z - other.Z) > FloatComparisonTolerance || 
+                Math.Abs(self.W - other.W) > FloatComparisonTolerance)
             {
                 result = (false, $"{attributeName} - Different values ({self} vs {other})");
                 return false;
