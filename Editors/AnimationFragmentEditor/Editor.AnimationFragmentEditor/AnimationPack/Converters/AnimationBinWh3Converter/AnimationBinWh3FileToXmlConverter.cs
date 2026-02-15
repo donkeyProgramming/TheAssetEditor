@@ -238,7 +238,7 @@ namespace Editors.AnimationFragmentEditor.AnimationPack.Converters.AnimationBinW
                 return false;
             }
 
-            var data = theFile.DataSource.PeekData(20);
+            var data = theFile.DataSource.ReadData();
             var headerIsReallyAnimFile = data[0] == 0x06 || data[0] == 0x07 || data[0] == 0x08; //check if version is not 6 7 8 (or just check if it's 2)
             return endsWithAnim && headerIsReallyAnimFile;
         }
@@ -254,7 +254,7 @@ namespace Editors.AnimationFragmentEditor.AnimationPack.Converters.AnimationBinW
                 return false;
             }
 
-            var data = theFile.DataSource.PeekData(20);
+            var data = theFile.DataSource.ReadData();
             var headerIsReallyAnimMetaFile = data[0] == 0x02; //check if version is not 6 7 8 (or just check if it's 2)
             return endsWithDotMeta && headerIsReallyAnimMetaFile;
         }
@@ -270,7 +270,7 @@ namespace Editors.AnimationFragmentEditor.AnimationPack.Converters.AnimationBinW
                 return false;
             }
 
-            var data = theFile.DataSource.PeekData(20);
+            var data = theFile.DataSource.ReadData();
             var headerIsReallyAnimMetaFile = data[0] == 0x02; //check if version is not 6 7 8 (or just check if it's 2)
             return endsWithDotMeta && headerIsReallyAnimMetaFile;
         }

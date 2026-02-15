@@ -60,6 +60,7 @@ namespace GameWorld.Core.Services
                     {
                         _standardDialogs.ShowDialogBox($"Unable to apply wsmodel file. Mismatch between expected mesh and lod counts.\nReverting to using rmv2 material.");
                         _wsModelFile = null;
+                        return;
                     }
                 }
             }

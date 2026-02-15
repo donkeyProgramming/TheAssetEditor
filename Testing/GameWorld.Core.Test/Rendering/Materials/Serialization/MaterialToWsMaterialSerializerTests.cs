@@ -49,7 +49,7 @@ namespace GameWorld.Core.Test.Rendering.Materials.Serialization
             var pathToCreatedMaterial = _wsMaterialSerializer.ProsessMaterial("variantmeshes/wh_variantmodels/hu1/emp/emp_karl_franz/myCustomModel.rmv2", "mymesh0", UiVertexFormat.Weighted, _testMaterial);
 
             // Assert
-            Assert.That(pathToCreatedMaterial, Is.EqualTo("variantmeshes\\wh_variantmodels\\hu1\\emp\\emp_karl_franz/materials/mymesh0_weighted2_alpha_off.xml.material"));
+            Assert.That(pathToCreatedMaterial, Is.EqualTo("variantmeshes\\wh_variantmodels\\hu1\\emp\\emp_karl_franz\\materials\\mymesh0_weighted2_alpha_off.xml.material"));
 
             var savedWsMaterialFile = _pfs.FindFile(pathToCreatedMaterial, _outputPack);
             Assert.That(savedWsMaterialFile, Is.Not.Null);
@@ -69,12 +69,24 @@ namespace GameWorld.Core.Test.Rendering.Materials.Serialization
             var pathToCreatedMaterial1 = _wsMaterialSerializer.ProsessMaterial("variantmeshes/wh_variantmodels/hu1/emp/emp_karl_franz/myCustomModel.rmv2", "mymesh1", UiVertexFormat.Weighted, _testMaterial);
 
             // Assert
-            Assert.That(pathToCreatedMaterial0, Is.EqualTo("variantmeshes\\wh_variantmodels\\hu1\\emp\\emp_karl_franz/materials/mymesh0_weighted2_alpha_off.xml.material"));
+            Assert.That(pathToCreatedMaterial0, Is.EqualTo("variantmeshes\\wh_variantmodels\\hu1\\emp\\emp_karl_franz\\materials\\mymesh0_weighted2_alpha_off.xml.material"));
             Assert.That(pathToCreatedMaterial0, Is.EqualTo(pathToCreatedMaterial1));
 
             var savedWsMaterialFile = _pfs.FindFile(pathToCreatedMaterial0, _outputPack);
             Assert.That(savedWsMaterialFile, Is.Not.Null);
             Assert.That(_outputPack.FileList.Count, Is.EqualTo(1));
+        }
+
+
+
+        [Test]
+        public void ProsessMaterial_NoFolders()
+        {
+            // Act
+            var pathToCreatedMaterial0 = _wsMaterialSerializer.ProsessMaterial("myCustomModel.rmv2", "mymesh0", UiVertexFormat.Weighted, _testMaterial);
+
+            // Assert
+            Assert.That(pathToCreatedMaterial0, Is.EqualTo("materials\\mymesh0_weighted2_alpha_off.xml.material"));
         }
     }
 }

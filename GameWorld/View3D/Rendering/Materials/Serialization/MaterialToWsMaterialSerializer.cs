@@ -57,7 +57,8 @@ namespace GameWorld.Core.Rendering.Materials.Serialization
 
             // Check if file is uniqe - if not use original. We do this to avid an explotion of materials.
             // Kitbashed models sometimes have severl hundred meshes, we dont want that many materials if not needed
-            var newMaterialPath = Path.GetDirectoryName(modelFilePath) + "/materials/" + fileName;
+            var newMaterialPath = Path.Combine(Path.GetDirectoryName(modelFilePath), "materials", fileName);
+
             var materialPath = _repository.GetExistingOrAddMaterial(fileContent, newMaterialPath, out var isNew);
             if (isNew)
                 _fileSaveService.Save(newMaterialPath, Encoding.UTF8.GetBytes(fileContent), false);
