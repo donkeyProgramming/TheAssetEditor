@@ -26,7 +26,7 @@ namespace GameWorld.Core.Test.Rendering.Shaders.MetalRough
             var appSettings = new ApplicationSettingsService(selectedGame);
             _pfs = new PackFileService(null);
             _pfs.EnforceGameFilesMustBeLoaded = false;
-            var _outputPack = _pfs.CreateNewPackFileContainer("output", PackFileCAType.MOD, true);
+            var _outputPack = _pfs.CreateNewPackFileContainer("output", PackFileVersion.PFH5, PackFileCAType.MOD, true);
 
             _abstractMaterialFactory = new CapabilityMaterialFactory(appSettings, null);
 

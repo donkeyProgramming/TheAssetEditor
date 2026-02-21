@@ -65,14 +65,15 @@ namespace Shared.Core.PackFiles
                 SetEditablePack(container);
         }
 
-        public PackFileContainer CreateNewPackFileContainer(string name, PackFileCAType type, bool setEditablePack = false)
+        public PackFileContainer CreateNewPackFileContainer(string name, PackFileVersion packFileVersion, PackFileCAType type, bool setEditablePack = false)
         {
             if (string.IsNullOrWhiteSpace(name))
                 throw new Exception("Name can not be empty");
 
+            var versionString = PackFileVersionConverter.ToString(packFileVersion);
             var newPackFile = new PackFileContainer(name)
             {
-                Header = new PFHeader("PFH5", type),
+                Header = new PFHeader(versionString, type),
             };
 
             AddContainerInternal(newPackFile, setEditablePack);

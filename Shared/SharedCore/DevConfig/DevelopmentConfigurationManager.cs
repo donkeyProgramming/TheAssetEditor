@@ -26,7 +26,7 @@ namespace Shared.Core.DevConfig
         {
             if (_activeConfig != null)
             {
-                var newPackFile = _packFileService.CreateNewPackFileContainer("CustomPackFile", PackFileCAType.MOD);
+                var newPackFile = _packFileService.CreateNewPackFileContainer("CustomPackFile", PackFileVersion.PFH5, PackFileCAType.MOD);
                 _packFileService.SetEditablePack(newPackFile);
             }
         }

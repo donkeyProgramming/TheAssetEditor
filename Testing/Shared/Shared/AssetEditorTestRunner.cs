@@ -49,7 +49,7 @@ namespace Test.TestingUtility.Shared
             PackFileService.AddContainer(container);
 
             if (createOutputPackFile)
-                return PackFileService.CreateNewPackFileContainer("TestOutput", PackFileCAType.MOD, true);
+                return PackFileService.CreateNewPackFileContainer("TestOutput", PackFileVersion.PFH5, PackFileCAType.MOD, true);
             return null;
         }
 
@@ -81,13 +81,13 @@ namespace Test.TestingUtility.Shared
 
         public PackFileContainer CreateOutputPack()
         {
-            return PackFileService.CreateNewPackFileContainer("TestOutput", PackFileCAType.MOD, true);
+            return PackFileService.CreateNewPackFileContainer("TestOutput", PackFileVersion.PFH5, PackFileCAType.MOD, true);
         }
 
 
         public PackFileContainer CreateEmptyPackFile(string packFileName, bool setAsEditable)
         {
-            return PackFileService.CreateNewPackFileContainer(packFileName, PackFileCAType.MOD, setAsEditable);
+            return PackFileService.CreateNewPackFileContainer(packFileName, PackFileVersion.PFH5, PackFileCAType.MOD, setAsEditable);
         }
 
         void MockServices(IServiceCollection services)

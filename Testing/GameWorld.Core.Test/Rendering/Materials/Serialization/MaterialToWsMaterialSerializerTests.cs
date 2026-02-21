@@ -30,7 +30,7 @@ namespace GameWorld.Core.Test.Rendering.Materials.Serialization
 
             var saveHelper = new FileSaveService(_pfs, null);
             var materialRepo = new WsMaterialRepository(_pfs);
-            _outputPack = _pfs.CreateNewPackFileContainer("output", PackFileCAType.MOD, true);
+            _outputPack = _pfs.CreateNewPackFileContainer("output", PackFileVersion.PFH5, PackFileCAType.MOD, true);
             var materialFactory = new CapabilityMaterialFactory(appSettings, null);
             _wsMaterialSerializer = new MaterialToWsMaterialSerializer(saveHelper, materialRepo, selectedGame);
 

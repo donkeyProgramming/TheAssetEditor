@@ -23,7 +23,7 @@ namespace GameWorld.Core.Test.Rendering.Shaders.SpecGloss
         {
             _pfs = new PackFileService(null);
             _pfs.EnforceGameFilesMustBeLoaded = false;
-            var _ = _pfs.CreateNewPackFileContainer("output", PackFileCAType.MOD, true);
+            var _ = _pfs.CreateNewPackFileContainer("output", PackFileVersion.PFH5, PackFileCAType.MOD, true);
         }
 
         CapabilityMaterialFactory GetMaterialFactory(GameTypeEnum gameTypeEnum)
