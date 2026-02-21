@@ -61,7 +61,9 @@ namespace CommonControls.Editors.AnimationPack
         [RelayCommand] private void CreateEmptyWarhammer3AnimSetFileAction() => _uiCommandFactory.Create<CreateEmptyWarhammer3AnimSetFileCommand>().Execute(this);
         [RelayCommand] private void ExportAnimationSlotsWh3Action() => _uiCommandFactory.Create<ExportAnimationSlotCommand>().Warhammer3();
         [RelayCommand] private void ExportAnimationSlotsWh2Action() => _uiCommandFactory.Create<ExportAnimationSlotCommand>().Warhammer2();
- 
+
+        [RelayCommand] private void SaveAction() => Save();
+
         bool BeforeItemSelected(IAnimationPackFile item)
         {
             if (SelectedItemViewModel != null && SelectedItemViewModel.HasUnsavedChanges())
@@ -108,6 +110,7 @@ namespace CommonControls.Editors.AnimationPack
 
         public PackFile CurrentFile => _packFile;
 
+ 
         public bool SaveActiveFile()
         {
             if (_packFile == null)
