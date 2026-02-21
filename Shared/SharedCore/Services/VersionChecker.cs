@@ -7,8 +7,8 @@ namespace Shared.Core.Services
 {
     public class VersionChecker
     {
-        private static readonly string GitHubLink = @"https://github.com/donkeyProgramming/TheAssetEditor/releases/latest";
-        public static string CurrentVersion { get => "0.65"; }
+        private static readonly string s_gitHubLink = @"https://github.com/donkeyProgramming/TheAssetEditor/releases/latest";
+        public static string CurrentVersion { get => "0.66"; }
 
         public static void CheckVersion()
         {
@@ -59,11 +59,11 @@ namespace Shared.Core.Services
         {
             var changes = "\n" + lastRelease.Body;
             var changesIndented = changes.Replace("\n", "\n\t");
-            var message = $"You are using an old version {currentVersion}, please go to\n{GitHubLink} to download {lastRelease.TagName} \n\nChanges:{changesIndented}\n\nGo to download page now?";
+            var message = $"You are using an old version {currentVersion}, please go to\n{s_gitHubLink} to download {lastRelease.TagName} \n\nChanges:{changesIndented}\n\nGo to download page now?";
 
             var messageBoxResult = MessageBox.Show(message, "Version checker", MessageBoxButton.YesNo);
             if (messageBoxResult == MessageBoxResult.Yes)
-                OpenUrl(GitHubLink);
+                OpenUrl(s_gitHubLink);
         }
 
         private static void OpenUrl(string url)
