@@ -3,6 +3,7 @@
 // See the LICENSE file in the project root for more information.
 
 using System.Windows.Controls;
+using Shared.Ui.BaseDialogs.SelectionListDialog;
 
 namespace CommonControls.SelectionListDialog
 {
@@ -14,6 +15,19 @@ namespace CommonControls.SelectionListDialog
         public SelectionListView()
         {
             InitializeComponent();
+        }
+
+        private void ItemsListView_MouseDoubleClick(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            var listView = sender as ListView;
+            var selectedItem = listView?.SelectedItem as ISelectionListItem;
+            selectedItem?.IsChecked.Value = !selectedItem.IsChecked.Value;
+
+            var window = System.Windows.Window.GetWindow(this) as SelectionListWindow;
+            if (window == null)
+                return;
+
+            window.OnItemDoubleClicked();
         }
     }
 }

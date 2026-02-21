@@ -1,5 +1,4 @@
-﻿using System;
-using GameWorld.Core.Rendering.Materials.Capabilities.Utility;
+﻿using GameWorld.Core.Rendering.Materials.Capabilities.Utility;
 using GameWorld.Core.Rendering.Materials.Serialization;
 using GameWorld.Core.Services;
 using Microsoft.Xna.Framework.Graphics;

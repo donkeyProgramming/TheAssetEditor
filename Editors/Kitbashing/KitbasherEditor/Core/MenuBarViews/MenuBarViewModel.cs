@@ -92,6 +92,7 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
             RegisterUiCommand<OpenSkeletonReshaperToolCommand>();
             RegisterUiCommand<OpenReriggingToolCommand>();
             RegisterUiCommand<OpenPinToolCommand>();
+            RegisterUiCommand<AssignMaterialFromOtherMeshUiCommand>();
 
             RegisterUiCommand<ExpandFaceSelectionCommand>();
             RegisterUiCommand<ConvertFaceToVertexCommand>();
@@ -163,6 +164,7 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
             builder.CreateButton<OpenSkeletonReshaperToolCommand>(IconLibrary.SkeletonReshaperIcon, ButtonVisibilityRule.ObjectMode);
             builder.CreateButton<OpenReriggingToolCommand>(IconLibrary.ReRiggingIcon, ButtonVisibilityRule.ObjectMode);
             builder.CreateButton<OpenPinToolCommand>(IconLibrary.PinIcon, ButtonVisibilityRule.ObjectMode);
+            builder.CreateButton<AssignMaterialFromOtherMeshUiCommand>(IconLibrary.AssignTextureFromOtherIcon, ButtonVisibilityRule.ObjectMode);
 
             // Face buttons
             builder.CreateButton<ConvertFaceToVertexCommand>(IconLibrary.FaceToVertexIcon, ButtonVisibilityRule.FaceMode);

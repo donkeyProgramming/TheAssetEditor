@@ -153,6 +153,9 @@
     <EmbeddedResource Include="Resources\AudioConversion\vgstream\xmp-vgmstream.dll" />
     <EmbeddedResource Include="Resources\AudioConversion\Wh3WavToWemWwiseProject\Wh3WavToWemWwiseProject.zip" />
     <EmbeddedResource Include="Resources\Icons\audio_file.png" />
+    <EmbeddedResource Include="Resources\Icons\Kitbasher\AssignTextureFromOther.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
     <EmbeddedResource Include="Resources\WsModelTemplates\MaterialTemplate_pharaoh_default.xml" />
     <EmbeddedResource Include="Resources\WsModelTemplates\MaterialTemplate_wh2_default.xml" />
     <EmbeddedResource Include="Resources\WsModelTemplates\MaterialTemplate_wh3_default.xml" />

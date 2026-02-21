@@ -3,6 +3,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using Editors.KitbasherEditor.ViewModels.SceneNodeEditor.Nodes.MeshNode.Mesh.WsMaterial.DirtAndDecal;
 using Editors.KitbasherEditor.ViewModels.SceneNodeEditor.Nodes.MeshNode.Mesh.WsMaterial.Emissive;
 using Editors.KitbasherEditor.ViewModels.SceneNodeEditor.Nodes.MeshNode.Mesh.WsMaterial.SpecGloss;
+using GameWorld.Core.Components;
 using GameWorld.Core.Components.Selection;
 using GameWorld.Core.Rendering.Materials;
 using GameWorld.Core.Rendering.Materials.Capabilities;
@@ -19,6 +20,7 @@ namespace Editors.KitbasherEditor.ViewModels.SceneExplorer.Nodes.MeshSubViews
     {
         private readonly IUiCommandFactory _uiCommandFactory;
         private readonly SelectionManager _selectionManager;
+        private readonly SceneManager _sceneManager;
         private readonly IPackFileService _packFileService;
         private readonly IScopedResourceLibrary _resourceLibrary;
         private readonly CapabilityMaterialFactory _materialFactory;
@@ -33,19 +35,26 @@ namespace Editors.KitbasherEditor.ViewModels.SceneExplorer.Nodes.MeshSubViews
         [ObservableProperty] AdvancedRmvMaterialViewModel? _advanceRvmMaterial;
         [ObservableProperty] BloodViewModel? _blood;
         [ObservableProperty] EmissiveViewModel? _emissive;
-        [ObservableProperty] TintViewModel? _tint;
 
-        public WsMaterialViewModel(IUiCommandFactory uiCommandFactory, SelectionManager selectionManager, IPackFileService packFileService, IScopedResourceLibrary resourceLibrary, CapabilityMaterialFactory abstractMaterialFactory, IStandardDialogs packFileUiProvider)
+        [ObservableProperty] public partial TintViewModel? Tint { get; set; }
+
+        public WsMaterialViewModel(IUiCommandFactory uiCommandFactory, 
+            SelectionManager selectionManager, 
+            SceneManager sceneManager, 
+            IPackFileService packFileService, 
+            IScopedResourceLibrary resourceLibrary, 
+            CapabilityMaterialFactory abstractMaterialFactory, 
+            IStandardDialogs packFileUiProvider)
         {
             _uiCommandFactory = uiCommandFactory;
             _selectionManager = selectionManager;
+            _sceneManager = sceneManager;
             _packFileService = packFileService;
             _resourceLibrary = resourceLibrary;
             _materialFactory = abstractMaterialFactory;
             _packFileUiProvider = packFileUiProvider;
             _possibleMaterialTypes = _materialFactory.GetPossibleMaterials();
         }
-
         internal void Initialize(Rmv2MeshNode node)
         {
             _currentNode = node;
