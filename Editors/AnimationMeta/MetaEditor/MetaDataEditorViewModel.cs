@@ -29,6 +29,12 @@ namespace Editors.AnimationMeta.Presentation
             _metaDataTagDeSerializer = metaDataTagDeSerializer;
         }
 
+        partial void OnSelectedTagChanged(IMetaDataEntry value)
+        {
+            
+
+        }
+
         public bool Save() => _uiCommandFactory.Create<SaveCommand>().Execute(this);
         public void Close() { }
 

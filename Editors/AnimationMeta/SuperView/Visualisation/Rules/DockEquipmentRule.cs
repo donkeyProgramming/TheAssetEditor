@@ -6,7 +6,7 @@ using Serilog;
 using Shared.Core.ErrorHandling;
 using System;
 
-namespace Editors.AnimationMeta.Visualisation.Rules
+namespace Editors.AnimationMeta.SuperView.Visualisation.Rules
 {
     public class DockEquipmentRule : IWorldSpaceAnimationRule
     {

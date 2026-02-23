@@ -1,4 +1,4 @@
-﻿using Editors.Shared.Core.Services;
+﻿using Editors.Shared.Core.Common;
 using GameWorld.Core.Animation;
 using GameWorld.Core.SceneNodes;
 using GameWorld.Core.Utility;
@@ -6,7 +6,7 @@ using Serilog;
 using Shared.Core.ErrorHandling;
 using System;
 
-namespace Editors.AnimationMeta.Visualisation.Instances
+namespace Editors.AnimationMeta.SuperView.Visualisation.Instances
 {
     public class DrawableMetaInstance : IMetaDataInstance
     {

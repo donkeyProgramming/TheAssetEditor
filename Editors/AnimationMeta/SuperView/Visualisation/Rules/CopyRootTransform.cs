@@ -1,20 +1,21 @@
-﻿using GameWorld.Core.Animation;
+﻿using System;
+using System.Collections.ObjectModel;
+using GameWorld.Core.Animation;
 using GameWorld.Core.Animation.AnimationChange;
 using GameWorld.Core.SceneNodes;
 using Microsoft.Xna.Framework;
 using Serilog;
 using Shared.Core.ErrorHandling;
-using System;
 
-namespace Editors.AnimationMeta.Visualisation.Rules
+namespace Editors.AnimationMeta.SuperView.Visualisation.Rules
 {
     public class CopyRootTransform : ILocalSpaceAnimationRule
     {
-        ILogger _logger = Logging.Create<CopyRootTransform>();
-        bool _hasError = false;
+        readonly ILogger _logger = Logging.Create<CopyRootTransform>();
+        readonly ISkeletonProvider _skeletonProvider;
+        readonly int _boneId;
 
-        ISkeletonProvider _skeletonProvider;
-        int _boneId;
+        bool _hasError = false;
         Vector3 _offsetPos;
         Quaternion _offsetRot;
 

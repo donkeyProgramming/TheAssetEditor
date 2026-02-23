@@ -2,6 +2,7 @@
 using System.Linq;
 using CommunityToolkit.Mvvm.ComponentModel;
 using Editors.AnimationMeta.Presentation;
+using Editors.AnimationMeta.SuperView.Visualisation;
 using Editors.Shared.Core.Common;
 using Editors.Shared.Core.Common.BaseControl;
 using Editors.Shared.Core.Common.ReferenceModel;
@@ -19,6 +20,7 @@ namespace Editors.AnimationMeta.SuperView
 
         private readonly SceneObjectEditor _sceneObjectBuilder;
         private readonly MetaDataTagDeSerializer _metaDataTagDeSerializer;
+        private readonly IMetaDataFactory _metaDataFactory;
         private readonly IPackFileService _packFileService;
         private readonly IEventHub _eventHub;
         private readonly IUiCommandFactory _uiCommandFactory;
@@ -36,7 +38,8 @@ namespace Editors.AnimationMeta.SuperView
             IUiCommandFactory uiCommandFactory,
             SceneObjectEditor sceneObjectBuilder,
             IEditorHostParameters editorHostParameters,
-            MetaDataTagDeSerializer metaDataTagDeSerializer)
+            MetaDataTagDeSerializer metaDataTagDeSerializer,
+            IMetaDataFactory metaDataFactory)
             : base(editorHostParameters)
         {
             DisplayName = "Super view";
@@ -45,6 +48,7 @@ namespace Editors.AnimationMeta.SuperView
             _uiCommandFactory = uiCommandFactory;
             _sceneObjectBuilder = sceneObjectBuilder;
             _metaDataTagDeSerializer = metaDataTagDeSerializer;
+            _metaDataFactory = metaDataFactory;
             Initialize();
             eventHub.Register<ScopedFileSavedEvent>(this, OnFileSaved);
             eventHub.Register<SceneObjectUpdateEvent>(this, OnSceneObjectUpdated);
@@ -66,11 +70,26 @@ namespace Editors.AnimationMeta.SuperView
             PersistentMetaEditor = new MetaDataEditorViewModel(_uiCommandFactory, _metaDataTagDeSerializer);
             MetaEditor = new MetaDataEditorViewModel(_uiCommandFactory, _metaDataTagDeSerializer);
             
-            var assetViewModel = _sceneObjectViewModelBuilder.CreateAsset("SuperViewRoot", true, "Root", Color.Black,null, true);
+            var assetViewModel = _sceneObjectViewModelBuilder.CreateAsset("SuperViewRoot", true, "Root", Color.Black,null);
             SceneObjects.Add(assetViewModel);
-            
+
+            assetViewModel.Data.MetaDataChanged += RecreateMetaDataInformation;
+
             _asset = assetViewModel;
             OnSceneObjectUpdated(new SceneObjectUpdateEvent(_asset.Data, false, false, false, true));
+        }
+
+        void RecreateMetaDataInformation(SceneObject model)
+        {
+            foreach (var item in model.MetaDataItems)
+                item.CleanUp();
+             model.MetaDataItems.Clear();
+            model.Player.AnimationRules.Clear();
+
+            var parser = new MetaDataFileParser();
+            var persist = parser.ParseFile(model.PersistMetaData, _metaDataTagDeSerializer);
+            var meta = parser.ParseFile(model.MetaData, _metaDataTagDeSerializer);
+            model.MetaDataItems = _metaDataFactory.Create(persist, meta, model.MainNode, model, model.Player, SceneObjects[0].FragAndSlotSelection.FragmentList.SelectedItem);
         }
 
         private void OnSceneObjectUpdated(SceneObjectUpdateEvent e)

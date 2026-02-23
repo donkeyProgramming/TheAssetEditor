@@ -6,7 +6,7 @@ using Serilog;
 using Shared.Core.ErrorHandling;
 using Shared.GameFormats.AnimationMeta.Definitions;
 
-namespace Editors.AnimationMeta.Visualisation.Rules
+namespace Editors.AnimationMeta.SuperView.Visualisation.Rules
 {
     public class TransformBoneRule : ILocalSpaceAnimationRule
     {

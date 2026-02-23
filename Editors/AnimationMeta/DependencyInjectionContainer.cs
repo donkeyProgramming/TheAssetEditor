@@ -3,7 +3,7 @@ using Editors.AnimationMeta.MetaEditor.Commands;
 using Editors.AnimationMeta.Presentation;
 using Editors.AnimationMeta.Presentation.View;
 using Editors.AnimationMeta.SuperView;
-using Editors.AnimationMeta.Visualisation;
+using Editors.AnimationMeta.SuperView.Visualisation;
 using Editors.Shared.Core.Common.BaseControl;
 using Editors.Shared.Core.Services;
 using Microsoft.Extensions.DependencyInjection;

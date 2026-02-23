@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
-using Editors.AnimationMeta.Visualisation.Instances;
-using Editors.AnimationMeta.Visualisation.Rules;
-using Editors.Shared.Core.Services;
+using Editors.AnimationMeta.SuperView.Visualisation.Instances;
+using Editors.AnimationMeta.SuperView.Visualisation.Rules;
+using Editors.Shared.Core.Common;
 using GameWorld.Core.Animation;
 using GameWorld.Core.Components;
 using GameWorld.Core.Components.Rendering;
@@ -22,8 +22,13 @@ using Shared.GameFormats.AnimationMeta.Definitions;
 using Shared.GameFormats.AnimationMeta.Parsing;
 using Shared.GameFormats.AnimationPack;
 
-namespace Editors.AnimationMeta.Visualisation
+namespace Editors.AnimationMeta.SuperView.Visualisation
 {
+
+    public interface IMetaDataFactory
+    {
+        List<IMetaDataInstance> Create(MetaDataFile persistent, MetaDataFile metaData, SceneNode root, ISkeletonProvider skeleton, AnimationPlayer rootPlayer, IAnimationBinGenericFormat fragment);
+    }
 
     public class MetaDataFactory : IMetaDataFactory
     {
@@ -79,7 +84,7 @@ namespace Editors.AnimationMeta.Visualisation
 
             output.AddRange(file.GetItemsOfType<SplashAttack_v10>().Select(meteDataItem => CreateSplashAttack(meteDataItem, root, $"SplashAttack_{Math.Round(meteDataItem.EndTime, 2)}", 0.1f)));
 
-            output.AddRange(file.GetItemsOfType<Effect_v11>().Select(x => CreateEffect(x, root, skeleton)));
+            output.AddRange(file.GetItemsOfType<IEffectMeta>().Select(x => CreateEffect(x, root, skeleton)));
 
             foreach (var meteDataItem in file.GetItemsOfType<DockEquipment>())
                 CreateEquipmentDock(meteDataItem, fragment, skeleton, rootPlayer);
@@ -217,12 +222,12 @@ namespace Editors.AnimationMeta.Visualisation
             planeVectorP.Normalize();
             planeVectorPN.Normalize();
 
-            var rotationM = MathUtil.CreateRotation(new[]
-            {
+            var rotationM = MathUtil.CreateRotation(
+            [
                 planeVectorP,
                 planeVectorPN,
                 normal
-            });
+            ]);
 
             if (splashAttack.AoeShape == 0) // Cone or Sphere
             {
@@ -248,16 +253,21 @@ namespace Editors.AnimationMeta.Visualisation
             return new DrawableMetaInstance(splashAttack.StartTime, splashAttack.EndTime, node.Name, node);
         }
 
-        private IMetaDataInstance CreateEffect(Effect_v11 effect, SceneNode root, ISkeletonProvider skeleton)
+        private IMetaDataInstance CreateEffect(IEffectMeta effect, SceneNode root, ISkeletonProvider skeleton)
         {
             var node = new SimpleDrawableNode("Effect:" + effect.VfxName);
 
-            node.AddItem(LineHelper.AddLocator(effect.Position, 0.3f, Color.Red));
+            var locatorScale = 0.3f;
+            node.AddItem(LineHelper.AddRgbLocator(effect.Position, locatorScale));
             node.AddItem(new WorldTextRenderItem(_resourceLibrary, effect.VfxName, effect.Position));
-           
+            node.AddItem(new WorldTextRenderItem(_resourceLibrary, "X", effect.Position + new Vector3(locatorScale * .5f + 0.01f,0,0), Color.Red));
+            node.AddItem(new WorldTextRenderItem(_resourceLibrary, "Y", effect.Position + new Vector3(0, locatorScale * .5f + 0.01f, 0), Color.Green));
+            node.AddItem(new WorldTextRenderItem(_resourceLibrary, "Z", effect.Position + new Vector3(0,0,locatorScale * .5f + 0.01f), Color.Blue));
+
+
             root.AddObject(node);
 
-            var instance = new DrawableMetaInstance(effect.StartTime, effect.EndTime, node.Name, node);
+            var instance = new DrawableMetaInstance(effect.EffectStartTime, effect.EffectEndTime, node.Name, node);
             if (effect.Tracking)
                 instance.FollowBone(skeleton, effect.NodeIndex);
             return instance;
