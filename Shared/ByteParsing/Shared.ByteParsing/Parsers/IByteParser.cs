@@ -30,6 +30,7 @@
         bool TryDecode(byte[] buffer, int index, out string value, out int bytesRead, out string? error);
         bool CanDecode(byte[] buffer, int index, out int bytesRead, out string? error);
         byte[]? Encode(string value, out string? error);
+
         object GetValueAsObject(byte[] buffer, int index, out int bytesRead);
     }
 

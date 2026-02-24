@@ -10,18 +10,18 @@ namespace Shared.GameFormats.AnimationMeta.Parsing
     {
         private readonly ILogger _logger = Logging.Create<MetaDataFileParser>();
 
-        public MetaDataFile? ParseFile(PackFile pf, MetaDataTagDeSerializer metaDataTagDeSerializer)
+        public ParsedMetadataFile? ParseFile(PackFile pf, MetaDataTagDeSerializer metaDataTagDeSerializer)
         {
             if (pf == null)
                 return null;
             return ParseFile(pf.DataSource.ReadData(), metaDataTagDeSerializer);
         }
 
-        public MetaDataFile ParseFile(byte[] fileContent, MetaDataTagDeSerializer metaDataTagDeSerializer)
+        public ParsedMetadataFile ParseFile(byte[] fileContent, MetaDataTagDeSerializer metaDataTagDeSerializer)
         {
             var contentLength = fileContent.Count();
 
-            var outputFile = new MetaDataFile()
+            var outputFile = new ParsedMetadataFile()
             {
                 Version = BitConverter.ToInt32(fileContent, 0)
             };
@@ -93,6 +93,29 @@ namespace Shared.GameFormats.AnimationMeta.Parsing
 
             return data.ToArray();
         }
+
+        public byte[] GenerateBytes(int version, ParsedMetadataFile metaFile)
+        {
+
+            var metaDataTagDeSerializer = new MetaDataTagDeSerializer();
+        
+
+
+            var data = new List<byte>();
+            data.AddRange(BitConverter.GetBytes(metaFile.Version));
+            data.AddRange(BitConverter.GetBytes(metaFile.Items.Count()));
+            foreach (var item in metaFile.Items)
+            {
+                metaDataTagDeSerializer.Serialize(item, out var errorStr)   ;
+
+
+                data.AddRange(ByteParsers.String.Encode(item.Name, out _));
+               // data.AddRange(item.DataItem.Bytes);
+            }
+
+            return data.ToArray();
+        }
+
 
         UnknownMetaEntry GetElement(int startIndex, byte[] data, out int updatedByteIndex)
         {

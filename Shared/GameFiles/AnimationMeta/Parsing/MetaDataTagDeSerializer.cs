@@ -199,38 +199,45 @@ namespace Shared.GameFormats.AnimationMeta.Parsing
             return array.Zip(array.Skip(1), (a, b) => a + 1 == b).All(x => x);
         }
 
-        List<Type> GetTypesFromMeta(BaseMetaEntry entry)
+        /// <summary>
+        /// Get all possible metadata definitions for a given metadata attribute.
+        /// It could be multiple, as some games share the same attribute name, but 
+        /// has different binary representation. For example BlendOverride_v11_Troy
+        /// </summary>
+        List<Type> GetPossibleTypesForMetaDataAttribute(ParsedMetadataAttribute entry)
         {
             var key = entry.Name + "_" + entry.Version;
             if (_typeTable.ContainsKey(key) == false)
-                return null;
+                return [];
 
             return _typeTable[key];
         }
 
-        public BaseMetaEntry? DeSerialize(UnknownMetaEntry entry, out string? errorMessage)
+        public ParsedMetadataAttribute? DeSerialize(UnknownMetaEntry entry, out string? errorMessage)
         {
-            var entryInfoList = GetEntryInformation(entry);
-            if (entryInfoList == null)
+            var possibleClassLayouts = GetPossibleClassLayoutsForMetaDataAttribute(entry);
+            if (possibleClassLayouts == null)
             {
-                errorMessage = $"Unable to find decoder for {entry.Name}_{entry.Version}";
+                errorMessage = $"Unable to find decoder for deserializing {entry.Name}_{entry.Version}";
                 return null;
             }
 
             errorMessage = null;
-            foreach (var entryInfo in entryInfoList)
+
+            // Try all possible class layouts until we find one that can successfully read the data
+            foreach (var possibleClassLayout in possibleClassLayouts)
             {
-                var instance = Activator.CreateInstance(entryInfo.Type);
+                var attributeInstance = Activator.CreateInstance(possibleClassLayout.Type);
                 var bytes = entry.Data;
                 var currentIndex = 0;
-                foreach (var proptery in entryInfo.Properties)
+                foreach (var proptery in possibleClassLayout.Properties)
                 {
                     var parser = ByteParserFactory.Create(proptery.PropertyType);
                     try
                     {
                         var value = parser.GetValueAsObject(bytes, currentIndex, out var bytesRead);
                         currentIndex += bytesRead;
-                        proptery.SetValue(instance, value);
+                        proptery.SetValue(attributeInstance, value);
                         errorMessage = "";
                     }
                     catch (Exception e)
@@ -250,7 +257,7 @@ namespace Shared.GameFormats.AnimationMeta.Parsing
                     continue;
                 }
 
-                var typedInstance = instance as BaseMetaEntry;
+                var typedInstance = attributeInstance as ParsedMetadataAttribute;
                 typedInstance.Name = entry.Name;
                 typedInstance.Data = bytes;
                 errorMessage = null;
@@ -260,9 +267,82 @@ namespace Shared.GameFormats.AnimationMeta.Parsing
             return null;
         }
 
-        public List<(string Header, string Value)>? DeSerializeToStrings(BaseMetaEntry entry, out string? errorMessage)
+
+        public byte[] Serialize(ParsedMetadataAttribute entry, out string? errorMessage)
         {
-            var entryInfoList = GetEntryInformation(entry);
+            var entryInfoList = GetPossibleClassLayoutsForMetaDataAttribute(entry);
+            if (entryInfoList == null)
+            {
+                errorMessage = $"Unable to find decoder for serializing {entry.Name}_{entry.Version}";
+                return null;
+            }
+
+            errorMessage = null;
+
+
+            var data = new List<byte>();
+           // data.AddRange(BitConverter.GetBytes(metaFile.Version));
+           // data.AddRange(BitConverter.GetBytes(metaFile.Items.Count()));
+
+            foreach (var entryInfo in entryInfoList)
+            {
+             //   var instance = Activator.CreateInstance(entryInfo.Type);
+                foreach (var proptery in entryInfo.Properties)
+                {
+                    var parser = ByteParserFactory.Create(proptery.PropertyType);
+                    try
+                    {
+                        object propertyValue = GetMemberValue(entry, proptery.Name);
+                        var attributeByteValue = parser.Encode(null, out var writeError);
+                        //data.AddRange(attributeByteValue);
+                    }
+                    catch (Exception e)
+                    {
+                      
+                        break;
+                    }
+                }
+            }
+
+            return null;
+        }
+
+
+        //
+
+        public static object GetMemberValue(object obj, string memberName)
+        {
+            if (obj == null)
+            {
+                throw new ArgumentNullException(nameof(obj));
+            }
+
+            Type type = obj.GetType();
+
+            // Try to get as a Property
+            PropertyInfo propInfo = type.GetProperty(memberName, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+            if (propInfo != null)
+            {
+                return propInfo.GetValue(obj, null);
+            }
+
+            // Try to get as a Field
+            FieldInfo fieldInfo = type.GetField(memberName, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+            if (fieldInfo != null)
+            {
+                return fieldInfo.GetValue(obj);
+            }
+
+            throw new MemberAccessException($"Member '{memberName}' not found in type '{type.Name}'.");
+        }
+        //
+
+
+
+
+        public List<(string Header, string Value)>? DeSerializeToStrings(ParsedMetadataAttribute entry, out string? errorMessage)
+        {
+            var entryInfoList = GetPossibleClassLayoutsForMetaDataAttribute(entry);
             if (entryInfoList == null)
             {
                 errorMessage = $"Unable to find decoder for {entry.Name}_{entry.Version}";
@@ -307,13 +387,13 @@ namespace Shared.GameFormats.AnimationMeta.Parsing
             return output;
         }
 
-        public BaseMetaEntry CreateDefault(string itemName)
+        public ParsedMetadataAttribute CreateDefault(string itemName)
         {
             if (_typeTable.ContainsKey(itemName) == false)
                 throw new Exception("Unknown metadata item " + itemName);
 
             var type = _typeTable[itemName].First();
-            var instance = Activator.CreateInstance(type) as BaseMetaEntry;
+            var instance = Activator.CreateInstance(type) as ParsedMetadataAttribute;
 
             var itemNameSplit = itemName.ToUpper().Split("_");
             instance.Version = int.Parse(itemNameSplit.Last());
@@ -321,33 +401,30 @@ namespace Shared.GameFormats.AnimationMeta.Parsing
             return instance;
         }
 
-        List<EntryInfoResult>? GetEntryInformation(BaseMetaEntry entry)
+        List<EntryInfoResult>? GetPossibleClassLayoutsForMetaDataAttribute(ParsedMetadataAttribute entry)
         {
-            var metaDataTypes = GetTypesFromMeta(entry);
-            if (metaDataTypes == null)
+            var possibleAttributeTypes = GetPossibleTypesForMetaDataAttribute(entry);
+            if (possibleAttributeTypes.Count() == 0)
                 return null;
 
             var output = new List<EntryInfoResult>();
-            foreach (var metaDataType in metaDataTypes)
+            foreach (var possibleAttributeType in possibleAttributeTypes)
             {
-                var instance = Activator.CreateInstance(metaDataType);
-                var orderedPropertiesList = metaDataType.GetProperties()
+                var instance = Activator.CreateInstance(possibleAttributeType);
+                var orderedPropertiesList = possibleAttributeType.GetProperties()
                     .Where(x => x.CanWrite)
                     .Where(x => Attribute.IsDefined(x, typeof(MetaDataTagAttribute)))
                     .OrderBy(x => x.GetCustomAttributes<MetaDataTagAttribute>(false).Single().Order)
                     .ToList();
 
-                var entryInfo = new EntryInfoResult() { Type = metaDataType, Properties = orderedPropertiesList };
+                var entryInfo = new EntryInfoResult(possibleAttributeType, orderedPropertiesList);
                 output.Add(entryInfo);
             }
 
             return output;
         }
 
-        public class EntryInfoResult
-        {
-            public Type? Type { get; set; }
-            public List<PropertyInfo> Properties { get; set; } = new();
-        }
+        public record EntryInfoResult(Type? Type, List<PropertyInfo> Properties);
+
     }
 }

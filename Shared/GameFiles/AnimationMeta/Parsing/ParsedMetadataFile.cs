@@ -2,10 +2,10 @@
 
 namespace Shared.GameFormats.AnimationMeta.Parsing
 {
-    public class MetaDataFile
+    public class ParsedMetadataFile
     {
         public int Version { get; set; }
-        public List<BaseMetaEntry> Items { get; set; } = new List<BaseMetaEntry>();
+        public List<ParsedMetadataAttribute> Items { get; set; } = new List<ParsedMetadataAttribute>();
 
         public List<T> GetItemsOfType<T>()
         {
@@ -14,7 +14,7 @@ namespace Shared.GameFormats.AnimationMeta.Parsing
     }
 
 
-    public abstract class BaseMetaEntry
+    public abstract class ParsedMetadataAttribute
     {
         public string Name { get; set; }
 
@@ -29,11 +29,11 @@ namespace Shared.GameFormats.AnimationMeta.Parsing
 
     }
 
-    public class UnknownMetaEntry : BaseMetaEntry
+    public class UnknownMetaEntry : ParsedMetadataAttribute
     {
 
     }
-    public abstract class DecodedMetaEntryBase_v0 : BaseMetaEntry
+    public abstract class DecodedMetaEntryBase_v0 : ParsedMetadataAttribute
     {
         [MetaDataTag(1)]
         public int UnknownIntBase_v0 { get; set; }
@@ -45,7 +45,7 @@ namespace Shared.GameFormats.AnimationMeta.Parsing
         public int UnknownIntBase_v1 { get; set; }
     }
 
-    public abstract class DecodedMetaEntryBase_v2 : BaseMetaEntry
+    public abstract class DecodedMetaEntryBase_v2 : ParsedMetadataAttribute
     {
         [MetaDataTag(1, "Time in second when the Tag takes effect")]
         public float StartTime { get; set; }
@@ -57,7 +57,7 @@ namespace Shared.GameFormats.AnimationMeta.Parsing
         public string Filter { get; set; } = "";
     }
 
-    public abstract class DecodedMetaEntryBase : BaseMetaEntry
+    public abstract class DecodedMetaEntryBase : ParsedMetadataAttribute
     {
         [MetaDataTag(1, "Time in second when the Tag takes effect")]
         public float StartTime { get; set; }

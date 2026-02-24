@@ -27,7 +27,7 @@ namespace Editors.AnimationMeta.SuperView.Visualisation
 
     public interface IMetaDataFactory
     {
-        List<IMetaDataInstance> Create(MetaDataFile persistent, MetaDataFile metaData, SceneNode root, ISkeletonProvider skeleton, AnimationPlayer rootPlayer, IAnimationBinGenericFormat fragment);
+        List<IMetaDataInstance> Create(ParsedMetadataFile persistent, ParsedMetadataFile metaData, SceneNode root, ISkeletonProvider skeleton, AnimationPlayer rootPlayer, IAnimationBinGenericFormat fragment);
     }
 
     public class MetaDataFactory : IMetaDataFactory
@@ -52,7 +52,7 @@ namespace Editors.AnimationMeta.SuperView.Visualisation
             _animationsContainerComponent = animationsContainerComponent;
         }
 
-        public List<IMetaDataInstance> Create(MetaDataFile persistent, MetaDataFile metaData, SceneNode root, ISkeletonProvider skeleton, AnimationPlayer rootPlayer, IAnimationBinGenericFormat fragment)
+        public List<IMetaDataInstance> Create(ParsedMetadataFile persistent, ParsedMetadataFile metaData, SceneNode root, ISkeletonProvider skeleton, AnimationPlayer rootPlayer, IAnimationBinGenericFormat fragment)
         {
             // Clear all
             var output = new List<IMetaDataInstance>();
@@ -68,7 +68,7 @@ namespace Editors.AnimationMeta.SuperView.Visualisation
             return output;
         }
 
-        private IEnumerable<IMetaDataInstance> ApplyMetaData(MetaDataFile file, SceneNode root, ISkeletonProvider skeleton, AnimationPlayer rootPlayer, IAnimationBinGenericFormat fragment)
+        private IEnumerable<IMetaDataInstance> ApplyMetaData(ParsedMetadataFile file, SceneNode root, ISkeletonProvider skeleton, AnimationPlayer rootPlayer, IAnimationBinGenericFormat fragment)
         {
             var output = new List<IMetaDataInstance>();
             if (file == null)

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Linq;
 using System.Reflection;
 using CommunityToolkit.Mvvm.ComponentModel;
@@ -58,7 +59,7 @@ namespace Editors.AnimationMeta.Presentation
         private readonly ILogger _logger = Logging.Create<MetaDataEntry>();
         private readonly string _originalName;
 
-        public MetaDataEntry(BaseMetaEntry typedMetaItem, MetaDataTagDeSerializer metaDataTagDeSerializer)
+        public MetaDataEntry(ParsedMetadataAttribute typedMetaItem, MetaDataTagDeSerializer metaDataTagDeSerializer)
         {
             _originalName = typedMetaItem.Name;
             DisplayName = typedMetaItem.DisplayName;
@@ -83,15 +84,15 @@ namespace Editors.AnimationMeta.Presentation
                 if (attributeInfo.DisplayOverride == MetaDataTagAttribute.DisplayType.EulerVector || value is Vector3)
                 {
                     if (value is Vector3 vector3)
-                        editableItem = new VectorMetaDataAttribute(parser as Vector3Parser, vector3);
+                        editableItem = new VectorMetaDataAttribute(parser as Vector3Parser, vector3, typedMetaItem, prop);
                     else if (value is Vector4 quaternion)
-                        editableItem = new OrientationMetaDataAttribute(parser as Vector4Parser, quaternion);
+                        editableItem = new OrientationMetaDataAttribute(parser as Vector4Parser, quaternion, typedMetaItem, prop);
                     else
                         throw new Exception("Unknown item");
                 }
                 else
                 {
-                    editableItem = new MetaDataAttribute(parser, value.ToString());
+                    editableItem = new MetaDataAttribute(parser, value.ToString(), typedMetaItem, prop);
                 }
 
                 editableItem.Description = itemDiscription;
@@ -119,6 +120,10 @@ namespace Editors.AnimationMeta.Presentation
 
         public override MetaDataTagItem GetAsFileFormatData()
         {
+            // Go though all using reflection.
+            // Get the byte 
+
+
             _logger.Here().Information("Start " + DisplayName);
             var newItem = new MetaDataTagItem()
             {
@@ -166,5 +171,7 @@ namespace Editors.AnimationMeta.Presentation
             return newName;
         }
     }
+
+
 }
 

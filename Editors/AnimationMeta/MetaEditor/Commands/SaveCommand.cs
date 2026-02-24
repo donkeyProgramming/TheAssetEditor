@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Drawing.Imaging;
 using System.Windows;
 using Editors.AnimationMeta.Presentation;
 using Serilog;
@@ -48,23 +50,49 @@ namespace Editors.AnimationMeta.MetaEditor.Commands
 
             _logger.Here().Information("Generating bytes");
 
-            var parser = new MetaDataFileParser();
-            var bytes = parser.GenerateBytes(controller.MetaDataFileVersion, tagDataItems);
-            _logger.Here().Information("Saving");
-            var res = _packFileSaveService.Save(path, bytes, false);
-            if (res != null)
             {
-                controller.CurrentFile = res;
-                controller.DisplayName = res.Name;
+                var parser = new MetaDataFileParser();
+                var bytes = parser.GenerateBytes(controller.MetaDataFileVersion, tagDataItems);
+                _logger.Here().Information("Saving");
+                var res = _packFileSaveService.Save(path, bytes, false);
+                if (res != null)
+                {
+                    controller.CurrentFile = res;
+                    controller.DisplayName = res.Name;
+                }
+
+                _logger.Here().Information("Creating metadata file complete");
+                var saveEvent = new ScopedFileSavedEvent()
+                {
+                    FileOwner = controller,
+                    NewPath = path,
+                };
+                _eventHub.Publish(saveEvent);
             }
 
-            _logger.Here().Information("Creating metadata file complete");
-            var saveEvent = new ScopedFileSavedEvent()
             {
-                FileOwner = controller,
-                NewPath = path,
-            };
-            _eventHub.Publish(saveEvent);
+
+
+
+                var parser = new MetaDataFileParser();
+                var bytes = parser.GenerateBytes(controller.MetaDataFileVersion, controller._metaDataFile);
+                _logger.Here().Information("Saving");
+                var res = _packFileSaveService.Save(path, bytes, false);
+                if (res != null)
+                {
+                    controller.CurrentFile = res;
+                    controller.DisplayName = res.Name;
+                }
+
+                _logger.Here().Information("Creating metadata file complete");
+                var saveEvent = new ScopedFileSavedEvent()
+                {
+                    FileOwner = controller,
+                    NewPath = path,
+                };
+                _eventHub.Publish(saveEvent);
+            }
+
 
             return true;
         }

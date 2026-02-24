@@ -63,7 +63,7 @@ namespace Editors.Reports.Animation
             var fileList = PackFileServiceUtility.FindAllWithExtentionIncludePaths(_pfs, ".meta");
             var failedFiles = new List<string>();
 
-            var metaTable = new List<(string Path, MetaDataFile File)>();
+            var metaTable = new List<(string Path, ParsedMetadataFile File)>();
             for (var i = 0; i < fileList.Count; i++)
             {
                 var fileName = fileList[i].FileName;

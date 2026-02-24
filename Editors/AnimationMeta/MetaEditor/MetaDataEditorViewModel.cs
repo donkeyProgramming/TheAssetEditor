@@ -15,6 +15,8 @@ namespace Editors.AnimationMeta.Presentation
         private readonly IUiCommandFactory _uiCommandFactory;
         private readonly MetaDataTagDeSerializer _metaDataTagDeSerializer;
 
+        public ParsedMetadataFile _metaDataFile;
+
         [ObservableProperty] string _displayName = "Metadata Editor";
         [ObservableProperty] IMetaDataEntry _selectedTag;
         [ObservableProperty] ObservableCollection<IMetaDataEntry> _tags = [];
@@ -56,14 +58,16 @@ namespace Editors.AnimationMeta.Presentation
             var loadedMetadataFile = parser.ParseFile(fileContent, _metaDataTagDeSerializer);
             MetaDataFileVersion = loadedMetadataFile.Version;
 
-            foreach (var item in loadedMetadataFile.Items)
+            _metaDataFile = loadedMetadataFile;
+
+            foreach (var metadataEntry in loadedMetadataFile.Items)
             {
-                if (item is UnknownMetaEntry uknMeta)
+                if (metadataEntry is UnknownMetaEntry uknMeta)
                     Tags.Add(new UnkMetaDataEntry(uknMeta));
-                else if (item is BaseMetaEntry metaBase)
-                    Tags.Add(new MetaDataEntry(metaBase, _metaDataTagDeSerializer));
+                else if (metadataEntry is ParsedMetadataAttribute parsedKnownAttribute)
+                    Tags.Add(new MetaDataEntry(parsedKnownAttribute, _metaDataTagDeSerializer));
                 else
-                    throw new Exception($"{item.GetType()} is not a known type for {nameof(MetaDataEditorViewModel)}");
+                    throw new Exception($"{metadataEntry.GetType()} is not a known type for {nameof(MetaDataEditorViewModel)}");
             }
         }
 
