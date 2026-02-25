@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Windows;
-using Editors.AnimationMeta.Presentation;
+﻿using Editors.AnimationMeta.Presentation;
 using Serilog;
 using Shared.Core.ErrorHandling;
 using Shared.Core.Events;
@@ -17,36 +15,32 @@ namespace Editors.AnimationMeta.MetaEditor.Commands
         private readonly IPackFileService _packFileService;
         private readonly IEventHub _eventHub;
         private readonly IFileSaveService _packFileSaveService;
+        private readonly IStandardDialogs _standardDialogs;
 
-        public SaveCommand(IPackFileService packFileService, IEventHub eventHub, IFileSaveService packFileSaveService)
+        public SaveCommand(IPackFileService packFileService, IEventHub eventHub, IFileSaveService packFileSaveService, IStandardDialogs standardDialogs)
         {
             _packFileService = packFileService;
             _eventHub = eventHub;
             _packFileSaveService = packFileSaveService;
+            _standardDialogs = standardDialogs;
         }
 
         public bool Execute(MetaDataEditorViewModel controller)
         {
-            var path = _packFileService.GetFullPath(controller.CurrentFile);
+           // Ensure there are no errors
             foreach (var tag in controller.Tags)
             {
                 var currentErrorMessage = tag.HasError();
                 if (string.IsNullOrWhiteSpace(currentErrorMessage) == false)
                 {
-                    MessageBox.Show($"Unable to save : {currentErrorMessage}");
+                    _standardDialogs.ShowDialogBox($"Unable to save : {currentErrorMessage}");
                     return false;
                 }
             }
 
+            // Save the file
+            var path = _packFileService.GetFullPath(controller.CurrentFile);
             _logger.Here().Information("Creating metadata file. TagCount=" + controller.Tags.Count + " " + path);
-            var tagDataItems = new List<MetaDataTagItem>();
-            foreach (var tag in controller.Tags)
-            {
-                _logger.Here().Information("Prosessing tag " + tag?.DisplayName);
-                tagDataItems.Add(tag.GetAsFileFormatData());
-            }
-
-            _logger.Here().Information("Generating bytes");
 
             var parser = new MetaDataFileParser();
             var bytes = parser.GenerateBytes(controller.MetaDataFileVersion, controller._metaDataFile);
@@ -66,8 +60,6 @@ namespace Editors.AnimationMeta.MetaEditor.Commands
             };
             _eventHub.Publish(saveEvent);
             
-
-
             return true;
         }
     }

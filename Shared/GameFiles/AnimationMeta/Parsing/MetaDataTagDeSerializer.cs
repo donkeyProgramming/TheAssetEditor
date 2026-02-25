@@ -4,6 +4,8 @@ using Shared.ByteParsing;
 
 namespace Shared.GameFormats.AnimationMeta.Parsing
 {
+    // Split into database and serializer 
+
     public class MetaDataTagDeSerializer
     {
         private readonly Dictionary<string, List<Type>> _typeTable = [];

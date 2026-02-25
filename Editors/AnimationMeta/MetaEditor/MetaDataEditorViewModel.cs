@@ -46,7 +46,7 @@ namespace Editors.AnimationMeta.Presentation
                 return;
 
             CurrentFile = file;
-            Tags.Clear();
+         
             DisplayName = file == null ? "" : file.Name;
 
             if (file == null)
@@ -60,7 +60,13 @@ namespace Editors.AnimationMeta.Presentation
 
             _metaDataFile = loadedMetadataFile;
 
-            foreach (var metadataEntry in loadedMetadataFile.Attributes)
+            UpdateView();
+        }
+
+        public void UpdateView()
+        {
+            Tags.Clear();
+            foreach (var metadataEntry in _metaDataFile.Attributes)
             {
                 if (metadataEntry is ParsedUnknownMetadataAttribute uknMeta)
                     Tags.Add(new UnkMetaDataEntry(uknMeta));

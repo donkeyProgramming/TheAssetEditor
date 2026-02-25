@@ -1,21 +1,19 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.ComponentModel;
 using System.Linq;
 using System.Reflection;
 using CommunityToolkit.Mvvm.ComponentModel;
 using Microsoft.Xna.Framework;
-using Serilog;
 using Shared.ByteParsing;
 using Shared.ByteParsing.Parsers;
-using Shared.Core.ErrorHandling;
 using Shared.GameFormats.AnimationMeta.Parsing;
 
 namespace Editors.AnimationMeta.Presentation
 {
     public abstract partial class IMetaDataEntry : ObservableObject
     {
+        public ParsedMetadataAttribute _input;
+
         [ObservableProperty] ObservableCollection<MetaDataAttribute> _variables  = [];
 
         [ObservableProperty] string _displayName = "";
@@ -24,7 +22,6 @@ namespace Editors.AnimationMeta.Presentation
         [ObservableProperty] int _version;
         [ObservableProperty] bool _isSelected;
 
-        public abstract MetaDataTagItem GetAsFileFormatData();
         public abstract string HasError();
     }
 
@@ -41,26 +38,17 @@ namespace Editors.AnimationMeta.Presentation
             Version = unknownMeta.Version;
         }
 
-        public override MetaDataTagItem GetAsFileFormatData()
-        {
-            var newItem = new MetaDataTagItem()
-            {
-                Name = _input.Name,
-                DataItem = new MetaDataTagItem.TagData(_input.Data, 0, _input.Data.Length)
-            };
-            return newItem;
-        }
-
         public override string HasError() => "";
     }
 
     public class MetaDataEntry : IMetaDataEntry
     {
-        private readonly ILogger _logger = Logging.Create<MetaDataEntry>();
         private readonly string _originalName;
+    
 
         public MetaDataEntry(ParsedMetadataAttribute typedMetaItem, MetaDataTagDeSerializer metaDataTagDeSerializer)
         {
+            _input = typedMetaItem;
             _originalName = typedMetaItem.Name;
             DisplayName = typedMetaItem.DisplayName;
             Description = metaDataTagDeSerializer.GetDescriptionSafe(_originalName);
@@ -116,47 +104,6 @@ namespace Editors.AnimationMeta.Presentation
             }
 
             return null;
-        }
-
-        public override MetaDataTagItem GetAsFileFormatData()
-        {
-            // Go though all using reflection.
-            // Get the byte 
-
-
-            _logger.Here().Information("Start " + DisplayName);
-            var newItem = new MetaDataTagItem()
-            {
-                Name = _originalName,
-            };
-
-            _logger.Here().Information("Getting variables");
-            var byteList = new List<byte[]>();
-            foreach (var variable in Variables)
-            {
-                _logger.Here().Information(variable.FieldName + " " + variable.ValueAsString);
-                var bytes = variable.GetByteValue();
-                _logger.Here().Information(variable.FieldName + " " + variable.ValueAsString + " {" + bytes.Length + "}");
-                byteList.Add(bytes);
-            }
-
-            _logger.Here().Information("Creating byte array");
-            var totalCount = byteList.Sum(x => x.Length);
-            var byteArray = new byte[totalCount];
-
-            var currentByte = 0;
-            foreach (var byteItem in byteList)
-            {
-                byteItem.CopyTo(byteArray, currentByte);
-                currentByte += byteItem.Length;
-            }
-
-            _logger.Here().Information("Creating tag. Length = " + totalCount);
-            var instance = new MetaDataTagItem.TagData(byteArray, 0, totalCount);
-            newItem.DataItem = instance;
-
-            _logger.Here().Information("Done");
-            return newItem;
         }
 
         static string FormatFieldName(string name)

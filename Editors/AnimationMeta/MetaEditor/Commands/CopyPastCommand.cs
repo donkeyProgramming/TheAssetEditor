@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing.Imaging;
 using System.Linq;
+using System.Reflection;
 using System.Windows;
 using Editors.AnimationMeta.Presentation;
 using Shared.Core.Events;
@@ -12,7 +14,7 @@ namespace Editors.AnimationMeta.MetaEditor.Commands
     public class MetaDataTagCopyItem : ICopyPastItem
     {
         public string Description => "Copy object for MetaDataTag";
-        public List<ParsedUnknownMetadataAttribute> Items { get; set; } = [];
+        public List<ParsedMetadataAttribute> Items { get; set; } = [];
     }
 
     class CopyPastCommand : IUiCommand
@@ -33,16 +35,37 @@ namespace Editors.AnimationMeta.MetaEditor.Commands
                 .ToList();
 
             // Check for errors
+
             foreach (var tag in selectedTags)
             {
-                if (string.IsNullOrWhiteSpace(tag.HasError()) == false)
+                if (string.IsNullOrWhiteSpace(tag.HasError()) == false || tag._input == null)
                 {
                     MessageBox.Show($"Can not copy object due to: {tag.HasError()}");
                     return;
                 }
             }
-
             var copyPastItem = new MetaDataTagCopyItem();
+            foreach (var item in selectedTags)
+            {
+                var copy = CreateShallowCopy(item._input);
+                copyPastItem.Items.Add(copy);
+
+            }
+            _copyPasteManager.SetCopyItem(copyPastItem);
+        }
+      
+
+           /* var metaDataTagDeSerializer = new MetaDataTagDeSerializer();
+
+            var data = new List<byte>();
+
+            foreach (var item in selectedTags)
+            {
+                var bytes = metaDataTagDeSerializer.Serialize(item., out var errorStr);
+
+
+
+                var copyPastItem = new MetaDataTagCopyItem();
             foreach (var tag in selectedTags)
             {
                 var fileFormatData = tag.GetAsFileFormatData();
@@ -54,36 +77,51 @@ namespace Editors.AnimationMeta.MetaEditor.Commands
                 };
                 copyPastItem.Items.Add(entry);
             }
-            _copyPasteManager.SetCopyItem(copyPastItem);
-        }
+            _copyPasteManager.SetCopyItem(copyPastItem);*/
+        
+
+
+
+     
+
 
         public void ExecutePaste(MetaDataEditorViewModel controller)
         {
             var pastObject = _copyPasteManager.GetPasteObject<MetaDataTagCopyItem>();
             if (pastObject != null)
             {
-                var pasteObjects = pastObject.Items;
-                var confirm = MessageBox.Show($"Paste {pasteObjects.Count} metadata objects?", "Meta Copy Paste", MessageBoxButton.YesNo);
-                if (confirm != MessageBoxResult.Yes)
-                    return;
-
-                foreach (var item in pasteObjects)
-                {
-                    try
-                    {
-                        var typed = _metaDataTagDeSerializer.DeSerialize(item, out var errorStr);
-                        if (typed == null)
-                            throw new Exception(errorStr);
-                        controller.Tags.Add(new MetaDataEntry(typed, _metaDataTagDeSerializer));
-                    }
-                    catch
-                    {
-                        controller.Tags.Add(new UnkMetaDataEntry(item));
-                    }
-                }
-                return;
+                controller._metaDataFile.Attributes.AddRange(pastObject.Items);
             }
 
+            controller.UpdateView();
+        }
+
+        public static T CreateShallowCopy<T>(T original) where T : class
+        {
+            if (original == null)
+            {
+                return null;
+            }
+
+            // Create a new instance of the same type as the original object.
+            // Activator.CreateInstance() uses reflection to instantiate the type dynamically.
+            T copy = (T)Activator.CreateInstance(original.GetType());
+
+            // Get all public, instance properties of the class.
+            PropertyInfo[] properties = original.GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance);
+
+            foreach (PropertyInfo property in properties)
+            {
+                // Check if the property can be read and written to.
+                if (property.CanRead && property.CanWrite)
+                {
+                    // Get the value from the original object and set it on the new copy.
+                    object value = property.GetValue(original);
+                    property.SetValue(copy, value);
+                }
+            }
+
+            return copy;
         }
 
 
