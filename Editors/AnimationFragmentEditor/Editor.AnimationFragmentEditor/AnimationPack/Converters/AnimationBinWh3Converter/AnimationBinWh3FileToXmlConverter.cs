@@ -297,7 +297,7 @@ namespace Editors.AnimationFragmentEditor.AnimationPack.Converters.AnimationBinW
 
             var mainAnimationVersion = mainAnimationHeader.Version;
 
-            var metaItems = parsed.Items;
+            var metaItems = parsed.Attributes;
 
             foreach (var item in metaItems)
             {

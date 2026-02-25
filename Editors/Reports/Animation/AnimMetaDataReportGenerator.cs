@@ -82,7 +82,7 @@ namespace Editors.Reports.Animation
                     metaTable.Add((fileName, metaData));
 
                     var completedTags = 0;
-                    foreach (var item in metaData.Items)
+                    foreach (var item in metaData.Attributes)
                     {
                         var tagName = item.DisplayName;
                         tagName = tagName.ToLower();
@@ -122,7 +122,7 @@ namespace Editors.Reports.Animation
                         }
                     }
 
-                    _logger.Here().Information($"File processed {i}/{fileList.Count} - {completedTags}/{metaData.Items.Count} tags loaded correctly");
+                    _logger.Here().Information($"File processed {i}/{fileList.Count} - {completedTags}/{metaData.Attributes.Count} tags loaded correctly");
                 }
                 catch
                 {

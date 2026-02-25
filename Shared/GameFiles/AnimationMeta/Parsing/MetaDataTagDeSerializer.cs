@@ -1,4 +1,5 @@
 ﻿using System.Reflection;
+using CommunityToolkit.Diagnostics;
 using Shared.ByteParsing;
 
 namespace Shared.GameFormats.AnimationMeta.Parsing
@@ -258,6 +259,8 @@ namespace Shared.GameFormats.AnimationMeta.Parsing
                 }
 
                 var typedInstance = attributeInstance as ParsedMetadataAttribute;
+                Guard.IsNotNull(typedInstance, $"Failed to convert {attributeInstance} into {nameof(ParsedMetadataAttribute)}");
+
                 typedInstance.Name = entry.Name;
                 typedInstance.Data = bytes;
                 errorMessage = null;
@@ -268,76 +271,48 @@ namespace Shared.GameFormats.AnimationMeta.Parsing
         }
 
 
-        public byte[] Serialize(ParsedMetadataAttribute entry, out string? errorMessage)
+        public byte[]? Serialize(ParsedMetadataAttribute entry, out string? errorMessage)
         {
-            var entryInfoList = GetPossibleClassLayoutsForMetaDataAttribute(entry);
-            if (entryInfoList == null)
+            var classLayout = GetClassLayoutsForMetaDataAttribute(entry);
+            if (classLayout == null)
             {
                 errorMessage = $"Unable to find decoder for serializing {entry.Name}_{entry.Version}";
                 return null;
             }
 
-            errorMessage = null;
-
-
+            // Convert the class to bytes by getting the class layout and serializing each property in order.
             var data = new List<byte>();
-           // data.AddRange(BitConverter.GetBytes(metaFile.Version));
-           // data.AddRange(BitConverter.GetBytes(metaFile.Items.Count()));
-
-            foreach (var entryInfo in entryInfoList)
+            foreach (var proptery in classLayout.Properties)
             {
-             //   var instance = Activator.CreateInstance(entryInfo.Type);
-                foreach (var proptery in entryInfo.Properties)
-                {
-                    var parser = ByteParserFactory.Create(proptery.PropertyType);
-                    //try
-                    {
-                        object propertyValue = GetMemberValue(entry, proptery.Name);
-                        var attributeByteValue = parser.Encode(propertyValue);
-                        data.AddRange(attributeByteValue);
-                    }
-                    //catch (Exception e)
-                    //{
-                    //  
-                    //    break;
-                    //}
-                }
+                var propertyValue = GetMemberValue(entry, proptery.Name);
+                var parser = ByteParserFactory.Create(proptery.PropertyType);
+                var attributeByteValue = parser.Encode(propertyValue);
+                data.AddRange(attributeByteValue);
             }
-
+            
+            errorMessage = null;
             return data.ToArray();
-
-            return null;
         }
-
-
-        //
 
         public static object GetMemberValue(object obj, string memberName)
         {
             if (obj == null)
-            {
                 throw new ArgumentNullException(nameof(obj));
-            }
-
-            Type type = obj.GetType();
+  
+            var type = obj.GetType();
 
             // Try to get as a Property
-            PropertyInfo propInfo = type.GetProperty(memberName, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+            var propInfo = type.GetProperty(memberName, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
             if (propInfo != null)
-            {
                 return propInfo.GetValue(obj, null);
-            }
 
             // Try to get as a Field
-            FieldInfo fieldInfo = type.GetField(memberName, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+            var fieldInfo = type.GetField(memberName, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
             if (fieldInfo != null)
-            {
                 return fieldInfo.GetValue(obj);
-            }
 
             throw new MemberAccessException($"Member '{memberName}' not found in type '{type.Name}'.");
         }
-        //
 
 
 
@@ -424,6 +399,20 @@ namespace Shared.GameFormats.AnimationMeta.Parsing
             }
 
             return output;
+        }
+
+
+        EntryInfoResult GetClassLayoutsForMetaDataAttribute(ParsedMetadataAttribute entry)
+        {
+            var orderedPropertiesList = entry.GetType().GetProperties()
+                .Where(x => x.CanWrite)
+                .Where(x => Attribute.IsDefined(x, typeof(MetaDataTagAttribute)))
+                .OrderBy(x => x.GetCustomAttributes<MetaDataTagAttribute>(false).Single().Order)
+                .ToList();
+
+            var entryInfo = new EntryInfoResult(entry.GetType(), orderedPropertiesList);
+            return entryInfo;
+
         }
 
         public record EntryInfoResult(Type? Type, List<PropertyInfo> Properties);

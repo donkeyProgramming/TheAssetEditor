@@ -19,7 +19,7 @@ namespace Shared.GameFormats.AnimationMeta.Parsing
 
         public ParsedMetadataFile ParseFile(byte[] fileContent, MetaDataTagDeSerializer metaDataTagDeSerializer)
         {
-            var contentLength = fileContent.Count();
+            var contentLength = fileContent.Length;
 
             var outputFile = new ParsedMetadataFile()
             {
@@ -29,95 +29,74 @@ namespace Shared.GameFormats.AnimationMeta.Parsing
             if (outputFile.Version != 2)
                 throw new Exception($"Unknown version - {outputFile.Version}");
 
-            if (contentLength > 8)
+            if (contentLength > 8 == false)
+                return outputFile;
+
+            var expectedAttributeCount = BitConverter.ToUInt32(fileContent, 4);
+            var attributes = GetAttributes(fileContent);
+            Debug.Assert(expectedAttributeCount == attributes.Count, $"Not the expected amount elements. Expected {expectedAttributeCount}, got {attributes.Count}");
+
+            // Try to convert from UnkownAttribute to KnownAttribute.
+            // If this fails, we keep the unkown in the list as it has the correct byte data. 
+            foreach (var attribute in attributes)
             {
-                var expectedElements = BitConverter.ToUInt32(fileContent, 4);
-                var items = ExploratoryGetEntries(fileContent);
-
-                if (Debugger.IsAttached)
+                try
                 {
-                    if (expectedElements != items.Count)
-                        throw new Exception($"Not the expected amount elements. Expected {expectedElements}, got {items.Count}");
+                    var deserializedAttribute = metaDataTagDeSerializer.DeSerialize(attribute, out var errorStr);
+                    if (deserializedAttribute != null)
+                    {
+                        outputFile.Attributes.Add(deserializedAttribute);
+                    }
+                    else
+                    {
+                        outputFile.Attributes.Add(attribute);
+                        _logger.Here().Error($"Failed to parse tag of type {attribute.Name}_{attribute.Version} - {errorStr}");
+                    }
                 }
-
-                // Convert to sensible stuff
-                foreach (var item in items)
+                catch (Exception e)
                 {
-                    try
-                    {
-                        var deserializedTag = metaDataTagDeSerializer.DeSerialize(item, out var errorStr);
-                        if (deserializedTag == null)
-                        {
-                            outputFile.Items.Add(item);
-                            _logger.Here().Error($"Failed to parse tag of type {item.Name}_{item.Version} - {errorStr}");
-                        }
-                        else
-                        {
-                            outputFile.Items.Add(deserializedTag);
-                        }
-                    }
-                    catch (Exception e)
-                    {
-                        _logger.Here().Error($"Failed to parse tag of type {item.Name}_{item.Version} - {e.Message}");
-                        outputFile.Items.Add(item);
-                    }
+                    _logger.Here().Error($"Failed to parse tag of type {attribute.Name}_{attribute.Version} - {e.Message}");
+                    outputFile.Attributes.Add(attribute);
                 }
             }
-
+            
             return outputFile;
         }
 
-        List<ParsedUnknownMetadataAttribute> ExploratoryGetEntries(byte[] fileContent)
+        public byte[] GenerateBytes(int version, ParsedMetadataFile metaFile)
+        {
+            var metaDataTagDeSerializer = new MetaDataTagDeSerializer();
+        
+            var data = new List<byte>();
+            data.AddRange(BitConverter.GetBytes(metaFile.Version));
+            data.AddRange(BitConverter.GetBytes(metaFile.Attributes.Count()));
+            foreach (var item in metaFile.Attributes)
+            {
+                var bytes = metaDataTagDeSerializer.Serialize(item, out var errorStr)   ;
+
+
+                data.AddRange(ByteParsers.String.Encode(item.Name, out _));
+                data.AddRange(bytes);
+            }
+
+            return data.ToArray();
+        }
+
+        List<ParsedUnknownMetadataAttribute> GetAttributes(byte[] fileContent)
         {
             var byteLength = fileContent.Length;
             var output = new List<ParsedUnknownMetadataAttribute>();
             var currentIndex = 0 + 8; // version and num elements
 
             ParsedUnknownMetadataAttribute currentElement;
-            while (currentIndex != byteLength && (currentElement = GetElement(currentIndex, fileContent, out currentIndex)) != null)
+            while (currentIndex != byteLength && (currentElement = GetAttribute(currentIndex, fileContent, out currentIndex)) != null)
                 output.Add(currentElement);
 
             return output;
         }
 
-        public byte[] GenerateBytes(int version, IEnumerable<MetaDataTagItem> items)
-        {
-            var data = new List<byte>();
-            data.AddRange(BitConverter.GetBytes(version));
-            data.AddRange(BitConverter.GetBytes(items.Count()));
-            foreach (var item in items)
-            {
-                data.AddRange(ByteParsers.String.Encode(item.Name, out _));
-                data.AddRange(item.DataItem.Bytes);
-            }
 
-            return data.ToArray();
-        }
-
-        public byte[] GenerateBytes(int version, ParsedMetadataFile metaFile)
-        {
-
-            var metaDataTagDeSerializer = new MetaDataTagDeSerializer();
-        
-
-
-            var data = new List<byte>();
-            data.AddRange(BitConverter.GetBytes(metaFile.Version));
-            data.AddRange(BitConverter.GetBytes(metaFile.Items.Count()));
-            foreach (var item in metaFile.Items)
-            {
-                metaDataTagDeSerializer.Serialize(item, out var errorStr)   ;
-
-
-                data.AddRange(ByteParsers.String.Encode(item.Name, out _));
-               // data.AddRange(item.DataItem.Bytes);
-            }
-
-            return data.ToArray();
-        }
-
-
-        ParsedUnknownMetadataAttribute GetElement(int startIndex, byte[] data, out int updatedByteIndex)
+        ParsedUnknownMetadataAttribute GetAttribute(int startIndex, byte[] data, out int updatedByteIndex)
         {
             if (!ByteParsers.String.TryDecode(data, startIndex, out var tagName, out var strBytesRead, out var error))
                 throw new Exception($"Unable to detect tagname for MetaData element starting at {startIndex} - {error}");

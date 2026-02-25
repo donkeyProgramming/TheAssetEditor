@@ -60,7 +60,7 @@ namespace Editors.AnimationMeta.Presentation
 
             _metaDataFile = loadedMetadataFile;
 
-            foreach (var metadataEntry in loadedMetadataFile.Items)
+            foreach (var metadataEntry in loadedMetadataFile.Attributes)
             {
                 if (metadataEntry is ParsedUnknownMetadataAttribute uknMeta)
                     Tags.Add(new UnkMetaDataEntry(uknMeta));

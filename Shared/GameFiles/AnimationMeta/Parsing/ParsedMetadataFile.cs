@@ -4,13 +4,10 @@ namespace Shared.GameFormats.AnimationMeta.Parsing
 {
     public class ParsedMetadataFile
     {
-        public int Version { get; set; }
-        public List<ParsedMetadataAttribute> Items { get; set; } = new List<ParsedMetadataAttribute>();
+        public required int Version { get; set; }
+        public List<ParsedMetadataAttribute> Attributes { get; set; } = [];
 
-        public List<T> GetItemsOfType<T>()
-        {
-            return Items.Where(x => x is T).Cast<T>().ToList();
-        }
+        public List<T> GetItemsOfType<T>() => Attributes.Where(x => x is T).Cast<T>().ToList();
     }
 
 
