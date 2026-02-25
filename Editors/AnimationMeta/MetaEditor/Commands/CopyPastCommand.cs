@@ -12,7 +12,7 @@ namespace Editors.AnimationMeta.MetaEditor.Commands
     public class MetaDataTagCopyItem : ICopyPastItem
     {
         public string Description => "Copy object for MetaDataTag";
-        public List<UnknownMetaEntry> Items { get; set; } = [];
+        public List<ParsedUnknownMetadataAttribute> Items { get; set; } = [];
     }
 
     class CopyPastCommand : IUiCommand
@@ -46,7 +46,7 @@ namespace Editors.AnimationMeta.MetaEditor.Commands
             foreach (var tag in selectedTags)
             {
                 var fileFormatData = tag.GetAsFileFormatData();
-                var entry = new UnknownMetaEntry()
+                var entry = new ParsedUnknownMetadataAttribute()
                 {
                     Name = fileFormatData.Name,
                     Data = fileFormatData.DataItem.Bytes,

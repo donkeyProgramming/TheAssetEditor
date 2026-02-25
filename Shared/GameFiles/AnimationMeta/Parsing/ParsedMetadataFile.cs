@@ -29,7 +29,7 @@ namespace Shared.GameFormats.AnimationMeta.Parsing
 
     }
 
-    public class UnknownMetaEntry : ParsedMetadataAttribute
+    public class ParsedUnknownMetadataAttribute : ParsedMetadataAttribute
     {
 
     }

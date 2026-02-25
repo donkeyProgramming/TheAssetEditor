@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Drawing.Imaging;
+﻿using System.Collections.Generic;
 using System.Windows;
 using Editors.AnimationMeta.Presentation;
 using Serilog;

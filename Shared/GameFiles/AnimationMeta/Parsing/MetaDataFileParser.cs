@@ -67,13 +67,13 @@ namespace Shared.GameFormats.AnimationMeta.Parsing
             return outputFile;
         }
 
-        List<UnknownMetaEntry> ExploratoryGetEntries(byte[] fileContent)
+        List<ParsedUnknownMetadataAttribute> ExploratoryGetEntries(byte[] fileContent)
         {
             var byteLength = fileContent.Length;
-            var output = new List<UnknownMetaEntry>();
+            var output = new List<ParsedUnknownMetadataAttribute>();
             var currentIndex = 0 + 8; // version and num elements
 
-            UnknownMetaEntry currentElement;
+            ParsedUnknownMetadataAttribute currentElement;
             while (currentIndex != byteLength && (currentElement = GetElement(currentIndex, fileContent, out currentIndex)) != null)
                 output.Add(currentElement);
 
@@ -117,7 +117,7 @@ namespace Shared.GameFormats.AnimationMeta.Parsing
         }
 
 
-        UnknownMetaEntry GetElement(int startIndex, byte[] data, out int updatedByteIndex)
+        ParsedUnknownMetadataAttribute GetElement(int startIndex, byte[] data, out int updatedByteIndex)
         {
             if (!ByteParsers.String.TryDecode(data, startIndex, out var tagName, out var strBytesRead, out var error))
                 throw new Exception($"Unable to detect tagname for MetaData element starting at {startIndex} - {error}");
@@ -140,7 +140,7 @@ namespace Shared.GameFormats.AnimationMeta.Parsing
             var destination = new byte[size];
             Array.Copy(data, start, destination, 0, size);
 
-            var metaTagItem = new UnknownMetaEntry()
+            var metaTagItem = new ParsedUnknownMetadataAttribute()
             {
                 Name = tagName,
                 Version = version,

@@ -30,9 +30,9 @@ namespace Editors.AnimationMeta.Presentation
 
     public class UnkMetaDataEntry : IMetaDataEntry
     {
-        private readonly UnknownMetaEntry _input;
+        private readonly ParsedUnknownMetadataAttribute _input;
 
-        public UnkMetaDataEntry(UnknownMetaEntry unknownMeta)
+        public UnkMetaDataEntry(ParsedUnknownMetadataAttribute unknownMeta)
         {
             _input = unknownMeta;
 

@@ -213,7 +213,7 @@ namespace Shared.GameFormats.AnimationMeta.Parsing
             return _typeTable[key];
         }
 
-        public ParsedMetadataAttribute? DeSerialize(UnknownMetaEntry entry, out string? errorMessage)
+        public ParsedMetadataAttribute? DeSerialize(ParsedUnknownMetadataAttribute entry, out string? errorMessage)
         {
             var possibleClassLayouts = GetPossibleClassLayoutsForMetaDataAttribute(entry);
             if (possibleClassLayouts == null)
@@ -290,19 +290,21 @@ namespace Shared.GameFormats.AnimationMeta.Parsing
                 foreach (var proptery in entryInfo.Properties)
                 {
                     var parser = ByteParserFactory.Create(proptery.PropertyType);
-                    try
+                    //try
                     {
                         object propertyValue = GetMemberValue(entry, proptery.Name);
-                        var attributeByteValue = parser.Encode(null, out var writeError);
-                        //data.AddRange(attributeByteValue);
+                        var attributeByteValue = parser.Encode(propertyValue);
+                        data.AddRange(attributeByteValue);
                     }
-                    catch (Exception e)
-                    {
-                      
-                        break;
-                    }
+                    //catch (Exception e)
+                    //{
+                    //  
+                    //    break;
+                    //}
                 }
             }
+
+            return data.ToArray();
 
             return null;
         }

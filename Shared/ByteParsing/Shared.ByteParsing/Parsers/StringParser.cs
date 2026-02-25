@@ -177,6 +177,31 @@ namespace Shared.ByteParsing.Parsers
 
             return value;
         }
+
+        public byte[] Encode(object value)
+        {
+            if (value == null)
+                throw new ArgumentNullException(nameof(value));
+
+            if (value is string s)
+            {
+                var bytes = EncodeValue(s, out var error);
+                if (bytes == null) throw new Exception(error);
+                return bytes;
+            }
+
+            try
+            {
+                var converted = Convert.ToString(value);
+                var bytes = EncodeValue(converted!, out var error);
+                if (bytes == null) throw new Exception(error);
+                return bytes;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Unable to convert object to String", ex);
+            }
+        }
     }
 
 
