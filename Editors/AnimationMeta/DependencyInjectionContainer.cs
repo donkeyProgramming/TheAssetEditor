@@ -5,12 +5,10 @@ using Editors.AnimationMeta.Presentation.View;
 using Editors.AnimationMeta.SuperView;
 using Editors.AnimationMeta.SuperView.Visualisation;
 using Editors.Shared.Core.Common.BaseControl;
-using Editors.Shared.Core.Services;
 using Microsoft.Extensions.DependencyInjection;
 using Shared.Core.DependencyInjection;
 using Shared.Core.DevConfig;
 using Shared.Core.ToolCreation;
-using Shared.GameFormats.AnimationMeta.Parsing;
 
 namespace Editors.AnimationMeta
 {
@@ -18,7 +16,6 @@ namespace Editors.AnimationMeta
     {
         public override void Register(IServiceCollection serviceCollection)
         {
-            serviceCollection.AddSingleton<MetaDataTagDeSerializer>();
             serviceCollection.AddTransient<MainEditorView>();
             serviceCollection.AddTransient<MetaDataEditorViewModel>();
 

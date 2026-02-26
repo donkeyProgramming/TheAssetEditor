@@ -29,7 +29,7 @@ namespace CommonControls.Editors.AnimationPack
         private ITextConverter? _activeConverter;
         private readonly ApplicationSettingsService _appSettings;
         private readonly IFileSaveService _packFileSaveService;
-        private readonly MetaDataTagDeSerializer _metaDataTagDeSerializer;
+        private readonly MetaDataFileParser _metaDataFileParser;
 
         public string DisplayName { get; set; } = "Not set";
 
@@ -40,15 +40,19 @@ namespace CommonControls.Editors.AnimationPack
         SimpleTextEditorViewModel _selectedItemViewModel;
         public SimpleTextEditorViewModel SelectedItemViewModel { get => _selectedItemViewModel; set => SetAndNotify(ref _selectedItemViewModel, value); }
 
-        public AnimPackViewModel(IUiCommandFactory uiCommandFactory, IPackFileService pfs, ISkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper, ApplicationSettingsService appSettings, IFileSaveService packFileSaveService, MetaDataTagDeSerializer metaDataTagDeSerializer)
+        public AnimPackViewModel(IUiCommandFactory uiCommandFactory, 
+            IPackFileService pfs, 
+            ISkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper, 
+            ApplicationSettingsService appSettings, 
+            IFileSaveService packFileSaveService,
+            MetaDataFileParser metaDataFileParser)
         {
             _uiCommandFactory = uiCommandFactory;
             _pfs = pfs;
             _skeletonAnimationLookUpHelper = skeletonAnimationLookUpHelper;
             _appSettings = appSettings;
             _packFileSaveService = packFileSaveService;
-            _metaDataTagDeSerializer = metaDataTagDeSerializer;
-
+            _metaDataFileParser = metaDataFileParser;
             AnimationPackItems = new FilterCollection<IAnimationPackFile>(new List<IAnimationPackFile>(), OnItemSelected, BeforeItemSelected)
             {
                 SearchFilter = (value, rx) => { return rx.Match(value.FileName).Success; }
@@ -83,7 +87,7 @@ namespace CommonControls.Editors.AnimationPack
             else if (seletedFile is AnimationBin typedBin)
                 _activeConverter = new AnimationBinFileToXmlConverter();
             else if (seletedFile is AnimationBinWh3 wh3Bin)
-                _activeConverter = new AnimationBinWh3FileToXmlConverter(_skeletonAnimationLookUpHelper, _metaDataTagDeSerializer, CurrentFile);
+                _activeConverter = new AnimationBinWh3FileToXmlConverter(_skeletonAnimationLookUpHelper, _metaDataFileParser, CurrentFile);
 
             if (seletedFile == null || _activeConverter == null || seletedFile.IsUnknownFile)
             {

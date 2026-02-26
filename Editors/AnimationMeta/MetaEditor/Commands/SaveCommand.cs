@@ -16,13 +16,15 @@ namespace Editors.AnimationMeta.MetaEditor.Commands
         private readonly IEventHub _eventHub;
         private readonly IFileSaveService _packFileSaveService;
         private readonly IStandardDialogs _standardDialogs;
+        private readonly MetaDataFileParser _metaDataFileParser;
 
-        public SaveCommand(IPackFileService packFileService, IEventHub eventHub, IFileSaveService packFileSaveService, IStandardDialogs standardDialogs)
+        public SaveCommand(IPackFileService packFileService, IEventHub eventHub, IFileSaveService packFileSaveService, IStandardDialogs standardDialogs, MetaDataFileParser metaDataFileParser)
         {
             _packFileService = packFileService;
             _eventHub = eventHub;
             _packFileSaveService = packFileSaveService;
             _standardDialogs = standardDialogs;
+            _metaDataFileParser = metaDataFileParser;
         }
 
         public bool Execute(MetaDataEditorViewModel controller)
@@ -42,8 +44,7 @@ namespace Editors.AnimationMeta.MetaEditor.Commands
             var path = _packFileService.GetFullPath(controller.CurrentFile);
             _logger.Here().Information("Creating metadata file. TagCount=" + controller.Tags.Count + " " + path);
 
-            var parser = new MetaDataFileParser();
-            var bytes = parser.GenerateBytes(controller.MetaDataFileVersion, controller._metaDataFile);
+            var bytes = _metaDataFileParser.GenerateBytes(controller.MetaDataFileVersion, controller._metaDataFile);
             _logger.Here().Information("Saving");
             var res = _packFileSaveService.Save(path, bytes, false);
             if (res != null)

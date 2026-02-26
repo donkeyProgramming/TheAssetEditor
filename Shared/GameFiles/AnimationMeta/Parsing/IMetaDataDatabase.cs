@@ -1,23 +1,43 @@
 ﻿using System.Reflection;
-using CommunityToolkit.Diagnostics;
-using Shared.ByteParsing;
 
 namespace Shared.GameFormats.AnimationMeta.Parsing
 {
-    // Split into database and serializer 
-
-    public class MetaDataTagDeSerializer
+    public interface IMetaDataDatabase
     {
+        string GetDescription(string metaDataTagName);
+        string GetDescriptionSafe(string metaDataTagName);
+        List<string> GetSupportedTypes();
+
+        List<Type> GetDefinition(string metadataName);
+    }
+
+    public class MetaDataDatabase : IMetaDataDatabase
+    {
+        private bool _isInitialized = false;
         private readonly Dictionary<string, List<Type>> _typeTable = [];
         private readonly Dictionary<string, string> _descriptionMap = [];
 
-        public MetaDataTagDeSerializer()
+        public MetaDataDatabase()
         {
-            EnsureMappingTableCreated();
+       
         }
 
-        void EnsureMappingTableCreated()
+        public List<Type> GetDefinition(string metadataName)
         {
+            EnsureMappingTableCreated();
+
+            var result = _typeTable.TryGetValue(metadataName, out var typeTable);
+            if (result == false || typeTable == null)
+                throw new Exception($"No metadata tags for {metadataName}");
+            return typeTable;
+        }
+
+        public void EnsureMappingTableCreated()
+        {
+            if (_isInitialized)
+                return;
+
+            _isInitialized = true;
             CreateDescriptions();
 
             var typesWithMyAttribute =
@@ -75,6 +95,24 @@ namespace Shared.GameFormats.AnimationMeta.Parsing
             }
 #endif
         }
+
+
+        ParsedMetadataAttribute CreateDefault(string itemName)
+        {
+            EnsureMappingTableCreated();
+
+            if (_typeTable.ContainsKey(itemName) == false)
+                throw new Exception("Unknown metadata item " + itemName);
+
+            var type = _typeTable[itemName].First();
+            var instance = Activator.CreateInstance(type) as ParsedMetadataAttribute;
+
+            var itemNameSplit = itemName.ToUpper().Split("_");
+            instance.Version = int.Parse(itemNameSplit.Last());
+            instance.Name = string.Join("_", itemNameSplit.Take(itemNameSplit.Length - 1));
+            return instance;
+        }
+
 
         void CreateDescriptions()
         {
@@ -180,6 +218,8 @@ namespace Shared.GameFormats.AnimationMeta.Parsing
 
         public string GetDescription(string metaDataTagName)
         {
+            EnsureMappingTableCreated();
+
             if (_descriptionMap.ContainsKey(metaDataTagName) == false)
                 throw new Exception($"Unable to get description of {metaDataTagName}");
             return _descriptionMap[metaDataTagName];
@@ -187,6 +227,8 @@ namespace Shared.GameFormats.AnimationMeta.Parsing
 
         public string GetDescriptionSafe(string metaDataTagName)
         {
+            EnsureMappingTableCreated();
+
             if (_descriptionMap.ContainsKey(metaDataTagName) == false)
                 return "Missing";
             return _descriptionMap[metaDataTagName];
@@ -194,230 +236,14 @@ namespace Shared.GameFormats.AnimationMeta.Parsing
 
         public List<string> GetSupportedTypes()
         {
+            EnsureMappingTableCreated();
+
             return _typeTable.Select(x => x.Key).ToList();
         }
 
-        bool IsSequential(int[] array)
+        static bool IsSequential(int[] array)
         {
             return array.Zip(array.Skip(1), (a, b) => a + 1 == b).All(x => x);
         }
-
-        /// <summary>
-        /// Get all possible metadata definitions for a given metadata attribute.
-        /// It could be multiple, as some games share the same attribute name, but 
-        /// has different binary representation. For example BlendOverride_v11_Troy
-        /// </summary>
-        List<Type> GetPossibleTypesForMetaDataAttribute(ParsedMetadataAttribute entry)
-        {
-            var key = entry.Name + "_" + entry.Version;
-            if (_typeTable.ContainsKey(key) == false)
-                return [];
-
-            return _typeTable[key];
-        }
-
-        public ParsedMetadataAttribute? DeSerialize(ParsedUnknownMetadataAttribute entry, out string? errorMessage)
-        {
-            var possibleClassLayouts = GetPossibleClassLayoutsForMetaDataAttribute(entry);
-            if (possibleClassLayouts == null)
-            {
-                errorMessage = $"Unable to find decoder for deserializing {entry.Name}_{entry.Version}";
-                return null;
-            }
-
-            errorMessage = null;
-
-            // Try all possible class layouts until we find one that can successfully read the data
-            foreach (var possibleClassLayout in possibleClassLayouts)
-            {
-                var attributeInstance = Activator.CreateInstance(possibleClassLayout.Type);
-                var bytes = entry.Data;
-                var currentIndex = 0;
-                foreach (var proptery in possibleClassLayout.Properties)
-                {
-                    var parser = ByteParserFactory.Create(proptery.PropertyType);
-                    try
-                    {
-                        var value = parser.GetValueAsObject(bytes, currentIndex, out var bytesRead);
-                        currentIndex += bytesRead;
-                        proptery.SetValue(attributeInstance, value);
-                        errorMessage = "";
-                    }
-                    catch (Exception e)
-                    {
-                        errorMessage = $"Failed to read object - {e.Message} bytes left";
-                        break;
-                    }
-                }
-
-                if (errorMessage != "")
-                    continue;
-
-                var bytesLeft = bytes.Length - currentIndex;
-                if (bytesLeft != 0)
-                {
-                    errorMessage = $"Failed to read object - {bytesLeft} bytes left";
-                    continue;
-                }
-
-                var typedInstance = attributeInstance as ParsedMetadataAttribute;
-                Guard.IsNotNull(typedInstance, $"Failed to convert {attributeInstance} into {nameof(ParsedMetadataAttribute)}");
-
-                typedInstance.Name = entry.Name;
-                typedInstance.Data = bytes;
-                errorMessage = null;
-                return typedInstance;
-            }
-
-            return null;
-        }
-
-
-        public byte[]? Serialize(ParsedMetadataAttribute entry, out string? errorMessage)
-        {
-            var classLayout = GetClassLayoutsForMetaDataAttribute(entry);
-            if (classLayout == null)
-            {
-                errorMessage = $"Unable to find decoder for serializing {entry.Name}_{entry.Version}";
-                return null;
-            }
-
-            // Convert the class to bytes by getting the class layout and serializing each property in order.
-            var data = new List<byte>();
-            foreach (var proptery in classLayout.Properties)
-            {
-                var propertyValue = GetMemberValue(entry, proptery.Name);
-                var parser = ByteParserFactory.Create(proptery.PropertyType);
-                var attributeByteValue = parser.Encode(propertyValue);
-                data.AddRange(attributeByteValue);
-            }
-            
-            errorMessage = null;
-            return data.ToArray();
-        }
-
-        public static object GetMemberValue(object obj, string memberName)
-        {
-            if (obj == null)
-                throw new ArgumentNullException(nameof(obj));
-  
-            var type = obj.GetType();
-
-            // Try to get as a Property
-            var propInfo = type.GetProperty(memberName, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
-            if (propInfo != null)
-                return propInfo.GetValue(obj, null);
-
-            // Try to get as a Field
-            var fieldInfo = type.GetField(memberName, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
-            if (fieldInfo != null)
-                return fieldInfo.GetValue(obj);
-
-            throw new MemberAccessException($"Member '{memberName}' not found in type '{type.Name}'.");
-        }
-
-
-
-
-        public List<(string Header, string Value)>? DeSerializeToStrings(ParsedMetadataAttribute entry, out string? errorMessage)
-        {
-            var entryInfoList = GetPossibleClassLayoutsForMetaDataAttribute(entry);
-            if (entryInfoList == null)
-            {
-                errorMessage = $"Unable to find decoder for {entry.Name}_{entry.Version}";
-                return null;
-            }
-
-            var bytes = entry.Data;
-            var currentIndex = 0;
-            var output = new List<(string, string)>();
-            errorMessage = null;
-
-            foreach (var entryInfo in entryInfoList)
-            {
-                errorMessage = "";
-                foreach (var proptery in entryInfo.Properties)
-                {
-                    var parser = ByteParserFactory.Create(proptery.PropertyType);
-                    var result = parser.TryDecode(bytes, currentIndex, out var value, out var bytesRead, out var error);
-                    if (result == false)
-                    {
-                        errorMessage = $"Failed to serialize {proptery.Name} - {error}";
-                        break;
-                    }
-                    currentIndex += bytesRead;
-                    output.Add((proptery.Name, value));
-                }
-
-                if (errorMessage != "")
-                    continue;
-
-                var bytesLeft = bytes.Length - currentIndex;
-                if (bytesLeft != 0)
-                {
-                    errorMessage = $"Failed to read object - {bytesLeft} bytes left";
-                    continue;
-                }
-
-                errorMessage = null;
-                return output;
-            }
-
-            return output;
-        }
-
-        public ParsedMetadataAttribute CreateDefault(string itemName)
-        {
-            if (_typeTable.ContainsKey(itemName) == false)
-                throw new Exception("Unknown metadata item " + itemName);
-
-            var type = _typeTable[itemName].First();
-            var instance = Activator.CreateInstance(type) as ParsedMetadataAttribute;
-
-            var itemNameSplit = itemName.ToUpper().Split("_");
-            instance.Version = int.Parse(itemNameSplit.Last());
-            instance.Name = string.Join("_", itemNameSplit.Take(itemNameSplit.Length - 1));
-            return instance;
-        }
-
-        List<EntryInfoResult>? GetPossibleClassLayoutsForMetaDataAttribute(ParsedMetadataAttribute entry)
-        {
-            var possibleAttributeTypes = GetPossibleTypesForMetaDataAttribute(entry);
-            if (possibleAttributeTypes.Count() == 0)
-                return null;
-
-            var output = new List<EntryInfoResult>();
-            foreach (var possibleAttributeType in possibleAttributeTypes)
-            {
-                var instance = Activator.CreateInstance(possibleAttributeType);
-                var orderedPropertiesList = possibleAttributeType.GetProperties()
-                    .Where(x => x.CanWrite)
-                    .Where(x => Attribute.IsDefined(x, typeof(MetaDataTagAttribute)))
-                    .OrderBy(x => x.GetCustomAttributes<MetaDataTagAttribute>(false).Single().Order)
-                    .ToList();
-
-                var entryInfo = new EntryInfoResult(possibleAttributeType, orderedPropertiesList);
-                output.Add(entryInfo);
-            }
-
-            return output;
-        }
-
-
-        EntryInfoResult GetClassLayoutsForMetaDataAttribute(ParsedMetadataAttribute entry)
-        {
-            var orderedPropertiesList = entry.GetType().GetProperties()
-                .Where(x => x.CanWrite)
-                .Where(x => Attribute.IsDefined(x, typeof(MetaDataTagAttribute)))
-                .OrderBy(x => x.GetCustomAttributes<MetaDataTagAttribute>(false).Single().Order)
-                .ToList();
-
-            var entryInfo = new EntryInfoResult(entry.GetType(), orderedPropertiesList);
-            return entryInfo;
-
-        }
-
-        public record EntryInfoResult(Type? Type, List<PropertyInfo> Properties);
-
     }
 }

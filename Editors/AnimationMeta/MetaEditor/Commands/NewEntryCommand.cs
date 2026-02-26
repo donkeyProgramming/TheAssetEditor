@@ -9,17 +9,19 @@ namespace Editors.AnimationMeta.MetaEditor.Commands
 {
     internal class NewEntryCommand : IUiCommand
     {
-        private readonly MetaDataTagDeSerializer _metaDataTagDeSerializer;
+        private readonly MetaDataFileParser _metaDataFileParser;
+        private readonly IMetaDataDatabase _metaDataDatabase;
 
-        public NewEntryCommand(MetaDataTagDeSerializer metaDataTagDeSerializer) 
+        public NewEntryCommand(MetaDataFileParser metaDataFileParser, IMetaDataDatabase metaDataDatabase) 
         {
-            _metaDataTagDeSerializer = metaDataTagDeSerializer;
+            _metaDataFileParser = metaDataFileParser;
+            _metaDataDatabase = metaDataDatabase;
         }
 
         public void Execute(MetaDataEditorViewModel controller)
         {
             var dialog = new NewMetaDataEntryWindow() { Owner = Application.Current.MainWindow };
-            var allDefs = _metaDataTagDeSerializer.GetSupportedTypes();
+            var allDefs = _metaDataDatabase.GetSupportedTypes();
 
             var model = new NewTagWindowViewModel
             {
@@ -30,8 +32,9 @@ namespace Editors.AnimationMeta.MetaEditor.Commands
             var res = dialog.ShowDialog();
             if (res.HasValue && res.Value == true)
             {
-                var newEntry = _metaDataTagDeSerializer.CreateDefault(model.SelectedItem);
-                var newTagView = new MetaDataEntry(newEntry, _metaDataTagDeSerializer);
+                var newEntry = _metaDataFileParser.CreateDefault(model.SelectedItem);
+                var desc = _metaDataDatabase.GetDescriptionSafe(newEntry.DisplayName);
+                var newTagView = new MetaDataEntry(newEntry, desc);
                 controller.Tags.Add(newTagView);
             }
 

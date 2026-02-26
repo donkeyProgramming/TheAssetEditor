@@ -32,18 +32,18 @@ namespace Editors.Reports.Animation
 
         private readonly IPackFileService _pfs;
         private readonly ApplicationSettingsService _settingsService;
-        private readonly MetaDataTagDeSerializer _metaDataTagDeSerializer;
+        private readonly MetaDataFileParser _metaDataFileParser;
 
-        public AnimMetaDataReportGenerator(IPackFileService pfs, ApplicationSettingsService settingsService, MetaDataTagDeSerializer metaDataTagDeSerializer)
+        public AnimMetaDataReportGenerator(IPackFileService pfs, ApplicationSettingsService settingsService, MetaDataFileParser metaDataFileParser)
         {
             _pfs = pfs;
             _settingsService = settingsService;
-            _metaDataTagDeSerializer = metaDataTagDeSerializer;
+            _metaDataFileParser = metaDataFileParser;
         }
 
-        public static void Generate(IPackFileService pfs, ApplicationSettingsService settingsService, MetaDataTagDeSerializer metaDataTagDeSerializer)
+        public static void Generate(IPackFileService pfs, ApplicationSettingsService settingsService, MetaDataFileParser metaDataFileParser)
         {
-            var instance = new AnimMetaDataReportGenerator(pfs, settingsService, metaDataTagDeSerializer);
+            var instance = new AnimMetaDataReportGenerator(pfs, settingsService, metaDataFileParser);
             instance.Create();
         }
 
@@ -77,8 +77,8 @@ namespace Editors.Reports.Animation
                     if (data.Length == 0)
                         continue;
 
-                    var parser = new MetaDataFileParser();
-                    var metaData = parser.ParseFile(data, _metaDataTagDeSerializer);
+
+                    var metaData = _metaDataFileParser.ParseFile(data);
                     metaTable.Add((fileName, metaData));
 
                     var completedTags = 0;
@@ -92,7 +92,7 @@ namespace Editors.Reports.Animation
 
                         try
                         {
-                            var variables = _metaDataTagDeSerializer.DeSerializeToStrings(item, out var errorMessage);
+                            var variables = _metaDataFileParser.DeSerializeToStrings(item, out var errorMessage);
                             if (variables != null)
                             {
 

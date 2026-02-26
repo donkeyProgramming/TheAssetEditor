@@ -13,8 +13,7 @@ namespace Editors.AnimationMeta.Presentation
     public partial class MetaDataEditorViewModel : ObservableObject, IEditorInterface, ISaveableEditor, IFileEditor
     {
         private readonly IUiCommandFactory _uiCommandFactory;
-        private readonly MetaDataTagDeSerializer _metaDataTagDeSerializer;
-
+        private readonly MetaDataFileParser _metaDataFileParser;
         public ParsedMetadataFile _metaDataFile;
 
         [ObservableProperty] string _displayName = "Metadata Editor";
@@ -25,10 +24,10 @@ namespace Editors.AnimationMeta.Presentation
         public bool HasUnsavedChanges { get; set; } = false;
         public PackFile CurrentFile { get; set; }
 
-        public MetaDataEditorViewModel(IUiCommandFactory uiCommandFactory, MetaDataTagDeSerializer metaDataTagDeSerializer)
+        public MetaDataEditorViewModel(IUiCommandFactory uiCommandFactory, MetaDataFileParser metaDataFileParser)
         {
             _uiCommandFactory = uiCommandFactory;
-            _metaDataTagDeSerializer = metaDataTagDeSerializer;
+            _metaDataFileParser = metaDataFileParser;
         }
 
         partial void OnSelectedTagChanged(IMetaDataEntry value)
@@ -54,8 +53,7 @@ namespace Editors.AnimationMeta.Presentation
 
             var fileContent = CurrentFile.DataSource.ReadData();
 
-            var parser = new MetaDataFileParser();
-            var loadedMetadataFile = parser.ParseFile(fileContent, _metaDataTagDeSerializer);
+            var loadedMetadataFile = _metaDataFileParser.ParseFile(fileContent);
             MetaDataFileVersion = loadedMetadataFile.Version;
 
             _metaDataFile = loadedMetadataFile;
@@ -71,7 +69,10 @@ namespace Editors.AnimationMeta.Presentation
                 if (metadataEntry is ParsedUnknownMetadataAttribute uknMeta)
                     Tags.Add(new UnkMetaDataEntry(uknMeta));
                 else if (metadataEntry is ParsedMetadataAttribute parsedKnownAttribute)
-                    Tags.Add(new MetaDataEntry(parsedKnownAttribute, _metaDataTagDeSerializer));
+                {
+                    var desc = _metaDataFileParser.GetDatabase().GetDescriptionSafe(parsedKnownAttribute.DisplayName);
+                    Tags.Add(new MetaDataEntry(parsedKnownAttribute, desc));
+                }
                 else
                     throw new Exception($"{metadataEntry.GetType()} is not a known type for {nameof(MetaDataEditorViewModel)}");
             }

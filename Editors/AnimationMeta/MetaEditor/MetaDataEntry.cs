@@ -46,12 +46,12 @@ namespace Editors.AnimationMeta.Presentation
         private readonly string _originalName;
     
 
-        public MetaDataEntry(ParsedMetadataAttribute typedMetaItem, MetaDataTagDeSerializer metaDataTagDeSerializer)
+        public MetaDataEntry(ParsedMetadataAttribute typedMetaItem, string description)
         {
             _input = typedMetaItem;
             _originalName = typedMetaItem.Name;
             DisplayName = typedMetaItem.DisplayName;
-            Description = metaDataTagDeSerializer.GetDescriptionSafe(_originalName);
+            Description = description;
             Version = typedMetaItem.Version;
 
             var orderedPropertiesList = typedMetaItem.GetType().GetProperties()
