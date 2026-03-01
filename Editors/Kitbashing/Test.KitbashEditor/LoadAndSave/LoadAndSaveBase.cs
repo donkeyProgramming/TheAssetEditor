@@ -6,11 +6,11 @@ using GameWorld.Core.Rendering.Materials.Shaders.SpecGloss;
 using GameWorld.Core.SceneNodes;
 using GameWorld.Core.Services.SceneSaving;
 using Shared.Core.Events;
+using Shared.Core.Events.Global;
 using Shared.Core.Settings;
 using Shared.GameFormats.RigidModel;
 using Shared.GameFormats.RigidModel.MaterialHeaders;
 using Shared.GameFormats.RigidModel.Types;
-using Shared.Ui.Events.UiCommands;
 using Test.TestingUtility.Shared;
 using Test.TestingUtility.TestUtility;
 

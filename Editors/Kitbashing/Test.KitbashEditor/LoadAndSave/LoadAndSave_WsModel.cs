@@ -6,8 +6,8 @@ using System.Threading.Tasks;
 using Editors.KitbasherEditor.UiCommands;
 using GameWorld.Core.Services.SceneSaving;
 using Shared.Core.Events;
+using Shared.Core.Events.Global;
 using Shared.GameFormats.RigidModel;
-using Shared.Ui.Events.UiCommands;
 using Test.TestingUtility.Shared;
 
 namespace Test.KitbashEditor.LoadAndSave

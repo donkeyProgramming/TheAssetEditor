@@ -7,8 +7,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Shared.Core.DependencyInjection;
 using Shared.Core.DevConfig;
 using Shared.Core.ErrorHandling.Exceptions;
+using Shared.Core.Events.Global;
 using Shared.Core.ToolCreation;
-using Shared.Ui.Events.UiCommands;
 
 namespace AssetEditor
 {

@@ -13,7 +13,6 @@ using Shared.Core.ToolCreation;
 using Shared.Ui.BaseDialogs.PackFileTree;
 using Shared.Ui.BaseDialogs.PackFileTree.ContextMenu;
 using Shared.Ui.Common;
-using Shared.Ui.Events.UiCommands;
 
 namespace AssetEditor.ViewModels
 {
