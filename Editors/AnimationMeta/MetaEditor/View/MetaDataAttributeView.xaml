@@ -40,7 +40,7 @@
                 </ListView.ItemContainerStyle>
 
                 <ListView.Resources>
-                    <DataTemplate DataType="{ x:Type tags:MetaDataAttribute}">
+                    <DataTemplate DataType="{ x:Type tags:AttributeViewModel}">
                         <ContentControl>
                             <ContentControl.ToolTip>
                                 <Viewbox StretchDirection="DownOnly" Stretch="Fill" HorizontalAlignment="Left">
@@ -61,7 +61,7 @@
                         </ContentControl>
                     </DataTemplate>
 
-                    <DataTemplate DataType="{ x:Type tags:VectorMetaDataAttribute}">
+                    <DataTemplate DataType="{ x:Type tags:VectorAttributeViewModel}">
                         <ContentControl>
                             <ContentControl.ToolTip>
                                 <Viewbox StretchDirection="DownOnly" Stretch="Fill" HorizontalAlignment="Left">
@@ -81,7 +81,7 @@
                         </ContentControl>
                     </DataTemplate>
 
-                    <DataTemplate DataType="{ x:Type tags:OrientationMetaDataAttribute}">
+                    <DataTemplate DataType="{ x:Type tags:OrientationAttributeViewModel}">
                         <ContentControl>
                             <ContentControl.ToolTip>
                                 <Viewbox StretchDirection="DownOnly" Stretch="Fill" HorizontalAlignment="Left">

@@ -25,21 +25,24 @@ using Shared.GameFormats.AnimationPack;
 namespace Editors.AnimationMeta.SuperView.Visualisation
 {
 
-    public interface IMetaDataFactory
+    public interface IMetaDataBuilder
     {
-        List<IMetaDataInstance> Create(ParsedMetadataFile persistent, ParsedMetadataFile metaData, SceneNode root, ISkeletonProvider skeleton, AnimationPlayer rootPlayer, IAnimationBinGenericFormat fragment);
+        List<IMetaDataInstance> Create(ParsedMetadataFile persistent, ParsedMetadataFile metaData, ParsedMetadataAttribute selectedMetaDataAttribute, SceneNode root, ISkeletonProvider skeleton, AnimationPlayer rootPlayer, IAnimationBinGenericFormat fragment);
     }
 
-    public class MetaDataFactory : IMetaDataFactory
+    public class MetaDataBuilder : IMetaDataBuilder
     {
-        private readonly ILogger _logger = Logging.Create<MetaDataFactory>();
+        private readonly ILogger _logger = Logging.Create<MetaDataBuilder>();
         private readonly ComplexMeshLoader _complexMeshLoader;
         private readonly RenderEngineComponent _resourceLibrary;
         private readonly ISkeletonAnimationLookUpHelper _skeletonAnimationLookUpHelper;
         private readonly IPackFileService _packFileService;
         private readonly AnimationsContainerComponent _animationsContainerComponent;
 
-        public MetaDataFactory(ComplexMeshLoader complexMeshLoader,
+        private static Color s_color = Color.Black;
+        private static Color s_selectedColor = Color.Red;
+
+        public MetaDataBuilder(ComplexMeshLoader complexMeshLoader,
             RenderEngineComponent resourceLibrary,
             ISkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper,
             IPackFileService packFileService,
@@ -52,39 +55,42 @@ namespace Editors.AnimationMeta.SuperView.Visualisation
             _animationsContainerComponent = animationsContainerComponent;
         }
 
-        public List<IMetaDataInstance> Create(ParsedMetadataFile persistent, ParsedMetadataFile metaData, SceneNode root, ISkeletonProvider skeleton, AnimationPlayer rootPlayer, IAnimationBinGenericFormat fragment)
+        public List<IMetaDataInstance> Create(ParsedMetadataFile persistent, 
+            ParsedMetadataFile metaData,ParsedMetadataAttribute selectedMetaDataAttribute,
+            SceneNode root, ISkeletonProvider skeleton, AnimationPlayer rootPlayer, IAnimationBinGenericFormat fragment)
         {
             // Clear all
             var output = new List<IMetaDataInstance>();
 
+            // Apply persistent meta data, if no disable is given.
             if (metaData == null || metaData.GetItemsOfType<DisablePersistant_v10>().Count == 0)
             {
-                var metaDataPersistent = ApplyMetaData(persistent, root, skeleton, rootPlayer, fragment);
+                var metaDataPersistent = ApplyMetaData(persistent, selectedMetaDataAttribute,root, skeleton, rootPlayer, fragment);
                 output.AddRange(metaDataPersistent);
             }
 
-            var metaDataInstances = ApplyMetaData(metaData, root, skeleton, rootPlayer, fragment);
+            var metaDataInstances = ApplyMetaData(metaData, selectedMetaDataAttribute,root, skeleton, rootPlayer, fragment);
             output.AddRange(metaDataInstances);
             return output;
         }
 
-        private IEnumerable<IMetaDataInstance> ApplyMetaData(ParsedMetadataFile file, SceneNode root, ISkeletonProvider skeleton, AnimationPlayer rootPlayer, IAnimationBinGenericFormat fragment)
+        private IEnumerable<IMetaDataInstance> ApplyMetaData(ParsedMetadataFile file, ParsedMetadataAttribute selectedAttribute, SceneNode root, ISkeletonProvider skeleton, AnimationPlayer rootPlayer, IAnimationBinGenericFormat fragment)
         {
             var output = new List<IMetaDataInstance>();
             if (file == null)
                 return output;
 
-            output.AddRange(file.GetItemsOfType<IAnimatedPropMeta>().Select(x => CreateAnimatedProp(x, root, skeleton)));
+            output.AddRange(file.GetItemsOfType<IAnimatedPropMeta>().Select(x => CreateAnimatedProp(x, root, skeleton, selectedAttribute, rootPlayer)));
 
-            output.AddRange(file.GetItemsOfType<ImpactPosition_v10>().Select(meteDataItem => CreateStaticLocator(meteDataItem, root, meteDataItem.Position, "ImpactPos")));
+            output.AddRange(file.GetItemsOfType<ImpactPosition_v10>().Select(meteDataItem => CreateStaticLocator(meteDataItem, root, meteDataItem.Position, "ImpactPos", selectedAttribute)));
 
-            output.AddRange(file.GetItemsOfType<TargetPos_10>().Select(meteDataItem => CreateStaticLocator(meteDataItem, root, meteDataItem.Position, "TargetPos")));
+            output.AddRange(file.GetItemsOfType<TargetPos_10>().Select(meteDataItem => CreateStaticLocator(meteDataItem, root, meteDataItem.Position, "TargetPos", selectedAttribute)));
 
-            output.AddRange(file.GetItemsOfType<FirePos_v10>().Select(meteDataItem => CreateStaticLocator(meteDataItem, root, meteDataItem.Position, "FirePos")));
+            output.AddRange(file.GetItemsOfType<FirePos_v10>().Select(meteDataItem => CreateStaticLocator(meteDataItem, root, meteDataItem.Position, "FirePos", selectedAttribute)));
 
-            output.AddRange(file.GetItemsOfType<SplashAttack_v10>().Select(meteDataItem => CreateSplashAttack(meteDataItem, root, $"SplashAttack_{Math.Round(meteDataItem.EndTime, 2)}", 0.1f)));
+            output.AddRange(file.GetItemsOfType<SplashAttack_v10>().Select(meteDataItem => CreateSplashAttack(meteDataItem, root, $"SplashAttack_{Math.Round(meteDataItem.EndTime, 2)}", 0.1f, selectedAttribute)));
 
-            output.AddRange(file.GetItemsOfType<IEffectMeta>().Select(x => CreateEffect(x, root, skeleton)));
+            output.AddRange(file.GetItemsOfType<IEffectMeta>().Select(x => CreateEffect(x, root, skeleton, selectedAttribute)));
 
             foreach (var meteDataItem in file.GetItemsOfType<DockEquipment>())
                 CreateEquipmentDock(meteDataItem, fragment, skeleton, rootPlayer);
@@ -134,9 +140,10 @@ namespace Editors.AnimationMeta.SuperView.Visualisation
             rootPlayer.AnimationRules.Add(rule);
         }
 
-        private IMetaDataInstance CreateAnimatedProp(IAnimatedPropMeta animatedPropMeta, SceneNode root, ISkeletonProvider rootSkeleton)
+        private IMetaDataInstance CreateAnimatedProp(IAnimatedPropMeta animatedPropMeta, SceneNode root, ISkeletonProvider rootSkeleton, ParsedMetadataAttribute selectedMetaDataAttribute, AnimationPlayer rootPlayer)
         {
             var propName = "Animated_prop";
+            var color = selectedMetaDataAttribute == animatedPropMeta ? s_selectedColor : s_color;
 
             var meshPath = _packFileService.FindFile(animatedPropMeta.ModelName);
             var animationPath = _packFileService.FindFile(animatedPropMeta.AnimationName);
@@ -156,23 +163,30 @@ namespace Editors.AnimationMeta.SuperView.Visualisation
                 propPlayer.SetAnimation(clip, skeleton);
 
                 // Add the prop skeleton
-                var skeletonSceneNode = new SkeletonNode(skeleton);
-                skeletonSceneNode.NodeColour = Color.Yellow;
-                skeletonSceneNode.ScaleMult = animatedPropMeta.Scale;
+                var skeletonSceneNode = new SkeletonNode(skeleton)
+                {
+                    NodeColour = color,
+                    ScaleMult = animatedPropMeta.Scale
+                };
                 loadedNode.AddObject(skeletonSceneNode);
             }
 
             // Configure scale
             loadedNode.ForeachNodeRecursive((node) =>
             {
-                if (node is SceneNode selectable)
-                    selectable.ScaleMult = animatedPropMeta.Scale;
+                if (node is ISelectable selectableNode)
+                    selectableNode.IsSelectable = false;
+
+                if (node is SceneNode sceneNode)
+                    sceneNode.ScaleMult = animatedPropMeta.Scale;
             });
             loadedNode.ScaleMult = animatedPropMeta.Scale;
 
             // Add the animation rules
             var animationRule = new CopyRootTransform(rootSkeleton, animatedPropMeta.BoneId, animatedPropMeta.Position, new Quaternion(animatedPropMeta.Orientation));
             propPlayer.AnimationRules.Add(animationRule);
+            if(rootPlayer.IsPlaying)
+                propPlayer.Play();
 
             // Add to scene
             root.AddObject(loadedNode);
@@ -180,39 +194,41 @@ namespace Editors.AnimationMeta.SuperView.Visualisation
             return new AnimatedPropInstance(loadedNode, propPlayer);
         }
 
-        private IMetaDataInstance CreateStaticLocator(DecodedMetaEntryBase metaData, SceneNode root, Vector3 position, string displayName, float scale = 0.3f)
+        private IMetaDataInstance CreateStaticLocator(DecodedMetaEntryBase metaData, SceneNode root, Vector3 position, string displayName, ParsedMetadataAttribute selectedMetaDataAttribute, float scale = 0.3f)
         {
+            var color = selectedMetaDataAttribute == metaData ? s_selectedColor : s_color;
+
             var node = new SimpleDrawableNode(displayName);
-            node.AddItem(new WorldTextRenderItem(_resourceLibrary, displayName, position));
-            node.AddItem(LineHelper.AddCircle(position, scale, Color.Red));
+            node.AddItem(new WorldTextRenderItem(_resourceLibrary, displayName, position, color));
+            node.AddItem(LineHelper.AddCircle(position, scale, color));
             root.AddObject(node);
 
             return new DrawableMetaInstance(metaData.StartTime, metaData.EndTime, node.Name, node);
         }
 
-        private IMetaDataInstance CreateSplashAttack(SplashAttack_v10 splashAttack, SceneNode root, string displayName, float scale = 0.3f)
+        private IMetaDataInstance CreateSplashAttack(SplashAttack_v10 splashAttack, SceneNode root, string displayName, float scale, ParsedMetadataAttribute selectedAttribute)
         {
             var distance = Vector3.Distance(splashAttack.StartPosition, splashAttack.EndPosition);
             if (MathUtil.CompareEqualFloats(distance))
-            {
                 throw new ConstraintException($"{displayName}: the distance between StartPosition {splashAttack.StartPosition} and EndPosition {splashAttack.EndPosition} is close to 0");
-            }
+
+            var color = selectedAttribute == splashAttack ? s_selectedColor : s_color;
 
             var node = new SimpleDrawableNode(displayName);
             var textPos = (splashAttack.EndPosition + splashAttack.StartPosition) / 2;
             
-            node.AddItem( new WorldTextRenderItem(_resourceLibrary, "StartPos", splashAttack.StartPosition));
-            node.AddItem(LineHelper.AddLocator(splashAttack.StartPosition, scale, Color.Red));
+            node.AddItem( new WorldTextRenderItem(_resourceLibrary, "StartPos", splashAttack.StartPosition, color));
+            node.AddItem(LineHelper.AddLocator(splashAttack.StartPosition, scale, color));
             
-            node.AddItem( new WorldTextRenderItem(_resourceLibrary, "EndPos", splashAttack.EndPosition));
-            node.AddItem(LineHelper.AddLocator(splashAttack.EndPosition, scale, Color.Red));
+            node.AddItem( new WorldTextRenderItem(_resourceLibrary, "EndPos", splashAttack.EndPosition, color));
+            node.AddItem(LineHelper.AddLocator(splashAttack.EndPosition, scale, color));
             
-            node.AddItem(new WorldTextRenderItem(_resourceLibrary, displayName, textPos));
-            node.AddItem(LineHelper.AddLine(splashAttack.StartPosition, splashAttack.EndPosition, Color.Red));
+            node.AddItem(new WorldTextRenderItem(_resourceLibrary, displayName, textPos, color));
+            node.AddItem(LineHelper.AddLine(splashAttack.StartPosition, splashAttack.EndPosition, color));
 
             var normal = splashAttack.EndPosition - splashAttack.StartPosition;  // corresponds to Z
             normal.Normalize();
-            var random = new Random();
+            var random = new Random(1);
             Func<Random, float> RandomFloat = r => (float)(2 * r.NextDouble() - 1);
             var vectorP = new Vector3(RandomFloat(random), RandomFloat(random), RandomFloat(random));
             vectorP.Normalize();
@@ -236,7 +252,7 @@ namespace Editors.AnimationMeta.SuperView.Visualisation
                     throw new ConstraintException($"{displayName}: the half-angle {splashAttack.AngleForCone / 2} of the cone is close to 0");
                 }
                 var transformationM = rotationM * Matrix.CreateScale(distance) * Matrix.CreateTranslation(splashAttack.StartPosition);
-                node.AddItem(LineHelper.AddConeSplash(splashAttack.StartPosition, splashAttack.EndPosition, transformationM, splashAttack.AngleForCone, Color.Red));
+                node.AddItem(LineHelper.AddConeSplash(splashAttack.StartPosition, splashAttack.EndPosition, transformationM, splashAttack.AngleForCone, color));
             }
             if (splashAttack.AoeShape == 1) // Corridor
             {
@@ -245,7 +261,7 @@ namespace Editors.AnimationMeta.SuperView.Visualisation
                     throw new ConstraintException($"{displayName}: the WidthForCorridor {splashAttack.WidthForCorridor} of the corridor is close to 0");
                 }
                 var transformationM = rotationM * Matrix.CreateScale(splashAttack.WidthForCorridor / 2) * Matrix.CreateTranslation(splashAttack.StartPosition);
-                node.AddItem(LineHelper.AddCorridorSplash(splashAttack.StartPosition, splashAttack.EndPosition, transformationM, Color.Red));
+                node.AddItem(LineHelper.AddCorridorSplash(splashAttack.StartPosition, splashAttack.EndPosition, transformationM, color));
             }
             
             root.AddObject(node);
@@ -253,17 +269,17 @@ namespace Editors.AnimationMeta.SuperView.Visualisation
             return new DrawableMetaInstance(splashAttack.StartTime, splashAttack.EndTime, node.Name, node);
         }
 
-        private IMetaDataInstance CreateEffect(IEffectMeta effect, SceneNode root, ISkeletonProvider skeleton)
+        private IMetaDataInstance CreateEffect(IEffectMeta effect, SceneNode root, ISkeletonProvider skeleton, ParsedMetadataAttribute selectedAttribute)
         {
+            var color = selectedAttribute == effect ? s_selectedColor : s_color;
             var node = new SimpleDrawableNode("Effect:" + effect.VfxName);
 
             var locatorScale = 0.3f;
             node.AddItem(LineHelper.AddRgbLocator(effect.Position, locatorScale));
-            node.AddItem(new WorldTextRenderItem(_resourceLibrary, effect.VfxName, effect.Position));
+            node.AddItem(new WorldTextRenderItem(_resourceLibrary, effect.VfxName, effect.Position, color));
             node.AddItem(new WorldTextRenderItem(_resourceLibrary, "X", effect.Position + new Vector3(locatorScale * .5f + 0.01f,0,0), Color.Red));
             node.AddItem(new WorldTextRenderItem(_resourceLibrary, "Y", effect.Position + new Vector3(0, locatorScale * .5f + 0.01f, 0), Color.Green));
             node.AddItem(new WorldTextRenderItem(_resourceLibrary, "Z", effect.Position + new Vector3(0,0,locatorScale * .5f + 0.01f), Color.Blue));
-
 
             root.AddObject(node);
 

@@ -6,15 +6,19 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using Microsoft.Xna.Framework;
 using Shared.ByteParsing;
 using Shared.ByteParsing.Parsers;
+using Shared.Core.Events;
 using Shared.GameFormats.AnimationMeta.Parsing;
 
 namespace Editors.AnimationMeta.Presentation
 {
-    public abstract partial class IMetaDataEntry : ObservableObject
+   // Remove the interface and make the unkownClass a property 
+
+
+    public abstract partial class IMetaDataEntryViewModel : ObservableObject
     {
         public ParsedMetadataAttribute _input;
 
-        [ObservableProperty] ObservableCollection<MetaDataAttribute> _variables  = [];
+        [ObservableProperty] ObservableCollection<AttributeViewModel> _variables  = [];
 
         [ObservableProperty] string _displayName = "";
         [ObservableProperty] string _description = "";
@@ -25,7 +29,7 @@ namespace Editors.AnimationMeta.Presentation
         public abstract string HasError();
     }
 
-    public class UnkMetaDataEntry : IMetaDataEntry
+    public class UnkMetaDataEntry : IMetaDataEntryViewModel
     {
         private readonly ParsedUnknownMetadataAttribute _input;
 
@@ -41,12 +45,12 @@ namespace Editors.AnimationMeta.Presentation
         public override string HasError() => "";
     }
 
-    public class MetaDataEntry : IMetaDataEntry
+    public class MetaDataEntry : IMetaDataEntryViewModel
     {
         private readonly string _originalName;
     
 
-        public MetaDataEntry(ParsedMetadataAttribute typedMetaItem, string description)
+        public MetaDataEntry(ParsedMetadataAttribute typedMetaItem, string description, IEventHub eventHub)
         {
             _input = typedMetaItem;
             _originalName = typedMetaItem.Name;
@@ -68,19 +72,19 @@ namespace Editors.AnimationMeta.Presentation
                 if (string.IsNullOrWhiteSpace(attributeInfo.Description) == false)
                     itemDiscription = attributeInfo.Description + "\n" + itemDiscription;
 
-                MetaDataAttribute editableItem = null;
+                AttributeViewModel editableItem = null;
                 if (attributeInfo.DisplayOverride == MetaDataTagAttribute.DisplayType.EulerVector || value is Vector3)
                 {
                     if (value is Vector3 vector3)
-                        editableItem = new VectorMetaDataAttribute(parser as Vector3Parser, vector3, typedMetaItem, prop);
+                        editableItem = new VectorAttributeViewModel(parser as Vector3Parser, vector3, typedMetaItem, prop, eventHub);
                     else if (value is Vector4 quaternion)
-                        editableItem = new OrientationMetaDataAttribute(parser as Vector4Parser, quaternion, typedMetaItem, prop);
+                        editableItem = new OrientationAttributeViewModel(parser as Vector4Parser, quaternion, typedMetaItem, prop, eventHub);
                     else
                         throw new Exception("Unknown item");
                 }
                 else
                 {
-                    editableItem = new MetaDataAttribute(parser, value.ToString(), typedMetaItem, prop);
+                    editableItem = new AttributeViewModel(parser, value.ToString(), typedMetaItem, prop, eventHub);
                 }
 
                 editableItem.Description = itemDiscription;

@@ -11,11 +11,13 @@ namespace Editors.AnimationMeta.MetaEditor.Commands
     {
         private readonly MetaDataFileParser _metaDataFileParser;
         private readonly IMetaDataDatabase _metaDataDatabase;
+        private readonly IEventHub _eventHub;
 
-        public NewEntryCommand(MetaDataFileParser metaDataFileParser, IMetaDataDatabase metaDataDatabase) 
+        public NewEntryCommand(MetaDataFileParser metaDataFileParser, IMetaDataDatabase metaDataDatabase, IEventHub eventHub) 
         {
             _metaDataFileParser = metaDataFileParser;
             _metaDataDatabase = metaDataDatabase;
+            _eventHub = eventHub;
         }
 
         public void Execute(MetaDataEditorViewModel controller)
@@ -34,7 +36,7 @@ namespace Editors.AnimationMeta.MetaEditor.Commands
             {
                 var newEntry = _metaDataFileParser.CreateDefault(model.SelectedItem);
                 var desc = _metaDataDatabase.GetDescriptionSafe(newEntry.DisplayName);
-                var newTagView = new MetaDataEntry(newEntry, desc);
+                var newTagView = new MetaDataEntry(newEntry, desc, _eventHub);
                 controller.Tags.Add(newTagView);
             }
 

@@ -10,7 +10,7 @@ namespace Editors.AnimationMeta.SuperView.Visualisation.Instances
 {
     public class DrawableMetaInstance : IMetaDataInstance
     {
-        private readonly ILogger _logger = Logging.Create<MetaDataFactory>();
+        private readonly ILogger _logger = Logging.Create<MetaDataBuilder>();
         private bool _hasError = false;
 
         private readonly SceneNode _node;

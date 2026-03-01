@@ -22,7 +22,7 @@ namespace Editors.AnimationMeta
             serviceCollection.AddScoped<EditorHost<SuperViewViewModel>>();
             serviceCollection.AddScoped<SuperViewViewModel>();
 
-            serviceCollection.AddScoped<IMetaDataFactory, MetaDataFactory>(); // Needs heavy refactorying!
+            serviceCollection.AddScoped<IMetaDataBuilder, MetaDataBuilder>(); // Needs heavy refactorying!
 
             // Commands for metadata editor
             serviceCollection.AddTransient<CopyPastCommand>();

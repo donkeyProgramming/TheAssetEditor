@@ -14,26 +14,34 @@ namespace Editors.AnimationMeta.Presentation
     {
         private readonly IUiCommandFactory _uiCommandFactory;
         private readonly MetaDataFileParser _metaDataFileParser;
+        private readonly IEventHub _eventHub;
         public ParsedMetadataFile _metaDataFile;
+        public ParsedMetadataAttribute _selectedAttribute;
 
         [ObservableProperty] string _displayName = "Metadata Editor";
-        [ObservableProperty] IMetaDataEntry _selectedTag;
-        [ObservableProperty] ObservableCollection<IMetaDataEntry> _tags = [];
+        [ObservableProperty] IMetaDataEntryViewModel _selectedTag;
+        [ObservableProperty] ObservableCollection<IMetaDataEntryViewModel> _tags = [];
         [ObservableProperty] int _metaDataFileVersion;
 
         public bool HasUnsavedChanges { get; set; } = false;
         public PackFile CurrentFile { get; set; }
 
-        public MetaDataEditorViewModel(IUiCommandFactory uiCommandFactory, MetaDataFileParser metaDataFileParser)
+        public MetaDataEditorViewModel(IUiCommandFactory uiCommandFactory, MetaDataFileParser metaDataFileParser, IEventHub eventHub)
         {
             _uiCommandFactory = uiCommandFactory;
             _metaDataFileParser = metaDataFileParser;
+            _eventHub = eventHub;
         }
 
-        partial void OnSelectedTagChanged(IMetaDataEntry value)
+        partial void OnSelectedTagChanged(IMetaDataEntryViewModel value)
         {
+            if(value == null)
             
+                _selectedAttribute = null;
+            else
+                _selectedAttribute = value._input;
 
+            _eventHub.Publish(new MetaDataAttributeChangedEvent());
         }
 
         public bool Save() => _uiCommandFactory.Create<SaveCommand>().Execute(this);
@@ -71,7 +79,7 @@ namespace Editors.AnimationMeta.Presentation
                 else if (metadataEntry is ParsedMetadataAttribute parsedKnownAttribute)
                 {
                     var desc = _metaDataFileParser.GetDatabase().GetDescriptionSafe(parsedKnownAttribute.DisplayName);
-                    Tags.Add(new MetaDataEntry(parsedKnownAttribute, desc));
+                    Tags.Add(new MetaDataEntry(parsedKnownAttribute, desc, _eventHub ));
                 }
                 else
                     throw new Exception($"{metadataEntry.GetType()} is not a known type for {nameof(MetaDataEditorViewModel)}");

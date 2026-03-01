@@ -1,11 +1,7 @@
 ﻿using GameWorld.Core.Animation.AnimationChange;
 using Microsoft.Xna.Framework;
-using Serilog;
 using Shared.Core.ErrorHandling;
 using Shared.Core.Misc;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace GameWorld.Core.Animation
 {

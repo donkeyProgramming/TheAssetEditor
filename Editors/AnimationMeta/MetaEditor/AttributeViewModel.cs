@@ -5,17 +5,24 @@ using Microsoft.Xna.Framework;
 using Serilog;
 using Shared.ByteParsing.Parsers;
 using Shared.Core.ErrorHandling;
+using Shared.Core.Events;
 using Shared.Core.Misc;
 using Shared.Ui.BaseDialogs.MathViews;
 
 namespace Editors.AnimationMeta.Presentation
 {
-    public partial class MetaDataAttribute : ObservableObject
+    public class MetaDataAttributeChangedEvent()
+    { 
+    
+    }
+
+    public partial class AttributeViewModel : ObservableObject
     {
-        private readonly ILogger _logger = Logging.Create<MetaDataAttribute>();
+        private readonly ILogger _logger = Logging.Create<AttributeViewModel>();
         private readonly IByteParser _parser;
         protected readonly object _target;
         protected readonly PropertyInfo _property;
+        protected readonly IEventHub _eventHub;
 
         [ObservableProperty] string _valueAsString;
         [ObservableProperty] string _fieldName;
@@ -24,11 +31,12 @@ namespace Editors.AnimationMeta.Presentation
         [ObservableProperty] bool _isReadOnly = true;
         [ObservableProperty] bool _isValid = true;
 
-        public MetaDataAttribute(IByteParser parser, object value, object target, PropertyInfo property)
+        public AttributeViewModel(IByteParser parser, object value, object target, PropertyInfo property, IEventHub eventHub)
         {
             _parser = parser;
             _target = target;
             _property = property;
+            _eventHub = eventHub;
             _valueAsString = value.ToString();
             Validate();
         }
@@ -62,19 +70,21 @@ namespace Editors.AnimationMeta.Presentation
                         _logger.Here().Error(loggingStr);
                         throw new ArgumentException(loggingStr);
                 }
+
+                _eventHub.Publish(new MetaDataAttributeChangedEvent());
             }
 
         }
     }
 
-    public partial class OrientationMetaDataAttribute : MetaDataAttribute
+    public partial class OrientationAttributeViewModel : AttributeViewModel
     {
         private readonly Vector4Parser _typedParser;
 
         [ObservableProperty] Vector3ViewModel _value = new(0, 0, 0);
 
-        public OrientationMetaDataAttribute(Vector4Parser parser, Vector4 value, object target, PropertyInfo property) 
-            : base(parser, value, target, property)
+        public OrientationAttributeViewModel(Vector4Parser parser, Vector4 value, object target, PropertyInfo property, IEventHub eventHub) 
+            : base(parser, value, target, property, eventHub)
         {
 
             _value = new(0, 0, 0, OnValueChangedCallback);
@@ -94,17 +104,20 @@ namespace Editors.AnimationMeta.Presentation
             var value = MathUtil.EulerDegreesToQuaternion(vector3);
             value.Normalize();
             _property.SetValue(_target, value.ToVector4());
+
+            _eventHub.Publish(new MetaDataAttributeChangedEvent());
         }
 
     }
 
-    public partial class VectorMetaDataAttribute : MetaDataAttribute
+    public partial class VectorAttributeViewModel : AttributeViewModel
     {
         private readonly Vector3Parser _parser;
 
         [ObservableProperty] Vector3ViewModel _value;
 
-        public VectorMetaDataAttribute(Vector3Parser parser, Vector3 value, object target, PropertyInfo property) : base(parser, value, target, property)
+        public VectorAttributeViewModel(Vector3Parser parser, Vector3 value, object target, PropertyInfo property, IEventHub eventHub) 
+            : base(parser, value, target, property, eventHub)
         {
             _value = new(0, 0, 0, OnValueChangedCallback);
             _parser = parser;
@@ -117,6 +130,8 @@ namespace Editors.AnimationMeta.Presentation
         {
             var vector3 = Value.GetAsVector3();
             _property.SetValue(_target, vector3);
+
+            _eventHub.Publish(new MetaDataAttributeChangedEvent());
         }
     }
 }
