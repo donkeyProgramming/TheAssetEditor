@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using GameWorld.Core.Components;
+﻿using GameWorld.Core.Components;
 using Microsoft.Xna.Framework;
 using Shared.Core.Misc;
 

@@ -1,15 +1,21 @@
-﻿// Licensed to the .NET Foundation under one or more agreements.
-// The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
-
-using Microsoft.Xna.Framework;
+﻿using Microsoft.Xna.Framework;
 using Shared.GameFormats.AnimationMeta.Parsing;
 
 namespace Shared.GameFormats.AnimationMeta.Definitions
 {
-    public interface IEffectMeta
+    public interface IEffectMeta 
     {
         public string VfxName { get; set; }
+        public int NodeIndex { get; set; }
+        public bool Tracking { get; set; }
+        public Vector3 Position { get; set; } 
+
+        public Vector4 Orientation { get; set; }
+
+        public float EffectStartTime { get; set; }
+        public float EffectEndTime { get; set; }
+
+
     }
 
     [MetaData("EFFECT", 1)]
@@ -29,6 +35,12 @@ namespace Shared.GameFormats.AnimationMeta.Definitions
 
         [MetaDataTag(7, "Bone the effect is attached to, use -1 for it to just spawn and not follow animations")]
         public int NodeIndex { get; set; }
+
+        // Part of the inteface - not the metedata file
+        public bool Tracking { get; set; } = false;
+        public float EffectStartTime { get => 0; set; }
+        public float EffectEndTime { get => 0; set; }
+
     }
 
     [MetaData("EFFECT", 2)]
@@ -48,6 +60,11 @@ namespace Shared.GameFormats.AnimationMeta.Definitions
 
         [MetaDataTag(8, "Bone the effect is attached to, use -1 for it to just spawn and not follow animations")]
         public int NodeIndex { get; set; }
+
+        // Part of the inteface - not the metedata file
+        public bool Tracking { get; set; } = false;
+        public float EffectStartTime { get => 0; set; }
+        public float EffectEndTime { get => 0; set; }
     }
 
     [MetaData("EFFECT", 3)]
@@ -95,6 +112,11 @@ namespace Shared.GameFormats.AnimationMeta.Definitions
 
         [MetaDataTag(11, "Scale of the effect")]
         public float Scale { get; set; } = 1;
+
+
+        // Part of the inteface - not the metedata file
+        public float EffectStartTime { get => StartTime; set; }
+        public float EffectEndTime { get => EndTime; set; }
     }
 
     [MetaData("EFFECT", 11)]
@@ -126,14 +148,63 @@ namespace Shared.GameFormats.AnimationMeta.Definitions
 
         [MetaDataTag(13, "Scale of the effect")]
         public float Scale { get; set; } = 1;
+
+
+        // Part of the inteface - not the metedata file
+        public float EffectStartTime { get => StartTime; set; }
+        public float EffectEndTime { get => EndTime; set; }
     }
 
     [MetaData("EFFECT", 12)]
-    public class Effect_v12 : Effect_v11
+    public class Effect_v12 : DecodedMetaEntryBase, IEffectMeta
     {
+        [MetaDataTag(5, "Name of the VFX's .xml file in the vfx folder. Leave off the file extension. Note that for this you don't need to add custom vfx to the particles db table and they still require a \"movie\"-type .pack for them to be loaded.")]
+        public string VfxName { get; set; } = "";
+
+        [MetaDataTag(6, "normal(0), ability_aura(1), ability_weapon(2)")]
+        public int EffectType { get; set; }
+
+        [MetaDataTag(7)]
+        public bool Tracking { get; set; }
+
+        [MetaDataTag(8, "Does the effect crash with the terrain?")]
+        public bool TerrainMutable { get; set; }
+
+        [MetaDataTag(9)]
+        public bool DistanceCulled { get; set; }
+
         // new field
         [MetaDataTag(10)]
-        public bool ScalesWithParent { get; set; }  
+        public bool ScalesWithParent { get; set; }
+
+        [MetaDataTag(11)]
+        public Vector3 Position { get; set; } = new Vector3();
+
+        [MetaDataTag(12, "", MetaDataTagAttribute.DisplayType.EulerVector)]
+        public Vector4 Orientation { get; set; } = new Vector4(0, 0, 0, 1);
+
+        [MetaDataTag(13, "Bone the effect is attached to, use -1 for it to just spawn and not follow animations")]
+        public int NodeIndex { get; set; }
+
+        [MetaDataTag(14, "Scale of the effect")]
+        public float Scale { get; set; } = 1;
+
+
+        // Part of the inteface - not the metedata file
+        public float EffectStartTime { get => StartTime; set; }
+        public float EffectEndTime { get => EndTime; set; }
+    }
+
+
+
+
+    /*
+
+
+    [MetaData("EFFECT", 12)]
+    public class Effect_v12_old : Effect_v11
+    {
+
 
         // override order
         [MetaDataTag(11)]
@@ -147,5 +218,5 @@ namespace Shared.GameFormats.AnimationMeta.Definitions
 
         [MetaDataTag(14, "Scale of the effect")]
         public new float Scale { get; set; } = 1;
-    }
+    }*/
 }

@@ -27,7 +27,7 @@ namespace GameWorld.Core.Components
                 _playerMap.Remove(item.First().Key);
         }
 
-        public AnimationPlayer Get(string name)
+        public AnimationPlayer? Get(string name)
         {
             var hasKey = _playerMap.ContainsKey(name);
             if (!hasKey)

@@ -1,5 +1,4 @@
 ﻿using GameWorld.Core.Components.Rendering;
-using GameWorld.Core.Services;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -8,7 +7,7 @@ namespace GameWorld.Core.Rendering.RenderItems
     public class WorldTextRenderItem : IRenderItem
     {
         Vector3 _pos;
-
+        private readonly Color _color;
         readonly RenderEngineComponent _resourceLib;
         readonly string _text;
         public Matrix ModelMatrix { get; set; } = Matrix.Identity;
@@ -18,11 +17,19 @@ namespace GameWorld.Core.Rendering.RenderItems
             _resourceLib = resourceLib;
             _text = text;
             _pos = pos;
+            _color = Color.Red;
+        }
+
+        public WorldTextRenderItem(RenderEngineComponent resourceLib, string text, Vector3 pos, Color color)
+        {
+            _resourceLib = resourceLib;
+            _text = text;
+            _pos = pos;
+            _color = color;
         }
 
         public void Draw(GraphicsDevice device, CommonShaderParameters parameters, RenderingTechnique renderingTechnique)
         {
-            var colour = Color.Red;
             float x = 1;
 
             var measure = _resourceLib.DefaultFont.MeasureString(_text);
@@ -33,7 +40,7 @@ namespace GameWorld.Core.Rendering.RenderItems
             var scale = 1.0f / (_pos - parameters.CameraPosition).Length();
 
             x = 0;
-            _resourceLib.CommonSpriteBatch.DrawString(_resourceLib.DefaultFont, _text, centeredPosition + new Vector2(measure.X * 0.5f, measure.Y * 0.5f), colour, x, new Vector2(measure.X * 0.5f, measure.Y * 0.5f), scale * 5, SpriteEffects.None, 0.99f);
+            _resourceLib.CommonSpriteBatch.DrawString(_resourceLib.DefaultFont, _text, centeredPosition + new Vector2(measure.X * 0.5f, measure.Y * 0.5f), _color, x, new Vector2(measure.X * 0.5f, measure.Y * 0.5f), scale * 5, SpriteEffects.None, 0.99f);
             x += 0.05f;
         }
     }

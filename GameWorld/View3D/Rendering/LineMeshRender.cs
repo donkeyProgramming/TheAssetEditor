@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using Microsoft.Xna.Framework;
+﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Shared.Core.Misc;
 
@@ -124,6 +121,20 @@ namespace GameWorld.Core.Rendering
             vertices[4] = new VertexPositionColor(pos + new Vector3(0, 0, -halfLength), color);
             vertices[5] = new VertexPositionColor(pos + new Vector3(0, 0, halfLength), color);
             
+            return vertices;
+        }
+
+        public static VertexPositionColor[] AddRgbLocator(Vector3 pos, float size)
+        {
+            var vertices = new VertexPositionColor[6];
+            var halfLength = size / 2;
+            vertices[0] = new VertexPositionColor(pos + new Vector3(-halfLength, 0, 0), Color.Red);
+            vertices[1] = new VertexPositionColor(pos + new Vector3(halfLength, 0, 0), Color.Red);
+            vertices[2] = new VertexPositionColor(pos + new Vector3(0, -halfLength, 0), Color.Green);
+            vertices[3] = new VertexPositionColor(pos + new Vector3(0, halfLength, 0), Color.Green);
+            vertices[4] = new VertexPositionColor(pos + new Vector3(0, 0, -halfLength), Color.Blue);
+            vertices[5] = new VertexPositionColor(pos + new Vector3(0, 0, halfLength), Color.Blue);
+
             return vertices;
         }
 
