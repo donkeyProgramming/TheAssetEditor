@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.Windows;
 using System.Windows.Threading;
 using AssetEditor.Services;
+using AssetEditor.Services.Ipc;
 using AssetEditor.ViewModels;
 using AssetEditor.Views;
 using AssetEditor.Views.Settings;
@@ -20,6 +21,7 @@ namespace AssetEditor
     public partial class App : Application
     {
         IServiceProvider _serviceProvider;
+        AssetEditorIpcServer _ipcServer;
 
         protected override void OnStartup(StartupEventArgs e)
         {
@@ -77,6 +79,9 @@ namespace AssetEditor
             devConfigManager.OpenFileOnLoad();
 
             ShowMainWindow();
+
+            _ipcServer = _serviceProvider.GetRequiredService<AssetEditorIpcServer>();
+            _ipcServer.Start();
         }
 
         void ShowMainWindow()
@@ -85,6 +90,7 @@ namespace AssetEditor
             ThemesController.SetTheme(applicationSettingsService.CurrentSettings.Theme);
 
             var mainWindow = _serviceProvider.GetRequiredService<MainWindow>();
+            MainWindow = mainWindow;
             mainWindow.DataContext = _serviceProvider.GetRequiredService<MainViewModel>();
             mainWindow.Closed += OnMainWindowClosed;
             mainWindow.Show();
@@ -99,9 +105,19 @@ namespace AssetEditor
 
         private void OnMainWindowClosed(object sender, EventArgs e)
         {
+            _ipcServer?.Dispose();
+            _ipcServer = null;
+
             foreach (Window window in Current.Windows)
                 window.Close();
             Shutdown();
+        }
+
+        protected override void OnExit(ExitEventArgs e)
+        {
+            _ipcServer?.Dispose();
+            _ipcServer = null;
+            base.OnExit(e);
         }
 
         void DispatcherUnhandledExceptionHandler(object sender, DispatcherUnhandledExceptionEventArgs args)

@@ -54,10 +54,23 @@ namespace Editors.KitbasherEditor.Services
 
             // Load the opened model
             var modelFullPath = _packFileService.GetFullPath(file);
+            var extension = Path.GetExtension(modelFullPath).ToLower();
+
+            if (extension == ".variantmeshdefinition")
+            {
+                LoadReference(file);
+
+                var openedFilePath = _packFileService.GetFullPath(file);
+                var openedFileDirectory = Path.GetDirectoryName(openedFilePath);
+                if (string.IsNullOrEmpty(openedFileDirectory) == false)
+                    _saveSettings.OutputName = openedFileDirectory + "\\";
+                _saveSettings.OutputName += Path.GetFileNameWithoutExtension(openedFilePath) + ".rigid_model_v2";
+                return;
+            }
 
             WsModelFile? wsModel = null;
             RmvFile rmv;
-            if (Path.GetExtension(modelFullPath).ToLower() == ".wsmodel")
+            if (extension == ".wsmodel")
             {
                 wsModel = new WsModelFile(file);
                 var rmvPackFile = _packFileService.FindFile(wsModel.GeometryPath);

@@ -1,4 +1,5 @@
 ﻿using AssetEditor.Services;
+using AssetEditor.Services.Ipc;
 using AssetEditor.UiCommands;
 using AssetEditor.ViewModels;
 using AssetEditor.Views;
@@ -28,6 +29,12 @@ namespace AssetEditor
             serviceCollection.AddTransient<PrintScopesCommand>();
             serviceCollection.AddTransient<OpenEditorCommand>();
             serviceCollection.AddTransient<TogglePackFileExplorerCommand>();
+            serviceCollection.AddTransient<IExternalPackFileLookup, ExternalPackFileLookup>();
+            serviceCollection.AddTransient<IExternalPackLoader, ExternalPackLoader>();
+            serviceCollection.AddTransient<IIpcUserNotifier, IpcUserNotifier>();
+            serviceCollection.AddTransient<IExternalFileOpenExecutor, ExternalFileOpenExecutor>();
+            serviceCollection.AddTransient<IIpcRequestHandler, IpcRequestHandler>();
+            serviceCollection.AddSingleton<AssetEditorIpcServer>();
 
             serviceCollection.AddTransient<SettingsWindow>();
             serviceCollection.AddScoped<SettingsViewModel>();
