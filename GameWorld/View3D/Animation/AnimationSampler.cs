@@ -45,7 +45,7 @@ namespace GameWorld.Core.Animation
                 }
 
                 // Apply animation rules
-                if (animationChangeRules != null)
+                if (animationChangeRules != null && animationClip != null)
                 {
                     foreach (var rule in animationChangeRules.OfType<IWorldSpaceAnimationRule>())
                         rule.TransformFrameWorldSpace(currentFrame, animationClip.PlayTimeInSec);

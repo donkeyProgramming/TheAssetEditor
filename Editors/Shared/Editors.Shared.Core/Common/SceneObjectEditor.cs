@@ -1,10 +1,8 @@
-﻿using Editors.Shared.Core.Common;
-using GameWorld.Core.Animation;
+﻿using GameWorld.Core.Animation;
 using GameWorld.Core.Components;
 using GameWorld.Core.SceneNodes;
 using GameWorld.Core.Services;
 using GameWorld.Core.Utility;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Xna.Framework;
 using Serilog;
 using Shared.Core.ErrorHandling;
