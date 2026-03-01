@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Editors.AnimationMeta.MetaEditor.Commands;
@@ -15,12 +14,12 @@ namespace Editors.AnimationMeta.Presentation
         private readonly IUiCommandFactory _uiCommandFactory;
         private readonly MetaDataFileParser _metaDataFileParser;
         private readonly IEventHub _eventHub;
-        public ParsedMetadataFile _metaDataFile;
-        public ParsedMetadataAttribute _selectedAttribute;
+        public ParsedMetadataFile? ParsedFile { get; private set; }
+        public ParsedMetadataAttribute? SelectedAttribute { get; private set; }
 
         [ObservableProperty] string _displayName = "Metadata Editor";
-        [ObservableProperty] IMetaDataEntryViewModel _selectedTag;
-        [ObservableProperty] ObservableCollection<IMetaDataEntryViewModel> _tags = [];
+        [ObservableProperty] MetaDataEntry _selectedTag;
+        [ObservableProperty] ObservableCollection<MetaDataEntry> _tags = [];
         [ObservableProperty] int _metaDataFileVersion;
 
         public bool HasUnsavedChanges { get; set; } = false;
@@ -33,13 +32,13 @@ namespace Editors.AnimationMeta.Presentation
             _eventHub = eventHub;
         }
 
-        partial void OnSelectedTagChanged(IMetaDataEntryViewModel value)
+        partial void OnSelectedTagChanged(MetaDataEntry value)
         {
             if(value == null)
             
-                _selectedAttribute = null;
+                SelectedAttribute = null;
             else
-                _selectedAttribute = value._input;
+                SelectedAttribute = value._input;
 
             _eventHub.Publish(new MetaDataAttributeChangedEvent());
         }
@@ -61,10 +60,8 @@ namespace Editors.AnimationMeta.Presentation
 
             var fileContent = CurrentFile.DataSource.ReadData();
 
-            var loadedMetadataFile = _metaDataFileParser.ParseFile(fileContent);
-            MetaDataFileVersion = loadedMetadataFile.Version;
-
-            _metaDataFile = loadedMetadataFile;
+            ParsedFile = _metaDataFileParser.ParseFile(fileContent);
+            MetaDataFileVersion = ParsedFile.Version;
 
             UpdateView();
         }
@@ -72,14 +69,20 @@ namespace Editors.AnimationMeta.Presentation
         public void UpdateView()
         {
             Tags.Clear();
-            foreach (var metadataEntry in _metaDataFile.Attributes)
+            if (ParsedFile == null)
+                return;
+
+            foreach (var metadataEntry in ParsedFile.Attributes)
             {
                 if (metadataEntry is ParsedUnknownMetadataAttribute uknMeta)
-                    Tags.Add(new UnkMetaDataEntry(uknMeta));
+                {
+                    var desc = _metaDataFileParser.GetDatabase().GetDescriptionSafe(uknMeta.DisplayName);
+                    Tags.Add(new MetaDataEntry(uknMeta, desc, _eventHub, false));
+                }
                 else if (metadataEntry is ParsedMetadataAttribute parsedKnownAttribute)
                 {
                     var desc = _metaDataFileParser.GetDatabase().GetDescriptionSafe(parsedKnownAttribute.DisplayName);
-                    Tags.Add(new MetaDataEntry(parsedKnownAttribute, desc, _eventHub ));
+                    Tags.Add(new MetaDataEntry(parsedKnownAttribute, desc, _eventHub, true));
                 }
                 else
                     throw new Exception($"{metadataEntry.GetType()} is not a known type for {nameof(MetaDataEditorViewModel)}");

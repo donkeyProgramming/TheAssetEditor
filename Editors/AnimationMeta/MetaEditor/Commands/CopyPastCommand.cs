@@ -56,7 +56,7 @@ namespace Editors.AnimationMeta.MetaEditor.Commands
             var pastObject = _copyPasteManager.GetPasteObject<MetaDataTagCopyItem>();
             if (pastObject != null)
             {
-                controller._metaDataFile.Attributes.AddRange(pastObject.Items);
+                controller.ParsedFile.Attributes.AddRange(pastObject.Items);
             }
 
             controller.UpdateView();

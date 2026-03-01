@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.ObjectModel;
-using System.Linq;
+﻿using System.Collections.ObjectModel;
 using System.Reflection;
 using CommunityToolkit.Mvvm.ComponentModel;
 using Microsoft.Xna.Framework;
@@ -11,52 +9,27 @@ using Shared.GameFormats.AnimationMeta.Parsing;
 
 namespace Editors.AnimationMeta.Presentation
 {
-   // Remove the interface and make the unkownClass a property 
-
-
-    public abstract partial class IMetaDataEntryViewModel : ObservableObject
+    public partial class MetaDataEntry : ObservableObject
     {
         public ParsedMetadataAttribute _input;
 
-        [ObservableProperty] ObservableCollection<AttributeViewModel> _variables  = [];
-
+        [ObservableProperty] ObservableCollection<AttributeViewModel> _variables = [];
         [ObservableProperty] string _displayName = "";
         [ObservableProperty] string _description = "";
         [ObservableProperty] bool _isDecodedCorrectly = false;
         [ObservableProperty] int _version;
         [ObservableProperty] bool _isSelected;
 
-        public abstract string HasError();
-    }
-
-    public class UnkMetaDataEntry : IMetaDataEntryViewModel
-    {
-        private readonly ParsedUnknownMetadataAttribute _input;
-
-        public UnkMetaDataEntry(ParsedUnknownMetadataAttribute unknownMeta)
-        {
-            _input = unknownMeta;
-
-            IsDecodedCorrectly = false;
-            DisplayName = unknownMeta.DisplayName;
-            Version = unknownMeta.Version;
-        }
-
-        public override string HasError() => "";
-    }
-
-    public class MetaDataEntry : IMetaDataEntryViewModel
-    {
-        private readonly string _originalName;
-    
-
-        public MetaDataEntry(ParsedMetadataAttribute typedMetaItem, string description, IEventHub eventHub)
+        public MetaDataEntry(ParsedMetadataAttribute typedMetaItem, string description, IEventHub eventHub, bool decodedCorrectly)
         {
             _input = typedMetaItem;
-            _originalName = typedMetaItem.Name;
             DisplayName = typedMetaItem.DisplayName;
             Description = description;
             Version = typedMetaItem.Version;
+            IsDecodedCorrectly = decodedCorrectly;
+
+            if(IsDecodedCorrectly == false)
+                return;
 
             var orderedPropertiesList = typedMetaItem.GetType().GetProperties()
                         .Where(x => x.CanWrite)
@@ -72,7 +45,7 @@ namespace Editors.AnimationMeta.Presentation
                 if (string.IsNullOrWhiteSpace(attributeInfo.Description) == false)
                     itemDiscription = attributeInfo.Description + "\n" + itemDiscription;
 
-                AttributeViewModel editableItem = null;
+                AttributeViewModel? editableItem = null;
                 if (attributeInfo.DisplayOverride == MetaDataTagAttribute.DisplayType.EulerVector || value is Vector3)
                 {
                     if (value is Vector3 vector3)
@@ -93,13 +66,11 @@ namespace Editors.AnimationMeta.Presentation
                 Variables.Add(editableItem);
             }
 
-            IsDecodedCorrectly = true;
-
             if (Variables.Count != 0)
                 Variables.First().IsReadOnly = true;
         }
 
-        public override string HasError()
+        public string? HasError()
         {
             foreach (var variable in Variables)
             {

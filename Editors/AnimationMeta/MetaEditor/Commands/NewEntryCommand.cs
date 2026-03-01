@@ -36,7 +36,7 @@ namespace Editors.AnimationMeta.MetaEditor.Commands
             {
                 var newEntry = _metaDataFileParser.CreateDefault(model.SelectedItem);
                 var desc = _metaDataDatabase.GetDescriptionSafe(newEntry.DisplayName);
-                var newTagView = new MetaDataEntry(newEntry, desc, _eventHub);
+                var newTagView = new MetaDataEntry(newEntry, desc, _eventHub, true);
                 controller.Tags.Add(newTagView);
             }
 

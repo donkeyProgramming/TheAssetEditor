@@ -44,7 +44,7 @@ namespace Editors.AnimationMeta.MetaEditor.Commands
             var path = _packFileService.GetFullPath(controller.CurrentFile);
             _logger.Here().Information("Creating metadata file. TagCount=" + controller.Tags.Count + " " + path);
 
-            var bytes = _metaDataFileParser.GenerateBytes(controller.MetaDataFileVersion, controller._metaDataFile);
+            var bytes = _metaDataFileParser.GenerateBytes(controller.MetaDataFileVersion, controller.ParsedFile);
             _logger.Here().Information("Saving");
             var res = _packFileSaveService.Save(path, bytes, false);
             if (res != null)

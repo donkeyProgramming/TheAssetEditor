@@ -1,5 +1,4 @@
-﻿using System;
-using System.Reflection;
+﻿using System.Reflection;
 using CommunityToolkit.Mvvm.ComponentModel;
 using Microsoft.Xna.Framework;
 using Serilog;
@@ -79,8 +78,6 @@ namespace Editors.AnimationMeta.Presentation
 
     public partial class OrientationAttributeViewModel : AttributeViewModel
     {
-        private readonly Vector4Parser _typedParser;
-
         [ObservableProperty] Vector3ViewModel _value = new(0, 0, 0);
 
         public OrientationAttributeViewModel(Vector4Parser parser, Vector4 value, object target, PropertyInfo property, IEventHub eventHub) 
@@ -88,8 +85,6 @@ namespace Editors.AnimationMeta.Presentation
         {
 
             _value = new(0, 0, 0, OnValueChangedCallback);
-
-            _typedParser = parser;
 
             var q = new Quaternion(value);
             var eulerRotation = MathUtil.QuaternionToEulerDegree(q);
@@ -112,15 +107,12 @@ namespace Editors.AnimationMeta.Presentation
 
     public partial class VectorAttributeViewModel : AttributeViewModel
     {
-        private readonly Vector3Parser _parser;
-
         [ObservableProperty] Vector3ViewModel _value;
 
         public VectorAttributeViewModel(Vector3Parser parser, Vector3 value, object target, PropertyInfo property, IEventHub eventHub) 
             : base(parser, value, target, property, eventHub)
         {
             _value = new(0, 0, 0, OnValueChangedCallback);
-            _parser = parser;
             Value.Set(value);
             IsValid = true;
         }
