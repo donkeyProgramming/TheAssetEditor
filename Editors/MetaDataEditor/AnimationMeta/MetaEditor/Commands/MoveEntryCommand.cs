@@ -36,7 +36,5 @@ namespace Editors.AnimationMeta.MetaEditor.Commands
 
             controller.SelectedTag = itemToMove;
         }
-
-
     }
 }

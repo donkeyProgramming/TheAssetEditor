@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using System.Windows;
+﻿using System.Windows;
 using Editors.AnimationMeta.Presentation;
 using Shared.Core.Events;
 using Shared.Core.Misc;

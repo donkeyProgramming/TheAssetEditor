@@ -1,6 +1,4 @@
-﻿using System;
-using System.Linq;
-using CommunityToolkit.Mvvm.ComponentModel;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
 using Editors.AnimationMeta.Presentation;
 using Editors.AnimationMeta.SuperView.Visualisation;
 using Editors.Shared.Core.Common;
@@ -50,7 +48,7 @@ namespace Editors.AnimationMeta.SuperView
             _metaDataFileParser = metaDataFileParser;
             _metaDataFactory = metaDataFactory;
             Initialize();
-            //eventHub.Register<ScopedFileSavedEvent>(this, OnFileSaved);
+            eventHub.Register<ScopedFileSavedEvent>(this, OnFileSaved);
             eventHub.Register<SceneObjectUpdateEvent>(this, OnSceneObjectUpdated);
             eventHub.Register<MetaDataAttributeChangedEvent>(this, OnMetaDataAttributeChanged);
         }
@@ -59,7 +57,7 @@ namespace Editors.AnimationMeta.SuperView
         {
             RecreateMetaDataInformation(null);
         }
-        /*
+        
         private void OnFileSaved(ScopedFileSavedEvent evnt)
         {
             var newFile = _packFileService.FindFile(evnt.NewPath);
@@ -69,7 +67,7 @@ namespace Editors.AnimationMeta.SuperView
                 _sceneObjectBuilder.SetMetaFile(_asset.Data, newFile, _asset.Data.PersistMetaData);
             else
                 throw new Exception($"Unable to determine file owner when reciving a file save event in SuperView. Owner:{evnt.FileOwner}, File:{evnt.NewPath}");
-        }*/
+        }
 
         void Initialize()
         {

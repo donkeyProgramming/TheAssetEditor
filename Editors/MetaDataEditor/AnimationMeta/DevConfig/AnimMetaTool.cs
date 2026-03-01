@@ -27,14 +27,14 @@ namespace Editors.AnimationMeta.DevConfig
             var packFile = ResourceLoader.GetDevelopmentDataFolder() + "\\Throt.pack";
   
             var container = _packFileContainerLoader.Load(packFile);
-            container.IsCaPackFile = true;
+            container!.IsCaPackFile = true;
             _packFileService.AddContainer(container);
         }
 
         public void OpenFileOnLoad()
         {
             var file = _packFileService.FindFile(@"animations\battle\humanoid17\throt_whip_catcher\attacks\hu17_whip_catcher_attack_05.anm.meta");
-            _editorCreator.CreateFromFile(file);
+            _editorCreator.CreateFromFile(file!);
         }
     }
 }

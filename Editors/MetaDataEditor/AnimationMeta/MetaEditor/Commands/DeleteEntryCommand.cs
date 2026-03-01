@@ -1,5 +1,4 @@
-﻿using System.Linq;
-using Editors.AnimationMeta.Presentation;
+﻿using Editors.AnimationMeta.Presentation;
 using Shared.Core.Events;
 
 namespace Editors.AnimationMeta.MetaEditor.Commands

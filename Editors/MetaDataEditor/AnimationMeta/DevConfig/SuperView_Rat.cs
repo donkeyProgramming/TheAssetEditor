@@ -29,7 +29,7 @@ namespace Editors.AnimationMeta.DevConfig
             currentSettings.LoadCaPacksByDefault = false;
             var packFile = ResourceLoader.GetDevelopmentDataFolder() + "\\Throt.pack";
             var container = _packFileContainerLoader.Load(packFile);
-            container.IsCaPackFile = true;
+            container!.IsCaPackFile = true;
             _packFileService.AddContainer(container);
         }
 
@@ -42,13 +42,13 @@ namespace Editors.AnimationMeta.DevConfig
         {
             var debugInput = new AnimationToolInput()
             {
-                Mesh = packfileService.FindFile(@"variantmeshes\variantmeshdefinitions\skv_throt.variantmeshdefinition"),
+                Mesh = packfileService.FindFile(@"variantmeshes\variantmeshdefinitions\skv_throt.variantmeshdefinition")!,
                 FragmentName = @"animations/database/battle/bin/hu17_dlc16_throt.bin",
                 AnimationSlot = DefaultAnimationSlotTypeHelper.GetfromValue("ATTACK_5")
             };
 
             var editor = creator.Create(EditorEnums.SuperView_Editor) as SuperViewViewModel;
-            editor.Load(debugInput);
+            editor!.Load(debugInput);
         }
     }
 

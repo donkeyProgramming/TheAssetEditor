@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data;
-using System.Linq;
+﻿using System.Data;
 using Editors.AnimationMeta.SuperView.Visualisation.Instances;
 using Editors.AnimationMeta.SuperView.Visualisation.Rules;
 using Editors.Shared.Core.Common;
@@ -24,7 +21,6 @@ using Shared.GameFormats.AnimationPack;
 
 namespace Editors.AnimationMeta.SuperView.Visualisation
 {
-
     public interface IMetaDataBuilder
     {
         List<IMetaDataInstance> Create(ParsedMetadataFile persistent, ParsedMetadataFile metaData, ParsedMetadataAttribute selectedMetaDataAttribute, SceneNode root, ISkeletonProvider skeleton, AnimationPlayer rootPlayer, IAnimationBinGenericFormat fragment);
@@ -187,6 +183,7 @@ namespace Editors.AnimationMeta.SuperView.Visualisation
             propPlayer.AnimationRules.Add(animationRule);
             if(rootPlayer.IsPlaying)
                 propPlayer.Play();
+            propPlayer.Refresh();
 
             // Add to scene
             root.AddObject(loadedNode);
