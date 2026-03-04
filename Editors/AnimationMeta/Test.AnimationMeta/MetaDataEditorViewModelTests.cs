@@ -155,5 +155,43 @@ namespace Test.AnimationMeta
             Assert.That(parsedFile, Is.Not.Null);
             Assert.That(parsedFile.Attributes[3], Is.InstanceOf<SplashAttack_v10>());
         }
+
+        [Test]
+        public void MetaDataEditor_CopyPaste_AddsNewTag()
+        {
+            var packFile = PathHelper.GetDataFile("Throt.pack");
+
+            var runner = new AssetEditorTestRunner();
+            runner.CreateCaContainer();
+            var outputPackFile = runner.LoadPackFile(packFile, true);
+
+            var filePath = @"animations/battle/humanoid17/throt_whip_catcher/attacks/hu17_whip_catcher_attack_05.anm.meta";
+            var metaPackFile = runner.PackFileService.FindFile(filePath);
+            var editor = runner.CommandFactory
+                .Create<OpenEditorCommand>()
+                .Execute<MetaDataEditorViewModel>(metaPackFile!, Shared.Core.ToolCreation.EditorEnums.Meta_Editor);
+
+            Assert.That(editor.ParsedFile, Is.Not.Null);
+
+            var initialCount = editor.Tags.Count;
+            Assert.That(initialCount, Is.GreaterThan(0));
+
+            // Select a known tag (SplashAttack at index 4) and copy
+            var indexToCopy = 4;
+            var originalType = editor.ParsedFile.Attributes[indexToCopy].GetType();
+
+            editor.Tags[indexToCopy].IsSelected = true;
+            editor.CopyActionCommand.Execute(null);
+
+            // Paste
+            editor.PasteActionCommand.Execute(null);
+
+            // View should be updated
+            Assert.That(editor.Tags.Count, Is.EqualTo(initialCount + 1));
+            Assert.That(editor.ParsedFile.Attributes.Count, Is.EqualTo(initialCount + 1));
+
+            var pasted = editor.ParsedFile.Attributes.Last();
+            Assert.That(pasted, Is.InstanceOf(originalType));
+        }
     }
 }

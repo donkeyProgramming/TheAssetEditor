@@ -35,9 +35,9 @@ namespace Editors.AnimationMeta.MetaEditor.Commands
             if (res.HasValue && res.Value == true)
             {
                 var newEntry = _metaDataFileParser.CreateDefault(model.SelectedItem);
-                var desc = _metaDataDatabase.GetDescriptionSafe(newEntry.DisplayName);
-                var newTagView = new MetaDataEntry(newEntry, desc, _eventHub, true);
-                controller.Tags.Add(newTagView);
+                controller.ParsedFile.Attributes.Add(newEntry);
+                controller.UpdateView();
+                controller.SelectedTag = controller.Tags.LastOrDefault();   
             }
 
             dialog.DataContext = null;
