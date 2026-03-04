@@ -7,34 +7,39 @@ namespace Editors.AnimationMeta.MetaEditor.Commands
     {
         public void ExecuteUp(MetaDataEditorViewModel controller)
         {
-            var itemToMove = controller.SelectedTag;
-            if (itemToMove == null)
+            var itemToMove = controller.SelectedAttribute;
+            if (itemToMove == null || controller.ParsedFile == null)
                 return;
 
-            var currentIndex = controller.Tags.IndexOf(itemToMove);
-            if (currentIndex == 0)
-                return;
+             var currentIndex = controller.ParsedFile.Attributes.IndexOf(itemToMove);
+             if (currentIndex == 0)
+                 return;
 
-            controller.Tags.Remove(itemToMove);
-            controller.Tags.Insert(currentIndex - 1, itemToMove);
-
-            controller.SelectedTag = itemToMove;
+            controller.ParsedFile.Attributes.Remove(itemToMove);
+            controller.ParsedFile.Attributes.Insert(currentIndex - 1, itemToMove);
+            controller.UpdateView();
+            controller.SelectedTag = controller.Tags
+                .Where(x => x._input == itemToMove)
+                .FirstOrDefault();
         }
 
         public void ExecuteDown(MetaDataEditorViewModel controller)
         {
-            var itemToMove = controller.SelectedTag;
-            if (itemToMove == null)
+            var itemToMove = controller.SelectedAttribute;
+            if (itemToMove == null || controller.ParsedFile == null)
                 return;
 
-            var currentIndex = controller.Tags.IndexOf(itemToMove);
-            if (currentIndex == controller.Tags.Count - 1)
+            var currentIndex = controller.ParsedFile.Attributes.IndexOf(itemToMove);
+            if (currentIndex == controller.ParsedFile.Attributes.Count -1)
                 return;
 
-            controller.Tags.Remove(itemToMove);
-            controller.Tags.Insert(currentIndex + 1, itemToMove);
+            controller.ParsedFile.Attributes.Remove(itemToMove);
+            controller.ParsedFile.Attributes.Insert(currentIndex + 1, itemToMove);
+            controller.UpdateView();
+            controller.SelectedTag = controller.Tags
+                .Where(x => x._input == itemToMove)
+                .FirstOrDefault();
 
-            controller.SelectedTag = itemToMove;
         }
     }
 }

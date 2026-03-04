@@ -7,10 +7,12 @@ namespace Editors.AnimationMeta.MetaEditor.Commands
     {
         public void Execute(MetaDataEditorViewModel controller)
         {
-            if (controller.SelectedTag == null)
+            var itemToRemove = controller.SelectedAttribute;
+            if (itemToRemove == null || controller.ParsedFile == null)
                 return;
 
-            controller.Tags.Remove(controller.SelectedTag);
+            controller.ParsedFile.Attributes.Remove(itemToRemove);
+            controller.UpdateView();
             controller.SelectedTag = controller.Tags.FirstOrDefault();
         }
 

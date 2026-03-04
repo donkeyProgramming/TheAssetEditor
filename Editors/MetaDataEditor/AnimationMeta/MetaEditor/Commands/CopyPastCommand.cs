@@ -30,7 +30,6 @@ namespace Editors.AnimationMeta.MetaEditor.Commands
                 .ToList();
 
             // Check for errors
-
             foreach (var tag in selectedTags)
             {
                 if (string.IsNullOrWhiteSpace(tag.HasError()) == false || tag._input == null)
