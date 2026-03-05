@@ -1,4 +1,6 @@
-﻿using System.Reflection;
+﻿using System;
+using System.Reflection;
+using System.Linq;
 
 namespace Shared.GameFormats.AnimationMeta.Parsing
 {
@@ -35,12 +37,29 @@ namespace Shared.GameFormats.AnimationMeta.Parsing
             _isInitialized = true;
             CreateDescriptions();
 
-            var typesWithMyAttribute =
-                from a in AppDomain.CurrentDomain.GetAssemblies()
-                from t in a.GetTypes()
-                let attributes = t.GetCustomAttributes(typeof(MetaDataAttribute), true)
-                where attributes != null && attributes.Length > 0
-                select new { Type = t, Attributes = attributes.Cast<MetaDataAttribute>() };
+            // Only consider assemblies that are part of this application's base directory to avoid scanning system/GAC assemblies
+            var appBase = AppContext.BaseDirectory;
+            var assemblies = AppDomain.CurrentDomain.GetAssemblies()
+                .Where(a => !a.IsDynamic && !string.IsNullOrEmpty(a.Location) && a.Location.StartsWith(appBase, StringComparison.OrdinalIgnoreCase));
+
+            var typesWithMyAttribute = assemblies
+                .SelectMany(a =>
+                {
+                    try
+                    {
+                        return a.GetTypes();
+                    }
+                    catch (ReflectionTypeLoadException)
+                    {
+                        return Array.Empty<Type>();
+                    }
+                })
+                .Select(t => new
+                {
+                    Type = t,
+                    Attributes = t.GetCustomAttributes(typeof(MetaDataAttribute), true).Cast<MetaDataAttribute>()
+                })
+                .Where(x => x.Attributes != null && x.Attributes.Any());
 
             var typesWithMyAttributeList = typesWithMyAttribute.Select(x => new { x.Type, AttributeInfo = x.Attributes.First() })
                 .OrderBy(x => x.AttributeInfo.Priority)
