@@ -22,6 +22,7 @@ namespace AssetEditor.ViewModels
 
         [ObservableProperty] private ThemeType _currentTheme;
         [ObservableProperty] private BackgroundColour _currentRenderEngineBackgroundColour;
+        [ObservableProperty] private int _visualEditorsGridSize;
         [ObservableProperty] private bool _startMaximised;
         [ObservableProperty] private GameTypeEnum _currentGame;
         [ObservableProperty] private bool _loadCaPacksByDefault;
@@ -36,6 +37,8 @@ namespace AssetEditor.ViewModels
             CurrentTheme = _settingsService.CurrentSettings.Theme;
             RenderEngineBackgroundColours = new ObservableCollection<BackgroundColour>((BackgroundColour[])Enum.GetValues(typeof(BackgroundColour)));
             CurrentRenderEngineBackgroundColour = _settingsService.CurrentSettings.RenderEngineBackgroundColour;
+            VisualEditorsGridSize = _settingsService.CurrentSettings.VisualEditorsGridSize;
+
             StartMaximised = _settingsService.CurrentSettings.StartMaximised;
             Games = new ObservableCollection<GameTypeEnum>(GameInformationDatabase.Games.Values.OrderBy(game => game.DisplayName).Select(game => game.Type));
             CurrentGame = _settingsService.CurrentSettings.CurrentGame;
@@ -61,6 +64,7 @@ namespace AssetEditor.ViewModels
         {
             _settingsService.CurrentSettings.Theme = CurrentTheme;
             _settingsService.CurrentSettings.RenderEngineBackgroundColour = CurrentRenderEngineBackgroundColour;
+            _settingsService.CurrentSettings.VisualEditorsGridSize = VisualEditorsGridSize;
             _settingsService.CurrentSettings.StartMaximised = StartMaximised;
             _settingsService.CurrentSettings.CurrentGame = CurrentGame;
             _settingsService.CurrentSettings.LoadCaPacksByDefault = LoadCaPacksByDefault;

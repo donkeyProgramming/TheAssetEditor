@@ -53,25 +53,25 @@ namespace GameWorld.Core.Rendering
             return output;
         }
 
-        public static VertexPositionColor[] CreateGrid()
+        public static VertexPositionColor[] CreateGrid(int lineCount, Color color)
         {
-            const int LineCount = 10;
+            var LineCount = lineCount;
             const float Spacing = 1;
-            const float Length = 10;
-            const float Offset = LineCount * Spacing / 2;
+            var length = lineCount;
+            var offset = LineCount * Spacing / 2;
 
             var list = new List<(Vector3, Vector3)>();
             for (var i = 0; i <= LineCount; i++)
             {
-                var start = new Vector3(i * Spacing - Offset, 0, -Length * 0.5f);
-                var stop = new Vector3(i * Spacing - Offset, 0, Length * 0.5f);
+                var start = new Vector3(i * Spacing - offset, 0, -length * 0.5f);
+                var stop = new Vector3(i * Spacing - offset, 0, length * 0.5f);
                 list.Add((start, stop));
             }
 
             for (var i = 0; i <= LineCount; i++)
             {
-                var start = new Vector3(-Length * 0.5f, 0, i * Spacing - Offset);
-                var stop = new Vector3(Length * 0.5f, 0, i * Spacing - Offset);
+                var start = new Vector3(-length * 0.5f, 0, i * Spacing - offset);
+                var stop = new Vector3(length * 0.5f, 0, i * Spacing - offset);
                 list.Add((start, stop));
             }
 
@@ -79,8 +79,8 @@ namespace GameWorld.Core.Rendering
             var output = new List<VertexPositionColor>();
             for (var i = 0; i < list.Count; i++)
             {
-                output.Add(new VertexPositionColor(list[i].Item1, Color.Black));
-                output.Add(new VertexPositionColor(list[i].Item2, Color.Black));
+                output.Add(new VertexPositionColor(list[i].Item1, color));
+                output.Add(new VertexPositionColor(list[i].Item2, color));
             }
 
             return output.ToArray();

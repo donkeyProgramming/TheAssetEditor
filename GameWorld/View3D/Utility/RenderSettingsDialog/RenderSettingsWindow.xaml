@@ -9,7 +9,7 @@
         mc:Ignorable="d"
         ResizeMode="NoResize"
         Style="{StaticResource CustomWindowStyle}"
-        Title="Render settings" Height="249" Width="347">
+        Title="Render settings" Height="300" Width="347">
 
     <DockPanel LastChildFill="False">
         <basedialogs:AeAttribute DockPanel.Dock="Top" LabelText="Use backface culling" LabelWidth="150">
@@ -18,6 +18,17 @@
 
         <basedialogs:AeAttribute DockPanel.Dock="Top" LabelText="Use Large scene culling" LabelWidth="150">
             <CheckBox IsChecked="{Binding UseBigSceneCulling, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
+        </basedialogs:AeAttribute>
+
+        <basedialogs:AeAttribute DockPanel.Dock="Top" LabelText="Show grid" LabelWidth="150">
+            <CheckBox IsChecked="{Binding ShowGrid, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
+        </basedialogs:AeAttribute>
+
+
+        <basedialogs:AeAttribute DockPanel.Dock="Top" LabelText="Grid colour" LabelWidth="150">
+            <DockPanel LastChildFill="False">
+                <colourpickerbutton:ColourPickerButtonView DockPanel.Dock="Left" Width="25" Height="25" Margin="2" DataContext="{Binding GridColour}"/>
+            </DockPanel>
         </basedialogs:AeAttribute>
 
         <basedialogs:AeAttribute DockPanel.Dock="Top" LabelText="Faction colours" LabelWidth="150">

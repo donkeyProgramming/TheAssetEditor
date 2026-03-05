@@ -25,6 +25,7 @@ namespace Shared.Core.Settings
         public bool IsDeveloperRun { get; set; } = false;
         public string WwisePath { get; set; }
         public bool OnlyLoadLod0ForReferenceMeshes { get; set; } = true;
+        public int VisualEditorsGridSize { get; set; } = 10;
 
         public ApplicationSettings()
         {
