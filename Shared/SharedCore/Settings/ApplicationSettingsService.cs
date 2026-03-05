@@ -109,16 +109,25 @@ namespace Shared.Core.Settings
         {
             if (File.Exists(SettingsFile))
             {
-                var content = File.ReadAllText(SettingsFile);
-                var settings = JsonSerializer.Deserialize<ApplicationSettings>(content);
-                if (settings == null)
-                    _logger.Here().Information($"Failed to load settings - json parsing error.");
-                else
-                    CurrentSettings = settings;
+                try
+                {
+                    var content = File.ReadAllText(SettingsFile);
+                    var settings = JsonSerializer.Deserialize<ApplicationSettings>(content);
+                    if (settings == null)
+                        _logger.Here().Information($"Failed to load settings - json parsing error.");
+                    else
+                        CurrentSettings = settings;
 
-                _logger.Here().Information($"Settings loaded.");
-                ValidateRecentPackFilePaths();
-                ValidateSettings();
+                    _logger.Here().Information($"Settings loaded.");
+                    ValidateRecentPackFilePaths();
+                    ValidateSettings();
+                }
+                catch (Exception ex)
+                {
+                    _logger.Here().Error($"Failed to load settings at {SettingsFile} due to {ex.Message}. Creating default settings");
+                    CurrentSettings = new ApplicationSettings();
+                    Save();
+                }
             }
             else
             {
