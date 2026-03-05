@@ -12,16 +12,16 @@ namespace KitbasherEditor.Views.EditorViews
         public AnimationPlayerView()
         {
             InitializeComponent();
-            AnimationContent.Visibility = Visibility.Collapsed;
+           // AnimationContent.Visibility = Visibility.Collapsed;
         }
 
         private void ToggleButton_Click(object sender, RoutedEventArgs e)
         {
-            var button = sender as ToggleButton;
-            if (button.IsChecked == false)
-                AnimationContent.Visibility = Visibility.Collapsed;
-            else
-                AnimationContent.Visibility = Visibility.Visible;
+            //var button = sender as ToggleButton;
+            //if (button.IsChecked == false)
+            //    AnimationContent.Visibility = Visibility.Collapsed;
+            //else
+            //    AnimationContent.Visibility = Visibility.Visible;
         }
     }
 }
