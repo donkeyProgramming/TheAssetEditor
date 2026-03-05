@@ -8,7 +8,7 @@ namespace Shared.Core.Services
     public class VersionChecker
     {
         private static readonly string s_gitHubLink = @"https://github.com/donkeyProgramming/TheAssetEditor/releases/latest";
-        public static string CurrentVersion { get => "0.66"; }
+        public static string CurrentVersion { get => "0.67"; }
 
         public static void CheckVersion()
         {
