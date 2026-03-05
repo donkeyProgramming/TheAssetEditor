@@ -18,7 +18,7 @@ namespace Editors.AnimationMeta.Presentation
         public ParsedMetadataAttribute? SelectedAttribute { get; private set; }
 
         [ObservableProperty] string _displayName = "Metadata Editor";
-        [ObservableProperty] MetaDataEntry _selectedTag;
+        [ObservableProperty] MetaDataEntry? _selectedTag;
         [ObservableProperty] ObservableCollection<MetaDataEntry> _tags = [];
         [ObservableProperty] int _metaDataFileVersion;
 
@@ -32,7 +32,7 @@ namespace Editors.AnimationMeta.Presentation
             _eventHub = eventHub;
         }
 
-        partial void OnSelectedTagChanged(MetaDataEntry value)
+        partial void OnSelectedTagChanged(MetaDataEntry? value)
         {
             if(value == null)
             

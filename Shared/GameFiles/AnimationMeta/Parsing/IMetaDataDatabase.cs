@@ -17,11 +17,6 @@ namespace Shared.GameFormats.AnimationMeta.Parsing
         private readonly Dictionary<string, List<Type>> _typeTable = [];
         private readonly Dictionary<string, string> _descriptionMap = [];
 
-        public MetaDataDatabase()
-        {
-       
-        }
-
         public List<Type> GetDefinition(string metadataName)
         {
             EnsureMappingTableCreated();

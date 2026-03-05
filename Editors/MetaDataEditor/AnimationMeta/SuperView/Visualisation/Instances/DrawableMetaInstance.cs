@@ -4,7 +4,6 @@ using GameWorld.Core.SceneNodes;
 using GameWorld.Core.Utility;
 using Serilog;
 using Shared.Core.ErrorHandling;
-using System;
 
 namespace Editors.AnimationMeta.SuperView.Visualisation.Instances
 {
@@ -17,7 +16,7 @@ namespace Editors.AnimationMeta.SuperView.Visualisation.Instances
         private readonly string _description;
         public AnimationPlayer Player => null;
 
-        private SkeletonBoneAnimationResolver _animationResolver;
+        private SkeletonBoneAnimationResolver? _animationResolver;
 
         public DrawableMetaInstance(float startTime, float endTime, string description, SceneNode node)
         {

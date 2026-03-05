@@ -53,11 +53,9 @@ namespace Editors.AnimationMeta.SuperView
             eventHub.Register<MetaDataAttributeChangedEvent>(this, OnMetaDataAttributeChanged);
         }
 
-        private void OnMetaDataAttributeChanged(MetaDataAttributeChangedEvent @event)
-        {
-            RecreateMetaDataInformation(null);
-        }
-        
+        void OnMetaDataAttributeChanged(MetaDataAttributeChangedEvent @event) => RecreateMetaDataInformation();
+        void OnMetaDataChanged(SceneObject sceneObject) => RecreateMetaDataInformation();
+
         private void OnFileSaved(ScopedFileSavedEvent evnt)
         {
             var newFile = _packFileService.FindFile(evnt.NewPath);
@@ -77,13 +75,15 @@ namespace Editors.AnimationMeta.SuperView
             var assetViewModel = _sceneObjectViewModelBuilder.CreateAsset("SuperViewRoot", true, "Root", Color.Black,null);
             SceneObjects.Add(assetViewModel);
 
-            assetViewModel.Data.MetaDataChanged += RecreateMetaDataInformation;
+            assetViewModel.Data.MetaDataChanged += OnMetaDataChanged;
 
             _asset = assetViewModel;
             OnSceneObjectUpdated(new SceneObjectUpdateEvent(_asset.Data, false, false, false, true));
         }
 
-        void RecreateMetaDataInformation(SceneObject modsel)
+    
+
+        void RecreateMetaDataInformation()
         {
             foreach (var item in SceneObjects)
             {

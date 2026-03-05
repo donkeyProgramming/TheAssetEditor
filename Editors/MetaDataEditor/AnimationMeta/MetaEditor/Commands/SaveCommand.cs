@@ -1,4 +1,5 @@
-﻿using Editors.AnimationMeta.Presentation;
+﻿using CommunityToolkit.Diagnostics;
+using Editors.AnimationMeta.Presentation;
 using Serilog;
 using Shared.Core.ErrorHandling;
 using Shared.Core.Events;
@@ -29,7 +30,10 @@ namespace Editors.AnimationMeta.MetaEditor.Commands
 
         public bool Execute(MetaDataEditorViewModel controller)
         {
-           // Ensure there are no errors
+            Guard.IsNotNull(controller.ParsedFile, $"{nameof(controller.ParsedFile)} - Can not save when no file is loaded");
+            Guard.IsNotNull(controller.CurrentFile, $"{nameof(controller.CurrentFile)} - Can not save when no file is loaded");
+
+            // Ensure there are no errors
             foreach (var tag in controller.Tags)
             {
                 var currentErrorMessage = tag.HasError();

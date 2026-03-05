@@ -36,7 +36,6 @@ namespace Test.AnimationMeta
         }
 
 
-        // MetaDataEditor_OpenAndSave metadata file without changes
         [Test]
         public void MetaDataEditor_OpenModifyAndSave()
         {

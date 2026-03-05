@@ -46,22 +46,21 @@ namespace Editors.AnimationMeta.Presentation
                     itemDiscription = attributeInfo.Description + "\n" + itemDiscription;
 
                 AttributeViewModel? editableItem = null;
+                var fieldName = FormatFieldName(prop.Name);
                 if (attributeInfo.DisplayOverride == MetaDataTagAttribute.DisplayType.EulerVector || value is Vector3)
                 {
                     if (value is Vector3 vector3)
-                        editableItem = new VectorAttributeViewModel(parser as Vector3Parser, vector3, typedMetaItem, prop, eventHub);
+                        editableItem = new VectorAttributeViewModel(fieldName, itemDiscription, parser as Vector3Parser, vector3, typedMetaItem, prop, eventHub);
                     else if (value is Vector4 quaternion)
-                        editableItem = new OrientationAttributeViewModel(parser as Vector4Parser, quaternion, typedMetaItem, prop, eventHub);
+                        editableItem = new OrientationAttributeViewModel(fieldName, itemDiscription, parser as Vector4Parser, quaternion, typedMetaItem, prop, eventHub);
                     else
                         throw new Exception("Unknown item");
                 }
                 else
                 {
-                    editableItem = new AttributeViewModel(parser, value.ToString(), typedMetaItem, prop, eventHub);
+                    editableItem = new AttributeViewModel(fieldName, itemDiscription, parser, value.ToString(), typedMetaItem, prop, eventHub);
                 }
 
-                editableItem.Description = itemDiscription;
-                editableItem.FieldName = FormatFieldName(prop.Name);
                 editableItem.IsReadOnly = !attributeInfo.IsEditable;
                 Variables.Add(editableItem);
             }

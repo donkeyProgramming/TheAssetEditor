@@ -1,4 +1,5 @@
 ﻿using System.Reflection;
+using CommunityToolkit.Diagnostics;
 using CommunityToolkit.Mvvm.ComponentModel;
 using Microsoft.Xna.Framework;
 using Serilog;
@@ -10,10 +11,7 @@ using Shared.Ui.BaseDialogs.MathViews;
 
 namespace Editors.AnimationMeta.Presentation
 {
-    public class MetaDataAttributeChangedEvent()
-    { 
-    
-    }
+    public record MetaDataAttributeChangedEvent();
 
     public partial class AttributeViewModel : ObservableObject
     {
@@ -26,17 +24,23 @@ namespace Editors.AnimationMeta.Presentation
         [ObservableProperty] string _valueAsString;
         [ObservableProperty] string _fieldName;
         [ObservableProperty] string _description;
-        [ObservableProperty] string _valueType;
+      //  [ObservableProperty] string _valueType;
         [ObservableProperty] bool _isReadOnly = true;
         [ObservableProperty] bool _isValid = true;
 
-        public AttributeViewModel(IByteParser parser, object value, object target, PropertyInfo property, IEventHub eventHub)
+        public AttributeViewModel(string fieldName, string description, IByteParser parser, object value, object target, PropertyInfo property, IEventHub eventHub)
         {
+            var valueStr = value.ToString();
+            Guard.IsNotNull(valueStr, nameof(valueStr));
+
             _parser = parser;
             _target = target;
             _property = property;
             _eventHub = eventHub;
-            _valueAsString = value.ToString();
+            _valueAsString = valueStr;
+            _fieldName = fieldName;
+            _description = description;
+
             Validate();
         }
 
@@ -80,8 +84,8 @@ namespace Editors.AnimationMeta.Presentation
     {
         [ObservableProperty] Vector3ViewModel _value = new(0, 0, 0);
 
-        public OrientationAttributeViewModel(Vector4Parser parser, Vector4 value, object target, PropertyInfo property, IEventHub eventHub) 
-            : base(parser, value, target, property, eventHub)
+        public OrientationAttributeViewModel(string fieldName, string description, Vector4Parser parser, Vector4 value, object target, PropertyInfo property, IEventHub eventHub) 
+            : base(fieldName, description, parser, value, target, property, eventHub)
         {
 
             _value = new(0, 0, 0, OnValueChangedCallback);
@@ -109,8 +113,8 @@ namespace Editors.AnimationMeta.Presentation
     {
         [ObservableProperty] Vector3ViewModel _value;
 
-        public VectorAttributeViewModel(Vector3Parser parser, Vector3 value, object target, PropertyInfo property, IEventHub eventHub) 
-            : base(parser, value, target, property, eventHub)
+        public VectorAttributeViewModel(string fieldName, string description, Vector3Parser parser, Vector3 value, object target, PropertyInfo property, IEventHub eventHub) 
+            : base(fieldName, description, parser, value, target, property, eventHub)
         {
             _value = new(0, 0, 0, OnValueChangedCallback);
             Value.Set(value);

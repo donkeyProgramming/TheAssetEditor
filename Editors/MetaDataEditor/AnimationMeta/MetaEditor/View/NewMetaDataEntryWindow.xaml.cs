@@ -1,6 +1,7 @@
 ﻿using System.Collections.ObjectModel;
 using System.Windows;
 using System.Windows.Input;
+using CommunityToolkit.Diagnostics;
 using Shared.Core.Misc;
 
 namespace Editors.AnimationMeta.Presentation.View
@@ -12,9 +13,13 @@ namespace Editors.AnimationMeta.Presentation.View
             InitializeComponent();
         }
 
-        private void OnOkClick(object sender, RoutedEventArgs e)
+        private void OnOkClick(object sender, RoutedEventArgs e) => HandleOnClick();
+
+        private void HandleOnClick()
         {
             var model = DataContext as NewTagWindowViewModel;
+            Guard.IsNotNull(model, $"{nameof(model)} - DataContext must be of type {nameof(NewTagWindowViewModel)}");
+
             if (model.SelectedItem == null)
             {
                 MessageBox.Show("Nothing selected");
@@ -23,7 +28,6 @@ namespace Editors.AnimationMeta.Presentation.View
 
             DialogResult = true;
             Close();
-
         }
 
         private void OnCloseClick(object sender, RoutedEventArgs e)
@@ -35,15 +39,16 @@ namespace Editors.AnimationMeta.Presentation.View
         private void ListView_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
             var model = DataContext as NewTagWindowViewModel;
+            Guard.IsNotNull(model, $"{nameof(model)} - DataContext must be of type {nameof(NewTagWindowViewModel)}");
             if (model.SelectedItem != null)
-                OnOkClick(null, null);
+                HandleOnClick();
         }
     }
 
     class NewTagWindowViewModel : NotifyPropertyChangedImpl
     {
-        public ObservableCollection<string> Items { get; set; } = new ObservableCollection<string>();
-        string _selectedItem;
-        public string SelectedItem { get => _selectedItem; set { SetAndNotify(ref _selectedItem, value); } }
+        public ObservableCollection<string> Items { get; set; } = [];
+        string? _selectedItem;
+        public string? SelectedItem { get => _selectedItem; set { SetAndNotify(ref _selectedItem, value); } }
     }
 }

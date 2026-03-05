@@ -1,7 +1,8 @@
-﻿using System.Windows;
+﻿using CommunityToolkit.Diagnostics;
 using Editors.AnimationMeta.Presentation;
 using Shared.Core.Events;
 using Shared.Core.Misc;
+using Shared.Core.Services;
 using Shared.GameFormats.AnimationMeta.Parsing;
 
 namespace Editors.AnimationMeta.MetaEditor.Commands
@@ -15,12 +16,12 @@ namespace Editors.AnimationMeta.MetaEditor.Commands
     class CopyPastCommand : IUiCommand
     {
         private readonly CopyPasteManager _copyPasteManager;
-        private readonly MetaDataFileParser _metaDataFileParser;
+        private readonly IStandardDialogs _standardDialogs;
 
-        public CopyPastCommand(CopyPasteManager copyPasteManager, MetaDataFileParser metaDataFileParser)
+        public CopyPastCommand(CopyPasteManager copyPasteManager, IStandardDialogs standardDialogs)
         {
             _copyPasteManager = copyPasteManager;
-            _metaDataFileParser = metaDataFileParser;
+            _standardDialogs = standardDialogs;
         }
 
         public void ExecuteCopy(MetaDataEditorViewModel controller)
@@ -34,10 +35,11 @@ namespace Editors.AnimationMeta.MetaEditor.Commands
             {
                 if (string.IsNullOrWhiteSpace(tag.HasError()) == false || tag._input == null)
                 {
-                    MessageBox.Show($"Can not copy object due to: {tag.HasError()}");
+                    _standardDialogs.ShowDialogBox($"Can not copy object due to: {tag.HasError()}");
                     return;
                 }
             }
+
             var copyPastItem = new MetaDataTagCopyItem();
             foreach (var item in selectedTags)
             {
@@ -50,11 +52,11 @@ namespace Editors.AnimationMeta.MetaEditor.Commands
 
         public void ExecutePaste(MetaDataEditorViewModel controller)
         {
+            Guard.IsNotNull(controller.ParsedFile, $"{nameof(controller.ParsedFile)} - Can not paste when no file is loaded");
+
             var pastObject = _copyPasteManager.GetPasteObject<MetaDataTagCopyItem>();
             if (pastObject != null)
-            {
                 controller.ParsedFile.Attributes.AddRange(pastObject.Items);
-            }
 
             controller.UpdateView();
         }

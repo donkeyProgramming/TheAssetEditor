@@ -23,7 +23,7 @@ namespace Editors.AnimationMeta.SuperView.Visualisation
 {
     public interface IMetaDataBuilder
     {
-        List<IMetaDataInstance> Create(ParsedMetadataFile persistent, ParsedMetadataFile metaData, ParsedMetadataAttribute selectedMetaDataAttribute, SceneNode root, ISkeletonProvider skeleton, AnimationPlayer rootPlayer, IAnimationBinGenericFormat fragment);
+        List<IMetaDataInstance> Create(ParsedMetadataFile? persistent, ParsedMetadataFile? metaData, ParsedMetadataAttribute? selectedMetaDataAttribute, SceneNode root, ISkeletonProvider skeleton, AnimationPlayer rootPlayer, IAnimationBinGenericFormat fragment);
     }
 
     public class MetaDataBuilder : IMetaDataBuilder
@@ -51,8 +51,8 @@ namespace Editors.AnimationMeta.SuperView.Visualisation
             _animationsContainerComponent = animationsContainerComponent;
         }
 
-        public List<IMetaDataInstance> Create(ParsedMetadataFile persistent, 
-            ParsedMetadataFile metaData,ParsedMetadataAttribute selectedMetaDataAttribute,
+        public List<IMetaDataInstance> Create(ParsedMetadataFile? persistent, 
+            ParsedMetadataFile? metaData, ParsedMetadataAttribute? selectedMetaDataAttribute,
             SceneNode root, ISkeletonProvider skeleton, AnimationPlayer rootPlayer, IAnimationBinGenericFormat fragment)
         {
             // Clear all
@@ -70,7 +70,7 @@ namespace Editors.AnimationMeta.SuperView.Visualisation
             return output;
         }
 
-        private IEnumerable<IMetaDataInstance> ApplyMetaData(ParsedMetadataFile file, ParsedMetadataAttribute selectedAttribute, SceneNode root, ISkeletonProvider skeleton, AnimationPlayer rootPlayer, IAnimationBinGenericFormat fragment)
+        private IEnumerable<IMetaDataInstance> ApplyMetaData(ParsedMetadataFile? file, ParsedMetadataAttribute? selectedAttribute, SceneNode root, ISkeletonProvider skeleton, AnimationPlayer rootPlayer, IAnimationBinGenericFormat fragment)
         {
             var output = new List<IMetaDataInstance>();
             if (file == null)
@@ -129,6 +129,9 @@ namespace Editors.AnimationMeta.SuperView.Visualisation
             }
 
             var pf = _packFileService.FindFile(animPath);
+            if(pf == null)
+                throw new Exception($"Unable to find animation for docking. Searched for {animPath} and failed to find it in the pack file service. This is required to visualise the docked equipment.");
+
             var animFile = AnimationFile.Create(pf);
             var clip = new AnimationClip(animFile, skeleton.Skeleton);
 
@@ -136,12 +139,15 @@ namespace Editors.AnimationMeta.SuperView.Visualisation
             rootPlayer.AnimationRules.Add(rule);
         }
 
-        private IMetaDataInstance CreateAnimatedProp(IAnimatedPropMeta animatedPropMeta, SceneNode root, ISkeletonProvider rootSkeleton, ParsedMetadataAttribute selectedMetaDataAttribute, AnimationPlayer rootPlayer)
+        private IMetaDataInstance CreateAnimatedProp(IAnimatedPropMeta animatedPropMeta, SceneNode root, ISkeletonProvider rootSkeleton, ParsedMetadataAttribute? selectedMetaDataAttribute, AnimationPlayer rootPlayer)
         {
             var propName = "Animated_prop";
             var color = selectedMetaDataAttribute == animatedPropMeta ? s_selectedColor : s_color;
 
             var meshPath = _packFileService.FindFile(animatedPropMeta.ModelName);
+            if(meshPath == null) 
+                throw new Exception($"Unable to find model for animated prop. Searched for {animatedPropMeta.ModelName} and failed to find it in the pack file service. This is required to visualise the animated prop.");
+
             var animationPath = _packFileService.FindFile(animatedPropMeta.AnimationName);
             var propPlayer = _animationsContainerComponent.RegisterAnimationPlayer(new AnimationPlayer(), propName + Guid.NewGuid());
 
@@ -153,6 +159,9 @@ namespace Editors.AnimationMeta.SuperView.Visualisation
             {
                 var skeletonName = SceneNodeHelper.GetSkeletonName(loadedNode);
                 var skeletonFile = _skeletonAnimationLookUpHelper.GetSkeletonFileFromName(skeletonName);
+                if (skeletonFile == null)
+                    throw new Exception($"Unable to find skeleton for animated prop. Searched for {skeletonName} and failed to find it in the skeleton animation look up helper. This is required to play the animation of the prop.");
+
                 var skeleton = new GameSkeleton(skeletonFile, propPlayer);
                 var animFile = AnimationFile.Create(animationPath);
                 var clip = new AnimationClip(animFile, skeleton);
@@ -191,7 +200,7 @@ namespace Editors.AnimationMeta.SuperView.Visualisation
             return new AnimatedPropInstance(loadedNode, propPlayer);
         }
 
-        private IMetaDataInstance CreateStaticLocator(DecodedMetaEntryBase metaData, SceneNode root, Vector3 position, string displayName, ParsedMetadataAttribute selectedMetaDataAttribute, float scale = 0.3f)
+        private IMetaDataInstance CreateStaticLocator(DecodedMetaEntryBase metaData, SceneNode root, Vector3 position, string displayName, ParsedMetadataAttribute? selectedMetaDataAttribute, float scale = 0.3f)
         {
             var color = selectedMetaDataAttribute == metaData ? s_selectedColor : s_color;
 
@@ -203,7 +212,7 @@ namespace Editors.AnimationMeta.SuperView.Visualisation
             return new DrawableMetaInstance(metaData.StartTime, metaData.EndTime, node.Name, node);
         }
 
-        private IMetaDataInstance CreateSplashAttack(SplashAttack_v10 splashAttack, SceneNode root, string displayName, float scale, ParsedMetadataAttribute selectedAttribute)
+        private IMetaDataInstance CreateSplashAttack(SplashAttack_v10 splashAttack, SceneNode root, string displayName, float scale, ParsedMetadataAttribute? selectedAttribute)
         {
             var distance = Vector3.Distance(splashAttack.StartPosition, splashAttack.EndPosition);
             if (MathUtil.CompareEqualFloats(distance))
@@ -266,7 +275,7 @@ namespace Editors.AnimationMeta.SuperView.Visualisation
             return new DrawableMetaInstance(splashAttack.StartTime, splashAttack.EndTime, node.Name, node);
         }
 
-        private IMetaDataInstance CreateEffect(IEffectMeta effect, SceneNode root, ISkeletonProvider skeleton, ParsedMetadataAttribute selectedAttribute)
+        private IMetaDataInstance CreateEffect(IEffectMeta effect, SceneNode root, ISkeletonProvider skeleton, ParsedMetadataAttribute? selectedAttribute)
         {
             var color = selectedAttribute == effect ? s_selectedColor : s_color;
             var node = new SimpleDrawableNode("Effect:" + effect.VfxName);

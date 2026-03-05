@@ -11,13 +11,11 @@ namespace Editors.AnimationMeta.MetaEditor.Commands
     {
         private readonly MetaDataFileParser _metaDataFileParser;
         private readonly IMetaDataDatabase _metaDataDatabase;
-        private readonly IEventHub _eventHub;
 
-        public NewEntryCommand(MetaDataFileParser metaDataFileParser, IMetaDataDatabase metaDataDatabase, IEventHub eventHub) 
+        public NewEntryCommand(MetaDataFileParser metaDataFileParser, IMetaDataDatabase metaDataDatabase) 
         {
             _metaDataFileParser = metaDataFileParser;
             _metaDataDatabase = metaDataDatabase;
-            _eventHub = eventHub;
         }
 
         public void Execute(MetaDataEditorViewModel controller)
