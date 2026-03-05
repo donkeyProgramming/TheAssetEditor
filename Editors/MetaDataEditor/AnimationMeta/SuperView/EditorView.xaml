@@ -10,7 +10,7 @@
     <DockPanel>
         <Button Margin="5" Content="Refresh" Click="{s:MethodBinding RefreshAction}" DockPanel.Dock="Top"/>
 
-        <TabControl DockPanel.Dock="Top">
+        <TabControl DockPanel.Dock="Top" SelectedIndex="{Binding SelectedTabControllerIndex, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">
             <TabItem Header="Persistent">
                 <DockPanel>
                     <view:MainEditorView DataContext="{Binding PersistentMetaEditor}" DockPanel.Dock="Top"/>

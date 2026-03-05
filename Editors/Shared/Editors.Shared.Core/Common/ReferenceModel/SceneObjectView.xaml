@@ -99,7 +99,7 @@
 
             <Rectangle  Fill="LightGray" Height="1" Margin="2,2,2,2"/>
 
-            <DockPanel Margin="0,0,40,0" Visibility="{Binding AllowMetaData, UpdateSourceTrigger=PropertyChanged , Converter={StaticResource BoolToCollapsedConverter}}">
+            <DockPanel Margin="0,0,40,0">
 
                 <DockPanel DockPanel.Dock="Top">
                     <CheckBox Visibility="Hidden"/>

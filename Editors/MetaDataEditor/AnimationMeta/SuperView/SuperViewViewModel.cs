@@ -27,7 +27,7 @@ namespace Editors.AnimationMeta.SuperView
         [ObservableProperty] string _metaFilePath = "";
         [ObservableProperty] MetaDataEditorViewModel _persistentMetaEditor;
         [ObservableProperty] MetaDataEditorViewModel _metaEditor;
-
+        [ObservableProperty] int _selectedTabControllerIndex = 0;
         public override Type EditorViewModelType => typeof(EditorView);
 
         public SuperViewViewModel(

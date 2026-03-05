@@ -19,7 +19,7 @@ namespace Editors.Shared.Core.Common.ReferenceModel
         [ObservableProperty] bool _isControlVisible = true;
 
         [ObservableProperty] bool _isEnabled = true;
-        [ObservableProperty] bool _isExpand = true;
+        [ObservableProperty] bool _isExpanded = true;
 
         public SkeletonPreviewViewModel SkeletonInformation { get; set; }
         public BinAnimationViewModel FragAndSlotSelection { get; set; }

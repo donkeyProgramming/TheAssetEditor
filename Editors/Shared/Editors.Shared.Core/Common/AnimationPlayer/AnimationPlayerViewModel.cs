@@ -1,5 +1,5 @@
-﻿using System.Collections.Generic;
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
+using System.Windows;
 using Shared.Core.Misc;
 
 namespace Editors.Shared.Core.Common.AnimationPlayer
@@ -15,6 +15,8 @@ namespace Editors.Shared.Core.Common.AnimationPlayer
         public NotifyAttr<int> SelectedAnimationFrameCount { get; private set; } = new();
         public NotifyAttr<bool> IsEnabled { get; set; } = new();
         public NotifyAttr<bool> LoopAnimation { get; set; } = new(true);
+
+        public NotifyAttr<Visibility> PlayerControlsVisibility { get; private set; } = new(Visibility.Collapsed);
 
         public ObservableCollection<AssetPlayerItem> PlayerItems { get; private set; } = new ObservableCollection<AssetPlayerItem>();
 
@@ -101,6 +103,8 @@ namespace Editors.Shared.Core.Common.AnimationPlayer
         {
             if (isEnabled)
             {
+                PlayerControlsVisibility.Value = Visibility.Visible;
+
                 SelectedAnimationFrameCount.Value = 0;
                 if (SelectedMainAnimation != null)
                     SelectedAnimationFrameCount.Value = SelectedMainAnimation.MaxFrames.Value;
@@ -109,6 +113,7 @@ namespace Editors.Shared.Core.Common.AnimationPlayer
             }
             else
             {
+                PlayerControlsVisibility.Value = Visibility.Collapsed;
                 _assetList.ForEach(x => Stop(x));
             }
         }
