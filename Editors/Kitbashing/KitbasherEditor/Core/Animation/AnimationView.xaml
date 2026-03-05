@@ -12,7 +12,7 @@
             <RowDefinition/>
         </Grid.RowDefinitions>
 
-        <ToggleButton Grid.Row="0" Content="Animation" Click="ToggleButton_Click" IsChecked="{Binding IsEnabled, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" Margin="10,1,10,1"/>
+        <ToggleButton Grid.Row="0" Content="Animation" IsChecked="{Binding IsEnabled, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" Margin="10,1,10,1"/>
         <Grid Grid.Row="1" Margin="0,1,0,10" Visibility="{Binding AnimationControllerVisability.Value, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">
 
             <Grid.ColumnDefinitions>

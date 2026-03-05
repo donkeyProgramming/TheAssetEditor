@@ -1,6 +1,4 @@
-﻿using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Controls.Primitives;
+﻿using System.Windows.Controls;
 
 namespace KitbasherEditor.Views.EditorViews
 {
@@ -12,16 +10,7 @@ namespace KitbasherEditor.Views.EditorViews
         public AnimationPlayerView()
         {
             InitializeComponent();
-           // AnimationContent.Visibility = Visibility.Collapsed;
         }
 
-        private void ToggleButton_Click(object sender, RoutedEventArgs e)
-        {
-            //var button = sender as ToggleButton;
-            //if (button.IsChecked == false)
-            //    AnimationContent.Visibility = Visibility.Collapsed;
-            //else
-            //    AnimationContent.Visibility = Visibility.Visible;
-        }
     }
 }
