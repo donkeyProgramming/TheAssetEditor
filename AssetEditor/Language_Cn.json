@@ -1,0 +1,15 @@
+{
+  "SettingsWindow.Application": "应用程序",
+  "SettingsWindow.SelectedLanguage": "选择语言",
+  "SettingsWindow.Theme": "主题",
+  "SettingsWindow.StartMaximised": "启动时最大化",
+  "SettingsWindow.SelectedGame": "选择游戏",
+  "SettingsWindow.LoadGameFileOnStartup": "启动时加载游戏文件",
+  "SettingsWindow.ShowCaWems": "显示 CA 音频 (.wem) 文件",
+  "SettingsWindow.Rendering": "渲染",
+  "SettingsWindow.RenderBackground": "渲染引擎背景颜色",
+  "SettingsWindow.OnlyLoadLod0": "仅为参考网格加载 Lod0",
+  "SettingsWindow.GridSize": "3D视窗地面网格大小",
+  "SettingsWindow.AudioModding": "音频 Mod",
+  "SettingsWindow.SaveButton": "保存"
+}

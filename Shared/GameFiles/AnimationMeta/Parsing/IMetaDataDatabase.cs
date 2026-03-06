@@ -1,6 +1,7 @@
-﻿using System;
-using System.Reflection;
-using System.Linq;
+﻿using System.Reflection;
+using Serilog;
+using Shared.Core.ErrorHandling;
+using SharpDX.MediaFoundation;
 
 namespace Shared.GameFormats.AnimationMeta.Parsing
 {
@@ -15,6 +16,8 @@ namespace Shared.GameFormats.AnimationMeta.Parsing
 
     public class MetaDataDatabase : IMetaDataDatabase
     {
+        private readonly ILogger _logger = Logging.Create<MetaDataDatabase>();
+
         private bool _isInitialized = false;
         private readonly Dictionary<string, List<Type>> _typeTable = [];
         private readonly Dictionary<string, string> _descriptionMap = [];
@@ -39,10 +42,24 @@ namespace Shared.GameFormats.AnimationMeta.Parsing
 
             // Only consider assemblies that are part of this application's base directory to avoid scanning system/GAC assemblies
             var appBase = AppContext.BaseDirectory;
-            var assemblies = AppDomain.CurrentDomain.GetAssemblies()
-                .Where(a => !a.IsDynamic && !string.IsNullOrEmpty(a.Location) && a.Location.StartsWith(appBase, StringComparison.OrdinalIgnoreCase));
+            var allAssemblies = AppDomain.CurrentDomain.GetAssemblies();
+            var wantedAssemplies = new List<Assembly>();
+            foreach (var ass in allAssemblies)
+            { 
+                var name = ass.GetName().Name;
+                if (name == null)
+                    continue;
 
-            var typesWithMyAttribute = assemblies
+                if(name.Contains("AssetEditor", StringComparison.InvariantCultureIgnoreCase))
+                    wantedAssemplies.Add(ass);
+
+                if (name.Contains("Shared.GameFormats", StringComparison.InvariantCultureIgnoreCase))
+                    wantedAssemplies.Add(ass);
+            }
+
+            _logger.Here().Information($"Scanning for metadata attributes in assemblies: {string.Join(", ", wantedAssemplies.Select(a => a.GetName().Name))}"); 
+
+            var typesWithMyAttribute = wantedAssemplies
                 .SelectMany(a =>
                 {
                     try
@@ -65,6 +82,7 @@ namespace Shared.GameFormats.AnimationMeta.Parsing
                 .OrderBy(x => x.AttributeInfo.Priority)
                 .ToList();
 
+            _logger.Here().Information($"{typesWithMyAttributeList.Count} metadata attributes found");
             foreach (var instance in typesWithMyAttributeList)
             {
                 var type = instance.Type;

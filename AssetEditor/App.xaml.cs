@@ -14,12 +14,14 @@ using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Utility;
 using Shared.Core.Services;
 using Shared.Core.Settings;
+using Shared.Ui.Common;
 
 namespace AssetEditor
 {
-    public partial class App : Application
+    public partial class App : Application, IAssetEditorMain
     {
         IServiceProvider _serviceProvider;
+        public IServiceProvider ServiceProvider { get => _serviceProvider; }
 
         protected override void OnStartup(StartupEventArgs e)
         {
@@ -40,6 +42,9 @@ namespace AssetEditor
             settingsService.AllowSettingsUpdate = true;
             settingsService.Load();
 
+            var localizationManager = _serviceProvider.GetRequiredService<LocalizationManager>();
+            localizationManager.GetPossibleLanguages();
+            localizationManager.LoadLanguage("en");
 
             // Show the settings window if its the first time the tool is ran
             if (settingsService.CurrentSettings.IsFirstTimeStartingApplication)

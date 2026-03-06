@@ -57,6 +57,15 @@
       <Resource Include="AssetEditorIcon.png" />
     </ItemGroup>
 
+    <ItemGroup>
+      <None Update="Language_Cn.json">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="Language_En.json">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+    </ItemGroup>
+
     <PropertyGroup>
         <!--
         Make sure any documentation comments which are included in code get checked for syntax during the build, but do

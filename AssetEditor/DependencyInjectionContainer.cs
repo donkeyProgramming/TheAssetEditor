@@ -30,7 +30,7 @@ namespace AssetEditor
             serviceCollection.AddTransient<TogglePackFileExplorerCommand>();
 
             serviceCollection.AddTransient<SettingsWindow>();
-            serviceCollection.AddScoped<SettingsViewModel>();
+            serviceCollection.AddTransient<SettingsViewModel>();
             serviceCollection.AddScoped<MenuBarViewModel>();
 
             serviceCollection.AddScoped<MainWindow>();

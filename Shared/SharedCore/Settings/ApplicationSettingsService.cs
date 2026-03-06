@@ -26,6 +26,7 @@ namespace Shared.Core.Settings
         public string WwisePath { get; set; }
         public bool OnlyLoadLod0ForReferenceMeshes { get; set; } = true;
         public int VisualEditorsGridSize { get; set; } = 10;
+        public string SelectedLangauge { get; set; } = "en";
 
         public ApplicationSettings()
         {

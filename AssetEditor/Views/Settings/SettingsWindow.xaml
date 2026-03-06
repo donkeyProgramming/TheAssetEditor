@@ -4,8 +4,9 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:AssetEditor.Views.Settings"
+          xmlns:loc="clr-namespace:Shared.Ui.Common;assembly=Shared.Ui"
         mc:Ignorable="d"
-        Title="Settings" Height="660" Width="850"
+        Title="Settings" Height="685" Width="850"
         Style="{StaticResource CustomWindowStyle}"
         ResizeMode="NoResize">
     <Grid>
@@ -15,7 +16,7 @@
         </Grid.RowDefinitions>
 
         <local:SettingsView Grid.Row="0" />
-        <Button Grid.Row="1" Content="Save" Width="75" Margin="2, 10, 8, 2" HorizontalAlignment="Right" VerticalAlignment="Bottom" Command="{Binding SaveCommand}"  Click="Button_Click"/>
+        <Button Grid.Row="1" Content="{loc:Loc SettingsWindow.SaveButton}" Width="75" Margin="2, 10, 8, 2" HorizontalAlignment="Right" VerticalAlignment="Bottom" Command="{Binding SaveCommand}"  Click="Button_Click"/>
     </Grid>
 
 </Window>

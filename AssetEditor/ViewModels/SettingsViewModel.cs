@@ -7,6 +7,7 @@ using System.Windows.Input;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Shared.Core.Misc;
+using Shared.Core.Services;
 using Shared.Core.Settings;
 
 namespace AssetEditor.ViewModels
@@ -14,12 +15,15 @@ namespace AssetEditor.ViewModels
     partial class SettingsViewModel : ObservableObject
     {
         private readonly ApplicationSettingsService _settingsService;
+        private readonly LocalizationManager _localizationManager;
 
+        public ObservableCollection<string> AvailableLangauges { get; set; } = [];
         public ObservableCollection<ThemeType> AvailableThemes { get; set; } = [];
         public ObservableCollection<BackgroundColour> RenderEngineBackgroundColours { get; set; } = [];
         public ObservableCollection<GameTypeEnum> Games { get; set; } = [];
         public ObservableCollection<GamePathItem> GameDirectores { get; set; } = [];
 
+        [ObservableProperty] private string _selectedLanguage;
         [ObservableProperty] private ThemeType _currentTheme;
         [ObservableProperty] private BackgroundColour _currentRenderEngineBackgroundColour;
         [ObservableProperty] private int _visualEditorsGridSize;
@@ -30,9 +34,14 @@ namespace AssetEditor.ViewModels
         [ObservableProperty] private string _wwisePath;
         [ObservableProperty] private bool _onlyLoadLod0ForReferenceMeshes;
 
-        public SettingsViewModel(ApplicationSettingsService settingsService)
+        public SettingsViewModel(ApplicationSettingsService settingsService, LocalizationManager localizationManager)
         {
             _settingsService = settingsService;
+            _localizationManager = localizationManager;
+
+            AvailableLangauges = new ObservableCollection<string>(_localizationManager.GetPossibleLanguages());
+            SelectedLanguage = _localizationManager.SelectedLangauge;
+
             AvailableThemes = new ObservableCollection<ThemeType>((ThemeType[])Enum.GetValues(typeof(ThemeType)));
             CurrentTheme = _settingsService.CurrentSettings.Theme;
             RenderEngineBackgroundColours = new ObservableCollection<BackgroundColour>((BackgroundColour[])Enum.GetValues(typeof(BackgroundColour)));
@@ -69,11 +78,14 @@ namespace AssetEditor.ViewModels
             _settingsService.CurrentSettings.CurrentGame = CurrentGame;
             _settingsService.CurrentSettings.LoadCaPacksByDefault = LoadCaPacksByDefault;
             _settingsService.CurrentSettings.ShowCAWemFiles = ShowCAWemFiles;
+            _settingsService.CurrentSettings.SelectedLangauge = SelectedLanguage;
             _settingsService.CurrentSettings.OnlyLoadLod0ForReferenceMeshes = OnlyLoadLod0ForReferenceMeshes;
             _settingsService.CurrentSettings.GameDirectories.Clear();
             foreach (var item in GameDirectores)
                 _settingsService.CurrentSettings.GameDirectories.Add(new ApplicationSettings.GamePathPair() { Game = item.GameType, Path = item.Path });
             _settingsService.CurrentSettings.WwisePath = WwisePath;
+           
+            _localizationManager.LoadLanguage(SelectedLanguage);
             _settingsService.Save();
             MessageBox.Show("Please restart the tool after updating settings!");
         }
