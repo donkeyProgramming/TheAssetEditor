@@ -3,17 +3,23 @@ using Editors.ImportExport.Exporting.Exporters;
 using Editors.ImportExport.Exporting.Exporters.RmvToGltf;
 using Editors.ImportExport.Misc;
 using Shared.Core.PackFiles.Models;
+using Shared.Ui.Common.DataTemplates;
 
 namespace Editors.ImportExport.Exporting.Presentation.RmvToGltf
 {
-    public partial class RmvToGltfStaticExporterViewModel : ObservableObject, IExporterViewModel
+    public partial class RmvToGltfStaticExporterViewModel : ObservableObject, IExporterViewModel, IViewProvider<RmvToGltfStaticExporterView>
     {
         private readonly RmvToGltfStaticExporter _exporter;
 
         [ObservableProperty] bool _exportTextures = true;
-        [ObservableProperty] bool _convertMaterialTextureToBlender = false;
-        [ObservableProperty] bool _convertNormalTextureToBlue = false;
-        [ObservableProperty] bool _generateDisplacementMaps = true;
+
+        // Displacement map quality settings for 3D printing
+        [ObservableProperty] int _displacementIterations = 10;
+        [ObservableProperty] float _displacementContrast = 0.1f;  // Slight contrast boost for detail
+        [ObservableProperty] float _displacementSharpness = 0.0f;  // Start with no extra sharpening
+        [ObservableProperty] bool _export16BitDisplacement = true;
+        [ObservableProperty] bool _useMultiScaleProcessing = false;  // Disable by default
+        [ObservableProperty] bool _usePoissonReconstruction = false;  // Disable by default
 
         public string DisplayName => "GLTF (Static Mesh)";
         public string OutputExtension => ".gltf";
@@ -30,7 +36,22 @@ namespace Editors.ImportExport.Exporting.Presentation.RmvToGltf
 
         public void Execute(PackFile exportSource, string outputPath, bool generateImporter)
         {
-            var settings = new RmvToGltfExporterSettings(exportSource, [], outputPath, ExportTextures, ConvertMaterialTextureToBlender, ConvertNormalTextureToBlue, false, true);
+            var settings = new RmvToGltfExporterSettings(
+                exportSource, 
+                [], 
+                outputPath, 
+                ExportTextures, 
+                false,  // ConvertMaterialTextureToBlender - not used for static export
+                false,  // ConvertNormalTextureToBlue - not used, handled automatically
+                false,  // ExportAnimations - static mesh has no animations
+                true,   // MirrorMesh
+                DisplacementIterations,
+                DisplacementContrast,
+                DisplacementSharpness,
+                Export16BitDisplacement,
+                UseMultiScaleProcessing,
+                UsePoissonReconstruction
+            );
             _exporter.Export(settings);
         }
     }

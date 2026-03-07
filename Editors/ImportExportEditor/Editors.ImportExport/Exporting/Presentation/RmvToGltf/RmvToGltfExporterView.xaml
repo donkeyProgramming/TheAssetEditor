@@ -43,5 +43,5 @@
         <TextBlock Grid.Row="3" Grid.Column="1" Text=" : " VerticalAlignment="Center"/>
         <CheckBox Grid.Row="3" Grid.Column="2" HorizontalAlignment="Left" IsChecked="{Binding ExportAnimations, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
     </Grid>
-    
+
 </UserControl>

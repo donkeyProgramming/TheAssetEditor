@@ -1,0 +1,61 @@
+<UserControl x:Class="Editors.ImportExport.Exporting.Presentation.RmvToGltf.RmvToGltfStaticExporterView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:Editors.ImportExport.Exporting.Presentation.RmvToGltf"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="auto"/>
+            <ColumnDefinition Width="auto"/>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="auto"/>
+        </Grid.ColumnDefinitions>
+
+        <Grid.RowDefinitions>
+            <RowDefinition Height="25"/>
+            <RowDefinition Height="10"/>
+            <RowDefinition Height="25"/>
+            <RowDefinition Height="25"/>
+            <RowDefinition Height="25"/>
+            <RowDefinition Height="25"/>
+            <RowDefinition Height="25"/>
+            <RowDefinition Height="25"/>
+        </Grid.RowDefinitions>
+
+        <TextBlock Grid.Row="0" Grid.Column="0" Text="Export Textures" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+        <TextBlock Grid.Row="0" Grid.Column="1" Text=" : " VerticalAlignment="Center"/>
+        <CheckBox Grid.Row="0" Grid.Column="2" HorizontalAlignment="Left"  IsChecked="{Binding ExportTextures, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
+
+        <!-- Separator -->
+        <Separator Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="4" Margin="0,5,0,5"/>
+
+        <!-- Displacement Map Settings for 3D Printing -->
+        <TextBlock Grid.Row="2" Grid.Column="0" Text="Displacement Iterations" HorizontalAlignment="Left" VerticalAlignment="Center" ToolTip="Number of smoothing iterations (1-100). Lower = sharper, Higher = smoother"/>
+        <TextBlock Grid.Row="2" Grid.Column="1" Text=" : " VerticalAlignment="Center"/>
+        <TextBox Grid.Row="2" Grid.Column="2" HorizontalAlignment="Left" Width="60" Text="{Binding DisplacementIterations, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
+
+        <TextBlock Grid.Row="3" Grid.Column="0" Text="Displacement Contrast" HorizontalAlignment="Left" VerticalAlignment="Center" ToolTip="Contrast adjustment (0.0-1.0). Higher = more pronounced features"/>
+        <TextBlock Grid.Row="3" Grid.Column="1" Text=" : " VerticalAlignment="Center"/>
+        <TextBox Grid.Row="3" Grid.Column="2" HorizontalAlignment="Left" Width="60" Text="{Binding DisplacementContrast, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
+
+        <TextBlock Grid.Row="4" Grid.Column="0" Text="Displacement Sharpness" HorizontalAlignment="Left" VerticalAlignment="Center" ToolTip="Sharpening strength (0.0-5.0). Higher = sharper edges"/>
+        <TextBlock Grid.Row="4" Grid.Column="1" Text=" : " VerticalAlignment="Center"/>
+        <TextBox Grid.Row="4" Grid.Column="2" HorizontalAlignment="Left" Width="60" Text="{Binding DisplacementSharpness, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
+
+        <TextBlock Grid.Row="5" Grid.Column="0" Text="16-bit Export (3D Print)" HorizontalAlignment="Left" VerticalAlignment="Center" ToolTip="Export 16-bit displacement for better print quality"/>
+        <TextBlock Grid.Row="5" Grid.Column="1" Text=" : " VerticalAlignment="Center"/>
+        <CheckBox Grid.Row="5" Grid.Column="2" HorizontalAlignment="Left" IsChecked="{Binding Export16BitDisplacement, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
+
+        <TextBlock Grid.Row="6" Grid.Column="0" Text="Multi-Scale Processing" HorizontalAlignment="Left" VerticalAlignment="Center" ToolTip="Process at multiple resolutions for better detail"/>
+        <TextBlock Grid.Row="6" Grid.Column="1" Text=" : " VerticalAlignment="Center"/>
+        <CheckBox Grid.Row="6" Grid.Column="2" HorizontalAlignment="Left" IsChecked="{Binding UseMultiScaleProcessing, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
+
+        <TextBlock Grid.Row="7" Grid.Column="0" Text="Poisson Reconstruction" HorizontalAlignment="Left" VerticalAlignment="Center" ToolTip="Use Poisson method for best quality (slower)"/>
+        <TextBlock Grid.Row="7" Grid.Column="1" Text=" : " VerticalAlignment="Center"/>
+        <CheckBox Grid.Row="7" Grid.Column="2" HorizontalAlignment="Left" IsChecked="{Binding UsePoissonReconstruction, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
+    </Grid>
+    
+</UserControl>

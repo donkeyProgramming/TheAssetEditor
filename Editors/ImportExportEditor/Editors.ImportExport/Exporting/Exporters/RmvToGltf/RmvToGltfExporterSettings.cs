@@ -11,6 +11,14 @@ namespace Editors.ImportExport.Exporting.Exporters.RmvToGltf
         bool ConvertMaterialTextureToBlender,
         bool ConvertNormalTextureToBlue,
         bool ExportAnimations,
-        bool MirrorMesh
+        bool MirrorMesh,
+
+        // Displacement map quality settings for 3D printing
+        int DisplacementIterations = 10,
+        float DisplacementContrast = 0.1f,
+        float DisplacementSharpness = 1.0f,
+        bool Export16BitDisplacement = true,
+        bool UseMultiScaleProcessing = true,
+        bool UsePoissonReconstruction = true
     );
 }

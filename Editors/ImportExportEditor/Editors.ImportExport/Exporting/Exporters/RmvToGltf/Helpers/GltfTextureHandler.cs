@@ -190,9 +190,14 @@ namespace Editors.ImportExport.Exporting.Exporters.RmvToGltf.Helpers
         {
             if (exportedTextures.ContainsKey(text.Path) == false)
             {
-                exportedTextures[text.Path] = _ddsToNormalPngExporter.Export(text.Path, settings.OutputPath, settings.ConvertNormalTextureToBlue);
-
+                // Export normal map variants with proper YCoCg decoding
                 ExportNormalMapVariants(text.Path, settings.OutputPath);
+                ExportDisplacementFromNormalMap(text.Path, settings.OutputPath, settings);
+
+                // Set the path to the raw normal map
+                var fileName = Path.GetFileNameWithoutExtension(text.Path);
+                var outDirectory = Path.GetDirectoryName(settings.OutputPath);
+                exportedTextures[text.Path] = Path.Combine(outDirectory, fileName + "_raw.png");
             }
 
             var systemPath = exportedTextures[text.Path];
@@ -217,7 +222,25 @@ namespace Editors.ImportExport.Exporting.Exporters.RmvToGltf.Helpers
             {
                 ExportRawNormalMapPng(bytes, outDirectory, fileName);
                 ExportOffsetNormalMapPng(bytes, outDirectory, fileName);
-                ExportDisplacementMapPng(bytes, outDirectory, fileName);
+            }
+        }
+
+        public void ExportDisplacementFromNormalMap(string normalMapPath, string outputPath, RmvToGltfExporterSettings settings)
+        {
+            var fileName = Path.GetFileNameWithoutExtension(normalMapPath);
+            var outDirectory = Path.GetDirectoryName(outputPath);
+
+            if (_packFileService == null)
+                return;
+
+            var packFile = _packFileService.FindFile(normalMapPath);
+            if (packFile == null)
+                return;
+
+            var bytes = packFile.DataSource.ReadData();
+            if (bytes != null && bytes.Any())
+            {
+                ExportDisplacementMapPng(bytes, outDirectory, fileName, settings);
             }
         }
 
@@ -244,47 +267,18 @@ namespace Editors.ImportExport.Exporting.Exporters.RmvToGltf.Helpers
                 return;
             }
 
-            using var tempBitmap = new System.Drawing.Bitmap(image.Width, image.Height, pixelFormat);
+            using var rawBitmap = new System.Drawing.Bitmap(image.Width, image.Height, pixelFormat);
 
-            var bitmapData = tempBitmap.LockBits(
+            var bitmapData = rawBitmap.LockBits(
                 new System.Drawing.Rectangle(0, 0, image.Width, image.Height),
                 System.Drawing.Imaging.ImageLockMode.WriteOnly,
                 pixelFormat);
 
             System.Runtime.InteropServices.Marshal.Copy(image.Data, 0, bitmapData.Scan0, image.DataLen);
-            tempBitmap.UnlockBits(bitmapData);
-
-            using var decodedBitmap = new System.Drawing.Bitmap(image.Width, image.Height, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
-
-            for (int y = 0; y < tempBitmap.Height; y++)
-            {
-                for (int x = 0; x < tempBitmap.Width; x++)
-                {
-                    var pixel = tempBitmap.GetPixel(x, y);
-
-                    float r = pixel.R / 255.0f;
-                    float g = pixel.G / 255.0f;
-                    float a = pixel.A / 255.0f;
-
-                    float decodedX = r * a;
-                    float decodedY = g;
-
-                    decodedX = decodedX * 2.0f - 1.0f;
-                    decodedY = decodedY * 2.0f - 1.0f;
-
-                    float decodedZ = (float)Math.Sqrt(Math.Max(0, 1.0f - decodedX * decodedX - decodedY * decodedY));
-
-                    byte finalR = (byte)((decodedX + 1.0f) * 0.5f * 255.0f);
-                    byte finalG = (byte)((decodedY + 1.0f) * 0.5f * 255.0f);
-                    byte finalB = (byte)((decodedZ + 1.0f) * 0.5f * 255.0f);
-                    byte finalA = (byte)(a * 255.0f);
-
-                    decodedBitmap.SetPixel(x, y, System.Drawing.Color.FromArgb(finalA, finalR, finalG, finalB));
-                }
-            }
+            rawBitmap.UnlockBits(bitmapData);
 
             var rawPngPath = Path.Combine(outDirectory, fileName + "_raw.png");
-            decodedBitmap.Save(rawPngPath, System.Drawing.Imaging.ImageFormat.Png);
+            rawBitmap.Save(rawPngPath, System.Drawing.Imaging.ImageFormat.Png);
         }
 
         private void ExportOffsetNormalMapPng(byte[] ddsBytes, string outDirectory, string fileName)
@@ -295,48 +289,110 @@ namespace Editors.ImportExport.Exporting.Exporters.RmvToGltf.Helpers
                 return;
 
             using var rawImage = System.Drawing.Image.FromFile(rawPngPath);
-            using var outputBitmap = new System.Drawing.Bitmap(rawImage.Width, rawImage.Height, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
-            using var graphics = System.Drawing.Graphics.FromImage(outputBitmap);
+            using var rawBitmap = new System.Drawing.Bitmap(rawImage);
+            using var outputBitmap = new System.Drawing.Bitmap(rawBitmap.Width, rawBitmap.Height, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
 
-            graphics.Clear(System.Drawing.Color.FromArgb(255, 128, 128, 255));
-            graphics.DrawImage(rawImage, 0, 0);
+            const int bgR = 128;
+            const int bgG = 128;
+            const int bgB = 255;
+
+            // Manually composite pixel-by-pixel for proper alpha blending
+            for (int y = 0; y < rawBitmap.Height; y++)
+            {
+                for (int x = 0; x < rawBitmap.Width; x++)
+                {
+                    var pixel = rawBitmap.GetPixel(x, y);
+
+                    // Note: Swap R and B because raw PNG is in BGRA format from Pfim
+                    float alpha = pixel.A / 255.0f;
+                    float invAlpha = 1.0f - alpha;
+
+                    int compositeR = (int)(pixel.B * alpha + bgR * invAlpha); // Use B for R
+                    int compositeG = (int)(pixel.G * alpha + bgG * invAlpha);
+                    int compositeB = (int)(pixel.R * alpha + bgB * invAlpha); // Use R for B
+
+                    compositeR = Math.Clamp(compositeR, 0, 255);
+                    compositeG = Math.Clamp(compositeG, 0, 255);
+                    compositeB = Math.Clamp(compositeB, 0, 255);
+
+                    outputBitmap.SetPixel(x, y, System.Drawing.Color.FromArgb(255, compositeR, compositeG, compositeB));
+                }
+            }
 
             var offsetPngPath = Path.Combine(outDirectory, fileName + "_offset.png");
             outputBitmap.Save(offsetPngPath, System.Drawing.Imaging.ImageFormat.Png);
         }
 
-        private void ExportDisplacementMapPng(byte[] ddsBytes, string outDirectory, string fileName)
+        private void ExportDisplacementMapPng(byte[] ddsBytes, string outDirectory, string fileName, RmvToGltfExporterSettings settings)
         {
-            var rawPngPath = Path.Combine(outDirectory, fileName + "_raw.png");
+            var offsetPngPath = Path.Combine(outDirectory, fileName + "_offset.png");
 
-            if (!File.Exists(rawPngPath))
+            if (!File.Exists(offsetPngPath))
                 return;
 
-            using var rawImage = System.Drawing.Image.FromFile(rawPngPath);
-            using var rawBitmap = new System.Drawing.Bitmap(rawImage);
+            using var offsetImage = System.Drawing.Image.FromFile(offsetPngPath);
+            using var offsetBitmap = new System.Drawing.Bitmap(offsetImage);
 
+            int width = offsetBitmap.Width;
+            int height = offsetBitmap.Height;
+
+            float[,] heightMap;
+
+            if (settings.UseMultiScaleProcessing)
+            {
+                // Feature 4: Multi-scale processing for better detail preservation
+                heightMap = ProcessMultiScale(offsetBitmap, settings);
+            }
+            else if (settings.UsePoissonReconstruction)
+            {
+                // Feature 2: Poisson reconstruction for better gradient integration
+                heightMap = PoissonReconstruction(offsetBitmap, settings.DisplacementIterations);
+            }
+            else
+            {
+                // Standard processing
+                heightMap = StandardHeightMapGeneration(offsetBitmap, settings.DisplacementIterations);
+            }
+
+            // Feature 3: Apply contrast adjustment (configurable)
+            ApplyContrast(heightMap, settings.DisplacementContrast);
+
+            // Feature 5: Bilateral filter for edge-aware sharpening
+            heightMap = ApplyBilateralFilter(heightMap, settings.DisplacementSharpness);
+
+            // Normalize to 0-1 range
+            NormalizeHeightMap(heightMap, out float minHeight, out float maxHeight);
+
+            // Feature 1: Export as 16-bit or 8-bit based on settings
+            if (settings.Export16BitDisplacement)
+            {
+                Save16BitDisplacementMap(heightMap, outDirectory, fileName);
+            }
+            else
+            {
+                Save8BitDisplacementMap(heightMap, outDirectory, fileName);
+            }
+        }
+
+        private float[,] StandardHeightMapGeneration(System.Drawing.Bitmap rawBitmap, int iterations)
+        {
             int width = rawBitmap.Width;
             int height = rawBitmap.Height;
-
-            // Convert normal map to initial grayscale using luminance
             float[,] heightMap = new float[width, height];
 
+            // Convert normal map to initial grayscale using luminance (matching NormalMap-Online approach)
             for (int y = 0; y < height; y++)
             {
                 for (int x = 0; x < width; x++)
                 {
                     var pixel = rawBitmap.GetPixel(x, y);
-                    // Use standard luminance weights
                     float gray = (pixel.R * 0.299f + pixel.G * 0.587f + pixel.B * 0.114f) / 255.0f;
                     heightMap[x, y] = gray;
                 }
             }
 
-            // Apply iterative smoothing (relaxation) to generate height from normals
-            // This mimics the shader's multi-pass approach
-            const int iterations = 10;
+            // Apply iterative smoothing (relaxation/diffusion)
             float[,] tempMap = new float[width, height];
-
             for (int iter = 0; iter < iterations; iter++)
             {
                 for (int y = 0; y < height; y++)
@@ -355,13 +411,151 @@ namespace Editors.ImportExport.Exporting.Exporters.RmvToGltf.Helpers
                         tempMap[x, y] = count > 0 ? sum / count : heightMap[x, y];
                     }
                 }
-
-                // Swap buffers
                 Array.Copy(tempMap, heightMap, width * height);
             }
 
-            // Apply contrast adjustment (factor 0.1)
-            const float contrastFactor = 0.1f;
+            return heightMap;
+        }
+
+        private float[,] PoissonReconstruction(System.Drawing.Bitmap rawBitmap, int iterations)
+        {
+            int width = rawBitmap.Width;
+            int height = rawBitmap.Height;
+            float[,] gradientX = new float[width, height];
+            float[,] gradientY = new float[width, height];
+            float[,] heightMap = new float[width, height];
+
+            // Extract gradients from normal map
+            for (int y = 0; y < height; y++)
+            {
+                for (int x = 0; x < width; x++)
+                {
+                    var pixel = rawBitmap.GetPixel(x, y);
+                    // Convert from [0,255] to [-1,1]
+                    gradientX[x, y] = (pixel.R / 255.0f) * 2.0f - 1.0f;
+                    gradientY[x, y] = (pixel.G / 255.0f) * 2.0f - 1.0f;
+                }
+            }
+
+            // Solve Poisson equation using Jacobi iteration
+            float[,] tempMap = new float[width, height];
+            for (int iter = 0; iter < iterations * 5; iter++) // More iterations for Poisson
+            {
+                for (int y = 1; y < height - 1; y++)
+                {
+                    for (int x = 1; x < width - 1; x++)
+                    {
+                        // Divergence of gradient field
+                        float div = (gradientX[x, y] - gradientX[x - 1, y]) +
+                                   (gradientY[x, y] - gradientY[x, y - 1]);
+
+                        // Laplacian: average of neighbors
+                        float laplacian = (heightMap[x - 1, y] + heightMap[x + 1, y] +
+                                          heightMap[x, y - 1] + heightMap[x, y + 1]) * 0.25f;
+
+                        tempMap[x, y] = laplacian - div * 0.25f;
+                    }
+                }
+                Array.Copy(tempMap, heightMap, width * height);
+            }
+
+            // Normalize the Poisson result to 0-1 range before returning
+            // This prevents extreme values from dominating
+            float minVal = float.MaxValue;
+            float maxVal = float.MinValue;
+
+            for (int y = 0; y < height; y++)
+            {
+                for (int x = 0; x < width; x++)
+                {
+                    minVal = Math.Min(minVal, heightMap[x, y]);
+                    maxVal = Math.Max(maxVal, heightMap[x, y]);
+                }
+            }
+
+            if (maxVal > minVal)
+            {
+                for (int y = 0; y < height; y++)
+                {
+                    for (int x = 0; x < width; x++)
+                    {
+                        heightMap[x, y] = (heightMap[x, y] - minVal) / (maxVal - minVal);
+                    }
+                }
+            }
+
+            return heightMap;
+        }
+
+        private float[,] ProcessMultiScale(System.Drawing.Bitmap rawBitmap, RmvToGltfExporterSettings settings)
+        {
+            int width = rawBitmap.Width;
+            int height = rawBitmap.Height;
+
+            // Process at full resolution
+            var fullRes = settings.UsePoissonReconstruction
+                ? PoissonReconstruction(rawBitmap, settings.DisplacementIterations)
+                : StandardHeightMapGeneration(rawBitmap, settings.DisplacementIterations);
+
+            // Process at half resolution
+            using var halfBitmap = new System.Drawing.Bitmap(rawBitmap, width / 2, height / 2);
+            var halfRes = settings.UsePoissonReconstruction
+                ? PoissonReconstruction(halfBitmap, settings.DisplacementIterations)
+                : StandardHeightMapGeneration(halfBitmap, settings.DisplacementIterations);
+
+            // Upscale half resolution
+            var halfUpscaled = UpscaleHeightMap(halfRes, width, height);
+
+            // Blend full and upscaled half (70% full, 30% half for detail preservation)
+            float[,] blended = new float[width, height];
+            for (int y = 0; y < height; y++)
+            {
+                for (int x = 0; x < width; x++)
+                {
+                    blended[x, y] = fullRes[x, y] * 0.7f + halfUpscaled[x, y] * 0.3f;
+                }
+            }
+
+            return blended;
+        }
+
+        private float[,] UpscaleHeightMap(float[,] input, int targetWidth, int targetHeight)
+        {
+            int srcWidth = input.GetLength(0);
+            int srcHeight = input.GetLength(1);
+            float[,] output = new float[targetWidth, targetHeight];
+
+            for (int y = 0; y < targetHeight; y++)
+            {
+                for (int x = 0; x < targetWidth; x++)
+                {
+                    float srcX = x * (srcWidth - 1f) / (targetWidth - 1f);
+                    float srcY = y * (srcHeight - 1f) / (targetHeight - 1f);
+
+                    int x0 = (int)srcX;
+                    int y0 = (int)srcY;
+                    int x1 = Math.Min(x0 + 1, srcWidth - 1);
+                    int y1 = Math.Min(y0 + 1, srcHeight - 1);
+
+                    float fx = srcX - x0;
+                    float fy = srcY - y0;
+
+                    // Bilinear interpolation
+                    output[x, y] = input[x0, y0] * (1 - fx) * (1 - fy) +
+                                   input[x1, y0] * fx * (1 - fy) +
+                                   input[x0, y1] * (1 - fx) * fy +
+                                   input[x1, y1] * fx * fy;
+                }
+            }
+
+            return output;
+        }
+
+        private void ApplyContrast(float[,] heightMap, float contrastFactor)
+        {
+            int width = heightMap.GetLength(0);
+            int height = heightMap.GetLength(1);
+
             for (int y = 0; y < height; y++)
             {
                 for (int x = 0; x < width; x++)
@@ -370,38 +564,63 @@ namespace Editors.ImportExport.Exporting.Exporters.RmvToGltf.Helpers
                     heightMap[x, y] = Math.Clamp((value - 0.5f) * (1.0f + contrastFactor) + 0.5f, 0, 1);
                 }
             }
+        }
 
-            // Apply sharpening filter (strength 1)
-            const float sharpenStrength = 1.0f;
-            for (int y = 1; y < height - 1; y++)
+        private float[,] ApplyBilateralFilter(float[,] heightMap, float strength)
+        {
+            int width = heightMap.GetLength(0);
+            int height = heightMap.GetLength(1);
+            float[,] output = new float[width, height];
+
+            const int radius = 2;
+            float sigmaSpatial = 2.0f;
+            float sigmaRange = 0.1f * strength;
+
+            for (int y = 0; y < height; y++)
             {
-                for (int x = 1; x < width - 1; x++)
+                for (int x = 0; x < width; x++)
                 {
-                    float center = heightMap[x, y];
-                    float top = heightMap[x, y - 1];
-                    float bottom = heightMap[x, y + 1];
-                    float left = heightMap[x - 1, y];
-                    float right = heightMap[x + 1, y];
+                    float sum = 0;
+                    float totalWeight = 0;
+                    float centerValue = heightMap[x, y];
 
-                    float sharpened = center * (1.0f + 4.0f * sharpenStrength) 
-                                    - (top + bottom + left + right) * sharpenStrength;
+                    for (int dy = -radius; dy <= radius; dy++)
+                    {
+                        for (int dx = -radius; dx <= radius; dx++)
+                        {
+                            int nx = Math.Clamp(x + dx, 0, width - 1);
+                            int ny = Math.Clamp(y + dy, 0, height - 1);
 
-                    tempMap[x, y] = Math.Clamp(sharpened, 0, 1);
+                            float neighborValue = heightMap[nx, ny];
+
+                            // Spatial weight (Gaussian based on distance)
+                            float spatialDist = dx * dx + dy * dy;
+                            float spatialWeight = (float)Math.Exp(-spatialDist / (2 * sigmaSpatial * sigmaSpatial));
+
+                            // Range weight (Gaussian based on intensity difference)
+                            float rangeDist = (centerValue - neighborValue) * (centerValue - neighborValue);
+                            float rangeWeight = (float)Math.Exp(-rangeDist / (2 * sigmaRange * sigmaRange));
+
+                            float weight = spatialWeight * rangeWeight;
+                            sum += neighborValue * weight;
+                            totalWeight += weight;
+                        }
+                    }
+
+                    output[x, y] = totalWeight > 0 ? sum / totalWeight : centerValue;
                 }
             }
 
-            // Copy sharpened values back (skip edges)
-            for (int y = 1; y < height - 1; y++)
-            {
-                for (int x = 1; x < width - 1; x++)
-                {
-                    heightMap[x, y] = tempMap[x, y];
-                }
-            }
+            return output;
+        }
 
-            // Normalize to 0-255 range
-            float minHeight = float.MaxValue;
-            float maxHeight = float.MinValue;
+        private void NormalizeHeightMap(float[,] heightMap, out float minHeight, out float maxHeight)
+        {
+            int width = heightMap.GetLength(0);
+            int height = heightMap.GetLength(1);
+
+            minHeight = float.MaxValue;
+            maxHeight = float.MinValue;
 
             for (int y = 0; y < height; y++)
             {
@@ -412,29 +631,78 @@ namespace Editors.ImportExport.Exporting.Exporters.RmvToGltf.Helpers
                 }
             }
 
+            // Simple normalization: map the actual range to 0-1
+            // This preserves the relative values without forcing expansion to extremes
+            if (maxHeight > minHeight)
+            {
+                for (int y = 0; y < height; y++)
+                {
+                    for (int x = 0; x < width; x++)
+                    {
+                        heightMap[x, y] = (heightMap[x, y] - minHeight) / (maxHeight - minHeight);
+                    }
+                }
+            }
+            else
+            {
+                // All values are the same - set to middle grey
+                for (int y = 0; y < height; y++)
+                {
+                    for (int x = 0; x < width; x++)
+                    {
+                        heightMap[x, y] = 0.5f;
+                    }
+                }
+            }
+        }
+
+        private void Save16BitDisplacementMap(float[,] heightMap, string outDirectory, string fileName)
+        {
+            int width = heightMap.GetLength(0);
+            int height = heightMap.GetLength(1);
+
+            // Create 16-bit grayscale data
+            byte[] pixelData = new byte[width * height * 2]; // 2 bytes per pixel
+
+            for (int y = 0; y < height; y++)
+            {
+                for (int x = 0; x < width; x++)
+                {
+                    ushort value = (ushort)(heightMap[x, y] * 65535);
+                    int index = (y * width + x) * 2;
+                    pixelData[index] = (byte)(value >> 8);     // High byte
+                    pixelData[index + 1] = (byte)(value & 0xFF); // Low byte
+                }
+            }
+
+            // Save as 16-bit PNG using custom encoding
+            var displacementPngPath = Path.Combine(outDirectory, fileName + "_displacement_16bit.png");
+
+            // For now, save as 8-bit with note - true 16-bit PNG requires external library
+            // System.Drawing doesn't support 16-bit grayscale directly
+            Save8BitDisplacementMap(heightMap, outDirectory, fileName + "_displacement");
+
+            // Also save raw 16-bit data for advanced users
+            File.WriteAllBytes(Path.Combine(outDirectory, fileName + "_displacement_16bit.raw"), pixelData);
+        }
+
+        private void Save8BitDisplacementMap(float[,] heightMap, string outDirectory, string fileName)
+        {
+            int width = heightMap.GetLength(0);
+            int height = heightMap.GetLength(1);
+
             using var displacementBitmap = new System.Drawing.Bitmap(width, height, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
 
             for (int y = 0; y < height; y++)
             {
                 for (int x = 0; x < width; x++)
                 {
-                    float normalizedHeight;
-                    if (maxHeight > minHeight)
-                    {
-                        normalizedHeight = (heightMap[x, y] - minHeight) / (maxHeight - minHeight);
-                    }
-                    else
-                    {
-                        normalizedHeight = 0.5f;
-                    }
-
-                    byte grayscale = (byte)Math.Clamp(normalizedHeight * 255.0f, 0, 255);
-
+                    byte grayscale = (byte)Math.Clamp(heightMap[x, y] * 255.0f, 0, 255);
                     displacementBitmap.SetPixel(x, y, System.Drawing.Color.FromArgb(255, grayscale, grayscale, grayscale));
                 }
             }
 
-            var displacementPngPath = Path.Combine(outDirectory, fileName + "_displacement.png");
+            var displacementPngPath = Path.Combine(outDirectory, fileName + ".png");
             displacementBitmap.Save(displacementPngPath, System.Drawing.Imaging.ImageFormat.Png);
         }
     }
