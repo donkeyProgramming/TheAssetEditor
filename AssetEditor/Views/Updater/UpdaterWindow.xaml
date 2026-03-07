@@ -1,0 +1,121 @@
+﻿<Window
+    x:Class="AssetEditor.Views.Updater.UpdaterWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:Updater="clr-namespace:AssetEditor.Views.Updater"
+    xmlns:MdXaml="clr-namespace:MdXaml;assembly=MdXaml"
+    xmlns:ViewModels="clr-namespace:AssetEditor.ViewModels" 
+    d:DataContext="{d:DesignInstance Type=ViewModels:UpdaterViewModel}"
+    mc:Ignorable="d"
+    Style="{StaticResource CustomWindowStyle}"
+    Closed="OnClosed"
+    ResizeMode="NoResize"   
+    WindowStartupLocation="CenterScreen"
+    Height="545" 
+    Width="800"
+    Title="Asset Editor Updater">
+
+    <Grid
+        Margin="15, 15, 15, 15">
+
+        <Grid.RowDefinitions>
+            <RowDefinition 
+                Height="Auto"/>
+            <RowDefinition 
+                Height="Auto"/>
+            <RowDefinition 
+                Height="Auto"/>
+            <RowDefinition 
+                Height="Auto"/>
+            <RowDefinition 
+                Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <TextBlock
+            Grid.Row="0"
+            Text="{Binding LatestVersionInfo}"
+            FontSize="14"/>
+
+        <TextBlock
+            Grid.Row="1"
+            Text="Release Notes"
+            FontSize="20"
+            FontWeight="SemiBold"/>
+
+        <Border
+            Grid.Row="2"
+            BorderThickness="1"
+            BorderBrush="{DynamicResource App.Border}"
+            Margin="0, 10, 0, 0"
+            Height="300">
+
+            <ScrollViewer 
+                VerticalScrollBarVisibility="Auto"
+                Padding="10, 10, 10, 10">
+
+                <ItemsControl 
+                    ItemsSource="{Binding ReleaseNotesItems}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Border 
+                                Padding="0, 0, 0, 20">
+                                <StackPanel>
+
+                                    <TextBlock
+                                        Text="{Binding ReleaseName}"
+                                        FontSize="18"
+                                        FontWeight="SemiBold"/>
+
+                                    <TextBlock
+                                        Margin="0,4,0,12"
+                                        Text="{Binding PublishedAt}"
+                                        FontSize="14"/>
+
+                                    <!-- Disable VerticalScrollBarVisibility as we don't won't loads of mini scroll viewers... -->
+                                    <MdXaml:MarkdownScrollViewer
+                                        Markdown="{Binding ReleaseNotes}"
+                                        VerticalAlignment="Stretch"
+                                        HorizontalAlignment="Stretch"
+                                        VerticalScrollBarVisibility="Disabled"
+                                        PreviewMouseWheel="OnMarkdownScrollViewerPreviewMouseWheel">
+
+                                        <MdXaml:MarkdownScrollViewer.Resources>
+                                            <Style 
+                                                TargetType="{x:Type List}">
+                                                <Setter 
+                                                    Property="FontSize" 
+                                                    Value="14"/>
+                                            </Style>
+                                        </MdXaml:MarkdownScrollViewer.Resources>
+                                    </MdXaml:MarkdownScrollViewer>
+                                </StackPanel>
+                            </Border>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </ScrollViewer>
+        </Border>
+
+        <StackPanel 
+            Grid.Row="3" 
+            Orientation="Horizontal" 
+            HorizontalAlignment="Right" 
+            Margin="10, 10, 0, 10">
+
+            <Button 
+                Content="Update"
+                Width="75"
+                Height="25"
+                Margin="0, 0, 5, 0"
+                Command="{Binding UpdateCommand}"/>
+
+            <Button 
+                Content="Cancel" 
+                Width="75"
+                Margin="5, 0, 0, 0" 
+                Command="{Binding CloseWindowActionCommand}"/>
+        </StackPanel>
+    </Grid>
+</Window>
