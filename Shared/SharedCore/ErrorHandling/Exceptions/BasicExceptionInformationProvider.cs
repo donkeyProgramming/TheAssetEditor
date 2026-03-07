@@ -42,7 +42,7 @@ namespace Shared.Core.ErrorHandling.Exceptions
             extendedException.Settings = _settingsService.CurrentSettings;
             extendedException.NumberOfOpenedEditors = ApplicationStateRecorder.GetNumberOfOpenedEditors();
             extendedException.RunTimeInSeconds = ApplicationStateRecorder.GetApplicationRunTimeInSec();
-            extendedException.AssetEditorVersion = VersionChecker.CurrentVersion;
+            extendedException.AssetEditorVersion = VersionChecker.GetCurrentVersion().ToString();
         }
 
         void CreateContext(ExceptionInformation extendedException)

@@ -1,98 +1,75 @@
-﻿using System.Diagnostics;
-using System.Runtime.InteropServices;
-using System.Windows;
+﻿using System.Reflection;
 using Octokit;
+using Shared.Core.ErrorHandling;
 
 namespace Shared.Core.Services
 {
     public class VersionChecker
     {
-        private static readonly string s_gitHubLink = @"https://github.com/donkeyProgramming/TheAssetEditor/releases/latest";
-        public static string CurrentVersion { get => "0.68"; }
+        private static readonly ILogger s_logger = Logging.Create<VersionChecker>();
 
-        public static void CheckVersion()
+        private const string GitHubOwner = "donkeyProgramming";
+        private const string GitHubRepository = "TheAssetEditor";
+
+        public static async Task<List<Release>?> GetNewerReleases()
         {
-            if (Debugger.IsAttached)
-                return;
+            var releases = await GetReleasesAsync();
+            if (releases == null || releases.Count == 0)
+                return null;
 
-            try
-            {
-                var client = new GitHubClient(new ProductHeaderValue("AssetEditor_instance"));
+            var currentVersion = GetCurrentVersion();
+            var newerReleases = GetReleasesSinceCurrentVersion(releases, currentVersion);
+            if (newerReleases.Count > 0)
+                return newerReleases;
 
-                client.Repository.Release.GetAll("donkeyProgramming", "TheAssetEditor").ContinueWith(
-                    task =>
-                    {
-                        try
-                        {
-                            if (task.IsFaulted)
-                            {
-                                Exception? ex = task.Exception;
-                                while (ex is AggregateException && ex.InnerException != null)
-                                    ex = ex.InnerException;
-                                if (ex != null)
-                                    throw ex;
-                            }
-
-                            var releases = task.Result;
-                            var latest = releases.First();
-                            var currentVersion = "v" + CurrentVersion;
-
-                            if (!latest.TagName.Contains(currentVersion, StringComparison.InvariantCultureIgnoreCase))
-                            {
-                                ProcessMessage(latest, currentVersion);
-                            }
-                        }
-                        catch
-                        {
-                            MessageBox.Show("Unable to contact Github to check for later version");
-                        }
-                    }
-                );
-            }
-            catch
-            {
-                MessageBox.Show("Unable to contact Github to check for later version");
-            }
+            return null;
         }
 
-        private static void ProcessMessage(Release lastRelease, string currentVersion)
-        {
-            var changes = "\n" + lastRelease.Body;
-            var changesIndented = changes.Replace("\n", "\n\t");
-            var message = $"You are using an old version {currentVersion}, please go to\n{s_gitHubLink} to download {lastRelease.TagName} \n\nChanges:{changesIndented}\n\nGo to download page now?";
-
-            var messageBoxResult = MessageBox.Show(message, "Version checker", MessageBoxButton.YesNo);
-            if (messageBoxResult == MessageBoxResult.Yes)
-                OpenUrl(s_gitHubLink);
-        }
-
-        private static void OpenUrl(string url)
+        private static async Task<IReadOnlyList<Release>?> GetReleasesAsync()
         {
             try
             {
-                Process.Start(url);
+                var gitHubClient = new GitHubClient(new ProductHeaderValue("AssetEditor"));
+                var releases = await gitHubClient.Repository.Release.GetAll(GitHubOwner, GitHubRepository);
+                return releases.Count > 0 ? releases : null;
             }
-            catch
+            catch (ApiException exception)
             {
-                // hack because of this: https://github.com/dotnet/corefx/issues/10361
-                if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-                {
-                    url = url.Replace("&", "^&");
-                    Process.Start(new ProcessStartInfo("cmd", $"/c start {url}") { CreateNoWindow = true });
-                }
-                else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
-                {
-                    Process.Start("xdg-open", url);
-                }
-                else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
-                {
-                    Process.Start("open", url);
-                }
+                s_logger.Information($"Unable to retrieve latest release from GitHub: {exception.Message}");
+                return null;
+            }
+        }
+
+        private static List<Release> GetReleasesSinceCurrentVersion(IReadOnlyList<Release> releases, Version currentVersion)
+        {
+            var newerReleases = new List<Release>();
+            foreach (var release in releases)
+            {
+                var releaseVersion = ParseReleaseVersion(release.TagName);
+                if (releaseVersion > currentVersion)
+                    newerReleases.Add(release);
                 else
-                {
-                    throw;
-                }
+                    break;
             }
+            return newerReleases;
+        }
+
+        public static Version GetCurrentVersion()
+        {
+            var version = Assembly.GetEntryAssembly()?.GetName().Version;
+            if (version == null)
+                throw new Exception("Current version is unknown.");
+
+            if (version.Build == 0 && version.Revision == 0)
+                return new Version(version.Major, version.Minor);
+
+            return new Version(version.Major, version.Minor, version.Build);
+        }
+
+        public static Version ParseReleaseVersion(string tagName)
+        {
+            var cleanedVersion = tagName.Trim().TrimStart('v', 'V');
+            return new Version(cleanedVersion);
         }
     }
 }
