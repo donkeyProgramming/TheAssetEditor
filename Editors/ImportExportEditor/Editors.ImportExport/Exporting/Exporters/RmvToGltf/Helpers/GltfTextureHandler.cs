@@ -190,14 +190,23 @@ namespace Editors.ImportExport.Exporting.Exporters.RmvToGltf.Helpers
         {
             if (exportedTextures.ContainsKey(text.Path) == false)
             {
-                // Export normal map variants with proper YCoCg decoding
-                ExportNormalMapVariants(text.Path, settings.OutputPath);
-                ExportDisplacementFromNormalMap(text.Path, settings.OutputPath, settings);
+                // Only export displacement maps for 3D printing workflow
+                if (settings.ExportDisplacementMaps)
+                {
+                    // Export normal map variants with proper YCoCg decoding
+                    ExportNormalMapVariants(text.Path, settings.OutputPath);
+                    ExportDisplacementFromNormalMap(text.Path, settings.OutputPath, settings);
 
-                // Set the path to the raw normal map
-                var fileName = Path.GetFileNameWithoutExtension(text.Path);
-                var outDirectory = Path.GetDirectoryName(settings.OutputPath);
-                exportedTextures[text.Path] = Path.Combine(outDirectory, fileName + "_raw.png");
+                    // Set the path to the raw normal map
+                    var fileName = Path.GetFileNameWithoutExtension(text.Path);
+                    var outDirectory = Path.GetDirectoryName(settings.OutputPath);
+                    exportedTextures[text.Path] = Path.Combine(outDirectory, fileName + "_raw.png");
+                }
+                else
+                {
+                    // Regular export: use the standard DDS to PNG exporter
+                    exportedTextures[text.Path] = _ddsToNormalPngExporter.Export(text.Path, settings.OutputPath, settings.ConvertNormalTextureToBlue);
+                }
             }
 
             var systemPath = exportedTextures[text.Path];
@@ -336,41 +345,58 @@ namespace Editors.ImportExport.Exporting.Exporters.RmvToGltf.Helpers
             int width = offsetBitmap.Width;
             int height = offsetBitmap.Height;
 
-            float[,] heightMap;
+            // Export standard displacement map (luminance + smoothing)
+            var standardHeightMap = StandardHeightMapGeneration(offsetBitmap, settings.DisplacementIterations);
+            ApplyContrast(standardHeightMap, settings.DisplacementContrast);
 
-            if (settings.UseMultiScaleProcessing)
+            if (settings.DisplacementSharpness > 0)
             {
-                // Feature 4: Multi-scale processing for better detail preservation
-                heightMap = ProcessMultiScale(offsetBitmap, settings);
-            }
-            else if (settings.UsePoissonReconstruction)
-            {
-                // Feature 2: Poisson reconstruction for better gradient integration
-                heightMap = PoissonReconstruction(offsetBitmap, settings.DisplacementIterations);
-            }
-            else
-            {
-                // Standard processing
-                heightMap = StandardHeightMapGeneration(offsetBitmap, settings.DisplacementIterations);
+                standardHeightMap = ApplyBilateralFilter(standardHeightMap, settings.DisplacementSharpness);
             }
 
-            // Feature 3: Apply contrast adjustment (configurable)
-            ApplyContrast(heightMap, settings.DisplacementContrast);
+            NormalizeHeightMap(standardHeightMap, out float minHeight, out float maxHeight);
 
-            // Feature 5: Bilateral filter for edge-aware sharpening
-            heightMap = ApplyBilateralFilter(heightMap, settings.DisplacementSharpness);
-
-            // Normalize to 0-1 range
-            NormalizeHeightMap(heightMap, out float minHeight, out float maxHeight);
-
-            // Feature 1: Export as 16-bit or 8-bit based on settings
             if (settings.Export16BitDisplacement)
             {
-                Save16BitDisplacementMap(heightMap, outDirectory, fileName);
+                Save16BitDisplacementMap(standardHeightMap, outDirectory, fileName);
             }
             else
             {
-                Save8BitDisplacementMap(heightMap, outDirectory, fileName);
+                Save8BitDisplacementMap(standardHeightMap, outDirectory, fileName + "_displacement");
+            }
+
+            // Export Poisson reconstruction version for comparison (if enabled)
+            if (settings.UsePoissonReconstruction)
+            {
+                var poissonHeightMap = PoissonReconstruction(offsetBitmap, settings.DisplacementIterations);
+                ApplyContrast(poissonHeightMap, settings.DisplacementContrast);
+
+                if (settings.DisplacementSharpness > 0)
+                {
+                    poissonHeightMap = ApplyBilateralFilter(poissonHeightMap, settings.DisplacementSharpness);
+                }
+
+                NormalizeHeightMap(poissonHeightMap, out float poissonMin, out float poissonMax);
+
+                // Save Poisson as 8-bit for comparison
+                Save8BitDisplacementMap(poissonHeightMap, outDirectory, fileName + "_displacement_poisson");
+            }
+
+            // Export multi-scale version for comparison (if enabled)
+            if (settings.UseMultiScaleProcessing)
+            {
+                var multiScaleHeightMap = ProcessMultiScale(offsetBitmap, settings);
+                ApplyContrast(multiScaleHeightMap, settings.DisplacementContrast);
+
+                if (settings.DisplacementSharpness > 0)
+                {
+                    multiScaleHeightMap = ApplyBilateralFilter(multiScaleHeightMap, settings.DisplacementSharpness);
+                }
+
+                NormalizeHeightMap(multiScaleHeightMap, out float multiMin, out float multiMax);
+
+                // Save multi-scale as 8-bit for comparison
+                Save8BitDisplacementMap(multiScaleHeightMap, outDirectory, fileName + "_displacement_multiscale");
             }
         }
 
@@ -421,25 +447,39 @@ namespace Editors.ImportExport.Exporting.Exporters.RmvToGltf.Helpers
         {
             int width = rawBitmap.Width;
             int height = rawBitmap.Height;
-            float[,] gradientX = new float[width, height];
-            float[,] gradientY = new float[width, height];
+
+            // Start with the same luminance-based initial height as standard method
             float[,] heightMap = new float[width, height];
 
-            // Extract gradients from normal map
             for (int y = 0; y < height; y++)
             {
                 for (int x = 0; x < width; x++)
                 {
                     var pixel = rawBitmap.GetPixel(x, y);
-                    // Convert from [0,255] to [-1,1]
+                    float gray = (pixel.R * 0.299f + pixel.G * 0.587f + pixel.B * 0.114f) / 255.0f;
+                    heightMap[x, y] = gray;
+                }
+            }
+
+            // Extract gradients from normal map for refinement
+            float[,] gradientX = new float[width, height];
+            float[,] gradientY = new float[width, height];
+
+            for (int y = 0; y < height; y++)
+            {
+                for (int x = 0; x < width; x++)
+                {
+                    var pixel = rawBitmap.GetPixel(x, y);
+                    // Convert from [0,255] to [-1,1] - normal map encoding
                     gradientX[x, y] = (pixel.R / 255.0f) * 2.0f - 1.0f;
                     gradientY[x, y] = (pixel.G / 255.0f) * 2.0f - 1.0f;
                 }
             }
 
             // Solve Poisson equation using Jacobi iteration
+            // Use fewer iterations and dampen the gradient influence to avoid noise amplification
             float[,] tempMap = new float[width, height];
-            for (int iter = 0; iter < iterations * 5; iter++) // More iterations for Poisson
+            for (int iter = 0; iter < iterations; iter++) // Reduced from iterations * 5
             {
                 for (int y = 1; y < height - 1; y++)
                 {
@@ -453,14 +493,14 @@ namespace Editors.ImportExport.Exporting.Exporters.RmvToGltf.Helpers
                         float laplacian = (heightMap[x - 1, y] + heightMap[x + 1, y] +
                                           heightMap[x, y - 1] + heightMap[x, y + 1]) * 0.25f;
 
-                        tempMap[x, y] = laplacian - div * 0.25f;
+                        // Dampen the divergence influence to reduce noise (0.1 instead of 0.25)
+                        tempMap[x, y] = laplacian - div * 0.1f;
                     }
                 }
                 Array.Copy(tempMap, heightMap, width * height);
             }
 
             // Normalize the Poisson result to 0-1 range before returning
-            // This prevents extreme values from dominating
             float minVal = float.MaxValue;
             float maxVal = float.MinValue;
 
@@ -492,16 +532,12 @@ namespace Editors.ImportExport.Exporting.Exporters.RmvToGltf.Helpers
             int width = rawBitmap.Width;
             int height = rawBitmap.Height;
 
-            // Process at full resolution
-            var fullRes = settings.UsePoissonReconstruction
-                ? PoissonReconstruction(rawBitmap, settings.DisplacementIterations)
-                : StandardHeightMapGeneration(rawBitmap, settings.DisplacementIterations);
+            // Process at full resolution - always use standard method for multi-scale
+            var fullRes = StandardHeightMapGeneration(rawBitmap, settings.DisplacementIterations);
 
-            // Process at half resolution
+            // Process at half resolution - always use standard method for multi-scale
             using var halfBitmap = new System.Drawing.Bitmap(rawBitmap, width / 2, height / 2);
-            var halfRes = settings.UsePoissonReconstruction
-                ? PoissonReconstruction(halfBitmap, settings.DisplacementIterations)
-                : StandardHeightMapGeneration(halfBitmap, settings.DisplacementIterations);
+            var halfRes = StandardHeightMapGeneration(halfBitmap, settings.DisplacementIterations);
 
             // Upscale half resolution
             var halfUpscaled = UpscaleHeightMap(halfRes, width, height);

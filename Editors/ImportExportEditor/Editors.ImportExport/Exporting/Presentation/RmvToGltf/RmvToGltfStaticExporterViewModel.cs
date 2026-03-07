@@ -21,7 +21,7 @@ namespace Editors.ImportExport.Exporting.Presentation.RmvToGltf
         [ObservableProperty] bool _useMultiScaleProcessing = false;  // Disable by default
         [ObservableProperty] bool _usePoissonReconstruction = false;  // Disable by default
 
-        public string DisplayName => "GLTF (Static Mesh)";
+        public string DisplayName => "GLTF for 3D Printing";
         public string OutputExtension => ".gltf";
 
         public RmvToGltfStaticExporterViewModel(RmvToGltfStaticExporter exporter)
@@ -45,6 +45,7 @@ namespace Editors.ImportExport.Exporting.Presentation.RmvToGltf
                 false,  // ConvertNormalTextureToBlue - not used, handled automatically
                 false,  // ExportAnimations - static mesh has no animations
                 true,   // MirrorMesh
+                true,   // ExportDisplacementMaps - ENABLED for 3D printing!
                 DisplacementIterations,
                 DisplacementContrast,
                 DisplacementSharpness,

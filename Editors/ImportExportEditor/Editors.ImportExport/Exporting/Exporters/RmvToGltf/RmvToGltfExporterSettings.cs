@@ -14,6 +14,7 @@ namespace Editors.ImportExport.Exporting.Exporters.RmvToGltf
         bool MirrorMesh,
 
         // Displacement map quality settings for 3D printing
+        bool ExportDisplacementMaps = false,  // NEW: Control whether to export displacement variants
         int DisplacementIterations = 10,
         float DisplacementContrast = 0.1f,
         float DisplacementSharpness = 1.0f,
