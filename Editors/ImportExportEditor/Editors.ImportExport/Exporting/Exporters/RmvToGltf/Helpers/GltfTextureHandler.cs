@@ -217,6 +217,7 @@ namespace Editors.ImportExport.Exporting.Exporters.RmvToGltf.Helpers
             {
                 ExportRawNormalMapPng(bytes, outDirectory, fileName);
                 ExportOffsetNormalMapPng(bytes, outDirectory, fileName);
+                ExportDisplacementMapPng(bytes, outDirectory, fileName);
             }
         }
 
@@ -302,6 +303,139 @@ namespace Editors.ImportExport.Exporting.Exporters.RmvToGltf.Helpers
 
             var offsetPngPath = Path.Combine(outDirectory, fileName + "_offset.png");
             outputBitmap.Save(offsetPngPath, System.Drawing.Imaging.ImageFormat.Png);
+        }
+
+        private void ExportDisplacementMapPng(byte[] ddsBytes, string outDirectory, string fileName)
+        {
+            var rawPngPath = Path.Combine(outDirectory, fileName + "_raw.png");
+
+            if (!File.Exists(rawPngPath))
+                return;
+
+            using var rawImage = System.Drawing.Image.FromFile(rawPngPath);
+            using var rawBitmap = new System.Drawing.Bitmap(rawImage);
+
+            int width = rawBitmap.Width;
+            int height = rawBitmap.Height;
+
+            // Convert normal map to initial grayscale using luminance
+            float[,] heightMap = new float[width, height];
+
+            for (int y = 0; y < height; y++)
+            {
+                for (int x = 0; x < width; x++)
+                {
+                    var pixel = rawBitmap.GetPixel(x, y);
+                    // Use standard luminance weights
+                    float gray = (pixel.R * 0.299f + pixel.G * 0.587f + pixel.B * 0.114f) / 255.0f;
+                    heightMap[x, y] = gray;
+                }
+            }
+
+            // Apply iterative smoothing (relaxation) to generate height from normals
+            // This mimics the shader's multi-pass approach
+            const int iterations = 10;
+            float[,] tempMap = new float[width, height];
+
+            for (int iter = 0; iter < iterations; iter++)
+            {
+                for (int y = 0; y < height; y++)
+                {
+                    for (int x = 0; x < width; x++)
+                    {
+                        float sum = 0;
+                        int count = 0;
+
+                        // Sample neighbors (above, left, right, below)
+                        if (y > 0) { sum += heightMap[x, y - 1]; count++; }
+                        if (x > 0) { sum += heightMap[x - 1, y]; count++; }
+                        if (x < width - 1) { sum += heightMap[x + 1, y]; count++; }
+                        if (y < height - 1) { sum += heightMap[x, y + 1]; count++; }
+
+                        tempMap[x, y] = count > 0 ? sum / count : heightMap[x, y];
+                    }
+                }
+
+                // Swap buffers
+                Array.Copy(tempMap, heightMap, width * height);
+            }
+
+            // Apply contrast adjustment (factor 0.1)
+            const float contrastFactor = 0.1f;
+            for (int y = 0; y < height; y++)
+            {
+                for (int x = 0; x < width; x++)
+                {
+                    float value = heightMap[x, y];
+                    heightMap[x, y] = Math.Clamp((value - 0.5f) * (1.0f + contrastFactor) + 0.5f, 0, 1);
+                }
+            }
+
+            // Apply sharpening filter (strength 1)
+            const float sharpenStrength = 1.0f;
+            for (int y = 1; y < height - 1; y++)
+            {
+                for (int x = 1; x < width - 1; x++)
+                {
+                    float center = heightMap[x, y];
+                    float top = heightMap[x, y - 1];
+                    float bottom = heightMap[x, y + 1];
+                    float left = heightMap[x - 1, y];
+                    float right = heightMap[x + 1, y];
+
+                    float sharpened = center * (1.0f + 4.0f * sharpenStrength) 
+                                    - (top + bottom + left + right) * sharpenStrength;
+
+                    tempMap[x, y] = Math.Clamp(sharpened, 0, 1);
+                }
+            }
+
+            // Copy sharpened values back (skip edges)
+            for (int y = 1; y < height - 1; y++)
+            {
+                for (int x = 1; x < width - 1; x++)
+                {
+                    heightMap[x, y] = tempMap[x, y];
+                }
+            }
+
+            // Normalize to 0-255 range
+            float minHeight = float.MaxValue;
+            float maxHeight = float.MinValue;
+
+            for (int y = 0; y < height; y++)
+            {
+                for (int x = 0; x < width; x++)
+                {
+                    minHeight = Math.Min(minHeight, heightMap[x, y]);
+                    maxHeight = Math.Max(maxHeight, heightMap[x, y]);
+                }
+            }
+
+            using var displacementBitmap = new System.Drawing.Bitmap(width, height, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
+
+            for (int y = 0; y < height; y++)
+            {
+                for (int x = 0; x < width; x++)
+                {
+                    float normalizedHeight;
+                    if (maxHeight > minHeight)
+                    {
+                        normalizedHeight = (heightMap[x, y] - minHeight) / (maxHeight - minHeight);
+                    }
+                    else
+                    {
+                        normalizedHeight = 0.5f;
+                    }
+
+                    byte grayscale = (byte)Math.Clamp(normalizedHeight * 255.0f, 0, 255);
+
+                    displacementBitmap.SetPixel(x, y, System.Drawing.Color.FromArgb(255, grayscale, grayscale, grayscale));
+                }
+            }
+
+            var displacementPngPath = Path.Combine(outDirectory, fileName + "_displacement.png");
+            displacementBitmap.Save(displacementPngPath, System.Drawing.Imaging.ImageFormat.Png);
         }
     }
 }

@@ -53,80 +53,9 @@ namespace Editors.ImportExport.Exporting.Exporters.DdsToNormalPng
             if (imgBytes == null || !imgBytes.Any())
                 throw new Exception($"image data invalid/empty. imgBytes.Count = {imgBytes?.Length}");
 
-            // Save raw version
             _imageSaveHandler.Save(imgBytes, rawFilePath);
-
-            if (convertToBlueNormalMap)
-            {
-                // Convert and save blue normal map version
-                var blueImgBytes = ConvertToBlueNormalMap(imgBytes, outDirectory);
-                _imageSaveHandler.Save(blueImgBytes, blueFilePath);
-                return blueFilePath;
-            }
 
             return rawFilePath;
         }
-
-
-        private byte[] ConvertToBlueNormalMap(byte[] imgBytes, string fileDirectory)
-        {
-            var inMs = new MemoryStream(imgBytes);
-            using Image inImg = Image.FromStream(inMs);
-
-            using Bitmap bitmap = new Bitmap(inImg);
-            {
-                for (int x = 0; x < bitmap.Width; x++)
-                {
-                    for (int y = 0; y < bitmap.Height; y++)
-                    {
-                        // get pixel from orange map
-                        var orangeMapRawPixel = bitmap.GetPixel(x, y);
-
-                        // convert bytes to float to interval [0; 1]
-                        Vector4 orangeMapVector = new Vector4()
-                        {
-                            X = (float)orangeMapRawPixel.R / 255.0f,
-                            Y = (float)orangeMapRawPixel.G / 255.0f,
-                            Z = (float)orangeMapRawPixel.B / 255.0f,
-                            W = (float)orangeMapRawPixel.A / 255.0f,
-                        };
-
-                        // fill blue map pixels
-                        Vector3 blueMapPixel = new Vector3()
-                        {
-                            X = orangeMapVector.X * orangeMapVector.W,
-                            Y = orangeMapVector.Y,
-                            Z = 0
-                        };
-
-                        // scale bluemap into interval [-1; 1]
-                        blueMapPixel *= 2.0f;
-                        blueMapPixel -= new Vector3(1, 1, 1);
-
-
-                        // calculte z, using an orthogonal projection
-                        blueMapPixel.Z = (float)Math.Sqrt(1.0f - blueMapPixel.X * blueMapPixel.X - blueMapPixel.Y * blueMapPixel.Y);
-
-
-                        // convert the float values back to bytes, interval [0; 255]
-                        var newColor = Color.FromArgb(
-                            255,
-                            (byte)((blueMapPixel.X + 1.0f) * 0.5f * 255.0f),
-                            (byte)((blueMapPixel.Y + 1.0f) * 0.5f * 255.0f),
-                            (byte)((blueMapPixel.Z + 1.0f) * 0.5f * 255.0f)                            
-                            );                                         
-
-                        bitmap.SetPixel(x, y, newColor);
-                    }
-                }
-
-                // get raw PNG bytes
-                using var b = new MemoryStream();
-                bitmap.Save(b, System.Drawing.Imaging.ImageFormat.Png);
-
-                return b.ToArray();
-            }
-        }
-
     }
 }
