@@ -98,6 +98,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Editors.AnimationMeta", "Ed
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Test.AnimationMeta", "Editors\AnimationMeta\Test.AnimationMeta\Test.AnimationMeta.csproj", "{E759BE6D-E0A4-46B8-A02A-E8573F579E2F}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AssetEditorUpdater", "AssetEditorUpdater\AssetEditorUpdater.csproj", "{24483A6F-DBD6-4415-B4D8-1A2FB86A2A12}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -228,6 +230,10 @@ Global
 		{E759BE6D-E0A4-46B8-A02A-E8573F579E2F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E759BE6D-E0A4-46B8-A02A-E8573F579E2F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E759BE6D-E0A4-46B8-A02A-E8573F579E2F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{24483A6F-DBD6-4415-B4D8-1A2FB86A2A12}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{24483A6F-DBD6-4415-B4D8-1A2FB86A2A12}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{24483A6F-DBD6-4415-B4D8-1A2FB86A2A12}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{24483A6F-DBD6-4415-B4D8-1A2FB86A2A12}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
