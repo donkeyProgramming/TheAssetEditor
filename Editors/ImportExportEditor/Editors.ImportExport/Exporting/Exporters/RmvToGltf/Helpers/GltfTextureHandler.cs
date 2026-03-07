@@ -103,7 +103,15 @@ namespace Editors.ImportExport.Exporting.Exporters.RmvToGltf.Helpers
         private void DoTextureDefault(KnownChannel textureType, RmvToGltfExporterSettings settings, List<TextureResult> output, Dictionary<string, string> exportedTextures, int meshIndex, MaterialBuilderTextureInput text)
         {
             if (exportedTextures.ContainsKey(text.Path) == false)
+            {
                 exportedTextures[text.Path] = _ddsToMaterialPngExporter.Export(text.Path, settings.OutputPath, false);
+
+                // For 3D printing: Export alpha channel as a separate mask for base color/diffuse
+                if (settings.ExportDisplacementMaps && textureType == KnownChannel.BaseColor)
+                {
+                    ExportAlphaMask(text.Path, settings.OutputPath);
+                }
+            }
 
             var systemPath = exportedTextures[text.Path];
             if (systemPath != null)
@@ -232,6 +240,63 @@ namespace Editors.ImportExport.Exporting.Exporters.RmvToGltf.Helpers
                 ExportRawNormalMapPng(bytes, outDirectory, fileName);
                 ExportOffsetNormalMapPng(bytes, outDirectory, fileName);
             }
+        }
+
+        private void ExportAlphaMask(string packFilePath, string outputPath)
+        {
+            if (_packFileService == null)
+                return;
+
+            var packFile = _packFileService.FindFile(packFilePath);
+            if (packFile == null)
+                return;
+
+            var fileName = Path.GetFileNameWithoutExtension(packFilePath);
+            var outDirectory = Path.GetDirectoryName(outputPath);
+
+            var bytes = packFile.DataSource.ReadData();
+            if (bytes == null || !bytes.Any())
+                return;
+
+            // Convert DDS to bitmap
+            using var m = new MemoryStream();
+            using var w = new BinaryWriter(m);
+            w.Write(bytes);
+            m.Seek(0, SeekOrigin.Begin);
+
+            var image = Pfim.Pfimage.FromStream(m);
+
+            if (image.Format != Pfim.ImageFormat.Rgba32)
+                return; // No alpha channel
+
+            using var sourceBitmap = new System.Drawing.Bitmap(image.Width, image.Height, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
+
+            var bitmapData = sourceBitmap.LockBits(
+                new System.Drawing.Rectangle(0, 0, image.Width, image.Height),
+                System.Drawing.Imaging.ImageLockMode.WriteOnly,
+                System.Drawing.Imaging.PixelFormat.Format32bppArgb);
+
+            System.Runtime.InteropServices.Marshal.Copy(image.Data, 0, bitmapData.Scan0, image.DataLen);
+            sourceBitmap.UnlockBits(bitmapData);
+
+            // Extract alpha channel as black and white mask
+            using var maskBitmap = new System.Drawing.Bitmap(image.Width, image.Height, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
+
+            for (int y = 0; y < image.Height; y++)
+            {
+                for (int x = 0; x < image.Width; x++)
+                {
+                    var pixel = sourceBitmap.GetPixel(x, y);
+                    byte alpha = pixel.A;
+
+                    // Create grayscale mask from alpha channel
+                    // White = opaque (alpha 255), Black = transparent (alpha 0)
+                    maskBitmap.SetPixel(x, y, System.Drawing.Color.FromArgb(255, alpha, alpha, alpha));
+                }
+            }
+
+            var maskPath = Path.Combine(outDirectory, fileName + "_alphamask.png");
+            maskBitmap.Save(maskPath, System.Drawing.Imaging.ImageFormat.Png);
         }
 
         public void ExportDisplacementFromNormalMap(string normalMapPath, string outputPath, RmvToGltfExporterSettings settings)
