@@ -31,7 +31,7 @@ namespace Editors.ImportExport.Exporting.Presentation.RmvToGltf
         public void Execute(PackFile exportSource, string outputPath, bool generateImporter)
         {
             var settings = new RmvToGltfExporterSettings(exportSource, [], outputPath, ExportTextures, ConvertMaterialTextureToBlender, ConvertNormalTextureToBlue, false, true);
-            _exporter.Export(settings, GenerateDisplacementMaps);
+            _exporter.Export(settings);
         }
     }
 }

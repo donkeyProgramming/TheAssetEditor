@@ -43,7 +43,7 @@ namespace Editors.ImportExport.Exporting.Exporters.DdsToNormalPng
 
             var fileName = Path.GetFileNameWithoutExtension(filePath);
             var outDirectory = Path.GetDirectoryName(outputPath);
-            var fullFilePath = outDirectory + "/" + fileName + ".png";
+            var rawFilePath = outDirectory + "/" + fileName + "_raw.png";
 
             var bytes = packFile.DataSource.ReadData();
             if (bytes == null || !bytes.Any())
@@ -53,11 +53,18 @@ namespace Editors.ImportExport.Exporting.Exporters.DdsToNormalPng
             if (imgBytes == null || !imgBytes.Any())
                 throw new Exception($"image data invalid/empty. imgBytes.Count = {imgBytes?.Length}");
 
-            if (convertToBlueNormalMap)
-                imgBytes = ConvertToBlueNormalMap(imgBytes, fullFilePath);
+            // Save raw version
+            _imageSaveHandler.Save(imgBytes, rawFilePath);
 
-            _imageSaveHandler.Save(imgBytes, fullFilePath);
-            return fullFilePath;
+            if (convertToBlueNormalMap)
+            {
+                // Convert and save blue normal map version
+                var blueImgBytes = ConvertToBlueNormalMap(imgBytes, outDirectory);
+                _imageSaveHandler.Save(blueImgBytes, blueFilePath);
+                return blueFilePath;
+            }
+
+            return rawFilePath;
         }
 
 
@@ -99,7 +106,7 @@ namespace Editors.ImportExport.Exporting.Exporters.DdsToNormalPng
 
                         // calculte z, using an orthogonal projection
                         blueMapPixel.Z = (float)Math.Sqrt(1.0f - blueMapPixel.X * blueMapPixel.X - blueMapPixel.Y * blueMapPixel.Y);
-                                           
+
 
                         // convert the float values back to bytes, interval [0; 255]
                         var newColor = Color.FromArgb(
@@ -108,7 +115,7 @@ namespace Editors.ImportExport.Exporting.Exporters.DdsToNormalPng
                             (byte)((blueMapPixel.Y + 1.0f) * 0.5f * 255.0f),
                             (byte)((blueMapPixel.Z + 1.0f) * 0.5f * 255.0f)                            
                             );                                         
-                        
+
                         bitmap.SetPixel(x, y, newColor);
                     }
                 }

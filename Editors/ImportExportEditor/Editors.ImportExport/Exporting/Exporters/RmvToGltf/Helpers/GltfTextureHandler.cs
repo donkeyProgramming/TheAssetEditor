@@ -1,4 +1,5 @@
-﻿using Editors.ImportExport.Exporting.Exporters.DdsToMaterialPng;
+﻿using System.IO;
+using Editors.ImportExport.Exporting.Exporters.DdsToMaterialPng;
 using Editors.ImportExport.Exporting.Exporters.DdsToNormalPng;
 using Shared.GameFormats.RigidModel;
 using Shared.GameFormats.RigidModel.Types;
@@ -8,6 +9,7 @@ using SharpGLTF.Materials;
 namespace Editors.ImportExport.Exporting.Exporters.RmvToGltf.Helpers
 {
     public record TextureResult(int MeshIndex, string SystemFilePath, KnownChannel GlftTexureType, bool HasAlphaChannel = false);
+    public record MaskTextureResult(int MeshIndex, string SystemFilePath);
 
     public interface IGltfTextureHandler
     {
@@ -18,14 +20,13 @@ namespace Editors.ImportExport.Exporting.Exporters.RmvToGltf.Helpers
     {
         private readonly IDdsToNormalPngExporter _ddsToNormalPngExporter;
         private readonly IDdsToMaterialPngExporter _ddsToMaterialPngExporter;
-        private readonly IDisplacementMapGenerator _displacementMapGenerator;
         private readonly IPackFileService _packFileService;
 
-        public GltfTextureHandler(IDdsToNormalPngExporter ddsToNormalPngExporter, IDdsToMaterialPngExporter ddsToMaterialPngExporter, IDisplacementMapGenerator displacementMapGenerator = null, IPackFileService packFileService = null)
+        public GltfTextureHandler(IDdsToNormalPngExporter ddsToNormalPngExporter, IDdsToMaterialPngExporter ddsToMaterialPngExporter, IPackFileService packFileService = null)
         {
             _ddsToNormalPngExporter = ddsToNormalPngExporter;
             _ddsToMaterialPngExporter = ddsToMaterialPngExporter;
-            _displacementMapGenerator = displacementMapGenerator ?? new DisplacementMapGenerator();
+
             _packFileService = packFileService;
         }
 
@@ -46,34 +47,17 @@ namespace Editors.ImportExport.Exporting.Exporters.RmvToGltf.Helpers
                     var model = rmvFile.ModelList[lodIndex][meshIndex];
                     var textures = ExtractTextures(model);
 
-                    // Check if this mesh has both diffuse and mask textures - if so, combine them
-                    var diffuseTexture = textures.FirstOrDefault(t => t.Type == TextureType.Diffuse || t.Type == TextureType.BaseColour);
-                    var maskTexture = textures.FirstOrDefault(t => t.Type == TextureType.Mask);
-
-                    bool shouldCombineMask = diffuseTexture != null && maskTexture != null;
-
                     foreach (var tex in textures)
                     {
-                        // Skip the mask if we're combining it with diffuse
-                        if (shouldCombineMask && tex.Type == TextureType.Mask)
-                            continue;
-
                         switch (tex.Type)
                         {
                             case TextureType.Normal: DoTextureConversionNormalMap(settings, output, exportedTextures, meshIndex, tex); break;
                             case TextureType.MaterialMap: DoTextureConversionMaterialMap(settings, output, exportedTextures, meshIndex, tex); break;
                             case TextureType.BaseColour: 
-                                if (shouldCombineMask)
-                                    DoCombinedDiffuseWithMask(settings, output, exportedTextures, meshIndex, tex, maskTexture);
-                                else
-                                    DoTextureDefault(KnownChannel.BaseColor, settings, output, exportedTextures, meshIndex, tex);
-                                break;
                             case TextureType.Diffuse: 
-                                if (shouldCombineMask)
-                                    DoCombinedDiffuseWithMask(settings, output, exportedTextures, meshIndex, tex, maskTexture);
-                                else
-                                    DoTextureDefault(KnownChannel.BaseColor, settings, output, exportedTextures, meshIndex, tex);
+                                DoTextureDefault(KnownChannel.BaseColor, settings, output, exportedTextures, meshIndex, tex);
                                 break;
+                            case TextureType.Mask: DoTextureMask(settings, output, exportedTextures, meshIndex, tex); break;
                             case TextureType.Specular: DoTextureDefault(KnownChannel.SpecularColor, settings, output, exportedTextures, meshIndex, tex); break;
                             case TextureType.Gloss: DoTextureDefault(KnownChannel.MetallicRoughness, settings, output, exportedTextures, meshIndex, tex); break;
                             case TextureType.Ambient_occlusion: DoTextureDefault(KnownChannel.Occlusion, settings, output, exportedTextures, meshIndex, tex); break;
@@ -123,62 +107,201 @@ namespace Editors.ImportExport.Exporting.Exporters.RmvToGltf.Helpers
 
             var systemPath = exportedTextures[text.Path];
             if (systemPath != null)
-                output.Add(new TextureResult(meshIndex, systemPath, textureType, hasAlphaChannel: false));
+                output.Add(new TextureResult(meshIndex, systemPath, textureType, false));
         }
 
-        private void DoCombinedDiffuseWithMask(RmvToGltfExporterSettings settings, List<TextureResult> output, Dictionary<string, string> exportedTextures, int meshIndex, MaterialBuilderTextureInput diffuseTexture, MaterialBuilderTextureInput maskTexture)
+        private void DoTextureMask(RmvToGltfExporterSettings settings, List<TextureResult> output, Dictionary<string, string> exportedTextures, int meshIndex, MaterialBuilderTextureInput text)
         {
-            var combinedKey = $"{diffuseTexture.Path}+{maskTexture.Path}";
-
-            if (exportedTextures.ContainsKey(combinedKey) == false)
+            if (exportedTextures.ContainsKey(text.Path) == false)
             {
-                try
-                {
-                    // Get the pack files
-                    var diffusePackFile = _packFileService.FindFile(diffuseTexture.Path);
-                    var maskPackFile = _packFileService.FindFile(maskTexture.Path);
+                // Export mask as separate PNG - name it with _mask suffix for clarity
+                var exportedPath = _ddsToMaterialPngExporter.Export(text.Path, settings.OutputPath, false);
 
-                    if (diffusePackFile == null || maskPackFile == null)
+                if (exportedPath != null)
+                {
+                    // Invert the mask values for proper alpha channel usage
+                    // Game masks are often inverted (black=show, white=hide)
+                    // Alpha channels need (black=transparent, white=opaque)
+                    InvertMaskImage(exportedPath);
+
+                    // Rename to have _mask suffix
+                    var directory = Path.GetDirectoryName(exportedPath);
+                    var fileNameWithoutExt = Path.GetFileNameWithoutExtension(exportedPath);
+                    var newFileName = fileNameWithoutExt + "_mask.png";
+                    var newPath = Path.Combine(directory, newFileName);
+
+                    if (File.Exists(exportedPath))
                     {
-                        throw new InvalidOperationException($"Could not find diffuse or mask texture in pack files");
+                        if (File.Exists(newPath))
+                            File.Delete(newPath);
+                        File.Move(exportedPath, newPath);
+                        exportedPath = newPath;
                     }
-
-                    // Read DDS data
-                    var diffuseDdsBytes = diffusePackFile.DataSource.ReadData();
-                    var maskDdsBytes = maskPackFile.DataSource.ReadData();
-
-                    // Combine diffuse and mask
-                    var combinedPngBytes = AlphaMaskCombiner.CombineDiffuseWithMask(diffuseDdsBytes, maskDdsBytes);
-
-                    // Save combined texture
-                    var fileName = Path.GetFileNameWithoutExtension(diffuseTexture.Path) + "_with_alpha.png";
-                    var outDirectory = Path.GetDirectoryName(settings.OutputPath);
-                    var outFilePath = Path.Combine(outDirectory, fileName);
-
-                    File.WriteAllBytes(outFilePath, combinedPngBytes);
-                    exportedTextures[combinedKey] = outFilePath;
                 }
-                catch (Exception ex)
+
+                exportedTextures[text.Path] = exportedPath;
+            }
+
+            var systemPath = exportedTextures[text.Path];
+            if (systemPath != null)
+            {
+                // Export mask as a regular texture - user will connect it manually in Blender
+                // We'll add it as a separate texture that doesn't get auto-connected but is available
+                output.Add(new TextureResult(meshIndex, systemPath, KnownChannel.BaseColor, false));
+            }
+        }
+
+        private void InvertMaskImage(string imagePath)
+        {
+            byte[] imageBytes;
+
+            // Load image into memory to avoid file lock
+            using (var fs = File.OpenRead(imagePath))
+            using (var ms = new MemoryStream())
+            {
+                fs.CopyTo(ms);
+                imageBytes = ms.ToArray();
+            }
+
+            // Process the image from memory
+            using var imageStream = new MemoryStream(imageBytes);
+            using var image = System.Drawing.Image.FromStream(imageStream);
+            using var bitmap = new System.Drawing.Bitmap(image);
+
+            // Invert all pixel values (255 - value)
+            for (int x = 0; x < bitmap.Width; x++)
+            {
+                for (int y = 0; y < bitmap.Height; y++)
                 {
-                    // If combining fails, fall back to just the diffuse
-                    exportedTextures[combinedKey] = _ddsToMaterialPngExporter.Export(diffuseTexture.Path, settings.OutputPath, false);
+                    var pixel = bitmap.GetPixel(x, y);
+                    var invertedR = 255 - pixel.R;
+                    var invertedG = 255 - pixel.G;
+                    var invertedB = 255 - pixel.B;
+                    var invertedColor = System.Drawing.Color.FromArgb(pixel.A, invertedR, invertedG, invertedB);
+                    bitmap.SetPixel(x, y, invertedColor);
                 }
             }
 
-            var systemPath = exportedTextures[combinedKey];
-            if (systemPath != null)
-                // Mark as having alpha channel since we combined the mask into it
-                output.Add(new TextureResult(meshIndex, systemPath, KnownChannel.BaseColor, hasAlphaChannel: true));
+            // Save back to the same file
+            bitmap.Save(imagePath, System.Drawing.Imaging.ImageFormat.Png);
         }
 
         private void DoTextureConversionNormalMap(RmvToGltfExporterSettings settings, List<TextureResult> output, Dictionary<string, string> exportedTextures, int meshIndex, MaterialBuilderTextureInput text)
         {
             if (exportedTextures.ContainsKey(text.Path) == false)
+            {
                 exportedTextures[text.Path] = _ddsToNormalPngExporter.Export(text.Path, settings.OutputPath, settings.ConvertNormalTextureToBlue);
+
+                ExportNormalMapVariants(text.Path, settings.OutputPath);
+            }
 
             var systemPath = exportedTextures[text.Path];
             if (systemPath != null)
                 output.Add(new TextureResult(meshIndex, systemPath, KnownChannel.Normal));
+        }
+
+        private void ExportNormalMapVariants(string packFilePath, string outputPath)
+        {
+            if (_packFileService == null)
+                return;
+
+            var packFile = _packFileService.FindFile(packFilePath);
+            if (packFile == null)
+                return;
+
+            var fileName = Path.GetFileNameWithoutExtension(packFilePath);
+            var outDirectory = Path.GetDirectoryName(outputPath);
+
+            var bytes = packFile.DataSource.ReadData();
+            if (bytes != null && bytes.Any())
+            {
+                ExportRawNormalMapPng(bytes, outDirectory, fileName);
+                ExportOffsetNormalMapPng(bytes, outDirectory, fileName);
+            }
+        }
+
+        private void ExportRawNormalMapPng(byte[] ddsBytes, string outDirectory, string fileName)
+        {
+            using var m = new MemoryStream();
+            using var w = new BinaryWriter(m);
+            w.Write(ddsBytes);
+            m.Seek(0, SeekOrigin.Begin);
+
+            var image = Pfim.Pfimage.FromStream(m);
+
+            var pixelFormat = System.Drawing.Imaging.PixelFormat.Format32bppArgb;
+            if (image.Format == Pfim.ImageFormat.Rgba32)
+            {
+                pixelFormat = System.Drawing.Imaging.PixelFormat.Format32bppArgb;
+            }
+            else if (image.Format == Pfim.ImageFormat.Rgb24)
+            {
+                pixelFormat = System.Drawing.Imaging.PixelFormat.Format24bppRgb;
+            }
+            else
+            {
+                return;
+            }
+
+            using var tempBitmap = new System.Drawing.Bitmap(image.Width, image.Height, pixelFormat);
+
+            var bitmapData = tempBitmap.LockBits(
+                new System.Drawing.Rectangle(0, 0, image.Width, image.Height),
+                System.Drawing.Imaging.ImageLockMode.WriteOnly,
+                pixelFormat);
+
+            System.Runtime.InteropServices.Marshal.Copy(image.Data, 0, bitmapData.Scan0, image.DataLen);
+            tempBitmap.UnlockBits(bitmapData);
+
+            using var decodedBitmap = new System.Drawing.Bitmap(image.Width, image.Height, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
+
+            for (int y = 0; y < tempBitmap.Height; y++)
+            {
+                for (int x = 0; x < tempBitmap.Width; x++)
+                {
+                    var pixel = tempBitmap.GetPixel(x, y);
+
+                    float r = pixel.R / 255.0f;
+                    float g = pixel.G / 255.0f;
+                    float a = pixel.A / 255.0f;
+
+                    float decodedX = r * a;
+                    float decodedY = g;
+
+                    decodedX = decodedX * 2.0f - 1.0f;
+                    decodedY = decodedY * 2.0f - 1.0f;
+
+                    float decodedZ = (float)Math.Sqrt(Math.Max(0, 1.0f - decodedX * decodedX - decodedY * decodedY));
+
+                    byte finalR = (byte)((decodedX + 1.0f) * 0.5f * 255.0f);
+                    byte finalG = (byte)((decodedY + 1.0f) * 0.5f * 255.0f);
+                    byte finalB = (byte)((decodedZ + 1.0f) * 0.5f * 255.0f);
+                    byte finalA = (byte)(a * 255.0f);
+
+                    decodedBitmap.SetPixel(x, y, System.Drawing.Color.FromArgb(finalA, finalR, finalG, finalB));
+                }
+            }
+
+            var rawPngPath = Path.Combine(outDirectory, fileName + "_raw.png");
+            decodedBitmap.Save(rawPngPath, System.Drawing.Imaging.ImageFormat.Png);
+        }
+
+        private void ExportOffsetNormalMapPng(byte[] ddsBytes, string outDirectory, string fileName)
+        {
+            var rawPngPath = Path.Combine(outDirectory, fileName + "_raw.png");
+
+            if (!File.Exists(rawPngPath))
+                return;
+
+            using var rawImage = System.Drawing.Image.FromFile(rawPngPath);
+            using var outputBitmap = new System.Drawing.Bitmap(rawImage.Width, rawImage.Height, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
+            using var graphics = System.Drawing.Graphics.FromImage(outputBitmap);
+
+            graphics.Clear(System.Drawing.Color.FromArgb(255, 128, 128, 255));
+            graphics.DrawImage(rawImage, 0, 0);
+
+            var offsetPngPath = Path.Combine(outDirectory, fileName + "_offset.png");
+            outputBitmap.Save(offsetPngPath, System.Drawing.Imaging.ImageFormat.Png);
         }
     }
 }

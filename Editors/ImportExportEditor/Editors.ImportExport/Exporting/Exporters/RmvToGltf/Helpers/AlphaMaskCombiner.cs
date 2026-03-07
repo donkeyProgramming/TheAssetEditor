@@ -55,7 +55,7 @@ namespace Editors.ImportExport.Exporting.Exporters.RmvToGltf.Helpers
 
                 // Export to PNG with alpha
                 using var pngStream = new MemoryStream();
-                combinedBitmap.Save(pngStream, ImageFormat.Png);
+                combinedBitmap.Save(pngStream, System.Drawing.Imaging.ImageFormat.Png);
                 return pngStream.ToArray();
             }
             catch (Exception ex)
@@ -70,16 +70,47 @@ namespace Editors.ImportExport.Exporting.Exporters.RmvToGltf.Helpers
             using var w = new BinaryWriter(m);
             w.Write(ddsBytes);
             m.Seek(0, SeekOrigin.Begin);
-            
+
             var image = Pfimage.FromStream(m);
-            
+
+            // Pfim returns BGRA data for Rgba32, but Bitmap expects ARGB
+            // We need to swap the R and B channels
+            byte[] correctedData = new byte[image.DataLen];
+
+            if (image.Format == Pfim.ImageFormat.Rgba32)
+            {
+                // BGRA -> ARGB conversion
+                for (int i = 0; i < image.DataLen; i += 4)
+                {
+                    correctedData[i] = image.Data[i + 2];     // B -> R
+                    correctedData[i + 1] = image.Data[i + 1]; // G -> G
+                    correctedData[i + 2] = image.Data[i];     // R -> B
+                    correctedData[i + 3] = image.Data[i + 3]; // A -> A
+                }
+            }
+            else if (image.Format == Pfim.ImageFormat.Rgb24)
+            {
+                // BGR -> RGB conversion
+                for (int i = 0; i < image.DataLen; i += 3)
+                {
+                    correctedData[i] = image.Data[i + 2];     // B -> R
+                    correctedData[i + 1] = image.Data[i + 1]; // G -> G
+                    correctedData[i + 2] = image.Data[i];     // R -> B
+                }
+            }
+            else
+            {
+                // For other formats, use the data as-is
+                correctedData = image.Data;
+            }
+
             PixelFormat pixelFormat = image.Format == Pfim.ImageFormat.Rgba32 
                 ? PixelFormat.Format32bppArgb 
                 : PixelFormat.Format24bppRgb;
 
             var bitmap = new Bitmap(image.Width, image.Height, pixelFormat);
             var bitmapData = bitmap.LockBits(new Rectangle(0, 0, image.Width, image.Height), ImageLockMode.WriteOnly, pixelFormat);
-            System.Runtime.InteropServices.Marshal.Copy(image.Data, 0, bitmapData.Scan0, image.DataLen);
+            System.Runtime.InteropServices.Marshal.Copy(correctedData, 0, bitmapData.Scan0, correctedData.Length);
             bitmap.UnlockBits(bitmapData);
 
             return bitmap;

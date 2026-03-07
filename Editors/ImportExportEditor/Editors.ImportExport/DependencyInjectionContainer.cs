@@ -2,7 +2,6 @@
 using Editors.ImportExport.Exporting.Exporters;
 using Editors.ImportExport.Exporting.Exporters.DdsToMaterialPng;
 using Editors.ImportExport.Exporting.Exporters.DdsToNormalPng;
-using Editors.ImportExport.Exporting.Exporters.DdsToDisplacementMap;
 using Editors.ImportExport.Exporting.Exporters.DdsToPng;
 using Editors.ImportExport.Exporting.Exporters.RmvToGltf;
 using Editors.ImportExport.Exporting.Exporters.RmvToGltf.Helpers;
@@ -69,7 +68,6 @@ namespace Editors.ImportExport
             services.AddTransient<IGltfSceneLoader, GltfSceneLoader>();
             services.AddTransient<GltfSkeletonBuilder>();
             services.AddTransient<GltfAnimationBuilder>();
-            services.AddTransient<IDdsToDisplacementMapExporter, DdsToDisplacementMapExporter>();
 
             RegisterAllAsInterface<IDeveloperConfiguration>(services, ServiceLifetime.Transient);
         }

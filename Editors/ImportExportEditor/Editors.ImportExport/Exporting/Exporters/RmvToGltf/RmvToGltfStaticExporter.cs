@@ -36,7 +36,7 @@ namespace Editors.ImportExport.Exporting.Exporters.RmvToGltf
             return ExportSupportEnum.NotSupported;
         }
 
-        public void Export(RmvToGltfExporterSettings settings, bool generateDisplacementMaps = false)
+        public void Export(RmvToGltfExporterSettings settings)
         {
             LogSettings(settings);
 
@@ -48,12 +48,6 @@ namespace Editors.ImportExport.Exporting.Exporters.RmvToGltf
 
             _logger.Here().Information($"Static Export - MeshCount={meshes.Count()} TextureCount={textures.Count()}");
             BuildGltfScene(meshes, settings, outputScene);
-
-            // Generate displacement maps if requested
-            if (generateDisplacementMaps)
-            {
-                GenerateDisplacementMapsForTextures(settings, textures);
-            }
         }
 
         void BuildGltfScene(List<IMeshBuilder<MaterialBuilder>> meshBuilders, RmvToGltfExporterSettings settings, ModelRoot outputScene)
@@ -66,36 +60,6 @@ namespace Editors.ImportExport.Exporting.Exporters.RmvToGltf
             }
 
             _gltfSaver.Save(outputScene, settings.OutputPath);
-        }
-
-        void GenerateDisplacementMapsForTextures(RmvToGltfExporterSettings settings, List<TextureResult> textures)
-        {
-            try
-            {
-                var outputDir = Path.GetDirectoryName(settings.OutputPath);
-                if (string.IsNullOrEmpty(outputDir))
-                    return;
-
-                // Find normal map textures and generate displacement maps
-                var normalMaps = textures.Where(t => t.GlftTexureType.ToString().Contains("Normal")).ToList();
-                
-                foreach (var texture in normalMaps)
-                {
-                    try
-                    {
-                        _displacementMapExporter.Export(texture.SystemFilePath, outputDir);
-                        _logger.Here().Information($"Generated displacement map for: {Path.GetFileName(texture.SystemFilePath)}");
-                    }
-                    catch (Exception ex)
-                    {
-                        _logger.Here().Warning($"Failed to generate displacement map for {texture.SystemFilePath}: {ex.Message}");
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                _logger.Here().Warning($"Error generating displacement maps: {ex.Message}");
-            }
         }
 
         void LogSettings(RmvToGltfExporterSettings settings)
