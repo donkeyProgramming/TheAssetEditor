@@ -55,7 +55,7 @@ namespace AssetEditor.ViewModels
 
             ToolsFactory = toolFactory;
 
-            ApplicationTitle = $"AssetEditor v{VersionChecker.CurrentVersion}";
+            ApplicationTitle = $"AssetEditor v{VersionChecker.GetCurrentVersion()}";
             CurrentGame = $"Current Game: {GameInformationDatabase.GetGameById(applicationSettingsService.CurrentSettings.CurrentGame).DisplayName}";
         }
 

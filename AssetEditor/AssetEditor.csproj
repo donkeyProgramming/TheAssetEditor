@@ -46,11 +46,16 @@
         <PackageProjectUrl>https://github.com/donkeyProgramming/TheAssetEditor</PackageProjectUrl>
         <RepositoryUrl>https://github.com/donkeyProgramming/TheAssetEditor</RepositoryUrl>
         <PackageId>AssetEditor</PackageId>
+        <Version>0.68.0</Version>
         <AnalysisLevel>6.0</AnalysisLevel>
     </PropertyGroup>
 
     <ItemGroup>
         <None Include="..\.editorconfig" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="MdXaml" Version="1.27.0" />
     </ItemGroup>
 
     <ItemGroup>
@@ -77,4 +82,13 @@
         <GenerateDocumentationFile>False</GenerateDocumentationFile>
         <NoWarn>$(NoWarn),1573,1591,1712</NoWarn>
     </PropertyGroup>
+
+    <Target Name="PublishUpdater" AfterTargets="ComputeFilesToPublish">
+        <PropertyGroup>
+            <UpdaterProject>$(MSBuildProjectDirectory)\..\AssetEditorUpdater\AssetEditorUpdater.csproj</UpdaterProject>
+            <AbsolutePublishDir>$([System.IO.Path]::GetFullPath('$(PublishDir)'))</AbsolutePublishDir>
+        </PropertyGroup>
+
+        <MSBuild Projects="$(UpdaterProject)" Targets="Restore;Publish" Properties="PublishDir=$(AbsolutePublishDir);Configuration=$(Configuration);RuntimeIdentifier=$(RuntimeIdentifier);SelfContained=$(SelfContained);PublishSingleFile=$(PublishSingleFile);PublishReadyToRun=$(PublishReadyToRun)" />
+    </Target>
 </Project>
