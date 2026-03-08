@@ -55,6 +55,7 @@ namespace Editors.AnimationMeta.MetaEditor.Commands
             {
                 controller.CurrentFile = res;
                 controller.DisplayName = res.Name;
+                controller.HasUnsavedChanges = false;
             }
 
             _logger.Here().Information("Creating metadata file complete");

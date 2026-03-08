@@ -8,11 +8,12 @@ using Microsoft.Xna.Framework;
 using Shared.Core.Events;
 using Shared.Core.Events.Scoped;
 using Shared.Core.PackFiles;
+using Shared.Core.ToolCreation;
 using Shared.GameFormats.AnimationMeta.Parsing;
 
 namespace Editors.AnimationMeta.SuperView
 {
-    public partial class SuperViewViewModel : EditorHostBase
+    public partial class SuperViewViewModel : EditorHostBase, ISaveableEditor
     {
         SceneObjectViewModel _asset;
 
@@ -29,6 +30,19 @@ namespace Editors.AnimationMeta.SuperView
         [ObservableProperty] MetaDataEditorViewModel _metaEditor;
         [ObservableProperty] int _selectedTabControllerIndex = 0;
         public override Type EditorViewModelType => typeof(EditorView);
+        public bool HasUnsavedChanges
+        { 
+            get 
+            {
+                return PersistentMetaEditor.HasUnsavedChanges || MetaEditor.HasUnsavedChanges;
+            }
+            set 
+            {
+                PersistentMetaEditor.HasUnsavedChanges = value;
+                MetaEditor.HasUnsavedChanges = value;
+            } 
+        }
+
 
         public SuperViewViewModel(
             IPackFileService packFileService,
@@ -51,8 +65,10 @@ namespace Editors.AnimationMeta.SuperView
             eventHub.Register<ScopedFileSavedEvent>(this, OnFileSaved);
             eventHub.Register<SceneObjectUpdateEvent>(this, OnSceneObjectUpdated);
             eventHub.Register<MetaDataAttributeChangedEvent>(this, OnMetaDataAttributeChanged);
+            eventHub.Register<SelecteMetaDataAttributeChangedEvent>(this, OnSelectedMetaDataAttributeChanged);
         }
 
+        private void OnSelectedMetaDataAttributeChanged(SelecteMetaDataAttributeChangedEvent @event) => RecreateMetaDataInformation();
         void OnMetaDataAttributeChanged(MetaDataAttributeChangedEvent @event) => RecreateMetaDataInformation();
         void OnMetaDataChanged(SceneObject sceneObject) => RecreateMetaDataInformation();
 
@@ -105,6 +121,8 @@ namespace Editors.AnimationMeta.SuperView
         {
             PersistentMetaEditor.LoadFile(e.Owner.PersistMetaData);
             MetaEditor.LoadFile(e.Owner.MetaData);
+
+            RecreateMetaDataInformation();
         }
 
         public void Load(AnimationToolInput debugDataToLoad)
@@ -129,6 +147,13 @@ namespace Editors.AnimationMeta.SuperView
         {
             _eventHub?.UnRegister(this);
             base.Close();
+        }
+
+        public bool Save()
+        {
+            var res0 = PersistentMetaEditor.Save();
+            var res1 = MetaEditor.Save();
+            return res0 && res1;
         }
     }
 }

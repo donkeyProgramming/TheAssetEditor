@@ -105,6 +105,12 @@ namespace Editors.AnimationMeta.SuperView.Visualisation
 
         private void CreateEquipmentDock(DockEquipment metaData, IAnimationBinGenericFormat fragment, ISkeletonProvider skeleton, AnimationPlayer rootPlayer)
         {
+            if (fragment == null)
+            {
+                _logger.Here().Error($"Unable to create docking, as animation is missing - select an animation");
+                return;
+            }
+ 
             var animPath = fragment.Entries.FirstOrDefault(x => x.SlotName == metaData.AnimationSlotName)?.AnimationFile ??
                            fragment.Entries.FirstOrDefault(x => x.SlotName == metaData.AnimationSlotName + "_2")?.AnimationFile;
             if (animPath == null)
