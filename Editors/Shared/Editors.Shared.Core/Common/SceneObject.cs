@@ -37,8 +37,8 @@ namespace Editors.Shared.Core.Common
 
         public GameSkeleton Skeleton { get; set; }
         public AnimationClip AnimationClip { get; set; }
-        public PackFile MetaData { get; set; }
-        public PackFile PersistMetaData { get; set; }
+        public PackFile? MetaData { get; set; }
+        public PackFile? PersistMetaData { get; set; }
         public Matrix Offset { get; set; } = Matrix.Identity;
         public string Id { get; private set; }
 
@@ -99,5 +99,6 @@ namespace Editors.Shared.Core.Common
             foreach (var item in MetaDataItems)
                 item.Update(p);
         }
+
     }
 }

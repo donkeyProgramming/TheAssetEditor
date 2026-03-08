@@ -22,7 +22,32 @@ namespace Editors.AnimationMeta.Presentation
         [ObservableProperty] ObservableCollection<MetaDataEntry> _tags = [];
         [ObservableProperty] int _metaDataFileVersion;
 
-        public bool HasUnsavedChanges { get; set; } = false;
+        public bool HasUnsavedChanges
+        {
+            get 
+            {
+                foreach (var tag in Tags)
+                {
+                    foreach(var variable in tag.Variables)
+                    {
+                        if (variable.IsModified)
+                            return true;
+                       
+                    }
+                }
+                return false;
+                    
+            }
+            set 
+            {
+                foreach (var tag in Tags)
+                {
+                    foreach (var variable in tag.Variables)
+                        variable.IsModified = false;
+                }
+            }
+
+        }
         public PackFile CurrentFile { get; set; }
 
         public MetaDataEditorViewModel(IUiCommandFactory uiCommandFactory, MetaDataFileParser metaDataFileParser, IEventHub eventHub)
@@ -40,28 +65,33 @@ namespace Editors.AnimationMeta.Presentation
             else
                 SelectedAttribute = value._input;
 
-            _eventHub.Publish(new MetaDataAttributeChangedEvent());
+            _eventHub.Publish(new SelecteMetaDataAttributeChangedEvent());
         }
 
         public bool Save() => _uiCommandFactory.Create<SaveCommand>().Execute(this);
         public void Close() { }
 
-        public void LoadFile(PackFile file)
+        public void LoadFile(PackFile? file)
         {
             if (file == CurrentFile)
                 return;
 
             CurrentFile = file;
-         
-            DisplayName = file == null ? "" : file.Name;
+            DisplayName = file == null ? "Metadata Editor" : file.Name;
 
             if (file == null)
-                return;
-
-            var fileContent = CurrentFile.DataSource.ReadData();
-
-            ParsedFile = _metaDataFileParser.ParseFile(fileContent);
-            MetaDataFileVersion = ParsedFile.Version;
+            {
+                ParsedFile = null;
+                SelectedAttribute = null;
+                Tags.Clear();
+                SelectedTag = null;
+            }
+            else
+            {
+                var fileContent = CurrentFile.DataSource.ReadData();
+                ParsedFile = _metaDataFileParser.ParseFile(fileContent);
+                MetaDataFileVersion = ParsedFile.Version;
+            }
 
             UpdateView();
         }
