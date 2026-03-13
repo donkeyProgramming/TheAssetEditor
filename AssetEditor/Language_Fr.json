@@ -1,0 +1,21 @@
+{
+  "SettingsWindow.Application": "Application",
+  "SettingsWindow.SelectedLanguage": "Langue sélectionnée",
+  "SettingsWindow.Theme": "Thème",
+  "SettingsWindow.StartMaximised": "Démarrer maximisé",
+  "SettingsWindow.SelectedGame": "Jeu sélectionné",
+  "SettingsWindow.LoadGameFileOnStartup": "Charger le fichier du jeu au démarrage",
+  "SettingsWindow.ShowCaWems": "Afficher les fichiers audio CA (.wem)",
+  "SettingsWindow.Rendering": "Rendu",
+  "SettingsWindow.RenderBackground": "Couleur d’arrière-plan du moteur de rendu",
+  "SettingsWindow.OnlyLoadLod0": "Charger uniquement le Lod0 pour les maillages de référence",
+  "SettingsWindow.GridSize": "Taille de la grille",
+  "SettingsWindow.AudioModding": "Modding audio",
+  "SettingsWindow.SaveButton": "Enregistrer",
+
+  "UpdaterWindow.Title": "Mise à jour",
+  "UpdaterWindow.UpdateInfo": "Une nouvelle version d’AssetEditor est disponible!\n\nVotre version actuelle est la {0}. Mettez à jour vers la version {1} pour découvrir les dernières modifications détaillées ci-dessous.",
+  "UpdaterWindow.ReleaseNotes": "Notes de version",
+  "UpdaterWindow.UpdateButton": "Mettre à jour",
+  "UpdaterWindow.CancelButton": "Annuler"
+}
