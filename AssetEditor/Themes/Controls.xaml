@@ -1,14 +1,16 @@
-﻿<ResourceDictionary x:Class="AssetEditor.Themes.Controls"
-                    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-                    xmlns:ap="clr-namespace:AssetEditor.Themes.Attached"
-                    xmlns:themes="clr-namespace:Microsoft.Windows.Themes;assembly=PresentationFramework.Aero2"
-                    xmlns:windowstitlemenu="clr-namespace:AssetEditor.WindowsTitleMenu"
-                    xmlns:sys="clr-namespace:System;assembly=netstandard"
-                    xmlns:extendedwpftoolkit="clr-namespace:Xceed.Wpf.Toolkit;assembly=Xceed.Wpf.Toolkit"
-                    xmlns:prim="clr-namespace:Xceed.Wpf.Toolkit.Primitives;assembly=Xceed.Wpf.Toolkit"
-                    xmlns:chrome="clr-namespace:Xceed.Wpf.Toolkit.Chromes;assembly=Xceed.Wpf.Toolkit"
-                    xmlns:options="http://schemas.microsoft.com/winfx/2006/xaml/presentation/options">
+﻿<ResourceDictionary 
+    x:Class="AssetEditor.Themes.Controls"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:ap="clr-namespace:AssetEditor.Themes.Attached"
+    xmlns:themes="clr-namespace:Microsoft.Windows.Themes;assembly=PresentationFramework.Aero2"
+    xmlns:windowstitlemenu="clr-namespace:AssetEditor.WindowsTitleMenu"
+    xmlns:sys="clr-namespace:System;assembly=netstandard"
+    xmlns:extendedwpftoolkit="clr-namespace:Xceed.Wpf.Toolkit;assembly=Xceed.Wpf.Toolkit"
+    xmlns:prim="clr-namespace:Xceed.Wpf.Toolkit.Primitives;assembly=Xceed.Wpf.Toolkit"
+    xmlns:chrome="clr-namespace:Xceed.Wpf.Toolkit.Chromes;assembly=Xceed.Wpf.Toolkit"
+    xmlns:MdXaml="clr-namespace:MdXaml;assembly=MdXaml"
+    xmlns:options="http://schemas.microsoft.com/winfx/2006/xaml/presentation/options">
 
     <!-- Converters for WindowsTitleMenu -->
     <windowstitlemenu:WindowStateToPathConverter x:Key="windowStateToPathConverter"/>
@@ -16,7 +18,7 @@
     <windowstitlemenu:CaptionHeightConverter x:Key="captionHeightConverter"/>
 
     <ap:WatermarkComboBoxDropDownVisibilityConverter x:Key="watermarkComboBoxDropDownVisibilityConverter" />
-    
+
     <Style x:Key="TitleBarButtonStyle" TargetType="Button">
         <Setter Property="Background" Value="{StaticResource TitleBar.Button.Background}"/>
         <Setter Property="Foreground" Value="{StaticResource TitleBar.Button.Foreground}"/>
@@ -93,6 +95,79 @@
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
+    </Style>
+
+    <Style 
+        x:Key="CustomMarkdownStyle" 
+        TargetType="{x:Type FlowDocument}"
+        BasedOn="{x:Static MdXaml:MarkdownStyle.Standard}">
+        <Style.Resources>
+            <Style TargetType="Paragraph">
+
+                <Style.Triggers>
+                    <Trigger Property="Tag" Value="Heading1">
+                        <Setter Property="FontSize" Value="42" />
+                        <Setter Property="Foreground" Value="{DynamicResource Markdown.Heading.Foreground}" />
+                        <Setter Property="FontWeight" Value="SemiBold" />
+                    </Trigger>
+
+                    <Trigger Property="Tag" Value="Heading2">
+                        <Setter Property="FontSize" Value="20" />
+                        <Setter Property="Foreground" Value="{DynamicResource Markdown.Heading.Foreground}"/>
+                        <Setter Property="FontWeight" Value="SemiBold" />
+                    </Trigger>
+
+                    <Trigger Property="Tag" Value="Heading3">
+                        <Setter Property="FontSize" Value="20" />
+                        <Setter Property="Foreground" Value="{DynamicResource Markdown.Heading.Foreground}" />
+                        <Setter Property="FontWeight" Value="SemiBold" />
+                    </Trigger>
+
+                    <Trigger Property="Tag" Value="Heading4">
+                        <Setter Property="FontSize" Value="14" />
+                        <Setter Property="Foreground" Value="{DynamicResource Markdown.Heading.Foreground}" />
+                        <Setter Property="FontWeight" Value="SemiBold" />
+                    </Trigger>
+
+                    <Trigger Property="Tag" Value="CodeBlock">
+                        <Setter Property="FontFamily" Value="Courier New" />
+                        <Setter Property="Foreground" Value="{DynamicResource Markdown.Codeblock.Foregrond}" />
+                        <Setter Property="Background" Value="{DynamicResource Markdown.Codeblock.Background}" />
+                        <Setter Property="BorderBrush" Value="{DynamicResource Markdown.Codeblock.Border}" />
+                        <Setter Property="BorderThickness" Value="0,5,0,5" />
+                        <Setter Property="Margin" Value="5,0,5,0" />
+                    </Trigger>
+
+                    <Trigger Property="Tag" Value="Note">
+                        <Setter Property="Margin" Value="5,0,5,0" />
+                        <Setter Property="Padding" Value="10,5" />
+                        <Setter Property="BorderBrush" Value="{DynamicResource Markdown.Note.Border}" />
+                        <Setter Property="BorderThickness" Value="3,3,3,3" />
+                        <Setter Property="Background" Value="{DynamicResource Markdown.Note.Background}" />
+                    </Trigger>
+
+                </Style.Triggers>
+            </Style>
+
+            <Style 
+                TargetType="{x:Type Hyperlink}">
+                <Setter 
+                    Property="TextDecorations" 
+                    Value="None"/>
+                <Setter 
+                    Property="Foreground" 
+                    Value="{DynamicResource Markdown.Hyperlink.Foreground}"/>
+                <Style.Triggers>
+                    <Trigger 
+                        Property="IsMouseOver" 
+                        Value="True">
+                        <Setter 
+                            Property="Foreground" 
+                            Value="{DynamicResource Markdown.Hyperlink.MouseOver.Foreground}"/>
+                    </Trigger>
+                </Style.Triggers>
+            </Style>
+        </Style.Resources>
     </Style>
 
     <DataTemplate x:Key="DefaultWatermarkTemplate">
@@ -5525,7 +5600,7 @@
                                         Data="M 18,16 H 28"
                                         Stroke="{Binding Path=Foreground, RelativeSource={RelativeSource AncestorType={x:Type Button}}}"
                                         StrokeThickness="1"/>
-                                    </Button>
+                                </Button>
                                 <Button 
                                     x:Name="btnMaximiseRestore" 
                                     Grid.Column="3"
@@ -5542,7 +5617,7 @@
                                         Data="{Binding WindowState, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource windowStateToPathConverter}}"
                                         Stroke="{Binding Path=Foreground, RelativeSource={RelativeSource AncestorType={x:Type Button}}}"
                                         StrokeThickness="1"/>
-                                        </Button>
+                                </Button>
                                 <Button 
                                     x:Name="btnClose" 
                                     Grid.Column="4"
@@ -5559,8 +5634,8 @@
                                         Data="M 18.5,11 27.5,20 M 18.5,20 27.5,11"
                                         Stroke="{Binding Path=Foreground, RelativeSource={RelativeSource AncestorType={x:Type Button}}}"
                                         StrokeThickness="1"/>
-                                        </Button>
-                                        </Grid>
+                                </Button>
+                            </Grid>
                             <Grid>
                                 <AdornerDecorator>
                                     <ContentPresenter/>

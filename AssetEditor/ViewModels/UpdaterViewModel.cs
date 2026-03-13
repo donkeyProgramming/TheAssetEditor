@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.IO;
-using System.Text;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Octokit;
@@ -17,39 +16,33 @@ namespace AssetEditor.ViewModels
 {
     public class ReleaseNoteItem(Release release)
     {
-        public string ReleaseName { get; } = release.Name;
-        public string PublishedAt { get; } = $"Published {release.PublishedAt.Value:dd MMM yyyy}";
+        public string ReleaseName { get; } = $"## [{release.Name}]({release.HtmlUrl})";
+        public string PublishedAt { get; } = $"{release.PublishedAt!.Value:dd MMM yyyy}";
         public string ReleaseNotes { get; } = release.Body;
     }
 
-    partial class UpdaterViewModel : ObservableObject
+    public partial class UpdaterViewModel(LocalizationManager localisationManager) : ObservableObject
     {
+        private readonly LocalizationManager _localisationManager = localisationManager;
+
         private readonly ILogger _logger = Logging.Create<UpdaterViewModel>();
-        private Action _closeAction;
+        private Action? _closeAction;
 
         private const string AssetEditorUpdaterExe = "AssetEditorUpdater.exe";
 
         private List<Release> _newerReleases = [];
 
         [ObservableProperty] private ObservableCollection<ReleaseNoteItem> _releaseNotesItems = [];
-
-        [ObservableProperty] private string _latestVersionInfo;
+        [ObservableProperty] private string _updateInfo = string.Empty;
 
         public void SetReleaseInfo(List<Release> newerReleases)
         {
             _newerReleases = newerReleases;
 
-            var currentVersion = VersionChecker.GetCurrentVersion();
             var latestRelease = _newerReleases[0];
             var latestVersion = VersionChecker.ParseReleaseVersion(latestRelease.TagName);
-
-            var stringBuilder = new StringBuilder();
-            stringBuilder.AppendLine($"A new version of AssetEditor is available! The AssetEditor donkeys have been busy...");
-            stringBuilder.AppendLine();
-            stringBuilder.AppendLine($"Your current version is {currentVersion}. The latest verison is {latestVersion}.");
-            stringBuilder.AppendLine();
-            stringBuilder.AppendLine("Update to get the changes detailed in the release notes below.");
-            LatestVersionInfo = stringBuilder.ToString();
+            var currentVersion = VersionChecker.GetCurrentVersion();
+            UpdateInfo = string.Format(_localisationManager.Get("UpdaterWindow.UpdateInfo"), currentVersion, latestVersion);
 
             ReleaseNotesItems.Clear();
             foreach (var release in _newerReleases)

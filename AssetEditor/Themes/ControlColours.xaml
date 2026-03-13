@@ -264,6 +264,15 @@
     <SolidColorBrush x:Key="DataGrid.Row.Selected.Background"         Color="{DynamicResource AColour.Tone6.Background.Selected}"/>
     <SolidColorBrush x:Key="DataGrid.CellItem.Static.Background"      Color="{DynamicResource AColour.Tone6.Background.Static}"/>
     <SolidColorBrush x:Key="DataGrid.CellItem.MouseOver.Background"   Color="{DynamicResource AColour.Tone6.Background.MouseOver}"/>
+    
+    <SolidColorBrush x:Key="Markdown.Heading.Foreground"              Color="{DynamicResource AColour.Foreground.Static}"/>
+    <SolidColorBrush x:Key="Markdown.Hyperlink.Foreground"            Color="{DynamicResource AColour.ColourfulGlyph.Static}"/>
+    <SolidColorBrush x:Key="Markdown.Hyperlink.MouseOver.Foreground"  Color="{DynamicResource AColour.ColourfulGlyph.MouseOver}"/>
+    <SolidColorBrush x:Key="Markdown.Codeblock.Foregrond"             Color="{DynamicResource AColour.AColour.Foreground.Static}"/>
+    <SolidColorBrush x:Key="Markdown.Codeblock.Background"            Color="{DynamicResource AColour.Tone6.Background.Static}"/>
+    <SolidColorBrush x:Key="Markdown.Codeblock.Border"                Color="{DynamicResource AColour.Tone6.Border.Static}"/>
+    <SolidColorBrush x:Key="Markdown.Note.Background"                 Color="{DynamicResource AColour.Tone6.Background.Static}"/>
+    <SolidColorBrush x:Key="Markdown.Note.Border"                     Color="{DynamicResource AColour.Tone6.Border.Static}"/>
 
     <SolidColorBrush x:Key="Window.Static.Background"                 Color="{DynamicResource AColour.Tone3.Background.Static}"/>
     <SolidColorBrush x:Key="Window.Static.Border"                     Color="{DynamicResource AColour.Tone2.Background.Static}"/>

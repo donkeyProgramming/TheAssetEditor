@@ -11,5 +11,11 @@
   "SettingsWindow.OnlyLoadLod0": "Only load Lod0 for reference meshes",
   "SettingsWindow.GridSize": "Grid Size",
   "SettingsWindow.AudioModding": "Audio Modding",
-  "SettingsWindow.SaveButton": "Save"
+  "SettingsWindow.SaveButton": "Save",
+
+  "UpdaterWindow.Title": "Updater",
+  "UpdaterWindow.UpdateInfo": "A new version of AssetEditor is available!\n\nYour current version is {0}. Update to version {1} to get the latest changes detailed below.",
+  "UpdaterWindow.ReleaseNotes": "Release Notes",
+  "UpdaterWindow.UpdateButton": "Update",
+  "UpdaterWindow.CancelButton": "Cancel"
 }
