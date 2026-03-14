@@ -1,9 +1,7 @@
-using System.Threading;
-using System.Threading.Tasks;
-using System.Windows;
+﻿using System.Windows;
 using Shared.Core.Services;
 
-namespace AssetEditor.Services.Ipc
+namespace Editors.Ipc
 {
     public class IpcUserNotifier : IIpcUserNotifier
     {

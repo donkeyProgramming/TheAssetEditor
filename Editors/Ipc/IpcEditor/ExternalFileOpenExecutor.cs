@@ -11,7 +11,7 @@ using Shared.Core.Events.Global;
 using Shared.Core.PackFiles.Models;
 using Shared.Core.ToolCreation;
 
-namespace AssetEditor.Services.Ipc
+namespace Editors.Ipc
 {
     public class ExternalFileOpenExecutor : IExternalFileOpenExecutor
     {
@@ -106,12 +106,10 @@ namespace AssetEditor.Services.Ipc
 
         private void SelectEditor(IEditorInterface editor)
         {
-            if (_editorManager is not EditorManager concreteEditorManager)
+            if (_editorManager is not IEditorManager concreteEditorManager)
                 return;
 
-            var index = concreteEditorManager.CurrentEditorsList.IndexOf(editor);
-            if (index >= 0)
-                concreteEditorManager.SelectedEditorIndex = index;
+            _editorManager.SetEditorAsCurrent(editor);
         }
 
         public static bool ShouldForceKitbash(PackFile file)

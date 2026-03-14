@@ -1,16 +1,11 @@
-using System;
-using System.IO;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
-using System.Windows;
+﻿using System.Windows;
 using Serilog;
 using Shared.Core.ErrorHandling;
 using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
 using Shared.Core.PackFiles.Utility;
 
-namespace AssetEditor.Services.Ipc
+namespace Editors.Ipc
 {
     public class ExternalPackLoader : IExternalPackLoader
     {

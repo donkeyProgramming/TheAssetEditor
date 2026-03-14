@@ -1,10 +1,7 @@
-using System;
-using System.Threading;
-using System.Threading.Tasks;
-using Serilog;
+﻿using Serilog;
 using Shared.Core.ErrorHandling;
 
-namespace AssetEditor.Services.Ipc
+namespace Editors.Ipc
 {
     public class IpcRequestHandler : IIpcRequestHandler
     {

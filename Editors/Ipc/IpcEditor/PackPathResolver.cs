@@ -1,6 +1,4 @@
-using System;
-
-namespace AssetEditor.Services.Ipc
+﻿namespace Editors.Ipc
 {
     public static class PackPathResolver
     {

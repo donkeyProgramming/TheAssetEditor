@@ -1,16 +1,12 @@
-using System;
-using System.IO;
-using System.IO.Pipes;
+﻿using System.IO.Pipes;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using System.Threading;
-using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Serilog;
 using Shared.Core.ErrorHandling;
 
-namespace AssetEditor.Services.Ipc
+namespace Editors.Ipc
 {
     public class AssetEditorIpcServer : IDisposable
     {
