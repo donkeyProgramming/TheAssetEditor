@@ -1,10 +1,8 @@
 ﻿using Editors.Ipc;
 using Shared.Core.PackFiles.Models;
 
-namespace AssetEditorTests.Ipc
+namespace Test.Ipc
 {
-
-
     public class IpcRequestHandlerTests
     {
         [Test]
@@ -18,11 +16,11 @@ namespace AssetEditorTests.Ipc
 
             var result = await sut.HandleAsync(new IpcRequest { Action = "ping", Path = "x" }, CancellationToken.None);
 
-            Assert.IsFalse(result.Ok);
-            Assert.AreEqual("Unsupported action", result.Error);
-            Assert.AreEqual(0, opener.OpenCallCount);
-            Assert.AreEqual(0, notifier.CallCount);
-            Assert.AreEqual(0, packLoader.CallCount);
+            Assert.That(result.Ok, Is.False);
+            Assert.That(result.Error, Is.EqualTo("Unsupported action"));
+            Assert.That(opener.OpenCallCount, Is.Zero);
+            Assert.That(notifier.CallCount, Is.Zero);
+            Assert.That(packLoader.CallCount, Is.Zero);
         }
 
         [Test]
@@ -32,8 +30,8 @@ namespace AssetEditorTests.Ipc
 
             var result = await sut.HandleAsync(new IpcRequest { Action = "open", Path = "   " }, CancellationToken.None);
 
-            Assert.IsFalse(result.Ok);
-            Assert.AreEqual("Path is empty", result.Error);
+            Assert.That(result.Ok, Is.False);
+            Assert.That(result.Error, Is.EqualTo("Path is empty"));
         }
 
         [Test]
@@ -51,14 +49,14 @@ namespace AssetEditorTests.Ipc
                 Path = @"C:\tmp\variantmeshes\foo\bar.rigid_model_v2"
             }, CancellationToken.None);
 
-            Assert.IsFalse(result.Ok);
-            Assert.AreEqual("File not found", result.Error);
-            Assert.AreEqual(@"variantmeshes\foo\bar.rigid_model_v2", result.NormalizedPath);
-            Assert.AreEqual(@"variantmeshes\foo\bar.rigid_model_v2", lookup.LastRequestedPath);
-            Assert.AreEqual(1, notifier.CallCount);
-            Assert.AreEqual(@"variantmeshes\foo\bar.rigid_model_v2", notifier.LastPath);
-            Assert.AreEqual(0, opener.OpenCallCount);
-            Assert.AreEqual(0, packLoader.CallCount);
+            Assert.That(result.Ok, Is.False);
+            Assert.That(result.Error, Is.EqualTo("File not found"));
+            Assert.That(result.NormalizedPath, Is.EqualTo(@"variantmeshes\foo\bar.rigid_model_v2"));
+            Assert.That(lookup.LastRequestedPath, Is.EqualTo(@"variantmeshes\foo\bar.rigid_model_v2"));
+            Assert.That(notifier.CallCount, Is.EqualTo(1));
+            Assert.That(notifier.LastPath, Is.EqualTo(@"variantmeshes\foo\bar.rigid_model_v2"));
+            Assert.That(opener.OpenCallCount, Is.Zero);
+            Assert.That(packLoader.CallCount, Is.Zero);
         }
 
         [Test]
@@ -77,13 +75,13 @@ namespace AssetEditorTests.Ipc
                 Path = @"variantmeshes\foo\bird.rigid_model_v2"
             }, CancellationToken.None);
 
-            Assert.IsTrue(result.Ok);
-            Assert.AreEqual(1, opener.OpenCallCount);
-            Assert.AreSame(packFile, opener.LastFile);
-            Assert.IsTrue(opener.LastBringToFront);
-            Assert.IsFalse(opener.LastOpenInExistingKitbashTab);
-            Assert.AreEqual(0, notifier.CallCount);
-            Assert.AreEqual(0, packLoader.CallCount);
+            Assert.That(result.Ok, Is.True);
+            Assert.That(opener.OpenCallCount, Is.EqualTo(1));
+            Assert.That(opener.LastFile, Is.SameAs(packFile));
+            Assert.That(opener.LastBringToFront, Is.True);
+            Assert.That(opener.LastOpenInExistingKitbashTab, Is.False);
+            Assert.That(notifier.CallCount, Is.Zero);
+            Assert.That(packLoader.CallCount, Is.Zero);
         }
 
         [Test]
@@ -102,11 +100,11 @@ namespace AssetEditorTests.Ipc
                 BringToFront = false
             }, CancellationToken.None);
 
-            Assert.IsTrue(result.Ok);
-            Assert.AreEqual(1, opener.OpenCallCount);
-            Assert.IsFalse(opener.LastBringToFront);
-            Assert.IsFalse(opener.LastOpenInExistingKitbashTab);
-            Assert.AreEqual(0, packLoader.CallCount);
+            Assert.That(result.Ok, Is.True);
+            Assert.That(opener.OpenCallCount, Is.EqualTo(1));
+            Assert.That(opener.LastBringToFront, Is.False);
+            Assert.That(opener.LastOpenInExistingKitbashTab, Is.False);
+            Assert.That(packLoader.CallCount, Is.Zero);
         }
 
         [Test]
@@ -125,11 +123,11 @@ namespace AssetEditorTests.Ipc
                 PackPathOnDisk = "k:/SteamLibrary/steamapps/common/Total War WARHAMMER III/data/ovn_araby.pack"
             }, CancellationToken.None);
 
-            Assert.IsTrue(result.Ok);
-            Assert.AreEqual(1, packLoader.CallCount);
-            Assert.AreEqual("k:/SteamLibrary/steamapps/common/Total War WARHAMMER III/data/ovn_araby.pack", packLoader.LastPackPath);
-            Assert.AreEqual(1, opener.OpenCallCount);
-            Assert.IsFalse(opener.LastOpenInExistingKitbashTab);
+            Assert.That(result.Ok, Is.True);
+            Assert.That(packLoader.CallCount, Is.EqualTo(1));
+            Assert.That(packLoader.LastPackPath, Is.EqualTo("k:/SteamLibrary/steamapps/common/Total War WARHAMMER III/data/ovn_araby.pack"));
+            Assert.That(opener.OpenCallCount, Is.EqualTo(1));
+            Assert.That(opener.LastOpenInExistingKitbashTab, Is.False);
         }
 
         [Test]
@@ -151,11 +149,11 @@ namespace AssetEditorTests.Ipc
                 PackPathOnDisk = @"k:\mods\ovn_araby.pack"
             }, CancellationToken.None);
 
-            Assert.IsFalse(result.Ok);
-            Assert.AreEqual("Pack file load failed", result.Error);
-            Assert.AreEqual(1, packLoader.CallCount);
-            Assert.AreEqual(0, opener.OpenCallCount);
-            Assert.AreEqual(0, notifier.CallCount);
+            Assert.That(result.Ok, Is.False);
+            Assert.That(result.Error, Is.EqualTo("Pack file load failed"));
+            Assert.That(packLoader.CallCount, Is.EqualTo(1));
+            Assert.That(opener.OpenCallCount, Is.Zero);
+            Assert.That(notifier.CallCount, Is.Zero);
         }
 
         [Test]
@@ -174,9 +172,9 @@ namespace AssetEditorTests.Ipc
                 OpenInExistingKitbashTab = true
             }, CancellationToken.None);
 
-            Assert.IsTrue(result.Ok);
-            Assert.AreEqual(1, opener.OpenCallCount);
-            Assert.IsTrue(opener.LastOpenInExistingKitbashTab);
+            Assert.That(result.Ok, Is.True);
+            Assert.That(opener.OpenCallCount, Is.EqualTo(1));
+            Assert.That(opener.LastOpenInExistingKitbashTab, Is.True);
         }
 
         private class FakeLookup : IExternalPackFileLookup
