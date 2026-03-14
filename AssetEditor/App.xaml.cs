@@ -8,6 +8,7 @@ using AssetEditor.Services.Ipc;
 using AssetEditor.UiCommands;
 using AssetEditor.ViewModels;
 using AssetEditor.Views;
+using CommunityToolkit.Diagnostics;
 using Microsoft.Extensions.DependencyInjection;
 using Shared.Core.DependencyInjection;
 using Shared.Core.DevConfig;
@@ -23,9 +24,17 @@ namespace AssetEditor
 {
     public partial class App : Application, IAssetEditorMain
     {
-        IServiceProvider _serviceProvider;
-        AssetEditorIpcServer _ipcServer;
-        public IServiceProvider ServiceProvider { get => _serviceProvider; }
+        IServiceProvider? _serviceProvider;
+        AssetEditorIpcServer? _ipcServer;
+
+        public IServiceProvider ServiceProvider 
+        {
+            get 
+            {
+                Guard.IsNotNull(_serviceProvider, nameof(ServiceProvider));
+                return _serviceProvider;
+            } 
+        }
 
         protected override void OnStartup(StartupEventArgs e)
         {

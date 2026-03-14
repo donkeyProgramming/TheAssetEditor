@@ -100,6 +100,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Test.AnimationMeta", "Edito
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AssetEditorUpdater", "AssetEditorUpdater\AssetEditorUpdater.csproj", "{24483A6F-DBD6-4415-B4D8-1A2FB86A2A12}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AssetEditorTests", "Testing\AssetEditorTests\AssetEditorTests.csproj", "{4E51AFDA-E5D2-9D14-22C8-F790FE265A65}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -234,6 +236,10 @@ Global
 		{24483A6F-DBD6-4415-B4D8-1A2FB86A2A12}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{24483A6F-DBD6-4415-B4D8-1A2FB86A2A12}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{24483A6F-DBD6-4415-B4D8-1A2FB86A2A12}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4E51AFDA-E5D2-9D14-22C8-F790FE265A65}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4E51AFDA-E5D2-9D14-22C8-F790FE265A65}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4E51AFDA-E5D2-9D14-22C8-F790FE265A65}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4E51AFDA-E5D2-9D14-22C8-F790FE265A65}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -279,6 +285,7 @@ Global
 		{3123DC8F-5FAD-45A9-8DCC-7C5E0E61FAEB} = {07AC615B-A8FC-4E1A-BDD5-BC11452429A0}
 		{0FCE7A0E-6478-A603-6491-6FE675F54000} = {3123DC8F-5FAD-45A9-8DCC-7C5E0E61FAEB}
 		{E759BE6D-E0A4-46B8-A02A-E8573F579E2F} = {3123DC8F-5FAD-45A9-8DCC-7C5E0E61FAEB}
+		{4E51AFDA-E5D2-9D14-22C8-F790FE265A65} = {18424B6A-CB8A-4CE1-935C-72459F31521B}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {AB5968F3-98ED-4AFF-98EA-0DBEDCACADF2}

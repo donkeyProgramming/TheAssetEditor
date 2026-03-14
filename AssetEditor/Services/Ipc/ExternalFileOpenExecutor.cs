@@ -1,16 +1,15 @@
-using System;
+﻿using System;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Linq;
 using System.Windows;
 using Editors.KitbasherEditor.UiCommands;
 using Editors.KitbasherEditor.ViewModels;
-using AssetEditor.Services;
 using Shared.Core.DependencyInjection;
 using Shared.Core.Events;
+using Shared.Core.Events.Global;
 using Shared.Core.PackFiles.Models;
 using Shared.Core.ToolCreation;
-using Shared.Ui.Events.UiCommands;
 
 namespace AssetEditor.Services.Ipc
 {

@@ -1,4 +1,4 @@
-using AssetEditor.Services;
+﻿using AssetEditor.Services;
 
 namespace AssetEditorTests
 {
@@ -8,8 +8,8 @@ namespace AssetEditorTests
         [TestMethod]
         public void Validate()
         {
-            DependencyInjectionConfig cfg = new DependencyInjectionConfig(false);
-            cfg.Build();
+            var cfg = new DependencyInjectionConfig(false);
+            cfg.Build(true);
         }
     }
 }
