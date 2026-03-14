@@ -35,6 +35,8 @@ namespace Shared.Core
             services.AddScoped<IExceptionInformationProvider, BasicExceptionInformationProvider>();
             services.AddTransient<DevelopmentConfigurationManager>();
 
+
+            services.AddSingleton<LocalizationManager>();
             services.AddSingleton<IPackFileContainerLoader, PackFileContainerLoader>();
         }
     }

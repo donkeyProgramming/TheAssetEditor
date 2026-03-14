@@ -5,7 +5,7 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace Shared.Core.Services
 {
-    public interface IWpfGame
+    public interface IWpfGame 
     {
         ContentManager Content { get; set; }
         GraphicsDevice GraphicsDevice { get; }

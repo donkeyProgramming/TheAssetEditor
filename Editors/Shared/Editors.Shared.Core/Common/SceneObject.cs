@@ -1,5 +1,4 @@
-﻿using Editors.Shared.Core.Services;
-using GameWorld.Core.Animation;
+﻿using GameWorld.Core.Animation;
 using GameWorld.Core.Components;
 using GameWorld.Core.SceneNodes;
 using Microsoft.Xna.Framework;
@@ -38,11 +37,10 @@ namespace Editors.Shared.Core.Common
 
         public GameSkeleton Skeleton { get; set; }
         public AnimationClip AnimationClip { get; set; }
-        public PackFile MetaData { get; set; }
-        public PackFile PersistMetaData { get; set; }
+        public PackFile? MetaData { get; set; }
+        public PackFile? PersistMetaData { get; set; }
         public Matrix Offset { get; set; } = Matrix.Identity;
         public string Id { get; private set; }
-
 
         // --- UI elements
         public NotifyAttr<string> MeshName { get; set; } = new NotifyAttr<string>("");
@@ -50,7 +48,6 @@ namespace Editors.Shared.Core.Common
         public NotifyAttr<string> AnimationName { get; set; } = new NotifyAttr<string>("");
         public NotifyAttr<bool> ShowMesh { get; set; }
         public NotifyAttr<bool> ShowSkeleton { get; set; }
-
 
         public SceneObject(string uniqeId) : base()
         {
@@ -102,5 +99,6 @@ namespace Editors.Shared.Core.Common
             foreach (var item in MetaDataItems)
                 item.Update(p);
         }
+
     }
 }

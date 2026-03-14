@@ -79,5 +79,37 @@
 
             return value;
         }
+
+        public byte[] Encode(object value)
+        {
+            if (value == null)
+                throw new ArgumentNullException(nameof(value));
+
+            if (value is bool b)
+            {
+                var bytes = EncodeValue(b, out var error);
+                if (bytes == null) throw new Exception(error);
+                return bytes;
+            }
+
+            if (value is string s)
+            {
+                var bytes = Encode(s, out var error);
+                if (bytes == null) throw new Exception(error);
+                return bytes;
+            }
+
+            try
+            {
+                var converted = Convert.ToBoolean(value);
+                var bytes = EncodeValue(converted, out var error);
+                if (bytes == null) throw new Exception(error);
+                return bytes;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Unable to convert object to Boolean", ex);
+            }
+        }
     }
 }

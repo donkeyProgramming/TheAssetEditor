@@ -1,0 +1,15 @@
+{
+  "SettingsWindow.Application": "Application",
+  "SettingsWindow.SelectedLanguage": "Selected language",
+  "SettingsWindow.Theme": "Theme",
+  "SettingsWindow.StartMaximised": "Start maximised",
+  "SettingsWindow.SelectedGame": "Selected game",
+  "SettingsWindow.LoadGameFileOnStartup": "Load game file on startup",
+  "SettingsWindow.ShowCaWems": "Show CA audio (.wem) files",
+  "SettingsWindow.Rendering": "Rendering",
+  "SettingsWindow.RenderBackground": "Render engine background colour",
+  "SettingsWindow.OnlyLoadLod0": "Only load Lod0 for reference meshes",
+  "SettingsWindow.GridSize": "Grid Size",
+  "SettingsWindow.AudioModding": "Audio Modding",
+  "SettingsWindow.SaveButton": "Save"
+}

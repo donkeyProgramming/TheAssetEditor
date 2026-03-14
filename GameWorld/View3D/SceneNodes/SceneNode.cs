@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using GameWorld.Core.Components;
+﻿using GameWorld.Core.Components;
 using Microsoft.Xna.Framework;
 using Shared.Core.Misc;
 
@@ -8,6 +6,8 @@ namespace GameWorld.Core.SceneNodes
 {
     public abstract class SceneNode : NotifyPropertyChangedImpl, ISceneNode
     {
+        
+
         public string Id { get; set; } = Guid.NewGuid().ToString();
         public SceneManager SceneManager { get; set; }
 
@@ -73,6 +73,27 @@ namespace GameWorld.Core.SceneNodes
             typedTarget.IsVisible = IsVisible;
             typedTarget.ScaleMult = ScaleMult;
             typedTarget.Name = Name + " - Clone";
+        }
+
+
+
+        public void Print(string context = "")
+        {
+            Console.WriteLine($"\nPrinting the scene graph {context}: \n");
+            var root = SceneManager.RootNode;
+            PrintChildren(root, 0, this);
+        }
+
+        void PrintChildren(ISceneNode node, int indent, ISceneNode startNode)
+        {
+            var isStartNodeForPrint = "";
+            if (startNode == node)
+                isStartNodeForPrint = " <--- SELECTED";
+
+            Console.WriteLine($"{new string(' ', indent)} [{node.GetType().Name}]{node.Name}-{node.Id} {isStartNodeForPrint}");
+
+            foreach (var child in node.Children)
+                PrintChildren(child, indent + 3, startNode);
         }
     }
 }

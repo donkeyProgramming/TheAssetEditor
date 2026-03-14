@@ -67,5 +67,24 @@ namespace Shared.ByteParsingTest.Parsers
             Assert.That(error, Is.Not.Null);
             Assert.That(bytesRead, Is.EqualTo(0));
         }
+
+        [TestCase(0)]
+        [TestCase(1)]
+        [TestCase(-1)]
+        [TestCase(123456)]
+        public void EncodeObject_RoundTrips(int input)
+        {
+            var parser = new IntParser();
+            var bytes = parser.Encode((object)input);
+
+            Assert.That(bytes, Is.Not.Null);
+
+            var ok = parser.TryDecodeValue(bytes, 0, out var value, out var bytesRead, out var error);
+
+            Assert.That(ok, Is.True);
+            Assert.That(error, Is.Null);
+            Assert.That(bytesRead, Is.EqualTo(4));
+            Assert.That(value, Is.EqualTo(input));
+        }
     }
 }

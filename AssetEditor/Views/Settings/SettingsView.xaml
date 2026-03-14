@@ -6,6 +6,7 @@
              xmlns:System="clr-namespace:System;assembly=mscorlib" 
              xmlns:gameinfo="clr-namespace:Shared.Core.Services;assembly=Shared.Core" 
              xmlns:behaviors="clr-namespace:Shared.Ui.Common.Behaviors;assembly=Shared.Ui"
+             xmlns:loc="clr-namespace:Shared.Ui.Common;assembly=Shared.Ui"
              xmlns:local="clr-namespace:AssetEditor.Views.Settings" xmlns:viewmodels="clr-namespace:AssetEditor.ViewModels" 
              d:DataContext="{d:DesignInstance Type=viewmodels:SettingsViewModel}"
              mc:Ignorable="d" >
@@ -29,6 +30,7 @@
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
         <Grid Grid.Row="0">
@@ -48,38 +50,69 @@
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
 
-            <TextBlock Grid.Row="0" Text="Application" Margin="5, 10, 0, 0" FontSize="15"/>
+            <TextBlock Grid.Row="0" Text="{loc:Loc SettingsWindow.Application}" Margin="5, 10, 0, 0" FontSize="15"/>
             <Separator Grid.Row="1" Grid.ColumnSpan="3" Height="1" Margin="5, 5, 10, 10"/>
 
-            <TextBlock Grid.Row="2" Text="Theme" Margin="5, 0, 0, 0"/>
-            <ComboBox Grid.Row="2" Grid.Column="1" Margin="0, 0, 0, 5" SelectedItem="{Binding CurrentTheme, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" 
+            <TextBlock Grid.Row="2" Text="{loc:Loc SettingsWindow.SelectedLanguage}" Margin="5, 0, 0, 0"/>
+            <ComboBox Grid.Row="2" Grid.Column="1" Margin="0, 0, 0, 5" SelectedItem="{Binding SelectedLanguage, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" 
+                      ItemsSource="{Binding AvailableLangauges}"/>
+
+            <TextBlock Grid.Row="3" Text="{loc:Loc SettingsWindow.Theme}" Margin="5, 0, 0, 0"/>
+            <ComboBox Grid.Row="3" Grid.Column="1" Margin="0, 0, 0, 5" SelectedItem="{Binding CurrentTheme, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" 
                       ItemsSource="{Binding AvailableThemes}" ItemTemplate="{StaticResource SettingsEnumConverterTemplate}"/>
 
-            <TextBlock Grid.Row="3" Grid.Column="0" Text="Render engine background colour" Margin="5, 0, 0, 0"/>
-            <ComboBox Grid.Row="3" Grid.Column="1" Margin="0, 0, 0, 5" SelectedItem="{Binding CurrentRenderEngineBackgroundColour, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" 
-                      ItemsSource="{Binding RenderEngineBackgroundColours}" ItemTemplate="{StaticResource SettingsEnumConverterTemplate}"/>
-
-            <TextBlock Grid.Row="4" Grid.Column="0" Text="Start maximised" Margin="5, 0, 0, 0"/>
+            <TextBlock Grid.Row="4" Grid.Column="0" Text="{loc:Loc SettingsWindow.StartMaximised}" Margin="5, 0, 0, 0"/>
             <CheckBox Grid.Row="4" Grid.Column="1" Margin="-1, 0, 0, 5" IsChecked="{Binding StartMaximised, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
 
-            <TextBlock Grid.Row="5" Grid.Column="0" Text="Loaded game" Margin="5, 0, 0, 0"/>
+            <TextBlock Grid.Row="5" Grid.Column="0"  Text="{loc:Loc SettingsWindow.SelectedGame}" Margin="5, 0, 0, 0"/>
             <ComboBox Grid.Row="5" Grid.Column="1" Width="150" Margin="0, 0, 0, 5" SelectedItem="{Binding CurrentGame, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" 
                       ItemsSource="{Binding Games}" ItemTemplate="{StaticResource SettingsEnumConverterTemplate}"/>
 
-            <TextBlock Grid.Row="6" Grid.Column="0" Text="Load game files" Margin="5, 0, 0, 0"/>
+            <TextBlock Grid.Row="6" Grid.Column="0" Text="{loc:Loc SettingsWindow.LoadGameFileOnStartup}" Margin="5, 0, 0, 0"/>
             <CheckBox Grid.Row="6" Grid.Column="1" Margin="-1, 0, 0, 5" IsChecked="{Binding LoadCaPacksByDefault, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
 
-            <TextBlock Grid.Row="7" Grid.Column="0" Text="Show CA audio (.wem) files" Margin="5, 0, 0, 0"/>
+            <TextBlock Grid.Row="7" Grid.Column="0" Text="{loc:Loc SettingsWindow.ShowCaWems}" Margin="5, 0, 0, 0"/>
             <CheckBox Grid.Row="7" Grid.Column="1" Margin="-1, 0, 0, 5" IsChecked="{Binding ShowCAWemFiles, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
+        </Grid>
 
-            <TextBlock Grid.Row="8" Grid.Column="0" Text="Only load Lod0 for Reference meshes" Margin="5, 0, 0, 0" ToolTip="When importing a reference mesh in the Kitbash tool, only import Lod0 in order to save memory."/>
-            <CheckBox Grid.Row="8" Grid.Column="1" Margin="-1, 0, 0, 5" IsChecked="{Binding OnlyLoadLod0ForReferenceMeshes, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
+
+
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="230"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <TextBlock Grid.Row="0" Text="{loc:Loc SettingsWindow.Rendering}" Margin="5, 10, 0, 0" FontSize="15"/>
+            <Separator Grid.Row="1" Grid.ColumnSpan="3" Height="1" Margin="5, 5, 10, 10"/>
+
+            <TextBlock Grid.Row="2" Grid.Column="0" Text="{loc:Loc SettingsWindow.RenderBackground}" Margin="5, 0, 0, 0"/>
+            <ComboBox Grid.Row="2" Grid.Column="1" Margin="0, 0, 0, 5" SelectedItem="{Binding CurrentRenderEngineBackgroundColour, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" 
+                      ItemsSource="{Binding RenderEngineBackgroundColours}" ItemTemplate="{StaticResource SettingsEnumConverterTemplate}"/>
+
+            <TextBlock Grid.Row="3" Grid.Column="0" Text="{loc:Loc SettingsWindow.OnlyLoadLod0}" Margin="5, 0, 0, 0" ToolTip="When importing a reference mesh in the Kitbash tool, only import Lod0 in order to save memory."/>
+            <CheckBox Grid.Row="3" Grid.Column="1" Margin="-1, 0, 0, 5" IsChecked="{Binding OnlyLoadLod0ForReferenceMeshes, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
+
+            <TextBlock Grid.Row="4" Grid.Column="0" Text="{loc:Loc SettingsWindow.GridSize}" Margin="5, 0, 0, 0" ToolTip="Size of the grid in visual editors"/>
+            <TextBox  Grid.Row="4" Grid.Column="1" Text="{Binding VisualEditorsGridSize, UpdateSourceTrigger=LostFocus}" MaxLength="4" Width="150" Margin="0, 0, 0, 5" HorizontalAlignment="Left" HorizontalContentAlignment="Right"/>
+
+
 
         </Grid>
 
-        <Grid Grid.Row="1">
+        <Grid Grid.Row="2">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
@@ -123,7 +156,7 @@
             </ItemsControl>
         </Grid>
 
-        <Grid Grid.Row="2">
+        <Grid Grid.Row="3">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="200"/>
                 <ColumnDefinition Width="605"/>
@@ -136,7 +169,7 @@
                 <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
 
-            <TextBlock Grid.Row="0" Text="Audio Modding" Margin="5, 5, 0, 0" FontSize="15"/>
+            <TextBlock Grid.Row="0" Text="{loc:Loc SettingsWindow.AudioModding}" Margin="5, 5, 0, 0" FontSize="15"/>
             <Separator Grid.Row="1" Grid.ColumnSpan="3" Height="1" Margin="5, 5, 10, 10"/>
 
             <TextBlock Grid.Row="2" Grid.Column="0" Text="Wwise CLI" Margin="5, 0, 0, 0"/>

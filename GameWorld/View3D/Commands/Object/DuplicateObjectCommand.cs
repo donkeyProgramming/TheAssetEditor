@@ -1,21 +1,17 @@
-﻿using GameWorld.Core.Commands;
-using GameWorld.Core.Commands.Face;
+﻿using GameWorld.Core.Commands.Face;
 using GameWorld.Core.Components.Selection;
 using GameWorld.Core.SceneNodes;
 using Serilog;
 using Shared.Core.ErrorHandling;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace GameWorld.Core.Commands.Object
 {
     public class DuplicateObjectCommand : ICommand
     {
-        ILogger _logger = Logging.Create<FaceSelectionCommand>();
+        readonly ILogger _logger = Logging.Create<FaceSelectionCommand>();
         List<ISceneNode> _objectsToCopy;
-        List<ISceneNode> _clonedObjects = new List<ISceneNode>();
-        SelectionManager _selectionManager;
+        readonly List<ISceneNode> _clonedObjects = new List<ISceneNode>();
+        readonly SelectionManager _selectionManager;
 
         ISelectionState _oldState;
 
@@ -44,7 +40,7 @@ namespace GameWorld.Core.Commands.Object
             foreach (var item in _objectsToCopy)
             {
                 var clonedItem = SceneNodeHelper.CloneNode(item);
-                clonedItem.Id = Guid.NewGuid().ToString();
+                clonedItem.Id = item.Id + Guid.NewGuid().ToString();
                 _clonedObjects.Add(clonedItem);
                 item.Parent.AddObject(clonedItem);
                 if (clonedItem is ISelectable selectableNode)

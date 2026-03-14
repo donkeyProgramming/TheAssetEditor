@@ -1,5 +1,7 @@
 ﻿using System;
 using System.IO;
+﻿using System.IO;
+using System.Windows;
 using CommunityToolkit.Mvvm.ComponentModel;
 using Editors.KitbasherEditor.EventHandlers;
 using Editors.KitbasherEditor.Services;
@@ -39,6 +41,8 @@ namespace Editors.KitbasherEditor.ViewModels
         public AnimationControllerViewModel Animation { get; set; }
 
         [ObservableProperty] string _displayName = "Kitbash Tool";
+        [ObservableProperty] GridLength _leftColumnWidth = new(0.75, GridUnitType.Star);
+        [ObservableProperty] GridLength _rightColumnWidth = new(0.25, GridUnitType.Star);
 
         PackFile _inputFileReference;
         public PackFile CurrentFile { get => _inputFileReference; }

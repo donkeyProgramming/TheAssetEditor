@@ -19,9 +19,9 @@
             </Style>
         </Grid.Style>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width=".75*"/>
+            <ColumnDefinition Width="{Binding LeftColumnWidth, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
             <ColumnDefinition Width="5"/>
-            <ColumnDefinition Width=".25*"/>
+            <ColumnDefinition Width="{Binding RightColumnWidth, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
         </Grid.ColumnDefinitions>
 
         <Grid.RowDefinitions>

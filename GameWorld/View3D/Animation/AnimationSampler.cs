@@ -1,11 +1,7 @@
 ﻿using GameWorld.Core.Animation.AnimationChange;
 using Microsoft.Xna.Framework;
-using Serilog;
 using Shared.Core.ErrorHandling;
 using Shared.Core.Misc;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace GameWorld.Core.Animation
 {
@@ -49,7 +45,7 @@ namespace GameWorld.Core.Animation
                 }
 
                 // Apply animation rules
-                if (animationChangeRules != null)
+                if (animationChangeRules != null && animationClip != null)
                 {
                     foreach (var rule in animationChangeRules.OfType<IWorldSpaceAnimationRule>())
                         rule.TransformFrameWorldSpace(currentFrame, animationClip.PlayTimeInSec);

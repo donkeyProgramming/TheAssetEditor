@@ -32,18 +32,18 @@ namespace Editors.Reports.Animation
 
         private readonly IPackFileService _pfs;
         private readonly ApplicationSettingsService _settingsService;
-        private readonly MetaDataTagDeSerializer _metaDataTagDeSerializer;
+        private readonly MetaDataFileParser _metaDataFileParser;
 
-        public AnimMetaDataReportGenerator(IPackFileService pfs, ApplicationSettingsService settingsService, MetaDataTagDeSerializer metaDataTagDeSerializer)
+        public AnimMetaDataReportGenerator(IPackFileService pfs, ApplicationSettingsService settingsService, MetaDataFileParser metaDataFileParser)
         {
             _pfs = pfs;
             _settingsService = settingsService;
-            _metaDataTagDeSerializer = metaDataTagDeSerializer;
+            _metaDataFileParser = metaDataFileParser;
         }
 
-        public static void Generate(IPackFileService pfs, ApplicationSettingsService settingsService, MetaDataTagDeSerializer metaDataTagDeSerializer)
+        public static void Generate(IPackFileService pfs, ApplicationSettingsService settingsService, MetaDataFileParser metaDataFileParser)
         {
-            var instance = new AnimMetaDataReportGenerator(pfs, settingsService, metaDataTagDeSerializer);
+            var instance = new AnimMetaDataReportGenerator(pfs, settingsService, metaDataFileParser);
             instance.Create();
         }
 
@@ -63,7 +63,7 @@ namespace Editors.Reports.Animation
             var fileList = PackFileServiceUtility.FindAllWithExtentionIncludePaths(_pfs, ".meta");
             var failedFiles = new List<string>();
 
-            var metaTable = new List<(string Path, MetaDataFile File)>();
+            var metaTable = new List<(string Path, ParsedMetadataFile File)>();
             for (var i = 0; i < fileList.Count; i++)
             {
                 var fileName = fileList[i].FileName;
@@ -77,12 +77,12 @@ namespace Editors.Reports.Animation
                     if (data.Length == 0)
                         continue;
 
-                    var parser = new MetaDataFileParser();
-                    var metaData = parser.ParseFile(data, _metaDataTagDeSerializer);
+
+                    var metaData = _metaDataFileParser.ParseFile(data);
                     metaTable.Add((fileName, metaData));
 
                     var completedTags = 0;
-                    foreach (var item in metaData.Items)
+                    foreach (var item in metaData.Attributes)
                     {
                         var tagName = item.DisplayName;
                         tagName = tagName.ToLower();
@@ -92,7 +92,7 @@ namespace Editors.Reports.Animation
 
                         try
                         {
-                            var variables = _metaDataTagDeSerializer.DeSerializeToStrings(item, out var errorMessage);
+                            var variables = _metaDataFileParser.DeSerializeToStrings(item, out var errorMessage);
                             if (variables != null)
                             {
 
@@ -122,7 +122,7 @@ namespace Editors.Reports.Animation
                         }
                     }
 
-                    _logger.Here().Information($"File processed {i}/{fileList.Count} - {completedTags}/{metaData.Items.Count} tags loaded correctly");
+                    _logger.Here().Information($"File processed {i}/{fileList.Count} - {completedTags}/{metaData.Attributes.Count} tags loaded correctly");
                 }
                 catch
                 {

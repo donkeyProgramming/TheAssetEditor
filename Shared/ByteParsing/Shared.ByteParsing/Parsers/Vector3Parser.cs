@@ -87,5 +87,27 @@ namespace Shared.ByteParsing.Parsers
 
             return value;
         }
+
+        public byte[] Encode(object value)
+        {
+            if (value == null)
+                throw new ArgumentNullException(nameof(value));
+
+            if (value is Vector3 v)
+            {
+                var bytes = EncodeValue(v, out var error);
+                if (bytes == null) throw new Exception(error);
+                return bytes;
+            }
+
+            if (value is string s)
+            {
+                var bytes = Encode(s, out var error);
+                if (bytes == null) throw new Exception(error);
+                return bytes;
+            }
+
+            throw new Exception("Unable to convert object to Vector3");
+        }
     }
 }

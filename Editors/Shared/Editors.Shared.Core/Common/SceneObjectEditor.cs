@@ -1,10 +1,8 @@
-﻿using Editors.Shared.Core.Common;
-using GameWorld.Core.Animation;
+﻿using GameWorld.Core.Animation;
 using GameWorld.Core.Components;
 using GameWorld.Core.SceneNodes;
 using GameWorld.Core.Services;
 using GameWorld.Core.Utility;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Xna.Framework;
 using Serilog;
 using Shared.Core.ErrorHandling;
@@ -22,7 +20,6 @@ namespace Editors.Shared.Core.Common
     {
         private readonly ILogger _logger = Logging.Create<SceneObjectEditor>();
         private readonly IWpfGame _mainScene;
-        private readonly IServiceProvider _serviceProvider;
         private readonly SceneManager _sceneManager;
         private readonly IPackFileService _packFileService;
         private readonly AnimationsContainerComponent _animationsContainerComponent;
@@ -30,7 +27,6 @@ namespace Editors.Shared.Core.Common
         private readonly IEventHub _eventHub;
 
         public SceneObjectEditor(IWpfGame mainScene,
-            IServiceProvider serviceProvider, 
             SceneManager sceneManager, 
             IPackFileService packFileService,
             AnimationsContainerComponent animationsContainerComponent,
@@ -38,7 +34,6 @@ namespace Editors.Shared.Core.Common
             IEventHub eventHub)
         {
             _mainScene = mainScene;
-            _serviceProvider = serviceProvider;
             _sceneManager = sceneManager;
             _packFileService = packFileService;
             _animationsContainerComponent = animationsContainerComponent;
@@ -77,18 +72,29 @@ namespace Editors.Shared.Core.Common
                 return;
             }
 
-            if (sceneObject.ModelNode != null)
+            if (sceneObject.MainNode != null)
+            {
+                foreach (var t in sceneObject.MetaDataItems)
+                    t.CleanUp();
+
+                sceneObject.MetaDataItems.Clear();
+                sceneObject.Player.AnimationRules.Clear();
                 sceneObject.ParentNode.RemoveObject(sceneObject.ModelNode);
+            }
+
             sceneObject.ModelNode = loadedNode;
             sceneObject.ParentNode.AddObject(loadedNode);
 
             var skeletonChanged = false;
+            var metaDataChanged = false;
             if (updateSkeleton)
             {
                 skeletonChanged = true;
+                metaDataChanged = true;
                 var skeletonName = SceneNodeHelper.GetSkeletonName(loadedNode);
                 var fullSkeletonName = $"animations\\skeletons\\{skeletonName}.anim";
                 var skeletonFile = _packFileService.FindFile(fullSkeletonName);
+                SetMetaFile(sceneObject, null, null);
                 SetSkeleton(sceneObject, skeletonFile, false);
             }
             sceneObject.MeshName.Value = file.Name;
@@ -107,7 +113,7 @@ namespace Editors.Shared.Core.Common
                 }
             });
 
-            _eventHub.Publish(new SceneObjectUpdateEvent(sceneObject, true, skeletonChanged, skeletonChanged, false));
+            _eventHub.Publish(new SceneObjectUpdateEvent(sceneObject, true, skeletonChanged, skeletonChanged, metaDataChanged));
             sceneObject.TriggerMeshChanged();
         }
 
@@ -170,7 +176,7 @@ namespace Editors.Shared.Core.Common
             assetViewModel.TriggerSkeletonChanged();
         }
 
-        public void SetSkeleton(SceneObject assetViewModel, AnimationFile animFile, string skeletonName, bool sendUpdateEvent = true)
+        /*public void SetSkeleton(SceneObject assetViewModel, AnimationFile animFile, string skeletonName, bool sendUpdateEvent = true)
         {
             assetViewModel.SkeletonName.Value = skeletonName;
             assetViewModel.Skeleton = new GameSkeleton(animFile, assetViewModel.Player);
@@ -181,7 +187,7 @@ namespace Editors.Shared.Core.Common
 
             if(sendUpdateEvent)
                 assetViewModel.TriggerSkeletonChanged();
-        }
+        }*/
 
         public void SetMetaFile(SceneObject sceneObject, PackFile? metaFile, PackFile? persistantFile)
         {

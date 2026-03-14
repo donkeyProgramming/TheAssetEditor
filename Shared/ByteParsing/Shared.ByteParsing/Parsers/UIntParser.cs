@@ -28,5 +28,37 @@
 
             return EncodeValue(spesificValue, out error);
         }
+
+        public byte[] Encode(object value)
+        {
+            if (value == null)
+                throw new ArgumentNullException(nameof(value));
+
+            if (value is uint v)
+            {
+                var bytes = EncodeValue(v, out var error);
+                if (bytes == null) throw new Exception(error);
+                return bytes;
+            }
+
+            if (value is string s)
+            {
+                var bytes = Encode(s, out var error);
+                if (bytes == null) throw new Exception(error);
+                return bytes;
+            }
+
+            try
+            {
+                var converted = Convert.ToUInt32(value);
+                var bytes = EncodeValue(converted, out var error);
+                if (bytes == null) throw new Exception(error);
+                return bytes;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Unable to convert object to UInt32", ex);
+            }
+        }
     }
 }
