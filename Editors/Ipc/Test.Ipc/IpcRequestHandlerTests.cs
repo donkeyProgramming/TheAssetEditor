@@ -3,10 +3,11 @@ using Shared.Core.PackFiles.Models;
 
 namespace AssetEditorTests.Ipc
 {
-    [TestClass]
+
+
     public class IpcRequestHandlerTests
     {
-        [TestMethod]
+        [Test]
         public async Task HandleAsync_ReturnsUnsupportedAction_ForUnknownAction()
         {
             var packLoader = new FakePackLoader();
@@ -24,7 +25,7 @@ namespace AssetEditorTests.Ipc
             Assert.AreEqual(0, packLoader.CallCount);
         }
 
-        [TestMethod]
+        [Test]
         public async Task HandleAsync_ReturnsError_ForEmptyPath()
         {
             var sut = new IpcRequestHandler(new FakePackLoader(), new FakeLookup(), new FakeOpenExecutor(), new FakeNotifier());
@@ -35,7 +36,7 @@ namespace AssetEditorTests.Ipc
             Assert.AreEqual("Path is empty", result.Error);
         }
 
-        [TestMethod]
+        [Test]
         public async Task HandleAsync_ReturnsNotFound_AndShowsDialog_WhenLookupFails()
         {
             var packLoader = new FakePackLoader();
@@ -60,7 +61,7 @@ namespace AssetEditorTests.Ipc
             Assert.AreEqual(0, packLoader.CallCount);
         }
 
-        [TestMethod]
+        [Test]
         public async Task HandleAsync_OpensFile_AndReturnsOk_WhenLookupSucceeds()
         {
             var packFile = PackFile.CreateFromBytes("bird.rigid_model_v2", []);
@@ -85,7 +86,7 @@ namespace AssetEditorTests.Ipc
             Assert.AreEqual(0, packLoader.CallCount);
         }
 
-        [TestMethod]
+        [Test]
         public async Task HandleAsync_DoesNotBringToFront_WhenBringToFrontFalse()
         {
             var packFile = PackFile.CreateFromBytes("bird.rigid_model_v2", []);
@@ -108,7 +109,7 @@ namespace AssetEditorTests.Ipc
             Assert.AreEqual(0, packLoader.CallCount);
         }
 
-        [TestMethod]
+        [Test]
         public async Task HandleAsync_LoadsPackFromDisk_WhenPackPathProvided()
         {
             var packFile = PackFile.CreateFromBytes("arb_base_elephant.rigid_model_v2", []);
@@ -131,7 +132,7 @@ namespace AssetEditorTests.Ipc
             Assert.IsFalse(opener.LastOpenInExistingKitbashTab);
         }
 
-        [TestMethod]
+        [Test]
         public async Task HandleAsync_ReturnsFailure_WhenPackLoadFails()
         {
             var packLoader = new FakePackLoader
@@ -157,7 +158,7 @@ namespace AssetEditorTests.Ipc
             Assert.AreEqual(0, notifier.CallCount);
         }
 
-        [TestMethod]
+        [Test]
         public async Task HandleAsync_PassesOpenInExistingKitbashTabFlag_ToExecutor()
         {
             var packFile = PackFile.CreateFromBytes("arb_base_elephant_1.wsmodel", []);

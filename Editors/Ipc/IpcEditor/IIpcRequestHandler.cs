@@ -1,8 +1,6 @@
-using System.Threading;
-using System.Threading.Tasks;
-using Shared.Core.PackFiles.Models;
+﻿using Shared.Core.PackFiles.Models;
 
-namespace AssetEditor.Services.Ipc
+namespace Editors.Ipc
 {
     public interface IIpcRequestHandler
     {

@@ -1,7 +1,7 @@
-using Shared.Core.PackFiles;
+﻿using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
 
-namespace AssetEditor.Services.Ipc
+namespace Editors.Ipc
 {
     public class ExternalPackFileLookup : IExternalPackFileLookup
     {

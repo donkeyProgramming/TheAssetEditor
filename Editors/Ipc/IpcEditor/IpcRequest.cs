@@ -1,4 +1,4 @@
-namespace AssetEditor.Services.Ipc
+﻿namespace Editors.Ipc
 {
     public class IpcRequest
     {

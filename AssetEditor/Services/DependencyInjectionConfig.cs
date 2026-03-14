@@ -34,6 +34,7 @@ namespace AssetEditor.Services
                 new Editor.VisualSkeletonEditor.DependencyInjectionContainer(),
                 new Editors.AnimatioReTarget.DependencyInjectionContainer(),
                 new Editors.Twui.DependencyInjectionContainer(),
+                new Editors.Ipc.DependencyInjectionContainer(),
 
                 // Host application
                 new DependencyInjectionContainer(),
