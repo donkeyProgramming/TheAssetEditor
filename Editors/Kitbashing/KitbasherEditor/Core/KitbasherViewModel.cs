@@ -1,3 +1,5 @@
+﻿using System;
+using System.IO;
 ﻿using System.IO;
 using System.Windows;
 using CommunityToolkit.Mvvm.ComponentModel;
@@ -84,7 +86,9 @@ namespace Editors.KitbasherEditor.ViewModels
             {
                 _inputFileReference = fileToLoad;
                 _kitbashSceneCreator.CreateFromPackFile(fileToLoad);
-                _focusSelectableObjectComponent.FocusScene();
+                var shouldFocusScene = string.Equals(Path.GetExtension(fileToLoad.Name), ".variantmeshdefinition", StringComparison.InvariantCultureIgnoreCase) == false;
+                if (shouldFocusScene)
+                    _focusSelectableObjectComponent.FocusScene();
                 DisplayName = fileToLoad.Name;
             }
             catch (Exception e)

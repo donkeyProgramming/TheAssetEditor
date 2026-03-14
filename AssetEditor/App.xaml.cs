@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Threading;
 using AssetEditor.Services;
+using AssetEditor.Services.Ipc;
 using AssetEditor.UiCommands;
 using AssetEditor.ViewModels;
 using AssetEditor.Views;
@@ -23,6 +24,7 @@ namespace AssetEditor
     public partial class App : Application, IAssetEditorMain
     {
         IServiceProvider _serviceProvider;
+        AssetEditorIpcServer _ipcServer;
         public IServiceProvider ServiceProvider { get => _serviceProvider; }
 
         protected override void OnStartup(StartupEventArgs e)
@@ -66,6 +68,8 @@ namespace AssetEditor
 
             ShowMainWindow();
 
+            _ipcServer = _serviceProvider.GetRequiredService<AssetEditorIpcServer>();
+            _ipcServer.Start();
             _ = CheckVersion(uiCommandFactory);
         }
 
@@ -99,6 +103,7 @@ namespace AssetEditor
             ThemesController.SetTheme(applicationSettingsService.CurrentSettings.Theme);
 
             var mainWindow = _serviceProvider.GetRequiredService<MainWindow>();
+            MainWindow = mainWindow;
             mainWindow.DataContext = _serviceProvider.GetRequiredService<MainViewModel>();
             mainWindow.Closed += OnMainWindowClosed;
             mainWindow.Show();
@@ -111,12 +116,23 @@ namespace AssetEditor
                 SystemCommands.MaximizeWindow(mainWindow);
         }
 
-        private void OnMainWindowClosed(object sender, EventArgs e)
+       private void OnMainWindowClosed(object sender, EventArgs e)
         {
+            _ipcServer?.Dispose();
+            _ipcServer = null;
+
             foreach (Window window in Current.Windows)
                 window.Close();
             Shutdown();
         }
+
+        protected override void OnExit(ExitEventArgs e)
+        {
+            _ipcServer?.Dispose();
+            _ipcServer = null;
+            base.OnExit(e);
+        }
+
 
         private static async Task CheckVersion(IUiCommandFactory uiCommandFactory)
         {

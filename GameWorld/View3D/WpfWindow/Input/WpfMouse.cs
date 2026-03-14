@@ -104,10 +104,13 @@ namespace GameWorld.Core.WpfWindow.Input
                 if (e.LeftButton == MouseButtonState.Pressed)
                 {
                     var res = LogicalTreeHelperEx.FindParent<Grid>(_focusElement);
-                    var result = VisualTreeHelper.HitTest(res, pos);
-                    if (result?.VisualHit == _focusElement)
+                    if (res != null)
                     {
-                        _focusElement.Focus();
+                        var result = VisualTreeHelper.HitTest(res, pos);
+                        if (result?.VisualHit == _focusElement)
+                        {
+                            _focusElement.Focus();
+                        }
                     }
                 }
             }
@@ -118,9 +121,12 @@ namespace GameWorld.Core.WpfWindow.Input
                 var hit = false;
                 var res = LogicalTreeHelperEx.FindParent<Grid>(_focusElement);
                 //if (res == null) return; <-- please see: https://github.com/donkeyProgramming/TheAssetEditor/pull/90#:~:text=Monogame.WpfInterop/Input/WpfMouse.cs
-                var result = VisualTreeHelper.HitTest(res, pos);
-                if (result?.VisualHit == _focusElement)
-                    hit = true;
+                if (res != null)
+                {
+                    var result = VisualTreeHelper.HitTest(res, pos);
+                    if (result?.VisualHit == _focusElement)
+                        hit = true;
+                }
 
                 if (!hit)
                 {
