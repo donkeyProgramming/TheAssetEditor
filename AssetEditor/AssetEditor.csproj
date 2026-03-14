@@ -67,6 +67,9 @@
       <None Update="Language_Cn.json">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </None>
+      <None Update="Language_Fr.json">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
       <None Update="Language_En.json">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </None>
