@@ -394,7 +394,10 @@ namespace Editors.Audio.AudioEditor.Presentation.AudioProjectViewer
 
         public void ResetTable()
         {
+            // Table.Clear() only removes the rows, so we need to do Table.Columns.Clear() to clear it fully. If we don't clear the table properly
+            // it leads to issues where e.g. a Dialogue Event may reference a table from a previous Dialogue Event with different State Groups.
             Table.Clear();
+            Table.Columns.Clear();
             DataGridColumns.Clear();
             SelectedRows = [];
         }

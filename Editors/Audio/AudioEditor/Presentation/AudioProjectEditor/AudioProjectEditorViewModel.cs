@@ -142,6 +142,9 @@ namespace Editors.Audio.AudioEditor.Presentation.AudioProjectEditor
             else
                 Table.ImportRow(row);
 
+            if (Table.Rows.Count != 1)
+                throw new Exception("There must only be one row in the Editor table.");
+
             var selectedAudioProjectExplorerNode = _audioEditorStateService.SelectedAudioProjectExplorerNode;
             _logger.Here().Information($"Added {selectedAudioProjectExplorerNode.Type} row to Audio Project Editor table for {selectedAudioProjectExplorerNode.Name} ");
         }
@@ -172,8 +175,8 @@ namespace Editors.Audio.AudioEditor.Presentation.AudioProjectEditor
 
         private void OnEditorTableRowAddedToViewer(EditorTableRowAddedToViewerEvent e)
         {
-            // Clear table to ensure there's only one row
-            Table.Clear();
+            // Clear rows to ensure there will only one row
+            Table.Rows.Clear();
 
             // Re-initialise table
             var selectedAudioProjectExplorerNode = _audioEditorStateService.SelectedAudioProjectExplorerNode;
@@ -186,8 +189,8 @@ namespace Editors.Audio.AudioEditor.Presentation.AudioProjectEditor
 
         private void OnViewerTableRowEdited(ViewerTableRowEditedEvent e)
         {
-            // Clear table to ensure there's only one row
-            Table.Clear();
+            // Clear rows to ensure there will only one row
+            Table.Rows.Clear();
 
             _eventHub.Publish(new EditorTableRowAddRequestedEvent(e.Row));
         }
@@ -286,7 +289,9 @@ namespace Editors.Audio.AudioEditor.Presentation.AudioProjectEditor
             var selectedAudioProjectExplorerNode = _audioEditorStateService.SelectedAudioProjectExplorerNode;
             if (selectedAudioProjectExplorerNode.IsDialogueEvent())
             {
-                Table.Clear();
+                ResetTable();
+
+                // Reload the table from scratch because ComboBoxes values can't be updated
                 LoadTable(selectedAudioProjectExplorerNode.Type);
             }
         }
@@ -393,8 +398,11 @@ namespace Editors.Audio.AudioEditor.Presentation.AudioProjectEditor
         }
 
         private void ResetTable()
-        {
-            Table = new DataTable();
+        {            
+            // Table.Clear() only removes the rows, so we need to do Table.Columns.Clear() to clear it fully. If we don't clear the table properly
+            // it leads to issues where e.g. a Dialogue Event may reference a table from a previous Dialogue Event with different State Groups.
+            Table.Clear();
+            Table.Columns.Clear();
             DataGridColumns.Clear();
         }
 
