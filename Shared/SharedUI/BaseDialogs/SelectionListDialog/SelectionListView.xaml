@@ -8,18 +8,25 @@
              d:DesignHeight="450" d:DesignWidth="800">
     <UserControl.Resources>
 
-        <Style x:Key="CustomListViewItemStyle" TargetType="{x:Type ListViewItem}">
+        <Style x:Key="CustomListViewItemStyle" TargetType="{x:Type ListViewItem}" BasedOn="{StaticResource {x:Type ListViewItem}}">
+            <!-- Use theme-aware brushes and alternate row backgrounds while keeping the default ListViewItem style
+                 so selection and other visual states follow the current theme. -->
+            <Setter Property="Background" Value="{DynamicResource ListView.Static.Background}" />
+
             <Style.Triggers>
                 <Trigger Property="ItemsControl.AlternationIndex" Value="0">
-                    <Setter Property="Background" Value="#EEEEEE"></Setter>
+                    <Setter Property="Background" Value="{DynamicResource ListView.Static.Background}" />
                 </Trigger>
- 
+
+                <Trigger Property="ItemsControl.AlternationIndex" Value="1">
+                    <Setter Property="Background" Value="{DynamicResource ABrush.AccentTone2.Background}" />
+                </Trigger>
             </Style.Triggers>
         </Style>
     </UserControl.Resources>
     
     <Grid>
-        <ListView  ItemsSource="{Binding ItemList, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" ItemContainerStyle="{DynamicResource CustomListViewItemStyle}" AlternationCount="2">
+        <ListView x:Name="ItemsListView" ItemsSource="{Binding ItemList, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" MouseDoubleClick="ItemsListView_MouseDoubleClick">
 
             <ListView.View>
                 <GridView>

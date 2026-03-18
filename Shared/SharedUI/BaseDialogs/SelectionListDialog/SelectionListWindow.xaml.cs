@@ -10,16 +10,13 @@ using Shared.Ui.Common;
 
 namespace CommonControls.SelectionListDialog
 {
-    /// <summary>
-    /// Interaction logic for SelectionListWindow.xaml
-    /// </summary>
     public partial class SelectionListWindow : Window
     {
         public bool Result { get; set; } = false;
         public delegate bool OnSeachDelegate(object item, Regex regex);
 
-        SolidColorBrush _noErrorBackground = new SolidColorBrush(Colors.White);
-        SolidColorBrush _errorBackground = new SolidColorBrush(Colors.Red);
+        readonly SolidColorBrush _noErrorBackground = new(Colors.White);
+        readonly SolidColorBrush _errorBackground = new(Colors.Red);
         public SelectionListWindow()
         {
             InitializeComponent();
@@ -33,7 +30,7 @@ namespace CommonControls.SelectionListDialog
 
         private void FilterConditionChanged<T>(ObservableCollection<SelectionListViewModel<T>.Item> originalList)
         {
-            SelectionListViewModel<T> typedDataContext = (SelectionListViewModel<T>)DataContext;
+            var typedDataContext = (SelectionListViewModel<T>)DataContext;
             using (new WaitCursor())
             {
                 var toolTip = SearchTextBox.ToolTip as ToolTip;
@@ -58,7 +55,7 @@ namespace CommonControls.SelectionListDialog
 
                 try
                 {
-                    Regex rx = null;
+                    Regex? rx = null;
                     typedDataContext.ItemList.Clear();
                     rx = new Regex(filterText, RegexOptions.Compiled | RegexOptions.IgnoreCase);
                     foreach (var item in originalList)
@@ -89,6 +86,7 @@ namespace CommonControls.SelectionListDialog
             var list = new ObservableCollection<SelectionListViewModel<T>.Item>(dc.ItemList);
             SearchTextBox.TextChanged += (sender, e) => FilterConditionChanged<T>(list);
         }
+
         public static SelectionListWindow ShowDialog<T>(string titel, IEnumerable<SelectionListViewModel<T>.Item> itemList, bool modal = true)
         {
             var window = new SelectionListWindow();
@@ -109,5 +107,12 @@ namespace CommonControls.SelectionListDialog
 
             return window;
         }
+
+        public void OnItemDoubleClicked()
+        {
+            Result = true;
+            Close();
+        }
+
     }
 }

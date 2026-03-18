@@ -152,7 +152,11 @@ namespace Shared.Core.PackFiles.Utility
                 {
                     var packFilesOrderedByName = group.OrderBy(x => x.Name);
                     foreach (var packfile in packFilesOrderedByName)
+                    {
+                        if (string.IsNullOrWhiteSpace(packfile.SystemFilePath) == false)
+                            caPackFileContainer.SourcePackFilePaths.Add(packfile.SystemFilePath);
                         caPackFileContainer.MergePackFileContainer(packfile);
+                    }
                 }
 
                 return caPackFileContainer;

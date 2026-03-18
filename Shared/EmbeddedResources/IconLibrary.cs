@@ -57,6 +57,7 @@ namespace Shared.EmbeddedResources
         [AllowNull] public static BitmapSource InformationIcon { get; private set; }
 
         [AllowNull] public static BitmapImage AudioFileIcon { get; private set; }
+        [AllowNull] public static BitmapImage AssignTextureFromOtherIcon { get; private set; }
 
         public static void Load()
         {
@@ -100,6 +101,7 @@ namespace Shared.EmbeddedResources
 
             FreezeAnimationIcon = BitmapToImageSource(@"Kitbasher.icons8-fruity-ice-pop-64.png");
             PinIcon = BitmapToImageSource(@"Kitbasher.pin.png");
+            AssignTextureFromOtherIcon = BitmapToImageSource(@"Kitbasher.AssignTextureFromOther.png");
 
             GrowSelectionIcon = BitmapToImageSource(@"Kitbasher.ExpandSelection.png");
             FaceToVertexIcon = BitmapToImageSource(@"Kitbasher.FaceToVertex.png");

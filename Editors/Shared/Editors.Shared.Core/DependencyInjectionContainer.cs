@@ -4,12 +4,12 @@ using CommonControls.Editors.TextEditor;
 using Editors.Shared.Core.Common;
 using Editors.Shared.Core.Common.AnimationPlayer;
 using Editors.Shared.Core.Common.BaseControl;
+using Editors.Shared.Core.Editors.VariantMeshDefinition;
 using Microsoft.Extensions.DependencyInjection;
 using Shared.Core.DependencyInjection;
 using Shared.Core.ToolCreation;
 using Shared.Ui.Editors.BoneMapping;
 using Shared.Ui.Editors.TextEditor;
-using Shared.Ui.Editors.VariantMeshDefinition;
 
 namespace Editors.Shared.Core
 {

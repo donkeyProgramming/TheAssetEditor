@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Shared.Core.DependencyInjection;
+using Shared.GameFormats.AnimationMeta.Parsing;
 
 namespace Shared.GameFormats
 {
@@ -11,6 +12,8 @@ namespace Shared.GameFormats
 
         public override void Register(IServiceCollection services)
         {
+            services.AddSingleton<IMetaDataDatabase, MetaDataDatabase>();
+            services.AddTransient<MetaDataFileParser>();
         }
     }
 }

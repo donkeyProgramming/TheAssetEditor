@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using GameWorld.Core.Components.Rendering;
+﻿using GameWorld.Core.Components.Rendering;
 using GameWorld.Core.Rendering.RenderItems;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;

@@ -15,7 +15,6 @@ using Shared.GameFormats.AnimationPack;
 using Shared.Ui.Common;
 using MessageBox = System.Windows.Forms.MessageBox;
 using Clipboard = System.Windows.Clipboard;
-using Shared.Ui.Events.UiCommands;
 using Shared.Core.Events;
 using GameWorld.Core.Components.Selection;
 using GameWorld.Core.Animation;
@@ -27,6 +26,7 @@ using Editors.Shared.Core.Common.ReferenceModel;
 using Editors.AnimationVisualEditors.MountAnimationCreator.Services;
 using GameWorld.Core.Services;
 using Shared.Core.Services;
+using Shared.Core.Events.Global;
 
 
 namespace AnimationEditor.MountAnimationCreator

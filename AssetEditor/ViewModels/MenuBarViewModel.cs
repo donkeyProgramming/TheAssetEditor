@@ -75,7 +75,10 @@ namespace AssetEditor.ViewModels
                     return;
                 }
 
-                var newPackFile = _packfileService.CreateNewPackFileContainer(window.TextValue.Trim(), PackFileCAType.MOD);
+                var currentGame = _settingsService.CurrentSettings.CurrentGame;
+                var pfsVersion = GameInformationDatabase.Games[currentGame].PackFileVersion; 
+
+                var newPackFile = _packfileService.CreateNewPackFileContainer(window.TextValue.Trim(), pfsVersion, PackFileCAType.MOD);
                 _packfileService.SetEditablePack(newPackFile);
             }
         }

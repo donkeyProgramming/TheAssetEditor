@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using GameWorld.Core.Components.Selection;
+﻿using GameWorld.Core.Components.Selection;
 using Serilog;
 using Shared.Core.ErrorHandling;
 

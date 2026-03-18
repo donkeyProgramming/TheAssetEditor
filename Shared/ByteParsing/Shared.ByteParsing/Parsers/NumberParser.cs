@@ -53,5 +53,33 @@
             var value = Decode(buffer, index) as object;
             return value!;
         }
+
+        public virtual byte[] Encode(object value)
+        {
+            if (value == null)
+                throw new ArgumentNullException(nameof(value));
+
+            // If already the correct type, use it
+            if (value is T t)
+            {
+                var bytes = EncodeValue(t, out var error);
+                if (bytes == null)
+                    throw new Exception(error);
+                return bytes;
+            }
+
+            try
+            {
+                var converted = (T)Convert.ChangeType(value, typeof(T));
+                var bytes = EncodeValue(converted, out var error);
+                if (bytes == null)
+                    throw new Exception(error);
+                return bytes;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Unable to convert object to {typeof(T).Name}", ex);
+            }
+        }
     }
 }

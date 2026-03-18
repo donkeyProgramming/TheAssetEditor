@@ -28,4 +28,23 @@ namespace Shared.Core.ToolCreation
         IEditorInterface Create(EditorEnums editor, Action<IEditorInterface>? onInitializeCallback = null);
         Window CreateWindow(PackFile packFile, EditorEnums? preferedEditor = null);
     }
+
+    public interface IEditorManager : IEditorCreator
+    {
+        IList<IEditorInterface> GetAllEditors();
+        int GetCurrentEditor();
+        void SetEditorAsCurrent(IEditorInterface editor);
+
+        public void CloseTool(IEditorInterface tool);
+        public bool ShouldBlockCloseCommand(IEditorInterface editor, bool hasUnsavedFiles);
+
+        public void CloseOtherTools(IEditorInterface tool);
+        public void CloseAllTools(IEditorInterface tool);
+        public void CloseToolsToLeft(IEditorInterface tool);
+        public void CloseToolsToRight(IEditorInterface tool);
+        public bool Drop(IEditorInterface node, IEditorInterface targetNode = default, bool insertAfterTargetNode = default);
+
+
+        
+    }
 }

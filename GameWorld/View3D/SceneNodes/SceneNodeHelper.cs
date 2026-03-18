@@ -49,10 +49,12 @@ namespace GameWorld.Core.SceneNodes
 
         public static void MakeNodeEditable(Rmv2ModelNode mainNode, ISceneNode node)
         {
+            var editableLod0 = GetOrCreateEditableLod0(mainNode);
+
             if (node is Rmv2MeshNode meshNode)
             {
                 node.Parent.RemoveObject(node);
-                mainNode.GetLodNodes()[0].AddObject(node);
+                editableLod0.AddObject(node);
                 meshNode.IsSelectable = true;
                 node.IsEditable = true;
                 return;
@@ -64,7 +66,7 @@ namespace GameWorld.Core.SceneNodes
                 foreach (var lodModel in lodNode.Children)
                 {
                     (lodModel as Rmv2MeshNode).IsSelectable = true;
-                    mainNode.GetLodNodes()[0].AddObject(lodModel);
+                    editableLod0.AddObject(lodModel);
                 }
             }
 
@@ -90,6 +92,7 @@ namespace GameWorld.Core.SceneNodes
 
         static void MakeModelNodeEditable(Rmv2ModelNode mainNode, Rmv2ModelNode modelNode)
         {
+            var editableLod0 = GetOrCreateEditableLod0(mainNode);
             foreach (var lodChild in modelNode.Children)
             {
                 if (lodChild is Rmv2LodNode lodNode0)
@@ -100,12 +103,21 @@ namespace GameWorld.Core.SceneNodes
                         if (index > 3)
                             continue;
                         (lodModel as Rmv2MeshNode).IsSelectable = true;
-                        mainNode.GetLodNodes()[0].AddObject(lodModel);
+                        editableLod0.AddObject(lodModel);
                     }
                     break;
                 }
             }
 
+        }
+
+        static Rmv2LodNode GetOrCreateEditableLod0(Rmv2ModelNode mainNode)
+        {
+            var lodNodes = mainNode.GetLodNodes();
+            if (lodNodes.Count != 0)
+                return lodNodes[0];
+
+            return mainNode.AddObject(new Rmv2LodNode("Lod 0", 0));
         }
 
         public static string GetSkeletonName(ISceneNode result)

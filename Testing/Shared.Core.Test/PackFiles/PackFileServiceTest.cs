@@ -3,13 +3,10 @@ using Shared.Core.Events;
 using Shared.Core.Events.Global;
 using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
-using Shared.Core.Services;
+using Shared.Core.Settings;
 
 namespace Test.Shared.Core.PackFiles
 {
-
-
-
     internal class PackFileServiceTest
     {
         [Test]
@@ -127,7 +124,7 @@ namespace Test.Shared.Core.PackFiles
 
             // Act
             pfs.AddContainer(container);
-            var emptyPackFileContainer = pfs.CreateNewPackFileContainer("Custom", PackFileCAType.MOD, true);
+            var emptyPackFileContainer = pfs.CreateNewPackFileContainer("Custom", PackFileVersion.PFH5, PackFileCAType.MOD, true);
 
             // Assert
             var containers = pfs.GetAllPackfileContainers();
@@ -137,6 +134,20 @@ namespace Test.Shared.Core.PackFiles
             eventHub.Verify(m => m.PublishGlobalEvent(new PackFileContainerAddedEvent(container)), Times.Once);
             eventHub.Verify(m => m.PublishGlobalEvent(new PackFileContainerAddedEvent(emptyPackFileContainer)), Times.Once);
         }
+
+        [Test]
+        public void CreateNewPackFileContainer_Wh3()
+        {
+            var eventHub = new Mock<IGlobalEventHub>();
+            var pfs = new PackFileService(eventHub.Object);
+           // pfs.CreateNewPackFileContainer("Custom", PackFileCAType.WH3, true);
+
+
+        }
+
+        [Test]
+        public void CreateNewPackFileContainer_Rome()
+        { }
 
 
 

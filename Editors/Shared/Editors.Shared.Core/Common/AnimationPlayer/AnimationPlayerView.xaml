@@ -13,8 +13,8 @@
             <RowDefinition/>
         </Grid.RowDefinitions>
 
-        <ToggleButton Grid.Row="0" Content="Animation" Click="ToggleButton_Click" IsChecked="{Binding IsEnabled.Value, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" Margin="10,1,10,1"/>
-        <Grid Grid.Row="1" Margin="0,1,0,10" x:Name="AnimationContent">
+        <ToggleButton Grid.Row="0" Content="Animation" IsChecked="{Binding IsEnabled.Value, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" Margin="10,1,10,1"/>
+        <Grid Grid.Row="1" Margin="0,1,0,10" Visibility="{Binding PlayerControlsVisibility.Value, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width=".1*"/>
                 <ColumnDefinition Width="5"/>

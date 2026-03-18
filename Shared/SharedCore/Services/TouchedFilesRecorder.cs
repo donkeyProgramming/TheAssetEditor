@@ -46,7 +46,7 @@ namespace Shared.Core.Services
 
         public void ExtractFilesToPack(string path)
         {
-            var newPack = _pfs.CreateNewPackFileContainer("AutoExtracted", PackFileCAType.MOD);
+            var newPack = _pfs.CreateNewPackFileContainer("AutoExtracted", PackFileVersion.PFH5, PackFileCAType.MOD);
 
             foreach (var item in _files)
                 _pfs.CopyFileFromOtherPackFile(item.Container, item.FilePath, newPack);

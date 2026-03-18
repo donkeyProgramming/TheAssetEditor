@@ -2,6 +2,8 @@
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
+using Serilog;
+using Shared.Core.ErrorHandling;
 using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Utility;
 
@@ -15,6 +17,7 @@ namespace GameWorld.Core.Rendering.Materials.Serialization
     class WsMaterialRepository : IWsMaterialRepository
     {
         private readonly Dictionary<string, string> _map;
+        private readonly ILogger _logger = Logging.Create<WsMaterialRepository>();
 
         public WsMaterialRepository(IPackFileService packFileService)
         {
@@ -71,11 +74,18 @@ namespace GameWorld.Core.Rendering.Materials.Serialization
 
             foreach (var (fileName, pack) in materialPacks)
             {
-                var bytes = pack.DataSource.ReadData();
-                var content = Encoding.UTF8.GetString(bytes);
-                var sanitizedWsMaterial = SanatizeMaterial(content);
+                try
+                {
+                    var bytes = pack.DataSource.ReadData();
+                    var content = Encoding.UTF8.GetString(bytes);
+                    var sanitizedWsMaterial = SanatizeMaterial(content);
 
-                materialList[sanitizedWsMaterial] = fileName;
+                    materialList[sanitizedWsMaterial] = fileName;
+                }
+                catch (Exception e)
+                {
+                    _logger.Here().Error(e, "Failed to load material {MaterialPath} from pack {PackName}", fileName, pack.Name);   
+                }
             }
 
             return materialList;

@@ -3,12 +3,13 @@ using AssetEditor.UiCommands;
 using AssetEditor.ViewModels;
 using AssetEditor.Views;
 using AssetEditor.Views.Settings;
+using AssetEditor.Views.Updater;
 using Microsoft.Extensions.DependencyInjection;
 using Shared.Core.DependencyInjection;
 using Shared.Core.DevConfig;
 using Shared.Core.ErrorHandling.Exceptions;
+using Shared.Core.Events.Global;
 using Shared.Core.ToolCreation;
-using Shared.Ui.Events.UiCommands;
 
 namespace AssetEditor
 {
@@ -24,13 +25,16 @@ namespace AssetEditor
             serviceCollection.AddTransient<OpenGamePackCommand>();
             serviceCollection.AddTransient<OpenPackFileCommand>();
             serviceCollection.AddTransient<OpenSettingsDialogCommand>();
+            serviceCollection.AddTransient<OpenUpdaterWindowCommand>();
             serviceCollection.AddTransient<OpenWebpageCommand>();
             serviceCollection.AddTransient<PrintScopesCommand>();
             serviceCollection.AddTransient<OpenEditorCommand>();
             serviceCollection.AddTransient<TogglePackFileExplorerCommand>();
 
             serviceCollection.AddTransient<SettingsWindow>();
-            serviceCollection.AddScoped<SettingsViewModel>();
+            serviceCollection.AddTransient<SettingsViewModel>();
+            serviceCollection.AddTransient<UpdaterWindow>();
+            serviceCollection.AddTransient<UpdaterViewModel>();
             serviceCollection.AddScoped<MenuBarViewModel>();
 
             serviceCollection.AddScoped<MainWindow>();

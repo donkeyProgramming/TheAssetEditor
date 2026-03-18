@@ -1,10 +1,10 @@
 ﻿using Editor.VisualSkeletonEditor.SkeletonEditor;
 using Editors.Shared.Core.Common.ReferenceModel;
 using Moq;
+using Shared.Core.Events.Global;
 using Shared.Core.Services;
 using Shared.Core.ToolCreation;
 using Shared.GameFormats.Animation;
-using Shared.Ui.Events.UiCommands;
 using Test.TestingUtility.Shared;
 using Test.TestingUtility.TestUtility;
 

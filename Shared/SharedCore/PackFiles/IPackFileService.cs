@@ -11,7 +11,7 @@ namespace Shared.Core.PackFiles
         PackFileContainer? AddContainer(PackFileContainer container, bool setToMainPackIfFirst = false);
         void AddFilesToPack(PackFileContainer container, List<NewPackFileEntry> newFiles);
         void CopyFileFromOtherPackFile(PackFileContainer source, string path, PackFileContainer target);
-        PackFileContainer CreateNewPackFileContainer(string name, PackFileCAType type, bool setEditablePack = false);
+        PackFileContainer CreateNewPackFileContainer(string name, PackFileVersion packFileVersion, PackFileCAType type, bool setEditablePack = false);
         void DeleteFile(PackFileContainer pf, PackFile file);
         void DeleteFolder(PackFileContainer pf, string folder);
         PackFile? FindFile(string path, PackFileContainer? container = null);

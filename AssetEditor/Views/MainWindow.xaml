@@ -17,8 +17,8 @@
         behaviors:WindowCancellableClosingBehavior.IsClosingWithoutPrompt="{Binding IsClosingWithoutPrompt}"
         Style="{StaticResource CustomWindowStyle}"
         x:Name="window"
-        Width="1280"
-        Height="720"
+        Width="1920"
+        Height="1080"
         BorderThickness="{Binding RelativeSource={RelativeSource Mode=Self}, Path=WindowState, Converter={StaticResource windowStateToThicknessConverter}}"
         ResizeMode="CanResize"
         WindowStyle="None"
@@ -89,13 +89,16 @@
 
             <Button
                 Grid.Column="2"
+                Width="46"
                 Click="OnMinimizeButtonClick"
                 Style="{StaticResource TitleBarButtonStyle}"
-                ToolTip="Minimize">
+                ToolTip="Minimise"
+                VerticalAlignment="Stretch"
+                Height="Auto">
                 <Path
-                    Width="36"
+                    Width="46"
                     Height="32"
-                    Data="M 13,15 H 23"
+                    Data="M 18,16 H 28"
                     Stroke="{Binding Path=Foreground, RelativeSource={RelativeSource AncestorType={x:Type Button}}}"
                     StrokeThickness="1" />
             </Button>
@@ -103,12 +106,15 @@
             <Button
                 x:Name="maximizeRestoreButton"
                 Grid.Column="3"
+                Width="46"
                 Click="OnMaximizeRestoreButtonClick"
                 Style="{StaticResource TitleBarButtonStyle}"
-                ToolTip="Maximize"
-                ToolTipOpening="MaximizeRestoreButton_ToolTipOpening">
+                ToolTip="Maximise"
+                ToolTipOpening="MaximizeRestoreButton_ToolTipOpening"
+                VerticalAlignment="Stretch"
+                Height="Auto">
                 <Path
-                    Width="36"
+                    Width="46"
                     Height="32"
                     Data="{Binding ElementName=window, Path=WindowState, Converter={StaticResource windowStateToPathConverter}}"
                     Stroke="{Binding Path=Foreground, RelativeSource={RelativeSource AncestorType={x:Type Button}}}"
@@ -117,13 +123,16 @@
 
             <Button
                 Grid.Column="4"
+                Width="46"
                 Click="OnCloseButtonClick"
                 Style="{StaticResource TitleBarCloseButtonStyle}"
-                ToolTip="Close">
+                ToolTip="Close"
+                VerticalAlignment="Stretch"
+                Height="Auto">
                 <Path
-                    Width="36"
+                    Width="46"
                     Height="32"
-                    Data="M 13,11 22,20 M 13,20 22,11"
+                    Data="M 18.5,11 27.5,20 M 18.5,20 27.5,11"
                     Stroke="{Binding Path=Foreground, RelativeSource={RelativeSource AncestorType={x:Type Button}}}"
                     StrokeThickness="1" />
             </Button>
@@ -215,15 +224,13 @@
                                         </Style>
                                     </TextBlock.Style>
                                 </TextBlock>
-                                <Button Margin="4,0,-4,0"  Grid.Column="1" 
-                                Command="{Binding DataContext.CloseToolCommand, RelativeSource={RelativeSource FindAncestor, AncestorType=TabControl}}" 
-                                CommandParameter="{Binding}"
-                                HorizontalContentAlignment="Right"
-                                Content="{materialIcons:MaterialIconExt Kind=CloseThick, Size=13 }">
-
-
-
-
+                                <Button
+                                    Margin="4,0,-4,0"  
+                                    Grid.Column="1" 
+                                    Command="{Binding DataContext.CloseToolCommand, RelativeSource={RelativeSource FindAncestor, AncestorType=TabControl}}" 
+                                    CommandParameter="{Binding}"
+                                    HorizontalContentAlignment="Right"
+                                    Content="{materialIcons:MaterialIconExt Kind=CloseThick, Size=13 }">
                                 </Button>
                             </Grid>
                         </DataTemplate>

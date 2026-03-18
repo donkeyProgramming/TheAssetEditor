@@ -4,6 +4,7 @@ using Shared.Core.Events;
 using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
 using Shared.Core.PackFiles.Utility;
+using Shared.Core.Settings;
 
 namespace Test.Shared.Core.PackFiles.Utility
 {
@@ -17,7 +18,7 @@ namespace Test.Shared.Core.PackFiles.Utility
         {
             var eventHub = new Mock<IGlobalEventHub>();
             _packFileService = new PackFileService(eventHub.Object);
-            _container = _packFileService.CreateNewPackFileContainer("EncryptedOutput", PackFileCAType.MOD, true);
+            _container = _packFileService.CreateNewPackFileContainer("EncryptedOutput", PackFileVersion.PFH5, PackFileCAType.MOD, true);
 
             // Use files that are large enough for compression to be effective as files that are too small may actually increase in size when compressed
             List<NewPackFileEntry> files = [

@@ -1,11 +1,22 @@
-﻿// Licensed to the .NET Foundation under one or more agreements.
-// The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
-
-using Shared.GameFormats.AnimationMeta.Parsing;
+﻿using Shared.GameFormats.AnimationMeta.Parsing;
 
 namespace Shared.GameFormats.AnimationMeta.Definitions
 {
+    public abstract class DockEquipment : DecodedMetaEntryBase
+    {
+        [MetaDataTag(5, "0=\"Weapon Bone 1\" in .frg but \"be_prop_0\" in a typical VMD. 1=\"Weapon Bone 2\" in .frg but \"be_prop_1\" in VMD. etc.")]
+        public int PropBoneId { get; set; }
+
+        [MetaDataTag(6)]
+        public float BlendInTime { get; set; }
+
+        [MetaDataTag(7)]
+        public float BlendOutTime { get; set; }
+
+        public virtual string AnimationSlotName { get; } = "";
+        public virtual string[] SkeletonNameAlternatives { get; } = new string[] { "" };
+    }
+
 
     public abstract class DockEquipment_v0 : DecodedMetaEntryBase_v0
     {
@@ -46,20 +57,7 @@ namespace Shared.GameFormats.AnimationMeta.Definitions
         public float BlendOutTime { get; set; }
     }
 
-    public abstract class DockEquipment : DecodedMetaEntryBase
-    {
-        [MetaDataTag(5, "0=\"Weapon Bone 1\" in .frg but \"be_prop_0\" in a typical VMD. 1=\"Weapon Bone 2\" in .frg but \"be_prop_1\" in VMD. etc.")]
-        public int PropBoneId { get; set; }
-
-        [MetaDataTag(6)]
-        public float BlendInTime { get; set; }
-
-        [MetaDataTag(7)]
-        public float BlendOutTime { get; set; }
-
-        public virtual string AnimationSlotName { get; } = "";
-        public virtual string[] SkeletonNameAlternatives { get; } = new string[] { "" };
-    }
+  
 
     /// <summary>
     /// Dock right hand

@@ -1,4 +1,7 @@
+﻿using System;
+using System.IO;
 ﻿using System.IO;
+using System.Windows;
 using CommunityToolkit.Mvvm.ComponentModel;
 using Editors.KitbasherEditor.EventHandlers;
 using Editors.KitbasherEditor.Services;
@@ -38,6 +41,8 @@ namespace Editors.KitbasherEditor.ViewModels
         public AnimationControllerViewModel Animation { get; set; }
 
         [ObservableProperty] string _displayName = "Kitbash Tool";
+        [ObservableProperty] GridLength _leftColumnWidth = new(0.75, GridUnitType.Star);
+        [ObservableProperty] GridLength _rightColumnWidth = new(0.25, GridUnitType.Star);
 
         PackFile _inputFileReference;
         public PackFile CurrentFile { get => _inputFileReference; }
@@ -81,7 +86,9 @@ namespace Editors.KitbasherEditor.ViewModels
             {
                 _inputFileReference = fileToLoad;
                 _kitbashSceneCreator.CreateFromPackFile(fileToLoad);
-                _focusSelectableObjectComponent.FocusScene();
+                var shouldFocusScene = string.Equals(Path.GetExtension(fileToLoad.Name), ".variantmeshdefinition", StringComparison.InvariantCultureIgnoreCase) == false;
+                if (shouldFocusScene)
+                    _focusSelectableObjectComponent.FocusScene();
                 DisplayName = fileToLoad.Name;
             }
             catch (Exception e)

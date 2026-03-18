@@ -15,21 +15,6 @@ using Shared.Core.ToolCreation;
 
 namespace AssetEditor.Services
 {
-    public interface IEditorManager : IEditorCreator
-    {
-        IList<IEditorInterface> GetAllEditors();
-        int GetCurrentEditor();
-
-        public void CloseTool(IEditorInterface tool);
-        public bool ShouldBlockCloseCommand(IEditorInterface editor, bool hasUnsavedFiles);
-
-        public void CloseOtherTools(IEditorInterface tool);
-        public void CloseAllTools(IEditorInterface tool);
-        public void CloseToolsToLeft(IEditorInterface tool);
-        public void CloseToolsToRight(IEditorInterface tool);
-        public bool Drop(IEditorInterface node, IEditorInterface targetNode = default, bool insertAfterTargetNode = default);
-    }
-
     public partial class EditorManager : ObservableObject, IEditorManager
     {
         private readonly ILogger _logger = Logging.Create<EditorManager>();
@@ -51,6 +36,14 @@ namespace AssetEditor.Services
 
         public IList<IEditorInterface> GetAllEditors() => CurrentEditorsList;
         public int GetCurrentEditor() => SelectedEditorIndex;
+
+        public void SetEditorAsCurrent(IEditorInterface editor)
+        {
+            var index = CurrentEditorsList.IndexOf(editor);
+            if (index >= 0)
+                SelectedEditorIndex = index;
+        }
+
         public IEditorInterface CreateFromFile(PackFile file, EditorEnums? preferedEditor)
         {
             if (file == null)

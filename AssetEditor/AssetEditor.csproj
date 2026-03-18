@@ -7,6 +7,7 @@
         <ApplicationIcon>AssetEditorIcon.ico</ApplicationIcon>
         <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
         <EnableNETAnalyzers>true</EnableNETAnalyzers>
+        <Nullable>enable</Nullable>
     </PropertyGroup>
     <ItemGroup>
       <None Remove="AssetEditorIcon.png" />
@@ -15,11 +16,12 @@
     <ItemGroup>
         <ProjectReference Include="..\Editors\AnimationEditor\Editors.AnimationVisualEditors.csproj" />
         <ProjectReference Include="..\Editors\AnimationFragmentEditor\Editor.AnimationFragmentEditor\Editors.AnimationFragmentEditor.csproj" />
-        <ProjectReference Include="..\Editors\AnimationMeta\Editors.AnimationMeta.csproj" />
         <ProjectReference Include="..\Editors\AnimationReTarget\Editors.AnimatioReTarget\Editors.AnimatioReTarget.csproj" />
         <ProjectReference Include="..\Editors\Audio\Editors.Audio.csproj" />
         <ProjectReference Include="..\Editors\ImportExportEditor\Editors.ImportExport\Editors.ImportExport.csproj" />
+        <ProjectReference Include="..\Editors\Ipc\IpcEditor\Editors.Ipc.csproj" />
         <ProjectReference Include="..\Editors\Kitbashing\KitbasherEditor\Editors.KitbasherEditor.csproj" />
+        <ProjectReference Include="..\Editors\MetaDataEditor\AnimationMeta\Editors.AnimationMeta.csproj" />
         <ProjectReference Include="..\Editors\Reports\Editors.Reports.csproj" />
         <ProjectReference Include="..\Editors\SkeletonEditor\Editor.VisualSkeletonEditor\Editor.VisualSkeletonEditor.csproj" />
         <ProjectReference Include="..\Editors\TextureEditor\Editors.TextureEditor.csproj" />
@@ -45,6 +47,7 @@
         <PackageProjectUrl>https://github.com/donkeyProgramming/TheAssetEditor</PackageProjectUrl>
         <RepositoryUrl>https://github.com/donkeyProgramming/TheAssetEditor</RepositoryUrl>
         <PackageId>AssetEditor</PackageId>
+        <Version>0.70.0</Version>
         <AnalysisLevel>6.0</AnalysisLevel>
     </PropertyGroup>
 
@@ -53,7 +56,23 @@
     </ItemGroup>
 
     <ItemGroup>
+      <PackageReference Include="MdXaml" Version="1.27.0" />
+    </ItemGroup>
+
+    <ItemGroup>
       <Resource Include="AssetEditorIcon.png" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <None Update="Language_Cn.json">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="Language_Fr.json">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="Language_En.json">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
     </ItemGroup>
 
     <PropertyGroup>
@@ -67,4 +86,13 @@
         <GenerateDocumentationFile>False</GenerateDocumentationFile>
         <NoWarn>$(NoWarn),1573,1591,1712</NoWarn>
     </PropertyGroup>
+
+    <Target Name="PublishUpdater" AfterTargets="ComputeFilesToPublish">
+        <PropertyGroup>
+            <UpdaterProject>$(MSBuildProjectDirectory)\..\AssetEditorUpdater\AssetEditorUpdater.csproj</UpdaterProject>
+            <AbsolutePublishDir>$([System.IO.Path]::GetFullPath('$(PublishDir)'))</AbsolutePublishDir>
+        </PropertyGroup>
+
+        <MSBuild Projects="$(UpdaterProject)" Targets="Restore;Publish" Properties="PublishDir=$(AbsolutePublishDir);Configuration=$(Configuration);RuntimeIdentifier=$(RuntimeIdentifier);SelfContained=$(SelfContained);PublishSingleFile=$(PublishSingleFile);PublishReadyToRun=$(PublishReadyToRun)" />
+    </Target>
 </Project>

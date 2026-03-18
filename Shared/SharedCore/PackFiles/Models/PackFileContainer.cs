@@ -7,6 +7,7 @@
         public bool IsCaPackFile { get; set; } = false;
         public string SystemFilePath { get; set; }
         public long OriginalLoadByteSize { get; set; } = -1;
+        public HashSet<string> SourcePackFilePaths { get; set; } = [];
 
         public Dictionary<string, PackFile> FileList { get; set; } = [];
 

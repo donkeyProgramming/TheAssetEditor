@@ -4,6 +4,7 @@ using Shared.Core.Events.Global;
 using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
 using Shared.Core.Services;
+using Shared.Core.Settings;
 
 namespace Test.Shared.Core.Services
 {
@@ -26,7 +27,7 @@ namespace Test.Shared.Core.Services
             container.IsCaPackFile = true;
 
             _pfs.AddContainer(container);
-            _container = _pfs.CreateNewPackFileContainer("Output", PackFileCAType.MOD, true);
+            _container = _pfs.CreateNewPackFileContainer("Output", PackFileVersion.PFH5, PackFileCAType.MOD, true);
 
             List<NewPackFileEntry> files = [
                 new NewPackFileEntry("folder\\subfolder", PackFile.CreateFromBytes("File0.test", [0])),

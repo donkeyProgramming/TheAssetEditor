@@ -1,10 +1,10 @@
 ﻿using System.Diagnostics;
-using Shared.Core.Events;
+using CommunityToolkit.Diagnostics;
 using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
 using Shared.Core.ToolCreation;
 
-namespace Shared.Ui.Events.UiCommands
+namespace Shared.Core.Events.Global
 {
     public class OpenEditorCommand : IUiCommand
     {
@@ -21,6 +21,15 @@ namespace Shared.Ui.Events.UiCommands
         {
             var editor = _editorCreator.CreateFromFile(file, preferedEditor);
             return editor;
+        }
+
+        public T Execute<T>(PackFile file, EditorEnums? preferedEditor = null) 
+            where T: class, IEditorInterface
+        {
+            var editor = _editorCreator.CreateFromFile(file, preferedEditor);
+            var typed =  editor as T;
+            Guard.IsNotNull(typed, "Editor is not of the expected type. Expected: " + typeof(T).Name + ", Actual: " + editor.GetType().Name);   
+            return typed;
         }
 
         public IEditorInterface Execute(string file, EditorEnums? preferedEditor = null)

@@ -3,6 +3,7 @@ using Editors.KitbasherEditor.ChildEditors.PinTool;
 using Editors.KitbasherEditor.ChildEditors.PinTool.Commands;
 using Editors.KitbasherEditor.ChildEditors.ReRiggingTool;
 using Editors.KitbasherEditor.ChildEditors.VertexDebugger;
+using Editors.KitbasherEditor.Commands;
 using Editors.KitbasherEditor.Core;
 using Editors.KitbasherEditor.Core.MenuBarViews;
 using Editors.KitbasherEditor.EventHandlers;
@@ -56,6 +57,9 @@ namespace Editors.KitbasherEditor
             serviceCollection.AddTransient<WeightedMaterialViewModel>();
             serviceCollection.AddTransient<WsMaterialViewModel>();
 
+            // Commands
+            serviceCollection.AddTransient<AssignMaterialFromOtherMeshCommand>();
+            
             // Mesh fitter
             RegisterWindow<MeshFitterWindow>(serviceCollection);
             serviceCollection.AddTransient<MeshFitterViewModel>();
@@ -108,7 +112,7 @@ namespace Editors.KitbasherEditor
             EditorInfoBuilder
                 .Create<KitbasherViewModel, KitbasherView>(EditorEnums.Kitbash_Editor)
                 .AddExtention(".rigid_model_v2", EditorPriorites.High)
-                //.AddExtention(".variantmeshdefinition", 0)
+                .AddExtention(".variantmeshdefinition", EditorPriorites.Default)
                 .AddExtention(".wsmodel", EditorPriorites.High)
                 .Build(factory);
         }

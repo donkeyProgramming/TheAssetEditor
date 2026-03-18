@@ -16,14 +16,14 @@ namespace Editors.AnimationFragmentEditor.AnimationPack.Converters.AnimationBinW
     public class AnimationBinWh3FileToXmlConverter : XmlToBinaryConverter<XmlFormat, AnimationBinWh3>
     {
         private readonly ISkeletonAnimationLookUpHelper _skeletonAnimationLookUpHelper;
-        private readonly MetaDataTagDeSerializer _metaDataTagDeSerializer;
+        private readonly MetaDataFileParser _metaDataTagDeSerializer;
 
         private string _animationPersistanceMetaFileName = "";
         private readonly Dictionary<string, uint> _animationsVersionFoundInPersistenceMeta = [];
 
         private readonly PackFile _animPackToValidate;
 
-        public AnimationBinWh3FileToXmlConverter(ISkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper, MetaDataTagDeSerializer metaDataTagDeSerializer, PackFile animPackToValidate)
+        public AnimationBinWh3FileToXmlConverter(ISkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper, MetaDataFileParser metaDataTagDeSerializer, PackFile animPackToValidate)
         {
             _skeletonAnimationLookUpHelper = skeletonAnimationLookUpHelper;
             _metaDataTagDeSerializer = metaDataTagDeSerializer;
@@ -238,7 +238,7 @@ namespace Editors.AnimationFragmentEditor.AnimationPack.Converters.AnimationBinW
                 return false;
             }
 
-            var data = theFile.DataSource.PeekData(20);
+            var data = theFile.DataSource.ReadData();
             var headerIsReallyAnimFile = data[0] == 0x06 || data[0] == 0x07 || data[0] == 0x08; //check if version is not 6 7 8 (or just check if it's 2)
             return endsWithAnim && headerIsReallyAnimFile;
         }
@@ -254,7 +254,7 @@ namespace Editors.AnimationFragmentEditor.AnimationPack.Converters.AnimationBinW
                 return false;
             }
 
-            var data = theFile.DataSource.PeekData(20);
+            var data = theFile.DataSource.ReadData();
             var headerIsReallyAnimMetaFile = data[0] == 0x02; //check if version is not 6 7 8 (or just check if it's 2)
             return endsWithDotMeta && headerIsReallyAnimMetaFile;
         }
@@ -270,7 +270,7 @@ namespace Editors.AnimationFragmentEditor.AnimationPack.Converters.AnimationBinW
                 return false;
             }
 
-            var data = theFile.DataSource.PeekData(20);
+            var data = theFile.DataSource.ReadData();
             var headerIsReallyAnimMetaFile = data[0] == 0x02; //check if version is not 6 7 8 (or just check if it's 2)
             return endsWithDotMeta && headerIsReallyAnimMetaFile;
         }
@@ -286,7 +286,7 @@ namespace Editors.AnimationFragmentEditor.AnimationPack.Converters.AnimationBinW
                 return false;
             }
             var data = theFile.DataSource.ReadData();
-            var parsed = new MetaDataFileParser().ParseFile(data, _metaDataTagDeSerializer);
+            var parsed = _metaDataTagDeSerializer.ParseFile(data);
 
             var mainAnimationHeader = GetAnimationHeader(mainAnimationFile, pfs);
             if (mainAnimationHeader == null)
@@ -297,7 +297,7 @@ namespace Editors.AnimationFragmentEditor.AnimationPack.Converters.AnimationBinW
 
             var mainAnimationVersion = mainAnimationHeader.Version;
 
-            var metaItems = parsed.Items;
+            var metaItems = parsed.Attributes;
 
             foreach (var item in metaItems)
             {

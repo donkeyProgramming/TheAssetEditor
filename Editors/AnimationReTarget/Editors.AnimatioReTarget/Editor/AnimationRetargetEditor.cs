@@ -92,7 +92,7 @@ namespace Editors.AnimatioReTarget.Editor
             _source = source.Data;
             _generated = generated.Data;
 
-            generated.IsExpand = false;
+            generated.IsExpanded = false;
             generated.IsEnabled = false;
 
             SceneObjects.Add(target);

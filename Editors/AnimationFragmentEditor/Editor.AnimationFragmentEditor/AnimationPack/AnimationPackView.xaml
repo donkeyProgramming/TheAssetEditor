@@ -23,7 +23,7 @@
         <DockPanel Grid.Column="0" Grid.ColumnSpan="3" Grid.Row="0">
             <Menu DockPanel.Dock="Top">
                 <MenuItem Header="_File">
-                    <MenuItem Header="Save" Command="{Binding Save}"/>
+                    <MenuItem Header="Save" Command="{Binding SaveActionCommand}"/>
                     <Separator/>
                     <MenuItem Header="New AnimationSet (Wh3/3K)"  Command="{Binding CreateEmptyWarhammer3AnimSetFileActionCommand}" />
                     <Separator/>
