@@ -122,9 +122,12 @@ namespace GameWorld.Core.Animation
 
         public int GetBoneIndexByName(string name)
         {
+            if (string.IsNullOrWhiteSpace(name)) return -1;
+
             for (var i = 0; i < BoneNames.Count(); i++)
             {
-                if (BoneNames[i] == name)
+                // 使用 OrdinalIgnoreCase 无视大小写进行匹配，解决 VMD 和 骨骼库 大小写不一致的问题
+                if (string.Equals(BoneNames[i], name, StringComparison.OrdinalIgnoreCase))
                     return i;
             }
 

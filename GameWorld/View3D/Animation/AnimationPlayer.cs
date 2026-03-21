@@ -61,7 +61,7 @@ namespace GameWorld.Core.Animation
         TimeSpanExtension _timeSinceStart;
         AnimationFrame _currentAnimFrame;
         AnimationClip _animationClip;
-        GameSkeleton Skeleton { get { return _skeleton; } }
+        public GameSkeleton Skeleton { get { return _skeleton; } } // 修改：公开 Skeleton
         public AnimationClip AnimationClip { get { return _animationClip; } }
 
         public bool IsPlaying { get; private set; } = true;
@@ -161,7 +161,9 @@ namespace GameWorld.Core.Animation
                 var animationLengthUs = GetAnimationLengthUs();
                 if (animationLengthUs != 0)
                     sampleT = (float)_timeSinceStart.TotalMicrosecondsAsLong / animationLengthUs;
-                _currentAnimFrame = AnimationSampler.Sample(sampleT, _skeleton, _animationClip, AnimationRules, !IsPlaying);
+
+                // 修改：最后传入 false，强制采样器忽略暂停状态，持续输出当前骨骼矩阵
+                _currentAnimFrame = AnimationSampler.Sample(sampleT, _skeleton, _animationClip, AnimationRules, false);
                 _skeleton?.Update();
             }
             catch

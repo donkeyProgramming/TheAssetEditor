@@ -18,6 +18,9 @@ namespace GameWorld.Core.Services
         private readonly ArcBallCamera _arcBallCamera;
         private readonly SceneManager _sceneManager;
 
+        // [ADDED]: Expose the camera to read its ViewMatrix for screen-space dragging
+        public ArcBallCamera Camera => _arcBallCamera;
+
         public FocusSelectableObjectService(SelectionManager selectionManager, ArcBallCamera arcBallCamera, SceneManager sceneManager)
         {
             _selectionManager = selectionManager;
@@ -113,7 +116,6 @@ namespace GameWorld.Core.Services
                 _arcBallCamera.LookAt = averageFacePos + objectPos;
             }
         }
-
 
         public void ResetCamera()
         {

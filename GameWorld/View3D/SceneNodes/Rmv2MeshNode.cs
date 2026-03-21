@@ -11,6 +11,8 @@ using Microsoft.Xna.Framework;
 using Shared.Core.Misc;
 using Shared.GameFormats.RigidModel;
 using Shared.GameFormats.RigidModel.MaterialHeaders;
+using System;
+using System.Linq;
 
 namespace GameWorld.Core.SceneNodes
 {
@@ -24,7 +26,7 @@ namespace GameWorld.Core.SceneNodes
         public MeshObject Geometry { get; set; }
         public RmvCommonHeader CommonHeader { get; set; }
 
- 
+
         public Vector3 Position { get { return _position; } set { _position = value; UpdateMatrix(); } }
         public Vector3 Scale { get { return _scale; } set { _scale = value; UpdateMatrix(); } }
         public Quaternion Orientation { get { return _orientation; } set { _orientation = value; UpdateMatrix(); } }
@@ -39,7 +41,7 @@ namespace GameWorld.Core.SceneNodes
 
         public override Matrix ModelMatrix { get => base.ModelMatrix; set => UpdateModelMatrix(value); }
         public CapabilityMaterial Material { get; set; }
-       
+
 
         bool _isSelectable = true;
         public bool IsSelectable { get => _isSelectable; set => SetAndNotifyWhenChanged(ref _isSelectable, value); }
@@ -47,7 +49,7 @@ namespace GameWorld.Core.SceneNodes
         public AnimationPlayer? AnimationPlayer { get; set; }                               // This is a hack - remove at some point
         public SkeletonBoneAnimationResolver? AttachmentBoneResolver { get; set; } = null;  // This is a hack - remove at some point
 
-    
+
         public Rmv2MeshNode(MeshObject meshObject, IRmvMaterial material, CapabilityMaterial shader, AnimationPlayer animationPlayer)
         {
             RmvMaterial = material;
@@ -58,12 +60,12 @@ namespace GameWorld.Core.SceneNodes
             Name = material.ModelName;
             PivotPoint = material.PivotPoint;
 
-            if(material != null && material is WeightedMaterial weightedMaterial)
+            if (material != null && material is WeightedMaterial weightedMaterial)
                 AnimationMatrixOverride = weightedMaterial.MatrixIndex;
         }
 
         private Rmv2MeshNode() { }
-       
+
         public void Render(RenderEngineComponent renderEngine, Matrix parentWorld)
         {
             var animationCapability = Material.TryGetCapability<AnimationCapability>();
@@ -88,8 +90,22 @@ namespace GameWorld.Core.SceneNodes
                 animationCapability.ApplyAnimation = AnimationPlayer != null && AnimationPlayer.IsEnabled && Geometry.VertexFormat != UiVertexFormat.Static;
             }
 
+            // 修改：注入底层自动吸附判定逻辑
             if (AttachmentBoneResolver != null)
+            {
                 parentWorld = parentWorld * AttachmentBoneResolver.GetWorldTransformIfAnimating();
+            }
+            else if (!string.IsNullOrWhiteSpace(AttachmentPointName) && AnimationPlayer != null && AnimationPlayer.Skeleton != null)
+            {
+                var boneIdx = AnimationPlayer.Skeleton.GetBoneIndexByName(AttachmentPointName);
+                if (boneIdx != -1)
+                {
+                    if (AnimationPlayer.IsEnabled)
+                        parentWorld = parentWorld * AnimationPlayer.Skeleton.GetAnimatedWorldTranform(boneIdx);
+                    else
+                        parentWorld = parentWorld * AnimationPlayer.Skeleton.GetWorldTransform(boneIdx);
+                }
+            }
 
             var modelWithOffset = ModelMatrix * Matrix.CreateTranslation(PivotPoint);
             RenderMatrix = modelWithOffset;
@@ -143,8 +159,8 @@ namespace GameWorld.Core.SceneNodes
             typedTarget.AnimationMatrixOverride = AnimationMatrixOverride;
             typedTarget.Geometry = Geometry.Clone();
             typedTarget.Material = Material.Clone();
-           
-            if(includeMesh)
+
+            if (includeMesh)
                 typedTarget.Geometry = Geometry.Clone();
 
             base.CopyInto(target);

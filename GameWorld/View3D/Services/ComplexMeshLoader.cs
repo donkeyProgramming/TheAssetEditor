@@ -96,7 +96,7 @@ namespace GameWorld.Core.Services
             else
                 parent.AddObject(variantMeshElement);
 
-            
+
             var meshFile = VariantMeshDefinitionLoader.Load(file);
             LoadVariantMesh(meshFile, variantMeshElement, player, attachmentPointName, onlyLoadRootNode, onlyLoadFirstMesh);
         }
@@ -114,7 +114,6 @@ namespace GameWorld.Core.Services
             {
                 var slotNode = root.AddObject(new SlotNode(slot.Name + " " + slot.AttachmentPoint, slot.AttachmentPoint));
 
-               
                 foreach (var childMesh in slot.ChildMeshes)
                 {
                     if (onlyLoadFirstMesh)
@@ -123,8 +122,8 @@ namespace GameWorld.Core.Services
                         if (meshNodes.Any())
                             break;
                     }
-
-                    LoadVariantMesh(childMesh, slotNode, player, attachmentPointName, onlyLoadRootNode, onlyLoadFirstMesh);
+                    // 修改：修复套娃加载时参数传入错误的问题，强制传递 slot.AttachmentPoint
+                    LoadVariantMesh(childMesh, slotNode, player, slot.AttachmentPoint, onlyLoadRootNode, onlyLoadFirstMesh);
                 }
 
                 foreach (var meshReference in slot.ChildReferences)
