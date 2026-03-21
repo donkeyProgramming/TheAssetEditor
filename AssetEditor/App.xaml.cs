@@ -58,8 +58,13 @@ namespace AssetEditor
 
             var localizationManager = _serviceProvider.GetRequiredService<LocalizationManager>();
             localizationManager.GetPossibleLanguages();
-            localizationManager.LoadLanguage("en");
-
+            // 读取保存的语言，如果为空则默认使用 "en"
+            var savedLanguage = settingsService.CurrentSettings.SelectedLangauge;
+            if (string.IsNullOrWhiteSpace(savedLanguage) || savedLanguage == "Not set")
+            {
+                savedLanguage = "en";
+            }
+            localizationManager.LoadLanguage(savedLanguage);
             // Show the settings window if its the first time the tool is ran
             if (settingsService.CurrentSettings.IsFirstTimeStartingApplication)
                 HandleFirstTimeSettings(uiCommandFactory, settingsService);

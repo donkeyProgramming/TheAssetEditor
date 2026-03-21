@@ -1,6 +1,7 @@
-﻿<UserControl x:Class="KitbasherEditor.Views.KitbasherView"
+<UserControl x:Class="KitbasherEditor.Views.KitbasherView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:loc="clr-namespace:Shared.Ui.Common;assembly=Shared.Ui"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:KitbasherEditor.Views"
@@ -59,18 +60,18 @@
                         <StackPanel Orientation="Horizontal">
                             <TextBlock Text="{Binding MenuBar.TransformTool.Text, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" Margin="2,0,2,0"/>
                             <mathviews:Vector3View Width="200" Vector3="{Binding MenuBar.TransformTool.Vector3, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
-                            <Button Content="Apply"
+                            <Button Content="{loc:Loc Kitbash.Bmi.Apply}"
                                     Width="50"
                                     Command="{Binding MenuBar.TransformTool.ApplyCommand}"
                                     IsEnabled="{Binding MenuBar.TransformTool.ButtonEnabled, UpdateSourceTrigger=PropertyChanged}"/> 
                         </StackPanel>
 
                         <DockPanel Margin="2" Visibility="{Binding MenuBar.TransformTool.ShowVertexFalloff.Value, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource BoolToCollapsedConverter}}">
-                            <TextBlock Text="Vertex Fall-of:" DockPanel.Dock="Left" Margin="0,0,4,0"/>
+                            <TextBlock Text="{loc:Loc KitbasherView.VertexFalloff}" DockPanel.Dock="Left" Margin="0,0,4,0"/>
                             <TextBox  DockPanel.Dock="Right"
                                          Text="{Binding MenuBar.TransformTool.VertexMovementFalloff.Value.TextValue, 
                                          UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" VerticalContentAlignment="Center" 
-                                         ToolTip="Fall of distance for selected vertexes">
+                                         ToolTip="{loc:Loc KitbasherView.VertexFalloffTooltip}">
                                 <b:Interaction.Behaviors>
                                     <behaviors:TextBoxInputBehavior InputMode="DecimalInput"/>
                                 </b:Interaction.Behaviors>

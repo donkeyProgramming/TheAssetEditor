@@ -1,6 +1,7 @@
-﻿<UserControl x:Class="CommonControls.Editors.BoneMapping.View.BoneMappingView"
+<UserControl x:Class="CommonControls.Editors.BoneMapping.View.BoneMappingView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:loc="clr-namespace:Shared.Ui.Common;assembly=Shared.Ui"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
@@ -128,17 +129,17 @@
             </Grid.ColumnDefinitions>
 
             <StackPanel  Grid.Row="0" Orientation="Horizontal">
-                <TextBlock  Text="Current model bones - " FontWeight="Bold" FontSize="16" TextDecorations="Underline"/>
+                <TextBlock  Text="{loc:Loc BoneMapping.CurrentModelBones}" FontWeight="Bold" FontSize="16" TextDecorations="Underline"/>
                 <TextBlock  Text="{Binding MeshSkeletonName.Value, UpdateSourceTrigger=PropertyChanged}" FontWeight="Bold" FontSize="16" TextDecorations="Underline"/>
             </StackPanel>
 
 
             <TextBox Grid.Row="1" BorderBrush="Black" Text="{Binding MeshBones.Filter, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
-            <Button Grid.Row="1" Grid.Column ="1"  Content="Clear" IsEnabled="False" />
+            <Button Grid.Row="1" Grid.Column ="1"  Content="{loc:Loc Common.Clear}" IsEnabled="False" />
 
 
             <CheckBox Grid.Row="2" VerticalContentAlignment="Center"
-                      Content="Only show used bones"
+                      Content="{loc:Loc BoneMapping.OnlyShowUsedBones}"
                       IsChecked="{Binding OnlyShowUsedBones.Value, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
 
             <TreeView 
@@ -204,8 +205,8 @@
                         <ColumnDefinition Width=".5*"/>
                         <ColumnDefinition Width=".5*"/>
                     </Grid.ColumnDefinitions>
-                    <Button Grid.Column="0"  Click="{s:MethodBinding AutoMapSelfAndChildrenByName}" Content="Auto map based on name" Margin="0,0,2,0"/>
-                    <Button Grid.Column="1" Click="{s:MethodBinding AutoMapSelfAndChildrenByHierarchy}" Content="Auto map based on hierarchy"/>
+                    <Button Grid.Column="0"  Click="{s:MethodBinding AutoMapSelfAndChildrenByName}" Content="{loc:Loc BoneMapping.AutoMapByName}" Margin="0,0,2,0"/>
+                    <Button Grid.Column="1" Click="{s:MethodBinding AutoMapSelfAndChildrenByHierarchy}" Content="{loc:Loc BoneMapping.AutoMapByHierarchy}"/>
                 </Grid>
                 <Grid Margin="0,2,0,0">
                     <Grid.ColumnDefinitions>
@@ -213,9 +214,9 @@
                         <ColumnDefinition Width=".5*"/>
                         <ColumnDefinition Width=".5*"/>
                     </Grid.ColumnDefinitions>
-                    <Button Grid.Column="0" Click="{s:MethodBinding ClearBindingSelf}" Content="Delete self"/>
-                    <Button Grid.Column="1" Click="{s:MethodBinding ClearBindingSelfAndChildren}" Content="Delete self and children" Margin="2,0,2,0"/>
-                    <Button Grid.Column="2" Click="{s:MethodBinding CopyMappingToAllChildren}" Content="Copy to to all children"/>
+                    <Button Grid.Column="0" Click="{s:MethodBinding ClearBindingSelf}" Content="{loc:Loc BoneMapping.DeleteSelf}"/>
+                    <Button Grid.Column="1" Click="{s:MethodBinding ClearBindingSelfAndChildren}" Content="{loc:Loc BoneMapping.DeleteSelfAndChildren}" Margin="2,0,2,0"/>
+                    <Button Grid.Column="2" Click="{s:MethodBinding CopyMappingToAllChildren}" Content="{loc:Loc BoneMapping.CopyToAllChildren}"/>
                 </Grid>
             </StackPanel>
 
@@ -233,12 +234,12 @@
             </Grid.ColumnDefinitions>
 
             <StackPanel  Grid.Row="0" Orientation="Horizontal">
-                <TextBlock  Text="Target Model Bones - " FontWeight="Bold" FontSize="16" TextDecorations="Underline"/>
+                <TextBlock  Text="{loc:Loc BoneMapping.TargetModelBones}" FontWeight="Bold" FontSize="16" TextDecorations="Underline"/>
                 <TextBlock  Text="{Binding ParentSkeletonName.Value, UpdateSourceTrigger=PropertyChanged}" FontWeight="Bold" FontSize="16" TextDecorations="Underline"/>
             </StackPanel>
 
             <TextBox Grid.Row="1" BorderBrush="Black" Text="{Binding ParentModelBones.Filter, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
-            <Button Grid.Row="1" Grid.Column ="1"  Content="Clear" IsEnabled="False"/>
+            <Button Grid.Row="1" Grid.Column ="1"  Content="{loc:Loc Common.Clear}" IsEnabled="False"/>
             <TreeView 
                 Grid.Row="2"
                 Grid.ColumnSpan="2"

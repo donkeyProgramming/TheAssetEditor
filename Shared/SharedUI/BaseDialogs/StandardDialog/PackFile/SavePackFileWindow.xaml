@@ -1,6 +1,7 @@
-﻿<Window x:Class="Shared.Ui.BaseDialogs.StandardDialog.PackFile.SavePackFileWindow"
+<Window x:Class="Shared.Ui.BaseDialogs.StandardDialog.PackFile.SavePackFileWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:loc="clr-namespace:Shared.Ui.Common"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:packfiletree="clr-namespace:Shared.Ui.BaseDialogs.PackFileTree"
@@ -19,7 +20,7 @@
 
         <packfiletree:PackFileBrowserView Grid.Row="0" Grid.ColumnSpan="2" DataContext="{Binding ViewModel, Mode=OneTime}"/>
 
-        <Button HorizontalAlignment="Right" Margin="5,2,5,2" Width="80" Grid.Row="1" Grid.Column="1" Click="Button_Click">Save</Button>
+        <Button HorizontalAlignment="Right" Margin="5,2,5,2" Width="80" Grid.Row="1" Grid.Column="1" Click="Button_Click" Content="{loc:Loc SettingsWindow.SaveButton}" />
         <TextBox Margin="5,2,5,2" Grid.Row="1" Grid.Column="0" Text="{Binding CurrentFileName, UpdateSourceTrigger=PropertyChanged}" />
     </Grid>
 </Window>

@@ -1,6 +1,7 @@
-﻿<UserControl x:Class="KitbasherEditor.Views.EditorViews.MainEditableNodeView"
+<UserControl x:Class="KitbasherEditor.Views.EditorViews.MainEditableNodeView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:loc="clr-namespace:Shared.Ui.Common;assembly=Shared.Ui"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:filterdialog="clr-namespace:CommonControls.FilterDialog;assembly=Shared.Ui" 
@@ -15,12 +16,12 @@
     <DockPanel  LastChildFill="False">
 
         <DockPanel DockPanel.Dock="Top">
-            <TextBlock  FontSize="20" FontWeight="Bold" >Main Node:</TextBlock>
+            <TextBlock  FontSize="20" FontWeight="Bold"  Text="{loc:Loc MainNode.Title}" />
         </DockPanel>
-        <Expander IsExpanded="True" Header="General" DockPanel.Dock="Top">
+        <Expander IsExpanded="True" Header="{loc:Loc Common.General}" DockPanel.Dock="Top">
             <DockPanel DockPanel.Dock="Top">
                 <DockPanel DockPanel.Dock="Top">
-                    <Label Width ="{StaticResource labelWidth}" Content="Skeleton"/>
+                    <Label Width ="{StaticResource labelWidth}" Content="{loc:Loc SkeletonEditor.Skeleton}"/>
                     <Label>:</Label>
                     <filterdialog:CollapsableFilterControl  VerticalContentAlignment="Center"
                                 SelectedItem="{Binding SkeletonName, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
@@ -31,25 +32,25 @@
                                 DockPanel.Dock="top"
                                 MaxHeight="400"
                                 ShowLabel="false"
-                                LabelText="Target Anim"/>
+                                LabelText="{loc:Loc MainNode.TargetAnim}"/>
                 </DockPanel>
 
                 <DockPanel DockPanel.Dock="Top">
-                    <Label Width ="{StaticResource labelWidth}" Content="Copy textures to pack" />
+                    <Label Width ="{StaticResource labelWidth}" Content="{loc:Loc MainNode.CopyTexturesToPack}" />
                     <Label>:</Label>
-                    <Button Content="Copy" Click="{s:MethodBinding CopyTexturesToOutputPack}" Margin="0,2,2,2" Width="50"/>
-                    <Label Content="Convertion:" Visibility="Collapsed"/>
+                    <Button Content="{loc:Loc Common.Copy}" Click="{s:MethodBinding CopyTexturesToOutputPack}" Margin="0,2,2,2" Width="50"/>
+                    <Label Content="{loc:Loc MainNode.Convertion}" Visibility="Collapsed"/>
                     <ComboBox SelectedValue="None" VerticalAlignment="Center" Visibility="Collapsed"/>
                 </DockPanel>
 
                 <StackPanel Orientation="Horizontal" DockPanel.Dock="Top">
-                    <Label Width ="{StaticResource labelWidth}" DockPanel.Dock="Left" Content="Attachment points"/>
+                    <Label Width ="{StaticResource labelWidth}" DockPanel.Dock="Left" Content="{loc:Loc MainNode.AttachmentPoints}"/>
                     <Label>:</Label>
 
                     <Expander>
                         <Expander.Header>
                             <StackPanel Orientation="Horizontal">
-                                <TextBlock Text="Count = "/>
+                                <TextBlock Text="{loc:Loc Common.Count}"/>
                                 <TextBlock Text="{Binding AttachmentPointList.Count, UpdateSourceTrigger=PropertyChanged}"/>
                             </StackPanel>
                         </Expander.Header>
@@ -58,14 +59,14 @@
                                 
                             <ListView.View>
                                     <GridView>
-                                        <GridViewColumn Header="Bone Id" DisplayMemberBinding="{Binding BoneIndex}" Width="auto"/>
-                                        <GridViewColumn Header="Name" DisplayMemberBinding="{Binding Name}" Width="auto"/>
-                                        <GridViewColumn Header="Use Bone Orientation" DisplayMemberBinding="{Binding IsIdentiy}" Width="auto"/>
+                                        <GridViewColumn Header="{loc:Loc MainNode.BoneId}" DisplayMemberBinding="{Binding BoneIndex}" Width="auto"/>
+                                        <GridViewColumn Header="{loc:Loc Common.Name}" DisplayMemberBinding="{Binding Name}" Width="auto"/>
+                                        <GridViewColumn Header="{loc:Loc MainNode.UseBoneOrientation}" DisplayMemberBinding="{Binding IsIdentiy}" Width="auto"/>
                                     </GridView>
                                 </ListView.View>
                             </ListView>
 
-                            <Button Content="Create AttachmentPoints from Skeleton" Margin="2" Height="25" Command="{Binding ResetAttachmentPointListCommand }"/>
+                            <Button Content="{loc:Loc MainNode.CreateAttachmentPoints}" Margin="2" Height="25" Command="{Binding ResetAttachmentPointListCommand }"/>
                         </StackPanel>
 
                     </Expander>

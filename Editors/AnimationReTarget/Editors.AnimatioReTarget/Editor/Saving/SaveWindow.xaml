@@ -1,6 +1,7 @@
-﻿<Window x:Class="Editors.AnimatioReTarget.Editor.Saving.SaveWindow"
+<Window x:Class="Editors.AnimatioReTarget.Editor.Saving.SaveWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:loc="clr-namespace:Shared.Ui.Common;assembly=Shared.Ui"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:System="clr-namespace:System;assembly=System.Runtime"
@@ -15,31 +16,31 @@
 
     <StackPanel>
         <DockPanel >
-            <Label Content="Save Prefix" Width ="{StaticResource labelWidth}" DockPanel.Dock="Left"/>
+            <Label Content="{loc:Loc AnimReTarget.SavePrefix}" Width ="{StaticResource labelWidth}" DockPanel.Dock="Left"/>
             <Label Content=":" DockPanel.Dock="Left"/>
             <ComboBox Margin="2" DockPanel.Dock="Right" Width="60" 
                       ItemsSource="{Binding PossibleAnimationFormats, UpdateSourceTrigger=PropertyChanged}" 
                       SelectedItem="{Binding AnimationFormat, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
-            <Label Content="Format:" DockPanel.Dock="Right"/>
+            <Label Content="{loc:Loc AnimReTarget.Format}" DockPanel.Dock="Right"/>
             <TextBox Text="{Binding SavePrefix, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" VerticalAlignment="Center" DockPanel.Dock="Left"/>
         </DockPanel>
 
         <DockPanel IsEnabled="False">
-            <Label Content="Use generated skeleton" Width ="{StaticResource labelWidth}"/>
+            <Label Content="{loc:Loc AnimReTarget.UseGeneratedSkeleton}" Width ="{StaticResource labelWidth}"/>
             <Label Content=":"/>
             <CheckBox VerticalContentAlignment="Center" IsChecked="{Binding UseScaledSkeletonName, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
-            <Button Content="Export Mesh/skeleton at scale" Command="{Binding ExportScaledMesh}"  DockPanel.Dock="Right" Margin="2"/>
+            <Button Content="{loc:Loc AnimReTarget.ExportMesh}" Command="{Binding ExportScaledMesh}"  DockPanel.Dock="Right" Margin="2"/>
             <TextBox Text="{Binding ScaledSkeletonName, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" VerticalAlignment="Center"/>
         </DockPanel>
 
         <DockPanel>
-            <Button Click="SaveButtonClick">Save</Button>
+            <Button Click="SaveButtonClick" Content="{loc:Loc SettingsWindow.SaveButton}" />
         </DockPanel>
         <DockPanel IsEnabled="False">
-            <Button>Batch export</Button>
+            <Button Content="{loc:Loc AnimReTarget.BatchExport}" />
         </DockPanel>
         <DockPanel>
-            <Button Click="CloseButtonClick">Close</Button>
+            <Button Click="CloseButtonClick" Content="{loc:Loc MainWindow.Titlebar.Close}" />
         </DockPanel>
     </StackPanel>
 

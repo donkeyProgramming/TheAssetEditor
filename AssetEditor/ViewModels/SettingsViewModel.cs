@@ -40,7 +40,7 @@ namespace AssetEditor.ViewModels
             _localizationManager = localizationManager;
 
             AvailableLangauges = new ObservableCollection<string>(_localizationManager.GetPossibleLanguages());
-            SelectedLanguage = _localizationManager.SelectedLangauge;
+            SelectedLanguage = _settingsService.CurrentSettings.SelectedLangauge;
 
             AvailableThemes = new ObservableCollection<ThemeType>((ThemeType[])Enum.GetValues(typeof(ThemeType)));
             CurrentTheme = _settingsService.CurrentSettings.Theme;
