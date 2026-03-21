@@ -194,10 +194,22 @@ namespace Editors.AnimationMeta.SuperView.Visualisation
             loadedNode.ScaleMult = animatedPropMeta.Scale;
 
             // Add the animation rules
+            // Add the animation rules
             var animationRule = new CopyRootTransform(rootSkeleton, animatedPropMeta.BoneId, animatedPropMeta.Position, new Quaternion(animatedPropMeta.Orientation));
             propPlayer.AnimationRules.Add(animationRule);
-            if(rootPlayer.IsPlaying)
+
+            // [FIX 1]: Force IsEnabled to true. Otherwise, if paused, Refresh() will return immediately and the bone transform won't calculate.
+            propPlayer.IsEnabled = true;
+
+            // Sync the exact frame to prevent the prop from resetting its own animation.
+            propPlayer.CurrentFrame = rootPlayer.CurrentFrame;
+
+            // Inherit the play/pause state from the root player.
+            if (rootPlayer.IsPlaying)
                 propPlayer.Play();
+            else
+                propPlayer.Pause();
+
             propPlayer.Refresh();
 
             // Add to scene
@@ -287,17 +299,36 @@ namespace Editors.AnimationMeta.SuperView.Visualisation
             var node = new SimpleDrawableNode("Effect:" + effect.VfxName);
 
             var locatorScale = 0.3f;
-            node.AddItem(LineHelper.AddRgbLocator(effect.Position, locatorScale));
+            var textOffset = locatorScale * 0.5f + 0.01f;
+
+            // 获取特效的旋转并生成变换矩阵 (基于四元数)
+            Quaternion rotationQuat = new Quaternion(effect.Orientation);
+            Matrix rotMatrix = Matrix.CreateFromQuaternion(rotationQuat);
+
+            // 将全局标准轴乘以旋转矩阵，计算出特效当前的局部坐标轴向
+            Vector3 localX = Vector3.Transform(Vector3.UnitX, rotMatrix);
+            Vector3 localY = Vector3.Transform(Vector3.UnitY, rotMatrix);
+            Vector3 localZ = Vector3.Transform(Vector3.UnitZ, rotMatrix);
+
+            // 绘制受旋转影响的三根轴线 (红=X, 绿=Y, 蓝=Z)
+            node.AddItem(LineHelper.AddLine(effect.Position, effect.Position + localX * locatorScale, Color.Red));
+            node.AddItem(LineHelper.AddLine(effect.Position, effect.Position + localY * locatorScale, Color.Green));
+            node.AddItem(LineHelper.AddLine(effect.Position, effect.Position + localZ * locatorScale, Color.Blue));
+
+            // 添加特效名称标签（原点）
             node.AddItem(new WorldTextRenderItem(_resourceLibrary, effect.VfxName, effect.Position, color));
-            node.AddItem(new WorldTextRenderItem(_resourceLibrary, "X", effect.Position + new Vector3(locatorScale * .5f + 0.01f,0,0), Color.Red));
-            node.AddItem(new WorldTextRenderItem(_resourceLibrary, "Y", effect.Position + new Vector3(0, locatorScale * .5f + 0.01f, 0), Color.Green));
-            node.AddItem(new WorldTextRenderItem(_resourceLibrary, "Z", effect.Position + new Vector3(0,0,locatorScale * .5f + 0.01f), Color.Blue));
+
+            // 添加跟随轴向旋转的 XYZ 文本标签
+            node.AddItem(new WorldTextRenderItem(_resourceLibrary, "X", effect.Position + localX * textOffset, Color.Red));
+            node.AddItem(new WorldTextRenderItem(_resourceLibrary, "Y", effect.Position + localY * textOffset, Color.Green));
+            node.AddItem(new WorldTextRenderItem(_resourceLibrary, "Z", effect.Position + localZ * textOffset, Color.Blue));
 
             root.AddObject(node);
 
             var instance = new DrawableMetaInstance(effect.EffectStartTime, effect.EffectEndTime, node.Name, node);
             if (effect.Tracking)
                 instance.FollowBone(skeleton, effect.NodeIndex);
+
             return instance;
         }
     }

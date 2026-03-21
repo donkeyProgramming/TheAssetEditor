@@ -1,12 +1,13 @@
-﻿<Window x:Class="Editors.ImportExport.Exporting.Presentation.ExportWindow"
+<Window x:Class="Editors.ImportExport.Exporting.Presentation.ExportWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:loc="clr-namespace:Shared.Ui.Common;assembly=Shared.Ui"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Editors.ImportExport.Exporting.Presentation"
         mc:Ignorable="d"
         Style="{StaticResource CustomWindowStyle}"
-        Title="Export" Height="350" Width="600">
+        Title="{loc:Loc Export.Export}" Height="350" Width="600">
 
     <Grid Margin="4">
         <Grid.ColumnDefinitions>
@@ -24,16 +25,16 @@
             <RowDefinition Height="auto"/>
         </Grid.RowDefinitions>
 
-        <TextBlock Grid.Row="0" Grid.Column="0" Text="System Path" HorizontalAlignment="Left"/>
+        <TextBlock Grid.Row="0" Grid.Column="0" Text="{loc:Loc Export.SystemPath}" HorizontalAlignment="Left"/>
         <TextBlock Grid.Row="0" Grid.Column="1" Text=": "/>
         <TextBox Grid.Row="0" Grid.Column="2" Text="{Binding SystemPath}" HorizontalContentAlignment="Right" IsReadOnly="True"/>
-        <Button Grid.Row="0" Grid.Column="3" Content="Browse" Command="{Binding BrowsePathCommandCommand}"/>
+        <Button Grid.Row="0" Grid.Column="3" Content="{loc:Loc Kitbash.SaveDialog.Browse}" Command="{Binding BrowsePathCommandCommand}"/>
 
-        <TextBlock Grid.Row="1" Grid.Column="0" Text="Create Import project   " HorizontalAlignment="Left"/>
+        <TextBlock Grid.Row="1" Grid.Column="0" Text="{loc:Loc Import.CreateProject}" HorizontalAlignment="Left"/>
         <TextBlock Grid.Row="1" Grid.Column="1" Text=": "/>
         <CheckBox Grid.Row="1" Grid.Column="2" HorizontalAlignment="Left" IsChecked="{Binding CreateImportProject, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
 
-        <TextBlock Grid.Row="2" Grid.Column="0" Text="Available Exporters" HorizontalAlignment="Left"/>
+        <TextBlock Grid.Row="2" Grid.Column="0" Text="{loc:Loc Export.AvailableExporters}" HorizontalAlignment="Left"/>
         <TextBlock Grid.Row="2" Grid.Column="1" Text=": "/>
         <ComboBox Grid.Row="2" Grid.Column="2"  HorizontalContentAlignment="Right"
                 ItemsSource="{Binding PossibleExporters, UpdateSourceTrigger=PropertyChanged}"
@@ -45,7 +46,7 @@
                       Content="{Binding SelectedExporter, UpdateSourceTrigger=PropertyChanged}"       
                       ContentTemplateSelector="{StaticResource ViewTemplateDataSelector}"/>
 
-        <Button Grid.Row="4" Grid.ColumnSpan="4" Content="Export" Click="ExportButton_Click"/>
+        <Button Grid.Row="4" Grid.ColumnSpan="4" Content="{loc:Loc Export.Export}" Click="ExportButton_Click"/>
 
     </Grid>
 </Window>

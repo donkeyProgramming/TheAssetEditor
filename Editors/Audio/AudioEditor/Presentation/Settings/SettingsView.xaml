@@ -1,7 +1,8 @@
-﻿<UserControl 
+<UserControl 
     x:Class="Editors.Audio.AudioEditor.Presentation.Settings.SettingsView"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:loc="clr-namespace:Shared.Ui.Common;assembly=Shared.Ui"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:sys="clr-namespace:System;assembly=netstandard"
@@ -49,7 +50,7 @@
             Grid.Column="0"
             Grid.ColumnSpan="2"
             Margin="0, 0, 0, 5"
-            Content="Settings"/>
+            Content="{loc:Loc MenuBar.Settings}"/>
 
         <Grid
             Grid.Row="1"
@@ -73,8 +74,8 @@
                 Width="100" 
                 VerticalAlignment="Center" 
                 HorizontalAlignment="Left"
-                Content="Reset Settings" 
-                ToolTip="Resets all settings to default."
+                Content="{loc:Loc AudioEditorSettings.ResetSettings}" 
+                ToolTip="{loc:Loc AudioEditorSettings.ResetSettingsTooltip}"
                 Command="{Binding ResetSettingsCommand}"/>
 
             <Button 
@@ -82,7 +83,7 @@
                 Width="190" 
                 Margin="5, 0, 0, 5" 
                 VerticalAlignment="Center"
-                Content="Set Recommended VO Settings"
+                Content="{loc:Loc AudioEditorSettings.SetRecommendedVO}"
                 ToolTipService.ShowOnDisabled="True"
                 Command="{Binding SetRecommendedVOSettingsCommand}"
                 IsEnabled="{Binding IsSetRecommendedVOSettingsEnabled}">
@@ -107,8 +108,8 @@
                 Width="130" 
                 Margin="5, 0, 0, 5" 
                 VerticalAlignment="Center"
-                Content="Remove Audio Files"
-                ToolTip="Remove the selected Audio Files from the Settings."
+                Content="{loc:Loc AudioEditorSettings.RemoveAudioFiles}"
+                ToolTip="{loc:Loc AudioEditorSettings.RemoveAudioFilesTooltip}"
                 ToolTipService.ShowOnDisabled="True"
                 Command="{Binding RemoveSelectedAudioFilesCommand}"
                 IsEnabled="{Binding IsRemoveAudioFilesEnabled}">
@@ -116,8 +117,8 @@
             
             <CheckBox 
                 Grid.Column="3"
-                Content="Show Settings from Audio Project Viewer"
-                ToolTip="When selecting items in the Audio Project Viewer with the selected the settings displayed will be that item's settings. When this is not selected the settings displayed will be the settings of the item in the Audio Project Editor." 
+                Content="{loc:Loc AudioEditorSettings.ShowSettingsViewer}"
+                ToolTip="{loc:Loc AudioEditorSettings.ShowSettingsViewerTooltip}" 
                 Margin="5, 0, 0, 5" 
                 VerticalAlignment="Center" 
                 IsChecked="{Binding ShowSettingsFromAudioProjectViewer, Mode=TwoWay}" 
@@ -156,7 +157,7 @@
                             Margin="10, 5, 10, 5">
 
                             <TextBlock 
-                                Text="Audio Files"
+                                Text="{loc:Loc AudioEditorSettings.AudioFiles}"
                                 VerticalAlignment="Center"
                                 Margin="-5, 0, 10, 0" />
                         </DockPanel>
@@ -175,11 +176,11 @@
                         <ListView.View>
                             <GridView>
                                 <GridViewColumn 
-                                    Header="File Name" 
+                                    Header="{loc:Loc AudioEditorSettings.FileName}" 
                                     DisplayMemberBinding="{Binding WavPackFileName}"
                                     Width="Auto"/>
                                 <GridViewColumn 
-                                    Header="File Path" 
+                                    Header="{loc:Loc AudioEditorSettings.FilePath}" 
                                     DisplayMemberBinding="{Binding WavPackFilePath}"
                                     Width="Auto"/>
                             </GridView>
@@ -206,7 +207,7 @@
                             Margin="10, 5, 10, 5">
 
                             <TextBlock 
-                                Text="Hirc Settings"
+                                Text="{loc:Loc AudioEditorSettings.HircSettings}"
                                 VerticalAlignment="Center"
                                 Margin="-5, 0, 10, 0"/>
                         </DockPanel>
@@ -249,7 +250,7 @@
                             Grid.Row="0"
                             Grid.Column="0"
                             Margin="10, 0, 5, 5"
-                            Text="Container Type"
+                            Text="{loc:Loc AudioEditorSettings.ContainerType}"
                             Visibility="{Binding IsContainerTypeVisible, Converter={StaticResource BoolToVisibilityConverter}}">
                             <TextBlock.ToolTip>
                                 <ToolTip>
@@ -279,7 +280,7 @@
                             Grid.Row="1"
                             Grid.Column="0"
                             Margin="10, 0, 5, 5"
-                            Text="Random Type"
+                            Text="{loc:Loc AudioEditorSettings.RandomType}"
                             Visibility="{Binding IsRandomTypeVisible, Converter={StaticResource BoolToVisibilityConverter}}">
                             <TextBlock.ToolTip>
                                 <ToolTip>
@@ -309,7 +310,7 @@
                             Grid.Row="2"
                             Grid.Column="0"
                             Margin="10, 0, 5, 5"
-                            Content="Repetition Interval"
+                            Content="{loc:Loc AudioEditorSettings.RepetitionInterval}"
                             IsChecked="{Binding EnableRepetitionInterval, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
                             IsEnabled="{Binding IsEnableRepetitionIntervalEnabled}"
                             Visibility="{Binding IsRepetitionIntervalVisible, Converter={StaticResource BoolToVisibilityConverter}}">
@@ -344,7 +345,7 @@
                             Grid.Row="3"
                             Grid.Column="0"
                             Margin="10, 0, 5, 5"
-                            Text="Playlist End Behaviour"
+                            Text="{loc:Loc AudioEditorSettings.PlaylistEndBehaviour}"
                             Visibility="{Binding IsPlaylistEndBehaviourVisible, Converter={StaticResource BoolToVisibilityConverter}}">
                             <TextBlock.ToolTip>
                                 <ToolTip>
@@ -374,7 +375,7 @@
                             Grid.Row="4"
                             Grid.Column="0"
                             Margin="10, 0, 5, 5"
-                            Text="Play Mode"
+                            Text="{loc:Loc AudioEditorSettings.PlayMode}"
                             Visibility="{Binding IsPlayModeVisible, Converter={StaticResource BoolToVisibilityConverter}}">
                             <TextBlock.ToolTip>
                                 <ToolTip>
@@ -404,8 +405,8 @@
                             Grid.Row="5"
                             Grid.Column="0"
                             Margin="10, 0, 5, 5"
-                            Text="Always Reset Container"
-                            ToolTip="Always Reset Container determines whether playback continues or returns to the start of the playlist when a container is replayed after being stopped during playback."
+                            Text="{loc:Loc AudioEditorSettings.AlwaysResetContainer}"
+                            ToolTip="{loc:Loc AudioEditorSettings.AlwaysResetContainerTooltip}"
                             Visibility="{Binding IsAlwaysResetPlaylistVisible, Converter={StaticResource BoolToVisibilityConverter}}"/>
 
                         <CheckBox
@@ -420,7 +421,7 @@
                             Grid.Row="6"
                             Grid.Column="0"
                             Margin="10, 1, 5, 5"
-                            Text="Looping Type"
+                            Text="{loc:Loc AudioEditorSettings.LoopingType}"
                             Visibility="{Binding IsLoopingTypeVisible, Converter={StaticResource BoolToVisibilityConverter}}">
                             <TextBlock.ToolTip>
                                 <ToolTip>
@@ -452,8 +453,8 @@
                             Grid.Row="7"
                             Grid.Column="0"
                             Margin="10, 1, 5, 5"
-                            Text="Number of Loops"
-                            ToolTip="The Number of Loops determines how many times a container is played if Looping Type is set to Finite Looping."
+                            Text="{loc:Loc AudioEditorSettings.NumberOfLoops}"
+                            ToolTip="{loc:Loc AudioEditorSettings.NumberOfLoopsTooltip}"
                             Visibility="{Binding IsNumberOfLoopsVisible, Converter={StaticResource BoolToVisibilityConverter}}"/>
 
                         <ExtendedWpfToolkit:IntegerUpDown
@@ -471,7 +472,7 @@
                             Grid.Row="8"
                             Grid.Column="0"
                             Margin="10, 1, 5, 5"
-                            Text="Transition Type"
+                            Text="{loc:Loc AudioEditorSettings.TransitionType}"
                             Visibility="{Binding IsTransitionTypeVisible, Converter={StaticResource BoolToVisibilityConverter}}">
                             <TextBlock.ToolTip>
                                 <ToolTip>
@@ -509,7 +510,7 @@
                             Grid.Row="9"
                             Grid.Column="0"
                             Margin="10, 1, 5, 5"
-                            Text="Transition Duration"
+                            Text="{loc:Loc AudioEditorSettings.TransitionDuration}"
                             Visibility="{Binding IsTransitionDurationVisible, Converter={StaticResource BoolToVisibilityConverter}}">
                             <TextBlock.ToolTip>
                                 <ToolTip>

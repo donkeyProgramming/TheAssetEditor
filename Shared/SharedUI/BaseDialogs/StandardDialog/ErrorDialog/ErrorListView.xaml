@@ -1,6 +1,7 @@
-﻿<UserControl x:Class="CommonControls.BaseDialogs.ErrorListDialog.ErrorListView"
+<UserControl x:Class="CommonControls.BaseDialogs.ErrorListDialog.ErrorListView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:loc="clr-namespace:Shared.Ui.Common"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              mc:Ignorable="d" 
@@ -25,19 +26,19 @@
                     
                     <GridViewColumn DisplayMemberBinding="{Binding Path=ErrorType}">
                         <GridViewColumn.Header>
-                            <GridViewColumnHeader Content="Error" Padding="5,0,0,0" Width="auto" HorizontalContentAlignment="Left" Name="ErrorType"/>
+                            <GridViewColumnHeader Content="{loc:Loc ErrorWindow.Title}" Padding="5,0,0,0" Width="auto" HorizontalContentAlignment="Left" Name="ErrorType"/>
                         </GridViewColumn.Header>
                     </GridViewColumn>
 
                     <GridViewColumn DisplayMemberBinding="{Binding Path=ItemName}">
                         <GridViewColumn.Header>
-                            <GridViewColumnHeader Content="Item" Padding="5,0,0,0" Width="auto" HorizontalContentAlignment="Left" Name="ItemName" />
+                            <GridViewColumnHeader Content="{loc:Loc ErrorList.Item}" Padding="5,0,0,0" Width="auto" HorizontalContentAlignment="Left" Name="ItemName" />
                         </GridViewColumn.Header>
                     </GridViewColumn>
 
                     <GridViewColumn DisplayMemberBinding="{Binding Path=Description}">
                         <GridViewColumn.Header>
-                            <GridViewColumnHeader Content="Description" Padding="5,0,0,0" Width="auto" HorizontalContentAlignment="Left" Name="Description" />
+                            <GridViewColumnHeader Content="{loc:Loc ErrorList.Description}" Padding="5,0,0,0" Width="auto" HorizontalContentAlignment="Left" Name="Description" />
                         </GridViewColumn.Header>
                     </GridViewColumn>
 

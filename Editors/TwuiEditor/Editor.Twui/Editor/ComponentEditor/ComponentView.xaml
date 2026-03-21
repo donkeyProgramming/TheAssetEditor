@@ -1,6 +1,7 @@
-﻿<UserControl x:Class="Editors.Twui.Editor.ComponentEditor.ComponentView"
+<UserControl x:Class="Editors.Twui.Editor.ComponentEditor.ComponentView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:loc="clr-namespace:Shared.Ui.Common;assembly=Shared.Ui"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:basedialogs="clr-namespace:Shared.Ui.BaseDialogs;assembly=Shared.Ui" xmlns:System="clr-namespace:System;assembly=mscorlib" xmlns:mathviews="clr-namespace:Shared.Ui.BaseDialogs.MathViews;assembly=Shared.Ui" xmlns:componenteditor="clr-namespace:Editors.Twui.Editor.ComponentEditor"
@@ -15,9 +16,9 @@
 
 
     <DockPanel LastChildFill="False">
-        <basedialogs:AutoAeAttribute InnerContent="{Binding SelectedComponentViewModel.TestString, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"  LabelText="String" DockPanel.Dock="Top"  LabelWidth="{StaticResource labelWidth}"/>
-        <basedialogs:AutoAeAttribute  InnerContent="{Binding SelectedComponentViewModel.TestFloat, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"  LabelText="Float" DockPanel.Dock="Top"  LabelWidth="{StaticResource labelWidth}"/>
-        <basedialogs:AutoAeAttribute  InnerContent="{Binding SelectedComponentViewModel.TextVector2, UpdateSourceTrigger=PropertyChanged}"  LabelText="Vector2" DockPanel.Dock="Top"  LabelWidth="{StaticResource labelWidth}"/>
-        <basedialogs:AutoAeAttribute  InnerContent="{Binding SelectedComponentViewModel.TestBool, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"  LabelText="Bool" DockPanel.Dock="Top"  LabelWidth="{StaticResource labelWidth}"/>
+        <basedialogs:AutoAeAttribute InnerContent="{Binding SelectedComponentViewModel.TestString, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"  LabelText="{loc:Loc TwuiEditor.Component.String}" DockPanel.Dock="Top"  LabelWidth="{StaticResource labelWidth}"/>
+        <basedialogs:AutoAeAttribute  InnerContent="{Binding SelectedComponentViewModel.TestFloat, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"  LabelText="{loc:Loc TwuiEditor.Component.Float}" DockPanel.Dock="Top"  LabelWidth="{StaticResource labelWidth}"/>
+        <basedialogs:AutoAeAttribute  InnerContent="{Binding SelectedComponentViewModel.TextVector2, UpdateSourceTrigger=PropertyChanged}"  LabelText="{loc:Loc TwuiEditor.Component.Vector2}" DockPanel.Dock="Top"  LabelWidth="{StaticResource labelWidth}"/>
+        <basedialogs:AutoAeAttribute  InnerContent="{Binding SelectedComponentViewModel.TestBool, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"  LabelText="{loc:Loc TwuiEditor.Component.Bool}" DockPanel.Dock="Top"  LabelWidth="{StaticResource labelWidth}"/>
     </DockPanel>
 </UserControl>

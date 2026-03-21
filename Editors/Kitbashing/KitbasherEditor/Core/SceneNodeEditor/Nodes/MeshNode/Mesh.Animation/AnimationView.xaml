@@ -1,6 +1,7 @@
-﻿<UserControl x:Class="KitbasherEditor.Views.EditorViews.Rmv2.AnimationView"
+<UserControl x:Class="KitbasherEditor.Views.EditorViews.Rmv2.AnimationView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:loc="clr-namespace:Shared.Ui.Common;assembly=Shared.Ui"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:System="clr-namespace:System;assembly=mscorlib"
@@ -13,25 +14,25 @@
     <Expander DockPanel.Dock="Top" IsExpanded="False">
         <Expander.Header>
             <StackPanel Orientation="Horizontal">
-                <TextBlock Text="Animation" FontWeight="Bold" Margin="3"/>
+                <TextBlock Text="{loc:Loc AnimationPlayer.Animation}" FontWeight="Bold" Margin="3"/>
             </StackPanel>
         </Expander.Header>
 
         <DockPanel LastChildFill="False" >
             <StackPanel Orientation="Horizontal" DockPanel.Dock="Top">
-                <Label Width ="{StaticResource labelWidth}" DockPanel.Dock="Left" Content="Skeleton Name"/>
+                <Label Width ="{StaticResource labelWidth}" DockPanel.Dock="Left" Content="{loc:Loc Rmv2AnimationView.SkeletonName}"/>
                 <Label>:</Label>
                 <TextBlock  Text="{Binding Animation.SkeletonName}"  VerticalAlignment="Center"/>
             </StackPanel>
 
             <StackPanel Orientation="Horizontal" DockPanel.Dock="Top">
-                <Label Width ="{StaticResource labelWidth}" DockPanel.Dock="Left" Content="Bones"/>
+                <Label Width ="{StaticResource labelWidth}" DockPanel.Dock="Left" Content="{loc:Loc Rmv2AnimationView.Bones}"/>
                 <Label>:</Label>
                 <StackPanel>
                     <Expander>
                         <Expander.Header>
                             <StackPanel Orientation="Horizontal">
-                                <TextBlock Text="Count = "/>
+                                <TextBlock Text="{loc:Loc Common.Count}"/>
                                 <TextBlock Text="{Binding Animation.AnimatedBones.Count, UpdateSourceTrigger=PropertyChanged}"/>
 
                             </StackPanel>
@@ -42,8 +43,8 @@
 
                                 <ListView.View>
                                     <GridView>
-                                        <GridViewColumn Header="Name" DisplayMemberBinding="{Binding Name.Value}"/>
-                                        <GridViewColumn Header="BoneIndex" DisplayMemberBinding="{Binding BoneIndex.Value}"/>
+                                        <GridViewColumn Header="{loc:Loc Common.Name}" DisplayMemberBinding="{Binding Name.Value}"/>
+                                        <GridViewColumn Header="{loc:Loc Rmv2AnimationView.BoneIndex}" DisplayMemberBinding="{Binding BoneIndex.Value}"/>
                                     </GridView>
                                 </ListView.View>
 
@@ -56,7 +57,7 @@
 
 
             <DockPanel DockPanel.Dock="Top" >
-                <Label Width ="{StaticResource labelWidth}" DockPanel.Dock="Left" Content="Attach To"/>
+                <Label Width ="{StaticResource labelWidth}" DockPanel.Dock="Left" Content="{loc:Loc Rmv2AnimationView.AttachTo}"/>
                 <Label>:</Label>
                 <ComboBox
                           IsEditable="True"
@@ -70,7 +71,7 @@
             </DockPanel>
 
             <DockPanel DockPanel.Dock="Top"  >
-                <Label Width ="{StaticResource labelWidth}" DockPanel.Dock="Left" Content="Animation Matrix "/>
+                <Label Width ="{StaticResource labelWidth}" DockPanel.Dock="Left" Content="{loc:Loc Rmv2AnimationView.AnimationMatrix}"/>
                 <Label>:</Label>
                 <TextBox DockPanel.Dock="Top" Margin="0,2,0,2"  Text="{Binding Animation.AnimationMatrixOverride, UpdateSourceTrigger=LostFocus}" MaxLength="8"  VerticalContentAlignment="Center" Width="100" HorizontalAlignment="Left" HorizontalContentAlignment="Right"/>
             </DockPanel>

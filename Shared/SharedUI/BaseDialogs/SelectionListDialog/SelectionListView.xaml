@@ -1,6 +1,7 @@
-﻿<UserControl x:Class="CommonControls.SelectionListDialog.SelectionListView"
+<UserControl x:Class="CommonControls.SelectionListDialog.SelectionListView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:loc="clr-namespace:Shared.Ui.Common"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:CommonControls.SelectionListDialog"
@@ -30,7 +31,7 @@
 
             <ListView.View>
                 <GridView>
-                    <GridViewColumn Header="IsChecked">
+                    <GridViewColumn Header="{loc:Loc SelectionList.IsChecked}">
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
                                 <CheckBox Margin="5, 0" IsChecked="{Binding IsChecked.Value, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
@@ -38,7 +39,7 @@
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>
 
-                    <GridViewColumn Header="Name">
+                    <GridViewColumn Header="{loc:Loc Common.Name}">
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
                                 <TextBlock Margin="5, 0" Text="{Binding DisplayName}"/>
