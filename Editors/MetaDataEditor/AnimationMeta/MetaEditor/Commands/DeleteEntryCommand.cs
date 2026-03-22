@@ -7,26 +7,14 @@ namespace Editors.AnimationMeta.MetaEditor.Commands
     {
         public void Execute(MetaDataEditorViewModel controller)
         {
-            if (controller.ParsedFile == null) return;
+            var itemToRemove = controller.SelectedAttribute;
+            if (itemToRemove == null || controller.ParsedFile == null)
+                return;
 
-            // Get all selected items from the UI tags
-            var itemsToRemove = controller.Tags
-                .Where(x => x.IsSelected)
-                .Select(x => x._input)
-                .ToList();
-
-            if (!itemsToRemove.Any()) return;
-
-            // Batch remove all selected tags
-            foreach (var item in itemsToRemove)
-            {
-                controller.ParsedFile.Attributes.Remove(item);
-            }
-
+            controller.ParsedFile.Attributes.Remove(itemToRemove);
             controller.UpdateView();
-
-            // Select the first item by default after deletion
             controller.SelectedTag = controller.Tags.FirstOrDefault();
         }
+
     }
 }
