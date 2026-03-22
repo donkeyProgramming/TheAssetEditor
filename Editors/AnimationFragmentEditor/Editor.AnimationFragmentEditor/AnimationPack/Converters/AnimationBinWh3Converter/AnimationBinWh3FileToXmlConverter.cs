@@ -301,9 +301,8 @@ namespace Editors.AnimationFragmentEditor.AnimationPack.Converters.AnimationBinW
 
             foreach (var item in metaItems)
             {
-                if (item.DisplayName.Contains("SPLICE"))
+                if (item.DisplayName.Contains("SPLICE") && item is Splice_v11 splice)
                 {
-                    var splice = (Splice_v11)item;
                     var animPath = splice.Animation;
                     if (animPath == null || animPath == "")
                     {
