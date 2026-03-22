@@ -31,16 +31,16 @@ namespace Editors.AnimationMeta.SuperView
         [ObservableProperty] int _selectedTabControllerIndex = 0;
         public override Type EditorViewModelType => typeof(EditorView);
         public bool HasUnsavedChanges
-        { 
-            get 
+        {
+            get
             {
                 return PersistentMetaEditor.HasUnsavedChanges || MetaEditor.HasUnsavedChanges;
             }
-            set 
+            set
             {
                 PersistentMetaEditor.HasUnsavedChanges = value;
                 MetaEditor.HasUnsavedChanges = value;
-            } 
+            }
         }
 
 
@@ -87,8 +87,8 @@ namespace Editors.AnimationMeta.SuperView
         {
             PersistentMetaEditor = new MetaDataEditorViewModel(_uiCommandFactory, _metaDataFileParser, _eventHub);
             MetaEditor = new MetaDataEditorViewModel(_uiCommandFactory, _metaDataFileParser, _eventHub);
-            
-            var assetViewModel = _sceneObjectViewModelBuilder.CreateAsset("SuperViewRoot", true, "Root", Color.Black,null);
+
+            var assetViewModel = _sceneObjectViewModelBuilder.CreateAsset("SuperViewRoot", true, "Root", Color.Black, null);
             SceneObjects.Add(assetViewModel);
 
             assetViewModel.Data.MetaDataChanged += OnMetaDataChanged;
@@ -97,7 +97,7 @@ namespace Editors.AnimationMeta.SuperView
             OnSceneObjectUpdated(new SceneObjectUpdateEvent(_asset.Data, false, false, false, true));
         }
 
-    
+
 
         void RecreateMetaDataInformation()
         {

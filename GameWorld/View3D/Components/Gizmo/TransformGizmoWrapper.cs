@@ -37,6 +37,36 @@ namespace GameWorld.Core.Components.Gizmo
         Matrix _totalGizomTransform = Matrix.Identity;
         bool _invertedWindingOrder = false;
 
+        private IGizmoTransformable _activeTarget;
+        private Matrix _initialMatrix;
+        private Vector3 _trueWorldPivot;
+
+        private Vector3 _lastWorldDeltaPos = Vector3.Zero;
+        private Quaternion _lastWorldDeltaRot = Quaternion.Identity;
+
+        public IGizmoTransformable ActiveTarget => _activeTarget;
+
+        public bool HasValidTarget
+        {
+            get
+            {
+                if (_activeTarget != null) return true;
+                if (_selectionState == null) return false;
+
+                var mode = _selectionState.Mode;
+                if (mode != GeometrySelectionMode.Object &&
+                    mode != GeometrySelectionMode.Face &&
+                    mode != GeometrySelectionMode.Vertex &&
+                    mode != GeometrySelectionMode.Bone) return false;
+
+                if (_selectionState is ObjectSelectionState objState) return objState.CurrentSelection().Any();
+                if (_selectionState is VertexSelectionState vState) return vState.SelectedVertices.Count > 0;
+                if (_selectionState is BoneSelectionState bState) return bState.SelectedBones.Count > 0;
+
+                return false;
+            }
+        }
+
         public TransformGizmoWrapper(CommandFactory commandFactory, List<MeshObject> effectedObjects, ISelectionState vertexSelectionState)
         {
             _commandFactory = commandFactory;
@@ -45,19 +75,13 @@ namespace GameWorld.Core.Components.Gizmo
             if (_selectionState as ObjectSelectionState != null)
             {
                 _effectedObjects = effectedObjects;
-
-                foreach (var item in _effectedObjects)
-                    Position += item.MeshCenter;
-
+                foreach (var item in _effectedObjects) Position += item.MeshCenter;
                 Position = Position / _effectedObjects.Count;
             }
             if (_selectionState is VertexSelectionState vertSelectionState)
             {
                 _effectedObjects = effectedObjects;
-
-                for (var i = 0; i < vertSelectionState.SelectedVertices.Count; i++)
-                    Position += _effectedObjects[0].GetVertexById(vertSelectionState.SelectedVertices[i]);
-
+                for (var i = 0; i < vertSelectionState.SelectedVertices.Count; i++) Position += _effectedObjects[0].GetVertexById(vertSelectionState.SelectedVertices[i]);
                 Position = Position / vertSelectionState.SelectedVertices.Count;
             }
         }
@@ -87,7 +111,6 @@ namespace GameWorld.Core.Components.Gizmo
                 Position += trans;
                 Scale += scale;
                 rotations.Add(rot);
-
             }
 
             Orientation = AverageOrientation(rotations);
@@ -99,18 +122,21 @@ namespace GameWorld.Core.Components.Gizmo
         {
             var average = orientations[0];
             for (var i = 1; i < orientations.Count; i++)
-            {
                 average = Quaternion.Slerp(average, orientations[i], 1.0f / (i + 1));
-            }
             return average;
         }
 
         public void Start(CommandExecutor commandManager)
         {
+            if (_activeTarget != null)
+            {
+                _totalGizomTransform = Matrix.Identity;
+                StartDrag();
+                return;
+            }
 
             if (_activeCommand is TransformVertexCommand transformVertexCommand)
             {
-                //   MessageBox.Show("Transform debug check - Please inform the creator of the tool that you got this message. Would also love it if you tried undoing your last command to see if that works..\n E-001");
                 transformVertexCommand.InvertWindingOrder = _invertedWindingOrder;
                 transformVertexCommand.Transform = _totalGizomTransform;
                 transformVertexCommand.PivotPoint = Position;
@@ -132,16 +158,21 @@ namespace GameWorld.Core.Components.Gizmo
                 _totalGizomTransform = Matrix.Identity;
                 _activeCommand = _commandFactory.Create<TransformBoneCommand>().Configure(x => x.Configure(_selectedBones, (BoneSelectionState)_selectionState)).Build();
             }
-            else
+            else if (_selectionState != null)
             {
                 _totalGizomTransform = Matrix.Identity;
                 _activeCommand = _commandFactory.Create<TransformVertexCommand>().Configure(x => x.Configure(_effectedObjects, Position)).Build();
             }
-
         }
 
         public void Stop(CommandExecutor commandManager)
         {
+            if (_activeTarget != null)
+            {
+                EndDrag(commandManager);
+                return;
+            }
+
             if (_activeCommand is TransformVertexCommand transformVertexCommand)
             {
                 transformVertexCommand.InvertWindingOrder = _invertedWindingOrder;
@@ -165,24 +196,25 @@ namespace GameWorld.Core.Components.Gizmo
 
         Matrix FixRotationAxis2(Matrix transform)
         {
-            // Decompose the transform matrix into its scale, rotation, and translation components
             transform.Decompose(out var scale, out var rotation, out var translation);
-
-            // Create a quaternion representing a 180-degree rotation around the X axis
             var flipQuaternion = Quaternion.CreateFromAxisAngle(Vector3.UnitX, MathHelper.Pi);
-
-            // Apply the rotation to the quaternion to correct the axis alignment
             var correctedQuaternion = flipQuaternion * rotation;
-
-            // Recompose the transform matrix with the corrected rotation
             var fixedTransform = Matrix.CreateScale(scale) * Matrix.CreateFromQuaternion(correctedQuaternion) * Matrix.CreateTranslation(translation);
-
             return fixedTransform;
         }
 
-
         public void GizmoTranslateEvent(Vector3 translation, PivotType pivot)
         {
+            if (_activeTarget != null)
+            {
+                Position += translation;
+                _totalGizomTransform *= Matrix.CreateTranslation(translation);
+                _totalGizomTransform.Decompose(out var _, out var totalDeltaRot, out var totalDeltaPos);
+                ApplyTransformDelta(totalDeltaPos, totalDeltaRot, false);
+                return;
+            }
+
+            // [FIX Bug 1] 原生工具的拖拽：正确累加总变换矩阵，这是保证最终撤销不弹回原点的核心！
             ApplyTransform(Matrix.CreateTranslation(translation), pivot, GizmoMode.Translate);
             Position += translation;
             _totalGizomTransform *= Matrix.CreateTranslation(translation);
@@ -190,12 +222,25 @@ namespace GameWorld.Core.Components.Gizmo
 
         public void GizmoRotateEvent(Matrix rotation, PivotType pivot)
         {
+            if (_activeTarget != null)
+            {
+                _totalGizomTransform *= rotation;
+                var fixedTransform = FixRotationAxis2(_totalGizomTransform);
+                fixedTransform.Decompose(out var _, out var quat, out var _);
+                Orientation = quat;
+
+                _totalGizomTransform.Decompose(out var _, out var totalDeltaRot, out var totalDeltaPos);
+                ApplyTransformDelta(totalDeltaPos, totalDeltaRot, false);
+                return;
+            }
+
+            // [FIX Bug 1] 原生工具的拖拽：正确累加总变换矩阵
             ApplyTransform(rotation, pivot, GizmoMode.Rotate);
             _totalGizomTransform *= rotation;
 
-            var fixedTransform = FixRotationAxis2(_totalGizomTransform);
-            fixedTransform.Decompose(out var _, out var quat, out var _);
-            Orientation = quat;
+            var fixedTransform2 = FixRotationAxis2(_totalGizomTransform);
+            fixedTransform2.Decompose(out var _, out var quat2, out var _);
+            Orientation = quat2;
         }
 
         public void GizmoScaleEvent(Vector3 scale, PivotType pivot)
@@ -205,7 +250,6 @@ namespace GameWorld.Core.Components.Gizmo
             ApplyTransform(scaleMatrix, pivot, GizmoMode.UniformScale);
 
             Scale += scale;
-
             _totalGizomTransform *= scaleMatrix;
 
             var negativeAxis = CountNegativeAxis(realScale);
@@ -238,28 +282,28 @@ namespace GameWorld.Core.Components.Gizmo
 
         void ApplyTransform(Matrix transform, PivotType pivotType, GizmoMode gizmoMode)
         {
+            if (_activeTarget != null) return;
+
             transform.Decompose(out var scale, out var rot, out var trans);
 
             if (_selectionState is BoneSelectionState boneSelectionState)
             {
                 var objCenter = Vector3.Zero;
-                if (pivotType == PivotType.ObjectCenter)
-                    objCenter = Position;
-
+                if (pivotType == PivotType.ObjectCenter) objCenter = Position;
                 TransformBone(Matrix.CreateScale(Scale) * Matrix.CreateFromQuaternion(rot) * Matrix.CreateTranslation(Position), objCenter, gizmoMode);
                 return;
             }
 
+            if (_effectedObjects == null) return;
+
             foreach (var geo in _effectedObjects)
             {
                 var objCenter = Vector3.Zero;
-                if (pivotType == PivotType.ObjectCenter)
-                    objCenter = Position;
+                if (pivotType == PivotType.ObjectCenter) objCenter = Position;
 
                 if (_selectionState is ObjectSelectionState objectSelectionState)
                 {
-                    for (var i = 0; i < geo.VertexCount(); i++)
-                        TransformVertex(transform, geo, objCenter, i);
+                    for (var i = 0; i < geo.VertexCount(); i++) TransformVertex(transform, geo, objCenter, i);
                 }
                 else if (_selectionState is VertexSelectionState vertSelectionState)
                 {
@@ -271,14 +315,11 @@ namespace GameWorld.Core.Components.Gizmo
                             var vertexScale = Vector3.Lerp(Vector3.One, scale, weight);
                             var vertRot = Quaternion.Slerp(Quaternion.Identity, rot, weight);
                             var vertTrnas = trans * weight;
-
                             var weightedTransform = Matrix.CreateScale(vertexScale) * Matrix.CreateFromQuaternion(vertRot) * Matrix.CreateTranslation(vertTrnas);
-
                             TransformVertex(weightedTransform, geo, objCenter, i);
                         }
                     }
                 }
-
                 geo.RebuildVertexBuffer();
             }
         }
@@ -286,9 +327,7 @@ namespace GameWorld.Core.Components.Gizmo
         void TransformBone(Matrix transform, Vector3 objCenter, GizmoMode gizmoMode)
         {
             if (_activeCommand is TransformBoneCommand transformBoneCommand)
-            {
                 transformBoneCommand.ApplyTransformation(transform, gizmoMode);
-            }
         }
 
         void TransformVertex(Matrix transform, MeshObject geo, Vector3 objCenter, int index)
@@ -297,31 +336,114 @@ namespace GameWorld.Core.Components.Gizmo
             geo.TransformVertex(index, m);
         }
 
-        public Vector3 GetObjectCentre()
-        {
-            return Position;
-        }
+        public Vector3 GetObjectCentre() => Position;
 
         public static TransformGizmoWrapper CreateFromSelectionState(ISelectionState state, CommandFactory commandFactory)
         {
             if (state is ObjectSelectionState objectSelectionState)
             {
                 var transformables = objectSelectionState.CurrentSelection().Where(x => x is ITransformable).Select(x => x.Geometry);
-                if (transformables.Any())
-                    return new TransformGizmoWrapper(commandFactory, transformables.ToList(), state);
+                if (transformables.Any()) return new TransformGizmoWrapper(commandFactory, transformables.ToList(), state);
             }
             else if (state is VertexSelectionState vertexSelectionState)
             {
-                if (vertexSelectionState.SelectedVertices.Count != 0)
-                    return new TransformGizmoWrapper(commandFactory, new List<MeshObject>() { vertexSelectionState.RenderObject.Geometry }, vertexSelectionState);
+                if (vertexSelectionState.SelectedVertices.Count != 0) return new TransformGizmoWrapper(commandFactory, new List<MeshObject>() { vertexSelectionState.RenderObject.Geometry }, vertexSelectionState);
             }
             else if (state is BoneSelectionState boneSelectionState)
             {
-                if (boneSelectionState.SelectedBones.Count != 0)
-                    return new TransformGizmoWrapper(commandFactory, boneSelectionState.SelectedBones, boneSelectionState);
+                if (boneSelectionState.SelectedBones.Count != 0) return new TransformGizmoWrapper(commandFactory, boneSelectionState.SelectedBones, boneSelectionState);
             }
             return null;
         }
 
+        public static TransformGizmoWrapper CreateFromGizmoTransformable(IGizmoTransformable target, CommandFactory commandFactory)
+        {
+            var wrapper = new TransformGizmoWrapper(commandFactory, new List<MeshObject>(), null);
+            wrapper.SetTarget(target);
+            return wrapper;
+        }
+
+        public void SetTarget(IGizmoTransformable target)
+        {
+            _activeTarget = target;
+            if (_activeTarget != null)
+            {
+                Position = _activeTarget.Pivot;
+                _activeTarget.WorldMatrix.Decompose(out var scale, out var rot, out var trans);
+                Orientation = rot;
+                Scale = scale;
+            }
+        }
+
+        public void StartDrag()
+        {
+            _lastWorldDeltaPos = Vector3.Zero;
+            _lastWorldDeltaRot = Quaternion.Identity;
+
+            if (_activeTarget == null) return;
+
+            _initialMatrix = _activeTarget.WorldMatrix;
+            _trueWorldPivot = _activeTarget.Pivot;
+
+            _activeTarget.OnGizmoDragStart();
+        }
+
+        public void EndDrag(CommandExecutor commandManager)
+        {
+            _activeTarget?.OnGizmoDragEnd(commandManager);
+        }
+
+        public void ApplyTransformDelta(Vector3 worldDeltaPos, Quaternion worldDeltaRot, bool syncGizmoVisuals = true)
+        {
+            if (_activeTarget != null)
+            {
+                var newMatrix = SolveInPlaceMatrix(_initialMatrix, _trueWorldPivot, worldDeltaRot, worldDeltaPos);
+                _activeTarget.WorldMatrix = newMatrix;
+
+                if (syncGizmoVisuals)
+                {
+                    Position = _activeTarget.Pivot;
+                    newMatrix.Decompose(out var scale, out var rot, out var trans);
+                    Orientation = rot;
+                    Scale = scale;
+                }
+            }
+            else
+            {
+                // [FIX Bug 1] 回退到了绝对稳固的 Kitbash 增量分解解算逻辑，保证每帧都能转化为最纯净的矩阵相乘。
+                Vector3 framePosDelta = worldDeltaPos - _lastWorldDeltaPos;
+                Quaternion frameRotDelta = worldDeltaRot * Quaternion.Inverse(_lastWorldDeltaRot);
+
+                _lastWorldDeltaPos = worldDeltaPos;
+                _lastWorldDeltaRot = worldDeltaRot;
+
+                if (framePosDelta != Vector3.Zero)
+                {
+                    ApplyTransform(Matrix.CreateTranslation(framePosDelta), PivotType.ObjectCenter, GizmoMode.Translate);
+                    Position += framePosDelta;
+                    _totalGizomTransform *= Matrix.CreateTranslation(framePosDelta);
+                }
+
+                if (frameRotDelta != Quaternion.Identity)
+                {
+                    var rotMatrix = Matrix.CreateFromQuaternion(frameRotDelta);
+                    ApplyTransform(rotMatrix, PivotType.ObjectCenter, GizmoMode.Rotate);
+                    _totalGizomTransform *= rotMatrix;
+
+                    var fixedTransform = FixRotationAxis2(_totalGizomTransform);
+                    fixedTransform.Decompose(out var _, out var quat, out var _);
+                    Orientation = quat;
+                }
+            }
+        }
+
+        public Matrix SolveInPlaceMatrix(Matrix initialMatrix, Vector3 trueWorldPivot, Quaternion worldDeltaRot, Vector3 worldDeltaPos)
+        {
+            return initialMatrix
+                   * Matrix.CreateTranslation(-trueWorldPivot)
+                   * Matrix.CreateFromQuaternion(worldDeltaRot)
+                   * Matrix.CreateTranslation(trueWorldPivot)
+                   * Matrix.CreateTranslation(worldDeltaPos);
+        }
     }
 }

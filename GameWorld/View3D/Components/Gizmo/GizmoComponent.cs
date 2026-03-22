@@ -28,6 +28,8 @@ namespace GameWorld.Core.Components.Gizmo
         TransformGizmoWrapper _activeTransformation;
         bool _isCtrlPressed = false;
 
+        private IGizmoTransformable _globalTarget;
+        private BlenderTransformInputHandler _blenderInputHandler = new BlenderTransformInputHandler();
 
         public GizmoComponent(IEventHub eventHub,
             IKeyboardComponent keyboardComponent, IMouseComponent mouseComponent, ArcBallCamera camera, CommandExecutor commandExecutor,
@@ -58,10 +60,33 @@ namespace GameWorld.Core.Components.Gizmo
             _gizmo.ScaleEvent += GizmoScaleEvent;
             _gizmo.StartEvent += GizmoTransformStart;
             _gizmo.StopEvent += GizmoTransformEnd;
+
+            _blenderInputHandler.OnUndoRequested = () => { _commandManager.Undo(); };
+        }
+
+        public void SetGlobalGizmoTarget(IGizmoTransformable target)
+        {
+            _globalTarget = target;
+            _gizmo.Selection.Clear();
+
+            if (_globalTarget != null)
+            {
+                _activeTransformation = TransformGizmoWrapper.CreateFromGizmoTransformable(_globalTarget, _commandFactory);
+                _gizmo.Selection.Add(_activeTransformation);
+                _isEnabled = true;
+            }
+            else
+            {
+                OnSelectionChanged(_selectionManager.GetState());
+            }
+
+            _gizmo.ResetDeltas();
         }
 
         private void OnSelectionChanged(ISelectionState state)
         {
+            if (_globalTarget != null) return;
+
             _gizmo.Selection.Clear();
             _activeTransformation = TransformGizmoWrapper.CreateFromSelectionState(state, _commandFactory);
             if (_activeTransformation != null)
@@ -86,7 +111,6 @@ namespace GameWorld.Core.Components.Gizmo
             }
         }
 
-
         private void GizmoTranslateEvent(ITransformable transformable, TransformationEventArgs e)
         {
             _activeTransformation.GizmoTranslateEvent((Vector3)e.Value, e.Pivot);
@@ -102,43 +126,44 @@ namespace GameWorld.Core.Components.Gizmo
             var value = (Vector3)e.Value;
             if (_isCtrlPressed)
             {
-                if (value.X != 0)
-                    value = new Vector3(value.X);
-                else if (value.Y != 0)
-                    value = new Vector3(value.Y);
-                else if (value.Z != 0)
-                    value = new Vector3(value.Z);
+                if (value.X != 0) value = new Vector3(value.X);
+                else if (value.Y != 0) value = new Vector3(value.Y);
+                else if (value.Z != 0) value = new Vector3(value.Z);
             }
-
             _activeTransformation.GizmoScaleEvent(value, e.Pivot);
         }
 
         public override void Update(GameTime gameTime)
         {
-            var selectionMode = _selectionManager.GetState().Mode;
-            switch (selectionMode)
+            if (_activeTransformation != null)
             {
-                case GeometrySelectionMode.Object:
-                case GeometrySelectionMode.Face:
-                case GeometrySelectionMode.Vertex:
-                case GeometrySelectionMode.Bone:
-                    break;
-                default:
+                if (_blenderInputHandler.HandleInput(_activeTransformation, _camera, _commandManager))
                     return;
             }
 
-            if (!_isEnabled)
-                return;
+            var selectionMode = _selectionManager.GetState().Mode;
+
+            if (_globalTarget == null)
+            {
+                switch (selectionMode)
+                {
+                    case GeometrySelectionMode.Object:
+                    case GeometrySelectionMode.Face:
+                    case GeometrySelectionMode.Vertex:
+                    case GeometrySelectionMode.Bone:
+                        break;
+                    default:
+                        return;
+                }
+            }
+
+            if (!_isEnabled) return;
 
             _isCtrlPressed = _keyboard.IsKeyDown(Keys.LeftControl);
             if (_gizmo.ActiveMode == GizmoMode.NonUniformScale && _isCtrlPressed)
                 _gizmo.ActiveMode = GizmoMode.UniformScale;
             else if (_gizmo.ActiveMode == GizmoMode.UniformScale && !_isCtrlPressed)
                 _gizmo.ActiveMode = GizmoMode.NonUniformScale;
-
-            //// Toggle space mode:
-            //if (_keyboard.IsKeyReleased(Keys.Home))
-            //    _gizmo.ToggleActiveSpace();
 
             var isCameraMoving = _keyboard.IsKeyDown(Keys.LeftAlt);
             _gizmo.Update(gameTime, !isCameraMoving);
@@ -164,38 +189,28 @@ namespace GameWorld.Core.Components.Gizmo
         {
             var selectionMode = _selectionManager.GetState().Mode;
 
-            switch (selectionMode)
+            if (_globalTarget == null)
             {
-                case GeometrySelectionMode.Object:
-                case GeometrySelectionMode.Face:
-                case GeometrySelectionMode.Vertex:
-                case GeometrySelectionMode.Bone:
-                    break;
-                default:
-                    return;
+                switch (selectionMode)
+                {
+                    case GeometrySelectionMode.Object:
+                    case GeometrySelectionMode.Face:
+                    case GeometrySelectionMode.Vertex:
+                    case GeometrySelectionMode.Bone:
+                        break;
+                    default:
+                        return;
+                }
             }
 
-            if (!_isEnabled)
-                return;
+            if (!_isEnabled) return;
 
             _gizmo.Draw();
         }
 
-        public void ResetScale()
-        {
-            _gizmo.ScaleModifier = 1;
-        }
-
-        public void ModifyGizmoScale(float v)
-        {
-            _gizmo.ScaleModifier += v;
-        }
-
-        public void Dispose()
-        {
-            _gizmo.Dispose();
-        }
-
+        public void ResetScale() { _gizmo.ScaleModifier = 1; }
+        public void ModifyGizmoScale(float v) { _gizmo.ScaleModifier += v; }
+        public void Dispose() { _gizmo.Dispose(); }
         public void Handle(SelectionChangedEvent notification) => OnSelectionChanged(notification.NewState);
     }
 }
