@@ -1,4 +1,4 @@
-﻿using System.Collections.ObjectModel;
+using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Windows.Input;
 using Editors.KitbasherEditor.ChildEditors.MeshFitter;
@@ -55,6 +55,7 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
         {
             RegisterUiCommand<SaveCommand>();
             RegisterUiCommand<SaveAsCommand>();
+            RegisterUiCommand<QuickExportPosedMeshCommand>();
 
             RegisterUiCommand<BrowseForReferenceCommand>();
             RegisterUiCommand<ImportGeneralReferenceCommand>();
@@ -106,6 +107,7 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
             var fileToolbar = builder.CreateRootToolBar("File");
             builder.CreateToolBarItem<SaveCommand>(fileToolbar, "Save");
             builder.CreateToolBarItem<SaveAsCommand>(fileToolbar, "Save As");
+            builder.CreateToolBarItem<QuickExportPosedMeshCommand>(fileToolbar, "Advanced Export (Current Frame)");
             builder.CreateToolBarSeparator(fileToolbar);
             builder.CreateToolBarItem<BrowseForReferenceCommand>(fileToolbar, "Import Reference model");
 
@@ -123,7 +125,6 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
             builder.CreateToolBarItem<FocusCameraCommand>(renderingToolbar, "Focus camera");
             builder.CreateToolBarItem<ResetCameraCommand>(renderingToolbar, "Reset camera");
             builder.CreateToolBarItem<OpenRenderSettingsWindowCommand>(renderingToolbar, "Open render settings");
-
 
             return builder.Build();
         }

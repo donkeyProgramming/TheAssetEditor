@@ -33,12 +33,14 @@ namespace Editors.ImportExport
             services.AddTransient<IExporterViewModel, DdsToMaterialPngViewModel>();
             services.AddTransient<IExporterViewModel, DdsToNormalPngViewModel>();
             services.AddTransient<IExporterViewModel, RmvToGltfExporterViewModel>();
+            services.AddTransient<IExporterViewModel, RmvToGltfStaticExporterViewModel>();
 
             // Exporters
             services.AddTransient<IDdsToMaterialPngExporter, DdsToMaterialPngExporter>();
             services.AddTransient<DdsToPngExporter>();
             services.AddTransient<IDdsToNormalPngExporter, DdsToNormalPngExporter>();
             services.AddTransient<RmvToGltfExporter>();
+            services.AddTransient<RmvToGltfStaticExporter>();
 
             // Importer ViewModels
             RegisterWindow<ImportWindow>(services);
@@ -60,6 +62,7 @@ namespace Editors.ImportExport
             services.AddTransient<DisplayImportFileToolCommand>();
 
             services.AddTransient<GltfMeshBuilder>();
+            services.AddTransient<GltfStaticMeshBuilder>();
             services.AddTransient<IGltfTextureHandler, GltfTextureHandler>();
             services.AddTransient<IGltfSceneSaver, GltfSceneSaver>();
             services.AddTransient<IGltfSceneLoader, GltfSceneLoader>();

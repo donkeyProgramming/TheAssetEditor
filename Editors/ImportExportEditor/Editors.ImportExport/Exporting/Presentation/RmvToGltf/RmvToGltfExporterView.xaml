@@ -1,4 +1,4 @@
-﻿<UserControl x:Class="Editors.ImportExport.Exporting.Presentation.RmvToGltf.RmvToGltfExporterView"
+<UserControl x:Class="Editors.ImportExport.Exporting.Presentation.RmvToGltf.RmvToGltfExporterView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
@@ -43,5 +43,5 @@
         <TextBlock Grid.Row="3" Grid.Column="1" Text=" : " VerticalAlignment="Center"/>
         <CheckBox Grid.Row="3" Grid.Column="2" HorizontalAlignment="Left" IsChecked="{Binding ExportAnimations, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
     </Grid>
-    
+
 </UserControl>
