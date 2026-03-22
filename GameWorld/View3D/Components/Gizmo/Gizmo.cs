@@ -18,8 +18,8 @@ using System.Collections.Generic;
 // --
 // -----------------Please Do Not Remove ----------------------
 // -- Work by Tom Looman, licensed under Ms-PL
-// -- My Blog: http://coreenginedev.blogspot.com
-// -- My Portfolio: http://tomlooman.com
+// -- My Blog: http://coreenginedev.blogspot.com/
+// -- My Portfolio: http://tomlooman.com/
 // -- You may find additional XNA resources and information on these sites.
 // ------------------------------------------------------------
 
@@ -43,6 +43,11 @@ namespace GameWorld.Core.Components.Gizmo
         private readonly BasicEffect _lineEffect;
         private readonly BasicEffect _meshEffect;
 
+        // ========== [NEW] Damping factor for precision control (Shift key modifier) ==========
+        // When user holds Shift during transform, this factor reduces the delta speed
+        // for fine-tuned adjustments. Default is 1.0 (no damping).
+        private float _dampingFactor = 1.0f;
+        // ========== [END NEW] ==========
 
         // -- Screen Scale -- //
         private float _screenScale;
@@ -219,6 +224,28 @@ namespace GameWorld.Core.Components.Gizmo
             _intersectPosition = Vector3.Zero;
         }
 
+        // ========== [NEW METHOD] Set damping factor for precision control ==========
+        /// <summary>
+        /// Sets the damping factor for transform operations.
+        /// Use 0.1f for precision mode (Shift held), 1.0f for normal mode.
+        /// This enables fine-tuned adjustments when the user holds the Shift key.
+        /// </summary>
+        /// <param name="factor">Damping factor between 0.01 and 1.0</param>
+        public void SetDampingFactor(float factor)
+        {
+            _dampingFactor = MathHelper.Clamp(factor, 0.01f, 1.0f);
+        }
+
+        /// <summary>
+        /// Gets the current damping factor.
+        /// Useful for testing and debugging.
+        /// </summary>
+        public float GetDampingFactor()
+        {
+            return _dampingFactor;
+        }
+        // ========== [END NEW METHOD] ==========
+
         public void Update(GameTime gameTime, bool enableMove)
         {
             if (_isActive && enableMove)
@@ -385,6 +412,12 @@ namespace GameWorld.Core.Components.Gizmo
                     var direction = Vector3.Normalize(mouseDragDelta);
                     mouseDragDelta = direction * 0.5f;
                 }
+
+                // ========== [NEW] Apply damping factor for precision control ==========
+                // This reduces the delta speed when Shift is held for fine-tuned adjustments
+                mouseDragDelta *= _dampingFactor;
+                // ========== [END NEW] ==========
+
                 switch (ActiveAxis)
                 {
                     case GizmoAxis.X:
@@ -420,6 +453,12 @@ namespace GameWorld.Core.Components.Gizmo
         private void HandleRotation(GameTime gameTime, out Matrix out_transformLocal, out Matrix out_transfromWorld)
         {
             var delta = _mouse.DeltaPosition().X * (float)gameTime.ElapsedGameTime.TotalSeconds;
+
+            // ========== [NEW] Apply damping factor for precision rotation control ==========
+            // This reduces the rotation speed when Shift is held for fine-tuned adjustments
+            delta *= _dampingFactor;
+            // ========== [END NEW] ==========
+
             if (SnapEnabled)
             {
                 var snapValue = MathHelper.ToRadians(RotationSnapValue);
@@ -648,7 +687,7 @@ namespace GameWorld.Core.Components.Gizmo
             }
 
             _graphics.DepthStencilState = DepthStencilState.Default;
-           
+
             Draw2D(view, projection);
         }
 

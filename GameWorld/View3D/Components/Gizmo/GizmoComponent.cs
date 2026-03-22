@@ -28,6 +28,18 @@ namespace GameWorld.Core.Components.Gizmo
         TransformGizmoWrapper _activeTransformation;
         bool _isCtrlPressed = false;
 
+        // ========== [NEW] Blender-style keyboard shortcut state machine ==========
+        // Tracks whether we are in a keyboard-activated transform mode
+        private bool _isKeyboardTransformActive = false;
+        // Stores the mode activated by keyboard (Translate/Rotate/Scale)
+        private GizmoMode? _keyboardActivatedMode = null;
+        // Tracks whether axis is locked via keyboard (X/Y/Z)
+        private bool _isAxisLockedByKeyboard = false;
+        // Store original transform for cancel operation
+        private Vector3 _originalPosition;
+        private Quaternion _originalOrientation;
+        private Vector3 _originalScale;
+        // ========== [END NEW] ==========
 
         public GizmoComponent(IEventHub eventHub,
             IKeyboardComponent keyboardComponent, IMouseComponent mouseComponent, ArcBallCamera camera, CommandExecutor commandExecutor,
@@ -58,7 +70,27 @@ namespace GameWorld.Core.Components.Gizmo
             _gizmo.ScaleEvent += GizmoScaleEvent;
             _gizmo.StartEvent += GizmoTransformStart;
             _gizmo.StopEvent += GizmoTransformEnd;
+
+            // ========== [NEW] Store original transform on transform start ==========
+            _gizmo.StartEvent += StoreOriginalTransform;
+            // ========== [END NEW] ==========
         }
+
+        // ========== [NEW METHOD] Store original transform for cancel functionality ==========
+        /// <summary>
+        /// Stores the original transform values when a transformation starts.
+        /// Used to restore the object state when the user cancels the operation.
+        /// </summary>
+        private void StoreOriginalTransform()
+        {
+            if (_activeTransformation != null)
+            {
+                _originalPosition = _activeTransformation.Position;
+                _originalOrientation = _activeTransformation.Orientation;
+                _originalScale = _activeTransformation.Scale;
+            }
+        }
+        // ========== [END NEW METHOD] ==========
 
         private void OnSelectionChanged(ISelectionState state)
         {
@@ -68,6 +100,10 @@ namespace GameWorld.Core.Components.Gizmo
                 _gizmo.Selection.Add(_activeTransformation);
 
             _gizmo.ResetDeltas();
+
+            // ========== [NEW] Reset keyboard transform state on selection change ==========
+            ResetKeyboardTransformState();
+            // ========== [END NEW] ==========
         }
 
         private void GizmoTransformStart()
@@ -84,6 +120,10 @@ namespace GameWorld.Core.Components.Gizmo
                 _mouse.MouseOwner = null;
                 _mouse.ClearStates();
             }
+
+            // ========== [NEW] Reset keyboard transform state after transform ends ==========
+            ResetKeyboardTransformState();
+            // ========== [END NEW] ==========
         }
 
 
@@ -113,6 +153,174 @@ namespace GameWorld.Core.Components.Gizmo
             _activeTransformation.GizmoScaleEvent(value, e.Pivot);
         }
 
+        // ========== [NEW METHOD] Handle keyboard shortcut for G/R/S mode activation ==========
+        /// <summary>
+        /// Checks for G/R/S key presses to activate transform modes (Blender-style).
+        /// G = Grab/Translate, R = Rotate, S = Scale.
+        /// </summary>
+        /// <returns>True if a keyboard shortcut was handled</returns>
+        private bool HandleKeyboardShortcutModeActivation()
+        {
+            // Only handle shortcuts if there is a selection
+            if (_activeTransformation == null || !_isEnabled)
+                return false;
+
+            // Check for G key - Grab/Translate mode
+            if (_keyboard.IsKeyReleased(Keys.G))
+            {
+                ActivateKeyboardTransformMode(GizmoMode.Translate);
+                return true;
+            }
+            // Check for R key - Rotate mode
+            else if (_keyboard.IsKeyReleased(Keys.R))
+            {
+                ActivateKeyboardTransformMode(GizmoMode.Rotate);
+                return true;
+            }
+            // Check for S key - Scale mode
+            else if (_keyboard.IsKeyReleased(Keys.S))
+            {
+                ActivateKeyboardTransformMode(GizmoMode.NonUniformScale);
+                return true;
+            }
+
+            return false;
+        }
+        // ========== [END NEW METHOD] ==========
+
+        // ========== [NEW METHOD] Activate keyboard transform mode ==========
+        /// <summary>
+        /// Activates a transform mode via keyboard shortcut (Blender-style).
+        /// Sets the gizmo to the specified mode and prepares for axis selection.
+        /// </summary>
+        /// <param name="mode">The gizmo mode to activate</param>
+        private void ActivateKeyboardTransformMode(GizmoMode mode)
+        {
+            _isKeyboardTransformActive = true;
+            _keyboardActivatedMode = mode;
+            _isAxisLockedByKeyboard = false;
+
+            // Set the gizmo mode
+            _gizmo.ActiveMode = mode;
+
+            // Reset axis to None - user must press X/Y/Z or drag to select
+            _gizmo.ActiveAxis = GizmoAxis.None;
+        }
+        // ========== [END NEW METHOD] ==========
+
+        // ========== [NEW METHOD] Handle axis locking via X/Y/Z keys ==========
+        /// <summary>
+        /// Checks for X/Y/Z key presses to lock transform to specific axis.
+        /// Only effective when keyboard transform mode is active.
+        /// </summary>
+        /// <returns>True if an axis lock was applied</returns>
+        private bool HandleAxisLockKeys()
+        {
+            if (!_isKeyboardTransformActive)
+                return false;
+
+            // Check for X key - lock to X axis
+            if (_keyboard.IsKeyReleased(Keys.X))
+            {
+                _isAxisLockedByKeyboard = true;
+                _gizmo.ActiveAxis = GizmoAxis.X;
+                return true;
+            }
+            // Check for Y key - lock to Y axis
+            else if (_keyboard.IsKeyReleased(Keys.Y))
+            {
+                _isAxisLockedByKeyboard = true;
+                _gizmo.ActiveAxis = GizmoAxis.Y;
+                return true;
+            }
+            // Check for Z key - lock to Z axis
+            else if (_keyboard.IsKeyReleased(Keys.Z))
+            {
+                _isAxisLockedByKeyboard = true;
+                _gizmo.ActiveAxis = GizmoAxis.Z;
+                return true;
+            }
+
+            return false;
+        }
+        // ========== [END NEW METHOD] ==========
+
+        // ========== [NEW METHOD] Handle Esc key to cancel operation ==========
+        /// <summary>
+        /// Checks for Escape key press to cancel the current transform operation.
+        /// Restores the object to its original transform before the operation started.
+        /// </summary>
+        /// <returns>True if cancel was triggered</returns>
+        private bool HandleEscapeCancel()
+        {
+            if (!_isKeyboardTransformActive)
+                return false;
+
+            if (_keyboard.IsKeyReleased(Keys.Escape))
+            {
+                CancelCurrentTransform();
+                return true;
+            }
+
+            return false;
+        }
+        // ========== [END NEW METHOD] ==========
+
+        // ========== [NEW METHOD] Cancel current transform and restore original state ==========
+        /// <summary>
+        /// Cancels the current keyboard-initiated transform operation.
+        /// Restores the object to its original position/orientation/scale.
+        /// </summary>
+        private void CancelCurrentTransform()
+        {
+            // Restore original transform if we have a valid transformation
+            if (_activeTransformation != null)
+            {
+                // Reset the transformation wrapper to original state
+                _activeTransformation.Position = _originalPosition;
+                _activeTransformation.Orientation = _originalOrientation;
+                _activeTransformation.Scale = _originalScale;
+            }
+
+            // Reset gizmo state
+            _gizmo.ResetDeltas();
+            _gizmo.ActiveAxis = GizmoAxis.None;
+
+            // Clear mouse ownership if we own it
+            if (_mouse.MouseOwner == this)
+            {
+                _mouse.MouseOwner = null;
+                _mouse.ClearStates();
+            }
+
+            // Reset state machine
+            ResetKeyboardTransformState();
+        }
+        // ========== [END NEW METHOD] ==========
+
+        // ========== [NEW METHOD] Reset keyboard transform state machine ==========
+        /// <summary>
+        /// Resets all keyboard transform state variables to idle state.
+        /// </summary>
+        public void ResetKeyboardTransformState()
+        {
+            _isKeyboardTransformActive = false;
+            _keyboardActivatedMode = null;
+            _isAxisLockedByKeyboard = false;
+        }
+        // ========== [END NEW METHOD] ==========
+
+        // ========== [NEW METHOD] Check if keyboard transform is active (for testing) ==========
+        /// <summary>
+        /// Returns whether a keyboard-initiated transform is currently active.
+        /// Useful for unit testing the state machine.
+        /// </summary>
+        public bool IsKeyboardTransformActive()
+        {
+            return _isKeyboardTransformActive;
+        }
+        // ========== [END NEW METHOD] ==========
+
         public override void Update(GameTime gameTime)
         {
             var selectionMode = _selectionManager.GetState().Mode;
@@ -130,11 +338,36 @@ namespace GameWorld.Core.Components.Gizmo
             if (!_isEnabled)
                 return;
 
+            // ========== [NEW] Handle Shift key for precision damping ==========
+            // Apply damping factor when Shift is held for fine-tuned adjustments
+            bool isShiftPressed = _keyboard.IsKeyDown(Keys.LeftShift) || _keyboard.IsKeyDown(Keys.RightShift);
+            _gizmo.SetDampingFactor(isShiftPressed ? 0.1f : 1.0f);
+            // ========== [END NEW] ==========
+
             _isCtrlPressed = _keyboard.IsKeyDown(Keys.LeftControl);
             if (_gizmo.ActiveMode == GizmoMode.NonUniformScale && _isCtrlPressed)
                 _gizmo.ActiveMode = GizmoMode.UniformScale;
             else if (_gizmo.ActiveMode == GizmoMode.UniformScale && !_isCtrlPressed)
                 _gizmo.ActiveMode = GizmoMode.NonUniformScale;
+
+            // ========== [NEW] Handle Blender-style keyboard shortcuts ==========
+            // Priority: Esc cancel > Axis lock > Mode activation
+            if (HandleEscapeCancel())
+            {
+                // Transform was cancelled, skip further processing
+                return;
+            }
+
+            if (HandleAxisLockKeys())
+            {
+                // Axis was locked, continue to allow further input
+            }
+
+            if (HandleKeyboardShortcutModeActivation())
+            {
+                // Mode was activated via keyboard, continue to allow axis selection
+            }
+            // ========== [END NEW] ==========
 
             //// Toggle space mode:
             //if (_keyboard.IsKeyReleased(Keys.Home))
@@ -158,6 +391,10 @@ namespace GameWorld.Core.Components.Gizmo
         public void Disable()
         {
             _isEnabled = false;
+
+            // ========== [NEW] Reset keyboard state when disabled ==========
+            ResetKeyboardTransformState();
+            // ========== [END NEW] ==========
         }
 
         public override void Draw(GameTime gameTime)
