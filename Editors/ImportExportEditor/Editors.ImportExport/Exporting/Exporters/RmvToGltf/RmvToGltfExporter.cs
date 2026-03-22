@@ -50,6 +50,8 @@ namespace Editors.ImportExport.Exporting.Exporters.RmvToGltf
             var rmv2 = new ModelFactory().Load(settings.InputModelFile.DataSource.ReadData());
             var outputScene = ModelRoot.CreateModel();
 
+            // Determine skeleton availability before building meshes to avoid weight validation issues
+            bool willHaveSkeleton = false;
             ProcessedGltfSkeleton? gltfSkeleton = null;
             if (settings.ExportAnimations && !string.IsNullOrEmpty(rmv2.Header.SkeletonName))
             {
@@ -64,6 +66,7 @@ namespace Editors.ImportExport.Exporting.Exporters.RmvToGltf
                 }
                 else                
                 {
+                    willHaveSkeleton = true;
                     gltfSkeleton = _gltfSkeletonBuilder.CreateSkeleton(skeletonAnimFile, outputScene, settings);
                     _gltfAnimationBuilder.Build(skeletonAnimFile, settings, gltfSkeleton, outputScene);
                 }
@@ -71,7 +74,7 @@ namespace Editors.ImportExport.Exporting.Exporters.RmvToGltf
             
             var textures = _gltfTextureHandler.HandleTextures(rmv2, settings);            
             
-            var meshes = _gltfMeshBuilder.Build(rmv2, textures, settings);
+            var meshes = _gltfMeshBuilder.Build(rmv2, textures, settings, willHaveSkeleton);
 
             _logger.Here().Information($"MeshCount={meshes.Count()} TextureCount={textures.Count()} Skeleton={gltfSkeleton?.Data.Count}");
             BuildGltfScene(meshes, gltfSkeleton, settings, outputScene);

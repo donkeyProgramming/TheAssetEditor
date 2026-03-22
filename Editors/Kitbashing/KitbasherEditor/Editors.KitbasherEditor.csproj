@@ -23,6 +23,7 @@
     <ProjectReference Include="..\..\..\GameWorld\View3D\GameWorld.Core.csproj" />
     <ProjectReference Include="..\..\..\Shared\SharedCore\Shared.Core.csproj" />
     <ProjectReference Include="..\..\..\Shared\SharedUI\Shared.Ui.csproj" />
+    <ProjectReference Include="..\..\ImportExportEditor\Editors.ImportExport\Editors.ImportExport.csproj" />
     <ProjectReference Include="..\..\Shared\Editors.Shared.Core\Editors.Shared.Core.csproj" />
   </ItemGroup>
 
