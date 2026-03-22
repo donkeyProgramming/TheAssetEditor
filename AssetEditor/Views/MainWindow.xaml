@@ -158,54 +158,28 @@
                 <GridSplitter Grid.Row="1" Grid.RowSpan="1" Grid.Column="1" Width="2.9" HorizontalAlignment="Stretch" Background="{DynamicResource App.Border}" 
                               Visibility="{Binding IsPackFileExplorerVisible, Converter={StaticResource BoolToVisibilityConverter}}"/>
 
-                <views:CachedTabControl Grid.Row="1" Grid.Column="2" ItemsSource="{Binding EditorManager.CurrentEditorsList, UpdateSourceTrigger=PropertyChanged}" 
+                <TabControl Grid.Row="1" Grid.Column="2" ItemsSource="{Binding EditorManager.CurrentEditorsList, UpdateSourceTrigger=PropertyChanged}" 
                         SelectedIndex="{Binding EditorManager.SelectedEditorIndex, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" 
                         ContentTemplateSelector="{StaticResource EditorSelector}" viewFactory:ToolFactoryParameter.ViewFactory="{Binding ToolsFactory}"
-                        x:Name="EditorsTabControl" BorderThickness="1, 1, 0, 0" >
+                        Name="EditorsTabControl" BorderThickness="1, 1, 0, 0" >
 
-                    <views:CachedTabControl.Template>
-                        <!-- [Crucial Fix]: TargetType must be strictly set to views:CachedTabControl to prevent rendering crashes or white screens -->
-                        <ControlTemplate TargetType="{x:Type views:CachedTabControl}">
-                            <Grid KeyboardNavigation.TabNavigation="Local">
-                                <Grid.RowDefinitions>
-                                    <RowDefinition Height="Auto"/>
-                                    <RowDefinition Height="*"/>
-                                </Grid.RowDefinitions>
+                <TabControl.Resources>
+                    <common:BindingProxy x:Key="Proxy" Data="{Binding}" />
+                </TabControl.Resources>
 
-                                <!-- This line controls the display of the tab headers -->
-                                <TabPanel x:Name="HeaderPanel" Panel.ZIndex="1" Margin="0,2,2,0" IsItemsHost="True" KeyboardNavigation.TabIndex="1" Background="Transparent" />
+                <TabControl.ItemContainerStyle>
+                    <Style TargetType="TabItem" BasedOn="{StaticResource {x:Type TabItem}}">
+                        <EventSetter Event="Drop" Handler="TabItem_Drop"/>
+                        <EventSetter Event="PreviewMouseMove" Handler="TabItem_MouseMove"/>
+                        <EventSetter Event="PreviewMouseDown" Handler="TabItem_MouseDown"/>
+                        <Setter Property="AllowDrop" Value="True"/>
+                        <Setter Property="Focusable" Value="False"/>
+                        <Setter Property="behaviors:MouseMiddleClick.Command" Value="{Binding Source={StaticResource Proxy}, Path=Data.CloseToolCommand}"/>
+                        <Setter Property="behaviors:MouseMiddleClick.CommandParameter" Value="{Binding}"/>
+                    </Style>
+                </TabControl.ItemContainerStyle>
 
-                                <!-- [Crucial Fix]: This binds to the AssetEditor exclusive dark theme color TabItem.Static.Background -->
-                                <Border x:Name="Border" Grid.Row="1" 
-                                        BorderThickness="{TemplateBinding BorderThickness}" 
-                                        BorderBrush="{DynamicResource App.Border}" 
-                                        Background="{DynamicResource TabItem.Static.Background}" 
-                                        KeyboardNavigation.DirectionalNavigation="Contained" 
-                                        KeyboardNavigation.TabIndex="2">
-                                    <Grid x:Name="PART_ItemsHolder" />
-                                </Border>
-                            </Grid>
-                        </ControlTemplate>
-                    </views:CachedTabControl.Template>
-
-                    <views:CachedTabControl.Resources>
-                        <common:BindingProxy x:Key="Proxy" Data="{Binding}" />
-                    </views:CachedTabControl.Resources>
-
-                    <views:CachedTabControl.ItemContainerStyle>
-                        <!-- Ensure each child tab item inherits the native theme and events -->
-                        <Style TargetType="TabItem" BasedOn="{StaticResource {x:Type TabItem}}">
-                            <EventSetter Event="Drop" Handler="TabItem_Drop"/>
-                            <EventSetter Event="PreviewMouseMove" Handler="TabItem_MouseMove"/>
-                            <EventSetter Event="PreviewMouseDown" Handler="TabItem_MouseDown"/>
-                            <Setter Property="AllowDrop" Value="True"/>
-                            <Setter Property="Focusable" Value="False"/>
-                            <Setter Property="behaviors:MouseMiddleClick.Command" Value="{Binding Source={StaticResource Proxy}, Path=Data.CloseToolCommand}"/>
-                            <Setter Property="behaviors:MouseMiddleClick.CommandParameter" Value="{Binding}"/>
-                        </Style>
-                    </views:CachedTabControl.ItemContainerStyle>
-
-                    <views:CachedTabControl.ItemTemplate>
+                    <TabControl.ItemTemplate>
                         <DataTemplate>
                             <Grid>
                                 <Grid.Resources>
@@ -219,12 +193,22 @@
 
                                 <Grid.ContextMenu>
                                     <ContextMenu>
-                                        <MenuItem Header="Close" Command="{Binding Source={StaticResource Proxy}, Path=Data.CloseToolCommand}" CommandParameter="{Binding Source={StaticResource GridProxy}, Path=Data}" />
+                                        <MenuItem Header="Close"
+                                            Command="{Binding Source={StaticResource Proxy}, Path=Data.CloseToolCommand}"
+                                            CommandParameter="{Binding Source={StaticResource GridProxy}, Path=Data}" />
                                         <MenuItem Header="Close Multiple">
-                                            <MenuItem Header="Close Other Tabs" Command="{Binding Source={StaticResource Proxy}, Path=Data.CloseOtherToolsCommand}" CommandParameter="{Binding Source={StaticResource GridProxy}, Path=Data}"/>
-                                            <MenuItem Header="Close All Tabs" Command="{Binding Source={StaticResource Proxy}, Path=Data.CloseAllToolsCommand}" CommandParameter="{Binding Source={StaticResource GridProxy}, Path=Data}"/>
-                                            <MenuItem Header="Close Tabs To Left" Command="{Binding Source={StaticResource Proxy}, Path=Data.CloseToolsToLeftCommand}" CommandParameter="{Binding Source={StaticResource GridProxy}, Path=Data}"/>
-                                            <MenuItem Header="Close Tabs To Right" Command="{Binding Source={StaticResource Proxy}, Path=Data.CloseToolsToRightCommand}" CommandParameter="{Binding Source={StaticResource GridProxy}, Path=Data}"/>
+                                            <MenuItem Header="Close Other Tabs"
+                                                Command="{Binding Source={StaticResource Proxy}, Path=Data.CloseOtherToolsCommand}"
+                                                CommandParameter="{Binding Source={StaticResource GridProxy}, Path=Data}"/>
+                                            <MenuItem Header="Close All Tabs"
+                                                Command="{Binding Source={StaticResource Proxy}, Path=Data.CloseAllToolsCommand}"
+                                                CommandParameter="{Binding Source={StaticResource GridProxy}, Path=Data}"/>
+                                            <MenuItem Header="Close Tabs To Left"
+                                                Command="{Binding Source={StaticResource Proxy}, Path=Data.CloseToolsToLeftCommand}"
+                                                CommandParameter="{Binding Source={StaticResource GridProxy}, Path=Data}"/>
+                                            <MenuItem Header="Close Tabs To Right"
+                                                Command="{Binding Source={StaticResource Proxy}, Path=Data.CloseToolsToRightCommand}"
+                                                CommandParameter="{Binding Source={StaticResource GridProxy}, Path=Data}"/>
                                         </MenuItem>
                                     </ContextMenu>
                                 </Grid.ContextMenu>
@@ -240,12 +224,18 @@
                                         </Style>
                                     </TextBlock.Style>
                                 </TextBlock>
-                                <Button Margin="4,0,-4,0" Grid.Column="1" Command="{Binding DataContext.CloseToolCommand, RelativeSource={RelativeSource FindAncestor, AncestorType=TabControl}}" CommandParameter="{Binding}" HorizontalContentAlignment="Right" Content="{materialIcons:MaterialIconExt Kind=CloseThick, Size=13 }">
+                                <Button
+                                    Margin="4,0,-4,0"  
+                                    Grid.Column="1" 
+                                    Command="{Binding DataContext.CloseToolCommand, RelativeSource={RelativeSource FindAncestor, AncestorType=TabControl}}" 
+                                    CommandParameter="{Binding}"
+                                    HorizontalContentAlignment="Right"
+                                    Content="{materialIcons:MaterialIconExt Kind=CloseThick, Size=13 }">
                                 </Button>
                             </Grid>
                         </DataTemplate>
-                    </views:CachedTabControl.ItemTemplate>
-                </views:CachedTabControl>
+                    </TabControl.ItemTemplate>
+                </TabControl>
             </Grid>
         </Border>
 

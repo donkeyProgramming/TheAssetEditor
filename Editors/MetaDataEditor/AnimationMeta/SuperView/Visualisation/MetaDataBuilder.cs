@@ -1,4 +1,4 @@
-﻿using System.Data;
+using System.Data;
 using Editors.AnimationMeta.SuperView.Visualisation.Instances;
 using Editors.AnimationMeta.SuperView.Visualisation.Rules;
 using Editors.Shared.Core.Common;
@@ -284,25 +284,14 @@ namespace Editors.AnimationMeta.SuperView.Visualisation
         private IMetaDataInstance CreateEffect(IEffectMeta effect, SceneNode root, ISkeletonProvider skeleton, ParsedMetadataAttribute? selectedAttribute)
         {
             var color = selectedAttribute == effect ? s_selectedColor : s_color;
-            var locatorScale = 0.3f;
-            var textOffset = locatorScale * 1.5f + 0.01f;
-
-            var rotationQuat = new Quaternion(effect.Orientation);
-            var rotMatrix = Matrix.CreateFromQuaternion(rotationQuat);
-    
-            var localX = Vector3.Transform(Vector3.UnitX, rotMatrix);
-            var localY = Vector3.Transform(Vector3.UnitY, rotMatrix);
-            var localZ = Vector3.Transform(Vector3.UnitZ, rotMatrix);
-
             var node = new SimpleDrawableNode("Effect:" + effect.VfxName);
-            node.AddItem(LineHelper.AddLine(effect.Position, effect.Position + localX * locatorScale, Color.Red));
-            node.AddItem(LineHelper.AddLine(effect.Position, effect.Position + localY * locatorScale, Color.Green));
-            node.AddItem(LineHelper.AddLine(effect.Position, effect.Position + localZ * locatorScale, Color.Blue));
 
+            var locatorScale = 0.3f;
+            node.AddItem(LineHelper.AddRgbLocator(effect.Position, locatorScale));
             node.AddItem(new WorldTextRenderItem(_resourceLibrary, effect.VfxName, effect.Position, color));
-            node.AddItem(new WorldTextRenderItem(_resourceLibrary, "X", effect.Position + localX * textOffset, Color.Red));
-            node.AddItem(new WorldTextRenderItem(_resourceLibrary, "Y", effect.Position + localY * textOffset, Color.Green));
-            node.AddItem(new WorldTextRenderItem(_resourceLibrary, "Z", effect.Position + localZ * textOffset, Color.Blue));
+            node.AddItem(new WorldTextRenderItem(_resourceLibrary, "X", effect.Position + new Vector3(locatorScale * .5f + 0.01f,0,0), Color.Red));
+            node.AddItem(new WorldTextRenderItem(_resourceLibrary, "Y", effect.Position + new Vector3(0, locatorScale * .5f + 0.01f, 0), Color.Green));
+            node.AddItem(new WorldTextRenderItem(_resourceLibrary, "Z", effect.Position + new Vector3(0,0,locatorScale * .5f + 0.01f), Color.Blue));
 
             root.AddObject(node);
 
