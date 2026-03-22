@@ -88,6 +88,8 @@ namespace Test.AnimationMeta
         [Test]
         public void MetaDataEditor_DeleteAndSave()
         {
+            throw new Exception();
+
             var packFile = PathHelper.GetDataFile("Throt.pack");
 
             var runner = new AssetEditorTestRunner();
