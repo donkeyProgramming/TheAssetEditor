@@ -19,11 +19,11 @@ namespace GameWorld.Core.Components.Input
         int DeletaScrollWheel();
         Vector2 DeltaPosition();
         Vector2 Position();
-   
+
         bool IsMouseButtonDown(MouseButton button);
         bool IsMouseButtonPressed(MouseButton button);
         bool IsMouseButtonReleased(MouseButton button);
-       
+
         bool IsMouseOwner(IGameComponent component);
         IGameComponent MouseOwner { get; set; }
 
@@ -32,6 +32,26 @@ namespace GameWorld.Core.Components.Input
         MouseState LastState();
 
         void Update(GameTime t);
+
+        // ========== [NEW] Cursor visibility control ==========
+        void HideCursor();
+        void ShowCursor();
+        void SetCursorPosition(int x, int y);
+        bool IsCursorVisible { get; }
+
+        // ========== [NEW] For immediate transform mode ==========
+        /// <summary>
+        /// Forces an immediate state update from WPF mouse.
+        /// Call this at the start of each frame during immediate transform mode
+        /// to ensure delta is calculated correctly.
+        /// </summary>
+        void UpdateState();
+
+        /// <summary>
+        /// Gets the mouse delta for the current frame.
+        /// This is updated once per frame when UpdateState() is called.
+        /// </summary>
+        Vector2 FrameDelta { get; }
     }
 
     public class MouseComponent : BaseComponent, IDisposable, IMouseComponent
@@ -62,6 +82,13 @@ namespace GameWorld.Core.Components.Input
             }
         }
 
+        // ========== [NEW] Cursor visibility state ==========
+        private bool _isCursorVisible = true;
+
+        // ========== [NEW] Frame delta for immediate transform ==========
+        private Vector2 _frameDelta = Vector2.Zero;
+        public Vector2 FrameDelta => _frameDelta;
+
         public MouseComponent(IWpfGame game)
         {
             _wpfMouse = new WpfMouse(game, true);
@@ -84,6 +111,37 @@ namespace GameWorld.Core.Components.Input
 
             if (_lastMousesState == null)
                 _lastMousesState = currentState;
+
+            // Update frame delta for normal usage
+            UpdateFrameDelta();
+        }
+
+        // ========== [NEW] UpdateState for immediate transform ==========
+        /// <summary>
+        /// Forces an immediate state update from WPF mouse.
+        /// This is called at the start of each frame during immediate transform
+        /// to ensure the delta is fresh and accurate.
+        /// </summary>
+        public void UpdateState()
+        {
+            var currentState = _wpfMouse.GetState();
+
+            _lastMousesState = _currentMouseState;
+            _currentMouseState = currentState;
+
+            UpdateFrameDelta();
+        }
+
+        private void UpdateFrameDelta()
+        {
+            // DeltaPosition = last - current (movement that happened)
+            // But we want the direction of movement, so we negate it
+            // Actually, let's keep the original calculation here
+            // and let the consumer decide whether to negate
+            _frameDelta = new Vector2(
+                _lastMousesState.X - _currentMouseState.X,
+                _lastMousesState.Y - _currentMouseState.Y
+            );
         }
 
         public bool IsMouseButtonReleased(MouseButton button)
@@ -147,6 +205,33 @@ namespace GameWorld.Core.Components.Input
         {
             _currentMouseState = new MouseState();
             _lastMousesState = new MouseState();
+            _frameDelta = Vector2.Zero;
+        }
+
+        // ========== [NEW] Cursor visibility control ==========
+        public bool IsCursorVisible => _isCursorVisible;
+
+        public void HideCursor()
+        {
+            if (_isCursorVisible)
+            {
+                _wpfMouse.SetCursorVisibility(false);
+                _isCursorVisible = false;
+            }
+        }
+
+        public void ShowCursor()
+        {
+            if (!_isCursorVisible)
+            {
+                _wpfMouse.SetCursorVisibility(true);
+                _isCursorVisible = true;
+            }
+        }
+
+        public void SetCursorPosition(int x, int y)
+        {
+            _wpfMouse.SetCursor(x, y);
         }
 
         public void Dispose()

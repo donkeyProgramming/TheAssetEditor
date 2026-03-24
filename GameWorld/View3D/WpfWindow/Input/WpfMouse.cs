@@ -26,6 +26,9 @@ namespace GameWorld.Core.WpfWindow.Input
         private MouseState _mouseState;
         private bool _captureMouseWithin = true;
 
+        // ========== [NEW] Cursor visibility state ==========
+        private bool _isCursorVisible = true;
+
         /// <summary>
         /// Creates a new instance of the mouse helper.
         /// </summary>
@@ -180,6 +183,35 @@ namespace GameWorld.Core.WpfWindow.Input
             SetCursorPos((int)p.X, (int)p.Y);
         }
 
+        // ========== [NEW] Cursor visibility control for Blender-style transforms ==========
+        /// <summary>
+        /// Sets the cursor visibility for the WPF focus element.
+        /// When hidden, the cursor is set to Cursors.None, making it invisible.
+        /// This is essential for Blender-style immediate transforms where mouse delta
+        /// is captured without showing the cursor.
+        /// </summary>
+        /// <param name="visible">True to show the cursor, false to hide it</param>
+        public void SetCursorVisibility(bool visible)
+        {
+            if (_focusElement == null)
+                return;
+
+            _isCursorVisible = visible;
+
+            // Use WPF dispatcher to ensure thread-safe cursor manipulation
+            _focusElement.Dispatcher.Invoke(() =>
+            {
+                _focusElement.Cursor = visible ? System.Windows.Input.Cursors.Arrow
+                                               : System.Windows.Input.Cursors.None;
+            });
+        }
+
+        /// <summary>
+        /// Gets the current cursor visibility state.
+        /// </summary>
+        public bool IsCursorVisible => _isCursorVisible;
+        // ========== [END NEW] ==========
+
         [DllImport("User32.dll")]
         private static extern bool SetCursorPos(int x, int y);
 
@@ -203,11 +235,11 @@ namespace GameWorld.Core.WpfWindow.Input
         public IEnumerable<Window> SortWindowsTopToBottom(IEnumerable<Window> unsorted)
         {
             var byHandle = unsorted.Select(win =>
-                {
-                    var a = PresentationSource.FromVisual(win);
-                    var s = (HwndSource)a;
-                    return (win, s?.Handle);
-                })
+            {
+                var a = PresentationSource.FromVisual(win);
+                var s = (HwndSource)a;
+                return (win, s?.Handle);
+            })
                 .Where(x => x.Handle != null)
                 .Where(x => x.win.ToString() != "Microsoft.VisualStudio.DesignTools.WpfTap.WpfVisualTreeService.Adorners.AdornerWindow")
                 .ToDictionary(x => x.Handle);

@@ -16,6 +16,63 @@ namespace GameWorld.Core.Components.Gizmo
 {
     public class TransformGizmoWrapper : ITransformable
     {
+        /// <summary>
+        /// Apply total rotation from original state to avoid accumulation error.
+        /// Used during Immediate Transform mode for precise rotation.
+        /// </summary>
+        /// <param name="axisX">Screen X axis (horizontal on screen, points right)</param>
+        /// <param name="axisY">Screen Y axis (vertical on screen, points up)</param>
+        /// <param name="totalPitch">Total pitch angle in radians (rotation around X axis)</param>
+        /// <param name="totalYaw">Total yaw angle in radians (rotation around Y axis)</param>
+        public void ApplyTotalRotation(Vector3 axisX, Vector3 axisY, float totalPitch, float totalYaw)
+        {
+            if (_effectedObjects == null)
+                return;
+
+            // [FIX] Calculate total rotation matrix from accumulated angles
+            // Pitch = rotation around screen X axis (horizontal, nodding motion)
+            // Yaw = rotation around screen Y axis (vertical, shaking head motion)
+            var pitchRotation = Matrix.CreateFromAxisAngle(axisX, totalPitch);
+            var yawRotation = Matrix.CreateFromAxisAngle(axisY, totalYaw);
+            var totalRotation = yawRotation * pitchRotation;
+
+            // [FIX] Restore to original state first, then apply new total transform
+            // This avoids floating point accumulation error
+            var inverseOfPrevious = Matrix.Invert(_totalGizomTransform);
+            var fullTransform = inverseOfPrevious * totalRotation;
+
+            // Apply transform to all vertices
+            foreach (var geo in _effectedObjects)
+            {
+                var objCenter = _originalPosition;
+
+                if (_selectionState is ObjectSelectionState)
+                {
+                    for (var i = 0; i < geo.VertexCount(); i++)
+                    {
+                        var m = Matrix.CreateTranslation(-objCenter) * fullTransform * Matrix.CreateTranslation(objCenter);
+                        geo.TransformVertex(i, m);
+                    }
+                }
+                else if (_selectionState is VertexSelectionState vertSelectionState)
+                {
+                    for (var i = 0; i < vertSelectionState.VertexWeights.Count; i++)
+                    {
+                        if (vertSelectionState.VertexWeights[i] != 0)
+                        {
+                            var m = Matrix.CreateTranslation(-objCenter) * fullTransform * Matrix.CreateTranslation(objCenter);
+                            geo.TransformVertex(i, m);
+                        }
+                    }
+                }
+
+                // [Performance] Rebuild vertex buffer once per mesh
+                geo.RebuildVertexBuffer();
+            }
+
+            // Update accumulated transform
+            _totalGizomTransform = totalRotation;
+        }
         protected ILogger _logger = Logging.Create<TransformGizmoWrapper>();
 
         Vector3 _pos;
@@ -36,6 +93,9 @@ namespace GameWorld.Core.Components.Gizmo
 
         Matrix _totalGizomTransform = Matrix.Identity;
         bool _invertedWindingOrder = false;
+
+        // [NEW] 保存原始位置用于取消恢复
+        Vector3 _originalPosition;
 
         public TransformGizmoWrapper(CommandFactory commandFactory, List<MeshObject> effectedObjects, ISelectionState vertexSelectionState)
         {
@@ -105,12 +165,60 @@ namespace GameWorld.Core.Components.Gizmo
             return average;
         }
 
+        // [NEW] 保存原始状态，在 Start 时调用
+        public void SaveOriginalState()
+        {
+            _originalPosition = Position;
+        }
+
+        public void Cancel()
+        {
+            // [FIX] 应用逆变换恢复顶点
+            if (_totalGizomTransform != Matrix.Identity && _effectedObjects != null)
+            {
+                // [性能优化] 只在有实际变换时才恢复
+                var inverseTransform = Matrix.Invert(_totalGizomTransform);
+
+                foreach (var geo in _effectedObjects)
+                {
+                    var objCenter = _originalPosition;
+
+                    if (_selectionState is ObjectSelectionState)
+                    {
+                        for (var i = 0; i < geo.VertexCount(); i++)
+                        {
+                            var m = Matrix.CreateTranslation(-objCenter) * inverseTransform * Matrix.CreateTranslation(objCenter);
+                            geo.TransformVertex(i, m);
+                        }
+                    }
+                    else if (_selectionState is VertexSelectionState vertSelectionState)
+                    {
+                        for (var i = 0; i < vertSelectionState.VertexWeights.Count; i++)
+                        {
+                            if (vertSelectionState.VertexWeights[i] != 0)
+                            {
+                                var m = Matrix.CreateTranslation(-objCenter) * inverseTransform * Matrix.CreateTranslation(objCenter);
+                                geo.TransformVertex(i, m);
+                            }
+                        }
+                    }
+
+                    geo.RebuildVertexBuffer();
+                }
+            }
+
+            // [FIX] 重置位置到原始位置
+            Position = _originalPosition;
+
+            _activeCommand = null;
+            _totalGizomTransform = Matrix.Identity;
+        }
+
         public void Start(CommandExecutor commandManager)
         {
 
             if (_activeCommand is TransformVertexCommand transformVertexCommand)
             {
-                //   MessageBox.Show("Transform debug check - Please inform the creator of the tool that you got this message. Would also love it if you tried undoing your last command to see if that works..\n E-001");
                 transformVertexCommand.InvertWindingOrder = _invertedWindingOrder;
                 transformVertexCommand.Transform = _totalGizomTransform;
                 transformVertexCommand.PivotPoint = Position;
@@ -165,16 +273,12 @@ namespace GameWorld.Core.Components.Gizmo
 
         Matrix FixRotationAxis2(Matrix transform)
         {
-            // Decompose the transform matrix into its scale, rotation, and translation components
             transform.Decompose(out var scale, out var rotation, out var translation);
 
-            // Create a quaternion representing a 180-degree rotation around the X axis
             var flipQuaternion = Quaternion.CreateFromAxisAngle(Vector3.UnitX, MathHelper.Pi);
 
-            // Apply the rotation to the quaternion to correct the axis alignment
             var correctedQuaternion = flipQuaternion * rotation;
 
-            // Recompose the transform matrix with the corrected rotation
             var fixedTransform = Matrix.CreateScale(scale) * Matrix.CreateFromQuaternion(correctedQuaternion) * Matrix.CreateTranslation(translation);
 
             return fixedTransform;
@@ -253,8 +357,15 @@ namespace GameWorld.Core.Components.Gizmo
             foreach (var geo in _effectedObjects)
             {
                 var objCenter = Vector3.Zero;
+
+                // [FIX] 对于旋转操作，使用原始位置作为中心，避免累积误差
                 if (pivotType == PivotType.ObjectCenter)
-                    objCenter = Position;
+                {
+                    if (gizmoMode == GizmoMode.Rotate)
+                        objCenter = _originalPosition;  // 使用原始位置
+                    else
+                        objCenter = Position;
+                }
 
                 if (_selectionState is ObjectSelectionState objectSelectionState)
                 {
@@ -270,9 +381,9 @@ namespace GameWorld.Core.Components.Gizmo
                             var weight = vertSelectionState.VertexWeights[i];
                             var vertexScale = Vector3.Lerp(Vector3.One, scale, weight);
                             var vertRot = Quaternion.Slerp(Quaternion.Identity, rot, weight);
-                            var vertTrnas = trans * weight;
+                            var vertTrans = trans * weight;
 
-                            var weightedTransform = Matrix.CreateScale(vertexScale) * Matrix.CreateFromQuaternion(vertRot) * Matrix.CreateTranslation(vertTrnas);
+                            var weightedTransform = Matrix.CreateScale(vertexScale) * Matrix.CreateFromQuaternion(vertRot) * Matrix.CreateTranslation(vertTrans);
 
                             TransformVertex(weightedTransform, geo, objCenter, i);
                         }
@@ -282,7 +393,6 @@ namespace GameWorld.Core.Components.Gizmo
                 geo.RebuildVertexBuffer();
             }
         }
-
         void TransformBone(Matrix transform, Vector3 objCenter, GizmoMode gizmoMode)
         {
             if (_activeCommand is TransformBoneCommand transformBoneCommand)

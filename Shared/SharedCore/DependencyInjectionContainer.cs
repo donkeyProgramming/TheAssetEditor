@@ -34,6 +34,8 @@ namespace Shared.Core
             services.AddScoped<IExceptionService, ExceptionService>();
             services.AddScoped<IExceptionInformationProvider, BasicExceptionInformationProvider>();
             services.AddTransient<DevelopmentConfigurationManager>();
+            // [FIX] Register active window provider for keyboard isolation
+            services.AddSingleton<IActiveWindowProvider, ActiveWindowProvider>();
 
 
             services.AddSingleton<LocalizationManager>();

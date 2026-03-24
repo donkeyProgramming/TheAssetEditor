@@ -23,23 +23,44 @@ namespace GameWorld.Core.Components.Gizmo
         private readonly RenderEngineComponent _resourceLibary;
         private readonly IDeviceResolver _deviceResolverComponent;
         private readonly CommandFactory _commandFactory;
+        private int _referenceCursorX;
+        private int _referenceCursorY;
+        private bool _skipNextDelta = false;  // [FIX] Skip delta after cursor reset
         Gizmo _gizmo;
         bool _isEnabled = false;
         TransformGizmoWrapper _activeTransformation;
         bool _isCtrlPressed = false;
 
-        // ========== [NEW] Blender-style keyboard shortcut state machine ==========
-        // Tracks whether we are in a keyboard-activated transform mode
-        private bool _isKeyboardTransformActive = false;
-        // Stores the mode activated by keyboard (Translate/Rotate/Scale)
-        private GizmoMode? _keyboardActivatedMode = null;
-        // Tracks whether axis is locked via keyboard (X/Y/Z)
-        private bool _isAxisLockedByKeyboard = false;
-        // Store original transform for cancel operation
+        // ========== [IMMEDIATE TRANSFORM] State Machine ==========
+        private enum ImmediateTransformState
+        {
+            Idle,
+            Transforming
+        }
+
+        private ImmediateTransformState _immediateState = ImmediateTransformState.Idle;
+        private GizmoMode? _immediateMode = null;
+        private GizmoAxis _axisLock = GizmoAxis.None;
+
+        // Original transform values for cancellation
         private Vector3 _originalPosition;
         private Quaternion _originalOrientation;
         private Vector3 _originalScale;
-        // ========== [END NEW] ==========
+
+        // Sensitivity control
+        private float _sensitivityMultiplier = 1.0f;
+        private const float PrecisionDampingFactor = 0.1f;
+
+
+        // Add fields in class (around line 65)
+        private bool _immediateCommandStarted = false;
+
+        // [FIX] Accumulated rotation angles to avoid floating point drift
+        private float _accumulatedYaw = 0f;
+        private float _accumulatedPitch = 0f;
+        // [FIX] Flag to skip frame after cursor reset (for rotation)
+        private bool _skipRotationFrame = false;
+        // ========== [END IMMEDIATE TRANSFORM] ==========
 
         public GizmoComponent(IEventHub eventHub,
             IKeyboardComponent keyboardComponent, IMouseComponent mouseComponent, ArcBallCamera camera, CommandExecutor commandExecutor,
@@ -70,27 +91,7 @@ namespace GameWorld.Core.Components.Gizmo
             _gizmo.ScaleEvent += GizmoScaleEvent;
             _gizmo.StartEvent += GizmoTransformStart;
             _gizmo.StopEvent += GizmoTransformEnd;
-
-            // ========== [NEW] Store original transform on transform start ==========
-            _gizmo.StartEvent += StoreOriginalTransform;
-            // ========== [END NEW] ==========
         }
-
-        // ========== [NEW METHOD] Store original transform for cancel functionality ==========
-        /// <summary>
-        /// Stores the original transform values when a transformation starts.
-        /// Used to restore the object state when the user cancels the operation.
-        /// </summary>
-        private void StoreOriginalTransform()
-        {
-            if (_activeTransformation != null)
-            {
-                _originalPosition = _activeTransformation.Position;
-                _originalOrientation = _activeTransformation.Orientation;
-                _originalScale = _activeTransformation.Scale;
-            }
-        }
-        // ========== [END NEW METHOD] ==========
 
         private void OnSelectionChanged(ISelectionState state)
         {
@@ -101,31 +102,44 @@ namespace GameWorld.Core.Components.Gizmo
 
             _gizmo.ResetDeltas();
 
-            // ========== [NEW] Reset keyboard transform state on selection change ==========
-            ResetKeyboardTransformState();
-            // ========== [END NEW] ==========
+            if (_immediateState == ImmediateTransformState.Transforming)
+            {
+                CancelImmediateTransform();
+            }
         }
 
         private void GizmoTransformStart()
         {
+            if (_immediateState != ImmediateTransformState.Idle)
+                return;
+
             _mouse.MouseOwner = this;
             _activeTransformation.Start(_commandManager);
         }
 
         private void GizmoTransformEnd()
         {
+            if (_immediateState != ImmediateTransformState.Idle)
+                return;
+
             _activeTransformation.Stop(_commandManager);
             if (_mouse.MouseOwner == this)
             {
                 _mouse.MouseOwner = null;
                 _mouse.ClearStates();
             }
-
-            // ========== [NEW] Reset keyboard transform state after transform ends ==========
-            ResetKeyboardTransformState();
-            // ========== [END NEW] ==========
         }
 
+        private void StoreOriginalTransform()
+        {
+            if (_activeTransformation != null)
+            {
+                _originalPosition = _activeTransformation.Position;
+                _originalOrientation = _activeTransformation.Orientation;
+                _originalScale = _activeTransformation.Scale;
+                _activeTransformation.SaveOriginalState();  // [FIX] Save original state for cancel
+            }
+        }
 
         private void GizmoTranslateEvent(ITransformable transformable, TransformationEventArgs e)
         {
@@ -153,174 +167,6 @@ namespace GameWorld.Core.Components.Gizmo
             _activeTransformation.GizmoScaleEvent(value, e.Pivot);
         }
 
-        // ========== [NEW METHOD] Handle keyboard shortcut for G/R/S mode activation ==========
-        /// <summary>
-        /// Checks for G/R/S key presses to activate transform modes (Blender-style).
-        /// G = Grab/Translate, R = Rotate, S = Scale.
-        /// </summary>
-        /// <returns>True if a keyboard shortcut was handled</returns>
-        private bool HandleKeyboardShortcutModeActivation()
-        {
-            // Only handle shortcuts if there is a selection
-            if (_activeTransformation == null || !_isEnabled)
-                return false;
-
-            // Check for G key - Grab/Translate mode
-            if (_keyboard.IsKeyReleased(Keys.G))
-            {
-                ActivateKeyboardTransformMode(GizmoMode.Translate);
-                return true;
-            }
-            // Check for R key - Rotate mode
-            else if (_keyboard.IsKeyReleased(Keys.R))
-            {
-                ActivateKeyboardTransformMode(GizmoMode.Rotate);
-                return true;
-            }
-            // Check for S key - Scale mode
-            else if (_keyboard.IsKeyReleased(Keys.S))
-            {
-                ActivateKeyboardTransformMode(GizmoMode.NonUniformScale);
-                return true;
-            }
-
-            return false;
-        }
-        // ========== [END NEW METHOD] ==========
-
-        // ========== [NEW METHOD] Activate keyboard transform mode ==========
-        /// <summary>
-        /// Activates a transform mode via keyboard shortcut (Blender-style).
-        /// Sets the gizmo to the specified mode and prepares for axis selection.
-        /// </summary>
-        /// <param name="mode">The gizmo mode to activate</param>
-        private void ActivateKeyboardTransformMode(GizmoMode mode)
-        {
-            _isKeyboardTransformActive = true;
-            _keyboardActivatedMode = mode;
-            _isAxisLockedByKeyboard = false;
-
-            // Set the gizmo mode
-            _gizmo.ActiveMode = mode;
-
-            // Reset axis to None - user must press X/Y/Z or drag to select
-            _gizmo.ActiveAxis = GizmoAxis.None;
-        }
-        // ========== [END NEW METHOD] ==========
-
-        // ========== [NEW METHOD] Handle axis locking via X/Y/Z keys ==========
-        /// <summary>
-        /// Checks for X/Y/Z key presses to lock transform to specific axis.
-        /// Only effective when keyboard transform mode is active.
-        /// </summary>
-        /// <returns>True if an axis lock was applied</returns>
-        private bool HandleAxisLockKeys()
-        {
-            if (!_isKeyboardTransformActive)
-                return false;
-
-            // Check for X key - lock to X axis
-            if (_keyboard.IsKeyReleased(Keys.X))
-            {
-                _isAxisLockedByKeyboard = true;
-                _gizmo.ActiveAxis = GizmoAxis.X;
-                return true;
-            }
-            // Check for Y key - lock to Y axis
-            else if (_keyboard.IsKeyReleased(Keys.Y))
-            {
-                _isAxisLockedByKeyboard = true;
-                _gizmo.ActiveAxis = GizmoAxis.Y;
-                return true;
-            }
-            // Check for Z key - lock to Z axis
-            else if (_keyboard.IsKeyReleased(Keys.Z))
-            {
-                _isAxisLockedByKeyboard = true;
-                _gizmo.ActiveAxis = GizmoAxis.Z;
-                return true;
-            }
-
-            return false;
-        }
-        // ========== [END NEW METHOD] ==========
-
-        // ========== [NEW METHOD] Handle Esc key to cancel operation ==========
-        /// <summary>
-        /// Checks for Escape key press to cancel the current transform operation.
-        /// Restores the object to its original transform before the operation started.
-        /// </summary>
-        /// <returns>True if cancel was triggered</returns>
-        private bool HandleEscapeCancel()
-        {
-            if (!_isKeyboardTransformActive)
-                return false;
-
-            if (_keyboard.IsKeyReleased(Keys.Escape))
-            {
-                CancelCurrentTransform();
-                return true;
-            }
-
-            return false;
-        }
-        // ========== [END NEW METHOD] ==========
-
-        // ========== [NEW METHOD] Cancel current transform and restore original state ==========
-        /// <summary>
-        /// Cancels the current keyboard-initiated transform operation.
-        /// Restores the object to its original position/orientation/scale.
-        /// </summary>
-        private void CancelCurrentTransform()
-        {
-            // Restore original transform if we have a valid transformation
-            if (_activeTransformation != null)
-            {
-                // Reset the transformation wrapper to original state
-                _activeTransformation.Position = _originalPosition;
-                _activeTransformation.Orientation = _originalOrientation;
-                _activeTransformation.Scale = _originalScale;
-            }
-
-            // Reset gizmo state
-            _gizmo.ResetDeltas();
-            _gizmo.ActiveAxis = GizmoAxis.None;
-
-            // Clear mouse ownership if we own it
-            if (_mouse.MouseOwner == this)
-            {
-                _mouse.MouseOwner = null;
-                _mouse.ClearStates();
-            }
-
-            // Reset state machine
-            ResetKeyboardTransformState();
-        }
-        // ========== [END NEW METHOD] ==========
-
-        // ========== [NEW METHOD] Reset keyboard transform state machine ==========
-        /// <summary>
-        /// Resets all keyboard transform state variables to idle state.
-        /// </summary>
-        public void ResetKeyboardTransformState()
-        {
-            _isKeyboardTransformActive = false;
-            _keyboardActivatedMode = null;
-            _isAxisLockedByKeyboard = false;
-        }
-        // ========== [END NEW METHOD] ==========
-
-        // ========== [NEW METHOD] Check if keyboard transform is active (for testing) ==========
-        /// <summary>
-        /// Returns whether a keyboard-initiated transform is currently active.
-        /// Useful for unit testing the state machine.
-        /// </summary>
-        public bool IsKeyboardTransformActive()
-        {
-            return _isKeyboardTransformActive;
-        }
-        // ========== [END NEW METHOD] ==========
-
         public override void Update(GameTime gameTime)
         {
             var selectionMode = _selectionManager.GetState().Mode;
@@ -338,11 +184,10 @@ namespace GameWorld.Core.Components.Gizmo
             if (!_isEnabled)
                 return;
 
-            // ========== [NEW] Handle Shift key for precision damping ==========
-            // Apply damping factor when Shift is held for fine-tuned adjustments
             bool isShiftPressed = _keyboard.IsKeyDown(Keys.LeftShift) || _keyboard.IsKeyDown(Keys.RightShift);
-            _gizmo.SetDampingFactor(isShiftPressed ? 0.1f : 1.0f);
-            // ========== [END NEW] ==========
+            _sensitivityMultiplier = isShiftPressed ? PrecisionDampingFactor : 1.0f;
+
+            _gizmo.SetDampingFactor(_sensitivityMultiplier);
 
             _isCtrlPressed = _keyboard.IsKeyDown(Keys.LeftControl);
             if (_gizmo.ActiveMode == GizmoMode.NonUniformScale && _isCtrlPressed)
@@ -350,32 +195,372 @@ namespace GameWorld.Core.Components.Gizmo
             else if (_gizmo.ActiveMode == GizmoMode.UniformScale && !_isCtrlPressed)
                 _gizmo.ActiveMode = GizmoMode.NonUniformScale;
 
-            // ========== [NEW] Handle Blender-style keyboard shortcuts ==========
-            // Priority: Esc cancel > Axis lock > Mode activation
-            if (HandleEscapeCancel())
+            UpdateImmediateTransformState();
+
+            var isCameraMoving = _keyboard.IsKeyDown(Keys.LeftAlt);
+            _gizmo.Update(gameTime, !isCameraMoving && _immediateState == ImmediateTransformState.Idle);
+        }
+
+        // ========== [IMMEDIATE TRANSFORM] State Machine Implementation ==========
+
+        private void UpdateImmediateTransformState()
+        {
+            switch (_immediateState)
             {
-                // Transform was cancelled, skip further processing
+                case ImmediateTransformState.Idle:
+                    UpdateIdleState();
+                    break;
+
+                case ImmediateTransformState.Transforming:
+                    UpdateTransformingState();
+                    break;
+            }
+        }
+
+        private void UpdateIdleState()
+        {
+            if (_activeTransformation == null || !_isEnabled)
+                return;
+
+            if (_keyboard.IsKeyReleased(Keys.G))
+            {
+                StartImmediateTransform(GizmoMode.Translate);
                 return;
             }
 
-            if (HandleAxisLockKeys())
+            if (_keyboard.IsKeyReleased(Keys.R))
             {
-                // Axis was locked, continue to allow further input
+                StartImmediateTransform(GizmoMode.Rotate);
+                return;
             }
 
-            if (HandleKeyboardShortcutModeActivation())
+            if (_keyboard.IsKeyReleased(Keys.S))
             {
-                // Mode was activated via keyboard, continue to allow axis selection
+                StartImmediateTransform(GizmoMode.NonUniformScale);
+                return;
             }
-            // ========== [END NEW] ==========
-
-            //// Toggle space mode:
-            //if (_keyboard.IsKeyReleased(Keys.Home))
-            //    _gizmo.ToggleActiveSpace();
-
-            var isCameraMoving = _keyboard.IsKeyDown(Keys.LeftAlt);
-            _gizmo.Update(gameTime, !isCameraMoving);
         }
+
+        private void UpdateTransformingState()
+        {
+            var currentMouseState = _mouse.State();
+            var lastMouseState = _mouse.LastState();
+
+            // [FIX] Check for right mouse button FIRST
+            bool rightButtonJustPressed = lastMouseState.RightButton == ButtonState.Released &&
+                                           currentMouseState.RightButton == ButtonState.Pressed;
+
+            if (rightButtonJustPressed)
+            {
+                CancelImmediateTransform();
+                return;
+            }
+
+            // Check for cancel via Escape key
+            if (_keyboard.IsKeyReleased(Keys.Escape))
+            {
+                CancelImmediateTransform();
+                return;
+            }
+
+            // Check for axis lock keys (X, Y, Z)
+            if (_keyboard.IsKeyReleased(Keys.X))
+            {
+                _axisLock = (_axisLock == GizmoAxis.X) ? GizmoAxis.None : GizmoAxis.X;
+                _gizmo.ActiveAxis = _axisLock;
+                return;
+            }
+            if (_keyboard.IsKeyReleased(Keys.Y))
+            {
+                _axisLock = (_axisLock == GizmoAxis.Y) ? GizmoAxis.None : GizmoAxis.Y;
+                _gizmo.ActiveAxis = _axisLock;
+                return;
+            }
+            if (_keyboard.IsKeyReleased(Keys.Z))
+            {
+                _axisLock = (_axisLock == GizmoAxis.Z) ? GizmoAxis.None : GizmoAxis.Z;
+                _gizmo.ActiveAxis = _axisLock;
+                return;
+            }
+
+            // Check for commit via Left Mouse Button
+            bool leftButtonJustPressed = lastMouseState.LeftButton == ButtonState.Released &&
+                                          currentMouseState.LeftButton == ButtonState.Pressed;
+
+            if (leftButtonJustPressed)
+            {
+                CommitImmediateTransform();
+                return;
+            }
+
+            // Process mouse movement delta for transform
+            ProcessMouseDeltaTransform();
+        }
+
+        // Modify StartImmediateTransform method
+        private void StartImmediateTransform(GizmoMode mode)
+        {
+            _immediateMode = mode;
+            _immediateState = ImmediateTransformState.Transforming;
+            _axisLock = GizmoAxis.None;
+            _immediateCommandStarted = false;
+            _skipNextDelta = false;
+            _skipRotationFrame = false;
+
+            // [FIX] Reset accumulated angles when starting new transform
+            _accumulatedYaw = 0f;
+            _accumulatedPitch = 0f;
+
+            StoreOriginalTransform();
+
+            _mouse.HideCursor();
+
+            _gizmo.ActiveMode = mode;
+            _gizmo.ActiveAxis = GizmoAxis.None;
+
+            _mouse.MouseOwner = this;
+
+            var currentPos = _mouse.Position();
+            _referenceCursorX = (int)currentPos.X;
+            _referenceCursorY = (int)currentPos.Y;
+
+            _activeTransformation.Start(_commandManager);
+            _immediateCommandStarted = true;
+        }
+        // Modify ProcessMouseDeltaTransform method
+        private void ProcessMouseDeltaTransform()
+        {
+            // [FIX] Skip frame after cursor reset to prevent drift
+            if (_skipNextDelta || _skipRotationFrame)
+            {
+                _skipNextDelta = false;
+                _skipRotationFrame = false;
+                _mouse.ClearStates();  // Clear stale mouse state
+                return;
+            }
+
+            var currentPos = _mouse.Position();
+
+            var mouseDelta = new Vector2(
+                currentPos.X - _referenceCursorX,
+                currentPos.Y - _referenceCursorY
+            );
+
+            var effectiveDelta = mouseDelta * _sensitivityMultiplier;
+
+            // [FIX] Skip tiny movements to avoid unnecessary updates
+            if (effectiveDelta.LengthSquared() < 0.001f)
+                return;
+
+            switch (_immediateMode)
+            {
+                case GizmoMode.Translate:
+                    ApplyTranslationDelta(effectiveDelta);
+                    _mouse.SetCursorPosition(_referenceCursorX, _referenceCursorY);
+                    _skipNextDelta = true;
+                    break;
+                case GizmoMode.Rotate:
+                    ApplyRotationDelta(effectiveDelta);
+                    // Cursor reset is handled in ApplyRotationDelta
+                    break;
+                case GizmoMode.NonUniformScale:
+                case GizmoMode.UniformScale:
+                    ApplyScaleDelta(effectiveDelta);
+                    _mouse.SetCursorPosition(_referenceCursorX, _referenceCursorY);
+                    _skipNextDelta = true;
+                    break;
+            }
+        }
+        private void ApplyTranslationDelta(Vector2 mouseDelta)
+        {
+            if (_activeTransformation == null)
+                return;
+
+            var cameraPos = _camera.Position;
+            var cameraLookAt = _camera.LookAt;
+
+            var cameraForward = Vector3.Normalize(cameraLookAt - cameraPos);
+            var cameraRight = Vector3.Normalize(Vector3.Cross(Vector3.Up, cameraForward));
+            var cameraUp = Vector3.Normalize(Vector3.Cross(cameraForward, cameraRight));
+
+            const float pixelToWorldScale = 0.01f;
+
+            var translation = cameraRight * (mouseDelta.X * pixelToWorldScale)
+                            + cameraUp * (-mouseDelta.Y * pixelToWorldScale);
+
+            translation = ApplyAxisConstraint(translation);
+
+            _activeTransformation.GizmoTranslateEvent(translation, _gizmo.ActivePivot);
+        }
+
+        // Modify ApplyRotationDelta method
+        // Completely rewrite ApplyRotationDelta method
+        private void ApplyRotationDelta(Vector2 mouseDelta)
+        {
+            if (_activeTransformation == null)
+                return;
+
+            const float rotationSpeed = 0.5f;
+
+            if (_axisLock == GizmoAxis.None)
+            {
+                // [FIX] Get camera vectors for screen-space rotation
+                var cameraPos = _camera.Position;
+                var cameraLookAt = _camera.LookAt;
+                var cameraForward = Vector3.Normalize(cameraLookAt - cameraPos);
+
+                // [FIX] Screen-space axes:
+                // Screen X axis (horizontal on screen, points right) = camera right
+                // Screen Y axis (vertical on screen, points up) = camera up
+
+                // Camera right vector (points right in world space)
+                var screenX = Vector3.Normalize(Vector3.Cross(Vector3.Up, cameraForward));
+
+                // Camera up vector (points up in world space)
+                var screenY = Vector3.Normalize(Vector3.Cross(cameraForward, screenX));
+
+                // [FIX] Negate mouseDelta.X for correct rotation direction
+                // Mouse right (+X) -> model rotates left (counterclockwise when viewed from above)
+                // So we negate to make mouse right -> model rotates right (clockwise)
+                _accumulatedYaw += -mouseDelta.X * rotationSpeed;
+
+                // Mouse down (+Y) -> model pitches down
+                _accumulatedPitch += -mouseDelta.Y * rotationSpeed;
+
+                float totalYawRadians = MathHelper.ToRadians(_accumulatedYaw);
+                float totalPitchRadians = MathHelper.ToRadians(_accumulatedPitch);
+
+                // [FIX] Call method to apply total rotation from original state
+                _activeTransformation.ApplyTotalRotation(screenX, screenY, totalPitchRadians, totalYawRadians);
+
+                // [FIX] Reset cursor for infinite dragging
+                _mouse.SetCursorPosition(_referenceCursorX, _referenceCursorY);
+                _skipRotationFrame = true;
+            }
+            else
+            {
+                // Axis lock mode: rotate around world axis
+                Vector3 rotationAxis;
+                float rotationDegrees;
+
+                switch (_axisLock)
+                {
+                    case GizmoAxis.X:
+                        rotationAxis = Vector3.UnitX;
+                        rotationDegrees = mouseDelta.Y * rotationSpeed;
+                        break;
+                    case GizmoAxis.Y:
+                        rotationAxis = Vector3.UnitY;
+                        rotationDegrees = mouseDelta.X * rotationSpeed;
+                        break;
+                    case GizmoAxis.Z:
+                        rotationAxis = Vector3.UnitZ;
+                        rotationDegrees = mouseDelta.X * rotationSpeed;
+                        break;
+                    default:
+                        return;
+                }
+
+                float rotationRadians = MathHelper.ToRadians(rotationDegrees);
+                var rotMatrix = Matrix.CreateFromAxisAngle(rotationAxis, rotationRadians);
+                _activeTransformation.GizmoRotateEvent(rotMatrix, _gizmo.ActivePivot);
+
+                // [FIX] Reset cursor for infinite dragging in axis lock mode too
+                _mouse.SetCursorPosition(_referenceCursorX, _referenceCursorY);
+                _skipRotationFrame = true;
+            }
+        }
+        private void ApplyScaleDelta(Vector2 mouseDelta)
+        {
+            if (_activeTransformation == null)
+                return;
+
+            // [FIX] Scale direction: mouse up (negative Y) -> smaller, mouse down (positive Y) -> larger
+            const float scaleSpeed = 0.01f;
+            float scaleFactor = 1.0f + (mouseDelta.Y * scaleSpeed);
+
+            Vector3 scaleVector;
+            if (_axisLock == GizmoAxis.X)
+                scaleVector = new Vector3(scaleFactor, 1.0f, 1.0f);
+            else if (_axisLock == GizmoAxis.Y)
+                scaleVector = new Vector3(1.0f, scaleFactor, 1.0f);
+            else if (_axisLock == GizmoAxis.Z)
+                scaleVector = new Vector3(1.0f, 1.0f, scaleFactor);
+            else
+                scaleVector = new Vector3(scaleFactor);
+
+            var deltaScale = scaleVector - Vector3.One;
+            _activeTransformation.GizmoScaleEvent(deltaScale, _gizmo.ActivePivot);
+        }
+
+        private Vector3 ApplyAxisConstraint(Vector3 translation)
+        {
+            if (_axisLock == GizmoAxis.X)
+                return new Vector3(translation.X, 0, 0);
+            if (_axisLock == GizmoAxis.Y)
+                return new Vector3(0, translation.Y, 0);
+            if (_axisLock == GizmoAxis.Z)
+                return new Vector3(0, 0, translation.Z);
+
+            return translation;
+        }
+
+        private void CommitImmediateTransform()
+        {
+            _mouse.ShowCursor();
+            if (_immediateCommandStarted)
+            {
+                _activeTransformation.Stop(_commandManager);
+                _immediateCommandStarted = false;
+            }
+            // [FIX] 刷新 Gizmo 位置
+            _gizmo.ResetDeltas();
+            if (_mouse.MouseOwner == this)
+            {
+                _mouse.MouseOwner = null;
+                _mouse.ClearStates();
+            }
+            ResetImmediateTransformState();
+        }
+
+        private void CancelImmediateTransform()
+        {
+            _mouse.ShowCursor();
+            if (_immediateCommandStarted)
+            {
+                _activeTransformation.Cancel();
+                _immediateCommandStarted = false;
+            }
+            // [FIX] 清除 Gizmo 选择，让坐标轴消失
+            // 下次重新选中模型时，坐标轴会正确显示在模型上
+            _gizmo.Selection.Clear();
+            _gizmo.ResetDeltas();
+            _gizmo.ActiveAxis = GizmoAxis.None;
+            if (_mouse.MouseOwner == this)
+            {
+                _mouse.MouseOwner = null;
+                _mouse.ClearStates();
+            }
+            ResetImmediateTransformState();
+        }
+
+        // Modify ResetImmediateTransformState method
+        private void ResetImmediateTransformState()
+        {
+            _immediateState = ImmediateTransformState.Idle;
+            _immediateMode = null;
+            _axisLock = GizmoAxis.None;
+            _skipNextDelta = false;
+            _skipRotationFrame = false;
+            _accumulatedYaw = 0f;
+            _accumulatedPitch = 0f;
+        }
+        public bool IsImmediateTransformActive()
+        {
+            return _immediateState == ImmediateTransformState.Transforming;
+        }
+
+        // ========== [END IMMEDIATE TRANSFORM] ==========
 
         public void SetGizmoMode(GizmoMode mode)
         {
@@ -392,9 +577,10 @@ namespace GameWorld.Core.Components.Gizmo
         {
             _isEnabled = false;
 
-            // ========== [NEW] Reset keyboard state when disabled ==========
-            ResetKeyboardTransformState();
-            // ========== [END NEW] ==========
+            if (_immediateState == ImmediateTransformState.Transforming)
+            {
+                CancelImmediateTransform();
+            }
         }
 
         public override void Draw(GameTime gameTime)
