@@ -181,6 +181,10 @@ namespace GameWorld.Core.Components.Rendering
 
             foreach (var item in _renderItems[RenderBuckedId.Font])
                 item.Draw(device, commonShaderParameters, RenderingTechnique.Normal);
+
+            foreach (var item in _renderItems[RenderBuckedId.Texture2D])
+                item.Draw(device, commonShaderParameters, RenderingTechnique.Normal);
+
             spriteBatch.End();
         }
 

@@ -26,6 +26,11 @@ namespace GameWorld.Core.WpfWindow.Input
         private MouseState _mouseState;
         private bool _captureMouseWithin = true;
 
+        // Cache window Z-order enumeration (expensive P/Invoke + VisualTree per mouse move)
+        private List<Window> _cachedWindowOrder;
+        private DateTime _windowOrderCacheTime;
+        private static readonly TimeSpan _windowOrderCacheDuration = TimeSpan.FromMilliseconds(500);
+
         /// <summary>
         /// Creates a new instance of the mouse helper.
         /// </summary>
@@ -81,9 +86,15 @@ namespace GameWorld.Core.WpfWindow.Input
                 return;
 
             // Detect if there is a window that is on top of the main application. If so, we dont want to capture the mouse
-            // This shit is buggy and bad =(
+            // Cache the window enumeration to avoid P/Invoke + VisualTree on every mouse move
             GetCursorPos(out var p);
-            var topToBottom = SortWindowsTopToBottom(Application.Current.Windows.OfType<Window>()).ToList();
+            var now = DateTime.UtcNow;
+            if (_cachedWindowOrder == null || (now - _windowOrderCacheTime) > _windowOrderCacheDuration)
+            {
+                _cachedWindowOrder = SortWindowsTopToBottom(Application.Current.Windows.OfType<Window>()).ToList();
+                _windowOrderCacheTime = now;
+            }
+            var topToBottom = _cachedWindowOrder;
             foreach (var window in topToBottom)
             {
                 var hitPoint = window.PointFromScreen(new Point() { X = p.X, Y = p.Y });
@@ -171,6 +182,7 @@ namespace GameWorld.Core.WpfWindow.Input
         /// <summary>
         /// Sets the cursor to the specific coordinates within the attached game.
         /// This is required as the monogame Mouse.SetPosition function relies on the underlying Winforms implementation and will not work with WPF.
+        /// Also updates the internal mouse state immediately to ensure correct position in next frame.
         /// </summary>
         /// <param name="x"></param>
         /// <param name="y"></param>
@@ -178,6 +190,52 @@ namespace GameWorld.Core.WpfWindow.Input
         {
             var p = _focusElement.PointToScreen(new Point(x, y));
             SetCursorPos((int)p.X, (int)p.Y);
+
+            // Immediately update mouse state to prevent stale position in next frame
+            // This is critical for infinite drag to work smoothly at high frame rates
+            var m = _mouseState;
+            _mouseState = new MouseState(x, y, m.ScrollWheelValue, m.LeftButton, m.MiddleButton, m.RightButton, m.XButton1, m.XButton2);
+        }
+
+        /// <summary>
+        /// Sets the mouse cursor appearance for modal transform operations.
+        /// </summary>
+        /// <param name="cursor">The cursor type to display, or null to reset to default.</param>
+        public void SetCursorType(System.Windows.Input.Cursor cursor)
+        {
+            if (_focusElement != null)
+            {
+                if (cursor == null)
+                {
+                    _focusElement.Cursor = System.Windows.Input.Cursors.Arrow;
+                    System.Windows.Input.Mouse.OverrideCursor = null;
+                }
+                else
+                {
+                    _focusElement.Cursor = cursor;
+                    System.Windows.Input.Mouse.OverrideCursor = cursor;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Resets the mouse cursor to the default arrow.
+        /// </summary>
+        public void ResetCursor()
+        {
+            SetCursorType(null);
+        }
+
+        /// <summary>
+        /// Get the size of the focus element (viewport size)
+        /// </summary>
+        public Microsoft.Xna.Framework.Vector2 GetElementSize()
+        {
+            if (_focusElement != null)
+            {
+                return new Microsoft.Xna.Framework.Vector2((float)_focusElement.ActualWidth, (float)_focusElement.ActualHeight);
+            }
+            return Microsoft.Xna.Framework.Vector2.Zero;
         }
 
         [DllImport("User32.dll")]
@@ -203,11 +261,11 @@ namespace GameWorld.Core.WpfWindow.Input
         public IEnumerable<Window> SortWindowsTopToBottom(IEnumerable<Window> unsorted)
         {
             var byHandle = unsorted.Select(win =>
-                {
-                    var a = PresentationSource.FromVisual(win);
-                    var s = (HwndSource)a;
-                    return (win, s?.Handle);
-                })
+            {
+                var a = PresentationSource.FromVisual(win);
+                var s = (HwndSource)a;
+                return (win, s?.Handle);
+            })
                 .Where(x => x.Handle != null)
                 .Where(x => x.win.ToString() != "Microsoft.VisualStudio.DesignTools.WpfTap.WpfVisualTreeService.Adorners.AdornerWindow")
                 .ToDictionary(x => x.Handle);

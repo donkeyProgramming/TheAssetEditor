@@ -7,6 +7,7 @@ using GameWorld.Core.Commands.Vertex;
 using GameWorld.Core.Components;
 using GameWorld.Core.Components.Gizmo;
 using GameWorld.Core.Components.Input;
+using GameWorld.Core.Components.Navigation;
 using GameWorld.Core.Components.Rendering;
 using GameWorld.Core.Components.Selection;
 using GameWorld.Core.Rendering.Geometry;
@@ -109,6 +110,11 @@ namespace GameWorld.Core
             RegisterGameComponent<GridComponent>(serviceCollection);
             RegisterGameComponent<AnimationsContainerComponent>(serviceCollection);
             RegisterGameComponent<LightControllerComponent>(serviceCollection);
+            RegisterGameComponent<ViewportGizmo>(serviceCollection);
+            RegisterGameComponent<ViewportSelector>(serviceCollection);
+            RegisterGameComponent<CameraController>(serviceCollection);
+            
+
 
             //serviceCollection.AddScoped<ISceneLightParameters>(x => x.GetRequiredService<LightControllerComponent>()); 
         }
