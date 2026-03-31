@@ -22,6 +22,7 @@ namespace AssetEditor.ViewModels
         public ObservableCollection<BackgroundColour> RenderEngineBackgroundColours { get; set; } = [];
         public ObservableCollection<GameTypeEnum> Games { get; set; } = [];
         public ObservableCollection<GamePathItem> GameDirectores { get; set; } = [];
+        public ObservableCollection<CameraControlMode> CameraModes { get; set; } = [];
 
         [ObservableProperty] private string _selectedLanguage;
         [ObservableProperty] private ThemeType _currentTheme;
@@ -33,6 +34,7 @@ namespace AssetEditor.ViewModels
         [ObservableProperty] private bool _showCAWemFiles;
         [ObservableProperty] private string _wwisePath;
         [ObservableProperty] private bool _onlyLoadLod0ForReferenceMeshes;
+        [ObservableProperty] private CameraControlMode _selectedCameraMode;
 
         public SettingsViewModel(ApplicationSettingsService settingsService, LocalizationManager localizationManager)
         {
@@ -47,6 +49,7 @@ namespace AssetEditor.ViewModels
             RenderEngineBackgroundColours = new ObservableCollection<BackgroundColour>((BackgroundColour[])Enum.GetValues(typeof(BackgroundColour)));
             CurrentRenderEngineBackgroundColour = _settingsService.CurrentSettings.RenderEngineBackgroundColour;
             VisualEditorsGridSize = _settingsService.CurrentSettings.VisualEditorsGridSize;
+            CameraModes = new ObservableCollection<CameraControlMode>((CameraControlMode[])Enum.GetValues(typeof(CameraControlMode)));
 
             StartMaximised = _settingsService.CurrentSettings.StartMaximised;
             Games = new ObservableCollection<GameTypeEnum>(GameInformationDatabase.Games.Values.OrderBy(game => game.DisplayName).Select(game => game.Type));
@@ -54,6 +57,8 @@ namespace AssetEditor.ViewModels
             LoadCaPacksByDefault = _settingsService.CurrentSettings.LoadCaPacksByDefault;
             ShowCAWemFiles = _settingsService.CurrentSettings.ShowCAWemFiles;
             OnlyLoadLod0ForReferenceMeshes = _settingsService.CurrentSettings.OnlyLoadLod0ForReferenceMeshes;
+            SelectedCameraMode = _settingsService.CurrentSettings.CameraControlMode;
+
             foreach (var game in GameInformationDatabase.Games.Values.OrderBy(game => game.DisplayName))
             {
                 GameDirectores.Add(
@@ -81,6 +86,8 @@ namespace AssetEditor.ViewModels
             _settingsService.CurrentSettings.SelectedLangauge = SelectedLanguage;
             _settingsService.CurrentSettings.OnlyLoadLod0ForReferenceMeshes = OnlyLoadLod0ForReferenceMeshes;
             _settingsService.CurrentSettings.GameDirectories.Clear();
+            _settingsService.CurrentSettings.CameraControlMode = SelectedCameraMode;
+
             foreach (var item in GameDirectores)
                 _settingsService.CurrentSettings.GameDirectories.Add(new ApplicationSettings.GamePathPair() { Game = item.GameType, Path = item.Path });
             _settingsService.CurrentSettings.WwisePath = WwisePath;

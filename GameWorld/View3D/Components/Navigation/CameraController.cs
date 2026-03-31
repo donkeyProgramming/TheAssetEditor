@@ -2,29 +2,23 @@
 using GameWorld.Core.Components.Rendering;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
+using Shared.Core.Settings;
 
 namespace GameWorld.Core.Components.Navigation
 {
-    public enum CameraControlMode
-    {
-        BlenderStyle,
-        AssetEditorStyle,  
-    }
-
     public class CameraController : BaseComponent
     {
         private readonly ArcBallCamera _arcBallCamera;
         private readonly IMouseComponent _mouseComponent;
         private readonly IKeyboardComponent _keyboardComponent;
+        private readonly ApplicationSettingsService _applicationSettingsService;
 
-        public CameraControlMode ControlMode { get; set; } = CameraControlMode.AssetEditorStyle;
-
-        public CameraController(ArcBallCamera arcBallCamera, IMouseComponent mouseComponent, IKeyboardComponent keyboardComponent)
+        public CameraController(ArcBallCamera arcBallCamera, IMouseComponent mouseComponent, IKeyboardComponent keyboardComponent, ApplicationSettingsService applicationSettingsService)
         {
             _arcBallCamera = arcBallCamera;
             _mouseComponent = mouseComponent;
             _keyboardComponent = keyboardComponent;
-
+            _applicationSettingsService = applicationSettingsService;
             UpdateOrder = (int)ComponentUpdateOrderEnum.Camera;
         }
 
@@ -38,6 +32,7 @@ namespace GameWorld.Core.Components.Navigation
             var deltaMouseX = -mouse.DeltaPosition().X;
             var deltaMouseY = mouse.DeltaPosition().Y;
             var deltaMouseWheel = mouse.DeletaScrollWheel();
+            var controlMode = _applicationSettingsService.CurrentSettings.CameraControlMode;
 
             // Reset camera
             if (keyboard.IsKeyReleased(Keys.F4))
@@ -73,7 +68,7 @@ namespace GameWorld.Core.Components.Navigation
             var isMiddleMouseDown = mouse.IsMouseButtonDown(MouseButton.Middle);
             var isShiftDown = keyboard.IsKeyDown(Keys.LeftShift);
 
-            if (ControlMode == CameraControlMode.BlenderStyle)
+            if (controlMode == CameraControlMode.BlenderStyle)
             {
                 // Blender-style: Middle mouse button navigation (no Alt required)
                 if (isMiddleMouseDown)
