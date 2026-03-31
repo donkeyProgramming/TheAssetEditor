@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Asset Editor Documentation</title>
+
+<style>
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    display: flex;
+    height: 100vh;
+}
+
+/* loadWithFallback is defined in the script section */
+
+.sidebar {
+    width: 320px;
+    background: #f8f9fb;
+    border-right: 1px solid #ddd;
+    padding: 15px;
+    box-sizing: border-box;
+}
+
+.sidebar-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+.sidebar-header img {
+    width: 28px;
+}
+
+.language-select {
+    margin-bottom: 20px;
+}
+
+.file-list a {
+    display: block;
+    padding: 6px 0;
+    text-decoration: none;
+    color: #2b5fd9;
+    cursor: pointer;
+}
+
+.file-list a:hover {
+    text-decoration: underline;
+}
+
+.content {
+    flex: 1;
+}
+
+iframe {
+    width: 100%;
+    height: 100%;
+    border: none;
+}
+</style>
+</head>
+
+<body>
+
+<div class="sidebar">
+
+    <div class="sidebar-header">
+        Asset Editor Documentation
+        <img src="icon.svg">
+    </div>
+
+    <div class="language-select">
+        Language:
+        <select id="languageSelector">
+            <option value="en">English</option>
+            <option value="no">Norwegian</option>
+        </select>
+    </div>
+
+    <div class="file-list" id="fileList"></div>
+
+</div>
+
+<div class="content">
+    <iframe id="docFrame"></iframe>
+</div>
+
+<script>
+
+// MASTER PAGE LIST (language independent)
+// Add an explicit 'langs' array for each doc to indicate available translations.
+// The code will check this against the currently selected language and only
+// attempt to load a localized file if that language is listed here. Otherwise
+// it will load the English default.
+const masterDocs = [
+    { title: "Getting Started", base: "GettingStarted", langs: ["en", "no"] },
+    { title: "PackFile Handling", base: "PackFileHandling", langs: ["en"] },
+    { title: "Camera Control", base: "CameraControl", langs: ["en"] }
+];
+
+
+
+
+
+function resolveFile(baseName) {
+    // Return the single file path to load. If the selected language is
+    // supported for this document, return the localized filename; otherwise
+    // return the English default file. No runtime fallback attempts are used.
+    const selectElement = document.getElementById("languageSelector");
+    const currentLanguage = selectElement.value;
+    console.log("Selected Value:", currentLanguage);
+    const defaultLanguage = 'en';
+    const fallback = `Documentation/${baseName}.html`;
+
+    // Find doc entry to see which languages are available for this file.
+    const docEntry = masterDocs.find(d => d.base === baseName) || {};
+    const available = docEntry.langs || [defaultLanguage];
+
+    const file = (currentLanguage && currentLanguage !== defaultLanguage && available.includes(currentLanguage))
+        ? `Documentation/${baseName}_${currentLanguage}.html`
+        : fallback;
+
+    console.log("Resolved file:", file);
+    return Promise.resolve(file);
+}
+
+function loadFile(frame, file) {
+    // Simple file load: set iframe src to the resolved file path.
+    frame.onload = null;
+    frame.onerror = null;
+    frame.src = file;
+}
+
+function loadSidebar() {
+
+    const list = document.getElementById("fileList");
+    list.innerHTML = "";
+
+    masterDocs.forEach(doc => {
+
+        const link = document.createElement("a");
+        link.textContent = doc.title;
+
+        link.onclick = async () => {
+            const file = await resolveFile(doc.base);
+            const frame = document.getElementById("docFrame");
+            loadFile(frame, file);
+        };
+
+        list.appendChild(link);
+    });
+
+}
+
+document.getElementById("languageSelector").addEventListener("change", e => {
+    // Rebuild sidebar links and load the first page in the newly selected language.
+    loadSidebar();
+    resolveFile(masterDocs[0].base).then(file => {
+        const frame = document.getElementById("docFrame");
+        loadFile(frame, file);
+    });
+});
+
+loadSidebar();
+
+// Load first page initially
+resolveFile(masterDocs[0].base).then(file => {
+    const frame = document.getElementById("docFrame");
+    loadFile(frame, file);
+});
+
+</script>
+
+</body>
+</html>

@@ -179,8 +179,12 @@ namespace GameWorld.Core.Components.Rendering
             // Clear the screen
             spriteBatch.Draw(_whiteTexture, new Rectangle(0, 0, device.Viewport.Width, device.Viewport.Height), _backgroundColour);
 
+            foreach (var item in _renderItems[RenderBuckedId.Texture2D])
+                item.Draw(device, commonShaderParameters, RenderingTechnique.Normal);
+
             foreach (var item in _renderItems[RenderBuckedId.Font])
                 item.Draw(device, commonShaderParameters, RenderingTechnique.Normal);
+
             spriteBatch.End();
         }
 

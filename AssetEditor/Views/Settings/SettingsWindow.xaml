@@ -6,7 +6,9 @@
         xmlns:local="clr-namespace:AssetEditor.Views.Settings"
           xmlns:loc="clr-namespace:Shared.Ui.Common;assembly=Shared.Ui"
         mc:Ignorable="d"
-        Title="Settings" Height="685" Width="850"
+        Title="Settings"
+        SizeToContent="WidthAndHeight"
+        ContentRendered="Window_OnContentRendered"
         Style="{StaticResource CustomWindowStyle}"
         ResizeMode="NoResize">
     <Grid>

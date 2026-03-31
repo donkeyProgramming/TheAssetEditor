@@ -51,6 +51,7 @@
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
 
             <TextBlock Grid.Row="0" Text="{loc:Loc SettingsWindow.Application}" Margin="5, 10, 0, 0" FontSize="15"/>
@@ -76,6 +77,10 @@
 
             <TextBlock Grid.Row="7" Grid.Column="0" Text="{loc:Loc SettingsWindow.ShowCaWems}" Margin="5, 0, 0, 0"/>
             <CheckBox Grid.Row="7" Grid.Column="1" Margin="-1, 0, 0, 5" IsChecked="{Binding ShowCAWemFiles, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
+
+            <TextBlock Grid.Row="8" Text="{loc:Loc SettingsWindow.CameraMode}" Margin="5, 0, 0, 0"/>
+            <ComboBox Grid.Row="8" Grid.Column="1" Margin="0, 0, 0, 5" SelectedItem="{Binding SelectedCameraMode, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" 
+                    ItemsSource="{Binding CameraModes}"/>
         </Grid>
 
 

@@ -1,5 +1,4 @@
-﻿using System;
-using GameWorld.Core.Commands;
+﻿using GameWorld.Core.Commands;
 using GameWorld.Core.Components.Input;
 using GameWorld.Core.Components.Rendering;
 using GameWorld.Core.Components.Selection;
@@ -135,10 +134,6 @@ namespace GameWorld.Core.Components.Gizmo
                 _gizmo.ActiveMode = GizmoMode.UniformScale;
             else if (_gizmo.ActiveMode == GizmoMode.UniformScale && !_isCtrlPressed)
                 _gizmo.ActiveMode = GizmoMode.NonUniformScale;
-
-            //// Toggle space mode:
-            //if (_keyboard.IsKeyReleased(Keys.Home))
-            //    _gizmo.ToggleActiveSpace();
 
             var isCameraMoving = _keyboard.IsKeyDown(Keys.LeftAlt);
             _gizmo.Update(gameTime, !isCameraMoving);

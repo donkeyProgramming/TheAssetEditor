@@ -5,6 +5,12 @@ using Shared.Core.Misc;
 
 namespace Shared.Core.Settings
 {
+    public enum CameraControlMode
+    {
+        BlenderStyle,
+        AssetEditorStyle,
+    }
+
     public class ApplicationSettings
     {
         public class GamePathPair
@@ -27,6 +33,7 @@ namespace Shared.Core.Settings
         public bool OnlyLoadLod0ForReferenceMeshes { get; set; } = true;
         public int VisualEditorsGridSize { get; set; } = 10;
         public string SelectedLangauge { get; set; } = "en";
+        public CameraControlMode CameraControlMode { get; set; } = CameraControlMode.AssetEditorStyle;
 
         public ApplicationSettings()
         {

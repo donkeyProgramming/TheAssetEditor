@@ -8,9 +8,6 @@ using GameWorld.Core.Services;
 using Microsoft.Xna.Framework;
 using Serilog;
 using Shared.Core.ErrorHandling;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace GameWorld.Core.Components.Gizmo
 {

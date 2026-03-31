@@ -1,0 +1,41 @@
+
+<!DOCTYPE html>
+<html>
+<head><meta charset="UTF-8"></head>
+<body>
+    <h1>PackFile handling</h1>
+    <p>PackFiles is the format that Total War games use. They are a folder stucture packed into a single file. Multiple packfiles can be open at any given time</p>
+
+    <h2>Creating or opening a packfile</h2>
+    <p>A packfile can be added to the editor in multiple ways. .</p>
+    <ul>
+        <li><b>File=>New Packfile</b> - Create a new PackFile. </li>
+        <li><b>File=>Open Pack</b> - Browse the computer for a packfile </li>
+        <li><b>File=>Open Recent Pack</b> - Open a recently used packfile</li>
+        <li><b>File=>Open Game Packs</b> - Load all the packfiles for a given game</li>
+    </ul>
+
+    <h2>The Editable pack</h2>
+    <p>
+        AssetEditor always have one main pack, which is the pack that is being edited. This pack is editable, and all changes are made to this pack. When a new packfile is opened, it becomes the main pack.
+        You can change the main pack by right clicking on a packfile in the packfile explorer and selecting "Set as main pack". The main pack is marked bold text in the packfile explore and the name displayed at the bottom
+    </p>
+    <img src="Images\AssetEditor_editablePack.png">
+
+    <h2>Editing a PackFile</h2>
+    <p>
+        Files inside a packfile can be draged and dropped into new locations. New folder can be created by right clicking on a folder and selecting "Create new folder".
+        Its possible to import files from disk by right clicking on a folder and selecting "Import file". This will import the file into the packfile in the same location as the folder. If a file with the same name already exists, it will be overwritten.
+        Right clicking on a file or folder in the packfile explorer will open a context menu with options to delete or rename.
+        If a folder in a different packfile is selected, the user can right click and pick "Copy to main pack". This will copy the file or folder to the same location in the main pack. If a file with the same name already exists, it will be overwritten.
+    </p>
+
+    <h2>Saving a PackFile</h2>
+    <p>
+        When a packfile is edited, the name of the packfile is marked with an asterisk and the name changes to red.
+        To save a packfile, right click on the packfile in the packfile explorer and select "Save". If the packfile is new and has not been saved before, a save file dialog will open. If the packfile has been saved before, it will be saved to the same location.
+    </p>
+    <img src="Images\AssetEditor_packfilewithchanges.png">
+
+</body>
+</html>

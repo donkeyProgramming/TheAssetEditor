@@ -7,6 +7,7 @@
   "SettingsWindow.LoadGameFileOnStartup": "Load game file on startup",
   "SettingsWindow.ShowCaWems": "Show CA audio (.wem) files",
   "SettingsWindow.Rendering": "Rendering",
+  "SettingsWindow.CameraMode": "3D camera mode",
   "SettingsWindow.RenderBackground": "Render engine background colour",
   "SettingsWindow.OnlyLoadLod0": "Only load Lod0 for reference meshes",
   "SettingsWindow.GridSize": "Grid Size",
