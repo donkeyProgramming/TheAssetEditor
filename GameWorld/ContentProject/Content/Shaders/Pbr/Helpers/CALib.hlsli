@@ -104,8 +104,6 @@ in const float3 c1,
 in const float3 c2,
 in const float3 c3)
 {
-   
-    
     float mask_p1 = MaskText.Sample(S, tex_coord).r;
     float mask_p2 = MaskText.Sample(S, tex_coord).g;
     float mask_p3 = MaskText.Sample(S, tex_coord).b;

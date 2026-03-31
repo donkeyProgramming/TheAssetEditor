@@ -7,11 +7,13 @@
         xmlns:basedialogs="clr-namespace:Shared.Ui.BaseDialogs;assembly=Shared.Ui" 
         xmlns:colourpickerbutton="clr-namespace:Shared.Ui.BaseDialogs.ColourPickerButton;assembly=Shared.Ui"
         mc:Ignorable="d"
+          ContentRendered="Window_OnContentRendered"
         ResizeMode="NoResize"
+          SizeToContent="WidthAndHeight"
         Style="{StaticResource CustomWindowStyle}"
-        Title="Render settings" Height="300" Width="347">
+        Title="Render settings" >
 
-    <DockPanel LastChildFill="False">
+    <DockPanel LastChildFill="False" >
         <basedialogs:AeAttribute DockPanel.Dock="Top" LabelText="Use backface culling" LabelWidth="150">
             <CheckBox IsChecked="{Binding UseBackfaceCulling, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
         </basedialogs:AeAttribute>
@@ -43,6 +45,12 @@
             <TextBox Margin="2" Text="{Binding LightIntensity, UpdateSourceTrigger=LostFocus}" MaxLength="8"  VerticalContentAlignment="Center" Width="100" HorizontalAlignment="Left" HorizontalContentAlignment="Right"/>
         </basedialogs:AeAttribute>
 
+        <basedialogs:AeAttribute DockPanel.Dock="Top" LabelText="Light Colour" LabelWidth="150">
+            <DockPanel LastChildFill="False">
+                <colourpickerbutton:ColourPickerButtonView DockPanel.Dock="Left" Width="25" Height="25" Margin="2" DataContext="{Binding LightColour}"/>
+            </DockPanel>
+        </basedialogs:AeAttribute>
+
         <basedialogs:AeAttribute DockPanel.Dock="Top" LabelText="Env light rotation X" LabelWidth="150">
             <TextBox Margin="2" Text="{Binding EnvLightRotationY, UpdateSourceTrigger=LostFocus}" MaxLength="8"  VerticalContentAlignment="Center" Width="100" HorizontalAlignment="Left" HorizontalContentAlignment="Right"/>
         </basedialogs:AeAttribute>
@@ -54,8 +62,6 @@
         <basedialogs:AeAttribute DockPanel.Dock="Top" LabelText="Direct light rotation Y" LabelWidth="150">
             <TextBox Margin="2" Text="{Binding DirectLightRotationY, UpdateSourceTrigger=LostFocus}" MaxLength="8"  VerticalContentAlignment="Center" Width="100" HorizontalAlignment="Left" HorizontalContentAlignment="Right"/>
         </basedialogs:AeAttribute>
-        
-        <Button DockPanel.Dock="Bottom" Margin="3" Click="SaveButtonClick">Save</Button>
     </DockPanel>
 </Window>
 

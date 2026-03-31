@@ -15,6 +15,7 @@ float LightMult = 1;
 
 bool debug = true;
 float exposure = 1;
+float3 Constant_LightColour = float3(1, 1, 1);
 
 float light0_roughnessFactor = 1;
 float light0_radiannce = 1;

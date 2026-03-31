@@ -17,6 +17,7 @@ namespace GameWorld.Core.Rendering.Materials.Capabilities
         public Matrix ModelMatrix { get; set; }
 
         public float LightIntensityMult { get; set; }
+        public Vector3 LightColour { get; set; }
 
         public void Apply(Effect effect, IScopedResourceLibrary _)
         {
@@ -27,6 +28,7 @@ namespace GameWorld.Core.Rendering.Materials.Capabilities
             effect.Parameters["LightMult"].SetValue(LightIntensityMult);
             effect.Parameters["World"].SetValue(ModelMatrix);
             effect.Parameters["CameraPos"].SetValue(CameraPosition);
+            effect.Parameters["Constant_LightColour"].SetValue(LightColour);
         }
 
         public void Assign(CommonShaderParameters parameters, Matrix modelMatrix)
@@ -41,6 +43,7 @@ namespace GameWorld.Core.Rendering.Materials.Capabilities
             DirLightRotationRadians_X = parameters.DirLightRotationRadians_X;
             DirLightRotationRadians_Y = parameters.DirLightRotationRadians_Y;
             LightIntensityMult = parameters.LightIntensityMult;
+            LightColour = parameters.LightColour;
         }
 
         public ICapability Clone()

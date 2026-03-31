@@ -8,7 +8,7 @@ namespace GameWorld.Core.Components.Rendering
         public static CommonShaderParameters Build(ArcBallCamera camera, SceneRenderParametersStore sceneLightParameters)
         {
             var commonShaderParameters = new CommonShaderParameters(
-                 camera.ViewMatrix,
+                camera.ViewMatrix,
                 camera.ProjectionMatrix,
                 camera.Position,
                 camera.LookAt,
@@ -18,7 +18,9 @@ namespace GameWorld.Core.Components.Rendering
                 MathHelper.ToRadians(sceneLightParameters.DirLightRotationDegrees_Y),
                 sceneLightParameters.LightIntensityMult,
 
-                [sceneLightParameters.FactionColour0, sceneLightParameters.FactionColour1, sceneLightParameters.FactionColour2]);
+                [sceneLightParameters.FactionColour0, sceneLightParameters.FactionColour1, sceneLightParameters.FactionColour2],
+                sceneLightParameters.LightColour
+                );
 
             return commonShaderParameters;
         }

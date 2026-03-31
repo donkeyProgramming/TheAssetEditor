@@ -4,7 +4,6 @@
 
 float3 SampleGradient_old(float t)
 {
-    
     float3 colors[4] = { float3(0, 0, 0), float3(1, 0.200000003, 0), float3(0.670000017, 0.670000017, 0.670000017), float3(1, 1, 1) };
     float times[4] = { 0, 0.330000013, 0.670000017, 1 };
     

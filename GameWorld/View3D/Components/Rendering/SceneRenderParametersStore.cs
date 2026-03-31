@@ -8,6 +8,7 @@ namespace GameWorld.Core.Components.Rendering
         public float DirLightRotationDegrees_X { get; set; } = 0;
         public float DirLightRotationDegrees_Y { get; set; } = 0;
         public float LightIntensityMult { get; set; } = 1;
+        public Vector3 LightColour { get; set; } = Color.White.ToVector3();
 
         public Vector3 FactionColour0 { get; set; } = Color.Red.ToVector3();
         public Vector3 FactionColour1 { get; set; } = Color.Blue.ToVector3();
