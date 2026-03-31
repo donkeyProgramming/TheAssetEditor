@@ -4,7 +4,6 @@ using Microsoft.Xna.Framework.Input;
 using Serilog;
 using Shared.Core.ErrorHandling;
 using Shared.Core.Services;
-using System;
 
 namespace GameWorld.Core.Components.Input
 {
@@ -37,7 +36,7 @@ namespace GameWorld.Core.Components.Input
         bool IsMouseButtonReleased(MouseButton button);
 
         bool IsMouseOwner(IGameComponent component);
-        IGameComponent MouseOwner { get; set; }
+        IGameComponent? MouseOwner { get; set; }
 
         void ClearStates();
         MouseState State();
@@ -62,8 +61,8 @@ namespace GameWorld.Core.Components.Input
         MouseState _lastMousesState;
         WpfMouse _wpfMouse;
 
-        IGameComponent _mouseOwner;
-        public IGameComponent MouseOwner
+        IGameComponent? _mouseOwner;
+        public IGameComponent? MouseOwner
         {
             get { return _mouseOwner; }
             set
@@ -101,8 +100,6 @@ namespace GameWorld.Core.Components.Input
 
             _lastMousesState = _currentMouseState;
             _currentMouseState = currentState;
-
-            Console.WriteLine("Mouse" + _currentMouseState.LeftButton + " - " + _lastMousesState.LeftButton);
 
             if (_lastMousesState == null)
                 _lastMousesState = currentState;

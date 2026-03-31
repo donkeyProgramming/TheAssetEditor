@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Resources;
-using System.Windows.Forms;
+﻿using System.Windows.Forms;
 using GameWorld.Core.Commands;
 using GameWorld.Core.Commands.Bone;
 using GameWorld.Core.Commands.Face;
@@ -11,7 +7,6 @@ using GameWorld.Core.Commands.Vertex;
 using GameWorld.Core.Components.Input;
 using GameWorld.Core.Components.Rendering;
 using GameWorld.Core.SceneNodes;
-using GameWorld.Core.Services;
 using GameWorld.Core.Utility;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;

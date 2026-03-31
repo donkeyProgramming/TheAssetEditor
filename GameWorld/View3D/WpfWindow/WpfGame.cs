@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Windows;
+﻿using System.Windows;
 using GameWorld.Core.Services;
 using GameWorld.Core.WpfWindow.Events;
 using Microsoft.Xna.Framework;

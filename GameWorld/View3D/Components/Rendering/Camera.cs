@@ -1,7 +1,5 @@
-﻿using GameWorld.Core.Components.Input;
-using GameWorld.Core.Utility;
+﻿using GameWorld.Core.Utility;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Input;
 
 namespace GameWorld.Core.Components.Rendering
 {
@@ -19,17 +17,16 @@ namespace GameWorld.Core.Components.Rendering
         static readonly float s_maxZoom = float.MaxValue;
 
         IDeviceResolver _deviceResolver;
-        private readonly IMouseComponent _mouse;
-        private readonly IKeyboardComponent _keyboard;
 
-        private Matrix viewMatrix;
+
+        private Matrix _viewMatrix;
         private Matrix _projectionMatrix;
         private bool _viewMatrixDirty = true;
         private bool _projectionMatrixDirty = true;
         private int _lastViewportWidth = 0;
         private int _lastViewportHeight = 0;
 
-        public ArcBallCamera(IDeviceResolver deviceResolverComponent, IKeyboardComponent keyboardComponent, IMouseComponent mouseComponent)
+        public ArcBallCamera(IDeviceResolver deviceResolverComponent)
         {
             Zoom = 10;
             Yaw = 0.8f;
@@ -39,8 +36,6 @@ namespace GameWorld.Core.Components.Rendering
             Position = new Vector3(0, 0, Zoom); 
 
             _deviceResolver = deviceResolverComponent;
-            _mouse = mouseComponent;
-            _keyboard = keyboardComponent;
         }
 
         public ProjectionType CurrentProjectionType
@@ -128,7 +123,7 @@ namespace GameWorld.Core.Components.Rendering
                 {
                     ReCreateViewMatrix();
                 }
-                return viewMatrix;
+                return _viewMatrix;
             }
         }
 
@@ -202,7 +197,7 @@ namespace GameWorld.Core.Components.Rendering
             newPosition *= Zoom;
             newPosition += LookAt;
 
-            viewMatrix = Matrix.CreateLookAt(newPosition, LookAt, Vector3.Up);
+            _viewMatrix = Matrix.CreateLookAt(newPosition, LookAt, Vector3.Up);
             Position = newPosition;
             _viewMatrixDirty = false;
         }

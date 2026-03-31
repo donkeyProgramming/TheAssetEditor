@@ -1,22 +1,20 @@
-﻿using GameWorld.Core.Commands;
+﻿using CommunityToolkit.Diagnostics;
 using GameWorld.Core.Components.Selection;
 using GameWorld.Core.SceneNodes;
 using Serilog;
 using Shared.Core.ErrorHandling;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace GameWorld.Core.Commands.Object
 {
     public class ObjectSelectionCommand : ICommand
     {
-        ILogger _logger = Logging.Create<ObjectSelectionCommand>();
-        SelectionManager _selectionManager;
+        private readonly ILogger _logger = Logging.Create<ObjectSelectionCommand>();
+        private readonly SelectionManager _selectionManager;
 
-        ISelectionState _oldState;
+        ISelectionState? _oldState;
         bool _isModification;
         bool _isRemove;
-        List<ISelectable> _items { get; set; } = new List<ISelectable>();
+        List<ISelectable> _items = [];
 
         public string HintText { get => "Object Selected"; }
         public bool IsMutation { get => false; }
@@ -46,6 +44,8 @@ namespace GameWorld.Core.Commands.Object
             var currentState = _selectionManager.GetState() as ObjectSelectionState;
             if (currentState == null)
                 currentState = _selectionManager.CreateSelectionSate(GeometrySelectionMode.Object, null) as ObjectSelectionState;
+
+            Guard.IsNotNull(currentState);
             _logger.Here().Information($"Command info - Remove[{_isRemove}] Mod[{_isModification}] Items[{string.Join(',', _items.Select(x => x.Name))}]");
 
             if (!(_isModification || _isRemove))
@@ -56,6 +56,7 @@ namespace GameWorld.Core.Commands.Object
 
         public void Undo()
         {
+            Guard.IsNotNull(_oldState);
             _selectionManager.SetState(_oldState);
         }
     }

@@ -1,13 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.InteropServices;
+﻿using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Interop;
 using System.Windows.Media;
-using GameWorld.Core.WpfWindow;
 using GameWorld.Core.WpfWindow.Internals;
 using Microsoft.Xna.Framework.Input;
 using Shared.Core.Services;

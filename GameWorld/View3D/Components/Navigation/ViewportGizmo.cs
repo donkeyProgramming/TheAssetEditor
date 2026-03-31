@@ -8,7 +8,6 @@ using Shared.Core.Events;
 
 namespace GameWorld.Core.Components.Navigation
 {
-
     public class ViewportGizmo : BaseComponent, IDisposable
     {
         private readonly IDeviceResolver _deviceResolver;
@@ -27,12 +26,12 @@ namespace GameWorld.Core.Components.Navigation
         private const float CENTER_RADIUS = 6f;         // Center indicator radius
 
         // Colors (Blender style)
-        private static readonly Color ColorX = new Color(220, 60, 60);    // Red
-        private static readonly Color ColorY = new Color(60, 220, 60);    // Green
-        private static readonly Color ColorZ = new Color(60, 100, 220);   // Blue
-        private static readonly Color ColorHighlight = new Color(255, 200, 50); // Gold
-        private static readonly Color ColorOutline = new Color(40, 40, 40); // Dark outline
-        private static readonly Color ColorCenter = new Color(80, 80, 80); // Center circle
+        private static readonly Color s_colorX = new(220, 60, 60);    // Red
+        private static readonly Color s_colorY = new(60, 220, 60);    // Green
+        private static readonly Color s_colorZ = new(60, 100, 220);   // Blue
+        private static readonly Color s_colorHighlight = new(255, 200, 50); // Gold
+        private static readonly Color s_colorOutline = new(40, 40, 40); // Dark outline
+        private static readonly Color s_colorCenter = new(80, 80, 80); // Center circle
 
         // Rendering
         private Texture2D _whiteTexture;
@@ -73,7 +72,7 @@ namespace GameWorld.Core.Components.Navigation
             _hoveredAxis = HitTestAxis(_mouse.Position());
         }
 
-        private NavigationAxis HitTestAxis(Vector2 mousePos)
+        public NavigationAxis HitTestAxis(Vector2 mousePos)
         {
             var axisEndpoints = GetAllAxisScreenPositions();
             var minDist = float.MaxValue;
@@ -122,10 +121,11 @@ namespace GameWorld.Core.Components.Navigation
 
                 // Apply sign and rotate
                 var axisEnd = baseDir * (isPositive ? AXIS_LENGTH : -AXIS_LENGTH);
-                var rotatedAxis = Vector3.Transform(axisEnd, rotationMatrix);
+                var viewMatrix = _camera.ViewMatrix;
+                var rotatedAxis = Vector3.TransformNormal(axisEnd, viewMatrix);
 
                 // Calculate screen position
-                var screenPos = _screenPosition + new Vector2(rotatedAxis.X, -rotatedAxis.Y) * scale;
+                var screenPos = _screenPosition + new Vector2(-rotatedAxis.X, -rotatedAxis.Y) * scale;
 
                 result.Add(new AxisDrawData(axis,rotatedAxis.Z, screenPos, isPositive, axisIndex));
             }
@@ -162,11 +162,12 @@ namespace GameWorld.Core.Components.Navigation
 
         private void DrawAxesLines(List<AxisDrawData> axisDataList)
         {
-            var rotationMatrix = Matrix.CreateFromYawPitchRoll(_camera.Yaw, _camera.Pitch, 0);
+            // Use view matrix for correct world-to-screen axis projection
+            var viewMatrix = _camera.ViewMatrix;
             var scale = GIZMO_SIZE / (AXIS_LENGTH * 2);
 
             // Draw lines for each axis pair (+/-)
-            for (var axisIndex = 0; axisIndex < 3; axisIndex++)
+            for (int axisIndex = 0; axisIndex < 3; axisIndex++)
             {
                 var baseDir = axisIndex switch
                 {
@@ -179,9 +180,9 @@ namespace GameWorld.Core.Components.Navigation
                 // Get color for this axis
                 var axisColor = axisIndex switch
                 {
-                    0 => ColorX,
-                    1 => ColorY,
-                    2 => ColorZ,
+                    0 => s_colorX,
+                    1 => s_colorY,
+                    2 => s_colorZ,
                     _ => Color.White
                 };
 
@@ -189,18 +190,18 @@ namespace GameWorld.Core.Components.Navigation
                 var isHovered = (_hoveredAxis == (NavigationAxis)(axisIndex * 2 + 1)) ||
                                  (_hoveredAxis == (NavigationAxis)(axisIndex * 2 + 2));
                 if (isHovered)
-                    axisColor = ColorHighlight;
+                    axisColor = s_colorHighlight;
 
                 // Draw positive line (from center to +endpoint)
                 var posEnd = baseDir * AXIS_LENGTH;
-                var rotatedPos = Vector3.Transform(posEnd, rotationMatrix);
-                var posScreen = _screenPosition + new Vector2(rotatedPos.X, -rotatedPos.Y) * scale;
+                var rotatedPos = Vector3.TransformNormal(posEnd, viewMatrix);
+                var posScreen = _screenPosition + new Vector2(-rotatedPos.X, -rotatedPos.Y) * scale;
                 DrawThickLine(_screenPosition, posScreen, axisColor * 0.8f, LINE_THICKNESS);
 
                 // Draw negative line (from center to -endpoint)
                 var negEnd = -baseDir * AXIS_LENGTH;
-                var rotatedNeg = Vector3.Transform(negEnd, rotationMatrix);
-                var negScreen = _screenPosition + new Vector2(rotatedNeg.X, -rotatedNeg.Y) * scale;
+                var rotatedNeg = Vector3.TransformNormal(negEnd, viewMatrix);
+                var negScreen = _screenPosition + new Vector2(-rotatedNeg.X, -rotatedNeg.Y) * scale;
                 DrawThickLine(_screenPosition, negScreen, axisColor * 0.6f, LINE_THICKNESS);
             }
         }
@@ -218,9 +219,9 @@ namespace GameWorld.Core.Components.Navigation
                 // Get base color
                 var baseColor = data.AxisIndex switch
                 {
-                    0 => ColorX,
-                    1 => ColorY,
-                    2 => ColorZ,
+                    0 => s_colorX,
+                    1 => s_colorY,
+                    2 => s_colorZ,
                     _ => Color.White
                 };
 
@@ -228,7 +229,7 @@ namespace GameWorld.Core.Components.Navigation
                 Color circleColor;
                 if (isHovered)
                 {
-                    circleColor = ColorHighlight;
+                    circleColor = s_colorHighlight;
                 }
                 else if (data.IsPositive)
                 {
@@ -257,7 +258,7 @@ namespace GameWorld.Core.Components.Navigation
 
                 // Draw circle
                 DrawFilledCircle(data.ScreenPos, CIRCLE_RADIUS, circleColor);
-                DrawCircleOutline(data.ScreenPos, CIRCLE_RADIUS, ColorOutline * 0.8f, 1f);
+                DrawCircleOutline(data.ScreenPos, CIRCLE_RADIUS, s_colorOutline * 0.8f, 1f);
 
                 // Draw label only for positive axes
                 if (data.IsPositive)
@@ -283,7 +284,7 @@ namespace GameWorld.Core.Components.Navigation
             var textPos = position - textSize / 2;
 
             // Draw outline for better visibility
-            Color outlineColor = ColorOutline;
+            Color outlineColor = s_colorOutline;
             for (int ox = -1; ox <= 1; ox++)
             {
                 for (int oy = -1; oy <= 1; oy++)
@@ -301,7 +302,7 @@ namespace GameWorld.Core.Components.Navigation
         private void DrawCenterIndicator()
         {
             // Draw center circle background
-            DrawFilledCircle(_screenPosition, CENTER_RADIUS, ColorCenter * 0.9f);
+            DrawFilledCircle(_screenPosition, CENTER_RADIUS, s_colorCenter * 0.9f);
 
             // Draw projection mode indicator
             var isPerspective = _camera.CurrentProjectionType == ProjectionType.Perspective;
@@ -326,7 +327,7 @@ namespace GameWorld.Core.Components.Navigation
             }
 
             // Draw outline
-            DrawCircleOutline(_screenPosition, CENTER_RADIUS, ColorOutline * 0.7f, 1f);
+            DrawCircleOutline(_screenPosition, CENTER_RADIUS, s_colorOutline * 0.7f, 1f);
         }
 
         private void DrawThickLine(Vector2 start, Vector2 end, Color color, float thickness)

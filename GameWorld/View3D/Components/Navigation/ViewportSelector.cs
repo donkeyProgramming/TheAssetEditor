@@ -37,7 +37,7 @@ namespace GameWorld.Core.Components.Navigation
             _eventHub = eventHub;
             _cameraTransition = new CameraTransitionAnimation(_camera);
 
-            UpdateOrder = (int)ComponentUpdateOrderEnum.Camera;
+            UpdateOrder = (int)ComponentUpdateOrderEnum.Gizmo;
             DrawOrder = (int)ComponentDrawOrderEnum.Default;
 
             _eventHub.Register<ChangeViewportEvent>(this, e => SwitchToView(e.Type));
@@ -45,31 +45,35 @@ namespace GameWorld.Core.Components.Navigation
 
         public override void Update(GameTime gameTime)
         {
-            _mouse.MouseOwner = null;
-
             // Update camera transition animation
             _cameraTransition.Update(gameTime);
-
-            // If transitioning, skip other processing
             if (_cameraTransition.IsTransitioning)
                 return;
 
             // Handle numpad shortcuts
             HandleNumpadShortcuts();
-
-            // Update gizmo hover state
             _navigationGizmo.Update(gameTime);
 
             // Handle mouse click on navigation gizmo
-            if (_mouse.IsMouseButtonPressed(MouseButton.Left))
+            // We need to take mouse ownership on mouse down to prevent other components from interfering while interacting with the gizmo
+            if (_mouse.MouseOwner == null || _mouse.IsMouseOwner(this))
             {
-                Console.WriteLine("We are ere");
-                if (_navigationGizmo.HandleClick(_mouse.Position()))
-                {
+                if (_navigationGizmo.HitTestAxis(_mouse.Position()) != NavigationAxis.None && _mouse.IsMouseButtonDown(MouseButton.Left))
                     _mouse.MouseOwner = this;
-                    _mouse.ClearStates(); // Prevent clicks from affecting other components after interacting with the gizmo
+
+                if (_mouse.IsMouseButtonReleased(MouseButton.Left) && _mouse.IsMouseOwner(this))
+                {
+                    if (_navigationGizmo.HandleClick(_mouse.Position()))
+                    {
+                        _mouse.MouseOwner = null;
+                        _mouse.ClearStates(); // Prevent clicks from affecting other components after interacting with the gizmo
+                    }
                 }
+
+                if (_mouse.IsMouseOwner(this) && _mouse.IsMouseButtonDown(MouseButton.Left) == false)
+                    _mouse.MouseOwner = null;
             }
+
 
             // In ortho view, exit ortho mode when middle mouse is pressed for rotation
             // Camera.cs handles the actual rotation and mouse ownership
@@ -78,7 +82,6 @@ namespace GameWorld.Core.Components.Navigation
             {
                 if (!_keyboard.IsKeyDown(Keys.LeftShift) && !_keyboard.IsKeyDown(Keys.RightShift))
                 {
-                    // Middle mouse without shift - exit ortho view to allow free rotation
                     ExitOrthoView();
                 }
             }
