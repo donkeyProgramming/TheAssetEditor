@@ -6,60 +6,61 @@
         xmlns:local="clr-namespace:GameWorld.Core.Utility.RenderSettingsDialog" 
         xmlns:basedialogs="clr-namespace:Shared.Ui.BaseDialogs;assembly=Shared.Ui" 
         xmlns:colourpickerbutton="clr-namespace:Shared.Ui.BaseDialogs.ColourPickerButton;assembly=Shared.Ui"
+        xmlns:loc="clr-namespace:Shared.Ui.Common;assembly=Shared.Ui"
         mc:Ignorable="d"
           ContentRendered="Window_OnContentRendered"
         ResizeMode="NoResize"
           SizeToContent="WidthAndHeight"
         Style="{StaticResource CustomWindowStyle}"
-        Title="Render settings" >
+        Title="{loc:Loc KitbashTool.RenderSettings.Title}" >
 
     <DockPanel LastChildFill="False" >
-        <basedialogs:AeAttribute DockPanel.Dock="Top" LabelText="Use backface culling" LabelWidth="150">
+        <basedialogs:AeAttribute DockPanel.Dock="Top" LabelText="{loc:Loc KitbashTool.RenderSettings.UseBackfaceCulling}" LabelWidth="150">
             <CheckBox IsChecked="{Binding UseBackfaceCulling, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
         </basedialogs:AeAttribute>
 
-        <basedialogs:AeAttribute DockPanel.Dock="Top" LabelText="Use Large scene culling" LabelWidth="150">
+        <basedialogs:AeAttribute DockPanel.Dock="Top" LabelText="{loc:Loc KitbashTool.RenderSettings.UseLargeSceneCulling}" LabelWidth="150">
             <CheckBox IsChecked="{Binding UseBigSceneCulling, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
         </basedialogs:AeAttribute>
 
-        <basedialogs:AeAttribute DockPanel.Dock="Top" LabelText="Show grid" LabelWidth="150">
+        <basedialogs:AeAttribute DockPanel.Dock="Top" LabelText="{loc:Loc KitbashTool.RenderSettings.ShowGrid}" LabelWidth="150">
             <CheckBox IsChecked="{Binding ShowGrid, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
         </basedialogs:AeAttribute>
 
 
-        <basedialogs:AeAttribute DockPanel.Dock="Top" LabelText="Grid colour" LabelWidth="150">
+        <basedialogs:AeAttribute DockPanel.Dock="Top" LabelText="{loc:Loc KitbashTool.RenderSettings.GridColour}" LabelWidth="150">
             <DockPanel LastChildFill="False">
                 <colourpickerbutton:ColourPickerButtonView DockPanel.Dock="Left" Width="25" Height="25" Margin="2" DataContext="{Binding GridColour}"/>
             </DockPanel>
         </basedialogs:AeAttribute>
 
-        <basedialogs:AeAttribute DockPanel.Dock="Top" LabelText="Faction colours" LabelWidth="150">
+        <basedialogs:AeAttribute DockPanel.Dock="Top" LabelText="{loc:Loc KitbashTool.RenderSettings.FactionColours}" LabelWidth="150">
             <DockPanel LastChildFill="False">
                 <colourpickerbutton:ColourPickerButtonView DockPanel.Dock="Left" Width="25" Height="25" Margin="2" DataContext="{Binding FactionColour0}"/>
                 <colourpickerbutton:ColourPickerButtonView DockPanel.Dock="Left" Width="25" Height="25" Margin="2" DataContext="{Binding FactionColour1}"/>
                 <colourpickerbutton:ColourPickerButtonView DockPanel.Dock="Left" Width="25" Height="25" Margin="2" DataContext="{Binding FactionColour2}"/>
-            </DockPanel>
+            </DockPanel> 
         </basedialogs:AeAttribute>
 
-        <basedialogs:AeAttribute DockPanel.Dock="Top" LabelText="Light intensity" LabelWidth="150">
+        <basedialogs:AeAttribute DockPanel.Dock="Top" LabelText="{loc:Loc KitbashTool.RenderSettings.LightIntensity}" LabelWidth="150">
             <TextBox Margin="2" Text="{Binding LightIntensity, UpdateSourceTrigger=LostFocus}" MaxLength="8"  VerticalContentAlignment="Center" Width="100" HorizontalAlignment="Left" HorizontalContentAlignment="Right"/>
         </basedialogs:AeAttribute>
 
-        <basedialogs:AeAttribute DockPanel.Dock="Top" LabelText="Light Colour" LabelWidth="150">
+        <basedialogs:AeAttribute DockPanel.Dock="Top" LabelText="{loc:Loc KitbashTool.RenderSettings.LightColour}" LabelWidth="150">
             <DockPanel LastChildFill="False">
                 <colourpickerbutton:ColourPickerButtonView DockPanel.Dock="Left" Width="25" Height="25" Margin="2" DataContext="{Binding LightColour}"/>
             </DockPanel>
         </basedialogs:AeAttribute>
 
-        <basedialogs:AeAttribute DockPanel.Dock="Top" LabelText="Env light rotation X" LabelWidth="150">
+        <basedialogs:AeAttribute DockPanel.Dock="Top" LabelText="{loc:Loc KitbashTool.RenderSettings.EnvLightRotationX}" LabelWidth="150">
             <TextBox Margin="2" Text="{Binding EnvLightRotationY, UpdateSourceTrigger=LostFocus}" MaxLength="8"  VerticalContentAlignment="Center" Width="100" HorizontalAlignment="Left" HorizontalContentAlignment="Right"/>
         </basedialogs:AeAttribute>
 
-        <basedialogs:AeAttribute DockPanel.Dock="Top" LabelText="Direct light rotation X" LabelWidth="150">
+        <basedialogs:AeAttribute DockPanel.Dock="Top" LabelText="{loc:Loc KitbashTool.RenderSettings.DirectLightRotationX}" LabelWidth="150">
             <TextBox Margin="2" Text="{Binding DirectLightRotationX, UpdateSourceTrigger=LostFocus}" MaxLength="8"  VerticalContentAlignment="Center" Width="100" HorizontalAlignment="Left" HorizontalContentAlignment="Right"/>
         </basedialogs:AeAttribute>
 
-        <basedialogs:AeAttribute DockPanel.Dock="Top" LabelText="Direct light rotation Y" LabelWidth="150">
+        <basedialogs:AeAttribute DockPanel.Dock="Top" LabelText="{loc:Loc KitbashTool.RenderSettings.DirectLightRotationY}" LabelWidth="150">
             <TextBox Margin="2" Text="{Binding DirectLightRotationY, UpdateSourceTrigger=LostFocus}" MaxLength="8"  VerticalContentAlignment="Center" Width="100" HorizontalAlignment="Left" HorizontalContentAlignment="Right"/>
         </basedialogs:AeAttribute>
     </DockPanel>
