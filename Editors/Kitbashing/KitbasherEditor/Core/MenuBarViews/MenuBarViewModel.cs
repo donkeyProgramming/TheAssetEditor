@@ -1,7 +1,7 @@
 ﻿using System.Collections.ObjectModel;
-using System.Diagnostics;
 using System.Windows.Input;
 using Editors.KitbasherEditor.ChildEditors.MeshFitter;
+using Editors.KitbasherEditor.ChildEditors.PhotoStudio;
 using Editors.KitbasherEditor.ChildEditors.PinTool.UiCommands;
 using Editors.KitbasherEditor.ChildEditors.ReRiggingTool;
 using Editors.KitbasherEditor.ChildEditors.VertexDebugger;
@@ -16,10 +16,6 @@ using Shared.Ui.Common.MenuSystem;
 
 namespace KitbasherEditor.ViewModels.MenuBarViews
 {
-
-
-
-
     public class MenuBarViewModel : IKeyboardHandler
     {
         public ObservableCollection<ToolbarItem> MenuItems { get; set; } = new ObservableCollection<ToolbarItem>();
@@ -48,7 +44,6 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
 
             eventHub.Register<CommandStackChangedEvent>(this, OnUndoStackChanged);
             eventHub.Register<SelectionChangedEvent>(this, OnSelectionChanged);
-
         }
 
         void RegisterActions()
@@ -97,6 +92,7 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
             RegisterUiCommand<ExpandFaceSelectionCommand>();
             RegisterUiCommand<ConvertFaceToVertexCommand>();
             RegisterUiCommand<OpenVertexDebuggerCommand>();
+            RegisterUiCommand<OpenPhotoStudioCommand>();
         }
 
         ObservableCollection<ToolbarItem> CreateToolbarMenu()
@@ -123,6 +119,7 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
             builder.CreateToolBarItem<FocusCameraCommand>(renderingToolbar, "Focus camera");
             builder.CreateToolBarItem<ResetCameraCommand>(renderingToolbar, "Reset camera");
             builder.CreateToolBarItem<OpenRenderSettingsWindowCommand>(renderingToolbar, "Open render settings");
+            builder.CreateToolBarItem<OpenPhotoStudioCommand>(renderingToolbar, "Open PhotoStudio");
 
 
             return builder.Build();

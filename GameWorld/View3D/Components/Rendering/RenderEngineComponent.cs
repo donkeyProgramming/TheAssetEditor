@@ -1,19 +1,25 @@
-﻿using CommunityToolkit.Diagnostics;
+﻿using System.IO;
+using CommunityToolkit.Diagnostics;
 using GameWorld.Core.Components.Selection;
 using GameWorld.Core.Rendering;
 using GameWorld.Core.Services;
 using GameWorld.Core.Utility;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Serilog;
+using Shared.Core.ErrorHandling;
 using Shared.Core.Events;
+using Shared.Core.Misc;
 using Shared.Core.Services;
 using Shared.Core.Settings;
 
 namespace GameWorld.Core.Components.Rendering
 {
+    public record SaveRenderImageSettings(string Name, bool OpenFolder, bool DrawLines, float ImageUpScaleFactor);
+
     public class RenderEngineComponent : BaseComponent, IDisposable
     {
-        Color _backgroundColour;
+        private readonly ILogger _logger = Logging.Create<RenderEngineComponent>();
 
         private readonly Dictionary<RasterizerStateEnum, RasterizerState> _rasterStates = [];
         private readonly IWpfGame _wpfGame;
@@ -22,18 +28,21 @@ namespace GameWorld.Core.Components.Rendering
         private readonly Dictionary<RenderBuckedId, List<IRenderItem>> _renderItems = [];
         private readonly List<VertexPositionColor> _renderLines = [];
         private readonly IDeviceResolver _deviceResolverComponent;
+        private readonly ApplicationSettingsService _applicationSettingsService;
         private readonly SceneRenderParametersStore _sceneLightParameters;
         private readonly IEventHub _eventHub;
 
         bool _cullingEnabled = false;
         bool _bigSceneDepthBiasMode = false;
         bool _drawGlow = true;
+        SaveRenderImageSettings? _saveRenderImageSettings;
 
         private BloomFilter _bloomFilter;
         Texture2D _whiteTexture;
 
-        RenderTarget2D _defaultRenderTarget;
-        RenderTarget2D _glowRenderTarget;
+        RenderTarget2D _normalRenderTarget;
+        RenderTarget2D _emissiveRenderTarget;
+        RenderTarget2D _screenRenderTarget;
 
         public SpriteBatch CommonSpriteBatch { get; private set; }
         public SpriteFont DefaultFont { get; private set; }
@@ -43,12 +52,12 @@ namespace GameWorld.Core.Components.Rendering
             UpdateOrder = (int)ComponentUpdateOrderEnum.RenderEngine;
             DrawOrder = (int)ComponentDrawOrderEnum.RenderEngine;
 
-            _backgroundColour = ApplicationSettingsHelper.GetEnumAsColour(applicationSettingsService.CurrentSettings.RenderEngineBackgroundColour);
             _wpfGame = wpfGame;
             _resourceLibrary = resourceLibrary;
             _camera = camera;
 
             _deviceResolverComponent = deviceResolverComponent;
+            _applicationSettingsService = applicationSettingsService;
             _sceneLightParameters = sceneLightParametersStore;
             _eventHub = eventHub;
 
@@ -58,6 +67,12 @@ namespace GameWorld.Core.Components.Rendering
             _renderLines = new List<VertexPositionColor>(1000);
 
             _eventHub.Register<SelectionChangedEvent>(this, OnSelectionChanged);
+        }
+
+        public void SaveNextFrame(SaveRenderImageSettings settings)
+        {
+            _saveRenderImageSettings = settings;
+            _logger.Here().Information($"Saving next frame - {settings.Name}");
         }
 
         void OnSelectionChanged(SelectionChangedEvent changedEvent)
@@ -123,6 +138,9 @@ namespace GameWorld.Core.Components.Rendering
             var spriteBatch = CommonSpriteBatch;
             var screenWidth = device.Viewport.Width;
             var screenHeight = device.Viewport.Height;
+            var drawLines = _saveRenderImageSettings == null ? true: _saveRenderImageSettings.DrawLines;
+            var imageUpScale = _saveRenderImageSettings == null ? 1 : _saveRenderImageSettings.ImageUpScaleFactor;
+
             if (screenWidth <= 10 || screenHeight <= 10)
             {
                 // Dont render the screen if its super small,
@@ -131,43 +149,83 @@ namespace GameWorld.Core.Components.Rendering
             }
 
             var commonShaderParameters = CommonShaderParameterBuilder.Build(_camera, _sceneLightParameters);
+            var backgroundColour = ApplicationSettingsHelper.GetEnumAsColour(_applicationSettingsService.CurrentSettings.RenderEngineBackgroundColour);
 
-            _defaultRenderTarget = RenderTargetHelper.GetRenderTarget(device, _defaultRenderTarget);
-            _glowRenderTarget = RenderTargetHelper.GetRenderTarget(device, _glowRenderTarget);
+            _normalRenderTarget = RenderTargetHelper.GetRenderTarget(device, _normalRenderTarget, imageUpScale);
+            _emissiveRenderTarget = RenderTargetHelper.GetRenderTarget(device, _emissiveRenderTarget, imageUpScale);
+            _screenRenderTarget = RenderTargetHelper.GetRenderTarget(device, _screenRenderTarget, imageUpScale);
 
             // Configure render targets
             var backBufferRenderTarget = device.GetRenderTargets()[0].RenderTarget as RenderTarget2D;
-            device.SetRenderTarget(_defaultRenderTarget);
+            device.SetRenderTarget(_normalRenderTarget);
+            device.Clear(Color.Transparent);
 
             // 2D drawing
             Render2DObjects(device, commonShaderParameters);
 
             // 3D drawing - Normal scene
             device.DepthStencilState = DepthStencilState.Default;
-            Render3DObjects(commonShaderParameters, RenderingTechnique.Normal);
-
-            // 3D drawing - Emissive 
-            device.SetRenderTarget(_glowRenderTarget);
-            Render3DObjects(commonShaderParameters, RenderingTechnique.Emissive);
-
+            Render3DObjects(commonShaderParameters, RenderingTechnique.Normal, drawLines);
+           
+  
             // Draw the result to the backBuffer
-            device.SetRenderTarget(backBufferRenderTarget);
-            spriteBatch.Begin();
-            spriteBatch.Draw(_defaultRenderTarget, new Rectangle(0, 0, screenWidth, screenHeight), Color.White);
+            device.SetRenderTarget(_screenRenderTarget);
+            device.Clear(Color.Transparent);
+            spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend);
+            spriteBatch.Draw(_normalRenderTarget, new Rectangle(0, 0, _screenRenderTarget.Width, _screenRenderTarget.Height), Color.White);
             spriteBatch.End();
 
             if (_drawGlow)
             {
+                // 3D drawing - Emissive 
+                device.SetRenderTarget(_emissiveRenderTarget);
+                device.Clear(Color.Transparent);
+                device.DepthStencilState = DepthStencilState.Default;
+                Render3DObjects(commonShaderParameters, RenderingTechnique.Emissive, drawLines);
+
                 // While re-sizing or changing view, there is a small chance that the
                 // bloomRenderTarget could be null
-                var bloomRenderTarget = _bloomFilter.Draw(_glowRenderTarget, screenWidth, screenHeight);
+                var bloomRenderTarget = _bloomFilter.Draw(_emissiveRenderTarget, _screenRenderTarget.Width, _screenRenderTarget.Height);
                 if (bloomRenderTarget != null)
                 {
-                    device.SetRenderTarget(backBufferRenderTarget);
+                    device.SetRenderTarget(_screenRenderTarget);
                     spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Additive);
-                    spriteBatch.Draw(bloomRenderTarget, new Rectangle(0, 0, screenWidth, screenHeight), Color.White);
+                    spriteBatch.Draw(bloomRenderTarget, new Rectangle(0, 0, _screenRenderTarget.Width, _screenRenderTarget.Height), Color.White);
                     spriteBatch.End();
                 }
+            }
+
+            device.SetRenderTarget(backBufferRenderTarget);
+            device.Clear(backgroundColour);
+            spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend);
+            spriteBatch.Draw(_screenRenderTarget, new Rectangle(0, 0, screenWidth, screenHeight), Color.White);
+            spriteBatch.End();
+
+            HandleSaveLastFrame();
+        }
+
+        void HandleSaveLastFrame( )
+        {
+            if (_saveRenderImageSettings != null && _screenRenderTarget != null)
+            {
+                try
+                {
+                    var folder = "Screenshots";
+                    DirectoryHelper.EnsureCreated(folder);
+                    using Stream stream = File.Create(folder + "\\" + _saveRenderImageSettings.Name + "_" + DateTime.Now.Ticks + ".png");
+
+                    _deviceResolverComponent.Device.SetRenderTarget(null);
+                    _screenRenderTarget.SaveAsPng(stream, _screenRenderTarget.Width, _screenRenderTarget.Height);
+
+                    if (_saveRenderImageSettings.OpenFolder)
+                        DirectoryHelper.OpenOrFocusFolder(folder);
+                }
+                catch (Exception e)
+                {
+                    _logger.Here().Information($"Failed to save frame - {e.Message}");
+                }
+
+                _saveRenderImageSettings = null;
             }
         }
 
@@ -175,9 +233,6 @@ namespace GameWorld.Core.Components.Rendering
         {
             var spriteBatch = CommonSpriteBatch;
             spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend);
-
-            // Clear the screen
-            spriteBatch.Draw(_whiteTexture, new Rectangle(0, 0, device.Viewport.Width, device.Viewport.Height), _backgroundColour);
 
             foreach (var item in _renderItems[RenderBuckedId.Texture2D])
                 item.Draw(device, commonShaderParameters, RenderingTechnique.Normal);
@@ -188,12 +243,12 @@ namespace GameWorld.Core.Components.Rendering
             spriteBatch.End();
         }
 
-        void Render3DObjects(CommonShaderParameters commonShaderParameters, RenderingTechnique renderingTechnique)
+        void Render3DObjects(CommonShaderParameters commonShaderParameters, RenderingTechnique renderingTechnique, bool drawLines)
         {
             var device = _deviceResolverComponent.Device;
             device.RasterizerState = _rasterStates[RasterizerStateEnum.Normal];
 
-            if (renderingTechnique == RenderingTechnique.Normal && _renderLines.Count != 0)
+            if (renderingTechnique == RenderingTechnique.Normal && _renderLines.Count != 0 && drawLines)
             {
                 var shader = _resourceLibrary.GetStaticEffect(ShaderTypes.Line);
                 shader.Parameters["View"].SetValue(commonShaderParameters.View);
@@ -227,8 +282,9 @@ namespace GameWorld.Core.Components.Rendering
             CommonSpriteBatch = null;
 
             _bloomFilter.Dispose();
-            _defaultRenderTarget.Dispose();
-            _glowRenderTarget.Dispose();
+            _normalRenderTarget.Dispose();
+            _emissiveRenderTarget.Dispose();
+            _screenRenderTarget.Dispose();
             _whiteTexture.Dispose();
 
             _renderLines.Clear();
