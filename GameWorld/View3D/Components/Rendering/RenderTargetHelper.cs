@@ -11,14 +11,14 @@ namespace GameWorld.Core.Components.Rendering
 
             if (existingRenderTarget == null)
             {
-                return new RenderTarget2D(device, width, height, false, SurfaceFormat.Color, DepthFormat.Depth24);
+                return new RenderTarget2D(device, width, height, false, SurfaceFormat.Color, DepthFormat.Depth24, 8, RenderTargetUsage.PreserveContents);
             }
 
             if (existingRenderTarget.Width == width && existingRenderTarget.Height == height)
                 return existingRenderTarget;
 
             existingRenderTarget.Dispose();
-            return new RenderTarget2D(device, width, height, false, SurfaceFormat.Color, DepthFormat.Depth24);
+            return new RenderTarget2D(device, width, height, false, SurfaceFormat.Color, DepthFormat.Depth24, 8, RenderTargetUsage.PreserveContents);
         }
     }
 }

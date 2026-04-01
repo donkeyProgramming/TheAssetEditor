@@ -1,7 +1,33 @@
-﻿namespace Shared.Core.Misc
+﻿using System.Diagnostics;
+using System.Runtime.InteropServices;
+using System.Text;
+
+namespace Shared.Core.Misc
 {
     public class DirectoryHelper
     {
+
+
+        private const string ExplorerWindowClass = "CabinetWClass";
+
+        private delegate bool EnumWindowsProc(IntPtr hWnd, IntPtr lParam);
+
+        [DllImport("user32.dll")]
+        private static extern bool EnumWindows(EnumWindowsProc lpEnumFunc, IntPtr lParam);
+
+        [DllImport("user32.dll")]
+        private static extern int GetClassName(IntPtr hWnd, StringBuilder lpClassName, int nMaxCount);
+
+        [DllImport("user32.dll")]
+        private static extern int GetWindowText(IntPtr hWnd, StringBuilder lpString, int nMaxCount);
+
+        [DllImport("user32.dll")]
+        private static extern bool IsWindowVisible(IntPtr hWnd);
+
+        [DllImport("user32.dll")]
+        private static extern bool SetForegroundWindow(IntPtr hWnd);
+
+
         public static string UserDirectory { get { return Environment.GetFolderPath(Environment.SpecialFolder.UserProfile); } }
         public static string ApplicationDirectory { get { return UserDirectory + "\\AssetEditor"; } }
         public static string SchemaDirectory { get { return ApplicationDirectory + "\\Schemas"; } }
@@ -63,7 +89,60 @@
             // it doesn't matter if there is a space after ','
             var argument = "/select, \"" + filePath + "\"";
 
-            System.Diagnostics.Process.Start("explorer.exe", argument);
+            Process.Start("explorer.exe", argument);
         }
+
+
+        public static void OpenOrFocusFolder(string folderPath)
+        {
+            folderPath = Path.GetFullPath(folderPath);
+
+            if (!Directory.Exists(folderPath))
+            {
+                Console.WriteLine("Folder does not exist.");
+                return;
+            }
+
+            IntPtr foundHandle = IntPtr.Zero;
+
+            EnumWindows((hWnd, lParam) =>
+            {
+                if (!IsWindowVisible(hWnd))
+                    return true;
+
+                var className = new StringBuilder(256);
+                GetClassName(hWnd, className, className.Capacity);
+
+                if (className.ToString() != ExplorerWindowClass)
+                    return true;
+
+                var windowTitle = new StringBuilder(1024);
+                GetWindowText(hWnd, windowTitle, windowTitle.Capacity);
+
+                // Explorer title usually ends with folder name
+                string folderName = Path.GetFileName(folderPath);
+
+                if (!string.IsNullOrEmpty(folderName) &&
+                    windowTitle.ToString().Contains(folderName, StringComparison.OrdinalIgnoreCase))
+                {
+                    foundHandle = hWnd;
+                    return false; // stop enumeration
+                }
+
+                return true;
+            }, IntPtr.Zero);
+
+            if (foundHandle != IntPtr.Zero)
+            {
+                SetForegroundWindow(foundHandle);
+                Console.WriteLine("Folder already open → brought to front.");
+            }
+            else
+            {
+                Process.Start("explorer.exe", folderPath);
+                Console.WriteLine("Folder not open → opened now.");
+            }
+        }
+
     }
 }

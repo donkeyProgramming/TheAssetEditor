@@ -24,9 +24,9 @@ namespace Shared.Core.Settings
         {
             return colour switch
             {
-                BackgroundColour.DarkGrey => new Color(50, 50, 50, 0),
-                BackgroundColour.LegacyBlue => new Color(94, 150, 239, 0),
-                BackgroundColour.Green => new Color(0, 177, 64, 0),
+                BackgroundColour.DarkGrey => new Color(50, 50, 50, 1),
+                BackgroundColour.LegacyBlue => new Color(94, 150, 239, 1),
+                BackgroundColour.Green => new Color(0, 177, 64, 1),
                 _ => throw new NotImplementedException(),
             };
         }
