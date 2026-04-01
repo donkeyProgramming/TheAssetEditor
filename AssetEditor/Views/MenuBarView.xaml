@@ -117,8 +117,8 @@
             </MenuItem>
 
             <MenuItem Header="Help" BorderThickness="1.5" WindowChrome.IsHitTestVisibleInChrome="True">
-                <MenuItem Header="Modding Wiki" Command="{Binding MenuBar.OpenHelpCommand}"/>
-
+                <MenuItem Header="AssetEditor Help" Command="{Binding MenuBar.OpenHelpCommand}"/>
+                <MenuItem Header="Modding Wiki" Command="{Binding MenuBar.OpenModdingWikiCommand}"/>
                 <Separator/>
 
                 <MenuItem Header="Video Tutorials">

@@ -108,6 +108,12 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Editors.Ipc", "Editors\Ipc\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Test.Ipc", "Editors\Ipc\Test.Ipc\Test.Ipc.csproj", "{34E82457-C19B-4EEF-B901-0E7CF1D97BCE}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "DocumentationWiki", "DocumentationWiki", "{0C33705F-54D5-4B35-A99D-F82986A8E34B}"
+	ProjectSection(SolutionItems) = preProject
+		Documentation\AssetEditorDocumentation.html = Documentation\AssetEditorDocumentation.html
+		Documentation\icon.svg = Documentation\icon.svg
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU

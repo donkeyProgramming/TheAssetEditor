@@ -18,6 +18,7 @@ namespace Shared.Core.Services
                 return null;
 
             var currentVersion = GetCurrentVersion();
+            //currentVersion = new Version("0.65");
             var newerReleases = GetReleasesSinceCurrentVersion(releases, currentVersion);
             if (newerReleases.Count > 0)
                 return newerReleases;
