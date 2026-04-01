@@ -79,6 +79,10 @@
                 <TextBox Margin="2" Text="{Binding DirectLightRotationY, UpdateSourceTrigger=LostFocus}" MaxLength="8"  VerticalContentAlignment="Center" Width="100" HorizontalAlignment="Left" HorizontalContentAlignment="Right"/>
             </basedialogs:AeAttribute>
 
+            <basedialogs:AeAttribute DockPanel.Dock="Top" LabelText="{loc:Loc KitbashTool.PhotoStudio.DoubleImageResolution}" LabelWidth="200">
+                <CheckBox Margin="2" IsChecked="{Binding DoubleImageResolution, UpdateSourceTrigger=LostFocus}"   VerticalContentAlignment="Center" Width="100" HorizontalAlignment="Left" HorizontalContentAlignment="Right"/>
+            </basedialogs:AeAttribute>
+
             <Button DockPanel.Dock="Bottom" Margin="3" Content="{loc:Loc KitbashTool.PhotoStudio.ExportSettings}" Command="{Binding SaveSettingsCommand}"/>
             <Button DockPanel.Dock="Bottom" Margin="3" Content="{loc:Loc KitbashTool.PhotoStudio.ImportSettings}" Command="{Binding ImportSettingsCommand}"/>
             <Button DockPanel.Dock="Bottom" Margin="3" Content="{loc:Loc KitbashTool.PhotoStudio.TakeScreenshot}" Command="{Binding TakeScreenshotCommand}"/>

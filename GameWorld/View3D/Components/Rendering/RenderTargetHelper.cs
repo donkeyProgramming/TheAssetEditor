@@ -4,10 +4,10 @@ namespace GameWorld.Core.Components.Rendering
 {
     internal class RenderTargetHelper
     {
-        public static RenderTarget2D GetRenderTarget(GraphicsDevice device, RenderTarget2D existingRenderTarget)
+        public static RenderTarget2D GetRenderTarget(GraphicsDevice device, RenderTarget2D existingRenderTarget, float imageUpScale)
         {
-            var width = device.Viewport.Width;
-            var height = device.Viewport.Height;
+            var width = (int)(device.Viewport.Width * imageUpScale);
+            var height = (int)(device.Viewport.Height * imageUpScale);
 
             if (existingRenderTarget == null)
             {

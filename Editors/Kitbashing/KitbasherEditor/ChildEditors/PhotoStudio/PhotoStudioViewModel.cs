@@ -29,6 +29,7 @@ namespace Editors.KitbasherEditor.ChildEditors.PhotoStudio
         [ObservableProperty] float _envLightRotationY;
         [ObservableProperty] float _directLightRotationX;
         [ObservableProperty] float _directLightRotationY;
+        [ObservableProperty] bool _doubleImageResolution = true;
 
         bool _allowUpdates = false;
      
@@ -188,7 +189,10 @@ namespace Editors.KitbasherEditor.ChildEditors.PhotoStudio
         [RelayCommand]
         private void TakeScreenshot()
         {
-            _renderEngineComponent.SaveNextFrame(new SaveRenderImageSettings("Screenshot", true, false));
+            var imageScale = 1.0f;
+            if (DoubleImageResolution)
+                imageScale = 2.0f;
+            _renderEngineComponent.SaveNextFrame(new SaveRenderImageSettings("Screenshot", true, false, imageScale));
         }
     }
 }

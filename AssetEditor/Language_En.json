@@ -46,7 +46,9 @@
   "KitbashTool.PhotoStudio.EnvLightRotation": "Env light rotation",
   "KitbashTool.PhotoStudio.DirectLightRotationX": "Light rotation X (0-360)",
   "KitbashTool.PhotoStudio.DirectLightRotationY": "Light rotation Y (0-360)",
+  "KitbashTool.PhotoStudio.DoubleImageResolution": "Double image resolution",
   "KitbashTool.PhotoStudio.ExportSettings": "Export settings",
   "KitbashTool.PhotoStudio.ImportSettings": "Import settings",
   "KitbashTool.PhotoStudio.TakeScreenshot": "Take screenshot"
 }
+

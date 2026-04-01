@@ -15,7 +15,7 @@ using Shared.Core.Settings;
 
 namespace GameWorld.Core.Components.Rendering
 {
-    public record SaveRenderImageSettings(string Name, bool OpenFolder, bool DrawLines);
+    public record SaveRenderImageSettings(string Name, bool OpenFolder, bool DrawLines, float ImageUpScaleFactor);
 
     public class RenderEngineComponent : BaseComponent, IDisposable
     {
@@ -46,7 +46,6 @@ namespace GameWorld.Core.Components.Rendering
 
         public SpriteBatch CommonSpriteBatch { get; private set; }
         public SpriteFont DefaultFont { get; private set; }
-
 
         public RenderEngineComponent(IWpfGame wpfGame, ResourceLibrary resourceLibrary, ArcBallCamera camera, IDeviceResolver deviceResolverComponent, ApplicationSettingsService applicationSettingsService, SceneRenderParametersStore sceneLightParametersStore, IEventHub eventHub)
         {
@@ -140,6 +139,8 @@ namespace GameWorld.Core.Components.Rendering
             var screenWidth = device.Viewport.Width;
             var screenHeight = device.Viewport.Height;
             var drawLines = _saveRenderImageSettings == null ? true: _saveRenderImageSettings.DrawLines;
+            var imageUpScale = _saveRenderImageSettings == null ? 1 : _saveRenderImageSettings.ImageUpScaleFactor;
+
             if (screenWidth <= 10 || screenHeight <= 10)
             {
                 // Dont render the screen if its super small,
@@ -150,9 +151,9 @@ namespace GameWorld.Core.Components.Rendering
             var commonShaderParameters = CommonShaderParameterBuilder.Build(_camera, _sceneLightParameters);
             var backgroundColour = ApplicationSettingsHelper.GetEnumAsColour(_applicationSettingsService.CurrentSettings.RenderEngineBackgroundColour);
 
-            _normalRenderTarget = RenderTargetHelper.GetRenderTarget(device, _normalRenderTarget);
-            _emissiveRenderTarget = RenderTargetHelper.GetRenderTarget(device, _emissiveRenderTarget);
-            _screenRenderTarget = RenderTargetHelper.GetRenderTarget(device, _screenRenderTarget);
+            _normalRenderTarget = RenderTargetHelper.GetRenderTarget(device, _normalRenderTarget, imageUpScale);
+            _emissiveRenderTarget = RenderTargetHelper.GetRenderTarget(device, _emissiveRenderTarget, imageUpScale);
+            _screenRenderTarget = RenderTargetHelper.GetRenderTarget(device, _screenRenderTarget, imageUpScale);
 
             // Configure render targets
             var backBufferRenderTarget = device.GetRenderTargets()[0].RenderTarget as RenderTarget2D;
@@ -171,7 +172,7 @@ namespace GameWorld.Core.Components.Rendering
             device.SetRenderTarget(_screenRenderTarget);
             device.Clear(Color.Transparent);
             spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend);
-            spriteBatch.Draw(_normalRenderTarget, new Rectangle(0, 0, screenWidth, screenHeight), Color.White);
+            spriteBatch.Draw(_normalRenderTarget, new Rectangle(0, 0, _screenRenderTarget.Width, _screenRenderTarget.Height), Color.White);
             spriteBatch.End();
 
             if (_drawGlow)
@@ -184,12 +185,12 @@ namespace GameWorld.Core.Components.Rendering
 
                 // While re-sizing or changing view, there is a small chance that the
                 // bloomRenderTarget could be null
-                var bloomRenderTarget = _bloomFilter.Draw(_emissiveRenderTarget, screenWidth, screenHeight);
+                var bloomRenderTarget = _bloomFilter.Draw(_emissiveRenderTarget, _screenRenderTarget.Width, _screenRenderTarget.Height);
                 if (bloomRenderTarget != null)
                 {
                     device.SetRenderTarget(_screenRenderTarget);
                     spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Additive);
-                    spriteBatch.Draw(bloomRenderTarget, new Rectangle(0, 0, screenWidth, screenHeight), Color.White);
+                    spriteBatch.Draw(bloomRenderTarget, new Rectangle(0, 0, _screenRenderTarget.Width, _screenRenderTarget.Height), Color.White);
                     spriteBatch.End();
                 }
             }
