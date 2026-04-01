@@ -52,6 +52,22 @@ body {
     text-decoration: underline;
 }
 
+.file-list a.active {
+    font-weight: 600;
+    color: #0b47c1;
+}
+
+.file-list .section-header {
+    display: block;
+    padding: 6px 0;
+    font-weight: 600;
+    color: #333;
+}
+
+.file-list .section-header.active {
+    color: #0b47c1;
+}
+
 .content {
     flex: 1;
 }
@@ -73,13 +89,7 @@ iframe {
         <img src="icon.svg">
     </div>
 
-    <div class="language-select">
-        Language:
-        <select id="languageSelector">
-            <option value="en">English</option>
-            <option value="no">Norwegian</option>
-        </select>
-    </div>
+    <!-- language support removed - simplified single-language documentation -->
 
     <div class="file-list" id="fileList"></div>
 
@@ -90,87 +100,123 @@ iframe {
 </div>
 
 <script>
+// Simplified single-language script: populate sidebar from masterDocs,
+// provide per-page permalinks using ?doc=BaseName, update URL on click,
+// and support back/forward navigation.
 
-// MASTER PAGE LIST (language independent)
-// Add an explicit 'langs' array for each doc to indicate available translations.
-// The code will check this against the currently selected language and only
-// attempt to load a localized file if that language is listed here. Otherwise
-// it will load the English default.
 const masterDocs = [
-    { title: "Getting Started", base: "GettingStarted", langs: ["en", "no"] },
-    { title: "PackFile Handling", base: "PackFileHandling", langs: ["en"] },
-    { title: "Camera Control", base: "CameraControl", langs: ["en"] }
+    { title: "Getting Started", base: "GettingStarted" },
+    { title: "Camera Control", base: "CameraControl" },
+    { title: "Kitbashing", children: [
+        { title: "Basics", base: "Kitbashing/Basics" },
+        { title: "Photo Studio", base: "Kitbashing/PhotoStudio" }
+    ] }
 ];
 
+function parseQuery(search) {
+    const params = {};
+    if (!search) return params;
+    const q = search.replace(/^\?/, '');
+    q.split('&').forEach(pair => {
+        const [k, v] = pair.split('=');
+        if (k) params[decodeURIComponent(k)] = decodeURIComponent(v || '');
+    });
+    return params;
+}
 
-
-
+function buildLinkFor(docBase) {
+    const params = new URLSearchParams();
+    params.set('doc', docBase);
+    return `${location.pathname}?${params.toString()}`;
+}
 
 function resolveFile(baseName) {
-    // Return the single file path to load. If the selected language is
-    // supported for this document, return the localized filename; otherwise
-    // return the English default file. No runtime fallback attempts are used.
-    const selectElement = document.getElementById("languageSelector");
-    const currentLanguage = selectElement.value;
-    console.log("Selected Value:", currentLanguage);
-    const defaultLanguage = 'en';
-    const fallback = `Documentation/${baseName}.html`;
-
-    // Find doc entry to see which languages are available for this file.
-    const docEntry = masterDocs.find(d => d.base === baseName) || {};
-    const available = docEntry.langs || [defaultLanguage];
-
-    const file = (currentLanguage && currentLanguage !== defaultLanguage && available.includes(currentLanguage))
-        ? `Documentation/${baseName}_${currentLanguage}.html`
-        : fallback;
-
-    console.log("Resolved file:", file);
-    return Promise.resolve(file);
+    return Promise.resolve(`Documentation/${baseName}.html`);
 }
 
 function loadFile(frame, file) {
-    // Simple file load: set iframe src to the resolved file path.
     frame.onload = null;
     frame.onerror = null;
     frame.src = file;
 }
 
-function loadSidebar() {
+function setActiveLink(docBase) {
+    const links = document.querySelectorAll('#fileList a[data-base]');
+    links.forEach(a => {
+        a.classList.toggle('active', a.dataset.base === docBase);
+    });
 
+    // Mark section headers active when any child is active
+    const headers = document.querySelectorAll('#fileList .section-header');
+    headers.forEach(h => {
+        const section = h.dataset.section; // e.g., 'Kitbashing'
+        const anyChildActive = Array.from(links).some(a => a.dataset.base === section || a.dataset.base.startsWith(section + '/'));
+        h.classList.toggle('active', anyChildActive);
+    });
+}
+
+function loadSidebar(currentDoc) {
     const list = document.getElementById("fileList");
     list.innerHTML = "";
 
-    masterDocs.forEach(doc => {
+    function renderItem(item, level) {
+        if (item.children && Array.isArray(item.children)) {
+            const hdr = document.createElement('div');
+            hdr.textContent = item.title;
+            hdr.className = 'section-header';
+            // store section key (used to match child bases)
+            hdr.dataset.section = item.title.replace(/\s+/g, '');
+            hdr.style.paddingLeft = (level * 12) + 'px';
+            list.appendChild(hdr);
+            item.children.forEach(child => renderItem(child, level + 1));
+            return;
+        }
 
-        const link = document.createElement("a");
-        link.textContent = doc.title;
+        const link = document.createElement('a');
+        link.textContent = item.title;
+        link.href = buildLinkFor(item.base);
+        link.dataset.base = item.base;
+        link.title = item.title;
+        link.style.paddingLeft = (level * 12) + 'px';
 
-        link.onclick = async () => {
-            const file = await resolveFile(doc.base);
-            const frame = document.getElementById("docFrame");
-            loadFile(frame, file);
-        };
+        link.addEventListener('click', (ev) => {
+            if (ev.metaKey || ev.ctrlKey || ev.shiftKey || ev.button !== 0) return;
+            ev.preventDefault();
+            const newUrl = buildLinkFor(item.base);
+            history.pushState({ doc: item.base }, '', newUrl);
+            resolveFile(item.base).then(file => {
+                const frame = document.getElementById('docFrame');
+                loadFile(frame, file);
+                setActiveLink(item.base);
+            });
+        });
 
         list.appendChild(link);
-    });
+    }
 
+    masterDocs.forEach(item => renderItem(item, 0));
+
+    setActiveLink(currentDoc || masterDocs[0].base);
 }
 
-document.getElementById("languageSelector").addEventListener("change", e => {
-    // Rebuild sidebar links and load the first page in the newly selected language.
-    loadSidebar();
-    resolveFile(masterDocs[0].base).then(file => {
-        const frame = document.getElementById("docFrame");
+window.addEventListener('popstate', (ev) => {
+    const state = ev.state || parseQuery(location.search);
+    const docBase = (state && state.doc) || masterDocs[0].base;
+    loadSidebar(docBase);
+    resolveFile(docBase).then(file => {
+        const frame = document.getElementById('docFrame');
         loadFile(frame, file);
     });
 });
 
-loadSidebar();
-
-// Load first page initially
-resolveFile(masterDocs[0].base).then(file => {
-    const frame = document.getElementById("docFrame");
+// Initial load
+const initialParams = parseQuery(location.search);
+const initialDoc = initialParams.doc || masterDocs[0].base;
+loadSidebar(initialDoc);
+resolveFile(initialDoc).then(file => {
+    const frame = document.getElementById('docFrame');
     loadFile(frame, file);
+    history.replaceState({ doc: initialDoc }, '', buildLinkFor(initialDoc));
 });
 
 </script>
