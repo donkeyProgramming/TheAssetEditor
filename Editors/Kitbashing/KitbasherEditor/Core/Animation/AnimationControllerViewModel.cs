@@ -193,8 +193,6 @@ namespace Editors.KitbasherEditor.ViewModels
             var isAnimationDataPresent = Animation != null && skeleton != null;
             if (isEnabled && isAnimationDataPresent)
             {
-                AnimationControllerVisability.Value = Visibility.Visible;
-
                 var animFile = AnimationFile.Create(Animation);
                 var animClip = new AnimationClip(animFile, skeleton);
 
@@ -205,10 +203,11 @@ namespace Editors.KitbasherEditor.ViewModels
             }
             else
             {
-                AnimationControllerVisability.Value = Visibility.Collapsed;
                 _player.SetAnimation(null, skeleton, true);
             }
 
+         
+            AnimationControllerVisability.Value = isEnabled ? Visibility.Visible: Visibility.Collapsed; 
             _player.IsEnabled = isEnabled;
         }
     }
