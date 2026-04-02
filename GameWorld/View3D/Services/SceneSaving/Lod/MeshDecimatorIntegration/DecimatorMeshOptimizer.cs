@@ -40,7 +40,7 @@ namespace GameWorld.Core.Services.SceneSaving.Lod.MeshDecimatorIntegration
                       0, 0, 0, 0)).ToArray();
             }
 
-            var currentTriangleCount = sourceVertices.Length;
+            var currentTriangleCount = sourceSubMeshIndices.Length / 3;
             var targetTriangleCount = (int)Math.Ceiling(currentTriangleCount * quality);
 
             var algorithm = MeshDecimation.CreateAlgorithm(Algorithm.FastQuadricMesh);
