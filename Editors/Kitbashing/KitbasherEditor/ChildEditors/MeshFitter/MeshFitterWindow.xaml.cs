@@ -8,13 +8,23 @@ namespace Editors.KitbasherEditor.ChildEditors.MeshFitter
     /// </summary>
     public partial class MeshFitterWindow : AssetEditorWindow
     {
-        public MeshFitterViewModel ViewModel { get; set; }
+        public MeshFitterViewModel? ViewModel { get; set; }
 
         public MeshFitterWindow(MeshFitterViewModel viewModel)
         {
             InitializeComponent();
             ViewModel = viewModel;
             DataContext = viewModel;
+        }
+
+        public override void Dispose()
+        {
+            if (ViewModel != null)
+            { 
+                ViewModel.Dispose();
+                ViewModel = null;
+            }
+            base.Dispose();
         }
 
         private void OkButtonClick(object sender, RoutedEventArgs e)

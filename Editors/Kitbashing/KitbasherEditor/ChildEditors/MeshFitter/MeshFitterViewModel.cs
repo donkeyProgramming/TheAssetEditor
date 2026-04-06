@@ -16,6 +16,7 @@ namespace Editors.KitbasherEditor.ChildEditors.MeshFitter
         private readonly CommandFactory _commandFactory;
         private readonly AnimationsContainerComponent _animationsContainerComponent;
         private readonly SceneManager _sceneManager;
+        private bool _disposed = false;
         GameSkeleton _targetSkeleton;
         GameSkeleton _fromSkeleton;
 
@@ -275,6 +276,10 @@ namespace Editors.KitbasherEditor.ChildEditors.MeshFitter
 
         public void Dispose()
         {
+            if(_disposed) 
+                return;
+            _disposed = true;
+
             // Restore animation player
             _animationsContainerComponent.Remove(_animationPlayer);
             foreach (var mesh in _meshNodes)

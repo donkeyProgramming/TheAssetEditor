@@ -26,7 +26,7 @@ namespace WindowHandling
             }
         }
 
-        public void Dispose()
+        public virtual void Dispose()
         {
             if (_isDisposed == false)
                 Deactivated -= AssetEdWindow_Deactivated;
