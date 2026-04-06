@@ -5,6 +5,7 @@ using GameWorld.Core.Components.Selection;
 using GameWorld.Core.SceneNodes;
 using GameWorld.Core.Services;
 using Shared.Core.Misc;
+using Shared.Core.Services;
 using Shared.Ui.Common.MenuSystem;
 using Shared.Ui.Editors.BoneMapping;
 
@@ -12,7 +13,7 @@ namespace Editors.KitbasherEditor.ChildEditors.MeshFitter
 {
     public class OpenMeshFitterToolCommand : IScopedKitbasherUiCommand, IDisposable
     {
-        public string ToolTip { get; set; } = "Open the MeshFitter tool";
+        public string ToolTip { get; set; }
         public ActionEnabledRule EnabledRule => ActionEnabledRule.AtleastOneObjectSelected;
         public Hotkey? HotKey { get; } = null;
 
@@ -20,16 +21,18 @@ namespace Editors.KitbasherEditor.ChildEditors.MeshFitter
         private readonly ISkeletonAnimationLookUpHelper _skeletonHelper;
         private readonly IAbstractFormFactory<MeshFitterWindow> _formFactory;
         private readonly SceneManager _sceneManager;
+        private readonly LocalizationManager _localizationManager;
 
         MeshFitterWindow? _windowHandle;
 
-        public OpenMeshFitterToolCommand(SelectionManager selectionManager, ISkeletonAnimationLookUpHelper skeletonHelper, IAbstractFormFactory<MeshFitterWindow> formFactory, SceneManager sceneManager)
+        public OpenMeshFitterToolCommand(SelectionManager selectionManager, ISkeletonAnimationLookUpHelper skeletonHelper, IAbstractFormFactory<MeshFitterWindow> formFactory, SceneManager sceneManager, LocalizationManager localizationManager)
         {
             _selectionManager = selectionManager;
             _skeletonHelper = skeletonHelper;
             _formFactory = formFactory;
-
             _sceneManager = sceneManager;
+            _localizationManager = localizationManager;
+            ToolTip = _localizationManager.Get("KitbashTool.MeshFitterTool.ToolTip");
         }
 
         public void Execute()
@@ -57,7 +60,7 @@ namespace Editors.KitbasherEditor.ChildEditors.MeshFitter
             if (allSkeltonNames.Count() != 1)
             {
                 var commaList = string.Join(",", allSkeltonNames);
-                MessageBox.Show($"Unexpected number of skeletons - {commaList}. This tool only works for one skeleton");
+                MessageBox.Show(string.Format(_localizationManager.Get("KitbashTool.MeshFitterTool.InvalidSkeletonSelection"), commaList));
                 return;
             }
 

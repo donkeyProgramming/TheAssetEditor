@@ -7,9 +7,10 @@
         xmlns:local="clr-namespace:Editors.KitbasherEditor.ChildEditors.MeshFitter" 
         xmlns:view="clr-namespace:CommonControls.Editors.BoneMapping.View;assembly=Editors.Shared.Core" 
         xmlns:view1="clr-namespace:Editors.Shared.Core.Editors.BoneMapping.View;assembly=Editors.Shared.Core"
+        xmlns:loc="clr-namespace:Shared.Ui.Common;assembly=Shared.Ui"
         mc:Ignorable="d"
         Style="{StaticResource CustomWindowStyle}"
-        Title="Mesh Fitter Tool" Height="500" Width="1000">
+        Title="{loc:Loc KitbashTool.MeshFitterTool.Title}" Height="500" Width="1000">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="*"/>
@@ -21,9 +22,9 @@
         <view1:BoneMappingMetaDataView Grid.Row="1"/>
         
         <DockPanel Grid.Row="2" LastChildFill="False" >
-            <Button DockPanel.Dock="Right" Width="50" Margin="3" Content="Apply" Click="ApplyButtonClick"/>
-            <Button DockPanel.Dock="Right" Width="50" Margin="3" Content="OK" Click="OkButtonClick"/>
-            <Button DockPanel.Dock="Right" Width="50" Margin="3" Content="Cancel" Click="CancelButtonClick"/>
+            <Button DockPanel.Dock="Right" Width="50" Margin="3" Content="{loc:Loc KitbashTool.MeshFitterTool.Apply}" Click="ApplyButtonClick"/>
+            <Button DockPanel.Dock="Right" Width="50" Margin="3" Content="{loc:Loc KitbashTool.MeshFitterTool.Ok}" Click="OkButtonClick"/>
+            <Button DockPanel.Dock="Right" Width="50" Margin="3" Content="{loc:Loc KitbashTool.MeshFitterTool.Cancel}" Click="CancelButtonClick"/>
         </DockPanel>
     </Grid>
 </windowhandling:AssetEditorWindow>
