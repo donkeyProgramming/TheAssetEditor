@@ -3,74 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <title>Mesh Fitter Tool</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            line-height: 1.55;
-            margin: 0 auto;
-            max-width: 1000px;
-            padding: 24px;
-            color: #202124;
-        }
-
-        h1, h2, h3 {
-            color: #1f2937;
-        }
-
-        figure {
-            margin: 24px 0;
-        }
-
-        figcaption {
-            color: #5f6368;
-            font-size: 0.95rem;
-            margin-top: 8px;
-        }
-
-        img {
-            max-width: 100%;
-            height: auto;
-            border: 1px solid #d0d7de;
-        }
-
-        .note, .warning {
-            padding: 12px 14px;
-            margin: 18px 0;
-        }
-
-        .note {
-            background: #f3f7ff;
-            border-left: 4px solid #2b5fd9;
-        }
-
-        .warning {
-            background: #fff6e5;
-            border-left: 4px solid #d28a00;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin: 18px 0 24px 0;
-        }
-
-        th, td {
-            border: 1px solid #d0d7de;
-            padding: 10px;
-            text-align: left;
-            vertical-align: top;
-        }
-
-        th {
-            background: #f6f8fa;
-        }
-
-        code {
-            background: #f6f8fa;
-            padding: 1px 4px;
-            border-radius: 4px;
-        }
-    </style>
+    <link rel="stylesheet" href="DocumentationShared.css">
+    <script src="DocumentationShared.js" defer></script>
 </head>
 <body>
 
@@ -79,7 +13,10 @@
     <p>
         The <strong>Mesh Fitter Tool</strong> helps you make a mesh from one skeleton sit correctly on the skeleton that is already loaded in the Kitbash Editor.
         In practice, it is the tool you use when a straight bone remap is not enough and the mesh still looks too large, too small, offset, twisted, or badly posed.
+
+        As seen in the image belove - the meshes do not perfectly line up with the target skeleton, but they are close enough that a few tweaks can get them into a good looking pose. This is the kind of problem Mesh Fitter is designed to solve.
     </p>
+    <img class="doc-image" id="meshFitterUiImage" src="Images/AssetEditor_Kitbash_MeshFitter_UseCase_Before.png">
 
     <div class="note">
         <strong>Short version:</strong> Mesh Fitter is for <strong>shape, pose, and proportion correction</strong>.
@@ -111,7 +48,7 @@
     </p>
 
     <figure>
-        <img src="Images/AssetEditor_Kitbash_MeshFitter_UI.png" alt="Simplified Mesh Fitter Tool layout">
+        <img class="doc-image" id="meshFitterUiImage" src="Images/AssetEditor_Kitbash_MeshFitter_UI.png" alt="Simplified Mesh Fitter Tool layout">
         <figcaption>
             Simplified layout based on the current Mesh Fitter Tool UI screenshot.
             The exact styling may change, but the workflow is the same: map bones on top, then correct the fit with scale and offsets below.
@@ -127,7 +64,35 @@
         <li>The tool works best when source and target bones have a clear semantic match: arm to arm, leg to leg, jaw to jaw, and so on.</li>
     </ul>
 
-    <h2>How to use it</h2>
+    <h2>How to use</h2>
+
+
+    <p>
+        Open the Mesh Fitter Tool by pressing the "Yellow guy" Icon. The icon can be pressed when one ore more modells are selected.
+        Make sure all the modells selected share the same skeleton.
+    </p>
+    <img class="doc-image" id="meshFitterUiImage" src="Images/AssetEditor_Kitbash_MeshFitter_UseCase0.png">
+
+    <p>
+        When the Mesh Fitter Tool is open, a red skeleton is created in the scene. This skeleton is the skeleton used by the meshes
+        selected. The goal is to allign this with the black skeleton (the one used by the existing models in the kitbahser tool).
+        The alligment is done by mapping bones manually or by using one of the auto mapping options. Its allways good idea to start with "Auto map based on name" to see how well that works.
+        The camera and scene can be moved around to inspect the fit. The red skeleton is the one that moves, while the black skeleton is the reference that stays still.
+        <strong>Important! The editor is not locked while the Mesh Fitter Tool is open, so be careful not to delete or edit meshes - that will cause bugs!</strong>
+    </p>
+    <img class="doc-image" id="meshFitterUiImage" src="Images/AssetEditor_Kitbash_MeshFitter_UseCase_1.png">
+
+    <p> When done, it should look something like this.</p>
+    <img class="doc-image" id="meshFitterUiImage" src="Images/AssetEditor_Kitbash_MeshFitter_UseCase_2.png">
+
+    <p>
+        The tool also alows for extra controll of the bones my using the offset values.
+        The scale values can be very usefull if there is a large difference in mesh size. Play around with root scale
+        and scale at the bone level (bottom of the editor). The mesh under was produced by setting the upperarm_left bone to 0.5 and pressing "Copy to Children"
+    </p>
+    <img class="doc-image" id="meshFitterUiImage" src="Images/AssetEditor_Kitbash_MeshFitter_UseCase_3_Proportions.png">
+
+    <h2>How to use it - step by step</h2>
 
     <ol>
         <li>Open the target model in the <strong>Kitbash Editor</strong>.</li>
