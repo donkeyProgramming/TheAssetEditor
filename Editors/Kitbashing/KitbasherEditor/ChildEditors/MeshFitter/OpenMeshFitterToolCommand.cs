@@ -1,4 +1,5 @@
-﻿using System.Windows;
+using System;
+using System.Linq;
 using Editors.KitbasherEditor.Core.MenuBarViews;
 using GameWorld.Core.Components;
 using GameWorld.Core.Components.Selection;
@@ -17,6 +18,7 @@ namespace Editors.KitbasherEditor.ChildEditors.MeshFitter
         public ActionEnabledRule EnabledRule => ActionEnabledRule.AtleastOneObjectSelected;
         public Hotkey? HotKey { get; } = null;
 
+        private readonly IStandardDialogs _standardDialogs;
         private readonly SelectionManager _selectionManager;
         private readonly ISkeletonAnimationLookUpHelper _skeletonHelper;
         private readonly IAbstractFormFactory<MeshFitterWindow> _formFactory;
@@ -25,8 +27,9 @@ namespace Editors.KitbasherEditor.ChildEditors.MeshFitter
 
         MeshFitterWindow? _windowHandle;
 
-        public OpenMeshFitterToolCommand(SelectionManager selectionManager, ISkeletonAnimationLookUpHelper skeletonHelper, IAbstractFormFactory<MeshFitterWindow> formFactory, SceneManager sceneManager, LocalizationManager localizationManager)
+        public OpenMeshFitterToolCommand(IStandardDialogs standardDialogs, SelectionManager selectionManager, ISkeletonAnimationLookUpHelper skeletonHelper, IAbstractFormFactory<MeshFitterWindow> formFactory, SceneManager sceneManager, LocalizationManager localizationManager)
         {
+            _standardDialogs = standardDialogs;
             _selectionManager = selectionManager;
             _skeletonHelper = skeletonHelper;
             _formFactory = formFactory;
@@ -53,19 +56,37 @@ namespace Editors.KitbasherEditor.ChildEditors.MeshFitter
                 .Cast<Rmv2MeshNode>()
                 .ToList();
 
+            if (meshNodes.Count == 0)
+            {
+                ShowError("KitbashTool.MeshFitterTool.NoMeshSelected");
+                return;
+            }
+
+            if (meshNodes.Any(x => string.IsNullOrWhiteSpace(x.Geometry.SkeletonName)))
+            {
+                ShowError("KitbashTool.MeshFitterTool.SelectedMeshMissingSkeleton");
+                return;
+            }
+
             var allSkeltonNames = meshNodes
                 .Select(x => x.Geometry.SkeletonName)
-                .Distinct();
+                .Distinct(StringComparer.InvariantCultureIgnoreCase)
+                .ToList();
 
-            if (allSkeltonNames.Count() != 1)
+            if (allSkeltonNames.Count != 1)
             {
                 var commaList = string.Join(",", allSkeltonNames);
-                MessageBox.Show(string.Format(_localizationManager.Get("KitbashTool.MeshFitterTool.InvalidSkeletonSelection"), commaList));
+                ShowError("KitbashTool.MeshFitterTool.InvalidSkeletonSelection", commaList);
                 return;
             }
 
             var currentSkeletonName = allSkeltonNames.First();
             var currentSkeletonFile = _skeletonHelper.GetSkeletonFileFromName(currentSkeletonName);
+            if (currentSkeletonFile == null)
+            {
+                ShowError("KitbashTool.MeshFitterTool.MeshSkeletonNotFound", currentSkeletonName);
+                return;
+            }
 
             var usedBoneIndexes = meshNodes
                 .SelectMany(x => x.Geometry.GetUniqeBlendIndices())
@@ -74,18 +95,36 @@ namespace Editors.KitbasherEditor.ChildEditors.MeshFitter
                 .ToList();
 
             var rootNode = _sceneManager.GetNodeByName<MainEditableNode>(SpecialNodes.EditableModel);
-            var targetSkeleton = rootNode.SkeletonNode;
-            var targetSkeletonFile = _skeletonHelper.GetSkeletonFileFromName(targetSkeleton.Name);
+            if (rootNode?.SkeletonNode?.Skeleton == null)
+            {
+                ShowError("KitbashTool.MeshFitterTool.TargetSkeletonMissing");
+                return;
+            }
+
+            var targetSkeletonNode = rootNode.SkeletonNode;
+            var targetSkeletonName = targetSkeletonNode.Skeleton.SkeletonName;
+            if (string.IsNullOrWhiteSpace(targetSkeletonName))
+            {
+                ShowError("KitbashTool.MeshFitterTool.TargetSkeletonMissing");
+                return;
+            }
+
+            var targetSkeletonFile = _skeletonHelper.GetSkeletonFileFromName(targetSkeletonName);
+            if (targetSkeletonFile == null)
+            {
+                ShowError("KitbashTool.MeshFitterTool.TargetSkeletonNotFound", targetSkeletonName);
+                return;
+            }
 
             var config = new RemappedAnimatedBoneConfiguration();
-            config.ParnetModelSkeletonName = targetSkeleton.Name;
+            config.ParnetModelSkeletonName = targetSkeletonName;
             config.ParentModelBones = AnimatedBoneHelper.CreateFromSkeleton(targetSkeletonFile);
 
             config.MeshSkeletonName = currentSkeletonName;
             config.MeshBones = AnimatedBoneHelper.CreateFromSkeleton(currentSkeletonFile, usedBoneIndexes);
 
             _windowHandle = _formFactory.Create();
-            _windowHandle.ViewModel.Initialize(config, meshNodes, targetSkeleton.Skeleton, currentSkeletonFile);
+            _windowHandle.ViewModel.Initialize(config, meshNodes, targetSkeletonNode.Skeleton, currentSkeletonFile);
             _windowHandle.Show();
 
             _windowHandle.Closed += OnWindowClosed;
@@ -105,6 +144,16 @@ namespace Editors.KitbasherEditor.ChildEditors.MeshFitter
         {
             _windowHandle?.Close();
             _windowHandle = null;
+        }
+
+        private void ShowError(string localizationKey, params object[] args)
+        {
+            var message = _localizationManager.Get(localizationKey);
+            if (args.Length > 0)
+                message = string.Format(message, args);
+
+            var title = _localizationManager.Get("KitbasherTool.BoneMapping.ErrorTitle");
+            _standardDialogs.ShowDialogBox(message, title);
         }
     }
 }

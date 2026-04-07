@@ -56,6 +56,11 @@
   "KitbashTool.MeshFitterTool.Ok": "OK",
   "KitbashTool.MeshFitterTool.Cancel": "Cancel",
   "KitbashTool.MeshFitterTool.InvalidSkeletonSelection": "Unexpected number of skeletons - {0}. This tool only works for one skeleton",
+  "KitbashTool.MeshFitterTool.NoMeshSelected": "Select one or more mesh objects before opening the Mesh Fitter tool.",
+  "KitbashTool.MeshFitterTool.SelectedMeshMissingSkeleton": "One or more selected meshes do not have a skeleton assigned, so the Mesh Fitter tool can not be opened.",
+  "KitbashTool.MeshFitterTool.MeshSkeletonNotFound": "Could not load the mesh skeleton '{0}'. Make sure the skeleton file exists in the loaded pack files.",
+  "KitbashTool.MeshFitterTool.TargetSkeletonMissing": "Could not find the target model skeleton in the current scene. Load or create an editable model first.",
+  "KitbashTool.MeshFitterTool.TargetSkeletonNotFound": "Could not load the target skeleton '{0}'. Make sure the skeleton file exists in the loaded pack files.",
 
   "KitbasherTool.BoneMapping.CurrentModelBones": "Current model bones - ",
   "KitbasherTool.BoneMapping.TargetModelBones": "Target model bones - ",
