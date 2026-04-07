@@ -53,7 +53,6 @@
 
   "KitbashTool.MeshFitterTool.Title": "Mesh Fitter Tool",
   "KitbashTool.MeshFitterTool.ToolTip": "Open the MeshFitter tool",
-  "KitbashTool.MeshFitterTool.Apply": "Apply",
   "KitbashTool.MeshFitterTool.Ok": "OK",
   "KitbashTool.MeshFitterTool.Cancel": "Cancel",
   "KitbashTool.MeshFitterTool.InvalidSkeletonSelection": "Unexpected number of skeletons - {0}. This tool only works for one skeleton",

@@ -1,4 +1,5 @@
 ﻿using System.Windows;
+using CommunityToolkit.Diagnostics;
 using WindowHandling;
 
 namespace Editors.KitbasherEditor.ChildEditors.MeshFitter
@@ -29,13 +30,13 @@ namespace Editors.KitbasherEditor.ChildEditors.MeshFitter
 
         private void OkButtonClick(object sender, RoutedEventArgs e)
         {
+            Guard.IsNotNull(ViewModel);
+
             var res = ViewModel.OnOkButton();
             if (res == true)
                 Close();
         }
 
         private void CancelButtonClick(object sender, RoutedEventArgs e) => Close();
-
-        private void ApplyButtonClick(object sender, RoutedEventArgs e) => ViewModel.OnApplyButton();
     }
 }

@@ -1,4 +1,4 @@
-using System.Text.RegularExpressions;
+﻿using System.Text.RegularExpressions;
 using System.Windows;
 using Shared.Core.Misc;
 using Shared.Core.Services;
@@ -157,11 +157,6 @@ namespace Shared.Ui.Editors.BoneMapping
 
         protected virtual void MappingUpdated()
         { }
-
-        public void OnApplyButton()
-        {
-            ApplyChanges();
-        }
 
         public bool OnOkButton()
         {

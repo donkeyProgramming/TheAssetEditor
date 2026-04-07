@@ -20,9 +20,8 @@
 
         <view:BoneMappingView Grid.Row="0"/>
         <view1:BoneMappingMetaDataView Grid.Row="1"/>
-        
+
         <DockPanel Grid.Row="2" LastChildFill="False" >
-            <Button DockPanel.Dock="Right" Width="50" Margin="3" Content="{loc:Loc KitbashTool.MeshFitterTool.Apply}" Click="ApplyButtonClick"/>
             <Button DockPanel.Dock="Right" Width="50" Margin="3" Content="{loc:Loc KitbashTool.MeshFitterTool.Ok}" Click="OkButtonClick"/>
             <Button DockPanel.Dock="Right" Width="50" Margin="3" Content="{loc:Loc KitbashTool.MeshFitterTool.Cancel}" Click="CancelButtonClick"/>
         </DockPanel>
