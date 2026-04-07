@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Mesh Fitter Tool</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.55;
+            margin: 0 auto;
+            max-width: 1000px;
+            padding: 24px;
+            color: #202124;
+        }
+
+        h1, h2, h3 {
+            color: #1f2937;
+        }
+
+        figure {
+            margin: 24px 0;
+        }
+
+        figcaption {
+            color: #5f6368;
+            font-size: 0.95rem;
+            margin-top: 8px;
+        }
+
+        img {
+            max-width: 100%;
+            height: auto;
+            border: 1px solid #d0d7de;
+        }
+
+        .note, .warning {
+            padding: 12px 14px;
+            margin: 18px 0;
+        }
+
+        .note {
+            background: #f3f7ff;
+            border-left: 4px solid #2b5fd9;
+        }
+
+        .warning {
+            background: #fff6e5;
+            border-left: 4px solid #d28a00;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 18px 0 24px 0;
+        }
+
+        th, td {
+            border: 1px solid #d0d7de;
+            padding: 10px;
+            text-align: left;
+            vertical-align: top;
+        }
+
+        th {
+            background: #f6f8fa;
+        }
+
+        code {
+            background: #f6f8fa;
+            padding: 1px 4px;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Mesh Fitter Tool</h1>
+
+    <p>
+        The <strong>Mesh Fitter Tool</strong> helps you make a mesh from one skeleton sit correctly on the skeleton that is already loaded in the Kitbash Editor.
+        In practice, it is the tool you use when a straight bone remap is not enough and the mesh still looks too large, too small, offset, twisted, or badly posed.
+    </p>
+
+    <div class="note">
+        <strong>Short version:</strong> Mesh Fitter is for <strong>shape, pose, and proportion correction</strong>.
+        Re-rigging is for <strong>telling the mesh which target bones it should follow</strong>.
+        They are related, but they solve different parts of the problem. Both is often needed for a good result, but they are not the same thing.
+    </div>
+
+    <h2>What problems it solves</h2>
+
+    <ul>
+        <li>Making armor, clothing, heads, or creature parts sit correctly on a different target body.</li>
+        <li>Adjusting a mesh when the source and target skeletons are similar, but not identical in scale or pose.</li>
+        <li>Correcting limb length differences between source and target skeletons.</li>
+        <li>Applying small manual offsets to individual bones after auto-mapping.</li>
+        <li>Preparing a reference mesh so it looks right before you continue with the rest of your kitbash workflow.</li>
+    </ul>
+
+    <h2>Typical use cases</h2>
+
+    <ul>
+        <li>Head and body swaps where the new head fits the animation set, but does not line up cleanly in the default pose.</li>
+        <li>Armor or accessory transfers between units that share a similar skeleton family.</li>
+        <li>Creature part reuse where the source and target have comparable bone chains, but different proportions.</li>
+    </ul>
+
+    <p>
+        Public mod examples suggest this broader AssetEditor workflow is often used for jobs like putting a different head on an existing body or adapting a model that shares most of its animations with a close relative.
+        Those workshop pages are not Mesh Fitter tutorials by themselves, but they are good examples of the kind of problem this tool is meant to help with.
+    </p>
+
+    <figure>
+        <img src="Images/AssetEditor_Kitbash_MeshFitter_UI.png" alt="Simplified Mesh Fitter Tool layout">
+        <figcaption>
+            Simplified layout based on the current Mesh Fitter Tool UI screenshot.
+            The exact styling may change, but the workflow is the same: map bones on top, then correct the fit with scale and offsets below.
+        </figcaption>
+    </figure>
+
+    <h2>Before you open it</h2>
+
+    <ul>
+        <li>The <strong>editable model</strong> in the Kitbash Editor is the <strong>target</strong>. Its skeleton becomes the right-hand tree.</li>
+        <li>The <strong>selected mesh nodes</strong> are the <strong>source</strong>. Their skeleton becomes the left-hand tree.</li>
+        <li>All selected source meshes must come from the <strong>same source skeleton</strong>. If you mix skeletons, the tool refuses to open.</li>
+        <li>The tool works best when source and target bones have a clear semantic match: arm to arm, leg to leg, jaw to jaw, and so on.</li>
+    </ul>
+
+    <h2>How to use it</h2>
+
+    <ol>
+        <li>Open the target model in the <strong>Kitbash Editor</strong>.</li>
+        <li>Import or select the source mesh pieces you want to fit.</li>
+        <li>Select the source mesh nodes in the scene.</li>
+        <li>Open the <strong>Mesh Fitter Tool</strong>.</li>
+        <li>Use the left tree to choose source bones and the right tree to choose matching target bones.</li>
+        <li>Map the major structure first: root, spine, main limbs, neck, and head.</li>
+        <li>Try <strong>Auto map based on name</strong> if the skeleton naming is similar.</li>
+        <li>Try <strong>Auto map based on hierarchy</strong> if the branches match but names do not.</li>
+        <li>Adjust <strong>Root scale</strong> to get the overall size close.</li>
+        <li>Enable <strong>Relative scale</strong> if the target limbs are proportionally different but the bone roles still match.</li>
+        <li>Select individual source bones and use <strong>Pos offset</strong>, <strong>Rot offset</strong>, and <strong>Scale</strong> to fix the remaining issues.</li>
+        <li>Use <strong>Display offset</strong> only to move the preview skeleton for visibility while you work.</li>
+        <li>When the preview looks correct, press <strong>OK</strong> to commit the current fit to the selected meshes.</li>
+    </ol>
+
+    <div class="note">
+        <strong>Good order of operations:</strong> map the main bones first, then fix the big size mismatch with Root scale,
+        then try Relative scale, and only after that start doing per-bone manual offsets.
+    </div>
+
+    <h2>What each control does</h2>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Control</th>
+                <th>What it does</th>
+                <th>When to use it</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Only show used bones</td>
+                <td>Filters the source tree to the bones that actually influence the selected mesh.</td>
+                <td>Leave it on most of the time. Turn it off only if you need to inspect unused or helper bones.</td>
+            </tr>
+            <tr>
+                <td>Auto map based on name</td>
+                <td>Attempts to map the selected source bone and its children by matching names against the target skeleton.</td>
+                <td>Use it when source and target skeletons follow similar naming conventions.</td>
+            </tr>
+            <tr>
+                <td>Auto map based on hierarchy</td>
+                <td>Attempts to map the selected source branch using the currently selected target branch as the starting point.</td>
+                <td>Use it when the tree shape matches, but bone names differ.</td>
+            </tr>
+            <tr>
+                <td>Delete self / Delete self and children</td>
+                <td>Clears mapping data for the selected source bone, or the whole selected subtree.</td>
+                <td>Useful when auto-map made bad guesses.</td>
+            </tr>
+            <tr>
+                <td>Copy to all children</td>
+                <td>Copies the selected bone's current mapping to its descendants.</td>
+                <td>Useful for simple chains where many child bones should follow the same target area.</td>
+            </tr>
+            <tr>
+                <td>Root scale</td>
+                <td>Sets the overall base scale used during fitting.</td>
+                <td>Use this first when the entire source mesh is globally too large or too small.</td>
+            </tr>
+            <tr>
+                <td>Only move selected bone</td>
+                <td>Visible in the current UI, but disabled.</td>
+                <td>Ignore it for now.</td>
+            </tr>
+            <tr>
+                <td>Relative scale</td>
+                <td>Tries to scale a source bone relative to the length difference between the mapped target bone and its parent.</td>
+                <td>Helpful for limbs and spines when the source and target skeletons have matching roles but different proportions.</td>
+            </tr>
+            <tr>
+                <td>Display offset</td>
+                <td>Moves the temporary preview skeleton in the viewport.</td>
+                <td>Use this only to make the preview easier to see. It is not meant to be a saved modeling adjustment.</td>
+            </tr>
+            <tr>
+                <td>Pos offset / Rot offset / Scale</td>
+                <td>Applies per-bone fitting offsets to the currently selected source bone.</td>
+                <td>Use these for final cleanup after mapping and main scaling are in place.</td>
+            </tr>
+            <tr>
+                <td>Copy to children (next to Scale)</td>
+                <td>Copies the current bone scale offset to child bones.</td>
+                <td>Useful when an entire chain needs the same scale treatment.</td>
+            </tr>
+            <tr>
+                <td>Reset offsets</td>
+                <td>Resets the selected bone's manual position, rotation, and scale offsets.</td>
+                <td>Use it when a local tweak went in the wrong direction.</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h2>What to watch out for</h2>
+
+    <ul>
+        <li><strong>Display offset is preview-only.</strong> Treat it as a viewport helper, not as a modeling change.</li>
+        <li><strong>Auto-map works from the selected source bone downward.</strong> If you want to map most of the skeleton, start from the source root or a major branch.</li>
+        <li><strong>Unmapped bones stay on the source side.</strong> That can be acceptable for tiny accessories, but it often causes visible problems on major moving parts.</li>
+        <li><strong>The tool does not replace re-rigging.</strong> If the mesh still animates badly after fitting, the problem may be bone mapping or weights rather than the fit itself.</li>
+        <li><strong>Selected source meshes should be from one skeleton family.</strong> Mixed-skeleton selections are rejected for a reason.</li>
+        <li><strong>Use manual offsets sparingly.</strong> Large stacks of per-bone tweaks usually mean the base mapping is wrong or the source/target are too different.</li>
+    </ul>
+
+    <div class="warning">
+        <strong>Important:</strong> Mesh Fitter is a correction tool, not a miracle converter.
+        If the source and target skeletons have very different structure, orientation, or bone purpose,
+        the result will usually be unstable no matter how much tweaking you do.
+    </div>
+
+    <h2>When it struggles</h2>
+
+    <ul>
+        <li>When the source and target skeletons have very different topology.</li>
+        <li>When important bones have no clear one-to-one match.</li>
+        <li>When the skeletons use many helper, twist, cloth, or zero-length bones.</li>
+        <li>When the rest pose orientation is radically different.</li>
+        <li>When the mesh depends on carefully tuned weights that really need a full re-rigging pass.</li>
+        <li>When facial rigs, tails, wings, cloth chains, or very asymmetrical creature parts are involved.</li>
+    </ul>
+
+    <h2>Good candidates vs bad candidates</h2>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Usually works well</th>
+                <th>Usually needs more than Mesh Fitter</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Human to human, or creature to close creature variant</td>
+                <td>Humanoid to creature, or creature to unrelated creature</td>
+            </tr>
+            <tr>
+                <td>Armor plates, helmets, accessories, heads, simple body parts</td>
+                <td>Complex face rigs, cloth-heavy pieces, or long chained appendages</td>
+            </tr>
+            <tr>
+                <td>Cases where names and hierarchy mostly line up</td>
+                <td>Cases where names are unrelated and bone roles are ambiguous</td>
+            </tr>
+            <tr>
+                <td>Proportion fixes and pose cleanup</td>
+                <td>Fundamental skeleton conversion or weight authoring</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h2>Related public references</h2>
+
+    <ul>
+        <li>
+            <a href="https://tw-modding.com/wiki/Tutorial%3AAssetEditor" target="_blank" rel="noopener noreferrer">Tutorial:AssetEditor on tw-modding.com</a> -
+            public wiki documentation for AssetEditor. Its re-rigging section describes the one-to-one bone mapping workflow and mentions fitting the mesh onto the skeleton.
+        </li>
+        <li>
+            <a href="https://steamcommunity.com/sharedfiles/filedetails/?id=2553006078" target="_blank" rel="noopener noreferrer">Masked Mustachio's Lady Ungrim</a> -
+            workshop example where the author credits AssetEditor help for putting a female head on a different body.
+            This is a useful real-world example of the kind of compatible body-part swap Mesh Fitter supports.
+        </li>
+    </ul>
+
+    <p>
+        The workshop links above are <strong>use-case references</strong>, not direct Mesh Fitter tutorials.
+        They are included because they show the kinds of problems modders solve with AssetEditor in practice.
+    </p>
+
+</body>
+</html>

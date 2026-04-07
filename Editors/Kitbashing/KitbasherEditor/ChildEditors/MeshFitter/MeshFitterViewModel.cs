@@ -80,6 +80,7 @@ namespace Editors.KitbasherEditor.ChildEditors.MeshFitter
 
             _currentSkeletonNode = new SkeletonNode(_fromSkeleton);
             _currentSkeletonNode.SelectedNodeColour = Color.White;
+            _currentSkeletonNode.NodeColour = Color.Red;
             _sceneManager.RootNode.AddObject(_currentSkeletonNode);
 
             _oldAnimationPlayer = _meshNodes.First().AnimationPlayer;
