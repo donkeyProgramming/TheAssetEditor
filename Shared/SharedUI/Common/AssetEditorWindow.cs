@@ -9,6 +9,15 @@ namespace WindowHandling
     public  class AssetEditorWindow : Window, IDisposable
     {
         public bool AlwaysOnTop { get; set; } = false;
+        public static readonly DependencyProperty HelpDocumentPathProperty =
+            DependencyProperty.Register(nameof(HelpDocumentPath), typeof(string), typeof(AssetEditorWindow), new PropertyMetadata(string.Empty));
+
+        public string HelpDocumentPath
+        {
+            get => (string)GetValue(HelpDocumentPathProperty);
+            set => SetValue(HelpDocumentPathProperty, value);
+        }
+
         bool _isDisposed = false;
 
         public AssetEditorWindow()

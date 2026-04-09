@@ -5564,6 +5564,7 @@
                                     <ColumnDefinition Width="Auto"/>
                                     <ColumnDefinition Width="Auto"/>
                                     <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="Auto"/>
                                 </Grid.ColumnDefinitions>
                                 <Image 
                                     Grid.Column="0"
@@ -5619,8 +5620,21 @@
                                         StrokeThickness="1"/>
                                 </Button>
                                 <Button 
-                                    x:Name="btnClose" 
+                                    x:Name="btnHelp" 
                                     Grid.Column="4"
+                                    Width="46"
+                                    Style="{StaticResource TitleBarButtonStyle}" 
+                                    ToolTip="Help"
+                                    VerticalAlignment="Stretch"
+                                    Height="Auto"
+                                    WindowChrome.IsHitTestVisibleInChrome="True" 
+                                    Click="Help_Event"
+                                    Content="?"
+                                    FontSize="16"
+                                    FontWeight="SemiBold"/>
+                                <Button 
+                                    x:Name="btnClose" 
+                                    Grid.Column="5"
                                     Width="46"
                                     Style="{StaticResource TitleBarCloseButtonStyle}" 
                                     ToolTip="Close"
@@ -5673,6 +5687,9 @@
                             <Setter TargetName="btnMaximiseRestore" Property="Visibility" Value="Collapsed"/>
                             <Setter TargetName="btnMinimise" Property="Visibility" Value="Collapsed"/>
                         </Trigger>
+                        <DataTrigger Binding="{Binding HelpDocumentPath, RelativeSource={RelativeSource TemplatedParent}}" Value="">
+                            <Setter TargetName="btnHelp" Property="Visibility" Value="Collapsed"/>
+                        </DataTrigger>
                         <Trigger Property="WindowStyle" Value="None">
                             <Setter TargetName="titlebar" Property="Visibility" Value="Collapsed"/>
                             <Setter Property="WindowChrome.WindowChrome">
