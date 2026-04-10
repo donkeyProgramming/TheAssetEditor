@@ -25,7 +25,7 @@ namespace Editors.KitbasherEditor.ChildEditors.MeshFitter
         private readonly SceneManager _sceneManager;
         private readonly LocalizationManager _localizationManager;
 
-        MeshFitterWindow? _windowHandle;
+        private MeshFitterWindow? _windowHandle;
 
         public OpenMeshFitterToolCommand(IStandardDialogs standardDialogs, SelectionManager selectionManager, ISkeletonAnimationLookUpHelper skeletonHelper, IAbstractFormFactory<MeshFitterWindow> formFactory, SceneManager sceneManager, LocalizationManager localizationManager)
         {
@@ -51,9 +51,7 @@ namespace Editors.KitbasherEditor.ChildEditors.MeshFitter
                 .CurrentSelection();
 
             var meshNodes = meshesToFit
-                .Where(x => x is Rmv2MeshNode)
-                .Select(x => x as Rmv2MeshNode)
-                .Cast<Rmv2MeshNode>()
+                .OfType<Rmv2MeshNode>()
                 .ToList();
 
             if (meshNodes.Count == 0)
@@ -68,19 +66,19 @@ namespace Editors.KitbasherEditor.ChildEditors.MeshFitter
                 return;
             }
 
-            var allSkeltonNames = meshNodes
+            var allSkeletonNames = meshNodes
                 .Select(x => x.Geometry.SkeletonName)
                 .Distinct(StringComparer.InvariantCultureIgnoreCase)
                 .ToList();
 
-            if (allSkeltonNames.Count != 1)
+            if (allSkeletonNames.Count != 1)
             {
-                var commaList = string.Join(",", allSkeltonNames);
+                var commaList = string.Join(",", allSkeletonNames);
                 ShowError("KitbashTool.MeshFitterTool.InvalidSkeletonSelection", commaList);
                 return;
             }
 
-            var currentSkeletonName = allSkeltonNames.First();
+            var currentSkeletonName = allSkeletonNames.First();
             var currentSkeletonFile = _skeletonHelper.GetSkeletonFileFromName(currentSkeletonName);
             if (currentSkeletonFile == null)
             {
@@ -116,15 +114,16 @@ namespace Editors.KitbasherEditor.ChildEditors.MeshFitter
                 return;
             }
 
-            var config = new RemappedAnimatedBoneConfiguration();
-            config.ParnetModelSkeletonName = targetSkeletonName;
-            config.ParentModelBones = AnimatedBoneHelper.CreateFromSkeleton(targetSkeletonFile);
-
-            config.MeshSkeletonName = currentSkeletonName;
-            config.MeshBones = AnimatedBoneHelper.CreateFromSkeleton(currentSkeletonFile, usedBoneIndexes);
+            var config = new RemappedAnimatedBoneConfiguration
+            {
+                ParnetModelSkeletonName = targetSkeletonName,
+                ParentModelBones = AnimatedBoneHelper.CreateFromSkeleton(targetSkeletonFile),
+                MeshSkeletonName = currentSkeletonName,
+                MeshBones = AnimatedBoneHelper.CreateFromSkeleton(currentSkeletonFile, usedBoneIndexes)
+            };
 
             _windowHandle = _formFactory.Create();
-            _windowHandle.ViewModel.Initialize(config, meshNodes, targetSkeletonNode.Skeleton, currentSkeletonFile);
+            _windowHandle.ViewModel!.Initialize(config, meshNodes, targetSkeletonNode.Skeleton, currentSkeletonFile);
             _windowHandle.Show();
 
             _windowHandle.Closed += OnWindowClosed;
@@ -132,12 +131,12 @@ namespace Editors.KitbasherEditor.ChildEditors.MeshFitter
 
         private void OnWindowClosed(object? sender, EventArgs e)
         {
-            if (_windowHandle != null)
-            {
-                _windowHandle.Closed -= OnWindowClosed;
-                _windowHandle.Dispose();
-                _windowHandle = null;
-            }
+            if (_windowHandle == null)
+                return;
+
+            _windowHandle.Closed -= OnWindowClosed;
+            _windowHandle.Dispose();
+            _windowHandle = null;
         }
 
         public void Dispose()

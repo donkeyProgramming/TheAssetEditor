@@ -14,18 +14,20 @@ namespace Editors.KitbasherEditor.ChildEditors.MeshFitter
 {
     public class MeshFitterViewModel : BoneMappingViewModel, IDisposable
     {
+        private const int PreviewFrameIndex = 0;
+
         private readonly CommandFactory _commandFactory;
         private readonly AnimationsContainerComponent _animationsContainerComponent;
         private readonly SceneManager _sceneManager;
-        private bool _disposed = false;
-        GameSkeleton _targetSkeleton;
-        GameSkeleton _fromSkeleton;
+        private bool _disposed;
+        private GameSkeleton _targetSkeleton = null!;
+        private GameSkeleton _fromSkeleton = null!;
 
-        AnimationClip _animationClip;
-        AnimationPlayer _animationPlayer;
-        AnimationPlayer _oldAnimationPlayer;
-        List<Rmv2MeshNode> _meshNodes;
-        SkeletonNode _currentSkeletonNode;
+        private AnimationClip _animationClip = null!;
+        private AnimationPlayer _animationPlayer = null!;
+        private AnimationPlayer _oldAnimationPlayer = null!;
+        private List<Rmv2MeshNode> _meshNodes = null!;
+        private SkeletonNode _currentSkeletonNode = null!;
 
         public NotifyAttr<bool> RelativeScale { get; set; } = new NotifyAttr<bool>(false);
         public DoubleViewModel ScaleFactor { get; set; } = new DoubleViewModel(1);
@@ -59,7 +61,7 @@ namespace Editors.KitbasherEditor.ChildEditors.MeshFitter
             BoneRotationOffset.OnValueChanged += (viewModel) => BoneRotationUpdated(viewModel, MeshBones.SelectedItem);
             SkeletonDisplayOffset.OnValueChanged += (viewModel) => SkeletonDisplayOffsetUpdated(viewModel);
             RelativeScale.PropertyChanged += (_0, _1) => ApplyMeshFittingTransforms();
-            MeshBones.SelectedItemChanged += (_) => OnBoneSelected();
+            MeshBones.SelectedItemChanged += _ => OnBoneSelected();
 
             _animationPlayer = _animationsContainerComponent.RegisterAnimationPlayer(new AnimationPlayer(), "Temp animation rerig" + Guid.NewGuid());
             _fromSkeleton = new GameSkeleton(currentSkeletonFile, _animationPlayer);
@@ -70,9 +72,9 @@ namespace Editors.KitbasherEditor.ChildEditors.MeshFitter
 
             for (var i = 0; i < _fromSkeleton.BoneCount; i++)
             {
-                _animationClip.DynamicFrames[0].Rotation.Add(_fromSkeleton.Rotation[i]);
-                _animationClip.DynamicFrames[0].Position.Add(_fromSkeleton.Translation[i]);
-                _animationClip.DynamicFrames[0].Scale.Add(Vector3.One);
+                _animationClip.DynamicFrames[PreviewFrameIndex].Rotation.Add(_fromSkeleton.Rotation[i]);
+                _animationClip.DynamicFrames[PreviewFrameIndex].Position.Add(_fromSkeleton.Translation[i]);
+                _animationClip.DynamicFrames[PreviewFrameIndex].Scale.Add(Vector3.One);
             }
 
             _animationPlayer.SetAnimation(_animationClip, _fromSkeleton);
@@ -83,7 +85,7 @@ namespace Editors.KitbasherEditor.ChildEditors.MeshFitter
             _currentSkeletonNode.NodeColour = Color.Red;
             _sceneManager.RootNode.AddObject(_currentSkeletonNode);
 
-            _oldAnimationPlayer = _meshNodes.First().AnimationPlayer;
+            _oldAnimationPlayer = _meshNodes.First().AnimationPlayer!;
             foreach (var mesh in _meshNodes)
                 mesh.AnimationPlayer = _animationPlayer;
         }
@@ -101,18 +103,20 @@ namespace Editors.KitbasherEditor.ChildEditors.MeshFitter
             _currentSkeletonNode.ModelMatrix = Matrix.CreateTranslation((float)viewModel.X.Value, (float)viewModel.Y.Value, (float)viewModel.Z.Value);
         }
 
-        void OnBoneSelected()
+        private void OnBoneSelected()
         {
-            IsBoneSelected.Value = MeshBones.SelectedItem != null;
-            if (MeshBones.SelectedItem != null)
-            {
-                BoneScaleFactor.Value = MeshBones.SelectedItem.BoneScaleOffset;
-                BoneRotationOffset.Set(MeshBones.SelectedItem.BoneRotOffset.X, MeshBones.SelectedItem.BoneRotOffset.Y, MeshBones.SelectedItem.BoneRotOffset.Z);
-                BonePositionOffset.Set(MeshBones.SelectedItem.BonePosOffset.X, MeshBones.SelectedItem.BonePosOffset.Y, MeshBones.SelectedItem.BonePosOffset.Z);
+            var selectedBone = MeshBones.SelectedItem;
+            IsBoneSelected.Value = selectedBone != null;
 
-                _currentSkeletonNode.SelectedBoneIndex = MeshBones.SelectedItem.BoneIndex.Value;
-                var rootNode = _sceneManager.GetNodeByName<MainEditableNode>(SpecialNodes.EditableModel);
-                rootNode.SkeletonNode.SelectedBoneIndex = MeshBones.SelectedItem.MappedBoneIndex.Value;
+            var rootNode = _sceneManager.GetNodeByName<MainEditableNode>(SpecialNodes.EditableModel);
+            if (selectedBone != null)
+            {
+                BoneScaleFactor.Value = selectedBone.BoneScaleOffset;
+                BoneRotationOffset.Set(selectedBone.BoneRotOffset.X, selectedBone.BoneRotOffset.Y, selectedBone.BoneRotOffset.Z);
+                BonePositionOffset.Set(selectedBone.BonePosOffset.X, selectedBone.BonePosOffset.Y, selectedBone.BonePosOffset.Z);
+
+                _currentSkeletonNode.SelectedBoneIndex = selectedBone.BoneIndex.Value;
+                rootNode.SkeletonNode.SelectedBoneIndex = selectedBone.MappedBoneIndex.Value;
             }
             else
             {
@@ -121,13 +125,11 @@ namespace Editors.KitbasherEditor.ChildEditors.MeshFitter
                 BonePositionOffset.Set(0);
 
                 _currentSkeletonNode.SelectedBoneIndex = null;
-
-                var rootNode = _sceneManager.GetNodeByName<MainEditableNode>(SpecialNodes.EditableModel);
                 rootNode.SkeletonNode.SelectedBoneIndex = null;
             }
         }
 
-        void BoneScaleUpdate(float newValue, AnimatedBone bone)
+        private void BoneScaleUpdate(float newValue, AnimatedBone? bone)
         {
             if (bone == null)
                 return;
@@ -135,7 +137,7 @@ namespace Editors.KitbasherEditor.ChildEditors.MeshFitter
             ApplyMeshFittingTransforms();
         }
 
-        void BoneRotationUpdated(Vector3ViewModel newValue, AnimatedBone bone)
+        private void BoneRotationUpdated(Vector3ViewModel newValue, AnimatedBone? bone)
         {
             if (bone == null)
                 return;
@@ -143,7 +145,7 @@ namespace Editors.KitbasherEditor.ChildEditors.MeshFitter
             ApplyMeshFittingTransforms();
         }
 
-        void BonePositionUpdated(Vector3ViewModel newValue, AnimatedBone bone)
+        private void BonePositionUpdated(Vector3ViewModel newValue, AnimatedBone? bone)
         {
             if (bone == null)
                 return;
@@ -151,23 +153,25 @@ namespace Editors.KitbasherEditor.ChildEditors.MeshFitter
             ApplyMeshFittingTransforms();
         }
 
-        void ApplyMeshFittingTransforms()
+        private void ApplyMeshFittingTransforms()
         {
+            var sourceBones = MeshBones.PossibleValues.First();
+
             // Rebuild the mapping index as its easy to work with
-            var mapping = AnimatedBoneHelper.BuildRemappingList(MeshBones.PossibleValues.First());
+            var mapping = AnimatedBoneHelper.BuildRemappingList(sourceBones);
 
             // Reset the animation back to bind pose
             for (var i = 0; i < _fromSkeleton.BoneCount; i++)
             {
-                _animationClip.DynamicFrames[0].Rotation[i] = _fromSkeleton.Rotation[i];
-                _animationClip.DynamicFrames[0].Position[i] = _fromSkeleton.Translation[i];
-                _animationClip.DynamicFrames[0].Scale[i] = Vector3.One;
+                _animationClip.DynamicFrames[PreviewFrameIndex].Rotation[i] = _fromSkeleton.Rotation[i];
+                _animationClip.DynamicFrames[PreviewFrameIndex].Position[i] = _fromSkeleton.Translation[i];
+                _animationClip.DynamicFrames[PreviewFrameIndex].Scale[i] = Vector3.One;
             }
 
             // Set the base scale for the mesh and apply the animation
             var baseScale = (float)ScaleFactor.Value;
-            _animationClip.DynamicFrames[0].Scale[0] = new Vector3(baseScale);
-            _animationPlayer.Refresh();
+            _animationClip.DynamicFrames[PreviewFrameIndex].Scale[0] = new Vector3(baseScale);
+            _animationPlayer!.Refresh();
 
             if (baseScale == 0)
                 return;
@@ -175,22 +179,15 @@ namespace Editors.KitbasherEditor.ChildEditors.MeshFitter
             for (var i = 0; i < _fromSkeleton.BoneCount; i++)
             {
                 var mappedIndex = mapping.FirstOrDefault(x => x.OriginalValue == i);
-                var boneValuesObject = MeshBones.PossibleValues.First().GetFromBoneId(i);
+                var boneValuesObject = sourceBones.GetFromBoneId(i);
 
                 var fromBoneIndex = i;
                 var fromParentBoneIndex = _fromSkeleton.GetParentBoneIndex(fromBoneIndex);
-                var desiredBonePosWorld = Matrix.Identity;
 
                 // Get the world position where we want to move the bone to
-                if (mappedIndex != null)
-                {
-                    var targetBoneIndex = mappedIndex.NewValue;
-                    desiredBonePosWorld = _targetSkeleton.GetAnimatedWorldTranform(targetBoneIndex);
-                }
-                else
-                {
-                    desiredBonePosWorld = _fromSkeleton.GetAnimatedWorldTranform(i);
-                }
+                var desiredBonePosWorld = mappedIndex != null
+                    ? _targetSkeleton.GetAnimatedWorldTranform(mappedIndex.NewValue)
+                    : _fromSkeleton.GetAnimatedWorldTranform(i);
 
                 // Apply the offset values to the bone in worldspace
                 var desiredBonePosWorldWithOffsets = MathUtil.CreateRotation(boneValuesObject.BoneRotOffset) *
@@ -203,7 +200,7 @@ namespace Editors.KitbasherEditor.ChildEditors.MeshFitter
                 if (computeRelativeScale)
                 {
                     var targetBoneIndex = mappedIndex.NewValue;
-                    var targetParentBoneIndex = _targetSkeleton.GetParentBoneIndex(targetBoneIndex);
+                    var targetParentBoneIndex = _targetSkeleton!.GetParentBoneIndex(targetBoneIndex);
 
                     if (fromParentBoneIndex != -1 && targetParentBoneIndex != -1)
                     {
@@ -233,16 +230,16 @@ namespace Editors.KitbasherEditor.ChildEditors.MeshFitter
                 bonePositionLocalSpace.Decompose(out var _, out var boneRotation, out var bonePosition);
 
                 // Apply the values to the animation
-                _animationClip.DynamicFrames[0].Rotation[i] = boneRotation;
-                _animationClip.DynamicFrames[0].Position[i] = bonePosition;
-                _animationClip.DynamicFrames[0].Scale[i] *= new Vector3(scale);
+                _animationClip.DynamicFrames[PreviewFrameIndex].Rotation[i] = boneRotation;
+                _animationClip.DynamicFrames[PreviewFrameIndex].Position[i] = bonePosition;
+                _animationClip.DynamicFrames[PreviewFrameIndex].Scale[i] *= new Vector3(scale);
 
                 // Apply the inv scale to all children to avoid the mesh growing out of control
                 var childBones = _fromSkeleton.GetDirectChildBones(i);
                 foreach (var childBoneIndex in childBones)
                 {
                     var invScale = 1 / scale;
-                    _animationClip.DynamicFrames[0].Scale[childBoneIndex] *= new Vector3(invScale);
+                    _animationClip.DynamicFrames[PreviewFrameIndex].Scale[childBoneIndex] *= new Vector3(invScale);
                 }
 
                 _animationPlayer.Refresh();
@@ -278,7 +275,7 @@ namespace Editors.KitbasherEditor.ChildEditors.MeshFitter
 
         public void Dispose()
         {
-            if(_disposed) 
+            if (_disposed)
                 return;
             _disposed = true;
 
@@ -296,7 +293,7 @@ namespace Editors.KitbasherEditor.ChildEditors.MeshFitter
 
         protected override void ApplyChanges()
         {
-            var frame = AnimationSampler.Sample(0, _fromSkeleton, _animationClip);
+            var frame = AnimationSampler.Sample(PreviewFrameIndex, _fromSkeleton, _animationClip);
             _commandFactory.Create<CreateAnimatedMeshPoseCommand>().Configure(x => x.Configure(_meshNodes, frame)).BuildAndExecute();
         }
     }
