@@ -7,6 +7,7 @@ using Shared.Ui.BaseDialogs.PackFileTree.ContextMenu;
 using Shared.Ui.BaseDialogs.PackFileTree.ContextMenu.Commands;
 using Shared.Ui.BaseDialogs.StandardDialog;
 using Shared.Ui.BaseDialogs.ToolSelector;
+using Shared.Ui.Common.MenuSystem;
 
 namespace Shared.Ui
 {
@@ -19,6 +20,7 @@ namespace Shared.Ui
         public override void Register(IServiceCollection services)
         {
             // Implement required interfaces
+            services.AddScoped<IWindowsKeyboard, WindowKeyboard>();
             services.AddScoped<IStandardDialogs, StandardDialogs>();
             services.AddTransient<IToolSelectorUiProvider, ToolSelectorUiProvider>();
 

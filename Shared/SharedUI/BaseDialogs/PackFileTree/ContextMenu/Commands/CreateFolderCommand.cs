@@ -20,7 +20,7 @@ namespace Shared.Ui.BaseDialogs.PackFileTree.ContextMenu.Commands
             var folderName = EditFileNameDialog.ShowDialog(_selectedNode, "");
 
             if (folderName.Any())
-                _selectedNode.Children.Add(new TreeNode(folderName, NodeType.Directory, _selectedNode.FileOwner, _selectedNode));
+                _selectedNode.AddDirectoryChild(folderName);
         }
     }
 }

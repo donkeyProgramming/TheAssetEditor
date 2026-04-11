@@ -2,6 +2,7 @@
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Media;
 using Shared.Ui.Common;
 
 namespace Shared.Ui.BaseDialogs.PackFileTree
@@ -15,6 +16,9 @@ namespace Shared.Ui.BaseDialogs.PackFileTree
 
         Point _lastMouseDown;
         TreeNode? _draggedItem;
+        TreeViewItem? _lastClickedItem;
+        int _lastClickTimestamp;
+        const int DoubleClickThresholdMs = 500;
 
         public System.Windows.Controls.ContextMenu CustomContextMenu
         {
@@ -28,10 +32,52 @@ namespace Shared.Ui.BaseDialogs.PackFileTree
             {
                 var item = (TreeViewItem)sender;
 
+                // PreviewMouseLeftButtonDown tunnels through all ancestor TreeViewItems.
+                // Only process the innermost (actual clicked) TreeViewItem.
+                var sourceItem = FindParentTreeViewItem(e.OriginalSource as DependencyObject);
+                if (!ReferenceEquals(sourceItem, item))
+                    return;
+
+                var now = e.Timestamp;
+                var isSecondClickOnSameItem = ReferenceEquals(_lastClickedItem, item) &&
+                    (now - _lastClickTimestamp) <= DoubleClickThresholdMs;
+
+                if (isSecondClickOnSameItem)
+                {
+                    _lastClickedItem = null;
+                    _lastClickTimestamp = 0;
+
+                    if (DataContext is PackFileBrowserViewModel viewModel && item.DataContext is TreeNode node)
+                    {
+                        var command = viewModel.DoubleClickCommand;
+                        if (command.CanExecute(node))
+                            command.Execute(node);
+
+                        e.Handled = true;
+                        return;
+                    }
+                }
+
+                _lastClickedItem = item;
+                _lastClickTimestamp = now;
+
                 _lastMouseDown = e.GetPosition(tvParameters);
 
                 _draggedItem = item.DataContext as TreeNode;
             }
+        }
+
+        private static TreeViewItem? FindParentTreeViewItem(DependencyObject? current)
+        {
+            while (current != null)
+            {
+                if (current is TreeViewItem treeViewItem)
+                    return treeViewItem;
+
+                current = VisualTreeHelper.GetParent(current);
+            }
+
+            return null;
         }
 
         public void TriggerPreviewKeyDown()

@@ -26,10 +26,10 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
         private readonly CommandExecutor _commandExecutor;
         private readonly MenuItemVisibilityRuleEngine _menuItemVisibilityRuleEngine;
         private readonly ActionHotkeyHandler _hotKeyHandler = new ActionHotkeyHandler();
-        private readonly WindowKeyboard _keyboard;
+        private readonly IWindowsKeyboard _keyboard;
         private readonly Dictionary<Type, MenuAction> _uiCommands = new();
 
-        public MenuBarViewModel(CommandExecutor commandExecutor, IEventHub eventHub, MenuItemVisibilityRuleEngine menuItemVisibilityRuleEngine, TransformToolViewModel transformToolViewModel,IUiCommandFactory uiCommandFactory, WindowKeyboard windowKeyboard)
+        public MenuBarViewModel(CommandExecutor commandExecutor, IEventHub eventHub, MenuItemVisibilityRuleEngine menuItemVisibilityRuleEngine, TransformToolViewModel transformToolViewModel,IUiCommandFactory uiCommandFactory, IWindowsKeyboard windowKeyboard)
         {
             _commandExecutor = commandExecutor;
             _menuItemVisibilityRuleEngine = menuItemVisibilityRuleEngine;
@@ -198,15 +198,12 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
 
         public bool OnKeyReleased(Key key, Key systemKey, ModifierKeys modifierKeys)
         {
-            _keyboard.SetKeyDown(key, false);
-            _keyboard.SetKeyDown(systemKey, false);
             return _hotKeyHandler.TriggerCommand(key, modifierKeys);
         }
 
         public void OnKeyDown(Key key, Key systemKey, ModifierKeys modifiers)
         {
-            _keyboard.SetKeyDown(systemKey, true);
-            _keyboard.SetKeyDown(key, true);
+
         }
 
         void OnUndoStackChanged(CommandStackChangedEvent notification)

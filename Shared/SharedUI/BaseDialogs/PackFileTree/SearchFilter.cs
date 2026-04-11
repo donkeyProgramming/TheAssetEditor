@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Linq;
 using System.Text.RegularExpressions;
 using Shared.Core.Misc;
 
@@ -13,6 +14,7 @@ namespace Shared.Ui.BaseDialogs.PackFileTree
         public string this[string columnName] => Filter(FilterText);
 
         private readonly ObservableCollection<TreeNode> _nodeCollection;
+        private readonly Func<IEnumerable<TreeNodeSource>> _sourceRootsFactory;
 
         string _filterText = "";
         public string FilterText
@@ -38,10 +40,12 @@ namespace Shared.Ui.BaseDialogs.PackFileTree
 
         List<string> _extensionFilter;
         public int AutoExapandResultsAfterLimitedCount { get; set; } = 25;
+        public bool HasActiveFilter => !string.IsNullOrWhiteSpace(FilterText) || ShowFoldersOnly || (_extensionFilter?.Count > 0);
 
-        public SearchFilter(ObservableCollection<TreeNode> nodes)
+        internal SearchFilter(ObservableCollection<TreeNode> nodes, Func<IEnumerable<TreeNodeSource>> sourceRootsFactory)
         {
             _nodeCollection = nodes;
+            _sourceRootsFactory = sourceRootsFactory;
         }
 
         string Filter(string text)
@@ -56,32 +60,58 @@ namespace Shared.Ui.BaseDialogs.PackFileTree
                 return e.Message;
             }
 
-            foreach (var item in _nodeCollection)
+            var rootSources = _sourceRootsFactory().ToList();
+            foreach (var item in rootSources)
                 HasChildWithFilterMatch(item, expression);
 
             if (ShowFoldersOnly)
             {
-                foreach (var node in _nodeCollection)
+                foreach (var node in rootSources)
                     ApplyFoldersOnlyFilter(node);
             }
+
+            foreach (var rootNode in _nodeCollection)
+                rootNode.RefreshLoadedBranch();
 
             if (AutoExapandResultsAfterLimitedCount != -1)
             {
                 var visibleNodes = 0;
-                foreach (var item in _nodeCollection)
+                foreach (var item in rootSources)
                     visibleNodes += CountVisibleNodes(item);
 
-                if (visibleNodes <= AutoExapandResultsAfterLimitedCount)
+                if (HasActiveFilter)
                 {
                     foreach (var item in _nodeCollection)
-                        item.ExpandIfVisible();
+                    {
+                        item.ExpandForFilter();
+                        item.EnsureChildrenLoaded();
+                    }
+
+                    if (visibleNodes <= AutoExapandResultsAfterLimitedCount)
+                    {
+                        foreach (var item in _nodeCollection)
+                            item.ExpandIfVisible(markAsFilterExpansion: true);
+                    }
+                }
+                else
+                {
+                    foreach (var item in _nodeCollection)
+                    {
+                        item.ClearFilterExpansion();
+                        item.NormalizeLazyState();
+                    }
                 }
             }
 
             return "";
         }
 
-        private static void ApplyFoldersOnlyFilter(TreeNode node)
+        public void Reapply()
+        {
+            Filter(FilterText);
+        }
+
+        private static void ApplyFoldersOnlyFilter(TreeNodeSource node)
         {
             if (node.NodeType == NodeType.File)
                 node.IsVisible = false;
@@ -93,7 +123,7 @@ namespace Shared.Ui.BaseDialogs.PackFileTree
             }
         }
 
-        private static int CountVisibleNodes(TreeNode file)
+        private static int CountVisibleNodes(TreeNodeSource file)
         {
             if (file.NodeType == NodeType.File && file.IsVisible)
                 return 1;
@@ -111,7 +141,7 @@ namespace Shared.Ui.BaseDialogs.PackFileTree
             Filter(FilterText);
         }
 
-        private bool HasChildWithFilterMatch(TreeNode file, Regex expression)
+        private bool HasChildWithFilterMatch(TreeNodeSource file, Regex expression)
         {
             if (file.NodeType == NodeType.Root && file.Children.Count == 0)
             {

@@ -20,17 +20,20 @@ namespace Shared.Ui.BaseDialogs.PackFileTree.ContextMenu.Commands
 
             if (_selectedNode.NodeType == NodeType.Directory)
             {
-                var newFolderName = EditFileNameDialog.ShowDialog(_selectedNode.Parent, _selectedNode.Name);
+                var currentPath = _selectedNode.GetFullPath();
+                var inputResult = standardDialogs.ShowTextInputDialog("Create folder", _selectedNode.Name);
+                var newFolderName = inputResult.Result ? inputResult.Text.ToLower().Trim() : string.Empty;
                 if (newFolderName.Any())
                 {
                     _selectedNode.Name = newFolderName;
-                    packFileService.RenameDirectory(_selectedNode.FileOwner, _selectedNode.GetFullPath(), newFolderName);
+                    packFileService.RenameDirectory(_selectedNode.FileOwner, currentPath, newFolderName);
                 }
 
             }
             else if (_selectedNode.NodeType == NodeType.File)
             {
-                var newFileName = EditFileNameDialog.ShowDialog(_selectedNode.Parent, _selectedNode.Name);
+                var inputResult = standardDialogs.ShowTextInputDialog("Rename file", _selectedNode.Name);
+                var newFileName = inputResult.Result ? inputResult.Text.ToLower().Trim() : string.Empty;
                 if (newFileName.Any())
                     packFileService.RenameFile(_selectedNode.FileOwner, _selectedNode.Item, newFileName);
 

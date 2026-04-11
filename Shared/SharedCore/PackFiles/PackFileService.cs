@@ -210,15 +210,26 @@ namespace Shared.Core.PackFiles
                 throw new Exception("Name can not be empty");
 
             var oldNodePath = currentNodeName;
-            var newNodePath = currentNodeName;
+            var newNodePath = newName;
+            var lastSeparatorIndex = currentNodeName.LastIndexOf(Path.DirectorySeparatorChar);
+            if (lastSeparatorIndex != -1)
+            {
+                var parentPath = currentNodeName.Substring(0, lastSeparatorIndex);
+                newNodePath = parentPath + Path.DirectorySeparatorChar + newName;
+            }
 
-            var files = pf.FileList.Where(x => x.Key.StartsWith(oldNodePath)).ToList();
+            var oldPathPrefix = oldNodePath + Path.DirectorySeparatorChar;
+            var files = pf.FileList
+                .Where(x => x.Key.Equals(oldNodePath, StringComparison.InvariantCultureIgnoreCase)
+                            || x.Key.StartsWith(oldPathPrefix, StringComparison.InvariantCultureIgnoreCase))
+                .ToList();
+
             foreach (var (path, file) in files)
             {
                 pf.FileList.Remove(path);
                 var newPath = newNodePath;
-                if (oldNodePath.Length != 0)
-                    newPath = path.Replace(oldNodePath, newNodePath);
+                if (oldNodePath.Length != 0 && path.Length > oldNodePath.Length)
+                    newPath = newNodePath + path.Substring(oldNodePath.Length);
 
                 pf.FileList[newPath] = file;
             }

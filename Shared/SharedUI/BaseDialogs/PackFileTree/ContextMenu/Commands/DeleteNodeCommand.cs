@@ -1,9 +1,9 @@
-﻿using System.Windows;
-using Shared.Core.PackFiles;
+﻿using Shared.Core.PackFiles;
+using Shared.Core.Services;
 
 namespace Shared.Ui.BaseDialogs.PackFileTree.ContextMenu.Commands
 {
-    public class DeleteNodeCommand(IPackFileService packFileService) : IContextMenuCommand
+    public class DeleteNodeCommand(IPackFileService packFileService, IStandardDialogs standardDialogs) : IContextMenuCommand
     {
         public string GetDisplayName(TreeNode node) => "Delete";
         public bool IsEnabled(TreeNode node) => true;
@@ -12,11 +12,12 @@ namespace Shared.Ui.BaseDialogs.PackFileTree.ContextMenu.Commands
         {
             if (_selectedNode.FileOwner.IsCaPackFile)
             {
-                MessageBox.Show("Unable to edit CA packfile");
+                standardDialogs.ShowDialogBox("Unable to edit CA packfile", "Error");
                 return;
             }
 
-            if (MessageBox.Show("Are you sure you want to delete the file?", "", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
+            var confirmDelete = standardDialogs.ShowYesNoBox("Are you sure you want to delete the file?", "");
+            if (confirmDelete == ShowMessageBoxResult.OK)
             {
                 if (_selectedNode.NodeType == NodeType.File)
                     packFileService.DeleteFile(_selectedNode.FileOwner, _selectedNode.Item);
