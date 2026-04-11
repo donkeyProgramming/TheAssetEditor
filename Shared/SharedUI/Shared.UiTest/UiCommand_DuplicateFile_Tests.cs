@@ -3,7 +3,7 @@ using Shared.Core.PackFiles.Models;
 using Shared.Ui.BaseDialogs.PackFileTree.ContextMenu.Commands;
 using Test.TestingUtility.Shared;
 
-namespace Test.E2EVerification
+namespace Shared.UiTest
 {
     internal class UiCommand_DuplicateFile_Tests
     {

@@ -5,7 +5,7 @@ using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
 using Shared.Core.Settings;
 
-namespace Test.Shared.Core.PackFiles
+namespace Shared.CoreTest.PackFiles
 {
     internal class PackFileServiceTest
     {

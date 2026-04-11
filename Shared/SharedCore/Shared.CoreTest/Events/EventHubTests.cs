@@ -3,7 +3,7 @@ using Shared.Core.DependencyInjection;
 using Shared.Core.Events;
 using Test.TestingUtility.TestUtility;
 
-namespace Test.Shared.Core.Events
+namespace Shared.CoreTest.Events
 {
     public class EventHubTests
     {

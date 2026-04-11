@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net10.0-windows</TargetFramework>
@@ -23,8 +23,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\Shared\SharedCore\Shared.Core.csproj" />
-    <ProjectReference Include="..\Shared\Test.TestingUtility.csproj" />
+    <ProjectReference Include="..\..\..\Testing\Shared\Test.TestingUtility.csproj" />
+    <ProjectReference Include="..\Shared.Core\Shared.Core.csproj" />
   </ItemGroup>
 
   <ItemGroup>

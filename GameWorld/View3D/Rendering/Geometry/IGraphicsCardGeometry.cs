@@ -88,10 +88,4 @@ namespace GameWorld.Core.Rendering.Geometry
             return new GraphicsCardGeometry(_deviceResolverComponent.Device);
         }
     }
-
-
-
-
-
-
 }

@@ -34,7 +34,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\ByteParsing\Shared.ByteParsing\Shared.ByteParsing.csproj" />
+            <ProjectReference Include="..\..\ByteParsing\Shared.ByteParsing\Shared.ByteParsing.csproj" />
     </ItemGroup>
 
 

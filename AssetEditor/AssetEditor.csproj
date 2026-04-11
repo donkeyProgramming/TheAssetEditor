@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
         <OutputType>Exe</OutputType>
         <LangVersion>preview</LangVersion>
@@ -29,7 +29,7 @@
         <ProjectReference Include="..\Editors\TwuiEditor\Editor.Twui\Editors.Twui.csproj" />
         <ProjectReference Include="..\GameWorld\View3D\GameWorld.Core.csproj" />
         <ProjectReference Include="..\Shared\EmbeddedResources\Shared.EmbeddedResources.csproj" />
-        <ProjectReference Include="..\Shared\SharedUI\Shared.Ui.csproj" />
+        <ProjectReference Include="..\Shared\SharedUI\Shared.Ui\Shared.Ui.csproj" />
     </ItemGroup>
 
     <ItemGroup>

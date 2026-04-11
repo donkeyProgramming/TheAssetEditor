@@ -3,7 +3,7 @@ using Shared.Core.PackFiles.Serialization;
 using Shared.Core.PackFiles.Utility;
 using Shared.Core.Settings;
 
-namespace Test.Shared.Core.PackFiles.Serialization
+namespace Shared.CoreTest.PackFiles.Serialization
 {
     [TestFixture]
     internal class PackFileSerializerWriterTests

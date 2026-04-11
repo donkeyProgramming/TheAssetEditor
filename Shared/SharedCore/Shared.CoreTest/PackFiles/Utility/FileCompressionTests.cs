@@ -6,7 +6,7 @@ using Shared.Core.PackFiles.Models;
 using Shared.Core.PackFiles.Utility;
 using Shared.Core.Settings;
 
-namespace Test.Shared.Core.PackFiles.Utility
+namespace Shared.CoreTest.PackFiles.Utility
 {
     internal class FileCompressionTests
     {

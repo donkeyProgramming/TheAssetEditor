@@ -1,12 +1,12 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-      <TargetFramework>net10.0-windows</TargetFramework>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <LangVersion>latest</LangVersion>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-
     <IsPackable>false</IsPackable>
-    <IsTestProject>true</IsTestProject>
+    <UseWPF>true</UseWPF>
   </PropertyGroup>
 
   <ItemGroup>
@@ -21,12 +21,11 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="NUnit3TestAdapter" Version="6.1.0" />
-      <PackageReference Include="Moq" Version="4.20.72" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\AssetEditor\AssetEditor.csproj" />
-    <ProjectReference Include="..\..\Shared\SharedCore\Shared.Core\Shared.Core.csproj" />
+    <ProjectReference Include="..\..\..\Testing\Shared\Test.TestingUtility.csproj" />
+    <ProjectReference Include="..\Shared.Ui\Shared.Ui.csproj" />
   </ItemGroup>
 
   <ItemGroup>

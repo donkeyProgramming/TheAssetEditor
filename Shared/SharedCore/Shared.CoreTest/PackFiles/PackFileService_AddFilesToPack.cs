@@ -1,7 +1,7 @@
 ﻿using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
 
-namespace Test.Shared.Core.PackFiles
+namespace Shared.CoreTest.PackFiles
 {
     internal class PackFileService_AddFilesToPack
     {

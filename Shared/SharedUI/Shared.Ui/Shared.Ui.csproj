@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
 		<TargetFramework>net10.0-windows</TargetFramework>
 		<UseWPF>true</UseWPF>
@@ -14,9 +14,9 @@
 	</ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\EmbeddedResources\Shared.EmbeddedResources.csproj" />
-    <ProjectReference Include="..\GameFiles\Shared.GameFormats.csproj" />
-    <ProjectReference Include="..\SharedCore\Shared.Core.csproj" />
+    <ProjectReference Include="..\..\EmbeddedResources\Shared.EmbeddedResources.csproj" />
+    <ProjectReference Include="..\..\GameFiles\Shared.GameFormats.csproj" />
+    <ProjectReference Include="..\..\SharedCore\Shared.Core\Shared.Core.csproj" />
   </ItemGroup>
 
   <ItemGroup>

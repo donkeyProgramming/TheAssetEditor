@@ -7,7 +7,7 @@ using Shared.Ui.BaseDialogs.PackFileTree;
 using Test.TestingUtility.Shared;
 using Test.TestingUtility.TestUtility;
 
-namespace Test.E2EVerification
+namespace Shared.UiTest
 {
     internal class PackFileBrowserViewModelTests
     {
@@ -175,7 +175,7 @@ namespace Test.E2EVerification
         }
 
         [Test]
-        public void DeletingFileRemovesItsNodeFromTheTree()
+        public void DeleteFileUsingPfs_EnsureTreeViewUpdated()
         {
             // Arrange: file nested inside a folder
             CreatePackfiles(("foldera\\file.txt", "file.txt"));
@@ -196,10 +196,40 @@ namespace Test.E2EVerification
             var container = _packageFileService.GetPackFileContainer(filePackFile);
             _packageFileService.DeleteFile(container, filePackFile);
 
-
             // Assert: the file node must be gone from the WPF tree
             Assert.That(folderA.Children.Count(x => x.NodeType == NodeType.File && x.Item != null),
                 Is.EqualTo(0), "File node should be removed after delete");
+        }
+
+        [Test]
+        public void RenameFileUsingPfs_EnsureTreeViewUpdated()
+        {
+            // Arrange: file nested inside a folder
+            CreatePackfiles(("foldera\\file.txt", "file.txt"));
+
+            var root = _viewModel.Files[0];
+            root.IsNodeExpanded = true;
+
+            var folderA = _viewModel.GetFromPath(root, "foldera");
+            Assert.That(folderA, Is.Not.Null);
+            folderA.IsNodeExpanded = true;
+
+            // Confirm the file node is visible in the WPF tree before rename
+            Assert.That(folderA.Children.Count(x => x.NodeType == NodeType.File && x.Item != null),
+                Is.EqualTo(1), "File node should be present before rename");
+
+            // Act: rename the file through PackFileService
+            var filePackFile = _packageFileService.FindFile("foldera\\file.txt");
+            var container = _packageFileService.GetPackFileContainer(filePackFile);
+            _packageFileService.RenameFile(container, filePackFile, "file_renamed.txt");
+
+            // Assert: old node/path should be gone and new node/path should exist in the tree
+            var oldNode = _viewModel.GetFromPath(root, "foldera\\file.txt");
+            var renamedNode = _viewModel.GetFromPath(root, "foldera\\file_renamed.txt");
+
+            Assert.That(oldNode, Is.Null, "Old file path should not exist after rename");
+            Assert.That(renamedNode, Is.Not.Null, "Renamed file should exist in the tree view");
+            Assert.That(renamedNode.Name, Is.EqualTo("file_renamed.txt"));
         }
 
         private void CreatePackfiles(params (string Path, string FileName)[] files)

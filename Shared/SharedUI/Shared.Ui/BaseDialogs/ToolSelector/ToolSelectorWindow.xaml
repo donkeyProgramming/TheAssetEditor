@@ -12,8 +12,8 @@
          Style="{StaticResource CustomWindowStyle}"
         WindowStartupLocation="CenterOwner">
     <DockPanel  >
-     
-        <Button DockPanel.Dock="Bottom" Margin="5" Click="Button_Click">{loc:Loc Dialog.ToolSelector.OpenButton}</Button>
+
+        <Button DockPanel.Dock="Bottom" Margin="5" Click="Button_Click" Content="{loc:Loc Dialog.ToolSelector.OpenButton}"/> 
         <ListView DockPanel.Dock="Top" x:Name="PossibleTools"  Margin="5" >
             <ListView.ItemContainerStyle>
                 <Style TargetType="ListViewItem">
