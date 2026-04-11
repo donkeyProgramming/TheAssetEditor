@@ -16,6 +16,7 @@ namespace Shared.Core.Services
         TextInputDialogResult ShowTextInputDialog(string title, string initialText = "");
         void ShowDialogBox(string message, string title = "Error");
         ShowMessageBoxResult ShowYesNoBox(string message, string title);
+        IWaitCursor ShowWaitCursor();
     }
 
     public record SaveDialogResult(bool Result, PackFile? SelectedPackFile, string? SelectedFilePath);
@@ -28,4 +29,6 @@ namespace Shared.Core.Services
         OK,
         Cancel,
     }
+
+    public interface IWaitCursor : IDisposable{}
 }

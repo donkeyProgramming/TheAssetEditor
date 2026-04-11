@@ -1,10 +1,12 @@
-﻿using System.Windows;
+﻿using System;
+using System.Windows;
 using Shared.Core.PackFiles;
+using Shared.Core.Services;
 using Shared.Ui.Common;
 
 namespace Shared.Ui.BaseDialogs.PackFileTree.ContextMenu.Commands
 {
-    public class CopyToEditablePackCommand(IPackFileService packFileService) : IContextMenuCommand
+    public class CopyToEditablePackCommand(IPackFileService packFileService, IStandardDialogs standardDialogs) : IContextMenuCommand
     {
         public string GetDisplayName(TreeNode node) => "Copy to editable pack";
         public bool IsEnabled(TreeNode node) => true;
@@ -13,11 +15,11 @@ namespace Shared.Ui.BaseDialogs.PackFileTree.ContextMenu.Commands
         {
             if (packFileService.GetEditablePack() == null)
             {
-                MessageBox.Show("No editable pack selected!");
+                standardDialogs.ShowDialogBox("No editable pack selected!");
                 return;
             }
 
-            using (new WaitCursor())
+            using (standardDialogs.ShowWaitCursor())
             {
                 var files = _selectedNode.GetAllChildFileNodes();
                 foreach (var file in files)
@@ -26,5 +28,5 @@ namespace Shared.Ui.BaseDialogs.PackFileTree.ContextMenu.Commands
         }
     }
 
-
+  
 }

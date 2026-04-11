@@ -11,10 +11,33 @@ using Shared.Core.PackFiles;
 using Shared.Core.Services;
 using Shared.Ui.BaseDialogs.PackFileTree;
 using Shared.Ui.BaseDialogs.StandardDialog.PackFile;
+using Shared.Ui.Common;
 using Shared.Ui.Common.Exceptions;
 
 namespace Shared.Ui.BaseDialogs.StandardDialog
 {
+
+    public class AeWaitCursor : IWaitCursor
+    {
+        readonly WaitCursor _handle;
+        bool _isDisposed;
+        public AeWaitCursor()
+        {
+            _handle = new WaitCursor();
+        }
+
+        public void Dispose()
+        {
+            if (_isDisposed == false)
+                _handle.Dispose();
+            _isDisposed = true;
+        }
+
+
+    }
+
+
+
     public class StandardDialogs : IStandardDialogs
     {
         private readonly IPackFileService _pfs;
@@ -23,6 +46,7 @@ namespace Shared.Ui.BaseDialogs.StandardDialog
         private readonly IScopeRepository _scopeRepository;
         private readonly IEventHub _eventHub;
         private readonly ScopeToken _scopeToken;
+        
 
         public StandardDialogs(IPackFileService pfs, PackFileTreeViewFactory packFileBrowserBuilder, IExceptionService exceptionService, IScopeRepository scopeRepository, IEventHub eventHub, ScopeToken scopeToken)
         {
@@ -33,6 +57,8 @@ namespace Shared.Ui.BaseDialogs.StandardDialog
             _eventHub = eventHub;
             _scopeToken = scopeToken;
         }
+
+        public IWaitCursor ShowWaitCursor() => new AeWaitCursor();
 
         public SaveDialogResult DisplaySaveDialog(IPackFileService remove, List<string> extensions)
         {

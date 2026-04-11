@@ -1,12 +1,7 @@
 ﻿using System.Collections.ObjectModel;
-using System.Threading;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
-using NUnit.Framework;
-using Octokit;
-using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
-using Shared.Core.PackFiles.Utility;
 using Shared.Core.Services;
 using Shared.Core.Settings;
 using Shared.Ui.BaseDialogs.PackFileTree;
@@ -39,16 +34,10 @@ namespace Test.E2EVerification
             runner.Dialogs.Setup(x => x.ShowYesNoBox(It.IsAny<string>(), It.IsAny<string>()))
                 .Returns(ShowMessageBoxResult.OK);
 
-            var treeView = new PackFileBrowserViewModel(
-                settingsService,
-                new EmptyContextMenuBuilder(),
-                packFileService,
-                null,
-                null,
-                showCaFiles: true,
-                showFoldersOnly: false);
+            var builder = runner.ServiceProvider.GetRequiredService<PackFileTreeViewFactory>();
+            var treeView = builder.Create(ContextMenuType.None, true, false);
 
-            var copyCommand = new CopyToEditablePackCommand(packFileService);
+            var copyCommand = new CopyToEditablePackCommand(packFileService, runner.Dialogs.Object);
             var renameCommand = new OnRenameNodeCommand(packFileService, runner.Dialogs.Object);
             var deleteCommand = new DeleteNodeCommand(packFileService, runner.Dialogs.Object);
 
@@ -61,7 +50,8 @@ namespace Test.E2EVerification
             var sourceAnimationFileCount = CountFilesWithPrefix(sourceContainer, "animations\\");
             var editableAnimationFileCountBefore = CountFilesWithPrefix(editableContainer, "animations\\");
 
-            ExecuteOnSta(() => copyCommand.Execute(sourceAnimations));
+            copyCommand.Execute(sourceAnimations);
+            //ExecuteOnSta(() => copyCommand.Execute(sourceAnimations));
 
             var editableAnimationFileCountAfterCopy = CountFilesWithPrefix(editableContainer, "animations\\");
             Assert.That(
@@ -128,11 +118,6 @@ namespace Test.E2EVerification
                 throw new Exception("Failed to run command on STA thread", thrown);
         }
 
-        private sealed class EmptyContextMenuBuilder : IContextMenuBuilder
-        {
-            public ContextMenuType Type => ContextMenuType.None;
-            public ObservableCollection<ContextMenuItem2> Build(TreeNode? node) => [];
-        }
     }
 }
 
