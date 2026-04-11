@@ -10,32 +10,33 @@
              xmlns:mathviews="clr-namespace:CommonControls.MathViews;assembly=Shared.Ui"
               xmlns:s="http://schemas.singulink.com/xaml" 
              xmlns:behaviors="clr-namespace:Shared.Ui.Common.Behaviors;assembly=Shared.Ui"
+             xmlns:loc="clr-namespace:Shared.Ui.Common;assembly=Shared.Ui"
              d:DesignHeight="450" d:DesignWidth="800">
     <UserControl.Resources>
         <System:Double x:Key="labelWidth">140</System:Double>
     </UserControl.Resources>
-    <Expander IsExpanded="True" Header="Settings:">
+    <Expander IsExpanded="True" Header="{loc:Loc AnimationTransfer.Settings.Header}">
         <StackPanel>
             <DockPanel>
-                <Label Content="Visability - Generated" Width ="{StaticResource labelWidth}"  />
+                <Label Content="{loc:Loc AnimationTransfer.Settings.VisibilityGenerated}" Width ="{StaticResource labelWidth}"  />
                 <Label Content=":"/>
 
-                <CheckBox VerticalContentAlignment="Center" IsChecked="{Binding Generated.ShowMesh.Value, UpdateSourceTrigger=PropertyChanged}" Content="Mesh | "/>
-                <CheckBox VerticalContentAlignment="Center" IsChecked="{Binding Generated.ShowSkeleton.Value, UpdateSourceTrigger=PropertyChanged}" Content="Skeleton | "/>
+                <CheckBox VerticalContentAlignment="Center" IsChecked="{Binding Generated.ShowMesh.Value, UpdateSourceTrigger=PropertyChanged}" Content="{loc:Loc AnimationTransfer.Settings.MeshToggle}"/>
+                <CheckBox VerticalContentAlignment="Center" IsChecked="{Binding Generated.ShowSkeleton.Value, UpdateSourceTrigger=PropertyChanged}" Content="{loc:Loc AnimationTransfer.Settings.SkeletonToggle}"/>
 
-                <Label Content="Offset:"  />
+                <Label Content="{loc:Loc AnimationTransfer.Settings.Offset}"  />
                 <mathviews:Vector3View Vector3="{Binding AnimationSettings.DisplayOffset, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" Margin="2"/>
             </DockPanel>
 
           
 
             <DockPanel>
-                <Label Content="Skeleton Scale" Width ="{StaticResource labelWidth}"  DockPanel.Dock="Left"/>
+                <Label Content="{loc:Loc AnimationTransfer.Settings.SkeletonScale}" Width ="{StaticResource labelWidth}"  DockPanel.Dock="Left"/>
                 <Label Content=":" DockPanel.Dock="Left"/>
 
                 <TextBox Text="{Binding AnimationSettings.Scale.TextValue, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" VerticalContentAlignment="Center" Margin="2">
                     <TextBox.ToolTip>
-                        <ToolTip Content="Scaling the skeleton will make the mesh look dragged unless the mesh is also exported"/>
+                            <ToolTip Content="{loc:Loc AnimationTransfer.Settings.SkeletonScaleTooltip}"/>
                     </TextBox.ToolTip>
 
                     <b:Interaction.Behaviors>
@@ -46,7 +47,7 @@
             </DockPanel>
 
             <DockPanel>
-                <Label Content="Animation speed mult" Width ="{StaticResource labelWidth}" DockPanel.Dock="Left"/>
+                <Label Content="{loc:Loc AnimationTransfer.Settings.AnimationSpeedMultiplier}" Width ="{StaticResource labelWidth}" DockPanel.Dock="Left"/>
                 <Label Content=":" DockPanel.Dock="Left"/>
                 <TextBox Text="{Binding AnimationSettings.SpeedMult.TextValue, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" VerticalContentAlignment="Center" Margin="2">
                     <b:Interaction.Behaviors>
@@ -57,17 +58,17 @@
 
 
             <DockPanel >
-                <Label Content="Config" Width ="{StaticResource labelWidth}"/>
+                <Label Content="{loc:Loc AnimationTransfer.Settings.Config}" Width ="{StaticResource labelWidth}"/>
                 <Label Content=":"/>
-                <CheckBox VerticalContentAlignment="Center" IsChecked="{Binding AnimationSettings.ApplyRelativeScale.Value, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" Content="Apply Relative scale" ToolTip="Scale bone length based on relative difference" Margin="0,0,5,0"/>
-                <CheckBox VerticalContentAlignment="Center" IsChecked="{Binding AnimationSettings.FreezeUnmapped.Value, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" Content="Zero unmapped bones" ToolTip="Set the transform of all unmapped bones to 0"/>
+                <CheckBox VerticalContentAlignment="Center" IsChecked="{Binding AnimationSettings.ApplyRelativeScale.Value, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" Content="{loc:Loc AnimationTransfer.Settings.ApplyRelativeScale}" ToolTip="{loc:Loc AnimationTransfer.Settings.ApplyRelativeScaleTooltip}" Margin="0,0,5,0"/>
+                <CheckBox VerticalContentAlignment="Center" IsChecked="{Binding AnimationSettings.FreezeUnmapped.Value, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" Content="{loc:Loc AnimationTransfer.Settings.ZeroUnmappedBones}" ToolTip="{loc:Loc AnimationTransfer.Settings.ZeroUnmappedBonesTooltip}"/>
             </DockPanel>
 
           
             <DockPanel>
                 <StackPanel>
                     <DockPanel>
-                        <Label Content="Root bone for animation war beast convert operation" Width ="300"/>
+                        <Label Content="{loc:Loc AnimationTransfer.Settings.RootBoneWarBeast}" Width ="300"/>
                         <Label Content=":"/>
                         <ComboBox Grid.Column="2" Grid.ColumnSpan="2" Grid.Row="0" 
                           IsEditable="True"
@@ -77,7 +78,7 @@
                           ItemsSource="{Binding ModelBoneList.Values}" 
                           SelectedItem="{Binding ModelBoneList.SelectedItem, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
                     </DockPanel>
-                    <Button  Content="convert to war beast!" Click="{s:MethodBinding FreezePositionAndRotation}" Margin="2" />
+                    <Button  Content="{loc:Loc AnimationTransfer.Settings.ConvertToWarBeast}" Click="{s:MethodBinding FreezePositionAndRotation}" Margin="2" />
                 </StackPanel>
             </DockPanel>
 

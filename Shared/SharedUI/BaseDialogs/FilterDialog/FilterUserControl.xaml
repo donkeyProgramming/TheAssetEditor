@@ -4,6 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:behaviors="clr-namespace:Shared.Ui.Common.Behaviors" 
+             xmlns:loc="clr-namespace:Shared.Ui.Common"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800"
              x:Name="self">
@@ -16,8 +17,8 @@
 
     <DockPanel >
         <DockPanel DockPanel.Dock="Top" Margin="0,5,0,5">
-            <Label  DockPanel.Dock="Left" Content="Filter:" VerticalContentAlignment="Center"/>
-            <TextBox x:Name="SearchTextBox" Height="20" behaviors:TextBoxExtensions.Watermark="Search filter, regEx supported"/>
+            <Label  DockPanel.Dock="Left" Content="{loc:Loc Dialog.Filter.Label}" VerticalContentAlignment="Center"/>
+            <TextBox x:Name="SearchTextBox" Height="20" behaviors:TextBoxExtensions.Watermark="{loc:Loc Dialog.Filter.Watermark}"/>
         </DockPanel>
 
         <ContentPresenter DockPanel.Dock="Top" Content="{Binding InnerContent, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=UserControl}}" />

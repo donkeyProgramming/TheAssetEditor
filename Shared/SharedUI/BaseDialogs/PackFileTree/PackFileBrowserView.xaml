@@ -5,6 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:behaviors="clr-namespace:Shared.Ui.Common.Behaviors"
              xmlns:e1="http://schemas.microsoft.com/xaml/behaviors" 
+             xmlns:loc="clr-namespace:Shared.Ui.Common"
              xmlns:nodevalueconverters="clr-namespace:Shared.Ui.BaseDialogs.PackFileTree" 
              xmlns:packfiletree="clr-namespace:Shared.Ui.BaseDialogs.PackFileTree" 
              xmlns:valueconverters="clr-namespace:Shared.Ui.BaseDialogs.PackFileTree.ValueConverters"
@@ -25,7 +26,7 @@
         </Grid.RowDefinitions>
 
         <!-- Title -->
-        <TextBlock Text="PackFile Explorer" FontSize="12" HorizontalAlignment="Left" Margin="0, 5, 5, 5" Grid.Row="0"/>
+        <TextBlock Text="{loc:Loc Dialog.PackFileBrowser.ExplorerTitle}" FontSize="12" HorizontalAlignment="Left" Margin="0, 5, 5, 5" Grid.Row="0"/>
 
         <!-- Search and Clear Button -->
         <Grid Grid.Row="1">
@@ -38,7 +39,7 @@
                     <TextBox x:Name="FilterTextBoxItem" Style="{StaticResource HintedTextBox}" KeyboardNavigation.TabIndex="0" FontSize="12" BorderThickness="0"
                              KeyboardNavigation.IsTabStop="True" HorizontalAlignment="Stretch" Padding="2.5, 0, 0, 0"  Height="24" VerticalContentAlignment="Center" 
                              Text="{Binding Filter.FilterText, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay, Delay=350, ValidatesOnDataErrors=True}"
-                             Tag="Search PackFile Explorer (Ctrl+Shift+F)">
+                             Tag="{loc:Loc Dialog.PackFileBrowser.SearchHint}">
                     </TextBox>
 
                     <Button Click="ClearButtonClick" Command="{Binding ClearTextCommand}" Padding="2" Width="24" Height="24" HorizontalAlignment="Right" 

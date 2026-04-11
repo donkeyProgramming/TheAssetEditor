@@ -6,9 +6,10 @@
         xmlns:local="clr-namespace:Editors.KitbasherEditor.ViewModels.SaveDialog"
         xmlns:s="http://schemas.singulink.com/xaml" 
         xmlns:common="clr-namespace:Shared.Ui.Common;assembly=Shared.Ui"
+        xmlns:loc="clr-namespace:Shared.Ui.Common;assembly=Shared.Ui"
         mc:Ignorable="d"
         Style="{StaticResource CustomWindowStyle}"
-        Title="Save" Height="400" Width="800">
+        Title="{loc:Loc KitbashTool.SaveDialog.Title}" Height="400" Width="800">
     
     <Grid Margin="2">
         <DockPanel LastChildFill="true">
@@ -26,69 +27,69 @@
                     <RowDefinition Height="auto"/>
                 </Grid.RowDefinitions>
 
-                <Label Grid.Row="0" Grid.Column="0">Path:</Label>
+                <Label Grid.Row="0" Grid.Column="0">{loc:Loc KitbashTool.SaveDialog.Path}</Label>
                 <DockPanel Grid.Row="0" Grid.Column="1" LastChildFill="True">
-                    <Button DockPanel.Dock="Right"  Command="{Binding HandleBrowseLocationCommand}">Browse</Button>
+                    <Button DockPanel.Dock="Right"  Command="{Binding HandleBrowseLocationCommand}">{loc:Loc KitbashTool.SaveDialog.Browse}</Button>
                     <TextBox DockPanel.Dock="Left" Text="{Binding OutputPath, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"></TextBox>
                 </DockPanel>
 
-                <Label Grid.Row="1" Grid.Column="0">Mesh Format:</Label>
+                <Label Grid.Row="1" Grid.Column="0">{loc:Loc KitbashTool.SaveDialog.MeshFormat}</Label>
                 <ComboBox Grid.Row="1" Grid.Column="1" Width="200" HorizontalAlignment="Right" Margin="0,1,0,1"
                       ItemsSource="{Binding MeshStrategies}" 
                       DisplayMemberPath="DisplayName" 
                       SelectedItem="{Binding SelectedMeshStrategy}"
                       ToolTip="{Binding Path=SelectedItem.Description, RelativeSource={RelativeSource Self}}"/>
 
-                <Label Grid.Row="2" Grid.Column="0">WS model Format:</Label>
+                <Label Grid.Row="2" Grid.Column="0">{loc:Loc KitbashTool.SaveDialog.WsModelFormat}</Label>
                 <ComboBox Grid.Row="2" Grid.Column="1" Width="200" HorizontalAlignment="Right" Margin="0,1,0,1"
                          ItemsSource="{Binding WsStrategies}" 
                           DisplayMemberPath="DisplayName" 
                           SelectedItem="{Binding SelectedWsModelStrategy}"
                           ToolTip="{Binding Path=SelectedItem.Description, RelativeSource={RelativeSource Self}}"/>
 
-                <Label Grid.Row="3" Grid.Column="0">Lod Stategy:</Label>
+                <Label Grid.Row="3" Grid.Column="0">{loc:Loc KitbashTool.SaveDialog.LodStrategy}</Label>
                 <ComboBox Grid.Row="3" Grid.Column="1" Width="200" HorizontalAlignment="Right" Margin="0,1,0,1" 
                         ItemsSource="{Binding LodStrategies}" 
                         DisplayMemberPath="DisplayName" 
                         SelectedItem="{Binding SelectedLodStrategy}"
                         ToolTip="{Binding Path=SelectedItem.Description, RelativeSource={RelativeSource Self}}"/>
 
-                <Label Grid.Row="4" Grid.Column="0">Number of lods:</Label>
+                <Label Grid.Row="4" Grid.Column="0">{loc:Loc KitbashTool.SaveDialog.NumberOfLods}</Label>
                 <ComboBox Grid.Row="4" Grid.Column="1" Width="200" HorizontalAlignment="Right" Margin="0,1,0,1" 
                    ItemsSource="{Binding PossibleLodNumbers}" 
 
                    SelectedItem="{Binding NumberOfLodsToGenerate}"
-                   ToolTip="Number of lods that will be generated. Normal is 4, large models have 5 and some special models have 1"/>
+                     ToolTip="{loc:Loc KitbashTool.SaveDialog.Tooltips.NumberOfLods}"/>
             </Grid>
 
-            <Label DockPanel.Dock="top"  Margin="2,10,2,0">Lod Info:</Label>
+                 <Label DockPanel.Dock="top"  Margin="2,10,2,0">{loc:Loc KitbashTool.SaveDialog.LodInfo}</Label>
             <DockPanel DockPanel.Dock="top" Margin="2,0,2,15">
                 <DockPanel DockPanel.Dock="Top">
                     <DataGrid Style="{DynamicResource {x:Type DataGrid}}"
                       ItemsSource="{Binding LodNodes, UpdateSourceTrigger=PropertyChanged}" 
                       AutoGenerateColumns="False" CanUserAddRows="False" ToolTipService.ShowOnDisabled="True" DockPanel.Dock="Top">
                         <DataGrid.Columns>
-                            <DataGridTextColumn Header="Index" Binding="{Binding LodIndex, UpdateSourceTrigger=PropertyChanged}" IsReadOnly="True"  ElementStyle="{DynamicResource {x:Type TextBlock}}"/>
-                            <common:DataGridNumericColumn Header="Distance" Binding="{Binding CameraDistance, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" ElementStyle="{DynamicResource {x:Type TextBlock}}" EditingElementStyle="{DynamicResource {x:Type TextBox}}"/>
-                            <common:DataGridNumericColumn Header="Qlt Level" Binding="{Binding QualityLvl, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" ElementStyle="{DynamicResource {x:Type TextBlock}}" EditingElementStyle="{DynamicResource {x:Type TextBox}}"/>
-                            <common:DataGridNumericColumn Header="Reduction Factor" Binding="{Binding LodReductionFactor, StringFormat={}{0:N2}, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" ElementStyle="{DynamicResource {x:Type TextBlock}}" EditingElementStyle="{DynamicResource {x:Type TextBox}}"/>
-                            <DataGridCheckBoxColumn Header="Merge Alpha" Binding="{Binding OptimizeLod_Alpha, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
-                            <DataGridCheckBoxColumn Header="Fast AnimVertex" Binding="{Binding OptimizeLod_Vertex, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
+                            <DataGridTextColumn Header="{loc:Loc KitbashTool.SaveDialog.Columns.Index}" Binding="{Binding LodIndex, UpdateSourceTrigger=PropertyChanged}" IsReadOnly="True"  ElementStyle="{DynamicResource {x:Type TextBlock}}"/>
+                            <common:DataGridNumericColumn Header="{loc:Loc KitbashTool.SaveDialog.Columns.Distance}" Binding="{Binding CameraDistance, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" ElementStyle="{DynamicResource {x:Type TextBlock}}" EditingElementStyle="{DynamicResource {x:Type TextBox}}"/>
+                            <common:DataGridNumericColumn Header="{loc:Loc KitbashTool.SaveDialog.Columns.QualityLevel}" Binding="{Binding QualityLvl, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" ElementStyle="{DynamicResource {x:Type TextBlock}}" EditingElementStyle="{DynamicResource {x:Type TextBox}}"/>
+                            <common:DataGridNumericColumn Header="{loc:Loc KitbashTool.SaveDialog.Columns.ReductionFactor}" Binding="{Binding LodReductionFactor, StringFormat={}{0:N2}, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" ElementStyle="{DynamicResource {x:Type TextBlock}}" EditingElementStyle="{DynamicResource {x:Type TextBox}}"/>
+                            <DataGridCheckBoxColumn Header="{loc:Loc KitbashTool.SaveDialog.Columns.MergeAlpha}" Binding="{Binding OptimizeLod_Alpha, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
+                            <DataGridCheckBoxColumn Header="{loc:Loc KitbashTool.SaveDialog.Columns.FastAnimVertex}" Binding="{Binding OptimizeLod_Vertex, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
 
-                            <common:DataGridNumericColumn Header="Num Polygons" Binding="{Binding PolygonCount.Value}" IsReadOnly="True" ElementStyle="{DynamicResource {x:Type TextBlock}}" />
-                            <common:DataGridNumericColumn Header="Num Meshes" Binding="{Binding MeshCount.Value}" IsReadOnly="True" ElementStyle="{DynamicResource {x:Type TextBlock}}" />
-                            <common:DataGridNumericColumn Header="Num Textures" Binding="{Binding TextureCount.Value}" IsReadOnly="True" ElementStyle="{DynamicResource {x:Type TextBlock}}" />
+                            <common:DataGridNumericColumn Header="{loc:Loc KitbashTool.SaveDialog.Columns.NumPolygons}" Binding="{Binding PolygonCount.Value}" IsReadOnly="True" ElementStyle="{DynamicResource {x:Type TextBlock}}" />
+                            <common:DataGridNumericColumn Header="{loc:Loc KitbashTool.SaveDialog.Columns.NumMeshes}" Binding="{Binding MeshCount.Value}" IsReadOnly="True" ElementStyle="{DynamicResource {x:Type TextBlock}}" />
+                            <common:DataGridNumericColumn Header="{loc:Loc KitbashTool.SaveDialog.Columns.NumTextures}" Binding="{Binding TextureCount.Value}" IsReadOnly="True" ElementStyle="{DynamicResource {x:Type TextBlock}}" />
                         </DataGrid.Columns>
                     </DataGrid>
                 </DockPanel>
             </DockPanel>
 
             <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,5,0,0">
-                <Button Width="100" Margin="0,0,2,0" Click="CancelButton_Click" >Cancel</Button>
-                <Button Width="100" Margin="0,0,2,0" Click="SaveButton_Click" >Save</Button>
+                <Button Width="100" Margin="0,0,2,0" Click="CancelButton_Click" >{loc:Loc KitbashTool.SaveDialog.Cancel}</Button>
+                <Button Width="100" Margin="0,0,2,0" Click="SaveButton_Click" >{loc:Loc KitbashTool.SaveDialog.Save}</Button>
             </StackPanel>
 
-            <CheckBox Margin="2" DockPanel.Dock="Bottom" FlowDirection="RightToLeft" IsChecked="{Binding OnlySaveVisible.Value, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">Only save visible nodes</CheckBox>
+            <CheckBox Margin="2" DockPanel.Dock="Bottom" FlowDirection="RightToLeft" IsChecked="{Binding OnlySaveVisible.Value, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">{loc:Loc KitbashTool.SaveDialog.OnlySaveVisibleNodes}</CheckBox>
         </DockPanel>
     </Grid>
 </Window>

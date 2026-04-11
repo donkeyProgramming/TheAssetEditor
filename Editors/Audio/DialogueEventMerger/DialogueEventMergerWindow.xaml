@@ -6,13 +6,14 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:sys="clr-namespace:System;assembly=netstandard"
     xmlns:DialogueEventMerger="clr-namespace:Editors.Audio.DialogueEventMerger"
+    xmlns:loc="clr-namespace:Shared.Ui.Common;assembly=Shared.Ui"
     d:DataContext="{d:DesignInstance Type=DialogueEventMerger:DialogueEventMergerViewModel}"
     Style="{StaticResource CustomWindowStyle}"
     mc:Ignorable="d"
     Width="700"
     SizeToContent="Height"
     Closed="OnClosed"
-    Title="Dialogue Event Merger">
+    Title="{loc:Loc DialogueEventMerger.Title}">
 
     <Grid>
         <Grid.RowDefinitions>
@@ -26,7 +27,7 @@
 
         <TextBlock  
             Grid.Row="0"  
-            Text="The Dialogue Event Merger is a tool for merging Dialogue Events from modded SoundBanks with Dialogue Events from vanilla into a single SoundBank. Read the tooltips for more information."  
+            Text="{loc:Loc DialogueEventMerger.Description}"  
             HorizontalAlignment="Left"
             Margin="10, 10, 10, 0"
             TextWrapping="Wrap"/>
@@ -60,8 +61,8 @@
                 <Label
                     Grid.Row="0" 
                     Grid.Column="0" 
-                    Content="SoundBank Suffix"
-                    ToolTip="The suffix of your merged SoundBanks."/>
+                    Content="{loc:Loc DialogueEventMerger.SoundBankSuffix}"
+                    ToolTip="{loc:Loc DialogueEventMerger.Tooltips.SoundBankSuffix}"/>
 
                 <TextBox 
                     Grid.Row="0" 
@@ -74,8 +75,8 @@
                     Grid.Row="1" 
                     Grid.Column="0" 
                     Margin="0, 10, 0, 0"
-                    Content="Modded SoundBanks"
-                    ToolTip="Select one or more modded SoundBanks from which their Dialogue Events will be merged with vanilla."/>
+                    Content="{loc:Loc DialogueEventMerger.ModdedSoundBanks}"
+                    ToolTip="{loc:Loc DialogueEventMerger.Tooltips.ModdedSoundBanks}"/>
 
                 <ListBox
                     Grid.Row="1" 
@@ -107,14 +108,14 @@
             Margin="10, 0, 10, 10">
 
             <Button 
-                Content="OK"
+                Content="{loc:Loc DialogueEventMerger.Ok}"
                 Width="75"
                 Margin="0, 0, 5, 0"
                 Command="{Binding GenerateMergedDialogueEventSoundBankCommand}" 
                 IsEnabled="{Binding IsOkButtonEnabled}"/>
 
             <Button 
-                Content="Cancel" 
+                Content="{loc:Loc DialogueEventMerger.Cancel}" 
                 Width="75"
                 Margin="5, 0, 0, 0" 
                 Command="{Binding CloseWindowActionCommand}"/>

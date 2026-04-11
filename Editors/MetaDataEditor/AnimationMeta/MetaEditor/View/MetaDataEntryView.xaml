@@ -3,14 +3,15 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:loc="clr-namespace:Shared.Ui.Common;assembly=Shared.Ui"
              mc:Ignorable="d" 
              xmlns:s="http://schemas.singulink.com/xaml"
              d:DesignHeight="450" d:DesignWidth="800">
     <DockPanel>
         <DockPanel DockPanel.Dock="Top" LastChildFill="False" >
-            <TextBlock Grid.Row="0" FontSize="20" DockPanel.Dock="Left" Text="Meta Data (v"/>
+            <TextBlock Grid.Row="0" FontSize="20" DockPanel.Dock="Left" Text="{loc:Loc MetadataEditor.Entry.HeaderPrefix}"/>
             <TextBlock Grid.Row="0" FontSize="20" DockPanel.Dock="Left" Text="{Binding MetaDataFileVersion, UpdateSourceTrigger=PropertyChanged}"/>
-            <TextBlock Grid.Row="0" FontSize="20" DockPanel.Dock="Left" Text=") Entries:"/>
+            <TextBlock Grid.Row="0" FontSize="20" DockPanel.Dock="Left" Text="{loc:Loc MetadataEditor.Entry.HeaderSuffix}"/>
         </DockPanel>
    
 
@@ -26,16 +27,16 @@
                 <RowDefinition Height="auto"/>
             </Grid.RowDefinitions>
 
-            <Button Grid.Row="0" Grid.Column="0" Content="New"  Margin="5,5,5,0"  Command="{Binding NewActionCommand}"/>
-            <Button Grid.Row="0" Grid.Column="1" Content="Delete"  Margin="5,5,5,0"  Command="{Binding DeleteActionCommand}"/>
+            <Button Grid.Row="0" Grid.Column="0" Content="{loc:Loc MetadataEditor.Buttons.New}"  Margin="5,5,5,0"  Command="{Binding NewActionCommand}"/>
+            <Button Grid.Row="0" Grid.Column="1" Content="{loc:Loc MetadataEditor.Buttons.Delete}"  Margin="5,5,5,0"  Command="{Binding DeleteActionCommand}"/>
 
-            <Button Grid.Row="1" Grid.Column="0" Content="Up"  Margin="5,5,5,0"  Command="{Binding MoveUpActionCommand}"/>
-            <Button Grid.Row="1" Grid.Column="1" Content="Down"  Margin="5,5,5,0"  Command="{Binding MoveDownActionCommand}"/>
+            <Button Grid.Row="1" Grid.Column="0" Content="{loc:Loc MetadataEditor.Buttons.Up}"  Margin="5,5,5,0"  Command="{Binding MoveUpActionCommand}"/>
+            <Button Grid.Row="1" Grid.Column="1" Content="{loc:Loc MetadataEditor.Buttons.Down}"  Margin="5,5,5,0"  Command="{Binding MoveDownActionCommand}"/>
 
-            <Button Grid.Row="2" Grid.Column="0" Content="Copy"  Margin="5,5,5,0" Command="{Binding CopyActionCommand}"/>
-            <Button Grid.Row="2" Grid.Column="1" Content="Paste"  Margin="5,5,5,0" Command="{Binding PasteActionCommand}"/>
+            <Button Grid.Row="2" Grid.Column="0" Content="{loc:Loc MetadataEditor.Buttons.Copy}"  Margin="5,5,5,0" Command="{Binding CopyActionCommand}"/>
+            <Button Grid.Row="2" Grid.Column="1" Content="{loc:Loc MetadataEditor.Buttons.Paste}"  Margin="5,5,5,0" Command="{Binding PasteActionCommand}"/>
 
-            <Button Grid.Row="3" Grid.ColumnSpan="2" Content="Save"  Margin="5,5,5,0"  Command="{Binding SaveActionCommand}"/>
+            <Button Grid.Row="3" Grid.ColumnSpan="2" Content="{loc:Loc MetadataEditor.Buttons.Save}"  Margin="5,5,5,0"  Command="{Binding SaveActionCommand}"/>
         </Grid>
 
         <ListView DockPanel.Dock="Bottom"

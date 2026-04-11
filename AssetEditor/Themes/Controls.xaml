@@ -10,6 +10,7 @@
     xmlns:prim="clr-namespace:Xceed.Wpf.Toolkit.Primitives;assembly=Xceed.Wpf.Toolkit"
     xmlns:chrome="clr-namespace:Xceed.Wpf.Toolkit.Chromes;assembly=Xceed.Wpf.Toolkit"
     xmlns:MdXaml="clr-namespace:MdXaml;assembly=MdXaml"
+    xmlns:loc="clr-namespace:Shared.Ui.Common;assembly=Shared.Ui"
     xmlns:options="http://schemas.microsoft.com/winfx/2006/xaml/presentation/options">
 
     <!-- Converters for WindowsTitleMenu -->
@@ -5590,7 +5591,7 @@
                                     Grid.Column="2"
                                     Width="46"
                                     Style="{StaticResource TitleBarButtonStyle}" 
-                                    ToolTip="Minimise"
+                                    ToolTip="{loc:Loc WindowChrome.Minimise}"
                                     VerticalAlignment="Stretch"
                                     Height="Auto"
                                     WindowChrome.IsHitTestVisibleInChrome="True" 
@@ -5607,7 +5608,7 @@
                                     Grid.Column="3"
                                     Width="46"
                                     Style="{StaticResource TitleBarButtonStyle}" 
-                                    ToolTip="Maximise"
+                                    ToolTip="{loc:Loc WindowChrome.Maximise}"
                                     VerticalAlignment="Stretch"
                                     Height="Auto"
                                     WindowChrome.IsHitTestVisibleInChrome="True" 
@@ -5624,7 +5625,7 @@
                                     Grid.Column="4"
                                     Width="46"
                                     Style="{StaticResource TitleBarButtonStyle}" 
-                                    ToolTip="Help"
+                                    ToolTip="{loc:Loc WindowChrome.Help}"
                                     VerticalAlignment="Stretch"
                                     Height="Auto"
                                     WindowChrome.IsHitTestVisibleInChrome="True" 
@@ -5637,7 +5638,7 @@
                                     Grid.Column="5"
                                     Width="46"
                                     Style="{StaticResource TitleBarCloseButtonStyle}" 
-                                    ToolTip="Close"
+                                    ToolTip="{loc:Loc WindowChrome.Close}"
                                     VerticalAlignment="Stretch"
                                     Height="Auto"
                                     WindowChrome.IsHitTestVisibleInChrome="True" 

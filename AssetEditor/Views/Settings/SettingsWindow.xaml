@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:AssetEditor.Views.Settings"
           xmlns:loc="clr-namespace:Shared.Ui.Common;assembly=Shared.Ui"
         mc:Ignorable="d"
-        Title="Settings"
+                Title="{loc:Loc SettingsWindow.Title}"
         SizeToContent="WidthAndHeight"
         ContentRendered="Window_OnContentRendered"
         Style="{StaticResource CustomWindowStyle}"

@@ -6,13 +6,14 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Editors.KitbasherEditor.ViewModels.PinTool"
         xmlns:s="http://schemas.singulink.com/xaml" xmlns:pintool="clr-namespace:Editors.KitbasherEditor.ChildEditors.PinTool"
+        xmlns:loc="clr-namespace:Shared.Ui.Common;assembly=Shared.Ui"
         mc:Ignorable="d"
                                 
         Style="{StaticResource CustomWindowStyle}"
-        Title="Pin Tool" Height="600" Width="400">
+        Title="{loc:Loc KitbashTool.PinTool.Title}" Height="600" Width="400">
     <DockPanel LastChildFill="False">
 
-        <Expander Header="Instructions" DockPanel.Dock="Top">
+        <Expander Header="{loc:Loc KitbashTool.PinTool.Instructions}" DockPanel.Dock="Top">
             <TextBlock Margin="10,0,0,10">
                 1. Select mode: 
                 <LineBreak/>
@@ -33,11 +34,11 @@
         </Expander>
 
         <DockPanel DockPanel.Dock="Top">
-            <Label Content="Animation transfer mode:"/>
+            <Label Content="{loc:Loc KitbashTool.PinTool.AnimationTransferMode}"/>
             <ComboBox Margin="10,0,0,0" ItemsSource="{Binding PossibleRiggingModes, UpdateSourceTrigger=PropertyChanged}" SelectedItem="{Binding SelectedRiggingMode, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
         </DockPanel>
 
-        <GroupBox Header="Apply animation to:" Margin="0,5,0,0" DockPanel.Dock="Top">
+        <GroupBox Header="{loc:Loc KitbashTool.PinTool.ApplyAnimationTo}" Margin="0,5,0,0" DockPanel.Dock="Top">
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="0.5*"/>
@@ -57,8 +58,8 @@
                     </ListView.ItemContainerStyle>
                 </ListView>
 
-                <Button Content="Add selected meshes" Grid.Row="1" Grid.Column="0" Margin="2,2,2,0" Command="{Binding AddSelectionToAffectMeshCollectionCommand}" />
-                <Button Content="Remove all" Grid.Row="1" Grid.Column="1" Margin="2,2,2,0" Command="{Binding ClearAffectedMeshCollectionCommand}" />
+                <Button Content="{loc:Loc KitbashTool.PinTool.AddSelectedMeshes}" Grid.Row="1" Grid.Column="0" Margin="2,2,2,0" Command="{Binding AddSelectionToAffectMeshCollectionCommand}" />
+                <Button Content="{loc:Loc KitbashTool.PinTool.RemoveAll}" Grid.Row="1" Grid.Column="1" Margin="2,2,2,0" Command="{Binding ClearAffectedMeshCollectionCommand}" />
             </Grid>
         </GroupBox>
 
@@ -70,7 +71,7 @@
                         <DataTrigger Binding="{Binding SelectedRiggingMode, UpdateSourceTrigger=PropertyChanged}" Value="Pin">
                             <Setter Property="Content">
                                 <Setter.Value>
-                                    <GroupBox Header="Take animation from (PinMode):" Margin="0,5,0,0">
+                                    <GroupBox Header="{loc:Loc KitbashTool.PinTool.TakeAnimationFromPinMode}" Margin="0,5,0,0">
                                         <Grid >
                                             <Grid.ColumnDefinitions>
                                                 <ColumnDefinition Width="auto"/>
@@ -82,10 +83,10 @@
                                                 <RowDefinition Height="auto"/>
                                             </Grid.RowDefinitions>
 
-                                            <Label Grid.Column="0" Grid.Row="0" Content="Source:"/>
+                                            <Label Grid.Column="0" Grid.Row="0" Content="{loc:Loc KitbashTool.PinTool.Source}"/>
                                             <TextBox Grid.Column="1" Grid.Row="0" IsReadOnly="true" VerticalContentAlignment="Center" Margin="2" Text="{Binding PinMode.Description, UpdateSourceTrigger=PropertyChanged}"/>
 
-                                            <Button Grid.Column="1" Grid.Row="1" Content="Set from selected Vertex" Margin="2" Command="{Binding PinMode.SetSelectionCommand}" />
+                                            <Button Grid.Column="1" Grid.Row="1" Content="{loc:Loc KitbashTool.PinTool.SetFromSelectedVertex}" Margin="2" Command="{Binding PinMode.SetSelectionCommand}" />
                                         </Grid>
                                     </GroupBox>
                                 </Setter.Value>
@@ -96,7 +97,7 @@
                         <DataTrigger Binding="{Binding SelectedRiggingMode, UpdateSourceTrigger=PropertyChanged}" Value="SkinWrap">
                             <Setter Property="Content">
                                 <Setter.Value>
-                                    <GroupBox Header="Take AnimationFrom (SkinWrapMode):" Margin="0,5,0,0">
+                                    <GroupBox Header="{loc:Loc KitbashTool.PinTool.TakeAnimationFromSkinWrapMode}" Margin="0,5,0,0">
                                         <Grid >
                                             <Grid.ColumnDefinitions>
                                                 <ColumnDefinition Width="auto"/>
@@ -108,9 +109,9 @@
                                                 <RowDefinition Height="auto"/>
                                             </Grid.RowDefinitions>
 
-                                            <Label Grid.Column="0" Grid.Row="0" Content="Mesh:"/>
+                                            <Label Grid.Column="0" Grid.Row="0" Content="{loc:Loc KitbashTool.PinTool.Mesh}"/>
                                             <TextBox Grid.Column="1" Grid.Row="0" IsReadOnly="true" VerticalContentAlignment="Center" Margin="2" Text="{Binding SkinWrapMode.Description, UpdateSourceTrigger=PropertyChanged}"/>
-                                            <Button Grid.Column="1" Grid.Row="1" Content="Set from selection" Margin="2" Command="{Binding SkinWrapMode.SetSelectionCommand}" />
+                                            <Button Grid.Column="1" Grid.Row="1" Content="{loc:Loc KitbashTool.PinTool.SetFromSelection}" Margin="2" Command="{Binding SkinWrapMode.SetSelectionCommand}" />
 
                                         </Grid>
                                     </GroupBox>
@@ -128,7 +129,7 @@
 
 
 
-        <Button Content="Apply" Margin="2,5,2,2" Click="OnApplyClick" DockPanel.Dock="Top"/>
+        <Button Content="{loc:Loc KitbashTool.PinTool.Apply}" Margin="2,5,2,2" Click="OnApplyClick" DockPanel.Dock="Top"/>
 
     </DockPanel>
 </windowhandling:AssetEditorWindow>

@@ -4,13 +4,14 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:s="http://schemas.singulink.com/xaml"                                            
+             xmlns:loc="clr-namespace:Shared.Ui.Common;assembly=Shared.Ui"
              mc:Ignorable="d"
              d:DesignHeight="650" d:DesignWidth="500">
 
 
 
     <Expander  x:Name="myExpander"    
-                Header="Animations Info" 
+                Header="{loc:Loc FbxAnimationPanel.Header}" 
                 ExpandDirection="Down" 
                 IsExpanded="True">
 
@@ -18,7 +19,7 @@
             <!--CheckBox for ""Apply Weighting"-->
             <DockPanel LastChildFill="False">            
                 <StackPanel Orientation="Horizontal" DockPanel.Dock="Top" >
-                    <Label Width ="100" DockPanel.Dock="Left" Content="Apply Weighting" x:Name="label"/>
+                    <Label Width ="100" DockPanel.Dock="Left" Content="{loc:Loc FbxAnimationPanel.ApplyWeighting}" x:Name="label"/>
                     <Label>:</Label>
                     <CheckBox                         
                         Grid.Row="0" Grid.Column="1"
@@ -29,7 +30,7 @@
 
                 <!--ComboxBox For skeletoton-->
                 <StackPanel Orientation="Horizontal" DockPanel.Dock="Top" >
-                    <Label Width ="100" DockPanel.Dock="Left" Content="Skeleton"/>
+                    <Label Width ="100" DockPanel.Dock="Left" Content="{loc:Loc FbxAnimationPanel.Skeleton}"/>
                     <Label>:</Label>
 
                     <!--PreviewKeyDown="SkeletonComboxBox_OnPreviewKeyDown"-->
@@ -48,11 +49,11 @@
 
                 <!--buton for broswing for disk file-->
                 <StackPanel Orientation="Horizontal" DockPanel.Dock="Top" >
-                    <Label Width ="100" DockPanel.Dock="Left" Content="Skeleton"/>
+                    <Label Width ="100" DockPanel.Dock="Left" Content="{loc:Loc FbxAnimationPanel.Skeleton}"/>
                     <Label>:</Label>
                     <Button x:Name="SkeletonBrowseButton" 
                         Grid.Row="2" Grid.Column="1"
-                        Content="Browse..." 
+                        Content="{loc:Loc FbxAnimationPanel.Browse}" 
                         Width="150" 
                         Click="{s:MethodBinding SkeletonFileBrowseButton}">
                     </Button>

@@ -3,6 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:loc="clr-namespace:Shared.Ui.Common;assembly=Shared.Ui"
              xmlns:local="clr-namespace:AssetEditor.Views" 
              xmlns:viewModels="clr-namespace:AssetEditor.ViewModels"
              mc:Ignorable="d" 
@@ -16,19 +17,19 @@
                 <Style TargetType="{x:Type MenuItem}" BasedOn="{StaticResource {x:Type MenuItem}}"/>
             </Menu.Resources>
 
-            <MenuItem Header="_File" BorderThickness="1.5" WindowChrome.IsHitTestVisibleInChrome="True">
+            <MenuItem Header="{loc:Loc MenuBar.File}" BorderThickness="1.5" WindowChrome.IsHitTestVisibleInChrome="True">
 
-                <MenuItem Header="New Pack" Command="{Binding MenuBar.CreateNewPackFileCommand}"/>
-                <MenuItem Header="New AnimPack (Warhammer III)" Command="{Binding MenuBar.CreateAnimPackWarhammer3Command}"/>
-                <MenuItem Header="New AnimPack (Three Kingdoms)" Command="{Binding MenuBar.CreateAnimPack3kCommand}"/>
+                <MenuItem Header="{loc:Loc MenuBar.File.NewPack}" Command="{Binding MenuBar.CreateNewPackFileCommand}"/>
+                <MenuItem Header="{loc:Loc MenuBar.File.NewAnimPackWh3}" Command="{Binding MenuBar.CreateAnimPackWarhammer3Command}"/>
+                <MenuItem Header="{loc:Loc MenuBar.File.NewAnimPack3K}" Command="{Binding MenuBar.CreateAnimPack3kCommand}"/>
 
                 <Separator/>
-                <MenuItem Header="Save active pack" Command="{Binding MenuBar.SaveActivePackCommand}"/>
+                <MenuItem Header="{loc:Loc MenuBar.File.SaveActivePack}" Command="{Binding MenuBar.SaveActivePackCommand}"/>
                 <Separator/>
 
-                <MenuItem Header="Open Pack" Command="{Binding MenuBar.OpenPackFileCommand}"/>
+                <MenuItem Header="{loc:Loc MenuBar.File.OpenPack}" Command="{Binding MenuBar.OpenPackFileCommand}"/>
 
-                <MenuItem Header="Open Recent Packs" ItemsSource="{Binding MenuBar.RecentPackFiles}">
+                <MenuItem Header="{loc:Loc MenuBar.File.OpenRecentPacks}" ItemsSource="{Binding MenuBar.RecentPackFiles}">
                     <MenuItem.Style>
                         <Style TargetType="{x:Type MenuItem}" BasedOn="{StaticResource {x:Type MenuItem}}">
                             <Style.Triggers>
@@ -50,33 +51,33 @@
                     </MenuItem.ItemTemplate>
                 </MenuItem>
 
-                <MenuItem Header="Open Game Packs">
-                    <MenuItem Header="Attila" Command="{Binding MenuBar.OpenAttilaPacksCommand}"/>
-                    <MenuItem Header="Rome Remastered" Command="{Binding MenuBar.OpenRomeRemasteredPacksCommand}"/>
-                    <MenuItem Header="Three Kingdoms" Command="{Binding MenuBar.OpenThreeKingdomsPacksCommand}"/>
-                    <MenuItem Header="Warhammer II" Command="{Binding MenuBar.OpenWarhammer2PacksCommand}"/>
-                    <MenuItem Header="Warhammer III" Command="{Binding MenuBar.OpenWarhammer3PacksCommand}"/>
-                    <MenuItem Header="Troy" Command="{Binding MenuBar.OpenTroyPacksCommand}"/>
+                <MenuItem Header="{loc:Loc MenuBar.File.OpenGamePacks}">
+                    <MenuItem Header="{loc:Loc MenuBar.File.GameAttila}" Command="{Binding MenuBar.OpenAttilaPacksCommand}"/>
+                    <MenuItem Header="{loc:Loc MenuBar.File.GameRomeRemastered}" Command="{Binding MenuBar.OpenRomeRemasteredPacksCommand}"/>
+                    <MenuItem Header="{loc:Loc MenuBar.File.GameThreeKingdoms}" Command="{Binding MenuBar.OpenThreeKingdomsPacksCommand}"/>
+                    <MenuItem Header="{loc:Loc MenuBar.File.GameWarhammer2}" Command="{Binding MenuBar.OpenWarhammer2PacksCommand}"/>
+                    <MenuItem Header="{loc:Loc MenuBar.File.GameWarhammer3}" Command="{Binding MenuBar.OpenWarhammer3PacksCommand}"/>
+                    <MenuItem Header="{loc:Loc MenuBar.File.GameTroy}" Command="{Binding MenuBar.OpenTroyPacksCommand}"/>
                 </MenuItem>
 
                 <Separator/>
-                <MenuItem Header="Settings" Command="{Binding MenuBar.OpenSettingsWindowCommand}"/>
+                <MenuItem Header="{loc:Loc MenuBar.File.Settings}" Command="{Binding MenuBar.OpenSettingsWindowCommand}"/>
 
                 <Separator/>
 
-                <MenuItem Header="Open AssetEditor Folder" Command="{Binding MenuBar.OpenAssetEditorFolderCommand}"/>
-                <MenuItem Header="Clear AssetEditor Folder" Command="{Binding MenuBar.ClearAssetEditorFolderCommand}"/>
+                <MenuItem Header="{loc:Loc MenuBar.File.OpenAssetEditorFolder}" Command="{Binding MenuBar.OpenAssetEditorFolderCommand}"/>
+                <MenuItem Header="{loc:Loc MenuBar.File.ClearAssetEditorFolder}" Command="{Binding MenuBar.ClearAssetEditorFolderCommand}"/>
 
                 <Separator/>
 
-                <MenuItem Header="_Exit" />
+                <MenuItem Header="{loc:Loc MenuBar.File.Exit}" />
             </MenuItem>
 
-            <MenuItem Header="View" BorderThickness="1.5" WindowChrome.IsHitTestVisibleInChrome="True">
-                <MenuItem Header="Toggle Pack File Browser" Command="{Binding MenuBar.TogglePackFileExplorerCommand}"/>
+            <MenuItem Header="{loc:Loc MenuBar.View}" BorderThickness="1.5" WindowChrome.IsHitTestVisibleInChrome="True">
+                <MenuItem Header="{loc:Loc MenuBar.View.TogglePackFileExplorer}" Command="{Binding MenuBar.TogglePackFileExplorerCommand}"/>
             </MenuItem>
 
-            <MenuItem Header="Tools" BorderThickness="1.5" WindowChrome.IsHitTestVisibleInChrome="True" ItemsSource="{Binding MenuBar.Editors}">
+            <MenuItem Header="{loc:Loc MenuBar.Tools}" BorderThickness="1.5" WindowChrome.IsHitTestVisibleInChrome="True" ItemsSource="{Binding MenuBar.Editors}">
 
                 <MenuItem.ItemContainerStyle>
                     <Style TargetType="{x:Type MenuItem}" BasedOn="{StaticResource {x:Type MenuItem}}">
@@ -93,48 +94,48 @@
 
             </MenuItem>
 
-            <MenuItem Header="Reports" BorderThickness="1.5" WindowChrome.IsHitTestVisibleInChrome="True">
-                <MenuItem Header="Rmv2" Command="{Binding MenuBar.GenerateRmv2ReportCommand}"/>
-                <MenuItem Header="Meta Data" Command="{Binding MenuBar.GenerateMetaDataReportCommand}"/>
-                <MenuItem Header="File List" Command="{Binding MenuBar.GenerateFileListReportCommand}"/>
-                <MenuItem Header="Meta Jsons" Command="{Binding MenuBar.GenerateMetaDataJsonsReportCommand}"/>
-                <MenuItem Header="Materials" Command="{Binding MenuBar.GenerateMaterialReportCommand}"/>
-                <MenuItem Header="Dialogue Events with State Groups" Command="{Binding MenuBar.GenerateDialogueEventInfoPrinterReportCommand}"/>
-                <MenuItem Header="Dialogue Event and Event Names" Command="{Binding MenuBar.GenerateDialogueEventAndEventNamePrinterReportCommand}"/>
-                <MenuItem Header="Dat Dump" Command="{Binding MenuBar.GenerateDatDumperReportCommand}"/>
+            <MenuItem Header="{loc:Loc MenuBar.Reports}" BorderThickness="1.5" WindowChrome.IsHitTestVisibleInChrome="True">
+                <MenuItem Header="{loc:Loc MenuBar.Reports.Rmv2}" Command="{Binding MenuBar.GenerateRmv2ReportCommand}"/>
+                <MenuItem Header="{loc:Loc MenuBar.Reports.MetaData}" Command="{Binding MenuBar.GenerateMetaDataReportCommand}"/>
+                <MenuItem Header="{loc:Loc MenuBar.Reports.FileList}" Command="{Binding MenuBar.GenerateFileListReportCommand}"/>
+                <MenuItem Header="{loc:Loc MenuBar.Reports.MetaJsons}" Command="{Binding MenuBar.GenerateMetaDataJsonsReportCommand}"/>
+                <MenuItem Header="{loc:Loc MenuBar.Reports.Materials}" Command="{Binding MenuBar.GenerateMaterialReportCommand}"/>
+                <MenuItem Header="{loc:Loc MenuBar.Reports.DialogueEventsStateGroups}" Command="{Binding MenuBar.GenerateDialogueEventInfoPrinterReportCommand}"/>
+                <MenuItem Header="{loc:Loc MenuBar.Reports.DialogueEventNames}" Command="{Binding MenuBar.GenerateDialogueEventAndEventNamePrinterReportCommand}"/>
+                <MenuItem Header="{loc:Loc MenuBar.Reports.DatDump}" Command="{Binding MenuBar.GenerateDatDumperReportCommand}"/>
                 <Separator/>
-                <MenuItem Header="Search" Command="{Binding MenuBar.SearchCommand}"/>
+                <MenuItem Header="{loc:Loc MenuBar.Reports.Search}" Command="{Binding MenuBar.SearchCommand}"/>
                 <Separator/>
-                <MenuItem Header="Touched Files">
-                    <MenuItem Header="Start Recorder" Command="{Binding MenuBar.TouchedFileRecorderStartCommand }"/>
-                    <MenuItem Header="Print Files" Command="{Binding MenuBar.TouchedFileRecorderPrintCommand }"/>
-                    <MenuItem Header="Extract to Pack" Command="{Binding MenuBar.TouchedFileRecorderExtractCommand }"/>
-                    <MenuItem Header="Stop Recorder" Command="{Binding MenuBar.TouchedFileRecorderStopCommand }"/>
+                <MenuItem Header="{loc:Loc MenuBar.Reports.TouchedFiles}">
+                    <MenuItem Header="{loc:Loc MenuBar.Reports.TouchedFiles.StartRecorder}" Command="{Binding MenuBar.TouchedFileRecorderStartCommand }"/>
+                    <MenuItem Header="{loc:Loc MenuBar.Reports.TouchedFiles.PrintFiles}" Command="{Binding MenuBar.TouchedFileRecorderPrintCommand }"/>
+                    <MenuItem Header="{loc:Loc MenuBar.Reports.TouchedFiles.ExtractToPack}" Command="{Binding MenuBar.TouchedFileRecorderExtractCommand }"/>
+                    <MenuItem Header="{loc:Loc MenuBar.Reports.TouchedFiles.StopRecorder}" Command="{Binding MenuBar.TouchedFileRecorderStopCommand }"/>
                 </MenuItem>
                 <Separator/>
-                <MenuItem Header="Debug - Clear Console" Command="{Binding MenuBar.ClearConsoleCommand}" />
-                <MenuItem Header="Debug - Print Scopes" Command="{Binding MenuBar.PrintScopeCommand}" />
+                <MenuItem Header="{loc:Loc MenuBar.Reports.DebugClearConsole}" Command="{Binding MenuBar.ClearConsoleCommand}" />
+                <MenuItem Header="{loc:Loc MenuBar.Reports.DebugPrintScopes}" Command="{Binding MenuBar.PrintScopeCommand}" />
             </MenuItem>
 
-            <MenuItem Header="Help" BorderThickness="1.5" WindowChrome.IsHitTestVisibleInChrome="True">
-                <MenuItem Header="AssetEditor Help" Command="{Binding MenuBar.OpenHelpCommand}"/>
-                <MenuItem Header="Modding Wiki" Command="{Binding MenuBar.OpenModdingWikiCommand}"/>
+            <MenuItem Header="{loc:Loc MenuBar.Help}" BorderThickness="1.5" WindowChrome.IsHitTestVisibleInChrome="True">
+                <MenuItem Header="{loc:Loc MenuBar.Help.AssetEditorHelp}" Command="{Binding MenuBar.OpenHelpCommand}"/>
+                <MenuItem Header="{loc:Loc MenuBar.Help.ModdingWiki}" Command="{Binding MenuBar.OpenModdingWikiCommand}"/>
                 <Separator/>
 
-                <MenuItem Header="Video Tutorials">
-                    <MenuItem Header="AssetEditor Basics 1" Command="{Binding MenuBar.OpenAssetEdBasic0TutorialCommand}"/>
-                    <MenuItem Header="AssetEditor Basics 2" Command="{Binding MenuBar.OpenAssetEdBasic1TutorialCommand}"/>
-                    <MenuItem Header="Skrag Reskin" Command="{Binding MenuBar.OpenSkragTutorialCommand}"/>
-                    <MenuItem Header="Tzar Guard with Gun" Command="{Binding MenuBar.OpenTzarGuardTutorialCommand}"/>
-                    <MenuItem Header="Kostaltyn Reskin" Command="{Binding MenuBar.OpenKostalynTutorialCommand}"/>
-                    <MenuItem Header="Recolouring Models" Command="{Binding MenuBar.OpenRecolouringModelsTutorialCommand}"/>
-                    <MenuItem Header="Animation Basics" Command="{Binding MenuBar.OpenAnimationBasicsTutorialCommand}"/>
-                    <MenuItem Header="Animated Props and Custom Animation Packs" Command="{Binding MenuBar.OpenAnimatedPropTutorialCommand}"/>
+                <MenuItem Header="{loc:Loc MenuBar.Help.VideoTutorials}">
+                    <MenuItem Header="{loc:Loc MenuBar.Help.Tutorial.Basics1}" Command="{Binding MenuBar.OpenAssetEdBasic0TutorialCommand}"/>
+                    <MenuItem Header="{loc:Loc MenuBar.Help.Tutorial.Basics2}" Command="{Binding MenuBar.OpenAssetEdBasic1TutorialCommand}"/>
+                    <MenuItem Header="{loc:Loc MenuBar.Help.Tutorial.SkragReskin}" Command="{Binding MenuBar.OpenSkragTutorialCommand}"/>
+                    <MenuItem Header="{loc:Loc MenuBar.Help.Tutorial.TzarGuardWithGun}" Command="{Binding MenuBar.OpenTzarGuardTutorialCommand}"/>
+                    <MenuItem Header="{loc:Loc MenuBar.Help.Tutorial.KostalynReskin}" Command="{Binding MenuBar.OpenKostalynTutorialCommand}"/>
+                    <MenuItem Header="{loc:Loc MenuBar.Help.Tutorial.RecolouringModels}" Command="{Binding MenuBar.OpenRecolouringModelsTutorialCommand}"/>
+                    <MenuItem Header="{loc:Loc MenuBar.Help.Tutorial.AnimationBasics}" Command="{Binding MenuBar.OpenAnimationBasicsTutorialCommand}"/>
+                    <MenuItem Header="{loc:Loc MenuBar.Help.Tutorial.AnimatedPropsCustomPacks}" Command="{Binding MenuBar.OpenAnimatedPropTutorialCommand}"/>
                 </MenuItem>
 
                 <Separator/>
 
-                <MenuItem Header="Discord" Command="{Binding MenuBar.OpenDiscordCommand}"/>
+                <MenuItem Header="{loc:Loc MenuBar.Help.Discord}" Command="{Binding MenuBar.OpenDiscordCommand}"/>
             </MenuItem>
         </Menu>
     </DockPanel>

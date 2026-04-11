@@ -4,6 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:Editors.Twui.Editor.Presentation" xmlns:b="http://schemas.microsoft.com/xaml/behaviors" xmlns:behaviors="clr-namespace:Shared.Ui.Common.Behaviors;assembly=Shared.Ui"
+             xmlns:loc="clr-namespace:Shared.Ui.Common;assembly=Shared.Ui"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <Grid>
@@ -14,8 +15,8 @@
         </Grid.RowDefinitions>
 
         <DockPanel Grid.Row="0">
-            <Button DockPanel.Dock="Right" Width="100">Filter</Button>
-            <TextBox DockPanel.Dock="Left">Search...</TextBox>
+            <Button DockPanel.Dock="Right" Width="100">{loc:Loc TwuiEditor.HierarchyView.Filter}</Button>
+            <TextBox DockPanel.Dock="Left">{loc:Loc TwuiEditor.HierarchyView.SearchPlaceholder}</TextBox>
         </DockPanel>
 
         <TreeView Grid.Row="1" ItemsSource="{Binding ParsedTwuiFile.Componenets, UpdateSourceTrigger=PropertyChanged}">
@@ -42,7 +43,7 @@
             </TreeView.ItemTemplate>
         </TreeView>
 
-        <Button Grid.Row="2" Command="{Binding ComponentManager.ToggleSelectedCommand}" Content="Toggle selected" Height="30"/>
+        <Button Grid.Row="2" Command="{Binding ComponentManager.ToggleSelectedCommand}" Content="{loc:Loc TwuiEditor.HierarchyView.ToggleSelected}" Height="30"/>
 
     </Grid>
   

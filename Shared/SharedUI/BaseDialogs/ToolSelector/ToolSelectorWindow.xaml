@@ -4,15 +4,16 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:CommonControls.BaseDialogs.ToolSelector"
+        xmlns:loc="clr-namespace:Shared.Ui.Common"
         mc:Ignorable="d"
-        Title="Tool Selector"
+        Title="{loc:Loc Dialog.ToolSelector.Title}"
         Height="250" Width="300"
         ResizeMode="NoResize"
          Style="{StaticResource CustomWindowStyle}"
         WindowStartupLocation="CenterOwner">
     <DockPanel  >
      
-        <Button DockPanel.Dock="Bottom" Margin="5" Click="Button_Click">Open</Button>
+        <Button DockPanel.Dock="Bottom" Margin="5" Click="Button_Click">{loc:Loc Dialog.ToolSelector.OpenButton}</Button>
         <ListView DockPanel.Dock="Top" x:Name="PossibleTools"  Margin="5" >
             <ListView.ItemContainerStyle>
                 <Style TargetType="ListViewItem">

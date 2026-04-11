@@ -107,10 +107,10 @@
             <ComboBox Grid.Row="2" Grid.Column="1" Margin="0, 0, 0, 5" SelectedItem="{Binding CurrentRenderEngineBackgroundColour, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" 
                       ItemsSource="{Binding RenderEngineBackgroundColours}" ItemTemplate="{StaticResource SettingsEnumConverterTemplate}"/>
 
-            <TextBlock Grid.Row="3" Grid.Column="0" Text="{loc:Loc SettingsWindow.OnlyLoadLod0}" Margin="5, 0, 0, 0" ToolTip="When importing a reference mesh in the Kitbash tool, only import Lod0 in order to save memory."/>
+            <TextBlock Grid.Row="3" Grid.Column="0" Text="{loc:Loc SettingsWindow.OnlyLoadLod0}" Margin="5, 0, 0, 0" ToolTip="{loc:Loc SettingsWindow.OnlyLoadLod0Tooltip}"/>
             <CheckBox Grid.Row="3" Grid.Column="1" Margin="-1, 0, 0, 5" IsChecked="{Binding OnlyLoadLod0ForReferenceMeshes, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
 
-            <TextBlock Grid.Row="4" Grid.Column="0" Text="{loc:Loc SettingsWindow.GridSize}" Margin="5, 0, 0, 0" ToolTip="Size of the grid in visual editors"/>
+            <TextBlock Grid.Row="4" Grid.Column="0" Text="{loc:Loc SettingsWindow.GridSize}" Margin="5, 0, 0, 0" ToolTip="{loc:Loc SettingsWindow.GridSizeTooltip}"/>
             <TextBox  Grid.Row="4" Grid.Column="1" Text="{Binding VisualEditorsGridSize, UpdateSourceTrigger=LostFocus}" MaxLength="4" Width="150" Margin="0, 0, 0, 5" HorizontalAlignment="Left" HorizontalContentAlignment="Right"/>
 
 
@@ -127,7 +127,7 @@
                 <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
 
-            <TextBlock Grid.Row="0" Text="Game Files" Margin="5, 10, 0, 0" FontSize="15"/>
+            <TextBlock Grid.Row="0" Text="{loc:Loc SettingsWindow.GameFiles}" Margin="5, 10, 0, 0" FontSize="15"/>
             <Separator Grid.Row="1" Height="1" Margin="5, 5, 10, 10"/>
 
             <ItemsControl Grid.Row="5" ItemsSource="{Binding GameDirectores}" >
@@ -151,7 +151,7 @@
                             <TextBox Grid.Column="1"
                                         Style="{StaticResource HintedTextBox}"                                     
                                         Text="{Binding Path}" 
-                                        Tag='Browse for game data location e.g. "C:\SteamLibrary\steamapps\common\Total War WARHAMMER III\data"'
+                                        Tag="{loc:Loc SettingsWindow.GameDataPathHint}"
                                         IsReadOnly="True"
                                         Padding="2.5, 0, 0, 0"/>
                             <Button Grid.Column="2" Content="..." Command="{Binding BrowseCommand}" Margin="5, 0, 5, 0"/>
@@ -177,9 +177,9 @@
             <TextBlock Grid.Row="0" Text="{loc:Loc SettingsWindow.AudioModding}" Margin="5, 5, 0, 0" FontSize="15"/>
             <Separator Grid.Row="1" Grid.ColumnSpan="3" Height="1" Margin="5, 5, 10, 10"/>
 
-            <TextBlock Grid.Row="2" Grid.Column="0" Text="Wwise CLI" Margin="5, 0, 0, 0"/>
+            <TextBlock Grid.Row="2" Grid.Column="0" Text="{loc:Loc SettingsWindow.WwiseCLI}" Margin="5, 0, 0, 0"/>
             <TextBox Grid.Row="2" Grid.Column="1" Style="{StaticResource HintedTextBox}" Text="{Binding WwisePath}" 
-                     Tag='e.g. "C:\Program Files (x86)\Audiokinetic\Wwise2019.2.15.7667\Authoring\x64\Release\bin\WwiseCLI.exe"' IsReadOnly="True" Margin="0, 0, 5, 5" Padding="2.5, 0, 0, 0"/>
+                     Tag="{loc:Loc SettingsWindow.WwiseCliPathHint}" IsReadOnly="True" Margin="0, 0, 5, 5" Padding="2.5, 0, 0, 0"/>
             <Button Grid.Row="2" Grid.Column="2" Content="..." Command="{Binding BrowseCommand}" Margin="0, 0, 10, 5"/>
         </Grid>
     </Grid>

@@ -5,6 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:KitbasherEditor.Views.EditorViews"
                      xmlns:filterdialog="clr-namespace:CommonControls.FilterDialog;assembly=Shared.Ui" 
+                 xmlns:loc="clr-namespace:Shared.Ui.Common;assembly=Shared.Ui"
              mc:Ignorable="d" >
     <Grid>
         <Grid.RowDefinitions>
@@ -12,7 +13,7 @@
             <RowDefinition/>
         </Grid.RowDefinitions>
 
-        <ToggleButton Grid.Row="0" Content="Animation" IsChecked="{Binding IsEnabled, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" Margin="10,1,10,1"/>
+        <ToggleButton Grid.Row="0" Content="{loc:Loc KitbashTool.AnimationView.Toggle}" IsChecked="{Binding IsEnabled, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" Margin="10,1,10,1"/>
         <Grid Grid.Row="1" Margin="0,1,0,10" Visibility="{Binding AnimationControllerVisability.Value, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">
 
             <Grid.ColumnDefinitions>
@@ -27,7 +28,7 @@
 
 
             <StackPanel Grid.Row="0" Orientation="Horizontal" HorizontalAlignment="Center">
-                <TextBlock Text="Frame "/>
+                <TextBlock Text="{loc:Loc KitbashTool.AnimationView.Frame}"/>
                 <TextBlock Text="{Binding CurrentFrame, UpdateSourceTrigger=PropertyChanged}"/>
                 <TextBlock Text=" / "/>
                 <TextBlock Text="{Binding MaxFrames, UpdateSourceTrigger=PropertyChanged}"/>
@@ -64,7 +65,7 @@
                                 <RowDefinition Height="auto" />
                             </Grid.RowDefinitions>
                             <DockPanel Grid.Row="0">
-                                <TextBlock Text="Skeleton" Width="70" DockPanel.Dock="Left" Height="20"/>
+                                <TextBlock Text="{loc:Loc KitbashTool.AnimationView.Skeleton}" Width="70" DockPanel.Dock="Left" Height="20"/>
                                 <TextBlock Text=" : " DockPanel.Dock="Left"/>
                                 <filterdialog:CollapsableFilterControl  
                                     SelectedItem="{Binding SelectedSkeleton, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
@@ -73,13 +74,13 @@
                                     IsManipulationEnabled="False"
                                     LabelTotalWidth="0"   
                                     ShowLabel="False"
-                                    LabelText="External Skeleton"
+                                    LabelText="{loc:Loc KitbashTool.AnimationView.ExternalSkeleton}"
                                     IsEnabled="true"/>
                             </DockPanel>
                         </Grid>
 
                         <DockPanel Grid.Row="1">
-                            <TextBlock Text="Animation" Width="70" DockPanel.Dock="Left" Height="20"/>
+                            <TextBlock Text="{loc:Loc KitbashTool.AnimationView.Animation}" Width="70" DockPanel.Dock="Left" Height="20"/>
                             <TextBlock Text=" : " DockPanel.Dock="Left"/>
 
                             <filterdialog:CollapsableFilterControl  
@@ -91,7 +92,7 @@
                                 DockPanel.Dock="top"
                                 MaxHeight="400"
                                 ShowLabel="false"
-                                LabelText="Target Anim">
+                                LabelText="{loc:Loc KitbashTool.AnimationView.TargetAnimation}">
                             </filterdialog:CollapsableFilterControl>
                         </DockPanel>
                     </Grid>

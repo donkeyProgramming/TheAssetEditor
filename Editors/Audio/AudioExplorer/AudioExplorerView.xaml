@@ -9,6 +9,7 @@
     xmlns:Behaviors="clr-namespace:Shared.Ui.Common.Behaviors;assembly=Shared.Ui" 
     xmlns:ValueConverters="clr-namespace:Editors.Audio.Shared.UI.ValueConverters" 
     xmlns:AudioExplorer="clr-namespace:Editors.Audio.AudioExplorer" 
+    xmlns:loc="clr-namespace:Shared.Ui.Common;assembly=Shared.Ui"
     d:DataContext="{d:DesignInstance Type=AudioExplorer:AudioExplorerViewModel}"
     mc:Ignorable="d" 
     d:DesignHeight="450" d:DesignWidth="800">
@@ -107,35 +108,35 @@
                     Margin="0, 0, 5, 0"
                     Grid.Column="0"
                     DockPanel.Dock="Top" 
-                    Content="Search by Action Event" 
+                    Content="{loc:Loc AudioExplorer.SearchByActionEvent}" 
                     IsChecked="{Binding SearchByActionEvent, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
 
                 <CheckBox 
                     Grid.Column="1"
                     Margin="5, 0, 5, 0"
                     DockPanel.Dock="Top" 
-                    Content="Search by Dialogue Event" 
+                    Content="{loc:Loc AudioExplorer.SearchByDialogueEvent}" 
                     IsChecked="{Binding SearchByDialogueEvent, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
                 
                 <CheckBox 
                     Grid.Column="2"
                     Margin="5, 0, 5, 0"
                     DockPanel.Dock="Top" 
-                    Content="Search by VO__Actor" 
+                    Content="{loc:Loc AudioExplorer.SearchByVOActor}" 
                     IsChecked="{Binding SearchByVOActor, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
                 
                 <CheckBox 
                     Grid.Column="3"
                     Margin="5, 0, 5, 0"
                     DockPanel.Dock="Top" 
-                    Content="Search by ID" 
+                    Content="{loc:Loc AudioExplorer.SearchById}" 
                     IsChecked="{Binding SearchByHircId, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
             </Grid>
 
             <Expander
                 Grid.Row="3"
                 Margin="4, 5, 4, 0"
-                Header="Languages">
+                Header="{loc:Loc AudioExplorer.Languages}">
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition
@@ -168,7 +169,7 @@
                     <Button
                         Margin="0, 5, 0, 0"
                         Grid.Row="1"
-                        Content="Load Languages"
+                        Content="{loc:Loc AudioExplorer.LoadLanguages}"
                         Height="25"
                         Command="{Binding LoadAudioRepositoryForSelectedLanguagesCommand}"/>
                     
@@ -178,7 +179,7 @@
             <Button
                 Grid.Row="4"
                 Margin="5, 5, 5, 5"
-                Content="Play Audio"
+                Content="{loc:Loc AudioExplorer.PlayAudio}"
                 Height="25"
                 Command="{Binding PlayAudioCommand}" 
                 IsEnabled="{Binding IsPlayAudioButtonEnabled, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
@@ -191,7 +192,7 @@
             <Label 
                 Grid.Row="6" 
                 Margin="0, 0, 0, 0"
-                Content="Wwise Object Hierarchy Graph"/>
+                Content="{loc:Loc AudioExplorer.WwiseHierarchyGraph}"/>
 
             <TreeView
                 Grid.Row="7"

@@ -6,6 +6,7 @@
              xmlns:tags="clr-namespace:Editors.AnimationMeta.Presentation"
              xmlns:System="clr-namespace:System;assembly=mscorlib" 
              xmlns:mathviews="clr-namespace:CommonControls.MathViews;assembly=Shared.Ui" xmlns:materialIcons="clr-namespace:Material.Icons.WPF;assembly=Material.Icons.WPF"
+             xmlns:loc="clr-namespace:Shared.Ui.Common;assembly=Shared.Ui"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <UserControl.Resources>
@@ -20,7 +21,7 @@
             </Grid.RowDefinitions>
 
             <StackPanel Grid.Row="0">
-                <TextBlock FontSize="12" FontWeight="Bold" Text="Decription:" />
+                <TextBlock FontSize="12" FontWeight="Bold" Text="{loc:Loc MetadataEditor.Attribute.Description}" />
                 <TextBlock TextWrapping="Wrap" Text="{Binding SelectedTag.Description, UpdateSourceTrigger=PropertyChanged}"/>
             </StackPanel>
 
