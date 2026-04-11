@@ -12,6 +12,7 @@ using Shared.Core.PackFiles.Utility;
 using Shared.Core.Services;
 using Shared.Core.Settings;
 using Shared.Ui.BaseDialogs.StandardDialog;
+using Shared.Ui.Common.MenuSystem;
 
 namespace Test.TestingUtility.Shared
 {
@@ -24,6 +25,7 @@ namespace Test.TestingUtility.Shared
         public IUiCommandFactory CommandFactory { get; private set; }
         public IScopeRepository ScopeRepository { get; private set; }
         public Mock<IStandardDialogs> Dialogs { get; private set; }
+        public TestKeyboard Keyboard { get; private set; }
 
 
         public AssetEditorTestRunner(GameTypeEnum gameEnum = GameTypeEnum.Warhammer3, bool forceValidateServiceScopes = false)
@@ -39,7 +41,8 @@ namespace Test.TestingUtility.Shared
 
             PackFileService = ServiceProvider.GetRequiredService<IPackFileService>();
             CommandFactory = ServiceProvider.GetRequiredService<IUiCommandFactory>();
-            ScopeRepository = ServiceProvider.GetRequiredService<IScopeRepository>() ;
+            ScopeRepository = ServiceProvider.GetRequiredService<IScopeRepository>();
+            Keyboard = ServiceProvider.GetRequiredService<IWindowsKeyboard>() as TestKeyboard;
         }
 
         public PackFileContainer? LoadPackFile(string path, bool createOutputPackFile = true)
@@ -106,6 +109,9 @@ namespace Test.TestingUtility.Shared
             services.Remove(mouseDescriptor);
             services.AddScoped(x => new Mock<IMouseComponent>().Object);
 
+            var windowsd = new ServiceDescriptor(typeof(IWindowsKeyboard), typeof(WindowKeyboard), ServiceLifetime.Scoped);
+            services.Remove(mouseDescriptor);
+            services.AddScoped<IWindowsKeyboard>(x => new TestKeyboard());
 
             Dialogs = new Mock<IStandardDialogs>();
             var dialogDescriptor = new ServiceDescriptor(typeof(IStandardDialogs), typeof(StandardDialogs), ServiceLifetime.Scoped);

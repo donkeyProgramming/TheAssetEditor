@@ -94,7 +94,7 @@ namespace Editors.KitbasherEditor
             serviceCollection.AddScoped<MenuItemVisibilityRuleEngine>();
 
             // Misc
-            serviceCollection.AddScoped<WindowKeyboard>();
+      
             serviceCollection.AddScoped<KitbashViewDropHandler>();
             serviceCollection.AddScoped<KitbasherRootScene>();
 

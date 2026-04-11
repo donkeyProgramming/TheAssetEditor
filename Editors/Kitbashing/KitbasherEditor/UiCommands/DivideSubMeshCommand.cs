@@ -15,9 +15,9 @@ namespace Editors.KitbasherEditor.UiCommands
         private readonly SelectionManager _selectionManager;
         private readonly ObjectEditor _objectEditor;
         private readonly FaceEditor _faceEditor;
-        private readonly WindowKeyboard _keyboard;
+        private readonly IWindowsKeyboard _keyboard;
 
-        public DivideSubMeshCommand(SelectionManager selectionManager, ObjectEditor objectEditor, FaceEditor faceEditor, WindowKeyboard keyboard)
+        public DivideSubMeshCommand(SelectionManager selectionManager, ObjectEditor objectEditor, FaceEditor faceEditor, IWindowsKeyboard keyboard)
         {
             _selectionManager = selectionManager;
             _objectEditor = objectEditor;
