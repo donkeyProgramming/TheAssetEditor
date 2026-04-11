@@ -1,6 +1,7 @@
 ﻿using System.Text.RegularExpressions;
 using System.Windows;
 using Shared.Core.Misc;
+using Shared.Core.Services;
 using Shared.Ui.Common;
 
 namespace Shared.Ui.Editors.BoneMapping
@@ -9,6 +10,7 @@ namespace Shared.Ui.Editors.BoneMapping
     {
        // protected IAssetEditorWindow _parentWindow;
         protected RemappedAnimatedBoneConfiguration _configuration;
+        protected readonly LocalizationManager _localizationManager;
 
         public FilterCollection<AnimatedBone> MeshBones { get; set; }
         public FilterCollection<AnimatedBone> ParentModelBones { get; set; }
@@ -19,8 +21,9 @@ namespace Shared.Ui.Editors.BoneMapping
         public NotifyAttr<bool> ShowTransformSection { get; set; } = new NotifyAttr<bool>(false);
         public NotifyAttr<bool> ShowApplyButton { get; set; } = new NotifyAttr<bool>(false);
 
-        public BoneMappingViewModel()
+        public BoneMappingViewModel(LocalizationManager localizationManager)
         {
+            _localizationManager = localizationManager;
             MeshBones = new FilterCollection<AnimatedBone>(null, OnBoneSelected);
             ParentModelBones = new FilterCollection<AnimatedBone>(null, OnParentBoneSelected);
             OnlyShowUsedBones = new NotifyAttr<bool>(true, (x) => MeshBones.RefreshFilter());
@@ -63,7 +66,7 @@ namespace Shared.Ui.Editors.BoneMapping
         {
             if (MeshBones.SelectedItem == null)
             {
-                MessageBox.Show("No bone selected - Please select a bone first");
+                MessageBox.Show(_localizationManager.Get("KitbasherTool.BoneMapping.NoBoneSelected"));
                 return;
             }
 
@@ -75,7 +78,7 @@ namespace Shared.Ui.Editors.BoneMapping
         {
             if (MeshBones.SelectedItem == null)
             {
-                MessageBox.Show("No bone selected - Please select a bone first");
+                MessageBox.Show(_localizationManager.Get("KitbasherTool.BoneMapping.NoBoneSelected"));
                 return;
             }
 
@@ -87,12 +90,12 @@ namespace Shared.Ui.Editors.BoneMapping
         {
             if (MeshBones.SelectedItem == null)
             {
-                MessageBox.Show("No mesh bone selected - Please select a bone first");
+                MessageBox.Show(_localizationManager.Get("KitbasherTool.BoneMapping.NoMeshBoneSelected"));
                 return;
             }
             if (ParentModelBones.SelectedItem == null)
             {
-                MessageBox.Show("No parent model bone selected - Please select a bone first");
+                MessageBox.Show(_localizationManager.Get("KitbasherTool.BoneMapping.NoParentModelBoneSelected"));
                 return;
             }
 
@@ -104,7 +107,7 @@ namespace Shared.Ui.Editors.BoneMapping
         {
             if (MeshBones.SelectedItem == null)
             {
-                MessageBox.Show("No mesh bone selected - Please select a bone first");
+                MessageBox.Show(_localizationManager.Get("KitbasherTool.BoneMapping.NoMeshBoneSelected"));
                 return;
             }
 
@@ -116,7 +119,7 @@ namespace Shared.Ui.Editors.BoneMapping
         {
             if (MeshBones.SelectedItem == null)
             {
-                MessageBox.Show("No mesh bone selected - Please select a bone first");
+                MessageBox.Show(_localizationManager.Get("KitbasherTool.BoneMapping.NoMeshBoneSelected"));
                 return;
             }
 
@@ -155,17 +158,14 @@ namespace Shared.Ui.Editors.BoneMapping
         protected virtual void MappingUpdated()
         { }
 
-        public void OnApplyButton()
-        {
-            ApplyChanges();
-        }
-
         public bool OnOkButton()
         {
             var res = Validate(out var errorText);
             if (res == false)
             {
-                var messageBoxResult = MessageBox.Show("Are you sure you want to do this?\n\n" + errorText + "\n\nContinue?", "Error", MessageBoxButton.OKCancel);
+                var message = string.Format(_localizationManager.Get("KitbasherTool.BoneMapping.ConfirmWithValidationError"), errorText);
+                var title = _localizationManager.Get("KitbasherTool.BoneMapping.ErrorTitle");
+                var messageBoxResult = MessageBox.Show(message, title, MessageBoxButton.OKCancel);
                 if (messageBoxResult == MessageBoxResult.Cancel)
                     return false;
             }

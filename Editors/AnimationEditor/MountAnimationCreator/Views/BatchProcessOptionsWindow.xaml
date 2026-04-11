@@ -4,8 +4,9 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:AnimationEditor.MountAnimationCreator"
+        xmlns:loc="clr-namespace:Shared.Ui.Common;assembly=Shared.Ui"
         mc:Ignorable="d"
-        Title="Batch Process Options" SizeToContent="WidthAndHeight">
+        Title="{loc:Loc MountAnimationCreator.BatchProcessOptions}" SizeToContent="WidthAndHeight">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="auto"/>
@@ -22,20 +23,20 @@
             <ColumnDefinition Width="auto"/>
         </Grid.ColumnDefinitions>
 
-        <Label Grid.Row="0" Grid.Column="0" Content="AnimPack"/>
+        <Label Grid.Row="0" Grid.Column="0" Content="{loc:Loc MountAnimationCreator.BatchProcess.AnimPack}"/>
         <Label Grid.Row="0" Grid.Column="1" Content=":"/>
         <CheckBox Grid.Row="0" Grid.Column="2" VerticalContentAlignment="Center" IsChecked="{Binding CreateAnimPack, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" IsEnabled="False"/>
         <TextBox Grid.Row="0" Grid.Column="3" Width="300" VerticalContentAlignment="Center" Margin="2,2,0,2" Text="{Binding AnimPackName, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" IsEnabled="{Binding CreateAnimPack, UpdateSourceTrigger=PropertyChanged}" />
 
-        <Label Grid.Row="2" Grid.Column="0" Content="Fragment"/>
+        <Label Grid.Row="2" Grid.Column="0" Content="{loc:Loc MountAnimationCreator.BatchProcess.Fragment}"/>
         <Label Grid.Row="2" Grid.Column="1" Content=":"/>
         <CheckBox Grid.Row="2" Grid.Column="2" VerticalContentAlignment="Center" IsChecked="{Binding CreateFragment, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" IsEnabled="False"/>
         <TextBox Grid.Row="2" Grid.Column="3" Width="300" VerticalContentAlignment="Center" Margin="2,2,0,2" Text="{Binding FragmentName, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" IsEnabled="{Binding CreateFragment, UpdateSourceTrigger=PropertyChanged}" />
 
-        <Label Grid.Row="3" Grid.Column="0" Content="Animations"/>
+        <Label Grid.Row="3" Grid.Column="0" Content="{loc:Loc MountAnimationCreator.BatchProcess.Animations}"/>
         <Label Grid.Row="3" Grid.Column="1" Content=":"/>
         <CheckBox Grid.Row="3" Grid.Column="2" VerticalContentAlignment="Center" IsChecked="{Binding CreateAnimations, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" IsEnabled="False"/>
 
-        <Button Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="4" Content="Create" Margin="10,2,10,2" Click="Button_Click"/>
+        <Button Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="4" Content="{loc:Loc MountAnimationCreator.Buttons.Create}" Margin="10,2,10,2" Click="Button_Click"/>
     </Grid>
 </Window>

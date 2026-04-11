@@ -1,0 +1,73 @@
+body {
+    font-family: Arial, sans-serif;
+    line-height: 1.55;
+    margin: 0 auto;
+    max-width: 1000px;
+    padding: 24px;
+    color: #202124;
+}
+
+h1, h2, h3 {
+    color: #1f2937;
+}
+
+figure {
+    margin: 24px 0;
+}
+
+figcaption {
+    color: #5f6368;
+    font-size: 0.95rem;
+    margin-top: 8px;
+}
+
+img {
+    max-width: 100%;
+    height: auto;
+    border: 1px solid #d0d7de;
+}
+
+.note, .warning {
+    padding: 12px 14px;
+    margin: 18px 0;
+}
+
+.note {
+    background: #f3f7ff;
+    border-left: 4px solid #2b5fd9;
+}
+
+.warning {
+    background: #fff6e5;
+    border-left: 4px solid #d28a00;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 18px 0 24px 0;
+}
+
+th, td {
+    border: 1px solid #d0d7de;
+    padding: 10px;
+    text-align: left;
+    vertical-align: top;
+}
+
+th {
+    background: #f6f8fa;
+}
+
+code {
+    background: #f6f8fa;
+    padding: 1px 4px;
+    border-radius: 4px;
+}
+
+.doc-image {
+    width: 50%;
+    max-width: 100%;
+    height: auto;
+    cursor: zoom-in;
+}

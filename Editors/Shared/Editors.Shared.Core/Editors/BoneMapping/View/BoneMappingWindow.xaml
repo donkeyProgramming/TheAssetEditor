@@ -3,14 +3,15 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:view="clr-namespace:CommonControls.Editors.BoneMapping.View"
+        xmlns:loc="clr-namespace:Shared.Ui.Common;assembly=Shared.Ui"
         mc:Ignorable="d"
-        Title="AnimatedBlendIndexRemappingWindow" Height="600" Width="1200">
+        Title="{loc:Loc Dialog.BoneMappingWindow.Title}" Height="600" Width="1200">
     <DockPanel LastChildFill="True">
 
         <DockPanel DockPanel.Dock="Bottom" LastChildFill="False">
-            <Button x:Name="ApplyButtonHandle" DockPanel.Dock="Right" Width="50" Click="ApplyButton_Click">Apply</Button>
-            <Button DockPanel.Dock="Right" Width="50" Margin="5,0,5,0" Click="OkButton_Click">Ok</Button>
-            <Button DockPanel.Dock="Right" Width="50" Click="CancelButton_Click">Cancel</Button>
+            <Button x:Name="ApplyButtonHandle" DockPanel.Dock="Right" Width="50" Click="ApplyButton_Click">{loc:Loc Dialog.BoneMappingWindow.ApplyButton}</Button>
+            <Button DockPanel.Dock="Right" Width="50" Margin="5,0,5,0" Click="OkButton_Click">{loc:Loc Dialog.BoneMappingWindow.OkButton}</Button>
+            <Button DockPanel.Dock="Right" Width="50" Click="CancelButton_Click">{loc:Loc Dialog.BoneMappingWindow.CancelButton}</Button>
         </DockPanel>
 
         <view:BoneMappingView/>

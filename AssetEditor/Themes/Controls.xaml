@@ -10,6 +10,7 @@
     xmlns:prim="clr-namespace:Xceed.Wpf.Toolkit.Primitives;assembly=Xceed.Wpf.Toolkit"
     xmlns:chrome="clr-namespace:Xceed.Wpf.Toolkit.Chromes;assembly=Xceed.Wpf.Toolkit"
     xmlns:MdXaml="clr-namespace:MdXaml;assembly=MdXaml"
+    xmlns:loc="clr-namespace:Shared.Ui.Common;assembly=Shared.Ui"
     xmlns:options="http://schemas.microsoft.com/winfx/2006/xaml/presentation/options">
 
     <!-- Converters for WindowsTitleMenu -->
@@ -5564,6 +5565,7 @@
                                     <ColumnDefinition Width="Auto"/>
                                     <ColumnDefinition Width="Auto"/>
                                     <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="Auto"/>
                                 </Grid.ColumnDefinitions>
                                 <Image 
                                     Grid.Column="0"
@@ -5589,7 +5591,7 @@
                                     Grid.Column="2"
                                     Width="46"
                                     Style="{StaticResource TitleBarButtonStyle}" 
-                                    ToolTip="Minimise"
+                                    ToolTip="{loc:Loc WindowChrome.Minimise}"
                                     VerticalAlignment="Stretch"
                                     Height="Auto"
                                     WindowChrome.IsHitTestVisibleInChrome="True" 
@@ -5606,7 +5608,7 @@
                                     Grid.Column="3"
                                     Width="46"
                                     Style="{StaticResource TitleBarButtonStyle}" 
-                                    ToolTip="Maximise"
+                                    ToolTip="{loc:Loc WindowChrome.Maximise}"
                                     VerticalAlignment="Stretch"
                                     Height="Auto"
                                     WindowChrome.IsHitTestVisibleInChrome="True" 
@@ -5619,11 +5621,24 @@
                                         StrokeThickness="1"/>
                                 </Button>
                                 <Button 
-                                    x:Name="btnClose" 
+                                    x:Name="btnHelp" 
                                     Grid.Column="4"
                                     Width="46"
+                                    Style="{StaticResource TitleBarButtonStyle}" 
+                                    ToolTip="{loc:Loc WindowChrome.Help}"
+                                    VerticalAlignment="Stretch"
+                                    Height="Auto"
+                                    WindowChrome.IsHitTestVisibleInChrome="True" 
+                                    Click="Help_Event"
+                                    Content="?"
+                                    FontSize="16"
+                                    FontWeight="SemiBold"/>
+                                <Button 
+                                    x:Name="btnClose" 
+                                    Grid.Column="5"
+                                    Width="46"
                                     Style="{StaticResource TitleBarCloseButtonStyle}" 
-                                    ToolTip="Close"
+                                    ToolTip="{loc:Loc WindowChrome.Close}"
                                     VerticalAlignment="Stretch"
                                     Height="Auto"
                                     WindowChrome.IsHitTestVisibleInChrome="True" 
@@ -5673,6 +5688,9 @@
                             <Setter TargetName="btnMaximiseRestore" Property="Visibility" Value="Collapsed"/>
                             <Setter TargetName="btnMinimise" Property="Visibility" Value="Collapsed"/>
                         </Trigger>
+                        <DataTrigger Binding="{Binding HelpDocumentPath, RelativeSource={RelativeSource TemplatedParent}}" Value="">
+                            <Setter TargetName="btnHelp" Property="Visibility" Value="Collapsed"/>
+                        </DataTrigger>
                         <Trigger Property="WindowStyle" Value="None">
                             <Setter TargetName="titlebar" Property="Visibility" Value="Collapsed"/>
                             <Setter Property="WindowChrome.WindowChrome">

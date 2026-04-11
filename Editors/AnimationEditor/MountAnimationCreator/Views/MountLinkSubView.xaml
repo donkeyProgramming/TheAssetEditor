@@ -6,9 +6,10 @@
              xmlns:local="clr-namespace:AnimationEditor.MountAnimationCreator" 
               xmlns:s="http://schemas.singulink.com/xaml"
              xmlns:dotNetKitControls="clr-namespace:DotNetKit.Windows.Controls;assembly=DotNetKit.Wpf.AutoCompleteComboBox"
+             xmlns:loc="clr-namespace:Shared.Ui.Common;assembly=Shared.Ui"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
-    <Expander IsExpanded="True" Grid.Row="2" Header="Mount link shortcut:">
+    <Expander IsExpanded="True" Grid.Row="2" Header="{loc:Loc MountAnimationCreator.MountLinkShortcut}">
         <Border BorderBrush="Gray" BorderThickness="0" Margin="10,5,10,0">
             <Grid>
                 <Grid.ColumnDefinitions>
@@ -30,7 +31,7 @@
                     <RowDefinition Height="auto"/>
                 </Grid.RowDefinitions>
                
-                <Label Grid.Column="0" Grid.Row="0" Content="Mount" Margin="0,1,0,0"/>
+                <Label Grid.Column="0" Grid.Row="0" Content="{loc:Loc MountAnimationCreator.MountLink.Mount}" Margin="0,1,0,0"/>
                 <Label Grid.Column="1" Grid.Row="0" Content=":" Margin="0,1,0,0"/>
                 <ComboBox Grid.Column="2" Grid.Row="0" 
                           IsEditable="True"
@@ -42,7 +43,7 @@
                 
                 <Button  Content="..." Grid.Column="3" Grid.Row="0" Width="25" Margin="2"  Click="{s:MethodBinding ViewMountFragmentAction}"/>
 
-                <Label Grid.Column="0" Grid.Row="1" Content="Rider"/>
+                <Label Grid.Column="0" Grid.Row="1" Content="{loc:Loc MountAnimationCreator.MountLink.Rider}"/>
                 <Label Grid.Column="1" Grid.Row="1" Content=":"/>
                 <ComboBox Grid.Column="2" Grid.Row="1" 
                           IsEditable="True"
@@ -53,7 +54,7 @@
                           SelectedItem="{Binding MountLinkController.AnimationSetForRider.SelectedItem, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
                 <Button Content="..." Grid.Column="3" Grid.Row="1" Width="25" Margin="2"  Click="{s:MethodBinding ViewRiderFragmentAction}"/>
 
-                <Label Grid.Column="0" Grid.Row="2" Content="Mount tag"/>
+                <Label Grid.Column="0" Grid.Row="2" Content="{loc:Loc MountAnimationCreator.MountLink.MountTag}"/>
                 <Label Grid.Column="1" Grid.Row="2" Content=":"/>
                 <ComboBox Grid.Column="2" Grid.Row="2" 
                           IsEditable="True"
@@ -73,7 +74,7 @@
                     </ComboBox.ItemContainerStyle>
                 </ComboBox>
 
-                <Label Grid.Column="0" Grid.Row="3" Content="Rider tag"/>
+                <Label Grid.Column="0" Grid.Row="3" Content="{loc:Loc MountAnimationCreator.MountLink.RiderTag}"/>
                 <Label Grid.Column="1" Grid.Row="3" Content=":"/>
                 <ComboBox Grid.Column="2" Grid.Row="3" 
                           IsEditable="True"

@@ -5,18 +5,19 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:AnimationEditor.MountAnimationCreator"
               xmlns:s="http://schemas.singulink.com/xaml"
+             xmlns:loc="clr-namespace:Shared.Ui.Common;assembly=Shared.Ui"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     
-    <Expander IsExpanded="True" Header="Save and preview:">
+    <Expander IsExpanded="True" Header="{loc:Loc MountAnimationCreator.SaveAndPreview}">
         <Border BorderBrush="Gray" BorderThickness="0">
             <StackPanel>
                 <DockPanel Grid.Row="0" Margin="10,5,10,0">
-                    <Button Content="Update Preview" Click="{s:MethodBinding CreateMountAnimationAction}" IsEnabled="{Binding CanPreview.Value, UpdateSourceTrigger=PropertyChanged}"/>
+                    <Button Content="{loc:Loc MountAnimationCreator.Buttons.UpdatePreview}" Click="{s:MethodBinding CreateMountAnimationAction}" IsEnabled="{Binding CanPreview.Value, UpdateSourceTrigger=PropertyChanged}"/>
                 </DockPanel>
 
                 <DockPanel Grid.Row="2" Margin="10,5,10,0">
-                    <Label DockPanel.Dock="Left" Content="Selected fragment:" HorizontalContentAlignment="Center"/>
+                    <Label DockPanel.Dock="Left" Content="{loc:Loc MountAnimationCreator.Labels.SelectedFragment}" HorizontalContentAlignment="Center"/>
                     <Button DockPanel.Dock="Right" Content=".." Width="25" Margin="2" Click="{s:MethodBinding ViewOutputFragmentAction}" />
                     <ComboBox DockPanel.Dock="Left" 
                           IsEditable="True"
@@ -28,8 +29,8 @@
                 </DockPanel>
 
                 <DockPanel Grid.Row="3" Margin="10,5,10,0">
-                    <Label DockPanel.Dock="Left" Content="Selected slot:         " HorizontalContentAlignment="Center"/>
-                    <Button DockPanel.Dock="Right" Content="Save to fragment" Margin="3,0,0,0" Click="{s:MethodBinding AddAnimationToFragment}" IsEnabled="{Binding CanAddToFragment.Value, UpdateSourceTrigger=PropertyChanged}"/>
+                    <Label DockPanel.Dock="Left" Content="{loc:Loc MountAnimationCreator.Labels.SelectedSlot}" HorizontalContentAlignment="Center"/>
+                    <Button DockPanel.Dock="Right" Content="{loc:Loc MountAnimationCreator.Buttons.SaveToFragment}" Margin="3,0,0,0" Click="{s:MethodBinding AddAnimationToFragment}" IsEnabled="{Binding CanAddToFragment.Value, UpdateSourceTrigger=PropertyChanged}"/>
                     
                     <ComboBox DockPanel.Dock="Left" 
                           IsEditable="True"
@@ -59,19 +60,19 @@
                         <ColumnDefinition Width="0.5*"/>
                     </Grid.ColumnDefinitions>
 
-                    <Button  Grid.Column="0" Click="{s:MethodBinding SaveCurrentAnimationAction}" Content="Save current" IsEnabled="{Binding CanSave.Value, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,1,0"/>
-                    <Button  Grid.Column="1" Click="{s:MethodBinding BatchProcessUsingTableAction}" Content="Batch save using table" IsEnabled="false" Margin="1,0,1,0" />
-                    <Button  Grid.Column="2" Click="{s:MethodBinding BatchProcessUsingFragmentsAction}" Content="Batch save using Mount/Rider fragment" IsEnabled="{Binding CanBatchProcess.Value, UpdateSourceTrigger=PropertyChanged}" Margin="1,0,0,0"/>
+                    <Button  Grid.Column="0" Click="{s:MethodBinding SaveCurrentAnimationAction}" Content="{loc:Loc MountAnimationCreator.Buttons.SaveCurrent}" IsEnabled="{Binding CanSave.Value, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,1,0"/>
+                    <Button  Grid.Column="1" Click="{s:MethodBinding BatchProcessUsingTableAction}" Content="{loc:Loc MountAnimationCreator.Buttons.BatchSaveTable}" IsEnabled="false" Margin="1,0,1,0" />
+                    <Button  Grid.Column="2" Click="{s:MethodBinding BatchProcessUsingFragmentsAction}" Content="{loc:Loc MountAnimationCreator.Buttons.BatchSaveFragment}" IsEnabled="{Binding CanBatchProcess.Value, UpdateSourceTrigger=PropertyChanged}" Margin="1,0,0,0"/>
                 </Grid>
 
                 <DockPanel  Grid.Row="5" Margin="10,5,10,0">
                     <CheckBox  DockPanel.Dock="Right" VerticalContentAlignment="Center" IsChecked="{Binding EnsureUniqeFileName.Value, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
-                    <Label  DockPanel.Dock="Right"  Content="Ensure unique:"/>
+                    <Label  DockPanel.Dock="Right"  Content="{loc:Loc MountAnimationCreator.Labels.EnsureUnique}"/>
 
                     <ComboBox  DockPanel.Dock="Right"   ItemsSource="{Binding AnimationOutputFormats}" SelectedItem="{Binding SelectedAnimationOutputFormat.Value, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
-                    <Label  DockPanel.Dock="Right"  Content="Anim Version:"/>
+                    <Label  DockPanel.Dock="Right"  Content="{loc:Loc MountAnimationCreator.Labels.AnimVersion}"/>
 
-                    <Label DockPanel.Dock="Left" Content="Save prefix:"/>
+                    <Label DockPanel.Dock="Left" Content="{loc:Loc MountAnimationCreator.Labels.SavePrefix}"/>
                     <TextBox DockPanel.Dock="Right" VerticalContentAlignment="Center" Text="{Binding SavePrefixText.Value, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
                 </DockPanel>
             </StackPanel>

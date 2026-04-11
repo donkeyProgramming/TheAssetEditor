@@ -84,7 +84,7 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
 
             RegisterUiCommand<ReduceMeshCommand>();
             RegisterUiCommand<OpenBmiToolCommand>();
-            RegisterUiCommand<OpenSkeletonReshaperToolCommand>();
+            RegisterUiCommand<OpenMeshFitterToolCommand>();
             RegisterUiCommand<OpenReriggingToolCommand>();
             RegisterUiCommand<OpenPinToolCommand>();
             RegisterUiCommand<AssignMaterialFromOtherMeshUiCommand>();
@@ -158,7 +158,7 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
             builder.CreateButtonSeparator();
             builder.CreateButton<ReduceMeshCommand>(IconLibrary.ReduceMeshIcon, ButtonVisibilityRule.ObjectMode);
             //builder.CreateButton<OpenBmiToolCommand>(ResourceController.BmiToolIcon, ButtonVisibilityRule.ObjectMode);    <-- Disabled to see if anyone complains. Plan is to delete it
-            builder.CreateButton<OpenSkeletonReshaperToolCommand>(IconLibrary.SkeletonReshaperIcon, ButtonVisibilityRule.ObjectMode);
+            builder.CreateButton<OpenMeshFitterToolCommand>(IconLibrary.SkeletonReshaperIcon, ButtonVisibilityRule.ObjectMode);
             builder.CreateButton<OpenReriggingToolCommand>(IconLibrary.ReRiggingIcon, ButtonVisibilityRule.ObjectMode);
             builder.CreateButton<OpenPinToolCommand>(IconLibrary.PinIcon, ButtonVisibilityRule.ObjectMode);
             builder.CreateButton<AssignMaterialFromOtherMeshUiCommand>(IconLibrary.AssignTextureFromOtherIcon, ButtonVisibilityRule.ObjectMode);

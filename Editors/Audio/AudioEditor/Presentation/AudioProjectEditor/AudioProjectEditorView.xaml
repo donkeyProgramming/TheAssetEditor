@@ -6,6 +6,7 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:Behaviors="clr-namespace:Shared.Ui.Common.Behaviors;assembly=Shared.Ui"
     xmlns:AudioProjectEditor="clr-namespace:Editors.Audio.AudioEditor.Presentation.AudioProjectEditor" 
+    xmlns:loc="clr-namespace:Shared.Ui.Common;assembly=Shared.Ui"
     d:DataContext="{d:DesignInstance Type=AudioProjectEditor:AudioProjectEditorViewModel}"
     mc:Ignorable="d"
     d:DesignHeight="450" d:DesignWidth="800">
@@ -45,7 +46,7 @@
 
             <Button 
                 Grid.Column="0"
-                Content="Add Row"
+                Content="{loc:Loc AudioProjectEditor.AddRow}"
                 ToolTipService.ShowOnDisabled="True"
                 Command="{Binding AddRowsToViewerCommand}" 
                 Margin="5, 0, 0, 0" 
@@ -57,10 +58,10 @@
                 <Button.ToolTip>
                     <ToolTip>
                         <TextBlock TextWrapping="Wrap">
-                            <Run Text="Adds the row to the Audio Project."/>
+                            <Run Text="{loc:Loc AudioProjectEditor.Tooltips.AddRowLine1}"/>
                             <LineBreak/>
                             <LineBreak/>
-                            <Run Text="Shortcut: Ctrl + Q"/>
+                            <Run Text="{loc:Loc AudioProjectEditor.Tooltips.AddRowShortcut}"/>
                         </TextBlock>
                     </ToolTip>
                 </Button.ToolTip>
@@ -69,8 +70,8 @@
 
             <CheckBox 
                 Grid.Column="1"
-                Content="Show Modded States Only"
-                ToolTip="Shows only modded states in the drop downs rather than modded states and vanilla states."
+                Content="{loc:Loc AudioProjectEditor.ShowModdedStatesOnly}"
+                ToolTip="{loc:Loc AudioProjectEditor.Tooltips.ShowModdedStatesOnly}"
                 ToolTipService.ShowOnDisabled="True"
                 Margin="5, 0, 0, 0" 
                 VerticalAlignment="Center" 

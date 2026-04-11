@@ -4,14 +4,15 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Shared.Ui.Common.Exceptions"
+        xmlns:loc="clr-namespace:Shared.Ui.Common"
         mc:Ignorable="d"
         Style="{StaticResource CustomWindowStyle}"
-        Title="Error" Height="450" Width="800">
+        Title="{loc:Loc Dialog.Exception.Title}" Height="450" Width="800">
     <DockPanel>
 
-        <Button DockPanel.Dock="Bottom" Content="Emergency - Force Close Current Window" Margin="5" Click="ForceCloseButtonPressed"/>
-        <Button DockPanel.Dock="Bottom" Content="Close Error window" Margin="5" Click="CloseButtonPressed"/>
-        <Button DockPanel.Dock="Bottom" Content="Copy to Clipboard" Margin="5" Click="CopyButtonPressed" />
+        <Button DockPanel.Dock="Bottom" Content="{loc:Loc Dialog.Exception.ForceCloseButton}" Margin="5" Click="ForceCloseButtonPressed"/>
+        <Button DockPanel.Dock="Bottom" Content="{loc:Loc Dialog.Exception.CloseButton}" Margin="5" Click="CloseButtonPressed"/>
+        <Button DockPanel.Dock="Bottom" Content="{loc:Loc Dialog.Exception.CopyButton}" Margin="5" Click="CopyButtonPressed" />
 
         <TextBox 
             IsReadOnly="True"
@@ -19,19 +20,19 @@
             DockPanel.Dock="Bottom"   
             TextWrapping="Wrap"
             HorizontalContentAlignment="Center"
-            Text="If this error was unexpected, please press the copy button and provide the text dump to the developers through discord or github.&#x0a;The Clipboard contains more information then what is displayed! &#x0a; &#x0a;Discord: https://discord.gg/moddingden &#x0a;Github: https://github.com/donkeyProgramming/TheAssetEditor/issues" />
+            Text="{loc:Loc Dialog.Exception.InstructionText}" />
 
 
         <Expander DockPanel.Dock="Bottom" IsExpanded="False">
             <Expander.Header>
                 <StackPanel Orientation="Horizontal" >
-                    <TextBlock Text="Extra information" FontWeight="Bold" Margin="3"/>
+                    <TextBlock Text="{loc:Loc Dialog.Exception.ExtraInformation}" FontWeight="Bold" Margin="3"/>
                 </StackPanel>
             </Expander.Header>
             <TextBox x:Name="ExtraInfoHandle" IsReadOnly="True" DockPanel.Dock="Top" Margin="5"/>
         </Expander>
 
-        <TextBlock DockPanel.Dock="TOp" Text="Error Message" FontWeight="Bold" Margin="3"/>
+        <TextBlock DockPanel.Dock="TOp" Text="{loc:Loc Dialog.Exception.ErrorMessageLabel}" FontWeight="Bold" Margin="3"/>
         <TextBox x:Name="ErrorTextHandle" IsReadOnly="True"   TextWrapping="Wrap" DockPanel.Dock="Top" Margin="5,0,5,5"/>
 
     </DockPanel>

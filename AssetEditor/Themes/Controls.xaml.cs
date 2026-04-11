@@ -1,4 +1,8 @@
-﻿using System.Windows;
+﻿using System;
+using System.Diagnostics;
+using System.IO;
+using System.Windows;
+using WindowHandling;
 
 namespace AssetEditor.Themes
 {
@@ -20,6 +24,29 @@ namespace AssetEditor.Themes
         {
             if (e.Source != null)
                 this.MinimizeWind(Window.GetWindow((FrameworkElement)e.Source));
+        }
+
+        private void Help_Event(object sender, RoutedEventArgs e)
+        {
+            if (e.Source == null)
+                return;
+
+            var window = Window.GetWindow((FrameworkElement)e.Source) as AssetEditorWindow;
+            if (window == null || string.IsNullOrWhiteSpace(window.HelpDocumentPath))
+                return;
+
+            var helpPath = Path.IsPathRooted(window.HelpDocumentPath)
+                ? window.HelpDocumentPath
+                : Path.GetFullPath(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, window.HelpDocumentPath));
+
+            if (File.Exists(helpPath) == false)
+                return;
+
+            Process.Start(new ProcessStartInfo
+            {
+                FileName = helpPath,
+                UseShellExecute = true
+            });
         }
 
         public void CloseWind(Window window) => window?.Close();

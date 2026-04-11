@@ -3,9 +3,10 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:loc="clr-namespace:Shared.Ui.Common;assembly=Shared.Ui"
         mc:Ignorable="d"
         Style="{StaticResource CustomWindowStyle}"
-        Title="Create MetaData entry" Height="450" Width="400">
+        Title="{loc:Loc MetadataEditor.NewEntryWindow.Title}" Height="450" Width="400">
     <Grid>
         <ListView
             ItemsSource="{Binding Items, UpdateSourceTrigger=PropertyChanged}"

@@ -5,14 +5,15 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:s="http://schemas.singulink.com/xaml" 
              xmlns:settings="clr-namespace:Editors.AnimatioReTarget.Editor.Settings" xmlns:presentation="clr-namespace:Editors.AnimatioReTarget.Editor.BoneHandling.Presentation"
+             xmlns:loc="clr-namespace:Shared.Ui.Common;assembly=Shared.Ui"
              mc:Ignorable="d" 
              d:DesignHeight="800" d:DesignWidth="800">
     <DockPanel >
         <settings:SettingsView DockPanel.Dock="Top"/>
 
-        <Button DockPanel.Dock="Bottom" Content="Apply Settings" Command="{Binding UpdateAnimationCommand}" Margin="2" />
-        <Button DockPanel.Dock="Bottom" Content="Save" Command="{Binding SaveManager.ShowSaveSettingsCommand}"  Margin="2" />
-        <Button DockPanel.Dock="Bottom" Content="Open Bone Mapping Window" Command="{Binding BoneManager.ShowBoneMappingWindowCommand}" Margin="2" />
+        <Button DockPanel.Dock="Bottom" Content="{loc:Loc AnimationReTarget.Editor.ApplySettings}" Command="{Binding UpdateAnimationCommand}" Margin="2" />
+        <Button DockPanel.Dock="Bottom" Content="{loc:Loc AnimationReTarget.Editor.Save}" Command="{Binding SaveManager.ShowSaveSettingsCommand}"  Margin="2" />
+        <Button DockPanel.Dock="Bottom" Content="{loc:Loc AnimationReTarget.Editor.OpenBoneMappingWindow}" Command="{Binding BoneManager.ShowBoneMappingWindowCommand}" Margin="2" />
 
         <presentation:BoneSettingsView DockPanel.Dock="Top"/>
     </DockPanel>

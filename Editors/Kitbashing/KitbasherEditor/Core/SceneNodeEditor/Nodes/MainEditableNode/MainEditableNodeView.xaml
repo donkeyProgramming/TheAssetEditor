@@ -6,6 +6,7 @@
              xmlns:filterdialog="clr-namespace:CommonControls.FilterDialog;assembly=Shared.Ui" 
              xmlns:System="clr-namespace:System;assembly=System.Runtime"
              xmlns:s="http://schemas.singulink.com/xaml"
+             xmlns:loc="clr-namespace:Shared.Ui.Common;assembly=Shared.Ui"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <UserControl.Resources>
@@ -15,12 +16,12 @@
     <DockPanel  LastChildFill="False">
 
         <DockPanel DockPanel.Dock="Top">
-            <TextBlock  FontSize="20" FontWeight="Bold" >Main Node:</TextBlock>
+            <TextBlock  FontSize="20" FontWeight="Bold" >{loc:Loc KitbashTool.MainNode.Title}</TextBlock>
         </DockPanel>
-        <Expander IsExpanded="True" Header="General" DockPanel.Dock="Top">
+        <Expander IsExpanded="True" Header="{loc:Loc KitbashTool.MainNode.General}" DockPanel.Dock="Top">
             <DockPanel DockPanel.Dock="Top">
                 <DockPanel DockPanel.Dock="Top">
-                    <Label Width ="{StaticResource labelWidth}" Content="Skeleton"/>
+                    <Label Width ="{StaticResource labelWidth}" Content="{loc:Loc KitbashTool.MainNode.Skeleton}"/>
                     <Label>:</Label>
                     <filterdialog:CollapsableFilterControl  VerticalContentAlignment="Center"
                                 SelectedItem="{Binding SkeletonName, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
@@ -35,21 +36,21 @@
                 </DockPanel>
 
                 <DockPanel DockPanel.Dock="Top">
-                    <Label Width ="{StaticResource labelWidth}" Content="Copy textures to pack" />
+                    <Label Width ="{StaticResource labelWidth}" Content="{loc:Loc KitbashTool.MainNode.CopyTexturesToPack}" />
                     <Label>:</Label>
-                    <Button Content="Copy" Click="{s:MethodBinding CopyTexturesToOutputPack}" Margin="0,2,2,2" Width="50"/>
-                    <Label Content="Convertion:" Visibility="Collapsed"/>
+                    <Button Content="{loc:Loc KitbashTool.MainNode.Copy}" Click="{s:MethodBinding CopyTexturesToOutputPack}" Margin="0,2,2,2" Width="50"/>
+                    <Label Content="{loc:Loc KitbashTool.MainNode.Conversion}" Visibility="Collapsed"/>
                     <ComboBox SelectedValue="None" VerticalAlignment="Center" Visibility="Collapsed"/>
                 </DockPanel>
 
                 <StackPanel Orientation="Horizontal" DockPanel.Dock="Top">
-                    <Label Width ="{StaticResource labelWidth}" DockPanel.Dock="Left" Content="Attachment points"/>
+                    <Label Width ="{StaticResource labelWidth}" DockPanel.Dock="Left" Content="{loc:Loc KitbashTool.MainNode.AttachmentPoints}"/>
                     <Label>:</Label>
 
                     <Expander>
                         <Expander.Header>
                             <StackPanel Orientation="Horizontal">
-                                <TextBlock Text="Count = "/>
+                                <TextBlock Text="{loc:Loc KitbashTool.MainNode.AttachmentPointCount}"/>
                                 <TextBlock Text="{Binding AttachmentPointList.Count, UpdateSourceTrigger=PropertyChanged}"/>
                             </StackPanel>
                         </Expander.Header>
@@ -58,14 +59,14 @@
                                 
                             <ListView.View>
                                     <GridView>
-                                        <GridViewColumn Header="Bone Id" DisplayMemberBinding="{Binding BoneIndex}" Width="auto"/>
-                                        <GridViewColumn Header="Name" DisplayMemberBinding="{Binding Name}" Width="auto"/>
-                                        <GridViewColumn Header="Use Bone Orientation" DisplayMemberBinding="{Binding IsIdentiy}" Width="auto"/>
+                                        <GridViewColumn Header="{loc:Loc KitbashTool.MainNode.Columns.BoneId}" DisplayMemberBinding="{Binding BoneIndex}" Width="auto"/>
+                                        <GridViewColumn Header="{loc:Loc KitbashTool.MainNode.Columns.Name}" DisplayMemberBinding="{Binding Name}" Width="auto"/>
+                                        <GridViewColumn Header="{loc:Loc KitbashTool.MainNode.Columns.UseBoneOrientation}" DisplayMemberBinding="{Binding IsIdentiy}" Width="auto"/>
                                     </GridView>
                                 </ListView.View>
                             </ListView>
 
-                            <Button Content="Create AttachmentPoints from Skeleton" Margin="2" Height="25" Command="{Binding ResetAttachmentPointListCommand }"/>
+                            <Button Content="{loc:Loc KitbashTool.MainNode.CreateAttachmentPointsFromSkeleton}" Margin="2" Height="25" Command="{Binding ResetAttachmentPointListCommand }"/>
                         </StackPanel>
 
                     </Expander>

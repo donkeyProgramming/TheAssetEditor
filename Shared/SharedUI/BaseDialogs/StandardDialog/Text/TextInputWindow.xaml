@@ -3,8 +3,9 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:loc="clr-namespace:Shared.Ui.Common"
         mc:Ignorable="d"
-        Title="TextInputWindow" 
+        Title="{loc:Loc Dialog.TextInput.Title}" 
         Width="310"
         Height="80"
         ResizeMode="NoResize"
@@ -18,7 +19,7 @@
 
         <TextBox x:Name="TextBoxItem" Margin="2" Grid.Row="0" Width="300" KeyDown="Key_Down"/>
 
-        <Button Margin="2" Grid.Row="1" Width="100" Content="Ok" HorizontalAlignment="Left" Click="Ok_Click"/>
-        <Button Margin="2" Grid.Row="1" Width="100" Content="Cancel" HorizontalAlignment="Right" Click="Cancel_Click"/>
+        <Button Margin="2" Grid.Row="1" Width="100" Content="{loc:Loc Dialog.TextInput.OkButton}" HorizontalAlignment="Left" Click="Ok_Click"/>
+        <Button Margin="2" Grid.Row="1" Width="100" Content="{loc:Loc Dialog.TextInput.CancelButton}" HorizontalAlignment="Right" Click="Cancel_Click"/>
     </Grid>
 </Window>

@@ -5,6 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:CommonControls.SelectionListDialog"
         xmlns:behaviors="clr-namespace:Shared.Ui.Common.Behaviors"
+        xmlns:loc="clr-namespace:Shared.Ui.Common"
         xmlns:s="http://schemas.singulink.com/xaml"
              Style="{StaticResource CustomWindowStyle}"
         mc:Ignorable="d"
@@ -18,12 +19,12 @@
         <local:SelectionListView/>
         
         <DockPanel Grid.Row="1">
-            <Button DockPanel.Dock="Left" Content="Select All" Margin="2,2,2,2" Width="80" Click="{s:MethodBinding SelectAll}" />
-            <Button DockPanel.Dock="Left"  Content="Deselect All" Margin="2,2,2,2" Width="80" Click="{s:MethodBinding DeselectAll}" />
-            <Button DockPanel.Dock="Right" Content="Ok" Margin="2,2,2,2" Width="80" Click="OkButton_Click"/>
+            <Button DockPanel.Dock="Left" Content="{loc:Loc Dialog.SelectionList.SelectAllButton}" Margin="2,2,2,2" Width="80" Click="{s:MethodBinding SelectAll}" />
+            <Button DockPanel.Dock="Left"  Content="{loc:Loc Dialog.SelectionList.DeselectAllButton}" Margin="2,2,2,2" Width="80" Click="{s:MethodBinding DeselectAll}" />
+            <Button DockPanel.Dock="Right" Content="{loc:Loc Dialog.SelectionList.OkButton}" Margin="2,2,2,2" Width="80" Click="OkButton_Click"/>
             <StackPanel>
-                <Label  DockPanel.Dock="Left" Content="Filter:" VerticalContentAlignment="Center"/>
-                <TextBox x:Name="SearchTextBox" Height="20" behaviors:TextBoxExtensions.Watermark="Search filter, regEx supported"/>
+                <Label  DockPanel.Dock="Left" Content="{loc:Loc Dialog.Filter.Label}" VerticalContentAlignment="Center"/>
+                <TextBox x:Name="SearchTextBox" Height="20" behaviors:TextBoxExtensions.Watermark="{loc:Loc Dialog.Filter.Watermark}"/>
             </StackPanel>
         </DockPanel>
 

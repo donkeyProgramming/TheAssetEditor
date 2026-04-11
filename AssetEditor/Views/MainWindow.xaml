@@ -8,6 +8,7 @@
         xmlns:datatemplates="clr-namespace:Shared.Ui.Common.DataTemplates;assembly=Shared.Ui"
         xmlns:behaviors="clr-namespace:Shared.Ui.Common.Behaviors;assembly=Shared.Ui" 
         xmlns:common="clr-namespace:Shared.Ui.Common;assembly=Shared.Ui"
+        xmlns:loc="clr-namespace:Shared.Ui.Common;assembly=Shared.Ui"
         xmlns:local="clr-namespace:AssetEditor" 
         xmlns:materialIcons="clr-namespace:Material.Icons.WPF;assembly=Material.Icons.WPF" 
         xmlns:viewmodels="clr-namespace:AssetEditor.ViewModels" 
@@ -92,7 +93,7 @@
                 Width="46"
                 Click="OnMinimizeButtonClick"
                 Style="{StaticResource TitleBarButtonStyle}"
-                ToolTip="Minimise"
+                ToolTip="{loc:Loc WindowChrome.Minimise}"
                 VerticalAlignment="Stretch"
                 Height="Auto">
                 <Path
@@ -109,7 +110,7 @@
                 Width="46"
                 Click="OnMaximizeRestoreButtonClick"
                 Style="{StaticResource TitleBarButtonStyle}"
-                ToolTip="Maximise"
+                ToolTip="{loc:Loc WindowChrome.Maximise}"
                 ToolTipOpening="MaximizeRestoreButton_ToolTipOpening"
                 VerticalAlignment="Stretch"
                 Height="Auto">
@@ -126,7 +127,7 @@
                 Width="46"
                 Click="OnCloseButtonClick"
                 Style="{StaticResource TitleBarCloseButtonStyle}"
-                ToolTip="Close"
+                ToolTip="{loc:Loc WindowChrome.Close}"
                 VerticalAlignment="Stretch"
                 Height="Auto">
                 <Path
@@ -219,12 +220,12 @@
 
                                 <Grid.ContextMenu>
                                     <ContextMenu>
-                                        <MenuItem Header="Close" Command="{Binding Source={StaticResource Proxy}, Path=Data.CloseToolCommand}" CommandParameter="{Binding Source={StaticResource GridProxy}, Path=Data}" />
-                                        <MenuItem Header="Close Multiple">
-                                            <MenuItem Header="Close Other Tabs" Command="{Binding Source={StaticResource Proxy}, Path=Data.CloseOtherToolsCommand}" CommandParameter="{Binding Source={StaticResource GridProxy}, Path=Data}"/>
-                                            <MenuItem Header="Close All Tabs" Command="{Binding Source={StaticResource Proxy}, Path=Data.CloseAllToolsCommand}" CommandParameter="{Binding Source={StaticResource GridProxy}, Path=Data}"/>
-                                            <MenuItem Header="Close Tabs To Left" Command="{Binding Source={StaticResource Proxy}, Path=Data.CloseToolsToLeftCommand}" CommandParameter="{Binding Source={StaticResource GridProxy}, Path=Data}"/>
-                                            <MenuItem Header="Close Tabs To Right" Command="{Binding Source={StaticResource Proxy}, Path=Data.CloseToolsToRightCommand}" CommandParameter="{Binding Source={StaticResource GridProxy}, Path=Data}"/>
+                                        <MenuItem Header="{loc:Loc MainWindow.TabContextMenu.Close}" Command="{Binding Source={StaticResource Proxy}, Path=Data.CloseToolCommand}" CommandParameter="{Binding Source={StaticResource GridProxy}, Path=Data}" />
+                                        <MenuItem Header="{loc:Loc MainWindow.TabContextMenu.CloseMultiple}">
+                                            <MenuItem Header="{loc:Loc MainWindow.TabContextMenu.CloseOtherTabs}" Command="{Binding Source={StaticResource Proxy}, Path=Data.CloseOtherToolsCommand}" CommandParameter="{Binding Source={StaticResource GridProxy}, Path=Data}"/>
+                                            <MenuItem Header="{loc:Loc MainWindow.TabContextMenu.CloseAllTabs}" Command="{Binding Source={StaticResource Proxy}, Path=Data.CloseAllToolsCommand}" CommandParameter="{Binding Source={StaticResource GridProxy}, Path=Data}"/>
+                                            <MenuItem Header="{loc:Loc MainWindow.TabContextMenu.CloseTabsToLeft}" Command="{Binding Source={StaticResource Proxy}, Path=Data.CloseToolsToLeftCommand}" CommandParameter="{Binding Source={StaticResource GridProxy}, Path=Data}"/>
+                                            <MenuItem Header="{loc:Loc MainWindow.TabContextMenu.CloseTabsToRight}" Command="{Binding Source={StaticResource Proxy}, Path=Data.CloseToolsToRightCommand}" CommandParameter="{Binding Source={StaticResource GridProxy}, Path=Data}"/>
                                         </MenuItem>
                                     </ContextMenu>
                                 </Grid.ContextMenu>
