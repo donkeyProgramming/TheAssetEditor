@@ -154,7 +154,7 @@
                     Padding="10, 0, 10, 5" 
                     BorderBrush="{DynamicResource App.Border}" 
                     BorderThickness="0, 1, 1, 0" 
-                    Visibility="{Binding IsPackFileExplorerVisible, Converter={StaticResource BoolToVisibilityConverter}}"/>
+                    Visibility="{Binding DataContext.IsPackFileExplorerVisible, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource BoolToVisibilityConverter}}"/>
 
                 <GridSplitter Grid.Row="1" Grid.RowSpan="1" Grid.Column="1" Width="2.9" HorizontalAlignment="Stretch" Background="{DynamicResource App.Border}" 
                               Visibility="{Binding IsPackFileExplorerVisible, Converter={StaticResource BoolToVisibilityConverter}}"/>

@@ -14,9 +14,9 @@ namespace Editors.KitbasherEditor.UiCommands
 
         private readonly FaceEditor _faceEditor;
         private readonly SelectionManager _selectionManager;
-        private readonly WindowKeyboard _keyboard;
+        private readonly IWindowsKeyboard _keyboard;
 
-        public ExpandFaceSelectionCommand(FaceEditor faceEditor, SelectionManager selectionManager, WindowKeyboard keyboard)
+        public ExpandFaceSelectionCommand(FaceEditor faceEditor, SelectionManager selectionManager, IWindowsKeyboard keyboard)
         {
             _faceEditor = faceEditor;
             _selectionManager = selectionManager;

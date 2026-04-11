@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
 		<TargetFramework>net8.0-windows</TargetFramework>
 		<UseWPF>true</UseWPF>
@@ -28,7 +28,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\GameWorld\View3D\GameWorld.Core.csproj" />
-    <ProjectReference Include="..\..\Shared\SharedUI\Shared.Ui.csproj" />
+    <ProjectReference Include="..\..\Shared\SharedUI\Shared.Ui\Shared.Ui.csproj" />
   </ItemGroup>
 
 </Project>
