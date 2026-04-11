@@ -1,15 +1,18 @@
 ﻿using System.Windows.Input;
+using AssetEditor.ViewModels;
 using Microsoft.Extensions.DependencyInjection;
 using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
 using Shared.Ui.BaseDialogs.PackFileTree;
-using Shared.Ui.BaseDialogs.PackFileTree.ContextMenu;
 using Test.TestingUtility.Shared;
+using Test.TestingUtility.TestUtility;
 
 namespace Test.E2EVerification
 {
     internal class PackFileBrowserViewModelTests
     {
+        private readonly string _inputPackFileKarl = PathHelper.GetDataFolder("Data\\Karl_and_celestialgeneral_Pack");
+
         private AssetEditorTestRunner _runner;
         private IPackFileService _packageFileService;
         private PackFileBrowserViewModel _viewModel;
@@ -21,8 +24,8 @@ namespace Test.E2EVerification
             _runner.PackFileService.EnforceGameFilesMustBeLoaded = false;
             _packageFileService = _runner.PackFileService;
 
-            var builder = _runner.ServiceProvider.GetRequiredService<PackFileTreeViewFactory>();
-            _viewModel = builder.Create(ContextMenuType.None, true, false);
+            var mainApplicationView = _runner.ServiceProvider.GetRequiredService<MainViewModel>();
+            _viewModel = mainApplicationView.FileTree;
         }
 
         [TearDown]
@@ -32,7 +35,32 @@ namespace Test.E2EVerification
         }
 
         [Test]
-        public void TreeStartsWithOnlyRootNodesMaterialized()
+        public void DragAndDrop_FileInFolder()
+        {
+            _runner.CreateCaContainer();
+            var outputPackFile = _runner.LoadFolderPackFile(_inputPackFileKarl);
+
+            var packRootNode = _viewModel.Files[1];
+
+            // Act
+            var fileToMove = _viewModel.GetFromPath(packRootNode, @"animations\battle\humanoid01\2handed_hammer\stand\hu1_2hh_stand_idle_01.anim");
+            var destinationNode = _viewModel.GetFromPath(packRootNode, @"animations");
+            _viewModel.Drop(fileToMove, destinationNode);
+
+            // Assert
+            // Get file in packfileservice
+            var movedFile = _runner.PackFileService.FindFile(@"animations\hu1_2hh_stand_idle_01.anim");
+            Assert.That(movedFile, Is.Not.Null);
+
+            // Get file node from 
+            var movedNode = _viewModel.GetFromPath(packRootNode, @"animations\hu1_2hh_stand_idle_01.anim");
+            Assert.That(movedNode, Is.Not.Null);
+            Assert.That(movedNode.UnsavedChanged, Is.True);
+            Assert.That(movedNode.Parent.UnsavedChanged, Is.True);
+        }
+
+        [Test]
+        public void OnlyRootExpandedByDefault()
         {
             CreatePackfiles(("folderA\\file1.txt", "file1.txt"), ("folderB\\file2.txt", "file2.txt"));
 
@@ -48,7 +76,7 @@ namespace Test.E2EVerification
         }
 
         [Test]
-        public void GetFromPathFindsNestedFileWhenFoldersAreCollapsed()
+        public void GetFileFromCollapsedNode()
         {
             CreatePackfiles(("animations\\battle\\humanoid01\\test.anim", "test.anim"));
             var root = _viewModel.Files[0];
@@ -176,14 +204,6 @@ namespace Test.E2EVerification
 
         private void CreatePackfiles(params (string Path, string FileName)[] files)
         {
-            var container = CreateContainer(files);
-            _packageFileService.AddContainer(container);
-
-
-        }
-
-        private static PackFileContainer CreateContainer(params (string Path, string FileName)[] files)
-        {
             var container = new PackFileContainer("test.pack")
             {
                 SystemFilePath = "test.pack",
@@ -195,9 +215,8 @@ namespace Test.E2EVerification
                 container.FileList[path.ToLowerInvariant()] = PackFile.CreateFromASCII(fileName, fileName);
             }
 
-            return container;
+            _packageFileService.AddContainer(container);
         }
-
     }
 }
 
