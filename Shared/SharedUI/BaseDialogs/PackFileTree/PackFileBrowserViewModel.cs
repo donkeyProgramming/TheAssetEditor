@@ -86,6 +86,11 @@ namespace Shared.Ui.BaseDialogs.PackFileTree
             }
         }
 
+        public void Dispose()
+        {
+            _eventHub?.UnRegister(this);
+        }
+
         partial void OnSelectedItemChanged(TreeNode value)
         {
             ContextMenu = _contextMenuBuilder.Build(value);
@@ -219,7 +224,6 @@ namespace Shared.Ui.BaseDialogs.PackFileTree
                         targetNode.ExpandIfVisible(true);
                 }
             }
-
         }
 
         private void MainEditablePackChanged(PackFileContainerSetAsMainEditableEvent e)
@@ -390,11 +394,6 @@ namespace Shared.Ui.BaseDialogs.PackFileTree
             return null;
         }
 
-        private TreeNode? GetPackFileCollectionRootNode(PackFileContainer container)
-        {
-            return _treeStates.TryGetValue(container, out var state) ? state.RootNode : null;
-        }
-
         private TreeNodeSource? GetNodeFromPackFile(PackFileContainer container, PackFile pf, bool createIfMissing = true)
         {
             var state = GetPackFileTreeState(container);
@@ -508,10 +507,7 @@ namespace Shared.Ui.BaseDialogs.PackFileTree
             }
         }
 
-        public void Dispose()
-        {
-            _eventHub?.UnRegister(this);
-        }
+
 
         public bool AllowDrop(TreeNode node, TreeNode targetNode = null)
         {

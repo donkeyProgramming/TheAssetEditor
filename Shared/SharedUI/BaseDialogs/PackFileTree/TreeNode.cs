@@ -15,6 +15,11 @@ namespace Shared.Ui.BaseDialogs.PackFileTree
         File
     }
 
+    /// <summary>
+    /// Represents the materialized UI node shown in the pack-file tree.
+    /// This class is optimized for WPF binding/state (expanded, visible, selected, unsaved changes)
+    /// and can be created lazily from a <see cref="TreeNodeSource"/> when branches are expanded or queried.
+    /// </summary>
     public partial class TreeNode : ObservableObject
     {
         private readonly TreeNodeSource? _source;

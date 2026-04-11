@@ -4,6 +4,11 @@ using Shared.Core.PackFiles.Models;
 
 namespace Shared.Ui.BaseDialogs.PackFileTree
 {
+    /// <summary>
+    /// Represents the lightweight backing data model for the pack-file tree.
+    /// It stores the canonical hierarchy and metadata independent of UI state, and may optionally
+    /// reference a materialized <see cref="TreeNode"/> when that branch has been created for display.
+    /// </summary>
     internal sealed class TreeNodeSource
     {
         public string Name { get; set; }
