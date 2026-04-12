@@ -5,7 +5,6 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace GameWorld.Core.Components.Grid
 {
-
     /// <summary>
     /// Infinite grid component using a procedural screen-space shader.
     /// Renders a camera-following ground plane quad with analytically anti-aliased
@@ -18,7 +17,6 @@ namespace GameWorld.Core.Components.Grid
         private readonly RenderEngineComponent _renderEngineComponent;
         private Effect? _shaderEffect;
         private GridRenderItem? _renderItem;
-
 
         public bool ShowGrid { get; set; } = true;
         public Vector3 GridColur { get; set; } = new Vector3(0f, 0f, 0f);

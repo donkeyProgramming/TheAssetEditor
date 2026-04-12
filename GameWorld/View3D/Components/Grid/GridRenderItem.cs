@@ -15,7 +15,6 @@ namespace GameWorld.Core.Components.Grid
         private bool _isOrthographic;
         private Vector3 _gridColur = new(0f, 0f, 0f);
 
-
         public GridRenderItem(Effect effect)
         {
             Guard.IsNotNull(effect);
@@ -42,11 +41,11 @@ namespace GameWorld.Core.Components.Grid
             _quadVertices[3] = new VertexPositionTexture(new Vector3(cx + halfSize, 0, cz - halfSize), Vector2.Zero);
 
             _isOrthographic = camera.CurrentProjectionType == ProjectionType.Orthographic;
+            _gridColur = gridColur;
         }
 
         public void Draw(GraphicsDevice device, CommonShaderParameters parameters, RenderingTechnique renderingTechnique)
         {
-
             _gridEffect.Parameters["World"].SetValue(Matrix.Identity);
             _gridEffect.Parameters["View"].SetValue(parameters.View);
             _gridEffect.Parameters["Projection"].SetValue(parameters.Projection);

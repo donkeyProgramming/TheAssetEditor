@@ -24,7 +24,7 @@ namespace GameWorld.Core.Utility.RenderSettingsDialog
                 UseBigSceneCulling = renderEngineComponent.LargeSceneCulling,
                 
                 ShowGrid = _gridComponent.ShowGrid,
-                GridColour = new ColourPickerViewModel(_gridComponent.GridColur),
+                GridColour = new ColourPickerViewModel(_gridComponent.GridColur, ColourChanged),
 
                 LightIntensity = sceneRenderParameterStore.LightIntensityMult,
                 LightColour = new ColourPickerViewModel(sceneRenderParameterStore.LightColour, ColourChanged),
