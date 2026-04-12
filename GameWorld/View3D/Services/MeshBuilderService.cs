@@ -1,6 +1,4 @@
-﻿using System;
-using System.Linq;
-using GameWorld.Core.Rendering;
+﻿using GameWorld.Core.Rendering;
 using GameWorld.Core.Rendering.Geometry;
 using Microsoft.Xna.Framework;
 using Shared.GameFormats.RigidModel;

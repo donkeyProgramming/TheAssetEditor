@@ -1,5 +1,5 @@
 ﻿using System.Windows;
-using GameWorld.Core.Components;
+using GameWorld.Core.Components.Grid;
 using GameWorld.Core.Components.Rendering;
 using Microsoft.Xna.Framework;
 using Shared.Ui.BaseDialogs.ColourPickerButton;
