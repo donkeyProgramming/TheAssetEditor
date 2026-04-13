@@ -1,5 +1,5 @@
 ﻿using System.Windows;
-using GameWorld.Core.Components;
+using GameWorld.Core.Components.Grid;
 using GameWorld.Core.Components.Rendering;
 using Microsoft.Xna.Framework;
 using Shared.Ui.BaseDialogs.ColourPickerButton;
@@ -24,7 +24,7 @@ namespace GameWorld.Core.Utility.RenderSettingsDialog
                 UseBigSceneCulling = renderEngineComponent.LargeSceneCulling,
                 
                 ShowGrid = _gridComponent.ShowGrid,
-                GridColour = new ColourPickerViewModel(_gridComponent.GridColur),
+                GridColour = new ColourPickerViewModel(_gridComponent.GridColur, ColourChanged),
 
                 LightIntensity = sceneRenderParameterStore.LightIntensityMult,
                 LightColour = new ColourPickerViewModel(sceneRenderParameterStore.LightColour, ColourChanged),

@@ -19,7 +19,8 @@ namespace GameWorld.Core.Services
         BasicEffect,
         GeometryInstance,
         Glow,
-        BloomFilter
+        BloomFilter,
+        Grid
     }
 
     public class ResourceLibrary
@@ -59,6 +60,7 @@ namespace GameWorld.Core.Services
                 LoadEffect("Shaders\\Geometry\\BasicShader", ShaderTypes.BasicEffect);
                 LoadEffect("Shaders\\TexturePreview", ShaderTypes.TexturePreview);
                 LoadEffect("Shaders\\LineShader", ShaderTypes.Line);
+                LoadEffect("Shaders\\GridShader", ShaderTypes.Grid);
                 LoadEffect("Shaders\\InstancingShader", ShaderTypes.GeometryInstance);
 
                 _pbrDiffuse = _content.Load<TextureCube>("textures\\phazer\\DiffuseAmbientLightCubeMap");

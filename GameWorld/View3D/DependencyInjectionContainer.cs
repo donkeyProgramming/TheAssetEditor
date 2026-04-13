@@ -6,6 +6,7 @@ using GameWorld.Core.Commands.Object;
 using GameWorld.Core.Commands.Vertex;
 using GameWorld.Core.Components;
 using GameWorld.Core.Components.Gizmo;
+using GameWorld.Core.Components.Grid;
 using GameWorld.Core.Components.Input;
 using GameWorld.Core.Components.Navigation;
 using GameWorld.Core.Components.Rendering;

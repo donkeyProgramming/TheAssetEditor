@@ -1,6 +1,6 @@
 ﻿using System.Windows;
 using Editors.KitbasherEditor.Core.MenuBarViews;
-using GameWorld.Core.Components;
+using GameWorld.Core.Components.Grid;
 using GameWorld.Core.Components.Rendering;
 using GameWorld.Core.Utility.RenderSettingsDialog;
 using Shared.Ui.Common.MenuSystem;

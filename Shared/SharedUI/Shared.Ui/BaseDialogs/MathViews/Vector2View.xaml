@@ -23,7 +23,7 @@
         Width="{Binding ActualWidth, ElementName=b}" 
         Grid.Row="0" Grid.Column="0" HorizontalContentAlignment="Right"
         Text="{Binding X.TextValue, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
-        MaxLength="{Binding NumbersMaxLength, ElementName=self}">
+        MaxLength="{Binding NumbersMaxLength}">
             <b:Interaction.Behaviors>
                 <behaviors:TextBoxInputBehavior InputMode="DecimalInput"/>
             </b:Interaction.Behaviors>
@@ -34,7 +34,7 @@
         Grid.Row="0" Grid.Column="1" HorizontalContentAlignment="Right"
         Margin="3,0,0,0"
         Text="{Binding Y.TextValue, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" 
-        MaxLength="{Binding NumbersMaxLength, ElementName=self}" >
+        MaxLength="{Binding NumbersMaxLength}" >
             <b:Interaction.Behaviors>
                 <behaviors:TextBoxInputBehavior InputMode="DecimalInput"/>
             </b:Interaction.Behaviors>

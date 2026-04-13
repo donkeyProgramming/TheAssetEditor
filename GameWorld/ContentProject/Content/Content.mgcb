@@ -32,6 +32,12 @@
 /processorParam:DebugMode=Auto
 /build:Shaders/Geometry/BasicShader.fx
 
+#begin Shaders/GridShader.fx
+/importer:EffectImporter
+/processor:EffectProcessor
+/processorParam:DebugMode=Auto
+/build:Shaders/GridShader.fx
+
 #begin Shaders/InstancingShader.fx
 /importer:EffectImporter
 /processor:EffectProcessor
