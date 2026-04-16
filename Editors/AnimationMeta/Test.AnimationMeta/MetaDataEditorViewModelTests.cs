@@ -105,7 +105,7 @@ namespace Test.AnimationMeta
             Assert.That(initialCount, Is.GreaterThan(0));
 
             // Select last tag and delete
-            editor.SelectedTag = editor.Tags.Last();
+            editor.Tags.Last().IsSelected = true;
             editor.DeleteActionCommand.Execute(null);
 
             Assert.That(editor.Tags.Count, Is.EqualTo(initialCount - 1));
@@ -140,7 +140,7 @@ namespace Test.AnimationMeta
             Assert.That(editor.ParsedFile, Is.Not.Null);
 
             // Move second entry up
-            editor.SelectedTag = editor.Tags[4];
+            editor.Tags[4].IsSelected = true;
             editor.MoveUpActionCommand.Execute(null);
 
             editor.SaveActionCommand.Execute(null);
