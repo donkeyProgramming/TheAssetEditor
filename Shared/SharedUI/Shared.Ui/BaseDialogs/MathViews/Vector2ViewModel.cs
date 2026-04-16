@@ -8,11 +8,9 @@ namespace Shared.Ui.BaseDialogs.MathViews
     {
         private readonly Action<Vector2>? _valueChangedCallback;
 
-        [ObservableProperty] int _NumbersMaxLength = 20;
+        [ObservableProperty] int _numbersMaxLength = 20;
         [ObservableProperty] FloatViewModel _x;
         [ObservableProperty] FloatViewModel _y;
-
-        [ObservableProperty] int _numbersMaxLength = 15;
 
         public Vector2ViewModel(float x = 0, float y = 0, Action<Vector2>? valueChangedCallback = null)
         {
