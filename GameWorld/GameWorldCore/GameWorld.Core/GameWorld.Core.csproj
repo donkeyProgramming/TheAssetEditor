@@ -8,9 +8,9 @@
 	</PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\Shared\SharedUI\Shared.Ui\Shared.Ui.csproj" />
-    <ProjectReference Include="..\ContentProject\ContentProject.csproj" />
-    <ProjectReference Include="..\MeshDecimator\MeshDecimator.csproj" />
+    <ProjectReference Include="..\..\..\Shared\SharedUI\Shared.Ui\Shared.Ui.csproj" />
+    <ProjectReference Include="..\..\ContentProject\ContentProject.csproj" />
+    <ProjectReference Include="..\..\MeshDecimator\MeshDecimator.csproj" />
   </ItemGroup>
 
 </Project>

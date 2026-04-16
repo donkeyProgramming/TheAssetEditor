@@ -23,8 +23,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\GameWorld\View3D\GameWorld.Core.csproj" />
-    <ProjectReference Include="..\Shared\Test.TestingUtility.csproj" />
+    <ProjectReference Include="..\GameWorld.Core\GameWorld.Core.csproj" />
+    <ProjectReference Include="..\..\..\Testing\Shared\Test.TestingUtility.csproj" />
   </ItemGroup>
 
   <ItemGroup>

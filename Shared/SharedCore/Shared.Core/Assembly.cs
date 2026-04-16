@@ -2,4 +2,5 @@
 [assembly: InternalsVisibleTo("Test.Shared.Core")]
 [assembly: InternalsVisibleTo("Test.TestingUtility")]
 [assembly: InternalsVisibleTo("Test.GameWorld.Core")]
+[assembly: InternalsVisibleTo("GameWorld.CoreTest")]
 [assembly: InternalsVisibleTo("Shared.CoreTest")]
