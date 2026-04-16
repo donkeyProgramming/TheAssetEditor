@@ -104,6 +104,8 @@ namespace Editors.Twui.Editor.Rendering
 
         public void Dispose()
         {
+            _twuiPreviewBuilder.Dispose();
+            _twuiPreview = null;
             _whiteSquareTexture = _graphicsResourceCreator.DisposeTracked(_whiteSquareTexture);
             _spriteBatch = _graphicsResourceCreator.DisposeTracked(_spriteBatch);
         }

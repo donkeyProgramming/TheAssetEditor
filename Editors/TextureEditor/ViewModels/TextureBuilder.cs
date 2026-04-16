@@ -12,12 +12,13 @@ using Shared.Core.Services;
 
 namespace Editors.TextureEditor.ViewModels
 {
-    public class TextureBuilder
+    public class TextureBuilder : IDisposable
     {
         private readonly IScopedResourceLibrary _resourceLib;
         private readonly TextureToTextureRenderer _textureRenderer;
         private readonly IWpfGame _wpfGame;
         private readonly IGraphicsResourceCreator _graphicsResourceCreator;
+        private bool _isDisposed;
 
         public TextureBuilder(IScopedResourceLibrary resourceLibrary, IWpfGame wpfGame, IGraphicsResourceCreator graphicsResourceCreator)
         {
@@ -105,6 +106,15 @@ namespace Editors.TextureEditor.ViewModels
             bitmapImage.EndInit();
 
             return bitmapImage;
+        }
+
+        public void Dispose()
+        {
+            if (_isDisposed)
+                return;
+
+            _isDisposed = true;
+            _textureRenderer.Dispose();
         }
     }
 }

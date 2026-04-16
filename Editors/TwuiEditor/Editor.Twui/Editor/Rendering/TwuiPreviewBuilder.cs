@@ -11,7 +11,7 @@ using Shared.GameFormats.Twui.Data;
 
 namespace Editors.Twui.Editor.Rendering
 {
-    public class TwuiPreviewBuilder
+    public class TwuiPreviewBuilder : IDisposable
     {
         private readonly IWpfGame _wpfGame;
         private readonly IScopedResourceLibrary _resourceLibrary;
@@ -21,6 +21,7 @@ namespace Editors.Twui.Editor.Rendering
         private RenderTarget2D _renderTarget;
         private SpriteBatch _spriteBatch;
         private Texture2D _whiteSquareTexture;
+        private bool _isDisposed;
 
         public TwuiPreviewBuilder(IWpfGame wpfGame, IScopedResourceLibrary resourceLibrary, IGraphicsResourceCreator graphicsResourceCreator)
         {
@@ -134,5 +135,16 @@ namespace Editors.Twui.Editor.Rendering
         }
 
         record DebugData(Rectangle renderRect, Color color);
+
+        public void Dispose()
+        {
+            if (_isDisposed)
+                return;
+
+            _isDisposed = true;
+            _renderTarget = _graphicsResourceCreator.DisposeTracked(_renderTarget);
+            _whiteSquareTexture = _graphicsResourceCreator.DisposeTracked(_whiteSquareTexture);
+            _spriteBatch = _graphicsResourceCreator.DisposeTracked(_spriteBatch);
+        }
     }
 }
