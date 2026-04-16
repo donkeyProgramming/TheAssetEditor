@@ -49,9 +49,11 @@ namespace Shared.Core.PackFiles.Models
             return newFiles.Select(x => x.PackFile).ToList();
         }
 
-        public virtual PackFile DeleteFile(PackFile file)
+        public virtual PackFile? DeleteFile(PackFile file)
         {
             var key = FileList.FirstOrDefault(x => x.Value == file).Key;
+            if (key == null)
+                return null;
             FileList.Remove(key);
             return file;
         }
@@ -65,7 +67,8 @@ namespace Shared.Core.PackFiles.Models
                 if (directory == null)
                     continue;
 
-                if (directory.StartsWith(folder, StringComparison.InvariantCultureIgnoreCase))
+                if (directory.Equals(folder, StringComparison.InvariantCultureIgnoreCase)
+                    || directory.StartsWith(folder + Path.DirectorySeparatorChar, StringComparison.InvariantCultureIgnoreCase))
                     filesToDelete.Add(file.Key);
             }
 
@@ -91,7 +94,7 @@ namespace Shared.Core.PackFiles.Models
             var newFullPath = newFolderPath + "\\" + file.Name;
             var key = FileList.FirstOrDefault(x => x.Value == file).Key;
             FileList.Remove(key);
-            FileList[newFullPath] = file;
+            FileList[newFullPath.ToLower()] = file;
         }
 
         public virtual string RenameDirectory(string currentNodeName, string newName)
@@ -118,7 +121,7 @@ namespace Shared.Core.PackFiles.Models
                 if (oldNodePath.Length != 0 && path.Length > oldNodePath.Length)
                     newPath = newNodePath + path.Substring(oldNodePath.Length);
 
-                FileList[newPath] = file;
+                FileList[newPath.ToLower()] = file;
             }
 
             return newNodePath;
@@ -131,7 +134,8 @@ namespace Shared.Core.PackFiles.Models
 
             var dir = Path.GetDirectoryName(key);
             file.Name = newName;
-            FileList[dir + "\\" + file.Name] = file;
+            var newPath = string.IsNullOrEmpty(dir) ? file.Name : dir + "\\" + file.Name;
+            FileList[newPath.ToLower()] = file;
         }
 
         public virtual void SaveFileData(PackFile file, byte[] data)

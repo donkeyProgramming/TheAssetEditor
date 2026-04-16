@@ -44,7 +44,7 @@ namespace Shared.Core.PackFiles
             // Check if already added!
             foreach (var packFile in _packFileContainers)
             {
-                if (packFile.SystemFilePath == container.SystemFilePath)
+                if (packFile.SystemFilePath != null && packFile.SystemFilePath == container.SystemFilePath)
                 {
                     MessageBoxProvider.ShowDialogBox($"Pack file \"{packFile.SystemFilePath}\" is already loaded.", "Error");
                     return null;
@@ -187,6 +187,8 @@ namespace Shared.Core.PackFiles
         public void SaveFile(PackFile file, byte[] data)
         {
             var pf = GetEditablePack();
+            if (pf == null)
+                throw new Exception("No editable pack file is set");
             if (pf.IsCaPackFile)
                 throw new Exception("Can not save ca pack file");
 

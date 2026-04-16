@@ -153,6 +153,18 @@ namespace Shared.CoreTest.PackFiles.Models
             });
             return container;
         }
+
+        [Test]
+        public void DeleteFile_FileNotInContainer_ReturnsNull()
+        {
+            var container = CreateContainerWithFiles();
+            var orphanFile = new PackFile("orphan.txt", null);
+
+            var result = container.DeleteFile(orphanFile);
+
+            Assert.That(result, Is.Null);
+            Assert.That(container.FileList.Count, Is.EqualTo(4));
+        }
     }
 
     internal class PackFileContainer_DeleteFolder
@@ -185,6 +197,22 @@ namespace Shared.CoreTest.PackFiles.Models
             container.DeleteFolder("directory_0\\subfolder");
 
             Assert.That(container.FileList.Count, Is.EqualTo(4));
+        }
+
+        [Test]
+        public void DeleteFolder_SimilarPrefixFolder_DoesNotDeleteWrongFiles()
+        {
+            var container = new PackFileContainer("Test");
+            container.AddFiles(new List<NewPackFileEntry>
+            {
+                new("dir", new PackFile("file0.txt", null)),
+                new("directory", new PackFile("file1.txt", null)),
+            });
+
+            container.DeleteFolder("dir");
+
+            Assert.That(container.FileList.Count, Is.EqualTo(1));
+            Assert.That(container.FindFile("directory\\file1.txt"), Is.Not.Null);
         }
 
         static PackFileContainer CreateTestContainer()
@@ -317,8 +345,21 @@ namespace Shared.CoreTest.PackFiles.Models
             container.MoveFile(file, "NewDir");
 
             Assert.That(container.FileList.Count, Is.EqualTo(1));
-            Assert.That(container.FileList.ContainsKey("NewDir\\file0.txt"), Is.True);
+            Assert.That(container.FileList.ContainsKey("newdir\\file0.txt"), Is.True);
             Assert.That(container.FileList.ContainsKey("olddir\\file0.txt"), Is.False);
+        }
+
+        [Test]
+        public void MoveFile_NormalizesPathCasing()
+        {
+            var container = new PackFileContainer("Test");
+            var file = new PackFile("file0.txt", null);
+            container.AddFiles(new List<NewPackFileEntry> { new("OldDir", file) });
+
+            container.MoveFile(file, "NewDir");
+
+            var found = container.FindFile("NewDir\\file0.txt");
+            Assert.That(found, Is.Not.Null);
         }
 
     }
@@ -339,7 +380,7 @@ namespace Shared.CoreTest.PackFiles.Models
 
             Assert.That(newNodePath, Is.EqualTo("NewName"));
             Assert.That(container.FileList.Count, Is.EqualTo(2));
-            Assert.That(container.FileList.Keys.All(k => k.StartsWith("NewName")), Is.True);
+            Assert.That(container.FileList.Keys.All(k => k.StartsWith("newname", StringComparison.OrdinalIgnoreCase)), Is.True);
         }
 
         [Test]
@@ -355,8 +396,8 @@ namespace Shared.CoreTest.PackFiles.Models
             var newNodePath = container.RenameDirectory("parent\\oldchild", "NewChild");
 
             Assert.That(newNodePath, Is.EqualTo("parent\\NewChild"));
-            Assert.That(container.FileList.ContainsKey("parent\\NewChild\\file0.txt"), Is.True);
-            Assert.That(container.FileList.ContainsKey("parent\\NewChild\\sub\\file1.txt"), Is.True);
+            Assert.That(container.FileList.ContainsKey("parent\\newchild\\file0.txt"), Is.True);
+            Assert.That(container.FileList.ContainsKey("parent\\newchild\\sub\\file1.txt"), Is.True);
         }
 
         [Test]
@@ -371,6 +412,21 @@ namespace Shared.CoreTest.PackFiles.Models
             var result = container.RenameDirectory("parent\\child", "RenamedChild");
 
             Assert.That(result, Is.EqualTo("parent\\RenamedChild"));
+        }
+
+        [Test]
+        public void RenameDirectory_NormalizesPathCasing()
+        {
+            var container = new PackFileContainer("Test");
+            container.AddFiles(new List<NewPackFileEntry>
+            {
+                new("OldDir", new PackFile("file.txt", null)),
+            });
+
+            container.RenameDirectory("olddir", "NewDir");
+
+            var found = container.FindFile("NewDir\\file.txt");
+            Assert.That(found, Is.Not.Null);
         }
     }
 
@@ -388,6 +444,32 @@ namespace Shared.CoreTest.PackFiles.Models
             Assert.That(file.Name, Is.EqualTo("new.txt"));
             Assert.That(container.FileList.Count, Is.EqualTo(1));
             Assert.That(container.FileList.ContainsKey("dir\\new.txt"), Is.True);
+        }
+
+        [Test]
+        public void RenameFile_RootFile_ProducesValidPath()
+        {
+            var container = new PackFileContainer("Test");
+            var file = new PackFile("old.txt", null);
+            container.AddFiles(new List<NewPackFileEntry> { new("", file) });
+
+            container.RenameFile(file, "new.txt");
+
+            Assert.That(container.FileList.ContainsKey("new.txt"), Is.True);
+            Assert.That(container.FileList.Keys.Any(k => k.StartsWith("\\")), Is.False);
+        }
+
+        [Test]
+        public void RenameFile_NormalizesPathCasing()
+        {
+            var container = new PackFileContainer("Test");
+            var file = new PackFile("old.txt", null);
+            container.AddFiles(new List<NewPackFileEntry> { new("Dir", file) });
+
+            container.RenameFile(file, "New.txt");
+
+            var found = container.FindFile("Dir\\New.txt");
+            Assert.That(found, Is.Not.Null);
         }
 
     }
