@@ -31,7 +31,7 @@ namespace GameWorld.Core.WpfWindow
         /// <summary>
         /// Creates a new instance of a game host panel.
         /// </summary>
-        public WpfGame(ResourceLibrary resourceLibrary, IStandardDialogs exceptionService, IEventHub eventHub, string contentDir = "Content")
+        public WpfGame(ResourceLibrary resourceLibrary, IStandardDialogs exceptionService, IEventHub eventHub, IGraphicsResourceCreator graphicsResourceCreator, string contentDir = "Content") : base(graphicsResourceCreator)
         {
             if (string.IsNullOrEmpty(contentDir))
                 throw new ArgumentNullException(nameof(contentDir));

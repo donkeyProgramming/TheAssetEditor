@@ -17,14 +17,16 @@ namespace Editors.TextureEditor.ViewModels
         private readonly IScopedResourceLibrary _resourceLib;
         private readonly TextureToTextureRenderer _textureRenderer;
         private readonly IWpfGame _wpfGame;
+        private readonly IGraphicsResourceCreator _graphicsResourceCreator;
 
-        public TextureBuilder(IScopedResourceLibrary resourceLibrary, IWpfGame wpfGame)
+        public TextureBuilder(IScopedResourceLibrary resourceLibrary, IWpfGame wpfGame, IGraphicsResourceCreator graphicsResourceCreator)
         {
             _resourceLib = resourceLibrary;
             _wpfGame = wpfGame;
+            _graphicsResourceCreator = graphicsResourceCreator;
             _wpfGame.ForceEnsureCreated();
 
-            _textureRenderer = new TextureToTextureRenderer(_wpfGame.GraphicsDevice, new SpriteBatch(_wpfGame.GraphicsDevice), _resourceLib);
+            _textureRenderer = new TextureToTextureRenderer(_wpfGame.GraphicsDevice, _graphicsResourceCreator.CreateSpriteBatch(), _resourceLib, _graphicsResourceCreator);
         }
 
         public void Build(TexturePreviewViewModel viewModel, string imagePath)

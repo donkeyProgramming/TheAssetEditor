@@ -1,7 +1,6 @@
 ﻿using System.Collections;
 using System.Reflection;
 using System.Text;
-using System.Windows.Forms.VisualStyles;
 using Microsoft.Extensions.DependencyInjection;
 using Shared.Core.ErrorHandling;
 using Shared.Core.ToolCreation;
@@ -45,6 +44,9 @@ namespace Shared.Core.DependencyInjection
         public IServiceScope CreateScope(IEditorInterface owner)
         { 
             var scope = _rootProvider.CreateScope();
+            foreach (var ownerAware in scope.ServiceProvider.GetServices<IScopeOwnerAware>())
+                ownerAware.SetScopeOwner(owner.GetType());
+
             Add(owner, scope);
             return scope;
         }
@@ -52,6 +54,9 @@ namespace Shared.Core.DependencyInjection
         public IEditorInterface CreateScope(Type editorType)
         {
             var scope = _rootProvider.CreateScope();
+            foreach (var ownerAware in scope.ServiceProvider.GetServices<IScopeOwnerAware>())
+                ownerAware.SetScopeOwner(editorType);
+
             var instance = scope.ServiceProvider.GetRequiredService(editorType) as IEditorInterface;
             if (instance == null)
                 throw new Exception($"Type '{editorType}' is not a IEditorViewModel");

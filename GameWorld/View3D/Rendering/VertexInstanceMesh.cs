@@ -49,6 +49,7 @@ namespace GameWorld.Core.Rendering
 
     public class VertexInstanceMesh : IDisposable
     {
+        private readonly IGraphicsResourceCreator _graphicsResourceCreator;
         Effect _effect;
         VertexDeclaration _instanceVertexDeclaration;
 
@@ -65,8 +66,9 @@ namespace GameWorld.Core.Rendering
         Vector3 _selectedColour = new(1, 0, 0);
         Vector3 _deselectedColour = new (1, 1, 1);
 
-        public VertexInstanceMesh(IDeviceResolver deviceResolverComponent, IScopedResourceLibrary resourceLibrary)
+        public VertexInstanceMesh(IDeviceResolver deviceResolverComponent, IScopedResourceLibrary resourceLibrary, IGraphicsResourceCreator graphicsResourceCreator)
         {
+            _graphicsResourceCreator = graphicsResourceCreator;
             Initialize(deviceResolverComponent.Device, resourceLibrary);
         }
 
@@ -76,7 +78,7 @@ namespace GameWorld.Core.Rendering
 
             _instanceVertexDeclaration = InstanceDataOrientation.VertexDeclaration;
             GenerateGeometry(device);
-            _instanceBuffer = new DynamicVertexBuffer(device, _instanceVertexDeclaration, _maxInstanceCount, BufferUsage.WriteOnly);
+            _instanceBuffer = _graphicsResourceCreator.CreateDynamicVertexBuffer(_instanceVertexDeclaration, _maxInstanceCount, BufferUsage.WriteOnly);
             _instanceTransform = new VertexMeshInstanceInfo[_maxInstanceCount];
             GenerateInstanceInformation(_maxInstanceCount);
 
@@ -118,7 +120,7 @@ namespace GameWorld.Core.Rendering
             vertices[22].Position = new Vector3(1, -1, -1);
             vertices[23].Position = new Vector3(-1, -1, -1);
 
-            _geometryBuffer = new VertexBuffer(device, VertexPosition.VertexDeclaration, 24, BufferUsage.WriteOnly);
+            _geometryBuffer = _graphicsResourceCreator.CreateVertexBuffer(VertexPosition.VertexDeclaration, 24, BufferUsage.WriteOnly);
             _geometryBuffer.SetData(vertices);
 
             var indices = new int[36];
@@ -140,7 +142,7 @@ namespace GameWorld.Core.Rendering
             indices[30] = 20; indices[31] = 21; indices[32] = 22;
             indices[33] = 21; indices[34] = 23; indices[35] = 22;
 
-            _indexBuffer = new IndexBuffer(device, typeof(int), 36, BufferUsage.WriteOnly);
+            _indexBuffer = _graphicsResourceCreator.CreateIndexBuffer(typeof(int), 36, BufferUsage.WriteOnly);
             _indexBuffer.SetData(indices);
         }
 
@@ -198,8 +200,10 @@ namespace GameWorld.Core.Rendering
 
         public void Dispose()
         {
-            _instanceVertexDeclaration.Dispose();
-            _instanceBuffer.Dispose();
+            _instanceVertexDeclaration = null;
+            _instanceBuffer = _graphicsResourceCreator.DisposeTracked(_instanceBuffer);
+            _geometryBuffer = _graphicsResourceCreator.DisposeTracked(_geometryBuffer);
+            _indexBuffer = _graphicsResourceCreator.DisposeTracked(_indexBuffer);
         }
     }
 }

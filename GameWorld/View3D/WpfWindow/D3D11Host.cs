@@ -1,4 +1,5 @@
 ﻿using GameWorld.Core.WpfWindow.Internals;
+using GameWorld.Core.Services;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
@@ -49,12 +50,14 @@ namespace GameWorld.Core.WpfWindow
         private double _dpiScalingFactor = 1;
         private static bool _useASingleSharedGraphicsDevice = true;
         private List<IDisposable> _toBeDisposedNextFrame = new List<IDisposable>();
+        private readonly IGraphicsResourceCreator _graphicsResourceCreator;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="D3D11Host"/> class.
         /// </summary>
-        protected D3D11Host()
+        protected D3D11Host(IGraphicsResourceCreator graphicsResourceCreator)
         {
+            _graphicsResourceCreator = graphicsResourceCreator;
             // defaulting to fill as that's what's needed in most cases
             Stretch = Stretch.Fill;
 
@@ -212,8 +215,7 @@ namespace GameWorld.Core.WpfWindow
             Deactivated = null;
             if (_spriteBatch != null)
             {
-                _spriteBatch.Dispose();
-                _spriteBatch = null;
+                _spriteBatch = _graphicsResourceCreator.DisposeTracked(_spriteBatch);
             }
             Dispose(true);
         }
@@ -369,7 +371,7 @@ namespace GameWorld.Core.WpfWindow
             var height = pp.BackBufferHeight;
             var ms = pp.MultiSampleCount;
 
-            _sharedRenderTarget = new RenderTarget2D(GraphicsDevice, width, height, false, SurfaceFormat.Bgr32,
+                _sharedRenderTarget = _graphicsResourceCreator.CreateRenderTarget2D(width, height, false, SurfaceFormat.Bgr32,
                     DepthFormat.Depth24Stencil8, 0, RenderTargetUsage.DiscardContents, true);
             _sharedRenderTarget.Name = "sharedRenderTarget";
             _d3D11Image.SetBackBuffer(_sharedRenderTarget);
@@ -377,7 +379,7 @@ namespace GameWorld.Core.WpfWindow
             // internal rendertarget; all user draws render into this before we draw it to the actual back buffer
             // that way flickering of screen will be prevented when under heavy system load (such as when using rendertargets on intel graphics: https://gitlab.com/MarcStan/MonoGame.Framework.WpfInterop/issues/12)
             // -> always preserve its contents so worst case user gets to see the old screen again
-            _cachedRenderTarget = new RenderTarget2D(GraphicsDevice, width, height, false, SurfaceFormat.Bgr32,
+            _cachedRenderTarget = _graphicsResourceCreator.CreateRenderTarget2D(width, height, false, SurfaceFormat.Bgr32,
                 DepthFormat.Depth24Stencil8, ms, RenderTargetUsage.PreserveContents, false);
             _cachedRenderTarget.Name = "cachedRenderTarget";
         }
@@ -388,7 +390,7 @@ namespace GameWorld.Core.WpfWindow
             _d3D11Image.IsFrontBufferAvailableChanged += OnIsFrontBufferAvailableChanged;
             CreateBackBuffer();
             Source = _d3D11Image;
-            _spriteBatch = new SpriteBatch(GraphicsDevice);
+            _spriteBatch = _graphicsResourceCreator.CreateSpriteBatch();
         }
 
         private void OnIsFrontBufferAvailableChanged(object sender, DependencyPropertyChangedEventArgs eventArgs)
@@ -594,7 +596,7 @@ namespace GameWorld.Core.WpfWindow
         {
             for (var i = 0; i < _toBeDisposedNextFrame.Count; i++)
             {
-                _toBeDisposedNextFrame[i]?.Dispose();
+                _graphicsResourceCreator.DisposeTracked(_toBeDisposedNextFrame[i]);
                 _toBeDisposedNextFrame.RemoveAt(i--);
             }
         }
@@ -632,7 +634,7 @@ namespace GameWorld.Core.WpfWindow
             }
             if (_sharedRenderTarget != null)
             {
-                _sharedRenderTarget.Dispose();
+                _graphicsResourceCreator.DisposeTracked(_sharedRenderTarget);
                 _sharedRenderTarget = null;
             }
             if (_cachedRenderTarget != null)
@@ -642,10 +644,11 @@ namespace GameWorld.Core.WpfWindow
                     // TODO: this is a memoryleak, the code is intentional because Dispose actually crashes Monogame when using a shared graphicsdevice and disposing MSAA enabled rendertargets
                     // at the very latest this will happen on window close, for SPA this is fine as the process will shut down
                     // but if your editor has multiple windows (or tabs) that can be created/closed multiple times this will slowly increase memory usage..
+                    _graphicsResourceCreator.RemoveTracking(_cachedRenderTarget);
                 }
                 else
                 {
-                    _cachedRenderTarget.Dispose();
+                    _graphicsResourceCreator.DisposeTracked(_cachedRenderTarget);
                 }
                 _cachedRenderTarget = null;
             }

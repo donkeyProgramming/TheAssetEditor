@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using GameWorld.Core.Components.Rendering;
+using GameWorld.Core.Services;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -9,6 +10,7 @@ namespace GameWorld.Core.Rendering.Materials.Shaders
     public class BasicShader : IShader, IDisposable
     {
         private readonly BasicEffect _effect;
+        private readonly IGraphicsResourceCreator _graphicsResourceCreator;
 
         bool _enableDefaultLighting = false;
 
@@ -16,20 +18,22 @@ namespace GameWorld.Core.Rendering.Materials.Shaders
         public Vector3 SpecularColour { get; set; }
         public void EnableDefaultLighting() { _enableDefaultLighting = true; }
 
-        public BasicShader(GraphicsDevice device)
+        public BasicShader(GraphicsDevice device, IGraphicsResourceCreator graphicsResourceCreator)
         {
-            _effect = new BasicEffect(device);
+            _graphicsResourceCreator = graphicsResourceCreator;
+            _effect = graphicsResourceCreator.CreateBasicEffect();
         }
 
-        protected BasicShader(BasicEffect effect)
+        protected BasicShader(BasicEffect effect, IGraphicsResourceCreator graphicsResourceCreator)
         {
-            _effect = effect;
+            _graphicsResourceCreator = graphicsResourceCreator;
+            _effect = graphicsResourceCreator.Track(effect);
         }
 
         public BasicShader Clone()
         {
             var clonedEffect = _effect.Clone() as BasicEffect;
-            return new BasicShader(clonedEffect!)
+            return new BasicShader(clonedEffect!, _graphicsResourceCreator)
             {
                 DiffuseColour = DiffuseColour,
                 SpecularColour = SpecularColour,
@@ -54,7 +58,7 @@ namespace GameWorld.Core.Rendering.Materials.Shaders
 
         public void Dispose()
         {
-            _effect.Dispose();
+            _graphicsResourceCreator.DisposeTracked(_effect);
         }
 
         public void SetTechnique(RenderingTechnique technique)

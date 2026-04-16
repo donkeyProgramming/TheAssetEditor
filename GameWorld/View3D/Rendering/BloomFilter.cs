@@ -64,6 +64,7 @@ namespace GameWorld.Core.Rendering
         //Objects
         private GraphicsDevice _graphicsDevice;
         private QuadRenderer _quadRenderer;
+        private IGraphicsResourceCreator _graphicsResourceCreator;
 
         //Shader + variables
         private Effect _bloomEffect;
@@ -226,9 +227,10 @@ namespace GameWorld.Core.Rendering
         /// <param name="height">initial value for creating the rendertargets</param>
         /// <param name="renderTargetFormat">The intended format for the rendertargets. For normal, non-hdr, applications color or rgba1010102 are fine NOTE: For OpenGL, SurfaceFormat.Color is recommended for non-HDR applications.</param>
         /// <param name="quadRenderer">if you already have quadRenderer you may reuse it here</param>
-        public void Load(GraphicsDevice graphicsDevice, ResourceLibrary content, int width, int height, SurfaceFormat renderTargetFormat = SurfaceFormat.Color, QuadRenderer quadRenderer = null)
+        public void Load(GraphicsDevice graphicsDevice, ResourceLibrary content, IGraphicsResourceCreator graphicsResourceCreator, int width, int height, SurfaceFormat renderTargetFormat = SurfaceFormat.Color, QuadRenderer quadRenderer = null)
         {
             _graphicsDevice = graphicsDevice;
+            _graphicsResourceCreator = graphicsResourceCreator;
             UpdateResolution(width, height);
 
             //if quadRenderer == null -> new, otherwise not
@@ -592,22 +594,22 @@ namespace GameWorld.Core.Rendering
                 Dispose();
             }
 
-            _bloomRenderTarget2DMip0 = new RenderTarget2D(_graphicsDevice,
+            _bloomRenderTarget2DMip0 = _graphicsResourceCreator.CreateRenderTarget2D(
                 Math.Max(1,width),
                 Math.Max(1, height), false, _renderTargetFormat, DepthFormat.None, 0, RenderTargetUsage.DiscardContents);
-            _bloomRenderTarget2DMip1 = new RenderTarget2D(_graphicsDevice,
+            _bloomRenderTarget2DMip1 = _graphicsResourceCreator.CreateRenderTarget2D(
                 Math.Max(1,width / 2),
                 Math.Max(1, height / 2), false, _renderTargetFormat, DepthFormat.None, 0, RenderTargetUsage.PreserveContents);
-            _bloomRenderTarget2DMip2 = new RenderTarget2D(_graphicsDevice,
+            _bloomRenderTarget2DMip2 = _graphicsResourceCreator.CreateRenderTarget2D(
                 Math.Max(1,width / 4),
                 Math.Max(1, height / 4), false, _renderTargetFormat, DepthFormat.None, 0, RenderTargetUsage.PreserveContents);
-            _bloomRenderTarget2DMip3 = new RenderTarget2D(_graphicsDevice,
+            _bloomRenderTarget2DMip3 = _graphicsResourceCreator.CreateRenderTarget2D(
                 Math.Max(1,width / 8),
                 Math.Max(1, height / 8), false, _renderTargetFormat, DepthFormat.None, 0, RenderTargetUsage.PreserveContents);
-            _bloomRenderTarget2DMip4 = new RenderTarget2D(_graphicsDevice,
+            _bloomRenderTarget2DMip4 = _graphicsResourceCreator.CreateRenderTarget2D(
                 Math.Max(1,width / 16),
                 Math.Max(1, height / 16), false, _renderTargetFormat, DepthFormat.None, 0, RenderTargetUsage.PreserveContents);
-            _bloomRenderTarget2DMip5 = new RenderTarget2D(_graphicsDevice,
+            _bloomRenderTarget2DMip5 = _graphicsResourceCreator.CreateRenderTarget2D(
                 Math.Max(1, width / 32),
                 Math.Max(1, height / 32), false, _renderTargetFormat, DepthFormat.None, 0, RenderTargetUsage.PreserveContents);
         }
@@ -617,12 +619,12 @@ namespace GameWorld.Core.Rendering
         /// </summary>
         public void Dispose()
         {
-            _bloomRenderTarget2DMip0.Dispose();
-            _bloomRenderTarget2DMip1.Dispose();
-            _bloomRenderTarget2DMip2.Dispose();
-            _bloomRenderTarget2DMip3.Dispose();
-            _bloomRenderTarget2DMip4.Dispose();
-            _bloomRenderTarget2DMip5.Dispose();
+            _bloomRenderTarget2DMip0 = _graphicsResourceCreator?.DisposeTracked(_bloomRenderTarget2DMip0);
+            _bloomRenderTarget2DMip1 = _graphicsResourceCreator?.DisposeTracked(_bloomRenderTarget2DMip1);
+            _bloomRenderTarget2DMip2 = _graphicsResourceCreator?.DisposeTracked(_bloomRenderTarget2DMip2);
+            _bloomRenderTarget2DMip3 = _graphicsResourceCreator?.DisposeTracked(_bloomRenderTarget2DMip3);
+            _bloomRenderTarget2DMip4 = _graphicsResourceCreator?.DisposeTracked(_bloomRenderTarget2DMip4);
+            _bloomRenderTarget2DMip5 = _graphicsResourceCreator?.DisposeTracked(_bloomRenderTarget2DMip5);
         }
     }
 }

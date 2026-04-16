@@ -15,22 +15,24 @@ namespace Editors.Twui.Editor.Rendering
     {
         private readonly IWpfGame _wpfGame;
         private readonly IScopedResourceLibrary _resourceLibrary;
+        private readonly IGraphicsResourceCreator _graphicsResourceCreator;
         private readonly float _invMaxLayerDepth = 1f / 999999f;
 
         private RenderTarget2D _renderTarget;
         private SpriteBatch _spriteBatch;
         private Texture2D _whiteSquareTexture;
 
-        public TwuiPreviewBuilder(IWpfGame wpfGame, IScopedResourceLibrary resourceLibrary)
+        public TwuiPreviewBuilder(IWpfGame wpfGame, IScopedResourceLibrary resourceLibrary, IGraphicsResourceCreator graphicsResourceCreator)
         {
             _wpfGame = wpfGame;
             _resourceLibrary = resourceLibrary;
+            _graphicsResourceCreator = graphicsResourceCreator;
         }
 
         public void Initialize()
         {
-            _spriteBatch = new SpriteBatch(_wpfGame.GraphicsDevice);
-            _whiteSquareTexture = new Texture2D(_wpfGame.GraphicsDevice, 1, 1);
+            _spriteBatch = _graphicsResourceCreator.CreateSpriteBatch();
+            _whiteSquareTexture = _graphicsResourceCreator.CreateTexture2D(1, 1);
             _whiteSquareTexture.SetData([Color.White]);
         }
 
@@ -42,8 +44,8 @@ namespace Editors.Twui.Editor.Rendering
 
             if (reCreateRenderTarget)
             {
-                _renderTarget?.Dispose();
-                _renderTarget = new RenderTarget2D(_wpfGame.GraphicsDevice, width, height, false, SurfaceFormat.Color, DepthFormat.Depth24);
+                _renderTarget = _graphicsResourceCreator.DisposeTracked(_renderTarget);
+                _renderTarget = _graphicsResourceCreator.CreateRenderTarget2D(width, height, false, SurfaceFormat.Color, DepthFormat.Depth24);
             }
 
             return _renderTarget!;
@@ -59,7 +61,7 @@ namespace Editors.Twui.Editor.Rendering
             var device = _wpfGame.GraphicsDevice;
             device.SetRenderTarget(renderTarget);
             device.Clear(Color.Transparent);
-            device.DepthStencilState = new DepthStencilState() { DepthBufferEnable = true };
+            device.DepthStencilState = DepthStencilState.Default;
 
             //_spriteBatch.Begin(SpriteSortMode.FrontToBack, BlendState.AlphaBlend);//, SamplerState.LinearClamp, DepthStencilState.Default, RasterizerState.CullNone);
             _spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend);

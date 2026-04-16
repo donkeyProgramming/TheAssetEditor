@@ -31,6 +31,7 @@ namespace GameWorld.Core.Components.Rendering
         private readonly ApplicationSettingsService _applicationSettingsService;
         private readonly SceneRenderParametersStore _sceneLightParameters;
         private readonly IEventHub _eventHub;
+        private readonly IGraphicsResourceCreator _graphicsResourceCreator;
 
         bool _cullingEnabled = false;
         bool _bigSceneDepthBiasMode = false;
@@ -47,7 +48,7 @@ namespace GameWorld.Core.Components.Rendering
         public SpriteBatch CommonSpriteBatch { get; private set; }
         public SpriteFont DefaultFont { get; private set; }
 
-        public RenderEngineComponent(IWpfGame wpfGame, ResourceLibrary resourceLibrary, ArcBallCamera camera, IDeviceResolver deviceResolverComponent, ApplicationSettingsService applicationSettingsService, SceneRenderParametersStore sceneLightParametersStore, IEventHub eventHub)
+        public RenderEngineComponent(IWpfGame wpfGame, ResourceLibrary resourceLibrary, ArcBallCamera camera, IDeviceResolver deviceResolverComponent, ApplicationSettingsService applicationSettingsService, SceneRenderParametersStore sceneLightParametersStore, IEventHub eventHub, IGraphicsResourceCreator graphicsResourceCreator)
         {
             UpdateOrder = (int)ComponentUpdateOrderEnum.RenderEngine;
             DrawOrder = (int)ComponentDrawOrderEnum.RenderEngine;
@@ -60,6 +61,7 @@ namespace GameWorld.Core.Components.Rendering
             _applicationSettingsService = applicationSettingsService;
             _sceneLightParameters = sceneLightParametersStore;
             _eventHub = eventHub;
+            _graphicsResourceCreator = graphicsResourceCreator;
 
             foreach (RenderBuckedId value in Enum.GetValues(typeof(RenderBuckedId)))
                 _renderItems.Add(value, new List<IRenderItem>(100));
@@ -90,13 +92,13 @@ namespace GameWorld.Core.Components.Rendering
             var device = _deviceResolverComponent.Device;
 
             _bloomFilter = new BloomFilter();
-            _bloomFilter.Load(device, _resourceLibrary, device.Viewport.Width, device.Viewport.Height);
+            _bloomFilter.Load(device, _resourceLibrary, _graphicsResourceCreator, device.Viewport.Width, device.Viewport.Height);
             _bloomFilter.BloomPreset = BloomFilter.BloomPresets.SuperWide;
 
-            _whiteTexture = new Texture2D(_deviceResolverComponent.Device, 1, 1);
+            _whiteTexture = _graphicsResourceCreator.CreateTexture2D(1, 1);
             _whiteTexture.SetData(new[] { Color.White });
 
-            CommonSpriteBatch = new SpriteBatch(device);
+            CommonSpriteBatch = _graphicsResourceCreator.CreateSpriteBatch();
             DefaultFont = _wpfGame.Content.Load<SpriteFont>("Fonts//DefaultFont");
         }
 
@@ -107,7 +109,7 @@ namespace GameWorld.Core.Components.Rendering
 
             // Set renderState to something we dont use, so we can rebuild the ones we care about
             _deviceResolverComponent.Device.RasterizerState = RasterizerState.CullNone;
-            RasterStateHelper.Rebuild(_rasterStates, _cullingEnabled, _bigSceneDepthBiasMode);
+            RasterStateHelper.Rebuild(_rasterStates, _cullingEnabled, _bigSceneDepthBiasMode, _graphicsResourceCreator);
         }
 
         public bool BackfaceCulling { get => _cullingEnabled; set => RebuildRasterStates(value, _bigSceneDepthBiasMode); }
@@ -151,9 +153,9 @@ namespace GameWorld.Core.Components.Rendering
             var commonShaderParameters = CommonShaderParameterBuilder.Build(_camera, _sceneLightParameters);
             var backgroundColour = ApplicationSettingsHelper.GetEnumAsColour(_applicationSettingsService.CurrentSettings.RenderEngineBackgroundColour);
 
-            _normalRenderTarget = RenderTargetHelper.GetRenderTarget(device, _normalRenderTarget, imageUpScale);
-            _emissiveRenderTarget = RenderTargetHelper.GetRenderTarget(device, _emissiveRenderTarget, imageUpScale);
-            _screenRenderTarget = RenderTargetHelper.GetRenderTarget(device, _screenRenderTarget, imageUpScale);
+            _normalRenderTarget = RenderTargetHelper.GetRenderTarget(device, _normalRenderTarget, imageUpScale, _graphicsResourceCreator);
+            _emissiveRenderTarget = RenderTargetHelper.GetRenderTarget(device, _emissiveRenderTarget, imageUpScale, _graphicsResourceCreator);
+            _screenRenderTarget = RenderTargetHelper.GetRenderTarget(device, _screenRenderTarget, imageUpScale, _graphicsResourceCreator);
 
             // Configure render targets
             var backBufferRenderTarget = device.GetRenderTargets()[0].RenderTarget as RenderTarget2D;
@@ -278,20 +280,19 @@ namespace GameWorld.Core.Components.Rendering
         {
             _eventHub.UnRegister(this);
 
-            CommonSpriteBatch?.Dispose();
-            CommonSpriteBatch = null;
+            CommonSpriteBatch = _graphicsResourceCreator.DisposeTracked(CommonSpriteBatch);
 
             _bloomFilter.Dispose();
-            _normalRenderTarget.Dispose();
-            _emissiveRenderTarget.Dispose();
-            _screenRenderTarget.Dispose();
-            _whiteTexture.Dispose();
+            _normalRenderTarget = _graphicsResourceCreator.DisposeTracked(_normalRenderTarget);
+            _emissiveRenderTarget = _graphicsResourceCreator.DisposeTracked(_emissiveRenderTarget);
+            _screenRenderTarget = _graphicsResourceCreator.DisposeTracked(_screenRenderTarget);
+            _whiteTexture = _graphicsResourceCreator.DisposeTracked(_whiteTexture);
 
             _renderLines.Clear();
             _renderItems.Clear();
 
             foreach (var item in _rasterStates.Values)
-                item.Dispose();
+                _graphicsResourceCreator.DisposeTracked(item);
             _rasterStates.Clear();
         }
     }

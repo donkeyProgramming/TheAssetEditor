@@ -1,4 +1,5 @@
 ﻿using GameWorld.Core.Components;
+using GameWorld.Core.Services;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Shared.Core.Events;
@@ -12,15 +13,17 @@ namespace Editors.Twui.Editor.Rendering
     {
         private readonly IWpfGame _wpfGame;
         private readonly TwuiPreviewBuilder _twuiPreviewBuilder;
+        private readonly IGraphicsResourceCreator _graphicsResourceCreator;
 
         Texture2D _twuiPreview;
         SpriteBatch _spriteBatch;
         Texture2D _whiteSquareTexture;
 
-        public TwuiRenderComponent(IWpfGame wpfGame, TwuiPreviewBuilder twuiPreviewBuilder, IEventHub eventHub)
+        public TwuiRenderComponent(IWpfGame wpfGame, TwuiPreviewBuilder twuiPreviewBuilder, IEventHub eventHub, IGraphicsResourceCreator graphicsResourceCreator)
         {
             _wpfGame = wpfGame;
             _twuiPreviewBuilder = twuiPreviewBuilder;
+            _graphicsResourceCreator = graphicsResourceCreator;
         }
 
         TwuiContext? _temp_twuiFile;
@@ -32,8 +35,8 @@ namespace Editors.Twui.Editor.Rendering
 
         public override void Initialize()
         {
-            _spriteBatch = new SpriteBatch(_wpfGame.GraphicsDevice);
-            _whiteSquareTexture = new Texture2D(_wpfGame.GraphicsDevice, 1, 1);
+            _spriteBatch = _graphicsResourceCreator.CreateSpriteBatch();
+            _whiteSquareTexture = _graphicsResourceCreator.CreateTexture2D(1, 1);
             _whiteSquareTexture.SetData([Color.White]);
 
             _twuiPreviewBuilder.Initialize();
@@ -101,8 +104,8 @@ namespace Editors.Twui.Editor.Rendering
 
         public void Dispose()
         {
-            _whiteSquareTexture?.Dispose();
-            _spriteBatch?.Dispose();
+            _whiteSquareTexture = _graphicsResourceCreator.DisposeTracked(_whiteSquareTexture);
+            _spriteBatch = _graphicsResourceCreator.DisposeTracked(_spriteBatch);
         }
 
 

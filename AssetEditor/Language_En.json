@@ -133,6 +133,8 @@
   "MenuBar.Reports.TouchedFiles.StopRecorder": "Stop Recorder",
   "MenuBar.Reports.DebugClearConsole": "Debug - Clear Console",
   "MenuBar.Reports.DebugPrintScopes": "Debug - Print Scopes",
+  "MenuBar.Debug": "Debug",
+  "MenuBar.Debug.PrintTrackedGraphicsResources": "Print Tracked Graphics Resources",
   "MenuBar.Help": "Help",
   "MenuBar.Help.AssetEditorHelp": "AssetEditor Help",
   "MenuBar.Help.ModdingWiki": "Modding Wiki",

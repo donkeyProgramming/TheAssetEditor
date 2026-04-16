@@ -1,4 +1,5 @@
 ﻿using GameWorld.Core.Utility;
+using GameWorld.Core.Services;
 using Microsoft.Xna.Framework.Graphics;
 
 namespace GameWorld.Core.Rendering.Geometry
@@ -18,55 +19,47 @@ namespace GameWorld.Core.Rendering.Geometry
     public class GraphicsCardGeometry : IGraphicsCardGeometry
     {
         private readonly GraphicsDevice Device;
+        private readonly IGraphicsResourceCreator _graphicsResourceCreator;
         public VertexBuffer VertexBuffer { get; private set; }
         public IndexBuffer IndexBuffer { get; private set; }
 
-        public GraphicsCardGeometry(GraphicsDevice device)
+        public GraphicsCardGeometry(GraphicsDevice device, IGraphicsResourceCreator graphicsResourceCreator)
         {
             Device = device;
+            _graphicsResourceCreator = graphicsResourceCreator;
         }
 
         public void RebuildIndexBuffer(ushort[] indexList)
         {
-            if (IndexBuffer != null)
-            {
-                IndexBuffer.Dispose();
-                IndexBuffer = null;
-            }
+            IndexBuffer = _graphicsResourceCreator.DisposeTracked(IndexBuffer);
 
             if (indexList.Length != 0)
             {
-                IndexBuffer = new IndexBuffer(Device, typeof(ushort), indexList.Length, BufferUsage.None);
+                IndexBuffer = _graphicsResourceCreator.CreateIndexBuffer(typeof(ushort), indexList.Length, BufferUsage.None);
                 IndexBuffer.SetData(indexList);
             }
         }
 
         public virtual void RebuildVertexBuffer(VertexPositionNormalTextureCustom[] vertArray, VertexDeclaration vertexDeclaration)
         {
-            if (VertexBuffer != null)
-            {
-                VertexBuffer.Dispose();
-                VertexBuffer = null;
-            }
+            VertexBuffer = _graphicsResourceCreator.DisposeTracked(VertexBuffer);
 
             if (vertArray.Length != 0)
             {
-                VertexBuffer = new VertexBuffer(Device, vertexDeclaration, vertArray.Length, BufferUsage.None);
+                VertexBuffer = _graphicsResourceCreator.CreateVertexBuffer(vertexDeclaration, vertArray.Length, BufferUsage.None);
                 VertexBuffer.SetData(vertArray);
             }
         }
 
         public IGraphicsCardGeometry Clone()
         {
-            return new GraphicsCardGeometry(Device);
+            return new GraphicsCardGeometry(Device, _graphicsResourceCreator);
         }
 
         public void Dispose()
         {
-            if (IndexBuffer != null)
-                IndexBuffer.Dispose();
-            if (VertexBuffer != null)
-                VertexBuffer.Dispose();
+            IndexBuffer = _graphicsResourceCreator.DisposeTracked(IndexBuffer);
+            VertexBuffer = _graphicsResourceCreator.DisposeTracked(VertexBuffer);
         }
     }
 
@@ -77,15 +70,17 @@ namespace GameWorld.Core.Rendering.Geometry
     public class GeometryGraphicsContextFactory : IGeometryGraphicsContextFactory
     {
         private readonly IDeviceResolver _deviceResolverComponent;
+        private readonly IGraphicsResourceCreator _graphicsResourceCreator;
 
-        public GeometryGraphicsContextFactory(IDeviceResolver deviceResolverComponent)
+        public GeometryGraphicsContextFactory(IDeviceResolver deviceResolverComponent, IGraphicsResourceCreator graphicsResourceCreator)
         {
             _deviceResolverComponent = deviceResolverComponent;
+            _graphicsResourceCreator = graphicsResourceCreator;
         }
 
         public IGraphicsCardGeometry Create()
         {
-            return new GraphicsCardGeometry(_deviceResolverComponent.Device);
+            return new GraphicsCardGeometry(_deviceResolverComponent.Device, _graphicsResourceCreator);
         }
     }
 }

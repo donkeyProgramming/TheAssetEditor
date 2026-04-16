@@ -4,6 +4,7 @@ namespace Shared.Core.ErrorHandling.Exceptions
 {
     public record ExceptionPackFileContainerInfo(bool IsMainEditable, bool IsCa, string Name, string SystemPath);
     public record ExceptionInstance(string Message, string[] StackTrace);
+    public record GraphicsResourceScopeInfo(string ScopeOwner, bool IsCurrentScope, int ResourceCount, List<string> Resources);
 
     public class ExceptionInformation
     {
@@ -27,6 +28,11 @@ namespace Shared.Core.ErrorHandling.Exceptions
         public string EditorInputFile { get; set; } = "Not set";
         public string EditorInputFileFull { get; set; } = "Not set";
         public string EditorInputFilePack { get; set; } = "Not set";
+        public string CurrentEditorGraphicsResourceScopeOwner { get; set; } = "Not set";
+        public int CurrentEditorGraphicsResourceCount { get; set; }
+        public List<string> CurrentEditorGraphicsResources { get; set; } = [];
+        public string CurrentEditorGraphicsResourceInfoError { get; set; } = "";
+        public List<GraphicsResourceScopeInfo> GraphicsResourceScopes { get; set; } = [];
         public List<string> LogHistory { get; set; } = [];
         public string UserMessage { get; set; } = "";
 

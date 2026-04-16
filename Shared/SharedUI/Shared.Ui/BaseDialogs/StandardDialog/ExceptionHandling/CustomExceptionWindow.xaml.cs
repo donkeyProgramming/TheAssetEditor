@@ -64,6 +64,18 @@ namespace Shared.Ui.Common.Exceptions
             extraInfo.AppendLine($"Culture: {extendedExceptionInformation.Culture}");
             extraInfo.AppendLine($"Open editors: {extendedExceptionInformation.NumberOfOpenEditors}");
             extraInfo.AppendLine($"Total Created editors: {extendedExceptionInformation.NumberOfOpenedEditors}");
+            if (extendedExceptionInformation.GraphicsResourceScopes.Count > 0)
+            {
+                var totalResources = extendedExceptionInformation.GraphicsResourceScopes.Sum(x => x.ResourceCount);
+                extraInfo.AppendLine($"Graphics resources tracked: {totalResources} across {extendedExceptionInformation.GraphicsResourceScopes.Count} scope(s)");
+                foreach (var scope in extendedExceptionInformation.GraphicsResourceScopes)
+                {
+                    var marker = scope.IsCurrentScope ? " [CURRENT]" : string.Empty;
+                    extraInfo.AppendLine($"  {scope.ScopeOwner}{marker}: {scope.ResourceCount} resource(s)");
+                }
+            }
+            if (string.IsNullOrWhiteSpace(extendedExceptionInformation.CurrentEditorGraphicsResourceInfoError) == false)
+                extraInfo.AppendLine($"Graphics resource info error: {extendedExceptionInformation.CurrentEditorGraphicsResourceInfoError}");
 
             ExtraInfoHandle.Text = extraInfo.ToString();
         }

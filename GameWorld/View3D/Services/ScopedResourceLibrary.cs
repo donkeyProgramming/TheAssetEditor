@@ -19,20 +19,22 @@ namespace GameWorld.Core.Services
         private readonly ResourceLibrary _resourceLibrary;
         private readonly IEventHub _eventHub;
         private readonly IStandardDialogs _standardDialogs;
+        private readonly IGraphicsResourceCreator _graphicsResourceCreator;
 
         private readonly Dictionary<string, Texture2D?> _cachedTextures = [];
         private bool _isDisposed = false;
 
-        public ScopedResourceLibrary(ResourceLibrary resourceLibrary, IEventHub eventHub, IStandardDialogs standardDialogs)
+        public ScopedResourceLibrary(ResourceLibrary resourceLibrary, IEventHub eventHub, IStandardDialogs standardDialogs, IGraphicsResourceCreator graphicsResourceCreator)
         {
             _resourceLibrary = resourceLibrary;
             _eventHub = eventHub;
             _standardDialogs = standardDialogs;
+            _graphicsResourceCreator = graphicsResourceCreator;
             _eventHub.Register<GraphicDeviceDisposedEvent>(this, x=> ClearTextureCache());
             _eventHub.Register<PackFileContainerManipulationEvent>(this, x => ClearTextureCache());
         }
 
-        public Texture2D? ForceLoadImage(string imagePath, out ImageInformation imageInformation) => _resourceLibrary.ForceLoadImage(imagePath, out imageInformation);
+        public Texture2D? ForceLoadImage(string imagePath, out ImageInformation imageInformation) => _resourceLibrary.ForceLoadImage(imagePath, out imageInformation, _graphicsResourceCreator);
 
         public Texture2D? LoadTexture(string fileName, bool forceRefreshTexture = false, bool fromFile = false)
         {
@@ -42,7 +44,7 @@ namespace GameWorld.Core.Services
                 Texture2D? textureLoadResult = null;
                 try
                 {
-                    textureLoadResult = _resourceLibrary.LoadTexture(fileName, forceRefreshTexture, fromFile);
+                    textureLoadResult = _resourceLibrary.LoadTexture(fileName, forceRefreshTexture, fromFile, _graphicsResourceCreator);
                 }
                 catch (Exception ex)
                 { 
@@ -70,7 +72,7 @@ namespace GameWorld.Core.Services
         void ClearTextureCache()
         {
             foreach (var item in _cachedTextures)
-                item.Value?.Dispose();
+                _graphicsResourceCreator.DisposeTracked(item.Value);
             _cachedTextures.Clear();
         }
     }

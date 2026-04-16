@@ -99,14 +99,14 @@ namespace GameWorld.Core.Services
             _isInitialized = false;
         }
 
-        public Texture2D ForceLoadImage(string imagePath, out ImageInformation imageInformation)
+        public Texture2D ForceLoadImage(string imagePath, out ImageInformation imageInformation, IGraphicsResourceCreator graphicsResourceCreator = null)
         {
-            return ImageLoader.ForceLoadImage(imagePath, _pfs, _graphicsDevice, out imageInformation);
+            return ImageLoader.ForceLoadImage(imagePath, _pfs, _graphicsDevice, out imageInformation, false, graphicsResourceCreator);
         }
 
-        public Texture2D LoadTexture(string fileName, bool forceRefreshTexture = false, bool fromFile = false)
+        public Texture2D LoadTexture(string fileName, bool forceRefreshTexture = false, bool fromFile = false, IGraphicsResourceCreator graphicsResourceCreator = null)
         {
-            var texture = ImageLoader.LoadTextureAsTexture2d(fileName, _pfs, _graphicsDevice, out var _, fromFile);
+            var texture = ImageLoader.LoadTextureAsTexture2d(fileName, _pfs, _graphicsDevice, out var _, fromFile, graphicsResourceCreator);
             return texture;
         }
 

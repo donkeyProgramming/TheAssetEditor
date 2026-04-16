@@ -1,6 +1,7 @@
 ﻿using GameWorld.Core.Components.Input;
 using GameWorld.Core.Components.Rendering;
 using GameWorld.Core.Rendering.RenderItems;
+using GameWorld.Core.Services;
 using GameWorld.Core.Utility;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -15,6 +16,7 @@ namespace GameWorld.Core.Components.Navigation
         private readonly IMouseComponent _mouse;
         private readonly RenderEngineComponent _renderEngine;
         private readonly IEventHub _eventHub;
+        private readonly IGraphicsResourceCreator _graphicsResourceCreator;
 
         // Gizmo size and position
         private const float GIZMO_SIZE = 70f;           // Display size (pixels)
@@ -45,18 +47,20 @@ namespace GameWorld.Core.Components.Navigation
             ArcBallCamera camera,
             IMouseComponent mouse, 
             RenderEngineComponent renderEngine,
-            IEventHub eventHub)
+            IEventHub eventHub,
+            IGraphicsResourceCreator graphicsResourceCreator)
         {
             _deviceResolver = deviceResolver;
             _camera = camera;
             _mouse = mouse;
             _renderEngine = renderEngine;
             _eventHub = eventHub;
+            _graphicsResourceCreator = graphicsResourceCreator;
         }
 
         public override void Initialize()
         {
-            _whiteTexture = new Texture2D(_deviceResolver.Device, 1, 1);
+            _whiteTexture = _graphicsResourceCreator.CreateTexture2D(1, 1);
             _whiteTexture.SetData([Color.White]);
 
             base.Initialize();
@@ -377,7 +381,7 @@ namespace GameWorld.Core.Components.Navigation
 
         public void Dispose()
         {
-            _whiteTexture?.Dispose();
+            _whiteTexture = _graphicsResourceCreator.DisposeTracked(_whiteTexture);
         }
     }
 }

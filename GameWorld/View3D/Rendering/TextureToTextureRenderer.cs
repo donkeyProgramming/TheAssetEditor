@@ -12,6 +12,7 @@ namespace GameWorld.Core.Rendering
         public readonly GraphicsDevice _device;
         public readonly SpriteBatch _spriteBatch;
         public readonly IScopedResourceLibrary _resourceLibary;
+        private readonly IGraphicsResourceCreator _graphicsResourceCreator;
 
         public class DrawSettings
         {
@@ -21,16 +22,17 @@ namespace GameWorld.Core.Rendering
             public bool OnlyAlpha { get; set; } = false;
         }
 
-        public TextureToTextureRenderer(GraphicsDevice device, SpriteBatch spriteBatch, IScopedResourceLibrary resourceLibary)
+        public TextureToTextureRenderer(GraphicsDevice device, SpriteBatch spriteBatch, IScopedResourceLibrary resourceLibary, IGraphicsResourceCreator graphicsResourceCreator)
         {
             _device = device;
             _spriteBatch = spriteBatch;
             _resourceLibary = resourceLibary;
+            _graphicsResourceCreator = graphicsResourceCreator;
         }
 
         public Texture2D RenderToTexture(Texture2D texture, int width, int height, DrawSettings settings, string outputPath = null)
         {
-            var renderTarget = new RenderTarget2D(_device, width, height, false, SurfaceFormat.Color, DepthFormat.Depth24);
+            var renderTarget = _graphicsResourceCreator.CreateRenderTarget2D(width, height, false, SurfaceFormat.Color, DepthFormat.Depth24);
             DrawTextureToTarget(renderTarget, texture, settings);
             if (outputPath != null)
                 SaveTexture(renderTarget, outputPath);
@@ -41,7 +43,7 @@ namespace GameWorld.Core.Rendering
         {
             _device.SetRenderTarget(renderTarget);
             _device.Clear(Color.Transparent);
-            _device.DepthStencilState = new DepthStencilState() { DepthBufferEnable = true };
+            _device.DepthStencilState = DepthStencilState.Default;
 
             var previewShader = _resourceLibary.GetStaticEffect(ShaderTypes.TexturePreview);
 
@@ -68,7 +70,7 @@ namespace GameWorld.Core.Rendering
 
         public void Dispose()
         {
-            _spriteBatch.Dispose();
+            _graphicsResourceCreator.DisposeTracked(_spriteBatch);
         }
     }
 }

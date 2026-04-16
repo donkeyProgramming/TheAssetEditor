@@ -28,25 +28,27 @@ namespace GameWorld.Core.Components.Selection
         float _vertexSelectionFalloff = 0;
         private readonly IScopedResourceLibrary _resourceLib;
         private readonly IDeviceResolver _deviceResolverComponent;
+        private readonly IGraphicsResourceCreator _graphicsResourceCreator;
 
-        public SelectionManager(IEventHub eventHub, RenderEngineComponent renderEngine, IScopedResourceLibrary resourceLib, IDeviceResolver deviceResolverComponent)
+        public SelectionManager(IEventHub eventHub, RenderEngineComponent renderEngine, IScopedResourceLibrary resourceLib, IDeviceResolver deviceResolverComponent, IGraphicsResourceCreator graphicsResourceCreator)
         {
             _eventHub = eventHub;
             _renderEngine = renderEngine;
             _resourceLib = resourceLib;
             _deviceResolverComponent = deviceResolverComponent;
+            _graphicsResourceCreator = graphicsResourceCreator;
         }
 
         public override void Initialize()
         {
             CreateSelectionSate(GeometrySelectionMode.Object, null, false);
 
-            _vertexRenderer = new VertexInstanceMesh(_deviceResolverComponent, _resourceLib);
+            _vertexRenderer = new VertexInstanceMesh(_deviceResolverComponent, _resourceLib, _graphicsResourceCreator);
 
-            _wireframeEffect = new BasicShader(_deviceResolverComponent.Device);
+            _wireframeEffect = new BasicShader(_deviceResolverComponent.Device, _graphicsResourceCreator);
             _wireframeEffect.DiffuseColour = Vector3.Zero;
 
-            _selectedFacesEffect = new BasicShader(_deviceResolverComponent.Device);
+            _selectedFacesEffect = new BasicShader(_deviceResolverComponent.Device, _graphicsResourceCreator);
             _selectedFacesEffect.DiffuseColour = new Vector3(1, 0, 0);
             _selectedFacesEffect.SpecularColour = new Vector3(1, 0, 0);
             _selectedFacesEffect.EnableDefaultLighting();
