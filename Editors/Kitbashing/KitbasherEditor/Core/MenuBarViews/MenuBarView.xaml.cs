@@ -20,32 +20,41 @@ namespace KitbasherEditor.Views
             var window = Window.GetWindow(this);
             if (window != null)
             {
-                window.KeyUp += HandleKeyPress;
+                window.KeyUp += HandleKeyUp;
                 window.KeyDown += HandleKeyDown;
             }
         }
 
-        private void HandleKeyPress(object sender, KeyEventArgs e)
+        private void UserControl_Unloaded(object sender, RoutedEventArgs e)
         {
-            if (e.OriginalSource is TextBox)
+            var window = Window.GetWindow(this);
+            if (window != null)
             {
-                e.Handled = true;
-                return;
+                window.KeyUp -= HandleKeyUp;
+                window.KeyDown -= HandleKeyDown;
             }
+        }
+
+        private void HandleKeyUp(object sender, KeyEventArgs e)
+        {
+            if (e.OriginalSource is TextBox && Keyboard.Modifiers == ModifierKeys.None)
+                return;
 
             if (DataContext is IKeyboardHandler keyboardHandler)
-            {
-                var res = keyboardHandler.OnKeyReleased(e.Key, e.SystemKey, Keyboard.Modifiers);
-                if (res)
-                    e.Handled = true;
-            }
+                keyboardHandler.OnKeyReleased(e.Key, e.SystemKey, Keyboard.Modifiers);
         }
 
         private void HandleKeyDown(object sender, KeyEventArgs e)
         {
+            if (e.OriginalSource is TextBox && Keyboard.Modifiers == ModifierKeys.None)
+                return;
+
             if (DataContext is IKeyboardHandler keyboardHandler)
             {
                 keyboardHandler.OnKeyDown(e.Key, e.SystemKey, Keyboard.Modifiers);
+                var res = keyboardHandler.OnKeyReleased(e.Key, e.SystemKey, Keyboard.Modifiers);
+                if (res)
+                    e.Handled = true;
             }
         }
     }
