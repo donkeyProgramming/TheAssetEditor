@@ -1,4 +1,5 @@
 ﻿using System.IO;
+using GameWorld.Core.Services;
 using Microsoft.Xna.Framework.Graphics;
 using Pfim;
 using Serilog;
@@ -11,9 +12,9 @@ namespace GameWorld.Core.Utility
     {
         private static readonly ILogger _logger = Logging.CreateStatic(typeof(ImageLoader));
 
-        public static Texture2D ForceLoadImage(string fileName, IPackFileService packFileService, GraphicsDevice graphicsDevice, out ImageInformation imageInfo, bool fromFile = false)
+        public static Texture2D ForceLoadImage(string fileName, IPackFileService packFileService, GraphicsDevice graphicsDevice, out ImageInformation imageInfo, bool fromFile = false, IGraphicsResourceCreator graphicsResourceCreator = null)
         {
-            return LoadTextureAsTexture2d(fileName, packFileService, graphicsDevice, out imageInfo, fromFile);
+            return LoadTextureAsTexture2d(fileName, packFileService, graphicsDevice, out imageInfo, fromFile, graphicsResourceCreator);
         }
 
         public static void SaveTexture(Texture2D texture, string path)
@@ -56,14 +57,17 @@ namespace GameWorld.Core.Utility
             return image;
         }
 
-        private static Texture2D ConvertTexture2D(string fileName, IImage image, GraphicsDevice device)
+        private static Texture2D ConvertTexture2D(string fileName, IImage image, GraphicsDevice device, IGraphicsResourceCreator graphicsResourceCreator)
         {
             Texture2D texture = null;
             if (image.Format == ImageFormat.Rgba32)
             {
                 try
                 {
-                    texture = new Texture2D(device, image.Width, image.Height, true, SurfaceFormat.Bgra32);
+                    if (graphicsResourceCreator == null)
+                        texture = new Texture2D(device, image.Width, image.Height, true, SurfaceFormat.Bgra32);
+                    else
+                        texture = graphicsResourceCreator.CreateTexture2D(image.Width, image.Height, true, SurfaceFormat.Bgra32);
                     texture.SetData(0, null, image.Data, 0, image.DataLen);
                 }
                 catch
@@ -96,7 +100,7 @@ namespace GameWorld.Core.Utility
             return texture;
         }
 
-        public static Texture2D LoadTextureAsTexture2d(string fileName, IPackFileService pfs, GraphicsDevice device, out ImageInformation out_imageInfo, bool fromFile)
+        public static Texture2D LoadTextureAsTexture2d(string fileName, IPackFileService pfs, GraphicsDevice device, out ImageInformation out_imageInfo, bool fromFile, IGraphicsResourceCreator graphicsResourceCreator = null)
         {
             out_imageInfo = null;
             var imageContent = GetFileBytes(pfs, fileName, fromFile);
@@ -106,14 +110,16 @@ namespace GameWorld.Core.Utility
             if (Path.GetExtension(fileName).ToLower() == ".png")
             {
                 using var stream = new MemoryStream(imageContent);
-                return Texture2D.FromStream(device, stream);
+                if (graphicsResourceCreator == null)
+                    return Texture2D.FromStream(device, stream);
+                return graphicsResourceCreator.CreateTextureFromStream(stream);
             }
 
             var image = LoadImageFromBytes(imageContent, out out_imageInfo);
             if (image == null)
                 return null;
 
-            return ConvertTexture2D(fileName, image, device);
+            return ConvertTexture2D(fileName, image, device, graphicsResourceCreator);
         }
     }
 }

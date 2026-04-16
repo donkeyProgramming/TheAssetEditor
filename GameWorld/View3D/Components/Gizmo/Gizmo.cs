@@ -1,5 +1,6 @@
 ﻿using GameWorld.Core.Components.Input;
 using GameWorld.Core.Components.Rendering;
+using GameWorld.Core.Services;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -39,6 +40,7 @@ namespace GameWorld.Core.Components.Gizmo
 
         private readonly GraphicsDevice _graphics;
         private readonly RenderEngineComponent _renderEngineComponent;
+        private readonly IGraphicsResourceCreator _graphicsResourceCreator;
 
         private readonly BasicEffect _lineEffect;
         private readonly BasicEffect _meshEffect;
@@ -142,19 +144,24 @@ namespace GameWorld.Core.Components.Gizmo
         private readonly IMouseComponent _mouse;
 
 
-        public Gizmo(ArcBallCamera camera, IMouseComponent mouse, GraphicsDevice graphics, RenderEngineComponent renderEngineComponent)
+        public Gizmo(ArcBallCamera camera, IMouseComponent mouse, GraphicsDevice graphics, RenderEngineComponent renderEngineComponent, IGraphicsResourceCreator graphicsResourceCreator)
         {
             SceneWorld = Matrix.Identity;
             _graphics = graphics;
             _renderEngineComponent = renderEngineComponent;
+            _graphicsResourceCreator = graphicsResourceCreator;
 
             _camera = camera;
             _mouse = mouse;
 
             Enabled = true;
 
-            _lineEffect = new BasicEffect(graphics) { VertexColorEnabled = true, AmbientLightColor = Vector3.One, EmissiveColor = Vector3.One };
-            _meshEffect = new BasicEffect(graphics);
+            _lineEffect = _graphicsResourceCreator.CreateBasicEffect();
+            _lineEffect.VertexColorEnabled = true;
+            _lineEffect.AmbientLightColor = Vector3.One;
+            _lineEffect.EmissiveColor = Vector3.One;
+
+            _meshEffect = _graphicsResourceCreator.CreateBasicEffect();
 
             Initialize();
         }
@@ -730,8 +737,8 @@ namespace GameWorld.Core.Components.Gizmo
 
         public void Dispose()
         {
-            _lineEffect.Dispose();
-            _meshEffect.Dispose();
+            _graphicsResourceCreator.DisposeTracked(_lineEffect);
+            _graphicsResourceCreator.DisposeTracked(_meshEffect);
         }
 
 

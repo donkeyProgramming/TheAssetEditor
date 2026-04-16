@@ -1,11 +1,12 @@
-﻿using Shared.Core.Misc;
+﻿using System;
+using Shared.Core.Misc;
 using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
 using Shared.Core.ToolCreation;
 
 namespace Editors.TextureEditor.ViewModels
 {
-    public class TextureEditorViewModel : NotifyPropertyChangedImpl, IEditorInterface, IFileEditor
+    public class TextureEditorViewModel : NotifyPropertyChangedImpl, IEditorInterface, IFileEditor, IDisposable
     {
         private readonly IPackFileService _pfs;
         private readonly TextureBuilder _textureBuilder;
@@ -45,9 +46,11 @@ namespace Editors.TextureEditor.ViewModels
 
         public void ShowTextureDetailsInfo() => ViewModel.ShowTextureDetailsInfo();
 
-        public void Close()
-        {
+        public void Close() => Dispose();
 
+        public void Dispose()
+        {
+            _textureBuilder.Dispose();
         }
     }
 }

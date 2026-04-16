@@ -9,6 +9,10 @@
              mc:Ignorable="d" 
              d:DesignHeight="30" d:DesignWidth="800">
 
+    <UserControl.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolToVisibility" />
+    </UserControl.Resources>
+
     <DockPanel>
         <Menu VerticalAlignment="Center"
               DockPanel.Dock="Left"
@@ -112,9 +116,13 @@
                     <MenuItem Header="{loc:Loc MenuBar.Reports.TouchedFiles.ExtractToPack}" Command="{Binding MenuBar.TouchedFileRecorderExtractCommand }"/>
                     <MenuItem Header="{loc:Loc MenuBar.Reports.TouchedFiles.StopRecorder}" Command="{Binding MenuBar.TouchedFileRecorderStopCommand }"/>
                 </MenuItem>
-                <Separator/>
-                <MenuItem Header="{loc:Loc MenuBar.Reports.DebugClearConsole}" Command="{Binding MenuBar.ClearConsoleCommand}" />
-                <MenuItem Header="{loc:Loc MenuBar.Reports.DebugPrintScopes}" Command="{Binding MenuBar.PrintScopeCommand}" />
+            </MenuItem>
+
+            <MenuItem Header="{loc:Loc MenuBar.Debug}" BorderThickness="1.5" WindowChrome.IsHitTestVisibleInChrome="True"
+                      Visibility="{Binding MenuBar.IsDebuggerAttached, Converter={StaticResource BoolToVisibility}}">
+                <MenuItem Header="{loc:Loc MenuBar.Debug.ClearConsole}" Command="{Binding MenuBar.ClearConsoleCommand}" />
+                <MenuItem Header="{loc:Loc MenuBar.Debug.PrintScopes}" Command="{Binding MenuBar.PrintScopeCommand}" />
+                <MenuItem Header="{loc:Loc MenuBar.Debug.PrintTrackedGraphicsResources}" Command="{Binding MenuBar.PrintTrackedGraphicsResourcesCommand}" />
             </MenuItem>
 
             <MenuItem Header="{loc:Loc MenuBar.Help}" BorderThickness="1.5" WindowChrome.IsHitTestVisibleInChrome="True">

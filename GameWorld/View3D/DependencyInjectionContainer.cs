@@ -27,6 +27,7 @@ using GameWorld.Core.Utility;
 using GameWorld.Core.WpfWindow;
 using Microsoft.Extensions.DependencyInjection;
 using Shared.Core.DependencyInjection;
+using Shared.Core.ErrorHandling.Exceptions;
 using Shared.Core.Services;
 
 namespace GameWorld.Core
@@ -39,7 +40,11 @@ namespace GameWorld.Core
             serviceCollection.AddScoped<IGeometryGraphicsContextFactory, GeometryGraphicsContextFactory>();
             serviceCollection.AddScoped<IWpfGame, WpfGame>();
             serviceCollection.AddScoped<IScopedResourceLibrary, ScopedResourceLibrary>();
+            serviceCollection.AddScoped<IGraphicsResourceCreator>(x => new GraphicsResourceCreator(() => x.GetRequiredService<IWpfGame>().GraphicsDevice));
+            serviceCollection.AddScoped<IScopeOwnerAware>(x => x.GetRequiredService<IGraphicsResourceCreator>() as IScopeOwnerAware);
             
+
+
             serviceCollection.AddSingleton<ResourceLibrary>();
 
             // Settings
@@ -54,7 +59,8 @@ namespace GameWorld.Core
             serviceCollection.AddScoped<ComplexMeshLoader>();
             serviceCollection.AddTransient<WsModelGeneratorService>();
             serviceCollection.AddTransient<MaterialToWsMaterialFactory>();
-            
+            serviceCollection.AddScoped<IExceptionInformationProvider, GraphicsResourceExceptionInfoProvider>();
+
             serviceCollection.AddScoped<FaceEditor>();
             serviceCollection.AddScoped<ObjectEditor>();
             serviceCollection.AddScoped<Rmv2ModelNodeLoader>();
@@ -102,6 +108,7 @@ namespace GameWorld.Core
             RegisterGameComponent<IMouseComponent, MouseComponent>(serviceCollection);
 
             RegisterGameComponent<FpsComponent>(serviceCollection);
+            RegisterGameComponent<GraphicsResourceStatsComponent>(serviceCollection);
             RegisterGameComponent<ArcBallCamera>(serviceCollection);
             RegisterGameComponent<SceneManager>(serviceCollection);
             RegisterGameComponent<GizmoComponent>(serviceCollection);

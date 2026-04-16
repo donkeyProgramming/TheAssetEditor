@@ -7,6 +7,7 @@ using GameWorld.Core.Commands.Vertex;
 using GameWorld.Core.Components.Input;
 using GameWorld.Core.Components.Rendering;
 using GameWorld.Core.SceneNodes;
+using GameWorld.Core.Services;
 using GameWorld.Core.Utility;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -31,12 +32,13 @@ namespace GameWorld.Core.Components.Selection
         private readonly CommandFactory _commandFactory;
         private readonly SceneManager _sceneManger;
         private readonly RenderEngineComponent _resourceLibrary;
+        private readonly IGraphicsResourceCreator _graphicsResourceCreator;
 
         public SelectionComponent(
             IMouseComponent mouseComponent, IKeyboardComponent keyboardComponent,
             ArcBallCamera camera, SelectionManager selectionManager,
             IDeviceResolver deviceResolverComponent, CommandFactory commandFactory,
-            SceneManager sceneManager, RenderEngineComponent resourceLibrary)
+            SceneManager sceneManager, RenderEngineComponent resourceLibrary, IGraphicsResourceCreator graphicsResourceCreator)
         {
             _mouseComponent = mouseComponent;
             _keyboardComponent = keyboardComponent;
@@ -46,6 +48,7 @@ namespace GameWorld.Core.Components.Selection
             _commandFactory = commandFactory;
             _sceneManger = sceneManager;
             _resourceLibrary = resourceLibrary;
+            _graphicsResourceCreator = graphicsResourceCreator;
         }
 
         public override void Initialize()
@@ -54,7 +57,7 @@ namespace GameWorld.Core.Components.Selection
             DrawOrder = (int)ComponentDrawOrderEnum.SelectionComponent;
 
             //_spriteBatch = new SpriteBatch(_deviceResolverComponent.Device);
-            _textTexture = new Texture2D(_deviceResolverComponent.Device, 1, 1);
+            _textTexture = _graphicsResourceCreator.CreateTexture2D(1, 1);
             _textTexture.SetData(new Color[1 * 1] { Color.White });
 
             base.Initialize();
@@ -340,7 +343,7 @@ namespace GameWorld.Core.Components.Selection
 
         public void Dispose()
         {
-            _textTexture.Dispose();
+            _textTexture = _graphicsResourceCreator.DisposeTracked(_textTexture);
         }
     }
 }
