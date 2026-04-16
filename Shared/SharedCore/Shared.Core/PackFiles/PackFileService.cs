@@ -86,25 +86,8 @@ namespace Shared.Core.PackFiles
             if (container.IsCaPackFile)
                 throw new Exception("Can not add files to ca pack file");
 
-            foreach (var file in newFiles)
-            {
-                if (string.IsNullOrWhiteSpace(file.PackFile.Name))
-                    throw new Exception("PackFile name can not be empty");
-            }
-
-            foreach (var file in newFiles)
-            {
-                file.PackFile.Name = file.PackFile.Name.Trim();
-
-                var path = file.DirectoyPath.Trim();
-                if (!string.IsNullOrWhiteSpace(path))
-                    path += "\\";
-                path += file.PackFile.Name;
-                container.FileList[path.ToLower()] = file.PackFile;
-            }
-
-            var files = newFiles.Select(x => x.PackFile).ToList();
-            _globalEventHub?.PublishGlobalEvent(new PackFileContainerFilesAddedEvent(container, files));
+            var addedFiles = container.AddFiles(newFiles);
+            _globalEventHub?.PublishGlobalEvent(new PackFileContainerFilesAddedEvent(container, addedFiles));
         }
 
         public void CopyFileFromOtherPackFile(PackFileContainer source, string path, PackFileContainer target)
@@ -151,24 +134,8 @@ namespace Shared.Core.PackFiles
             if (pf.IsCaPackFile)
                 throw new Exception("Can not delete folder inside CA pack file");
 
-            var filesToDelete = new List<string>();
-            foreach (var file in pf.FileList)
-            { 
-                var directory = Path.GetDirectoryName(file.Key);
-                if (directory == null)
-                    continue;
-
-                if (directory.StartsWith(folder, StringComparison.InvariantCultureIgnoreCase))
-                    filesToDelete.Add(file.Key);
-            }
-
             _globalEventHub?.PublishGlobalEvent(new PackFileContainerFolderRemovedEvent(pf, folder));
-
-            foreach (var item in filesToDelete)
-            {
-                _logger.Here().Information($"Deleting file {item} in directory {folder}");
-                pf.FileList.Remove(item);
-            }
+            pf.DeleteFolder(folder);
         }
 
         public void DeleteFile(PackFileContainer pf, PackFile file)
@@ -176,11 +143,9 @@ namespace Shared.Core.PackFiles
             if (pf.IsCaPackFile)
                 throw new Exception("Can not delete files inside CA pack file");
 
-            var key = pf.FileList.FirstOrDefault(x => x.Value == file).Key;
-            _logger.Here().Information($"Deleting file {key}");
-
+            _logger.Here().Information($"Deleting file {pf.GetFullPath(file)}");
             _globalEventHub?.PublishGlobalEvent(new PackFileContainerFilesRemovedEvent(pf, [file]));
-            pf.FileList.Remove(key);
+            pf.DeleteFile(file);
         }
 
         public void MoveFile(PackFileContainer pf, PackFile file, string newFolderPath)
@@ -188,16 +153,10 @@ namespace Shared.Core.PackFiles
             if (pf.IsCaPackFile)
                 throw new Exception("Can not move files inside CA pack file");
 
-            var newFullPath = newFolderPath + "\\" + file.Name;
-
-            var key = pf.FileList.FirstOrDefault(x => x.Value == file).Key;
+            var key = pf.GetFullPath(file);
             _globalEventHub?.PublishGlobalEvent(new PackFileContainerFilesRemovedEvent(pf, [file]));
-
-            pf.FileList.Remove(key);
-            pf.FileList[newFullPath] = file;
-
+            pf.MoveFile(file, newFolderPath);
             _logger.Here().Information($"Moving file {key}");
-
             _globalEventHub?.PublishGlobalEvent(new PackFileContainerFilesAddedEvent(pf, [file]));
         }
 
@@ -209,31 +168,7 @@ namespace Shared.Core.PackFiles
             if (string.IsNullOrWhiteSpace(newName))
                 throw new Exception("Name can not be empty");
 
-            var oldNodePath = currentNodeName;
-            var newNodePath = newName;
-            var lastSeparatorIndex = currentNodeName.LastIndexOf(Path.DirectorySeparatorChar);
-            if (lastSeparatorIndex != -1)
-            {
-                var parentPath = currentNodeName.Substring(0, lastSeparatorIndex);
-                newNodePath = parentPath + Path.DirectorySeparatorChar + newName;
-            }
-
-            var oldPathPrefix = oldNodePath + Path.DirectorySeparatorChar;
-            var files = pf.FileList
-                .Where(x => x.Key.Equals(oldNodePath, StringComparison.InvariantCultureIgnoreCase)
-                            || x.Key.StartsWith(oldPathPrefix, StringComparison.InvariantCultureIgnoreCase))
-                .ToList();
-
-            foreach (var (path, file) in files)
-            {
-                pf.FileList.Remove(path);
-                var newPath = newNodePath;
-                if (oldNodePath.Length != 0 && path.Length > oldNodePath.Length)
-                    newPath = newNodePath + path.Substring(oldNodePath.Length);
-
-                pf.FileList[newPath] = file;
-            }
-
+            var newNodePath = pf.RenameDirectory(currentNodeName, newName);
             _globalEventHub?.PublishGlobalEvent(new PackFileContainerFolderRenamedEvent(pf, newNodePath));
         }
 
@@ -245,13 +180,7 @@ namespace Shared.Core.PackFiles
             if (string.IsNullOrWhiteSpace(newName))
                 throw new Exception("Name can not be empty");
 
-            var key = pf.FileList.FirstOrDefault(x => x.Value == file).Key;
-            pf.FileList.Remove(key);
-
-            var dir = Path.GetDirectoryName(key);
-            file.Name = newName;
-            pf.FileList[dir + "\\" + file.Name] = file;
-
+            pf.RenameFile(file, newName);
             _globalEventHub?.PublishGlobalEvent(new PackFileContainerFilesUpdatedEvent(pf, [file]));
         }
 
@@ -260,45 +189,18 @@ namespace Shared.Core.PackFiles
             var pf = GetEditablePack();
             if (pf.IsCaPackFile)
                 throw new Exception("Can not save ca pack file");
-            file.DataSource = new MemorySource(data);
 
+            pf.SaveFileData(file, data);
             _globalEventHub?.PublishGlobalEvent(new PackFileContainerFilesUpdatedEvent(pf, [file]));
             _globalEventHub?.PublishGlobalEvent(new PackFileSavedEvent(file));
         }
 
         public void SavePackContainer(PackFileContainer pf, string path, bool createBackup, GameInformation gameInformation)
         {
-            if (File.Exists(path) && DirectoryHelper.IsFileLocked(path))
-            {
-                throw new IOException($"Cannot access {path} because another process has locked it, most likely the game.");
-            }
-
             if (pf.IsCaPackFile)
                 throw new Exception("Can not save ca pack file");
-            if (createBackup)
-                SaveUtility.CreateFileBackup(path);
 
-            // Check if file has changed in size
-            if (pf.OriginalLoadByteSize != -1)
-            {
-                var fileInfo = new FileInfo(pf.SystemFilePath);
-                var byteSize = fileInfo.Length;
-                if (byteSize != pf.OriginalLoadByteSize)
-                    throw new Exception("File has been changed outside of AssetEditor. Can not save the file as it will cause corruptions");
-            }
-
-            using (var memoryStream = new FileStream(path + "_temp", FileMode.Create))
-            {
-                using var writer = new BinaryWriter(memoryStream);
-                PackFileSerializerWriter.SaveToByteArray(path, pf, writer, gameInformation);
-            }
-
-            File.Delete(path);
-            File.Move(path + "_temp", path);
-
-            pf.SystemFilePath = path;
-            pf.OriginalLoadByteSize = new FileInfo(path).Length;
-
+            pf.SaveToDisk(path, createBackup, gameInformation);
             _globalEventHub?.PublishGlobalEvent(new PackFileContainerSavedEvent(pf));
         }
 
@@ -316,27 +218,27 @@ namespace Shared.Core.PackFiles
 
         public PackFile? FindFile(string path, PackFileContainer? container = null)
         {
-            var lowerPath = path.Replace('/', '\\').ToLower().Trim();
-
             if (container == null)
             {
                 for (var i = _packFileContainers.Count - 1; i >= 0; i--)
                 {
-                    if (_packFileContainers[i].FileList.TryGetValue(lowerPath, out var value))
+                    var result = _packFileContainers[i].FindFile(path);
+                    if (result != null)
                     {
                         if (EnableFileLookUpEvents)
                             _globalEventHub?.PublishGlobalEvent(new PackFileLookUpEvent(path, _packFileContainers[i], true));
-                        return value;
+                        return result;
                     }
                 }
             }
             else
             {
-                if (container.FileList.TryGetValue(lowerPath, out var value))
+                var result = container.FindFile(path);
+                if (result != null)
                 {
                     if (EnableFileLookUpEvents)
                         _globalEventHub?.PublishGlobalEvent(new PackFileLookUpEvent(path, container, true));
-                    return value;
+                    return result;
                 }
             }
 
@@ -351,17 +253,15 @@ namespace Shared.Core.PackFiles
             {
                 foreach (var pf in _packFileContainers)
                 {
-                    var res = pf.FileList.FirstOrDefault(x => ReferenceEquals(x.Value, file) 
-                        || string.Equals(x.Value.Name, file.Name, StringComparison.OrdinalIgnoreCase)).Key;
-                    if (string.IsNullOrWhiteSpace(res) == false)
+                    var res = pf.GetFullPath(file);
+                    if (res != null)
                         return res;
                 }
             }
             else
             {
-                var res = container.FileList.FirstOrDefault(x => ReferenceEquals(x.Value, file) 
-                    || string.Equals(x.Value.Name, file.Name, StringComparison.OrdinalIgnoreCase)).Key;
-                if (string.IsNullOrWhiteSpace(res) == false)
+                var res = container.GetFullPath(file);
+                if (res != null)
                     return res;
             }
 
