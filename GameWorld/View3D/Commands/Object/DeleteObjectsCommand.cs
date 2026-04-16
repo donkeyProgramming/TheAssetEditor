@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using GameWorld.Core.Components.Selection;
+﻿using GameWorld.Core.Components.Selection;
 using GameWorld.Core.SceneNodes;
 using Serilog;
 using Shared.Core.ErrorHandling;
