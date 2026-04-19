@@ -2,7 +2,6 @@
 using Shared.Core.ErrorHandling;
 using Shared.Core.Events;
 using Shared.Core.Events.Global;
-using Shared.Core.Misc;
 using Shared.Core.PackFiles.Models;
 using Shared.Core.PackFiles.Serialization;
 using Shared.Core.Settings;
@@ -14,8 +13,8 @@ namespace Shared.Core.PackFiles
         private readonly ILogger _logger = Logging.Create<PackFileService>();
         private readonly IGlobalEventHub? _globalEventHub;
 
-        private readonly List<PackFileContainer> _packFileContainers = [];
-        private PackFileContainer? _packFileContainerSelectedForEdit;
+        private readonly List<IPackFileContainerInternal> _packFileContainers = [];
+        private IPackFileContainerInternal? _packFileContainerSelectedForEdit;
 
         // We use this instead of the standard dialog helper, to avaid a circular dependency
         public ISimpleMessageBox MessageBoxProvider { get; set; } = new SimpleMessageBox();
@@ -27,7 +26,7 @@ namespace Shared.Core.PackFiles
             _globalEventHub = globalEventHub;
         }
 
-        private static PackFileContainer CastContainer(IPackFileContainer container) => (PackFileContainer)container;
+        private static IPackFileContainerInternal CastContainer(IPackFileContainer container) => (IPackFileContainerInternal)container;
 
         public List<IPackFileContainer> GetAllPackfileContainers() => _packFileContainers.Cast<IPackFileContainer>().ToList();
 
@@ -58,7 +57,7 @@ namespace Shared.Core.PackFiles
             return pf;
         }
 
-        void AddContainerInternal(PackFileContainer container, bool setToMainPackIfFirst = false)
+        void AddContainerInternal(IPackFileContainerInternal container, bool setToMainPackIfFirst = false)
         {
             _packFileContainers.Add(container);
             _globalEventHub?.PublishGlobalEvent(new PackFileContainerAddedEvent(container));
