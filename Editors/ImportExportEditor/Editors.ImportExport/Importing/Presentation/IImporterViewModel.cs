@@ -13,7 +13,7 @@ namespace Editors.ImportExport.Importing.Presentation
         public string DisplayName { get; }
         string OutputExtension { get; }
         string[] InputExtensions { get; } // ADDed THIS!
-        public void Execute(PackFile exportSource, string outputPath, PackFileContainer packFileContainer, GameTypeEnum gameType);
+        public void Execute(PackFile exportSource, string outputPath, IPackFileContainer packFileContainer, GameTypeEnum gameType);
         public ImportSupportEnum CanImportFile(PackFile file);
 
     }

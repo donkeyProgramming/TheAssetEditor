@@ -11,7 +11,7 @@ namespace Shared.CoreTest.PackFiles.Utility
     internal class FileCompressionTests
     {
         private IPackFileService _packFileService;
-        private PackFileContainer _container;
+        private IPackFileContainer _container;
 
         [SetUp]
         public void Setup()

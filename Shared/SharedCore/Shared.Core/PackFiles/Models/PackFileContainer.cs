@@ -4,7 +4,7 @@ using Shared.Core.Settings;
 
 namespace Shared.Core.PackFiles.Models
 {
-    public class PackFileContainer
+    internal class PackFileContainer : IPackFileContainer
     {
         public string Name { get; set; }
         public PFHeader Header { get; set; }

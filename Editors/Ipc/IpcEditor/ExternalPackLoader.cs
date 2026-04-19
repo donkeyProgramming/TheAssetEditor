@@ -59,7 +59,7 @@ namespace Editors.Ipc
             }
         }
 
-        private PackFileContainer AddContainerOnUiThread(PackFileContainer container)
+        private IPackFileContainer AddContainerOnUiThread(IPackFileContainer container)
         {
             var app = Application.Current;
             if (app?.Dispatcher == null || app.Dispatcher.CheckAccess())

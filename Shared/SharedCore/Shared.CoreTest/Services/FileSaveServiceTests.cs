@@ -11,7 +11,7 @@ namespace Shared.CoreTest.Services
     internal class FileSaveServiceTests
     {
         IPackFileService _pfs;
-        PackFileContainer _container;
+        IPackFileContainer _container;
         Mock<IStandardDialogs> _uiProvider = new();
         Mock<IGlobalEventHub> _eventHub = new();
         PackFile _fileHandle;

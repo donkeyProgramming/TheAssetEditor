@@ -10,9 +10,9 @@ namespace Shared.Core.PackFiles.Utility
 {
     public interface IPackFileContainerLoader
     {
-        PackFileContainer? Load(string packFileSystemPath);
-        PackFileContainer? LoadAllCaFiles(GameTypeEnum gameEnum);
-        PackFileContainer LoadSystemFolderAsPackFileContainer(string packFileSystemPath);
+        IPackFileContainer? Load(string packFileSystemPath);
+        IPackFileContainer? LoadAllCaFiles(GameTypeEnum gameEnum);
+        IPackFileContainer LoadSystemFolderAsPackFileContainer(string packFileSystemPath);
     }
 
 
@@ -26,7 +26,7 @@ namespace Shared.Core.PackFiles.Utility
             _settingsService = settingsService;
         }
 
-        public PackFileContainer LoadSystemFolderAsPackFileContainer(string packFileSystemPath)
+        public IPackFileContainer LoadSystemFolderAsPackFileContainer(string packFileSystemPath)
         {
             if (Directory.Exists(packFileSystemPath) == false)
             {
@@ -61,7 +61,7 @@ namespace Shared.Core.PackFiles.Utility
                 AddFolderContentToPackFile(container, folder, rootPath);
         }
 
-        public PackFileContainer? Load(string packFileSystemPath)
+        public IPackFileContainer? Load(string packFileSystemPath)
         {
             try
             {
@@ -89,7 +89,7 @@ namespace Shared.Core.PackFiles.Utility
             }
         }
 
-        public PackFileContainer? LoadAllCaFiles(GameTypeEnum gameEnum)
+        public IPackFileContainer? LoadAllCaFiles(GameTypeEnum gameEnum)
         {
             var game = GameInformationDatabase.GetGameById(gameEnum);
             var gamePathInfo = _settingsService.CurrentSettings.GameDirectories.FirstOrDefault(x => x.Game == game.Type);

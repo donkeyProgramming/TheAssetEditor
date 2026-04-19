@@ -45,7 +45,7 @@ namespace Test.TestingUtility.Shared
             Keyboard = ServiceProvider.GetRequiredService<IWindowsKeyboard>() as TestKeyboard;
         }
 
-        public PackFileContainer? LoadPackFile(string path, bool createOutputPackFile = true)
+        public IPackFileContainer? LoadPackFile(string path, bool createOutputPackFile = true)
         {
             var loader = ServiceProvider.GetRequiredService<IPackFileContainerLoader>();
             var container = loader.Load(path);
@@ -56,7 +56,7 @@ namespace Test.TestingUtility.Shared
             return null;
         }
 
-        public PackFileContainer? CreateCaContainer()
+        public IPackFileContainer? CreateCaContainer()
         {
             var caConainter = new PackFileContainer("CA")
             {
@@ -73,7 +73,7 @@ namespace Test.TestingUtility.Shared
             return ScopeRepository.GetRequiredService<T>(handle);
         }
 
-        public PackFileContainer LoadFolderPackFile(string path)
+        public IPackFileContainer LoadFolderPackFile(string path)
         {
             var loader = ServiceProvider.GetRequiredService<IPackFileContainerLoader>();
             var container = loader.LoadSystemFolderAsPackFileContainer(path);
@@ -82,13 +82,13 @@ namespace Test.TestingUtility.Shared
             return container;
         }
 
-        public PackFileContainer CreateOutputPack()
+        public IPackFileContainer CreateOutputPack()
         {
             return PackFileService.CreateNewPackFileContainer("TestOutput", PackFileVersion.PFH5, PackFileCAType.MOD, true);
         }
 
 
-        public PackFileContainer CreateEmptyPackFile(string packFileName, bool setAsEditable)
+        public IPackFileContainer CreateEmptyPackFile(string packFileName, bool setAsEditable)
         {
             return PackFileService.CreateNewPackFileContainer(packFileName, PackFileVersion.PFH5, PackFileCAType.MOD, setAsEditable);
         }

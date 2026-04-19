@@ -53,7 +53,7 @@ namespace Shared.CoreTest.PackFiles
 
         static PackFileContainer CreateTestPack(IPackFileService pfs)
         {
-            var container = pfs.AddContainer(new PackFileContainer("Custom") { SystemFilePath = "SystemPath" }, true)!;
+            var container = (PackFileContainer)pfs.AddContainer(new PackFileContainer("Custom") { SystemFilePath = "SystemPath" }, true)!;
             var newFiles = new List<NewPackFileEntry>
             {
                 new("Directory_0", new PackFile("file0.txt", null)),

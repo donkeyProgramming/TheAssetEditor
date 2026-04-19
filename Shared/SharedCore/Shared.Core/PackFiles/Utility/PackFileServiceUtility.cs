@@ -61,13 +61,13 @@ namespace Shared.Core.PackFiles.Utility
         }
 
 
-        public static List<PackFile> FindAllWithExtention(IPackFileService pfs, string extention, PackFileContainer? packFileContainer = null)
+        public static List<PackFile> FindAllWithExtention(IPackFileService pfs, string extention, IPackFileContainer? packFileContainer = null)
         {
             return FindAllWithExtentionIncludePaths(pfs, extention, packFileContainer).Select(x => x.Item2).ToList();
         }
 
 
-        public static List<(string FileName, PackFile Pack)> FindAllWithExtentionIncludePaths(IPackFileService pfs, string extention, PackFileContainer? packFileContainer = null)
+        public static List<(string FileName, PackFile Pack)> FindAllWithExtentionIncludePaths(IPackFileService pfs, string extention, IPackFileContainer? packFileContainer = null)
         {
             extention = extention.ToLower();
             var output = new List<ValueTuple<string, PackFile>>();

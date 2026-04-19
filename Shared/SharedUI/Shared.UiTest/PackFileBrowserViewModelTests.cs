@@ -3,6 +3,7 @@ using AssetEditor.ViewModels;
 using Microsoft.Extensions.DependencyInjection;
 using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
+using Shared.Core.Settings;
 using Shared.Ui.BaseDialogs.PackFileTree;
 using Test.TestingUtility.Shared;
 using Test.TestingUtility.TestUtility;
@@ -234,12 +235,7 @@ namespace Shared.UiTest
 
         private void CreatePackfiles(params (string Path, string FileName)[] files)
         {
-            var container = new PackFileContainer("test.pack")
-            {
-                SystemFilePath = "test.pack",
-                Header = new PFHeader("PFH5", PackFileCAType.MOD)
-            };
-
+            var container = _packageFileService.CreateNewPackFileContainer("test.pack", PackFileVersion.PFH5, PackFileCAType.MOD);
             foreach (var (path, fileName) in files)
             {
                 container.FileList[path.ToLowerInvariant()] = PackFile.CreateFromASCII(fileName, fileName);

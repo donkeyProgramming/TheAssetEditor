@@ -13,7 +13,7 @@ namespace Shared.Ui.BaseDialogs.PackFileTree
     {
         public string Name { get; set; }
         public NodeType NodeType { get; }
-        public PackFileContainer FileOwner { get; }
+        public IPackFileContainer FileOwner { get; }
         public PackFile? Item { get; }
         public TreeNodeSource? Parent { get; private set; }
         public List<TreeNodeSource> Children { get; } = [];
@@ -23,7 +23,7 @@ namespace Shared.Ui.BaseDialogs.PackFileTree
 
         public bool HasChildren => Children.Count > 0;
 
-        public TreeNodeSource(string name, NodeType nodeType, PackFileContainer fileOwner, TreeNodeSource? parent, PackFile? item = null)
+        public TreeNodeSource(string name, NodeType nodeType, IPackFileContainer fileOwner, TreeNodeSource? parent, PackFile? item = null)
         {
             Name = name;
             NodeType = nodeType;

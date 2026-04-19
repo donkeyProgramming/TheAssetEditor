@@ -34,7 +34,7 @@ namespace Editors.ImportImport.Importing.Presentation.RmvToGltf
 
         public ImportSupportEnum CanImportFile(PackFile file) => _Importer.CanImportFile(file);
 
-        public void Execute(PackFile importSource, string outputPath, PackFileContainer packFileContainer, GameTypeEnum gameType)
+        public void Execute(PackFile importSource, string outputPath, IPackFileContainer packFileContainer, GameTypeEnum gameType)
         {
             var settings = new GltfImporterSettings(
                 InputGltfFile: importSource.Name,
