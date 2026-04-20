@@ -95,6 +95,10 @@ namespace Shared.Core.PackFiles
 
         public void CopyFileFromOtherPackFile(IPackFileContainer source, string path, IPackFileContainer target)
         {
+            var pf = CastContainer(target);
+            if (pf.IsCaPackFile)
+                throw new Exception("Can not add files to ca pack file");
+
             var sourceContainer = CastContainer(source);
             var targetContainer = CastContainer(target);
             var lowerPath = path.Replace('/', '\\').ToLower().Trim();
