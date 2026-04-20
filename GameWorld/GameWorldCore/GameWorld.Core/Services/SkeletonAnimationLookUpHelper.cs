@@ -54,18 +54,18 @@ namespace GameWorld.Core.Services
             _globalEventHub.UnRegister(this);
         }
 
-        void PackfileContainerRefresh(PackFileContainer packFileContainer)
+        void PackfileContainerRefresh(IPackFileContainer packFileContainer)
         {
             UnloadAnimationFromContainer(packFileContainer);
             LoadFromPackFileContainer(packFileContainer);
         }
 
-        void PackfileContainerRemove(PackFileContainer packFileContainer)
+        void PackfileContainerRemove(IPackFileContainer packFileContainer)
         {
             UnloadAnimationFromContainer(packFileContainer);
         }
 
-        void LoadFromPackFileContainer(PackFileContainer packFileContainer)
+        void LoadFromPackFileContainer(IPackFileContainer packFileContainer)
         {
             List<string> skeletonFileNameList = [];
             Dictionary<string, List<AnimationReference>> animationList = [];
@@ -127,7 +127,7 @@ namespace GameWorld.Core.Services
             }
         }
 
-        void FileDiscovered(byte[] byteChunk, PackFileContainer container, string fullPath, ref List<string> skeletonFileNameList, ref Dictionary<string, List<AnimationReference>> animationList)
+        void FileDiscovered(byte[] byteChunk, IPackFileContainer container, string fullPath, ref List<string> skeletonFileNameList, ref Dictionary<string, List<AnimationReference>> animationList)
         {
             var brokenFiles = new string[]
             {
@@ -172,7 +172,7 @@ namespace GameWorld.Core.Services
             }
         }
 
-        void UnloadAnimationFromContainer(PackFileContainer packFileContainer)
+        void UnloadAnimationFromContainer(IPackFileContainer packFileContainer)
         {
             lock (_threadLock)
             {
@@ -266,13 +266,13 @@ namespace GameWorld.Core.Services
     // Delete this piece of shit
     public class AnimationReference
     {
-        public AnimationReference(string animationFile, PackFileContainer container)
+        public AnimationReference(string animationFile, IPackFileContainer container)
         {
             AnimationFile = animationFile;
             Container = container;
         }
         public string AnimationFile { get; set; }
-        public PackFileContainer Container { get; set; }
+        public IPackFileContainer Container { get; set; }
 
         public override string ToString()
         {

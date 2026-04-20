@@ -10,9 +10,9 @@ namespace Shared.Core.PackFiles.Utility
 {
     public interface IPackFileContainerLoader
     {
-        PackFileContainer? Load(string packFileSystemPath);
-        PackFileContainer? LoadAllCaFiles(GameTypeEnum gameEnum);
-        PackFileContainer LoadSystemFolderAsPackFileContainer(string packFileSystemPath);
+        IPackFileContainer? Load(string packFileSystemPath);
+        IPackFileContainer? LoadAllCaFiles(GameTypeEnum gameEnum);
+        IPackFileContainer LoadSystemFolderAsPackFileContainer(string packFileSystemPath);
     }
 
 
@@ -26,7 +26,7 @@ namespace Shared.Core.PackFiles.Utility
             _settingsService = settingsService;
         }
 
-        public PackFileContainer LoadSystemFolderAsPackFileContainer(string packFileSystemPath)
+        public IPackFileContainer LoadSystemFolderAsPackFileContainer(string packFileSystemPath)
         {
             if (Directory.Exists(packFileSystemPath) == false)
             {
@@ -61,7 +61,7 @@ namespace Shared.Core.PackFiles.Utility
                 AddFolderContentToPackFile(container, folder, rootPath);
         }
 
-        public PackFileContainer? Load(string packFileSystemPath)
+        public IPackFileContainer? Load(string packFileSystemPath)
         {
             try
             {
@@ -89,7 +89,7 @@ namespace Shared.Core.PackFiles.Utility
             }
         }
 
-        public PackFileContainer? LoadAllCaFiles(GameTypeEnum gameEnum)
+        public IPackFileContainer? LoadAllCaFiles(GameTypeEnum gameEnum)
         {
             var game = GameInformationDatabase.GetGameById(gameEnum);
             var gamePathInfo = _settingsService.CurrentSettings.GameDirectories.FirstOrDefault(x => x.Game == game.Type);
@@ -101,71 +101,114 @@ namespace Shared.Core.PackFiles.Utility
                 _logger.Here().Information($"Loading pack files for {gameName} located in {gameDataFolder}");
                 var allCaPackFiles = ManifestHelper.GetPackFilesFromManifest(gameDataFolder, out var manifestFileFound);
 
-                // When loading ca pack packs, we want to use the CA resolver as its faster. 
-                // If there is no manifest file, we need to use the duplicate resolver as it loads all file in the folder.
-                // There might be custom mods in there that does not follow the rules! 
-                IDuplicateFileResolver packfileResolver = new CaPackDuplicateFileResolver();
-                if (manifestFileFound == false)
+                var fingerprint = PackFileContainerCacheHelper.ComputeFingerprint(gameDataFolder, allCaPackFiles);
+                var cacheFilePath = PackFileContainerCacheHelper.GetCacheFilePath(gameDataFolder, gameName);
+
+                var cached = TryLoadFromCache(cacheFilePath, fingerprint, gameName);
+                if (cached != null)
+                    return cached;
+
+                var container = LoadAllCaFilesFromDisk(gameDataFolder, gameName, allCaPackFiles, manifestFileFound);
+
+                try
                 {
-                    _logger.Here().Warning($"Loading pack files for {gameName}, which does not uses manifest.txt. If there are MODs in the game folder, this might cause issues!");
-                    packfileResolver = new CustomPackDuplicateFileResolver();
+                    var cacheData = PackFileContainerCacheHelper.BuildCacheData(fingerprint, container);
+                    PackFileContainerCacheHelper.SaveCache(cacheData, cacheFilePath);
+                    _logger.Here().Information($"Saved CA pack cache for {gameName} to {cacheFilePath}");
+                }
+                catch (Exception cacheEx)
+                {
+                    _logger.Here().Warning($"Failed to save CA pack cache for {gameName}: {cacheEx.Message}");
                 }
 
-                var packList = new List<PackFileContainer>();
-                var packsCompressionStats = new ConcurrentDictionary<CompressionFormat, CompressionInformation>();
-
-                Parallel.ForEach(allCaPackFiles, packFilePath =>
-                {
-                    var path = gameDataFolder + "\\" + packFilePath;
-                    if (File.Exists(path))
-                    {
-                        using var fileStream = File.OpenRead(path);
-                        using var reader = new BinaryReader(fileStream, Encoding.ASCII);
-
-                        var packFileSize = new FileInfo(path).Length;
-                        var pack = PackFileSerializerLoader.Load(path, packFileSize, reader, packfileResolver);
-                        packList.Add(pack);
-
-                        PackFileLog.LogPackCompression(pack);
-                        var packCompressionStats = PackFileLog.GetCompressionInformation(pack);
-                        foreach (var kvp in packCompressionStats)
-                        {
-                            if (!packsCompressionStats.TryGetValue(kvp.Key, out var existingStats))
-                                packsCompressionStats[kvp.Key] = new CompressionInformation(kvp.Value.DiskSize, kvp.Value.UncompressedSize);
-                            else
-                                existingStats.Add(kvp.Value);
-                        }
-                    }
-                    else
-                        _logger.Here().Warning($"{gameName} pack file '{path}' not found, loading skipped");
-                }
-                );
-
-                PackFileLog.LogPacksCompression(packsCompressionStats);
-
-                var caPackFileContainer = new PackFileContainer($"All Game Packs - {gameName}");
-                caPackFileContainer.IsCaPackFile = true;
-                caPackFileContainer.SystemFilePath = gameDataFolder;
-                var packFilesOrderedByGroup = packList.GroupBy(x => x.Header.LoadOrder).OrderBy(x => x.Key);
-
-                foreach (var group in packFilesOrderedByGroup)
-                {
-                    var packFilesOrderedByName = group.OrderBy(x => x.Name);
-                    foreach (var packfile in packFilesOrderedByName)
-                    {
-                        if (string.IsNullOrWhiteSpace(packfile.SystemFilePath) == false)
-                            caPackFileContainer.SourcePackFilePaths.Add(packfile.SystemFilePath);
-                        caPackFileContainer.MergePackFileContainer(packfile);
-                    }
-                }
-
-                return caPackFileContainer;
+                return container;
             }
             catch (Exception e)
             {
                 _logger.Here().Error($"Trying to get all CA packs in {gameDataFolder}. Error : {e.ToString()}");
                 return null;
             }
+        }
+
+        private CachedPackFileContainer? TryLoadFromCache(string cacheFilePath, string fingerprint, string gameName)
+        {
+            try
+            {
+                var container = PackFileContainerCacheHelper.LoadContainerFromCache(cacheFilePath, fingerprint);
+                if (container != null)
+                {
+                    _logger.Here().Information($"Loading CA packs for {gameName} from cache: {cacheFilePath}");
+                    return container;
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.Here().Warning($"Failed to read CA pack cache for {gameName}, will rebuild: {ex.Message}");
+            }
+            return null;
+        }
+
+        private PackFileContainer LoadAllCaFilesFromDisk(string gameDataFolder, string gameName, List<string> allCaPackFiles, bool manifestFileFound)
+        {
+            // When loading ca pack packs, we want to use the CA resolver as its faster. 
+            // If there is no manifest file, we need to use the duplicate resolver as it loads all file in the folder.
+            // There might be custom mods in there that does not follow the rules! 
+            IDuplicateFileResolver packfileResolver = new CaPackDuplicateFileResolver();
+            if (manifestFileFound == false)
+            {
+                _logger.Here().Warning($"Loading pack files for {gameName}, which does not uses manifest.txt. If there are MODs in the game folder, this might cause issues!");
+                packfileResolver = new CustomPackDuplicateFileResolver();
+            }
+
+            var packList = new List<PackFileContainer>();
+            var packsCompressionStats = new ConcurrentDictionary<CompressionFormat, CompressionInformation>();
+
+            Parallel.ForEach(allCaPackFiles, packFilePath =>
+            {
+                var path = gameDataFolder + "\\" + packFilePath;
+                if (File.Exists(path))
+                {
+                    using var fileStream = File.OpenRead(path);
+                    using var reader = new BinaryReader(fileStream, Encoding.ASCII);
+
+                    var packFileSize = new FileInfo(path).Length;
+                    var pack = PackFileSerializerLoader.Load(path, packFileSize, reader, packfileResolver);
+                    packList.Add(pack);
+
+                    PackFileLog.LogPackCompression(pack);
+                    var packCompressionStats = PackFileLog.GetCompressionInformation(pack);
+                    foreach (var kvp in packCompressionStats)
+                    {
+                        if (!packsCompressionStats.TryGetValue(kvp.Key, out var existingStats))
+                            packsCompressionStats[kvp.Key] = new CompressionInformation(kvp.Value.DiskSize, kvp.Value.UncompressedSize);
+                        else
+                            existingStats.Add(kvp.Value);
+                    }
+                }
+                else
+                    _logger.Here().Warning($"{gameName} pack file '{path}' not found, loading skipped");
+            }
+            );
+
+            PackFileLog.LogPacksCompression(packsCompressionStats);
+
+            var caPackFileContainer = new PackFileContainer($"All Game Packs - {gameName}");
+            caPackFileContainer.IsCaPackFile = true;
+            caPackFileContainer.SystemFilePath = gameDataFolder;
+            var packFilesOrderedByGroup = packList.GroupBy(x => x.Header.LoadOrder).OrderBy(x => x.Key);
+
+            foreach (var group in packFilesOrderedByGroup)
+            {
+                var packFilesOrderedByName = group.OrderBy(x => x.Name);
+                foreach (var packfile in packFilesOrderedByName)
+                {
+                    if (string.IsNullOrWhiteSpace(packfile.SystemFilePath) == false)
+                        caPackFileContainer.SourcePackFilePaths.Add(packfile.SystemFilePath);
+                    caPackFileContainer.MergePackFileContainer(packfile);
+                }
+            }
+
+            return caPackFileContainer;
         }
     }
 }

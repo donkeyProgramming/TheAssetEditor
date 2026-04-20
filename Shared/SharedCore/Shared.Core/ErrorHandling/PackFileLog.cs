@@ -20,7 +20,7 @@ namespace Shared.Core.ErrorHandling
         private static readonly ILogger s_logger = Logging.CreateStatic(typeof(PackFileLog));
         public static bool IsLoggingEnabled { get; set; } = true;
 
-        public static Dictionary<CompressionFormat, CompressionInformation> GetCompressionInformation(PackFileContainer container)
+        internal static Dictionary<CompressionFormat, CompressionInformation> GetCompressionInformation(PackFileContainer container)
         {
             var compressionInformation = new Dictionary<CompressionFormat, CompressionInformation>();
             if(IsLoggingEnabled == false)
@@ -46,7 +46,7 @@ namespace Shared.Core.ErrorHandling
             return compressionInformation;
         }
 
-        public static void LogPackCompression(PackFileContainer container)
+        internal static void LogPackCompression(PackFileContainer container)
         {
             if (IsLoggingEnabled == false)
                 return;

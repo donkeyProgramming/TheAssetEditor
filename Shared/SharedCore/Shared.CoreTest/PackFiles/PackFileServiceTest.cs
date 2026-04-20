@@ -161,5 +161,35 @@ namespace Shared.CoreTest.PackFiles
         // UnloadPackContainer
         // SaveFile
         // SavePackContainer
+
+        [Test]
+        public void SaveFile_NoEditablePack_ThrowsDescriptiveException()
+        {
+            var pfs = new PackFileService(null);
+            pfs.AddContainer(new PackFileContainer("Ca") { IsCaPackFile = true });
+            var file = new PackFile("file.txt", new MemorySource([1, 2, 3]));
+
+            var ex = Assert.Throws<Exception>(() => pfs.SaveFile(file, [4, 5, 6]));
+            Assert.That(ex.Message, Does.Contain("No editable pack file is set"));
+        }
+
+        [Test]
+        public void AddContainer_TwoContainersWithNullSystemFilePath_BothAdded()
+        {
+            var dialogProvider = new Mock<ISimpleMessageBox>();
+            var pfs = new PackFileService(null);
+            pfs.MessageBoxProvider = dialogProvider.Object;
+            var ca = new PackFileContainer("Ca") { IsCaPackFile = true };
+            pfs.AddContainer(ca);
+
+            var container1 = new PackFileContainer("Pack1") { SystemFilePath = null };
+            var container2 = new PackFileContainer("Pack2") { SystemFilePath = null };
+
+            pfs.AddContainer(container1);
+            var result = pfs.AddContainer(container2);
+
+            Assert.That(result, Is.Not.Null);
+            Assert.That(pfs.GetAllPackfileContainers().Count, Is.EqualTo(3));
+        }
     }
 }

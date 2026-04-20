@@ -108,7 +108,7 @@ namespace Test.AnimatioReTarget
             // Check player
         }
 
-        private void Step5_UpdateAnimationSettingsAndGenerateAnimation(AssetEditorTestRunner runner, AnimationRetargetEditor editor, PackFileContainer outputPackFile)
+        private void Step5_UpdateAnimationSettingsAndGenerateAnimation(AssetEditorTestRunner runner, AnimationRetargetEditor editor, IPackFileContainer outputPackFile)
         {
             Assert.That(outputPackFile.FileList.Count, Is.EqualTo(0));
 

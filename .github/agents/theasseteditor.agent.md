@@ -70,6 +70,7 @@ When tests are mixed-framework, preserve existing framework choice (NUnit and MS
 - Avoid coupling business logic to UI framework types where possible; keep logic behind testable seams.
 - Prefer existing abstractions and dependency injection instead of creating new layers purely for mocking.
 - Avoid designs that require implementing fake classes to test core behavior.
+- Test files should follow the same folder stucture as the file being tested. 
 
 ## Safety Checklist Before Finalizing
 - Change is limited to requested scope.

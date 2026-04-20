@@ -25,7 +25,7 @@ namespace Editors.ImportExport.Importing.Importers.GltfToRmv.Helper
         ModelRoot modelRoot,
         string skeletonName,
         float keysPerSecond,
-        PackFileContainer packFileContainer,
+        IPackFileContainer packFileContainer,
         string packPath
     );
 

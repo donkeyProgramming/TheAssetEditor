@@ -28,7 +28,7 @@ namespace Shared.Ui.BaseDialogs.PackFileTree
         private bool _isExpandedByFilter;
         private readonly bool _isPlaceholder;
 
-        public PackFileContainer FileOwner { get; private set; }
+        public IPackFileContainer FileOwner { get; private set; }
         public PackFile? Item { get; set; }
         public TreeNode? Parent { get; set; }
 
@@ -43,7 +43,7 @@ namespace Shared.Ui.BaseDialogs.PackFileTree
         internal TreeNodeSource? Source => _source;
         internal bool HasMaterializedChildren => Children.Any(x => x._isPlaceholder == false);
 
-        public TreeNode(string name, NodeType type, PackFileContainer ower, TreeNode? parent, PackFile? packFile = null)
+        public TreeNode(string name, NodeType type, IPackFileContainer ower, TreeNode? parent, PackFile? packFile = null)
         {
             Name = name;
             Item = packFile;

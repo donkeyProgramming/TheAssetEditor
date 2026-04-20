@@ -10,7 +10,7 @@ namespace Shared.Core.Services
     public class TouchedFilesRecorder
     {
         readonly ILogger _logger = Logging.Create<TouchedFilesRecorder>();
-        readonly List<(string FilePath, PackFileContainer Container)> _files = new();
+        readonly List<(string FilePath, IPackFileContainer Container)> _files = new();
         readonly IPackFileService _pfs;
         private readonly IGlobalEventHub _eventHub;
         private readonly ApplicationSettingsService _applicationSettingsService;

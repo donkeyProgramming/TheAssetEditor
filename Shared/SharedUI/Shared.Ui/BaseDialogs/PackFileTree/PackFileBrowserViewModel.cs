@@ -39,7 +39,7 @@ namespace Shared.Ui.BaseDialogs.PackFileTree
         private readonly IWindowsKeyboard _windowKeyboard;
         private readonly ApplicationSettingsService _applicationSettingsService;
         private readonly IContextMenuBuilder _contextMenuBuilder;
-        private readonly Dictionary<PackFileContainer, PackFileTreeState> _treeStates = [];
+        private readonly Dictionary<IPackFileContainer, PackFileTreeState> _treeStates = [];
 
         public event FileSelectedDelegate FileOpen;
         public event NodeSelectedDelegate NodeSelected;
@@ -97,7 +97,7 @@ namespace Shared.Ui.BaseDialogs.PackFileTree
             NodeSelected?.Invoke(_selectedItem);
         }
 
-        private void Database_PackFileFolderRemoved(PackFileContainer container, string folder)
+        private void Database_PackFileFolderRemoved(IPackFileContainer container, string folder)
         {
             var state = GetPackFileTreeState(container);
             var root = state.RootNode;
@@ -118,7 +118,7 @@ namespace Shared.Ui.BaseDialogs.PackFileTree
             Filter.Reapply();
         }
 
-        private void Database_PackFileFolderRenamed(PackFileContainer container, string folder)
+        private void Database_PackFileFolderRenamed(IPackFileContainer container, string folder)
         {
             var state = GetPackFileTreeState(container);
             var node = GetNodeFromPath(state.RootSource, folder, false);
@@ -142,7 +142,7 @@ namespace Shared.Ui.BaseDialogs.PackFileTree
             Filter.Reapply();
         }
 
-        private void Database_PackFilesRemoved(PackFileContainer container, List<PackFile> files)
+        private void Database_PackFilesRemoved(IPackFileContainer container, List<PackFile> files)
         {
             var state = GetPackFileTreeState(container);
             var root = state.RootNode;
@@ -236,7 +236,7 @@ namespace Shared.Ui.BaseDialogs.PackFileTree
                 newContiner.IsMainEditabelPack = true;
         }
 
-        private void AddFiles(PackFileContainer container, List<PackFile> files)
+        private void AddFiles(IPackFileContainer container, List<PackFile> files)
         {
             var state = GetPackFileTreeState(container);
             var root = state.RootNode;
@@ -394,7 +394,7 @@ namespace Shared.Ui.BaseDialogs.PackFileTree
             return null;
         }
 
-        private TreeNodeSource? GetNodeFromPackFile(PackFileContainer container, PackFile pf, bool createIfMissing = true)
+        private TreeNodeSource? GetNodeFromPackFile(IPackFileContainer container, PackFile pf, bool createIfMissing = true)
         {
             var state = GetPackFileTreeState(container);
             var root = state.RootSource;
@@ -415,7 +415,7 @@ namespace Shared.Ui.BaseDialogs.PackFileTree
             }
         }
 
-        private void ReloadTree(PackFileContainer container)
+        private void ReloadTree(IPackFileContainer container)
         {
             if (_treeStates.TryGetValue(container, out var existingState))
             {
@@ -541,7 +541,7 @@ namespace Shared.Ui.BaseDialogs.PackFileTree
             return true;
         }
 
-        private PackFileTreeState GetPackFileTreeState(PackFileContainer container)
+        private PackFileTreeState GetPackFileTreeState(IPackFileContainer container)
         {
             return _treeStates[container];
         }

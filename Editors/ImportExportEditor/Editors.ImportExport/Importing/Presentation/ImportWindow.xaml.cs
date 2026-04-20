@@ -29,7 +29,7 @@ namespace Editors.ImportExport.Importing.Presentation
             DataContext = _viewModel;
         }
 
-        internal void Initialize(PackFileContainer packFileContainer, string packPath, string diskFile)
+        internal void Initialize(IPackFileContainer packFileContainer, string packPath, string diskFile)
         {
             _viewModel.Initialize(packFileContainer, packPath, diskFile);            
         }
