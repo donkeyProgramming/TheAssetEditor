@@ -14,7 +14,7 @@ namespace Shared.CoreTest.PackFiles.Serialization
         {
             _tempDir = Path.Combine(Path.GetTempPath(), "AssetEditorCacheTests_" + Guid.NewGuid().ToString("N"));
             Directory.CreateDirectory(_tempDir);
-            _cacheFilePath = Path.Combine(_tempDir, "test_cache.json");
+            _cacheFilePath = Path.Combine(_tempDir, "test_cache.bin");
         }
 
         [TearDown]
@@ -151,7 +151,7 @@ namespace Shared.CoreTest.PackFiles.Serialization
         [Test]
         public void LoadCache_ReturnsNullForMissingFile()
         {
-            var result = PackFileContainerCacheHelper.LoadCache(Path.Combine(_tempDir, "nonexistent.json"));
+            var result = PackFileContainerCacheHelper.LoadCache(Path.Combine(_tempDir, "nonexistent.bin"));
             Assert.That(result, Is.Null);
         }
 
@@ -228,6 +228,28 @@ namespace Shared.CoreTest.PackFiles.Serialization
             Assert.That(restoredSource.IsCompressed, Is.True);
             Assert.That(restoredSource.CompressionFormat, Is.EqualTo(CompressionFormat.Lz4));
             Assert.That(restoredSource.UncompressedSize, Is.EqualTo(1024));
+        }
+
+        [Test]
+        public void LoadCache_ReturnsNullForBadMagic()
+        {
+            File.WriteAllBytes(_cacheFilePath, [0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00]);
+            var result = PackFileContainerCacheHelper.LoadCache(_cacheFilePath);
+            Assert.That(result, Is.Null);
+        }
+
+        [Test]
+        public void LoadCache_ReturnsNullForWrongVersion()
+        {
+            using (var stream = File.Create(_cacheFilePath))
+            using (var writer = new BinaryWriter(stream))
+            {
+                writer.Write("AEPC"u8);
+                writer.Write(999); // wrong version
+            }
+
+            var result = PackFileContainerCacheHelper.LoadCache(_cacheFilePath);
+            Assert.That(result, Is.Null);
         }
     }
 }

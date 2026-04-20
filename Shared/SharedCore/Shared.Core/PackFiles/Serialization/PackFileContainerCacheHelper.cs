@@ -1,7 +1,5 @@
 using System.Security.Cryptography;
 using System.Text;
-using System.Text.Json;
-using System.Text.Json.Serialization;
 using Shared.Core.PackFiles.Models;
 using Shared.Core.PackFiles.Utility;
 
@@ -15,7 +13,6 @@ namespace Shared.Core.PackFiles.Serialization
         long Size,
         bool IsEncrypted,
         bool IsCompressed,
-        [property: JsonConverter(typeof(JsonStringEnumConverter))]
         CompressionFormat CompressionFormat,
         uint UncompressedSize);
 
@@ -30,10 +27,8 @@ namespace Shared.Core.PackFiles.Serialization
 
     internal static class PackFileContainerCacheHelper
     {
-        private static readonly JsonSerializerOptions s_jsonOptions = new()
-        {
-            WriteIndented = false,
-        };
+        private static readonly byte[] s_magic = "AEPC"u8.ToArray();
+        private const int CacheVersion = 1;
 
         public static string GetCacheFilePath(string gameDataFolder, string gameName)
         {
@@ -45,7 +40,7 @@ namespace Shared.Core.PackFiles.Serialization
             Directory.CreateDirectory(cacheDir);
 
             var safeGameName = string.Join("_", gameName.Split(Path.GetInvalidFileNameChars()));
-            return Path.Combine(cacheDir, $"ca_pack_cache_{safeGameName}.json");
+            return Path.Combine(cacheDir, $"ca_pack_cache_{safeGameName}.bin");
         }
 
         public static string ComputeFingerprint(string gameDataFolder, List<string> packFileNames)
@@ -84,8 +79,33 @@ namespace Shared.Core.PackFiles.Serialization
 
         public static void SaveCache(CachedContainerData data, string cacheFilePath)
         {
-            var json = JsonSerializer.Serialize(data, s_jsonOptions);
-            File.WriteAllText(cacheFilePath, json);
+            using var stream = File.Create(cacheFilePath);
+            using var writer = new BinaryWriter(stream, Encoding.UTF8);
+
+            writer.Write(s_magic);
+            writer.Write(CacheVersion);
+
+            writer.Write(data.Fingerprint);
+            writer.Write(data.ContainerName);
+            writer.Write(data.SystemFilePath);
+
+            writer.Write(data.SourcePackFilePaths.Count);
+            foreach (var path in data.SourcePackFilePaths)
+                writer.Write(path);
+
+            writer.Write(data.Files.Count);
+            foreach (var entry in data.Files)
+            {
+                writer.Write(entry.RelativePath);
+                writer.Write(entry.FileName);
+                writer.Write(entry.SourcePackFilePath);
+                writer.Write(entry.Offset);
+                writer.Write(entry.Size);
+                writer.Write(entry.IsEncrypted);
+                writer.Write(entry.IsCompressed);
+                writer.Write((int)entry.CompressionFormat);
+                writer.Write(entry.UncompressedSize);
+            }
         }
 
         public static CachedContainerData? LoadCache(string cacheFilePath)
@@ -93,8 +113,44 @@ namespace Shared.Core.PackFiles.Serialization
             if (!File.Exists(cacheFilePath))
                 return null;
 
-            var json = File.ReadAllText(cacheFilePath);
-            return JsonSerializer.Deserialize<CachedContainerData>(json, s_jsonOptions);
+            using var stream = File.OpenRead(cacheFilePath);
+            using var reader = new BinaryReader(stream, Encoding.UTF8);
+
+            var magic = reader.ReadBytes(s_magic.Length);
+            if (!magic.AsSpan().SequenceEqual(s_magic))
+                return null;
+
+            var version = reader.ReadInt32();
+            if (version != CacheVersion)
+                return null;
+
+            var data = new CachedContainerData
+            {
+                Fingerprint = reader.ReadString(),
+                ContainerName = reader.ReadString(),
+                SystemFilePath = reader.ReadString(),
+            };
+
+            var sourcePathCount = reader.ReadInt32();
+            for (var i = 0; i < sourcePathCount; i++)
+                data.SourcePackFilePaths.Add(reader.ReadString());
+
+            var fileCount = reader.ReadInt32();
+            for (var i = 0; i < fileCount; i++)
+            {
+                data.Files.Add(new CachedFileEntry(
+                    RelativePath: reader.ReadString(),
+                    FileName: reader.ReadString(),
+                    SourcePackFilePath: reader.ReadString(),
+                    Offset: reader.ReadInt64(),
+                    Size: reader.ReadInt64(),
+                    IsEncrypted: reader.ReadBoolean(),
+                    IsCompressed: reader.ReadBoolean(),
+                    (CompressionFormat)reader.ReadInt32(),
+                    UncompressedSize: reader.ReadUInt32()));
+            }
+
+            return data;
         }
 
         public static CachedContainerData BuildCacheData(string fingerprint, PackFileContainer container)
