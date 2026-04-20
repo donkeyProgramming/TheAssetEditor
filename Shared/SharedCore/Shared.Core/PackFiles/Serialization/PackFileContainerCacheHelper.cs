@@ -108,13 +108,19 @@ namespace Shared.Core.PackFiles.Serialization
             }
         }
 
-        public static CachedContainerData? LoadCache(string cacheFilePath)
+        /// <summary>
+        /// Single-pass optimized load: reads binary cache directly into a CachedPackFileContainer,
+        /// skipping intermediate CachedContainerData/CachedFileEntry allocations.
+        /// Returns null if the file is missing, corrupt, or the fingerprint doesn't match.
+        /// </summary>
+        public static CachedPackFileContainer? LoadContainerFromCache(string cacheFilePath, string expectedFingerprint)
         {
             if (!File.Exists(cacheFilePath))
                 return null;
 
-            using var stream = File.OpenRead(cacheFilePath);
-            using var reader = new BinaryReader(stream, Encoding.UTF8);
+            using var fileStream = File.OpenRead(cacheFilePath);
+            using var buffered = new BufferedStream(fileStream, 1024 * 64);
+            using var reader = new BinaryReader(buffered, Encoding.UTF8);
 
             var magic = reader.ReadBytes(s_magic.Length);
             if (!magic.AsSpan().SequenceEqual(s_magic))
@@ -124,33 +130,58 @@ namespace Shared.Core.PackFiles.Serialization
             if (version != CacheVersion)
                 return null;
 
-            var data = new CachedContainerData
+            var fingerprint = reader.ReadString();
+            if (fingerprint != expectedFingerprint)
+                return null;
+
+            var containerName = reader.ReadString();
+            var systemFilePath = reader.ReadString();
+
+            var container = new CachedPackFileContainer(containerName)
             {
-                Fingerprint = reader.ReadString(),
-                ContainerName = reader.ReadString(),
-                SystemFilePath = reader.ReadString(),
+                SystemFilePath = systemFilePath,
             };
 
             var sourcePathCount = reader.ReadInt32();
             for (var i = 0; i < sourcePathCount; i++)
-                data.SourcePackFilePaths.Add(reader.ReadString());
+                container.SourcePackFilePaths.Add(reader.ReadString());
 
             var fileCount = reader.ReadInt32();
+            var fileList = new Dictionary<string, PackFile>(fileCount);
+            var parentCache = new Dictionary<string, PackedFileSourceParent>(sourcePathCount, StringComparer.OrdinalIgnoreCase);
+            var stringPool = new Dictionary<string, string>(sourcePathCount, StringComparer.Ordinal);
+
             for (var i = 0; i < fileCount; i++)
             {
-                data.Files.Add(new CachedFileEntry(
-                    RelativePath: reader.ReadString(),
-                    FileName: reader.ReadString(),
-                    SourcePackFilePath: reader.ReadString(),
-                    Offset: reader.ReadInt64(),
-                    Size: reader.ReadInt64(),
-                    IsEncrypted: reader.ReadBoolean(),
-                    IsCompressed: reader.ReadBoolean(),
-                    (CompressionFormat)reader.ReadInt32(),
-                    UncompressedSize: reader.ReadUInt32()));
+                var relativePath = reader.ReadString();
+                var fileName = reader.ReadString();
+                var sourcePackFilePath = reader.ReadString();
+                var offset = reader.ReadInt64();
+                var size = reader.ReadInt64();
+                var isEncrypted = reader.ReadBoolean();
+                var isCompressed = reader.ReadBoolean();
+                var compressionFormat = (CompressionFormat)reader.ReadInt32();
+                var uncompressedSize = reader.ReadUInt32();
+
+                // Intern the source pack path string — ~20 unique values across 600K entries
+                if (!stringPool.TryGetValue(sourcePackFilePath, out var internedPath))
+                {
+                    internedPath = sourcePackFilePath;
+                    stringPool[internedPath] = internedPath;
+                }
+
+                if (!parentCache.TryGetValue(internedPath, out var parent))
+                {
+                    parent = new PackedFileSourceParent { FilePath = internedPath };
+                    parentCache[internedPath] = parent;
+                }
+
+                var source = new PackedFileSource(parent, offset, size, isEncrypted, isCompressed, compressionFormat, uncompressedSize);
+                fileList[relativePath] = new PackFile(fileName, source);
             }
 
-            return data;
+            container.FileList = fileList;
+            return container;
         }
 
         public static CachedContainerData BuildCacheData(string fingerprint, PackFileContainer container)

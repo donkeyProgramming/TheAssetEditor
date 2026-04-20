@@ -134,11 +134,11 @@ namespace Shared.Core.PackFiles.Utility
         {
             try
             {
-                var cacheData = PackFileContainerCacheHelper.LoadCache(cacheFilePath);
-                if (cacheData != null && cacheData.Fingerprint == fingerprint)
+                var container = PackFileContainerCacheHelper.LoadContainerFromCache(cacheFilePath, fingerprint);
+                if (container != null)
                 {
                     _logger.Here().Information($"Loading CA packs for {gameName} from cache: {cacheFilePath}");
-                    return PackFileContainerCacheHelper.RestoreFromCache(cacheData);
+                    return container;
                 }
             }
             catch (Exception ex)

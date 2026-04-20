@@ -49,15 +49,14 @@ namespace Shared.CoreTest.PackFiles.Serialization
             // Act
             var cacheData = PackFileContainerCacheHelper.BuildCacheData("fingerprint123", container);
             PackFileContainerCacheHelper.SaveCache(cacheData, _cacheFilePath);
-            var loaded = PackFileContainerCacheHelper.LoadCache(_cacheFilePath);
+            var loaded = PackFileContainerCacheHelper.LoadContainerFromCache(_cacheFilePath, "fingerprint123");
 
             // Assert
             Assert.That(loaded, Is.Not.Null);
-            Assert.That(loaded.Fingerprint, Is.EqualTo("fingerprint123"));
-            Assert.That(loaded.ContainerName, Is.EqualTo("All Game Packs - TestGame"));
+            Assert.That(loaded.Name, Is.EqualTo("All Game Packs - TestGame"));
             Assert.That(loaded.SystemFilePath, Is.EqualTo(@"c:\game\data"));
             Assert.That(loaded.SourcePackFilePaths.Count, Is.EqualTo(2));
-            Assert.That(loaded.Files.Count, Is.EqualTo(2));
+            Assert.That(loaded.FileList.Count, Is.EqualTo(2));
         }
 
         [Test]
@@ -151,7 +150,7 @@ namespace Shared.CoreTest.PackFiles.Serialization
         [Test]
         public void LoadCache_ReturnsNullForMissingFile()
         {
-            var result = PackFileContainerCacheHelper.LoadCache(Path.Combine(_tempDir, "nonexistent.bin"));
+            var result = PackFileContainerCacheHelper.LoadContainerFromCache(Path.Combine(_tempDir, "nonexistent.bin"), "fp");
             Assert.That(result, Is.Null);
         }
 
@@ -207,11 +206,10 @@ namespace Shared.CoreTest.PackFiles.Serialization
             container.FileList["text\\localisation.loc"] = new PackFile("localisation.loc",
                 new PackedFileSource(parent, 256, 512, false, true, CompressionFormat.Lz4, 1024));
 
-            // Act: build → save → load → restore
+            // Act: build → save → load
             var cacheData = PackFileContainerCacheHelper.BuildCacheData("test_fp", container);
             PackFileContainerCacheHelper.SaveCache(cacheData, _cacheFilePath);
-            var loadedData = PackFileContainerCacheHelper.LoadCache(_cacheFilePath);
-            var restored = PackFileContainerCacheHelper.RestoreFromCache(loadedData!);
+            var restored = PackFileContainerCacheHelper.LoadContainerFromCache(_cacheFilePath, "test_fp");
 
             // Assert: restored container matches original
             Assert.That(restored.Name, Is.EqualTo("Full Cycle Test"));
@@ -234,7 +232,7 @@ namespace Shared.CoreTest.PackFiles.Serialization
         public void LoadCache_ReturnsNullForBadMagic()
         {
             File.WriteAllBytes(_cacheFilePath, [0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00]);
-            var result = PackFileContainerCacheHelper.LoadCache(_cacheFilePath);
+            var result = PackFileContainerCacheHelper.LoadContainerFromCache(_cacheFilePath, "fp");
             Assert.That(result, Is.Null);
         }
 
@@ -248,8 +246,50 @@ namespace Shared.CoreTest.PackFiles.Serialization
                 writer.Write(999); // wrong version
             }
 
-            var result = PackFileContainerCacheHelper.LoadCache(_cacheFilePath);
+            var result = PackFileContainerCacheHelper.LoadContainerFromCache(_cacheFilePath, "fp");
             Assert.That(result, Is.Null);
+        }
+
+        [Test]
+        public void LoadContainerFromCache_ReturnsNullForFingerprintMismatch()
+        {
+            var container = new PackFileContainer("Test")
+            {
+                IsCaPackFile = true,
+                SystemFilePath = @"c:\game\data"
+            };
+            var parent = new PackedFileSourceParent { FilePath = @"c:\game\data\pack.pack" };
+            container.FileList["a.txt"] = new PackFile("a.txt",
+                new PackedFileSource(parent, 0, 10, false, false, CompressionFormat.None, 0));
+
+            var cacheData = PackFileContainerCacheHelper.BuildCacheData("original_fp", container);
+            PackFileContainerCacheHelper.SaveCache(cacheData, _cacheFilePath);
+
+            var result = PackFileContainerCacheHelper.LoadContainerFromCache(_cacheFilePath, "different_fp");
+            Assert.That(result, Is.Null);
+        }
+
+        [Test]
+        public void LoadContainerFromCache_SharesParentInstances()
+        {
+            var container = new PackFileContainer("Test")
+            {
+                IsCaPackFile = true,
+                SystemFilePath = @"c:\game"
+            };
+            var parent = new PackedFileSourceParent { FilePath = @"c:\pack.pack" };
+            container.FileList["a.txt"] = new PackFile("a.txt",
+                new PackedFileSource(parent, 0, 10, false, false, CompressionFormat.None, 0));
+            container.FileList["b.txt"] = new PackFile("b.txt",
+                new PackedFileSource(parent, 10, 20, false, false, CompressionFormat.None, 0));
+
+            var cacheData = PackFileContainerCacheHelper.BuildCacheData("fp", container);
+            PackFileContainerCacheHelper.SaveCache(cacheData, _cacheFilePath);
+
+            var restored = PackFileContainerCacheHelper.LoadContainerFromCache(_cacheFilePath, "fp");
+            var sourceA = (PackedFileSource)restored!.FileList["a.txt"].DataSource;
+            var sourceB = (PackedFileSource)restored.FileList["b.txt"].DataSource;
+            Assert.That(ReferenceEquals(sourceA.Parent, sourceB.Parent), Is.True);
         }
     }
 }
