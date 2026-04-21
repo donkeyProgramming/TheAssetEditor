@@ -1,4 +1,5 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
+﻿using System.Collections.ObjectModel;
+using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Editors.KitbasherEditor.ChildEditors.PinTool.Commands;
 using GameWorld.Core.Commands;
@@ -15,8 +16,7 @@ namespace Editors.KitbasherEditor.ChildEditors.PinTool
         private readonly SelectionManager _selectionManager;
         private readonly CommandFactory _commandFactory;
 
-        [ObservableProperty] Rmv2MeshNode _takeAnimationFromMesh;
-        [ObservableProperty] string _description = "";
+        [ObservableProperty] ObservableCollection<Rmv2MeshNode> _sourceMeshes = [];
 
         public SkinWrapAlgorithm(CommandFactory commandFactory, IStandardDialogs standardDialogs, SelectionManager selectionManager)
         {
@@ -25,11 +25,9 @@ namespace Editors.KitbasherEditor.ChildEditors.PinTool
             _selectionManager = selectionManager;
         }
 
-        [RelayCommand] void SetSelection()
+        [RelayCommand]
+        void AddFromSelection()
         {
-            TakeAnimationFromMesh = null;
-
-            var description = "No Mesh selected";
             var selectionState = _selectionManager.GetState<ObjectSelectionState>();
             if (selectionState == null || selectionState.SelectionCount() == 0)
             {
@@ -37,39 +35,48 @@ namespace Editors.KitbasherEditor.ChildEditors.PinTool
                 return;
             }
 
-            if(selectionState.SelectionCount() != 1)
+            var selectedMeshes = selectionState.SelectedObjects()
+                .OfType<Rmv2MeshNode>()
+                .ToList();
+
+            if (selectedMeshes.Count == 0)
             {
-                _standardDialogs.ShowDialogBox("Multiple meshes selected - pick one", "Error");
+                _standardDialogs.ShowDialogBox("No mesh selected", "Error");
                 return;
             }
 
-            var selectionAsMeshNode = selectionState.GetSingleSelectedObject() as Rmv2MeshNode;
-            if (selectionAsMeshNode == null)
-                throw new Exception($"Unexpected result for selection. State = {selectionState}");
-
-            if (selectionAsMeshNode.PivotPoint != Vector3.Zero)
+            if (selectedMeshes.Any(x => x.PivotPoint != Vector3.Zero))
             {
                 _standardDialogs.ShowDialogBox("Selected mesh has a pivot point, the tool will not work correctly", "error");
                 return;
             }
 
-            TakeAnimationFromMesh = selectionAsMeshNode;
-
-            description = $"{TakeAnimationFromMesh.Name}'";
-            Description = description;
+            foreach (var mesh in selectedMeshes)
+            {
+                if (!SourceMeshes.Contains(mesh))
+                    SourceMeshes.Add(mesh);
+            }
         }
 
+        [RelayCommand]
+        void ClearSourceMeshes() => SourceMeshes.Clear();
 
-        internal bool Excute(List<Rmv2MeshNode> giveAnimationTo)
+        internal bool Execute(List<Rmv2MeshNode> giveAnimationTo)
         {
-            var isAlsoInInputList = giveAnimationTo.Contains(TakeAnimationFromMesh);
-            if (isAlsoInInputList)
+            if (SourceMeshes.Count == 0)
             {
-                _standardDialogs.ShowDialogBox("Same mesh found in both lists", "error");
+                _standardDialogs.ShowDialogBox("No source meshes selected", "Error");
                 return false;
             }
 
-            _commandFactory.Create<SkinWrapRiggingCommand>().Configure(x => x.Configure(giveAnimationTo, TakeAnimationFromMesh)).BuildAndExecute();
+            var overlap = giveAnimationTo.Intersect(SourceMeshes).ToList();
+            if (overlap.Count > 0)
+            {
+                _standardDialogs.ShowDialogBox("Same mesh found in both source and target lists", "error");
+                return false;
+            }
+
+            _commandFactory.Create<SkinWrapRiggingCommand>().Configure(x => x.Configure(giveAnimationTo, SourceMeshes.ToList())).BuildAndExecute();
             return true;
         }
     }

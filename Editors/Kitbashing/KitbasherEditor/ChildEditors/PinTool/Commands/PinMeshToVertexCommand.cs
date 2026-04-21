@@ -45,9 +45,9 @@ namespace Editors.KitbasherEditor.ChildEditors.PinTool.Commands
                 currentMesh.Geometry.ChangeVertexType(_source.Geometry.VertexFormat, false);
                 currentMesh.Geometry.UpdateSkeletonName(_source.Geometry.SkeletonName);
 
+                currentMesh.PivotPoint = Vector3.Zero;
                 for (var i = 0; i < currentMesh.Geometry.VertexCount(); i++)
                 {
-                    currentMesh.PivotPoint = Vector3.Zero;
                     currentMesh.Geometry.SetVertexBlendIndex(i, sourceVert.BlendIndices);
                     currentMesh.Geometry.SetVertexWeights(i, sourceVert.BlendWeights);
                 }

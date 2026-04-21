@@ -13,44 +13,44 @@ namespace Editors.KitbasherEditor.ChildEditors.PinTool.Commands
         List<MeshObject> _originalGeometries;
 
         List<Rmv2MeshNode> _giveAnimationToList;
-        Rmv2MeshNode _takeAnimationFrom;
+        List<Rmv2MeshNode> _takeAnimationFromList;
 
         public string HintText { get => "Skin wrap re-rigging"; }
         public bool IsMutation { get => true; }
 
-
-
         public SkinWrapRiggingCommand(SelectionManager selectionManager)
         {
-            _selectionManager = selectionManager; ;
+            _selectionManager = selectionManager;
         }
 
-        public void Configure(IEnumerable<Rmv2MeshNode> giveAnimationTo, Rmv2MeshNode takeAnimationFrom)
+        public void Configure(IEnumerable<Rmv2MeshNode> giveAnimationTo, List<Rmv2MeshNode> takeAnimationFrom)
         {
             _giveAnimationToList = giveAnimationTo.ToList();
-            _takeAnimationFrom = takeAnimationFrom;
+            _takeAnimationFromList = takeAnimationFrom;
         }
 
         public void Execute()
         {
-            // Create undo state
             _originalGeometries = _giveAnimationToList.Select(x => x.Geometry.Clone()).ToList();
             _selectionOldState = _selectionManager.GetStateCopy();
 
-            // Update the meshes
+            var firstSource = _takeAnimationFromList[0];
             foreach (var giveAnimationTo in _giveAnimationToList)
             {
-                // Set skeleton and vertex type from first source object
-                giveAnimationTo.Geometry.ChangeVertexType(_takeAnimationFrom.Geometry.VertexFormat, false);
-                giveAnimationTo.Geometry.UpdateSkeletonName(_takeAnimationFrom.Geometry.SkeletonName);
+                giveAnimationTo.Geometry.ChangeVertexType(firstSource.Geometry.VertexFormat, false);
+                giveAnimationTo.Geometry.UpdateSkeletonName(firstSource.Geometry.SkeletonName);
+
+                var maxBoneInfluences = giveAnimationTo.Geometry.WeightCount;
 
                 for (var i = 0; i < giveAnimationTo.Geometry.VertexCount(); i++)
                 {
-                    var inputVertexPos = giveAnimationTo.Geometry.VertexArray[i].Position3();
-                    var res = RegiggingHelper.FindClosestUV(inputVertexPos, _takeAnimationFrom.Geometry, _takeAnimationFrom.Position);
+                    var localVertexPos = giveAnimationTo.Geometry.VertexArray[i].Position3();
+                    var worldVertexPos = localVertexPos + giveAnimationTo.Position;
 
-                    giveAnimationTo.Geometry.VertexArray[i].BlendIndices = res.Bones;
-                    giveAnimationTo.Geometry.VertexArray[i].BlendWeights = res.BlendWeights;
+                    var result = RegiggingHelper.FindClosestBoneWeightsMultiMesh(worldVertexPos, _takeAnimationFromList, maxBoneInfluences);
+
+                    giveAnimationTo.Geometry.SetVertexBlendIndex(i, result.BoneIndices);
+                    giveAnimationTo.Geometry.SetVertexWeights(i, result.BlendWeights);
                 }
 
                 giveAnimationTo.Geometry.RebuildVertexBuffer();

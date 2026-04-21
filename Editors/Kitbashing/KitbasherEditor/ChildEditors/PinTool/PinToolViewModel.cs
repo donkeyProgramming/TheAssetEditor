@@ -26,7 +26,6 @@ namespace Editors.KitbasherEditor.ChildEditors.PinTool
         [ObservableProperty] RiggingMode[] _possibleRiggingModes = Enum.GetValues<RiggingMode>();
         [ObservableProperty] RiggingMode _selectedRiggingMode = RiggingMode.Pin;
         [ObservableProperty] ObservableCollection<Rmv2MeshNode> _affectedMeshCollection = [];
-        [ObservableProperty] ObservableCollection<Rmv2MeshNode> _sourceMeshCollection = [];
 
         public PinToolViewModel(SelectionManager selectionManager, CommandFactory commandFactory, IStandardDialogs standardDialogs)
         {
@@ -87,7 +86,7 @@ namespace Editors.KitbasherEditor.ChildEditors.PinTool
                     return PinMode.Execute(AffectedMeshCollection.ToList());
               
                 case RiggingMode.SkinWrap:
-                    return SkinWrapMode.Excute(AffectedMeshCollection.ToList());
+                    return SkinWrapMode.Execute(AffectedMeshCollection.ToList());
                 default:
                     throw new NotImplementedException($"unable to find an algorithm for selected mode '{SelectedRiggingMode}'");
             }

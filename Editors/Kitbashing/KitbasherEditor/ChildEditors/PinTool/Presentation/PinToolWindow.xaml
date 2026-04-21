@@ -10,28 +10,9 @@
         mc:Ignorable="d"
                                 
         Style="{StaticResource CustomWindowStyle}"
+        HelpDocumentPath="Documentation\AssetEditorDocumentation.html?doc=Kitbash_PinTool"
         Title="{loc:Loc KitbashTool.PinTool.Title}" Height="600" Width="400">
     <DockPanel LastChildFill="False">
-
-        <Expander Header="{loc:Loc KitbashTool.PinTool.Instructions}" DockPanel.Dock="Top">
-            <TextBlock Margin="10,0,0,10">
-                1. Select mode: 
-                <LineBreak/>
-                'Pin': for things which should not bend
-                <LineBreak/>
-                'Skin wrap': for things which should deform
-                <LineBreak/>           
-                2. Select meshes which should get new animation
-                <LineBreak/>
-                3. Select the meshes to take animation from
-                <LineBreak/>
-                'Pin': go into vertex mode and press button with a vertex selected
-                <LineBreak/>
-                'Skin wrap': select mesh
-                <LineBreak/>
-                4. Press Apply
-            </TextBlock>
-        </Expander>
 
         <DockPanel DockPanel.Dock="Top">
             <Label Content="{loc:Loc KitbashTool.PinTool.AnimationTransferMode}"/>
@@ -100,19 +81,25 @@
                                     <GroupBox Header="{loc:Loc KitbashTool.PinTool.TakeAnimationFromSkinWrapMode}" Margin="0,5,0,0">
                                         <Grid >
                                             <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="auto"/>
-                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="0.5*"/>
+                                                <ColumnDefinition Width="0.5*"/>
                                             </Grid.ColumnDefinitions>
 
                                             <Grid.RowDefinitions>
-                                                <RowDefinition Height="auto"/>
+                                                <RowDefinition Height="100"/>
                                                 <RowDefinition Height="auto"/>
                                             </Grid.RowDefinitions>
 
-                                            <Label Grid.Column="0" Grid.Row="0" Content="{loc:Loc KitbashTool.PinTool.Mesh}"/>
-                                            <TextBox Grid.Column="1" Grid.Row="0" IsReadOnly="true" VerticalContentAlignment="Center" Margin="2" Text="{Binding SkinWrapMode.Description, UpdateSourceTrigger=PropertyChanged}"/>
-                                            <Button Grid.Column="1" Grid.Row="1" Content="{loc:Loc KitbashTool.PinTool.SetFromSelection}" Margin="2" Command="{Binding SkinWrapMode.SetSelectionCommand}" />
+                                            <ListView Grid.Row="0" Grid.ColumnSpan="2" ItemsSource="{Binding SkinWrapMode.SourceMeshes, UpdateSourceTrigger=PropertyChanged}" DisplayMemberPath="Name">
+                                                <ListView.ItemContainerStyle>
+                                                    <Style TargetType="ListViewItem">
+                                                        <Setter Property="Height" Value="30"/>
+                                                    </Style>
+                                                </ListView.ItemContainerStyle>
+                                            </ListView>
 
+                                            <Button Content="{loc:Loc KitbashTool.PinTool.AddSelectedMeshes}" Grid.Row="1" Grid.Column="0" Margin="2,2,2,0" Command="{Binding SkinWrapMode.AddFromSelectionCommand}" />
+                                            <Button Content="{loc:Loc KitbashTool.PinTool.RemoveAll}" Grid.Row="1" Grid.Column="1" Margin="2,2,2,0" Command="{Binding SkinWrapMode.ClearSourceMeshesCommand}" />
                                         </Grid>
                                     </GroupBox>
                                 </Setter.Value>
