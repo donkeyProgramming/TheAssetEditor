@@ -9,6 +9,7 @@ using GameWorld.Core.SceneNodes;
 using GameWorld.Core.Services;
 using Microsoft.Xna.Framework;
 using Moq;
+using Shared.Core.Events;
 using Shared.GameFormats.RigidModel;
 using Shared.GameFormats.RigidModel.MaterialHeaders;
 
@@ -43,8 +44,11 @@ namespace Test.KitbashEditor.PinTool
                 null!, null!, null!, null!, null!);
 
             var selectionState = Mock.Of<ISelectionState>(s => s.Clone() == Mock.Of<ISelectionState>());
-            var field = typeof(SelectionManager).GetField("_currentState", BindingFlags.NonPublic | BindingFlags.Instance)!;
-            field.SetValue(_selectionManagerMock.Object, selectionState);
+            var stateField = typeof(SelectionManager).GetField("_currentState", BindingFlags.NonPublic | BindingFlags.Instance)!;
+            stateField.SetValue(_selectionManagerMock.Object, selectionState);
+
+            var eventHubField = typeof(SelectionManager).GetField("_eventHub", BindingFlags.NonPublic | BindingFlags.Instance)!;
+            eventHubField.SetValue(_selectionManagerMock.Object, Mock.Of<IEventHub>());
 
             _command = new SkinWrapRiggingCommand(_selectionManagerMock.Object);
         }
