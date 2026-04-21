@@ -11,77 +11,118 @@
     <h1>Pin Tool</h1>
 
     <p>
-        The <strong>Pin Tool</strong> transfers bone weight and rigging information from one or more source meshes to a set of target meshes.
-        This is used when you have imported or created new geometry that needs to follow an animated skeleton, but does not yet have the correct bone indices or blend weights.
+        The <strong>Pin Tool</strong> makes meshes move with an animated skeleton.
+        When you import a new piece of armor, a weapon, or any other 3D object into the Kitbash Editor,
+        that object does not know how to follow the character's animations yet.
+        The Pin Tool copies the animation information from an already-working mesh onto your new one.
     </p>
 
     <!-- PLACEHOLDER IMAGE: Screenshot of the Pin Tool window showing both modes in the dropdown, the target mesh list, and the source area. -->
     <img class="doc-image" src="Images/AssetEditor_Kitbash_PinTool_UI.png" alt="Pin Tool UI overview">
 
+    <h2>Key concepts</h2>
+
     <p>
-        The tool has two modes that solve different problems:
+        In Total War games, every model that moves with an animation is connected to a <strong>skeleton</strong> — an invisible set of bones
+        (like arm_left, spine, head, and so on). Each point on the mesh surface is told which bone(s) it should follow and
+        by how much. This information is often called <strong>rigging</strong> or <strong>bone weights</strong>.
+    </p>
+
+    <p>
+        Without correct rigging, your mesh will either stay frozen in place, or fly off in wrong directions when the character animates.
+        The Pin Tool gives you two ways to fix this:
     </p>
 
     <ul>
-        <li><strong>Pin</strong> — attaches rigid objects to one point on the skeleton. Every vertex in the target mesh gets the same bone weights, so the mesh moves as a solid piece.</li>
-        <li><strong>Skin Wrap</strong> — transfers smooth deformation weights. Each vertex in the target mesh gets bone weights interpolated from the nearest point on the source mesh surface, so the mesh deforms naturally with the skeleton.</li>
+        <li>
+            <strong>Pin</strong> — makes the entire mesh follow a single point on the skeleton.
+            The mesh moves as one solid piece, like a weapon held in a hand or a shield strapped to an arm.
+            Nothing on the mesh bends or stretches.
+        </li>
+        <li>
+            <strong>Skin Wrap</strong> — copies animation data from a nearby mesh that already animates correctly.
+            Each point on your new mesh looks at the closest spot on the source mesh and copies the animation information from there.
+            This means your mesh will bend, stretch, and move naturally — great for things like clothing, cloaks, or body parts.
+        </li>
     </ul>
 
     <div class="note">
-        <strong>Short version:</strong> Use <strong>Pin</strong> for rigid attachments (weapons, shields, buckles).
-        Use <strong>Skin Wrap</strong> for deformable things (clothing, capes, skin, armor that should bend with the body).
+        <strong>Quick rule of thumb:</strong> If the object should stay rigid (a sword, a helmet ornament, a belt buckle), use <strong>Pin</strong>.
+        If the object should bend and deform with the body (a shirt, a cape, flexible armor plates, skin), use <strong>Skin Wrap</strong>.
     </div>
 
-    <h2>What problems it solves</h2>
+    <h2>When to use this tool</h2>
 
     <ul>
-        <li>Giving new or imported meshes the rigging they need to follow an existing skeleton.</li>
-        <li>Attaching rigid accessories to a specific bone without manually setting weights.</li>
-        <li>Transferring smooth skin weights from an already-rigged body mesh to new clothing or armor pieces that cover the same area.</li>
-        <li>Quick re-rigging when source and target meshes are spatially aligned (same pose, overlapping or nearby surfaces).</li>
+        <li>You imported a new mesh and it does not animate at all.</li>
+        <li>You want to attach an accessory (weapon, shield, ornament) to a specific spot on a character.</li>
+        <li>You have clothing or armor that should deform the same way as the body underneath it.</li>
+        <li>You want to quickly copy animation data from one mesh to another without doing it by hand.</li>
     </ul>
 
-    <h2>Typical use cases</h2>
+    <h2>Examples</h2>
 
     <ul>
-        <li><strong>Pin:</strong> a weapon, shield, or helmet ornament that should rigidly follow one bone.</li>
-        <li><strong>Pin:</strong> a simple rigid plate or buckle that attaches to the chest or belt.</li>
-        <li><strong>Skin Wrap:</strong> a new shirt, cloak, or armor piece draped over a body mesh that already has good weights.</li>
-        <li><strong>Skin Wrap:</strong> transferring rigging from an existing character body to replacement body parts after kitbashing.</li>
+        <li><strong>Pin:</strong> Attach a sword to a hand — the sword should move with the hand bone and never bend.</li>
+        <li><strong>Pin:</strong> Fix a decorative plate to the chest — the plate follows the torso as a solid piece.</li>
+        <li><strong>Skin Wrap:</strong> A new chain mail shirt placed over an existing body — the shirt bends at the waist, shoulders, and elbows just like the body does.</li>
+        <li><strong>Skin Wrap:</strong> Replacement legs or arms after kitbashing — the new parts need to animate the same way the originals did.</li>
     </ul>
 
-    <h2>Before you open it</h2>
+    <h2>Before you start</h2>
 
     <ul>
-        <li>The <strong>target meshes</strong> (meshes that will receive new rigging) should be positioned correctly relative to the source. Skin Wrap relies on spatial proximity.</li>
-        <li>None of the meshes should have a non-zero <strong>pivot point</strong>. The tool will warn you if this is the case.</li>
-        <li>For <strong>Skin Wrap</strong>, make sure the source mesh already has correct rigging and covers the area of the target mesh. Vertices far from any source surface will get weights from the nearest triangle, which may not be meaningful.</li>
-        <li>For <strong>Pin</strong>, you need to know which vertex on the source mesh represents the attachment point. Switch to vertex selection mode before setting the source.</li>
+        <li>
+            Your new mesh (the one that needs animation) should already be <strong>positioned correctly</strong> on top of or near
+            the character. Skin Wrap copies data based on how close the meshes are in 3D space, so they need to line up.
+        </li>
+        <li>
+            The tool will warn you if any mesh has a <strong>pivot point</strong> that is not at zero.
+            If you see this warning, the results will be wrong. Fix the pivot point first.
+        </li>
+        <li>
+            For <strong>Skin Wrap</strong>, the source mesh (the one you are copying from) must already animate correctly
+            and should cover the same area as the target. If your new armor covers the chest, the source mesh needs to have
+            a chest area too.
+        </li>
+        <li>
+            For <strong>Pin</strong>, you will need to pick a specific point (vertex) on the source mesh.
+            A good choice is a point that sits right on the bone you want the object to follow.
+        </li>
     </ul>
 
     <h2>How to use — Pin mode</h2>
+
+    <p>Use this when the object should stay rigid and follow one spot on the skeleton.</p>
 
     <!-- PLACEHOLDER IMAGE: Screenshot showing Pin mode selected, a mesh added to the target list, and a vertex selected on the source mesh highlighted in the viewport. -->
     <img class="doc-image" src="Images/AssetEditor_Kitbash_PinTool_PinMode.png" alt="Pin mode workflow">
 
     <ol>
         <li>Open the <strong>Pin Tool</strong>.</li>
-        <li>Set the mode to <strong>Pin</strong>.</li>
-        <li>In the viewport, select the mesh(es) that should receive rigging.</li>
-        <li>Press <strong>Add selected meshes</strong> to add them to the target list.</li>
-        <li>Switch to <strong>vertex selection mode</strong> in the viewport.</li>
-        <li>Select a vertex on the already-rigged source mesh at the point where you want the target to attach.</li>
-        <li>Press <strong>Set from selected Vertex</strong> to capture the source vertex.</li>
-        <li>Press <strong>Apply</strong>. Every vertex in the target meshes will receive the bone weights from that single source vertex.</li>
+        <li>Make sure the mode is set to <strong>Pin</strong>.</li>
+        <li>In the 3D view, click on the mesh(es) you want to give animation to.</li>
+        <li>Press <strong>Add selected meshes</strong> to add them to the "Apply animation to" list.</li>
+        <li>Switch to <strong>vertex selection mode</strong> in the 3D view (this lets you click on individual points instead of whole meshes).</li>
+        <li>Click on a point on the mesh that already animates correctly — pick a point at the spot where you want your object to attach.</li>
+        <li>Press <strong>Set from selected Vertex</strong>.</li>
+        <li>Press <strong>Apply</strong>.</li>
     </ol>
 
+    <p>
+        After applying, every point on your target mesh will follow the same bone as the vertex you picked.
+        The mesh will move as one solid piece.
+    </p>
+
     <div class="note">
-        <strong>Tip:</strong> Pick a vertex that is on the bone you want the rigid object to follow.
-        If the source vertex has influence from multiple bones, the target will inherit that same mix — which is usually not what you want for a rigid attachment.
-        Choose a vertex with a single dominant bone for a clean result.
+        <strong>Tip:</strong> Try to pick a vertex that follows only one bone.
+        Points near joints (like elbows or knees) often follow two bones at once, which can make a "pinned" object wobble slightly.
+        Pick a point further from any joint for the cleanest result.
     </div>
 
     <h2>How to use — Skin Wrap mode</h2>
+
+    <p>Use this when the object should bend and move like the body underneath it.</p>
 
     <!-- PLACEHOLDER IMAGE: Screenshot showing Skin Wrap mode selected, target meshes in the top list, and one or more source meshes in the bottom source list. -->
     <img class="doc-image" src="Images/AssetEditor_Kitbash_PinTool_SkinWrapMode.png" alt="Skin Wrap mode workflow">
@@ -89,23 +130,29 @@
     <ol>
         <li>Open the <strong>Pin Tool</strong>.</li>
         <li>Set the mode to <strong>Skin Wrap</strong>.</li>
-        <li>In the viewport, select the mesh(es) that should receive rigging.</li>
-        <li>Press <strong>Add selected meshes</strong> to add them to the target list.</li>
-        <li>In the viewport, select the rigged source mesh(es) you want to transfer weights from.</li>
-        <li>Press <strong>Add selected meshes</strong> in the source area to add them.</li>
-        <li>Press <strong>Apply</strong>. For each vertex in each target mesh, the tool finds the closest point on any source mesh surface and interpolates the bone weights from that triangle.</li>
+        <li>In the 3D view, select the mesh(es) that need animation.</li>
+        <li>Press <strong>Add selected meshes</strong> to add them to the "Apply animation to" list.</li>
+        <li>Now select the mesh(es) that already animate correctly — these are the ones you want to copy from.</li>
+        <li>Press <strong>Add selected meshes</strong> in the source area.</li>
+        <li>Press <strong>Apply</strong>.</li>
     </ol>
 
     <!-- PLACEHOLDER IMAGE: Before/after comparison showing a target mesh without rigging (T-pose or stiff) and the same mesh after Skin Wrap, deforming correctly with the skeleton. -->
     <img class="doc-image" src="Images/AssetEditor_Kitbash_PinTool_SkinWrap_Result.png" alt="Skin Wrap before and after">
 
+    <p>
+        The tool goes through every point on your target mesh, finds the closest spot on the source mesh surface,
+        and copies the animation data from there. This means areas near the arm will follow the arm, areas near the
+        torso will follow the torso, and so on — all done automatically.
+    </p>
+
     <div class="note">
-        <strong>Multiple source meshes:</strong> You can add more than one source mesh.
-        The tool will find the closest point across all source meshes for each target vertex.
-        This is useful when different body parts (torso, arms, legs) are separate meshes.
+        <strong>Multiple sources:</strong> You can add more than one source mesh.
+        This is useful when the body is split into separate pieces (torso, arms, legs, head).
+        The tool will look across all of them and copy from whichever is closest for each point.
     </div>
 
-    <h2>What each control does</h2>
+    <h2>Controls reference</h2>
 
     <table>
         <thead>
@@ -121,83 +168,96 @@
             </tr>
             <tr>
                 <td>Apply animation to — Add selected meshes</td>
-                <td>Adds the currently selected meshes in the viewport to the target list.</td>
+                <td>Adds the meshes you have selected in the 3D view to the list of meshes that will receive animation.</td>
             </tr>
             <tr>
                 <td>Apply animation to — Remove all</td>
-                <td>Clears the target mesh list.</td>
+                <td>Clears the list.</td>
             </tr>
             <tr>
-                <td>Set from selected Vertex (Pin mode)</td>
-                <td>Captures the currently selected vertex and its mesh as the rigging source.</td>
+                <td>Set from selected Vertex <em>(Pin mode)</em></td>
+                <td>Saves the vertex you have selected in the 3D view as the animation source.</td>
             </tr>
             <tr>
-                <td>Add selected meshes (Skin Wrap source)</td>
-                <td>Adds selected viewport meshes to the source list for weight transfer.</td>
+                <td>Add selected meshes <em>(Skin Wrap source)</em></td>
+                <td>Adds meshes to copy animation from.</td>
             </tr>
             <tr>
-                <td>Remove all (Skin Wrap source)</td>
+                <td>Remove all <em>(Skin Wrap source)</em></td>
                 <td>Clears the source mesh list.</td>
             </tr>
             <tr>
                 <td>Apply</td>
-                <td>Executes the rigging transfer and closes the window.</td>
+                <td>Runs the tool and closes the window. The result can be undone with Ctrl+Z.</td>
             </tr>
         </tbody>
     </table>
 
-    <h2>What to watch out for</h2>
+    <h2>Things to watch out for</h2>
 
     <ul>
-        <li><strong>Pivot points must be zero.</strong> The tool warns you if a mesh has a non-zero pivot point. Rigging transfer will produce incorrect results in that case.</li>
-        <li><strong>Source and target must not overlap.</strong> A mesh cannot appear in both the target list and the source. The tool will refuse to apply if it detects this.</li>
-        <li><strong>Spatial alignment matters for Skin Wrap.</strong> The tool finds the nearest point on the source surface. If the target mesh is far from the source, the weights will come from whatever triangle happens to be closest, which may not be the correct body part.</li>
-        <li><strong>Vertex format changes.</strong> Both modes change the target mesh vertex format and skeleton name to match the source. This is required for the mesh to animate with the target skeleton.</li>
-        <li><strong>Undo is supported.</strong> Both Pin and Skin Wrap are undoable commands. If the result is not right, undo and try again.</li>
+        <li>
+            <strong>Pivot point warning.</strong> If the tool tells you a mesh has a pivot point, the result will be wrong.
+            You need to reset the pivot point to zero before using the tool.
+        </li>
+        <li>
+            <strong>Same mesh in both lists.</strong> You cannot put the same mesh in both the target and the source.
+            The tool will stop and show an error if you try.
+        </li>
+        <li>
+            <strong>Meshes must overlap (Skin Wrap).</strong>
+            Skin Wrap works by finding the nearest surface. If your new mesh is far away from the source, the closest surface
+            might be a completely wrong body part, and the animation will look broken. Make sure the meshes line up first.
+        </li>
+        <li>
+            <strong>Undo works.</strong> If the result looks wrong, just press Ctrl+Z to undo and try again with different settings.
+        </li>
     </ul>
 
     <div class="warning">
-        <strong>Important:</strong> Skin Wrap works best when the target mesh closely overlaps the source mesh in 3D space.
-        If the meshes are far apart or in very different poses, the nearest-point lookup will produce poor results.
-        Align the meshes before running the tool.
+        <strong>Important:</strong> Skin Wrap works best when your new mesh sits right on top of the source mesh.
+        If they are far apart or in very different poses, the results will be poor.
+        Position and align your meshes before running the tool.
     </div>
 
-    <h2>Pin vs Skin Wrap — when to use which</h2>
+    <h2>Pin vs Skin Wrap — quick comparison</h2>
 
     <table>
         <thead>
             <tr>
-                <th>Use Pin when…</th>
-                <th>Use Skin Wrap when…</th>
+                <th>Pin</th>
+                <th>Skin Wrap</th>
             </tr>
         </thead>
         <tbody>
             <tr>
-                <td>The object should move rigidly (weapon, shield, ornament)</td>
-                <td>The object should deform with the body (clothing, skin, flexible armor)</td>
+                <td>Object stays rigid — no bending</td>
+                <td>Object bends and deforms with the body</td>
             </tr>
             <tr>
-                <td>You want all vertices to follow the same bone(s)</td>
-                <td>You want each vertex to get weights from its nearest surface point</td>
+                <td>Good for: weapons, shields, buckles, ornaments</td>
+                <td>Good for: clothing, capes, skin, flexible armor</td>
             </tr>
             <tr>
-                <td>You know exactly which bone the object should attach to</td>
-                <td>You have a rigged body mesh that covers the same area as the target</td>
+                <td>You pick one point to attach to</td>
+                <td>Every point is matched automatically</td>
             </tr>
             <tr>
-                <td>Quick — just select one vertex</td>
-                <td>Automatic — processes every vertex based on proximity</td>
+                <td>Very fast — one click</td>
+                <td>Takes a moment to process, but fully automatic</td>
             </tr>
         </tbody>
     </table>
 
-    <h2>When it struggles</h2>
+    <h2>When results are not good enough</h2>
+
+    <p>The Pin Tool is a quick automated solution. It may not produce perfect results in every situation:</p>
 
     <ul>
-        <li>When the target mesh has regions far from any source mesh surface (e.g., long flowing parts with no nearby source geometry).</li>
-        <li>When the source mesh has very sparse triangulation in the area closest to the target.</li>
-        <li>When the source and target are in very different poses or positions.</li>
-        <li>When the mesh requires carefully hand-painted weights that cannot be approximated by proximity.</li>
+        <li>Parts of your mesh that stick out far from the source (like a long flowing cape trailing behind) may get wrong animation data because the nearest surface is not the right body part.</li>
+        <li>If the source mesh has very few triangles in the area you care about, the transferred animation may look rough or imprecise.</li>
+        <li>If the source and target are in very different positions or poses, the automatic matching will not work well.</li>
+        <li>Some cases need hand-tuned animation data that an automatic tool cannot replicate. For those, consider doing a proper re-rig in a 3D modelling application.</li>
     </ul>
 
 </body>

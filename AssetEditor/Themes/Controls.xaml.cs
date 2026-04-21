@@ -2,12 +2,15 @@
 using System.Diagnostics;
 using System.IO;
 using System.Windows;
+using Serilog;
+using Shared.Core.ErrorHandling;
 using WindowHandling;
 
 namespace AssetEditor.Themes
 {
     public partial class Controls
     {
+        private static readonly ILogger _logger = Logging.Create<Controls>();
         private void CloseWindow_Event(object sender, RoutedEventArgs e)
         {
             if (e.Source != null)
@@ -50,6 +53,7 @@ namespace AssetEditor.Themes
 
             if (!File.Exists(helpPath) && Debugger.IsAttached)
             {
+                _logger.Here().Information("Help file not found at '{HelpPath}', searching parent directories", helpPath);
                 var searchDir = new DirectoryInfo(AppDomain.CurrentDomain.BaseDirectory);
                 while (searchDir?.Parent != null)
                 {
@@ -64,9 +68,13 @@ namespace AssetEditor.Themes
             }
 
             if (!File.Exists(helpPath))
+            {
+                _logger.Here().Warning("Help file not found: '{HelpPath}'", helpPath);
                 return;
+            }
 
             var fileUri = new Uri(helpPath).AbsoluteUri + queryString;
+            _logger.Here().Information("Opening help document: {Uri}", fileUri);
             Process.Start(new ProcessStartInfo
             {
                 FileName = fileUri,

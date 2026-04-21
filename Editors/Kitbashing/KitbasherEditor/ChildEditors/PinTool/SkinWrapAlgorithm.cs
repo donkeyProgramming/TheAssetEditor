@@ -6,12 +6,15 @@ using GameWorld.Core.Commands;
 using GameWorld.Core.Components.Selection;
 using GameWorld.Core.SceneNodes;
 using Microsoft.Xna.Framework;
+using Serilog;
+using Shared.Core.ErrorHandling;
 using Shared.Core.Services;
 
 namespace Editors.KitbasherEditor.ChildEditors.PinTool
 {
     public partial class SkinWrapAlgorithm : ObservableObject
     {
+        private readonly ILogger _logger = Logging.Create<SkinWrapAlgorithm>();
         private readonly IStandardDialogs _standardDialogs;
         private readonly SelectionManager _selectionManager;
         private readonly CommandFactory _commandFactory;
@@ -76,6 +79,7 @@ namespace Editors.KitbasherEditor.ChildEditors.PinTool
                 return false;
             }
 
+            _logger.Here().Information("Skin wrap: transferring rigging from {SourceCount} source meshes to {TargetCount} target meshes", SourceMeshes.Count, giveAnimationTo.Count);
             _commandFactory.Create<SkinWrapRiggingCommand>().Configure(x => x.Configure(giveAnimationTo, SourceMeshes.ToList())).BuildAndExecute();
             return true;
         }

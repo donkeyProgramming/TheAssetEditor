@@ -5,6 +5,8 @@ using GameWorld.Core.Commands;
 using GameWorld.Core.Components.Selection;
 using GameWorld.Core.SceneNodes;
 using Microsoft.Xna.Framework;
+using Serilog;
+using Shared.Core.ErrorHandling;
 using Shared.Core.Services;
 
 namespace Editors.KitbasherEditor.ChildEditors.PinTool
@@ -17,6 +19,7 @@ namespace Editors.KitbasherEditor.ChildEditors.PinTool
 
     public partial class PinToolViewModel : ObservableObject
     {
+        private readonly ILogger _logger = Logging.Create<PinToolViewModel>();
         private readonly SelectionManager _selectionManager;
         private readonly CommandFactory _commandFactory;
         private readonly IStandardDialogs _standardDialogs;
@@ -50,8 +53,7 @@ namespace Editors.KitbasherEditor.ChildEditors.PinTool
             }
 
             var selectedObjects = selectionState.SelectedObjects()
-                .Select(x => x as Rmv2MeshNode)
-                .Where(x => x != null)
+                .OfType<Rmv2MeshNode>()
                 .ToList();
 
             if (selectedObjects.Any(x => x.PivotPoint != Vector3.Zero))
@@ -80,6 +82,8 @@ namespace Editors.KitbasherEditor.ChildEditors.PinTool
                 return false;
             }
 
+            _logger.Here().Information("Applying {Mode} to {Count} meshes", SelectedRiggingMode, AffectedMeshCollection.Count);
+
             switch (SelectedRiggingMode)
             {
                 case RiggingMode.Pin:
@@ -88,9 +92,8 @@ namespace Editors.KitbasherEditor.ChildEditors.PinTool
                 case RiggingMode.SkinWrap:
                     return SkinWrapMode.Execute(AffectedMeshCollection.ToList());
                 default:
-                    throw new NotImplementedException($"unable to find an algorithm for selected mode '{SelectedRiggingMode}'");
+                    throw new NotImplementedException($"Unable to find an algorithm for selected mode '{SelectedRiggingMode}'");
             }
-
         }
     }
 }
