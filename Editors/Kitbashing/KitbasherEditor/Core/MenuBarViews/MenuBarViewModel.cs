@@ -11,6 +11,7 @@ using GameWorld.Core.Components.Selection;
 using GameWorld.Core.Services;
 using KitbasherEditor.ViewModels.MenuBarViews.Helpers;
 using Shared.Core.Events;
+using Shared.Core.Services;
 using Shared.EmbeddedResources;
 using Shared.Ui.Common.MenuSystem;
 
@@ -27,14 +28,16 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
         private readonly MenuItemVisibilityRuleEngine _menuItemVisibilityRuleEngine;
         private readonly ActionHotkeyHandler _hotKeyHandler = new ActionHotkeyHandler();
         private readonly IWindowsKeyboard _keyboard;
+        private readonly LocalizationManager _localizationManager;
         private readonly Dictionary<Type, MenuAction> _uiCommands = new();
 
-        public MenuBarViewModel(CommandExecutor commandExecutor, IEventHub eventHub, MenuItemVisibilityRuleEngine menuItemVisibilityRuleEngine, TransformToolViewModel transformToolViewModel,IUiCommandFactory uiCommandFactory, IWindowsKeyboard windowKeyboard)
+        public MenuBarViewModel(CommandExecutor commandExecutor, IEventHub eventHub, MenuItemVisibilityRuleEngine menuItemVisibilityRuleEngine, TransformToolViewModel transformToolViewModel, IUiCommandFactory uiCommandFactory, IWindowsKeyboard windowKeyboard, LocalizationManager localizationManager)
         {
             _commandExecutor = commandExecutor;
             _menuItemVisibilityRuleEngine = menuItemVisibilityRuleEngine;
             _uiCommandFactory = uiCommandFactory;
             _keyboard = windowKeyboard;
+            _localizationManager = localizationManager;
             TransformTool = transformToolViewModel;
 
             RegisterActions();
@@ -54,6 +57,9 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
             RegisterUiCommand<BrowseForReferenceCommand>();
             RegisterUiCommand<ImportGeneralReferenceCommand>();
             RegisterUiCommand<ImportKarlHammerReferenceCommand>();
+            RegisterUiCommand<ConstructBoxUiCommand>();
+            RegisterUiCommand<ConstructPlaneUiCommand>();
+            RegisterUiCommand<ConstructSphereUiCommand>();
             
             RegisterUiCommand<DeleteLodsCommand>();    
             RegisterUiCommand<UndoCommand>();
@@ -108,6 +114,13 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
             var debugToolbar = builder.CreateRootToolBar("Debug");
             builder.CreateToolBarItem<ImportGeneralReferenceCommand>(debugToolbar, "Import General");
             builder.CreateToolBarItem<ImportKarlHammerReferenceCommand>(debugToolbar, "Import Hammer");
+
+            var geometryToolbar = new ToolbarItem() { Name = _localizationManager.Get("KitbashTool.Debug.Geometry.Menu") };
+            debugToolbar.Children.Add(geometryToolbar);
+            builder.CreateToolBarItem<ConstructBoxUiCommand>(geometryToolbar, _localizationManager.Get("KitbashTool.Debug.Geometry.CreateBox.Menu"));
+            builder.CreateToolBarItem<ConstructPlaneUiCommand>(geometryToolbar, _localizationManager.Get("KitbashTool.Debug.Geometry.CreatePlane.Menu"));
+            builder.CreateToolBarItem<ConstructSphereUiCommand>(geometryToolbar, _localizationManager.Get("KitbashTool.Debug.Geometry.CreateSphere.Menu"));
+
             builder.CreateToolBarItem<DeleteLodsCommand>(debugToolbar, "Delete lods");
 
             var toolsToolbar = builder.CreateRootToolBar("Tools");

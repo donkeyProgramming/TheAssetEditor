@@ -17,5 +17,13 @@
   "UpdaterWindow.UpdateInfo": "Une nouvelle version d’AssetEditor est disponible!\n\nVotre version actuelle est la {0}. Mettez à jour vers la version {1} pour découvrir les dernières modifications détaillées ci-dessous.",
   "UpdaterWindow.ReleaseNotes": "Notes de version",
   "UpdaterWindow.UpdateButton": "Mettre à jour",
-  "UpdaterWindow.CancelButton": "Annuler"
+  "UpdaterWindow.CancelButton": "Annuler",
+
+  "KitbashTool.Debug.Geometry.Menu": "Geometrie",
+  "KitbashTool.Debug.Geometry.CreateBox.Menu": "Creer une boite",
+  "KitbashTool.Debug.Geometry.CreatePlane.Menu": "Creer un plan",
+  "KitbashTool.Debug.Geometry.CreateSphere.Menu": "Creer une sphere",
+  "KitbashTool.Debug.Geometry.CreateBox.Tooltip": "Creer une boite subdivisee",
+  "KitbashTool.Debug.Geometry.CreatePlane.Tooltip": "Creer un plan subdivise",
+  "KitbashTool.Debug.Geometry.CreateSphere.Tooltip": "Creer une sphere subdivisee"
 }

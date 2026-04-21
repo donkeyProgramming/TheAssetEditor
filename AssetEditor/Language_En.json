@@ -61,6 +61,13 @@
   "KitbashTool.MeshFitterTool.MeshSkeletonNotFound": "Could not load the mesh skeleton '{0}'. Make sure the skeleton file exists in the loaded pack files.",
   "KitbashTool.MeshFitterTool.TargetSkeletonMissing": "Could not find the target model skeleton in the current scene. Load or create an editable model first.",
   "KitbashTool.MeshFitterTool.TargetSkeletonNotFound": "Could not load the target skeleton '{0}'. Make sure the skeleton file exists in the loaded pack files.",
+  "KitbashTool.Debug.Geometry.Menu": "Geometry",
+  "KitbashTool.Debug.Geometry.CreateBox.Menu": "Create box",
+  "KitbashTool.Debug.Geometry.CreatePlane.Menu": "Create plane",
+  "KitbashTool.Debug.Geometry.CreateSphere.Menu": "Create sphere",
+  "KitbashTool.Debug.Geometry.CreateBox.Tooltip": "Create a subdivided box",
+  "KitbashTool.Debug.Geometry.CreatePlane.Tooltip": "Create a subdivided plane",
+  "KitbashTool.Debug.Geometry.CreateSphere.Tooltip": "Create a subdivided sphere",
 
   "KitbasherTool.BoneMapping.CurrentModelBones": "Current model bones - ",
   "KitbasherTool.BoneMapping.TargetModelBones": "Target model bones - ",

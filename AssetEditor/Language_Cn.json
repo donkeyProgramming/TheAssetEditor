@@ -61,6 +61,13 @@
   "KitbashTool.MeshFitterTool.MeshSkeletonNotFound": "无法加载 Mesh Skeleton '{0}'。请确保 Skeleton 文件存在于已加载的 Pack 文件中。",
   "KitbashTool.MeshFitterTool.TargetSkeletonMissing": "在当前场景中找不到目标模型 Skeleton。请先加载或创建可编辑模型。",
   "KitbashTool.MeshFitterTool.TargetSkeletonNotFound": "无法加载目标 Skeleton '{0}'。请确保 Skeleton 文件存在于已加载的 Pack 文件中。",
+  "KitbashTool.Debug.Geometry.Menu": "几何体",
+  "KitbashTool.Debug.Geometry.CreateBox.Menu": "创建立方体",
+  "KitbashTool.Debug.Geometry.CreatePlane.Menu": "创建平面",
+  "KitbashTool.Debug.Geometry.CreateSphere.Menu": "创建球体",
+  "KitbashTool.Debug.Geometry.CreateBox.Tooltip": "创建细分立方体",
+  "KitbashTool.Debug.Geometry.CreatePlane.Tooltip": "创建细分平面",
+  "KitbashTool.Debug.Geometry.CreateSphere.Tooltip": "创建细分球体",
 
   "KitbasherTool.BoneMapping.CurrentModelBones": "当前模型骨骼 - ",
   "KitbasherTool.BoneMapping.TargetModelBones": "目标模型骨骼 - ",

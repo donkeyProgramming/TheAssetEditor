@@ -23,6 +23,7 @@ using KitbasherEditor.ViewModels.SaveDialog;
 using KitbasherEditor.ViewModels.SceneExplorerNodeViews;
 using KitbasherEditor.Views;
 using Microsoft.Extensions.DependencyInjection;
+using GameWorld.Core.Rendering.Geometry;
 using Shared.Core.DependencyInjection;
 using Shared.Core.DevConfig;
 using Shared.Core.ToolCreation;
@@ -60,6 +61,8 @@ namespace Editors.KitbasherEditor
 
             // Commands
             serviceCollection.AddTransient<AssignMaterialFromOtherMeshCommand>();
+            serviceCollection.AddTransient<ConstructPrimitiveCommand>();
+            serviceCollection.AddTransient<PrimitiveConstructor>();
             
             // Mesh fitter
             RegisterWindow<MeshFitterWindow>(serviceCollection);
