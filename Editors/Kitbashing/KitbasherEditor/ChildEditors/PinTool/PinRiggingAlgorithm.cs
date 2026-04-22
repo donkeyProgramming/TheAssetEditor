@@ -8,6 +8,7 @@ using Microsoft.Xna.Framework;
 using Serilog;
 using Shared.Core.ErrorHandling;
 using Shared.Core.Services;
+using Shared.GameFormats.RigidModel;
 
 namespace Editors.KitbasherEditor.ChildEditors.PinTool
 {
@@ -40,6 +41,12 @@ namespace Editors.KitbasherEditor.ChildEditors.PinTool
             if (meshesToAffect.Any(x => x == SelectedMesh))
             {
                 _standardDialogs.ShowDialogBox("Source mesh is also in the list of target meshes", "Error");
+                return false;
+            }
+
+            if (SelectedMesh.Geometry.VertexFormat == UiVertexFormat.Static)
+            {
+                _standardDialogs.ShowDialogBox("Source mesh has no bone weights (static format). Use an animated mesh as source.", "Error");
                 return false;
             }
 

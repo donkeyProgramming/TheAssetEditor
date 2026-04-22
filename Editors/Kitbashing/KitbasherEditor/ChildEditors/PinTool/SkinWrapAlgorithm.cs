@@ -9,6 +9,7 @@ using Microsoft.Xna.Framework;
 using Serilog;
 using Shared.Core.ErrorHandling;
 using Shared.Core.Services;
+using Shared.GameFormats.RigidModel;
 
 namespace Editors.KitbasherEditor.ChildEditors.PinTool
 {
@@ -76,6 +77,14 @@ namespace Editors.KitbasherEditor.ChildEditors.PinTool
             if (overlap.Count > 0)
             {
                 _standardDialogs.ShowDialogBox("Same mesh found in both source and target lists", "error");
+                return false;
+            }
+
+            var staticSources = SourceMeshes.Where(m => m.Geometry.VertexFormat == UiVertexFormat.Static).ToList();
+            if (staticSources.Count > 0)
+            {
+                var names = string.Join(", ", staticSources.Select(m => m.Name));
+                _standardDialogs.ShowDialogBox($"Source mesh(es) have no bone weights (static format): {names}. Use an animated mesh as source.", "Error");
                 return false;
             }
 

@@ -41,6 +41,9 @@ namespace Editors.KitbasherEditor.ChildEditors.PinTool.Commands
 
             _logger.Here().Information("Executing pin: {Count} meshes to vertex {VertexId} on '{Source}'", _meshesToPin.Count, _vertexId, _source.Name);
 
+            if (_vertexId < 0 || _vertexId >= _source.Geometry.VertexCount())
+                throw new InvalidOperationException($"Vertex index {_vertexId} is out of range for mesh '{_source.Name}' (vertex count: {_source.Geometry.VertexCount()})");
+
             // Create undo state
             _originalGeos = _meshesToPin.Select(x => x.Geometry.Clone()).ToList();
             _selectionOldState = _selectionManager.GetStateCopy();
