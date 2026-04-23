@@ -41,7 +41,7 @@ namespace GameWorld.Core.Components.Grid
                 return;
 
             _renderItem.Update(_camera, GridColur);
-            _renderEngineComponent.AddRenderItem(RenderBuckedId.Normal, _renderItem);
+            _renderEngineComponent.AddRenderItem(RenderBuckedId.Grid, _renderItem);
         }
 
         public void Dispose()

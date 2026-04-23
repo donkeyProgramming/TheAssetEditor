@@ -5,6 +5,7 @@ using CommunityToolkit.Mvvm.Input;
 using GameWorld.Core.Components.Rendering;
 using Microsoft.Win32;
 using Microsoft.Xna.Framework;
+using Shared.Core.Misc;
 using Shared.Core.Services;
 using Shared.Ui.BaseDialogs.ColourPickerButton;
 using Shared.Ui.BaseDialogs.MathViews;
@@ -192,7 +193,9 @@ namespace Editors.KitbasherEditor.ChildEditors.PhotoStudio
             var imageScale = 1.0f;
             if (DoubleImageResolution)
                 imageScale = 2.0f;
-            _renderEngineComponent.SaveNextFrame(new SaveRenderImageSettings("Screenshot", true, false, imageScale));
+
+            var outputFolder = Path.Combine(DirectoryHelper.ApplicationDirectory, "PhotoStudio", "Screenshots");
+            _renderEngineComponent.SaveNextFrame(new SaveRenderImageSettings("Screenshot", true, false, imageScale, outputFolder));
         }
     }
 }

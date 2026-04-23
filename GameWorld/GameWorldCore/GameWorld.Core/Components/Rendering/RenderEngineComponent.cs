@@ -15,7 +15,7 @@ using Shared.Core.Settings;
 
 namespace GameWorld.Core.Components.Rendering
 {
-    public record SaveRenderImageSettings(string Name, bool OpenFolder, bool DrawLines, float ImageUpScaleFactor);
+    public record SaveRenderImageSettings(string Name, bool OpenFolder, bool DrawLines, float ImageUpScaleFactor, string OutputFolder);
 
     public class RenderEngineComponent : BaseComponent, IDisposable
     {
@@ -212,7 +212,7 @@ namespace GameWorld.Core.Components.Rendering
             {
                 try
                 {
-                    var folder = "Screenshots";
+                    var folder = _saveRenderImageSettings.OutputFolder;
                     DirectoryHelper.EnsureCreated(folder);
                     using Stream stream = File.Create(folder + "\\" + _saveRenderImageSettings.Name + "_" + DateTime.Now.Ticks + ".png");
 
@@ -267,6 +267,12 @@ namespace GameWorld.Core.Components.Rendering
             foreach (var item in _renderItems[RenderBuckedId.Normal])
                 item.Draw(device, commonShaderParameters, renderingTechnique);
 
+            if (drawLines)
+            {
+                foreach (var item in _renderItems[RenderBuckedId.Grid])
+                    item.Draw(device, commonShaderParameters, renderingTechnique);
+            }
+
             device.RasterizerState = _rasterStates[RasterizerStateEnum.Wireframe];
             foreach (var item in _renderItems[RenderBuckedId.Wireframe])
                 item.Draw(device, commonShaderParameters, renderingTechnique);
@@ -274,6 +280,8 @@ namespace GameWorld.Core.Components.Rendering
             device.RasterizerState = _rasterStates[RasterizerStateEnum.SelectedFaces];
             foreach (var item in _renderItems[RenderBuckedId.Selection])
                 item.Draw(device, commonShaderParameters, renderingTechnique);
+
+
         }
 
         public void Dispose()

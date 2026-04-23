@@ -9,7 +9,8 @@ namespace GameWorld.Core.Components.Rendering
         Wireframe,
         Selection,
         Font,
-        Texture2D
+        Texture2D,
+        Grid
     }
 
     public enum RenderingTechnique
