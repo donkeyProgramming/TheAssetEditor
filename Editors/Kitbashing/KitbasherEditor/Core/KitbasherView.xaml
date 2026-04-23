@@ -9,6 +9,7 @@
              xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
              xmlns:behaviors="clr-namespace:Shared.Ui.Common.Behaviors;assembly=Shared.Ui"
              xmlns:loc="clr-namespace:Shared.Ui.Common;assembly=Shared.Ui"
+             xmlns:menusystem="clr-namespace:Shared.Ui.Common.MenuSystem;assembly=Shared.Ui"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800"
              AllowDrop="True">
@@ -43,11 +44,53 @@
             </Grid.RowDefinitions>
 
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="auto"/>
+                <ColumnDefinition Width="48"/>
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
+            <!-- Left sidebar: Blender-style tool icons (vertical toolbar) -->
+            <ToolBarTray Grid.Row="0" Grid.Column="0" Orientation="Vertical" Background="{DynamicResource ToolBarTrayBackground}">
+                <ToolBar Band="0" BandIndex="0" ItemsSource="{Binding MenuBar.SidebarButtons, Mode=OneTime}">
+                    <ToolBar.Resources>
+                        <Style x:Key="SidebarSeparatorStyle" TargetType="Separator">
+                            <Setter Property="Margin" Value="4,8,4,8"/>
+                            <Setter Property="Background" Value="#606060"/>
+                        </Style>
+                        <DataTemplate x:Key="sidebarDefaultTemplate">
+                            <Button ToolTip="{Binding Action.ToolTipAttribute.Value}" BorderThickness="0" Background="Transparent" Margin="2" Padding="6"
+                                    IsEnabled="{Binding Action.IsActionEnabled.Value, UpdateSourceTrigger=PropertyChanged}"
+                                    Command="{Binding Path=Action.Command}"
+                                    Visibility="{Binding IsVisible.Value, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource BoolToCollapsedConverter}}">
+                                <Image Height="24" Width="24" Source="{Binding Image}"/>
+                            </Button>
+                        </DataTemplate>
+                        <DataTemplate x:Key="sidebarRadioTemplate">
+                            <RadioButton ToolTip="{Binding Action.ToolTipAttribute.Value}" BorderThickness="0" Background="Transparent" Margin="2" Padding="6"
+                                         IsChecked="{Binding IsChecked.Value, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                                         Command="{Binding Path=Action.Command}"
+                                         GroupName="{Binding GroupName}"
+                                         Style="{StaticResource {x:Type ToggleButton}}"
+                                         IsEnabled="{Binding Action.IsActionEnabled.Value, UpdateSourceTrigger=PropertyChanged}"
+                                         Visibility="{Binding IsVisible.Value, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource BoolToCollapsedConverter}}">
+                                <Image Height="24" Width="24" Source="{Binding Image}"/>
+                            </RadioButton>
+                        </DataTemplate>
+                        <DataTemplate x:Key="sidebarSeparatorTemplate">
+                            <Separator Style="{StaticResource SidebarSeparatorStyle}"/>
+                        </DataTemplate>
+                        <local:SidebarTemplateSelector x:Key="sidebarTemplateSelector"
+                            DefaultTemplate="{StaticResource sidebarDefaultTemplate}"
+                            RadioTemplate="{StaticResource sidebarRadioTemplate}"
+                            SeparatorTemplate="{StaticResource sidebarSeparatorTemplate}"/>
+                    </ToolBar.Resources>
+                    <ToolBar.ItemTemplateSelector>
+                        <StaticResource ResourceKey="sidebarTemplateSelector"/>
+                    </ToolBar.ItemTemplateSelector>
+                </ToolBar>
+            </ToolBarTray>
 
-            <ContentControl Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2"  Content="{Binding Scene, Mode=OneTime}"/>
+
+
+            <ContentControl Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="2"  Content="{Binding Scene, Mode=OneTime}"/>
             <editorviews:AnimationPlayerView DataContext="{Binding Animation}" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2"/>
 
             <Grid Grid.Row="0" Grid.Column="1" 
