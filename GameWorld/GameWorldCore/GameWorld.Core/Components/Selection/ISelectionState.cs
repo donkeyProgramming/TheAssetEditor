@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using GameWorld.Core.SceneNodes;
+﻿using GameWorld.Core.SceneNodes;
 
 namespace GameWorld.Core.Components.Selection
 {

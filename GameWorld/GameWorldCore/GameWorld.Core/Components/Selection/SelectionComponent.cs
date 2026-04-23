@@ -192,7 +192,10 @@ namespace GameWorld.Core.Components.Selection
 
             if (currentState is VertexSelectionState vertexState)
             {
-                if (IntersectionMath.IntersectVertex(ray, vertexState.RenderObject.Geometry, _camera.Position, vertexState.RenderObject.RenderMatrix, out var selecteVert) != null)
+                var viewProjection = _camera.ViewMatrix * _camera.ProjectionMatrix;
+                var viewport = _deviceResolverComponent.Device.Viewport;
+                if (IntersectionMath.IntersectVertex(mousePosition, vertexState.RenderObject.Geometry, vertexState.RenderObject.RenderMatrix,
+                    viewProjection, viewport.Width, viewport.Height, out var selecteVert) != null)
                 {
                     _commandFactory.Create<VertexSelectionCommand>().Configure(x => x.Configure(new List<int>() { selecteVert }, isSelectionModification, removeSelection)).BuildAndExecute();
                     return;

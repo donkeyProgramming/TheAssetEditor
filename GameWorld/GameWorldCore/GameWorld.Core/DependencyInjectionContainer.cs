@@ -1,4 +1,5 @@
-﻿using GameWorld.Core.Commands;
+﻿using System.Diagnostics;
+using GameWorld.Core.Commands;
 using GameWorld.Core.Commands.Bone;
 using GameWorld.Core.Commands.Bone.Clipboard;
 using GameWorld.Core.Commands.Face;
@@ -108,7 +109,7 @@ namespace GameWorld.Core
             RegisterGameComponent<IMouseComponent, MouseComponent>(serviceCollection);
 
             RegisterGameComponent<FpsComponent>(serviceCollection);
-            RegisterGameComponent<GraphicsResourceStatsComponent>(serviceCollection);
+            RegisterGameComponent<SceneInformationComponent>(serviceCollection);
             RegisterGameComponent<ArcBallCamera>(serviceCollection);
             RegisterGameComponent<SceneManager>(serviceCollection);
             RegisterGameComponent<GizmoComponent>(serviceCollection);
@@ -121,7 +122,10 @@ namespace GameWorld.Core
             RegisterGameComponent<ViewportGizmo>(serviceCollection);
             RegisterGameComponent<ViewportSelector>(serviceCollection);
             RegisterGameComponent<CameraController>(serviceCollection);
-            
+
+            if (Debugger.IsAttached)
+                RegisterGameComponent<GraphicsResourceStatsComponent>(serviceCollection);
+
 
 
             //serviceCollection.AddScoped<ISceneLightParameters>(x => x.GetRequiredService<LightControllerComponent>()); 

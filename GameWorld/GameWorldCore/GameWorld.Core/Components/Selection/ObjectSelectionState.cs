@@ -1,12 +1,10 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using GameWorld.Core.SceneNodes;
+﻿using GameWorld.Core.SceneNodes;
 
 namespace GameWorld.Core.Components.Selection
 {
     public class ObjectSelectionState : ISelectionState
     {
-        public event SelectionStateChanged SelectionChanged;
+        public event SelectionStateChanged? SelectionChanged;
         public GeometrySelectionMode Mode => GeometrySelectionMode.Object;
 
         List<ISelectable> _selectionList { get; set; } = new List<ISelectable>();

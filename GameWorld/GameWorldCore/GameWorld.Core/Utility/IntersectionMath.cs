@@ -11,42 +11,53 @@ namespace GameWorld.Core.Utility
     {
         public static float? IntersectObject(Ray ray, MeshObject geometry, Matrix matrix)
         {
+            var inverseTransform = Matrix.Invert(matrix);
+            var localRay = new Ray(
+                Vector3.Transform(ray.Position, inverseTransform),
+                Vector3.TransformNormal(ray.Direction, inverseTransform));
+            if (localRay.Intersects(geometry.BoundingBox) == null)
+                return null;
+
             var res = IntersectFace(ray, geometry, matrix, out var _);
             return res;
         }
 
-        public static float? IntersectVertex(Ray ray, MeshObject geometry, Vector3 cameraPos, Matrix matrix, out int selectedVertex)
+        public static float? IntersectVertex(Vector2 mouseScreenPos, MeshObject geometry, Matrix modelMatrix,
+            Matrix viewProjection, float viewportWidth, float viewportHeight, out int selectedVertex)
         {
-            var inverseTransform = Matrix.Invert(matrix);
-            ray.Position = Vector3.Transform(ray.Position, inverseTransform);
-            ray.Direction = Vector3.TransformNormal(ray.Direction, inverseTransform);
-            cameraPos = Vector3.Transform(cameraPos, inverseTransform);
-
-            var vertexList = geometry.GetVertexList();
-            var bestDistance = float.MaxValue;
             selectedVertex = -1;
-            for (var i = 0; i < vertexList.Count; i++)
-            {
-                var distance = (cameraPos - vertexList[i]).Length();
-                var distanceScale = 0.0025f * distance * 1.5f;
+            var bestDist = float.MaxValue;
 
-                var bb = new BoundingBox(new Vector3(distanceScale * -0.5f) + vertexList[i], new Vector3(distanceScale * 0.5f) + vertexList[i]);
-                var res = bb.Intersects(ray); ;
-                if (res != null)
+            const float pixelThreshold = 25.0f;
+
+            for (var i = 0; i < geometry.VertexArray.Length; i++)
+            {
+                var worldPos = Vector3.Transform(geometry.GetVertexById(i), modelMatrix);
+                var clipPos = Vector4.Transform(new Vector4(worldPos, 1.0f), viewProjection);
+
+                if (clipPos.W <= 0.0f)
+                    continue;
+
+                var invW = 1.0f / clipPos.W;
+                var screenX = (clipPos.X * invW + 1.0f) * 0.5f * viewportWidth;
+                var screenY = (1.0f - clipPos.Y * invW) * 0.5f * viewportHeight;
+
+                var dist = MathF.Abs(screenX - mouseScreenPos.X) + MathF.Abs(screenY - mouseScreenPos.Y);
+
+                if (dist < bestDist)
                 {
-                    var dist = res.Value;
-                    if (dist < bestDistance)
-                    {
-                        selectedVertex = i;
-                        bestDistance = dist;
-                    }
+                    bestDist = dist;
+                    selectedVertex = i;
                 }
             }
 
-            if (selectedVertex == -1)
+            if (selectedVertex == -1 || bestDist > pixelThreshold)
+            {
+                selectedVertex = -1;
                 return null;
+            }
 
-            return bestDistance;
+            return bestDist;
         }
 
         public static float? IntersectFace(Ray ray, MeshObject geometry, Matrix matrix, out int? face)
@@ -56,6 +67,9 @@ namespace GameWorld.Core.Utility
             var inverseTransform = Matrix.Invert(matrix);
             ray.Position = Vector3.Transform(ray.Position, inverseTransform);
             ray.Direction = Vector3.TransformNormal(ray.Direction, inverseTransform);
+
+            if (ray.Intersects(geometry.BoundingBox) == null)
+                return null;
 
             var faceIndex = -1;
             var bestDistance = float.MaxValue;
@@ -90,6 +104,10 @@ namespace GameWorld.Core.Utility
 
         public static bool IntersectObject(BoundingFrustum boundingFrustum, MeshObject geometry, Matrix matrix)
         {
+            var transformedBox = TransformBoundingBox(geometry.BoundingBox, matrix);
+            if (boundingFrustum.Contains(transformedBox) == ContainmentType.Disjoint)
+                return false;
+
             for (var i = 0; i < geometry.VertexCount(); i++)
             {
                 if (boundingFrustum.Contains(Vector3.Transform(geometry.GetVertexById(i), matrix)) != ContainmentType.Disjoint)
@@ -103,28 +121,30 @@ namespace GameWorld.Core.Utility
         {
             faces = new List<int>();
 
-            var indexList = geometry.GetIndexBuffer();
-            var vertList = geometry.GetVertexList();
+            var transformedBox = TransformBoundingBox(geometry.BoundingBox, matrix);
+            if (boundingFrustum.Contains(transformedBox) == ContainmentType.Disjoint)
+                return false;
 
-            var transformedVertList = new Vector3[vertList.Count];
-            for (var i = 0; i < vertList.Count; i++)
-                transformedVertList[i] = Vector3.Transform(vertList[i], matrix);
+            var vertCount = geometry.VertexArray.Length;
+            var transformedVerts = new Vector3[vertCount];
+            for (var i = 0; i < vertCount; i++)
+                transformedVerts[i] = Vector3.Transform(geometry.GetVertexById(i), matrix);
 
-            for (var i = 0; i < indexList.Count; i += 3)
+            for (var i = 0; i < geometry.IndexArray.Length; i += 3)
             {
-                var index0 = indexList[i + 0];
-                var index1 = indexList[i + 1];
-                var index2 = indexList[i + 2];
+                var index0 = geometry.IndexArray[i + 0];
+                var index1 = geometry.IndexArray[i + 1];
+                var index2 = geometry.IndexArray[i + 2];
 
-                if (boundingFrustum.Contains(transformedVertList[index0]) != ContainmentType.Disjoint)
+                if (boundingFrustum.Contains(transformedVerts[index0]) != ContainmentType.Disjoint)
                     faces.Add(i);
-                else if (boundingFrustum.Contains(transformedVertList[index1]) != ContainmentType.Disjoint)
+                else if (boundingFrustum.Contains(transformedVerts[index1]) != ContainmentType.Disjoint)
                     faces.Add(i);
-                else if (boundingFrustum.Contains(transformedVertList[index2]) != ContainmentType.Disjoint)
+                else if (boundingFrustum.Contains(transformedVerts[index2]) != ContainmentType.Disjoint)
                     faces.Add(i);
             }
 
-            if (faces.Count() == 0)
+            if (faces.Count == 0)
                 faces = null;
             return faces != null;
         }
@@ -133,17 +153,106 @@ namespace GameWorld.Core.Utility
         {
             vertices = new List<int>();
 
-            for (var i = 0; i < geometry.GetIndexCount(); i++)
+            for (var i = 0; i < geometry.IndexArray.Length; i++)
             {
-                var index = geometry.GetIndex(i);
-
+                var index = geometry.IndexArray[i];
                 if (boundingFrustum.Contains(Vector3.Transform(geometry.GetVertexById(index), matrix)) != ContainmentType.Disjoint)
                     vertices.Add(index);
             }
-            vertices = vertices.Distinct().ToList();
-            if (vertices.Count() == 0)
+
+            if (vertices.Count == 0)
                 vertices = null;
+            else
+                vertices = vertices.Distinct().ToList();
             return vertices != null;
+        }
+
+        public static float? IntersectEdge(Ray ray, MeshObject geometry, Vector3 cameraPos, Matrix matrix, out (int v0, int v1) selectedEdge)
+        {
+            selectedEdge = (-1, -1);
+            var inverseTransform = Matrix.Invert(matrix);
+            ray.Position = Vector3.Transform(ray.Position, inverseTransform);
+            ray.Direction = Vector3.TransformNormal(ray.Direction, inverseTransform);
+            cameraPos = Vector3.Transform(cameraPos, inverseTransform);
+
+            var bestDistance = float.MaxValue;
+            var edgeThreshold = 0.0025f;
+
+            var processedEdges = new HashSet<(int, int)>();
+            var indexBuffer = geometry.IndexArray;
+
+            for (var i = 0; i < indexBuffer.Length; i += 3)
+            {
+                var i0 = indexBuffer[i];
+                var i1 = indexBuffer[i + 1];
+                var i2 = indexBuffer[i + 2];
+
+                var edges = new[] { (Math.Min(i0, i1), Math.Max(i0, i1)), (Math.Min(i1, i2), Math.Max(i1, i2)), (Math.Min(i0, i2), Math.Max(i0, i2)) };
+
+                foreach (var edge in edges)
+                {
+                    if (processedEdges.Contains(edge))
+                        continue;
+                    processedEdges.Add(edge);
+
+                    var p0 = geometry.GetVertexById(edge.Item1);
+                    var p1 = geometry.GetVertexById(edge.Item2);
+
+                    var midPoint = (p0 + p1) * 0.5f;
+                    var distToCamera = (cameraPos - midPoint).Length();
+                    var scaledThreshold = edgeThreshold * distToCamera * 1.5f;
+
+                    var dist = RayToLineSegmentDistance(ray, p0, p1);
+                    if (dist < scaledThreshold && dist < bestDistance)
+                    {
+                        bestDistance = dist;
+                        selectedEdge = edge;
+                    }
+                }
+            }
+
+            if (selectedEdge.Item1 == -1)
+                return null;
+
+            return bestDistance;
+        }
+
+        public static bool IntersectEdges(BoundingFrustum boundingFrustum, MeshObject geometry, Matrix matrix, out List<(int v0, int v1)> edges)
+        {
+            edges = new List<(int, int)>();
+            var processedEdges = new HashSet<(int, int)>();
+            var indexBuffer = geometry.IndexArray;
+
+            var vertCount = geometry.VertexArray.Length;
+            var transformedVerts = new Vector3[vertCount];
+            for (var i = 0; i < vertCount; i++)
+                transformedVerts[i] = Vector3.Transform(geometry.GetVertexById(i), matrix);
+
+            for (var i = 0; i < indexBuffer.Length; i += 3)
+            {
+                var i0 = indexBuffer[i];
+                var i1 = indexBuffer[i + 1];
+                var i2 = indexBuffer[i + 2];
+
+                var edgeList = new[] { (Math.Min(i0, i1), Math.Max(i0, i1)), (Math.Min(i1, i2), Math.Max(i1, i2)), (Math.Min(i0, i2), Math.Max(i0, i2)) };
+
+                foreach (var edge in edgeList)
+                {
+                    if (processedEdges.Contains(edge))
+                        continue;
+                    processedEdges.Add(edge);
+
+                    if (boundingFrustum.Contains(transformedVerts[edge.Item1]) != ContainmentType.Disjoint &&
+                        boundingFrustum.Contains(transformedVerts[edge.Item2]) != ContainmentType.Disjoint)
+                    {
+                        edges.Add(edge);
+                    }
+                }
+            }
+
+            if (edges.Count == 0)
+                return false;
+            return true;
         }
 
         public static ushort FindClosestVertexIndex(MeshObject mesh, Vector3 point, out float distance)
@@ -167,7 +276,6 @@ namespace GameWorld.Core.Utility
 
         public static bool MollerTrumboreIntersection(Ray r, Vector3 vertex0, Vector3 vertex1, Vector3 vertex2, out float? distance)
         {
-            //Source : https://en.wikipedia.org/wiki/M%C3%B6ller%E2%80%93Trumbore_intersection_algorithm
             const float EPSILON = 0.0000001f;
             Vector3 edge1, edge2, h, s, q;
             float a, f, u, v;
@@ -178,7 +286,7 @@ namespace GameWorld.Core.Utility
             if (a > -EPSILON && a < EPSILON)
             {
                 distance = null;
-                return false;    // This ray is parallel to this triangle.
+                return false;
             }
             f = 1.0f / a;
             s = r.Position - vertex0;
@@ -195,14 +303,13 @@ namespace GameWorld.Core.Utility
                 distance = null;
                 return false;
             }
-            // At this stage we can compute t to find out where the intersection point is on the line.
             var t = f * Vector3.Dot(edge2, q);
-            if (t > EPSILON) // ray intersection
+            if (t > EPSILON)
             {
                 distance = t;
                 return true;
             }
-            else // This means that there is a line intersection but not a ray intersection.
+            else
             {
                 distance = null;
                 return false;
@@ -233,6 +340,58 @@ namespace GameWorld.Core.Utility
             if (bones.Count() == 0)
                 bones = null;
             return bones != null;
+        }
+
+        public static BoundingBox TransformBoundingBox(BoundingBox box, Matrix matrix)
+        {
+            var corners = box.GetCorners();
+            Vector3.Transform(corners, ref matrix, corners);
+            return BoundingBox.CreateFromPoints(corners);
+        }
+
+        static float RayToLineSegmentDistance(Ray ray, Vector3 segStart, Vector3 segEnd)
+        {
+            var rayDir = ray.Direction;
+            var segDir = segEnd - segStart;
+            var segLength = segDir.Length();
+
+            if (segLength < 0.0001f)
+            {
+                var toPoint = segStart - ray.Position;
+                var projection = Vector3.Dot(toPoint, rayDir);
+                var closestOnRay = ray.Position + rayDir * projection;
+                return (closestOnRay - segStart).Length();
+            }
+
+            segDir /= segLength;
+
+            var w0 = ray.Position - segStart;
+            var a = Vector3.Dot(rayDir, rayDir);
+            var b = Vector3.Dot(rayDir, segDir);
+            var c = Vector3.Dot(segDir, segDir);
+            var d = Vector3.Dot(rayDir, w0);
+            var e = Vector3.Dot(segDir, w0);
+
+            var denom = a * c - b * b;
+
+            float s, t;
+            if (denom < 0.0001f)
+            {
+                s = 0f;
+                t = d / b;
+            }
+            else
+            {
+                s = (b * e - c * d) / denom;
+                t = (a * e - b * d) / denom;
+            }
+
+            t = MathHelper.Clamp(t, 0f, segLength);
+
+            var rayPt = ray.Position + rayDir * s;
+            var segPt = segStart + segDir * t;
+
+            return (rayPt - segPt).Length();
         }
     }
 }

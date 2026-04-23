@@ -38,11 +38,23 @@
 /processorParam:DebugMode=Auto
 /build:Shaders/GridShader.fx
 
+#begin Shaders/EdgeQuadShader.fx
+/importer:EffectImporter
+/processor:EffectProcessor
+/processorParam:DebugMode=Auto
+/build:Shaders/EdgeQuadShader.fx
+
 #begin Shaders/InstancingShader.fx
 /importer:EffectImporter
 /processor:EffectProcessor
 /processorParam:DebugMode=Auto
 /build:Shaders/InstancingShader.fx
+
+#begin Shaders/VertexPointShader.fx
+/importer:EffectImporter
+/processor:EffectProcessor
+/processorParam:DebugMode=Auto
+/build:Shaders/VertexPointShader.fx
 
 #begin Shaders/LineShader.fx
 /importer:EffectImporter

@@ -21,6 +21,7 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
     {
         public ObservableCollection<ToolbarItem> MenuItems { get; set; } = new ObservableCollection<ToolbarItem>();
         public ObservableCollection<MenuBarButton> CustomButtons { get; set; } = new ObservableCollection<MenuBarButton>();
+        public ObservableCollection<MenuBarButton> SidebarButtons { get; set; } = new ObservableCollection<MenuBarButton>();
         public TransformToolViewModel TransformTool { get; set; }
 
         private readonly IUiCommandFactory _uiCommandFactory;
@@ -43,6 +44,7 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
             RegisterActions();
             RegisterHotkeys();
             CustomButtons = CreateButtons();
+            SidebarButtons = CreateVerticalButtons();
             MenuItems = CreateToolbarMenu();
 
             eventHub.Register<CommandStackChangedEvent>(this, OnUndoStackChanged);
@@ -148,20 +150,6 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
             builder.CreateButton<UndoCommand>(IconLibrary.UndoIcon);
             builder.CreateButtonSeparator();
 
-            // Gizmo buttons
-            builder.CreateGroupedButton<SelectGizmoModeCommand>("Gizmo", true, IconLibrary.Gizmo_CursorIcon);
-            builder.CreateGroupedButton<MoveGizmoModeCommand>("Gizmo", false, IconLibrary.Gizmo_MoveIcon);
-            builder.CreateGroupedButton<RotateGizmoModeCommand>("Gizmo", false, IconLibrary.Gizmo_RotateIcon);
-            builder.CreateGroupedButton<ScaleGizmoModeCommand>("Gizmo", false, IconLibrary.Gizmo_ScaleIcon);
-            builder.CreateButtonSeparator();
-
-            // Selection buttons
-            builder.CreateGroupedButton<ObjectSelectionModeCommand>("SelectionMode", true, IconLibrary.Selection_Object_Icon);
-            builder.CreateGroupedButton<FaceSelectionModeCommand>("SelectionMode", false, IconLibrary.Selection_Face_Icon);
-            builder.CreateGroupedButton<VertexSelectionModeCommand>("SelectionMode", false, IconLibrary.Selection_Vertex_Icon);
-            builder.CreateButton<ToggleViewSelectedCommand>(IconLibrary.ViewSelectedIcon);
-            builder.CreateButtonSeparator();
-
             // Object buttons
             builder.CreateButton<DivideSubMeshCommand>(IconLibrary.DivideIntoSubMeshIcon, ButtonVisibilityRule.ObjectMode);
             builder.CreateButton<MergeObjectsCommand>(IconLibrary.MergeMeshIcon, ButtonVisibilityRule.ObjectMode);
@@ -186,6 +174,27 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
             // Vertex buttons
             builder.CreateButton<OpenVertexDebuggerCommand>(IconLibrary.VertexDebuggerIcon, ButtonVisibilityRule.VertexMode);
             
+            return builder.Build();
+        }
+
+
+        ObservableCollection<MenuBarButton> CreateVerticalButtons()
+        {
+            var builder = new ButtonBuilder(_uiCommands);
+
+            // Gizmo buttons
+            builder.CreateGroupedButton<SelectGizmoModeCommand>("Gizmo", true, IconLibrary.Gizmo_CursorIcon);
+            builder.CreateGroupedButton<MoveGizmoModeCommand>("Gizmo", false, IconLibrary.Gizmo_MoveIcon);
+            builder.CreateGroupedButton<RotateGizmoModeCommand>("Gizmo", false, IconLibrary.Gizmo_RotateIcon);
+            builder.CreateGroupedButton<ScaleGizmoModeCommand>("Gizmo", false, IconLibrary.Gizmo_ScaleIcon);
+            builder.CreateButtonSeparator();
+
+            // Selection buttons
+            builder.CreateGroupedButton<ObjectSelectionModeCommand>("SelectionMode", true, IconLibrary.Selection_Object_Icon);
+            builder.CreateGroupedButton<FaceSelectionModeCommand>("SelectionMode", false, IconLibrary.Selection_Face_Icon);
+            builder.CreateGroupedButton<VertexSelectionModeCommand>("SelectionMode", false, IconLibrary.Selection_Vertex_Icon);
+            builder.CreateButton<ToggleViewSelectedCommand>(IconLibrary.ViewSelectedIcon);
+ 
             return builder.Build();
         }
 
@@ -242,6 +251,9 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
 
             // Validate if tool button is visible
             foreach (var button in CustomButtons)
+                _menuItemVisibilityRuleEngine.Validate(button);
+
+            foreach (var button in SidebarButtons)
                 _menuItemVisibilityRuleEngine.Validate(button);
 
             // Validate if menu action is enabled
