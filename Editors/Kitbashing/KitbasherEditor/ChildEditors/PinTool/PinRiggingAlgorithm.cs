@@ -5,18 +5,22 @@ using GameWorld.Core.Commands;
 using GameWorld.Core.Components.Selection;
 using GameWorld.Core.SceneNodes;
 using Microsoft.Xna.Framework;
+using Serilog;
+using Shared.Core.ErrorHandling;
 using Shared.Core.Services;
+using Shared.GameFormats.RigidModel;
 
 namespace Editors.KitbasherEditor.ChildEditors.PinTool
 {
     public partial class PinRiggingAlgorithm : ObservableObject
     {
+        private readonly ILogger _logger = Logging.Create<PinRiggingAlgorithm>();
         private readonly IStandardDialogs _standardDialogs;
         private readonly SelectionManager _selectionManager;
         private readonly CommandFactory _commandFactory;
 
-        [ObservableProperty] List<int> _selectedVertex =[];
-        [ObservableProperty] Rmv2MeshNode _selectedMesh;
+        [ObservableProperty] List<int> _selectedVertex = [];
+        [ObservableProperty] Rmv2MeshNode? _selectedMesh;
         [ObservableProperty] string _description = "";
 
         public PinRiggingAlgorithm(CommandFactory commandFactory, IStandardDialogs standardDialogs, SelectionManager selectionManager)
@@ -40,6 +44,13 @@ namespace Editors.KitbasherEditor.ChildEditors.PinTool
                 return false;
             }
 
+            if (SelectedMesh.Geometry.VertexFormat == UiVertexFormat.Static)
+            {
+                _standardDialogs.ShowDialogBox("Source mesh has no bone weights (static format). Use an animated mesh as source.", "Error");
+                return false;
+            }
+
+            _logger.Here().Information("Pinning {Count} meshes to vertex {VertexId} on '{MeshName}'", meshesToAffect.Count, SelectedVertex.First(), SelectedMesh.Name);
             _commandFactory.Create<PinMeshToVertexCommand>().Configure(x => x.Configure(meshesToAffect, SelectedMesh, SelectedVertex.First())).BuildAndExecute();
             return true;
         }
@@ -49,7 +60,6 @@ namespace Editors.KitbasherEditor.ChildEditors.PinTool
             SelectedVertex.Clear();
             SelectedMesh = null;
 
-            var description = "No Mesh selected";
             var selectionState = _selectionManager.GetState<VertexSelectionState>();
             if (selectionState == null || selectionState.SelectionCount() == 0)
             {
@@ -59,19 +69,21 @@ namespace Editors.KitbasherEditor.ChildEditors.PinTool
             
             var selectionAsMeshNode = selectionState.GetSingleSelectedObject() as Rmv2MeshNode;
             if (selectionAsMeshNode == null)
-                throw new Exception($"Unexpected result for selection. State = {selectionState}");
+            {
+                _logger.Here().Error("Unexpected selection type: {State}", selectionState);
+                _standardDialogs.ShowDialogBox("Unexpected selection type - expected a mesh node", "Error");
+                return;
+            }
 
             if (selectionAsMeshNode.PivotPoint != Vector3.Zero)
             {
-                _standardDialogs.ShowDialogBox("Selected mesh has a pivot point, the tool will not work correctly", "error");
+                _standardDialogs.ShowDialogBox("Selected mesh has a pivot point, the tool will not work correctly", "Error");
                 return;
             }
             
             SelectedMesh = selectionAsMeshNode;
             SelectedVertex = selectionState.SelectedVertices.ToList();
-
-            description = $"Mesh:{SelectedMesh.Name}', Num Verts: {SelectedVertex.Count}";
-            Description = description;
+            Description = $"Mesh: '{SelectedMesh.Name}', Num Verts: {SelectedVertex.Count}";
         }
     }
 }

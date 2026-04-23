@@ -10,7 +10,7 @@
         xmlns:loc="clr-namespace:Shared.Ui.Common;assembly=Shared.Ui"
         mc:Ignorable="d"
         Style="{StaticResource CustomWindowStyle}"
-        HelpDocumentPath="Documentation\AssetEditorDocumentation.html"
+        HelpDocumentPath="Documentation\AssetEditorDocumentation.html?doc=Kitbash_MeshFitter"
         Title="{loc:Loc KitbashTool.MeshFitterTool.Title}" Height="500" Width="1000">
     <Grid>
         <Grid.RowDefinitions>

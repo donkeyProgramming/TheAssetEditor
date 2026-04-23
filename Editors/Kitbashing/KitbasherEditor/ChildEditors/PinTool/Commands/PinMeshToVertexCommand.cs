@@ -3,19 +3,21 @@ using GameWorld.Core.Components.Selection;
 using GameWorld.Core.Rendering.Geometry;
 using GameWorld.Core.SceneNodes;
 using Microsoft.Xna.Framework;
+using Serilog;
+using Shared.Core.ErrorHandling;
 
 namespace Editors.KitbasherEditor.ChildEditors.PinTool.Commands
 {
     public class PinMeshToVertexCommand : ICommand
     {
-        ISelectionState _selectionOldState;
-        SelectionManager _selectionManager;
+        private readonly ILogger _logger = Logging.Create<PinMeshToVertexCommand>();
+        private readonly SelectionManager _selectionManager;
 
-        List<MeshObject> _originalGeos;
-
-        List<Rmv2MeshNode> _meshesToPin;
-        Rmv2MeshNode _source;
-        int _vertexId;
+        private ISelectionState? _selectionOldState;
+        private List<MeshObject>? _originalGeos;
+        private List<Rmv2MeshNode> _meshesToPin = [];
+        private Rmv2MeshNode? _source;
+        private int _vertexId;
 
         public void Configure(IEnumerable<Rmv2MeshNode> meshesToPin, Rmv2MeshNode source, int vertexId)
         {
@@ -34,6 +36,14 @@ namespace Editors.KitbasherEditor.ChildEditors.PinTool.Commands
 
         public void Execute()
         {
+            if (_source == null || _meshesToPin.Count == 0)
+                throw new InvalidOperationException("PinMeshToVertexCommand not configured before Execute");
+
+            _logger.Here().Information("Executing pin: {Count} meshes to vertex {VertexId} on '{Source}'", _meshesToPin.Count, _vertexId, _source.Name);
+
+            if (_vertexId < 0 || _vertexId >= _source.Geometry.VertexCount())
+                throw new InvalidOperationException($"Vertex index {_vertexId} is out of range for mesh '{_source.Name}' (vertex count: {_source.Geometry.VertexCount()})");
+
             // Create undo state
             _originalGeos = _meshesToPin.Select(x => x.Geometry.Clone()).ToList();
             _selectionOldState = _selectionManager.GetStateCopy();
@@ -45,9 +55,9 @@ namespace Editors.KitbasherEditor.ChildEditors.PinTool.Commands
                 currentMesh.Geometry.ChangeVertexType(_source.Geometry.VertexFormat, false);
                 currentMesh.Geometry.UpdateSkeletonName(_source.Geometry.SkeletonName);
 
+                currentMesh.PivotPoint = Vector3.Zero;
                 for (var i = 0; i < currentMesh.Geometry.VertexCount(); i++)
                 {
-                    currentMesh.PivotPoint = Vector3.Zero;
                     currentMesh.Geometry.SetVertexBlendIndex(i, sourceVert.BlendIndices);
                     currentMesh.Geometry.SetVertexWeights(i, sourceVert.BlendWeights);
                 }
@@ -58,6 +68,9 @@ namespace Editors.KitbasherEditor.ChildEditors.PinTool.Commands
 
         public void Undo()
         {
+            if (_originalGeos == null || _selectionOldState == null)
+                return;
+
             for (var i = 0; i < _meshesToPin.Count; i++)
             {
                 _meshesToPin[i].Geometry = _originalGeos[i];

@@ -2,12 +2,15 @@
 using System.Diagnostics;
 using System.IO;
 using System.Windows;
+using Serilog;
+using Shared.Core.ErrorHandling;
 using WindowHandling;
 
 namespace AssetEditor.Themes
 {
     public partial class Controls
     {
+        private static readonly ILogger _logger = Logging.Create<Controls>();
         private void CloseWindow_Event(object sender, RoutedEventArgs e)
         {
             if (e.Source != null)
@@ -35,16 +38,46 @@ namespace AssetEditor.Themes
             if (window == null || string.IsNullOrWhiteSpace(window.HelpDocumentPath))
                 return;
 
-            var helpPath = Path.IsPathRooted(window.HelpDocumentPath)
-                ? window.HelpDocumentPath
-                : Path.GetFullPath(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, window.HelpDocumentPath));
+            var rawPath = window.HelpDocumentPath;
+            var queryString = "";
+            var queryIndex = rawPath.IndexOf('?');
+            if (queryIndex >= 0)
+            {
+                queryString = rawPath.Substring(queryIndex);
+                rawPath = rawPath.Substring(0, queryIndex);
+            }
 
-            if (File.Exists(helpPath) == false)
+            var helpPath = Path.IsPathRooted(rawPath)
+                ? rawPath
+                : Path.GetFullPath(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, rawPath));
+
+            if (!File.Exists(helpPath) && Debugger.IsAttached)
+            {
+                _logger.Here().Information("Help file not found at '{HelpPath}', searching parent directories", helpPath);
+                var searchDir = new DirectoryInfo(AppDomain.CurrentDomain.BaseDirectory);
+                while (searchDir?.Parent != null)
+                {
+                    searchDir = searchDir.Parent;
+                    var candidate = Path.Combine(searchDir.FullName, rawPath);
+                    if (File.Exists(candidate))
+                    {
+                        helpPath = candidate;
+                        break;
+                    }
+                }
+            }
+
+            if (!File.Exists(helpPath))
+            {
+                _logger.Here().Warning("Help file not found: '{HelpPath}'", helpPath);
                 return;
+            }
 
+            var fileUri = new Uri(helpPath).AbsoluteUri + queryString;
+            _logger.Here().Information("Opening help document: {Uri}", fileUri);
             Process.Start(new ProcessStartInfo
             {
-                FileName = helpPath,
+                FileName = fileUri,
                 UseShellExecute = true
             });
         }
