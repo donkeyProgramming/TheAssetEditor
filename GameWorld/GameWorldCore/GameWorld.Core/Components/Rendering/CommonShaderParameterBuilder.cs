@@ -5,7 +5,7 @@ namespace GameWorld.Core.Components.Rendering
 {
     internal static class CommonShaderParameterBuilder
     {
-        public static CommonShaderParameters Build(ArcBallCamera camera, SceneRenderParametersStore sceneLightParameters)
+        public static CommonShaderParameters Build(ArcBallCamera camera, SceneRenderParametersStore sceneLightParameters, float viewportWidth, float viewportHeight)
         {
             // Light follows camera rotation for better model visibility
             float dirLightRotX = MathHelper.ToRadians(sceneLightParameters.DirLightRotationDegrees_X) + camera.Pitch;
@@ -24,7 +24,9 @@ namespace GameWorld.Core.Components.Rendering
                 sceneLightParameters.LightIntensityMult,
 
                 [sceneLightParameters.FactionColour0, sceneLightParameters.FactionColour1, sceneLightParameters.FactionColour2],
-                sceneLightParameters.LightColour
+                sceneLightParameters.LightColour,
+                viewportHeight,
+                viewportWidth
                 );
 
             return commonShaderParameters;

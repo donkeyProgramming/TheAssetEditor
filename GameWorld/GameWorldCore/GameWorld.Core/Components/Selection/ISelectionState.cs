@@ -8,6 +8,7 @@ namespace GameWorld.Core.Components.Selection
         Object,
         Face,
         Vertex,
+        Edge,
         Bone
     };
 

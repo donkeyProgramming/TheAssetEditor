@@ -150,7 +150,7 @@ namespace GameWorld.Core.Components.Rendering
                 return;
             }
 
-            var commonShaderParameters = CommonShaderParameterBuilder.Build(_camera, _sceneLightParameters);
+            var commonShaderParameters = CommonShaderParameterBuilder.Build(_camera, _sceneLightParameters, screenWidth, screenHeight);
             var backgroundColour = ApplicationSettingsHelper.GetEnumAsColour(_applicationSettingsService.CurrentSettings.RenderEngineBackgroundColour);
 
             _normalRenderTarget = RenderTargetHelper.GetRenderTarget(device, _normalRenderTarget, imageUpScale, _graphicsResourceCreator);

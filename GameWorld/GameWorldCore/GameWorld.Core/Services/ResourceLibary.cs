@@ -20,7 +20,9 @@ namespace GameWorld.Core.Services
         GeometryInstance,
         Glow,
         BloomFilter,
-        Grid
+        Grid,
+        VertexPoint,
+        EdgeQuad
     }
 
     public class ResourceLibrary
@@ -62,6 +64,8 @@ namespace GameWorld.Core.Services
                 LoadEffect("Shaders\\LineShader", ShaderTypes.Line);
                 LoadEffect("Shaders\\GridShader", ShaderTypes.Grid);
                 LoadEffect("Shaders\\InstancingShader", ShaderTypes.GeometryInstance);
+                LoadEffect("Shaders\\VertexPointShader", ShaderTypes.VertexPoint);
+                LoadEffect("Shaders\\EdgeQuadShader", ShaderTypes.EdgeQuad);
 
                 _pbrDiffuse = _content.Load<TextureCube>("textures\\phazer\\DiffuseAmbientLightCubeMap");
                 _pbrSpecular= _content.Load<TextureCube>("textures\\phazer\\SpecularAmbientLightCubemap");
