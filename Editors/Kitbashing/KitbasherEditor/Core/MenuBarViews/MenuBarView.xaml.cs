@@ -52,9 +52,6 @@ namespace KitbasherEditor.Views
             if (DataContext is IKeyboardHandler keyboardHandler)
             {
                 keyboardHandler.OnKeyDown(e.Key, e.SystemKey, Keyboard.Modifiers);
-                var res = keyboardHandler.OnKeyReleased(e.Key, e.SystemKey, Keyboard.Modifiers);
-                if (res)
-                    e.Handled = true;
             }
         }
     }

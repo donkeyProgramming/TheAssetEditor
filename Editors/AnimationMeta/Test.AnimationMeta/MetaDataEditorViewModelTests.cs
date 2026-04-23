@@ -192,5 +192,55 @@ namespace Test.AnimationMeta
             var pasted = editor.ParsedFile.Attributes.Last();
             Assert.That(pasted, Is.InstanceOf(originalType));
         }
+
+        [Test]
+        public void MetaDataEditor_CopyPaste_EditPastedTagAndSave_UsesEditedValues()
+        {
+            var packFile = PathHelper.GetDataFile("Throt.pack");
+
+            var runner = new AssetEditorTestRunner();
+            runner.CreateCaContainer();
+            var outputPackFile = runner.LoadPackFile(packFile, true);
+
+            var filePath = @"animations/battle/humanoid17/throt_whip_catcher/attacks/hu17_whip_catcher_attack_05.anm.meta";
+            var metaPackFile = runner.PackFileService.FindFile(filePath);
+            var editor = runner.CommandFactory
+                .Create<OpenEditorCommand>()
+                .Execute<MetaDataEditorViewModel>(metaPackFile!, Shared.Core.ToolCreation.EditorEnums.Meta_Editor);
+
+            Assert.That(editor.ParsedFile, Is.Not.Null);
+
+            var sourceIndex = 4;
+            editor.Tags[sourceIndex].IsSelected = true;
+            editor.CopyActionCommand.Execute(null);
+            editor.PasteActionCommand.Execute(null);
+
+            var pastedIndex = editor.Tags.Count - 1;
+            Assert.That(editor.ParsedFile.Attributes[pastedIndex], Is.InstanceOf<SplashAttack_v10>());
+
+            // Edit the pasted tag values, not the original source tag.
+            var editedFilter = "edited_after_paste";
+            var editedAoeShape = 13;
+            var editedEndPositionX = 777;
+
+            editor.Tags[pastedIndex].Variables[3].ValueAsString = editedFilter;
+            editor.Tags[pastedIndex].Variables[5].ValueAsString = editedAoeShape.ToString();
+            (editor.Tags[pastedIndex].Variables[7] as VectorAttributeViewModel)!.Value.X.Value = editedEndPositionX;
+
+            editor.SaveActionCommand.Execute(null);
+
+            var savedFile = runner.PackFileService.FindFile(filePath, outputPackFile);
+            Assert.That(savedFile, Is.Not.Null);
+
+            var parser = runner.GetRequiredServiceInCurrentEditorScope<MetaDataFileParser>();
+            var parsedFile = parser.ParseFile(savedFile);
+            Assert.That(parsedFile, Is.Not.Null);
+
+            var pastedSplashAttack = parsedFile.Attributes[pastedIndex] as SplashAttack_v10;
+            Assert.That(pastedSplashAttack, Is.Not.Null);
+            Assert.That(pastedSplashAttack.Filter, Is.EqualTo(editedFilter));
+            Assert.That(pastedSplashAttack.AoeShape, Is.EqualTo(editedAoeShape));
+            Assert.That(pastedSplashAttack.EndPosition.X, Is.EqualTo(editedEndPositionX));
+        }
     }
 }
