@@ -111,7 +111,7 @@ const masterDocs = [
         { title: "Basics", base: "kitbash_basics" },
         { title: "Mesh Fitter", base: "Kitbash_MeshFitter" },
         { title: "Pin Tool", base: "Kitbash_PinTool" },
-        { title: "Photo Studio", base: "kitbash_photostudio" }
+        { title: "Photo Studio", base: "Kitbash_PhotoStudio" }
     ] }
 ];
 
@@ -126,10 +126,31 @@ function parseQuery(search) {
     return params;
 }
 
+function parseHash(hash) {
+    const params = {};
+    if (!hash) return params;
+    const h = hash.replace(/^#/, '');
+    h.split('&').forEach(pair => {
+        const [k, v] = pair.split('=');
+        if (k) params[decodeURIComponent(k)] = decodeURIComponent(v || '');
+    });
+    return params;
+}
+
+function getRequestedDoc() {
+    const hashParams = parseHash(location.hash);
+    if (hashParams.doc)
+        return hashParams.doc;
+
+    const queryParams = parseQuery(location.search);
+    return queryParams.doc || masterDocs[0].base;
+}
+
 function buildLinkFor(docBase) {
-    const params = new URLSearchParams();
-    params.set('doc', docBase);
-    return `${location.pathname}?${params.toString()}`;
+    const url = new URL(location.href);
+    url.search = '';
+    url.hash = `doc=${encodeURIComponent(docBase)}`;
+    return url.toString();
 }
 
 function resolveFile(baseName) {
@@ -202,7 +223,7 @@ function loadSidebar(currentDoc) {
 }
 
 window.addEventListener('popstate', (ev) => {
-    const state = ev.state || parseQuery(location.search);
+    const state = ev.state || { doc: getRequestedDoc() };
     const docBase = (state && state.doc) || masterDocs[0].base;
     loadSidebar(docBase);
     resolveFile(docBase).then(file => {
@@ -211,9 +232,17 @@ window.addEventListener('popstate', (ev) => {
     });
 });
 
+window.addEventListener('hashchange', () => {
+    const docBase = getRequestedDoc();
+    loadSidebar(docBase);
+    resolveFile(docBase).then(file => {
+        const frame = document.getElementById('docFrame');
+        loadFile(frame, file);
+    });
+});
+
 // Initial load
-const initialParams = parseQuery(location.search);
-const initialDoc = initialParams.doc || masterDocs[0].base;
+const initialDoc = getRequestedDoc();
 loadSidebar(initialDoc);
 resolveFile(initialDoc).then(file => {
     const frame = document.getElementById('docFrame');

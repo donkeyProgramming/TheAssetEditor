@@ -39,12 +39,21 @@ namespace AssetEditor.Themes
                 return;
 
             var rawPath = window.HelpDocumentPath;
-            var queryString = "";
+            var pathSuffix = "";
             var queryIndex = rawPath.IndexOf('?');
-            if (queryIndex >= 0)
+            var fragmentIndex = rawPath.IndexOf('#');
+            var suffixIndex = -1;
+            if (queryIndex >= 0 && fragmentIndex >= 0)
+                suffixIndex = Math.Min(queryIndex, fragmentIndex);
+            else if (queryIndex >= 0)
+                suffixIndex = queryIndex;
+            else if (fragmentIndex >= 0)
+                suffixIndex = fragmentIndex;
+
+            if (suffixIndex >= 0)
             {
-                queryString = rawPath.Substring(queryIndex);
-                rawPath = rawPath.Substring(0, queryIndex);
+                pathSuffix = rawPath.Substring(suffixIndex);
+                rawPath = rawPath.Substring(0, suffixIndex);
             }
 
             var helpPath = Path.IsPathRooted(rawPath)
@@ -73,11 +82,12 @@ namespace AssetEditor.Themes
                 return;
             }
 
-            var fileUri = new Uri(helpPath).AbsoluteUri + queryString;
+            var fileUri = new Uri(helpPath).AbsoluteUri + pathSuffix;
             _logger.Here().Information("Opening help document: {Uri}", fileUri);
             Process.Start(new ProcessStartInfo
             {
-                FileName = fileUri,
+                FileName = "explorer.exe",
+                Arguments = $"\"{fileUri}\"",
                 UseShellExecute = true
             });
         }
