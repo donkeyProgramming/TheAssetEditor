@@ -1,7 +1,6 @@
 ﻿using System.Windows.Forms;
 using GameWorld.Core.Commands;
 using GameWorld.Core.Commands.Bone;
-using GameWorld.Core.Commands.Edge;
 using GameWorld.Core.Commands.Face;
 using GameWorld.Core.Commands.Object;
 using GameWorld.Core.Commands.Vertex;
@@ -141,14 +140,6 @@ namespace GameWorld.Core.Components.Selection
                     return;
                 }
             }
-            else if (currentState.Mode == GeometrySelectionMode.Edge && currentState is EdgeSelectionState edgeState)
-            {
-                if (edgeState.RenderObject != null && IntersectionMath.IntersectEdges(unprojectedSelectionRect, edgeState.RenderObject.Geometry, edgeState.RenderObject.RenderMatrix, out var edges))
-                {
-                    _commandFactory.Create<EdgeSelectionCommand>().Configure(x => x.Configure(edges, isSelectionModification, removeSelection)).BuildAndExecute();
-                    return;
-                }
-            }
             else if (currentState.Mode == GeometrySelectionMode.Bone && currentState is BoneSelectionState boneState)
             {
                 if (boneState.RenderObject == null)
@@ -211,15 +202,6 @@ namespace GameWorld.Core.Components.Selection
                 }
             }
 
-            if (currentState is EdgeSelectionState edgeState && edgeState.RenderObject != null)
-            {
-                if (IntersectionMath.IntersectEdge(ray, edgeState.RenderObject.Geometry, _camera.Position, edgeState.RenderObject.RenderMatrix, out var selectedEdge) != null)
-                {
-                    _commandFactory.Create<EdgeSelectionCommand>().Configure(x => x.Configure(new List<(int, int)>() { selectedEdge }, isSelectionModification, removeSelection)).BuildAndExecute();
-                    return;
-                }
-            }
-
             // Pick object
             var selectedObject = _sceneManger.SelectObject(ray);
             if (selectedObject == null && isSelectionModification == false)
@@ -276,21 +258,6 @@ namespace GameWorld.Core.Components.Selection
             return false;
         }
 
-        public bool SetEdgeSelectionMode()
-        {
-            var selectionState = _selectionManager.GetState();
-            if (_selectionManager.GetState().Mode != GeometrySelectionMode.Edge)
-            {
-                var selectedObject = selectionState.GetSingleSelectedObject();
-                if (selectedObject != null)
-                {
-                    _commandFactory.Create<ObjectSelectionModeCommand>().Configure(x => x.Configure(selectedObject, GeometrySelectionMode.Edge)).BuildAndExecute();
-                    return true;
-                }
-            }
-            return false;
-        }
-
         public bool SetBoneSelectionMode()
         {
             var selectionState = _selectionManager.GetState();
@@ -324,12 +291,6 @@ namespace GameWorld.Core.Components.Selection
             else if (_keyboardComponent.IsKeyReleased(Keys.F3))
             {
                 if (SetVertexSelectionMode())
-                    return true;
-            }
-
-            else if (_keyboardComponent.IsKeyReleased(Keys.F4))
-            {
-                if (SetEdgeSelectionMode())
                     return true;
             }
 

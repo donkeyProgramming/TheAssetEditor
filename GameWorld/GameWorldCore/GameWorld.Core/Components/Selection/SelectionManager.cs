@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using GameWorld.Core.Components.Rendering;
+﻿using GameWorld.Core.Components.Rendering;
 using GameWorld.Core.Rendering;
 using GameWorld.Core.Rendering.Materials.Shaders;
 using GameWorld.Core.Rendering.RenderItems;
@@ -8,14 +6,13 @@ using GameWorld.Core.SceneNodes;
 using GameWorld.Core.Services;
 using GameWorld.Core.Utility;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
 using Shared.Core.Events;
 
 namespace GameWorld.Core.Components.Selection
 {
     public class SelectionChangedEvent
     {
-        public ISelectionState NewState { get; internal set; }
+        public ISelectionState? NewState { get; internal set; }
     }
 
     public class SelectionManager : BaseComponent, IDisposable
@@ -44,7 +41,7 @@ namespace GameWorld.Core.Components.Selection
         private int _sampleIdx1 = 1;
 
         const int MaxRenderEdges = 50000;
-        private EdgeData[] _edgeDataCache = new EdgeData[MaxRenderEdges];
+        private readonly EdgeData[] _edgeDataCache = new EdgeData[MaxRenderEdges];
 
         public SelectionManager(IEventHub eventHub, RenderEngineComponent renderEngine, IScopedResourceLibrary resourceLib, IDeviceResolver deviceResolverComponent, IGraphicsResourceCreator graphicsResourceCreator)
         {
@@ -84,31 +81,14 @@ namespace GameWorld.Core.Components.Selection
                 _currentState.SelectionChanged -= SelectionManager_SelectionChanged;
             }
 
-            switch (mode)
+            _currentState = mode switch
             {
-                case GeometrySelectionMode.Object:
-                    _currentState = new ObjectSelectionState();
-                    break;
-
-                case GeometrySelectionMode.Face:
-                    _currentState = new FaceSelectionState();
-                    break;
-
-                //case GeometrySelectionMode.Edge:
-                //    _currentState = new EdgeSelectionState();
-                //    break;
-                //
-                case GeometrySelectionMode.Vertex:
-                    _currentState = new VertexSelectionState(selectedObj, _vertexSelectionFalloff);
-                    break;
-                case GeometrySelectionMode.Bone:
-                    _currentState = new BoneSelectionState(selectedObj);
-                    break;
-
-                default:
-                    throw new Exception();
-            }
-
+                GeometrySelectionMode.Object => new ObjectSelectionState(),
+                GeometrySelectionMode.Face => new FaceSelectionState(),
+                GeometrySelectionMode.Vertex => new VertexSelectionState(selectedObj, _vertexSelectionFalloff),
+                GeometrySelectionMode.Bone => new BoneSelectionState(selectedObj),
+                _ => throw new Exception(),
+            };
             _currentState.SelectionChanged += SelectionManager_SelectionChanged;
             SelectionManager_SelectionChanged(_currentState, sendEvent);
             return _currentState;
@@ -211,23 +191,6 @@ namespace GameWorld.Core.Components.Selection
                 _cachedEdgeMesh = null;
                 _edgeDataDirty = true;
             }
-           //
-           //if (selectionState is EdgeSelectionState selectionEdgeState && selectionEdgeState.RenderObject is Rmv2MeshNode edgeNode)
-           //{
-           //    _renderEngine.AddRenderItem(RenderBuckedId.Wireframe, new GeometryRenderItem(edgeNode.Geometry, _wireframeEffect, edgeNode.RenderMatrix));
-           //    var geometry = edgeNode.Geometry;
-           //    var matrix = edgeNode.RenderMatrix;
-           //    foreach (var edge in selectionEdgeState.SelectedEdges)
-           //    {
-           //        var p0 = Vector3.Transform(geometry.GetVertexById(edge.v0), matrix);
-           //        var p1 = Vector3.Transform(geometry.GetVertexById(edge.v1), matrix);
-           //        _renderEngine.AddRenderLines(new VertexPositionColor[]
-           //        {
-           //            new VertexPositionColor(p0, Color.Orange),
-           //            new VertexPositionColor(p1, Color.Orange)
-           //        });
-           //    }
-           //}
 
             if (selectionState is BoneSelectionState selectionBoneState && selectionBoneState.RenderObject != null)
             {
