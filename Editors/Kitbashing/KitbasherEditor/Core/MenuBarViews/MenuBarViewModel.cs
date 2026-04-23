@@ -134,8 +134,6 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
             builder.CreateToolBarItem<FocusCameraCommand>(renderingToolbar, "Focus camera");
             builder.CreateToolBarItem<ResetCameraCommand>(renderingToolbar, "Reset camera");
             builder.CreateToolBarItem<OpenRenderSettingsWindowCommand>(renderingToolbar, "Open render settings");
-            builder.CreateToolBarItem<OpenPhotoStudioCommand>(renderingToolbar, "Open PhotoStudio");
-
 
             return builder.Build();
         }
@@ -163,6 +161,7 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
             builder.CreateButton<OpenReriggingToolCommand>(IconLibrary.ReRiggingIcon, ButtonVisibilityRule.ObjectMode);
             builder.CreateButton<OpenPinToolCommand>(IconLibrary.PinIcon, ButtonVisibilityRule.ObjectMode);
             builder.CreateButton<AssignMaterialFromOtherMeshUiCommand>(IconLibrary.AssignTextureFromOtherIcon, ButtonVisibilityRule.ObjectMode);
+            builder.CreateButton<OpenPhotoStudioCommand>(IconLibrary.CameraTool, ButtonVisibilityRule.Always);
 
             // Face buttons
             builder.CreateButton<ConvertFaceToVertexCommand>(IconLibrary.FaceToVertexIcon, ButtonVisibilityRule.FaceMode);
