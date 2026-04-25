@@ -96,7 +96,7 @@ namespace Shared.ByteParsing.Parsers
 
         public bool TryDecodeValue(byte[] buffer, int index, out string value, out int bytesRead, out string? error)
         {
-            value = null;
+            value = string.Empty;
             var result = TryReadReadCAStringAsArray(buffer, index, StringEncoding, IsOptStr, out error, out var stringStrt, out var stringLength, out bytesRead);
             if (result)
             {

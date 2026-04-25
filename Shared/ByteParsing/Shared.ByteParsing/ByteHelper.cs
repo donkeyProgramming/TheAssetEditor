@@ -72,8 +72,7 @@ namespace Shared.ByteParsing
             if (property == null)
             {
                 var type = typeof(T);
-                if (Nullable.GetUnderlyingType(type) != null)
-                    type = Nullable.GetUnderlyingType(type);
+                type = Nullable.GetUnderlyingType(type) ?? type;
                 return (uint)Marshal.SizeOf(type);
             }
 

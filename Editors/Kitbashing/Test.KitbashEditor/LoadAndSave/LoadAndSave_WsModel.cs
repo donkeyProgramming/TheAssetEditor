@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Editors.KitbasherEditor.ChildEditors.SaveDialog;
+﻿using Editors.KitbasherEditor.ChildEditors.SaveDialog;
 using GameWorld.Core.Services.SceneSaving;
 using Shared.Core.Events;
 using Shared.Core.Events.Global;
@@ -33,6 +28,7 @@ namespace Test.KitbashEditor.LoadAndSave
             // Edit the save settings and trigger a save
             var saveSettings = runner.GetRequiredServiceInCurrentEditorScope<GeometrySaveSettings>();
             saveSettings.IsUserInitialized = true;
+            saveSettings.DisplayDialogOnNextSave = false;
 
             var toolCommandFactory = runner.GetRequiredServiceInCurrentEditorScope<IUiCommandFactory>();
             toolCommandFactory.Create<SaveCommand>().Execute();

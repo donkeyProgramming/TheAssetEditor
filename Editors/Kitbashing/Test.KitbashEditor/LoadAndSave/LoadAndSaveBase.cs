@@ -74,6 +74,7 @@ namespace Test.KitbashEditor.LoadAndSave
             // Edit the save settings and trigger a save
             var saveSettings = runner.GetRequiredServiceInCurrentEditorScope<GeometrySaveSettings>();
             saveSettings.IsUserInitialized = true;
+            saveSettings.DisplayDialogOnNextSave = false;
 
             var toolCommandFactory = runner.GetRequiredServiceInCurrentEditorScope<IUiCommandFactory>();
             var saveResult = toolCommandFactory.Create<SaveCommand>().ExecuteWithResult();

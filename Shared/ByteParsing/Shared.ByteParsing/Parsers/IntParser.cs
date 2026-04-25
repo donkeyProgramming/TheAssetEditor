@@ -29,7 +29,7 @@
             return EncodeValue(spesificValue, out error);
         }
 
-        public byte[] Encode(object value)
+        public override byte[] Encode(object value)
         {
             if (value == null) throw new ArgumentNullException(nameof(value));
 
