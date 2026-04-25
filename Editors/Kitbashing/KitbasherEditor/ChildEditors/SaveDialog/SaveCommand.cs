@@ -1,5 +1,4 @@
-﻿using System.Runtime;
-using Editors.KitbasherEditor.Core.MenuBarViews;
+﻿using Editors.KitbasherEditor.Core.MenuBarViews;
 using Editors.KitbasherEditor.ViewModels.SaveDialog;
 using GameWorld.Core.Components;
 using GameWorld.Core.SceneNodes;
@@ -7,7 +6,7 @@ using GameWorld.Core.Services.SceneSaving;
 using Shared.Core.Misc;
 using Shared.Ui.Common.MenuSystem;
 
-namespace Editors.KitbasherEditor.UiCommands
+namespace Editors.KitbasherEditor.ChildEditors.SaveDialog
 {
     public class SaveCommandBase
     {
@@ -26,7 +25,7 @@ namespace Editors.KitbasherEditor.UiCommands
 
         protected SaveResult? Save(bool forceShowDialog)
         {
-            if (_settings.IsUserInitialized == false || forceShowDialog)
+            if (_settings.IsUserInitialized == false || forceShowDialog || _settings.DisplayDialogOnNextSave)
             {
                 var window = _saveWindowFactory.Create();
                 window.Initialize(_settings);
@@ -34,7 +33,6 @@ namespace Editors.KitbasherEditor.UiCommands
                 if (saveScene != true)
                     return null;
             }
-
 
             var mainNode = _sceneManager.GetNodeByName<MainEditableNode>(SpecialNodes.EditableModel);
             _settings.AttachmentPoints = mainNode.AttachmentPoints; // Bit of a hack, clean up at some point
@@ -60,7 +58,7 @@ namespace Editors.KitbasherEditor.UiCommands
 
     public class SaveAsCommand : SaveCommandBase, ITransientKitbasherUiCommand
     {
-        public string ToolTip { get; set; } = "SaveAs";
+        public string ToolTip { get; set; } = "Save As";
         public ActionEnabledRule EnabledRule => ActionEnabledRule.Always;
         public Hotkey? HotKey { get; } = null;
 

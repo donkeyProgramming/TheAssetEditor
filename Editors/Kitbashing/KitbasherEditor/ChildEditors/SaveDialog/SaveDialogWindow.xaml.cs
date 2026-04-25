@@ -1,13 +1,11 @@
 ﻿using System.Windows;
 using GameWorld.Core.Services.SceneSaving;
 using KitbasherEditor.ViewModels.SaveDialog;
+using WindowHandling;
 
 namespace Editors.KitbasherEditor.ViewModels.SaveDialog
 {
-    /// <summary>
-    /// Interaction logic for SaveDialogWindow.xaml
-    /// </summary>
-    public partial class SaveDialogWindow : Window
+    public partial class SaveDialogWindow : AssetEditorWindow
     {
         private readonly SaveDialogViewModel _saveDialogViewModel;
 
@@ -34,6 +32,11 @@ namespace Editors.KitbasherEditor.ViewModels.SaveDialog
         {
             DialogResult = false;
             Close();
+        }
+
+        private void Window_OnContentRendered(object sender, EventArgs e)
+        {
+            InvalidateVisual();
         }
     }
 }

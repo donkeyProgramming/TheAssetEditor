@@ -43,9 +43,6 @@ namespace GameWorld.Core
             serviceCollection.AddScoped<IScopedResourceLibrary, ScopedResourceLibrary>();
             serviceCollection.AddScoped<IGraphicsResourceCreator>(x => new GraphicsResourceCreator(() => x.GetRequiredService<IWpfGame>().GraphicsDevice));
             serviceCollection.AddScoped<IScopeOwnerAware>(x => x.GetRequiredService<IGraphicsResourceCreator>() as IScopeOwnerAware);
-            
-
-
             serviceCollection.AddSingleton<ResourceLibrary>();
 
             // Settings

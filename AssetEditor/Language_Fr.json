@@ -25,5 +25,7 @@
   "KitbashTool.Debug.Geometry.CreateSphere.Menu": "Creer une sphere",
   "KitbashTool.Debug.Geometry.CreateBox.Tooltip": "Creer une boite subdivisee",
   "KitbashTool.Debug.Geometry.CreatePlane.Tooltip": "Creer un plan subdivise",
-  "KitbashTool.Debug.Geometry.CreateSphere.Tooltip": "Creer une sphere subdivisee"
+  "KitbashTool.Debug.Geometry.CreateSphere.Tooltip": "Creer une sphere subdivisee",
+
+  "KitbashTool.SaveDialog.DisplayDialogOnNextSave": "Afficher la boîte de dialogue à la prochaine sauvegarde"
 }

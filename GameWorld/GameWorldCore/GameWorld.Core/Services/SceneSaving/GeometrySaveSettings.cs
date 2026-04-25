@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using GameWorld.Core.Services.SceneSaving.Geometry;
+﻿using GameWorld.Core.Services.SceneSaving.Geometry;
 using GameWorld.Core.Services.SceneSaving.Lod;
 using GameWorld.Core.Services.SceneSaving.Material;
 using Microsoft.Xna.Framework;
@@ -23,6 +21,7 @@ namespace GameWorld.Core.Services.SceneSaving
         public bool OnlySaveVisible { get; set; } = true;
         public int NumberOfLodsToGenerate { get; set; } = 4;
         public List<RmvAttachmentPoint> AttachmentPoints { get; set; } = [];
+        public bool DisplayDialogOnNextSave { get; set; } = true;
 
         public GeometrySaveSettings(ApplicationSettingsService applicationSettingsService)
         {

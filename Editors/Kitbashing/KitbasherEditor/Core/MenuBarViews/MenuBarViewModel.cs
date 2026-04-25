@@ -4,6 +4,7 @@ using Editors.KitbasherEditor.ChildEditors.MeshFitter;
 using Editors.KitbasherEditor.ChildEditors.PhotoStudio;
 using Editors.KitbasherEditor.ChildEditors.PinTool.UiCommands;
 using Editors.KitbasherEditor.ChildEditors.ReRiggingTool;
+using Editors.KitbasherEditor.ChildEditors.SaveDialog;
 using Editors.KitbasherEditor.ChildEditors.VertexDebugger;
 using Editors.KitbasherEditor.Core.MenuBarViews;
 using Editors.KitbasherEditor.UiCommands;

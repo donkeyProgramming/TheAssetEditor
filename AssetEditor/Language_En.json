@@ -579,6 +579,7 @@
   "KitbashTool.SaveDialog.LodInfo": "Lod Info:",
   "KitbashTool.SaveDialog.Cancel": "Cancel",
   "KitbashTool.SaveDialog.Save": "Save",
+  "KitbashTool.SaveDialog.DisplayDialogOnNextSave": "Display dialog on next save",
   "KitbashTool.SaveDialog.OnlySaveVisibleNodes": "Only save visible nodes",
   "KitbashTool.SaveDialog.Tooltips.NumberOfLods": "Number of lods that will be generated. Normal is 4, large models have 5 and some special models have 1",
   "KitbashTool.SaveDialog.Columns.Index": "Index",

@@ -579,6 +579,7 @@
   "KitbashTool.SaveDialog.LodInfo": "LOD 信息:",
   "KitbashTool.SaveDialog.Cancel": "取消",
   "KitbashTool.SaveDialog.Save": "保存",
+  "KitbashTool.SaveDialog.DisplayDialogOnNextSave": "下次保存时显示对话框",
   "KitbashTool.SaveDialog.OnlySaveVisibleNodes": "仅保存可见节点",
   "KitbashTool.SaveDialog.Tooltips.NumberOfLods": "将生成的 LOD 数量。正常为 4，大型模型为 5，某些特殊模型为 1",
   "KitbashTool.SaveDialog.Columns.Index": "索引",

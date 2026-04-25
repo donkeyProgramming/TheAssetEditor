@@ -1,6 +1,4 @@
-﻿using System.Windows;
-using Editors.KitbasherEditor.ChildEditors.MeshFitter;
-using WindowHandling;
+﻿using WindowHandling;
 
 namespace Editors.KitbasherEditor.ChildEditors.PhotoStudio
 {
