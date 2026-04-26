@@ -1,4 +1,4 @@
-using System.Globalization;
+﻿using System.Globalization;
 using System.Text;
 using Shared.Core.Misc;
 using Shared.Core.PackFiles;

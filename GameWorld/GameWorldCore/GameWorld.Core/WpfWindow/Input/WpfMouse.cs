@@ -25,7 +25,7 @@ namespace GameWorld.Core.WpfWindow.Input
         // Cache window Z-order enumeration (expensive P/Invoke + VisualTree per mouse move)
         private List<Window> _cachedWindowOrder;
         private DateTime _windowOrderCacheTime;
-        private static readonly TimeSpan _windowOrderCacheDuration = TimeSpan.FromMilliseconds(500);
+        private static readonly TimeSpan _windowOrderCacheDuration = TimeSpan.FromMilliseconds(100);
 
         /// <summary>
         /// Creates a new instance of the mouse helper.

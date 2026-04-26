@@ -48,7 +48,7 @@
         <PackageProjectUrl>https://github.com/donkeyProgramming/TheAssetEditor</PackageProjectUrl>
         <RepositoryUrl>https://github.com/donkeyProgramming/TheAssetEditor</RepositoryUrl>
         <PackageId>AssetEditor</PackageId>
-        <Version>0.70.0</Version>
+        <Version>0.71.0</Version>
         <AnalysisLevel>6.0</AnalysisLevel>
     </PropertyGroup>
 

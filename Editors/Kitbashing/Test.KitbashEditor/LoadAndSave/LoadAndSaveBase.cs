@@ -1,5 +1,4 @@
-﻿using System;
-using Editors.KitbasherEditor.ChildEditors.SaveDialog;
+﻿using Editors.KitbasherEditor.ChildEditors.SaveDialog;
 using Editors.KitbasherEditor.ViewModels;
 using GameWorld.Core.Rendering.Materials.Capabilities;
 using GameWorld.Core.Rendering.Materials.Shaders.SpecGloss;
