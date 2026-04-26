@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using GameWorld.Core.Rendering.Materials.Capabilities;
+﻿using GameWorld.Core.Rendering.Materials.Capabilities;
 using GameWorld.Core.SceneNodes;
 using GameWorld.Core.Utility;
 using Shared.Core.ErrorHandling;

@@ -53,6 +53,9 @@ namespace Shared.Ui.BaseDialogs.PackFileTree.ContextMenu
             var openFolder = AddChildMenu("Open", rootNode);
             Add<OpenNodeInHxDCommand>(selectedNode, openFolder);
             Add<OpenNodeInNotepadCommand>(selectedNode, openFolder);
+
+            var reportsFolder = AddChildMenu("Reports", rootNode);
+            Add<IRmvToTextCommand>(selectedNode, reportsFolder);
         }
 
         void CreateForDirectory(ContextMenuItem2 rootNode, TreeNode selectedNode)

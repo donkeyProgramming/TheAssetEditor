@@ -59,8 +59,10 @@ namespace GameWorld.Core.Services
             return mesh;
         }
 
-        public RmvMesh CreateRmvMeshFromGeometry(MeshObject geometry)
+        public RmvMesh CreateRmvMeshFromGeometry(MeshObject geometry, int lodIndex, int meshId, string meshName)
         {
+            AssertVertexWeightsAreNormalized(geometry, lodIndex, meshId, meshName);
+
             // Ensure normalized
             for (var i = 0; i < geometry.VertexArray.Length; i++)
             {
@@ -89,6 +91,67 @@ namespace GameWorld.Core.Services
                 }).ToArray();
 
             return mesh;
+        }
+
+        /// <summary>
+        /// Normalizes bone weights for every vertex in <paramref name="geometry"/> so that the
+        /// active weights (2 for Weighted, 4 for Cinematic) always sum to exactly 1.
+        /// Weights beyond the active count are zeroed out. Static meshes are skipped.
+        /// </summary>
+        public static void NormalizeBoneWeights(MeshObject geometry)
+        {
+            var weightCount = geometry.WeightCount;
+            if (weightCount == 0)
+                return;
+
+            for (var i = 0; i < geometry.VertexArray.Length; i++)
+            {
+                var w = geometry.VertexArray[i].BlendWeights;
+
+                if (weightCount == 2)
+                {
+                    w.Z = 0f;
+                    w.W = 0f;
+                }
+
+                var total = w.X + w.Y + w.Z + w.W;
+                if (total > 0f)
+                {
+                    w.X /= total;
+                    w.Y /= total;
+                    w.Z /= total;
+                    w.W /= total;
+                }
+                else
+                {
+                    w.X = 1f;
+                    w.Y = 0f;
+                    w.Z = 0f;
+                    w.W = 0f;
+                }
+
+                geometry.VertexArray[i].BlendWeights = w;
+            }
+        }
+
+        static void AssertVertexWeightsAreNormalized(MeshObject geometry, int lodIndex, int meshId, string meshName)
+        {
+            if (geometry.WeightCount == 0)
+                return;
+
+            const float tolerance = 0.1f;
+            for (var vertexIndex = 0; vertexIndex < geometry.VertexArray.Length; vertexIndex++)
+            {
+                var totalWeight = geometry.VertexArray[vertexIndex]
+                    .GetBoneWeights()
+                    .Take(geometry.WeightCount)
+                    .Sum();
+
+                if (MathF.Abs(totalWeight - 1.0f) > tolerance)
+                {
+                    throw new InvalidOperationException($"Unable to save rmv2 mesh - vertex not normalized. LodIndex:{lodIndex}, MeshId:{meshId}, MeshName:'{meshName}', Vertex:{vertexIndex}, TotalBoneWeight:{totalWeight}.");
+                }
+            }
         }
     }
 }

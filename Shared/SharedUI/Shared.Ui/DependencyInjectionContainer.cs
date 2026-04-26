@@ -53,6 +53,9 @@ namespace Shared.Ui
             services.AddScoped<SaveAsPackFileContainerCommand>();
             services.AddScoped<SavePackFileContainerCommand>();
             services.AddScoped<SetAsEditablePackCommand>();
+
+            // Interfaces for context menu commands implemented externally
+            // IRmvToTextCommand is registered in Editors.Reports
         }
 
         public override void RegisterTools(IEditorDatabase factory)

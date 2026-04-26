@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Windows;
+﻿using System.Windows;
 using GameWorld.Core.SceneNodes;
 using GameWorld.Core.Services.SceneSaving.Geometry;
 using GameWorld.Core.Services.SceneSaving.Lod;
@@ -44,6 +43,16 @@ namespace GameWorld.Core.Services.SceneSaving
 
             var outputPath = settings.OutputName;
             _lodStrategyProvider.GetStrategy(settings.LodGenerationMethod).Generate(mainNode, settings.LodSettingsPerLod);
+
+
+            var lods = mainNode.GetLodNodes();
+            foreach (var lod in lods)
+            {
+                var meshesInLod = lod.GetAllModels(settings.OnlySaveVisible);
+                foreach (var mesh in meshesInLod)
+                    MeshBuilderService.NormalizeBoneWeights(mesh.Geometry);
+            }
+
             var generatedRmvFile = _geometryStrategyProvider.GetStrategy(settings.GeometryOutputType).Generate(mainNode, settings);
             var materialResult = _materialStrategyProvider.GetStrategy(settings.MaterialOutputType).Generate(mainNode, outputPath, settings.OnlySaveVisible);
 

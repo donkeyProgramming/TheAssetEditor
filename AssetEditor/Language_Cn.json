@@ -125,6 +125,7 @@
   "MenuBar.Tools": "工具",
   "MenuBar.Reports": "报告",
   "MenuBar.Reports.Rmv2": "Rmv2",
+  "MenuBar.Reports.RmvToText": "Rmv to Text",
   "MenuBar.Reports.MetaData": "元数据",
   "MenuBar.Reports.FileList": "文件列表",
   "MenuBar.Reports.MetaJsons": "元 Json",

@@ -125,6 +125,7 @@
   "MenuBar.Tools": "Tools",
   "MenuBar.Reports": "Reports",
   "MenuBar.Reports.Rmv2": "Rmv2",
+  "MenuBar.Reports.RmvToText": "Rmv to Text",
   "MenuBar.Reports.MetaData": "Meta Data",
   "MenuBar.Reports.FileList": "File List",
   "MenuBar.Reports.MetaJsons": "Meta Jsons",

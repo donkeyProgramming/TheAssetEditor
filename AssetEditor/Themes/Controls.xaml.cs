@@ -35,8 +35,14 @@ namespace AssetEditor.Themes
                 return;
 
             var window = Window.GetWindow((FrameworkElement)e.Source) as AssetEditorWindow;
-            if (window == null || string.IsNullOrWhiteSpace(window.HelpDocumentPath))
+            if (window == null)
                 return;
+
+            if (string.IsNullOrWhiteSpace(window.HelpDocumentPath))
+            {
+                MessageBox.Show("No documentation is currently available for this tool", "Documentation Not Available", MessageBoxButton.OK, MessageBoxImage.Information);
+                return;
+            }
 
             var rawPath = window.HelpDocumentPath;
             var pathSuffix = "";
@@ -79,6 +85,7 @@ namespace AssetEditor.Themes
             if (!File.Exists(helpPath))
             {
                 _logger.Here().Warning("Help file not found: '{HelpPath}'", helpPath);
+                MessageBox.Show("No documentation is currently available for this tool", "Documentation Not Available", MessageBoxButton.OK, MessageBoxImage.Information);
                 return;
             }
 

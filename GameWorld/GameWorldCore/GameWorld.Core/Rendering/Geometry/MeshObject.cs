@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using GameWorld.Core.Services;
 using Microsoft.Xna.Framework;
 using Shared.GameFormats.RigidModel;
 using Shared.Ui.Editors.BoneMapping;
@@ -266,10 +267,18 @@ namespace GameWorld.Core.Rendering.Geometry
                         vertInfo[2] = (VertexArray[i].BlendIndices.Z, VertexArray[i].BlendWeights.Z);
                         vertInfo[3] = (VertexArray[i].BlendIndices.W, VertexArray[i].BlendWeights.W);
 
-                        var sortedVertInfo = vertInfo.OrderByDescending(x => x.weight);
+                        var sortedVertInfo = vertInfo.OrderByDescending(x => x.weight).ToArray();
 
-                        VertexArray[i].BlendIndices = new Vector4(sortedVertInfo.First().index, 0, 0, 0);
-                        VertexArray[i].BlendWeights = new Vector4(1, 0, 0, 0);
+                        if (VertexFormat == UiVertexFormat.Weighted)
+                        {
+                            VertexArray[i].BlendIndices = new Vector4(sortedVertInfo[0].index, sortedVertInfo[1].index, 0, 0);
+                            VertexArray[i].BlendWeights = new Vector4(sortedVertInfo[0].weight, sortedVertInfo[1].weight, 0, 0);
+                        }
+                        else if (VertexFormat == UiVertexFormat.Cinematic)
+                        {
+                            VertexArray[i].BlendIndices = new Vector4(sortedVertInfo[0].index, sortedVertInfo[1].index, sortedVertInfo[2].index, sortedVertInfo[3].index);
+                            VertexArray[i].BlendWeights = new Vector4(sortedVertInfo[0].weight, sortedVertInfo[1].weight, sortedVertInfo[2].weight, sortedVertInfo[3].weight);
+                        }
                     }
                     else
                     {
@@ -277,6 +286,9 @@ namespace GameWorld.Core.Rendering.Geometry
                         VertexArray[i].BlendWeights = new Vector4(1, 0, 0, 0);
                     }
                 }
+
+                if (VertexFormat != UiVertexFormat.Static)
+                    MeshBuilderService.NormalizeBoneWeights(this);
 
                 RebuildVertexBuffer();
             }
