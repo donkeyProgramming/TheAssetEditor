@@ -59,8 +59,10 @@ namespace GameWorld.Core.Services
             return mesh;
         }
 
-        public RmvMesh CreateRmvMeshFromGeometry(MeshObject geometry)
+        public RmvMesh CreateRmvMeshFromGeometry(MeshObject geometry, int lodIndex, int meshId, string meshName)
         {
+            AssertVertexWeightsAreNormalized(geometry, lodIndex, meshId, meshName);
+
             // Ensure normalized
             for (var i = 0; i < geometry.VertexArray.Length; i++)
             {
@@ -89,6 +91,26 @@ namespace GameWorld.Core.Services
                 }).ToArray();
 
             return mesh;
+        }
+
+        static void AssertVertexWeightsAreNormalized(MeshObject geometry, int lodIndex, int meshId, string meshName)
+        {
+            if (geometry.WeightCount == 0)
+                return;
+
+            const float tolerance = 0.1f;
+            for (var vertexIndex = 0; vertexIndex < geometry.VertexArray.Length; vertexIndex++)
+            {
+                var totalWeight = geometry.VertexArray[vertexIndex]
+                    .GetBoneWeights()
+                    .Take(geometry.WeightCount)
+                    .Sum();
+
+                if (MathF.Abs(totalWeight - 1.0f) > tolerance)
+                {
+                    throw new InvalidOperationException($"Unable to save rmv2 mesh - vertex not normalized. LodIndex:{lodIndex}, MeshId:{meshId}, MeshName:'{meshName}', Vertex:{vertexIndex}, TotalBoneWeight:{totalWeight}.");
+                }
+            }
         }
     }
 }

@@ -246,15 +246,23 @@ namespace GameWorld.Core.Components.Selection
         public bool SetVertexSelectionMode()
         {
             var selectionState = _selectionManager.GetState();
-            if (_selectionManager.GetState().Mode != GeometrySelectionMode.Vertex)
+            
+            // No object selected - we cant switch state
+            if (selectionState == null)
+                return false;
+
+            // Already in vertex mode, nothing to do
+            if (selectionState.Mode == GeometrySelectionMode.Vertex)
+                return false;
+
+            // Get the selected object, if there is one
+            var selectedObject = selectionState.GetSingleSelectedObject();
+            if (selectedObject != null)
             {
-                var selectedObject = selectionState.GetSingleSelectedObject();
-                if (selectedObject != null)
-                {
-                    _commandFactory.Create<ObjectSelectionModeCommand>().Configure(x => x.Configure(selectedObject, GeometrySelectionMode.Vertex)).BuildAndExecute();
-                    return true;
-                }
+                _commandFactory.Create<ObjectSelectionModeCommand>().Configure(x => x.Configure(selectedObject, GeometrySelectionMode.Vertex)).BuildAndExecute();
+                return true;
             }
+            
             return false;
         }
 

@@ -5,6 +5,7 @@ using Editors.Reports.Files;
 using Editors.Reports.Geometry;
 using Microsoft.Extensions.DependencyInjection;
 using Shared.Core.DependencyInjection;
+using Shared.Ui.BaseDialogs.PackFileTree.ContextMenu.Commands;
 
 namespace Editors.Reports
 {
@@ -33,6 +34,10 @@ namespace Editors.Reports
 
             serviceCollection.AddTransient<Rmv2ReportCommand>();
             serviceCollection.AddTransient<Rmv2ReportGenerator>();
+
+            serviceCollection.AddTransient<RmvToTextCommand>();
+            serviceCollection.AddScoped<IRmvToTextCommand, RmvToTextCommand>();
+            serviceCollection.AddTransient<RmvToTextReport>();
 
             serviceCollection.AddTransient<GenerateDialogueEventInfoPrinterReportCommand>();
             serviceCollection.AddTransient<DialogueEventInfoPrinter>();

@@ -80,7 +80,7 @@ namespace GameWorld.Core.Services.SceneSaving.Geometry
                 for (var meshIndex = 0; meshIndex < meshes.Count; meshIndex++)
                 {
                     var modelname = meshes[meshIndex].Name;
-                    rmvFile.ModelList[lodIndex][meshIndex] = CreateRmvModel(modelname, meshes[meshIndex].PivotPoint, meshes[meshIndex].Material, meshes[meshIndex].Geometry, skeleton, saveSettings.AttachmentPoints, meshes[meshIndex].AnimationMatrixOverride);
+                    rmvFile.ModelList[lodIndex][meshIndex] = CreateRmvModel(modelname, meshes[meshIndex].PivotPoint, meshes[meshIndex].Material, meshes[meshIndex].Geometry, skeleton, saveSettings.AttachmentPoints, meshes[meshIndex].AnimationMatrixOverride, lodIndex, meshIndex);
                 }
             }
 
@@ -90,7 +90,7 @@ namespace GameWorld.Core.Services.SceneSaving.Geometry
             return rmvFile;
         }
 
-        RmvModel CreateRmvModel(string modelName, Vector3 pivotPoint, CapabilityMaterial capabilityMaterial, MeshObject geometry, GameSkeleton? skeleton, List<RmvAttachmentPoint> attachmentPoints, int animationMatrixOverride)
+        RmvModel CreateRmvModel(string modelName, Vector3 pivotPoint, CapabilityMaterial capabilityMaterial, MeshObject geometry, GameSkeleton? skeleton, List<RmvAttachmentPoint> attachmentPoints, int animationMatrixOverride, int lodIndex, int meshId)
         {
             var newRmvMaterial = new MaterialToRmvSerializer().CreateMaterialFromCapabilityMaterial(capabilityMaterial);
             newRmvMaterial.UpdateInternalState(geometry.VertexFormat);
@@ -101,7 +101,7 @@ namespace GameWorld.Core.Services.SceneSaving.Geometry
             {
                 CommonHeader = RmvCommonHeader.CreateDefault(),
                 Material = newRmvMaterial,
-                Mesh = _meshBuilderService.CreateRmvMeshFromGeometry(geometry)
+                Mesh = _meshBuilderService.CreateRmvMeshFromGeometry(geometry, lodIndex, meshId, modelName)
             };
 
             newModel.UpdateBoundingBox(geometry.BoundingBox);
