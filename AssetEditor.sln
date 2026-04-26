@@ -110,7 +110,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Test.Ipc", "Editors\Ipc\Tes
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "DocumentationWiki", "DocumentationWiki", "{0C33705F-54D5-4B35-A99D-F82986A8E34B}"
 	ProjectSection(SolutionItems) = preProject
-		Documentation\AssetEditorDocumentation.html = Documentation\AssetEditorDocumentation.html
+		Documentation\index.html = Documentation\index.html
 		Documentation\icon.svg = Documentation\icon.svg
 	EndProjectSection
 EndProject

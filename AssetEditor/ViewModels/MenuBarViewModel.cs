@@ -128,7 +128,7 @@ namespace AssetEditor.ViewModels
         private void OpenHelp()
         {
             var appDirectory = AppDomain.CurrentDomain.BaseDirectory;
-            var fullPath = Path.Combine(appDirectory, "Documentation", "AssetEditorDocumentation.html");
+            var fullPath = Path.Combine(appDirectory, "Documentation", "index.html");
             Console.WriteLine(fullPath);
             _uiCommandFactory.Create<OpenWebpageCommand>().Execute(fullPath);
         }
