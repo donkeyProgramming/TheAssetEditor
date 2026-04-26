@@ -10,7 +10,7 @@
         mc:Ignorable="d"
                                 
         Style="{StaticResource CustomWindowStyle}"
-        HelpDocumentPath="Documentation\index.html#doc=Kitbash_PinTool"
+        HelpDocumentPath="docs\index.html#doc=Kitbash_PinTool"
         Title="{loc:Loc KitbashTool.PinTool.Title}" Height="600" Width="400">
     <DockPanel LastChildFill="False">
 

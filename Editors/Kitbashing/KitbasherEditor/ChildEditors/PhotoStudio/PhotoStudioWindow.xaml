@@ -15,7 +15,7 @@
     ResizeMode="NoResize"
     SizeToContent="WidthAndHeight"
     Style="{StaticResource CustomWindowStyle}"
-    HelpDocumentPath="Documentation\index.html#doc=Kitbash_PhotoStudio"
+    HelpDocumentPath="docs\index.html#doc=Kitbash_PhotoStudio"
     Title="{loc:Loc KitbashTool.PhotoStudio.Title}">
     <Grid>
         <DockPanel LastChildFill="False" Width="450">
