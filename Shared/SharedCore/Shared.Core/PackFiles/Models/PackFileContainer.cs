@@ -84,9 +84,12 @@ namespace Shared.Core.PackFiles.Models
 
         public virtual string? GetFullPath(PackFile file)
         {
-            var res = FileList.FirstOrDefault(x => ReferenceEquals(x.Value, file)
-                || string.Equals(x.Value.Name, file.Name, StringComparison.OrdinalIgnoreCase)).Key;
-            return string.IsNullOrWhiteSpace(res) ? null : res;
+            var pathByReference = FileList.FirstOrDefault(x => ReferenceEquals(x.Value, file)).Key;
+            if (!string.IsNullOrWhiteSpace(pathByReference))
+                return pathByReference;
+
+            var pathByName = FileList.FirstOrDefault(x => string.Equals(x.Value.Name, file.Name, StringComparison.OrdinalIgnoreCase)).Key;
+            return string.IsNullOrWhiteSpace(pathByName) ? null : pathByName;
         }
 
         public virtual void MoveFile(PackFile file, string newFolderPath)

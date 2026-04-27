@@ -233,6 +233,33 @@ namespace Shared.UiTest
             Assert.That(renamedNode.Name, Is.EqualTo("file_renamed.txt"));
         }
 
+        [Test]
+        public void AddDuplicateNamedFileToNewFolderUsingPfs_EnsureTreeViewUpdated()
+        {
+            // Arrange: existing rigid model file already in one folder
+            CreatePackfiles(("variantmeshes\\wh_variantmodels\\hu1\\emp\\emp_karl_franz\\emp_karl_franz.rigid_model_v2", "emp_karl_franz.rigid_model_v2"));
+
+            var root = _viewModel.Files.First(x => x.Name == "test.pack");
+            var container = _packageFileService.GetAllPackfileContainers().Last(x => x.Name == "test.pack");
+            var saveAsTargetFolder = @"variantmeshes\wh_variantmodels\hu1\emp\new";
+            var saveAsTargetPath = saveAsTargetFolder + @"\emp_karl_franz.rigid_model_v2";
+
+            // Act: simulate Save As by adding a second file with the same name in a new folder.
+            var copiedRigidModel = PackFile.CreateFromASCII("emp_karl_franz.rigid_model_v2", "copied");
+            _packageFileService.AddFilesToPack(container, [new NewPackFileEntry(saveAsTargetFolder, copiedRigidModel)]);
+
+            var addedFile = _packageFileService.FindFile(saveAsTargetPath, container);
+            var resolvedPathForAddedFile = _packageFileService.GetFullPath(copiedRigidModel, container);
+            var addedNode = _viewModel.GetFromPath(root, saveAsTargetPath);
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(addedFile, Is.Not.Null, "PackFileService should contain the Save As file at the new folder path");
+                Assert.That(resolvedPathForAddedFile, Is.EqualTo(saveAsTargetPath), "Full path lookup should resolve to the newly added file instance path");
+                Assert.That(addedNode, Is.Not.Null, "PackFile Explorer should show newly added file path without requiring reload");
+            });
+        }
+
         private void CreatePackfiles(params (string Path, string FileName)[] files)
         {
             var container = _packageFileService.CreateNewPackFileContainer("test.pack", PackFileVersion.PFH5, PackFileCAType.MOD);
