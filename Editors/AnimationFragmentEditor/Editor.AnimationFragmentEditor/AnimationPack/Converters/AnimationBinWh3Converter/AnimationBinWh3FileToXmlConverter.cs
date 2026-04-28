@@ -1,4 +1,4 @@
-﻿using CommonControls.BaseDialogs.ErrorListDialog;
+using CommonControls.BaseDialogs.ErrorListDialog;
 using Editors.Shared.Core.Editors.TextEditor;
 using GameWorld.Core.Services;
 using Shared.Core.ErrorHandling;
