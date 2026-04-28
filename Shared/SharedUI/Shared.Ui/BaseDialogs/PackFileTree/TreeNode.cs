@@ -309,6 +309,19 @@ namespace Shared.Ui.BaseDialogs.PackFileTree
             }
         }
 
+        internal void AbsorbFilterExpansion()
+        {
+            foreach (var child in Children)
+            {
+                if (child._isPlaceholder)
+                    continue;
+
+                child.AbsorbFilterExpansion();
+            }
+
+            _isExpandedByFilter = false;
+        }
+
         partial void OnIsNodeExpandedChanged(bool value)
         {
             if (_source == null)

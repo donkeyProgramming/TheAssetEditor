@@ -1,4 +1,4 @@
-using Shared.Core.Settings;
+﻿using Shared.Core.Settings;
 
 namespace Shared.Core.PackFiles.Models
 {
@@ -23,8 +23,7 @@ namespace Shared.Core.PackFiles.Models
 
         public string? GetFullPath(PackFile file)
         {
-            var res = FileList.FirstOrDefault(x => ReferenceEquals(x.Value, file)
-                || string.Equals(x.Value.Name, file.Name, StringComparison.OrdinalIgnoreCase)).Key;
+            var res = FileList.FirstOrDefault(x => ReferenceEquals(x.Value, file)).Key;
             return string.IsNullOrWhiteSpace(res) ? null : res;
         }
 

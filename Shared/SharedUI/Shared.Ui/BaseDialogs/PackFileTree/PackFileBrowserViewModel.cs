@@ -74,7 +74,6 @@ namespace Shared.Ui.BaseDialogs.PackFileTree
 
             Filter = new SearchFilter(Files, () => _treeStates.Values.Select(x => x.RootSource));
             Filter.ShowFoldersOnly = ShowFoldersOnly;
-
             foreach (var item in _packFileService.GetAllPackfileContainers())
             {
                 var loadFile = true;
