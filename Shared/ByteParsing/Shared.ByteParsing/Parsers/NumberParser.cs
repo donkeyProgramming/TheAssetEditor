@@ -31,13 +31,13 @@
             if (result == false)
                 value = "Null";
             else
-                value = temp!.ToString();
+                value = temp?.ToString() ?? string.Empty;
             return result;
         }
 
         public virtual bool TryDecodeValue(byte[] buffer, int index, out T value, out int bytesRead, out string? error)
         {
-            value = default;
+            value = default!;
             var canDecode = CanDecode(buffer, index, out bytesRead, out error);
             if (canDecode)
                 value = Decode(buffer, index);

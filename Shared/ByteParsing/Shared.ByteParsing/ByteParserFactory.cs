@@ -13,7 +13,7 @@ namespace Shared.ByteParsing
             if (s_typeToParserMap != null)
                 return;
 
-            var items = new List<(DbTypesEnum DbEnum, Type type, IByteParser parser)>
+            var items = new List<(DbTypesEnum DbEnum, Type? type, IByteParser parser)>
             {
                 (DbEnum: DbTypesEnum.String, typeof(string), ByteParsers.String),
                 (DbEnum: DbTypesEnum.String_ascii, null, ByteParsers.StringAscii),

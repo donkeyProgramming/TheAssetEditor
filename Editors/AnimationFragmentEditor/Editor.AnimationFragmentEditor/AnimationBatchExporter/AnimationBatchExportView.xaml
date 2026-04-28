@@ -5,6 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:CommonControls.Editors.AnimationBatchExporter"
                xmlns:s="http://schemas.singulink.com/xaml"
+                         xmlns:loc="clr-namespace:Shared.Ui.Common;assembly=Shared.Ui"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <Grid>
@@ -15,7 +16,7 @@
             <RowDefinition Height='auto'/>
         </Grid.RowDefinitions>
 
-        <GroupBox Grid.Row="0" Header="Packfiles to convert:">
+        <GroupBox Grid.Row="0" Header="{loc:Loc AnimationBatchExporter.PackfilesToConvert}">
             <ListView  ItemsSource="{Binding PackfileList, UpdateSourceTrigger=PropertyChanged}">
                 <ListView.ItemContainerStyle>
                     <Style TargetType="ListViewItem">
@@ -35,14 +36,14 @@
         </GroupBox>
 
         <DockPanel Grid.Row="1" LastChildFill="True" Margin="0,5,0,0">
-            <Label Content="Output format:"/>
+            <Label Content="{loc:Loc AnimationBatchExporter.OutputFormat}"/>
             <ComboBox ItemsSource="{Binding PossibleOutputFormats, UpdateSourceTrigger=PropertyChanged}" 
                       SelectedItem="{Binding SelectedOutputFormat.Value, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
         </DockPanel>
 
-        <Button Grid.Row="2" Content="Apply" Margin="5,5,5,0" Click="{s:MethodBinding Process}"/>
+        <Button Grid.Row="2" Content="{loc:Loc AnimationBatchExporter.Buttons.Apply}" Margin="5,5,5,0" Click="{s:MethodBinding Process}"/>
 
 
-        <TextBlock Grid.Row="3" HorizontalAlignment="Center" Text="Note: Can not batch process the active packfile" Margin="5" FontWeight="Bold"/>
+        <TextBlock Grid.Row="3" HorizontalAlignment="Center" Text="{loc:Loc AnimationBatchExporter.Messages.CannotBatchActivePackfile}" Margin="5" FontWeight="Bold"/>
     </Grid>
 </UserControl>

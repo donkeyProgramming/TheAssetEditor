@@ -6,6 +6,7 @@
              xmlns:s="http://schemas.singulink.com/xaml"
              xmlns:System="clr-namespace:System;assembly=mscorlib"
              xmlns:behaviors="clr-namespace:Shared.Ui.Common.Behaviors;assembly=Shared.Ui"
+             xmlns:loc="clr-namespace:Shared.Ui.Common;assembly=Shared.Ui"
              xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
              xmlns:filterdialog="clr-namespace:CommonControls.FilterDialog;assembly=Shared.Ui"
              mc:Ignorable="d" d:DesignWidth="800">
@@ -30,16 +31,16 @@
 
             <DockPanel >
                 <CheckBox DockPanel.Dock="Left" VerticalContentAlignment="Center" IsChecked="{Binding Data.ShowMesh.Value, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
-                <Label DockPanel.Dock="Left" Content="Mesh" Width ="{StaticResource labelWidth}" />
+                <Label DockPanel.Dock="Left" Content="{loc:Loc ReferenceModel.SceneObject.Mesh}" Width ="{StaticResource labelWidth}" />
                 <Label DockPanel.Dock="Left" Content=":"/>
-                <Button DockPanel.Dock="Right" Width="30" Margin="10,0,0,0" Content="X" Click="{s:MethodBinding RemoveMesh}" />
-                <Button DockPanel.Dock="Right" Width="70" Content="Browse" Click="{s:MethodBinding BrowseMesh}" />
+                <Button DockPanel.Dock="Right" Width="30" Margin="10,0,0,0" Content="{loc:Loc ReferenceModel.SceneObject.RemoveShort}" Click="{s:MethodBinding RemoveMesh}" />
+                <Button DockPanel.Dock="Right" Width="70" Content="{loc:Loc ReferenceModel.SceneObject.Browse}" Click="{s:MethodBinding BrowseMesh}" />
                 <TextBox VerticalContentAlignment="Center" IsReadOnly="True" Text="{Binding Data.MeshName.Value, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
             </DockPanel>
 
             <DockPanel>
                 <CheckBox VerticalContentAlignment="Top" Margin="0,3,0,0" IsChecked="{Binding Data.ShowSkeleton.Value, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
-                <Label  Width ="{StaticResource labelWidth}" Content="Skeleton"/>
+                <Label  Width ="{StaticResource labelWidth}" Content="{loc:Loc ReferenceModel.SceneObject.Skeleton}"/>
                 <Label  Content=":"/>
                 <Expander IsExpanded="False" Header="{Binding Data.SkeletonName.Value, UpdateSourceTrigger=PropertyChanged}">
                     <TreeView ItemsSource="{Binding SkeletonInformation.Bones, UpdateSourceTrigger=PropertyChanged}" MaxHeight="400">
@@ -69,7 +70,7 @@
 
             <DockPanel >
                 <CheckBox Visibility="Hidden" />
-                <Label DockPanel.Dock="Left" Content="Fragment" Width ="{StaticResource labelWidth}" />
+                <Label DockPanel.Dock="Left" Content="{loc:Loc ReferenceModel.SceneObject.Fragment}" Width ="{StaticResource labelWidth}" />
                 <Label DockPanel.Dock="Left" Content=":"/>
                 <Button DockPanel.Dock="Right" Width="30" Margin="10,0,0,0" Content="..."  Click="{s:MethodBinding ViewFragment}" />
 
@@ -84,7 +85,7 @@
 
             <DockPanel Margin="0,3,0,1">
                 <CheckBox Visibility="Hidden" />
-                <Label DockPanel.Dock="Left" Content="Slot" Width ="{StaticResource labelWidth}" />
+                <Label DockPanel.Dock="Left" Content="{loc:Loc ReferenceModel.SceneObject.Slot}" Width ="{StaticResource labelWidth}" />
                 <Label DockPanel.Dock="Left" Content=":"/>
                 <Button DockPanel.Dock="Right" Width="30" Margin="10,0,0,0" Content="..." Click="{s:MethodBinding RemoveMesh}" Visibility="Hidden"/>
 
@@ -103,7 +104,7 @@
 
                 <DockPanel DockPanel.Dock="Top">
                     <CheckBox Visibility="Hidden"/>
-                    <Label  Width ="{StaticResource labelWidth}" Content="Animation File"/>
+                    <Label  Width ="{StaticResource labelWidth}" Content="{loc:Loc ReferenceModel.SceneObject.AnimationFile}"/>
                     <Label  Content=":"/>
                     <TextBox Text="{Binding FragAndSlotSelection.AnimationFileName, UpdateSourceTrigger=PropertyChanged}" IsReadOnly="true" VerticalContentAlignment="Center"/>
                 </DockPanel>
@@ -111,14 +112,14 @@
 
                 <DockPanel DockPanel.Dock="Top" Margin="0,3,0,3">
                     <CheckBox Visibility="Hidden"/>
-                    <Label  Width ="{StaticResource labelWidth}" Content="Meta File"/>
+                    <Label  Width ="{StaticResource labelWidth}" Content="{loc:Loc ReferenceModel.SceneObject.MetaFile}"/>
                     <Label  Content=":"/>
                     <TextBox Text="{Binding FragAndSlotSelection.MetaDataName, UpdateSourceTrigger=PropertyChanged}" IsReadOnly="true" VerticalContentAlignment="Center"/>
                 </DockPanel>
 
                 <DockPanel DockPanel.Dock="Top">
                     <CheckBox Visibility="Hidden"/>
-                    <Label  Width ="{StaticResource labelWidth}" Content="Persist Meta File"/>
+                    <Label  Width ="{StaticResource labelWidth}" Content="{loc:Loc ReferenceModel.SceneObject.PersistMetaFile}"/>
                     <Label  Content=":"/>
 
                     <TextBox Text="{Binding FragAndSlotSelection.MetaDataPersistName, UpdateSourceTrigger=PropertyChanged}" IsReadOnly="true" VerticalContentAlignment="Center"/>

@@ -1,9 +1,10 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
         <OutputType>Exe</OutputType>
         <LangVersion>preview</LangVersion>
         <TargetFramework>net10.0-windows</TargetFramework>
         <UseWPF>true</UseWPF>
+      <ApplicationManifest>app.manifest</ApplicationManifest>
         <ApplicationIcon>AssetEditorIcon.ico</ApplicationIcon>
         <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
         <EnableNETAnalyzers>true</EnableNETAnalyzers>
@@ -26,9 +27,9 @@
         <ProjectReference Include="..\Editors\SkeletonEditor\Editor.VisualSkeletonEditor\Editor.VisualSkeletonEditor.csproj" />
         <ProjectReference Include="..\Editors\TextureEditor\Editors.TextureEditor.csproj" />
         <ProjectReference Include="..\Editors\TwuiEditor\Editor.Twui\Editors.Twui.csproj" />
-        <ProjectReference Include="..\GameWorld\View3D\GameWorld.Core.csproj" />
+        <ProjectReference Include="..\GameWorld\GameWorldCore\GameWorld.Core\GameWorld.Core.csproj" />
         <ProjectReference Include="..\Shared\EmbeddedResources\Shared.EmbeddedResources.csproj" />
-        <ProjectReference Include="..\Shared\SharedUI\Shared.Ui.csproj" />
+        <ProjectReference Include="..\Shared\SharedUI\Shared.Ui\Shared.Ui.csproj" />
     </ItemGroup>
 
     <ItemGroup>
@@ -47,7 +48,7 @@
         <PackageProjectUrl>https://github.com/donkeyProgramming/TheAssetEditor</PackageProjectUrl>
         <RepositoryUrl>https://github.com/donkeyProgramming/TheAssetEditor</RepositoryUrl>
         <PackageId>AssetEditor</PackageId>
-        <Version>0.70.0</Version>
+        <Version>0.71.0</Version>
         <AnalysisLevel>6.0</AnalysisLevel>
     </PropertyGroup>
 

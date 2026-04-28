@@ -8,10 +8,11 @@
         xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
         xmlns:behaviors="clr-namespace:Shared.Ui.Common.Behaviors;assembly=Shared.Ui"
         xmlns:local="clr-namespace:Editors.KitbasherEditor.ChildEditors.VertexDebugger"
+        xmlns:loc="clr-namespace:Shared.Ui.Common;assembly=Shared.Ui"
         mc:Ignorable="d"
          Style="{StaticResource CustomWindowStyle}"
         Closing="Window_Closing"
-        Title="Vertex Debugger" Height="1200" Width="1100">
+        Title="{loc:Loc KitbashTool.VertexDebugger.Title}" Height="1200" Width="1100">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="auto"/>
@@ -19,14 +20,14 @@
         </Grid.RowDefinitions>
 
         <StackPanel Orientation="Horizontal">
-            <Label Content="Normal debug scale:"/>
+            <Label Content="{loc:Loc KitbashTool.VertexDebugger.NormalDebugScale}"/>
             <TextBox Width="100" Text="{Binding DebugScale.TextValue, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">
                 <b:Interaction.Behaviors>
                     <behaviors:TextBoxInputBehavior InputMode="DecimalInput"/>
                 </b:Interaction.Behaviors>
             </TextBox>
 
-            <Button Content="Show Statistics" Margin="2" Click="Button_Click"/>
+            <Button Content="{loc:Loc KitbashTool.VertexDebugger.ShowStatistics}" Margin="2" Click="Button_Click"/>
         </StackPanel>
 
         <DataGrid Grid.Row="1" 

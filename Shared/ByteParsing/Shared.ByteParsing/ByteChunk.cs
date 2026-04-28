@@ -122,7 +122,7 @@ namespace Shared.ByteParsing
             CurrentIndex += byteCount;
         }
 
-        public void Read(IByteParser parser, out string value, out string error)
+        public void Read(IByteParser parser, out string value, out string? error)
         {
             if (!parser.TryDecode(_buffer, CurrentIndex, out value, out var bytesRead, out error))
                 throw new Exception("Unable to parse :" + error);
@@ -130,7 +130,7 @@ namespace Shared.ByteParsing
             CurrentIndex += bytesRead;
         }
 
-        public void Read<T>(SpesificByteParser<T> parser, out T value, out string error)
+        public void Read<T>(SpesificByteParser<T> parser, out T value, out string? error)
         {
             if (!parser.TryDecodeValue(_buffer, CurrentIndex, out value, out var bytesRead, out error))
                 throw new Exception("Unable to parse :" + error);
@@ -168,7 +168,7 @@ namespace Shared.ByteParsing
                 var item = new UnknownParseResult.Item()
                 {
                     Result = result,
-                    ErrorMessage = error,
+                    ErrorMessage = error ?? string.Empty,
                     Value = value,
                     Type = parser.Type,
                 };

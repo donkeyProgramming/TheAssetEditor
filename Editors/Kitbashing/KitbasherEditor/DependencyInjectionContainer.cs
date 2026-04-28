@@ -1,4 +1,5 @@
 ﻿using Editors.KitbasherEditor.ChildEditors.MeshFitter;
+using Editors.KitbasherEditor.ChildEditors.PhotoStudio;
 using Editors.KitbasherEditor.ChildEditors.PinTool;
 using Editors.KitbasherEditor.ChildEditors.PinTool.Commands;
 using Editors.KitbasherEditor.ChildEditors.ReRiggingTool;
@@ -22,6 +23,7 @@ using KitbasherEditor.ViewModels.SaveDialog;
 using KitbasherEditor.ViewModels.SceneExplorerNodeViews;
 using KitbasherEditor.Views;
 using Microsoft.Extensions.DependencyInjection;
+using GameWorld.Core.Rendering.Geometry;
 using Shared.Core.DependencyInjection;
 using Shared.Core.DevConfig;
 using Shared.Core.ToolCreation;
@@ -59,6 +61,8 @@ namespace Editors.KitbasherEditor
 
             // Commands
             serviceCollection.AddTransient<AssignMaterialFromOtherMeshCommand>();
+            serviceCollection.AddTransient<ConstructPrimitiveCommand>();
+            serviceCollection.AddTransient<PrimitiveConstructor>();
             
             // Mesh fitter
             RegisterWindow<MeshFitterWindow>(serviceCollection);
@@ -78,6 +82,11 @@ namespace Editors.KitbasherEditor
             serviceCollection.AddTransient<PinMeshToVertexCommand>();
             serviceCollection.AddTransient<SkinWrapRiggingCommand>();
 
+            // PhotoStudio
+            serviceCollection.AddTransient<OpenPhotoStudioCommand>();
+            serviceCollection.AddScoped<PhotoStudioViewModel>();
+            RegisterWindow<PhotoStudioWindow>(serviceCollection);
+
             // Save dialog
             serviceCollection.AddTransient<SaveDialogViewModel>();
             RegisterWindow<SaveDialogWindow>(serviceCollection);
@@ -88,7 +97,7 @@ namespace Editors.KitbasherEditor
             serviceCollection.AddScoped<MenuItemVisibilityRuleEngine>();
 
             // Misc
-            serviceCollection.AddScoped<WindowKeyboard>();
+      
             serviceCollection.AddScoped<KitbashViewDropHandler>();
             serviceCollection.AddScoped<KitbasherRootScene>();
 

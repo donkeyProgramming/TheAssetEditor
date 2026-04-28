@@ -7,6 +7,7 @@
              xmlns:b="http://schemas.microsoft.com/xaml/behaviors" 
              xmlns:behaviors="clr-namespace:Shared.Ui.Common.Behaviors;assembly=Shared.Ui"
              xmlns:System="clr-namespace:System;assembly=System.Runtime"
+             xmlns:loc="clr-namespace:Shared.Ui.Common;assembly=Shared.Ui"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
 
@@ -22,7 +23,7 @@
                 <Label>
                     <Label.Content>
                         <StackPanel Orientation="Horizontal">
-                            <TextBlock Text="Settings for selected Bone: " FontSize="16" VerticalAlignment="Center"/>
+                            <TextBlock Text="{loc:Loc AnimationReTarget.SelectedBone.SettingsForSelectedBone}" FontSize="16" VerticalAlignment="Center"/>
                             <TextBlock Text="&quot;"  VerticalAlignment="Center" FontSize="16" FontWeight="Bold"/>
                             <TextBlock Text="{Binding BoneManager.SelectedBone.BoneName, UpdateSourceTrigger=PropertyChanged}"  VerticalAlignment="Center" FontSize="16" FontWeight="Bold"/>
                             <TextBlock Text="&quot;"  VerticalAlignment="Center" FontSize="16" FontWeight="Bold"/>
@@ -32,19 +33,19 @@
             </DockPanel>
 
             <DockPanel>
-                <Label      Width ="{StaticResource labelWidth}" Content="Translation offset"/>
+                <Label      Width ="{StaticResource labelWidth}" Content="{loc:Loc AnimationReTarget.SelectedBone.TranslationOffset}"/>
                 <Label      Content=":"/>
                 <mathviews:Vector3View  VerticalContentAlignment="Center" Vector3="{Binding BoneManager.SelectedBone.TranslationOffset, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
             </DockPanel>
 
             <DockPanel>
-                <Label     Width ="{StaticResource labelWidth}" Content="Rotation offset"/>
+                <Label     Width ="{StaticResource labelWidth}" Content="{loc:Loc AnimationReTarget.SelectedBone.RotationOffset}"/>
                 <Label     Content=":"/>
                 <mathviews:Vector3View  VerticalContentAlignment="Center" Vector3="{Binding BoneManager.SelectedBone.RotationOffset, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
             </DockPanel>
 
             <DockPanel >
-                <Label Content="Bone length Mult" Width ="{StaticResource labelWidth}"/>
+                <Label Content="{loc:Loc AnimationReTarget.SelectedBone.BoneLengthMult}" Width ="{StaticResource labelWidth}"/>
                 <Label Content=":"/>
                 <TextBox Text="{Binding BoneManager.SelectedBone.BoneLengthMult, UpdateSourceTrigger=LostFocus, Mode=TwoWay}" VerticalContentAlignment="Center" Margin="2">
                     <b:Interaction.Behaviors>
@@ -56,47 +57,47 @@
             <DockPanel>
                 <Label Width ="{StaticResource labelWidth}"/>
                 <Label Content=":" Visibility="Hidden"/>
-                <CheckBox VerticalContentAlignment="Center" IsChecked="{Binding BoneManager.SelectedBone.FreezeTranslation}" Content="Freeze position" Margin="0,0,5,0" ToolTip="Set the bone position to 0,0,0"/>
+                <CheckBox VerticalContentAlignment="Center" IsChecked="{Binding BoneManager.SelectedBone.FreezeTranslation}" Content="{loc:Loc AnimationReTarget.SelectedBone.FreezePosition}" Margin="0,0,5,0" ToolTip="{loc:Loc AnimationReTarget.SelectedBone.Tooltips.FreezePosition}"/>
             </DockPanel>
 
             <DockPanel>
                 <Label Width ="{StaticResource labelWidth}"/>
                 <Label Content=":" Visibility="Hidden"/>
-                <CheckBox VerticalContentAlignment="Center" IsChecked="{Binding BoneManager.SelectedBone.FreezeRotation}" Content="Freeze Rotation" Margin="0,0,5,0" ToolTip="Set the bone rotation to 0,0,0"/>
+                <CheckBox VerticalContentAlignment="Center" IsChecked="{Binding BoneManager.SelectedBone.FreezeRotation}" Content="{loc:Loc AnimationReTarget.SelectedBone.FreezeRotation}" Margin="0,0,5,0" ToolTip="{loc:Loc AnimationReTarget.SelectedBone.Tooltips.FreezeRotation}"/>
             </DockPanel>
 
             <DockPanel>
                 <Label Width ="{StaticResource labelWidth}"/>
                 <Label Content=":" Visibility="Hidden"/>
-                <CheckBox VerticalContentAlignment="Center" IsChecked="{Binding BoneManager.SelectedBone.FreezeRotationZ}" Content="Freeze Rotation Z" Margin="0,0,5,0" ToolTip="Set the bone rotation to 0,0, to some rotation Z at frame 1"/>
+                <CheckBox VerticalContentAlignment="Center" IsChecked="{Binding BoneManager.SelectedBone.FreezeRotationZ}" Content="{loc:Loc AnimationReTarget.SelectedBone.FreezeRotationZ}" Margin="0,0,5,0" ToolTip="{loc:Loc AnimationReTarget.SelectedBone.Tooltips.FreezeRotationZ}"/>
             </DockPanel>
 
             <DockPanel>
                 <Label Width ="{StaticResource labelWidth}"/>
                 <Label Content=":" Visibility="Hidden"/>
-                <CheckBox VerticalContentAlignment="Center" IsChecked="{Binding BoneManager.SelectedBone.ForceSnapToWorld}" Content="Snap worldspace" ToolTip="Sets the bone transform to the same as the target, no magic attempted"/>
+                <CheckBox VerticalContentAlignment="Center" IsChecked="{Binding BoneManager.SelectedBone.ForceSnapToWorld}" Content="{loc:Loc AnimationReTarget.SelectedBone.SnapWorldspace}" ToolTip="{loc:Loc AnimationReTarget.SelectedBone.Tooltips.SnapWorldspace}"/>
             </DockPanel>
 
             <DockPanel>
                 <Label Width ="{StaticResource labelWidth}"/>
                 <Label Content=":" Visibility="Hidden"/>
-                <CheckBox VerticalContentAlignment="Center" IsChecked="{Binding BoneManager.SelectedBone.ApplyTranslation}" Content="Apply translation" Margin="0,0,5,0"/>
+                <CheckBox VerticalContentAlignment="Center" IsChecked="{Binding BoneManager.SelectedBone.ApplyTranslation}" Content="{loc:Loc AnimationReTarget.SelectedBone.ApplyTranslation}" Margin="0,0,5,0"/>
             </DockPanel>
 
             <DockPanel>
                 <Label Width ="{StaticResource labelWidth}"/>
                 <Label Content=":" Visibility="Hidden"/>
-                <CheckBox VerticalContentAlignment="Center" IsChecked="{Binding BoneManager.SelectedBone.ApplyRotation}" Content="Apply Rotation"/>
+                <CheckBox VerticalContentAlignment="Center" IsChecked="{Binding BoneManager.SelectedBone.ApplyRotation}" Content="{loc:Loc AnimationReTarget.SelectedBone.ApplyRotation}"/>
             </DockPanel>
 
             <DockPanel>
-                <Label     Width ="{StaticResource labelWidth}" Content="Is Relative to"/>
+                <Label     Width ="{StaticResource labelWidth}" Content="{loc:Loc AnimationReTarget.SelectedBone.IsRelativeTo}"/>
                 <Label       Content=":"/>
-                <Button DockPanel.Dock="Right" Content="Clear" Width="60" Command="{Binding ClearRelativeSelectedBoneAction}" Margin="3,0,0,0"/>
+                <Button DockPanel.Dock="Right" Content="{loc:Loc AnimationReTarget.SelectedBone.Clear}" Width="60" Command="{Binding ClearRelativeSelectedBoneAction}" Margin="3,0,0,0"/>
                 <ComboBox ItemsSource="{Binding FlatBoneList}" SelectedItem="{Binding SelectedBone.SelectedRelativeBone, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" DisplayMemberPath="BoneName.Value"/>
             </DockPanel>
 
-            <Button Grid.Row="4"  Content="Clear selected bone settings" Command="{Binding BoneManager.ResetSelectedBoneCommand}" Margin="2" />
+            <Button Grid.Row="4"  Content="{loc:Loc AnimationReTarget.SelectedBone.ClearSelectedBoneSettings}" Command="{Binding BoneManager.ResetSelectedBoneCommand}" Margin="2" />
         </StackPanel>
     </Grid>
 </UserControl>

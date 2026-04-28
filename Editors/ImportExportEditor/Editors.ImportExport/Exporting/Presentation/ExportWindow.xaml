@@ -4,9 +4,10 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Editors.ImportExport.Exporting.Presentation"
+        xmlns:loc="clr-namespace:Shared.Ui.Common;assembly=Shared.Ui"
         mc:Ignorable="d"
         Style="{StaticResource CustomWindowStyle}"
-        Title="Export" Height="350" Width="600">
+        Title="{loc:Loc ExportWindow.Title}" Height="350" Width="600">
 
     <Grid Margin="4">
         <Grid.ColumnDefinitions>
@@ -24,16 +25,16 @@
             <RowDefinition Height="auto"/>
         </Grid.RowDefinitions>
 
-        <TextBlock Grid.Row="0" Grid.Column="0" Text="System Path" HorizontalAlignment="Left"/>
+        <TextBlock Grid.Row="0" Grid.Column="0" Text="{loc:Loc ExportWindow.SystemPath}" HorizontalAlignment="Left"/>
         <TextBlock Grid.Row="0" Grid.Column="1" Text=": "/>
         <TextBox Grid.Row="0" Grid.Column="2" Text="{Binding SystemPath}" HorizontalContentAlignment="Right" IsReadOnly="True"/>
-        <Button Grid.Row="0" Grid.Column="3" Content="Browse" Command="{Binding BrowsePathCommandCommand}"/>
+        <Button Grid.Row="0" Grid.Column="3" Content="{loc:Loc ExportWindow.Browse}" Command="{Binding BrowsePathCommandCommand}"/>
 
-        <TextBlock Grid.Row="1" Grid.Column="0" Text="Create Import project   " HorizontalAlignment="Left"/>
+        <TextBlock Grid.Row="1" Grid.Column="0" Text="{loc:Loc ExportWindow.CreateImportProject}" HorizontalAlignment="Left"/>
         <TextBlock Grid.Row="1" Grid.Column="1" Text=": "/>
         <CheckBox Grid.Row="1" Grid.Column="2" HorizontalAlignment="Left" IsChecked="{Binding CreateImportProject, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
 
-        <TextBlock Grid.Row="2" Grid.Column="0" Text="Available Exporters" HorizontalAlignment="Left"/>
+        <TextBlock Grid.Row="2" Grid.Column="0" Text="{loc:Loc ExportWindow.AvailableExporters}" HorizontalAlignment="Left"/>
         <TextBlock Grid.Row="2" Grid.Column="1" Text=": "/>
         <ComboBox Grid.Row="2" Grid.Column="2"  HorizontalContentAlignment="Right"
                 ItemsSource="{Binding PossibleExporters, UpdateSourceTrigger=PropertyChanged}"
@@ -45,7 +46,7 @@
                       Content="{Binding SelectedExporter, UpdateSourceTrigger=PropertyChanged}"       
                       ContentTemplateSelector="{StaticResource ViewTemplateDataSelector}"/>
 
-        <Button Grid.Row="4" Grid.ColumnSpan="4" Content="Export" Click="ExportButton_Click"/>
+        <Button Grid.Row="4" Grid.ColumnSpan="4" Content="{loc:Loc ExportWindow.ExportButton}" Click="ExportButton_Click"/>
 
     </Grid>
 </Window>

@@ -7,12 +7,13 @@
     xmlns:sys="clr-namespace:System;assembly=netstandard"
     xmlns:ValueConverters="clr-namespace:Editors.Audio.Shared.UI.ValueConverters"
     xmlns:Local="clr-namespace:Editors.Audio.AudioEditor.Presentation.NewAudioProject"
+    xmlns:loc="clr-namespace:Shared.Ui.Common;assembly=Shared.Ui"
     Style="{StaticResource CustomWindowStyle}"
     d:DataContext="{d:DesignInstance Type=Local:NewAudioProjectViewModel}"
     mc:Ignorable="d"
     Width="500"
     Height="170"
-    Title="New Audio Project">
+    Title="{loc:Loc NewAudioProject.Title}">
 
     <Window.Resources>
         <ValueConverters:EnumConverter 
@@ -59,12 +60,12 @@
 
                 <Label
                     Grid.Column="0" 
-                    Content="Name"/>
+                    Content="{loc:Loc NewAudioProject.Name}"/>
                 
                 <TextBox 
                     Grid.Column="1"
                     Text="{Binding AudioProjectFileName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                    ToolTip="The name of the Audio Project."
+                    ToolTip="{loc:Loc NewAudioProject.Tooltips.Name}"
                     VerticalContentAlignment="Center"
                     Padding="2, 0, 0, 0"/>
             </Grid>
@@ -84,12 +85,12 @@
 
                 <Label 
                     Grid.Column="0"
-                    Content="Location"/>
+                    Content="{loc:Loc NewAudioProject.Location}"/>
                 
                 <TextBox 
                     Grid.Column="1"
                     Text="{Binding AudioProjectDirectory, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                    ToolTip="The folder location in the Pack the Audio Project should go."
+                    ToolTip="{loc:Loc NewAudioProject.Tooltips.Location}"
                     IsReadOnly="True"
                     VerticalContentAlignment="Center"
                     Padding="2, 0, 0, 0"/>
@@ -115,11 +116,11 @@
 
                 <Label 
                     Grid.Column="0"
-                    Content="Language"/>
+                    Content="{loc:Loc NewAudioProject.Language}"/>
 
                 <ComboBox 
                     Grid.Column="1" 
-                    ToolTip="The game language of your Audio Project."
+                    ToolTip="{loc:Loc NewAudioProject.Tooltips.Language}"
                     ItemsSource="{Binding Languages}" 
                     SelectedItem="{Binding SelectedLanguage}" 
                     ItemTemplate="{StaticResource EnumToStringTemplate}"/>
@@ -133,14 +134,14 @@
             Margin="10, 0, 10, 10">
             
             <Button 
-                Content="OK"
+                Content="{loc:Loc NewAudioProject.Ok}"
                 Width="75"
                 Margin="0, 0, 5, 0"
                 Command="{Binding CreateAudioProjectCommand}" 
                 IsEnabled="{Binding IsOkButtonEnabled}"/>
             
             <Button 
-                Content="Cancel" 
+                Content="{loc:Loc NewAudioProject.Cancel}" 
                 Width="75"
                 Margin="5, 0, 0, 0" 
                 Command="{Binding CloseWindowActionCommand}"/>

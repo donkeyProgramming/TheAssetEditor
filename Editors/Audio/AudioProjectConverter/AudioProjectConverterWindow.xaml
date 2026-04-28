@@ -6,13 +6,14 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:sys="clr-namespace:System;assembly=netstandard"
     xmlns:AudioProjectConverter="clr-namespace:Editors.Audio.AudioProjectConverter"
+    xmlns:loc="clr-namespace:Shared.Ui.Common;assembly=Shared.Ui"
     d:DataContext="{d:DesignInstance Type=AudioProjectConverter:AudioProjectConverterViewModel}"
     Style="{StaticResource CustomWindowStyle}"
     mc:Ignorable="d"
     Width="850"
     SizeToContent="Height"
     Closed="OnClosed"
-    Title="Audio Project Converter">
+    Title="{loc:Loc AudioProjectConverter.Title}">
 
     <Grid>
         <Grid.RowDefinitions>
@@ -26,7 +27,7 @@
 
         <TextBlock  
             Grid.Row="0"  
-            Text="The Audio Project Converter is a tool for creating an Audio Project out of Dialogue Events in the provided .bnk files. It takes the VO Actor substring(s) and searches the Dialogue Events in the supplied .bnk files for their usage and converts that to the Audio Project format. Read the tooltips for more information."  
+            Text="{loc:Loc AudioProjectConverter.Description}"  
             HorizontalAlignment="Left"
             Margin="10, 10, 10, 0"
             TextWrapping="Wrap"/>
@@ -64,8 +65,8 @@
 
                 <Label
                     Grid.Column="0" 
-                    Content="Audio Project Name"
-                    ToolTip="The name of your converted Audio Project."/>
+                    Content="{loc:Loc AudioProjectConverter.AudioProjectName}"
+                    ToolTip="{loc:Loc AudioProjectConverter.Tooltips.AudioProjectName}"/>
 
                 <TextBox 
                     Grid.Column="1"
@@ -89,8 +90,8 @@
 
                 <Label 
                     Grid.Column="0"
-                    Content="Output Directory Path"
-                    ToolTip="The pack directory where the converted Audio Project is output to. There needs to be a file in the directory for it to show."/>
+                    Content="{loc:Loc AudioProjectConverter.OutputDirectoryPath}"
+                    ToolTip="{loc:Loc AudioProjectConverter.Tooltips.OutputDirectoryPath}"/>
 
                 <TextBox 
                     Grid.Column="1"
@@ -120,8 +121,8 @@
 
                 <Label
                     Grid.Column="0" 
-                    Content="VO Actor Substring"
-                    ToolTip="A substring common to all the VO Actor keys whose usage you want converted to the Audio Project format. You can include multiple substrings using a comma to separate them e.g. &quot;ovn_vo_actor_Araby, ovn_vo_actor_Albion&quot;."/>
+                    Content="{loc:Loc AudioProjectConverter.VoActorSubstring}"
+                    ToolTip="{loc:Loc AudioProjectConverter.Tooltips.VoActorSubstring}"/>
 
                 <TextBox 
                     Grid.Column="1"
@@ -145,8 +146,8 @@
 
                 <Label 
                     Grid.Column="0"
-                    Content="Wems Directory Path"
-                    ToolTip="A directory on your computer containing all the .wem files used in the soundbank (just use all wem files if you don't know which are used)."/>
+                    Content="{loc:Loc AudioProjectConverter.WemsDirectoryPath}"
+                    ToolTip="{loc:Loc AudioProjectConverter.Tooltips.WemsDirectoryPath}"/>
 
                 <TextBox 
                     Grid.Column="1"
@@ -178,8 +179,8 @@
 
                 <Label 
                     Grid.Column="0"
-                    Content="Bnks Directory Path"
-                    ToolTip="A directory on your computer containing all the .bnk files to be searched."/>
+                    Content="{loc:Loc AudioProjectConverter.BnksDirectoryPath}"
+                    ToolTip="{loc:Loc AudioProjectConverter.Tooltips.BnksDirectoryPath}"/>
 
                 <TextBox 
                     Grid.Column="1"
@@ -209,8 +210,8 @@
                 
                 <Label 
                     Grid.Column="0" 
-                    Content="Converting Soundbanks from Wwise Project"
-                    ToolTip="Tick this box if you need to get the States used in the soundbank from the Wwise project. There's no need to tick if you're converting a vanilla .bnk or the pack has a states_data.dat in the pack for the .bnk you're converting as that contains the States data for a or .bnk made by the Audio Editor."/>
+                    Content="{loc:Loc AudioProjectConverter.ConvertingFromWwiseProject}"
+                    ToolTip="{loc:Loc AudioProjectConverter.Tooltips.ConvertingFromWwiseProject}"/>
                 
                 <CheckBox 
                     Grid.Column="1"
@@ -234,8 +235,8 @@
 
                 <Label 
                     Grid.Column="0"
-                    Content="SoundbanksInfo.xml"
-                    ToolTip="The path to the SoundbanksInfo.xml should be &quot;your_wwise_project_folder\GeneratedSoundBanks\Windows\SoundbanksInfo.xml&quot;. This contains the States data for the Wwise project."/>
+                    Content="{loc:Loc AudioProjectConverter.SoundbanksInfoXml}"
+                    ToolTip="{loc:Loc AudioProjectConverter.Tooltips.SoundbanksInfoXml}"/>
 
                 <TextBox 
                     Grid.Column="1"
@@ -260,14 +261,14 @@
             Margin="10, 0, 10, 10">
 
             <Button 
-                Content="OK"
+                Content="{loc:Loc AudioProjectConverter.Ok}"
                 Width="75"
                 Margin="0, 0, 5, 0"
                 Command="{Binding ProcessAudioProjectConversionCommand}" 
                 IsEnabled="{Binding IsOkButtonEnabled}"/>
 
             <Button 
-                Content="Cancel" 
+                Content="{loc:Loc AudioProjectConverter.Cancel}" 
                 Width="75"
                 Margin="5, 0, 0, 0" 
                 Command="{Binding CloseWindowActionCommand}"/>

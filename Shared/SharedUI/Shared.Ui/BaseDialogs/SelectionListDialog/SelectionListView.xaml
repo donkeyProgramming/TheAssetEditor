@@ -1,0 +1,54 @@
+﻿<UserControl x:Class="CommonControls.SelectionListDialog.SelectionListView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:CommonControls.SelectionListDialog"
+             xmlns:loc="clr-namespace:Shared.Ui.Common"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <UserControl.Resources>
+
+        <Style x:Key="CustomListViewItemStyle" TargetType="{x:Type ListViewItem}" BasedOn="{StaticResource {x:Type ListViewItem}}">
+            <!-- Use theme-aware brushes and alternate row backgrounds while keeping the default ListViewItem style
+                 so selection and other visual states follow the current theme. -->
+            <Setter Property="Background" Value="{DynamicResource ListView.Static.Background}" />
+
+            <Style.Triggers>
+                <Trigger Property="ItemsControl.AlternationIndex" Value="0">
+                    <Setter Property="Background" Value="{DynamicResource ListView.Static.Background}" />
+                </Trigger>
+
+                <Trigger Property="ItemsControl.AlternationIndex" Value="1">
+                    <Setter Property="Background" Value="{DynamicResource ABrush.AccentTone2.Background}" />
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+    </UserControl.Resources>
+    
+    <Grid>
+        <ListView x:Name="ItemsListView" ItemsSource="{Binding ItemList, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" MouseDoubleClick="ItemsListView_MouseDoubleClick">
+
+            <ListView.View>
+                <GridView>
+                    <GridViewColumn Header="{loc:Loc Dialog.SelectionList.Column.IsChecked}">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <CheckBox Margin="5, 0" IsChecked="{Binding IsChecked.Value, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+
+                    <GridViewColumn Header="{loc:Loc Dialog.SelectionList.Column.Name}">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock Margin="5, 0" Text="{Binding DisplayName}"/>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+                    
+                </GridView>
+            </ListView.View>
+        </ListView>
+    </Grid>
+</UserControl>

@@ -4,6 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:Editors.ImportExport.Exporting.Presentation.RmvToGltf"
+             xmlns:loc="clr-namespace:Shared.Ui.Common;assembly=Shared.Ui"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <Grid>
@@ -21,25 +22,25 @@
             <RowDefinition Height="25"/>
         </Grid.RowDefinitions>
 
-        <TextBlock Grid.Row="0" Grid.Column="0" Text="Export Textures" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+        <TextBlock Grid.Row="0" Grid.Column="0" Text="{loc:Loc RmvToGltfExporter.ExportTextures}" HorizontalAlignment="Left" VerticalAlignment="Center"/>
         <TextBlock Grid.Row="0" Grid.Column="1" Text=" : " VerticalAlignment="Center"/>
         <CheckBox Grid.Row="0" Grid.Column="2" HorizontalAlignment="Left"  IsChecked="{Binding ExportTextures, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
 
-        <TextBlock Grid.Row="1" Grid.Column="0" Text="Convert Material" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+        <TextBlock Grid.Row="1" Grid.Column="0" Text="{loc:Loc RmvToGltfExporter.ConvertMaterial}" HorizontalAlignment="Left" VerticalAlignment="Center"/>
         <TextBlock Grid.Row="1" Grid.Column="1" Text=" : " VerticalAlignment="Center"/>
         <CheckBox Grid.Row="1" Grid.Column="2" HorizontalAlignment="Left" 
                   IsEnabled="{Binding ExportTextures, UpdateSourceTrigger=PropertyChanged}" 
                   IsChecked="{Binding ConvertMaterialTextureToBlender, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
-                  ToolTip="Convert the Material texture into the version Blender prefers"/>
+                  ToolTip="{loc:Loc RmvToGltfExporter.Tooltips.ConvertMaterial}"/>
 
-        <TextBlock Grid.Row="2" Grid.Column="0" Text="Convert Normal" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+        <TextBlock Grid.Row="2" Grid.Column="0" Text="{loc:Loc RmvToGltfExporter.ConvertNormal}" HorizontalAlignment="Left" VerticalAlignment="Center"/>
         <TextBlock Grid.Row="2" Grid.Column="1" Text=" : " VerticalAlignment="Center"/>
         <CheckBox Grid.Row="2" Grid.Column="2" HorizontalAlignment="Left" 
                   IsEnabled="{Binding ExportTextures, UpdateSourceTrigger=PropertyChanged}" 
                   IsChecked="{Binding ConvertNormalTextureToBlue, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
-                  ToolTip="Convert the normal map texture into blue version - used by a lot of software, including blender"/>
+                  ToolTip="{loc:Loc RmvToGltfExporter.Tooltips.ConvertNormal}"/>
 
-        <TextBlock Grid.Row="3" Grid.Column="0" Text="Export Animations   " HorizontalAlignment="Left" VerticalAlignment="Center"/>
+        <TextBlock Grid.Row="3" Grid.Column="0" Text="{loc:Loc RmvToGltfExporter.ExportAnimations}" HorizontalAlignment="Left" VerticalAlignment="Center"/>
         <TextBlock Grid.Row="3" Grid.Column="1" Text=" : " VerticalAlignment="Center"/>
         <CheckBox Grid.Row="3" Grid.Column="2" HorizontalAlignment="Left" IsChecked="{Binding ExportAnimations, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
     </Grid>

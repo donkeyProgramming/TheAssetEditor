@@ -6,6 +6,7 @@
              xmlns:local="clr-namespace:TextureEditor.Views" 
              xmlns:System="clr-namespace:System;assembly=System.Runtime"
               xmlns:s="http://schemas.singulink.com/xaml"
+             xmlns:loc="clr-namespace:Shared.Ui.Common;assembly=Shared.Ui"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <UserControl.Resources>
@@ -19,7 +20,7 @@
             <GroupBox>
                 <StackPanel>
                     <StackPanel Orientation="Horizontal" DockPanel.Dock="Top">
-                        <Label Width="{StaticResource labelWidth}">Uv Channels</Label>
+                        <Label Width="{StaticResource labelWidth}">{loc:Loc TextureEditor.Labels.UvChannels}</Label>
                         <Label>:</Label>
                         <ComboBox  HorizontalAlignment="Center" VerticalAlignment="Center" 
                                    SelectedValue="{Binding Path=ViewModel.UvChannelSelectedValue.Value, UpdateSourceTrigger=PropertyChanged}" 
@@ -27,30 +28,30 @@
                     </StackPanel>
 
                     <StackPanel Orientation="Horizontal" DockPanel.Dock="Top">
-                        <Label Width="{StaticResource labelWidth}">Format</Label>
+                        <Label Width="{StaticResource labelWidth}">{loc:Loc TextureEditor.Labels.Format}</Label>
                         <Label>:</Label>
                         <Label  HorizontalAlignment="Center" VerticalAlignment="Center" Content="{Binding Path=ViewModel.Format.Value, UpdateSourceTrigger=PropertyChanged}"/>
                     </StackPanel>
 
                     <StackPanel Orientation="Horizontal" DockPanel.Dock="Top">
-                        <Label Width="{StaticResource labelWidth}">Width</Label>
+                        <Label Width="{StaticResource labelWidth}">{loc:Loc TextureEditor.Labels.Width}</Label>
                         <Label>:</Label>
                         <Label  HorizontalAlignment="Center" VerticalAlignment="Center" Content="{Binding Path=ViewModel.Width.Value, UpdateSourceTrigger=PropertyChanged}"/>
                     </StackPanel>
 
                     <StackPanel Orientation="Horizontal" DockPanel.Dock="Top">
-                        <Label Width="{StaticResource labelWidth}">Height</Label>
+                        <Label Width="{StaticResource labelWidth}">{loc:Loc TextureEditor.Labels.Height}</Label>
                         <Label>:</Label>
                         <Label  HorizontalAlignment="Center" VerticalAlignment="Center" Content="{Binding Path=ViewModel.Height.Value, UpdateSourceTrigger=PropertyChanged}"/>
                     </StackPanel>
 
                     <StackPanel Orientation="Horizontal" DockPanel.Dock="Top">
-                        <Label Width="{StaticResource labelWidth}">Num MipMaps</Label>
+                        <Label Width="{StaticResource labelWidth}">{loc:Loc TextureEditor.Labels.NumMipMaps}</Label>
                         <Label>:</Label>
                         <Label  HorizontalAlignment="Center" VerticalAlignment="Center" Content="{Binding ViewModel.NumMipMaps.Value, UpdateSourceTrigger=PropertyChanged}"/>
                     </StackPanel>
 
-                    <Button Content="Image Details" DockPanel.Dock="Top" HorizontalAlignment="Stretch" Click="{s:MethodBinding ShowTextureDetailsInfo}"/>
+                    <Button Content="{loc:Loc TextureEditor.Buttons.ImageDetails}" DockPanel.Dock="Top" HorizontalAlignment="Stretch" Click="{s:MethodBinding ShowTextureDetailsInfo}"/>
                
                     <StackPanel Orientation="Horizontal" DockPanel.Dock="Top" Margin="0,10,0,0">
                         <StackPanel>
@@ -96,7 +97,7 @@
         </DockPanel>
 
         <DockPanel DockPanel.Dock="Bottom" >
-            <Label DockPanel.Dock="Left" Content="Image Path:" FontWeight="Bold"/>
+            <Label DockPanel.Dock="Left" Content="{loc:Loc TextureEditor.Labels.ImagePath}" FontWeight="Bold"/>
             <Label DockPanel.Dock="Left" HorizontalAlignment="Left" VerticalAlignment="Center" Content="{Binding Path=ViewModel.ImagePath.Value, UpdateSourceTrigger=PropertyChanged}"/>
         </DockPanel>
 

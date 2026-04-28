@@ -13,6 +13,7 @@
     xmlns:Settings="clr-namespace:Editors.Audio.AudioEditor.Presentation.Settings"
     xmlns:AudioProjectViewer="clr-namespace:Editors.Audio.AudioEditor.Presentation.AudioProjectViewer"
     xmlns:WaveformVisualiser="clr-namespace:Editors.Audio.AudioEditor.Presentation.WaveformVisualiser" 
+    xmlns:loc="clr-namespace:Shared.Ui.Common;assembly=Shared.Ui"
     d:DataContext="{d:DesignInstance Type=Local:AudioEditorViewModel}"
     mc:Ignorable="d" 
     d:DesignWidth="1200" d:DesignHeight="700">
@@ -44,40 +45,40 @@
                 Grid.Row="0" 
                 Margin="0, 5, 5, 0">
                 <MenuItem 
-                    Header="File" 
+                    Header="{loc:Loc AudioEditor.Menu.File}" 
                     HorizontalAlignment="Left">
                     <MenuItem 
-                        Header="New Audio Project" 
+                        Header="{loc:Loc AudioEditor.Menu.NewAudioProject}" 
                         Command="{Binding NewAudioProjectCommand}"/>
                     <MenuItem 
-                        Header="Open Audio Project" 
+                        Header="{loc:Loc AudioEditor.Menu.OpenAudioProject}" 
                         Command="{Binding LoadAudioProjectCommand}"/>
                     <Separator/>
                     <MenuItem 
-                        Header="Save Audio Project" 
+                        Header="{loc:Loc AudioEditor.Menu.SaveAudioProject}" 
                         Command="{Binding SaveAudioProjectCommand}"
                         IsEnabled="{Binding IsAudioProjectLoaded}"/>
                     <MenuItem 
-                        Header="Compile Audio Project" 
+                        Header="{loc:Loc AudioEditor.Menu.CompileAudioProject}" 
                         Command="{Binding CompileAudioProjectCommand}"
                         IsEnabled="{Binding IsAudioProjectLoaded}"/>
                     <Separator/>
                     <MenuItem 
-                        Header="Refresh Source Ids" 
+                        Header="{loc:Loc AudioEditor.Menu.RefreshSourceIds}" 
                         Command="{Binding RefreshSourceIdsCommand}"
                         IsEnabled="{Binding IsAudioProjectLoaded}"/>
                 </MenuItem>
                 <MenuItem 
-                    Header="Tools" 
+                    Header="{loc:Loc AudioEditor.Menu.Tools}" 
                     HorizontalAlignment="Left">
                     <MenuItem 
-                        Header="Dialogue Event Merger" 
+                        Header="{loc:Loc AudioEditor.Menu.DialogueEventMerger}" 
                         Command="{Binding OpenDialogueEventMergerCommand}"/>
                     <MenuItem
-                        Header="Audio Project Merger"
+                        Header="{loc:Loc AudioEditor.Menu.AudioProjectMerger}"
                         Command="{Binding OpenAudioProjectMergerCommand}"/>
                     <MenuItem 
-                        Header="Audio Project Converter" 
+                        Header="{loc:Loc AudioEditor.Menu.AudioProjectConverter}" 
                         Command="{Binding OpenAudioProjectConverterCommand}"/>
                 </MenuItem>
             </Menu>

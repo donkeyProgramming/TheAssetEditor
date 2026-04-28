@@ -9,6 +9,7 @@
     xmlns:ExtendedWpfToolkit="clr-namespace:Xceed.Wpf.Toolkit;assembly=Xceed.Wpf.Toolkit"
     xmlns:Models="clr-namespace:Editors.Audio.AudioEditor.Presentation.Shared.Models" 
     xmlns:AudioProjectExplorer="clr-namespace:Editors.Audio.AudioEditor.Presentation.AudioProjectExplorer" 
+    xmlns:loc="clr-namespace:Shared.Ui.Common;assembly=Shared.Ui"
     d:DataContext="{d:DesignInstance Type=AudioProjectExplorer:AudioProjectExplorerViewModel}"
     mc:Ignorable="d" 
     d:DesignHeight="550" d:DesignWidth="800">
@@ -85,7 +86,7 @@
                         Grid.Row="0"
                         Grid.ColumnSpan="2"
                         Margin="-5, 0, 0, 0"
-                        Content="Dialogue Event Filters"/>
+                        Content="{loc:Loc AudioProjectExplorer.DialogueEventFilters}"/>
 
                     <ExtendedWpfToolkit:WatermarkComboBox 
                         x:Name ="DialogueEventTypeFilterComboBox"
@@ -99,8 +100,8 @@
                         SelectedItem="{Binding SelectedDialogueEventType, Mode=TwoWay}"
                         SelectionChanged="OnWatermarkComboBoxSelectionChanged"
                         IsEnabled="{Binding IsDialogueEventFilterEnabled}"
-                        Watermark="Select Dialogue Event Type Filter" 
-                        ToolTip="Dialogue Event Type refers to the type of action or trigger in game that the Dialogue Event relates to. Select the Dialogue Event type to filter by that."
+                        Watermark="{loc:Loc AudioProjectExplorer.Watermark.DialogueEventTypeFilter}" 
+                        ToolTip="{loc:Loc AudioProjectExplorer.Tooltips.DialogueEventTypeFilter}"
                         ToolTipService.ShowOnDisabled="True"/>
 
                     <ExtendedWpfToolkit:WatermarkComboBox 
@@ -116,8 +117,8 @@
                         SelectedItem="{Binding SelectedDialogueEventProfile, Mode=TwoWay}"
                         SelectionChanged="OnWatermarkComboBoxSelectionChanged"
                         IsEnabled="{Binding IsDialogueEventFilterEnabled}"
-                        Watermark="Select Dialogue Event Profile Filter" 
-                        ToolTip="The Dialogue Event profile refers to the Select the Dialogue Event profile to filter by that"
+                        Watermark="{loc:Loc AudioProjectExplorer.Watermark.DialogueEventProfileFilter}" 
+                        ToolTip="{loc:Loc AudioProjectExplorer.Tooltips.DialogueEventProfileFilter}"
                         ToolTipService.ShowOnDisabled="True"/>
                 </Grid>
 
@@ -145,15 +146,15 @@
                         Grid.Row="0"
                         Grid.ColumnSpan="2"
                         Margin="-5, -5, 0, 0"
-                        Content="General Filters"/>
+                        Content="{loc:Loc AudioProjectExplorer.GeneralFilters}"/>
                     
                     <CheckBox 
                         Grid.Column="0"
                         Grid.Row="1"
                         Margin="0, 0, 0, 0"
                         VerticalAlignment="Center"
-                        Content="Show Edited Items Only"
-                        ToolTip="Filters the Audio Project Explorer tree to show only items that have been edited."
+                        Content="{loc:Loc AudioProjectExplorer.ShowEditedItemsOnly}"
+                        ToolTip="{loc:Loc AudioProjectExplorer.Tooltips.ShowEditedItemsOnly}"
                         IsChecked="{Binding ShowEditedItemsOnly, Mode=TwoWay}"/>
                     
                     <CheckBox 
@@ -161,8 +162,8 @@
                         Grid.Row="1"
                         Margin="5, 0, 0, 0"
                         VerticalAlignment="Center"
-                        Content="Show Action Events"
-                        ToolTip="Filters the Audio Project Explorer tree to show or hide Action Events."
+                        Content="{loc:Loc AudioProjectExplorer.ShowActionEvents}"
+                        ToolTip="{loc:Loc AudioProjectExplorer.Tooltips.ShowActionEvents}"
                         IsChecked="{Binding ShowActionEvents, Mode=TwoWay}"/>
                     
                     <CheckBox 
@@ -170,8 +171,8 @@
                         Grid.Row="1"
                         Margin="5, 0, 0, 0"
                         VerticalAlignment="Center"
-                        Content="Show Dialogue Events"
-                        ToolTip="Filters the Audio Project Explorer Tree to show or hide Dialogue Events."
+                        Content="{loc:Loc AudioProjectExplorer.ShowDialogueEvents}"
+                        ToolTip="{loc:Loc AudioProjectExplorer.Tooltips.ShowDialogueEvents}"
                         IsChecked="{Binding ShowDialogueEvents, Mode=TwoWay}"/>
                 </Grid>
 
@@ -195,8 +196,8 @@
                         Width="180" 
                         VerticalAlignment="Center" 
                         HorizontalAlignment="Left"
-                        Content="Toggle Collapse / Expand Tree" 
-                        ToolTip="Collapse / expand the tree." 
+                        Content="{loc:Loc AudioProjectExplorer.ToggleCollapseExpandTree}" 
+                        ToolTip="{loc:Loc AudioProjectExplorer.Tooltips.CollapseExpandTree}" 
                         Command="{Binding CollapseOrExpandTreeCommand}"/>
                     
                     <Button
@@ -205,8 +206,8 @@
                         Width="85" 
                         VerticalAlignment="Center" 
                         HorizontalAlignment="Left"
-                        Content="Reset Filters" 
-                        ToolTip="Collapse / expand the tree." 
+                        Content="{loc:Loc AudioProjectExplorer.ResetFilters}" 
+                        ToolTip="{loc:Loc AudioProjectExplorer.Tooltips.ResetFilters}" 
                         Command="{Binding ResetFiltersCommand}"/>
                 </Grid>
 
@@ -227,7 +228,7 @@
                             KeyboardNavigation.IsTabStop="True"
                             HorizontalAlignment="Stretch" Padding="2.5, 0, 0, 0"  Height="24" VerticalContentAlignment="Center" 
                             Text="{Binding SearchQuery, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay, Delay=350}"
-                            Tag="Search Audio Project Explorer">
+                            Tag="{loc:Loc AudioProjectExplorer.SearchTag}">
                         </TextBox>
 
                         <Button 

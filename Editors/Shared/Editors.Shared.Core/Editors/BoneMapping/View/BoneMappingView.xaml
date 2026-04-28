@@ -6,6 +6,7 @@
              xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
              xmlns:s="http://schemas.singulink.com/xaml"
              xmlns:behaviors="clr-namespace:Shared.Ui.Common.Behaviors;assembly=Shared.Ui"
+             xmlns:loc="clr-namespace:Shared.Ui.Common;assembly=Shared.Ui"
              xmlns:mathviews="clr-namespace:CommonControls.MathViews;assembly=Shared.Ui" xmlns:view="clr-namespace:Editors.Shared.Core.Editors.BoneMapping.View"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
@@ -128,17 +129,17 @@
             </Grid.ColumnDefinitions>
 
             <StackPanel  Grid.Row="0" Orientation="Horizontal">
-                <TextBlock  Text="Current model bones - " FontWeight="Bold" FontSize="16" TextDecorations="Underline"/>
+                <TextBlock  Text="{loc:Loc KitbasherTool.BoneMapping.CurrentModelBones}" FontWeight="Bold" FontSize="16" TextDecorations="Underline"/>
                 <TextBlock  Text="{Binding MeshSkeletonName.Value, UpdateSourceTrigger=PropertyChanged}" FontWeight="Bold" FontSize="16" TextDecorations="Underline"/>
             </StackPanel>
 
 
             <TextBox Grid.Row="1" BorderBrush="Black" Text="{Binding MeshBones.Filter, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
-            <Button Grid.Row="1" Grid.Column ="1"  Content="Clear" IsEnabled="False" />
+            <Button Grid.Row="1" Grid.Column ="1"  Content="{loc:Loc KitbasherTool.BoneMapping.Clear}" IsEnabled="False" />
 
 
             <CheckBox Grid.Row="2" VerticalContentAlignment="Center"
-                      Content="Only show used bones"
+                      Content="{loc:Loc KitbasherTool.BoneMapping.OnlyShowUsedBones}"
                       IsChecked="{Binding OnlyShowUsedBones.Value, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
 
             <TreeView 
@@ -204,8 +205,8 @@
                         <ColumnDefinition Width=".5*"/>
                         <ColumnDefinition Width=".5*"/>
                     </Grid.ColumnDefinitions>
-                    <Button Grid.Column="0"  Click="{s:MethodBinding AutoMapSelfAndChildrenByName}" Content="Auto map based on name" Margin="0,0,2,0"/>
-                    <Button Grid.Column="1" Click="{s:MethodBinding AutoMapSelfAndChildrenByHierarchy}" Content="Auto map based on hierarchy"/>
+                    <Button Grid.Column="0"  Click="{s:MethodBinding AutoMapSelfAndChildrenByName}" Content="{loc:Loc KitbasherTool.BoneMapping.AutoMapBasedOnName}" Margin="0,0,2,0"/>
+                    <Button Grid.Column="1" Click="{s:MethodBinding AutoMapSelfAndChildrenByHierarchy}" Content="{loc:Loc KitbasherTool.BoneMapping.AutoMapBasedOnHierarchy}"/>
                 </Grid>
                 <Grid Margin="0,2,0,0">
                     <Grid.ColumnDefinitions>
@@ -213,9 +214,9 @@
                         <ColumnDefinition Width=".5*"/>
                         <ColumnDefinition Width=".5*"/>
                     </Grid.ColumnDefinitions>
-                    <Button Grid.Column="0" Click="{s:MethodBinding ClearBindingSelf}" Content="Delete self"/>
-                    <Button Grid.Column="1" Click="{s:MethodBinding ClearBindingSelfAndChildren}" Content="Delete self and children" Margin="2,0,2,0"/>
-                    <Button Grid.Column="2" Click="{s:MethodBinding CopyMappingToAllChildren}" Content="Copy to to all children"/>
+                    <Button Grid.Column="0" Click="{s:MethodBinding ClearBindingSelf}" Content="{loc:Loc KitbasherTool.BoneMapping.DeleteSelf}"/>
+                    <Button Grid.Column="1" Click="{s:MethodBinding ClearBindingSelfAndChildren}" Content="{loc:Loc KitbasherTool.BoneMapping.DeleteSelfAndChildren}" Margin="2,0,2,0"/>
+                    <Button Grid.Column="2" Click="{s:MethodBinding CopyMappingToAllChildren}" Content="{loc:Loc KitbasherTool.BoneMapping.CopyToAllChildren}"/>
                 </Grid>
             </StackPanel>
 
@@ -233,12 +234,12 @@
             </Grid.ColumnDefinitions>
 
             <StackPanel  Grid.Row="0" Orientation="Horizontal">
-                <TextBlock  Text="Target Model Bones - " FontWeight="Bold" FontSize="16" TextDecorations="Underline"/>
+                <TextBlock  Text="{loc:Loc KitbasherTool.BoneMapping.TargetModelBones}" FontWeight="Bold" FontSize="16" TextDecorations="Underline"/>
                 <TextBlock  Text="{Binding ParentSkeletonName.Value, UpdateSourceTrigger=PropertyChanged}" FontWeight="Bold" FontSize="16" TextDecorations="Underline"/>
             </StackPanel>
 
             <TextBox Grid.Row="1" BorderBrush="Black" Text="{Binding ParentModelBones.Filter, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
-            <Button Grid.Row="1" Grid.Column ="1"  Content="Clear" IsEnabled="False"/>
+            <Button Grid.Row="1" Grid.Column ="1"  Content="{loc:Loc KitbasherTool.BoneMapping.Clear}" IsEnabled="False"/>
             <TreeView 
                 Grid.Row="2"
                 Grid.ColumnSpan="2"

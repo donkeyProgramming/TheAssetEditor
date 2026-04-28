@@ -80,6 +80,9 @@ float4 mainPS(in PixelInputType input, bool bIsFrontFace : SV_IsFrontFace) : SV_
     
     // Light the pixel...
     float3 hdr_linear_col = standard_lighting_model_directional_light(diretLightColor * directlightIntensity, rotatedNormalizedLightDirection, normalizedViewDirection, standard_mat);
+
+    // Apply global constant light colour so the scene lighting can be globally tuned
+    hdr_linear_col *= Constant_LightColour;
     
     //  Tone-map the pixel...            
     float3 ldr_linear_col = saturate(tone_map_linear_hdr_pixel_value(hdr_linear_col*exposure));        

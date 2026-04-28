@@ -77,8 +77,11 @@ namespace AssetEditor
 
             ShowMainWindow();
 
-            _ipcServer = _serviceProvider.GetRequiredService<AssetEditorIpcServer>();
-            _ipcServer.Start();
+            if (e.Args.Contains("Start_IPC"))
+            {
+                _ipcServer = _serviceProvider.GetRequiredService<AssetEditorIpcServer>();
+                _ipcServer.Start();
+            }
             _ = CheckVersion(uiCommandFactory);
         }
 

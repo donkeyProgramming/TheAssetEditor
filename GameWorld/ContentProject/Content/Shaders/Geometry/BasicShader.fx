@@ -1,5 +1,4 @@
-﻿
-float4 DiffuseColor             ;
+﻿float4 DiffuseColor             ;
 float3 EmissiveColor            ;
 float3 SpecularColor            ;
 float  SpecularPower            ;
@@ -20,6 +19,7 @@ float3 EyePosition              ;
 float4x4 World;
 float3x3 WorldInverseTranspose;
 float4x4 WorldViewProj;
+float3 Constant_LightColour = float3(1, 1, 1);
 
 // Textures
 Texture2D<float4> DiffuseTexture;
@@ -103,8 +103,8 @@ ColorPair ComputeLights(float3 eyeVector, float3 worldNormal, uniform int numLig
 
 	ColorPair result;
 
-	result.Diffuse = mul(diffuse, lightDiffuse) * DiffuseColor.rgb + EmissiveColor;
-	result.Specular = mul(specular, lightSpecular) * specColour;
+    result.Diffuse = (mul(diffuse, lightDiffuse) * DiffuseColor.rgb + EmissiveColor) * Constant_LightColour;
+	result.Specular = mul(specular, lightSpecular) * specColour * Constant_LightColour;
 
 	return result;
 }

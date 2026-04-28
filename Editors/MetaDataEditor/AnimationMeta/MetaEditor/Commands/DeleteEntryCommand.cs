@@ -1,5 +1,6 @@
-﻿using Editors.AnimationMeta.Presentation;
+using Editors.AnimationMeta.Presentation;
 using Shared.Core.Events;
+using Shared.GameFormats.AnimationMeta.Parsing;
 
 namespace Editors.AnimationMeta.MetaEditor.Commands
 {
@@ -7,14 +8,23 @@ namespace Editors.AnimationMeta.MetaEditor.Commands
     {
         public void Execute(MetaDataEditorViewModel controller)
         {
-            var itemToRemove = controller.SelectedAttribute;
-            if (itemToRemove == null || controller.ParsedFile == null)
+            if (controller?.ParsedFile == null)
                 return;
 
-            controller.ParsedFile.Attributes.Remove(itemToRemove);
-            controller.UpdateView();
-            controller.SelectedTag = controller.Tags.FirstOrDefault();
-        }
+            var itemsToRemove = controller.Tags
+                .Where(x => x.IsSelected)
+                .Select(x => x._input)
+                .ToList();
 
+            if (itemsToRemove.Count == 0)
+                return;
+
+            foreach (var item in itemsToRemove)
+            {
+                controller.ParsedFile.Attributes.Remove(item);
+            }
+
+            controller.UpdateView();
+        }
     }
 }

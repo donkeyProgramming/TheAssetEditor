@@ -7,6 +7,7 @@
              xmlns:mathviews="clr-namespace:CommonControls.MathViews;assembly=Shared.Ui"
              xmlns:b="http://schemas.microsoft.com/xaml/behaviors" 
              xmlns:behaviors="clr-namespace:Shared.Ui.Common.Behaviors;assembly=Shared.Ui"
+             xmlns:loc="clr-namespace:Shared.Ui.Common;assembly=Shared.Ui"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <UserControl.Resources>
@@ -14,23 +15,23 @@
     </UserControl.Resources>
    
     <DockPanel LastChildFill="False">
-        <Expander IsExpanded="True" Header="Render Settings:" DockPanel.Dock="Top" >
+        <Expander IsExpanded="True" Header="{loc:Loc AnimationReTarget.Settings.RenderSettings}" DockPanel.Dock="Top" >
             <StackPanel Margin="10,0,2,0">
 
                 <DockPanel>
-                    <Label Content="Generated Mesh" Width ="{StaticResource labelWidth}"  />
+                    <Label Content="{loc:Loc AnimationReTarget.Settings.GeneratedMesh}" Width ="{StaticResource labelWidth}"  />
                     <Label Content=":"/>
                     <CheckBox VerticalContentAlignment="Center" IsChecked="{Binding Rendering.ShowGeneratedMesh, UpdateSourceTrigger=PropertyChanged}"/>
                 </DockPanel>
 
                 <DockPanel>
-                    <Label Content="Generated Skeleton" Width ="{StaticResource labelWidth}" />
+                    <Label Content="{loc:Loc AnimationReTarget.Settings.GeneratedSkeleton}" Width ="{StaticResource labelWidth}" />
                     <Label Content=":"/>
                     <CheckBox VerticalContentAlignment="Center" IsChecked="{Binding Rendering.ShowGeneratedSkeleton, UpdateSourceTrigger=PropertyChanged}"/>
                 </DockPanel>
 
                 <DockPanel>
-                    <Label Content="Offset spacing" Width ="{StaticResource labelWidth}"  />
+                    <Label Content="{loc:Loc AnimationReTarget.Settings.OffsetSpacing}" Width ="{StaticResource labelWidth}"  />
                     <Label Content=":"/>
 
                     <TextBox Text="{Binding Rendering.VisualOffset, UpdateSourceTrigger=LostFocus, Mode=TwoWay}" VerticalContentAlignment="Center" Margin="2">
@@ -42,15 +43,15 @@
             </StackPanel>
         </Expander>
 
-        <Expander IsExpanded="True" Header="Animation Settings:" DockPanel.Dock="Bottom">
+        <Expander IsExpanded="True" Header="{loc:Loc AnimationReTarget.Settings.AnimationSettings}" DockPanel.Dock="Bottom">
             <StackPanel Margin="10,0,2,0">
                 <DockPanel>
-                    <Label Content="Skeleton Scale" Width ="{StaticResource labelWidth}"  DockPanel.Dock="Left"/>
+                    <Label Content="{loc:Loc AnimationReTarget.Settings.SkeletonScale}" Width ="{StaticResource labelWidth}"  DockPanel.Dock="Left"/>
                     <Label Content=":" DockPanel.Dock="Left"/>
 
                     <TextBox Text="{Binding Settings.SkeletonScale, UpdateSourceTrigger=LostFocus, Mode=TwoWay}" VerticalContentAlignment="Center" Margin="2">
                         <TextBox.ToolTip>
-                            <ToolTip Content="Scaling the skeleton will make the mesh look dragged unless the mesh is also exported"/>
+                            <ToolTip Content="{loc:Loc AnimationReTarget.Settings.SkeletonScaleTooltip}"/>
                         </TextBox.ToolTip>
 
                         <b:Interaction.Behaviors>
@@ -60,7 +61,7 @@
                 </DockPanel>
 
                 <DockPanel>
-                    <Label Content="Animation speed mult" Width ="{StaticResource labelWidth}" DockPanel.Dock="Left"/>
+                    <Label Content="{loc:Loc AnimationReTarget.Settings.AnimationSpeedMultiplier}" Width ="{StaticResource labelWidth}" DockPanel.Dock="Left"/>
                     <Label Content=":" DockPanel.Dock="Left"/>
                     <TextBox Text="{Binding Settings.AnimationSpeedMult, UpdateSourceTrigger=LostFocus, Mode=TwoWay}" VerticalContentAlignment="Center" Margin="2">
                         <b:Interaction.Behaviors>
@@ -70,16 +71,16 @@
                 </DockPanel>
 
                 <DockPanel >
-                    <Label Content="Zero unmapped bones" Width ="{StaticResource labelWidth}"/>
+                    <Label Content="{loc:Loc AnimationReTarget.Settings.ZeroUnmappedBones}" Width ="{StaticResource labelWidth}"/>
                     <Label Content=":"/>
 
-                    <CheckBox VerticalContentAlignment="Center" IsChecked="{Binding Settings.ZeroUnmappedBones, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"  ToolTip="Set the transform of all unmapped bones to 0"/>
+                    <CheckBox VerticalContentAlignment="Center" IsChecked="{Binding Settings.ZeroUnmappedBones, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"  ToolTip="{loc:Loc AnimationReTarget.Settings.ZeroUnmappedBonesTooltip}"/>
                 </DockPanel>
 
                 <DockPanel >
-                <Label Content="Apply Relative scale" Width ="{StaticResource labelWidth}"/>
+                <Label Content="{loc:Loc AnimationReTarget.Settings.ApplyRelativeScale}" Width ="{StaticResource labelWidth}"/>
                 <Label Content=":"/>
-                <CheckBox VerticalContentAlignment="Center" IsChecked="{Binding Settings.ApplyRelativeScale, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"  ToolTip="Scale bone length based on relative difference" Margin="0,0,5,0"/>
+                <CheckBox VerticalContentAlignment="Center" IsChecked="{Binding Settings.ApplyRelativeScale, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"  ToolTip="{loc:Loc AnimationReTarget.Settings.ApplyRelativeScaleTooltip}" Margin="0,0,5,0"/>
             </DockPanel>
 
         </StackPanel>

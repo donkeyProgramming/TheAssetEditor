@@ -4,6 +4,7 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
     xmlns:s="http://schemas.singulink.com/xaml"                        
+    xmlns:loc="clr-namespace:Shared.Ui.Common;assembly=Shared.Ui"
     SizeToContent="WidthAndHeight"
     mc:Ignorable="d" d:DesignHeight="137.155" d:DesignWidth="768.503">
     
@@ -11,7 +12,7 @@
         <Grid>
             <StackPanel Orientation="Vertical" Height="114" VerticalAlignment="Top">
                 <StackPanel Orientation="Horizontal">
-                    <Label x:Name="SkeletonFile" Content="Skeleton File:" Width="94"/>
+                    <Label x:Name="SkeletonFile" Content="{loc:Loc FbxSettings.SkeletonFile}" Width="94"/>
 
                     <TextBox x:Name="SkeletonFileTextBox" 
                              IsReadOnly="True"
@@ -19,17 +20,17 @@
                              Text="{Binding SkeletonFileName.Value,  UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">
                         <TextBox.ToolTip>
                             <ToolTip>
-                                Not implemented yet
+                                {loc:Loc FbxSettings.NotImplementedYet}
                             </ToolTip>
                         </TextBox.ToolTip>
                     </TextBox>
 
-                    <Button x:Name="BrowseAnimButton" Content="Browse .ANIM..."  Width="114"  Height="26" 
+                    <Button x:Name="BrowseAnimButton" Content="{loc:Loc FbxSettings.BrowseAnim}"  Width="114"  Height="26" 
                             ToolTipService.ShowOnDisabled="true"                            
                             Click="{s:MethodBinding BrowseButtonClicked}">
                         <Button.ToolTip>
                             <ToolTip>
-                                Not implemented yet
+                                {loc:Loc FbxSettings.NotImplementedYet}
                             </ToolTip>
                         </Button.ToolTip>
                     </Button>
@@ -37,22 +38,22 @@
                 </StackPanel>
                 <StackPanel Orientation="Horizontal" Height="28">
 
-                    <Label x:Name="label2" Content="Skeleton Name:" Width="94"/>
+                    <Label x:Name="label2" Content="{loc:Loc FbxSettings.SkeletonName}" Width="94"/>
 
                     <TextBox x:Name="SkeletonNameTextBox"  Width="405"
                              Text="{Binding SkeletonName.Value,  UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">
                         <TextBox.ToolTip>
                             <TextBlock>
-                                Skeleton name stored in .FBX File
+                                {loc:Loc FbxSettings.Tooltips.SkeletonNameLine1}
                                 <LineBreak />
-                                Used in the .rigid_model_v2
+                                {loc:Loc FbxSettings.Tooltips.SkeletonNameLine2}
                                 <LineBreak />
-                                Enter name manually if needed.
+                                {loc:Loc FbxSettings.Tooltips.SkeletonNameLine3}
                             </TextBlock>
                         </TextBox.ToolTip>
                     </TextBox>
 
-                    <CheckBox x:Name="DoAutoRig" Content="Attemp Auto-Rig"  Width="154" 
+                    <CheckBox x:Name="DoAutoRig" Content="{loc:Loc FbxSettings.AttemptAutoRig}"  Width="154" 
                               IsEnabled="False"                              
                               IsChecked="{Binding UseAutoRigging.Value, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
 
@@ -63,7 +64,7 @@
         <StackPanel Orientation="Horizontal" Width="auto" HorizontalAlignment="Right">
             <Button
                 Name="ImportButton"
-                Content="Import&#xD;&#xA;"
+                Content="{loc:Loc FbxSettings.Import}"
                 Height="23"
                 HorizontalAlignment="Right" 
                 Margin="0,0,26,5"
@@ -75,7 +76,7 @@
 
             <Button
                 Name="CancelButton"
-                Content="Cancel" 
+                Content="{loc:Loc FbxSettings.Cancel}" 
                 Height="23" 
                 Margin="0,0,37,5"            
                 VerticalAlignment="Bottom"

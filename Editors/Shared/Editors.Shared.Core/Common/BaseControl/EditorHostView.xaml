@@ -6,6 +6,7 @@
              xmlns:referencemodel="clr-namespace:AnimationEditor.Common.ReferenceModel" 
              xmlns:animationplayer="clr-namespace:AnimationEditor.Common.AnimationPlayer" 
              xmlns:basecontrol="clr-namespace:Editors.Shared.Core.Common.BaseControl"
+             xmlns:loc="clr-namespace:Shared.Ui.Common;assembly=Shared.Ui"
              mc:Ignorable="d" >
 
     <UserControl.Resources>
@@ -27,12 +28,12 @@
         </Grid.RowDefinitions>
 
         <Menu Grid.Row="1" Grid.Column="0">
-            <MenuItem Header="General" IsEnabled="False">
-                <MenuItem Header="Save shortcut file" />
+            <MenuItem Header="{loc:Loc EditorHost.Menu.General}" IsEnabled="False">
+                <MenuItem Header="{loc:Loc EditorHost.Menu.SaveShortcutFile}" />
             </MenuItem>
-            <MenuItem Header="Camera">
-                <MenuItem Header="Focus Selection" Command="{Binding FocusCameraCommand}"/>
-                <MenuItem Header="Reset" Command="{Binding ResetCameraCommand}"/>
+            <MenuItem Header="{loc:Loc EditorHost.Menu.Camera}">
+                <MenuItem Header="{loc:Loc EditorHost.Menu.FocusSelection}" Command="{Binding FocusCameraCommand}"/>
+                <MenuItem Header="{loc:Loc EditorHost.Menu.Reset}" Command="{Binding ResetCameraCommand}"/>
             </MenuItem>
         </Menu>
 
@@ -63,7 +64,7 @@
                 <Expander.Header>
                     <StackPanel Orientation="Horizontal">
                         <TextBlock VerticalAlignment="Center">
-                            <Run FontSize="14" FontWeight="Bold"  Text="Scene content:"/>
+                            <Run FontSize="14" FontWeight="Bold"  Text="{loc:Loc EditorHost.SceneContent}"/>
                         </TextBlock>
                     </StackPanel>
                 </Expander.Header>

@@ -3,11 +3,12 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"              
+             xmlns:loc="clr-namespace:Shared.Ui.Common;assembly=Shared.Ui"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
 
     <Expander Name="myExpander"                             
-            Header="File Info" 
+            Header="{loc:Loc FbxFileInfo.Header}" 
                       ExpandDirection="Down" 
                       IsExpanded="True">
         <GroupBox>            
@@ -15,7 +16,7 @@
 
                 <!--File Name-->
                 <StackPanel Orientation="Horizontal" DockPanel.Dock="Top">
-                    <Label Content="File Name" Width="150" DockPanel.Dock="Left" />
+                    <Label Content="{loc:Loc FbxFileInfo.FileName}" Width="150" DockPanel.Dock="Left" />
                     <Label>:</Label>
                     <TextBlock   VerticalAlignment="Center" FontWeight="Bold"
                         Text="{Binding FileName, UpdateSourceTrigger=PropertyChanged}">
@@ -24,7 +25,7 @@
 
                 <!--Sdk Version used to make file-->
                 <StackPanel Orientation="Horizontal" DockPanel.Dock="Top">
-                    <Label Content="Sdk Version" Width="150" DockPanel.Dock="Left" />
+                    <Label Content="{loc:Loc FbxFileInfo.SdkVersion}" Width="150" DockPanel.Dock="Left" />
                     <Label>:</Label>
                     <TextBlock   VerticalAlignment="Center" FontWeight="Bold"
                         Text="{Binding SdkVersion, UpdateSourceTrigger=PropertyChanged}">
@@ -33,7 +34,7 @@
 
                 <!--Skeleton name fetched from node-->
                 <StackPanel Orientation="Horizontal" DockPanel.Dock="Top">
-                    <Label Content="Units" Width="150" DockPanel.Dock="Left" />
+                    <Label Content="{loc:Loc FbxFileInfo.Units}" Width="150" DockPanel.Dock="Left" />
                     <Label>:</Label>
                     <TextBlock   VerticalAlignment="Center" FontWeight="Bold"
                         Text="{Binding Units, UpdateSourceTrigger=PropertyChanged}">
@@ -42,7 +43,7 @@
 
                 <!--Node Count-->
                 <StackPanel Orientation="Horizontal" DockPanel.Dock="Top">
-                    <Label Content="NodeCount" Width="150" DockPanel.Dock="Left" />
+                    <Label Content="{loc:Loc FbxFileInfo.NodeCount}" Width="150" DockPanel.Dock="Left" />
                     <Label>:</Label>
                     <TextBlock   VerticalAlignment="Center" FontWeight="Bold"
                         Text="{Binding NodeCount, UpdateSourceTrigger=PropertyChanged}">
@@ -51,7 +52,7 @@
 
                 <!--Mesh Count-->
                 <StackPanel Orientation="Horizontal" DockPanel.Dock="Top">
-                    <Label Content="Mesh Count" Width="150" DockPanel.Dock="Left" />
+                    <Label Content="{loc:Loc FbxFileInfo.MeshCount}" Width="150" DockPanel.Dock="Left" />
                     <Label>:</Label>
                     <TextBlock   VerticalAlignment="Center" FontWeight="Bold"
                         Text="{Binding MeshCount, UpdateSourceTrigger=PropertyChanged}">
@@ -60,7 +61,7 @@
 
                 <!--Material Count-->
                 <StackPanel Orientation="Horizontal" DockPanel.Dock="Top">
-                    <Label Content="Material Count" Width="150" DockPanel.Dock="Left" />
+                    <Label Content="{loc:Loc FbxFileInfo.MaterialCount}" Width="150" DockPanel.Dock="Left" />
                     <Label>:</Label>
                     <TextBlock   VerticalAlignment="Center" FontWeight="Bold"
                         Text="{Binding MaterialCount, UpdateSourceTrigger=PropertyChanged}">
@@ -69,7 +70,7 @@
 
                 <!--Animation Count-->
                 <StackPanel Orientation="Horizontal" DockPanel.Dock="Top">
-                    <Label Content="Animation Count" Width="150" DockPanel.Dock="Left" />
+                    <Label Content="{loc:Loc FbxFileInfo.AnimationCount}" Width="150" DockPanel.Dock="Left" />
                     <Label>:</Label>
                     <TextBlock   VerticalAlignment="Center" FontWeight="Bold"
                         Text="{Binding AnimationCount, UpdateSourceTrigger=PropertyChanged}">
@@ -78,7 +79,7 @@
 
                 <!--Bone Count-->
                 <StackPanel Orientation="Horizontal" DockPanel.Dock="Top">
-                    <Label Content="Bone Count" Width="150" DockPanel.Dock="Left" />
+                    <Label Content="{loc:Loc FbxFileInfo.BoneCount}" Width="150" DockPanel.Dock="Left" />
                     <Label>:</Label>
                     <TextBlock   VerticalAlignment="Center" FontWeight="Bold"
                            Text="{Binding BoneCount, UpdateSourceTrigger=PropertyChanged}">
@@ -87,7 +88,7 @@
 
                 <!-- Derformation(weighting) "yes/no" -->
                 <StackPanel Orientation="Horizontal" DockPanel.Dock="Top" IsEnabled="{Binding IsEnabled}">
-                    <Label Content="Derformation Data" Width="150" DockPanel.Dock="Left" />
+                    <Label Content="{loc:Loc FbxFileInfo.DeformationData}" Width="150" DockPanel.Dock="Left" />
                     <Label>:</Label>
                     <TextBlock VerticalAlignment="Center" FontWeight="Bold"
                            Text="{Binding DerformationData, UpdateSourceTrigger=PropertyChanged}">

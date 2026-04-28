@@ -137,7 +137,7 @@ namespace Editors.Audio.AudioEditor.Presentation.AudioFilesExplorer
 
         private void OnAudioFilesChanged(AudioFilesChangedEvent e) => SetButtonEnablement();
 
-        private void OnPackFileContainerSetAsMainEditable(PackFileContainer packFileContainer)
+        private void OnPackFileContainerSetAsMainEditable(IPackFileContainer packFileContainer)
         {
             if (packFileContainer == null)
                 return;
@@ -146,7 +146,7 @@ namespace Editors.Audio.AudioEditor.Presentation.AudioFilesExplorer
             RefreshAudioFilesTree(packFileContainer);
         }
 
-        private void RefreshAudioFilesTree(PackFileContainer packFileContainer)
+        private void RefreshAudioFilesTree(IPackFileContainer packFileContainer)
         {
             AudioFilesTree = _audioFilesTreeBuilder.BuildTree(packFileContainer);
             CacheRootWaveformVisualisations();

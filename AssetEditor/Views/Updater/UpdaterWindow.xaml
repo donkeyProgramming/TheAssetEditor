@@ -80,6 +80,7 @@
                                     Markdown="{Binding ReleaseNotes}"
                                     VerticalAlignment="Stretch"
                                     HorizontalAlignment="Stretch"
+                                    ClickAction="OpenBrowser"
                                     VerticalScrollBarVisibility="Disabled"
                                     MarkdownStyle="{StaticResource CustomMarkdownStyle}"
                                     PreviewMouseWheel="OnMarkdownScrollViewerPreviewMouseWheel"

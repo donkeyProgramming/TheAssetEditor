@@ -13,7 +13,6 @@ namespace Editors.KitbasherEditor.ViewModels.SceneExplorer.Nodes.Rmv2
     {
         Rmv2MeshNode _meshNode;
         private readonly SceneManager _sceneManager;
-        private readonly KitbasherRootScene _kitbasherRootScene;
 
         public Vector3ViewModel Pivot { get; set; }
 
@@ -26,9 +25,8 @@ namespace Editors.KitbasherEditor.ViewModels.SceneExplorer.Nodes.Rmv2
         [ObservableProperty] UiVertexFormat _vertexType;
         [ObservableProperty] IEnumerable<UiVertexFormat> _possibleVertexTypes = [UiVertexFormat.Static, UiVertexFormat.Weighted, UiVertexFormat.Cinematic];
 
-        public MeshViewModel(KitbasherRootScene kitbasherRootScene, SceneManager sceneManager)
+        public MeshViewModel(SceneManager sceneManager)
         {
-            _kitbasherRootScene = kitbasherRootScene;
             _sceneManager = sceneManager;
         }
 

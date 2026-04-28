@@ -5,18 +5,19 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:s="http://schemas.singulink.com/xaml" 
              xmlns:view="clr-namespace:Editors.AnimationMeta.Presentation.View"
+             xmlns:loc="clr-namespace:Shared.Ui.Common;assembly=Shared.Ui"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <DockPanel>
-        <Button Margin="5" Content="Refresh" Click="{s:MethodBinding RefreshAction}" DockPanel.Dock="Top"/>
+        <Button Margin="5" Content="{loc:Loc MetadataEditor.Buttons.Refresh}" Click="{s:MethodBinding RefreshAction}" DockPanel.Dock="Top"/>
 
         <TabControl DockPanel.Dock="Top" SelectedIndex="{Binding SelectedTabControllerIndex, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">
-            <TabItem Header="Persistent">
+            <TabItem Header="{loc:Loc MetadataEditor.Tabs.Persistent}">
                 <DockPanel>
                     <view:MainEditorView DataContext="{Binding PersistentMetaEditor}" DockPanel.Dock="Top"/>
                 </DockPanel>
             </TabItem>
-            <TabItem Header="Animation">
+            <TabItem Header="{loc:Loc MetadataEditor.Tabs.Animation}">
                 <DockPanel>
                     <view:MainEditorView DataContext="{Binding MetaEditor}" DockPanel.Dock="Top"/>
                 </DockPanel>

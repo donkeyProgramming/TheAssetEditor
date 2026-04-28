@@ -7,6 +7,7 @@
     xmlns:Behaviours="clr-namespace:Shared.Ui.Common.Behaviors;assembly=Shared.Ui"
     xmlns:AudioProjectViewer="clr-namespace:Editors.Audio.AudioEditor.Presentation.AudioProjectViewer"
     xmlns:ValueConverters="clr-namespace:Editors.Audio.AudioEditor.Presentation.AudioProjectViewer.ValueConverters" 
+    xmlns:loc="clr-namespace:Shared.Ui.Common;assembly=Shared.Ui"
     d:DataContext="{d:DesignInstance Type=AudioProjectViewer:AudioProjectViewerViewModel}"
     mc:Ignorable="d" 
     d:DesignHeight="450" d:DesignWidth="800">
@@ -53,7 +54,7 @@
                 Width="70" 
                 VerticalAlignment="Center" 
                 HorizontalAlignment="Left"
-                Content="Edit Row"
+                Content="{loc:Loc AudioProjectViewer.EditRow}"
                 ToolTipService.ShowOnDisabled="True"
                 Command="{Binding EditRowCommand}" 
                 IsEnabled="{Binding IsUpdateRowButtonEnabled}">
@@ -63,11 +64,11 @@
                         <TextBlock 
                             TextWrapping="Wrap">
                             <Run 
-                                Text="Removes the selected row from the Audio Project and adds it to the Audio Project Editor."/>
+                                Text="{loc:Loc AudioProjectViewer.Tooltips.EditRowLine1}"/>
                             <LineBreak/>
                             <LineBreak/>
                             <Run 
-                                Text="Shortcut: Ctrl + E"/>
+                                Text="{loc:Loc AudioProjectViewer.Tooltips.EditRowShortcut}"/>
                         </TextBlock>
                     </ToolTip>
                 </Button.ToolTip>
@@ -79,7 +80,7 @@
                 Width="93" 
                 VerticalAlignment="Center"
                 HorizontalAlignment="Left"
-                Content="Remove Row"
+                Content="{loc:Loc AudioProjectViewer.RemoveRow}"
                 ToolTipService.ShowOnDisabled="True"
                 Command="{Binding RemoveRowCommand}" 
                 IsEnabled="{Binding IsRemoveRowButtonEnabled}">
@@ -88,11 +89,11 @@
                     <ToolTip>
                         <TextBlock TextWrapping="Wrap">
                             <Run 
-                                Text="Removes the selected row(s) from the Audio Project."/>
+                                Text="{loc:Loc AudioProjectViewer.Tooltips.RemoveRowLine1}"/>
                             <LineBreak/>
                             <LineBreak/>
                             <Run 
-                                Text="Shortcuts: Delete / Backspace"/>
+                                Text="{loc:Loc AudioProjectViewer.Tooltips.RemoveRowShortcut}"/>
                         </TextBlock>
                     </ToolTip>
                 </Button.ToolTip>
@@ -125,17 +126,17 @@
                         <Setter.Value>
                             <TextBlock TextWrapping="Wrap">
                                 <Run 
-                                    Text="To edit or remove rows select them."/>
+                                    Text="{loc:Loc AudioProjectViewer.Tooltips.DataGridLine1}"/>
                                 <LineBreak/>
                                 <LineBreak/>
                                 <Run 
-                                    Text="To copy and paste rows (Dialogue Events rows only) select them and right-click or use the shortcuts:"/>
+                                    Text="{loc:Loc AudioProjectViewer.Tooltips.DataGridLine2}"/>
                                 <LineBreak/>
                                 <Run 
-                                    Text="Copy: Ctrl + C"/>
+                                    Text="{loc:Loc AudioProjectViewer.Tooltips.CopyShortcut}"/>
                                 <LineBreak/>
                                 <Run 
-                                    Text="Paste: Ctrl + V"/>
+                                    Text="{loc:Loc AudioProjectViewer.Tooltips.PasteShortcut}"/>
                             </TextBlock>
                         </Setter.Value>
                     </Setter>
@@ -168,12 +169,12 @@
                     DataContext="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource Self}}">
 
                     <MenuItem
-                        Header="Copy"
+                        Header="{loc:Loc AudioProjectViewer.ContextMenu.Copy}"
                         Command="{Binding CopyRowsCommand}"
                         Visibility="{Binding IsContextMenuCopyVisible, Converter={StaticResource BoolToVisibilityConverter}}" />
 
                     <MenuItem
-                        Header="Paste"
+                        Header="{loc:Loc AudioProjectViewer.ContextMenu.Paste}"
                         Command="{Binding PasteRowsCommand}"
                         Visibility="{Binding IsContextMenuPasteVisible, Converter={StaticResource BoolToVisibilityConverter}}" />
                 </ContextMenu>

@@ -102,8 +102,11 @@ namespace AssetEditor.ViewModels
         [RelayCommand] private void TouchedFileRecorderExtract() => _touchedFilesRecorder.ExtractFilesToPack(@"c:\temp\extractedPack.pack");
         [RelayCommand] private void TouchedFileRecorderStop() => _touchedFilesRecorder.Stop();
 
+        public bool IsDebuggerAttached => Debugger.IsAttached;
+
         [RelayCommand] private void ClearConsole() => Console.Clear();
         [RelayCommand] private void PrintScope() => _uiCommandFactory.Create<PrintScopesCommand>().Execute();
+        [RelayCommand] private void PrintTrackedGraphicsResources() => _uiCommandFactory.Create<PrintTrackedGraphicsResourcesCommand>().Execute();
         [RelayCommand] private void Search() => _uiCommandFactory.Create<DeepSearchCommand>().Execute();
         [RelayCommand] private void OpenAttilaPacks() => _uiCommandFactory.Create<OpenGamePackCommand>().Execute(GameTypeEnum.Attila);
         [RelayCommand] private void OpenRomeRemasteredPacks() => _uiCommandFactory.Create<OpenGamePackCommand>().Execute(GameTypeEnum.RomeRemastered);
@@ -121,7 +124,16 @@ namespace AssetEditor.ViewModels
         [RelayCommand] private void OpenKostalynTutorial() => _uiCommandFactory.Create<OpenWebpageCommand>().Execute("https://www.youtube.com/watch?v=AXw99yc74CY");
         [RelayCommand] private void OpenRecolouringModelsTutorial() => _uiCommandFactory.Create<OpenWebpageCommand>().Execute("https://youtu.be/azDq2IRnr1U?si=GammGsisnCzGKYiA");
 
-        [RelayCommand] private void OpenHelp() => _uiCommandFactory.Create<OpenWebpageCommand>().Execute("https://tw-modding.com/index.php/Tutorial:AssetEditor");
+        [RelayCommand]
+        private void OpenHelp()
+        {
+            var appDirectory = AppDomain.CurrentDomain.BaseDirectory;
+            var fullPath = Path.Combine(appDirectory, "Doc", "index.html");
+            Console.WriteLine(fullPath);
+            _uiCommandFactory.Create<OpenWebpageCommand>().Execute(fullPath);
+        }
+        [RelayCommand] private void OpenModdingWiki() => _uiCommandFactory.Create<OpenWebpageCommand>().Execute("https://tw-modding.com/index.php/Tutorial:AssetEditor");
+        
         [RelayCommand] private void OpenPatreon() => _uiCommandFactory.Create<OpenWebpageCommand>().Execute("https://www.patreon.com/TheAssetEditor");
         [RelayCommand] private void OpenDiscord() => _uiCommandFactory.Create<OpenWebpageCommand>().Execute("https://discord.gg/6Djf2sCczC");
         [RelayCommand] private void DownloadRme() => _uiCommandFactory.Create<OpenWebpageCommand>().Execute("https://github.com/mr-phazer/RME_Release/releases/latest");

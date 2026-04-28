@@ -7,10 +7,11 @@
              xmlns:s="http://schemas.singulink.com/xaml"
              xmlns:behaviors="clr-namespace:Shared.Ui.Common.Behaviors;assembly=Shared.Ui"
              xmlns:mathviews="clr-namespace:CommonControls.MathViews;assembly=Shared.Ui"
+               xmlns:loc="clr-namespace:Shared.Ui.Common;assembly=Shared.Ui"
              mc:Ignorable="d" 
              d:DesignHeight="850" d:DesignWidth="800">
     <DockPanel LastChildFill="False">
-        <Label  DockPanel.Dock="Top" Content="Skeleton Editor:" FontSize="18" FontWeight="Bold"/>
+           <Label  DockPanel.Dock="Top" Content="{loc:Loc SkeletonEditor.Title}" FontSize="18" FontWeight="Bold"/>
 
         <Grid DockPanel.Dock="Top" Margin="5,0,5,5">
             <Grid.ColumnDefinitions>
@@ -26,16 +27,16 @@
             </Grid.RowDefinitions>
 
             <CheckBox  Grid.Row="0" Grid.Column="0" IsChecked="{Binding ShowSkeleton, UpdateSourceTrigger=PropertyChanged}" VerticalContentAlignment="Center"/>
-            <Label     Grid.Row="0" Grid.Column="1" Content="Skeleton"/>
+            <Label     Grid.Row="0" Grid.Column="1" Content="{loc:Loc SkeletonEditor.Labels.Skeleton}"/>
             <Label     Grid.Row="0" Grid.Column="2" Content=":"/>
             <TextBlock Grid.Row="0" Grid.Column="3" Text="{Binding SkeletonName, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Center"/>
-            <Button    Grid.Row="0" Grid.Column="4" Content="Load" Click="{s:MethodBinding LoadSkeletonAction}" Margin="1"/>
+            <Button    Grid.Row="0" Grid.Column="4" Content="{loc:Loc SkeletonEditor.Buttons.Load}" Click="{s:MethodBinding LoadSkeletonAction}" Margin="1"/>
 
             <CheckBox  Grid.Row="1" Grid.Column="0" IsChecked="{Binding ShowRefMesh, UpdateSourceTrigger=PropertyChanged}" VerticalContentAlignment="Center"/>
-            <Label     Grid.Row="1" Grid.Column="1" Content="Ref Mesh"/>
+            <Label     Grid.Row="1" Grid.Column="1" Content="{loc:Loc SkeletonEditor.Labels.RefMesh}"/>
             <Label     Grid.Row="1" Grid.Column="2" Content=":"/>
             <TextBlock Grid.Row="1" Grid.Column="3" Text="{Binding RefMeshName, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Center"/>
-            <Button    Grid.Row="1" Grid.Column="4" Content="Load" Click="{s:MethodBinding LoadRefMeshAction}" Margin="1"/>
+            <Button    Grid.Row="1" Grid.Column="4" Content="{loc:Loc SkeletonEditor.Buttons.Load}" Click="{s:MethodBinding LoadRefMeshAction}" Margin="1"/>
 
         </Grid>
 
@@ -69,14 +70,14 @@
                 <ColumnDefinition Width="0.33*"/>
             </Grid.ColumnDefinitions>
 
-            <Button Grid.Column="0" Content="New"  Click="{s:MethodBinding CreateBoneAction}" Margin="0,0,2,0"/>
-            <Button Grid.Column="1" Content="Duplicate"  Click="{s:MethodBinding DuplicateBoneAction}"  Margin="2,0,2,0"/>
-            <Button Grid.Column="2" Content="Delete"  Click="{s:MethodBinding DeleteBoneAction}" Margin="2,0,0,0"/>
-            <Button Grid.Column="3" Content="Copy"  Click="{s:MethodBinding CopyBoneAction}" Margin="2,0,0,0"/>
-            <Button Grid.Column="4" Content="Paste"  Click="{s:MethodBinding PasteBoneAction}" Margin="2,0,0,0"/>
+            <Button Grid.Column="0" Content="{loc:Loc SkeletonEditor.Buttons.New}"  Click="{s:MethodBinding CreateBoneAction}" Margin="0,0,2,0"/>
+            <Button Grid.Column="1" Content="{loc:Loc SkeletonEditor.Buttons.Duplicate}"  Click="{s:MethodBinding DuplicateBoneAction}"  Margin="2,0,2,0"/>
+            <Button Grid.Column="2" Content="{loc:Loc SkeletonEditor.Buttons.Delete}"  Click="{s:MethodBinding DeleteBoneAction}" Margin="2,0,0,0"/>
+            <Button Grid.Column="3" Content="{loc:Loc SkeletonEditor.Buttons.Copy}"  Click="{s:MethodBinding CopyBoneAction}" Margin="2,0,0,0"/>
+            <Button Grid.Column="4" Content="{loc:Loc SkeletonEditor.Buttons.Paste}"  Click="{s:MethodBinding PasteBoneAction}" Margin="2,0,0,0"/>
         </Grid>
 
-        <GroupBox DockPanel.Dock="Top" Margin="5" Header="Settings:">
+        <GroupBox DockPanel.Dock="Top" Margin="5" Header="{loc:Loc SkeletonEditor.SettingsGroupHeader}">
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="auto"/>
@@ -92,11 +93,11 @@
                     <RowDefinition/>
                 </Grid.RowDefinitions>
 
-                <Label      Grid.Row="0" Grid.Column="0" Content="Source Skeleton"/>
+                <Label      Grid.Row="0" Grid.Column="0" Content="{loc:Loc SkeletonEditor.Settings.SourceSkeleton}"/>
                 <Label      Grid.Row="0" Grid.Column="1" Content=":"/>
                 <TextBox    Grid.Row="0" Grid.Column="2" Text="{Binding SourceSkeletonName, UpdateSourceTrigger=LostFocus, Mode=TwoWay}" VerticalContentAlignment="Center" Margin="2"/>
 
-                <Label      Grid.Row="1" Grid.Column="0" Content="Selected Bone Scale"/>
+                <Label      Grid.Row="1" Grid.Column="0" Content="{loc:Loc SkeletonEditor.Settings.SelectedBoneScale}"/>
                 <Label      Grid.Row="1" Grid.Column="1" Content=":"/>
                 <TextBox    Grid.Row="1" Grid.Column="2" Text="{Binding BoneVisualScale, UpdateSourceTrigger=LostFocus, Mode=TwoWay}" VerticalContentAlignment="Center" Margin="2">
                     <b:Interaction.Behaviors>
@@ -104,21 +105,21 @@
                     </b:Interaction.Behaviors>
                 </TextBox>
 
-                <Label      Grid.Row="2" Grid.Column="0" Content="Foucs"/>
+                <Label      Grid.Row="2" Grid.Column="0" Content="{loc:Loc SkeletonEditor.Settings.Focus}"/>
                 <Label      Grid.Row="2" Grid.Column="1" Content=":"/>
-                <Button     Grid.Row="2" Grid.Column="2" Content="Focus selected bone" VerticalContentAlignment="Center"  Click="{s:MethodBinding FocusSelectedBoneAction}" Margin="2"/>
+                <Button     Grid.Row="2" Grid.Column="2" Content="{loc:Loc SkeletonEditor.Buttons.FocusSelectedBone}" VerticalContentAlignment="Center"  Click="{s:MethodBinding FocusSelectedBoneAction}" Margin="2"/>
 
-                <Label      Grid.Row="3" Grid.Column="0" Content="World transforms"/>
+                <Label      Grid.Row="3" Grid.Column="0" Content="{loc:Loc SkeletonEditor.Settings.WorldTransforms}"/>
                 <Label      Grid.Row="3" Grid.Column="1" Content=":"/>
                 <CheckBox   Grid.Row="3" Grid.Column="2" IsChecked="{Binding ShowBonesAsWorldTransform, UpdateSourceTrigger=PropertyChanged}" VerticalContentAlignment="Center"/>
 
-                <Label      Grid.Row="4" Grid.Column="0" Content="Is Tech skeleton"/>
+                <Label      Grid.Row="4" Grid.Column="0" Content="{loc:Loc SkeletonEditor.Settings.IsTechSkeleton}"/>
                 <Label      Grid.Row="4" Grid.Column="1" Content=":"/>
                 <CheckBox   Grid.Row="4" Grid.Column="2" IsChecked="{Binding IsTechSkeleton, UpdateSourceTrigger=PropertyChanged}" VerticalContentAlignment="Center"/>
             </Grid>
         </GroupBox>
 
-        <GroupBox DockPanel.Dock="Top" Margin="5" Header="Selected bone:">
+        <GroupBox DockPanel.Dock="Top" Margin="5" Header="{loc:Loc SkeletonEditor.SelectedBoneGroupHeader}">
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="auto"/>
@@ -133,29 +134,29 @@
                     <RowDefinition Height="auto"/>
                 </Grid.RowDefinitions>
 
-                <Label Grid.Row="0"   Grid.Column="0" Content="Name"/>
+                <Label Grid.Row="0"   Grid.Column="0" Content="{loc:Loc SkeletonEditor.SelectedBone.Name}"/>
                 <Label  Grid.Row="0"  Grid.Column="1" Content=":"/>
                 <TextBox Grid.Row="0"  Grid.Column="2" Text="{Binding SelectedBoneName, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" VerticalContentAlignment="Center" Margin="2"/>
 
-                <Label      Grid.Row="1" Grid.Column="0" Content="Translation"/>
+                <Label      Grid.Row="1" Grid.Column="0" Content="{loc:Loc SkeletonEditor.SelectedBone.Translation}"/>
                 <Label      Grid.Row="1" Grid.Column="1" Content=":"/>
                 <mathviews:Vector3View Grid.Row="1" Grid.Column="3" VerticalContentAlignment="Center" Vector3="{Binding SelectedBoneTranslationOffset, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
 
-                <Label      Grid.Row="2" Grid.Column="0" Content="Rotation"/>
+                <Label      Grid.Row="2" Grid.Column="0" Content="{loc:Loc SkeletonEditor.SelectedBone.Rotation}"/>
                 <Label      Grid.Row="2" Grid.Column="1" Content=":"/>
                 <mathviews:Vector3View Grid.Row="2" Grid.Column="3" VerticalContentAlignment="Center" Vector3="{Binding SelectedBoneRotationOffset, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
 
 
-                <Label      Grid.Row="4" Grid.Column="0" Content="Length Scale"/>
+                <Label      Grid.Row="4" Grid.Column="0" Content="{loc:Loc SkeletonEditor.SelectedBone.LengthScale}"/>
                 <Label      Grid.Row="4" Grid.Column="1" Content=":"/>
                 <DockPanel Grid.Row="4" Grid.Column="2">
-                    <Button Content="Bake" DockPanel.Dock="Right" Width="60"  Click="{s:MethodBinding BakeSkeletonAction}" Margin="2"/>
+                    <Button Content="{loc:Loc SkeletonEditor.Buttons.Bake}" DockPanel.Dock="Right" Width="60"  Click="{s:MethodBinding BakeSkeletonAction}" Margin="2"/>
                     <TextBox Text="{Binding BoneScale, UpdateSourceTrigger=LostFocus, Mode=TwoWay}" VerticalContentAlignment="Center" Margin="2" DockPanel.Dock="Left"/>
                 </DockPanel>
            
             </Grid>
         </GroupBox>
 
-        <Button DockPanel.Dock="Top" Margin="5" Content="Save" Click="{s:MethodBinding SaveSkeletonAction}"/>
+        <Button DockPanel.Dock="Top" Margin="5" Content="{loc:Loc SkeletonEditor.Buttons.Save}" Click="{s:MethodBinding SaveSkeletonAction}"/>
     </DockPanel>
 </UserControl>

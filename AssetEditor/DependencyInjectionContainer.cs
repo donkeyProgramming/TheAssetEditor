@@ -28,6 +28,7 @@ namespace AssetEditor
             serviceCollection.AddTransient<OpenUpdaterWindowCommand>();
             serviceCollection.AddTransient<OpenWebpageCommand>();
             serviceCollection.AddTransient<PrintScopesCommand>();
+            serviceCollection.AddTransient<PrintTrackedGraphicsResourcesCommand>();
             serviceCollection.AddTransient<OpenEditorCommand>();
             serviceCollection.AddTransient<TogglePackFileExplorerCommand>();
 
@@ -42,6 +43,7 @@ namespace AssetEditor
             serviceCollection.AddSingleton<RecentFilesTracker>();
 
             serviceCollection.AddScoped<IExceptionInformationProvider, CurrentEditorExceptionInfoProvider>();
+
 
             RegisterAllAsInterface<IDeveloperConfiguration>(serviceCollection, ServiceLifetime.Transient);
         }

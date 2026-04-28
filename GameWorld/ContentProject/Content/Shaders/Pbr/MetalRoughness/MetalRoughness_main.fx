@@ -48,7 +48,6 @@ GBufferMaterial GetMaterial(in PixelInputType input)
         float4 glossTexSample = GlossTexture.Sample(SampleType, texCord);
         material.metalness = (glossTexSample.r);
         material.roughness = (glossTexSample.g);
-
     }
     
     if (UseNormal)
@@ -97,6 +96,9 @@ float4 DefaultPixelShader(in PixelInputType input, bool bIsFrontFace : SV_IsFron
     
     //  Light the pixel...    
     float3 hdr_linear_col = standard_lighting_model_directional_light(get_sun_colour() * unchartedSunFactor, rotatedNormalizedLightDirection, normalizedViewDirection, slm_uncompressed);
+
+    // Apply global constant light colour so the scene lighting can be globally tuned
+    hdr_linear_col *= Constant_LightColour;
 
     //  Tone-map the pixel...            
     //float3 ldr_linear_col = saturate(tone_map_linear_hdr_to_linear_ldr_reinhard(hdr_linear_col));    

@@ -1,5 +1,4 @@
-﻿using System;
-using Editors.KitbasherEditor.UiCommands;
+﻿using Editors.KitbasherEditor.ChildEditors.SaveDialog;
 using Editors.KitbasherEditor.ViewModels;
 using GameWorld.Core.Rendering.Materials.Capabilities;
 using GameWorld.Core.Rendering.Materials.Shaders.SpecGloss;
@@ -74,6 +73,7 @@ namespace Test.KitbashEditor.LoadAndSave
             // Edit the save settings and trigger a save
             var saveSettings = runner.GetRequiredServiceInCurrentEditorScope<GeometrySaveSettings>();
             saveSettings.IsUserInitialized = true;
+            saveSettings.DisplayDialogOnNextSave = false;
 
             var toolCommandFactory = runner.GetRequiredServiceInCurrentEditorScope<IUiCommandFactory>();
             var saveResult = toolCommandFactory.Create<SaveCommand>().ExecuteWithResult();

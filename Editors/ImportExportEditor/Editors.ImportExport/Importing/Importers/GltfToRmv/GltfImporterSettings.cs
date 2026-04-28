@@ -7,7 +7,7 @@ namespace Editors.ImportExport.Importing.Importers.GltfToRmv
     (
         string InputGltfFile,
         string DestinationPackPath,
-        PackFileContainer DestinationPackFileContainer,
+        IPackFileContainer DestinationPackFileContainer,
         GameTypeEnum SelectedGame,
         bool ImportMeshes,        
         bool ImportMaterials,

@@ -5,9 +5,10 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:Editors.Shared.Core.Editors.BoneMapping.View"
              mc:Ignorable="d" 
-                          xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
+             xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
              xmlns:s="http://schemas.singulink.com/xaml"
              xmlns:behaviors="clr-namespace:Shared.Ui.Common.Behaviors;assembly=Shared.Ui"
+             xmlns:loc="clr-namespace:Shared.Ui.Common;assembly=Shared.Ui"
              xmlns:mathviews="clr-namespace:CommonControls.MathViews;assembly=Shared.Ui" xmlns:view="clr-namespace:Editors.Shared.Core.Editors.BoneMapping.View"
              d:DesignHeight="450" d:DesignWidth="800">
     <Grid Visibility="{Binding ShowTransformSection.Value, UpdateSourceTrigger=PropertyChanged , Converter={StaticResource BoolToCollapsedConverter}}">
@@ -34,7 +35,7 @@
 
         <Border Grid.Row="0" Grid.ColumnSpan="4" Background="Gray" BorderThickness="2" />
 
-        <TextBlock Grid.Row="1" Grid.Column="0" Text="Root scale"/>
+        <TextBlock Grid.Row="1" Grid.Column="0" Text="{loc:Loc KitbasherTool.BoneMapping.RootScale}"/>
         <TextBlock Grid.Row="1" Grid.Column="1" Text=":"/>
         <TextBox Grid.Row="1" Grid.Column="2"  Width="116" Text="{Binding ScaleFactor.TextValue, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" VerticalContentAlignment="Center" HorizontalAlignment="Left" Margin="2" >
             <b:Interaction.Behaviors>
@@ -42,37 +43,37 @@
             </b:Interaction.Behaviors>
         </TextBox>
 
-        <TextBlock Grid.Row="2" Grid.Column="0" Text="Only move selected bone "/>
+        <TextBlock Grid.Row="2" Grid.Column="0" Text="{loc:Loc KitbasherTool.BoneMapping.OnlyMoveSelectedBone}"/>
         <TextBlock Grid.Row="2" Grid.Column="1" Text=":"/>
         <CheckBox Grid.Row="2" Grid.Column="2" IsChecked="{Binding OnlyMOveSelectedBone.Value, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" IsEnabled="False"/>
 
-        <TextBlock Grid.Row="3" Grid.Column="0" Text="Relative Scale:"/>
+        <TextBlock Grid.Row="3" Grid.Column="0" Text="{loc:Loc KitbasherTool.BoneMapping.RelativeScale}"/>
         <TextBlock Grid.Row="3" Grid.Column="1" Text=":"/>
         <CheckBox Grid.Row="3" Grid.Column="2" IsChecked="{Binding RelativeScale.Value, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
 
-        <TextBlock Grid.Row="4" Grid.Column="0" Text="Display offset"/>
+        <TextBlock Grid.Row="4" Grid.Column="0" Text="{loc:Loc KitbasherTool.BoneMapping.DisplayOffset}"/>
         <TextBlock Grid.Row="4" Grid.Column="1" Text=":"/>
         <mathviews:Vector3View Grid.Row="4" Grid.Column="2" Width="350" VerticalContentAlignment="Center" Vector3="{Binding SkeletonDisplayOffset, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" Margin="2" HorizontalAlignment="Left"/>
 
         <Border Grid.Row="5" Grid.ColumnSpan="3" Background="Gray" BorderThickness="2"/>
 
-        <TextBlock Grid.Row="6" Grid.Column="0" Text="Pos offset"/>
+        <TextBlock Grid.Row="6" Grid.Column="0" Text="{loc:Loc KitbasherTool.BoneMapping.PositionOffset}"/>
         <TextBlock Grid.Row="6" Grid.Column="1" Text=":"/>
         <mathviews:Vector3View Grid.Row="6" Grid.Column="2" Width="350" VerticalContentAlignment="Center" Vector3="{Binding BonePositionOffset, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" Margin="2" HorizontalAlignment="Left" IsEnabled="{Binding IsBoneSelected.Value, UpdateSourceTrigger=PropertyChanged}"/>
 
-        <TextBlock Grid.Row="7" Grid.Column="0" Text="Rot offset"/>
+        <TextBlock Grid.Row="7" Grid.Column="0" Text="{loc:Loc KitbasherTool.BoneMapping.RotationOffset}"/>
         <TextBlock Grid.Row="7" Grid.Column="1" Text=":"/>
         <mathviews:Vector3View Grid.Row="7" Grid.Column="2" Width="350" VerticalContentAlignment="Center" Vector3="{Binding BoneRotationOffset, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" Margin="2" HorizontalAlignment="Left" IsEnabled="{Binding IsBoneSelected.Value, UpdateSourceTrigger=PropertyChanged}"/>
 
-        <TextBlock Grid.Row="8" Grid.Column="0" Text="Scale"/>
+        <TextBlock Grid.Row="8" Grid.Column="0" Text="{loc:Loc KitbasherTool.BoneMapping.Scale}"/>
         <TextBlock Grid.Row="8" Grid.Column="1" Text=":"/>
         <TextBox Grid.Row="8" Grid.Column="2"  Width="116" Text="{Binding BoneScaleFactor.TextValue, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" VerticalContentAlignment="Center" HorizontalAlignment="Left" Margin="2" IsEnabled="{Binding IsBoneSelected.Value, UpdateSourceTrigger=PropertyChanged}">
             <b:Interaction.Behaviors>
                 <behaviors:TextBoxInputBehavior InputMode="DecimalInput"/>
             </b:Interaction.Behaviors>
         </TextBox>
-        <Button Grid.Row="8" Grid.Column="3" HorizontalAlignment="Left" Content="Copy to children"  Click="{s:MethodBinding CopyScaleToChildren}"/>
+        <Button Grid.Row="8" Grid.Column="3" HorizontalAlignment="Left" Content="{loc:Loc KitbasherTool.BoneMapping.CopyToChildren}"  Click="{s:MethodBinding CopyScaleToChildren}"/>
 
-        <Button Grid.Row="9" Grid.Column="2" Content="Reset offsets" Margin="2" Click="{s:MethodBinding ResetOffsetTransforms}"/>
+        <Button Grid.Row="9" Grid.Column="2" Content="{loc:Loc KitbasherTool.BoneMapping.ResetOffsets}" Margin="2" Click="{s:MethodBinding ResetOffsetTransforms}"/>
     </Grid>
 </UserControl>

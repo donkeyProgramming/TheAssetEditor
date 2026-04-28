@@ -125,9 +125,9 @@ namespace CommonControls.Editors.AnimationBatchExporter
 
         public class PackFileListItem
         {
-            public PackFileContainer Container { get; private set; }
+            public IPackFileContainer Container { get; private set; }
 
-            public PackFileListItem(PackFileContainer item)
+            public PackFileListItem(IPackFileContainer item)
             {
                 Name.Value = item.Name;
                 Container = item;

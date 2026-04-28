@@ -8,6 +8,7 @@
     xmlns:Models="clr-namespace:Editors.Audio.AudioEditor.Presentation.Shared.Models"
     xmlns:Controls="clr-namespace:Editors.Audio.AudioEditor.Presentation.Shared.Controls"
     xmlns:AudioFilesExplorer="clr-namespace:Editors.Audio.AudioEditor.Presentation.AudioFilesExplorer"
+    xmlns:loc="clr-namespace:Shared.Ui.Common;assembly=Shared.Ui"
     d:DataContext="{d:DesignInstance Type=AudioFilesExplorer:AudioFilesExplorerViewModel}"
     mc:Ignorable="d"
     d:DesignHeight="250" 
@@ -56,16 +57,16 @@
                 Width="180" 
                 VerticalAlignment="Center" 
                 HorizontalAlignment="Left"
-                Content="Toggle Collapse / Expand Tree" 
-                ToolTip="Collapse / expand the tree." 
+                Content="{loc:Loc AudioFilesExplorer.ToggleCollapseExpandTree}" 
+                ToolTip="{loc:Loc AudioFilesExplorer.Tooltips.CollapseExpandTree}" 
                 Command="{Binding CollapseOrExpandTreeCommand}"/>
 
             <Button 
                 Grid.Column="1"
                 Margin="5, 0, 0, 0" 
                 Width="100" 
-                Content="Set Audio Files" 
-                ToolTip="Set the selected audio files as the audio files in the Settings."
+                Content="{loc:Loc AudioFilesExplorer.SetAudioFiles}" 
+                ToolTip="{loc:Loc AudioFilesExplorer.Tooltips.SetAudioFiles}"
                 ToolTipService.ShowOnDisabled="True"
                 Command="{Binding SetAudioFilesCommand}" 
                 VerticalAlignment="Center" 
@@ -76,8 +77,8 @@
                 Grid.Column="2"
                 Margin="5, 0, 0, 0" 
                 Width="120" 
-                Content="Add to Audio Files" 
-                ToolTip="Add the selected audio files to the audio files already set in the Settings."
+                Content="{loc:Loc AudioFilesExplorer.AddToAudioFiles}" 
+                ToolTip="{loc:Loc AudioFilesExplorer.Tooltips.AddToAudioFiles}"
                 ToolTipService.ShowOnDisabled="True"
                 Command="{Binding AddToAudioFilesCommand}" 
                 VerticalAlignment="Center" 
@@ -110,7 +111,7 @@
                         KeyboardNavigation.IsTabStop="True"
                         HorizontalAlignment="Stretch" Padding="2.5, 0, 0, 0"  Height="24" VerticalContentAlignment="Center" 
                         Text="{Binding FilterQuery, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay, Delay=350}"
-                        Tag="Search Audio Files Explorer">
+                        Tag="{loc:Loc AudioFilesExplorer.SearchTag}">
                     </TextBox>
 
                     <Button 

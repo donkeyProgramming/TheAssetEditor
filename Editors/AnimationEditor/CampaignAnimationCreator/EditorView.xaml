@@ -5,6 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:AnimationEditor.CampaignAnimationCreator"
               xmlns:s="http://schemas.singulink.com/xaml"
+             xmlns:loc="clr-namespace:Shared.Ui.Common;assembly=Shared.Ui"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <Grid>
@@ -20,7 +21,7 @@
             <RowDefinition Height="auto"/>
         </Grid.RowDefinitions>
 
-        <Label Grid.Column="0" Grid.Row="0" Content="Root bone"/>
+        <Label Grid.Column="0" Grid.Row="0" Content="{loc:Loc CampaignAnimationCreator.RootBone}"/>
         <Label Grid.Column="1" Grid.Row="0" Content=":"/>
         <ComboBox Grid.Column="2" Grid.ColumnSpan="2" Grid.Row="0" 
                           IsEditable="True"
@@ -29,7 +30,7 @@
                           Text="{Binding ModelBoneList.Filter, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" 
                           ItemsSource="{Binding ModelBoneList.Values}" 
                           SelectedItem="{Binding ModelBoneList.SelectedItem, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
-        <Button Grid.Row="1" Grid.ColumnSpan="3"  Content="Convert" Margin="5" Click="{s:MethodBinding Convert}" />
-        <Button Grid.Row="2" Grid.ColumnSpan="3"  Content="Save" Margin="5" Click="{s:MethodBinding SaveAnimation}" />
+        <Button Grid.Row="1" Grid.ColumnSpan="3"  Content="{loc:Loc CampaignAnimationCreator.Buttons.Convert}" Margin="5" Click="{s:MethodBinding Convert}" />
+        <Button Grid.Row="2" Grid.ColumnSpan="3"  Content="{loc:Loc CampaignAnimationCreator.Buttons.Save}" Margin="5" Click="{s:MethodBinding SaveAnimation}" />
     </Grid>
 </UserControl>

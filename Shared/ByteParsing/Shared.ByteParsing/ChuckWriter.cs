@@ -9,6 +9,8 @@ namespace Shared.ByteParsing
         public void Write<T>(T value, SpesificByteParser<T> parser)
         {
             var bytes = parser.EncodeValue(value, out _);
+            if (bytes == null)
+                throw new Exception($"Unable to encode value using parser {parser.TypeName}");
             _bytes.AddRange(bytes);
         }
 

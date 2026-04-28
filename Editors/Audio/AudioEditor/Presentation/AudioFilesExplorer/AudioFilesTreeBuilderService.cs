@@ -9,12 +9,12 @@ namespace Editors.Audio.AudioEditor.Presentation.AudioFilesExplorer
 {
     public interface IAudioFilesTreeBuilderService
     {
-        ObservableCollection<AudioFilesTreeNode> BuildTree(PackFileContainer editablePack);
+        ObservableCollection<AudioFilesTreeNode> BuildTree(IPackFileContainer editablePack);
     }
 
     public class AudioFilesTreeBuilderService() : IAudioFilesTreeBuilderService
     {
-        public ObservableCollection<AudioFilesTreeNode> BuildTree(PackFileContainer editablePack)
+        public ObservableCollection<AudioFilesTreeNode> BuildTree(IPackFileContainer editablePack)
         {
             var wavFilePaths = editablePack.FileList
                 .Where(x => x.Key.EndsWith(".wav", StringComparison.OrdinalIgnoreCase))

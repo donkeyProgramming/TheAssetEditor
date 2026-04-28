@@ -6,6 +6,7 @@
              xmlns:behaviors="clr-namespace:Shared.Ui.Common.Behaviors;assembly=Shared.Ui"
              xmlns:s="http://schemas.singulink.com/xaml" 
              xmlns:texteditor="clr-namespace:CommonControls.Editors.TextEditor;assembly=Editors.Shared.Core"
+             xmlns:loc="clr-namespace:Shared.Ui.Common;assembly=Shared.Ui"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <Grid>
@@ -22,13 +23,13 @@
         <!-- File Menu -->
         <DockPanel Grid.Column="0" Grid.ColumnSpan="3" Grid.Row="0">
             <Menu DockPanel.Dock="Top">
-                <MenuItem Header="_File">
-                    <MenuItem Header="Save" Command="{Binding SaveActionCommand}"/>
+                <MenuItem Header="{loc:Loc AnimationPack.Menu.File}">
+                    <MenuItem Header="{loc:Loc AnimationPack.Menu.Save}" Command="{Binding SaveActionCommand}"/>
                     <Separator/>
-                    <MenuItem Header="New AnimationSet (Wh3/3K)"  Command="{Binding CreateEmptyWarhammer3AnimSetFileActionCommand}" />
+                    <MenuItem Header="{loc:Loc AnimationPack.Menu.NewAnimationSetWh3Or3k}"  Command="{Binding CreateEmptyWarhammer3AnimSetFileActionCommand}" />
                     <Separator/>
-                    <MenuItem Header="Export animation slots (Wh3)"  Command="{Binding ExportAnimationSlotsWh3ActionCommand}" />
-                    <MenuItem Header="Export animation slots (Wh2)"  Command="{Binding ExportAnimationSlotsWh2ActionCommand}" />
+                    <MenuItem Header="{loc:Loc AnimationPack.Menu.ExportAnimationSlotsWh3}"  Command="{Binding ExportAnimationSlotsWh3ActionCommand}" />
+                    <MenuItem Header="{loc:Loc AnimationPack.Menu.ExportAnimationSlotsWh2}"  Command="{Binding ExportAnimationSlotsWh2ActionCommand}" />
                 </MenuItem>
             </Menu>
         </DockPanel>
@@ -42,7 +43,7 @@
 
             <TextBox Grid.Row="0" 
                      Text="{Binding AnimationPackItems.Filter, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
-                     behaviors:TextBoxExtensions.Watermark="Filter, Regex">
+                     behaviors:TextBoxExtensions.Watermark="{loc:Loc AnimationPack.FilterWatermark}">
                 <TextBox.Style>
                     <Style TargetType="{x:Type TextBox}">
                         <Setter Property="Background" Value="White"/>
@@ -70,9 +71,9 @@
 
                 <ListView.ContextMenu>
                     <ContextMenu>
-                        <MenuItem Header="Rename" Command="{Binding RenameActionCommand}" />
-                        <MenuItem Header="Remove" Command="{Binding RemoveActionCommand}"/>
-                        <MenuItem Header="Copy Full Path" Command="{Binding CopyFullPathActionCommand}"/>
+                        <MenuItem Header="{loc:Loc AnimationPack.ContextMenu.Rename}" Command="{Binding RenameActionCommand}" />
+                        <MenuItem Header="{loc:Loc AnimationPack.ContextMenu.Remove}" Command="{Binding RemoveActionCommand}"/>
+                        <MenuItem Header="{loc:Loc AnimationPack.ContextMenu.CopyFullPath}" Command="{Binding CopyFullPathActionCommand}"/>
                     </ContextMenu>
                 </ListView.ContextMenu>
 

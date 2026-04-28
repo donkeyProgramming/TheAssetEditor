@@ -154,10 +154,5 @@ namespace Editors.KitbasherEditor.ChildEditors.VertexDebugger
 
             _logger.Here().Information(str);    
         }
-
-        void GetMinMaxUv()
-        { 
-        
-        }
     }
 }

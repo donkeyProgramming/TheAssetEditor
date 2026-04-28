@@ -4,6 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:Editors.Audio.AudioEditor.Presentation.WaveformVisualiser" 
+             xmlns:loc="clr-namespace:Shared.Ui.Common;assembly=Shared.Ui"
              d:DataContext="{d:DesignInstance Type=local:WaveformVisualiserViewModel}"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
@@ -72,7 +73,7 @@
                 HorizontalAlignment="Center"
                 VerticalAlignment="Bottom"
                 Width="70"
-                Content="Play" 
+                Content="{loc:Loc WaveformVisualiser.Play}" 
                 Command="{Binding PlayPauseCommand}"/>
 
             <Grid

@@ -271,6 +271,8 @@ namespace Shared.GameFormats.RigidModel.MaterialHeaders
                 TexturesParams = [],
             };
 
+            material.OriginalTransform = RmvTransform.CreateIdentity();
+
             return material;
         }
 
