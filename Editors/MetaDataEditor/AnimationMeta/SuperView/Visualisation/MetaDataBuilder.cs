@@ -1,4 +1,4 @@
-﻿using System.Data;
+using System.Data;
 using Editors.AnimationMeta.SuperView.Visualisation.Instances;
 using Editors.AnimationMeta.SuperView.Visualisation.Rules;
 using Editors.Shared.Core.Common;
