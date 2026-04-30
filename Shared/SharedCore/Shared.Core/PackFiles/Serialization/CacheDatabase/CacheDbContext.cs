@@ -25,6 +25,7 @@ namespace Shared.Core.PackFiles.Serialization.CacheDatabase
                 entity.HasKey(e => e.Id);
                 entity.HasIndex(e => e.RelativePath).IsUnique();
                 entity.HasIndex(e => e.Extension);
+                entity.HasIndex(e => e.FolderPath);
             });
         }
     }
@@ -45,6 +46,7 @@ namespace Shared.Core.PackFiles.Serialization.CacheDatabase
         public string RelativePath { get; set; } = "";
         public string FileName { get; set; } = "";
         public string Extension { get; set; } = "";
+        public string FolderPath { get; set; } = "";
         public string SourcePackFilePath { get; set; } = "";
         public long Offset { get; set; }
         public long Size { get; set; }

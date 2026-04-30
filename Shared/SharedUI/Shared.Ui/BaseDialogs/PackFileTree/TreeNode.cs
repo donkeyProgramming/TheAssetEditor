@@ -190,7 +190,9 @@ namespace Shared.Ui.BaseDialogs.PackFileTree
                 return newNode;
             }
 
+            _source.EnsureChildrenPopulated();
             var sourceNode = new TreeNodeSource(name, NodeType.Directory, FileOwner, _source);
+            sourceNode.MarkChildrenLoaded();
             _source.AddChild(sourceNode);
 
             if (HasMaterializedChildren || IsNodeExpanded || (_isFilterActive?.Invoke() ?? false))
@@ -231,7 +233,12 @@ namespace Shared.Ui.BaseDialogs.PackFileTree
 
         internal void EnsureChildrenLoaded()
         {
-            if (_source == null || !_source.HasChildren || _nodeFactory == null)
+            if (_source == null || _nodeFactory == null)
+                return;
+
+            _source.EnsureChildrenPopulated();
+
+            if (!_source.HasChildren)
                 return;
 
             var existingChildren = Children

@@ -26,6 +26,41 @@ namespace Shared.Core.PackFiles.Models.Containers
 
         public Dictionary<string, PackFile> GetAllFiles() => FileList;
 
+        public DirectoryContent GetDirectoryContent(string directoryPath)
+        {
+            var prefix = string.IsNullOrEmpty(directoryPath) ? "" : directoryPath + "\\";
+            var prefixLength = prefix.Length;
+            var subFolders = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            var files = new List<(string FileName, PackFile File)>();
+
+            foreach (var (path, packFile) in FileList)
+            {
+                if (prefixLength > 0 && !path.StartsWith(prefix, StringComparison.OrdinalIgnoreCase))
+                    continue;
+                if (prefixLength == 0 && path.Length == 0)
+                    continue;
+
+                var remainder = path.AsSpan(prefixLength);
+                var separatorIndex = remainder.IndexOf(Path.DirectorySeparatorChar);
+
+                if (separatorIndex == -1)
+                {
+                    files.Add((packFile.Name, packFile));
+                }
+                else
+                {
+                    var folderName = remainder.Slice(0, separatorIndex).ToString();
+                    subFolders.Add(folderName);
+                }
+            }
+
+            return new DirectoryContent
+            {
+                SubFolders = subFolders.OrderBy(x => x, StringComparer.CurrentCultureIgnoreCase).ToList(),
+                Files = files.OrderBy(x => x.FileName, StringComparer.CurrentCultureIgnoreCase).ToList()
+            };
+        }
+
         public List<(string FileName, PackFile Pack)> FindAllWithExtention(string extention)
         {
             extention = extention.ToLower();

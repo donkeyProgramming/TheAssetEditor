@@ -89,6 +89,74 @@ namespace Shared.Core.PackFiles.Models.Containers
         public void AddOrUpdateFile(string path, PackFile file) =>
             throw new InvalidOperationException("Cannot modify a cached CA pack file container.");
 
+        public DirectoryContent GetDirectoryContent(string directoryPath)
+        {
+            using var db = new CacheDbContext(_dbOptions);
+
+            // Get files directly in this folder
+            var filesInDir = db.Files.AsNoTracking()
+                .Where(f => f.FolderPath == directoryPath)
+                .Select(f => new { f.FileName, f.SourcePackFilePath, f.Offset, f.Size, f.IsEncrypted, f.IsCompressed, f.CompressionFormat, f.UncompressedSize })
+                .ToList();
+
+            var files = filesInDir
+                .Select(f =>
+                {
+                    var parent = new PackedFileSourceParent { FilePath = f.SourcePackFilePath };
+                    var source = new PackedFileSource(parent, f.Offset, f.Size, f.IsEncrypted, f.IsCompressed, (Utility.CompressionFormat)f.CompressionFormat, f.UncompressedSize);
+                    return (f.FileName, File: new PackFile(f.FileName, source));
+                })
+                .OrderBy(x => x.FileName, StringComparer.CurrentCultureIgnoreCase)
+                .ToList();
+
+            // Get immediate subfolders
+            var prefix = string.IsNullOrEmpty(directoryPath) ? "" : directoryPath + "\\";
+            var prefixLen = prefix.Length;
+
+            List<string> subFolders;
+            if (string.IsNullOrEmpty(directoryPath))
+            {
+                // Root level: get distinct first path segment from all FolderPaths
+                subFolders = db.Files.AsNoTracking()
+                    .Where(f => f.FolderPath != "")
+                    .Select(f => f.FolderPath)
+                    .Distinct()
+                    .AsEnumerable()
+                    .Select(fp =>
+                    {
+                        var sepIdx = fp.IndexOf('\\');
+                        return sepIdx == -1 ? fp : fp.Substring(0, sepIdx);
+                    })
+                    .Distinct(StringComparer.OrdinalIgnoreCase)
+                    .OrderBy(x => x, StringComparer.CurrentCultureIgnoreCase)
+                    .ToList();
+            }
+            else
+            {
+                // Non-root: get distinct next segment from FolderPaths that start with prefix
+                subFolders = db.Files.AsNoTracking()
+                    .Where(f => f.FolderPath.StartsWith(prefix))
+                    .Select(f => f.FolderPath)
+                    .Distinct()
+                    .AsEnumerable()
+                    .Select(fp =>
+                    {
+                        var remainder = fp.Substring(prefixLen);
+                        var sepIdx = remainder.IndexOf('\\');
+                        return sepIdx == -1 ? remainder : remainder.Substring(0, sepIdx);
+                    })
+                    .Distinct(StringComparer.OrdinalIgnoreCase)
+                    .OrderBy(x => x, StringComparer.CurrentCultureIgnoreCase)
+                    .ToList();
+            }
+
+            return new DirectoryContent
+            {
+                SubFolders = subFolders,
+                Files = files
+            };
+        }
+
         public List<PackFile> AddFiles(List<NewPackFileEntry> newFiles) =>
             throw new InvalidOperationException("Cannot modify a cached CA pack file container.");
 

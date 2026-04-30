@@ -105,9 +105,12 @@ namespace Shared.Core.PackFiles.Utility
                 var fingerprint = PackFileContainerCacheHelper.ComputeFingerprint(gameDataFolder, allCaPackFiles);
                 var cacheFilePath = PackFileContainerCacheHelper.GetCacheFilePath(gameDataFolder, gameName, fingerprint);
 
-                var cached = TryLoadFromCache(cacheFilePath, fingerprint, gameName);
+                var cached = PackFileContainerCacheHelper.TryLoadFromCache(cacheFilePath, fingerprint);
                 if (cached != null)
+                {
+                    _logger.Here().Information($"Loading CA packs for {gameName} from cache: {cacheFilePath}");
                     return cached;
+                }
 
                 var container = LoadAllCaFilesFromDisk(gameDataFolder, gameName, allCaPackFiles, manifestFileFound);
 
@@ -131,23 +134,7 @@ namespace Shared.Core.PackFiles.Utility
             }
         }
 
-        private CachedPackFileContainer? TryLoadFromCache(string cacheFilePath, string fingerprint, string gameName)
-        {
-            try
-            {
-                var container = PackFileContainerCacheHelper.LoadContainerFromCache(cacheFilePath, fingerprint);
-                if (container != null)
-                {
-                    _logger.Here().Information($"Loading CA packs for {gameName} from cache: {cacheFilePath}");
-                    return container;
-                }
-            }
-            catch (Exception ex)
-            {
-                _logger.Here().Warning($"Failed to read CA pack cache for {gameName}, will rebuild: {ex.Message}");
-            }
-            return null;
-        }
+
 
         private PackFileContainer LoadAllCaFilesFromDisk(string gameDataFolder, string gameName, List<string> allCaPackFiles, bool manifestFileFound)
         {

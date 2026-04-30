@@ -62,6 +62,14 @@ namespace Shared.Ui.BaseDialogs.PackFileTree
             }
 
             var rootSources = _sourceRootsFactory().ToList();
+
+            // Force-populate all source children when an active filter requires full traversal
+            if (HasActiveFilter)
+            {
+                foreach (var item in rootSources)
+                    item.EnsureFullyPopulated();
+            }
+
             foreach (var item in rootSources)
                 HasChildWithFilterMatch(item, expression);
 

@@ -1,27 +1,22 @@
 ﻿using System.Security.Cryptography;
 using System.Text;
 using Microsoft.EntityFrameworkCore;
-using Shared.Core.PackFiles.Models;
+using Shared.Core.ErrorHandling;
+using Shared.Core.Misc;
 using Shared.Core.PackFiles.Models.Containers;
 using Shared.Core.PackFiles.Models.FileSources;
 using Shared.Core.PackFiles.Serialization.CacheDatabase;
-using Shared.Core.PackFiles.Utility;
+using SharpDX.Direct3D9;
 
 namespace Shared.Core.PackFiles.Serialization
 {
     internal static class PackFileContainerCacheHelper
     {
+        private static readonly ILogger _logger = Logging.CreateStatic(typeof(PackFileContainerCacheHelper));
         public static string GetCacheFilePath(string gameDataFolder, string gameName, string cacheId)
         {
-            var cacheDir = Path.Combine(
-                Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-                "AssetEditor",
-                "Cache");
-
-            Directory.CreateDirectory(cacheDir);
-
             var safeGameName = string.Join("_", gameName.Split(Path.GetInvalidFileNameChars()));
-            return Path.Combine(cacheDir, $"CachedGameFiles_{safeGameName}_{cacheId}.db");
+            return Path.Combine(DirectoryHelper.CacheDirectory, $"CachedGameFiles_{safeGameName}_{cacheId}.db");
         }
 
         public static string ComputeFingerprint(string gameDataFolder, List<string> packFileNames)
@@ -65,10 +60,11 @@ namespace Shared.Core.PackFiles.Serialization
                 .Options;
         }
 
-        private const int CurrentSchemaVersion = 2;
+        private const int CurrentSchemaVersion = 3;
 
         public static void SaveCache(string fingerprint, PackFileContainer container, DbContextOptions<CacheDbContext> dbOptions)
         {
+            _logger.Here().Information($"Saving cache for '{container.Name}' with {container.GetFileCount()} files");
             using var db = new CacheDbContext(dbOptions);
             db.Database.EnsureDeleted();
             db.Database.EnsureCreated();
@@ -88,11 +84,15 @@ namespace Shared.Core.PackFiles.Serialization
             {
                 if (packFile.DataSource is PackedFileSource source)
                 {
+                    var lastSep = relativePath.LastIndexOf(Path.DirectorySeparatorChar);
+                    var folderPath = lastSep == -1 ? "" : relativePath.Substring(0, lastSep);
+
                     db.Files.Add(new CachedFileEntity
                     {
                         RelativePath = relativePath,
                         FileName = packFile.Name,
                         Extension = Path.GetExtension(relativePath).ToLower(),
+                        FolderPath = folderPath,
                         SourcePackFilePath = source.Parent.FilePath,
                         Offset = source.Offset,
                         Size = source.Size,
@@ -104,13 +104,18 @@ namespace Shared.Core.PackFiles.Serialization
                 }
             }
 
+            _logger.Here().Information($"Starting to save cache for '{container.Name}'");
             db.SaveChanges();
+            _logger.Here().Information($"Cache saved successfully for '{container.Name}'");
         }
 
         public static CachedPackFileContainer? LoadContainerFromCache(string dbFilePath, string expectedFingerprint)
         {
             if (!File.Exists(dbFilePath))
+            {
+                _logger.Here().Information($"No cache file found at '{dbFilePath}'");
                 return null;
+            }
 
             var dbOptions = CreateDbOptions(dbFilePath);
             return LoadContainerFromCache(dbOptions, expectedFingerprint);
@@ -124,8 +129,9 @@ namespace Shared.Core.PackFiles.Serialization
             {
                 db.Database.EnsureCreated();
             }
-            catch
+            catch (Exception ex)
             {
+                _logger.Here().Warning($"Failed to open cache database: {ex.Message}");
                 return null;
             }
 
@@ -134,13 +140,17 @@ namespace Shared.Core.PackFiles.Serialization
             {
                 cacheInfo = db.CacheInfo.FirstOrDefault();
             }
-            catch
+            catch (Exception ex)
             {
+                _logger.Here().Warning($"Failed to read cache info: {ex.Message}");
                 return null;
             }
 
             if (cacheInfo == null || cacheInfo.SchemaVersion != CurrentSchemaVersion || cacheInfo.Fingerprint != expectedFingerprint)
+            {
+                _logger.Here().Information($"Cache invalid - schema:{cacheInfo?.SchemaVersion} (expected {CurrentSchemaVersion}), fingerprint match:{cacheInfo?.Fingerprint == expectedFingerprint}");
                 return null;
+            }
 
             var container = new CachedPackFileContainer(cacheInfo.ContainerName, dbOptions)
             {
@@ -153,7 +163,21 @@ namespace Shared.Core.PackFiles.Serialization
                     container.SourcePackFilePaths.Add(path);
             }
 
+            _logger.Here().Information($"Loaded container '{container.Name}' from cache");
             return container;
+        }
+
+        public static CachedPackFileContainer? TryLoadFromCache(string cacheFilePath, string fingerprint)
+        {
+            try
+            {
+                return LoadContainerFromCache(cacheFilePath, fingerprint);
+            }
+            catch (Exception ex)
+            {
+                _logger.Here().Warning($"Failed to load from cache '{cacheFilePath}': {ex.Message}");
+                return null;
+            }
         }
     }
 }
