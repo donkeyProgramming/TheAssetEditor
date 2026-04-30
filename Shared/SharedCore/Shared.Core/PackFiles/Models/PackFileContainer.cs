@@ -23,6 +23,8 @@ namespace Shared.Core.PackFiles.Models
             FileList[lowerPath] = file;
         }
 
+        public Dictionary<string, PackFile> GetAllFiles() => FileList;
+
         public List<(string FileName, PackFile Pack)> FindAllWithExtention(string extention)
         {
             extention = extention.ToLower();
