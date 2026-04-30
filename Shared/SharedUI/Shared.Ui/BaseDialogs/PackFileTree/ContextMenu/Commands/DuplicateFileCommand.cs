@@ -1,6 +1,7 @@
 ﻿using System.IO;
 using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
+using Shared.Core.PackFiles.Models.FileSources;
 
 namespace Shared.Ui.BaseDialogs.PackFileTree.ContextMenu.Commands
 {
@@ -37,7 +38,4 @@ namespace Shared.Ui.BaseDialogs.PackFileTree.ContextMenu.Commands
             packFileService.AddFilesToPack(editablePack, [fileEntry]);
         }
     }
-
-
 }
-//_uiCommandFactory.Create<DuplicateFileCommand>().Execute(_selectedNode.Item);

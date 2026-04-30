@@ -2,6 +2,7 @@
 using Shared.Core.ErrorHandling;
 using Shared.Core.PackFiles.Models;
 using Shared.Core.PackFiles.Models.Containers;
+using Shared.Core.PackFiles.Models.FileSources;
 using Shared.Core.PackFiles.Utility;
 using Shared.Core.Settings;
 

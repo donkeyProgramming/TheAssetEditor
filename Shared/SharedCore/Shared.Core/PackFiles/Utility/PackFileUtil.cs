@@ -1,4 +1,5 @@
 ﻿using Shared.Core.PackFiles.Models;
+using Shared.Core.PackFiles.Models.FileSources;
 
 namespace Shared.Core.PackFiles.Utility
 {

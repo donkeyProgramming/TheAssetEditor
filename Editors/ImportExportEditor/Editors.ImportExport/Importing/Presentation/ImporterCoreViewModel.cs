@@ -4,6 +4,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Editors.ImportExport.Misc;
 using Shared.Core.PackFiles.Models;
+using Shared.Core.PackFiles.Models.FileSources;
 using Shared.Core.Settings;
 
 namespace Editors.ImportExport.Importing.Presentation

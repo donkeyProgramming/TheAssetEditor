@@ -12,6 +12,7 @@ using Editors.Audio.Shared.Wwise.Generators.Hirc;
 using Serilog;
 using Shared.Core.ErrorHandling;
 using Shared.Core.PackFiles.Models;
+using Shared.Core.PackFiles.Models.FileSources;
 using Shared.Core.Services;
 using Shared.Core.Settings;
 using Shared.GameFormats.Wwise;
