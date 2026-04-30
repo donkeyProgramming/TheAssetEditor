@@ -44,7 +44,7 @@ namespace Shared.Core.PackFiles.Models
 
         public void MergePackFileContainer(PackFileContainer other)
         {
-            foreach (var item in other.FileList)
+            foreach (var item in other.GetAllFiles())
                 FileList[item.Key] = item.Value;
             return;
         }

@@ -430,7 +430,7 @@ namespace Shared.Ui.BaseDialogs.PackFileTree
             var skipWemFiles = container.IsCaPackFile && _applicationSettingsService.CurrentSettings.ShowCAWemFiles == false;
 
             List<(string FolderName, string FullFolderPath)> stackFileNames = new(10);
-            foreach (var item in container.FileList)
+            foreach (var item in container.GetAllFiles())
             {
                 ReadOnlySpan<char> pathSpan = item.Key;
                 var lastTreeNode = rootSource;

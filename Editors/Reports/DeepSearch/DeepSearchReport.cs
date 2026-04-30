@@ -46,7 +46,7 @@ namespace Editors.Reports.DeepSearch
             var packFiles = _packFileService.GetAllPackfileContainers();
 
             var filesWithResult = new List<KeyValuePair<string, string>>();
-            var files = packFiles.SelectMany(x => x.FileList.Select(x => (x.Value.DataSource as PackedFileSource).Parent.FilePath)).Distinct().ToList();
+            var files = packFiles.SelectMany(x => x.GetAllFiles().Select(x => (x.Value.DataSource as PackedFileSource).Parent.FilePath)).Distinct().ToList();
 
             var indexLock = new object();
             var currentPackFileIndex = 0;
@@ -77,7 +77,7 @@ namespace Editors.Reports.DeepSearch
 
                               _logger.Here().Information($"Searching through packfile {currentIndex}/{files.Count} -  {packFilePath} {pfc.GetFileCount()} files");
 
-                              foreach (var packFile in pfc.FileList.Values)
+                              foreach (var packFile in pfc.GetAllFiles().Values)
                               {
                                   var pf = packFile;
                                   var ds = pf.DataSource as PackedFileSource;

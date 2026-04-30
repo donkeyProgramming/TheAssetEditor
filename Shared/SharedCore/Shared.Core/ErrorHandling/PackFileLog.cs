@@ -27,7 +27,7 @@ namespace Shared.Core.ErrorHandling
                 return compressionInformation;
 
 
-            foreach (var packFile in container.FileList.Values)
+            foreach (var packFile in container.GetAllFiles().Values)
             {
                 if (packFile.DataSource is PackedFileSource source)
                 {
@@ -60,7 +60,7 @@ namespace Shared.Core.ErrorHandling
             var fileCountsByCompressionFormat = new Dictionary<CompressionFormat, int>();
             var fileTypeCountsByCompressionFormat = new Dictionary<CompressionFormat, Dictionary<string, int>>();
 
-            foreach (var packFile in container.FileList.Values)
+            foreach (var packFile in container.GetAllFiles().Values)
             {
                 if (packFile.DataSource is not PackedFileSource packedFileSource)
                     continue;

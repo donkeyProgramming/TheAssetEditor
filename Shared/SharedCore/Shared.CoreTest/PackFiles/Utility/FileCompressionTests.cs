@@ -35,7 +35,7 @@ namespace Shared.CoreTest.PackFiles.Utility
         public void TestCompressAndDecompressPackFile()
         {
             var compressionFormats = Enum.GetValues<CompressionFormat>().Where(compressionFormat => compressionFormat != CompressionFormat.None);
-            var originals = _container.FileList.ToDictionary(file => file.Value.Name, file => file.Value.DataSource.ReadData());
+            var originals = _container.GetAllFiles().ToDictionary(file => file.Value.Name, file => file.Value.DataSource.ReadData());
 
             foreach (var fileName in originals.Keys)
             {

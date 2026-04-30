@@ -35,7 +35,7 @@ namespace Shared.CoreTest.PackFiles.Utility
         public void TestEncryptAndDecryptPackFile()
         {
             // Encrypt each file in the pack
-            foreach (var file in _container.FileList)
+            foreach (var file in _container.GetAllFiles())
             {
                 var originalData = file.Value.DataSource.ReadData();
                 var encryptedData = FileEncryption.Encrypt(originalData);
@@ -46,7 +46,7 @@ namespace Shared.CoreTest.PackFiles.Utility
             Assert.That(_container.GetFileCount(), Is.EqualTo(4), "Unexpected number of files in the container.");
 
             // Verify encryption and decryption
-            foreach (var file in _container.FileList)
+            foreach (var file in _container.GetAllFiles())
             {
                 var encryptedData = file.Value.DataSource.ReadData();
                 var decryptedContent = FileEncryption.Decrypt(encryptedData);

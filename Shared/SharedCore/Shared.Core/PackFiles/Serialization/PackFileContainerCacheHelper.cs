@@ -194,7 +194,7 @@ namespace Shared.Core.PackFiles.Serialization
                 SourcePackFilePaths = container.SourcePackFilePaths.ToList(),
             };
 
-            foreach (var (relativePath, packFile) in container.FileList)
+            foreach (var (relativePath, packFile) in container.GetAllFiles())
             {
                 if (packFile.DataSource is PackedFileSource source)
                 {

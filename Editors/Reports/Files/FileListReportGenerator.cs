@@ -68,7 +68,7 @@ namespace Editors.Reports.Files
 
             foreach (var container in containers)
             {
-                foreach (var filePair in container.FileList)
+                foreach (var filePair in container.GetAllFiles())
                 {
                     var fileItem = CreateFileItemFromFile(filePair.Key, filePair.Value);
                     WriteItem(writer, fileItem);
