@@ -1,14 +1,13 @@
 ﻿using System.Security.Cryptography;
 using System.Text;
+using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Shared.Core.ErrorHandling;
 using Shared.Core.Misc;
 using Shared.Core.PackFiles.Models.Containers;
 using Shared.Core.PackFiles.Models.FileSources;
-using Shared.Core.PackFiles.Serialization.CacheDatabase;
-using SharpDX.Direct3D9;
 
-namespace Shared.Core.PackFiles.Serialization
+namespace Shared.Core.PackFiles.Serialization.CacheDatabase
 {
     internal static class PackFileContainerCacheHelper
     {
@@ -65,48 +64,92 @@ namespace Shared.Core.PackFiles.Serialization
         public static void SaveCache(string fingerprint, PackFileContainer container, DbContextOptions<CacheDbContext> dbOptions)
         {
             _logger.Here().Information($"Saving cache for '{container.Name}' with {container.GetFileCount()} files");
-            using var db = new CacheDbContext(dbOptions);
-            db.Database.EnsureDeleted();
-            db.Database.EnsureCreated();
 
-            var sourcePackFilePaths = string.Join("|", container.SourcePackFilePaths);
-
-            db.CacheInfo.Add(new CacheInfoEntity
+            // Use EF only to create the schema, then dispose to release memory
+            using (var db = new CacheDbContext(dbOptions))
             {
-                SchemaVersion = CurrentSchemaVersion,
-                Fingerprint = fingerprint,
-                ContainerName = container.Name,
-                SystemFilePath = container.SystemFilePath,
-                SourcePackFilePaths = sourcePackFilePaths,
-            });
+                db.Database.EnsureDeleted();
+                db.Database.EnsureCreated();
+            }
 
-            foreach (var (relativePath, packFile) in container.GetAllFiles())
+            // Use raw SQLite for bulk insert - avoids EF change tracker memory and perf overhead
+            var connectionString = $"Data Source={GetDbFilePath(dbOptions)};Pooling=False";
+            using var connection = new SqliteConnection(connectionString);
+            connection.Open();
+
+            using var transaction = connection.BeginTransaction();
+
+            // Insert CacheInfo
+            using (var cmd = connection.CreateCommand())
             {
-                if (packFile.DataSource is PackedFileSource source)
+                cmd.Transaction = transaction;
+                cmd.CommandText = @"INSERT INTO CacheInfo (SchemaVersion, Fingerprint, ContainerName, SystemFilePath, SourcePackFilePaths)
+                                    VALUES ($schemaVersion, $fingerprint, $containerName, $systemFilePath, $sourcePackFilePaths)";
+                cmd.Parameters.AddWithValue("$schemaVersion", CurrentSchemaVersion);
+                cmd.Parameters.AddWithValue("$fingerprint", fingerprint);
+                cmd.Parameters.AddWithValue("$containerName", container.Name);
+                cmd.Parameters.AddWithValue("$systemFilePath", container.SystemFilePath);
+                cmd.Parameters.AddWithValue("$sourcePackFilePaths", string.Join("|", container.SourcePackFilePaths));
+                cmd.ExecuteNonQuery();
+            }
+
+            // Bulk insert files using a prepared statement
+            using (var cmd = connection.CreateCommand())
+            {
+                cmd.Transaction = transaction;
+                cmd.CommandText = @"INSERT INTO FileList (RelativePath, FileName, Extension, FolderPath, SourcePackFilePath, Offset, Size, IsEncrypted, IsCompressed, CompressionFormat, UncompressedSize)
+                                    VALUES ($relativePath, $fileName, $extension, $folderPath, $sourcePackFilePath, $offset, $size, $isEncrypted, $isCompressed, $compressionFormat, $uncompressedSize)";
+
+                var pRelativePath = cmd.Parameters.Add("$relativePath", SqliteType.Text);
+                var pFileName = cmd.Parameters.Add("$fileName", SqliteType.Text);
+                var pExtension = cmd.Parameters.Add("$extension", SqliteType.Text);
+                var pFolderPath = cmd.Parameters.Add("$folderPath", SqliteType.Text);
+                var pSourcePackFilePath = cmd.Parameters.Add("$sourcePackFilePath", SqliteType.Text);
+                var pOffset = cmd.Parameters.Add("$offset", SqliteType.Integer);
+                var pSize = cmd.Parameters.Add("$size", SqliteType.Integer);
+                var pIsEncrypted = cmd.Parameters.Add("$isEncrypted", SqliteType.Integer);
+                var pIsCompressed = cmd.Parameters.Add("$isCompressed", SqliteType.Integer);
+                var pCompressionFormat = cmd.Parameters.Add("$compressionFormat", SqliteType.Integer);
+                var pUncompressedSize = cmd.Parameters.Add("$uncompressedSize", SqliteType.Integer);
+
+                cmd.Prepare();
+
+                foreach (var (relativePath, packFile) in container.GetAllFiles())
                 {
+                    if (packFile.DataSource is not PackedFileSource source)
+                        continue;
+
                     var lastSep = relativePath.LastIndexOf(Path.DirectorySeparatorChar);
                     var folderPath = lastSep == -1 ? "" : relativePath.Substring(0, lastSep);
 
-                    db.Files.Add(new CachedFileEntity
-                    {
-                        RelativePath = relativePath,
-                        FileName = packFile.Name,
-                        Extension = Path.GetExtension(relativePath).ToLower(),
-                        FolderPath = folderPath,
-                        SourcePackFilePath = source.Parent.FilePath,
-                        Offset = source.Offset,
-                        Size = source.Size,
-                        IsEncrypted = source.IsEncrypted,
-                        IsCompressed = source.IsCompressed,
-                        CompressionFormat = (int)source.CompressionFormat,
-                        UncompressedSize = source.UncompressedSize,
-                    });
+                    pRelativePath.Value = relativePath;
+                    pFileName.Value = packFile.Name;
+                    pExtension.Value = Path.GetExtension(relativePath).ToLower();
+                    pFolderPath.Value = folderPath;
+                    pSourcePackFilePath.Value = source.Parent.FilePath;
+                    pOffset.Value = source.Offset;
+                    pSize.Value = source.Size;
+                    pIsEncrypted.Value = source.IsEncrypted ? 1 : 0;
+                    pIsCompressed.Value = source.IsCompressed ? 1 : 0;
+                    pCompressionFormat.Value = (int)source.CompressionFormat;
+                    pUncompressedSize.Value = (long)source.UncompressedSize;
+
+                    cmd.ExecuteNonQuery();
                 }
             }
 
-            _logger.Here().Information($"Starting to save cache for '{container.Name}'");
-            db.SaveChanges();
+            transaction.Commit();
             _logger.Here().Information($"Cache saved successfully for '{container.Name}'");
+        }
+
+        private static string GetDbFilePath(DbContextOptions<CacheDbContext> dbOptions)
+        {
+            var relationalOptions = dbOptions.Extensions
+                .OfType<Microsoft.EntityFrameworkCore.Infrastructure.RelationalOptionsExtension>()
+                .FirstOrDefault();
+            var connStr = relationalOptions?.ConnectionString ?? "";
+            var builder = new SqliteConnectionStringBuilder(connStr);
+            return builder.DataSource;
         }
 
         public static CachedPackFileContainer? LoadContainerFromCache(string dbFilePath, string expectedFingerprint)
