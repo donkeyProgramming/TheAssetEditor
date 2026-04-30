@@ -6,6 +6,7 @@ using Shared.Core.PackFiles.Models;
 using Shared.Core.PackFiles.Models.Containers;
 using Shared.Core.PackFiles.Models.FileSources;
 using Shared.Core.PackFiles.Serialization;
+using Shared.Core.PackFiles.Utility;
 using Shared.Core.Settings;
 
 namespace Shared.Core.PackFiles
@@ -103,7 +104,7 @@ namespace Shared.Core.PackFiles
 
             var sourceContainer = CastContainer(source);
             var targetContainer = CastContainer(target);
-            var lowerPath = path.Replace('/', '\\').ToLower().Trim();
+            var lowerPath = PathNormalization.NormalizeFileName(path);
             var file = sourceContainer.FindFile(lowerPath);
             if (file != null)
             {

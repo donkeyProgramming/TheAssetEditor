@@ -1,6 +1,7 @@
 ﻿using Shared.Core.Misc;
 using Shared.Core.PackFiles.Models.FileSources;
 using Shared.Core.PackFiles.Serialization;
+using Shared.Core.PackFiles.Utility;
 using Shared.Core.Settings;
 
 namespace Shared.Core.PackFiles.Models.Containers
@@ -20,7 +21,7 @@ namespace Shared.Core.PackFiles.Models.Containers
 
         public void AddOrUpdateFile(string path, PackFile file)
         {
-            var lowerPath = path.Replace('/', '\\').ToLower().Trim();
+            var lowerPath = PathNormalization.NormalizeFileName(path);
             FileList[lowerPath] = file;
         }
 
@@ -136,13 +137,13 @@ namespace Shared.Core.PackFiles.Models.Containers
 
         public virtual PackFile? FindFile(string path)
         {
-            var lowerPath = path.Replace('/', '\\').ToLower().Trim();
+            var lowerPath = PathNormalization.NormalizeFileName(path);
             return FileList.TryGetValue(lowerPath, out var value) ? value : null;
         }
 
         public virtual bool ContainsFile(string path)
         {
-            var lowerPath = path.Replace('/', '\\').ToLower().Trim();
+            var lowerPath = PathNormalization.NormalizeFileName(path);
             return FileList.ContainsKey(lowerPath);
         }
 

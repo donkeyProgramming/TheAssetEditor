@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Shared.Core.PackFiles.Models.FileSources;
 using Shared.Core.PackFiles.Serialization.CacheDatabase;
+using Shared.Core.PackFiles.Utility;
 using Shared.Core.Settings;
 
 namespace Shared.Core.PackFiles.Models.Containers
@@ -29,7 +30,7 @@ namespace Shared.Core.PackFiles.Models.Containers
 
         public PackFile? FindFile(string path)
         {
-            var lowerPath = path.Replace('/', '\\').ToLower().Trim();
+            var lowerPath = PathNormalization.NormalizeFileName(path);
             using var db = new CacheDbContext(_dbOptions);
             var entry = db.Files.AsNoTracking().FirstOrDefault(f => f.RelativePath == lowerPath);
             return entry != null ? ToPackFile(entry) : null;
@@ -37,7 +38,7 @@ namespace Shared.Core.PackFiles.Models.Containers
 
         public bool ContainsFile(string path)
         {
-            var lowerPath = path.Replace('/', '\\').ToLower().Trim();
+            var lowerPath = PathNormalization.NormalizeFileName(path);
             using var db = new CacheDbContext(_dbOptions);
             return db.Files.Any(f => f.RelativePath == lowerPath);
         }
