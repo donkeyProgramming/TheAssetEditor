@@ -15,7 +15,7 @@ namespace Shared.CoreTest.PackFiles.Models
             {
                 SystemFilePath = @"c:\game\data"
             };
-            _container.FileList["folder\\file.txt"] = new PackFile("file.txt", null);
+            _container.AddOrUpdateFile("folder\\file.txt", new PackFile("file.txt", null));
         }
 
         [Test]
@@ -56,7 +56,7 @@ namespace Shared.CoreTest.PackFiles.Models
         [Test]
         public void GetFullPath_ReturnsPath()
         {
-            var file = _container.FileList["folder\\file.txt"];
+            var file = _container.FindFile("folder\\file.txt");
             var path = _container.GetFullPath(file);
             Assert.That(path, Is.EqualTo("folder\\file.txt"));
         }
@@ -82,7 +82,7 @@ namespace Shared.CoreTest.PackFiles.Models
         [Test]
         public void DeleteFile_Throws()
         {
-            var file = _container.FileList["folder\\file.txt"];
+            var file = _container.FindFile("folder\\file.txt");
             Assert.Throws<InvalidOperationException>(() => _container.DeleteFile(file));
         }
 
@@ -95,7 +95,7 @@ namespace Shared.CoreTest.PackFiles.Models
         [Test]
         public void MoveFile_Throws()
         {
-            var file = _container.FileList["folder\\file.txt"];
+            var file = _container.FindFile("folder\\file.txt");
             Assert.Throws<InvalidOperationException>(() => _container.MoveFile(file, "other"));
         }
 
@@ -108,14 +108,14 @@ namespace Shared.CoreTest.PackFiles.Models
         [Test]
         public void RenameFile_Throws()
         {
-            var file = _container.FileList["folder\\file.txt"];
+            var file = _container.FindFile("folder\\file.txt");
             Assert.Throws<InvalidOperationException>(() => _container.RenameFile(file, "renamed.txt"));
         }
 
         [Test]
         public void SaveFileData_Throws()
         {
-            var file = _container.FileList["folder\\file.txt"];
+            var file = _container.FindFile("folder\\file.txt");
             Assert.Throws<InvalidOperationException>(() => _container.SaveFileData(file, [1, 2, 3]));
         }
 

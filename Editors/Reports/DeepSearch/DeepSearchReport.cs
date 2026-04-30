@@ -86,7 +86,7 @@ namespace Editors.Reports.DeepSearch
 
                                   if (str.Contains(searchStr, StringComparison.InvariantCultureIgnoreCase))
                                   {
-                                      var fillPathFile = pfc.FileList.FirstOrDefault(x => x.Value == packFile).Key;
+                                      var fillPathFile = pfc.GetFullPath(packFile);
                                       _logger.Here().Information($"Found result in '{fillPathFile}' in '{packFilePath}'");
 
                                       lock (filesWithResult)

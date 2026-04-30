@@ -105,7 +105,7 @@ namespace Editors.ImportExport.Importing.Importers.GltfToRmv.Helper
                 rmvModel.Material.SetTexture(textureType, texturePackFolder);
 
                 // make sure we don't add the same file to .pack more the once, as several meshes, may use the same texture, 
-                if (!settings.DestinationPackFileContainer.FileList.ContainsKey(texturePackFolder))
+                if (!settings.DestinationPackFileContainer.ContainsFile(texturePackFolder))
                 {
                     var newFile = new NewPackFileEntry(Path.GetDirectoryName(texturePackFolder) ?? "", ddsPackFile);
                     _packFileService.AddFilesToPack(settings.DestinationPackFileContainer, [newFile]);

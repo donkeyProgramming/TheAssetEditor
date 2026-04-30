@@ -102,12 +102,12 @@ namespace Shared.Core.PackFiles
             var sourceContainer = CastContainer(source);
             var targetContainer = CastContainer(target);
             var lowerPath = path.Replace('/', '\\').ToLower().Trim();
-            if (sourceContainer.FileList.ContainsKey(lowerPath))
+            var file = sourceContainer.FindFile(lowerPath);
+            if (file != null)
             {
-                var file = sourceContainer.FileList[lowerPath];
                 var data = file.DataSource.ReadData();
                 var newFile = new PackFile(file.Name, new MemorySource(data));
-                targetContainer.FileList[lowerPath] = newFile;
+                targetContainer.AddOrUpdateFile(lowerPath, newFile);
 
                 _globalEventHub?.PublishGlobalEvent(new PackFileContainerFilesAddedEvent(targetContainer, [newFile]));
             }
@@ -226,8 +226,8 @@ namespace Shared.Core.PackFiles
         {
             foreach (var pf in _packFileContainers)
             {
-                var res = pf.FileList.FirstOrDefault(x => x.Value == file).Value;
-                if (res != null)
+                var path = pf.GetFullPath(file);
+                if (path != null)
                     return pf;
             }
             _logger.Here().Information($"Unknown packfile container for {file.Name}");

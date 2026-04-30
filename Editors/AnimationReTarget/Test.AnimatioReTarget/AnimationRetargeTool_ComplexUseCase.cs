@@ -120,7 +120,7 @@ namespace Test.AnimatioReTarget
 
             // Ensure new file is created in pfs
             Assert.That(outputPackFile.GetFileCount(), Is.EqualTo(1));
-            Assert.That(outputPackFile.FileList.First().Key, Is.EqualTo("animations\\battle\\humanoid01e\\2handed_hammer\\stand\\prefix_hu1_2hh_stand_idle_01.anim"));
+            Assert.That(outputPackFile.FindFile("animations\\battle\\humanoid01e\\2handed_hammer\\stand\\prefix_hu1_2hh_stand_idle_01.anim"), Is.Not.Null);
         }
 
     }

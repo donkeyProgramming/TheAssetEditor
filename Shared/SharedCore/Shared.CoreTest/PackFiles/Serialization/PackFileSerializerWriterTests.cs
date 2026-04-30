@@ -61,7 +61,7 @@ namespace Shared.CoreTest.PackFiles.Serialization
             };
 
             foreach (var fileInfo in expectedFileInfo)
-                container.FileList[fileInfo.FilePath] = PackFile.CreateFromASCII(fileInfo.FileName, new string(fileInfo.Content, fileInfo.Length));
+                container.AddOrUpdateFile(fileInfo.FilePath, PackFile.CreateFromASCII(fileInfo.FileName, new string(fileInfo.Content, fileInfo.Length)));
 
             using var writeMs = new MemoryStream();
             using var writer = new BinaryWriter(writeMs);
@@ -71,7 +71,11 @@ namespace Shared.CoreTest.PackFiles.Serialization
             // Asser that the internal file references have been updated
             foreach (var fileInfo in expectedFileInfo)
             {
-                var dataSourceInstance = container.FileList[fileInfo.FilePath].DataSource as PackedFileSource;
+                var containerFile = container.FindFile(fileInfo.FilePath);
+                Assert.That(containerFile, Is.Not.Null);
+                Assert.That(containerFile.DataSource, Is.Not.Null);
+
+                var dataSourceInstance = containerFile.DataSource as PackedFileSource;
                 Assert.That(dataSourceInstance, Is.Not.Null);
                 Assert.That(dataSourceInstance.Parent.FilePath, Is.EqualTo(outputContainerName));
             }
@@ -84,7 +88,7 @@ namespace Shared.CoreTest.PackFiles.Serialization
             for (var i = 0; i < expectedFileInfo.Count; i++)
             {
                 var expectedFileInfoInstance = expectedFileInfo[i];
-                var packFile = loadedPackFile.FileList[expectedFileInfoInstance.FilePath.ToLower()];
+                var packFile = loadedPackFile.FindFile(expectedFileInfoInstance.FilePath.ToLower());
 
                 // Bypass the filesystem lookup and go directly to stream
                 var packFileConentet = (packFile.DataSource as PackedFileSource).ReadData(readBackMs);

@@ -53,7 +53,7 @@ namespace Shared.Core.PackFiles.Utility
                 var relativePath = sanatizedFilePath.Replace(rootPath, "");
                 var fileName = Path.GetFileName(sanatizedFilePath);
 
-                container.FileList[relativePath] = PackFile.CreateFromFileSystem(fileName, sanatizedFilePath);
+                container.AddOrUpdateFile(relativePath, PackFile.CreateFromFileSystem(fileName, sanatizedFilePath));
             }
 
             var folders = Directory.GetDirectories(folderPath);

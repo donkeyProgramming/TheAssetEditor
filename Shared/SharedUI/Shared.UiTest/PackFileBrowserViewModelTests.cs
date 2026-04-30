@@ -315,7 +315,7 @@ namespace Shared.UiTest
             var container = _packageFileService.CreateNewPackFileContainer("test.pack", PackFileVersion.PFH5, PackFileCAType.MOD);
             foreach (var (path, fileName) in files)
             {
-                container.FileList[path.ToLowerInvariant()] = PackFile.CreateFromASCII(fileName, fileName);
+                container.AddOrUpdateFile(path.ToLowerInvariant(), PackFile.CreateFromASCII(fileName, fileName));
             }
 
             _packageFileService.AddContainer(container);

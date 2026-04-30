@@ -4,52 +4,6 @@ namespace Shared.Core.PackFiles.Utility
 {
     public static class PackFileServiceUtility
     {
-        public static List<PackFile> FindAllFilesInDirectory(IPackFileService pfs, string dir, bool includeSubFolders = true)
-        {
-            dir = dir.Replace('/', '\\').ToLower();
-            var output = new List<PackFile>();
-
-            foreach (var pf in pfs.GetAllPackfileContainers())
-            {
-                foreach (var file in pf.FileList)
-                {
-                    var includeFile = false;
-                    if (includeSubFolders)
-                    {
-                        includeFile = file.Key.IndexOf(dir) == 0;
-                    }
-                    else
-                    {
-                        var dirName = Path.GetDirectoryName(file.Key);
-                        var compareResult = string.Compare(dirName, dir, StringComparison.InvariantCultureIgnoreCase);
-                        if (compareResult == 0)
-                            includeFile = true;
-                    }
-
-                    if (includeFile)
-                        output.Add(file.Value);
-                }
-            }
-
-
-            return output;
-        }
-
-        public static List<string> SearchForFile(IPackFileService pfs, string partOfFileName)
-        {
-            var output = new List<string>();
-            foreach (var pf in pfs.GetAllPackfileContainers())
-            {
-                foreach (var file in pf.FileList)
-                {
-                    if (file.Key.Contains(partOfFileName, StringComparison.InvariantCultureIgnoreCase))
-                        output.Add(file.Key);
-                }
-            }
-
-            return output;
-        }
-
         public static List<PackFile> GetAllAnimPacks(IPackFileService pfs)
         {
             var animPacks = FindAllWithExtention(pfs, @".animpack");

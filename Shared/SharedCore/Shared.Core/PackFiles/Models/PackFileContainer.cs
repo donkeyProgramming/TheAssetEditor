@@ -17,6 +17,12 @@ namespace Shared.Core.PackFiles.Models
 
         public int GetFileCount() => FileList.Count;
 
+        public void AddOrUpdateFile(string path, PackFile file)
+        {
+            var lowerPath = path.Replace('/', '\\').ToLower().Trim();
+            FileList[lowerPath] = file;
+        }
+
         public PackFileContainer(string name)
         {
             Name = name;
@@ -82,6 +88,12 @@ namespace Shared.Core.PackFiles.Models
         {
             var lowerPath = path.Replace('/', '\\').ToLower().Trim();
             return FileList.TryGetValue(lowerPath, out var value) ? value : null;
+        }
+
+        public virtual bool ContainsFile(string path)
+        {
+            var lowerPath = path.Replace('/', '\\').ToLower().Trim();
+            return FileList.ContainsKey(lowerPath);
         }
 
         public virtual string? GetFullPath(PackFile file)

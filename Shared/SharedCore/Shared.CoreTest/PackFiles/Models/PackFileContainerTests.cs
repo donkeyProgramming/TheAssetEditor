@@ -35,7 +35,7 @@ namespace Shared.CoreTest.PackFiles.Models
             container.AddFiles(newFiles);
 
             Assert.That(container.GetFileCount(), Is.EqualTo(1));
-            Assert.That(container.FileList.ContainsKey("rootfile.txt"), Is.True);
+            Assert.That(container.ContainsFile("rootfile.txt"), Is.True);
         }
 
         [Test]
@@ -345,8 +345,8 @@ namespace Shared.CoreTest.PackFiles.Models
             container.MoveFile(file, "NewDir");
 
             Assert.That(container.GetFileCount(), Is.EqualTo(1));
-            Assert.That(container.FileList.ContainsKey("newdir\\file0.txt"), Is.True);
-            Assert.That(container.FileList.ContainsKey("olddir\\file0.txt"), Is.False);
+            Assert.That(container.ContainsFile("newdir\\file0.txt"), Is.True);
+            Assert.That(container.ContainsFile("olddir\\file0.txt"), Is.False);
         }
 
         [Test]
@@ -396,8 +396,8 @@ namespace Shared.CoreTest.PackFiles.Models
             var newNodePath = container.RenameDirectory("parent\\oldchild", "NewChild");
 
             Assert.That(newNodePath, Is.EqualTo("parent\\NewChild"));
-            Assert.That(container.FileList.ContainsKey("parent\\newchild\\file0.txt"), Is.True);
-            Assert.That(container.FileList.ContainsKey("parent\\newchild\\sub\\file1.txt"), Is.True);
+            Assert.That(container.ContainsFile("parent\\newchild\\file0.txt"), Is.True);
+            Assert.That(container.ContainsFile("parent\\newchild\\sub\\file1.txt"), Is.True);
         }
 
         [Test]
@@ -443,7 +443,7 @@ namespace Shared.CoreTest.PackFiles.Models
 
             Assert.That(file.Name, Is.EqualTo("new.txt"));
             Assert.That(container.GetFileCount(), Is.EqualTo(1));
-            Assert.That(container.FileList.ContainsKey("dir\\new.txt"), Is.True);
+            Assert.That(container.ContainsFile("dir\\new.txt"), Is.True);
         }
 
         [Test]
@@ -455,7 +455,7 @@ namespace Shared.CoreTest.PackFiles.Models
 
             container.RenameFile(file, "new.txt");
 
-            Assert.That(container.FileList.ContainsKey("new.txt"), Is.True);
+            Assert.That(container.ContainsFile("new.txt"), Is.True);
             Assert.That(container.FileList.Keys.Any(k => k.StartsWith("\\")), Is.False);
         }
 

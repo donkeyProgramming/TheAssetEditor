@@ -8,5 +8,9 @@
         Dictionary<string, PackFile> FileList { get; }
         HashSet<string> SourcePackFilePaths { get; }
         int GetFileCount();
+        PackFile? FindFile(string path);
+        bool ContainsFile(string path);
+        string? GetFullPath(PackFile file);
+        void AddOrUpdateFile(string path, PackFile file);
     }
 }
