@@ -1,38 +1,17 @@
 ﻿using System.Security.Cryptography;
 using System.Text;
+using Microsoft.EntityFrameworkCore;
 using Shared.Core.PackFiles.Models;
 using Shared.Core.PackFiles.Models.Containers;
 using Shared.Core.PackFiles.Models.FileSources;
+using Shared.Core.PackFiles.Serialization.CacheDatabase;
 using Shared.Core.PackFiles.Utility;
 
 namespace Shared.Core.PackFiles.Serialization
 {
-    internal record CachedFileEntry(
-        string RelativePath,
-        string FileName,
-        string SourcePackFilePath,
-        long Offset,
-        long Size,
-        bool IsEncrypted,
-        bool IsCompressed,
-        CompressionFormat CompressionFormat,
-        uint UncompressedSize);
-
-    internal class CachedContainerData
-    {
-        public string Fingerprint { get; set; } = "";
-        public string ContainerName { get; set; } = "";
-        public string SystemFilePath { get; set; } = "";
-        public List<string> SourcePackFilePaths { get; set; } = [];
-        public List<CachedFileEntry> Files { get; set; } = [];
-    }
-
     internal static class PackFileContainerCacheHelper
     {
-        private static readonly byte[] s_magic = "AEPC"u8.ToArray();
-        private const int CacheVersion = 1;
-
-        public static string GetCacheFilePath(string gameDataFolder, string gameName)
+        public static string GetCacheFilePath(string gameDataFolder, string gameName, string cacheId)
         {
             var cacheDir = Path.Combine(
                 Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
@@ -42,7 +21,7 @@ namespace Shared.Core.PackFiles.Serialization
             Directory.CreateDirectory(cacheDir);
 
             var safeGameName = string.Join("_", gameName.Split(Path.GetInvalidFileNameChars()));
-            return Path.Combine(cacheDir, $"ca_pack_cache_{safeGameName}.bin");
+            return Path.Combine(cacheDir, $"CachedGameFiles_{safeGameName}_{cacheId}.db");
         }
 
         public static string ComputeFingerprint(string gameDataFolder, List<string> packFileNames)
@@ -79,173 +58,99 @@ namespace Shared.Core.PackFiles.Serialization
             return Convert.ToHexString(hash);
         }
 
-        public static void SaveCache(CachedContainerData data, string cacheFilePath)
+        public static DbContextOptions<CacheDbContext> CreateDbOptions(string dbFilePath)
         {
-            using var stream = File.Create(cacheFilePath);
-            using var writer = new BinaryWriter(stream, Encoding.UTF8);
-
-            writer.Write(s_magic);
-            writer.Write(CacheVersion);
-
-            writer.Write(data.Fingerprint);
-            writer.Write(data.ContainerName);
-            writer.Write(data.SystemFilePath);
-
-            writer.Write(data.SourcePackFilePaths.Count);
-            foreach (var path in data.SourcePackFilePaths)
-                writer.Write(path);
-
-            writer.Write(data.Files.Count);
-            foreach (var entry in data.Files)
-            {
-                writer.Write(entry.RelativePath);
-                writer.Write(entry.FileName);
-                writer.Write(entry.SourcePackFilePath);
-                writer.Write(entry.Offset);
-                writer.Write(entry.Size);
-                writer.Write(entry.IsEncrypted);
-                writer.Write(entry.IsCompressed);
-                writer.Write((int)entry.CompressionFormat);
-                writer.Write(entry.UncompressedSize);
-            }
+            return new DbContextOptionsBuilder<CacheDbContext>()
+                .UseSqlite($"Data Source={dbFilePath};Pooling=False")
+                .Options;
         }
 
-        /// <summary>
-        /// Single-pass optimized load: reads binary cache directly into a CachedPackFileContainer,
-        /// skipping intermediate CachedContainerData/CachedFileEntry allocations.
-        /// Returns null if the file is missing, corrupt, or the fingerprint doesn't match.
-        /// </summary>
-        public static CachedPackFileContainer? LoadContainerFromCache(string cacheFilePath, string expectedFingerprint)
+        private const int CurrentSchemaVersion = 2;
+
+        public static void SaveCache(string fingerprint, PackFileContainer container, DbContextOptions<CacheDbContext> dbOptions)
         {
-            if (!File.Exists(cacheFilePath))
-                return null;
+            using var db = new CacheDbContext(dbOptions);
+            db.Database.EnsureDeleted();
+            db.Database.EnsureCreated();
 
-            using var fileStream = File.OpenRead(cacheFilePath);
-            using var buffered = new BufferedStream(fileStream, 1024 * 64);
-            using var reader = new BinaryReader(buffered, Encoding.UTF8);
+            var sourcePackFilePaths = string.Join("|", container.SourcePackFilePaths);
 
-            var magic = reader.ReadBytes(s_magic.Length);
-            if (!magic.AsSpan().SequenceEqual(s_magic))
-                return null;
-
-            var version = reader.ReadInt32();
-            if (version != CacheVersion)
-                return null;
-
-            var fingerprint = reader.ReadString();
-            if (fingerprint != expectedFingerprint)
-                return null;
-
-            var containerName = reader.ReadString();
-            var systemFilePath = reader.ReadString();
-
-            var container = new CachedPackFileContainer(containerName)
+            db.CacheInfo.Add(new CacheInfoEntity
             {
-                SystemFilePath = systemFilePath,
-            };
-
-            var sourcePathCount = reader.ReadInt32();
-            for (var i = 0; i < sourcePathCount; i++)
-                container.SourcePackFilePaths.Add(reader.ReadString());
-
-            var fileCount = reader.ReadInt32();
-            var fileList = new Dictionary<string, PackFile>(fileCount);
-            var parentCache = new Dictionary<string, PackedFileSourceParent>(sourcePathCount, StringComparer.OrdinalIgnoreCase);
-            var stringPool = new Dictionary<string, string>(sourcePathCount, StringComparer.Ordinal);
-
-            for (var i = 0; i < fileCount; i++)
-            {
-                var relativePath = reader.ReadString();
-                var fileName = reader.ReadString();
-                var sourcePackFilePath = reader.ReadString();
-                var offset = reader.ReadInt64();
-                var size = reader.ReadInt64();
-                var isEncrypted = reader.ReadBoolean();
-                var isCompressed = reader.ReadBoolean();
-                var compressionFormat = (CompressionFormat)reader.ReadInt32();
-                var uncompressedSize = reader.ReadUInt32();
-
-                // Intern the source pack path string — ~20 unique values across 600K entries
-                if (!stringPool.TryGetValue(sourcePackFilePath, out var internedPath))
-                {
-                    internedPath = sourcePackFilePath;
-                    stringPool[internedPath] = internedPath;
-                }
-
-                if (!parentCache.TryGetValue(internedPath, out var parent))
-                {
-                    parent = new PackedFileSourceParent { FilePath = internedPath };
-                    parentCache[internedPath] = parent;
-                }
-
-                var source = new PackedFileSource(parent, offset, size, isEncrypted, isCompressed, compressionFormat, uncompressedSize);
-                fileList[relativePath] = new PackFile(fileName, source);
-            }
-
-            container.FileList = fileList;
-            return container;
-        }
-
-        public static CachedContainerData BuildCacheData(string fingerprint, PackFileContainer container)
-        {
-            var data = new CachedContainerData
-            {
+                SchemaVersion = CurrentSchemaVersion,
                 Fingerprint = fingerprint,
                 ContainerName = container.Name,
                 SystemFilePath = container.SystemFilePath,
-                SourcePackFilePaths = container.SourcePackFilePaths.ToList(),
-            };
+                SourcePackFilePaths = sourcePackFilePaths,
+            });
 
             foreach (var (relativePath, packFile) in container.GetAllFiles())
             {
                 if (packFile.DataSource is PackedFileSource source)
                 {
-                    data.Files.Add(new CachedFileEntry(
-                        relativePath,
-                        packFile.Name,
-                        source.Parent.FilePath,
-                        source.Offset,
-                        source.Size,
-                        source.IsEncrypted,
-                        source.IsCompressed,
-                        source.CompressionFormat,
-                        source.UncompressedSize));
+                    db.Files.Add(new CachedFileEntity
+                    {
+                        RelativePath = relativePath,
+                        FileName = packFile.Name,
+                        Extension = Path.GetExtension(relativePath).ToLower(),
+                        SourcePackFilePath = source.Parent.FilePath,
+                        Offset = source.Offset,
+                        Size = source.Size,
+                        IsEncrypted = source.IsEncrypted,
+                        IsCompressed = source.IsCompressed,
+                        CompressionFormat = (int)source.CompressionFormat,
+                        UncompressedSize = source.UncompressedSize,
+                    });
                 }
             }
 
-            return data;
+            db.SaveChanges();
         }
 
-        public static CachedPackFileContainer RestoreFromCache(CachedContainerData data)
+        public static CachedPackFileContainer? LoadContainerFromCache(string dbFilePath, string expectedFingerprint)
         {
-            var container = new CachedPackFileContainer(data.ContainerName)
+            if (!File.Exists(dbFilePath))
+                return null;
+
+            var dbOptions = CreateDbOptions(dbFilePath);
+            return LoadContainerFromCache(dbOptions, expectedFingerprint);
+        }
+
+        public static CachedPackFileContainer? LoadContainerFromCache(DbContextOptions<CacheDbContext> dbOptions, string expectedFingerprint)
+        {
+            using var db = new CacheDbContext(dbOptions);
+
+            try
             {
-                SystemFilePath = data.SystemFilePath,
+                db.Database.EnsureCreated();
+            }
+            catch
+            {
+                return null;
+            }
+
+            CacheInfoEntity? cacheInfo;
+            try
+            {
+                cacheInfo = db.CacheInfo.FirstOrDefault();
+            }
+            catch
+            {
+                return null;
+            }
+
+            if (cacheInfo == null || cacheInfo.SchemaVersion != CurrentSchemaVersion || cacheInfo.Fingerprint != expectedFingerprint)
+                return null;
+
+            var container = new CachedPackFileContainer(cacheInfo.ContainerName, dbOptions)
+            {
+                SystemFilePath = cacheInfo.SystemFilePath,
             };
 
-            foreach (var sourcePath in data.SourcePackFilePaths)
-                container.SourcePackFilePaths.Add(sourcePath);
-
-            var parentCache = new Dictionary<string, PackedFileSourceParent>(StringComparer.OrdinalIgnoreCase);
-
-            foreach (var entry in data.Files)
+            if (!string.IsNullOrEmpty(cacheInfo.SourcePackFilePaths))
             {
-                if (!parentCache.TryGetValue(entry.SourcePackFilePath, out var parent))
-                {
-                    parent = new PackedFileSourceParent { FilePath = entry.SourcePackFilePath };
-                    parentCache[entry.SourcePackFilePath] = parent;
-                }
-
-                var source = new PackedFileSource(
-                    parent,
-                    entry.Offset,
-                    entry.Size,
-                    entry.IsEncrypted,
-                    entry.IsCompressed,
-                    entry.CompressionFormat,
-                    entry.UncompressedSize);
-
-                container.FileList.Add(entry.RelativePath, new PackFile(entry.FileName, source));
+                foreach (var path in cacheInfo.SourcePackFilePaths.Split('|'))
+                    container.SourcePackFilePaths.Add(path);
             }
 
             return container;

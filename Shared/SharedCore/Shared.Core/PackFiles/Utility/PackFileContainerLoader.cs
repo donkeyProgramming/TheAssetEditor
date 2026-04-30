@@ -103,7 +103,7 @@ namespace Shared.Core.PackFiles.Utility
                 var allCaPackFiles = ManifestHelper.GetPackFilesFromManifest(gameDataFolder, out var manifestFileFound);
 
                 var fingerprint = PackFileContainerCacheHelper.ComputeFingerprint(gameDataFolder, allCaPackFiles);
-                var cacheFilePath = PackFileContainerCacheHelper.GetCacheFilePath(gameDataFolder, gameName);
+                var cacheFilePath = PackFileContainerCacheHelper.GetCacheFilePath(gameDataFolder, gameName, fingerprint);
 
                 var cached = TryLoadFromCache(cacheFilePath, fingerprint, gameName);
                 if (cached != null)
@@ -113,8 +113,8 @@ namespace Shared.Core.PackFiles.Utility
 
                 try
                 {
-                    var cacheData = PackFileContainerCacheHelper.BuildCacheData(fingerprint, container);
-                    PackFileContainerCacheHelper.SaveCache(cacheData, cacheFilePath);
+                    var dbOptions = PackFileContainerCacheHelper.CreateDbOptions(cacheFilePath);
+                    PackFileContainerCacheHelper.SaveCache(fingerprint, container, dbOptions);
                     _logger.Here().Information($"Saved CA pack cache for {gameName} to {cacheFilePath}");
                 }
                 catch (Exception cacheEx)
