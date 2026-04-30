@@ -23,6 +23,18 @@ namespace Shared.Core.PackFiles.Models
             FileList[lowerPath] = file;
         }
 
+        public List<(string FileName, PackFile Pack)> FindAllWithExtention(string extention)
+        {
+            extention = extention.ToLower();
+            var output = new List<(string, PackFile)>();
+            foreach (var file in FileList)
+            {
+                if (Path.GetExtension(file.Key) == extention)
+                    output.Add((file.Key, file.Value));
+            }
+            return output;
+        }
+
         public PackFileContainer(string name)
         {
             Name = name;

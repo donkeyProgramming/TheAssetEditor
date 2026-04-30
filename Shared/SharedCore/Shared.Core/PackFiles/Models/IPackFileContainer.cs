@@ -12,5 +12,6 @@
         bool ContainsFile(string path);
         string? GetFullPath(PackFile file);
         void AddOrUpdateFile(string path, PackFile file);
+        List<(string FileName, PackFile Pack)> FindAllWithExtention(string extention);
     }
 }
