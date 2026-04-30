@@ -31,4 +31,8 @@
     <Using Include="NUnit.Framework" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="PackFiles\Models\FileSources\" />
+  </ItemGroup>
+
 </Project>

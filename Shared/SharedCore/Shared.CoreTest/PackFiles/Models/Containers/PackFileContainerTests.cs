@@ -1,7 +1,8 @@
-using Shared.Core.PackFiles;
+﻿using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
+using Shared.Core.PackFiles.Models.Containers;
 
-namespace Shared.CoreTest.PackFiles.Models
+namespace Shared.CoreTest.PackFiles.Models.Containers
 {
     internal class PackFileContainer_AddFiles
     {

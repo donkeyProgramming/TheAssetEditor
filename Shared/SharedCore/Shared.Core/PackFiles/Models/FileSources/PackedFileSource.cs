@@ -1,7 +1,7 @@
 ﻿using Shared.ByteParsing;
 using Shared.Core.PackFiles.Utility;
 
-namespace Shared.Core.PackFiles.Models
+namespace Shared.Core.PackFiles.Models.FileSources
 {
     public class PackedFileSourceParent
     {
@@ -61,7 +61,6 @@ namespace Shared.Core.PackFiles.Models
             return data;
         }
 
-
         public byte[] PeekData(int size)
         {
             byte[] data;
@@ -94,8 +93,6 @@ namespace Shared.Core.PackFiles.Models
 
             return data;
         }
-
-       
 
         public byte[] ReadDataWithoutDecompressing()
         {

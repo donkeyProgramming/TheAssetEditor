@@ -1,6 +1,6 @@
 ﻿using Shared.Core.Settings;
 
-namespace Shared.Core.PackFiles.Models
+namespace Shared.Core.PackFiles.Models.Containers
 {
     internal class CachedPackFileContainer : IPackFileContainerInternal
     {

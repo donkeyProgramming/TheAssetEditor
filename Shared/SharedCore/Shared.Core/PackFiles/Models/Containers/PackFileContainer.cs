@@ -2,7 +2,7 @@
 using Shared.Core.PackFiles.Serialization;
 using Shared.Core.Settings;
 
-namespace Shared.Core.PackFiles.Models
+namespace Shared.Core.PackFiles.Models.Containers
 {
     internal class PackFileContainer : IPackFileContainerInternal
     {

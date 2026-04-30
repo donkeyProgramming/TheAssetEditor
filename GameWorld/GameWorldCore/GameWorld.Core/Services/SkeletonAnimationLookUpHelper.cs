@@ -11,6 +11,7 @@ using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
 using Shared.Core.PackFiles.Utility;
 using Shared.GameFormats.Animation;
+using Shared.Core.PackFiles.Models.FileSources;
 
 namespace GameWorld.Core.Services
 {

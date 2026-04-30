@@ -3,6 +3,7 @@ using System.Reflection;
 using System.Text;
 using Shared.Core.ErrorHandling;
 using Shared.Core.PackFiles.Models;
+using Shared.Core.PackFiles.Models.Containers;
 using Shared.Core.PackFiles.Serialization;
 using Shared.Core.Settings;
 

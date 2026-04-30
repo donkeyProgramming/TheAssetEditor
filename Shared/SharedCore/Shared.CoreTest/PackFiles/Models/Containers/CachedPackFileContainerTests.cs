@@ -1,8 +1,9 @@
-using Shared.Core.PackFiles;
+﻿using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
+using Shared.Core.PackFiles.Models.Containers;
 using Shared.Core.Settings;
 
-namespace Shared.CoreTest.PackFiles.Models
+namespace Shared.CoreTest.PackFiles.Models.Containers
 {
     internal class CachedPackFileContainer_ReadOnly
     {
