@@ -37,6 +37,9 @@ namespace Editors.KitbasherEditor.ChildEditors.PinTool.Commands
                 throw new InvalidOperationException("SkinWrapRiggingCommand not configured before Execute");
 
             _originalGeometries = _giveAnimationToList.Select(x => x.Geometry.Clone()).ToList();
+            foreach (var geo in _originalGeometries)
+                geo.RemoveGraphicsCardResources();
+
             _selectionOldState = _selectionManager.GetStateCopy();
 
             var firstSource = _takeAnimationFromList[0];
@@ -71,7 +74,11 @@ namespace Editors.KitbasherEditor.ChildEditors.PinTool.Commands
                 return;
 
             for (var i = 0; i < _giveAnimationToList.Count; i++)
-                _giveAnimationToList[i].Geometry = _originalGeometries[i];
+            {
+                _giveAnimationToList[i].Geometry.RemoveGraphicsCardResources(); // Remove old
+                _originalGeometries[i].EnsureGraphicsResourcesCreated();        // Enable new
+                _giveAnimationToList[i].Geometry = _originalGeometries[i];      // Swap
+            }
 
             _selectionManager.SetState(_selectionOldState);
         }

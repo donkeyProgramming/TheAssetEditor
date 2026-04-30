@@ -132,14 +132,17 @@ namespace GameWorld.Core.Services
                 resource,
                 record));
 
+            var typeCount = _trackedResources.Count(x => x.Record.ResourceType == record.ResourceType);
+
             _logger.Here().Information(
-                "Graphics resource created: Id={ResourceId}, Type={ResourceType}, ScopeOwner={ScopeOwner}, Source={SourceFile}:{SourceLine}::{SourceMember}",
+                "Graphics resource created: Id={ResourceId}, Type={ResourceType}, ScopeOwner={ScopeOwner}, Source={SourceFile}:{SourceLine}::{SourceMember} TotalCount={CountOfType}",
                 resourceId,
                 record.ResourceType,
                 record.ScopeOwner,
                 record.SourceFile,
                 record.SourceLine,
-                record.SourceMember);
+                record.SourceMember,
+                typeCount);
 
             return resource;
         }
@@ -153,16 +156,20 @@ namespace GameWorld.Core.Services
             if (trackedMatches.Count == 0)
                 return;
 
+            var type = trackedMatches.First().Record.ResourceType;
+            var typeCount = _trackedResources.Count(x => x.Record.ResourceType == type);
+
             foreach (var match in trackedMatches)
             {
                 _logger.Here().Information(
-                    "Graphics resource deleted: Id={ResourceId}, Type={ResourceType}, ScopeOwner={ScopeOwner}, Source={SourceFile}:{SourceLine}::{SourceMember}",
+                    "Graphics resource deleted: Id={ResourceId}, Type={ResourceType}, ScopeOwner={ScopeOwner}, Source={SourceFile}:{SourceLine}::{SourceMember} TotalCount={CountOfType}",
                     match.Record.ResourceId,
                     match.Record.ResourceType,
                     match.Record.ScopeOwner,
                     match.Record.SourceFile,
                     match.Record.SourceLine,
-                    match.Record.SourceMember);
+                    match.Record.SourceMember,
+                    typeCount);
             }
 
             _trackedResources.RemoveAll(x => ReferenceEquals(x.Resource, resource));

@@ -2,8 +2,6 @@
 using GameWorld.Core.Rendering.Geometry;
 using MeshDecimator;
 using Microsoft.Xna.Framework;
-using System;
-using System.Linq;
 
 namespace GameWorld.Core.Services.SceneSaving.Lod.MeshDecimatorIntegration
 {

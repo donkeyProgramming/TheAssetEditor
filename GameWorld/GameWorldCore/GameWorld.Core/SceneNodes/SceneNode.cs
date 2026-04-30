@@ -6,8 +6,6 @@ namespace GameWorld.Core.SceneNodes
 {
     public abstract class SceneNode : NotifyPropertyChangedImpl, ISceneNode
     {
-        
-
         public string Id { get; set; } = Guid.NewGuid().ToString();
         public SceneManager SceneManager { get; set; }
 
@@ -39,6 +37,7 @@ namespace GameWorld.Core.SceneNodes
         public ISceneNode RemoveObject(ISceneNode item)
         {
             _children.Remove(item);
+            item?.ForeachNodeRecursive((node) => node.OnNodeRemoved());
             SceneManager?.TriggerRemoveObjectEvent(this, item);
             return item;
         }
@@ -54,6 +53,7 @@ namespace GameWorld.Core.SceneNodes
         {
             item.SceneManager = SceneManager;
             item.ForeachNodeRecursive((node) => node.SceneManager = SceneManager);
+            item.ForeachNodeRecursive((node) => node.OnNodeAdded());
 
             item.Parent = this;
             _children.Add(item);
@@ -75,7 +75,11 @@ namespace GameWorld.Core.SceneNodes
             typedTarget.Name = Name + " - Clone";
         }
 
+        public virtual void OnNodeAdded()
+        { }
 
+        public virtual void OnNodeRemoved()
+        { }
 
         public void Print(string context = "")
         {
