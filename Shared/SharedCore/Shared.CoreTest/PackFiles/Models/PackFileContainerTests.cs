@@ -81,8 +81,8 @@ namespace Shared.CoreTest.PackFiles.Models
             container.AddFiles(newFiles);
 
             Assert.That(container.GetFileCount(), Is.EqualTo(1));
-            Assert.That(container.FileList.First().Key.Any(char.IsWhiteSpace), Is.False);
-            Assert.That(container.FileList.First().Value.Name.Any(char.IsWhiteSpace), Is.False);
+            Assert.That(container.GetAllFiles().First().Key.Any(char.IsWhiteSpace), Is.False);
+            Assert.That(container.GetAllFiles().First().Value.Name.Any(char.IsWhiteSpace), Is.False);
         }
 
         [Test]
@@ -122,19 +122,19 @@ namespace Shared.CoreTest.PackFiles.Models
         public void DeleteFile_RemovesFile()
         {
             var container = CreateContainerWithFiles();
-            var file = container.FileList.Values.First();
+            var file = container.GetAllFiles().Values.First();
 
             container.DeleteFile(file);
 
             Assert.That(container.GetFileCount(), Is.EqualTo(3));
-            Assert.That(container.FileList.Values, Does.Not.Contain(file));
+            Assert.That(container.GetAllFiles().Values, Does.Not.Contain(file));
         }
 
         [Test]
         public void DeleteFile_ReturnsDeletedFile()
         {
             var container = CreateContainerWithFiles();
-            var file = container.FileList.Values.First();
+            var file = container.GetAllFiles().Values.First();
 
             var result = container.DeleteFile(file);
 
@@ -380,7 +380,7 @@ namespace Shared.CoreTest.PackFiles.Models
 
             Assert.That(newNodePath, Is.EqualTo("NewName"));
             Assert.That(container.GetFileCount(), Is.EqualTo(2));
-            Assert.That(container.FileList.Keys.All(k => k.StartsWith("newname", StringComparison.OrdinalIgnoreCase)), Is.True);
+            Assert.That(container.GetAllFiles().Keys.All(k => k.StartsWith("newname", StringComparison.OrdinalIgnoreCase)), Is.True);
         }
 
         [Test]
@@ -456,7 +456,7 @@ namespace Shared.CoreTest.PackFiles.Models
             container.RenameFile(file, "new.txt");
 
             Assert.That(container.ContainsFile("new.txt"), Is.True);
-            Assert.That(container.FileList.Keys.Any(k => k.StartsWith("\\")), Is.False);
+            Assert.That(container.GetAllFiles().Keys.Any(k => k.StartsWith("\\")), Is.False);
         }
 
         [Test]

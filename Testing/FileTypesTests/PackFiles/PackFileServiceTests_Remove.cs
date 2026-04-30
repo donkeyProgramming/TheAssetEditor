@@ -9,7 +9,7 @@
         //    var loadedPackFile = packFileService.Load(@"Data\CaPackFile_01.pack");
         //
         //    Assert.NotNull(loadedPackFile);
-        //    var fileCount = loadedPackFile.FileList.Count;
+        //    var fileCount = loadedPackFile.GetFileCount();
         //    Assert.AreEqual(4, fileCount);
         //}
         //
@@ -22,7 +22,7 @@
         //
         //    packFileService.DeleteFile(loadedPackFile, file);
         //
-        //    var fileCount = loadedPackFile.FileList.Count;
+        //    var fileCount = loadedPackFile.GetFileCount();
         //    Assert.AreEqual(3, fileCount);
         //}
         //
@@ -34,7 +34,7 @@
         //
         //    packFileService.DeleteFolder(loadedPackFile, @"warmachines\tex");
         //
-        //    var fileCount = loadedPackFile.FileList.Count;
+        //    var fileCount = loadedPackFile.GetFileCount();
         //    Assert.AreEqual(2, fileCount);
         //}
     }

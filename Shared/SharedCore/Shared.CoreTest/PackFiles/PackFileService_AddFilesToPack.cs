@@ -121,8 +121,8 @@ namespace Shared.CoreTest.PackFiles
 
             // Assert
             Assert.That(container.GetFileCount(), Is.EqualTo(1));
-            Assert.That(container.FileList.First().Key.Any(char.IsWhiteSpace), Is.EqualTo(false));
-            Assert.That(container.FileList.First().Value.Name.Any(char.IsWhiteSpace), Is.EqualTo(false));
+            Assert.That(container.GetAllFiles().First().Key.Any(char.IsWhiteSpace), Is.EqualTo(false));
+            Assert.That(container.GetAllFiles().First().Value.Name.Any(char.IsWhiteSpace), Is.EqualTo(false));
         }
 
         [Test]
