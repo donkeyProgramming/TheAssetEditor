@@ -423,7 +423,7 @@ namespace Shared.Ui.BaseDialogs.PackFileTree
             }
 
             var rootSource = new TreeNodeSource(container.Name, NodeType.Root, container, null);
-            var directoryMap_new = new Dictionary<string, TreeNodeSource>(container.FileList.Count)
+            var directoryMap_new = new Dictionary<string, TreeNodeSource>(container.GetFileCount())
             {
                 [string.Empty] = rootSource
             };

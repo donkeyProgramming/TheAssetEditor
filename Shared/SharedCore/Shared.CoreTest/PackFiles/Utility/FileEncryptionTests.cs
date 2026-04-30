@@ -43,7 +43,7 @@ namespace Shared.CoreTest.PackFiles.Utility
             }
 
             // Assert the file count is what we expect
-            Assert.That(_container.FileList.Count, Is.EqualTo(4), "Unexpected number of files in the container.");
+            Assert.That(_container.GetFileCount(), Is.EqualTo(4), "Unexpected number of files in the container.");
 
             // Verify encryption and decryption
             foreach (var file in _container.FileList)

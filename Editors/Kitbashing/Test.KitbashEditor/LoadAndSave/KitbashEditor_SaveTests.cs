@@ -34,7 +34,7 @@
             toolCommandFactory.Create<SaveCommand>().Execute();
 
             // Verify output files
-            Assert.That(outputPackFile!.FileList.Count, Is.EqualTo(1));
+            Assert.That(outputPackFile!.GetFileCount(), Is.EqualTo(1));
 
             // Verify the generated RMV2 file
             VertexFormat[][] expectedVertexType = [[VertexFormat.Weighted], [VertexFormat.Weighted], [VertexFormat.Weighted], [VertexFormat.Weighted]];
@@ -67,7 +67,7 @@
             toolCommandFactory.Create<SaveCommand>().Execute();
 
             // Verify output files
-            Assert.That(outputPackFile!.FileList.Count, Is.EqualTo(1));
+            Assert.That(outputPackFile!.GetFileCount(), Is.EqualTo(1));
 
             // Verify the generated RMV2 file
             VertexFormat[][] expectedVertexType = [[VertexFormat.Static], [VertexFormat.Static], [VertexFormat.Static]];

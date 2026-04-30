@@ -40,7 +40,7 @@ namespace Test.KitbashEditor.LoadAndSave
             toolCommandFactory.Create<SaveCommand>().Execute();
 
             // Verify output files
-            Assert.That(outputPackFile!.FileList.Count, Is.EqualTo(2));
+            Assert.That(outputPackFile!.GetFileCount(), Is.EqualTo(2));
 
             // Verify the generated RMV2 file
             uint[] expectedMeshCountPerLod = [4, 4, 2, 2];
@@ -88,7 +88,7 @@ namespace Test.KitbashEditor.LoadAndSave
             toolCommandFactory.Create<SaveCommand>().Execute();
 
             // Verify output files
-            Assert.That(outputPackFile!.FileList.Count, Is.EqualTo(2));
+            Assert.That(outputPackFile!.GetFileCount(), Is.EqualTo(2));
 
             // Verify the generated RMV2 file
             uint[] expectedMeshCountPerLod = [4, 4, 4, 4];

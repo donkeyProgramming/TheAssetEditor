@@ -52,7 +52,7 @@ namespace Shared.Core.ErrorHandling
                 return;
 
             var compressionInformation = GetCompressionInformation(container);
-            var totalFiles = container.FileList.Count;
+            var totalFiles = container.GetFileCount();
             var packSize = FormatSize(container.OriginalLoadByteSize);
 
             var loadingPart = $"Loading {container.Name}.pack ({totalFiles} files, {packSize})";

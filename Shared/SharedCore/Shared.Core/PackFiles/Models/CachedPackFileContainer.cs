@@ -10,6 +10,8 @@ namespace Shared.Core.PackFiles.Models
         public Dictionary<string, PackFile> FileList { get; set; } = [];
         public HashSet<string> SourcePackFilePaths { get; set; } = [];
 
+        public int GetFileCount() => FileList.Count;
+
         public CachedPackFileContainer(string name)
         {
             Name = name;

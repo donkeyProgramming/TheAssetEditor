@@ -74,7 +74,7 @@ namespace GameWorld.Core.Test.Rendering.Materials.Serialization
 
             var savedWsMaterialFile = _pfs.FindFile(pathToCreatedMaterial0, _outputPack);
             Assert.That(savedWsMaterialFile, Is.Not.Null);
-            Assert.That(_outputPack.FileList.Count, Is.EqualTo(1));
+            Assert.That(_outputPack.GetFileCount(), Is.EqualTo(1));
         }
 
 

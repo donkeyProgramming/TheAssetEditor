@@ -75,7 +75,7 @@ namespace Editors.Reports.DeepSearch
                           {
                               var pfc = _loader.Load(packFilePath);
 
-                              _logger.Here().Information($"Searching through packfile {currentIndex}/{files.Count} -  {packFilePath} {pfc.FileList.Count} files");
+                              _logger.Here().Information($"Searching through packfile {currentIndex}/{files.Count} -  {packFilePath} {pfc.GetFileCount()} files");
 
                               foreach (var packFile in pfc.FileList.Values)
                               {

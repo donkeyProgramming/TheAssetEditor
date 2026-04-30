@@ -56,7 +56,7 @@ namespace Shared.CoreTest.PackFiles.Serialization
             Assert.That(loaded.Name, Is.EqualTo("All Game Packs - TestGame"));
             Assert.That(loaded.SystemFilePath, Is.EqualTo(@"c:\game\data"));
             Assert.That(loaded.SourcePackFilePaths.Count, Is.EqualTo(2));
-            Assert.That(loaded.FileList.Count, Is.EqualTo(2));
+            Assert.That(loaded.GetFileCount(), Is.EqualTo(2));
         }
 
         [Test]
@@ -103,7 +103,7 @@ namespace Shared.CoreTest.PackFiles.Serialization
             Assert.That(container.IsCaPackFile, Is.True);
             Assert.That(container.SystemFilePath, Is.EqualTo(@"c:\game\data"));
             Assert.That(container.SourcePackFilePaths.Count, Is.EqualTo(1));
-            Assert.That(container.FileList.Count, Is.EqualTo(2));
+            Assert.That(container.GetFileCount(), Is.EqualTo(2));
 
             var file1 = container.FileList["folder\\file.txt"];
             Assert.That(file1.Name, Is.EqualTo("file.txt"));
@@ -215,7 +215,7 @@ namespace Shared.CoreTest.PackFiles.Serialization
             Assert.That(restored.Name, Is.EqualTo("Full Cycle Test"));
             Assert.That(restored.IsCaPackFile, Is.True);
             Assert.That(restored.SystemFilePath, Is.EqualTo(@"c:\game\data"));
-            Assert.That(restored.FileList.Count, Is.EqualTo(2));
+            Assert.That(restored.GetFileCount(), Is.EqualTo(2));
 
             Assert.That(restored.FindFile("db\\units.bin"), Is.Not.Null);
             Assert.That(restored.FindFile("text\\localisation.loc"), Is.Not.Null);

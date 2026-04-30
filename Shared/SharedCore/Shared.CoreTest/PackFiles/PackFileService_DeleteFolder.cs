@@ -17,7 +17,7 @@ namespace Shared.CoreTest.PackFiles
             pfs.DeleteFolder(container, "Directory_0");
 
             // Assert
-            Assert.That(container.FileList.Count, Is.EqualTo(2));
+            Assert.That(container.GetFileCount(), Is.EqualTo(2));
         }
 
         [Test]
@@ -32,7 +32,7 @@ namespace Shared.CoreTest.PackFiles
             pfs.DeleteFolder(container, "folderWithoutFiles");
 
             // Assert
-            Assert.That(container.FileList.Count, Is.EqualTo(8));
+            Assert.That(container.GetFileCount(), Is.EqualTo(8));
         }
 
         [Test]
@@ -47,7 +47,7 @@ namespace Shared.CoreTest.PackFiles
             pfs.DeleteFolder(container, "Directory_0\\subfolder");
 
             // Assert
-            Assert.That(container.FileList.Count, Is.EqualTo(4));
+            Assert.That(container.GetFileCount(), Is.EqualTo(4));
         }
 
 
@@ -69,7 +69,7 @@ namespace Shared.CoreTest.PackFiles
             };
 
             pfs.AddFilesToPack(container, newFiles);
-            Assert.That(container.FileList.Count, Is.EqualTo(8));
+            Assert.That(container.GetFileCount(), Is.EqualTo(8));
             return container;
         }
     }

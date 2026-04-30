@@ -58,8 +58,8 @@ namespace Editors.Reports.Files
             var outputFilePath = $"{outputFolder}\\{outputFileName}";
 
             var containers = _pfs.GetAllPackfileContainers();
-            var fileCount = containers.Sum(x => x.FileList.Count());
-            _logger.Here().Information($"Creating file list report for {fileCount} files. Result will be saved at {outputFilePath}.)");
+            var fileCount = containers.Sum(x => x.GetFileCount());
+            _logger.Here().Information($"Creating file list report for {fileCount} files. Result will be saved at {outputFilePath}.);");
 
             var counter = 0;
             using var writer = new StreamWriter(outputFilePath, false);

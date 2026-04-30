@@ -27,7 +27,7 @@ namespace Shared.CoreTest.PackFiles
             pfs.AddFilesToPack(container, newFiles);
 
             // Assert
-            Assert.That(container.FileList.Count, Is.EqualTo(4));
+            Assert.That(container.GetFileCount(), Is.EqualTo(4));
         }
 
         [Test]
@@ -48,7 +48,7 @@ namespace Shared.CoreTest.PackFiles
             pfs.AddFilesToPack(container, newFiles);
 
             // Assert
-            Assert.That(container.FileList.Count, Is.EqualTo(1));
+            Assert.That(container.GetFileCount(), Is.EqualTo(1));
         }
 
         [Test]
@@ -72,7 +72,7 @@ namespace Shared.CoreTest.PackFiles
             pfs.AddFilesToPack(container, newFiles);
 
             // Assert
-            Assert.That(container.FileList.Count, Is.EqualTo(3));
+            Assert.That(container.GetFileCount(), Is.EqualTo(3));
         }
 
 
@@ -99,7 +99,7 @@ namespace Shared.CoreTest.PackFiles
             pfs.AddFilesToPack(container, newFiles);
 
             // Assert
-            Assert.That(container.FileList.Count, Is.EqualTo(3));
+            Assert.That(container.GetFileCount(), Is.EqualTo(3));
         }
 
         [Test]
@@ -120,7 +120,7 @@ namespace Shared.CoreTest.PackFiles
             pfs.AddFilesToPack(container, newFiles);
 
             // Assert
-            Assert.That(container.FileList.Count, Is.EqualTo(1));
+            Assert.That(container.GetFileCount(), Is.EqualTo(1));
             Assert.That(container.FileList.First().Key.Any(char.IsWhiteSpace), Is.EqualTo(false));
             Assert.That(container.FileList.First().Value.Name.Any(char.IsWhiteSpace), Is.EqualTo(false));
         }

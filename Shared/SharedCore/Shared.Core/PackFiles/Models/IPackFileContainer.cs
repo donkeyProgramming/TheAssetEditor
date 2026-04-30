@@ -7,5 +7,6 @@
         string SystemFilePath { get; }
         Dictionary<string, PackFile> FileList { get; }
         HashSet<string> SourcePackFilePaths { get; }
+        int GetFileCount();
     }
 }

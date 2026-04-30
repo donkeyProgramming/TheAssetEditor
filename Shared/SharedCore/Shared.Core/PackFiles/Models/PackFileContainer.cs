@@ -15,6 +15,8 @@ namespace Shared.Core.PackFiles.Models
 
         public Dictionary<string, PackFile> FileList { get; set; } = [];
 
+        public int GetFileCount() => FileList.Count;
+
         public PackFileContainer(string name)
         {
             Name = name;

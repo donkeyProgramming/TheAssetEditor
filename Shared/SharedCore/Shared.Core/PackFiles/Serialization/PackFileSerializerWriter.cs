@@ -27,7 +27,7 @@ namespace Shared.Core.PackFiles.Serialization
             var fileNamesOffset = ComputeFileNameOffset(headerSpecificBytes, sortedFiles);
 
             // Update and write header
-            container.Header.FileCount = (uint)container.FileList.Count;
+            container.Header.FileCount = (uint)container.GetFileCount();
             WriteHeader(container.Header, (uint)fileNamesOffset, writer);
 
             // Write the core of the file
