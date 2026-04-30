@@ -10,13 +10,13 @@ namespace Shared.Core.PackFiles.Models.Containers
         public Dictionary<string, PackFile> FileList { get; set; } = [];
         public HashSet<string> SourcePackFilePaths { get; set; } = [];
 
-        public int GetFileCount() => FileList.Count;
-
-        public void AddOrUpdateFile(string path, PackFile file)
+        public CachedPackFileContainer(string name)
         {
-            FileList[path] = file;
+            Name = name;
+            SystemFilePath = string.Empty;
         }
 
+        public int GetFileCount() => FileList.Count;
         public Dictionary<string, PackFile> GetAllFiles() => FileList;
 
         public List<(string FileName, PackFile Pack)> FindAllWithExtention(string extention)
@@ -29,11 +29,6 @@ namespace Shared.Core.PackFiles.Models.Containers
                     output.Add((file.Key, file.Value));
             }
             return output;
-        }
-
-        public CachedPackFileContainer(string name)
-        {
-            Name = name;
         }
 
         public PackFile? FindFile(string path)
@@ -53,6 +48,8 @@ namespace Shared.Core.PackFiles.Models.Containers
             var res = FileList.FirstOrDefault(x => ReferenceEquals(x.Value, file)).Key;
             return string.IsNullOrWhiteSpace(res) ? null : res;
         }
+
+        public void AddOrUpdateFile(string path, PackFile file) => throw new InvalidOperationException("Cannot modify a cached CA pack file container.");
 
         public List<PackFile> AddFiles(List<NewPackFileEntry> newFiles) =>
             throw new InvalidOperationException("Cannot modify a cached CA pack file container.");

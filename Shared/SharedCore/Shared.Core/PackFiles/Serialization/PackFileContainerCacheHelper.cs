@@ -245,7 +245,7 @@ namespace Shared.Core.PackFiles.Serialization
                     entry.CompressionFormat,
                     entry.UncompressedSize);
 
-                container.AddOrUpdateFile(entry.RelativePath, new PackFile(entry.FileName, source));
+                container.FileList.Add(entry.RelativePath, new PackFile(entry.FileName, source));
             }
 
             return container;

@@ -16,7 +16,7 @@ namespace Shared.CoreTest.PackFiles.Models.Containers
             {
                 SystemFilePath = @"c:\game\data"
             };
-            _container.AddOrUpdateFile("folder\\file.txt", new PackFile("file.txt", null));
+            _container.FileList.Add("folder\\file.txt", new PackFile("file.txt", null));
         }
 
         [Test]
@@ -68,6 +68,12 @@ namespace Shared.CoreTest.PackFiles.Models.Containers
             var unknownFile = new PackFile("unknown.txt", null);
             var path = _container.GetFullPath(unknownFile);
             Assert.That(path, Is.Null);
+        }
+
+        [Test]
+        public void AddFiles_AddOrUpdateFile()
+        {
+            Assert.Throws<InvalidOperationException>(() => _container.AddOrUpdateFile("path", new PackFile("new.txt", null)));
         }
 
         [Test]
