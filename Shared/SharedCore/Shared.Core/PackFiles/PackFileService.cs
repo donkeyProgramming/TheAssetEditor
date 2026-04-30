@@ -139,6 +139,17 @@ namespace Shared.Core.PackFiles
             _globalEventHub?.PublishGlobalEvent(new PackFileContainerRemovedEvent(container));
         }
 
+        public List<(string FileName, PackFile Pack)> FindAllWithExtention(string extention, IPackFileContainer? container = null)
+        {
+            if (container != null)
+                return container.FindAllWithExtention(extention);
+
+            var output = new List<(string, PackFile)>();
+            foreach (var pf in _packFileContainers)
+                output.AddRange(pf.FindAllWithExtention(extention));
+            return output;
+        }
+
         public void DeleteFolder(IPackFileContainer pf, string folder)
         {
             var container = CastContainer(pf);

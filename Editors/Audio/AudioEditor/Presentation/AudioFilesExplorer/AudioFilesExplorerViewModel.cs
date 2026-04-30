@@ -76,7 +76,7 @@ namespace Editors.Audio.AudioEditor.Presentation.AudioFilesExplorer
 
             AudioFilesExplorerLabel = $"Audio Files Explorer - {WpfHelpers.DuplicateUnderscores(editablePack.Name)}";
 
-            AudioFilesTree = _audioFilesTreeBuilder.BuildTree(editablePack);
+            AudioFilesTree = _audioFilesTreeBuilder.BuildTree(_packFileService, editablePack);
             SetupIsExpandedHandlers(AudioFilesTree);
 
             CacheRootWaveformVisualisations();
@@ -148,7 +148,7 @@ namespace Editors.Audio.AudioEditor.Presentation.AudioFilesExplorer
 
         private void RefreshAudioFilesTree(IPackFileContainer packFileContainer)
         {
-            AudioFilesTree = _audioFilesTreeBuilder.BuildTree(packFileContainer);
+            AudioFilesTree = _audioFilesTreeBuilder.BuildTree(_packFileService, packFileContainer);
             CacheRootWaveformVisualisations();
         }
 
