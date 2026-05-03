@@ -212,9 +212,19 @@ namespace Shared.Core.PackFiles.Serialization.CacheDatabase
 
         public static CachedPackFileContainer? TryLoadFromCache(string cacheFilePath, string fingerprint)
         {
+            if (!File.Exists(cacheFilePath))
+            {
+                _logger.Here().Information($"Cache file does not exist: {cacheFilePath}");
+                return null;
+            }
+
             try
             {
-                return LoadContainerFromCache(cacheFilePath, fingerprint);
+                _logger.Here().Information($"Attempting to load cache from: {cacheFilePath} with fingerprint: {fingerprint}");
+                var result = LoadContainerFromCache(cacheFilePath, fingerprint);
+                if (result == null)
+                    _logger.Here().Information($"Cache load returned null (fingerprint/schema mismatch) for: {cacheFilePath}");
+                return result;
             }
             catch (Exception ex)
             {

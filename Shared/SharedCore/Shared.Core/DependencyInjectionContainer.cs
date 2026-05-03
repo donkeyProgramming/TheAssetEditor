@@ -37,7 +37,7 @@ namespace Shared.Core
 
 
             services.AddSingleton<LocalizationManager>();
-            services.AddSingleton<IPackFileContainerLoader, PackFileContainerLoader>();
+            services.AddTransient<IPackFileContainerLoader, PackFileContainerLoader>();
         }
     }
 

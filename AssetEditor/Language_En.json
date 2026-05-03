@@ -881,6 +881,14 @@
 
   "AnimationReTarget.BoneSettings.Title": "Bone settings:",
   "FbxSettingsDialog.Import": "Import",
-  "FbxSettingsDialog.Cancel": "Cancel"
+  "FbxSettingsDialog.Cancel": "Cancel",
+
+  "PackFileCache.InvalidReason.Title": "Cache Rebuild Required",
+  "PackFileCache.InvalidReason.NotFound": "No cache found for {0}. Building cache for the first time - this may take a moment.",
+  "PackFileCache.InvalidReason.DataChanged": "Game files for {0} have changed since the cache was built. Rebuilding cache.",
+  "PackFileCache.InvalidReason.Corrupted": "Cache for {0} is corrupted and will be rebuilt.",
+  "PackFileCache.BuildingCache": "Building pack file cache for {0}. This may take some time, please wait...",
+  "PackFileCache.BuildingCache.Title": "Building Cache",
+  "PackFileCache.Description": "The cache allows faster startup times and reduces memory usage by storing pre-processed game file data on disk."
 }
 
