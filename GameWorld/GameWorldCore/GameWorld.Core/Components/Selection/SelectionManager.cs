@@ -72,7 +72,6 @@ namespace GameWorld.Core.Components.Selection
             base.Initialize();
         }
 
-
         public ISelectionState CreateSelectionSate(GeometrySelectionMode mode, ISelectable selectedObj, bool sendEvent = true)
         {
             if (_currentState != null)
@@ -147,6 +146,8 @@ namespace GameWorld.Core.Components.Selection
                     _cachedEdgeMesh = vertexObject;
                     _cachedEdgeIndices = BuildEdgeIndexCache(geo);
                     _edgeDataDirty = true;
+                    _sampleIdx0 = 0;
+                    _sampleIdx1 = geo.VertexCount() > 1 ? 1 : 0;
                 }
 
                 if (selectionVertexState.SelectedVertices.Count >= 2)
@@ -160,7 +161,14 @@ namespace GameWorld.Core.Components.Selection
                     _sampleIdx1 = _sampleIdx0 < geo.VertexCount() - 1 ? _sampleIdx0 + 1 : 0;
                 }
 
-                if (!_edgeDataDirty && geo.VertexCount() >= 2)
+                var vertexCount = geo.VertexCount();
+                if (vertexCount > 0)
+                {
+                    _sampleIdx0 = Math.Clamp(_sampleIdx0, 0, vertexCount - 1);
+                    _sampleIdx1 = Math.Clamp(_sampleIdx1, 0, vertexCount - 1);
+                }
+
+                if (!_edgeDataDirty && vertexCount >= 2)
                 {
                     var p0 = geo.GetVertexById(_sampleIdx0);
                     var p1 = geo.GetVertexById(_sampleIdx1);
@@ -173,7 +181,7 @@ namespace GameWorld.Core.Components.Selection
                     UpdateEdgeQuadData(vertexObject, selectionVertexState);
                     _edgeDataDirty = false;
 
-                    if (geo.VertexCount() >= 2)
+                    if (vertexCount >= 2)
                     {
                         _samplePos0 = geo.GetVertexById(_sampleIdx0);
                         _samplePos1 = geo.GetVertexById(_sampleIdx1);

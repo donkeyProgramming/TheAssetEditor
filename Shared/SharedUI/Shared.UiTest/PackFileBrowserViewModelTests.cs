@@ -1,6 +1,31 @@
-﻿using System.Windows.Input;
+﻿// PackFileBrowserViewModel Lazy Loading Architecture:
+//
+// The tree is built lazily. When a container is added (via PackFileContainerAddedEvent), only
+// the root TreeNodeSource is created with a child-loader delegate. Children are NOT loaded from
+// the container's GetDirectoryContent() until the node is expanded or explicitly queried.
+//
+// TreeNodeSource is the canonical backing model (lightweight, no UI state).
+// TreeNode is the materialized WPF-bound node, created on demand when a branch is expanded.
+// A placeholder child is used so the WPF TreeView shows the expand arrow for unloaded directories.
+//
+// Event-driven updates from PackFileService:
+//   - PackFileContainerAddedEvent      → ReloadTree: creates root source + lazy child loader
+//   - PackFileContainerRemovedEvent    → removes container's tree state and TreeNode from Files
+//   - PackFileContainerFilesAddedEvent → AddFiles: inserts nodes into loaded source branches, creates dirs as needed
+//   - PackFileContainerFilesRemovedEvent → removes source + materialized nodes for deleted files
+//   - PackFileContainerFilesUpdatedEvent → updates Name/UnsavedChanged on source nodes (for rename/save)
+//   - PackFileContainerFolderRemovedEvent → finds and removes folder source node and materialized subtree
+//   - PackFileContainerFolderRenamedEvent → finds folder by OLD path, renames leaf, marks unsaved
+//   - PackFileContainerSetAsMainEditableEvent → toggles IsMainEditabelPack on root TreeNodes
+//   - PackFileContainerSavedEvent      → clears UnsavedChanged on loaded nodes only (avoids forcing full population)
+//
+// SearchFilter: when active, calls EnsureFullyPopulated() to load entire subtree for regex matching.
+// When cleared, filter-expanded nodes are absorbed as user expansions and collapsed nodes are unloaded.
+
+using System.Windows.Input;
 using AssetEditor.ViewModels;
 using Microsoft.Extensions.DependencyInjection;
+using Shared.Core.Events;
 using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
 using Shared.Core.Settings;
@@ -319,6 +344,293 @@ namespace Shared.UiTest
             }
 
             _packageFileService.AddContainer(container);
+        }
+
+        [Test]
+        public void RenameFolderUsingPfs_EnsureTreeViewUpdated()
+        {
+            CreatePackfiles(("foldera\\file.txt", "file.txt"));
+            var root = _viewModel.Files[0];
+            root.IsNodeExpanded = true;
+
+            var folderA = _viewModel.GetFromPath(root, "foldera");
+            Assert.That(folderA, Is.Not.Null);
+
+            var container = _packageFileService.GetAllPackfileContainers().Last(x => x.Name == "test.pack");
+            _packageFileService.RenameDirectory(container, "foldera", "folderb");
+
+            // Old path gone, new path available
+            var oldNode = _viewModel.GetFromPath(root, "foldera");
+            var newNode = _viewModel.GetFromPath(root, "folderb");
+
+            Assert.That(oldNode, Is.Null, "Old folder path should not exist after rename");
+            Assert.That(newNode, Is.Not.Null, "Renamed folder should be accessible via the new name");
+            Assert.That(newNode.UnsavedChanged, Is.True, "Renamed folder should be marked unsaved");
+        }
+
+        [Test]
+        public void RenameFolderUsingPfs_NestedFolder_EnsureTreeViewUpdated()
+        {
+            CreatePackfiles(("parent\\child\\file.txt", "file.txt"));
+            var root = _viewModel.Files[0];
+            root.IsNodeExpanded = true;
+
+            var parent = _viewModel.GetFromPath(root, "parent");
+            Assert.That(parent, Is.Not.Null);
+            parent.IsNodeExpanded = true;
+
+            var container = _packageFileService.GetAllPackfileContainers().Last(x => x.Name == "test.pack");
+            _packageFileService.RenameDirectory(container, "parent\\child", "renamed");
+
+            var newNode = _viewModel.GetFromPath(root, "parent\\renamed");
+            Assert.That(newNode, Is.Not.Null, "Nested renamed folder should be accessible");
+            Assert.That(newNode.UnsavedChanged, Is.True);
+        }
+
+        [Test]
+        public void DeleteFolderUsingPfs_EnsureTreeViewUpdated()
+        {
+            CreatePackfiles(("foldera\\file.txt", "file.txt"), ("folderb\\other.txt", "other.txt"));
+            var root = _viewModel.Files[0];
+            root.IsNodeExpanded = true;
+
+            var folderA = _viewModel.GetFromPath(root, "foldera");
+            Assert.That(folderA, Is.Not.Null);
+
+            var container = _packageFileService.GetAllPackfileContainers().Last(x => x.Name == "test.pack");
+            _packageFileService.DeleteFolder(container, "foldera");
+
+            var deletedNode = _viewModel.GetFromPath(root, "foldera");
+            Assert.That(deletedNode, Is.Null, "Deleted folder should not exist in tree");
+
+            var survivingNode = _viewModel.GetFromPath(root, "folderb");
+            Assert.That(survivingNode, Is.Not.Null, "Non-deleted folder should still exist");
+        }
+
+        [Test]
+        public void UnloadPackContainer_RemovesFromTree()
+        {
+            CreatePackfiles(("foldera\\file.txt", "file.txt"));
+            Assert.That(_viewModel.Files.Count, Is.EqualTo(1));
+
+            var container = _packageFileService.GetAllPackfileContainers().Last(x => x.Name == "test.pack");
+            _packageFileService.UnloadPackContainer(container);
+
+            Assert.That(_viewModel.Files.Count, Is.EqualTo(0));
+        }
+
+        [Test]
+        public void AddContainer_AppearsInTree()
+        {
+            Assert.That(_viewModel.Files.Count, Is.EqualTo(0));
+
+            var container = _packageFileService.CreateNewPackFileContainer("new.pack", PackFileVersion.PFH5, PackFileCAType.MOD);
+            _packageFileService.AddContainer(container);
+
+            Assert.That(_viewModel.Files.Count, Is.EqualTo(1));
+            Assert.That(_viewModel.Files[0].Name, Is.EqualTo("new.pack"));
+            Assert.That(_viewModel.Files[0].NodeType, Is.EqualTo(NodeType.Root));
+        }
+
+        [Test]
+        public void MainEditablePackChanged_UpdatesRootNode()
+        {
+            var container1 = _packageFileService.CreateNewPackFileContainer("pack1.pack", PackFileVersion.PFH5, PackFileCAType.MOD, true);
+            _packageFileService.AddContainer(container1);
+            var container2 = _packageFileService.CreateNewPackFileContainer("pack2.pack", PackFileVersion.PFH5, PackFileCAType.MOD);
+            _packageFileService.AddContainer(container2);
+
+            var root1 = _viewModel.Files.First(x => x.Name == "pack1.pack");
+            var root2 = _viewModel.Files.First(x => x.Name == "pack2.pack");
+
+            Assert.That(root1.IsMainEditabelPack, Is.True);
+            Assert.That(root2.IsMainEditabelPack, Is.False);
+
+            _packageFileService.SetEditablePack(container2);
+
+            Assert.That(root1.IsMainEditabelPack, Is.False);
+            Assert.That(root2.IsMainEditabelPack, Is.True);
+        }
+
+        [Test]
+        public void ContainerSaved_ClearsUnsavedFlags()
+        {
+            CreatePackfiles(("foldera\\file.txt", "file.txt"));
+            var root = _viewModel.Files[0];
+            var container = _packageFileService.GetAllPackfileContainers().Last(x => x.Name == "test.pack");
+
+            // Add a file to mark things as unsaved
+            var newFile = PackFile.CreateFromASCII("new.txt", "data");
+            _packageFileService.AddFilesToPack(container, [new NewPackFileEntry("foldera", newFile)]);
+
+            root.IsNodeExpanded = true;
+            var folderA = _viewModel.GetFromPath(root, "foldera");
+            Assert.That(folderA, Is.Not.Null);
+            Assert.That(root.UnsavedChanged, Is.True, "Root should be unsaved after adding file");
+
+            // Simulate save via PFS — we can't call SavePackContainer without disk I/O,
+            // so trigger the event directly through the event hub
+            var eventHub = _runner.ServiceProvider.GetRequiredService<IEventHub>();
+            eventHub.PublishGlobalEvent(new Shared.Core.Events.Global.PackFileContainerSavedEvent(container));
+
+            Assert.That(root.UnsavedChanged, Is.False, "Root should be cleared after save");
+        }
+
+        [Test]
+        public void ContainerSaved_DoesNotForcePopulationOfUnloadedBranches()
+        {
+            CreatePackfiles(("foldera\\sub\\deep\\file.txt", "file.txt"));
+            var root = _viewModel.Files[0];
+            var container = _packageFileService.GetAllPackfileContainers().Last(x => x.Name == "test.pack");
+
+            // Root is collapsed — only root exists as materialized node
+            Assert.That(root.IsNodeExpanded, Is.False);
+
+            var eventHub = _runner.ServiceProvider.GetRequiredService<IEventHub>();
+            eventHub.PublishGlobalEvent(new Shared.Core.Events.Global.PackFileContainerSavedEvent(container));
+
+            // After save, the tree should NOT have expanded/materialized children
+            Assert.That(root.Children.All(c => c.Name == "<placeholder>" || c.NodeType == NodeType.Root),
+                Is.True, "Save should not force population of collapsed branches");
+        }
+
+        [Test]
+        public void AddFileToRootLevel_EnsureTreeViewUpdated()
+        {
+            var container = _packageFileService.CreateNewPackFileContainer("test.pack", PackFileVersion.PFH5, PackFileCAType.MOD, true);
+            _packageFileService.AddContainer(container);
+
+            var newFile = PackFile.CreateFromASCII("rootfile.txt", "content");
+            _packageFileService.AddFilesToPack(container, [new NewPackFileEntry("", newFile)]);
+
+            var root = _viewModel.Files.First(x => x.Name == "test.pack");
+            root.IsNodeExpanded = true;
+
+            var fileNode = _viewModel.GetFromPath(root, "rootfile.txt");
+            Assert.That(fileNode, Is.Not.Null, "File added at root level should appear in tree");
+            Assert.That(fileNode.NodeType, Is.EqualTo(NodeType.File));
+        }
+
+        [Test]
+        public void DoubleClick_File_InvokesFileOpenEvent()
+        {
+            CreatePackfiles(("foldera\\file.txt", "file.txt"));
+            var root = _viewModel.Files[0];
+            root.IsNodeExpanded = true;
+
+            var folderA = _viewModel.GetFromPath(root, "foldera");
+            folderA.IsNodeExpanded = true;
+
+            var fileNode = _viewModel.GetFromPath(root, "foldera\\file.txt");
+            Assert.That(fileNode, Is.Not.Null);
+
+            PackFile? openedFile = null;
+            _viewModel.FileOpen += f => openedFile = f;
+
+            _viewModel.DoubleClickCommand.Execute(fileNode);
+
+            Assert.That(openedFile, Is.Not.Null, "FileOpen should be invoked on double-click");
+            Assert.That(openedFile.Name, Is.EqualTo("file.txt"));
+        }
+
+        [Test]
+        public void DoubleClick_Directory_TogglesExpansion()
+        {
+            CreatePackfiles(("foldera\\file.txt", "file.txt"));
+            var root = _viewModel.Files[0];
+            root.IsNodeExpanded = true;
+
+            var folderA = _viewModel.GetFromPath(root, "foldera");
+            Assert.That(folderA, Is.Not.Null);
+            Assert.That(folderA.IsNodeExpanded, Is.False);
+
+            _viewModel.DoubleClickCommand.Execute(folderA);
+            Assert.That(folderA.IsNodeExpanded, Is.True);
+
+            _viewModel.DoubleClickCommand.Execute(folderA);
+            Assert.That(folderA.IsNodeExpanded, Is.False);
+        }
+
+        [Test]
+        public void MoveFileUsingPfs_EnsureTreeViewUpdated()
+        {
+            CreatePackfiles(("source\\file.txt", "file.txt"), ("target\\other.txt", "other.txt"));
+            var root = _viewModel.Files[0];
+            root.IsNodeExpanded = true;
+            var container = _packageFileService.GetAllPackfileContainers().Last(x => x.Name == "test.pack");
+
+            var sourceFolder = _viewModel.GetFromPath(root, "source");
+            Assert.That(sourceFolder, Is.Not.Null);
+            sourceFolder.IsNodeExpanded = true;
+
+            var fileNode = _viewModel.GetFromPath(root, "source\\file.txt");
+            Assert.That(fileNode, Is.Not.Null);
+
+            var file = _packageFileService.FindFile("source\\file.txt", container);
+            _packageFileService.MoveFile(container, file, "target");
+
+            // Old location gone
+            var oldNode = _viewModel.GetFromPath(root, "source\\file.txt");
+            Assert.That(oldNode, Is.Null, "File should not be in old folder after move");
+
+            // New location has the file
+            var targetFolder = _viewModel.GetFromPath(root, "target");
+            targetFolder.IsNodeExpanded = true;
+            var newNode = _viewModel.GetFromPath(root, "target\\file.txt");
+            Assert.That(newNode, Is.Not.Null, "File should appear in target folder after move");
+        }
+
+        [Test]
+        public void DragDrop_FileOntoFile_NotAllowed()
+        {
+            CreatePackfiles(("foldera\\file1.txt", "file1.txt"), ("foldera\\file2.txt", "file2.txt"));
+            var root = _viewModel.Files[0];
+            root.IsNodeExpanded = true;
+
+            var folderA = _viewModel.GetFromPath(root, "foldera");
+            folderA.IsNodeExpanded = true;
+
+            var file1 = _viewModel.GetFromPath(root, "foldera\\file1.txt");
+            var file2 = _viewModel.GetFromPath(root, "foldera\\file2.txt");
+
+            Assert.That(_viewModel.AllowDrop(file1, file2), Is.False, "Should not allow dropping file onto file");
+        }
+
+        [Test]
+        public void DragDrop_FolderDrag_NotAllowed()
+        {
+            CreatePackfiles(("foldera\\file.txt", "file.txt"), ("folderb\\file2.txt", "file2.txt"));
+            var root = _viewModel.Files[0];
+            root.IsNodeExpanded = true;
+
+            var folderA = _viewModel.GetFromPath(root, "foldera");
+            var folderB = _viewModel.GetFromPath(root, "folderb");
+
+            Assert.That(_viewModel.AllowDrop(folderA, folderB), Is.False, "Should not allow dragging folders");
+        }
+
+        [Test]
+        public void ShowFoldersOnly_HidesFiles()
+        {
+            CreatePackfiles(("foldera\\file.txt", "file.txt"));
+            var root = _viewModel.Files[0];
+
+            _viewModel.Filter.ShowFoldersOnly = true;
+
+            root.IsNodeExpanded = true;
+            var folderA = _viewModel.GetFromPath(root, "foldera");
+            Assert.That(folderA, Is.Not.Null, "Folder should be visible with ShowFoldersOnly");
+            Assert.That(folderA.IsVisible, Is.True);
+
+            folderA.IsNodeExpanded = true;
+
+            // File nodes are not materialized when ShowFoldersOnly is active
+            var fileNode = _viewModel.GetFromPath(root, "foldera\\file.txt");
+            Assert.That(fileNode, Is.Null, "File should not be materialized with ShowFoldersOnly active");
+
+            // Only folder children should be present
+            Assert.That(folderA.Children.All(c => c.NodeType != NodeType.File || !c.IsVisible), Is.True,
+                "No visible file nodes should exist under folder with ShowFoldersOnly");
         }
     }
 }

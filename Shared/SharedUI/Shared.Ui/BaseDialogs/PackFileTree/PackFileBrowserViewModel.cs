@@ -69,7 +69,7 @@ namespace Shared.Ui.BaseDialogs.PackFileTree
             _eventHub?.Register<PackFileContainerFilesAddedEvent>(this, x => AddFiles(x.Container, x.AddedFiles));
             _eventHub?.Register<PackFileContainerFilesRemovedEvent>(this, x => Database_PackFilesRemoved(x.Container, x.RemovedFiles));
             _eventHub?.Register<PackFileContainerFolderRemovedEvent>(this, x => Database_PackFileFolderRemoved(x.Container, x.Folder));
-            _eventHub?.Register<PackFileContainerFolderRenamedEvent>(this, x => Database_PackFileFolderRenamed(x.Container, x.NewNodePath));
+            _eventHub?.Register<PackFileContainerFolderRenamedEvent>(this, x => Database_PackFileFolderRenamed(x.Container, x.OldNodePath, x.NewNodePath));
             _eventHub?.Register<PackFileContainerSavedEvent>(this, ContainerSaved);
 
             Filter = new SearchFilter(Files, () => _treeStates.Values.Select(x => x.RootSource));
@@ -117,13 +117,19 @@ namespace Shared.Ui.BaseDialogs.PackFileTree
             Filter.Reapply();
         }
 
-        private void Database_PackFileFolderRenamed(IPackFileContainer container, string folder)
+        private void Database_PackFileFolderRenamed(IPackFileContainer container, string oldPath, string newPath)
         {
             var state = GetPackFileTreeState(container);
-            var node = GetNodeFromPath(state.RootSource, folder, false);
+            var node = GetNodeFromPath(state.RootSource, oldPath, false);
             if (node == null)
                 return;
 
+            var newLeafName = newPath;
+            var lastSep = newPath.LastIndexOf(Path.DirectorySeparatorChar);
+            if (lastSep != -1)
+                newLeafName = newPath.Substring(lastSep + 1);
+
+            node.Name = newLeafName;
             node.UnsavedChanged = true;
             Filter.Reapply();
         }
@@ -133,12 +139,21 @@ namespace Shared.Ui.BaseDialogs.PackFileTree
             var state = GetPackFileTreeState(e.Container);
             var root = state.RootNode;
 
-            foreach (var node in state.RootSource.EnumerateAllNodesDepthFirst())
-                node.UnsavedChanged = false;
+            ClearUnsavedOnLoadedSourceNodes(state.RootSource);
 
             root.UnsavedChanged = false;
             root.ForeachNode((node) => node.UnsavedChanged = false);
             Filter.Reapply();
+        }
+
+        private static void ClearUnsavedOnLoadedSourceNodes(TreeNodeSource node)
+        {
+            node.UnsavedChanged = false;
+            if (!node.ChildrenLoaded)
+                return;
+
+            foreach (var child in node.Children)
+                ClearUnsavedOnLoadedSourceNodes(child);
         }
 
         private void Database_PackFilesRemoved(IPackFileContainer container, List<PackFile> files)
@@ -255,7 +270,6 @@ namespace Shared.Ui.BaseDialogs.PackFileTree
                 var numSeperators = fullPath.Count(x => x == Path.DirectorySeparatorChar);
 
                 var directoryEnd = fullPath.LastIndexOf(Path.DirectorySeparatorChar);
-                var fileName = fullPath.Substring(directoryEnd + 1);
 
                 // Check if alreayd added - this happens moving files.
 
@@ -263,14 +277,14 @@ namespace Shared.Ui.BaseDialogs.PackFileTree
                 if (numSeperators == 0)
                 {
                     RemoveExistingFileNode(state.RootSource, item.Name, item);
-                    newNode = new TreeNodeSource(fileName, NodeType.File, container, state.RootSource, item);
+                    newNode = new TreeNodeSource(item.Name, NodeType.File, container, state.RootSource, item);
                     InsertChildSorted(state.RootSource, newNode);
                 }
                 else
                 {
                     var directory = fullPath.Substring(0, directoryEnd);
                     var folder = GetNodeFromPath(state.RootSource, directory)!;
-                    newNode = new TreeNodeSource(fileName, NodeType.File, container, folder, item);
+                    newNode = new TreeNodeSource(item.Name, NodeType.File, container, folder, item);
 
                     // remove any existing files with same name
                     var existingFile = folder.Children.FirstOrDefault(node => node.Name == item.Name && node.NodeType == NodeType.File);
@@ -391,6 +405,7 @@ namespace Shared.Ui.BaseDialogs.PackFileTree
             if (createIfMissing)
             {
                 var newNode = new TreeNodeSource(nodeName, NodeType.Directory, parent.FileOwner, parent);
+                newNode.MarkChildrenLoaded();
                 InsertChildSorted(parent, newNode);
                 return GetNodeFromPath(newNode, remainingStr, createIfMissing);
             }

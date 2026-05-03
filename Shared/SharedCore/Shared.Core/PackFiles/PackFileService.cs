@@ -197,7 +197,7 @@ namespace Shared.Core.PackFiles
                 throw new Exception("Name can not be empty");
 
             var newNodePath = container.RenameDirectory(currentNodeName, newName);
-            _globalEventHub?.PublishGlobalEvent(new PackFileContainerFolderRenamedEvent(container, newNodePath));
+            _globalEventHub?.PublishGlobalEvent(new PackFileContainerFolderRenamedEvent(container, currentNodeName, newNodePath));
         }
 
         public void RenameFile(IPackFileContainer pf, PackFile file, string newName)
