@@ -9,6 +9,7 @@ using CommunityToolkit.Mvvm.Input;
 using Editors.AnimationFragmentEditor.AnimationPack.Commands;
 using Editors.Reports.Animation;
 using Editors.Reports.Audio;
+using Editors.Reports.Bmd;
 using Editors.Reports.DeepSearch;
 using Editors.Reports.Files;
 using Editors.Reports.Geometry;
@@ -88,6 +89,7 @@ namespace AssetEditor.ViewModels
         [RelayCommand] private void SaveActivePack() => _uiCommandFactory.Create<SavePackFileContainerCommand>().Execute();
         [RelayCommand] private void OpenWh2AnimpackUpdater() => new AnimPackUpdaterService(_packfileService).Process();
         [RelayCommand] private void GenerateRmv2Report() => _uiCommandFactory.Create<Rmv2ReportCommand>().Execute();
+        [RelayCommand] private void GenerateBmdReport() => _uiCommandFactory.Create<BmdReportCommand>().Execute();
         [RelayCommand] private void GenerateMetaDataReport() => _uiCommandFactory.Create<GenerateMetaDataReportCommand>().Execute();
         [RelayCommand] private void GenerateFileListReport() => _uiCommandFactory.Create<FileListReportCommand>().Execute();
         [RelayCommand] private void GenerateMetaDataJsonsReport() => _uiCommandFactory.Create<GenerateMetaJsonDataReportCommand>().Execute();

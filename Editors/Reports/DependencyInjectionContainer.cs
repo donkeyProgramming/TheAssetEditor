@@ -1,5 +1,6 @@
 ﻿using Editors.Reports.Animation;
 using Editors.Reports.Audio;
+using Editors.Reports.Bmd;
 using Editors.Reports.DeepSearch;
 using Editors.Reports.Files;
 using Editors.Reports.Geometry;
@@ -34,6 +35,9 @@ namespace Editors.Reports
 
             serviceCollection.AddTransient<Rmv2ReportCommand>();
             serviceCollection.AddTransient<Rmv2ReportGenerator>();
+
+            serviceCollection.AddTransient<BmdReportCommand>();
+            serviceCollection.AddTransient<BmdReportGenerator>();
 
             serviceCollection.AddTransient<RmvToTextCommand>();
             serviceCollection.AddScoped<IRmvToTextCommand, RmvToTextCommand>();

@@ -1,0 +1,47 @@
+<UserControl x:Class="Editors.BmdEditor.Views.BmdSceneView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:vm="clr-namespace:Editors.BmdEditor.ViewModels"
+             xmlns:views="clr-namespace:Editors.BmdEditor.Views"
+             mc:Ignorable="d" 
+             d:DesignHeight="600" d:DesignWidth="800">
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- Toolbar -->
+        <ToolBar Grid.Row="0" Margin="0,0,0,5">
+            <Button Content="Reset Camera" Command="{Binding ResetCameraCommand}" Padding="10,5"/>
+            <Separator/>
+            <Button Content="Show Grid" Command="{Binding ToggleGridCommand}" Padding="10,5"/>
+            <Separator/>
+            <Button Content="Show Props" Command="{Binding TogglePropsCommand}" Padding="10,5"/>
+            <Separator/>
+            <Button Content="Show Lights" Command="{Binding ToggleLightsCommand}" Padding="10,5"/>
+            <Separator/>
+            <TextBlock Text="Loaded Props:" VerticalAlignment="Center" Margin="5,0"/>
+            <TextBlock Text="{Binding LoadedPropsCount}" VerticalAlignment="Center" FontWeight="Bold"/>
+        </ToolBar>
+
+        <!-- 3D Scene Container -->
+        <Border Grid.Row="1" BorderBrush="Gray" BorderThickness="1">
+            <views:Bmd3DSceneViewer />
+        </Border>
+
+        <!-- Status Bar -->
+        <StatusBar Grid.Row="2">
+            <StatusBarItem>
+                <TextBlock Text="{Binding StatusText}"/>
+            </StatusBarItem>
+            <StatusBarItem HorizontalAlignment="Right">
+                <TextBlock Text="{Binding SceneInfo}"/>
+            </StatusBarItem>
+        </StatusBar>
+    </Grid>
+</UserControl>
