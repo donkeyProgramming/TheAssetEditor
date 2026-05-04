@@ -5,6 +5,8 @@ using Shared.Core.ErrorHandling;
 using Shared.Core.PackFiles.Models;
 using Shared.Core.PackFiles.Models.Containers;
 using Shared.Core.PackFiles.Serialization;
+using Shared.Core.PackFiles.Serialization.CacheDatabase;
+using Shared.Core.Services;
 using Shared.Core.Settings;
 
 namespace Shared.Core.PackFiles.Utility
@@ -21,10 +23,14 @@ namespace Shared.Core.PackFiles.Utility
     {
         static private readonly ILogger _logger = Logging.CreateStatic(typeof(PackFileContainerLoader));
         private readonly ApplicationSettingsService _settingsService;
+        private readonly IStandardDialogs _standardDialogs;
+        private readonly LocalizationManager _localizationManager;
 
-        public PackFileContainerLoader(ApplicationSettingsService settingsService)
+        public PackFileContainerLoader(ApplicationSettingsService settingsService, IStandardDialogs standardDialogs, LocalizationManager localizationManager)
         {
             _settingsService = settingsService;
+            _standardDialogs = standardDialogs;
+            _localizationManager = localizationManager;
         }
 
         public IPackFileContainer LoadSystemFolderAsPackFileContainer(string packFileSystemPath)
@@ -103,23 +109,44 @@ namespace Shared.Core.PackFiles.Utility
                 var allCaPackFiles = ManifestHelper.GetPackFilesFromManifest(gameDataFolder, out var manifestFileFound);
 
                 var fingerprint = PackFileContainerCacheHelper.ComputeFingerprint(gameDataFolder, allCaPackFiles);
-                var cacheFilePath = PackFileContainerCacheHelper.GetCacheFilePath(gameDataFolder, gameName);
+                _logger.Here().Information($"Computed fingerprint for {gameName}: {fingerprint}");
 
-                var cached = TryLoadFromCache(cacheFilePath, fingerprint, gameName);
+                var cacheFilePath = PackFileContainerCacheHelper.GetCacheFilePath(gameDataFolder, gameName, fingerprint);
+                _logger.Here().Information($"Cache file path for {gameName}: {cacheFilePath}");
+
+                var cached = PackFileContainerCacheHelper.TryLoadFromCache(cacheFilePath, fingerprint);
                 if (cached != null)
+                {
+                    _logger.Here().Information($"Cache hit for {gameName} - loaded {cached.GetFileCount()} files from: {cacheFilePath}");
                     return cached;
-
-                var container = LoadAllCaFilesFromDisk(gameDataFolder, gameName, allCaPackFiles, manifestFileFound);
-
-                try
-                {
-                    var cacheData = PackFileContainerCacheHelper.BuildCacheData(fingerprint, container);
-                    PackFileContainerCacheHelper.SaveCache(cacheData, cacheFilePath);
-                    _logger.Here().Information($"Saved CA pack cache for {gameName} to {cacheFilePath}");
                 }
-                catch (Exception cacheEx)
+
+                _logger.Here().Information($"Cache miss for {gameName} at: {cacheFilePath}");
+
+                var cacheInvalidReason = GetCacheInvalidReason(cacheFilePath, fingerprint);
+                _logger.Here().Information($"Cache invalid reason for {gameName}: {cacheInvalidReason}");
+                var reasonMessage = string.Format(_localizationManager.Get("PackFileCache.InvalidReason." + cacheInvalidReason), gameName);
+                var buildingMessage = string.Format(_localizationManager.Get("PackFileCache.BuildingCache"), gameName);
+                var cacheDescription = _localizationManager.Get("PackFileCache.Description");
+                _standardDialogs.ShowDialogBox(
+                    reasonMessage + "\n\n" + buildingMessage + "\n\n" + cacheDescription,
+                    _localizationManager.Get("PackFileCache.InvalidReason.Title"));
+
+                PackFileContainer container;
+                using (_standardDialogs.ShowWaitCursor())
                 {
-                    _logger.Here().Warning($"Failed to save CA pack cache for {gameName}: {cacheEx.Message}");
+                    container = LoadAllCaFilesFromDisk(gameDataFolder, gameName, allCaPackFiles, manifestFileFound);
+
+                    try
+                    {
+                        var dbOptions = PackFileContainerCacheHelper.CreateDbOptions(cacheFilePath);
+                        PackFileContainerCacheHelper.SaveCache(fingerprint, container, dbOptions);
+                        _logger.Here().Information($"Saved CA pack cache for {gameName} to {cacheFilePath}");
+                    }
+                    catch (Exception cacheEx)
+                    {
+                        _logger.Here().Warning($"Failed to save CA pack cache for {gameName}: {cacheEx.Message}");
+                    }
                 }
 
                 return container;
@@ -131,22 +158,24 @@ namespace Shared.Core.PackFiles.Utility
             }
         }
 
-        private CachedPackFileContainer? TryLoadFromCache(string cacheFilePath, string fingerprint, string gameName)
+        private static string GetCacheInvalidReason(string cacheFilePath, string fingerprint)
         {
+            if (!File.Exists(cacheFilePath))
+                return "NotFound";
+
             try
             {
-                var container = PackFileContainerCacheHelper.LoadContainerFromCache(cacheFilePath, fingerprint);
-                if (container != null)
-                {
-                    _logger.Here().Information($"Loading CA packs for {gameName} from cache: {cacheFilePath}");
-                    return container;
-                }
+                var dbOptions = PackFileContainerCacheHelper.CreateDbOptions(cacheFilePath);
+                var result = PackFileContainerCacheHelper.LoadContainerFromCache(dbOptions, fingerprint);
+                if (result == null)
+                    return "DataChanged";
             }
-            catch (Exception ex)
+            catch
             {
-                _logger.Here().Warning($"Failed to read CA pack cache for {gameName}, will rebuild: {ex.Message}");
+                return "Corrupted";
             }
-            return null;
+
+            return "DataChanged";
         }
 
         private PackFileContainer LoadAllCaFilesFromDisk(string gameDataFolder, string gameName, List<string> allCaPackFiles, bool manifestFileFound)

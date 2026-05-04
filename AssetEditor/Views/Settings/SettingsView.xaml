@@ -7,7 +7,8 @@
              xmlns:gameinfo="clr-namespace:Shared.Core.Services;assembly=Shared.Core" 
              xmlns:behaviors="clr-namespace:Shared.Ui.Common.Behaviors;assembly=Shared.Ui"
              xmlns:loc="clr-namespace:Shared.Ui.Common;assembly=Shared.Ui"
-             xmlns:local="clr-namespace:AssetEditor.Views.Settings" xmlns:viewmodels="clr-namespace:AssetEditor.ViewModels" 
+             xmlns:local="clr-namespace:AssetEditor.Views.Settings" xmlns:viewmodels="clr-namespace:AssetEditor.ViewModels"
+             xmlns:colourpickerbutton="clr-namespace:Shared.Ui.BaseDialogs.ColourPickerButton;assembly=Shared.Ui"
              d:DataContext="{d:DesignInstance Type=viewmodels:SettingsViewModel}"
              mc:Ignorable="d" >
 
@@ -98,6 +99,7 @@
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
 
             <TextBlock Grid.Row="0" Text="{loc:Loc SettingsWindow.Rendering}" Margin="5, 10, 0, 0" FontSize="15"/>
@@ -112,6 +114,9 @@
 
             <TextBlock Grid.Row="4" Grid.Column="0" Text="{loc:Loc SettingsWindow.GridSize}" Margin="5, 0, 0, 0" ToolTip="{loc:Loc SettingsWindow.GridSizeTooltip}"/>
             <TextBox  Grid.Row="4" Grid.Column="1" Text="{Binding VisualEditorsGridSize, UpdateSourceTrigger=LostFocus}" MaxLength="4" Width="150" Margin="0, 0, 0, 5" HorizontalAlignment="Left" HorizontalContentAlignment="Right"/>
+
+            <TextBlock Grid.Row="5" Grid.Column="0" Text="{loc:Loc SettingsWindow.VertexSelectionColour}" Margin="5, 0, 0, 0" ToolTip="{loc:Loc SettingsWindow.VertexSelectionColourTooltip}"/>
+            <colourpickerbutton:ColourPickerButtonView Grid.Row="5" Grid.Column="1" DataContext="{Binding VertexSelectionColour}" Width="25" Height="25" Margin="0, 0, 0, 5" HorizontalAlignment="Left"/>
 
 
 

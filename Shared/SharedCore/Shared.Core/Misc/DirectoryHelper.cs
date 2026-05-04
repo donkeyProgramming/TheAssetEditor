@@ -36,6 +36,7 @@ namespace Shared.Core.Misc
         public static string Applications { get { return ApplicationDirectory + "\\Applications"; } }
         public static string Temp { get { return ApplicationDirectory + "\\Temp"; } }
         public static string UpdateDirectory { get { return Temp + "\\Update"; } }
+        public static string CacheDirectory { get => ApplicationDirectory + "\\Cache"; }
         public static string AnimationIndexMappingDirectory { get { return ApplicationDirectory + "\\Animation\\BoneIndexMapping"; } }
 
         public static void EnsureCreated()
@@ -47,6 +48,7 @@ namespace Shared.Core.Misc
             EnsureCreated(Applications);
             EnsureCreated(Temp);
             EnsureCreated(AnimationIndexMappingDirectory);
+            EnsureCreated(CacheDirectory);
         }
 
         public static void EnsureCreated(string? path)

@@ -6,6 +6,7 @@ using Shared.Core.PackFiles.Models;
 using Shared.Core.PackFiles.Models.Containers;
 using Shared.Core.PackFiles.Models.FileSources;
 using Shared.Core.PackFiles.Serialization;
+using Shared.Core.PackFiles.Utility;
 using Shared.Core.Settings;
 
 namespace Shared.Core.PackFiles
@@ -103,7 +104,7 @@ namespace Shared.Core.PackFiles
 
             var sourceContainer = CastContainer(source);
             var targetContainer = CastContainer(target);
-            var lowerPath = path.Replace('/', '\\').ToLower().Trim();
+            var lowerPath = PathNormalization.NormalizeFileName(path);
             var file = sourceContainer.FindFile(lowerPath);
             if (file != null)
             {
@@ -196,7 +197,7 @@ namespace Shared.Core.PackFiles
                 throw new Exception("Name can not be empty");
 
             var newNodePath = container.RenameDirectory(currentNodeName, newName);
-            _globalEventHub?.PublishGlobalEvent(new PackFileContainerFolderRenamedEvent(container, newNodePath));
+            _globalEventHub?.PublishGlobalEvent(new PackFileContainerFolderRenamedEvent(container, currentNodeName, newNodePath));
         }
 
         public void RenameFile(IPackFileContainer pf, PackFile file, string newName)

@@ -1,5 +1,7 @@
 {
     "chat.tools.terminal.autoApprove": {
-        "ForEach-Object": true
+        "ForEach-Object": true,
+        "dotnet restore": true,
+        "Set-Content": true
     }
 }

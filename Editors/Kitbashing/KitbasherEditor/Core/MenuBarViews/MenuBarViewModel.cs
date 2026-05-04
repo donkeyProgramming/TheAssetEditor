@@ -1,5 +1,4 @@
-using System.Collections.ObjectModel;
-using System.Diagnostics;
+﻿using System.Collections.ObjectModel;
 using System.Windows.Input;
 using Editors.KitbasherEditor.ChildEditors.MeshFitter;
 using Editors.KitbasherEditor.ChildEditors.PhotoStudio;
@@ -30,16 +29,14 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
         private readonly CommandExecutor _commandExecutor;
         private readonly MenuItemVisibilityRuleEngine _menuItemVisibilityRuleEngine;
         private readonly ActionHotkeyHandler _hotKeyHandler = new ActionHotkeyHandler();
-        private readonly IWindowsKeyboard _keyboard;
         private readonly LocalizationManager _localizationManager;
         private readonly Dictionary<Type, MenuAction> _uiCommands = new();
 
-        public MenuBarViewModel(CommandExecutor commandExecutor, IEventHub eventHub, MenuItemVisibilityRuleEngine menuItemVisibilityRuleEngine, TransformToolViewModel transformToolViewModel, IUiCommandFactory uiCommandFactory, IWindowsKeyboard windowKeyboard, LocalizationManager localizationManager)
+        public MenuBarViewModel(CommandExecutor commandExecutor, IEventHub eventHub, MenuItemVisibilityRuleEngine menuItemVisibilityRuleEngine, TransformToolViewModel transformToolViewModel, IUiCommandFactory uiCommandFactory, LocalizationManager localizationManager)
         {
             _commandExecutor = commandExecutor;
             _menuItemVisibilityRuleEngine = menuItemVisibilityRuleEngine;
             _uiCommandFactory = uiCommandFactory;
-            _keyboard = windowKeyboard;
             _localizationManager = localizationManager;
             TransformTool = transformToolViewModel;
 

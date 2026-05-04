@@ -1,5 +1,6 @@
 ﻿using System.Collections.ObjectModel;
 using System.Text.Json;
+using Microsoft.Xna.Framework;
 using Shared.Core.ErrorHandling;
 using Shared.Core.Misc;
 
@@ -32,6 +33,7 @@ namespace Shared.Core.Settings
         public string WwisePath { get; set; }
         public bool OnlyLoadLod0ForReferenceMeshes { get; set; } = true;
         public int VisualEditorsGridSize { get; set; } = 10;
+        public Vector3 VertexSelectionColour { get; set; } = new Vector3(1.0f, 0.47f, 0.0f);
         public string SelectedLangauge { get; set; } = "en";
         public CameraControlMode CameraControlMode { get; set; } = CameraControlMode.AssetEditorStyle;
 

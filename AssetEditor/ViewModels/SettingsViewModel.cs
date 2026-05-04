@@ -6,9 +6,11 @@ using System.Windows.Forms;
 using System.Windows.Input;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Microsoft.Xna.Framework;
 using Shared.Core.Misc;
 using Shared.Core.Services;
 using Shared.Core.Settings;
+using Shared.Ui.BaseDialogs.ColourPickerButton;
 
 namespace AssetEditor.ViewModels
 {
@@ -28,6 +30,7 @@ namespace AssetEditor.ViewModels
         [ObservableProperty] private ThemeType _currentTheme;
         [ObservableProperty] private BackgroundColour _currentRenderEngineBackgroundColour;
         [ObservableProperty] private int _visualEditorsGridSize;
+        [ObservableProperty] private ColourPickerViewModel _vertexSelectionColour;
         [ObservableProperty] private bool _startMaximised;
         [ObservableProperty] private GameTypeEnum _currentGame;
         [ObservableProperty] private bool _loadCaPacksByDefault;
@@ -49,6 +52,7 @@ namespace AssetEditor.ViewModels
             RenderEngineBackgroundColours = new ObservableCollection<BackgroundColour>((BackgroundColour[])Enum.GetValues(typeof(BackgroundColour)));
             CurrentRenderEngineBackgroundColour = _settingsService.CurrentSettings.RenderEngineBackgroundColour;
             VisualEditorsGridSize = _settingsService.CurrentSettings.VisualEditorsGridSize;
+            VertexSelectionColour = new ColourPickerViewModel(_settingsService.CurrentSettings.VertexSelectionColour);
             CameraModes = new ObservableCollection<CameraControlMode>((CameraControlMode[])Enum.GetValues(typeof(CameraControlMode)));
 
             StartMaximised = _settingsService.CurrentSettings.StartMaximised;
@@ -79,6 +83,7 @@ namespace AssetEditor.ViewModels
             _settingsService.CurrentSettings.Theme = CurrentTheme;
             _settingsService.CurrentSettings.RenderEngineBackgroundColour = CurrentRenderEngineBackgroundColour;
             _settingsService.CurrentSettings.VisualEditorsGridSize = VisualEditorsGridSize;
+            _settingsService.CurrentSettings.VertexSelectionColour = VertexSelectionColour.SelectedColour;
             _settingsService.CurrentSettings.StartMaximised = StartMaximised;
             _settingsService.CurrentSettings.CurrentGame = CurrentGame;
             _settingsService.CurrentSettings.LoadCaPacksByDefault = LoadCaPacksByDefault;

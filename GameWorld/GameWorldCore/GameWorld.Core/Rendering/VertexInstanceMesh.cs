@@ -49,9 +49,9 @@ namespace GameWorld.Core.Rendering
         readonly int _maxInstanceCount = 50000;
         int _currentInstanceCount;
 
-        Vector3 _selectedColour = new(1.0f, 0.47f, 0.0f);
         Vector3 _deselectedColour = new(0.0f, 0.0f, 0.0f);
 
+        public Vector3 SelectionColour { get; set; } = new Vector3(1.0f, 0.47f, 0.0f);
         public float VertexPixelSize { get; set; } = 5.5f;
         public float SelectedSizeBoost { get; set; } = 2.0f;
         public float SelectionThresholdMultiplier { get; set; } = 2.0f;
@@ -108,7 +108,7 @@ namespace GameWorld.Core.Rendering
                 var distance = (cameraPos - vertPos).Length();
 
                 var weight = selectedVertexes.VertexWeights[i];
-                var color = Vector3.Lerp(_deselectedColour, _selectedColour, weight);
+                var color = Vector3.Lerp(_deselectedColour, SelectionColour, weight);
 
                 var effectivePixelSize = VertexPixelSize + weight * SelectedSizeBoost;
                 var worldScale = effectivePixelSize * distance * fovScale;
