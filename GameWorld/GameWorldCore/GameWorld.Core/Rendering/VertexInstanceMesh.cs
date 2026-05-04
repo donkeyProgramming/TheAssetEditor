@@ -108,7 +108,7 @@ namespace GameWorld.Core.Rendering
                 var distance = (cameraPos - vertPos).Length();
 
                 var weight = selectedVertexes.VertexWeights[i];
-                var color = Vector3.Lerp(_deselectedColour, _selectedColour, weight);
+                var color = Vector3.Lerp(_deselectedColour, SelectionColour, weight);
 
                 var effectivePixelSize = VertexPixelSize + weight * SelectedSizeBoost;
                 var worldScale = effectivePixelSize * distance * fovScale;

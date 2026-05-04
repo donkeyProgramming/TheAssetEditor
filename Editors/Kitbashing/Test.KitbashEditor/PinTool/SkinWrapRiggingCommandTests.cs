@@ -41,7 +41,7 @@ namespace Test.KitbashEditor.PinTool
             // SelectionManager has complex constructor and non-virtual methods;
             // use reflection to set _currentState so GetStateCopy() works.
             _selectionManagerMock = new Mock<SelectionManager>(MockBehavior.Loose,
-                null!, null!, null!, null!, null!);
+                null!, null!, null!, null!, null!, null!);
 
             var selectionState = Mock.Of<ISelectionState>(s => s.Clone() == Mock.Of<ISelectionState>());
             var stateField = typeof(SelectionManager).GetField("_currentState", BindingFlags.NonPublic | BindingFlags.Instance)!;
