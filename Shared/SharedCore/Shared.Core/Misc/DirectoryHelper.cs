@@ -42,7 +42,6 @@ namespace Shared.Core.Misc
         public static void EnsureCreated()
         {
             EnsureCreated(ApplicationDirectory);
-            EnsureCreated(ApplicationDirectory);
             EnsureCreated(SchemaDirectory);
             EnsureCreated(LogDirectory);
             EnsureCreated(ReportsDirectory);
