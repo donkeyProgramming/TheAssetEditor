@@ -21,6 +21,7 @@
         AudioExplorer_Editor,
         Audio_Editor,
         Twui_Editor,
+        BMD_Editor,
         None,
     }
 }
