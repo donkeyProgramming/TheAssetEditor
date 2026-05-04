@@ -1,4 +1,5 @@
 using Moq;
+using Shared.Core.Misc;
 using Shared.Core.PackFiles.Utility;
 using Shared.Core.Services;
 using Shared.Core.Settings;
@@ -17,6 +18,8 @@ namespace Shared.CoreTest.PackFiles.Utility
         [SetUp]
         public void Setup()
         {
+            DirectoryHelper.EnsureCreated();
+
             _tempGameDir = Path.Combine(Path.GetTempPath(), "AE_LoaderTest_" + Guid.NewGuid().ToString("N"));
             Directory.CreateDirectory(_tempGameDir);
 
