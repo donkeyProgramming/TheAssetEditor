@@ -9,6 +9,7 @@ using GameWorld.Core.Test.TestUtility;
 using Microsoft.Xna.Framework;
 using Moq;
 using Shared.Core.Events;
+using Shared.Core.Settings;
 using Shared.GameFormats.RigidModel.MaterialHeaders;
 using System.Reflection;
 using Test.GameWorld.Core.WsMaterialTemplate;
@@ -44,7 +45,8 @@ namespace GameWorld.Core.Test.Selection
                 _renderEngine,
                 null,
                 null,
-                null);
+                null,
+                new ApplicationSettingsService());
 
             // Set render items that are normally created in Initialize() (requires GPU)
             SetPrivateField(_selectionManager, "_edgeQuadRenderItem", new EdgeQuadRenderItem());

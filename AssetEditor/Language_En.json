@@ -11,6 +11,7 @@
   "SettingsWindow.RenderBackground": "Render engine background colour",
   "SettingsWindow.OnlyLoadLod0": "Only load Lod0 for reference meshes",
   "SettingsWindow.GridSize": "Grid Size",
+  "SettingsWindow.VertexSelectionColour": "Vertex Selection Colour",
   "SettingsWindow.AudioModding": "Audio Modding",
   "SettingsWindow.SaveButton": "Save",
 
@@ -97,6 +98,7 @@
   "SettingsWindow.Title": "Settings",
   "SettingsWindow.OnlyLoadLod0Tooltip": "When importing a reference mesh in the Kitbash tool, only import Lod0 in order to save memory.",
   "SettingsWindow.GridSizeTooltip": "Size of the grid in visual editors",
+  "SettingsWindow.VertexSelectionColourTooltip": "Hex colour for selected vertices (e.g. #FF7800)",
   "SettingsWindow.GameFiles": "Game Files",
   "SettingsWindow.GameDataPathHint": "Browse for game data location e.g. \"C:\\SteamLibrary\\steamapps\\common\\Total War WARHAMMER III\\data\"",
   "SettingsWindow.WwiseCLI": "Wwise CLI",

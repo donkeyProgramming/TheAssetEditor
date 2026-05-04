@@ -52,6 +52,7 @@ namespace GameWorld.Core.Rendering
         Vector3 _selectedColour = new(1.0f, 0.47f, 0.0f);
         Vector3 _deselectedColour = new(0.0f, 0.0f, 0.0f);
 
+        public Vector3 SelectionColour { get => _selectedColour; set => _selectedColour = value; }
         public float VertexPixelSize { get; set; } = 5.5f;
         public float SelectedSizeBoost { get; set; } = 2.0f;
         public float SelectionThresholdMultiplier { get; set; } = 2.0f;

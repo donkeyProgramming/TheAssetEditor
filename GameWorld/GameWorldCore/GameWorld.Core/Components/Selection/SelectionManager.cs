@@ -7,6 +7,7 @@ using GameWorld.Core.Services;
 using GameWorld.Core.Utility;
 using Microsoft.Xna.Framework;
 using Shared.Core.Events;
+using Shared.Core.Settings;
 
 namespace GameWorld.Core.Components.Selection
 {
@@ -31,6 +32,7 @@ namespace GameWorld.Core.Components.Selection
         private readonly IScopedResourceLibrary _resourceLib;
         private readonly IDeviceResolver _deviceResolverComponent;
         private readonly IGraphicsResourceCreator _graphicsResourceCreator;
+        private readonly ApplicationSettingsService _settingsService;
 
         private (int v0, int v1)[] _cachedEdgeIndices;
         private Rmv2MeshNode _cachedEdgeMesh;
@@ -43,13 +45,14 @@ namespace GameWorld.Core.Components.Selection
         const int MaxRenderEdges = 50000;
         private readonly EdgeData[] _edgeDataCache = new EdgeData[MaxRenderEdges];
 
-        public SelectionManager(IEventHub eventHub, RenderEngineComponent renderEngine, IScopedResourceLibrary resourceLib, IDeviceResolver deviceResolverComponent, IGraphicsResourceCreator graphicsResourceCreator)
+        public SelectionManager(IEventHub eventHub, RenderEngineComponent renderEngine, IScopedResourceLibrary resourceLib, IDeviceResolver deviceResolverComponent, IGraphicsResourceCreator graphicsResourceCreator, ApplicationSettingsService settingsService)
         {
             _eventHub = eventHub;
             _renderEngine = renderEngine;
             _resourceLib = resourceLib;
             _deviceResolverComponent = deviceResolverComponent;
             _graphicsResourceCreator = graphicsResourceCreator;
+            _settingsService = settingsService;
         }
 
         public override void Initialize()
@@ -119,6 +122,9 @@ namespace GameWorld.Core.Components.Selection
 
         public override void Draw(GameTime gameTime)
         {
+            if (_vertexRenderer != null)
+                _vertexRenderer.SelectionColour = _settingsService.CurrentSettings.VertexSelectionColour;
+
             var selectionState = GetState();
 
             if (selectionState is ObjectSelectionState objectSelectionState)

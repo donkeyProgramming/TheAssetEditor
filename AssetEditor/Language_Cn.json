@@ -11,6 +11,7 @@
   "SettingsWindow.RenderBackground": "渲染引擎背景颜色",
   "SettingsWindow.OnlyLoadLod0": "仅为参考 Mesh 加载 Lod0",
   "SettingsWindow.GridSize": "网格大小",
+  "SettingsWindow.VertexSelectionColour": "顶点选择颜色",
   "SettingsWindow.AudioModding": "音频 Mod",
   "SettingsWindow.SaveButton": "保存",
 
@@ -97,6 +98,7 @@
   "SettingsWindow.Title": "设置",
   "SettingsWindow.OnlyLoadLod0Tooltip": "在 Kitbash 工具中导入参考 Mesh 时，仅导入 Lod0 以节省内存。",
   "SettingsWindow.GridSizeTooltip": "可视化编辑器中网格的大小",
+  "SettingsWindow.VertexSelectionColourTooltip": "选中顶点的十六进制颜色（例如 #FF7800）",
   "SettingsWindow.GameFiles": "游戏文件",
   "SettingsWindow.GameDataPathHint": "浏览游戏数据位置，例如 \"C:\\SteamLibrary\\steamapps\\common\\Total War WARHAMMER III\\data\"",
   "SettingsWindow.WwiseCLI": "Wwise CLI",
