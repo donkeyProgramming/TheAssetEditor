@@ -32,9 +32,8 @@ namespace Editors.Ipc
 
             var alreadyLoaded = _packFileService
                 .GetAllPackfileContainers()
-                .Any(x =>
-                    PathsEqual(x.SystemFilePath, normalizedDiskPath)
-                    || x.SourcePackFilePaths.Any(sourcePath => PathsEqual(sourcePath, normalizedDiskPath)));
+                .Any(x => x.GetAllFiles().ContainsKey(normalizedDiskPath));
+
 
             if (alreadyLoaded)
                 return Task.FromResult(PackLoadResult.Ok());

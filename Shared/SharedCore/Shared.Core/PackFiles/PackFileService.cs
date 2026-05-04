@@ -3,6 +3,8 @@ using Shared.Core.ErrorHandling;
 using Shared.Core.Events;
 using Shared.Core.Events.Global;
 using Shared.Core.PackFiles.Models;
+using Shared.Core.PackFiles.Models.Containers;
+using Shared.Core.PackFiles.Models.FileSources;
 using Shared.Core.PackFiles.Serialization;
 using Shared.Core.Settings;
 
@@ -102,12 +104,12 @@ namespace Shared.Core.PackFiles
             var sourceContainer = CastContainer(source);
             var targetContainer = CastContainer(target);
             var lowerPath = path.Replace('/', '\\').ToLower().Trim();
-            if (sourceContainer.FileList.ContainsKey(lowerPath))
+            var file = sourceContainer.FindFile(lowerPath);
+            if (file != null)
             {
-                var file = sourceContainer.FileList[lowerPath];
                 var data = file.DataSource.ReadData();
                 var newFile = new PackFile(file.Name, new MemorySource(data));
-                targetContainer.FileList[lowerPath] = newFile;
+                targetContainer.AddOrUpdateFile(lowerPath, newFile);
 
                 _globalEventHub?.PublishGlobalEvent(new PackFileContainerFilesAddedEvent(targetContainer, [newFile]));
             }
@@ -137,6 +139,17 @@ namespace Shared.Core.PackFiles
                 SetEditablePack(null);
 
             _globalEventHub?.PublishGlobalEvent(new PackFileContainerRemovedEvent(container));
+        }
+
+        public List<(string FileName, PackFile Pack)> FindAllWithExtention(string extention, IPackFileContainer? container = null)
+        {
+            if (container != null)
+                return container.FindAllWithExtention(extention);
+
+            var output = new List<(string, PackFile)>();
+            foreach (var pf in _packFileContainers)
+                output.AddRange(pf.FindAllWithExtention(extention));
+            return output;
         }
 
         public void DeleteFolder(IPackFileContainer pf, string folder)
@@ -226,8 +239,8 @@ namespace Shared.Core.PackFiles
         {
             foreach (var pf in _packFileContainers)
             {
-                var res = pf.FileList.FirstOrDefault(x => x.Value == file).Value;
-                if (res != null)
+                var path = pf.GetFullPath(file);
+                if (path != null)
                     return pf;
             }
             _logger.Here().Information($"Unknown packfile container for {file.Name}");

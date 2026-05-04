@@ -110,7 +110,7 @@ namespace Test.AnimatioReTarget
 
         private void Step5_UpdateAnimationSettingsAndGenerateAnimation(AssetEditorTestRunner runner, AnimationRetargetEditor editor, IPackFileContainer outputPackFile)
         {
-            Assert.That(outputPackFile.FileList.Count, Is.EqualTo(0));
+            Assert.That(outputPackFile.GetFileCount(), Is.EqualTo(0));
 
             var bone = SkeletonBoneNodeHelper.GetNodeFromName("skirt_back_0", editor.BoneManager.Bones);
             bone.TranslationOffset.X.Value = 10;
@@ -119,8 +119,8 @@ namespace Test.AnimatioReTarget
             editor.SaveManager.SaveAnimation(false);
 
             // Ensure new file is created in pfs
-            Assert.That(outputPackFile.FileList.Count, Is.EqualTo(1));
-            Assert.That(outputPackFile.FileList.First().Key, Is.EqualTo("animations\\battle\\humanoid01e\\2handed_hammer\\stand\\prefix_hu1_2hh_stand_idle_01.anim"));
+            Assert.That(outputPackFile.GetFileCount(), Is.EqualTo(1));
+            Assert.That(outputPackFile.FindFile("animations\\battle\\humanoid01e\\2handed_hammer\\stand\\prefix_hu1_2hh_stand_idle_01.anim"), Is.Not.Null);
         }
 
     }

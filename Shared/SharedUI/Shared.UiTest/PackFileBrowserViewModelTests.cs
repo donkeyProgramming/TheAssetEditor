@@ -128,8 +128,11 @@ namespace Shared.UiTest
 
             _viewModel.Filter.FilterText = string.Empty;
 
-            Assert.That(root.IsNodeExpanded, Is.False);
-            Assert.That(_viewModel.GetFromPath(root, "foldera"), Is.Null);
+            // After clearing, filter-expanded folders are preserved (absorbed as user expansions)
+            Assert.That(root.IsNodeExpanded, Is.True);
+            Assert.That(_viewModel.GetFromPath(root, "foldera"), Is.Not.Null);
+            // folderB is now also visible and materialized since filter is cleared
+            Assert.That(_viewModel.GetFromPath(root, "folderb"), Is.Not.Null);
         }
 
         [Test]
@@ -145,6 +148,53 @@ namespace Shared.UiTest
 
             Assert.That(root.IsNodeExpanded, Is.True);
             Assert.That(_viewModel.GetFromPath(root, "foldera"), Is.Not.Null);
+        }
+
+        [Test]
+        public void ClearingFilterKeepsExpandedFoldersAndShowsAllFiles()
+        {
+            CreatePackfiles(
+                ("folderA\\sub\\match_file.txt", "match_file.txt"),
+                ("folderA\\sub\\other_a.txt", "other_a.txt"),
+                ("folderB\\other_b.txt", "other_b.txt"));
+
+            var root = _viewModel.Files[0];
+
+            // User manually expands root and folderA
+            root.IsNodeExpanded = true;
+            var folderA = _viewModel.GetFromPath(root, "foldera");
+            Assert.That(folderA, Is.Not.Null);
+            folderA.IsNodeExpanded = true;
+
+            // Search for a specific file — folderA/sub gets expanded by filter, folderB hidden
+            _viewModel.Filter.FilterText = "match_file";
+
+            var sub = _viewModel.GetFromPath(root, "foldera\\sub");
+            Assert.That(sub, Is.Not.Null);
+            Assert.That(sub.IsNodeExpanded, Is.True, "sub should be expanded by filter");
+
+            // Clear filter
+            _viewModel.Filter.FilterText = string.Empty;
+
+            // User-expanded nodes stay expanded
+            Assert.That(root.IsNodeExpanded, Is.True, "Root was user-expanded, should stay open");
+            Assert.That(folderA.IsNodeExpanded, Is.True, "folderA was user-expanded, should stay open");
+
+            // Filter-expanded nodes are preserved (absorbed)
+            sub = _viewModel.GetFromPath(root, "foldera\\sub");
+            Assert.That(sub, Is.Not.Null, "sub should still be materialized");
+            Assert.That(sub.IsNodeExpanded, Is.True, "sub was filter-expanded, now absorbed as user expansion");
+
+            // Previously hidden folder is now visible and materialized
+            var folderB = _viewModel.GetFromPath(root, "folderb");
+            Assert.That(folderB, Is.Not.Null, "folderB should be materialized after filter cleared");
+            Assert.That(folderB.IsVisible, Is.True, "folderB should be visible after filter cleared");
+
+            // All files in expanded folders are visible
+            var matchFile = _viewModel.GetFromPath(root, "foldera\\sub\\match_file.txt");
+            var otherA = _viewModel.GetFromPath(root, "foldera\\sub\\other_a.txt");
+            Assert.That(matchFile, Is.Not.Null, "match_file should be visible");
+            Assert.That(otherA, Is.Not.Null, "other_a should be visible after filter cleared");
         }
 
         [Test]
@@ -265,7 +315,7 @@ namespace Shared.UiTest
             var container = _packageFileService.CreateNewPackFileContainer("test.pack", PackFileVersion.PFH5, PackFileCAType.MOD);
             foreach (var (path, fileName) in files)
             {
-                container.FileList[path.ToLowerInvariant()] = PackFile.CreateFromASCII(fileName, fileName);
+                container.AddOrUpdateFile(path.ToLowerInvariant(), PackFile.CreateFromASCII(fileName, fileName));
             }
 
             _packageFileService.AddContainer(container);

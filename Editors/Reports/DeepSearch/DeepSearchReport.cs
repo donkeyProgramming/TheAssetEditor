@@ -4,7 +4,7 @@ using Serilog;
 using Shared.Core.ErrorHandling;
 using Shared.Core.Events;
 using Shared.Core.PackFiles;
-using Shared.Core.PackFiles.Models;
+using Shared.Core.PackFiles.Models.FileSources;
 using Shared.Core.PackFiles.Serialization;
 using Shared.Core.PackFiles.Utility;
 
@@ -46,7 +46,7 @@ namespace Editors.Reports.DeepSearch
             var packFiles = _packFileService.GetAllPackfileContainers();
 
             var filesWithResult = new List<KeyValuePair<string, string>>();
-            var files = packFiles.SelectMany(x => x.FileList.Select(x => (x.Value.DataSource as PackedFileSource).Parent.FilePath)).Distinct().ToList();
+            var files = packFiles.SelectMany(x => x.GetAllFiles().Select(x => (x.Value.DataSource as PackedFileSource).Parent.FilePath)).Distinct().ToList();
 
             var indexLock = new object();
             var currentPackFileIndex = 0;
@@ -75,9 +75,9 @@ namespace Editors.Reports.DeepSearch
                           {
                               var pfc = _loader.Load(packFilePath);
 
-                              _logger.Here().Information($"Searching through packfile {currentIndex}/{files.Count} -  {packFilePath} {pfc.FileList.Count} files");
+                              _logger.Here().Information($"Searching through packfile {currentIndex}/{files.Count} -  {packFilePath} {pfc.GetFileCount()} files");
 
-                              foreach (var packFile in pfc.FileList.Values)
+                              foreach (var packFile in pfc.GetAllFiles().Values)
                               {
                                   var pf = packFile;
                                   var ds = pf.DataSource as PackedFileSource;
@@ -86,7 +86,7 @@ namespace Editors.Reports.DeepSearch
 
                                   if (str.Contains(searchStr, StringComparison.InvariantCultureIgnoreCase))
                                   {
-                                      var fillPathFile = pfc.FileList.FirstOrDefault(x => x.Value == packFile).Key;
+                                      var fillPathFile = pfc.GetFullPath(packFile);
                                       _logger.Here().Information($"Found result in '{fillPathFile}' in '{packFilePath}'");
 
                                       lock (filesWithResult)

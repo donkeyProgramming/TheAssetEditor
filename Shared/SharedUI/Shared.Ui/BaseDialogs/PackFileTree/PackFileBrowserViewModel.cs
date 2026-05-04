@@ -74,7 +74,6 @@ namespace Shared.Ui.BaseDialogs.PackFileTree
 
             Filter = new SearchFilter(Files, () => _treeStates.Values.Select(x => x.RootSource));
             Filter.ShowFoldersOnly = ShowFoldersOnly;
-
             foreach (var item in _packFileService.GetAllPackfileContainers())
             {
                 var loadFile = true;
@@ -424,14 +423,14 @@ namespace Shared.Ui.BaseDialogs.PackFileTree
             }
 
             var rootSource = new TreeNodeSource(container.Name, NodeType.Root, container, null);
-            var directoryMap_new = new Dictionary<string, TreeNodeSource>(container.FileList.Count)
+            var directoryMap_new = new Dictionary<string, TreeNodeSource>(container.GetFileCount())
             {
                 [string.Empty] = rootSource
             };
             var skipWemFiles = container.IsCaPackFile && _applicationSettingsService.CurrentSettings.ShowCAWemFiles == false;
 
             List<(string FolderName, string FullFolderPath)> stackFileNames = new(10);
-            foreach (var item in container.FileList)
+            foreach (var item in container.GetAllFiles())
             {
                 ReadOnlySpan<char> pathSpan = item.Key;
                 var lastTreeNode = rootSource;

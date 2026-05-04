@@ -1,6 +1,8 @@
-using System.Security.Cryptography;
+﻿using System.Security.Cryptography;
 using System.Text;
 using Shared.Core.PackFiles.Models;
+using Shared.Core.PackFiles.Models.Containers;
+using Shared.Core.PackFiles.Models.FileSources;
 using Shared.Core.PackFiles.Utility;
 
 namespace Shared.Core.PackFiles.Serialization
@@ -194,7 +196,7 @@ namespace Shared.Core.PackFiles.Serialization
                 SourcePackFilePaths = container.SourcePackFilePaths.ToList(),
             };
 
-            foreach (var (relativePath, packFile) in container.FileList)
+            foreach (var (relativePath, packFile) in container.GetAllFiles())
             {
                 if (packFile.DataSource is PackedFileSource source)
                 {
@@ -243,7 +245,7 @@ namespace Shared.Core.PackFiles.Serialization
                     entry.CompressionFormat,
                     entry.UncompressedSize);
 
-                container.FileList[entry.RelativePath] = new PackFile(entry.FileName, source);
+                container.FileList.Add(entry.RelativePath, new PackFile(entry.FileName, source));
             }
 
             return container;

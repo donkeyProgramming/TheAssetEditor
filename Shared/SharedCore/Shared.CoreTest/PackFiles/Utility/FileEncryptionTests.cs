@@ -3,6 +3,7 @@ using Moq;
 using Shared.Core.Events;
 using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
+using Shared.Core.PackFiles.Models.FileSources;
 using Shared.Core.PackFiles.Utility;
 using Shared.Core.Settings;
 
@@ -35,7 +36,7 @@ namespace Shared.CoreTest.PackFiles.Utility
         public void TestEncryptAndDecryptPackFile()
         {
             // Encrypt each file in the pack
-            foreach (var file in _container.FileList)
+            foreach (var file in _container.GetAllFiles())
             {
                 var originalData = file.Value.DataSource.ReadData();
                 var encryptedData = FileEncryption.Encrypt(originalData);
@@ -43,10 +44,10 @@ namespace Shared.CoreTest.PackFiles.Utility
             }
 
             // Assert the file count is what we expect
-            Assert.That(_container.FileList.Count, Is.EqualTo(4), "Unexpected number of files in the container.");
+            Assert.That(_container.GetFileCount(), Is.EqualTo(4), "Unexpected number of files in the container.");
 
             // Verify encryption and decryption
-            foreach (var file in _container.FileList)
+            foreach (var file in _container.GetAllFiles())
             {
                 var encryptedData = file.Value.DataSource.ReadData();
                 var decryptedContent = FileEncryption.Decrypt(encryptedData);

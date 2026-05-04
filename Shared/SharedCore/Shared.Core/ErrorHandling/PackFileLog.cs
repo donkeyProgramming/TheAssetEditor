@@ -1,4 +1,5 @@
-﻿using Shared.Core.PackFiles.Models;
+﻿using Shared.Core.PackFiles.Models.Containers;
+using Shared.Core.PackFiles.Models.FileSources;
 using Shared.Core.PackFiles.Utility;
 
 namespace Shared.Core.ErrorHandling
@@ -27,7 +28,7 @@ namespace Shared.Core.ErrorHandling
                 return compressionInformation;
 
 
-            foreach (var packFile in container.FileList.Values)
+            foreach (var packFile in container.GetAllFiles().Values)
             {
                 if (packFile.DataSource is PackedFileSource source)
                 {
@@ -52,7 +53,7 @@ namespace Shared.Core.ErrorHandling
                 return;
 
             var compressionInformation = GetCompressionInformation(container);
-            var totalFiles = container.FileList.Count;
+            var totalFiles = container.GetFileCount();
             var packSize = FormatSize(container.OriginalLoadByteSize);
 
             var loadingPart = $"Loading {container.Name}.pack ({totalFiles} files, {packSize})";
@@ -60,7 +61,7 @@ namespace Shared.Core.ErrorHandling
             var fileCountsByCompressionFormat = new Dictionary<CompressionFormat, int>();
             var fileTypeCountsByCompressionFormat = new Dictionary<CompressionFormat, Dictionary<string, int>>();
 
-            foreach (var packFile in container.FileList.Values)
+            foreach (var packFile in container.GetAllFiles().Values)
             {
                 if (packFile.DataSource is not PackedFileSource packedFileSource)
                     continue;

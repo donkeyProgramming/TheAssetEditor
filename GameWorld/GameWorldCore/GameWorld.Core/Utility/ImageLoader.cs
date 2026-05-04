@@ -59,7 +59,7 @@ namespace GameWorld.Core.Utility
 
         private static Texture2D ConvertTexture2D(string fileName, IImage image, GraphicsDevice device, IGraphicsResourceCreator graphicsResourceCreator)
         {
-            Texture2D texture = null;
+            Texture2D? texture = null;
             if (image.Format == ImageFormat.Rgba32)
             {
                 try

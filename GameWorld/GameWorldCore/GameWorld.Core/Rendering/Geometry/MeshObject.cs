@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using CommunityToolkit.Diagnostics;
 using GameWorld.Core.Services;
 using Microsoft.Xna.Framework;
 using Shared.GameFormats.RigidModel;
@@ -10,7 +8,7 @@ namespace GameWorld.Core.Rendering.Geometry
 {
     public class MeshObject : IDisposable
     {
-        IGraphicsCardGeometry Context;
+        IGraphicsCardGeometry _context;
 
         public VertexPositionNormalTextureCustom[] VertexArray; // Vector3 for pos at some point
         public ushort[] IndexArray;
@@ -23,9 +21,26 @@ namespace GameWorld.Core.Rendering.Geometry
         public string SkeletonName { get; private set; }  // SkeletonName
 
 
-        public IGraphicsCardGeometry GetGeometryContext() => Context;
+        public IGraphicsCardGeometry GetGeometryContext() => _context;
 
+        public MeshObject(IGraphicsCardGeometry context, string skeletonName)
+        {
+            SkeletonName = skeletonName;
+            _context = context;
+        }
 
+        public void RemoveGraphicsCardResources()
+        {
+            _context.DeleteResources();
+        }
+
+        public void EnsureGraphicsResourcesCreated()
+        {
+            if(_context.IndexBuffer == null)
+                RebuildIndexBuffer();
+            if(_context.VertexBuffer == null)
+                RebuildVertexBuffer();
+        }
 
         public int GetWeightCount() => VertexFormat switch
         {
@@ -37,17 +52,13 @@ namespace GameWorld.Core.Rendering.Geometry
         };
 
 
-        public MeshObject(IGraphicsCardGeometry context, string skeletonName)
-        {
-            SkeletonName = skeletonName;
-            Context = context;
-        }
+
 
         public MeshObject Clone(bool includeMesh = true)
         {
-            var mesh = new MeshObject(Context, SkeletonName)
+            var mesh = new MeshObject(_context, SkeletonName)
             {
-                Context = Context.Clone(),
+                _context = _context.Clone(),
                 BoundingBox = BoundingBox,
                 MeshCenter = MeshCenter,
                 SkeletonName = SkeletonName,
@@ -62,8 +73,8 @@ namespace GameWorld.Core.Rendering.Geometry
                 mesh.VertexArray = new VertexPositionNormalTextureCustom[VertexArray.Length];
                 VertexArray.CopyTo(mesh.VertexArray, 0);
 
-                mesh.Context.RebuildIndexBuffer(mesh.IndexArray);
-                mesh.Context.RebuildVertexBuffer(mesh.VertexArray, VertexPositionNormalTextureCustom.VertexDeclaration);
+                mesh._context.RebuildIndexBuffer(mesh.IndexArray);
+                mesh._context.RebuildVertexBuffer(mesh.VertexArray, VertexPositionNormalTextureCustom.VertexDeclaration);
             }
 
             return mesh;
@@ -190,7 +201,7 @@ namespace GameWorld.Core.Rendering.Geometry
             RebuildVertexBuffer();
         }
 
-        byte GetMappedBlendIndex(byte currentValue, List<IndexRemapping> remappingList)
+        static byte GetMappedBlendIndex(byte currentValue, List<IndexRemapping> remappingList)
         {
             var remappingItem = remappingList.FirstOrDefault(x => x.OriginalValue == currentValue);
             if (remappingItem != null)
@@ -198,7 +209,7 @@ namespace GameWorld.Core.Rendering.Geometry
             return currentValue;
         }
 
-        public void Merge(List<MeshObject> others)//
+        public void Merge(List<MeshObject> others)
         {
             var newVertexBufferSize = others.Sum(x => x.VertexCount()) + VertexCount();
             var newVertexArray = new VertexPositionNormalTextureCustom[newVertexBufferSize];
@@ -345,7 +356,9 @@ namespace GameWorld.Core.Rendering.Geometry
 
         public void Dispose()
         {
-            Context.Dispose();
+            if(_context != null)
+                _context.DeleteResources();
+            _context = null;
         }
 
         public void RemoveFaces(List<int> facesToDelete)
@@ -426,13 +439,15 @@ namespace GameWorld.Core.Rendering.Geometry
 
         public void RebuildVertexBuffer()
         {
-            Context.RebuildVertexBuffer(VertexArray, VertexPositionNormalTextureCustom.VertexDeclaration);
+            Guard.IsNotNull(_context);
+            _context.RebuildVertexBuffer(VertexArray, VertexPositionNormalTextureCustom.VertexDeclaration);
             BuildBoundingBox();
         }
 
         public void RebuildIndexBuffer()
         {
-            Context.RebuildIndexBuffer(IndexArray);
+            Guard.IsNotNull(_context);
+            _context.RebuildIndexBuffer(IndexArray);
         }
     }
 }

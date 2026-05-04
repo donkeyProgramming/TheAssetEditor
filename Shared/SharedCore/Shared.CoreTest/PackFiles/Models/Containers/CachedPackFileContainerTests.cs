@@ -1,8 +1,9 @@
-using Shared.Core.PackFiles;
+﻿using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
+using Shared.Core.PackFiles.Models.Containers;
 using Shared.Core.Settings;
 
-namespace Shared.CoreTest.PackFiles.Models
+namespace Shared.CoreTest.PackFiles.Models.Containers
 {
     internal class CachedPackFileContainer_ReadOnly
     {
@@ -15,7 +16,7 @@ namespace Shared.CoreTest.PackFiles.Models
             {
                 SystemFilePath = @"c:\game\data"
             };
-            _container.FileList["folder\\file.txt"] = new PackFile("file.txt", null);
+            _container.FileList.Add("folder\\file.txt", new PackFile("file.txt", null));
         }
 
         [Test]
@@ -56,7 +57,7 @@ namespace Shared.CoreTest.PackFiles.Models
         [Test]
         public void GetFullPath_ReturnsPath()
         {
-            var file = _container.FileList["folder\\file.txt"];
+            var file = _container.FindFile("folder\\file.txt");
             var path = _container.GetFullPath(file);
             Assert.That(path, Is.EqualTo("folder\\file.txt"));
         }
@@ -67,6 +68,12 @@ namespace Shared.CoreTest.PackFiles.Models
             var unknownFile = new PackFile("unknown.txt", null);
             var path = _container.GetFullPath(unknownFile);
             Assert.That(path, Is.Null);
+        }
+
+        [Test]
+        public void AddFiles_AddOrUpdateFile()
+        {
+            Assert.Throws<InvalidOperationException>(() => _container.AddOrUpdateFile("path", new PackFile("new.txt", null)));
         }
 
         [Test]
@@ -82,7 +89,7 @@ namespace Shared.CoreTest.PackFiles.Models
         [Test]
         public void DeleteFile_Throws()
         {
-            var file = _container.FileList["folder\\file.txt"];
+            var file = _container.FindFile("folder\\file.txt");
             Assert.Throws<InvalidOperationException>(() => _container.DeleteFile(file));
         }
 
@@ -95,7 +102,7 @@ namespace Shared.CoreTest.PackFiles.Models
         [Test]
         public void MoveFile_Throws()
         {
-            var file = _container.FileList["folder\\file.txt"];
+            var file = _container.FindFile("folder\\file.txt");
             Assert.Throws<InvalidOperationException>(() => _container.MoveFile(file, "other"));
         }
 
@@ -108,14 +115,14 @@ namespace Shared.CoreTest.PackFiles.Models
         [Test]
         public void RenameFile_Throws()
         {
-            var file = _container.FileList["folder\\file.txt"];
+            var file = _container.FindFile("folder\\file.txt");
             Assert.Throws<InvalidOperationException>(() => _container.RenameFile(file, "renamed.txt"));
         }
 
         [Test]
         public void SaveFileData_Throws()
         {
-            var file = _container.FileList["folder\\file.txt"];
+            var file = _container.FindFile("folder\\file.txt");
             Assert.Throws<InvalidOperationException>(() => _container.SaveFileData(file, [1, 2, 3]));
         }
 

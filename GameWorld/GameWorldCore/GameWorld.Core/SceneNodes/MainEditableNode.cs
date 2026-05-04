@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using Shared.Core.PackFiles;
+﻿using Shared.Core.PackFiles;
 using Shared.GameFormats.RigidModel.Types;
 
 namespace GameWorld.Core.SceneNodes

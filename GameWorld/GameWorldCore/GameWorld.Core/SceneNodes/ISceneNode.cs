@@ -2,8 +2,6 @@
 using GameWorld.Core.Components.Rendering;
 using GameWorld.Core.Rendering.Geometry;
 using Microsoft.Xna.Framework;
-using System;
-using System.Collections.Generic;
 
 namespace GameWorld.Core.SceneNodes
 {
@@ -20,10 +18,15 @@ namespace GameWorld.Core.SceneNodes
         ISceneNode Parent { get; set; }
         SceneManager SceneManager { get; set; }
 
-        T AddObject<T>(T item) where T : ISceneNode;
-
         void ForeachNodeRecursive(Action<ISceneNode> func);
+
+
+
+        T AddObject<T>(T item) where T : ISceneNode;
+        void OnNodeAdded();
+
         ISceneNode RemoveObject(ISceneNode item);
+        void OnNodeRemoved();
 
 
         ISceneNode CreateCopyInstance();

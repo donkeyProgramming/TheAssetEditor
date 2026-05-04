@@ -1,7 +1,9 @@
-using Shared.Core.PackFiles;
+﻿using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
+using Shared.Core.PackFiles.Models.Containers;
+using Shared.Core.PackFiles.Models.FileSources;
 
-namespace Shared.CoreTest.PackFiles.Models
+namespace Shared.CoreTest.PackFiles.Models.Containers
 {
     internal class PackFileContainer_AddFiles
     {
@@ -19,7 +21,7 @@ namespace Shared.CoreTest.PackFiles.Models
 
             var result = container.AddFiles(newFiles);
 
-            Assert.That(container.FileList.Count, Is.EqualTo(4));
+            Assert.That(container.GetFileCount(), Is.EqualTo(4));
             Assert.That(result.Count, Is.EqualTo(4));
         }
 
@@ -34,8 +36,8 @@ namespace Shared.CoreTest.PackFiles.Models
 
             container.AddFiles(newFiles);
 
-            Assert.That(container.FileList.Count, Is.EqualTo(1));
-            Assert.That(container.FileList.ContainsKey("rootfile.txt"), Is.True);
+            Assert.That(container.GetFileCount(), Is.EqualTo(1));
+            Assert.That(container.ContainsFile("rootfile.txt"), Is.True);
         }
 
         [Test]
@@ -51,7 +53,7 @@ namespace Shared.CoreTest.PackFiles.Models
 
             container.AddFiles(newFiles);
 
-            Assert.That(container.FileList.Count, Is.EqualTo(3));
+            Assert.That(container.GetFileCount(), Is.EqualTo(3));
         }
 
         [Test]
@@ -66,7 +68,7 @@ namespace Shared.CoreTest.PackFiles.Models
             container.AddFiles(newFiles);
             container.AddFiles(newFiles);
 
-            Assert.That(container.FileList.Count, Is.EqualTo(1));
+            Assert.That(container.GetFileCount(), Is.EqualTo(1));
         }
 
         [Test]
@@ -80,9 +82,9 @@ namespace Shared.CoreTest.PackFiles.Models
 
             container.AddFiles(newFiles);
 
-            Assert.That(container.FileList.Count, Is.EqualTo(1));
-            Assert.That(container.FileList.First().Key.Any(char.IsWhiteSpace), Is.False);
-            Assert.That(container.FileList.First().Value.Name.Any(char.IsWhiteSpace), Is.False);
+            Assert.That(container.GetFileCount(), Is.EqualTo(1));
+            Assert.That(container.GetAllFiles().First().Key.Any(char.IsWhiteSpace), Is.False);
+            Assert.That(container.GetAllFiles().First().Value.Name.Any(char.IsWhiteSpace), Is.False);
         }
 
         [Test]
@@ -122,19 +124,19 @@ namespace Shared.CoreTest.PackFiles.Models
         public void DeleteFile_RemovesFile()
         {
             var container = CreateContainerWithFiles();
-            var file = container.FileList.Values.First();
+            var file = container.GetAllFiles().Values.First();
 
             container.DeleteFile(file);
 
-            Assert.That(container.FileList.Count, Is.EqualTo(3));
-            Assert.That(container.FileList.Values, Does.Not.Contain(file));
+            Assert.That(container.GetFileCount(), Is.EqualTo(3));
+            Assert.That(container.GetAllFiles().Values, Does.Not.Contain(file));
         }
 
         [Test]
         public void DeleteFile_ReturnsDeletedFile()
         {
             var container = CreateContainerWithFiles();
-            var file = container.FileList.Values.First();
+            var file = container.GetAllFiles().Values.First();
 
             var result = container.DeleteFile(file);
 
@@ -163,7 +165,7 @@ namespace Shared.CoreTest.PackFiles.Models
             var result = container.DeleteFile(orphanFile);
 
             Assert.That(result, Is.Null);
-            Assert.That(container.FileList.Count, Is.EqualTo(4));
+            Assert.That(container.GetFileCount(), Is.EqualTo(4));
         }
     }
 
@@ -176,7 +178,7 @@ namespace Shared.CoreTest.PackFiles.Models
 
             container.DeleteFolder("directory_0");
 
-            Assert.That(container.FileList.Count, Is.EqualTo(2));
+            Assert.That(container.GetFileCount(), Is.EqualTo(2));
         }
 
         [Test]
@@ -186,7 +188,7 @@ namespace Shared.CoreTest.PackFiles.Models
 
             container.DeleteFolder("nonexistent");
 
-            Assert.That(container.FileList.Count, Is.EqualTo(8));
+            Assert.That(container.GetFileCount(), Is.EqualTo(8));
         }
 
         [Test]
@@ -196,7 +198,7 @@ namespace Shared.CoreTest.PackFiles.Models
 
             container.DeleteFolder("directory_0\\subfolder");
 
-            Assert.That(container.FileList.Count, Is.EqualTo(4));
+            Assert.That(container.GetFileCount(), Is.EqualTo(4));
         }
 
         [Test]
@@ -211,7 +213,7 @@ namespace Shared.CoreTest.PackFiles.Models
 
             container.DeleteFolder("dir");
 
-            Assert.That(container.FileList.Count, Is.EqualTo(1));
+            Assert.That(container.GetFileCount(), Is.EqualTo(1));
             Assert.That(container.FindFile("directory\\file1.txt"), Is.Not.Null);
         }
 
@@ -229,7 +231,7 @@ namespace Shared.CoreTest.PackFiles.Models
                 new("Directory_1", new PackFile("file0.txt", null)),
                 new("", new PackFile("rootFile.txt", null))
             });
-            Assert.That(container.FileList.Count, Is.EqualTo(8));
+            Assert.That(container.GetFileCount(), Is.EqualTo(8));
             return container;
         }
     }
@@ -344,9 +346,9 @@ namespace Shared.CoreTest.PackFiles.Models
 
             container.MoveFile(file, "NewDir");
 
-            Assert.That(container.FileList.Count, Is.EqualTo(1));
-            Assert.That(container.FileList.ContainsKey("newdir\\file0.txt"), Is.True);
-            Assert.That(container.FileList.ContainsKey("olddir\\file0.txt"), Is.False);
+            Assert.That(container.GetFileCount(), Is.EqualTo(1));
+            Assert.That(container.ContainsFile("newdir\\file0.txt"), Is.True);
+            Assert.That(container.ContainsFile("olddir\\file0.txt"), Is.False);
         }
 
         [Test]
@@ -379,8 +381,8 @@ namespace Shared.CoreTest.PackFiles.Models
             var newNodePath = container.RenameDirectory("oldname", "NewName");
 
             Assert.That(newNodePath, Is.EqualTo("NewName"));
-            Assert.That(container.FileList.Count, Is.EqualTo(2));
-            Assert.That(container.FileList.Keys.All(k => k.StartsWith("newname", StringComparison.OrdinalIgnoreCase)), Is.True);
+            Assert.That(container.GetFileCount(), Is.EqualTo(2));
+            Assert.That(container.GetAllFiles().Keys.All(k => k.StartsWith("newname", StringComparison.OrdinalIgnoreCase)), Is.True);
         }
 
         [Test]
@@ -396,8 +398,8 @@ namespace Shared.CoreTest.PackFiles.Models
             var newNodePath = container.RenameDirectory("parent\\oldchild", "NewChild");
 
             Assert.That(newNodePath, Is.EqualTo("parent\\NewChild"));
-            Assert.That(container.FileList.ContainsKey("parent\\newchild\\file0.txt"), Is.True);
-            Assert.That(container.FileList.ContainsKey("parent\\newchild\\sub\\file1.txt"), Is.True);
+            Assert.That(container.ContainsFile("parent\\newchild\\file0.txt"), Is.True);
+            Assert.That(container.ContainsFile("parent\\newchild\\sub\\file1.txt"), Is.True);
         }
 
         [Test]
@@ -442,8 +444,8 @@ namespace Shared.CoreTest.PackFiles.Models
             container.RenameFile(file, "new.txt");
 
             Assert.That(file.Name, Is.EqualTo("new.txt"));
-            Assert.That(container.FileList.Count, Is.EqualTo(1));
-            Assert.That(container.FileList.ContainsKey("dir\\new.txt"), Is.True);
+            Assert.That(container.GetFileCount(), Is.EqualTo(1));
+            Assert.That(container.ContainsFile("dir\\new.txt"), Is.True);
         }
 
         [Test]
@@ -455,8 +457,8 @@ namespace Shared.CoreTest.PackFiles.Models
 
             container.RenameFile(file, "new.txt");
 
-            Assert.That(container.FileList.ContainsKey("new.txt"), Is.True);
-            Assert.That(container.FileList.Keys.Any(k => k.StartsWith("\\")), Is.False);
+            Assert.That(container.ContainsFile("new.txt"), Is.True);
+            Assert.That(container.GetAllFiles().Keys.Any(k => k.StartsWith("\\")), Is.False);
         }
 
         [Test]

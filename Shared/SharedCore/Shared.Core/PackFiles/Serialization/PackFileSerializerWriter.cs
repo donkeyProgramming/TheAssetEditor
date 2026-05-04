@@ -1,5 +1,7 @@
 ﻿using System.Text;
 using Shared.Core.PackFiles.Models;
+using Shared.Core.PackFiles.Models.Containers;
+using Shared.Core.PackFiles.Models.FileSources;
 using Shared.Core.PackFiles.Utility;
 using Shared.Core.Settings;
 
@@ -22,12 +24,12 @@ namespace Shared.Core.PackFiles.Serialization
             if (container.Header.HasEncryptedData || container.Header.HasEncryptedIndex)
                 throw new InvalidOperationException("Saving encrypted packs is not supported.");
 
-            var sortedFiles = container.FileList.OrderBy(x => x.Key, StringComparer.Ordinal).ToList();
+            var sortedFiles = container.GetAllFiles().OrderBy(x => x.Key, StringComparer.Ordinal).ToList();
             var headerSpecificBytes = ComputeFileHeaderSpecificByte(container);
             var fileNamesOffset = ComputeFileNameOffset(headerSpecificBytes, sortedFiles);
 
             // Update and write header
-            container.Header.FileCount = (uint)container.FileList.Count;
+            container.Header.FileCount = (uint)container.GetFileCount();
             WriteHeader(container.Header, (uint)fileNamesOffset, writer);
 
             // Write the core of the file

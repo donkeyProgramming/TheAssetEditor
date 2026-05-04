@@ -20,7 +20,7 @@ namespace GameWorld.Core.Test.TestUtility
         { }
 
         public IGraphicsCardGeometry Clone() { return this; }
-        public void Dispose()
+        public void DeleteResources()
         { }
     }
 }

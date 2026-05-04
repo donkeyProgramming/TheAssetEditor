@@ -3,6 +3,7 @@ using Shared.Core.Events;
 using Shared.Core.Events.Global;
 using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
+using Shared.Core.PackFiles.Models.Containers;
 using Shared.Core.Services;
 using Shared.Core.Settings;
 
@@ -49,7 +50,7 @@ namespace Shared.CoreTest.Services
             var result = saveService.Save("folder\\subfolder2\\File1.test", [3], false);
 
             // Assert
-            Assert.That(_container.FileList.Count, Is.EqualTo(3));
+            Assert.That(_container.GetFileCount(), Is.EqualTo(3));
             Assert.That(result, Is.Not.Null);
             Assert.That(result!.DataSource.ReadData(), Is.EqualTo(new byte[] { 3 }));
 
@@ -67,7 +68,7 @@ namespace Shared.CoreTest.Services
             var result = saveService.Save("folder\\subfolder\\File1.test", [3], false);
 
             // Assert
-            Assert.That(_container.FileList.Count, Is.EqualTo(2));
+            Assert.That(_container.GetFileCount(), Is.EqualTo(2));
             Assert.That(result, Is.Not.Null);
             Assert.That(result, Is.EqualTo(_fileHandle));
             Assert.That(result!.DataSource.ReadData(), Is.EqualTo(new byte[] { 3 }));
@@ -87,7 +88,7 @@ namespace Shared.CoreTest.Services
             var result = saveService.Save("folder\\subfolder2\\File1.test", [3], true);
 
             // Assert
-            Assert.That(_container.FileList.Count, Is.EqualTo(3));
+            Assert.That(_container.GetFileCount(), Is.EqualTo(3));
             Assert.That(result, Is.Not.Null);
             Assert.That(result!.DataSource.ReadData(), Is.EqualTo(new byte[] { 3 }));
 
@@ -106,7 +107,7 @@ namespace Shared.CoreTest.Services
             var result = saveService.Save("folder\\subfolder\\File1.test", [3], true);
 
             // Assert
-            Assert.That(_container.FileList.Count, Is.EqualTo(3));
+            Assert.That(_container.GetFileCount(), Is.EqualTo(3));
             Assert.That(result, Is.Not.Null);
             Assert.That(result!.DataSource.ReadData(), Is.EqualTo(new byte[] { 3 }));
             var lookup = _pfs.FindFile("folder\\subfolder3\\File1.test");
@@ -128,7 +129,7 @@ namespace Shared.CoreTest.Services
             var result = saveService.Save("folder\\subfolder\\File1.test", [3], true);
 
             // Assert
-            Assert.That(_container.FileList.Count, Is.EqualTo(2));
+            Assert.That(_container.GetFileCount(), Is.EqualTo(2));
             Assert.That(result, Is.Not.Null);
             Assert.That(result!.DataSource.ReadData(), Is.EqualTo(new byte[] { 3 }));
 
@@ -147,7 +148,7 @@ namespace Shared.CoreTest.Services
             var result = saveService.Save("folder\\subfolder\\File1.test", [3], true);
 
             // Assert
-            Assert.That(_container.FileList.Count, Is.EqualTo(2));
+            Assert.That(_container.GetFileCount(), Is.EqualTo(2));
             Assert.That(result, Is.Null);
 
             _eventHub.Verify(x => x.PublishGlobalEvent(It.IsAny<PackFileSavedEvent>()), Times.Never);

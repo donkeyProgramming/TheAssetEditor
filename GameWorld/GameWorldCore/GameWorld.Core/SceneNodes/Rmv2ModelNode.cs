@@ -1,7 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-
-namespace GameWorld.Core.SceneNodes
+﻿namespace GameWorld.Core.SceneNodes
 {
     public class Rmv2ModelNode : GroupNode
     {
@@ -43,7 +40,6 @@ namespace GameWorld.Core.SceneNodes
         protected Rmv2ModelNode() { }
 
         public override ISceneNode CreateCopyInstance() => new Rmv2ModelNode();
-
     }
 }
 

@@ -1,7 +1,7 @@
 ﻿using Shared.ByteParsing;
 using Shared.Core.PackFiles.Utility;
 
-namespace Shared.Core.PackFiles.Models
+namespace Shared.Core.PackFiles.Models.FileSources
 {
     public class MemorySource : IDataSource
     {
@@ -33,6 +33,4 @@ namespace Shared.Core.PackFiles.Models
 
         public static MemorySource FromFile(string path) => new MemorySource(File.ReadAllBytes(path));
     }
-
-
 }

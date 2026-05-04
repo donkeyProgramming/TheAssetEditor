@@ -1,6 +1,8 @@
 ﻿using Shared.ByteParsing;
 using Shared.Core.ErrorHandling;
 using Shared.Core.PackFiles.Models;
+using Shared.Core.PackFiles.Models.Containers;
+using Shared.Core.PackFiles.Models.FileSources;
 using Shared.Core.PackFiles.Utility;
 using Shared.Core.Settings;
 
@@ -89,20 +91,20 @@ namespace Shared.Core.PackFiles.Serialization
 
                     if (duplicatePackFileResolver.CheckForDuplicates)
                     {
-                        var containsKey = output.FileList.ContainsKey(fullPackedFileName);
+                        var containsKey = output.ContainsFile(fullPackedFileName);
                         if (containsKey)
                         {
                             if (duplicatePackFileResolver.KeepDuplicateFile(fullPackedFileName))
                             {
                                 s_logger.Here().Warning($"Duplicate file found {fullPackedFileName}");
-                                output.FileList.Add(fullPackedFileName + Guid.NewGuid().ToString(), fileContent);
+                                output.AddOrUpdateFile(fullPackedFileName + Guid.NewGuid().ToString(), fileContent);
                             }
                         }
                         else
-                            output.FileList[fullPackedFileName] = fileContent;
+                            output.AddOrUpdateFile(fullPackedFileName, fileContent);
                     }
                     else
-                        output.FileList[fullPackedFileName] = fileContent;
+                        output.AddOrUpdateFile(fullPackedFileName, fileContent);
 
                     offset += size;
                 }

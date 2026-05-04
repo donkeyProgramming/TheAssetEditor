@@ -11,6 +11,7 @@ using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
 using Shared.Core.PackFiles.Utility;
 using Shared.GameFormats.Animation;
+using Shared.Core.PackFiles.Models.FileSources;
 
 namespace GameWorld.Core.Services
 {
@@ -361,7 +362,8 @@ namespace GameWorld.Core.Services
                         if (file != null && fullName == lookUpFullName)
                         {
                             // Make sure its not a tech skeleton
-                            if (_packFileService.GetFullPath(file).Contains("tech", StringComparison.OrdinalIgnoreCase) == false)
+                            if (_packFileService.GetFullPath(file).Contains("tech", StringComparison.OrdinalIgnoreCase) == false && 
+                                _packFileService.GetFullPath(file).Contains("reference_poses", StringComparison.OrdinalIgnoreCase ) == false)
                                 return AnimationFile.Create(file);
                         }
                     }

@@ -179,7 +179,7 @@ namespace Shared.GameFormats.Animation
         {
             var logger = Logging.Create<AnimationFile>();
             var data = file.DataSource.ReadData();
-            logger.Here().Information($"Loading animation: {file} Size:{data.Length}");
+            logger.Here().Information($"Loading animation: {file?.Name} Size:{data.Length}");
             return Create(new ByteChunk(data));
         }
 

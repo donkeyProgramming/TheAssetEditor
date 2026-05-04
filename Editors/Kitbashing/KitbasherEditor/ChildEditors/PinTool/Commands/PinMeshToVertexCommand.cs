@@ -46,6 +46,9 @@ namespace Editors.KitbasherEditor.ChildEditors.PinTool.Commands
 
             // Create undo state
             _originalGeos = _meshesToPin.Select(x => x.Geometry.Clone()).ToList();
+            foreach (var geo in _originalGeos)
+                geo.RemoveGraphicsCardResources();
+
             _selectionOldState = _selectionManager.GetStateCopy();
 
             // Update the meshes
@@ -73,7 +76,9 @@ namespace Editors.KitbasherEditor.ChildEditors.PinTool.Commands
 
             for (var i = 0; i < _meshesToPin.Count; i++)
             {
-                _meshesToPin[i].Geometry = _originalGeos[i];
+                _meshesToPin[i].Geometry.RemoveGraphicsCardResources(); // Delete graphicscard resources
+                _originalGeos[i].EnsureGraphicsResourcesCreated();      // Ensure graphics card resources
+                _meshesToPin[i].Geometry = _originalGeos[i];            // Swap
                 _meshesToPin[i].PivotPoint = Vector3.Zero;
             }
 

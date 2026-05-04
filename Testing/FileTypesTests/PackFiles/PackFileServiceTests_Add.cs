@@ -9,7 +9,7 @@
             var loadedPackFile = packFileService.Load(@"Data\CaPackFile_01.pack");
 
             Assert.NotNull(loadedPackFile);
-            var fileCount = loadedPackFile.FileList.Count;
+            var fileCount = loadedPackFile.GetFileCount();
             Assert.AreEqual(4, fileCount);
         }
 
@@ -20,7 +20,7 @@
             var loadedPackFile = packFileService.Load(@"Data\CaPackFile_01.pack");
             packFileService.AddFileToPack(loadedPackFile, "", TestPackFileHelper.CreatePackFile("TestFile.txt"));
 
-            var newFileCount = loadedPackFile.FileList.Count;
+            var newFileCount = loadedPackFile.GetFileCount();
             Assert.AreEqual(5, newFileCount);
 
             var file = packFileService.FindFile("TestFile.txt");
@@ -34,7 +34,7 @@
             var loadedPackFile = packFileService.Load(@"Data\CaPackFile_01.pack");
             packFileService.AddFileToPack(loadedPackFile, @"warmachines\materials", TestPackFileHelper.CreatePackFile("TestFile.txt"));
 
-            var newFileCount = loadedPackFile.FileList.Count;
+            var newFileCount = loadedPackFile.GetFileCount();
             Assert.AreEqual(5, newFileCount);
 
             var file = packFileService.FindFile(@"warmachines\materials\TestFile.txt");
@@ -49,7 +49,7 @@
 
             packFileService.AddFolderContent(loadedPackFile, "", @"Data\FolderData");
 
-            var newFileCount = loadedPackFile.FileList.Count;
+            var newFileCount = loadedPackFile.GetFileCount();
             Assert.AreEqual(9, newFileCount);
 
             var file = packFileService.FindFile(@"SubFolder1\Subfolder_1_file1.txt");
@@ -64,7 +64,7 @@
 
             packFileService.AddFolderContent(loadedPackFile, @"warmachines\materials", @"Data\FolderData");
 
-            var newFileCount = loadedPackFile.FileList.Count;
+            var newFileCount = loadedPackFile.GetFileCount();
             Assert.AreEqual(9, newFileCount);
 
             var file = packFileService.FindFile(@"warmachines\materials\subFolder1\Subfolder_1_file1.txt");

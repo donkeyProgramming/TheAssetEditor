@@ -16,18 +16,12 @@ namespace GameWorld.Core.SceneNodes
 {
     public class Rmv2MeshNode : SceneNode, ITransformable, IEditableGeometry, ISelectable, IDrawableItem
     {
-        private Quaternion _orientation = Quaternion.Identity;
-        private Vector3 _position = Vector3.Zero;
-        private Vector3 _scale = Vector3.One;
-
         public IRmvMaterial RmvMaterial { get; set; }
         public MeshObject Geometry { get; set; }
-        public RmvCommonHeader CommonHeader { get; set; }
 
- 
-        public Vector3 Position { get { return _position; } set { _position = value; UpdateMatrix(); } }
-        public Vector3 Scale { get { return _scale; } set { _scale = value; UpdateMatrix(); } }
-        public Quaternion Orientation { get { return _orientation; } set { _orientation = value; UpdateMatrix(); } }
+        public Vector3 Position { get; set { field = value; UpdateMatrix(); } } = Vector3.Zero;
+        public Vector3 Scale { get; set { field = value; UpdateMatrix(); } } = Vector3.One;
+        public Quaternion Orientation { get;  set { field = value; UpdateMatrix(); } } = Quaternion.Identity;
         public Vector3 PivotPoint { get; set; }
 
         public string AttachmentPointName { get; set; } = "";
@@ -141,7 +135,6 @@ namespace GameWorld.Core.SceneNodes
 
             typedTarget.RmvMaterial = RmvMaterial.Clone();
             typedTarget.AnimationMatrixOverride = AnimationMatrixOverride;
-            typedTarget.Geometry = Geometry.Clone();
             typedTarget.Material = Material.Clone();
            
             if(includeMesh)
@@ -160,5 +153,11 @@ namespace GameWorld.Core.SceneNodes
         {
             ModelMatrix = Matrix.CreateScale(Scale) * Matrix.CreateFromQuaternion(Orientation) * Matrix.CreateTranslation(Position);
         }
+
+
+        public override void OnNodeAdded() => Geometry?.EnsureGraphicsResourcesCreated();
+        
+        public override void OnNodeRemoved() => Geometry?.RemoveGraphicsCardResources();
+        
     }
 }

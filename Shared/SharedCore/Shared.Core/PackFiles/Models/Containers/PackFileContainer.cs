@@ -1,8 +1,9 @@
 ﻿using Shared.Core.Misc;
+using Shared.Core.PackFiles.Models.FileSources;
 using Shared.Core.PackFiles.Serialization;
 using Shared.Core.Settings;
 
-namespace Shared.Core.PackFiles.Models
+namespace Shared.Core.PackFiles.Models.Containers
 {
     internal class PackFileContainer : IPackFileContainerInternal
     {
@@ -15,6 +16,28 @@ namespace Shared.Core.PackFiles.Models
 
         public Dictionary<string, PackFile> FileList { get; set; } = [];
 
+        public int GetFileCount() => FileList.Count;
+
+        public void AddOrUpdateFile(string path, PackFile file)
+        {
+            var lowerPath = path.Replace('/', '\\').ToLower().Trim();
+            FileList[lowerPath] = file;
+        }
+
+        public Dictionary<string, PackFile> GetAllFiles() => FileList;
+
+        public List<(string FileName, PackFile Pack)> FindAllWithExtention(string extention)
+        {
+            extention = extention.ToLower();
+            var output = new List<(string, PackFile)>();
+            foreach (var file in FileList)
+            {
+                if (Path.GetExtension(file.Key) == extention)
+                    output.Add((file.Key, file.Value));
+            }
+            return output;
+        }
+
         public PackFileContainer(string name)
         {
             Name = name;
@@ -22,7 +45,7 @@ namespace Shared.Core.PackFiles.Models
 
         public void MergePackFileContainer(PackFileContainer other)
         {
-            foreach (var item in other.FileList)
+            foreach (var item in other.GetAllFiles())
                 FileList[item.Key] = item.Value;
             return;
         }
@@ -80,6 +103,12 @@ namespace Shared.Core.PackFiles.Models
         {
             var lowerPath = path.Replace('/', '\\').ToLower().Trim();
             return FileList.TryGetValue(lowerPath, out var value) ? value : null;
+        }
+
+        public virtual bool ContainsFile(string path)
+        {
+            var lowerPath = path.Replace('/', '\\').ToLower().Trim();
+            return FileList.ContainsKey(lowerPath);
         }
 
         public virtual string? GetFullPath(PackFile file)

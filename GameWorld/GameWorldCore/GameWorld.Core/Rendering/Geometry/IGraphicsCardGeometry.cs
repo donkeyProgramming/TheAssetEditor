@@ -6,26 +6,26 @@ namespace GameWorld.Core.Rendering.Geometry
 {
     public interface IGraphicsCardGeometry
     {
-        IndexBuffer IndexBuffer { get; }
-        VertexBuffer VertexBuffer { get; }
+        IndexBuffer? IndexBuffer { get; }
+        VertexBuffer? VertexBuffer { get; }
 
         void RebuildIndexBuffer(ushort[] indexList);
         void RebuildVertexBuffer(VertexPositionNormalTextureCustom[] vertArray, VertexDeclaration vertexDeclaration);
 
         IGraphicsCardGeometry Clone();
-        void Dispose();
+        void DeleteResources();
     }
 
     public class GraphicsCardGeometry : IGraphicsCardGeometry
     {
-        private readonly GraphicsDevice Device;
+        private readonly GraphicsDevice _device;
         private readonly IGraphicsResourceCreator _graphicsResourceCreator;
-        public VertexBuffer VertexBuffer { get; private set; }
-        public IndexBuffer IndexBuffer { get; private set; }
+        public VertexBuffer? VertexBuffer { get; private set; }
+        public IndexBuffer? IndexBuffer { get; private set; }
 
         public GraphicsCardGeometry(GraphicsDevice device, IGraphicsResourceCreator graphicsResourceCreator)
         {
-            Device = device;
+            _device = device;
             _graphicsResourceCreator = graphicsResourceCreator;
         }
 
@@ -53,10 +53,10 @@ namespace GameWorld.Core.Rendering.Geometry
 
         public IGraphicsCardGeometry Clone()
         {
-            return new GraphicsCardGeometry(Device, _graphicsResourceCreator);
+            return new GraphicsCardGeometry(_device, _graphicsResourceCreator);
         }
 
-        public void Dispose()
+        public void DeleteResources()
         {
             IndexBuffer = _graphicsResourceCreator.DisposeTracked(IndexBuffer);
             VertexBuffer = _graphicsResourceCreator.DisposeTracked(VertexBuffer);

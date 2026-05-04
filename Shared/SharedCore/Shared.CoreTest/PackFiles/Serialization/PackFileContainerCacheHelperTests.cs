@@ -1,4 +1,6 @@
-using Shared.Core.PackFiles.Models;
+﻿using Shared.Core.PackFiles.Models;
+using Shared.Core.PackFiles.Models.Containers;
+using Shared.Core.PackFiles.Models.FileSources;
 using Shared.Core.PackFiles.Serialization;
 using Shared.Core.PackFiles.Utility;
 
@@ -43,8 +45,8 @@ namespace Shared.CoreTest.PackFiles.Serialization
             var source1 = new PackedFileSource(parent1, 100, 500, false, false, CompressionFormat.None, 0);
             var source2 = new PackedFileSource(parent2, 200, 1000, false, true, CompressionFormat.Lz4, 2000);
 
-            container.FileList["folder\\file1.txt"] = new PackFile("file1.txt", source1);
-            container.FileList["folder\\file2.bin"] = new PackFile("file2.bin", source2);
+            container.AddOrUpdateFile("folder\\file1.txt", new PackFile("file1.txt", source1));
+            container.AddOrUpdateFile("folder\\file2.bin", new PackFile("file2.bin", source2));
 
             // Act
             var cacheData = PackFileContainerCacheHelper.BuildCacheData("fingerprint123", container);
@@ -56,7 +58,7 @@ namespace Shared.CoreTest.PackFiles.Serialization
             Assert.That(loaded.Name, Is.EqualTo("All Game Packs - TestGame"));
             Assert.That(loaded.SystemFilePath, Is.EqualTo(@"c:\game\data"));
             Assert.That(loaded.SourcePackFilePaths.Count, Is.EqualTo(2));
-            Assert.That(loaded.FileList.Count, Is.EqualTo(2));
+            Assert.That(loaded.GetFileCount(), Is.EqualTo(2));
         }
 
         [Test]
@@ -103,9 +105,9 @@ namespace Shared.CoreTest.PackFiles.Serialization
             Assert.That(container.IsCaPackFile, Is.True);
             Assert.That(container.SystemFilePath, Is.EqualTo(@"c:\game\data"));
             Assert.That(container.SourcePackFilePaths.Count, Is.EqualTo(1));
-            Assert.That(container.FileList.Count, Is.EqualTo(2));
+            Assert.That(container.GetFileCount(), Is.EqualTo(2));
 
-            var file1 = container.FileList["folder\\file.txt"];
+            var file1 = container.FindFile("folder\\file.txt");
             Assert.That(file1.Name, Is.EqualTo("file.txt"));
             var file1Source = file1.DataSource as PackedFileSource;
             Assert.That(file1Source, Is.Not.Null);
@@ -114,7 +116,7 @@ namespace Shared.CoreTest.PackFiles.Serialization
             Assert.That(file1Source.IsCompressed, Is.False);
             Assert.That(file1Source.Parent.FilePath, Is.EqualTo(@"c:\game\data\pack1.pack"));
 
-            var file2 = container.FileList["other\\data.bin"];
+            var file2 = container.FindFile("other\\data.bin");
             var file2Source = file2.DataSource as PackedFileSource;
             Assert.That(file2Source, Is.Not.Null);
             Assert.That(file2Source.Offset, Is.EqualTo(2048));
@@ -141,8 +143,8 @@ namespace Shared.CoreTest.PackFiles.Serialization
 
             var container = PackFileContainerCacheHelper.RestoreFromCache(cacheData);
 
-            var sourceA = (PackedFileSource)container.FileList["a.txt"].DataSource;
-            var sourceB = (PackedFileSource)container.FileList["b.txt"].DataSource;
+            var sourceA = (PackedFileSource)container.FindFile("a.txt")!.DataSource;
+            var sourceB = (PackedFileSource)container.FindFile("b.txt")!.DataSource;
             Assert.That(ReferenceEquals(sourceA.Parent, sourceB.Parent), Is.True,
                 "Files from the same pack should share PackedFileSourceParent instances");
         }
@@ -201,10 +203,10 @@ namespace Shared.CoreTest.PackFiles.Serialization
             var parent = new PackedFileSourceParent { FilePath = @"c:\game\data\main.pack" };
             container.SourcePackFilePaths.Add(parent.FilePath);
 
-            container.FileList["db\\units.bin"] = new PackFile("units.bin",
-                new PackedFileSource(parent, 0, 256, false, false, CompressionFormat.None, 0));
-            container.FileList["text\\localisation.loc"] = new PackFile("localisation.loc",
-                new PackedFileSource(parent, 256, 512, false, true, CompressionFormat.Lz4, 1024));
+            container.AddOrUpdateFile("db\\units.bin", new PackFile("units.bin",
+                new PackedFileSource(parent, 0, 256, false, false, CompressionFormat.None, 0)));
+            container.AddOrUpdateFile("text\\localisation.loc", new PackFile("localisation.loc",
+                new PackedFileSource(parent, 256, 512, false, true, CompressionFormat.Lz4, 1024)));
 
             // Act: build → save → load
             var cacheData = PackFileContainerCacheHelper.BuildCacheData("test_fp", container);
@@ -215,12 +217,12 @@ namespace Shared.CoreTest.PackFiles.Serialization
             Assert.That(restored.Name, Is.EqualTo("Full Cycle Test"));
             Assert.That(restored.IsCaPackFile, Is.True);
             Assert.That(restored.SystemFilePath, Is.EqualTo(@"c:\game\data"));
-            Assert.That(restored.FileList.Count, Is.EqualTo(2));
+            Assert.That(restored.GetFileCount(), Is.EqualTo(2));
 
             Assert.That(restored.FindFile("db\\units.bin"), Is.Not.Null);
             Assert.That(restored.FindFile("text\\localisation.loc"), Is.Not.Null);
 
-            var restoredSource = (PackedFileSource)restored.FileList["text\\localisation.loc"].DataSource;
+            var restoredSource = (PackedFileSource)restored.FindFile("text\\localisation.loc")!.DataSource;
             Assert.That(restoredSource.Offset, Is.EqualTo(256));
             Assert.That(restoredSource.Size, Is.EqualTo(512));
             Assert.That(restoredSource.IsCompressed, Is.True);
@@ -259,8 +261,8 @@ namespace Shared.CoreTest.PackFiles.Serialization
                 SystemFilePath = @"c:\game\data"
             };
             var parent = new PackedFileSourceParent { FilePath = @"c:\game\data\pack.pack" };
-            container.FileList["a.txt"] = new PackFile("a.txt",
-                new PackedFileSource(parent, 0, 10, false, false, CompressionFormat.None, 0));
+            container.AddOrUpdateFile("a.txt", new PackFile("a.txt",
+                new PackedFileSource(parent, 0, 10, false, false, CompressionFormat.None, 0)));
 
             var cacheData = PackFileContainerCacheHelper.BuildCacheData("original_fp", container);
             PackFileContainerCacheHelper.SaveCache(cacheData, _cacheFilePath);
@@ -278,17 +280,17 @@ namespace Shared.CoreTest.PackFiles.Serialization
                 SystemFilePath = @"c:\game"
             };
             var parent = new PackedFileSourceParent { FilePath = @"c:\pack.pack" };
-            container.FileList["a.txt"] = new PackFile("a.txt",
-                new PackedFileSource(parent, 0, 10, false, false, CompressionFormat.None, 0));
-            container.FileList["b.txt"] = new PackFile("b.txt",
-                new PackedFileSource(parent, 10, 20, false, false, CompressionFormat.None, 0));
+            container.AddOrUpdateFile("a.txt", new PackFile("a.txt",
+                new PackedFileSource(parent, 0, 10, false, false, CompressionFormat.None, 0)));
+            container.AddOrUpdateFile("b.txt", new PackFile("b.txt",
+                new PackedFileSource(parent, 10, 20, false, false, CompressionFormat.None, 0)));
 
             var cacheData = PackFileContainerCacheHelper.BuildCacheData("fp", container);
             PackFileContainerCacheHelper.SaveCache(cacheData, _cacheFilePath);
 
             var restored = PackFileContainerCacheHelper.LoadContainerFromCache(_cacheFilePath, "fp");
-            var sourceA = (PackedFileSource)restored!.FileList["a.txt"].DataSource;
-            var sourceB = (PackedFileSource)restored.FileList["b.txt"].DataSource;
+            var sourceA = (PackedFileSource)restored!.FindFile("a.txt")!.DataSource;
+            var sourceB = (PackedFileSource)restored.FindFile("b.txt")!.DataSource;
             Assert.That(ReferenceEquals(sourceA.Parent, sourceB.Parent), Is.True);
         }
     }

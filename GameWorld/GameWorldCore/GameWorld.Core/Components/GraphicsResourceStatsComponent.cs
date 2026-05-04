@@ -20,7 +20,6 @@ namespace GameWorld.Core.Components
             _graphicsResourceCreator = graphicsResourceCreator;
         }
 
-
         public override void Draw(GameTime gameTime)
         {
             var records = _graphicsResourceCreator.Records;

@@ -36,8 +36,9 @@ namespace GameWorld.Core.Utility
 
             return true;
         }
-
    
+        // Merge a set of MeshNodes. 
+        // A new set of merged nodes are created. The caller needs to handle the memory of the old nodes.
         public static List<Rmv2MeshNode> CombineMeshes(List<Rmv2MeshNode> geometriesToCombine, bool addPrefix = false)
         {
             var combinedMeshes = new List<Rmv2MeshNode>();
@@ -46,17 +47,15 @@ namespace GameWorld.Core.Utility
             {
                 if (currentGroup.Count != 1)
                 {
+                    // Clone the first mesh
                     var combinedMesh = SceneNodeHelper.CloneNode(currentGroup.First());
                     combinedMesh.Name = currentGroup.First().Name;
                     if (addPrefix)
                         combinedMesh.Name += "_Combined";
 
-                    var newModel = currentGroup.First().Geometry.Clone();
-                    var typedGeo = currentGroup.Select(x => x.Geometry);
-                    combinedMesh.Geometry = newModel;
-
+                    // Merge the rest of the meshes into it
                     var geoList = currentGroup.Skip(1).Select(x => x.Geometry).ToList();
-                    newModel.Merge(geoList);
+                    combinedMesh.Geometry.Merge(geoList);
 
                     combinedMeshes.Add(combinedMesh);
                 }

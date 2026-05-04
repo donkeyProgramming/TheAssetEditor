@@ -1,6 +1,6 @@
-using Shared.Core.Settings;
+﻿using Shared.Core.Settings;
 
-namespace Shared.Core.PackFiles.Models
+namespace Shared.Core.PackFiles.Models.Containers
 {
     internal class CachedPackFileContainer : IPackFileContainerInternal
     {
@@ -13,6 +13,22 @@ namespace Shared.Core.PackFiles.Models
         public CachedPackFileContainer(string name)
         {
             Name = name;
+            SystemFilePath = string.Empty;
+        }
+
+        public int GetFileCount() => FileList.Count;
+        public Dictionary<string, PackFile> GetAllFiles() => FileList;
+
+        public List<(string FileName, PackFile Pack)> FindAllWithExtention(string extention)
+        {
+            extention = extention.ToLower();
+            var output = new List<(string, PackFile)>();
+            foreach (var file in FileList)
+            {
+                if (Path.GetExtension(file.Key) == extention)
+                    output.Add((file.Key, file.Value));
+            }
+            return output;
         }
 
         public PackFile? FindFile(string path)
@@ -21,12 +37,19 @@ namespace Shared.Core.PackFiles.Models
             return FileList.TryGetValue(lowerPath, out var value) ? value : null;
         }
 
+        public bool ContainsFile(string path)
+        {
+            var lowerPath = path.Replace('/', '\\').ToLower().Trim();
+            return FileList.ContainsKey(lowerPath);
+        }
+
         public string? GetFullPath(PackFile file)
         {
-            var res = FileList.FirstOrDefault(x => ReferenceEquals(x.Value, file)
-                || string.Equals(x.Value.Name, file.Name, StringComparison.OrdinalIgnoreCase)).Key;
+            var res = FileList.FirstOrDefault(x => ReferenceEquals(x.Value, file)).Key;
             return string.IsNullOrWhiteSpace(res) ? null : res;
         }
+
+        public void AddOrUpdateFile(string path, PackFile file) => throw new InvalidOperationException("Cannot modify a cached CA pack file container.");
 
         public List<PackFile> AddFiles(List<NewPackFileEntry> newFiles) =>
             throw new InvalidOperationException("Cannot modify a cached CA pack file container.");

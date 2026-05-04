@@ -41,6 +41,7 @@ namespace Shared.Ui.BaseDialogs.PackFileTree
         List<string> _extensionFilter;
         public int AutoExapandResultsAfterLimitedCount { get; set; } = 25;
         public bool HasActiveFilter => !string.IsNullOrWhiteSpace(FilterText) || ShowFoldersOnly || (_extensionFilter?.Count > 0);
+        public Action? FilterCleared { get; set; }
 
         internal SearchFilter(ObservableCollection<TreeNode> nodes, Func<IEnumerable<TreeNodeSource>> sourceRootsFactory)
         {
@@ -97,9 +98,11 @@ namespace Shared.Ui.BaseDialogs.PackFileTree
                 {
                     foreach (var item in _nodeCollection)
                     {
-                        item.ClearFilterExpansion();
+                        item.AbsorbFilterExpansion();
                         item.NormalizeLazyState();
                     }
+
+                    FilterCleared?.Invoke();
                 }
             }
 
