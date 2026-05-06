@@ -8,7 +8,7 @@ namespace Shared.Core.PackFiles.Models.Containers
 {
     internal class CachedPackFileContainer : IPackFileContainerInternal
     {
-        private readonly DbContextOptions<CacheDbContext> _dbOptions;
+        private readonly CacheDbContext _db;
 
         public string Name { get; set; }
         public bool IsCaPackFile { get => true; set { } }
@@ -19,42 +19,38 @@ namespace Shared.Core.PackFiles.Models.Containers
         {
             Name = name;
             SystemFilePath = string.Empty;
-            _dbOptions = dbOptions;
+            _db = new CacheDbContext(dbOptions);
+            _db.ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking;
         }
 
         public int GetFileCount()
         {
-            using var db = new CacheDbContext(_dbOptions);
-            return db.Files.Count();
+            return _db.Files.Count();
         }
 
         public PackFile? FindFile(string path)
         {
             var lowerPath = PathNormalization.NormalizeFileName(path);
-            using var db = new CacheDbContext(_dbOptions);
-            var entry = db.Files.AsNoTracking().FirstOrDefault(f => f.RelativePath == lowerPath);
+            var entry = _db.Files.FirstOrDefault(f => f.RelativePath == lowerPath);
             return entry != null ? ToPackFile(entry) : null;
         }
 
         public bool ContainsFile(string path)
         {
             var lowerPath = PathNormalization.NormalizeFileName(path);
-            using var db = new CacheDbContext(_dbOptions);
-            return db.Files.Any(f => f.RelativePath == lowerPath);
+            return _db.Files.Any(f => f.RelativePath == lowerPath);
         }
 
         public string? GetFullPath(PackFile file)
         {
-            using var db = new CacheDbContext(_dbOptions);
-            var entry = db.Files.AsNoTracking().FirstOrDefault(f => f.FileName == file.Name);
+            var entry = _db.Files.FirstOrDefault(f => f.FileName == file.Name);
             return entry?.RelativePath;
         }
 
         public List<(string FileName, PackFile Pack)> FindAllWithExtention(string extention)
         {
             extention = extention.ToLower();
-            using var db = new CacheDbContext(_dbOptions);
-            var entries = db.Files.AsNoTracking()
+            var entries = _db.Files
                 .Where(f => f.Extension == extention)
                 .ToList();
 
@@ -63,20 +59,16 @@ namespace Shared.Core.PackFiles.Models.Containers
 
         public List<(string Path, PackFile File)> SearchFiles(string? textFilter, IReadOnlyList<string>? extensions)
         {
-            using var db = new CacheDbContext(_dbOptions);
-
-            IQueryable<CachedFileEntity> query = db.Files.AsNoTracking();
+            IQueryable<CachedFileEntity> query = _db.Files;
 
             if (extensions != null && extensions.Count > 0)
             {
-                // Filter by extensions using SQL — handle most common case of actual file extensions
                 var extList = extensions.Select(e => e.ToLowerInvariant()).ToList();
                 query = query.Where(f => extList.Any(ext => f.FileName.Contains(ext)));
             }
 
             if (!string.IsNullOrWhiteSpace(textFilter))
             {
-                // Use LIKE for case-insensitive substring matching in SQLite
                 var pattern = $"%{textFilter}%";
                 query = query.Where(f => EF.Functions.Like(f.FileName, pattern));
             }
@@ -88,8 +80,7 @@ namespace Shared.Core.PackFiles.Models.Containers
 
         public Dictionary<string, PackFile> GetAllFiles()
         {
-            using var db = new CacheDbContext(_dbOptions);
-            var entries = db.Files.AsNoTracking().ToList();
+            var entries = _db.Files.ToList();
             var parentCache = new Dictionary<string, PackedFileSourceParent>(StringComparer.OrdinalIgnoreCase);
             var result = new Dictionary<string, PackFile>(entries.Count);
 
@@ -117,64 +108,59 @@ namespace Shared.Core.PackFiles.Models.Containers
 
         public DirectoryContent GetDirectoryContent(string directoryPath)
         {
-            using var db = new CacheDbContext(_dbOptions);
+            var prefix = string.IsNullOrEmpty(directoryPath) ? "" : directoryPath + "\\";
+            var prefixLen = prefix.Length;
 
-            // Get files directly in this folder
-            var filesInDir = db.Files.AsNoTracking()
-                .Where(f => f.FolderPath == directoryPath)
-                .Select(f => new { f.FileName, f.SourcePackFilePath, f.Offset, f.Size, f.IsEncrypted, f.IsCompressed, f.CompressionFormat, f.UncompressedSize })
+            // Single DB query: load all rows needed to derive both direct files and immediate subfolders.
+            // - root: all rows are relevant
+            // - non-root: direct files (FolderPath == directoryPath) and descendants (FolderPath.StartsWith(prefix))
+            var allNeededRows = _db.Files
+                .Where(f => string.IsNullOrEmpty(directoryPath)
+                    || f.FolderPath == directoryPath
+                    || f.FolderPath.StartsWith(prefix))
+                .Select(f => new { f.FolderPath, f.FileName, f.SourcePackFilePath, f.Offset, f.Size, f.IsEncrypted, f.IsCompressed, f.CompressionFormat, f.UncompressedSize })
                 .ToList();
 
-            var files = filesInDir
+            var parentCache = new Dictionary<string, PackedFileSourceParent>(StringComparer.OrdinalIgnoreCase);
+
+            // Create all files
+            var files = allNeededRows
+                .Where(f => f.FolderPath == directoryPath)
                 .Select(f =>
                 {
-                    var parent = new PackedFileSourceParent { FilePath = f.SourcePackFilePath };
+                    if (!parentCache.TryGetValue(f.SourcePackFilePath, out var parent))
+                    {
+                        parent = new PackedFileSourceParent { FilePath = f.SourcePackFilePath };
+                        parentCache[f.SourcePackFilePath] = parent;
+                    }
+
                     var source = new PackedFileSource(parent, f.Offset, f.Size, f.IsEncrypted, f.IsCompressed, (Utility.CompressionFormat)f.CompressionFormat, f.UncompressedSize);
                     return (f.FileName, File: new PackFile(f.FileName, source));
                 })
                 .OrderBy(x => x.FileName, StringComparer.CurrentCultureIgnoreCase)
                 .ToList();
 
-            // Get immediate subfolders
-            var prefix = string.IsNullOrEmpty(directoryPath) ? "" : directoryPath + "\\";
-            var prefixLen = prefix.Length;
+            // Works for both root and non-root directories:
+            // - root: candidate is full folder path (e.g. "models\\textures") => "models"
+            // - non-root: candidate is path remainder after prefix (e.g. "textures\\specular") => "textures"
+            var subFolders = allNeededRows
+                .Where(f => string.IsNullOrEmpty(directoryPath)
+                    ? f.FolderPath != ""
+                    : f.FolderPath.StartsWith(prefix))
+                .Select(f => f.FolderPath)
+                .Select(folderPath =>
+                {
+                    var candidate = string.IsNullOrEmpty(directoryPath)
+                        ? folderPath
+                        : folderPath.Substring(prefixLen);
 
-            List<string> subFolders;
-            if (string.IsNullOrEmpty(directoryPath))
-            {
-                // Root level: get distinct first path segment from all FolderPaths
-                subFolders = db.Files.AsNoTracking()
-                    .Where(f => f.FolderPath != "")
-                    .Select(f => f.FolderPath)
-                    .Distinct()
-                    .AsEnumerable()
-                    .Select(fp =>
-                    {
-                        var sepIdx = fp.IndexOf('\\');
-                        return sepIdx == -1 ? fp : fp.Substring(0, sepIdx);
-                    })
-                    .Distinct(StringComparer.OrdinalIgnoreCase)
-                    .OrderBy(x => x, StringComparer.CurrentCultureIgnoreCase)
-                    .ToList();
-            }
-            else
-            {
-                // Non-root: get distinct next segment from FolderPaths that start with prefix
-                subFolders = db.Files.AsNoTracking()
-                    .Where(f => f.FolderPath.StartsWith(prefix))
-                    .Select(f => f.FolderPath)
-                    .Distinct()
-                    .AsEnumerable()
-                    .Select(fp =>
-                    {
-                        var remainder = fp.Substring(prefixLen);
-                        var sepIdx = remainder.IndexOf('\\');
-                        return sepIdx == -1 ? remainder : remainder.Substring(0, sepIdx);
-                    })
-                    .Distinct(StringComparer.OrdinalIgnoreCase)
-                    .OrderBy(x => x, StringComparer.CurrentCultureIgnoreCase)
-                    .ToList();
-            }
+                    var sepIdx = candidate.IndexOf('\\');
+                    return sepIdx == -1 ? candidate : candidate.Substring(0, sepIdx);
+                })
+                .Where(folderName => !string.IsNullOrWhiteSpace(folderName))
+                .Distinct(StringComparer.OrdinalIgnoreCase)
+                .OrderBy(x => x, StringComparer.CurrentCultureIgnoreCase)
+                .ToList();
 
             return new DirectoryContent
             {
