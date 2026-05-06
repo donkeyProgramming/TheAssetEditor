@@ -1,20 +1,21 @@
 ﻿// PackFileBrowserViewModel Lazy Loading Architecture:
 //
 // The tree is built lazily. When a container is added (via PackFileContainerAddedEvent), only
-// the root TreeNodeSource is created with a child-loader delegate. Children are NOT loaded from
+// the root TreeNode is created with a child-loader delegate. Children are NOT loaded from
 // the container's GetDirectoryContent() until the node is expanded or explicitly queried.
 //
-// TreeNodeSource is the canonical backing model (lightweight, no UI state).
-// TreeNode is the materialized WPF-bound node, created on demand when a branch is expanded.
-// A placeholder child is used so the WPF TreeView shows the expand arrow for unloaded directories.
+// TreeNode serves as both the data model (BackingChildren) and the WPF-bound node.
+// BackingChildren holds the full logical tree once loaded; Children (ObservableCollection) holds
+// only the materialized subset visible to WPF. A placeholder child is used so the WPF TreeView
+// shows the expand arrow for unloaded directories.
 //
 // Event-driven updates from PackFileService:
-//   - PackFileContainerAddedEvent      → ReloadTree: creates root source + lazy child loader
-//   - PackFileContainerRemovedEvent    → removes container's tree state and TreeNode from Files
-//   - PackFileContainerFilesAddedEvent → AddFiles: inserts nodes into loaded source branches, creates dirs as needed
-//   - PackFileContainerFilesRemovedEvent → removes source + materialized nodes for deleted files
-//   - PackFileContainerFilesUpdatedEvent → updates Name/UnsavedChanged on source nodes (for rename/save)
-//   - PackFileContainerFolderRemovedEvent → finds and removes folder source node and materialized subtree
+//   - PackFileContainerAddedEvent      → ReloadTree: creates root node + lazy child loader
+//   - PackFileContainerRemovedEvent    → removes container's root and TreeNode from Files
+//   - PackFileContainerFilesAddedEvent → AddFiles: inserts nodes into loaded branches, creates dirs as needed
+//   - PackFileContainerFilesRemovedEvent → removes nodes for deleted files
+//   - PackFileContainerFilesUpdatedEvent → updates Name/UnsavedChanged on nodes (for rename/save)
+//   - PackFileContainerFolderRemovedEvent → finds and removes folder node and subtree
 //   - PackFileContainerFolderRenamedEvent → finds folder by OLD path, renames leaf, marks unsaved
 //   - PackFileContainerSetAsMainEditableEvent → toggles IsMainEditabelPack on root TreeNodes
 //   - PackFileContainerSavedEvent      → clears UnsavedChanged on loaded nodes only (avoids forcing full population)
@@ -631,6 +632,108 @@ namespace Shared.UiTest
             // Only folder children should be present
             Assert.That(folderA.Children.All(c => c.NodeType != NodeType.File || !c.IsVisible), Is.True,
                 "No visible file nodes should exist under folder with ShowFoldersOnly");
+        }
+
+        [Test]
+        public void SearchAutoExpandsWhenResultCountBelowThreshold()
+        {
+            // Create a small number of files (below default threshold of 25)
+            CreatePackfiles(
+                ("folderA\\sub\\file1.txt", "file1.txt"),
+                ("folderA\\sub\\file2.txt", "file2.txt"),
+                ("folderB\\file3.txt", "file3.txt"));
+
+            var root = _viewModel.Files[0];
+            Assert.That(root.IsNodeExpanded, Is.False, "Root should start collapsed");
+
+            // Filter matches all 3 files — well below the 25 threshold
+            _viewModel.Filter.FilterText = "file";
+
+            // All matching nodes should be auto-expanded
+            Assert.That(root.IsNodeExpanded, Is.True, "Root should be expanded when results < threshold");
+
+            var folderA = _viewModel.GetFromPath(root, "foldera");
+            Assert.That(folderA, Is.Not.Null);
+            Assert.That(folderA.IsNodeExpanded, Is.True, "folderA should be auto-expanded");
+
+            var sub = _viewModel.GetFromPath(root, "foldera\\sub");
+            Assert.That(sub, Is.Not.Null);
+            Assert.That(sub.IsNodeExpanded, Is.True, "sub should be auto-expanded");
+
+            var folderB = _viewModel.GetFromPath(root, "folderb");
+            Assert.That(folderB, Is.Not.Null);
+            Assert.That(folderB.IsNodeExpanded, Is.True, "folderB should be auto-expanded");
+        }
+
+        [Test]
+        public void SearchDoesNotAutoExpandWhenResultCountAboveThreshold()
+        {
+            // Create more files than the threshold
+            var files = new List<(string Path, string FileName)>();
+            for (var i = 0; i < 30; i++)
+                files.Add(($"folder{i}\\file{i}.txt", $"file{i}.txt"));
+
+            CreatePackfiles(files.ToArray());
+
+            var root = _viewModel.Files[0];
+
+            // Set threshold low to ensure we exceed it
+            _viewModel.Filter.AutoExapandResultsAfterLimitedCount = 5;
+            _viewModel.Filter.FilterText = "file";
+
+            // Root gets expanded by ExpandForFilter (always happens), but children should NOT be recursively expanded
+            Assert.That(root.IsNodeExpanded, Is.True, "Root is always expanded by ExpandForFilter");
+
+            // Check that deep nodes are NOT expanded (since results exceed threshold)
+            var expandedFolders = root.Children.Where(c => c.IsNodeExpanded).ToList();
+            Assert.That(expandedFolders.Count, Is.EqualTo(0),
+                "Folders should NOT be auto-expanded when results exceed threshold");
+        }
+
+        [Test]
+        public void DoubleClickCollapseAndReexpand_ChildrenRemainVisible()
+        {
+            // Scenario: user expands folders manually, collapses a parent,
+            // then re-expands it — child folders that were expanded should still show their children.
+            CreatePackfiles(
+                ("folderA\\sub\\file1.txt", "file1.txt"),
+                ("folderA\\sub\\file2.txt", "file2.txt"));
+
+            var root = _viewModel.Files[0];
+
+            // Expand the tree manually
+            root.IsNodeExpanded = true;
+            var folderA = _viewModel.GetFromPath(root, "foldera");
+            Assert.That(folderA, Is.Not.Null);
+            folderA.IsNodeExpanded = true;
+            var sub = _viewModel.GetFromPath(root, "foldera\\sub");
+            Assert.That(sub, Is.Not.Null);
+            sub.IsNodeExpanded = true;
+
+            // Verify files are visible
+            var file1 = _viewModel.GetFromPath(root, "foldera\\sub\\file1.txt");
+            Assert.That(file1, Is.Not.Null);
+
+            // User double-clicks root to collapse
+            _viewModel.DoubleClickCommand.Execute(root);
+            Assert.That(root.IsNodeExpanded, Is.False);
+
+            // User double-clicks root to re-expand
+            _viewModel.DoubleClickCommand.Execute(root);
+            Assert.That(root.IsNodeExpanded, Is.True);
+
+            // folderA should still be visible and expanded with its children materialized
+            folderA = _viewModel.GetFromPath(root, "foldera");
+            Assert.That(folderA, Is.Not.Null, "folderA should be visible after re-expanding root");
+            Assert.That(folderA.IsNodeExpanded, Is.True, "folderA should still be expanded");
+
+            sub = _viewModel.GetFromPath(root, "foldera\\sub");
+            Assert.That(sub, Is.Not.Null, "sub should be visible since folderA is expanded");
+            Assert.That(sub.IsNodeExpanded, Is.True, "sub should still be expanded");
+
+            // Files inside sub should be materialized
+            file1 = _viewModel.GetFromPath(root, "foldera\\sub\\file1.txt");
+            Assert.That(file1, Is.Not.Null, "file1 should be visible inside expanded sub folder");
         }
     }
 }

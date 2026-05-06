@@ -26,6 +26,7 @@ namespace Shared.Core.PackFiles.Serialization.CacheDatabase
                 entity.HasIndex(e => e.RelativePath).IsUnique();
                 entity.HasIndex(e => e.Extension);
                 entity.HasIndex(e => e.FolderPath);
+                entity.HasIndex(e => e.FileName);
             });
         }
     }

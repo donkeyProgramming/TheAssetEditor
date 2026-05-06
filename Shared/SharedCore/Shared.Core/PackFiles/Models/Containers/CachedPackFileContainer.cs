@@ -61,6 +61,31 @@ namespace Shared.Core.PackFiles.Models.Containers
             return entries.Select(e => (e.RelativePath, ToPackFile(e))).ToList();
         }
 
+        public List<(string Path, PackFile File)> SearchFiles(string? textFilter, IReadOnlyList<string>? extensions)
+        {
+            using var db = new CacheDbContext(_dbOptions);
+
+            IQueryable<CachedFileEntity> query = db.Files.AsNoTracking();
+
+            if (extensions != null && extensions.Count > 0)
+            {
+                // Filter by extensions using SQL — handle most common case of actual file extensions
+                var extList = extensions.Select(e => e.ToLowerInvariant()).ToList();
+                query = query.Where(f => extList.Any(ext => f.FileName.Contains(ext)));
+            }
+
+            if (!string.IsNullOrWhiteSpace(textFilter))
+            {
+                // Use LIKE for case-insensitive substring matching in SQLite
+                var pattern = $"%{textFilter}%";
+                query = query.Where(f => EF.Functions.Like(f.FileName, pattern));
+            }
+
+            var entries = query.OrderBy(f => f.RelativePath).ToList();
+
+            return entries.Select(e => (e.RelativePath, ToPackFile(e))).ToList();
+        }
+
         public Dictionary<string, PackFile> GetAllFiles()
         {
             using var db = new CacheDbContext(_dbOptions);

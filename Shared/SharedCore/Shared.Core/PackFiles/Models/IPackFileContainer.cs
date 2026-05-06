@@ -29,5 +29,6 @@ namespace Shared.Core.PackFiles.Models
         List<(string FileName, PackFile Pack)> FindAllWithExtention(string extention);
         Dictionary<string, PackFile> GetAllFiles();
         DirectoryContent GetDirectoryContent(string directoryPath);
+        List<(string Path, PackFile File)> SearchFiles(string? textFilter, IReadOnlyList<string>? extensions);
     }
 }

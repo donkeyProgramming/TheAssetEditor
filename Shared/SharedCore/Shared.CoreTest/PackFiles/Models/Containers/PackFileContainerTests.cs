@@ -492,4 +492,128 @@ namespace Shared.CoreTest.PackFiles.Models.Containers
         }
 
     }
+
+    internal class PackFileContainer_SearchFiles
+    {
+        private PackFileContainer _container;
+
+        [SetUp]
+        public void Setup()
+        {
+            _container = new PackFileContainer("Test");
+            _container.AddOrUpdateFile("models\\unit.rigid_model_v2", new PackFile("unit.rigid_model_v2", null));
+            _container.AddOrUpdateFile("models\\vehicle.rigid_model_v2", new PackFile("vehicle.rigid_model_v2", null));
+            _container.AddOrUpdateFile("models\\textures\\diffuse.dds", new PackFile("diffuse.dds", null));
+            _container.AddOrUpdateFile("models\\textures\\normal.dds", new PackFile("normal.dds", null));
+            _container.AddOrUpdateFile("audio\\battle_sound.wem", new PackFile("battle_sound.wem", null));
+            _container.AddOrUpdateFile("audio\\music.wem", new PackFile("music.wem", null));
+            _container.AddOrUpdateFile("scripts\\campaign_script.lua", new PackFile("campaign_script.lua", null));
+        }
+
+        [Test]
+        public void NullFilters_ReturnsAllFiles()
+        {
+            var results = _container.SearchFiles(null, null);
+            Assert.That(results.Count, Is.EqualTo(7));
+        }
+
+        [Test]
+        public void TextFilter_MatchesFileName()
+        {
+            var results = _container.SearchFiles("unit", null);
+            Assert.That(results.Count, Is.EqualTo(1));
+            Assert.That(results[0].File.Name, Is.EqualTo("unit.rigid_model_v2"));
+        }
+
+        [Test]
+        public void TextFilter_IsCaseInsensitive()
+        {
+            var results = _container.SearchFiles("UNIT", null);
+            Assert.That(results.Count, Is.EqualTo(1));
+            Assert.That(results[0].File.Name, Is.EqualTo("unit.rigid_model_v2"));
+        }
+
+        [Test]
+        public void TextFilter_PartialMatch()
+        {
+            var results = _container.SearchFiles("battle", null);
+            Assert.That(results.Count, Is.EqualTo(1));
+            Assert.That(results[0].File.Name, Is.EqualTo("battle_sound.wem"));
+        }
+
+        [Test]
+        public void TextFilter_NoMatch_ReturnsEmpty()
+        {
+            var results = _container.SearchFiles("nonexistent", null);
+            Assert.That(results, Is.Empty);
+        }
+
+        [Test]
+        public void ExtensionFilter_SingleExtension()
+        {
+            var results = _container.SearchFiles(null, [".wem"]);
+            Assert.That(results.Count, Is.EqualTo(2));
+            Assert.That(results.All(r => r.File.Name.EndsWith(".wem")), Is.True);
+        }
+
+        [Test]
+        public void ExtensionFilter_MultipleExtensions()
+        {
+            var results = _container.SearchFiles(null, [".wem", ".lua"]);
+            Assert.That(results.Count, Is.EqualTo(3));
+        }
+
+        [Test]
+        public void ExtensionFilter_NoMatch_ReturnsEmpty()
+        {
+            var results = _container.SearchFiles(null, [".xyz"]);
+            Assert.That(results, Is.Empty);
+        }
+
+        [Test]
+        public void CombinedFilters_TextAndExtension()
+        {
+            var results = _container.SearchFiles("battle", [".wem"]);
+            Assert.That(results.Count, Is.EqualTo(1));
+            Assert.That(results[0].File.Name, Is.EqualTo("battle_sound.wem"));
+        }
+
+        [Test]
+        public void CombinedFilters_TextMatchesButExtensionDoesNot_ReturnsEmpty()
+        {
+            var results = _container.SearchFiles("unit", [".wem"]);
+            Assert.That(results, Is.Empty);
+        }
+
+        [Test]
+        public void ResultsAreSortedByPath()
+        {
+            var results = _container.SearchFiles(null, null);
+            var paths = results.Select(r => r.Path).ToList();
+            var sorted = paths.OrderBy(p => p, StringComparer.OrdinalIgnoreCase).ToList();
+            Assert.That(paths, Is.EqualTo(sorted));
+        }
+
+        [Test]
+        public void ResultsContainCorrectPaths()
+        {
+            var results = _container.SearchFiles("diffuse", null);
+            Assert.That(results.Count, Is.EqualTo(1));
+            Assert.That(results[0].Path, Is.EqualTo("models\\textures\\diffuse.dds"));
+        }
+
+        [Test]
+        public void EmptyTextFilter_TreatedAsNull()
+        {
+            var results = _container.SearchFiles("   ", null);
+            Assert.That(results.Count, Is.EqualTo(7));
+        }
+
+        [Test]
+        public void EmptyExtensionList_TreatedAsNoFilter()
+        {
+            var results = _container.SearchFiles(null, []);
+            Assert.That(results.Count, Is.EqualTo(7));
+        }
+    }
 }

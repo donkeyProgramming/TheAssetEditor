@@ -74,6 +74,40 @@ namespace Shared.Core.PackFiles.Models.Containers
             return output;
         }
 
+        public List<(string Path, PackFile File)> SearchFiles(string? textFilter, IReadOnlyList<string>? extensions)
+        {
+            var results = new List<(string Path, PackFile File)>();
+
+            foreach (var (path, packFile) in FileList)
+            {
+                if (extensions != null && extensions.Count > 0)
+                {
+                    var matchesExtension = false;
+                    foreach (var ext in extensions)
+                    {
+                        if (packFile.Name.Contains(ext, StringComparison.OrdinalIgnoreCase))
+                        {
+                            matchesExtension = true;
+                            break;
+                        }
+                    }
+                    if (!matchesExtension)
+                        continue;
+                }
+
+                if (!string.IsNullOrWhiteSpace(textFilter))
+                {
+                    if (!packFile.Name.Contains(textFilter, StringComparison.OrdinalIgnoreCase))
+                        continue;
+                }
+
+                results.Add((path, packFile));
+            }
+
+            results.Sort((a, b) => StringComparer.OrdinalIgnoreCase.Compare(a.Path, b.Path));
+            return results;
+        }
+
         public PackFileContainer(string name)
         {
             Name = name;
