@@ -1,5 +1,4 @@
-using Shared.Core.PackFiles;
-using Shared.Core.PackFiles.Models;
+﻿using Shared.Core.PackFiles.Models;
 using Shared.Core.PackFiles.Models.Containers;
 using Shared.Core.PackFiles.Models.FileSources;
 using Shared.Core.PackFiles.Serialization.CacheDatabase;
@@ -14,13 +13,12 @@ namespace Shared.CoreTest.PackFiles.Models.Containers
         protected string _tempDir = null!;
         protected string _dbFilePath = null!;
         protected IPackFileContainerInternal _container = null!;
+        protected bool IsCachedContainer => _useCachedContainer;
 
         protected PackFileContainerTests_TestBase(Type containerType)
         {
             _useCachedContainer = containerType == typeof(CachedPackFileContainer);
         }
-
-        protected bool IsCachedContainer => _useCachedContainer;
 
         [SetUp]
         public void Setup()
