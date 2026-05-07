@@ -10,6 +10,7 @@ using Shared.Core.Events;
 using Shared.Core.Events.Global;
 using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
+using Shared.Core.PackFiles.Utility;
 using Shared.Core.Settings;
 using Shared.Ui.BaseDialogs.PackFileTree.ContextMenu;
 using Shared.Ui.Common;
@@ -420,17 +421,19 @@ namespace Shared.Ui.BaseDialogs.PackFileTree
         private bool LoadChildrenFromContainer(TreeNode node, IPackFileContainer container, bool skipWemFiles)
         {
             var directoryPath = node.GetFullPath();
-            var content = container.GetDirectoryContent(directoryPath);
+            var split = PackFileServiceUtility.SplitDirectoryEntries(container, directoryPath);
 
-            foreach (var folderName in content.SubFolders)
+            foreach (var folderName in split.SubFolders)
             {
                 var childNode = new TreeNode(folderName, NodeType.Directory, container, node, () => Filter.HasActiveFilter);
                 childNode.SetChildLoader(n => LoadChildrenFromContainer(n, container, skipWemFiles));
                 node.AddChild(childNode);
             }
 
-            foreach (var (fileName, file) in content.Files)
+            foreach (var fileEntry in split.Files)
             {
+                var fileName = fileEntry.FileName;
+                var file = fileEntry.File;
                 if (skipWemFiles && fileName.EndsWith(".wem", StringComparison.OrdinalIgnoreCase))
                     continue;
 

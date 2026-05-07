@@ -347,10 +347,12 @@ namespace Shared.CoreTest.PackFiles.Serialization
             };
 
             var parent = new PackedFileSourceParent { FilePath = @"c:\game\pack.pack" };
-            container.AddOrUpdateFile("a\\b\\c\\file.txt", new PackFile("file.txt",
+            container.AddOrUpdateFile("a\\folder_marker.txt", new PackFile("folder_marker.txt",
                 new PackedFileSource(parent, 0, 10, false, false, CompressionFormat.None, 0)));
+            container.AddOrUpdateFile("a\\b\\c\\file.txt", new PackFile("file.txt",
+                new PackedFileSource(parent, 10, 10, false, false, CompressionFormat.None, 0)));
             container.AddOrUpdateFile("root_file.txt", new PackFile("root_file.txt",
-                new PackedFileSource(parent, 10, 20, false, false, CompressionFormat.None, 0)));
+                new PackedFileSource(parent, 20, 20, false, false, CompressionFormat.None, 0)));
 
             var dbOptions = CreateTestDbOptions();
             PackFileContainerCacheHelper.SaveCache("fp", container, dbOptions);
@@ -359,11 +361,11 @@ namespace Shared.CoreTest.PackFiles.Serialization
             var loaded = PackFileContainerCacheHelper.LoadContainerFromCache(dbOptions, "fp");
             Assert.That(loaded, Is.Not.Null);
 
-            var rootContent = loaded.GetDirectoryContent("");
+            var rootContent = PackFileServiceUtility.SplitDirectoryEntries(loaded, "");
             Assert.That(rootContent.Files.Any(f => f.FileName == "root_file.txt"), Is.True);
             Assert.That(rootContent.SubFolders, Does.Contain("a"));
 
-            var deepContent = loaded.GetDirectoryContent("a\\b\\c");
+            var deepContent = PackFileServiceUtility.SplitDirectoryEntries(loaded, "a\\b\\c");
             Assert.That(deepContent.Files.Any(f => f.FileName == "file.txt"), Is.True);
         }
 

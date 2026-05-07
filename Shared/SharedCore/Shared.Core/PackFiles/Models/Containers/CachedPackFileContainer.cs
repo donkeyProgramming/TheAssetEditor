@@ -103,71 +103,62 @@ namespace Shared.Core.PackFiles.Models.Containers
             return result;
         }
 
-        public void AddOrUpdateFile(string path, PackFile file) =>
-            throw new InvalidOperationException("Cannot modify a cached CA pack file container.");
 
-        public DirectoryContent GetDirectoryContent(string directoryPath)
+
+        public List<(string Path, PackFile File)> GetDirectoryContent(string directoryPath)
         {
-            var prefix = string.IsNullOrEmpty(directoryPath) ? "" : directoryPath + "\\";
-            var prefixLen = prefix.Length;
-
-            // Single DB query: load all rows needed to derive both direct files and immediate subfolders.
-            // - root: all rows are relevant
-            // - non-root: direct files (FolderPath == directoryPath) and descendants (FolderPath.StartsWith(prefix))
-            var allNeededRows = _db.Files
-                .Where(f => string.IsNullOrEmpty(directoryPath)
-                    || f.FolderPath == directoryPath
-                    || f.FolderPath.StartsWith(prefix))
+            var directFileRows = _db.Files
+                .Where(f => f.FolderPath == directoryPath)
                 .Select(f => new { f.FolderPath, f.FileName, f.SourcePackFilePath, f.Offset, f.Size, f.IsEncrypted, f.IsCompressed, f.CompressionFormat, f.UncompressedSize })
                 .ToList();
 
-            var parentCache = new Dictionary<string, PackedFileSourceParent>(StringComparer.OrdinalIgnoreCase);
-
-            // Create all files
-            var files = allNeededRows
-                .Where(f => f.FolderPath == directoryPath)
+            var packedFileSourceParentCache = new Dictionary<string, PackedFileSourceParent>(StringComparer.OrdinalIgnoreCase);
+            var files = directFileRows
                 .Select(f =>
                 {
-                    if (!parentCache.TryGetValue(f.SourcePackFilePath, out var parent))
+                    if (!packedFileSourceParentCache.TryGetValue(f.SourcePackFilePath, out var parent))
                     {
                         parent = new PackedFileSourceParent { FilePath = f.SourcePackFilePath };
-                        parentCache[f.SourcePackFilePath] = parent;
+                        packedFileSourceParentCache[f.SourcePackFilePath] = parent;
                     }
 
                     var source = new PackedFileSource(parent, f.Offset, f.Size, f.IsEncrypted, f.IsCompressed, (Utility.CompressionFormat)f.CompressionFormat, f.UncompressedSize);
-                    return (f.FileName, File: new PackFile(f.FileName, source));
+                    var relativePath = string.IsNullOrEmpty(f.FolderPath) ? f.FileName : $"{f.FolderPath}\\{f.FileName}";
+                    return (Path: relativePath, File: new PackFile(f.FileName, source));
                 })
-                .OrderBy(x => x.FileName, StringComparer.CurrentCultureIgnoreCase)
+                .OrderBy(x => x.Path, StringComparer.CurrentCultureIgnoreCase)
                 .ToList();
 
-            // Works for both root and non-root directories:
-            // - root: candidate is full folder path (e.g. "models\\textures") => "models"
-            // - non-root: candidate is path remainder after prefix (e.g. "textures\\specular") => "textures"
-            var subFolders = allNeededRows
+            return files;
+        }
+
+        public List<string> GetSubDirectories(string directoryPath)
+        {
+            var prefix = string.IsNullOrEmpty(directoryPath) ? "" : directoryPath + "\\";
+            var prefixLength = prefix.Length;
+
+            return _db.Files
                 .Where(f => string.IsNullOrEmpty(directoryPath)
                     ? f.FolderPath != ""
                     : f.FolderPath.StartsWith(prefix))
                 .Select(f => f.FolderPath)
-                .Select(folderPath =>
+                .AsEnumerable()
+                .Select(folderPath => string.IsNullOrEmpty(directoryPath)
+                    ? folderPath
+                    : folderPath.Substring(prefixLength))
+                .Select(candidate =>
                 {
-                    var candidate = string.IsNullOrEmpty(directoryPath)
-                        ? folderPath
-                        : folderPath.Substring(prefixLen);
-
-                    var sepIdx = candidate.IndexOf('\\');
-                    return sepIdx == -1 ? candidate : candidate.Substring(0, sepIdx);
+                    var separatorIndex = candidate.IndexOf('\\');
+                    return separatorIndex == -1 ? candidate : candidate.Substring(0, separatorIndex);
                 })
                 .Where(folderName => !string.IsNullOrWhiteSpace(folderName))
                 .Distinct(StringComparer.OrdinalIgnoreCase)
                 .OrderBy(x => x, StringComparer.CurrentCultureIgnoreCase)
                 .ToList();
-
-            return new DirectoryContent
-            {
-                SubFolders = subFolders,
-                Files = files
-            };
         }
+
+        public void AddOrUpdateFile(string path, PackFile file) =>
+            throw new InvalidOperationException("Cannot modify a cached CA pack file container.");
 
         public List<PackFile> AddFiles(List<NewPackFileEntry> newFiles) =>
             throw new InvalidOperationException("Cannot modify a cached CA pack file container.");

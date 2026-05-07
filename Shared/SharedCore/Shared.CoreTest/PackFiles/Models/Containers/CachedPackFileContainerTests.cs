@@ -280,7 +280,7 @@ namespace Shared.CoreTest.PackFiles.Models.Containers
         [Test]
         public void Root_ReturnsRootFilesAndTopFolders()
         {
-            var content = _container.GetDirectoryContent("");
+            var content = PackFileServiceUtility.SplitDirectoryEntries(_container, "");
 
             Assert.That(content.Files.Any(f => f.FileName == "root_file.txt"), Is.True);
             Assert.That(content.SubFolders, Does.Contain("models"));
@@ -292,77 +292,80 @@ namespace Shared.CoreTest.PackFiles.Models.Containers
         [Test]
         public void Root_DoesNotIncludeFilesFromSubfolders()
         {
-            var content = _container.GetDirectoryContent("");
+            var entries = _container.GetDirectoryContent("");
 
-            Assert.That(content.Files.Count, Is.EqualTo(1));
-            Assert.That(content.Files[0].FileName, Is.EqualTo("root_file.txt"));
+            Assert.That(entries.Count, Is.EqualTo(1));
+            Assert.That(entries[0].File.Name, Is.EqualTo("root_file.txt"));
         }
 
         [Test]
         public void Subfolder_ReturnsDirectFilesAndImmediateSubfolders()
         {
-            var content = _container.GetDirectoryContent("models");
+            var entries = _container.GetDirectoryContent("models");
+            var subFolders = _container.GetSubDirectories("models");
 
-            Assert.That(content.Files.Any(f => f.FileName == "unit.model"), Is.True);
-            Assert.That(content.Files.Any(f => f.FileName == "vehicle.model"), Is.True);
-            Assert.That(content.SubFolders, Does.Contain("textures"));
-            // Should NOT include files from deeper levels
-            Assert.That(content.Files.Any(f => f.FileName == "diffuse.dds"), Is.False);
+            Assert.That(entries.Any(f => f.File.Name == "unit.model"), Is.True);
+            Assert.That(entries.Any(f => f.File.Name == "vehicle.model"), Is.True);
+            Assert.That(subFolders, Does.Contain("textures"));
+            Assert.That(entries.Any(f => f.File.Name == "diffuse.dds"), Is.False);
         }
 
         [Test]
         public void NestedSubfolder_ReturnsCorrectContent()
         {
-            var content = _container.GetDirectoryContent("models\\textures");
+            var entries = _container.GetDirectoryContent("models\\textures");
+            var subFolders = _container.GetSubDirectories("models\\textures");
 
-            Assert.That(content.Files.Any(f => f.FileName == "diffuse.dds"), Is.True);
-            Assert.That(content.Files.Any(f => f.FileName == "normal.dds"), Is.True);
-            Assert.That(content.SubFolders, Does.Contain("specular"));
-            Assert.That(content.Files.Count, Is.EqualTo(2));
+            Assert.That(entries.Any(f => f.File.Name == "diffuse.dds"), Is.True);
+            Assert.That(entries.Any(f => f.File.Name == "normal.dds"), Is.True);
+            Assert.That(subFolders, Does.Contain("specular"));
+            Assert.That(entries.Count, Is.EqualTo(2));
         }
 
         [Test]
         public void DeepNestedFolder_ReturnsOnlyItsFiles()
         {
-            var content = _container.GetDirectoryContent("models\\textures\\specular");
+            var entries = _container.GetDirectoryContent("models\\textures\\specular");
+            var subFolders = _container.GetSubDirectories("models\\textures\\specular");
 
-            Assert.That(content.Files.Count, Is.EqualTo(1));
-            Assert.That(content.Files[0].FileName, Is.EqualTo("gloss.dds"));
-            Assert.That(content.SubFolders, Is.Empty);
+            Assert.That(entries.Count, Is.EqualTo(1));
+            Assert.That(entries[0].File.Name, Is.EqualTo("gloss.dds"));
+            Assert.That(subFolders, Is.Empty);
         }
 
         [Test]
         public void NonexistentFolder_ReturnsEmpty()
         {
-            var content = _container.GetDirectoryContent("nonexistent\\path");
+            var entries = _container.GetDirectoryContent("nonexistent\\path");
+            var subFolders = _container.GetSubDirectories("nonexistent\\path");
 
-            Assert.That(content.Files, Is.Empty);
-            Assert.That(content.SubFolders, Is.Empty);
+            Assert.That(entries, Is.Empty);
+            Assert.That(subFolders, Is.Empty);
         }
 
         [Test]
         public void SubfoldersAreSorted()
         {
-            var content = _container.GetDirectoryContent("");
+            var subFolders = _container.GetSubDirectories("");
 
-            var sorted = content.SubFolders.OrderBy(x => x, StringComparer.CurrentCultureIgnoreCase).ToList();
-            Assert.That(content.SubFolders, Is.EqualTo(sorted));
+            var sorted = subFolders.OrderBy(x => x, StringComparer.CurrentCultureIgnoreCase).ToList();
+            Assert.That(subFolders, Is.EqualTo(sorted));
         }
 
         [Test]
         public void FilesAreSorted()
         {
-            var content = _container.GetDirectoryContent("models");
+            var entries = _container.GetDirectoryContent("models");
 
-            var sorted = content.Files.OrderBy(x => x.FileName, StringComparer.CurrentCultureIgnoreCase).ToList();
-            Assert.That(content.Files.Select(f => f.FileName), Is.EqualTo(sorted.Select(f => f.FileName)));
+            var sorted = entries.OrderBy(x => x.File.Name, StringComparer.CurrentCultureIgnoreCase).ToList();
+            Assert.That(entries.Select(f => f.File.Name), Is.EqualTo(sorted.Select(f => f.File.Name)));
         }
 
         [Test]
         public void Files_HaveCorrectDataSource()
         {
-            var content = _container.GetDirectoryContent("models");
-            var unitFile = content.Files.First(f => f.FileName == "unit.model");
+            var entries = _container.GetDirectoryContent("models");
+            var unitFile = entries.First(f => f.File.Name == "unit.model");
             var source = unitFile.File.DataSource as PackedFileSource;
 
             Assert.That(source, Is.Not.Null);
@@ -482,9 +485,8 @@ namespace Shared.CoreTest.PackFiles.Models.Containers
             PackFileContainerCacheHelper.SaveCache("fp", sourceContainer, dbOptions);
             var container = PackFileContainerCacheHelper.LoadContainerFromCache(dbOptions, "fp")!;
 
-            var content = container.GetDirectoryContent("");
-            Assert.That(content.Files, Is.Empty);
-            Assert.That(content.SubFolders, Is.Empty);
+            Assert.That(container.GetDirectoryContent(""), Is.Empty);
+            Assert.That(container.GetSubDirectories(""), Is.Empty);
         }
     }
 
@@ -633,6 +635,117 @@ namespace Shared.CoreTest.PackFiles.Models.Containers
         {
             var results = _container.SearchFiles(null, []);
             Assert.That(results.Count, Is.EqualTo(7));
+        }
+    }
+
+    [TestFixture]
+    public class CachedPackFileContainer_GetDirectoryContent_PathRows
+    {
+        private string _tempDir = null!;
+        private string _dbPath = null!;
+        private CachedPackFileContainer _container = null!;
+
+        // Test structure (backslash delimited, invariant: every folder has at least one direct file):
+        //   audio\filea
+        //   audio\fileb
+        //   texture\textureFile      <- direct file so "texture" sub-folder is discoverable
+        //   texture\mesha\filea
+        //   texture\meshb\filea
+        //   rootfilea
+        //   rootfileb
+
+        [SetUp]
+        public void SetUp()
+        {
+            _tempDir = Path.Combine(Path.GetTempPath(), "QueryDirTests_" + Guid.NewGuid().ToString("N"));
+            Directory.CreateDirectory(_tempDir);
+            _dbPath = Path.Combine(_tempDir, "test_cache.db");
+
+            var sourceContainer = new PackFileContainer("TestCache") { IsCaPackFile = true, SystemFilePath = @"c:\game\data" };
+            sourceContainer.SourcePackFilePaths.Add(@"c:\game\data\p.pack");
+            var parent = new PackedFileSourceParent { FilePath = @"c:\game\data\p.pack" };
+
+            sourceContainer.AddOrUpdateFile(@"audio\filea",           new PackFile("filea",       new PackedFileSource(parent, 0,  10, false, false, CompressionFormat.None, 0)));
+            sourceContainer.AddOrUpdateFile(@"audio\fileb",           new PackFile("fileb",       new PackedFileSource(parent, 10, 10, false, false, CompressionFormat.None, 0)));
+            sourceContainer.AddOrUpdateFile(@"texture\textureFile",   new PackFile("textureFile", new PackedFileSource(parent, 20, 10, false, false, CompressionFormat.None, 0)));
+            sourceContainer.AddOrUpdateFile(@"texture\mesha\filea",   new PackFile("filea",       new PackedFileSource(parent, 30, 10, false, false, CompressionFormat.None, 0)));
+            sourceContainer.AddOrUpdateFile(@"texture\meshb\filea",   new PackFile("filea",       new PackedFileSource(parent, 40, 10, false, false, CompressionFormat.None, 0)));
+            sourceContainer.AddOrUpdateFile(@"rootfilea",             new PackFile("rootfilea",   new PackedFileSource(parent, 50, 10, false, false, CompressionFormat.None, 0)));
+            sourceContainer.AddOrUpdateFile(@"rootfileb",             new PackFile("rootfileb",   new PackedFileSource(parent, 60, 10, false, false, CompressionFormat.None, 0)));
+
+            var dbOptions = PackFileContainerCacheHelper.CreateDbOptions(_dbPath);
+            PackFileContainerCacheHelper.SaveCache("test_fp", sourceContainer, dbOptions);
+            _container = PackFileContainerCacheHelper.LoadContainerFromCache(dbOptions, "test_fp")!;
+        }
+
+        [TearDown]
+        public void TearDown()
+        {
+            if (Directory.Exists(_tempDir))
+                Directory.Delete(_tempDir, true);
+        }
+
+        [Test]
+        public void Root_IncludesOnlyRootFiles()
+        {
+            var rows = _container.GetDirectoryContent("");
+            var paths = rows.Select(r => r.Path).ToHashSet(StringComparer.OrdinalIgnoreCase);
+
+            Assert.That(paths, Does.Contain("rootfilea"));
+            Assert.That(paths, Does.Contain("rootfileb"));
+        }
+
+        [Test]
+        public void Root_ExcludesDeepDescendantFolders()
+        {
+            var rows = _container.GetDirectoryContent("");
+            var paths = rows.Select(r => r.Path).ToHashSet(StringComparer.OrdinalIgnoreCase);
+
+            Assert.That(paths, Does.Not.Contain(@"texture\mesha\filea"));
+            Assert.That(paths, Does.Not.Contain(@"texture\meshb\filea"));
+        }
+
+        [Test]
+        public void Root_ReturnsExpectedRowCount()
+        {
+            // root contains only its direct files
+            var rows = _container.GetDirectoryContent("");
+            Assert.That(rows.Count, Is.EqualTo(2));
+        }
+
+        [Test]
+        public void Subfolder_IncludesOnlyDirectFiles()
+        {
+            var rows = _container.GetDirectoryContent(@"texture");
+            var paths = rows.Select(r => r.Path).ToHashSet(StringComparer.OrdinalIgnoreCase);
+
+            Assert.That(paths, Does.Contain(@"texture\textureFile"));
+            Assert.That(paths.Count, Is.EqualTo(1));
+        }
+
+        [Test]
+        public void Subfolder_ExcludesParentAndSiblingRows()
+        {
+            var rows = _container.GetDirectoryContent(@"texture");
+            var paths = rows.Select(r => r.Path).ToHashSet(StringComparer.OrdinalIgnoreCase);
+
+            Assert.That(paths.Any(p => p.StartsWith(@"audio\", StringComparison.OrdinalIgnoreCase)), Is.False);
+            Assert.That(paths.Any(p => !p.StartsWith(@"texture\", StringComparison.OrdinalIgnoreCase)), Is.False);
+        }
+
+        [Test]
+        public void Subfolder_ReturnsExpectedRowCount()
+        {
+            var rows = _container.GetDirectoryContent(@"texture");
+            Assert.That(rows.Count, Is.EqualTo(1));
+        }
+
+        [Test]
+        public void LeafFolder_ReturnsOnlyDirectFiles()
+        {
+            var rows = _container.GetDirectoryContent(@"audio");
+            Assert.That(rows.Count, Is.EqualTo(2));
+            Assert.That(rows.All(r => r.Path.StartsWith(@"audio\", StringComparison.OrdinalIgnoreCase)), Is.True);
         }
     }
 }

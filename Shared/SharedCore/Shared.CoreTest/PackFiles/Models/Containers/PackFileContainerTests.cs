@@ -2,6 +2,7 @@
 using Shared.Core.PackFiles.Models;
 using Shared.Core.PackFiles.Models.Containers;
 using Shared.Core.PackFiles.Models.FileSources;
+using Shared.Core.PackFiles.Utility;
 
 namespace Shared.CoreTest.PackFiles.Models.Containers
 {
@@ -614,6 +615,66 @@ namespace Shared.CoreTest.PackFiles.Models.Containers
         {
             var results = _container.SearchFiles(null, []);
             Assert.That(results.Count, Is.EqualTo(7));
+        }
+    }
+
+    internal class PackFileContainer_GetDirectoryContent
+    {
+        [Test]
+        public void Root_ReturnsOnlyDirectFiles_Sorted()
+        {
+            var container = CreateContainer();
+
+            var entries = container.GetDirectoryContent("");
+            var paths = entries.Select(x => x.Path).ToList();
+
+            Assert.That(paths, Is.EqualTo(new[] { "root_a.txt", "root_b.txt" }));
+        }
+
+        [Test]
+        public void SubFolder_ReturnsOnlyDirectFiles()
+        {
+            var container = CreateContainer();
+
+            var entries = container.GetDirectoryContent("texture");
+
+            Assert.That(entries.Select(x => x.Path), Is.EqualTo(new[] { "texture\\texture_file.dds" }));
+        }
+
+        [Test]
+        public void GetSubDirectories_ReturnsImmediateSubfolders()
+        {
+            var container = CreateContainer();
+
+            var subDirectories = container.GetSubDirectories("texture");
+
+            Assert.That(subDirectories, Is.EqualTo(new[] { "mesha", "meshb" }));
+        }
+
+        [Test]
+        public void Utility_ComposesFilesAndSubfolders()
+        {
+            var container = CreateContainer();
+            var split = PackFileServiceUtility.SplitDirectoryEntries(container, "texture");
+
+            Assert.That(split.Files.Select(x => x.FileName), Is.EqualTo(new[] { "texture_file.dds" }));
+            Assert.That(split.SubFolders, Is.EqualTo(new[] { "mesha", "meshb" }));
+        }
+
+        private static PackFileContainer CreateContainer()
+        {
+            var container = new PackFileContainer("Test");
+            var parent = new PackedFileSourceParent { FilePath = @"c:\game\p.pack" };
+
+            container.AddOrUpdateFile(@"audio\b.wem", new PackFile("b.wem", new PackedFileSource(parent, 0, 1, false, false, CompressionFormat.None, 0)));
+            container.AddOrUpdateFile(@"audio\a.wem", new PackFile("a.wem", new PackedFileSource(parent, 1, 1, false, false, CompressionFormat.None, 0)));
+            container.AddOrUpdateFile(@"texture\texture_file.dds", new PackFile("texture_file.dds", new PackedFileSource(parent, 2, 1, false, false, CompressionFormat.None, 0)));
+            container.AddOrUpdateFile(@"texture\mesha\filea", new PackFile("filea", new PackedFileSource(parent, 3, 1, false, false, CompressionFormat.None, 0)));
+            container.AddOrUpdateFile(@"texture\meshb\filea", new PackFile("filea", new PackedFileSource(parent, 4, 1, false, false, CompressionFormat.None, 0)));
+            container.AddOrUpdateFile(@"root_b.txt", new PackFile("root_b.txt", new PackedFileSource(parent, 5, 1, false, false, CompressionFormat.None, 0)));
+            container.AddOrUpdateFile(@"root_a.txt", new PackFile("root_a.txt", new PackedFileSource(parent, 6, 1, false, false, CompressionFormat.None, 0)));
+
+            return container;
         }
     }
 }

@@ -2,18 +2,6 @@
 
 namespace Shared.Core.PackFiles.Models
 {
-    public readonly struct DirectoryContent
-    {
-        public IReadOnlyList<string> SubFolders { get; init; }
-        public IReadOnlyList<(string FileName, PackFile File)> Files { get; init; }
-
-        public static DirectoryContent Empty => new()
-        {
-            SubFolders = [],
-            Files = []
-        };
-    }
-
     public interface IPackFileContainer
     {
         string Name { get; }
@@ -28,7 +16,8 @@ namespace Shared.Core.PackFiles.Models
         void AddOrUpdateFile(string path, PackFile file);
         List<(string FileName, PackFile Pack)> FindAllWithExtention(string extention);
         Dictionary<string, PackFile> GetAllFiles();
-        DirectoryContent GetDirectoryContent(string directoryPath);
+        List<(string Path, PackFile File)> GetDirectoryContent(string directoryPath);
+        List<string> GetSubDirectories(string directoryPath);
         List<(string Path, PackFile File)> SearchFiles(string? textFilter, IReadOnlyList<string>? extensions);
     }
 }

@@ -29,7 +29,9 @@ namespace Shared.Ui.BaseDialogs.PackFileTree
         public TreeNode? Parent { get; set; }
         public List<TreeNode> BackingChildren { get; } = [];
 
-        public bool HasChildren => BackingChildren.Count > 0 || (!_childrenLoaded && _childLoader != null && NodeType != NodeType.File);
+        public bool HasChildren => NodeType == NodeType.Directory
+            ? (BackingChildren.Count > 0 || !_childrenLoaded)
+            : (BackingChildren.Count > 0 || (!_childrenLoaded && _childLoader != null && NodeType != NodeType.File));
         public bool ChildrenLoaded => _childrenLoaded;
 
         [ObservableProperty] public partial ObservableCollection<TreeNode> Children { get; set; } = [];
@@ -52,6 +54,9 @@ namespace Shared.Ui.BaseDialogs.PackFileTree
 
             if (string.IsNullOrWhiteSpace(name))
                 throw new Exception($"Packfile name or folder is empty '{GetFullPath()}', this is not allowed! Please report as a bug if it happens outside of packfile loading! If it happens while loading clean up the packfile in RPFM");
+
+            if (ShouldUsePlaceholder())
+                AddPlaceholderChild();
         }
 
         internal TreeNode(string name, NodeType type, IPackFileContainer owner, TreeNode? parent, Func<bool> isFilterActive, PackFile? packFile = null)

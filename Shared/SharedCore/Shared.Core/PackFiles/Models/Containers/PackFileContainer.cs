@@ -27,39 +27,40 @@ namespace Shared.Core.PackFiles.Models.Containers
 
         public Dictionary<string, PackFile> GetAllFiles() => FileList;
 
-        public DirectoryContent GetDirectoryContent(string directoryPath)
+        public List<(string Path, PackFile File)> GetDirectoryContent(string directoryPath)
         {
             var prefix = string.IsNullOrEmpty(directoryPath) ? "" : directoryPath + "\\";
-            var prefixLength = prefix.Length;
-            var subFolders = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-            var files = new List<(string FileName, PackFile File)>();
+            var results = new List<(string Path, PackFile File)>();
+            var directFileSlashCount = string.IsNullOrEmpty(directoryPath) ? 0 : directoryPath.Count(c => c == '\\') + 1;
 
             foreach (var (path, packFile) in FileList)
             {
-                if (prefixLength > 0 && !path.StartsWith(prefix, StringComparison.OrdinalIgnoreCase))
-                    continue;
-                if (prefixLength == 0 && path.Length == 0)
-                    continue;
-
-                var remainder = path.AsSpan(prefixLength);
-                var separatorIndex = remainder.IndexOf(Path.DirectorySeparatorChar);
-
-                if (separatorIndex == -1)
-                {
-                    files.Add((packFile.Name, packFile));
-                }
-                else
-                {
-                    var folderName = remainder.Slice(0, separatorIndex).ToString();
-                    subFolders.Add(folderName);
-                }
+                if ((string.IsNullOrEmpty(prefix) || path.StartsWith(prefix, StringComparison.OrdinalIgnoreCase))
+                    && path.Count(c => c == '\\') == directFileSlashCount)
+                    results.Add((path, packFile));
             }
 
-            return new DirectoryContent
+            results.Sort((a, b) => StringComparer.CurrentCultureIgnoreCase.Compare(a.Path, b.Path));
+            return results;
+        }
+
+        public List<string> GetSubDirectories(string directoryPath)
+        {
+            var prefix = string.IsNullOrEmpty(directoryPath) ? "" : directoryPath + "\\";
+            var subFolders = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
+            foreach (var path in FileList.Keys)
             {
-                SubFolders = subFolders.OrderBy(x => x, StringComparer.CurrentCultureIgnoreCase).ToList(),
-                Files = files.OrderBy(x => x.FileName, StringComparer.CurrentCultureIgnoreCase).ToList()
-            };
+                if (!string.IsNullOrEmpty(prefix) && !path.StartsWith(prefix, StringComparison.OrdinalIgnoreCase))
+                    continue;
+
+                var remainder = string.IsNullOrEmpty(prefix) ? path : path.Substring(prefix.Length);
+                var separatorIndex = remainder.IndexOf(Path.DirectorySeparatorChar);
+                if (separatorIndex > 0)
+                    subFolders.Add(remainder.Substring(0, separatorIndex));
+            }
+
+            return subFolders.OrderBy(x => x, StringComparer.CurrentCultureIgnoreCase).ToList();
         }
 
         public List<(string FileName, PackFile Pack)> FindAllWithExtention(string extention)
