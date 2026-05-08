@@ -1,4 +1,4 @@
-﻿// PackFileBrowserViewModel Lazy Loading Architecture:
+// PackFileBrowserViewModel Lazy Loading Architecture:
 //
 // The tree is built lazily. When a container is added (via PackFileContainerAddedEvent), only
 // the root TreeNode is created with a child-loader delegate. Children are NOT loaded from
@@ -10,15 +10,15 @@
 // shows the expand arrow for unloaded directories.
 //
 // Event-driven updates from PackFileService:
-//   - PackFileContainerAddedEvent      → ReloadTree: creates root node + lazy child loader
-//   - PackFileContainerRemovedEvent    → removes container's root and TreeNode from Files
-//   - PackFileContainerFilesAddedEvent → AddFiles: inserts nodes into loaded branches, creates dirs as needed
-//   - PackFileContainerFilesRemovedEvent → removes nodes for deleted files
-//   - PackFileContainerFilesUpdatedEvent → updates Name/UnsavedChanged on nodes (for rename/save)
-//   - PackFileContainerFolderRemovedEvent → finds and removes folder node and subtree
-//   - PackFileContainerFolderRenamedEvent → finds folder by OLD path, renames leaf, marks unsaved
-//   - PackFileContainerSetAsMainEditableEvent → toggles IsMainEditabelPack on root TreeNodes
-//   - PackFileContainerSavedEvent      → clears UnsavedChanged on loaded nodes only (avoids forcing full population)
+//   - PackFileContainerAddedEvent      ? ReloadTree: creates root node + lazy child loader
+//   - PackFileContainerRemovedEvent    ? removes container's root and TreeNode from Files
+//   - PackFileContainerFilesAddedEvent ? AddFiles: inserts nodes into loaded branches, creates dirs as needed
+//   - PackFileContainerFilesRemovedEvent ? removes nodes for deleted files
+//   - PackFileContainerFilesUpdatedEvent ? updates Name/UnsavedChanged on nodes (for rename/save)
+//   - PackFileContainerFolderRemovedEvent ? finds and removes folder node and subtree
+//   - PackFileContainerFolderRenamedEvent ? finds folder by OLD path, renames leaf, marks unsaved
+//   - PackFileContainerSetAsMainEditableEvent ? toggles IsMainEditabelPack on root TreeNodes
+//   - PackFileContainerSavedEvent      ? clears UnsavedChanged on loaded nodes only (avoids forcing full population)
 //
 // SearchFilter: when active, calls EnsureFullyPopulated() to load entire subtree for regex matching.
 // When cleared, filter-expanded nodes are absorbed as user expansions and collapsed nodes are unloaded.
@@ -71,8 +71,8 @@ namespace Shared.UiTest
             var packRootNode = _viewModel.Files[1];
 
             // Act
-            var fileToMove = _viewModel.GetFromPath(packRootNode, @"animations\battle\humanoid01\2handed_hammer\stand\hu1_2hh_stand_idle_01.anim");
-            var destinationNode = _viewModel.GetFromPath(packRootNode, @"animations");
+            var fileToMove = PackFileBrowserViewModelTestHelper.GetFromPath(packRootNode, @"animations\battle\humanoid01\2handed_hammer\stand\hu1_2hh_stand_idle_01.anim");
+            var destinationNode = PackFileBrowserViewModelTestHelper.GetFromPath(packRootNode, @"animations");
             _viewModel.Drop(fileToMove, destinationNode);
 
             // Assert
@@ -81,7 +81,7 @@ namespace Shared.UiTest
             Assert.That(movedFile, Is.Not.Null);
 
             // Get file node from 
-            var movedNode = _viewModel.GetFromPath(packRootNode, @"animations\hu1_2hh_stand_idle_01.anim");
+            var movedNode = PackFileBrowserViewModelTestHelper.GetFromPath(packRootNode, @"animations\hu1_2hh_stand_idle_01.anim");
             Assert.That(movedNode, Is.Not.Null);
             Assert.That(movedNode.UnsavedChanged, Is.True);
             Assert.That(movedNode.Parent.UnsavedChanged, Is.True);
@@ -95,12 +95,12 @@ namespace Shared.UiTest
             Assert.That(_viewModel.Files.Count, Is.EqualTo(1));
 
             var root = _viewModel.Files[0];
-            Assert.That(_viewModel.GetFromPath(root, "foldera"), Is.Null);
+            Assert.That(PackFileBrowserViewModelTestHelper.GetFromPath(root, "foldera"), Is.Null);
 
             root.IsNodeExpanded = true;
 
-            Assert.That(_viewModel.GetFromPath(root, "foldera"), Is.Not.Null);
-            Assert.That(_viewModel.GetFromPath(root, "folderb"), Is.Not.Null);
+            Assert.That(PackFileBrowserViewModelTestHelper.GetFromPath(root, "foldera"), Is.Not.Null);
+            Assert.That(PackFileBrowserViewModelTestHelper.GetFromPath(root, "folderb"), Is.Not.Null);
         }
 
         [Test]
@@ -111,7 +111,7 @@ namespace Shared.UiTest
 
             Assert.That(root.IsNodeExpanded, Is.False);
 
-            var fileNode = _viewModel.GetFromPath(root, "animations\\battle\\humanoid01\\test.anim");
+            var fileNode = PackFileBrowserViewModelTestHelper.GetFromPath(root, "animations\\battle\\humanoid01\\test.anim");
 
             Assert.That(fileNode, Is.Not.Null);
             Assert.That(fileNode.NodeType, Is.EqualTo(NodeType.File));
@@ -126,15 +126,15 @@ namespace Shared.UiTest
             var root = _viewModel.Files[0];
 
             root.IsNodeExpanded = true;
-            var folderA = _viewModel.GetFromPath(root, "foldera");
+            var folderA = PackFileBrowserViewModelTestHelper.GetFromPath(root, "foldera");
             Assert.That(folderA, Is.Not.Null);
 
             folderA.IsNodeExpanded = true;
-            Assert.That(_viewModel.GetFromPath(root, "foldera\\sub"), Is.Not.Null);
+            Assert.That(PackFileBrowserViewModelTestHelper.GetFromPath(root, "foldera\\sub"), Is.Not.Null);
 
             folderA.IsNodeExpanded = false;
 
-            Assert.That(_viewModel.GetFromPath(root, "foldera\\sub"), Is.Null);
+            Assert.That(PackFileBrowserViewModelTestHelper.GetFromPath(root, "foldera\\sub"), Is.Null);
         }
 
         [Test]
@@ -150,16 +150,16 @@ namespace Shared.UiTest
             _viewModel.Filter.FilterText = "match_file";
 
             Assert.That(root.IsNodeExpanded, Is.True);
-            Assert.That(_viewModel.GetFromPath(root, "foldera\\sub\\match_file.txt"), Is.Not.Null);
-            Assert.That(_viewModel.GetFromPath(root, "folderb"), Is.Null);
+            Assert.That(PackFileBrowserViewModelTestHelper.GetFromPath(root, "foldera\\sub\\match_file.txt"), Is.Not.Null);
+            Assert.That(PackFileBrowserViewModelTestHelper.GetFromPath(root, "folderb"), Is.Null);
 
             _viewModel.Filter.FilterText = string.Empty;
 
             // After clearing, filter-expanded folders are preserved (absorbed as user expansions)
             Assert.That(root.IsNodeExpanded, Is.True);
-            Assert.That(_viewModel.GetFromPath(root, "foldera"), Is.Not.Null);
+            Assert.That(PackFileBrowserViewModelTestHelper.GetFromPath(root, "foldera"), Is.Not.Null);
             // folderB is now also visible and materialized since filter is cleared
-            Assert.That(_viewModel.GetFromPath(root, "folderb"), Is.Not.Null);
+            Assert.That(PackFileBrowserViewModelTestHelper.GetFromPath(root, "folderb"), Is.Not.Null);
         }
 
         [Test]
@@ -174,7 +174,7 @@ namespace Shared.UiTest
             _viewModel.Filter.FilterText = string.Empty;
 
             Assert.That(root.IsNodeExpanded, Is.True);
-            Assert.That(_viewModel.GetFromPath(root, "foldera"), Is.Not.Null);
+            Assert.That(PackFileBrowserViewModelTestHelper.GetFromPath(root, "foldera"), Is.Not.Null);
         }
 
         [Test]
@@ -189,14 +189,14 @@ namespace Shared.UiTest
 
             // User manually expands root and folderA
             root.IsNodeExpanded = true;
-            var folderA = _viewModel.GetFromPath(root, "foldera");
+            var folderA = PackFileBrowserViewModelTestHelper.GetFromPath(root, "foldera");
             Assert.That(folderA, Is.Not.Null);
             folderA.IsNodeExpanded = true;
 
-            // Search for a specific file — folderA/sub gets expanded by filter, folderB hidden
+            // Search for a specific file � folderA/sub gets expanded by filter, folderB hidden
             _viewModel.Filter.FilterText = "match_file";
 
-            var sub = _viewModel.GetFromPath(root, "foldera\\sub");
+            var sub = PackFileBrowserViewModelTestHelper.GetFromPath(root, "foldera\\sub");
             Assert.That(sub, Is.Not.Null);
             Assert.That(sub.IsNodeExpanded, Is.True, "sub should be expanded by filter");
 
@@ -208,18 +208,18 @@ namespace Shared.UiTest
             Assert.That(folderA.IsNodeExpanded, Is.True, "folderA was user-expanded, should stay open");
 
             // Filter-expanded nodes are preserved (absorbed)
-            sub = _viewModel.GetFromPath(root, "foldera\\sub");
+            sub = PackFileBrowserViewModelTestHelper.GetFromPath(root, "foldera\\sub");
             Assert.That(sub, Is.Not.Null, "sub should still be materialized");
             Assert.That(sub.IsNodeExpanded, Is.True, "sub was filter-expanded, now absorbed as user expansion");
 
             // Previously hidden folder is now visible and materialized
-            var folderB = _viewModel.GetFromPath(root, "folderb");
+            var folderB = PackFileBrowserViewModelTestHelper.GetFromPath(root, "folderb");
             Assert.That(folderB, Is.Not.Null, "folderB should be materialized after filter cleared");
             Assert.That(folderB.IsVisible, Is.True, "folderB should be visible after filter cleared");
 
             // All files in expanded folders are visible
-            var matchFile = _viewModel.GetFromPath(root, "foldera\\sub\\match_file.txt");
-            var otherA = _viewModel.GetFromPath(root, "foldera\\sub\\other_a.txt");
+            var matchFile = PackFileBrowserViewModelTestHelper.GetFromPath(root, "foldera\\sub\\match_file.txt");
+            var otherA = PackFileBrowserViewModelTestHelper.GetFromPath(root, "foldera\\sub\\other_a.txt");
             Assert.That(matchFile, Is.Not.Null, "match_file should be visible");
             Assert.That(otherA, Is.Not.Null, "other_a should be visible after filter cleared");
         }
@@ -234,7 +234,7 @@ namespace Shared.UiTest
             var root = _viewModel.Files[0];
             root.IsNodeExpanded = true;
 
-            var folderA = _viewModel.GetFromPath(root, "foldera");
+            var folderA = PackFileBrowserViewModelTestHelper.GetFromPath(root, "foldera");
             Assert.That(folderA, Is.Not.Null);
 
             // Intentionally set a different selected item to verify command uses clicked node argument.
@@ -242,8 +242,8 @@ namespace Shared.UiTest
             _viewModel.SelectedItem = root;
             _viewModel.DoubleClickCommand.Execute(folderA);
 
-            var subA = _viewModel.GetFromPath(root, "foldera\\suba");
-            var subB = _viewModel.GetFromPath(root, "foldera\\subb");
+            var subA = PackFileBrowserViewModelTestHelper.GetFromPath(root, "foldera\\suba");
+            var subB = PackFileBrowserViewModelTestHelper.GetFromPath(root, "foldera\\subb");
 
             Assert.That(folderA.IsNodeExpanded, Is.True);
             Assert.That(subA, Is.Not.Null);
@@ -261,7 +261,7 @@ namespace Shared.UiTest
             var root = _viewModel.Files[0];
             root.IsNodeExpanded = true;
 
-            var folderA = _viewModel.GetFromPath(root, "foldera");
+            var folderA = PackFileBrowserViewModelTestHelper.GetFromPath(root, "foldera");
             Assert.That(folderA, Is.Not.Null);
             folderA.IsNodeExpanded = true;
 
@@ -288,7 +288,7 @@ namespace Shared.UiTest
             var root = _viewModel.Files[0];
             root.IsNodeExpanded = true;
 
-            var folderA = _viewModel.GetFromPath(root, "foldera");
+            var folderA = PackFileBrowserViewModelTestHelper.GetFromPath(root, "foldera");
             Assert.That(folderA, Is.Not.Null);
             folderA.IsNodeExpanded = true;
 
@@ -302,8 +302,8 @@ namespace Shared.UiTest
             _packageFileService.RenameFile(container, filePackFile, "file_renamed.txt");
 
             // Assert: old node/path should be gone and new node/path should exist in the tree
-            var oldNode = _viewModel.GetFromPath(root, "foldera\\file.txt");
-            var renamedNode = _viewModel.GetFromPath(root, "foldera\\file_renamed.txt");
+            var oldNode = PackFileBrowserViewModelTestHelper.GetFromPath(root, "foldera\\file.txt");
+            var renamedNode = PackFileBrowserViewModelTestHelper.GetFromPath(root, "foldera\\file_renamed.txt");
 
             Assert.That(oldNode, Is.Null, "Old file path should not exist after rename");
             Assert.That(renamedNode, Is.Not.Null, "Renamed file should exist in the tree view");
@@ -327,7 +327,7 @@ namespace Shared.UiTest
 
             var addedFile = _packageFileService.FindFile(saveAsTargetPath, container);
             var resolvedPathForAddedFile = _packageFileService.GetFullPath(copiedRigidModel, container);
-            var addedNode = _viewModel.GetFromPath(root, saveAsTargetPath);
+            var addedNode = PackFileBrowserViewModelTestHelper.GetFromPath(root, saveAsTargetPath);
 
             Assert.Multiple(() =>
             {
@@ -357,15 +357,15 @@ namespace Shared.UiTest
             var root = _viewModel.Files[0];
             root.IsNodeExpanded = true;
 
-            var folderA = _viewModel.GetFromPath(root, "foldera");
+            var folderA = PackFileBrowserViewModelTestHelper.GetFromPath(root, "foldera");
             Assert.That(folderA, Is.Not.Null);
 
             var container = _packageFileService.GetAllPackfileContainers().Last(x => x.Name == "test.pack");
             _packageFileService.RenameDirectory(container, "foldera", "folderb");
 
             // Old path gone, new path available
-            var oldNode = _viewModel.GetFromPath(root, "foldera");
-            var newNode = _viewModel.GetFromPath(root, "folderb");
+            var oldNode = PackFileBrowserViewModelTestHelper.GetFromPath(root, "foldera");
+            var newNode = PackFileBrowserViewModelTestHelper.GetFromPath(root, "folderb");
 
             Assert.That(oldNode, Is.Null, "Old folder path should not exist after rename");
             Assert.That(newNode, Is.Not.Null, "Renamed folder should be accessible via the new name");
@@ -379,14 +379,14 @@ namespace Shared.UiTest
             var root = _viewModel.Files[0];
             root.IsNodeExpanded = true;
 
-            var parent = _viewModel.GetFromPath(root, "parent");
+            var parent = PackFileBrowserViewModelTestHelper.GetFromPath(root, "parent");
             Assert.That(parent, Is.Not.Null);
             parent.IsNodeExpanded = true;
 
             var container = _packageFileService.GetAllPackfileContainers().Last(x => x.Name == "test.pack");
             _packageFileService.RenameDirectory(container, "parent\\child", "renamed");
 
-            var newNode = _viewModel.GetFromPath(root, "parent\\renamed");
+            var newNode = PackFileBrowserViewModelTestHelper.GetFromPath(root, "parent\\renamed");
             Assert.That(newNode, Is.Not.Null, "Nested renamed folder should be accessible");
             Assert.That(newNode.UnsavedChanged, Is.True);
         }
@@ -398,16 +398,16 @@ namespace Shared.UiTest
             var root = _viewModel.Files[0];
             root.IsNodeExpanded = true;
 
-            var folderA = _viewModel.GetFromPath(root, "foldera");
+            var folderA = PackFileBrowserViewModelTestHelper.GetFromPath(root, "foldera");
             Assert.That(folderA, Is.Not.Null);
 
             var container = _packageFileService.GetAllPackfileContainers().Last(x => x.Name == "test.pack");
             _packageFileService.DeleteFolder(container, "foldera");
 
-            var deletedNode = _viewModel.GetFromPath(root, "foldera");
+            var deletedNode = PackFileBrowserViewModelTestHelper.GetFromPath(root, "foldera");
             Assert.That(deletedNode, Is.Null, "Deleted folder should not exist in tree");
 
-            var survivingNode = _viewModel.GetFromPath(root, "folderb");
+            var survivingNode = PackFileBrowserViewModelTestHelper.GetFromPath(root, "folderb");
             Assert.That(survivingNode, Is.Not.Null, "Non-deleted folder should still exist");
         }
 
@@ -468,11 +468,11 @@ namespace Shared.UiTest
             _packageFileService.AddFilesToPack(container, [new NewPackFileEntry("foldera", newFile)]);
 
             root.IsNodeExpanded = true;
-            var folderA = _viewModel.GetFromPath(root, "foldera");
+            var folderA = PackFileBrowserViewModelTestHelper.GetFromPath(root, "foldera");
             Assert.That(folderA, Is.Not.Null);
             Assert.That(root.UnsavedChanged, Is.True, "Root should be unsaved after adding file");
 
-            // Simulate save via PFS — we can't call SavePackContainer without disk I/O,
+            // Simulate save via PFS � we can't call SavePackContainer without disk I/O,
             // so trigger the event directly through the event hub
             var eventHub = _runner.ServiceProvider.GetRequiredService<IEventHub>();
             eventHub.PublishGlobalEvent(new Shared.Core.Events.Global.PackFileContainerSavedEvent(container));
@@ -487,7 +487,7 @@ namespace Shared.UiTest
             var root = _viewModel.Files[0];
             var container = _packageFileService.GetAllPackfileContainers().Last(x => x.Name == "test.pack");
 
-            // Root is collapsed — only root exists as materialized node
+            // Root is collapsed � only root exists as materialized node
             Assert.That(root.IsNodeExpanded, Is.False);
 
             var eventHub = _runner.ServiceProvider.GetRequiredService<IEventHub>();
@@ -510,7 +510,7 @@ namespace Shared.UiTest
             var root = _viewModel.Files.First(x => x.Name == "test.pack");
             root.IsNodeExpanded = true;
 
-            var fileNode = _viewModel.GetFromPath(root, "rootfile.txt");
+            var fileNode = PackFileBrowserViewModelTestHelper.GetFromPath(root, "rootfile.txt");
             Assert.That(fileNode, Is.Not.Null, "File added at root level should appear in tree");
             Assert.That(fileNode.NodeType, Is.EqualTo(NodeType.File));
         }
@@ -522,10 +522,10 @@ namespace Shared.UiTest
             var root = _viewModel.Files[0];
             root.IsNodeExpanded = true;
 
-            var folderA = _viewModel.GetFromPath(root, "foldera");
+            var folderA = PackFileBrowserViewModelTestHelper.GetFromPath(root, "foldera");
             folderA.IsNodeExpanded = true;
 
-            var fileNode = _viewModel.GetFromPath(root, "foldera\\file.txt");
+            var fileNode = PackFileBrowserViewModelTestHelper.GetFromPath(root, "foldera\\file.txt");
             Assert.That(fileNode, Is.Not.Null);
 
             PackFile? openedFile = null;
@@ -544,7 +544,7 @@ namespace Shared.UiTest
             var root = _viewModel.Files[0];
             root.IsNodeExpanded = true;
 
-            var folderA = _viewModel.GetFromPath(root, "foldera");
+            var folderA = PackFileBrowserViewModelTestHelper.GetFromPath(root, "foldera");
             Assert.That(folderA, Is.Not.Null);
             Assert.That(folderA.IsNodeExpanded, Is.False);
 
@@ -563,24 +563,24 @@ namespace Shared.UiTest
             root.IsNodeExpanded = true;
             var container = _packageFileService.GetAllPackfileContainers().Last(x => x.Name == "test.pack");
 
-            var sourceFolder = _viewModel.GetFromPath(root, "source");
+            var sourceFolder = PackFileBrowserViewModelTestHelper.GetFromPath(root, "source");
             Assert.That(sourceFolder, Is.Not.Null);
             sourceFolder.IsNodeExpanded = true;
 
-            var fileNode = _viewModel.GetFromPath(root, "source\\file.txt");
+            var fileNode = PackFileBrowserViewModelTestHelper.GetFromPath(root, "source\\file.txt");
             Assert.That(fileNode, Is.Not.Null);
 
             var file = _packageFileService.FindFile("source\\file.txt", container);
             _packageFileService.MoveFile(container, file, "target");
 
             // Old location gone
-            var oldNode = _viewModel.GetFromPath(root, "source\\file.txt");
+            var oldNode = PackFileBrowserViewModelTestHelper.GetFromPath(root, "source\\file.txt");
             Assert.That(oldNode, Is.Null, "File should not be in old folder after move");
 
             // New location has the file
-            var targetFolder = _viewModel.GetFromPath(root, "target");
+            var targetFolder = PackFileBrowserViewModelTestHelper.GetFromPath(root, "target");
             targetFolder.IsNodeExpanded = true;
-            var newNode = _viewModel.GetFromPath(root, "target\\file.txt");
+            var newNode = PackFileBrowserViewModelTestHelper.GetFromPath(root, "target\\file.txt");
             Assert.That(newNode, Is.Not.Null, "File should appear in target folder after move");
         }
 
@@ -591,11 +591,11 @@ namespace Shared.UiTest
             var root = _viewModel.Files[0];
             root.IsNodeExpanded = true;
 
-            var folderA = _viewModel.GetFromPath(root, "foldera");
+            var folderA = PackFileBrowserViewModelTestHelper.GetFromPath(root, "foldera");
             folderA.IsNodeExpanded = true;
 
-            var file1 = _viewModel.GetFromPath(root, "foldera\\file1.txt");
-            var file2 = _viewModel.GetFromPath(root, "foldera\\file2.txt");
+            var file1 = PackFileBrowserViewModelTestHelper.GetFromPath(root, "foldera\\file1.txt");
+            var file2 = PackFileBrowserViewModelTestHelper.GetFromPath(root, "foldera\\file2.txt");
 
             Assert.That(_viewModel.AllowDrop(file1, file2), Is.False, "Should not allow dropping file onto file");
         }
@@ -607,8 +607,8 @@ namespace Shared.UiTest
             var root = _viewModel.Files[0];
             root.IsNodeExpanded = true;
 
-            var folderA = _viewModel.GetFromPath(root, "foldera");
-            var folderB = _viewModel.GetFromPath(root, "folderb");
+            var folderA = PackFileBrowserViewModelTestHelper.GetFromPath(root, "foldera");
+            var folderB = PackFileBrowserViewModelTestHelper.GetFromPath(root, "folderb");
 
             Assert.That(_viewModel.AllowDrop(folderA, folderB), Is.False, "Should not allow dragging folders");
         }
@@ -622,14 +622,14 @@ namespace Shared.UiTest
             _viewModel.Filter.ShowFoldersOnly = true;
 
             root.IsNodeExpanded = true;
-            var folderA = _viewModel.GetFromPath(root, "foldera");
+            var folderA = PackFileBrowserViewModelTestHelper.GetFromPath(root, "foldera");
             Assert.That(folderA, Is.Not.Null, "Folder should be visible with ShowFoldersOnly");
             Assert.That(folderA.IsVisible, Is.True);
 
             folderA.IsNodeExpanded = true;
 
             // File nodes are not materialized when ShowFoldersOnly is active
-            var fileNode = _viewModel.GetFromPath(root, "foldera\\file.txt");
+            var fileNode = PackFileBrowserViewModelTestHelper.GetFromPath(root, "foldera\\file.txt");
             Assert.That(fileNode, Is.Null, "File should not be materialized with ShowFoldersOnly active");
 
             // Only folder children should be present
@@ -649,21 +649,21 @@ namespace Shared.UiTest
             var root = _viewModel.Files[0];
             Assert.That(root.IsNodeExpanded, Is.False, "Root should start collapsed");
 
-            // Filter matches all 3 files — well below the 25 threshold
+            // Filter matches all 3 files � well below the 25 threshold
             _viewModel.Filter.FilterText = "file";
 
             // All matching nodes should be auto-expanded
             Assert.That(root.IsNodeExpanded, Is.True, "Root should be expanded when results < threshold");
 
-            var folderA = _viewModel.GetFromPath(root, "foldera");
+            var folderA = PackFileBrowserViewModelTestHelper.GetFromPath(root, "foldera");
             Assert.That(folderA, Is.Not.Null);
             Assert.That(folderA.IsNodeExpanded, Is.True, "folderA should be auto-expanded");
 
-            var sub = _viewModel.GetFromPath(root, "foldera\\sub");
+            var sub = PackFileBrowserViewModelTestHelper.GetFromPath(root, "foldera\\sub");
             Assert.That(sub, Is.Not.Null);
             Assert.That(sub.IsNodeExpanded, Is.True, "sub should be auto-expanded");
 
-            var folderB = _viewModel.GetFromPath(root, "folderb");
+            var folderB = PackFileBrowserViewModelTestHelper.GetFromPath(root, "folderb");
             Assert.That(folderB, Is.Not.Null);
             Assert.That(folderB.IsNodeExpanded, Is.True, "folderB should be auto-expanded");
         }
@@ -697,7 +697,7 @@ namespace Shared.UiTest
         public void DoubleClickCollapseAndReexpand_ChildrenRemainVisible()
         {
             // Scenario: user expands folders manually, collapses a parent,
-            // then re-expands it — child folders that were expanded should still show their children.
+            // then re-expands it � child folders that were expanded should still show their children.
             CreatePackfiles(
                 ("folderA\\sub\\file1.txt", "file1.txt"),
                 ("folderA\\sub\\file2.txt", "file2.txt"));
@@ -706,15 +706,15 @@ namespace Shared.UiTest
 
             // Expand the tree manually
             root.IsNodeExpanded = true;
-            var folderA = _viewModel.GetFromPath(root, "foldera");
+            var folderA = PackFileBrowserViewModelTestHelper.GetFromPath(root, "foldera");
             Assert.That(folderA, Is.Not.Null);
             folderA.IsNodeExpanded = true;
-            var sub = _viewModel.GetFromPath(root, "foldera\\sub");
+            var sub = PackFileBrowserViewModelTestHelper.GetFromPath(root, "foldera\\sub");
             Assert.That(sub, Is.Not.Null);
             sub.IsNodeExpanded = true;
 
             // Verify files are visible
-            var file1 = _viewModel.GetFromPath(root, "foldera\\sub\\file1.txt");
+            var file1 = PackFileBrowserViewModelTestHelper.GetFromPath(root, "foldera\\sub\\file1.txt");
             Assert.That(file1, Is.Not.Null);
 
             // User double-clicks root to collapse
@@ -726,16 +726,16 @@ namespace Shared.UiTest
             Assert.That(root.IsNodeExpanded, Is.True);
 
             // folderA should still be visible and expanded with its children materialized
-            folderA = _viewModel.GetFromPath(root, "foldera");
+            folderA = PackFileBrowserViewModelTestHelper.GetFromPath(root, "foldera");
             Assert.That(folderA, Is.Not.Null, "folderA should be visible after re-expanding root");
             Assert.That(folderA.IsNodeExpanded, Is.True, "folderA should still be expanded");
 
-            sub = _viewModel.GetFromPath(root, "foldera\\sub");
+            sub = PackFileBrowserViewModelTestHelper.GetFromPath(root, "foldera\\sub");
             Assert.That(sub, Is.Not.Null, "sub should be visible since folderA is expanded");
             Assert.That(sub.IsNodeExpanded, Is.True, "sub should still be expanded");
 
             // Files inside sub should be materialized
-            file1 = _viewModel.GetFromPath(root, "foldera\\sub\\file1.txt");
+            file1 = PackFileBrowserViewModelTestHelper.GetFromPath(root, "foldera\\sub\\file1.txt");
             Assert.That(file1, Is.Not.Null, "file1 should be visible inside expanded sub folder");
         }
 
@@ -747,7 +747,7 @@ namespace Shared.UiTest
             var root = _viewModel.Files[0];
             var container = _packageFileService.GetAllPackfileContainers().Last(x => x.Name == "test.pack");
 
-            // Folder is collapsed — BackingChildren are NOT yet loaded.
+            // Folder is collapsed � BackingChildren are NOT yet loaded.
             Assert.That(root.IsNodeExpanded, Is.False);
 
             // Act: add a second file with the same name (simulates Save As / overwrite import).
@@ -756,7 +756,7 @@ namespace Shared.UiTest
 
             // Expand to materialise children and assert only ONE node with that name exists.
             root.IsNodeExpanded = true;
-            var folderA = _viewModel.GetFromPath(root, "foldera");
+            var folderA = PackFileBrowserViewModelTestHelper.GetFromPath(root, "foldera");
             Assert.That(folderA, Is.Not.Null);
             folderA.IsNodeExpanded = true;
 
@@ -777,7 +777,7 @@ namespace Shared.UiTest
             var container = _packageFileService.GetAllPackfileContainers().Last(x => x.Name == "test.pack");
 
             root.IsNodeExpanded = true;
-            var folderA = _viewModel.GetFromPath(root, "foldera");
+            var folderA = PackFileBrowserViewModelTestHelper.GetFromPath(root, "foldera");
             Assert.That(folderA, Is.Not.Null);
             folderA.IsNodeExpanded = true;
 
@@ -796,4 +796,5 @@ namespace Shared.UiTest
         }
     }
 }
+
 
