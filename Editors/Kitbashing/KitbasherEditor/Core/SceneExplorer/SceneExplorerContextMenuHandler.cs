@@ -22,7 +22,7 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
         ISceneNode _activeNode;
         IEnumerable<ISceneNode> _activeNodes;
 
-        [ObservableProperty] ObservableCollection<ContextMenuItem2?> _items = [];
+        [ObservableProperty] ObservableCollection<ContextMenuItem?> _items = [];
 
         public SceneExplorerContextMenuHandler(IEventHub eventHub, SceneManager sceneManager, CommandFactory commandFactory, SelectionManager selectionManager)
         {
@@ -49,26 +49,26 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
                 return;
 
             if (CanMakeEditable(_activeNode))
-                Items.Add(new ContextMenuItem2("Make Editable", MakeEditable));
+                Items.Add(new ContextMenuItem("Make Editable", MakeEditable));
 
             if (IsUngroupable(_activeNode))
-                Items.Add(new ContextMenuItem2("Ungroup", Ungroup));
+                Items.Add(new ContextMenuItem("Ungroup", Ungroup));
 
             if (IsLockable(_activeNode))
-                Items.Add(new ContextMenuItem2("Lock", ToggleLock));
+                Items.Add(new ContextMenuItem("Lock", ToggleLock));
             else if (IsUnlockable(_activeNode))
-                Items.Add(new ContextMenuItem2("Unlock", ToggleLock));
+                Items.Add(new ContextMenuItem("Unlock", ToggleLock));
 
             if (Items.Count != 0)
                 Items.Add(null);
-            Items.Add(new ContextMenuItem2("Invert Selection", InvertSelection));
-            Items.Add(new ContextMenuItem2("Select Similarly Named", SelectSimilar));
+            Items.Add(new ContextMenuItem("Invert Selection", InvertSelection));
+            Items.Add(new ContextMenuItem("Select Similarly Named", SelectSimilar));
 
             if (IsRemovable(_activeNode))
             {
                 if (Items.Count != 0)
                     Items.Add(null);
-                Items.Add(new ContextMenuItem2("Remove", RemoveNode));
+                Items.Add(new ContextMenuItem("Remove", RemoveNode));
             }
         }
 

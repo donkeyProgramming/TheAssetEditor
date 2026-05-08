@@ -29,7 +29,7 @@ namespace Shared.Ui.BaseDialogs.PackFileTree.ContextMenu
     public interface IContextMenuBuilder
     {
         ContextMenuType Type { get; }
-        public ObservableCollection<ContextMenuItem2> Build(TreeNode? node);
+        public ObservableCollection<ContextMenuItem> Build(TreeNode? node);
     }
 
     public abstract class ContextMenuBuilder : IContextMenuBuilder
@@ -44,15 +44,15 @@ namespace Shared.Ui.BaseDialogs.PackFileTree.ContextMenu
             _commandFactory = commandFactory;
         }
 
-        protected abstract void Create(ContextMenuItem2 rootNode, TreeNode selectedNode);
+        protected abstract void Create(ContextMenuItem rootNode, TreeNode selectedNode);
 
-        public ObservableCollection<ContextMenuItem2> Build(TreeNode? node)
+        public ObservableCollection<ContextMenuItem> Build(TreeNode? node)
         {
-            var output = new ObservableCollection<ContextMenuItem2>();
+            var output = new ObservableCollection<ContextMenuItem>();
             if (node == null)
                 return output;
 
-            var placeholderRoot = new ContextMenuItem2("Root", null);
+            var placeholderRoot = new ContextMenuItem("Root", null);
             Create(placeholderRoot, node);
 
             foreach (var item in placeholderRoot.ContextMenu)
@@ -62,7 +62,7 @@ namespace Shared.Ui.BaseDialogs.PackFileTree.ContextMenu
         }
 
 
-        protected void Add<T>(TreeNode? node, ContextMenuItem2 parent) where T : IContextMenuCommand
+        protected void Add<T>(TreeNode? node, ContextMenuItem parent) where T : IContextMenuCommand
         {
             var instance = _commandFactory.Create<T>();
 
@@ -70,18 +70,18 @@ namespace Shared.Ui.BaseDialogs.PackFileTree.ContextMenu
                 return;
 
             var name = instance.GetDisplayName(node);
-            var item = new ContextMenuItem2(name, () => instance.Execute(node));
+            var item = new ContextMenuItem(name, () => instance.Execute(node));
             parent.ContextMenu.Add(item);
         }
 
-        protected void AddSeperator(ContextMenuItem2 parent)
+        protected void AddSeperator(ContextMenuItem parent)
         {
             parent.ContextMenu.Add(null);
         }
 
-        public ContextMenuItem2 AddChildMenu(string name, ContextMenuItem2 parent)
+        public ContextMenuItem AddChildMenu(string name, ContextMenuItem parent)
         {
-            var newItem = new ContextMenuItem2(name, null);
+            var newItem = new ContextMenuItem(name, null);
             parent.ContextMenu.Add(newItem);
             return newItem;
 

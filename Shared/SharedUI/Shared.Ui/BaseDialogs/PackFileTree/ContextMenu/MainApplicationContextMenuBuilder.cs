@@ -13,7 +13,7 @@ namespace Shared.Ui.BaseDialogs.PackFileTree.ContextMenu
             _packFileService = packFileService;
         }
 
-        protected override void Create(ContextMenuItem2 rootNode, TreeNode selectedNode)
+        protected override void Create(ContextMenuItem rootNode, TreeNode selectedNode)
         {
             var nodeType = selectedNode.NodeType;
             switch (nodeType)
@@ -30,7 +30,7 @@ namespace Shared.Ui.BaseDialogs.PackFileTree.ContextMenu
             }
         }
 
-        void CreateForFile(ContextMenuItem2 rootNode, TreeNode selectedNode)
+        void CreateForFile(ContextMenuItem rootNode, TreeNode selectedNode)
         {
             if (_packFileService.GetEditablePack() != selectedNode.FileOwner)
                 Add<CopyToEditablePackCommand>(selectedNode, rootNode);
@@ -58,7 +58,7 @@ namespace Shared.Ui.BaseDialogs.PackFileTree.ContextMenu
             Add<IRmvToTextCommand>(selectedNode, reportsFolder);
         }
 
-        void CreateForDirectory(ContextMenuItem2 rootNode, TreeNode selectedNode)
+        void CreateForDirectory(ContextMenuItem rootNode, TreeNode selectedNode)
         {
             var isCaPack = selectedNode.FileOwner.IsCaPackFile;
             var isCurrentEditable = _packFileService.GetEditablePack() == selectedNode.FileOwner;

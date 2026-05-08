@@ -5,13 +5,13 @@ using CommunityToolkit.Mvvm.Input;
 
 namespace Shared.Ui.BaseDialogs.PackFileTree.ContextMenu
 {
-    public class ContextMenuItem2
+    public class ContextMenuItem
     {
         public string Name { get; set; }
         public ICommand? Command { get; set; }
-        public ObservableCollection<ContextMenuItem2?> ContextMenu { get; set; } = [];
+        public ObservableCollection<ContextMenuItem?> ContextMenu { get; set; } = [];
 
-        public ContextMenuItem2(string name, Action? action)
+        public ContextMenuItem(string name, Action? action)
         {
             Name = name;
             if (action != null)

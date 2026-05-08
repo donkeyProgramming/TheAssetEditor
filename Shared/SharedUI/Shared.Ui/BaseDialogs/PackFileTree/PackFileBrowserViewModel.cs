@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
@@ -37,7 +37,7 @@ namespace Shared.Ui.BaseDialogs.PackFileTree
         public SearchFilter Filter { get; private set; }
 
         [ObservableProperty] TreeNode _selectedItem;
-        [ObservableProperty] ObservableCollection<ContextMenuItem2> _contextMenu = [];
+        [ObservableProperty] ObservableCollection<ContextMenuItem> _contextMenu = [];
 
         public bool ShowFoldersOnly { get; }
 

@@ -9,7 +9,7 @@ namespace Shared.Ui.BaseDialogs.PackFileTree.ContextMenu
         {
         }
 
-        protected override void Create(ContextMenuItem2 rootNode, TreeNode selectedNode)
+        protected override void Create(ContextMenuItem rootNode, TreeNode selectedNode)
         {
             var nodeType = selectedNode.NodeType;
             if (nodeType == NodeType.File)
