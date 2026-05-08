@@ -49,7 +49,7 @@ namespace Shared.Ui.BaseDialogs.PackFileTree.ContextMenu.Commands
                         packDirectoryPath = $"{packDirectoryPath}\\{directoryPath}";
                     }
 
-                    var source = MemorySource.FromFile(originalFilePaths[i]);
+                    var source = new MemorySource(fileSystemAccess.FileReadAllBytes(originalFilePaths[i]));
                     var file = new PackFile(fileName, source);
 
                     filesAdded.Add(new NewPackFileEntry(packDirectoryPath, file));

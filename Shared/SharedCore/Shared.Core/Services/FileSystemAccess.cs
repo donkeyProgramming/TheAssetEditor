@@ -9,6 +9,7 @@ namespace Shared.Core.Services
         public string PathGetFileName(string path) => Path.GetFileName(path);
 
         public void FileWriteAllBytes(string path, byte[] bytes) => File.WriteAllBytes(path, bytes);
+        public byte[] FileReadAllBytes(string path) => File.ReadAllBytes(path);
         public bool FileExists(string path) => File.Exists(path);
 
         public bool DirectoryExists(string path) => Directory.Exists(path);

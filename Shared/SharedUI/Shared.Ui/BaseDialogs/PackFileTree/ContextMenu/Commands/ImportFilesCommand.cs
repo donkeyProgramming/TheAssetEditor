@@ -6,7 +6,7 @@ using Shared.Core.Services;
 
 namespace Shared.Ui.BaseDialogs.PackFileTree.ContextMenu.Commands
 {
-    public class ImportFileCommand(IPackFileService packFileService, IStandardDialogs standardDialogs) : IContextMenuCommand
+    public class ImportFileCommand(IPackFileService packFileService, IStandardDialogs standardDialogs, IFileSystemAccess fileSystemAccess) : IContextMenuCommand
     {
         public string GetDisplayName(TreeNode node) => "Import File";
         public bool ShouldAdd(TreeNode node) => node.NodeType != NodeType.File && !node.FileOwner.IsCaPackFile;
@@ -28,7 +28,7 @@ namespace Shared.Ui.BaseDialogs.PackFileTree.ContextMenu.Commands
                 foreach (var file in files)
                 {
                     var fileName = Path.GetFileName(file);
-                    var packFile = new PackFile(fileName, new MemorySource(File.ReadAllBytes(file)));
+                    var packFile = new PackFile(fileName, new MemorySource(fileSystemAccess.FileReadAllBytes(file)));
                     var item = new NewPackFileEntry(parentPath, packFile);
                     packFileService.AddFilesToPack(_selectedNode.FileOwner, [item]);
                 }

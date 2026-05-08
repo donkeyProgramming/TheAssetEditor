@@ -34,10 +34,15 @@ namespace Shared.UiTest.PackFileTree.ContextMenu.Commands
         {
             var owner = CreateContainer();
             var root = new TreeNode("root", NodeType.Root, owner, null);
-            var command = new ExportToDirectoryCommand(new Mock<IStandardDialogs>().Object, new Mock<IFileSystemAccess>().Object);
+            var dialogs = new Mock<IStandardDialogs>();
+            dialogs.Setup(x => x.ShowSystemFolderBrowserDialog()).Returns(new SystemBrowseFolderDialogResult(false, null));
+            var fileSystem = new Mock<IFileSystemAccess>();
+            var command = new ExportToDirectoryCommand(dialogs.Object, fileSystem.Object);
 
-            // TODO: Execute uses FolderBrowserDialog and writes exported files to disk; skip for filesystem pass two.
-            Assert.Ignore("TODO: Execute uses FolderBrowserDialog and writes exported files to disk; skip for filesystem pass two.");
+            command.Execute(root);
+
+            fileSystem.Verify(x => x.FileWriteAllBytes(It.IsAny<string>(), It.IsAny<byte[]>()), Times.Never);
+            dialogs.Verify(x => x.ShowDialogBox(It.Is<string>(s => s.Contains("exported")), It.IsAny<string>()), Times.Never);
         }
 
         [Test]

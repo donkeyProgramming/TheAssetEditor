@@ -56,5 +56,28 @@ namespace Shared.UiTest.PackFileTree.ContextMenu.Commands
             Assert.That(folder.IsNodeExpanded, Is.True);
             Assert.That(file.IsNodeExpanded, Is.True);
         }
+
+        [Test]
+        public void Execute_ExpandsUnmaterializedChildren()
+        {
+            var owner = CreateContainer();
+            var root = new TreeNode("root", NodeType.Root, owner, null);
+            var folder = new TreeNode("folder", NodeType.Directory, owner, root);
+            var nested = new TreeNode("nested", NodeType.Directory, owner, folder);
+
+            root.AddChild(folder);
+            folder.AddChild(nested);
+
+            root.IsNodeExpanded = false;
+            folder.IsNodeExpanded = false;
+            nested.IsNodeExpanded = false;
+
+            var command = new ExpandNodeCommand();
+            command.Execute(root);
+
+            Assert.That(root.IsNodeExpanded, Is.True);
+            Assert.That(folder.IsNodeExpanded, Is.True);
+            Assert.That(nested.IsNodeExpanded, Is.True);
+        }
     }
 }

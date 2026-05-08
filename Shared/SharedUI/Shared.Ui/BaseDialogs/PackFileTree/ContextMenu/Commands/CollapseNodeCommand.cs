@@ -11,7 +11,7 @@
         void CollapsAllRecursive(TreeNode node)
         {
             node.IsNodeExpanded = false;
-            foreach (var child in node.Children)
+            foreach (var child in node.BackingChildren)
                 CollapsAllRecursive(child);
         }
 

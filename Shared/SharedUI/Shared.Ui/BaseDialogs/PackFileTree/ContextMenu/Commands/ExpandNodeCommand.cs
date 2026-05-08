@@ -11,7 +11,7 @@
         void ExpandAllRecursive(TreeNode node)
         {
             node.IsNodeExpanded = true;
-            foreach (var child in node.Children)
+            foreach (var child in node.BackingChildren)
                 ExpandAllRecursive(child);
         }
 

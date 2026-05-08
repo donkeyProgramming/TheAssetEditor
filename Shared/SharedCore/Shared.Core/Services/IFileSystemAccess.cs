@@ -8,6 +8,7 @@ namespace Shared.Core.Services
         string PathGetFileName(string path);
 
         void FileWriteAllBytes(string path, byte[] bytes);
+        byte[] FileReadAllBytes(string path);
         bool FileExists(string path);
 
         bool DirectoryExists(string path);
