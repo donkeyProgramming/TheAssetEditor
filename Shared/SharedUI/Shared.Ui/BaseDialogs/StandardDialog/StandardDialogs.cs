@@ -13,46 +13,19 @@ using Shared.Core.PackFiles;
 using Shared.Core.Services;
 using Shared.Ui.BaseDialogs.PackFileTree;
 using Shared.Ui.BaseDialogs.StandardDialog.PackFile;
-using Shared.Ui.Common;
 using Shared.Ui.Common.Exceptions;
 
 namespace Shared.Ui.BaseDialogs.StandardDialog
 {
-
-    public class AeWaitCursor : IWaitCursor
-    {
-        readonly WaitCursor _handle;
-        bool _isDisposed;
-        public AeWaitCursor()
-        {
-            _handle = new WaitCursor();
-        }
-
-        public void Dispose()
-        {
-            if (_isDisposed == false)
-                _handle.Dispose();
-            _isDisposed = true;
-        }
-
-
-    }
-
-
-
     public class StandardDialogs : IStandardDialogs
     {
-        private readonly IPackFileService _pfs;
         private readonly PackFileTreeViewFactory _packFileBrowserBuilder;
         private readonly IExceptionService _exceptionService;
         private readonly IScopeRepository _scopeRepository;
         private readonly IEventHub _eventHub;
         private readonly ScopeToken _scopeToken;
-        
-
-        public StandardDialogs(IPackFileService pfs, PackFileTreeViewFactory packFileBrowserBuilder, IExceptionService exceptionService, IScopeRepository scopeRepository, IEventHub eventHub, ScopeToken scopeToken)
+        public StandardDialogs(PackFileTreeViewFactory packFileBrowserBuilder, IExceptionService exceptionService, IScopeRepository scopeRepository, IEventHub eventHub, ScopeToken scopeToken)
         {
-            _pfs = pfs;
             _packFileBrowserBuilder = packFileBrowserBuilder;
             _exceptionService = exceptionService;
             _scopeRepository = scopeRepository;
@@ -62,9 +35,9 @@ namespace Shared.Ui.BaseDialogs.StandardDialog
 
         public IWaitCursor ShowWaitCursor() => new AeWaitCursor();
 
-        public SaveDialogResult DisplaySaveDialog(IPackFileService remove, List<string> extensions)
+        public SaveDialogResult DisplaySaveDialog(IPackFileService pfs, List<string> extensions)
         {
-            using var browser = new SavePackFileWindow(_pfs, _packFileBrowserBuilder);
+            using var browser = new SavePackFileWindow(pfs, _packFileBrowserBuilder);
             browser.ViewModel.Filter.SetExtensions(extensions);
 
             if (browser.ShowDialog() == true)
@@ -209,7 +182,7 @@ namespace Shared.Ui.BaseDialogs.StandardDialog
 
         public void ShowDialogBox(string message, string title)
         {
-            System.Windows.MessageBox.Show(message, title);
+            MessageBox.Show(message, title);
         }
 
         public ShowMessageBoxResult ShowYesNoBox(string message, string title)

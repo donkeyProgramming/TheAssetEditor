@@ -44,7 +44,7 @@ namespace CommonControls.BaseDialogs
             Close();
         }
 
-        private void Key_Down(object sender, System.Windows.Input.KeyEventArgs e)
+        private void Key_Down(object sender, KeyEventArgs e)
         {
             if (e.Key == Key.Enter)
             {

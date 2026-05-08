@@ -9,16 +9,18 @@ namespace Shared.Ui.BaseDialogs.StandardDialog.PackFile
 {
     public partial class SavePackFileWindow : Window, IDisposable, INotifyPropertyChanged
     {
+        readonly IPackFileService _packfileService;
+
         public Core.PackFiles.Models.PackFile SelectedFile { get; set; }
         public PackFileBrowserViewModel ViewModel { get; set; }
 
         TreeNode _selectedNode;
         string _currentFileName;
 
-        public event PropertyChangedEventHandler PropertyChanged;
+        public event PropertyChangedEventHandler? PropertyChanged;
 
         public string CurrentFileName { get => _currentFileName; set { _currentFileName = value; PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("CurrentFileName")); SelectedFile = null; } }
-        IPackFileService _packfileService;
+
 
         public string FilePath { get; private set; }
 
