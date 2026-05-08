@@ -43,8 +43,29 @@ namespace Shared.Core.PackFiles.Models.Containers
 
         public string? GetFullPath(PackFile file)
         {
-            var entry = _db.Files.FirstOrDefault(f => f.FileName == file.Name);
-            return entry?.RelativePath;
+            if (file.DataSource is PackedFileSource source)
+            {
+                var entry = _db.Files.FirstOrDefault(f =>
+                    f.SourcePackFilePath == source.Parent.FilePath &&
+                    f.Offset == source.Offset &&
+                    f.Size == source.Size &&
+                    f.IsEncrypted == source.IsEncrypted &&
+                    f.IsCompressed == source.IsCompressed &&
+                    f.CompressionFormat == (int)source.CompressionFormat &&
+                    f.UncompressedSize == source.UncompressedSize &&
+                    f.FileName.ToLower() == file.Name.ToLower());
+
+                if (entry != null)
+                    return entry.RelativePath;
+            }
+
+            var matchingPaths = _db.Files
+                .Where(f => f.FileName.ToLower() == file.Name.ToLower())
+                .Select(f => f.RelativePath)
+                .Take(2)
+                .ToList();
+
+            return matchingPaths.Count == 1 ? matchingPaths[0] : null;
         }
 
         public List<(string FileName, PackFile Pack)> FindAllWithExtention(string extention)
