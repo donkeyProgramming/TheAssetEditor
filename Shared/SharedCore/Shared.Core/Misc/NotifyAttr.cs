@@ -17,7 +17,7 @@ namespace Shared.Core.Misc
 
         public NotifyAttr()
         {
-            _value = default;
+            _value = default!;
         }
 
         public NotifyAttr(T value, ValueChangedDelegate<T> onValueChanged)

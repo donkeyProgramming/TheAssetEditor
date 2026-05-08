@@ -15,18 +15,17 @@ namespace Shared.Core.ErrorHandling
                 OnUnknownElement = Element,
             };
         }
-
-        void Attribute(object sender, XmlAttributeEventArgs e)
+        void Attribute(object? sender, XmlAttributeEventArgs e)
         {
             throw new XmlException("Unsuported xml attribute : " + e.Attr.LocalName + $" at line {e.LineNumber} and position {e.LinePosition}", null, e.LineNumber, e.LinePosition);
         }
 
-        void Node(object sender, XmlNodeEventArgs e)
+        void Node(object? sender, XmlNodeEventArgs e)
         {
             throw new XmlException("Unsuported xml node : " + e.LocalName + $" at line {e.LineNumber} and position {e.LinePosition}", null, e.LineNumber, e.LinePosition);
         }
 
-        void Element(object sender, XmlElementEventArgs e)
+        void Element(object? sender, XmlElementEventArgs e)
         {
             throw new XmlException("Unsuported xml element : " + e.Element.LocalName + $" at line {e.LineNumber} and position {e.LinePosition}", null, e.LineNumber, e.LinePosition);
         }

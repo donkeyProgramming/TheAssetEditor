@@ -42,9 +42,6 @@ namespace Shared.Core.ToolCreation
         public void CloseAllTools(IEditorInterface tool);
         public void CloseToolsToLeft(IEditorInterface tool);
         public void CloseToolsToRight(IEditorInterface tool);
-        public bool Drop(IEditorInterface node, IEditorInterface targetNode = default, bool insertAfterTargetNode = default);
-
-
-        
+        public bool Drop(IEditorInterface node, IEditorInterface? targetNode = default, bool insertAfterTargetNode = default); 
     }
 }

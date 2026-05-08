@@ -1,4 +1,5 @@
-﻿using Shared.Core.Misc;
+﻿using CommunityToolkit.Diagnostics;
+using Shared.Core.Misc;
 using Shared.Core.PackFiles.Models.FileSources;
 using Shared.Core.PackFiles.Serialization;
 using Shared.Core.PackFiles.Utility;
@@ -11,11 +12,19 @@ namespace Shared.Core.PackFiles.Models.Containers
         public string Name { get; set; }
         public PFHeader Header { get; set; }
         public bool IsCaPackFile { get; set; } = false;
-        public string SystemFilePath { get; set; }
+        public string? SystemFilePath { get; set; }
         public long OriginalLoadByteSize { get; set; } = -1;
         public HashSet<string> SourcePackFilePaths { get; set; } = [];
 
         public Dictionary<string, PackFile> FileList { get; set; } = [];
+
+        public PackFileContainer(string name)
+        {
+            Name = name;
+            var v = PackFileVersionConverter.ToString(PackFileVersion.PFH5);
+            Header = new PFHeader(v, PackFileCAType.MOD);
+        }
+
 
         public int GetFileCount() => FileList.Count;
 
@@ -109,10 +118,7 @@ namespace Shared.Core.PackFiles.Models.Containers
             return results;
         }
 
-        public PackFileContainer(string name)
-        {
-            Name = name;
-        }
+
 
         public void MergePackFileContainer(PackFileContainer other)
         {
@@ -256,6 +262,7 @@ namespace Shared.Core.PackFiles.Models.Containers
 
             if (OriginalLoadByteSize != -1)
             {
+                Guard.IsNotNull(SystemFilePath, "SystemFilePath must be set if saving to disk");
                 var fileInfo = new FileInfo(SystemFilePath);
                 var byteSize = fileInfo.Length;
                 if (byteSize != OriginalLoadByteSize)

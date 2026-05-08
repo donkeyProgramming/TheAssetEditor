@@ -71,7 +71,7 @@ namespace Shared.Core.ToolCreation
                 return null;
             }
 
-            Type selectedEditor = null;
+            Type? selectedEditor = null;
             if (allEditors.Count == 1)
             {
                 selectedEditor = allEditors.First().ViewModel;

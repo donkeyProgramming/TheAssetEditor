@@ -30,12 +30,15 @@
     public class EditorInfoBuilder
     {
         protected EditorInfo _instance;
+
+        protected EditorInfoBuilder(EditorEnums editorType, Type tView, Type tViewModel)
+        {
+            _instance = new EditorInfo(editorType, tView, tViewModel);
+        }
+
         public static EditorInfoBuilder Create<TViewModel, TView>(EditorEnums editorType) where TViewModel : IEditorInterface
         {
-            return new EditorInfoBuilder()
-            {
-                _instance = new EditorInfo(editorType, typeof(TView), typeof(TViewModel))
-            };
+            return new EditorInfoBuilder(editorType, typeof(TView), typeof(TViewModel));
         }
 
         public EditorInfoBuilder AddToToolbar(string toolbarLabel, bool enabled = true)

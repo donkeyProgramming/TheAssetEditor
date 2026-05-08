@@ -4,7 +4,7 @@
     {
         string Name { get; }
         bool IsCaPackFile { get; set; }
-        string SystemFilePath { get; }
+        string? SystemFilePath { get; }
 
 
         int GetFileCount();
