@@ -5,13 +5,6 @@ using Shared.Ui.BaseDialogs.PackFileTree.ContextMenu.External;
 
 namespace Shared.Ui.BaseDialogs.PackFileTree.ContextMenu
 {
-
-
-
-    
-
-
-
     public class MainApplicationContextMenuBuilder : ContextMenuBuilder
     {
         private readonly IPackFileService _packFileService;
