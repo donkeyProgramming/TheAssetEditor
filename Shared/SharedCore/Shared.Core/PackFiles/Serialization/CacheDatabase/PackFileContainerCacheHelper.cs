@@ -59,6 +59,23 @@ namespace Shared.Core.PackFiles.Serialization.CacheDatabase
                 .Options;
         }
 
+        public static DbContextOptions<CacheDbContext> CreateDbOptionsFromConnectionString(string connectionString)
+        {
+            return new DbContextOptionsBuilder<CacheDbContext>()
+                .UseSqlite(connectionString)
+                .Options;
+        }
+
+        public static DbContextOptions<CacheDbContext> CreateDbOptions(SqliteConnection connection)
+        {
+            if (connection.State != System.Data.ConnectionState.Open)
+                connection.Open();
+
+            return new DbContextOptionsBuilder<CacheDbContext>()
+                .UseSqlite(connection)
+                .Options;
+        }
+
         private const int CurrentSchemaVersion = 3;
 
         public static void SaveCache(string fingerprint, PackFileContainer container, DbContextOptions<CacheDbContext> dbOptions)
@@ -72,84 +89,99 @@ namespace Shared.Core.PackFiles.Serialization.CacheDatabase
                 db.Database.EnsureCreated();
             }
 
-            // Use raw SQLite for bulk insert - avoids EF change tracker memory and perf overhead
-            var connectionString = $"Data Source={GetDbFilePath(dbOptions)};Pooling=False";
-            using var connection = new SqliteConnection(connectionString);
-            connection.Open();
+            // Use raw SQLite for bulk insert - avoids EF change tracker memory and perf overhead.
+            // If dbOptions carries an explicit SqliteConnection (for tests/in-memory), reuse it.
+            var (connection, shouldDisposeConnection) = GetSqliteConnection(dbOptions);
+            if (connection.State != System.Data.ConnectionState.Open)
+                connection.Open();
 
-            using var transaction = connection.BeginTransaction();
-
-            // Insert CacheInfo
-            using (var cmd = connection.CreateCommand())
+            try
             {
-                cmd.Transaction = transaction;
-                cmd.CommandText = @"INSERT INTO CacheInfo (SchemaVersion, Fingerprint, ContainerName, SystemFilePath, SourcePackFilePaths)
-                                    VALUES ($schemaVersion, $fingerprint, $containerName, $systemFilePath, $sourcePackFilePaths)";
-                cmd.Parameters.AddWithValue("$schemaVersion", CurrentSchemaVersion);
-                cmd.Parameters.AddWithValue("$fingerprint", fingerprint);
-                cmd.Parameters.AddWithValue("$containerName", container.Name);
-                cmd.Parameters.AddWithValue("$systemFilePath", container.SystemFilePath);
-                cmd.Parameters.AddWithValue("$sourcePackFilePaths", string.Join("|", container.SourcePackFilePaths));
-                cmd.ExecuteNonQuery();
-            }
+                using var transaction = connection.BeginTransaction();
 
-            // Bulk insert files using a prepared statement
-            using (var cmd = connection.CreateCommand())
-            {
-                cmd.Transaction = transaction;
-                cmd.CommandText = @"INSERT INTO FileList (RelativePath, FileName, Extension, FolderPath, SourcePackFilePath, Offset, Size, IsEncrypted, IsCompressed, CompressionFormat, UncompressedSize)
-                                    VALUES ($relativePath, $fileName, $extension, $folderPath, $sourcePackFilePath, $offset, $size, $isEncrypted, $isCompressed, $compressionFormat, $uncompressedSize)";
-
-                var pRelativePath = cmd.Parameters.Add("$relativePath", SqliteType.Text);
-                var pFileName = cmd.Parameters.Add("$fileName", SqliteType.Text);
-                var pExtension = cmd.Parameters.Add("$extension", SqliteType.Text);
-                var pFolderPath = cmd.Parameters.Add("$folderPath", SqliteType.Text);
-                var pSourcePackFilePath = cmd.Parameters.Add("$sourcePackFilePath", SqliteType.Text);
-                var pOffset = cmd.Parameters.Add("$offset", SqliteType.Integer);
-                var pSize = cmd.Parameters.Add("$size", SqliteType.Integer);
-                var pIsEncrypted = cmd.Parameters.Add("$isEncrypted", SqliteType.Integer);
-                var pIsCompressed = cmd.Parameters.Add("$isCompressed", SqliteType.Integer);
-                var pCompressionFormat = cmd.Parameters.Add("$compressionFormat", SqliteType.Integer);
-                var pUncompressedSize = cmd.Parameters.Add("$uncompressedSize", SqliteType.Integer);
-
-                cmd.Prepare();
-
-                foreach (var (relativePath, packFile) in container.GetAllFiles())
+                // Insert CacheInfo
+                using (var cmd = connection.CreateCommand())
                 {
-                    if (packFile.DataSource is not PackedFileSource source)
-                        continue;
-
-                    var lastSep = relativePath.LastIndexOf(Path.DirectorySeparatorChar);
-                    var folderPath = lastSep == -1 ? "" : relativePath.Substring(0, lastSep);
-
-                    pRelativePath.Value = relativePath;
-                    pFileName.Value = packFile.Name;
-                    pExtension.Value = Path.GetExtension(relativePath).ToLower();
-                    pFolderPath.Value = folderPath;
-                    pSourcePackFilePath.Value = source.Parent.FilePath;
-                    pOffset.Value = source.Offset;
-                    pSize.Value = source.Size;
-                    pIsEncrypted.Value = source.IsEncrypted ? 1 : 0;
-                    pIsCompressed.Value = source.IsCompressed ? 1 : 0;
-                    pCompressionFormat.Value = (int)source.CompressionFormat;
-                    pUncompressedSize.Value = (long)source.UncompressedSize;
-
+                    cmd.Transaction = transaction;
+                    cmd.CommandText = @"INSERT INTO CacheInfo (SchemaVersion, Fingerprint, ContainerName, SystemFilePath, SourcePackFilePaths)
+                                    VALUES ($schemaVersion, $fingerprint, $containerName, $systemFilePath, $sourcePackFilePaths)";
+                    cmd.Parameters.AddWithValue("$schemaVersion", CurrentSchemaVersion);
+                    cmd.Parameters.AddWithValue("$fingerprint", fingerprint);
+                    cmd.Parameters.AddWithValue("$containerName", container.Name);
+                    cmd.Parameters.AddWithValue("$systemFilePath", container.SystemFilePath);
+                    cmd.Parameters.AddWithValue("$sourcePackFilePaths", string.Join("|", container.SourcePackFilePaths));
                     cmd.ExecuteNonQuery();
                 }
-            }
 
-            transaction.Commit();
-            _logger.Here().Information($"Cache saved successfully for '{container.Name}'");
+                // Bulk insert files using a prepared statement
+                using (var cmd = connection.CreateCommand())
+                {
+                    cmd.Transaction = transaction;
+                    cmd.CommandText = @"INSERT INTO FileList (RelativePath, FileName, Extension, FolderPath, SourcePackFilePath, Offset, Size, IsEncrypted, IsCompressed, CompressionFormat, UncompressedSize)
+                                    VALUES ($relativePath, $fileName, $extension, $folderPath, $sourcePackFilePath, $offset, $size, $isEncrypted, $isCompressed, $compressionFormat, $uncompressedSize)";
+
+                    var pRelativePath = cmd.Parameters.Add("$relativePath", SqliteType.Text);
+                    var pFileName = cmd.Parameters.Add("$fileName", SqliteType.Text);
+                    var pExtension = cmd.Parameters.Add("$extension", SqliteType.Text);
+                    var pFolderPath = cmd.Parameters.Add("$folderPath", SqliteType.Text);
+                    var pSourcePackFilePath = cmd.Parameters.Add("$sourcePackFilePath", SqliteType.Text);
+                    var pOffset = cmd.Parameters.Add("$offset", SqliteType.Integer);
+                    var pSize = cmd.Parameters.Add("$size", SqliteType.Integer);
+                    var pIsEncrypted = cmd.Parameters.Add("$isEncrypted", SqliteType.Integer);
+                    var pIsCompressed = cmd.Parameters.Add("$isCompressed", SqliteType.Integer);
+                    var pCompressionFormat = cmd.Parameters.Add("$compressionFormat", SqliteType.Integer);
+                    var pUncompressedSize = cmd.Parameters.Add("$uncompressedSize", SqliteType.Integer);
+
+                    cmd.Prepare();
+
+                    foreach (var (relativePath, packFile) in container.GetAllFiles())
+                    {
+                        if (packFile.DataSource is not PackedFileSource source)
+                            continue;
+
+                        var lastSep = relativePath.LastIndexOf(Path.DirectorySeparatorChar);
+                        var folderPath = lastSep == -1 ? "" : relativePath.Substring(0, lastSep);
+
+                        pRelativePath.Value = relativePath;
+                        pFileName.Value = packFile.Name;
+                        pExtension.Value = Path.GetExtension(relativePath).ToLower();
+                        pFolderPath.Value = folderPath;
+                        pSourcePackFilePath.Value = source.Parent.FilePath;
+                        pOffset.Value = source.Offset;
+                        pSize.Value = source.Size;
+                        pIsEncrypted.Value = source.IsEncrypted ? 1 : 0;
+                        pIsCompressed.Value = source.IsCompressed ? 1 : 0;
+                        pCompressionFormat.Value = (int)source.CompressionFormat;
+                        pUncompressedSize.Value = (long)source.UncompressedSize;
+
+                        cmd.ExecuteNonQuery();
+                    }
+                }
+
+                transaction.Commit();
+                _logger.Here().Information($"Cache saved successfully for '{container.Name}'");
+            }
+            finally
+            {
+                if (shouldDisposeConnection)
+                    connection.Dispose();
+            }
         }
 
-        private static string GetDbFilePath(DbContextOptions<CacheDbContext> dbOptions)
+        private static (SqliteConnection Connection, bool ShouldDisposeConnection) GetSqliteConnection(DbContextOptions<CacheDbContext> dbOptions)
         {
             var relationalOptions = dbOptions.Extensions
                 .OfType<Microsoft.EntityFrameworkCore.Infrastructure.RelationalOptionsExtension>()
                 .FirstOrDefault();
-            var connStr = relationalOptions?.ConnectionString ?? "";
-            var builder = new SqliteConnectionStringBuilder(connStr);
-            return builder.DataSource;
+
+            if (relationalOptions?.Connection is SqliteConnection sqliteConnection)
+                return (sqliteConnection, false);
+
+            var connectionString = relationalOptions?.ConnectionString;
+            if (string.IsNullOrWhiteSpace(connectionString))
+                throw new InvalidOperationException("Unable to resolve SQLite connection from DbContextOptions.");
+
+            return (new SqliteConnection(connectionString), true);
         }
 
         public static CachedPackFileContainer? LoadContainerFromCache(string dbFilePath, string expectedFingerprint)

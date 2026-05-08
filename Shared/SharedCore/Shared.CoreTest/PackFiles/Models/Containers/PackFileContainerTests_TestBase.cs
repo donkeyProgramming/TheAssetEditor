@@ -1,4 +1,5 @@
-﻿using Shared.Core.PackFiles.Models;
+﻿using Microsoft.Data.Sqlite;
+using Shared.Core.PackFiles.Models;
 using Shared.Core.PackFiles.Models.Containers;
 using Shared.Core.PackFiles.Models.FileSources;
 using Shared.Core.PackFiles.Serialization.CacheDatabase;
@@ -10,8 +11,7 @@ namespace Shared.CoreTest.PackFiles.Models.Containers
     {
         private readonly bool _useCachedContainer;
 
-        protected string _tempDir = null!;
-        protected string _dbFilePath = null!;
+        private SqliteConnection? _cacheKeepAliveConnection;
         protected IPackFileContainerInternal _container = null!;
         protected bool IsCachedContainer => _useCachedContainer;
 
@@ -23,10 +23,6 @@ namespace Shared.CoreTest.PackFiles.Models.Containers
         [SetUp]
         public void Setup()
         {
-            _tempDir = Path.Combine(Path.GetTempPath(), "CachedContainerTests_" + Guid.NewGuid().ToString("N"));
-            Directory.CreateDirectory(_tempDir);
-            _dbFilePath = Path.Combine(_tempDir, "test.db");
-
             var sourceContainer = new PackFileContainer("TestCache")
             {
                 IsCaPackFile = true,
@@ -66,9 +62,20 @@ namespace Shared.CoreTest.PackFiles.Models.Containers
             sourceContainer.AddOrUpdateFile("compressed\\data.bin", new PackFile("data.bin",
                 new PackedFileSource(parent, 1000, 500, true, true, CompressionFormat.Lz4, 2000)));
 
-            var dbOptions = PackFileContainerCacheHelper.CreateDbOptions(_dbFilePath);
             if (_useCachedContainer)
             {
+                var dbName = "CachedContainerTests_" + Guid.NewGuid().ToString("N");
+                var connectionString = new SqliteConnectionStringBuilder
+                {
+                    DataSource = dbName,
+                    Mode = SqliteOpenMode.Memory,
+                    Cache = SqliteCacheMode.Shared
+                }.ToString();
+
+                _cacheKeepAliveConnection = new SqliteConnection(connectionString);
+                _cacheKeepAliveConnection.Open();
+
+                var dbOptions = PackFileContainerCacheHelper.CreateDbOptionsFromConnectionString(connectionString);
                 PackFileContainerCacheHelper.SaveCache("test_fp", sourceContainer, dbOptions);
                 _container = PackFileContainerCacheHelper.LoadContainerFromCache(dbOptions, "test_fp")!;
             }
@@ -81,8 +88,8 @@ namespace Shared.CoreTest.PackFiles.Models.Containers
         [TearDown]
         public void TearDown()
         {
-            if (Directory.Exists(_tempDir))
-                Directory.Delete(_tempDir, true);
+            _cacheKeepAliveConnection?.Dispose();
+            _cacheKeepAliveConnection = null;
         }
 
         protected void IgnoreIfNotCached(string scenario)
