@@ -7,6 +7,7 @@ namespace Shared.Ui.BaseDialogs.PackFileTree.ContextMenu.Commands
     public class ExportToDirectoryCommand() : IContextMenuCommand
     {
         public string GetDisplayName(TreeNode node) => "Export to system folder";
+        public bool ShouldAdd(TreeNode node) => node.NodeType == NodeType.Directory || node.NodeType == NodeType.Root || (node.NodeType == NodeType.File && node.Item != null);
         public bool IsEnabled(TreeNode node) => true;
 
         public void Execute(TreeNode selectedNode)

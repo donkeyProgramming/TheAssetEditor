@@ -27,7 +27,8 @@ namespace Shared.Ui.BaseDialogs.PackFileTree
         private readonly IEventHub? _eventHub;
         private readonly IWindowsKeyboard _windowKeyboard;
         private readonly ApplicationSettingsService _applicationSettingsService;
-        private readonly IContextMenuBuilder _contextMenuBuilder;
+        private readonly PackFileContextMenuComposer _contextMenuComposer;
+        private readonly ContextMenuType _contextMenuType;
         private readonly Dictionary<IPackFileContainer, TreeNode> _treeRoots = [];
 
         public event FileSelectedDelegate FileOpen;
@@ -41,13 +42,14 @@ namespace Shared.Ui.BaseDialogs.PackFileTree
 
         public bool ShowFoldersOnly { get; }
 
-        public PackFileBrowserViewModel(ApplicationSettingsService applicationSettingsService, IContextMenuBuilder contextMenuBuilder, IPackFileService packFileService, IEventHub? eventHub, IWindowsKeyboard windowKeyboard, bool showCaFiles, bool showFoldersOnly)
+        public PackFileBrowserViewModel(ApplicationSettingsService applicationSettingsService, PackFileContextMenuComposer contextMenuComposer, ContextMenuType contextMenuType, IPackFileService packFileService, IEventHub? eventHub, IWindowsKeyboard windowKeyboard, bool showCaFiles, bool showFoldersOnly)
         {
             _packFileService = packFileService;
             _eventHub = eventHub;
             _windowKeyboard = windowKeyboard;
             _applicationSettingsService = applicationSettingsService;
-            _contextMenuBuilder = contextMenuBuilder;
+            _contextMenuComposer = contextMenuComposer;
+            _contextMenuType = contextMenuType;
 
             ShowFoldersOnly = showFoldersOnly;
 
@@ -82,7 +84,7 @@ namespace Shared.Ui.BaseDialogs.PackFileTree
 
         partial void OnSelectedItemChanged(TreeNode value)
         {
-            ContextMenu = _contextMenuBuilder.Build(value);
+            ContextMenu = _contextMenuComposer.Build(_contextMenuType, value);
             NodeSelected?.Invoke(_selectedItem);
         }
 

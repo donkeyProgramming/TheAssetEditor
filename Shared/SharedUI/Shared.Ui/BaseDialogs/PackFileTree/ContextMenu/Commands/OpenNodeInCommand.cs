@@ -9,6 +9,7 @@ namespace Shared.Ui.BaseDialogs.PackFileTree.ContextMenu.Commands
     public abstract class OpenNodeInCommand() : IContextMenuCommand
     {
         public abstract string GetDisplayName(TreeNode node);
+        public bool ShouldAdd(TreeNode node) => node.NodeType == NodeType.File && node.Item != null;
         public bool IsEnabled(TreeNode node) => true;
 
         public abstract void Execute(TreeNode _selectedNode);

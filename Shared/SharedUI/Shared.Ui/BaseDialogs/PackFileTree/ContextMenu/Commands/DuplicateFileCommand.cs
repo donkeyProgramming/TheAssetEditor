@@ -8,6 +8,7 @@ namespace Shared.Ui.BaseDialogs.PackFileTree.ContextMenu.Commands
     public class DuplicateFileCommand(IPackFileService packFileService) : IContextMenuCommand
     {
         public string GetDisplayName(TreeNode node) => "Duplicate";
+        public bool ShouldAdd(TreeNode node) => node.NodeType == NodeType.File && node.Item != null && !node.FileOwner.IsCaPackFile;
         public bool IsEnabled(TreeNode node) => true;
 
         public void Execute(TreeNode _selectedNode) => Execute(_selectedNode.Item);

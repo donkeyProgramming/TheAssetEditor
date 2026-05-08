@@ -7,13 +7,15 @@ using Shared.GameFormats.RigidModel;
 using Shared.GameFormats.RigidModel.LodHeader;
 using Shared.GameFormats.RigidModel.MaterialHeaders;
 using Shared.Ui.BaseDialogs.PackFileTree;
-using Shared.Ui.BaseDialogs.PackFileTree.ContextMenu.External;
+using Shared.Ui.BaseDialogs.PackFileTree.ContextMenu.Commands;
 
 namespace Editors.Reports.Geometry
 {
-    public class RmvToTextCommand(RmvToTextReport report) : IRmvToTextCommand
+    public class RmvToTextCommand(RmvToTextReport report) : IContextMenuCommand
     {
         public string GetDisplayName(TreeNode node) => "Generate Rmv to Text";
+
+        public bool ShouldAdd(TreeNode node) => IsEnabled(node);
 
         public bool IsEnabled(TreeNode node) => node.NodeType == NodeType.File && node.Item != null && node.Name.EndsWith(".rigid_model_v2", StringComparison.OrdinalIgnoreCase);
 

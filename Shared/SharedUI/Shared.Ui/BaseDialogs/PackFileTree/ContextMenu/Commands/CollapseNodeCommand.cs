@@ -3,6 +3,7 @@
     public class CollapseNodeCommand() : IContextMenuCommand
     {
         public string GetDisplayName(TreeNode node) => "Collapse all";
+        public bool ShouldAdd(TreeNode node) => node.NodeType != NodeType.File;
         public bool IsEnabled(TreeNode node) => true;
 
         public void Execute(TreeNode _selectedNode) => CollapsAllRecursive(_selectedNode);

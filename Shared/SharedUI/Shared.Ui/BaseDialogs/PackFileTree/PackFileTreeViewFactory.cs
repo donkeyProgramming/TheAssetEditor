@@ -11,22 +11,21 @@ namespace Shared.Ui.BaseDialogs.PackFileTree
         private readonly ApplicationSettingsService _applicationSettingsService;
         private readonly IPackFileService _packFileService;
         private readonly IEventHub _eventHub;
-        private readonly ContextMenuFactory _contextMenuFactory;
+        private readonly PackFileContextMenuComposer _contextMenuComposer;
         private readonly IWindowsKeyboard _windowKeyboard;
 
-        public PackFileTreeViewFactory(ApplicationSettingsService applicationSettingsService, IPackFileService packFileService, IEventHub eventHub, ContextMenuFactory contextMenuFactory, IWindowsKeyboard windowKeyboard)
+        public PackFileTreeViewFactory(ApplicationSettingsService applicationSettingsService, IPackFileService packFileService, IEventHub eventHub, PackFileContextMenuComposer contextMenuComposer, IWindowsKeyboard windowKeyboard)
         {
             _applicationSettingsService = applicationSettingsService;
             _packFileService = packFileService;
             _eventHub = eventHub;
-            _contextMenuFactory = contextMenuFactory;
+            _contextMenuComposer = contextMenuComposer;
             _windowKeyboard = windowKeyboard;
         }
 
         public PackFileBrowserViewModel Create(ContextMenuType contextMenu, bool showCaFiles, bool showFoldersOnly)
         {
-            var contextMenuBuilder = _contextMenuFactory.GetContextMenu(contextMenu);
-            var fileTree = new PackFileBrowserViewModel(_applicationSettingsService, contextMenuBuilder, _packFileService, _eventHub, _windowKeyboard, showCaFiles, showFoldersOnly);
+            var fileTree = new PackFileBrowserViewModel(_applicationSettingsService, _contextMenuComposer, contextMenu, _packFileService, _eventHub, _windowKeyboard, showCaFiles, showFoldersOnly);
             return fileTree;
         }
     }

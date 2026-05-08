@@ -9,6 +9,7 @@ namespace Shared.Ui.BaseDialogs.PackFileTree.ContextMenu.Commands
     public class ImportFileCommand(IPackFileService packFileService) : IContextMenuCommand
     {
         public string GetDisplayName(TreeNode node) => "Import File";
+        public bool ShouldAdd(TreeNode node) => node.NodeType != NodeType.File && !node.FileOwner.IsCaPackFile;
         public bool IsEnabled(TreeNode node) => true;
 
         public void Execute(TreeNode _selectedNode)
