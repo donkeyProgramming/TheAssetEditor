@@ -5,10 +5,11 @@ using System.Windows.Forms;
 using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
 using Shared.Core.PackFiles.Models.FileSources;
+using Shared.Core.Services;
 
 namespace Shared.Ui.BaseDialogs.PackFileTree.ContextMenu.Commands
 {
-    public class ImportDirectoryCommand(IPackFileService packFileService) : IContextMenuCommand
+    public class ImportDirectoryCommand(IPackFileService packFileService, IStandardDialogs standardDialogs) : IContextMenuCommand
     {
         public string GetDisplayName(TreeNode node) => "Import Directory";
         public bool ShouldAdd(TreeNode node) => node.NodeType != NodeType.File && !node.FileOwner.IsCaPackFile;
@@ -18,11 +19,11 @@ namespace Shared.Ui.BaseDialogs.PackFileTree.ContextMenu.Commands
         {
             if (_selectedNode.FileOwner.IsCaPackFile)
             {
-                System.Windows.MessageBox.Show("Unable to edit CA packfile");
+                standardDialogs.ShowDialogBox("Unable to edit CA packfile");
                 return;
             }
 
-            var dialog = new FolderBrowserDialog();
+            using var dialog = new FolderBrowserDialog();
             if (dialog.ShowDialog() == DialogResult.OK)
             {
                 var folderPath = dialog.SelectedPath;

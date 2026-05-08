@@ -3,10 +3,11 @@ using System.Windows.Forms;
 using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
 using Shared.Core.PackFiles.Models.FileSources;
+using Shared.Core.Services;
 
 namespace Shared.Ui.BaseDialogs.PackFileTree.ContextMenu.Commands
 {
-    public class ImportFileCommand(IPackFileService packFileService) : IContextMenuCommand
+    public class ImportFileCommand(IPackFileService packFileService, IStandardDialogs standardDialogs) : IContextMenuCommand
     {
         public string GetDisplayName(TreeNode node) => "Import File";
         public bool ShouldAdd(TreeNode node) => node.NodeType != NodeType.File && !node.FileOwner.IsCaPackFile;
@@ -16,11 +17,11 @@ namespace Shared.Ui.BaseDialogs.PackFileTree.ContextMenu.Commands
         {
             if (_selectedNode.FileOwner.IsCaPackFile)
             {
-                System.Windows.MessageBox.Show("Unable to edit CA packfile");
+                standardDialogs.ShowDialogBox("Unable to edit CA packfile");
                 return;
             }
 
-            var dialog = new OpenFileDialog()
+            using var dialog = new OpenFileDialog()
             {
                 Multiselect = true,
             };

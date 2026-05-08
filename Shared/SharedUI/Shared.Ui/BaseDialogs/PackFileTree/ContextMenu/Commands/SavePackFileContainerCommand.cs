@@ -24,7 +24,7 @@ namespace Shared.Ui.BaseDialogs.PackFileTree.ContextMenu.Commands
             var systemPath = _selectedNode.FileOwner.SystemFilePath;
             if (string.IsNullOrWhiteSpace(systemPath))
             {
-                var saveFileDialog = new SaveFileDialog();
+                using var saveFileDialog = new SaveFileDialog();
                 saveFileDialog.FileName = _selectedNode.FileOwner.Name;
                 saveFileDialog.Filter = "PackFile | *.pack";
                 saveFileDialog.DefaultExt = "pack";
@@ -43,7 +43,7 @@ namespace Shared.Ui.BaseDialogs.PackFileTree.ContextMenu.Commands
                 catch (Exception e)
                 {
                     _logger.Here().Error(e, "Exception while saving");
-                    System.Windows.MessageBox.Show("Error saving:\n\n" + e.Message, "Error");
+                    standardDialogs.ShowDialogBox("Error saving:\n\n" + e.Message, "Error");
                 }
             }
         }
@@ -60,7 +60,7 @@ namespace Shared.Ui.BaseDialogs.PackFileTree.ContextMenu.Commands
             var systemPath = pack.SystemFilePath;
             if (string.IsNullOrWhiteSpace(systemPath))
             {
-                var saveFileDialog = new SaveFileDialog();
+                using var saveFileDialog = new SaveFileDialog();
                 saveFileDialog.FileName = pack.Name;
                 saveFileDialog.Filter = "PackFile | *.pack";
                 saveFileDialog.DefaultExt = "pack";
@@ -79,7 +79,7 @@ namespace Shared.Ui.BaseDialogs.PackFileTree.ContextMenu.Commands
                 catch (Exception e)
                 {
                     _logger.Here().Error(e, "Exception while saving");
-                    System.Windows.MessageBox.Show("Error saving:\n\n" + e.Message, "Error");
+                    standardDialogs.ShowDialogBox("Error saving:\n\n" + e.Message, "Error");
                 }
             }
         }
