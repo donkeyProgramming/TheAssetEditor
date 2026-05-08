@@ -94,7 +94,7 @@ namespace AssetEditor.ViewModels
             _settingsService.CurrentSettings.CameraControlMode = SelectedCameraMode;
 
             foreach (var item in GameDirectores)
-                _settingsService.CurrentSettings.GameDirectories.Add(new ApplicationSettings.GamePathPair() { Game = item.GameType, Path = item.Path });
+                _settingsService.CurrentSettings.GameDirectories.Add(new ApplicationSettings.GamePathPair(item.GameType, item.Path));
             _settingsService.CurrentSettings.WwisePath = WwisePath;
            
             _localizationManager.LoadLanguage(SelectedLanguage);

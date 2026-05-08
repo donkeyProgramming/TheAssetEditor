@@ -11,16 +11,18 @@ namespace Shared.Core.Misc
 
         public NotifyAttr(T value)
         {
+            _value = value;
             Value = value;
         }
 
         public NotifyAttr()
         {
-            Value = default;
+            _value = default;
         }
 
         public NotifyAttr(T value, ValueChangedDelegate<T> onValueChanged)
         {
+            _value = value;
             Value = value;
             _onValueChanged = onValueChanged;
         }

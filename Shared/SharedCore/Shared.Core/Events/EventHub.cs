@@ -1,5 +1,4 @@
-﻿using Serilog;
-using Shared.Core.DependencyInjection;
+﻿using Shared.Core.DependencyInjection;
 using Shared.Core.ErrorHandling;
 
 namespace Shared.Core.Events
@@ -57,7 +56,7 @@ namespace Shared.Core.Events
             // If gloabl, send to self and all children
             if (_isGlobal)
             {
-                _logger.Here().Information($"Publshing global event {e.GetType().Name} on {_hubName}");
+                _logger.Here().Information($"Publshing global event {e!.GetType().Name} on {_hubName}");
 
                 // Send to global subscribers 
                 Publish(e);

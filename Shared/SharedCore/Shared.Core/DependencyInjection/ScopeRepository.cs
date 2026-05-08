@@ -174,7 +174,7 @@ namespace Shared.Core.DependencyInjection
             foreach (var key in dictionary.Keys)
             {
                 var value = dictionary[key];
-                objectDictionary[key] = value;
+                objectDictionary[key] = value!;
             }
 
             return objectDictionary;

@@ -1,4 +1,4 @@
-using Moq;
+﻿using Moq;
 using Shared.Core.Misc;
 using Shared.Core.PackFiles.Utility;
 using Shared.Core.Services;
@@ -36,8 +36,7 @@ namespace Shared.CoreTest.PackFiles.Utility
             _localizationManager = new LocalizationManager();
 
             _settingsService = new ApplicationSettingsService(GameTypeEnum.Warhammer3);
-            _settingsService.CurrentSettings.GameDirectories.Add(
-                new ApplicationSettings.GamePathPair { Game = GameTypeEnum.Warhammer3, Path = _tempGameDir });
+            _settingsService.CurrentSettings.GameDirectories.Add(new ApplicationSettings.GamePathPair(GameTypeEnum.Warhammer3, _tempGameDir));
         }
 
         [TearDown]

@@ -26,7 +26,7 @@ namespace Shared.Core.Misc
                 valueChangedDelegate?.Invoke(value);
         }
 
-        protected virtual void SetAndNotify<T>(ref T variable, T newValue, ValueChangedDelegate<T> valueChangedDelegate = null, [CallerMemberName] string propertyName = "")
+        protected virtual void SetAndNotify<T>(ref T variable, T newValue, ValueChangedDelegate<T>? valueChangedDelegate = null, [CallerMemberName] string propertyName = "")
         {
             variable = newValue;
             NotifyPropertyChanged(propertyName);
@@ -51,7 +51,7 @@ namespace Shared.Core.Misc
                 valueChangedDelegate?.Invoke(this, value);
         }
 
-        protected virtual void SetAndNotifyWithSender<T>(ref T variable, T newValue, ValueAndSenderChangedDelegate<T> valueChangedDelegate = null, [CallerMemberName] string propertyName = "")
+        protected virtual void SetAndNotifyWithSender<T>(ref T variable, T newValue, ValueAndSenderChangedDelegate<T>? valueChangedDelegate = null, [CallerMemberName] string propertyName = "")
         {
             variable = newValue;
             NotifyPropertyChanged(propertyName);
