@@ -1,5 +1,8 @@
-﻿using System.Threading;
+﻿using System.IO;
+using System.Threading;
 using Moq;
+using Shared.Core.PackFiles.Models;
+using Shared.Core.PackFiles.Models.FileSources;
 using Shared.Core.Services;
 using Shared.Ui.BaseDialogs.PackFileTree;
 using Shared.Ui.BaseDialogs.PackFileTree.ContextMenu.Commands;
@@ -58,6 +61,57 @@ namespace Shared.UiTest.PackFileTree.ContextMenu.Commands
         {
             var result = ExportToDirectoryCommand.ComputeRelativePath("sub\\file.mesh", null);
             Assert.That(result, Is.EqualTo("\\sub\\file.mesh"));
+        }
+
+        [Test]
+        public void Execute_ExportMultipleFilesFromRoot_ExportsSuccessfully()
+        {
+            var owner = CreateContainer();
+            var root = new TreeNode("root", NodeType.Root, owner, null);
+            
+            // Create directory structure: root -> [dir -> file1, file2]
+            var dir = new TreeNode("models", NodeType.Directory, owner, root);
+            
+            // Create real PackFile objects with MemorySource
+            var packFile1 = new PackFile("mesh1.mesh", new MemorySource(new byte[] { 0x01, 0x02 }));
+            var packFile2 = new PackFile("mesh2.mesh", new MemorySource(new byte[] { 0x03, 0x04 }));
+            
+            var file1 = new TreeNode("mesh1.mesh", NodeType.File, owner, dir, packFile1);
+            var file2 = new TreeNode("mesh2.mesh", NodeType.File, owner, dir, packFile2);
+            
+            dir.AddChild(file1);
+            dir.AddChild(file2);
+            root.AddChild(dir);
+            root.MarkChildrenLoaded();
+            dir.MarkChildrenLoaded();
+            
+            var outputDir = "C:\\export";
+            var dialogs = new Mock<IStandardDialogs>();
+            dialogs.Setup(x => x.ShowSystemFolderBrowserDialog())
+                .Returns(new SystemBrowseFolderDialogResult(true, outputDir));
+            
+            var fileSystem = new Mock<IFileSystemAccess>();
+            // Mock PathGetDirectoryName to extract directory from path
+            fileSystem.Setup(x => x.PathGetDirectoryName(It.IsAny<string>()))
+                .Returns<string>(p => {
+                    if (string.IsNullOrEmpty(p)) return null;
+                    var lastSlash = p.LastIndexOf('\\');
+                    return lastSlash > 0 ? p.Substring(0, lastSlash) : null;
+                });
+            fileSystem.Setup(x => x.PathGetFileName(It.IsAny<string>()))
+                .Returns<string>(p => {
+                    if (string.IsNullOrEmpty(p)) return p;
+                    var lastSlash = p.LastIndexOf('\\');
+                    return lastSlash >= 0 ? p.Substring(lastSlash + 1) : p;
+                });
+            
+            var command = new ExportToDirectoryCommand(dialogs.Object, fileSystem.Object);
+
+            command.Execute(root);
+
+            // Verify files were written
+            fileSystem.Verify(x => x.FileWriteAllBytes(It.IsAny<string>(), It.IsAny<byte[]>()), Times.Exactly(2));
+            dialogs.Verify(x => x.ShowDialogBox("2 files exported!", "Export"), Times.Once);
         }
     }
 }

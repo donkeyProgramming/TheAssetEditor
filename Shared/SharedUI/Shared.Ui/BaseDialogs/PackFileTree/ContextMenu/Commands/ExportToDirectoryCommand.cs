@@ -17,18 +17,21 @@ namespace Shared.Ui.BaseDialogs.PackFileTree.ContextMenu.Commands
             var folderDialogResult = standardDialogs.ShowSystemFolderBrowserDialog();
             if (folderDialogResult.Result && !string.IsNullOrEmpty(folderDialogResult.FolderPath))
             {
-                var nodeStartDir = fileSystemAccess.PathGetDirectoryName(selectedNode.GetFullPath());
+                // For root nodes, use empty string as base path; for others, use parent directory
+                var nodeStartDir = selectedNode.NodeType == NodeType.Root 
+                    ? "" 
+                    : fileSystemAccess.PathGetDirectoryName(selectedNode.GetFullPath());
                 var fileCounter = 0;
                 SaveSelfAndChildren(selectedNode, folderDialogResult.FolderPath, nodeStartDir, ref fileCounter);
                 standardDialogs.ShowDialogBox($"{fileCounter} files exported!", "Export");
             }
         }
 
-        void SaveSelfAndChildren(TreeNode node, string outputDirectory, string rootPath, ref int fileCounter)
+        void SaveSelfAndChildren(TreeNode node, string outputDirectory, string? rootPath, ref int fileCounter)
         {
-            if (node.NodeType == NodeType.Directory)
+            if (node.NodeType == NodeType.Directory || node.NodeType == NodeType.Root)
             {
-                foreach (var item in node.Children)
+                foreach (var item in node.BackingChildren)
                     SaveSelfAndChildren(item, outputDirectory, rootPath, ref fileCounter);
             }
             else
@@ -38,7 +41,8 @@ namespace Shared.Ui.BaseDialogs.PackFileTree.ContextMenu.Commands
                 var fileOutputPath = outputDirectory + nodePathWithoutRoot;
 
                 var fileOutputDir = fileSystemAccess.PathGetDirectoryName(fileOutputPath);
-                DirectoryHelper.EnsureCreated(fileOutputDir);
+                if (!string.IsNullOrEmpty(fileOutputDir))
+                    DirectoryHelper.EnsureCreated(fileOutputDir);
 
                 var packFile = node.Item;
                 var bytes = packFile.DataSource.ReadData();
