@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Windows;
+using CommunityToolkit.Diagnostics;
 
 // there is a bug in visual studio code generation. Having generated classes with
 // Overlapping names (Shared.Ui and Editors.Shared) causes compile errors as the code 
@@ -28,9 +29,10 @@ namespace WindowHandling
 
         private void AssetEdWindow_Deactivated(object? sender, EventArgs e)
         {
-            if (AlwaysOnTop)
+            if (AlwaysOnTop && sender != null)
             {
                 var window = (Window)sender;
+                Guard.IsNotNull(window, "window should not be null");
                 window.Topmost = true;
             }
         }

@@ -385,7 +385,7 @@ namespace Shared.Ui.BaseDialogs.PackFileTree
             }
         }
 
-        public bool AllowDrop(TreeNode node, TreeNode targetNode = null)
+        public bool AllowDrop(TreeNode node, TreeNode? targetNode = null)
         {
             if (node.Item == null)
                 return false;
@@ -402,7 +402,7 @@ namespace Shared.Ui.BaseDialogs.PackFileTree
             return true;
         }
 
-        public bool Drop(TreeNode node, TreeNode targeNode)
+        public bool Drop(TreeNode node, TreeNode? targeNode)
         {
             var container = node.FileOwner;
             var draggedFile = node.Item;

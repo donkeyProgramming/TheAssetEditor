@@ -1,8 +1,4 @@
-﻿// Licensed to the .NET Foundation under one or more agreements.
-// The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
-
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
 using Shared.Core.Misc;
 
 namespace Shared.Ui.Common.MenuSystem
@@ -12,7 +8,7 @@ namespace Shared.Ui.Common.MenuSystem
         public NotifyAttr<string> NameAttribute { get; set; } = new NotifyAttr<string>("");
         public ObservableCollection<ToolbarItem> Children { get; set; } = new ObservableCollection<ToolbarItem>();
 
-        string _name;
+        string _name = "";
         public string Name
         {
             get => _name;

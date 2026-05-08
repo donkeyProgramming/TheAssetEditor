@@ -17,7 +17,8 @@ namespace Shared.Core.Misc
             {
                 return token.ToObject<List<T>>();
             }
-            return new List<T> { token.ToObject<T>() };
+            var tokenT = token.ToObject<T>();
+            return new List<T> { tokenT };
         }
 
         public override bool CanWrite
