@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Windows.Controls;
+using CommunityToolkit.Diagnostics;
 
 namespace Shared.Ui.Common
 {
@@ -8,6 +9,7 @@ namespace Shared.Ui.Common
         protected override object PrepareCellForEdit(System.Windows.FrameworkElement editingElement, System.Windows.RoutedEventArgs editingEventArgs)
         {
             var edit = editingElement as TextBox;
+            Guard.IsNotNull(edit, "Casting to textbox returned null");
             edit.PreviewTextInput += OnPreviewTextInput;
 
             return base.PrepareCellForEdit(editingElement, editingEventArgs);

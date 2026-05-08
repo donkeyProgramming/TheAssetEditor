@@ -9,6 +9,11 @@ namespace Shared.Ui.BaseDialogs.PackFileTree.ContextMenu.Commands
     public class CopyToEditablePackCommand(IPackFileService packFileService, IStandardDialogs standardDialogs) : IContextMenuCommand
     {
         public string GetDisplayName(TreeNode node) => "Copy to editable pack";
+        public bool ShouldAdd(TreeNode node)
+        {
+            var editablePack = packFileService.GetEditablePack();
+            return editablePack != null && editablePack != node.FileOwner;
+        }
         public bool IsEnabled(TreeNode node) => true;
 
         public void Execute(TreeNode _selectedNode)
@@ -27,6 +32,4 @@ namespace Shared.Ui.BaseDialogs.PackFileTree.ContextMenu.Commands
             }
         }
     }
-
-  
 }

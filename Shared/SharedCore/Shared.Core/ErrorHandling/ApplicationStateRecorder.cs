@@ -4,7 +4,7 @@ namespace Shared.Core.ErrorHandling
 {
     public static class ApplicationStateRecorder
     {
-        static Stopwatch s_applicationTimer;
+        static Stopwatch? s_applicationTimer;
         static uint s_numberOfEditorsOpened = 0;
 
         public static void Initialize()
@@ -18,7 +18,7 @@ namespace Shared.Core.ErrorHandling
             s_numberOfEditorsOpened++;
         }
 
-        public static double GetApplicationRunTimeInSec() => s_applicationTimer.Elapsed.TotalSeconds;
+        public static double GetApplicationRunTimeInSec() => s_applicationTimer?.Elapsed.TotalSeconds ?? 0;
         public static uint GetNumberOfOpenedEditors() => s_numberOfEditorsOpened;
     }
 }

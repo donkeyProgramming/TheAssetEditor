@@ -1,7 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using Shared.Core.Events;
+using Microsoft.Extensions.DependencyInjection;
 using Shared.Ui.BaseDialogs.PackFileTree.ContextMenu.Commands;
 
 namespace Shared.Ui.BaseDialogs.PackFileTree.ContextMenu
@@ -14,77 +15,156 @@ namespace Shared.Ui.BaseDialogs.PackFileTree.ContextMenu
         SceneExplorer
     }
 
-    public class ContextMenuFactory
+    public enum ContextMenuCluster
     {
-        private readonly IEnumerable<IContextMenuBuilder> _builders;
-
-        public ContextMenuFactory(IEnumerable<IContextMenuBuilder> builders)
-        {
-            _builders = builders;
-        }
-
-        public IContextMenuBuilder GetContextMenu(ContextMenuType menuType) => _builders.First(x => x.Type == menuType);
+        PackFileOperation,
+        FolderOperation,
+        FileOperation,
+        Export,
+        Reports,
+        Misc
     }
 
-    public interface IContextMenuBuilder
+    public interface IPackFileContextMenuRegistration
     {
-        ContextMenuType Type { get; }
-        public ObservableCollection<ContextMenuItem2> Build(TreeNode? node);
+        void Register(PackFileContextMenuRegistry registry);
     }
 
-    public abstract class ContextMenuBuilder : IContextMenuBuilder
+    public sealed class PackFileContextMenuItemRegistration
     {
-        private readonly IUiCommandFactory _commandFactory;
+        public required Type CommandType { get; init; }
+        public required ContextMenuType ContextMenuType { get; init; }
+        public required ContextMenuCluster Cluster { get; init; }
+        public required string Path { get; init; }
+        public required int Priority { get; init; }
+    }
 
-        public ContextMenuType Type { get; private set; }
+    public class PackFileContextMenuRegistry
+    {
+        private readonly List<PackFileContextMenuItemRegistration> _items = [];
 
-        public ContextMenuBuilder(ContextMenuType type, IUiCommandFactory commandFactory)
+        public void RegisterPackFileContextMenuItem<TCommand>(ContextMenuType contextMenuType, string path, int priority, ContextMenuCluster cluster)
+            where TCommand : IContextMenuCommand
         {
-            Type = type;
-            _commandFactory = commandFactory;
+            RegisterPackFileContextMenuItem(typeof(TCommand), contextMenuType, path, priority, cluster);
         }
 
-        protected abstract void Create(ContextMenuItem2 rootNode, TreeNode selectedNode);
-
-        public ObservableCollection<ContextMenuItem2> Build(TreeNode? node)
+        public void RegisterPackFileContextMenuItem(Type commandType, ContextMenuType contextMenuType, string path, int priority, ContextMenuCluster cluster)
         {
-            var output = new ObservableCollection<ContextMenuItem2>();
+            if (!typeof(IContextMenuCommand).IsAssignableFrom(commandType))
+                throw new System.ArgumentException($"{commandType.Name} must implement {nameof(IContextMenuCommand)}");
+
+            _items.Add(new PackFileContextMenuItemRegistration
+            {
+                CommandType = commandType,
+                ContextMenuType = contextMenuType,
+                Cluster = cluster,
+                Path = path ?? string.Empty,
+                Priority = priority
+            });
+        }
+
+        public IReadOnlyList<PackFileContextMenuItemRegistration> Get(ContextMenuType contextMenuType)
+        {
+            return _items
+                .Where(x => x.ContextMenuType == contextMenuType)
+                .OrderBy(x => x.Cluster)
+                .ThenBy(x => x.Priority)
+                .ThenBy(x => x.Path)
+                .ThenBy(x => x.CommandType.FullName)
+                .ToList();
+        }
+    }
+
+    public class PackFileContextMenuComposer
+    {
+        private readonly PackFileContextMenuRegistry _registry;
+        private readonly IServiceProvider _serviceProvider;
+
+        public PackFileContextMenuComposer(PackFileContextMenuRegistry registry, IServiceProvider serviceProvider)
+        {
+            _registry = registry;
+            _serviceProvider = serviceProvider;
+        }
+
+        public ObservableCollection<ContextMenuItem> Build(ContextMenuType contextMenuType, TreeNode? node)
+        {
+            var output = new ObservableCollection<ContextMenuItem>();
             if (node == null)
                 return output;
 
-            var placeholderRoot = new ContextMenuItem2("Root", null);
-            Create(placeholderRoot, node);
+            var items = _registry.Get(contextMenuType);
+            var hasClusterContent = false;
 
-            foreach (var item in placeholderRoot.ContextMenu)
-                output.Add(item);
+            foreach (var cluster in System.Enum.GetValues<ContextMenuCluster>())
+            {
+                var clusterRoot = new ContextMenuItem("Root", null);
+                var pathToMenuLookup = new Dictionary<string, ContextMenuItem>(System.StringComparer.OrdinalIgnoreCase);
+
+                foreach (var item in items.Where(x => x.Cluster == cluster))
+                {
+                    var command = (IContextMenuCommand)_serviceProvider.GetRequiredService(item.CommandType);
+                    if (!command.ShouldAdd(node) || !command.IsEnabled(node))
+                        continue;
+
+                    var parent = GetOrCreateMenuPath(item.Path, clusterRoot, pathToMenuLookup);
+                    parent.ContextMenu.Add(new ContextMenuItem(command.GetDisplayName(node), () => command.Execute(node)));
+                }
+
+                RemoveEmptySubmenus(clusterRoot);
+                if (clusterRoot.ContextMenu.Count == 0)
+                    continue;
+
+                if (hasClusterContent)
+                    output.Add(null);
+
+                foreach (var menuItem in clusterRoot.ContextMenu)
+                    output.Add(menuItem);
+
+                hasClusterContent = true;
+            }
 
             return output;
         }
 
-
-        protected void Add<T>(TreeNode? node, ContextMenuItem2 parent) where T : IContextMenuCommand
+        private static ContextMenuItem GetOrCreateMenuPath(string path, ContextMenuItem root, Dictionary<string, ContextMenuItem> pathToMenuLookup)
         {
-            var instance = _commandFactory.Create<T>();
+            if (string.IsNullOrWhiteSpace(path))
+                return root;
 
-            if (instance.IsEnabled(node) == false)
-                return;
+            var current = root;
+            var runningPath = string.Empty;
+            foreach (var pathSegment in path.Split('/').Where(x => !string.IsNullOrWhiteSpace(x)))
+            {
+                runningPath = string.IsNullOrEmpty(runningPath) ? pathSegment : $"{runningPath}/{pathSegment}";
 
-            var name = instance.GetDisplayName(node);
-            var item = new ContextMenuItem2(name, () => instance.Execute(node));
-            parent.ContextMenu.Add(item);
+                if (pathToMenuLookup.TryGetValue(runningPath, out var menu) == false)
+                {
+                    menu = new ContextMenuItem(pathSegment, null);
+                    current.ContextMenu.Add(menu);
+                    pathToMenuLookup[runningPath] = menu;
+                }
+
+                current = menu;
+            }
+
+            return current;
         }
 
-        protected void AddSeperator(ContextMenuItem2 parent)
+        private static void RemoveEmptySubmenus(ContextMenuItem root)
         {
-            parent.ContextMenu.Add(null);
-        }
+            for (var i = root.ContextMenu.Count - 1; i >= 0; i--)
+            {
+                var menuItem = root.ContextMenu[i];
+                if (menuItem == null)
+                    continue;
 
-        public ContextMenuItem2 AddChildMenu(string name, ContextMenuItem2 parent)
-        {
-            var newItem = new ContextMenuItem2(name, null);
-            parent.ContextMenu.Add(newItem);
-            return newItem;
+                if (menuItem.ContextMenu.Count > 0)
+                    RemoveEmptySubmenus(menuItem);
 
+                if (menuItem.Command == null && menuItem.ContextMenu.Count == 0)
+                    root.ContextMenu.RemoveAt(i);
+            }
         }
     }
 }

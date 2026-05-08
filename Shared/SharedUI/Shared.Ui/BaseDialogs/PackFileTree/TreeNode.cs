@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
@@ -15,22 +15,24 @@ namespace Shared.Ui.BaseDialogs.PackFileTree
         File
     }
 
-    /// <summary>
-    /// Represents the materialized UI node shown in the pack-file tree.
-    /// This class is optimized for WPF binding/state (expanded, visible, selected, unsaved changes)
-    /// and can be created lazily from a <see cref="TreeNodeSource"/> when branches are expanded or queried.
-    /// </summary>
     public partial class TreeNode : ObservableObject
     {
-        private readonly TreeNodeSource? _source;
-        private readonly Func<TreeNodeSource, TreeNode?, TreeNode>? _nodeFactory;
-        private readonly Func<bool>? _isFilterActive;
+        private Func<TreeNode, bool>? _childLoader;
+        private bool _childrenLoaded;
         private bool _isExpandedByFilter;
         private readonly bool _isPlaceholder;
+        private readonly Func<bool>? _isFilterActive;
+        private Func<TreeNode, bool>? _childVisibilityPredicate;
 
         public IPackFileContainer FileOwner { get; private set; }
         public PackFile? Item { get; set; }
         public TreeNode? Parent { get; set; }
+        public List<TreeNode> BackingChildren { get; } = [];
+
+        public bool HasChildren => NodeType == NodeType.Directory
+            ? (BackingChildren.Count > 0 || !_childrenLoaded)
+            : (BackingChildren.Count > 0 || (!_childrenLoaded && _childLoader != null && NodeType != NodeType.File));
+        public bool ChildrenLoaded => _childrenLoaded;
 
         [ObservableProperty] public partial ObservableCollection<TreeNode> Children { get; set; } = [];
         [ObservableProperty] public partial bool UnsavedChanged { get; set; }
@@ -40,36 +42,34 @@ namespace Shared.Ui.BaseDialogs.PackFileTree
         [ObservableProperty] public partial bool IsNodeExpanded { get; set; } = false;
         [ObservableProperty] public partial NodeType NodeType { get; private set; }
 
-        internal TreeNodeSource? Source => _source;
         internal bool HasMaterializedChildren => Children.Any(x => x._isPlaceholder == false);
 
-        public TreeNode(string name, NodeType type, IPackFileContainer ower, TreeNode? parent, PackFile? packFile = null)
+        public TreeNode(string name, NodeType type, IPackFileContainer owner, TreeNode? parent, PackFile? packFile = null)
         {
             Name = name;
             Item = packFile;
-            FileOwner = ower;
+            FileOwner = owner;
             Parent = parent;
             NodeType = type;
 
             if (string.IsNullOrWhiteSpace(name))
                 throw new Exception($"Packfile name or folder is empty '{GetFullPath()}', this is not allowed! Please report as a bug if it happens outside of packfile loading! If it happens while loading clean up the packfile in RPFM");
+
+            if (ShouldUsePlaceholder())
+                AddPlaceholderChild();
         }
 
-        internal TreeNode(TreeNodeSource source, TreeNode? parent, Func<TreeNodeSource, TreeNode?, TreeNode> nodeFactory, Func<bool> isFilterActive)
+        internal TreeNode(string name, NodeType type, IPackFileContainer owner, TreeNode? parent, Func<bool> isFilterActive, PackFile? packFile = null)
         {
-            _source = source;
-            _nodeFactory = nodeFactory;
             _isFilterActive = isFilterActive;
-
-            Name = source.Name;
-            Item = source.Item;
-            FileOwner = source.FileOwner;
+            Name = name;
+            Item = packFile;
+            FileOwner = owner;
             Parent = parent;
-            NodeType = source.NodeType;
-            UnsavedChanged = source.UnsavedChanged;
-            IsVisible = source.IsVisible;
+            NodeType = type;
 
-            source.MaterializedNode = this;
+            if (string.IsNullOrWhiteSpace(name))
+                throw new Exception($"Packfile name or folder is empty '{GetFullPath()}', this is not allowed! Please report as a bug if it happens outside of packfile loading! If it happens while loading clean up the packfile in RPFM");
 
             if (ShouldUsePlaceholder())
                 AddPlaceholderChild();
@@ -85,11 +85,55 @@ namespace Shared.Ui.BaseDialogs.PackFileTree
             IsVisible = false;
         }
 
+        public void SetChildLoader(Func<TreeNode, bool> childLoader)
+        {
+            _childLoader = childLoader;
+        }
+
+        public void SetChildVisibilityPredicate(Func<TreeNode, bool>? predicate)
+        {
+            _childVisibilityPredicate = predicate;
+        }
+
+        public void MarkChildrenLoaded()
+        {
+            _childrenLoaded = true;
+        }
+
+        public void ResetChildrenLoaded()
+        {
+            _childrenLoaded = false;
+        }
+
+        public void EnsureChildrenPopulated()
+        {
+            if (_childrenLoaded || _childLoader == null || NodeType == NodeType.File)
+                return;
+
+            _childrenLoaded = _childLoader(this);
+        }
+
+        public void EnsureFullyPopulated()
+        {
+            EnsureChildrenPopulated();
+            foreach (var child in BackingChildren)
+                child.EnsureFullyPopulated();
+        }
+
+        public void AddChild(TreeNode child)
+        {
+            child.Parent = this;
+            BackingChildren.Add(child);
+        }
+
+        public void RemoveChild(TreeNode child)
+        {
+            BackingChildren.Remove(child);
+            child.Parent = null;
+        }
+
         public string GetFullPath()
         {
-            if (_source != null)
-                return _source.GetFullPath();
-
             if (NodeType == NodeType.Root)
                 return "";
 
@@ -111,38 +155,45 @@ namespace Shared.Ui.BaseDialogs.PackFileTree
 
         public List<TreeNode> GetAllChildFileNodes()
         {
-            if (_source != null)
+            return EnumerateFileNodesDepthFirst().ToList();
+        }
+
+        public IEnumerable<TreeNode> EnumerateAllNodesDepthFirst()
+        {
+            var stack = new Stack<TreeNode>();
+            stack.Push(this);
+
+            while (stack.Count > 0)
             {
-                return _source.EnumerateFileNodesDepthFirst()
-                    .Select(sourceNode => sourceNode.MaterializedNode ?? _nodeFactory!(sourceNode, null))
-                    .ToList();
+                var current = stack.Pop();
+                current.EnsureChildrenPopulated();
+                yield return current;
+
+                for (var i = current.BackingChildren.Count - 1; i >= 0; i--)
+                    stack.Push(current.BackingChildren[i]);
             }
+        }
 
-            var output = new List<TreeNode>();
-
-            var nodes = new Stack<TreeNode>(new[] { this });
-            while (nodes.Any())
+        public IEnumerable<TreeNode> EnumerateFileNodesDepthFirst()
+        {
+            foreach (var node in EnumerateAllNodesDepthFirst())
             {
-                var node = nodes.Pop();
                 if (node.NodeType == NodeType.File)
-                    output.Add(node);
-
-                foreach (var n in node.Children)
-                    nodes.Push(n);
+                    yield return node;
             }
-            return output;
         }
 
         public void RemoveSelf()
         {
-            if (_source != null)
-                _source.MaterializedNode = null;
-
             foreach (var child in Children)
                 child.RemoveSelf();
 
             Children.Clear();
             Parent = null;
+
+            // Clear closures and delegates to break reference cycles
+            _childLoader = null;
+            _childVisibilityPredicate = null;
         }
 
         public void ForeachNode(Action<TreeNode> func)
@@ -166,7 +217,7 @@ namespace Shared.Ui.BaseDialogs.PackFileTree
                 else
                     IsNodeExpanded = true;
 
-                EnsureChildrenLoaded();
+                MaterializeChildren();
                 if (includeChildren)
                 {
                     foreach (var child in Children)
@@ -182,46 +233,26 @@ namespace Shared.Ui.BaseDialogs.PackFileTree
 
         public TreeNode AddDirectoryChild(string name)
         {
-            var newNode = new TreeNode(name, NodeType.Directory, FileOwner, this);
-
-            if (_source == null)
-            {
-                Children.Add(newNode);
-                return newNode;
-            }
-
-            _source.EnsureChildrenPopulated();
-            var sourceNode = new TreeNodeSource(name, NodeType.Directory, FileOwner, _source);
-            sourceNode.MarkChildrenLoaded();
-            _source.AddChild(sourceNode);
+            EnsureChildrenPopulated();
+            var newNode = new TreeNode(name, NodeType.Directory, FileOwner, this, _isFilterActive ?? (() => false));
+            newNode.MarkChildrenLoaded();
+            InsertChildSorted(this, newNode);
 
             if (HasMaterializedChildren || IsNodeExpanded || (_isFilterActive?.Invoke() ?? false))
-                EnsureChildrenLoaded();
+                MaterializeChildren();
 
             if (Children.Count == 1 && Children[0]._isPlaceholder)
-                EnsureChildrenLoaded();
+                MaterializeChildren();
 
-            return sourceNode.MaterializedNode ?? newNode;
-        }
-
-        internal void SyncFromSource()
-        {
-            if (_source == null)
-                return;
-
-            Name = _source.Name;
-            UnsavedChanged = _source.UnsavedChanged;
-            IsVisible = _source.IsVisible;
+            return newNode;
         }
 
         internal void RefreshLoadedBranch()
         {
-            SyncFromSource();
-
             if (!HasMaterializedChildren)
                 return;
 
-            EnsureChildrenLoaded();
+            MaterializeChildren();
             foreach (var child in Children)
             {
                 if (child._isPlaceholder)
@@ -231,52 +262,51 @@ namespace Shared.Ui.BaseDialogs.PackFileTree
             }
         }
 
-        internal void EnsureChildrenLoaded()
+        internal void MaterializeChildren()
         {
-            if (_source == null || _nodeFactory == null)
+            EnsureChildrenPopulated();
+
+            if (!HasChildren)
                 return;
 
-            _source.EnsureChildrenPopulated();
+            // Propagate the visibility predicate to newly loaded children
+            if (_childVisibilityPredicate != null)
+            {
+                foreach (var child in BackingChildren)
+                {
+                    if (child._childVisibilityPredicate != _childVisibilityPredicate)
+                        child._childVisibilityPredicate = _childVisibilityPredicate;
+                }
+            }
 
-            if (!_source.HasChildren)
-                return;
-
-            var existingChildren = Children
-                .Where(x => x._isPlaceholder == false && x._source != null)
-                .ToDictionary(x => x._source!, x => x);
-
-            var childSources = _source.Children
+            var childNodes = BackingChildren
                 .Where(ShouldMaterializeChild)
                 .ToList();
 
-            foreach (var removedChild in Children.Where(x => x._isPlaceholder == false && x._source != null && childSources.Contains(x._source) == false).ToList())
-            {
-                removedChild.RemoveSelf();
-            }
-
             Children.Clear();
-            foreach (var childSource in childSources)
+            foreach (var child in childNodes)
             {
-                if (!existingChildren.TryGetValue(childSource, out var childNode))
-                    childNode = _nodeFactory(childSource, this);
+                child.Parent = this;
+                Children.Add(child);
 
-                childNode.Parent = this;
-                childNode.SyncFromSource();
-                Children.Add(childNode);
+                if (child.IsNodeExpanded && !child.HasMaterializedChildren)
+                    child.MaterializeChildren();
             }
 
             if (Children.Count == 0 && ShouldUsePlaceholder())
                 AddPlaceholderChild();
         }
 
+        internal void EnsureChildrenLoaded()
+        {
+            MaterializeChildren();
+        }
+
         internal void NormalizeLazyState()
         {
-            if (_source == null)
-                return;
-
             if (IsNodeExpanded)
             {
-                EnsureChildrenLoaded();
+                MaterializeChildren();
                 foreach (var child in Children)
                 {
                     if (child._isPlaceholder)
@@ -331,41 +361,22 @@ namespace Shared.Ui.BaseDialogs.PackFileTree
 
         partial void OnIsNodeExpandedChanged(bool value)
         {
-            if (_source == null)
-                return;
-
             if (value)
-                EnsureChildrenLoaded();
+                MaterializeChildren();
             else
                 UnloadChildren();
 
             LogLoadedNodeCount(value);
         }
 
-        partial void OnNameChanged(string value)
-        {
-            if (_source != null && !_isPlaceholder)
-                _source.Name = value;
-        }
-
-        partial void OnUnsavedChangedChanged(bool value)
-        {
-            if (_source != null && !_isPlaceholder)
-                _source.UnsavedChanged = value;
-        }
-
-        partial void OnIsVisibleChanged(bool value)
-        {
-            if (_source != null && !_isPlaceholder)
-                _source.IsVisible = value;
-        }
-
         private void UnloadChildren()
         {
-            if (_source == null)
-                return;
-
+            // Recursively unload all children to break closure cycles
             foreach (var child in Children)
+                child.RemoveSelf();
+
+            // Also unload any backing children that weren't materialized
+            foreach (var child in BackingChildren.Where(c => !Children.Contains(c)))
                 child.RemoveSelf();
 
             Children.Clear();
@@ -374,17 +385,20 @@ namespace Shared.Ui.BaseDialogs.PackFileTree
                 AddPlaceholderChild();
         }
 
-        private bool ShouldMaterializeChild(TreeNodeSource childSource)
+        private bool ShouldMaterializeChild(TreeNode child)
         {
             if (_isFilterActive?.Invoke() != true)
-                return true;
+                return _childVisibilityPredicate?.Invoke(child) ?? true;
 
-            return childSource.IsVisible || childSource.MaterializedNode != null;
+            if (_childVisibilityPredicate != null && !_childVisibilityPredicate(child))
+                return false;
+
+            return child.IsVisible;
         }
 
         private bool ShouldUsePlaceholder()
         {
-            return _source != null && _source.HasChildren && !IsNodeExpanded && (_isFilterActive?.Invoke() != true);
+            return HasChildren && !IsNodeExpanded && (_isFilterActive?.Invoke() != true);
         }
 
         private void AddPlaceholderChild()
@@ -419,6 +433,22 @@ namespace Shared.Ui.BaseDialogs.PackFileTree
             var loadedNodes = root.CountLoadedNodes();
             var action = expanded ? "expanded" : "collapsed";
             Console.WriteLine($"[PackFileTree] Node '{Name}' {action}. Loaded nodes: {loadedNodes}");
+        }
+
+        private static readonly Comparison<TreeNode> ChildComparison = (left, right) =>
+        {
+            var nodeTypeComparison = left.NodeType.CompareTo(right.NodeType);
+            if (nodeTypeComparison != 0)
+                return nodeTypeComparison;
+
+            return StringComparer.CurrentCultureIgnoreCase.Compare(left.Name, right.Name);
+        };
+
+        private static void InsertChildSorted(TreeNode parent, TreeNode child)
+        {
+            parent.EnsureChildrenPopulated();
+            parent.AddChild(child);
+            parent.BackingChildren.Sort(ChildComparison);
         }
     }
 }

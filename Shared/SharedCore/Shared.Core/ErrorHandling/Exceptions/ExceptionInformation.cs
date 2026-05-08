@@ -2,7 +2,7 @@
 
 namespace Shared.Core.ErrorHandling.Exceptions
 {
-    public record ExceptionPackFileContainerInfo(bool IsMainEditable, bool IsCa, string Name, string SystemPath);
+    public record ExceptionPackFileContainerInfo(bool IsMainEditable, bool IsCa, string Name, string? SystemPath);
     public record ExceptionInstance(string Message, string[] StackTrace);
     public record GraphicsResourceScopeInfo(string ScopeOwner, bool IsCurrentScope, int ResourceCount, List<string> Resources);
 

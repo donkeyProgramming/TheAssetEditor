@@ -6,6 +6,7 @@ namespace Shared.Ui.BaseDialogs.PackFileTree.ContextMenu.Commands
     public class DeleteNodeCommand(IPackFileService packFileService, IStandardDialogs standardDialogs) : IContextMenuCommand
     {
         public string GetDisplayName(TreeNode node) => "Delete";
+        public bool ShouldAdd(TreeNode node) => (node.NodeType == NodeType.File || node.NodeType == NodeType.Directory) && !node.FileOwner.IsCaPackFile;
         public bool IsEnabled(TreeNode node) => true;
 
         public void Execute(TreeNode _selectedNode)

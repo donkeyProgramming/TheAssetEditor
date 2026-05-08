@@ -9,10 +9,10 @@ namespace Editors.AnimationVisualEditors.CampaignAnimationCreator.DevConfig
 {
     internal class CampaignAnimation_Damsel : IDeveloperConfiguration
     {
-        private readonly IEditorCreator _editorCreator;
+        private readonly IEditorManager _editorCreator;
         private readonly IPackFileService _packFileService;
 
-        public CampaignAnimation_Damsel(IEditorCreator editorCreator, IPackFileService packFileService)
+        public CampaignAnimation_Damsel(IEditorManager editorCreator, IPackFileService packFileService)
         {
             _editorCreator = editorCreator;
             _packFileService = packFileService;

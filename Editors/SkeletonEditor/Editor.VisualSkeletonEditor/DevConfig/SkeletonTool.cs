@@ -9,11 +9,11 @@ namespace Editor.VisualSkeletonEditor.DevConfig
 {
     internal class SkeletonTool : IDeveloperConfiguration
     {
-        private readonly IEditorCreator _editorCreator;
+        private readonly IEditorManager _editorCreator;
         private readonly IPackFileContainerLoader _packFileContainerLoader;
         private readonly IPackFileService _packFileService;
 
-        public SkeletonTool(IEditorCreator editorCreator, IPackFileContainerLoader packFileContainerLoader, IPackFileService packFileService)
+        public SkeletonTool(IEditorManager editorCreator, IPackFileContainerLoader packFileContainerLoader, IPackFileService packFileService)
         {
             _editorCreator = editorCreator;
             _packFileContainerLoader = packFileContainerLoader;

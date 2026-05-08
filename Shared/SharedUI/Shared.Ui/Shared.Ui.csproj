@@ -20,6 +20,12 @@
   </ItemGroup>
 
   <ItemGroup>
+    <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
+      <_Parameter1>Shared.UiTest</_Parameter1>
+    </AssemblyAttribute>
+  </ItemGroup>
+
+  <ItemGroup>
     <Compile Update="BaseDialogs\AeAttribute2.xaml.cs">
       <SubType>Code</SubType>
     </Compile>

@@ -19,7 +19,6 @@ namespace AssetEditor
         {
             serviceCollection.AddScoped<MainWindow>();
             serviceCollection.AddScoped<MainViewModel>();
-            serviceCollection.AddSingleton<IEditorCreator>( x=> x.GetRequiredService<IEditorManager>());
             serviceCollection.AddSingleton<IEditorManager, EditorManager>();
 
             serviceCollection.AddTransient<OpenGamePackCommand>();

@@ -14,11 +14,7 @@ namespace Shared.Core.Settings
 
     public class ApplicationSettings
     {
-        public class GamePathPair
-        {
-            public GameTypeEnum Game { get; set; }
-            public string Path { get; set; }
-        }
+        public record GamePathPair(GameTypeEnum Game, string Path);
 
         public ObservableCollection<string> RecentPackFilePaths { get; set; } = [];
         public ThemeType Theme { get; set; } = ThemeType.DarkTheme;
@@ -30,7 +26,7 @@ namespace Shared.Core.Settings
         public bool ShowCAWemFiles { get; set; } = false;
         public bool IsFirstTimeStartingApplication { get; set; } = true;
         public bool IsDeveloperRun { get; set; } = false;
-        public string WwisePath { get; set; }
+        public string WwisePath { get; set; } = string.Empty;
         public bool OnlyLoadLod0ForReferenceMeshes { get; set; } = true;
         public int VisualEditorsGridSize { get; set; } = 10;
         public Vector3 VertexSelectionColour { get; set; } = new Vector3(1.0f, 0.47f, 0.0f);
@@ -39,7 +35,6 @@ namespace Shared.Core.Settings
 
         public ApplicationSettings()
         {
-
             // TODO: Need a way to get the right wwise path according to the game or instead just have several settings for the wwise CLI according tot he version
             var wwiseRoot = Environment.GetEnvironmentVariable("WWISEROOT") ?? "";
             if (!string.IsNullOrEmpty(wwiseRoot))

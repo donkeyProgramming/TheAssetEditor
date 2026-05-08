@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Windows.Forms;
 using Serilog;
 using Shared.Core.ErrorHandling;
 using Shared.Core.PackFiles;
@@ -16,6 +15,7 @@ namespace Shared.Ui.BaseDialogs.PackFileTree.ContextMenu.Commands
     {
         private readonly ILogger _logger = Logging.Create<SavePackFileContainerCommand>();
         public string GetDisplayName(TreeNode node) => "Save";
+        public bool ShouldAdd(TreeNode node) => node.NodeType == NodeType.Root && !node.FileOwner.IsCaPackFile;
         public bool IsEnabled(TreeNode node) => true;
 
         public void Execute(TreeNode _selectedNode)
@@ -23,16 +23,13 @@ namespace Shared.Ui.BaseDialogs.PackFileTree.ContextMenu.Commands
             var systemPath = _selectedNode.FileOwner.SystemFilePath;
             if (string.IsNullOrWhiteSpace(systemPath))
             {
-                var saveFileDialog = new SaveFileDialog();
-                saveFileDialog.FileName = _selectedNode.FileOwner.Name;
-                saveFileDialog.Filter = "PackFile | *.pack";
-                saveFileDialog.DefaultExt = "pack";
-                if (saveFileDialog.ShowDialog() != DialogResult.OK)
+                var saveDialogResult = standardDialogs.ShowSystemSaveFileDialog(_selectedNode.FileOwner.Name, "PackFile | *.pack", "pack");
+                if (!saveDialogResult.Result || string.IsNullOrEmpty(saveDialogResult.FilePath))
                     return;
-                systemPath = saveFileDialog.FileName;
+                systemPath = saveDialogResult.FilePath;
             }
 
-            using (new WaitCursor())
+            using (standardDialogs.ShowWaitCursor())
             {
                 try
                 {
@@ -42,7 +39,7 @@ namespace Shared.Ui.BaseDialogs.PackFileTree.ContextMenu.Commands
                 catch (Exception e)
                 {
                     _logger.Here().Error(e, "Exception while saving");
-                    System.Windows.MessageBox.Show("Error saving:\n\n" + e.Message, "Error");
+                    standardDialogs.ShowDialogBox("Error saving:\n\n" + e.Message, "Error");
                 }
             }
         }
@@ -59,16 +56,13 @@ namespace Shared.Ui.BaseDialogs.PackFileTree.ContextMenu.Commands
             var systemPath = pack.SystemFilePath;
             if (string.IsNullOrWhiteSpace(systemPath))
             {
-                var saveFileDialog = new SaveFileDialog();
-                saveFileDialog.FileName = pack.Name;
-                saveFileDialog.Filter = "PackFile | *.pack";
-                saveFileDialog.DefaultExt = "pack";
-                if (saveFileDialog.ShowDialog() != DialogResult.OK)
+                var saveDialogResult = standardDialogs.ShowSystemSaveFileDialog(pack.Name, "PackFile | *.pack", "pack");
+                if (!saveDialogResult.Result || string.IsNullOrEmpty(saveDialogResult.FilePath))
                     return;
-                systemPath = saveFileDialog.FileName;
+                systemPath = saveDialogResult.FilePath;
             }
 
-            using (new WaitCursor())
+            using (standardDialogs.ShowWaitCursor())
             {
                 try
                 {
@@ -78,7 +72,7 @@ namespace Shared.Ui.BaseDialogs.PackFileTree.ContextMenu.Commands
                 catch (Exception e)
                 {
                     _logger.Here().Error(e, "Exception while saving");
-                    System.Windows.MessageBox.Show("Error saving:\n\n" + e.Message, "Error");
+                    standardDialogs.ShowDialogBox("Error saving:\n\n" + e.Message, "Error");
                 }
             }
         }

@@ -2,12 +2,14 @@
 using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
 using Shared.Core.PackFiles.Models.FileSources;
+using Shared.Core.Services;
 
 namespace Shared.Ui.BaseDialogs.PackFileTree.ContextMenu.Commands
 {
-    public class DuplicateFileCommand(IPackFileService packFileService) : IContextMenuCommand
+    public class DuplicateFileCommand(IPackFileService packFileService, IStandardDialogs standardDialogs) : IContextMenuCommand
     {
         public string GetDisplayName(TreeNode node) => "Duplicate";
+        public bool ShouldAdd(TreeNode node) => node.NodeType == NodeType.File && node.Item != null && !node.FileOwner.IsCaPackFile;
         public bool IsEnabled(TreeNode node) => true;
 
         public void Execute(TreeNode _selectedNode) => Execute(_selectedNode.Item);
@@ -28,11 +30,17 @@ namespace Shared.Ui.BaseDialogs.PackFileTree.ContextMenu.Commands
 
         private void ReadAndSave(string newName, PackFile item)
         {
+            var editablePack = packFileService.GetEditablePack();
+            if (editablePack == null)
+            {
+                standardDialogs.ShowDialogBox("No editable pack selected.");
+                return;
+            }
+
             var bytes = item.DataSource.ReadData();
             var packFile = new PackFile(newName, new MemorySource(bytes));
             var parentPath = packFileService.GetFullPath(item);
             var path = Path.GetDirectoryName(parentPath);
-            var editablePack = packFileService.GetEditablePack();
 
             var fileEntry = new NewPackFileEntry(path, packFile);
             packFileService.AddFilesToPack(editablePack, [fileEntry]);

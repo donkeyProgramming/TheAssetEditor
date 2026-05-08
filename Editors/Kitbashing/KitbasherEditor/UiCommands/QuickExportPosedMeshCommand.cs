@@ -13,9 +13,9 @@ using GameWorld.Core.Services.SceneSaving;
 using Shared.Core.Misc;
 using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
+using Editors.ImportExport.ContextMenu;
 using Shared.Ui.Common.MenuSystem;
 using Shared.GameFormats.RigidModel;
-using Shared.Ui.BaseDialogs.PackFileTree.ContextMenu.External; // <- added
 using MessageBox = System.Windows.MessageBox;
 
 namespace Editors.KitbasherEditor.UiCommands

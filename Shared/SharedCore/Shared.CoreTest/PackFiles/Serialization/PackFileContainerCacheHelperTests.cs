@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.Data.Sqlite;
+using Microsoft.EntityFrameworkCore;
 using Shared.Core.PackFiles.Models;
 using Shared.Core.PackFiles.Models.Containers;
 using Shared.Core.PackFiles.Models.FileSources;
@@ -11,6 +12,7 @@ namespace Shared.CoreTest.PackFiles.Serialization
     {
         private string _tempDir;
         private string _dbFilePath;
+        private List<SqliteConnection> _inMemoryKeepAliveConnections;
 
         [SetUp]
         public void Setup()
@@ -18,16 +20,37 @@ namespace Shared.CoreTest.PackFiles.Serialization
             _tempDir = Path.Combine(Path.GetTempPath(), "AssetEditorCacheTests_" + Guid.NewGuid().ToString("N"));
             Directory.CreateDirectory(_tempDir);
             _dbFilePath = Path.Combine(_tempDir, "test_cache.db");
+            _inMemoryKeepAliveConnections = [];
         }
 
         [TearDown]
         public void TearDown()
         {
+            foreach (var connection in _inMemoryKeepAliveConnections)
+                connection.Dispose();
+
             if (Directory.Exists(_tempDir))
                 Directory.Delete(_tempDir, true);
         }
 
         private DbContextOptions<CacheDbContext> CreateTestDbOptions()
+        {
+            var dbName = "CacheHelperTests_" + Guid.NewGuid().ToString("N");
+            var connectionString = new SqliteConnectionStringBuilder
+            {
+                DataSource = dbName,
+                Mode = SqliteOpenMode.Memory,
+                Cache = SqliteCacheMode.Shared
+            }.ToString();
+
+            var keepAliveConnection = new SqliteConnection(connectionString);
+            keepAliveConnection.Open();
+            _inMemoryKeepAliveConnections.Add(keepAliveConnection);
+
+            return PackFileContainerCacheHelper.CreateDbOptionsFromConnectionString(connectionString);
+        }
+
+        private DbContextOptions<CacheDbContext> CreateFileDbOptions()
         {
             return PackFileContainerCacheHelper.CreateDbOptions(_dbFilePath);
         }
@@ -247,7 +270,7 @@ namespace Shared.CoreTest.PackFiles.Serialization
             container.AddOrUpdateFile("test\\file.txt", new PackFile("file.txt",
                 new PackedFileSource(parent, 0, 100, false, false, CompressionFormat.None, 0)));
 
-            var dbOptions = CreateTestDbOptions();
+            var dbOptions = CreateFileDbOptions();
             PackFileContainerCacheHelper.SaveCache("fp_try", container, dbOptions);
 
             var result = PackFileContainerCacheHelper.TryLoadFromCache(_dbFilePath, "fp_try");
@@ -312,7 +335,7 @@ namespace Shared.CoreTest.PackFiles.Serialization
         public void SaveCache_OverwritesExistingCache()
         {
             var parent = new PackedFileSourceParent { FilePath = @"c:\game\pack.pack" };
-            var dbOptions = CreateTestDbOptions();
+            var dbOptions = CreateFileDbOptions();
 
             // Save first version
             var container1 = new PackFileContainer("Version1") { SystemFilePath = @"c:\game" };
@@ -347,10 +370,12 @@ namespace Shared.CoreTest.PackFiles.Serialization
             };
 
             var parent = new PackedFileSourceParent { FilePath = @"c:\game\pack.pack" };
-            container.AddOrUpdateFile("a\\b\\c\\file.txt", new PackFile("file.txt",
+            container.AddOrUpdateFile("a\\folder_marker.txt", new PackFile("folder_marker.txt",
                 new PackedFileSource(parent, 0, 10, false, false, CompressionFormat.None, 0)));
+            container.AddOrUpdateFile("a\\b\\c\\file.txt", new PackFile("file.txt",
+                new PackedFileSource(parent, 10, 10, false, false, CompressionFormat.None, 0)));
             container.AddOrUpdateFile("root_file.txt", new PackFile("root_file.txt",
-                new PackedFileSource(parent, 10, 20, false, false, CompressionFormat.None, 0)));
+                new PackedFileSource(parent, 20, 20, false, false, CompressionFormat.None, 0)));
 
             var dbOptions = CreateTestDbOptions();
             PackFileContainerCacheHelper.SaveCache("fp", container, dbOptions);
@@ -359,11 +384,11 @@ namespace Shared.CoreTest.PackFiles.Serialization
             var loaded = PackFileContainerCacheHelper.LoadContainerFromCache(dbOptions, "fp");
             Assert.That(loaded, Is.Not.Null);
 
-            var rootContent = loaded.GetDirectoryContent("");
+            var rootContent = PackFileServiceUtility.SplitDirectoryEntries(loaded, "");
             Assert.That(rootContent.Files.Any(f => f.FileName == "root_file.txt"), Is.True);
             Assert.That(rootContent.SubFolders, Does.Contain("a"));
 
-            var deepContent = loaded.GetDirectoryContent("a\\b\\c");
+            var deepContent = PackFileServiceUtility.SplitDirectoryEntries(loaded, "a\\b\\c");
             Assert.That(deepContent.Files.Any(f => f.FileName == "file.txt"), Is.True);
         }
 

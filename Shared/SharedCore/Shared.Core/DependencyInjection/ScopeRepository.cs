@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Reflection;
 using System.Text;
+using CommunityToolkit.Diagnostics;
 using Microsoft.Extensions.DependencyInjection;
 using Shared.Core.ErrorHandling;
 using Shared.Core.ToolCreation;
@@ -14,8 +15,8 @@ namespace Shared.Core.DependencyInjection
         IEditorInterface CreateScope(Type owner);
         void RemoveScope(IEditorInterface owner);
 
-        T GetRequiredServiceRootScope<T>();
-        T GetRequiredService<T>(IEditorInterface editorHandle);
+        T GetRequiredServiceRootScope<T>() where T : notnull;
+        T GetRequiredService<T>(IEditorInterface editorHandle) where T : notnull;
 
         void Print();
         IEditorInterface? GetEditorFromToken(ScopeToken token);
@@ -131,16 +132,22 @@ namespace Shared.Core.DependencyInjection
                 // Get resolved services
                 var serviceProviderType = provider.GetType();
                 var resolvedServicesProperty = serviceProviderType.GetProperty("ResolvedServices", BindingFlags.NonPublic | BindingFlags.Instance);
+
+                Guard.IsNotNull(resolvedServicesProperty, "Failed get property ResolvedServices");
                 var resolved = resolvedServicesProperty.GetValue(provider);
+                Guard.IsNotNull(resolved, "Failed to get value from provider");
                 var resolveList = CastToObjectDictionary(resolved);
+
 
                 stringBuilder.AppendLine($"\tResolvedServices[{resolveList.Count}]");
                 foreach (var service in resolveList)
                     stringBuilder.AppendLine($"\t\t{ service.Value.GetType().FullName}");
 
                 var disposablesServicesProperty = serviceProviderType.GetProperty("Disposables", BindingFlags.NonPublic | BindingFlags.Instance);
+                Guard.IsNotNull(disposablesServicesProperty, "Unable to find Disposables property on ServiceProvider");
                 var disposables = disposablesServicesProperty.GetValue(provider) as IList;
-                
+                Guard.IsNotNull(disposables, "Unable to cast Disposables to IList");
+
                 stringBuilder.AppendLine($"\tDisposables[{disposables.Count}]");
                 foreach (var service in disposables)
                     stringBuilder.AppendLine($"\t\t{service.GetType().FullName}");
@@ -167,7 +174,7 @@ namespace Shared.Core.DependencyInjection
             foreach (var key in dictionary.Keys)
             {
                 var value = dictionary[key];
-                objectDictionary[key] = value;
+                objectDictionary[key] = value!;
             }
 
             return objectDictionary;

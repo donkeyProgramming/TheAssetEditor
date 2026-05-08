@@ -26,17 +26,17 @@
             </Expander.Header>
 
             <DockPanel LastChildFill="False" Margin="0,2,0,0">
-                <basedialogs:AeAttribute DockPanel.Dock="Top" LabelText="{loc:Loc KitbashTool.TintView.PreviewCapability}" LabelWidth="{StaticResource labelWidth}"  ToolTipEnumValue="None">
+                <basedialogs:AeAttribute DockPanel.Dock="Top" LabelText="{loc:Loc KitbashTool.TintView.PreviewCapability}" LabelWidth="{StaticResource labelWidth}"  >
                     <CheckBox Margin="0,2,2,2" IsChecked="{Binding ApplyCapability, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
                 </basedialogs:AeAttribute>
 
-                <basedialogs:AeAttribute DockPanel.Dock="Top" LabelText="{loc:Loc KitbashTool.TintView.TintMask}" LabelWidth="{StaticResource labelWidth}"  ToolTipEnumValue="None">
+                <basedialogs:AeAttribute DockPanel.Dock="Top" LabelText="{loc:Loc KitbashTool.TintView.TintMask}" LabelWidth="{StaticResource labelWidth}" >
                     <DockPanel>
                         <mathviews:Vector4View DataContext="{Binding TintMask}"/>
                     </DockPanel>
                 </basedialogs:AeAttribute>
 
-                <basedialogs:AeAttribute DockPanel.Dock="Top" LabelText="{loc:Loc KitbashTool.TintView.TintColour}" LabelWidth="{StaticResource labelWidth}"  ToolTipEnumValue="None">
+                <basedialogs:AeAttribute DockPanel.Dock="Top" LabelText="{loc:Loc KitbashTool.TintView.TintColour}" LabelWidth="{StaticResource labelWidth}"  >
                     <DockPanel>
                         <colourpickerbutton:ColourPickerButtonView DataContext="{Binding TintColour}" HorizontalAlignment="Left" Width="20" Height="20"/>
                         <Label>{loc:Loc KitbashTool.TintView.Variation}</Label>
@@ -53,7 +53,7 @@
                     </DockPanel>
                 </basedialogs:AeAttribute>
 
-                <basedialogs:AeAttribute DockPanel.Dock="Top" LabelText="{loc:Loc KitbashTool.TintView.FactionColour3Mask}" LabelWidth="{StaticResource labelWidth}"  ToolTipEnumValue="None">
+                <basedialogs:AeAttribute DockPanel.Dock="Top" LabelText="{loc:Loc KitbashTool.TintView.FactionColour3Mask}" LabelWidth="{StaticResource labelWidth}"  >
                     <mathviews:Vector4View DataContext="{Binding FactionColour3Mask}"/>
                 </basedialogs:AeAttribute>
 

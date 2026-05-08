@@ -55,7 +55,13 @@ namespace Shared.Core.PackFiles.Models
 
         public List<string> DependantFiles { get; set; } = [];
 
-        public PFHeader() { }
+        public PFHeader(string strVersion, int type, uint referenceFileCount)
+        {
+            StrVersion = strVersion;
+            ByteMask = type;
+            ReferenceFileCount = referenceFileCount;
+            Buffer = DefaultTimeStamp;
+        }
 
         public PFHeader(string version, PackFileCAType type)
         {
