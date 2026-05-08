@@ -7,7 +7,7 @@ using Shared.GameFormats.RigidModel;
 using Shared.GameFormats.RigidModel.LodHeader;
 using Shared.GameFormats.RigidModel.MaterialHeaders;
 using Shared.Ui.BaseDialogs.PackFileTree;
-using Shared.Ui.BaseDialogs.PackFileTree.ContextMenu.Commands;
+using Shared.Ui.BaseDialogs.PackFileTree.ContextMenu.External;
 
 namespace Editors.Reports.Geometry
 {

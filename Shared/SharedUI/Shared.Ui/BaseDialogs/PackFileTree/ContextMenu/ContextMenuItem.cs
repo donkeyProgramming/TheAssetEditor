@@ -20,6 +20,4 @@ namespace Shared.Ui.BaseDialogs.PackFileTree.ContextMenu
 
         public override string ToString() => Name;
     }
-
-
 }

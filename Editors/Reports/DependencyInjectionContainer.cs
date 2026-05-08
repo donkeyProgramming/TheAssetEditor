@@ -6,7 +6,7 @@ using Editors.Reports.Files;
 using Editors.Reports.Geometry;
 using Microsoft.Extensions.DependencyInjection;
 using Shared.Core.DependencyInjection;
-using Shared.Ui.BaseDialogs.PackFileTree.ContextMenu.Commands;
+using Shared.Ui.BaseDialogs.PackFileTree.ContextMenu.External;
 
 namespace Editors.Reports
 {

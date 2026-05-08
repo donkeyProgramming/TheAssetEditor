@@ -1,9 +1,17 @@
 ﻿using Shared.Core.Events;
 using Shared.Core.PackFiles;
 using Shared.Ui.BaseDialogs.PackFileTree.ContextMenu.Commands;
+using Shared.Ui.BaseDialogs.PackFileTree.ContextMenu.External;
 
 namespace Shared.Ui.BaseDialogs.PackFileTree.ContextMenu
 {
+
+
+
+    
+
+
+
     public class MainApplicationContextMenuBuilder : ContextMenuBuilder
     {
         private readonly IPackFileService _packFileService;
@@ -68,7 +76,6 @@ namespace Shared.Ui.BaseDialogs.PackFileTree.ContextMenu
                 // Close
                 Add<ClosePackContainerFileCommand>(selectedNode, rootNode);
                 AddSeperator(rootNode);
-
 
                 if (!isCaPack && isCurrentEditable == false)
                     Add<SetAsEditablePackCommand>(selectedNode, rootNode);
