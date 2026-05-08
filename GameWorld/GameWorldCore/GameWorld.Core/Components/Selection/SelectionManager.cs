@@ -116,7 +116,7 @@ namespace GameWorld.Core.Components.Selection
 
         private void SelectionManager_SelectionChanged(ISelectionState state, bool sendEvent)
         {
-            _edgeDataDirty = true;
+            RefreshVertexSelectionCache(state);
             _eventHub.Publish(new SelectionChangedEvent { NewState = state });
         }
 
@@ -142,31 +142,12 @@ namespace GameWorld.Core.Components.Selection
                 _renderEngine.AddRenderItem(RenderBuckedId.Wireframe, new GeometryRenderItem(meshNode.Geometry, _wireframeEffect, meshNode.RenderMatrix));
             }
 
+            // We keep the dirty check here, as it can change when a mesh is selected, or if a mesh is modified while selected.
+            // This allows the edge quads to update in real time as vertices are moved, without needing to update the selection state.
             if (selectionState is VertexSelectionState selectionVertexState && selectionVertexState.RenderObject != null)
             {
                 var vertexObject = selectionVertexState.RenderObject as Rmv2MeshNode;
                 var geo = vertexObject.Geometry;
-
-                if (_cachedEdgeMesh != vertexObject)
-                {
-                    _cachedEdgeMesh = vertexObject;
-                    _cachedEdgeIndices = BuildEdgeIndexCache(geo);
-                    _edgeDataDirty = true;
-                    _sampleIdx0 = 0;
-                    _sampleIdx1 = geo.VertexCount() > 1 ? 1 : 0;
-                }
-
-                if (selectionVertexState.SelectedVertices.Count >= 2)
-                {
-                    _sampleIdx0 = selectionVertexState.SelectedVertices[0];
-                    _sampleIdx1 = selectionVertexState.SelectedVertices[1];
-                }
-                else if (selectionVertexState.SelectedVertices.Count == 1)
-                {
-                    _sampleIdx0 = selectionVertexState.SelectedVertices[0];
-                    _sampleIdx1 = _sampleIdx0 < geo.VertexCount() - 1 ? _sampleIdx0 + 1 : 0;
-                }
-
                 var vertexCount = geo.VertexCount();
                 if (vertexCount > 0)
                 {
@@ -202,8 +183,7 @@ namespace GameWorld.Core.Components.Selection
             }
             else
             {
-                _cachedEdgeMesh = null;
-                _edgeDataDirty = true;
+                ClearVertexSelectionCache();
             }
 
             if (selectionState is BoneSelectionState selectionBoneState && selectionBoneState.RenderObject != null)
@@ -331,6 +311,72 @@ namespace GameWorld.Core.Components.Selection
             _edgeQuadRenderItem.Edges = _edgeDataCache;
             _edgeQuadRenderItem.EdgeCount = edgeCount;
             _edgeQuadRenderItem.MarkDirty();
+        }
+
+        private void RefreshVertexSelectionCache(ISelectionState state)
+        {
+            if (state is not VertexSelectionState selectionVertexState || selectionVertexState.RenderObject is not Rmv2MeshNode vertexObject)
+            {
+                ClearVertexSelectionCache();
+                return;
+            }
+
+            var geo = vertexObject.Geometry;
+            if (_cachedEdgeMesh != vertexObject)
+            {
+                _cachedEdgeMesh = vertexObject;
+                _cachedEdgeIndices = BuildEdgeIndexCache(geo);
+            }
+
+            var vertexCount = geo.VertexCount();
+            SetSampleIndicesFromSelection(selectionVertexState.SelectedVertices, vertexCount);
+            _edgeDataDirty = true;
+
+            if (_edgeQuadRenderItem != null && _cachedEdgeIndices != null)
+            {
+                UpdateEdgeQuadData(vertexObject, selectionVertexState);
+                _edgeDataDirty = false;
+
+                if (vertexCount >= 2)
+                {
+                    _samplePos0 = geo.GetVertexById(_sampleIdx0);
+                    _samplePos1 = geo.GetVertexById(_sampleIdx1);
+                }
+            }
+        }
+
+        private void ClearVertexSelectionCache()
+        {
+            _cachedEdgeMesh = null;
+            _cachedEdgeIndices = null;
+            _edgeDataDirty = true;
+            _sampleIdx0 = 0;
+            _sampleIdx1 = 1;
+            _samplePos0 = Vector3.Zero;
+            _samplePos1 = Vector3.Zero;
+        }
+
+        private void SetSampleIndicesFromSelection(List<int> selectedVertices, int vertexCount)
+        {
+            _sampleIdx0 = 0;
+            _sampleIdx1 = vertexCount > 1 ? 1 : 0;
+
+            if (selectedVertices.Count >= 2)
+            {
+                _sampleIdx0 = selectedVertices[0];
+                _sampleIdx1 = selectedVertices[1];
+            }
+            else if (selectedVertices.Count == 1)
+            {
+                _sampleIdx0 = selectedVertices[0];
+                _sampleIdx1 = _sampleIdx0 < vertexCount - 1 ? _sampleIdx0 + 1 : 0;
+            }
+
+            if (vertexCount > 0)
+            {
+                _sampleIdx0 = Math.Clamp(_sampleIdx0, 0, vertexCount - 1);
+                _sampleIdx1 = Math.Clamp(_sampleIdx1, 0, vertexCount - 1);
+            }
         }
     }
 }
