@@ -40,7 +40,7 @@ namespace Shared.Core.Events
         private readonly ILogger _logger = Logging.Create<EventHub>();
         bool _isDisposed = false;
         
-        Dictionary<Type, List<(Delegate Callback, object Owner)>> _callbackList = new();
+        readonly Dictionary<Type, List<(Delegate Callback, object Owner)>> _callbackList = new();
         private readonly IScopeRepository _scopeRepository;
         private readonly string _hubName;
         private readonly bool _isGlobal;
@@ -135,6 +135,9 @@ namespace Shared.Core.Events
 
         public void Dispose()
         {
+            if (_isDisposed == true)
+                return;
+
             _isDisposed = true;
             _callbackList?.Clear();
         }

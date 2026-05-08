@@ -1,4 +1,4 @@
-﻿namespace Shared.Core.Misc
+﻿/*namespace Shared.Core.Misc
 {
     public class FileWatcher
     {
@@ -61,4 +61,4 @@
             set => _path = value;
         }
     }
-}
+}*/

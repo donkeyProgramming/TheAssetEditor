@@ -5,9 +5,9 @@ namespace Shared.Core.ErrorHandling
     [DebuggerDisplay("{ErrorType}:{ItemName}-{Description}")]
     public class ErrorListDataItem
     {
-        public string ErrorType { get; set; }
-        public string ItemName { get; set; }
-        public string Description { get; set; }
+        public string ErrorType { get; set; } = "";
+        public string ItemName { get; set; } = "";
+        public string Description { get; set; } = "";
         public bool IsError { get; set; } = false;
 
         public bool IsWarning { get; set; } = false;

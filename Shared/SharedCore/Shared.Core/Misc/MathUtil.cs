@@ -141,7 +141,7 @@ namespace Shared.Core.Misc
             return Matrix.CreateRotationX(x) * Matrix.CreateRotationY(y) * Matrix.CreateRotationZ(z);
         }
 
-        public static Matrix CreateRotation(Vector3[] vectors, Vector3[] basis = null)
+        public static Matrix CreateRotation(Vector3[] vectors, Vector3[]? basis = null)
         {
             if (vectors.Length != 3)
             {

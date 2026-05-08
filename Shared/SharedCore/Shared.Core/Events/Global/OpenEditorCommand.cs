@@ -49,6 +49,7 @@ namespace Shared.Core.Events.Global
         public void ExecuteAsWindow(string fileName, int width, int heigh)
         {
             var file = _packFileService.FindFile(fileName);
+            Guard.IsNotNull(file, "File not found: " + fileName);
             var window = _editorCreator.CreateWindow(file);
 
             window.Width = width;

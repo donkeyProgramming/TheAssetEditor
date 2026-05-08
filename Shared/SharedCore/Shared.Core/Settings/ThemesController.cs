@@ -59,7 +59,8 @@ namespace Shared.Core.Settings
             return theme switch
             {
                 ThemeType.DarkTheme => "Dark",
-                ThemeType.LightTheme => "Light"
+                ThemeType.LightTheme => "Light",
+                _ => "Dark"
             };
         }
     }

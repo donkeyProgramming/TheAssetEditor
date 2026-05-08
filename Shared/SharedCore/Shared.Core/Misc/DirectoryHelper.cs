@@ -6,8 +6,6 @@ namespace Shared.Core.Misc
 {
     public class DirectoryHelper
     {
-
-
         private const string ExplorerWindowClass = "CabinetWClass";
 
         private delegate bool EnumWindowsProc(IntPtr hWnd, IntPtr lParam);
@@ -51,7 +49,7 @@ namespace Shared.Core.Misc
             EnsureCreated(CacheDirectory);
         }
 
-        public static void EnsureCreated(string? path)
+        public static void EnsureCreated(string path)
         {
             if (!Directory.Exists(path))
                 Directory.CreateDirectory(path);
@@ -60,7 +58,7 @@ namespace Shared.Core.Misc
         public static void EnsureFileFolderCreated(string filePath)
         {
             var folder = Path.GetDirectoryName(filePath);
-            if (!Directory.Exists(folder))
+            if (!Directory.Exists(folder) && string.IsNullOrWhiteSpace(folder) == false)
                 Directory.CreateDirectory(folder);
         }
 
@@ -68,9 +66,7 @@ namespace Shared.Core.Misc
         {
             try
             {
-                using (Stream stream = new FileStream(path, FileMode.Open))
-                {
-                }
+                using Stream stream = new FileStream(path, FileMode.Open);
             }
             catch (IOException)
             {
@@ -105,8 +101,7 @@ namespace Shared.Core.Misc
                 return;
             }
 
-            IntPtr foundHandle = IntPtr.Zero;
-
+            var foundHandle = IntPtr.Zero;
             EnumWindows((hWnd, lParam) =>
             {
                 if (!IsWindowVisible(hWnd))
@@ -122,8 +117,7 @@ namespace Shared.Core.Misc
                 GetWindowText(hWnd, windowTitle, windowTitle.Capacity);
 
                 // Explorer title usually ends with folder name
-                string folderName = Path.GetFileName(folderPath);
-
+                var folderName = Path.GetFileName(folderPath);
                 if (!string.IsNullOrEmpty(folderName) &&
                     windowTitle.ToString().Contains(folderName, StringComparison.OrdinalIgnoreCase))
                 {

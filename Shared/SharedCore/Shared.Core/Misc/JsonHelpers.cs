@@ -10,8 +10,7 @@ namespace Shared.Core.Misc
             return objecType == typeof(List<T>);
         }
 
-        public override object ReadJson(JsonReader reader, Type objecType, object existingValue,
-            JsonSerializer serializer)
+        public override object? ReadJson(JsonReader reader, Type objectType, object? existingValue, JsonSerializer serializer)
         {
             var token = JToken.Load(reader);
             if (token.Type == JTokenType.Array)
@@ -26,9 +25,6 @@ namespace Shared.Core.Misc
             get { return false; }
         }
 
-        public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
-        {
-            throw new NotImplementedException();
-        }
+        public override void WriteJson(JsonWriter writer, object? value, JsonSerializer serializer) => throw new NotImplementedException();
     }
 }
