@@ -29,7 +29,7 @@ namespace Shared.Core.PackFiles
             _globalEventHub = globalEventHub;
         }
 
-        private static IPackFileContainerInternal CastContainer(IPackFileContainer container) => (IPackFileContainerInternal)container;
+        internal static IPackFileContainerInternal CastContainer(IPackFileContainer container) => (IPackFileContainerInternal)container;
 
         public List<IPackFileContainer> GetAllPackfileContainers() => _packFileContainers.Cast<IPackFileContainer>().ToList();
 
@@ -142,14 +142,17 @@ namespace Shared.Core.PackFiles
             _globalEventHub?.PublishGlobalEvent(new PackFileContainerRemovedEvent(container));
         }
 
-        public List<(string FileName, PackFile Pack)> FindAllWithExtention(string extention, IPackFileContainer? container = null)
+        public List<(string FileName, PackFile Pack)> FindAllWithExtention(string extention, IPackFileContainer? pf = null)
         {
-            if (container != null)
+            if (pf != null)
+            {
+                var container = CastContainer(pf);
                 return container.FindAllWithExtention(extention);
+            }
 
             var output = new List<(string, PackFile)>();
-            foreach (var pf in _packFileContainers)
-                output.AddRange(pf.FindAllWithExtention(extention));
+            foreach (var instance in _packFileContainers)
+                output.AddRange(instance.FindAllWithExtention(extention));
             return output;
         }
 

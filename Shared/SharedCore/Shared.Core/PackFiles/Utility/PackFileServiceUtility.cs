@@ -13,12 +13,14 @@ namespace Shared.Core.PackFiles.Utility
     {
         public static DirectoryEntriesSplitResult SplitDirectoryEntries(IPackFileContainer container, string directoryPath)
         {
-            var files = container.GetDirectoryContent(directoryPath)
+            var packFileContainerInternal = PackFileService.CastContainer(container);
+
+            var files = packFileContainerInternal.GetDirectoryContent(directoryPath)
                 .Select(entry => new DirectoryFileEntry(entry.File.Name, entry.File))
                 .OrderBy(x => x.FileName, StringComparer.CurrentCultureIgnoreCase)
                 .ToList();
 
-            var subFolders = container.GetSubDirectories(directoryPath)
+            var subFolders = packFileContainerInternal.GetSubDirectories(directoryPath)
                 .OrderBy(x => x, StringComparer.CurrentCultureIgnoreCase)
                 .ToList();
 
@@ -46,11 +48,17 @@ namespace Shared.Core.PackFiles.Utility
         public static List<(string FileName, PackFile Pack)> FindAllWithExtentionIncludePaths(IPackFileService pfs, string extention, IPackFileContainer? packFileContainer = null)
         {
             if (packFileContainer != null)
-                return packFileContainer.FindAllWithExtention(extention);
+            {
+                var container = PackFileService.CastContainer(packFileContainer);
+                return container.FindAllWithExtention(extention);
+            }
 
             var output = new List<(string, PackFile)>();
             foreach (var pf in pfs.GetAllPackfileContainers())
-                output.AddRange(pf.FindAllWithExtention(extention));
+            {
+                var container = PackFileService.CastContainer(pf);
+                output.AddRange(container.FindAllWithExtention(extention));
+            }
             return output;
         }
 

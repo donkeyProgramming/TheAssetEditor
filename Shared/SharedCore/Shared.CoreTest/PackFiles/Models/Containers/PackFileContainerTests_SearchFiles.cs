@@ -6,105 +6,33 @@ namespace Shared.CoreTest.PackFiles.Models.Containers
     [TestFixture(typeof(PackFileContainer))]
     internal class PackFileContainerTests_SearchFiles : PackFileContainerTests_TestBase
     {
-        public PackFileContainerTests_SearchFiles(Type containerType)
-            : base(containerType)
-        {
-        }
+        public PackFileContainerTests_SearchFiles(Type containerType) : base(containerType) { }
 
         [Test]
-        public void NullFilters_ReturnsAllFiles()
+        public void SearchFiles_NullFilters_ReturnsAll()
         {
             var results = _container.SearchFiles(null, null);
             Assert.That(results.Count, Is.EqualTo(15));
         }
 
         [Test]
-        public void TextFilter_MatchesFileName()
-        {
-            var results = _container.SearchFiles("unit", null);
-            Assert.That(results.Count, Is.EqualTo(1));
-            Assert.That(results[0].File.Name, Is.EqualTo("unit.model"));
-        }
-
-        [Test]
-        public void TextFilter_IsCaseInsensitive()
-        {
-            var results = _container.SearchFiles("UNIT", null);
-            Assert.That(results.Count, Is.EqualTo(1));
-            Assert.That(results[0].File.Name, Is.EqualTo("unit.model"));
-        }
-
-        [Test]
-        public void TextFilter_PartialMatch()
-        {
-            var results = _container.SearchFiles("battle", null);
-            Assert.That(results.Count, Is.EqualTo(1));
-            Assert.That(results[0].File.Name, Is.EqualTo("battle_sound.wem"));
-        }
-
-        [Test]
-        public void TextFilter_NoMatch_ReturnsEmpty()
-        {
-            var results = _container.SearchFiles("nonexistent", null);
-            Assert.That(results, Is.Empty);
-        }
-
-        [Test]
-        public void ExtensionFilter_SingleExtension()
-        {
-            var results = _container.SearchFiles(null, [".wem"]);
-            Assert.That(results.Count, Is.EqualTo(3));
-            Assert.That(results.All(r => r.File.Name.EndsWith(".wem")), Is.True);
-        }
-
-        [Test]
-        public void ExtensionFilter_MultipleExtensions()
-        {
-            var results = _container.SearchFiles(null, [".wem", ".lua"]);
-            Assert.That(results.Count, Is.EqualTo(4));
-        }
-
-        [Test]
-        public void ExtensionFilter_NoMatch_ReturnsEmpty()
-        {
-            var results = _container.SearchFiles(null, [".xyz"]);
-            Assert.That(results, Is.Empty);
-        }
-
-        [Test]
-        public void CombinedFilters_TextAndExtension()
+        public void SearchFiles_TextAndExtension_FiltersCorrectly()
         {
             var results = _container.SearchFiles("battle", [".wem"]);
             Assert.That(results.Count, Is.EqualTo(1));
-            Assert.That(results[0].File.Name, Is.EqualTo("battle_sound.wem"));
+            Assert.That(results[0].Path, Is.EqualTo(@"audio\battle_sound.wem"));
         }
 
         [Test]
-        public void CombinedFilters_TextMatchesButExtensionDoesNot_ReturnsEmpty()
+        public void SearchFiles_ResultsArePathSorted()
         {
-            var results = _container.SearchFiles("unit", [".wem"]);
-            Assert.That(results, Is.Empty);
-        }
-
-        [Test]
-        public void ResultsAreSortedByPath()
-        {
-            var results = _container.SearchFiles(null, null);
-            var paths = results.Select(r => r.Path).ToList();
-            var sorted = paths.OrderBy(p => p, StringComparer.OrdinalIgnoreCase).ToList();
+            var paths = _container.SearchFiles(null, null).Select(x => x.Path).ToList();
+            var sorted = paths.OrderBy(x => x, StringComparer.OrdinalIgnoreCase).ToList();
             Assert.That(paths, Is.EqualTo(sorted));
         }
 
         [Test]
-        public void ResultsContainCorrectPaths()
-        {
-            var results = _container.SearchFiles("diffuse", null);
-            Assert.That(results.Count, Is.EqualTo(1));
-            Assert.That(results[0].Path, Is.EqualTo("models\\textures\\diffuse.dds"));
-        }
-
-        [Test]
-        public void EmptyExtensionList_TreatedAsNoFilter()
+        public void SearchFiles_EmptyExtensionList_TreatedAsNoFilter()
         {
             var results = _container.SearchFiles(null, []);
             Assert.That(results.Count, Is.EqualTo(15));

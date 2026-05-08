@@ -24,6 +24,7 @@
 // When cleared, filter-expanded nodes are absorbed as user expansions and collapsed nodes are unloaded.
 
 using System.Windows.Input;
+using System.IO;
 using AssetEditor.ViewModels;
 using Microsoft.Extensions.DependencyInjection;
 using Shared.Core.Events;
@@ -341,7 +342,9 @@ namespace Shared.UiTest
             var container = _packageFileService.CreateNewPackFileContainer("test.pack", PackFileVersion.PFH5, PackFileCAType.MOD);
             foreach (var (path, fileName) in files)
             {
-                container.AddOrUpdateFile(path.ToLowerInvariant(), PackFile.CreateFromASCII(fileName, fileName));
+                var normalizedPath = path.ToLowerInvariant().Replace('/', '\\');
+                var directory = Path.GetDirectoryName(normalizedPath)?.Replace('/', '\\') ?? string.Empty;
+                _packageFileService.AddFilesToPack(container, [new NewPackFileEntry(directory, PackFile.CreateFromASCII(fileName, fileName))]);
             }
 
             _packageFileService.AddContainer(container);
