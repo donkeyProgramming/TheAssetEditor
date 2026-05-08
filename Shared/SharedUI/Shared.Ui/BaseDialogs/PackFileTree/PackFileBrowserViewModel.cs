@@ -247,6 +247,9 @@ namespace Shared.Ui.BaseDialogs.PackFileTree
                 TreeNode newNode;
                 if (numSeperators == 0)
                 {
+                    // EnsureChildrenPopulated runs inside InsertChildSorted and may load the
+                    // just-added file from the container, so remove any duplicate after population.
+                    root.EnsureChildrenPopulated();
                     RemoveExistingFileNode(root, item.Name, item);
                     newNode = new TreeNode(item.Name, NodeType.File, container, root, item);
                     InsertChildSorted(root, newNode);
@@ -255,19 +258,13 @@ namespace Shared.Ui.BaseDialogs.PackFileTree
                 {
                     var directory = fullPath.Substring(0, directoryEnd);
                     var folder = GetNodeFromPath(root, directory)!;
+
+                    // Populate the folder first so that any duplicate loaded from the container
+                    // by EnsureChildrenPopulated (inside InsertChildSorted) is visible here.
+                    folder.EnsureChildrenPopulated();
+                    RemoveExistingFileNode(folder, item.Name, item);
+
                     newNode = new TreeNode(item.Name, NodeType.File, container, folder, item);
-
-                    var existingFile = folder.BackingChildren.FirstOrDefault(node => node.Name == item.Name && node.NodeType == NodeType.File);
-                    if (existingFile != null)
-                    {
-                        folder.RemoveChild(existingFile);
-                        if (folder.Children.Contains(existingFile))
-                        {
-                            folder.Children.Remove(existingFile);
-                            existingFile.RemoveSelf();
-                        }
-                    }
-
                     InsertChildSorted(folder, newNode);
                 }
 
@@ -514,11 +511,8 @@ namespace Shared.Ui.BaseDialogs.PackFileTree
                 return;
 
             parent.RemoveChild(existingFile);
-            if (parent.Children.Contains(existingFile))
-            {
-                parent.Children.Remove(existingFile);
-                existingFile.RemoveSelf();
-            }
+            parent.Children.Remove(existingFile);
+            existingFile.RemoveSelf();
         }
     }
 }

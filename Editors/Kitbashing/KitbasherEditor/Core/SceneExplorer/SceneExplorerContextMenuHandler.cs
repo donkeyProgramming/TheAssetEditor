@@ -22,7 +22,7 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
         ISceneNode _activeNode;
         IEnumerable<ISceneNode> _activeNodes;
 
-        [ObservableProperty] ObservableCollection<ContextMenuItem> _items = [];
+        [ObservableProperty] ObservableCollection<ContextMenuItem2?> _items = [];
 
         public SceneExplorerContextMenuHandler(IEventHub eventHub, SceneManager sceneManager, CommandFactory commandFactory, SelectionManager selectionManager)
         {
@@ -49,26 +49,26 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
                 return;
 
             if (CanMakeEditable(_activeNode))
-                Items.Add(new ContextMenuItem("Make Editable", new RelayCommand(MakeEditable)));
+                Items.Add(new ContextMenuItem2("Make Editable", MakeEditable));
 
             if (IsUngroupable(_activeNode))
-                Items.Add(new ContextMenuItem("Ungroup", new RelayCommand(Ungroup)));
+                Items.Add(new ContextMenuItem2("Ungroup", Ungroup));
 
             if (IsLockable(_activeNode))
-                Items.Add(new ContextMenuItem("Lock", new RelayCommand(ToggleLock)));
+                Items.Add(new ContextMenuItem2("Lock", ToggleLock));
             else if (IsUnlockable(_activeNode))
-                Items.Add(new ContextMenuItem("Unlock", new RelayCommand(ToggleLock)));
+                Items.Add(new ContextMenuItem2("Unlock", ToggleLock));
 
             if (Items.Count != 0)
                 Items.Add(null);
-            Items.Add(new ContextMenuItem("Invert Selection", new RelayCommand(InvertSelection)));
-            Items.Add(new ContextMenuItem("Select Similarly Named", new RelayCommand(SelectSimilar)));
+            Items.Add(new ContextMenuItem2("Invert Selection", InvertSelection));
+            Items.Add(new ContextMenuItem2("Select Similarly Named", SelectSimilar));
 
             if (IsRemovable(_activeNode))
             {
                 if (Items.Count != 0)
                     Items.Add(null);
-                Items.Add(new ContextMenuItem("Remove", new RelayCommand(RemoveNode)));
+                Items.Add(new ContextMenuItem2("Remove", RemoveNode));
             }
         }
 

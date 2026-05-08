@@ -738,6 +738,62 @@ namespace Shared.UiTest
             file1 = _viewModel.GetFromPath(root, "foldera\\sub\\file1.txt");
             Assert.That(file1, Is.Not.Null, "file1 should be visible inside expanded sub folder");
         }
+
+        [Test]
+        public void OverwriteFileInCollapsedFolder_NoDuplicateNodeInTree()
+        {
+            // Arrange: file exists in a folder that is NOT expanded (lazy state).
+            CreatePackfiles(("foldera\\file.txt", "file.txt"));
+            var root = _viewModel.Files[0];
+            var container = _packageFileService.GetAllPackfileContainers().Last(x => x.Name == "test.pack");
+
+            // Folder is collapsed — BackingChildren are NOT yet loaded.
+            Assert.That(root.IsNodeExpanded, Is.False);
+
+            // Act: add a second file with the same name (simulates Save As / overwrite import).
+            var replacement = PackFile.CreateFromASCII("file.txt", "updated content");
+            _packageFileService.AddFilesToPack(container, [new NewPackFileEntry("foldera", replacement)]);
+
+            // Expand to materialise children and assert only ONE node with that name exists.
+            root.IsNodeExpanded = true;
+            var folderA = _viewModel.GetFromPath(root, "foldera");
+            Assert.That(folderA, Is.Not.Null);
+            folderA.IsNodeExpanded = true;
+
+            var duplicates = folderA.Children
+                .Where(n => n.NodeType == NodeType.File && n.Name.Equals("file.txt", StringComparison.OrdinalIgnoreCase))
+                .ToList();
+
+            Assert.That(duplicates.Count, Is.EqualTo(1), "Overwriting a file in a collapsed folder must not create a duplicate node");
+            Assert.That(duplicates[0].Item, Is.SameAs(replacement), "The surviving node should reference the replacement PackFile");
+        }
+
+        [Test]
+        public void OverwriteFileInExpandedFolder_NoDuplicateNodeInTree()
+        {
+            // Arrange: file exists in a folder that IS already expanded (children materialised).
+            CreatePackfiles(("foldera\\file.txt", "file.txt"));
+            var root = _viewModel.Files[0];
+            var container = _packageFileService.GetAllPackfileContainers().Last(x => x.Name == "test.pack");
+
+            root.IsNodeExpanded = true;
+            var folderA = _viewModel.GetFromPath(root, "foldera");
+            Assert.That(folderA, Is.Not.Null);
+            folderA.IsNodeExpanded = true;
+
+            Assert.That(folderA.Children.Count(n => n.NodeType == NodeType.File), Is.EqualTo(1));
+
+            // Act: add a second file with the same name (simulates overwrite while folder is visible).
+            var replacement = PackFile.CreateFromASCII("file.txt", "updated content");
+            _packageFileService.AddFilesToPack(container, [new NewPackFileEntry("foldera", replacement)]);
+
+            var duplicates = folderA.Children
+                .Where(n => n.NodeType == NodeType.File && n.Name.Equals("file.txt", StringComparison.OrdinalIgnoreCase))
+                .ToList();
+
+            Assert.That(duplicates.Count, Is.EqualTo(1), "Overwriting a file in an expanded folder must not create a duplicate node");
+            Assert.That(duplicates[0].Item, Is.SameAs(replacement), "The surviving node should reference the replacement PackFile");
+        }
     }
 }
 
