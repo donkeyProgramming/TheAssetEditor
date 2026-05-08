@@ -6,10 +6,10 @@ using Shared.Core.Services;
 using Shared.Ui.BaseDialogs.PackFileTree;
 using Shared.Ui.BaseDialogs.PackFileTree.ContextMenu.Commands;
 
-namespace Shared.UiTest.PackFileTree.ContextMenu.Commands
+namespace Shared.UiTest.BaseDialogs.PackFileTree.ContextMenu.Commands
 {
     [TestFixture]
-    internal class DeleteNodeCommandTests : ContextMenuCommandTestBase
+    internal class RenameNodeCommandTests : ContextMenuCommandTestBase
     {
         [Test]
         public void ShouldAdd_ReturnsTrueForFile()
@@ -17,7 +17,7 @@ namespace Shared.UiTest.PackFileTree.ContextMenu.Commands
             var owner = CreateContainer();
             var root = new TreeNode("root", NodeType.Root, owner, null);
             var file = new TreeNode("file.txt", NodeType.File, owner, root, PackFile.CreateFromASCII("file.txt", "a"));
-            var command = new DeleteNodeCommand(new Mock<IPackFileService>().Object, new Mock<IStandardDialogs>().Object);
+            var command = new RenameNodeCommand(new Mock<IPackFileService>().Object, new Mock<IStandardDialogs>().Object);
 
             Assert.That(command.ShouldAdd(file), Is.True);
         }
@@ -28,13 +28,13 @@ namespace Shared.UiTest.PackFileTree.ContextMenu.Commands
             var owner = CreateContainer();
             var root = new TreeNode("root", NodeType.Root, owner, null);
             var file = new TreeNode("file.txt", NodeType.File, owner, root, PackFile.CreateFromASCII("file.txt", "a"));
-            var command = new DeleteNodeCommand(new Mock<IPackFileService>().Object, new Mock<IStandardDialogs>().Object);
+            var command = new RenameNodeCommand(new Mock<IPackFileService>().Object, new Mock<IStandardDialogs>().Object);
 
             Assert.That(command.IsEnabled(file), Is.True);
         }
 
         [Test]
-        public void Execute_DeletesFileAfterConfirmation()
+        public void Execute_RenamesFile()
         {
             var owner = CreateContainer();
             var root = new TreeNode("root", NodeType.Root, owner, null);
@@ -43,13 +43,12 @@ namespace Shared.UiTest.PackFileTree.ContextMenu.Commands
 
             var service = new Mock<IPackFileService>();
             var dialogs = new Mock<IStandardDialogs>();
-            dialogs.Setup(x => x.ShowYesNoBox(It.IsAny<string>(), It.IsAny<string>())).Returns(ShowMessageBoxResult.OK);
-
-            var command = new DeleteNodeCommand(service.Object, dialogs.Object);
+            dialogs.Setup(x => x.ShowTextInputDialog("Rename file", file.Name)).Returns(new TextInputDialogResult(true, "renamed.txt"));
+            var command = new RenameNodeCommand(service.Object, dialogs.Object);
 
             command.Execute(file);
 
-            service.Verify(x => x.DeleteFile(owner, file.Item!), Times.Once);
+            service.Verify(x => x.RenameFile(owner, file.Item!, "renamed.txt"), Times.Once);
         }
     }
 }

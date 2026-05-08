@@ -1,4 +1,4 @@
-// PackFileBrowserViewModel Lazy Loading Architecture:
+ï»¿// PackFileBrowserViewModel Lazy Loading Architecture:
 //
 // The tree is built lazily. When a container is added (via PackFileContainerAddedEvent), only
 // the root TreeNode is created with a child-loader delegate. Children are NOT loaded from
@@ -35,7 +35,7 @@ using Shared.Ui.BaseDialogs.PackFileTree;
 using Test.TestingUtility.Shared;
 using Test.TestingUtility.TestUtility;
 
-namespace Shared.UiTest
+namespace Shared.UiTest.BaseDialogs
 {
     internal class PackFileBrowserViewModelTests
     {
@@ -193,7 +193,7 @@ namespace Shared.UiTest
             Assert.That(folderA, Is.Not.Null);
             folderA.IsNodeExpanded = true;
 
-            // Search for a specific file — folderA/sub gets expanded by filter, folderB hidden
+            // Search for a specific file â€” folderA/sub gets expanded by filter, folderB hidden
             _viewModel.Filter.FilterText = "match_file";
 
             var sub = PackFileBrowserViewModelTestHelper.GetFromPath(root, "foldera\\sub");
@@ -472,10 +472,10 @@ namespace Shared.UiTest
             Assert.That(folderA, Is.Not.Null);
             Assert.That(root.UnsavedChanged, Is.True, "Root should be unsaved after adding file");
 
-            // Simulate save via PFS — we can't call SavePackContainer without disk I/O,
+            // Simulate save via PFS â€” we can't call SavePackContainer without disk I/O,
             // so trigger the event directly through the event hub
             var eventHub = _runner.ServiceProvider.GetRequiredService<IEventHub>();
-            eventHub.PublishGlobalEvent(new Shared.Core.Events.Global.PackFileContainerSavedEvent(container));
+            eventHub.PublishGlobalEvent(new Core.Events.Global.PackFileContainerSavedEvent(container));
 
             Assert.That(root.UnsavedChanged, Is.False, "Root should be cleared after save");
         }
@@ -487,11 +487,11 @@ namespace Shared.UiTest
             var root = _viewModel.Files[0];
             var container = _packageFileService.GetAllPackfileContainers().Last(x => x.Name == "test.pack");
 
-            // Root is collapsed — only root exists as materialized node
+            // Root is collapsed â€” only root exists as materialized node
             Assert.That(root.IsNodeExpanded, Is.False);
 
             var eventHub = _runner.ServiceProvider.GetRequiredService<IEventHub>();
-            eventHub.PublishGlobalEvent(new Shared.Core.Events.Global.PackFileContainerSavedEvent(container));
+            eventHub.PublishGlobalEvent(new Core.Events.Global.PackFileContainerSavedEvent(container));
 
             // After save, the tree should NOT have expanded/materialized children
             Assert.That(root.Children.All(c => c.Name == "<placeholder>" || c.NodeType == NodeType.Root),
@@ -649,7 +649,7 @@ namespace Shared.UiTest
             var root = _viewModel.Files[0];
             Assert.That(root.IsNodeExpanded, Is.False, "Root should start collapsed");
 
-            // Filter matches all 3 files — well below the 25 threshold
+            // Filter matches all 3 files â€” well below the 25 threshold
             _viewModel.Filter.FilterText = "file";
 
             // All matching nodes should be auto-expanded
@@ -697,7 +697,7 @@ namespace Shared.UiTest
         public void DoubleClickCollapseAndReexpand_ChildrenRemainVisible()
         {
             // Scenario: user expands folders manually, collapses a parent,
-            // then re-expands it — child folders that were expanded should still show their children.
+            // then re-expands it â€” child folders that were expanded should still show their children.
             CreatePackfiles(
                 ("folderA\\sub\\file1.txt", "file1.txt"),
                 ("folderA\\sub\\file2.txt", "file2.txt"));
@@ -747,7 +747,7 @@ namespace Shared.UiTest
             var root = _viewModel.Files[0];
             var container = _packageFileService.GetAllPackfileContainers().Last(x => x.Name == "test.pack");
 
-            // Folder is collapsed — BackingChildren are NOT yet loaded.
+            // Folder is collapsed â€” BackingChildren are NOT yet loaded.
             Assert.That(root.IsNodeExpanded, Is.False);
 
             // Act: add a second file with the same name (simulates Save As / overwrite import).

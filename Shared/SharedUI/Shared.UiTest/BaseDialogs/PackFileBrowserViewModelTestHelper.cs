@@ -1,6 +1,6 @@
-using Shared.Ui.BaseDialogs.PackFileTree;
+﻿using Shared.Ui.BaseDialogs.PackFileTree;
 
-namespace Shared.UiTest
+namespace Shared.UiTest.BaseDialogs
 {
     /// <summary>
     /// Test utility helper for PackFileBrowserViewModel testing.

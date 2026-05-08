@@ -5,7 +5,7 @@ using Shared.Ui.BaseDialogs.PackFileTree;
 using Shared.Ui.BaseDialogs.PackFileTree.ContextMenu.Commands;
 using Test.TestingUtility.Shared;
 
-namespace Shared.UiTest.PackFileTree.ContextMenu.Commands
+namespace Shared.UiTest.BaseDialogs.PackFileTree.ContextMenu.Commands
 {
     [TestFixture]
     internal class DuplicateFileCommandTests : ContextMenuCommandTestBase
@@ -60,5 +60,26 @@ namespace Shared.UiTest.PackFileTree.ContextMenu.Commands
             var foundFile = runner.PackFileService.FindFile("Animation\\Meta\\testFile_copy.anm", outputPackFile);
             Assert.That(foundFile, Is.Not.Null);
         }
+
+        [Test]
+        [TestCase("testFile", "testFile_copy")]            // No extension
+        [TestCase("testFile.anm", "testFile_copy.anm")]        // Single extension 
+        [TestCase("testFile.anm.meta", "testFile_copy.anm.meta")]   // Double extension 
+        public void DuplicateFileCommand(string fileName, string result)
+        {
+            var runner = new AssetEditorTestRunner();
+            runner.PackFileService.EnforceGameFilesMustBeLoaded = false;
+            var sourcePackFile = runner.CreateEmptyPackFile("SourcePack", false);
+            var outputPackFile = runner.CreateEmptyPackFile("OutputPack", true);
+
+            var fileEntry = new NewPackFileEntry("Animation\\Meta", PackFile.CreateFromASCII(fileName, "DummyContent"));
+            runner.PackFileService.AddFilesToPack(sourcePackFile, [fileEntry]);
+            var fileToCopy = runner.PackFileService.FindFile("Animation\\Meta\\" + fileName, sourcePackFile);
+
+            runner.CommandFactory.Create<DuplicateFileCommand>().Execute(fileToCopy);
+            var foundFile = runner.PackFileService.FindFile("Animation\\Meta\\" + result, outputPackFile);
+            Assert.That(foundFile, Is.Not.Null);
+        }
     }
+}
 }

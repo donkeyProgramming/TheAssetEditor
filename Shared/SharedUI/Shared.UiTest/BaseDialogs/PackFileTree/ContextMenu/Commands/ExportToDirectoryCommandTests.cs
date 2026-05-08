@@ -7,7 +7,7 @@ using Shared.Core.Services;
 using Shared.Ui.BaseDialogs.PackFileTree;
 using Shared.Ui.BaseDialogs.PackFileTree.ContextMenu.Commands;
 
-namespace Shared.UiTest.PackFileTree.ContextMenu.Commands
+namespace Shared.UiTest.BaseDialogs.PackFileTree.ContextMenu.Commands
 {
     [TestFixture]
     internal class ExportToDirectoryCommandTests : ContextMenuCommandTestBase
