@@ -6,7 +6,7 @@ using Shared.Core.Services;
 
 namespace Shared.Ui.BaseDialogs.PackFileTree.ContextMenu.Commands
 {
-    public abstract class OpenNodeInCommand(IStandardDialogs standardDialogs) : IContextMenuCommand
+    public abstract class OpenNodeInCommand(IStandardDialogs standardDialogs, IFileSystemAccess fileSystemAccess) : IContextMenuCommand
     {
         public abstract string GetDisplayName(TreeNode node);
         public bool ShouldAdd(TreeNode node) => node.NodeType == NodeType.File && node.Item != null;
@@ -16,7 +16,7 @@ namespace Shared.Ui.BaseDialogs.PackFileTree.ContextMenu.Commands
 
         protected void OpenPackFileUsing(string applicationPath, PackFile packFile)
         {
-            if (File.Exists(applicationPath) == false)
+            if (fileSystemAccess.FileExists(applicationPath) == false)
             {
                 standardDialogs.ShowDialogBox($"Application {applicationPath} does not exist");
                 return;
@@ -27,26 +27,26 @@ namespace Shared.Ui.BaseDialogs.PackFileTree.ContextMenu.Commands
 
             var path = tempFolder + "\\" + fileName;
             var bytes = packFile.DataSource.ReadData();
-            File.WriteAllBytes(path, bytes);
+            fileSystemAccess.FileWriteAllBytes(path, bytes);
 
-            using var process = Process.Start(applicationPath, $"\"{path}\"");
+            using var process = fileSystemAccess.ProcessStart(applicationPath, $"\"{path}\"");
         }
 
-        protected static string ResolveApplicationPath(string appRelativePath)
+        protected string ResolveApplicationPath(string appRelativePath)
         {
             var x64 = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles), appRelativePath);
-            if (File.Exists(x64)) return x64;
+            if (fileSystemAccess.FileExists(x64)) return x64;
             return Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86), appRelativePath);
         }
     }
 
-    public class OpenNodeInNotepadCommand(IStandardDialogs standardDialogs) : OpenNodeInCommand(standardDialogs)
+    public class OpenNodeInNotepadCommand(IStandardDialogs standardDialogs, IFileSystemAccess fileSystemAccess) : OpenNodeInCommand(standardDialogs, fileSystemAccess)
     {
         public override string GetDisplayName(TreeNode node) => "Open in Notepad++";
         public override void Execute(TreeNode _selectedNode) => OpenPackFileUsing(ResolveApplicationPath(@"Notepad++\notepad++.exe"), _selectedNode.Item!);
     }
 
-    public class OpenNodeInHxDCommand(IStandardDialogs standardDialogs) : OpenNodeInCommand(standardDialogs)
+    public class OpenNodeInHxDCommand(IStandardDialogs standardDialogs, IFileSystemAccess fileSystemAccess) : OpenNodeInCommand(standardDialogs, fileSystemAccess)
     {
         public override string GetDisplayName(TreeNode node) => "Open in Hxd";
         public override void Execute(TreeNode _selectedNode) => OpenPackFileUsing(ResolveApplicationPath(@"HxD\HxD.exe"), _selectedNode.Item!);

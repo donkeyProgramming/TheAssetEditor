@@ -1,16 +1,39 @@
-using System.Threading;
+﻿using System.Threading;
 using Shared.Core.PackFiles.Models;
 using Shared.Ui.BaseDialogs.PackFileTree;
 using Shared.Ui.BaseDialogs.PackFileTree.ContextMenu.Commands;
 
-namespace Shared.UiTest.ContextMenuCommands
+namespace Shared.UiTest.PackFileTree.ContextMenu.Commands
 {
     [TestFixture]
-    [Apartment(ApartmentState.STA)]
     internal class ExpandNodeCommandTests : ContextMenuCommandTestBase
     {
         [Test]
-        public void ShouldAdd_IsEnabled_Execute()
+        public void ShouldAdd_ReturnsTrueForFolderAndFalseForFile()
+        {
+            var owner = CreateContainer();
+            var root = new TreeNode("root", NodeType.Root, owner, null);
+            var folder = new TreeNode("folder", NodeType.Directory, owner, root);
+            var file = new TreeNode("file.txt", NodeType.File, owner, folder, PackFile.CreateFromASCII("file.txt", "a"));
+            var command = new ExpandNodeCommand();
+
+            Assert.That(command.ShouldAdd(folder), Is.True);
+            Assert.That(command.ShouldAdd(file), Is.False);
+        }
+
+        [Test]
+        public void IsEnabled_ReturnsTrue()
+        {
+            var owner = CreateContainer();
+            var root = new TreeNode("root", NodeType.Root, owner, null);
+            var folder = new TreeNode("folder", NodeType.Directory, owner, root);
+            var command = new ExpandNodeCommand();
+
+            Assert.That(command.IsEnabled(folder), Is.True);
+        }
+
+        [Test]
+        public void Execute_ExpandsAllNodes()
         {
             var owner = CreateContainer();
             var root = new TreeNode("root", NodeType.Root, owner, null);
@@ -26,10 +49,6 @@ namespace Shared.UiTest.ContextMenuCommands
             file.IsNodeExpanded = false;
 
             var command = new ExpandNodeCommand();
-
-            Assert.That(command.ShouldAdd(folder), Is.True);
-            Assert.That(command.ShouldAdd(file), Is.False);
-            Assert.That(command.IsEnabled(folder), Is.True);
 
             command.Execute(root);
 

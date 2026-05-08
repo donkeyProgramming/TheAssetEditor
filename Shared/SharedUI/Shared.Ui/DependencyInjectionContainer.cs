@@ -22,6 +22,7 @@ namespace Shared.Ui
             // Implement required interfaces
             services.AddScoped<IWindowsKeyboard, WindowKeyboard>();
             services.AddScoped<IStandardDialogs, StandardDialogs>();
+            services.AddSingleton<IFileSystemAccess, FileSystemAccess>();
             services.AddTransient<IToolSelectorUiProvider, ToolSelectorUiProvider>();
 
             services.AddScoped<PackFileTreeViewFactory>();

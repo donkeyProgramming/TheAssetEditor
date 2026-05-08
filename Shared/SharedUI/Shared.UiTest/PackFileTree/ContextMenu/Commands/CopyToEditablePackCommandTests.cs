@@ -1,4 +1,4 @@
-using System.Threading;
+﻿using System.Threading;
 using Moq;
 using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
@@ -6,14 +6,36 @@ using Shared.Core.Services;
 using Shared.Ui.BaseDialogs.PackFileTree;
 using Shared.Ui.BaseDialogs.PackFileTree.ContextMenu.Commands;
 
-namespace Shared.UiTest.ContextMenuCommands
+namespace Shared.UiTest.PackFileTree.ContextMenu.Commands
 {
     [TestFixture]
-    [Apartment(ApartmentState.STA)]
     internal class CopyToEditablePackCommandTests : ContextMenuCommandTestBase
     {
         [Test]
-        public void ShouldAdd_IsEnabled_Execute()
+        public void ShouldAdd_ReturnsTrueWhenEditablePackExists()
+        {
+            var source = CreateContainer(name: "source");
+            var target = CreateContainer(name: "target");
+            var service = new Mock<IPackFileService>();
+            service.Setup(x => x.GetEditablePack()).Returns(target);
+            var command = new CopyToEditablePackCommand(service.Object, new Mock<IStandardDialogs>().Object);
+            var node = new TreeNode("folder", NodeType.Directory, source, null);
+
+            Assert.That(command.ShouldAdd(node), Is.True);
+        }
+
+        [Test]
+        public void IsEnabled_ReturnsTrue()
+        {
+            var source = CreateContainer(name: "source");
+            var node = new TreeNode("folder", NodeType.Directory, source, null);
+            var command = new CopyToEditablePackCommand(new Mock<IPackFileService>().Object, new Mock<IStandardDialogs>().Object);
+
+            Assert.That(command.IsEnabled(node), Is.True);
+        }
+
+        [Test]
+        public void Execute_CopiesChildFilesToEditablePack()
         {
             var source = CreateContainer(name: "source");
             var target = CreateContainer(name: "target");
@@ -31,9 +53,6 @@ namespace Shared.UiTest.ContextMenuCommands
             folder.AddChild(file);
 
             var command = new CopyToEditablePackCommand(service.Object, dialogs.Object);
-
-            Assert.That(command.ShouldAdd(folder), Is.True);
-            Assert.That(command.IsEnabled(folder), Is.True);
 
             command.Execute(folder);
 

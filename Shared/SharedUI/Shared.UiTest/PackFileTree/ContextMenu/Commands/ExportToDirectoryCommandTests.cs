@@ -1,24 +1,40 @@
-using System.Threading;
+﻿using System.Threading;
 using Moq;
 using Shared.Core.Services;
 using Shared.Ui.BaseDialogs.PackFileTree;
 using Shared.Ui.BaseDialogs.PackFileTree.ContextMenu.Commands;
 
-namespace Shared.UiTest.ContextMenuCommands
+namespace Shared.UiTest.PackFileTree.ContextMenu.Commands
 {
     [TestFixture]
-    [Apartment(ApartmentState.STA)]
     internal class ExportToDirectoryCommandTests : ContextMenuCommandTestBase
     {
         [Test]
-        public void ShouldAdd_IsEnabled()
+        public void ShouldAdd_ReturnsTrueForRoot()
         {
             var owner = CreateContainer();
             var root = new TreeNode("root", NodeType.Root, owner, null);
-            var command = new ExportToDirectoryCommand(new Mock<IStandardDialogs>().Object);
+            var command = new ExportToDirectoryCommand(new Mock<IStandardDialogs>().Object, new Mock<IFileSystemAccess>().Object);
 
             Assert.That(command.ShouldAdd(root), Is.True);
+        }
+
+        [Test]
+        public void IsEnabled_ReturnsTrue()
+        {
+            var owner = CreateContainer();
+            var root = new TreeNode("root", NodeType.Root, owner, null);
+            var command = new ExportToDirectoryCommand(new Mock<IStandardDialogs>().Object, new Mock<IFileSystemAccess>().Object);
+
             Assert.That(command.IsEnabled(root), Is.True);
+        }
+
+        [Test]
+        public void Execute_IgnoredUntilFilesystemPassTwo()
+        {
+            var owner = CreateContainer();
+            var root = new TreeNode("root", NodeType.Root, owner, null);
+            var command = new ExportToDirectoryCommand(new Mock<IStandardDialogs>().Object, new Mock<IFileSystemAccess>().Object);
 
             // TODO: Execute uses FolderBrowserDialog and writes exported files to disk; skip for filesystem pass two.
             Assert.Ignore("TODO: Execute uses FolderBrowserDialog and writes exported files to disk; skip for filesystem pass two.");

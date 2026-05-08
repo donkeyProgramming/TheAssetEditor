@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Windows.Forms;
 using Serilog;
 using Shared.Core.ErrorHandling;
 using Shared.Core.PackFiles;
@@ -24,16 +23,13 @@ namespace Shared.Ui.BaseDialogs.PackFileTree.ContextMenu.Commands
             var systemPath = _selectedNode.FileOwner.SystemFilePath;
             if (string.IsNullOrWhiteSpace(systemPath))
             {
-                using var saveFileDialog = new SaveFileDialog();
-                saveFileDialog.FileName = _selectedNode.FileOwner.Name;
-                saveFileDialog.Filter = "PackFile | *.pack";
-                saveFileDialog.DefaultExt = "pack";
-                if (saveFileDialog.ShowDialog() != DialogResult.OK)
+                var saveDialogResult = standardDialogs.ShowSystemSaveFileDialog(_selectedNode.FileOwner.Name, "PackFile | *.pack", "pack");
+                if (!saveDialogResult.Result || string.IsNullOrEmpty(saveDialogResult.FilePath))
                     return;
-                systemPath = saveFileDialog.FileName;
+                systemPath = saveDialogResult.FilePath;
             }
 
-            using (new WaitCursor())
+            using (standardDialogs.ShowWaitCursor())
             {
                 try
                 {
@@ -60,16 +56,13 @@ namespace Shared.Ui.BaseDialogs.PackFileTree.ContextMenu.Commands
             var systemPath = pack.SystemFilePath;
             if (string.IsNullOrWhiteSpace(systemPath))
             {
-                using var saveFileDialog = new SaveFileDialog();
-                saveFileDialog.FileName = pack.Name;
-                saveFileDialog.Filter = "PackFile | *.pack";
-                saveFileDialog.DefaultExt = "pack";
-                if (saveFileDialog.ShowDialog() != DialogResult.OK)
+                var saveDialogResult = standardDialogs.ShowSystemSaveFileDialog(pack.Name, "PackFile | *.pack", "pack");
+                if (!saveDialogResult.Result || string.IsNullOrEmpty(saveDialogResult.FilePath))
                     return;
-                systemPath = saveFileDialog.FileName;
+                systemPath = saveDialogResult.FilePath;
             }
 
-            using (new WaitCursor())
+            using (standardDialogs.ShowWaitCursor())
             {
                 try
                 {

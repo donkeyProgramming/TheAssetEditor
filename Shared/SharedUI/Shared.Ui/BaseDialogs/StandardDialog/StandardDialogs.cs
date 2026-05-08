@@ -91,6 +91,45 @@ namespace Shared.Ui.BaseDialogs.StandardDialog
             return output;
         }
 
+        public SystemOpenFileDialogResult ShowSystemOpenFileDialog(bool multiselect = false, string filter = "All files|*.*")
+        {
+            using var dialog = new System.Windows.Forms.OpenFileDialog
+            {
+                Multiselect = multiselect,
+                Filter = filter
+            };
+
+            if (dialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+                return new SystemOpenFileDialogResult(true, dialog.FileNames);
+
+            return new SystemOpenFileDialogResult(false, Array.Empty<string>());
+        }
+
+        public SystemSaveFileDialogResult ShowSystemSaveFileDialog(string initialFileName, string filter, string defaultExt)
+        {
+            using var dialog = new System.Windows.Forms.SaveFileDialog
+            {
+                FileName = initialFileName,
+                Filter = filter,
+                DefaultExt = defaultExt
+            };
+
+            if (dialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+                return new SystemSaveFileDialogResult(true, dialog.FileName);
+
+            return new SystemSaveFileDialogResult(false, null);
+        }
+
+        public SystemBrowseFolderDialogResult ShowSystemFolderBrowserDialog()
+        {
+            using var dialog = new System.Windows.Forms.FolderBrowserDialog();
+
+            if (dialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+                return new SystemBrowseFolderDialogResult(true, dialog.SelectedPath);
+
+            return new SystemBrowseFolderDialogResult(false, null);
+        }
+
         public string ShowFolderNameDialog(IEnumerable<string> existingNames, string currentValue = "")
         {
             var isInputCorrect = false;
@@ -110,13 +149,13 @@ namespace Shared.Ui.BaseDialogs.StandardDialog
 
                 if (string.IsNullOrWhiteSpace(newFolderName))
                 {
-                    MessageBox.Show("Folder name can not be empty! Please Try Again.");
+                    System.Windows.MessageBox.Show("Folder name can not be empty! Please Try Again.");
                     isInputCorrect = false;
                 }
 
                 if (isInputCorrect && normalizedExistingNames.Contains(newFolderName))
                 {
-                    MessageBox.Show($"Folder with name '{newFolderName}' already exists in this folder!\nPlease Try Again.");
+                    System.Windows.MessageBox.Show($"Folder with name '{newFolderName}' already exists in this folder!\nPlease Try Again.");
                     isInputCorrect = false;
                 }
 
@@ -127,7 +166,7 @@ namespace Shared.Ui.BaseDialogs.StandardDialog
                     {
                         if (listOfInvalidChars.Contains(c))
                         {
-                            MessageBox.Show($"Folder name contains invalid character: {c}. \nPlease Try Again.");
+                            System.Windows.MessageBox.Show($"Folder name contains invalid character: {c}. \nPlease Try Again.");
                             isInputCorrect = false;
                             break;
                         }
@@ -170,12 +209,12 @@ namespace Shared.Ui.BaseDialogs.StandardDialog
 
         public void ShowDialogBox(string message, string title)
         {
-            MessageBox.Show(message, title);
+            System.Windows.MessageBox.Show(message, title);
         }
 
         public ShowMessageBoxResult ShowYesNoBox(string message, string title)
         {
-            var result = MessageBox.Show(message, title, MessageBoxButton.YesNo);
+            var result = System.Windows.MessageBox.Show(message, title, MessageBoxButton.YesNo);
             if (result == MessageBoxResult.Yes)
                 return ShowMessageBoxResult.OK;
             return ShowMessageBoxResult.Cancel;

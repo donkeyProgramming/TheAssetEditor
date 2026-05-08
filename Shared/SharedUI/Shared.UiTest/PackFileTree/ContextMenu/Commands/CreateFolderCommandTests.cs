@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using Moq;
@@ -6,14 +6,33 @@ using Shared.Core.Services;
 using Shared.Ui.BaseDialogs.PackFileTree;
 using Shared.Ui.BaseDialogs.PackFileTree.ContextMenu.Commands;
 
-namespace Shared.UiTest.ContextMenuCommands
+namespace Shared.UiTest.PackFileTree.ContextMenu.Commands
 {
     [TestFixture]
-    [Apartment(ApartmentState.STA)]
     internal class CreateFolderCommandTests : ContextMenuCommandTestBase
     {
         [Test]
-        public void ShouldAdd_IsEnabled_Execute()
+        public void ShouldAdd_ReturnsTrueForEditableRoot()
+        {
+            var owner = CreateContainer();
+            var root = new TreeNode("root", NodeType.Root, owner, null);
+            var command = new CreateFolderCommand(new Mock<IStandardDialogs>().Object);
+
+            Assert.That(command.ShouldAdd(root), Is.True);
+        }
+
+        [Test]
+        public void IsEnabled_ReturnsTrue()
+        {
+            var owner = CreateContainer();
+            var root = new TreeNode("root", NodeType.Root, owner, null);
+            var command = new CreateFolderCommand(new Mock<IStandardDialogs>().Object);
+
+            Assert.That(command.IsEnabled(root), Is.True);
+        }
+
+        [Test]
+        public void Execute_AddsFolderChild()
         {
             var owner = CreateContainer();
             var root = new TreeNode("root", NodeType.Root, owner, null);
@@ -24,9 +43,6 @@ namespace Shared.UiTest.ContextMenuCommands
             dialogs.Setup(x => x.ShowFolderNameDialog(It.IsAny<IEnumerable<string>>(), It.IsAny<string>())).Returns("new_folder");
 
             var command = new CreateFolderCommand(dialogs.Object);
-
-            Assert.That(command.ShouldAdd(root), Is.True);
-            Assert.That(command.IsEnabled(root), Is.True);
 
             command.Execute(root);
 

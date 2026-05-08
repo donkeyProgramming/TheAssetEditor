@@ -1,12 +1,11 @@
 ﻿using System;
 using System.IO;
-using System.Windows.Forms;
 using Shared.Core.Misc;
 using Shared.Core.Services;
 
 namespace Shared.Ui.BaseDialogs.PackFileTree.ContextMenu.Commands
 {
-    public class ExportToDirectoryCommand(IStandardDialogs standardDialogs) : IContextMenuCommand
+    public class ExportToDirectoryCommand(IStandardDialogs standardDialogs, IFileSystemAccess fileSystemAccess) : IContextMenuCommand
     {
         public string GetDisplayName(TreeNode node) => "Export to system folder";
         public bool ShouldAdd(TreeNode node) => node.NodeType == NodeType.Directory || node.NodeType == NodeType.Root || (node.NodeType == NodeType.File && node.Item != null);
@@ -15,12 +14,12 @@ namespace Shared.Ui.BaseDialogs.PackFileTree.ContextMenu.Commands
         public void Execute(TreeNode selectedNode)
         {
             // TODO: Fix bug where if you export the packfilecontainer itself it doesn't export correctly.
-            using var dialog = new FolderBrowserDialog();
-            if (dialog.ShowDialog() == DialogResult.OK)
+            var folderDialogResult = standardDialogs.ShowSystemFolderBrowserDialog();
+            if (folderDialogResult.Result && !string.IsNullOrEmpty(folderDialogResult.FolderPath))
             {
-                var nodeStartDir = Path.GetDirectoryName(selectedNode.GetFullPath());
+                var nodeStartDir = fileSystemAccess.PathGetDirectoryName(selectedNode.GetFullPath());
                 var fileCounter = 0;
-                SaveSelfAndChildren(selectedNode, dialog.SelectedPath, nodeStartDir, ref fileCounter);
+                SaveSelfAndChildren(selectedNode, folderDialogResult.FolderPath, nodeStartDir, ref fileCounter);
                 standardDialogs.ShowDialogBox($"{fileCounter} files exported!", "Export");
             }
         }
@@ -38,13 +37,13 @@ namespace Shared.Ui.BaseDialogs.PackFileTree.ContextMenu.Commands
                 var nodePathWithoutRoot = ComputeRelativePath(nodeOriginalPath, rootPath);
                 var fileOutputPath = outputDirectory + nodePathWithoutRoot;
 
-                var fileOutputDir = Path.GetDirectoryName(fileOutputPath);
+                var fileOutputDir = fileSystemAccess.PathGetDirectoryName(fileOutputPath);
                 DirectoryHelper.EnsureCreated(fileOutputDir);
 
                 var packFile = node.Item;
                 var bytes = packFile.DataSource.ReadData();
 
-                File.WriteAllBytes(fileOutputPath, bytes);
+                fileSystemAccess.FileWriteAllBytes(fileOutputPath, bytes);
 
                 fileCounter++;
             }

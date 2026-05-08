@@ -1,8 +1,7 @@
-using Moq;
+﻿using Moq;
 using Shared.Core.PackFiles.Models;
-using Shared.Ui.BaseDialogs.PackFileTree;
 
-namespace Shared.UiTest.ContextMenuCommands
+namespace Shared.UiTest.PackFileTree.ContextMenu.Commands
 {
     internal abstract class ContextMenuCommandTestBase
     {

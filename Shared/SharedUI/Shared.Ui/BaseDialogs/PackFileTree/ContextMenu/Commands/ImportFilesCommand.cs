@@ -1,5 +1,4 @@
 ﻿using System.IO;
-using System.Windows.Forms;
 using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
 using Shared.Core.PackFiles.Models.FileSources;
@@ -21,15 +20,11 @@ namespace Shared.Ui.BaseDialogs.PackFileTree.ContextMenu.Commands
                 return;
             }
 
-            using var dialog = new OpenFileDialog()
-            {
-                Multiselect = true,
-            };
-
-            if (dialog.ShowDialog() == DialogResult.OK)
+            var dialogResult = standardDialogs.ShowSystemOpenFileDialog(multiselect: true);
+            if (dialogResult.Result)
             {
                 var parentPath = _selectedNode.GetFullPath();
-                var files = dialog.FileNames;
+                var files = dialogResult.FilePaths;
                 foreach (var file in files)
                 {
                     var fileName = Path.GetFileName(file);

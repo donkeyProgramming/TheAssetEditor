@@ -1,11 +1,10 @@
 ﻿using System.Diagnostics;
-using System.IO;
 using Shared.Core.PackFiles;
 using Shared.Core.Services;
 
 namespace Shared.Ui.BaseDialogs.PackFileTree.ContextMenu.Commands
 {
-    public class OpenPackInFileExplorerCommand(IPackFileService packFileService, IStandardDialogs standardDialogs) : IContextMenuCommand
+    public class OpenPackInFileExplorerCommand(IPackFileService packFileService, IStandardDialogs standardDialogs, IFileSystemAccess fileSystemAccess) : IContextMenuCommand
     {
         public string GetDisplayName(TreeNode node) => "Open In File Explorer";
         public bool ShouldAdd(TreeNode node) => node.NodeType != NodeType.File && !node.FileOwner.IsCaPackFile;
@@ -20,8 +19,8 @@ namespace Shared.Ui.BaseDialogs.PackFileTree.ContextMenu.Commands
                 return;
             }
 
-            if (!Directory.Exists(systemFilePath))
-                systemFilePath = Path.GetDirectoryName(systemFilePath);
+            if (!fileSystemAccess.DirectoryExists(systemFilePath))
+                systemFilePath = fileSystemAccess.PathGetDirectoryName(systemFilePath);
 
             if (systemFilePath == null)
             {
@@ -29,7 +28,7 @@ namespace Shared.Ui.BaseDialogs.PackFileTree.ContextMenu.Commands
                 return;
             }
 
-            Process.Start(new ProcessStartInfo
+            using var process = fileSystemAccess.ProcessStart(new ProcessStartInfo
             {
                 FileName = "explorer.exe",
                 Arguments = $"\"{systemFilePath}\"",
