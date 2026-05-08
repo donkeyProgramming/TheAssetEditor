@@ -22,15 +22,12 @@ namespace Shared.Core.ToolCreation
         public void LoadFile(PackFile file);
     }
 
-    public interface IEditorCreator
+    public interface IEditorManager
     {
         IEditorInterface CreateFromFile(PackFile file, EditorEnums? preferedEditor = null);
         IEditorInterface Create(EditorEnums editor, Action<IEditorInterface>? onInitializeCallback = null);
         Window CreateWindow(PackFile packFile, EditorEnums? preferedEditor = null);
-    }
 
-    public interface IEditorManager : IEditorCreator
-    {
         IList<IEditorInterface> GetAllEditors();
         int GetCurrentEditor();
         void SetEditorAsCurrent(IEditorInterface editor);

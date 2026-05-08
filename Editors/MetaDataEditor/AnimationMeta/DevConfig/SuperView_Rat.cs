@@ -12,11 +12,11 @@ namespace Editors.AnimationMeta.DevConfig
 {
     internal class SuperView_Rat : IDeveloperConfiguration
     {
-        private readonly IEditorCreator _editorCreator;
+        private readonly IEditorManager _editorCreator;
         private readonly IPackFileContainerLoader _packFileContainerLoader;
         private readonly IPackFileService _packFileService;
 
-        public SuperView_Rat(IEditorCreator editorCreator, IPackFileContainerLoader packFileContainerLoader, IPackFileService packFileService)
+        public SuperView_Rat(IEditorManager editorCreator, IPackFileContainerLoader packFileContainerLoader, IPackFileService packFileService)
         {
             _editorCreator = editorCreator;
             _packFileContainerLoader = packFileContainerLoader;
@@ -38,7 +38,7 @@ namespace Editors.AnimationMeta.DevConfig
             CreateThrot(_editorCreator, _packFileService);
         }
 
-        void CreateThrot(IEditorCreator creator, IPackFileService packfileService)
+        void CreateThrot(IEditorManager creator, IPackFileService packfileService)
         {
             var debugInput = new AnimationToolInput()
             {

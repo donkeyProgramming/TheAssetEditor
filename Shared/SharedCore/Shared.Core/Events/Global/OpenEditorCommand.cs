@@ -8,10 +8,10 @@ namespace Shared.Core.Events.Global
 {
     public class OpenEditorCommand : IUiCommand
     {
-        private readonly IEditorCreator _editorCreator;
+        private readonly IEditorManager _editorCreator;
         private readonly IPackFileService _packFileService;
 
-        public OpenEditorCommand(IEditorCreator editorCreator, IPackFileService packFileService)
+        public OpenEditorCommand(IEditorManager editorCreator, IPackFileService packFileService)
         {
             _packFileService = packFileService;
             _editorCreator = editorCreator;
