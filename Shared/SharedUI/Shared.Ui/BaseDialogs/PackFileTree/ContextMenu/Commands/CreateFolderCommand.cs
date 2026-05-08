@@ -1,26 +1,25 @@
 ﻿using System.Linq;
-using System.Windows;
-using Shared.Core.PackFiles;
+using Shared.Core.Services;
 
 namespace Shared.Ui.BaseDialogs.PackFileTree.ContextMenu.Commands
 {
-    public class CreateFolderCommand(IPackFileService packFileService) : IContextMenuCommand
+    public class CreateFolderCommand(IStandardDialogs standardDialogs) : IContextMenuCommand
     {
         public string GetDisplayName(TreeNode node) => "Create Folder";
         public bool IsEnabled(TreeNode node) => true;
 
-        public void Execute(TreeNode _selectedNode)
+        public void Execute(TreeNode selectedNode)
         {
-            if (_selectedNode.FileOwner.IsCaPackFile)
+            if (selectedNode.FileOwner.IsCaPackFile)
             {
-                MessageBox.Show("Unable to edit CA packfile");
+                standardDialogs.ShowDialogBox("Unable to edit CA packfile");
                 return;
             }
 
-            var folderName = EditFileNameDialog.ShowDialog(_selectedNode, "");
+            var folderName = standardDialogs.ShowFolderNameDialog(selectedNode.Children.Select(x => x.Name), "");
 
             if (folderName.Any())
-                _selectedNode.AddDirectoryChild(folderName);
+                selectedNode.AddDirectoryChild(folderName);
         }
     }
 }

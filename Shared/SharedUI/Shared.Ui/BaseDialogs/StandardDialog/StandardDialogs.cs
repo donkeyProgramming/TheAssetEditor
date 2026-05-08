@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using System.Windows;
 using CommonControls.BaseDialogs;
 using CommonControls.BaseDialogs.ErrorListDialog;
@@ -87,6 +89,56 @@ namespace Shared.Ui.BaseDialogs.StandardDialog
             var saveResult = browser.ShowDialog();
             var output = new BrowseDialogResultFolder(saveResult, browser.SelectedFolder);
             return output;
+        }
+
+        public string ShowFolderNameDialog(IEnumerable<string> existingNames, string currentValue = "")
+        {
+            var isInputCorrect = false;
+            var dialogTextBoxValue = currentValue;
+            var normalizedExistingNames = new HashSet<string>(existingNames.Select(x => x.ToLower().Trim()));
+
+            while (!isInputCorrect)
+            {
+                isInputCorrect = true;
+                var window = new TextInputWindow("Create folder", dialogTextBoxValue, true);
+
+                if (window.ShowDialog() == false)
+                    return string.Empty;
+
+                dialogTextBoxValue = window.TextValue;
+                var newFolderName = window.TextValue.ToLower().Trim();
+
+                if (string.IsNullOrWhiteSpace(newFolderName))
+                {
+                    MessageBox.Show("Folder name can not be empty! Please Try Again.");
+                    isInputCorrect = false;
+                }
+
+                if (isInputCorrect && normalizedExistingNames.Contains(newFolderName))
+                {
+                    MessageBox.Show($"Folder with name '{newFolderName}' already exists in this folder!\nPlease Try Again.");
+                    isInputCorrect = false;
+                }
+
+                if (isInputCorrect)
+                {
+                    var listOfInvalidChars = Path.GetInvalidFileNameChars();
+                    foreach (var c in newFolderName)
+                    {
+                        if (listOfInvalidChars.Contains(c))
+                        {
+                            MessageBox.Show($"Folder name contains invalid character: {c}. \nPlease Try Again.");
+                            isInputCorrect = false;
+                            break;
+                        }
+                    }
+                }
+
+                if (isInputCorrect)
+                    return newFolderName;
+            }
+
+            return string.Empty;
         }
 
         public void ShowExceptionWindow(Exception e, string userInfo = "")

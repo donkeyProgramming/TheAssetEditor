@@ -1,6 +1,7 @@
 ﻿using Shared.Core.ErrorHandling;
 using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
+using System.Collections.Generic;
 
 namespace Shared.Core.Services
 {
@@ -9,6 +10,7 @@ namespace Shared.Core.Services
         SaveDialogResult DisplaySaveDialog(IPackFileService pfs, List<string> extensions);
         BrowseDialogResultFile DisplayBrowseDialog(List<string> extensions);
         BrowseDialogResultFolder DisplayBrowseFolderDialog();
+        string ShowFolderNameDialog(IEnumerable<string> existingNames, string currentValue = "");
 
         void ShowExceptionWindow(Exception e, string userInfo = "");
         void ShowErrorViewDialog(string title, ErrorList errorItems, bool modal = true);

@@ -10,7 +10,7 @@ using Shared.Core.PackFiles.Models;
 
 namespace Shared.Ui.BaseDialogs.PackFileTree
 {
-    public class SearchFilter : NotifyPropertyChangedImpl, IDataErrorInfo
+    public class SearchFilter : NotifyPropertyChangedImpl, IDataErrorInfo, IDisposable
     {
         public string Error { get; set; } = string.Empty;
         public string this[string columnName] => ApplyFilter(FilterText);
@@ -68,6 +68,7 @@ namespace Shared.Ui.BaseDialogs.PackFileTree
         private async void DebounceFilter()
         {
             _debounceCts?.Cancel();
+            _debounceCts?.Dispose();
             _debounceCts = new CancellationTokenSource();
             var token = _debounceCts.Token;
 
@@ -328,6 +329,13 @@ namespace Shared.Ui.BaseDialogs.PackFileTree
                 foreach (var child in node.BackingChildren)
                     SetChildVisibilityPredicateRecursive(child, predicate);
             }
+        }
+
+        public void Dispose()
+        {
+            _debounceCts?.Cancel();
+            _debounceCts?.Dispose();
+            _debounceCts = null;
         }
     }
 }

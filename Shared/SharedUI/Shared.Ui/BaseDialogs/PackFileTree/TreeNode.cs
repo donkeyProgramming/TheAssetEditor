@@ -190,6 +190,10 @@ namespace Shared.Ui.BaseDialogs.PackFileTree
 
             Children.Clear();
             Parent = null;
+
+            // Clear closures and delegates to break reference cycles
+            _childLoader = null;
+            _childVisibilityPredicate = null;
         }
 
         public void ForeachNode(Action<TreeNode> func)
@@ -367,7 +371,12 @@ namespace Shared.Ui.BaseDialogs.PackFileTree
 
         private void UnloadChildren()
         {
+            // Recursively unload all children to break closure cycles
             foreach (var child in Children)
+                child.RemoveSelf();
+
+            // Also unload any backing children that weren't materialized
+            foreach (var child in BackingChildren.Where(c => !Children.Contains(c)))
                 child.RemoveSelf();
 
             Children.Clear();

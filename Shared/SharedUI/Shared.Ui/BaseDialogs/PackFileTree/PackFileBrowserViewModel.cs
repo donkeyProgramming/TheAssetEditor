@@ -77,6 +77,7 @@ namespace Shared.Ui.BaseDialogs.PackFileTree
         public void Dispose()
         {
             _eventHub?.UnRegister(this);
+            Filter?.Dispose();
         }
 
         partial void OnSelectedItemChanged(TreeNode value)
