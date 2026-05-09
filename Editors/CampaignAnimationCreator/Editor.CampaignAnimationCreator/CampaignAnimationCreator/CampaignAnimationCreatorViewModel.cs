@@ -23,6 +23,7 @@ namespace Editor.CampaignAnimationCreator.CampaignAnimationCreator
         public CampaignAnimationCreatorViewModel(IEditorHostParameters editorHostParameters, IUiCommandFactory uiCommandFactory)
             : base(editorHostParameters)
         {
+            DisplayName = "CampaignAnimationCreator";
             _uiCommandFactory = uiCommandFactory;
             Initialize();
         }
