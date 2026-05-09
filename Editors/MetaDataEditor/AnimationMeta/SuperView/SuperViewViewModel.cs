@@ -97,8 +97,6 @@ namespace Editors.AnimationMeta.SuperView
             OnSceneObjectUpdated(new SceneObjectUpdateEvent(_asset.Data, false, false, false, true));
         }
 
-    
-
         void RecreateMetaDataInformation()
         {
             foreach (var item in SceneObjects)
