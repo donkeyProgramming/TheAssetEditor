@@ -1,5 +1,4 @@
-﻿using System.Windows;
-using CommunityToolkit.Diagnostics;
+﻿using CommunityToolkit.Diagnostics;
 using CommunityToolkit.Mvvm.Input;
 using Editor.CampaignAnimationCreator.CampaignAnimationCreator.Commands;
 using Editors.Shared.Core.Common;
@@ -45,47 +44,29 @@ namespace Editor.CampaignAnimationCreator.CampaignAnimationCreator
             AnimationChanged(_sceneObject.AnimationClip);
         }
 
-
         [RelayCommand]
         public void ConvertAction()
         {
-            Guard.IsNotNull(_sceneObject, "Scene object not created");
+            Guard.IsNotNull(_sceneObject, "Scene object not created - unable to convert");
 
-
-            var result = _uiCommandFactory.Create<ConvertCampaignAnimationCommand>().Execute(_selectedAnimationClip, ModelBoneList.SelectedItem, out var convertedAnimation, out var errorText);
+            var result = _uiCommandFactory.Create<ConvertCampaignAnimationCommand>().Execute(_selectedAnimationClip, ModelBoneList.SelectedItem, out var convertedAnimation);
             if (result == false)
-            {
-             
                 return;
-            }
             
             var outputName = _sceneObject.AnimationName.Value;
             SceneObjectEditor.SetAnimationClip(_sceneObject, convertedAnimation, outputName);
         }
 
-
         [RelayCommand]
         public void SaveAnimationAction()
         {
-            if (_sceneObject == null)
-            {
-                MessageBox.Show("No model loaded");
-                return;
-            }
+            Guard.IsNotNull(_sceneObject, "Scene object not created - unable to save");
 
-            var result = _uiCommandFactory.Create<SaveCampaignAnimationCommand>().Execute(_sceneObject, out var errorText);
-            if (result == false)
-            {
-                MessageBox.Show(errorText ?? "Unable to save animation");
-            }
+            _uiCommandFactory.Create<SaveCampaignAnimationCommand>().Execute(_sceneObject.Skeleton, _sceneObject.AnimationClip);
         }
 
-
-        private void AnimationChanged(AnimationClip? newValue)
-        {
-            _selectedAnimationClip = newValue;
-        }
-
+        private void AnimationChanged(AnimationClip? newValue) => _selectedAnimationClip = newValue;
+        
         private void SkeletonChanged(GameSkeleton? newValue)
         {
             if (newValue == null)

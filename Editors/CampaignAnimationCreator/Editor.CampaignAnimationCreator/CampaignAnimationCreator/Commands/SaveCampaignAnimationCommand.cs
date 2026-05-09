@@ -1,42 +1,30 @@
-﻿using Editors.Shared.Core.Common;
+﻿using GameWorld.Core.Animation;
 using Shared.Core.Events;
 using Shared.Core.Services;
 using Shared.GameFormats.Animation;
 
 namespace Editor.CampaignAnimationCreator.CampaignAnimationCreator.Commands
 {
-    public class SaveCampaignAnimationCommand : IUiCommand
+    public class SaveCampaignAnimationCommand(IFileSaveService fileSaveService, IStandardDialogs standardDialogs) : IUiCommand
     {
-        private readonly IFileSaveService _fileSaveService;
+        private readonly IFileSaveService _fileSaveService = fileSaveService;
 
-        public SaveCampaignAnimationCommand(IFileSaveService fileSaveService)
+        public bool Execute(GameSkeleton? skeleton, AnimationClip? animClip)
         {
-            _fileSaveService = fileSaveService;
-        }
-
-        public bool Execute(SceneObject sceneObject, out string? errorText)
-        {
-            errorText = null;
-
-            if (sceneObject == null)
+            if (skeleton == null)
             {
-                errorText = "No model loaded";
+                standardDialogs.ShowDialogBox("Unable to save - No skeleton provided");
+          
                 return false;
             }
 
-            if (sceneObject.Skeleton == null)
+            if (animClip == null)
             {
-                errorText = "Model has no skeleton";
+                standardDialogs.ShowDialogBox("Unable to save - No animation provided");
                 return false;
             }
 
-            if (sceneObject.AnimationClip == null)
-            {
-                errorText = "No animation selected";
-                return false;
-            }
-
-            var animFile = sceneObject.AnimationClip.ConvertToFileFormat(sceneObject.Skeleton);
+            var animFile = animClip.ConvertToFileFormat(skeleton);
             var bytes = AnimationFile.ConvertToBytes(animFile);
             _fileSaveService.SaveAs(".anim", bytes);
 

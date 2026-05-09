@@ -516,6 +516,32 @@ namespace Shared.UiTest.BaseDialogs
         }
 
         [Test]
+        public void AddSecondRootFileAfterExpandingInitiallyEmptyEditablePack_UpdatesMaterializedTree()
+        {
+            var container = _packageFileService.CreateNewPackFileContainer("test.pack", PackFileVersion.PFH5, PackFileCAType.MOD, true);
+            _packageFileService.AddContainer(container);
+
+            var firstFile = PackFile.CreateFromASCII("first.txt", "first");
+            _packageFileService.AddFilesToPack(container, [new NewPackFileEntry("", firstFile)]);
+
+            var root = _viewModel.Files.First(x => x.Name == "test.pack");
+            Assert.That(root.IsMainEditabelPack, Is.True, "The new pack should be the editable pack for this scenario");
+
+            root.IsNodeExpanded = true;
+
+            var visibleChildrenAfterFirstAdd = root.Children.Where(x => x.NodeType == NodeType.File).Select(x => x.Name).ToList();
+            Assert.That(visibleChildrenAfterFirstAdd, Is.EqualTo(new[] { "first.txt" }), "Expanding after the first add should materialize the first root file");
+
+            var secondFile = PackFile.CreateFromASCII("second.txt", "second");
+            _packageFileService.AddFilesToPack(container, [new NewPackFileEntry("", secondFile)]);
+
+            var visibleChildrenAfterSecondAdd = root.Children.Where(x => x.NodeType == NodeType.File).Select(x => x.Name).ToList();
+
+            Assert.That(root.IsNodeExpanded, Is.True, "Root should remain expanded after the second add");
+            Assert.That(visibleChildrenAfterSecondAdd, Is.EqualTo(new[] { "first.txt", "second.txt" }), "An expanded root should immediately show the newly added root-level file without requiring collapse/re-expand");
+        }
+
+        [Test]
         public void DoubleClick_File_InvokesFileOpenEvent()
         {
             CreatePackfiles(("foldera\\file.txt", "file.txt"));

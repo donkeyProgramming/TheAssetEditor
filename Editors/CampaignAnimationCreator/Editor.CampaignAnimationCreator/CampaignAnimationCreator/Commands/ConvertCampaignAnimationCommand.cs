@@ -6,49 +6,28 @@ using Shared.Core.Services;
 
 namespace Editor.CampaignAnimationCreator.CampaignAnimationCreator.Commands
 {
-    public class ConvertCampaignAnimationCommand(IStandardDialogs StandardDialogs) : IUiCommand
+    public class ConvertCampaignAnimationCommand(IStandardDialogs standardDialogs) : IUiCommand
     {
-        public bool Execute(AnimationClip? sourceAnimation, SkeletonBoneNode? rootBone, out AnimationClip? convertedAnimation, out string? errorText)
+        public bool Execute(AnimationClip? sourceAnimation, SkeletonBoneNode? rootBone, out AnimationClip? convertedAnimation)
         {
             convertedAnimation = null;
-            errorText = null;
-
-            // if (_selectedUnit == null)
-            // {
-            //     MessageBox.Show("No model loaded");
-            //     return;
-            // }
-            //
-            // if (_selectedAnimationClip == null)
-            // {
-            //     MessageBox.Show("No animation selected");
-            //     return;
-            // }
-            //
-            // if (ModelBoneList.SelectedItem == null)
-            // {
-            //     MessageBox.Show("No root bone selected");
-            //     return;
-            // }
-
-            //   MessageBox.Show(errorText ?? "Unable to convert animation");
 
             if (sourceAnimation == null)
             {
-                errorText = "No animation selected";
+                standardDialogs.ShowDialogBox("Unable to convert animation - No animation selected");
                 return false;
             }
 
             if (rootBone == null)
             {
-                errorText = "No root bone selected";
+                standardDialogs.ShowDialogBox("Unable to convert animation - No root bone selected");
                 return false;
             }
 
             var animationCopy = sourceAnimation.Clone();
             if (animationCopy.DynamicFrames.Count == 0)
             {
-                errorText = "Animation has no frames";
+                standardDialogs.ShowDialogBox("Unable to convert animation - Animation has no frames");
                 return false;
             }
 
@@ -59,7 +38,7 @@ namespace Editor.CampaignAnimationCreator.CampaignAnimationCreator.Commands
 
                 if (rootBone.BoneIndex < 0 || rootBone.BoneIndex >= boneCount)
                 {
-                    errorText = $"Bone index {rootBone.BoneIndex} is out of range for frame {frameIndex}";
+                    standardDialogs.ShowDialogBox($"Unable to convert animation - Bone index {rootBone.BoneIndex} is out of range for frame {frameIndex}");
                     return false;
                 }
 
