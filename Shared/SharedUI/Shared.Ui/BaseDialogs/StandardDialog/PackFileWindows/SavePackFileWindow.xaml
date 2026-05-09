@@ -20,7 +20,7 @@
 
         <packfiletree:PackFileBrowserView Grid.Row="0" Grid.ColumnSpan="2" DataContext="{Binding ViewModel, Mode=OneTime}"/>
 
-        <Button HorizontalAlignment="Right" Margin="5,2,5,2" Width="80" Grid.Row="1" Grid.Column="1" Click="Button_Click">{loc:Loc Dialog.SavePackFile.SaveButton}</Button>
+        <Button HorizontalAlignment="Right" Margin="5,2,5,2" Width="80" Grid.Row="1" Grid.Column="1" Click="Button_Click" Content="{loc:Loc Dialog.SavePackFile.SaveButton}"/>
         <TextBox Margin="5,2,5,2" Grid.Row="1" Grid.Column="0" Text="{Binding CurrentFileName, UpdateSourceTrigger=PropertyChanged}" />
     </Grid>
 </Window>

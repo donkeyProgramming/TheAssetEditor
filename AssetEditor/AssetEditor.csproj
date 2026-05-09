@@ -16,6 +16,7 @@
 
     <ItemGroup>
         <ProjectReference Include="..\Editors\AnimationEditor\Editors.AnimationVisualEditors.csproj" />
+        <ProjectReference Include="..\Editors\CampaignAnimationCreator\Editor.CampaignAnimationCreator\Editor.CampaignAnimationCreator.csproj" />
         <ProjectReference Include="..\Editors\AnimationFragmentEditor\Editor.AnimationFragmentEditor\Editors.AnimationFragmentEditor.csproj" />
         <ProjectReference Include="..\Editors\AnimationReTarget\Editors.AnimatioReTarget\Editors.AnimatioReTarget.csproj" />
         <ProjectReference Include="..\Editors\Audio\Editors.Audio.csproj" />

@@ -9,6 +9,7 @@ namespace Shared.Core.PackFiles.Models.Containers
     internal class CachedPackFileContainer : IPackFileContainerInternal
     {
         private readonly CacheDbContext _db;
+        private readonly object _dbLock = new();
 
         public string Name { get; set; }
         public bool IsCaPackFile { get => true; set { } }
@@ -25,45 +26,64 @@ namespace Shared.Core.PackFiles.Models.Containers
 
         public int GetFileCount()
         {
-            return _db.Files.Count();
+            lock (_dbLock)
+            {
+                return _db.Files.Count();
+            }
         }
 
         public PackFile? FindFile(string path)
         {
             var lowerPath = PathNormalization.NormalizeFileName(path);
-            var entry = _db.Files.FirstOrDefault(f => f.RelativePath == lowerPath);
+            CachedFileEntity? entry;
+            lock (_dbLock)
+            {
+                entry = _db.Files.FirstOrDefault(f => f.RelativePath == lowerPath);
+            }
+
             return entry != null ? ToPackFile(entry) : null;
         }
 
         public bool ContainsFile(string path)
         {
             var lowerPath = PathNormalization.NormalizeFileName(path);
-            return _db.Files.Any(f => f.RelativePath == lowerPath);
+            lock (_dbLock)
+            {
+                return _db.Files.Any(f => f.RelativePath == lowerPath);
+            }
         }
 
         public string? GetFullPath(PackFile file)
         {
             if (file.DataSource is PackedFileSource source)
             {
-                var entry = _db.Files.FirstOrDefault(f =>
-                    f.SourcePackFilePath == source.Parent.FilePath &&
-                    f.Offset == source.Offset &&
-                    f.Size == source.Size &&
-                    f.IsEncrypted == source.IsEncrypted &&
-                    f.IsCompressed == source.IsCompressed &&
-                    f.CompressionFormat == (int)source.CompressionFormat &&
-                    f.UncompressedSize == source.UncompressedSize &&
-                    f.FileName.ToLower() == file.Name.ToLower());
+                CachedFileEntity? entry;
+                lock (_dbLock)
+                {
+                    entry = _db.Files.FirstOrDefault(f =>
+                        f.SourcePackFilePath == source.Parent.FilePath &&
+                        f.Offset == source.Offset &&
+                        f.Size == source.Size &&
+                        f.IsEncrypted == source.IsEncrypted &&
+                        f.IsCompressed == source.IsCompressed &&
+                        f.CompressionFormat == (int)source.CompressionFormat &&
+                        f.UncompressedSize == source.UncompressedSize &&
+                        f.FileName.ToLower() == file.Name.ToLower());
+                }
 
                 if (entry != null)
                     return entry.RelativePath;
             }
 
-            var matchingPaths = _db.Files
-                .Where(f => f.FileName.ToLower() == file.Name.ToLower())
-                .Select(f => f.RelativePath)
-                .Take(2)
-                .ToList();
+            List<string> matchingPaths;
+            lock (_dbLock)
+            {
+                matchingPaths = _db.Files
+                    .Where(f => f.FileName.ToLower() == file.Name.ToLower())
+                    .Select(f => f.RelativePath)
+                    .Take(2)
+                    .ToList();
+            }
 
             return matchingPaths.Count == 1 ? matchingPaths[0] : null;
         }
@@ -71,37 +91,50 @@ namespace Shared.Core.PackFiles.Models.Containers
         public List<(string FileName, PackFile Pack)> FindAllWithExtention(string extention)
         {
             extention = extention.ToLower();
-            var entries = _db.Files
-                .Where(f => f.Extension == extention)
-                .ToList();
+            List<CachedFileEntity> entries;
+            lock (_dbLock)
+            {
+                entries = _db.Files
+                    .Where(f => f.Extension == extention)
+                    .ToList();
+            }
 
             return entries.Select(e => (e.RelativePath, ToPackFile(e))).ToList();
         }
 
         public List<(string Path, PackFile File)> SearchFiles(string? textFilter, IReadOnlyList<string>? extensions)
         {
-            IQueryable<CachedFileEntity> query = _db.Files;
-
-            if (extensions != null && extensions.Count > 0)
+            List<CachedFileEntity> entries;
+            lock (_dbLock)
             {
-                var extList = extensions.Select(e => e.ToLowerInvariant()).ToList();
-                query = query.Where(f => extList.Any(ext => f.FileName.Contains(ext)));
-            }
+                IQueryable<CachedFileEntity> query = _db.Files;
 
-            if (!string.IsNullOrWhiteSpace(textFilter))
-            {
-                var pattern = $"%{textFilter}%";
-                query = query.Where(f => EF.Functions.Like(f.FileName, pattern));
-            }
+                if (extensions != null && extensions.Count > 0)
+                {
+                    var extList = extensions.Select(e => e.ToLowerInvariant()).ToList();
+                    query = query.Where(f => extList.Any(ext => f.FileName.Contains(ext)));
+                }
 
-            var entries = query.OrderBy(f => f.RelativePath).ToList();
+                if (!string.IsNullOrWhiteSpace(textFilter))
+                {
+                    var pattern = $"%{textFilter}%";
+                    query = query.Where(f => EF.Functions.Like(f.FileName, pattern));
+                }
+
+                entries = query.OrderBy(f => f.RelativePath).ToList();
+            }
 
             return entries.Select(e => (e.RelativePath, ToPackFile(e))).ToList();
         }
 
         public Dictionary<string, PackFile> GetAllFiles()
         {
-            var entries = _db.Files.ToList();
+            List<CachedFileEntity> entries;
+            lock (_dbLock)
+            {
+                entries = _db.Files.ToList();
+            }
+
             var parentCache = new Dictionary<string, PackedFileSourceParent>(StringComparer.OrdinalIgnoreCase);
             var result = new Dictionary<string, PackFile>(entries.Count);
 
@@ -128,10 +161,25 @@ namespace Shared.Core.PackFiles.Models.Containers
 
         public List<(string Path, PackFile File)> GetDirectoryContent(string directoryPath)
         {
-            var directFileRows = _db.Files
-                .Where(f => f.FolderPath == directoryPath)
-                .Select(f => new { f.FolderPath, f.FileName, f.SourcePackFilePath, f.Offset, f.Size, f.IsEncrypted, f.IsCompressed, f.CompressionFormat, f.UncompressedSize })
-                .ToList();
+            List<DirectoryFileRow> directFileRows;
+            lock (_dbLock)
+            {
+                directFileRows = _db.Files
+                    .Where(f => f.FolderPath == directoryPath)
+                    .Select(f => new DirectoryFileRow
+                    {
+                        FolderPath = f.FolderPath,
+                        FileName = f.FileName,
+                        SourcePackFilePath = f.SourcePackFilePath,
+                        Offset = f.Offset,
+                        Size = f.Size,
+                        IsEncrypted = f.IsEncrypted,
+                        IsCompressed = f.IsCompressed,
+                        CompressionFormat = f.CompressionFormat,
+                        UncompressedSize = f.UncompressedSize
+                    })
+                    .ToList();
+            }
 
             var packedFileSourceParentCache = new Dictionary<string, PackedFileSourceParent>(StringComparer.OrdinalIgnoreCase);
             var files = directFileRows
@@ -158,12 +206,18 @@ namespace Shared.Core.PackFiles.Models.Containers
             var prefix = string.IsNullOrEmpty(directoryPath) ? "" : directoryPath + "\\";
             var prefixLength = prefix.Length;
 
-            return _db.Files
-                .Where(f => string.IsNullOrEmpty(directoryPath)
-                    ? f.FolderPath != ""
-                    : f.FolderPath.StartsWith(prefix))
-                .Select(f => f.FolderPath)
-                .AsEnumerable()
+            List<string> folderPaths;
+            lock (_dbLock)
+            {
+                folderPaths = _db.Files
+                    .Where(f => string.IsNullOrEmpty(directoryPath)
+                        ? f.FolderPath != ""
+                        : f.FolderPath.StartsWith(prefix))
+                    .Select(f => f.FolderPath)
+                    .ToList();
+            }
+
+            return folderPaths
                 .Select(folderPath => string.IsNullOrEmpty(directoryPath)
                     ? folderPath
                     : folderPath.Substring(prefixLength))
@@ -213,6 +267,19 @@ namespace Shared.Core.PackFiles.Models.Containers
                 entry.IsEncrypted, entry.IsCompressed,
                 (Utility.CompressionFormat)entry.CompressionFormat, entry.UncompressedSize);
             return new PackFile(entry.FileName, source);
+        }
+
+        private sealed class DirectoryFileRow
+        {
+            public string FolderPath { get; init; } = string.Empty;
+            public string FileName { get; init; } = string.Empty;
+            public string SourcePackFilePath { get; init; } = string.Empty;
+            public long Offset { get; init; }
+            public long Size { get; init; }
+            public bool IsEncrypted { get; init; }
+            public bool IsCompressed { get; init; }
+            public int CompressionFormat { get; init; }
+            public uint UncompressedSize { get; init; }
         }
     }
 }
