@@ -30,6 +30,7 @@ namespace AssetEditor.Services
                 new Editors.Audio.DependencyInjectionContainer(),
                 new Editors.TextureEditor.DependencyInjectionContainer(),
                 new Editors.AnimationVisualEditors.DependencyInjectionContainer(),
+                new Editor.CampaignAnimationCreator.DependencyInjectionContainer(),
                 new Editors.ImportExport.DependencyInjectionContainer(),
                 new Editor.VisualSkeletonEditor.DependencyInjectionContainer(),
                 new Editors.AnimatioReTarget.DependencyInjectionContainer(),

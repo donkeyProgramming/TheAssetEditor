@@ -1,4 +1,5 @@
-﻿using Shared.Core.DevConfig;
+﻿using CommunityToolkit.Diagnostics;
+using Shared.Core.DevConfig;
 using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Utility;
 using Shared.Core.Settings;
@@ -28,6 +29,7 @@ namespace Editor.VisualSkeletonEditor.DevConfig
 
             var packFile = ResourceLoader.GetDevelopmentDataFolder() + "\\Karl_and_celestialgeneral.pack";
             var container = _packFileContainerLoader.Load(packFile);
+            Guard.IsNotNull(container, "Failed to load pack file container for development config.");   
             container.IsCaPackFile = true;
             _packFileService.AddContainer(container);
         }

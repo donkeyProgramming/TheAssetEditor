@@ -28,12 +28,15 @@ namespace Shared.Core.Services
                 throw new Exception($"Unable to save file. No Editable PackFile selected");
 
             var saveDialogResult = _packFileUiProvider.DisplaySaveDialog(_packFileService, [extention]);
-            if (saveDialogResult.Result)
+            if (saveDialogResult.Result == false)
                 return null;
 
             var fileName = Path.GetFileName(saveDialogResult.SelectedFilePath);
             if (string.IsNullOrWhiteSpace(fileName))
                 return null;
+
+            if (Path.GetExtension(fileName)?.ToLower() != extention.ToLower())
+                fileName = Path.ChangeExtension(fileName, extention);
 
             var isExistingFile = _packFileService.FindFile(saveDialogResult.SelectedFilePath!, editablePack);
             if (isExistingFile == null)
