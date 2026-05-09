@@ -10,7 +10,7 @@
   <ItemGroup>
     <PackageReference Include="Octokit" Version="14.0.0" />
     <PackageReference Include="Serilog" Version="4.3.1" />
-    <PackageReference Include="SharpCompress" Version="0.46.3" />
+    <PackageReference Include="SharpCompress" Version="0.48.0" />
   </ItemGroup>
 
 </Project>
