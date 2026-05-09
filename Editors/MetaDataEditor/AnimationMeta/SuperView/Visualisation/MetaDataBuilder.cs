@@ -1,4 +1,4 @@
-using System.Data;
+﻿using System.Data;
 using Editors.AnimationMeta.SuperView.Visualisation.Instances;
 using Editors.AnimationMeta.SuperView.Visualisation.Rules;
 using Editors.Shared.Core.Common;
@@ -76,7 +76,7 @@ namespace Editors.AnimationMeta.SuperView.Visualisation
             if (file == null)
                 return output;
 
-            output.AddRange(file.GetItemsOfType<IAnimatedPropMeta>().Select(x => CreateAnimatedProp(x, root, skeleton, selectedAttribute, rootPlayer)));
+            output.AddRange(file.GetItemsOfType<IAnimatedPropMeta>().Select(x => CreateAnimatedProp(x, root, skeleton, selectedAttribute, rootPlayer)).Where(x => x != null));
 
             output.AddRange(file.GetItemsOfType<ImpactPosition_v10>().Select(meteDataItem => CreateStaticLocator(meteDataItem, root, meteDataItem.Position, "ImpactPos", selectedAttribute)));
 
@@ -151,8 +151,9 @@ namespace Editors.AnimationMeta.SuperView.Visualisation
             var color = selectedMetaDataAttribute == animatedPropMeta ? s_selectedColor : s_color;
 
             var meshPath = _packFileService.FindFile(animatedPropMeta.ModelName);
-            if(meshPath == null) 
-                throw new Exception($"Unable to find model for animated prop. Searched for {animatedPropMeta.ModelName} and failed to find it in the pack file service. This is required to visualise the animated prop.");
+            if (meshPath == null)
+                return null;
+                //throw new Exception($"Unable to find model for animated prop. Searched for {animatedPropMeta.ModelName} and failed to find it in the pack file service. This is required to visualise the animated prop.");
 
             var animationPath = _packFileService.FindFile(animatedPropMeta.AnimationName);
             var propPlayer = _animationsContainerComponent.RegisterAnimationPlayer(new AnimationPlayer(), propName + Guid.NewGuid());
