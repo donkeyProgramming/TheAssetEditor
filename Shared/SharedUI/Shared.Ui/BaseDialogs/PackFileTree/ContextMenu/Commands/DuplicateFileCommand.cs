@@ -3,16 +3,24 @@ using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
 using Shared.Core.PackFiles.Models.FileSources;
 using Shared.Core.Services;
+using Serilog;
+using Shared.Core.ErrorHandling;
 
 namespace Shared.Ui.BaseDialogs.PackFileTree.ContextMenu.Commands
 {
     public class DuplicateFileCommand(IPackFileService packFileService, IStandardDialogs standardDialogs) : IContextMenuCommand
     {
+        private readonly ILogger _logger = Logging.Create<DuplicateFileCommand>();
+
         public string GetDisplayName(TreeNode node) => "Duplicate";
         public bool ShouldAdd(TreeNode node) => node.NodeType == NodeType.File && node.Item != null && !node.FileOwner.IsCaPackFile;
         public bool IsEnabled(TreeNode node) => true;
 
-        public void Execute(TreeNode _selectedNode) => Execute(_selectedNode.Item);
+        public void Execute(TreeNode _selectedNode)
+        {
+            _logger.Here().Information($"Duplicating file node '{CommandLoggingHelper.DescribeNode(_selectedNode)}'");
+            Execute(_selectedNode.Item!);
+        }
 
         public void Execute(PackFile item)
         {
@@ -33,6 +41,7 @@ namespace Shared.Ui.BaseDialogs.PackFileTree.ContextMenu.Commands
             var editablePack = packFileService.GetEditablePack();
             if (editablePack == null)
             {
+                _logger.Here().Warning($"Duplicate requested for '{item.Name}' but no editable pack is selected");
                 standardDialogs.ShowDialogBox("No editable pack selected.");
                 return;
             }
@@ -41,9 +50,11 @@ namespace Shared.Ui.BaseDialogs.PackFileTree.ContextMenu.Commands
             var packFile = new PackFile(newName, new MemorySource(bytes));
             var parentPath = packFileService.GetFullPath(item);
             var path = Path.GetDirectoryName(parentPath);
+            var duplicatePath = string.IsNullOrWhiteSpace(path) ? newName : $"{path}\\{newName}";
 
             var fileEntry = new NewPackFileEntry(path, packFile);
             packFileService.AddFilesToPack(editablePack, [fileEntry]);
+            _logger.Here().Information($"Duplicated file '{parentPath}' as '{duplicatePath}' in editable pack '{CommandLoggingHelper.DescribePack(editablePack)}'");
         }
     }
 }

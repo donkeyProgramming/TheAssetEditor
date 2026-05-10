@@ -41,6 +41,7 @@ namespace Shared.Core.PackFiles
                 var caPacksLoaded = _packFileContainers.Count(x => x.IsCaPackFile);
                 if (caPacksLoaded == 0 && pf.IsCaPackFile == false)
                 {
+                    _logger.Here().Warning($"Rejected loading pack file '{DescribeContainer(pf)}' because no CA pack files are loaded yet");
                     MessageBoxProvider.ShowDialogBox("You are trying to load a pack file before loading CA packfile. Most editors EXPECT the CA packfiles to be loaded and will cause issues if they are not.\nFile not loaded!", "Error");
                     return null;
                 }
@@ -51,6 +52,7 @@ namespace Shared.Core.PackFiles
             {
                 if (packFile.SystemFilePath != null && packFile.SystemFilePath == pf.SystemFilePath)
                 {
+                    _logger.Here().Warning($"Rejected loading duplicate pack file '{packFile.SystemFilePath}'");
                     MessageBoxProvider.ShowDialogBox($"Pack file \"{packFile.SystemFilePath}\" is already loaded.", "Error");
                     return null;
                 }
@@ -63,11 +65,15 @@ namespace Shared.Core.PackFiles
         void AddContainerInternal(IPackFileContainerInternal container, bool setToMainPackIfFirst = false)
         {
             _packFileContainers.Add(container);
+            var notCaPacksLoaded = _packFileContainers.Count(x => !x.IsCaPackFile);
+            _logger.Here().Information($"Added pack file container '{DescribeContainer(container)}' (CA:{container.IsCaPackFile}). Loaded containers: {_packFileContainers.Count}, editable containers: {notCaPacksLoaded}");
             _globalEventHub?.PublishGlobalEvent(new PackFileContainerAddedEvent(container));
 
-            var notCaPacksLoaded = _packFileContainers.Count(x => !x.IsCaPackFile);
             if (container.IsCaPackFile == false && setToMainPackIfFirst)
+            {
+                _logger.Here().Information($"Setting '{DescribeContainer(container)}' as editable pack after load");
                 SetEditablePack(container);
+            }
         }
 
         public IPackFileContainer CreateNewPackFileContainer(string name, PackFileVersion packFileVersion, PackFileCAType type, bool setEditablePack = false)
@@ -81,6 +87,7 @@ namespace Shared.Core.PackFiles
                 Header = new PFHeader(versionString, type),
             };
 
+            _logger.Here().Information($"Creating new pack file container '{name}' with version '{versionString}' and type '{type}'");
             AddContainerInternal(newPackFile, setEditablePack);
 
             return newPackFile;
@@ -92,7 +99,9 @@ namespace Shared.Core.PackFiles
             if (pf.IsCaPackFile)
                 throw new Exception("Can not add files to ca pack file");
 
+            _logger.Here().Information($"Adding {newFiles.Count} file(s) to '{DescribeContainer(pf)}'");
             var addedFiles = pf.AddFiles(newFiles);
+            _logger.Here().Information($"Added {addedFiles.Count} file(s) to '{DescribeContainer(pf)}'");
             _globalEventHub?.PublishGlobalEvent(new PackFileContainerFilesAddedEvent(pf, addedFiles));
         }
 
@@ -112,7 +121,13 @@ namespace Shared.Core.PackFiles
                 var newFile = new PackFile(file.Name, new MemorySource(data));
                 targetContainer.AddOrUpdateFile(lowerPath, newFile);
 
+                _logger.Here().Information($"Copied '{lowerPath}' from '{DescribeContainer(sourceContainer)}' to '{DescribeContainer(targetContainer)}'");
+
                 _globalEventHub?.PublishGlobalEvent(new PackFileContainerFilesAddedEvent(targetContainer, [newFile]));
+            }
+            else
+            {
+                _logger.Here().Warning($"Unable to copy '{lowerPath}' from '{DescribeContainer(sourceContainer)}' because the file was not found");
             }
         }
 
@@ -121,6 +136,7 @@ namespace Shared.Core.PackFiles
             if (pf != null && pf.IsCaPackFile)
                 throw new Exception("Trying to set CA packfile container to be editable - this is not legal!");
             _packFileContainerSelectedForEdit = pf != null ? CastContainer(pf) : null;
+            _logger.Here().Information($"Editable pack set to '{DescribeContainer(_packFileContainerSelectedForEdit)}'");
             _globalEventHub?.PublishGlobalEvent(new PackFileContainerSetAsMainEditableEvent(pf));
         }
 
@@ -129,16 +145,21 @@ namespace Shared.Core.PackFiles
         public void UnloadPackContainer(IPackFileContainer pf)
         {
             var container = CastContainer(pf);
+            _logger.Here().Information($"Unload requested for pack file container '{DescribeContainer(container)}'");
             var e = new BeforePackFileContainerRemovedEvent(container);
             _globalEventHub?.PublishGlobalEvent(e);
 
             if (e.AllowClose == false)
+            {
+                _logger.Here().Information($"Unload cancelled for pack file container '{DescribeContainer(container)}'");
                 return;
+            }
 
             _packFileContainers.Remove(container);
             if (_packFileContainerSelectedForEdit == container)
                 SetEditablePack(null);
 
+            _logger.Here().Information($"Unloaded pack file container '{DescribeContainer(container)}'. Remaining containers: {_packFileContainers.Count}");
             _globalEventHub?.PublishGlobalEvent(new PackFileContainerRemovedEvent(container));
         }
 
@@ -162,6 +183,7 @@ namespace Shared.Core.PackFiles
             if (container.IsCaPackFile)
                 throw new Exception("Can not delete folder inside CA pack file");
 
+            _logger.Here().Information($"Deleting folder '{folder}' from '{DescribeContainer(container)}'");
             _globalEventHub?.PublishGlobalEvent(new PackFileContainerFolderRemovedEvent(container, folder));
             container.DeleteFolder(folder);
         }
@@ -172,7 +194,7 @@ namespace Shared.Core.PackFiles
             if (container.IsCaPackFile)
                 throw new Exception("Can not delete files inside CA pack file");
 
-            _logger.Here().Information($"Deleting file {container.GetFullPath(file)}");
+            _logger.Here().Information($"Deleting file '{DescribeFile(container, file)}' from '{DescribeContainer(container)}'");
             _globalEventHub?.PublishGlobalEvent(new PackFileContainerFilesRemovedEvent(container, [file]));
             container.DeleteFile(file);
         }
@@ -186,7 +208,7 @@ namespace Shared.Core.PackFiles
             var key = container.GetFullPath(file);
             _globalEventHub?.PublishGlobalEvent(new PackFileContainerFilesRemovedEvent(container, [file]));
             container.MoveFile(file, newFolderPath);
-            _logger.Here().Information($"Moving file {key}");
+            _logger.Here().Information($"Moved file '{key ?? file.Name}' to '{newFolderPath}' in '{DescribeContainer(container)}'");
             _globalEventHub?.PublishGlobalEvent(new PackFileContainerFilesAddedEvent(container, [file]));
         }
 
@@ -200,6 +222,7 @@ namespace Shared.Core.PackFiles
                 throw new Exception("Name can not be empty");
 
             var newNodePath = container.RenameDirectory(currentNodeName, newName);
+            _logger.Here().Information($"Renamed directory '{currentNodeName}' to '{newNodePath}' in '{DescribeContainer(container)}'");
             _globalEventHub?.PublishGlobalEvent(new PackFileContainerFolderRenamedEvent(container, currentNodeName, newNodePath));
         }
 
@@ -212,7 +235,9 @@ namespace Shared.Core.PackFiles
             if (string.IsNullOrWhiteSpace(newName))
                 throw new Exception("Name can not be empty");
 
+            var previousPath = container.GetFullPath(file) ?? file.Name;
             container.RenameFile(file, newName);
+            _logger.Here().Information($"Renamed file '{previousPath}' to '{DescribeFile(container, file)}' in '{DescribeContainer(container)}'");
             _globalEventHub?.PublishGlobalEvent(new PackFileContainerFilesUpdatedEvent(container, [file]));
         }
 
@@ -224,6 +249,7 @@ namespace Shared.Core.PackFiles
             if (pf.IsCaPackFile)
                 throw new Exception("Can not save ca pack file");
 
+            _logger.Here().Information($"Saving file '{DescribeFile(pf, file)}' to '{DescribeContainer(pf)}' ({data.Length} bytes)");
             pf.SaveFileData(file, data);
             _globalEventHub?.PublishGlobalEvent(new PackFileContainerFilesUpdatedEvent(pf, [file]));
             _globalEventHub?.PublishGlobalEvent(new PackFileSavedEvent(file));
@@ -235,7 +261,9 @@ namespace Shared.Core.PackFiles
             if (container.IsCaPackFile)
                 throw new Exception("Can not save ca pack file");
 
+            _logger.Here().Information($"Saving pack file container '{DescribeContainer(container)}' to '{path}' (CreateBackup:{createBackup}, Game:{gameInformation.DisplayName})");
             container.SaveToDisk(path, createBackup, gameInformation);
+            _logger.Here().Information($"Saved pack file container '{DescribeContainer(container)}' to '{path}'");
             _globalEventHub?.PublishGlobalEvent(new PackFileContainerSavedEvent(container));
         }
 
@@ -247,7 +275,7 @@ namespace Shared.Core.PackFiles
                 if (path != null)
                     return pf;
             }
-            _logger.Here().Information($"Unknown packfile container for {file.Name}");
+            _logger.Here().Warning($"Unknown packfile container for file '{file.Name}'");
             return null;
         }
 
@@ -302,7 +330,23 @@ namespace Shared.Core.PackFiles
                     return res;
             }
 
+            _logger.Here().Warning($"Unable to resolve full path for file '{file.Name}'");
             throw new Exception("Unknown path for " + file.Name);
+        }
+
+        private static string DescribeContainer(IPackFileContainer? container)
+        {
+            if (container == null)
+                return "<none>";
+
+            var concreteContainer = CastContainer(container);
+            return concreteContainer.SystemFilePath ?? concreteContainer.Name;
+        }
+
+        private static string DescribeFile(IPackFileContainer container, PackFile file)
+        {
+            var concreteContainer = CastContainer(container);
+            return concreteContainer.GetFullPath(file) ?? file.Name;
         }
     }
 

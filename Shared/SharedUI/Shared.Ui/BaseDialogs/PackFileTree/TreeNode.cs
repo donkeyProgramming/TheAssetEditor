@@ -4,6 +4,8 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Diagnostics;
 using CommunityToolkit.Mvvm.ComponentModel;
+using Serilog;
+using Shared.Core.ErrorHandling;
 using Shared.Core.PackFiles.Models;
 
 namespace Shared.Ui.BaseDialogs.PackFileTree
@@ -17,6 +19,7 @@ namespace Shared.Ui.BaseDialogs.PackFileTree
 
     public partial class TreeNode : ObservableObject
     {
+        private static readonly ILogger s_logger = Logging.Create<TreeNode>();
         private Func<TreeNode, bool>? _childLoader;
         private bool _childrenLoaded;
         private bool _isExpandedByFilter;
@@ -53,7 +56,10 @@ namespace Shared.Ui.BaseDialogs.PackFileTree
             NodeType = type;
 
             if (string.IsNullOrWhiteSpace(name))
+            {
+                s_logger.Here().Error($"Encountered empty tree node name. Owner:'{owner.Name}', Parent:'{DescribeNode(parent)}'");
                 throw new Exception($"Packfile name or folder is empty '{GetFullPath()}', this is not allowed! Please report as a bug if it happens outside of packfile loading! If it happens while loading clean up the packfile in RPFM");
+            }
 
             if (ShouldUsePlaceholder())
                 AddPlaceholderChild();
@@ -69,7 +75,10 @@ namespace Shared.Ui.BaseDialogs.PackFileTree
             NodeType = type;
 
             if (string.IsNullOrWhiteSpace(name))
+            {
+                s_logger.Here().Error($"Encountered empty tree node name. Owner:'{owner.Name}', Parent:'{DescribeNode(parent)}'");
                 throw new Exception($"Packfile name or folder is empty '{GetFullPath()}', this is not allowed! Please report as a bug if it happens outside of packfile loading! If it happens while loading clean up the packfile in RPFM");
+            }
 
             if (ShouldUsePlaceholder())
                 AddPlaceholderChild();
@@ -111,6 +120,7 @@ namespace Shared.Ui.BaseDialogs.PackFileTree
                 return;
 
             _childrenLoaded = _childLoader(this);
+            s_logger.Here().Information($"Populated children for node '{DescribeNode(this)}' (Loaded:{_childrenLoaded}, BackingChildren:{BackingChildren.Count})");
         }
 
         public void EnsureFullyPopulated()
@@ -244,6 +254,8 @@ namespace Shared.Ui.BaseDialogs.PackFileTree
             if (Children.Count == 1 && Children[0]._isPlaceholder)
                 MaterializeChildren();
 
+            s_logger.Here().Information($"Added directory node '{DescribeNode(newNode)}' under '{DescribeNode(this)}'");
+
             return newNode;
         }
 
@@ -295,6 +307,9 @@ namespace Shared.Ui.BaseDialogs.PackFileTree
 
             if (Children.Count == 0 && ShouldUsePlaceholder())
                 AddPlaceholderChild();
+
+            var materializedChildren = Children.Count(x => !x._isPlaceholder);
+            s_logger.Here().Information($"Materialized {materializedChildren} child node(s) for '{DescribeNode(this)}' (BackingChildren:{BackingChildren.Count}, FilterActive:{_isFilterActive?.Invoke() == true})");
         }
 
         internal void EnsureChildrenLoaded()
@@ -371,6 +386,10 @@ namespace Shared.Ui.BaseDialogs.PackFileTree
 
         private void UnloadChildren()
         {
+            var materializedChildren = Children.Count(x => !x._isPlaceholder);
+            if (materializedChildren > 0 || BackingChildren.Count > 0)
+                s_logger.Here().Information($"Unloading child nodes for '{DescribeNode(this)}' (MaterializedChildren:{materializedChildren}, BackingChildren:{BackingChildren.Count})");
+
             // Recursively unload all children to break closure cycles
             foreach (var child in Children)
                 child.RemoveSelf();
@@ -423,7 +442,6 @@ namespace Shared.Ui.BaseDialogs.PackFileTree
             return count;
         }
 
-        [Conditional("DEBUG")]
         private void LogLoadedNodeCount(bool expanded)
         {
             var root = this;
@@ -432,7 +450,19 @@ namespace Shared.Ui.BaseDialogs.PackFileTree
 
             var loadedNodes = root.CountLoadedNodes();
             var action = expanded ? "expanded" : "collapsed";
-            Console.WriteLine($"[PackFileTree] Node '{Name}' {action}. Loaded nodes: {loadedNodes}");
+            s_logger.Here().Information($"Tree node '{DescribeNode(this)}' {action}. Loaded nodes in tree: {loadedNodes}");
+        }
+
+        private static string DescribeNode(TreeNode? node)
+        {
+            if (node == null)
+                return "<none>";
+
+            if (node.NodeType == NodeType.Root)
+                return "<root>";
+
+            var path = node.GetFullPath();
+            return string.IsNullOrWhiteSpace(path) ? node.Name : path;
         }
 
         private static readonly Comparison<TreeNode> ChildComparison = (left, right) =>

@@ -1,7 +1,7 @@
 ﻿using Shared.Core.PackFiles.Models.Containers;
 using Shared.Ui.BaseDialogs.PackFileTree;
 
-namespace Shared.UiTest.BaseDialogs
+namespace Shared.UiTest.BaseDialogs.PackFileTree
 {
     internal class TreeNodeTests
     {

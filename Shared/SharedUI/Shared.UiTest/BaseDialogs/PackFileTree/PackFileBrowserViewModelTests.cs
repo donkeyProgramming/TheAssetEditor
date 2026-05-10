@@ -34,8 +34,9 @@ using Shared.Core.Settings;
 using Shared.Ui.BaseDialogs.PackFileTree;
 using Test.TestingUtility.Shared;
 using Test.TestingUtility.TestUtility;
+using Shared.UiTest.BaseDialogs.PackFileTree.Utility;
 
-namespace Shared.UiTest.BaseDialogs
+namespace Shared.UiTest.BaseDialogs.PackFileTree
 {
     internal class PackFileBrowserViewModelTests
     {
