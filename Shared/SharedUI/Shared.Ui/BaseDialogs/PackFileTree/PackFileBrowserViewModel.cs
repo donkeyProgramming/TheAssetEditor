@@ -119,7 +119,14 @@ namespace Shared.Ui.BaseDialogs.PackFileTree
                 newLeafName = newPath.Substring(lastSep + 1);
 
             node.Name = newLeafName;
+            root.UnsavedChanged = true;
             node.UnsavedChanged = true;
+            var parent = node.Parent;
+            while (parent != null && parent != root)
+            {
+                parent.UnsavedChanged = true;
+                parent = parent.Parent;
+            }
             Filter.Reapply();
         }
 
@@ -387,6 +394,9 @@ namespace Shared.Ui.BaseDialogs.PackFileTree
 
         public bool AllowDrop(TreeNode node, TreeNode? targetNode = null)
         {
+            if (targetNode == null)
+                return false;
+
             if (node.Item == null)
                 return false;
 
@@ -404,11 +414,16 @@ namespace Shared.Ui.BaseDialogs.PackFileTree
 
         public bool Drop(TreeNode node, TreeNode? targeNode)
         {
+            if (targeNode == null)
+                return false;
+
             var container = node.FileOwner;
             var draggedFile = node.Item;
             var dropPath = targeNode.GetFullPath();
 
-            var newFullPath = dropPath + "\\" + draggedFile.Name;
+            var newFullPath = string.IsNullOrWhiteSpace(dropPath)
+                ? draggedFile.Name
+                : dropPath + "\\" + draggedFile.Name;
             if (newFullPath == _packFileService.GetFullPath(draggedFile, container))
                 return false;
 

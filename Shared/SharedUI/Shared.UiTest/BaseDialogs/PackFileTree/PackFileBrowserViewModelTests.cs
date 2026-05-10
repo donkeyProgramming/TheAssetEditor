@@ -89,6 +89,30 @@ namespace Shared.UiTest.BaseDialogs.PackFileTree
         }
 
         [Test]
+        public void DragAndDrop_FileToRoot_UsesRootRelativePath()
+        {
+            CreatePackfiles(("foldera\\file.txt", "file.txt"));
+
+            var root = _viewModel.Files[0];
+            root.IsNodeExpanded = true;
+
+            var folderA = PackFileBrowserViewModelTestHelper.GetFromPath(root, "foldera");
+            Assert.That(folderA, Is.Not.Null);
+            folderA.IsNodeExpanded = true;
+
+            var fileToMove = PackFileBrowserViewModelTestHelper.GetFromPath(root, "foldera\\file.txt");
+            Assert.That(fileToMove, Is.Not.Null);
+
+            var result = _viewModel.Drop(fileToMove, root);
+
+            Assert.That(result, Is.True);
+            Assert.That(_packageFileService.FindFile("file.txt"), Is.Not.Null, "Root-level move should keep a root-relative path");
+            Assert.That(_packageFileService.FindFile("\\file.txt"), Is.Null, "Root-level move should not introduce a leading slash path");
+            Assert.That(PackFileBrowserViewModelTestHelper.GetFromPath(root, "foldera\\file.txt"), Is.Null);
+            Assert.That(PackFileBrowserViewModelTestHelper.GetFromPath(root, "file.txt"), Is.Not.Null);
+        }
+
+        [Test]
         public void OnlyRootExpandedByDefault()
         {
             CreatePackfiles(("folderA\\file1.txt", "file1.txt"), ("folderB\\file2.txt", "file2.txt"));
@@ -371,6 +395,7 @@ namespace Shared.UiTest.BaseDialogs.PackFileTree
             Assert.That(oldNode, Is.Null, "Old folder path should not exist after rename");
             Assert.That(newNode, Is.Not.Null, "Renamed folder should be accessible via the new name");
             Assert.That(newNode.UnsavedChanged, Is.True, "Renamed folder should be marked unsaved");
+            Assert.That(root.UnsavedChanged, Is.True, "Renaming a folder should mark the pack root as unsaved");
         }
 
         [Test]
@@ -390,6 +415,8 @@ namespace Shared.UiTest.BaseDialogs.PackFileTree
             var newNode = PackFileBrowserViewModelTestHelper.GetFromPath(root, "parent\\renamed");
             Assert.That(newNode, Is.Not.Null, "Nested renamed folder should be accessible");
             Assert.That(newNode.UnsavedChanged, Is.True);
+            Assert.That(parent.UnsavedChanged, Is.True, "Renaming a nested folder should mark its parent unsaved");
+            Assert.That(root.UnsavedChanged, Is.True, "Renaming a nested folder should mark the pack root as unsaved");
         }
 
         [Test]

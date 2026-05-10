@@ -139,11 +139,8 @@ namespace Shared.Core.PackFiles.Models.Containers
             {
                 file.PackFile.Name = file.PackFile.Name.Trim();
 
-                var path = file.DirectoyPath.Trim();
-                if (!string.IsNullOrWhiteSpace(path))
-                    path += "\\";
-                path += file.PackFile.Name;
-                FileList[path.ToLower()] = file.PackFile;
+                var path = BuildPackPath(file.DirectoyPath, file.PackFile.Name);
+                FileList[path] = file.PackFile;
             }
 
             return newFiles.Select(x => x.PackFile).ToList();
@@ -200,10 +197,10 @@ namespace Shared.Core.PackFiles.Models.Containers
 
         public virtual void MoveFile(PackFile file, string newFolderPath)
         {
-            var newFullPath = newFolderPath + "\\" + file.Name;
+            var newFullPath = BuildPackPath(newFolderPath, file.Name);
             var key = FileList.FirstOrDefault(x => x.Value == file).Key;
             FileList.Remove(key);
-            FileList[newFullPath.ToLower()] = file;
+            FileList[newFullPath] = file;
         }
 
         public virtual string RenameDirectory(string currentNodeName, string newName)
@@ -243,8 +240,8 @@ namespace Shared.Core.PackFiles.Models.Containers
 
             var dir = Path.GetDirectoryName(key);
             file.Name = newName;
-            var newPath = string.IsNullOrEmpty(dir) ? file.Name : dir + "\\" + file.Name;
-            FileList[newPath.ToLower()] = file;
+            var newPath = BuildPackPath(dir, file.Name);
+            FileList[newPath] = file;
         }
 
         public virtual void SaveFileData(PackFile file, byte[] data)
@@ -280,6 +277,21 @@ namespace Shared.Core.PackFiles.Models.Containers
 
             SystemFilePath = path;
             OriginalLoadByteSize = new FileInfo(path).Length;
+        }
+
+        private static string BuildPackPath(string? directoryPath, string fileName)
+        {
+            var normalizedFileName = fileName.Replace('/', '\\').Trim().TrimStart('\\');
+            var normalizedDirectory = PathNormalization.NormalizeDirectoryPath(directoryPath);
+
+            if (string.IsNullOrWhiteSpace(normalizedFileName))
+                throw new Exception("PackFile name can not be empty");
+
+            var fullPath = string.IsNullOrEmpty(normalizedDirectory)
+                ? normalizedFileName
+                : normalizedDirectory + "\\" + normalizedFileName;
+
+            return PathNormalization.NormalizeFileName(fullPath);
         }
     }
 }

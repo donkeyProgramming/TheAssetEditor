@@ -1,7 +1,10 @@
 ﻿using System;
 using System.ComponentModel;
 using System.Windows;
+using Serilog;
+using Shared.Core.ErrorHandling;
 using Shared.Core.PackFiles;
+using Shared.Core.PackFiles.Utility;
 using Shared.Ui.BaseDialogs.PackFileTree;
 using Shared.Ui.BaseDialogs.PackFileTree.ContextMenu;
 
@@ -9,6 +12,7 @@ namespace Shared.Ui.BaseDialogs.StandardDialog.PackFile
 {
     public partial class SavePackFileWindow : Window, IDisposable, INotifyPropertyChanged
     {
+        private static readonly ILogger s_logger = Logging.Create<SavePackFileWindow>();
         readonly IPackFileService _packfileService;
 
         public Core.PackFiles.Models.PackFile SelectedFile { get; set; }
@@ -56,6 +60,7 @@ namespace Shared.Ui.BaseDialogs.StandardDialog.PackFile
         {
             if (string.IsNullOrWhiteSpace(CurrentFileName))
             {
+                s_logger.Here().Warning("Save pack file dialog was confirmed without a file name");
                 MessageBox.Show("No name provided, can not save file");
                 return;
             }
@@ -63,40 +68,14 @@ namespace Shared.Ui.BaseDialogs.StandardDialog.PackFile
             if (SelectedFile != null)
             {
                 if (MessageBox.Show("Replace file?", "", MessageBoxButton.YesNo) == MessageBoxResult.No)
+                {
+                    s_logger.Here().Information($"Save pack file dialog replace declined for '{SelectedFile.Name}'");
                     return;
+                }
             }
 
-            var path = "";
-            if (SelectedFile != null)
-            {
-                path = _packfileService.GetFullPath(SelectedFile);
-            }
-            else
-            {
-                if (_selectedNode == null)
-                {
-                    path = "";
-                }
-                else
-                if (_selectedNode.NodeType == NodeType.File)
-                {
-                    var fullPath = _selectedNode.GetFullPath();
-                    path = System.IO.Path.GetDirectoryName(fullPath) + "\\";
-                }
-                else
-                {
-                    if (string.IsNullOrWhiteSpace(_selectedNode?.Name) == false)
-                    {
-                        var fullPath = _selectedNode.GetFullPath();
-                        path = fullPath + "\\";
-                    }
-                }
-
-                path += CurrentFileName;
-                path = path.ToLower();
-            }
-
-            FilePath = path;
+            FilePath = BuildTargetPath(_selectedNode, SelectedFile, CurrentFileName, _packfileService).ToLower();
+            s_logger.Here().Information($"Save pack file dialog accepted path '{FilePath}'");
             DialogResult = true;
             Close();
         }
@@ -108,6 +87,29 @@ namespace Shared.Ui.BaseDialogs.StandardDialog.PackFile
             ViewModel.Dispose();
             ViewModel = null;
             DataContext = null;
+        }
+
+        private static string BuildTargetPath(TreeNode? selectedNode, Core.PackFiles.Models.PackFile? selectedFile, string currentFileName, IPackFileService packfileService)
+        {
+            if (selectedFile != null)
+                return packfileService.GetFullPath(selectedFile);
+
+            var directoryPath = GetSelectedDirectoryPath(selectedNode);
+            var normalizedFileName = currentFileName.Replace('/', '\\').Trim().TrimStart('\\');
+            return string.IsNullOrWhiteSpace(directoryPath)
+                ? normalizedFileName
+                : directoryPath + "\\" + normalizedFileName;
+        }
+
+        private static string GetSelectedDirectoryPath(TreeNode? selectedNode)
+        {
+            if (selectedNode == null || selectedNode.NodeType == NodeType.Root)
+                return string.Empty;
+
+            if (selectedNode.NodeType == NodeType.File)
+                return PathNormalization.NormalizeDirectoryPath(System.IO.Path.GetDirectoryName(selectedNode.GetFullPath()));
+
+            return PathNormalization.NormalizeDirectoryPath(selectedNode.GetFullPath());
         }
     }
 }

@@ -41,10 +41,20 @@ namespace Shared.Core.Services
                 return null;
             }
 
-            var fileName = Path.GetFileName(saveDialogResult.SelectedFilePath);
+            if (string.IsNullOrWhiteSpace(saveDialogResult.SelectedFilePath))
+            {
+                _logger.Here().Warning($"SaveAs returned no selected path for extension '{extention}' in '{DescribePack(editablePack)}'");
+                return null;
+            }
+
+            var selectedFilePath = NormalizeRelativePackPath(saveDialogResult.SelectedFilePath);
+            if (!string.Equals(selectedFilePath, saveDialogResult.SelectedFilePath, StringComparison.Ordinal))
+                _logger.Here().Information($"Normalized SaveAs path from '{saveDialogResult.SelectedFilePath}' to '{selectedFilePath}'");
+
+            var fileName = Path.GetFileName(selectedFilePath);
             if (string.IsNullOrWhiteSpace(fileName))
             {
-                _logger.Here().Warning($"SaveAs returned an empty file name for path '{saveDialogResult.SelectedFilePath}'");
+                _logger.Here().Warning($"SaveAs returned an empty file name for path '{selectedFilePath}'");
                 return null;
             }
 
@@ -55,19 +65,19 @@ namespace Shared.Core.Services
                 fileName = adjustedFileName;
             }
 
-            var isExistingFile = _packFileService.FindFile(saveDialogResult.SelectedFilePath!, editablePack);
+            var isExistingFile = _packFileService.FindFile(selectedFilePath, editablePack);
             if (isExistingFile == null)
             {
-                _logger.Here().Information($"Creating new pack file '{saveDialogResult.SelectedFilePath}' in '{DescribePack(editablePack)}' ({content.Length} bytes)");
+                _logger.Here().Information($"Creating new pack file '{selectedFilePath}' in '{DescribePack(editablePack)}' ({content.Length} bytes)");
                 var newPackFile = new PackFile(fileName, new MemorySource(content));
-                var directoryPath = Path.GetDirectoryName(saveDialogResult.SelectedFilePath);
-                var item = new NewPackFileEntry(directoryPath!, newPackFile);
+                var directoryPath = GetDirectoryPathOrRoot(selectedFilePath);
+                var item = new NewPackFileEntry(directoryPath, newPackFile);
                 _packFileService.AddFilesToPack(editablePack, [item]);
 
                 return newPackFile;
             }
 
-            _logger.Here().Information($"Overwriting existing pack file '{saveDialogResult.SelectedFilePath}' in '{DescribePack(editablePack)}' ({content.Length} bytes)");
+            _logger.Here().Information($"Overwriting existing pack file '{selectedFilePath}' in '{DescribePack(editablePack)}' ({content.Length} bytes)");
             _packFileService.SaveFile(isExistingFile, content);
             return isExistingFile;
         }
@@ -81,6 +91,8 @@ namespace Shared.Core.Services
                 _logger.Here().Error($"Unable to save '{fullPathWithExtention}'. No editable pack selected");
                 throw new Exception($"Unable to save file {fullPathWithExtention}. No Editable PackFile selected");
             }
+
+            fullPathWithExtention = NormalizeRelativePackPath(fullPathWithExtention);
 
             _logger.Here().Information($"Save requested for '{fullPathWithExtention}' in '{DescribePack(editablePack)}' (PromptOnConflict:{prompOnConflict}, Bytes:{content.Length})");
 
@@ -96,7 +108,13 @@ namespace Shared.Core.Services
                     return null;
                 }
 
-                fullPathWithExtention = saveDialogResult.SelectedFilePath!;
+                if (string.IsNullOrWhiteSpace(saveDialogResult.SelectedFilePath))
+                {
+                    _logger.Here().Warning($"Save conflict dialog returned no selected path for '{fullPathWithExtention}'");
+                    return null;
+                }
+
+                fullPathWithExtention = NormalizeRelativePackPath(saveDialogResult.SelectedFilePath);
                 _logger.Here().Information($"Conflict save redirected to '{fullPathWithExtention}'");
                 isExistingFile = _packFileService.FindFile(fullPathWithExtention, editablePack);
             }
@@ -106,8 +124,8 @@ namespace Shared.Core.Services
                 _logger.Here().Information($"Creating new pack file '{fullPathWithExtention}' in '{DescribePack(editablePack)}' ({content.Length} bytes)");
                 var fileName = Path.GetFileName(fullPathWithExtention);
                 var newPackFile = new PackFile(fileName, new MemorySource(content));
-                var directoryPath = Path.GetDirectoryName(fullPathWithExtention);
-                var item = new NewPackFileEntry(directoryPath!, newPackFile);
+                var directoryPath = GetDirectoryPathOrRoot(fullPathWithExtention);
+                var item = new NewPackFileEntry(directoryPath, newPackFile);
                 _packFileService.AddFilesToPack(editablePack, [item]);
                 return newPackFile;
             }
@@ -123,6 +141,16 @@ namespace Shared.Core.Services
         private static string DescribePack(IPackFileContainer pack)
         {
             return pack.SystemFilePath ?? pack.Name;
+        }
+
+        private static string NormalizeRelativePackPath(string path)
+        {
+            return path.Replace('/', '\\').Trim().TrimStart('\\');
+        }
+
+        private static string GetDirectoryPathOrRoot(string fullPath)
+        {
+            return Path.GetDirectoryName(fullPath) ?? string.Empty;
         }
     }
 }

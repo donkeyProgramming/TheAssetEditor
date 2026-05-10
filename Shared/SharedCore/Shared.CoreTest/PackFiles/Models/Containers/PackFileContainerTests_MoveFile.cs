@@ -23,5 +23,23 @@ namespace Shared.CoreTest.PackFiles.Models.Containers
             Assert.That(_container.ContainsFile("other\\file.txt"), Is.True);
             Assert.That(_container.ContainsFile("folder\\file.txt"), Is.False);
         }
+
+        [Test]
+        public void MoveFile_ToRoot_UsesRootRelativePathOrThrowsOnCached()
+        {
+            var file = _container.FindFile("folder\\file.txt")!;
+
+            if (IsCachedContainer)
+            {
+                Assert.Throws<InvalidOperationException>(() => _container.MoveFile(file, string.Empty));
+                return;
+            }
+
+            _container.MoveFile(file, string.Empty);
+
+            Assert.That(_container.ContainsFile("file.txt"), Is.True);
+            Assert.That(_container.ContainsFile("\\file.txt"), Is.False);
+            Assert.That(_container.ContainsFile("folder\\file.txt"), Is.False);
+        }
     }
 }

@@ -52,6 +52,17 @@ namespace Shared.CoreTest.PackFiles.Utility
         }
 
         [Test]
+        public void LoadAllCaFiles_MissingGameDirectory_ShowsErrorAndSkipsBuild()
+        {
+            _settingsService.CurrentSettings.GameDirectories.Clear();
+            var loader = CreateLoader();
+
+            var result = loader.LoadAllCaFiles(GameTypeEnum.Warhammer3);
+
+            Assert.That(result, Is.Null);
+        }
+
+        [Test]
         public void LoadAllCaFiles_NoCacheExists_ShowsNotFoundDialogAndWaitCursor()
         {
             var loader = CreateLoader();

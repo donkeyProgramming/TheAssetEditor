@@ -6,5 +6,13 @@ namespace Shared.Core.PackFiles.Utility
         {
             return path.Replace('/', '\\').ToLower().Trim();
         }
+
+        public static string NormalizeDirectoryPath(string? directoryPath)
+        {
+            if (string.IsNullOrWhiteSpace(directoryPath))
+                return string.Empty;
+
+            return directoryPath.Replace('/', '\\').Trim().Trim('\\');
+        }
     }
 }
