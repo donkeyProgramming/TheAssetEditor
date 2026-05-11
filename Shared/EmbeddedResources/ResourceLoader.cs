@@ -23,6 +23,14 @@ namespace Shared.EmbeddedResources
                 .Split(Environment.NewLine.ToCharArray(), StringSplitOptions.RemoveEmptyEntries);
         }
 
+        public static byte[] LoadBytes(string resourcePath)
+        {
+            using var resourceStream = GetResourceStream(resourcePath);
+            using var memoryStream = new MemoryStream();
+            resourceStream.CopyTo(memoryStream);
+            return memoryStream.ToArray();
+        }
+
         public static BitmapImage LoadBitmapImage(string resourcePath)
         {
             using var stream = GetResourceStream(resourcePath);

@@ -113,6 +113,7 @@
     <None Remove="Resources\WsModelTemplates\MaterialTemplate_wh2_default.xml" />
     <None Remove="Resources\WsModelTemplates\MaterialTemplate_wh3_default.xml" />
     <None Remove="Resources\WsModelTemplates\MaterialTemplate_wh3_emissive.xml" />
+    <None Remove="Resources\Wwise\packed_codebooks_aoTuV_603.bin" />
   </ItemGroup>
 
   <ItemGroup>
@@ -164,6 +165,7 @@
     <EmbeddedResource Include="Resources\WsModelTemplates\MaterialTemplate_wh2_default.xml" />
     <EmbeddedResource Include="Resources\WsModelTemplates\MaterialTemplate_wh3_default.xml" />
     <EmbeddedResource Include="Resources\WsModelTemplates\MaterialTemplate_wh3_emissive.xml" />
+    <EmbeddedResource Include="Resources\Wwise\packed_codebooks_aoTuV_603.bin" />
   </ItemGroup>
 
   <ItemGroup>
