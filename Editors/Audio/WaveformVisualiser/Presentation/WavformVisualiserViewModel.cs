@@ -14,6 +14,7 @@ using Editors.Audio.Shared.Wwise;
 using Editors.Audio.WaveformVisualiser.Events;
 using NAudio.Wave;
 using Shared.Core.Events;
+using Shared.Core.Services;
 using Shared.Ui.Common;
 
 namespace Editors.Audio.WaveformVisualiser.Presentation
@@ -21,6 +22,7 @@ namespace Editors.Audio.WaveformVisualiser.Presentation
     public partial class WaveformVisualiserViewModel : ObservableObject, IDisposable
     {
         private readonly IEventHub _eventHub;
+        private readonly LocalizationManager _localisationManager;
         private readonly ISoundEngine _soundEngine;
         private readonly IWaveformRendererService _waveformRendererService;
         private readonly IWaveformVisualisationCacheService _waveformVisualisationCacheService;
@@ -53,14 +55,18 @@ namespace Editors.Audio.WaveformVisualiser.Presentation
         [ObservableProperty] private double _hostWidth;
         [ObservableProperty] private TimeSpan _currentPlaybackTime = TimeSpan.Zero;
         [ObservableProperty] private TimeSpan _totalPlaybackTime = TimeSpan.Zero;
+        [ObservableProperty] private bool _isPlaying;
+        [ObservableProperty] private string _playPauseButtonText;
 
         public WaveformVisualiserViewModel(
             IEventHub eventHub,
+            LocalizationManager localizationManager,
             ISoundEngine soundEngine,
             IWaveformRendererService waveformRendererService,
             IWaveformVisualisationCacheService waveformVisualisationCacheService)
         {
             _eventHub = eventHub;
+            _localisationManager = localizationManager;
             _soundEngine = soundEngine;
             _waveformRendererService = waveformRendererService;
             _waveformVisualisationCacheService = waveformVisualisationCacheService;
@@ -76,7 +82,10 @@ namespace Editors.Audio.WaveformVisualiser.Presentation
             AudioWaveformOverlayClip = new Rect(0, 0, 0, 0);
 
             UpdateWaveformVisualiserLabel();
+            UpdatePlayPauseButtonText();
         }
+
+        partial void OnIsPlayingChanged(bool value) => UpdatePlayPauseButtonText();
 
         public void AudioFilesExplorerNodeSelected(AudioFilesExplorerNodeSelectedEvent e) => SetSelectedPlaylist(e.WavFilePaths);
 
@@ -92,7 +101,7 @@ namespace Editors.Audio.WaveformVisualiser.Presentation
         public void OnPlayAudioRequested(PlayAudioRequestedEvent e)
         {
             SetSelectedPlaylist(e.WavFilePaths);
-            PlayPause();
+            Play();
         }
 
         public void OnCacheWaveformRequested(CacheWaveformRequestedEvent e)
@@ -132,6 +141,7 @@ namespace Editors.Audio.WaveformVisualiser.Presentation
             CurrentPlaybackTime = TimeSpan.Zero;
             WaveformVisualiserLabel = labelKey;
             TotalPlaybackTime = TimeSpan.Zero;
+            IsPlaying = false;
 
             ResetWaveformPlayheadAndProgress();
 
@@ -188,6 +198,7 @@ namespace Editors.Audio.WaveformVisualiser.Presentation
             _visualSeconds = 0;
 
             CurrentPlaybackTime = TimeSpan.Zero;
+            IsPlaying = false;
 
             LoadWaveformImagesIntoCacheForCurrentWidth(_currentPlaylistFilePaths);
 
@@ -250,7 +261,24 @@ namespace Editors.Audio.WaveformVisualiser.Presentation
 
         [RelayCommand] private void PlayPause()
         {
+            if (_soundEngine.PlaybackState == PlaybackState.Playing)
+            {
+                IsPlaying = false;
+                Pause();
+            }
+            else
+            {
+                IsPlaying = true;
+                Play();
+            }
+        }
+
+        [RelayCommand] private void Play()
+        {
             if (_currentWemBytes == null && string.IsNullOrWhiteSpace(_currentFilePathKey))
+                return;
+
+            if (_soundEngine.PlaybackState == PlaybackState.Playing)
                 return;
 
             if (_soundEngine.PlaybackState == PlaybackState.Stopped)
@@ -271,6 +299,18 @@ namespace Editors.Audio.WaveformVisualiser.Presentation
                 StartWaveformPlayheadRendering();
             else
                 StopWaveformPlayheadRendering();
+
+            IsPlaying = _soundEngine.PlaybackState == PlaybackState.Playing;
+        }
+
+        [RelayCommand] private void Pause()
+        {
+            if (_soundEngine.PlaybackState != PlaybackState.Playing)
+                return;
+
+            IsPlaying = false;
+            _soundEngine.PlayPause();
+            StopWaveformPlayheadRendering();
         }
 
         private async Task RenderWaveformPreviewAsync()
@@ -411,6 +451,7 @@ namespace Editors.Audio.WaveformVisualiser.Presentation
             _currentFilePathKey = filePath;
             UpdateWaveformVisualiserLabel();
             UpdateTotalPlaybackTimeFromFilePath(_currentFilePathKey);
+            IsPlaying = false;
 
             CurrentPlaybackTime = TimeSpan.Zero;
 
@@ -430,6 +471,7 @@ namespace Editors.Audio.WaveformVisualiser.Presentation
                     ResetWaveformPlayheadAndProgress();
                     StopWaveformPlayheadRendering();
                     CurrentPlaybackTime = TimeSpan.Zero;
+                    IsPlaying = false;
 
                     if (wasExplicitStop)
                         return;
@@ -447,7 +489,7 @@ namespace Editors.Audio.WaveformVisualiser.Presentation
                         var nextPath = _currentPlaylistFilePaths[_currentPlaylistIndex];
 
                         SetSelectedFilePath(nextPath);
-                        PlayPause();
+                        Play();
                     }
                 }
                 finally { }
@@ -473,6 +515,11 @@ namespace Editors.Audio.WaveformVisualiser.Presentation
                 var fileName = Path.GetFileName(_currentFilePathKey);
                 WaveformVisualiserLabel = $"Sound Engine – {WpfHelpers.DuplicateUnderscores(fileName)}";
             }
+        }
+
+        private void UpdatePlayPauseButtonText()
+        {
+            PlayPauseButtonText = IsPlaying ? _localisationManager.Get("WaveformVisualiser.Pause") : _localisationManager.Get("WaveformVisualiser.Play");
         }
 
         private void UpdateTotalPlaybackTimeFromFilePath(string filePath)

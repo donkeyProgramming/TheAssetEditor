@@ -746,6 +746,7 @@
   "MetadataEditor.NewEntryWindow.Title": "Create MetaData entry",
 
   "WaveformVisualiser.Play": "Play",
+  "WaveformVisualiser.Pause": "Pause",
 
   "AudioProjectExplorer.DialogueEventFilters": "Dialogue Event Filters",
   "AudioProjectExplorer.Watermark.DialogueEventTypeFilter": "Select Dialogue Event Type Filter",

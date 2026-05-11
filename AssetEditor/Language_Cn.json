@@ -746,6 +746,7 @@
   "MetadataEditor.NewEntryWindow.Title": "创建元数据条目",
 
   "WaveformVisualiser.Play": "播放",
+  "WaveformVisualiser.Pause": "暂停",
 
   "AudioProjectExplorer.DialogueEventFilters": "对话事件筛选",
   "AudioProjectExplorer.Watermark.DialogueEventTypeFilter": "选择对话事件类型筛选",
