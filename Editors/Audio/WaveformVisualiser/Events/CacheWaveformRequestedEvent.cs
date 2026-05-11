@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Editors.Audio.AudioEditor.Events.WaveformVisualiser
+namespace Editors.Audio.WaveformVisualiser.Events
 {
     public record CacheWaveformRequestedEvent(List<string> FilePaths);
 }

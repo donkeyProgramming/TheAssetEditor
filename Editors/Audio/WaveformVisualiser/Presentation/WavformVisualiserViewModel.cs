@@ -10,13 +10,13 @@ using System.Windows.Media.Imaging;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Editors.Audio.AudioEditor.Events.AudioFilesExplorer;
-using Editors.Audio.AudioEditor.Events.WaveformVisualiser;
 using Editors.Audio.Shared.Wwise;
+using Editors.Audio.WaveformVisualiser.Events;
 using NAudio.Wave;
 using Shared.Core.Events;
 using Shared.Ui.Common;
 
-namespace Editors.Audio.AudioEditor.Presentation.WaveformVisualiser
+namespace Editors.Audio.WaveformVisualiser.Presentation
 {
     public partial class WaveformVisualiserViewModel : ObservableObject, IDisposable
     {
@@ -40,6 +40,7 @@ namespace Editors.Audio.AudioEditor.Presentation.WaveformVisualiser
         private DateTime _lastPlaybackTimerTextUpdateUtc = DateTime.MinValue;
 
         private string _currentFilePathKey;
+        private byte[] _currentWemBytes;
         private int _currentPlaylistIndex = -1;
         private bool _isExplicitStopRequested;
         
@@ -117,10 +118,56 @@ namespace Editors.Audio.AudioEditor.Presentation.WaveformVisualiser
             }
         }
 
+        public async Task LoadFromWemBytesAsync(byte[] wemBytes, string labelKey)
+        {
+            StopWaveformPlayheadRendering();
+            _soundEngine.Stop();
+
+            _currentWemBytes = wemBytes;
+            _currentFilePathKey = string.Empty;
+            _currentPlaylistFilePaths.Clear();
+            _currentPlaylistIndex = -1;
+            _visualSeconds = 0;
+
+            CurrentPlaybackTime = TimeSpan.Zero;
+            WaveformVisualiserLabel = labelKey;
+            TotalPlaybackTime = TimeSpan.Zero;
+
+            ResetWaveformPlayheadAndProgress();
+
+            if (wemBytes == null || wemBytes.Length == 0)
+                return;
+
+            var previousCancellationToken = Interlocked.Exchange(ref _waveformRenderCancellationTokenSource, new CancellationTokenSource());
+            if (previousCancellationToken != null)
+            {
+                previousCancellationToken.Cancel();
+                previousCancellationToken.Dispose();
+            }
+
+            var cancellationToken = _waveformRenderCancellationTokenSource.Token;
+
+            await _waveformRenderGate.WaitAsync(cancellationToken).ConfigureAwait(false);
+            try
+            {
+                var targetWidth = GetTargetWidth();
+                var result = await _waveformRendererService.RenderFromWemBytesAsync(wemBytes, targetWidth, cancellationToken).ConfigureAwait(false);
+
+                TotalPlaybackTime = result.TotalTime;
+                ApplyWaveformBitmaps(result.Visualisation.BaseImage, result.Visualisation.OverlayImage);
+            }
+            catch (OperationCanceledException) { }
+            finally
+            {
+                _waveformRenderGate.Release();
+            }
+        }
+
         public void SetSelectedPlaylist(List<string> filePaths)
         {
             StopWaveformPlayheadRendering();
             _soundEngine.Stop();
+            _currentWemBytes = null;
 
             _currentPlaylistFilePaths.Clear();
             if (filePaths != null)
@@ -203,12 +250,15 @@ namespace Editors.Audio.AudioEditor.Presentation.WaveformVisualiser
 
         [RelayCommand] private void PlayPause()
         {
-            if (string.IsNullOrWhiteSpace(_currentFilePathKey))
+            if (_currentWemBytes == null && string.IsNullOrWhiteSpace(_currentFilePathKey))
                 return;
 
             if (_soundEngine.PlaybackState == PlaybackState.Stopped)
             {
-                _soundEngine.LoadFromFilePath(_currentFilePathKey);
+                if (_currentWemBytes != null)
+                    _soundEngine.LoadFromWemBytes(_currentWemBytes);
+                else
+                    _soundEngine.LoadFromFilePath(_currentFilePathKey);
 
                 _visualSeconds = 0;
                 CurrentPlaybackTime = TimeSpan.Zero;
@@ -354,6 +404,7 @@ namespace Editors.Audio.AudioEditor.Presentation.WaveformVisualiser
         {
             StopWaveformPlayheadRendering();
             _soundEngine.Stop();
+            _currentWemBytes = null;
 
             _visualSeconds = 0;
 

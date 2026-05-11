@@ -21,6 +21,7 @@ using Editors.Audio.AudioEditor.Presentation.AudioProjectEditor.Table;
 using Editors.Audio.AudioEditor.Presentation.Shared.Models;
 using Editors.Audio.AudioEditor.Presentation.Shared.Table;
 using Editors.Audio.Shared.AudioProject.Models;
+using Editors.Audio.Shared.GameInformation.Warhammer3;
 using Editors.Audio.Shared.Storage;
 using Serilog;
 using Shared.Core.ErrorHandling;
@@ -223,13 +224,8 @@ namespace Editors.Audio.AudioEditor.Presentation.AudioProjectEditor
 
         private void SetMovieFilePath(string movieFilePath)
         {
-            var relativePath = Path.GetRelativePath("movies", movieFilePath);
-            var withoutExtension = Path.ChangeExtension(relativePath, null);
-            var slashesToUnderscores = withoutExtension.Replace("\\", "_");
-            var eventName = $"Play_Movie_{slashesToUnderscores}";
-
             var row = Table.Rows[0];
-            row[TableInformation.ActionEventColumnName] = eventName;
+            row[TableInformation.ActionEventColumnName] = Wh3ActionEventInformation.GetMovieActionEventName(movieFilePath);
         }
 
         public void OnEditorAddRowButtonEnablementUpdateRequested(EditorAddRowButtonEnablementUpdateRequestedEvent e) => SetAddRowButtonEnablement();

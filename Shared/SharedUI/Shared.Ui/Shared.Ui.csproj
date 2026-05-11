@@ -15,7 +15,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\EmbeddedResources\Shared.EmbeddedResources.csproj" />
-    <ProjectReference Include="..\..\GameFiles\Shared.GameFormats.csproj" />
     <ProjectReference Include="..\..\SharedCore\Shared.Core\Shared.Core.csproj" />
   </ItemGroup>
 

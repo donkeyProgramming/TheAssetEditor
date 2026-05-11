@@ -5,7 +5,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Editors.Audio.AudioEditor.Presentation.WaveformVisualiser
+namespace Editors.Audio.WaveformVisualiser.Presentation
 {
     public interface IWaveformVisualisationCacheService
     {

@@ -8,7 +8,7 @@ using Editors.Audio.AudioEditor.Presentation.AudioProjectEditor;
 using Editors.Audio.AudioEditor.Presentation.AudioProjectExplorer;
 using Editors.Audio.AudioEditor.Presentation.AudioProjectViewer;
 using Editors.Audio.AudioEditor.Presentation.Settings;
-using Editors.Audio.AudioEditor.Presentation.WaveformVisualiser;
+using Editors.Audio.WaveformVisualiser.Presentation;
 
 namespace Editors.Audio.AudioEditor.Presentation
 {

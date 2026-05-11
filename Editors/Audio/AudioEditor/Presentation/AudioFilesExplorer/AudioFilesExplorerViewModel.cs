@@ -12,7 +12,7 @@ using Editors.Audio.AudioEditor.Commands.AudioFilesExplorer;
 using Editors.Audio.AudioEditor.Core;
 using Editors.Audio.AudioEditor.Events.AudioFilesExplorer;
 using Editors.Audio.AudioEditor.Events.AudioProjectExplorer;
-using Editors.Audio.AudioEditor.Events.WaveformVisualiser;
+using Editors.Audio.WaveformVisualiser.Events;
 using Editors.Audio.AudioEditor.Presentation.Shared.Models;
 using Shared.Core.Events;
 using Shared.Core.Events.Global;

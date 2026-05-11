@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Editors.Audio.Shared.Wwise;
+using Shared.GameFormats.Wwise;
 
 namespace Editors.Audio.Shared.AudioProject.Models
 {

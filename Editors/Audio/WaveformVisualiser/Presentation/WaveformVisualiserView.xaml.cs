@@ -1,6 +1,6 @@
 ﻿using System.Windows.Controls;
 
-namespace Editors.Audio.AudioEditor.Presentation.WaveformVisualiser
+namespace Editors.Audio.WaveformVisualiser.Presentation
 {
     public partial class WaveformVisualiserView : UserControl
     {

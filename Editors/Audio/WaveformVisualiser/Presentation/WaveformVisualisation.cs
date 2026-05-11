@@ -1,6 +1,6 @@
 ﻿using System.Windows.Media.Imaging;
 
-namespace Editors.Audio.AudioEditor.Presentation.WaveformVisualiser
+namespace Editors.Audio.WaveformVisualiser.Presentation
 {
     public class WaveformVisualisation
     {
