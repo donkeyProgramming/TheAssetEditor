@@ -12,7 +12,6 @@
   "SettingsWindow.OnlyLoadLod0": "Only load Lod0 for reference meshes",
   "SettingsWindow.GridSize": "Grid Size",
   "SettingsWindow.VertexSelectionColour": "Vertex Selection Colour",
-  "SettingsWindow.AudioModding": "Audio Modding",
   "SettingsWindow.SaveButton": "Save",
 
   "UpdaterWindow.Title": "Updater",
@@ -101,8 +100,6 @@
   "SettingsWindow.VertexSelectionColourTooltip": "Hex colour for selected vertices (e.g. #FF7800)",
   "SettingsWindow.GameFiles": "Game Files",
   "SettingsWindow.GameDataPathHint": "Browse for game data location e.g. \"C:\\SteamLibrary\\steamapps\\common\\Total War WARHAMMER III\\data\"",
-  "SettingsWindow.WwiseCLI": "Wwise CLI",
-  "SettingsWindow.WwiseCliPathHint": "e.g. \"C:\\Program Files (x86)\\Audiokinetic\\Wwise2019.2.15.7667\\Authoring\\x64\\Release\\bin\\WwiseCLI.exe\"",
 
   "MenuBar.File": "_File",
   "MenuBar.File.NewPack": "New Pack",

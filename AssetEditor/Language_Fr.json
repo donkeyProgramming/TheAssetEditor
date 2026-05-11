@@ -11,7 +11,6 @@
   "SettingsWindow.OnlyLoadLod0": "Charger uniquement le Lod0 pour les maillages de référence",
   "SettingsWindow.GridSize": "Taille de la grille",
   "SettingsWindow.VertexSelectionColour": "Couleur de sélection des sommets",
-  "SettingsWindow.AudioModding": "Modding audio",
   "SettingsWindow.SaveButton": "Enregistrer",
 
   "UpdaterWindow.Title": "Mise à jour",
