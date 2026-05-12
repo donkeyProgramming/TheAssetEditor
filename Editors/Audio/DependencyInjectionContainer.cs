@@ -24,7 +24,6 @@ using Editors.Audio.Shared.AudioProject.Compiler;
 using Editors.Audio.Shared.AudioProject.Factories;
 using Editors.Audio.Shared.Dat;
 using Editors.Audio.Shared.Storage;
-using Editors.Audio.Shared.Utilities;
 using Editors.Audio.Shared.Wwise;
 using Editors.Audio.Shared.Wwise.Generators;
 using Editors.Audio.WaveformVisualiser.Presentation;
@@ -132,9 +131,6 @@ namespace Editors.Audio
             serviceCollection.AddScoped<IAudioRepository, AudioRepository>();
             serviceCollection.AddSingleton<BnkLoader>();
             serviceCollection.AddSingleton<DatLoader>();
-            serviceCollection.AddScoped<SoundPlayer>();
-            serviceCollection.AddScoped<VgStreamWrapper>();
-            serviceCollection.AddScoped<WSourcesWrapper>();
 
             RegisterAllAsInterface<IDeveloperConfiguration>(serviceCollection, ServiceLifetime.Transient);
         }
