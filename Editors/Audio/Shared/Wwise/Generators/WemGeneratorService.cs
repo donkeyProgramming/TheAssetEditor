@@ -8,6 +8,7 @@ using Shared.Core.ErrorHandling;
 using Shared.Core.Misc;
 using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Utility;
+using Shared.GameFormats.Wwise.Wem.V132;
 
 namespace Editors.Audio.Shared.Wwise.Generators
 {
@@ -18,10 +19,9 @@ namespace Editors.Audio.Shared.Wwise.Generators
         void SaveWemsToPack(List<AudioFile> audioFiles);
     }
 
-    public class WemGeneratorService(IPackFileService packFileService, WSourcesWrapper wSourcesWrapper) : IWemGeneratorService
+    public class WemGeneratorService(IPackFileService packFileService) : IWemGeneratorService
     {
         private readonly IPackFileService _packFileService = packFileService;
-        private readonly WSourcesWrapper _wSourcesWrapper = wSourcesWrapper;
 
         private readonly ILogger _logger = Logging.Create<WemGeneratorService>();
 
@@ -38,34 +38,25 @@ namespace Editors.Audio.Shared.Wwise.Generators
                 }
             }
         }
+
         public void GenerateWems(List<AudioFile> audioFiles)
         {
-            var wavToWemFolderPath = $"{DirectoryHelper.Temp}\\WavToWem";
-            var audioFolderPath = $"{DirectoryHelper.Temp}\\Audio";
-            var wprojPath = $"{DirectoryHelper.Temp}\\WavToWem\\WavToWemWwiseProject\\WavToWem.wproj";
-            var wsourcesPath = $"{DirectoryHelper.Temp}\\WavToWem\\wav_to_wem.wsources";
-
-            var wavFileNames = new List<string>();
             foreach (var audioFile in audioFiles)
             {
                 var wavFile = _packFileService.FindFile(audioFile.WavPackFilePath);
-                var wavFileName = $"{audioFile.Id}.wav";
-                var wavFilePath = $"{audioFolderPath}\\{wavFileName}";
+                var wavBytes = wavFile.DataSource.ReadData();
+                var wemBytes = WemFile.CreateFromWavBytes(wavBytes).WriteData();
 
-                ExportWav(wavFilePath, wavFile.DataSource.ReadData());
-
-                wavFileNames.Add(wavFileName);
+                try
+                {
+                    DirectoryHelper.EnsureFileFolderCreated(audioFile.WemDiskFilePath);
+                    File.WriteAllBytes(audioFile.WemDiskFilePath, wemBytes);
+                }
+                catch (Exception e)
+                {
+                    _logger.Here().Error(e.Message);
+                }
             }
-
-            _wSourcesWrapper.InitialiseWwiseProject();
-
-            DirectoryHelper.EnsureCreated(wavToWemFolderPath);
-
-            _wSourcesWrapper.CreateWsourcesFile(wavFileNames);
-
-            var arguments = $"\"{wprojPath}\" -ConvertExternalSources \"{wsourcesPath}\" -ExternalSourcesOutput \"{audioFolderPath}\"";
-            _wSourcesWrapper.RunExternalCommand(arguments);
-            _wSourcesWrapper.DeleteExcessStuff();
         }
 
         public void SaveWemsToPack(List<AudioFile> audioFiles)
@@ -75,19 +66,6 @@ namespace Editors.Audio.Shared.Wwise.Generators
                 wemFiles.Add(new PackFileUtil.FileRef(audioFile.WemDiskFilePath, Path.GetDirectoryName(audioFile.WemPackFilePath)));
 
             PackFileUtil.LoadFilesFromDisk(_packFileService, wemFiles);
-        }
-
-        private void ExportWav(string filePath, byte[] bytes)
-        {
-            try
-            {
-                DirectoryHelper.EnsureFileFolderCreated(filePath);
-                File.WriteAllBytes(filePath, bytes);
-            }
-            catch (Exception e)
-            {
-                _logger.Here().Error(e.Message);
-            }
         }
     }
 }

@@ -7,12 +7,14 @@
 	</PropertyGroup>
 
 
-	<ItemGroup>
+    <ItemGroup>
 	  <PackageReference Include="NAudio" Version="2.2.1" />
+	  <PackageReference Include="NAudio.Vorbis" Version="1.5.0" />
 	  <PackageReference Include="NAudio.WaveFormRenderer" Version="2.0.0" />
 	</ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\Shared\GameFiles\Shared.GameFormats.csproj" />
     <ProjectReference Include="..\..\Shared\SharedCore\Shared.Core\Shared.Core.csproj" />
     <ProjectReference Include="..\..\Shared\SharedUI\Shared.Ui\Shared.Ui.csproj" />
   </ItemGroup>

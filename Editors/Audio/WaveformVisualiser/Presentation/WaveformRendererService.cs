@@ -4,19 +4,24 @@ using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Media.Imaging;
+using NAudio.Vorbis;
 using NAudio.Wave;
 using NAudio.WaveFormRenderer;
 using Shared.Core.PackFiles;
+using Shared.GameFormats.Wwise.Wem.V132;
+using Shared.GameFormats.Wwise.Wem.V132.Decoding;
+using Shared.GameFormats.Wwise.Wem.V132.Encoding;
 using Color = System.Drawing.Color;
 using DrawingImage = System.Drawing.Image;
 
-namespace Editors.Audio.AudioEditor.Presentation.WaveformVisualiser
+namespace Editors.Audio.WaveformVisualiser.Presentation
 {
     public record WaveformRenderResult(WaveformVisualisation Visualisation, TimeSpan TotalTime, int PixelWidth);
 
     public interface IWaveformRendererService
     {
         Task<WaveformRenderResult> RenderAsync(string filePathKey, int targetWidth, CancellationToken cancellationToken);
+        Task<WaveformRenderResult> RenderFromWemBytesAsync(byte[] wemBytes, int targetWidth, CancellationToken cancellationToken);
     }
 
     public sealed class WaveformRendererService(IPackFileService packFileService) : IWaveformRendererService
@@ -37,29 +42,72 @@ namespace Editors.Audio.AudioEditor.Presentation.WaveformVisualiser
             var baseSettings = CreateBaseWaveformSettings(targetWidth);
             var overlaySettings = CreateOverlayWaveformSettings(targetWidth);
 
-            return await Task.Run(() => RenderWaveformFromBytes(data, packFile.Extension, baseSettings, overlaySettings), cancellationToken).ConfigureAwait(false);
+            return await Task.Run(() => RenderWaveformFromWavBytes(data, baseSettings, overlaySettings), cancellationToken).ConfigureAwait(false);
         }
 
-        private static WaveformRenderResult RenderWaveformFromBytes(byte[] data, string extension, WaveFormRendererSettings baseSettings, WaveFormRendererSettings overlaySettings)
+        public async Task<WaveformRenderResult> RenderFromWemBytesAsync(byte[] wemBytes, int targetWidth, CancellationToken cancellationToken)
         {
-            using var memoryStream = new MemoryStream(data, writable: false);
-            using var waveStream = new WaveFileReader(memoryStream);
-            using var alignedWaveStream = new BlockAlignReductionStream(waveStream);
+            if (wemBytes == null || wemBytes.Length == 0)
+                throw new ArgumentNullException(nameof(wemBytes));
 
-            var waveFormRenderer = new WaveFormRenderer();
+            var baseSettings = CreateBaseWaveformSettings(targetWidth);
+            var overlaySettings = CreateOverlayWaveformSettings(targetWidth);
 
-            using var baseImageDrawing = waveFormRenderer.Render(alignedWaveStream, baseSettings);
-            alignedWaveStream.Position = 0;
-            using var overlayImageDrawing = waveFormRenderer.Render(alignedWaveStream, overlaySettings);
+            return await Task.Run(() =>
+            {
+                var codebookLibrary = new WwiseCodebookLibrary();
+                var decoder = new WemVorbisDecoder(codebookLibrary);
+                var oggBytes = decoder.Decode(WemFile.CreateFromBytes(wemBytes)).ToOgg();
+                return RenderWaveformFromOggBytes(oggBytes, baseSettings, overlaySettings);
+            }, cancellationToken).ConfigureAwait(false);
+        }
 
-            var baseBitmap = ToBitmapImage(baseImageDrawing);
-            var overlayBitmap = ToBitmapImage(overlayImageDrawing);
+        private static WaveformRenderResult RenderWaveformFromWavBytes(byte[] wavBytes, WaveFormRendererSettings baseSettings, WaveFormRendererSettings overlaySettings)
+        {
+            using var baseMemoryStream = new MemoryStream(wavBytes, writable: false);
+            using var baseWaveStream = new WaveFileReader(baseMemoryStream);
+            var totalTime = baseWaveStream.TotalTime;
+
+            // Use separate readers for base/overlay so both renders start from an identical decode origin.
+            // Rewinding and reusing the same decoded stream can produce slight pixel drift on some codecs.
+            var baseBitmap = RenderWaveformImage(baseWaveStream, baseSettings);
+
+            using var overlayMemoryStream = new MemoryStream(wavBytes, writable: false);
+            using var overlayWaveStream = new WaveFileReader(overlayMemoryStream);
+            var overlayBitmap = RenderWaveformImage(overlayWaveStream, overlaySettings);
 
             var waveformVisualisation = WaveformVisualisation.Create(baseBitmap, overlayBitmap);
-            var totalTime = waveStream.TotalTime;
             var pixelWidth = baseBitmap.PixelWidth;
 
             return new WaveformRenderResult(waveformVisualisation, totalTime, pixelWidth);
+        }
+
+        private static WaveformRenderResult RenderWaveformFromOggBytes(byte[] oggBytes, WaveFormRendererSettings baseSettings, WaveFormRendererSettings overlaySettings)
+        {
+            using var baseMemoryStream = new MemoryStream(oggBytes, writable: false);
+            using var baseWaveStream = new VorbisWaveReader(baseMemoryStream);
+            var totalTime = baseWaveStream.TotalTime;
+
+            // Use separate readers for base/overlay so both renders start from an identical decode origin.
+            // Rewinding and reusing the same decoded stream can produce slight pixel drift on some codecs.
+            var baseBitmap = RenderWaveformImage(baseWaveStream, baseSettings);
+
+            using var overlayMemoryStream = new MemoryStream(oggBytes, writable: false);
+            using var overlayWaveStream = new VorbisWaveReader(overlayMemoryStream);
+            var overlayBitmap = RenderWaveformImage(overlayWaveStream, overlaySettings);
+
+            var waveformVisualisation = WaveformVisualisation.Create(baseBitmap, overlayBitmap);
+            var pixelWidth = baseBitmap.PixelWidth;
+
+            return new WaveformRenderResult(waveformVisualisation, totalTime, pixelWidth);
+        }
+
+        private static BitmapImage RenderWaveformImage(WaveStream waveStream, WaveFormRendererSettings settings)
+        {
+            using var alignedWaveStream = new BlockAlignReductionStream(waveStream);
+            var waveFormRenderer = new WaveFormRenderer();
+            using var imageDrawing = waveFormRenderer.Render(alignedWaveStream, settings);
+            return ToBitmapImage(imageDrawing);
         }
 
         private static SoundCloudBlockWaveFormSettings CreateBaseWaveformSettings(int width)

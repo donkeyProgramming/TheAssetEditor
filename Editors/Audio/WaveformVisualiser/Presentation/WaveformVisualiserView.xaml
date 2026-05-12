@@ -1,10 +1,9 @@
-﻿<UserControl x:Class="Editors.Audio.AudioEditor.Presentation.WaveformVisualiser.WaveformVisualiserView"
+﻿<UserControl x:Class="Editors.Audio.WaveformVisualiser.Presentation.WaveformVisualiserView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:local="clr-namespace:Editors.Audio.AudioEditor.Presentation.WaveformVisualiser" 
-             xmlns:loc="clr-namespace:Shared.Ui.Common;assembly=Shared.Ui"
+             xmlns:local="clr-namespace:Editors.Audio.WaveformVisualiser.Presentation" 
              d:DataContext="{d:DesignInstance Type=local:WaveformVisualiserViewModel}"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
@@ -72,8 +71,8 @@
                 Margin="0, 0, 0, 5"
                 HorizontalAlignment="Center"
                 VerticalAlignment="Bottom"
-                Width="70"
-                Content="{loc:Loc WaveformVisualiser.Play}" 
+                Width="80"
+                Content="{Binding PlayPauseButtonText}"
                 Command="{Binding PlayPauseCommand}"/>
 
             <Grid

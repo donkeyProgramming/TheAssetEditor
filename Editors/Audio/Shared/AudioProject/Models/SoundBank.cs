@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json.Serialization;
 using Editors.Audio.Shared.GameInformation.Warhammer3;
-using Editors.Audio.Shared.Wwise;
+using Shared.GameFormats.Wwise;
 
 namespace Editors.Audio.Shared.AudioProject.Models
 {

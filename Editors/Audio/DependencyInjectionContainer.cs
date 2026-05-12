@@ -15,7 +15,6 @@ using Editors.Audio.AudioEditor.Presentation.AudioProjectViewer.Table;
 using Editors.Audio.AudioEditor.Presentation.NewAudioProject;
 using Editors.Audio.AudioEditor.Presentation.Settings;
 using Editors.Audio.AudioEditor.Presentation.Shared.Table;
-using Editors.Audio.AudioEditor.Presentation.WaveformVisualiser;
 using Editors.Audio.AudioExplorer;
 using Editors.Audio.AudioProjectConverter;
 using Editors.Audio.AudioProjectMerger;
@@ -28,6 +27,7 @@ using Editors.Audio.Shared.Storage;
 using Editors.Audio.Shared.Utilities;
 using Editors.Audio.Shared.Wwise;
 using Editors.Audio.Shared.Wwise.Generators;
+using Editors.Audio.WaveformVisualiser.Presentation;
 using Microsoft.Extensions.DependencyInjection;
 using Shared.Core.DependencyInjection;
 using Shared.Core.DevConfig;
@@ -105,8 +105,6 @@ namespace Editors.Audio
             serviceCollection.AddScoped<IViewerTableService, ViewerStateGroupTableService>();
 
             // Waveform Visualiser services
-            //serviceCollection.AddSingleton<IWaveformRenderingService, WaveformRenderingService>();
-            //serviceCollection.AddSingleton<IAudioPlayerService, AudioPlayerService>();
             serviceCollection.AddSingleton<IWaveformVisualisationCacheService, WaveformVisualisationCacheService>();
             serviceCollection.AddTransient<IWaveformRendererService, WaveformRendererService>();
             serviceCollection.AddTransient<ISoundEngine, SoundEngine>();

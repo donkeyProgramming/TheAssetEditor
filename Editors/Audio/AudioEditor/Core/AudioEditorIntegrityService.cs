@@ -7,7 +7,7 @@ using Editors.Audio.Shared.AudioProject.Compiler;
 using Editors.Audio.Shared.AudioProject.Models;
 using Editors.Audio.Shared.GameInformation.Warhammer3;
 using Editors.Audio.Shared.Storage;
-using Editors.Audio.Shared.Wwise;
+using Shared.GameFormats.Wwise;
 using Shared.Core.PackFiles;
 using Shared.GameFormats.Wwise.Hirc;
 

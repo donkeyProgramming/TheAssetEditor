@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Editors.Audio.Shared.Wwise;
+using Shared.GameFormats.Wwise;
 using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
 using Shared.Core.PackFiles.Utility;

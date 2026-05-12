@@ -2,8 +2,12 @@
 using System.IO;
 using System.Windows;
 using NAudio.CoreAudioApi;
+using NAudio.Vorbis;
 using NAudio.Wave;
 using Shared.Core.PackFiles;
+using Shared.GameFormats.Wwise.Wem.V132;
+using Shared.GameFormats.Wwise.Wem.V132.Decoding;
+using Shared.GameFormats.Wwise.Wem.V132.Encoding;
 
 namespace Editors.Audio.Shared.Wwise
 {
@@ -14,6 +18,7 @@ namespace Editors.Audio.Shared.Wwise
         long DeviceBytesAtLastPlayOrResume { get; }
         PlaybackState PlaybackState { get; }
         void LoadFromFilePath(string filePath);
+        void LoadFromWemBytes(byte[] wemBytes);
         void Stop();
         void PlayPause();
         TimeSpan GetDeviceAlignedTimeNow();
@@ -27,7 +32,7 @@ namespace Editors.Audio.Shared.Wwise
         private readonly IPackFileService _packFileService = packFileService;
 
         private IWavePlayer _wavePlayer;
-        private WaveFileReader _waveFileReader;
+        private WaveStream _waveFileReader;
         private MemoryStream _memoryStream;
 
         public TimeSpan TotalPlaybackTime { get; private set; } = TimeSpan.Zero;
@@ -58,6 +63,28 @@ namespace Editors.Audio.Shared.Wwise
 
             _memoryStream = new MemoryStream(data, writable: false);
             _waveFileReader = new WaveFileReader(_memoryStream);
+
+            TotalPlaybackTime = _waveFileReader.TotalTime;
+            ReaderTimeAtLastPlayOrResume = _waveFileReader.CurrentTime;
+            DeviceBytesAtLastPlayOrResume = 0;
+
+            if (_wavePlayer != null)
+            {
+                _wavePlayer.PlaybackStopped -= OnPlaybackStoppedForward;
+                _wavePlayer.Dispose();
+                _wavePlayer = null;
+            }
+        }
+
+        public void LoadFromWemBytes(byte[] wemBytes)
+        {
+            DisposeReaderOnly();
+
+            var codebookLibrary = new WwiseCodebookLibrary();
+            var decoder = new WemVorbisDecoder(codebookLibrary);
+            var oggBytes = decoder.Decode(WemFile.CreateFromBytes(wemBytes)).ToOgg();
+            _memoryStream = new MemoryStream(oggBytes, writable: false);
+            _waveFileReader = new VorbisWaveReader(_memoryStream);
 
             TotalPlaybackTime = _waveFileReader.TotalTime;
             ReaderTimeAtLastPlayOrResume = _waveFileReader.CurrentTime;
