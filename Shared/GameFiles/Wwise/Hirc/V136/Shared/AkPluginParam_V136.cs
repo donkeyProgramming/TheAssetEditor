@@ -43,16 +43,16 @@ namespace Shared.GameFormats.Wwise.Hirc.V136.Shared
         public class CAkFxSrcSilenceParams_V136 : AkPluginParam_V136
         {
             public float Duration { get; set; }
-            public float RandomizedLengthMinus { get; set; }
-            public float RandomizedLengthPlus { get; set; }
+            public float RandomisedLengthMinus { get; set; }
+            public float RandomisedLengthPlus { get; set; }
 
             public static CAkFxSrcSilenceParams_V136 ReadData(ByteChunk chunk)
             {
                 return new CAkFxSrcSilenceParams_V136
                 {
                     Duration = chunk.ReadSingle(),
-                    RandomizedLengthMinus = chunk.ReadSingle(),
-                    RandomizedLengthPlus = chunk.ReadSingle()
+                    RandomisedLengthMinus = chunk.ReadSingle(),
+                    RandomisedLengthPlus = chunk.ReadSingle()
                 };
             }
         }
