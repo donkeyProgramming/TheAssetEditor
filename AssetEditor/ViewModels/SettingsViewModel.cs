@@ -35,7 +35,6 @@ namespace AssetEditor.ViewModels
         [ObservableProperty] private GameTypeEnum _currentGame;
         [ObservableProperty] private bool _loadCaPacksByDefault;
         [ObservableProperty] private bool _showCAWemFiles;
-        [ObservableProperty] private string _wwisePath;
         [ObservableProperty] private bool _onlyLoadLod0ForReferenceMeshes;
         [ObservableProperty] private CameraControlMode _selectedCameraMode;
 
@@ -73,7 +72,6 @@ namespace AssetEditor.ViewModels
                         Path = _settingsService.CurrentSettings.GameDirectories.FirstOrDefault(x => x.Game == game.Type)?.Path
                     });
             }
-            WwisePath = _settingsService.CurrentSettings.WwisePath;
         }
 
 
@@ -95,21 +93,10 @@ namespace AssetEditor.ViewModels
 
             foreach (var item in GameDirectores)
                 _settingsService.CurrentSettings.GameDirectories.Add(new ApplicationSettings.GamePathPair(item.GameType, item.Path));
-            _settingsService.CurrentSettings.WwisePath = WwisePath;
            
             _localizationManager.LoadLanguage(SelectedLanguage);
             _settingsService.Save();
             MessageBox.Show("Please restart the tool after updating settings!");
-        }
-
-        [RelayCommand]
-        private void Browse()
-        {
-            var dialog = new OpenFileDialog();
-            dialog.Filter = "Executable files (*.exe)|*.exe";
-            dialog.Multiselect = false;
-            if (dialog.ShowDialog() == DialogResult.OK)
-                WwisePath = dialog.FileName;
         }
     }
 

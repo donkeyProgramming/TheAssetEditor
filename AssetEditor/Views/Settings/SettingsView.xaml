@@ -30,8 +30,6 @@
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
         <Grid Grid.Row="0">
@@ -166,26 +164,5 @@
             </ItemsControl>
         </Grid>
 
-        <Grid Grid.Row="3">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="200"/>
-                <ColumnDefinition Width="605"/>
-                <ColumnDefinition Width="40"/>
-            </Grid.ColumnDefinitions>
-
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-            </Grid.RowDefinitions>
-
-            <TextBlock Grid.Row="0" Text="{loc:Loc SettingsWindow.AudioModding}" Margin="5, 5, 0, 0" FontSize="15"/>
-            <Separator Grid.Row="1" Grid.ColumnSpan="3" Height="1" Margin="5, 5, 10, 10"/>
-
-            <TextBlock Grid.Row="2" Grid.Column="0" Text="{loc:Loc SettingsWindow.WwiseCLI}" Margin="5, 0, 0, 0"/>
-            <TextBox Grid.Row="2" Grid.Column="1" Style="{StaticResource HintedTextBox}" Text="{Binding WwisePath}" 
-                     Tag="{loc:Loc SettingsWindow.WwiseCliPathHint}" IsReadOnly="True" Margin="0, 0, 5, 5" Padding="2.5, 0, 0, 0"/>
-            <Button Grid.Row="2" Grid.Column="2" Content="..." Command="{Binding BrowseCommand}" Margin="0, 0, 10, 5"/>
-        </Grid>
     </Grid>
 </UserControl>

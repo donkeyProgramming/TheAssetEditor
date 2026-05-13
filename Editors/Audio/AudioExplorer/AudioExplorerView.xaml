@@ -9,6 +9,7 @@
     xmlns:Behaviors="clr-namespace:Shared.Ui.Common.Behaviors;assembly=Shared.Ui" 
     xmlns:ValueConverters="clr-namespace:Editors.Audio.Shared.UI.ValueConverters" 
     xmlns:AudioExplorer="clr-namespace:Editors.Audio.AudioExplorer" 
+    xmlns:WaveformVisualiser="clr-namespace:Editors.Audio.WaveformVisualiser.Presentation"
     xmlns:loc="clr-namespace:Shared.Ui.Common;assembly=Shared.Ui"
     d:DataContext="{d:DesignInstance Type=AudioExplorer:AudioExplorerViewModel}"
     mc:Ignorable="d" 
@@ -57,9 +58,11 @@
                 <RowDefinition
                     Height="Auto"/>
                 <RowDefinition
+                    Height="*"/>
+                <RowDefinition
                     Height="Auto"/>
                 <RowDefinition
-                    Height="*"/>
+                    Height="161"/>
             </Grid.RowDefinitions>
 
             <Grid
@@ -176,34 +179,25 @@
                 </Grid>
             </Expander>
 
-            <Button
-                Grid.Row="4"
-                Margin="5, 5, 5, 5"
-                Content="{loc:Loc AudioExplorer.PlayAudio}"
-                Height="25"
-                Command="{Binding PlayAudioCommand}" 
-                IsEnabled="{Binding IsPlayAudioButtonEnabled, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
-
             <Border 
-                Grid.Row="5"
+                Grid.Row="4"
                 Height="5" 
                 Background="{DynamicResource App.Border}"/>
 
             <Label 
-                Grid.Row="6" 
+                Grid.Row="5" 
                 Margin="0, 0, 0, 0"
                 Content="{loc:Loc AudioExplorer.WwiseHierarchyGraph}"/>
 
             <TreeView
-                Grid.Row="7"
+                Grid.Row="6"
                 Margin="0, 2, 0, 0"
                 Padding="0, 5, 0, 0"
                 BorderBrush="{DynamicResource App.Border}"
                 ItemsSource="{Binding TreeList, UpdateSourceTrigger=PropertyChanged}"
                 VirtualizingPanel.IsVirtualizing="True"
                 VirtualizingPanel.VirtualizationMode="Recycling"
-                VirtualizingPanel.IsVirtualizingWhenGrouping="True"
-                PreviewMouseDoubleClick="OnNodeDoubleClick">
+                VirtualizingPanel.IsVirtualizingWhenGrouping="True">
 
                 <TreeView.ItemContainerStyle>
                     <Style 
@@ -339,6 +333,20 @@
                     </HierarchicalDataTemplate>
                 </TreeView.ItemTemplate>
             </TreeView>
+
+            <GridSplitter
+                Grid.Row="7"
+                Height="5"
+                Background="{DynamicResource App.Border}"
+                VerticalAlignment="Center"
+                HorizontalAlignment="Stretch"
+                ResizeBehavior="PreviousAndNext"
+                ResizeDirection="Rows"/>
+
+            <WaveformVisualiser:WaveformVisualiserView
+                Grid.Row="8"
+                DataContext="{Binding WaveformVisualiserViewModel}"/>
+
         </Grid>
 
         <GridSplitter

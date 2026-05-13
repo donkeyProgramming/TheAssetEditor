@@ -11,18 +11,19 @@ using Editors.Audio.Shared.AudioProject.Compiler;
 using Editors.Audio.Shared.AudioProject.Models;
 using Editors.Audio.Shared.GameInformation.Warhammer3;
 using Editors.Audio.Shared.Storage;
-using Editors.Audio.Shared.Utilities;
-using Editors.Audio.Shared.Wwise;
 using Editors.Audio.Shared.Wwise.HircExploration;
 using Serilog;
 using Shared.Core.ErrorHandling;
-using Shared.Core.Misc;
 using Shared.Core.PackFiles.Models;
 using Shared.Core.Services;
 using Shared.Core.Settings;
 using Shared.GameFormats.Wwise;
 using Shared.GameFormats.Wwise.Enums;
 using Shared.GameFormats.Wwise.Hirc;
+using Shared.GameFormats.Wwise.Wem.V132;
+using Shared.GameFormats.Wwise.Wem.V132.Decoding;
+using Shared.GameFormats.Wwise.Wem.V132.Encoding;
+using Wav = Shared.GameFormats.Audio.Wav.WavFile;
 
 namespace Editors.Audio.AudioProjectConverter
 {
@@ -33,7 +34,6 @@ namespace Editors.Audio.AudioProjectConverter
         private readonly IAudioRepository _audioRepository;
         private readonly IAudioEditorFileService _audioEditorFileService;
         private readonly ApplicationSettingsService _applicationSettingsService;
-        private readonly VgStreamWrapper _vgStreamWrapper;
 
         private readonly ILogger _logger = Logging.Create<AudioProjectConverterViewModel>();
         private System.Action _closeAction;
@@ -59,15 +59,13 @@ namespace Editors.Audio.AudioProjectConverter
             IFileSaveService fileSaveService,
             IAudioRepository audioRepository,
             IAudioEditorFileService audioEditorFileService,
-            ApplicationSettingsService applicationSettingsService,
-            VgStreamWrapper vgStreamWrapper)
+            ApplicationSettingsService applicationSettingsService)
         {
             _standardDialogs = standardDialogs;
             _fileSaveService = fileSaveService;
             _audioRepository = audioRepository;
             _audioEditorFileService = audioEditorFileService;
             _applicationSettingsService = applicationSettingsService;
-            _vgStreamWrapper = vgStreamWrapper;
 
             _audioRepository.Load([Wh3LanguageInformation.GetLanguageAsString(Wh3Language.EnglishUK)]);
 
@@ -506,6 +504,9 @@ namespace Editors.Audio.AudioProjectConverter
             string voActor,
             HashSet<uint> usedSourceIds)
         {
+            var codebookLibrary = new WwiseCodebookLibrary();
+            var decoder = new WemVorbisDecoder(codebookLibrary);
+
             var voActorSegment = voActor.Substring(voActor.IndexOf("vo_actor_") + "vo_actor_".Length).ToLower();
 
             foreach (var wavFile in statePathWavs)
@@ -534,16 +535,14 @@ namespace Editors.Audio.AudioProjectConverter
                 audioFiles.Add(audioFile);
 
                 var wemFilePath = $"{WemsDirectoryPath}\\{wavFile.WemId}.wem";
-                var wavTempFilePath = $"{DirectoryHelper.Temp}\\Audio\\{wavFile.FileName}";
-                var wavPackOutputPath = $"{OutputDirectoryPath}\\vo\\{voActorSegment}\\{wavFile.FileName}";
+                if (!File.Exists(wemFilePath))
+                    throw new Exception($"Cannot find source wem file: {wemFilePath}");
 
-                var conversionResult = _vgStreamWrapper.ConvertFileUsingVgStream(wemFilePath, wavTempFilePath);
-                if (conversionResult.Failed)
-                    throw new Exception($"Failed to convert {wemFilePath} to {wavTempFilePath}");
-
-                var wavFileBytes = File.ReadAllBytes(wavTempFilePath);
-                var packFile = PackFile.CreateFromBytes(AudioProjectName, wavFileBytes);
-                _fileSaveService.Save(wavPackOutputPath, packFile.DataSource.ReadData(), false);
+                var wavPackOutputPath = $"{OutputDirectoryPath}\\vo\\{voActorSegment}\\{wavFile.FileName}".ToLower();
+                var wemFileBytes = File.ReadAllBytes(wemFilePath);
+                var vorbisAudio = decoder.Decode(WemFile.CreateFromBytes(wemFileBytes));
+                var wavFileBytes = new Wav { Audio = vorbisAudio.ToPcm() }.WriteData();
+                _fileSaveService.Save(wavPackOutputPath, wavFileBytes, false);
             }
         }
 

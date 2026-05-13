@@ -2,11 +2,11 @@
 using System.Collections.Generic;
 using Editors.Audio.Shared.AudioProject.Models;
 using Editors.Audio.Shared.Storage;
-using Editors.Audio.Shared.Wwise;
+using Shared.GameFormats.Wwise;
 
 namespace Editors.Audio.Shared.AudioProject.Compiler
 {
-    // In Wwise Hirc and Source IDs are scoped to the language folder they're in so we only care about ID conflicts within a language.
+    // Hirc and Source IDs are scoped to the language folder they're in so we only care about ID conflicts within a language.
     public class IdGenerator()
     {
         public record Result(Guid Guid, uint Id, int Attempts);

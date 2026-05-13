@@ -12,7 +12,7 @@
     xmlns:AudioProjectEditor="clr-namespace:Editors.Audio.AudioEditor.Presentation.AudioProjectEditor"
     xmlns:Settings="clr-namespace:Editors.Audio.AudioEditor.Presentation.Settings"
     xmlns:AudioProjectViewer="clr-namespace:Editors.Audio.AudioEditor.Presentation.AudioProjectViewer"
-    xmlns:WaveformVisualiser="clr-namespace:Editors.Audio.AudioEditor.Presentation.WaveformVisualiser" 
+    xmlns:WaveformVisualiser="clr-namespace:Editors.Audio.WaveformVisualiser.Presentation" 
     xmlns:loc="clr-namespace:Shared.Ui.Common;assembly=Shared.Ui"
     d:DataContext="{d:DesignInstance Type=Local:AudioEditorViewModel}"
     mc:Ignorable="d" 

@@ -11,7 +11,7 @@ using Editors.Audio.AudioEditor.Events.AudioProjectEditor.Table;
 using Editors.Audio.AudioEditor.Events.AudioProjectExplorer;
 using Editors.Audio.AudioEditor.Events.AudioProjectViewer.Table;
 using Editors.Audio.AudioEditor.Events.Settings.Shortcuts;
-using Editors.Audio.AudioEditor.Events.WaveformVisualiser;
+using Editors.Audio.WaveformVisualiser.Events;
 using Editors.Audio.AudioEditor.Presentation.Shared.Models;
 using Editors.Audio.AudioEditor.Presentation.Shared.Table;
 using Editors.Audio.Shared.AudioProject.Compiler;

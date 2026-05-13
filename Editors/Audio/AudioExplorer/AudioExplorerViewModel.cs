@@ -9,8 +9,8 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Editors.Audio.Shared.GameInformation.Warhammer3;
 using Editors.Audio.Shared.Storage;
-using Editors.Audio.Shared.Utilities;
 using Editors.Audio.Shared.Wwise.HircExploration;
+using Editors.Audio.WaveformVisualiser.Presentation;
 using Shared.Core.ToolCreation;
 using Shared.GameFormats.Wwise.Enums;
 using Shared.GameFormats.Wwise.Hirc;
@@ -28,7 +28,6 @@ namespace Editors.Audio.AudioExplorer
     public partial class AudioExplorerViewModel : ObservableObject, IEditorInterface
     {
         private readonly IAudioRepository _audioRepository;
-        private readonly SoundPlayer _soundPlayer;
 
         [ObservableProperty] private ExplorerListSelectionFilter _explorerFilter;
         [ObservableProperty] private ObservableCollection<HircTreeNode> _treeList = [];
@@ -41,14 +40,15 @@ namespace Editors.Audio.AudioExplorer
         [ObservableProperty] private bool _searchByDialogueEvent = true;
         [ObservableProperty] private bool _searchByHircId = false;
         [ObservableProperty] private bool _searchByVOActor = false;
-        [ObservableProperty] private bool _isPlayAudioButtonEnabled = false;
+
+        public WaveformVisualiserViewModel WaveformVisualiserViewModel { get; }
 
         public string DisplayName { get; set; } = "Audio Explorer";
 
-        public AudioExplorerViewModel(IAudioRepository audioRepository, SoundPlayer soundPlayer)
+        public AudioExplorerViewModel(IAudioRepository audioRepository, WaveformVisualiserViewModel waveformVisualiserViewModel)
         {
             _audioRepository = audioRepository;
-            _soundPlayer = soundPlayer;
+            WaveformVisualiserViewModel = waveformVisualiserViewModel;
 
             // Remove SFX as we don't allow for filtering it out in the AudioRepository so we don't need to display it
             var languages = Enum.GetValues<Wh3Language>()
@@ -131,8 +131,6 @@ namespace Editors.Audio.AudioExplorer
 
         private void OnNodeSelected(HircTreeNode selectedNode)
         {
-            IsPlayAudioButtonEnabled = selectedNode?.Hirc is ICAkSound or ICAkMusicTrack;
-
             SelectedNodeText = string.Empty;
 
             if (selectedNode == null || selectedNode.Hirc == null)
@@ -163,6 +161,44 @@ namespace Editors.Audio.AudioExplorer
             }
 
             ExpandNodes(selectedNode);
+
+            _ = LoadWaveformForNodeAsync(selectedNode);
+        }
+
+        private async System.Threading.Tasks.Task LoadWaveformForNodeAsync(HircTreeNode node)
+        {
+            if (node?.Hirc is ICAkSound sound)
+            {
+                byte[] wemBytes;
+
+                // From at least V136 and newer, AkMediaInformation no longer stores a FileOffset. To get the wem data you would search the DidxChunk
+                // for the SourceId. While some Warhammer 3 AkBankSourceData are AKBKSourceType.Data_BNK and therefore should appear in the DidxChunk,
+                // no Warhammer 3 wems are in there and instead all wems are stored in Packs so they're actually AKBKSourceType.Streaming.
+                // This could be explained by Wwiser's Enum for AKBKSourceType in V136 mapping incorrectly, or V136 not supporting data bnks but who knows?
+                // So, as there are no data wems in Warhammer 3, functionality to find wem data in V136 is not implemented as they can only be streamed.
+                if (sound.GetStreamType() == AKBKSourceType.Data_BNK && sound is CAkSound_V112 sound_V112)
+                {
+                    wemBytes = _audioRepository.FindDataWem(
+                        sound_V112.AkBankSourceData.AkMediaInformation.FileId,
+                        (int)sound_V112.AkBankSourceData.AkMediaInformation.FileOffset,
+                        (int)sound_V112.AkBankSourceData.AkMediaInformation.InMemoryMediaSize);
+                }
+                else
+                {
+                    var wemFile = _audioRepository.FindWem(sound.GetSourceId().ToString());
+                    wemBytes = wemFile?.DataSource.ReadData();
+                }
+
+                if (wemBytes != null)
+                    await WaveformVisualiserViewModel.LoadFromWemBytesAsync(wemBytes, node.DisplayName).ConfigureAwait(false);
+            }
+            else if (node?.Hirc is ICAkMusicTrack musicTrack)
+            {
+                var musicTrackId = musicTrack.GetChildren().FirstOrDefault();
+                var wemFile = _audioRepository.FindWem(musicTrackId.ToString());
+                if (wemFile != null)
+                    await WaveformVisualiserViewModel.LoadFromWemBytesAsync(wemFile.DataSource.ReadData(), node.DisplayName).ConfigureAwait(false);
+            }
         }
 
         private static void ExpandNodes(HircTreeNode selectedNode)
@@ -246,7 +282,7 @@ namespace Editors.Audio.AudioExplorer
 
             if (SearchByVOActor)
             {
-                var wwiseTreeParserChildren = new HircTreeChildrenParser(_audioRepository);
+                var hircTreeChildrenParser = new HircTreeChildrenParser(_audioRepository);
 
                 SelectedNode = null;
                 TreeList.Clear();
@@ -254,7 +290,7 @@ namespace Editors.Audio.AudioExplorer
                 var dialogueEvents = _audioRepository.GetHircsByHircType(AkBkHircType.Dialogue_Event);
                 foreach (var dialogueEvent in dialogueEvents)
                 {
-                    var dialogueEventRootNode = wwiseTreeParserChildren.BuildHierarchy(dialogueEvent);
+                    var dialogueEventRootNode = hircTreeChildrenParser.BuildHierarchy(dialogueEvent);
                     if (FilterTreeByVOActor(dialogueEventRootNode, newValue.DisplayName))
                         TreeList.Add(dialogueEventRootNode);
                 }
@@ -263,12 +299,12 @@ namespace Editors.Audio.AudioExplorer
             }
             else
             {
-                var wwiseTreeParserChildren = new HircTreeChildrenParser(_audioRepository);
+                var hircTreeChildrenParser = new HircTreeChildrenParser(_audioRepository);
 
                 SelectedNode = null;
                 TreeList.Clear();
 
-                var rootNode = wwiseTreeParserChildren.BuildHierarchy(newValue.HircItem);
+                var rootNode = hircTreeChildrenParser.BuildHierarchy(newValue.HircItem);
                 rootNode.IsExpanded = true;
 
                 TreeList.Add(rootNode);
@@ -297,35 +333,6 @@ namespace Editors.Audio.AudioExplorer
             }
 
             return anyMatches;
-        }
-
-        [RelayCommand] public void PlayAudio()
-        {
-            // From at least V136 and newer, AkMediaInformation no longer stores and FileOffset. To get the wem data you would search the DidxChunk
-            // for the SourceId. While some Warhammer 3 AkBankSourceData are AKBKSourceType.Data_BNK and therefore should appear in the DidxChunk,
-            // no Warhammer 3 wems are in there and instead all wems are stored in Packs so they're actually AKBKSourceType.Streaming.
-            // This could be explained by Wwiser's Enum for AKBKSourceType in V136 mapping incorrectly, or V136 not supporting data bnks but who knows?
-            // So, as there are no data wems in Warhammer 3, functionality to find wem data in V136 is not implemented as they can only be streamed.
-            if (SelectedNode?.Hirc is ICAkSound sound)
-            {
-                if (sound.GetStreamType() == AKBKSourceType.Data_BNK && sound is CAkSound_V112 sound_V112)
-                {
-                    _soundPlayer.PlayDataWem(
-                        sound_V112.AkBankSourceData.AkMediaInformation.SourceId,
-                        sound_V112.AkBankSourceData.AkMediaInformation.FileId,
-                        (int)sound_V112.AkBankSourceData.AkMediaInformation.FileOffset,
-                        (int)sound_V112.AkBankSourceData.AkMediaInformation.InMemoryMediaSize
-                    );
-                }
-                else
-                    _soundPlayer.PlayStreamedWem(sound.GetSourceId().ToString());
-            }
-            else if (SelectedNode?.Hirc is ICAkMusicTrack musicTrack)
-            {
-                // There is normally only one MusicTrack?
-                var musicTrackId = musicTrack.GetChildren().FirstOrDefault();
-                _soundPlayer.PlayStreamedWem(musicTrackId.ToString());
-            }
         }
 
         private void Reset()
