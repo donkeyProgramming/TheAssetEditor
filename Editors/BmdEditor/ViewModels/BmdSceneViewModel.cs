@@ -24,7 +24,7 @@ namespace Editors.BmdEditor.ViewModels
     {
         private readonly ILogger _logger = Serilog.Log.ForContext<BmdSceneViewModel>();
         private readonly IPackFileService _packFileService;
-        private readonly IEditorCreator _editorCreator;
+        private readonly IEditorManager _editorCreator;
         private readonly ResourceLibrary _resourceLibrary;
         private readonly IGraphicsResourceCreator _graphicsResourceCreator;
         private readonly MeshBuilderService _meshBuilderService;
@@ -56,7 +56,7 @@ namespace Editors.BmdEditor.ViewModels
 
         public BmdSceneViewModel(
             IPackFileService packFileService,
-            IEditorCreator editorCreator,
+            IEditorManager editorCreator,
             ResourceLibrary resourceLibrary,
             IGraphicsResourceCreator graphicsResourceCreator,
             MeshBuilderService meshBuilderService,

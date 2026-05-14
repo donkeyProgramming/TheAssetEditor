@@ -156,5 +156,37 @@ namespace Shared.CoreTest.Services
         }
 
         // SaveAs
+
+        [Test]
+        public void Save_RootPathWithLeadingSlash_CreatesRootLevelFile()
+        {
+            var saveService = new FileSaveService(_pfs, _uiProvider.Object);
+
+            var result = saveService.Save("\\RootFile.test", [9], false);
+
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result!.Name, Is.EqualTo("RootFile.test"));
+            Assert.That(_pfs.FindFile("RootFile.test", _container), Is.Not.Null);
+            Assert.That(_pfs.FindFile("\\RootFile.test", _container), Is.Null);
+            _eventHub.Verify(x => x.PublishGlobalEvent(It.IsAny<PackFileContainerFilesAddedEvent>()), Times.Once);
+        }
+
+        [Test]
+        public void SaveAs_RootPathWithLeadingSlash_CreatesRootLevelFile()
+        {
+            var saveService = new FileSaveService(_pfs, _uiProvider.Object);
+            _uiProvider
+                .Setup(x => x.DisplaySaveDialog(_pfs, It.IsAny<List<string>>()))
+                .Returns(new SaveDialogResult(true, null, "\\RootFile.test"));
+
+            var result = saveService.SaveAs(".test", [9]);
+
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result!.Name, Is.EqualTo("RootFile.test"));
+            Assert.That(_pfs.FindFile("RootFile.test", _container), Is.Not.Null);
+            Assert.That(_pfs.FindFile("\\RootFile.test", _container), Is.Null);
+            _eventHub.Verify(x => x.PublishGlobalEvent(It.IsAny<PackFileContainerFilesAddedEvent>()), Times.Once);
+            _uiProvider.Verify(x => x.DisplaySaveDialog(_pfs, It.IsAny<List<string>>()), Times.Once);
+        }
     }
 }

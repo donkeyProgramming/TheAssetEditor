@@ -100,8 +100,16 @@ namespace Shared.Core.PackFiles.Utility
         {
             var game = GameInformationDatabase.GetGameById(gameEnum);
             var gamePathInfo = _settingsService.CurrentSettings.GameDirectories.FirstOrDefault(x => x.Game == game.Type);
-            var gameDataFolder = gamePathInfo!.Path;
             var gameName = game.DisplayName;
+
+            if (gamePathInfo == null || string.IsNullOrWhiteSpace(gamePathInfo.Path))
+            {
+                var errorMessage = $"Unable to load pack files for {gameName} because no game directory is configured.";
+                _logger.Here().Error(errorMessage);
+                return null;
+            }
+
+            var gameDataFolder = gamePathInfo.Path;
 
             try
             {
@@ -170,8 +178,9 @@ namespace Shared.Core.PackFiles.Utility
                 if (result == null)
                     return "DataChanged";
             }
-            catch
+            catch (Exception cacheReadException)
             {
+                _logger.Here().Warning($"Failed to inspect CA pack cache '{cacheFilePath}': {cacheReadException.Message}");
                 return "Corrupted";
             }
 
@@ -190,7 +199,7 @@ namespace Shared.Core.PackFiles.Utility
                 packfileResolver = new CustomPackDuplicateFileResolver();
             }
 
-            var packList = new List<PackFileContainer>();
+            var packList = new ConcurrentBag<PackFileContainer>();
             var packsCompressionStats = new ConcurrentDictionary<CompressionFormat, CompressionInformation>();
 
             Parallel.ForEach(allCaPackFiles, packFilePath =>
@@ -209,10 +218,12 @@ namespace Shared.Core.PackFiles.Utility
                     var packCompressionStats = PackFileLog.GetCompressionInformation(pack);
                     foreach (var kvp in packCompressionStats)
                     {
-                        if (!packsCompressionStats.TryGetValue(kvp.Key, out var existingStats))
-                            packsCompressionStats[kvp.Key] = new CompressionInformation(kvp.Value.DiskSize, kvp.Value.UncompressedSize);
-                        else
-                            existingStats.Add(kvp.Value);
+                        packsCompressionStats.AddOrUpdate(
+                            kvp.Key,
+                            _ => new CompressionInformation(kvp.Value.DiskSize, kvp.Value.UncompressedSize),
+                            (_, existingStats) => new CompressionInformation(
+                                existingStats.DiskSize + kvp.Value.DiskSize,
+                                existingStats.UncompressedSize + kvp.Value.UncompressedSize));
                     }
                 }
                 else

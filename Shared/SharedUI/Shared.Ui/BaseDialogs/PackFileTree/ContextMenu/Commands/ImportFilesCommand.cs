@@ -1,40 +1,49 @@
 ﻿using System.IO;
-using System.Windows.Forms;
 using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
 using Shared.Core.PackFiles.Models.FileSources;
+using Shared.Core.Services;
+using Serilog;
+using Shared.Core.ErrorHandling;
 
 namespace Shared.Ui.BaseDialogs.PackFileTree.ContextMenu.Commands
 {
-    public class ImportFileCommand(IPackFileService packFileService) : IContextMenuCommand
+    public class ImportFileCommand(IPackFileService packFileService, IStandardDialogs standardDialogs, IFileSystemAccess fileSystemAccess) : IContextMenuCommand
     {
+        private readonly ILogger _logger = Logging.Create<ImportFileCommand>();
+
         public string GetDisplayName(TreeNode node) => "Import File";
+        public bool ShouldAdd(TreeNode node) => node.NodeType != NodeType.File && !node.FileOwner.IsCaPackFile;
         public bool IsEnabled(TreeNode node) => true;
 
         public void Execute(TreeNode _selectedNode)
         {
             if (_selectedNode.FileOwner.IsCaPackFile)
             {
-                System.Windows.MessageBox.Show("Unable to edit CA packfile");
+                _logger.Here().Warning($"Import file blocked for CA pack '{CommandLoggingHelper.DescribePack(_selectedNode.FileOwner)}'");
+                standardDialogs.ShowDialogBox("Unable to edit CA packfile");
                 return;
             }
 
-            var dialog = new OpenFileDialog()
-            {
-                Multiselect = true,
-            };
-
-            if (dialog.ShowDialog() == DialogResult.OK)
+            var dialogResult = standardDialogs.ShowSystemOpenFileDialog(multiselect: true);
+            if (dialogResult.Result)
             {
                 var parentPath = _selectedNode.GetFullPath();
-                var files = dialog.FileNames;
+                var files = dialogResult.FilePaths;
+                _logger.Here().Information($"Importing {files.Count} file(s) into '{CommandLoggingHelper.DescribeNode(_selectedNode)}'");
                 foreach (var file in files)
                 {
                     var fileName = Path.GetFileName(file);
-                    var packFile = new PackFile(fileName, new MemorySource(File.ReadAllBytes(file)));
+                    var packFile = new PackFile(fileName, new MemorySource(fileSystemAccess.FileReadAllBytes(file)));
                     var item = new NewPackFileEntry(parentPath, packFile);
                     packFileService.AddFilesToPack(_selectedNode.FileOwner, [item]);
                 }
+
+                _logger.Here().Information($"Imported {files.Count} file(s) into '{CommandLoggingHelper.DescribeNode(_selectedNode)}'");
+            }
+            else
+            {
+                _logger.Here().Information($"Import file cancelled for '{CommandLoggingHelper.DescribeNode(_selectedNode)}'");
             }
         }
     }

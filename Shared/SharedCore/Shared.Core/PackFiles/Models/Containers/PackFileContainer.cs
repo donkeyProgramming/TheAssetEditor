@@ -1,4 +1,5 @@
-﻿using Shared.Core.Misc;
+﻿using CommunityToolkit.Diagnostics;
+using Shared.Core.Misc;
 using Shared.Core.PackFiles.Models.FileSources;
 using Shared.Core.PackFiles.Serialization;
 using Shared.Core.PackFiles.Utility;
@@ -11,11 +12,19 @@ namespace Shared.Core.PackFiles.Models.Containers
         public string Name { get; set; }
         public PFHeader Header { get; set; }
         public bool IsCaPackFile { get; set; } = false;
-        public string SystemFilePath { get; set; }
+        public string? SystemFilePath { get; set; }
         public long OriginalLoadByteSize { get; set; } = -1;
         public HashSet<string> SourcePackFilePaths { get; set; } = [];
 
         public Dictionary<string, PackFile> FileList { get; set; } = [];
+
+        public PackFileContainer(string name)
+        {
+            Name = name;
+            var v = PackFileVersionConverter.ToString(PackFileVersion.PFH5);
+            Header = new PFHeader(v, PackFileCAType.MOD);
+        }
+
 
         public int GetFileCount() => FileList.Count;
 
@@ -27,39 +36,40 @@ namespace Shared.Core.PackFiles.Models.Containers
 
         public Dictionary<string, PackFile> GetAllFiles() => FileList;
 
-        public DirectoryContent GetDirectoryContent(string directoryPath)
+        public List<(string Path, PackFile File)> GetDirectoryContent(string directoryPath)
         {
             var prefix = string.IsNullOrEmpty(directoryPath) ? "" : directoryPath + "\\";
-            var prefixLength = prefix.Length;
-            var subFolders = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-            var files = new List<(string FileName, PackFile File)>();
+            var results = new List<(string Path, PackFile File)>();
+            var directFileSlashCount = string.IsNullOrEmpty(directoryPath) ? 0 : directoryPath.Count(c => c == '\\') + 1;
 
             foreach (var (path, packFile) in FileList)
             {
-                if (prefixLength > 0 && !path.StartsWith(prefix, StringComparison.OrdinalIgnoreCase))
-                    continue;
-                if (prefixLength == 0 && path.Length == 0)
-                    continue;
-
-                var remainder = path.AsSpan(prefixLength);
-                var separatorIndex = remainder.IndexOf(Path.DirectorySeparatorChar);
-
-                if (separatorIndex == -1)
-                {
-                    files.Add((packFile.Name, packFile));
-                }
-                else
-                {
-                    var folderName = remainder.Slice(0, separatorIndex).ToString();
-                    subFolders.Add(folderName);
-                }
+                if ((string.IsNullOrEmpty(prefix) || path.StartsWith(prefix, StringComparison.OrdinalIgnoreCase))
+                    && path.Count(c => c == '\\') == directFileSlashCount)
+                    results.Add((path, packFile));
             }
 
-            return new DirectoryContent
+            results.Sort((a, b) => StringComparer.CurrentCultureIgnoreCase.Compare(a.Path, b.Path));
+            return results;
+        }
+
+        public List<string> GetSubDirectories(string directoryPath)
+        {
+            var prefix = string.IsNullOrEmpty(directoryPath) ? "" : directoryPath + "\\";
+            var subFolders = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
+            foreach (var path in FileList.Keys)
             {
-                SubFolders = subFolders.OrderBy(x => x, StringComparer.CurrentCultureIgnoreCase).ToList(),
-                Files = files.OrderBy(x => x.FileName, StringComparer.CurrentCultureIgnoreCase).ToList()
-            };
+                if (!string.IsNullOrEmpty(prefix) && !path.StartsWith(prefix, StringComparison.OrdinalIgnoreCase))
+                    continue;
+
+                var remainder = string.IsNullOrEmpty(prefix) ? path : path.Substring(prefix.Length);
+                var separatorIndex = remainder.IndexOf(Path.DirectorySeparatorChar);
+                if (separatorIndex > 0)
+                    subFolders.Add(remainder.Substring(0, separatorIndex));
+            }
+
+            return subFolders.OrderBy(x => x, StringComparer.CurrentCultureIgnoreCase).ToList();
         }
 
         public List<(string FileName, PackFile Pack)> FindAllWithExtention(string extention)
@@ -74,10 +84,41 @@ namespace Shared.Core.PackFiles.Models.Containers
             return output;
         }
 
-        public PackFileContainer(string name)
+        public List<(string Path, PackFile File)> SearchFiles(string? textFilter, IReadOnlyList<string>? extensions)
         {
-            Name = name;
+            var results = new List<(string Path, PackFile File)>();
+
+            foreach (var (path, packFile) in FileList)
+            {
+                if (extensions != null && extensions.Count > 0)
+                {
+                    var matchesExtension = false;
+                    foreach (var ext in extensions)
+                    {
+                        if (packFile.Name.Contains(ext, StringComparison.OrdinalIgnoreCase))
+                        {
+                            matchesExtension = true;
+                            break;
+                        }
+                    }
+                    if (!matchesExtension)
+                        continue;
+                }
+
+                if (!string.IsNullOrWhiteSpace(textFilter))
+                {
+                    if (!packFile.Name.Contains(textFilter, StringComparison.OrdinalIgnoreCase))
+                        continue;
+                }
+
+                results.Add((path, packFile));
+            }
+
+            results.Sort((a, b) => StringComparer.OrdinalIgnoreCase.Compare(a.Path, b.Path));
+            return results;
         }
+
+
 
         public void MergePackFileContainer(PackFileContainer other)
         {
@@ -98,11 +139,8 @@ namespace Shared.Core.PackFiles.Models.Containers
             {
                 file.PackFile.Name = file.PackFile.Name.Trim();
 
-                var path = file.DirectoyPath.Trim();
-                if (!string.IsNullOrWhiteSpace(path))
-                    path += "\\";
-                path += file.PackFile.Name;
-                FileList[path.ToLower()] = file.PackFile;
+                var path = BuildPackPath(file.DirectoyPath, file.PackFile.Name);
+                FileList[path] = file.PackFile;
             }
 
             return newFiles.Select(x => x.PackFile).ToList();
@@ -159,10 +197,10 @@ namespace Shared.Core.PackFiles.Models.Containers
 
         public virtual void MoveFile(PackFile file, string newFolderPath)
         {
-            var newFullPath = newFolderPath + "\\" + file.Name;
+            var newFullPath = BuildPackPath(newFolderPath, file.Name);
             var key = FileList.FirstOrDefault(x => x.Value == file).Key;
             FileList.Remove(key);
-            FileList[newFullPath.ToLower()] = file;
+            FileList[newFullPath] = file;
         }
 
         public virtual string RenameDirectory(string currentNodeName, string newName)
@@ -202,8 +240,8 @@ namespace Shared.Core.PackFiles.Models.Containers
 
             var dir = Path.GetDirectoryName(key);
             file.Name = newName;
-            var newPath = string.IsNullOrEmpty(dir) ? file.Name : dir + "\\" + file.Name;
-            FileList[newPath.ToLower()] = file;
+            var newPath = BuildPackPath(dir, file.Name);
+            FileList[newPath] = file;
         }
 
         public virtual void SaveFileData(PackFile file, byte[] data)
@@ -221,6 +259,7 @@ namespace Shared.Core.PackFiles.Models.Containers
 
             if (OriginalLoadByteSize != -1)
             {
+                Guard.IsNotNull(SystemFilePath, "SystemFilePath must be set if saving to disk");
                 var fileInfo = new FileInfo(SystemFilePath);
                 var byteSize = fileInfo.Length;
                 if (byteSize != OriginalLoadByteSize)
@@ -238,6 +277,21 @@ namespace Shared.Core.PackFiles.Models.Containers
 
             SystemFilePath = path;
             OriginalLoadByteSize = new FileInfo(path).Length;
+        }
+
+        private static string BuildPackPath(string? directoryPath, string fileName)
+        {
+            var normalizedFileName = fileName.Replace('/', '\\').Trim().TrimStart('\\');
+            var normalizedDirectory = PathNormalization.NormalizeDirectoryPath(directoryPath);
+
+            if (string.IsNullOrWhiteSpace(normalizedFileName))
+                throw new Exception("PackFile name can not be empty");
+
+            var fullPath = string.IsNullOrEmpty(normalizedDirectory)
+                ? normalizedFileName
+                : normalizedDirectory + "\\" + normalizedFileName;
+
+            return PathNormalization.NormalizeFileName(fullPath);
         }
     }
 }

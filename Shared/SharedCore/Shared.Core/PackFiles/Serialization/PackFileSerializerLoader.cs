@@ -10,7 +10,7 @@ namespace Shared.Core.PackFiles.Serialization
 {
     public static class PackFileVersionConverter
     {
-        static List<(PackFileVersion EnumValue, string StringValue)> s_values = new List<(PackFileVersion EnumValue, string StringValue)>()
+        readonly static List<(PackFileVersion EnumValue, string StringValue)> s_values = new List<(PackFileVersion EnumValue, string StringValue)>()
         {
             (PackFileVersion.PFH0,  "PFH0"),
             (PackFileVersion.PFH2,  "PFH2"),
@@ -121,12 +121,11 @@ namespace Shared.Core.PackFiles.Serialization
         static PFHeader ReadHeader(BinaryReader reader)
         {
             var fileNameBuffer = new byte[1024];
-            var header = new PFHeader()
-            {
-                StrVersion = new string(reader.ReadChars(4)),      // 4
-                ByteMask = reader.ReadInt32(),                      // 8
-                ReferenceFileCount = reader.ReadUInt32(),           // 12    
-            };
+
+            var header_strVersion = new string(reader.ReadChars(4));           // 4
+            var header_byteMask = reader.ReadInt32();                          // 8
+            var header_referenceFileCount = reader.ReadUInt32();               // 12  
+            var header = new PFHeader(header_strVersion, header_byteMask, header_referenceFileCount);
 
             var pack_file_index_size = reader.ReadUInt32();         // 16
             var pack_file_count = reader.ReadUInt32();              // 20

@@ -1,4 +1,4 @@
-using Editors.BmdEditor.ViewModels;
+﻿using Editors.BmdEditor.ViewModels;
 using Editors.BmdEditor.Views;
 using Editors.BmdEditor.Services;
 using Microsoft.Extensions.DependencyInjection;

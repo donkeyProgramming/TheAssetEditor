@@ -1,8 +1,4 @@
-﻿// Licensed to the .NET Foundation under one or more agreements.
-// The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
-
-using System.Windows.Media.Imaging;
+﻿using System.Windows.Media.Imaging;
 using Shared.Core.Misc;
 
 namespace Shared.Ui.Common.MenuSystem
@@ -11,8 +7,8 @@ namespace Shared.Ui.Common.MenuSystem
     public class MenuBarButton
     {
         public NotifyAttr<bool> IsVisible { get; set; } = new NotifyAttr<bool>(true);
-        public BitmapImage Image { get; set; }
-        public MenuAction Action { get; set; }
+        public BitmapImage? Image { get; set; }
+        public MenuAction? Action { get; set; }
         public ButtonVisibilityRule ShowRule { get; set; } = ButtonVisibilityRule.Always;
         public bool IsSeperator { get; set; } = false;
 

@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using System.Windows;
 using CommonControls.BaseDialogs;
 using CommonControls.BaseDialogs.ErrorListDialog;
@@ -11,46 +13,19 @@ using Shared.Core.PackFiles;
 using Shared.Core.Services;
 using Shared.Ui.BaseDialogs.PackFileTree;
 using Shared.Ui.BaseDialogs.StandardDialog.PackFile;
-using Shared.Ui.Common;
 using Shared.Ui.Common.Exceptions;
 
 namespace Shared.Ui.BaseDialogs.StandardDialog
 {
-
-    public class AeWaitCursor : IWaitCursor
-    {
-        readonly WaitCursor _handle;
-        bool _isDisposed;
-        public AeWaitCursor()
-        {
-            _handle = new WaitCursor();
-        }
-
-        public void Dispose()
-        {
-            if (_isDisposed == false)
-                _handle.Dispose();
-            _isDisposed = true;
-        }
-
-
-    }
-
-
-
     public class StandardDialogs : IStandardDialogs
     {
-        private readonly IPackFileService _pfs;
         private readonly PackFileTreeViewFactory _packFileBrowserBuilder;
         private readonly IExceptionService _exceptionService;
         private readonly IScopeRepository _scopeRepository;
         private readonly IEventHub _eventHub;
         private readonly ScopeToken _scopeToken;
-        
-
-        public StandardDialogs(IPackFileService pfs, PackFileTreeViewFactory packFileBrowserBuilder, IExceptionService exceptionService, IScopeRepository scopeRepository, IEventHub eventHub, ScopeToken scopeToken)
+        public StandardDialogs(PackFileTreeViewFactory packFileBrowserBuilder, IExceptionService exceptionService, IScopeRepository scopeRepository, IEventHub eventHub, ScopeToken scopeToken)
         {
-            _pfs = pfs;
             _packFileBrowserBuilder = packFileBrowserBuilder;
             _exceptionService = exceptionService;
             _scopeRepository = scopeRepository;
@@ -60,9 +35,9 @@ namespace Shared.Ui.BaseDialogs.StandardDialog
 
         public IWaitCursor ShowWaitCursor() => new AeWaitCursor();
 
-        public SaveDialogResult DisplaySaveDialog(IPackFileService remove, List<string> extensions)
+        public SaveDialogResult DisplaySaveDialog(IPackFileService pfs, List<string> extensions)
         {
-            using var browser = new SavePackFileWindow(_pfs, _packFileBrowserBuilder);
+            using var browser = new SavePackFileWindow(pfs, _packFileBrowserBuilder);
             browser.ViewModel.Filter.SetExtensions(extensions);
 
             if (browser.ShowDialog() == true)
@@ -87,6 +62,95 @@ namespace Shared.Ui.BaseDialogs.StandardDialog
             var saveResult = browser.ShowDialog();
             var output = new BrowseDialogResultFolder(saveResult, browser.SelectedFolder);
             return output;
+        }
+
+        public SystemOpenFileDialogResult ShowSystemOpenFileDialog(bool multiselect = false, string filter = "All files|*.*")
+        {
+            using var dialog = new System.Windows.Forms.OpenFileDialog
+            {
+                Multiselect = multiselect,
+                Filter = filter
+            };
+
+            if (dialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+                return new SystemOpenFileDialogResult(true, dialog.FileNames);
+
+            return new SystemOpenFileDialogResult(false, Array.Empty<string>());
+        }
+
+        public SystemSaveFileDialogResult ShowSystemSaveFileDialog(string initialFileName, string filter, string defaultExt)
+        {
+            using var dialog = new System.Windows.Forms.SaveFileDialog
+            {
+                FileName = initialFileName,
+                Filter = filter,
+                DefaultExt = defaultExt
+            };
+
+            if (dialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+                return new SystemSaveFileDialogResult(true, dialog.FileName);
+
+            return new SystemSaveFileDialogResult(false, null);
+        }
+
+        public SystemBrowseFolderDialogResult ShowSystemFolderBrowserDialog()
+        {
+            using var dialog = new System.Windows.Forms.FolderBrowserDialog();
+
+            if (dialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+                return new SystemBrowseFolderDialogResult(true, dialog.SelectedPath);
+
+            return new SystemBrowseFolderDialogResult(false, null);
+        }
+
+        public string ShowFolderNameDialog(IEnumerable<string> existingNames, string currentValue = "")
+        {
+            var isInputCorrect = false;
+            var dialogTextBoxValue = currentValue;
+            var normalizedExistingNames = new HashSet<string>(existingNames.Select(x => x.ToLower().Trim()));
+
+            while (!isInputCorrect)
+            {
+                isInputCorrect = true;
+                var window = new TextInputWindow("Create folder", dialogTextBoxValue, true);
+
+                if (window.ShowDialog() == false)
+                    return string.Empty;
+
+                dialogTextBoxValue = window.TextValue;
+                var newFolderName = window.TextValue.ToLower().Trim();
+
+                if (string.IsNullOrWhiteSpace(newFolderName))
+                {
+                    System.Windows.MessageBox.Show("Folder name can not be empty! Please Try Again.");
+                    isInputCorrect = false;
+                }
+
+                if (isInputCorrect && normalizedExistingNames.Contains(newFolderName))
+                {
+                    System.Windows.MessageBox.Show($"Folder with name '{newFolderName}' already exists in this folder!\nPlease Try Again.");
+                    isInputCorrect = false;
+                }
+
+                if (isInputCorrect)
+                {
+                    var listOfInvalidChars = Path.GetInvalidFileNameChars();
+                    foreach (var c in newFolderName)
+                    {
+                        if (listOfInvalidChars.Contains(c))
+                        {
+                            System.Windows.MessageBox.Show($"Folder name contains invalid character: {c}. \nPlease Try Again.");
+                            isInputCorrect = false;
+                            break;
+                        }
+                    }
+                }
+
+                if (isInputCorrect)
+                    return newFolderName;
+            }
+
+            return string.Empty;
         }
 
         public void ShowExceptionWindow(Exception e, string userInfo = "")
@@ -123,7 +187,7 @@ namespace Shared.Ui.BaseDialogs.StandardDialog
 
         public ShowMessageBoxResult ShowYesNoBox(string message, string title)
         {
-            var result = MessageBox.Show(message, title, MessageBoxButton.YesNo);
+            var result = System.Windows.MessageBox.Show(message, title, MessageBoxButton.YesNo);
             if (result == MessageBoxResult.Yes)
                 return ShowMessageBoxResult.OK;
             return ShowMessageBoxResult.Cancel;

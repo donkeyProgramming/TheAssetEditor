@@ -1,16 +1,26 @@
-﻿namespace Shared.Ui.BaseDialogs.PackFileTree.ContextMenu.Commands
+﻿using Serilog;
+using Shared.Core.ErrorHandling;
+
+namespace Shared.Ui.BaseDialogs.PackFileTree.ContextMenu.Commands
 {
     public class CollapseNodeCommand() : IContextMenuCommand
     {
+        private readonly ILogger _logger = Logging.Create<CollapseNodeCommand>();
+
         public string GetDisplayName(TreeNode node) => "Collapse all";
+        public bool ShouldAdd(TreeNode node) => node.NodeType != NodeType.File;
         public bool IsEnabled(TreeNode node) => true;
 
-        public void Execute(TreeNode _selectedNode) => CollapsAllRecursive(_selectedNode);
+        public void Execute(TreeNode _selectedNode)
+        {
+            _logger.Here().Information($"Collapsing node '{CommandLoggingHelper.DescribeNode(_selectedNode)}' recursively");
+            CollapsAllRecursive(_selectedNode);
+        }
 
         void CollapsAllRecursive(TreeNode node)
         {
             node.IsNodeExpanded = false;
-            foreach (var child in node.Children)
+            foreach (var child in node.BackingChildren)
                 CollapsAllRecursive(child);
         }
 

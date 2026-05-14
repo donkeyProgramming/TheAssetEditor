@@ -47,7 +47,7 @@ namespace Shared.Ui.Common
         public FilterExtendedDelegate SearchFilterExtended { get; set; }
 
 
-        public FilterCollection(IEnumerable<T> data, ValueChangedDelegate<T> valueChangedEvent = null, BeforeValueChangedDelegate<T> beforeValueChangeEvent = null)
+        public FilterCollection(IEnumerable<T>? data, ValueChangedDelegate<T> valueChangedEvent = null, BeforeValueChangedDelegate<T> beforeValueChangeEvent = null)
         {
             UpdatePossibleValues(data);
             if (valueChangedEvent != null)

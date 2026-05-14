@@ -10,6 +10,7 @@ using Editors.ImportExport.Exporting.Presentation.DdsToMaterialPng;
 using Editors.ImportExport.Exporting.Presentation.DdsToNormalPng;
 using Editors.ImportExport.Exporting.Presentation.DdsToPng;
 using Editors.ImportExport.Exporting.Presentation.RmvToGltf;
+using Editors.ImportExport.ContextMenu;
 using Editors.ImportExport.Importing;
 using Editors.ImportExport.Importing.Importers.GltfToRmv;
 using Editors.ImportExport.Importing.Importers.GltfToRmv.Helper;
@@ -18,7 +19,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Shared.Core.DependencyInjection;
 using Shared.Core.DevConfig;
 using Editors.ImportImport.Importing.Presentation.RmvToGltf;
-using Shared.Ui.BaseDialogs.PackFileTree.ContextMenu.External;
+using Shared.Ui.BaseDialogs.PackFileTree.ContextMenu;
 
 namespace Editors.ImportExport
 {
@@ -55,6 +56,8 @@ namespace Editors.ImportExport
             services.AddScoped<IImageSaveHandler, SystemImageSaveHandler>();
 
             // Helpers to ensure we can hook up to the UI
+            services.AddTransient<AdvancedExportCommand>();
+            services.AddTransient<AdvancedImportCommand>();
             services.AddTransient<IExportFileContextMenuHelper, ExportFileContextMenuHelper>();
             services.AddTransient<DisplayExportFileToolCommand>();
 
@@ -69,7 +72,18 @@ namespace Editors.ImportExport
             services.AddTransient<GltfSkeletonBuilder>();
             services.AddTransient<GltfAnimationBuilder>();
 
+            services.AddSingleton<IPackFileContextMenuRegistration, ImportExportPackFileContextMenuRegistration>();
+
             RegisterAllAsInterface<IDeveloperConfiguration>(services, ServiceLifetime.Transient);
+        }
+    }
+
+    public class ImportExportPackFileContextMenuRegistration : IPackFileContextMenuRegistration
+    {
+        public void Register(PackFileContextMenuRegistry registry)
+        {
+            registry.RegisterPackFileContextMenuItem<AdvancedExportCommand>(ContextMenuType.MainApplication, path: "Export", priority: 10, ContextMenuCluster.Export);
+            registry.RegisterPackFileContextMenuItem<AdvancedImportCommand>(ContextMenuType.MainApplication, path: "Import", priority: 20, ContextMenuCluster.FolderOperation);
         }
     }
 }

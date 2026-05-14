@@ -2,255 +2,26 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+<meta http-equiv="refresh" content="0; url=Documentation/Installing.html">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Asset Editor Documentation</title>
-
 <style>
 body {
     margin: 0;
+    min-height: 100vh;
+    display: grid;
+    place-items: center;
     font-family: Arial, sans-serif;
-    display: flex;
-    height: 100vh;
-}
-
-/* loadWithFallback is defined in the script section */
-
-.sidebar {
-    width: 320px;
     background: #f8f9fb;
-    border-right: 1px solid #ddd;
-    padding: 15px;
-    box-sizing: border-box;
+    color: #202124;
 }
 
-.sidebar-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    font-size: 18px;
-    font-weight: bold;
-    margin-bottom: 10px;
-}
-
-.sidebar-header img {
-    width: 28px;
-}
-
-.language-select {
-    margin-bottom: 20px;
-}
-
-.file-list a {
-    display: block;
-    padding: 6px 0;
-    text-decoration: none;
+a {
     color: #2b5fd9;
-    cursor: pointer;
-}
-
-.file-list a:hover {
-    text-decoration: underline;
-}
-
-.file-list a.active {
-    font-weight: 600;
-    color: #0b47c1;
-}
-
-.file-list .section-header {
-    display: block;
-    padding: 6px 0;
-    font-weight: 600;
-    color: #333;
-}
-
-.file-list .section-header.active {
-    color: #0b47c1;
-}
-
-.content {
-    flex: 1;
-}
-
-iframe {
-    width: 100%;
-    height: 100%;
-    border: none;
 }
 </style>
 </head>
-
 <body>
-
-<div class="sidebar">
-
-    <div class="sidebar-header">
-        Asset Editor Documentation
-        <img src="icon.svg">
-    </div>
-
-    <!-- language support removed - simplified single-language documentation -->
-
-    <div class="file-list" id="fileList"></div>
-
-</div>
-
-<div class="content">
-    <iframe id="docFrame"></iframe>
-</div>
-
-<script>
-// Simplified single-language script: populate sidebar from masterDocs,
-// provide per-page permalinks using ?doc=BaseName, update URL on click,
-// and support back/forward navigation.
-
-const masterDocs = [
-    { title: "Getting Started", base: "GettingStarted" },
-    { title: "Camera Control", base: "CameraControl" },
-    { title: "Kitbashing", children: [
-        { title: "Basics", base: "kitbash_basics" },
-        { title: "Mesh Fitter", base: "Kitbash_MeshFitter" },
-        { title: "Pin Tool", base: "Kitbash_PinTool" },
-        { title: "Photo Studio", base: "Kitbash_PhotoStudio" }
-    ] }
-];
-
-function parseQuery(search) {
-    const params = {};
-    if (!search) return params;
-    const q = search.replace(/^\?/, '');
-    q.split('&').forEach(pair => {
-        const [k, v] = pair.split('=');
-        if (k) params[decodeURIComponent(k)] = decodeURIComponent(v || '');
-    });
-    return params;
-}
-
-function parseHash(hash) {
-    const params = {};
-    if (!hash) return params;
-    const h = hash.replace(/^#/, '');
-    h.split('&').forEach(pair => {
-        const [k, v] = pair.split('=');
-        if (k) params[decodeURIComponent(k)] = decodeURIComponent(v || '');
-    });
-    return params;
-}
-
-function getRequestedDoc() {
-    const hashParams = parseHash(location.hash);
-    if (hashParams.doc)
-        return hashParams.doc;
-
-    const queryParams = parseQuery(location.search);
-    return queryParams.doc || masterDocs[0].base;
-}
-
-function buildLinkFor(docBase) {
-    const url = new URL(location.href);
-    url.search = '';
-    url.hash = `doc=${encodeURIComponent(docBase)}`;
-    return url.toString();
-}
-
-function resolveFile(baseName) {
-    return Promise.resolve(`Documentation/${baseName}.html`);
-}
-
-function loadFile(frame, file) {
-    frame.onload = null;
-    frame.onerror = null;
-    frame.src = file;
-}
-
-function setActiveLink(docBase) {
-    const links = document.querySelectorAll('#fileList a[data-base]');
-    links.forEach(a => {
-        a.classList.toggle('active', a.dataset.base === docBase);
-    });
-
-    // Mark section headers active when any child is active
-    const headers = document.querySelectorAll('#fileList .section-header');
-    headers.forEach(h => {
-        const section = h.dataset.section; // e.g., 'Kitbashing'
-        const anyChildActive = Array.from(links).some(a => a.dataset.base === section || a.dataset.base.startsWith(section + '/'));
-        h.classList.toggle('active', anyChildActive);
-    });
-}
-
-function loadSidebar(currentDoc) {
-    const list = document.getElementById("fileList");
-    list.innerHTML = "";
-
-    function renderItem(item, level) {
-        if (item.children && Array.isArray(item.children)) {
-            const hdr = document.createElement('div');
-            hdr.textContent = item.title;
-            hdr.className = 'section-header';
-            // store section key (used to match child bases)
-            hdr.dataset.section = item.title.replace(/\s+/g, '');
-            hdr.style.paddingLeft = (level * 12) + 'px';
-            list.appendChild(hdr);
-            item.children.forEach(child => renderItem(child, level + 1));
-            return;
-        }
-
-        const link = document.createElement('a');
-        link.textContent = item.title;
-        link.href = buildLinkFor(item.base);
-        link.dataset.base = item.base;
-        link.title = item.title;
-        link.style.paddingLeft = (level * 12) + 'px';
-
-        link.addEventListener('click', (ev) => {
-            if (ev.metaKey || ev.ctrlKey || ev.shiftKey || ev.button !== 0) return;
-            ev.preventDefault();
-            const newUrl = buildLinkFor(item.base);
-            history.pushState({ doc: item.base }, '', newUrl);
-            resolveFile(item.base).then(file => {
-                const frame = document.getElementById('docFrame');
-                loadFile(frame, file);
-                setActiveLink(item.base);
-            });
-        });
-
-        list.appendChild(link);
-    }
-
-    masterDocs.forEach(item => renderItem(item, 0));
-
-    setActiveLink(currentDoc || masterDocs[0].base);
-}
-
-window.addEventListener('popstate', (ev) => {
-    const state = ev.state || { doc: getRequestedDoc() };
-    const docBase = (state && state.doc) || masterDocs[0].base;
-    loadSidebar(docBase);
-    resolveFile(docBase).then(file => {
-        const frame = document.getElementById('docFrame');
-        loadFile(frame, file);
-    });
-});
-
-window.addEventListener('hashchange', () => {
-    const docBase = getRequestedDoc();
-    loadSidebar(docBase);
-    resolveFile(docBase).then(file => {
-        const frame = document.getElementById('docFrame');
-        loadFile(frame, file);
-    });
-});
-
-// Initial load
-const initialDoc = getRequestedDoc();
-loadSidebar(initialDoc);
-resolveFile(initialDoc).then(file => {
-    const frame = document.getElementById('docFrame');
-    loadFile(frame, file);
-    history.replaceState({ doc: initialDoc }, '', buildLinkFor(initialDoc));
-});
-
-</script>
-
+    <p>Opening documentation. If you are not redirected, <a href="Documentation/Installing.html">continue to Installing</a>.</p>
 </body>
 </html>

@@ -1,4 +1,5 @@
-﻿using Shared.Core.PackFiles.Models;
+﻿using CommunityToolkit.Diagnostics;
+using Shared.Core.PackFiles.Models;
 using Shared.Core.PackFiles.Models.FileSources;
 
 namespace Shared.Core.PackFiles.Utility
@@ -70,7 +71,9 @@ namespace Shared.Core.PackFiles.Utility
                 packFileList.Add( new NewPackFileEntry(fileRef.PackFilePath, packfile));
             }
 
-            pfs.AddFilesToPack(pfs.GetEditablePack(), packFileList);
+            var editablePack = pfs.GetEditablePack();
+            Guard.IsNotNull(editablePack, "EditablePack returns null");
+            pfs.AddFilesToPack(editablePack, packFileList);
             return packFileList.Select(x=>x.PackFile).ToList();
         }
 
@@ -80,7 +83,7 @@ namespace Shared.Core.PackFiles.Utility
         {
             public string SystemPath { get; set; }
             public string PackFilePath { get; set; }
-            public string OverrideName { get; set; } = null;
+            public string? OverrideName { get; set; } = null;
 
             public FileRef(string systemPath, string packFilePath)
             {

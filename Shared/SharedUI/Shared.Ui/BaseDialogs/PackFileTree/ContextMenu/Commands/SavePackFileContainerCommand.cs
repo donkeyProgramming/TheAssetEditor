@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Windows.Forms;
 using Serilog;
 using Shared.Core.ErrorHandling;
 using Shared.Core.PackFiles;
@@ -16,33 +15,37 @@ namespace Shared.Ui.BaseDialogs.PackFileTree.ContextMenu.Commands
     {
         private readonly ILogger _logger = Logging.Create<SavePackFileContainerCommand>();
         public string GetDisplayName(TreeNode node) => "Save";
+        public bool ShouldAdd(TreeNode node) => node.NodeType == NodeType.Root && !node.FileOwner.IsCaPackFile;
         public bool IsEnabled(TreeNode node) => true;
 
         public void Execute(TreeNode _selectedNode)
         {
+            var packDescription = CommandLoggingHelper.DescribePack(_selectedNode.FileOwner);
             var systemPath = _selectedNode.FileOwner.SystemFilePath;
             if (string.IsNullOrWhiteSpace(systemPath))
             {
-                var saveFileDialog = new SaveFileDialog();
-                saveFileDialog.FileName = _selectedNode.FileOwner.Name;
-                saveFileDialog.Filter = "PackFile | *.pack";
-                saveFileDialog.DefaultExt = "pack";
-                if (saveFileDialog.ShowDialog() != DialogResult.OK)
+                var saveDialogResult = standardDialogs.ShowSystemSaveFileDialog(_selectedNode.FileOwner.Name, "PackFile | *.pack", "pack");
+                if (!saveDialogResult.Result || string.IsNullOrEmpty(saveDialogResult.FilePath))
+                {
+                    _logger.Here().Information($"Save cancelled for pack file container '{packDescription}'");
                     return;
-                systemPath = saveFileDialog.FileName;
+                }
+                systemPath = saveDialogResult.FilePath;
             }
 
-            using (new WaitCursor())
+            using (standardDialogs.ShowWaitCursor())
             {
                 try
                 {
                     var gameInformation = GameInformationDatabase.GetGameById(applicationSettingsService.CurrentSettings.CurrentGame);
+                    _logger.Here().Information($"Saving pack file container '{packDescription}' to '{systemPath}'");
                     packFileService.SavePackContainer(_selectedNode.FileOwner, systemPath, false, gameInformation);
+                    _logger.Here().Information($"Saved pack file container '{packDescription}' to '{systemPath}'");
                 }
                 catch (Exception e)
                 {
                     _logger.Here().Error(e, "Exception while saving");
-                    System.Windows.MessageBox.Show("Error saving:\n\n" + e.Message, "Error");
+                    standardDialogs.ShowDialogBox("Error saving:\n\n" + e.Message, "Error");
                 }
             }
         }
@@ -52,33 +55,37 @@ namespace Shared.Ui.BaseDialogs.PackFileTree.ContextMenu.Commands
             var pack = packFileService.GetEditablePack();
             if (pack == null)
             {
+                _logger.Here().Warning("Save requested from command without an editable pack selected");
                 standardDialogs.ShowDialogBox("No editable pack selected, cant save", "Error");
                 return;
             }
 
+            var packDescription = CommandLoggingHelper.DescribePack(pack);
             var systemPath = pack.SystemFilePath;
             if (string.IsNullOrWhiteSpace(systemPath))
             {
-                var saveFileDialog = new SaveFileDialog();
-                saveFileDialog.FileName = pack.Name;
-                saveFileDialog.Filter = "PackFile | *.pack";
-                saveFileDialog.DefaultExt = "pack";
-                if (saveFileDialog.ShowDialog() != DialogResult.OK)
+                var saveDialogResult = standardDialogs.ShowSystemSaveFileDialog(pack.Name, "PackFile | *.pack", "pack");
+                if (!saveDialogResult.Result || string.IsNullOrEmpty(saveDialogResult.FilePath))
+                {
+                    _logger.Here().Information($"Save cancelled for editable pack '{packDescription}'");
                     return;
-                systemPath = saveFileDialog.FileName;
+                }
+                systemPath = saveDialogResult.FilePath;
             }
 
-            using (new WaitCursor())
+            using (standardDialogs.ShowWaitCursor())
             {
                 try
                 {
                     var gameInformation = GameInformationDatabase.GetGameById(applicationSettingsService.CurrentSettings.CurrentGame);
+                    _logger.Here().Information($"Saving editable pack '{packDescription}' to '{systemPath}'");
                     packFileService.SavePackContainer(pack, systemPath, false, gameInformation);
+                    _logger.Here().Information($"Saved editable pack '{packDescription}' to '{systemPath}'");
                 }
                 catch (Exception e)
                 {
                     _logger.Here().Error(e, "Exception while saving");
-                    System.Windows.MessageBox.Show("Error saving:\n\n" + e.Message, "Error");
+                    standardDialogs.ShowDialogBox("Error saving:\n\n" + e.Message, "Error");
                 }
             }
         }

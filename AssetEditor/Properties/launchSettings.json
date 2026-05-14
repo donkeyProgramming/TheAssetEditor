@@ -93,6 +93,11 @@
       "commandName": "Project",
       "commandLineArgs": "-devcfg TwuiToolEditor",
       "nativeDebugging": false
+    },
+    "AE-CampaignAnimationDamsel": {
+      "commandName": "Project",
+      "commandLineArgs": "-devcfg CampaignAnimationDamsel",
+      "nativeDebugging": false
     }
   }
 }

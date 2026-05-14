@@ -41,27 +41,27 @@
                     <CheckBox IsChecked="{Binding UseSkin, UpdateSourceTrigger=PropertyChanged}"/>
                 </basedialogs:AeAttribute>
 
-                <basedialogs:AeAttribute DockPanel.Dock="Top" LabelText="{loc:Loc KitbashTool.AdvancedRmv.DirtMap}" LabelWidth="{StaticResource labelWidth}"  ToolTipEnumValue="None" IsEnabled="{Binding ShowDirtMap, UpdateSourceTrigger=PropertyChanged}">
+                <basedialogs:AeAttribute DockPanel.Dock="Top" LabelText="{loc:Loc KitbashTool.AdvancedRmv.DirtMap}" LabelWidth="{StaticResource labelWidth}"  IsEnabled="{Binding ShowDirtMap, UpdateSourceTrigger=PropertyChanged}">
                     <userinterface:ShaderTextureView DataContext="{Binding DirtMap}"/>
                 </basedialogs:AeAttribute>
 
-                <basedialogs:AeAttribute DockPanel.Dock="Top" LabelText="{loc:Loc KitbashTool.AdvancedRmv.DirtMask}" LabelWidth="{StaticResource labelWidth}"  ToolTipEnumValue="None" IsEnabled="{Binding ShowDirtMask, UpdateSourceTrigger=PropertyChanged}">
+                <basedialogs:AeAttribute DockPanel.Dock="Top" LabelText="{loc:Loc KitbashTool.AdvancedRmv.DirtMask}" LabelWidth="{StaticResource labelWidth}"  IsEnabled="{Binding ShowDirtMask, UpdateSourceTrigger=PropertyChanged}">
                     <userinterface:ShaderTextureView DataContext="{Binding DirtMask}"/>
                 </basedialogs:AeAttribute>
 
-                <basedialogs:AeAttribute DockPanel.Dock="Top" LabelText="{loc:Loc KitbashTool.AdvancedRmv.SkinMask}" LabelWidth="{StaticResource labelWidth}"  ToolTipEnumValue="None" IsEnabled="{Binding ShowSkinMask, UpdateSourceTrigger=PropertyChanged}">
+                <basedialogs:AeAttribute DockPanel.Dock="Top" LabelText="{loc:Loc KitbashTool.AdvancedRmv.SkinMask}" LabelWidth="{StaticResource labelWidth}"   IsEnabled="{Binding ShowSkinMask, UpdateSourceTrigger=PropertyChanged}">
                     <userinterface:ShaderTextureView DataContext="{Binding SkinMask}"/>
                 </basedialogs:AeAttribute>
 
-                <basedialogs:AeAttribute DockPanel.Dock="Top" LabelText="{loc:Loc KitbashTool.AdvancedRmv.DecalMask}" LabelWidth="{StaticResource labelWidth}"  ToolTipEnumValue="None" IsEnabled="{Binding ShowDecalMask, UpdateSourceTrigger=PropertyChanged}">
+                <basedialogs:AeAttribute DockPanel.Dock="Top" LabelText="{loc:Loc KitbashTool.AdvancedRmv.DecalMask}" LabelWidth="{StaticResource labelWidth}"  IsEnabled="{Binding ShowDecalMask, UpdateSourceTrigger=PropertyChanged}">
                     <userinterface:ShaderTextureView DataContext="{Binding DecalMask}" />
                 </basedialogs:AeAttribute>
 
-                <basedialogs:AeAttribute DockPanel.Dock="Top" LabelText="{loc:Loc KitbashTool.AdvancedRmv.UvScale}" LabelWidth="{StaticResource labelWidth}"  ToolTipEnumValue="None" IsEnabled="{Binding ShowUvScale, UpdateSourceTrigger=PropertyChanged}">
+                <basedialogs:AeAttribute DockPanel.Dock="Top" LabelText="{loc:Loc KitbashTool.AdvancedRmv.UvScale}" LabelWidth="{StaticResource labelWidth}"   IsEnabled="{Binding ShowUvScale, UpdateSourceTrigger=PropertyChanged}">
                     <mathviews1:Vector2View DataContext="{Binding UvScale}" />
                 </basedialogs:AeAttribute>
 
-                <basedialogs:AeAttribute DockPanel.Dock="Top" LabelText="{loc:Loc KitbashTool.AdvancedRmv.TextureTransform}" LabelWidth="{StaticResource labelWidth}"  ToolTipEnumValue="None" IsEnabled="{Binding ShowTextureTransform, UpdateSourceTrigger=PropertyChanged}">
+                <basedialogs:AeAttribute DockPanel.Dock="Top" LabelText="{loc:Loc KitbashTool.AdvancedRmv.TextureTransform}" LabelWidth="{StaticResource labelWidth}"   IsEnabled="{Binding ShowTextureTransform, UpdateSourceTrigger=PropertyChanged}">
                     <mathviews11:Vector4View Vector4="{Binding TextureTransform}" />
                 </basedialogs:AeAttribute>
                 

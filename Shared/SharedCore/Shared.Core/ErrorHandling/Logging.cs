@@ -25,7 +25,7 @@ namespace Shared.Core.ErrorHandling
         public static ILogger CreateStatic(Type type) => Log.ForContext(type);
 
         static bool IsConfigured = false;
-        public static string LogName { get; private set; }
+        public static string LogName { get; private set; } = string.Empty;
 
         public static CustomLoggingSink? CustomSink;
         public static void Configure(LogEventLevel logEventLevel)

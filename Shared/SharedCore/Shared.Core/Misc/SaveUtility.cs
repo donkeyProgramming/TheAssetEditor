@@ -36,9 +36,9 @@ namespace Shared.Core.Misc
                 var dirName = Path.GetDirectoryName(originalFileName);
                 var fileName = Path.GetFileNameWithoutExtension(originalFileName);
                 var extention = Path.GetExtension(originalFileName);
-                var uniqeFileName = IndexedFilename(Path.Combine(dirName, s_backupFolderPath, fileName), extention);
+                var uniqeFileName = IndexedFilename(Path.Combine(dirName!, s_backupFolderPath, fileName), extention);
 
-                Directory.CreateDirectory(Path.Combine(dirName, s_backupFolderPath));
+                Directory.CreateDirectory(Path.Combine(dirName!, s_backupFolderPath));
                 File.Copy(originalFileName, uniqeFileName);
             }
         }
@@ -46,7 +46,7 @@ namespace Shared.Core.Misc
         static string IndexedFilename(string stub, string extension)
         {
             var ix = 0;
-            string filename = null;
+            string? filename = null;
             do
             {
                 ix++;

@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
@@ -24,7 +24,7 @@ namespace Editors.BmdEditor.ViewModels
     public class BmdEditorViewModel : NotifyPropertyChangedImpl, IEditorInterface, IFileEditor, IDisposable
     {
         private readonly IPackFileService _packFileService;
-        private readonly IEditorCreator _editorCreator;
+        private readonly IEditorManager _editorCreator;
         private readonly IStandardDialogs _standardDialogs;
         private readonly GameWorld.Core.Services.ResourceLibrary _resourceLibrary;
         private readonly Shared.Core.Events.IEventHub _eventHub;
@@ -94,7 +94,7 @@ namespace Editors.BmdEditor.ViewModels
 
         public BmdEditorViewModel(
             IPackFileService packFileService,
-            IEditorCreator editorCreator,
+            IEditorManager editorCreator,
             IStandardDialogs standardDialogs,
             MeshBuilderService meshBuilderService, 
             CapabilityMaterialFactory materialFactory,

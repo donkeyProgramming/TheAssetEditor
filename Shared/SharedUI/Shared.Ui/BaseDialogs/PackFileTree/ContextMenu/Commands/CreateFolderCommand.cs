@@ -1,26 +1,38 @@
 ﻿using System.Linq;
-using System.Windows;
-using Shared.Core.PackFiles;
+using Shared.Core.Services;
+using Serilog;
+using Shared.Core.ErrorHandling;
 
 namespace Shared.Ui.BaseDialogs.PackFileTree.ContextMenu.Commands
 {
-    public class CreateFolderCommand(IPackFileService packFileService) : IContextMenuCommand
+    public class CreateFolderCommand(IStandardDialogs standardDialogs) : IContextMenuCommand
     {
+        private readonly ILogger _logger = Logging.Create<CreateFolderCommand>();
+
         public string GetDisplayName(TreeNode node) => "Create Folder";
+        public bool ShouldAdd(TreeNode node) => node.NodeType != NodeType.File && !node.FileOwner.IsCaPackFile;
         public bool IsEnabled(TreeNode node) => true;
 
-        public void Execute(TreeNode _selectedNode)
+        public void Execute(TreeNode selectedNode)
         {
-            if (_selectedNode.FileOwner.IsCaPackFile)
+            if (selectedNode.FileOwner.IsCaPackFile)
             {
-                MessageBox.Show("Unable to edit CA packfile");
+                _logger.Here().Warning($"Create folder blocked for CA pack '{CommandLoggingHelper.DescribePack(selectedNode.FileOwner)}'");
+                standardDialogs.ShowDialogBox("Unable to edit CA packfile");
                 return;
             }
 
-            var folderName = EditFileNameDialog.ShowDialog(_selectedNode, "");
+            var folderName = standardDialogs.ShowFolderNameDialog(selectedNode.Children.Select(x => x.Name), "");
 
             if (folderName.Any())
-                _selectedNode.AddDirectoryChild(folderName);
+            {
+                _logger.Here().Information($"Creating folder '{folderName}' under '{CommandLoggingHelper.DescribeNode(selectedNode)}'");
+                selectedNode.AddDirectoryChild(folderName);
+            }
+            else
+            {
+                _logger.Here().Information($"Create folder cancelled under '{CommandLoggingHelper.DescribeNode(selectedNode)}'");
+            }
         }
     }
 }

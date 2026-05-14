@@ -1,23 +1,29 @@
-﻿using System.Diagnostics;
-using System;
-using System.Windows;
-using Shared.Core.PackFiles.Models;
+﻿using System;
+using System.Diagnostics;
 using System.IO;
+using Shared.Core.PackFiles.Models;
+using Shared.Core.Services;
+using Serilog;
+using Shared.Core.ErrorHandling;
 
 namespace Shared.Ui.BaseDialogs.PackFileTree.ContextMenu.Commands
 {
-    public abstract class OpenNodeInCommand() : IContextMenuCommand
+    public abstract class OpenNodeInCommand(IStandardDialogs standardDialogs, IFileSystemAccess fileSystemAccess) : IContextMenuCommand
     {
+        private readonly ILogger _logger = Logging.Create<OpenNodeInCommand>();
+
         public abstract string GetDisplayName(TreeNode node);
+        public bool ShouldAdd(TreeNode node) => node.NodeType == NodeType.File && node.Item != null;
         public bool IsEnabled(TreeNode node) => true;
 
         public abstract void Execute(TreeNode _selectedNode);
 
         protected void OpenPackFileUsing(string applicationPath, PackFile packFile)
         {
-            if (File.Exists(applicationPath) == false)
+            if (fileSystemAccess.FileExists(applicationPath) == false)
             {
-                MessageBox.Show($"Application {applicationPath} does not exist");
+                _logger.Here().Warning($"Unable to open '{packFile.Name}' because application '{applicationPath}' was not found");
+                standardDialogs.ShowDialogBox($"Application {applicationPath} does not exist");
                 return;
             }
 
@@ -26,21 +32,33 @@ namespace Shared.Ui.BaseDialogs.PackFileTree.ContextMenu.Commands
 
             var path = tempFolder + "\\" + fileName;
             var bytes = packFile.DataSource.ReadData();
-            File.WriteAllBytes(path, bytes);
+            fileSystemAccess.FileWriteAllBytes(path, bytes);
+            _logger.Here().Information($"Prepared temporary file '{path}' for '{packFile.Name}' ({bytes.Length} byte(s))");
 
-            Process.Start(applicationPath, $"\"{path}\"");
+            using var process = fileSystemAccess.ProcessStart(applicationPath, $"\"{path}\"");
+            if (process == null)
+                _logger.Here().Warning($"Process launch returned null while opening '{packFile.Name}' with '{applicationPath}'");
+            else
+                _logger.Here().Information($"Opened '{packFile.Name}' with '{applicationPath}'");
+        }
+
+        protected string ResolveApplicationPath(string appRelativePath)
+        {
+            var x64 = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles), appRelativePath);
+            if (fileSystemAccess.FileExists(x64)) return x64;
+            return Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86), appRelativePath);
         }
     }
 
-    public class OpenNodeInNotepadCommand() : OpenNodeInCommand
+    public class OpenNodeInNotepadCommand(IStandardDialogs standardDialogs, IFileSystemAccess fileSystemAccess) : OpenNodeInCommand(standardDialogs, fileSystemAccess)
     {
         public override string GetDisplayName(TreeNode node) => "Open in Notepad++";
-        public override void Execute(TreeNode _selectedNode) => OpenPackFileUsing(@"C:\Program Files\Notepad++\notepad++.exe", _selectedNode.Item!);
+        public override void Execute(TreeNode _selectedNode) => OpenPackFileUsing(ResolveApplicationPath(@"Notepad++\notepad++.exe"), _selectedNode.Item!);
     }
 
-    public class OpenNodeInHxDCommand() : OpenNodeInCommand
+    public class OpenNodeInHxDCommand(IStandardDialogs standardDialogs, IFileSystemAccess fileSystemAccess) : OpenNodeInCommand(standardDialogs, fileSystemAccess)
     {
         public override string GetDisplayName(TreeNode node) => "Open in Hxd";
-        public override void Execute(TreeNode _selectedNode) => OpenPackFileUsing(@"C:\Program Files\HxD\HxD.exe", _selectedNode.Item!);
+        public override void Execute(TreeNode _selectedNode) => OpenPackFileUsing(ResolveApplicationPath(@"HxD\HxD.exe"), _selectedNode.Item!);
     }
 }

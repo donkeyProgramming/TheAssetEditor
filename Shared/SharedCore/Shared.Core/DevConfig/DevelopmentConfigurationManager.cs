@@ -13,7 +13,7 @@ namespace Shared.Core.DevConfig
         private readonly IPackFileService _packFileService;
         private readonly ApplicationSettingsService _settingsService;
         private readonly IEnumerable<IDeveloperConfiguration> _developerConfigurations;
-        private IDeveloperConfiguration _activeConfig;
+        private IDeveloperConfiguration? _activeConfig;
 
         public DevelopmentConfigurationManager(IEnumerable<IDeveloperConfiguration> developerConfigurations, IPackFileService packFileService, ApplicationSettingsService settingsService)
         {

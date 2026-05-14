@@ -1,5 +1,4 @@
-﻿using Serilog;
-using Shared.Core.DependencyInjection;
+﻿using Shared.Core.DependencyInjection;
 using Shared.Core.ErrorHandling;
 
 namespace Shared.Core.Events
@@ -40,7 +39,7 @@ namespace Shared.Core.Events
         private readonly ILogger _logger = Logging.Create<EventHub>();
         bool _isDisposed = false;
         
-        Dictionary<Type, List<(Delegate Callback, object Owner)>> _callbackList = new();
+        readonly Dictionary<Type, List<(Delegate Callback, object Owner)>> _callbackList = new();
         private readonly IScopeRepository _scopeRepository;
         private readonly string _hubName;
         private readonly bool _isGlobal;
@@ -57,7 +56,7 @@ namespace Shared.Core.Events
             // If gloabl, send to self and all children
             if (_isGlobal)
             {
-                _logger.Here().Information($"Publshing global event {e.GetType().Name} on {_hubName}");
+                _logger.Here().Information($"Publshing global event {e!.GetType().Name} on {_hubName}");
 
                 // Send to global subscribers 
                 Publish(e);
@@ -135,6 +134,9 @@ namespace Shared.Core.Events
 
         public void Dispose()
         {
+            if (_isDisposed == true)
+                return;
+
             _isDisposed = true;
             _callbackList?.Clear();
         }
