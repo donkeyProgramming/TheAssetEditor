@@ -86,10 +86,10 @@ namespace Shared.GameFormats.Bmd
                             earlyProp.EarlyVersionUnknownBool = _reader.ReadByte() != 0;
                         if (earlyProp.PropInfoVersion > 2) //this being the seasons is a guess
                         {
-                            earlyProp.SeasonSpring = _reader.ReadByte() != 0;
-                            earlyProp.SeasonSummer = _reader.ReadByte() != 0;
-                            earlyProp.SeasonAutumn = _reader.ReadByte() != 0;
-                            earlyProp.SeasonWinter = _reader.ReadByte() != 0;
+                            earlyProp.Flags.SeasonSpring = _reader.ReadByte() != 0;
+                            earlyProp.Flags.SeasonSummer = _reader.ReadByte() != 0;
+                            earlyProp.Flags.SeasonAutumn = _reader.ReadByte() != 0;
+                            earlyProp.Flags.SeasonWinter = _reader.ReadByte() != 0;
                         }
                         
                         bmdFile.PropInfos.Add(earlyProp);
@@ -302,16 +302,18 @@ namespace Shared.GameFormats.Bmd
             var building = new BattlefieldBuilding();
             building.Version = _reader.ReadUInt16();
 
-            // Read building attributes
             building.BuildingId = ReadString();
-            building.ParentId = _reader.ReadInt32();
+            if (building.Version > 8)
+                building.ParentId = _reader.ReadInt32();
+            else
+                building.ParentId = _reader.ReadInt16();
             building.BuildingKey = ReadString();
             building.PositionType = ReadString();
 
-            // Read transform matrix (3x4 matrix stored in row-major order)
+            // Transform matrix (3x4 matrix stored in row-major order)
             building.Transform = ReadRowMajorMatrix(false);
             
-            // Read properties inline
+            // Properties
             building.PropertiesVersion = _reader.ReadUInt16();
             building.PropertiesBuildingId = ReadString();
             building.StartingDamageUnary = _reader.ReadSingle();
@@ -325,14 +327,19 @@ namespace Shared.GameFormats.Bmd
             building.Lite = _reader.ReadByte() != 0;
             building.CastShadows = _reader.ReadByte() != 0;
             building.KeyBuilding = _reader.ReadByte() != 0;
-            building.KeyBuildingUseFort = _reader.ReadByte() != 0;
-            building.IsPropInOutfield = _reader.ReadByte() != 0;
-            building.SettlementLevelConfigurable = _reader.ReadByte() != 0;
-            building.HideTooltip = _reader.ReadByte() != 0;
-            building.IncludeInFog = _reader.ReadByte() != 0;
+            if (building.Version > 8)
+            {
+                building.KeyBuildingUseFort = _reader.ReadByte() != 0;
+                building.IsPropInOutfield = _reader.ReadByte() != 0;
+                building.SettlementLevelConfigurable = _reader.ReadByte() != 0;
+                building.HideTooltip = _reader.ReadByte() != 0;
+                building.IncludeInFog = _reader.ReadByte() != 0;
+            }
             
             building.HeightMode = ReadString();
-            building.Uid = _reader.ReadInt64();
+
+            if (building.Version > 8)
+                building.Uid = _reader.ReadInt64();
             
             return building;
         }
@@ -530,30 +537,18 @@ namespace Shared.GameFormats.Bmd
             prop.DecalParallaxScale = _reader.ReadSingle();
             prop.DecalTiling = _reader.ReadSingle();
             prop.DecalOverrideGbufferNormal = _reader.ReadByte() != 0;
-            
-            prop.FlagsVersion = _reader.ReadUInt16();
-            prop.AllowInOutfield = _reader.ReadByte() != 0;
-            prop.ClampToWaterSurface = _reader.ReadByte() != 0;
-            if (prop.FlagsVersion == 2) //unknown extra bool that's only here for this version?
-                prop.FlagBool3 = _reader.ReadByte() != 0;
-            prop.SeasonSpring = _reader.ReadByte() != 0;
-            prop.SeasonSummer = _reader.ReadByte() != 0;
-            prop.SeasonAutumn = _reader.ReadByte() != 0;
-            prop.SeasonWinter = _reader.ReadByte() != 0;
-            if (prop.FlagsVersion > 3)
-            {
-                prop.VisibleInTactical = _reader.ReadByte() != 0;
-                prop.OnlyVisibleInTactical = _reader.ReadByte() != 0;
-            }
+
+            prop.Flags = ReadBmdComponentFlags();
             
             prop.VisibleInShroud = _reader.ReadByte() != 0;
             prop.ApplyToTerrain = _reader.ReadByte() != 0;
             prop.ApplyToPropsOrReceiveDecal = _reader.ReadByte() != 0;
             prop.RenderAboveSnow = _reader.ReadByte() != 0;
             
-            prop.HeightMode = ReadString();
+            if (prop.PropInfoVersion > 7)
+                prop.HeightMode = ReadString();
             
-            if (prop.PropInfoVersion > 15)
+            if (prop.PropInfoVersion > 14)
                 prop.CultureMask = _reader.ReadBytes(8);
             else if (prop.PropInfoVersion > 10)
             {
@@ -567,11 +562,11 @@ namespace Shared.GameFormats.Bmd
              //there's an extra byte in here just for version 9, then it's gone in version 10
              //  (representing it with "CastsShadow")
 
-            if (prop.PropInfoVersion > 10 || prop.PropInfoVersion == 9)
+            if (prop.PropInfoVersion > 11 || prop.PropInfoVersion == 9)
                 prop.CastsShadow = _reader.ReadByte() != 0;
-            if (prop.PropInfoVersion > 12)
+            if (prop.PropInfoVersion > 13)
                 prop.NoCulling = _reader.ReadByte() != 0;
-            if (prop.PropInfoVersion > 14)
+            if (prop.PropInfoVersion > 15)
                 prop.HasHeightPatch = _reader.ReadByte() != 0;
             if (prop.PropInfoVersion > 16)
                 prop.ApplyHeightPatch = _reader.ReadByte() != 0;
@@ -605,23 +600,15 @@ namespace Shared.GameFormats.Bmd
             
             // Read transform matrix (3x4 matrix stored in row-major order)
             vfx.Transform = ReadRowMajorMatrix(false);
-            vfx.Booleans = _reader.ReadBytes(6);
-            vfx.FlagVersion = _reader.ReadUInt16();
-            vfx.AllowInOutfield = _reader.ReadByte() != 0;
-            vfx.ClampToWaterSurface = _reader.ReadByte() != 0;
-            if (vfx.FlagVersion == 2) //unknown extra bool that's only here for this version?
-                vfx.Version2ExtraBool = _reader.ReadByte() != 0;
-            vfx.Seasons = _reader.ReadBytes(4);
-            if (vfx.FlagVersion > 3)
-            {
-                vfx.VisibleInTactical = _reader.ReadByte() != 0;
-                vfx.OnlyVisibleInTactical = _reader.ReadByte() != 0;
-            }
+            
+            vfx.EmissionRate = _reader.ReadSingle();
+            vfx.InstanceName = ReadString();
+            vfx.Flags = ReadBmdComponentFlags();
             
             if (vfx.VfxInfoVersion > 2)
-            {
                 vfx.HeightMode = ReadString();
-            
+            if (vfx.VfxInfoVersion > 3)
+            {
                 if (vfx.VfxInfoVersion > 5)
                     vfx.CultureMask = _reader.ReadBytes(8);
                 else
@@ -630,7 +617,9 @@ namespace Shared.GameFormats.Bmd
                     var oldMask = _reader.ReadBytes(4);
                     Array.Copy(oldMask, vfx.CultureMask, 4);
                 }
-                
+            }
+            if (vfx.VfxInfoVersion > 4)
+            {
                 vfx.Autoplay = _reader.ReadByte() != 0;
                 vfx.VisibleInShroud = _reader.ReadByte() != 0;
             }
@@ -784,14 +773,18 @@ namespace Shared.GameFormats.Bmd
             light.AnimationSpeedScale2 = _reader.ReadSingle();
             light.ColorMin = _reader.ReadSingle();
             light.RandomOffset = _reader.ReadSingle();
-            light.WPLFTType = ReadString();
-            light.SomeZero = _reader.ReadByte();
-            light.HeightMode = ReadString();
-            light.ForLightProbeOnly = _reader.ReadByte() != 0;
-            light.MoreData = _reader.ReadBytes(4);
-            if (light.PointLightInfoVersion > 5)
+            light.FalloffType = ReadString();
+            light.LFRelative = _reader.ReadByte();
+            if (light.PointLightInfoVersion > 1)
+                light.HeightMode = ReadString();
+            if (light.PointLightInfoVersion > 2)
             {
-                light.EvenMoreData = _reader.ReadBytes(4);
+                light.LightProbeOnly = _reader.ReadByte() != 0;
+                
+                if (light.PointLightInfoVersion > 5)
+                    light.PdlcMask = _reader.ReadUInt64();
+                else
+                    light.PdlcMask = _reader.ReadUInt32();
             }
             if (light.PointLightInfoVersion > 6)
             {
@@ -806,22 +799,16 @@ namespace Shared.GameFormats.Bmd
             
             emitter.BuildingProjectileEmitterVersion = _reader.ReadUInt16();
             
-            // Read location (COORD - using RmvVector3 for 3D coordinates)
             emitter.Location = ReadRmvVector3();
-            
-            // Read rotation[3] (3 floats)
             emitter.Rotation[0] = _reader.ReadSingle();
             emitter.Rotation[1] = _reader.ReadSingle();
             emitter.Rotation[2] = _reader.ReadSingle();
             
-            // Read building_index (uint32)
             emitter.BuildingIndex = _reader.ReadUInt32();
-            
-            // Read height_mode (length prefixed string)
             emitter.HeightMode = ReadString();
             
-            // Read specialized_building_projectile_emitter_key (length prefixed string)
-            emitter.SpecializedBuildingProjectileEmitterKey = ReadString();
+            if (emitter.BuildingProjectileEmitterVersion > 2)
+                emitter.SpecializedBuildingProjectileEmitterKey = ReadString();
             
             return emitter;
         }
@@ -839,13 +826,12 @@ namespace Shared.GameFormats.Bmd
             
             if (area.PlayableAreaVersion > 1)
             {
-                area.FlagVersion = _reader.ReadUInt16();
+                if (area.PlayableAreaVersion > 2)
+                    area.FlagVersion = _reader.ReadUInt16();
                 area.Flag1 = _reader.ReadByte() != 0;
                 area.Flag2 = _reader.ReadByte() != 0;
                 area.Flag3 = _reader.ReadByte() != 0;
-                
-                if (area.FlagVersion > 0)
-                    area.Flag4 = _reader.ReadByte() != 0;
+                area.Flag4 = _reader.ReadByte() != 0;
             }
             
             return area;
@@ -1112,6 +1098,29 @@ namespace Shared.GameFormats.Bmd
         private WaterOutline ReadWaterOutline()
         {
             throw new NotImplementedException("WaterOutline parsing not implemented yet");
+        }
+
+
+
+        //Helper Functions
+        private BmdComponentFlags ReadBmdComponentFlags()
+        {
+            var flags = new BmdComponentFlags();
+            flags.FlagVersion = _reader.ReadUInt16();
+            flags.AllowInOutfield = _reader.ReadByte() != 0;
+            if (flags.FlagVersion == 2)
+                flags.ClampToSurface = _reader.ReadByte() != 0;
+            flags.ClampToWaterSurface = _reader.ReadByte() != 0;
+            flags.SeasonSpring = _reader.ReadByte() != 0;
+            flags.SeasonSummer = _reader.ReadByte() != 0;
+            flags.SeasonAutumn = _reader.ReadByte() != 0;
+            flags.SeasonWinter = _reader.ReadByte() != 0;
+            if (flags.FlagVersion > 3)
+            {
+                flags.VisibleInTactical = _reader.ReadByte() != 0;
+                flags.OnlyVisibleInTactical = _reader.ReadByte() != 0;
+            }
+            return flags;
         }
 
         private string ReadString()

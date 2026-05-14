@@ -358,11 +358,11 @@ namespace Editors.BmdEditor.ViewModels
                     details.AppendLine("VFX Details:");
                     details.AppendLine($"  Version: {vfx.Vfx.VfxInfoVersion}");
                     details.AppendLine($"  VFX String: {vfx.Vfx.VfxString}");
-                    details.AppendLine($"  Flag Version: {vfx.Vfx.FlagVersion}");
-                    details.AppendLine($"  Allow In Outfield: {vfx.Vfx.AllowInOutfield}");
-                    details.AppendLine($"  Clamp To Water: {vfx.Vfx.ClampToWaterSurface}");
-                    details.AppendLine($"  Visible In Tactical: {vfx.Vfx.VisibleInTactical}");
-                    details.AppendLine($"  Only Visible In Tactical: {vfx.Vfx.OnlyVisibleInTactical}");
+                    details.AppendLine($"  Flag Version: {vfx.Vfx.Flags.FlagVersion}");
+                    details.AppendLine($"  Allow In Outfield: {vfx.Vfx.Flags.AllowInOutfield}");
+                    details.AppendLine($"  Clamp To Water: {vfx.Vfx.Flags.ClampToWaterSurface}");
+                    details.AppendLine($"  Visible In Tactical: {vfx.Vfx.Flags.VisibleInTactical}");
+                    details.AppendLine($"  Only Visible In Tactical: {vfx.Vfx.Flags.OnlyVisibleInTactical}");
                     details.AppendLine($"  Autoplay: {vfx.Vfx.Autoplay}");
                     details.AppendLine($"  Visible In Shroud: {vfx.Vfx.VisibleInShroud}");
                     details.AppendLine($"  Parent ID: {vfx.Vfx.ParentId}");
@@ -380,9 +380,9 @@ namespace Editors.BmdEditor.ViewModels
                     details.AppendLine($"  Animation Speed 2: {light.Light.AnimationSpeedScale2:F2}");
                     details.AppendLine($"  Color Min: {light.Light.ColorMin:F2}");
                     details.AppendLine($"  Random Offset: {light.Light.RandomOffset:F2}");
-                    details.AppendLine($"  WPLFT Type: {light.Light.WPLFTType}");
+                    details.AppendLine($"  Falloff Type: {light.Light.FalloffType}");
                     details.AppendLine($"  Height Mode: {light.Light.HeightMode}");
-                    details.AppendLine($"  For Light Probe Only: {light.Light.ForLightProbeOnly}");
+                    details.AppendLine($"  Light Probe Only: {light.Light.LightProbeOnly}");
                     break;
 
                 case SpotLightInfoViewModel spotLight:

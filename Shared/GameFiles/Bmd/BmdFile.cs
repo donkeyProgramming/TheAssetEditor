@@ -43,6 +43,10 @@ namespace Shared.GameFormats.Bmd
         public List<TreeListReference> TreeListReferences { get; set; } = new();
         public List<GrassListReference> GrassListReferences { get; set; } = new();
         public List<WaterOutline> WaterOutlines { get; set; } = new();
+
+        //Pharaoh Exclusive classes (for Pharaoh's version of the version 25 BMD format)
+        public CameraZoneNew CameraZoneNew { get; set; } = new();
+        public MiscParams MiscParams { get; set; } = new();
     }
 
     public class FastBinHeader
@@ -89,6 +93,20 @@ namespace Shared.GameFormats.Bmd
         public bool CultMaskCth { get; set; }
         public bool CultMaskNor { get; set; }
         public bool CultMaskChd { get; set; }
+    }
+
+    public class BmdComponentFlags
+    {
+        public ushort FlagVersion { get; set; }
+        public bool AllowInOutfield { get; set; }
+        public bool ClampToSurface { get; set; }   //Flag version 2 only
+        public bool ClampToWaterSurface { get; set; }
+        public bool SeasonSpring { get; set; }
+        public bool SeasonSummer { get; set; }
+        public bool SeasonAutumn { get; set; }
+        public bool SeasonWinter { get; set; }
+        public bool VisibleInTactical { get; set; }
+        public bool OnlyVisibleInTactical { get; set; }
     }
 
     public class BattlefieldBuilding
@@ -186,8 +204,8 @@ namespace Shared.GameFormats.Bmd
         public ushort Version { get; set; }
         public string BmdString { get; set; } = string.Empty;
         public Matrix Transform { get; set; } = Matrix.Identity;
-        public byte[] SeasonsMaybe { get; set; } = new byte[4]; //is this <property_overrides/>?
-        public CultureMask CultureMask { get; set; }
+        public byte[] SeasonsMaybe { get; set; } = new byte[4]; //this has to correspond to <property_overrides/>
+        public CultureMask CultureMask { get; set; } //"campaign_type_mask"?
         public string RegionString { get; set; } = string.Empty;
         public string HeightMode { get; set; } = string.Empty;
         public byte[] Uid { get; set; } = new byte[8];
@@ -229,7 +247,6 @@ namespace Shared.GameFormats.Bmd
         public ushort Version { get; set; }
     }
 
-
     public class PropInfo
     {
         public ushort PropInfoVersion { get; set; }
@@ -247,16 +264,7 @@ namespace Shared.GameFormats.Bmd
         public float DecalTiling { get; set; }
         public bool DecalOverrideGbufferNormal { get; set; }
         
-        public ushort FlagsVersion { get; set; }
-        public bool AllowInOutfield { get; set; }
-        public bool ClampToWaterSurface { get; set; }
-        public bool FlagBool3 { get; set; }  //Flag version 3/4 or something
-        public bool SeasonSpring { get; set; }
-        public bool SeasonSummer { get; set; }
-        public bool SeasonAutumn { get; set; }
-        public bool SeasonWinter { get; set; }
-        public bool VisibleInTactical { get; set; }
-        public bool OnlyVisibleInTactical { get; set; }
+        public BmdComponentFlags Flags { get; set; } = new();
 
         public bool VisibleInShroud { get; set; }
         public bool ApplyToTerrain { get; set; }
@@ -285,14 +293,11 @@ namespace Shared.GameFormats.Bmd
         public ushort VfxInfoVersion { get; set; }
         public string VfxString { get; set; } = string.Empty;
         public Matrix Transform { get; set; } = Matrix.Identity;
-        public byte[] Booleans { get; set; } = new byte[6];
-        public ushort FlagVersion { get; set; }
-        public bool AllowInOutfield { get; set; }
-        public bool ClampToWaterSurface { get; set; }
-        public bool Version2ExtraBool { get; set; }
-        public byte[] Seasons { get; set; } = new byte[4];
-        public bool VisibleInTactical { get; set; }
-        public bool OnlyVisibleInTactical { get; set; }
+        public float EmissionRate { get; set; }
+        public string InstanceName { get; set; } = string.Empty;
+        
+        public BmdComponentFlags Flags { get; set; } = new();
+
         public string HeightMode { get; set; } = string.Empty;
         public byte[] CultureMask { get; set; } = new byte[8];
         public bool Autoplay { get; set; }
@@ -380,12 +385,11 @@ namespace Shared.GameFormats.Bmd
         public float AnimationSpeedScale2 { get; set; }
         public float ColorMin { get; set; }
         public float RandomOffset { get; set; }
-        public string WPLFTType { get; set; } = string.Empty;
-        public byte SomeZero { get; set; }
+        public string FalloffType { get; set; } = string.Empty;
+        public byte LFRelative { get; set; }
         public string HeightMode { get; set; } = string.Empty;
-        public bool ForLightProbeOnly { get; set; }
-        public byte[] MoreData { get; set; } = new byte[4];
-        public byte[] EvenMoreData { get; set; } = new byte[4];
+        public bool LightProbeOnly { get; set; }
+        public ulong PdlcMask { get; set; }
         public byte[] MoreData2 { get; set; } = new byte[10];
     }
 
@@ -556,5 +560,34 @@ namespace Shared.GameFormats.Bmd
     {
         //TODO: Not properly implemented
         public ushort Version { get; set; }
+    }
+
+
+
+    //Pharaoh Exclusive classes (for Pharaoh's version of the version 25 BMD format)
+    //This is version hell! They didn't keep the versions consistent!
+    public class CameraZoneNew
+    {
+        //TODO: Not properly implemented
+        public ushort Version { get; set; }
+    }
+    public class MiscParams
+    {
+        public ushort Version { get; set; }
+        public string WaterPlaneMaterial { get; set; } = string.Empty;
+        public float NormalTiling { get; set; }
+        public float NormalStrengthScale { get; set; }
+        public float NormalTimeScale { get; set; }
+        public float DepthDistortionCoef { get; set; }
+        public float CausticsScale { get; set; }
+        public float CausticsMinDepthCoef { get; set; }
+        public float CausticsMaxDepthCoef { get; set; }
+        public float WaterOpacity { get; set; }
+        public float WaterSpeed { get; set; }
+        public float WaterDirection { get; set; }
+        public bool ShoreWaves { get; set; }
+        public RmvVector2 CausticsUvScale { get; set; }
+        public RmvVector3 WaterColor { get; set; }
+        public RmvVector3 WaterSpecular { get; set; }
     }
 }
