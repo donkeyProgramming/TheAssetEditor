@@ -280,6 +280,13 @@ namespace Editors.Reports.Bmd
                         vfxRecord.PositionY = vfx.Transform.M42;
                         vfxRecord.PositionZ = vfx.Transform.M43;
                         vfxRecord.VfxString = vfx.VfxString;
+                        vfxRecord.EmissionRate = vfx.EmissionRate;
+                        vfxRecord.InstanceName = vfx.InstanceName;
+                        vfxRecord.ClampToSurface = vfx.Flags.ClampToSurface;
+                        vfxRecord.SeasonSpring = vfx.Flags.SeasonSpring;
+                        vfxRecord.SeasonSummer = vfx.Flags.SeasonSummer;
+                        vfxRecord.SeasonAutumn = vfx.Flags.SeasonAutumn;
+                        vfxRecord.SeasonWinter = vfx.Flags.SeasonWinter;
                         vfxRecords.Add(vfxRecord);
                     }
 
@@ -326,6 +333,10 @@ namespace Editors.Reports.Bmd
                         pointLightRecord.PositionY = pointLight.Position.Y;
                         pointLightRecord.PositionZ = pointLight.Position.Z;
                         pointLightRecord.Color = $"{pointLight.Red},{pointLight.Green},{pointLight.Blue}";
+                        pointLightRecord.FalloffType = pointLight.FalloffType;
+                        pointLightRecord.LFRelative = pointLight.LFRelative;
+                        pointLightRecord.LightProbeOnly = pointLight.LightProbeOnly;
+                        pointLightRecord.PdlcMask = pointLight.PdlcMask;
                         pointLightRecords.Add(pointLightRecord);
                     }
 
@@ -346,9 +357,17 @@ namespace Editors.Reports.Bmd
                     {
                         dynamic playableAreaRecord = new ExpandoObject();
                         playableAreaRecord.Path = path;
+                        playableAreaRecord.PlayableAreaVersion = parsedFile.PlayableArea.PlayableAreaVersion;
                         playableAreaRecord.BoundingBoxMinX = parsedFile.PlayableArea.BoundingBox.Length > 0 ? parsedFile.PlayableArea.BoundingBox[0] : 0;
                         playableAreaRecord.BoundingBoxMinY = parsedFile.PlayableArea.BoundingBox.Length > 1 ? parsedFile.PlayableArea.BoundingBox[1] : 0;
+                        playableAreaRecord.BoundingBoxMaxX = parsedFile.PlayableArea.BoundingBox.Length > 2 ? parsedFile.PlayableArea.BoundingBox[2] : 0;
+                        playableAreaRecord.BoundingBoxMaxY = parsedFile.PlayableArea.BoundingBox.Length > 3 ? parsedFile.PlayableArea.BoundingBox[3] : 0;
                         playableAreaRecord.HasBeenSet = parsedFile.PlayableArea.HasBeenSet;
+                        playableAreaRecord.FlagVersion = parsedFile.PlayableArea.FlagVersion;
+                        playableAreaRecord.Flag1 = parsedFile.PlayableArea.Flag1;
+                        playableAreaRecord.Flag2 = parsedFile.PlayableArea.Flag2;
+                        playableAreaRecord.Flag3 = parsedFile.PlayableArea.Flag3;
+                        playableAreaRecord.Flag4 = parsedFile.PlayableArea.Flag4;
                         playableAreaRecords.Add(playableAreaRecord);
                     }
 
