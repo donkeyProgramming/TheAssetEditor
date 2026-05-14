@@ -5,11 +5,11 @@ using System.Linq;
 using Editors.Audio.Shared.AudioProject.Models;
 using Editors.Audio.Shared.Dat;
 using Editors.Audio.Shared.GameInformation.Warhammer3;
-using Editors.Audio.Shared.Wwise;
 using Editors.Audio.Shared.Wwise.Generators;
 using Serilog;
 using Shared.Core.ErrorHandling;
 using Shared.Core.Misc;
+using Shared.GameFormats.Wwise;
 
 namespace Editors.Audio.Shared.AudioProject.Compiler
 {
@@ -51,13 +51,12 @@ namespace Editors.Audio.Shared.AudioProject.Compiler
 
         private static void ClearTempAudioFiles()
         {
-            var audioFolder = $"{DirectoryHelper.Temp}\\Audio";
-            if (Directory.Exists(audioFolder))
+            if (Directory.Exists(DirectoryHelper.AudioDirectory))
             {
-                foreach (var file in Directory.GetFiles(audioFolder, "*.wav"))
+                foreach (var file in Directory.GetFiles(DirectoryHelper.AudioDirectory, "*.wav"))
                     File.Delete(file);
 
-                foreach (var file in Directory.GetFiles(audioFolder, "*.wem"))
+                foreach (var file in Directory.GetFiles(DirectoryHelper.AudioDirectory, "*.wem"))
                     File.Delete(file);
             }
         }
@@ -186,7 +185,7 @@ namespace Editors.Audio.Shared.AudioProject.Compiler
         private static void SetSoundData(AudioFile audioFile, SoundBank soundBank)
         {
             audioFile.WemPackFileName = $"{audioFile.Id}.wem";
-            audioFile.WemDiskFilePath = $"{DirectoryHelper.Temp}\\Audio\\{audioFile.WemPackFileName}";
+            audioFile.WemDiskFilePath = $"{DirectoryHelper.AudioDirectory}\\{audioFile.WemPackFileName}";
             
             if (soundBank.Language == Wh3LanguageInformation.GetLanguageAsString(Wh3Language.Sfx))
                 audioFile.WemPackFilePath = $"audio\\wwise\\{audioFile.WemPackFileName}";

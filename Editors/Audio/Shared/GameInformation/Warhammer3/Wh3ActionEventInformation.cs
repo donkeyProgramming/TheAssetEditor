@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using static Editors.Audio.Shared.GameInformation.Warhammer3.Wh3ActionEventType;
 using static Editors.Audio.Shared.GameInformation.Warhammer3.Wh3SoundBank;
@@ -37,8 +38,9 @@ namespace Editors.Audio.Shared.GameInformation.Warhammer3
             // Reference: Play_wh3_prologue_battle_advice_lords_1
             new("Battle Advice", Wh3ActionEventType.BattleAdvice, Wh3SoundBank.BattleAdvice, ActorMixerId: Wh3ActorMixerInformation.BattleAdvice),
 
+            // TODO: Need to figure out how to actually get advisor audio working...
             // Reference: Play_wh2_dlc13_camp_advice_emp_emperors_mandate_001_1
-            new("Campaign Advice", Wh3ActionEventType.CampaignAdvice, Wh3SoundBank.CampaignAdvice, ActorMixerId: Wh3ActorMixerInformation.CampaignAdvice),
+            // new("Campaign Advice", Wh3ActionEventType.CampaignAdvice, Wh3SoundBank.CampaignAdvice, ActorMixerId: Wh3ActorMixerInformation.CampaignAdvice),
 
             // Reference: Battle_Individual_Ability_Storm_Dragon_To_Human_Form_Transform
             new("Battle Abilities", BattleAbilities, BattleIndividualMagic, ActorMixerId: Wh3ActorMixerInformation.BattleAbilities),
@@ -75,6 +77,14 @@ namespace Editors.Audio.Shared.GameInformation.Warhammer3
         public static uint GetActorMixerId(Wh3ActionEventType actionEventType) => Information.First(definition => definition.ActionEventType == actionEventType).ActorMixerId;
         
         public static uint GetOverrideBusId(Wh3ActionEventType actionEventType) => Information.First(definition => definition.ActionEventType == actionEventType).OverrideBusId;
+
+        public static string GetMovieActionEventName(string filePath)
+        {
+            var relativePath = Path.GetRelativePath("movies", filePath);
+            var withoutExtension = Path.ChangeExtension(relativePath, null);
+            var slashesToUnderscores = withoutExtension.Replace("\\", "_").Replace("/", "_");
+            return $"Play_Movie_{slashesToUnderscores}";
+        }
 
         public static List<Wh3ActionEventType> GetSoundBankActionEventTypes(Wh3SoundBank soundBank)
         {
