@@ -8,6 +8,11 @@
     </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="NVorbis" Version="0.10.5" />
+    <PackageReference Include="OggVorbisEncoder" Version="1.2.2" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\EmbeddedResources\Shared.EmbeddedResources.csproj" />
     <ProjectReference Include="..\SharedCore\Shared.Core\Shared.Core.csproj" />
   </ItemGroup>

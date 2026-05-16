@@ -26,27 +26,11 @@ namespace Shared.Core.Settings
         public bool ShowCAWemFiles { get; set; } = false;
         public bool IsFirstTimeStartingApplication { get; set; } = true;
         public bool IsDeveloperRun { get; set; } = false;
-        public string WwisePath { get; set; } = string.Empty;
         public bool OnlyLoadLod0ForReferenceMeshes { get; set; } = true;
         public int VisualEditorsGridSize { get; set; } = 10;
         public Vector3 VertexSelectionColour { get; set; } = new Vector3(1.0f, 0.47f, 0.0f);
         public string SelectedLangauge { get; set; } = "en";
         public CameraControlMode CameraControlMode { get; set; } = CameraControlMode.AssetEditorStyle;
-
-        public ApplicationSettings()
-        {
-            // TODO: Need a way to get the right wwise path according to the game or instead just have several settings for the wwise CLI according tot he version
-            var wwiseRoot = Environment.GetEnvironmentVariable("WWISEROOT") ?? "";
-            if (!string.IsNullOrEmpty(wwiseRoot))
-            {
-                var audiokineticRoot = Path.GetDirectoryName(wwiseRoot) ?? "";
-                if (!string.IsNullOrEmpty(audiokineticRoot))
-                {
-                    var wwise2019Path = Path.Combine(audiokineticRoot, "Wwise2019.2.15.7667", "Authoring", "x64", "Release", "bin", "WwiseCLI.exe");
-                    WwisePath = wwise2019Path;
-                }
-            }
-        }
     }
 
     public class ApplicationSettingsService

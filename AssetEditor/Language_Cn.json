@@ -12,7 +12,6 @@
   "SettingsWindow.OnlyLoadLod0": "仅为参考 Mesh 加载 Lod0",
   "SettingsWindow.GridSize": "网格大小",
   "SettingsWindow.VertexSelectionColour": "顶点选择颜色",
-  "SettingsWindow.AudioModding": "音频 Mod",
   "SettingsWindow.SaveButton": "保存",
 
   "UpdaterWindow.Title": "更新器",
@@ -101,8 +100,6 @@
   "SettingsWindow.VertexSelectionColourTooltip": "选中顶点的十六进制颜色（例如 #FF7800）",
   "SettingsWindow.GameFiles": "游戏文件",
   "SettingsWindow.GameDataPathHint": "浏览游戏数据位置，例如 \"C:\\SteamLibrary\\steamapps\\common\\Total War WARHAMMER III\\data\"",
-  "SettingsWindow.WwiseCLI": "Wwise CLI",
-  "SettingsWindow.WwiseCliPathHint": "例如 \"C:\\Program Files (x86)\\Audiokinetic\\Wwise2019.2.15.7667\\Authoring\\x64\\Release\\bin\\WwiseCLI.exe\"",
 
   "MenuBar.File": "_文件",
   "MenuBar.File.NewPack": "新建 Pack",
@@ -749,6 +746,7 @@
   "MetadataEditor.NewEntryWindow.Title": "创建元数据条目",
 
   "WaveformVisualiser.Play": "播放",
+  "WaveformVisualiser.Pause": "暂停",
 
   "AudioProjectExplorer.DialogueEventFilters": "对话事件筛选",
   "AudioProjectExplorer.Watermark.DialogueEventTypeFilter": "选择对话事件类型筛选",

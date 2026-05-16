@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Editors.Audio.Shared.GameInformation.Warhammer3;
 using Shared.Core.Misc;
+using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
 using Shared.Core.Settings;
 using Shared.GameFormats.Wwise.Didx;
@@ -36,13 +37,20 @@ namespace Editors.Audio.Shared.Storage
         Dictionary<string, Dictionary<string, List<HircItem>>> GetModdedHircsByBnkByLanguage();
         Dictionary<string, List<HircItem>> GetModdedDialogueEventsByLanguage(List<string> moddedSoundBanks);
         List<string> GetModdedSoundBankFilePaths(string bnkNameSubstring);
+        PackFile FindWem(string wemId);
+        byte[] FindDataWem(uint dataSoundbankId, int fileOffset, int byteCount);
     }
 
-    public class AudioRepository(ApplicationSettingsService applicationSettingsService, BnkLoader bnkLoader, DatLoader datLoader) : IAudioRepository, IDisposable
+    public class AudioRepository(
+        ApplicationSettingsService applicationSettingsService,
+        BnkLoader bnkLoader,
+        DatLoader datLoader,
+        IPackFileService packFileService) : IAudioRepository, IDisposable
     {
         private readonly ApplicationSettingsService _applicationSettingsService = applicationSettingsService;
         private readonly BnkLoader _bnkLoader = bnkLoader;
         private readonly DatLoader _datLoader = datLoader;
+        private readonly IPackFileService _packFileService = packFileService;
 
         private readonly List<string> _loadedBnkDataLanguages = [];
         private bool _isDatDataLoaded = false;
@@ -264,6 +272,37 @@ namespace Editors.Audio.Shared.Storage
 
             MemoryOptimiser.Optimise();
             MemoryOptimiser.LogMemory("After clearing AudioRepository");
+        }
+
+        public PackFile FindWem(string wemId)
+        {
+            var wemFile = _packFileService.FindFile($"audio\\wwise\\{wemId}.wem");
+            if (wemFile != null)
+                return wemFile;
+
+            foreach (var language in Enum.GetValues<Wh3Language>())
+            {
+                wemFile = _packFileService.FindFile($"audio\\wwise\\{Wh3LanguageInformation.GetLanguageAsString(language)}\\{wemId}.wem");
+                if (wemFile != null)
+                    return wemFile;
+            }
+
+            return null;
+        }
+
+        public byte[] FindDataWem(uint dataSoundbankId, int fileOffset, int byteCount)
+        {
+            var dataSoundbankName = GetNameFromId(dataSoundbankId, out var found);
+            if (!found)
+                return null;
+
+            var packFile = PackFileByBnkName[$"{dataSoundbankName}.bnk"];
+            if (packFile == null)
+                return null;
+
+            var byteChunk = packFile.DataSource.ReadDataAsChunk();
+            byteChunk.Advance(fileOffset);
+            return byteChunk.ReadBytes(byteCount);
         }
 
         public void Dispose() => Clear();

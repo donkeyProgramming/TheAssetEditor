@@ -11,7 +11,6 @@
   "SettingsWindow.OnlyLoadLod0": "Charger uniquement le Lod0 pour les maillages de référence",
   "SettingsWindow.GridSize": "Taille de la grille",
   "SettingsWindow.VertexSelectionColour": "Couleur de sélection des sommets",
-  "SettingsWindow.AudioModding": "Modding audio",
   "SettingsWindow.SaveButton": "Enregistrer",
 
   "UpdaterWindow.Title": "Mise à jour",
@@ -36,5 +35,8 @@
   "PackFileCache.InvalidReason.Corrupted": "Cache for {0} is corrupted and will be rebuilt.",
   "PackFileCache.BuildingCache": "Building pack file cache for {0}. This may take some time, please wait...",
   "PackFileCache.BuildingCache.Title": "Building Cache",
-  "PackFileCache.Description": "The cache allows faster startup times and reduces memory usage by storing pre-processed game file data on disk."
+  "PackFileCache.Description": "The cache allows faster startup times and reduces memory usage by storing pre-processed game file data on disk.",
+
+  "WaveformVisualiser.Play": "Lecture",
+  "WaveformVisualiser.Pause": "Pause"
 }
