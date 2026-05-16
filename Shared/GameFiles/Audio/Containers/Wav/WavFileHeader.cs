@@ -1,7 +1,7 @@
 ﻿using System.Text;
 using Shared.ByteParsing;
 
-namespace Shared.GameFormats.Audio.Wav
+namespace Shared.GameFormats.Audio.Containers.Wav
 {
     public class WavFileHeader
     {

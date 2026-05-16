@@ -13,23 +13,20 @@ namespace Shared.GameFormats.Wwise.Wem.V132
         public CueChunk? CueChunk { get; set; }
         public List<UnknownChunk> UnknownChunks { get; set; } = [];
 
-        public static WemFile CreateFromBytes(byte[] wemData)
+        public static WemFile CreateFromWemBytes(byte[] wemBytes)
         {
-            ArgumentNullException.ThrowIfNull(wemData);
             var wemFile = new WemFile();
-            wemFile.ReadData(new ByteChunk(wemData));
+            wemFile.ReadData(new ByteChunk(wemBytes));
             return wemFile;
         }
 
-        public static WemFile CreateFromWavBytes(byte[] wavData, WemEncodingSettings? encodingSettings = null)
+        public static WemFile CreateFromWavBytes(byte[] wavBytes, WemEncodingSettings? encodingSettings = null)
         {
-            ArgumentNullException.ThrowIfNull(wavData);
             var codebookLibrary = new WwiseCodebookLibrary();
             var encoder = new WemVorbisEncoder(codebookLibrary);
             if (encodingSettings != null)
                 encoder.EncodingSettings = encodingSettings;
-
-            return encoder.EncodeFromWav(wavData);
+            return encoder.EncodeFromWavBytes(wavBytes);
         }
 
         public void ReadData(ByteChunk chunk)

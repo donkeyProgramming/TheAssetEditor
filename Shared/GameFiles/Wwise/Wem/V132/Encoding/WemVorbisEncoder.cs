@@ -1,7 +1,7 @@
 ﻿using Shared.ByteParsing;
-using Shared.GameFormats.Audio.Codecs;
-using Shared.GameFormats.Audio.Ogg;
-using Shared.GameFormats.Audio.Wav;
+using Shared.GameFormats.Audio.Containers.Ogg;
+using Shared.GameFormats.Audio.Containers.Wav;
+using Shared.GameFormats.Audio.Formats.Pcm;
 
 namespace Shared.GameFormats.Wwise.Wem.V132.Encoding
 {
@@ -14,10 +14,9 @@ namespace Shared.GameFormats.Wwise.Wem.V132.Encoding
         private const int EncodingWriteBufferSize = 512;
         private const float DefaultSilenceDbFloor = -96.0f;
 
-        public WemFile EncodeFromWav(byte[] wavData, WemEncodingSettings? encodingSettings = null)
+        public WemFile EncodeFromWavBytes(byte[] wavBytes, WemEncodingSettings? encodingSettings = null)
         {
-            ArgumentNullException.ThrowIfNull(wavData);
-            var wavFile = WavFile.CreateFromBytes(wavData);
+            var wavFile = WavFile.CreateFromBytes(wavBytes);
             var perChannelSamples = ConvertPcmToPerChannelFloat(wavFile.Audio, wavFile.FmtChunk.FormatTag);
             return EncodeFloatSamplesToWem(perChannelSamples, checked(wavFile.Audio.Channels), checked((int)wavFile.Audio.SampleRate));
         }
@@ -47,9 +46,9 @@ namespace Shared.GameFormats.Wwise.Wem.V132.Encoding
             }
             processingState.WriteEndOfStream();
 
-            var oggAudioPackets = new List<OggAudioPacket>();
+            var oggAudioPackets = new List<OggPacket>();
             while (processingState.PacketOut(out var oggPacket))
-                oggAudioPackets.Add(new OggAudioPacket { PacketData = oggPacket.PacketData, GranulePosition = oggPacket.GranulePosition });
+                oggAudioPackets.Add(new OggPacket { PacketData = oggPacket.PacketData, GranulePosition = oggPacket.GranulePosition });
 
             var wemSetupData = CompressSetup(booksPacket.PacketData, channels);
             var previousPacketIsLargeBlock = false;

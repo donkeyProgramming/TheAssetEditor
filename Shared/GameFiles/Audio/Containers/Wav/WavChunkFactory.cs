@@ -1,4 +1,4 @@
-﻿namespace Shared.GameFormats.Audio.Wav
+﻿namespace Shared.GameFormats.Audio.Containers.Wav
 {
     public static class WavChunkFactory
     {

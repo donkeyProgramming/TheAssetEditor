@@ -1,6 +1,5 @@
 ﻿using Shared.ByteParsing;
-using Shared.GameFormats.Audio.Codecs;
-using Shared.GameFormats.Wwise.Wem.V132;
+using Shared.GameFormats.Audio.Codecs.Vorbis;
 using Shared.GameFormats.Wwise.Wem.V132.Encoding;
 
 namespace Shared.GameFormats.Wwise.Wem.V132.Decoding
@@ -15,12 +14,6 @@ namespace Shared.GameFormats.Wwise.Wem.V132.Decoding
 
         public VorbisAudio Decode(WemFile wemFile)
         {
-            var decodeResult = BuildDecodeResult(wemFile);
-            return BuildVorbis(wemFile, decodeResult);
-        }
-
-        private VorbisDecodeResult BuildDecodeResult(WemFile wemFile)
-        {
             var decodeResult = new VorbisDecodeResult
             {
                 CommentPacket = new VorbisCommentHeader().WriteData(),
@@ -29,12 +22,9 @@ namespace Shared.GameFormats.Wwise.Wem.V132.Decoding
                 SmallBlockSize = 1 << wemFile.FmtChunk.SmallBlockSizeExponent,
                 UsesWwisePacketHeaderVariant = wemFile.FmtChunk.SmallBlockSizeExponent != wemFile.FmtChunk.LargeBlockSizeExponent,
             };
-            ExpandSetupPacket(wemFile.DataChunk.SetupPacket, wemFile.FmtChunk.Channels, decodeResult);
-            return decodeResult;
-        }
 
-        private static VorbisAudio BuildVorbis(WemFile wemFile, VorbisDecodeResult decodeResult)
-        {
+            ExpandSetupPacket(wemFile.DataChunk.SetupPacket, wemFile.FmtChunk.Channels, decodeResult);
+
             var wemPackets = wemFile.DataChunk.AudioPackets;
             var rebuiltPackets = new List<byte[]>(wemPackets.Count);
             var perPacketBlockSizes = new List<bool>(wemPackets.Count);
@@ -67,6 +57,9 @@ namespace Shared.GameFormats.Wwise.Wem.V132.Decoding
             {
                 Channels = checked((byte)wemFile.FmtChunk.Channels),
                 VorbisCodecPrivateData = BuildXiphLacedCodecPrivate(decodeResult.IdentificationPacket, decodeResult.CommentPacket, decodeResult.SetupPacket),
+                IdentificationHeader = VorbisIdentificationPacket.ReadData(decodeResult.IdentificationPacket),
+                CommentHeader = VorbisCommentPacket.ReadData(decodeResult.CommentPacket),
+                SetupHeader = VorbisSetupPacket.ReadData(decodeResult.SetupPacket),
                 Packets = vorbisPackets,
                 SampleCount = wemFile.FmtChunk.SampleCount,
                 SampleRate = wemFile.FmtChunk.SampleRate,

@@ -12,23 +12,26 @@ namespace Shared.GameFormats.Wwise.Wem.V132.Decoding
 
         public byte[] WriteData()
         {
-            var writer = new BitWriter(128);
-            writer.WriteByte(PacketType);
-            writer.WriteAscii(HeaderTag);
-            writer.WriteBits((uint)VendorString.Length, 32);
-            writer.WriteAscii(VendorString);
-            writer.WriteBits((uint)UserComments.Count, 32);
+            using var stream = new MemoryStream();
+            stream.Write(ByteParsers.Byte.EncodeValue(PacketType, out _));
+            stream.Write(System.Text.Encoding.ASCII.GetBytes(HeaderTag));
 
+            var vendorBytes = System.Text.Encoding.ASCII.GetBytes(VendorString);
+            stream.Write(ByteParsers.UInt32.EncodeValue((uint)vendorBytes.Length, out _));
+            stream.Write(vendorBytes);
+
+            stream.Write(ByteParsers.UInt32.EncodeValue((uint)UserComments.Count, out _));
             foreach (var comment in UserComments)
             {
-                writer.WriteBits((uint)comment.Length, 32);
-                writer.WriteAscii(comment);
+                var commentBytes = System.Text.Encoding.ASCII.GetBytes(comment);
+                stream.Write(ByteParsers.UInt32.EncodeValue((uint)commentBytes.Length, out _));
+                stream.Write(commentBytes);
             }
 
-            writer.WriteBits(FramingBit, 1);
-            writer.AlignToByte();
+            var framingByte = (byte)BitHelper.ExtractBits(FramingBit, 0, 1);
+            stream.Write(ByteParsers.Byte.EncodeValue(framingByte, out _));
 
-            return writer.ToArray();
+            return stream.ToArray();
         }
     }
 }
