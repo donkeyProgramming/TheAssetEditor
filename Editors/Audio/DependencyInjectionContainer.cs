@@ -18,12 +18,14 @@ using Editors.Audio.AudioEditor.Presentation.Shared.Table;
 using Editors.Audio.AudioExplorer;
 using Editors.Audio.AudioProjectConverter;
 using Editors.Audio.AudioProjectMerger;
+using Editors.Audio.ContextMenu;
 using Editors.Audio.DialogueEventMerger;
 using Editors.Audio.Shared.AudioProject;
 using Editors.Audio.Shared.AudioProject.Compiler;
 using Editors.Audio.Shared.AudioProject.Factories;
 using Editors.Audio.Shared.Dat;
 using Editors.Audio.Shared.Storage;
+using Editors.Audio.Shared.Utilities;
 using Editors.Audio.Shared.Wwise;
 using Editors.Audio.Shared.Wwise.Generators;
 using Editors.Audio.WaveformVisualiser.Presentation;
@@ -31,6 +33,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Shared.Core.DependencyInjection;
 using Shared.Core.DevConfig;
 using Shared.Core.ToolCreation;
+using Shared.Ui.BaseDialogs.PackFileTree.ContextMenu;
 
 namespace Editors.Audio
 {
@@ -129,8 +132,14 @@ namespace Editors.Audio
 
             // Shared audio stuff 
             serviceCollection.AddScoped<IAudioRepository, AudioRepository>();
+            serviceCollection.AddScoped<IMovieAudioResolver, MovieAudioResolver>();
             serviceCollection.AddSingleton<BnkLoader>();
             serviceCollection.AddSingleton<DatLoader>();
+
+            // Context menu
+            serviceCollection.AddScoped<ExportCAVp8AsWebMCommand>();
+            serviceCollection.AddScoped<ExportCAVp8AsIvfCommand>();
+            serviceCollection.AddSingleton<IPackFileContextMenuRegistration, AudioPackFileContextMenuRegistration>();
 
             RegisterAllAsInterface<IDeveloperConfiguration>(serviceCollection, ServiceLifetime.Transient);
         }
@@ -146,6 +155,15 @@ namespace Editors.Audio
                 .Create<AudioExplorerViewModel, AudioExplorerView>(EditorEnums.AudioExplorer_Editor)
                 .AddToToolbar("Audio Explorer")
                 .Build(factory);
+        }
+    }
+
+    public class AudioPackFileContextMenuRegistration : IPackFileContextMenuRegistration
+    {
+        public void Register(PackFileContextMenuRegistry registry)
+        {
+            registry.RegisterPackFileContextMenuItem<ExportCAVp8AsWebMCommand>(ContextMenuType.MainApplication, path: "Export", priority: 20, ContextMenuCluster.Export);
+            registry.RegisterPackFileContextMenuItem<ExportCAVp8AsIvfCommand>(ContextMenuType.MainApplication, path: "Export", priority: 30, ContextMenuCluster.Export);
         }
     }
 }
