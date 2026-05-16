@@ -17,18 +17,12 @@ namespace Editors.Reports.Bmd
         public void Execute() => generator.Create();
     }
 
-    public class BmdReportGenerator
+    public class BmdReportGenerator(IPackFileService pfs, ApplicationSettingsService applicationSettingsService)
     {
-        private readonly IPackFileService _pfs;
-        private readonly ApplicationSettingsService _applicationSettingsService;
+        private readonly IPackFileService _pfs = pfs;
+        private readonly ApplicationSettingsService _applicationSettingsService = applicationSettingsService;
 
-        public BmdReportGenerator(IPackFileService pfs, ApplicationSettingsService applicationSettingsService)
-        {
-            _pfs = pfs;
-            _applicationSettingsService = applicationSettingsService;
-        }
-
-        public void Create(string outputDir = null)
+        public void Create(string? outputDir = null)
         {
             var gameName = GameInformationDatabase.GetGameById(_applicationSettingsService.CurrentSettings.CurrentGame).DisplayName;
             var timeStamp = DateTime.Now.ToString("yyyyMMddHHmmssfff");
@@ -127,10 +121,34 @@ namespace Editors.Reports.Bmd
                     {
                         dynamic buildingRecord = new ExpandoObject();
                         buildingRecord.Path = path;
+                        buildingRecord.Version = building.Version;
+                        buildingRecord.BuildingId = building.BuildingId;
+                        buildingRecord.ParentId = building.ParentId;
+                        buildingRecord.BuildingKey = building.BuildingKey;
+                        buildingRecord.PositionType = building.PositionType;
                         buildingRecord.PositionX = building.Transform.M41;
                         buildingRecord.PositionY = building.Transform.M42;
                         buildingRecord.PositionZ = building.Transform.M43;
-                        buildingRecord.BuildingKey = building.BuildingKey;
+                        buildingRecord.PropertiesVersion = building.PropertiesVersion;
+                        buildingRecord.PropertiesBuildingId = building.PropertiesBuildingId;
+                        buildingRecord.StartingDamageUnary = building.StartingDamageUnary;
+                        buildingRecord.OnFire = building.OnFire;
+                        buildingRecord.StartDisabled = building.StartDisabled;
+                        buildingRecord.WeakPoint = building.WeakPoint;
+                        buildingRecord.AiBreachable = building.AiBreachable;
+                        buildingRecord.Indestructible = building.Indestructible;
+                        buildingRecord.Dockable = building.Dockable;
+                        buildingRecord.Toggleable = building.Toggleable;
+                        buildingRecord.Lite = building.Lite;
+                        buildingRecord.CastShadows = building.CastShadows;
+                        buildingRecord.KeyBuilding = building.KeyBuilding;
+                        buildingRecord.KeyBuildingUseFort = building.KeyBuildingUseFort;
+                        buildingRecord.IsPropInOutfield = building.IsPropInOutfield;
+                        buildingRecord.SettlementLevelConfigurable = building.SettlementLevelConfigurable;
+                        buildingRecord.HideTooltip = building.HideTooltip;
+                        buildingRecord.IncludeInFog = building.IncludeInFog;
+                        buildingRecord.HeightMode = building.HeightMode;
+                        buildingRecord.Uid = building.Uid;
                         battlefieldBuildingRecords.Add(buildingRecord);
                     }
 
@@ -168,7 +186,7 @@ namespace Editors.Reports.Bmd
                     {
                         dynamic goOutlineRecord = new ExpandoObject();
                         goOutlineRecord.Path = path;
-                        goOutlineRecord.Version = goOutline.Version;
+                        goOutlineRecord.VertexCount = goOutline.VertexList.Count;
                         goOutlineRecords.Add(goOutlineRecord);
                     }
 
@@ -276,17 +294,28 @@ namespace Editors.Reports.Bmd
                     {
                         dynamic vfxRecord = new ExpandoObject();
                         vfxRecord.Path = path;
+                        vfxRecord.Version = vfx.VfxInfoVersion;
                         vfxRecord.PositionX = vfx.Transform.M41;
                         vfxRecord.PositionY = vfx.Transform.M42;
                         vfxRecord.PositionZ = vfx.Transform.M43;
                         vfxRecord.VfxString = vfx.VfxString;
                         vfxRecord.EmissionRate = vfx.EmissionRate;
                         vfxRecord.InstanceName = vfx.InstanceName;
+                        vfxRecord.HeightMode = vfx.HeightMode;
+                        vfxRecord.Autoplay = vfx.Autoplay;
+                        vfxRecord.VisibleInShroud = vfx.VisibleInShroud;
+                        vfxRecord.ParentId = vfx.ParentId;
+                        vfxRecord.VisibleInShroudOnly = vfx.VisibleInShroudOnly;
+                        vfxRecord.FlagsVersion = vfx.Flags.FlagVersion;
+                        vfxRecord.AllowInOutfield = vfx.Flags.AllowInOutfield;
                         vfxRecord.ClampToSurface = vfx.Flags.ClampToSurface;
+                        vfxRecord.ClampToWaterSurface = vfx.Flags.ClampToWaterSurface;
                         vfxRecord.SeasonSpring = vfx.Flags.SeasonSpring;
                         vfxRecord.SeasonSummer = vfx.Flags.SeasonSummer;
                         vfxRecord.SeasonAutumn = vfx.Flags.SeasonAutumn;
                         vfxRecord.SeasonWinter = vfx.Flags.SeasonWinter;
+                        vfxRecord.VisibleInTactical = vfx.Flags.VisibleInTactical;
+                        vfxRecord.OnlyVisibleInTactical = vfx.Flags.OnlyVisibleInTactical;
                         vfxRecords.Add(vfxRecord);
                     }
 
@@ -321,6 +350,16 @@ namespace Editors.Reports.Bmd
                         terrainHoleRecord.PositionY = terrainHole.FirstVert.Y;
                         terrainHoleRecord.PositionZ = terrainHole.FirstVert.Z;
                         terrainHoleRecord.HeightMode = terrainHole.HeightMode;
+                        terrainHoleRecord.FlagsVersion = terrainHole.Flags.FlagVersion;
+                        terrainHoleRecord.AllowInOutfield = terrainHole.Flags.AllowInOutfield;
+                        terrainHoleRecord.ClampToSurface = terrainHole.Flags.ClampToSurface;
+                        terrainHoleRecord.ClampToWaterSurface = terrainHole.Flags.ClampToWaterSurface;
+                        terrainHoleRecord.SeasonSpring = terrainHole.Flags.SeasonSpring;
+                        terrainHoleRecord.SeasonSummer = terrainHole.Flags.SeasonSummer;
+                        terrainHoleRecord.SeasonAutumn = terrainHole.Flags.SeasonAutumn;
+                        terrainHoleRecord.SeasonWinter = terrainHole.Flags.SeasonWinter;
+                        terrainHoleRecord.VisibleInTactical = terrainHole.Flags.VisibleInTactical;
+                        terrainHoleRecord.OnlyVisibleInTactical = terrainHole.Flags.OnlyVisibleInTactical;
                         terrainHoleRecords.Add(terrainHoleRecord);
                     }
 
@@ -337,6 +376,16 @@ namespace Editors.Reports.Bmd
                         pointLightRecord.LFRelative = pointLight.LFRelative;
                         pointLightRecord.LightProbeOnly = pointLight.LightProbeOnly;
                         pointLightRecord.PdlcMask = pointLight.PdlcMask;
+                        pointLightRecord.FlagsVersion = pointLight.Flags.FlagVersion;
+                        pointLightRecord.AllowInOutfield = pointLight.Flags.AllowInOutfield;
+                        pointLightRecord.ClampToSurface = pointLight.Flags.ClampToSurface;
+                        pointLightRecord.ClampToWaterSurface = pointLight.Flags.ClampToWaterSurface;
+                        pointLightRecord.SeasonSpring = pointLight.Flags.SeasonSpring;
+                        pointLightRecord.SeasonSummer = pointLight.Flags.SeasonSummer;
+                        pointLightRecord.SeasonAutumn = pointLight.Flags.SeasonAutumn;
+                        pointLightRecord.SeasonWinter = pointLight.Flags.SeasonWinter;
+                        pointLightRecord.VisibleInTactical = pointLight.Flags.VisibleInTactical;
+                        pointLightRecord.OnlyVisibleInTactical = pointLight.Flags.OnlyVisibleInTactical;
                         pointLightRecords.Add(pointLightRecord);
                     }
 
@@ -380,6 +429,16 @@ namespace Editors.Reports.Bmd
                         meshRecord.PositionY = mesh.Transform.M42;
                         meshRecord.PositionZ = mesh.Transform.M43;
                         meshRecord.MaterialString = mesh.MaterialString;
+                        meshRecord.FlagsVersion = mesh.Flags.FlagVersion;
+                        meshRecord.AllowInOutfield = mesh.Flags.AllowInOutfield;
+                        meshRecord.ClampToSurface = mesh.Flags.ClampToSurface;
+                        meshRecord.ClampToWaterSurface = mesh.Flags.ClampToWaterSurface;
+                        meshRecord.SeasonSpring = mesh.Flags.SeasonSpring;
+                        meshRecord.SeasonSummer = mesh.Flags.SeasonSummer;
+                        meshRecord.SeasonAutumn = mesh.Flags.SeasonAutumn;
+                        meshRecord.SeasonWinter = mesh.Flags.SeasonWinter;
+                        meshRecord.VisibleInTactical = mesh.Flags.VisibleInTactical;
+                        meshRecord.OnlyVisibleInTactical = mesh.Flags.OnlyVisibleInTactical;
                         meshRecords.Add(meshRecord);
                     }
 
@@ -401,6 +460,17 @@ namespace Editors.Reports.Bmd
                         spotLightRecord.PositionY = spotLight.Position.Y;
                         spotLightRecord.PositionZ = spotLight.Position.Z;
                         spotLightRecord.Color = $"{spotLight.IntensityRed},{spotLight.IntensityGreen},{spotLight.IntensityBlue}";
+                        spotLightRecord.PdlcMask = spotLight.PdlcMask;
+                        spotLightRecord.FlagsVersion = spotLight.Flags.FlagVersion;
+                        spotLightRecord.AllowInOutfield = spotLight.Flags.AllowInOutfield;
+                        spotLightRecord.ClampToSurface = spotLight.Flags.ClampToSurface;
+                        spotLightRecord.ClampToWaterSurface = spotLight.Flags.ClampToWaterSurface;
+                        spotLightRecord.SeasonSpring = spotLight.Flags.SeasonSpring;
+                        spotLightRecord.SeasonSummer = spotLight.Flags.SeasonSummer;
+                        spotLightRecord.SeasonAutumn = spotLight.Flags.SeasonAutumn;
+                        spotLightRecord.SeasonWinter = spotLight.Flags.SeasonWinter;
+                        spotLightRecord.VisibleInTactical = spotLight.Flags.VisibleInTactical;
+                        spotLightRecord.OnlyVisibleInTactical = spotLight.Flags.OnlyVisibleInTactical;
                         spotLightRecords.Add(spotLightRecord);
                     }
 
@@ -428,7 +498,6 @@ namespace Editors.Reports.Bmd
                         soundRecord.OuterBoundingBoxMaxX = sound.OuterCubeBoundingBox.Max.X;
                         soundRecord.OuterBoundingBoxMaxY = sound.OuterCubeBoundingBox.Max.Y;
                         soundRecord.OuterBoundingBoxMaxZ = sound.OuterCubeBoundingBox.Max.Z;
-                        soundRecord.RiverNodesLength = sound.RiverNodesLength;
                         soundRecord.ClampToSurface = sound.ClampToSurface;
                         soundRecord.HeightMode = sound.HeightMode;
                         soundRecord.CampaignTypeMask = sound.CampaignTypeMask;
@@ -612,7 +681,7 @@ namespace Editors.Reports.Bmd
             }
         }
 
-        void Write(List<dynamic> dataRecords, string filePath)
+        static void Write(List<dynamic> dataRecords, string filePath)
         {
             using var writer = new StringWriter();
             using var csv = new CsvWriter(writer, CultureInfo.InvariantCulture);
@@ -620,7 +689,7 @@ namespace Editors.Reports.Bmd
             File.WriteAllText(filePath, writer.ToString());
         }
 
-        private ValidationResult ValidateParsedData(BmdFile parsedFile, string filePath)
+        private static ValidationResult ValidateParsedData(BmdFile parsedFile, string filePath)
         {
             var errors = new List<string>();
 
@@ -719,12 +788,12 @@ namespace Editors.Reports.Bmd
 
             return new ValidationResult
             {
-                IsValid = !errors.Any(),
+                IsValid = errors.Count == 0,
                 ErrorMessage = string.Join("; ", errors)
             };
         }
 
-        private void ValidateStringField(IEnumerable<string> strings, string fieldName, List<string> errors)
+        private static void ValidateStringField(IEnumerable<string> strings, string fieldName, List<string> errors)
         {
             foreach (var str in strings)
             {
@@ -733,7 +802,7 @@ namespace Editors.Reports.Bmd
                 // Check for Unicode garbage characters
                 if (ContainsUnicodeGarbage(str))
                 {
-                    errors.Add($"Unicode garbage detected in {fieldName}: '{str.Substring(0, Math.Min(50, str.Length))}...'");
+                    errors.Add($"Unicode garbage detected in {fieldName}: '{str[..Math.Min(50, str.Length)]}...'");
                 }
 
                 // Check for unusually long strings (likely corrupted)
@@ -744,7 +813,7 @@ namespace Editors.Reports.Bmd
             }
         }
 
-        private bool ContainsUnicodeGarbage(string str)
+        private static bool ContainsUnicodeGarbage(string str)
         {
             // Check for common Unicode garbage patterns
             var garbagePatterns = new[]

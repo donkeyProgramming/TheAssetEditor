@@ -1,9 +1,6 @@
 using System;
 using System.Collections.ObjectModel;
-using System.IO;
-using System.Linq;
 using Shared.Core.PackFiles;
-using Shared.Core.PackFiles.Models;
 using Shared.GameFormats.Bmd;
 using Serilog;
 using Editors.BmdEditor.ViewModels;
@@ -13,17 +10,11 @@ namespace Editors.BmdEditor.Services
     /// <summary>
     /// Service for recursively loading BMD elements and their child elements
     /// </summary>
-    public class BmdElementLoader
+    public class BmdElementLoader(IPackFileService packFileService, BmdSceneCreator bmdSceneCreator)
     {
-        private readonly IPackFileService _packFileService;
+        private readonly IPackFileService _packFileService = packFileService;
         private readonly ILogger _logger = Serilog.Log.ForContext<BmdElementLoader>();
-        private readonly BmdSceneCreator _bmdSceneCreator;
-
-        public BmdElementLoader(IPackFileService packFileService, BmdSceneCreator bmdSceneCreator)
-        {
-            _packFileService = packFileService;
-            _bmdSceneCreator = bmdSceneCreator;
-        }
+        private readonly BmdSceneCreator _bmdSceneCreator = bmdSceneCreator;
 
         /// <summary>
         /// Loads all elements from a BMD file into the provided collections
@@ -140,7 +131,7 @@ namespace Editors.BmdEditor.Services
         private void LoadBmdInfos(BmdFile bmdFile, ObservableCollection<BmdInfoViewModel> bmdInfos, 
             ObservableCollection<BmdElementViewModel> allElements, bool loadChildBmds)
         {
-            for (int i = 0; i < bmdFile.BmdInfos.Count; i++)
+            for (var i = 0; i < bmdFile.BmdInfos.Count; i++)
             {
                 var bmd = bmdFile.BmdInfos[i];
                 _logger.Information($"Processing BMD reference: {bmd.BmdString}");
@@ -176,10 +167,10 @@ namespace Editors.BmdEditor.Services
             }
         }
 
-        private void LoadBattlefieldBuildings(BmdFile bmdFile, ObservableCollection<BattlefieldBuildingViewModel> battlefieldBuildings, 
+        private static void LoadBattlefieldBuildings(BmdFile bmdFile, ObservableCollection<BattlefieldBuildingViewModel> battlefieldBuildings, 
             ObservableCollection<BmdElementViewModel> allElements)
         {
-            for (int i = 0; i < bmdFile.BattlefieldBuildings.Count; i++)
+            for (var i = 0; i < bmdFile.BattlefieldBuildings.Count; i++)
             {
                 var building = bmdFile.BattlefieldBuildings[i];
                 var vm = new BattlefieldBuildingViewModel(building);
@@ -188,7 +179,7 @@ namespace Editors.BmdEditor.Services
             }
         }
 
-        private void LoadBattlefieldBuildingFars(BmdFile bmdFile, ObservableCollection<BattlefieldBuildingFarViewModel> battlefieldBuildingFars, 
+        private static void LoadBattlefieldBuildingFars(BmdFile bmdFile, ObservableCollection<BattlefieldBuildingFarViewModel> battlefieldBuildingFars, 
             ObservableCollection<BmdElementViewModel> allElements)
         {
             foreach (var buildingFar in bmdFile.BattlefieldBuildingFars)
@@ -199,7 +190,7 @@ namespace Editors.BmdEditor.Services
             }
         }
 
-        private void LoadCaptureLocations(BmdFile bmdFile, ObservableCollection<CaptureLocationViewModel> captureLocations, 
+        private static void LoadCaptureLocations(BmdFile bmdFile, ObservableCollection<CaptureLocationViewModel> captureLocations, 
             ObservableCollection<BmdElementViewModel> allElements)
         {
             foreach (var captureLocation in bmdFile.CaptureLocations)
@@ -210,7 +201,7 @@ namespace Editors.BmdEditor.Services
             }
         }
 
-        private void LoadEFLines(BmdFile bmdFile, ObservableCollection<EFLineViewModel> efLines, 
+        private static void LoadEFLines(BmdFile bmdFile, ObservableCollection<EFLineViewModel> efLines, 
             ObservableCollection<BmdElementViewModel> allElements)
         {
             foreach (var efLine in bmdFile.EFLines)
@@ -221,7 +212,7 @@ namespace Editors.BmdEditor.Services
             }
         }
 
-        private void LoadGoOutlines(BmdFile bmdFile, ObservableCollection<GoOutlineViewModel> goOutlines, 
+        private static void LoadGoOutlines(BmdFile bmdFile, ObservableCollection<GoOutlineViewModel> goOutlines, 
             ObservableCollection<BmdElementViewModel> allElements)
         {
             foreach (var goOutline in bmdFile.GoOutlines)
@@ -232,10 +223,10 @@ namespace Editors.BmdEditor.Services
             }
         }
 
-        private void LoadNonTerrainOutlines(BmdFile bmdFile, ObservableCollection<NonTerrainOutlineViewModel> nonTerrainOutlines, 
+        private static void LoadNonTerrainOutlines(BmdFile bmdFile, ObservableCollection<NonTerrainOutlineViewModel> nonTerrainOutlines, 
             ObservableCollection<BmdElementViewModel> allElements)
         {
-            for (int i = 0; i < bmdFile.NonTerrainOutlines.Count; i++)
+            for (var i = 0; i < bmdFile.NonTerrainOutlines.Count; i++)
             {
                 var nonTerrainOutline = bmdFile.NonTerrainOutlines[i];
                 var vm = new NonTerrainOutlineViewModel(nonTerrainOutline);
@@ -244,10 +235,10 @@ namespace Editors.BmdEditor.Services
             }
         }
 
-        private void LoadBuildingProjectileEmitters(BmdFile bmdFile, ObservableCollection<BuildingProjectileEmitterViewModel> buildingProjectileEmitters, 
+        private static void LoadBuildingProjectileEmitters(BmdFile bmdFile, ObservableCollection<BuildingProjectileEmitterViewModel> buildingProjectileEmitters, 
             ObservableCollection<BmdElementViewModel> allElements)
         {
-            for (int i = 0; i < bmdFile.BuildingProjectileEmitters.Count; i++)
+            for (var i = 0; i < bmdFile.BuildingProjectileEmitters.Count; i++)
             {
                 var buildingProjectileEmitter = bmdFile.BuildingProjectileEmitters[i];
                 var vm = new BuildingProjectileEmitterViewModel(buildingProjectileEmitter);
@@ -256,7 +247,7 @@ namespace Editors.BmdEditor.Services
             }
         }
 
-        private void LoadZonesTemplates(BmdFile bmdFile, ObservableCollection<ZonesTemplateViewModel> zonesTemplates, 
+        private static void LoadZonesTemplates(BmdFile bmdFile, ObservableCollection<ZonesTemplateViewModel> zonesTemplates, 
             ObservableCollection<BmdElementViewModel> allElements)
         {
             foreach (var zonesTemplate in bmdFile.ZonesTemplates)
@@ -267,10 +258,10 @@ namespace Editors.BmdEditor.Services
             }
         }
 
-        private void LoadProps(BmdFile bmdFile, ObservableCollection<PropInfoViewModel> props, 
+        private static void LoadProps(BmdFile bmdFile, ObservableCollection<PropInfoViewModel> props, 
             ObservableCollection<BmdElementViewModel> allElements)
         {
-            for (int i = 0; i < bmdFile.PropInfos.Count; i++)
+            for (var i = 0; i < bmdFile.PropInfos.Count; i++)
             {
                 var propInfo = bmdFile.PropInfos[i];
                 var vm = new PropInfoViewModel(propInfo, propInfo.Rmv2Path);
@@ -279,10 +270,10 @@ namespace Editors.BmdEditor.Services
             }
         }
 
-        private void LoadVfxInfos(BmdFile bmdFile, ObservableCollection<VfxInfoViewModel> vfxInfos, 
+        private static void LoadVfxInfos(BmdFile bmdFile, ObservableCollection<VfxInfoViewModel> vfxInfos, 
             ObservableCollection<BmdElementViewModel> allElements)
         {
-            for (int i = 0; i < bmdFile.VfxInfos.Count; i++)
+            for (var i = 0; i < bmdFile.VfxInfos.Count; i++)
             {
                 var vfx = bmdFile.VfxInfos[i];
                 var vm = new VfxInfoViewModel(vfx);
@@ -291,10 +282,10 @@ namespace Editors.BmdEditor.Services
             }
         }
 
-        private void LoadPointLights(BmdFile bmdFile, ObservableCollection<PointLightInfoViewModel> pointLights, 
+        private static void LoadPointLights(BmdFile bmdFile, ObservableCollection<PointLightInfoViewModel> pointLights, 
             ObservableCollection<BmdElementViewModel> allElements)
         {
-            for (int i = 0; i < bmdFile.PointLights.Count; i++)
+            for (var i = 0; i < bmdFile.PointLights.Count; i++)
             {
                 var light = bmdFile.PointLights[i];
                 var vm = new PointLightInfoViewModel(light);
@@ -303,10 +294,10 @@ namespace Editors.BmdEditor.Services
             }
         }
 
-        private void LoadSpotLights(BmdFile bmdFile, ObservableCollection<SpotLightInfoViewModel> spotLights, 
+        private static void LoadSpotLights(BmdFile bmdFile, ObservableCollection<SpotLightInfoViewModel> spotLights, 
             ObservableCollection<BmdElementViewModel> allElements)
         {
-            for (int i = 0; i < bmdFile.SpotLights.Count; i++)
+            for (var i = 0; i < bmdFile.SpotLights.Count; i++)
             {
                 var light = bmdFile.SpotLights[i];
                 var vm = new SpotLightInfoViewModel(light);
@@ -315,7 +306,7 @@ namespace Editors.BmdEditor.Services
             }
         }
 
-        private void LoadSounds(BmdFile bmdFile, ObservableCollection<SoundInfoViewModel> sounds, 
+        private static void LoadSounds(BmdFile bmdFile, ObservableCollection<SoundInfoViewModel> sounds, 
             ObservableCollection<BmdElementViewModel> allElements)
         {
             foreach (var sound in bmdFile.Sounds)
@@ -326,10 +317,10 @@ namespace Editors.BmdEditor.Services
             }
         }
 
-        private void LoadPolyMeshes(BmdFile bmdFile, ObservableCollection<PolyMeshInfoViewModel> polyMeshes, 
+        private static void LoadPolyMeshes(BmdFile bmdFile, ObservableCollection<PolyMeshInfoViewModel> polyMeshes, 
             ObservableCollection<BmdElementViewModel> allElements)
         {
-            for (int i = 0; i < bmdFile.PolyMeshes.Count; i++)
+            for (var i = 0; i < bmdFile.PolyMeshes.Count; i++)
             {
                 var mesh = bmdFile.PolyMeshes[i];
                 var vm = new PolyMeshInfoViewModel(mesh);
@@ -338,10 +329,10 @@ namespace Editors.BmdEditor.Services
             }
         }
 
-        private void LoadLightProbes(BmdFile bmdFile, ObservableCollection<LightProbeInfoViewModel> lightProbes, 
+        private static void LoadLightProbes(BmdFile bmdFile, ObservableCollection<LightProbeInfoViewModel> lightProbes, 
             ObservableCollection<BmdElementViewModel> allElements)
         {
-            for (int i = 0; i < bmdFile.LightProbes.Count; i++)
+            for (var i = 0; i < bmdFile.LightProbes.Count; i++)
             {
                 var probe = bmdFile.LightProbes[i];
                 var vm = new LightProbeInfoViewModel(probe);
@@ -350,10 +341,10 @@ namespace Editors.BmdEditor.Services
             }
         }
 
-        private void LoadTerrainHoles(BmdFile bmdFile, ObservableCollection<TerrainHoleInfoViewModel> terrainHoles, 
+        private static void LoadTerrainHoles(BmdFile bmdFile, ObservableCollection<TerrainHoleInfoViewModel> terrainHoles, 
             ObservableCollection<BmdElementViewModel> allElements)
         {
-            for (int i = 0; i < bmdFile.TerrainHoles.Count; i++)
+            for (var i = 0; i < bmdFile.TerrainHoles.Count; i++)
             {
                 var hole = bmdFile.TerrainHoles[i];
                 var vm = new TerrainHoleInfoViewModel(hole);
@@ -362,7 +353,7 @@ namespace Editors.BmdEditor.Services
             }
         }
 
-        private void LoadPlayableAreas(BmdFile bmdFile, ObservableCollection<PlayableAreaViewModel> playableAreas, 
+        private static void LoadPlayableAreas(BmdFile bmdFile, ObservableCollection<PlayableAreaViewModel> playableAreas, 
             ObservableCollection<BmdElementViewModel> allElements)
         {
             if (bmdFile.PlayableArea != null)
@@ -373,10 +364,10 @@ namespace Editors.BmdEditor.Services
             }
         }
 
-        private void LoadCscInfos(BmdFile bmdFile, ObservableCollection<CscInfoViewModel> cscInfos, 
+        private static void LoadCscInfos(BmdFile bmdFile, ObservableCollection<CscInfoViewModel> cscInfos, 
             ObservableCollection<BmdElementViewModel> allElements)
         {
-            for (int i = 0; i < bmdFile.CscInfos.Count; i++)
+            for (var i = 0; i < bmdFile.CscInfos.Count; i++)
             {
                 var csc = bmdFile.CscInfos[i];
                 var vm = new CscInfoViewModel(csc);
@@ -385,10 +376,10 @@ namespace Editors.BmdEditor.Services
             }
         }
 
-        private void LoadDeployments(BmdFile bmdFile, ObservableCollection<DeploymentViewModel> deployments, 
+        private static void LoadDeployments(BmdFile bmdFile, ObservableCollection<DeploymentViewModel> deployments, 
             ObservableCollection<BmdElementViewModel> allElements)
         {
-            for (int i = 0; i < bmdFile.Deployments.Count; i++)
+            for (var i = 0; i < bmdFile.Deployments.Count; i++)
             {
                 var deployment = bmdFile.Deployments[i];
                 var vm = new DeploymentViewModel(deployment);

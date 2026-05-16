@@ -1,5 +1,3 @@
-using System;
-using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Shared.GameFormats.RigidModel.Transforms;
 
@@ -8,41 +6,41 @@ namespace Shared.GameFormats.Bmd
     public class BmdFile
     {
         public FastBinHeader Header { get; set; } = new FastBinHeader();
-        public List<BattlefieldBuilding> BattlefieldBuildings { get; set; } = new();
-        public List<BattlefieldBuildingFar> BattlefieldBuildingFars { get; set; } = new();
-        public List<CaptureLocation> CaptureLocations { get; set; } = new();
-        public List<EFLine> EFLines { get; set; } = new();
-        public List<GoOutline> GoOutlines { get; set; } = new();
-        public List<NonTerrainOutline> NonTerrainOutlines { get; set; } = new();
-        public List<ZonesTemplate> ZonesTemplates { get; set; } = new();
-        public List<BmdInfo> BmdInfos { get; set; } = new();
-        public List<BmdOutline> BmdOutlines { get; set; } = new();
-        public List<TerrainOutline> TerrainOutlines { get; set; } = new();
-        public List<LiteBuildingOutline> LiteBuildingOutlines { get; set; } = new();
-        public List<CameraZone> CameraZones { get; set; } = new();
-        public List<CivilianDeployment> CivilianDeployments { get; set; } = new();
-        public List<CivilianShelter> CivilianShelters { get; set; } = new();
-        public List<string> Props { get; set; } = new();
-        public List<PropInfo> PropInfos { get; set; } = new();
-        public List<VfxInfo> VfxInfos { get; set; } = new();
+        public List<BattlefieldBuilding> BattlefieldBuildings { get; set; } = [];
+        public List<BattlefieldBuildingFar> BattlefieldBuildingFars { get; set; } = [];
+        public List<CaptureLocation> CaptureLocations { get; set; } = [];
+        public List<EFLine> EFLines { get; set; } = [];
+        public List<GoOutline> GoOutlines { get; set; } = [];
+        public List<NonTerrainOutline> NonTerrainOutlines { get; set; } = [];
+        public List<ZonesTemplate> ZonesTemplates { get; set; } = [];
+        public List<BmdInfo> BmdInfos { get; set; } = [];
+        public List<BmdOutline> BmdOutlines { get; set; } = [];
+        public List<TerrainOutline> TerrainOutlines { get; set; } = [];
+        public List<LiteBuildingOutline> LiteBuildingOutlines { get; set; } = [];
+        public List<CameraZone> CameraZones { get; set; } = [];
+        public List<CivilianDeployment> CivilianDeployments { get; set; } = [];
+        public List<CivilianShelter> CivilianShelters { get; set; } = [];
+        public List<string> Props { get; set; } = [];
+        public List<PropInfo> PropInfos { get; set; } = [];
+        public List<VfxInfo> VfxInfos { get; set; } = [];
         public AiHints AiHints { get; set; } = new();
-        public List<LightProbeInfo> LightProbes { get; set; } = new();
-        public List<TerrainHoleTriangleInfo> TerrainHoles { get; set; } = new();
-        public List<PointLightInfo> PointLights { get; set; } = new();
-        public List<BuildingProjectileEmitter> BuildingProjectileEmitters { get; set; } = new();
+        public List<LightProbeInfo> LightProbes { get; set; } = [];
+        public List<TerrainHoleTriangleInfo> TerrainHoles { get; set; } = [];
+        public List<PointLightInfo> PointLights { get; set; } = [];
+        public List<BuildingProjectileEmitter> BuildingProjectileEmitters { get; set; } = [];
         public PlayableArea PlayableArea { get; set; } = new();
-        public List<PolyMeshInfo> PolyMeshes { get; set; } = new();
-        public List<TerrainStencilBlendTriangle> TerrainStencilBlendTriangles { get; set; } = new();
-        public List<SpotLightInfo> SpotLights { get; set; } = new();
-        public List<SoundInfo> Sounds { get; set; } = new();
-        public List<CscInfo> CscInfos { get; set; } = new();
-        public List<Deployment> Deployments { get; set; } = new();
-        public List<BmdCachedArea> BmdCachedAreas { get; set; } = new();
-        public List<ToggleableBuildingSlot> ToggleableBuildingSlots { get; set; } = new();
-        public List<TerraindDecal> TerraindDecals { get; set; } = new();
-        public List<TreeListReference> TreeListReferences { get; set; } = new();
-        public List<GrassListReference> GrassListReferences { get; set; } = new();
-        public List<WaterOutline> WaterOutlines { get; set; } = new();
+        public List<PolyMeshInfo> PolyMeshes { get; set; } = [];
+        public List<TerrainStencilBlendTriangle> TerrainStencilBlendTriangles { get; set; } = [];
+        public List<SpotLightInfo> SpotLights { get; set; } = [];
+        public List<SoundInfo> Sounds { get; set; } = [];
+        public List<CscInfo> CscInfos { get; set; } = [];
+        public List<Deployment> Deployments { get; set; } = [];
+        public List<BmdCachedArea> BmdCachedAreas { get; set; } = [];
+        public List<ToggleableBuildingSlot> ToggleableBuildingSlots { get; set; } = [];
+        public List<TerraindDecal> TerraindDecals { get; set; } = [];
+        public List<TreeListReference> TreeListReferences { get; set; } = [];
+        public List<GrassListReference> GrassListReferences { get; set; } = [];
+        public List<WaterOutline> WaterOutlines { get; set; } = [];
 
         //Pharaoh Exclusive classes (for Pharaoh's version of the version 25 BMD format)
         public CameraZoneNew CameraZoneNew { get; set; } = new();
@@ -161,7 +159,7 @@ namespace Shared.GameFormats.Bmd
         public int Something5 { get; set; }
         public string Str { get; set; } = string.Empty;
         public string Str2 { get; set; } = string.Empty;
-        public float[] Coords { get; set; } = Array.Empty<float>();
+        public float[] Coords { get; set; } = [];
         public string Str3 { get; set; } = string.Empty;
         public float Something6 { get; set; }
         public float Something7 { get; set; }
@@ -179,32 +177,29 @@ namespace Shared.GameFormats.Bmd
 
     public class GoOutline
     {
-        //TODO: Not properly implemented
-        public ushort Version { get; set; }
+        public List<RmvVector2> VertexList { get; set; } = [];
     }
 
     public class NonTerrainOutline
     {
-        public List<RmvVector2> VertexList { get; set; } = new();
+        public List<RmvVector2> VertexList { get; set; } = [];
     }
 
     public class ZonesTemplate
     {
-        public ushort Version { get; set; }
-        public List<RmvVector2> Outline { get; set; } = new();
+        public List<RmvVector2> Outline { get; set; } = [];
         public string ZoneName { get; set; } = string.Empty;
         public string EntityFormationTemplateName { get; set; } = string.Empty;
         public uint LinesLength { get; set; }
-        public byte[] LinesData { get; set; } = new byte[0]; // Raw data since Lines structure is unknown
-        public float[] TransformMatrix { get; set; } = new float[16]; // 4x4 transform matrix
-    }
+        public byte[] LinesData { get; set; } = []; // Raw data since Lines structure is unknown
+        public Matrix Transform { get; set; } = Matrix.Identity;} //4x4
     
     public class BmdInfo
     {
         public ushort Version { get; set; }
         public string BmdString { get; set; } = string.Empty;
         public Matrix Transform { get; set; } = Matrix.Identity;
-        public byte[] SeasonsMaybe { get; set; } = new byte[4]; //this has to correspond to <property_overrides/>
+        public uint PropertyOverrides { get; set; } //this has to correspond to <property_overrides/>
         public CultureMask CultureMask { get; set; } //"campaign_type_mask"?
         public string RegionString { get; set; } = string.Empty;
         public string HeightMode { get; set; } = string.Empty;
@@ -304,14 +299,17 @@ namespace Shared.GameFormats.Bmd
         public bool VisibleInShroud { get; set; }
         public int ParentId { get; set; }
         public bool VisibleInShroudOnly { get; set; }
+
+        // Early version 4 specific fields
+        public byte[] EarlyVersionUnknownBytes { get; set; } = new byte[12];
     }
 
     public class AiHints
     {
-        public List<Separator> Separators { get; set; } = new();
-        public List<DirectedPoint> DirectedPoints { get; set; } = new();
-        public List<HintPolyLine> PolyLines { get; set; } = new();
-        public List<HintPolyLineList> PolyLinesList { get; set; } = new();
+        public List<Separator> Separators { get; set; } = [];
+        public List<DirectedPoint> DirectedPoints { get; set; } = [];
+        public List<HintPolyLine> PolyLines { get; set; } = [];
+        public List<HintPolyLineList> PolyLinesList { get; set; } = [];
     }
 
     public class Separator
@@ -334,7 +332,7 @@ namespace Shared.GameFormats.Bmd
         public bool OnlyVanguard { get; set; }
         public bool OnlyDeployWhenClear { get; set; }
         public bool SpawnVfx { get; set; }
-        public List<RmvVector2> Points { get; set; } = new();
+        public List<RmvVector2> Points { get; set; } = [];
     }
 
     public class HintPolyLineList
@@ -342,12 +340,12 @@ namespace Shared.GameFormats.Bmd
         public ushort Version { get; set; }
         public string Type { get; set; } = string.Empty;
         public uint District { get; set; }
-        public List<Polygon> PolygonList { get; set; } = new();
+        public List<Polygon> PolygonList { get; set; } = [];
     }
 
     public class Polygon
     {
-        public List<RmvVector2> Points { get; set; } = new();
+        public List<RmvVector2> Points { get; set; } = [];
     }
 
     public class LightProbeInfo
@@ -368,7 +366,7 @@ namespace Shared.GameFormats.Bmd
         public RmvVector3 SecondVert { get; set; }
         public RmvVector3 ThirdVert { get; set; }
         public string HeightMode { get; set; } = string.Empty;
-        public byte[] Booleans { get; set; } = new byte[10];
+        public BmdComponentFlags Flags { get; set; } = new();
     }
 
     public class PointLightInfo
@@ -390,14 +388,14 @@ namespace Shared.GameFormats.Bmd
         public string HeightMode { get; set; } = string.Empty;
         public bool LightProbeOnly { get; set; }
         public ulong PdlcMask { get; set; }
-        public byte[] MoreData2 { get; set; } = new byte[10];
+        public BmdComponentFlags Flags { get; set; } = new();
     }
 
     public class BuildingProjectileEmitter
     {
         public ushort BuildingProjectileEmitterVersion { get; set; }
         public RmvVector3 Location { get; set; }
-        public float[] Rotation { get; set; } = new float[3];
+        public float[] Rotation { get; set; } = [0, 0, 0];
         public uint BuildingIndex { get; set; }
         public string HeightMode { get; set; } = string.Empty;
         public string SpecializedBuildingProjectileEmitterKey { get; set; } = string.Empty;
@@ -407,7 +405,7 @@ namespace Shared.GameFormats.Bmd
     {
         public ushort PlayableAreaVersion { get; set; }
         public bool HasBeenSet { get; set; }
-        public float[] BoundingBox { get; set; } = new float[4];
+        public float[] BoundingBox { get; set; } = [0, 0, 0, 0];
         public ushort FlagVersion { get; set; }
         public bool Flag1 { get; set; }
         public bool Flag2 { get; set; }
@@ -418,13 +416,11 @@ namespace Shared.GameFormats.Bmd
     public class PolyMeshInfo
     {
         public ushort PolyMeshVersion { get; set; }
-        public RmvVector3[] VertexList { get; set; } = Array.Empty<RmvVector3>();
-        public ushort[] TriangleList { get; set; } = Array.Empty<ushort>();
+        public RmvVector3[] VertexList { get; set; } = [];
+        public ushort[] TriangleList { get; set; } = [];
         public string MaterialString { get; set; } = string.Empty;
         public string HeightMode { get; set; } = string.Empty;
-        public byte[] MoreData { get; set; } = new byte[8];
-        public bool VisibleInTactical { get; set; }
-        public bool OnlyVisibleInTactical { get; set; }
+        public BmdComponentFlags Flags { get; set; } = new();
         public Matrix Transform { get; set; } = Matrix.Identity;
         public byte[] Booleans { get; set; } = new byte[4];
         public bool VisibleInShroud { get; set; }
@@ -455,7 +451,16 @@ namespace Shared.GameFormats.Bmd
         public string Gobo { get; set; } = string.Empty;
         public bool Volumetric { get; set; }
         public string HeightMode { get; set; } = string.Empty;
-        public byte[] MoreData { get; set; } = new byte[18];
+        public ulong PdlcMask { get; set; }
+        public BmdComponentFlags Flags { get; set; } = new();
+    }
+
+    public class RiverNode
+    {
+        public ushort Version { get; set; }
+        public RmvVector3 Position { get; set; }
+        public float Something1 { get; set; }
+        public float Something2 { get; set; }
     }
 
     public class SoundInfo
@@ -463,12 +468,12 @@ namespace Shared.GameFormats.Bmd
         public ushort Version { get; set; }
         public string SoundString { get; set; } = string.Empty;
         public string TypeString { get; set; } = string.Empty;
-        public RmvVector3[] CoordList { get; set; } = Array.Empty<RmvVector3>();
+        public RmvVector3[] CoordList { get; set; } = [];
         public float InnerRadius { get; set; }
         public float OuterRadius { get; set; }
         public (RmvVector3 Min, RmvVector3 Max) InnerCubeBoundingBox { get; set; }
         public (RmvVector3 Min, RmvVector3 Max) OuterCubeBoundingBox { get; set; }
-        public uint RiverNodesLength { get; set; }
+        public RiverNode[] RiverNodeList { get; set; } = [];
         public byte ClampToSurface { get; set; }
         public string HeightMode { get; set; } = string.Empty;
         public ulong CampaignTypeMask { get; set; }
@@ -501,19 +506,19 @@ namespace Shared.GameFormats.Bmd
     {
         public ushort Version { get; set; }
         public string Category { get; set; } = string.Empty;
-        public List<DeploymentZone> DeploymentZones { get; set; } = new();
+        public List<DeploymentZone> DeploymentZones { get; set; } = [];
     }
 
     public class DeploymentZone
     {
         public ushort Version { get; set; }
-        public List<DeploymentZoneRegion> DeploymentZoneRegions { get; set; } = new();
+        public List<DeploymentZoneRegion> DeploymentZoneRegions { get; set; } = [];
     }
 
     public class DeploymentZoneRegion
     {
         public ushort Version { get; set; }
-        public List<Boundary> Boundaries { get; set; } = new();
+        public List<Boundary> Boundaries { get; set; } = [];
         public float Orientation { get; set; }
         public byte SnapFacing { get; set; }
         public uint Id { get; set; }
@@ -523,7 +528,7 @@ namespace Shared.GameFormats.Bmd
     {
         public ushort Version { get; set; }
         public string BoundaryType { get; set; } = string.Empty;
-        public List<RmvVector2> PointList { get; set; } = new();
+        public List<RmvVector2> PointList { get; set; } = [];
     }
 
     public class BmdCachedArea

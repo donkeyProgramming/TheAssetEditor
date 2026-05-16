@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.ObjectModel;
 using System.IO;
-using System.Linq;
 using System.Windows.Input;
 using CommunityToolkit.Mvvm.Input;
 using Shared.Core.Misc;
@@ -9,15 +8,13 @@ using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
 using Shared.Core.ToolCreation;
 using Shared.Core.Services;
-using Shared.Core.ErrorHandling;
 using Shared.GameFormats.Bmd;
 using GameWorld.Core.Services;
 using GameWorld.Core.Rendering.Materials;
 using GameWorld.Core.Components;
 using GameWorld.Core.Components.Selection;
 using GameWorld.Core.SceneNodes;
-using Serilog;
-using Editors.BmdEditor.Services; // Added missing using directive
+using Editors.BmdEditor.Services;
 
 namespace Editors.BmdEditor.ViewModels
 {
@@ -43,27 +40,27 @@ namespace Editors.BmdEditor.ViewModels
         }
 
         // Collections for different element types
-        public ObservableCollection<BmdElementViewModel> AllElements { get; } = new();
-        public ObservableCollection<BattlefieldBuildingViewModel> BattlefieldBuildings { get; } = new();
-        public ObservableCollection<BattlefieldBuildingFarViewModel> BattlefieldBuildingFars { get; } = new();
-        public ObservableCollection<CaptureLocationViewModel> CaptureLocations { get; } = new();
-        public ObservableCollection<EFLineViewModel> EFLines { get; } = new();
-        public ObservableCollection<GoOutlineViewModel> GoOutlines { get; } = new();
-        public ObservableCollection<NonTerrainOutlineViewModel> NonTerrainOutlines { get; } = new();
-        public ObservableCollection<BuildingProjectileEmitterViewModel> BuildingProjectileEmitters { get; } = new();
-        public ObservableCollection<ZonesTemplateViewModel> ZonesTemplates { get; } = new();
-        public ObservableCollection<BmdInfoViewModel> BmdInfos { get; } = new();
-        public ObservableCollection<PropInfoViewModel> Props { get; } = new();
-        public ObservableCollection<VfxInfoViewModel> VfxInfos { get; } = new();
-        public ObservableCollection<PointLightInfoViewModel> PointLights { get; } = new();
-        public ObservableCollection<SpotLightInfoViewModel> SpotLights { get; } = new();
-        public ObservableCollection<SoundInfoViewModel> Sounds { get; } = new();
-        public ObservableCollection<PolyMeshInfoViewModel> PolyMeshes { get; } = new();
-        public ObservableCollection<LightProbeInfoViewModel> LightProbes { get; } = new();
-        public ObservableCollection<TerrainHoleInfoViewModel> TerrainHoles { get; } = new();
-        public ObservableCollection<PlayableAreaViewModel> PlayableAreas { get; } = new();
-        public ObservableCollection<CscInfoViewModel> CscInfos { get; } = new();
-        public ObservableCollection<DeploymentViewModel> Deployments { get; } = new();
+        public ObservableCollection<BmdElementViewModel> AllElements { get; } = [];
+        public ObservableCollection<BattlefieldBuildingViewModel> BattlefieldBuildings { get; } = [];
+        public ObservableCollection<BattlefieldBuildingFarViewModel> BattlefieldBuildingFars { get; } = [];
+        public ObservableCollection<CaptureLocationViewModel> CaptureLocations { get; } = [];
+        public ObservableCollection<EFLineViewModel> EFLines { get; } = [];
+        public ObservableCollection<GoOutlineViewModel> GoOutlines { get; } = [];
+        public ObservableCollection<NonTerrainOutlineViewModel> NonTerrainOutlines { get; } = [];
+        public ObservableCollection<BuildingProjectileEmitterViewModel> BuildingProjectileEmitters { get; } = [];
+        public ObservableCollection<ZonesTemplateViewModel> ZonesTemplates { get; } = [];
+        public ObservableCollection<BmdInfoViewModel> BmdInfos { get; } = [];
+        public ObservableCollection<PropInfoViewModel> Props { get; } = [];
+        public ObservableCollection<VfxInfoViewModel> VfxInfos { get; } = [];
+        public ObservableCollection<PointLightInfoViewModel> PointLights { get; } = [];
+        public ObservableCollection<SpotLightInfoViewModel> SpotLights { get; } = [];
+        public ObservableCollection<SoundInfoViewModel> Sounds { get; } = [];
+        public ObservableCollection<PolyMeshInfoViewModel> PolyMeshes { get; } = [];
+        public ObservableCollection<LightProbeInfoViewModel> LightProbes { get; } = [];
+        public ObservableCollection<TerrainHoleInfoViewModel> TerrainHoles { get; } = [];
+        public ObservableCollection<PlayableAreaViewModel> PlayableAreas { get; } = [];
+        public ObservableCollection<CscInfoViewModel> CscInfos { get; } = [];
+        public ObservableCollection<DeploymentViewModel> Deployments { get; } = [];
 
         // Commands
         public ICommand RefreshCommand { get; }
@@ -87,7 +84,7 @@ namespace Editors.BmdEditor.ViewModels
         }
 
         private readonly BmdSceneCreator _bmdSceneCreator;
-        private readonly SelectionManager _selectionManager;
+        private readonly SelectionManager? _selectionManager;
         private readonly BmdElementLoader _bmdElementLoader;
 
         public IWpfGame Scene { get; set; }
@@ -114,7 +111,7 @@ namespace Editors.BmdEditor.ViewModels
             _eventHub = eventHub;
             _graphicsResourceCreator = graphicsResourceCreator;
             _bmdSceneCreator = bmdSceneCreator;
-            _selectionManager = selectionManager;
+            _selectionManager = selectionManager!;
             _bmdElementLoader = bmdElementLoader;
             
             Scene = gameWorld;
@@ -288,7 +285,7 @@ namespace Editors.BmdEditor.ViewModels
                     ComponentDetails += $"\n[DEBUG] Found selectable node: {selectableNode.Name}";
                     
                     // Clear current selection and select the new object
-                    var objectSelection = _selectionManager.GetState<ObjectSelectionState>();
+                    var objectSelection = _selectionManager!.GetState<ObjectSelectionState>();
                     if (objectSelection != null)
                     {
                         objectSelection.Clear();
@@ -315,7 +312,7 @@ namespace Editors.BmdEditor.ViewModels
             }
         }
 
-        private ISelectable? FindFirstSelectableNode(ISceneNode sceneNode)
+        private static ISelectable? FindFirstSelectableNode(ISceneNode sceneNode)
         {
             // Check if the current node is selectable
             if (sceneNode is ISelectable selectable)
@@ -332,7 +329,7 @@ namespace Editors.BmdEditor.ViewModels
             return null;
         }
 
-        private string GenerateComponentDetails(BmdElementViewModel component)
+        private static string GenerateComponentDetails(BmdElementViewModel component)
         {
             var details = new System.Text.StringBuilder();
             details.AppendLine($"Type: {component.ElementType}");
@@ -383,6 +380,16 @@ namespace Editors.BmdEditor.ViewModels
                     details.AppendLine($"  Falloff Type: {light.Light.FalloffType}");
                     details.AppendLine($"  Height Mode: {light.Light.HeightMode}");
                     details.AppendLine($"  Light Probe Only: {light.Light.LightProbeOnly}");
+                    details.AppendLine($"  Flags Version: {light.Light.Flags.FlagVersion}");
+                    details.AppendLine($"  Allow In Outfield: {light.Light.Flags.AllowInOutfield}");
+                    details.AppendLine($"  Clamp To Surface: {light.Light.Flags.ClampToSurface}");
+                    details.AppendLine($"  Clamp To Water Surface: {light.Light.Flags.ClampToWaterSurface}");
+                    details.AppendLine($"  Season Spring: {light.Light.Flags.SeasonSpring}");
+                    details.AppendLine($"  Season Summer: {light.Light.Flags.SeasonSummer}");
+                    details.AppendLine($"  Season Autumn: {light.Light.Flags.SeasonAutumn}");
+                    details.AppendLine($"  Season Winter: {light.Light.Flags.SeasonWinter}");
+                    details.AppendLine($"  Visible In Tactical: {light.Light.Flags.VisibleInTactical}");
+                    details.AppendLine($"  Only Visible In Tactical: {light.Light.Flags.OnlyVisibleInTactical}");
                     break;
 
                 case SpotLightInfoViewModel spotLight:
@@ -393,6 +400,17 @@ namespace Editors.BmdEditor.ViewModels
                     details.AppendLine($"  Inner Angle: {spotLight.Light.InnerAngleRadians:F2}");
                     details.AppendLine($"  Outer Angle: {spotLight.Light.OuterAngleRadians:F2}");
                     details.AppendLine($"  Color: ({spotLight.Light.IntensityRed:F2}, {spotLight.Light.IntensityGreen:F2}, {spotLight.Light.IntensityBlue:F2})");
+                    details.AppendLine($"  PdlcMask: {spotLight.Light.PdlcMask}");
+                    details.AppendLine($"  Flags Version: {spotLight.Light.Flags.FlagVersion}");
+                    details.AppendLine($"  Allow In Outfield: {spotLight.Light.Flags.AllowInOutfield}");
+                    details.AppendLine($"  Clamp To Surface: {spotLight.Light.Flags.ClampToSurface}");
+                    details.AppendLine($"  Clamp To Water Surface: {spotLight.Light.Flags.ClampToWaterSurface}");
+                    details.AppendLine($"  Season Spring: {spotLight.Light.Flags.SeasonSpring}");
+                    details.AppendLine($"  Season Summer: {spotLight.Light.Flags.SeasonSummer}");
+                    details.AppendLine($"  Season Autumn: {spotLight.Light.Flags.SeasonAutumn}");
+                    details.AppendLine($"  Season Winter: {spotLight.Light.Flags.SeasonWinter}");
+                    details.AppendLine($"  Visible In Tactical: {spotLight.Light.Flags.VisibleInTactical}");
+                    details.AppendLine($"  Only Visible In Tactical: {spotLight.Light.Flags.OnlyVisibleInTactical}");
                     break;
 
                 case SoundInfoViewModel sound:
@@ -417,7 +435,16 @@ namespace Editors.BmdEditor.ViewModels
                     details.AppendLine($"  Material: {mesh.Mesh.MaterialString}");
                     details.AppendLine($"  Vertices: {mesh.Mesh.VertexList.Length}");
                     details.AppendLine($"  Triangles: {mesh.Mesh.TriangleList.Length / 3}");
-                    details.AppendLine($"  Visible In Tactical: {mesh.Mesh.VisibleInTactical}");
+                    details.AppendLine($"  Flags Version: {mesh.Mesh.Flags.FlagVersion}");
+                    details.AppendLine($"  Allow In Outfield: {mesh.Mesh.Flags.AllowInOutfield}");
+                    details.AppendLine($"  Clamp To Surface: {mesh.Mesh.Flags.ClampToSurface}");
+                    details.AppendLine($"  Clamp To Water Surface: {mesh.Mesh.Flags.ClampToWaterSurface}");
+                    details.AppendLine($"  Season Spring: {mesh.Mesh.Flags.SeasonSpring}");
+                    details.AppendLine($"  Season Summer: {mesh.Mesh.Flags.SeasonSummer}");
+                    details.AppendLine($"  Season Autumn: {mesh.Mesh.Flags.SeasonAutumn}");
+                    details.AppendLine($"  Season Winter: {mesh.Mesh.Flags.SeasonWinter}");
+                    details.AppendLine($"  Visible In Tactical: {mesh.Mesh.Flags.VisibleInTactical}");
+                    details.AppendLine($"  Only Visible In Tactical: {mesh.Mesh.Flags.OnlyVisibleInTactical}");
                     break;
 
                 case LightProbeInfoViewModel probe:
@@ -434,6 +461,16 @@ namespace Editors.BmdEditor.ViewModels
                     details.AppendLine("Terrain Hole Details:");
                     details.AppendLine($"  Version: {hole.Hole.TerrainHoleVersion}");
                     details.AppendLine($"  Position: ({hole.Hole.FirstVert.X:F2}, {hole.Hole.FirstVert.Y:F2}, {hole.Hole.FirstVert.Z:F2})");
+                    details.AppendLine($"  Flags Version: {hole.Hole.Flags.FlagVersion}");
+                    details.AppendLine($"  Allow In Outfield: {hole.Hole.Flags.AllowInOutfield}");
+                    details.AppendLine($"  Clamp To Surface: {hole.Hole.Flags.ClampToSurface}");
+                    details.AppendLine($"  Clamp To Water Surface: {hole.Hole.Flags.ClampToWaterSurface}");
+                    details.AppendLine($"  Season Spring: {hole.Hole.Flags.SeasonSpring}");
+                    details.AppendLine($"  Season Summer: {hole.Hole.Flags.SeasonSummer}");
+                    details.AppendLine($"  Season Autumn: {hole.Hole.Flags.SeasonAutumn}");
+                    details.AppendLine($"  Season Winter: {hole.Hole.Flags.SeasonWinter}");
+                    details.AppendLine($"  Visible In Tactical: {hole.Hole.Flags.VisibleInTactical}");
+                    details.AppendLine($"  Only Visible In Tactical: {hole.Hole.Flags.OnlyVisibleInTactical}");
                     break;
 
                 case CscInfoViewModel csc:
@@ -479,7 +516,7 @@ namespace Editors.BmdEditor.ViewModels
 
                 case GoOutlineViewModel goOutline:
                     details.AppendLine("GO Outline Details:");
-                    details.AppendLine($"  Version: {goOutline.GoOutline.Version}");
+                    details.AppendLine($"  Vertices: {goOutline.GoOutline.VertexList.Count}");
                     break;
 
                 case NonTerrainOutlineViewModel nonTerrainOutline:
@@ -496,7 +533,6 @@ namespace Editors.BmdEditor.ViewModels
 
                 case ZonesTemplateViewModel zonesTemplate:
                     details.AppendLine("Zones Template Details:");
-                    details.AppendLine($"  Version: {zonesTemplate.ZonesTemplate.Version}");
                     details.AppendLine($"  Outline Points: {zonesTemplate.ZonesTemplate.Outline.Count}");
                     break;
 
@@ -542,7 +578,7 @@ namespace Editors.BmdEditor.ViewModels
                     if (boundary.Boundary.PointList.Count > 0)
                     {
                         details.AppendLine("  First few points:");
-                        for (int i = 0; i < Math.Min(3, boundary.Boundary.PointList.Count); i++)
+                        for (var i = 0; i < Math.Min(3, boundary.Boundary.PointList.Count); i++)
                         {
                             var point = boundary.Boundary.PointList[i];
                             details.AppendLine($"    Point {i + 1}: ({point.X:F2}, {point.Y:F2})");
@@ -660,7 +696,7 @@ namespace Editors.BmdEditor.ViewModels
             return null;
         }
 
-        private bool IsNodeOrDescendant(ISceneNode node, ISelectable target)
+        private static bool IsNodeOrDescendant(ISceneNode node, ISelectable target)
         {
             // Check if the node itself is the target
             if (node == target)
@@ -684,246 +720,124 @@ namespace Editors.BmdEditor.ViewModels
             
             // Unregister from events
             _eventHub?.UnRegister(this);
+            GC.SuppressFinalize(this);
         }
     }
 
     // Base class for all BMD element view models
-    public abstract class BmdElementViewModel : NotifyPropertyChangedImpl
+    public abstract class BmdElementViewModel(string elementType, string displayName, string description = "") : NotifyPropertyChangedImpl
     {
-        public string ElementType { get; }
-        public string DisplayName { get; }
-        public string Description { get; }
-        public virtual ObservableCollection<BmdElementViewModel> Children { get; } = new();
-
-        protected BmdElementViewModel(string elementType, string displayName, string description = "")
-        {
-            ElementType = elementType;
-            DisplayName = displayName;
-            Description = description;
-        }
+        public string ElementType { get; } = elementType;
+        public string DisplayName { get; } = displayName;
+        public string Description { get; } = description;
+        public virtual ObservableCollection<BmdElementViewModel> Children { get; } = [];
     }
 
     // View models for specific element types
-    public class BattlefieldBuildingViewModel : BmdElementViewModel
+    public class BattlefieldBuildingViewModel(BattlefieldBuilding building) : BmdElementViewModel("Battlefield Building", building.BuildingKey, $"Version: {building.Version}")
     {
-        public BattlefieldBuilding Building { get; }
-
-        public BattlefieldBuildingViewModel(BattlefieldBuilding building) 
-            : base("Battlefield Building", building.BuildingKey, $"Version: {building.Version}")
-        {
-            Building = building;
-        }
+        public BattlefieldBuilding Building { get; } = building;
     }
 
-    public class PropInfoViewModel : BmdElementViewModel
+    public class PropInfoViewModel(PropInfo prop, string propFilePath) : BmdElementViewModel("Prop", System.IO.Path.GetFileNameWithoutExtension(propFilePath) ?? "Unknown Prop", $"Version: {prop.PropInfoVersion}")
     {
-        public PropInfo Prop { get; }
-        public string PropName { get; }
-        public string PropFilePath { get; }
-
-        public PropInfoViewModel(PropInfo prop, string propFilePath) 
-            : base("Prop", System.IO.Path.GetFileNameWithoutExtension(propFilePath) ?? "Unknown Prop", $"Version: {prop.PropInfoVersion}")
-        {
-            Prop = prop;
-            PropName = System.IO.Path.GetFileNameWithoutExtension(propFilePath) ?? "Unknown Prop";
-            PropFilePath = propFilePath;
-        }
+        public PropInfo Prop { get; } = prop;
+        public string PropName { get; } = System.IO.Path.GetFileNameWithoutExtension(propFilePath) ?? "Unknown Prop";
+        public string PropFilePath { get; } = propFilePath;
     }
 
-    public class VfxInfoViewModel : BmdElementViewModel
+    public class VfxInfoViewModel(VfxInfo vfx) : BmdElementViewModel("VFX", vfx.VfxString, $"Version: {vfx.VfxInfoVersion}")
     {
-        public VfxInfo Vfx { get; }
-
-        public VfxInfoViewModel(VfxInfo vfx) 
-            : base("VFX", vfx.VfxString, $"Version: {vfx.VfxInfoVersion}")
-        {
-            Vfx = vfx;
-        }
+        public VfxInfo Vfx { get; } = vfx;
     }
 
-    public class PointLightInfoViewModel : BmdElementViewModel
+    public class PointLightInfoViewModel(PointLightInfo light) : BmdElementViewModel("Point Light", $"Point Light at ({light.Position.X:F1}, {light.Position.Y:F1}, {light.Position.Z:F1})", 
+          $"Radius: {light.Radius:F1}, Color: ({light.Red:F1}, {light.Green:F1}, {light.Blue:F1})")
     {
-        public PointLightInfo Light { get; }
-
-        public PointLightInfoViewModel(PointLightInfo light) 
-            : base("Point Light", $"Point Light at ({light.Position.X:F1}, {light.Position.Y:F1}, {light.Position.Z:F1})", 
-                  $"Radius: {light.Radius:F1}, Color: ({light.Red:F1}, {light.Green:F1}, {light.Blue:F1})")
-        {
-            Light = light;
-        }
+        public PointLightInfo Light { get; } = light;
     }
 
-    public class SpotLightInfoViewModel : BmdElementViewModel
+    public class SpotLightInfoViewModel(SpotLightInfo light) : BmdElementViewModel("Spot Light", $"Spot Light at ({light.Position.X:F1}, {light.Position.Y:F1}, {light.Position.Z:F1})", 
+          $"RGB: ({light.IntensityRed:F2},{light.IntensityGreen:F2},{light.IntensityBlue:F2}), Length: {light.Length:F2}")
     {
-        public SpotLightInfo Light { get; }
-
-        public SpotLightInfoViewModel(SpotLightInfo light) 
-            : base("Spot Light", $"Spot Light at ({light.Position.X:F1}, {light.Position.Y:F1}, {light.Position.Z:F1})", 
-                  $"RGB: ({light.IntensityRed:F2},{light.IntensityGreen:F2},{light.IntensityBlue:F2}), Length: {light.Length:F2}")
-        {
-            Light = light;
-        }
+        public SpotLightInfo Light { get; } = light;
     }
 
-    public class SoundInfoViewModel : BmdElementViewModel
+    public class SoundInfoViewModel(SoundInfo sound) : BmdElementViewModel("Sound", sound.SoundString, $"Type: {sound.TypeString}, Version: {sound.Version}")
     {
-        public SoundInfo Sound { get; }
-
-        public SoundInfoViewModel(SoundInfo sound) 
-            : base("Sound", sound.SoundString, $"Type: {sound.TypeString}, Version: {sound.Version}")
-        {
-            Sound = sound;
-        }
+        public SoundInfo Sound { get; } = sound;
     }
 
-    public class PolyMeshInfoViewModel : BmdElementViewModel
+    public class PolyMeshInfoViewModel(PolyMeshInfo mesh) : BmdElementViewModel("PolyMesh", mesh.MaterialString, $"Vertices: {mesh.VertexList.Length}, Triangles: {mesh.TriangleList.Length / 3}")
     {
-        public PolyMeshInfo Mesh { get; }
-
-        public PolyMeshInfoViewModel(PolyMeshInfo mesh) 
-            : base("PolyMesh", mesh.MaterialString, $"Vertices: {mesh.VertexList.Length}, Triangles: {mesh.TriangleList.Length / 3}")
-        {
-            Mesh = mesh;
-        }
+        public PolyMeshInfo Mesh { get; } = mesh;
     }
 
-    public class LightProbeInfoViewModel : BmdElementViewModel
+    public class LightProbeInfoViewModel(LightProbeInfo probe) : BmdElementViewModel("Light Probe", $"Probe_{probe.Position.X:F2}_{probe.Position.Y:F2}_{probe.Position.Z:F2}", 
+          $"Inner: {probe.InnerRadius:F2}, Outer: {probe.OuterRadius:F2}, Primary: {probe.Primary}")
     {
-        public LightProbeInfo Probe { get; }
-
-        public LightProbeInfoViewModel(LightProbeInfo probe) 
-            : base("Light Probe", $"Probe_{probe.Position.X:F2}_{probe.Position.Y:F2}_{probe.Position.Z:F2}", 
-                  $"Inner: {probe.InnerRadius:F2}, Outer: {probe.OuterRadius:F2}, Primary: {probe.Primary}")
-        {
-            Probe = probe;
-        }
+        public LightProbeInfo Probe { get; } = probe;
     }
 
-    public class TerrainHoleInfoViewModel : BmdElementViewModel
+    public class TerrainHoleInfoViewModel(TerrainHoleTriangleInfo hole) : BmdElementViewModel("Terrain Hole", $"Hole at ({hole.FirstVert.X:F1}, {hole.FirstVert.Y:F1}, {hole.FirstVert.Z:F1})", 
+          $"Version: {hole.TerrainHoleVersion}")
     {
-        public TerrainHoleTriangleInfo Hole { get; }
-
-        public TerrainHoleInfoViewModel(TerrainHoleTriangleInfo hole) 
-            : base("Terrain Hole", $"Hole at ({hole.FirstVert.X:F1}, {hole.FirstVert.Y:F1}, {hole.FirstVert.Z:F1})", 
-                  $"Version: {hole.TerrainHoleVersion}")
-        {
-            Hole = hole;
-        }
+        public TerrainHoleTriangleInfo Hole { get; } = hole;
     }
 
-    public class CscInfoViewModel : BmdElementViewModel
+    public class CscInfoViewModel(CscInfo csc) : BmdElementViewModel("CSC Info", csc.SceneFile, $"Version: {csc.Version}")
     {
-        public CscInfo Csc { get; }
-
-        public CscInfoViewModel(CscInfo csc) 
-            : base("CSC Info", csc.SceneFile, $"Version: {csc.Version}")
-        {
-            Csc = csc;
-        }
+        public CscInfo Csc { get; } = csc;
     }
 
-    public class BattlefieldBuildingFarViewModel : BmdElementViewModel
+    public class BattlefieldBuildingFarViewModel(BattlefieldBuildingFar buildingFar) : BmdElementViewModel("Battlefield Building Far", "", $"Version: {buildingFar.Version}")
     {
-        public BattlefieldBuildingFar BuildingFar { get; }
-
-        public BattlefieldBuildingFarViewModel(BattlefieldBuildingFar buildingFar) 
-            : base("Battlefield Building Far", "", $"Version: {buildingFar.Version}")
-        {
-            BuildingFar = buildingFar;
-        }
+        public BattlefieldBuildingFar BuildingFar { get; } = buildingFar;
     }
 
-    public class CaptureLocationViewModel : BmdElementViewModel
+    public class CaptureLocationViewModel(CaptureLocation captureLocation) : BmdElementViewModel("Capture Location", "", $"Version: {captureLocation.Version}")
     {
-        public CaptureLocation CaptureLocation { get; }
-
-        public CaptureLocationViewModel(CaptureLocation captureLocation) 
-            : base("Capture Location", "", $"Version: {captureLocation.Version}")
-        {
-            CaptureLocation = captureLocation;
-        }
+        public CaptureLocation CaptureLocation { get; } = captureLocation;
     }
 
-    public class EFLineViewModel : BmdElementViewModel
+    public class EFLineViewModel(EFLine efLine) : BmdElementViewModel("EF Line", "", $"Version: {efLine.Version}")
     {
-        public EFLine EFLine { get; }
-
-        public EFLineViewModel(EFLine efLine) 
-            : base("EF Line", "", $"Version: {efLine.Version}")
-        {
-            EFLine = efLine;
-        }
+        public EFLine EFLine { get; } = efLine;
     }
 
-    public class GoOutlineViewModel : BmdElementViewModel
+    public class GoOutlineViewModel(GoOutline goOutline) : BmdElementViewModel("Go Outline", "", $"Vertices: {goOutline.VertexList?.Count ?? 0}")
     {
-        public GoOutline GoOutline { get; }
-
-        public GoOutlineViewModel(GoOutline goOutline) 
-            : base("GO Outline", "", $"Version: {goOutline.Version}")
-        {
-            GoOutline = goOutline;
-        }
+        public GoOutline GoOutline { get; } = goOutline;
     }
 
-    public class NonTerrainOutlineViewModel : BmdElementViewModel
+    public class NonTerrainOutlineViewModel(NonTerrainOutline nonTerrainOutline) : BmdElementViewModel("Non-Terrain Outline", "", $"Vertices: {nonTerrainOutline.VertexList?.Count ?? 0}")
     {
-        public NonTerrainOutline NonTerrainOutline { get; }
-
-        public NonTerrainOutlineViewModel(NonTerrainOutline nonTerrainOutline) 
-            : base("Non-Terrain Outline", "", $"Vertices: {nonTerrainOutline.VertexList?.Count ?? 0}")
-        {
-            NonTerrainOutline = nonTerrainOutline;
-        }
+        public NonTerrainOutline NonTerrainOutline { get; } = nonTerrainOutline;
     }
 
-    public class BuildingProjectileEmitterViewModel : BmdElementViewModel
+    public class BuildingProjectileEmitterViewModel(BuildingProjectileEmitter buildingProjectileEmitter) : BmdElementViewModel("Building Projectile Emitter", buildingProjectileEmitter.SpecializedBuildingProjectileEmitterKey, $"Version: {buildingProjectileEmitter.BuildingProjectileEmitterVersion}")
     {
-        public BuildingProjectileEmitter BuildingProjectileEmitter { get; }
-
-        public BuildingProjectileEmitterViewModel(BuildingProjectileEmitter buildingProjectileEmitter) 
-            : base("Building Projectile Emitter", buildingProjectileEmitter.SpecializedBuildingProjectileEmitterKey, $"Version: {buildingProjectileEmitter.BuildingProjectileEmitterVersion}")
-        {
-            BuildingProjectileEmitter = buildingProjectileEmitter;
-        }
+        public BuildingProjectileEmitter BuildingProjectileEmitter { get; } = buildingProjectileEmitter;
     }
 
-    public class ZonesTemplateViewModel : BmdElementViewModel
+    public class ZonesTemplateViewModel(ZonesTemplate zonesTemplate) : BmdElementViewModel("Zones Template", "", "")
     {
-        public ZonesTemplate ZonesTemplate { get; }
-
-        public ZonesTemplateViewModel(ZonesTemplate zonesTemplate) 
-            : base("Zones Template", "", $"Version: {zonesTemplate.Version}")
-        {
-            ZonesTemplate = zonesTemplate;
-        }
+        public ZonesTemplate ZonesTemplate { get; } = zonesTemplate;
     }
 
-    public class PlayableAreaViewModel : BmdElementViewModel
+    public class PlayableAreaViewModel(PlayableArea playableArea) : BmdElementViewModel("Playable Area", "", $"Version: {playableArea.PlayableAreaVersion}")
     {
-        public PlayableArea PlayableArea { get; }
-
-        public PlayableAreaViewModel(PlayableArea playableArea) 
-            : base("Playable Area", "", $"Version: {playableArea.PlayableAreaVersion}")
-        {
-            PlayableArea = playableArea;
-        }
+        public PlayableArea PlayableArea { get; } = playableArea;
     }
 
-    public class BmdInfoViewModel : BmdElementViewModel
+    public class BmdInfoViewModel(BmdInfo bmd) : BmdElementViewModel("BMD", bmd.BmdString, $"Version: {bmd.Version}, Region: {bmd.RegionString}")
     {
-        public BmdInfo Bmd { get; }
-        public ObservableCollection<BmdElementViewModel> ChildElements { get; } = new();
+        public BmdInfo Bmd { get; } = bmd;
+        public ObservableCollection<BmdElementViewModel> ChildElements { get; } = [];
         public bool IsExpanded { get; set; } = false;
         public bool HasChildren { get; set; } = false;
 
         public override ObservableCollection<BmdElementViewModel> Children => ChildElements;
-
-        public BmdInfoViewModel(BmdInfo bmd) 
-            : base("BMD", bmd.BmdString, $"Version: {bmd.Version}, Region: {bmd.RegionString}")
-        {
-            Bmd = bmd;
-        }
     }
 
     public class DeploymentZoneViewModel : BmdElementViewModel
@@ -960,15 +874,9 @@ namespace Editors.BmdEditor.ViewModels
         }
     }
 
-    public class BoundaryViewModel : BmdElementViewModel
+    public class BoundaryViewModel(Boundary boundary) : BmdElementViewModel("Boundary", boundary.BoundaryType, $"Version: {boundary.Version}, Points: {boundary.PointList.Count}")
     {
-        public Boundary Boundary { get; }
-
-        public BoundaryViewModel(Boundary boundary) 
-            : base("Boundary", boundary.BoundaryType, $"Version: {boundary.Version}, Points: {boundary.PointList.Count}")
-        {
-            Boundary = boundary;
-        }
+        public Boundary Boundary { get; } = boundary;
     }
 
     public class DeploymentViewModel : BmdElementViewModel
@@ -981,7 +889,7 @@ namespace Editors.BmdEditor.ViewModels
             Deployment = deployment;
             
             // Add child zones
-            for (int i = 0; i < deployment.DeploymentZones.Count; i++)
+            for (var i = 0; i < deployment.DeploymentZones.Count; i++)
             {
                 Children.Add(new DeploymentZoneViewModel(deployment.DeploymentZones[i], i));
             }

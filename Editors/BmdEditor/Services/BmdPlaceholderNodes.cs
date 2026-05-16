@@ -2,22 +2,17 @@ using System;
 using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Shared.GameFormats.RigidModel;
 using Shared.GameFormats.RigidModel.Transforms;
 using GameWorld.Core.SceneNodes;
 
 namespace Editors.BmdEditor.Services
 {
     // Custom node class for VFX placeholders that renders a visible cube
-    public class VfxPlaceholderNode : GroupNode, IDrawableItem
+    public class VfxPlaceholderNode(string name = "VFX_Placeholder") : GroupNode(name), IDrawableItem
     {
         public Color NodeColour { get; set; } = Color.Purple;
         public Color SelectedNodeColour { get; set; } = Color.Magenta;
         public float Scale { get; set; } = 0.5f;
-
-        public VfxPlaceholderNode(string name = "VFX_Placeholder") : base(name)
-        {
-        }
 
         public void Render(GameWorld.Core.Components.Rendering.RenderEngineComponent renderEngine, Matrix parentWorld)
         {
@@ -35,7 +30,8 @@ namespace Editors.BmdEditor.Services
 
         public override void CopyInto(ISceneNode target)
         {
-            var typedTarget = target as VfxPlaceholderNode;
+            if (target is not VfxPlaceholderNode typedTarget)
+                return;
             typedTarget.NodeColour = NodeColour;
             typedTarget.SelectedNodeColour = SelectedNodeColour;
             typedTarget.Scale = Scale;
@@ -44,15 +40,11 @@ namespace Editors.BmdEditor.Services
     }
 
     // Custom node class for CSC placeholders that renders a visible cube
-    public class CscPlaceholderNode : GroupNode, IDrawableItem
+    public class CscPlaceholderNode(string name = "CSC_Placeholder") : GroupNode(name), IDrawableItem
     {
         public Color NodeColour { get; set; } = Color.Orange;
         public Color SelectedNodeColour { get; set; } = Color.DarkOrange;
         public float Scale { get; set; } = 0.4f;
-
-        public CscPlaceholderNode(string name = "CSC_Placeholder") : base(name)
-        {
-        }
 
         public void Render(GameWorld.Core.Components.Rendering.RenderEngineComponent renderEngine, Matrix parentWorld)
         {
@@ -70,7 +62,8 @@ namespace Editors.BmdEditor.Services
 
         public override void CopyInto(ISceneNode target)
         {
-            var typedTarget = target as CscPlaceholderNode;
+            if (target is not CscPlaceholderNode typedTarget)
+                return;
             typedTarget.NodeColour = NodeColour;
             typedTarget.SelectedNodeColour = SelectedNodeColour;
             typedTarget.Scale = Scale;
@@ -79,16 +72,12 @@ namespace Editors.BmdEditor.Services
     }
 
     // Custom node class for Light Probe placeholders that renders two spheres (inner and outer)
-    public class LightProbePlaceholderNode : GroupNode, IDrawableItem
+    public class LightProbePlaceholderNode(string name = "LightProbe_Placeholder") : GroupNode(name), IDrawableItem
     {
         public Color NodeColour { get; set; } = Color.Cyan;
         public Color SelectedNodeColour { get; set; } = Color.DarkCyan;
         public float OuterRadius { get; set; } = 1.0f;
         public float InnerRadius { get; set; } = 0.5f;
-
-        public LightProbePlaceholderNode(string name = "LightProbe_Placeholder") : base(name)
-        {
-        }
 
         public void Render(GameWorld.Core.Components.Rendering.RenderEngineComponent renderEngine, Matrix parentWorld)
         {
@@ -110,7 +99,8 @@ namespace Editors.BmdEditor.Services
 
         public override void CopyInto(ISceneNode target)
         {
-            var typedTarget = target as LightProbePlaceholderNode;
+            if (target is not LightProbePlaceholderNode typedTarget)
+                return;
             typedTarget.NodeColour = NodeColour;
             typedTarget.SelectedNodeColour = SelectedNodeColour;
             typedTarget.OuterRadius = OuterRadius;
@@ -120,15 +110,11 @@ namespace Editors.BmdEditor.Services
     }
     
     // Custom node class for Building Projectile Emitter placeholders that renders a visible cube
-    public class BuildingProjectileEmitterPlaceholderNode : GroupNode, IDrawableItem
+    public class BuildingProjectileEmitterPlaceholderNode(string name = "BuildingProjectileEmitter_Placeholder") : GroupNode(name), IDrawableItem
     {
         public Color NodeColour { get; set; } = Color.Red;
         public Color SelectedNodeColour { get; set; } = Color.DarkRed;
         public float Scale { get; set; } = 0.35f;
-
-        public BuildingProjectileEmitterPlaceholderNode(string name = "BuildingProjectileEmitter_Placeholder") : base(name)
-        {
-        }
 
         public void Render(GameWorld.Core.Components.Rendering.RenderEngineComponent renderEngine, Matrix parentWorld)
         {
@@ -146,7 +132,8 @@ namespace Editors.BmdEditor.Services
 
         public override void CopyInto(ISceneNode target)
         {
-            var typedTarget = target as BuildingProjectileEmitterPlaceholderNode;
+            if (target is not BuildingProjectileEmitterPlaceholderNode typedTarget)
+                return;
             typedTarget.NodeColour = NodeColour;
             typedTarget.SelectedNodeColour = SelectedNodeColour;
             typedTarget.Scale = Scale;
@@ -155,15 +142,11 @@ namespace Editors.BmdEditor.Services
     }
 
     // Custom node class for Battlefield Building placeholders that renders a visible cube
-    public class BattlefieldBuildingPlaceholderNode : GroupNode, IDrawableItem
+    public class BattlefieldBuildingPlaceholderNode(string name = "BattlefieldBuilding_Placeholder") : GroupNode(name), IDrawableItem
     {
         public Color NodeColour { get; set; } = Color.Brown;
         public Color SelectedNodeColour { get; set; } = Color.SaddleBrown;
         public float Scale { get; set; } = 0.6f;
-
-        public BattlefieldBuildingPlaceholderNode(string name = "BattlefieldBuilding_Placeholder") : base(name)
-        {
-        }
 
         public void Render(GameWorld.Core.Components.Rendering.RenderEngineComponent renderEngine, Matrix parentWorld)
         {
@@ -181,7 +164,8 @@ namespace Editors.BmdEditor.Services
 
         public override void CopyInto(ISceneNode target)
         {
-            var typedTarget = target as BattlefieldBuildingPlaceholderNode;
+            if (target is not BattlefieldBuildingPlaceholderNode typedTarget)
+                return;
             typedTarget.NodeColour = NodeColour;
             typedTarget.SelectedNodeColour = SelectedNodeColour;
             typedTarget.Scale = Scale;
@@ -189,16 +173,12 @@ namespace Editors.BmdEditor.Services
         }
     }
 
-    // Custom node class for NonTerrainOutline placeholders that renders connected vertices as lines
-    public class NonTerrainOutlineNode : GroupNode, IDrawableItem
+    // Custom node class for GoOutline placeholders that renders connected vertices as lines
+    public class GoOutlineNode(string name = "GoOutline") : GroupNode(name), IDrawableItem
     {
-        public Color NodeColour { get; set; } = Color.Cyan;
-        public Color SelectedNodeColour { get; set; } = Color.DarkCyan;
-        public List<RmvVector2> VertexList { get; set; } = new();
-
-        public NonTerrainOutlineNode(string name = "NonTerrainOutline") : base(name)
-        {
-        }
+        public Color NodeColour { get; set; } = Color.Yellow;
+        public Color SelectedNodeColour { get; set; } = Color.Gold;
+        public List<RmvVector2> VertexList { get; set; } = [];
 
         public void Render(GameWorld.Core.Components.Rendering.RenderEngineComponent renderEngine, Matrix parentWorld)
         {
@@ -206,29 +186,82 @@ namespace Editors.BmdEditor.Services
             {
                 var drawColour = NodeColour;
                 var worldTransform = ModelMatrix * parentWorld;
-                
+
                 // Create lines connecting all vertices in order, including closing the loop
                 var lineVertices = new List<VertexPositionColor>();
-                
-                for (int i = 0; i < VertexList.Count; i++)
+
+                for (var i = 0; i < VertexList.Count; i++)
                 {
                     var currentVertex = VertexList[i];
                     var nextVertex = VertexList[(i + 1) % VertexList.Count]; // Wrap around to connect last to first
-                    
+
                     var startPos = new Vector3(currentVertex.X, 0, currentVertex.Y);
                     var endPos = new Vector3(nextVertex.X, 0, nextVertex.Y);
-                    
+
                     var worldStart = Vector3.Transform(startPos, worldTransform);
                     var worldEnd = Vector3.Transform(endPos, worldTransform);
-                    
+
                     // Add two vertices for each line segment
                     lineVertices.Add(new VertexPositionColor(worldStart, drawColour));
                     lineVertices.Add(new VertexPositionColor(worldEnd, drawColour));
                 }
-                
+
                 if (lineVertices.Count > 0)
                 {
-                    renderEngine.AddRenderLines(lineVertices.ToArray());
+                    renderEngine.AddRenderLines([.. lineVertices]);
+                }
+            }
+        }
+
+        public override ISceneNode CreateCopyInstance() => new GoOutlineNode();
+
+        public override void CopyInto(ISceneNode target)
+        {
+            if (target is not GoOutlineNode typedTarget)
+                return;
+            typedTarget.NodeColour = NodeColour;
+            typedTarget.SelectedNodeColour = SelectedNodeColour;
+            typedTarget.VertexList = [.. VertexList];
+            base.CopyInto(target);
+        }
+    }
+
+    // Custom node class for NonTerrainOutline placeholders that renders connected vertices as lines
+    public class NonTerrainOutlineNode(string name = "NonTerrainOutline") : GroupNode(name), IDrawableItem
+    {
+        public Color NodeColour { get; set; } = Color.Cyan;
+        public Color SelectedNodeColour { get; set; } = Color.DarkCyan;
+        public List<RmvVector2> VertexList { get; set; } = [];
+
+        public void Render(GameWorld.Core.Components.Rendering.RenderEngineComponent renderEngine, Matrix parentWorld)
+        {
+            if (IsVisible && VertexList.Count >= 2)
+            {
+                var drawColour = NodeColour;
+                var worldTransform = ModelMatrix * parentWorld;
+
+                // Create lines connecting all vertices in order, including closing the loop
+                var lineVertices = new List<VertexPositionColor>();
+
+                for (var i = 0; i < VertexList.Count; i++)
+                {
+                    var currentVertex = VertexList[i];
+                    var nextVertex = VertexList[(i + 1) % VertexList.Count]; // Wrap around to connect last to first
+
+                    var startPos = new Vector3(currentVertex.X, 0, currentVertex.Y);
+                    var endPos = new Vector3(nextVertex.X, 0, nextVertex.Y);
+
+                    var worldStart = Vector3.Transform(startPos, worldTransform);
+                    var worldEnd = Vector3.Transform(endPos, worldTransform);
+
+                    // Add two vertices for each line segment
+                    lineVertices.Add(new VertexPositionColor(worldStart, drawColour));
+                    lineVertices.Add(new VertexPositionColor(worldEnd, drawColour));
+                }
+
+                if (lineVertices.Count > 0)
+                {
+                    renderEngine.AddRenderLines([.. lineVertices]);
                 }
             }
         }
@@ -237,24 +270,21 @@ namespace Editors.BmdEditor.Services
 
         public override void CopyInto(ISceneNode target)
         {
-            var typedTarget = target as NonTerrainOutlineNode;
+            if (target is not NonTerrainOutlineNode typedTarget)
+                return;
             typedTarget.NodeColour = NodeColour;
             typedTarget.SelectedNodeColour = SelectedNodeColour;
-            typedTarget.VertexList = new List<RmvVector2>(VertexList);
+            typedTarget.VertexList = [.. VertexList];
             base.CopyInto(target);
         }
     }
 
     // Custom node class for Boundary placeholders that renders connected vertices as lines
-    public class BoundaryNode : GroupNode, IDrawableItem
+    public class BoundaryNode(string name = "Boundary") : GroupNode(name), IDrawableItem
     {
         public Color NodeColour { get; set; } = Color.Magenta;
         public Color SelectedNodeColour { get; set; } = Color.Purple;
-        public List<RmvVector2> PointList { get; set; } = new();
-
-        public BoundaryNode(string name = "Boundary") : base(name)
-        {
-        }
+        public List<RmvVector2> PointList { get; set; } = [];
 
         public void Render(GameWorld.Core.Components.Rendering.RenderEngineComponent renderEngine, Matrix parentWorld)
         {
@@ -266,7 +296,7 @@ namespace Editors.BmdEditor.Services
                 // Create lines connecting all points in order, including closing the loop
                 var lineVertices = new List<VertexPositionColor>();
                 
-                for (int i = 0; i < PointList.Count; i++)
+                for (var i = 0; i < PointList.Count; i++)
                 {
                     var currentPoint = PointList[i];
                     var nextPoint = PointList[(i + 1) % PointList.Count]; // Wrap around to connect last to first
@@ -284,7 +314,7 @@ namespace Editors.BmdEditor.Services
                 
                 if (lineVertices.Count > 0)
                 {
-                    renderEngine.AddRenderLines(lineVertices.ToArray());
+                    renderEngine.AddRenderLines([.. lineVertices]);
                 }
             }
         }
@@ -293,24 +323,21 @@ namespace Editors.BmdEditor.Services
 
         public override void CopyInto(ISceneNode target)
         {
-            var typedTarget = target as BoundaryNode;
+            if (target is not BoundaryNode typedTarget)
+                return;
             typedTarget.NodeColour = NodeColour;
             typedTarget.SelectedNodeColour = SelectedNodeColour;
-            typedTarget.PointList = new List<RmvVector2>(PointList);
+            typedTarget.PointList = [.. PointList];
             base.CopyInto(target);
         }
     }
     
     // Custom node class for Point Light spheres that renders a sphere with radius
-    public class PointLightSphereNode : GroupNode, IDrawableItem
+    public class PointLightSphereNode(string name = "PointLight_Sphere") : GroupNode(name), IDrawableItem
     {
         public Color NodeColour { get; set; } = Color.Yellow;
         public Color SelectedNodeColour { get; set; } = Color.Orange;
         public float Radius { get; set; } = 1.0f;
-
-        public PointLightSphereNode(string name = "PointLight_Sphere") : base(name)
-        {
-        }
 
         public void Render(GameWorld.Core.Components.Rendering.RenderEngineComponent renderEngine, Matrix parentWorld)
         {
@@ -329,7 +356,8 @@ namespace Editors.BmdEditor.Services
 
         public override void CopyInto(ISceneNode target)
         {
-            var typedTarget = target as PointLightSphereNode;
+            if (target is not PointLightSphereNode typedTarget)
+                return;
             typedTarget.NodeColour = NodeColour;
             typedTarget.SelectedNodeColour = SelectedNodeColour;
             typedTarget.Radius = Radius;
@@ -341,7 +369,7 @@ namespace Editors.BmdEditor.Services
             var lines = new List<VertexPositionColor>();
             
             // Create latitude lines (horizontal circles)
-            for (int lat = 0; lat <= segments / 2; lat++)
+            for (var lat = 0; lat <= segments / 2; lat++)
             {
                 var theta = MathF.PI * lat / (segments / 2);
                 var sinTheta = MathF.Sin(theta);
@@ -349,7 +377,7 @@ namespace Editors.BmdEditor.Services
                 
                 Vector3? prevPoint = null;
                 
-                for (int lon = 0; lon <= segments; lon++)  // Use <= to close the circle
+                for (var lon = 0; lon <= segments; lon++)  // Use <= to close the circle
                 {
                     var phi = 2 * MathF.PI * lon / segments;
                     var sinPhi = MathF.Sin(phi);
@@ -373,7 +401,7 @@ namespace Editors.BmdEditor.Services
             }
             
             // Create longitude lines (vertical lines from pole to pole)
-            for (int lon = 0; lon < segments; lon++)
+            for (var lon = 0; lon < segments; lon++)
             {
                 var phi = 2 * MathF.PI * lon / segments;
                 var sinPhi = MathF.Sin(phi);
@@ -381,7 +409,7 @@ namespace Editors.BmdEditor.Services
                 
                 Vector3? prevPoint = null;
                 
-                for (int lat = 0; lat <= segments / 2; lat++)
+                for (var lat = 0; lat <= segments / 2; lat++)
                 {
                     var theta = MathF.PI * lat / (segments / 2);
                     var sinTheta = MathF.Sin(theta);
@@ -404,12 +432,12 @@ namespace Editors.BmdEditor.Services
                 }
             }
             
-            return lines.ToArray();
+            return [.. lines];
         }
     }
 
     // Custom node class for Spot Light cones that renders a cone with direction
-    public class SpotLightConeNode : GroupNode, IDrawableItem
+    public class SpotLightConeNode(string name = "SpotLight_Cone") : GroupNode(name), IDrawableItem
     {
         public Color NodeColour { get; set; } = Color.LightBlue;
         public Color SelectedNodeColour { get; set; } = Color.Blue;
@@ -418,10 +446,6 @@ namespace Editors.BmdEditor.Services
         public float OuterAngle { get; set; } = 1.0f;
         public RmvVector3 Position { get; set; } = new();
         public Quaternion Quaternion { get; set; } = Quaternion.Identity;
-
-        public SpotLightConeNode(string name = "SpotLight_Cone") : base(name)
-        {
-        }
 
         public void Render(GameWorld.Core.Components.Rendering.RenderEngineComponent renderEngine, Matrix parentWorld)
         {
@@ -448,7 +472,8 @@ namespace Editors.BmdEditor.Services
 
         public override void CopyInto(ISceneNode target)
         {
-            var typedTarget = target as SpotLightConeNode;
+            if (target is not SpotLightConeNode typedTarget)
+                return;
             typedTarget.NodeColour = NodeColour;
             typedTarget.SelectedNodeColour = SelectedNodeColour;
             typedTarget.Length = Length;
@@ -471,7 +496,7 @@ namespace Editors.BmdEditor.Services
             
             // Create base circle points extending along positive X axis (X as forward)
             var basePoints = new Vector3[segments];
-            for (int i = 0; i < segments; i++)
+            for (var i = 0; i < segments; i++)
             {
                 var theta = 2 * MathF.PI * i / segments;
                 basePoints[i] = new Vector3(length, radius * MathF.Cos(theta), radius * MathF.Sin(theta));
@@ -479,36 +504,32 @@ namespace Editors.BmdEditor.Services
             }
             
             // Create lines from tip to base
-            for (int i = 0; i < segments; i++)
+            for (var i = 0; i < segments; i++)
             {
                 lines.Add(new VertexPositionColor(tip, color));
                 lines.Add(new VertexPositionColor(basePoints[i], color));
             }
             
             // Create base circle lines
-            for (int i = 0; i < segments; i++)
+            for (var i = 0; i < segments; i++)
             {
                 var next = (i + 1) % segments;
                 lines.Add(new VertexPositionColor(basePoints[i], color));
                 lines.Add(new VertexPositionColor(basePoints[next], color));
             }
             
-            return lines.ToArray();
+            return [.. lines];
         }
     }
 
     // Custom node class for Terrain Hole edges that renders triangle edges only
-    public class TerrainHoleEdgesNode : GroupNode, IDrawableItem
+    public class TerrainHoleEdgesNode(string name = "TerrainHole_Edges") : GroupNode(name), IDrawableItem
     {
         public Color NodeColour { get; set; } = Color.Red;
         public Color SelectedNodeColour { get; set; } = Color.DarkRed;
         public RmvVector3 FirstVert { get; set; } = new();
         public RmvVector3 SecondVert { get; set; } = new();
         public RmvVector3 ThirdVert { get; set; } = new();
-
-        public TerrainHoleEdgesNode(string name = "TerrainHole_Edges") : base(name)
-        {
-        }
 
         public void Render(GameWorld.Core.Components.Rendering.RenderEngineComponent renderEngine, Matrix parentWorld)
         {
@@ -528,14 +549,14 @@ namespace Editors.BmdEditor.Services
                 v3 = Vector3.Transform(v3, worldTransform);
                 
                 // Draw triangle edges
-                renderEngine.AddRenderLines(new[] {
+                renderEngine.AddRenderLines([
                     new VertexPositionColor(v1, drawColour),
                     new VertexPositionColor(v2, drawColour),
                     new VertexPositionColor(v2, drawColour),
                     new VertexPositionColor(v3, drawColour),
                     new VertexPositionColor(v3, drawColour),
                     new VertexPositionColor(v1, drawColour)
-                });
+                ]);
             }
         }
 
@@ -543,7 +564,8 @@ namespace Editors.BmdEditor.Services
 
         public override void CopyInto(ISceneNode target)
         {
-            var typedTarget = target as TerrainHoleEdgesNode;
+            if (target is not TerrainHoleEdgesNode typedTarget)
+                return;
             typedTarget.NodeColour = NodeColour;
             typedTarget.SelectedNodeColour = SelectedNodeColour;
             typedTarget.FirstVert = FirstVert;
@@ -554,17 +576,13 @@ namespace Editors.BmdEditor.Services
     }
 
     // Custom node class for PolyMesh triangles that renders filled triangles with materials
-    public class PolyMeshTrianglesNode : GroupNode, IDrawableItem
+    public class PolyMeshTrianglesNode(string name = "PolyMesh_Triangles") : GroupNode(name), IDrawableItem
     {
         public Color NodeColour { get; set; } = Color.Green;
         public Color SelectedNodeColour { get; set; } = Color.DarkGreen;
-        public RmvVector3[] Vertices { get; set; } = Array.Empty<RmvVector3>();
-        public ushort[] Triangles { get; set; } = Array.Empty<ushort>();
+        public RmvVector3[] Vertices { get; set; } = [];
+        public ushort[] Triangles { get; set; } = [];
         public string MaterialString { get; set; } = string.Empty;
-
-        public PolyMeshTrianglesNode(string name = "PolyMesh_Triangles") : base(name)
-        {
-        }
 
         public void Render(GameWorld.Core.Components.Rendering.RenderEngineComponent renderEngine, Matrix parentWorld)
         {
@@ -575,7 +593,7 @@ namespace Editors.BmdEditor.Services
                 
                 // Convert vertices to world space
                 var worldVertices = new Vector3[Vertices.Length];
-                for (int i = 0; i < Vertices.Length; i++)
+                for (var i = 0; i < Vertices.Length; i++)
                 {
                     var vertex = new Vector3(Vertices[i].X, Vertices[i].Y, Vertices[i].Z);
                     worldVertices[i] = Vector3.Transform(vertex, worldTransform);
@@ -584,7 +602,7 @@ namespace Editors.BmdEditor.Services
                 // Create triangle edges (for now, render as wireframe - filled triangles would require proper mesh rendering)
                 var lineVertices = new List<VertexPositionColor>();
                 
-                for (int i = 0; i < Triangles.Length; i += 3)
+                for (var i = 0; i < Triangles.Length; i += 3)
                 {
                     if (i + 2 < Triangles.Length)
                     {
@@ -607,7 +625,7 @@ namespace Editors.BmdEditor.Services
                 
                 if (lineVertices.Count > 0)
                 {
-                    renderEngine.AddRenderLines(lineVertices.ToArray());
+                    renderEngine.AddRenderLines([.. lineVertices]);
                 }
             }
         }
@@ -616,7 +634,8 @@ namespace Editors.BmdEditor.Services
 
         public override void CopyInto(ISceneNode target)
         {
-            var typedTarget = target as PolyMeshTrianglesNode;
+            if (target is not PolyMeshTrianglesNode typedTarget)
+                return;
             typedTarget.NodeColour = NodeColour;
             typedTarget.SelectedNodeColour = SelectedNodeColour;
             typedTarget.Vertices = Vertices;
@@ -627,16 +646,12 @@ namespace Editors.BmdEditor.Services
     }
 
     // Custom node class for BMD Info placeholders that represents recursive BMD file references
-    public class BmdInfoPlaceholderNode : GroupNode, IDrawableItem
+    public class BmdInfoPlaceholderNode(string name = "BMD_Info_Placeholder") : GroupNode(name), IDrawableItem
     {
         public Color NodeColour { get; set; } = Color.White;
         public Color SelectedNodeColour { get; set; } = Color.Gray;
         public float Scale { get; set; } = 0.8f;
         public string ReferencedBmdPath { get; set; } = string.Empty;
-
-        public BmdInfoPlaceholderNode(string name = "BMD_Info_Placeholder") : base(name)
-        {
-        }
 
         public void Render(GameWorld.Core.Components.Rendering.RenderEngineComponent renderEngine, Matrix parentWorld)
         {
@@ -654,7 +669,8 @@ namespace Editors.BmdEditor.Services
 
         public override void CopyInto(ISceneNode target)
         {
-            var typedTarget = target as BmdInfoPlaceholderNode;
+            if (target is not BmdInfoPlaceholderNode typedTarget)
+                return;
             typedTarget.NodeColour = NodeColour;
             typedTarget.SelectedNodeColour = SelectedNodeColour;
             typedTarget.Scale = Scale;
@@ -664,16 +680,12 @@ namespace Editors.BmdEditor.Services
     }
 
     // Custom node class for Prop placeholders that renders a visible cube when RMV2 loading fails
-    public class PropPlaceholderNode : GroupNode, IDrawableItem
+    public class PropPlaceholderNode(string name = "Prop_Placeholder") : GroupNode(name), IDrawableItem
     {
         public Color NodeColour { get; set; } = Color.Red;
         public Color SelectedNodeColour { get; set; } = Color.DarkRed;
         public float Scale { get; set; } = 0.5f;
         public string FailedModelPath { get; set; } = string.Empty;
-
-        public PropPlaceholderNode(string name = "Prop_Placeholder") : base(name)
-        {
-        }
 
         public void Render(GameWorld.Core.Components.Rendering.RenderEngineComponent renderEngine, Matrix parentWorld)
         {
@@ -691,7 +703,8 @@ namespace Editors.BmdEditor.Services
 
         public override void CopyInto(ISceneNode target)
         {
-            var typedTarget = target as PropPlaceholderNode;
+            if (target is not PropPlaceholderNode typedTarget)
+                return;
             typedTarget.NodeColour = NodeColour;
             typedTarget.SelectedNodeColour = SelectedNodeColour;
             typedTarget.Scale = Scale;
@@ -701,17 +714,13 @@ namespace Editors.BmdEditor.Services
     }
 
     // Custom node class for Sound placeholders that renders cubes at coordinates with optional connecting lines
-    public class SoundPlaceholderNode : GroupNode, IDrawableItem
+    public class SoundPlaceholderNode(string name = "Sound_Placeholder") : GroupNode(name), IDrawableItem
     {
         public Color NodeColour { get; set; } = Color.Lime;
         public Color SelectedNodeColour { get; set; } = Color.Green;
         public float Scale { get; set; } = 0.3f;
         public string SoundType { get; set; } = string.Empty;
-        public RmvVector3[] CoordList { get; set; } = Array.Empty<RmvVector3>();
-
-        public SoundPlaceholderNode(string name = "Sound_Placeholder") : base(name)
-        {
-        }
+        public RmvVector3[] CoordList { get; set; } = [];
 
         public void Render(GameWorld.Core.Components.Rendering.RenderEngineComponent renderEngine, Matrix parentWorld)
         {
@@ -733,7 +742,7 @@ namespace Editors.BmdEditor.Services
                 {
                     var lineVertices = new List<VertexPositionColor>();
                     
-                    for (int i = 0; i < CoordList.Length - 1; i++)
+                    for (var i = 0; i < CoordList.Length - 1; i++)
                     {
                         var currentVertex = CoordList[i];
                         var nextVertex = CoordList[i + 1];
@@ -751,7 +760,7 @@ namespace Editors.BmdEditor.Services
                     
                     if (lineVertices.Count > 0)
                     {
-                        renderEngine.AddRenderLines(lineVertices.ToArray());
+                        renderEngine.AddRenderLines([.. lineVertices]);
                     }
                 }
             }
@@ -761,7 +770,8 @@ namespace Editors.BmdEditor.Services
 
         public override void CopyInto(ISceneNode target)
         {
-            var typedTarget = target as SoundPlaceholderNode;
+            if (target is not SoundPlaceholderNode typedTarget)
+                return;
             typedTarget.NodeColour = NodeColour;
             typedTarget.SelectedNodeColour = SelectedNodeColour;
             typedTarget.Scale = Scale;
