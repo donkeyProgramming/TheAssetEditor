@@ -1,20 +1,14 @@
 using System;
-using System.Collections.ObjectModel;
-using System.Linq;
 using System.Windows.Input;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using Microsoft.Xna.Framework;
 using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
 using Shared.Core.ToolCreation;
 using Shared.Core.Services;
 using Shared.GameFormats.Bmd;
-using Shared.GameFormats.RigidModel;
-using GameWorld.Core.Components;
 using GameWorld.Core.Rendering.Materials;
 using GameWorld.Core.Services;
-using GameWorld.Core.SceneNodes;
 using Editors.BmdEditor.Services;
 using Serilog;
 
@@ -150,6 +144,7 @@ namespace Editors.BmdEditor.ViewModels
             // Cleanup resources
             Scene3D = null;
             _bmdFile = null;
+            GC.SuppressFinalize(this);
         }
     }
 }

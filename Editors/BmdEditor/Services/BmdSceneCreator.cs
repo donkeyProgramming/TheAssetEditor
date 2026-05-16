@@ -237,6 +237,7 @@ namespace Editors.BmdEditor.Services
                 ("Building_Projectile_Emitters", bmdFile.BuildingProjectileEmitters.Count, group => LoadComponents(bmdFile.BuildingProjectileEmitters, group, "BuildingProjectileEmitter", CreateBuildingProjectileEmitterPlaceholderNode, allElements.OfType<BuildingProjectileEmitterViewModel>().ToList())),
                 ("Terrain_Holes", bmdFile.TerrainHoles.Count, group => LoadComponents(bmdFile.TerrainHoles, group, "TerrainHole", CreateTerrainHoleNode, allElements.OfType<TerrainHoleInfoViewModel>().ToList())),
                 ("PolyMeshes", bmdFile.PolyMeshes.Count, group => LoadComponents(bmdFile.PolyMeshes, group, "PolyMesh", CreatePolyMeshNode, allElements.OfType<PolyMeshInfoViewModel>().ToList())),
+                ("Go_Outlines", bmdFile.GoOutlines.Count, group => LoadComponents(bmdFile.GoOutlines, group, "GoOutline", CreateGoOutlineNode, allElements.OfType<GoOutlineViewModel>().ToList())),
                 ("NonTerrain_Outlines", bmdFile.NonTerrainOutlines.Count, group => LoadComponents(bmdFile.NonTerrainOutlines, group, "NonTerrainOutline", CreateNonTerrainOutlineNode, allElements.OfType<NonTerrainOutlineViewModel>().ToList())),
                 ("Battlefield_Buildings", bmdFile.BattlefieldBuildings.Count, group => LoadComponents(bmdFile.BattlefieldBuildings, group, "BattlefieldBuilding", CreateBattlefieldBuildingPlaceholderNode, allElements.OfType<BattlefieldBuildingViewModel>().ToList())),
                 ("BMD_References", bmdFile.BmdInfos.Count, group => LoadComponents(bmdFile.BmdInfos, group, "BMD", CreateBmdInfoNode, allElements.OfType<BmdInfoViewModel>().ToList())),
@@ -420,6 +421,23 @@ namespace Editors.BmdEditor.Services
                 _logger.Error($"Failed to create specialized node: {ex.Message}");
                 return null;
             }
+        }
+
+        private SceneNode CreateGoOutlineNode(GoOutline outlineInfo, GroupNode goOutlineGroup, int index)
+        {
+            var outlineName = $"GoOutline_{index}";
+            var outlineNode = goOutlineGroup.AddObject(new GroupNode(outlineName) { IsEditable = false });
+
+            var placeholderMesh = CreateSpecializedNode(() => new GoOutlineNode("GoOutline_Placeholder")
+            {
+                VertexList = outlineInfo.VertexList
+            });
+            if (placeholderMesh != null)
+            {
+                outlineNode.AddObject(placeholderMesh);
+            }
+
+            return outlineNode;
         }
 
         private SceneNode CreateNonTerrainOutlineNode(NonTerrainOutline outlineInfo, GroupNode nonTerrainOutlineGroup, int index)
@@ -636,6 +654,7 @@ namespace Editors.BmdEditor.Services
                 ("Referenced_Building_Projectile_Emitters", referencedBmd.BuildingProjectileEmitters.Count, group => LoadReferencedComponents(referencedBmd.BuildingProjectileEmitters, group, "Referenced_BuildingProjectileEmitter", CreateBuildingProjectileEmitterPlaceholderNode, parentIndex)),
                 ("Referenced_Terrain_Holes", referencedBmd.TerrainHoles.Count, group => LoadReferencedComponents(referencedBmd.TerrainHoles, group, "Referenced_TerrainHole", CreateTerrainHoleNode, parentIndex)),
                 ("Referenced_PolyMeshes", referencedBmd.PolyMeshes.Count, group => LoadReferencedComponents(referencedBmd.PolyMeshes, group, "Referenced_PolyMesh", CreatePolyMeshNode, parentIndex)),
+                ("Referenced_Go_Outlines", referencedBmd.GoOutlines.Count, group => LoadReferencedComponents(referencedBmd.GoOutlines, group, "Referenced_GoOutline", CreateGoOutlineNode, parentIndex)),
                 ("Referenced_NonTerrain_Outlines", referencedBmd.NonTerrainOutlines.Count, group => LoadReferencedComponents(referencedBmd.NonTerrainOutlines, group, "Referenced_NonTerrainOutline", CreateNonTerrainOutlineNode, parentIndex)),
                 ("Referenced_Battlefield_Buildings", referencedBmd.BattlefieldBuildings.Count, group => LoadReferencedComponents(referencedBmd.BattlefieldBuildings, group, "Referenced_BattlefieldBuilding", CreateBattlefieldBuildingPlaceholderNode, parentIndex))
                 // Note: We intentionally exclude BmdInfos here to prevent infinite recursion
