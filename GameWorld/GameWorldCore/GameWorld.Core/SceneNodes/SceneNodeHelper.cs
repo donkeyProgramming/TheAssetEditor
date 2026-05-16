@@ -49,6 +49,15 @@ namespace GameWorld.Core.SceneNodes
 
         public static void MakeNodeEditable(Rmv2ModelNode mainNode, ISceneNode node)
         {
+
+            node.Parent.RemoveObject(node);
+            node.ForeachNodeRecursive(x =>
+            {
+                x.IsEditable = true;
+                if (x is Rmv2MeshNode mesh)
+                    mesh.IsSelectable = true;
+            });
+
             var editableLod0 = GetOrCreateEditableLod0(mainNode);
 
             if (node is Rmv2MeshNode meshNode)
@@ -81,13 +90,6 @@ namespace GameWorld.Core.SceneNodes
                 MakeModelNodeEditable(mainNode, child as Rmv2ModelNode);
             }
 
-            node.Parent.RemoveObject(node);
-            node.ForeachNodeRecursive(x =>
-            {
-                x.IsEditable = true;
-                if (x is Rmv2MeshNode mesh)
-                    mesh.IsSelectable = true;
-            });
         }
 
         static void MakeModelNodeEditable(Rmv2ModelNode mainNode, Rmv2ModelNode modelNode)
