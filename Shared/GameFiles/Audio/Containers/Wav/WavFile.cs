@@ -1,7 +1,7 @@
 ﻿using Shared.ByteParsing;
-using Shared.GameFormats.Audio.Codecs;
+using Shared.GameFormats.Audio.Formats.Pcm;
 
-namespace Shared.GameFormats.Audio.Wav
+namespace Shared.GameFormats.Audio.Containers.Wav
 {
     public class WavFile
     {
@@ -12,11 +12,10 @@ namespace Shared.GameFormats.Audio.Wav
         public DataChunk DataChunk { get; set; } = new();
         public PcmAudio Audio { get; set; } = new();
 
-        public static WavFile CreateFromBytes(byte[] wavData)
+        public static WavFile CreateFromBytes(byte[] wavBytes)
         {
-            ArgumentNullException.ThrowIfNull(wavData);
             var wavFile = new WavFile();
-            wavFile.ReadData(new ByteChunk(wavData));
+            wavFile.ReadData(new ByteChunk(wavBytes));
             return wavFile;
         }
 

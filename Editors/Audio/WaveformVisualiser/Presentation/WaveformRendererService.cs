@@ -8,9 +8,7 @@ using NAudio.Vorbis;
 using NAudio.Wave;
 using NAudio.WaveFormRenderer;
 using Shared.Core.PackFiles;
-using Shared.GameFormats.Wwise.Wem.V132;
-using Shared.GameFormats.Wwise.Wem.V132.Decoding;
-using Shared.GameFormats.Wwise.Wem.V132.Encoding;
+using Shared.GameFormats.Audio.Containers.Ogg;
 using Color = System.Drawing.Color;
 using DrawingImage = System.Drawing.Image;
 
@@ -55,9 +53,7 @@ namespace Editors.Audio.WaveformVisualiser.Presentation
 
             return await Task.Run(() =>
             {
-                var codebookLibrary = new WwiseCodebookLibrary();
-                var decoder = new WemVorbisDecoder(codebookLibrary);
-                var oggBytes = decoder.Decode(WemFile.CreateFromBytes(wemBytes)).ToOgg();
+                var oggBytes = OggFile.CreateFromWemBytes(wemBytes).WriteData();
                 return RenderWaveformFromOggBytes(oggBytes, baseSettings, overlaySettings);
             }, cancellationToken).ConfigureAwait(false);
         }

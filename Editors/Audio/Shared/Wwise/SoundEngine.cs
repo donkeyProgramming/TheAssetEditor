@@ -5,9 +5,7 @@ using NAudio.CoreAudioApi;
 using NAudio.Vorbis;
 using NAudio.Wave;
 using Shared.Core.PackFiles;
-using Shared.GameFormats.Wwise.Wem.V132;
-using Shared.GameFormats.Wwise.Wem.V132.Decoding;
-using Shared.GameFormats.Wwise.Wem.V132.Encoding;
+using Shared.GameFormats.Audio.Containers.Ogg;
 
 namespace Editors.Audio.Shared.Wwise
 {
@@ -39,15 +37,7 @@ namespace Editors.Audio.Shared.Wwise
         public TimeSpan ReaderTimeAtLastPlayOrResume { get; private set; } = TimeSpan.Zero;
         public long DeviceBytesAtLastPlayOrResume { get; private set; } = 0;
 
-        public PlaybackState PlaybackState
-        {
-            get
-            {
-                if (_wavePlayer == null)
-                    return PlaybackState.Stopped;
-                return _wavePlayer.PlaybackState;
-            }
-        }
+        public PlaybackState PlaybackState => _wavePlayer?.PlaybackState ?? PlaybackState.Stopped;
 
         public event EventHandler<StoppedEventArgs> PlaybackStopped;
 
@@ -80,9 +70,7 @@ namespace Editors.Audio.Shared.Wwise
         {
             DisposeReaderOnly();
 
-            var codebookLibrary = new WwiseCodebookLibrary();
-            var decoder = new WemVorbisDecoder(codebookLibrary);
-            var oggBytes = decoder.Decode(WemFile.CreateFromBytes(wemBytes)).ToOgg();
+            var oggBytes = OggFile.CreateFromWemBytes(wemBytes).WriteData();
             _memoryStream = new MemoryStream(oggBytes, writable: false);
             _waveFileReader = new VorbisWaveReader(_memoryStream);
 

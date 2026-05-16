@@ -18,20 +18,23 @@ namespace Shared.GameFormats.Wwise.Wem.V132.Decoding
 
         public byte[] WriteData()
         {
-            var writer = new BitWriter(64);
-            writer.WriteByte(PacketType);
-            writer.WriteAscii(HeaderTag);
-            writer.WriteBits(Version, 32);
-            writer.WriteByte(Channels);
-            writer.WriteBits(SampleRate, 32);
-            writer.WriteBits(BitrateMaximum, 32);
-            writer.WriteBits(NominalBitrate, 32);
-            writer.WriteBits(BitrateMinimum, 32);
-            writer.WriteBits(SmallBlockSizeExponent, 4);
-            writer.WriteBits(LargeBlockSizeExponent, 4);
-            writer.WriteBits(FramingBit, 1);
-            writer.AlignToByte();
-            return writer.ToArray();
+            using var stream = new MemoryStream();
+            stream.Write(ByteParsers.Byte.EncodeValue(PacketType, out _));
+            stream.Write(System.Text.Encoding.ASCII.GetBytes(HeaderTag));
+            stream.Write(ByteParsers.UInt32.EncodeValue(Version, out _));
+            stream.Write(ByteParsers.Byte.EncodeValue(Channels, out _));
+            stream.Write(ByteParsers.UInt32.EncodeValue(SampleRate, out _));
+            stream.Write(ByteParsers.UInt32.EncodeValue(BitrateMaximum, out _));
+            stream.Write(ByteParsers.UInt32.EncodeValue(NominalBitrate, out _));
+            stream.Write(ByteParsers.UInt32.EncodeValue(BitrateMinimum, out _));
+
+            var blockSizeByte = (byte)(BitHelper.ExtractBits(SmallBlockSizeExponent, 0, 4) | (BitHelper.ExtractBits(LargeBlockSizeExponent, 0, 4) << 4));
+            stream.Write(ByteParsers.Byte.EncodeValue(blockSizeByte, out _));
+
+            var framingByte = (byte)BitHelper.ExtractBits(FramingBit, 0, 1);
+            stream.Write(ByteParsers.Byte.EncodeValue(framingByte, out _));
+
+            return stream.ToArray();
         }
     }
 }

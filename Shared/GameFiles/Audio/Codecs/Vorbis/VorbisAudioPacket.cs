@@ -1,4 +1,4 @@
-﻿namespace Shared.GameFormats.Audio.Codecs
+﻿namespace Shared.GameFormats.Audio.Codecs.Vorbis
 {
     public class VorbisAudioPacket
     {

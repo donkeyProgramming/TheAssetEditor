@@ -1,6 +1,6 @@
 ﻿using Shared.ByteParsing;
 
-namespace Shared.GameFormats.Audio.Wav
+namespace Shared.GameFormats.Audio.Containers.Wav
 {
     public class FmtChunk : RiffChunk
     {

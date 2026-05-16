@@ -17,13 +17,11 @@ using Shared.Core.ErrorHandling;
 using Shared.Core.PackFiles.Models;
 using Shared.Core.Services;
 using Shared.Core.Settings;
+using Shared.GameFormats.Audio.Formats.Pcm;
 using Shared.GameFormats.Wwise;
 using Shared.GameFormats.Wwise.Enums;
 using Shared.GameFormats.Wwise.Hirc;
-using Shared.GameFormats.Wwise.Wem.V132;
-using Shared.GameFormats.Wwise.Wem.V132.Decoding;
-using Shared.GameFormats.Wwise.Wem.V132.Encoding;
-using Wav = Shared.GameFormats.Audio.Wav.WavFile;
+using Wav = Shared.GameFormats.Audio.Containers.Wav.WavFile;
 
 namespace Editors.Audio.AudioProjectConverter
 {
@@ -504,9 +502,6 @@ namespace Editors.Audio.AudioProjectConverter
             string voActor,
             HashSet<uint> usedSourceIds)
         {
-            var codebookLibrary = new WwiseCodebookLibrary();
-            var decoder = new WemVorbisDecoder(codebookLibrary);
-
             var voActorSegment = voActor.Substring(voActor.IndexOf("vo_actor_") + "vo_actor_".Length).ToLower();
 
             foreach (var wavFile in statePathWavs)
@@ -540,8 +535,8 @@ namespace Editors.Audio.AudioProjectConverter
 
                 var wavPackOutputPath = $"{OutputDirectoryPath}\\vo\\{voActorSegment}\\{wavFile.FileName}".ToLower();
                 var wemFileBytes = File.ReadAllBytes(wemFilePath);
-                var vorbisAudio = decoder.Decode(WemFile.CreateFromBytes(wemFileBytes));
-                var wavFileBytes = new Wav { Audio = vorbisAudio.ToPcm() }.WriteData();
+                var wav = new Wav { Audio = PcmAudio.CreateFromWemBytes(wemFileBytes) };
+                var wavFileBytes = wav.WriteData();
                 _fileSaveService.Save(wavPackOutputPath, wavFileBytes, false);
             }
         }

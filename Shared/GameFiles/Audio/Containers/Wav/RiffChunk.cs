@@ -2,7 +2,7 @@
 using Shared.ByteParsing;
 using Shared.Core.ErrorHandling;
 
-namespace Shared.GameFormats.Audio.Wav
+namespace Shared.GameFormats.Audio.Containers.Wav
 {
     public abstract class RiffChunk
     {

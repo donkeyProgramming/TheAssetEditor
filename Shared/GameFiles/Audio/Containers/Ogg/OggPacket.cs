@@ -1,6 +1,6 @@
-﻿namespace Shared.GameFormats.Audio.Ogg
+﻿namespace Shared.GameFormats.Audio.Containers.Ogg
 {
-    public class OggAudioPacket
+    public class OggPacket
     {
         public byte[] PacketData { get; set; } = [];
         public long GranulePosition { get; set; }
