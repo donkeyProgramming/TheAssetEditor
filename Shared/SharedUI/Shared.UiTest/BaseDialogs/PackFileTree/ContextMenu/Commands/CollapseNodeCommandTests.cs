@@ -40,8 +40,6 @@ namespace Shared.UiTest.BaseDialogs.PackFileTree.ContextMenu.Commands
             var file = new TreeNode("file.txt", NodeType.File, owner, folder, PackFile.CreateFromASCII("file.txt", "a"));
             root.AddChild(folder);
             folder.AddChild(file);
-            root.Children.Add(folder);
-            folder.Children.Add(file);
 
             root.IsNodeExpanded = true;
             folder.IsNodeExpanded = true;
@@ -55,7 +53,7 @@ namespace Shared.UiTest.BaseDialogs.PackFileTree.ContextMenu.Commands
         }
 
         [Test]
-        public void Execute_CollapsesUnmaterializedChildren()
+        public void Execute_CollapsesNestedChildren()
         {
             var owner = CreateContainer();
             var root = new TreeNode("root", NodeType.Root, owner, null);

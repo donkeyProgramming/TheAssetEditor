@@ -41,7 +41,7 @@ namespace Shared.Ui.BaseDialogs.PackFileTree.ContextMenu.Commands
         {
             if (node.NodeType == NodeType.Directory || node.NodeType == NodeType.Root)
             {
-                foreach (var item in node.BackingChildren)
+                foreach (var item in node.Children)
                     SaveSelfAndChildren(item, outputDirectory, rootPath, ref fileCounter);
             }
             else

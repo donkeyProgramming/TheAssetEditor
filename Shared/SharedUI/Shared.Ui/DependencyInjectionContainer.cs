@@ -26,6 +26,7 @@ namespace Shared.Ui
             services.AddTransient<IToolSelectorUiProvider, ToolSelectorUiProvider>();
 
             services.AddScoped<PackFileTreeViewFactory>();
+            services.AddScoped<PackFileTreeMutationService>();
 
             // Context menu
             services.AddSingleton(provider =>

@@ -71,7 +71,7 @@
         <!-- TreeView -->
         <TreeView x:Name="tvParameters" AllowDrop="True" Grid.Row="2" Margin="0, 2.5, 0, 5" behaviors:TreeViewExtension.SelectItemOnRightClick="True" 
                   ScrollViewer.HorizontalScrollBarVisibility="Disabled" ItemsSource="{Binding Path=Files, UpdateSourceTrigger=PropertyChanged}" 
-                  VirtualizingPanel.IsVirtualizing="True" VirtualizingPanel.VirtualizationMode="Recycling" VirtualizingPanel.IsVirtualizingWhenGrouping="True"
+                  VirtualizingPanel.IsVirtualizing="True" VirtualizingPanel.VirtualizationMode="Standard" VirtualizingPanel.IsVirtualizingWhenGrouping="True"
                   ScrollViewer.CanContentScroll="True"
                   BorderBrush="Transparent" Background="Transparent">
 

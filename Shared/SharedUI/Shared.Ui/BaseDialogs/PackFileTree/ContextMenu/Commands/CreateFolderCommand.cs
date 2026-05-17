@@ -5,7 +5,7 @@ using Shared.Core.ErrorHandling;
 
 namespace Shared.Ui.BaseDialogs.PackFileTree.ContextMenu.Commands
 {
-    public class CreateFolderCommand(IStandardDialogs standardDialogs) : IContextMenuCommand
+    public class CreateFolderCommand(IStandardDialogs standardDialogs, PackFileTreeMutationService treeMutationService) : IContextMenuCommand
     {
         private readonly ILogger _logger = Logging.Create<CreateFolderCommand>();
 
@@ -27,7 +27,7 @@ namespace Shared.Ui.BaseDialogs.PackFileTree.ContextMenu.Commands
             if (folderName.Any())
             {
                 _logger.Here().Information($"Creating folder '{folderName}' under '{CommandLoggingHelper.DescribeNode(selectedNode)}'");
-                selectedNode.AddDirectoryChild(folderName);
+                treeMutationService.CreateDirectoryChild(selectedNode, folderName);
             }
             else
             {

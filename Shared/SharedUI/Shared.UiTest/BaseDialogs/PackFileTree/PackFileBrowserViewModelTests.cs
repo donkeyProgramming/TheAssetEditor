@@ -1,27 +1,21 @@
-﻿// PackFileBrowserViewModel Lazy Loading Architecture:
+﻿// PackFileBrowserViewModel eager tree architecture:
 //
-// The tree is built lazily. When a container is added (via PackFileContainerAddedEvent), only
-// the root TreeNode is created with a child-loader delegate. Children are NOT loaded from
-// the container's GetDirectoryContent() until the node is expanded or explicitly queried.
+// The full tree is built when a container is added or reloaded, and TreeNode now acts as a
+// lightweight UI node with expansion, visibility, and pack-file metadata.
 //
-// TreeNode serves as both the data model (BackingChildren) and the WPF-bound node.
-// BackingChildren holds the full logical tree once loaded; Children (ObservableCollection) holds
-// only the materialized subset visible to WPF. A placeholder child is used so the WPF TreeView
-// shows the expand arrow for unloaded directories.
+// Event-driven updates from PackFileService mutate that prebuilt hierarchy in place:
+//   - PackFileContainerAddedEvent ? creates and populates a full root tree
+//   - PackFileContainerRemovedEvent ? removes the container root from Files
+//   - PackFileContainerFilesAddedEvent ? inserts files and creates missing folders as needed
+//   - PackFileContainerFilesRemovedEvent ? removes deleted files from the tree
+//   - PackFileContainerFilesUpdatedEvent ? updates Name/UnsavedChanged on renamed files
+//   - PackFileContainerFolderRemovedEvent ? removes folder nodes and subtrees
+//   - PackFileContainerFolderRenamedEvent ? renames the target folder and marks its branch dirty
+//   - PackFileContainerSetAsMainEditableEvent ? toggles IsMainEditabelPack on roots
+//   - PackFileContainerSavedEvent ? clears UnsavedChanged across the loaded tree
 //
-// Event-driven updates from PackFileService:
-//   - PackFileContainerAddedEvent      ? ReloadTree: creates root node + lazy child loader
-//   - PackFileContainerRemovedEvent    ? removes container's root and TreeNode from Files
-//   - PackFileContainerFilesAddedEvent ? AddFiles: inserts nodes into loaded branches, creates dirs as needed
-//   - PackFileContainerFilesRemovedEvent ? removes nodes for deleted files
-//   - PackFileContainerFilesUpdatedEvent ? updates Name/UnsavedChanged on nodes (for rename/save)
-//   - PackFileContainerFolderRemovedEvent ? finds and removes folder node and subtree
-//   - PackFileContainerFolderRenamedEvent ? finds folder by OLD path, renames leaf, marks unsaved
-//   - PackFileContainerSetAsMainEditableEvent ? toggles IsMainEditabelPack on root TreeNodes
-//   - PackFileContainerSavedEvent      ? clears UnsavedChanged on loaded nodes only (avoids forcing full population)
-//
-// SearchFilter: when active, calls EnsureFullyPopulated() to load entire subtree for regex matching.
-// When cleared, filter-expanded nodes are absorbed as user expansions and collapsed nodes are unloaded.
+// SearchFilter only changes visibility and expansion state. It no longer relies on node
+// materialization or placeholder children.
 
 using System.Windows.Input;
 using System.IO;
@@ -120,7 +114,9 @@ namespace Shared.UiTest.BaseDialogs.PackFileTree
             Assert.That(_viewModel.Files.Count, Is.EqualTo(1));
 
             var root = _viewModel.Files[0];
-            Assert.That(PackFileBrowserViewModelTestHelper.GetFromPath(root, "foldera"), Is.Null);
+            Assert.That(root.IsNodeExpanded, Is.False);
+            Assert.That(PackFileBrowserViewModelTestHelper.GetFromPath(root, "foldera"), Is.Not.Null,
+                "Collapsed roots should still keep their eagerly built child nodes.");
 
             root.IsNodeExpanded = true;
 
@@ -145,7 +141,7 @@ namespace Shared.UiTest.BaseDialogs.PackFileTree
         }
 
         [Test]
-        public void CollapsingNodeUnloadsItsChildren()
+        public void CollapsingNodeKeepsItsChildrenButClosesTheBranch()
         {
             CreatePackfiles(("folderA\\sub\\file2.txt", "file2.txt"));
             var root = _viewModel.Files[0];
@@ -159,11 +155,13 @@ namespace Shared.UiTest.BaseDialogs.PackFileTree
 
             folderA.IsNodeExpanded = false;
 
-            Assert.That(PackFileBrowserViewModelTestHelper.GetFromPath(root, "foldera\\sub"), Is.Null);
+            var subFolder = PackFileBrowserViewModelTestHelper.GetFromPath(root, "foldera\\sub");
+            Assert.That(subFolder, Is.Not.Null, "Collapsing should not discard the eagerly built subtree.");
+            Assert.That(folderA.IsNodeExpanded, Is.False);
         }
 
         [Test]
-        public void SearchMaterializesOnlyMatchingBranchAndClearsBackToLazyState()
+        public void SearchHidesNonMatchingBranchesAndClearsBackToVisibleState()
         {
             CreatePackfiles(
                  ("folderA\\sub\\match_file.txt", "match_file.txt"),
@@ -176,15 +174,16 @@ namespace Shared.UiTest.BaseDialogs.PackFileTree
 
             Assert.That(root.IsNodeExpanded, Is.True);
             Assert.That(PackFileBrowserViewModelTestHelper.GetFromPath(root, "foldera\\sub\\match_file.txt"), Is.Not.Null);
-            Assert.That(PackFileBrowserViewModelTestHelper.GetFromPath(root, "folderb"), Is.Null);
+            var folderB = PackFileBrowserViewModelTestHelper.GetFromPath(root, "folderb");
+            Assert.That(folderB, Is.Not.Null);
+            Assert.That(folderB.IsVisible, Is.False, "Non-matching branches should stay in the tree but be hidden.");
 
             _viewModel.Filter.FilterText = string.Empty;
 
             // After clearing, filter-expanded folders are preserved (absorbed as user expansions)
             Assert.That(root.IsNodeExpanded, Is.True);
             Assert.That(PackFileBrowserViewModelTestHelper.GetFromPath(root, "foldera"), Is.Not.Null);
-            // folderB is now also visible and materialized since filter is cleared
-            Assert.That(PackFileBrowserViewModelTestHelper.GetFromPath(root, "folderb"), Is.Not.Null);
+            Assert.That(folderB.IsVisible, Is.True, "Clearing the filter should restore visibility on hidden branches.");
         }
 
         [Test]
@@ -515,15 +514,15 @@ namespace Shared.UiTest.BaseDialogs.PackFileTree
             var root = _viewModel.Files[0];
             var container = _packageFileService.GetAllPackfileContainers().Last(x => x.Name == "test.pack");
 
-            // Root is collapsed — only root exists as materialized node
+            // Root is collapsed, but the eager tree is already built.
             Assert.That(root.IsNodeExpanded, Is.False);
+            var childCountBeforeSave = root.Children.Count;
 
             var eventHub = _runner.ServiceProvider.GetRequiredService<IEventHub>();
             eventHub.PublishGlobalEvent(new Core.Events.Global.PackFileContainerSavedEvent(container));
 
-            // After save, the tree should NOT have expanded/materialized children
-            Assert.That(root.Children.All(c => c.Name == "<placeholder>" || c.NodeType == NodeType.Root),
-                Is.True, "Save should not force population of collapsed branches");
+            Assert.That(root.IsNodeExpanded, Is.False, "Save should not expand collapsed branches.");
+            Assert.That(root.Children.Count, Is.EqualTo(childCountBeforeSave), "Save should not rebuild the eager tree.");
         }
 
         [Test]
@@ -682,9 +681,10 @@ namespace Shared.UiTest.BaseDialogs.PackFileTree
 
             folderA.IsNodeExpanded = true;
 
-            // File nodes are not materialized when ShowFoldersOnly is active
+            // File nodes stay in the eager tree but are hidden.
             var fileNode = PackFileBrowserViewModelTestHelper.GetFromPath(root, "foldera\\file.txt");
-            Assert.That(fileNode, Is.Null, "File should not be materialized with ShowFoldersOnly active");
+            Assert.That(fileNode, Is.Not.Null, "File should still exist in the eager tree with ShowFoldersOnly active");
+            Assert.That(fileNode.IsVisible, Is.False, "File should be hidden with ShowFoldersOnly active");
 
             // Only folder children should be present
             Assert.That(folderA.Children.All(c => c.NodeType != NodeType.File || !c.IsVisible), Is.True,
@@ -801,7 +801,7 @@ namespace Shared.UiTest.BaseDialogs.PackFileTree
             var root = _viewModel.Files[0];
             var container = _packageFileService.GetAllPackfileContainers().Last(x => x.Name == "test.pack");
 
-            // Folder is collapsed — BackingChildren are NOT yet loaded.
+            // Folder is collapsed, but the eager tree is already built.
             Assert.That(root.IsNodeExpanded, Is.False);
 
             // Act: add a second file with the same name (simulates Save As / overwrite import).

@@ -20,7 +20,7 @@ namespace Shared.Ui.BaseDialogs.PackFileTree.ContextMenu.Commands
         void ExpandAllRecursive(TreeNode node)
         {
             node.IsNodeExpanded = true;
-            foreach (var child in node.BackingChildren)
+            foreach (var child in node.Children)
                 ExpandAllRecursive(child);
         }
 

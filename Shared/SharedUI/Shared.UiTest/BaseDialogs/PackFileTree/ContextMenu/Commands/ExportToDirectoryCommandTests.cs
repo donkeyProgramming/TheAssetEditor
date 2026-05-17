@@ -82,8 +82,6 @@ namespace Shared.UiTest.BaseDialogs.PackFileTree.ContextMenu.Commands
             dir.AddChild(file1);
             dir.AddChild(file2);
             root.AddChild(dir);
-            root.MarkChildrenLoaded();
-            dir.MarkChildrenLoaded();
             
             var outputDir = "C:\\export";
             var dialogs = new Mock<IStandardDialogs>();

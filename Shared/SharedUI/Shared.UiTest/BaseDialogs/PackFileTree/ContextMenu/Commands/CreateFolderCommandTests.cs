@@ -11,12 +11,14 @@ namespace Shared.UiTest.BaseDialogs.PackFileTree.ContextMenu.Commands
     [TestFixture]
     internal class CreateFolderCommandTests : ContextMenuCommandTestBase
     {
+        private static readonly PackFileTreeMutationService s_treeMutationService = new();
+
         [Test]
         public void ShouldAdd_ReturnsTrueForEditableRoot()
         {
             var owner = CreateContainer();
             var root = new TreeNode("root", NodeType.Root, owner, null);
-            var command = new CreateFolderCommand(new Mock<IStandardDialogs>().Object);
+            var command = new CreateFolderCommand(new Mock<IStandardDialogs>().Object, s_treeMutationService);
 
             Assert.That(command.ShouldAdd(root), Is.True);
         }
@@ -26,7 +28,7 @@ namespace Shared.UiTest.BaseDialogs.PackFileTree.ContextMenu.Commands
         {
             var owner = CreateContainer();
             var root = new TreeNode("root", NodeType.Root, owner, null);
-            var command = new CreateFolderCommand(new Mock<IStandardDialogs>().Object);
+            var command = new CreateFolderCommand(new Mock<IStandardDialogs>().Object, s_treeMutationService);
 
             Assert.That(command.IsEnabled(root), Is.True);
         }
@@ -42,11 +44,11 @@ namespace Shared.UiTest.BaseDialogs.PackFileTree.ContextMenu.Commands
             var dialogs = new Mock<IStandardDialogs>();
             dialogs.Setup(x => x.ShowFolderNameDialog(It.IsAny<IEnumerable<string>>(), It.IsAny<string>())).Returns("new_folder");
 
-            var command = new CreateFolderCommand(dialogs.Object);
+            var command = new CreateFolderCommand(dialogs.Object, s_treeMutationService);
 
             command.Execute(root);
 
-            Assert.That(root.BackingChildren.Any(x => x.Name == "new_folder"), Is.True);
+            Assert.That(root.Children.Any(x => x.Name == "new_folder"), Is.True);
         }
     }
 }
