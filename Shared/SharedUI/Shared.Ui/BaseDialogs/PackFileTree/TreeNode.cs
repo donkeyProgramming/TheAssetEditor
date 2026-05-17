@@ -62,6 +62,11 @@ namespace Shared.Ui.BaseDialogs.PackFileTree
             child.Parent = null;
         }
 
+        internal void SetChildren(List<TreeNode> children)
+        {
+            Children = new ObservableCollection<TreeNode>(children);
+        }
+
         public string GetFullPath()
         {
             if (NodeType == NodeType.Root)

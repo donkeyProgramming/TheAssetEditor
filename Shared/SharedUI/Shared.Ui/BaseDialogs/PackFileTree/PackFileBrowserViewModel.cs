@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Windows.Input;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -22,6 +23,32 @@ namespace Shared.Ui.BaseDialogs.PackFileTree
 
     public partial class PackFileBrowserViewModel : ObservableObject, IDisposable, IDropTarget<TreeNode>
     {
+        private readonly record struct PathPrefixKey(string Path, int Length)
+        {
+            public static readonly PathPrefixKey Empty = new(string.Empty, 0);
+
+            public ReadOnlySpan<char> Span => Path.AsSpan(0, Length);
+        }
+
+        private sealed class PathPrefixKeyComparer : IEqualityComparer<PathPrefixKey>
+        {
+            public static readonly PathPrefixKeyComparer Ordinal = new();
+
+            public bool Equals(PathPrefixKey x, PathPrefixKey y)
+            {
+                return x.Length == y.Length && x.Span.SequenceEqual(y.Span);
+            }
+
+            public int GetHashCode(PathPrefixKey obj)
+            {
+                var hash = new HashCode();
+                foreach (var ch in obj.Span)
+                    hash.Add(ch);
+
+                return hash.ToHashCode();
+            }
+        }
+
         protected IPackFileService _packFileService;
         private readonly IEventHub? _eventHub;
         private readonly IWindowsKeyboard _windowKeyboard;
@@ -333,58 +360,106 @@ namespace Shared.Ui.BaseDialogs.PackFileTree
         private static void BuildTreeFromFiles(TreeNode root, IPackFileContainer container, bool skipWemFiles)
         {
             var allFiles = container.GetAllFiles();
-            var directoryMap = new Dictionary<string, TreeNode>(allFiles.Count, StringComparer.OrdinalIgnoreCase)
+            var filesByFolder = GroupFilesByFolder(allFiles, skipWemFiles);
+            var directoryMap = new Dictionary<PathPrefixKey, TreeNode>(filesByFolder.Count + 1, PathPrefixKeyComparer.Ordinal)
             {
-                [string.Empty] = root
+                [PathPrefixKey.Empty] = root
             };
-            var pendingDirectories = new List<(string FolderName, string FullFolderPath)>(10);
+            var childrenByParent = new Dictionary<TreeNode, List<TreeNode>>(filesByFolder.Count + 1);
+            var pendingDirectories = new List<(string FolderName, PathPrefixKey FullFolderPath)>(8);
+
+            foreach (var folderPath in filesByFolder.Keys)
+            {
+                if (folderPath.Length == 0)
+                    continue;
+
+                EnsureDirectoryPath(root, container, folderPath, directoryMap, pendingDirectories, childrenByParent);
+            }
+
+            foreach (var folderEntry in filesByFolder)
+            {
+                var parentNode = directoryMap[folderEntry.Key];
+                foreach (var file in folderEntry.Value)
+                {
+                    var fileNode = new TreeNode(file.Name, NodeType.File, container, parentNode, file);
+                    AddChildForBuild(parentNode, fileNode, childrenByParent);
+                }
+            }
+
+            FinalizeTree(root, childrenByParent);
+        }
+
+        private static Dictionary<PathPrefixKey, List<PackFile>> GroupFilesByFolder(Dictionary<string, PackFile> allFiles, bool skipWemFiles)
+        {
+            var filesByFolder = new Dictionary<PathPrefixKey, List<PackFile>>(PathPrefixKeyComparer.Ordinal)
+            {
+                [PathPrefixKey.Empty] = []
+            };
 
             foreach (var item in allFiles)
             {
-                var pathSpan = item.Key.AsSpan();
-                if (skipWemFiles && pathSpan.EndsWith(".wem", StringComparison.InvariantCultureIgnoreCase))
+                var path = item.Key;
+                if (skipWemFiles && path.EndsWith(".wem", StringComparison.OrdinalIgnoreCase))
                     continue;
 
-                var parentNode = root;
-                pendingDirectories.Clear();
+                var separatorIndex = FindLastDirectorySeparatorIndex(path.AsSpan());
+                var folderPath = separatorIndex == -1
+                    ? PathPrefixKey.Empty
+                    : new PathPrefixKey(path, separatorIndex);
 
-                var end = pathSpan.Length - 1;
-                while (end >= 0)
-                {
-                    var separatorIndex = pathSpan[..(end + 1)].LastIndexOf(Path.DirectorySeparatorChar);
-                    if (separatorIndex == -1)
-                        break;
-
-                    var fullFolderPath = pathSpan[..separatorIndex].ToString();
-                    if (directoryMap.TryGetValue(fullFolderPath, out var existingDirectory))
-                    {
-                        parentNode = existingDirectory;
-                        break;
-                    }
-
-                    var folderNameStart = fullFolderPath.LastIndexOf(Path.DirectorySeparatorChar);
-                    var folderName = folderNameStart == -1
-                        ? fullFolderPath
-                        : fullFolderPath[(folderNameStart + 1)..];
-                    pendingDirectories.Add((folderName, fullFolderPath));
-
-                    end = separatorIndex - 1;
-                }
-
-                for (var i = pendingDirectories.Count - 1; i >= 0; i--)
-                {
-                    var currentDirectory = pendingDirectories[i];
-                    var currentNode = new TreeNode(currentDirectory.FolderName, NodeType.Directory, container, parentNode);
-                    parentNode.AddChild(currentNode);
-                    parentNode = currentNode;
-                    directoryMap[currentDirectory.FullFolderPath] = currentNode;
-                }
-
-                var fileNode = new TreeNode(item.Value.Name, NodeType.File, container, parentNode, item.Value);
-                parentNode.AddChild(fileNode);
+                ref var files = ref CollectionsMarshal.GetValueRefOrAddDefault(filesByFolder, folderPath, out _);
+                files ??= [];
+                files.Add(item.Value);
             }
 
-            SortTree(root);
+            return filesByFolder;
+        }
+
+        private static TreeNode EnsureDirectoryPath(TreeNode root, IPackFileContainer container, PathPrefixKey folderPath, Dictionary<PathPrefixKey, TreeNode> directoryMap, List<(string FolderName, PathPrefixKey FullFolderPath)> pendingDirectories, Dictionary<TreeNode, List<TreeNode>> childrenByParent)
+        {
+            if (directoryMap.TryGetValue(folderPath, out var existingDirectory))
+                return existingDirectory;
+
+            pendingDirectories.Clear();
+            var currentFolderPath = folderPath;
+            while (currentFolderPath.Length > 0 && !directoryMap.TryGetValue(currentFolderPath, out existingDirectory))
+            {
+                var currentPathSpan = currentFolderPath.Span;
+                var separatorIndex = FindLastDirectorySeparatorIndex(currentPathSpan);
+                var folderName = separatorIndex == -1
+                    ? currentFolderPath.Path[..currentFolderPath.Length]
+                    : currentFolderPath.Path.Substring(separatorIndex + 1, currentFolderPath.Length - separatorIndex - 1);
+                pendingDirectories.Add((folderName, currentFolderPath));
+                currentFolderPath = separatorIndex == -1
+                    ? PathPrefixKey.Empty
+                    : new PathPrefixKey(currentFolderPath.Path, separatorIndex);
+            }
+
+            var parentNode = currentFolderPath.Length == 0 ? root : directoryMap[currentFolderPath];
+            for (var i = pendingDirectories.Count - 1; i >= 0; i--)
+            {
+                var currentDirectory = pendingDirectories[i];
+                var currentNode = new TreeNode(currentDirectory.FolderName, NodeType.Directory, container, parentNode);
+                AddChildForBuild(parentNode, currentNode, childrenByParent);
+                directoryMap[currentDirectory.FullFolderPath] = currentNode;
+                parentNode = currentNode;
+            }
+
+            return parentNode;
+        }
+
+        private static void AddChildForBuild(TreeNode parent, TreeNode child, Dictionary<TreeNode, List<TreeNode>> childrenByParent)
+        {
+            child.Parent = parent;
+
+            ref var children = ref CollectionsMarshal.GetValueRefOrAddDefault(childrenByParent, parent, out _);
+            children ??= [];
+            children.Add(child);
+        }
+
+        private static int FindLastDirectorySeparatorIndex(ReadOnlySpan<char> path)
+        {
+            return path.LastIndexOfAny(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
         }
 
         private static readonly Comparison<TreeNode> TreeNodeComparison = (left, right) =>
@@ -396,18 +471,16 @@ namespace Shared.Ui.BaseDialogs.PackFileTree
             return StringComparer.CurrentCultureIgnoreCase.Compare(left.Name, right.Name);
         };
 
-        private static void SortTree(TreeNode node)
+        private static void FinalizeTree(TreeNode node, Dictionary<TreeNode, List<TreeNode>> childrenByParent)
         {
-            var sortedChildren = node.Children
-                .OrderBy(child => child, Comparer<TreeNode>.Create(TreeNodeComparison))
-                .ToList();
+            if (!childrenByParent.TryGetValue(node, out var children) || children.Count == 0)
+                return;
 
-            node.Children.Clear();
-            foreach (var child in sortedChildren)
-            {
-                node.Children.Add(child);
-                SortTree(child);
-            }
+            children.Sort(TreeNodeComparison);
+            node.SetChildren(children);
+
+            foreach (var child in children)
+                FinalizeTree(child, childrenByParent);
         }
 
         private void OnPackFileContainerRemoved(PackFileContainerRemovedEvent e)
