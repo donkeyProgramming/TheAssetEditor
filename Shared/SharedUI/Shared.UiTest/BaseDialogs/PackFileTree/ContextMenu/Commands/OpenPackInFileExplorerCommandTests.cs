@@ -17,7 +17,7 @@ namespace Shared.UiTest.BaseDialogs.PackFileTree.ContextMenu.Commands
             var root = new TreeNode("root", NodeType.Root, owner, null);
             var command = new OpenPackInFileExplorerCommand( new Mock<IStandardDialogs>().Object, new Mock<IFileSystemAccess>().Object);
 
-            Assert.That(command.ShouldAdd(root), Is.True);
+            Assert.That(command.ShouldAdd(root, null), Is.True);
         }
 
         [Test]
@@ -27,7 +27,7 @@ namespace Shared.UiTest.BaseDialogs.PackFileTree.ContextMenu.Commands
             var root = new TreeNode("root", NodeType.Root, owner, null);
             var command = new OpenPackInFileExplorerCommand(new Mock<IStandardDialogs>().Object, new Mock<IFileSystemAccess>().Object);
 
-            Assert.That(command.IsEnabled(root), Is.True);
+            Assert.That(command.IsEnabled(root, null), Is.True);
         }
 
         [Test]
@@ -40,7 +40,7 @@ namespace Shared.UiTest.BaseDialogs.PackFileTree.ContextMenu.Commands
             fileSystem.Setup(x => x.PathGetDirectoryName(It.IsAny<string>())).Returns("C:\\temp");
 
             var command = new OpenPackInFileExplorerCommand( new Mock<IStandardDialogs>().Object, fileSystem.Object);
-            command.Execute(root);
+            command.Execute(root, null);
 
             fileSystem.Verify(x => x.ProcessStart(It.Is<ProcessStartInfo>(p => p.FileName == "explorer.exe")), Times.Once);
         }
@@ -53,7 +53,7 @@ namespace Shared.UiTest.BaseDialogs.PackFileTree.ContextMenu.Commands
             var dialogs = new Mock<IStandardDialogs>();
             var command = new OpenPackInFileExplorerCommand(dialogs.Object, new Mock<IFileSystemAccess>().Object);
 
-            command.Execute(root);
+            command.Execute(root, null);
 
             dialogs.Verify(x => x.ShowDialogBox(It.IsAny<string>(), It.IsAny<string>()), Times.Once);
         }

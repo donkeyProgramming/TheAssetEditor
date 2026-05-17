@@ -14,11 +14,11 @@ namespace Shared.Ui.BaseDialogs.PackFileTree.ContextMenu.Commands
     {
         private readonly ILogger _logger = Logging.Create<ImportDirectoryCommand>();
 
-        public string GetDisplayName(TreeNode node) => "Import Directory";
-        public bool ShouldAdd(TreeNode node) => node.NodeType != NodeType.File && !node.FileOwner.IsCaPackFile;
-        public bool IsEnabled(TreeNode node) => true;
+        public string GetDisplayName(TreeNode node, PackFile? packFile) => "Import Directory";
+        public bool ShouldAdd(TreeNode node, PackFile? packFile) => node.NodeType != NodeType.File && !node.FileOwner.IsCaPackFile;
+        public bool IsEnabled(TreeNode node, PackFile? packFile) => true;
 
-        public void Execute(TreeNode _selectedNode)
+        public void Execute(TreeNode _selectedNode, PackFile? packFile)
         {
             if (_selectedNode.FileOwner.IsCaPackFile)
             {

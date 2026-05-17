@@ -16,10 +16,11 @@ namespace Shared.UiTest.BaseDialogs.PackFileTree.ContextMenu.Commands
         {
             var owner = CreateContainer();
             var root = new TreeNode("root", NodeType.Root, owner, null);
-            var file = new TreeNode("file.txt", NodeType.File, owner, root, PackFile.CreateFromASCII("file.txt", "a"));
+            var packFile = PackFile.CreateFromASCII("file.txt", "a");
+            var file = new TreeNode("file.txt", NodeType.File, owner, root);
             var command = new DeleteNodeCommand(new Mock<IPackFileService>().Object, new Mock<IStandardDialogs>().Object);
 
-            Assert.That(command.ShouldAdd(file), Is.True);
+            Assert.That(command.ShouldAdd(file, packFile), Is.True);
         }
 
         [Test]
@@ -27,10 +28,11 @@ namespace Shared.UiTest.BaseDialogs.PackFileTree.ContextMenu.Commands
         {
             var owner = CreateContainer();
             var root = new TreeNode("root", NodeType.Root, owner, null);
-            var file = new TreeNode("file.txt", NodeType.File, owner, root, PackFile.CreateFromASCII("file.txt", "a"));
+            var packFile = PackFile.CreateFromASCII("file.txt", "a");
+            var file = new TreeNode("file.txt", NodeType.File, owner, root);
             var command = new DeleteNodeCommand(new Mock<IPackFileService>().Object, new Mock<IStandardDialogs>().Object);
 
-            Assert.That(command.IsEnabled(file), Is.True);
+            Assert.That(command.IsEnabled(file, packFile), Is.True);
         }
 
         [Test]
@@ -38,7 +40,8 @@ namespace Shared.UiTest.BaseDialogs.PackFileTree.ContextMenu.Commands
         {
             var owner = CreateContainer();
             var root = new TreeNode("root", NodeType.Root, owner, null);
-            var file = new TreeNode("file.txt", NodeType.File, owner, root, PackFile.CreateFromASCII("file.txt", "a"));
+            var packFile = PackFile.CreateFromASCII("file.txt", "a");
+            var file = new TreeNode("file.txt", NodeType.File, owner, root);
             root.AddChild(file);
 
             var service = new Mock<IPackFileService>();
@@ -47,9 +50,9 @@ namespace Shared.UiTest.BaseDialogs.PackFileTree.ContextMenu.Commands
 
             var command = new DeleteNodeCommand(service.Object, dialogs.Object);
 
-            command.Execute(file);
+            command.Execute(file, packFile);
 
-            service.Verify(x => x.DeleteFile(owner, file.Item!), Times.Once);
+            service.Verify(x => x.DeleteFile(owner, packFile), Times.Once);
         }
     }
 }

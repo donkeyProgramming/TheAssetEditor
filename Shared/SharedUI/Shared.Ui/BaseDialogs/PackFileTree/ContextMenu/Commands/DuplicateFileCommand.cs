@@ -12,14 +12,17 @@ namespace Shared.Ui.BaseDialogs.PackFileTree.ContextMenu.Commands
     {
         private readonly ILogger _logger = Logging.Create<DuplicateFileCommand>();
 
-        public string GetDisplayName(TreeNode node) => "Duplicate";
-        public bool ShouldAdd(TreeNode node) => node.NodeType == NodeType.File && node.Item != null && !node.FileOwner.IsCaPackFile;
-        public bool IsEnabled(TreeNode node) => true;
+        public string GetDisplayName(TreeNode node, PackFile? packFile) => "Duplicate";
+        public bool ShouldAdd(TreeNode node, PackFile? packFile) => node.NodeType == NodeType.File && packFile != null && !node.FileOwner.IsCaPackFile;
+        public bool IsEnabled(TreeNode node, PackFile? packFile) => true;
 
-        public void Execute(TreeNode _selectedNode)
+        public void Execute(TreeNode _selectedNode, PackFile? packFile)
         {
+            if (packFile == null)
+                return;
+
             _logger.Here().Information($"Duplicating file node '{CommandLoggingHelper.DescribeNode(_selectedNode)}'");
-            Execute(_selectedNode.Item!);
+            Execute(packFile);
         }
 
         public void Execute(PackFile item)

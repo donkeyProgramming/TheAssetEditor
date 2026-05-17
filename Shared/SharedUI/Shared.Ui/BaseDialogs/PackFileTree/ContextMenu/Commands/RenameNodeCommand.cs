@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using Shared.Core.PackFiles;
+using Shared.Core.PackFiles.Models;
 using Shared.Core.Services;
 using Serilog;
 using Shared.Core.ErrorHandling;
@@ -10,11 +11,11 @@ namespace Shared.Ui.BaseDialogs.PackFileTree.ContextMenu.Commands
     {
         private readonly ILogger _logger = Logging.Create<RenameNodeCommand>();
 
-        public string GetDisplayName(TreeNode node) => "Rename";
-        public bool ShouldAdd(TreeNode node) => (node.NodeType == NodeType.File || node.NodeType == NodeType.Directory) && !node.FileOwner.IsCaPackFile;
-        public bool IsEnabled(TreeNode node) => true;
+        public string GetDisplayName(TreeNode node, PackFile? packFile) => "Rename";
+        public bool ShouldAdd(TreeNode node, PackFile? packFile) => ((node.NodeType == NodeType.File && packFile != null) || node.NodeType == NodeType.Directory) && !node.FileOwner.IsCaPackFile;
+        public bool IsEnabled(TreeNode node, PackFile? packFile) => true;
 
-        public void Execute(TreeNode _selectedNode)
+        public void Execute(TreeNode _selectedNode, PackFile? packFile)
         {
             var FileOwner = _selectedNode.FileOwner;
             if (FileOwner.IsCaPackFile)
@@ -48,8 +49,11 @@ namespace Shared.Ui.BaseDialogs.PackFileTree.ContextMenu.Commands
                 var newFileName = inputResult.Result ? inputResult.Text.ToLower().Trim() : string.Empty;
                 if (newFileName.Any())
                 {
+                    if (packFile == null)
+                        return;
+
                     _logger.Here().Information($"Renaming file '{currentPath}' to '{newFileName}'");
-                    packFileService.RenameFile(_selectedNode.FileOwner, _selectedNode.Item, newFileName);
+                    packFileService.RenameFile(_selectedNode.FileOwner, packFile, newFileName);
                 }
                 else
                 {

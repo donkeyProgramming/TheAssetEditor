@@ -1,6 +1,7 @@
 ﻿using System.IO;
 using Editors.KitbasherEditor.UiCommands;
 using Shared.Core.Events;
+using Shared.Core.PackFiles;
 using Shared.Ui.BaseDialogs.PackFileTree;
 
 namespace Editors.KitbasherEditor.ViewModels
@@ -8,10 +9,12 @@ namespace Editors.KitbasherEditor.ViewModels
     public class KitbashViewDropHandler
     {
         private readonly IUiCommandFactory _uiCommandFactory;
+        private readonly IPackFileService _packFileService;
 
-        public KitbashViewDropHandler(IUiCommandFactory uiCommandFactory)
+        public KitbashViewDropHandler(IUiCommandFactory uiCommandFactory, IPackFileService packFileService)
         {
             _uiCommandFactory = uiCommandFactory;
+            _packFileService = packFileService;
         }
 
         public bool AllowDrop(TreeNode node, TreeNode targeNode = null)
@@ -27,7 +30,11 @@ namespace Editors.KitbasherEditor.ViewModels
 
         public bool Drop(TreeNode node)
         {
-            _uiCommandFactory.Create<ImportReferenceMeshCommand>().Execute(node.Item);
+            var packFile = _packFileService.FindFile(node.GetFullPath(), node.FileOwner);
+            if (packFile == null)
+                return false;
+
+            _uiCommandFactory.Create<ImportReferenceMeshCommand>().Execute(packFile);
             return true;
         }
     }

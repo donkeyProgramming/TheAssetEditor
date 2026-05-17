@@ -12,11 +12,11 @@ namespace Shared.Ui.BaseDialogs.PackFileTree.ContextMenu.Commands
     {
         private readonly ILogger _logger = Logging.Create<ImportFileCommand>();
 
-        public string GetDisplayName(TreeNode node) => "Import File";
-        public bool ShouldAdd(TreeNode node) => node.NodeType != NodeType.File && !node.FileOwner.IsCaPackFile;
-        public bool IsEnabled(TreeNode node) => true;
+        public string GetDisplayName(TreeNode node, PackFile? packFile) => "Import File";
+        public bool ShouldAdd(TreeNode node, PackFile? packFile) => node.NodeType != NodeType.File && !node.FileOwner.IsCaPackFile;
+        public bool IsEnabled(TreeNode node, PackFile? packFile) => true;
 
-        public void Execute(TreeNode _selectedNode)
+        public void Execute(TreeNode _selectedNode, PackFile? packFile)
         {
             if (_selectedNode.FileOwner.IsCaPackFile)
             {
@@ -34,8 +34,8 @@ namespace Shared.Ui.BaseDialogs.PackFileTree.ContextMenu.Commands
                 foreach (var file in files)
                 {
                     var fileName = Path.GetFileName(file);
-                    var packFile = new PackFile(fileName, new MemorySource(fileSystemAccess.FileReadAllBytes(file)));
-                    var item = new NewPackFileEntry(parentPath, packFile);
+                    var importedFile = new PackFile(fileName, new MemorySource(fileSystemAccess.FileReadAllBytes(file)));
+                    var item = new NewPackFileEntry(parentPath, importedFile);
                     packFileService.AddFilesToPack(_selectedNode.FileOwner, [item]);
                 }
 

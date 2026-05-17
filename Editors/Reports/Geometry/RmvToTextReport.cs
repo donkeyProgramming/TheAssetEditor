@@ -13,15 +13,18 @@ namespace Editors.Reports.Geometry
 {
     public class RmvToTextCommand(RmvToTextReport report) : IContextMenuCommand
     {
-        public string GetDisplayName(TreeNode node) => "Generate Rmv to Text";
+        public string GetDisplayName(TreeNode node, PackFile? packFile) => "Generate Rmv to Text";
 
-        public bool ShouldAdd(TreeNode node) => IsEnabled(node);
+        public bool ShouldAdd(TreeNode node, PackFile? packFile) => IsEnabled(node, packFile);
 
-        public bool IsEnabled(TreeNode node) => node.NodeType == NodeType.File && node.Item != null && node.Name.EndsWith(".rigid_model_v2", StringComparison.OrdinalIgnoreCase);
+        public bool IsEnabled(TreeNode node, PackFile? packFile) => node.NodeType == NodeType.File && packFile != null && node.Name.EndsWith(".rigid_model_v2", StringComparison.OrdinalIgnoreCase);
 
-        public void Execute(TreeNode node)
+        public void Execute(TreeNode node, PackFile? packFile)
         {
-            report.Generate(node.Item!);
+            if (packFile == null)
+                return;
+
+            report.Generate(packFile);
         }
     }
 

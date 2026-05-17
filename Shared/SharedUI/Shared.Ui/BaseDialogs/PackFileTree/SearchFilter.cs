@@ -158,13 +158,13 @@ namespace Shared.Ui.BaseDialogs.PackFileTree
                 return;
 
             // Build the visible tree directly from paths — no container calls
-            foreach (var (path, file) in matchingFiles)
+            foreach (var (path, _) in matchingFiles)
             {
-                MarkPathVisibleFromData(rootNode, path, file);
+                MarkPathVisibleFromData(rootNode, path);
             }
         }
 
-        private void MarkPathVisibleFromData(TreeNode rootNode, string filePath, PackFile file)
+        private void MarkPathVisibleFromData(TreeNode rootNode, string filePath)
         {
             var current = rootNode;
             var segments = filePath.Split('\\', StringSplitOptions.RemoveEmptyEntries);
@@ -186,12 +186,7 @@ namespace Shared.Ui.BaseDialogs.PackFileTree
             var fileName = segments[^1];
             var fileNode = current.Children.FirstOrDefault(
                 c => c.Name.Equals(fileName, StringComparison.OrdinalIgnoreCase)
-                    && c.NodeType == NodeType.File
-                    && ReferenceEquals(c.Item, file));
-
-            if (fileNode == null)
-                fileNode = current.Children.FirstOrDefault(
-                    c => c.Name.Equals(fileName, StringComparison.OrdinalIgnoreCase) && c.NodeType == NodeType.File);
+                    && c.NodeType == NodeType.File);
 
             if (fileNode == null)
                 return;

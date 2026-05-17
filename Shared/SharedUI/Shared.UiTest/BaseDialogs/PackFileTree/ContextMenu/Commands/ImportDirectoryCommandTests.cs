@@ -17,7 +17,7 @@ namespace Shared.UiTest.BaseDialogs.PackFileTree.ContextMenu.Commands
         public void ShouldAdd_ReturnsTrueForDirectoryNode()
         {
             var command = new ImportDirectoryCommand(new Mock<IPackFileService>().Object, new Mock<IStandardDialogs>().Object, new Mock<IFileSystemAccess>().Object);
-            Assert.That(command.ShouldAdd(new TreeNode("dir", NodeType.Directory, CreateContainer(), null)), Is.True);
+            Assert.That(command.ShouldAdd(new TreeNode("dir", NodeType.Directory, CreateContainer(), null), null), Is.True);
         }
 
         [Test]
@@ -27,7 +27,7 @@ namespace Shared.UiTest.BaseDialogs.PackFileTree.ContextMenu.Commands
             var root = new TreeNode("root", NodeType.Root, owner, null);
             var command = new ImportDirectoryCommand(new Mock<IPackFileService>().Object, new Mock<IStandardDialogs>().Object, new Mock<IFileSystemAccess>().Object);
 
-            Assert.That(command.IsEnabled(root), Is.True);
+            Assert.That(command.IsEnabled(root, null), Is.True);
         }
 
         [Test]
@@ -40,7 +40,7 @@ namespace Shared.UiTest.BaseDialogs.PackFileTree.ContextMenu.Commands
             var dialogs = new Mock<IStandardDialogs>();
             var command = new ImportDirectoryCommand(service.Object, dialogs.Object, new Mock<IFileSystemAccess>().Object);
 
-            command.Execute(root);
+            command.Execute(root, null);
 
             dialogs.Verify(x => x.ShowDialogBox("Unable to edit CA packfile", "Error"), Times.Once);
             service.Verify(x => x.AddFilesToPack(It.IsAny<IPackFileContainer>(), It.IsAny<List<NewPackFileEntry>>()), Times.Never);
@@ -59,7 +59,7 @@ namespace Shared.UiTest.BaseDialogs.PackFileTree.ContextMenu.Commands
             var fileSystem = new Mock<IFileSystemAccess>();
             var command = new ImportDirectoryCommand(service.Object, dialogs.Object, fileSystem.Object);
 
-            command.Execute(root);
+            command.Execute(root, null);
 
             service.Verify(x => x.AddFilesToPack(It.IsAny<IPackFileContainer>(), It.IsAny<List<NewPackFileEntry>>()), Times.Never);
             fileSystem.Verify(x => x.FileReadAllBytes(It.IsAny<string>()), Times.Never);
@@ -91,7 +91,7 @@ namespace Shared.UiTest.BaseDialogs.PackFileTree.ContextMenu.Commands
             fileSystem.Setup(x => x.FileReadAllBytes(file2Path)).Returns(file2Bytes);
             var command = new ImportDirectoryCommand(service.Object, dialogs.Object, fileSystem.Object);
 
-            command.Execute(root);
+            command.Execute(root, null);
 
             fileSystem.Verify(x => x.FileReadAllBytes(file1Path), Times.Once);
             fileSystem.Verify(x => x.FileReadAllBytes(file2Path), Times.Once);

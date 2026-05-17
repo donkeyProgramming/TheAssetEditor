@@ -22,7 +22,6 @@ namespace Shared.Ui.BaseDialogs.PackFileTree
         private bool _isExpandedByFilter;
 
         public IPackFileContainer FileOwner { get; private set; }
-        public PackFile? Item { get; set; }
         public TreeNode? Parent { get; set; }
 
         public bool HasChildren => Children.Count > 0;
@@ -35,10 +34,9 @@ namespace Shared.Ui.BaseDialogs.PackFileTree
         [ObservableProperty] public partial bool IsNodeExpanded { get; set; } = false;
         [ObservableProperty] public partial NodeType NodeType { get; private set; }
 
-        public TreeNode(string name, NodeType type, IPackFileContainer owner, TreeNode? parent, PackFile? packFile = null)
+        public TreeNode(string name, NodeType type, IPackFileContainer owner, TreeNode? parent)
         {
             Name = name;
-            Item = packFile;
             FileOwner = owner;
             Parent = parent;
             NodeType = type;

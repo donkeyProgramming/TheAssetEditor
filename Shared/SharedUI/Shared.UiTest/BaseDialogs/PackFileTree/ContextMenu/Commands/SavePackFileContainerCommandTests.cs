@@ -18,7 +18,7 @@ namespace Shared.UiTest.BaseDialogs.PackFileTree.ContextMenu.Commands
             var root = new TreeNode("root", NodeType.Root, owner, null);
             var command = new SavePackFileContainerCommand(new Mock<IPackFileService>().Object, new Mock<IStandardDialogs>().Object, new ApplicationSettingsService(GameTypeEnum.Warhammer3));
 
-            Assert.That(command.ShouldAdd(root), Is.True);
+            Assert.That(command.ShouldAdd(root, null), Is.True);
         }
 
         [Test]
@@ -28,7 +28,7 @@ namespace Shared.UiTest.BaseDialogs.PackFileTree.ContextMenu.Commands
             var root = new TreeNode("root", NodeType.Root, owner, null);
             var command = new SavePackFileContainerCommand(new Mock<IPackFileService>().Object, new Mock<IStandardDialogs>().Object, new ApplicationSettingsService(GameTypeEnum.Warhammer3));
 
-            Assert.That(command.IsEnabled(root), Is.True);
+            Assert.That(command.IsEnabled(root, null), Is.True);
         }
 
         [Test]
@@ -42,7 +42,7 @@ namespace Shared.UiTest.BaseDialogs.PackFileTree.ContextMenu.Commands
 
             var command = new SavePackFileContainerCommand(service.Object, dialogs.Object, appSettings);
 
-            command.Execute(root);
+            command.Execute(root, null);
 
             service.Verify(x => x.SavePackContainer(owner, owner.SystemFilePath, false, It.IsAny<GameInformation>()), Times.Once);
         }

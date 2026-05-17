@@ -290,7 +290,7 @@ namespace Shared.UiTest.BaseDialogs.PackFileTree
             folderA.IsNodeExpanded = true;
 
             // Confirm the file node is visible in the WPF tree before deletion
-            Assert.That(folderA.Children.Count(x => x.NodeType == NodeType.File && x.Item != null),
+            Assert.That(folderA.Children.Count(x => x.NodeType == NodeType.File),
                 Is.EqualTo(1), "File node should be present before delete");
 
             // Act: simulate what PackFileService.DeleteFile does
@@ -299,7 +299,7 @@ namespace Shared.UiTest.BaseDialogs.PackFileTree
             _packageFileService.DeleteFile(container, filePackFile);
 
             // Assert: the file node must be gone from the WPF tree
-            Assert.That(folderA.Children.Count(x => x.NodeType == NodeType.File && x.Item != null),
+            Assert.That(folderA.Children.Count(x => x.NodeType == NodeType.File),
                 Is.EqualTo(0), "File node should be removed after delete");
         }
 
@@ -317,7 +317,7 @@ namespace Shared.UiTest.BaseDialogs.PackFileTree
             folderA.IsNodeExpanded = true;
 
             // Confirm the file node is visible in the WPF tree before rename
-            Assert.That(folderA.Children.Count(x => x.NodeType == NodeType.File && x.Item != null),
+            Assert.That(folderA.Children.Count(x => x.NodeType == NodeType.File),
                 Is.EqualTo(1), "File node should be present before rename");
 
             // Act: rename the file through PackFileService
@@ -819,7 +819,7 @@ namespace Shared.UiTest.BaseDialogs.PackFileTree
                 .ToList();
 
             Assert.That(duplicates.Count, Is.EqualTo(1), "Overwriting a file in a collapsed folder must not create a duplicate node");
-            Assert.That(duplicates[0].Item, Is.SameAs(replacement), "The surviving node should reference the replacement PackFile");
+            Assert.That(_packageFileService.FindFile(duplicates[0].GetFullPath(), duplicates[0].FileOwner), Is.SameAs(replacement), "The surviving node should resolve to the replacement PackFile");
         }
 
         [Test]
@@ -846,7 +846,7 @@ namespace Shared.UiTest.BaseDialogs.PackFileTree
                 .ToList();
 
             Assert.That(duplicates.Count, Is.EqualTo(1), "Overwriting a file in an expanded folder must not create a duplicate node");
-            Assert.That(duplicates[0].Item, Is.SameAs(replacement), "The surviving node should reference the replacement PackFile");
+            Assert.That(_packageFileService.FindFile(duplicates[0].GetFullPath(), duplicates[0].FileOwner), Is.SameAs(replacement), "The surviving node should resolve to the replacement PackFile");
         }
     }
 }

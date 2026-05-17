@@ -41,13 +41,14 @@ namespace Shared.Ui.BaseDialogs.StandardDialog.PackFile
         private void ViewModel_FileSelected(TreeNode node)
         {
             _selectedNode = node;
+            SelectedFile = node.NodeType == NodeType.File
+                ? _packfileService.FindFile(node.GetFullPath(), node.FileOwner)
+                : null;
 
-            if (_selectedNode.Item == null)
+            if (SelectedFile == null)
                 CurrentFileName = "";
             else
-                CurrentFileName = _selectedNode.Item.Name;
-
-            SelectedFile = _selectedNode.Item;
+                CurrentFileName = SelectedFile.Name;
         }
 
         private void ViewModel_FileOpen(Core.PackFiles.Models.PackFile file)

@@ -1,5 +1,6 @@
 ﻿using Serilog;
 using Shared.Core.ErrorHandling;
+using Shared.Core.PackFiles.Models;
 
 namespace Shared.Ui.BaseDialogs.PackFileTree.ContextMenu.Commands
 {
@@ -7,11 +8,11 @@ namespace Shared.Ui.BaseDialogs.PackFileTree.ContextMenu.Commands
     {
         private readonly ILogger _logger = Logging.Create<CollapseNodeCommand>();
 
-        public string GetDisplayName(TreeNode node) => "Collapse all";
-        public bool ShouldAdd(TreeNode node) => node.NodeType != NodeType.File;
-        public bool IsEnabled(TreeNode node) => true;
+        public string GetDisplayName(TreeNode node, PackFile? packFile) => "Collapse all";
+        public bool ShouldAdd(TreeNode node, PackFile? packFile) => node.NodeType != NodeType.File;
+        public bool IsEnabled(TreeNode node, PackFile? packFile) => true;
 
-        public void Execute(TreeNode _selectedNode)
+        public void Execute(TreeNode _selectedNode, PackFile? packFile)
         {
             _logger.Here().Information($"Collapsing node '{CommandLoggingHelper.DescribeNode(_selectedNode)}' recursively");
             CollapsAllRecursive(_selectedNode);

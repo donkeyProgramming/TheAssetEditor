@@ -1,21 +1,23 @@
 ﻿using System;
 using System.IO;
 using Shared.Core.Misc;
+using Shared.Core.PackFiles;
+using Shared.Core.PackFiles.Models;
 using Shared.Core.Services;
 using Serilog;
 using Shared.Core.ErrorHandling;
 
 namespace Shared.Ui.BaseDialogs.PackFileTree.ContextMenu.Commands
 {
-    public class ExportToDirectoryCommand(IStandardDialogs standardDialogs, IFileSystemAccess fileSystemAccess) : IContextMenuCommand
+    public class ExportToDirectoryCommand(IPackFileService packFileService, IStandardDialogs standardDialogs, IFileSystemAccess fileSystemAccess) : IContextMenuCommand
     {
         private readonly ILogger _logger = Logging.Create<ExportToDirectoryCommand>();
 
-        public string GetDisplayName(TreeNode node) => "Export to system folder";
-        public bool ShouldAdd(TreeNode node) => node.NodeType == NodeType.Directory || node.NodeType == NodeType.Root || (node.NodeType == NodeType.File && node.Item != null);
-        public bool IsEnabled(TreeNode node) => true;
+        public string GetDisplayName(TreeNode node, PackFile? packFile) => "Export to system folder";
+        public bool ShouldAdd(TreeNode node, PackFile? packFile) => node.NodeType == NodeType.Directory || node.NodeType == NodeType.Root || (node.NodeType == NodeType.File && packFile != null);
+        public bool IsEnabled(TreeNode node, PackFile? packFile) => true;
 
-        public void Execute(TreeNode selectedNode)
+        public void Execute(TreeNode selectedNode, PackFile? packFile)
         {
             // TODO: Fix bug where if you export the packfilecontainer itself it doesn't export correctly.
             var folderDialogResult = standardDialogs.ShowSystemFolderBrowserDialog();
@@ -54,7 +56,10 @@ namespace Shared.Ui.BaseDialogs.PackFileTree.ContextMenu.Commands
                 if (!string.IsNullOrEmpty(fileOutputDir))
                     DirectoryHelper.EnsureCreated(fileOutputDir);
 
-                var packFile = node.Item;
+                var packFile = packFileService.FindFile(node.GetFullPath(), node.FileOwner);
+                if (packFile == null)
+                    return;
+
                 var bytes = packFile.DataSource.ReadData();
 
                 fileSystemAccess.FileWriteAllBytes(fileOutputPath, bytes);

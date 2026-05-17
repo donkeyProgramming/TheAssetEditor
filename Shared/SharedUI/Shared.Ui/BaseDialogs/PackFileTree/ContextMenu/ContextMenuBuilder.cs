@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
+using Shared.Core.PackFiles.Models;
 using Shared.Ui.BaseDialogs.PackFileTree.ContextMenu.Commands;
 
 namespace Shared.Ui.BaseDialogs.PackFileTree.ContextMenu
@@ -18,7 +19,7 @@ namespace Shared.Ui.BaseDialogs.PackFileTree.ContextMenu
             _serviceProvider = serviceProvider;
         }
 
-        public ObservableCollection<ContextMenuItem> Build(ContextMenuType contextMenuType, TreeNode? node)
+        public ObservableCollection<ContextMenuItem> Build(ContextMenuType contextMenuType, TreeNode? node, PackFile? packFile)
         {
             var output = new ObservableCollection<ContextMenuItem>();
             if (node == null)
@@ -35,11 +36,11 @@ namespace Shared.Ui.BaseDialogs.PackFileTree.ContextMenu
                 foreach (var item in items.Where(x => x.Cluster == cluster))
                 {
                     var command = (IContextMenuCommand)_serviceProvider.GetRequiredService(item.CommandType);
-                    if (!command.ShouldAdd(node) || !command.IsEnabled(node))
+                    if (!command.ShouldAdd(node, packFile) || !command.IsEnabled(node, packFile))
                         continue;
 
                     var parent = GetOrCreateMenuPath(item.Path, clusterRoot, pathToMenuLookup);
-                    parent.ContextMenu.Add(new ContextMenuItem(command.GetDisplayName(node), () => command.Execute(node)));
+                    parent.ContextMenu.Add(new ContextMenuItem(command.GetDisplayName(node, packFile), () => command.Execute(node, packFile)));
                 }
 
                 RemoveEmptySubmenus(clusterRoot);

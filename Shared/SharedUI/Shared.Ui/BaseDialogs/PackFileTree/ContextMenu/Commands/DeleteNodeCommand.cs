@@ -1,4 +1,5 @@
 ﻿using Shared.Core.PackFiles;
+using Shared.Core.PackFiles.Models;
 using Shared.Core.Services;
 using Serilog;
 using Shared.Core.ErrorHandling;
@@ -9,11 +10,11 @@ namespace Shared.Ui.BaseDialogs.PackFileTree.ContextMenu.Commands
     {
         private readonly ILogger _logger = Logging.Create<DeleteNodeCommand>();
 
-        public string GetDisplayName(TreeNode node) => "Delete";
-        public bool ShouldAdd(TreeNode node) => (node.NodeType == NodeType.File || node.NodeType == NodeType.Directory) && !node.FileOwner.IsCaPackFile;
-        public bool IsEnabled(TreeNode node) => true;
+        public string GetDisplayName(TreeNode node, PackFile? packFile) => "Delete";
+        public bool ShouldAdd(TreeNode node, PackFile? packFile) => ((node.NodeType == NodeType.File && packFile != null) || node.NodeType == NodeType.Directory) && !node.FileOwner.IsCaPackFile;
+        public bool IsEnabled(TreeNode node, PackFile? packFile) => true;
 
-        public void Execute(TreeNode _selectedNode)
+        public void Execute(TreeNode _selectedNode, PackFile? packFile)
         {
             if (_selectedNode.FileOwner.IsCaPackFile)
             {
@@ -27,8 +28,11 @@ namespace Shared.Ui.BaseDialogs.PackFileTree.ContextMenu.Commands
             {
                 if (_selectedNode.NodeType == NodeType.File)
                 {
+                    if (packFile == null)
+                        return;
+
                     _logger.Here().Information($"Deleting file node '{CommandLoggingHelper.DescribeNode(_selectedNode)}'");
-                    packFileService.DeleteFile(_selectedNode.FileOwner, _selectedNode.Item);
+                    packFileService.DeleteFile(_selectedNode.FileOwner, packFile);
                 }
                 else if (_selectedNode.NodeType == NodeType.Directory)
                 {

@@ -15,11 +15,11 @@ namespace Shared.UiTest.BaseDialogs.PackFileTree.ContextMenu.Commands
         {
             var owner = CreateContainer();
             var root = new TreeNode("root", NodeType.Root, owner, null);
-            var file = new TreeNode("file.txt", NodeType.File, owner, root, PackFile.CreateFromASCII("file.txt", "a"));
+            var file = new TreeNode("file.txt", NodeType.File, owner, root);
             var command = new ClosePackContainerFileCommand(new Mock<IPackFileService>().Object, new Mock<IStandardDialogs>().Object);
 
-            Assert.That(command.ShouldAdd(root), Is.True);
-            Assert.That(command.ShouldAdd(file), Is.False);
+            Assert.That(command.ShouldAdd(root, null), Is.True);
+            Assert.That(command.ShouldAdd(file, null), Is.False);
         }
 
         [Test]
@@ -29,7 +29,7 @@ namespace Shared.UiTest.BaseDialogs.PackFileTree.ContextMenu.Commands
             var root = new TreeNode("root", NodeType.Root, owner, null);
             var command = new ClosePackContainerFileCommand(new Mock<IPackFileService>().Object, new Mock<IStandardDialogs>().Object);
 
-            Assert.That(command.IsEnabled(root), Is.True);
+            Assert.That(command.IsEnabled(root, null), Is.True);
         }
 
         [Test]
@@ -43,7 +43,7 @@ namespace Shared.UiTest.BaseDialogs.PackFileTree.ContextMenu.Commands
 
             var command = new ClosePackContainerFileCommand(service.Object, dialogs.Object);
 
-            command.Execute(root);
+            command.Execute(root, null);
 
             service.Verify(x => x.UnloadPackContainer(owner), Times.Once);
         }

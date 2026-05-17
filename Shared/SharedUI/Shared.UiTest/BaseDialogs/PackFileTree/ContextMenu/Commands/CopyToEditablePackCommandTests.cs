@@ -21,7 +21,7 @@ namespace Shared.UiTest.BaseDialogs.PackFileTree.ContextMenu.Commands
             var command = new CopyToEditablePackCommand(service.Object, new Mock<IStandardDialogs>().Object);
             var node = new TreeNode("folder", NodeType.Directory, source, null);
 
-            Assert.That(command.ShouldAdd(node), Is.True);
+            Assert.That(command.ShouldAdd(node, null), Is.True);
         }
 
         [Test]
@@ -31,7 +31,7 @@ namespace Shared.UiTest.BaseDialogs.PackFileTree.ContextMenu.Commands
             var node = new TreeNode("folder", NodeType.Directory, source, null);
             var command = new CopyToEditablePackCommand(new Mock<IPackFileService>().Object, new Mock<IStandardDialogs>().Object);
 
-            Assert.That(command.IsEnabled(node), Is.True);
+            Assert.That(command.IsEnabled(node, null), Is.True);
         }
 
         [Test]
@@ -49,12 +49,12 @@ namespace Shared.UiTest.BaseDialogs.PackFileTree.ContextMenu.Commands
             var root = new TreeNode("root", NodeType.Root, source, null);
             var folder = new TreeNode("folder", NodeType.Directory, source, root);
             root.AddChild(folder);
-            var file = new TreeNode("file.txt", NodeType.File, source, folder, PackFile.CreateFromASCII("file.txt", "a"));
+            var file = new TreeNode("file.txt", NodeType.File, source, folder);
             folder.AddChild(file);
 
             var command = new CopyToEditablePackCommand(service.Object, dialogs.Object);
 
-            command.Execute(folder);
+            command.Execute(folder, null);
 
             service.Verify(x => x.CopyFileFromOtherPackFile(source, It.IsAny<string>(), target), Times.Once);
         }

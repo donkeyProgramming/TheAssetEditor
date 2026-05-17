@@ -15,10 +15,10 @@ namespace Shared.UiTest.BaseDialogs.PackFileTree.ContextMenu.Commands
         {
             var owner = CreateContainer();
             var root = new TreeNode("root", NodeType.Root, owner, null);
-            var file = new TreeNode("file.txt", NodeType.File, owner, root, PackFile.CreateFromASCII("file.txt", "a"));
-            var command = new CopyNodePathCommand(new Mock<IPackFileService>().Object);
+            var file = new TreeNode("file.txt", NodeType.File, owner, root);
+            var command = new CopyNodePathCommand();
 
-            Assert.That(command.ShouldAdd(file), Is.True);
+            Assert.That(command.ShouldAdd(file, null), Is.True);
         }
 
         [Test]
@@ -26,10 +26,10 @@ namespace Shared.UiTest.BaseDialogs.PackFileTree.ContextMenu.Commands
         {
             var owner = CreateContainer();
             var root = new TreeNode("root", NodeType.Root, owner, null);
-            var file = new TreeNode("file.txt", NodeType.File, owner, root, PackFile.CreateFromASCII("file.txt", "a"));
-            var command = new CopyNodePathCommand(new Mock<IPackFileService>().Object);
+            var file = new TreeNode("file.txt", NodeType.File, owner, root);
+            var command = new CopyNodePathCommand();
 
-            Assert.That(command.IsEnabled(file), Is.True);
+            Assert.That(command.IsEnabled(file, null), Is.True);
         }
 
         [Test]
@@ -38,13 +38,14 @@ namespace Shared.UiTest.BaseDialogs.PackFileTree.ContextMenu.Commands
         {
             var owner = CreateContainer();
             var root = new TreeNode("root", NodeType.Root, owner, null);
-            var file = new TreeNode("file.txt", NodeType.File, owner, root, PackFile.CreateFromASCII("file.txt", "a"));
-            var service = new Mock<IPackFileService>();
-            service.Setup(x => x.GetFullPath(file.Item!, null)).Returns("folder\\file.txt");
+            var folder = new TreeNode("folder", NodeType.Directory, owner, root);
+            var file = new TreeNode("file.txt", NodeType.File, owner, folder);
+            folder.AddChild(file);
+            root.AddChild(folder);
 
-            var command = new CopyNodePathCommand(service.Object);
+            var command = new CopyNodePathCommand();
 
-            command.Execute(file);
+            command.Execute(file, null);
 
             Assert.That(System.Windows.Clipboard.GetText(), Is.EqualTo("folder\\file.txt"));
         }

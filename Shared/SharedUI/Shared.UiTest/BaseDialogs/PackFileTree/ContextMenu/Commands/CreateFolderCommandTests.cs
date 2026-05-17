@@ -20,7 +20,7 @@ namespace Shared.UiTest.BaseDialogs.PackFileTree.ContextMenu.Commands
             var root = new TreeNode("root", NodeType.Root, owner, null);
             var command = new CreateFolderCommand(new Mock<IStandardDialogs>().Object, s_treeMutationService);
 
-            Assert.That(command.ShouldAdd(root), Is.True);
+            Assert.That(command.ShouldAdd(root, null), Is.True);
         }
 
         [Test]
@@ -30,7 +30,7 @@ namespace Shared.UiTest.BaseDialogs.PackFileTree.ContextMenu.Commands
             var root = new TreeNode("root", NodeType.Root, owner, null);
             var command = new CreateFolderCommand(new Mock<IStandardDialogs>().Object, s_treeMutationService);
 
-            Assert.That(command.IsEnabled(root), Is.True);
+            Assert.That(command.IsEnabled(root, null), Is.True);
         }
 
         [Test]
@@ -46,7 +46,7 @@ namespace Shared.UiTest.BaseDialogs.PackFileTree.ContextMenu.Commands
 
             var command = new CreateFolderCommand(dialogs.Object, s_treeMutationService);
 
-            command.Execute(root);
+            command.Execute(root, null);
 
             Assert.That(root.Children.Any(x => x.Name == "new_folder"), Is.True);
         }

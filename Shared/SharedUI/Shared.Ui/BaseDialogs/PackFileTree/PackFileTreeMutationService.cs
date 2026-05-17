@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Shared.Core.PackFiles.Models;
 
 namespace Shared.Ui.BaseDialogs.PackFileTree
 {
@@ -29,11 +28,11 @@ namespace Shared.Ui.BaseDialogs.PackFileTree
             SortChildren(parent);
         }
 
-        public void RemoveExistingFileNode(TreeNode parent, string fileName, PackFile packFile)
+        public void RemoveExistingFileNode(TreeNode parent, string fileName)
         {
             var existingFile = parent.Children.FirstOrDefault(node =>
                 node.NodeType == NodeType.File &&
-                (node.Item == packFile || node.Name == fileName));
+                node.Name == fileName);
 
             if (existingFile == null)
                 return;

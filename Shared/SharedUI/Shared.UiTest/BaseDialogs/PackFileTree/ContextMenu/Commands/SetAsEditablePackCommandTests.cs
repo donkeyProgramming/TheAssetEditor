@@ -17,7 +17,7 @@ namespace Shared.UiTest.BaseDialogs.PackFileTree.ContextMenu.Commands
             var root = new TreeNode("root", NodeType.Root, owner, null);
             var command = new SetAsEditablePackCommand(new Mock<IPackFileService>().Object);
 
-            Assert.That(command.ShouldAdd(root), Is.True);
+            Assert.That(command.ShouldAdd(root, null), Is.True);
         }
 
         [Test]
@@ -27,7 +27,7 @@ namespace Shared.UiTest.BaseDialogs.PackFileTree.ContextMenu.Commands
             var root = new TreeNode("root", NodeType.Root, owner, null);
             var command = new SetAsEditablePackCommand(new Mock<IPackFileService>().Object);
 
-            Assert.That(command.IsEnabled(root), Is.True);
+            Assert.That(command.IsEnabled(root, null), Is.True);
         }
 
         [Test]
@@ -39,7 +39,7 @@ namespace Shared.UiTest.BaseDialogs.PackFileTree.ContextMenu.Commands
             service.Setup(x => x.GetEditablePack()).Returns((IPackFileContainer?)null);
             var command = new SetAsEditablePackCommand(service.Object);
 
-            command.Execute(root);
+            command.Execute(root, null);
 
             service.Verify(x => x.SetEditablePack(owner), Times.Once);
         }

@@ -14,11 +14,11 @@ namespace Shared.UiTest.BaseDialogs.PackFileTree.ContextMenu.Commands
             var owner = CreateContainer();
             var root = new TreeNode("root", NodeType.Root, owner, null);
             var folder = new TreeNode("folder", NodeType.Directory, owner, root);
-            var file = new TreeNode("file.txt", NodeType.File, owner, folder, PackFile.CreateFromASCII("file.txt", "a"));
+            var file = new TreeNode("file.txt", NodeType.File, owner, folder);
             var command = new ExpandNodeCommand();
 
-            Assert.That(command.ShouldAdd(folder), Is.True);
-            Assert.That(command.ShouldAdd(file), Is.False);
+            Assert.That(command.ShouldAdd(folder, null), Is.True);
+            Assert.That(command.ShouldAdd(file, null), Is.False);
         }
 
         [Test]
@@ -29,7 +29,7 @@ namespace Shared.UiTest.BaseDialogs.PackFileTree.ContextMenu.Commands
             var folder = new TreeNode("folder", NodeType.Directory, owner, root);
             var command = new ExpandNodeCommand();
 
-            Assert.That(command.IsEnabled(folder), Is.True);
+            Assert.That(command.IsEnabled(folder, null), Is.True);
         }
 
         [Test]
@@ -38,7 +38,7 @@ namespace Shared.UiTest.BaseDialogs.PackFileTree.ContextMenu.Commands
             var owner = CreateContainer();
             var root = new TreeNode("root", NodeType.Root, owner, null);
             var folder = new TreeNode("folder", NodeType.Directory, owner, root);
-            var file = new TreeNode("file.txt", NodeType.File, owner, folder, PackFile.CreateFromASCII("file.txt", "a"));
+            var file = new TreeNode("file.txt", NodeType.File, owner, folder);
             root.AddChild(folder);
             folder.AddChild(file);
 
@@ -48,7 +48,7 @@ namespace Shared.UiTest.BaseDialogs.PackFileTree.ContextMenu.Commands
 
             var command = new ExpandNodeCommand();
 
-            command.Execute(root);
+            command.Execute(root, null);
 
             Assert.That(root.IsNodeExpanded, Is.True);
             Assert.That(folder.IsNodeExpanded, Is.True);
@@ -71,7 +71,7 @@ namespace Shared.UiTest.BaseDialogs.PackFileTree.ContextMenu.Commands
             nested.IsNodeExpanded = false;
 
             var command = new ExpandNodeCommand();
-            command.Execute(root);
+            command.Execute(root, null);
 
             Assert.That(root.IsNodeExpanded, Is.True);
             Assert.That(folder.IsNodeExpanded, Is.True);

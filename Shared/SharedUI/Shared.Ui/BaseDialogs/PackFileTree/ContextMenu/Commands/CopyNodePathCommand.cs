@@ -1,21 +1,21 @@
 ﻿using System.Windows;
-using Shared.Core.PackFiles;
+using Shared.Core.PackFiles.Models;
 using Serilog;
 using Shared.Core.ErrorHandling;
 
 namespace Shared.Ui.BaseDialogs.PackFileTree.ContextMenu.Commands
 {
-    public class CopyNodePathCommand(IPackFileService packFileService) : IContextMenuCommand
+    public class CopyNodePathCommand() : IContextMenuCommand
     {
         private readonly ILogger _logger = Logging.Create<CopyNodePathCommand>();
 
-        public string GetDisplayName(TreeNode node) => "Copy full path";
-        public bool ShouldAdd(TreeNode node) => node.NodeType == NodeType.File && node.Item != null;
-        public bool IsEnabled(TreeNode node) => true;
+        public string GetDisplayName(TreeNode node, PackFile? packFile) => "Copy full path";
+        public bool ShouldAdd(TreeNode node, PackFile? packFile) => node.NodeType == NodeType.File;
+        public bool IsEnabled(TreeNode node, PackFile? packFile) => true;
 
-        public void Execute(TreeNode _selectedNode)
+        public void Execute(TreeNode _selectedNode, PackFile? packFile)
         {
-            var path = packFileService.GetFullPath(_selectedNode.Item!);
+            var path = _selectedNode.GetFullPath();
             Clipboard.SetText(path);
             _logger.Here().Information($"Copied full path '{path}' from node '{CommandLoggingHelper.DescribeNode(_selectedNode)}'");
         }

@@ -2,6 +2,7 @@
 using Serilog;
 using Shared.Core.ErrorHandling;
 using Shared.Core.PackFiles;
+using Shared.Core.PackFiles.Models;
 using Shared.Core.Services;
 using Shared.Core.Settings;
 using Shared.Ui.Common;
@@ -11,11 +12,11 @@ namespace Shared.Ui.BaseDialogs.PackFileTree.ContextMenu.Commands
     public class SaveAsPackFileContainerCommand(IPackFileService packFileService, ApplicationSettingsService applicationSettingsService, IStandardDialogs standardDialogs) : IContextMenuCommand
     {
         private readonly ILogger _logger = Logging.Create<SaveAsPackFileContainerCommand>();
-        public string GetDisplayName(TreeNode node) => "Save As";
-        public bool ShouldAdd(TreeNode node) => node.NodeType == NodeType.Root && !node.FileOwner.IsCaPackFile;
-        public bool IsEnabled(TreeNode node) => true;
+        public string GetDisplayName(TreeNode node, PackFile? packFile) => "Save As";
+        public bool ShouldAdd(TreeNode node, PackFile? packFile) => node.NodeType == NodeType.Root && !node.FileOwner.IsCaPackFile;
+        public bool IsEnabled(TreeNode node, PackFile? packFile) => true;
 
-        public void Execute(TreeNode _selectedNode)
+        public void Execute(TreeNode _selectedNode, PackFile? packFile)
         {
             var packDescription = CommandLoggingHelper.DescribePack(_selectedNode.FileOwner);
             var saveDialogResult = standardDialogs.ShowSystemSaveFileDialog(_selectedNode.FileOwner.Name, "PackFile | *.pack", "pack");

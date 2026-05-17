@@ -2,6 +2,7 @@
 using System.IO;
 using Editors.Audio.Shared.Utilities;
 using Shared.Core.Misc;
+using Shared.Core.PackFiles.Models;
 using Shared.Core.Services;
 using Shared.Ui.BaseDialogs.PackFileTree;
 using Shared.Ui.BaseDialogs.PackFileTree.ContextMenu.Commands;
@@ -13,13 +14,12 @@ namespace Editors.Audio.ContextMenu
         private readonly IStandardDialogs _standardDialogs = standardDialogs;
         private readonly IFileSystemAccess _fileSystemAccess = fileSystemAccess;
 
-        public string GetDisplayName(TreeNode node) => "Export as IVF";
-        public bool ShouldAdd(TreeNode node) => node.NodeType == NodeType.File && node.Item != null;
-        public bool IsEnabled(TreeNode node) => node.Item != null && node.Item.Name.EndsWith(".ca_vp8", StringComparison.OrdinalIgnoreCase);
+        public string GetDisplayName(TreeNode node, PackFile? packFile) => "Export as IVF";
+        public bool ShouldAdd(TreeNode node, PackFile? packFile) => node.NodeType == NodeType.File && packFile != null;
+        public bool IsEnabled(TreeNode node, PackFile? packFile) => packFile != null && packFile.Name.EndsWith(".ca_vp8", StringComparison.OrdinalIgnoreCase);
 
-        public void Execute(TreeNode selectedNode)
+        public void Execute(TreeNode selectedNode, PackFile? packFile)
         {
-            var packFile = selectedNode.Item;
             if (packFile == null)
                 return;
 

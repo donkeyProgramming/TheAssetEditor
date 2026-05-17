@@ -1,6 +1,7 @@
 ﻿using System.IO;
 using System.Threading;
 using Moq;
+using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
 using Shared.Core.PackFiles.Models.FileSources;
 using Shared.Core.Services;
@@ -17,9 +18,9 @@ namespace Shared.UiTest.BaseDialogs.PackFileTree.ContextMenu.Commands
         {
             var owner = CreateContainer();
             var root = new TreeNode("root", NodeType.Root, owner, null);
-            var command = new ExportToDirectoryCommand(new Mock<IStandardDialogs>().Object, new Mock<IFileSystemAccess>().Object);
+            var command = new ExportToDirectoryCommand(new Mock<IPackFileService>().Object, new Mock<IStandardDialogs>().Object, new Mock<IFileSystemAccess>().Object);
 
-            Assert.That(command.ShouldAdd(root), Is.True);
+            Assert.That(command.ShouldAdd(root, null), Is.True);
         }
 
         [Test]
@@ -27,9 +28,9 @@ namespace Shared.UiTest.BaseDialogs.PackFileTree.ContextMenu.Commands
         {
             var owner = CreateContainer();
             var root = new TreeNode("root", NodeType.Root, owner, null);
-            var command = new ExportToDirectoryCommand(new Mock<IStandardDialogs>().Object, new Mock<IFileSystemAccess>().Object);
+            var command = new ExportToDirectoryCommand(new Mock<IPackFileService>().Object, new Mock<IStandardDialogs>().Object, new Mock<IFileSystemAccess>().Object);
 
-            Assert.That(command.IsEnabled(root), Is.True);
+            Assert.That(command.IsEnabled(root, null), Is.True);
         }
 
         [Test]
@@ -40,9 +41,9 @@ namespace Shared.UiTest.BaseDialogs.PackFileTree.ContextMenu.Commands
             var dialogs = new Mock<IStandardDialogs>();
             dialogs.Setup(x => x.ShowSystemFolderBrowserDialog()).Returns(new SystemBrowseFolderDialogResult(false, null));
             var fileSystem = new Mock<IFileSystemAccess>();
-            var command = new ExportToDirectoryCommand(dialogs.Object, fileSystem.Object);
+            var command = new ExportToDirectoryCommand(new Mock<IPackFileService>().Object, dialogs.Object, fileSystem.Object);
 
-            command.Execute(root);
+            command.Execute(root, null);
 
             fileSystem.Verify(x => x.FileWriteAllBytes(It.IsAny<string>(), It.IsAny<byte[]>()), Times.Never);
             dialogs.Verify(x => x.ShowDialogBox(It.Is<string>(s => s.Contains("exported")), It.IsAny<string>()), Times.Never);
@@ -76,8 +77,8 @@ namespace Shared.UiTest.BaseDialogs.PackFileTree.ContextMenu.Commands
             var packFile1 = new PackFile("mesh1.mesh", new MemorySource(new byte[] { 0x01, 0x02 }));
             var packFile2 = new PackFile("mesh2.mesh", new MemorySource(new byte[] { 0x03, 0x04 }));
             
-            var file1 = new TreeNode("mesh1.mesh", NodeType.File, owner, dir, packFile1);
-            var file2 = new TreeNode("mesh2.mesh", NodeType.File, owner, dir, packFile2);
+            var file1 = new TreeNode("mesh1.mesh", NodeType.File, owner, dir);
+            var file2 = new TreeNode("mesh2.mesh", NodeType.File, owner, dir);
             
             dir.AddChild(file1);
             dir.AddChild(file2);
@@ -87,6 +88,9 @@ namespace Shared.UiTest.BaseDialogs.PackFileTree.ContextMenu.Commands
             var dialogs = new Mock<IStandardDialogs>();
             dialogs.Setup(x => x.ShowSystemFolderBrowserDialog())
                 .Returns(new SystemBrowseFolderDialogResult(true, outputDir));
+            var packFileService = new Mock<IPackFileService>();
+            packFileService.Setup(x => x.FindFile("models\\mesh1.mesh", owner)).Returns(packFile1);
+            packFileService.Setup(x => x.FindFile("models\\mesh2.mesh", owner)).Returns(packFile2);
             
             var fileSystem = new Mock<IFileSystemAccess>();
             // Mock PathGetDirectoryName to extract directory from path
@@ -103,9 +107,9 @@ namespace Shared.UiTest.BaseDialogs.PackFileTree.ContextMenu.Commands
                     return lastSlash >= 0 ? p.Substring(lastSlash + 1) : p;
                 });
             
-            var command = new ExportToDirectoryCommand(dialogs.Object, fileSystem.Object);
+            var command = new ExportToDirectoryCommand(packFileService.Object, dialogs.Object, fileSystem.Object);
 
-            command.Execute(root);
+            command.Execute(root, null);
 
             // Verify files were written
             fileSystem.Verify(x => x.FileWriteAllBytes(It.IsAny<string>(), It.IsAny<byte[]>()), Times.Exactly(2));

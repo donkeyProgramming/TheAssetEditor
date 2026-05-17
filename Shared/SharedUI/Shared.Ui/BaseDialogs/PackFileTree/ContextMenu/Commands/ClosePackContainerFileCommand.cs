@@ -1,4 +1,5 @@
 ﻿using Shared.Core.PackFiles;
+using Shared.Core.PackFiles.Models;
 using Shared.Core.Services;
 using Serilog;
 using Shared.Core.ErrorHandling;
@@ -9,11 +10,11 @@ namespace Shared.Ui.BaseDialogs.PackFileTree.ContextMenu.Commands
     {
         private readonly ILogger _logger = Logging.Create<ClosePackContainerFileCommand>();
 
-        public string GetDisplayName(TreeNode node) => "Close";
-        public bool ShouldAdd(TreeNode node) => node.NodeType == NodeType.Root;
-        public bool IsEnabled(TreeNode node) => true;
+        public string GetDisplayName(TreeNode node, PackFile? packFile) => "Close";
+        public bool ShouldAdd(TreeNode node, PackFile? packFile) => node.NodeType == NodeType.Root;
+        public bool IsEnabled(TreeNode node, PackFile? packFile) => true;
 
-        public void Execute(TreeNode selectedNode)
+        public void Execute(TreeNode selectedNode, PackFile? packFile)
         {
             var packDescription = CommandLoggingHelper.DescribePack(selectedNode.FileOwner);
             if (standardDialogs.ShowYesNoBox("Are you sure you want to close the packfile?", "") == ShowMessageBoxResult.OK)

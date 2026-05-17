@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Windows;
 using Shared.Core.PackFiles;
+using Shared.Core.PackFiles.Models;
 using Shared.Core.Services;
 using Shared.Ui.Common;
 using Serilog;
@@ -12,15 +13,15 @@ namespace Shared.Ui.BaseDialogs.PackFileTree.ContextMenu.Commands
     {
         private readonly ILogger _logger = Logging.Create<CopyToEditablePackCommand>();
 
-        public string GetDisplayName(TreeNode node) => "Copy to editable pack";
-        public bool ShouldAdd(TreeNode node)
+        public string GetDisplayName(TreeNode node, PackFile? packFile) => "Copy to editable pack";
+        public bool ShouldAdd(TreeNode node, PackFile? packFile)
         {
             var editablePack = packFileService.GetEditablePack();
             return editablePack != null && editablePack != node.FileOwner;
         }
-        public bool IsEnabled(TreeNode node) => true;
+        public bool IsEnabled(TreeNode node, PackFile? packFile) => true;
 
-        public void Execute(TreeNode _selectedNode)
+        public void Execute(TreeNode _selectedNode, PackFile? packFile)
         {
             var editablePack = packFileService.GetEditablePack();
             if (editablePack == null)

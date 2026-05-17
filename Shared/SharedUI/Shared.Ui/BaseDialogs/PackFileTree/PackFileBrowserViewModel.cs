@@ -112,7 +112,8 @@ namespace Shared.Ui.BaseDialogs.PackFileTree
 
         partial void OnSelectedItemChanged(TreeNode value)
         {
-            ContextMenu = _contextMenuComposer.Build(_contextMenuType, value);
+            var selectedFile = FindPackFile(value);
+            ContextMenu = _contextMenuComposer.Build(_contextMenuType, value, selectedFile);
             NodeSelected?.Invoke(_selectedItem);
         }
 
@@ -186,9 +187,10 @@ namespace Shared.Ui.BaseDialogs.PackFileTree
             {
                 var root = GetRootNode(e.Container);
                 root.UnsavedChanged = true;
-                var node = GetNodeFromPackFile(e.Container, file);
+                var node = GetNodeFromPackFile(e.Container, file, false) ?? FindRenamedFileNode(e.Container, file);
                 if (node == null)
                     continue;
+
                 node.Name = file.Name;
                 node.UnsavedChanged = true;
 
@@ -222,7 +224,9 @@ namespace Shared.Ui.BaseDialogs.PackFileTree
             var maxExpandCount = 200;
             if (targetNode.NodeType == NodeType.File)
             {
-                FileOpen?.Invoke(targetNode.Item!);
+                var selectedFile = FindPackFile(targetNode);
+                if (selectedFile != null)
+                    FileOpen?.Invoke(selectedFile);
             }
             else if (targetNode.NodeType == NodeType.Directory || targetNode.NodeType == NodeType.Root)
             {
@@ -269,17 +273,17 @@ namespace Shared.Ui.BaseDialogs.PackFileTree
                 TreeNode newNode;
                 if (numSeperators == 0)
                 {
-                    _treeMutationService.RemoveExistingFileNode(root, item.Name, item);
-                    newNode = new TreeNode(item.Name, NodeType.File, container, root, item);
+                    _treeMutationService.RemoveExistingFileNode(root, item.Name);
+                    newNode = new TreeNode(item.Name, NodeType.File, container, root);
                     _treeMutationService.InsertChildSorted(root, newNode);
                 }
                 else
                 {
                     var directory = fullPath.Substring(0, directoryEnd);
                     var folder = GetNodeFromPath(root, directory)!;
-                    _treeMutationService.RemoveExistingFileNode(folder, item.Name, item);
+                    _treeMutationService.RemoveExistingFileNode(folder, item.Name);
 
-                    newNode = new TreeNode(item.Name, NodeType.File, container, folder, item);
+                    newNode = new TreeNode(item.Name, NodeType.File, container, folder);
                     _treeMutationService.InsertChildSorted(folder, newNode);
                 }
 
@@ -323,10 +327,11 @@ namespace Shared.Ui.BaseDialogs.PackFileTree
             var root = GetRootNode(container);
             var fullPath = _packFileService.GetFullPath(pf, container);
             var numSeperators = fullPath.Count(x => x == Path.DirectorySeparatorChar);
+            var fileName = pf.Name;
 
             if (numSeperators == 0)
             {
-                return root.Children.FirstOrDefault(x => x.Item == pf);
+                return root.Children.FirstOrDefault(x => x.NodeType == NodeType.File && x.Name.Equals(fileName, StringComparison.OrdinalIgnoreCase));
             }
             else
             {
@@ -334,8 +339,25 @@ namespace Shared.Ui.BaseDialogs.PackFileTree
                 var directory = fullPath.Substring(0, directoryEnd);
                 var parent = GetNodeFromPath(root, directory, createIfMissing);
 
-                return parent?.Children.FirstOrDefault(x => x.Item == pf);
+                return parent?.Children.FirstOrDefault(x => x.NodeType == NodeType.File && x.Name.Equals(fileName, StringComparison.OrdinalIgnoreCase));
             }
+        }
+
+        private TreeNode? FindRenamedFileNode(IPackFileContainer container, PackFile file)
+        {
+            var root = GetRootNode(container);
+            var fullPath = _packFileService.GetFullPath(file, container);
+            var directoryEnd = fullPath.LastIndexOf(Path.DirectorySeparatorChar);
+            var parent = directoryEnd == -1
+                ? root
+                : GetNodeFromPath(root, fullPath.Substring(0, directoryEnd), false);
+            if (parent == null)
+                return null;
+
+            return parent.Children.FirstOrDefault(child =>
+                child.NodeType == NodeType.File &&
+                !child.Name.Equals(file.Name, StringComparison.OrdinalIgnoreCase) &&
+                FindPackFile(child) == null);
         }
 
         private void ReloadTree(IPackFileContainer container)
@@ -381,7 +403,7 @@ namespace Shared.Ui.BaseDialogs.PackFileTree
                 var parentNode = directoryMap[folderEntry.Key];
                 foreach (var file in folderEntry.Value)
                 {
-                    var fileNode = new TreeNode(file.Name, NodeType.File, container, parentNode, file);
+                    var fileNode = new TreeNode(file.Name, NodeType.File, container, parentNode);
                     AddChildForBuild(parentNode, fileNode, childrenByParent);
                 }
             }
@@ -497,7 +519,7 @@ namespace Shared.Ui.BaseDialogs.PackFileTree
             if (targetNode == null)
                 return false;
 
-            if (node.Item == null)
+            if (node.NodeType != NodeType.File)
                 return false;
 
             if (node.FileOwner != targetNode.FileOwner)
@@ -506,7 +528,10 @@ namespace Shared.Ui.BaseDialogs.PackFileTree
             if (node.FileOwner.IsCaPackFile)
                 return false;
 
-            if (targetNode.Item != null)
+            if (targetNode.NodeType == NodeType.File)
+                return false;
+
+            if (FindPackFile(node) == null)
                 return false;
 
             return true;
@@ -518,7 +543,10 @@ namespace Shared.Ui.BaseDialogs.PackFileTree
                 return false;
 
             var container = node.FileOwner;
-            var draggedFile = node.Item;
+            var draggedFile = FindPackFile(node);
+            if (draggedFile == null)
+                return false;
+
             var dropPath = targeNode.GetFullPath();
 
             var newFullPath = string.IsNullOrWhiteSpace(dropPath)
@@ -535,6 +563,14 @@ namespace Shared.Ui.BaseDialogs.PackFileTree
         private TreeNode GetRootNode(IPackFileContainer container)
         {
             return _treeRoots[container];
+        }
+
+        public PackFile? FindPackFile(TreeNode? node)
+        {
+            if (node == null || node.NodeType != NodeType.File)
+                return null;
+
+            return _packFileService.FindFile(node.GetFullPath(), node.FileOwner);
         }
     }
 }

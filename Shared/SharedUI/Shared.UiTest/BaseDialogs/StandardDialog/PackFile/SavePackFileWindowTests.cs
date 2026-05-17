@@ -35,7 +35,7 @@ namespace Shared.UiTest.BaseDialogs.StandardDialog.PackFile
             };
             var root = new TreeNode("test.pack", NodeType.Root, owner, null);
             var existingFile = new Shared.Core.PackFiles.Models.PackFile("existing.txt", new MemorySource([1]));
-            var fileNode = new TreeNode("existing.txt", NodeType.File, owner, root, existingFile);
+            var fileNode = new TreeNode("existing.txt", NodeType.File, owner, root);
 
             var path = InvokeBuildTargetPath(fileNode, null, "renamed.txt", new Mock<IPackFileService>().Object);
 
