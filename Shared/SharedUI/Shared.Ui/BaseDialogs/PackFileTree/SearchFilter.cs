@@ -15,7 +15,7 @@ namespace Shared.Ui.BaseDialogs.PackFileTree
         public string Error { get; set; } = string.Empty;
         public string this[string columnName] => ApplyFilter(FilterText);
 
-        private readonly Func<IEnumerable<TreeNode>> _rootNodesFactory;
+        private readonly Func<IEnumerable<KeyValuePair<IPackFileContainer, TreeNode>>> _rootNodesFactory;
 
         private CancellationTokenSource? _debounceCts;
         private const int DebounceMilliseconds = 250;
@@ -57,7 +57,7 @@ namespace Shared.Ui.BaseDialogs.PackFileTree
         public bool HasActiveFilter => !string.IsNullOrWhiteSpace(FilterText) || ShowFoldersOnly || (_extensionFilter?.Count > 0);
         public Action? FilterCleared { get; set; }
 
-        internal SearchFilter(ObservableCollection<TreeNode> nodes, Func<IEnumerable<TreeNode>> rootNodesFactory)
+        internal SearchFilter(ObservableCollection<TreeNode> nodes, Func<IEnumerable<KeyValuePair<IPackFileContainer, TreeNode>>> rootNodesFactory)
         {
             _rootNodesFactory = rootNodesFactory;
         }
@@ -83,7 +83,8 @@ namespace Shared.Ui.BaseDialogs.PackFileTree
 
         string ApplyFilter(string text)
         {
-            var rootNodes = _rootNodesFactory().ToList();
+            var rootEntries = _rootNodesFactory().ToList();
+            var rootNodes = rootEntries.Select(x => x.Value).ToList();
 
             if (HasActiveFilter)
             {
@@ -92,9 +93,8 @@ namespace Shared.Ui.BaseDialogs.PackFileTree
 
                 if (hasSearchFilter)
                 {
-                    foreach (var rootNode in rootNodes)
+                    foreach (var (container, rootNode) in rootEntries)
                     {
-                        var container = rootNode.FileOwner;
                         var matchingFiles = container.SearchFiles(textFilter, _extensionFilter);
 
                         RebuildTreeFromSearchResults(rootNode, matchingFiles);

@@ -1,4 +1,4 @@
-﻿using System.Threading;
+using System.Threading;
 using Moq;
 using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
@@ -15,41 +15,41 @@ namespace Shared.UiTest.BaseDialogs.PackFileTree.ContextMenu.Commands
         public void ShouldAdd_ReturnsTrueForFile()
         {
             var owner = CreateContainer();
-            var root = new TreeNode("root", NodeType.Root, owner, null);
+            var root = CreateRoot(owner);
             var packFile = PackFile.CreateFromASCII("file.txt", "a");
-            var file = new TreeNode("file.txt", NodeType.File, owner, root);
-            var command = new RenameNodeCommand(new Mock<IPackFileService>().Object, new Mock<IStandardDialogs>().Object);
+            var file = new TreeNode("file.txt", NodeType.File, root);
+            var command = new RenameNodeCommand(CreatePackFileService(owner, packFile).Object, new Mock<IStandardDialogs>().Object);
 
-            Assert.That(command.ShouldAdd(file, packFile), Is.True);
+            Assert.That(command.ShouldAdd(file), Is.True);
         }
 
         [Test]
         public void IsEnabled_ReturnsTrue()
         {
             var owner = CreateContainer();
-            var root = new TreeNode("root", NodeType.Root, owner, null);
+            var root = CreateRoot(owner);
             var packFile = PackFile.CreateFromASCII("file.txt", "a");
-            var file = new TreeNode("file.txt", NodeType.File, owner, root);
-            var command = new RenameNodeCommand(new Mock<IPackFileService>().Object, new Mock<IStandardDialogs>().Object);
+            var file = new TreeNode("file.txt", NodeType.File, root);
+            var command = new RenameNodeCommand(CreatePackFileService(owner, packFile).Object, new Mock<IStandardDialogs>().Object);
 
-            Assert.That(command.IsEnabled(file, packFile), Is.True);
+            Assert.That(command.IsEnabled(file), Is.True);
         }
 
         [Test]
         public void Execute_RenamesFile()
         {
             var owner = CreateContainer();
-            var root = new TreeNode("root", NodeType.Root, owner, null);
+            var root = CreateRoot(owner);
             var packFile = PackFile.CreateFromASCII("file.txt", "a");
-            var file = new TreeNode("file.txt", NodeType.File, owner, root);
+            var file = new TreeNode("file.txt", NodeType.File, root);
             root.AddChild(file);
 
-            var service = new Mock<IPackFileService>();
+            var service = CreatePackFileService(owner, packFile);
             var dialogs = new Mock<IStandardDialogs>();
             dialogs.Setup(x => x.ShowTextInputDialog("Rename file", file.Name)).Returns(new TextInputDialogResult(true, "renamed.txt"));
             var command = new RenameNodeCommand(service.Object, dialogs.Object);
 
-            command.Execute(file, packFile);
+            command.Execute(file);
 
             service.Verify(x => x.RenameFile(owner, packFile, "renamed.txt"), Times.Once);
         }

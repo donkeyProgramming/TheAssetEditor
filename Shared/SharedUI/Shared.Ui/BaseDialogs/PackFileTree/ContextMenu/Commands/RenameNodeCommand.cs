@@ -11,14 +11,27 @@ namespace Shared.Ui.BaseDialogs.PackFileTree.ContextMenu.Commands
     {
         private readonly ILogger _logger = Logging.Create<RenameNodeCommand>();
 
-        public string GetDisplayName(TreeNode node, PackFile? packFile) => "Rename";
-        public bool ShouldAdd(TreeNode node, PackFile? packFile) => ((node.NodeType == NodeType.File && packFile != null) || node.NodeType == NodeType.Directory) && !node.FileOwner.IsCaPackFile;
-        public bool IsEnabled(TreeNode node, PackFile? packFile) => true;
-
-        public void Execute(TreeNode _selectedNode, PackFile? packFile)
+        public string GetDisplayName(TreeNode node) => "Rename";
+        public bool ShouldAdd(TreeNode node)
         {
-            var FileOwner = _selectedNode.FileOwner;
-            if (FileOwner.IsCaPackFile)
+            var container = TreeNodeHelper.GetPackFileContainer(node);
+            var packFile = TreeNodeHelper.GetPackFile(node);
+            return container is { IsCaPackFile: false } && ((node.NodeType == NodeType.File && packFile != null) || node.NodeType == NodeType.Directory);
+        }
+
+        public bool IsEnabled(TreeNode node) => true;
+
+        public void Execute(TreeNode _selectedNode)
+        {
+            var container = TreeNodeHelper.GetPackFileContainer(_selectedNode);
+            if (container == null)
+            {
+                _logger.Here().Warning($"Rename blocked because no container was resolved for '{CommandLoggingHelper.DescribeNode(_selectedNode)}'");
+                standardDialogs.ShowDialogBox("Unable to resolve selected packfile", "Error");
+                return;
+            }
+
+            if (container.IsCaPackFile)
             {
                 _logger.Here().Warning($"Rename blocked for CA pack node '{CommandLoggingHelper.DescribeNode(_selectedNode)}'");
                 standardDialogs.ShowDialogBox("Unable to edit CA packfile", "Error");
@@ -34,7 +47,7 @@ namespace Shared.Ui.BaseDialogs.PackFileTree.ContextMenu.Commands
                 {
                     _logger.Here().Information($"Renaming directory '{currentPath}' to '{newFolderName}'");
                     _selectedNode.Name = newFolderName;
-                    packFileService.RenameDirectory(_selectedNode.FileOwner, currentPath, newFolderName);
+                    packFileService.RenameDirectory(container, currentPath, newFolderName);
                 }
                 else
                 {
@@ -49,11 +62,12 @@ namespace Shared.Ui.BaseDialogs.PackFileTree.ContextMenu.Commands
                 var newFileName = inputResult.Result ? inputResult.Text.ToLower().Trim() : string.Empty;
                 if (newFileName.Any())
                 {
+                    var packFile = TreeNodeHelper.GetPackFile(_selectedNode);
                     if (packFile == null)
                         return;
 
                     _logger.Here().Information($"Renaming file '{currentPath}' to '{newFileName}'");
-                    packFileService.RenameFile(_selectedNode.FileOwner, packFile, newFileName);
+                    packFileService.RenameFile(container, packFile, newFileName);
                 }
                 else
                 {

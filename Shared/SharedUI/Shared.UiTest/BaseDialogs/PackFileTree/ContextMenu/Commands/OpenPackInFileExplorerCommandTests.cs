@@ -1,4 +1,4 @@
-﻿using System.Diagnostics;
+using System.Diagnostics;
 using Moq;
 using Shared.Core.PackFiles;
 using Shared.Core.Services;
@@ -14,33 +14,35 @@ namespace Shared.UiTest.BaseDialogs.PackFileTree.ContextMenu.Commands
         public void ShouldAdd_ReturnsTrueForRoot()
         {
             var owner = CreateContainer();
-            var root = new TreeNode("root", NodeType.Root, owner, null);
-            var command = new OpenPackInFileExplorerCommand( new Mock<IStandardDialogs>().Object, new Mock<IFileSystemAccess>().Object);
+            var service = CreatePackFileService(owner);
+            var root = CreateRoot(owner);
+            var command = new OpenPackInFileExplorerCommand(service.Object, new Mock<IStandardDialogs>().Object, new Mock<IFileSystemAccess>().Object);
 
-            Assert.That(command.ShouldAdd(root, null), Is.True);
+            Assert.That(command.ShouldAdd(root), Is.True);
         }
 
         [Test]
         public void IsEnabled_ReturnsTrue()
         {
             var owner = CreateContainer();
-            var root = new TreeNode("root", NodeType.Root, owner, null);
-            var command = new OpenPackInFileExplorerCommand(new Mock<IStandardDialogs>().Object, new Mock<IFileSystemAccess>().Object);
+            var root = CreateRoot(owner);
+            var command = new OpenPackInFileExplorerCommand(CreatePackFileService(owner).Object, new Mock<IStandardDialogs>().Object, new Mock<IFileSystemAccess>().Object);
 
-            Assert.That(command.IsEnabled(root, null), Is.True);
+            Assert.That(command.IsEnabled(root), Is.True);
         }
 
         [Test]
         public void Execute_ValidPath_StartsExplorer()
         {
             var owner = CreateContainer(systemFilePath: "C:\\temp\\pack.pack");
-            var root = new TreeNode("root", NodeType.Root, owner, null);
+            var service = CreatePackFileService(owner);
+            var root = CreateRoot(owner);
             var fileSystem = new Mock<IFileSystemAccess>();
             fileSystem.Setup(x => x.DirectoryExists(It.IsAny<string>())).Returns(false);
             fileSystem.Setup(x => x.PathGetDirectoryName(It.IsAny<string>())).Returns("C:\\temp");
 
-            var command = new OpenPackInFileExplorerCommand( new Mock<IStandardDialogs>().Object, fileSystem.Object);
-            command.Execute(root, null);
+            var command = new OpenPackInFileExplorerCommand(service.Object, new Mock<IStandardDialogs>().Object, fileSystem.Object);
+            command.Execute(root);
 
             fileSystem.Verify(x => x.ProcessStart(It.Is<ProcessStartInfo>(p => p.FileName == "explorer.exe")), Times.Once);
         }
@@ -49,11 +51,11 @@ namespace Shared.UiTest.BaseDialogs.PackFileTree.ContextMenu.Commands
         public void Execute_NullSystemFilePath_ShowsError()
         {
             var owner = CreateContainer(systemFilePath: "");
-            var root = new TreeNode("root", NodeType.Root, owner, null);
+            var root = CreateRoot(owner);
             var dialogs = new Mock<IStandardDialogs>();
-            var command = new OpenPackInFileExplorerCommand(dialogs.Object, new Mock<IFileSystemAccess>().Object);
+            var command = new OpenPackInFileExplorerCommand(CreatePackFileService(owner).Object, dialogs.Object, new Mock<IFileSystemAccess>().Object);
 
-            command.Execute(root, null);
+            command.Execute(root);
 
             dialogs.Verify(x => x.ShowDialogBox(It.IsAny<string>(), It.IsAny<string>()), Times.Once);
         }

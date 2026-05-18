@@ -1,3 +1,4 @@
+using System;
 using Shared.Core.PackFiles.Models;
 
 namespace Shared.Ui.BaseDialogs.PackFileTree.ContextMenu.Commands
@@ -8,9 +9,6 @@ namespace Shared.Ui.BaseDialogs.PackFileTree.ContextMenu.Commands
         {
             if (node == null)
                 return "<none>";
-
-            if (node.NodeType == NodeType.Root)
-                return DescribePack(node.FileOwner);
 
             var path = node.GetFullPath();
             return string.IsNullOrWhiteSpace(path) ? node.Name : path;

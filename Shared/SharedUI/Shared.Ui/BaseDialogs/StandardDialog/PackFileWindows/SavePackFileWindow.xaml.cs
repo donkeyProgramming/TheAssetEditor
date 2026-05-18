@@ -41,9 +41,7 @@ namespace Shared.Ui.BaseDialogs.StandardDialog.PackFile
         private void ViewModel_FileSelected(TreeNode node)
         {
             _selectedNode = node;
-            SelectedFile = node.NodeType == NodeType.File
-                ? _packfileService.FindFile(node.GetFullPath(), node.FileOwner)
-                : null;
+            SelectedFile = ViewModel.FindPackFile(node);
 
             if (SelectedFile == null)
                 CurrentFileName = "";

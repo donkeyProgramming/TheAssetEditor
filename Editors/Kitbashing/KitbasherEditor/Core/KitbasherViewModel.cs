@@ -15,7 +15,6 @@ using Shared.Core.Events.Scoped;
 using Shared.Core.PackFiles.Models;
 using Shared.Core.Services;
 using Shared.Core.ToolCreation;
-using Shared.Ui.BaseDialogs.PackFileTree;
 using Shared.Ui.Common;
 
 namespace Editors.KitbasherEditor.ViewModels
@@ -24,7 +23,7 @@ namespace Editors.KitbasherEditor.ViewModels
         IEditorInterface, 
         IFileEditor,
         ISaveableEditor,
-        IDropTarget<TreeNode>
+        IDropTarget<PackFile>
     {
         private readonly ILogger _logger = Logging.Create<KitbasherViewModel>();
 
@@ -110,8 +109,8 @@ namespace Editors.KitbasherEditor.ViewModels
             }
         }
 
-        public bool AllowDrop(TreeNode node, TreeNode targeNode = null) => _dropHandler.AllowDrop(node, targeNode);
-        public bool Drop(TreeNode node, TreeNode targeNode = null) => _dropHandler.Drop(node);
+        public bool AllowDrop(PackFile node, PackFile targeNode = null) => _dropHandler.AllowDrop(node, targeNode);
+        public bool Drop(PackFile node, PackFile targeNode = null) => _dropHandler.Drop(node);
 
         void OnFileSaved(ScopedFileSavedEvent notification)
         {

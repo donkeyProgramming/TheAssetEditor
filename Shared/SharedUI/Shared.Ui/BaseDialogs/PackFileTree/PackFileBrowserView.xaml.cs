@@ -106,7 +106,15 @@ namespace Shared.Ui.BaseDialogs.PackFileTree
                 {
                     if (_draggedItem != null)
                     {
-                        DragDrop.DoDragDrop(tvParameters, tvParameters.SelectedValue, DragDropEffects.Move);
+                        if (DataContext is PackFileBrowserViewModel viewModel)
+                        {
+                            var dragData = viewModel.FindPackFile(_draggedItem) ?? tvParameters.SelectedValue;
+                            DragDrop.DoDragDrop(tvParameters, dragData, DragDropEffects.Move);
+                        }
+                        else
+                        {
+                            DragDrop.DoDragDrop(tvParameters, tvParameters.SelectedValue, DragDropEffects.Move);
+                        }
                     }
                 }
             }

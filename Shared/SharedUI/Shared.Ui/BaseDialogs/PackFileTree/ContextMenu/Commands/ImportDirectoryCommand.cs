@@ -14,15 +14,28 @@ namespace Shared.Ui.BaseDialogs.PackFileTree.ContextMenu.Commands
     {
         private readonly ILogger _logger = Logging.Create<ImportDirectoryCommand>();
 
-        public string GetDisplayName(TreeNode node, PackFile? packFile) => "Import Directory";
-        public bool ShouldAdd(TreeNode node, PackFile? packFile) => node.NodeType != NodeType.File && !node.FileOwner.IsCaPackFile;
-        public bool IsEnabled(TreeNode node, PackFile? packFile) => true;
-
-        public void Execute(TreeNode _selectedNode, PackFile? packFile)
+        public string GetDisplayName(TreeNode node) => "Import Directory";
+        public bool ShouldAdd(TreeNode node)
         {
-            if (_selectedNode.FileOwner.IsCaPackFile)
+            var container = TreeNodeHelper.GetPackFileContainer(node);
+            return node.NodeType != NodeType.File && container is { IsCaPackFile: false };
+        }
+
+        public bool IsEnabled(TreeNode node) => true;
+
+        public void Execute(TreeNode _selectedNode)
+        {
+            var container = TreeNodeHelper.GetPackFileContainer(_selectedNode);
+            if (container == null)
             {
-                _logger.Here().Warning($"Import directory blocked for CA pack '{CommandLoggingHelper.DescribePack(_selectedNode.FileOwner)}'");
+                _logger.Here().Warning($"Import directory blocked because no container was resolved for '{CommandLoggingHelper.DescribeNode(_selectedNode)}'");
+                standardDialogs.ShowDialogBox("Unable to resolve selected packfile");
+                return;
+            }
+
+            if (container.IsCaPackFile)
+            {
+                _logger.Here().Warning($"Import directory blocked for CA pack '{CommandLoggingHelper.DescribePack(container)}'");
                 standardDialogs.ShowDialogBox("Unable to edit CA packfile");
                 return;
             }
@@ -62,7 +75,7 @@ namespace Shared.Ui.BaseDialogs.PackFileTree.ContextMenu.Commands
                     filesAdded.Add(new NewPackFileEntry(packDirectoryPath, file));
                 }
 
-                packFileService.AddFilesToPack(_selectedNode.FileOwner, filesAdded);
+                packFileService.AddFilesToPack(container, filesAdded);
                 _logger.Here().Information($"Imported {filesAdded.Count} file(s) from '{folderPath}' into '{CommandLoggingHelper.DescribeNode(_selectedNode)}'");
             }
             else

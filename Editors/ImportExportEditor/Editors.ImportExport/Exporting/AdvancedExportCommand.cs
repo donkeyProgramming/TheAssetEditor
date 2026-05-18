@@ -7,12 +7,17 @@ namespace Editors.ImportExport.Exporting
 {
     public class AdvancedExportCommand(IExportFileContextMenuHelper exportFileContextMenuHelper) : IContextMenuCommand
     {
-        public string GetDisplayName(TreeNode node, PackFile? packFile) => "Advanced Export";
-        public bool ShouldAdd(TreeNode node, PackFile? packFile) => node.NodeType == NodeType.File && packFile != null;
-        public bool IsEnabled(TreeNode node, PackFile? packFile) => packFile != null && exportFileContextMenuHelper.CanExportFile(packFile);
-
-        public void Execute(TreeNode selectedNode, PackFile? packFile)
+        public string GetDisplayName(TreeNode node) => "Advanced Export";
+        public bool ShouldAdd(TreeNode node) => node.NodeType == NodeType.File && TreeNodeHelper.GetPackFile(node) != null;
+        public bool IsEnabled(TreeNode node)
         {
+            var packFile = TreeNodeHelper.GetPackFile(node);
+            return packFile != null && exportFileContextMenuHelper.CanExportFile(packFile);
+        }
+
+        public void Execute(TreeNode selectedNode)
+        {
+            var packFile = TreeNodeHelper.GetPackFile(selectedNode);
             if (packFile == null)
                 return;
 

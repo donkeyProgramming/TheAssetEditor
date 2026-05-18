@@ -819,7 +819,7 @@ namespace Shared.UiTest.BaseDialogs.PackFileTree
                 .ToList();
 
             Assert.That(duplicates.Count, Is.EqualTo(1), "Overwriting a file in a collapsed folder must not create a duplicate node");
-            Assert.That(_packageFileService.FindFile(duplicates[0].GetFullPath(), duplicates[0].FileOwner), Is.SameAs(replacement), "The surviving node should resolve to the replacement PackFile");
+            Assert.That(_packageFileService.FindFile(duplicates[0].GetFullPath(), _viewModel.FindFileOwner(duplicates[0])), Is.SameAs(replacement), "The surviving node should resolve to the replacement PackFile");
         }
 
         [Test]
@@ -846,7 +846,7 @@ namespace Shared.UiTest.BaseDialogs.PackFileTree
                 .ToList();
 
             Assert.That(duplicates.Count, Is.EqualTo(1), "Overwriting a file in an expanded folder must not create a duplicate node");
-            Assert.That(_packageFileService.FindFile(duplicates[0].GetFullPath(), duplicates[0].FileOwner), Is.SameAs(replacement), "The surviving node should resolve to the replacement PackFile");
+            Assert.That(_packageFileService.FindFile(duplicates[0].GetFullPath(), _viewModel.FindFileOwner(duplicates[0])), Is.SameAs(replacement), "The surviving node should resolve to the replacement PackFile");
         }
     }
 }

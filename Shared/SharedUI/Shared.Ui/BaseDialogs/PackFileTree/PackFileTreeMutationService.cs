@@ -17,7 +17,7 @@ namespace Shared.Ui.BaseDialogs.PackFileTree
 
         public TreeNode CreateDirectoryChild(TreeNode parent, string name)
         {
-            var newNode = new TreeNode(name, NodeType.Directory, parent.FileOwner, parent);
+            var newNode = new TreeNode(name, NodeType.Directory, parent);
             InsertChildSorted(parent, newNode);
             return newNode;
         }

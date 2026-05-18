@@ -9,11 +9,11 @@ namespace Shared.Ui.BaseDialogs.PackFileTree.ContextMenu.Commands
     {
         private readonly ILogger _logger = Logging.Create<CopyNodePathCommand>();
 
-        public string GetDisplayName(TreeNode node, PackFile? packFile) => "Copy full path";
-        public bool ShouldAdd(TreeNode node, PackFile? packFile) => node.NodeType == NodeType.File;
-        public bool IsEnabled(TreeNode node, PackFile? packFile) => true;
+        public string GetDisplayName(TreeNode node) => "Copy full path";
+        public bool ShouldAdd(TreeNode node) => node.NodeType == NodeType.File;
+        public bool IsEnabled(TreeNode node) => true;
 
-        public void Execute(TreeNode _selectedNode, PackFile? packFile)
+        public void Execute(TreeNode _selectedNode)
         {
             var path = _selectedNode.GetFullPath();
             Clipboard.SetText(path);

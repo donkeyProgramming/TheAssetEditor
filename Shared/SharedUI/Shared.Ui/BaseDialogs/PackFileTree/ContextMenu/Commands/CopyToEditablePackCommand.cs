@@ -13,15 +13,16 @@ namespace Shared.Ui.BaseDialogs.PackFileTree.ContextMenu.Commands
     {
         private readonly ILogger _logger = Logging.Create<CopyToEditablePackCommand>();
 
-        public string GetDisplayName(TreeNode node, PackFile? packFile) => "Copy to editable pack";
-        public bool ShouldAdd(TreeNode node, PackFile? packFile)
+        public string GetDisplayName(TreeNode node) => "Copy to editable pack";
+        public bool ShouldAdd(TreeNode node)
         {
+            var container = TreeNodeHelper.GetPackFileContainer(node);
             var editablePack = packFileService.GetEditablePack();
-            return editablePack != null && editablePack != node.FileOwner;
+            return editablePack != null && container != null && editablePack != container;
         }
-        public bool IsEnabled(TreeNode node, PackFile? packFile) => true;
+        public bool IsEnabled(TreeNode node) => true;
 
-        public void Execute(TreeNode _selectedNode, PackFile? packFile)
+        public void Execute(TreeNode _selectedNode)
         {
             var editablePack = packFileService.GetEditablePack();
             if (editablePack == null)
@@ -31,12 +32,20 @@ namespace Shared.Ui.BaseDialogs.PackFileTree.ContextMenu.Commands
                 return;
             }
 
+            var container = TreeNodeHelper.GetPackFileContainer(_selectedNode);
+            if (container == null)
+            {
+                _logger.Here().Warning($"Copy to editable pack blocked because no container was resolved for '{CommandLoggingHelper.DescribeNode(_selectedNode)}'");
+                standardDialogs.ShowDialogBox("Unable to resolve selected packfile");
+                return;
+            }
+
             using (standardDialogs.ShowWaitCursor())
             {
                 var files = _selectedNode.GetAllChildFileNodes();
                 _logger.Here().Information($"Copying {files.Count} file(s) from '{CommandLoggingHelper.DescribeNode(_selectedNode)}' to editable pack '{CommandLoggingHelper.DescribePack(editablePack)}'");
                 foreach (var file in files)
-                    packFileService.CopyFileFromOtherPackFile(file.FileOwner, file.GetFullPath(), editablePack);
+                    packFileService.CopyFileFromOtherPackFile(container, file.GetFullPath(), editablePack);
 
                 _logger.Here().Information($"Copied {files.Count} file(s) from '{CommandLoggingHelper.DescribeNode(_selectedNode)}' to editable pack '{CommandLoggingHelper.DescribePack(editablePack)}'");
             }

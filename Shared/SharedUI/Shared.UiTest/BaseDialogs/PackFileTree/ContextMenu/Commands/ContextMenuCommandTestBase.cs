@@ -1,5 +1,7 @@
 ﻿using Moq;
+using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
+using Shared.Ui.BaseDialogs.PackFileTree;
 
 namespace Shared.UiTest.BaseDialogs.PackFileTree.ContextMenu.Commands
 {
@@ -13,5 +15,18 @@ namespace Shared.UiTest.BaseDialogs.PackFileTree.ContextMenu.Commands
             container.SetupProperty(x => x.IsCaPackFile, isCa);
             return container.Object;
         }
+
+        protected static Mock<IPackFileService> CreatePackFileService(IPackFileContainer? container = null, PackFile? packFile = null)
+        {
+            var service = new Mock<IPackFileService>();
+            service.Setup(x => x.GetAllPackfileContainers()).Returns(container == null ? [] : [container]);
+
+            if (container != null && packFile != null)
+                service.Setup(x => x.GetPackFileContainer(packFile)).Returns(container);
+
+            return service;
+        }
+
+        protected static TreeNode CreateRoot(IPackFileContainer container) => new RootTreeNode(container.Name, container);
     }
 }

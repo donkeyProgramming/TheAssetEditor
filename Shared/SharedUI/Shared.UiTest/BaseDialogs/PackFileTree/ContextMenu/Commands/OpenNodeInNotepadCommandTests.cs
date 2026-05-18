@@ -1,4 +1,4 @@
-﻿using System.Threading;
+using System.Threading;
 using Moq;
 using Shared.Core.PackFiles.Models;
 using Shared.Core.Services;
@@ -14,40 +14,40 @@ namespace Shared.UiTest.BaseDialogs.PackFileTree.ContextMenu.Commands
         public void ShouldAdd_ReturnsTrueForFileNode()
         {
             var owner = CreateContainer();
-            var root = new TreeNode("root", NodeType.Root, owner, null);
+            var root = CreateRoot(owner);
             var packFile = PackFile.CreateFromASCII("file.txt", "a");
-            var file = new TreeNode("file.txt", NodeType.File, owner, root);
+            var file = new TreeNode("file.txt", NodeType.File, root);
             var command = new OpenNodeInNotepadCommand(new Mock<IStandardDialogs>().Object, new Mock<IFileSystemAccess>().Object);
 
-            Assert.That(command.ShouldAdd(file, packFile), Is.True);
+            Assert.That(command.ShouldAdd(file), Is.True);
         }
 
         [Test]
         public void IsEnabled_ReturnsTrue()
         {
             var owner = CreateContainer();
-            var root = new TreeNode("root", NodeType.Root, owner, null);
+            var root = CreateRoot(owner);
             var packFile = PackFile.CreateFromASCII("file.txt", "a");
-            var file = new TreeNode("file.txt", NodeType.File, owner, root);
+            var file = new TreeNode("file.txt", NodeType.File, root);
             var command = new OpenNodeInNotepadCommand(new Mock<IStandardDialogs>().Object, new Mock<IFileSystemAccess>().Object);
 
-            Assert.That(command.IsEnabled(file, packFile), Is.True);
+            Assert.That(command.IsEnabled(file), Is.True);
         }
 
         [Test]
         public void Execute_AppMissing_ShowsError()
         {
             var owner = CreateContainer();
-            var root = new TreeNode("root", NodeType.Root, owner, null);
+            var root = CreateRoot(owner);
             var packFile = PackFile.CreateFromASCII("file.txt", "a");
-            var file = new TreeNode("file.txt", NodeType.File, owner, root);
+            var file = new TreeNode("file.txt", NodeType.File, root);
 
             var dialogs = new Mock<IStandardDialogs>();
             var fileSystem = new Mock<IFileSystemAccess>();
             fileSystem.Setup(x => x.FileExists(It.IsAny<string>())).Returns(false);
 
             var command = new OpenNodeInNotepadCommand(dialogs.Object, fileSystem.Object);
-            command.Execute(file, packFile);
+            command.Execute(file);
 
             dialogs.Verify(x => x.ShowDialogBox(It.Is<string>(s => s.Contains("does not exist")), It.IsAny<string>()), Times.Once);
             fileSystem.Verify(x => x.ProcessStart(It.IsAny<string>(), It.IsAny<string>()), Times.Never);
@@ -57,16 +57,16 @@ namespace Shared.UiTest.BaseDialogs.PackFileTree.ContextMenu.Commands
         public void Execute_AppExists_WritesTempFileAndStartsProcess()
         {
             var owner = CreateContainer();
-            var root = new TreeNode("root", NodeType.Root, owner, null);
+            var root = CreateRoot(owner);
             var packFile = PackFile.CreateFromASCII("file.txt", "abc");
-            var file = new TreeNode("file.txt", NodeType.File, owner, root);
+            var file = new TreeNode("file.txt", NodeType.File, root);
 
             var dialogs = new Mock<IStandardDialogs>();
             var fileSystem = new Mock<IFileSystemAccess>();
             fileSystem.Setup(x => x.FileExists(It.IsAny<string>())).Returns(true);
 
             var command = new OpenNodeInNotepadCommand(dialogs.Object, fileSystem.Object);
-            command.Execute(file, packFile);
+            command.Execute(file);
 
             fileSystem.Verify(x => x.FileWriteAllBytes(It.IsAny<string>(), It.Is<byte[]>(b => b.Length == 3)), Times.Once);
             fileSystem.Verify(x => x.ProcessStart(It.IsAny<string>(), It.IsAny<string>()), Times.Once);

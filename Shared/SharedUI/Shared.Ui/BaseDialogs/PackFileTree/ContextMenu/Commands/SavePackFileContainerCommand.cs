@@ -15,17 +15,30 @@ namespace Shared.Ui.BaseDialogs.PackFileTree.ContextMenu.Commands
         ApplicationSettingsService applicationSettingsService) : IContextMenuCommand
     {
         private readonly ILogger _logger = Logging.Create<SavePackFileContainerCommand>();
-        public string GetDisplayName(TreeNode node, PackFile? packFile) => "Save";
-        public bool ShouldAdd(TreeNode node, PackFile? packFile) => node.NodeType == NodeType.Root && !node.FileOwner.IsCaPackFile;
-        public bool IsEnabled(TreeNode node, PackFile? packFile) => true;
-
-        public void Execute(TreeNode _selectedNode, PackFile? packFile)
+        public string GetDisplayName(TreeNode node) => "Save";
+        public bool ShouldAdd(TreeNode node)
         {
-            var packDescription = CommandLoggingHelper.DescribePack(_selectedNode.FileOwner);
-            var systemPath = _selectedNode.FileOwner.SystemFilePath;
+            var container = TreeNodeHelper.GetPackFileContainer(node);
+            return node.NodeType == NodeType.Root && container is { IsCaPackFile: false };
+        }
+
+        public bool IsEnabled(TreeNode node) => true;
+
+        public void Execute(TreeNode _selectedNode)
+        {
+            var container = TreeNodeHelper.GetPackFileContainer(_selectedNode);
+            if (container == null)
+            {
+                _logger.Here().Warning($"Save blocked because no container was resolved for '{CommandLoggingHelper.DescribeNode(_selectedNode)}'");
+                standardDialogs.ShowDialogBox("Unable to resolve selected packfile", "Error");
+                return;
+            }
+
+            var packDescription = CommandLoggingHelper.DescribePack(container);
+            var systemPath = container.SystemFilePath;
             if (string.IsNullOrWhiteSpace(systemPath))
             {
-                var saveDialogResult = standardDialogs.ShowSystemSaveFileDialog(_selectedNode.FileOwner.Name, "PackFile | *.pack", "pack");
+                var saveDialogResult = standardDialogs.ShowSystemSaveFileDialog(container.Name, "PackFile | *.pack", "pack");
                 if (!saveDialogResult.Result || string.IsNullOrEmpty(saveDialogResult.FilePath))
                 {
                     _logger.Here().Information($"Save cancelled for pack file container '{packDescription}'");
@@ -40,7 +53,7 @@ namespace Shared.Ui.BaseDialogs.PackFileTree.ContextMenu.Commands
                 {
                     var gameInformation = GameInformationDatabase.GetGameById(applicationSettingsService.CurrentSettings.CurrentGame);
                     _logger.Here().Information($"Saving pack file container '{packDescription}' to '{systemPath}'");
-                    packFileService.SavePackContainer(_selectedNode.FileOwner, systemPath, false, gameInformation);
+                    packFileService.SavePackContainer(container, systemPath, false, gameInformation);
                     _logger.Here().Information($"Saved pack file container '{packDescription}' to '{systemPath}'");
                 }
                 catch (Exception e)

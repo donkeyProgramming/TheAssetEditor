@@ -14,12 +14,17 @@ namespace Editors.Audio.ContextMenu
         private readonly IStandardDialogs _standardDialogs = standardDialogs;
         private readonly IFileSystemAccess _fileSystemAccess = fileSystemAccess;
 
-        public string GetDisplayName(TreeNode node, PackFile? packFile) => "Export as IVF";
-        public bool ShouldAdd(TreeNode node, PackFile? packFile) => node.NodeType == NodeType.File && packFile != null;
-        public bool IsEnabled(TreeNode node, PackFile? packFile) => packFile != null && packFile.Name.EndsWith(".ca_vp8", StringComparison.OrdinalIgnoreCase);
-
-        public void Execute(TreeNode selectedNode, PackFile? packFile)
+        public string GetDisplayName(TreeNode node) => "Export as IVF";
+        public bool ShouldAdd(TreeNode node) => node.NodeType == NodeType.File && TreeNodeHelper.GetPackFile(node) != null;
+        public bool IsEnabled(TreeNode node)
         {
+            var packFile = TreeNodeHelper.GetPackFile(node);
+            return packFile != null && packFile.Name.EndsWith(".ca_vp8", StringComparison.OrdinalIgnoreCase);
+        }
+
+        public void Execute(TreeNode selectedNode)
+        {
+            var packFile = TreeNodeHelper.GetPackFile(selectedNode);
             if (packFile == null)
                 return;
 

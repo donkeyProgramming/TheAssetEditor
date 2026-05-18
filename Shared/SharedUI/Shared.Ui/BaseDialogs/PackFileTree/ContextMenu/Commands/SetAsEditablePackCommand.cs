@@ -9,14 +9,26 @@ namespace Shared.Ui.BaseDialogs.PackFileTree.ContextMenu.Commands
     {
         private readonly ILogger _logger = Logging.Create<SetAsEditablePackCommand>();
 
-        public string GetDisplayName(TreeNode node, PackFile? packFile) => "Set as Editable Pack";
-        public bool ShouldAdd(TreeNode node, PackFile? packFile) => node.NodeType == NodeType.Root && !node.FileOwner.IsCaPackFile && packFileService.GetEditablePack() != node.FileOwner;
-        public bool IsEnabled(TreeNode node, PackFile? packFile) => true;
-
-        public void Execute(TreeNode selectedNode, PackFile? packFile)
+        public string GetDisplayName(TreeNode node) => "Set as Editable Pack";
+        public bool ShouldAdd(TreeNode node)
         {
-            _logger.Here().Information($"Setting pack file container '{CommandLoggingHelper.DescribePack(selectedNode.FileOwner)}' as editable");
-            packFileService.SetEditablePack(selectedNode.FileOwner);
+            var container = TreeNodeHelper.GetPackFileContainer(node);
+            return node.NodeType == NodeType.Root && container is { IsCaPackFile: false } && packFileService.GetEditablePack() != container;
+        }
+
+        public bool IsEnabled(TreeNode node) => true;
+
+        public void Execute(TreeNode selectedNode)
+        {
+            var container = TreeNodeHelper.GetPackFileContainer(selectedNode);
+            if (container == null)
+            {
+                _logger.Here().Warning($"Set editable pack blocked because no container was resolved for '{CommandLoggingHelper.DescribeNode(selectedNode)}'");
+                return;
+            }
+
+            _logger.Here().Information($"Setting pack file container '{CommandLoggingHelper.DescribePack(container)}' as editable");
+            packFileService.SetEditablePack(container);
         }
     }
 }

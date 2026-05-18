@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
@@ -16,12 +16,50 @@ namespace Shared.Ui.BaseDialogs.PackFileTree
         File
     }
 
+
+    public static class TreeNodeHelper
+    {
+        public static PackFile? GetPackFile(TreeNode? node)
+        {
+            if (node == null || node.NodeType != NodeType.File)
+                return null;
+
+            var container = GetPackFileContainer(node);
+            return container?.FindFile(node.GetFullPath());
+        }
+
+        public static IPackFileContainer? GetPackFileContainer(TreeNode? node)
+        {
+            var root = GetRootNode(node);
+            return (root as RootTreeNode)?.Owner;
+        }
+
+        private static TreeNode? GetRootNode(TreeNode? node)
+        {
+            var current = node;
+            while (current?.Parent != null)
+                current = current.Parent;
+
+            return current;
+        }
+    }
+
+    public partial class RootTreeNode : TreeNode
+    {
+        public IPackFileContainer Owner { get; }
+
+        public RootTreeNode(string name, IPackFileContainer owner) : 
+            base(name, NodeType.Root, null)
+        {
+
+            Owner = owner;
+        }
+    }
+
     public partial class TreeNode : ObservableObject
     {
-        private static readonly ILogger s_logger = Logging.Create<TreeNode>();
         private bool _isExpandedByFilter;
 
-        public IPackFileContainer FileOwner { get; private set; }
         public TreeNode? Parent { get; set; }
 
         public bool HasChildren => Children.Count > 0;
@@ -34,16 +72,14 @@ namespace Shared.Ui.BaseDialogs.PackFileTree
         [ObservableProperty] public partial bool IsNodeExpanded { get; set; } = false;
         [ObservableProperty] public partial NodeType NodeType { get; private set; }
 
-        public TreeNode(string name, NodeType type, IPackFileContainer owner, TreeNode? parent)
+        public TreeNode(string name, NodeType type, TreeNode? parent)
         {
             Name = name;
-            FileOwner = owner;
             Parent = parent;
             NodeType = type;
 
             if (string.IsNullOrWhiteSpace(name))
             {
-                s_logger.Here().Error($"Encountered empty tree node name. Owner:'{owner.Name}', Parent:'{DescribeNode(parent)}'");
                 throw new Exception($"Packfile name or folder is empty '{GetFullPath()}', this is not allowed! Please report as a bug if it happens outside of packfile loading! If it happens while loading clean up the packfile in RPFM");
             }
         }
@@ -176,42 +212,6 @@ namespace Shared.Ui.BaseDialogs.PackFileTree
             _isExpandedByFilter = false;
         }
 
-        partial void OnIsNodeExpandedChanged(bool value)
-        {
-            LogLoadedNodeCount(value);
-        }
-
-        public int CountLoadedNodes()
-        {
-            var count = 1;
-            foreach (var child in Children)
-                count += child.CountLoadedNodes();
-
-            return count;
-        }
-
-        private void LogLoadedNodeCount(bool expanded)
-        {
-            var root = this;
-            while (root.Parent != null)
-                root = root.Parent;
-
-            var loadedNodes = root.CountLoadedNodes();
-            var action = expanded ? "expanded" : "collapsed";
-            s_logger.Here().Information($"Tree node '{DescribeNode(this)}' {action}. Loaded nodes in tree: {loadedNodes}");
-        }
-
-        private static string DescribeNode(TreeNode? node)
-        {
-            if (node == null)
-                return "<none>";
-
-            if (node.NodeType == NodeType.Root)
-                return "<root>";
-
-            var path = node.GetFullPath();
-            return string.IsNullOrWhiteSpace(path) ? node.Name : path;
-        }
-
+    
     }
 }
