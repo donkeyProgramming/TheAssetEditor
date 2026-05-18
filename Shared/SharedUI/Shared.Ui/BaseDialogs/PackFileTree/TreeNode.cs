@@ -16,34 +16,6 @@ namespace Shared.Ui.BaseDialogs.PackFileTree
         File
     }
 
-
-    public static class TreeNodeHelper
-    {
-        public static PackFile? GetPackFile(TreeNode? node)
-        {
-            if (node == null || node.NodeType != NodeType.File)
-                return null;
-
-            var container = GetPackFileContainer(node);
-            return container?.FindFile(node.GetFullPath());
-        }
-
-        public static IPackFileContainer? GetPackFileContainer(TreeNode? node)
-        {
-            var root = GetRootNode(node);
-            return (root as RootTreeNode)?.Owner;
-        }
-
-        private static TreeNode? GetRootNode(TreeNode? node)
-        {
-            var current = node;
-            while (current?.Parent != null)
-                current = current.Parent;
-
-            return current;
-        }
-    }
-
     public partial class RootTreeNode : TreeNode
     {
         public IPackFileContainer Owner { get; }

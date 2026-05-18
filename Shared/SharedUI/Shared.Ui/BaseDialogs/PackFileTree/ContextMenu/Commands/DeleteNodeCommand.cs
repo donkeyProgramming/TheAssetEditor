@@ -3,6 +3,7 @@ using Shared.Core.PackFiles.Models;
 using Shared.Core.Services;
 using Serilog;
 using Shared.Core.ErrorHandling;
+using Shared.Ui.BaseDialogs.PackFileTree.Utility;
 
 namespace Shared.Ui.BaseDialogs.PackFileTree.ContextMenu.Commands
 {

@@ -14,10 +14,7 @@ namespace Shared.UiTest.BaseDialogs.PackFileTree.ContextMenu.Commands
         [Test]
         public void ShouldAdd_ReturnsTrueForFile()
         {
-            var owner = CreateContainer();
-            var root = CreateRoot(owner);
-            var packFile = PackFile.CreateFromASCII("file.txt", "a");
-            var file = new TreeNode("file.txt", NodeType.File, root);
+            var (owner, _, file, packFile) = CreateResolvedFileSelection("file.txt", "a");
             var service = CreatePackFileService(owner, packFile);
             var command = new DeleteNodeCommand(service.Object, new Mock<IStandardDialogs>().Object);
 
@@ -27,10 +24,7 @@ namespace Shared.UiTest.BaseDialogs.PackFileTree.ContextMenu.Commands
         [Test]
         public void IsEnabled_ReturnsTrue()
         {
-            var owner = CreateContainer();
-            var root = CreateRoot(owner);
-            var packFile = PackFile.CreateFromASCII("file.txt", "a");
-            var file = new TreeNode("file.txt", NodeType.File, root);
+            var (owner, _, file, packFile) = CreateResolvedFileSelection("file.txt", "a");
             var command = new DeleteNodeCommand(CreatePackFileService(owner, packFile).Object, new Mock<IStandardDialogs>().Object);
 
             Assert.That(command.IsEnabled(file), Is.True);
@@ -39,11 +33,7 @@ namespace Shared.UiTest.BaseDialogs.PackFileTree.ContextMenu.Commands
         [Test]
         public void Execute_DeletesFileAfterConfirmation()
         {
-            var owner = CreateContainer();
-            var root = CreateRoot(owner);
-            var packFile = PackFile.CreateFromASCII("file.txt", "a");
-            var file = new TreeNode("file.txt", NodeType.File, root);
-            root.AddChild(file);
+            var (owner, _, file, packFile) = CreateResolvedFileSelection("file.txt", "a");
 
             var service = CreatePackFileService(owner, packFile);
             var dialogs = new Mock<IStandardDialogs>();

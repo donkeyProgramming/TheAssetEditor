@@ -1,4 +1,5 @@
 ﻿using Shared.Ui.BaseDialogs.PackFileTree;
+using Shared.Ui.BaseDialogs.PackFileTree.Utility;
 
 namespace Shared.UiTest.BaseDialogs.PackFileTree.Utility
 {
@@ -16,7 +17,7 @@ namespace Shared.UiTest.BaseDialogs.PackFileTree.Utility
         /// <returns>The found node or null if not found.</returns>
         public static TreeNode? GetFromPath(TreeNode parent, string path)
         {
-            return TreeNodePathHelper.FindInTree(parent, path);
+            return TreeNodeHelper.FindInTree(parent, path);
         }
     }
 }

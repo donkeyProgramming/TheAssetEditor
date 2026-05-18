@@ -13,10 +13,7 @@ namespace Shared.UiTest.BaseDialogs.PackFileTree.ContextMenu.Commands
         [Test]
         public void ShouldAdd_ReturnsTrueForFileNode()
         {
-            var owner = CreateContainer();
-            var root = CreateRoot(owner);
-            var packFile = PackFile.CreateFromASCII("file.txt", "a");
-            var file = new TreeNode("file.txt", NodeType.File, root);
+            var (_, _, file, _) = CreateResolvedFileSelection("file.txt", "a");
             var command = new OpenNodeInNotepadCommand(new Mock<IStandardDialogs>().Object, new Mock<IFileSystemAccess>().Object);
 
             Assert.That(command.ShouldAdd(file), Is.True);
@@ -25,10 +22,7 @@ namespace Shared.UiTest.BaseDialogs.PackFileTree.ContextMenu.Commands
         [Test]
         public void IsEnabled_ReturnsTrue()
         {
-            var owner = CreateContainer();
-            var root = CreateRoot(owner);
-            var packFile = PackFile.CreateFromASCII("file.txt", "a");
-            var file = new TreeNode("file.txt", NodeType.File, root);
+            var (_, _, file, _) = CreateResolvedFileSelection("file.txt", "a");
             var command = new OpenNodeInNotepadCommand(new Mock<IStandardDialogs>().Object, new Mock<IFileSystemAccess>().Object);
 
             Assert.That(command.IsEnabled(file), Is.True);
@@ -37,10 +31,7 @@ namespace Shared.UiTest.BaseDialogs.PackFileTree.ContextMenu.Commands
         [Test]
         public void Execute_AppMissing_ShowsError()
         {
-            var owner = CreateContainer();
-            var root = CreateRoot(owner);
-            var packFile = PackFile.CreateFromASCII("file.txt", "a");
-            var file = new TreeNode("file.txt", NodeType.File, root);
+            var (_, _, file, _) = CreateResolvedFileSelection("file.txt", "a");
 
             var dialogs = new Mock<IStandardDialogs>();
             var fileSystem = new Mock<IFileSystemAccess>();
@@ -56,10 +47,7 @@ namespace Shared.UiTest.BaseDialogs.PackFileTree.ContextMenu.Commands
         [Test]
         public void Execute_AppExists_WritesTempFileAndStartsProcess()
         {
-            var owner = CreateContainer();
-            var root = CreateRoot(owner);
-            var packFile = PackFile.CreateFromASCII("file.txt", "abc");
-            var file = new TreeNode("file.txt", NodeType.File, root);
+            var (_, _, file, _) = CreateResolvedFileSelection("file.txt", "abc");
 
             var dialogs = new Mock<IStandardDialogs>();
             var fileSystem = new Mock<IFileSystemAccess>();

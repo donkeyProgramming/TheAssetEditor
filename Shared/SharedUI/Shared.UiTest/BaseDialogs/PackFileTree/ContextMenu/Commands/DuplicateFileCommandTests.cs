@@ -18,8 +18,7 @@ namespace Shared.UiTest.BaseDialogs.PackFileTree.ContextMenu.Commands
             var sourcePackFile = runner.CreateEmptyPackFile("SourcePack", false);
             var fileEntry = new NewPackFileEntry("Animation\\Meta", PackFile.CreateFromASCII("testFile.anm", "DummyContent"));
             runner.PackFileService.AddFilesToPack(sourcePackFile, [fileEntry]);
-            var fileToCopy = runner.PackFileService.FindFile("Animation\\Meta\\testFile.anm", sourcePackFile)!;
-            var node = new TreeNode(fileToCopy.Name, NodeType.File, null);
+            var node = CreateNodePath(CreateRoot(sourcePackFile), "Animation\\Meta\\testFile.anm");
             var command = runner.CommandFactory.Create<DuplicateFileCommand>();
 
             Assert.That(command.ShouldAdd(node), Is.True);
@@ -33,8 +32,7 @@ namespace Shared.UiTest.BaseDialogs.PackFileTree.ContextMenu.Commands
             var sourcePackFile = runner.CreateEmptyPackFile("SourcePack", false);
             var fileEntry = new NewPackFileEntry("Animation\\Meta", PackFile.CreateFromASCII("testFile.anm", "DummyContent"));
             runner.PackFileService.AddFilesToPack(sourcePackFile, [fileEntry]);
-            var fileToCopy = runner.PackFileService.FindFile("Animation\\Meta\\testFile.anm", sourcePackFile)!;
-            var node = new TreeNode(fileToCopy.Name, NodeType.File, null);
+            var node = CreateNodePath(CreateRoot(sourcePackFile), "Animation\\Meta\\testFile.anm");
             var command = runner.CommandFactory.Create<DuplicateFileCommand>();
 
             Assert.That(command.IsEnabled(node), Is.True);
@@ -50,9 +48,7 @@ namespace Shared.UiTest.BaseDialogs.PackFileTree.ContextMenu.Commands
 
             var fileEntry = new NewPackFileEntry("Animation\\Meta", PackFile.CreateFromASCII("testFile.anm", "DummyContent"));
             runner.PackFileService.AddFilesToPack(sourcePackFile, [fileEntry]);
-            var fileToCopy = runner.PackFileService.FindFile("Animation\\Meta\\testFile.anm", sourcePackFile)!;
-
-            var node = new TreeNode(fileToCopy.Name, NodeType.File, null);
+            var node = CreateNodePath(CreateRoot(sourcePackFile), "Animation\\Meta\\testFile.anm");
             var command = runner.CommandFactory.Create<DuplicateFileCommand>();
 
             command.Execute(node);

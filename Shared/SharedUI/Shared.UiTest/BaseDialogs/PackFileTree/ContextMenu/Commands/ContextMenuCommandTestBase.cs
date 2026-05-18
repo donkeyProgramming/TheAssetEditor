@@ -1,4 +1,5 @@
-﻿using Moq;
+﻿using System.IO;
+using Moq;
 using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
 using Shared.Ui.BaseDialogs.PackFileTree;
@@ -28,5 +29,40 @@ namespace Shared.UiTest.BaseDialogs.PackFileTree.ContextMenu.Commands
         }
 
         protected static TreeNode CreateRoot(IPackFileContainer container) => new RootTreeNode(container.Name, container);
+
+        protected static TreeNode CreateNodePath(TreeNode root, string path, NodeType leafType = NodeType.File)
+        {
+            var segments = path.Split(['\\', '/'], StringSplitOptions.RemoveEmptyEntries);
+            var current = root;
+
+            for (var i = 0; i < segments.Length; i++)
+            {
+                var nodeType = i == segments.Length - 1 ? leafType : NodeType.Directory;
+                var child = new TreeNode(segments[i], nodeType, current);
+                current.AddChild(child);
+                current = child;
+            }
+
+            return current;
+        }
+
+        protected static (IPackFileContainer Container, TreeNode Root, TreeNode FileNode, PackFile PackFile) CreateResolvedFileSelection(string filePath = "file.txt", string content = "a", bool isCa = false, string name = "pack", string systemFilePath = "C:\\temp\\pack.pack")
+        {
+            var container = new Mock<IPackFileContainer>();
+            container.SetupGet(x => x.Name).Returns(name);
+            container.SetupGet(x => x.SystemFilePath).Returns(systemFilePath);
+            container.SetupProperty(x => x.IsCaPackFile, isCa);
+
+            var root = CreateRoot(container.Object);
+            var fileNode = CreateNodePath(root, filePath);
+            var packFile = PackFile.CreateFromASCII(Path.GetFileName(filePath), content);
+            var fullPath = fileNode.GetFullPath();
+
+            container.Setup(x => x.FindFile(fullPath)).Returns(packFile);
+            container.Setup(x => x.ContainsFile(fullPath)).Returns(true);
+            container.Setup(x => x.GetFullPath(packFile)).Returns(fullPath);
+
+            return (container.Object, root, fileNode, packFile);
+        }
     }
 }
