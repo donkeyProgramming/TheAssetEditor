@@ -1,8 +1,14 @@
 ﻿using System.IO;
+using System.Reflection.Metadata;
 using Moq;
+using Shared.Core.DependencyInjection;
+using Shared.Core.Events;
 using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
+using Shared.Core.PackFiles.Models.Containers;
+using Shared.Core.ToolCreation;
 using Shared.Ui.BaseDialogs.PackFileTree;
+using Shared.Ui.BaseDialogs.PackFileTree.ContextMenu;
 
 namespace Shared.UiTest.BaseDialogs.PackFileTree.ContextMenu.Commands
 {
@@ -63,6 +69,57 @@ namespace Shared.UiTest.BaseDialogs.PackFileTree.ContextMenu.Commands
             container.Setup(x => x.GetFullPath(packFile)).Returns(fullPath);
 
             return (container.Object, root, fileNode, packFile);
+        }
+
+
+
+        protected Mock<IScopeRepository> _scopeRepo;
+        protected LocalScopeEventHub _eventHub;
+        protected SingletonScopeEventHub _globalEventHub;
+        protected IPackFileService _packFileService;
+
+        [SetUp]
+        public void Setup()
+        {
+            _scopeRepo = new Mock<IScopeRepository>();
+
+        //    var mockedEditorHandle = new Mock<IEditorInterface>();
+
+
+
+            _globalEventHub = new SingletonScopeEventHub(_scopeRepo.Object);
+            _eventHub = new LocalScopeEventHub(_scopeRepo.Object);
+
+            _packFileService = new PackFileService(_globalEventHub);
+
+            _scopeRepo.Setup(x => x.GetRequiredServiceRootScope<IEventHub>()).Returns(_eventHub);
+            _scopeRepo.Setup(x => x.GetEditorHandles()).Returns([]);
+        }
+
+        protected IPackFileContainer AddPackFiles(bool isCa, string containerName, string fileSystemPath, params string[] files)
+        {
+            var packfileContainer = new PackFileContainer(containerName) { IsCaPackFile = isCa, SystemFilePath = fileSystemPath };
+            foreach (var file in files)
+            {
+                var packFile = PackFile.CreateFromASCII(Path.GetFileName(file), "content");
+                packfileContainer.AddOrUpdateFile(file, packFile);
+            }
+            _packFileService.AddContainer(packfileContainer);
+            return packfileContainer;
+        }
+
+        protected PackFileBrowserViewModel GetViewModel()
+        {
+
+            var packFileBrowserViewModel = new PackFileBrowserViewModel(null, null, ContextMenuType.None, _packFileService, _eventHub, null, null, true, false);
+            return packFileBrowserViewModel;
+        }
+
+        [TearDown]
+        public void TearDown()
+        {
+            _eventHub.Dispose();
+            _globalEventHub.Dispose();
         }
     }
 }

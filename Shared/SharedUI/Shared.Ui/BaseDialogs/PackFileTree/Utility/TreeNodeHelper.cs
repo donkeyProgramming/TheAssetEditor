@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using Shared.Core.PackFiles.Models;
 
 namespace Shared.Ui.BaseDialogs.PackFileTree.Utility
@@ -46,6 +47,11 @@ namespace Shared.Ui.BaseDialogs.PackFileTree.Utility
 
             var child = parent.Children.FirstOrDefault(x => x.Name == nodeName);
             return child == null ? null : FindInTree(child, remainingPath);
+        }
+
+        internal static TreeNode FindNode(IPackFileContainer container, string v)
+        {
+            throw new NotImplementedException();
         }
     }
 }
