@@ -1,10 +1,8 @@
-using System.Threading;
 using Moq;
-using Shared.Core.PackFiles;
-using Shared.Core.PackFiles.Models;
 using Shared.Core.Services;
 using Shared.Ui.BaseDialogs.PackFileTree;
 using Shared.Ui.BaseDialogs.PackFileTree.ContextMenu.Commands;
+using Shared.Ui.BaseDialogs.PackFileTree.Utility;
 
 namespace Shared.UiTest.BaseDialogs.PackFileTree.ContextMenu.Commands
 {
@@ -14,14 +12,14 @@ namespace Shared.UiTest.BaseDialogs.PackFileTree.ContextMenu.Commands
         [Test]
         public void ShouldAdd_ReturnsTrueWhenEditablePackExists()
         {
-            var source = CreateContainer(name: "source");
-            var target = CreateContainer(name: "target");
-            var service = CreatePackFileService(source);
-            service.Setup(x => x.GetEditablePack()).Returns(target);
-            var command = new CopyToEditablePackCommand(service.Object, new Mock<IStandardDialogs>().Object);
-            var root = CreateRoot(source);
-            var node = new TreeNode("folder", NodeType.Directory, root);
-            root.AddChild(node);
+            var source = AddPackFiles(false, "source", "c:\\source.pack", ["folder\\file.txt"]);
+            var target = AddPackFiles(false, "target", "c:\\target.pack", []);
+            _packFileService.SetEditablePack(target);
+
+            var viewModel = PackFileBrowser();
+            var node = TreeNodeHelper.FindNode(viewModel, source, "folder\\file.txt");
+
+            var command = new CopyToEditablePackCommand(_packFileService, new Mock<IStandardDialogs>().Object);
 
             Assert.That(command.ShouldAdd(node), Is.True);
         }
@@ -29,9 +27,11 @@ namespace Shared.UiTest.BaseDialogs.PackFileTree.ContextMenu.Commands
         [Test]
         public void IsEnabled_ReturnsTrue()
         {
-            var source = CreateContainer(name: "source");
-            var node = new TreeNode("folder", NodeType.Directory, null);
-            var command = new CopyToEditablePackCommand(new Mock<IPackFileService>().Object, new Mock<IStandardDialogs>().Object);
+            var source = AddPackFiles(false, "source", "c:\\source.pack", ["folder\\file.txt"]);
+            var viewModel = PackFileBrowser();
+            var node = TreeNodeHelper.FindNode(viewModel, source, "folder\\file.txt");
+
+            var command = new CopyToEditablePackCommand(_packFileService, new Mock<IStandardDialogs>().Object);
 
             Assert.That(command.IsEnabled(node), Is.True);
         }
@@ -39,26 +39,26 @@ namespace Shared.UiTest.BaseDialogs.PackFileTree.ContextMenu.Commands
         [Test]
         public void Execute_CopiesChildFilesToEditablePack()
         {
-            var source = CreateContainer(name: "source");
-            var target = CreateContainer(name: "target");
-            var service = CreatePackFileService(source);
-            service.Setup(x => x.GetEditablePack()).Returns(target);
+            // Arrange
+            var source = AddPackFiles(false, "source", "c:\\source.pack", ["folder\\file.txt"]);
+            var target = AddPackFiles(false, "target", "c:\\target.pack", []);
+            _packFileService.SetEditablePack(target);
+
+            var viewModel = PackFileBrowser();
+            var root = viewModel.Files.First(x => (x as RootTreeNode)!.Owner == source);
+            var folder = root.Children.First(x => x.NodeType == NodeType.Directory);
 
             var dialogs = new Mock<IStandardDialogs>();
             var waitCursor = new Mock<IWaitCursor>();
             dialogs.Setup(x => x.ShowWaitCursor()).Returns(waitCursor.Object);
 
-            var root = CreateRoot(source);
-            var folder = new TreeNode("folder", NodeType.Directory, root);
-            root.AddChild(folder);
-            var file = new TreeNode("file.txt", NodeType.File, folder);
-            folder.AddChild(file);
-
-            var command = new CopyToEditablePackCommand(service.Object, dialogs.Object);
-
+            // Act
+            var command = new CopyToEditablePackCommand(_packFileService, dialogs.Object);
             command.Execute(folder);
 
-            service.Verify(x => x.CopyFileFromOtherPackFile(source, It.IsAny<string>(), target), Times.Once);
+            // Assert
+            var copiedFile = target.FindFile("folder\\file.txt");
+            Assert.That(copiedFile, Is.Not.Null);
         }
     }
 }

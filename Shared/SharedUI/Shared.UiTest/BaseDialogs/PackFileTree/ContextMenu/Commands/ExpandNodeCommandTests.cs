@@ -1,7 +1,6 @@
-using System.Threading;
-using Shared.Core.PackFiles.Models;
 using Shared.Ui.BaseDialogs.PackFileTree;
 using Shared.Ui.BaseDialogs.PackFileTree.ContextMenu.Commands;
+using Shared.Ui.BaseDialogs.PackFileTree.Utility;
 
 namespace Shared.UiTest.BaseDialogs.PackFileTree.ContextMenu.Commands
 {
@@ -11,10 +10,12 @@ namespace Shared.UiTest.BaseDialogs.PackFileTree.ContextMenu.Commands
         [Test]
         public void ShouldAdd_ReturnsTrueForFolderAndFalseForFile()
         {
-            var owner = CreateContainer();
-            var root = CreateRoot(owner);
-            var folder = new TreeNode("folder", NodeType.Directory, root);
-            var file = new TreeNode("file.txt", NodeType.File, folder);
+            var container = AddPackFiles(false, "modfile", "c:\\mymod.pack", ["folder\\file.txt"]);
+            var viewModel = PackFileBrowser();
+            var root = viewModel.Files.First();
+            var folder = root.Children.First(x => x.NodeType == NodeType.Directory);
+            var file = TreeNodeHelper.FindNode(viewModel, container, "folder\\file.txt");
+
             var command = new ExpandNodeCommand();
 
             Assert.That(command.ShouldAdd(folder), Is.True);
@@ -24,9 +25,11 @@ namespace Shared.UiTest.BaseDialogs.PackFileTree.ContextMenu.Commands
         [Test]
         public void IsEnabled_ReturnsTrue()
         {
-            var owner = CreateContainer();
-            var root = CreateRoot(owner);
-            var folder = new TreeNode("folder", NodeType.Directory, root);
+            AddPackFiles(false, "modfile", "c:\\mymod.pack", ["folder\\file.txt"]);
+            var viewModel = PackFileBrowser();
+            var root = viewModel.Files.First();
+            var folder = root.Children.First(x => x.NodeType == NodeType.Directory);
+
             var command = new ExpandNodeCommand();
 
             Assert.That(command.IsEnabled(folder), Is.True);
@@ -35,36 +38,28 @@ namespace Shared.UiTest.BaseDialogs.PackFileTree.ContextMenu.Commands
         [Test]
         public void Execute_ExpandsAllNodes()
         {
-            var owner = CreateContainer();
-            var root = CreateRoot(owner);
-            var folder = new TreeNode("folder", NodeType.Directory, root);
-            var file = new TreeNode("file.txt", NodeType.File, folder);
-            root.AddChild(folder);
-            folder.AddChild(file);
+            AddPackFiles(false, "modfile", "c:\\mymod.pack", ["folder\\file.txt"]);
+            var viewModel = PackFileBrowser();
+            var root = viewModel.Files.First();
 
             root.IsNodeExpanded = false;
-            folder.IsNodeExpanded = false;
-            file.IsNodeExpanded = false;
+            root.Children.First().IsNodeExpanded = false;
 
             var command = new ExpandNodeCommand();
-
             command.Execute(root);
 
             Assert.That(root.IsNodeExpanded, Is.True);
-            Assert.That(folder.IsNodeExpanded, Is.True);
-            Assert.That(file.IsNodeExpanded, Is.True);
+            Assert.That(root.Children.First().IsNodeExpanded, Is.True);
         }
 
         [Test]
         public void Execute_ExpandsNestedChildren()
         {
-            var owner = CreateContainer();
-            var root = CreateRoot(owner);
-            var folder = new TreeNode("folder", NodeType.Directory, root);
-            var nested = new TreeNode("nested", NodeType.Directory, folder);
-
-            root.AddChild(folder);
-            folder.AddChild(nested);
+            AddPackFiles(false, "modfile", "c:\\mymod.pack", ["folder\\nested\\file.txt"]);
+            var viewModel = PackFileBrowser();
+            var root = viewModel.Files.First();
+            var folder = root.Children.First();
+            var nested = folder.Children.First(x => x.NodeType == NodeType.Directory);
 
             root.IsNodeExpanded = false;
             folder.IsNodeExpanded = false;

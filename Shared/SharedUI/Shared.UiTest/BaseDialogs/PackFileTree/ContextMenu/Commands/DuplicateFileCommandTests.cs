@@ -1,9 +1,9 @@
-using System.Threading;
-using Shared.Core.PackFiles.Models;
+using Moq;
 using Shared.Core.PackFiles;
-using Shared.Ui.BaseDialogs.PackFileTree;
+using Shared.Core.PackFiles.Models;
+using Shared.Core.Services;
 using Shared.Ui.BaseDialogs.PackFileTree.ContextMenu.Commands;
-using Test.TestingUtility.Shared;
+using Shared.Ui.BaseDialogs.PackFileTree.Utility;
 
 namespace Shared.UiTest.BaseDialogs.PackFileTree.ContextMenu.Commands
 {
@@ -13,13 +13,11 @@ namespace Shared.UiTest.BaseDialogs.PackFileTree.ContextMenu.Commands
         [Test]
         public void ShouldAdd_ReturnsTrueForFileNode()
         {
-            var runner = new AssetEditorTestRunner();
-            runner.PackFileService.EnforceGameFilesMustBeLoaded = false;
-            var sourcePackFile = runner.CreateEmptyPackFile("SourcePack", false);
-            var fileEntry = new NewPackFileEntry("Animation\\Meta", PackFile.CreateFromASCII("testFile.anm", "DummyContent"));
-            runner.PackFileService.AddFilesToPack(sourcePackFile, [fileEntry]);
-            var node = CreateNodePath(CreateRoot(sourcePackFile), "Animation\\Meta\\testFile.anm");
-            var command = runner.CommandFactory.Create<DuplicateFileCommand>();
+            var container = AddPackFiles(false, "modfile", "c:\\mymod.pack", ["animation\\meta\\testfile.anm"]);
+            var viewModel = PackFileBrowser();
+            var node = TreeNodeHelper.FindNode(viewModel, container, "animation\\meta\\testfile.anm");
+
+            var command = new DuplicateFileCommand(_packFileService, new Mock<IStandardDialogs>().Object);
 
             Assert.That(command.ShouldAdd(node), Is.True);
         }
@@ -27,13 +25,11 @@ namespace Shared.UiTest.BaseDialogs.PackFileTree.ContextMenu.Commands
         [Test]
         public void IsEnabled_ReturnsTrue()
         {
-            var runner = new AssetEditorTestRunner();
-            runner.PackFileService.EnforceGameFilesMustBeLoaded = false;
-            var sourcePackFile = runner.CreateEmptyPackFile("SourcePack", false);
-            var fileEntry = new NewPackFileEntry("Animation\\Meta", PackFile.CreateFromASCII("testFile.anm", "DummyContent"));
-            runner.PackFileService.AddFilesToPack(sourcePackFile, [fileEntry]);
-            var node = CreateNodePath(CreateRoot(sourcePackFile), "Animation\\Meta\\testFile.anm");
-            var command = runner.CommandFactory.Create<DuplicateFileCommand>();
+            var container = AddPackFiles(false, "modfile", "c:\\mymod.pack", ["animation\\meta\\testfile.anm"]);
+            var viewModel = PackFileBrowser();
+            var node = TreeNodeHelper.FindNode(viewModel, container, "animation\\meta\\testfile.anm");
+
+            var command = new DuplicateFileCommand(_packFileService, new Mock<IStandardDialogs>().Object);
 
             Assert.That(command.IsEnabled(node), Is.True);
         }
@@ -41,41 +37,44 @@ namespace Shared.UiTest.BaseDialogs.PackFileTree.ContextMenu.Commands
         [Test]
         public void Execute_DuplicatesFileIntoEditablePack()
         {
-            var runner = new AssetEditorTestRunner();
-            runner.PackFileService.EnforceGameFilesMustBeLoaded = false;
-            var sourcePackFile = runner.CreateEmptyPackFile("SourcePack", false);
-            var outputPackFile = runner.CreateEmptyPackFile("OutputPack", true);
+            // Arrange
+            var sourceContainer = AddPackFiles(false, "SourcePack", "c:\\source.pack", ["animation\\meta\\testfile.anm"]);
+            var outputContainer = AddPackFiles(false, "OutputPack", "c:\\output.pack", []);
+            _packFileService.SetEditablePack(outputContainer);
 
-            var fileEntry = new NewPackFileEntry("Animation\\Meta", PackFile.CreateFromASCII("testFile.anm", "DummyContent"));
-            runner.PackFileService.AddFilesToPack(sourcePackFile, [fileEntry]);
-            var node = CreateNodePath(CreateRoot(sourcePackFile), "Animation\\Meta\\testFile.anm");
-            var command = runner.CommandFactory.Create<DuplicateFileCommand>();
+            var viewModel = PackFileBrowser();
+            var node = TreeNodeHelper.FindNode(viewModel, sourceContainer, "animation\\meta\\testfile.anm");
 
+            // Act
+            var command = new DuplicateFileCommand(_packFileService, new Mock<IStandardDialogs>().Object);
             command.Execute(node);
 
-            var foundFile = runner.PackFileService.FindFile("Animation\\Meta\\testFile_copy.anm", outputPackFile);
+            // Assert
+            var foundFile = outputContainer.FindFile("animation\\meta\\testfile_copy.anm");
             Assert.That(foundFile, Is.Not.Null);
         }
 
         [Test]
-        [TestCase("testFile", "testFile_copy")]            // No extension
-        [TestCase("testFile.anm", "testFile_copy.anm")]        // Single extension 
-        [TestCase("testFile.anm.meta", "testFile_copy.anm.meta")]   // Double extension 
+        [TestCase("testfile", "testfile_copy")]
+        [TestCase("testfile.anm", "testfile_copy.anm")]
+        [TestCase("testfile.anm.meta", "testfile_copy.anm.meta")]
         public void DuplicateFileCommand(string fileName, string result)
         {
-            var runner = new AssetEditorTestRunner();
-            runner.PackFileService.EnforceGameFilesMustBeLoaded = false;
-            var sourcePackFile = runner.CreateEmptyPackFile("SourcePack", false);
-            var outputPackFile = runner.CreateEmptyPackFile("OutputPack", true);
+            // Arrange
+            var sourceContainer = AddPackFiles(false, "SourcePack", "c:\\source.pack", ["animation\\meta\\" + fileName]);
+            var outputContainer = AddPackFiles(false, "OutputPack", "c:\\output.pack", []);
+            _packFileService.SetEditablePack(outputContainer);
 
-            var fileEntry = new NewPackFileEntry("Animation\\Meta", PackFile.CreateFromASCII(fileName, "DummyContent"));
-            runner.PackFileService.AddFilesToPack(sourcePackFile, [fileEntry]);
-            var fileToCopy = runner.PackFileService.FindFile("Animation\\Meta\\" + fileName, sourcePackFile);
+            var viewModel = PackFileBrowser();
+            var node = TreeNodeHelper.FindNode(viewModel, sourceContainer, "animation\\meta\\" + fileName);
 
-            runner.CommandFactory.Create<DuplicateFileCommand>().Execute(fileToCopy);
-            var foundFile = runner.PackFileService.FindFile("Animation\\Meta\\" + result, outputPackFile);
+            // Act
+            var command = new DuplicateFileCommand(_packFileService, new Mock<IStandardDialogs>().Object);
+            command.Execute(node);
+
+            // Assert
+            var foundFile = outputContainer.FindFile("animation\\meta\\" + result);
             Assert.That(foundFile, Is.Not.Null);
         }
     }
 }
-

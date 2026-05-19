@@ -1,8 +1,3 @@
-using System.Threading;
-using Moq;
-using Shared.Core.PackFiles;
-using Shared.Core.PackFiles.Models;
-using Shared.Ui.BaseDialogs.PackFileTree;
 using Shared.Ui.BaseDialogs.PackFileTree.ContextMenu.Commands;
 
 namespace Shared.UiTest.BaseDialogs.PackFileTree.ContextMenu.Commands
@@ -13,9 +8,11 @@ namespace Shared.UiTest.BaseDialogs.PackFileTree.ContextMenu.Commands
         [Test]
         public void ShouldAdd_ReturnsTrueForRoot()
         {
-            var owner = CreateContainer();
-            var root = CreateRoot(owner);
-            var command = new SetAsEditablePackCommand(CreatePackFileService(owner).Object);
+            AddPackFiles(false, "modfile", "c:\\mymod.pack", ["rootfolder\\file.txt"]);
+            var viewModel = PackFileBrowser();
+            var root = viewModel.Files.First();
+
+            var command = new SetAsEditablePackCommand(_packFileService);
 
             Assert.That(command.ShouldAdd(root), Is.True);
         }
@@ -23,9 +20,11 @@ namespace Shared.UiTest.BaseDialogs.PackFileTree.ContextMenu.Commands
         [Test]
         public void IsEnabled_ReturnsTrue()
         {
-            var owner = CreateContainer();
-            var root = CreateRoot(owner);
-            var command = new SetAsEditablePackCommand(CreatePackFileService(owner).Object);
+            AddPackFiles(false, "modfile", "c:\\mymod.pack", ["rootfolder\\file.txt"]);
+            var viewModel = PackFileBrowser();
+            var root = viewModel.Files.First();
+
+            var command = new SetAsEditablePackCommand(_packFileService);
 
             Assert.That(command.IsEnabled(root), Is.True);
         }
@@ -33,15 +32,17 @@ namespace Shared.UiTest.BaseDialogs.PackFileTree.ContextMenu.Commands
         [Test]
         public void Execute_SetsEditablePack()
         {
-            var owner = CreateContainer();
-            var root = CreateRoot(owner);
-            var service = CreatePackFileService(owner);
-            service.Setup(x => x.GetEditablePack()).Returns((IPackFileContainer?)null);
-            var command = new SetAsEditablePackCommand(service.Object);
+            // Arrange
+            var container = AddPackFiles(false, "modfile", "c:\\mymod.pack", ["rootfolder\\file.txt"]);
+            var viewModel = PackFileBrowser();
+            var root = viewModel.Files.First();
 
+            // Act
+            var command = new SetAsEditablePackCommand(_packFileService);
             command.Execute(root);
 
-            service.Verify(x => x.SetEditablePack(owner), Times.Once);
+            // Assert
+            Assert.That(_packFileService.GetEditablePack(), Is.EqualTo(container));
         }
     }
 }
