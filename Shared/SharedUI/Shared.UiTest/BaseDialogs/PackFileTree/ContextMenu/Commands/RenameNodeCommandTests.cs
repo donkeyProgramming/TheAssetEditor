@@ -31,41 +31,45 @@ namespace Shared.UiTest.BaseDialogs.PackFileTree.ContextMenu.Commands
             Assert.That(command.IsEnabled(file), Is.True);
         }
 
+       //[Test]
+       //public void Execute_RenamesFile()
+       //{
+       //    var (owner, _, file, packFile) = CreateResolvedFileSelection("file.txt", "a");
+       //
+       //    var service = CreatePackFileService(owner, packFile);
+       //    var dialogs = new Mock<IStandardDialogs>();
+       //    dialogs.Setup(x => x.ShowTextInputDialog("Rename file", file.Name)).Returns(new TextInputDialogResult(true, "renamed.txt"));
+       //    var command = new RenameNodeCommand(service.Object, dialogs.Object);
+       //
+       //    command.Execute(file);
+       //
+       //    service.Verify(x => x.RenameFile(owner, packFile, "renamed.txt"), Times.Once);
+       //}
+
+
         [Test]
         public void Execute_RenamesFile()
-        {
-            var (owner, _, file, packFile) = CreateResolvedFileSelection("file.txt", "a");
-
-            var service = CreatePackFileService(owner, packFile);
-            var dialogs = new Mock<IStandardDialogs>();
-            dialogs.Setup(x => x.ShowTextInputDialog("Rename file", file.Name)).Returns(new TextInputDialogResult(true, "renamed.txt"));
-            var command = new RenameNodeCommand(service.Object, dialogs.Object);
-
-            command.Execute(file);
-
-            service.Verify(x => x.RenameFile(owner, packFile, "renamed.txt"), Times.Once);
-        }
-
-
-        [Test]
-        public void Execute_RenamesFile2()
         {
             // Arrange
             AddPackFiles(true, "gamefile", "root", []);
             var container = AddPackFiles(false, "modfile", "c:\\mymod.pack", ["rootfolder\\file0.txt", "rootfolder\\file1.txt"]);
 
-
+            var viewModel = PackFileBrowser();
+            var node = TreeNodeHelper.FindNode(viewModel, container, "rootfolder\\file0.txt");
+           
             var dialogs = new Mock<IStandardDialogs>();
-            dialogs.Setup(x => x.ShowTextInputDialog("Rename file", "")).Returns(new TextInputDialogResult(true, "renamed.txt"));
-
-            var viewModel = GetViewModel();
-            var node = TreeNodeHelper.FindNode(container, "rootfolder\\file0.txt");
+            dialogs.Setup(x => x.ShowTextInputDialog("Rename file", node.Name)).Returns(new TextInputDialogResult(true, "renamed.txt"));
 
             // Act
             var command = new RenameNodeCommand(_packFileService, dialogs.Object);
             command.Execute(node);
 
             // Assert
+            Assert.That(node.Name, Is.EqualTo("renamed.txt"));
+            var packfile = container.FindFile("rootfolder\\renamed.txt");
+            Assert.That(packfile, Is.Not.Null);
+
+
             // File name changed 
             // File name in the container changed
             // File moved in the tree

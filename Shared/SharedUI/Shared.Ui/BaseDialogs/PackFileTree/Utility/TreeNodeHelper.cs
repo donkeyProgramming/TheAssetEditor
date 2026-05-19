@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Shared.Core.PackFiles.Models;
+using Shared.Core.PackFiles.Utility;
 
 namespace Shared.Ui.BaseDialogs.PackFileTree.Utility
 {
@@ -49,9 +51,25 @@ namespace Shared.Ui.BaseDialogs.PackFileTree.Utility
             return child == null ? null : FindInTree(child, remainingPath);
         }
 
-        internal static TreeNode FindNode(IPackFileContainer container, string v)
+        internal static TreeNode FindNode(PackFileBrowserViewModel viewModel, IPackFileContainer container, string fullPathName)
         {
-            throw new NotImplementedException();
+            var root = viewModel.Files.First(x=>(x as RootTreeNode)!.Owner == container);
+
+            var normalizedPath = PathNormalization.NormalizeFileName(fullPathName);
+            var splits = normalizedPath.Split('\\');
+
+            var currentNode = root;
+            for (var i = 0; i < splits.Length; i++)
+            {
+                var nextNode = currentNode.Children.Where(x => x.Name == splits[i]).FirstOrDefault();
+                if (nextNode == null)
+                    throw new Exception("Could not find node for path: " + fullPathName);
+
+
+                currentNode = nextNode;
+            }
+
+            return currentNode;
         }
     }
 }

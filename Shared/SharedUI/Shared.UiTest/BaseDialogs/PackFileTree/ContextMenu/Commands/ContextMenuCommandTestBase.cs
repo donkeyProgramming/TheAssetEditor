@@ -6,6 +6,7 @@ using Shared.Core.Events;
 using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
 using Shared.Core.PackFiles.Models.Containers;
+using Shared.Core.Settings;
 using Shared.Core.ToolCreation;
 using Shared.Ui.BaseDialogs.PackFileTree;
 using Shared.Ui.BaseDialogs.PackFileTree.ContextMenu;
@@ -83,10 +84,6 @@ namespace Shared.UiTest.BaseDialogs.PackFileTree.ContextMenu.Commands
         {
             _scopeRepo = new Mock<IScopeRepository>();
 
-        //    var mockedEditorHandle = new Mock<IEditorInterface>();
-
-
-
             _globalEventHub = new SingletonScopeEventHub(_scopeRepo.Object);
             _eventHub = new LocalScopeEventHub(_scopeRepo.Object);
 
@@ -108,10 +105,10 @@ namespace Shared.UiTest.BaseDialogs.PackFileTree.ContextMenu.Commands
             return packfileContainer;
         }
 
-        protected PackFileBrowserViewModel GetViewModel()
+        protected PackFileBrowserViewModel PackFileBrowser()
         {
-
-            var packFileBrowserViewModel = new PackFileBrowserViewModel(null, null, ContextMenuType.None, _packFileService, _eventHub, null, null, true, false);
+            var settings = new ApplicationSettingsService(GameTypeEnum.Warhammer3);
+            var packFileBrowserViewModel = new PackFileBrowserViewModel(settings, null, ContextMenuType.None, _packFileService, _eventHub, null, null, true, false);
             return packFileBrowserViewModel;
         }
 
