@@ -53,31 +53,14 @@ namespace Shared.UiTest.BaseDialogs.PackFileTree.ContextMenu.Commands
             return current;
         }
 
-        protected static (IPackFileContainer Container, TreeNode Root, TreeNode FileNode, PackFile PackFile) CreateResolvedFileSelection(string filePath = "file.txt", string content = "a", bool isCa = false, string name = "pack", string systemFilePath = "C:\\temp\\pack.pack")
-        {
-            var container = new Mock<IPackFileContainer>();
-            container.SetupGet(x => x.Name).Returns(name);
-            container.SetupGet(x => x.SystemFilePath).Returns(systemFilePath);
-            container.SetupProperty(x => x.IsCaPackFile, isCa);
-
-            var root = CreateRoot(container.Object);
-            var fileNode = CreateNodePath(root, filePath);
-            var packFile = PackFile.CreateFromASCII(Path.GetFileName(filePath), content);
-            var fullPath = fileNode.GetFullPath();
-
-            container.Setup(x => x.FindFile(fullPath)).Returns(packFile);
-            container.Setup(x => x.ContainsFile(fullPath)).Returns(true);
-            container.Setup(x => x.GetFullPath(packFile)).Returns(fullPath);
-
-            return (container.Object, root, fileNode, packFile);
-        }
 
 
 
         protected Mock<IScopeRepository> _scopeRepo;
         protected LocalScopeEventHub _eventHub;
         protected SingletonScopeEventHub _globalEventHub;
-        protected IPackFileService _packFileService;
+        protected PackFileService _packFileService;
+
 
         [SetUp]
         public void Setup()
@@ -87,8 +70,11 @@ namespace Shared.UiTest.BaseDialogs.PackFileTree.ContextMenu.Commands
             _globalEventHub = new SingletonScopeEventHub(_scopeRepo.Object);
             _eventHub = new LocalScopeEventHub(_scopeRepo.Object);
 
-            _packFileService = new PackFileService(_globalEventHub);
-
+            _packFileService = new PackFileService(_globalEventHub)
+            {
+                EnforceGameFilesMustBeLoaded = false
+            };
+            
             _scopeRepo.Setup(x => x.GetRequiredServiceRootScope<IEventHub>()).Returns(_eventHub);
             _scopeRepo.Setup(x => x.GetEditorHandles()).Returns([]);
         }
@@ -108,7 +94,7 @@ namespace Shared.UiTest.BaseDialogs.PackFileTree.ContextMenu.Commands
         protected PackFileBrowserViewModel PackFileBrowser()
         {
             var settings = new ApplicationSettingsService(GameTypeEnum.Warhammer3);
-            var packFileBrowserViewModel = new PackFileBrowserViewModel(settings, null, ContextMenuType.None, _packFileService, _eventHub, null, null, true, false);
+            var packFileBrowserViewModel = new PackFileBrowserViewModel(settings, null, ContextMenuType.None, _packFileService, _eventHub, new PackFileTreeMutationService(), null, true, false);
             return packFileBrowserViewModel;
         }
 

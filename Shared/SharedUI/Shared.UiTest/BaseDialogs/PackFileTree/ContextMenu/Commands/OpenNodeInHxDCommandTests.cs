@@ -1,9 +1,7 @@
-using System.Threading;
 using Moq;
-using Shared.Core.PackFiles.Models;
 using Shared.Core.Services;
-using Shared.Ui.BaseDialogs.PackFileTree;
 using Shared.Ui.BaseDialogs.PackFileTree.ContextMenu.Commands;
+using Shared.Ui.BaseDialogs.PackFileTree.Utility;
 
 namespace Shared.UiTest.BaseDialogs.PackFileTree.ContextMenu.Commands
 {
@@ -13,32 +11,40 @@ namespace Shared.UiTest.BaseDialogs.PackFileTree.ContextMenu.Commands
         [Test]
         public void ShouldAdd_ReturnsTrueForFileNode()
         {
-            var (_, _, file, _) = CreateResolvedFileSelection("file.txt", "a");
+            var container = AddPackFiles(false, "modfile", "c:\\mymod.pack", ["rootfolder\\file.txt"]);
+            var viewModel = PackFileBrowser();
+            var node = TreeNodeHelper.FindNode(viewModel, container, "rootfolder\\file.txt");
+
             var command = new OpenNodeInHxDCommand(new Mock<IStandardDialogs>().Object, new Mock<IFileSystemAccess>().Object);
 
-            Assert.That(command.ShouldAdd(file), Is.True);
+            Assert.That(command.ShouldAdd(node), Is.True);
         }
 
         [Test]
         public void IsEnabled_ReturnsTrue()
         {
-            var (_, _, file, _) = CreateResolvedFileSelection("file.txt", "a");
+            var container = AddPackFiles(false, "modfile", "c:\\mymod.pack", ["rootfolder\\file.txt"]);
+            var viewModel = PackFileBrowser();
+            var node = TreeNodeHelper.FindNode(viewModel, container, "rootfolder\\file.txt");
+
             var command = new OpenNodeInHxDCommand(new Mock<IStandardDialogs>().Object, new Mock<IFileSystemAccess>().Object);
 
-            Assert.That(command.IsEnabled(file), Is.True);
+            Assert.That(command.IsEnabled(node), Is.True);
         }
 
         [Test]
         public void Execute_AppMissing_ShowsError()
         {
-            var (_, _, file, _) = CreateResolvedFileSelection("file.txt", "a");
+            var container = AddPackFiles(false, "modfile", "c:\\mymod.pack", ["rootfolder\\file.txt"]);
+            var viewModel = PackFileBrowser();
+            var node = TreeNodeHelper.FindNode(viewModel, container, "rootfolder\\file.txt");
 
             var dialogs = new Mock<IStandardDialogs>();
             var fileSystem = new Mock<IFileSystemAccess>();
             fileSystem.Setup(x => x.FileExists(It.IsAny<string>())).Returns(false);
 
             var command = new OpenNodeInHxDCommand(dialogs.Object, fileSystem.Object);
-            command.Execute(file);
+            command.Execute(node);
 
             dialogs.Verify(x => x.ShowDialogBox(It.Is<string>(s => s.Contains("does not exist")), It.IsAny<string>()), Times.Once);
             fileSystem.Verify(x => x.ProcessStart(It.IsAny<string>(), It.IsAny<string>()), Times.Never);
@@ -47,16 +53,18 @@ namespace Shared.UiTest.BaseDialogs.PackFileTree.ContextMenu.Commands
         [Test]
         public void Execute_AppExists_WritesTempFileAndStartsProcess()
         {
-            var (_, _, file, _) = CreateResolvedFileSelection("file.txt", "abc");
+            var container = AddPackFiles(false, "modfile", "c:\\mymod.pack", ["rootfolder\\file.txt"]);
+            var viewModel = PackFileBrowser();
+            var node = TreeNodeHelper.FindNode(viewModel, container, "rootfolder\\file.txt");
 
             var dialogs = new Mock<IStandardDialogs>();
             var fileSystem = new Mock<IFileSystemAccess>();
             fileSystem.Setup(x => x.FileExists(It.IsAny<string>())).Returns(true);
 
             var command = new OpenNodeInHxDCommand(dialogs.Object, fileSystem.Object);
-            command.Execute(file);
+            command.Execute(node);
 
-            fileSystem.Verify(x => x.FileWriteAllBytes(It.IsAny<string>(), It.Is<byte[]>(b => b.Length == 3)), Times.Once);
+            fileSystem.Verify(x => x.FileWriteAllBytes(It.IsAny<string>(), It.Is<byte[]>(b => b.Length > 0)), Times.Once);
             fileSystem.Verify(x => x.ProcessStart(It.IsAny<string>(), It.IsAny<string>()), Times.Once);
         }
     }

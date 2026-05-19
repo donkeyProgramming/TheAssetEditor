@@ -1,10 +1,8 @@
-using System.Threading;
 using Moq;
 using Shared.Core.PackFiles;
-using Shared.Core.PackFiles.Models;
 using Shared.Core.Services;
-using Shared.Ui.BaseDialogs.PackFileTree;
 using Shared.Ui.BaseDialogs.PackFileTree.ContextMenu.Commands;
+using Shared.Ui.BaseDialogs.PackFileTree.Utility;
 
 namespace Shared.UiTest.BaseDialogs.PackFileTree.ContextMenu.Commands
 {
@@ -14,36 +12,45 @@ namespace Shared.UiTest.BaseDialogs.PackFileTree.ContextMenu.Commands
         [Test]
         public void ShouldAdd_ReturnsTrueForFile()
         {
-            var (owner, _, file, packFile) = CreateResolvedFileSelection("file.txt", "a");
-            var service = CreatePackFileService(owner, packFile);
-            var command = new DeleteNodeCommand(service.Object, new Mock<IStandardDialogs>().Object);
+            var container = AddPackFiles(false, "modfile", "c:\\mymod.pack", ["rootfolder\\file.txt"]);
+            var viewModel = PackFileBrowser();
+            var node = TreeNodeHelper.FindNode(viewModel, container, "rootfolder\\file.txt");
 
-            Assert.That(command.ShouldAdd(file), Is.True);
+            var command = new DeleteNodeCommand(_packFileService, new Mock<IStandardDialogs>().Object);
+
+            Assert.That(command.ShouldAdd(node), Is.True);
         }
 
         [Test]
         public void IsEnabled_ReturnsTrue()
         {
-            var (owner, _, file, packFile) = CreateResolvedFileSelection("file.txt", "a");
-            var command = new DeleteNodeCommand(CreatePackFileService(owner, packFile).Object, new Mock<IStandardDialogs>().Object);
+            var container = AddPackFiles(false, "modfile", "c:\\mymod.pack", ["rootfolder\\file.txt"]);
+            var viewModel = PackFileBrowser();
+            var node = TreeNodeHelper.FindNode(viewModel, container, "rootfolder\\file.txt");
 
-            Assert.That(command.IsEnabled(file), Is.True);
+            var command = new DeleteNodeCommand(_packFileService, new Mock<IStandardDialogs>().Object);
+
+            Assert.That(command.IsEnabled(node), Is.True);
         }
 
         [Test]
         public void Execute_DeletesFileAfterConfirmation()
         {
-            var (owner, _, file, packFile) = CreateResolvedFileSelection("file.txt", "a");
+            // Arrange
+            var container = AddPackFiles(false, "modfile", "c:\\mymod.pack", ["rootfolder\\file.txt"]);
+            var viewModel = PackFileBrowser();
+            var node = TreeNodeHelper.FindNode(viewModel, container, "rootfolder\\file.txt");
 
-            var service = CreatePackFileService(owner, packFile);
             var dialogs = new Mock<IStandardDialogs>();
             dialogs.Setup(x => x.ShowYesNoBox(It.IsAny<string>(), It.IsAny<string>())).Returns(ShowMessageBoxResult.OK);
 
-            var command = new DeleteNodeCommand(service.Object, dialogs.Object);
+            // Act
+            var command = new DeleteNodeCommand(_packFileService, dialogs.Object);
+            command.Execute(node);
 
-            command.Execute(file);
-
-            service.Verify(x => x.DeleteFile(owner, packFile), Times.Once);
+            // Assert
+            var packFile = container.FindFile("rootfolder\\file.txt");
+            Assert.That(packFile, Is.Null);
         }
     }
 }
