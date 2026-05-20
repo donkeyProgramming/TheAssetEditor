@@ -72,7 +72,7 @@ namespace AssetEditor.Services
                     {
                         if (existingFileEditor.CurrentFile == file)
                         {
-                            _logger.Here().Information($"Attempting to open file '{file.Name}', but is is already open");
+                            _logger.Here().Information($"Attempting to open file '{fullFileName}', but is is already open");
                             SelectedEditorIndex = i;
                             return CurrentEditorsList[i];
                         }
@@ -80,7 +80,7 @@ namespace AssetEditor.Services
                 }
 
                 // Open the file
-                _logger.Here().Information($"Opening {file.Name} with {editorViewModel?.GetType().Name}");
+                _logger.Here().Information($"Opening {fullFileName} with {editorViewModel?.GetType().Name}");
                 fileEditor.LoadFile(file);
             }
 

@@ -370,56 +370,9 @@ namespace Shared.Ui.BaseDialogs.PackFileTree
             }
         }
 
-        public bool AllowDrop(TreeNode node, TreeNode? targetNode = null)
-        {
-            if (targetNode == null)
-                return false;
+        public bool AllowDrop(TreeNode node, TreeNode? targetNode = null) => DropHandler.AllowDrop(node, targetNode, _packFileService);
 
-            if (node.NodeType != NodeType.File)
-                return false;
-
-            var sourceContainer = FindFileOwner(node);
-            var targetContainer = FindFileOwner(targetNode);
-            if (sourceContainer == null || sourceContainer != targetContainer)
-                return false;
-
-            if (sourceContainer.IsCaPackFile)
-                return false;
-
-            if (targetNode.NodeType == NodeType.File)
-                return false;
-
-            if (FindPackFile(node) == null)
-                return false;
-
-            return true;
-        }
-
-        public bool Drop(TreeNode node, TreeNode? targeNode)
-        {
-            if (targeNode == null)
-                return false;
-
-            var container = FindFileOwner(node);
-            if (container == null)
-                return false;
-
-            var draggedFile = FindPackFile(node);
-            if (draggedFile == null)
-                return false;
-
-            var dropPath = targeNode.GetFullPath();
-
-            var newFullPath = string.IsNullOrWhiteSpace(dropPath)
-                ? draggedFile.Name
-                : dropPath + "\\" + draggedFile.Name;
-            if (newFullPath == _packFileService.GetFullPath(draggedFile, container))
-                return false;
-
-            _packFileService.MoveFile(container, draggedFile, dropPath);
-
-            return true;
-        }
+        public bool Drop(TreeNode node, TreeNode? targeNode) => DropHandler.Drop(node, targeNode, _packFileService);
 
         private TreeNode GetRootNode(IPackFileContainer container)
         {
