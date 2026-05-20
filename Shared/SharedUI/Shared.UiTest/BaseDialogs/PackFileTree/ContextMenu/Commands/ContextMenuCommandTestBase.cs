@@ -14,7 +14,7 @@ using Shared.Ui.BaseDialogs.PackFileTree.Utility;
 
 namespace Shared.UiTest.BaseDialogs.PackFileTree.ContextMenu.Commands
 {
-    internal abstract class ContextMenuCommandTestBase
+    internal abstract class ContextMenuCommandTestBase : PackFileTreeTestBase
     {
         protected static IPackFileContainer CreateContainer(bool isCa = false, string name = "pack", string systemFilePath = "C:\\temp\\pack.pack")
         {
@@ -52,58 +52,6 @@ namespace Shared.UiTest.BaseDialogs.PackFileTree.ContextMenu.Commands
             }
 
             return current;
-        }
-
-
-
-
-        protected Mock<IScopeRepository> _scopeRepo;
-        protected LocalScopeEventHub _eventHub;
-        protected SingletonScopeEventHub _globalEventHub;
-        protected PackFileService _packFileService;
-
-
-        [SetUp]
-        public void Setup()
-        {
-            _scopeRepo = new Mock<IScopeRepository>();
-
-            _globalEventHub = new SingletonScopeEventHub(_scopeRepo.Object);
-            _eventHub = new LocalScopeEventHub(_scopeRepo.Object);
-
-            _packFileService = new PackFileService(_globalEventHub)
-            {
-                EnforceGameFilesMustBeLoaded = false
-            };
-            
-            _scopeRepo.Setup(x => x.GetRequiredServiceRootScope<IEventHub>()).Returns(_eventHub);
-            _scopeRepo.Setup(x => x.GetEditorHandles()).Returns([]);
-        }
-
-        protected IPackFileContainer AddPackFiles(bool isCa, string containerName, string fileSystemPath, params string[] files)
-        {
-            var packfileContainer = new PackFileContainer(containerName) { IsCaPackFile = isCa, SystemFilePath = fileSystemPath };
-            foreach (var file in files)
-            {
-                var packFile = PackFile.CreateFromASCII(Path.GetFileName(file), "content");
-                packfileContainer.AddOrUpdateFile(file, packFile);
-            }
-            _packFileService.AddContainer(packfileContainer);
-            return packfileContainer;
-        }
-
-        protected PackFileBrowserViewModel PackFileBrowser()
-        {
-            var settings = new ApplicationSettingsService(GameTypeEnum.Warhammer3);
-            var packFileBrowserViewModel = new PackFileBrowserViewModel(settings, null, ContextMenuType.None, _packFileService, _eventHub, null, true, false);
-            return packFileBrowserViewModel;
-        }
-
-        [TearDown]
-        public void TearDown()
-        {
-            _eventHub.Dispose();
-            _globalEventHub.Dispose();
         }
     }
 }
