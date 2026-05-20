@@ -10,6 +10,7 @@ using Shared.Core.Settings;
 using Shared.Core.ToolCreation;
 using Shared.Ui.BaseDialogs.PackFileTree;
 using Shared.Ui.BaseDialogs.PackFileTree.ContextMenu;
+using Shared.Ui.BaseDialogs.PackFileTree.Utility;
 
 namespace Shared.UiTest.BaseDialogs.PackFileTree.ContextMenu.Commands
 {
@@ -94,7 +95,7 @@ namespace Shared.UiTest.BaseDialogs.PackFileTree.ContextMenu.Commands
         protected PackFileBrowserViewModel PackFileBrowser()
         {
             var settings = new ApplicationSettingsService(GameTypeEnum.Warhammer3);
-            var packFileBrowserViewModel = new PackFileBrowserViewModel(settings, null, ContextMenuType.None, _packFileService, _eventHub, new PackFileTreeMutationService(), null, true, false);
+            var packFileBrowserViewModel = new PackFileBrowserViewModel(settings, null, ContextMenuType.None, _packFileService, _eventHub, null, true, false);
             return packFileBrowserViewModel;
         }
 

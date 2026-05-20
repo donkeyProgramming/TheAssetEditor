@@ -1,8 +1,8 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Shared.Ui.BaseDialogs.PackFileTree
+namespace Shared.Ui.BaseDialogs.PackFileTree.Utility
 {
     public class PackFileTreeMutationService
     {
@@ -15,20 +15,20 @@ namespace Shared.Ui.BaseDialogs.PackFileTree
             return StringComparer.CurrentCultureIgnoreCase.Compare(left.Name, right.Name);
         };
 
-        public TreeNode CreateDirectoryChild(TreeNode parent, string name)
+        public static TreeNode CreateDirectoryChild(TreeNode parent, string name)
         {
             var newNode = new TreeNode(name, NodeType.Directory, parent);
             InsertChildSorted(parent, newNode);
             return newNode;
         }
 
-        public void InsertChildSorted(TreeNode parent, TreeNode child)
+        public static void InsertChildSorted(TreeNode parent, TreeNode child)
         {
             parent.AddChild(child);
             SortChildren(parent);
         }
 
-        public void RemoveExistingFileNode(TreeNode parent, string fileName)
+        public static void RemoveExistingFileNode(TreeNode parent, string fileName)
         {
             var existingFile = parent.Children.FirstOrDefault(node =>
                 node.NodeType == NodeType.File &&
@@ -40,7 +40,7 @@ namespace Shared.Ui.BaseDialogs.PackFileTree
             RemoveNode(existingFile);
         }
 
-        public void RemoveNode(TreeNode node)
+        public static void RemoveNode(TreeNode node)
         {
             var parent = node.Parent;
             parent?.RemoveChild(node);

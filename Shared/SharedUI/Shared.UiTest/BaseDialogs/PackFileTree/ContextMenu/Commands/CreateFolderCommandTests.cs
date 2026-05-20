@@ -1,4 +1,4 @@
-using Moq;
+﻿using Moq;
 using Shared.Core.Services;
 using Shared.Ui.BaseDialogs.PackFileTree;
 using Shared.Ui.BaseDialogs.PackFileTree.ContextMenu.Commands;
@@ -15,7 +15,7 @@ namespace Shared.UiTest.BaseDialogs.PackFileTree.ContextMenu.Commands
             var viewModel = PackFileBrowser();
             var root = viewModel.Files.First();
 
-            var command = new CreateFolderCommand(_packFileService, new Mock<IStandardDialogs>().Object, new PackFileTreeMutationService());
+            var command = new CreateFolderCommand(_packFileService, new Mock<IStandardDialogs>().Object);
 
             Assert.That(command.ShouldAdd(root), Is.True);
         }
@@ -27,7 +27,7 @@ namespace Shared.UiTest.BaseDialogs.PackFileTree.ContextMenu.Commands
             var viewModel = PackFileBrowser();
             var root = viewModel.Files.First();
 
-            var command = new CreateFolderCommand(_packFileService, new Mock<IStandardDialogs>().Object, new PackFileTreeMutationService());
+            var command = new CreateFolderCommand(_packFileService, new Mock<IStandardDialogs>().Object);
 
             Assert.That(command.IsEnabled(root), Is.True);
         }
@@ -44,7 +44,7 @@ namespace Shared.UiTest.BaseDialogs.PackFileTree.ContextMenu.Commands
             dialogs.Setup(x => x.ShowFolderNameDialog(It.IsAny<IEnumerable<string>>(), It.IsAny<string>())).Returns("new_folder");
 
             // Act
-            var command = new CreateFolderCommand(_packFileService, dialogs.Object, new PackFileTreeMutationService());
+            var command = new CreateFolderCommand(_packFileService, dialogs.Object);
             command.Execute(root);
 
             // Assert

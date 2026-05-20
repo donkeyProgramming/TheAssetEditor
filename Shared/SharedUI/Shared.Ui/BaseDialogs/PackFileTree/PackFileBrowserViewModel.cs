@@ -24,13 +24,11 @@ namespace Shared.Ui.BaseDialogs.PackFileTree
 
     public partial class PackFileBrowserViewModel : ObservableObject, IDisposable, IDropTarget<TreeNode>
     {
-
         protected IPackFileService _packFileService;
         private readonly IEventHub? _eventHub;
         private readonly IWindowsKeyboard _windowKeyboard;
         private readonly ApplicationSettingsService _applicationSettingsService;
         private readonly PackFileContextMenuComposer _contextMenuComposer;
-        private readonly PackFileTreeMutationService _treeMutationService;
         private readonly ContextMenuType _contextMenuType;
 
         public event FileSelectedDelegate FileOpen;
@@ -44,11 +42,17 @@ namespace Shared.Ui.BaseDialogs.PackFileTree
 
         public bool ShowFoldersOnly { get; }
 
-        public PackFileBrowserViewModel(ApplicationSettingsService applicationSettingsService, PackFileContextMenuComposer contextMenuComposer, ContextMenuType contextMenuType, IPackFileService packFileService, IEventHub? eventHub, PackFileTreeMutationService treeMutationService, IWindowsKeyboard windowKeyboard, bool showCaFiles, bool showFoldersOnly)
+        public PackFileBrowserViewModel(
+            ApplicationSettingsService applicationSettingsService, 
+            PackFileContextMenuComposer contextMenuComposer, 
+            ContextMenuType contextMenuType, 
+            IPackFileService packFileService,
+            IEventHub? eventHub, 
+            IWindowsKeyboard windowKeyboard,
+            bool showCaFiles, bool showFoldersOnly)
         {
             _packFileService = packFileService;
             _eventHub = eventHub;
-            _treeMutationService = treeMutationService;
             _windowKeyboard = windowKeyboard;
             _applicationSettingsService = applicationSettingsService;
             _contextMenuComposer = contextMenuComposer;
@@ -103,7 +107,7 @@ namespace Shared.Ui.BaseDialogs.PackFileTree
             if (nodeToDelete == null)
                 return;
 
-            _treeMutationService.RemoveNode(nodeToDelete);
+            PackFileTreeMutationService.RemoveNode(nodeToDelete);
 
             root.UnsavedChanged = true;
             Filter.Reapply();
@@ -152,7 +156,7 @@ namespace Shared.Ui.BaseDialogs.PackFileTree
                 if (node == null)
                     continue;
 
-                _treeMutationService.RemoveNode(node);
+                PackFileTreeMutationService.RemoveNode(node);
             }
 
             Filter.Reapply();
@@ -246,18 +250,18 @@ namespace Shared.Ui.BaseDialogs.PackFileTree
                 TreeNode newNode;
                 if (numSeperators == 0)
                 {
-                    _treeMutationService.RemoveExistingFileNode(root, item.Name);
+                    PackFileTreeMutationService.RemoveExistingFileNode(root, item.Name);
                     newNode = new TreeNode(item.Name, NodeType.File, root);
-                    _treeMutationService.InsertChildSorted(root, newNode);
+                    PackFileTreeMutationService.InsertChildSorted(root, newNode);
                 }
                 else
                 {
                     var directory = fullPath.Substring(0, directoryEnd);
                     var folder = GetNodeFromPath(root, directory)!;
-                    _treeMutationService.RemoveExistingFileNode(folder, item.Name);
+                    PackFileTreeMutationService.RemoveExistingFileNode(folder, item.Name);
 
                     newNode = new TreeNode(item.Name, NodeType.File, folder);
-                    _treeMutationService.InsertChildSorted(folder, newNode);
+                    PackFileTreeMutationService.InsertChildSorted(folder, newNode);
                 }
 
                 newNode.UnsavedChanged = true;
@@ -289,7 +293,7 @@ namespace Shared.Ui.BaseDialogs.PackFileTree
 
             if (createIfMissing)
             {
-                var newNode = _treeMutationService.CreateDirectoryChild(parent, nodeName);
+                var newNode = PackFileTreeMutationService.CreateDirectoryChild(parent, nodeName);
                 return GetNodeFromPath(newNode, remainingStr, createIfMissing);
             }
             return null;
@@ -343,7 +347,6 @@ namespace Shared.Ui.BaseDialogs.PackFileTree
                     break;
                 }  
             }
-
 
             var skipWemFiles = container.IsCaPackFile && _applicationSettingsService.CurrentSettings.ShowCAWemFiles == false;
 
@@ -436,7 +439,7 @@ namespace Shared.Ui.BaseDialogs.PackFileTree
             if (node == null)
                 return null;
 
-            var root = GetTreeRoot(node);
+            var root = TreeNodeHelper.GetRootNode(node);
             return root.Owner;
         }
 
@@ -450,15 +453,6 @@ namespace Shared.Ui.BaseDialogs.PackFileTree
                 return null;
 
             return _packFileService.FindFile(node.GetFullPath(), container);
-        }
-
-        private static RootTreeNode GetTreeRoot(TreeNode node)
-        {
-            var current = node;
-            while (current.Parent != null)
-                current = current.Parent;
-
-            return current as RootTreeNode;
         }
     }
 }
