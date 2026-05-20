@@ -6,7 +6,6 @@ using Shared.Core.PackFiles.Models;
 using Shared.Core.Services;
 using Shared.Core.Settings;
 using Shared.Ui.BaseDialogs.PackFileTree.Utility;
-using Shared.Ui.Common;
 
 namespace Shared.Ui.BaseDialogs.PackFileTree.ContextMenu.Commands
 {
@@ -40,7 +39,7 @@ namespace Shared.Ui.BaseDialogs.PackFileTree.ContextMenu.Commands
                 return;
             }
 
-            using (new WaitCursor())
+            using (standardDialogs.ShowWaitCursor())
             {
                 try
                 {

@@ -62,5 +62,30 @@ namespace Shared.UiTest.BaseDialogs.PackFileTree.ContextMenu.Commands
             Assert.That(packfile, Is.Not.Null);
             Assert.That(node.UnsavedChanged, Is.EqualTo(true));
         }
+
+        [Test]
+        public void Execute_RenamesDirectory()
+        {
+            // Arrange
+            var container = AddPackFiles(false, "modfile", "c:\\mymod.pack", ["myfolder\\file0.txt", "myfolder\\file1.txt"]);
+
+            var viewModel = PackFileBrowser();
+            var root = viewModel.Files.First();
+            var dirNode = root.Children.First(x => x.NodeType == NodeType.Directory);
+
+            var dialogs = new Mock<IStandardDialogs>();
+            dialogs.Setup(x => x.ShowTextInputDialog("Create folder", dirNode.Name)).Returns(new TextInputDialogResult(true, "renamed_folder"));
+
+            // Act
+            var command = new RenameNodeCommand(_packFileService, dialogs.Object);
+            command.Execute(dirNode);
+
+            // Assert
+            Assert.That(dirNode.Name, Is.EqualTo("renamed_folder"));
+            var file0 = container.FindFile("renamed_folder\\file0.txt");
+            var file1 = container.FindFile("renamed_folder\\file1.txt");
+            Assert.That(file0, Is.Not.Null);
+            Assert.That(file1, Is.Not.Null);
+        }
     }
 }
