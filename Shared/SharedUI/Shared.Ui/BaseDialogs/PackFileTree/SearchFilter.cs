@@ -7,6 +7,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Shared.Core.Misc;
 using Shared.Core.PackFiles.Models;
+using Shared.Core.Services;
 
 namespace Shared.Ui.BaseDialogs.PackFileTree
 {
@@ -16,8 +17,10 @@ namespace Shared.Ui.BaseDialogs.PackFileTree
         public string this[string columnName] => ApplyFilter(FilterText);
 
         private readonly ObservableCollection<RootTreeNode> _rootNodes;
+        private readonly IStandardDialogs? _standardDialogs;
 
         private CancellationTokenSource? _debounceCts;
+        private readonly object _debounceLock = new();
         private const int DebounceMilliseconds = 250;
         private bool _useDebounce;
 
@@ -57,17 +60,22 @@ namespace Shared.Ui.BaseDialogs.PackFileTree
         public bool HasActiveFilter => !string.IsNullOrWhiteSpace(FilterText) || ShowFoldersOnly || (_extensionFilter?.Count > 0);
         public Action? FilterCleared { get; set; }
 
-        internal SearchFilter(ObservableCollection<RootTreeNode> nodes)
+        internal SearchFilter(ObservableCollection<RootTreeNode> nodes, IStandardDialogs? standardDialogs = null)
         {
             _rootNodes = nodes;
+            _standardDialogs = standardDialogs;
         }
 
         private async void DebounceFilter()
         {
-            _debounceCts?.Cancel();
-            _debounceCts?.Dispose();
-            _debounceCts = new CancellationTokenSource();
-            var token = _debounceCts.Token;
+            CancellationToken token;
+            lock (_debounceLock)
+            {
+                _debounceCts?.Cancel();
+                _debounceCts?.Dispose();
+                _debounceCts = new CancellationTokenSource();
+                token = _debounceCts.Token;
+            }
 
             try
             {
@@ -83,6 +91,7 @@ namespace Shared.Ui.BaseDialogs.PackFileTree
 
         string ApplyFilter(string text)
         {
+            using var _ = _standardDialogs?.ShowWaitCursor();
             var rootNodes = _rootNodes.ToList();
 
             if (HasActiveFilter)
@@ -195,7 +204,9 @@ namespace Shared.Ui.BaseDialogs.PackFileTree
 
         private static void SetVisibilityRecursive(TreeNode node, bool visible)
         {
-            node.IsVisible = visible;
+            if (node.IsVisible != visible)
+                node.IsVisible = visible;
+
             foreach (var child in node.Children)
                 SetVisibilityRecursive(child, visible);
         }

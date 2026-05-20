@@ -11,6 +11,7 @@ using Shared.Core.Events;
 using Shared.Core.Events.Global;
 using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
+using Shared.Core.Services;
 using Shared.Core.Settings;
 using Shared.Ui.BaseDialogs.PackFileTree.ContextMenu;
 using Shared.Ui.BaseDialogs.PackFileTree.Utility;
@@ -49,7 +50,8 @@ namespace Shared.Ui.BaseDialogs.PackFileTree
             IPackFileService packFileService,
             IEventHub? eventHub, 
             IWindowsKeyboard windowKeyboard,
-            bool showCaFiles, bool showFoldersOnly)
+            bool showCaFiles, bool showFoldersOnly,
+            IStandardDialogs? standardDialogs = null)
         {
             _packFileService = packFileService;
             _eventHub = eventHub;
@@ -70,7 +72,7 @@ namespace Shared.Ui.BaseDialogs.PackFileTree
             _eventHub?.Register<PackFileContainerFolderRenamedEvent>(this, x => OnPackFileContainerFolderRenamedEvent(x.Container, x.OldNodePath, x.NewNodePath));
             _eventHub?.Register<PackFileContainerSavedEvent>(this, OnPackFileContainerSavedEvent);
 
-            Filter = new SearchFilter(Files)
+            Filter = new SearchFilter(Files, standardDialogs)
             {
                 ShowFoldersOnly = showFoldersOnly
             };
@@ -215,7 +217,7 @@ namespace Shared.Ui.BaseDialogs.PackFileTree
 
                 if (_windowKeyboard.IsKeyDown(Key.LeftCtrl))
                 {
-                    var numChildren = targetNode.GetAllChildFileNodes().Count;
+                    var numChildren = targetNode.EnumerateFileNodesDepthFirst().Take(maxExpandCount + 1).Count();
                     if (numChildren < maxExpandCount)
                         targetNode.ExpandIfVisible(true);
                 }

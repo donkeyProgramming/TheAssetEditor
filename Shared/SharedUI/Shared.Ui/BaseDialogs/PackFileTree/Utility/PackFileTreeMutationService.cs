@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 
 namespace Shared.Ui.BaseDialogs.PackFileTree.Utility
@@ -24,8 +24,9 @@ namespace Shared.Ui.BaseDialogs.PackFileTree.Utility
 
         public static void InsertChildSorted(TreeNode parent, TreeNode child)
         {
-            parent.AddChild(child);
-            SortChildren(parent);
+            var children = parent.Children;
+            var index = BinarySearchInsertIndex(children, child);
+            children.Insert(index, child);
         }
 
         public static void RemoveExistingFileNode(TreeNode parent, string fileName)
@@ -47,15 +48,22 @@ namespace Shared.Ui.BaseDialogs.PackFileTree.Utility
             node.RemoveSelf();
         }
 
-        private static void SortChildren(TreeNode parent)
+        private static int BinarySearchInsertIndex(ObservableCollection<TreeNode> children, TreeNode newChild)
         {
-            var sortedChildren = parent.Children
-                .OrderBy(child => child, Comparer<TreeNode>.Create(ChildComparison))
-                .ToList();
+            var lo = 0;
+            var hi = children.Count - 1;
 
-            parent.Children.Clear();
-            foreach (var child in sortedChildren)
-                parent.Children.Add(child);
+            while (lo <= hi)
+            {
+                var mid = lo + (hi - lo) / 2;
+                var cmp = ChildComparison(children[mid], newChild);
+                if (cmp <= 0)
+                    lo = mid + 1;
+                else
+                    hi = mid - 1;
+            }
+
+            return lo;
         }
     }
 }
