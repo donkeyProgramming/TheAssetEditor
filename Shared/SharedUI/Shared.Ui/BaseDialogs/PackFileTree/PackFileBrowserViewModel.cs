@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Windows.Input;
@@ -12,6 +13,7 @@ using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
 using Shared.Core.Settings;
 using Shared.Ui.BaseDialogs.PackFileTree.ContextMenu;
+using Shared.Ui.BaseDialogs.PackFileTree.Utility;
 using Shared.Ui.Common;
 using Shared.Ui.Common.MenuSystem;
 
@@ -30,13 +32,11 @@ namespace Shared.Ui.BaseDialogs.PackFileTree
         private readonly PackFileContextMenuComposer _contextMenuComposer;
         private readonly PackFileTreeMutationService _treeMutationService;
         private readonly ContextMenuType _contextMenuType;
-        private readonly Dictionary<IPackFileContainer, TreeNode> _treeRoots = [];
-        private readonly Dictionary<TreeNode, IPackFileContainer> _rootOwners = [];
 
         public event FileSelectedDelegate FileOpen;
         public event NodeSelectedDelegate NodeSelected;
 
-        public ObservableCollection<TreeNode> Files { get; set; } = [];
+        public ObservableCollection<RootTreeNode> Files { get; set; } = [];
         public SearchFilter Filter { get; private set; }
 
         [ObservableProperty] TreeNode _selectedItem;
@@ -66,7 +66,7 @@ namespace Shared.Ui.BaseDialogs.PackFileTree
             _eventHub?.Register<PackFileContainerFolderRenamedEvent>(this, x => OnPackFileContainerFolderRenamedEvent(x.Container, x.OldNodePath, x.NewNodePath));
             _eventHub?.Register<PackFileContainerSavedEvent>(this, OnPackFileContainerSavedEvent);
 
-            Filter = new SearchFilter(Files, () => _treeRoots)
+            Filter = new SearchFilter(Files)
             {
                 ShowFoldersOnly = showFoldersOnly
             };
@@ -221,11 +221,7 @@ namespace Shared.Ui.BaseDialogs.PackFileTree
         private void OnMainEditablePackChanged(PackFileContainerSetAsMainEditableEvent e)
         {
             foreach (var item in Files)
-                item.IsMainEditabelPack = false;
-
-            _treeRoots.TryGetValue(e.Container, out var newContiner);
-            if (newContiner != null)
-                newContiner.IsMainEditabelPack = true;
+                item.IsMainEditabelPack = item.Owner == e.Container;
         }
 
         private void OnPackFileContainerFilesAddedEvent(IPackFileContainer container, List<PackFile> files)
@@ -339,12 +335,15 @@ namespace Shared.Ui.BaseDialogs.PackFileTree
 
         private void ReloadTree(IPackFileContainer container)
         {
-            if (_treeRoots.TryGetValue(container, out var existingRoot))
+            foreach (var file in Files)
             {
-                Files.Remove(existingRoot);
-                _treeRoots.Remove(container);
-                _rootOwners.Remove(existingRoot);
+                if (file.Owner == container)
+                {
+                    Files.Remove(file);
+                    break;
+                }  
             }
+
 
             var skipWemFiles = container.IsCaPackFile && _applicationSettingsService.CurrentSettings.ShowCAWemFiles == false;
 
@@ -352,19 +351,19 @@ namespace Shared.Ui.BaseDialogs.PackFileTree
             PackFileTreeBuilder.BuildTreeFromFiles(root, container, skipWemFiles);
             root.IsMainEditabelPack = _packFileService.GetEditablePack() == container;
 
-            _treeRoots[container] = root;
-            _rootOwners[root] = container;
             Files.Add(root);
             Filter.Reapply();
         }
 
         private void OnPackFileContainerRemoved(PackFileContainerRemovedEvent e)
         {
-            if (_treeRoots.TryGetValue(e.Container, out var root))
+            foreach (var file in Files)
             {
-                Files.Remove(root);
-                _treeRoots.Remove(e.Container);
-                _rootOwners.Remove(root);
+                if (file.Owner == e.Container)
+                {
+                    Files.Remove(file);
+                    break;
+                }
             }
         }
 
@@ -421,7 +420,15 @@ namespace Shared.Ui.BaseDialogs.PackFileTree
 
         private TreeNode GetRootNode(IPackFileContainer container)
         {
-            return _treeRoots[container];
+            foreach (var node in Files)
+            {
+                if (node.Owner == container)
+                {
+                    return node;
+                }
+            }
+
+            throw new Exception("Unable to find root node from Container where name = " + container.Name);
         }
 
         public IPackFileContainer? FindFileOwner(TreeNode? node)
@@ -430,7 +437,7 @@ namespace Shared.Ui.BaseDialogs.PackFileTree
                 return null;
 
             var root = GetTreeRoot(node);
-            return _rootOwners.GetValueOrDefault(root);
+            return root.Owner;
         }
 
         public PackFile? FindPackFile(TreeNode? node)
@@ -445,13 +452,13 @@ namespace Shared.Ui.BaseDialogs.PackFileTree
             return _packFileService.FindFile(node.GetFullPath(), container);
         }
 
-        private static TreeNode GetTreeRoot(TreeNode node)
+        private static RootTreeNode GetTreeRoot(TreeNode node)
         {
             var current = node;
             while (current.Parent != null)
                 current = current.Parent;
 
-            return current;
+            return current as RootTreeNode;
         }
     }
 }

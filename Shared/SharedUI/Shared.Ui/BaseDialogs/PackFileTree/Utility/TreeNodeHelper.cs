@@ -23,13 +23,13 @@ namespace Shared.Ui.BaseDialogs.PackFileTree.Utility
             return (root as RootTreeNode)?.Owner;
         }
 
-        private static TreeNode? GetRootNode(TreeNode? node)
+        public static RootTreeNode? GetRootNode(TreeNode? node)
         {
             var current = node;
             while (current?.Parent != null)
                 current = current.Parent;
 
-            return current;
+            return current as RootTreeNode;
         }
 
         /// <summary>
@@ -58,7 +58,7 @@ namespace Shared.Ui.BaseDialogs.PackFileTree.Utility
             var normalizedPath = PathNormalization.NormalizeFileName(fullPathName);
             var splits = normalizedPath.Split('\\');
 
-            var currentNode = root;
+            TreeNode? currentNode = root;
             for (var i = 0; i < splits.Length; i++)
             {
                 var nextNode = currentNode.Children.Where(x => x.Name == splits[i]).FirstOrDefault();
