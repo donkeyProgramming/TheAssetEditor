@@ -13,6 +13,7 @@ using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
 using Shared.Core.Services;
 using Shared.Core.Settings;
+using Shared.Ui.BaseDialogs.PackFileTree.Commands;
 using Shared.Ui.BaseDialogs.PackFileTree.ContextMenu;
 using Shared.Ui.BaseDialogs.PackFileTree.Utility;
 using Shared.Ui.Common;
@@ -31,6 +32,7 @@ namespace Shared.Ui.BaseDialogs.PackFileTree
         private readonly ApplicationSettingsService _applicationSettingsService;
         private readonly PackFileContextMenuComposer _contextMenuComposer;
         private readonly ContextMenuType _contextMenuType;
+        private readonly DoubleClickCommand _doubleClickCommand;
 
         public event FileSelectedDelegate FileOpen;
         public event NodeSelectedDelegate NodeSelected;
@@ -59,6 +61,7 @@ namespace Shared.Ui.BaseDialogs.PackFileTree
             _applicationSettingsService = applicationSettingsService;
             _contextMenuComposer = contextMenuComposer;
             _contextMenuType = contextMenuType;
+            _doubleClickCommand = new DoubleClickCommand(packFileService, windowKeyboard);
 
             ShowFoldersOnly = showFoldersOnly;
 
@@ -197,31 +200,7 @@ namespace Shared.Ui.BaseDialogs.PackFileTree
         [RelayCommand]
         protected virtual void OnDoubleClick(TreeNode node)
         {
-            var targetNode = node ?? SelectedItem;
-            if (targetNode == null)
-                return;
-
-            if (!ReferenceEquals(SelectedItem, targetNode))
-                SelectedItem = targetNode;
-
-            var maxExpandCount = 200;
-            if (targetNode.NodeType == NodeType.File)
-            {
-                var selectedFile = FindPackFile(targetNode);
-                if (selectedFile != null)
-                    FileOpen?.Invoke(selectedFile);
-            }
-            else if (targetNode.NodeType == NodeType.Directory || targetNode.NodeType == NodeType.Root)
-            {
-                targetNode.IsNodeExpanded = !targetNode.IsNodeExpanded;
-
-                if (_windowKeyboard.IsKeyDown(Key.LeftCtrl))
-                {
-                    var numChildren = targetNode.EnumerateFileNodesDepthFirst().Take(maxExpandCount + 1).Count();
-                    if (numChildren < maxExpandCount)
-                        targetNode.ExpandIfVisible(true);
-                }
-            }
+            _doubleClickCommand.Execute(node, SelectedItem, n => SelectedItem = n, file => FileOpen?.Invoke(file));
         }
 
         private void OnMainEditablePackChanged(PackFileContainerSetAsMainEditableEvent e)

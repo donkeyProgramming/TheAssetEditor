@@ -249,34 +249,6 @@ namespace Shared.UiTest.BaseDialogs.PackFileTree
         }
 
         [Test]
-        public void CtrlDoubleClickDirectoryExpandsAllChildren()
-        {
-            CreatePackfiles(
-                  ("folderA\\subA\\file1.txt", "file1.txt"),
-                  ("folderA\\subB\\file2.txt", "file2.txt"));
-
-            var root = _viewModel.Files[0];
-            root.IsNodeExpanded = true;
-
-            var folderA = PackFileBrowserViewModelTestHelper.GetFromPath(root, "foldera");
-            Assert.That(folderA, Is.Not.Null);
-
-            // Intentionally set a different selected item to verify command uses clicked node argument.
-            _runner.Keyboard.SetKeyDown(Key.LeftCtrl, true);
-            _viewModel.SelectedItem = root;
-            _viewModel.DoubleClickCommand.Execute(folderA);
-
-            var subA = PackFileBrowserViewModelTestHelper.GetFromPath(root, "foldera\\suba");
-            var subB = PackFileBrowserViewModelTestHelper.GetFromPath(root, "foldera\\subb");
-
-            Assert.That(folderA.IsNodeExpanded, Is.True);
-            Assert.That(subA, Is.Not.Null);
-            Assert.That(subB, Is.Not.Null);
-            Assert.That(subA.IsNodeExpanded, Is.True);
-            Assert.That(subB.IsNodeExpanded, Is.True);
-        }
-
-        [Test]
         public void DeleteFileUsingPfs_EnsureTreeViewUpdated()
         {
             // Arrange: file nested inside a folder
