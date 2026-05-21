@@ -1,7 +1,7 @@
-using Shared.Core.PackFiles;
+﻿using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
 
-namespace Shared.Ui.BaseDialogs.PackFileTree
+namespace Shared.Ui.BaseDialogs.PackFileTree.Utility
 {
     public static class DropHandler
     {
