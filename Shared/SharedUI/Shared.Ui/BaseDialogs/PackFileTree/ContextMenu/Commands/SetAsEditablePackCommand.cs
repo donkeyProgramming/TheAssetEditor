@@ -1,6 +1,8 @@
 ﻿using Shared.Core.PackFiles;
+using Shared.Core.PackFiles.Models;
 using Serilog;
 using Shared.Core.ErrorHandling;
+using Shared.Ui.BaseDialogs.PackFileTree.Utility;
 
 namespace Shared.Ui.BaseDialogs.PackFileTree.ContextMenu.Commands
 {
@@ -9,13 +11,25 @@ namespace Shared.Ui.BaseDialogs.PackFileTree.ContextMenu.Commands
         private readonly ILogger _logger = Logging.Create<SetAsEditablePackCommand>();
 
         public string GetDisplayName(TreeNode node) => "Set as Editable Pack";
-        public bool ShouldAdd(TreeNode node) => node.NodeType == NodeType.Root && !node.FileOwner.IsCaPackFile && packFileService.GetEditablePack() != node.FileOwner;
+        public bool ShouldAdd(TreeNode node)
+        {
+            var container = TreeNodeHelper.GetPackFileContainer(node);
+            return node.NodeType == NodeType.Root && container is { IsCaPackFile: false } && packFileService.GetEditablePack() != container;
+        }
+
         public bool IsEnabled(TreeNode node) => true;
 
         public void Execute(TreeNode selectedNode)
         {
-            _logger.Here().Information($"Setting pack file container '{CommandLoggingHelper.DescribePack(selectedNode.FileOwner)}' as editable");
-            packFileService.SetEditablePack(selectedNode.FileOwner);
+            var container = TreeNodeHelper.GetPackFileContainer(selectedNode);
+            if (container == null)
+            {
+                _logger.Here().Warning($"Set editable pack blocked because no container was resolved for '{CommandLoggingHelper.DescribeNode(selectedNode)}'");
+                return;
+            }
+
+            _logger.Here().Information($"Setting pack file container '{CommandLoggingHelper.DescribePack(container)}' as editable");
+            packFileService.SetEditablePack(container);
         }
     }
 }

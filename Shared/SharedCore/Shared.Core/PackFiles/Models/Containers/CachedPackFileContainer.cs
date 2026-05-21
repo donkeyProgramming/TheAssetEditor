@@ -1,4 +1,7 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System.Diagnostics;
+using System.Windows.Forms;
+using Microsoft.EntityFrameworkCore;
+using Shared.Core.ErrorHandling;
 using Shared.Core.PackFiles.Models.FileSources;
 using Shared.Core.PackFiles.Serialization.CacheDatabase;
 using Shared.Core.PackFiles.Utility;
@@ -8,6 +11,8 @@ namespace Shared.Core.PackFiles.Models.Containers
 {
     internal class CachedPackFileContainer : IPackFileContainerInternal
     {
+        private readonly ILogger _logger = Logging.Create<CachedPackFileContainer>();
+
         private readonly CacheDbContext _db;
         private readonly object _dbLock = new();
 
@@ -129,11 +134,24 @@ namespace Shared.Core.PackFiles.Models.Containers
 
         public Dictionary<string, PackFile> GetAllFiles()
         {
+            var time = Stopwatch.StartNew();
             List<CachedFileEntity> entries;
             lock (_dbLock)
             {
+              //var x = _db.Files
+              //    .GroupBy(x=>x.FolderPath)
+              //   .Select(g => new 
+              //   {
+              //       Folder = g.Key,
+              //       FileList = g.Select(x => x.FileName).ToList()
+              //   })
+              //    .ToList();
+              //    
+              //
+
                 entries = _db.Files.ToList();
             }
+            _logger.Here().Information("Getting all files from cached container took {ElapsedMilliseconds} ms", time.ElapsedMilliseconds);
 
             var parentCache = new Dictionary<string, PackedFileSourceParent>(StringComparer.OrdinalIgnoreCase);
             var result = new Dictionary<string, PackFile>(entries.Count);
@@ -153,6 +171,8 @@ namespace Shared.Core.PackFiles.Models.Containers
 
                 result[entry.RelativePath] = new PackFile(entry.FileName, source);
             }
+
+            _logger.Here().Information("Getting all files and processing from cached container took {ElapsedMilliseconds} ms", time.ElapsedMilliseconds);
 
             return result;
         }

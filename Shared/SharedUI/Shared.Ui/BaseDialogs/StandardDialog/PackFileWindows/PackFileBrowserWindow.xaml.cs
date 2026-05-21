@@ -51,7 +51,7 @@ namespace Shared.Ui.BaseDialogs.StandardDialog.PackFile
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
-            SelectedFile = ViewModel.SelectedItem?.Item;
+            SelectedFile = ViewModel.FindPackFile(ViewModel.SelectedItem);
 
             if (ViewModel.SelectedItem?.NodeType == NodeType.Directory)
                 SelectedFolder = GetFolderPath(ViewModel.SelectedItem, ViewModel.SelectedItem?.Name);

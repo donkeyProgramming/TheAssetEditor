@@ -33,7 +33,7 @@ namespace Editors.ImportExport.Importing
             return false;
         }
 
-        public void ShowDialog(TreeNode clickedNode) =>
-                _uiCommandFactory.Create<DisplayImportFileToolCommand>().Execute(clickedNode.FileOwner, clickedNode.GetFullPath());
+        public void ShowDialog(IPackFileContainer container, TreeNode clickedNode) =>
+            _uiCommandFactory.Create<DisplayImportFileToolCommand>().Execute(container, clickedNode.GetFullPath());
     }
 }

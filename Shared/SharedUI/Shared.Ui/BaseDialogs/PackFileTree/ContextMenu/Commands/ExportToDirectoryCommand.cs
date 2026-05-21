@@ -1,22 +1,33 @@
 ﻿using System;
 using System.IO;
 using Shared.Core.Misc;
+using Shared.Core.PackFiles;
+using Shared.Core.PackFiles.Models;
 using Shared.Core.Services;
 using Serilog;
 using Shared.Core.ErrorHandling;
+using Shared.Ui.BaseDialogs.PackFileTree.Utility;
 
 namespace Shared.Ui.BaseDialogs.PackFileTree.ContextMenu.Commands
 {
-    public class ExportToDirectoryCommand(IStandardDialogs standardDialogs, IFileSystemAccess fileSystemAccess) : IContextMenuCommand
+    public class ExportToDirectoryCommand(IPackFileService packFileService, IStandardDialogs standardDialogs, IFileSystemAccess fileSystemAccess) : IContextMenuCommand
     {
         private readonly ILogger _logger = Logging.Create<ExportToDirectoryCommand>();
 
         public string GetDisplayName(TreeNode node) => "Export to system folder";
-        public bool ShouldAdd(TreeNode node) => node.NodeType == NodeType.Directory || node.NodeType == NodeType.Root || (node.NodeType == NodeType.File && node.Item != null);
+        public bool ShouldAdd(TreeNode node) => node.NodeType == NodeType.Directory || node.NodeType == NodeType.Root || (node.NodeType == NodeType.File && TreeNodeHelper.GetPackFile(node) != null);
         public bool IsEnabled(TreeNode node) => true;
 
         public void Execute(TreeNode selectedNode)
         {
+            var container = TreeNodeHelper.GetPackFileContainer(selectedNode);
+            if (container == null)
+            {
+                _logger.Here().Warning($"Export blocked because no container was resolved for '{CommandLoggingHelper.DescribeNode(selectedNode)}'");
+                standardDialogs.ShowDialogBox("Unable to resolve selected packfile");
+                return;
+            }
+
             // TODO: Fix bug where if you export the packfilecontainer itself it doesn't export correctly.
             var folderDialogResult = standardDialogs.ShowSystemFolderBrowserDialog();
             if (folderDialogResult.Result && !string.IsNullOrEmpty(folderDialogResult.FolderPath))
@@ -27,7 +38,7 @@ namespace Shared.Ui.BaseDialogs.PackFileTree.ContextMenu.Commands
                     ? "" 
                     : fileSystemAccess.PathGetDirectoryName(selectedNode.GetFullPath());
                 var fileCounter = 0;
-                SaveSelfAndChildren(selectedNode, folderDialogResult.FolderPath, nodeStartDir, ref fileCounter);
+                SaveSelfAndChildren(selectedNode, container, folderDialogResult.FolderPath, nodeStartDir, ref fileCounter);
                 standardDialogs.ShowDialogBox($"{fileCounter} files exported!", "Export");
                 _logger.Here().Information($"Exported {fileCounter} file(s) from '{CommandLoggingHelper.DescribeNode(selectedNode)}' to '{folderDialogResult.FolderPath}'");
             }
@@ -37,12 +48,12 @@ namespace Shared.Ui.BaseDialogs.PackFileTree.ContextMenu.Commands
             }
         }
 
-        void SaveSelfAndChildren(TreeNode node, string outputDirectory, string? rootPath, ref int fileCounter)
+        void SaveSelfAndChildren(TreeNode node, IPackFileContainer container, string outputDirectory, string? rootPath, ref int fileCounter)
         {
             if (node.NodeType == NodeType.Directory || node.NodeType == NodeType.Root)
             {
-                foreach (var item in node.BackingChildren)
-                    SaveSelfAndChildren(item, outputDirectory, rootPath, ref fileCounter);
+                foreach (var item in node.Children)
+                    SaveSelfAndChildren(item, container, outputDirectory, rootPath, ref fileCounter);
             }
             else
             {
@@ -54,7 +65,10 @@ namespace Shared.Ui.BaseDialogs.PackFileTree.ContextMenu.Commands
                 if (!string.IsNullOrEmpty(fileOutputDir))
                     DirectoryHelper.EnsureCreated(fileOutputDir);
 
-                var packFile = node.Item;
+                var packFile = packFileService.FindFile(node.GetFullPath(), container);
+                if (packFile == null)
+                    return;
+
                 var bytes = packFile.DataSource.ReadData();
 
                 fileSystemAccess.FileWriteAllBytes(fileOutputPath, bytes);

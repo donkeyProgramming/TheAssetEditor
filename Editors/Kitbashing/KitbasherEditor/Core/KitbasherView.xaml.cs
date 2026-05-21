@@ -1,5 +1,6 @@
 ﻿using System.Windows;
 using System.Windows.Controls;
+using Shared.Core.PackFiles.Models;
 using Shared.Ui.BaseDialogs.PackFileTree;
 using Shared.Ui.Common;
 using Shared.Ui.Common.MenuSystem;
@@ -18,12 +19,12 @@ namespace KitbasherEditor.Views
 
         private void treeView_Drop(object sender, DragEventArgs e)
         {
-            var dropTarget = DataContext as IDropTarget<TreeNode>;
+            var dropTarget = DataContext as IDropTarget<PackFile>;
             if (dropTarget != null)
             {
                 var formats = e.Data.GetFormats();
                 object droppedObject = e.Data.GetData(formats[0]);
-                var node = droppedObject as TreeNode;
+                var node = droppedObject as PackFile;
 
                 if (dropTarget.AllowDrop(node))
                 {

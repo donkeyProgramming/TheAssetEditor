@@ -5,6 +5,7 @@ using Shared.Core.PackFiles.Models;
 using Shared.Core.Services;
 using Serilog;
 using Shared.Core.ErrorHandling;
+using Shared.Ui.BaseDialogs.PackFileTree.Utility;
 
 namespace Shared.Ui.BaseDialogs.PackFileTree.ContextMenu.Commands
 {
@@ -13,7 +14,7 @@ namespace Shared.Ui.BaseDialogs.PackFileTree.ContextMenu.Commands
         private readonly ILogger _logger = Logging.Create<OpenNodeInCommand>();
 
         public abstract string GetDisplayName(TreeNode node);
-        public bool ShouldAdd(TreeNode node) => node.NodeType == NodeType.File && node.Item != null;
+        public bool ShouldAdd(TreeNode node) => node.NodeType == NodeType.File && TreeNodeHelper.GetPackFile(node) != null;
         public bool IsEnabled(TreeNode node) => true;
 
         public abstract void Execute(TreeNode _selectedNode);
@@ -48,17 +49,30 @@ namespace Shared.Ui.BaseDialogs.PackFileTree.ContextMenu.Commands
             if (fileSystemAccess.FileExists(x64)) return x64;
             return Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86), appRelativePath);
         }
+
+        protected void OpenSelectedNodeUsing(TreeNode selectedNode, string applicationPath)
+        {
+            var packFile = TreeNodeHelper.GetPackFile(selectedNode);
+            if (packFile == null)
+            {
+                _logger.Here().Warning($"Unable to resolve file for node '{CommandLoggingHelper.DescribeNode(selectedNode)}'");
+                standardDialogs.ShowDialogBox("Unable to resolve selected file");
+                return;
+            }
+
+            OpenPackFileUsing(applicationPath, packFile);
+        }
     }
 
     public class OpenNodeInNotepadCommand(IStandardDialogs standardDialogs, IFileSystemAccess fileSystemAccess) : OpenNodeInCommand(standardDialogs, fileSystemAccess)
     {
         public override string GetDisplayName(TreeNode node) => "Open in Notepad++";
-        public override void Execute(TreeNode _selectedNode) => OpenPackFileUsing(ResolveApplicationPath(@"Notepad++\notepad++.exe"), _selectedNode.Item!);
+        public override void Execute(TreeNode _selectedNode) => OpenSelectedNodeUsing(_selectedNode, ResolveApplicationPath(@"Notepad++\notepad++.exe"));
     }
 
     public class OpenNodeInHxDCommand(IStandardDialogs standardDialogs, IFileSystemAccess fileSystemAccess) : OpenNodeInCommand(standardDialogs, fileSystemAccess)
     {
         public override string GetDisplayName(TreeNode node) => "Open in Hxd";
-        public override void Execute(TreeNode _selectedNode) => OpenPackFileUsing(ResolveApplicationPath(@"HxD\HxD.exe"), _selectedNode.Item!);
+        public override void Execute(TreeNode _selectedNode) => OpenSelectedNodeUsing(_selectedNode, ResolveApplicationPath(@"HxD\HxD.exe"));
     }
 }

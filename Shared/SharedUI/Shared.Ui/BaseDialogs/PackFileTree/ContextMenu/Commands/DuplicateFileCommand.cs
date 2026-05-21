@@ -5,6 +5,7 @@ using Shared.Core.PackFiles.Models.FileSources;
 using Shared.Core.Services;
 using Serilog;
 using Shared.Core.ErrorHandling;
+using Shared.Ui.BaseDialogs.PackFileTree.Utility;
 
 namespace Shared.Ui.BaseDialogs.PackFileTree.ContextMenu.Commands
 {
@@ -13,13 +14,23 @@ namespace Shared.Ui.BaseDialogs.PackFileTree.ContextMenu.Commands
         private readonly ILogger _logger = Logging.Create<DuplicateFileCommand>();
 
         public string GetDisplayName(TreeNode node) => "Duplicate";
-        public bool ShouldAdd(TreeNode node) => node.NodeType == NodeType.File && node.Item != null && !node.FileOwner.IsCaPackFile;
+        public bool ShouldAdd(TreeNode node)
+        {
+            var container = TreeNodeHelper.GetPackFileContainer(node);
+            var packFile = TreeNodeHelper.GetPackFile(node);
+            return node.NodeType == NodeType.File && packFile != null && container is { IsCaPackFile: false };
+        }
+
         public bool IsEnabled(TreeNode node) => true;
 
         public void Execute(TreeNode _selectedNode)
         {
+            var packFile = TreeNodeHelper.GetPackFile(_selectedNode);
+            if (packFile == null)
+                return;
+
             _logger.Here().Information($"Duplicating file node '{CommandLoggingHelper.DescribeNode(_selectedNode)}'");
-            Execute(_selectedNode.Item!);
+            Execute(packFile);
         }
 
         public void Execute(PackFile item)

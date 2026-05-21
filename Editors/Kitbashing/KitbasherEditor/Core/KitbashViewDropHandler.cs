@@ -1,6 +1,7 @@
 ﻿using System.IO;
 using Editors.KitbasherEditor.UiCommands;
 using Shared.Core.Events;
+using Shared.Core.PackFiles.Models;
 using Shared.Ui.BaseDialogs.PackFileTree;
 
 namespace Editors.KitbasherEditor.ViewModels
@@ -14,20 +15,23 @@ namespace Editors.KitbasherEditor.ViewModels
             _uiCommandFactory = uiCommandFactory;
         }
 
-        public bool AllowDrop(TreeNode node, TreeNode targeNode = null)
+        public bool AllowDrop(PackFile file, PackFile targeNode = null)
         {
-            if (node != null && node.NodeType == NodeType.File)
+            if (file != null)
             {
-                var extension = Path.GetExtension(node.Name).ToLower();
+                var extension = Path.GetExtension(file.Name).ToLower();
                 if (extension == ".rigid_model_v2" || extension == ".wsmodel" || extension == ".variantmeshdefinition")
                     return true;
             }
             return false;
         }
 
-        public bool Drop(TreeNode node)
+        public bool Drop(PackFile file)
         {
-            _uiCommandFactory.Create<ImportReferenceMeshCommand>().Execute(node.Item);
+            if (file == null)
+                return false;
+
+            _uiCommandFactory.Create<ImportReferenceMeshCommand>().Execute(file);
             return true;
         }
     }

@@ -1,7 +1,9 @@
 ﻿using Shared.Core.PackFiles;
+using Shared.Core.PackFiles.Models;
 using Shared.Core.Services;
 using Serilog;
 using Shared.Core.ErrorHandling;
+using Shared.Ui.BaseDialogs.PackFileTree.Utility;
 
 namespace Shared.Ui.BaseDialogs.PackFileTree.ContextMenu.Commands
 {
@@ -15,11 +17,19 @@ namespace Shared.Ui.BaseDialogs.PackFileTree.ContextMenu.Commands
 
         public void Execute(TreeNode selectedNode)
         {
-            var packDescription = CommandLoggingHelper.DescribePack(selectedNode.FileOwner);
+            var container = TreeNodeHelper.GetPackFileContainer(selectedNode);
+            if (container == null)
+            {
+                _logger.Here().Warning($"Close blocked because no container was resolved for '{CommandLoggingHelper.DescribeNode(selectedNode)}'");
+                standardDialogs.ShowDialogBox("Unable to resolve selected packfile");
+                return;
+            }
+
+            var packDescription = CommandLoggingHelper.DescribePack(container);
             if (standardDialogs.ShowYesNoBox("Are you sure you want to close the packfile?", "") == ShowMessageBoxResult.OK)
             {
                 _logger.Here().Information($"Closing pack file container '{packDescription}' from context menu");
-                packFileService.UnloadPackContainer(selectedNode.FileOwner);
+                packFileService.UnloadPackContainer(container);
             }
             else
             {

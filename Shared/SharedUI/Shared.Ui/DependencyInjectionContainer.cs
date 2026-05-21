@@ -5,6 +5,7 @@ using Shared.Core.ToolCreation;
 using Shared.Ui.BaseDialogs.PackFileTree;
 using Shared.Ui.BaseDialogs.PackFileTree.ContextMenu;
 using Shared.Ui.BaseDialogs.PackFileTree.ContextMenu.Commands;
+using Shared.Ui.BaseDialogs.PackFileTree.Utility;
 using Shared.Ui.BaseDialogs.StandardDialog;
 using Shared.Ui.BaseDialogs.ToolSelector;
 using Shared.Ui.Common.MenuSystem;
@@ -24,7 +25,6 @@ namespace Shared.Ui
             services.AddScoped<IStandardDialogs, StandardDialogs>();
             services.AddSingleton<IFileSystemAccess, FileSystemAccess>();
             services.AddTransient<IToolSelectorUiProvider, ToolSelectorUiProvider>();
-
             services.AddScoped<PackFileTreeViewFactory>();
 
             // Context menu

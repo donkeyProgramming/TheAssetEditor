@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Windows.Input;
@@ -10,9 +11,11 @@ using Shared.Core.Events;
 using Shared.Core.Events.Global;
 using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
-using Shared.Core.PackFiles.Utility;
+using Shared.Core.Services;
 using Shared.Core.Settings;
+using Shared.Ui.BaseDialogs.PackFileTree.Commands;
 using Shared.Ui.BaseDialogs.PackFileTree.ContextMenu;
+using Shared.Ui.BaseDialogs.PackFileTree.Utility;
 using Shared.Ui.Common;
 using Shared.Ui.Common.MenuSystem;
 
@@ -29,12 +32,12 @@ namespace Shared.Ui.BaseDialogs.PackFileTree
         private readonly ApplicationSettingsService _applicationSettingsService;
         private readonly PackFileContextMenuComposer _contextMenuComposer;
         private readonly ContextMenuType _contextMenuType;
-        private readonly Dictionary<IPackFileContainer, TreeNode> _treeRoots = [];
+        private readonly DoubleClickCommand _doubleClickCommand;
 
         public event FileSelectedDelegate FileOpen;
         public event NodeSelectedDelegate NodeSelected;
 
-        public ObservableCollection<TreeNode> Files { get; set; } = [];
+        public ObservableCollection<RootTreeNode> Files { get; set; } = [];
         public SearchFilter Filter { get; private set; }
 
         [ObservableProperty] TreeNode _selectedItem;
@@ -42,7 +45,15 @@ namespace Shared.Ui.BaseDialogs.PackFileTree
 
         public bool ShowFoldersOnly { get; }
 
-        public PackFileBrowserViewModel(ApplicationSettingsService applicationSettingsService, PackFileContextMenuComposer contextMenuComposer, ContextMenuType contextMenuType, IPackFileService packFileService, IEventHub? eventHub, IWindowsKeyboard windowKeyboard, bool showCaFiles, bool showFoldersOnly)
+        public PackFileBrowserViewModel(
+            ApplicationSettingsService applicationSettingsService, 
+            PackFileContextMenuComposer contextMenuComposer, 
+            ContextMenuType contextMenuType, 
+            IPackFileService packFileService,
+            IEventHub? eventHub, 
+            IWindowsKeyboard windowKeyboard,
+            bool showCaFiles, bool showFoldersOnly,
+            IStandardDialogs? standardDialogs = null)
         {
             _packFileService = packFileService;
             _eventHub = eventHub;
@@ -50,6 +61,7 @@ namespace Shared.Ui.BaseDialogs.PackFileTree
             _applicationSettingsService = applicationSettingsService;
             _contextMenuComposer = contextMenuComposer;
             _contextMenuType = contextMenuType;
+            _doubleClickCommand = new DoubleClickCommand(packFileService, windowKeyboard);
 
             ShowFoldersOnly = showFoldersOnly;
 
@@ -63,8 +75,11 @@ namespace Shared.Ui.BaseDialogs.PackFileTree
             _eventHub?.Register<PackFileContainerFolderRenamedEvent>(this, x => OnPackFileContainerFolderRenamedEvent(x.Container, x.OldNodePath, x.NewNodePath));
             _eventHub?.Register<PackFileContainerSavedEvent>(this, OnPackFileContainerSavedEvent);
 
-            Filter = new SearchFilter(Files, () => _treeRoots.Values);
-            Filter.ShowFoldersOnly = showFoldersOnly;
+            Filter = new SearchFilter(Files, standardDialogs)
+            {
+                ShowFoldersOnly = showFoldersOnly
+            };
+
             foreach (var item in _packFileService.GetAllPackfileContainers())
             {
                 var loadFile = true;
@@ -97,12 +112,10 @@ namespace Shared.Ui.BaseDialogs.PackFileTree
             if (nodeToDelete == null)
                 return;
 
-            var parentNode = nodeToDelete.Parent;
-            parentNode?.RemoveChild(nodeToDelete);
-            parentNode?.Children.Remove(nodeToDelete);
-            nodeToDelete.RemoveSelf();
+            root.UnsavedChanges.RemoveWithDescendants(nodeToDelete);
+            PackFileTreeMutationService.RemoveNode(nodeToDelete);
 
-            root.UnsavedChanged = true;
+            root.UnsavedChanges.MarkChanged(root);
             Filter.Reapply();
         }
 
@@ -119,14 +132,7 @@ namespace Shared.Ui.BaseDialogs.PackFileTree
                 newLeafName = newPath.Substring(lastSep + 1);
 
             node.Name = newLeafName;
-            root.UnsavedChanged = true;
-            node.UnsavedChanged = true;
-            var parent = node.Parent;
-            while (parent != null && parent != root)
-            {
-                parent.UnsavedChanged = true;
-                parent = parent.Parent;
-            }
+            root.UnsavedChanges.MarkChangedWithAncestors(node, root);
             Filter.Reapply();
         }
 
@@ -134,16 +140,14 @@ namespace Shared.Ui.BaseDialogs.PackFileTree
         {
             var root = GetRootNode(e.Container);
 
-            TreeNodeStateHelper.ClearUnsavedOnLoadedNodes(root);
-
-            root.ForeachNode((node) => node.UnsavedChanged = false);
+            root.UnsavedChanges.ClearAll();
             Filter.Reapply();
         }
 
         private void OnPackFileContainerFilesRemovedEvent(IPackFileContainer container, List<PackFile> files)
         {
             var root = GetRootNode(container);
-            root.UnsavedChanged = true;
+            root.UnsavedChanges.MarkChanged(root);
 
             foreach (var file in files)
             {
@@ -151,10 +155,8 @@ namespace Shared.Ui.BaseDialogs.PackFileTree
                 if (node == null)
                     continue;
 
-                var parentNode = node.Parent;
-                parentNode?.RemoveChild(node);
-                parentNode?.Children.Remove(node);
-                node.RemoveSelf();
+                root.UnsavedChanges.Remove(node);
+                PackFileTreeMutationService.RemoveNode(node);
             }
 
             Filter.Reapply();
@@ -165,19 +167,12 @@ namespace Shared.Ui.BaseDialogs.PackFileTree
             foreach (var file in e.ChangedFiles)
             {
                 var root = GetRootNode(e.Container);
-                root.UnsavedChanged = true;
-                var node = GetNodeFromPackFile(e.Container, file);
+                var node = GetNodeFromPackFile(e.Container, file, false) ?? FindRenamedFileNode(e.Container, file);
                 if (node == null)
                     continue;
-                node.Name = file.Name;
-                node.UnsavedChanged = true;
 
-                var parent = node.Parent;
-                while (parent != null && parent != root)
-                {
-                    parent.UnsavedChanged = true;
-                    parent = parent.Parent;
-                }
+                node.Name = file.Name;
+                root.UnsavedChanges.MarkChangedWithAncestors(node, root);
             }
 
             Filter.Reapply();
@@ -192,45 +187,18 @@ namespace Shared.Ui.BaseDialogs.PackFileTree
         [RelayCommand]
         protected virtual void OnDoubleClick(TreeNode node)
         {
-            var targetNode = node ?? SelectedItem;
-            if (targetNode == null)
-                return;
-
-            if (!ReferenceEquals(SelectedItem, targetNode))
-                SelectedItem = targetNode;
-
-            var maxExpandCount = 200;
-            if (targetNode.NodeType == NodeType.File)
-            {
-                FileOpen?.Invoke(targetNode.Item!);
-            }
-            else if (targetNode.NodeType == NodeType.Directory || targetNode.NodeType == NodeType.Root)
-            {
-                targetNode.IsNodeExpanded = !targetNode.IsNodeExpanded;
-
-                if (_windowKeyboard.IsKeyDown(Key.LeftCtrl))
-                {
-                    var numChildren = targetNode.GetAllChildFileNodes().Count;
-                    if (numChildren < maxExpandCount)
-                        targetNode.ExpandIfVisible(true);
-                }
-            }
+            _doubleClickCommand.Execute(node, SelectedItem, n => SelectedItem = n, file => FileOpen?.Invoke(file));
         }
 
         private void OnMainEditablePackChanged(PackFileContainerSetAsMainEditableEvent e)
         {
             foreach (var item in Files)
-                item.IsMainEditabelPack = false;
-
-            var newContiner = Files.FirstOrDefault(x => x.FileOwner == e.Container);
-            if (newContiner != null)
-                newContiner.IsMainEditabelPack = true;
+                item.IsMainEditabelPack = item.Owner == e.Container;
         }
 
         private void OnPackFileContainerFilesAddedEvent(IPackFileContainer container, List<PackFile> files)
         {
             var root = GetRootNode(container);
-            root.UnsavedChanged = true;
 
             foreach (var item in files)
             {
@@ -249,34 +217,21 @@ namespace Shared.Ui.BaseDialogs.PackFileTree
                 TreeNode newNode;
                 if (numSeperators == 0)
                 {
-                    // EnsureChildrenPopulated runs inside InsertChildSorted and may load the
-                    // just-added file from the container, so remove any duplicate after population.
-                    root.EnsureChildrenPopulated();
-                    TreeNodeManipulationHelper.RemoveExistingFileNode(root, item.Name, item);
-                    newNode = new TreeNode(item.Name, NodeType.File, container, root, item);
-                    TreeNodeManipulationHelper.InsertChildSorted(root, newNode);
+                    PackFileTreeMutationService.RemoveExistingFileNode(root, item.Name);
+                    newNode = new TreeNode(item.Name, NodeType.File, root);
+                    PackFileTreeMutationService.InsertChildSorted(root, newNode);
                 }
                 else
                 {
                     var directory = fullPath.Substring(0, directoryEnd);
                     var folder = GetNodeFromPath(root, directory)!;
+                    PackFileTreeMutationService.RemoveExistingFileNode(folder, item.Name);
 
-                    // Populate the folder first so that any duplicate loaded from the container
-                    // by EnsureChildrenPopulated (inside InsertChildSorted) is visible here.
-                    folder.EnsureChildrenPopulated();
-                    TreeNodeManipulationHelper.RemoveExistingFileNode(folder, item.Name, item);
-
-                    newNode = new TreeNode(item.Name, NodeType.File, container, folder, item);
-                    TreeNodeManipulationHelper.InsertChildSorted(folder, newNode);
+                    newNode = new TreeNode(item.Name, NodeType.File, folder);
+                    PackFileTreeMutationService.InsertChildSorted(folder, newNode);
                 }
 
-                newNode.UnsavedChanged = true;
-                var parent = newNode.Parent;
-                while (parent != null && parent != root)
-                {
-                    parent.UnsavedChanged = true;
-                    parent = parent.Parent;
-                }
+                root.UnsavedChanges.MarkChangedWithAncestors(newNode, root);
             }
 
             Filter.Reapply();
@@ -284,23 +239,14 @@ namespace Shared.Ui.BaseDialogs.PackFileTree
 
         private TreeNode? GetNodeFromPath(TreeNode parent, string path, bool createIfMissing = true)
         {
-            var numSeperators = path.Count(x => x == Path.DirectorySeparatorChar);
             if (path.Length == 0)
                 return parent;
 
-            parent.EnsureChildrenPopulated();
+            var currentIndex = path.IndexOf(Path.DirectorySeparatorChar, 0);
+            var nodeName = currentIndex == -1 ? path : path.Substring(0, currentIndex);
+            var remainingStr = currentIndex == -1 ? string.Empty : path.Substring(currentIndex + 1);
 
-            var nodeName = path;
-            var remainingStr = "";
-
-            if (numSeperators != 0)
-            {
-                var currentIndex = path.IndexOf(Path.DirectorySeparatorChar, 0);
-                nodeName = path.Substring(0, currentIndex);
-                remainingStr = path.Substring(currentIndex + 1);
-            }
-
-            foreach (var child in parent.BackingChildren)
+            foreach (var child in parent.Children)
             {
                 if (child.Name == nodeName && child.NodeType == NodeType.Directory)
                     return GetNodeFromPath(child, remainingStr, createIfMissing);
@@ -308,9 +254,7 @@ namespace Shared.Ui.BaseDialogs.PackFileTree
 
             if (createIfMissing)
             {
-                var newNode = new TreeNode(nodeName, NodeType.Directory, parent.FileOwner, parent, () => Filter.HasActiveFilter);
-                newNode.MarkChildrenLoaded();
-                TreeNodeManipulationHelper.InsertChildSorted(parent, newNode);
+                var newNode = PackFileTreeMutationService.CreateDirectoryChild(parent, nodeName);
                 return GetNodeFromPath(newNode, remainingStr, createIfMissing);
             }
             return null;
@@ -321,12 +265,11 @@ namespace Shared.Ui.BaseDialogs.PackFileTree
             var root = GetRootNode(container);
             var fullPath = _packFileService.GetFullPath(pf, container);
             var numSeperators = fullPath.Count(x => x == Path.DirectorySeparatorChar);
-
-            root.EnsureChildrenPopulated();
+            var fileName = pf.Name;
 
             if (numSeperators == 0)
             {
-                return root.BackingChildren.FirstOrDefault(x => x.Item == pf);
+                return root.Children.FirstOrDefault(x => x.NodeType == NodeType.File && x.Name.Equals(fileName, StringComparison.OrdinalIgnoreCase));
             }
             else
             {
@@ -334,107 +277,96 @@ namespace Shared.Ui.BaseDialogs.PackFileTree
                 var directory = fullPath.Substring(0, directoryEnd);
                 var parent = GetNodeFromPath(root, directory, createIfMissing);
 
-                return parent?.BackingChildren.FirstOrDefault(x => x.Item == pf);
+                return parent?.Children.FirstOrDefault(x => x.NodeType == NodeType.File && x.Name.Equals(fileName, StringComparison.OrdinalIgnoreCase));
             }
+        }
+
+        private TreeNode? FindRenamedFileNode(IPackFileContainer container, PackFile file)
+        {
+            var root = GetRootNode(container);
+            var fullPath = _packFileService.GetFullPath(file, container);
+            var directoryEnd = fullPath.LastIndexOf(Path.DirectorySeparatorChar);
+            var parent = directoryEnd == -1
+                ? root
+                : GetNodeFromPath(root, fullPath.Substring(0, directoryEnd), false);
+            if (parent == null)
+                return null;
+
+            return parent.Children.FirstOrDefault(child =>
+                child.NodeType == NodeType.File &&
+                !child.Name.Equals(file.Name, StringComparison.OrdinalIgnoreCase) &&
+                FindPackFile(child) == null);
         }
 
         private void ReloadTree(IPackFileContainer container)
         {
-            if (_treeRoots.TryGetValue(container, out var existingRoot))
+            foreach (var file in Files)
             {
-                Files.Remove(existingRoot);
-                _treeRoots.Remove(container);
+                if (file.Owner == container)
+                {
+                    Files.Remove(file);
+                    break;
+                }  
             }
 
             var skipWemFiles = container.IsCaPackFile && _applicationSettingsService.CurrentSettings.ShowCAWemFiles == false;
 
-            var root = new TreeNode(container.Name, NodeType.Root, container, null, () => Filter.HasActiveFilter);
-            root.SetChildLoader(node => LoadChildrenFromContainer(node, container, skipWemFiles));
+            var root = new RootTreeNode(container.Name, container);
+            PackFileTreeBuilder.BuildTreeFromFiles(root, container, skipWemFiles);
             root.IsMainEditabelPack = _packFileService.GetEditablePack() == container;
 
-            _treeRoots[container] = root;
             Files.Add(root);
             Filter.Reapply();
         }
 
-        private bool LoadChildrenFromContainer(TreeNode node, IPackFileContainer container, bool skipWemFiles)
-        {
-            var directoryPath = node.GetFullPath();
-            var split = PackFileServiceUtility.SplitDirectoryEntries(container, directoryPath);
-
-            foreach (var folderName in split.SubFolders)
-            {
-                var childNode = new TreeNode(folderName, NodeType.Directory, container, node, () => Filter.HasActiveFilter);
-                childNode.SetChildLoader(n => LoadChildrenFromContainer(n, container, skipWemFiles));
-                node.AddChild(childNode);
-            }
-
-            foreach (var fileEntry in split.Files)
-            {
-                var fileName = fileEntry.FileName;
-                var file = fileEntry.File;
-                if (skipWemFiles && fileName.EndsWith(".wem", StringComparison.OrdinalIgnoreCase))
-                    continue;
-
-                var fileNode = new TreeNode(fileName, NodeType.File, container, node, file);
-                node.AddChild(fileNode);
-            }
-
-            return true;
-        }
-
         private void OnPackFileContainerRemoved(PackFileContainerRemovedEvent e)
         {
-            if (_treeRoots.TryGetValue(e.Container, out var root))
+            foreach (var file in Files)
             {
-                Files.Remove(root);
-                _treeRoots.Remove(e.Container);
+                if (file.Owner == e.Container)
+                {
+                    Files.Remove(file);
+                    break;
+                }
             }
         }
 
-        public bool AllowDrop(TreeNode node, TreeNode? targetNode = null)
+        public bool AllowDrop(TreeNode node, TreeNode? targetNode = null) => DropHandler.AllowDrop(node, targetNode, _packFileService);
+
+        public bool Drop(TreeNode node, TreeNode? targeNode) => DropHandler.Drop(node, targeNode, _packFileService);
+
+        private RootTreeNode GetRootNode(IPackFileContainer container)
         {
-            if (targetNode == null)
-                return false;
+            foreach (var node in Files)
+            {
+                if (node.Owner == container)
+                {
+                    return node;
+                }
+            }
 
-            if (node.Item == null)
-                return false;
-
-            if (node.FileOwner != targetNode.FileOwner)
-                return false;
-
-            if (node.FileOwner.IsCaPackFile)
-                return false;
-
-            if (targetNode.Item != null)
-                return false;
-
-            return true;
+            throw new Exception("Unable to find root node from Container where name = " + container.Name);
         }
 
-        public bool Drop(TreeNode node, TreeNode? targeNode)
+        public IPackFileContainer? FindFileOwner(TreeNode? node)
         {
-            if (targeNode == null)
-                return false;
+            if (node == null)
+                return null;
 
-            var container = node.FileOwner;
-            var draggedFile = node.Item;
-            var dropPath = targeNode.GetFullPath();
-
-            var newFullPath = string.IsNullOrWhiteSpace(dropPath)
-                ? draggedFile.Name
-                : dropPath + "\\" + draggedFile.Name;
-            if (newFullPath == _packFileService.GetFullPath(draggedFile, container))
-                return false;
-
-            _packFileService.MoveFile(container, draggedFile, dropPath);
-
-            return true;
+            var root = TreeNodeHelper.GetRootNode(node);
+            return root.Owner;
         }
 
-        private TreeNode GetRootNode(IPackFileContainer container)
+        public PackFile? FindPackFile(TreeNode? node)
         {
-            return _treeRoots[container];
+            if (node == null || node.NodeType != NodeType.File)
+                return null;
+
+            var container = FindFileOwner(node);
+            if (container == null)
+                return null;
+
+            return _packFileService.FindFile(node.GetFullPath(), container);
         }
     }
 }

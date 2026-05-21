@@ -39,7 +39,8 @@ namespace Shared.Ui.BaseDialogs.PackFileTree.ContextMenu
                         continue;
 
                     var parent = GetOrCreateMenuPath(item.Path, clusterRoot, pathToMenuLookup);
-                    parent.ContextMenu.Add(new ContextMenuItem(command.GetDisplayName(node), () => command.Execute(node)));
+                    var x = new ContextMenuItem(command.GetDisplayName(node), () => command.Execute(node));
+                    parent.ContextMenu.Add(x);
                 }
 
                 RemoveEmptySubmenus(clusterRoot);
@@ -57,6 +58,8 @@ namespace Shared.Ui.BaseDialogs.PackFileTree.ContextMenu
 
             return output;
         }
+
+
 
         private static ContextMenuItem GetOrCreateMenuPath(string path, ContextMenuItem root, Dictionary<string, ContextMenuItem> pathToMenuLookup)
         {

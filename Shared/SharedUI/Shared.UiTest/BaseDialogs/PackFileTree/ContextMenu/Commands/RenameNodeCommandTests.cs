@@ -5,6 +5,8 @@ using Shared.Core.PackFiles.Models;
 using Shared.Core.Services;
 using Shared.Ui.BaseDialogs.PackFileTree;
 using Shared.Ui.BaseDialogs.PackFileTree.ContextMenu.Commands;
+using Shared.Ui.BaseDialogs.PackFileTree.Utility;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.Window;
 
 namespace Shared.UiTest.BaseDialogs.PackFileTree.ContextMenu.Commands
 {
@@ -14,41 +16,76 @@ namespace Shared.UiTest.BaseDialogs.PackFileTree.ContextMenu.Commands
         [Test]
         public void ShouldAdd_ReturnsTrueForFile()
         {
-            var owner = CreateContainer();
-            var root = new TreeNode("root", NodeType.Root, owner, null);
-            var file = new TreeNode("file.txt", NodeType.File, owner, root, PackFile.CreateFromASCII("file.txt", "a"));
-            var command = new RenameNodeCommand(new Mock<IPackFileService>().Object, new Mock<IStandardDialogs>().Object);
+            var container = AddPackFiles(false, "modfile", "c:\\mymod.pack", ["rootfolder\\file.txt"]);
+            var viewModel = PackFileBrowser();
+            var node = TreeNodeHelper.FindNode(viewModel, container, "rootfolder\\file.txt");
 
-            Assert.That(command.ShouldAdd(file), Is.True);
+            var command = new RenameNodeCommand(_packFileService, new Mock<IStandardDialogs>().Object);
+
+            Assert.That(command.ShouldAdd(node), Is.True);
         }
 
         [Test]
         public void IsEnabled_ReturnsTrue()
         {
-            var owner = CreateContainer();
-            var root = new TreeNode("root", NodeType.Root, owner, null);
-            var file = new TreeNode("file.txt", NodeType.File, owner, root, PackFile.CreateFromASCII("file.txt", "a"));
-            var command = new RenameNodeCommand(new Mock<IPackFileService>().Object, new Mock<IStandardDialogs>().Object);
+            var container = AddPackFiles(false, "modfile", "c:\\mymod.pack", ["rootfolder\\file.txt"]);
+            var viewModel = PackFileBrowser();
+            var node = TreeNodeHelper.FindNode(viewModel, container, "rootfolder\\file.txt");
 
-            Assert.That(command.IsEnabled(file), Is.True);
+            var command = new RenameNodeCommand(_packFileService, new Mock<IStandardDialogs>().Object);
+
+            Assert.That(command.IsEnabled(node), Is.True);
         }
+
+
 
         [Test]
         public void Execute_RenamesFile()
         {
-            var owner = CreateContainer();
-            var root = new TreeNode("root", NodeType.Root, owner, null);
-            var file = new TreeNode("file.txt", NodeType.File, owner, root, PackFile.CreateFromASCII("file.txt", "a"));
-            root.AddChild(file);
+            // Arrange
+            AddPackFiles(true, "gamefile", "root", []);
+            var container = AddPackFiles(false, "modfile", "c:\\mymod.pack", ["rootfolder\\file0.txt", "rootfolder\\file1.txt"]);
 
-            var service = new Mock<IPackFileService>();
+            var viewModel = PackFileBrowser();
+            var node = TreeNodeHelper.FindNode(viewModel, container, "rootfolder\\file0.txt");
+           
             var dialogs = new Mock<IStandardDialogs>();
-            dialogs.Setup(x => x.ShowTextInputDialog("Rename file", file.Name)).Returns(new TextInputDialogResult(true, "renamed.txt"));
-            var command = new RenameNodeCommand(service.Object, dialogs.Object);
+            dialogs.Setup(x => x.ShowTextInputDialog("Rename file", node.Name)).Returns(new TextInputDialogResult(true, "renamed.txt"));
 
-            command.Execute(file);
+            // Act
+            var command = new RenameNodeCommand(_packFileService, dialogs.Object);
+            command.Execute(node);
 
-            service.Verify(x => x.RenameFile(owner, file.Item!, "renamed.txt"), Times.Once);
+            // Assert
+            Assert.That(node.Name, Is.EqualTo("renamed.txt"));
+            var packfile = container.FindFile("rootfolder\\renamed.txt");
+            Assert.That(packfile, Is.Not.Null);
+            Assert.That(node.UnsavedChanged, Is.EqualTo(true));
+        }
+
+        [Test]
+        public void Execute_RenamesDirectory()
+        {
+            // Arrange
+            var container = AddPackFiles(false, "modfile", "c:\\mymod.pack", ["myfolder\\file0.txt", "myfolder\\file1.txt"]);
+
+            var viewModel = PackFileBrowser();
+            var root = viewModel.Files.First();
+            var dirNode = root.Children.First(x => x.NodeType == NodeType.Directory);
+
+            var dialogs = new Mock<IStandardDialogs>();
+            dialogs.Setup(x => x.ShowTextInputDialog("Create folder", dirNode.Name)).Returns(new TextInputDialogResult(true, "renamed_folder"));
+
+            // Act
+            var command = new RenameNodeCommand(_packFileService, dialogs.Object);
+            command.Execute(dirNode);
+
+            // Assert
+            Assert.That(dirNode.Name, Is.EqualTo("renamed_folder"));
+            var file0 = container.FindFile("renamed_folder\\file0.txt");
+            var file1 = container.FindFile("renamed_folder\\file1.txt");
+            Assert.That(file0, Is.Not.Null);
+            Assert.That(file1, Is.Not.Null);
         }
     }
 }

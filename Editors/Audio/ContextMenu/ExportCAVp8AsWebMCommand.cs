@@ -5,9 +5,11 @@ using Editors.Audio.Shared.Storage;
 using Editors.Audio.Shared.Utilities;
 using Shared.Core.Misc;
 using Shared.Core.PackFiles;
+using Shared.Core.PackFiles.Models;
 using Shared.Core.Services;
 using Shared.Ui.BaseDialogs.PackFileTree;
 using Shared.Ui.BaseDialogs.PackFileTree.ContextMenu.Commands;
+using Shared.Ui.BaseDialogs.PackFileTree.Utility;
 
 namespace Editors.Audio.ContextMenu
 {
@@ -25,13 +27,17 @@ namespace Editors.Audio.ContextMenu
         private readonly IMovieAudioResolver _movieAudioResolver = movieAudioResolver;
 
         public string GetDisplayName(TreeNode node) => "Export as WebM";
-        public bool ShouldAdd(TreeNode node) => node.NodeType == NodeType.File && node.Item != null;
-        public bool IsEnabled(TreeNode node) => node.Item != null && node.Item.Name.EndsWith(".ca_vp8", StringComparison.OrdinalIgnoreCase);
+        public bool ShouldAdd(TreeNode node) => node.NodeType == NodeType.File && TreeNodeHelper.GetPackFile(node) != null;
+        public bool IsEnabled(TreeNode node)
+        {
+            var packFile = TreeNodeHelper.GetPackFile(node);
+            return packFile != null && packFile.Name.EndsWith(".ca_vp8", StringComparison.OrdinalIgnoreCase);
+        }
 
         public void Execute(TreeNode selectedNode)
         {
-            var caVp8PackFile = selectedNode.Item;
-            if (caVp8PackFile == null)
+            var packFile = TreeNodeHelper.GetPackFile(selectedNode);
+            if (packFile == null)
                 return;
 
             var dialogResult = _standardDialogs.ShowSystemFolderBrowserDialog();
@@ -42,10 +48,10 @@ namespace Editors.Audio.ContextMenu
 
             _audioRepository.Load(Wh3LanguageInformation.GetAllLanguages());
 
-            var caVp8PackFilePath = _packFileService.GetFullPath(caVp8PackFile);
+            var caVp8PackFilePath = _packFileService.GetFullPath(packFile);
             var wemPackFile = _movieAudioResolver.ResolveMovieWem(caVp8PackFilePath);
-            var webMPath = Path.Combine(dialogResult.FolderPath, Path.ChangeExtension(caVp8PackFile.Name, ".webm"));
-            var webMBytes = CAVp8Exporter.ExportToWebM(caVp8PackFile, wemPackFile);
+            var webMPath = Path.Combine(dialogResult.FolderPath, Path.ChangeExtension(packFile.Name, ".webm"));
+            var webMBytes = CAVp8Exporter.ExportToWebM(packFile, wemPackFile);
             _fileSystemAccess.FileWriteAllBytes(webMPath, webMBytes);
         }
     }

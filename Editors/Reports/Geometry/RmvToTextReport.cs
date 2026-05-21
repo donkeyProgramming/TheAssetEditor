@@ -8,6 +8,7 @@ using Shared.GameFormats.RigidModel.LodHeader;
 using Shared.GameFormats.RigidModel.MaterialHeaders;
 using Shared.Ui.BaseDialogs.PackFileTree;
 using Shared.Ui.BaseDialogs.PackFileTree.ContextMenu.Commands;
+using Shared.Ui.BaseDialogs.PackFileTree.Utility;
 
 namespace Editors.Reports.Geometry
 {
@@ -17,11 +18,19 @@ namespace Editors.Reports.Geometry
 
         public bool ShouldAdd(TreeNode node) => IsEnabled(node);
 
-        public bool IsEnabled(TreeNode node) => node.NodeType == NodeType.File && node.Item != null && node.Name.EndsWith(".rigid_model_v2", StringComparison.OrdinalIgnoreCase);
+        public bool IsEnabled(TreeNode node)
+        {
+            var packFile = TreeNodeHelper.GetPackFile(node);
+            return node.NodeType == NodeType.File && packFile != null && node.Name.EndsWith(".rigid_model_v2", StringComparison.OrdinalIgnoreCase);
+        }
 
         public void Execute(TreeNode node)
         {
-            report.Generate(node.Item!);
+            var packFile = TreeNodeHelper.GetPackFile(node);
+            if (packFile == null)
+                return;
+
+            report.Generate(packFile);
         }
     }
 

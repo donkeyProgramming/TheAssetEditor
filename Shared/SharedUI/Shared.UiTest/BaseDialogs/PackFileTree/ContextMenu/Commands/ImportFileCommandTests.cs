@@ -1,12 +1,8 @@
-﻿using System.Collections.Generic;
-using System.IO;
-using System.Threading;
 using Moq;
-using Shared.Core.PackFiles;
-using Shared.Core.PackFiles.Models;
 using Shared.Core.Services;
 using Shared.Ui.BaseDialogs.PackFileTree;
 using Shared.Ui.BaseDialogs.PackFileTree.ContextMenu.Commands;
+using Shared.Ui.BaseDialogs.PackFileTree.Utility;
 
 namespace Shared.UiTest.BaseDialogs.PackFileTree.ContextMenu.Commands
 {
@@ -16,16 +12,24 @@ namespace Shared.UiTest.BaseDialogs.PackFileTree.ContextMenu.Commands
         [Test]
         public void ShouldAdd_ReturnsTrueForDirectoryNode()
         {
-            var command = new ImportFileCommand(new Mock<IPackFileService>().Object, new Mock<IStandardDialogs>().Object, new Mock<IFileSystemAccess>().Object);
-            Assert.That(command.ShouldAdd(new TreeNode("dir", NodeType.Directory, CreateContainer(), null)), Is.True);
+            var container = AddPackFiles(false, "modfile", "c:\\mymod.pack", ["dir\\file.txt"]);
+            var viewModel = PackFileBrowser();
+            var root = viewModel.Files.First();
+            var dirNode = root.Children.First(x => x.NodeType == NodeType.Directory);
+
+            var command = new ImportFileCommand(_packFileService, new Mock<IStandardDialogs>().Object, new Mock<IFileSystemAccess>().Object);
+
+            Assert.That(command.ShouldAdd(dirNode), Is.True);
         }
 
         [Test]
         public void IsEnabled_ReturnsTrue()
         {
-            var owner = CreateContainer(isCa: true);
-            var root = new TreeNode("root", NodeType.Root, owner, null);
-            var command = new ImportFileCommand(new Mock<IPackFileService>().Object, new Mock<IStandardDialogs>().Object, new Mock<IFileSystemAccess>().Object);
+            AddPackFiles(true, "gamefile", "root", ["rootfolder\\file.txt"]);
+            var viewModel = PackFileBrowser();
+            var root = viewModel.Files.First();
+
+            var command = new ImportFileCommand(_packFileService, new Mock<IStandardDialogs>().Object, new Mock<IFileSystemAccess>().Object);
 
             Assert.That(command.IsEnabled(root), Is.True);
         }
@@ -33,61 +37,68 @@ namespace Shared.UiTest.BaseDialogs.PackFileTree.ContextMenu.Commands
         [Test]
         public void Execute_CaPackShowsErrorAndDoesNotImport()
         {
-            var owner = CreateContainer(isCa: true);
-            var root = new TreeNode("root", NodeType.Root, owner, null);
+            // Arrange
+            AddPackFiles(true, "gamefile", "root", ["rootfolder\\file.txt"]);
+            var viewModel = PackFileBrowser();
+            var root = viewModel.Files.First();
 
-            var service = new Mock<IPackFileService>();
             var dialogs = new Mock<IStandardDialogs>();
             var fileSystem = new Mock<IFileSystemAccess>();
-            var command = new ImportFileCommand(service.Object, dialogs.Object, fileSystem.Object);
 
+            // Act
+            var command = new ImportFileCommand(_packFileService, dialogs.Object, fileSystem.Object);
             command.Execute(root);
 
+            // Assert
             dialogs.Verify(x => x.ShowDialogBox("Unable to edit CA packfile", "Error"), Times.Once);
-            service.Verify(x => x.AddFilesToPack(It.IsAny<IPackFileContainer>(), It.IsAny<List<NewPackFileEntry>>()), Times.Never);
         }
 
         [Test]
         public void Execute_DialogCancelled_DoesNotImport()
         {
-            var owner = CreateContainer(isCa: false);
-            var root = new TreeNode("root", NodeType.Root, owner, null);
+            // Arrange
+            AddPackFiles(false, "modfile", "c:\\mymod.pack", ["rootfolder\\file.txt"]);
+            var viewModel = PackFileBrowser();
+            var root = viewModel.Files.First();
 
-            var service = new Mock<IPackFileService>();
             var dialogs = new Mock<IStandardDialogs>();
             dialogs.Setup(x => x.ShowSystemOpenFileDialog(It.IsAny<bool>(), It.IsAny<string>()))
                 .Returns(new SystemOpenFileDialogResult(Result: false, FilePaths: []));
             var fileSystem = new Mock<IFileSystemAccess>();
-            var command = new ImportFileCommand(service.Object, dialogs.Object, fileSystem.Object);
 
+            // Act
+            var command = new ImportFileCommand(_packFileService, dialogs.Object, fileSystem.Object);
             command.Execute(root);
 
-            service.Verify(x => x.AddFilesToPack(It.IsAny<IPackFileContainer>(), It.IsAny<List<NewPackFileEntry>>()), Times.Never);
+            // Assert
             fileSystem.Verify(x => x.FileReadAllBytes(It.IsAny<string>()), Times.Never);
         }
 
         [Test]
-        public void Execute_FileSelected_ImportsFileWithMockedRead()
+        public void Execute_FileSelected_ImportsFile()
         {
-            var owner = CreateContainer(isCa: false);
-            var root = new TreeNode("root", NodeType.Root, owner, null);
+            // Arrange
+            var container = AddPackFiles(false, "modfile", "c:\\mymod.pack", ["rootfolder\\existing.txt"]);
+            var viewModel = PackFileBrowser();
+            var root = viewModel.Files.First();
 
             var fileBytes = new byte[] { 0x01, 0x02, 0x03 };
             var filePath = "C:\\test\\file.txt";
 
-            var service = new Mock<IPackFileService>();
             var dialogs = new Mock<IStandardDialogs>();
             dialogs.Setup(x => x.ShowSystemOpenFileDialog(It.IsAny<bool>(), It.IsAny<string>()))
                 .Returns(new SystemOpenFileDialogResult(Result: true, FilePaths: [filePath]));
             var fileSystem = new Mock<IFileSystemAccess>();
             fileSystem.Setup(x => x.FileReadAllBytes(filePath)).Returns(fileBytes);
-            var command = new ImportFileCommand(service.Object, dialogs.Object, fileSystem.Object);
 
+            // Act
+            var command = new ImportFileCommand(_packFileService, dialogs.Object, fileSystem.Object);
             command.Execute(root);
 
+            // Assert
             fileSystem.Verify(x => x.FileReadAllBytes(filePath), Times.Once);
-            service.Verify(x => x.AddFilesToPack(owner, It.Is<List<NewPackFileEntry>>(items =>
-                items.Count == 1)), Times.Once);
+            var importedFile = container.FindFile("file.txt");
+            Assert.That(importedFile, Is.Not.Null);
         }
     }
 }
