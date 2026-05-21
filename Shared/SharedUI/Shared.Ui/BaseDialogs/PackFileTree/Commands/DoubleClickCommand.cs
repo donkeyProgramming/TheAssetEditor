@@ -11,7 +11,7 @@ namespace Shared.Ui.BaseDialogs.PackFileTree.Commands
 {
     public class DoubleClickCommand(IPackFileService packFileService, IWindowsKeyboard windowKeyboard) : IUiCommand
     {
-        private const int MaxExpandCount = 200;
+        public int MaxExpandCount { get; set; } = 200;
 
         public void Execute(TreeNode? node, TreeNode? selectedItem, Action<TreeNode> setSelectedItem, Action<PackFile> openFile)
         {
@@ -34,7 +34,7 @@ namespace Shared.Ui.BaseDialogs.PackFileTree.Commands
 
                 if (windowKeyboard.IsKeyDown(Key.LeftCtrl))
                 {
-                    var numChildren = targetNode.EnumerateFileNodesDepthFirst().Take(MaxExpandCount + 1).Count();
+                    var numChildren = targetNode.EnumerateFileNodesDepthFirst().Where(n => n.IsVisible).Take(MaxExpandCount + 1).Count();
                     if (numChildren < MaxExpandCount)
                         targetNode.ExpandIfVisible(true);
                 }

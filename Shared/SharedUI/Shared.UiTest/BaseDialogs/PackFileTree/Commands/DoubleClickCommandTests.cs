@@ -98,6 +98,33 @@ namespace Shared.UiTest.BaseDialogs.PackFileTree.Commands
         }
 
         [Test]
+        public void CtrlDoubleClickDirectory_OnlyCountsVisibleNodes()
+        {
+            AddPackFiles(false, "myPack", @"c:\myPack.pack",
+                @"foldera\file1.txt",
+                @"foldera\file2.txt",
+                @"foldera\file3.txt");
+
+            var browser = PackFileBrowser();
+            var root = browser.Files[0];
+            var folderA = PackFileBrowserViewModelTestHelper.GetFromPath(root, "foldera");
+            Assert.That(folderA, Is.Not.Null);
+
+            // Hide two of the three files
+            var file2 = PackFileBrowserViewModelTestHelper.GetFromPath(root, @"foldera\file2.txt");
+            var file3 = PackFileBrowserViewModelTestHelper.GetFromPath(root, @"foldera\file3.txt");
+            file2!.IsVisible = false;
+            file3!.IsVisible = false;
+
+            // Use a command with MaxExpandCount effectively = 2 (only 1 visible file, under threshold)
+            _keyboard.SetKeyDown(Key.LeftCtrl, true);
+            _command.Execute(folderA, root, _ => { }, _ => { });
+
+            // Should expand because only 1 visible file node (below MaxExpandCount of 200)
+            Assert.That(folderA!.IsNodeExpanded, Is.True);
+        }
+
+        [Test]
         public void NullNode_WithNullSelectedItem_DoesNothing()
         {
             PackFile? openedFile = null;
@@ -107,6 +134,37 @@ namespace Shared.UiTest.BaseDialogs.PackFileTree.Commands
 
             Assert.That(openedFile, Is.Null);
             Assert.That(selected, Is.Null);
+        }
+
+        [Test]
+        public void CtrlDoubleClickDirectory_DoesNotExpandWhenOverMaxCount()
+        {
+            AddPackFiles(false, "myPack", @"c:\myPack.pack",
+                @"foldera\folderb\file01.txt",
+                @"foldera\folderb\file02.txt",
+                @"foldera\folderb\file03.txt",
+                @"foldera\folderb\file04.txt",
+                @"foldera\folderb\file05.txt",
+                @"foldera\folderb\file06.txt",
+                @"foldera\folderb\file07.txt",
+                @"foldera\folderb\file08.txt",
+                @"foldera\folderb\file09.txt",
+                @"foldera\folderb\file10.txt",
+                @"foldera\folderb\file11.txt");
+
+            var browser = PackFileBrowser();
+            var root = browser.Files[0];
+            var folderA = PackFileBrowserViewModelTestHelper.GetFromPath(root, "foldera");
+            var folderB = PackFileBrowserViewModelTestHelper.GetFromPath(root, @"foldera\folderb");
+            Assert.That(folderA, Is.Not.Null);
+            Assert.That(folderB, Is.Not.Null);
+
+            _command.MaxExpandCount = 10;
+            _keyboard.SetKeyDown(Key.LeftCtrl, true);
+            _command.Execute(folderA, root, _ => { }, _ => { });
+
+            Assert.That(folderA!.IsNodeExpanded, Is.True, "FolderA should toggle expanded on double-click");
+            Assert.That(folderB!.IsNodeExpanded, Is.False, "FolderB should NOT expand because file count exceeds MaxExpandCount");
         }
     }
 }
