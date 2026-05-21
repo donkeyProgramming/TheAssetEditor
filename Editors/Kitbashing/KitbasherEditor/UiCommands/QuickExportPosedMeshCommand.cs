@@ -22,7 +22,7 @@ namespace Editors.KitbasherEditor.UiCommands
 
         private readonly AnimationsContainerComponent _animationsContainerComponent;
         private readonly SelectionManager _selectionManager;
-        private readonly CommandFactory _commandFactory;
+        private readonly IUiCommandFactory _commandFactory;
         private readonly SceneManager _sceneManager;
         private readonly SaveService _saveService;
         private readonly GeometrySaveSettings _saveSettings;
@@ -31,7 +31,7 @@ namespace Editors.KitbasherEditor.UiCommands
         public QuickExportPosedMeshCommand(
             AnimationsContainerComponent animationsContainerComponent,
             SelectionManager selectionManager,
-            CommandFactory commandFactory,
+            IUiCommandFactory commandFactory,
             SceneManager sceneManager,
             SaveService saveService,
             GeometrySaveSettings saveSettings,

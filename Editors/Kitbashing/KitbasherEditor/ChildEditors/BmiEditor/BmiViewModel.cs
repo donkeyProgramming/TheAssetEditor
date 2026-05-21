@@ -12,7 +12,7 @@ namespace KitbasherEditor.ViewModels.BmiEditor
     public class BmiViewModel : NotifyPropertyChangedImpl
     {
         Rmv2MeshNode _meshNode;
-        private readonly CommandFactory _commandFactory;
+        private readonly IUiCommandFactory _commandFactory;
         GameSkeleton _skeleton;
 
         public ObservableCollection<SkeletonBoneNode> Bones { get; set; } = new ObservableCollection<SkeletonBoneNode>();
@@ -37,7 +37,7 @@ namespace KitbasherEditor.ViewModels.BmiEditor
             set { SetAndNotify(ref _scaleFactor, value); }
         }
 
-        public BmiViewModel(CommandFactory commandFactory)
+        public BmiViewModel(IUiCommandFactory commandFactory)
         {
             _commandFactory = commandFactory;
         }

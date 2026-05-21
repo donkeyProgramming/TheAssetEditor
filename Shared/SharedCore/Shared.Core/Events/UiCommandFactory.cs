@@ -4,6 +4,7 @@ namespace Shared.Core.Events
 {
     public interface IAeCommand
     {
+     
     }
 
     public interface IAeUndoCommandCommand : IAeCommand
@@ -14,44 +15,21 @@ namespace Shared.Core.Events
         bool IsMutation { get; }
     }
 
-
-    public record CommandStackChangedEvent(string HintText, bool IsMutation);
-    public record CommandStackUndoEvent(string HintText);
-
-
-
-    public class CommandFactory
-    {
-        private readonly IServiceProvider _serviceProvider;
-        private readonly CommandManager _commandExecutor;
-
-        public CommandFactory(IServiceProvider serviceProvider, CommandManager commandExecutor)
-        {
-            _serviceProvider = serviceProvider;
-            _commandExecutor = commandExecutor;
-        }
-
-        public CommandBuilder<T> CreateWithBuilder<T>() where T : IAeUndoCommandCommand
-        {
-            var instance = _serviceProvider.GetRequiredService<T>();
-            return new CommandBuilder<T>(_commandExecutor, instance); ;
-        }
-    }
-
     public interface IUiCommandFactory
     {
         T Create<T>(Action<T>? configure = null) where T : IAeCommand;
+        CommandBuilder<T> CreateWithBuilder<T>() where T : IAeUndoCommandCommand;
     }
-
-
 
     public class UiCommandFactory : IUiCommandFactory
     {
         private readonly IServiceProvider _serviceProvider;
+        private readonly CommandManager _commandManager;
 
-        public UiCommandFactory(IServiceProvider serviceProvider)
+        public UiCommandFactory(IServiceProvider serviceProvider, CommandManager manager)
         {
             _serviceProvider = serviceProvider;
+            _commandManager = manager;
         }
 
         public T Create<T>(Action<T>? configure = null) where T : IAeCommand
@@ -59,6 +37,12 @@ namespace Shared.Core.Events
             var instance = _serviceProvider.GetRequiredService<T>();
             configure?.Invoke(instance);
             return instance;
+        }
+
+        public CommandBuilder<T> CreateWithBuilder<T>() where T : IAeUndoCommandCommand
+        {
+            var instance = _serviceProvider.GetRequiredService<T>();
+            return new CommandBuilder<T>(_commandManager, instance); ;
         }
     }
 }

@@ -29,13 +29,13 @@ namespace GameWorld.Core.Components.Gizmo
 
         List<MeshObject> _effectedObjects;
         List<int> _selectedBones;
-        private readonly CommandFactory _commandFactory;
+        private readonly IUiCommandFactory _commandFactory;
         ISelectionState _selectionState;
 
         Matrix _totalGizomTransform = Matrix.Identity;
         bool _invertedWindingOrder = false;
 
-        public TransformGizmoWrapper(CommandFactory commandFactory, List<MeshObject> effectedObjects, ISelectionState vertexSelectionState)
+        public TransformGizmoWrapper(IUiCommandFactory commandFactory, List<MeshObject> effectedObjects, ISelectionState vertexSelectionState)
         {
             _commandFactory = commandFactory;
             _selectionState = vertexSelectionState;
@@ -60,7 +60,7 @@ namespace GameWorld.Core.Components.Gizmo
             }
         }
 
-        public TransformGizmoWrapper(CommandFactory commandFactory, List<int> selectedBones, BoneSelectionState boneSelectionState)
+        public TransformGizmoWrapper(IUiCommandFactory commandFactory, List<int> selectedBones, BoneSelectionState boneSelectionState)
         {
             _commandFactory = commandFactory;
             _selectionState = boneSelectionState;
@@ -300,7 +300,7 @@ namespace GameWorld.Core.Components.Gizmo
             return Position;
         }
 
-        public static TransformGizmoWrapper CreateFromSelectionState(ISelectionState state, CommandFactory commandFactory)
+        public static TransformGizmoWrapper CreateFromSelectionState(ISelectionState state, IUiCommandFactory commandFactory)
         {
             if (state is ObjectSelectionState objectSelectionState)
             {

@@ -18,7 +18,7 @@ namespace Editors.KitbasherEditor.UiCommands
         private readonly SelectionManager _selectionManager;
         private readonly SceneManager _sceneManager;
         private readonly IStandardDialogs _dialogProvider;
-        private readonly CommandFactory _commandFactory;
+        private readonly IUiCommandFactory _commandFactory;
 
         public string ToolTip { get; set; } = "Assign a already know material to selected objects";
 
@@ -26,7 +26,7 @@ namespace Editors.KitbasherEditor.UiCommands
 
         public Hotkey? HotKey => null;
 
-        public AssignMaterialFromOtherMeshUiCommand(SelectionManager selectionManager, SceneManager sceneManager, IStandardDialogs dialogProvider, CommandFactory commandFactory)
+        public AssignMaterialFromOtherMeshUiCommand(SelectionManager selectionManager, SceneManager sceneManager, IStandardDialogs dialogProvider, IUiCommandFactory commandFactory)
         {
             _selectionManager = selectionManager;
             _sceneManager = sceneManager;

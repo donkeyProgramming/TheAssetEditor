@@ -21,7 +21,7 @@ namespace GameWorld.Core.Components.Gizmo
         private readonly ArcBallCamera _camera;
         private readonly RenderEngineComponent _resourceLibary;
         private readonly IDeviceResolver _deviceResolverComponent;
-        private readonly CommandFactory _commandFactory;
+        private readonly IUiCommandFactory _commandFactory;
         private readonly IGraphicsResourceCreator _graphicsResourceCreator;
         Gizmo _gizmo;
         bool _isEnabled = false;
@@ -31,7 +31,7 @@ namespace GameWorld.Core.Components.Gizmo
 
         public GizmoComponent(IEventHub eventHub,
             IKeyboardComponent keyboardComponent, IMouseComponent mouseComponent, ArcBallCamera camera, CommandManager commandExecutor,
-            RenderEngineComponent resourceLibary, IDeviceResolver deviceResolverComponent, CommandFactory commandFactory,
+            RenderEngineComponent resourceLibary, IDeviceResolver deviceResolverComponent, IUiCommandFactory commandFactory,
             SelectionManager selectionManager, IGraphicsResourceCreator graphicsResourceCreator)
         {
             UpdateOrder = (int)ComponentUpdateOrderEnum.Gizmo;

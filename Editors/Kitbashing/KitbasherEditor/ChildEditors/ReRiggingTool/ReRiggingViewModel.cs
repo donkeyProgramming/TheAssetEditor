@@ -8,10 +8,10 @@ namespace Editors.KitbasherEditor.ChildEditors.ReRiggingTool
 {
     public class ReRiggingViewModel : BoneMappingViewModel
     {
-        private readonly CommandFactory _commandFactory;
+        private readonly IUiCommandFactory _commandFactory;
         private List<Rmv2MeshNode> _selectedMeshes;
 
-        public ReRiggingViewModel(CommandFactory commandFactory, LocalizationManager localizationManager) : base(localizationManager)
+        public ReRiggingViewModel(IUiCommandFactory commandFactory, LocalizationManager localizationManager) : base(localizationManager)
         {
             _commandFactory = commandFactory;
         }

@@ -11,9 +11,9 @@ namespace GameWorld.Core.Services
 {
     public class FaceEditor
     {
-        private readonly CommandFactory _commandFactory;
+        private readonly IUiCommandFactory _commandFactory;
 
-        public FaceEditor(CommandFactory commandFactory)
+        public FaceEditor(IUiCommandFactory commandFactory)
         {
             _commandFactory = commandFactory;
         }

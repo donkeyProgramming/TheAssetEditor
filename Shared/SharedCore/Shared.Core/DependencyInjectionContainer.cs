@@ -30,7 +30,7 @@ namespace Shared.Core
             services.AddSingleton<TouchedFilesRecorder>();
             services.AddScoped<IUiCommandFactory, UiCommandFactory>();
             services.AddScoped<CommandManager>();
-            services.AddScoped<CommandFactory>();
+            
 
 
             services.AddScoped<IEventHub, LocalScopeEventHub>();

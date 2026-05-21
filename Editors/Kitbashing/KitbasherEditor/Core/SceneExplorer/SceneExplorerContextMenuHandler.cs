@@ -17,14 +17,14 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
     {
         private readonly IEventHub _eventHub;
         private readonly SceneManager _sceneManager;
-        private readonly CommandFactory _commandFactory;
+        private readonly IUiCommandFactory _commandFactory;
         private readonly SelectionManager _selectionManager;
         ISceneNode _activeNode;
         IEnumerable<ISceneNode> _activeNodes;
 
         [ObservableProperty] ObservableCollection<ContextMenuItem?> _items = [];
 
-        public SceneExplorerContextMenuHandler(IEventHub eventHub, SceneManager sceneManager, CommandFactory commandFactory, SelectionManager selectionManager)
+        public SceneExplorerContextMenuHandler(IEventHub eventHub, SceneManager sceneManager, IUiCommandFactory commandFactory, SelectionManager selectionManager)
         {
             _eventHub = eventHub;
             _sceneManager = sceneManager;

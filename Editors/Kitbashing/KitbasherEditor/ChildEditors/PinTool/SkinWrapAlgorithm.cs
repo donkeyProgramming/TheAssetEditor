@@ -19,11 +19,11 @@ namespace Editors.KitbasherEditor.ChildEditors.PinTool
         private readonly ILogger _logger = Logging.Create<SkinWrapAlgorithm>();
         private readonly IStandardDialogs _standardDialogs;
         private readonly SelectionManager _selectionManager;
-        private readonly CommandFactory _commandFactory;
+        private readonly IUiCommandFactory _commandFactory;
 
         [ObservableProperty] ObservableCollection<Rmv2MeshNode> _sourceMeshes = [];
 
-        public SkinWrapAlgorithm(CommandFactory commandFactory, IStandardDialogs standardDialogs, SelectionManager selectionManager)
+        public SkinWrapAlgorithm(IUiCommandFactory commandFactory, IStandardDialogs standardDialogs, SelectionManager selectionManager)
         {
             _commandFactory = commandFactory;
             _standardDialogs = standardDialogs;

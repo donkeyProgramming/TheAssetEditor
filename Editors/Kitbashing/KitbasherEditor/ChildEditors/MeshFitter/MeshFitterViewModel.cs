@@ -17,7 +17,7 @@ namespace Editors.KitbasherEditor.ChildEditors.MeshFitter
     {
         private const int PreviewFrameIndex = 0;
 
-        private readonly CommandFactory _commandFactory;
+        private readonly IUiCommandFactory _commandFactory;
         private readonly AnimationsContainerComponent _animationsContainerComponent;
         private readonly SceneManager _sceneManager;
         private bool _disposed;
@@ -40,7 +40,7 @@ namespace Editors.KitbasherEditor.ChildEditors.MeshFitter
         public Vector3ViewModel BonePositionOffset { get; set; } = new Vector3ViewModel(0, 0, 0);
         public Vector3ViewModel BoneRotationOffset { get; set; } = new Vector3ViewModel(0, 0, 0);
 
-        public MeshFitterViewModel(CommandFactory commandFactory, AnimationsContainerComponent animationsContainerComponent, SceneManager sceneManager, LocalizationManager localizationManager) : base(localizationManager)
+        public MeshFitterViewModel(IUiCommandFactory commandFactory, AnimationsContainerComponent animationsContainerComponent, SceneManager sceneManager, LocalizationManager localizationManager) : base(localizationManager)
         {
             _commandFactory = commandFactory;
             _animationsContainerComponent = animationsContainerComponent;

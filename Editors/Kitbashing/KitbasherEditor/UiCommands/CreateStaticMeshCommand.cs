@@ -18,10 +18,10 @@ namespace Editors.KitbasherEditor.UiCommands
 
         private readonly AnimationsContainerComponent _animationsContainerComponent;
         private readonly SelectionManager _selectionManager;
-        private readonly CommandFactory _commandFactory;
+        private readonly IUiCommandFactory _commandFactory;
         private readonly SceneManager _sceneManager;
 
-        public CreateStaticMeshCommand(AnimationsContainerComponent animationsContainerComponent, SelectionManager selectionManager, CommandFactory commandFactory, SceneManager sceneManager)
+        public CreateStaticMeshCommand(AnimationsContainerComponent animationsContainerComponent, SelectionManager selectionManager, IUiCommandFactory commandFactory, SceneManager sceneManager)
         {
             _animationsContainerComponent = animationsContainerComponent;
             _selectionManager = selectionManager;

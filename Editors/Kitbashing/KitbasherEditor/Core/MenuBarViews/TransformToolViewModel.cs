@@ -25,7 +25,7 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
 
         private readonly SelectionManager _selectionManager;
         private readonly CommandManager _commandExecutor;
-        private readonly CommandFactory _commandFactory;
+        private readonly IUiCommandFactory _commandFactory;
 
         public System.Windows.Input.ICommand ApplyCommand { get; set; }
 
@@ -46,7 +46,7 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
 
         public NotifyAttr<bool> ShowVertexFalloff { get; set; } = new NotifyAttr<bool>(false);
 
-        public TransformToolViewModel(SelectionManager selectionManager, CommandManager commandExecutor, CommandFactory commandFactory, IEventHub eventHub)
+        public TransformToolViewModel(SelectionManager selectionManager, CommandManager commandExecutor, IUiCommandFactory commandFactory, IEventHub eventHub)
         {
             ApplyCommand = new RelayCommand(ApplyTransform);
 

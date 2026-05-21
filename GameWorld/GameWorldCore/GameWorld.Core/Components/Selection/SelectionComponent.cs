@@ -30,7 +30,7 @@ namespace GameWorld.Core.Components.Selection
         private readonly ArcBallCamera _camera;
         private readonly SelectionManager _selectionManager;
         private readonly IDeviceResolver _deviceResolverComponent;
-        private readonly CommandFactory _commandFactory;
+        private readonly IUiCommandFactory _commandFactory;
         private readonly SceneManager _sceneManger;
         private readonly RenderEngineComponent _resourceLibrary;
         private readonly IGraphicsResourceCreator _graphicsResourceCreator;
@@ -38,7 +38,7 @@ namespace GameWorld.Core.Components.Selection
         public SelectionComponent(
             IMouseComponent mouseComponent, IKeyboardComponent keyboardComponent,
             ArcBallCamera camera, SelectionManager selectionManager,
-            IDeviceResolver deviceResolverComponent, CommandFactory commandFactory,
+            IDeviceResolver deviceResolverComponent, IUiCommandFactory commandFactory,
             SceneManager sceneManager, RenderEngineComponent resourceLibrary, IGraphicsResourceCreator graphicsResourceCreator)
         {
             _mouseComponent = mouseComponent;

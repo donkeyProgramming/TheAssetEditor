@@ -12,9 +12,9 @@ namespace GameWorld.Core.Services
 {
     public class ObjectEditor
     {
-        private readonly CommandFactory _commandFactory;
+        private readonly IUiCommandFactory _commandFactory;
 
-        public ObjectEditor(CommandFactory commandFactory)
+        public ObjectEditor(IUiCommandFactory commandFactory)
         {
             _commandFactory = commandFactory;
         }

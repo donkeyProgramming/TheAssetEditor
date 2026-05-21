@@ -9,13 +9,13 @@ namespace Editors.KitbasherEditor.UiCommands
 {
     public class ConstructBoxUiCommand : ITransientKitbasherUiCommand
     {
-        private readonly CommandFactory _commandFactory;
+        private readonly IUiCommandFactory _commandFactory;
 
         public string ToolTip { get; set; }
         public ActionEnabledRule EnabledRule => ActionEnabledRule.Always;
         public Hotkey? HotKey { get; } = null;
 
-        public ConstructBoxUiCommand(CommandFactory commandFactory, LocalizationManager localizationManager)
+        public ConstructBoxUiCommand(IUiCommandFactory commandFactory, LocalizationManager localizationManager)
         {
             _commandFactory = commandFactory;
             ToolTip = localizationManager.Get("KitbashTool.Debug.Geometry.CreateBox.Tooltip");

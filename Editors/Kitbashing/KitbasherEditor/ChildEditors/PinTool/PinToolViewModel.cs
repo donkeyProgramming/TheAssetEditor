@@ -22,7 +22,7 @@ namespace Editors.KitbasherEditor.ChildEditors.PinTool
     {
         private readonly ILogger _logger = Logging.Create<PinToolViewModel>();
         private readonly SelectionManager _selectionManager;
-        private readonly CommandFactory _commandFactory;
+        private readonly IUiCommandFactory _commandFactory;
         private readonly IStandardDialogs _standardDialogs;
 
         [ObservableProperty] PinRiggingAlgorithm _pinMode;
@@ -31,7 +31,7 @@ namespace Editors.KitbasherEditor.ChildEditors.PinTool
         [ObservableProperty] RiggingMode _selectedRiggingMode = RiggingMode.Pin;
         [ObservableProperty] ObservableCollection<Rmv2MeshNode> _affectedMeshCollection = [];
 
-        public PinToolViewModel(SelectionManager selectionManager, CommandFactory commandFactory, IStandardDialogs standardDialogs)
+        public PinToolViewModel(SelectionManager selectionManager, IUiCommandFactory commandFactory, IStandardDialogs standardDialogs)
         {
             _selectionManager = selectionManager;
             _commandFactory = commandFactory;

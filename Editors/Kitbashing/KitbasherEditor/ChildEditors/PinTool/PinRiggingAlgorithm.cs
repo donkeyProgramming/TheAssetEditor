@@ -18,13 +18,13 @@ namespace Editors.KitbasherEditor.ChildEditors.PinTool
         private readonly ILogger _logger = Logging.Create<PinRiggingAlgorithm>();
         private readonly IStandardDialogs _standardDialogs;
         private readonly SelectionManager _selectionManager;
-        private readonly CommandFactory _commandFactory;
+        private readonly IUiCommandFactory _commandFactory;
 
         [ObservableProperty] List<int> _selectedVertex = [];
         [ObservableProperty] Rmv2MeshNode? _selectedMesh;
         [ObservableProperty] string _description = "";
 
-        public PinRiggingAlgorithm(CommandFactory commandFactory, IStandardDialogs standardDialogs, SelectionManager selectionManager)
+        public PinRiggingAlgorithm(IUiCommandFactory commandFactory, IStandardDialogs standardDialogs, SelectionManager selectionManager)
         {
             _commandFactory = commandFactory;
             _standardDialogs = standardDialogs;

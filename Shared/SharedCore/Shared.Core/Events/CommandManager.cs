@@ -2,6 +2,9 @@
 
 namespace Shared.Core.Events
 {
+    public record CommandStackChangedEvent(string HintText, bool IsMutation);
+    public record CommandStackUndoEvent(string HintText);
+
     public class CommandManager
     {
         protected ILogger _logger = Logging.Create<CommandManager>();

@@ -45,8 +45,8 @@ namespace Editors.AnimationVisualEditors.AnimationKeyframeEditor
         public GizmoComponent GizmoComponent { get => _gizmoComponent; private set { _gizmoComponent = value; } }
         private GizmoComponent _gizmoComponent;
 
-        public CommandFactory CommandFactory { get => _commandFactory; private set { _commandFactory = value; } }
-        private CommandFactory _commandFactory;
+        public IUiCommandFactory CommandFactory { get => _commandFactory; private set { _commandFactory = value; } }
+        private IUiCommandFactory _commandFactory;
 
         public SelectionManager SelectionManager { get => _selectionManager; private set { _selectionManager = value; } }
         private SelectionManager _selectionManager;
@@ -166,7 +166,7 @@ namespace Editors.AnimationVisualEditors.AnimationKeyframeEditor
             SceneObjectViewModelBuilder sceneObjectViewModelBuilder,
             AnimationPlayerViewModel animationPlayerViewModel,
             SceneObjectEditor sceneObjectBuilder,
-            CommandFactory commandFactory,
+            IUiCommandFactory commandFactory,
             SelectionManager selectionManager,
             GizmoComponent gizmoComponent,
             CommandManager commandExecutor,
