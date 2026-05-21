@@ -5,6 +5,7 @@ using GameWorld.Core.Commands.Face;
 using GameWorld.Core.Commands.Object;
 using GameWorld.Core.Components.Selection;
 using GameWorld.Core.SceneNodes;
+using Shared.Core.Events;
 
 namespace GameWorld.Core.Services
 {

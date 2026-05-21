@@ -4,10 +4,12 @@ using GameWorld.Core.Components.Selection;
 using GameWorld.Core.Rendering.Geometry;
 using GameWorld.Core.SceneNodes;
 using Shared.Ui.Editors.BoneMapping;
+using Shared.Core.Events;
+
 
 namespace Editors.KitbasherEditor.ChildEditors.ReRiggingTool
 {
-    public class RemapBoneIndexesCommand : ICommand
+    public class RemapBoneIndexesCommand : IAeUndoCommandCommand
     {
         readonly SelectionManager _selectionManager;
 

@@ -8,7 +8,7 @@ using Shared.Core.Events;
 
 namespace AssetEditor.UiCommands
 {
-    public class OpenUpdaterWindowCommand(IServiceProvider serviceProvider) : IUiCommand
+    public class OpenUpdaterWindowCommand(IServiceProvider serviceProvider) : IAeCommand
     {
         private readonly IServiceProvider _serviceProvider = serviceProvider;
 

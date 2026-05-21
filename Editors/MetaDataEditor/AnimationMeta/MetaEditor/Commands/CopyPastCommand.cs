@@ -13,7 +13,7 @@ namespace Editors.AnimationMeta.MetaEditor.Commands
         public List<ParsedMetadataAttribute> Items { get; set; } = [];
     }
 
-    class CopyPastCommand : IUiCommand
+    class CopyPastCommand : IAeCommand
     {
         private readonly CopyPasteManager _copyPasteManager;
         private readonly IStandardDialogs _standardDialogs;

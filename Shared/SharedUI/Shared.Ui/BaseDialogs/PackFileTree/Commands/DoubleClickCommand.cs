@@ -9,7 +9,7 @@ using Shared.Ui.Common.MenuSystem;
 
 namespace Shared.Ui.BaseDialogs.PackFileTree.Commands
 {
-    public class DoubleClickCommand(IPackFileService packFileService, IWindowsKeyboard windowKeyboard) : IUiCommand
+    public class DoubleClickCommand(IPackFileService packFileService, IWindowsKeyboard windowKeyboard) : IAeCommand
     {
         public int MaxExpandCount { get; set; } = 200;
 

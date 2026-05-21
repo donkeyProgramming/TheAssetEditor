@@ -2,10 +2,11 @@
 using GameWorld.Core.SceneNodes;
 using Serilog;
 using Shared.Core.ErrorHandling;
+using Shared.Core.Events;
 
 namespace GameWorld.Core.Commands.Object
 {
-    public class DeleteObjectsCommand : ICommand
+    public class DeleteObjectsCommand : IAeUndoCommandCommand
     {
         private readonly ILogger _logger = Logging.Create<DeleteObjectsCommand>();
         private readonly SelectionManager _selectionManager;

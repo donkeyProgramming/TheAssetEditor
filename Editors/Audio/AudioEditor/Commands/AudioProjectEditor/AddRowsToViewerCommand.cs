@@ -11,7 +11,7 @@ namespace Editors.Audio.AudioEditor.Commands.AudioProjectEditor
     public class AddRowsToViewerCommand(
     IAudioEditorStateService audioEditorStateService,
     IAudioProjectMutationUICommandFactory audioProjectMutationUICommandFactory,
-    IEventHub eventHub) : IUiCommand
+    IEventHub eventHub) : IAeCommand
     {
         private readonly IAudioEditorStateService _audioEditorStateService = audioEditorStateService;
         private readonly IAudioProjectMutationUICommandFactory _audioProjectMutationUICommandFactory = audioProjectMutationUICommandFactory;

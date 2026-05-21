@@ -8,7 +8,7 @@ using Shared.GameFormats.Dat;
 
 namespace Editors.Reports.Audio
 {
-    public class GenerateDatDumperReportCommand(DatDumper generator) : IUiCommand
+    public class GenerateDatDumperReportCommand(DatDumper generator) : IAeCommand
     {
         public void Execute() => generator.Create();
     }

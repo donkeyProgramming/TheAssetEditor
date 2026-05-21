@@ -4,6 +4,7 @@ using GameWorld.Core.Commands.Object;
 using GameWorld.Core.Components;
 using GameWorld.Core.SceneNodes;
 using Microsoft.Xna.Framework;
+using Shared.Core.Events;
 using Shared.Core.Misc;
 using Shared.Core.Services;
 using Shared.GameFormats.Animation;

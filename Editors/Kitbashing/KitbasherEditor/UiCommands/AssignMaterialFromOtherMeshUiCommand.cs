@@ -6,6 +6,7 @@ using GameWorld.Core.Components;
 using GameWorld.Core.Components.Selection;
 using GameWorld.Core.Rendering.Materials.Capabilities;
 using GameWorld.Core.SceneNodes;
+using Shared.Core.Events;
 using Shared.Core.Services;
 using Shared.Ui.BaseDialogs.SelectionListDialog;
 using Shared.Ui.Common.MenuSystem;

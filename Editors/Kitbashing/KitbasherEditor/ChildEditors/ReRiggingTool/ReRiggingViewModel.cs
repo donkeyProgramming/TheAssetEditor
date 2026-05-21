@@ -1,5 +1,6 @@
-using GameWorld.Core.Commands;
+﻿using GameWorld.Core.Commands;
 using GameWorld.Core.SceneNodes;
+using Shared.Core.Events;
 using Shared.Core.Services;
 using Shared.Ui.Editors.BoneMapping;
 

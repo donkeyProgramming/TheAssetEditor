@@ -5,7 +5,7 @@ using Shared.Core.PackFiles.Utility;
 
 namespace AssetEditor.UiCommands
 {
-    public class OpenPackFileCommand : IUiCommand
+    public class OpenPackFileCommand : IAeCommand
     {
         private readonly IPackFileService _packFileService;
         private readonly IPackFileContainerLoader _packFileContainerLoader;

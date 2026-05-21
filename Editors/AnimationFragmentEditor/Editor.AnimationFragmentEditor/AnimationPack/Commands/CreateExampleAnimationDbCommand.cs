@@ -10,7 +10,7 @@ using Shared.GameFormats.AnimationPack;
 
 namespace Editors.AnimationFragmentEditor.AnimationPack.Commands
 {
-    public class CreateExampleAnimationDbCommand : IUiCommand
+    public class CreateExampleAnimationDbCommand : IAeCommand
     {
         private readonly IFileSaveService _saveHelper;
         private readonly IPackFileService _pfs;

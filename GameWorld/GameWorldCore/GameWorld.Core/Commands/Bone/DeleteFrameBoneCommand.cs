@@ -7,10 +7,11 @@ using System.Linq;
 using GameWorld.Core.Animation;
 using GameWorld.Core.Commands;
 using Microsoft.Xna.Framework;
+using Shared.Core.Events;
 
 namespace GameWorld.Core.Commands.Bone
 {
-    public class DeleteFrameBoneCommand : ICommand
+    public class DeleteFrameBoneCommand : IAeUndoCommandCommand
     {
         public string HintText => "duplicate/add frame";
 

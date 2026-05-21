@@ -13,7 +13,7 @@ using Shared.GameFormats.AnimationMeta.Parsing;
 
 namespace Editors.Reports.Animation
 {
-    public class GenerateMetaDataReportCommand(AnimMetaDataReportGenerator generator) : IUiCommand
+    public class GenerateMetaDataReportCommand(AnimMetaDataReportGenerator generator) : IAeCommand
     {
         public void Execute() => generator.Create();
     }

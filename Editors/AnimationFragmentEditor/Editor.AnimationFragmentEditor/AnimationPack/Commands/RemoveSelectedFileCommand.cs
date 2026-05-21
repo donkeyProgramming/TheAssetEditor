@@ -3,7 +3,7 @@ using Shared.Core.Events;
 
 namespace Editors.AnimationFragmentEditor.AnimationPack.Commands
 {
-    public class RemoveSelectedFileCommand : IUiCommand
+    public class RemoveSelectedFileCommand : IAeCommand
     {
         public void Execute(AnimPackViewModel editor)
         {

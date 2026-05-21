@@ -3,7 +3,7 @@ using Shared.Core.Events;
 
 namespace AssetEditor.UiCommands
 {
-    public class PrintScopesCommand : IUiCommand
+    public class PrintScopesCommand : IAeCommand
     {
         private readonly IScopeRepository _scopeRepository;
 

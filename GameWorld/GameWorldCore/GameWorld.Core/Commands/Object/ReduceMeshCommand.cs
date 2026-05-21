@@ -3,10 +3,11 @@ using GameWorld.Core.Components.Selection;
 using GameWorld.Core.Rendering.Geometry;
 using GameWorld.Core.SceneNodes;
 using GameWorld.Core.Services.SceneSaving.Lod.MeshDecimatorIntegration;
+using Shared.Core.Events;
 
 namespace GameWorld.Core.Commands.Object
 {
-    public class ReduceMeshCommand : ICommand
+    public class ReduceMeshCommand : IAeUndoCommandCommand
     {
         List<Rmv2MeshNode> _meshList;
         List<MeshObject> _originalGeometry = new List<MeshObject>();

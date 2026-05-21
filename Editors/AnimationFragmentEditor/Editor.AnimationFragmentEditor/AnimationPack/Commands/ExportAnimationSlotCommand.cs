@@ -5,7 +5,7 @@ using Shared.GameFormats.AnimationPack;
 
 namespace Editors.AnimationFragmentEditor.AnimationPack.Commands
 {
-    public class ExportAnimationSlotCommand : IUiCommand
+    public class ExportAnimationSlotCommand : IAeCommand
     {
         public void Warhammer3()
         {

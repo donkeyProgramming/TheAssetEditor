@@ -5,10 +5,11 @@ using GameWorld.Core.Components.Selection;
 using GameWorld.Core.SceneNodes;
 using GameWorld.Core.Utility;
 using Shared.Ui.Common;
+using Shared.Core.Events;
 
 namespace GameWorld.Core.Commands.Object
 {
-    public class CombineMeshCommand : ICommand
+    public class CombineMeshCommand : IAeUndoCommandCommand
     {
         List<ISelectable> _objectsToCombine;
         List<Rmv2MeshNode> _combinedMeshes = new List<Rmv2MeshNode>();

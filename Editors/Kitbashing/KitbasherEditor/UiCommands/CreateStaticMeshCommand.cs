@@ -4,6 +4,7 @@ using GameWorld.Core.Commands.Object;
 using GameWorld.Core.Components;
 using GameWorld.Core.Components.Selection;
 using GameWorld.Core.SceneNodes;
+using Shared.Core.Events;
 using Shared.Ui.Common.MenuSystem;
 using MessageBox = System.Windows.MessageBox;
 

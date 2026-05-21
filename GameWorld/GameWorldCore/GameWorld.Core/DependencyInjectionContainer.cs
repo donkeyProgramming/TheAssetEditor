@@ -130,9 +130,6 @@ namespace GameWorld.Core
 
         void RegisterCommands(IServiceCollection serviceCollection)
         {
-            serviceCollection.AddScoped<CommandExecutor>();
-            serviceCollection.AddScoped<CommandFactory>();
-
             serviceCollection.AddTransient<ConvertFacesToVertexSelectionCommand>();
             serviceCollection.AddTransient<FaceSelectionCommand>();
             serviceCollection.AddTransient<DuplicateFacesCommand>();

@@ -6,6 +6,7 @@ using GameWorld.Core.Components.Selection;
 using GameWorld.Core.SceneNodes;
 using GameWorld.Core.Utility;
 using Shared.Core.ErrorHandling;
+using Shared.Core.Events;
 
 namespace GameWorld.Core.Services
 {

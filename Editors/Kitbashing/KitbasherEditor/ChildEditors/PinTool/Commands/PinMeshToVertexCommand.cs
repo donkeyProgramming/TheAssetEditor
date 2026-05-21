@@ -5,10 +5,11 @@ using GameWorld.Core.SceneNodes;
 using Microsoft.Xna.Framework;
 using Serilog;
 using Shared.Core.ErrorHandling;
+using Shared.Core.Events;
 
 namespace Editors.KitbasherEditor.ChildEditors.PinTool.Commands
 {
-    public class PinMeshToVertexCommand : ICommand
+    public class PinMeshToVertexCommand : IAeUndoCommandCommand
     {
         private readonly ILogger _logger = Logging.Create<PinMeshToVertexCommand>();
         private readonly SelectionManager _selectionManager;

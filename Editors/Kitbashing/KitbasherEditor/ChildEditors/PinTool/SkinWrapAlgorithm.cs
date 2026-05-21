@@ -8,6 +8,7 @@ using GameWorld.Core.SceneNodes;
 using Microsoft.Xna.Framework;
 using Serilog;
 using Shared.Core.ErrorHandling;
+using Shared.Core.Events;
 using Shared.Core.Services;
 using Shared.GameFormats.RigidModel;
 

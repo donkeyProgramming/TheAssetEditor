@@ -9,7 +9,7 @@ using Shared.Core.Events;
 
 namespace Editors.Audio.AudioEditor.Commands.AudioFilesExplorer
 {
-    public class SetAudioFilesCommand(IAudioEditorStateService audioEditorStateService, IEventHub eventHub, IAudioRepository audioRepository) : IUiCommand
+    public class SetAudioFilesCommand(IAudioEditorStateService audioEditorStateService, IEventHub eventHub, IAudioRepository audioRepository) : IAeCommand
     {
         private readonly IAudioEditorStateService _audioEditorStateService = audioEditorStateService;
         private readonly IEventHub _eventHub = eventHub;

@@ -6,7 +6,7 @@ using Shared.Core.Services;
 
 namespace Editors.Audio.AudioEditor.Commands.Dialogs
 {
-    public class OpenMovieFileSelectionWindowCommand(IStandardDialogs standardDialogs, IEventHub eventHub, IPackFileService packFileService) : IUiCommand
+    public class OpenMovieFileSelectionWindowCommand(IStandardDialogs standardDialogs, IEventHub eventHub, IPackFileService packFileService) : IAeCommand
     {
         private readonly IStandardDialogs _standardDialogs = standardDialogs;
         private readonly IEventHub _eventHub = eventHub;

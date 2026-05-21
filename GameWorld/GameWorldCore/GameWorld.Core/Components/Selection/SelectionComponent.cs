@@ -11,6 +11,7 @@ using GameWorld.Core.Services;
 using GameWorld.Core.Utility;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Shared.Core.Events;
 using Keys = Microsoft.Xna.Framework.Input.Keys;
 using MouseButton = GameWorld.Core.Components.Input.MouseButton;
 

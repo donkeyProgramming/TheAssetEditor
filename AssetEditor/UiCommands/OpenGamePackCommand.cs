@@ -7,7 +7,7 @@ using Shared.Core.Settings;
 using Shared.Ui.Common;
 namespace AssetEditor.UiCommands
 {
-    internal class OpenGamePackCommand : IUiCommand
+    internal class OpenGamePackCommand : IAeCommand
     {
         private readonly IPackFileService _packFileService;
         private readonly IPackFileContainerLoader _packFileContainerLoader;

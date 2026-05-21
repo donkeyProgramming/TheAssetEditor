@@ -16,7 +16,7 @@ using Shared.GameFormats.AnimationPack.AnimPackFileTypes.Wh3;
 
 namespace Editors.Reports.Animation
 {
-    public class GenerateMetaJsonDataReportCommand(AnimMetaDataJsonGenerator generator) : IUiCommand
+    public class GenerateMetaJsonDataReportCommand(AnimMetaDataJsonGenerator generator) : IAeCommand
     {
         public void Execute() => generator.Create();
     }

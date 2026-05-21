@@ -1,9 +1,10 @@
 ﻿using System.Collections.Generic;
 using GameWorld.Core.Components.Selection;
+using Shared.Core.Events;
 
 namespace GameWorld.Core.Commands.Bone
 {
-    public class BoneSelectionCommand : ICommand
+    public class BoneSelectionCommand : IAeUndoCommandCommand
     {
         readonly SelectionManager _selectionManager;
         ISelectionState _oldState;
@@ -16,7 +17,7 @@ namespace GameWorld.Core.Commands.Bone
 
         public string HintText => "Select Bones";
 
-        bool ICommand.IsMutation => false;
+        bool IAeUndoCommandCommand.IsMutation => false;
 
         public void Configure(List<int> selectedBones, bool isAdd, bool isRemove)
         {

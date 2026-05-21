@@ -5,10 +5,11 @@
 using System.Collections.Generic;
 using GameWorld.Core.Animation;
 using GameWorld.Core.Commands;
+using Shared.Core.Events;
 
 namespace GameWorld.Core.Commands.Bone
 {
-    public class DuplicateFrameBoneCommand : ICommand
+    public class DuplicateFrameBoneCommand : IAeUndoCommandCommand
     {
         public string HintText => "duplicate/add frame";
 

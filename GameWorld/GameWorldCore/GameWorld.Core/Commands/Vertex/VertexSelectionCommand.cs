@@ -3,10 +3,11 @@ using GameWorld.Core.Components.Selection;
 using Serilog;
 using Shared.Core.ErrorHandling;
 using System.Collections.Generic;
+using Shared.Core.Events;
 
 namespace GameWorld.Core.Commands.Vertex
 {
-    public class VertexSelectionCommand : ICommand
+    public class VertexSelectionCommand : IAeUndoCommandCommand
     {
         ILogger _logger = Logging.Create<VertexSelectionCommand>();
         SelectionManager _selectionManager;

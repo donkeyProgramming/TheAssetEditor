@@ -6,7 +6,7 @@ using Shared.Core.ToolCreation;
 
 namespace Shared.Core.Events.Global
 {
-    public class OpenEditorCommand : IUiCommand
+    public class OpenEditorCommand : IAeCommand
     {
         private readonly IEditorManager _editorCreator;
         private readonly IPackFileService _packFileService;

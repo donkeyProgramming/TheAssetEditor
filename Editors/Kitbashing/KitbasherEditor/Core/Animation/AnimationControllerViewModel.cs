@@ -55,12 +55,12 @@ namespace Editors.KitbasherEditor.ViewModels
         public NotifyAttr<Visibility> AnimationControllerVisability { get; set; } = new NotifyAttr<Visibility>(Visibility.Collapsed);
 
 
-        public ICommand PausePlayCommand { get; set; }
-        public ICommand NextFrameCommand { get; set; }
-        public ICommand PrivFrameCommand { get; set; }
+        public System.Windows.Input.ICommand PausePlayCommand { get; set; }
+        public System.Windows.Input.ICommand NextFrameCommand { get; set; }
+        public System.Windows.Input.ICommand PrivFrameCommand { get; set; }
 
-        public ICommand FirstFrameCommand { get; set; }
-        public ICommand LastFrameCommand { get; set; }
+        public System.Windows.Input.ICommand FirstFrameCommand { get; set; }
+        public System.Windows.Input.ICommand LastFrameCommand { get; set; }
 
         bool _isEnabled;
         public bool IsEnabled { get { return _isEnabled; } set { SetAndNotify(ref _isEnabled, value); OnEnableChanged(IsEnabled); } }

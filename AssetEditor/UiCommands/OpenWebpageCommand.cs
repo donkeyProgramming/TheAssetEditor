@@ -3,7 +3,7 @@ using Shared.Core.Events;
 
 namespace AssetEditor.UiCommands
 {
-    public class OpenWebpageCommand : IUiCommand
+    public class OpenWebpageCommand : IAeCommand
     {
         public OpenWebpageCommand()
         {

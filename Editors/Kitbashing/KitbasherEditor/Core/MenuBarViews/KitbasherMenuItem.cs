@@ -3,7 +3,7 @@ using Shared.Ui.Common.MenuSystem;
 
 namespace Editors.KitbasherEditor.Core.MenuBarViews
 {
-    public interface IKitbasherUiCommand : IUiCommand
+    public interface IKitbasherUiCommand : IAeCommand
     {
         public string ToolTip { get; set; }
         public ActionEnabledRule EnabledRule { get; }

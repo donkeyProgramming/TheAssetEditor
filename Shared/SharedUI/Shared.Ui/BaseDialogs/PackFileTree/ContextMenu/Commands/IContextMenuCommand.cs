@@ -2,7 +2,7 @@
 
 namespace Shared.Ui.BaseDialogs.PackFileTree.ContextMenu.Commands
 {
-    public interface IContextMenuCommand : IUiCommand
+    public interface IContextMenuCommand : IAeCommand
     {
         public string GetDisplayName(TreeNode node);
         public bool ShouldAdd(TreeNode node);

@@ -7,10 +7,11 @@ using GameWorld.Core.Services;
 using Serilog;
 using Shared.Core.ErrorHandling;
 using Shared.Ui.Common;
+using Shared.Core.Events;
 
 namespace GameWorld.Core.Commands.Object
 {
-    public class DivideObjectIntoSubmeshesCommand : ICommand
+    public class DivideObjectIntoSubmeshesCommand : IAeUndoCommandCommand
     {
         readonly ILogger _logger = Logging.Create<FaceSelectionCommand>();
 

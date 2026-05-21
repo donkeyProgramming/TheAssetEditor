@@ -58,7 +58,7 @@ namespace Editors.KitbasherEditor.UiCommands
         }
     }
 
-    public class ImportReferenceMeshCommand : IUiCommand
+    public class ImportReferenceMeshCommand : IAeCommand
     {
         private readonly KitbashSceneCreator _kitbashSceneCreator;
         private readonly IPackFileService _packFileService;

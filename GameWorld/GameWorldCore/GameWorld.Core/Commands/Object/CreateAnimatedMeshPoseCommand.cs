@@ -4,10 +4,11 @@ using GameWorld.Core.SceneNodes;
 using Microsoft.Xna.Framework;
 using Shared.GameFormats.RigidModel;
 using System.Collections.Generic;
+using Shared.Core.Events;
 
 namespace GameWorld.Core.Commands.Object
 {
-    public class CreateAnimatedMeshPoseCommand : ICommand
+    public class CreateAnimatedMeshPoseCommand : IAeUndoCommandCommand
     {
         List<MeshObject> _originalGeometries;
 

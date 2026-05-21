@@ -6,7 +6,7 @@ using Shared.GameFormats.Wwise.Hirc;
 
 namespace Editors.Reports.Audio
 {
-    public class GenerateDialogueEventInfoPrinterReportCommand(DialogueEventInfoPrinter generator) : IUiCommand
+    public class GenerateDialogueEventInfoPrinterReportCommand(DialogueEventInfoPrinter generator) : IAeCommand
     {
         public void Execute() => generator.Create();
     }

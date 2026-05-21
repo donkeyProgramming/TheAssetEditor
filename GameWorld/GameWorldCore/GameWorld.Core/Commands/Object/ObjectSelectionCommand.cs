@@ -3,10 +3,11 @@ using GameWorld.Core.Components.Selection;
 using GameWorld.Core.SceneNodes;
 using Serilog;
 using Shared.Core.ErrorHandling;
+using Shared.Core.Events;
 
 namespace GameWorld.Core.Commands.Object
 {
-    public class ObjectSelectionCommand : ICommand
+    public class ObjectSelectionCommand : IAeUndoCommandCommand
     {
         private readonly ILogger _logger = Logging.Create<ObjectSelectionCommand>();
         private readonly SelectionManager _selectionManager;

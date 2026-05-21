@@ -1,11 +1,12 @@
 ﻿using GameWorld.Core.Commands;
 using GameWorld.Core.Components.Selection;
 using GameWorld.Core.SceneNodes;
+using Shared.Core.Events;
 
 namespace GameWorld.Core.Commands.Object
 {
 
-    public class ObjectSelectionModeCommand : ICommand
+    public class ObjectSelectionModeCommand : IAeUndoCommandCommand
     {
         SelectionManager _selectionManager;
 

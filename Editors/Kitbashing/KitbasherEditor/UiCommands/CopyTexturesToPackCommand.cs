@@ -4,7 +4,7 @@ using Shared.Core.PackFiles;
 
 namespace Editors.KitbasherEditor.UiCommands
 {
-    public class CopyTexturesToPackCommand : IUiCommand
+    public class CopyTexturesToPackCommand : IAeCommand
     {
         private readonly IPackFileService _packFileService;
 

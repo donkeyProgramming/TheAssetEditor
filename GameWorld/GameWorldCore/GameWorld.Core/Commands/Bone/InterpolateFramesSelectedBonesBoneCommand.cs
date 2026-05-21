@@ -1,10 +1,11 @@
 ﻿using System.Collections.Generic;
 using GameWorld.Core.Animation;
 using GameWorld.Core.Commands;
+using Shared.Core.Events;
 
 namespace GameWorld.Core.Commands.Bone
 {
-    public class InterpolateFramesSelectedBonesBoneCommand : ICommand
+    public class InterpolateFramesSelectedBonesBoneCommand : IAeUndoCommandCommand
     {
         public string HintText => "interpolates between 2 frames on selected bones";
 

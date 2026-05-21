@@ -3,10 +3,11 @@ using System.Linq;
 using GameWorld.Core.Commands;
 using GameWorld.Core.Components.Selection;
 using GameWorld.Core.SceneNodes;
+using Shared.Core.Events;
 
 namespace GameWorld.Core.Commands.Object
 {
-    public class GroupObjectsCommand : ICommand
+    public class GroupObjectsCommand : IAeUndoCommandCommand
     {
         SelectionManager _selectionManager;
         ISelectionState _oldState;
@@ -63,7 +64,7 @@ namespace GameWorld.Core.Commands.Object
         }
     }
 
-    public class UnGroupObjectsCommand : ICommand
+    public class UnGroupObjectsCommand : IAeUndoCommandCommand
     {
         SelectionManager _selectionManager;
         ISelectionState _oldState;
@@ -122,7 +123,7 @@ namespace GameWorld.Core.Commands.Object
         }
     }
 
-    public class AddObjectsToGroupCommand : ICommand
+    public class AddObjectsToGroupCommand : IAeUndoCommandCommand
     {
         ISelectionState _originalSelectionState;
 

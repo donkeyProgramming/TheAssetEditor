@@ -1,10 +1,11 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using GameWorld.Core.Components.Selection;
+using Shared.Core.Events;
 
 namespace GameWorld.Core.Commands.Face
 {
-    public class ConvertFacesToVertexSelectionCommand : ICommand
+    public class ConvertFacesToVertexSelectionCommand : IAeUndoCommandCommand
     {
         private readonly SelectionManager _selectionManager;
         FaceSelectionState _originalSelectionState;

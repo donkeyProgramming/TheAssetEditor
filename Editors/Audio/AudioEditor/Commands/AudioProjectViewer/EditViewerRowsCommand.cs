@@ -11,7 +11,7 @@ namespace Editors.Audio.AudioEditor.Commands.AudioProjectViewer
     public class EditViewerRowsCommand(
         IAudioEditorStateService audioEditorStateService,
         IUiCommandFactory uiCommandFactory,
-        IEventHub eventHub) : IUiCommand
+        IEventHub eventHub) : IAeCommand
     {
         private readonly IAudioEditorStateService _audioEditorStateService = audioEditorStateService;
         private readonly IUiCommandFactory _uiCommandFactory = uiCommandFactory;

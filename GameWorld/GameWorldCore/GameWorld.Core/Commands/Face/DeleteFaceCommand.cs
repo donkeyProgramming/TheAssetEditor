@@ -2,10 +2,11 @@
 using GameWorld.Core.Commands;
 using GameWorld.Core.Components.Selection;
 using GameWorld.Core.Rendering.Geometry;
+using Shared.Core.Events;
 
 namespace GameWorld.Core.Commands.Face
 {
-    public class DeleteFaceCommand : ICommand
+    public class DeleteFaceCommand : IAeUndoCommandCommand
     {
         FaceSelectionState _originalSelectionState;
         MeshObject _originalGeometry;

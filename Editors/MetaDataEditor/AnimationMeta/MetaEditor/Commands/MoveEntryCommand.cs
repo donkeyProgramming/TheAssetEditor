@@ -1,10 +1,10 @@
-using Editors.AnimationMeta.Presentation;
+﻿using Editors.AnimationMeta.Presentation;
 using Shared.Core.Events;
 using Shared.GameFormats.AnimationMeta.Parsing;
 
 namespace Editors.AnimationMeta.MetaEditor.Commands
 {
-    internal class MoveEntryCommand : IUiCommand
+    internal class MoveEntryCommand : IAeCommand
     {
         public void ExecuteUp(MetaDataEditorViewModel controller)
         {

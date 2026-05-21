@@ -2,19 +2,48 @@
 
 namespace Shared.Core.Events
 {
-    public interface IUiCommand
+    public interface IAeCommand
     {
     }
 
-    public interface IExecutableUiCommand : IUiCommand
+    public interface IAeUndoCommandCommand : IAeCommand
     {
-        public void Execute();
+        void Undo();
+        void Execute();
+        string HintText { get; }
+        bool IsMutation { get; }
+    }
+
+
+    public record CommandStackChangedEvent(string HintText, bool IsMutation);
+    public record CommandStackUndoEvent(string HintText);
+
+
+
+    public class CommandFactory
+    {
+        private readonly IServiceProvider _serviceProvider;
+        private readonly CommandExecutor _commandExecutor;
+
+        public CommandFactory(IServiceProvider serviceProvider, CommandExecutor commandExecutor)
+        {
+            _serviceProvider = serviceProvider;
+            _commandExecutor = commandExecutor;
+        }
+
+        public CommandBuilder<T> Create<T>() where T : IAeUndoCommandCommand
+        {
+            var instance = _serviceProvider.GetRequiredService<T>();
+            return new CommandBuilder<T>(_commandExecutor, instance); ;
+        }
     }
 
     public interface IUiCommandFactory
     {
-        T Create<T>(Action<T>? configure = null) where T : IUiCommand;
+        T Create<T>(Action<T>? configure = null) where T : IAeCommand;
     }
+
+
 
     public class UiCommandFactory : IUiCommandFactory
     {
@@ -25,13 +54,10 @@ namespace Shared.Core.Events
             _serviceProvider = serviceProvider;
         }
 
-        public T Create<T>(Action<T>? configure = null) where T : IUiCommand
+        public T Create<T>(Action<T>? configure = null) where T : IAeCommand
         {
             var instance = _serviceProvider.GetRequiredService<T>();
             configure?.Invoke(instance);
-
-            if (instance is IExecutableUiCommand executable)
-                executable.Execute();
             return instance;
         }
     }

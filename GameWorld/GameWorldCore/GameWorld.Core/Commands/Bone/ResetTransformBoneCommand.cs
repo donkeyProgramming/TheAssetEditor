@@ -4,10 +4,11 @@
 
 using GameWorld.Core.Animation;
 using GameWorld.Core.Commands;
+using Shared.Core.Events;
 
 namespace GameWorld.Core.Commands.Bone
 {
-    public class ResetTransformBoneCommand : ICommand
+    public class ResetTransformBoneCommand : IAeUndoCommandCommand
     {
         AnimationClip.KeyFrame _oldFrame;
         AnimationClip _originalAnimationClip;

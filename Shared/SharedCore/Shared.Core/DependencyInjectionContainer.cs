@@ -29,6 +29,10 @@ namespace Shared.Core
             services.AddSingleton<IScopeRepository, ScopeRepository>();
             services.AddSingleton<TouchedFilesRecorder>();
             services.AddScoped<IUiCommandFactory, UiCommandFactory>();
+            services.AddScoped<CommandExecutor>();
+            services.AddScoped<CommandFactory>();
+
+
             services.AddScoped<IEventHub, LocalScopeEventHub>();
             services.AddSingleton<IGlobalEventHub, SingletonScopeEventHub>();
             services.AddScoped<IExceptionService, ExceptionService>();

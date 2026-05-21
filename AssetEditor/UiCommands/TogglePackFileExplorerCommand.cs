@@ -4,7 +4,7 @@ using Shared.Core.Events;
 
 namespace AssetEditor.UiCommands
 {
-    public class TogglePackFileExplorerCommand : IUiCommand
+    public class TogglePackFileExplorerCommand : IAeCommand
     {
         private readonly MainViewModel _mainViewModel;
 

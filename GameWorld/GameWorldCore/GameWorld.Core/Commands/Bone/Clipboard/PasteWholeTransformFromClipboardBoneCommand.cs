@@ -8,6 +8,7 @@ using System.Text.Json.Serialization;
 using GameWorld.Core.Animation;
 using GameWorld.Core.Commands;
 using Microsoft.Xna.Framework;
+using Shared.Core.Events;
 
 namespace GameWorld.Core.Commands.Bone.Clipboard
 {
@@ -29,7 +30,7 @@ namespace GameWorld.Core.Commands.Bone.Clipboard
         }
     }
 
-    public class PasteWholeTransformFromClipboardBoneCommand : ICommand
+    public class PasteWholeTransformFromClipboardBoneCommand : IAeUndoCommandCommand
     {
         public string HintText => "Copy/paste bone transform from clipboard";
 

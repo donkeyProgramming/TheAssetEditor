@@ -4,10 +4,12 @@ using GameWorld.Core.Rendering.Materials.Shaders;
 using GameWorld.Core.SceneNodes;
 using Serilog;
 using Shared.Core.ErrorHandling;
+using Shared.Core.Events;
+
 
 namespace Editors.KitbasherEditor.Commands
 {
-    internal class AssignMaterialFromOtherMeshCommand : ICommand
+    internal class AssignMaterialFromOtherMeshCommand : IAeUndoCommandCommand
     {
         record MeshMaterialHistory(Rmv2MeshNode Mesh, CapabilityMaterial Material);
 

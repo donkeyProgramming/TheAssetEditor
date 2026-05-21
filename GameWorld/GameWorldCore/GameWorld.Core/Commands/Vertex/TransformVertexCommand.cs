@@ -3,11 +3,12 @@ using GameWorld.Core.Components.Selection;
 using GameWorld.Core.Rendering.Geometry;
 using Microsoft.Xna.Framework;
 using System.Collections.Generic;
+using Shared.Core.Events;
 
 namespace GameWorld.Core.Commands.Vertex
 {
 
-    public class TransformVertexCommand : ICommand
+    public class TransformVertexCommand : IAeUndoCommandCommand
     {
         List<MeshObject> _geometryList;
         public Vector3 PivotPoint;

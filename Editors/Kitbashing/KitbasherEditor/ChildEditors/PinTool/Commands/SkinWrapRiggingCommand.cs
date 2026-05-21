@@ -4,10 +4,12 @@ using GameWorld.Core.Rendering.Geometry;
 using GameWorld.Core.SceneNodes;
 using Serilog;
 using Shared.Core.ErrorHandling;
+using Shared.Core.Events;
+
 
 namespace Editors.KitbasherEditor.ChildEditors.PinTool.Commands
 {
-    public class SkinWrapRiggingCommand : ICommand
+    public class SkinWrapRiggingCommand : IAeUndoCommandCommand
     {
         private readonly ILogger _logger = Logging.Create<SkinWrapRiggingCommand>();
         private readonly SelectionManager _selectionManager;

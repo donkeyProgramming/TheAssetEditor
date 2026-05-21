@@ -9,7 +9,7 @@ using AnimationBinEntry = Shared.GameFormats.AnimationPack.AnimPackFileTypes.Wh3
 
 namespace Editors.AnimationFragmentEditor.AnimationPack.Commands
 {
-    public class CreateEmptyWarhammer3AnimSetFileCommand : IUiCommand
+    public class CreateEmptyWarhammer3AnimSetFileCommand : IAeCommand
     {
         public void Execute(AnimPackViewModel editor)
         {

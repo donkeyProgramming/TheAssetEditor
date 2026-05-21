@@ -6,7 +6,7 @@ using Shared.Core.Services;
 
 namespace Editor.CampaignAnimationCreator.CampaignAnimationCreator.Commands
 {
-    public class ConvertCampaignAnimationCommand(IStandardDialogs standardDialogs) : IUiCommand
+    public class ConvertCampaignAnimationCommand(IStandardDialogs standardDialogs) : IAeCommand
     {
         public bool Execute(AnimationClip? sourceAnimation, SkeletonBoneNode? rootBone, out AnimationClip? convertedAnimation)
         {

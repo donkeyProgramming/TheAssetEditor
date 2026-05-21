@@ -5,7 +5,7 @@ using Shared.Core.Events;
 
 namespace Editors.Audio.AudioEditor.Commands.Dialogs
 {
-    public class OpenNewAudioProjectWindowCommand(IServiceProvider serviceProvider) : IUiCommand
+    public class OpenNewAudioProjectWindowCommand(IServiceProvider serviceProvider) : IAeCommand
     {
         private readonly IServiceProvider _serviceProvider = serviceProvider;
 

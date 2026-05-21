@@ -6,7 +6,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace AssetEditor.UiCommands
 {
-    public class OpenSettingsDialogCommand : IUiCommand
+    public class OpenSettingsDialogCommand : IAeCommand
     {
         private readonly IServiceProvider _serviceProvider;
 

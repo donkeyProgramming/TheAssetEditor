@@ -1,4 +1,4 @@
-using System.Dynamic;
+﻿using System.Dynamic;
 using System.Globalization;
 using System.Windows;
 using CsvHelper;
@@ -12,7 +12,7 @@ using Shared.GameFormats.Bmd;
 
 namespace Editors.Reports.Bmd
 {
-    public class BmdReportCommand(BmdReportGenerator generator) : IUiCommand
+    public class BmdReportCommand(BmdReportGenerator generator) : IAeCommand
     {
         public void Execute() => generator.Create();
     }

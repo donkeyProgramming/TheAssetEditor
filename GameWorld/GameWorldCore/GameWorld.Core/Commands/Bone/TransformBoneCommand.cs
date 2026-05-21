@@ -6,11 +6,12 @@ using GameWorld.Core.Components.Gizmo;
 using GameWorld.Core.Components.Selection;
 using GameWorld.Core.SceneNodes;
 using Microsoft.Xna.Framework;
+using Shared.Core.Events;
 using static GameWorld.Core.Animation.AnimationClip;
 
 namespace GameWorld.Core.Commands.Bone
 {
-    public class TransformBoneCommand : ICommand
+    public class TransformBoneCommand : IAeUndoCommandCommand
     {
         List<int> _selectedBones;
         BoneSelectionState _boneSelectionState;

@@ -4,7 +4,7 @@ using Shared.Core.Events;
 
 namespace Editors.AnimationFragmentEditor.AnimationPack.Commands
 {
-    public class RenameSelectedFileCommand : IUiCommand
+    public class RenameSelectedFileCommand : IAeCommand
     { 
         public void Execute(AnimPackViewModel editor)
         {

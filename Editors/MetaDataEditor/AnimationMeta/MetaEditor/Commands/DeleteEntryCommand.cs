@@ -1,10 +1,10 @@
-using Editors.AnimationMeta.Presentation;
+﻿using Editors.AnimationMeta.Presentation;
 using Shared.Core.Events;
 using Shared.GameFormats.AnimationMeta.Parsing;
 
 namespace Editors.AnimationMeta.MetaEditor.Commands
 {
-    internal class DeleteEntryCommand : IUiCommand
+    internal class DeleteEntryCommand : IAeCommand
     {
         public void Execute(MetaDataEditorViewModel controller)
         {

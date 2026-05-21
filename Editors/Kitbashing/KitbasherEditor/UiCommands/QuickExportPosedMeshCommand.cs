@@ -1,21 +1,15 @@
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using Editors.ImportExport.Exporting;
+﻿using System.IO;
+using Editors.ImportExport.ContextMenu;
 using Editors.KitbasherEditor.Core.MenuBarViews;
-using GameWorld.Core.Commands;
 using GameWorld.Core.Commands.Object;
 using GameWorld.Core.Components;
 using GameWorld.Core.Components.Selection;
 using GameWorld.Core.SceneNodes;
 using GameWorld.Core.Services.SceneSaving;
-using Shared.Core.Misc;
-using Shared.Core.PackFiles;
+using Shared.Core.Events;
 using Shared.Core.PackFiles.Models;
-using Editors.ImportExport.ContextMenu;
-using Shared.Ui.Common.MenuSystem;
 using Shared.GameFormats.RigidModel;
+using Shared.Ui.Common.MenuSystem;
 using MessageBox = System.Windows.MessageBox;
 
 namespace Editors.KitbasherEditor.UiCommands

@@ -5,7 +5,7 @@ using Shared.Core.PackFiles.Models;
 
 namespace Editors.ImportExport.Exporting
 {
-    public class DisplayExportFileToolCommand : IUiCommand
+    public class DisplayExportFileToolCommand : IAeCommand
     {
         private readonly IAbstractFormFactory<ExportWindow> _exportWindowFactory;
 

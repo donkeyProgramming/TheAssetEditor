@@ -5,10 +5,11 @@
 using System.Collections.Generic;
 using GameWorld.Core.Animation;
 using GameWorld.Core.Commands;
+using Shared.Core.Events;
 
 namespace GameWorld.Core.Commands.Bone
 {
-    public class PasteWholeTransformBoneCommand : ICommand
+    public class PasteWholeTransformBoneCommand : IAeUndoCommandCommand
     {
         public string HintText => "Copy/paste bone transform";
 

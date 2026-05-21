@@ -10,7 +10,7 @@ using Shared.GameFormats.AnimationMeta.Parsing;
 
 namespace Editors.AnimationMeta.MetaEditor.Commands
 {
-    class SaveCommand : IUiCommand
+    class SaveCommand : IAeCommand
     {
         private readonly ILogger _logger = Logging.Create<SaveCommand>();
         private readonly IPackFileService _packFileService;

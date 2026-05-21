@@ -14,7 +14,7 @@ namespace Editors.Audio.AudioEditor.Commands.AudioProjectMutation
         Remove
     }
 
-    public interface IAudioProjectMutationUICommand : IUiCommand
+    public interface IAudioProjectMutationUICommand : IAeCommand
     {
         MutationType Action { get; }
         AudioProjectTreeNodeType NodeType { get; }

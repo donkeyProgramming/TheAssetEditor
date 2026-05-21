@@ -3,6 +3,7 @@ using GameWorld.Core.Animation;
 using GameWorld.Core.Commands;
 using GameWorld.Core.Commands.Object;
 using GameWorld.Core.SceneNodes;
+using Shared.Core.Events;
 using Shared.Core.Misc;
 using Shared.Ui.BaseDialogs.MathViews;
 

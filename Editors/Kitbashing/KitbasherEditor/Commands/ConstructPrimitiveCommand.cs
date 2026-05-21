@@ -1,4 +1,4 @@
-using GameWorld.Core.Animation;
+﻿using GameWorld.Core.Animation;
 using GameWorld.Core.Commands;
 using GameWorld.Core.Components;
 using GameWorld.Core.Components.Selection;
@@ -9,6 +9,8 @@ using GameWorld.Core.SceneNodes;
 using Microsoft.Xna.Framework;
 using Shared.GameFormats.RigidModel;
 using Shared.GameFormats.RigidModel.MaterialHeaders;
+using Shared.Core.Events;
+
 
 namespace Editors.KitbasherEditor.Commands
 {
@@ -19,7 +21,7 @@ namespace Editors.KitbasherEditor.Commands
         Sphere
     }
 
-    internal class ConstructPrimitiveCommand : ICommand
+    internal class ConstructPrimitiveCommand : IAeUndoCommandCommand
     {
         private readonly SceneManager _sceneManager;
         private readonly SelectionManager _selectionManager;

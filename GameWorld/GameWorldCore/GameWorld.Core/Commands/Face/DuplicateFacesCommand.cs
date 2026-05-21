@@ -1,10 +1,11 @@
 ﻿using System.Collections.Generic;
 using GameWorld.Core.Components.Selection;
 using GameWorld.Core.SceneNodes;
+using Shared.Core.Events;
 
 namespace GameWorld.Core.Commands.Face
 {
-    public class DuplicateFacesCommand : ICommand
+    public class DuplicateFacesCommand : IAeUndoCommandCommand
     {
         readonly SelectionManager _selectionManager;
 

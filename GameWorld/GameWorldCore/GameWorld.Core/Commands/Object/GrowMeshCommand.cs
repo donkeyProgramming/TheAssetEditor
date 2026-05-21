@@ -4,10 +4,11 @@ using GameWorld.Core.Rendering.Geometry;
 using GameWorld.Core.SceneNodes;
 using Microsoft.Xna.Framework;
 using System.Collections.Generic;
+using Shared.Core.Events;
 
 namespace GameWorld.Core.Commands.Object
 {
-    public class GrowMeshCommand : ICommand
+    public class GrowMeshCommand : IAeUndoCommandCommand
     {
         Rmv2MeshNode _node;
         float _factor;

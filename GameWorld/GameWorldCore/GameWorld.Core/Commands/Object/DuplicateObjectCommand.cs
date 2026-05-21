@@ -3,10 +3,11 @@ using GameWorld.Core.Components.Selection;
 using GameWorld.Core.SceneNodes;
 using Serilog;
 using Shared.Core.ErrorHandling;
+using Shared.Core.Events;
 
 namespace GameWorld.Core.Commands.Object
 {
-    public class DuplicateObjectCommand : ICommand
+    public class DuplicateObjectCommand : IAeUndoCommandCommand
     {
         readonly ILogger _logger = Logging.Create<FaceSelectionCommand>();
         List<ISceneNode> _objectsToCopy;

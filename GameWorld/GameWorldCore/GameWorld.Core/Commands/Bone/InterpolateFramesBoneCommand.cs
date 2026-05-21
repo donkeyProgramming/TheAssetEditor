@@ -1,9 +1,10 @@
 ﻿using GameWorld.Core.Animation;
 using GameWorld.Core.Commands;
+using Shared.Core.Events;
 
 namespace GameWorld.Core.Commands.Bone
 {
-    public class InterpolateFramesBoneCommand : ICommand
+    public class InterpolateFramesBoneCommand : IAeUndoCommandCommand
     {
         public string HintText => "interpolates between 2 frames";
 

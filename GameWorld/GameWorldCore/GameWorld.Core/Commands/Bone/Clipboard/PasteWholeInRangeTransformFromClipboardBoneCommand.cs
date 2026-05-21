@@ -7,10 +7,11 @@ using System.Collections.Generic;
 using System.Linq;
 using GameWorld.Core.Animation;
 using GameWorld.Core.Commands;
+using Shared.Core.Events;
 
 namespace GameWorld.Core.Commands.Bone.Clipboard
 {
-    public class PasteWholeInRangeTransformFromClipboardBoneCommand : ICommand
+    public class PasteWholeInRangeTransformFromClipboardBoneCommand : IAeUndoCommandCommand
     {
         public string HintText => "Copy/paste bone transform from clipboard";
 

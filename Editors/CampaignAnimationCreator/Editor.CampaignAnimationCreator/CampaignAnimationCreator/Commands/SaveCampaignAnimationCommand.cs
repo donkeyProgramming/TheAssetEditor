@@ -5,7 +5,7 @@ using Shared.GameFormats.Animation;
 
 namespace Editor.CampaignAnimationCreator.CampaignAnimationCreator.Commands
 {
-    public class SaveCampaignAnimationCommand(IFileSaveService fileSaveService, IStandardDialogs standardDialogs) : IUiCommand
+    public class SaveCampaignAnimationCommand(IFileSaveService fileSaveService, IStandardDialogs standardDialogs) : IAeCommand
     {
         private readonly IFileSaveService _fileSaveService = fileSaveService;
 

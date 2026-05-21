@@ -1,10 +1,11 @@
 ﻿using GameWorld.Core.Components.Selection;
 using Serilog;
 using Shared.Core.ErrorHandling;
+using Shared.Core.Events;
 
 namespace GameWorld.Core.Commands.Face
 {
-    public class FaceSelectionCommand : ICommand
+    public class FaceSelectionCommand : IAeUndoCommandCommand
     {
         ILogger _logger = Logging.Create<FaceSelectionCommand>();
         SelectionManager _selectionManager;

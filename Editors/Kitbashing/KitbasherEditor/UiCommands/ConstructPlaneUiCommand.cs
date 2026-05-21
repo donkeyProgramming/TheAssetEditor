@@ -1,6 +1,7 @@
-using Editors.KitbasherEditor.Commands;
+﻿using Editors.KitbasherEditor.Commands;
 using Editors.KitbasherEditor.Core.MenuBarViews;
 using GameWorld.Core.Commands;
+using Shared.Core.Events;
 using Shared.Core.Services;
 using Shared.Ui.Common.MenuSystem;
 

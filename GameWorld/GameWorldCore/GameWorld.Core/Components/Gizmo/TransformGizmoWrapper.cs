@@ -8,6 +8,7 @@ using GameWorld.Core.Services;
 using Microsoft.Xna.Framework;
 using Serilog;
 using Shared.Core.ErrorHandling;
+using Shared.Core.Events;
 
 namespace GameWorld.Core.Components.Gizmo
 {
@@ -24,7 +25,7 @@ namespace GameWorld.Core.Components.Gizmo
         Quaternion _orientation = Quaternion.Identity;
         public Quaternion Orientation { get => _orientation; set { _orientation = value; } }
 
-        ICommand _activeCommand;
+        IAeUndoCommandCommand _activeCommand;
 
         List<MeshObject> _effectedObjects;
         List<int> _selectedBones;

@@ -13,7 +13,7 @@ using Shared.GameFormats.RigidModel.MaterialHeaders;
 
 namespace Editors.Reports.Geometry
 {
-    public class Rmv2ReportCommand(Rmv2ReportGenerator generator) : IUiCommand
+    public class Rmv2ReportCommand(Rmv2ReportGenerator generator) : IAeCommand
     {
         public void Execute() => generator.Create();
     }

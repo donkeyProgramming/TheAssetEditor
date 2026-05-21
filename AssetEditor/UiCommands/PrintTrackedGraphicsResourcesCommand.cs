@@ -8,7 +8,7 @@ using Shared.Core.ToolCreation;
 
 namespace AssetEditor.UiCommands
 {
-    public class PrintTrackedGraphicsResourcesCommand : IUiCommand
+    public class PrintTrackedGraphicsResourcesCommand : IAeCommand
     {
         private readonly ILogger _logger = Logging.Create<PrintTrackedGraphicsResourcesCommand>();
         private readonly IScopeRepository _scopeRepository;

@@ -11,7 +11,7 @@ using Editors.ImportExport.Importing.Presentation;
 
 namespace Editors.ImportExport.Importing
 {
-    public class DisplayImportFileToolCommand : IUiCommand
+    public class DisplayImportFileToolCommand : IAeCommand
     {
         private readonly IEnumerable<IImporterViewModel> _importerViewModels;
         private readonly IAbstractFormFactory<ImportWindow> _importWindowFactory;

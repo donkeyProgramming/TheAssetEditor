@@ -14,7 +14,7 @@ using Shared.Core.Settings;
 
 namespace Editors.Reports.Files
 {
-    public class FileListReportCommand(FileListReportGenerator generator) : IUiCommand
+    public class FileListReportCommand(FileListReportGenerator generator) : IAeCommand
     {
         public void Execute() => generator.Create();
     }

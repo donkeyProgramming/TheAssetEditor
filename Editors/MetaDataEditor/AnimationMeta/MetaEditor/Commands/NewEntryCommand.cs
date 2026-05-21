@@ -7,7 +7,7 @@ using Editors.AnimationMeta.Presentation;
 
 namespace Editors.AnimationMeta.MetaEditor.Commands
 {
-    internal class NewEntryCommand : IUiCommand
+    internal class NewEntryCommand : IAeCommand
     {
         private readonly MetaDataFileParser _metaDataFileParser;
         private readonly IMetaDataDatabase _metaDataDatabase;

@@ -8,7 +8,7 @@ using Shared.GameFormats.WsModel;
 
 namespace Editors.Reports.Geometry
 {
-    public class MaterialReportCommand(MaterialReportGenerator generator) : IUiCommand
+    public class MaterialReportCommand(MaterialReportGenerator generator) : IAeCommand
     {
         public void Execute() => generator.Create();
     }

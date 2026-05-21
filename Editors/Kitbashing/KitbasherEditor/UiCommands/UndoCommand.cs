@@ -2,6 +2,7 @@
 using Shared.Ui.Common.MenuSystem;
 using GameWorld.Core.Services;
 using Editors.KitbasherEditor.Core.MenuBarViews;
+using Shared.Core.Events;
 
 namespace Editors.KitbasherEditor.UiCommands
 {

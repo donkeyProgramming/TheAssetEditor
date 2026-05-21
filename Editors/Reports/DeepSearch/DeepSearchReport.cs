@@ -11,7 +11,7 @@ using Shared.Core.PackFiles.Utility;
 namespace Editors.Reports.DeepSearch
 {
 
-    public class DeepSearchCommand(DeepSearchReport deepSearchReport) : IUiCommand
+    public class DeepSearchCommand(DeepSearchReport deepSearchReport) : IAeCommand
     {
         public void Execute()
         {
