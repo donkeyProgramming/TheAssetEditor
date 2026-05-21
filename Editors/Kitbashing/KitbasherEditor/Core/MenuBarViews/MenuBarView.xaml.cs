@@ -1,4 +1,5 @@
-﻿using Shared.Ui.Common.MenuSystem;
+﻿using Editors.KitbasherEditor.Core.MenuBarViews;
+using Shared.Ui.Common.MenuSystem;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -10,6 +11,9 @@ namespace KitbasherEditor.Views
     /// </summary>
     public partial class MenuBarView : UserControl
     {
+        private Window? _parentWindow;
+        private MenuBarKeyboardDispatcher? _dispatcher;
+
         public MenuBarView()
         {
             InitializeComponent();
@@ -17,42 +21,38 @@ namespace KitbasherEditor.Views
 
         private void UserControl_Loaded(object sender, RoutedEventArgs e)
         {
-            var window = Window.GetWindow(this);
-            if (window != null)
+            _parentWindow = Window.GetWindow(this);
+            _dispatcher = new MenuBarKeyboardDispatcher(
+                () => IsVisible,
+                () => DataContext as IKeyboardHandler);
+
+            if (_parentWindow != null)
             {
-                window.KeyUp += HandleKeyUp;
-                window.KeyDown += HandleKeyDown;
+                _parentWindow.KeyUp += HandleKeyUp;
+                _parentWindow.KeyDown += HandleKeyDown;
             }
         }
 
         private void UserControl_Unloaded(object sender, RoutedEventArgs e)
         {
-            var window = Window.GetWindow(this);
-            if (window != null)
+            if (_parentWindow != null)
             {
-                window.KeyUp -= HandleKeyUp;
-                window.KeyDown -= HandleKeyDown;
+                _parentWindow.KeyUp -= HandleKeyUp;
+                _parentWindow.KeyDown -= HandleKeyDown;
+                _parentWindow = null;
             }
+
+            _dispatcher = null;
         }
 
         private void HandleKeyUp(object sender, KeyEventArgs e)
         {
-            if (e.OriginalSource is TextBox && Keyboard.Modifiers == ModifierKeys.None)
-                return;
-
-            if (DataContext is IKeyboardHandler keyboardHandler)
-                keyboardHandler.OnKeyReleased(e.Key, e.SystemKey, Keyboard.Modifiers);
+            _dispatcher?.HandleKeyUp(e.Key, e.SystemKey, Keyboard.Modifiers, e.OriginalSource is TextBox);
         }
 
         private void HandleKeyDown(object sender, KeyEventArgs e)
         {
-            if (e.OriginalSource is TextBox && Keyboard.Modifiers == ModifierKeys.None)
-                return;
-
-            if (DataContext is IKeyboardHandler keyboardHandler)
-            {
-                keyboardHandler.OnKeyDown(e.Key, e.SystemKey, Keyboard.Modifiers);
-            }
+            _dispatcher?.HandleKeyDown(e.Key, e.SystemKey, Keyboard.Modifiers, e.OriginalSource is TextBox);
         }
     }
 }
