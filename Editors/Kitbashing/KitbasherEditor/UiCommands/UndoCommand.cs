@@ -12,9 +12,9 @@ namespace Editors.KitbasherEditor.UiCommands
         public ActionEnabledRule EnabledRule => ActionEnabledRule.Custom;
         public Hotkey? HotKey { get; } = new Hotkey(Key.Z, ModifierKeys.Control);
 
-        private readonly CommandExecutor _commandExecutor;
+        private readonly global::Shared.Core.Events.CommandManager _commandExecutor;
 
-        public UndoCommand(CommandExecutor commandExecutor)
+        public UndoCommand(global::Shared.Core.Events.CommandManager commandExecutor)
         {
             _commandExecutor = commandExecutor;
         }

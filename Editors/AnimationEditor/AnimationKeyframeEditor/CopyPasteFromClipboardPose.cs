@@ -99,7 +99,7 @@ namespace AnimationEditor.AnimationKeyframeEditor
                 {
                     _parent.NextFrame();
                 }
-                _parent.IsDirty.Value = _parent.CommandExecutor.CanUndo();
+                _parent.IsDirty.Value = _parent.CommandManager.CanUndo();
             }
             catch (JsonException)
             {
@@ -158,7 +158,7 @@ namespace AnimationEditor.AnimationKeyframeEditor
                 {
                     _parent.NextFrame();
                 }
-                _parent.IsDirty.Value = _parent.CommandExecutor.CanUndo();
+                _parent.IsDirty.Value = _parent.CommandManager.CanUndo();
             }
             catch (JsonException)
             {
@@ -210,7 +210,7 @@ namespace AnimationEditor.AnimationKeyframeEditor
                 {
                     _parent.NextFrame();
                 }
-                _parent.IsDirty.Value = _parent.CommandExecutor.CanUndo();
+                _parent.IsDirty.Value = _parent.CommandManager.CanUndo();
             }
             catch (JsonException)
             {
@@ -276,7 +276,7 @@ namespace AnimationEditor.AnimationKeyframeEditor
                 {
                     _parent.Rider.Player.CurrentFrame++;
                 }
-                _parent.IsDirty.Value = _parent.CommandExecutor.CanUndo();
+                _parent.IsDirty.Value = _parent.CommandManager.CanUndo();
             }
             catch (JsonException)
             {
@@ -343,7 +343,7 @@ namespace AnimationEditor.AnimationKeyframeEditor
                 {
                     _parent.NextFrame();
                 }
-                _parent.IsDirty.Value = _parent.CommandExecutor.CanUndo();
+                _parent.IsDirty.Value = _parent.CommandManager.CanUndo();
             }
             catch (JsonException)
             {
@@ -391,7 +391,7 @@ namespace AnimationEditor.AnimationKeyframeEditor
                 {
                     _parent.NextFrame();
                 }
-                _parent.IsDirty.Value = _parent.CommandExecutor.CanUndo();
+                _parent.IsDirty.Value = _parent.CommandManager.CanUndo();
             }
             catch (JsonException)
             {

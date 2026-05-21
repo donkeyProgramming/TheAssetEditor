@@ -17,7 +17,7 @@ namespace GameWorld.Core.Components.Gizmo
 
         private readonly IKeyboardComponent _keyboard;
         private readonly SelectionManager _selectionManager;
-        private readonly CommandExecutor _commandManager;
+        private readonly CommandManager _commandManager;
         private readonly ArcBallCamera _camera;
         private readonly RenderEngineComponent _resourceLibary;
         private readonly IDeviceResolver _deviceResolverComponent;
@@ -30,7 +30,7 @@ namespace GameWorld.Core.Components.Gizmo
 
 
         public GizmoComponent(IEventHub eventHub,
-            IKeyboardComponent keyboardComponent, IMouseComponent mouseComponent, ArcBallCamera camera, CommandExecutor commandExecutor,
+            IKeyboardComponent keyboardComponent, IMouseComponent mouseComponent, ArcBallCamera camera, CommandManager commandExecutor,
             RenderEngineComponent resourceLibary, IDeviceResolver deviceResolverComponent, CommandFactory commandFactory,
             SelectionManager selectionManager, IGraphicsResourceCreator graphicsResourceCreator)
         {

@@ -26,13 +26,13 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
         public TransformToolViewModel TransformTool { get; set; }
 
         private readonly IUiCommandFactory _uiCommandFactory;
-        private readonly CommandExecutor _commandExecutor;
+        private readonly Shared.Core.Events.CommandManager _commandExecutor;
         private readonly MenuItemVisibilityRuleEngine _menuItemVisibilityRuleEngine;
         private readonly ActionHotkeyHandler _hotKeyHandler = new ActionHotkeyHandler();
         private readonly LocalizationManager _localizationManager;
         private readonly Dictionary<Type, MenuAction> _uiCommands = new();
 
-        public MenuBarViewModel(CommandExecutor commandExecutor, IEventHub eventHub, MenuItemVisibilityRuleEngine menuItemVisibilityRuleEngine, TransformToolViewModel transformToolViewModel, IUiCommandFactory uiCommandFactory, LocalizationManager localizationManager)
+        public MenuBarViewModel(Shared.Core.Events.CommandManager commandExecutor, IEventHub eventHub, MenuItemVisibilityRuleEngine menuItemVisibilityRuleEngine, TransformToolViewModel transformToolViewModel, IUiCommandFactory uiCommandFactory, LocalizationManager localizationManager)
         {
             _commandExecutor = commandExecutor;
             _menuItemVisibilityRuleEngine = menuItemVisibilityRuleEngine;

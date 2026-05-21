@@ -51,8 +51,8 @@ namespace Editors.AnimationVisualEditors.AnimationKeyframeEditor
         public SelectionManager SelectionManager { get => _selectionManager; private set { _selectionManager = value; } }
         private SelectionManager _selectionManager;
 
-        public CommandExecutor CommandExecutor { get => _commandExecutor; private set { _commandExecutor = value; } }
-        private CommandExecutor _commandExecutor;
+        public CommandManager CommandManager { get => _commandExecutor; private set { _commandExecutor = value; } }
+        private CommandManager _commandExecutor;
         private readonly IFileSaveService _packFileSaveService;
         private SceneObject _newAnimation;
 
@@ -169,7 +169,7 @@ namespace Editors.AnimationVisualEditors.AnimationKeyframeEditor
             CommandFactory commandFactory,
             SelectionManager selectionManager,
             GizmoComponent gizmoComponent,
-            CommandExecutor commandExecutor,
+            CommandManager commandExecutor,
             IFileSaveService packFileSaveService)
         {
             _sceneObjectViewModelBuilder = sceneObjectViewModelBuilder;

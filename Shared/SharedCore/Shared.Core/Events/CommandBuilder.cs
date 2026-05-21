@@ -2,11 +2,11 @@
 {
     public class CommandBuilder<T> where T : IAeUndoCommandCommand
     {
-        private readonly CommandExecutor _commandExecutor;
+        private readonly CommandManager _commandExecutor;
         private readonly T _command;
         private bool _isUndoable = true;
 
-        public CommandBuilder(CommandExecutor commandExecutor, T command)
+        public CommandBuilder(CommandManager commandExecutor, T command)
         {
             _commandExecutor = commandExecutor;
             _command = command;

@@ -52,7 +52,7 @@ namespace AnimationEditor.AnimationKeyframeEditor
             {
                 _parent.NextFrame();
             }
-            _parent.IsDirty.Value = _parent.CommandExecutor.CanUndo();
+            _parent.IsDirty.Value = _parent.CommandManager.CanUndo();
         }
 
 
@@ -82,7 +82,7 @@ namespace AnimationEditor.AnimationKeyframeEditor
             {
                 _parent.NextFrame();
             }
-            _parent.IsDirty.Value = _parent.CommandExecutor.CanUndo();
+            _parent.IsDirty.Value = _parent.CommandManager.CanUndo();
         }
 
         public void PastePreviousEditedNodesIntoCurrentPose()
@@ -110,7 +110,7 @@ namespace AnimationEditor.AnimationKeyframeEditor
             {
                 _parent.NextFrame();
             }
-            _parent.IsDirty.Value = _parent.CommandExecutor.CanUndo();
+            _parent.IsDirty.Value = _parent.CommandManager.CanUndo();
         }
     }
 }

@@ -2,13 +2,13 @@
 
 namespace Shared.Core.Events
 {
-    public class CommandExecutor
+    public class CommandManager
     {
-        protected ILogger _logger = Logging.Create<CommandExecutor>();
+        protected ILogger _logger = Logging.Create<CommandManager>();
         private readonly Stack<IAeUndoCommandCommand> _commands = new Stack<IAeUndoCommandCommand>();
         private readonly IEventHub _eventHub;
 
-        public CommandExecutor(IEventHub eventHub)
+        public CommandManager(IEventHub eventHub)
         {
             _eventHub = eventHub;
         }

@@ -29,7 +29,7 @@ namespace Shared.Core
             services.AddSingleton<IScopeRepository, ScopeRepository>();
             services.AddSingleton<TouchedFilesRecorder>();
             services.AddScoped<IUiCommandFactory, UiCommandFactory>();
-            services.AddScoped<CommandExecutor>();
+            services.AddScoped<CommandManager>();
             services.AddScoped<CommandFactory>();
 
 

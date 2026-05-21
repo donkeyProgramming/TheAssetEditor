@@ -103,7 +103,7 @@ namespace GameWorld.Core.Components.Gizmo
             return average;
         }
 
-        public void Start(CommandExecutor commandManager)
+        public void Start(CommandManager commandManager)
         {
 
             if (_activeCommand is TransformVertexCommand transformVertexCommand)
@@ -138,7 +138,7 @@ namespace GameWorld.Core.Components.Gizmo
 
         }
 
-        public void Stop(CommandExecutor commandManager)
+        public void Stop(CommandManager commandManager)
         {
             if (_activeCommand is TransformVertexCommand transformVertexCommand)
             {

@@ -23,9 +23,9 @@ namespace Shared.Core.Events
     public class CommandFactory
     {
         private readonly IServiceProvider _serviceProvider;
-        private readonly CommandExecutor _commandExecutor;
+        private readonly CommandManager _commandExecutor;
 
-        public CommandFactory(IServiceProvider serviceProvider, CommandExecutor commandExecutor)
+        public CommandFactory(IServiceProvider serviceProvider, CommandManager commandExecutor)
         {
             _serviceProvider = serviceProvider;
             _commandExecutor = commandExecutor;

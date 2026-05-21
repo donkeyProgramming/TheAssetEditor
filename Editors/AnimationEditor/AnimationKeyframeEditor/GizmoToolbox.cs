@@ -46,7 +46,7 @@ namespace AnimationEditor.AnimationKeyframeEditor
 
         private void OnModifiedBonesEvent(BoneSelectionState state)
         {
-            _parent.IsDirty.Value = _parent.CommandExecutor.CanUndo();
+            _parent.IsDirty.Value = _parent.CommandManager.CanUndo();
 
             if (_modifiedFrameNr == state.CurrentFrame)
             {
@@ -63,7 +63,7 @@ namespace AnimationEditor.AnimationKeyframeEditor
 
         private void OnSelectionChanged(ISelectionState state, bool sendEvent)
         {
-            _parent.IsDirty.Value = _parent.CommandExecutor.CanUndo();
+            _parent.IsDirty.Value = _parent.CommandManager.CanUndo();
 
             if (state is BoneSelectionState boneSelectionState)
             {
