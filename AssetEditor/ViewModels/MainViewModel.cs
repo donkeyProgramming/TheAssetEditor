@@ -63,7 +63,7 @@ namespace AssetEditor.ViewModels
 
         [RelayCommand] private void Closing(IEditorInterface editor) 
         {
-            var hasUnsavedPackFiles = FileTree.Files.Any(node => node.UnsavedChanged);
+            var hasUnsavedPackFiles = FileTree.Files.Any(node => node.UnsavedChanges.HasChanges);
             if (EditorManager.ShouldBlockCloseCommand(editor, hasUnsavedPackFiles))
             {
                 IsClosingWithoutPrompt = true;

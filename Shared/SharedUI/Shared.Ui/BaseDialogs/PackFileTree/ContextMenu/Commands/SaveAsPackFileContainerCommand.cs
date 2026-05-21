@@ -46,8 +46,7 @@ namespace Shared.Ui.BaseDialogs.PackFileTree.ContextMenu.Commands
                     var gameInformation = GameInformationDatabase.GetGameById(applicationSettingsService.CurrentSettings.CurrentGame);
                     _logger.Here().Information($"Saving pack file container '{packDescription}' as '{saveDialogResult.FilePath}'");
                     packFileService.SavePackContainer(container, saveDialogResult.FilePath, false, gameInformation);
-                    _selectedNode.UnsavedChanged = false;
-                    _selectedNode.ForeachNode((node) => node.UnsavedChanged = false);
+                    (_selectedNode as RootTreeNode)?.UnsavedChanges.ClearAll();
                     _logger.Here().Information($"Saved pack file container '{packDescription}' as '{saveDialogResult.FilePath}'");
                 }
                 catch (Exception e)

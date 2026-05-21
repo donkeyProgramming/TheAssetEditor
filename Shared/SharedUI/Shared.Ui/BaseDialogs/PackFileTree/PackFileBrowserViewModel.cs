@@ -112,9 +112,10 @@ namespace Shared.Ui.BaseDialogs.PackFileTree
             if (nodeToDelete == null)
                 return;
 
+            root.UnsavedChanges.RemoveWithDescendants(nodeToDelete);
             PackFileTreeMutationService.RemoveNode(nodeToDelete);
 
-            root.UnsavedChanged = true;
+            root.UnsavedChanges.MarkChanged(root);
             Filter.Reapply();
         }
 
@@ -131,14 +132,7 @@ namespace Shared.Ui.BaseDialogs.PackFileTree
                 newLeafName = newPath.Substring(lastSep + 1);
 
             node.Name = newLeafName;
-            root.UnsavedChanged = true;
-            node.UnsavedChanged = true;
-            var parent = node.Parent;
-            while (parent != null && parent != root)
-            {
-                parent.UnsavedChanged = true;
-                parent = parent.Parent;
-            }
+            root.UnsavedChanges.MarkChangedWithAncestors(node, root);
             Filter.Reapply();
         }
 
@@ -146,14 +140,14 @@ namespace Shared.Ui.BaseDialogs.PackFileTree
         {
             var root = GetRootNode(e.Container);
 
-            root.ForeachNode((node) => node.UnsavedChanged = false);
+            root.UnsavedChanges.ClearAll();
             Filter.Reapply();
         }
 
         private void OnPackFileContainerFilesRemovedEvent(IPackFileContainer container, List<PackFile> files)
         {
             var root = GetRootNode(container);
-            root.UnsavedChanged = true;
+            root.UnsavedChanges.MarkChanged(root);
 
             foreach (var file in files)
             {
@@ -161,6 +155,7 @@ namespace Shared.Ui.BaseDialogs.PackFileTree
                 if (node == null)
                     continue;
 
+                root.UnsavedChanges.Remove(node);
                 PackFileTreeMutationService.RemoveNode(node);
             }
 
@@ -172,20 +167,12 @@ namespace Shared.Ui.BaseDialogs.PackFileTree
             foreach (var file in e.ChangedFiles)
             {
                 var root = GetRootNode(e.Container);
-                root.UnsavedChanged = true;
                 var node = GetNodeFromPackFile(e.Container, file, false) ?? FindRenamedFileNode(e.Container, file);
                 if (node == null)
                     continue;
 
                 node.Name = file.Name;
-                node.UnsavedChanged = true;
-
-                var parent = node.Parent;
-                while (parent != null && parent != root)
-                {
-                    parent.UnsavedChanged = true;
-                    parent = parent.Parent;
-                }
+                root.UnsavedChanges.MarkChangedWithAncestors(node, root);
             }
 
             Filter.Reapply();
@@ -212,7 +199,6 @@ namespace Shared.Ui.BaseDialogs.PackFileTree
         private void OnPackFileContainerFilesAddedEvent(IPackFileContainer container, List<PackFile> files)
         {
             var root = GetRootNode(container);
-            root.UnsavedChanged = true;
 
             foreach (var item in files)
             {
@@ -245,13 +231,7 @@ namespace Shared.Ui.BaseDialogs.PackFileTree
                     PackFileTreeMutationService.InsertChildSorted(folder, newNode);
                 }
 
-                newNode.UnsavedChanged = true;
-                var parent = newNode.Parent;
-                while (parent != null && parent != root)
-                {
-                    parent.UnsavedChanged = true;
-                    parent = parent.Parent;
-                }
+                root.UnsavedChanges.MarkChangedWithAncestors(newNode, root);
             }
 
             Filter.Reapply();
@@ -355,7 +335,7 @@ namespace Shared.Ui.BaseDialogs.PackFileTree
 
         public bool Drop(TreeNode node, TreeNode? targeNode) => DropHandler.Drop(node, targeNode, _packFileService);
 
-        private TreeNode GetRootNode(IPackFileContainer container)
+        private RootTreeNode GetRootNode(IPackFileContainer container)
         {
             foreach (var node in Files)
             {

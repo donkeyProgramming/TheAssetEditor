@@ -59,7 +59,7 @@ namespace Shared.UiTest.BaseDialogs.PackFileTree.ContextMenu.Commands
             var container = AddPackFiles(false, "modfile", "c:\\mymod.pack", ["rootfolder\\file.txt"]);
             var viewModel = PackFileBrowser();
             var root = viewModel.Files.First();
-            root.UnsavedChanged = true;
+            root.UnsavedChanges.MarkChanged(root);
 
             var dialogs = new Mock<IStandardDialogs>();
             dialogs.Setup(x => x.ShowSystemSaveFileDialog(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))

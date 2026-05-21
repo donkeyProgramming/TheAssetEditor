@@ -480,6 +480,32 @@ namespace Shared.UiTest.BaseDialogs.PackFileTree
         }
 
         [Test]
+        public void ContainerSaved_PropertyChangedReportsCorrectValue()
+        {
+            CreatePackfiles(("foldera\\file.txt", "file.txt"));
+            var root = _viewModel.Files[0];
+            var container = _packageFileService.GetAllPackfileContainers().Last(x => x.Name == "test.pack");
+
+            var newFile = PackFile.CreateFromASCII("new.txt", "data");
+            _packageFileService.AddFilesToPack(container, [new NewPackFileEntry("foldera", newFile)]);
+            Assert.That(root.UnsavedChanged, Is.True);
+
+            // Simulate what WPF does: read the property value inside PropertyChanged
+            bool? valueAtNotification = null;
+            root.PropertyChanged += (_, args) =>
+            {
+                if (args.PropertyName == nameof(TreeNode.UnsavedChanged))
+                    valueAtNotification = root.UnsavedChanged;
+            };
+
+            var eventHub = _runner.ServiceProvider.GetRequiredService<IEventHub>();
+            eventHub.PublishGlobalEvent(new Core.Events.Global.PackFileContainerSavedEvent(container));
+
+            Assert.That(valueAtNotification, Is.Not.Null, "PropertyChanged should have fired for UnsavedChanged");
+            Assert.That(valueAtNotification, Is.False, "UnsavedChanged should be false when PropertyChanged fires");
+        }
+
+        [Test]
         public void ContainerSaved_DoesNotForcePopulationOfUnloadedBranches()
         {
             CreatePackfiles(("foldera\\sub\\deep\\file.txt", "file.txt"));

@@ -19,6 +19,7 @@ namespace Shared.Ui.BaseDialogs.PackFileTree
     public partial class RootTreeNode : TreeNode
     {
         public IPackFileContainer Owner { get; }
+        public UnsavedChangesTracker UnsavedChanges { get; } = new();
 
         public RootTreeNode(string name, IPackFileContainer owner) : 
             base(name, NodeType.Root, null)
@@ -37,12 +38,15 @@ namespace Shared.Ui.BaseDialogs.PackFileTree
         public bool HasChildren => Children.Count > 0;
 
         [ObservableProperty] public partial ObservableCollection<TreeNode> Children { get; set; } = [];
-        [ObservableProperty] public partial bool UnsavedChanged { get; set; }
         [ObservableProperty] public partial bool IsMainEditabelPack { get; set; }
         [ObservableProperty] public partial bool IsVisible { get; set; } = true;
         [ObservableProperty] public partial string Name { get; set; }
         [ObservableProperty] public partial bool IsNodeExpanded { get; set; } = false;
         [ObservableProperty] public partial NodeType NodeType { get; private set; }
+
+        public bool UnsavedChanged => Utility.TreeNodeHelper.GetRootNode(this)?.UnsavedChanges.IsChanged(this) ?? false;
+
+        public void NotifyUnsavedChangedChanged() => OnPropertyChanged(nameof(UnsavedChanged));
 
         public TreeNode(string name, NodeType type, TreeNode? parent)
         {
