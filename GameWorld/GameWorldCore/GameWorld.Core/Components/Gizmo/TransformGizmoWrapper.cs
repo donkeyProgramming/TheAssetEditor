@@ -128,12 +128,12 @@ namespace GameWorld.Core.Components.Gizmo
             if (_selectionState is BoneSelectionState)
             {
                 _totalGizomTransform = Matrix.Identity;
-                _activeCommand = _commandFactory.Create<TransformBoneCommand>().Configure(x => x.Configure(_selectedBones, (BoneSelectionState)_selectionState)).Build();
+                _activeCommand = _commandFactory.CreateWithBuilder<TransformBoneCommand>().Configure(x => x.Configure(_selectedBones, (BoneSelectionState)_selectionState)).Build();
             }
             else
             {
                 _totalGizomTransform = Matrix.Identity;
-                _activeCommand = _commandFactory.Create<TransformVertexCommand>().Configure(x => x.Configure(_effectedObjects, Position)).Build();
+                _activeCommand = _commandFactory.CreateWithBuilder<TransformVertexCommand>().Configure(x => x.Configure(_effectedObjects, Position)).Build();
             }
 
         }

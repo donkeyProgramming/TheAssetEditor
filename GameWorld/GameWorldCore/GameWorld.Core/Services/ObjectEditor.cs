@@ -23,7 +23,7 @@ namespace GameWorld.Core.Services
         {
             var selection = objectSelectionState.CurrentSelection();
             if (selection.Count != 0)
-                _commandFactory.Create<DeleteObjectsCommand>().Configure(x => x.Configure(selection)).BuildAndExecute();
+                _commandFactory.CreateWithBuilder<DeleteObjectsCommand>().Configure(x => x.Configure(selection)).BuildAndExecute();
         }
 
         public void DuplicateObject(ObjectSelectionState objectSelectionState)
@@ -31,14 +31,14 @@ namespace GameWorld.Core.Services
             if (objectSelectionState.CurrentSelection().Count != 0)
             {
                 var objectsToCopy = objectSelectionState.CurrentSelection().Select(x => (ISceneNode)x).ToList();
-                _commandFactory.Create<DuplicateObjectCommand>().Configure(x => x.Configure(objectsToCopy)).BuildAndExecute();
+                _commandFactory.CreateWithBuilder<DuplicateObjectCommand>().Configure(x => x.Configure(objectsToCopy)).BuildAndExecute();
             }
         }
 
         public void DivideIntoSubmeshes(ObjectSelectionState objectSelectionState, bool combineOverlappingVertexes)
         {
             if (objectSelectionState.GetSingleSelectedObject() is IEditableGeometry drawableNode)
-                _commandFactory.Create<DivideObjectIntoSubmeshesCommand>().Configure(x => x.Configure(drawableNode, combineOverlappingVertexes)).BuildAndExecute();
+                _commandFactory.CreateWithBuilder<DivideObjectIntoSubmeshesCommand>().Configure(x => x.Configure(drawableNode, combineOverlappingVertexes)).BuildAndExecute();
         }
 
         public bool CombineMeshes(ObjectSelectionState objectSelectionState, out ErrorList errorMessages)
@@ -52,7 +52,7 @@ namespace GameWorld.Core.Services
             if (result)
             {
                 errorMessages = new ErrorList();
-                _commandFactory.Create<CombineMeshCommand>().Configure(x => x.Configure(objectSelectionState.SelectedObjects())).BuildAndExecute();
+                _commandFactory.CreateWithBuilder<CombineMeshCommand>().Configure(x => x.Configure(objectSelectionState.SelectedObjects())).BuildAndExecute();
             }
 
             return result;
@@ -61,7 +61,7 @@ namespace GameWorld.Core.Services
 
         public void ReduceMesh(List<Rmv2MeshNode> meshNodes, float factor, bool undoable)
         {
-            _commandFactory.Create<ReduceMeshCommand>()
+            _commandFactory.CreateWithBuilder<ReduceMeshCommand>()
                 .Configure(x => x.Configure(meshNodes, factor))
                 .IsUndoable(undoable)
                 .BuildAndExecute();
@@ -82,7 +82,7 @@ namespace GameWorld.Core.Services
             var numDifferentParents = parents.Distinct().Count();
             if (numDifferentParents == 1 && parents.First() is GroupNode groupNode && groupNode.IsUngroupable)
             {
-                _commandFactory.Create<UnGroupObjectsCommand>().Configure(x => x.Configure(parents.First().Parent, selectedObjects, groupNode)).BuildAndExecute();
+                _commandFactory.CreateWithBuilder<UnGroupObjectsCommand>().Configure(x => x.Configure(parents.First().Parent, selectedObjects, groupNode)).BuildAndExecute();
                 return;
             }
 
@@ -96,7 +96,7 @@ namespace GameWorld.Core.Services
 
                 var itemsInGroup = groupParent.Children;
                 var itemsToAdd = selectedObjects.Where(x => itemsInGroup.Contains(x) == false).ToList();
-                _commandFactory.Create<AddObjectsToGroupCommand>().Configure(x => x.Configure(groupParent, itemsToAdd)).BuildAndExecute();
+                _commandFactory.CreateWithBuilder<AddObjectsToGroupCommand>().Configure(x => x.Configure(groupParent, itemsToAdd)).BuildAndExecute();
                 return;
             }
 
@@ -106,7 +106,7 @@ namespace GameWorld.Core.Services
             if (parent is GroupNode parentGroupNode && parentGroupNode.IsUngroupable)
                 parent = parent.Parent;
 
-            _commandFactory.Create<GroupObjectsCommand>().Configure(x => x.Configure(parent, selectionState.CurrentSelection())).BuildAndExecute();
+            _commandFactory.CreateWithBuilder<GroupObjectsCommand>().Configure(x => x.Configure(parent, selectionState.CurrentSelection())).BuildAndExecute();
         }
 
         public void SortMeshes(ISceneNode node)

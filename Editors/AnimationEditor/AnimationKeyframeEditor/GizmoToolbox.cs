@@ -137,7 +137,7 @@ namespace AnimationEditor.AnimationKeyframeEditor
 
             if (selectableNode != null)
             {
-                _parent.CommandFactory.Create<ObjectSelectionCommand>().Configure(x => x.Configure(new List<ISelectable>() { selectableNode }, false, false)).BuildAndExecute();
+                _parent.CommandFactory.CreateWithBuilder<ObjectSelectionCommand>().Configure(x => x.Configure(new List<ISelectable>() { selectableNode }, false, false)).BuildAndExecute();
                 _parent.SelectionComponent.SetBoneSelectionMode();
                 _parent.Pause();
             }
@@ -181,7 +181,7 @@ namespace AnimationEditor.AnimationKeyframeEditor
                 selection.CurrentFrame = _parent.Rider.Player.CurrentFrame;
                 selection.SelectedBones.Clear();
             }
-            _parent.CommandFactory.Create<BoneSelectionCommand>().Configure(x => x.Configure(_previousSelectedBones, true, false)).BuildAndExecute();
+            _parent.CommandFactory.CreateWithBuilder<BoneSelectionCommand>().Configure(x => x.Configure(_previousSelectedBones, true, false)).BuildAndExecute();
             switch (_lastGizmoTool)
             {
                 case GizmoMode.Translate:

@@ -88,7 +88,7 @@ namespace AnimationEditor.AnimationKeyframeEditor
                     if (result == DialogResult.No) return;
                 }
 
-                _parent.CommandFactory.Create<PasteWholeInRangeTransformFromClipboardBoneCommand>().Configure(x => x.Configure(
+                _parent.CommandFactory.CreateWithBuilder<PasteWholeInRangeTransformFromClipboardBoneCommand>().Configure(x => x.Configure(
                     skeleton, 
                     parsedClipboardFrame,
                     _parent.Rider.AnimationClip, 
@@ -147,7 +147,7 @@ namespace AnimationEditor.AnimationKeyframeEditor
 
                 if (confirm != DialogResult.Yes) return;
 
-                _parent.CommandFactory.Create<PasteWholeInRangeTransformFromClipboardBoneCommand>().Configure(x => x.Configure(
+                _parent.CommandFactory.CreateWithBuilder<PasteWholeInRangeTransformFromClipboardBoneCommand>().Configure(x => x.Configure(
                     skeleton, 
                     parsedClipboardFrame,
                    _parent.Rider.AnimationClip,
@@ -200,7 +200,7 @@ namespace AnimationEditor.AnimationKeyframeEditor
 
                 if (confirm != DialogResult.Yes) return;
 
-                _parent.CommandFactory.Create<PasteWholeTransformFromClipboardBoneCommand>().Configure(x => x.Configure(
+                _parent.CommandFactory.CreateWithBuilder<PasteWholeTransformFromClipboardBoneCommand>().Configure(x => x.Configure(
                     skeleton, 
                     parsedClipboardFrame, 
                     _parent.Rider.AnimationClip,
@@ -265,7 +265,7 @@ namespace AnimationEditor.AnimationKeyframeEditor
 
                 if (confirm != DialogResult.Yes) return;
 
-                _parent.CommandFactory.Create<PasteIntoSelectedBonesTransformFromClipboardBoneCommand>().Configure(x => x.Configure(
+                _parent.CommandFactory.CreateWithBuilder<PasteIntoSelectedBonesTransformFromClipboardBoneCommand>().Configure(x => x.Configure(
                     skeleton, 
                     parsedClipboardFrame, 
                     _parent.Rider.AnimationClip,
@@ -331,7 +331,7 @@ namespace AnimationEditor.AnimationKeyframeEditor
 
                 if (confirm != DialogResult.Yes) return;
 
-                _parent.CommandFactory.Create<PasteIntoSelectedBonesInRangeTransformFromClipboardBoneCommand>().Configure(x => x.Configure(
+                _parent.CommandFactory.CreateWithBuilder<PasteIntoSelectedBonesInRangeTransformFromClipboardBoneCommand>().Configure(x => x.Configure(
                     skeleton, 
                     parsedClipboardFrame, 
                     _parent.Rider.AnimationClip,
@@ -379,7 +379,7 @@ namespace AnimationEditor.AnimationKeyframeEditor
                     if (result == DialogResult.No) return;
                 }
 
-                _parent.CommandFactory.Create<PasteIntoSelectedBonesInRangeTransformFromClipboardBoneCommand>().Configure(x => x.Configure(
+                _parent.CommandFactory.CreateWithBuilder<PasteIntoSelectedBonesInRangeTransformFromClipboardBoneCommand>().Configure(x => x.Configure(
                     skeleton, 
                     parsedClipboardFrame, 
                     _parent.Rider.AnimationClip,

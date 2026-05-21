@@ -173,7 +173,7 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
 
         void RemoveNode()
         {
-            _commandFactory.Create<DeleteObjectsCommand>().Configure(x => x.Configure(_activeNode as SceneNode)).BuildAndExecute();
+            _commandFactory.CreateWithBuilder<DeleteObjectsCommand>().Configure(x => x.Configure(_activeNode as SceneNode)).BuildAndExecute();
         }
 
         void MakeEditable()
@@ -185,9 +185,9 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
         void Ungroup()
         {
             if (_activeNode is GroupNode gn && gn.IsUngroupable)
-                _commandFactory.Create<UnGroupObjectsCommand>().Configure(x => x.Configure(_activeNode.Parent, _activeNode.Children.Select(x => x as ISelectable).ToList(), _activeNode)).BuildAndExecute();
+                _commandFactory.CreateWithBuilder<UnGroupObjectsCommand>().Configure(x => x.Configure(_activeNode.Parent, _activeNode.Children.Select(x => x as ISelectable).ToList(), _activeNode)).BuildAndExecute();
             else if (_activeNode.Parent is GroupNode g && g.IsUngroupable)
-                _commandFactory.Create<UnGroupObjectsCommand>().Configure(x => x.Configure(_activeNode.Parent.Parent, new List<ISelectable>() { _activeNode as ISelectable }, _activeNode.Parent)).BuildAndExecute();
+                _commandFactory.CreateWithBuilder<UnGroupObjectsCommand>().Configure(x => x.Configure(_activeNode.Parent.Parent, new List<ISelectable>() { _activeNode as ISelectable }, _activeNode.Parent)).BuildAndExecute();
         }
 
         void InvertSelection()

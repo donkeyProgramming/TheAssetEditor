@@ -60,7 +60,7 @@ namespace Editors.KitbasherEditor.UiCommands
                 }
             }
 
-            _commandFactory.Create<CreateAnimatedMeshPoseCommand>()
+            _commandFactory.CreateWithBuilder<CreateAnimatedMeshPoseCommand>()
                 .IsUndoable(false)
                 .Configure(x => x.Configure(meshes, frame, true))
                 .BuildAndExecute();

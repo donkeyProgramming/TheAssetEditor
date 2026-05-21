@@ -295,7 +295,7 @@ namespace Editors.KitbasherEditor.ChildEditors.MeshFitter
         protected override void ApplyChanges()
         {
             var frame = AnimationSampler.Sample(PreviewFrameIndex, _fromSkeleton, _animationClip);
-            _commandFactory.Create<CreateAnimatedMeshPoseCommand>().Configure(x => x.Configure(_meshNodes, frame)).BuildAndExecute();
+            _commandFactory.CreateWithBuilder<CreateAnimatedMeshPoseCommand>().Configure(x => x.Configure(_meshNodes, frame)).BuildAndExecute();
         }
     }
 }

@@ -31,7 +31,7 @@ namespace Shared.Core.Events
             _commandExecutor = commandExecutor;
         }
 
-        public CommandBuilder<T> Create<T>() where T : IAeUndoCommandCommand
+        public CommandBuilder<T> CreateWithBuilder<T>() where T : IAeUndoCommandCommand
         {
             var instance = _serviceProvider.GetRequiredService<T>();
             return new CommandBuilder<T>(_commandExecutor, instance); ;

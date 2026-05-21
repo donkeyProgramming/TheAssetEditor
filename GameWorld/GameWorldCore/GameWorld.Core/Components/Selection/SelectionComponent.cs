@@ -117,7 +117,7 @@ namespace GameWorld.Core.Components.Selection
                 return;
 
             //_selectionManager.CreateSelectionSate(GeometrySelectionMode.Object, selectable, true);
-            _commandFactory.Create<ObjectSelectionCommand>().Configure(x => x.Configure([selectable], false, true)).BuildAndExecute();
+            _commandFactory.CreateWithBuilder<ObjectSelectionCommand>().Configure(x => x.Configure([selectable], false, true)).BuildAndExecute();
         }
 
         void SelectFromRectangle(Rectangle screenRect, bool isSelectionModification, bool removeSelection)
@@ -129,7 +129,7 @@ namespace GameWorld.Core.Components.Selection
             {
                 if (IntersectionMath.IntersectFaces(unprojectedSelectionRect, faceState.RenderObject.Geometry, faceState.RenderObject.RenderMatrix, out var faces))
                 {
-                    _commandFactory.Create<FaceSelectionCommand>().Configure(x => x.Configure(faces, isSelectionModification, removeSelection)).BuildAndExecute();
+                    _commandFactory.CreateWithBuilder<FaceSelectionCommand>().Configure(x => x.Configure(faces, isSelectionModification, removeSelection)).BuildAndExecute();
                     return;
                 }
             }
@@ -137,7 +137,7 @@ namespace GameWorld.Core.Components.Selection
             {
                 if (IntersectionMath.IntersectVertices(unprojectedSelectionRect, vertexState.RenderObject.Geometry, vertexState.RenderObject.RenderMatrix, out var vertices))
                 {
-                    _commandFactory.Create<VertexSelectionCommand>().Configure(x => x.Configure(vertices, isSelectionModification, removeSelection)).BuildAndExecute();
+                    _commandFactory.CreateWithBuilder<VertexSelectionCommand>().Configure(x => x.Configure(vertices, isSelectionModification, removeSelection)).BuildAndExecute();
                     return;
                 }
             }
@@ -160,7 +160,7 @@ namespace GameWorld.Core.Components.Selection
                     {
                         Console.WriteLine($"bone id: {bone}");
                     }
-                    _commandFactory.Create<BoneSelectionCommand>().Configure(x => x.Configure(bones, isSelectionModification, removeSelection)).BuildAndExecute();
+                    _commandFactory.CreateWithBuilder<BoneSelectionCommand>().Configure(x => x.Configure(bones, isSelectionModification, removeSelection)).BuildAndExecute();
                     return;
                 }
             }
@@ -170,11 +170,11 @@ namespace GameWorld.Core.Components.Selection
             {
                 // Only clear selection if we are not in geometry mode and the selection count is not empty
                 if (currentState.Mode != GeometrySelectionMode.Object || currentState.SelectionCount() != 0)
-                    _commandFactory.Create<ObjectSelectionCommand>().Configure(x => x.Configure(new List<ISelectable>(), false, false)).BuildAndExecute();
+                    _commandFactory.CreateWithBuilder<ObjectSelectionCommand>().Configure(x => x.Configure(new List<ISelectable>(), false, false)).BuildAndExecute();
             }
             else if (selectedObjects != null)
             {
-                _commandFactory.Create<ObjectSelectionCommand>().Configure(x => x.Configure(selectedObjects, isSelectionModification, removeSelection)).BuildAndExecute();
+                _commandFactory.CreateWithBuilder<ObjectSelectionCommand>().Configure(x => x.Configure(selectedObjects, isSelectionModification, removeSelection)).BuildAndExecute();
             }
         }
 
@@ -186,7 +186,7 @@ namespace GameWorld.Core.Components.Selection
             {
                 if (IntersectionMath.IntersectFace(ray, faceState.RenderObject.Geometry, faceState.RenderObject.RenderMatrix, out var selectedFace) != null)
                 {
-                    _commandFactory.Create<FaceSelectionCommand>().Configure(x => x.Configure(selectedFace.Value, isSelectionModification, removeSelection)).BuildAndExecute();
+                    _commandFactory.CreateWithBuilder<FaceSelectionCommand>().Configure(x => x.Configure(selectedFace.Value, isSelectionModification, removeSelection)).BuildAndExecute();
                     return;
                 }
             }
@@ -198,7 +198,7 @@ namespace GameWorld.Core.Components.Selection
                 if (IntersectionMath.IntersectVertex(mousePosition, vertexState.RenderObject.Geometry, vertexState.RenderObject.RenderMatrix,
                     viewProjection, viewport.Width, viewport.Height, out var selecteVert) != null)
                 {
-                    _commandFactory.Create<VertexSelectionCommand>().Configure(x => x.Configure(new List<int>() { selecteVert }, isSelectionModification, removeSelection)).BuildAndExecute();
+                    _commandFactory.CreateWithBuilder<VertexSelectionCommand>().Configure(x => x.Configure(new List<int>() { selecteVert }, isSelectionModification, removeSelection)).BuildAndExecute();
                     return;
                 }
             }
@@ -209,11 +209,11 @@ namespace GameWorld.Core.Components.Selection
             {
                 // Only clear selection if we are not in geometry mode and the selection count is not empty
                 if (currentState.Mode != GeometrySelectionMode.Object || currentState.SelectionCount() != 0)
-                    _commandFactory.Create<ObjectSelectionCommand>().Configure(x => x.Configure(new List<ISelectable>(), false, false)).BuildAndExecute();
+                    _commandFactory.CreateWithBuilder<ObjectSelectionCommand>().Configure(x => x.Configure(new List<ISelectable>(), false, false)).BuildAndExecute();
             }
             else if (selectedObject != null)
             {
-                _commandFactory.Create<ObjectSelectionCommand>().Configure(x => x.Configure(selectedObject, isSelectionModification, removeSelection)).BuildAndExecute();
+                _commandFactory.CreateWithBuilder<ObjectSelectionCommand>().Configure(x => x.Configure(selectedObject, isSelectionModification, removeSelection)).BuildAndExecute();
             }
         }
 
@@ -222,7 +222,7 @@ namespace GameWorld.Core.Components.Selection
             var selectionState = _selectionManager.GetState();
             if (_selectionManager.GetState().Mode != GeometrySelectionMode.Object)
             {
-                _commandFactory.Create<ObjectSelectionModeCommand>().Configure(x => x.Configure(selectionState.GetSingleSelectedObject(), GeometrySelectionMode.Object)).BuildAndExecute();
+                _commandFactory.CreateWithBuilder<ObjectSelectionModeCommand>().Configure(x => x.Configure(selectionState.GetSingleSelectedObject(), GeometrySelectionMode.Object)).BuildAndExecute();
                 return true;
             }
             return false;
@@ -236,7 +236,7 @@ namespace GameWorld.Core.Components.Selection
                 var selectedObject = selectionState.GetSingleSelectedObject();
                 if (selectedObject != null)
                 {
-                    _commandFactory.Create<ObjectSelectionModeCommand>().Configure(x => x.Configure(selectedObject, GeometrySelectionMode.Face)).BuildAndExecute();
+                    _commandFactory.CreateWithBuilder<ObjectSelectionModeCommand>().Configure(x => x.Configure(selectedObject, GeometrySelectionMode.Face)).BuildAndExecute();
                     return true;
                 }
 
@@ -260,7 +260,7 @@ namespace GameWorld.Core.Components.Selection
             var selectedObject = selectionState.GetSingleSelectedObject();
             if (selectedObject != null)
             {
-                _commandFactory.Create<ObjectSelectionModeCommand>().Configure(x => x.Configure(selectedObject, GeometrySelectionMode.Vertex)).BuildAndExecute();
+                _commandFactory.CreateWithBuilder<ObjectSelectionModeCommand>().Configure(x => x.Configure(selectedObject, GeometrySelectionMode.Vertex)).BuildAndExecute();
                 return true;
             }
             
@@ -275,7 +275,7 @@ namespace GameWorld.Core.Components.Selection
                 var selectedObject = selectionState.GetSingleSelectedObject();
                 if (selectedObject != null)
                 {
-                    _commandFactory.Create<ObjectSelectionModeCommand>().Configure(x => x.Configure(selectedObject, GeometrySelectionMode.Bone)).BuildAndExecute();
+                    _commandFactory.CreateWithBuilder<ObjectSelectionModeCommand>().Configure(x => x.Configure(selectedObject, GeometrySelectionMode.Bone)).BuildAndExecute();
                     return true;
                 }
             }

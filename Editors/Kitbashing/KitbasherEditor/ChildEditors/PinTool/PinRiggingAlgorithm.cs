@@ -52,7 +52,7 @@ namespace Editors.KitbasherEditor.ChildEditors.PinTool
             }
 
             _logger.Here().Information("Pinning {Count} meshes to vertex {VertexId} on '{MeshName}'", meshesToAffect.Count, SelectedVertex.First(), SelectedMesh.Name);
-            _commandFactory.Create<PinMeshToVertexCommand>().Configure(x => x.Configure(meshesToAffect, SelectedMesh, SelectedVertex.First())).BuildAndExecute();
+            _commandFactory.CreateWithBuilder<PinMeshToVertexCommand>().Configure(x => x.Configure(meshesToAffect, SelectedMesh, SelectedVertex.First())).BuildAndExecute();
             return true;
         }
 

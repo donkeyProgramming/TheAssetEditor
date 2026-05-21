@@ -24,7 +24,7 @@ namespace Editors.KitbasherEditor.UiCommands
         public void Execute()
         {
             _commandFactory
-                .Create<ConstructPrimitiveCommand>()
+                .CreateWithBuilder<ConstructPrimitiveCommand>()
                 .Configure(x => x.Configure(PrimitiveType.Box))
                 .BuildAndExecute();
         }

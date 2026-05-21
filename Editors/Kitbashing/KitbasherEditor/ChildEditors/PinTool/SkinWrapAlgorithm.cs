@@ -90,7 +90,7 @@ namespace Editors.KitbasherEditor.ChildEditors.PinTool
             }
 
             _logger.Here().Information("Skin wrap: transferring rigging from {SourceCount} source meshes to {TargetCount} target meshes", SourceMeshes.Count, giveAnimationTo.Count);
-            _commandFactory.Create<SkinWrapRiggingCommand>().Configure(x => x.Configure(giveAnimationTo, SourceMeshes.ToList())).BuildAndExecute();
+            _commandFactory.CreateWithBuilder<SkinWrapRiggingCommand>().Configure(x => x.Configure(giveAnimationTo, SourceMeshes.ToList())).BuildAndExecute();
             return true;
         }
     }

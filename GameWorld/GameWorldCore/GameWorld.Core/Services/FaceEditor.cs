@@ -25,11 +25,11 @@ namespace GameWorld.Core.Services
 
             if (selectedFaceCount == totalObjectFaceCount)
             {
-                _commandFactory.Create<DeleteObjectsCommand>().Configure(x => x.Configure(new List<ISelectable>() { faceSelectionState.RenderObject })).BuildAndExecute();
+                _commandFactory.CreateWithBuilder<DeleteObjectsCommand>().Configure(x => x.Configure(new List<ISelectable>() { faceSelectionState.RenderObject })).BuildAndExecute();
             }
             else
             {
-                _commandFactory.Create<DeleteFaceCommand>().Configure(x => x.Configure(faceSelectionState.RenderObject.Geometry, faceSelectionState.CurrentSelection())).BuildAndExecute();
+                _commandFactory.CreateWithBuilder<DeleteFaceCommand>().Configure(x => x.Configure(faceSelectionState.RenderObject.Geometry, faceSelectionState.CurrentSelection())).BuildAndExecute();
             }
         }
 
@@ -46,21 +46,21 @@ namespace GameWorld.Core.Services
 
             var newSelection = MeshSplitterService.GrowFaceSelection(faceSelectionState.RenderObject.Geometry, selectedFaceIndecies, combineOverlappingVertexes);
 
-            _commandFactory.Create<FaceSelectionCommand>()
+            _commandFactory.CreateWithBuilder<FaceSelectionCommand>()
                .Configure(x => x.Configure(newSelection))
                .BuildAndExecute();
         }
 
         public void DuplicatedSelectedFacesToNewMesh(FaceSelectionState faceSelectionState, bool deleteOriginal)
         {
-            _commandFactory.Create<DuplicateFacesCommand>()
+            _commandFactory.CreateWithBuilder<DuplicateFacesCommand>()
              .Configure(x => x.Configure(faceSelectionState.RenderObject, faceSelectionState.SelectedFaces, deleteOriginal))
              .BuildAndExecute();
         }
 
         public void ConvertSelectionToVertex(FaceSelectionState faceSelectionState)
         {
-            _commandFactory.Create<ConvertFacesToVertexSelectionCommand>()
+            _commandFactory.CreateWithBuilder<ConvertFacesToVertexSelectionCommand>()
                 .Configure(x => x.Configure(faceSelectionState))
                 .BuildAndExecute();
         }

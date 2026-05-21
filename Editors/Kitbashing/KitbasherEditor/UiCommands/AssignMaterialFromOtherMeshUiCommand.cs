@@ -79,7 +79,7 @@ namespace Editors.KitbasherEditor.UiCommands
             }
 
             var selectedMeshes = selectedObjects.SelectedObjects().OfType<Rmv2MeshNode>().ToList();
-            _commandFactory.Create<AssignMaterialFromOtherMeshCommand>()
+            _commandFactory.CreateWithBuilder<AssignMaterialFromOtherMeshCommand>()
                .Configure(x => x.Configure(selected.First().ItemValue.Material, selectedMeshes))
                .BuildAndExecute();
 

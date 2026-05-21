@@ -96,7 +96,7 @@ namespace AnimationEditor.AnimationKeyframeEditor
         private void ApplyOnCurrentFrame()
         {
             if (!Check()) return;
-            _parent.CommandFactory.Create<InterpolateFramesBoneCommand>().Configure(x => x.Configure(
+            _parent.CommandFactory.CreateWithBuilder<InterpolateFramesBoneCommand>().Configure(x => x.Configure(
                 _parent.Rider.AnimationClip,
                 _parent.Rider.Player.CurrentFrame,
                 _keyframeNrA,
@@ -113,7 +113,7 @@ namespace AnimationEditor.AnimationKeyframeEditor
             if (!CheckForBones()) return;
             if (!Check()) return;
 
-            _parent.CommandFactory.Create<InterpolateFramesSelectedBonesBoneCommand>().Configure(x => x.Configure(
+            _parent.CommandFactory.CreateWithBuilder<InterpolateFramesSelectedBonesBoneCommand>().Configure(x => x.Configure(
             _parent.Rider.AnimationClip,
             _parent.Rider.Player.CurrentFrame,
             _keyframeNrA,

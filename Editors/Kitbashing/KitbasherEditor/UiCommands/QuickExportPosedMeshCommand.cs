@@ -95,7 +95,7 @@ namespace Editors.KitbasherEditor.UiCommands
                 }
 
                 // Step 2: Pose the meshes at the current animation frame
-                _commandFactory.Create<CreateAnimatedMeshPoseCommand>()
+                _commandFactory.CreateWithBuilder<CreateAnimatedMeshPoseCommand>()
                     .IsUndoable(false)
                     .Configure(x => x.Configure(meshes, frame, true))
                     .BuildAndExecute();

@@ -25,7 +25,7 @@ namespace Editors.KitbasherEditor.ChildEditors.ReRiggingTool
         protected override void ApplyChanges()
         {
             var remapping = AnimatedBoneHelper.BuildRemappingList(_configuration.MeshBones.First());
-            _commandFactory.Create<RemapBoneIndexesCommand>().Configure(x => x.Configure(_selectedMeshes, remapping, _configuration.ParnetModelSkeletonName)).BuildAndExecute();
+            _commandFactory.CreateWithBuilder<RemapBoneIndexesCommand>().Configure(x => x.Configure(_selectedMeshes, remapping, _configuration.ParnetModelSkeletonName)).BuildAndExecute();
         }
 
         public override bool Validate(out string errorText)
