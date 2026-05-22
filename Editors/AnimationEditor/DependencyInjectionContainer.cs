@@ -25,9 +25,8 @@ namespace Editors.AnimationVisualEditors
 
             serviceCollection.AddScoped<AnimationToolInput, AnimationToolInput>();
 
-            serviceCollection.AddScoped<EditorHost<CampaignAnimationCreatorViewModel>>();
-            serviceCollection.AddScoped<CampaignAnimationCreatorViewModel>();
-            serviceCollection.AddScoped<EditorHost<MountAnimationCreatorViewModel>>();
+            //serviceCollection.AddScoped<EditorHost<CampaignAnimationCreatorViewModel>>();
+            //serviceCollection.AddScoped<CampaignAnimationCreatorViewModel>();
             serviceCollection.AddScoped<MountAnimationCreatorViewModel>();
 
             // Use the new EditorHostBase-based view model directly for the Keyframe editor
@@ -39,10 +38,10 @@ namespace Editors.AnimationVisualEditors
         public override void RegisterTools(IEditorDatabase database)
         {
             EditorInfoBuilder
-                .Create<EditorHost<MountAnimationCreatorViewModel>, EditorHostView>(EditorEnums.MountTool_Editor)
+                .Create<MountAnimationCreatorViewModel, EditorHostView>(EditorEnums.MountTool_Editor)
                 .AddToToolbar("Mount Tool", true)
                 .Build(database);
-        
+
             // Register the Keyframe editor using its EditorHostBase-based type
             EditorInfoBuilder
               .Create<AnimationKeyframeEditorViewModel, EditorHostView>(EditorEnums.AnimationKeyFrame_Editor)
