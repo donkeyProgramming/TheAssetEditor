@@ -1,24 +1,23 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using Editors.Audio.AudioEditor.Presentation.Shared;
+using Editors.Audio.AudioEditor.Presentation.Shared.Models;
+using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
 
 namespace Editors.Audio.AudioEditor.Presentation.AudioFilesExplorer
 {
     public interface IAudioFilesTreeBuilderService
     {
-        ObservableCollection<AudioFilesTreeNode> BuildTree(PackFileContainer editablePack);
+        ObservableCollection<AudioFilesTreeNode> BuildTree(IPackFileService packFileService, IPackFileContainer editablePack);
     }
 
     public class AudioFilesTreeBuilderService() : IAudioFilesTreeBuilderService
     {
-        public ObservableCollection<AudioFilesTreeNode> BuildTree(PackFileContainer editablePack)
+        public ObservableCollection<AudioFilesTreeNode> BuildTree(IPackFileService packFileService, IPackFileContainer editablePack)
         {
-            var wavFilePaths = editablePack.FileList
-                .Where(x => x.Key.EndsWith(".wav", StringComparison.OrdinalIgnoreCase))
-                .Select(x => x.Key.Split('\\'))
+            var wavFilePaths = packFileService.FindAllWithExtention(".wav", editablePack)
+                .Select(x => x.FileName.Split('\\'))
                 .ToList();
 
             var uniqueDirectoryPaths = wavFilePaths

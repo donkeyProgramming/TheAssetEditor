@@ -4,6 +4,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Editors.ImportExport.Misc;
 using Shared.Core.PackFiles.Models;
+using Shared.Core.PackFiles.Models.FileSources;
 using Shared.Core.Settings;
 
 namespace Editors.ImportExport.Importing.Presentation
@@ -24,7 +25,7 @@ namespace Editors.ImportExport.Importing.Presentation
 
         private readonly IEnumerable<IImporterViewModel> _exporterViewModels;
         PackFile? _inputFile;
-        PackFileContainer? _destPackFileContainer;
+        IPackFileContainer? _destPackFileContainer;
         string _packPath = "";
 
         [ObservableProperty] IImporterViewModel? _selectedImporterViewModel;
@@ -39,13 +40,11 @@ namespace Editors.ImportExport.Importing.Presentation
             _applicationSettings = applicationSettings;
         }
 
-        public void Initialize(PackFileContainer packFile, string packPath, string diskFile)
+        public void Initialize(IPackFileContainer packFile, string packPath, string diskFile)
         {
             _destPackFileContainer = packFile;
             _packPath = packPath;
             SystemPath = diskFile;
-
-
 
             _inputFile = new PackFile(SystemPath, new FileSystemSource(SystemPath));
             FindImporter();

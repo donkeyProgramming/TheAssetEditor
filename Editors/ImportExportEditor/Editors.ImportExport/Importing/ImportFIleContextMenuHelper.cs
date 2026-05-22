@@ -1,10 +1,10 @@
 ﻿using System.IO;
+using Editors.ImportExport.ContextMenu;
 using Editors.ImportExport.Exporting.Exporters;
 using Editors.ImportExport.Misc;
 using Shared.Core.Events;
 using Shared.Core.PackFiles.Models;
 using Shared.Core.Settings;
-using Shared.Ui.BaseDialogs.PackFileTree.ContextMenu.External;
 using TreeNode = Shared.Ui.BaseDialogs.PackFileTree.TreeNode;
 
 namespace Editors.ImportExport.Importing
@@ -33,7 +33,7 @@ namespace Editors.ImportExport.Importing
             return false;
         }
 
-        public void ShowDialog(TreeNode clickedNode) =>
-                _uiCommandFactory.Create<DisplayImportFileToolCommand>().Execute(clickedNode.FileOwner, clickedNode.GetFullPath());
+        public void ShowDialog(IPackFileContainer container, TreeNode clickedNode) =>
+            _uiCommandFactory.Create<DisplayImportFileToolCommand>().Execute(container, clickedNode.GetFullPath());
     }
 }

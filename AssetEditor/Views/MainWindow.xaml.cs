@@ -134,7 +134,7 @@ namespace AssetEditor.Views
                     {
                         // Return HTMAXBUTTON when the mouse is over the maximize/restore button
                         var point = PointFromScreen(new Point(lParam.ToInt32() & 0xFFFF, lParam.ToInt32() >> 16));
-                        if (WpfHelpers.GetElementBoundsRelativeToWindow(maximizeRestoreButton, this).Contains(point))
+                        if (WindowsTitleMenu.WpfHelpers.GetElementBoundsRelativeToWindow(maximizeRestoreButton, this).Contains(point))
                         {
                             handled = true;
                             // Apply hover button style

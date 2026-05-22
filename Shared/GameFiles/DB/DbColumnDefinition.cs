@@ -1,7 +1,7 @@
 ﻿using System.Diagnostics;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
-using Shared.Core.ByteParsing;
+using Shared.ByteParsing.Parsers;
 
 namespace Shared.GameFormats.DB
 {

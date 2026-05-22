@@ -1,23 +1,14 @@
-﻿using System;
-using System.IO;
-using System.Text;
+﻿using System.Text;
 using System.Windows;
 using System.Xml;
-using System.Xml.Serialization;
-using Shared.Core.ErrorHandling;
 using Shared.Core.ErrorHandling.Exceptions;
 using Shared.Core.PackFiles;
-using Shared.Core.PackFiles.Models;
 using Shared.GameFormats.Vmd;
 using Shared.Ui.Editors.TextEditor;
 using static Shared.GameFormats.Vmd.VariantMeshDefinition;
 
-namespace Shared.Ui.Editors.VariantMeshDefinition
+namespace Editors.Shared.Core.Editors.VariantMeshDefinition
 {
-
-
-
-
     public class VariantMeshToXmlConverter : ITextConverter
     {
         public string GetText(byte[] bytes)

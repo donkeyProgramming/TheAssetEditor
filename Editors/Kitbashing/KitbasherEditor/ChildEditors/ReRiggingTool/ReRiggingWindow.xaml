@@ -7,9 +7,10 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Editors.KitbasherEditor.ChildEditors.MeshFitter" 
     xmlns:view="clr-namespace:CommonControls.Editors.BoneMapping.View;assembly=Editors.Shared.Core"
+    xmlns:loc="clr-namespace:Shared.Ui.Common;assembly=Shared.Ui"
     mc:Ignorable="d"
         Style="{StaticResource CustomWindowStyle}"
-        Title="Re-Rigging Tool" Height="500" Width="1000">
+        Title="{loc:Loc KitbashTool.ReRigging.Title}" Height="500" Width="1000">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="*"/>
@@ -19,8 +20,8 @@
         <view:BoneMappingView Grid.Row="0"/>
 
         <DockPanel Grid.Row="1" LastChildFill="False" >
-            <Button DockPanel.Dock="Right" Width="50" Margin="3" Content="OK" Click="OkButtonClick"/>
-            <Button DockPanel.Dock="Right" Width="50" Margin="3" Content="Cancel" Click="CancelButtonClick"/>
+            <Button DockPanel.Dock="Right" Width="50" Margin="3" Content="{loc:Loc KitbashTool.ReRigging.Ok}" Click="OkButtonClick"/>
+            <Button DockPanel.Dock="Right" Width="50" Margin="3" Content="{loc:Loc KitbashTool.ReRigging.Cancel}" Click="CancelButtonClick"/>
         </DockPanel>
     </Grid>
 </common:AssetEditorWindow>

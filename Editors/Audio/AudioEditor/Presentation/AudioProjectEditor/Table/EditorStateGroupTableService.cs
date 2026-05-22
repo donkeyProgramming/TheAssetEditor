@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Data;
-using Editors.Audio.AudioEditor.Events;
-using Editors.Audio.AudioEditor.Presentation.Shared;
+using Editors.Audio.AudioEditor.Events.AudioProjectEditor.Table;
+using Editors.Audio.AudioEditor.Presentation.Shared.Models;
 using Editors.Audio.AudioEditor.Presentation.Shared.Table;
 using Shared.Core.Events;
 
@@ -24,7 +24,7 @@ namespace Editors.Audio.AudioEditor.Presentation.AudioProjectEditor.Table
         public List<string> DefineSchema()
         {
             var schema = new List<string>();
-            var columnName = TableInfo.StateColumnName;
+            var columnName = TableInformation.StateColumnName;
             schema.Add(columnName);
             return schema;
         }
@@ -52,7 +52,7 @@ namespace Editors.Audio.AudioEditor.Presentation.AudioProjectEditor.Table
 
         public void InitialiseTable(DataTable table)
         {
-            var columnHeader = TableInfo.StateColumnName;
+            var columnHeader = TableInformation.StateColumnName;
             var row = table.NewRow();
             row[columnHeader] = string.Empty;
             _eventHub.Publish(new EditorTableRowAddRequestedEvent(row));

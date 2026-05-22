@@ -49,7 +49,7 @@ namespace Editors.Audio.Shared.Wwise.HircExploration
                 func(item, parent);
             else
             {
-                var unknownNode = new HircTreeNode() { DisplayName = $"Unknown node type {item.HircType} for ID {item.Id} in {item.BnkFilePath}", Item = item };
+                var unknownNode = new HircTreeNode() { DisplayName = $"Unknown node type {item.HircType} for ID {item.Id} in {item.BnkFilePath}", Hirc = item };
                 parent.Children.Add(unknownNode);
             }
         }
@@ -84,7 +84,7 @@ namespace Editors.Audio.Shared.Wwise.HircExploration
         protected static Wanted GetAsType<Wanted>(HircItem instance) where Wanted : class
         {
             if (instance is not Wanted wanted)
-                throw new Exception($"HircItem with Id {instance.Id} is of type {instance.GetType().Name} and cannot be converted to {typeof(Wanted).Name}.");
+                throw new Exception($"Hirc with Id {instance.Id} is of type {instance.GetType().Name} and cannot be converted to {typeof(Wanted).Name}.");
             return wanted;
         }
     }

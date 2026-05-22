@@ -2,11 +2,12 @@
 using System.Data;
 using System.Linq;
 using Editors.Audio.AudioEditor.Core;
-using Editors.Audio.AudioEditor.Events;
-using Editors.Audio.AudioEditor.Presentation.Shared;
+using Editors.Audio.AudioEditor.Events.AudioProjectEditor.Table;
+using Editors.Audio.AudioEditor.Presentation.Shared.Models;
 using Editors.Audio.AudioEditor.Presentation.Shared.Table;
 using Editors.Audio.Shared.Storage;
 using Shared.Core.Events;
+using Shared.Ui.Common;
 
 namespace Editors.Audio.AudioEditor.Presentation.AudioProjectEditor.Table
 {
@@ -36,7 +37,7 @@ namespace Editors.Audio.AudioEditor.Presentation.AudioProjectEditor.Table
             var stateGroupsWithQualifiers = _audioRepository.QualifiedStateGroupByStateGroupByDialogueEvent[dialogueEventName];
             foreach (var stateGroupWithQualifier in stateGroupsWithQualifiers)
             {
-                var columnName = TableHelpers.DuplicateUnderscores(stateGroupWithQualifier.Key);
+                var columnName = WpfHelpers.DuplicateUnderscores(stateGroupWithQualifier.Key);
                 schema.Add(columnName);
             }
             return schema;
@@ -59,7 +60,7 @@ namespace Editors.Audio.AudioEditor.Presentation.AudioProjectEditor.Table
 
             foreach (var columnName in schema)
             {
-                var stateGroupNameWithQualifier = TableHelpers.DeduplicateUnderscores(columnName);
+                var stateGroupNameWithQualifier = WpfHelpers.DeduplicateUnderscores(columnName);
                 var stateGroupName = TableHelpers.GetStateGroupFromStateGroupWithQualifier(_audioRepository, dialogueEventName, stateGroupNameWithQualifier);
 
                 var column = DataGridTemplates.CreateColumnTemplate(columnName, columnWidth);
@@ -82,8 +83,8 @@ namespace Editors.Audio.AudioEditor.Presentation.AudioProjectEditor.Table
             var stateGroupsWithQualifiers = _audioRepository.QualifiedStateGroupByStateGroupByDialogueEvent[dialogueEvent.Name];
             foreach (var stateGroupWithQualifier in stateGroupsWithQualifiers)
             {
-                var columnName = TableHelpers.DuplicateUnderscores(stateGroupWithQualifier.Key);
-                var stateGroup = TableHelpers.GetStateGroupFromStateGroupWithQualifier(_audioRepository, dialogueEvent.Name, TableHelpers.DeduplicateUnderscores(columnName));
+                var columnName = WpfHelpers.DuplicateUnderscores(stateGroupWithQualifier.Key);
+                var stateGroup = TableHelpers.GetStateGroupFromStateGroupWithQualifier(_audioRepository, dialogueEvent.Name, WpfHelpers.DeduplicateUnderscores(columnName));
 
                 if (stateGroupsWithAnyState.ContainsKey(stateGroup))
                     row[columnName] = "Any"; // Set the cell value to Any as the default value

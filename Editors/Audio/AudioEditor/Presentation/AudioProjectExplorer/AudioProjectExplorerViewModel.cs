@@ -10,10 +10,11 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Editors.Audio.AudioEditor.Core;
 using Editors.Audio.AudioEditor.Events;
-using Editors.Audio.AudioEditor.Presentation.Shared;
-using Editors.Audio.AudioEditor.Presentation.Shared.Table;
+using Editors.Audio.AudioEditor.Events.AudioProjectExplorer;
+using Editors.Audio.AudioEditor.Presentation.Shared.Models;
 using Editors.Audio.Shared.GameInformation.Warhammer3;
 using Shared.Core.Events;
+using Shared.Ui.Common;
 
 namespace Editors.Audio.AudioEditor.Presentation.AudioProjectExplorer
 {
@@ -58,11 +59,10 @@ namespace Editors.Audio.AudioEditor.Presentation.AudioProjectExplorer
         {
             ResetFilters();
 
-            var audioProject = _audioEditorStateService.AudioProject;
-            AudioProjectTree = _audioProjectTreeBuilder.BuildTree(audioProject, ShowEditedItemsOnly);
+            AudioProjectTree = _audioProjectTreeBuilder.BuildTree(_audioEditorStateService.AudioProject, ShowEditedItemsOnly);
 
             var audioProjectFileName = Path.GetFileNameWithoutExtension(_audioEditorStateService.AudioProjectFileName);
-            AudioProjectExplorerLabel = $"Audio Project Explorer - {TableHelpers.DuplicateUnderscores(audioProjectFileName)}";
+            AudioProjectExplorerLabel = $"Audio Project Explorer - {WpfHelpers.DuplicateUnderscores(audioProjectFileName)}";
         }
 
         partial void OnSelectedNodeChanged(AudioProjectTreeNode value)

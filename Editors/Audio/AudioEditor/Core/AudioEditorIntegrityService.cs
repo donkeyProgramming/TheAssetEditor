@@ -3,10 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Windows;
+using Editors.Audio.Shared.AudioProject.Compiler;
 using Editors.Audio.Shared.AudioProject.Models;
 using Editors.Audio.Shared.GameInformation.Warhammer3;
 using Editors.Audio.Shared.Storage;
-using Editors.Audio.Shared.Wwise;
+using Shared.GameFormats.Wwise;
 using Shared.Core.PackFiles;
 using Shared.GameFormats.Wwise.Hirc;
 
@@ -14,10 +15,12 @@ namespace Editors.Audio.AudioEditor.Core
 {
     public interface IAudioEditorIntegrityService
     {
+        void EnsureCorrectSoundBankNames(AudioProjectFile audioProject, string audioProjectNameWithoutExtension);
+        void RefreshSourceIds(AudioProjectFile audioProject);
         void CheckDialogueEventInformationIntegrity(List<Wh3DialogueEventDefinition> dialogueEventData);
         void CheckAudioProjectDialogueEventIntegrity(AudioProjectFile audioProject);
         void CheckAudioProjectWavFilesIntegrity(AudioProjectFile audioProject);
-        void CheckAudioProjectDataIntegrity(AudioProjectFile audioProject, string audioProjectFileNameWithoutExtension);
+        void CheckAudioProjectDataIntegrity(AudioProjectFile audioProject, string audioProjectNameWithoutExtension);
         void CheckMergingSoundBanksIdIntegrity();
     }
 
@@ -25,6 +28,41 @@ namespace Editors.Audio.AudioEditor.Core
     {
         private readonly IPackFileService _packFileService = packFileService;
         private readonly IAudioRepository _audioRepository = audioRepository;
+
+        public void EnsureCorrectSoundBankNames(AudioProjectFile audioProject, string audioProjectNameWithoutExtension)
+        {
+            foreach (var soundBank in audioProject.SoundBanks)
+            {
+                var soundBankAudioProjectName = Wh3SoundBankInformation.GetAudioProjectNameFromSoundBankWithAudioProjectName(soundBank.Name);
+                if (audioProjectNameWithoutExtension != soundBankAudioProjectName)
+                {
+                    var gameSoundBankName = Wh3SoundBankInformation.GetSoundBankNameFromSoundBankWithAudioProjectName(soundBank.Name);
+                    var correctSoundBankName = $"{gameSoundBankName}_{audioProjectNameWithoutExtension}";
+                    soundBank.Name = correctSoundBankName;
+                }
+            }
+        }
+
+        public void RefreshSourceIds(AudioProjectFile audioProject)
+        {
+            var usedSourceIds = IdGenerator.GetUsedSourceIds(_audioRepository, audioProject);
+
+            var audioProjectSounds = audioProject.GetSounds();
+            foreach (var audioFile in audioProject.AudioFiles)
+            {
+                var audioFileIds = IdGenerator.GenerateIds(usedSourceIds);
+                usedSourceIds.Add(audioFile.Id);
+
+                foreach (var sound in audioProjectSounds.Where(sound => sound.SourceId == audioFile.Id))
+                {
+                    sound.SourceId = audioFileIds.Id;
+                }
+                audioFile.Guid = audioFileIds.Guid;
+                audioFile.Id = audioFileIds.Id;
+            }
+
+            MessageBox.Show("Delete all your existing WEMs and then recompile the Audio Project as all WEM IDs have now been updated.", "Warning");
+        }
 
         public void CheckDialogueEventInformationIntegrity(List<Wh3DialogueEventDefinition> information)
         {
@@ -130,7 +168,7 @@ namespace Editors.Audio.AudioEditor.Core
             }
         }
 
-        public void CheckAudioProjectDataIntegrity(AudioProjectFile audioProject, string audioProjectFileNameWithoutExtension)
+        public void CheckAudioProjectDataIntegrity(AudioProjectFile audioProject, string audioProjectNameWithoutExtension)
         {
             var usedHircIds = new HashSet<uint>();
             var usedSourceIds = new HashSet<uint>();
@@ -198,14 +236,16 @@ namespace Editors.Audio.AudioEditor.Core
             usedSourceIds.UnionWith(audioProjectSourceIds);
             usedSourceIds.UnionWith(languageSourceIds);
 
+            // TODO: Implement a get all references by ID to then replace them all for the clashing IDs
+
             foreach (var soundBank in audioProject.SoundBanks)
             {
-                ResolveSoundBankDataIntegrity(audioProject, audioProjectFileNameWithoutExtension, soundBank);
+                ResolveSoundBankDataIntegrity(audioProject, audioProjectNameWithoutExtension, soundBank);
 
-                if (soundBank.ActionEvents != null)
+                if (soundBank.ActionEvents.Count != 0)
                     ResolveActionEventDataIntegrity(usedHircIds, usedSourceIds, soundBank);
 
-                if (soundBank.DialogueEvents != null)
+                if (soundBank.DialogueEvents.Count != 0)
                     ResolveDialogueEventDataIntegrity(usedHircIds, usedSourceIds, soundBank);
             }
 
@@ -215,7 +255,7 @@ namespace Editors.Audio.AudioEditor.Core
             ResolveStateGroupDataIntegrity(audioProject);
         }
 
-        private static void ResolveSoundBankDataIntegrity(AudioProjectFile audioProject, string audioProjectFileNameWithoutExtension, SoundBank soundBank)
+        private static void ResolveSoundBankDataIntegrity(AudioProjectFile audioProject, string audioProjectNameWithoutExtension, SoundBank soundBank)
         {
             if (soundBank == null)
                 throw new InvalidOperationException("SoundBank should not be null.");
@@ -223,9 +263,9 @@ namespace Editors.Audio.AudioEditor.Core
             if (string.IsNullOrWhiteSpace(soundBank.Name))
                 throw new InvalidOperationException("SoundBank.Name should not be null or empty.");
 
-            var gameSoundBankName = Wh3SoundBankInformation.GetSoundBankNameFromPrefix(soundBank.Name);
+            var gameSoundBankName = Wh3SoundBankInformation.GetSoundBankNameFromSoundBankWithAudioProjectName(soundBank.Name);
             var gameSoundBank = Wh3SoundBankInformation.GetSoundBank(gameSoundBankName);
-            var correctSoundBankName = $"{gameSoundBankName}_{audioProjectFileNameWithoutExtension}";
+            var correctSoundBankName = $"{gameSoundBankName}_{audioProjectNameWithoutExtension}";
 
             if (soundBank.Name != correctSoundBankName)
                 throw new InvalidOperationException($"SoundBank.Name is incorrect. Expected '{correctSoundBankName}'.");
@@ -246,9 +286,6 @@ namespace Editors.Audio.AudioEditor.Core
                 if (!string.Equals(soundBank.Language, requiredLanguageAsString, StringComparison.Ordinal))
                     throw new InvalidOperationException($"SoundBank.Language should be '{requiredLanguageAsString}'.");
             }
-
-            if (soundBank.LanguageId == 0)
-                throw new InvalidOperationException("SoundBank.LanguageId should not be 0.");
         }
 
         private static void ResolveActionEventDataIntegrity(HashSet<uint> usedHircIds, HashSet<uint> usedSourceIds, SoundBank soundBank)
@@ -368,7 +405,7 @@ namespace Editors.Audio.AudioEditor.Core
 
         private static void ResolveStateGroupDataIntegrity(AudioProjectFile audioProject)
         {
-            if (audioProject.StateGroups != null)
+            if (audioProject.StateGroups.Count != 0)
             {
                 foreach (var stateGroup in audioProject.StateGroups)
                 {
@@ -572,6 +609,17 @@ namespace Editors.Audio.AudioEditor.Core
 
                 hasClashes = true;
                 messageBuilder.AppendLine($"Language: {languageName}");
+
+                var conflictingBnks = clashingIdsById.Values
+                    .SelectMany(bnkNames => bnkNames)
+                    .Concat(clashingSourceIdsById.Values.SelectMany(bnkNames => bnkNames))
+                    .Distinct(StringComparer.OrdinalIgnoreCase)
+                    .OrderBy(name => name, StringComparer.OrdinalIgnoreCase);
+
+                foreach (var conflictingBnk in conflictingBnks)
+                    messageBuilder.AppendLine(conflictingBnk);
+
+                messageBuilder.AppendLine();
 
                 foreach (var sourceBnk in idsByBnk.Keys
                              .Union(sourceIdsByBnk.Keys, StringComparer.OrdinalIgnoreCase)

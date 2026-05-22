@@ -1,10 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Data;
 using Editors.Audio.AudioEditor.Core;
-using Editors.Audio.AudioEditor.Events;
-using Editors.Audio.AudioEditor.Presentation.Shared;
+using Editors.Audio.AudioEditor.Events.AudioProjectEditor.Table;
+using Editors.Audio.AudioEditor.Presentation.Shared.Models;
 using Editors.Audio.AudioEditor.Presentation.Shared.Table;
-using Editors.Audio.Shared.GameInformation.Warhammer3;
 using Shared.Core.Events;
 
 namespace Editors.Audio.AudioEditor.Presentation.AudioProjectEditor.Table
@@ -31,7 +30,7 @@ namespace Editors.Audio.AudioEditor.Presentation.AudioProjectEditor.Table
         public List<string> DefineSchema()
         {
             var schema = new List<string>();
-            var columnName = TableInfo.EventColumnName;
+            var columnName = TableInformation.ActionEventColumnName;
             schema.Add(columnName);
             return schema;
         }
@@ -50,16 +49,16 @@ namespace Editors.Audio.AudioEditor.Presentation.AudioProjectEditor.Table
             var columnsCount = 1;
             var columnWidth = 1.0 / columnsCount;
 
-            var selectedAudioProjectExplorerNode = _audioEditorStateService.SelectedAudioProjectExplorerNode;
-            if (selectedAudioProjectExplorerNode.Name == Wh3ActionEventInformation.GetName(Wh3ActionEventType.Movies))
+            if (_audioEditorStateService.SelectedAudioProjectExplorerNode.IsMovieActionEvent())
             {
-                var fileSelectColumnHeader = TableInfo.BrowseMovieColumnName;
+                var fileSelectColumnHeader = TableInformation.BrowseMovieColumnName;
                 var fileSelectColumn = DataGridTemplates.CreateColumnTemplate(fileSelectColumnHeader, 85, useAbsoluteWidth: true);
                 fileSelectColumn.CellTemplate = DataGridTemplates.CreateFileSelectButtonCellTemplate(_uiCommandFactory);
                 _eventHub.Publish(new EditorDataGridColumnAddRequestedEvent(fileSelectColumn));
 
                 foreach (var columnName in schema)
                 {
+                    // We don't allow editing because the Event name must match the path of the movie
                     var eventColumn = DataGridTemplates.CreateColumnTemplate(columnName, columnWidth, isReadOnly: true);
                     eventColumn.CellTemplate = DataGridTemplates.CreateReadOnlyTextBlockTemplate(columnName);
                     _eventHub.Publish(new EditorDataGridColumnAddRequestedEvent(eventColumn));
@@ -69,7 +68,7 @@ namespace Editors.Audio.AudioEditor.Presentation.AudioProjectEditor.Table
             {
                 foreach (var columnName in schema)
                 {
-                    var eventColumn = DataGridTemplates.CreateColumnTemplate(columnName, columnWidth, isReadOnly: true);
+                    var eventColumn = DataGridTemplates.CreateColumnTemplate(columnName, columnWidth);
                     eventColumn.CellTemplate = DataGridTemplates.CreateEditableEventTextBoxTemplate(_eventHub, columnName);
                     _eventHub.Publish(new EditorDataGridColumnAddRequestedEvent(eventColumn));
                 }
@@ -80,12 +79,11 @@ namespace Editors.Audio.AudioEditor.Presentation.AudioProjectEditor.Table
         {
             var eventName = string.Empty;
 
-            var selectedAudioProjectExplorerNode = _audioEditorStateService.SelectedAudioProjectExplorerNode.Name;
-            if (selectedAudioProjectExplorerNode != Wh3ActionEventInformation.GetName(Wh3ActionEventType.Movies))
+            if (!_audioEditorStateService.SelectedAudioProjectExplorerNode.IsMovieActionEvent())
                 eventName = "Play_";
 
             var row = editorTable.NewRow();
-            row[TableInfo.EventColumnName] = eventName;
+            row[TableInformation.ActionEventColumnName] = eventName;
 
             _eventHub.Publish(new EditorTableRowAddRequestedEvent(row));
         }

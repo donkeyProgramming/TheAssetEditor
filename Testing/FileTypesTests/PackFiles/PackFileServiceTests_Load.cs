@@ -17,7 +17,7 @@
         //
         //    Assert.NotNull(result);
         //    Assert.AreEqual(1, packFileDb.PackFiles.Count);
-        //    var fileCount = packFileDb.PackFiles[0].FileList.Count;
+        //    var fileCount = packFileDb.PackFiles[0].GetFileCount();
         //    Assert.AreEqual(4, fileCount);
         //}
         //

@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Data;
+using Editors.Audio.AudioEditor.Presentation.Shared.Models;
 
 namespace Editors.Audio.AudioEditor.Presentation.Shared.Table
 {

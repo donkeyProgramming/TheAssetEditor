@@ -3,6 +3,7 @@ using System.Windows;
 using Shared.Core.Events;
 using Shared.Core.Misc;
 using Shared.Core.PackFiles;
+using Shared.Core.PackFiles.Utility;
 using Shared.GameFormats.WsModel;
 
 namespace Editors.Reports.Geometry

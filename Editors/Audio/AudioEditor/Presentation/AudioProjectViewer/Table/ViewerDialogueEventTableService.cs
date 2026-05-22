@@ -3,11 +3,12 @@ using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using Editors.Audio.AudioEditor.Core;
-using Editors.Audio.AudioEditor.Events;
-using Editors.Audio.AudioEditor.Presentation.Shared;
+using Editors.Audio.AudioEditor.Events.AudioProjectViewer.Table;
+using Editors.Audio.AudioEditor.Presentation.Shared.Models;
 using Editors.Audio.AudioEditor.Presentation.Shared.Table;
 using Editors.Audio.Shared.Storage;
 using Shared.Core.Events;
+using Shared.Ui.Common;
 
 namespace Editors.Audio.AudioEditor.Presentation.AudioProjectViewer.Table
 {
@@ -37,7 +38,7 @@ namespace Editors.Audio.AudioEditor.Presentation.AudioProjectViewer.Table
             var stateGroupsWithQualifiers = _audioRepository.QualifiedStateGroupByStateGroupByDialogueEvent[dialogueEventName];
             foreach (var stateGroupWithQualifier in stateGroupsWithQualifiers)
             {
-                var columnName = TableHelpers.DuplicateUnderscores(stateGroupWithQualifier.Key);
+                var columnName = WpfHelpers.DuplicateUnderscores(stateGroupWithQualifier.Key);
                 schema.Add(columnName);
             }
             return schema;
@@ -83,7 +84,7 @@ namespace Editors.Audio.AudioEditor.Presentation.AudioProjectViewer.Table
 
                 foreach (var stateGroupWithQualifier in orderedStateGroupsWithQualifiers)
                 {
-                    var columnHeader = TableHelpers.DuplicateUnderscores(stateGroupWithQualifier.Key);
+                    var columnHeader = WpfHelpers.DuplicateUnderscores(stateGroupWithQualifier.Key);
                     var stateGroupName = stateGroupWithQualifier.Value;
 
                     if (!occurrenceIndexByStateGroupName.TryGetValue(stateGroupName, out var currentOccurrenceIndex))

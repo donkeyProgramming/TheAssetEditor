@@ -1,7 +1,7 @@
 ﻿
 using System.Runtime.InteropServices;
 using Microsoft.Xna.Framework;
-using Shared.Core.ByteParsing;
+using Shared.ByteParsing;
 
 namespace Shared.GameFormats.RigidModel.Vertex.Formats
 {

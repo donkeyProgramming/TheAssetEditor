@@ -3,7 +3,8 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-using Editors.Audio.AudioEditor.Presentation.Shared;
+using Editors.Audio.AudioEditor.Presentation.Shared.Controls;
+using Editors.Audio.AudioEditor.Presentation.Shared.Models;
 using Editors.Audio.Shared.AudioProject.Models;
 
 namespace Editors.Audio.AudioEditor.Presentation.Settings
@@ -19,7 +20,7 @@ namespace Editors.Audio.AudioEditor.Presentation.Settings
 
         private void OnListViewDragOver(object sender, DragEventArgs e)
         {
-            if (e.Data.GetDataPresent(typeof(IEnumerable<AudioFilesTreeNode>)))
+            if (e.Data.GetDataPresent(typeof(IEnumerable<IMultiSelectTreeNode>)))
                 e.Effects = DragDropEffects.Copy;
             else
                 e.Effects = DragDropEffects.None;
@@ -29,43 +30,35 @@ namespace Editors.Audio.AudioEditor.Presentation.Settings
 
         private void OnListViewDrop(object sender, DragEventArgs e)
         {
-            if (e.Data.GetDataPresent(typeof(IEnumerable<AudioFilesTreeNode>)))
-            {
-                if (e.Data.GetData(typeof(IEnumerable<AudioFilesTreeNode>)) is not IEnumerable<AudioFilesTreeNode> droppedNodes)
-                    return;
+            if (!e.Data.GetDataPresent(typeof(IEnumerable<IMultiSelectTreeNode>)))
+                return;
 
-                ViewModel.SetAudioFilesViaDrop(droppedNodes);
-            }
+            if (e.Data.GetData(typeof(IEnumerable<IMultiSelectTreeNode>)) is not IEnumerable<IMultiSelectTreeNode> droppedMultiSelectTreeNodes)
+                return;
+
+            var droppedAudioFilesTreeNodes = droppedMultiSelectTreeNodes
+                .OfType<AudioFilesTreeNode>()
+                .Where(node => node.Type == AudioFilesTreeNodeType.WavFile)
+                .ToList();
+            if (droppedAudioFilesTreeNodes.Count == 0)
+                return;
+
+            ViewModel.SetAudioFilesViaDrop(droppedAudioFilesTreeNodes);
         }
 
-        private void OnAudioFileDoubleClick(object sender, MouseButtonEventArgs e)
+        private void OnAudioFilesListViewMouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
-            if (DataContext is SettingsViewModel viewModel)
-            {
-                if (AudioFilesListView.SelectedItem is AudioFile audioFile)
-                    viewModel.PlayWav(audioFile);
-            }
+            if (AudioFilesListView.SelectedItem is AudioFile audioFile)
+                ViewModel.PlayWav(audioFile);
         }
 
-        private void OnAudioFilesListViewPreviewKeyDown(object sender, KeyEventArgs e)
+        private void OnAudioFilesListViewSelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            if (e.Key == Key.Delete || e.Key == Key.Back)
-            {
-                if (ViewModel.ShowSettingsFromAudioProjectViewer)
-                    return;
-
-                var selectedAudioFiles = AudioFilesListView.SelectedItems
-                    .Cast<AudioFile>()
-                    .Where(audioFile => audioFile != null)
-                    .ToList();
-
-                if (selectedAudioFiles.Count == 0)
-                    return;
-
-                ViewModel.RemoveAudioFiles(selectedAudioFiles);
-
-                e.Handled = true;
-            }
+            var selectedAudioFiles = AudioFilesListView.SelectedItems
+                .Cast<AudioFile>()
+                .Where(audioFile => audioFile != null)
+                .ToList();
+            ViewModel.OnSelectedAudioFilesChanged(selectedAudioFiles);
         }
     }
 }

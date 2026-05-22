@@ -1,0 +1,38 @@
+﻿using System.Collections.Generic;
+using Editors.Audio.AudioEditor.Core;
+using Editors.Audio.AudioEditor.Events.AudioFilesExplorer;
+using Editors.Audio.AudioEditor.Presentation.Shared.Models;
+using Editors.Audio.Shared.AudioProject.Compiler;
+using Editors.Audio.Shared.AudioProject.Models;
+using Editors.Audio.Shared.Storage;
+using Shared.Core.Events;
+
+namespace Editors.Audio.AudioEditor.Commands.AudioFilesExplorer
+{
+    public class SetAudioFilesCommand(IAudioEditorStateService audioEditorStateService, IEventHub eventHub, IAudioRepository audioRepository) : IUiCommand
+    {
+        private readonly IAudioEditorStateService _audioEditorStateService = audioEditorStateService;
+        private readonly IEventHub _eventHub = eventHub;
+        private readonly IAudioRepository _audioRepository = audioRepository;
+
+        public void Execute(List<AudioFilesTreeNode> selectedAudioFiles, bool addToExistingAudioFiles)
+        {
+            var usedSourceIds = IdGenerator.GetUsedSourceIds(_audioRepository, _audioEditorStateService.AudioProject);
+
+            var audioFiles = new List<AudioFile>();
+            foreach (var wavFile in selectedAudioFiles)
+            {
+                var audioFile = _audioEditorStateService.AudioProject.GetAudioFile(wavFile.FilePath);
+                if (audioFile == null)
+                {
+                    var audioFileIds = IdGenerator.GenerateIds(usedSourceIds);
+                    audioFile = new AudioFile(audioFileIds.Guid, audioFileIds.Id, wavFile.FileName, wavFile.FilePath);
+                }
+                audioFiles.Add(audioFile);
+            }
+
+            _audioEditorStateService.StoreAudioFiles(audioFiles);
+            _eventHub.Publish(new AudioFilesChangedEvent(audioFiles, addToExistingAudioFiles, false, false));
+        }
+    }
+}

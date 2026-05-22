@@ -1,0 +1,42 @@
+{
+  "SettingsWindow.Application": "Application",
+  "SettingsWindow.SelectedLanguage": "Langue sélectionnée",
+  "SettingsWindow.Theme": "Thème",
+  "SettingsWindow.StartMaximised": "Démarrer maximisé",
+  "SettingsWindow.SelectedGame": "Jeu sélectionné",
+  "SettingsWindow.LoadGameFileOnStartup": "Charger le fichier du jeu au démarrage",
+  "SettingsWindow.ShowCaWems": "Afficher les fichiers audio CA (.wem)",
+  "SettingsWindow.Rendering": "Rendu",
+  "SettingsWindow.RenderBackground": "Couleur d’arrière-plan du moteur de rendu",
+  "SettingsWindow.OnlyLoadLod0": "Charger uniquement le Lod0 pour les maillages de référence",
+  "SettingsWindow.GridSize": "Taille de la grille",
+  "SettingsWindow.VertexSelectionColour": "Couleur de sélection des sommets",
+  "SettingsWindow.SaveButton": "Enregistrer",
+
+  "UpdaterWindow.Title": "Mise à jour",
+  "UpdaterWindow.UpdateInfo": "Une nouvelle version d’AssetEditor est disponible!\n\nVotre version actuelle est la {0}. Mettez à jour vers la version {1} pour découvrir les dernières modifications détaillées ci-dessous.",
+  "UpdaterWindow.ReleaseNotes": "Notes de version",
+  "UpdaterWindow.UpdateButton": "Mettre à jour",
+  "UpdaterWindow.CancelButton": "Annuler",
+
+  "KitbashTool.Debug.Geometry.Menu": "Geometrie",
+  "KitbashTool.Debug.Geometry.CreateBox.Menu": "Creer une boite",
+  "KitbashTool.Debug.Geometry.CreatePlane.Menu": "Creer un plan",
+  "KitbashTool.Debug.Geometry.CreateSphere.Menu": "Creer une sphere",
+  "KitbashTool.Debug.Geometry.CreateBox.Tooltip": "Creer une boite subdivisee",
+  "KitbashTool.Debug.Geometry.CreatePlane.Tooltip": "Creer un plan subdivise",
+  "KitbashTool.Debug.Geometry.CreateSphere.Tooltip": "Creer une sphere subdivisee",
+
+  "KitbashTool.SaveDialog.DisplayDialogOnNextSave": "Afficher la boÃ®te de dialogue Ã  la prochaine sauvegarde",
+
+  "PackFileCache.InvalidReason.Title": "Cache Rebuild Required",
+  "PackFileCache.InvalidReason.NotFound": "No cache found for {0}. Building cache for the first time - this may take a moment.",
+  "PackFileCache.InvalidReason.DataChanged": "Game files for {0} have changed since the cache was built. Rebuilding cache.",
+  "PackFileCache.InvalidReason.Corrupted": "Cache for {0} is corrupted and will be rebuilt.",
+  "PackFileCache.BuildingCache": "Building pack file cache for {0}. This may take some time, please wait...",
+  "PackFileCache.BuildingCache.Title": "Building Cache",
+  "PackFileCache.Description": "The cache allows faster startup times and reduces memory usage by storing pre-processed game file data on disk.",
+
+  "WaveformVisualiser.Play": "Lecture",
+  "WaveformVisualiser.Pause": "Pause"
+}

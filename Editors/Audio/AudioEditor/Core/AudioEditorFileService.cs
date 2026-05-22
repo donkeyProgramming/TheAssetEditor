@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Windows;
@@ -8,8 +9,8 @@ using Editors.Audio.Shared.AudioProject.Models;
 using Editors.Audio.Shared.GameInformation.Warhammer3;
 using Editors.Audio.Shared.Storage;
 using Shared.Core.Events;
-using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
+using Shared.Core.Services;
 using Shared.Core.Settings;
 
 namespace Editors.Audio.AudioEditor.Core
@@ -40,7 +41,7 @@ namespace Editors.Audio.AudioEditor.Core
 
         public void Save(AudioProjectFile audioProject, string fileName, string filePath)
         {
-            var cleanedAudioProject = AudioProjectFile.Clean(audioProject);
+            var cleanedAudioProject = audioProject.Clean();
 
             var options = new JsonSerializerOptions
             {
@@ -76,10 +77,17 @@ namespace Editors.Audio.AudioEditor.Core
 
             var fileNameWithoutExtension = Path.GetFileNameWithoutExtension(fileName);
 
-            // We create a 'dirty' Audio Project to display the whole model in the Audio Project Explorer rather than
-            // just the clean data from the loaded Audio Project as when it's saved any unused parts are removed.
+            // We add the Audio Project name as a suffix to all SoundBank names so if the Audio Project name has changed we need to update them
+            _audioEditorIntegrityService.EnsureCorrectSoundBankNames(audioProject, fileNameWithoutExtension);
+
             var currentGame = _applicationSettingsService.CurrentSettings.CurrentGame;
-            var dirtyAudioProject = AudioProjectFile.Create(audioProject, currentGame, fileNameWithoutExtension);
+            if (currentGame != GameTypeEnum.Warhammer3)
+                throw new NotImplementedException($"The Audio Editor does not support the selected game.");
+
+            // We create a 'dirty' Audio Project to display the whole model in the Audio Project Explorer rather than
+            // just the clean data from the loaded Audio Project as any unused parts are removed when it's saved
+            var dirtyAudioProject = AudioProjectFile.CreateNew(audioProject.Language, fileNameWithoutExtension);
+            AudioProjectFileMerger.Merge(dirtyAudioProject, audioProject, fileNameWithoutExtension, fileNameWithoutExtension);
 
             _audioRepository.Load([audioProject.Language]);
 

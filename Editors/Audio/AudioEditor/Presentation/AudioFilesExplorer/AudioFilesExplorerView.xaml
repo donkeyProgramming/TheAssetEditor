@@ -4,15 +4,18 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-    xmlns:Converters="clr-namespace:Editors.Audio.Shared.UI.Converters"
+    xmlns:ValueConverters="clr-namespace:Editors.Audio.AudioEditor.Presentation.AudioFilesExplorer.ValueConverters"
+    xmlns:Models="clr-namespace:Editors.Audio.AudioEditor.Presentation.Shared.Models"
+    xmlns:Controls="clr-namespace:Editors.Audio.AudioEditor.Presentation.Shared.Controls"
     xmlns:AudioFilesExplorer="clr-namespace:Editors.Audio.AudioEditor.Presentation.AudioFilesExplorer"
-    xmlns:Shared="clr-namespace:Editors.Audio.AudioEditor.Presentation.Shared"
+    xmlns:loc="clr-namespace:Shared.Ui.Common;assembly=Shared.Ui"
     d:DataContext="{d:DesignInstance Type=AudioFilesExplorer:AudioFilesExplorerViewModel}"
     mc:Ignorable="d"
-    d:DesignHeight="250" d:DesignWidth="500">
+    d:DesignHeight="250" 
+    d:DesignWidth="500">
 
     <UserControl.Resources>
-        <Converters:ImageConverter 
+        <ValueConverters:ImageConverter 
             x:Key="ImageValueConverter"/>
         <BooleanToVisibilityConverter 
             x:Key="BoolToVisibilityConverter"/>
@@ -54,16 +57,17 @@
                 Width="180" 
                 VerticalAlignment="Center" 
                 HorizontalAlignment="Left"
-                Content="Toggle Collapse / Expand Tree" 
-                ToolTip="Collapse / expand the tree." 
+                Content="{loc:Loc AudioFilesExplorer.ToggleCollapseExpandTree}" 
+                ToolTip="{loc:Loc AudioFilesExplorer.Tooltips.CollapseExpandTree}" 
                 Command="{Binding CollapseOrExpandTreeCommand}"/>
 
             <Button 
                 Grid.Column="1"
                 Margin="5, 0, 0, 0" 
                 Width="100" 
-                Content="Set Audio Files" 
-                ToolTip="Set the selected audio file(s) as the audio file(s) in the Audio Project Editor." 
+                Content="{loc:Loc AudioFilesExplorer.SetAudioFiles}" 
+                ToolTip="{loc:Loc AudioFilesExplorer.Tooltips.SetAudioFiles}"
+                ToolTipService.ShowOnDisabled="True"
                 Command="{Binding SetAudioFilesCommand}" 
                 VerticalAlignment="Center" 
                 HorizontalAlignment="Left"
@@ -73,8 +77,9 @@
                 Grid.Column="2"
                 Margin="5, 0, 0, 0" 
                 Width="120" 
-                Content="Add to Audio Files" 
-                ToolTip="Add the selected audio file(s) to the audio file(s) already set in the Audio Project Editor." 
+                Content="{loc:Loc AudioFilesExplorer.AddToAudioFiles}" 
+                ToolTip="{loc:Loc AudioFilesExplorer.Tooltips.AddToAudioFiles}"
+                ToolTipService.ShowOnDisabled="True"
                 Command="{Binding AddToAudioFilesCommand}" 
                 VerticalAlignment="Center" 
                 HorizontalAlignment="Left"
@@ -106,7 +111,7 @@
                         KeyboardNavigation.IsTabStop="True"
                         HorizontalAlignment="Stretch" Padding="2.5, 0, 0, 0"  Height="24" VerticalContentAlignment="Center" 
                         Text="{Binding FilterQuery, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay, Delay=350}"
-                        Tag="Search Audio Files Explorer">
+                        Tag="{loc:Loc AudioFilesExplorer.SearchTag}">
                     </TextBox>
 
                     <Button 
@@ -166,7 +171,7 @@
             </Border>
         </Grid>
 
-        <AudioFilesExplorer:MultiSelectTreeView
+        <Controls:MultiSelectTreeView
             x:Name="AudioFilesTreeView"
             Grid.Row="3"
             Grid.ColumnSpan="2"
@@ -176,10 +181,10 @@
             Background="{DynamicResource TreeView.Static.Background}"
             BorderBrush="Transparent"
             SelectedItems="{Binding SelectedTreeNodes, Mode=TwoWay}"
-            PreviewMouseDoubleClick="OnNodeDoubleClick"
+            MouseDoubleClick="OnMouseDoubleClick"
             Style="{StaticResource {x:Type TreeView}}">
 
-            <AudioFilesExplorer:MultiSelectTreeView.ItemContainerStyle>
+            <Controls:MultiSelectTreeView.ItemContainerStyle>
                 <Style 
                     TargetType="{x:Type TreeViewItem}" 
                     BasedOn="{StaticResource {x:Type TreeViewItem}}">
@@ -194,12 +199,27 @@
                                 Converter="{StaticResource BoolToVisibilityConverter}" />
                         </Setter.Value>
                     </Setter>
+                    <Style.Triggers>
+                        <Trigger 
+                            Property="Controls:MultiSelectTreeView.IsMultiSelected" 
+                            Value="True">
+                            <Setter 
+                                Property="Background" 
+                                Value="{DynamicResource TreeViewItem.Selected.Background}" />
+                            <Setter 
+                                Property="BorderBrush" 
+                                Value="{DynamicResource TreeViewItem.Selected.Border}" />
+                            <Setter 
+                                Property="Foreground" 
+                                Value="{DynamicResource ABrush.Foreground.Deeper}" />
+                        </Trigger>
+                    </Style.Triggers>
                 </Style>
-            </AudioFilesExplorer:MultiSelectTreeView.ItemContainerStyle>
+            </Controls:MultiSelectTreeView.ItemContainerStyle>
 
-            <AudioFilesExplorer:MultiSelectTreeView.ItemTemplate>
+            <Controls:MultiSelectTreeView.ItemTemplate>
                 <HierarchicalDataTemplate 
-                    DataType="{x:Type Shared:AudioFilesTreeNode}" 
+                    DataType="{x:Type Models:AudioFilesTreeNode}" 
                     ItemsSource="{Binding Children}">
                     <Grid>
                         <Grid.ColumnDefinitions>
@@ -220,7 +240,7 @@
                             Text="{Binding FileName}" />
                     </Grid>
                 </HierarchicalDataTemplate>
-            </AudioFilesExplorer:MultiSelectTreeView.ItemTemplate>
-        </AudioFilesExplorer:MultiSelectTreeView>
+            </Controls:MultiSelectTreeView.ItemTemplate>
+        </Controls:MultiSelectTreeView>
     </Grid>
 </UserControl>

@@ -1,12 +1,13 @@
 ﻿using System.Diagnostics;
 using System.Windows;
-using Editors.AnimationTextEditors.AnimationPack.Converters;
+using Editors.AnimationFragmentEditor.AnimationPack.Converters.AnimationBinWh3Converter;
 using Newtonsoft.Json;
 using Serilog;
 using Shared.Core.ErrorHandling;
 using Shared.Core.Events;
 using Shared.Core.Misc;
 using Shared.Core.PackFiles;
+using Shared.Core.PackFiles.Utility;
 using Shared.Core.Settings;
 using Shared.GameFormats.Animation;
 using Shared.GameFormats.AnimationMeta.Parsing;
@@ -25,20 +26,21 @@ namespace Editors.Reports.Animation
         private readonly ILogger _logger = Logging.Create<AnimMetaDataJsonGenerator>();
         private readonly IPackFileService _pfs;
         private readonly ApplicationSettingsService _settingsService;
-        private readonly MetaDataTagDeSerializer _metaDataTagDeSerializer;
+
+        private readonly MetaDataFileParser _metaDataFileParser;
         private readonly JsonSerializerSettings _jsonOptions;
 
-        public AnimMetaDataJsonGenerator(IPackFileService pfs, ApplicationSettingsService settingsService, MetaDataTagDeSerializer metaDataTagDeSerializer)
+        public AnimMetaDataJsonGenerator(IPackFileService pfs, ApplicationSettingsService settingsService, MetaDataFileParser metaDataFileParser)
         {
             _pfs = pfs;
             _settingsService = settingsService;
-            _metaDataTagDeSerializer = metaDataTagDeSerializer;
+            _metaDataFileParser = metaDataFileParser;
             _jsonOptions = new JsonSerializerSettings { Formatting = Formatting.Indented };
         }
 
-        public static void Generate(IPackFileService pfs, ApplicationSettingsService settingsService, MetaDataTagDeSerializer metaDataTagDeSerializer)
+        public static void Generate(IPackFileService pfs, ApplicationSettingsService settingsService,MetaDataFileParser metaDataFileParser)
         {
-            var instance = new AnimMetaDataJsonGenerator(pfs, settingsService, metaDataTagDeSerializer);
+            var instance = new AnimMetaDataJsonGenerator(pfs, settingsService, metaDataFileParser);
             instance.Create();
         }
 
@@ -61,10 +63,10 @@ namespace Editors.Reports.Animation
 
             //dump animationTable
             var packFileContainer = _pfs.GetAllPackfileContainers();
-            var animPack = packFileContainer[0].FileList["animations\\database\\battle\\bin\\animation_tables.animpack"];
+            var animPack = packFileContainer[0].FindFile("animations\\database\\battle\\bin\\animation_tables.animpack");
             var animPackFile = AnimationPackSerializer.Load(animPack, _pfs);
 
-            var converter = new AnimationBinWh3FileToXmlConverter(null, _metaDataTagDeSerializer);
+            var converter = new AnimationBinWh3FileToXmlConverter(null, _metaDataFileParser, null);
             foreach (var animFile in animPackFile.Files)
             {
                 if (animFile is AnimationBinWh3)
@@ -85,8 +87,7 @@ namespace Editors.Reports.Animation
                     if (data.Length == 0)
                         continue;
 
-                    var parser = new MetaDataFileParser();
-                    var metaData = parser.ParseFile(data, _metaDataTagDeSerializer);
+                    var metaData = _metaDataFileParser.ParseFile(data);
                     DumpAsJson(gameOutputDir, fileName + ".json", metaData);
                 }
                 catch (Exception e)

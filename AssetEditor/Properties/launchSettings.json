@@ -9,6 +9,16 @@
       "commandLineArgs": "-devcfg Kitbash_Karl",
       "nativeDebugging": false
     },
+    "AE-MeshFitter": {
+      "commandName": "Project",
+      "commandLineArgs": "-devcfg Kitbash_MeshFitter",
+      "nativeDebugging": false
+    },
+    "AE-AnimPack_Wh3": {
+      "commandName": "Project",
+      "commandLineArgs": "-devcfg AnimPack_WH3",
+      "nativeDebugging": false
+    },
     "AE-KitbashRat": {
       "commandName": "Project",
       "commandLineArgs": "-devcfg Kitbash_Rat",
@@ -82,6 +92,11 @@
     "AE-Twui": {
       "commandName": "Project",
       "commandLineArgs": "-devcfg TwuiToolEditor",
+      "nativeDebugging": false
+    },
+    "AE-CampaignAnimationDamsel": {
+      "commandName": "Project",
+      "commandLineArgs": "-devcfg CampaignAnimationDamsel",
       "nativeDebugging": false
     }
   }

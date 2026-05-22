@@ -4,6 +4,7 @@ using Shared.Core.PackFiles.Models;
 using Shared.Core.Settings;
 using Shared.GameFormats.RigidModel.Types;
 using Editors.ImportExport.Common.Interfaces;
+using Shared.Core.PackFiles.Models.FileSources;
 
 namespace Editors.ImportExport.Importing.Importers.PngToDds
 {

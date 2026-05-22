@@ -1,6 +1,6 @@
 ﻿using System.Collections;
 using System.Diagnostics;
-using Shared.Core.ByteParsing;
+using Shared.ByteParsing;
 using Shared.Core.Misc;
 using Shared.Core.Settings;
 using Shared.GameFormats.DB;
@@ -13,7 +13,7 @@ namespace Shared.GameFormats.AnimationPack.AnimPackFileTypes
         GameTypeEnum _preferedGame = GameTypeEnum.Warhammer2;
 
         public string FileName { get; set; }
-        public AnimationPackFile Parent { get; set; }
+        public AnimationPackFileDatabase Parent { get; set; }
         public bool IsUnknownFile { get; set; } = false;
         public NotifyAttr<bool> IsChanged { get; set; } = new NotifyAttr<bool>(false);
 

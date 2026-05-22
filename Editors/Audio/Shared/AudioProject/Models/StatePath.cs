@@ -11,15 +11,12 @@ namespace Editors.Audio.Shared.AudioProject.Models
         public AkBkHircType TargetHircType { get; set; }
         public List<Node> Nodes { get; set; } = [];
 
-        public static StatePath Create(List<Node> nodes, uint targetHircId, AkBkHircType targetHircType)
+        public StatePath(List<Node> nodes, uint targetHircId, AkBkHircType targetHircType)
         {
-            return new StatePath
-            {
-                Name = BuildName(nodes),
-                Nodes = nodes,
-                TargetHircId = targetHircId,
-                TargetHircType = targetHircType
-            };
+            Name = BuildName(nodes);
+            Nodes = nodes;
+            TargetHircId = targetHircId;
+            TargetHircType = targetHircType;
         }
 
         public static string BuildName(List<Node> nodes)
@@ -27,35 +24,14 @@ namespace Editors.Audio.Shared.AudioProject.Models
             return string.Join('.', nodes.Select(node => $"[{node.StateGroup.Name}]{node.State.Name}"));
         }
 
-        public bool TargetHircTypeIsSound()
-        {
-            if (TargetHircType == AkBkHircType.Sound)
-                return true;
-            else
-                return false;
-        }
+        public bool TargetHircTypeIsSound() => TargetHircType == AkBkHircType.Sound;
 
-        public bool TargetHircTypeIsRandomSequenceContainer()
-        {
-            if (TargetHircType == AkBkHircType.RandomSequenceContainer)
-                return true;
-            else
-                return false;
-        }
+        public bool TargetHircTypeIsRandomSequenceContainer() => TargetHircType == AkBkHircType.RandomSequenceContainer;
 
-        public class Node
+        public class Node(StateGroup stateGroup, State state)
         {
-            public StateGroup StateGroup { get; set; }
-            public State State { get; set; }
-
-            public static Node Create(StateGroup stateGroup, State state)
-            {
-                return new Node
-                {
-                    StateGroup = stateGroup,
-                    State = state
-                };
-            }
+            public StateGroup StateGroup { get; set; } = stateGroup;
+            public State State { get; set; } = state;
         }
     }
 
@@ -79,6 +55,21 @@ namespace Editors.Audio.Shared.AudioProject.Models
             ArgumentNullException.ThrowIfNull(statePath);
 
             if (existingStatePaths.Any(existingStatePath => StringComparer.OrdinalIgnoreCase.Equals(existingStatePath, statePath.Name)))
+                throw new ArgumentException($"Cannot add StatePath with Name {statePath.Name} as it already exists.");
+
+            var index = existingStatePaths.BinarySearch(statePath, s_nameComparerIgnoreCase);
+            if (index < 0)
+                index = ~index;
+
+            existingStatePaths.Insert(index, statePath);
+        }
+
+        public static void TryAdd(this List<StatePath> existingStatePaths, StatePath statePath)
+        {
+            ArgumentNullException.ThrowIfNull(existingStatePaths);
+            ArgumentNullException.ThrowIfNull(statePath);
+
+            if (existingStatePaths.Any(existingStatePath => StringComparer.OrdinalIgnoreCase.Equals(existingStatePath.Name, statePath.Name)))
                 throw new ArgumentException($"Cannot add StatePath with Name {statePath.Name} as it already exists.");
 
             var index = existingStatePaths.BinarySearch(statePath, s_nameComparerIgnoreCase);

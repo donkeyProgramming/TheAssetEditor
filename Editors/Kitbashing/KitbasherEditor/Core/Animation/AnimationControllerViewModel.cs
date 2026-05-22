@@ -1,5 +1,6 @@
 ﻿using System.Collections.ObjectModel;
 using System.IO;
+using System.Windows;
 using System.Windows.Input;
 using CommunityToolkit.Mvvm.Input;
 using Editors.KitbasherEditor.Core;
@@ -50,6 +51,8 @@ namespace Editors.KitbasherEditor.ViewModels
 
         int _maxFrames = 0;
         public int MaxFrames { get { return _maxFrames; } set { SetAndNotify(ref _maxFrames, value); } }
+
+        public NotifyAttr<Visibility> AnimationControllerVisability { get; set; } = new NotifyAttr<Visibility>(Visibility.Collapsed);
 
 
         public ICommand PausePlayCommand { get; set; }
@@ -203,6 +206,8 @@ namespace Editors.KitbasherEditor.ViewModels
                 _player.SetAnimation(null, skeleton, true);
             }
 
+         
+            AnimationControllerVisability.Value = isEnabled ? Visibility.Visible: Visibility.Collapsed; 
             _player.IsEnabled = isEnabled;
         }
     }

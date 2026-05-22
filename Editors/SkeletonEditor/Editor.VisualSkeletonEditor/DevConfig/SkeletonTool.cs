@@ -1,5 +1,7 @@
-﻿using Shared.Core.DevConfig;
+﻿using CommunityToolkit.Diagnostics;
+using Shared.Core.DevConfig;
 using Shared.Core.PackFiles;
+using Shared.Core.PackFiles.Utility;
 using Shared.Core.Settings;
 using Shared.Core.ToolCreation;
 using Shared.EmbeddedResources;
@@ -8,11 +10,11 @@ namespace Editor.VisualSkeletonEditor.DevConfig
 {
     internal class SkeletonTool : IDeveloperConfiguration
     {
-        private readonly IEditorCreator _editorCreator;
+        private readonly IEditorManager _editorCreator;
         private readonly IPackFileContainerLoader _packFileContainerLoader;
         private readonly IPackFileService _packFileService;
 
-        public SkeletonTool(IEditorCreator editorCreator, IPackFileContainerLoader packFileContainerLoader, IPackFileService packFileService)
+        public SkeletonTool(IEditorManager editorCreator, IPackFileContainerLoader packFileContainerLoader, IPackFileService packFileService)
         {
             _editorCreator = editorCreator;
             _packFileContainerLoader = packFileContainerLoader;
@@ -27,6 +29,7 @@ namespace Editor.VisualSkeletonEditor.DevConfig
 
             var packFile = ResourceLoader.GetDevelopmentDataFolder() + "\\Karl_and_celestialgeneral.pack";
             var container = _packFileContainerLoader.Load(packFile);
+            Guard.IsNotNull(container, "Failed to load pack file container for development config.");   
             container.IsCaPackFile = true;
             _packFileService.AddContainer(container);
         }

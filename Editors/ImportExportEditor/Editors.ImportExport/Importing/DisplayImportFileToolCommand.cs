@@ -22,7 +22,7 @@ namespace Editors.ImportExport.Importing
             _importerViewModels = exporterViewModels;
         }
 
-        public void Execute(PackFileContainer packFileContainer, string packPath)
+        public void Execute(IPackFileContainer packFileContainer, string packPath)
         {
             var fileExtentionFilters = GetFileDialogFilters();
 

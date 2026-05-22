@@ -20,7 +20,7 @@ namespace Editors.Audio.Shared.AudioProject.Models
             HircType = AkBkHircType.Sound;
         }
 
-        public static Sound Create(Guid guid, uint id, uint overrideBusId, uint directParentId, uint sourceId, string language, HircSettings hircSettings)
+        public static Sound CreateTargetSound(Guid guid, uint id, uint overrideBusId, uint directParentId, uint sourceId, string language, HircSettings hircSettings)
         {
             return new Sound()
             {
@@ -34,7 +34,7 @@ namespace Editors.Audio.Shared.AudioProject.Models
             };
         }
 
-        public static Sound Create(Guid guid, uint id, uint directParentId, int playlistOrder, uint sourceId, string language)
+        public static Sound CreateContainerSound(Guid guid, uint id, uint directParentId, int playlistOrder, uint sourceId, string language)
         {
             return new Sound()
             {

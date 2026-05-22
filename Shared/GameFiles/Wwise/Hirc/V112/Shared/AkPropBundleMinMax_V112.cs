@@ -1,4 +1,4 @@
-﻿using Shared.Core.ByteParsing;
+﻿using Shared.ByteParsing;
 using static Shared.GameFormats.Wwise.Enums.Enums_V112;
 
 namespace Shared.GameFormats.Wwise.Hirc.V112.Shared

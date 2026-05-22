@@ -70,7 +70,8 @@ namespace Editors.Audio.Shared.Wwise.Generators.Hirc.V136
                 VirtualQueueBehavior = 0x01,
                 MaxNumInstance = 0,
                 BelowThresholdBehavior = 0,
-                BitVector2 = 0x00
+                BitVector2 = 0x00,
+                EnableLoudnessNormalisation = true
             };
             nodeBaseParams.StateChunk = new StateChunk_V136();
             nodeBaseParams.InitialRtpc = new InitialRtpc_V136();
@@ -109,7 +110,8 @@ namespace Editors.Audio.Shared.Wwise.Generators.Hirc.V136
                 VirtualQueueBehavior = 0x01,
                 MaxNumInstance = 0,
                 BelowThresholdBehavior = 0,
-                BitVector2 = 0x00
+                BitVector2 = 0x00,
+                EnableLoudnessNormalisation = true
             };
             nodeBaseParams.StateChunk = new StateChunk_V136();
             nodeBaseParams.InitialRtpc = new InitialRtpc_V136();

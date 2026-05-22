@@ -1,12 +1,10 @@
-﻿using Editors.ImportExport.Exporting.Exporters.DdsToMaterialPng;
-using Editors.ImportExport.Exporting.Exporters.DdsToNormalPng;
-using Editors.ImportExport.Exporting.Exporters.RmvToGltf.Helpers;
+﻿using Editors.ImportExport.Exporting.Exporters.RmvToGltf.Helpers;
 using Editors.ImportExport.Importing.Importers.GltfToRmv;
 using Editors.ImportExport.Importing.Importers.GltfToRmv.Helper;
 using GameWorld.Core.Services;
 using Moq;
 using Shared.Core.Events;
-using Shared.Core.PackFiles.Models;
+using Shared.Core.PackFiles.Models.Containers;
 using Shared.Core.Services;
 using Shared.GameFormats.RigidModel;
 using Shared.TestUtility;
@@ -67,10 +65,10 @@ namespace Test.ImportExport.Importing.Importers.GltfImporterTest
             // Act
             importer.Import(settings);
             var rmv2FileName = @$"{settings.DestinationPackPath}\{Path.GetFileNameWithoutExtension(settings.InputGltfFile)}.rigid_model_v2".ToLower();
-            var isPackFileAddedToContainer = packFileContainer.FileList.TryGetValue(rmv2FileName, out var packFile);
+            var packFile = packFileContainer.FindFile(rmv2FileName);
                          
             //  Assert                        
-            Assert.That(isPackFileAddedToContainer, Is.EqualTo(true));            
+            Assert.That(packFile, Is.Not.Null);            
             var rmv2File = ModelFactory.Create().Load(packFile!.DataSource!.ReadData());
             Assert.That(rmv2File, Is.Not.Null);
             Assert.That(rmv2File!.LodHeaders.Length, Is.EqualTo(TestData.Rmv2Expected.lodCount));            

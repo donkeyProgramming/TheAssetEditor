@@ -1,5 +1,4 @@
-﻿using AnimationEditor.CampaignAnimationCreator;
-using AnimationEditor.Common.BaseControl;
+﻿using AnimationEditor.Common.BaseControl;
 using AnimationEditor.MountAnimationCreator;
 using Editors.AnimationVisualEditors.AnimationKeyframeEditor;
 using Editors.Shared.Core.Common.BaseControl;
@@ -28,7 +27,6 @@ namespace Editors.AnimationVisualEditors
 
             serviceCollection.AddScoped<EditorHost<CampaignAnimationCreatorViewModel>>();
             serviceCollection.AddScoped<CampaignAnimationCreatorViewModel>();
-
             serviceCollection.AddScoped<EditorHost<MountAnimationCreatorViewModel>>();
             serviceCollection.AddScoped<MountAnimationCreatorViewModel>();
 
@@ -44,11 +42,6 @@ namespace Editors.AnimationVisualEditors
                 .Create<EditorHost<MountAnimationCreatorViewModel>, EditorHostView>(EditorEnums.MountTool_Editor)
                 .AddToToolbar("Mount Tool", true)
                 .Build(database);
-      
-            EditorInfoBuilder
-              .Create<EditorHost<CampaignAnimationCreatorViewModel>, EditorHostView>(EditorEnums.CampaginAnimation_Editor)
-              .AddToToolbar("Campagin Aanimation Tool", false)
-              .Build(database);
         
             // Register the Keyframe editor using its EditorHostBase-based type
             EditorInfoBuilder

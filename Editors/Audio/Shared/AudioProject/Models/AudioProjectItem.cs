@@ -12,7 +12,6 @@ namespace Editors.Audio.Shared.AudioProject.Models
         [JsonPropertyOrder(-2)] public uint Id { get; set; }
         [JsonPropertyOrder(-1)] public AkBkHircType HircType { get; set; }
 
-
         public static readonly IComparer<AudioProjectItem> IdComparer = new AudioProjectItemIdComparer();
 
         private class AudioProjectItemIdComparer : IComparer<AudioProjectItem>

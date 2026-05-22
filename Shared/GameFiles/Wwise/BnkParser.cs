@@ -1,4 +1,4 @@
-﻿using Shared.Core.ByteParsing;
+﻿using Shared.ByteParsing;
 using Shared.Core.PackFiles.Models;
 using Shared.GameFormats.Wwise.Bkhd;
 using Shared.GameFormats.Wwise.Data;

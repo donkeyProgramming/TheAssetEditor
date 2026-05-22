@@ -13,11 +13,11 @@ namespace AssetEditor.WindowsTitleMenu
             var ws = (WindowState)value;
             if (ws == WindowState.Normal)
             {
-                return Geometry.Parse("M 13.5,10.5 H 22.5 V 19.5 H 13.5 Z");
+                return Geometry.Parse("M 18.5,10.5 H 27.5 V 19.5 H 18.5 Z");
             }
             else
             {
-                return Geometry.Parse("M 13.5,12.5 H 20.5 V 19.5 H 13.5 Z M 15.5,12.5 V 10.5 H 22.5 V 17.5 H 20.5");
+                return Geometry.Parse("M 18.5,12.5 H 25.5 V 19.5 H 18.5 Z M 20.5,12.5 V 10.5 H 27.5 V 17.5 H 25.5");
             }
         }
 

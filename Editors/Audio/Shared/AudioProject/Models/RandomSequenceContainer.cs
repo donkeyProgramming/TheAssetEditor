@@ -10,24 +10,17 @@ namespace Editors.Audio.Shared.AudioProject.Models
         public uint OverrideBusId { get; set; }
         public uint DirectParentId { get; set; }
         public HircSettings HircSettings { get; set; }
-        public List<uint> Children { get; set; }
+        public List<uint> Children { get; set; } = [];
 
-        public RandomSequenceContainer()
+        public RandomSequenceContainer(Guid guid, uint id, uint overrideBusId, uint directParentId, HircSettings hircSettings, List<uint> children)
         {
+            Guid = guid;
+            Id = id;
             HircType = AkBkHircType.RandomSequenceContainer;
-        }
-
-        public static RandomSequenceContainer Create(Guid guid, uint id, HircSettings hircSettings, List<uint> children, uint overrideBusId = 0, uint directParentId = 0)
-        {
-            return new RandomSequenceContainer
-            {
-                Guid = guid,
-                Id = id,
-                OverrideBusId = overrideBusId,
-                DirectParentId = directParentId,
-                HircSettings = hircSettings,
-                Children = children
-            };
+            OverrideBusId = overrideBusId;
+            DirectParentId = directParentId;
+            HircSettings = hircSettings;
+            Children = children;
         }
     }
 

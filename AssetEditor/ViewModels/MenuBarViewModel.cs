@@ -5,10 +5,11 @@ using System.IO;
 using System.Linq;
 using AssetEditor.UiCommands;
 using CommonControls.BaseDialogs;
-using CommonControls.Editors.AnimationPack;
 using CommunityToolkit.Mvvm.Input;
+using Editors.AnimationFragmentEditor.AnimationPack.Commands;
 using Editors.Reports.Animation;
 using Editors.Reports.Audio;
+using Editors.Reports.Bmd;
 using Editors.Reports.DeepSearch;
 using Editors.Reports.Files;
 using Editors.Reports.Geometry;
@@ -17,6 +18,7 @@ using Shared.Core.Events;
 using Shared.Core.Misc;
 using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
+using Shared.Core.PackFiles.Utility;
 using Shared.Core.Services;
 using Shared.Core.Settings;
 using Shared.Core.ToolCreation;
@@ -74,16 +76,20 @@ namespace AssetEditor.ViewModels
                     return;
                 }
 
-                var newPackFile = _packfileService.CreateNewPackFileContainer(window.TextValue.Trim(), PackFileCAType.MOD);
+                var currentGame = _settingsService.CurrentSettings.CurrentGame;
+                var pfsVersion = GameInformationDatabase.Games[currentGame].PackFileVersion; 
+
+                var newPackFile = _packfileService.CreateNewPackFileContainer(window.TextValue.Trim(), pfsVersion, PackFileCAType.MOD);
                 _packfileService.SetEditablePack(newPackFile);
             }
         }
-
-        [RelayCommand] private void CreateAnimPackWarhammer3() => AnimationPackSampleDataCreator.CreateAnimationDbWarhammer3(_packFileSaveService, _packfileService);
-        [RelayCommand] private void CreateAnimPack3k() => AnimationPackSampleDataCreator.CreateAnimationDb3k(_packfileService, _packFileSaveService);
+        
+        [RelayCommand] private void CreateAnimPackWarhammer3() => _uiCommandFactory.Create<CreateExampleAnimationDbCommand>().CreateAnimationDbWarhammer3();
+        [RelayCommand] private void CreateAnimPack3k() => _uiCommandFactory.Create<CreateExampleAnimationDbCommand>().CreateAnimationDb3k();
         [RelayCommand] private void SaveActivePack() => _uiCommandFactory.Create<SavePackFileContainerCommand>().Execute();
         [RelayCommand] private void OpenWh2AnimpackUpdater() => new AnimPackUpdaterService(_packfileService).Process();
         [RelayCommand] private void GenerateRmv2Report() => _uiCommandFactory.Create<Rmv2ReportCommand>().Execute();
+        [RelayCommand] private void GenerateBmdReport() => _uiCommandFactory.Create<BmdReportCommand>().Execute();
         [RelayCommand] private void GenerateMetaDataReport() => _uiCommandFactory.Create<GenerateMetaDataReportCommand>().Execute();
         [RelayCommand] private void GenerateFileListReport() => _uiCommandFactory.Create<FileListReportCommand>().Execute();
         [RelayCommand] private void GenerateMetaDataJsonsReport() => _uiCommandFactory.Create<GenerateMetaJsonDataReportCommand>().Execute();
@@ -98,8 +104,11 @@ namespace AssetEditor.ViewModels
         [RelayCommand] private void TouchedFileRecorderExtract() => _touchedFilesRecorder.ExtractFilesToPack(@"c:\temp\extractedPack.pack");
         [RelayCommand] private void TouchedFileRecorderStop() => _touchedFilesRecorder.Stop();
 
+        public bool IsDebuggerAttached => Debugger.IsAttached;
+
         [RelayCommand] private void ClearConsole() => Console.Clear();
         [RelayCommand] private void PrintScope() => _uiCommandFactory.Create<PrintScopesCommand>().Execute();
+        [RelayCommand] private void PrintTrackedGraphicsResources() => _uiCommandFactory.Create<PrintTrackedGraphicsResourcesCommand>().Execute();
         [RelayCommand] private void Search() => _uiCommandFactory.Create<DeepSearchCommand>().Execute();
         [RelayCommand] private void OpenAttilaPacks() => _uiCommandFactory.Create<OpenGamePackCommand>().Execute(GameTypeEnum.Attila);
         [RelayCommand] private void OpenRomeRemasteredPacks() => _uiCommandFactory.Create<OpenGamePackCommand>().Execute(GameTypeEnum.RomeRemastered);
@@ -117,7 +126,16 @@ namespace AssetEditor.ViewModels
         [RelayCommand] private void OpenKostalynTutorial() => _uiCommandFactory.Create<OpenWebpageCommand>().Execute("https://www.youtube.com/watch?v=AXw99yc74CY");
         [RelayCommand] private void OpenRecolouringModelsTutorial() => _uiCommandFactory.Create<OpenWebpageCommand>().Execute("https://youtu.be/azDq2IRnr1U?si=GammGsisnCzGKYiA");
 
-        [RelayCommand] private void OpenHelp() => _uiCommandFactory.Create<OpenWebpageCommand>().Execute("https://tw-modding.com/index.php/Tutorial:AssetEditor");
+        [RelayCommand]
+        private void OpenHelp()
+        {
+            var appDirectory = AppDomain.CurrentDomain.BaseDirectory;
+            var fullPath = Path.Combine(appDirectory, "Doc", "index.html");
+            Console.WriteLine(fullPath);
+            _uiCommandFactory.Create<OpenWebpageCommand>().Execute(fullPath);
+        }
+        [RelayCommand] private void OpenModdingWiki() => _uiCommandFactory.Create<OpenWebpageCommand>().Execute("https://tw-modding.com/index.php/Tutorial:AssetEditor");
+        
         [RelayCommand] private void OpenPatreon() => _uiCommandFactory.Create<OpenWebpageCommand>().Execute("https://www.patreon.com/TheAssetEditor");
         [RelayCommand] private void OpenDiscord() => _uiCommandFactory.Create<OpenWebpageCommand>().Execute("https://discord.gg/6Djf2sCczC");
         [RelayCommand] private void DownloadRme() => _uiCommandFactory.Create<OpenWebpageCommand>().Execute("https://github.com/mr-phazer/RME_Release/releases/latest");

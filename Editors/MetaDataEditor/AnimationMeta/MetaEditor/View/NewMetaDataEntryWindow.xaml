@@ -1,0 +1,23 @@
+﻿<Window x:Class="Editors.AnimationMeta.Presentation.View.NewMetaDataEntryWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:loc="clr-namespace:Shared.Ui.Common;assembly=Shared.Ui"
+        mc:Ignorable="d"
+        Style="{StaticResource CustomWindowStyle}"
+        Title="{loc:Loc MetadataEditor.NewEntryWindow.Title}" Height="450" Width="400">
+    <Grid>
+        <ListView
+            ItemsSource="{Binding Items, UpdateSourceTrigger=PropertyChanged}"
+            SelectedItem="{Binding SelectedItem, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" 
+            MouseDoubleClick="ListView_MouseDoubleClick">
+            <ListView.ItemContainerStyle>
+                <Style TargetType="ListViewItem">
+                    <Setter Property="Height" Value="24"/>
+                </Style>
+            </ListView.ItemContainerStyle>
+        </ListView>
+    </Grid>
+    
+</Window>

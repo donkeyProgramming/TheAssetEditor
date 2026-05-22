@@ -1,13 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Editors.KitbasherEditor.UiCommands;
+﻿using Editors.KitbasherEditor.ChildEditors.SaveDialog;
 using GameWorld.Core.Services.SceneSaving;
 using Shared.Core.Events;
+using Shared.Core.Events.Global;
 using Shared.GameFormats.RigidModel;
-using Shared.Ui.Events.UiCommands;
 using Test.TestingUtility.Shared;
 
 namespace Test.KitbashEditor.LoadAndSave
@@ -33,12 +28,13 @@ namespace Test.KitbashEditor.LoadAndSave
             // Edit the save settings and trigger a save
             var saveSettings = runner.GetRequiredServiceInCurrentEditorScope<GeometrySaveSettings>();
             saveSettings.IsUserInitialized = true;
+            saveSettings.DisplayDialogOnNextSave = false;
 
             var toolCommandFactory = runner.GetRequiredServiceInCurrentEditorScope<IUiCommandFactory>();
             toolCommandFactory.Create<SaveCommand>().Execute();
 
             // Verify output files
-            Assert.That(outputPackFile!.FileList.Count, Is.EqualTo(2));
+            Assert.That(outputPackFile!.GetFileCount(), Is.EqualTo(2));
 
             // Verify the generated RMV2 file
             uint[] expectedMeshCountPerLod = [4, 4, 2, 2];

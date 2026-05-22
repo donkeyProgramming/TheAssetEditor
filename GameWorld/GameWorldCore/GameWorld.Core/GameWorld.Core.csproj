@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFramework>net10.0-windows</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+		<UseWPF>true</UseWPF>
+        <Nullable>enable</Nullable>
+	</PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\Shared\SharedUI\Shared.Ui\Shared.Ui.csproj" />
+    <ProjectReference Include="..\..\..\Shared\GameFiles\Shared.GameFormats.csproj" />
+    <ProjectReference Include="..\..\ContentProject\ContentProject.csproj" />
+    <ProjectReference Include="..\..\MeshDecimator\MeshDecimator.csproj" />
+  </ItemGroup>
+
+</Project>

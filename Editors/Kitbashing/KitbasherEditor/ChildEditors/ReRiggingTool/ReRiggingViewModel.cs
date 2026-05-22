@@ -1,5 +1,6 @@
-﻿using GameWorld.Core.Commands;
+using GameWorld.Core.Commands;
 using GameWorld.Core.SceneNodes;
+using Shared.Core.Services;
 using Shared.Ui.Editors.BoneMapping;
 
 namespace Editors.KitbasherEditor.ChildEditors.ReRiggingTool
@@ -9,7 +10,7 @@ namespace Editors.KitbasherEditor.ChildEditors.ReRiggingTool
         private readonly CommandFactory _commandFactory;
         private List<Rmv2MeshNode> _selectedMeshes;
 
-        public ReRiggingViewModel(CommandFactory commandFactory)
+        public ReRiggingViewModel(CommandFactory commandFactory, LocalizationManager localizationManager) : base(localizationManager)
         {
             _commandFactory = commandFactory;
         }
@@ -33,7 +34,7 @@ namespace Editors.KitbasherEditor.ChildEditors.ReRiggingTool
             var numMappings = mapping.Count(x => x.IsUsedByModel);
             if (usedBonesCount != numMappings)
             {
-                errorText = "Not all bones mapped. This will not work as you expect and will case problems later!\nOnly do this if your REALLY know what you are doing";
+                errorText = _localizationManager.Get("KitbasherTool.BoneMapping.ValidationIncompleteMapping");
                 return false;
             }
             errorText = "";

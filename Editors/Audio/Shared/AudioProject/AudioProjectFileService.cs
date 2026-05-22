@@ -30,7 +30,7 @@ namespace Editors.Audio.Shared.AudioProject
 
         public void Save(AudioProjectFile audioProject, string fileName, string filePath)
         {
-            var cleanedAudioProject = AudioProjectFile.Clean(audioProject);
+            var cleanedAudioProject = audioProject.Clean();
 
             var options = new JsonSerializerOptions { DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull, WriteIndented = true };
             var audioProjectJson = JsonSerializer.Serialize(cleanedAudioProject, options);

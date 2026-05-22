@@ -48,6 +48,7 @@ namespace Shared.EmbeddedResources
 
         [AllowNull]public static BitmapImage FreezeAnimationIcon { get; private set; }
         [AllowNull]public static BitmapImage PinIcon { get; private set; }
+        [AllowNull] public static BitmapImage CameraTool { get; private set; }
 
         [AllowNull]public static BitmapImage GrowSelectionIcon { get; private set; } 
         [AllowNull]public static BitmapImage FaceToVertexIcon { get; private set; } 
@@ -57,6 +58,7 @@ namespace Shared.EmbeddedResources
         [AllowNull] public static BitmapSource InformationIcon { get; private set; }
 
         [AllowNull] public static BitmapImage AudioFileIcon { get; private set; }
+        [AllowNull] public static BitmapImage AssignTextureFromOtherIcon { get; private set; }
 
         public static void Load()
         {
@@ -100,7 +102,8 @@ namespace Shared.EmbeddedResources
 
             FreezeAnimationIcon = BitmapToImageSource(@"Kitbasher.icons8-fruity-ice-pop-64.png");
             PinIcon = BitmapToImageSource(@"Kitbasher.pin.png");
-
+            AssignTextureFromOtherIcon = BitmapToImageSource(@"Kitbasher.AssignTextureFromOther.png");
+            CameraTool = BitmapToImageSource(@"Kitbasher.CameraTool.png");
             GrowSelectionIcon = BitmapToImageSource(@"Kitbasher.ExpandSelection.png");
             FaceToVertexIcon = BitmapToImageSource(@"Kitbasher.FaceToVertex.png");
             MergeVertexIcon = BitmapToImageSource(@"Kitbasher.tool_mergeVertex.png");

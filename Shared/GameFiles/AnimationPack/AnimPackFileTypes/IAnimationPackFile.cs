@@ -4,7 +4,7 @@ namespace Shared.GameFormats.AnimationPack.AnimPackFileTypes
 {
     public interface IAnimationPackFile
     {
-        AnimationPackFile Parent { get; set; }
+        AnimationPackFileDatabase Parent { get; set; }
 
         string FileName { get; set; }
         public bool IsUnknownFile { get; set; }

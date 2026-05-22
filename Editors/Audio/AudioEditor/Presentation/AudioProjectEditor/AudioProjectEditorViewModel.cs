@@ -7,11 +7,18 @@ using System.Linq;
 using System.Windows.Controls;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using Editors.Audio.AudioEditor.Commands;
+using Editors.Audio.AudioEditor.Commands.AudioProjectEditor;
 using Editors.Audio.AudioEditor.Core;
 using Editors.Audio.AudioEditor.Events;
+using Editors.Audio.AudioEditor.Events.AudioFilesExplorer;
+using Editors.Audio.AudioEditor.Events.AudioProjectEditor;
+using Editors.Audio.AudioEditor.Events.AudioProjectEditor.Enablement;
+using Editors.Audio.AudioEditor.Events.AudioProjectEditor.Shortcuts;
+using Editors.Audio.AudioEditor.Events.AudioProjectEditor.Table;
+using Editors.Audio.AudioEditor.Events.AudioProjectExplorer;
+using Editors.Audio.AudioEditor.Events.AudioProjectViewer.Table;
 using Editors.Audio.AudioEditor.Presentation.AudioProjectEditor.Table;
-using Editors.Audio.AudioEditor.Presentation.Shared;
+using Editors.Audio.AudioEditor.Presentation.Shared.Models;
 using Editors.Audio.AudioEditor.Presentation.Shared.Table;
 using Editors.Audio.Shared.AudioProject.Models;
 using Editors.Audio.Shared.GameInformation.Warhammer3;
@@ -19,6 +26,7 @@ using Editors.Audio.Shared.Storage;
 using Serilog;
 using Shared.Core.ErrorHandling;
 using Shared.Core.Events;
+using Shared.Ui.Common;
 
 namespace Editors.Audio.AudioEditor.Presentation.AudioProjectEditor
 {
@@ -68,6 +76,7 @@ namespace Editors.Audio.AudioEditor.Presentation.AudioProjectEditor
             _eventHub.Register<EditorDataGridTextboxTextChangedEvent>(this, OnEditorDataGridTextboxTextChanged);
             _eventHub.Register<MovieFileChangedEvent>(this, OnMovieFileChanged);
             _eventHub.Register<EditorAddRowButtonEnablementUpdateRequestedEvent>(this, OnEditorAddRowButtonEnablementUpdateRequested);
+            _eventHub.Register<EditorAddRowShortcutActivatedEvent>(this, OnEditorAddRowShortcutActivated);
         }
 
         private void OnAudioProjectInitialised(AudioProjectLoadedEvent e)
@@ -90,13 +99,13 @@ namespace Editors.Audio.AudioEditor.Presentation.AudioProjectEditor
             {
                 MakeEditorVisible();
                 SetEditorLabel(selectedAudioProjectExplorerNode.Name);
-                Load(selectedAudioProjectExplorerNode.Type);
+                LoadTable(selectedAudioProjectExplorerNode.Type);
             }
             else if (selectedAudioProjectExplorerNode.IsDialogueEvent())
             {
                 MakeEditorVisible();
-                SetEditorLabel(TableHelpers.DuplicateUnderscores(selectedAudioProjectExplorerNode.Name));
-                Load(selectedAudioProjectExplorerNode.Type);
+                SetEditorLabel(WpfHelpers.DuplicateUnderscores(selectedAudioProjectExplorerNode.Name));
+                LoadTable(selectedAudioProjectExplorerNode.Type);
 
                 var moddedStatesCount = _audioEditorStateService.AudioProject.StateGroups.SelectMany(stateGroup => stateGroup.States).Count();
                 if (moddedStatesCount > 0)
@@ -105,8 +114,8 @@ namespace Editors.Audio.AudioEditor.Presentation.AudioProjectEditor
             else if (selectedAudioProjectExplorerNode.IsStateGroup())
             {
                 MakeEditorVisible();
-                SetEditorLabel(TableHelpers.DuplicateUnderscores(selectedAudioProjectExplorerNode.Name));
-                Load(selectedAudioProjectExplorerNode.Type);
+                SetEditorLabel(WpfHelpers.DuplicateUnderscores(selectedAudioProjectExplorerNode.Name));
+                LoadTable(selectedAudioProjectExplorerNode.Type);
             }
             else
                 return;
@@ -133,6 +142,9 @@ namespace Editors.Audio.AudioEditor.Presentation.AudioProjectEditor
                 Table.Rows.Add(row);
             else
                 Table.ImportRow(row);
+
+            if (Table.Rows.Count != 1)
+                throw new Exception("There must only be one row in the Editor table.");
 
             var selectedAudioProjectExplorerNode = _audioEditorStateService.SelectedAudioProjectExplorerNode;
             _logger.Here().Information($"Added {selectedAudioProjectExplorerNode.Type} row to Audio Project Editor table for {selectedAudioProjectExplorerNode.Name} ");
@@ -164,8 +176,8 @@ namespace Editors.Audio.AudioEditor.Presentation.AudioProjectEditor
 
         private void OnEditorTableRowAddedToViewer(EditorTableRowAddedToViewerEvent e)
         {
-            // Clear table to ensure there's only one row
-            Table.Clear();
+            // Clear rows to ensure there will only one row
+            Table.Rows.Clear();
 
             // Re-initialise table
             var selectedAudioProjectExplorerNode = _audioEditorStateService.SelectedAudioProjectExplorerNode;
@@ -178,31 +190,29 @@ namespace Editors.Audio.AudioEditor.Presentation.AudioProjectEditor
 
         private void OnViewerTableRowEdited(ViewerTableRowEditedEvent e)
         {
-            // Clear table to ensure there's only one row
-            Table.Clear();
+            // Clear rows to ensure there will only one row
+            Table.Rows.Clear();
 
             _eventHub.Publish(new EditorTableRowAddRequestedEvent(e.Row));
         }
 
-        private void OnAudioFilesChanged(AudioFilesChangedEvent e) => SetEventNameFromAudioFile(e.AudioFiles, e.AddToExistingAudioFiles, e.IsSetFromEditedItem);
+        private void OnAudioFilesChanged(AudioFilesChangedEvent e) => SetEventNameFromAudioFile(e.AudioFiles, e.AddToExistingAudioFiles, e.IsSetFromEditedViewerItem);
 
-        private void SetEventNameFromAudioFile(List<AudioFile> audioFiles, bool addToExistingAudioFiles, bool isSetFromEditedItem)
+        private void SetEventNameFromAudioFile(List<AudioFile> audioFiles, bool addToExistingAudioFiles, bool isSetFromEditedViewerItem)
         {
             var selectedAudioProjectExplorerNode = _audioEditorStateService.SelectedAudioProjectExplorerNode;
-            var isActionEvent = selectedAudioProjectExplorerNode.IsActionEvent();
-            var isNotMoviesActionEvent = selectedAudioProjectExplorerNode.Name != Wh3ActionEventInformation.GetName(Wh3ActionEventType.Movies);
             var hasExistingAudioFiles = _audioEditorStateService.AudioFiles.Count > 0;
 
-            if (isActionEvent
-                && !isSetFromEditedItem
-                && isNotMoviesActionEvent
+            if (selectedAudioProjectExplorerNode.IsActionEvent()
+                && !selectedAudioProjectExplorerNode.IsMovieActionEvent()
+                && isSetFromEditedViewerItem
                 && audioFiles.Count == 1
                 && ((hasExistingAudioFiles && !addToExistingAudioFiles) || (!hasExistingAudioFiles && addToExistingAudioFiles)))
             {
                 var row = Table.Rows[0];
                 var wavFileName = Path.GetFileNameWithoutExtension(audioFiles[0].WavPackFileName);
                 var eventName = $"Play_{wavFileName}";
-                row[TableInfo.EventColumnName] = eventName;
+                row[TableInformation.ActionEventColumnName] = eventName;
             }
 
             SetAddRowButtonEnablement();
@@ -214,24 +224,59 @@ namespace Editors.Audio.AudioEditor.Presentation.AudioProjectEditor
 
         private void SetMovieFilePath(string movieFilePath)
         {
-            var relativePath = Path.GetRelativePath("movies", movieFilePath);
-            var withoutExtension = Path.ChangeExtension(relativePath, null);
-            var slashesToUnderscores = withoutExtension.Replace("\\", "_");
-            var eventName = $"Play_Movie_{slashesToUnderscores}";
-
             var row = Table.Rows[0];
-            row[TableInfo.EventColumnName] = eventName;
+            row[TableInformation.ActionEventColumnName] = Wh3ActionEventInformation.GetMovieActionEventName(movieFilePath);
         }
 
         public void OnEditorAddRowButtonEnablementUpdateRequested(EditorAddRowButtonEnablementUpdateRequestedEvent e) => SetAddRowButtonEnablement();
 
-        private void Load(AudioProjectTreeNodeType selectedNodeType)
+        private void LoadTable(AudioProjectTreeNodeType selectedNodeType)
         {
             var tableService = _tableServiceFactory.GetService(selectedNodeType);
             tableService.Load(Table);
         }
 
-        [RelayCommand] public void AddRowToViewer() => _uiCommandFactory.Create<AddEditorRowToViewerCommand>().Execute(Table.Rows[0]);
+        private void OnEditorAddRowShortcutActivated(EditorAddRowShortcutActivatedEvent e)
+        {
+            if (_audioEditorStateService.EditorRow != null)
+                AddRowsToViewer();
+        }
+
+        [RelayCommand] public void AddRowsToViewer()
+        {
+            var rows = new List<DataRow>();
+            var row = Table.Rows[0];
+            rows.Add(row);
+
+            // TODO: Add support for vocalisation Action Events when implemented
+            // To hide the complexity of creating Pause / Resume / Stop Action Events
+            // from the user we create them for them for the necessary types of audio
+            // We put the Play Action Event first in the list so it's created before the others as they need to reference it
+            var selectedAudioProjectExplorerNode = _audioEditorStateService.SelectedAudioProjectExplorerNode;
+            if (selectedAudioProjectExplorerNode.IsActionEvent())
+            {
+                var actionEventName = TableHelpers.GetActionEventNameFromRow(row);
+                var actionEventSuffix = TableHelpers.RemoveActionEventPrefix(actionEventName);
+                if (selectedAudioProjectExplorerNode.IsMusicActionEvent())
+                {
+                    var pauseActionEventRow = TableHelpers.CreateRow(Table, $"Pause_{actionEventSuffix}");
+                    rows.Add(pauseActionEventRow);
+
+                    var resumeActionEventRow = TableHelpers.CreateRow(Table, $"Resume_{actionEventSuffix}");
+                    rows.Add(resumeActionEventRow);
+
+                    var stopActionEventRow = TableHelpers.CreateRow(Table, $"Stop_{actionEventSuffix}");
+                    rows.Add(stopActionEventRow);
+                }
+                else if (selectedAudioProjectExplorerNode.IsBattleAbilityActionEvent())
+                {
+                    var stopActionEventRow = TableHelpers.CreateRow(Table, $"Stop_{actionEventSuffix}");
+                    rows.Add(stopActionEventRow);
+                }
+            }
+
+            _uiCommandFactory.Create<AddRowsToViewerCommand>().Execute(rows);
+        }
 
         partial void OnShowModdedStatesOnlyChanged(bool value)
         {
@@ -240,8 +285,10 @@ namespace Editors.Audio.AudioEditor.Presentation.AudioProjectEditor
             var selectedAudioProjectExplorerNode = _audioEditorStateService.SelectedAudioProjectExplorerNode;
             if (selectedAudioProjectExplorerNode.IsDialogueEvent())
             {
-                Table.Clear();
-                Load(selectedAudioProjectExplorerNode.Type);
+                ResetTable();
+
+                // Reload the table from scratch because ComboBoxes values can't be updated
+                LoadTable(selectedAudioProjectExplorerNode.Type);
             }
         }
 
@@ -272,6 +319,7 @@ namespace Editors.Audio.AudioEditor.Presentation.AudioProjectEditor
             else
             {
                 IsAddRowButtonEnabled = true;
+                _audioEditorStateService.StoreEditorRow(Table.Rows[0]);
                 return;
             }
         }
@@ -346,8 +394,11 @@ namespace Editors.Audio.AudioEditor.Presentation.AudioProjectEditor
         }
 
         private void ResetTable()
-        {
-            Table = new DataTable();
+        {            
+            // Table.Clear() only removes the rows, so we need to do Table.Columns.Clear() to clear it fully. If we don't clear the table properly
+            // it leads to issues where e.g. a Dialogue Event may reference a table from a previous Dialogue Event with different State Groups.
+            Table.Clear();
+            Table.Columns.Clear();
             DataGridColumns.Clear();
         }
 

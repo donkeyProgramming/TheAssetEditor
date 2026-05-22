@@ -6,6 +6,7 @@
              xmlns:local="clr-namespace:KitbasherEditor.Views.EditorViews.Rmv2"
              xmlns:s="http://schemas.singulink.com/xaml"
              xmlns:System="clr-namespace:System;assembly=mscorlib"
+             xmlns:loc="clr-namespace:Shared.Ui.Common;assembly=Shared.Ui"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <UserControl.Resources>
@@ -15,57 +16,57 @@
     <Expander DockPanel.Dock="Top" IsExpanded="False">
         <Expander.Header>
             <StackPanel Orientation="Horizontal" >
-                <TextBlock Text="RMV2 Weighted Material - Details" FontWeight="Bold" Margin="3"/>
+                <TextBlock Text="{loc:Loc KitbashTool.WeightedMaterial.Title}" FontWeight="Bold" Margin="3"/>
             </StackPanel>
         </Expander.Header>
 
         <DockPanel LastChildFill="False" >
             <StackPanel Orientation="Horizontal" DockPanel.Dock="Top">
-                <Label Width ="{StaticResource labelWidth}" DockPanel.Dock="Left" Content="Filter"/>
+                <Label Width ="{StaticResource labelWidth}" DockPanel.Dock="Left" Content="{loc:Loc KitbashTool.WeightedMaterial.Filter}"/>
                 <Label>:</Label>
                 <TextBlock  Text="{Binding Material.Filters.Value}"  VerticalAlignment="Center"/>
             </StackPanel>
 
             <DockPanel DockPanel.Dock="Top">
-                <Label Width ="{StaticResource labelWidth}" DockPanel.Dock="Left" Content="MatrixIndex"/>
+                <Label Width ="{StaticResource labelWidth}" DockPanel.Dock="Left" Content="{loc:Loc KitbashTool.WeightedMaterial.MatrixIndex}"/>
                 <Label>:</Label>
-                <Button Content="Set to default" Command="{Binding Material.SetDefaultMatrixIndexCommand}" Margin="2" DockPanel.Dock="Right"/>
+                <Button Content="{loc:Loc KitbashTool.WeightedMaterial.SetToDefault}" Command="{Binding Material.SetDefaultMatrixIndexCommand}" Margin="2" DockPanel.Dock="Right"/>
                 <TextBlock  Text="{Binding Material.MatrixIndex.Value}"  VerticalAlignment="Center"/>
             </DockPanel>
 
             <DockPanel DockPanel.Dock="Top">
-                <Label Width ="{StaticResource labelWidth}" DockPanel.Dock="Left" Content="ParentMatrixIndex"/>
+                <Label Width ="{StaticResource labelWidth}" DockPanel.Dock="Left" Content="{loc:Loc KitbashTool.WeightedMaterial.ParentMatrixIndex}"/>
                 <Label>:</Label>
-                <Button Content="Set to default" Command="{Binding Material.SetDefaultParentMatrixIndexCommand}" Margin="2" DockPanel.Dock="Right"/>
+                <Button Content="{loc:Loc KitbashTool.WeightedMaterial.SetToDefault}" Command="{Binding Material.SetDefaultParentMatrixIndexCommand}" Margin="2" DockPanel.Dock="Right"/>
                 <TextBlock  Text="{Binding Material.ParentMatrixIndex.Value}"  VerticalAlignment="Center"/>
             </DockPanel>
 
             <StackPanel Orientation="Horizontal" DockPanel.Dock="Top">
-                <Label Width ="{StaticResource labelWidth}" DockPanel.Dock="Left" Content="Rmv Vertex format"/>
+                <Label Width ="{StaticResource labelWidth}" DockPanel.Dock="Left" Content="{loc:Loc KitbashTool.WeightedMaterial.RmvVertexFormat}"/>
                 <Label>:</Label>
                 <TextBlock  Text="{Binding Material.BinaryVertexFormat.Value}"  VerticalAlignment="Center"/>
             </StackPanel>
 
             <StackPanel Orientation="Horizontal" DockPanel.Dock="Top">
-                <Label Width ="{StaticResource labelWidth}" DockPanel.Dock="Left" Content="Rmv Material Id"/>
+                <Label Width ="{StaticResource labelWidth}" DockPanel.Dock="Left" Content="{loc:Loc KitbashTool.WeightedMaterial.RmvMaterialId}"/>
                 <Label>:</Label>
                 <TextBlock  Text="{Binding Material.MaterialId.Value}"  VerticalAlignment="Center"/>
             </StackPanel>
 
             <StackPanel Orientation="Horizontal" DockPanel.Dock="Top">
-                <Label Width ="{StaticResource labelWidth}" DockPanel.Dock="Left" Content="TransformInfo"/>
+                <Label Width ="{StaticResource labelWidth}" DockPanel.Dock="Left" Content="{loc:Loc KitbashTool.WeightedMaterial.TransformInfo}"/>
                 <Label>:</Label>
                 <TextBlock  Text="{Binding Material.TransformInfo.Value}"  VerticalAlignment="Center"/>
             </StackPanel>
 
             <StackPanel Orientation="Horizontal" DockPanel.Dock="Top">
-                <Label Width ="{StaticResource labelWidth}" DockPanel.Dock="Left" Content="String params"/>
+                <Label Width ="{StaticResource labelWidth}" DockPanel.Dock="Left" Content="{loc:Loc KitbashTool.WeightedMaterial.StringParams}"/>
                 <Label>:</Label>
                 <StackPanel>
                     <Expander>
                         <Expander.Header>
                             <StackPanel Orientation="Horizontal">
-                                <TextBlock Text="Count = "/>
+                                <TextBlock Text="{loc:Loc KitbashTool.WeightedMaterial.CountPrefix}"/>
                                 <TextBlock Text="{Binding Material.StringParameters.Count, UpdateSourceTrigger=PropertyChanged}"/>
                             </StackPanel>
                         </Expander.Header>
@@ -78,13 +79,13 @@
 
 
             <StackPanel Orientation="Horizontal" DockPanel.Dock="Top">
-                <Label Width ="{StaticResource labelWidth}" DockPanel.Dock="Left" Content="Float params"/>
+                <Label Width ="{StaticResource labelWidth}" DockPanel.Dock="Left" Content="{loc:Loc KitbashTool.WeightedMaterial.FloatParams}"/>
                 <Label>:</Label>
                 <StackPanel>
                     <Expander>
                         <Expander.Header>
                             <StackPanel Orientation="Horizontal">
-                                <TextBlock Text="Count = "/>
+                                <TextBlock Text="{loc:Loc KitbashTool.WeightedMaterial.CountPrefix}"/>
                                 <TextBlock Text="{Binding Material.FloatParameters.Count, UpdateSourceTrigger=PropertyChanged}"/>
                             </StackPanel>
                         </Expander.Header>
@@ -104,13 +105,13 @@
 
 
             <StackPanel Orientation="Horizontal" DockPanel.Dock="Top">
-                <Label Width ="{StaticResource labelWidth}" DockPanel.Dock="Left" Content="Int params"/>
+                <Label Width ="{StaticResource labelWidth}" DockPanel.Dock="Left" Content="{loc:Loc KitbashTool.WeightedMaterial.IntParams}"/>
                 <Label>:</Label>
                 <StackPanel>
                     <Expander>
                         <Expander.Header>
                             <StackPanel Orientation="Horizontal">
-                                <TextBlock Text="Count = "/>
+                                <TextBlock Text="{loc:Loc KitbashTool.WeightedMaterial.CountPrefix}"/>
                                 <TextBlock Text="{Binding Material.IntParameters.Count, UpdateSourceTrigger=PropertyChanged}"/>
                             </StackPanel>
                         </Expander.Header>
@@ -129,13 +130,13 @@
             </StackPanel>
 
             <StackPanel Orientation="Horizontal" DockPanel.Dock="Top">
-                <Label Width ="{StaticResource labelWidth}" DockPanel.Dock="Left" Content="Texture params"/>
+                <Label Width ="{StaticResource labelWidth}" DockPanel.Dock="Left" Content="{loc:Loc KitbashTool.WeightedMaterial.TextureParams}"/>
                 <Label>:</Label>
                 <StackPanel>
                     <Expander>
                         <Expander.Header>
                             <StackPanel Orientation="Horizontal">
-                                <TextBlock Text="Count = "/>
+                                <TextBlock Text="{loc:Loc KitbashTool.WeightedMaterial.CountPrefix}"/>
                                 <TextBlock Text="{Binding Material.TextureParameters.Count, UpdateSourceTrigger=PropertyChanged}"/>
                             </StackPanel>
                         </Expander.Header>
@@ -153,13 +154,13 @@
 
 
             <StackPanel Orientation="Horizontal" DockPanel.Dock="Top">
-                <Label Width ="{StaticResource labelWidth}" DockPanel.Dock="Left" Content="Attachment params"/>
+                <Label Width ="{StaticResource labelWidth}" DockPanel.Dock="Left" Content="{loc:Loc KitbashTool.WeightedMaterial.AttachmentParams}"/>
                 <Label>:</Label>
                 <StackPanel>
                     <Expander>
                         <Expander.Header>
                             <StackPanel Orientation="Horizontal">
-                                <TextBlock Text="Count = "/>
+                                <TextBlock Text="{loc:Loc KitbashTool.WeightedMaterial.CountPrefix}"/>
                                 <TextBlock Text="{Binding Material.AttachmentPointParameters.Count, UpdateSourceTrigger=PropertyChanged}"/>
                             </StackPanel>
                         </Expander.Header>
@@ -175,13 +176,13 @@
             </StackPanel>
 
             <StackPanel Orientation="Horizontal" DockPanel.Dock="Top">
-                <Label Width ="{StaticResource labelWidth}" DockPanel.Dock="Left" Content="Vec4 params"/>
+                <Label Width ="{StaticResource labelWidth}" DockPanel.Dock="Left" Content="{loc:Loc KitbashTool.WeightedMaterial.Vec4Params}"/>
                 <Label>:</Label>
                 <StackPanel>
                     <Expander>
                         <Expander.Header>
                             <StackPanel Orientation="Horizontal">
-                                <TextBlock Text="Count = "/>
+                                <TextBlock Text="{loc:Loc KitbashTool.WeightedMaterial.CountPrefix}"/>
                                 <TextBlock Text="{Binding Material.VectorParameters.Count, UpdateSourceTrigger=PropertyChanged}"/>
                             </StackPanel>
                         </Expander.Header>

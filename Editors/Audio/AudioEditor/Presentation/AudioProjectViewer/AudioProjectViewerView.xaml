@@ -5,15 +5,20 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
     xmlns:Behaviours="clr-namespace:Shared.Ui.Common.Behaviors;assembly=Shared.Ui"
-    xmlns:AudioProjectViewer="clr-namespace:Editors.Audio.AudioEditor.Presentation.AudioProjectViewer" 
+    xmlns:AudioProjectViewer="clr-namespace:Editors.Audio.AudioEditor.Presentation.AudioProjectViewer"
+    xmlns:ValueConverters="clr-namespace:Editors.Audio.AudioEditor.Presentation.AudioProjectViewer.ValueConverters" 
+    xmlns:loc="clr-namespace:Shared.Ui.Common;assembly=Shared.Ui"
     d:DataContext="{d:DesignInstance Type=AudioProjectViewer:AudioProjectViewerViewModel}"
     mc:Ignorable="d" 
     d:DesignHeight="450" d:DesignWidth="800">
-    
+
     <UserControl.Resources>
-        <BooleanToVisibilityConverter x:Key="BoolToVisibilityConverter"/>
+        <BooleanToVisibilityConverter 
+            x:Key="BoolToVisibilityConverter"/>
+        <ValueConverters:ActionEventRowEnablementConverter
+            x:Key="ActionEventRowEnablementConverter"/>
     </UserControl.Resources>
-    
+
     <Grid
         Visibility="{Binding IsViewerVisible, Converter={StaticResource BoolToVisibilityConverter}}">
 
@@ -42,28 +47,57 @@
                 <ColumnDefinition 
                     Width="Auto"/>
             </Grid.ColumnDefinitions>
-
+            
             <Button 
                 Grid.Column="0"
                 Margin="5, 0, 0, 0" 
                 Width="70" 
                 VerticalAlignment="Center" 
                 HorizontalAlignment="Left"
-                Content="Edit Item" 
-                ToolTip="Removes the selected row from the Audio Project and adds it to the Audio Project Editor" 
+                Content="{loc:Loc AudioProjectViewer.EditRow}"
+                ToolTipService.ShowOnDisabled="True"
                 Command="{Binding EditRowCommand}" 
-                IsEnabled="{Binding IsUpdateRowButtonEnabled}"/>
+                IsEnabled="{Binding IsUpdateRowButtonEnabled}">
 
+                <Button.ToolTip>
+                    <ToolTip>
+                        <TextBlock 
+                            TextWrapping="Wrap">
+                            <Run 
+                                Text="{loc:Loc AudioProjectViewer.Tooltips.EditRowLine1}"/>
+                            <LineBreak/>
+                            <LineBreak/>
+                            <Run 
+                                Text="{loc:Loc AudioProjectViewer.Tooltips.EditRowShortcut}"/>
+                        </TextBlock>
+                    </ToolTip>
+                </Button.ToolTip>
+            </Button>
+            
             <Button 
                 Grid.Column="1"
                 Margin="5, 0, 0, 0" 
-                Width="90" 
-                VerticalAlignment="Center" 
+                Width="93" 
+                VerticalAlignment="Center"
                 HorizontalAlignment="Left"
-                Content="Remove Row" 
-                ToolTip="Removes the selected row(s) from the Audio Project." 
+                Content="{loc:Loc AudioProjectViewer.RemoveRow}"
+                ToolTipService.ShowOnDisabled="True"
                 Command="{Binding RemoveRowCommand}" 
-                IsEnabled="{Binding IsRemoveRowButtonEnabled}"/>
+                IsEnabled="{Binding IsRemoveRowButtonEnabled}">
+
+                <Button.ToolTip>
+                    <ToolTip>
+                        <TextBlock TextWrapping="Wrap">
+                            <Run 
+                                Text="{loc:Loc AudioProjectViewer.Tooltips.RemoveRowLine1}"/>
+                            <LineBreak/>
+                            <LineBreak/>
+                            <Run 
+                                Text="{loc:Loc AudioProjectViewer.Tooltips.RemoveRowShortcut}"/>
+                        </TextBlock>
+                    </ToolTip>
+                </Button.ToolTip>
+            </Button>
         </Grid>
 
         <!-- Setting CanUserAddRows to false ensures that data won't go missing from the last row when a new row is added. Wtf WPF. -->
@@ -79,18 +113,68 @@
             EnableRowVirtualization="True" 
             EnableColumnVirtualization="True"
             ScrollViewer.HorizontalScrollBarVisibility="Disabled">
-            
+
+            <DataGrid.RowStyle>
+                <Style 
+                    TargetType="{x:Type DataGridRow}"
+                    BasedOn="{StaticResource {x:Type DataGridRow}}">
+                    <Setter
+                        Property="ToolTipService.ShowOnDisabled"
+                        Value="True" />
+
+                    <Setter Property="ToolTip">
+                        <Setter.Value>
+                            <TextBlock TextWrapping="Wrap">
+                                <Run 
+                                    Text="{loc:Loc AudioProjectViewer.Tooltips.DataGridLine1}"/>
+                                <LineBreak/>
+                                <LineBreak/>
+                                <Run 
+                                    Text="{loc:Loc AudioProjectViewer.Tooltips.DataGridLine2}"/>
+                                <LineBreak/>
+                                <Run 
+                                    Text="{loc:Loc AudioProjectViewer.Tooltips.CopyShortcut}"/>
+                                <LineBreak/>
+                                <Run 
+                                    Text="{loc:Loc AudioProjectViewer.Tooltips.PasteShortcut}"/>
+                            </TextBlock>
+                        </Setter.Value>
+                    </Setter>
+                    
+                    <Style.Triggers>
+                        <DataTrigger 
+                            Value="True">
+                            <DataTrigger.Binding>
+                                <MultiBinding 
+                                    Converter="{StaticResource ActionEventRowEnablementConverter}">
+                                    <Binding />
+                                    <Binding
+                                        Path="DataContext.SelectedAudioProjectExplorerNode"
+                                        RelativeSource="{RelativeSource AncestorType=UserControl}"/>
+                                </MultiBinding>
+                            </DataTrigger.Binding>
+                            <Setter 
+                                Property="IsEnabled" 
+                                Value="False" />
+                            <Setter 
+                                Property="ToolTip"
+                                Value="This row cannot be selected directly, it is controlled by the corresponding &quot;Play_...&quot; Action Event." />
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </DataGrid.RowStyle>
+
             <DataGrid.ContextMenu>
                 <ContextMenu
                     DataContext="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource Self}}">
 
                     <MenuItem
-                        Header="Copy"
+                        Header="{loc:Loc AudioProjectViewer.ContextMenu.Copy}"
                         Command="{Binding CopyRowsCommand}"
                         Visibility="{Binding IsContextMenuCopyVisible, Converter={StaticResource BoolToVisibilityConverter}}" />
 
                     <MenuItem
-                        Header="Paste"
+                        Header="{loc:Loc AudioProjectViewer.ContextMenu.Paste}"
                         Command="{Binding PasteRowsCommand}"
                         Visibility="{Binding IsContextMenuPasteVisible, Converter={StaticResource BoolToVisibilityConverter}}" />
                 </ContextMenu>

@@ -1,7 +1,7 @@
 ﻿using System.Runtime.InteropServices;
 using System.Text;
 using Microsoft.Xna.Framework;
-using Shared.Core.ByteParsing;
+using Shared.ByteParsing;
 using Shared.Core.Misc;
 using Shared.GameFormats.RigidModel.Transforms;
 using Shared.GameFormats.RigidModel.Types;
@@ -271,6 +271,8 @@ namespace Shared.GameFormats.RigidModel.MaterialHeaders
                 TexturesParams = [],
             };
 
+            material.OriginalTransform = RmvTransform.CreateIdentity();
+
             return material;
         }
 
@@ -318,7 +320,7 @@ namespace Shared.GameFormats.RigidModel.MaterialHeaders
             {
                 var param = typedMaterial.StringParams.Values[stringIndex];
                 writer.Write(ByteParsers.Int32.EncodeValue(param.Index, out _));
-                writer.Write(ByteParsers.String.Encode(param.Value, out _));
+                writer.Write(ByteParsers.String.EncodeValue(param.Value, out _));
             }
 
             for (var floatIndex = 0; floatIndex < typedMaterial.FloatParams.Values.Count; floatIndex++)

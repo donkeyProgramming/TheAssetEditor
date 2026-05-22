@@ -1,5 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
-using Shared.Core.ByteParsing;
+using Shared.ByteParsing;
 
 namespace Shared.GameFormats.Animation
 {

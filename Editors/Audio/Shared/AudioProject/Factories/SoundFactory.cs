@@ -6,7 +6,7 @@ namespace Editors.Audio.Shared.AudioProject.Factories
 {
     public interface ISoundFactory
     {
-        Sound Create(
+        Sound CreateTargetSound(
             HashSet<uint> usedHircIds,
             HashSet<uint> usedSourceIds,
             AudioFile audioFile,
@@ -14,7 +14,7 @@ namespace Editors.Audio.Shared.AudioProject.Factories
             string language,
             uint overrideBusId = 0,
             uint directParentId = 0);
-        Sound Create(
+        Sound CreateContainerSound(
             HashSet<uint> usedHircIds,
             HashSet<uint> usedSourceIds,
             AudioFile audioFile,
@@ -25,7 +25,7 @@ namespace Editors.Audio.Shared.AudioProject.Factories
 
     public class SoundFactory : ISoundFactory
     {
-        public Sound Create(
+        public Sound CreateTargetSound(
             HashSet<uint> usedHircIds,
             HashSet<uint> usedSourceIds,
             AudioFile audioFile,
@@ -36,13 +36,13 @@ namespace Editors.Audio.Shared.AudioProject.Factories
         {
             var soundIds = IdGenerator.GenerateIds(usedHircIds);
             var soundSettings = HircSettings.CreateSoundSettings(hircSettings);
-            return Sound.Create(soundIds.Guid, soundIds.Id, overrideBusId, directParentId, audioFile.Id, language, soundSettings);
+            return Sound.CreateTargetSound(soundIds.Guid, soundIds.Id, overrideBusId, directParentId, audioFile.Id, language, soundSettings);
         }
 
-        public Sound Create(HashSet<uint> usedHircIds, HashSet<uint> usedSourceIds, AudioFile audioFile, uint directParentId, int playlistOrder, string language)
+        public Sound CreateContainerSound(HashSet<uint> usedHircIds, HashSet<uint> usedSourceIds, AudioFile audioFile, uint directParentId, int playlistOrder, string language)
         {
             var soundIds = IdGenerator.GenerateIds(usedHircIds);
-            return Sound.Create(soundIds.Guid, soundIds.Id, directParentId, playlistOrder, audioFile.Id, language);
+            return Sound.CreateContainerSound(soundIds.Guid, soundIds.Id, directParentId, playlistOrder, audioFile.Id, language);
         }
     }
 }

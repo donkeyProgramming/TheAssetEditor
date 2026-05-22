@@ -1,6 +1,6 @@
 ﻿using System.Runtime.InteropServices;
 using Serilog;
-using Shared.Core.ByteParsing;
+using Shared.ByteParsing;
 using Shared.Core.ErrorHandling;
 using Shared.GameFormats.RigidModel.LodHeader;
 using Shared.GameFormats.RigidModel.MaterialHeaders;

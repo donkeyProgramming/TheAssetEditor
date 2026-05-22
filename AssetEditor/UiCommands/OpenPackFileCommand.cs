@@ -1,6 +1,7 @@
 ﻿using System.Windows.Forms;
 using Shared.Core.Events;
 using Shared.Core.PackFiles;
+using Shared.Core.PackFiles.Utility;
 
 namespace AssetEditor.UiCommands
 {

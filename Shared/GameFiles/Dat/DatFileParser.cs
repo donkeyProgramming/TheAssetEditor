@@ -1,5 +1,5 @@
 ﻿using System.Text;
-using Shared.Core.ByteParsing;
+using Shared.ByteParsing;
 using Shared.Core.PackFiles.Models;
 
 namespace Shared.GameFormats.Dat

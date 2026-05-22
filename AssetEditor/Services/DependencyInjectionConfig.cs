@@ -23,17 +23,20 @@ namespace AssetEditor.Services
 
                 // Domains
                 new Editors.Shared.Core.DependencyInjectionContainer(),
-                new Editors.AnimationTextEditors.DependencyInjectionContainer(),
+                new Editors.AnimationFragmentEditor.DependencyInjectionContainer(),
                 new Editors.Reports.DependencyInjectionContainer(),
                 new Editors.KitbasherEditor.DependencyInjectionContainer(),
                 new Editors.AnimationMeta.DependencyInjectionContainer(),
                 new Editors.Audio.DependencyInjectionContainer(),
                 new Editors.TextureEditor.DependencyInjectionContainer(),
                 new Editors.AnimationVisualEditors.DependencyInjectionContainer(),
+                new Editor.CampaignAnimationCreator.DependencyInjectionContainer(),
                 new Editors.ImportExport.DependencyInjectionContainer(),
                 new Editor.VisualSkeletonEditor.DependencyInjectionContainer(),
                 new Editors.AnimatioReTarget.DependencyInjectionContainer(),
                 new Editors.Twui.DependencyInjectionContainer(),
+                new Editors.Ipc.DependencyInjectionContainer(),
+                new Editors.BmdEditor.DependencyInjectionContainer(),
 
                 // Host application
                 new DependencyInjectionContainer(),

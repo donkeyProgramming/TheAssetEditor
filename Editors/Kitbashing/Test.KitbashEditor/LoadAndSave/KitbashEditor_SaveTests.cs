@@ -1,14 +1,4 @@
-﻿using Editors.KitbasherEditor.UiCommands;
-using GameWorld.Core.Services.SceneSaving;
-using GameWorld.Core.Services.SceneSaving.Lod;
-using Shared.Core.Events;
-using Shared.Core.Settings;
-using Shared.GameFormats.RigidModel;
-using Shared.Ui.Events.UiCommands;
-using Test.TestingUtility.Shared;
-using Test.TestingUtility.TestUtility;
-
-namespace Test.KitbashEditor.LoadAndSave
+﻿namespace Test.KitbashEditor.LoadAndSave
 {
     public class KitbashEditor_SaveTests
     {
@@ -44,7 +34,7 @@ namespace Test.KitbashEditor.LoadAndSave
             toolCommandFactory.Create<SaveCommand>().Execute();
 
             // Verify output files
-            Assert.That(outputPackFile!.FileList.Count, Is.EqualTo(1));
+            Assert.That(outputPackFile!.GetFileCount(), Is.EqualTo(1));
 
             // Verify the generated RMV2 file
             VertexFormat[][] expectedVertexType = [[VertexFormat.Weighted], [VertexFormat.Weighted], [VertexFormat.Weighted], [VertexFormat.Weighted]];
@@ -77,7 +67,7 @@ namespace Test.KitbashEditor.LoadAndSave
             toolCommandFactory.Create<SaveCommand>().Execute();
 
             // Verify output files
-            Assert.That(outputPackFile!.FileList.Count, Is.EqualTo(1));
+            Assert.That(outputPackFile!.GetFileCount(), Is.EqualTo(1));
 
             // Verify the generated RMV2 file
             VertexFormat[][] expectedVertexType = [[VertexFormat.Static], [VertexFormat.Static], [VertexFormat.Static]];

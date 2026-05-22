@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics;
 using System.Text;
-using Shared.Core.ByteParsing;
+using Shared.ByteParsing;
 using Shared.Core.ErrorHandling;
 using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
@@ -128,7 +128,7 @@ namespace Shared.GameFormats.Animation
 
         public static AnimationHeader GetAnimationHeader(PackFile file)
         {
-            var data = file.DataSource.ReadData(100);
+            var data = file.DataSource.PeekData(100);
             try
             {
                 return GetAnimationHeader(new ByteChunk(data));
@@ -179,7 +179,7 @@ namespace Shared.GameFormats.Animation
         {
             var logger = Logging.Create<AnimationFile>();
             var data = file.DataSource.ReadData();
-            logger.Here().Information($"Loading animation: {file} Size:{data.Length}");
+            logger.Here().Information($"Loading animation: {file?.Name} Size:{data.Length}");
             return Create(new ByteChunk(data));
         }
 

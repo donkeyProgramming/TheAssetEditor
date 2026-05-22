@@ -6,42 +6,62 @@ using System.Windows.Forms;
 using System.Windows.Input;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Microsoft.Xna.Framework;
 using Shared.Core.Misc;
+using Shared.Core.Services;
 using Shared.Core.Settings;
+using Shared.Ui.BaseDialogs.ColourPickerButton;
 
 namespace AssetEditor.ViewModels
 {
     partial class SettingsViewModel : ObservableObject
     {
         private readonly ApplicationSettingsService _settingsService;
+        private readonly LocalizationManager _localizationManager;
 
+        public ObservableCollection<string> AvailableLangauges { get; set; } = [];
         public ObservableCollection<ThemeType> AvailableThemes { get; set; } = [];
         public ObservableCollection<BackgroundColour> RenderEngineBackgroundColours { get; set; } = [];
         public ObservableCollection<GameTypeEnum> Games { get; set; } = [];
         public ObservableCollection<GamePathItem> GameDirectores { get; set; } = [];
+        public ObservableCollection<CameraControlMode> CameraModes { get; set; } = [];
 
+        [ObservableProperty] private string _selectedLanguage;
         [ObservableProperty] private ThemeType _currentTheme;
         [ObservableProperty] private BackgroundColour _currentRenderEngineBackgroundColour;
+        [ObservableProperty] private int _visualEditorsGridSize;
+        [ObservableProperty] private ColourPickerViewModel _vertexSelectionColour;
         [ObservableProperty] private bool _startMaximised;
         [ObservableProperty] private GameTypeEnum _currentGame;
         [ObservableProperty] private bool _loadCaPacksByDefault;
         [ObservableProperty] private bool _showCAWemFiles;
-        [ObservableProperty] private string _wwisePath;
         [ObservableProperty] private bool _onlyLoadLod0ForReferenceMeshes;
+        [ObservableProperty] private CameraControlMode _selectedCameraMode;
 
-        public SettingsViewModel(ApplicationSettingsService settingsService)
+        public SettingsViewModel(ApplicationSettingsService settingsService, LocalizationManager localizationManager)
         {
             _settingsService = settingsService;
+            _localizationManager = localizationManager;
+
+            AvailableLangauges = new ObservableCollection<string>(_localizationManager.GetPossibleLanguages());
+            SelectedLanguage = _localizationManager.SelectedLangauge;
+
             AvailableThemes = new ObservableCollection<ThemeType>((ThemeType[])Enum.GetValues(typeof(ThemeType)));
             CurrentTheme = _settingsService.CurrentSettings.Theme;
             RenderEngineBackgroundColours = new ObservableCollection<BackgroundColour>((BackgroundColour[])Enum.GetValues(typeof(BackgroundColour)));
             CurrentRenderEngineBackgroundColour = _settingsService.CurrentSettings.RenderEngineBackgroundColour;
+            VisualEditorsGridSize = _settingsService.CurrentSettings.VisualEditorsGridSize;
+            VertexSelectionColour = new ColourPickerViewModel(_settingsService.CurrentSettings.VertexSelectionColour);
+            CameraModes = new ObservableCollection<CameraControlMode>((CameraControlMode[])Enum.GetValues(typeof(CameraControlMode)));
+
             StartMaximised = _settingsService.CurrentSettings.StartMaximised;
             Games = new ObservableCollection<GameTypeEnum>(GameInformationDatabase.Games.Values.OrderBy(game => game.DisplayName).Select(game => game.Type));
             CurrentGame = _settingsService.CurrentSettings.CurrentGame;
             LoadCaPacksByDefault = _settingsService.CurrentSettings.LoadCaPacksByDefault;
             ShowCAWemFiles = _settingsService.CurrentSettings.ShowCAWemFiles;
             OnlyLoadLod0ForReferenceMeshes = _settingsService.CurrentSettings.OnlyLoadLod0ForReferenceMeshes;
+            SelectedCameraMode = _settingsService.CurrentSettings.CameraControlMode;
+
             foreach (var game in GameInformationDatabase.Games.Values.OrderBy(game => game.DisplayName))
             {
                 GameDirectores.Add(
@@ -52,7 +72,6 @@ namespace AssetEditor.ViewModels
                         Path = _settingsService.CurrentSettings.GameDirectories.FirstOrDefault(x => x.Game == game.Type)?.Path
                     });
             }
-            WwisePath = _settingsService.CurrentSettings.WwisePath;
         }
 
 
@@ -61,27 +80,23 @@ namespace AssetEditor.ViewModels
         {
             _settingsService.CurrentSettings.Theme = CurrentTheme;
             _settingsService.CurrentSettings.RenderEngineBackgroundColour = CurrentRenderEngineBackgroundColour;
+            _settingsService.CurrentSettings.VisualEditorsGridSize = VisualEditorsGridSize;
+            _settingsService.CurrentSettings.VertexSelectionColour = VertexSelectionColour.SelectedColour;
             _settingsService.CurrentSettings.StartMaximised = StartMaximised;
             _settingsService.CurrentSettings.CurrentGame = CurrentGame;
             _settingsService.CurrentSettings.LoadCaPacksByDefault = LoadCaPacksByDefault;
             _settingsService.CurrentSettings.ShowCAWemFiles = ShowCAWemFiles;
+            _settingsService.CurrentSettings.SelectedLangauge = SelectedLanguage;
             _settingsService.CurrentSettings.OnlyLoadLod0ForReferenceMeshes = OnlyLoadLod0ForReferenceMeshes;
             _settingsService.CurrentSettings.GameDirectories.Clear();
+            _settingsService.CurrentSettings.CameraControlMode = SelectedCameraMode;
+
             foreach (var item in GameDirectores)
-                _settingsService.CurrentSettings.GameDirectories.Add(new ApplicationSettings.GamePathPair() { Game = item.GameType, Path = item.Path });
-            _settingsService.CurrentSettings.WwisePath = WwisePath;
+                _settingsService.CurrentSettings.GameDirectories.Add(new ApplicationSettings.GamePathPair(item.GameType, item.Path));
+           
+            _localizationManager.LoadLanguage(SelectedLanguage);
             _settingsService.Save();
             MessageBox.Show("Please restart the tool after updating settings!");
-        }
-
-        [RelayCommand]
-        private void Browse()
-        {
-            var dialog = new OpenFileDialog();
-            dialog.Filter = "Executable files (*.exe)|*.exe";
-            dialog.Multiselect = false;
-            if (dialog.ShowDialog() == DialogResult.OK)
-                WwisePath = dialog.FileName;
         }
     }
 

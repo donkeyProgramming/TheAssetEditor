@@ -1,5 +1,5 @@
 ﻿using System.Collections.ObjectModel;
-using System.Windows.Input;
+using System.Windows;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Editors.Shared.Core.Common.AnimationPlayer;
@@ -19,12 +19,14 @@ namespace Editors.Shared.Core.Common.BaseControl
         protected FocusSelectableObjectService FocusService => _focusSelectableObjectService;
         protected SceneObjectEditor SceneObjectEditor => _sceneObjectEditor;
 
-        public string DisplayName { get; set; }
+        public string DisplayName { get; set; } = "Not set";
         public abstract Type EditorViewModelType { get; }
 
-        [ObservableProperty] IWpfGame _gameWorld;
+        [ObservableProperty] IWpfGame? _gameWorld;
         [ObservableProperty] ObservableCollection<SceneObjectViewModel> _sceneObjects = new();
         [ObservableProperty] AnimationPlayerViewModel _player;
+        [ObservableProperty] GridLength _leftColumnWidth = new(0.75, GridUnitType.Star);
+        [ObservableProperty] GridLength _rightColumnWidth = new(0.25, GridUnitType.Star);
 
         public EditorHostBase(IEditorHostParameters inputParams)
         {

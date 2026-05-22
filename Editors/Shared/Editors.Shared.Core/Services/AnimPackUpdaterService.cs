@@ -2,6 +2,7 @@
 using System.Windows;
 using Shared.Core.ErrorHandling;
 using Shared.Core.PackFiles;
+using Shared.Core.PackFiles.Utility;
 using Shared.Core.Settings;
 using Shared.GameFormats.AnimationPack;
 using Shared.GameFormats.AnimationPack.AnimPackFileTypes;
@@ -42,7 +43,7 @@ namespace Editors.Shared.Core.Services
 
             foreach (var animPack in animPacks)
             {
-                var outputWh3AnimPack = new AnimationPackFile("Placeholder");
+                var outputWh3AnimPack = new AnimationPackFileDatabase("Placeholder");
 
                 var unknownFilesCount = animPack.Files.Count(x => x is IMatchedCombatBin || x is UnknownAnimFile);
                 if (unknownFilesCount != 0)

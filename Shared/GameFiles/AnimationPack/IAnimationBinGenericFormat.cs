@@ -2,7 +2,7 @@
 {
     public interface IAnimationBinGenericFormat
     {
-        public AnimationPackFile PackFileReference { get; }
+        public AnimationPackFileDatabase PackFileReference { get; }
         public string Name { get; }
         public string FullPath { get; }
         public string SkeletonName { get; }

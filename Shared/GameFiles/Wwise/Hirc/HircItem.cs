@@ -1,5 +1,5 @@
 ﻿using Serilog;
-using Shared.Core.ByteParsing;
+using Shared.ByteParsing;
 using Shared.Core.ErrorHandling;
 using Shared.GameFormats.Wwise.Enums;
 

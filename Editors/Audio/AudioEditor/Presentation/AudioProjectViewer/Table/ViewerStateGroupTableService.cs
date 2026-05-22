@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Data;
 using Editors.Audio.AudioEditor.Core;
-using Editors.Audio.AudioEditor.Events;
-using Editors.Audio.AudioEditor.Presentation.Shared;
+using Editors.Audio.AudioEditor.Events.AudioProjectViewer.Table;
+using Editors.Audio.AudioEditor.Presentation.Shared.Models;
 using Editors.Audio.AudioEditor.Presentation.Shared.Table;
 using Shared.Core.Events;
 
@@ -26,7 +26,7 @@ namespace Editors.Audio.AudioEditor.Presentation.AudioProjectViewer.Table
         public List<string> DefineSchema()
         {
             var schema = new List<string>();
-            var columnName = TableInfo.StateColumnName;
+            var columnName = TableInformation.StateColumnName;
             schema.Add(columnName);
             return schema;
         }
@@ -54,7 +54,7 @@ namespace Editors.Audio.AudioEditor.Presentation.AudioProjectViewer.Table
 
         public void InitialiseTable(DataTable table)
         {
-            var columnHeader = TableInfo.StateColumnName;
+            var columnHeader = TableInformation.StateColumnName;
             var stateGroupName = _audioEditorStateService.SelectedAudioProjectExplorerNode.Name;
             var stateGroup = _audioEditorStateService.AudioProject.GetStateGroup(stateGroupName);
             foreach (var state in stateGroup.States)

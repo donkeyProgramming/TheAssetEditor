@@ -13,7 +13,6 @@ using Shared.Core.ToolCreation;
 using Shared.Ui.BaseDialogs.PackFileTree;
 using Shared.Ui.BaseDialogs.PackFileTree.ContextMenu;
 using Shared.Ui.Common;
-using Shared.Ui.Events.UiCommands;
 
 namespace AssetEditor.ViewModels
 {
@@ -56,7 +55,7 @@ namespace AssetEditor.ViewModels
 
             ToolsFactory = toolFactory;
 
-            ApplicationTitle = $"AssetEditor v{VersionChecker.CurrentVersion}";
+            ApplicationTitle = $"AssetEditor v{VersionChecker.GetCurrentVersion()}";
             CurrentGame = $"Current Game: {GameInformationDatabase.GetGameById(applicationSettingsService.CurrentSettings.CurrentGame).DisplayName}";
         }
 
@@ -64,7 +63,7 @@ namespace AssetEditor.ViewModels
 
         [RelayCommand] private void Closing(IEditorInterface editor) 
         {
-            var hasUnsavedPackFiles = FileTree.Files.Any(node => node.UnsavedChanged);
+            var hasUnsavedPackFiles = FileTree.Files.Any(node => node.UnsavedChanges.HasChanges);
             if (EditorManager.ShouldBlockCloseCommand(editor, hasUnsavedPackFiles))
             {
                 IsClosingWithoutPrompt = true;

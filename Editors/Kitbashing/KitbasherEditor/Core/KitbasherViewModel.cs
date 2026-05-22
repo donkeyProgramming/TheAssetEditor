@@ -1,4 +1,5 @@
 ﻿using System.IO;
+using System.Windows;
 using CommunityToolkit.Mvvm.ComponentModel;
 using Editors.KitbasherEditor.EventHandlers;
 using Editors.KitbasherEditor.Services;
@@ -14,7 +15,6 @@ using Shared.Core.Events.Scoped;
 using Shared.Core.PackFiles.Models;
 using Shared.Core.Services;
 using Shared.Core.ToolCreation;
-using Shared.Ui.BaseDialogs.PackFileTree;
 using Shared.Ui.Common;
 
 namespace Editors.KitbasherEditor.ViewModels
@@ -23,7 +23,7 @@ namespace Editors.KitbasherEditor.ViewModels
         IEditorInterface, 
         IFileEditor,
         ISaveableEditor,
-        IDropTarget<TreeNode>
+        IDropTarget<PackFile>
     {
         private readonly ILogger _logger = Logging.Create<KitbasherViewModel>();
 
@@ -38,6 +38,8 @@ namespace Editors.KitbasherEditor.ViewModels
         public AnimationControllerViewModel Animation { get; set; }
 
         [ObservableProperty] string _displayName = "Kitbash Tool";
+        [ObservableProperty] GridLength _leftColumnWidth = new(0.75, GridUnitType.Star);
+        [ObservableProperty] GridLength _rightColumnWidth = new(0.25, GridUnitType.Star);
 
         PackFile _inputFileReference;
         public PackFile CurrentFile { get => _inputFileReference; }
@@ -81,7 +83,9 @@ namespace Editors.KitbasherEditor.ViewModels
             {
                 _inputFileReference = fileToLoad;
                 _kitbashSceneCreator.CreateFromPackFile(fileToLoad);
-                _focusSelectableObjectComponent.FocusScene();
+                var shouldFocusScene = string.Equals(Path.GetExtension(fileToLoad.Name), ".variantmeshdefinition", StringComparison.InvariantCultureIgnoreCase) == false;
+                if (shouldFocusScene)
+                    _focusSelectableObjectComponent.FocusScene();
                 DisplayName = fileToLoad.Name;
             }
             catch (Exception e)
@@ -105,8 +109,8 @@ namespace Editors.KitbasherEditor.ViewModels
             }
         }
 
-        public bool AllowDrop(TreeNode node, TreeNode targeNode = null) => _dropHandler.AllowDrop(node, targeNode);
-        public bool Drop(TreeNode node, TreeNode targeNode = null) => _dropHandler.Drop(node);
+        public bool AllowDrop(PackFile node, PackFile targeNode = null) => _dropHandler.AllowDrop(node, targeNode);
+        public bool Drop(PackFile node, PackFile targeNode = null) => _dropHandler.Drop(node);
 
         void OnFileSaved(ScopedFileSavedEvent notification)
         {

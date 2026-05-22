@@ -1,8 +1,8 @@
 ﻿using Serilog;
-using Shared.Core.ByteParsing;
+using Shared.ByteParsing;
 using Shared.Core.ErrorHandling;
 using Shared.Core.PackFiles.Models;
-using static Shared.Core.ByteParsing.ByteChunk;
+using static Shared.ByteParsing.ByteChunk;
 
 namespace Shared.GameFormats.FastBin
 {

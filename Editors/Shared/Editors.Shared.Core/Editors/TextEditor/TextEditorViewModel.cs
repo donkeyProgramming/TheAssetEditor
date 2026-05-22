@@ -5,6 +5,7 @@ using CommunityToolkit.Mvvm.Input;
 using Shared.Core.Misc;
 using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
+using Shared.Core.Services;
 using Shared.Core.ToolCreation;
 
 namespace Shared.Ui.Editors.TextEditor

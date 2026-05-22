@@ -1,5 +1,6 @@
 ﻿using Shared.Core.DevConfig;
 using Shared.Core.PackFiles;
+using Shared.Core.PackFiles.Utility;
 using Shared.Core.Settings;
 using Shared.Core.ToolCreation;
 using Shared.EmbeddedResources;
@@ -8,11 +9,11 @@ namespace Editors.Twui.DevConfig
 {
     internal class TwuiToolEditor : IDeveloperConfiguration
     {
-        private readonly IEditorCreator _editorCreator;
+        private readonly IEditorManager _editorCreator;
         private readonly IPackFileContainerLoader _packFileContainerLoader;
         private readonly IPackFileService _packFileService;
 
-        public TwuiToolEditor(IEditorCreator editorCreator, IPackFileContainerLoader packFileContainerLoader, IPackFileService packFileService)
+        public TwuiToolEditor(IEditorManager editorCreator, IPackFileContainerLoader packFileContainerLoader, IPackFileService packFileService)
         {
             _editorCreator = editorCreator;
             _packFileContainerLoader = packFileContainerLoader;

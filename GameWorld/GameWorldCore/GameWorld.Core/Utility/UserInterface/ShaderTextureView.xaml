@@ -1,0 +1,55 @@
+﻿<UserControl x:Class="GameWorld.Core.Utility.UserInterface.ShaderTextureView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:GameWorld.Core.Utility.UserInterface"
+             xmlns:materialIcons="clr-namespace:Material.Icons.WPF;assembly=Material.Icons.WPF"
+             xmlns:loc="clr-namespace:Shared.Ui.Common;assembly=Shared.Ui"
+             mc:Ignorable="d" 
+             d:DesignHeight="40" d:DesignWidth="800">
+    <UserControl.Resources>
+        <ControlTemplate x:Key="ValidationErrorTemplate">
+            <Border BorderBrush="Red" BorderThickness="1">
+                <AdornedElementPlaceholder/>
+                <Border.ToolTip>
+                    <ToolTip>
+                        <ToolTip.Triggers>
+                            <EventTrigger RoutedEvent="ToolTip.Opened">
+                                <BeginStoryboard>
+                                    <Storyboard>
+                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="Visibility">
+                                            <DiscreteObjectKeyFrame KeyTime="0:0:0" Value="{x:Static Visibility.Visible}"/>
+                                        </ObjectAnimationUsingKeyFrames>
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </EventTrigger>
+                        </ToolTip.Triggers>
+                        <TextBlock Text="{Binding Path=AdornedElement.(Validation.Errors)[0].ErrorContent}"  Foreground="Red"/>
+                    </ToolTip>
+                </Border.ToolTip>
+            </Border>
+        </ControlTemplate>
+
+
+    </UserControl.Resources>
+    <DockPanel>
+        <CheckBox Margin="2,0,2,0"  IsChecked="{Binding ShouldRenderTexture, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" VerticalContentAlignment="Center" ToolTip="{loc:Loc ShaderTextureView.ApplyTextureTooltip}"/>
+        <Button Content="{materialIcons:MaterialIconExt Kind=Delete}" Margin="1" Command="{Binding HandleClearTextureCommand}" DockPanel.Dock="Right" Width="20" ToolTip="{loc:Loc ShaderTextureView.ClearTextureTooltip}"/>
+        <Button Content="{materialIcons:MaterialIconExt Kind=Folder}" Margin="1" Command="{Binding HandleBrowseTextureCommand}" DockPanel.Dock="Right" Width="20" ToolTip="{loc:Loc ShaderTextureView.BrowseTextureTooltip}" />
+        <Button Content="{materialIcons:MaterialIconExt Kind=Eye}" Margin="1" Command="{Binding HandlePreviewTextureCommand}" DockPanel.Dock="Right" Width="20" ToolTip="{loc:Loc ShaderTextureView.PreviewTextureTooltip}"/>
+        <TextBox Margin="2,2,2,2" Text="{Binding Path, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" VerticalContentAlignment="Center">
+            <TextBox.Style>
+                <Style TargetType="TextBox"  BasedOn="{StaticResource {x:Type TextBox}}">
+                    <Setter Property="Validation.ErrorTemplate" Value="{StaticResource ValidationErrorTemplate}"/>
+                    <Style.Triggers>
+                        <Trigger Property="Validation.HasError" Value="true">
+                            <Setter Property="ToolTip" Value="{Binding (Validation.Errors)[0].ErrorContent, RelativeSource={RelativeSource Self}}"/>
+                        </Trigger>
+                    </Style.Triggers>
+                </Style>
+            </TextBox.Style>
+        </TextBox>
+    </DockPanel>
+</UserControl>
+ 

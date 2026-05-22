@@ -1,8 +1,10 @@
 ﻿using Editors.KitbasherEditor.ChildEditors.MeshFitter;
+using Editors.KitbasherEditor.ChildEditors.PhotoStudio;
 using Editors.KitbasherEditor.ChildEditors.PinTool;
 using Editors.KitbasherEditor.ChildEditors.PinTool.Commands;
 using Editors.KitbasherEditor.ChildEditors.ReRiggingTool;
 using Editors.KitbasherEditor.ChildEditors.VertexDebugger;
+using Editors.KitbasherEditor.Commands;
 using Editors.KitbasherEditor.Core;
 using Editors.KitbasherEditor.Core.MenuBarViews;
 using Editors.KitbasherEditor.EventHandlers;
@@ -21,6 +23,7 @@ using KitbasherEditor.ViewModels.SaveDialog;
 using KitbasherEditor.ViewModels.SceneExplorerNodeViews;
 using KitbasherEditor.Views;
 using Microsoft.Extensions.DependencyInjection;
+using GameWorld.Core.Rendering.Geometry;
 using Shared.Core.DependencyInjection;
 using Shared.Core.DevConfig;
 using Shared.Core.ToolCreation;
@@ -56,6 +59,11 @@ namespace Editors.KitbasherEditor
             serviceCollection.AddTransient<WeightedMaterialViewModel>();
             serviceCollection.AddTransient<WsMaterialViewModel>();
 
+            // Commands
+            serviceCollection.AddTransient<AssignMaterialFromOtherMeshCommand>();
+            serviceCollection.AddTransient<ConstructPrimitiveCommand>();
+            serviceCollection.AddTransient<PrimitiveConstructor>();
+            
             // Mesh fitter
             RegisterWindow<MeshFitterWindow>(serviceCollection);
             serviceCollection.AddTransient<MeshFitterViewModel>();
@@ -74,6 +82,11 @@ namespace Editors.KitbasherEditor
             serviceCollection.AddTransient<PinMeshToVertexCommand>();
             serviceCollection.AddTransient<SkinWrapRiggingCommand>();
 
+            // PhotoStudio
+            serviceCollection.AddTransient<OpenPhotoStudioCommand>();
+            serviceCollection.AddScoped<PhotoStudioViewModel>();
+            RegisterWindow<PhotoStudioWindow>(serviceCollection);
+
             // Save dialog
             serviceCollection.AddTransient<SaveDialogViewModel>();
             RegisterWindow<SaveDialogWindow>(serviceCollection);
@@ -84,7 +97,7 @@ namespace Editors.KitbasherEditor
             serviceCollection.AddScoped<MenuItemVisibilityRuleEngine>();
 
             // Misc
-            serviceCollection.AddScoped<WindowKeyboard>();
+      
             serviceCollection.AddScoped<KitbashViewDropHandler>();
             serviceCollection.AddScoped<KitbasherRootScene>();
 
@@ -108,7 +121,7 @@ namespace Editors.KitbasherEditor
             EditorInfoBuilder
                 .Create<KitbasherViewModel, KitbasherView>(EditorEnums.Kitbash_Editor)
                 .AddExtention(".rigid_model_v2", EditorPriorites.High)
-                //.AddExtention(".variantmeshdefinition", 0)
+                .AddExtention(".variantmeshdefinition", EditorPriorites.Default)
                 .AddExtention(".wsmodel", EditorPriorites.High)
                 .Build(factory);
         }

@@ -1,6 +1,8 @@
-﻿using Audio.AudioExplorer;
-using Editors.Audio.AudioEditor;
-using Editors.Audio.AudioEditor.Commands;
+﻿using Editors.Audio.AudioEditor.Commands.AudioFilesExplorer;
+using Editors.Audio.AudioEditor.Commands.AudioProjectEditor;
+using Editors.Audio.AudioEditor.Commands.AudioProjectMutation;
+using Editors.Audio.AudioEditor.Commands.AudioProjectViewer;
+using Editors.Audio.AudioEditor.Commands.Dialogs;
 using Editors.Audio.AudioEditor.Core;
 using Editors.Audio.AudioEditor.Core.AudioProjectMutation;
 using Editors.Audio.AudioEditor.Presentation;
@@ -13,10 +15,10 @@ using Editors.Audio.AudioEditor.Presentation.AudioProjectViewer.Table;
 using Editors.Audio.AudioEditor.Presentation.NewAudioProject;
 using Editors.Audio.AudioEditor.Presentation.Settings;
 using Editors.Audio.AudioEditor.Presentation.Shared.Table;
-using Editors.Audio.AudioEditor.Presentation.WaveformVisualiser;
 using Editors.Audio.AudioExplorer;
 using Editors.Audio.AudioProjectConverter;
 using Editors.Audio.AudioProjectMerger;
+using Editors.Audio.ContextMenu;
 using Editors.Audio.DialogueEventMerger;
 using Editors.Audio.Shared.AudioProject;
 using Editors.Audio.Shared.AudioProject.Compiler;
@@ -26,10 +28,12 @@ using Editors.Audio.Shared.Storage;
 using Editors.Audio.Shared.Utilities;
 using Editors.Audio.Shared.Wwise;
 using Editors.Audio.Shared.Wwise.Generators;
+using Editors.Audio.WaveformVisualiser.Presentation;
 using Microsoft.Extensions.DependencyInjection;
 using Shared.Core.DependencyInjection;
 using Shared.Core.DevConfig;
 using Shared.Core.ToolCreation;
+using Shared.Ui.BaseDialogs.PackFileTree.ContextMenu;
 
 namespace Editors.Audio
 {
@@ -41,6 +45,7 @@ namespace Editors.Audio
             serviceCollection.AddScoped<IAudioEditorStateService, AudioEditorStateService>();
             serviceCollection.AddScoped<IAudioEditorFileService, AudioEditorFileService>();
             serviceCollection.AddScoped<IAudioEditorIntegrityService, AudioEditorIntegrityService>();
+            serviceCollection.AddScoped<IShortcutService, ShortcutService>();
 
             // Audio Editor View Models
             serviceCollection.AddScoped<AudioEditorViewModel>();
@@ -49,7 +54,7 @@ namespace Editors.Audio
             serviceCollection.AddScoped<AudioProjectEditorViewModel>();
             serviceCollection.AddScoped<AudioProjectViewerViewModel>();
             serviceCollection.AddScoped<SettingsViewModel>();
-            var serviceCollection1 = serviceCollection.AddScoped<WaveformVisualiserViewModel>();
+            serviceCollection.AddScoped<WaveformVisualiserViewModel>();
 
             // New Audio Project
             serviceCollection.AddTransient<NewAudioProjectViewModel>();
@@ -68,16 +73,15 @@ namespace Editors.Audio
             serviceCollection.AddTransient<AudioProjectConverterWindow>();
 
             // Audio Editor Commands
-            serviceCollection.AddScoped<AddEditorRowToViewerCommand>();
-            serviceCollection.AddScoped<EditViewerRowCommand>();
             serviceCollection.AddScoped<OpenAudioProjectConverterWindowCommand>();
             serviceCollection.AddScoped<OpenAudioProjectMergerWindowCommand>();
             serviceCollection.AddScoped<OpenDialogueEventMergerWindowCommand>();
             serviceCollection.AddScoped<OpenMovieFileSelectionWindowCommand>();
             serviceCollection.AddScoped<OpenNewAudioProjectWindowCommand>();
-            serviceCollection.AddScoped<PasteViewerRowsCommand>();
-            serviceCollection.AddScoped<PlayAudioFileCommand>();
+            serviceCollection.AddScoped<AddRowsToViewerCommand>();
+            serviceCollection.AddScoped<EditViewerRowsCommand>();
             serviceCollection.AddScoped<RemoveViewerRowsCommand>();
+            serviceCollection.AddScoped<PasteViewerRowsCommand>();
             serviceCollection.AddScoped<SetAudioFilesCommand>();
             serviceCollection.AddScoped<IAudioProjectMutationUICommandFactory, AudioProjectMutationUICommandFactory>();
             RegisterAllAsInterface<IAudioProjectMutationUICommand>(serviceCollection, ServiceLifetime.Transient);
@@ -103,8 +107,9 @@ namespace Editors.Audio
             serviceCollection.AddScoped<IViewerTableService, ViewerStateGroupTableService>();
 
             // Waveform Visualiser services
-            //serviceCollection.AddSingleton<IWaveformRenderingService, WaveformRenderingService>();
-            //serviceCollection.AddSingleton<IAudioPlayerService, AudioPlayerService>();
+            serviceCollection.AddSingleton<IWaveformVisualisationCacheService, WaveformVisualisationCacheService>();
+            serviceCollection.AddTransient<IWaveformRendererService, WaveformRendererService>();
+            serviceCollection.AddTransient<ISoundEngine, SoundEngine>();
 
             // Audio Project
             serviceCollection.AddScoped<IAudioProjectFileService, AudioProjectFileService>();
@@ -127,11 +132,14 @@ namespace Editors.Audio
 
             // Shared audio stuff 
             serviceCollection.AddScoped<IAudioRepository, AudioRepository>();
+            serviceCollection.AddScoped<IMovieAudioResolver, MovieAudioResolver>();
             serviceCollection.AddSingleton<BnkLoader>();
             serviceCollection.AddSingleton<DatLoader>();
-            serviceCollection.AddScoped<SoundPlayer>();
-            serviceCollection.AddScoped<VgStreamWrapper>();
-            serviceCollection.AddScoped<WSourcesWrapper>();
+
+            // Context menu
+            serviceCollection.AddScoped<ExportCAVp8AsWebMCommand>();
+            serviceCollection.AddScoped<ExportCAVp8AsIvfCommand>();
+            serviceCollection.AddSingleton<IPackFileContextMenuRegistration, AudioPackFileContextMenuRegistration>();
 
             RegisterAllAsInterface<IDeveloperConfiguration>(serviceCollection, ServiceLifetime.Transient);
         }
@@ -147,6 +155,15 @@ namespace Editors.Audio
                 .Create<AudioExplorerViewModel, AudioExplorerView>(EditorEnums.AudioExplorer_Editor)
                 .AddToToolbar("Audio Explorer")
                 .Build(factory);
+        }
+    }
+
+    public class AudioPackFileContextMenuRegistration : IPackFileContextMenuRegistration
+    {
+        public void Register(PackFileContextMenuRegistry registry)
+        {
+            registry.RegisterPackFileContextMenuItem<ExportCAVp8AsWebMCommand>(ContextMenuType.MainApplication, path: "Export", priority: 20, ContextMenuCluster.Export);
+            registry.RegisterPackFileContextMenuItem<ExportCAVp8AsIvfCommand>(ContextMenuType.MainApplication, path: "Export", priority: 30, ContextMenuCluster.Export);
         }
     }
 }
