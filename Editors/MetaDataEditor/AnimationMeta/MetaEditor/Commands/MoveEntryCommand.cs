@@ -6,6 +6,7 @@ namespace Editors.AnimationMeta.MetaEditor.Commands
 {
     internal class MoveEntryCommand : IAeCommand
     {
+        void IAeCommand.Execute() => throw new NotSupportedException("Use ExecuteUp or ExecuteDown instead.");
         public void ExecuteUp(MetaDataEditorViewModel controller)
         {
             if (controller?.ParsedFile == null)

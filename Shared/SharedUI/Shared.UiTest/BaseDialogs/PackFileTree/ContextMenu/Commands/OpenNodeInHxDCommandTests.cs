@@ -44,7 +44,9 @@ namespace Shared.UiTest.BaseDialogs.PackFileTree.ContextMenu.Commands
             fileSystem.Setup(x => x.FileExists(It.IsAny<string>())).Returns(false);
 
             var command = new OpenNodeInHxDCommand(dialogs.Object, fileSystem.Object);
-            command.Execute(node);
+            command.Configure(node);
+
+            command.Execute();
 
             dialogs.Verify(x => x.ShowDialogBox(It.Is<string>(s => s.Contains("does not exist")), It.IsAny<string>()), Times.Once);
             fileSystem.Verify(x => x.ProcessStart(It.IsAny<string>(), It.IsAny<string>()), Times.Never);
@@ -62,7 +64,9 @@ namespace Shared.UiTest.BaseDialogs.PackFileTree.ContextMenu.Commands
             fileSystem.Setup(x => x.FileExists(It.IsAny<string>())).Returns(true);
 
             var command = new OpenNodeInHxDCommand(dialogs.Object, fileSystem.Object);
-            command.Execute(node);
+            command.Configure(node);
+
+            command.Execute();
 
             fileSystem.Verify(x => x.FileWriteAllBytes(It.IsAny<string>(), It.Is<byte[]>(b => b.Length > 0)), Times.Once);
             fileSystem.Verify(x => x.ProcessStart(It.IsAny<string>(), It.IsAny<string>()), Times.Once);

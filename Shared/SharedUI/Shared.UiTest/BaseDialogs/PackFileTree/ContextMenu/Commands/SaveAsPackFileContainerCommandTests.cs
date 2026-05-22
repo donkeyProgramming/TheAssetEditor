@@ -46,7 +46,9 @@ namespace Shared.UiTest.BaseDialogs.PackFileTree.ContextMenu.Commands
 
             // Act
             var command = new SaveAsPackFileContainerCommand(_packFileService, new ApplicationSettingsService(GameTypeEnum.Warhammer3), dialogs.Object);
-            command.Execute(root);
+            command.Configure(root);
+
+            command.Execute();
 
             // Assert - no exception, command exits early
             Assert.Pass();
@@ -69,7 +71,9 @@ namespace Shared.UiTest.BaseDialogs.PackFileTree.ContextMenu.Commands
 
             // Act
             var command = new SaveAsPackFileContainerCommand(_packFileService, new ApplicationSettingsService(GameTypeEnum.Warhammer3), dialogs.Object);
-            command.Execute(root);
+            command.Configure(root);
+
+            command.Execute();
 
             // Assert - SavePackContainer will throw due to file I/O, caught by the command
             // The error dialog is shown, but the flow was exercised

@@ -64,5 +64,7 @@ namespace Shared.Core.Events.Global
        //    window.Height = heigh;
        //    window.ShowDialog();
        //}
+
+        void IAeCommand.Execute() => throw new NotSupportedException("Use the overloads with parameters instead.");
     }
 }

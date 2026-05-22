@@ -121,8 +121,8 @@ namespace Editors.AnimationMeta.Presentation
 
         [RelayCommand] void MoveUpAction() => _uiCommandFactory.Create<MoveEntryCommand>().ExecuteUp(this);
         [RelayCommand] void MoveDownAction() => _uiCommandFactory.Create<MoveEntryCommand>().ExecuteDown(this);
-        [RelayCommand] void DeleteAction() => _uiCommandFactory.Create<DeleteEntryCommand>().Execute(this);
-        [RelayCommand] void NewAction() => _uiCommandFactory.Create<NewEntryCommand>().Execute(this);
+        [RelayCommand] void DeleteAction() => _uiCommandFactory.Create<DeleteEntryCommand>(x => x.Configure(this)).Execute();
+        [RelayCommand] void NewAction() => _uiCommandFactory.Create<NewEntryCommand>(x => x.Configure(this)).Execute();
         [RelayCommand] void PasteAction() => _uiCommandFactory.Create<CopyPastCommand>().ExecutePaste(this);
         [RelayCommand] void CopyAction() => _uiCommandFactory.Create<CopyPastCommand>().ExecuteCopy(this);
         [RelayCommand] void SaveAction() => _uiCommandFactory.Create<SaveCommand>().Execute(this);

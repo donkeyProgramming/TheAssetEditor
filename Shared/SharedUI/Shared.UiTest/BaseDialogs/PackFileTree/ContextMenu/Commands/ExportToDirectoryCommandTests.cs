@@ -46,7 +46,9 @@ namespace Shared.UiTest.BaseDialogs.PackFileTree.ContextMenu.Commands
 
             // Act
             var command = new ExportToDirectoryCommand(_packFileService, dialogs.Object, fileSystem.Object);
-            command.Execute(root);
+            command.Configure(root);
+
+            command.Execute();
 
             // Assert
             fileSystem.Verify(x => x.FileWriteAllBytes(It.IsAny<string>(), It.IsAny<byte[]>()), Times.Never);
@@ -97,7 +99,9 @@ namespace Shared.UiTest.BaseDialogs.PackFileTree.ContextMenu.Commands
 
             // Act
             var command = new ExportToDirectoryCommand(_packFileService, dialogs.Object, fileSystem.Object);
-            command.Execute(root);
+            command.Configure(root);
+
+            command.Execute();
 
             // Assert
             fileSystem.Verify(x => x.FileWriteAllBytes(It.IsAny<string>(), It.IsAny<byte[]>()), Times.Exactly(2));

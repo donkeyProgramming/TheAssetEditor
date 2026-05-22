@@ -86,7 +86,7 @@ namespace AssetEditor.ViewModels
         
         [RelayCommand] private void CreateAnimPackWarhammer3() => _uiCommandFactory.Create<CreateExampleAnimationDbCommand>().CreateAnimationDbWarhammer3();
         [RelayCommand] private void CreateAnimPack3k() => _uiCommandFactory.Create<CreateExampleAnimationDbCommand>().CreateAnimationDb3k();
-        [RelayCommand] private void SaveActivePack() => _uiCommandFactory.Create<SavePackFileContainerCommand>().Execute();
+        [RelayCommand] private void SaveActivePack() => _uiCommandFactory.Create<SavePackFileContainerCommand>().ExecuteForEditablePack();
         [RelayCommand] private void OpenWh2AnimpackUpdater() => new AnimPackUpdaterService(_packfileService).Process();
         [RelayCommand] private void GenerateRmv2Report() => _uiCommandFactory.Create<Rmv2ReportCommand>().Execute();
         [RelayCommand] private void GenerateBmdReport() => _uiCommandFactory.Create<BmdReportCommand>().Execute();
@@ -110,21 +110,21 @@ namespace AssetEditor.ViewModels
         [RelayCommand] private void PrintScope() => _uiCommandFactory.Create<PrintScopesCommand>().Execute();
         [RelayCommand] private void PrintTrackedGraphicsResources() => _uiCommandFactory.Create<PrintTrackedGraphicsResourcesCommand>().Execute();
         [RelayCommand] private void Search() => _uiCommandFactory.Create<DeepSearchCommand>().Execute();
-        [RelayCommand] private void OpenAttilaPacks() => _uiCommandFactory.Create<OpenGamePackCommand>().Execute(GameTypeEnum.Attila);
-        [RelayCommand] private void OpenRomeRemasteredPacks() => _uiCommandFactory.Create<OpenGamePackCommand>().Execute(GameTypeEnum.RomeRemastered);
-        [RelayCommand] private void OpenThreeKingdomsPacks() => _uiCommandFactory.Create<OpenGamePackCommand>().Execute(GameTypeEnum.ThreeKingdoms);
-        [RelayCommand] private void OpenWarhammer2Packs() => _uiCommandFactory.Create<OpenGamePackCommand>().Execute(GameTypeEnum.Warhammer2);
-        [RelayCommand] private void OpenWarhammer3Packs() => _uiCommandFactory.Create<OpenGamePackCommand>().Execute(GameTypeEnum.Warhammer3);
-        [RelayCommand] private void OpenTroyPacks() => _uiCommandFactory.Create<OpenGamePackCommand>().Execute(GameTypeEnum.Troy);
+        [RelayCommand] private void OpenAttilaPacks() => _uiCommandFactory.Create<OpenGamePackCommand>(x => x.Configure(GameTypeEnum.Attila)).Execute();
+        [RelayCommand] private void OpenRomeRemasteredPacks() => _uiCommandFactory.Create<OpenGamePackCommand>(x => x.Configure(GameTypeEnum.RomeRemastered)).Execute();
+        [RelayCommand] private void OpenThreeKingdomsPacks() => _uiCommandFactory.Create<OpenGamePackCommand>(x => x.Configure(GameTypeEnum.ThreeKingdoms)).Execute();
+        [RelayCommand] private void OpenWarhammer2Packs() => _uiCommandFactory.Create<OpenGamePackCommand>(x => x.Configure(GameTypeEnum.Warhammer2)).Execute();
+        [RelayCommand] private void OpenWarhammer3Packs() => _uiCommandFactory.Create<OpenGamePackCommand>(x => x.Configure(GameTypeEnum.Warhammer3)).Execute();
+        [RelayCommand] private void OpenTroyPacks() => _uiCommandFactory.Create<OpenGamePackCommand>(x => x.Configure(GameTypeEnum.Troy)).Execute();
 
-        [RelayCommand] private void OpenAnimatedPropTutorial() => _uiCommandFactory.Create<OpenWebpageCommand>().Execute("https://www.youtube.com/watch?v=b68hSHZ5raY");
-        [RelayCommand] private void OpenAnimationBasicsTutorial() => _uiCommandFactory.Create<OpenWebpageCommand>().Execute("https://youtu.be/H10jDrHJ_Uo?si=XnePs_0X5CQjxLZZ");
-        [RelayCommand] private void OpenAssetEdBasic0Tutorial() => _uiCommandFactory.Create<OpenWebpageCommand>().Execute("https://www.youtube.com/watch?v=iVjAVEn8jYc");
-        [RelayCommand] private void OpenAssetEdBasic1Tutorial() => _uiCommandFactory.Create<OpenWebpageCommand>().Execute("https://www.youtube.com/watch?v=7HN4oA2LsFM");
-        [RelayCommand] private void OpenSkragTutorial() => _uiCommandFactory.Create<OpenWebpageCommand>().Execute("https://www.youtube.com/watch?v=MhvbZfNp8Qw");
-        [RelayCommand] private void OpenTzarGuardTutorial() => _uiCommandFactory.Create<OpenWebpageCommand>().Execute("https://www.youtube.com/watch?v=ONRAKJUmuiM");
-        [RelayCommand] private void OpenKostalynTutorial() => _uiCommandFactory.Create<OpenWebpageCommand>().Execute("https://www.youtube.com/watch?v=AXw99yc74CY");
-        [RelayCommand] private void OpenRecolouringModelsTutorial() => _uiCommandFactory.Create<OpenWebpageCommand>().Execute("https://youtu.be/azDq2IRnr1U?si=GammGsisnCzGKYiA");
+        [RelayCommand] private void OpenAnimatedPropTutorial() => _uiCommandFactory.Create<OpenWebpageCommand>(x => x.Configure("https://www.youtube.com/watch?v=b68hSHZ5raY")).Execute();
+        [RelayCommand] private void OpenAnimationBasicsTutorial() => _uiCommandFactory.Create<OpenWebpageCommand>(x => x.Configure("https://youtu.be/H10jDrHJ_Uo?si=XnePs_0X5CQjxLZZ")).Execute();
+        [RelayCommand] private void OpenAssetEdBasic0Tutorial() => _uiCommandFactory.Create<OpenWebpageCommand>(x => x.Configure("https://www.youtube.com/watch?v=iVjAVEn8jYc")).Execute();
+        [RelayCommand] private void OpenAssetEdBasic1Tutorial() => _uiCommandFactory.Create<OpenWebpageCommand>(x => x.Configure("https://www.youtube.com/watch?v=7HN4oA2LsFM")).Execute();
+        [RelayCommand] private void OpenSkragTutorial() => _uiCommandFactory.Create<OpenWebpageCommand>(x => x.Configure("https://www.youtube.com/watch?v=MhvbZfNp8Qw")).Execute();
+        [RelayCommand] private void OpenTzarGuardTutorial() => _uiCommandFactory.Create<OpenWebpageCommand>(x => x.Configure("https://www.youtube.com/watch?v=ONRAKJUmuiM")).Execute();
+        [RelayCommand] private void OpenKostalynTutorial() => _uiCommandFactory.Create<OpenWebpageCommand>(x => x.Configure("https://www.youtube.com/watch?v=AXw99yc74CY")).Execute();
+        [RelayCommand] private void OpenRecolouringModelsTutorial() => _uiCommandFactory.Create<OpenWebpageCommand>(x => x.Configure("https://youtu.be/azDq2IRnr1U?si=GammGsisnCzGKYiA")).Execute();
 
         [RelayCommand]
         private void OpenHelp()
@@ -132,13 +132,13 @@ namespace AssetEditor.ViewModels
             var appDirectory = AppDomain.CurrentDomain.BaseDirectory;
             var fullPath = Path.Combine(appDirectory, "Doc", "index.html");
             Console.WriteLine(fullPath);
-            _uiCommandFactory.Create<OpenWebpageCommand>().Execute(fullPath);
+            _uiCommandFactory.Create<OpenWebpageCommand>(x => x.Configure(fullPath)).Execute();
         }
-        [RelayCommand] private void OpenModdingWiki() => _uiCommandFactory.Create<OpenWebpageCommand>().Execute("https://tw-modding.com/index.php/Tutorial:AssetEditor");
+        [RelayCommand] private void OpenModdingWiki() => _uiCommandFactory.Create<OpenWebpageCommand>(x => x.Configure("https://tw-modding.com/index.php/Tutorial:AssetEditor")).Execute();
         
-        [RelayCommand] private void OpenPatreon() => _uiCommandFactory.Create<OpenWebpageCommand>().Execute("https://www.patreon.com/TheAssetEditor");
-        [RelayCommand] private void OpenDiscord() => _uiCommandFactory.Create<OpenWebpageCommand>().Execute("https://discord.gg/6Djf2sCczC");
-        [RelayCommand] private void DownloadRme() => _uiCommandFactory.Create<OpenWebpageCommand>().Execute("https://github.com/mr-phazer/RME_Release/releases/latest");
+        [RelayCommand] private void OpenPatreon() => _uiCommandFactory.Create<OpenWebpageCommand>(x => x.Configure("https://www.patreon.com/TheAssetEditor")).Execute();
+        [RelayCommand] private void OpenDiscord() => _uiCommandFactory.Create<OpenWebpageCommand>(x => x.Configure("https://discord.gg/6Djf2sCczC")).Execute();
+        [RelayCommand] private void DownloadRme() => _uiCommandFactory.Create<OpenWebpageCommand>(x => x.Configure("https://github.com/mr-phazer/RME_Release/releases/latest")).Execute();
 
         [RelayCommand] private static void OpenAssetEditorFolder() => Process.Start("explorer.exe", DirectoryHelper.ApplicationDirectory);
 

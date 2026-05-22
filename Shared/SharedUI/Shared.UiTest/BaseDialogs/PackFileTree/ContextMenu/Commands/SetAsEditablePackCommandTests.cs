@@ -39,7 +39,9 @@ namespace Shared.UiTest.BaseDialogs.PackFileTree.ContextMenu.Commands
 
             // Act
             var command = new SetAsEditablePackCommand(_packFileService);
-            command.Execute(root);
+            command.Configure(root);
+
+            command.Execute();
 
             // Assert
             Assert.That(_packFileService.GetEditablePack(), Is.EqualTo(container));

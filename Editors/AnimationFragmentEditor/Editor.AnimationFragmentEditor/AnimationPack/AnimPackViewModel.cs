@@ -59,10 +59,10 @@ namespace CommonControls.Editors.AnimationPack
             };
         }
 
-        [RelayCommand] private void RenameAction() => _uiCommandFactory.Create<RenameSelectedFileCommand>().Execute(this);
-        [RelayCommand] private void RemoveAction() => _uiCommandFactory.Create<RemoveSelectedFileCommand>().Execute(this);
+        [RelayCommand] private void RenameAction() => _uiCommandFactory.Create<RenameSelectedFileCommand>(x => x.Configure(this)).Execute();
+        [RelayCommand] private void RemoveAction() => _uiCommandFactory.Create<RemoveSelectedFileCommand>(x => x.Configure(this)).Execute();
         [RelayCommand] private void CopyFullPathAction() => Clipboard.SetText(AnimationPackItems.SelectedItem.FileName);
-        [RelayCommand] private void CreateEmptyWarhammer3AnimSetFileAction() => _uiCommandFactory.Create<CreateEmptyWarhammer3AnimSetFileCommand>().Execute(this);
+        [RelayCommand] private void CreateEmptyWarhammer3AnimSetFileAction() => _uiCommandFactory.Create<CreateEmptyWarhammer3AnimSetFileCommand>(x => x.Configure(this)).Execute();
         [RelayCommand] private void ExportAnimationSlotsWh3Action() => _uiCommandFactory.Create<ExportAnimationSlotCommand>().Warhammer3();
         [RelayCommand] private void ExportAnimationSlotsWh2Action() => _uiCommandFactory.Create<ExportAnimationSlotCommand>().Warhammer2();
 

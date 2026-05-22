@@ -13,20 +13,33 @@ namespace Shared.Ui.BaseDialogs.PackFileTree.Commands
     {
         public int MaxExpandCount { get; set; } = 200;
 
-        public void Execute(TreeNode? node, TreeNode? selectedItem, Action<TreeNode> setSelectedItem, Action<PackFile> openFile)
+        private TreeNode? _node;
+        private TreeNode? _selectedItem;
+        private Action<TreeNode> _setSelectedItem = null!;
+        private Action<PackFile> _openFile = null!;
+
+        public void Configure(TreeNode? node, TreeNode? selectedItem, Action<TreeNode> setSelectedItem, Action<PackFile> openFile)
         {
-            var targetNode = node ?? selectedItem;
+            _node = node;
+            _selectedItem = selectedItem;
+            _setSelectedItem = setSelectedItem;
+            _openFile = openFile;
+        }
+
+        public void Execute()
+        {
+            var targetNode = _node ?? _selectedItem;
             if (targetNode == null)
                 return;
 
-            if (!ReferenceEquals(selectedItem, targetNode))
-                setSelectedItem(targetNode);
+            if (!ReferenceEquals(_selectedItem, targetNode))
+                _setSelectedItem(targetNode);
 
             if (targetNode.NodeType == NodeType.File)
             {
                 var selectedFile = FindPackFile(targetNode);
                 if (selectedFile != null)
-                    openFile(selectedFile);
+                    _openFile(selectedFile);
             }
             else if (targetNode.NodeType == NodeType.Directory || targetNode.NodeType == NodeType.Root)
             {

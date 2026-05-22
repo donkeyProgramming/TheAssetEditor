@@ -18,7 +18,7 @@ namespace Editors.Audio.AudioEditor.Commands.AudioProjectMutation
     {
         MutationType Action { get; }
         AudioProjectTreeNodeType NodeType { get; }
-        void Execute(DataRow row);
+        void Configure(DataRow row);
     }
 
     public interface IAudioProjectMutationUICommandFactory

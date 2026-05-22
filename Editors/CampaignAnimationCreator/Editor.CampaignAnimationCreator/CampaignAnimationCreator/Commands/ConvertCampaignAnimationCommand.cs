@@ -8,6 +8,7 @@ namespace Editor.CampaignAnimationCreator.CampaignAnimationCreator.Commands
 {
     public class ConvertCampaignAnimationCommand(IStandardDialogs standardDialogs) : IAeCommand
     {
+        void IAeCommand.Execute() => throw new NotSupportedException("Use Execute with parameters instead.");
         public bool Execute(AnimationClip? sourceAnimation, SkeletonBoneNode? rootBone, out AnimationClip? convertedAnimation)
         {
             convertedAnimation = null;

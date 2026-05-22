@@ -11,15 +11,22 @@ namespace Editors.AnimationFragmentEditor.AnimationPack.Commands
 {
     public class CreateEmptyWarhammer3AnimSetFileCommand : IAeCommand
     {
-        public void Execute(AnimPackViewModel editor)
+        private AnimPackViewModel _editor = null!;
+
+        public void Configure(AnimPackViewModel editor)
+        {
+            _editor = editor;
+        }
+
+        public void Execute()
         {
             var fileName = GetAnimSetFileName();
             if (fileName == null)
                 return;
 
             var animSet = CreateExampleWarhammer3AnimSet(fileName);
-            editor.AnimationPackItems.PossibleValues.Add(animSet);
-            editor.AnimationPackItems.UpdatePossibleValues(editor.AnimationPackItems.PossibleValues);
+            _editor.AnimationPackItems.PossibleValues.Add(animSet);
+            _editor.AnimationPackItems.UpdatePossibleValues(_editor.AnimationPackItems.PossibleValues);
         }
 
         string? GetAnimSetFileName()

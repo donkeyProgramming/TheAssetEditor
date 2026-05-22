@@ -1,4 +1,4 @@
-﻿using System.Data;
+using System.Data;
 using Editors.Audio.AudioEditor.Core;
 using Editors.Audio.AudioEditor.Core.AudioProjectMutation;
 using Editors.Audio.AudioEditor.Events.AudioProjectViewer.Table;
@@ -20,12 +20,19 @@ namespace Editors.Audio.AudioEditor.Commands.AudioProjectMutation
         public MutationType Action => MutationType.Remove;
         public AudioProjectTreeNodeType NodeType => AudioProjectTreeNodeType.ActionEventType;
 
-        public void Execute(DataRow row)
+        private DataRow _row = null!;
+
+        public void Configure(DataRow row)
+        {
+            _row = row;
+        }
+
+        public void Execute()
         {
             var soundBankName = _audioEditorStateService.SelectedAudioProjectExplorerNode.Name;
-            var actionEventName = TableHelpers.GetActionEventNameFromRow(row);
+            var actionEventName = TableHelpers.GetActionEventNameFromRow(_row);
             _actionEventService.RemoveActionEvent(soundBankName, actionEventName);
-            _eventHub.Publish(new ViewerTableRowRemoveRequestedEvent(row));
+            _eventHub.Publish(new ViewerTableRowRemoveRequestedEvent(_row));
         }
     }
 }

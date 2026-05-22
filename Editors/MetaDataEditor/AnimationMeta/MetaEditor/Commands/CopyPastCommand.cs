@@ -24,6 +24,8 @@ namespace Editors.AnimationMeta.MetaEditor.Commands
             _standardDialogs = standardDialogs;
         }
 
+        void IAeCommand.Execute() => throw new NotSupportedException("Use ExecuteCopy or ExecutePaste instead.");
+
         public void ExecuteCopy(MetaDataEditorViewModel controller)
         {
             var selectedTags = controller.Tags

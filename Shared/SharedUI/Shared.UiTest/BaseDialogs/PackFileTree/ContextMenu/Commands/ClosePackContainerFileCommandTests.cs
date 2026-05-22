@@ -48,7 +48,9 @@ namespace Shared.UiTest.BaseDialogs.PackFileTree.ContextMenu.Commands
 
             // Act
             var command = new ClosePackContainerFileCommand(_packFileService, dialogs.Object);
-            command.Execute(root);
+            command.Configure(root);
+
+            command.Execute();
 
             // Assert
             Assert.That(viewModel.Files.Count, Is.EqualTo(0));

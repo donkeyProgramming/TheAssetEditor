@@ -19,6 +19,8 @@ namespace Editors.AnimationMeta.MetaEditor.Commands
         private readonly IStandardDialogs _standardDialogs;
         private readonly MetaDataFileParser _metaDataFileParser;
 
+        void IAeCommand.Execute() => throw new NotSupportedException("Use Execute(MetaDataEditorViewModel) instead.");
+
         public SaveCommand(IPackFileService packFileService, IEventHub eventHub, IFileSaveService packFileSaveService, IStandardDialogs standardDialogs, MetaDataFileParser metaDataFileParser)
         {
             _packFileService = packFileService;

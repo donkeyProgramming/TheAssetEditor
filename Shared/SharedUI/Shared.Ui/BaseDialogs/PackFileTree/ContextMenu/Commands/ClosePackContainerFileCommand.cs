@@ -1,4 +1,4 @@
-﻿using Shared.Core.PackFiles;
+using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
 using Shared.Core.Services;
 using Serilog;
@@ -15,12 +15,19 @@ namespace Shared.Ui.BaseDialogs.PackFileTree.ContextMenu.Commands
         public bool ShouldAdd(TreeNode node) => node.NodeType == NodeType.Root;
         public bool IsEnabled(TreeNode node) => true;
 
-        public void Execute(TreeNode selectedNode)
+        private TreeNode _node = null!;
+
+        public void Configure(TreeNode node)
         {
-            var container = TreeNodeHelper.GetPackFileContainer(selectedNode);
+            _node = node;
+        }
+
+        public void Execute()
+        {
+            var container = TreeNodeHelper.GetPackFileContainer(_node);
             if (container == null)
             {
-                _logger.Here().Warning($"Close blocked because no container was resolved for '{CommandLoggingHelper.DescribeNode(selectedNode)}'");
+                _logger.Here().Warning($"Close blocked because no container was resolved for '{CommandLoggingHelper.DescribeNode(_node)}'");
                 standardDialogs.ShowDialogBox("Unable to resolve selected packfile");
                 return;
             }

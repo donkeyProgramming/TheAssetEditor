@@ -7,6 +7,6 @@ namespace Shared.Ui.BaseDialogs.PackFileTree.ContextMenu.Commands
         public string GetDisplayName(TreeNode node);
         public bool ShouldAdd(TreeNode node);
         public bool IsEnabled(TreeNode node);
-        public void Execute(TreeNode node);
+        public void Configure(TreeNode node);
     }
 }

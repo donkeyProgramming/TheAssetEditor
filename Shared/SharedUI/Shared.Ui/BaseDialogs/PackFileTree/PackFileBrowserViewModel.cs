@@ -187,7 +187,8 @@ namespace Shared.Ui.BaseDialogs.PackFileTree
         [RelayCommand]
         protected virtual void OnDoubleClick(TreeNode node)
         {
-            _doubleClickCommand.Execute(node, SelectedItem, n => SelectedItem = n, file => FileOpen?.Invoke(file));
+            _doubleClickCommand.Configure(node, SelectedItem, n => SelectedItem = n, file => FileOpen?.Invoke(file));
+            _doubleClickCommand.Execute();
         }
 
         private void OnMainEditablePackChanged(PackFileContainerSetAsMainEditableEvent e)

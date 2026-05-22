@@ -23,9 +23,16 @@ namespace Editors.Audio.ContextMenu
             return packFile != null && packFile.Name.EndsWith(".ca_vp8", StringComparison.OrdinalIgnoreCase);
         }
 
-        public void Execute(TreeNode selectedNode)
+        private TreeNode _node = null!;
+
+        public void Configure(TreeNode node)
         {
-            var packFile = TreeNodeHelper.GetPackFile(selectedNode);
+            _node = node;
+        }
+
+        public void Execute()
+        {
+            var packFile = TreeNodeHelper.GetPackFile(_node);
             if (packFile == null)
                 return;
 

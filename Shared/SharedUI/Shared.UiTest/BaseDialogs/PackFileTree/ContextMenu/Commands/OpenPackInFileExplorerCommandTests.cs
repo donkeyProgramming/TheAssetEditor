@@ -46,7 +46,9 @@ namespace Shared.UiTest.BaseDialogs.PackFileTree.ContextMenu.Commands
 
             // Act
             var command = new OpenPackInFileExplorerCommand(_packFileService, new Mock<IStandardDialogs>().Object, fileSystem.Object);
-            command.Execute(root);
+            command.Configure(root);
+
+            command.Execute();
 
             // Assert
             fileSystem.Verify(x => x.ProcessStart(It.Is<ProcessStartInfo>(p => p.FileName == "explorer.exe")), Times.Once);
@@ -64,7 +66,9 @@ namespace Shared.UiTest.BaseDialogs.PackFileTree.ContextMenu.Commands
 
             // Act
             var command = new OpenPackInFileExplorerCommand(_packFileService, dialogs.Object, new Mock<IFileSystemAccess>().Object);
-            command.Execute(root);
+            command.Configure(root);
+
+            command.Execute();
 
             // Assert
             dialogs.Verify(x => x.ShowDialogBox(It.IsAny<string>(), It.IsAny<string>()), Times.Once);

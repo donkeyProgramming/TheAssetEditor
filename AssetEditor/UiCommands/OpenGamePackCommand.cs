@@ -12,6 +12,7 @@ namespace AssetEditor.UiCommands
         private readonly IPackFileService _packFileService;
         private readonly IPackFileContainerLoader _packFileContainerLoader;
         private readonly ApplicationSettingsService _applicationSettingsService;
+        private GameTypeEnum _game;
 
         public OpenGamePackCommand(IPackFileService packFileService, IPackFileContainerLoader packFileContainerLoader, ApplicationSettingsService applicationSettingsService)
         {
@@ -20,11 +21,16 @@ namespace AssetEditor.UiCommands
             _applicationSettingsService = applicationSettingsService;
         }
 
-        public void Execute(GameTypeEnum game)
+        public void Configure(GameTypeEnum game)
+        {
+            _game = game;
+        }
+
+        public void Execute()
         {
             var settingsService = _applicationSettingsService;
             var settings = settingsService.CurrentSettings;
-            var gamePath = settings.GameDirectories.FirstOrDefault(x => x.Game == game);
+            var gamePath = settings.GameDirectories.FirstOrDefault(x => x.Game == _game);
 
             if (gamePath == null || string.IsNullOrWhiteSpace(gamePath.Path))
             {
@@ -37,14 +43,14 @@ namespace AssetEditor.UiCommands
             {
                 if (packFile.SystemFilePath == gamePath.Path)
                 {
-                    MessageBox.Show($"Pack files for \"{GameInformationDatabase.GetGameById(game).DisplayName}\" are already loaded.", "Error");
+                    MessageBox.Show($"Pack files for \"{GameInformationDatabase.GetGameById(_game).DisplayName}\" are already loaded.", "Error");
                     return;
                 }
             }
 
             using (new WaitCursor())
             {
-                var res = _packFileContainerLoader.LoadAllCaFiles(game);
+                var res = _packFileContainerLoader.LoadAllCaFiles(_game);
                 _packFileService.AddContainer(res);
             }
         }

@@ -1,4 +1,4 @@
-﻿using System.Linq;
+using System.Linq;
 using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
 using Shared.Core.Services;
@@ -21,12 +21,19 @@ namespace Shared.Ui.BaseDialogs.PackFileTree.ContextMenu.Commands
 
         public bool IsEnabled(TreeNode node) => true;
 
-        public void Execute(TreeNode selectedNode)
+        private TreeNode _node = null!;
+
+        public void Configure(TreeNode node)
         {
-            var container = TreeNodeHelper.GetPackFileContainer(selectedNode);
+            _node = node;
+        }
+
+        public void Execute()
+        {
+            var container = TreeNodeHelper.GetPackFileContainer(_node);
             if (container == null)
             {
-                _logger.Here().Warning($"Create folder blocked because no container was resolved for '{CommandLoggingHelper.DescribeNode(selectedNode)}'");
+                _logger.Here().Warning($"Create folder blocked because no container was resolved for '{CommandLoggingHelper.DescribeNode(_node)}'");
                 standardDialogs.ShowDialogBox("Unable to resolve selected packfile");
                 return;
             }
@@ -38,16 +45,16 @@ namespace Shared.Ui.BaseDialogs.PackFileTree.ContextMenu.Commands
                 return;
             }
 
-            var folderName = standardDialogs.ShowFolderNameDialog(selectedNode.Children.Select(x => x.Name), "");
+            var folderName = standardDialogs.ShowFolderNameDialog(_node.Children.Select(x => x.Name), "");
 
             if (folderName.Any())
             {
-                _logger.Here().Information($"Creating folder '{folderName}' under '{CommandLoggingHelper.DescribeNode(selectedNode)}'");
-                PackFileTreeMutationService.CreateDirectoryChild(selectedNode, folderName);
+                _logger.Here().Information($"Creating folder '{folderName}' under '{CommandLoggingHelper.DescribeNode(_node)}'");
+                PackFileTreeMutationService.CreateDirectoryChild(_node, folderName);
             }
             else
             {
-                _logger.Here().Information($"Create folder cancelled under '{CommandLoggingHelper.DescribeNode(selectedNode)}'");
+                _logger.Here().Information($"Create folder cancelled under '{CommandLoggingHelper.DescribeNode(_node)}'");
             }
         }
     }

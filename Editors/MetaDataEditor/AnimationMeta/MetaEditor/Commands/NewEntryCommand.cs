@@ -11,6 +11,7 @@ namespace Editors.AnimationMeta.MetaEditor.Commands
     {
         private readonly MetaDataFileParser _metaDataFileParser;
         private readonly IMetaDataDatabase _metaDataDatabase;
+        private MetaDataEditorViewModel _controller = null!;
 
         public NewEntryCommand(MetaDataFileParser metaDataFileParser, IMetaDataDatabase metaDataDatabase) 
         {
@@ -18,7 +19,12 @@ namespace Editors.AnimationMeta.MetaEditor.Commands
             _metaDataDatabase = metaDataDatabase;
         }
 
-        public void Execute(MetaDataEditorViewModel controller)
+        public void Configure(MetaDataEditorViewModel controller)
+        {
+            _controller = controller;
+        }
+
+        public void Execute()
         {
             var dialog = new NewMetaDataEntryWindow() { Owner = Application.Current.MainWindow };
             var allDefs = _metaDataDatabase.GetSupportedTypes();
@@ -33,9 +39,9 @@ namespace Editors.AnimationMeta.MetaEditor.Commands
             if (res.HasValue && res.Value == true)
             {
                 var newEntry = _metaDataFileParser.CreateDefault(model.SelectedItem);
-                controller.ParsedFile.Attributes.Add(newEntry);
-                controller.UpdateView();
-                controller.SelectedTag = controller.Tags.LastOrDefault();   
+                _controller.ParsedFile.Attributes.Add(newEntry);
+                _controller.UpdateView();
+                _controller.SelectedTag = _controller.Tags.LastOrDefault();   
             }
 
             dialog.DataContext = null;

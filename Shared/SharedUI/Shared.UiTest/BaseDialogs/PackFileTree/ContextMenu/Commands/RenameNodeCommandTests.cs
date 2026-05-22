@@ -1,4 +1,4 @@
-﻿using System.Threading;
+using System.Threading;
 using Moq;
 using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
@@ -54,7 +54,9 @@ namespace Shared.UiTest.BaseDialogs.PackFileTree.ContextMenu.Commands
 
             // Act
             var command = new RenameNodeCommand(_packFileService, dialogs.Object);
-            command.Execute(node);
+            command.Configure(node);
+
+            command.Execute();
 
             // Assert
             Assert.That(node.Name, Is.EqualTo("renamed.txt"));
@@ -78,7 +80,9 @@ namespace Shared.UiTest.BaseDialogs.PackFileTree.ContextMenu.Commands
 
             // Act
             var command = new RenameNodeCommand(_packFileService, dialogs.Object);
-            command.Execute(dirNode);
+            command.Configure(dirNode);
+
+            command.Execute();
 
             // Assert
             Assert.That(dirNode.Name, Is.EqualTo("renamed_folder"));

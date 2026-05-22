@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO;
 using Shared.Core.Misc;
 using Shared.Core.PackFiles;
@@ -18,12 +18,19 @@ namespace Shared.Ui.BaseDialogs.PackFileTree.ContextMenu.Commands
         public bool ShouldAdd(TreeNode node) => node.NodeType == NodeType.Directory || node.NodeType == NodeType.Root || (node.NodeType == NodeType.File && TreeNodeHelper.GetPackFile(node) != null);
         public bool IsEnabled(TreeNode node) => true;
 
-        public void Execute(TreeNode selectedNode)
+        private TreeNode _node = null!;
+
+        public void Configure(TreeNode node)
         {
-            var container = TreeNodeHelper.GetPackFileContainer(selectedNode);
+            _node = node;
+        }
+
+        public void Execute()
+        {
+            var container = TreeNodeHelper.GetPackFileContainer(_node);
             if (container == null)
             {
-                _logger.Here().Warning($"Export blocked because no container was resolved for '{CommandLoggingHelper.DescribeNode(selectedNode)}'");
+                _logger.Here().Warning($"Export blocked because no container was resolved for '{CommandLoggingHelper.DescribeNode(_node)}'");
                 standardDialogs.ShowDialogBox("Unable to resolve selected packfile");
                 return;
             }
@@ -32,19 +39,19 @@ namespace Shared.Ui.BaseDialogs.PackFileTree.ContextMenu.Commands
             var folderDialogResult = standardDialogs.ShowSystemFolderBrowserDialog();
             if (folderDialogResult.Result && !string.IsNullOrEmpty(folderDialogResult.FolderPath))
             {
-                _logger.Here().Information($"Exporting node '{CommandLoggingHelper.DescribeNode(selectedNode)}' to system folder '{folderDialogResult.FolderPath}'");
+                _logger.Here().Information($"Exporting node '{CommandLoggingHelper.DescribeNode(_node)}' to system folder '{folderDialogResult.FolderPath}'");
                 // For root nodes, use empty string as base path; for others, use parent directory
-                var nodeStartDir = selectedNode.NodeType == NodeType.Root 
+                var nodeStartDir = _node.NodeType == NodeType.Root 
                     ? "" 
-                    : fileSystemAccess.PathGetDirectoryName(selectedNode.GetFullPath());
+                    : fileSystemAccess.PathGetDirectoryName(_node.GetFullPath());
                 var fileCounter = 0;
-                SaveSelfAndChildren(selectedNode, container, folderDialogResult.FolderPath, nodeStartDir, ref fileCounter);
+                SaveSelfAndChildren(_node, container, folderDialogResult.FolderPath, nodeStartDir, ref fileCounter);
                 standardDialogs.ShowDialogBox($"{fileCounter} files exported!", "Export");
-                _logger.Here().Information($"Exported {fileCounter} file(s) from '{CommandLoggingHelper.DescribeNode(selectedNode)}' to '{folderDialogResult.FolderPath}'");
+                _logger.Here().Information($"Exported {fileCounter} file(s) from '{CommandLoggingHelper.DescribeNode(_node)}' to '{folderDialogResult.FolderPath}'");
             }
             else
             {
-                _logger.Here().Information($"Export cancelled for node '{CommandLoggingHelper.DescribeNode(selectedNode)}'");
+                _logger.Here().Information($"Export cancelled for node '{CommandLoggingHelper.DescribeNode(_node)}'");
             }
         }
 

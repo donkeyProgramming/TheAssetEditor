@@ -39,7 +39,8 @@ namespace Shared.Ui.BaseDialogs.PackFileTree.ContextMenu
                         continue;
 
                     var parent = GetOrCreateMenuPath(item.Path, clusterRoot, pathToMenuLookup);
-                    var x = new ContextMenuItem(command.GetDisplayName(node), () => command.Execute(node));
+                    command.Configure(node);
+                    var x = new ContextMenuItem(command.GetDisplayName(node), () => command.Execute());
                     parent.ContextMenu.Add(x);
                 }
 

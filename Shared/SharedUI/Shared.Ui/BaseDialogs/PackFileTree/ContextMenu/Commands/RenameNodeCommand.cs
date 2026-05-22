@@ -1,4 +1,4 @@
-﻿using System.Linq;
+using System.Linq;
 using Serilog;
 using Shared.Core.ErrorHandling;
 using Shared.Core.PackFiles;
@@ -22,32 +22,39 @@ namespace Shared.Ui.BaseDialogs.PackFileTree.ContextMenu.Commands
 
         public bool IsEnabled(TreeNode node) => true;
 
-        public void Execute(TreeNode selectedNode)
+        private TreeNode _node = null!;
+
+        public void Configure(TreeNode node)
         {
-            var container = TreeNodeHelper.GetPackFileContainer(selectedNode);
+            _node = node;
+        }
+
+        public void Execute()
+        {
+            var container = TreeNodeHelper.GetPackFileContainer(_node);
             if (container == null)
             {
-                _logger.Here().Warning($"Rename blocked because no container was resolved for '{CommandLoggingHelper.DescribeNode(selectedNode)}'");
+                _logger.Here().Warning($"Rename blocked because no container was resolved for '{CommandLoggingHelper.DescribeNode(_node)}'");
                 standardDialogs.ShowDialogBox("Unable to resolve selected packfile", "Error");
                 return;
             }
 
             if (container.IsCaPackFile)
             {
-                _logger.Here().Warning($"Rename blocked for CA pack node '{CommandLoggingHelper.DescribeNode(selectedNode)}'");
+                _logger.Here().Warning($"Rename blocked for CA pack node '{CommandLoggingHelper.DescribeNode(_node)}'");
                 standardDialogs.ShowDialogBox("Unable to edit CA packfile", "Error");
                 return;
             }
 
-            if (selectedNode.NodeType == NodeType.Directory)
+            if (_node.NodeType == NodeType.Directory)
             {
-                var currentPath = selectedNode.GetFullPath();
-                var inputResult = standardDialogs.ShowTextInputDialog("Create folder", selectedNode.Name);
+                var currentPath = _node.GetFullPath();
+                var inputResult = standardDialogs.ShowTextInputDialog("Create folder", _node.Name);
                 var newFolderName = inputResult.Result ? inputResult.Text.ToLower().Trim() : string.Empty;
                 if (newFolderName.Any())
                 {
                     _logger.Here().Information($"Renaming directory '{currentPath}' to '{newFolderName}'");
-                    selectedNode.Name = newFolderName;
+                    _node.Name = newFolderName;
                     packFileService.RenameDirectory(container, currentPath, newFolderName);
                 }
                 else
@@ -56,14 +63,14 @@ namespace Shared.Ui.BaseDialogs.PackFileTree.ContextMenu.Commands
                 }
 
             }
-            else if (selectedNode.NodeType == NodeType.File)
+            else if (_node.NodeType == NodeType.File)
             {
-                var currentPath = CommandLoggingHelper.DescribeNode(selectedNode);
-                var inputResult = standardDialogs.ShowTextInputDialog("Rename file", selectedNode.Name);
+                var currentPath = CommandLoggingHelper.DescribeNode(_node);
+                var inputResult = standardDialogs.ShowTextInputDialog("Rename file", _node.Name);
                 var newFileName = inputResult.Result ? inputResult.Text.ToLower().Trim() : string.Empty;
                 if (newFileName.Any())
                 {
-                    var packFile = TreeNodeHelper.GetPackFile(selectedNode);
+                    var packFile = TreeNodeHelper.GetPackFile(_node);
                     if (packFile == null)
                         return;
 

@@ -46,7 +46,9 @@ namespace Shared.UiTest.BaseDialogs.PackFileTree.ContextMenu.Commands
             root.Children.First().IsNodeExpanded = false;
 
             var command = new ExpandNodeCommand();
-            command.Execute(root);
+            command.Configure(root);
+
+            command.Execute();
 
             Assert.That(root.IsNodeExpanded, Is.True);
             Assert.That(root.Children.First().IsNodeExpanded, Is.True);
@@ -66,7 +68,9 @@ namespace Shared.UiTest.BaseDialogs.PackFileTree.ContextMenu.Commands
             nested.IsNodeExpanded = false;
 
             var command = new ExpandNodeCommand();
-            command.Execute(root);
+            command.Configure(root);
+
+            command.Execute();
 
             Assert.That(root.IsNodeExpanded, Is.True);
             Assert.That(folder.IsNodeExpanded, Is.True);

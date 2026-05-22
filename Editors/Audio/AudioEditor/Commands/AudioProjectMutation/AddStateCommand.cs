@@ -1,4 +1,4 @@
-﻿using System.Data;
+using System.Data;
 using Editors.Audio.AudioEditor.Core;
 using Editors.Audio.AudioEditor.Core.AudioProjectMutation;
 using Editors.Audio.AudioEditor.Presentation.Shared.Models;
@@ -14,9 +14,16 @@ namespace Editors.Audio.AudioEditor.Commands.AudioProjectMutation
         public MutationType Action => MutationType.Add;
         public AudioProjectTreeNodeType NodeType => AudioProjectTreeNodeType.StateGroup;
 
-        public void Execute(DataRow row)
+        private DataRow _row = null!;
+
+        public void Configure(DataRow row)
         {
-            var stateName = TableHelpers.GetStateNameFromRow(row);
+            _row = row;
+        }
+
+        public void Execute()
+        {
+            var stateName = TableHelpers.GetStateNameFromRow(_row);
             var stateGroupName = _audioEditorStateService.SelectedAudioProjectExplorerNode.Name;
             _stateService.AddState(stateGroupName, stateName);
         }

@@ -37,7 +37,7 @@ namespace Editors.KitbasherEditor.DevConfig
             var editorHandle = _scopeRepository.GetEditorHandles().First();
             var uiCommandFactory = _scopeRepository.GetRequiredService<IUiCommandFactory>(editorHandle);
 
-            uiCommandFactory.Create<ImportReferenceMeshCommand>().Execute(@"variantmeshes\wh_variantmodels\bo1\bst\bst_tuskgor\bst_tuskgor_01.wsmodel");
+            uiCommandFactory.Create<ImportReferenceMeshCommand>(x => x.Configure(@"variantmeshes\wh_variantmodels\bo1\bst\bst_tuskgor\bst_tuskgor_01.wsmodel")).Execute();
         }
 
         public void OverrideSettings(ApplicationSettings currentSettings)

@@ -62,6 +62,8 @@ namespace Editors.KitbasherEditor.UiCommands
     {
         private readonly KitbashSceneCreator _kitbashSceneCreator;
         private readonly IPackFileService _packFileService;
+        private string? _path;
+        private PackFile? _file;
 
         public ImportReferenceMeshCommand(KitbashSceneCreator kitbashSceneCreator, IPackFileService packFileService)
         {
@@ -69,18 +71,32 @@ namespace Editors.KitbasherEditor.UiCommands
             _packFileService = packFileService;
         }
 
-        public void Execute(string path)
+        public void Configure(string path)
         {
-            var packFile = _packFileService.FindFile(path);
-            if (packFile == null)
-                throw new Exception($"Unable to load file {path}");
-
-            _kitbashSceneCreator.LoadReference(packFile);
+            _path = path;
+            _file = null;
         }
 
-        public void Execute(PackFile file)
+        public void Configure(PackFile file)
         {
-            _kitbashSceneCreator.LoadReference(file);
+            _file = file;
+            _path = null;
+        }
+
+        public void Execute()
+        {
+            if (_file != null)
+            {
+                _kitbashSceneCreator.LoadReference(_file);
+            }
+            else if (_path != null)
+            {
+                var packFile = _packFileService.FindFile(_path);
+                if (packFile == null)
+                    throw new Exception($"Unable to load file {_path}");
+
+                _kitbashSceneCreator.LoadReference(packFile);
+            }
         }
     }
 

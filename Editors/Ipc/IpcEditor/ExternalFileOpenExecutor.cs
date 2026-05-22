@@ -98,7 +98,7 @@ namespace Editors.Ipc
                 return false;
 
             var localCommandFactory = _scopeRepository.GetRequiredService<IUiCommandFactory>(existingKitbash);
-            localCommandFactory.Create<ImportReferenceMeshCommand>().Execute(file);
+            localCommandFactory.Create<ImportReferenceMeshCommand>(x => x.Configure(file)).Execute();
 
             SelectEditor(existingKitbash);
             return true;

@@ -33,10 +33,10 @@ namespace Editors.KitbasherEditor.DevConfig
             var editorHandle = _scopeRepositor.GetEditorHandles().First();
             var localCommandFactory = _scopeRepositor.GetRequiredService<IUiCommandFactory>(editorHandle);
 
-            localCommandFactory.Create<ImportReferenceMeshCommand>().Execute("variantmeshes\\wh_variantmodels\\hu17\\skv\\skv_throt\\skv_throt_head_01.wsmodel");
-            localCommandFactory.Create<ImportReferenceMeshCommand>().Execute("variantmeshes\\wh_variantmodels\\hu17\\skv\\skv_props\\skv_throt_ratcatcher_1h_rigid_01.wsmodel");
-            localCommandFactory.Create<ImportReferenceMeshCommand>().Execute("variantmeshes\\wh_variantmodels\\hu17\\skv\\skv_props\\skv_warpstone_1h_01.rigid_model_v2");
-            localCommandFactory.Create<ImportReferenceMeshCommand>().Execute("variantmeshes\\wh_variantmodels\\hu17\\skv\\skv_props\\skv_warpstone_1h_02.rigid_model_v2");
+            localCommandFactory.Create<ImportReferenceMeshCommand>(x => x.Configure("variantmeshes\\wh_variantmodels\\hu17\\skv\\skv_throt\\skv_throt_head_01.wsmodel")).Execute();
+            localCommandFactory.Create<ImportReferenceMeshCommand>(x => x.Configure("variantmeshes\\wh_variantmodels\\hu17\\skv\\skv_props\\skv_throt_ratcatcher_1h_rigid_01.wsmodel")).Execute();
+            localCommandFactory.Create<ImportReferenceMeshCommand>(x => x.Configure("variantmeshes\\wh_variantmodels\\hu17\\skv\\skv_props\\skv_warpstone_1h_01.rigid_model_v2")).Execute();
+            localCommandFactory.Create<ImportReferenceMeshCommand>(x => x.Configure("variantmeshes\\wh_variantmodels\\hu17\\skv\\skv_props\\skv_warpstone_1h_02.rigid_model_v2")).Execute();
         }
 
         public void OverrideSettings(ApplicationSettings currentSettings)

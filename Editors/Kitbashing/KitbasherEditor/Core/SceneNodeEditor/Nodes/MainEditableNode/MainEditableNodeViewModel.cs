@@ -112,7 +112,7 @@ namespace Editors.KitbasherEditor.ViewModels.SceneExplorer.Nodes
             }
         }
 
-        public void CopyTexturesToOutputPack() => _uiCommandFactory.Create<CopyTexturesToPackCommand>().Execute(_mainNode);
+        public void CopyTexturesToOutputPack() => _uiCommandFactory.Create<CopyTexturesToPackCommand>(x => x.Configure(_mainNode)).Execute();
         public void Dispose() { }
     }
 }

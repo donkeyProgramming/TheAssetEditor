@@ -5,10 +5,17 @@ using Shared.Core.Events;
 namespace Editors.AnimationFragmentEditor.AnimationPack.Commands
 {
     public class RenameSelectedFileCommand : IAeCommand
-    { 
-        public void Execute(AnimPackViewModel editor)
+    {
+        private AnimPackViewModel _editor = null!;
+
+        public void Configure(AnimPackViewModel editor)
         {
-            var animFile = editor.AnimationPackItems.PossibleValues.FirstOrDefault(file => file == editor.AnimationPackItems.SelectedItem);
+            _editor = editor;
+        }
+
+        public void Execute()
+        {
+            var animFile = _editor.AnimationPackItems.PossibleValues.FirstOrDefault(file => file == _editor.AnimationPackItems.SelectedItem);
             if (animFile == null)
                 return;
 
@@ -17,7 +24,7 @@ namespace Editors.AnimationFragmentEditor.AnimationPack.Commands
                 animFile.FileName = window.TextValue;
 
             // way to refresh the view
-            editor.AnimationPackItems.RefreshFilter();
+            _editor.AnimationPackItems.RefreshFilter();
         }
     }
 

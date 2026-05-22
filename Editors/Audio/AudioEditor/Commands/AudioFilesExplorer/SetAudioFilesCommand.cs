@@ -14,13 +14,21 @@ namespace Editors.Audio.AudioEditor.Commands.AudioFilesExplorer
         private readonly IAudioEditorStateService _audioEditorStateService = audioEditorStateService;
         private readonly IEventHub _eventHub = eventHub;
         private readonly IAudioRepository _audioRepository = audioRepository;
+        private List<AudioFilesTreeNode> _selectedAudioFiles = new();
+        private bool _addToExistingAudioFiles;
 
-        public void Execute(List<AudioFilesTreeNode> selectedAudioFiles, bool addToExistingAudioFiles)
+        public void Configure(List<AudioFilesTreeNode> selectedAudioFiles, bool addToExistingAudioFiles)
+        {
+            _selectedAudioFiles = selectedAudioFiles;
+            _addToExistingAudioFiles = addToExistingAudioFiles;
+        }
+
+        public void Execute()
         {
             var usedSourceIds = IdGenerator.GetUsedSourceIds(_audioRepository, _audioEditorStateService.AudioProject);
 
             var audioFiles = new List<AudioFile>();
-            foreach (var wavFile in selectedAudioFiles)
+            foreach (var wavFile in _selectedAudioFiles)
             {
                 var audioFile = _audioEditorStateService.AudioProject.GetAudioFile(wavFile.FilePath);
                 if (audioFile == null)
@@ -32,7 +40,7 @@ namespace Editors.Audio.AudioEditor.Commands.AudioFilesExplorer
             }
 
             _audioEditorStateService.StoreAudioFiles(audioFiles);
-            _eventHub.Publish(new AudioFilesChangedEvent(audioFiles, addToExistingAudioFiles, false, false));
+            _eventHub.Publish(new AudioFilesChangedEvent(audioFiles, _addToExistingAudioFiles, false, false));
         }
     }
 }

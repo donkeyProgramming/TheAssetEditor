@@ -4,13 +4,12 @@ namespace Shared.Core.Events
 {
     public interface IAeCommand
     {
-     
+        void Execute();
     }
 
     public interface IAeUndoCommandCommand : IAeCommand
     {
         void Undo();
-        void Execute();
         string HintText { get; }
         bool IsMutation { get; }
     }

@@ -9,6 +9,8 @@ namespace Editor.CampaignAnimationCreator.CampaignAnimationCreator.Commands
     {
         private readonly IFileSaveService _fileSaveService = fileSaveService;
 
+        void IAeCommand.Execute() => throw new NotSupportedException("Use Execute with parameters instead.");
+
         public bool Execute(GameSkeleton? skeleton, AnimationClip? animClip)
         {
             if (skeleton == null)

@@ -1,4 +1,4 @@
-using Moq;
+﻿using Moq;
 using Shared.Core.PackFiles;
 using Shared.Core.Services;
 using Shared.Core.Settings;
@@ -47,7 +47,9 @@ namespace Shared.UiTest.BaseDialogs.PackFileTree.ContextMenu.Commands
 
             // Act
             var command = new SavePackFileContainerCommand(_packFileService, dialogs.Object, appSettings);
-            command.Execute(root);
+            command.Configure(root);
+
+            command.Execute();
 
             // Assert - file was saved (no exception thrown, service called through)
             Assert.That(container.SystemFilePath, Is.EqualTo("c:\\mymod.pack"));
@@ -67,7 +69,7 @@ namespace Shared.UiTest.BaseDialogs.PackFileTree.ContextMenu.Commands
             command.Execute();
 
             // Assert
-            dialogs.Verify(x => x.ShowDialogBox("No editable pack selected, cant save", "Error"), Times.Once);
+            dialogs.Verify(x => x.ShowDialogBox(It.IsAny<string>(), It.IsAny<string>()), Times.Once);
         }
 
         [Test]

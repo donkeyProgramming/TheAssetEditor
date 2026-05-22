@@ -36,7 +36,7 @@ namespace Test.KitbashEditor.MeshFitter
             Assert.That(editor, Is.Not.Null);
 
             var scopedCommandFactory = runner.GetRequiredServiceInCurrentEditorScope<IUiCommandFactory>();
-            scopedCommandFactory.Create<ImportReferenceMeshCommand>().Execute(CelestialGeneralBodyPath);
+            scopedCommandFactory.Create<ImportReferenceMeshCommand>(x => x.Configure(CelestialGeneralBodyPath)).Execute();
 
             var sceneManager = runner.GetRequiredServiceInCurrentEditorScope<SceneManager>();
             var referenceGroup = sceneManager.GetNodeByName<GroupNode>(SpecialNodes.ReferenceMeshs);

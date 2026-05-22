@@ -1,4 +1,4 @@
-﻿using System.Data;
+using System.Data;
 using Editors.Audio.AudioEditor.Core;
 using Editors.Audio.AudioEditor.Core.AudioProjectMutation;
 using Editors.Audio.AudioEditor.Presentation.Shared.Models;
@@ -14,12 +14,19 @@ namespace Editors.Audio.AudioEditor.Commands.AudioProjectMutation
         public MutationType Action => MutationType.Add;
         public AudioProjectTreeNodeType NodeType => AudioProjectTreeNodeType.ActionEventType;
 
-        public void Execute(DataRow row)
+        private DataRow _row = null!;
+
+        public void Configure(DataRow row)
+        {
+            _row = row;
+        }
+
+        public void Execute()
         {
             var actionEventTypeName = _audioEditorStateService.SelectedAudioProjectExplorerNode.Name;
             var audioFiles = _audioEditorStateService.AudioFiles;
             var hircSettings = _audioEditorStateService.HircSettings;
-            var actionEventName = TableHelpers.GetActionEventNameFromRow(row);
+            var actionEventName = TableHelpers.GetActionEventNameFromRow(_row);
 
             if (actionEventName.StartsWith("Play_"))
                 _actionEventService.AddPlayActionEvent(actionEventTypeName, actionEventName, audioFiles, hircSettings);

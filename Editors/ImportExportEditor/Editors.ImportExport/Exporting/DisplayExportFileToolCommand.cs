@@ -8,16 +8,22 @@ namespace Editors.ImportExport.Exporting
     public class DisplayExportFileToolCommand : IAeCommand
     {
         private readonly IAbstractFormFactory<ExportWindow> _exportWindowFactory;
+        private PackFile _packFile = null!;
 
         public DisplayExportFileToolCommand(IAbstractFormFactory<ExportWindow> exportWindowFactory)
         {
             _exportWindowFactory = exportWindowFactory;
         }
 
-        public void Execute(PackFile packFile)
+        public void Configure(PackFile packFile)
+        {
+            _packFile = packFile;
+        }
+
+        public void Execute()
         {
             var window = _exportWindowFactory.Create();
-            window.Initialize(packFile);
+            window.Initialize(_packFile);
             window.ShowDialog();
         }
     }

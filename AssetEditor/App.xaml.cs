@@ -150,7 +150,7 @@ namespace AssetEditor
         {
             var newerReleases = await VersionChecker.GetNewerReleases();
             if (newerReleases != null)
-                uiCommandFactory.Create<OpenUpdaterWindowCommand>().Execute(newerReleases);
+                uiCommandFactory.Create<OpenUpdaterWindowCommand>(x => x.Configure(newerReleases)).Execute();
         }
 
         void DispatcherUnhandledExceptionHandler(object sender, DispatcherUnhandledExceptionEventArgs args)

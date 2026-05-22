@@ -34,6 +34,6 @@ namespace Editors.ImportExport.Importing
         }
 
         public void ShowDialog(IPackFileContainer container, TreeNode clickedNode) =>
-            _uiCommandFactory.Create<DisplayImportFileToolCommand>().Execute(container, clickedNode.GetFullPath());
+            _uiCommandFactory.Create<DisplayImportFileToolCommand>(x => x.Configure(container, clickedNode.GetFullPath())).Execute();
     }
 }

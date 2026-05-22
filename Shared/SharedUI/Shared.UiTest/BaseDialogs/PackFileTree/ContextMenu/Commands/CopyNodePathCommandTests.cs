@@ -41,7 +41,9 @@ namespace Shared.UiTest.BaseDialogs.PackFileTree.ContextMenu.Commands
             var file = TreeNodeHelper.FindNode(viewModel, container, "folder\\file.txt");
 
             var command = new CopyNodePathCommand();
-            command.Execute(file);
+            command.Configure(file);
+
+            command.Execute();
 
             Assert.That(System.Windows.Clipboard.GetText(), Is.EqualTo("folder\\file.txt"));
         }

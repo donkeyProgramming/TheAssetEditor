@@ -5,12 +5,18 @@ namespace Editors.AnimationFragmentEditor.AnimationPack.Commands
 {
     public class RemoveSelectedFileCommand : IAeCommand
     {
-        public void Execute(AnimPackViewModel editor)
+        private AnimPackViewModel _editor = null!;
+
+        public void Configure(AnimPackViewModel editor)
         {
-            editor.AnimationPackItems.PossibleValues.Remove(editor.AnimationPackItems.SelectedItem);
-            editor.AnimationPackItems.RefreshFilter();
+            _editor = editor;
         }
 
+        public void Execute()
+        {
+            _editor.AnimationPackItems.PossibleValues.Remove(_editor.AnimationPackItems.SelectedItem);
+            _editor.AnimationPackItems.RefreshFilter();
+        }
     }
 
 }

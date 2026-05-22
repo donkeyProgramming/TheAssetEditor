@@ -7,15 +7,21 @@ namespace Editors.KitbasherEditor.UiCommands
     public class CopyTexturesToPackCommand : IAeCommand
     {
         private readonly IPackFileService _packFileService;
+        private MainEditableNode _mainNode = null!;
 
         public CopyTexturesToPackCommand(IPackFileService packFileService)
         {
             _packFileService = packFileService;
         }
 
-        internal void Execute(MainEditableNode mainNode)
+        public void Configure(MainEditableNode mainNode)
         {
-            var meshes = mainNode.GetMeshesInLod(0, false);
+            _mainNode = mainNode;
+        }
+
+        public void Execute()
+        {
+            var meshes = _mainNode.GetMeshesInLod(0, false);
             var materials = meshes.Select(x => x.RmvMaterial);
             var allTextures = materials.SelectMany(x => x.GetAllTextures());
             var distinctTextures = allTextures.DistinctBy(x => x.Path);

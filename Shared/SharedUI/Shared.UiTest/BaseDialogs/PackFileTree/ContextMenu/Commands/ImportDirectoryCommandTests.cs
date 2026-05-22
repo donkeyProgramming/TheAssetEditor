@@ -46,7 +46,9 @@ namespace Shared.UiTest.BaseDialogs.PackFileTree.ContextMenu.Commands
 
             // Act
             var command = new ImportDirectoryCommand(_packFileService, dialogs.Object, new Mock<IFileSystemAccess>().Object);
-            command.Execute(root);
+            command.Configure(root);
+
+            command.Execute();
 
             // Assert
             dialogs.Verify(x => x.ShowDialogBox("Unable to edit CA packfile", "Error"), Times.Once);
@@ -67,7 +69,9 @@ namespace Shared.UiTest.BaseDialogs.PackFileTree.ContextMenu.Commands
 
             // Act
             var command = new ImportDirectoryCommand(_packFileService, dialogs.Object, fileSystem.Object);
-            command.Execute(root);
+            command.Configure(root);
+
+            command.Execute();
 
             // Assert
             fileSystem.Verify(x => x.FileReadAllBytes(It.IsAny<string>()), Times.Never);
@@ -101,7 +105,9 @@ namespace Shared.UiTest.BaseDialogs.PackFileTree.ContextMenu.Commands
 
             // Act
             var command = new ImportDirectoryCommand(_packFileService, dialogs.Object, fileSystem.Object);
-            command.Execute(root);
+            command.Configure(root);
+
+            command.Execute();
 
             // Assert
             fileSystem.Verify(x => x.FileReadAllBytes(file1Path), Times.Once);

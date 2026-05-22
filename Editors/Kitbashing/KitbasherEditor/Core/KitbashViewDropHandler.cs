@@ -31,7 +31,7 @@ namespace Editors.KitbasherEditor.ViewModels
             if (file == null)
                 return false;
 
-            _uiCommandFactory.Create<ImportReferenceMeshCommand>().Execute(file);
+            _uiCommandFactory.Create<ImportReferenceMeshCommand>(x => x.Configure(file)).Execute();
             return true;
         }
     }

@@ -18,13 +18,20 @@ namespace Editors.ImportExport.Importing
 
         public bool IsEnabled(TreeNode node) => true;
 
-        public void Execute(TreeNode selectedNode)
+        private TreeNode _node = null!;
+
+        public void Configure(TreeNode node)
         {
-            var container = TreeNodeHelper.GetPackFileContainer(selectedNode);
+            _node = node;
+        }
+
+        public void Execute()
+        {
+            var container = TreeNodeHelper.GetPackFileContainer(_node);
             if (container == null)
                 return;
 
-            importFileContextMenuHelper.ShowDialog(container, selectedNode);
+            importFileContextMenuHelper.ShowDialog(container, _node);
         }
     }
 }

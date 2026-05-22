@@ -23,17 +23,24 @@ namespace Shared.Ui.BaseDialogs.PackFileTree.ContextMenu.Commands
 
         public bool IsEnabled(TreeNode node) => true;
 
-        public void Execute(TreeNode _selectedNode)
+        private TreeNode _node = null!;
+
+        public void Configure(TreeNode node)
         {
-            var packFile = TreeNodeHelper.GetPackFile(_selectedNode);
+            _node = node;
+        }
+
+        public void Execute()
+        {
+            var packFile = TreeNodeHelper.GetPackFile(_node);
             if (packFile == null)
                 return;
 
-            _logger.Here().Information($"Duplicating file node '{CommandLoggingHelper.DescribeNode(_selectedNode)}'");
-            Execute(packFile);
+            _logger.Here().Information($"Duplicating file node '{CommandLoggingHelper.DescribeNode(_node)}'");
+            DuplicatePackFile(packFile);
         }
 
-        public void Execute(PackFile item)
+        public void DuplicatePackFile(PackFile item)
         {
             var fileName = item.Name;
             var extension = "";

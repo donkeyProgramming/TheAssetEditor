@@ -275,7 +275,7 @@ namespace Editors.Audio.AudioEditor.Presentation.AudioProjectEditor
                 }
             }
 
-            _uiCommandFactory.Create<AddRowsToViewerCommand>().Execute(rows);
+            _uiCommandFactory.Create<AddRowsToViewerCommand>(x => x.Configure(rows)).Execute();
         }
 
         partial void OnShowModdedStatesOnlyChanged(bool value)

@@ -47,7 +47,9 @@ namespace Shared.UiTest.BaseDialogs.PackFileTree.ContextMenu.Commands
 
             // Act
             var command = new DeleteNodeCommand(_packFileService, dialogs.Object);
-            command.Execute(node);
+            command.Configure(node);
+
+            command.Execute();
 
             // Assert
             var packFile = container.FindFile("rootfolder\\file.txt");
@@ -68,7 +70,9 @@ namespace Shared.UiTest.BaseDialogs.PackFileTree.ContextMenu.Commands
 
             // Act
             var command = new DeleteNodeCommand(_packFileService, dialogs.Object);
-            command.Execute(dirNode);
+            command.Configure(dirNode);
+
+            command.Execute();
 
             // Assert
             Assert.That(container.FindFile("myfolder\\file1.txt"), Is.Null);

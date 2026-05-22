@@ -252,7 +252,7 @@ namespace Editors.Audio.AudioEditor.Presentation.AudioFilesExplorer
             if (selectedWavs.Count == 0)
                 return;
 
-            _uiCommandFactory.Create<SetAudioFilesCommand>().Execute(selectedWavs, false);
+            _uiCommandFactory.Create<SetAudioFilesCommand>(x => x.Configure(selectedWavs, false)).Execute();
         }
 
         [RelayCommand] public void AddToAudioFiles()
@@ -261,7 +261,7 @@ namespace Editors.Audio.AudioEditor.Presentation.AudioFilesExplorer
             if (selectedWavs.Count == 0)
                 return;
 
-            _uiCommandFactory.Create<SetAudioFilesCommand>().Execute(selectedWavs, true);
+            _uiCommandFactory.Create<SetAudioFilesCommand>(x => x.Configure(selectedWavs, true)).Execute();
         }
 
         [RelayCommand] public void PlayWav()

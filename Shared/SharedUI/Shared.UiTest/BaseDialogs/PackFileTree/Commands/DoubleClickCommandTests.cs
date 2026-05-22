@@ -31,7 +31,8 @@ namespace Shared.UiTest.BaseDialogs.PackFileTree.Commands
             Assert.That(file1, Is.Not.Null);
 
             PackFile? openedFile = null;
-            _command.Execute(file1, null, _ => { }, f => openedFile = f);
+            _command.Configure(file1, null, _ => { }, f => openedFile = f);
+            _command.Execute();
 
             Assert.That(openedFile, Is.Not.Null);
             Assert.That(openedFile!.Name, Is.EqualTo("file1.txt"));
@@ -48,11 +49,13 @@ namespace Shared.UiTest.BaseDialogs.PackFileTree.Commands
             Assert.That(folderA, Is.Not.Null);
             Assert.That(folderA!.IsNodeExpanded, Is.False);
 
-            _command.Execute(folderA, null, _ => { }, _ => { });
+            _command.Configure(folderA, null, _ => { }, _ => { });
+            _command.Execute();
 
             Assert.That(folderA.IsNodeExpanded, Is.True);
 
-            _command.Execute(folderA, null, _ => { }, _ => { });
+            _command.Configure(folderA, null, _ => { }, _ => { });
+            _command.Execute();
 
             Assert.That(folderA.IsNodeExpanded, Is.False);
         }
@@ -67,7 +70,8 @@ namespace Shared.UiTest.BaseDialogs.PackFileTree.Commands
             var folderA = PackFileBrowserViewModelTestHelper.GetFromPath(root, "foldera");
 
             TreeNode? selectedNode = null;
-            _command.Execute(folderA, null, n => selectedNode = n, _ => { });
+            _command.Configure(folderA, null, n => selectedNode = n, _ => { });
+            _command.Execute();
 
             Assert.That(selectedNode, Is.SameAs(folderA));
         }
@@ -85,7 +89,8 @@ namespace Shared.UiTest.BaseDialogs.PackFileTree.Commands
             Assert.That(folderA, Is.Not.Null);
 
             _keyboard.SetKeyDown(Key.LeftCtrl, true);
-            _command.Execute(folderA, root, _ => { }, _ => { });
+            _command.Configure(folderA, root, _ => { }, _ => { });
+            _command.Execute();
 
             var subA = PackFileBrowserViewModelTestHelper.GetFromPath(root, @"foldera\suba");
             var subB = PackFileBrowserViewModelTestHelper.GetFromPath(root, @"foldera\subb");
@@ -118,7 +123,8 @@ namespace Shared.UiTest.BaseDialogs.PackFileTree.Commands
 
             // Use a command with MaxExpandCount effectively = 2 (only 1 visible file, under threshold)
             _keyboard.SetKeyDown(Key.LeftCtrl, true);
-            _command.Execute(folderA, root, _ => { }, _ => { });
+            _command.Configure(folderA, root, _ => { }, _ => { });
+            _command.Execute();
 
             // Should expand because only 1 visible file node (below MaxExpandCount of 200)
             Assert.That(folderA!.IsNodeExpanded, Is.True);
@@ -130,7 +136,8 @@ namespace Shared.UiTest.BaseDialogs.PackFileTree.Commands
             PackFile? openedFile = null;
             TreeNode? selected = null;
 
-            _command.Execute(null, null, n => selected = n, f => openedFile = f);
+            _command.Configure(null, null, n => selected = n, f => openedFile = f);
+            _command.Execute();
 
             Assert.That(openedFile, Is.Null);
             Assert.That(selected, Is.Null);
@@ -161,7 +168,8 @@ namespace Shared.UiTest.BaseDialogs.PackFileTree.Commands
 
             _command.MaxExpandCount = 10;
             _keyboard.SetKeyDown(Key.LeftCtrl, true);
-            _command.Execute(folderA, root, _ => { }, _ => { });
+            _command.Configure(folderA, root, _ => { }, _ => { });
+            _command.Execute();
 
             Assert.That(folderA!.IsNodeExpanded, Is.True, "FolderA should toggle expanded on double-click");
             Assert.That(folderB!.IsNodeExpanded, Is.False, "FolderB should NOT expand because file count exceeds MaxExpandCount");

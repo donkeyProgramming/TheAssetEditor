@@ -33,6 +33,6 @@ namespace Editors.ImportExport.Exporting
             return false;
         }
 
-        public void ShowDialog(PackFile packFile) => _uiCommandFactory.Create<DisplayExportFileToolCommand>().Execute(packFile);
+        public void ShowDialog(PackFile packFile) => _uiCommandFactory.Create<DisplayExportFileToolCommand>(x => x.Configure(packFile)).Execute();
     }
 }

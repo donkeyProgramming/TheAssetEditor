@@ -2,11 +2,9 @@
 using Serilog;
 using Shared.Core.ErrorHandling;
 using Shared.Core.PackFiles;
-using Shared.Core.PackFiles.Models;
 using Shared.Core.Services;
 using Shared.Core.Settings;
 using Shared.Ui.BaseDialogs.PackFileTree.Utility;
-using Shared.Ui.Common;
 
 namespace Shared.Ui.BaseDialogs.PackFileTree.ContextMenu.Commands
 {
@@ -25,12 +23,19 @@ namespace Shared.Ui.BaseDialogs.PackFileTree.ContextMenu.Commands
 
         public bool IsEnabled(TreeNode node) => true;
 
-        public void Execute(TreeNode _selectedNode)
+        private TreeNode _node = null!;
+
+        public void Configure(TreeNode node)
         {
-            var container = TreeNodeHelper.GetPackFileContainer(_selectedNode);
+            _node = node;
+        }
+
+        public void Execute()
+        {
+            var container = TreeNodeHelper.GetPackFileContainer(_node);
             if (container == null)
             {
-                _logger.Here().Warning($"Save blocked because no container was resolved for '{CommandLoggingHelper.DescribeNode(_selectedNode)}'");
+                _logger.Here().Warning($"Save blocked because no container was resolved for '{CommandLoggingHelper.DescribeNode(_node)}'");
                 standardDialogs.ShowDialogBox("Unable to resolve selected packfile", "Error");
                 return;
             }
@@ -65,7 +70,7 @@ namespace Shared.Ui.BaseDialogs.PackFileTree.ContextMenu.Commands
             }
         }
 
-        public void Execute()
+        public void ExecuteForEditablePack()
         {
             var pack = packFileService.GetEditablePack();
             if (pack == null)

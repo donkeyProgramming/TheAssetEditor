@@ -15,12 +15,22 @@ namespace Editors.Audio.AudioEditor.Commands.AudioProjectViewer
         private readonly IAudioEditorStateService _audioEditorStateService = audioEditorStateService;
         private readonly IAudioProjectMutationUICommandFactory _audioProjectMutationUICommandFactory = audioProjectMutationUICommandFactory;
         private readonly IEventHub _eventHub = eventHub;
+        private List<DataRow> _rows = new();
 
-        public void Execute(List<DataRow> rows)
+        public void Configure(List<DataRow> rows)
+        {
+            _rows = rows;
+        }
+
+        public void Execute()
         {
             var selectedAudioProjectExplorerNode = _audioEditorStateService.SelectedAudioProjectExplorerNode;
-            foreach (var row in rows)
-                _audioProjectMutationUICommandFactory.Create(MutationType.Remove, selectedAudioProjectExplorerNode.Type).Execute(row);
+            foreach (var row in _rows)
+            {
+                var cmd = _audioProjectMutationUICommandFactory.Create(MutationType.Remove, selectedAudioProjectExplorerNode.Type);
+                cmd.Configure(row);
+                cmd.Execute();
+            }
 
             _eventHub.Publish(new EditorAddRowButtonEnablementUpdateRequestedEvent());
         }

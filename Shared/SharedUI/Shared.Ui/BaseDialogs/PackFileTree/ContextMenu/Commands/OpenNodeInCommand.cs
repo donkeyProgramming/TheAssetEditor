@@ -17,7 +17,14 @@ namespace Shared.Ui.BaseDialogs.PackFileTree.ContextMenu.Commands
         public bool ShouldAdd(TreeNode node) => node.NodeType == NodeType.File && TreeNodeHelper.GetPackFile(node) != null;
         public bool IsEnabled(TreeNode node) => true;
 
-        public abstract void Execute(TreeNode _selectedNode);
+        protected TreeNode _node = null!;
+
+        public void Configure(TreeNode node)
+        {
+            _node = node;
+        }
+
+        public abstract void Execute();
 
         protected void OpenPackFileUsing(string applicationPath, PackFile packFile)
         {
@@ -67,12 +74,12 @@ namespace Shared.Ui.BaseDialogs.PackFileTree.ContextMenu.Commands
     public class OpenNodeInNotepadCommand(IStandardDialogs standardDialogs, IFileSystemAccess fileSystemAccess) : OpenNodeInCommand(standardDialogs, fileSystemAccess)
     {
         public override string GetDisplayName(TreeNode node) => "Open in Notepad++";
-        public override void Execute(TreeNode _selectedNode) => OpenSelectedNodeUsing(_selectedNode, ResolveApplicationPath(@"Notepad++\notepad++.exe"));
+        public override void Execute() => OpenSelectedNodeUsing(_node, ResolveApplicationPath(@"Notepad++\notepad++.exe"));
     }
 
     public class OpenNodeInHxDCommand(IStandardDialogs standardDialogs, IFileSystemAccess fileSystemAccess) : OpenNodeInCommand(standardDialogs, fileSystemAccess)
     {
         public override string GetDisplayName(TreeNode node) => "Open in Hxd";
-        public override void Execute(TreeNode _selectedNode) => OpenSelectedNodeUsing(_selectedNode, ResolveApplicationPath(@"HxD\HxD.exe"));
+        public override void Execute() => OpenSelectedNodeUsing(_node, ResolveApplicationPath(@"HxD\HxD.exe"));
     }
 }

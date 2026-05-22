@@ -1,4 +1,4 @@
-﻿using System.Data;
+using System.Data;
 using System.Windows;
 using Editors.Audio.AudioEditor.Core;
 using Editors.Audio.AudioEditor.Core.AudioProjectMutation;
@@ -24,13 +24,20 @@ namespace Editors.Audio.AudioEditor.Commands.AudioProjectMutation
         public MutationType Action => MutationType.Remove;
         public AudioProjectTreeNodeType NodeType => AudioProjectTreeNodeType.DialogueEvent;
 
-        public void Execute(DataRow row)
+        private DataRow _row = null!;
+
+        public void Configure(DataRow row)
+        {
+            _row = row;
+        }
+
+        public void Execute()
         {
             var dialogueEventNodeName = _audioEditorStateService.SelectedAudioProjectExplorerNode.Name;
-            var statePathName = TableHelpers.GetStatePathNameFromRow(row, _audioRepository, dialogueEventNodeName);
+            var statePathName = TableHelpers.GetStatePathNameFromRow(_row, _audioRepository, dialogueEventNodeName);
             var result = _dialogueEventService.RemoveStatePath(dialogueEventNodeName, statePathName);
             if (result)
-                _eventHub.Publish(new ViewerTableRowRemoveRequestedEvent(row));
+                _eventHub.Publish(new ViewerTableRowRemoveRequestedEvent(_row));
             else
             {
                 var message = "State Path is incomplete probably due to a change to the Dialogue Event by CA. Add the missing State(s).";

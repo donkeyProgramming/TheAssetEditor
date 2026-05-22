@@ -184,7 +184,7 @@ namespace Editors.Audio.AudioEditor.Presentation.AudioProjectViewer
             if (!IsPasteEnabled)
                 return;
 
-            _uiCommandFactory.Create<PasteViewerRowsCommand>().Execute(_audioEditorStateService.CopiedViewerRows);
+            _uiCommandFactory.Create<PasteViewerRowsCommand>(x => x.Configure(_audioEditorStateService.CopiedViewerRows)).Execute();
             SetPasteEnablement();
         }
 
@@ -228,7 +228,7 @@ namespace Editors.Audio.AudioEditor.Presentation.AudioProjectViewer
         [RelayCommand] public void RemoveRow()
         {
             var rowsToRemove = GetRowsToRemove();
-            _uiCommandFactory.Create<RemoveViewerRowsCommand>().Execute(rowsToRemove);
+            _uiCommandFactory.Create<RemoveViewerRowsCommand>(x => x.Configure(rowsToRemove)).Execute();
             SetPasteEnablement();
         }
 
@@ -241,7 +241,7 @@ namespace Editors.Audio.AudioEditor.Presentation.AudioProjectViewer
         [RelayCommand] public void EditRow()
         {
             var rowsToRemove = GetRowsToRemove();
-            _uiCommandFactory.Create<EditViewerRowsCommand>().Execute(rowsToRemove);
+            _uiCommandFactory.Create<EditViewerRowsCommand>(x => x.Configure(rowsToRemove)).Execute();
             SetPasteEnablement();
         }
 

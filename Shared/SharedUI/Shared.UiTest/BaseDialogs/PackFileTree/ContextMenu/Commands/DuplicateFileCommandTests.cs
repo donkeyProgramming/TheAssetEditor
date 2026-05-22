@@ -47,7 +47,9 @@ namespace Shared.UiTest.BaseDialogs.PackFileTree.ContextMenu.Commands
 
             // Act
             var command = new DuplicateFileCommand(_packFileService, new Mock<IStandardDialogs>().Object);
-            command.Execute(node);
+            command.Configure(node);
+
+            command.Execute();
 
             // Assert
             var foundFile = outputContainer.FindFile("animation\\meta\\testfile_copy.anm");
@@ -70,7 +72,9 @@ namespace Shared.UiTest.BaseDialogs.PackFileTree.ContextMenu.Commands
 
             // Act
             var command = new DuplicateFileCommand(_packFileService, new Mock<IStandardDialogs>().Object);
-            command.Execute(node);
+            command.Configure(node);
+
+            command.Execute();
 
             // Assert
             var foundFile = outputContainer.FindFile("animation\\meta\\" + result);

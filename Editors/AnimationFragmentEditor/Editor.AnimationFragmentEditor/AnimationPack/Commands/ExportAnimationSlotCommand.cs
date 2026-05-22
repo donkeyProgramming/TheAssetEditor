@@ -7,6 +7,8 @@ namespace Editors.AnimationFragmentEditor.AnimationPack.Commands
 {
     public class ExportAnimationSlotCommand : IAeCommand
     {
+        void IAeCommand.Execute() => throw new NotSupportedException("Use Warhammer3 or Warhammer2 instead.");
+
         public void Warhammer3()
         {
             var slots = AnimationSlotTypeHelperWh3.Values.Select(x => x.Id + "\t\t" + x.Value).ToList();

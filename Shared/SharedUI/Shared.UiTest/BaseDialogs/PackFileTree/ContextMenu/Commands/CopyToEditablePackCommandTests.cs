@@ -54,7 +54,9 @@ namespace Shared.UiTest.BaseDialogs.PackFileTree.ContextMenu.Commands
 
             // Act
             var command = new CopyToEditablePackCommand(_packFileService, dialogs.Object);
-            command.Execute(folder);
+            command.Configure(folder);
+
+            command.Execute();
 
             // Assert
             var copiedFile = target.FindFile("folder\\file.txt");

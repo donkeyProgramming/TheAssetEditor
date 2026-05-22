@@ -16,9 +16,16 @@ namespace Editors.ImportExport.Exporting
             return packFile != null && exportFileContextMenuHelper.CanExportFile(packFile);
         }
 
-        public void Execute(TreeNode selectedNode)
+        private TreeNode _node = null!;
+
+        public void Configure(TreeNode node)
         {
-            var packFile = TreeNodeHelper.GetPackFile(selectedNode);
+            _node = node;
+        }
+
+        public void Execute()
+        {
+            var packFile = TreeNodeHelper.GetPackFile(_node);
             if (packFile == null)
                 return;
 

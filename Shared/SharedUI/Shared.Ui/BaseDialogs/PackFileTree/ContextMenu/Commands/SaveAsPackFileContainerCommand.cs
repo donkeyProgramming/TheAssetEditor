@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Serilog;
 using Shared.Core.ErrorHandling;
 using Shared.Core.PackFiles;
@@ -21,12 +21,19 @@ namespace Shared.Ui.BaseDialogs.PackFileTree.ContextMenu.Commands
 
         public bool IsEnabled(TreeNode node) => true;
 
-        public void Execute(TreeNode _selectedNode)
+        private TreeNode _node = null!;
+
+        public void Configure(TreeNode node)
         {
-            var container = TreeNodeHelper.GetPackFileContainer(_selectedNode);
+            _node = node;
+        }
+
+        public void Execute()
+        {
+            var container = TreeNodeHelper.GetPackFileContainer(_node);
             if (container == null)
             {
-                _logger.Here().Warning($"Save As blocked because no container was resolved for '{CommandLoggingHelper.DescribeNode(_selectedNode)}'");
+                _logger.Here().Warning($"Save As blocked because no container was resolved for '{CommandLoggingHelper.DescribeNode(_node)}'");
                 standardDialogs.ShowDialogBox("Unable to resolve selected packfile", "Error");
                 return;
             }
@@ -46,7 +53,7 @@ namespace Shared.Ui.BaseDialogs.PackFileTree.ContextMenu.Commands
                     var gameInformation = GameInformationDatabase.GetGameById(applicationSettingsService.CurrentSettings.CurrentGame);
                     _logger.Here().Information($"Saving pack file container '{packDescription}' as '{saveDialogResult.FilePath}'");
                     packFileService.SavePackContainer(container, saveDialogResult.FilePath, false, gameInformation);
-                    (_selectedNode as RootTreeNode)?.UnsavedChanges.ClearAll();
+                    (_node as RootTreeNode)?.UnsavedChanges.ClearAll();
                     _logger.Here().Information($"Saved pack file container '{packDescription}' as '{saveDialogResult.FilePath}'");
                 }
                 catch (Exception e)

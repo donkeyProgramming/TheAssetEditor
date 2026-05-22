@@ -15,6 +15,8 @@ namespace Editors.ImportExport.Importing
     {
         private readonly IEnumerable<IImporterViewModel> _importerViewModels;
         private readonly IAbstractFormFactory<ImportWindow> _importWindowFactory;
+        private IPackFileContainer _packFileContainer = null!;
+        private string _packPath = string.Empty;
 
         public DisplayImportFileToolCommand(IAbstractFormFactory<ImportWindow> exportWindowFactory, IEnumerable<IImporterViewModel> exporterViewModels)
         {
@@ -22,7 +24,13 @@ namespace Editors.ImportExport.Importing
             _importerViewModels = exporterViewModels;
         }
 
-        public void Execute(IPackFileContainer packFileContainer, string packPath)
+        public void Configure(IPackFileContainer packFileContainer, string packPath)
+        {
+            _packFileContainer = packFileContainer;
+            _packPath = packPath;
+        }
+
+        public void Execute()
         {
             var fileExtentionFilters = GetFileDialogFilters();
 
@@ -33,7 +41,7 @@ namespace Editors.ImportExport.Importing
             var diskFilePath = openFileDialog.FileName;
 
             var window = _importWindowFactory.Create();
-            window.Initialize(packFileContainer, packPath, diskFilePath);
+            window.Initialize(_packFileContainer, _packPath, diskFilePath);
             window.ShowDialog();
         }
 

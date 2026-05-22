@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Data;
 using Editors.Audio.AudioEditor.Core;
 using Editors.Audio.AudioEditor.Core.AudioProjectMutation;
@@ -21,7 +21,14 @@ namespace Editors.Audio.AudioEditor.Commands.AudioProjectMutation
         public MutationType Action => MutationType.Add;
         public AudioProjectTreeNodeType NodeType => AudioProjectTreeNodeType.DialogueEvent;
 
-        public void Execute(DataRow row)
+        private DataRow _row = null!;
+
+        public void Configure(DataRow row)
+        {
+            _row = row;
+        }
+
+        public void Execute()
         {
             var dialogueEventName = _audioEditorStateService.SelectedAudioProjectExplorerNode.Name;
             var audioFiles = _audioEditorStateService.AudioFiles;
@@ -33,7 +40,7 @@ namespace Editors.Audio.AudioEditor.Commands.AudioProjectMutation
             {
                 var stateGroupName = TableHelpers.GetStateGroupFromStateGroupWithQualifier(_audioRepository, dialogueEventName, stateGroupWithQualifier.Key);
                 var columnName = WpfHelpers.DuplicateUnderscores(stateGroupWithQualifier.Key);
-                var stateName = TableHelpers.GetValueFromRow(row, columnName);
+                var stateName = TableHelpers.GetValueFromRow(_row, columnName);
                 statePathList.Add(new KeyValuePair<string, string>(stateGroupName, stateName));
             }
 

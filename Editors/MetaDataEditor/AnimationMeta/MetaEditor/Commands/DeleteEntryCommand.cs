@@ -6,12 +6,19 @@ namespace Editors.AnimationMeta.MetaEditor.Commands
 {
     internal class DeleteEntryCommand : IAeCommand
     {
-        public void Execute(MetaDataEditorViewModel controller)
+        private MetaDataEditorViewModel _controller = null!;
+
+        public void Configure(MetaDataEditorViewModel controller)
         {
-            if (controller?.ParsedFile == null)
+            _controller = controller;
+        }
+
+        public void Execute()
+        {
+            if (_controller?.ParsedFile == null)
                 return;
 
-            var itemsToRemove = controller.Tags
+            var itemsToRemove = _controller.Tags
                 .Where(x => x.IsSelected)
                 .Select(x => x._input)
                 .ToList();
@@ -21,10 +28,10 @@ namespace Editors.AnimationMeta.MetaEditor.Commands
 
             foreach (var item in itemsToRemove)
             {
-                controller.ParsedFile.Attributes.Remove(item);
+                _controller.ParsedFile.Attributes.Remove(item);
             }
 
-            controller.UpdateView();
+            _controller.UpdateView();
         }
     }
 }

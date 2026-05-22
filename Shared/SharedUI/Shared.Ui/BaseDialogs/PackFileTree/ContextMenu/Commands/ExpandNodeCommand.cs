@@ -1,4 +1,4 @@
-﻿using Serilog;
+using Serilog;
 using Shared.Core.ErrorHandling;
 using Shared.Core.PackFiles.Models;
 
@@ -12,10 +12,17 @@ namespace Shared.Ui.BaseDialogs.PackFileTree.ContextMenu.Commands
         public bool ShouldAdd(TreeNode node) => node.NodeType != NodeType.File;
         public bool IsEnabled(TreeNode node) => true;
 
-        public void Execute(TreeNode _selectedNode)
+        private TreeNode _node = null!;
+
+        public void Configure(TreeNode node)
         {
-            _logger.Here().Information($"Expanding node '{CommandLoggingHelper.DescribeNode(_selectedNode)}' recursively");
-            ExpandAllRecursive(_selectedNode);
+            _node = node;
+        }
+
+        public void Execute()
+        {
+            _logger.Here().Information($"Expanding node '{CommandLoggingHelper.DescribeNode(_node)}' recursively");
+            ExpandAllRecursive(_node);
         }
 
         void ExpandAllRecursive(TreeNode node)

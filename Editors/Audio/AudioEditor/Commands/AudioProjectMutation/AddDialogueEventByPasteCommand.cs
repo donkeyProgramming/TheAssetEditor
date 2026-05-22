@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Data;
 using Editors.Audio.AudioEditor.Core;
 using Editors.Audio.AudioEditor.Core.AudioProjectMutation;
@@ -23,14 +23,21 @@ namespace Editors.Audio.AudioEditor.Commands.AudioProjectMutation
         public MutationType Action => MutationType.AddByPaste;
         public AudioProjectTreeNodeType NodeType => AudioProjectTreeNodeType.DialogueEvent;
 
-        public void Execute(DataRow row)
+        private DataRow _row = null!;
+
+        public void Configure(DataRow row)
+        {
+            _row = row;
+        }
+
+        public void Execute()
         {
             HircSettings hircSettings = null;
             var audioFiles = new List<AudioFile>();
 
             var dialogueEventName = _audioEditorStateService.CopiedFromAudioProjectExplorerNode.Name;
             var dialogueEvent = _audioEditorStateService.AudioProject.GetDialogueEvent(dialogueEventName);
-            var statePathName = TableHelpers.GetStatePathNameFromRow(row, _audioRepository, dialogueEventName);
+            var statePathName = TableHelpers.GetStatePathNameFromRow(_row, _audioRepository, dialogueEventName);
             var statePath = dialogueEvent.GetStatePath(statePathName);
             var soundBankName = _audioEditorStateService.CopiedFromAudioProjectExplorerNode.GetParentSoundBankNode().Name;
             var soundBank = _audioEditorStateService.AudioProject.GetSoundBank(soundBankName);
@@ -49,11 +56,11 @@ namespace Editors.Audio.AudioEditor.Commands.AudioProjectMutation
             }
 
             var statePathList = new List<KeyValuePair<string, string>>();
-            foreach (DataColumn dataColumn in row.Table.Columns)
+            foreach (DataColumn dataColumn in _row.Table.Columns)
             {
                 var columnNameWithQualifier = WpfHelpers.DeduplicateUnderscores(dataColumn.ColumnName);
                 var stateGroupName = TableHelpers.GetStateGroupFromStateGroupWithQualifier(_audioRepository, dialogueEventName, columnNameWithQualifier);
-                var stateName = TableHelpers.GetValueFromRow(row, dataColumn.ColumnName);
+                var stateName = TableHelpers.GetValueFromRow(_row, dataColumn.ColumnName);
                 statePathList.Add(new KeyValuePair<string, string>(stateGroupName, stateName));
             }
 

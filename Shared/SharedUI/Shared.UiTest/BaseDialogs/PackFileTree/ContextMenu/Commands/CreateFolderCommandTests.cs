@@ -1,4 +1,4 @@
-﻿using Moq;
+using Moq;
 using Shared.Core.Services;
 using Shared.Ui.BaseDialogs.PackFileTree;
 using Shared.Ui.BaseDialogs.PackFileTree.ContextMenu.Commands;
@@ -45,7 +45,9 @@ namespace Shared.UiTest.BaseDialogs.PackFileTree.ContextMenu.Commands
 
             // Act
             var command = new CreateFolderCommand(_packFileService, dialogs.Object);
-            command.Execute(root);
+            command.Configure(root);
+
+            command.Execute();
 
             // Assert
             Assert.That(root.Children.Any(x => x.Name == "new_folder"), Is.True);

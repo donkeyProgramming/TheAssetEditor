@@ -15,6 +15,8 @@ namespace Editors.AnimationFragmentEditor.AnimationPack.Commands
         private readonly IFileSaveService _saveHelper;
         private readonly IPackFileService _pfs;
 
+        void IAeCommand.Execute() => throw new NotSupportedException("Use specific methods instead.");
+
         public CreateExampleAnimationDbCommand(IFileSaveService saveHelper, IPackFileService pfs)
         {
             _saveHelper = saveHelper;

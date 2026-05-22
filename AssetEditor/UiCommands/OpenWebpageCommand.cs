@@ -5,13 +5,20 @@ namespace AssetEditor.UiCommands
 {
     public class OpenWebpageCommand : IAeCommand
     {
+        private string _url = string.Empty;
+
         public OpenWebpageCommand()
         {
         }
 
-        public void Execute(string url)
+        public void Configure(string url)
         {
-            Process.Start(new ProcessStartInfo("cmd", $"/c start {url}") { CreateNoWindow = true });
+            _url = url;
+        }
+
+        public void Execute()
+        {
+            Process.Start(new ProcessStartInfo("cmd", $"/c start {_url}") { CreateNoWindow = true });
         }
     }
 }

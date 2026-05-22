@@ -1,4 +1,4 @@
-﻿using Shared.Core.PackFiles;
+using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
 using Shared.Core.Services;
 using Serilog;
@@ -21,19 +21,26 @@ namespace Shared.Ui.BaseDialogs.PackFileTree.ContextMenu.Commands
 
         public bool IsEnabled(TreeNode node) => true;
 
-        public void Execute(TreeNode _selectedNode)
+        private TreeNode _node = null!;
+
+        public void Configure(TreeNode node)
         {
-            var container = TreeNodeHelper.GetPackFileContainer(_selectedNode);
+            _node = node;
+        }
+
+        public void Execute()
+        {
+            var container = TreeNodeHelper.GetPackFileContainer(_node);
             if (container == null)
             {
-                _logger.Here().Warning($"Delete blocked because no container was resolved for '{CommandLoggingHelper.DescribeNode(_selectedNode)}'");
+                _logger.Here().Warning($"Delete blocked because no container was resolved for '{CommandLoggingHelper.DescribeNode(_node)}'");
                 standardDialogs.ShowDialogBox("Unable to resolve selected packfile", "Error");
                 return;
             }
 
             if (container.IsCaPackFile)
             {
-                _logger.Here().Warning($"Delete blocked for CA pack node '{CommandLoggingHelper.DescribeNode(_selectedNode)}'");
+                _logger.Here().Warning($"Delete blocked for CA pack node '{CommandLoggingHelper.DescribeNode(_node)}'");
                 standardDialogs.ShowDialogBox("Unable to edit CA packfile", "Error");
                 return;
             }
@@ -41,24 +48,24 @@ namespace Shared.Ui.BaseDialogs.PackFileTree.ContextMenu.Commands
             var confirmDelete = standardDialogs.ShowYesNoBox("Are you sure you want to delete the file?", "");
             if (confirmDelete == ShowMessageBoxResult.OK)
             {
-                if (_selectedNode.NodeType == NodeType.File)
+                if (_node.NodeType == NodeType.File)
                 {
-                    var packFile = TreeNodeHelper.GetPackFile(_selectedNode);
+                    var packFile = TreeNodeHelper.GetPackFile(_node);
                     if (packFile == null)
                         return;
 
-                    _logger.Here().Information($"Deleting file node '{CommandLoggingHelper.DescribeNode(_selectedNode)}'");
+                    _logger.Here().Information($"Deleting file node '{CommandLoggingHelper.DescribeNode(_node)}'");
                     packFileService.DeleteFile(container, packFile);
                 }
-                else if (_selectedNode.NodeType == NodeType.Directory)
+                else if (_node.NodeType == NodeType.Directory)
                 {
-                    _logger.Here().Information($"Deleting directory node '{CommandLoggingHelper.DescribeNode(_selectedNode)}'");
-                    packFileService.DeleteFolder(container, _selectedNode.GetFullPath());
+                    _logger.Here().Information($"Deleting directory node '{CommandLoggingHelper.DescribeNode(_node)}'");
+                    packFileService.DeleteFolder(container, _node.GetFullPath());
                 }
             }
             else
             {
-                _logger.Here().Information($"Delete cancelled for node '{CommandLoggingHelper.DescribeNode(_selectedNode)}'");
+                _logger.Here().Information($"Delete cancelled for node '{CommandLoggingHelper.DescribeNode(_node)}'");
             }
         }
     }

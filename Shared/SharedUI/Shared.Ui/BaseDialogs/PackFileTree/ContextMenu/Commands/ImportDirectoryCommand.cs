@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Shared.Core.PackFiles;
@@ -24,12 +24,19 @@ namespace Shared.Ui.BaseDialogs.PackFileTree.ContextMenu.Commands
 
         public bool IsEnabled(TreeNode node) => true;
 
-        public void Execute(TreeNode _selectedNode)
+        private TreeNode _node = null!;
+
+        public void Configure(TreeNode node)
         {
-            var container = TreeNodeHelper.GetPackFileContainer(_selectedNode);
+            _node = node;
+        }
+
+        public void Execute()
+        {
+            var container = TreeNodeHelper.GetPackFileContainer(_node);
             if (container == null)
             {
-                _logger.Here().Warning($"Import directory blocked because no container was resolved for '{CommandLoggingHelper.DescribeNode(_selectedNode)}'");
+                _logger.Here().Warning($"Import directory blocked because no container was resolved for '{CommandLoggingHelper.DescribeNode(_node)}'");
                 standardDialogs.ShowDialogBox("Unable to resolve selected packfile");
                 return;
             }
@@ -49,9 +56,9 @@ namespace Shared.Ui.BaseDialogs.PackFileTree.ContextMenu.Commands
                 var originalFilePaths = fileSystemAccess.DirectoryGetFiles(folderPath, "*", SearchOption.AllDirectories);
                 var filePaths = originalFilePaths.Select(x => x.Replace($"{folderPath}\\", "")).ToList();
 
-                _logger.Here().Information($"Importing directory '{folderPath}' into '{CommandLoggingHelper.DescribeNode(_selectedNode)}' ({originalFilePaths.Length} file(s))");
+                _logger.Here().Information($"Importing directory '{folderPath}' into '{CommandLoggingHelper.DescribeNode(_node)}' ({originalFilePaths.Length} file(s))");
 
-                var packNodeParentPath = _selectedNode.GetFullPath();
+                var packNodeParentPath = _node.GetFullPath();
                 if (!string.IsNullOrWhiteSpace(packNodeParentPath))
                     packNodeParentPath += "\\";
 
@@ -77,11 +84,11 @@ namespace Shared.Ui.BaseDialogs.PackFileTree.ContextMenu.Commands
                 }
 
                 packFileService.AddFilesToPack(container, filesAdded);
-                _logger.Here().Information($"Imported {filesAdded.Count} file(s) from '{folderPath}' into '{CommandLoggingHelper.DescribeNode(_selectedNode)}'");
+                _logger.Here().Information($"Imported {filesAdded.Count} file(s) from '{folderPath}' into '{CommandLoggingHelper.DescribeNode(_node)}'");
             }
             else
             {
-                _logger.Here().Information($"Import directory cancelled for '{CommandLoggingHelper.DescribeNode(_selectedNode)}'");
+                _logger.Here().Information($"Import directory cancelled for '{CommandLoggingHelper.DescribeNode(_node)}'");
             }
         }
     }

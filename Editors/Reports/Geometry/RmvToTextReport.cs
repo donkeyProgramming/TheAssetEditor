@@ -24,9 +24,16 @@ namespace Editors.Reports.Geometry
             return node.NodeType == NodeType.File && packFile != null && node.Name.EndsWith(".rigid_model_v2", StringComparison.OrdinalIgnoreCase);
         }
 
-        public void Execute(TreeNode node)
+        private TreeNode _node = null!;
+
+        public void Configure(TreeNode node)
         {
-            var packFile = TreeNodeHelper.GetPackFile(node);
+            _node = node;
+        }
+
+        public void Execute()
+        {
+            var packFile = TreeNodeHelper.GetPackFile(_node);
             if (packFile == null)
                 return;
 
