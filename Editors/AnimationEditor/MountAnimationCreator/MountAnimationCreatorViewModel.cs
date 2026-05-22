@@ -116,15 +116,43 @@ namespace AnimationEditor.MountAnimationCreator
 
             // If debug inputs were provided before ctor finished, initialize now
             if (_inputRiderData != null && _inputMountData != null)
+            {
                 InitializeFromDebugInputs();
+            }
+            else
+            {
+                // Default initialization when running inside the app (no debug inputs provided).
+                // This mirrors other editors (eg. AnimationKeyframeEditor) and ensures
+                // MountLinkController and scene objects are created so the view model
+                // is fully usable after the applet loads.
+                var riderItem = _sceneObjectViewModelBuilder.CreateAsset("IDK", true, "Rider", Color.Black, null);
+                var mountItem = _sceneObjectViewModelBuilder.CreateAsset("IDK", true, "Mount", Color.Black, null);
+                mountItem.Data.IsSelectable = true;
+
+                var propAsset = _sceneObjectBuilder.CreateAsset("IDK", "New Anim", Color.Red);
+                _animationPlayerViewModel.RegisterAsset(propAsset);
+
+                Create(riderItem.Data, mountItem.Data, propAsset);
+                SceneObjects.Add(riderItem);
+                SceneObjects.Add(mountItem);
+            }
         }
 
         public void SetDebugInputParameters(AnimationToolInput rider, AnimationToolInput mount)
+
         {
+
             _inputRiderData = rider;
+
             _inputMountData = mount;
 
-            InitializeFromDebugInputs();
+
+
+            // Only initialize from debug inputs if we haven't already initialized the view model.
+            // This prevents creating duplicate scene objects when the app performs the default init in the ctor.
+            if (!_initializedFromDebugInputs && MountLinkController == null)
+                InitializeFromDebugInputs();
+
         }
 
         void InitializeFromDebugInputs()
