@@ -13,10 +13,23 @@ namespace Editors.AnimationVisualEditors
     {
         public override void Register(IServiceCollection serviceCollection)
         {
-            serviceCollection.AddScoped<EditorHost<MountAnimationCreatorViewModel>>();
+
+            //serviceCollection.AddScoped<AnimationRetargetEditor>();
+            //serviceCollection.AddScoped<BoneManager>();
+            //serviceCollection.AddScoped<SaveManager>();
+            //serviceCollection.AddScoped<SaveSettings>();
+            //serviceCollection.AddScoped<AnimationReTargetRenderingComponent>();
+
+            //RegisterWindow<BoneMappingWindow>(serviceCollection);
+            //RegisterWindow<SaveWindow>(serviceCollection);
+
+            serviceCollection.AddScoped<AnimationToolInput, AnimationToolInput>();
+
+            //serviceCollection.AddScoped<EditorHost<CampaignAnimationCreatorViewModel>>();
+            //serviceCollection.AddScoped<CampaignAnimationCreatorViewModel>();
             serviceCollection.AddScoped<MountAnimationCreatorViewModel>();
 
-            serviceCollection.AddScoped<EditorHost<AnimationKeyframeEditorViewModel>>();
+            // Use the new EditorHostBase-based view model directly for the Keyframe editor
             serviceCollection.AddScoped<AnimationKeyframeEditorViewModel>();
 
             RegisterAllAsInterface<IDeveloperConfiguration>(serviceCollection, ServiceLifetime.Transient);
@@ -25,13 +38,14 @@ namespace Editors.AnimationVisualEditors
         public override void RegisterTools(IEditorDatabase database)
         {
             EditorInfoBuilder
-                .Create<EditorHost<MountAnimationCreatorViewModel>, EditorHostView>(EditorEnums.MountTool_Editor)
-                .AddToToolbar("Mount Tool", false)
+                .Create<MountAnimationCreatorViewModel, EditorHostView>(EditorEnums.MountTool_Editor)
+                .AddToToolbar("Mount Tool", true)
                 .Build(database);
-        
+
+            // Register the Keyframe editor using its EditorHostBase-based type
             EditorInfoBuilder
-              .Create<EditorHost<AnimationKeyframeEditorViewModel>, EditorHostView>(EditorEnums.AnimationKeyFrame_Editor)
-              .AddToToolbar("KeyFrame Tool", false)
+              .Create<AnimationKeyframeEditorViewModel, EditorHostView>(EditorEnums.AnimationKeyFrame_Editor)
+              .AddToToolbar("KeyFrame Tool", true)
               .Build(database);
         }
     }

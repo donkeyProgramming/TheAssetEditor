@@ -102,7 +102,7 @@ namespace AnimationEditor.AnimationKeyframeEditor
                 _keyframeNrA,
                 _keyframeNrB,
                 _parent.Skeleton,
-                _parent.InterpolationValue,
+                _parent.InterpolationValue.Value,
                 _parent.PastePosition.Value,
                 _parent.PasteRotation.Value,
                 _parent.PasteScale.Value)).BuildAndExecute();
@@ -119,7 +119,7 @@ namespace AnimationEditor.AnimationKeyframeEditor
             _keyframeNrA,
             _keyframeNrB,
             _parent.Skeleton,
-            _parent.InterpolationValue,
+            _parent.InterpolationValue.Value,
             _parent.GetSelectedBones(),
             _parent.PastePosition.Value,
             _parent.PasteRotation.Value,

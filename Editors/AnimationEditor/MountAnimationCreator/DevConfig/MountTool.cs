@@ -42,7 +42,7 @@ namespace Editors.AnimationVisualEditors.MountAnimationCreator.DevConfig
                 Mesh = packfileService.FindFile(@"variantmeshes\variantmeshdefinitions\hef_war_lion.variantmeshdefinition")
             };
 
-            creator.Create(EditorEnums.MountTool_Editor, x => (x as EditorHost<MountAnimationCreatorViewModel>).Editor.SetDebugInputParameters(riderInput, mountInput));
+            creator.Create(EditorEnums.MountTool_Editor, x => (x as MountAnimationCreatorViewModel)?.SetDebugInputParameters(riderInput, mountInput));
         }
     }
 }

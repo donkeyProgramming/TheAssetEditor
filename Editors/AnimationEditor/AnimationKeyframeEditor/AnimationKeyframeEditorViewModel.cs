@@ -4,6 +4,7 @@ using System.Linq;
 using System.Windows.Forms;
 using AnimationEditor.AnimationKeyframeEditor;
 using AnimationEditor.MountAnimationCreator.ViewModels;
+using CommunityToolkit.Mvvm.ComponentModel;
 using Editors.Shared.Core.Common;
 using Editors.Shared.Core.Common.AnimationPlayer;
 using Editors.Shared.Core.Common.BaseControl;
@@ -15,6 +16,7 @@ using GameWorld.Core.Components.Gizmo;
 using GameWorld.Core.Components.Selection;
 using GameWorld.Core.Services;
 using Microsoft.Xna.Framework;
+using Shared.Core.Events;
 using Shared.Core.Misc;
 using Shared.Core.PackFiles;
 using Shared.Core.Services;
@@ -25,9 +27,10 @@ using SkeletonBoneNode = Editors.Shared.Core.Common.ReferenceModel.SkeletonBoneN
 
 namespace Editors.AnimationVisualEditors.AnimationKeyframeEditor
 {
-    public class AnimationKeyframeEditorViewModel : NotifyPropertyChangedImpl, IHostedEditor<AnimationKeyframeEditorViewModel>
+    public partial class AnimationKeyframeEditorViewModel : EditorHostBase, IDisposable
     {
-        public Type EditorViewModelType => typeof(EditorView);
+        public override Type EditorViewModelType => typeof(EditorView);
+
         private readonly SceneObjectViewModelBuilder _sceneObjectViewModelBuilder;
         private readonly AnimationPlayerViewModel _animationPlayerViewModel;
         private readonly SceneObjectEditor _sceneObjectBuilder;
@@ -37,6 +40,7 @@ namespace Editors.AnimationVisualEditors.AnimationKeyframeEditor
         private CopyPastePose _copyPastePose;
         private CopyPasteFromClipboardPose _copyPasteClipboardPose;
         private InterpolateBetweenPose _interpolateBetweenPose;
+        private readonly AnimationToolInput _animationToolInput;
 
         public SelectionComponent SelectionComponent { get => _selectionComponent; private set { _selectionComponent = value; } }
         private SelectionComponent _selectionComponent;
@@ -70,29 +74,22 @@ namespace Editors.AnimationVisualEditors.AnimationKeyframeEditor
         public NotifyAttr<bool> EnableInverseKinematics { get; set; } = new NotifyAttr<bool>(false);
         public NotifyAttr<bool> IncrementFrameAfterCopyOperation { get; set; } = new NotifyAttr<bool>(false);
 
-        public bool CopyMoreThanSingleFrame
+        [ObservableProperty]
+        private bool _copyMoreThanSingleFrame;
+        partial void OnCopyMoreThanSingleFrameChanged(bool value)
         {
-            get => _copyMoreThanSingleFrame;
-            set
-            {
-                SetAndNotify(ref _copyMoreThanSingleFrame, value);
-                EnableFrameNrStartTextboxOnPaste.Value = value && PasteUsingFormBelow;
-            }
+            EnableFrameNrStartTextboxOnPaste.Value = value && PasteUsingFormBelow;
         }
-        bool _copyMoreThanSingleFrame = false;
 
         public NotifyAttr<bool> DontWarnDifferentSkeletons { get; set; } = new(false);
         public NotifyAttr<bool> DontWarnIncomingFramesBigger { get; set; } = new(false);
-        public bool PasteUsingFormBelow
+
+        [ObservableProperty]
+        private bool _pasteUsingFormBelow;
+        partial void OnPasteUsingFormBelowChanged(bool value)
         {
-            get => _pasteUsingFormBelow;
-            set
-            {
-                SetAndNotify(ref _pasteUsingFormBelow, value);
-                EnableFrameNrStartTextboxOnPaste.Value = !value && CopyMoreThanSingleFrame;
-            }
+            EnableFrameNrStartTextboxOnPaste.Value = !value && CopyMoreThanSingleFrame;
         }
-        bool _pasteUsingFormBelow = false;
 
         public NotifyAttr<bool> PastePosition { get; set; } = new(true);
         public NotifyAttr<bool> PasteRotation { get; set; } = new(true);
@@ -106,60 +103,35 @@ namespace Editors.AnimationVisualEditors.AnimationKeyframeEditor
         public NotifyAttr<string> CurrentFrameNumber { get; set; } = new("");
         public NotifyAttr<string> TotalFrameNumber { get; set; } = new("");
 
-        public string FrameNrLength { get => _frameNrLength; set => SetAndNotify(ref _frameNrLength, value); }
+        [ObservableProperty]
         private string _frameNrLength = "0";
 
-        public string FramesDurationInSeconds
-        {
-            get => _txtEditDurationInSeconds;
-            set
-            {
-                SetAndNotify(ref _txtEditDurationInSeconds, value);
-            }
-        }
-        private string _txtEditDurationInSeconds = "";
+        [ObservableProperty]
+        private string _framesDurationInSeconds = "";
+
+        
 
         public NotifyAttr<string> SelectedFrameAInterpolation { get; set; } = new("Not set");
         public NotifyAttr<string> SelectedFrameBInterpolation { get; set; } = new("Not set");
 
-        public bool PreviewInterpolation
-        {
-            get => _previewInterpolation;
-            set
-            {
-                SetAndNotify(ref _previewInterpolation, value);
-            }
-        }
+        [ObservableProperty]
         private bool _previewInterpolation;
 
-        public bool InterpolationOnlyOnSelectedBones
-        {
-            get => _interpolationOnlyOnSelectedBones;
-            set
-            {
-                SetAndNotify(ref _interpolationOnlyOnSelectedBones, value);
-            }
-        }
+        [ObservableProperty]
         private bool _interpolationOnlyOnSelectedBones;
 
-        public float InterpolationValue
-        {
-            get => _interpolationValue;
-            set
-            {
-                SetAndNotify(ref _interpolationValue, value);
-                if (PreviewInterpolation) ApplyInterpolationOnCurrentFrame();
-            }
-        }
-        private float _interpolationValue;
-
+        public NotifyAttr<float> InterpolationValue { get; set; } = new NotifyAttr<float>(0f);
 
         public FilterCollection<SkeletonBoneNode> ModelBoneListForIKEndBone { get; set; } = new FilterCollection<SkeletonBoneNode>(null);
         public AnimationSettingsViewModel AnimationSettings { get; set; } = new AnimationSettingsViewModel();
-        public FilterCollection<SkeletonBoneNode> SelectedRiderBone { get; set; }
+        public FilterCollection<SkeletonBoneNode> SelectedRiderBone { get; set; } 
         public FilterCollection<IAnimationBinGenericFormat> ActiveOutputFragment { get; set; }
 
-        public AnimationKeyframeEditorViewModel(IPackFileService pfs,
+        private readonly IEventHub _eventHub;
+
+        public AnimationKeyframeEditorViewModel(
+            IEditorHostParameters editorHostParameters,
+            IPackFileService pfs,
             ISkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper,
             SelectionComponent selectionComponent,
             SceneObjectViewModelBuilder sceneObjectViewModelBuilder,
@@ -169,13 +141,16 @@ namespace Editors.AnimationVisualEditors.AnimationKeyframeEditor
             SelectionManager selectionManager,
             GizmoComponent gizmoComponent,
             CommandExecutor commandExecutor,
-            IFileSaveService packFileSaveService)
+            IFileSaveService packFileSaveService,
+            IEventHub eventHub,
+            AnimationToolInput animationToolInput) : base(editorHostParameters)
         {
+            DisplayName = "Keyframing Editor";
+
             _sceneObjectViewModelBuilder = sceneObjectViewModelBuilder;
             _animationPlayerViewModel = animationPlayerViewModel;
             _sceneObjectBuilder = sceneObjectBuilder;
             _pfs = pfs;
-
 
             _skeletonAnimationLookUpHelper = skeletonAnimationLookUpHelper;
             _selectionComponent = selectionComponent;
@@ -194,6 +169,33 @@ namespace Editors.AnimationVisualEditors.AnimationKeyframeEditor
             ActiveFragmentSlot = new FilterCollection<AnimationBinEntryGenericFormat>(null, (x) => UpdateCanSaveAndPreviewStates());
             ActiveFragmentSlot.SearchFilter = (value, rx) => { return rx.Match(value.SlotName).Success; };
 
+            _eventHub = eventHub;
+
+            _eventHub.Register<SceneObjectUpdateEvent>(this, OnSceneObjectUpdated);
+
+            _animationToolInput = animationToolInput;
+
+            Initialize();
+        }
+
+        void Initialize()
+        {
+            var riderItem = _sceneObjectViewModelBuilder.CreateAsset("IDK", true, "Rider", Color.Black, _animationToolInput);
+            var mountItem = _sceneObjectViewModelBuilder.CreateAsset("IDK", true, "Mount", Color.Black, _animationToolInput);
+            mountItem.Data.IsSelectable = true;
+
+            var newAnimItem = _sceneObjectBuilder.CreateAsset("IDK", "New Anim", Color.Red);
+            _animationPlayerViewModel.RegisterAsset(newAnimItem);
+
+            Create(riderItem.Data, mountItem.Data, newAnimItem);
+            SceneObjects.Add(riderItem);
+            SceneObjects.Add(mountItem);
+            //SceneObjects.Add(newAnimItem);
+
+            _gizmoToolbox = new(this);
+            _copyPastePose = new(this);
+            _copyPasteClipboardPose = new(this);
+            _interpolateBetweenPose = new(this);
         }
 
         private void OutputAnimationSetSelected(IAnimationBinGenericFormat newValue)
@@ -208,21 +210,7 @@ namespace Editors.AnimationVisualEditors.AnimationKeyframeEditor
 
         public void Initialize(EditorHost<AnimationKeyframeEditorViewModel> owner)
         {
-           //var riderItem = _sceneObjectViewModelBuilder.CreateAsset(true, "Rider", Color.Black, null);
-           //var mountItem = _sceneObjectViewModelBuilder.CreateAsset(true, "Mount", Color.Black, null);
-           //mountItem.Data.IsSelectable = true;
-           //
-           //var propAsset = _sceneObjectBuilder.CreateAsset("New Anim", Color.Red);
-           //_animationPlayerViewModel.RegisterAsset(propAsset);
-           //
-           //Create(riderItem.Data, mountItem.Data, propAsset);
-           //owner.SceneObjects.Add(riderItem);
-           //owner.SceneObjects.Add(mountItem);
-           //
-           //_gizmoToolbox = new(this);
-           //_copyPastePose = new(this);
-           //_copyPasteClipboardPose = new(this);
-           //_interpolateBetweenPose = new(this);
+            // Legacy init kept for compatibility; new Initialize() is used in ctor
         }
 
         internal void Create(SceneObject rider, SceneObject mount, SceneObject newAnimation)
@@ -264,18 +252,18 @@ namespace Editors.AnimationVisualEditors.AnimationKeyframeEditor
 
         private void TryReGenerateAnimation(AnimationClip newValue = null)
         {
-           // if (_newAnimation != null)
-           //     _sceneObjectBuilder.SetAnimation(_newAnimation, null);
-           //
-           // if (newValue != null)
-           // {
-           //     _originalClip = newValue.Clone();
-           //     FramesDurationInSeconds = _originalClip.PlayTimeInSec.ToString();
-           //     SetFrameLengthMax();
-           // }
-           //
-           // IsDirty.Value = false;
-           // _interpolateBetweenPose.Reset();
+            // if (_newAnimation != null)
+            //     _sceneObjectBuilder.SetAnimation(_newAnimation, null);
+            //
+            // if (newValue != null)
+            // {
+            //     _originalClip = newValue.Clone();
+            //     FramesDurationInSeconds = _originalClip.PlayTimeInSec.ToString();
+            //     SetFrameLengthMax();
+            // }
+            //
+            // IsDirty.Value = false;
+            // _interpolateBetweenPose.Reset();
         }
 
         private void RiderSkeletonChanges(GameSkeleton newValue)
@@ -311,6 +299,15 @@ namespace Editors.AnimationVisualEditors.AnimationKeyframeEditor
 
             MountLinkController.ReloadFragments(true, false);
             _skeleton = newValue;
+        }
+
+        private void OnSceneObjectUpdated(SceneObjectUpdateEvent e)
+        {
+            // Keep player frame sync if needed; extend later for mesh/skeleton updates
+            if (e.Owner == _rider && (e.SkeletonChanged || e.AnimationChanged))
+                RiderSkeletonChanges(_rider.Skeleton);
+            if (e.Owner == _mount && e.SkeletonChanged)
+                MountSkeletonChanged(_mount.Skeleton);
         }
 
         public List<int> GetSelectedBones() => _gizmoToolbox.PreviousSelectedBones;
@@ -673,7 +670,7 @@ namespace Editors.AnimationVisualEditors.AnimationKeyframeEditor
         public void ResetInterpolationSlider()
         {
             PreviewInterpolation = false;
-            InterpolationValue = 0;
+            InterpolationValue.Value = 0;
         }
 
         public void ApplyInterpolationOnCurrentFrame()
@@ -721,6 +718,11 @@ namespace Editors.AnimationVisualEditors.AnimationKeyframeEditor
             var bytes = AnimationFile.ConvertToBytes(animFile);
             _packFileSaveService.SaveAs(".anim", bytes);
             IsDirty.Value = false;
+        }
+
+        public void Dispose()
+        {
+            _eventHub?.UnRegister(this);
         }
     }
 }
