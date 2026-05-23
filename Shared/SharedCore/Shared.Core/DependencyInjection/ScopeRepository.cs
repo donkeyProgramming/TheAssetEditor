@@ -127,7 +127,7 @@ namespace Shared.Core.DependencyInjection
             builder.AppendLine($"ScopeTable info - Num Scopes:{_scopes.Count}");
             GenerateDebugString(_rootProvider, "RootScope", builder);
             foreach (var scope in _scopes)
-                GenerateDebugString(scope.Value.Scope.ServiceProvider, $"{scope.Key.GetType()}-'{scope.Key.DisplayName}'", builder);
+                GenerateDebugString(scope.Value.Scope.ServiceProvider, $"{scope.Key.GetType()}-'{scope.Key.DisplayName}-[{scope.Value.token.ScopeId}]'", builder);
 
             _logger.Here().Information(builder.ToString()); 
         }
@@ -136,7 +136,7 @@ namespace Shared.Core.DependencyInjection
         {
             try
             {
-                stringBuilder.AppendLine($"ScopeTable for {scopeName}");
+                stringBuilder.AppendLine($"ScopeTable for {scopeName} - ");
 
                 // Get resolved services
                 var serviceProviderType = provider.GetType();

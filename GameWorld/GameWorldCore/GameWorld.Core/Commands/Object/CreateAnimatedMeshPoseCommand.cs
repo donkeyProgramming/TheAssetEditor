@@ -30,8 +30,14 @@ namespace GameWorld.Core.Commands.Object
         public void Execute()
         {
             _originalGeometries = new List<MeshObject>();
+            // Clone geometry for undo, but release GPU resources immediately - the backup
+            // only needs CPU-side vertex/index data. GPU buffers are rebuilt lazily on Undo.
             foreach (var node in _meshNodes)
-                _originalGeometries.Add(node.Geometry.Clone());
+            {
+                var clone = node.Geometry.Clone();
+                clone.RemoveGraphicsCardResources();
+                _originalGeometries.Add(clone);
+            }
 
             foreach (var node in _meshNodes)
             {
@@ -56,7 +62,11 @@ namespace GameWorld.Core.Commands.Object
         public void Undo()
         {
             for (var i = 0; i < _meshNodes.Count; i++)
+            {
+                _meshNodes[i].Geometry.RemoveGraphicsCardResources();
                 _meshNodes[i].Geometry = _originalGeometries[i];
+                _meshNodes[i].Geometry.EnsureGraphicsResourcesCreated();
+            }
         }
     }
 }

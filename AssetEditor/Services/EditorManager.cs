@@ -50,7 +50,7 @@ namespace AssetEditor.Services
         {
             _logger.Here().Information($"Setting new active editor from {oldValue} to {newValue}");
 
-            if (newValue < CurrentEditorsList.Count)
+            if (newValue >= 0 && newValue < CurrentEditorsList.Count)
             {
                 var editor = CurrentEditorsList[newValue];
                 _logger.Here().Information($"Setting active editor to '{editor.DisplayName}' ({editor.GetType().Name})");
