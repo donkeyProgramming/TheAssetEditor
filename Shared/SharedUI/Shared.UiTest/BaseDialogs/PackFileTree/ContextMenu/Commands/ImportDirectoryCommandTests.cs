@@ -1,3 +1,4 @@
+using Test.TestingUtility.TestUtility;
 using System.IO;
 using Moq;
 using Shared.Core.Services;
@@ -17,7 +18,7 @@ namespace Shared.UiTest.BaseDialogs.PackFileTree.ContextMenu.Commands
             var root = viewModel.Files.First();
             var dirNode = root.Children.First(x => x.NodeType == NodeType.Directory);
 
-            var command = new ImportDirectoryCommand(_packFileService, new Mock<IStandardDialogs>().Object, new Mock<IFileSystemAccess>().Object);
+            var command = new ImportDirectoryCommand(_packFileService, new Mock<IStandardDialogs>().Object, new Mock<IFileSystemAccess>().Object, MockScopedLogger.Create());
 
             Assert.That(command.ShouldAdd(dirNode), Is.True);
         }
@@ -29,7 +30,7 @@ namespace Shared.UiTest.BaseDialogs.PackFileTree.ContextMenu.Commands
             var viewModel = PackFileBrowser();
             var root = viewModel.Files.First();
 
-            var command = new ImportDirectoryCommand(_packFileService, new Mock<IStandardDialogs>().Object, new Mock<IFileSystemAccess>().Object);
+            var command = new ImportDirectoryCommand(_packFileService, new Mock<IStandardDialogs>().Object, new Mock<IFileSystemAccess>().Object, MockScopedLogger.Create());
 
             Assert.That(command.IsEnabled(root), Is.True);
         }
@@ -45,7 +46,7 @@ namespace Shared.UiTest.BaseDialogs.PackFileTree.ContextMenu.Commands
             var dialogs = new Mock<IStandardDialogs>();
 
             // Act
-            var command = new ImportDirectoryCommand(_packFileService, dialogs.Object, new Mock<IFileSystemAccess>().Object);
+            var command = new ImportDirectoryCommand(_packFileService, dialogs.Object, new Mock<IFileSystemAccess>().Object, MockScopedLogger.Create());
             command.Configure(root);
 
             command.Execute();
@@ -68,7 +69,7 @@ namespace Shared.UiTest.BaseDialogs.PackFileTree.ContextMenu.Commands
             var fileSystem = new Mock<IFileSystemAccess>();
 
             // Act
-            var command = new ImportDirectoryCommand(_packFileService, dialogs.Object, fileSystem.Object);
+            var command = new ImportDirectoryCommand(_packFileService, dialogs.Object, fileSystem.Object, MockScopedLogger.Create());
             command.Configure(root);
 
             command.Execute();
@@ -104,7 +105,7 @@ namespace Shared.UiTest.BaseDialogs.PackFileTree.ContextMenu.Commands
             fileSystem.Setup(x => x.FileReadAllBytes(file2Path)).Returns(file2Bytes);
 
             // Act
-            var command = new ImportDirectoryCommand(_packFileService, dialogs.Object, fileSystem.Object);
+            var command = new ImportDirectoryCommand(_packFileService, dialogs.Object, fileSystem.Object, MockScopedLogger.Create());
             command.Configure(root);
 
             command.Execute();

@@ -13,13 +13,18 @@ namespace Editors.KitbasherEditor.Commands
     {
         record MeshMaterialHistory(Rmv2MeshNode Mesh, CapabilityMaterial Material);
 
-        readonly ILogger _logger = Logging.Create<AssignMaterialFromOtherMeshCommand>();
+        readonly ILogger _logger;
         public string HintText => "Assign Material";
         public bool IsMutation => true;
 
         
         readonly List<MeshMaterialHistory> _history = [];
         CapabilityMaterial? _newMaterial;
+
+        public AssignMaterialFromOtherMeshCommand(IScopedLogger scopedLogger)
+        {
+            _logger = scopedLogger.ForContext<AssignMaterialFromOtherMeshCommand>();
+        }
 
         public void Execute()
         {

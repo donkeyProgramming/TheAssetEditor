@@ -4,9 +4,9 @@ using Shared.Core.PackFiles.Models;
 
 namespace Shared.Ui.BaseDialogs.PackFileTree.ContextMenu.Commands
 {
-    public class ExpandNodeCommand() : IContextMenuCommand
+    public class ExpandNodeCommand(IScopedLogger scopedLogger) : IContextMenuCommand
     {
-        private readonly ILogger _logger = Logging.Create<ExpandNodeCommand>();
+        private readonly ILogger _logger = scopedLogger.ForContext<ExpandNodeCommand>();
 
         public string GetDisplayName(TreeNode node) => "Expand all";
         public bool ShouldAdd(TreeNode node) => node.NodeType != NodeType.File;

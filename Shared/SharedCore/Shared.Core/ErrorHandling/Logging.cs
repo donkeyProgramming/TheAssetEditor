@@ -39,7 +39,7 @@ namespace Shared.Core.ErrorHandling
             fileName = getNextFileName(fileName);
             LogName = fileName;
          
-            var outputTemplate = "[{Timestamp:HH:mm:ss} {Level}] [{ThreadId}] {SourceContext}::{MemberName} : {Message} {Exception}{NewLine}";
+            var outputTemplate = "[{Timestamp:HH:mm:ss} {Level}] [{ThreadId}] [{ScopeId}] {SourceContext}::{MemberName} : {Message} {Exception}{NewLine}";
             CustomSink = new CustomLoggingSink(logEventLevel, outputTemplate);
 
             Log.Logger = new LoggerConfiguration()

@@ -1,4 +1,6 @@
 ﻿using Moq;
+using Serilog;
+using Shared.Core.ErrorHandling;
 using Shared.Core.Events;
 using Shared.Core.Events.Global;
 using Shared.Core.PackFiles;
@@ -6,6 +8,7 @@ using Shared.Core.PackFiles.Models;
 using Shared.Core.PackFiles.Models.Containers;
 using Shared.Core.Services;
 using Shared.Core.Settings;
+using Test.TestingUtility.TestUtility;
 
 namespace Shared.CoreTest.Services
 {
@@ -15,11 +18,14 @@ namespace Shared.CoreTest.Services
         IPackFileContainer _container;
         Mock<IStandardDialogs> _uiProvider = new();
         Mock<IGlobalEventHub> _eventHub = new();
+        IScopedLogger _scopedLogger;
         PackFile _fileHandle;
 
         [SetUp]
         public void Setup()
         {
+            _scopedLogger = MockScopedLogger.Create();
+
             var dialogProvider = new Mock<ISimpleMessageBox>();
             _pfs = new PackFileService(_eventHub.Object);
             (_pfs as PackFileService).MessageBoxProvider = dialogProvider.Object;
@@ -44,7 +50,7 @@ namespace Shared.CoreTest.Services
         public void Save_NoExistingFile_DontPromptOnConflict()
         {
             // Arrange
-            var saveService = new FileSaveService(_pfs, _uiProvider.Object);
+            var saveService = new FileSaveService(_pfs, _uiProvider.Object, _scopedLogger);
 
             // Act
             var result = saveService.Save("folder\\subfolder2\\File1.test", [3], false);
@@ -62,7 +68,7 @@ namespace Shared.CoreTest.Services
         public void Save_ExistingFile_DontPromptOnConflict()
         {
             // Arrange
-            var saveService = new FileSaveService(_pfs, _uiProvider.Object);
+            var saveService = new FileSaveService(_pfs, _uiProvider.Object, _scopedLogger);
 
             // Act
             var result = saveService.Save("folder\\subfolder\\File1.test", [3], false);
@@ -82,7 +88,7 @@ namespace Shared.CoreTest.Services
         public void Save_NoExistingFile_PromptOnConflict()
         {
             // Arrange
-            var saveService = new FileSaveService(_pfs, _uiProvider.Object);
+            var saveService = new FileSaveService(_pfs, _uiProvider.Object, _scopedLogger);
 
             // Act
             var result = saveService.Save("folder\\subfolder2\\File1.test", [3], true);
@@ -100,7 +106,7 @@ namespace Shared.CoreTest.Services
         public void Save_ExistingFile_PromptOnConflict_NewPath()
         {
             // Arrange
-            var saveService = new FileSaveService(_pfs, _uiProvider.Object);
+            var saveService = new FileSaveService(_pfs, _uiProvider.Object, _scopedLogger);
             _uiProvider.Setup(x => x.DisplaySaveDialog(_pfs, It.IsAny<List<string>>())).Returns(new SaveDialogResult(true, null, "folder\\subfolder3\\File1.test"));
 
             // Act
@@ -122,7 +128,7 @@ namespace Shared.CoreTest.Services
         public void Save_ExistingFile_PromptOnConflict_ExistingPath()
         {
             // Arrange
-            var saveService = new FileSaveService(_pfs, _uiProvider.Object);
+            var saveService = new FileSaveService(_pfs, _uiProvider.Object, _scopedLogger);
             _uiProvider.Setup(x => x.DisplaySaveDialog(_pfs, It.IsAny<List<string>>())).Returns(new SaveDialogResult(true, null, "folder\\subfolder\\File0.test"));
 
             // Act
@@ -141,7 +147,7 @@ namespace Shared.CoreTest.Services
         public void Save_ExistingFile_PromptOnConflict_Exit()
         {
             // Arrange
-            var saveService = new FileSaveService(_pfs, _uiProvider.Object);
+            var saveService = new FileSaveService(_pfs, _uiProvider.Object, _scopedLogger);
             _uiProvider.Setup(x => x.DisplaySaveDialog(_pfs, It.IsAny<List<string>>())).Returns(new SaveDialogResult(false, null, null));
 
             // Act
@@ -160,7 +166,7 @@ namespace Shared.CoreTest.Services
         [Test]
         public void Save_RootPathWithLeadingSlash_CreatesRootLevelFile()
         {
-            var saveService = new FileSaveService(_pfs, _uiProvider.Object);
+            var saveService = new FileSaveService(_pfs, _uiProvider.Object, _scopedLogger);
 
             var result = saveService.Save("\\RootFile.test", [9], false);
 
@@ -174,7 +180,7 @@ namespace Shared.CoreTest.Services
         [Test]
         public void SaveAs_RootPathWithLeadingSlash_CreatesRootLevelFile()
         {
-            var saveService = new FileSaveService(_pfs, _uiProvider.Object);
+            var saveService = new FileSaveService(_pfs, _uiProvider.Object, _scopedLogger);
             _uiProvider
                 .Setup(x => x.DisplaySaveDialog(_pfs, It.IsAny<List<string>>()))
                 .Returns(new SaveDialogResult(true, null, "\\RootFile.test"));

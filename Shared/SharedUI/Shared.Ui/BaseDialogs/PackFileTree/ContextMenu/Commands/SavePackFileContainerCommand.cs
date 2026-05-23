@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Serilog;
 using Shared.Core.ErrorHandling;
 using Shared.Core.PackFiles;
@@ -11,9 +11,9 @@ namespace Shared.Ui.BaseDialogs.PackFileTree.ContextMenu.Commands
     public class SavePackFileContainerCommand(
         IPackFileService packFileService,
         IStandardDialogs standardDialogs,
-        ApplicationSettingsService applicationSettingsService) : IContextMenuCommand
+        ApplicationSettingsService applicationSettingsService, IScopedLogger scopedLogger) : IContextMenuCommand
     {
-        private readonly ILogger _logger = Logging.Create<SavePackFileContainerCommand>();
+        private readonly ILogger _logger = scopedLogger.ForContext<SavePackFileContainerCommand>();
         public string GetDisplayName(TreeNode node) => "Save";
         public bool ShouldAdd(TreeNode node)
         {

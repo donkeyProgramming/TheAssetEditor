@@ -13,13 +13,14 @@ namespace GameWorld.Core.Services
 {
     public class FocusSelectableObjectService
     {
-        private readonly ILogger _logger = Logging.Create<FocusSelectableObjectService>();
+        private readonly ILogger _logger;
         private readonly SelectionManager _selectionManager;
         private readonly ArcBallCamera _arcBallCamera;
         private readonly SceneManager _sceneManager;
 
-        public FocusSelectableObjectService(SelectionManager selectionManager, ArcBallCamera arcBallCamera, SceneManager sceneManager)
+        public FocusSelectableObjectService(SelectionManager selectionManager, ArcBallCamera arcBallCamera, SceneManager sceneManager, IScopedLogger scopedLogger)
         {
+            _logger = scopedLogger.ForContext<FocusSelectableObjectService>();
             _selectionManager = selectionManager;
             _arcBallCamera = arcBallCamera;
             _sceneManager = sceneManager;

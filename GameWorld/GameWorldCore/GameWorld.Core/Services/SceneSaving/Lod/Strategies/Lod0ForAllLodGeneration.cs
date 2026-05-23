@@ -1,4 +1,5 @@
 ﻿using GameWorld.Core.SceneNodes;
+using Shared.Core.ErrorHandling;
 
 namespace GameWorld.Core.Services.SceneSaving.Lod.Strategies
 {
@@ -9,7 +10,7 @@ namespace GameWorld.Core.Services.SceneSaving.Lod.Strategies
         public string Description => "Copy lod 0 to all other LODs";
         public bool IsAvailable => true;
 
-        public Lod0ForAllLodGeneration()
+        public Lod0ForAllLodGeneration(IScopedLogger scopedLogger) : base(scopedLogger)
         {
         }
 

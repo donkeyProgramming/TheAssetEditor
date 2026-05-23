@@ -1,3 +1,4 @@
+using Test.TestingUtility.TestUtility;
 using Shared.Ui.BaseDialogs.PackFileTree.ContextMenu.Commands;
 
 namespace Shared.UiTest.BaseDialogs.PackFileTree.ContextMenu.Commands
@@ -12,7 +13,7 @@ namespace Shared.UiTest.BaseDialogs.PackFileTree.ContextMenu.Commands
             var viewModel = PackFileBrowser();
             var root = viewModel.Files.First();
 
-            var command = new SetAsEditablePackCommand(_packFileService);
+            var command = new SetAsEditablePackCommand(_packFileService, MockScopedLogger.Create());
 
             Assert.That(command.ShouldAdd(root), Is.True);
         }
@@ -24,7 +25,7 @@ namespace Shared.UiTest.BaseDialogs.PackFileTree.ContextMenu.Commands
             var viewModel = PackFileBrowser();
             var root = viewModel.Files.First();
 
-            var command = new SetAsEditablePackCommand(_packFileService);
+            var command = new SetAsEditablePackCommand(_packFileService, MockScopedLogger.Create());
 
             Assert.That(command.IsEnabled(root), Is.True);
         }
@@ -38,7 +39,7 @@ namespace Shared.UiTest.BaseDialogs.PackFileTree.ContextMenu.Commands
             var root = viewModel.Files.First();
 
             // Act
-            var command = new SetAsEditablePackCommand(_packFileService);
+            var command = new SetAsEditablePackCommand(_packFileService, MockScopedLogger.Create());
             command.Configure(root);
 
             command.Execute();

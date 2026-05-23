@@ -1,3 +1,4 @@
+using Test.TestingUtility.TestUtility;
 using Moq;
 using Shared.Core.Services;
 using Shared.Ui.BaseDialogs.PackFileTree.ContextMenu.Commands;
@@ -15,7 +16,7 @@ namespace Shared.UiTest.BaseDialogs.PackFileTree.ContextMenu.Commands
             var viewModel = PackFileBrowser();
             var root = viewModel.Files.First();
 
-            var command = new ExportToDirectoryCommand(_packFileService, new Mock<IStandardDialogs>().Object, new Mock<IFileSystemAccess>().Object);
+            var command = new ExportToDirectoryCommand(_packFileService, new Mock<IStandardDialogs>().Object, new Mock<IFileSystemAccess>().Object, MockScopedLogger.Create());
 
             Assert.That(command.ShouldAdd(root), Is.True);
         }
@@ -27,7 +28,7 @@ namespace Shared.UiTest.BaseDialogs.PackFileTree.ContextMenu.Commands
             var viewModel = PackFileBrowser();
             var root = viewModel.Files.First();
 
-            var command = new ExportToDirectoryCommand(_packFileService, new Mock<IStandardDialogs>().Object, new Mock<IFileSystemAccess>().Object);
+            var command = new ExportToDirectoryCommand(_packFileService, new Mock<IStandardDialogs>().Object, new Mock<IFileSystemAccess>().Object, MockScopedLogger.Create());
 
             Assert.That(command.IsEnabled(root), Is.True);
         }
@@ -45,7 +46,7 @@ namespace Shared.UiTest.BaseDialogs.PackFileTree.ContextMenu.Commands
             var fileSystem = new Mock<IFileSystemAccess>();
 
             // Act
-            var command = new ExportToDirectoryCommand(_packFileService, dialogs.Object, fileSystem.Object);
+            var command = new ExportToDirectoryCommand(_packFileService, dialogs.Object, fileSystem.Object, MockScopedLogger.Create());
             command.Configure(root);
 
             command.Execute();
@@ -98,7 +99,7 @@ namespace Shared.UiTest.BaseDialogs.PackFileTree.ContextMenu.Commands
                 });
 
             // Act
-            var command = new ExportToDirectoryCommand(_packFileService, dialogs.Object, fileSystem.Object);
+            var command = new ExportToDirectoryCommand(_packFileService, dialogs.Object, fileSystem.Object, MockScopedLogger.Create());
             command.Configure(root);
 
             command.Execute();

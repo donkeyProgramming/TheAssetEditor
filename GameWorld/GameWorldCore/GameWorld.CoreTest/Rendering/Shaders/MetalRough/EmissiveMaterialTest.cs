@@ -1,4 +1,5 @@
-﻿using GameWorld.Core.Rendering.Materials;
+using Test.TestingUtility.TestUtility;
+using GameWorld.Core.Rendering.Materials;
 using GameWorld.Core.Rendering.Materials.Capabilities;
 using GameWorld.Core.Rendering.Materials.Serialization;
 using GameWorld.Core.Test.TestUtility.Material;
@@ -30,7 +31,7 @@ namespace GameWorld.Core.Test.Rendering.Shaders.MetalRough
 
             _abstractMaterialFactory = new CapabilityMaterialFactory(appSettings, null);
 
-            var saveHelper = new FileSaveService(_pfs, null);
+            var saveHelper = new FileSaveService(_pfs, null, MockScopedLogger.Create());
             var materialRepo = new WsMaterialRepository(_pfs);
             _wsMaterialSerializer = new MaterialToWsMaterialSerializer(saveHelper, materialRepo, selectedGame);
         }

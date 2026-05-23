@@ -15,7 +15,7 @@ namespace Editors.KitbasherEditor.ChildEditors.PinTool
 {
     public partial class PinRiggingAlgorithm : ObservableObject
     {
-        private readonly ILogger _logger = Logging.Create<PinRiggingAlgorithm>();
+        private readonly ILogger _logger;
         private readonly IStandardDialogs _standardDialogs;
         private readonly SelectionManager _selectionManager;
         private readonly IUiCommandFactory _commandFactory;
@@ -24,8 +24,9 @@ namespace Editors.KitbasherEditor.ChildEditors.PinTool
         [ObservableProperty] Rmv2MeshNode? _selectedMesh;
         [ObservableProperty] string _description = "";
 
-        public PinRiggingAlgorithm(IUiCommandFactory commandFactory, IStandardDialogs standardDialogs, SelectionManager selectionManager)
+        public PinRiggingAlgorithm(IUiCommandFactory commandFactory, IStandardDialogs standardDialogs, SelectionManager selectionManager, IScopedLogger scopedLogger)
         {
+            _logger = scopedLogger.ForContext<PinRiggingAlgorithm>();
             _commandFactory = commandFactory;
             _standardDialogs = standardDialogs;
             _selectionManager = selectionManager;

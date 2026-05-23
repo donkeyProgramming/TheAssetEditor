@@ -20,7 +20,7 @@ namespace Editors.KitbasherEditor.ChildEditors.PinTool
 
     public partial class PinToolViewModel : ObservableObject
     {
-        private readonly ILogger _logger = Logging.Create<PinToolViewModel>();
+        private readonly ILogger _logger;
         private readonly SelectionManager _selectionManager;
         private readonly IUiCommandFactory _commandFactory;
         private readonly IStandardDialogs _standardDialogs;
@@ -31,14 +31,15 @@ namespace Editors.KitbasherEditor.ChildEditors.PinTool
         [ObservableProperty] RiggingMode _selectedRiggingMode = RiggingMode.Pin;
         [ObservableProperty] ObservableCollection<Rmv2MeshNode> _affectedMeshCollection = [];
 
-        public PinToolViewModel(SelectionManager selectionManager, IUiCommandFactory commandFactory, IStandardDialogs standardDialogs)
+        public PinToolViewModel(SelectionManager selectionManager, IUiCommandFactory commandFactory, IStandardDialogs standardDialogs, IScopedLogger scopedLogger)
         {
+            _logger = scopedLogger.ForContext<PinToolViewModel>();
             _selectionManager = selectionManager;
             _commandFactory = commandFactory;
             _standardDialogs = standardDialogs;
 
-            _pinMode = new PinRiggingAlgorithm(_commandFactory, _standardDialogs, _selectionManager);
-            _skinWrapMode = new SkinWrapAlgorithm(_commandFactory, _standardDialogs, _selectionManager);
+            _pinMode = new PinRiggingAlgorithm(_commandFactory, _standardDialogs, _selectionManager, scopedLogger);
+            _skinWrapMode = new SkinWrapAlgorithm(_commandFactory, _standardDialogs, _selectionManager, scopedLogger);
         }
 
         [RelayCommand] void ClearAffectedMeshCollection() => AffectedMeshCollection.Clear();

@@ -4,9 +4,9 @@ using Shared.Core.PackFiles.Models;
 
 namespace Shared.Ui.BaseDialogs.PackFileTree.ContextMenu.Commands
 {
-    public class CollapseNodeCommand() : IContextMenuCommand
+    public class CollapseNodeCommand(IScopedLogger scopedLogger) : IContextMenuCommand
     {
-        private readonly ILogger _logger = Logging.Create<CollapseNodeCommand>();
+        private readonly ILogger _logger = scopedLogger.ForContext<CollapseNodeCommand>();
 
         public string GetDisplayName(TreeNode node) => "Collapse all";
         public bool ShouldAdd(TreeNode node) => node.NodeType != NodeType.File;

@@ -7,9 +7,9 @@ using Shared.Ui.BaseDialogs.PackFileTree.Utility;
 
 namespace Shared.Ui.BaseDialogs.PackFileTree.ContextMenu.Commands
 {
-    public class DeleteNodeCommand(IPackFileService packFileService, IStandardDialogs standardDialogs) : IContextMenuCommand
+    public class DeleteNodeCommand(IPackFileService packFileService, IStandardDialogs standardDialogs, IScopedLogger scopedLogger) : IContextMenuCommand
     {
-        private readonly ILogger _logger = Logging.Create<DeleteNodeCommand>();
+        private readonly ILogger _logger = scopedLogger.ForContext<DeleteNodeCommand>();
 
         public string GetDisplayName(TreeNode node) => "Delete";
         public bool ShouldAdd(TreeNode node)

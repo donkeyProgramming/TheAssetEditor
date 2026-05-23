@@ -13,7 +13,7 @@ namespace GameWorld.Core.Commands.Object
 {
     public class DivideObjectIntoSubmeshesCommand : IAeUndoCommandCommand
     {
-        readonly ILogger _logger = Logging.Create<FaceSelectionCommand>();
+        readonly ILogger _logger;
 
         private readonly List<GroupNode> _newGroupNodes = [];
         private readonly SelectionManager _selectionManager;
@@ -25,8 +25,9 @@ namespace GameWorld.Core.Commands.Object
         public string HintText { get => "Divide Object"; }
         public bool IsMutation { get => true; }
 
-        public DivideObjectIntoSubmeshesCommand(SelectionManager selectionManager)
+        public DivideObjectIntoSubmeshesCommand(SelectionManager selectionManager, IScopedLogger scopedLogger)
         {
+            _logger = scopedLogger.ForContext<DivideObjectIntoSubmeshesCommand>();
             _selectionManager = selectionManager;
         }
 

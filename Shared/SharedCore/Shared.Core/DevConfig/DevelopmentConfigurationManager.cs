@@ -9,14 +9,15 @@ namespace Shared.Core.DevConfig
 {
     public class DevelopmentConfigurationManager
     {
-        private readonly ILogger _logger = Logging.Create<DevelopmentConfigurationManager>();
+        private readonly ILogger _logger;
         private readonly IPackFileService _packFileService;
         private readonly ApplicationSettingsService _settingsService;
         private readonly IEnumerable<IDeveloperConfiguration> _developerConfigurations;
         private IDeveloperConfiguration? _activeConfig;
 
-        public DevelopmentConfigurationManager(IEnumerable<IDeveloperConfiguration> developerConfigurations, IPackFileService packFileService, ApplicationSettingsService settingsService)
+        public DevelopmentConfigurationManager(IEnumerable<IDeveloperConfiguration> developerConfigurations, IPackFileService packFileService, ApplicationSettingsService settingsService, IScopedLogger scopedLogger)
         {
+            _logger = scopedLogger.ForContext<DevelopmentConfigurationManager>();
             _developerConfigurations = developerConfigurations;
             _packFileService = packFileService;
             _settingsService = settingsService;

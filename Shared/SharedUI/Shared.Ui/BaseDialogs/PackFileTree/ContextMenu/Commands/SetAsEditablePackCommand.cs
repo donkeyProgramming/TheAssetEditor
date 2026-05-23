@@ -6,9 +6,9 @@ using Shared.Ui.BaseDialogs.PackFileTree.Utility;
 
 namespace Shared.Ui.BaseDialogs.PackFileTree.ContextMenu.Commands
 {
-    public class SetAsEditablePackCommand(IPackFileService packFileService) : IContextMenuCommand
+    public class SetAsEditablePackCommand(IPackFileService packFileService, IScopedLogger scopedLogger) : IContextMenuCommand
     {
-        private readonly ILogger _logger = Logging.Create<SetAsEditablePackCommand>();
+        private readonly ILogger _logger = scopedLogger.ForContext<SetAsEditablePackCommand>();
 
         public string GetDisplayName(TreeNode node) => "Set as Editable Pack";
         public bool ShouldAdd(TreeNode node)

@@ -1,3 +1,4 @@
+using Test.TestingUtility.TestUtility;
 using Moq;
 using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
@@ -17,7 +18,7 @@ namespace Shared.UiTest.BaseDialogs.PackFileTree.ContextMenu.Commands
             var viewModel = PackFileBrowser();
             var node = TreeNodeHelper.FindNode(viewModel, container, "animation\\meta\\testfile.anm");
 
-            var command = new DuplicateFileCommand(_packFileService, new Mock<IStandardDialogs>().Object);
+            var command = new DuplicateFileCommand(_packFileService, new Mock<IStandardDialogs>().Object, MockScopedLogger.Create());
 
             Assert.That(command.ShouldAdd(node), Is.True);
         }
@@ -29,7 +30,7 @@ namespace Shared.UiTest.BaseDialogs.PackFileTree.ContextMenu.Commands
             var viewModel = PackFileBrowser();
             var node = TreeNodeHelper.FindNode(viewModel, container, "animation\\meta\\testfile.anm");
 
-            var command = new DuplicateFileCommand(_packFileService, new Mock<IStandardDialogs>().Object);
+            var command = new DuplicateFileCommand(_packFileService, new Mock<IStandardDialogs>().Object, MockScopedLogger.Create());
 
             Assert.That(command.IsEnabled(node), Is.True);
         }
@@ -46,7 +47,7 @@ namespace Shared.UiTest.BaseDialogs.PackFileTree.ContextMenu.Commands
             var node = TreeNodeHelper.FindNode(viewModel, sourceContainer, "animation\\meta\\testfile.anm");
 
             // Act
-            var command = new DuplicateFileCommand(_packFileService, new Mock<IStandardDialogs>().Object);
+            var command = new DuplicateFileCommand(_packFileService, new Mock<IStandardDialogs>().Object, MockScopedLogger.Create());
             command.Configure(node);
 
             command.Execute();
@@ -71,7 +72,7 @@ namespace Shared.UiTest.BaseDialogs.PackFileTree.ContextMenu.Commands
             var node = TreeNodeHelper.FindNode(viewModel, sourceContainer, "animation\\meta\\" + fileName);
 
             // Act
-            var command = new DuplicateFileCommand(_packFileService, new Mock<IStandardDialogs>().Object);
+            var command = new DuplicateFileCommand(_packFileService, new Mock<IStandardDialogs>().Object, MockScopedLogger.Create());
             command.Configure(node);
 
             command.Execute();

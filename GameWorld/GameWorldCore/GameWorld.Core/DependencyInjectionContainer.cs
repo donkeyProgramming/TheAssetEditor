@@ -28,6 +28,7 @@ using GameWorld.Core.Utility;
 using GameWorld.Core.WpfWindow;
 using Microsoft.Extensions.DependencyInjection;
 using Shared.Core.DependencyInjection;
+using Shared.Core.ErrorHandling;
 using Shared.Core.ErrorHandling.Exceptions;
 using Shared.Core.Services;
 
@@ -41,7 +42,7 @@ namespace GameWorld.Core
             serviceCollection.AddScoped<IGeometryGraphicsContextFactory, GeometryGraphicsContextFactory>();
             serviceCollection.AddScoped<IWpfGame, WpfGame>();
             serviceCollection.AddScoped<IScopedResourceLibrary, ScopedResourceLibrary>();
-            serviceCollection.AddScoped<IGraphicsResourceCreator>(x => new GraphicsResourceCreator(() => x.GetRequiredService<IWpfGame>().GraphicsDevice));
+            serviceCollection.AddScoped<IGraphicsResourceCreator>(x => new GraphicsResourceCreator(() => x.GetRequiredService<IWpfGame>().GraphicsDevice, x.GetRequiredService<IScopedLogger>()));
             serviceCollection.AddScoped<IScopeOwnerAware>(x => x.GetRequiredService<IGraphicsResourceCreator>() as IScopeOwnerAware);
             serviceCollection.AddSingleton<ResourceLibrary>();
 

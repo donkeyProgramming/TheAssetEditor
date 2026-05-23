@@ -1,3 +1,4 @@
+using Test.TestingUtility.TestUtility;
 using Shared.Ui.BaseDialogs.PackFileTree;
 using Shared.Ui.BaseDialogs.PackFileTree.ContextMenu.Commands;
 using Shared.Ui.BaseDialogs.PackFileTree.Utility;
@@ -16,7 +17,7 @@ namespace Shared.UiTest.BaseDialogs.PackFileTree.ContextMenu.Commands
             var folder = root.Children.First(x => x.NodeType == NodeType.Directory);
             var file = TreeNodeHelper.FindNode(viewModel, container, "folder\\file.txt");
 
-            var command = new ExpandNodeCommand();
+            var command = new ExpandNodeCommand(MockScopedLogger.Create());
 
             Assert.That(command.ShouldAdd(folder), Is.True);
             Assert.That(command.ShouldAdd(file), Is.False);
@@ -30,7 +31,7 @@ namespace Shared.UiTest.BaseDialogs.PackFileTree.ContextMenu.Commands
             var root = viewModel.Files.First();
             var folder = root.Children.First(x => x.NodeType == NodeType.Directory);
 
-            var command = new ExpandNodeCommand();
+            var command = new ExpandNodeCommand(MockScopedLogger.Create());
 
             Assert.That(command.IsEnabled(folder), Is.True);
         }
@@ -45,7 +46,7 @@ namespace Shared.UiTest.BaseDialogs.PackFileTree.ContextMenu.Commands
             root.IsNodeExpanded = false;
             root.Children.First().IsNodeExpanded = false;
 
-            var command = new ExpandNodeCommand();
+            var command = new ExpandNodeCommand(MockScopedLogger.Create());
             command.Configure(root);
 
             command.Execute();
@@ -67,7 +68,7 @@ namespace Shared.UiTest.BaseDialogs.PackFileTree.ContextMenu.Commands
             folder.IsNodeExpanded = false;
             nested.IsNodeExpanded = false;
 
-            var command = new ExpandNodeCommand();
+            var command = new ExpandNodeCommand(MockScopedLogger.Create());
             command.Configure(root);
 
             command.Execute();

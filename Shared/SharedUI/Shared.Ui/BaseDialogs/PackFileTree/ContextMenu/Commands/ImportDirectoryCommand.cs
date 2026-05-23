@@ -11,9 +11,9 @@ using Shared.Ui.BaseDialogs.PackFileTree.Utility;
 
 namespace Shared.Ui.BaseDialogs.PackFileTree.ContextMenu.Commands
 {
-    public class ImportDirectoryCommand(IPackFileService packFileService, IStandardDialogs standardDialogs, IFileSystemAccess fileSystemAccess) : IContextMenuCommand
+    public class ImportDirectoryCommand(IPackFileService packFileService, IStandardDialogs standardDialogs, IFileSystemAccess fileSystemAccess, IScopedLogger scopedLogger) : IContextMenuCommand
     {
-        private readonly ILogger _logger = Logging.Create<ImportDirectoryCommand>();
+        private readonly ILogger _logger = scopedLogger.ForContext<ImportDirectoryCommand>();
 
         public string GetDisplayName(TreeNode node) => "Import Directory";
         public bool ShouldAdd(TreeNode node)

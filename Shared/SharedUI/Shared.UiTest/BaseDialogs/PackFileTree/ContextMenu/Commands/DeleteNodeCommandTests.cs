@@ -1,3 +1,4 @@
+using Test.TestingUtility.TestUtility;
 using Moq;
 using Shared.Core.PackFiles;
 using Shared.Core.Services;
@@ -17,7 +18,7 @@ namespace Shared.UiTest.BaseDialogs.PackFileTree.ContextMenu.Commands
             var viewModel = PackFileBrowser();
             var node = TreeNodeHelper.FindNode(viewModel, container, "rootfolder\\file.txt");
 
-            var command = new DeleteNodeCommand(_packFileService, new Mock<IStandardDialogs>().Object);
+            var command = new DeleteNodeCommand(_packFileService, new Mock<IStandardDialogs>().Object, MockScopedLogger.Create());
 
             Assert.That(command.ShouldAdd(node), Is.True);
         }
@@ -29,7 +30,7 @@ namespace Shared.UiTest.BaseDialogs.PackFileTree.ContextMenu.Commands
             var viewModel = PackFileBrowser();
             var node = TreeNodeHelper.FindNode(viewModel, container, "rootfolder\\file.txt");
 
-            var command = new DeleteNodeCommand(_packFileService, new Mock<IStandardDialogs>().Object);
+            var command = new DeleteNodeCommand(_packFileService, new Mock<IStandardDialogs>().Object, MockScopedLogger.Create());
 
             Assert.That(command.IsEnabled(node), Is.True);
         }
@@ -46,7 +47,7 @@ namespace Shared.UiTest.BaseDialogs.PackFileTree.ContextMenu.Commands
             dialogs.Setup(x => x.ShowYesNoBox(It.IsAny<string>(), It.IsAny<string>())).Returns(ShowMessageBoxResult.OK);
 
             // Act
-            var command = new DeleteNodeCommand(_packFileService, dialogs.Object);
+            var command = new DeleteNodeCommand(_packFileService, dialogs.Object, MockScopedLogger.Create());
             command.Configure(node);
 
             command.Execute();
@@ -69,7 +70,7 @@ namespace Shared.UiTest.BaseDialogs.PackFileTree.ContextMenu.Commands
             dialogs.Setup(x => x.ShowYesNoBox(It.IsAny<string>(), It.IsAny<string>())).Returns(ShowMessageBoxResult.OK);
 
             // Act
-            var command = new DeleteNodeCommand(_packFileService, dialogs.Object);
+            var command = new DeleteNodeCommand(_packFileService, dialogs.Object, MockScopedLogger.Create());
             command.Configure(dirNode);
 
             command.Execute();

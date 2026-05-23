@@ -1,4 +1,4 @@
-﻿using GameWorld.Core.Rendering.Materials;
+using GameWorld.Core.Rendering.Materials;
 using GameWorld.Core.Rendering.Materials.Capabilities;
 using GameWorld.Core.Test.TestUtility;
 using Shared.Core.Settings;

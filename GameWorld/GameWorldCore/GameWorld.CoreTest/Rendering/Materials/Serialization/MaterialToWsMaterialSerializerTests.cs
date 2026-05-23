@@ -1,4 +1,5 @@
-﻿using GameWorld.Core.Rendering.Materials;
+using Test.TestingUtility.TestUtility;
+using GameWorld.Core.Rendering.Materials;
 using GameWorld.Core.Rendering.Materials.Capabilities;
 using GameWorld.Core.Rendering.Materials.Serialization;
 using GameWorld.Core.Rendering.Materials.Shaders;
@@ -28,7 +29,7 @@ namespace GameWorld.Core.Test.Rendering.Materials.Serialization
             var appSettings = new ApplicationSettingsService(selectedGame);
             _pfs = PackFileSerivceTestHelper.CreateFromFolder(selectedGame, "Data\\Karl_and_celestialgeneral_Pack");
 
-            var saveHelper = new FileSaveService(_pfs, null);
+            var saveHelper = new FileSaveService(_pfs, null, MockScopedLogger.Create());
             var materialRepo = new WsMaterialRepository(_pfs);
             _outputPack = _pfs.CreateNewPackFileContainer("output", PackFileVersion.PFH5, PackFileCAType.MOD, true);
             var materialFactory = new CapabilityMaterialFactory(appSettings, null);

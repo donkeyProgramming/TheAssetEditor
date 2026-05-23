@@ -9,9 +9,9 @@ using Shared.Ui.BaseDialogs.PackFileTree.Utility;
 
 namespace Shared.Ui.BaseDialogs.PackFileTree.ContextMenu.Commands
 {
-    public class ImportFileCommand(IPackFileService packFileService, IStandardDialogs standardDialogs, IFileSystemAccess fileSystemAccess) : IContextMenuCommand
+    public class ImportFileCommand(IPackFileService packFileService, IStandardDialogs standardDialogs, IFileSystemAccess fileSystemAccess, IScopedLogger scopedLogger) : IContextMenuCommand
     {
-        private readonly ILogger _logger = Logging.Create<ImportFileCommand>();
+        private readonly ILogger _logger = scopedLogger.ForContext<ImportFileCommand>();
 
         public string GetDisplayName(TreeNode node) => "Import File";
         public bool ShouldAdd(TreeNode node)

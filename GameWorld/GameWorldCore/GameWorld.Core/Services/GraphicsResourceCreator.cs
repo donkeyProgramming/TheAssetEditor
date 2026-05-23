@@ -94,7 +94,7 @@ namespace GameWorld.Core.Services
         private record TrackedResource(object Resource, GraphicsResourceRecord Record);
 
         private readonly Func<GraphicsDevice> _graphicsDeviceFactory;
-        private readonly ILogger _logger = Logging.Create<GraphicsResourceCreator>();
+        private readonly ILogger _logger;
         private readonly List<TrackedResource> _trackedResources = [];
         private bool _isDisposed;
 
@@ -103,8 +103,9 @@ namespace GameWorld.Core.Services
 
         private GraphicsDevice GraphicsDevice => _graphicsDeviceFactory() ?? throw new InvalidOperationException("GraphicsDevice is not available for the current scope.");
 
-        public GraphicsResourceCreator(Func<GraphicsDevice> graphicsDeviceFactory)
+        public GraphicsResourceCreator(Func<GraphicsDevice> graphicsDeviceFactory, IScopedLogger scopedLogger)
         {
+            _logger = scopedLogger.ForContext<GraphicsResourceCreator>();
             _graphicsDeviceFactory = graphicsDeviceFactory;
         }
 

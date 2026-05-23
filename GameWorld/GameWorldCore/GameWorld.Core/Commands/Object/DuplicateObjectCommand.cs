@@ -9,7 +9,7 @@ namespace GameWorld.Core.Commands.Object
 {
     public class DuplicateObjectCommand : IAeUndoCommandCommand
     {
-        readonly ILogger _logger = Logging.Create<FaceSelectionCommand>();
+        readonly ILogger _logger;
         List<ISceneNode> _objectsToCopy;
         readonly List<ISceneNode> _clonedObjects = new List<ISceneNode>();
         readonly SelectionManager _selectionManager;
@@ -24,8 +24,9 @@ namespace GameWorld.Core.Commands.Object
             _objectsToCopy = new List<ISceneNode>(objectsToCopy);
         }
 
-        public DuplicateObjectCommand(SelectionManager selectionManager)
+        public DuplicateObjectCommand(SelectionManager selectionManager, IScopedLogger scopedLogger)
         {
+            _logger = scopedLogger.ForContext<DuplicateObjectCommand>();
             _selectionManager = selectionManager;
         }
 

@@ -8,7 +8,7 @@ namespace GameWorld.Core.Commands.Object
 {
     public class DeleteObjectsCommand : IAeUndoCommandCommand
     {
-        private readonly ILogger _logger = Logging.Create<DeleteObjectsCommand>();
+        private readonly ILogger _logger;
         private readonly SelectionManager _selectionManager;
         
         List<ISceneNode> _itemsToDelete = [];
@@ -17,8 +17,9 @@ namespace GameWorld.Core.Commands.Object
         public string HintText { get => "Delete Object"; }
         public bool IsMutation { get => true; }
 
-        public DeleteObjectsCommand(SelectionManager selectionManager)
+        public DeleteObjectsCommand(SelectionManager selectionManager, IScopedLogger scopedLogger)
         {
+            _logger = scopedLogger.ForContext<DeleteObjectsCommand>();
             _selectionManager = selectionManager;
         }
 

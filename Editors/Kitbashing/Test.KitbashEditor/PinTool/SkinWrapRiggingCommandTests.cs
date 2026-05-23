@@ -9,9 +9,12 @@ using GameWorld.Core.SceneNodes;
 using GameWorld.Core.Services;
 using Microsoft.Xna.Framework;
 using Moq;
+using Serilog;
+using Shared.Core.ErrorHandling;
 using Shared.Core.Events;
 using Shared.GameFormats.RigidModel;
 using Shared.GameFormats.RigidModel.MaterialHeaders;
+using Test.TestingUtility.TestUtility;
 
 namespace Test.KitbashEditor.PinTool
 {
@@ -50,7 +53,7 @@ namespace Test.KitbashEditor.PinTool
             var eventHubField = typeof(SelectionManager).GetField("_eventHub", BindingFlags.NonPublic | BindingFlags.Instance)!;
             eventHubField.SetValue(_selectionManagerMock.Object, Mock.Of<IEventHub>());
 
-            _command = new SkinWrapRiggingCommand(_selectionManagerMock.Object);
+            _command = new SkinWrapRiggingCommand(_selectionManagerMock.Object, CreateMockScopedLogger());
         }
 
         [Test]
@@ -354,6 +357,8 @@ namespace Test.KitbashEditor.PinTool
             node.Position = position;
             return node;
         }
+
+        private static IScopedLogger CreateMockScopedLogger() => MockScopedLogger.Create();
 
         #endregion
     }

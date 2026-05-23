@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Shared.Core.DependencyInjection;
 using Shared.Core.DevConfig;
+using Shared.Core.ErrorHandling;
 using Shared.Core.ErrorHandling.Exceptions;
 using Shared.Core.Events;
 using Shared.Core.Misc;
@@ -26,6 +27,7 @@ namespace Shared.Core
             services.AddSingleton<IPackFileService, PackFileService>();
             services.AddScoped<IFileSaveService, FileSaveService>();
             services.AddScoped<ScopeToken>();
+            services.AddScoped<IScopedLogger, ScopedLogger>();
             services.AddSingleton<IScopeRepository, ScopeRepository>();
             services.AddSingleton<TouchedFilesRecorder>();
             services.AddScoped<IUiCommandFactory, UiCommandFactory>();

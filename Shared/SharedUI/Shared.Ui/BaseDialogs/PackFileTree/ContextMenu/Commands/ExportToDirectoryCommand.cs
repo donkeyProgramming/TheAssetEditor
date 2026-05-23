@@ -10,9 +10,9 @@ using Shared.Ui.BaseDialogs.PackFileTree.Utility;
 
 namespace Shared.Ui.BaseDialogs.PackFileTree.ContextMenu.Commands
 {
-    public class ExportToDirectoryCommand(IPackFileService packFileService, IStandardDialogs standardDialogs, IFileSystemAccess fileSystemAccess) : IContextMenuCommand
+    public class ExportToDirectoryCommand(IPackFileService packFileService, IStandardDialogs standardDialogs, IFileSystemAccess fileSystemAccess, IScopedLogger scopedLogger) : IContextMenuCommand
     {
-        private readonly ILogger _logger = Logging.Create<ExportToDirectoryCommand>();
+        private readonly ILogger _logger = scopedLogger.ForContext<ExportToDirectoryCommand>();
 
         public string GetDisplayName(TreeNode node) => "Export to system folder";
         public bool ShouldAdd(TreeNode node) => node.NodeType == NodeType.Directory || node.NodeType == NodeType.Root || (node.NodeType == NodeType.File && TreeNodeHelper.GetPackFile(node) != null);

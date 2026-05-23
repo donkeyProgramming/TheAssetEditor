@@ -19,7 +19,7 @@ namespace GameWorld.Core.Components.Rendering
 
     public class RenderEngineComponent : BaseComponent, IDisposable
     {
-        private readonly ILogger _logger = Logging.Create<RenderEngineComponent>();
+        private readonly ILogger _logger;
 
         private readonly Dictionary<RasterizerStateEnum, RasterizerState> _rasterStates = [];
         private readonly IWpfGame _wpfGame;
@@ -48,8 +48,9 @@ namespace GameWorld.Core.Components.Rendering
         public SpriteBatch CommonSpriteBatch { get; private set; }
         public SpriteFont DefaultFont { get; private set; }
 
-        public RenderEngineComponent(IWpfGame wpfGame, ResourceLibrary resourceLibrary, ArcBallCamera camera, IDeviceResolver deviceResolverComponent, ApplicationSettingsService applicationSettingsService, SceneRenderParametersStore sceneLightParametersStore, IEventHub eventHub, IGraphicsResourceCreator graphicsResourceCreator)
+        public RenderEngineComponent(IWpfGame wpfGame, ResourceLibrary resourceLibrary, ArcBallCamera camera, IDeviceResolver deviceResolverComponent, ApplicationSettingsService applicationSettingsService, SceneRenderParametersStore sceneLightParametersStore, IEventHub eventHub, IGraphicsResourceCreator graphicsResourceCreator, IScopedLogger scopedLogger)
         {
+            _logger = scopedLogger.ForContext<RenderEngineComponent>();
             UpdateOrder = (int)ComponentUpdateOrderEnum.RenderEngine;
             DrawOrder = (int)ComponentDrawOrderEnum.RenderEngine;
 

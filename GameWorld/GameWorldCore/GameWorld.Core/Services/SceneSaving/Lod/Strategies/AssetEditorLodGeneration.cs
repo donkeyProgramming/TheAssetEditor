@@ -1,5 +1,6 @@
 ﻿using GameWorld.Core.SceneNodes;
 using GameWorld.Core.Services.SceneSaving.Lod.MeshDecimatorIntegration;
+using Shared.Core.ErrorHandling;
 
 namespace GameWorld.Core.Services.SceneSaving.Lod.Strategies
 {
@@ -9,6 +10,10 @@ namespace GameWorld.Core.Services.SceneSaving.Lod.Strategies
         public string Name => "Default";
         public string Description => "Use AssetEditor Algorithm";
         public bool IsAvailable => true;
+
+        public AssetEditorLodGeneration(IScopedLogger scopedLogger) : base(scopedLogger)
+        {
+        }
 
         public void Generate(MainEditableNode mainNode, List<LodGenerationSettings> settings)
         {

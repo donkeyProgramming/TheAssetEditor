@@ -11,7 +11,7 @@ namespace Editors.KitbasherEditor.ChildEditors.PinTool.Commands
 {
     public class PinMeshToVertexCommand : IAeUndoCommandCommand
     {
-        private readonly ILogger _logger = Logging.Create<PinMeshToVertexCommand>();
+        private readonly ILogger _logger;
         private readonly SelectionManager _selectionManager;
 
         private ISelectionState? _selectionOldState;
@@ -30,8 +30,9 @@ namespace Editors.KitbasherEditor.ChildEditors.PinTool.Commands
         public string HintText { get => "Pin meshes to vertex"; }
         public bool IsMutation { get => true; }
 
-        public PinMeshToVertexCommand(SelectionManager selectionManager)
+        public PinMeshToVertexCommand(SelectionManager selectionManager, IScopedLogger scopedLogger)
         {
+            _logger = scopedLogger.ForContext<PinMeshToVertexCommand>();
             _selectionManager = selectionManager;
         }
 

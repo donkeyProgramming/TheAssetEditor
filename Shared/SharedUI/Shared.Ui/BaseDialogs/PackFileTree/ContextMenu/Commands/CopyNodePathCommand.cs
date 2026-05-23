@@ -5,9 +5,9 @@ using Shared.Core.ErrorHandling;
 
 namespace Shared.Ui.BaseDialogs.PackFileTree.ContextMenu.Commands
 {
-    public class CopyNodePathCommand() : IContextMenuCommand
+    public class CopyNodePathCommand(IScopedLogger scopedLogger) : IContextMenuCommand
     {
-        private readonly ILogger _logger = Logging.Create<CopyNodePathCommand>();
+        private readonly ILogger _logger = scopedLogger.ForContext<CopyNodePathCommand>();
 
         public string GetDisplayName(TreeNode node) => "Copy full path";
         public bool ShouldAdd(TreeNode node) => node.NodeType == NodeType.File;

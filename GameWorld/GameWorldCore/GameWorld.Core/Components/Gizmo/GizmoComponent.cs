@@ -6,6 +6,7 @@ using GameWorld.Core.Services;
 using GameWorld.Core.Utility;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
+using Shared.Core.ErrorHandling;
 using Shared.Core.Events;
 
 namespace GameWorld.Core.Components.Gizmo
@@ -23,6 +24,7 @@ namespace GameWorld.Core.Components.Gizmo
         private readonly IDeviceResolver _deviceResolverComponent;
         private readonly IUiCommandFactory _commandFactory;
         private readonly IGraphicsResourceCreator _graphicsResourceCreator;
+        private readonly IScopedLogger _scopedLogger;
         Gizmo _gizmo;
         bool _isEnabled = false;
         TransformGizmoWrapper _activeTransformation;
@@ -32,7 +34,7 @@ namespace GameWorld.Core.Components.Gizmo
         public GizmoComponent(IEventHub eventHub,
             IKeyboardComponent keyboardComponent, IMouseComponent mouseComponent, ArcBallCamera camera, CommandManager commandExecutor,
             RenderEngineComponent resourceLibary, IDeviceResolver deviceResolverComponent, IUiCommandFactory commandFactory,
-            SelectionManager selectionManager, IGraphicsResourceCreator graphicsResourceCreator)
+            SelectionManager selectionManager, IGraphicsResourceCreator graphicsResourceCreator, IScopedLogger scopedLogger)
         {
             UpdateOrder = (int)ComponentUpdateOrderEnum.Gizmo;
             DrawOrder = (int)ComponentDrawOrderEnum.Gizmo;
@@ -46,6 +48,7 @@ namespace GameWorld.Core.Components.Gizmo
             _commandFactory = commandFactory;
             _selectionManager = selectionManager;
             _graphicsResourceCreator = graphicsResourceCreator;
+            _scopedLogger = scopedLogger;
 
             _eventHub.Register<SelectionChangedEvent>(this, Handle);
         }
@@ -64,7 +67,7 @@ namespace GameWorld.Core.Components.Gizmo
         private void OnSelectionChanged(ISelectionState state)
         {
             _gizmo.Selection.Clear();
-            _activeTransformation = TransformGizmoWrapper.CreateFromSelectionState(state, _commandFactory);
+            _activeTransformation = TransformGizmoWrapper.CreateFromSelectionState(state, _commandFactory, _scopedLogger);
             if (_activeTransformation != null)
                 _gizmo.Selection.Add(_activeTransformation);
 

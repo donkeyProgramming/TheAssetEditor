@@ -7,9 +7,9 @@ using Shared.Ui.BaseDialogs.PackFileTree.Utility;
 
 namespace Shared.Ui.BaseDialogs.PackFileTree.ContextMenu.Commands
 {
-    public class ClosePackContainerFileCommand(IPackFileService packFileService, IStandardDialogs standardDialogs) : IContextMenuCommand
+    public class ClosePackContainerFileCommand(IPackFileService packFileService, IStandardDialogs standardDialogs, IScopedLogger scopedLogger) : IContextMenuCommand
     {
-        private readonly ILogger _logger = Logging.Create<ClosePackContainerFileCommand>();
+        private readonly ILogger _logger = scopedLogger.ForContext<ClosePackContainerFileCommand>();
 
         public string GetDisplayName(TreeNode node) => "Close";
         public bool ShouldAdd(TreeNode node) => node.NodeType == NodeType.Root;

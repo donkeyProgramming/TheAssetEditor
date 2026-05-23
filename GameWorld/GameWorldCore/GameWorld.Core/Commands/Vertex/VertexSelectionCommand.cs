@@ -9,7 +9,7 @@ namespace GameWorld.Core.Commands.Vertex
 {
     public class VertexSelectionCommand : IAeUndoCommandCommand
     {
-        ILogger _logger = Logging.Create<VertexSelectionCommand>();
+        ILogger _logger;
         SelectionManager _selectionManager;
         ISelectionState _oldState;
 
@@ -30,8 +30,9 @@ namespace GameWorld.Core.Commands.Vertex
             _isRemove = isRemove;
         }
 
-        public VertexSelectionCommand(SelectionManager selectionManager)
+        public VertexSelectionCommand(SelectionManager selectionManager, IScopedLogger scopedLogger)
         {
+            _logger = scopedLogger.ForContext<VertexSelectionCommand>();
             _selectionManager = selectionManager;
         }
 

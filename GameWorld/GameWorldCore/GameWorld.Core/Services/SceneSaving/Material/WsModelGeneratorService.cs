@@ -19,12 +19,13 @@ namespace GameWorld.Core.Services.SceneSaving.Material
 
     public class WsModelGeneratorService
     {
-        private readonly ILogger _logger = Logging.Create<WsModelGeneratorService>();
+        private readonly ILogger _logger;
         private readonly IPackFileService _packFileService;
         private readonly IFileSaveService _packFileSaveService;
 
-        public WsModelGeneratorService(IPackFileService packFileService, IFileSaveService packFileSaveService)
+        public WsModelGeneratorService(IPackFileService packFileService, IFileSaveService packFileSaveService, IScopedLogger scopedLogger)
         {
+            _logger = scopedLogger.ForContext<WsModelGeneratorService>();
             _packFileService = packFileService;
             _packFileSaveService = packFileSaveService;
         }

@@ -34,13 +34,15 @@ namespace Editors.KitbasherEditor.ChildEditors.VertexDebugger
         private readonly RenderEngineComponent _renderEngineComponent;
         private readonly SelectionManager _selectionManager;
         private readonly IEventHub _eventHub;
-        private readonly ILogger _logger = Logging.Create<VertexDebuggerViewModel>();
+        private readonly ILogger _logger;
 
         public VertexDebuggerViewModel(
             RenderEngineComponent renderEngineComponent,
             SelectionManager selectionManager,
-            IEventHub eventHub)
+            IEventHub eventHub,
+            IScopedLogger scopedLogger)
         {
+            _logger = scopedLogger.ForContext<VertexDebuggerViewModel>();
             _renderEngineComponent = renderEngineComponent;
             _selectionManager = selectionManager;
             _eventHub = eventHub;

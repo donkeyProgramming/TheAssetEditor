@@ -1,7 +1,23 @@
-﻿using Shared.Core.ToolCreation;
+﻿using Moq;
+using Serilog;
+using Shared.Core.ErrorHandling;
+using Shared.Core.ToolCreation;
 
 namespace Test.TestingUtility.TestUtility
 {
+    public static class MockScopedLogger
+    {
+        public static IScopedLogger Create()
+        {
+            var loggerMock = new Mock<ILogger>();
+            loggerMock.Setup(x => x.ForContext(It.IsAny<string>(), It.IsAny<object>(), It.IsAny<bool>())).Returns(loggerMock.Object);
+
+            var scopedMock = new Mock<IScopedLogger>();
+            scopedMock.Setup(x => x.ForContext<It.IsAnyType>()).Returns(loggerMock.Object);
+            return scopedMock.Object;
+        }
+    }
+
     public record BaseEvent();
     public record ExampleEventNoBase;
 

@@ -11,7 +11,7 @@ namespace Editors.KitbasherEditor.ChildEditors.PinTool.Commands
 {
     public class SkinWrapRiggingCommand : IAeUndoCommandCommand
     {
-        private readonly ILogger _logger = Logging.Create<SkinWrapRiggingCommand>();
+        private readonly ILogger _logger;
         private readonly SelectionManager _selectionManager;
 
         private ISelectionState? _selectionOldState;
@@ -22,8 +22,9 @@ namespace Editors.KitbasherEditor.ChildEditors.PinTool.Commands
         public string HintText { get => "Skin wrap re-rigging"; }
         public bool IsMutation { get => true; }
 
-        public SkinWrapRiggingCommand(SelectionManager selectionManager)
+        public SkinWrapRiggingCommand(SelectionManager selectionManager, IScopedLogger scopedLogger)
         {
+            _logger = scopedLogger.ForContext<SkinWrapRiggingCommand>();
             _selectionManager = selectionManager;
         }
 

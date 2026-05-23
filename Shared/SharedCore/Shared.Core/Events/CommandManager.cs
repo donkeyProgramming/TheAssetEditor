@@ -7,12 +7,13 @@ namespace Shared.Core.Events
 
     public class CommandManager
     {
-        protected ILogger _logger = Logging.Create<CommandManager>();
+        protected ILogger _logger;
         private readonly Stack<IAeUndoCommandCommand> _commands = new Stack<IAeUndoCommandCommand>();
         private readonly IEventHub _eventHub;
 
-        public CommandManager(IEventHub eventHub)
+        public CommandManager(IEventHub eventHub, IScopedLogger scopedLogger)
         {
+            _logger = scopedLogger.ForContext<CommandManager>();
             _eventHub = eventHub;
         }
 

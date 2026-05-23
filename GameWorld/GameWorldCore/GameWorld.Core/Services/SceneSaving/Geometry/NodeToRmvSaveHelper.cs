@@ -20,12 +20,13 @@ namespace GameWorld.Core.Services.SceneSaving.Geometry
 {
     public class NodeToRmvSaveHelper
     {
-        private readonly ILogger _logger = Logging.Create<NodeToRmvSaveHelper>();
+        private readonly ILogger _logger;
         private readonly IFileSaveService _packFileSaveService;
         private readonly MeshBuilderService _meshBuilderService;
        
-        public NodeToRmvSaveHelper(IFileSaveService packFileSaveService, MeshBuilderService meshBuilderService)
+        public NodeToRmvSaveHelper(IFileSaveService packFileSaveService, MeshBuilderService meshBuilderService, IScopedLogger scopedLogger)
         {
+            _logger = scopedLogger.ForContext<NodeToRmvSaveHelper>();
             _packFileSaveService = packFileSaveService;
             _meshBuilderService = meshBuilderService;
         }

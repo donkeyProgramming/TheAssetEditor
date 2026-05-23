@@ -7,7 +7,7 @@ namespace GameWorld.Core.Commands.Face
 {
     public class FaceSelectionCommand : IAeUndoCommandCommand
     {
-        ILogger _logger = Logging.Create<FaceSelectionCommand>();
+        ILogger _logger;
         SelectionManager _selectionManager;
 
         ISelectionState _oldState;
@@ -18,8 +18,9 @@ namespace GameWorld.Core.Commands.Face
         public string HintText { get => "Face selected"; }
         public bool IsMutation { get => false; }
 
-        public FaceSelectionCommand(SelectionManager selectionManager)
+        public FaceSelectionCommand(SelectionManager selectionManager, IScopedLogger scopedLogger)
         {
+            _logger = scopedLogger.ForContext<FaceSelectionCommand>();
             _selectionManager = selectionManager;
         }
 

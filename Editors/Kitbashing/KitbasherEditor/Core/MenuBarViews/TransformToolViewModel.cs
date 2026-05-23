@@ -5,6 +5,7 @@ using GameWorld.Core.Components.Gizmo;
 using GameWorld.Core.Components.Selection;
 using GameWorld.Core.Services;
 using Microsoft.Xna.Framework;
+using Shared.Core.ErrorHandling;
 using Shared.Core.Events;
 using Shared.Core.Misc;
 using Shared.Ui.BaseDialogs.MathViews;
@@ -26,6 +27,7 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
         private readonly SelectionManager _selectionManager;
         private readonly CommandManager _commandExecutor;
         private readonly IUiCommandFactory _commandFactory;
+        private readonly IScopedLogger _scopedLogger;
 
         public System.Windows.Input.ICommand ApplyCommand { get; set; }
 
@@ -46,7 +48,7 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
 
         public NotifyAttr<bool> ShowVertexFalloff { get; set; } = new NotifyAttr<bool>(false);
 
-        public TransformToolViewModel(SelectionManager selectionManager, CommandManager commandExecutor, IUiCommandFactory commandFactory, IEventHub eventHub)
+        public TransformToolViewModel(SelectionManager selectionManager, CommandManager commandExecutor, IUiCommandFactory commandFactory, IEventHub eventHub, IScopedLogger scopedLogger)
         {
             ApplyCommand = new RelayCommand(ApplyTransform);
 
@@ -55,6 +57,7 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
             _selectionManager = selectionManager;
             _commandExecutor = commandExecutor;
             _commandFactory = commandFactory;
+            _scopedLogger = scopedLogger;
             eventHub.Register<SelectionChangedEvent>(this, Handle);
         }
 
@@ -99,7 +102,7 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
 
         void ApplyTransform()
         {
-            var transform = TransformGizmoWrapper.CreateFromSelectionState(_selectionManager.GetState(), _commandFactory);
+            var transform = TransformGizmoWrapper.CreateFromSelectionState(_selectionManager.GetState(), _commandFactory, _scopedLogger);
             if (transform == null || _activeMode == TransformMode.None)
                 return;
 

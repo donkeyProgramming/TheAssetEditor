@@ -1,4 +1,5 @@
-﻿using Moq;
+using Test.TestingUtility.TestUtility;
+using Moq;
 using Shared.Core.PackFiles;
 using Shared.Core.Services;
 using Shared.Core.Settings;
@@ -17,7 +18,7 @@ namespace Shared.UiTest.BaseDialogs.PackFileTree.ContextMenu.Commands
             var viewModel = PackFileBrowser();
             var root = viewModel.Files.First();
 
-            var command = new SavePackFileContainerCommand(_packFileService, new Mock<IStandardDialogs>().Object, new ApplicationSettingsService(GameTypeEnum.Warhammer3));
+            var command = new SavePackFileContainerCommand(_packFileService, new Mock<IStandardDialogs>().Object, new ApplicationSettingsService(GameTypeEnum.Warhammer3), MockScopedLogger.Create());
 
             Assert.That(command.ShouldAdd(root), Is.True);
         }
@@ -29,7 +30,7 @@ namespace Shared.UiTest.BaseDialogs.PackFileTree.ContextMenu.Commands
             var viewModel = PackFileBrowser();
             var root = viewModel.Files.First();
 
-            var command = new SavePackFileContainerCommand(_packFileService, new Mock<IStandardDialogs>().Object, new ApplicationSettingsService(GameTypeEnum.Warhammer3));
+            var command = new SavePackFileContainerCommand(_packFileService, new Mock<IStandardDialogs>().Object, new ApplicationSettingsService(GameTypeEnum.Warhammer3), MockScopedLogger.Create());
 
             Assert.That(command.IsEnabled(root), Is.True);
         }
@@ -46,7 +47,7 @@ namespace Shared.UiTest.BaseDialogs.PackFileTree.ContextMenu.Commands
             var appSettings = new ApplicationSettingsService(GameTypeEnum.Warhammer3);
 
             // Act
-            var command = new SavePackFileContainerCommand(_packFileService, dialogs.Object, appSettings);
+            var command = new SavePackFileContainerCommand(_packFileService, dialogs.Object, appSettings, MockScopedLogger.Create());
             command.Configure(root);
 
             command.Execute();
@@ -65,7 +66,7 @@ namespace Shared.UiTest.BaseDialogs.PackFileTree.ContextMenu.Commands
             var appSettings = new ApplicationSettingsService(GameTypeEnum.Warhammer3);
 
             // Act
-            var command = new SavePackFileContainerCommand(_packFileService, dialogs.Object, appSettings);
+            var command = new SavePackFileContainerCommand(_packFileService, dialogs.Object, appSettings, MockScopedLogger.Create());
             command.Execute();
 
             // Assert
@@ -83,7 +84,7 @@ namespace Shared.UiTest.BaseDialogs.PackFileTree.ContextMenu.Commands
             var appSettings = new ApplicationSettingsService(GameTypeEnum.Warhammer3);
 
             // Act
-            var command = new SavePackFileContainerCommand(_packFileService, dialogs.Object, appSettings);
+            var command = new SavePackFileContainerCommand(_packFileService, dialogs.Object, appSettings, MockScopedLogger.Create());
             command.Execute();
 
             // Assert - SavePackContainer was invoked (it will throw internally due to file I/O, caught by the command)

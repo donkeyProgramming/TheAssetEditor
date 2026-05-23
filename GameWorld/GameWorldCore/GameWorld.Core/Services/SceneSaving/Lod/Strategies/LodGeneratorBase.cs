@@ -9,7 +9,12 @@ namespace GameWorld.Core.Services.SceneSaving.Lod.Strategies
 {
     public abstract class LodGeneratorBase
     {
-        private readonly ILogger _logger = Logging.Create<LodGeneratorBase>();
+        private readonly ILogger _logger;
+
+        protected LodGeneratorBase(IScopedLogger scopedLogger)
+        {
+            _logger = scopedLogger.ForContext<LodGeneratorBase>();
+        }
 
         protected abstract void ReduceMesh(Rmv2MeshNode rmv2MeshNode, float deductionRatio);
 

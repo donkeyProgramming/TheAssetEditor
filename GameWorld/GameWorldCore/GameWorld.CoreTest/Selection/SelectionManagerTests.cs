@@ -13,6 +13,7 @@ using Shared.Core.Settings;
 using Shared.GameFormats.RigidModel.MaterialHeaders;
 using System.Reflection;
 using Test.GameWorld.Core.WsMaterialTemplate;
+using Test.TestingUtility.TestUtility;
 
 namespace GameWorld.Core.Test.Selection
 {
@@ -38,7 +39,7 @@ namespace GameWorld.Core.Test.Selection
         {
             _eventHubMock = new Mock<IEventHub>();
 
-            _renderEngine = new RenderEngineComponent(null, null, null, null, null, null, _eventHubMock.Object, null);
+            _renderEngine = new RenderEngineComponent(null, null, null, null, null, null, _eventHubMock.Object, null, MockScopedLogger.Create());
 
             _selectionManager = new SelectionManager(
                 _eventHubMock.Object,

@@ -7,9 +7,9 @@ using Shared.Ui.BaseDialogs.PackFileTree.Utility;
 
 namespace Shared.Ui.BaseDialogs.PackFileTree.ContextMenu.Commands
 {
-    public class RenameNodeCommand(IPackFileService packFileService, IStandardDialogs standardDialogs) : IContextMenuCommand
+    public class RenameNodeCommand(IPackFileService packFileService, IStandardDialogs standardDialogs, IScopedLogger scopedLogger) : IContextMenuCommand
     {
-        private readonly ILogger _logger = Logging.Create<RenameNodeCommand>();
+        private readonly ILogger _logger = scopedLogger.ForContext<RenameNodeCommand>();
 
         public string GetDisplayName(TreeNode node) => "Rename";
        

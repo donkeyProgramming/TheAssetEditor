@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Diagnostics;
 using System.IO;
 using Shared.Core.PackFiles.Models;
@@ -9,9 +9,9 @@ using Shared.Ui.BaseDialogs.PackFileTree.Utility;
 
 namespace Shared.Ui.BaseDialogs.PackFileTree.ContextMenu.Commands
 {
-    public abstract class OpenNodeInCommand(IStandardDialogs standardDialogs, IFileSystemAccess fileSystemAccess) : IContextMenuCommand
+    public abstract class OpenNodeInCommand(IStandardDialogs standardDialogs, IFileSystemAccess fileSystemAccess, IScopedLogger scopedLogger) : IContextMenuCommand
     {
-        private readonly ILogger _logger = Logging.Create<OpenNodeInCommand>();
+        private readonly ILogger _logger = scopedLogger.ForContext<OpenNodeInCommand>();
 
         public abstract string GetDisplayName(TreeNode node);
         public bool ShouldAdd(TreeNode node) => node.NodeType == NodeType.File && TreeNodeHelper.GetPackFile(node) != null;
@@ -71,13 +71,13 @@ namespace Shared.Ui.BaseDialogs.PackFileTree.ContextMenu.Commands
         }
     }
 
-    public class OpenNodeInNotepadCommand(IStandardDialogs standardDialogs, IFileSystemAccess fileSystemAccess) : OpenNodeInCommand(standardDialogs, fileSystemAccess)
+    public class OpenNodeInNotepadCommand(IStandardDialogs standardDialogs, IFileSystemAccess fileSystemAccess, IScopedLogger scopedLogger) : OpenNodeInCommand(standardDialogs, fileSystemAccess, scopedLogger)
     {
         public override string GetDisplayName(TreeNode node) => "Open in Notepad++";
         public override void Execute() => OpenSelectedNodeUsing(_node, ResolveApplicationPath(@"Notepad++\notepad++.exe"));
     }
 
-    public class OpenNodeInHxDCommand(IStandardDialogs standardDialogs, IFileSystemAccess fileSystemAccess) : OpenNodeInCommand(standardDialogs, fileSystemAccess)
+    public class OpenNodeInHxDCommand(IStandardDialogs standardDialogs, IFileSystemAccess fileSystemAccess, IScopedLogger scopedLogger) : OpenNodeInCommand(standardDialogs, fileSystemAccess, scopedLogger)
     {
         public override string GetDisplayName(TreeNode node) => "Open in Hxd";
         public override void Execute() => OpenSelectedNodeUsing(_node, ResolveApplicationPath(@"HxD\HxD.exe"));

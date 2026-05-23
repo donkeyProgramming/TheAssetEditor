@@ -9,7 +9,7 @@ namespace GameWorld.Core.Commands.Object
 {
     public class ObjectSelectionCommand : IAeUndoCommandCommand
     {
-        private readonly ILogger _logger = Logging.Create<ObjectSelectionCommand>();
+        private readonly ILogger _logger;
         private readonly SelectionManager _selectionManager;
 
         ISelectionState? _oldState;
@@ -20,8 +20,9 @@ namespace GameWorld.Core.Commands.Object
         public string HintText { get => "Object Selected"; }
         public bool IsMutation { get => false; }
 
-        public ObjectSelectionCommand(SelectionManager selectionManager)
+        public ObjectSelectionCommand(SelectionManager selectionManager, IScopedLogger scopedLogger)
         {
+            _logger = scopedLogger.ForContext<ObjectSelectionCommand>();
             _selectionManager = selectionManager;
         }
 

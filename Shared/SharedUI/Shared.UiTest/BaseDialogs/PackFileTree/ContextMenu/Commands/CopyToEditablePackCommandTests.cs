@@ -1,3 +1,4 @@
+using Test.TestingUtility.TestUtility;
 using Moq;
 using Shared.Core.Services;
 using Shared.Ui.BaseDialogs.PackFileTree;
@@ -19,7 +20,7 @@ namespace Shared.UiTest.BaseDialogs.PackFileTree.ContextMenu.Commands
             var viewModel = PackFileBrowser();
             var node = TreeNodeHelper.FindNode(viewModel, source, "folder\\file.txt");
 
-            var command = new CopyToEditablePackCommand(_packFileService, new Mock<IStandardDialogs>().Object);
+            var command = new CopyToEditablePackCommand(_packFileService, new Mock<IStandardDialogs>().Object, MockScopedLogger.Create());
 
             Assert.That(command.ShouldAdd(node), Is.True);
         }
@@ -31,7 +32,7 @@ namespace Shared.UiTest.BaseDialogs.PackFileTree.ContextMenu.Commands
             var viewModel = PackFileBrowser();
             var node = TreeNodeHelper.FindNode(viewModel, source, "folder\\file.txt");
 
-            var command = new CopyToEditablePackCommand(_packFileService, new Mock<IStandardDialogs>().Object);
+            var command = new CopyToEditablePackCommand(_packFileService, new Mock<IStandardDialogs>().Object, MockScopedLogger.Create());
 
             Assert.That(command.IsEnabled(node), Is.True);
         }
@@ -53,7 +54,7 @@ namespace Shared.UiTest.BaseDialogs.PackFileTree.ContextMenu.Commands
             dialogs.Setup(x => x.ShowWaitCursor()).Returns(waitCursor.Object);
 
             // Act
-            var command = new CopyToEditablePackCommand(_packFileService, dialogs.Object);
+            var command = new CopyToEditablePackCommand(_packFileService, dialogs.Object, MockScopedLogger.Create());
             command.Configure(folder);
 
             command.Execute();

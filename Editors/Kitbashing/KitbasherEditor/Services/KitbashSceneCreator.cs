@@ -19,7 +19,7 @@ namespace Editors.KitbasherEditor.Services
 {
     public class KitbashSceneCreator
     {
-        private readonly ILogger _logger = Logging.Create<KitbashSceneCreator>();
+        private readonly ILogger _logger;
         private readonly IPackFileService _packFileService;
         private readonly ApplicationSettingsService _settingsService;
         private readonly KitbasherRootScene _kitbasherRootScene;
@@ -35,8 +35,10 @@ namespace Editors.KitbasherEditor.Services
             SceneManager sceneManager,
             IPackFileService packFileService,
             Rmv2ModelNodeLoader rmv2ModelNodeLoader,
-            GeometrySaveSettings saveSettings)
+            GeometrySaveSettings saveSettings,
+            IScopedLogger scopedLogger)
         {
+            _logger = scopedLogger.ForContext<KitbashSceneCreator>();
             _packFileService = packFileService;
             _settingsService = settingsService;
             _kitbasherRootScene = kitbasherRootScene;

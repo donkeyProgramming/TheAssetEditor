@@ -25,8 +25,7 @@ namespace Editors.KitbasherEditor.ViewModels
         ISaveableEditor,
         IDropTarget<PackFile>
     {
-        private readonly ILogger _logger = Logging.Create<KitbasherViewModel>();
-
+        private readonly ILogger _logger;
         private readonly KitbashViewDropHandler _dropHandler;
         private readonly KitbashSceneCreator _kitbashSceneCreator;
         private readonly FocusSelectableObjectService _focusSelectableObjectComponent;
@@ -49,6 +48,7 @@ namespace Editors.KitbasherEditor.ViewModels
 
         public KitbasherViewModel(
             IEventHub eventHub,
+            IScopedLogger scopedLogger,
             IWpfGame gameWorld,
             MenuBarViewModel menuBarViewModel,
             AnimationControllerViewModel animationControllerViewModel,
@@ -60,6 +60,8 @@ namespace Editors.KitbasherEditor.ViewModels
             SkeletonChangedHandler skeletonChangedHandler, 
             SceneNodeEditorViewModel sceneNodeEditorView)
         {
+            _logger = scopedLogger.ForContext<KitbasherViewModel>();
+
             _dropHandler = dropHandler;
             _kitbashSceneCreator = kitbashSceneCreator;
             _focusSelectableObjectComponent = focusSelectableObjectComponent;

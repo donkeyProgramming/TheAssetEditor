@@ -16,15 +16,16 @@ namespace Editors.KitbasherEditor.ChildEditors.PinTool
 {
     public partial class SkinWrapAlgorithm : ObservableObject
     {
-        private readonly ILogger _logger = Logging.Create<SkinWrapAlgorithm>();
+        private readonly ILogger _logger;
         private readonly IStandardDialogs _standardDialogs;
         private readonly SelectionManager _selectionManager;
         private readonly IUiCommandFactory _commandFactory;
 
         [ObservableProperty] ObservableCollection<Rmv2MeshNode> _sourceMeshes = [];
 
-        public SkinWrapAlgorithm(IUiCommandFactory commandFactory, IStandardDialogs standardDialogs, SelectionManager selectionManager)
+        public SkinWrapAlgorithm(IUiCommandFactory commandFactory, IStandardDialogs standardDialogs, SelectionManager selectionManager, IScopedLogger scopedLogger)
         {
+            _logger = scopedLogger.ForContext<SkinWrapAlgorithm>();
             _commandFactory = commandFactory;
             _standardDialogs = standardDialogs;
             _selectionManager = selectionManager;

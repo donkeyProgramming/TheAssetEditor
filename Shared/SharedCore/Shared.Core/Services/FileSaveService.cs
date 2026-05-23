@@ -13,12 +13,13 @@ namespace Shared.Core.Services
 
     public class FileSaveService : IFileSaveService
     {
-        private readonly ILogger _logger = Logging.Create<FileSaveService>();
+        private readonly ILogger _logger;
         private readonly IPackFileService _packFileService;
         private readonly IStandardDialogs _packFileUiProvider;
 
-        public FileSaveService(IPackFileService packFileService, IStandardDialogs packFileUiProvider)
+        public FileSaveService(IPackFileService packFileService, IStandardDialogs packFileUiProvider, IScopedLogger scopedLogger)
         {
+            _logger = scopedLogger.ForContext<FileSaveService>();
             _packFileService = packFileService;
             _packFileUiProvider = packFileUiProvider;
         }

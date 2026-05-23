@@ -33,15 +33,16 @@ namespace GameWorld.Core.Components
 
     public class SceneManager : BaseComponent, IDisposable
     {
-        private readonly ILogger _logger = Logging.Create<SceneManager>();
+        private readonly ILogger _logger;
         public ISceneNode RootNode { get; private set; }
 
 
         private readonly RenderEngineComponent _renderEngineComponent;
         private readonly IEventHub _eventHub;
 
-        public SceneManager(RenderEngineComponent renderEngineComponent, IEventHub eventHub)
+        public SceneManager(RenderEngineComponent renderEngineComponent, IEventHub eventHub, IScopedLogger scopedLogger)
         {
+            _logger = scopedLogger.ForContext<SceneManager>();
             _renderEngineComponent = renderEngineComponent;
             _eventHub = eventHub;
             RootNode = new GroupNode(SpecialNodes.Root) { SceneManager = this, IsEditable = true, IsLockable = false };

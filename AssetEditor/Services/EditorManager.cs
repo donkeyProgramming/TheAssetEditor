@@ -46,6 +46,17 @@ namespace AssetEditor.Services
                 SelectedEditorIndex = index;
         }
 
+        partial void OnSelectedEditorIndexChanged(int oldValue, int newValue)
+        {
+            _logger.Here().Information($"Setting new active editor from {oldValue} to {newValue}");
+
+            if (newValue < CurrentEditorsList.Count)
+            {
+                var editor = CurrentEditorsList[newValue];
+                _logger.Here().Information($"Setting active editor to '{editor.DisplayName}' ({editor.GetType().Name})");
+            }
+        }
+
         public IEditorInterface CreateFromFile(PackFile file, EditorEnums? preferedEditor)
         {
             if (file == null)
@@ -121,6 +132,7 @@ namespace AssetEditor.Services
 
             newWindow.Closed += (s, args) =>
             {
+                _logger.Here().Information($"Editor destroyed: '{editorViewModel.DisplayName}' ({editorViewModel.GetType().Name})");
                 _editorDatabase.DestroyEditor(editorViewModel);
                 editorViewModel.Close();
                 _globalEventHub.UnRegister(editorViewModel);
@@ -131,6 +143,7 @@ namespace AssetEditor.Services
 
         void InsertEditorIntoTab(IEditorInterface editorView)
         {
+            _logger.Here().Information($"Editor created: '{editorView.DisplayName}' ({editorView.GetType().Name})");
             CurrentEditorsList.Add(editorView);
             SelectedEditorIndex = CurrentEditorsList.Count - 1;
         }
@@ -182,6 +195,7 @@ namespace AssetEditor.Services
 
             var index = CurrentEditorsList.IndexOf(tool);
             CurrentEditorsList.RemoveAt(index);
+            _logger.Here().Information($"Editor destroyed: '{tool.DisplayName}' ({tool.GetType().Name})");
             try
             {
                 _editorDatabase.DestroyEditor(tool);

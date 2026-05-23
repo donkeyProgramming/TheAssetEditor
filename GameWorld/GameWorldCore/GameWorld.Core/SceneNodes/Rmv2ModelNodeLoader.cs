@@ -15,14 +15,15 @@ namespace GameWorld.Core.SceneNodes
 {
     public class Rmv2ModelNodeLoader
     {
-        private readonly ILogger _logger = Logging.Create<Rmv2ModelNodeLoader>();
+        private readonly ILogger _logger;
         private readonly MeshBuilderService _meshBuilderService;
         private readonly IPackFileService _packFileService;
         private readonly CapabilityMaterialFactory _capabilityMaterialFactory;
         private readonly IStandardDialogs _standardDialogs;
 
-        public Rmv2ModelNodeLoader(MeshBuilderService meshBuilderService, IPackFileService packFileService, CapabilityMaterialFactory materialFactory, IStandardDialogs exceptionService)
+        public Rmv2ModelNodeLoader(MeshBuilderService meshBuilderService, IPackFileService packFileService, CapabilityMaterialFactory materialFactory, IStandardDialogs exceptionService, IScopedLogger scopedLogger)
         {
+            _logger = scopedLogger.ForContext<Rmv2ModelNodeLoader>();
             _meshBuilderService = meshBuilderService;
             _packFileService = packFileService;
             _capabilityMaterialFactory = materialFactory;

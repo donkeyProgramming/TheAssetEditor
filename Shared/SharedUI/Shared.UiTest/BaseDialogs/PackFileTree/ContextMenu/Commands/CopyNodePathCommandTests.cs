@@ -1,3 +1,4 @@
+using Test.TestingUtility.TestUtility;
 using System.Threading;
 using Shared.Ui.BaseDialogs.PackFileTree;
 using Shared.Ui.BaseDialogs.PackFileTree.ContextMenu.Commands;
@@ -15,7 +16,7 @@ namespace Shared.UiTest.BaseDialogs.PackFileTree.ContextMenu.Commands
             var viewModel = PackFileBrowser();
             var file = TreeNodeHelper.FindNode(viewModel, container, "folder\\file.txt");
 
-            var command = new CopyNodePathCommand();
+            var command = new CopyNodePathCommand(MockScopedLogger.Create());
 
             Assert.That(command.ShouldAdd(file), Is.True);
         }
@@ -27,7 +28,7 @@ namespace Shared.UiTest.BaseDialogs.PackFileTree.ContextMenu.Commands
             var viewModel = PackFileBrowser();
             var file = TreeNodeHelper.FindNode(viewModel, container, "folder\\file.txt");
 
-            var command = new CopyNodePathCommand();
+            var command = new CopyNodePathCommand(MockScopedLogger.Create());
 
             Assert.That(command.IsEnabled(file), Is.True);
         }
@@ -40,7 +41,7 @@ namespace Shared.UiTest.BaseDialogs.PackFileTree.ContextMenu.Commands
             var viewModel = PackFileBrowser();
             var file = TreeNodeHelper.FindNode(viewModel, container, "folder\\file.txt");
 
-            var command = new CopyNodePathCommand();
+            var command = new CopyNodePathCommand(MockScopedLogger.Create());
             command.Configure(file);
 
             command.Execute();

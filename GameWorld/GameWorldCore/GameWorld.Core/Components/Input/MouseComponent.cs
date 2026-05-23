@@ -55,7 +55,7 @@ namespace GameWorld.Core.Components.Input
 
     public class MouseComponent : BaseComponent, IDisposable, IMouseComponent
     {
-        readonly ILogger _logger = Logging.Create<MouseComponent>();
+        readonly ILogger _logger;
 
         MouseState _currentMouseState;
         MouseState _lastMousesState;
@@ -81,8 +81,9 @@ namespace GameWorld.Core.Components.Input
             }
         }
 
-        public MouseComponent(IWpfGame game)
+        public MouseComponent(IWpfGame game, IScopedLogger scopedLogger)
         {
+            _logger = scopedLogger.ForContext<MouseComponent>();
             _wpfMouse = new WpfMouse(game, true);
             UpdateOrder = (int)ComponentUpdateOrderEnum.Input;
         }

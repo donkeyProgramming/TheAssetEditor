@@ -14,7 +14,7 @@ namespace GameWorld.Core.Components.Gizmo
 {
     public class TransformGizmoWrapper : ITransformable
     {
-        protected ILogger _logger = Logging.Create<TransformGizmoWrapper>();
+        protected ILogger _logger;
 
         Vector3 _pos;
         public Vector3 Position { get => _pos; set { _pos = value; } }
@@ -35,8 +35,9 @@ namespace GameWorld.Core.Components.Gizmo
         Matrix _totalGizomTransform = Matrix.Identity;
         bool _invertedWindingOrder = false;
 
-        public TransformGizmoWrapper(IUiCommandFactory commandFactory, List<MeshObject> effectedObjects, ISelectionState vertexSelectionState)
+        public TransformGizmoWrapper(IUiCommandFactory commandFactory, List<MeshObject> effectedObjects, ISelectionState vertexSelectionState, IScopedLogger scopedLogger)
         {
+            _logger = scopedLogger.ForContext<TransformGizmoWrapper>();
             _commandFactory = commandFactory;
             _selectionState = vertexSelectionState;
 
@@ -60,8 +61,9 @@ namespace GameWorld.Core.Components.Gizmo
             }
         }
 
-        public TransformGizmoWrapper(IUiCommandFactory commandFactory, List<int> selectedBones, BoneSelectionState boneSelectionState)
+        public TransformGizmoWrapper(IUiCommandFactory commandFactory, List<int> selectedBones, BoneSelectionState boneSelectionState, IScopedLogger scopedLogger)
         {
+            _logger = scopedLogger.ForContext<TransformGizmoWrapper>();
             _commandFactory = commandFactory;
             _selectionState = boneSelectionState;
             _selectedBones = selectedBones;
@@ -300,23 +302,23 @@ namespace GameWorld.Core.Components.Gizmo
             return Position;
         }
 
-        public static TransformGizmoWrapper CreateFromSelectionState(ISelectionState state, IUiCommandFactory commandFactory)
+        public static TransformGizmoWrapper CreateFromSelectionState(ISelectionState state, IUiCommandFactory commandFactory, IScopedLogger scopedLogger)
         {
             if (state is ObjectSelectionState objectSelectionState)
             {
                 var transformables = objectSelectionState.CurrentSelection().Where(x => x is ITransformable).Select(x => x.Geometry);
                 if (transformables.Any())
-                    return new TransformGizmoWrapper(commandFactory, transformables.ToList(), state);
+                    return new TransformGizmoWrapper(commandFactory, transformables.ToList(), state, scopedLogger);
             }
             else if (state is VertexSelectionState vertexSelectionState)
             {
                 if (vertexSelectionState.SelectedVertices.Count != 0)
-                    return new TransformGizmoWrapper(commandFactory, new List<MeshObject>() { vertexSelectionState.RenderObject.Geometry }, vertexSelectionState);
+                    return new TransformGizmoWrapper(commandFactory, new List<MeshObject>() { vertexSelectionState.RenderObject.Geometry }, vertexSelectionState, scopedLogger);
             }
             else if (state is BoneSelectionState boneSelectionState)
             {
                 if (boneSelectionState.SelectedBones.Count != 0)
-                    return new TransformGizmoWrapper(commandFactory, boneSelectionState.SelectedBones, boneSelectionState);
+                    return new TransformGizmoWrapper(commandFactory, boneSelectionState.SelectedBones, boneSelectionState, scopedLogger);
             }
             return null;
         }

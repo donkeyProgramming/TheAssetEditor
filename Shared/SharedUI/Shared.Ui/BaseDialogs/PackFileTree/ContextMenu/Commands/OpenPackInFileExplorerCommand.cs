@@ -8,9 +8,9 @@ using Shared.Ui.BaseDialogs.PackFileTree.Utility;
 
 namespace Shared.Ui.BaseDialogs.PackFileTree.ContextMenu.Commands
 {
-    public class OpenPackInFileExplorerCommand(IPackFileService packFileService, IStandardDialogs standardDialogs, IFileSystemAccess fileSystemAccess) : IContextMenuCommand
+    public class OpenPackInFileExplorerCommand(IPackFileService packFileService, IStandardDialogs standardDialogs, IFileSystemAccess fileSystemAccess, IScopedLogger scopedLogger) : IContextMenuCommand
     {
-        private readonly ILogger _logger = Logging.Create<OpenPackInFileExplorerCommand>();
+        private readonly ILogger _logger = scopedLogger.ForContext<OpenPackInFileExplorerCommand>();
 
         public string GetDisplayName(TreeNode node) => "Open In File Explorer";
         public bool ShouldAdd(TreeNode node)

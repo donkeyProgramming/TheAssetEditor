@@ -6,9 +6,9 @@ using Shared.Ui.BaseDialogs.PackFileTree.Utility;
 
 namespace Shared.Ui.BaseDialogs.PackFileTree.ContextMenu.Commands
 {
-    public class CopyToEditablePackCommand(IPackFileService packFileService, IStandardDialogs standardDialogs) : IContextMenuCommand
+    public class CopyToEditablePackCommand(IPackFileService packFileService, IStandardDialogs standardDialogs, IScopedLogger scopedLogger) : IContextMenuCommand
     {
-        private readonly ILogger _logger = Logging.Create<CopyToEditablePackCommand>();
+        private readonly ILogger _logger = scopedLogger.ForContext<CopyToEditablePackCommand>();
 
         public string GetDisplayName(TreeNode node) => "Copy to editable pack";
         public bool ShouldAdd(TreeNode node)
