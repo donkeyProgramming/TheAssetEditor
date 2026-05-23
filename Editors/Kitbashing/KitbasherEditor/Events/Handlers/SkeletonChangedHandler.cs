@@ -8,6 +8,7 @@ namespace Editors.KitbasherEditor.EventHandlers
     public class SkeletonChangedHandler
     {
         private readonly SceneManager _sceneManager;
+        private IEventHub? _eventHub;
 
         public SkeletonChangedHandler(SceneManager sceneManager)
         {
@@ -16,7 +17,14 @@ namespace Editors.KitbasherEditor.EventHandlers
 
         public void Subscribe(IEventHub eventHub)
         {
+            _eventHub = eventHub;
             eventHub.Register<KitbasherSkeletonChangedEvent>(this, OnSkeletonChanged);
+        }
+
+        public void Unsubscribe()
+        {
+            _eventHub?.UnRegister(this);
+            _eventHub = null;
         }
 
         private void OnSkeletonChanged(KitbasherSkeletonChangedEvent e)
