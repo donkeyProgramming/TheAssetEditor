@@ -30,6 +30,7 @@ namespace Editors.KitbasherEditor.ViewModels
         private readonly KitbashViewDropHandler _dropHandler;
         private readonly KitbashSceneCreator _kitbashSceneCreator;
         private readonly FocusSelectableObjectService _focusSelectableObjectComponent;
+        private readonly IEventHub _eventHub;
 
         public IWpfGame Scene { get; set; }
         public SceneExplorerViewModel SceneExplorer { get; set; }
@@ -62,6 +63,7 @@ namespace Editors.KitbasherEditor.ViewModels
             _dropHandler = dropHandler;
             _kitbashSceneCreator = kitbashSceneCreator;
             _focusSelectableObjectComponent = focusSelectableObjectComponent;
+            _eventHub = eventHub;
             Scene = gameWorld;
             Animation = animationControllerViewModel;
             SceneExplorer = sceneExplorerViewModel;
@@ -97,7 +99,10 @@ namespace Editors.KitbasherEditor.ViewModels
 
         public bool Save() => true;
 
-        public void Close() { }
+        public void Close()
+        {
+            _eventHub.UnRegister(this);
+        }
 
         public bool HasUnsavedChanges
         {

@@ -21,6 +21,7 @@ namespace AssetEditor.Services
 
         private readonly IPackFileService _packFileService;
         private readonly IEditorDatabase _editorDatabase;
+        private readonly IGlobalEventHub _globalEventHub;
 
         public ObservableCollection<IEditorInterface> CurrentEditorsList { get; set; } = [];
         [ObservableProperty] private int _selectedEditorIndex = -1;
@@ -29,6 +30,7 @@ namespace AssetEditor.Services
         {
             _packFileService = packFileService;
             _editorDatabase = editorDatabase;
+            _globalEventHub = eventHub;
 
             eventHub.Register<BeforePackFileContainerRemovedEvent>(this, OnBeforeRemoved);
             eventHub.Register<ForceShutdownEvent>(this, OnForceShutdownEditor);
@@ -117,6 +119,13 @@ namespace AssetEditor.Services
                 Title = editorViewModel.DisplayName
             };
 
+            newWindow.Closed += (s, args) =>
+            {
+                _editorDatabase.DestroyEditor(editorViewModel);
+                editorViewModel.Close();
+                _globalEventHub.UnRegister(editorViewModel);
+            };
+
             return newWindow;
         }
 
@@ -151,7 +160,9 @@ namespace AssetEditor.Services
             foreach (var editor in openFiles)
             {
                 CurrentEditorsList.Remove(editor);
+                _editorDatabase.DestroyEditor(editor);
                 editor.Close();
+                _globalEventHub.UnRegister(editor);
             }
         }
 
@@ -171,11 +182,19 @@ namespace AssetEditor.Services
 
             var index = CurrentEditorsList.IndexOf(tool);
             CurrentEditorsList.RemoveAt(index);
-            _editorDatabase.DestroyEditor(tool);
+            try
+            {
+                _editorDatabase.DestroyEditor(tool);
+            }
+            catch (Exception e)
+            {
+                _logger.Here().Error($"Error destroying editor {tool.DisplayName}: {e.Message}");
+            }
             tool.Close();
+            _globalEventHub.UnRegister(tool);
         }
 
-        public  void CloseOtherTools(IEditorInterface tool)
+        public void CloseOtherTools(IEditorInterface tool)
         {
             foreach (var editorViewModel in CurrentEditorsList.ToList())
             {
@@ -186,7 +205,7 @@ namespace AssetEditor.Services
 
         public void CloseAllTools(IEditorInterface tool)
         {
-            foreach (var editorViewModel in CurrentEditorsList)
+            foreach (var editorViewModel in CurrentEditorsList.ToList())
                 CloseTool(editorViewModel);
         }
 

@@ -24,7 +24,15 @@ namespace Shared.Core.DependencyInjection
 
     public class ScopeToken
     { 
+        private static int _scopeCounter = 0;
+
         public string MetaData { get; set; } = string.Empty;
+        public int ScopeId { get; private set; }
+
+        public ScopeToken()
+        {
+            ScopeId = _scopeCounter++;
+        }
     }
 
     public class ScopeRepository : IScopeRepository
@@ -81,8 +89,9 @@ namespace Shared.Core.DependencyInjection
         public void RemoveScope(IEditorInterface owner)
         {
             _logger.Here().Information($"Removing scope for {owner.DisplayName} of type {owner.GetType()}");
-            _scopes[owner].Scope.Dispose();
+            var scope = _scopes[owner].Scope;
             _scopes.Remove(owner);
+            scope.Dispose();
         }
 
         public T GetRequiredService<T>(IEditorInterface editorHandle) where T : notnull
