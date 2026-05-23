@@ -49,7 +49,7 @@ namespace Shared.GameFormats.RigidModel.Vertex.Formats
             }
             else
             {
-                var typedVert = RmvWeighted2Vertex.ToRmv(vertex);
+                var typedVert = RmvWeighted2Vertex.ToRmv(rmvVersion, vertex);
                 return ByteHelper.GetBytes(typedVert);
             }
         }
@@ -151,13 +151,19 @@ namespace Shared.GameFormats.RigidModel.Vertex.Formats
                 };
             }
 
-            public static RmvWeighted2Vertex ToRmv(CommonVertex vertex)
+            public static RmvWeighted2Vertex ToRmv(RmvVersionEnum version, CommonVertex vertex)
             {
                 var newPos = vertex.Position;
                 newPos.W = 0;
+                HalfVector4 pos;
+                if (version == RmvVersionEnum.RMV2_V6)
+                    pos = new HalfVector4() { X = vertex.Position.X, Y = vertex.Position.Y, Z = vertex.Position.Z, W = 1 };
+                else
+                    pos = VertexLoadHelper.CreatePositionVector4ExtraPrecision_v2(newPos);
+
                 return new RmvWeighted2Vertex()
                 {
-                    Position = VertexLoadHelper.CreatePositionVector4ExtraPrecision_v2(newPos),
+                    Position = pos,
                     BoneIndex = new ByteVector2()
                     {
                         X = vertex.BoneIndex[0],

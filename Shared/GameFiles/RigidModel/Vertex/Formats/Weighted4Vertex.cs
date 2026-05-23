@@ -88,6 +88,7 @@ namespace Shared.GameFormats.RigidModel.Vertex.Formats
             {
                 var newPos = vertex.Position;
                 newPos.W = 0;
+
                 return new RmvWeighted4ColourVertex()
                 {
                     Position = VertexLoadHelper.CreatePositionVector4ExtraPrecision_v2(newPos),
