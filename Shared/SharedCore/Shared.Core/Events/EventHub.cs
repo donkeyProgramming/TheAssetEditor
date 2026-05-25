@@ -20,23 +20,27 @@ namespace Shared.Core.Events
         void UnRegister(object owner);
     }
 
-    class SingletonScopeEventHub : EventHub, IGlobalEventHub
+    class GlobalEventHub : EventHub, IGlobalEventHub
     {
-        public SingletonScopeEventHub(IScopeRepository scopeRepository) : base(scopeRepository, nameof(IGlobalEventHub), true)
+        public GlobalEventHub(IScopeRepository scopeRepository) 
+            : base(scopeRepository, nameof(IGlobalEventHub), true)
         {
+            _logger = Logging.Create<GlobalEventHub>();
         }
     }
 
     class LocalScopeEventHub : EventHub, IEventHub
     {
-        public LocalScopeEventHub(IScopeRepository scopeRepository) : base(scopeRepository, nameof(IEventHub), false)
+        public LocalScopeEventHub(IScopeRepository scopeRepository, IScopedLogger scopedLogger) 
+            : base(scopeRepository, nameof(IEventHub), false)
         {
+            _logger = scopedLogger.ForContext<LocalScopeEventHub>();
         }
     }
 
     abstract class EventHub : IDisposable
     {
-        private readonly ILogger _logger = Logging.Create<EventHub>();
+        protected ILogger _logger = Logging.Create<EventHub>();
         bool _isDisposed = false;
         
         readonly Dictionary<Type, List<(Delegate Callback, object Owner)>> _callbackList = new();
@@ -50,6 +54,7 @@ namespace Shared.Core.Events
             _hubName = hubName;
             _isGlobal = isGlobal;
         }
+
 
         public void PublishGlobalEvent<T>(T e)
         {

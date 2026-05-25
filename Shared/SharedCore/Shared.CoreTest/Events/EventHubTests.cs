@@ -16,7 +16,7 @@ namespace Shared.CoreTest.Events
         {
             var serviceCollection = new ServiceCollection();
             serviceCollection.AddSingleton<IScopeRepository, ScopeRepository>();
-            serviceCollection.AddSingleton<IGlobalEventHub, SingletonScopeEventHub>();
+            serviceCollection.AddSingleton<IGlobalEventHub, GlobalEventHub>();
             serviceCollection.AddScoped<IEventHub, LocalScopeEventHub>();
             serviceCollection.AddScoped<ScopedClass>();
             serviceCollection.AddScoped<ScopeToken>();

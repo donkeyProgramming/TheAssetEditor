@@ -36,7 +36,7 @@ namespace Shared.Core
 
 
             services.AddScoped<IEventHub, LocalScopeEventHub>();
-            services.AddSingleton<IGlobalEventHub, SingletonScopeEventHub>();
+            services.AddSingleton<IGlobalEventHub, GlobalEventHub>();
             services.AddScoped<IExceptionService, ExceptionService>();
             services.AddScoped<IExceptionInformationProvider, BasicExceptionInformationProvider>();
             services.AddTransient<DevelopmentConfigurationManager>();

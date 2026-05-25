@@ -1,4 +1,4 @@
-using System.IO;
+﻿using System.IO;
 using Moq;
 using Shared.Core.DependencyInjection;
 using Shared.Core.Events;
@@ -16,14 +16,14 @@ namespace Shared.UiTest.BaseDialogs.PackFileTree
     {
         protected Mock<IScopeRepository> _scopeRepo;
         protected LocalScopeEventHub _eventHub;
-        protected SingletonScopeEventHub _globalEventHub;
+        protected GlobalEventHub _globalEventHub;
         protected PackFileService _packFileService;
 
         [SetUp]
         public void Setup()
         {
             _scopeRepo = new Mock<IScopeRepository>();
-            _globalEventHub = new SingletonScopeEventHub(_scopeRepo.Object);
+            _globalEventHub = new GlobalEventHub(_scopeRepo.Object);
             _eventHub = new LocalScopeEventHub(_scopeRepo.Object);
 
             _packFileService = new PackFileService(_globalEventHub)
