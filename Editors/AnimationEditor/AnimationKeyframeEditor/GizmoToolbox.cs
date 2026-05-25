@@ -25,23 +25,26 @@ namespace AnimationEditor.AnimationKeyframeEditor
         private GizmoMode _lastGizmoTool = GizmoMode.Translate;
 
         private int _lastFrame = 0;
+        private bool _isSelectModeSubscribed;
 
 
         public GizmoToolbox(AnimationKeyframeEditorViewModel parent)
         {
             _parent = parent;
 
-            _parent.Rider.Player.OnFrameChanged += (frameNr) =>
+            _parent.Rider.Player.OnFrameChanged += OnParentFrameChanged;
+        }
+
+        private void OnParentFrameChanged(int frameNr)
+        {
+            var selection = _parent.SelectionManager.GetState<BoneSelectionState>();
+            if (selection != null)
             {
-                var selection = _parent.SelectionManager.GetState<BoneSelectionState>();
-                if (selection != null)
-                {
-                    selection.CurrentAnimation = _parent.Rider.Player.AnimationClip;
-                    selection.Skeleton = _parent.Skeleton;
-                    selection.CurrentFrame = _parent.Rider.Player.CurrentFrame;
-                    selection.SelectedBones.Clear();
-                }
-            };
+                selection.CurrentAnimation = _parent.Rider.Player.AnimationClip;
+                selection.Skeleton = _parent.Skeleton;
+                selection.CurrentFrame = _parent.Rider.Player.CurrentFrame;
+                selection.SelectedBones.Clear();
+            }
         }
 
         private void OnModifiedBonesEvent(BoneSelectionState state)
@@ -151,11 +154,15 @@ namespace AnimationEditor.AnimationKeyframeEditor
                 selection.SelectedBones.Clear();
             }
 
-            _parent.SelectionManager.GetState().SelectionChanged += OnSelectionChanged;
-
-            if (_parent.SelectionManager.GetState() is BoneSelectionState state)
+            if (!_isSelectModeSubscribed)
             {
-                state.BoneModifiedEvent += OnModifiedBonesEvent;
+                _isSelectModeSubscribed = true;
+                _parent.SelectionManager.GetState().SelectionChanged += OnSelectionChanged;
+
+                if (_parent.SelectionManager.GetState() is BoneSelectionState state)
+                {
+                    state.BoneModifiedEvent += OnModifiedBonesEvent;
+                }
             }
         }
 

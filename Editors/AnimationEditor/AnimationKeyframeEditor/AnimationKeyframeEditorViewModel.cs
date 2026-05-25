@@ -26,7 +26,7 @@ using SkeletonBoneNode = Editors.Shared.Core.Common.ReferenceModel.SkeletonBoneN
 
 namespace Editors.AnimationVisualEditors.AnimationKeyframeEditor
 {
-    public class AnimationKeyframeEditorViewModel : NotifyPropertyChangedImpl, IHostedEditor<AnimationKeyframeEditorViewModel>
+    public class AnimationKeyframeEditorViewModel : NotifyPropertyChangedImpl, IHostedEditor<AnimationKeyframeEditorViewModel>, IDisposable
     {
         public Type EditorViewModelType => typeof(EditorView);
         private readonly SceneObjectViewModelBuilder _sceneObjectViewModelBuilder;
@@ -722,6 +722,22 @@ namespace Editors.AnimationVisualEditors.AnimationKeyframeEditor
             var bytes = AnimationFile.ConvertToBytes(animFile);
             _packFileSaveService.SaveAs(".anim", bytes);
             IsDirty.Value = false;
+        }
+
+        public void Dispose()
+        {
+            if (_mount != null)
+            {
+                _mount.SkeletonChanged -= MountSkeletonChanged;
+                _mount.AnimationChanged -= TryReGenerateAnimation;
+            }
+
+            if (_rider != null)
+            {
+                _rider.SkeletonChanged -= RiderSkeletonChanges;
+                _rider.AnimationChanged -= TryReGenerateAnimation;
+                _rider.Player.OnFrameChanged -= RiderOnFrameChanged;
+            }
         }
     }
 }

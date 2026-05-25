@@ -79,5 +79,15 @@ namespace Editor.CampaignAnimationCreator.CampaignAnimationCreator
             ModelBoneList.UpdatePossibleValues(SkeletonBoneNodeHelper.CreateFlatSkeletonList(newValue));
             ModelBoneList.SelectedItem = ModelBoneList.PossibleValues.FirstOrDefault(x => string.Equals(x.BoneName, "animroot", StringComparison.InvariantCultureIgnoreCase));
         }
+
+        public override void Close()
+        {
+            if (_sceneObject != null)
+            {
+                _sceneObject.SkeletonChanged -= SkeletonChanged;
+                _sceneObject.AnimationChanged -= AnimationChanged;
+            }
+            base.Close();
+        }
     }
 }

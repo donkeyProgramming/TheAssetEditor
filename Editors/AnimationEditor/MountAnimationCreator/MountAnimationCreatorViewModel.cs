@@ -31,7 +31,7 @@ using Shared.Core.Events.Global;
 
 namespace AnimationEditor.MountAnimationCreator
 {
-    public class MountAnimationCreatorViewModel : NotifyPropertyChangedImpl, IHostedEditor<MountAnimationCreatorViewModel>
+    public class MountAnimationCreatorViewModel : NotifyPropertyChangedImpl, IHostedEditor<MountAnimationCreatorViewModel>, IDisposable
     {
         public Type EditorViewModelType => typeof(EditorView);
         private readonly SceneObjectViewModelBuilder _sceneObjectViewModelBuilder;
@@ -339,6 +339,21 @@ namespace AnimationEditor.MountAnimationCreator
             var jsonText = JsonConvert.SerializeObject(AnimationCliboardCreator.CreateFrameClipboard(skeleton, frames, currentFrame, endFrame));
             Clipboard.SetText(jsonText);
             MessageBox.Show($"copied frame {currentFrame} up to {endFrame - 1}", "warn", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+        }
+
+        public void Dispose()
+        {
+            if (_mount != null)
+            {
+                _mount.SkeletonChanged -= MountSkeletonChanged;
+                _mount.AnimationChanged -= TryReGenerateAnimation;
+            }
+
+            if (_rider != null)
+            {
+                _rider.SkeletonChanged -= RiderSkeletonChanges;
+                _rider.AnimationChanged -= TryReGenerateAnimation;
+            }
         }
     }
 }

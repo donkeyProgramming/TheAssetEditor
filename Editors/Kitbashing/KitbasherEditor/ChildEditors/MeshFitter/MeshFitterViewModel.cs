@@ -56,13 +56,13 @@ namespace Editors.KitbasherEditor.ChildEditors.MeshFitter
             _meshNodes = meshNodes;
             _targetSkeleton = targetSkeleton;
 
-            ScaleFactor.PropertyChanged += (_0, _1) => ApplyMeshFittingTransforms();
-            BoneScaleFactor.PropertyChanged += (_0, _1) => BoneScaleUpdate((float)BoneScaleFactor.Value, MeshBones.SelectedItem);
-            BonePositionOffset.OnValueChanged += (viewModel) => BonePositionUpdated(viewModel, MeshBones.SelectedItem);
-            BoneRotationOffset.OnValueChanged += (viewModel) => BoneRotationUpdated(viewModel, MeshBones.SelectedItem);
-            SkeletonDisplayOffset.OnValueChanged += (viewModel) => SkeletonDisplayOffsetUpdated(viewModel);
-            RelativeScale.PropertyChanged += (_0, _1) => ApplyMeshFittingTransforms();
-            MeshBones.SelectedItemChanged += _ => OnBoneSelected();
+            ScaleFactor.PropertyChanged += OnScaleFactorChanged;
+            BoneScaleFactor.PropertyChanged += OnBoneScaleFactorChanged;
+            BonePositionOffset.OnValueChanged += OnBonePositionOffsetChanged;
+            BoneRotationOffset.OnValueChanged += OnBoneRotationOffsetChanged;
+            SkeletonDisplayOffset.OnValueChanged += OnSkeletonDisplayOffsetChanged;
+            RelativeScale.PropertyChanged += OnRelativeScaleChanged;
+            MeshBones.SelectedItemChanged += OnMeshBonesSelectedItemChanged;
 
             _animationPlayer = _animationsContainerComponent.RegisterAnimationPlayer(new AnimationPlayer(), "Temp animation rerig" + Guid.NewGuid());
             _fromSkeleton = new GameSkeleton(currentSkeletonFile, _animationPlayer);
@@ -90,6 +90,14 @@ namespace Editors.KitbasherEditor.ChildEditors.MeshFitter
             foreach (var mesh in _meshNodes)
                 mesh.AnimationPlayer = _animationPlayer;
         }
+
+        private void OnScaleFactorChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e) => ApplyMeshFittingTransforms();
+        private void OnBoneScaleFactorChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e) => BoneScaleUpdate((float)BoneScaleFactor.Value, MeshBones.SelectedItem);
+        private void OnBonePositionOffsetChanged(Vector3ViewModel viewModel) => BonePositionUpdated(viewModel, MeshBones.SelectedItem);
+        private void OnBoneRotationOffsetChanged(Vector3ViewModel viewModel) => BoneRotationUpdated(viewModel, MeshBones.SelectedItem);
+        private void OnSkeletonDisplayOffsetChanged(Vector3ViewModel viewModel) => SkeletonDisplayOffsetUpdated(viewModel);
+        private void OnRelativeScaleChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e) => ApplyMeshFittingTransforms();
+        private void OnMeshBonesSelectedItemChanged(AnimatedBone? _) => OnBoneSelected();
 
         protected override void MappingUpdated()
         {
@@ -279,6 +287,15 @@ namespace Editors.KitbasherEditor.ChildEditors.MeshFitter
             if (_disposed)
                 return;
             _disposed = true;
+
+            // Unsubscribe event handlers
+            ScaleFactor.PropertyChanged -= OnScaleFactorChanged;
+            BoneScaleFactor.PropertyChanged -= OnBoneScaleFactorChanged;
+            BonePositionOffset.OnValueChanged -= OnBonePositionOffsetChanged;
+            BoneRotationOffset.OnValueChanged -= OnBoneRotationOffsetChanged;
+            SkeletonDisplayOffset.OnValueChanged -= OnSkeletonDisplayOffsetChanged;
+            RelativeScale.PropertyChanged -= OnRelativeScaleChanged;
+            MeshBones.SelectedItemChanged -= OnMeshBonesSelectedItemChanged;
 
             // Restore animation player
             _animationsContainerComponent.Remove(_animationPlayer);

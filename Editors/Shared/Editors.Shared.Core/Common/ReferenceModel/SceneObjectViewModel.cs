@@ -1,4 +1,5 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
+using GameWorld.Core.Animation;
 using GameWorld.Core.Services;
 using Shared.Core.Events;
 using Shared.Core.PackFiles;
@@ -6,11 +7,12 @@ using Shared.Core.Services;
 
 namespace Editors.Shared.Core.Common.ReferenceModel
 {
-    public partial class SceneObjectViewModel : ObservableObject
+    public partial class SceneObjectViewModel : ObservableObject, IDisposable
     {
         private readonly IPackFileService _pfs;
         private readonly IStandardDialogs _uiProvider;
         private readonly SceneObjectEditor _sceneObjectBuilder;
+        private bool _disposed;
 
         [ObservableProperty] string _headerName;
         [ObservableProperty] string _subHeaderName;
@@ -42,9 +44,12 @@ namespace Editors.Shared.Core.Common.ReferenceModel
             SkeletonInformation = new SkeletonPreviewViewModel(Data);
             FragAndSlotSelection = new BinAnimationViewModel(sceneObjectBuilder, _pfs, skeletonAnimationLookUpHelper, Data, uiCommandFactory);
 
-            Data.AnimationChanged += (x) => OnSceneObjectChanged();
-            Data.SkeletonChanged += (x) => OnSceneObjectChanged();
+            Data.AnimationChanged += OnDataAnimationChanged;
+            Data.SkeletonChanged += OnDataSkeletonChanged;
         }
+
+        private void OnDataAnimationChanged(AnimationClip x) => OnSceneObjectChanged();
+        private void OnDataSkeletonChanged(GameSkeleton x) => OnSceneObjectChanged();
 
         partial void OnIsVisibleChanged(bool value)
         {
@@ -73,6 +78,16 @@ namespace Editors.Shared.Core.Common.ReferenceModel
                 var file = result.File;
                 _sceneObjectBuilder.SetMesh(Data, file);
             }
+        }
+
+        public void Dispose()
+        {
+            if (_disposed)
+                return;
+            _disposed = true;
+
+            Data.AnimationChanged -= OnDataAnimationChanged;
+            Data.SkeletonChanged -= OnDataSkeletonChanged;
         }
     }
 }

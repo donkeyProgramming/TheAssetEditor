@@ -1,12 +1,15 @@
 ﻿using System.Collections.ObjectModel;
 using System.Windows;
+using GameWorld.Core.Animation;
 using Shared.Core.Misc;
 
 namespace Editors.Shared.Core.Common.AnimationPlayer
 {
-    public class AnimationPlayerViewModel : NotifyPropertyChangedImpl
+    public class AnimationPlayerViewModel : NotifyPropertyChangedImpl, IDisposable
     {
         readonly List<SceneObject> _assetList = new();
+        readonly List<ValueChangedDelegate<AnimationClip>> _animationChangedHandlers = new();
+        private bool _disposed;
 
         public NotifyAttr<float> SelectedAnimationCurrentTime { get; private set; } = new();
         public NotifyAttr<float> SelectedAnimationMaxTime { get; private set; } = new();
@@ -49,7 +52,9 @@ namespace Editors.Shared.Core.Common.AnimationPlayer
                 SelectedMainAnimation = playerItem;
 
             OnAnimationPlayerEnabled(IsEnabled.Value);
-            asset.AnimationChanged += (x) => RefreshAssetViewModel(asset, playerItem);
+            ValueChangedDelegate<AnimationClip> handler = (x) => RefreshAssetViewModel(asset, playerItem);
+            _animationChangedHandlers.Add(handler);
+            asset.AnimationChanged += handler;
         }
 
         void RefreshAssetViewModel(SceneObject asset, AssetPlayerItem playerItem)
@@ -198,6 +203,25 @@ namespace Editors.Shared.Core.Common.AnimationPlayer
             public NotifyAttr<string> SlotName { get; internal set; } = new();
             public NotifyAttr<int> MaxFrames { get; internal set; } = new();
             public NotifyAttr<string> AnimationName { get; internal set; } = new();
+        }
+
+        public void Dispose()
+        {
+            if (_disposed)
+                return;
+            _disposed = true;
+
+            if (_selectedMainAnimation != null)
+                _selectedMainAnimation.Asset.Player.OnFrameChanged -= OnAnimationFrameChanged;
+
+            for (var i = 0; i < _assetList.Count; i++)
+            {
+                if (i < _animationChangedHandlers.Count)
+                    _assetList[i].AnimationChanged -= _animationChangedHandlers[i];
+            }
+
+            _animationChangedHandlers.Clear();
+            _assetList.Clear();
         }
     }
 }

@@ -26,7 +26,7 @@ using Shared.Ui.BaseDialogs.PackFileTree.ContextMenu.Commands;
 
 namespace AssetEditor.ViewModels
 {
-    public partial class MenuBarViewModel
+    public partial class MenuBarViewModel : IDisposable
     {
         private readonly IPackFileService _packfileService;
         private readonly ApplicationSettingsService _settingsService;
@@ -58,9 +58,19 @@ namespace AssetEditor.ViewModels
             _packFileContainerLoader = packFileContainerLoader;
             _standardDialogs = standardDialogs;
             var settings = settingsService.CurrentSettings;
-            settings.RecentPackFilePaths.CollectionChanged += (sender, args) => CreateRecentPackFilesItems();
+            settings.RecentPackFilePaths.CollectionChanged += OnRecentPackFilePathsChanged;
             CreateRecentPackFilesItems();
             CreateTools();
+        }
+
+        private void OnRecentPackFilePathsChanged(object? sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        {
+            CreateRecentPackFilesItems();
+        }
+
+        public void Dispose()
+        {
+            _settingsService.CurrentSettings.RecentPackFilePaths.CollectionChanged -= OnRecentPackFilePathsChanged;
         }
 
         [RelayCommand] private void OpenSettingsWindow() => _uiCommandFactory.Create<OpenSettingsDialogCommand>().Execute();

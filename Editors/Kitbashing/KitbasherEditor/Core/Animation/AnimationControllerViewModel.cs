@@ -16,7 +16,7 @@ using static CommonControls.FilterDialog.FilterUserControl;
 
 namespace Editors.KitbasherEditor.ViewModels
 {
-    public class AnimationControllerViewModel : NotifyPropertyChangedImpl
+    public class AnimationControllerViewModel : NotifyPropertyChangedImpl, IDisposable
     {
         private readonly IPackFileService _packFileService;
 
@@ -76,7 +76,7 @@ namespace Editors.KitbasherEditor.ViewModels
             SkeletonList = _skeletonAnimationLookUpHelper.GetAllSkeletonFileNames();
 
             _player = _kitbasherRootScene.Player;
-            _player.OnFrameChanged += (currentFrame) => CurrentFrame = currentFrame + 1;
+            _player.OnFrameChanged += OnPlayerFrameChanged;
 
             PausePlayCommand = new RelayCommand(OnPlayPause);
             NextFrameCommand = new RelayCommand(OnNextFrame);
@@ -209,6 +209,13 @@ namespace Editors.KitbasherEditor.ViewModels
          
             AnimationControllerVisability.Value = isEnabled ? Visibility.Visible: Visibility.Collapsed; 
             _player.IsEnabled = isEnabled;
+        }
+
+        private void OnPlayerFrameChanged(int currentFrame) => CurrentFrame = currentFrame + 1;
+
+        public void Dispose()
+        {
+            _player.OnFrameChanged -= OnPlayerFrameChanged;
         }
     }
 }
