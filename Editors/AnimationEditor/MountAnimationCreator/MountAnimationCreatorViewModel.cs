@@ -43,6 +43,7 @@ namespace AnimationEditor.MountAnimationCreator
         private readonly IPackFileService _pfs;
         private readonly SelectionManager _selectionManager;
         private readonly ISkeletonAnimationLookUpHelper _skeletonAnimationLookUpHelper;
+        private readonly IGlobalEventHub _globalEventHub;
 
         SceneObject _mount;
         SceneObject _rider;
@@ -86,7 +87,8 @@ namespace AnimationEditor.MountAnimationCreator
             AnimationPlayerViewModel animationPlayerViewModel,
             SceneObjectEditor sceneObjectBuilder,
             IFileSaveService fileSaveService,
-            IUiCommandFactory uiCommandFactory) : base(editorHostParameters)
+            IUiCommandFactory uiCommandFactory,
+            IGlobalEventHub globalEventHub) : base(editorHostParameters)
         {
             DisplayName = "Mount Animation Creator";
 
@@ -99,6 +101,7 @@ namespace AnimationEditor.MountAnimationCreator
 
             _skeletonAnimationLookUpHelper = skeletonAnimationLookUpHelper;
             _selectionManager = selectionManager;
+            _globalEventHub = globalEventHub;
 
             DisplayGeneratedSkeleton = new NotifyAttr<bool>(true, (value) => { if (_newAnimation != null) _newAnimation.ShowSkeleton.Value = value; });
             DisplayGeneratedMesh = new NotifyAttr<bool>(true, (value) => { if (_newAnimation?.MainNode != null) _newAnimation.ShowMesh.Value = value; });
@@ -281,14 +284,14 @@ namespace AnimationEditor.MountAnimationCreator
 
         public void CreateMountAnimationAction()
         {
-            //var newRiderAnim = CreateAnimationGenerator().GenerateMountAnimation(_mount.AnimationClip, _rider.AnimationClip);
+            var newRiderAnim = CreateAnimationGenerator().GenerateMountAnimation(_mount.AnimationClip, _rider.AnimationClip);
             //
             //// Apply
-            //_sceneObjectBuilder.CopyMeshFromOther(_newAnimation, _rider);
-            //_sceneObjectBuilder.SetAnimationClip(_newAnimation, newRiderAnim, new SkeletonAnimationLookUpHelper.AnimationReference("Generated animation", null));
-            //_newAnimation.ShowSkeleton.Value = DisplayGeneratedSkeleton.Value;
-            //_newAnimation.ShowMesh.Value = DisplayGeneratedMesh.Value;
-            //UpdateCanSaveAndPreviewStates();
+            _sceneObjectBuilder.CopyMeshFromOther(_newAnimation, _rider);
+            _sceneObjectBuilder.SetAnimationClip(_newAnimation, newRiderAnim, "Gemerated anim");
+            _newAnimation.ShowSkeleton.Value = DisplayGeneratedSkeleton.Value;
+            _newAnimation.ShowMesh.Value = DisplayGeneratedMesh.Value;
+            UpdateCanSaveAndPreviewStates();
         }
 
         MountAnimationGeneratorService CreateAnimationGenerator()
