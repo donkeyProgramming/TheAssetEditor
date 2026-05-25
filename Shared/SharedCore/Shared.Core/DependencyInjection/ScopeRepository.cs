@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Reflection;
+using System.Runtime.Intrinsics.Arm;
 using System.Text;
 using CommunityToolkit.Diagnostics;
 using Microsoft.Extensions.DependencyInjection;
@@ -88,10 +89,22 @@ namespace Shared.Core.DependencyInjection
 
         public void RemoveScope(IEditorInterface owner)
         {
-            _logger.Here().Information($"Removing scope for {owner.DisplayName} of type {owner.GetType()}");
-            var scope = _scopes[owner].Scope;
-            _scopes.Remove(owner);
-            scope.Dispose();
+           // WeakReference weak;
+            {
+                _logger.Here().Information($"Removing scope for {owner.DisplayName} of type {owner.GetType()}");
+                var scope = _scopes[owner].Scope;
+
+                //weak = new WeakReference(owner);
+
+                _scopes.Remove(owner);
+                scope.Dispose();
+            }
+
+            GC.Collect();
+            GC.WaitForPendingFinalizers();
+            GC.Collect();
+
+            //Console.WriteLine(weak.IsAlive);
         }
 
         public T GetRequiredService<T>(IEditorInterface editorHandle) where T : notnull

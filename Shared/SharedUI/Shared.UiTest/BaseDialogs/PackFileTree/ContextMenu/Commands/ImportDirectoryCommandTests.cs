@@ -1,4 +1,4 @@
-using Test.TestingUtility.TestUtility;
+﻿using Test.TestingUtility.TestUtility;
 using System.IO;
 using Moq;
 using Shared.Core.Services;

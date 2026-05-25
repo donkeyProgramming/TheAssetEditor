@@ -6,9 +6,9 @@ using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
 using Shared.Core.PackFiles.Models.Containers;
 using Shared.Core.Settings;
-using Shared.Core.ToolCreation;
 using Shared.Ui.BaseDialogs.PackFileTree;
 using Shared.Ui.BaseDialogs.PackFileTree.ContextMenu;
+using Test.TestingUtility.TestUtility;
 
 namespace Shared.UiTest.BaseDialogs.PackFileTree
 {
@@ -24,7 +24,7 @@ namespace Shared.UiTest.BaseDialogs.PackFileTree
         {
             _scopeRepo = new Mock<IScopeRepository>();
             _globalEventHub = new GlobalEventHub(_scopeRepo.Object);
-            _eventHub = new LocalScopeEventHub(_scopeRepo.Object);
+            _eventHub = new LocalScopeEventHub(_scopeRepo.Object, MockScopedLogger.Create());
 
             _packFileService = new PackFileService(_globalEventHub)
             {

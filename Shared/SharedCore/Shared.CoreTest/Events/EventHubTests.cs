@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Shared.Core.DependencyInjection;
+using Shared.Core.ErrorHandling;
 using Shared.Core.Events;
 using Test.TestingUtility.TestUtility;
 
@@ -20,6 +21,7 @@ namespace Shared.CoreTest.Events
             serviceCollection.AddScoped<IEventHub, LocalScopeEventHub>();
             serviceCollection.AddScoped<ScopedClass>();
             serviceCollection.AddScoped<ScopeToken>();
+            serviceCollection.AddScoped<IScopedLogger, ScopedLogger>();
 
             // Build first provider
             var initialServiceProvider = serviceCollection.BuildServiceProvider();
