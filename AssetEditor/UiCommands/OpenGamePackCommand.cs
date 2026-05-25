@@ -50,7 +50,7 @@ namespace AssetEditor.UiCommands
 
             using (new WaitCursor())
             {
-                var res = _packFileContainerLoader.LoadAllCaFiles(_game);
+                var res = _packFileContainerLoader.CreateFromGameEnum(PackFileContainerType.Cached, _game);
                 _packFileService.AddContainer(res);
             }
         }

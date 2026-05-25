@@ -25,7 +25,7 @@ namespace AssetEditor.UiCommands
 
             if (dialog.ShowDialog() != DialogResult.OK)
                 return;
-            var container = _packFileContainerLoader.Load(dialog.FileName);
+            var container = _packFileContainerLoader.CreateFromPackFile(PackFileContainerType.Normal, dialog.FileName, false);
             _packFileService.AddContainer(container, true);
         }
     }

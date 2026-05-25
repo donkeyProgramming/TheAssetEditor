@@ -12,23 +12,28 @@ namespace Shared.Core.PackFiles.Serialization.CacheDatabase
     internal static class PackFileContainerCacheHelper
     {
         private static readonly ILogger _logger = Logging.CreateStatic(typeof(PackFileContainerCacheHelper));
-        public static string GetCacheFilePath(string gameDataFolder, string gameName, string cacheId)
+        public static string GetCacheFilePath(string gameName, string cacheId)
         {
             var safeGameName = string.Join("_", gameName.Split(Path.GetInvalidFileNameChars()));
             return Path.Combine(DirectoryHelper.CacheDirectory, $"CachedGameFiles_{safeGameName}_{cacheId}.db");
         }
 
-        public static string ComputeFingerprint(string gameDataFolder, List<string> packFileNames)
+        public static string ComputeFingerprint(List<string> packFileNames)
         {
             using var sha = SHA256.Create();
             var sb = new StringBuilder();
 
+            if (packFileNames.Count == 0)
+                throw new Exception("Trying to compute CachecFingerPrint, but no files provied");
+
+            var foundFiles = 0;
             foreach (var packFileName in packFileNames.OrderBy(x => x, StringComparer.OrdinalIgnoreCase))
             {
-                var fullPath = Path.Combine(gameDataFolder, packFileName);
-                if (File.Exists(fullPath))
+                if (File.Exists(packFileName))
                 {
-                    var info = new FileInfo(fullPath);
+                    foundFiles++;
+
+                    var info = new FileInfo(packFileName);
                     sb.Append(packFileName);
                     sb.Append('|');
                     sb.Append(info.Length);
@@ -36,17 +41,14 @@ namespace Shared.Core.PackFiles.Serialization.CacheDatabase
                     sb.Append(info.LastWriteTimeUtc.Ticks);
                     sb.Append(';');
                 }
+                else
+                {
+                    _logger.Here().Warning($"Trying to compute CachecFingerPrint, but file {packFileName} is not found");
+                }
             }
 
-            var manifestPath = Path.Combine(gameDataFolder, "manifest.txt");
-            if (File.Exists(manifestPath))
-            {
-                var info = new FileInfo(manifestPath);
-                sb.Append("manifest.txt|");
-                sb.Append(info.Length);
-                sb.Append('|');
-                sb.Append(info.LastWriteTimeUtc.Ticks);
-            }
+            if (foundFiles == 0)
+                throw new Exception("Trying to compute CachecFingerPrint, but no files found. This will result in a default ID which can cause problems");
 
             var hash = sha.ComputeHash(Encoding.UTF8.GetBytes(sb.ToString()));
             return Convert.ToHexString(hash);

@@ -13,7 +13,7 @@ namespace Shared.TestUtility
         {
             var pfs = new PackFileService(null);
             var loader = new PackFileContainerLoader(new ApplicationSettingsService(gameTypeEnum), new Mock<IStandardDialogs>().Object, new LocalizationManager());
-            var container = loader.LoadSystemFolderAsPackFileContainer(path);
+            var container = loader.CreateFromSystemFolder(path);
             container.IsCaPackFile = true;
             pfs.AddContainer(container);
             
@@ -25,7 +25,7 @@ namespace Shared.TestUtility
             var pfs = new PackFileService(null);
             var loader = new PackFileContainerLoader(new ApplicationSettingsService(selectedGame), new Mock<IStandardDialogs>().Object, new LocalizationManager());
 
-            var container = loader.LoadSystemFolderAsPackFileContainer(PathHelper.GetDataFolder(path));
+            var container = loader.CreateFromSystemFolder(PathHelper.GetDataFolder(path));
             container.IsCaPackFile = true;
             pfs.AddContainer(container);
             return pfs;

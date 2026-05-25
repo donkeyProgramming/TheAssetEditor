@@ -45,7 +45,7 @@ namespace Editors.KitbasherEditor.DevConfig
             currentSettings.LoadCaPacksByDefault = false;
             var packFile = ResourceLoader.GetDevelopmentDataFolder() + "\\Throt.pack";
 
-            var container = _packFileContainerLoader.Load(packFile);
+            var container = _packFileContainerLoader.CreateFromPackFile(PackFileContainerType.Normal, packFile, true);
             container.IsCaPackFile = true;
             _packFileService.AddContainer(container);
         }

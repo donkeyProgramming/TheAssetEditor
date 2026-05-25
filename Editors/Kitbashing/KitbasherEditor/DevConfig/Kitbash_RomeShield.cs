@@ -33,7 +33,7 @@ namespace Editors.KitbasherEditor.DevConfig
             currentSettings.CurrentGame = GameTypeEnum.Rome2;
             var packFile = ResourceLoader.GetDevelopmentDataFolder() + "\\Rome_Man_And_Shield_Pack";
 
-            var container = _packFileContainerLoader.LoadSystemFolderAsPackFileContainer(packFile);
+            var container = _packFileContainerLoader.CreateFromSystemFolder(packFile);
             container.IsCaPackFile = true;
             _packFileService.AddContainer(container);
         }

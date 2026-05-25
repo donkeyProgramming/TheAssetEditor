@@ -11,13 +11,20 @@ using Shared.Core.Settings;
 
 namespace Shared.Core.PackFiles.Utility
 {
-    public interface IPackFileContainerLoader
+   /* public interface IPackFileContainerLoader
     {
         IPackFileContainer? Load(string packFileSystemPath);
         IPackFileContainer? LoadAllCaFiles(GameTypeEnum gameEnum);
         IPackFileContainer LoadSystemFolderAsPackFileContainer(string packFileSystemPath);
-    }
+    }*/
 
+
+
+
+
+
+
+/*
 
     public class PackFileContainerLoader : IPackFileContainerLoader
     {
@@ -251,5 +258,5 @@ namespace Shared.Core.PackFiles.Utility
 
             return caPackFileContainer;
         }
-    }
+    }*/
 }

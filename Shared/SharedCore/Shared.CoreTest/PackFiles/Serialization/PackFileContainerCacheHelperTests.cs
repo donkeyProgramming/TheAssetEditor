@@ -192,10 +192,10 @@ namespace Shared.CoreTest.PackFiles.Serialization
             Directory.CreateDirectory(packDir);
             File.WriteAllText(Path.Combine(packDir, "a.pack"), "data_a");
             File.WriteAllText(Path.Combine(packDir, "b.pack"), "data_b");
-            var packFiles = new List<string> { "a.pack", "b.pack" };
+            var packFiles = new List<string> { Path.Combine(packDir, "a.pack"), Path.Combine(packDir, "b.pack") };
 
-            var fp1 = PackFileContainerCacheHelper.ComputeFingerprint(packDir, packFiles);
-            var fp2 = PackFileContainerCacheHelper.ComputeFingerprint(packDir, packFiles);
+            var fp1 = PackFileContainerCacheHelper.ComputeFingerprint(packFiles);
+            var fp2 = PackFileContainerCacheHelper.ComputeFingerprint(packFiles);
 
             Assert.That(fp1, Is.EqualTo(fp2));
         }
@@ -206,13 +206,14 @@ namespace Shared.CoreTest.PackFiles.Serialization
             var packDir = Path.Combine(_tempDir, "gamedata2");
             Directory.CreateDirectory(packDir);
             File.WriteAllText(Path.Combine(packDir, "a.pack"), "data_a");
-            var packFiles = new List<string> { "a.pack" };
+            
+            var packFiles = new List<string> { Path.Combine(packDir,"a.pack") };
 
-            var fp1 = PackFileContainerCacheHelper.ComputeFingerprint(packDir, packFiles);
+            var fp1 = PackFileContainerCacheHelper.ComputeFingerprint(packFiles);
 
             File.WriteAllText(Path.Combine(packDir, "a.pack"), "data_a_modified_longer");
 
-            var fp2 = PackFileContainerCacheHelper.ComputeFingerprint(packDir, packFiles);
+            var fp2 = PackFileContainerCacheHelper.ComputeFingerprint(packFiles);
 
             Assert.That(fp1, Is.Not.EqualTo(fp2));
         }
@@ -417,19 +418,20 @@ namespace Shared.CoreTest.PackFiles.Serialization
         }
 
         [Test]
+
         public void ComputeFingerprint_IgnoresMissingPackFiles()
         {
             var packDir = Path.Combine(_tempDir, "partial");
             Directory.CreateDirectory(packDir);
             File.WriteAllText(Path.Combine(packDir, "exists.pack"), "data");
 
-            var packFiles = new List<string> { "exists.pack", "missing.pack" };
-            var fp = PackFileContainerCacheHelper.ComputeFingerprint(packDir, packFiles);
+            var packFiles = new List<string> { Path.Combine(packDir, "exists.pack"), Path.Combine(packDir, "missing.pack") };
+            var fp = PackFileContainerCacheHelper.ComputeFingerprint(packFiles);
 
             Assert.That(fp, Is.Not.Null.And.Not.Empty);
 
             // Same result regardless of missing file in list
-            var fp2 = PackFileContainerCacheHelper.ComputeFingerprint(packDir, new List<string> { "exists.pack", "missing.pack" });
+            var fp2 = PackFileContainerCacheHelper.ComputeFingerprint(new List<string> { Path.Combine(packDir, "exists.pack"), Path.Combine(packDir, "missing.pack") });
             Assert.That(fp, Is.EqualTo(fp2));
         }
 
@@ -442,12 +444,9 @@ namespace Shared.CoreTest.PackFiles.Serialization
             File.WriteAllText(Path.Combine(packDir, "beta.pack"), "bbb");
             File.WriteAllText(Path.Combine(packDir, "gamma.pack"), "ccc");
 
-            var fp1 = PackFileContainerCacheHelper.ComputeFingerprint(packDir,
-                new List<string> { "gamma.pack", "alpha.pack", "beta.pack" });
-            var fp2 = PackFileContainerCacheHelper.ComputeFingerprint(packDir,
-                new List<string> { "alpha.pack", "beta.pack", "gamma.pack" });
-            var fp3 = PackFileContainerCacheHelper.ComputeFingerprint(packDir,
-                new List<string> { "beta.pack", "gamma.pack", "alpha.pack" });
+            var fp1 = PackFileContainerCacheHelper.ComputeFingerprint(new List<string> { Path.Combine(packDir, "gamma.pack"), Path.Combine(packDir, "alpha.pack"), Path.Combine(packDir, "beta.pack") });
+            var fp2 = PackFileContainerCacheHelper.ComputeFingerprint(new List<string> { Path.Combine(packDir, "alpha.pack"), Path.Combine(packDir, "beta.pack"), Path.Combine(packDir, "gamma.pack") });
+            var fp3 = PackFileContainerCacheHelper.ComputeFingerprint(new List<string> { Path.Combine(packDir, "beta.pack"), Path.Combine(packDir, "gamma.pack"), Path.Combine(packDir, "alpha.pack") });
 
             Assert.That(fp1, Is.EqualTo(fp2));
             Assert.That(fp2, Is.EqualTo(fp3));
@@ -456,7 +455,7 @@ namespace Shared.CoreTest.PackFiles.Serialization
         [Test]
         public void GetCacheFilePath_SanitizesInvalidChars()
         {
-            var path = PackFileContainerCacheHelper.GetCacheFilePath(@"c:\game", "Game:Name/With<Bad>Chars", "abc123");
+            var path = PackFileContainerCacheHelper.GetCacheFilePath("Game:Name/With<Bad>Chars", "abc123");
             var fileName = Path.GetFileName(path);
 
             Assert.That(fileName.IndexOfAny(Path.GetInvalidFileNameChars()), Is.EqualTo(-1));
