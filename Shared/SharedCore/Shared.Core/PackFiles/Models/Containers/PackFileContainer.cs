@@ -53,25 +53,6 @@ namespace Shared.Core.PackFiles.Models.Containers
             return results;
         }
 
-        public List<string> GetSubDirectories(string directoryPath)
-        {
-            var prefix = string.IsNullOrEmpty(directoryPath) ? "" : directoryPath + "\\";
-            var subFolders = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-
-            foreach (var path in FileList.Keys)
-            {
-                if (!string.IsNullOrEmpty(prefix) && !path.StartsWith(prefix, StringComparison.OrdinalIgnoreCase))
-                    continue;
-
-                var remainder = string.IsNullOrEmpty(prefix) ? path : path.Substring(prefix.Length);
-                var separatorIndex = remainder.IndexOf(Path.DirectorySeparatorChar);
-                if (separatorIndex > 0)
-                    subFolders.Add(remainder.Substring(0, separatorIndex));
-            }
-
-            return subFolders.OrderBy(x => x, StringComparer.CurrentCultureIgnoreCase).ToList();
-        }
-
         public List<(string FileName, PackFile Pack)> FindAllWithExtention(string extention)
         {
             extention = extention.ToLower();

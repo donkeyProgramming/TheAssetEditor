@@ -385,12 +385,11 @@ namespace Shared.CoreTest.PackFiles.Serialization
             var loaded = PackFileContainerCacheHelper.LoadContainerFromCache(dbOptions, "fp");
             Assert.That(loaded, Is.Not.Null);
 
-            var rootContent = PackFileServiceUtility.SplitDirectoryEntries(loaded, "");
-            Assert.That(rootContent.Files.Any(f => f.FileName == "root_file.txt"), Is.True);
-            Assert.That(rootContent.SubFolders, Does.Contain("a"));
+            var rootFiles = loaded.GetDirectoryContent("");
+            Assert.That(rootFiles.Any(f => f.File.Name == "root_file.txt"), Is.True);
 
-            var deepContent = PackFileServiceUtility.SplitDirectoryEntries(loaded, "a\\b\\c");
-            Assert.That(deepContent.Files.Any(f => f.FileName == "file.txt"), Is.True);
+            var deepFiles = loaded.GetDirectoryContent("a\\b\\c");
+            Assert.That(deepFiles.Any(f => f.File.Name == "file.txt"), Is.True);
         }
 
         [Test]

@@ -243,37 +243,6 @@ namespace Shared.Core.PackFiles.Models.Containers
             return files;
         }
 
-        public List<string> GetSubDirectories(string directoryPath)
-        {
-            var prefix = string.IsNullOrEmpty(directoryPath) ? "" : directoryPath + "\\";
-            var prefixLength = prefix.Length;
-
-            List<string> folderPaths;
-            lock (_dbLock)
-            {
-                folderPaths = _db.Files
-                    .Where(f => string.IsNullOrEmpty(directoryPath)
-                        ? f.FolderPath != ""
-                        : f.FolderPath.StartsWith(prefix))
-                    .Select(f => f.FolderPath)
-                    .ToList();
-            }
-
-            return folderPaths
-                .Select(folderPath => string.IsNullOrEmpty(directoryPath)
-                    ? folderPath
-                    : folderPath.Substring(prefixLength))
-                .Select(candidate =>
-                {
-                    var separatorIndex = candidate.IndexOf('\\');
-                    return separatorIndex == -1 ? candidate : candidate.Substring(0, separatorIndex);
-                })
-                .Where(folderName => !string.IsNullOrWhiteSpace(folderName))
-                .Distinct(StringComparer.OrdinalIgnoreCase)
-                .OrderBy(x => x, StringComparer.CurrentCultureIgnoreCase)
-                .ToList();
-        }
-
         public void AddOrUpdateFile(string path, PackFile file) =>
             throw new InvalidOperationException("Cannot modify a cached CA pack file container.");
 

@@ -1,5 +1,4 @@
 using Shared.Core.PackFiles.Models.Containers;
-using Shared.Core.PackFiles.Utility;
 
 namespace Shared.CoreTest.PackFiles.Models.Containers
 {
@@ -35,11 +34,10 @@ namespace Shared.CoreTest.PackFiles.Models.Containers
         }
 
         [Test]
-        public void GetDirectoryContent_ComposesWithUtility()
+        public void GetDirectoryContent_ModelsFolder_ReturnsExpectedFiles()
         {
-            var split = PackFileServiceUtility.SplitDirectoryEntries(_container, "models");
-            Assert.That(split.Files.Any(x => x.FileName == "unit.model"), Is.True);
-            Assert.That(split.SubFolders, Does.Contain("textures"));
+            var files = _container.GetDirectoryContent("models");
+            Assert.That(files.Any(x => x.File.Name == "unit.model"), Is.True);
         }
     }
 }
