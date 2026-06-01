@@ -293,5 +293,10 @@ namespace Shared.Core.PackFiles.Models.Containers
 
             return PathNormalization.NormalizeFileName(fullPath);
         }
+
+        public SortedDictionary<string, List<string>> GetAllFilesByFolder()
+        {
+            throw new NotImplementedException();
+        }
     }
 }

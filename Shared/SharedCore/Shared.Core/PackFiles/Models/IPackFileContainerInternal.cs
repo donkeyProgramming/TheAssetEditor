@@ -17,5 +17,7 @@ namespace Shared.Core.PackFiles.Models
         List<(string FileName, PackFile Pack)> FindAllWithExtention(string extention);
         List<string> GetSubDirectories(string directoryPath);
         List<(string Path, PackFile File)> GetDirectoryContent(string directoryPath);
+
+    
     }
 }

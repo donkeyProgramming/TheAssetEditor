@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+﻿using System.Collections.Immutable;
+using System.Diagnostics;
 using Microsoft.EntityFrameworkCore;
 using Shared.Core.ErrorHandling;
 using Shared.Core.PackFiles.Models.FileSources;
@@ -131,23 +132,45 @@ namespace Shared.Core.PackFiles.Models.Containers
             return entries.Select(e => (e.RelativePath, ToPackFile(e))).ToList();
         }
 
+        public SortedDictionary<string, List<string>> GetAllFilesByFolder()
+        {
+            var time = Stopwatch.StartNew();
+            lock (_dbLock)
+            {
+
+              var rows = _db.Files
+           .Select(f => new
+           {
+               f.FolderPath,
+               f.FileName
+           })
+           .OrderBy(f => f.FolderPath)
+           .ThenBy(f => f.FileName)
+           .ToList();
+
+                var result = rows
+                    .GroupBy(f => f.FolderPath)
+                    .ToList();
+
+                var sorted = new SortedDictionary<string, List<string>>(StringComparer.InvariantCultureIgnoreCase);
+                foreach (var re in result)
+                {
+                    sorted[re.Key] = re.Select(f => f.FileName).OrderByDescending(f=>f).ToList();
+
+
+                }
+
+                _logger.Here().Information("Getting all files from cached container took {ElapsedMilliseconds} ms", time.ElapsedMilliseconds);
+                return sorted;
+            }
+        }
+
         public Dictionary<string, PackFile> GetAllFiles()
         {
             var time = Stopwatch.StartNew();
             List<CachedFileEntity> entries;
             lock (_dbLock)
             {
-              //var x = _db.Files
-              //    .GroupBy(x=>x.FolderPath)
-              //   .Select(g => new 
-              //   {
-              //       Folder = g.Key,
-              //       FileList = g.Select(x => x.FileName).ToList()
-              //   })
-              //    .ToList();
-              //    
-              //
-
                 entries = _db.Files.ToList();
             }
             _logger.Here().Information("Getting all files from cached container took {ElapsedMilliseconds} ms", time.ElapsedMilliseconds);

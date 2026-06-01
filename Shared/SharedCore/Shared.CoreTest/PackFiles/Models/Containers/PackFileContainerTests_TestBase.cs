@@ -31,36 +31,21 @@ namespace Shared.CoreTest.PackFiles.Models.Containers
             sourceContainer.SourcePackFilePaths.Add(@"c:\game\data\pack1.pack");
 
             var parent = new PackedFileSourceParent { FilePath = @"c:\game\data\pack1.pack" };
-            sourceContainer.AddOrUpdateFile("folder\\file.txt", new PackFile("file.txt",
-                new PackedFileSource(parent, 100, 200, false, false, CompressionFormat.None, 0)));
-            sourceContainer.AddOrUpdateFile("other\\data.bin", new PackFile("data.bin",
-                new PackedFileSource(parent, 300, 400, false, true, CompressionFormat.Lz4, 800)));
-            sourceContainer.AddOrUpdateFile("audio\\sound.wem", new PackFile("sound.wem",
-                new PackedFileSource(parent, 700, 500, false, false, CompressionFormat.None, 0)));
-            sourceContainer.AddOrUpdateFile("root_file.txt", new PackFile("root_file.txt",
-                new PackedFileSource(parent, 0, 10, false, false, CompressionFormat.None, 0)));
-            sourceContainer.AddOrUpdateFile("models\\unit.model", new PackFile("unit.model",
-                new PackedFileSource(parent, 10, 20, false, false, CompressionFormat.None, 0)));
-            sourceContainer.AddOrUpdateFile("models\\vehicle.model", new PackFile("vehicle.model",
-                new PackedFileSource(parent, 30, 40, false, false, CompressionFormat.None, 0)));
-            sourceContainer.AddOrUpdateFile("models\\textures\\diffuse.dds", new PackFile("diffuse.dds",
-                new PackedFileSource(parent, 70, 50, false, false, CompressionFormat.None, 0)));
-            sourceContainer.AddOrUpdateFile("models\\textures\\normal.dds", new PackFile("normal.dds",
-                new PackedFileSource(parent, 120, 60, false, false, CompressionFormat.None, 0)));
-            sourceContainer.AddOrUpdateFile("models\\textures\\specular\\gloss.dds", new PackFile("gloss.dds",
-                new PackedFileSource(parent, 180, 30, false, false, CompressionFormat.None, 0)));
-            sourceContainer.AddOrUpdateFile("audio\\music.wem", new PackFile("music.wem",
-                new PackedFileSource(parent, 210, 100, false, false, CompressionFormat.None, 0)));
-            sourceContainer.AddOrUpdateFile("audio\\battle_sound.wem", new PackFile("battle_sound.wem",
-                new PackedFileSource(parent, 400, 300, false, false, CompressionFormat.None, 0)));
-            sourceContainer.AddOrUpdateFile("scripts\\campaign_script.lua", new PackFile("campaign_script.lua",
-                new PackedFileSource(parent, 850, 80, false, false, CompressionFormat.None, 0)));
-            sourceContainer.AddOrUpdateFile("folder_a\\shared.txt", new PackFile("shared.txt",
-                new PackedFileSource(parent, 900, 10, false, false, CompressionFormat.None, 0)));
-            sourceContainer.AddOrUpdateFile("folder_b\\shared.txt", new PackFile("shared.txt",
-                new PackedFileSource(parent, 910, 20, false, false, CompressionFormat.None, 0)));
-            sourceContainer.AddOrUpdateFile("compressed\\data.bin", new PackFile("data.bin",
-                new PackedFileSource(parent, 1000, 500, true, true, CompressionFormat.Lz4, 2000)));
+            sourceContainer.AddOrUpdateFile("folder\\file.txt", new PackFile("file.txt", new PackedFileSource(parent, 100, 200, false, false, CompressionFormat.None, 0)));
+            sourceContainer.AddOrUpdateFile("other\\data.bin", new PackFile("data.bin", new PackedFileSource(parent, 300, 400, false, true, CompressionFormat.Lz4, 800)));
+            sourceContainer.AddOrUpdateFile("audio\\sound.wem", new PackFile("sound.wem", new PackedFileSource(parent, 700, 500, false, false, CompressionFormat.None, 0)));
+            sourceContainer.AddOrUpdateFile("root_file.txt", new PackFile("root_file.txt",new PackedFileSource(parent, 0, 10, false, false, CompressionFormat.None, 0)));
+            sourceContainer.AddOrUpdateFile("models\\unit.model", new PackFile("unit.model",  new PackedFileSource(parent, 10, 20, false, false, CompressionFormat.None, 0)));
+            sourceContainer.AddOrUpdateFile("models\\vehicle.model", new PackFile("vehicle.model", new PackedFileSource(parent, 30, 40, false, false, CompressionFormat.None, 0)));
+            sourceContainer.AddOrUpdateFile("models\\textures\\diffuse.dds", new PackFile("diffuse.dds",new PackedFileSource(parent, 70, 50, false, false, CompressionFormat.None, 0)));
+            sourceContainer.AddOrUpdateFile("models\\textures\\normal.dds", new PackFile("normal.dds", new PackedFileSource(parent, 120, 60, false, false, CompressionFormat.None, 0)));
+            sourceContainer.AddOrUpdateFile("models\\textures\\specular\\gloss.dds", new PackFile("gloss.dds",new PackedFileSource(parent, 180, 30, false, false, CompressionFormat.None, 0)));
+            sourceContainer.AddOrUpdateFile("audio\\music.wem", new PackFile("music.wem", new PackedFileSource(parent, 210, 100, false, false, CompressionFormat.None, 0)));
+            sourceContainer.AddOrUpdateFile("audio\\battle_sound.wem", new PackFile("battle_sound.wem", new PackedFileSource(parent, 400, 300, false, false, CompressionFormat.None, 0)));
+            sourceContainer.AddOrUpdateFile("scripts\\campaign_script.lua", new PackFile("campaign_script.lua",new PackedFileSource(parent, 850, 80, false, false, CompressionFormat.None, 0)));
+            sourceContainer.AddOrUpdateFile("folder_a\\shared.txt", new PackFile("shared.txt",new PackedFileSource(parent, 900, 10, false, false, CompressionFormat.None, 0)));
+            sourceContainer.AddOrUpdateFile("folder_b\\shared.txt", new PackFile("shared.txt", new PackedFileSource(parent, 910, 20, false, false, CompressionFormat.None, 0)));
+            sourceContainer.AddOrUpdateFile("compressed\\data.bin", new PackFile("data.bin", new PackedFileSource(parent, 1000, 500, true, true, CompressionFormat.Lz4, 2000)));
 
             if (_useCachedContainer)
             {

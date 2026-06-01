@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Runtime.InteropServices;
 using Shared.Core.PackFiles.Models;
+using SharpDX.MediaFoundation;
 
 namespace Shared.Ui.BaseDialogs.PackFileTree.Utility
 {
@@ -45,34 +47,78 @@ namespace Shared.Ui.BaseDialogs.PackFileTree.Utility
 
         public static void BuildTreeFromFiles(TreeNode root, IPackFileContainer container, bool skipWemFiles)
         {
-            var allFiles = container.GetAllFiles();
-            var filesByFolder = GroupFilesByFolder(allFiles, skipWemFiles);
-            var directoryMap = new Dictionary<PathPrefixKey, TreeNode>(filesByFolder.Count + 1, PathPrefixKeyComparer.Ordinal)
-            {
-                [PathPrefixKey.Empty] = root
-            };
-            var childrenByParent = new Dictionary<TreeNode, List<TreeNode>>(filesByFolder.Count + 1);
-            var pendingDirectories = new List<(string FolderName, PathPrefixKey FullFolderPath)>(8);
+            // Get all files sorted by folders. The result is always sorted.
+            var fileByFolders = container.GetAllFilesByFolder();
+            bool addFiles = true;
 
-            foreach (var folderPath in filesByFolder.Keys)
+            var nodeLookUp = new Dictionary<string, TreeNode>();
+
+            foreach (var folder in fileByFolders)
             {
+                var folderPath = folder.Key;
+
                 if (folderPath.Length == 0)
                     continue;
 
-                EnsureDirectoryPath(root, folderPath, directoryMap, pendingDirectories, childrenByParent);
-            }
-
-            foreach (var folderEntry in filesByFolder)
-            {
-                var parentNode = directoryMap[folderEntry.Key];
-                foreach (var file in folderEntry.Value)
+                // If this exact path already exists, skip folder creation
+                if (!nodeLookUp.ContainsKey(folderPath))
                 {
-                    var fileNode = new TreeNode(file.Name, NodeType.File, parentNode);
-                    AddChildForBuild(parentNode, fileNode, childrenByParent);
+                    // Search from the right to find the deepest existing ancestor.
+                    // Since keys are sorted, most parent paths will already be in the map.
+                    var foldersToCreate = new List<string> { folderPath };
+                    var parentNode = root;
+                    var lastSep = folderPath.LastIndexOf(Path.DirectorySeparatorChar);
+
+                    while (lastSep != -1)
+                    {
+                        var parentPath = folderPath.Substring(0, lastSep);
+                        if (nodeLookUp.TryGetValue(parentPath, out var foundNode))
+                        {
+                            parentNode = foundNode;
+                            break;
+                        }
+
+                        foldersToCreate.Add(parentPath);
+                        lastSep = parentPath.LastIndexOf(Path.DirectorySeparatorChar);
+                    }
+
+                    // Create missing folders from shallowest to deepest
+                    for (var i = foldersToCreate.Count - 1; i >= 0; i--)
+                    {
+                        var path = foldersToCreate[i];
+                        var sep = path.LastIndexOf(Path.DirectorySeparatorChar);
+                        var folderName = sep == -1 ? path : path.Substring(sep + 1);
+
+                        var newNode = new TreeNode(folderName, NodeType.Directory, parentNode);
+                        parentNode.AddChild(newNode);
+                        nodeLookUp[path] = newNode;
+                        parentNode = newNode;
+                    }
                 }
             }
 
-            FinalizeTree(root, childrenByParent);
+            // Add files after all folders have been created
+            if (addFiles)
+            {
+                foreach (var folder in fileByFolders)
+                {
+                    if (folder.Key.Length == 0)
+                    {
+                        foreach (var fileName in folder.Value)
+                        {
+                            var fileNode = new TreeNode(fileName, NodeType.File, root);
+                            root.AddChild(fileNode);
+                        }
+                    }
+
+                    var folderNode = nodeLookUp[folder.Key];
+                    foreach (var fileName in folder.Value)
+                    {
+                        var fileNode = new TreeNode(fileName, NodeType.File, folderNode);
+                        folderNode.AddChild(fileNode);
+                    }
+                }
+            }
         }
 
         private static Dictionary<PathPrefixKey, List<PackFile>> GroupFilesByFolder(Dictionary<string, PackFile> allFiles, bool skipWemFiles)

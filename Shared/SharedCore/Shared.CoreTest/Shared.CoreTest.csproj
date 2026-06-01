@@ -9,6 +9,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="PackFiles\Models\FileSources\**" />
+    <EmbeddedResource Remove="PackFiles\Models\FileSources\**" />
+    <None Remove="PackFiles\Models\FileSources\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="coverlet.collector" Version="6.0.4">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -30,10 +36,6 @@
 
   <ItemGroup>
     <Using Include="NUnit.Framework" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="PackFiles\Models\FileSources\" />
   </ItemGroup>
 
 </Project>
