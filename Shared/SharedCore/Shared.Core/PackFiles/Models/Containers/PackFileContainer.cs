@@ -296,7 +296,24 @@ namespace Shared.Core.PackFiles.Models.Containers
 
         public SortedDictionary<string, List<string>> GetAllFilesByFolder()
         {
-            throw new NotImplementedException();
+            var result = new SortedDictionary<string, List<string>>(StringComparer.InvariantCultureIgnoreCase);
+
+            foreach (var fullPath in FileList.Keys)
+            {
+                var lastSep = fullPath.LastIndexOf('\\');
+                var folder = lastSep == -1 ? string.Empty : fullPath.Substring(0, lastSep);
+                var fileName = lastSep == -1 ? fullPath : fullPath.Substring(lastSep + 1);
+
+                if (!result.TryGetValue(folder, out var files))
+                {
+                    files = new List<string>();
+                    result[folder] = files;
+                }
+
+                files.Add(fileName);
+            }
+
+            return result;
         }
     }
 }
