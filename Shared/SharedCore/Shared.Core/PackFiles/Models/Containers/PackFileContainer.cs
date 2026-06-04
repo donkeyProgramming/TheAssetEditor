@@ -1,4 +1,5 @@
 ﻿using CommunityToolkit.Diagnostics;
+using Shared.Core.ErrorHandling;
 using Shared.Core.Misc;
 using Shared.Core.PackFiles.Models.FileSources;
 using Shared.Core.PackFiles.Serialization;
@@ -9,6 +10,8 @@ namespace Shared.Core.PackFiles.Models.Containers
 {
     internal class PackFileContainer : IPackFileContainerInternal
     {
+        private static readonly ILogger _logger = Logging.Create<PackFileContainer>();    
+
         public string Name { get; set; }
         public PFHeader Header { get; set; }
         public bool IsCaPackFile { get; set; } = false;
@@ -24,7 +27,6 @@ namespace Shared.Core.PackFiles.Models.Containers
             var v = PackFileVersionConverter.ToString(PackFileVersion.PFH5);
             Header = new PFHeader(v, PackFileCAType.MOD);
         }
-
 
         public int GetFileCount() => FileList.Count;
 
@@ -98,8 +100,6 @@ namespace Shared.Core.PackFiles.Models.Containers
             results.Sort((a, b) => StringComparer.OrdinalIgnoreCase.Compare(a.Path, b.Path));
             return results;
         }
-
-
 
         public void MergePackFileContainer(PackFileContainer other)
         {
@@ -232,8 +232,21 @@ namespace Shared.Core.PackFiles.Models.Containers
 
         public virtual void SaveToDisk(string path, bool createBackup, GameInformation gameInformation)
         {
+            _logger.Here().Information("Saving pack file to disk at {Path}, createBackup = {createBackup} Game = {game}", path, createBackup, gameInformation.DisplayName);
+
             if (File.Exists(path) && DirectoryHelper.IsFileLocked(path))
-                throw new IOException($"Cannot access {path} because another process has locked it, most likely the game.");
+            {
+                var msg = $"Cannot access {path} because another process has locked it, most likely the game.";
+                _logger.Here().Error(msg);
+                throw new IOException(msg);
+            }
+
+            if (File.Exists(path + "_temp") && DirectoryHelper.IsFileLocked(path + "_temp"))
+            {
+                var msg = $"Cannot access {path + "_temp"} because another process has locked it, most likely the game.";
+                _logger.Here().Error(msg);
+                throw new IOException(msg);
+            }
 
             if (createBackup)
                 SaveUtility.CreateFileBackup(path);
@@ -253,11 +266,16 @@ namespace Shared.Core.PackFiles.Models.Containers
                 PackFileSerializerWriter.SaveToByteArray(path, this, writer, gameInformation);
             }
 
+            _logger.Here().Information("Finished writing pack file to temporary file, now replacing original file with the new one");
             File.Delete(path);
+
+            _logger.Here().Information("Original file deleted, now moving temporary file to original file path");
             File.Move(path + "_temp", path);
 
             SystemFilePath = path;
             OriginalLoadByteSize = new FileInfo(path).Length;
+
+            _logger.Here().Information("SaveToDisk completed");
         }
 
         private static string BuildPackPath(string? directoryPath, string fileName)
