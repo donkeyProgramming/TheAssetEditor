@@ -29,6 +29,9 @@ namespace Shared.CoreTest.PackFiles.Models.Containers
             ("folder_a\\shared.txt", "shared.txt", 900, 10, false, false, CompressionFormat.None, 0),
             ("folder_b\\shared.txt", "shared.txt", 910, 20, false, false, CompressionFormat.None, 0),
             ("compressed\\data.bin", "data.bin", 1000, 500, true, true, CompressionFormat.Lz4, 2000),
+            ("audio\\voice.wem_temp", "voice.wem_temp", 1500, 10, false, false, CompressionFormat.None, 0),
+            ("audio\\voice.wem.{sdf}", "voice.wem.{sdf}", 1510, 10, false, false, CompressionFormat.None, 0),
+            ("audio\\voice.txt", "voice.txt", 1520, 10, false, false, CompressionFormat.None, 0),
         ];
 
         protected PackFileContainerTests_TestBase(Type containerType)

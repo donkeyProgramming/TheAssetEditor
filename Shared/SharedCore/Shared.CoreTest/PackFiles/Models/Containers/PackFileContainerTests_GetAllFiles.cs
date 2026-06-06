@@ -14,7 +14,7 @@ namespace Shared.CoreTest.PackFiles.Models.Containers
         public void GetAllFiles_ReturnsExpectedCountAndKeys()
         {
             var files = _container.GetAllFiles();
-            Assert.That(files.Count, Is.EqualTo(15));
+            Assert.That(files.Count, Is.EqualTo(18));
             Assert.That(files.ContainsKey("folder\\file.txt"), Is.True);
             Assert.That(files.ContainsKey("scripts\\campaign_script.lua"), Is.True);
         }

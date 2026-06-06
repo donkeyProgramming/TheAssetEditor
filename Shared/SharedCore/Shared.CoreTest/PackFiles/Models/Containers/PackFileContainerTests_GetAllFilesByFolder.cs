@@ -56,7 +56,10 @@ namespace Shared.CoreTest.PackFiles.Models.Containers
             Assert.That(audioFiles, Does.Contain("sound.wem"));
             Assert.That(audioFiles, Does.Contain("music.wem"));
             Assert.That(audioFiles, Does.Contain("battle_sound.wem"));
-            Assert.That(audioFiles.Count, Is.EqualTo(3));
+            Assert.That(audioFiles, Does.Contain("voice.wem_temp"));
+            Assert.That(audioFiles, Does.Contain("voice.wem.{sdf}"));
+            Assert.That(audioFiles, Does.Contain("voice.txt"));
+            Assert.That(audioFiles.Count, Is.EqualTo(6));
         }
 
         [Test]

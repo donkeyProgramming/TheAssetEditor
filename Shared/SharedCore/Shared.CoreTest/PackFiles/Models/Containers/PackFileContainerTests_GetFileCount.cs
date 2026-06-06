@@ -11,7 +11,7 @@ namespace Shared.CoreTest.PackFiles.Models.Containers
         [Test]
         public void GetFileCount_ReturnsMasterDatasetCount()
         {
-            Assert.That(_container.GetFileCount(), Is.EqualTo(15));
+            Assert.That(_container.GetFileCount(), Is.EqualTo(18));
         }
     }
 }
