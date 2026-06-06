@@ -9,16 +9,29 @@ using Shared.Core.PackFiles.Models.FileSources;
 
 namespace Shared.Core.PackFiles.Serialization.CacheDatabase
 {
-    internal static class PackFileContainerCacheHelper
+    interface IPackFileContainerCacheHelper
     {
-        private static readonly ILogger _logger = Logging.CreateStatic(typeof(PackFileContainerCacheHelper));
-        public static string GetCacheFilePath(string gameName, string cacheId)
+        string ComputeFingerprint(List<string> packFileNames);
+        DbContextOptions<CacheDbContext> CreateDbOptions(SqliteConnection connection);
+        DbContextOptions<CacheDbContext> CreateDbOptions(string dbFilePath);
+        DbContextOptions<CacheDbContext> CreateDbOptionsFromConnectionString(string connectionString);
+        string GetCacheFilePath(string gameName, string cacheId);
+        CachedPackFileContainer? LoadContainerFromCache(DbContextOptions<CacheDbContext> dbOptions, string expectedFingerprint);
+        CachedPackFileContainer? LoadContainerFromCache(string dbFilePath, string expectedFingerprint);
+        void SaveCache(string fingerprint, PackFileContainer container, DbContextOptions<CacheDbContext> dbOptions);
+        CachedPackFileContainer? TryLoadFromCache(string cacheFilePath, string fingerprint);
+    }
+
+    class PackFileContainerCacheHelper : IPackFileContainerCacheHelper
+    {
+        private readonly ILogger _logger = Logging.Create<PackFileContainerCacheHelper>();
+        public string GetCacheFilePath(string gameName, string cacheId)
         {
             var safeGameName = string.Join("_", gameName.Split(Path.GetInvalidFileNameChars()));
             return Path.Combine(DirectoryHelper.CacheDirectory, $"CachedGameFiles_{safeGameName}_{cacheId}.db");
         }
 
-        public static string ComputeFingerprint(List<string> packFileNames)
+        public string ComputeFingerprint(List<string> packFileNames)
         {
             using var sha = SHA256.Create();
             var sb = new StringBuilder();
@@ -54,21 +67,21 @@ namespace Shared.Core.PackFiles.Serialization.CacheDatabase
             return Convert.ToHexString(hash);
         }
 
-        public static DbContextOptions<CacheDbContext> CreateDbOptions(string dbFilePath)
+        public DbContextOptions<CacheDbContext> CreateDbOptions(string dbFilePath)
         {
             return new DbContextOptionsBuilder<CacheDbContext>()
                 .UseSqlite($"Data Source={dbFilePath};Pooling=False")
                 .Options;
         }
 
-        public static DbContextOptions<CacheDbContext> CreateDbOptionsFromConnectionString(string connectionString)
+        public DbContextOptions<CacheDbContext> CreateDbOptionsFromConnectionString(string connectionString)
         {
             return new DbContextOptionsBuilder<CacheDbContext>()
                 .UseSqlite(connectionString)
                 .Options;
         }
 
-        public static DbContextOptions<CacheDbContext> CreateDbOptions(SqliteConnection connection)
+        public DbContextOptions<CacheDbContext> CreateDbOptions(SqliteConnection connection)
         {
             if (connection.State != System.Data.ConnectionState.Open)
                 connection.Open();
@@ -80,7 +93,7 @@ namespace Shared.Core.PackFiles.Serialization.CacheDatabase
 
         private const int CurrentSchemaVersion = 3;
 
-        public static void SaveCache(string fingerprint, PackFileContainer container, DbContextOptions<CacheDbContext> dbOptions)
+        public void SaveCache(string fingerprint, PackFileContainer container, DbContextOptions<CacheDbContext> dbOptions)
         {
             _logger.Here().Information($"Saving cache for '{container.Name}' with {container.GetFileCount()} files");
 
@@ -170,7 +183,7 @@ namespace Shared.Core.PackFiles.Serialization.CacheDatabase
             }
         }
 
-        private static (SqliteConnection Connection, bool ShouldDisposeConnection) GetSqliteConnection(DbContextOptions<CacheDbContext> dbOptions)
+        private (SqliteConnection Connection, bool ShouldDisposeConnection) GetSqliteConnection(DbContextOptions<CacheDbContext> dbOptions)
         {
             var relationalOptions = dbOptions.Extensions
                 .OfType<Microsoft.EntityFrameworkCore.Infrastructure.RelationalOptionsExtension>()
@@ -186,7 +199,7 @@ namespace Shared.Core.PackFiles.Serialization.CacheDatabase
             return (new SqliteConnection(connectionString), true);
         }
 
-        public static CachedPackFileContainer? LoadContainerFromCache(string dbFilePath, string expectedFingerprint)
+        public CachedPackFileContainer? LoadContainerFromCache(string dbFilePath, string expectedFingerprint)
         {
             if (!File.Exists(dbFilePath))
             {
@@ -198,7 +211,7 @@ namespace Shared.Core.PackFiles.Serialization.CacheDatabase
             return LoadContainerFromCache(dbOptions, expectedFingerprint);
         }
 
-        public static CachedPackFileContainer? LoadContainerFromCache(DbContextOptions<CacheDbContext> dbOptions, string expectedFingerprint)
+        public CachedPackFileContainer? LoadContainerFromCache(DbContextOptions<CacheDbContext> dbOptions, string expectedFingerprint)
         {
             using var db = new CacheDbContext(dbOptions);
 
@@ -244,7 +257,7 @@ namespace Shared.Core.PackFiles.Serialization.CacheDatabase
             return container;
         }
 
-        public static CachedPackFileContainer? TryLoadFromCache(string cacheFilePath, string fingerprint)
+        public CachedPackFileContainer? TryLoadFromCache(string cacheFilePath, string fingerprint)
         {
             if (!File.Exists(cacheFilePath))
             {

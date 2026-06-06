@@ -6,6 +6,7 @@ using Shared.Core.ErrorHandling.Exceptions;
 using Shared.Core.Events;
 using Shared.Core.Misc;
 using Shared.Core.PackFiles;
+using Shared.Core.PackFiles.Serialization.CacheDatabase;
 using Shared.Core.PackFiles.Utility;
 using Shared.Core.Services;
 using Shared.Core.Settings;
@@ -32,9 +33,9 @@ namespace Shared.Core
             services.AddSingleton<TouchedFilesRecorder>();
             services.AddScoped<IUiCommandFactory, UiCommandFactory>();
             services.AddScoped<CommandManager>();
-            
 
 
+          
             services.AddScoped<IEventHub, LocalScopeEventHub>();
             services.AddSingleton<IGlobalEventHub, GlobalEventHub>();
             services.AddScoped<IExceptionService, ExceptionService>();
@@ -43,6 +44,7 @@ namespace Shared.Core
 
 
             services.AddSingleton<LocalizationManager>();
+            services.AddScoped<IPackFileContainerCacheHelper, PackFileContainerCacheHelper>();
             services.AddTransient<IPackFileContainerLoader, PackFileContainerLoader>();
         }
     }

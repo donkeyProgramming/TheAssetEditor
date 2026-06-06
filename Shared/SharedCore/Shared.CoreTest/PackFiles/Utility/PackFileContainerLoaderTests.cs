@@ -1,5 +1,6 @@
 ﻿using Moq;
 using Shared.Core.Misc;
+using Shared.Core.PackFiles.Serialization.CacheDatabase;
 using Shared.Core.PackFiles.Utility;
 using Shared.Core.Services;
 using Shared.Core.Settings;
@@ -46,7 +47,7 @@ namespace Shared.CoreTest.PackFiles.Utility
                 Directory.Delete(_tempGameDir, true);
         }
 
-        private PackFileContainerLoader CreateLoader() => new PackFileContainerLoader(_settingsService, _dialogs.Object, _localizationManager);
+        private PackFileContainerLoader CreateLoader() => new PackFileContainerLoader(_settingsService, _dialogs.Object, _localizationManager, new PackFileContainerCacheHelper());
 
         [Test]
         public void LoadAllCaFiles_MissingGameDirectory_ShowsErrorAndSkipsBuild()

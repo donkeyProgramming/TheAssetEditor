@@ -1,7 +1,6 @@
 ﻿using System.Collections.Concurrent;
 using System.Reflection;
 using System.Text;
-using Microsoft.Xna.Framework;
 using Shared.Core.ErrorHandling;
 using Shared.Core.PackFiles.Models;
 using Shared.Core.PackFiles.Models.Containers;
@@ -11,8 +10,7 @@ using Shared.Core.Services;
 using Shared.Core.Settings;
 
 namespace Shared.Core.PackFiles.Utility
-{
-
+{ 
     public enum PackFileContainerType
     {
         Cached,
@@ -28,20 +26,22 @@ namespace Shared.Core.PackFiles.Utility
         IPackFileContainer CreateFromSystemFolder(string folderPath);
     }
 
-    public class PackFileContainerLoader : IPackFileContainerLoader
+    class PackFileContainerLoader : IPackFileContainerLoader
     {
         static private readonly ILogger _logger = Logging.CreateStatic(typeof(PackFileContainerLoader));
         private readonly ApplicationSettingsService _settingsService;
         private readonly IStandardDialogs _standardDialogs;
         private readonly LocalizationManager _localizationManager;
+        private readonly IPackFileContainerCacheHelper _packFileContainerCacheHelper;
 
-        public PackFileContainerLoader(ApplicationSettingsService settingsService, IStandardDialogs standardDialogs, LocalizationManager localizationManager)
+        public PackFileContainerLoader(ApplicationSettingsService settingsService, IStandardDialogs standardDialogs, LocalizationManager localizationManager, IPackFileContainerCacheHelper packFileContainerCacheHelper)
         {
             // TODO : Handle context for logger
 
             _settingsService = settingsService;
             _standardDialogs = standardDialogs;
             _localizationManager = localizationManager;
+            _packFileContainerCacheHelper = packFileContainerCacheHelper;
         }
 
         public IPackFileContainer CreateFromSystemFolder(string packFileSystemPath)
@@ -121,14 +121,13 @@ namespace Shared.Core.PackFiles.Utility
             if(type == PackFileContainerType.Cached && loadAsReadOnly == false)
                 throw new InvalidOperationException($"Cannot load as writable if loading from cache. Caching is only supported for read-only containers. PackFile {createdPackFileName}");
 
-
-            var fingerprint = PackFileContainerCacheHelper.ComputeFingerprint(fullPackFilePaths); 
+            var fingerprint = _packFileContainerCacheHelper.ComputeFingerprint(fullPackFilePaths); 
             var cachePrefix = createdPackFileName;
-            var cacheFilePath = PackFileContainerCacheHelper.GetCacheFilePath(cachePrefix, fingerprint);
+            var cacheFilePath = _packFileContainerCacheHelper.GetCacheFilePath(cachePrefix, fingerprint);
 
             if (type == PackFileContainerType.Cached)
             {
-                var cached = PackFileContainerCacheHelper.TryLoadFromCache(cacheFilePath, fingerprint);
+                var cached = _packFileContainerCacheHelper.TryLoadFromCache(cacheFilePath, fingerprint);
                 if (cached != null)
                     return cached;
 
@@ -138,12 +137,10 @@ namespace Shared.Core.PackFiles.Utility
                 //var buildingMessage = string.Format(_localizationManager.Get("PackFileCache.BuildingCache"), gameName);
                 //var cacheDescription = _localizationManager.Get("PackFileCache.Description");
                 _standardDialogs.ShowDialogBox("Failed to load from cache - make better error later");
-
             }
 
             using (_standardDialogs.ShowWaitCursor())
             {
-
                 var container = LoadPackFilesFromDisk(createdPackFileName, fullPackFilePaths, duplicateFileResolver);
                 container.Name = createdPackFileName;
                 container.IsCaPackFile = loadAsReadOnly;
@@ -151,9 +148,13 @@ namespace Shared.Core.PackFiles.Utility
 
                 if (type == PackFileContainerType.Cached)
                 {
-                    var dbOptions = PackFileContainerCacheHelper.CreateDbOptions(cacheFilePath);
-                    PackFileContainerCacheHelper.SaveCache(fingerprint, container, dbOptions);
-                    // Do we want to set it to the cached version? It should be the same data, just in a different format.
+                    var dbOptions = _packFileContainerCacheHelper.CreateDbOptions(cacheFilePath);
+                    _packFileContainerCacheHelper.SaveCache(fingerprint, container, dbOptions);
+                    var cached = _packFileContainerCacheHelper.TryLoadFromCache(cacheFilePath, fingerprint);
+                    if(cached == null)
+                        throw new Exception($"Failed to load from cache after saving cache. PackFile {createdPackFileName}");
+
+                    return cached;
                 }
 
                 return container;

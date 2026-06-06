@@ -60,9 +60,10 @@ namespace Shared.CoreTest.PackFiles.Models.Containers
                 _cacheKeepAliveConnection = new SqliteConnection(connectionString);
                 _cacheKeepAliveConnection.Open();
 
-                var dbOptions = PackFileContainerCacheHelper.CreateDbOptionsFromConnectionString(connectionString);
-                PackFileContainerCacheHelper.SaveCache("test_fp", sourceContainer, dbOptions);
-                _container = PackFileContainerCacheHelper.LoadContainerFromCache(dbOptions, "test_fp")!;
+                var cacheHelper = new PackFileContainerCacheHelper();
+                var dbOptions = cacheHelper.CreateDbOptionsFromConnectionString(connectionString);
+                cacheHelper.SaveCache("test_fp", sourceContainer, dbOptions);
+                _container = cacheHelper.LoadContainerFromCache(dbOptions, "test_fp")!;
             }
             else
             {
