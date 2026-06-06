@@ -24,6 +24,7 @@ namespace Shared.Core.PackFiles.Models.Containers
         private CacheDbContext _db;
         private readonly DbContextOptions<CacheDbContext> _dbOptions;
         private readonly object _dbLock = new();
+        private SqliteConnection? _keepAliveConnection;
 
         public CacheStorageMode StorageMode { get; }
         public string? DbFilePath { get; }
@@ -246,9 +247,76 @@ namespace Shared.Core.PackFiles.Models.Containers
             return (new SqliteConnection(connectionString), true);
         }
 
+        /// <summary>
+        /// Creates a CachedPackFileContainer from a list of file entries. Useful for testing.
+        /// </summary>
+        public static CachedPackFileContainer CreateFromFileList(
+            string containerName,
+            (string RelativePath, string FileName, long Offset, long Size, bool IsEncrypted, bool IsCompressed, CompressionFormat CompressionFormat, uint UncompressedSize)[] files,
+            bool useInMemoryDb,
+            string? dbFilePath = null,
+            string systemFilePath = "",
+            string? sourcePackFilePath = null)
+        {
+            var packParent = new PackedFileSourceParent { FilePath = sourcePackFilePath ?? @"c:\game\data\pack1.pack" };
+
+            var source = new PackFileContainer(containerName)
+            {
+                IsCaPackFile = true,
+                SystemFilePath = systemFilePath
+            };
+
+            if (sourcePackFilePath != null)
+                source.SourcePackFilePaths.Add(sourcePackFilePath);
+            else
+                source.SourcePackFilePaths.Add(packParent.FilePath);
+
+            foreach (var file in files)
+                source.AddOrUpdateFile(file.RelativePath, new PackFile(file.FileName, new PackedFileSource(packParent, file.Offset, file.Size, file.IsEncrypted, file.IsCompressed, file.CompressionFormat, file.UncompressedSize)));
+
+            DbContextOptions<CacheDbContext> dbOptions;
+            SqliteConnection? keepAlive = null;
+            if (useInMemoryDb)
+            {
+                var dbName = "CachedContainer_" + Guid.NewGuid().ToString("N");
+                var connectionString = new SqliteConnectionStringBuilder
+                {
+                    DataSource = dbName,
+                    Mode = SqliteOpenMode.Memory,
+                    Cache = SqliteCacheMode.Shared
+                }.ToString();
+
+                // Open a keep-alive connection for shared in-memory SQLite
+                keepAlive = new SqliteConnection(connectionString);
+                keepAlive.Open();
+
+                dbOptions = new DbContextOptionsBuilder<CacheDbContext>()
+                    .UseSqlite(connectionString)
+                    .Options;
+            }
+            else
+            {
+                dbOptions = new DbContextOptionsBuilder<CacheDbContext>()
+                    .UseSqlite($"Data Source={dbFilePath};Pooling=False")
+                    .Options;
+            }
+
+            var fingerprint = "factory_fp";
+            using (var temp = new CachedPackFileContainer(containerName, dbOptions))
+            {
+                temp.Save(fingerprint, source);
+            }
+
+            var result = CreateFromFingerPrint(dbOptions, fingerprint)!;
+            result._keepAliveConnection = keepAlive;
+            return result;
+        }
+
         public void Dispose()
         {
             _db.Dispose();
+            _keepAliveConnection?.Dispose();
+            _keepAliveConnection = null;
         }
 
         public int GetFileCount()
