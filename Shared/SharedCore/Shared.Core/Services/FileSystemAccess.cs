@@ -27,7 +27,37 @@ namespace Shared.Core.Services
 
         public bool FileExists(string path) => File.Exists(path);
 
+        public void FileDelete(string path)
+        {
+            File.Delete(path);
+            _logger.Here().Information($"Deleted file '{path}'");
+        }
+
+        public void FileMove(string sourceFileName, string destFileName)
+        {
+            File.Move(sourceFileName, destFileName);
+            _logger.Here().Information($"Moved file '{sourceFileName}' to '{destFileName}'");
+        }
+
         public bool DirectoryExists(string path) => Directory.Exists(path);
+
+        public void DirectoryCreateDirectory(string path)
+        {
+            Directory.CreateDirectory(path);
+            _logger.Here().Information($"Created directory '{path}'");
+        }
+
+        public void DirectoryDelete(string path, bool recursive)
+        {
+            Directory.Delete(path, recursive);
+            _logger.Here().Information($"Deleted directory '{path}' (recursive={recursive})");
+        }
+
+        public void DirectoryMove(string sourceDirName, string destDirName)
+        {
+            Directory.Move(sourceDirName, destDirName);
+            _logger.Here().Information($"Moved directory '{sourceDirName}' to '{destDirName}'");
+        }
 
         public string[] DirectoryGetFiles(string path, string searchPattern, SearchOption searchOption)
         {

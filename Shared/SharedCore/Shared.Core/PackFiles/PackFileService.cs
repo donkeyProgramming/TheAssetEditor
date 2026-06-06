@@ -161,6 +161,9 @@ namespace Shared.Core.PackFiles
 
             _logger.Here().Information($"Unloaded pack file container '{DescribeContainer(container)}'. Remaining containers: {_packFileContainers.Count}");
             _globalEventHub?.PublishGlobalEvent(new PackFileContainerRemovedEvent(container));
+
+            if (container is IDisposable disposable)
+                disposable.Dispose();
         }
 
         public List<(string FileName, PackFile Pack)> FindAllWithExtention(string extention, IPackFileContainer? pf = null)

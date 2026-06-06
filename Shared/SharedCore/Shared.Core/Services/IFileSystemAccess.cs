@@ -11,7 +11,13 @@ namespace Shared.Core.Services
         byte[] FileReadAllBytes(string path);
         bool FileExists(string path);
 
+        void FileDelete(string path);
+        void FileMove(string sourceFileName, string destFileName);
+
         bool DirectoryExists(string path);
+        void DirectoryCreateDirectory(string path);
+        void DirectoryDelete(string path, bool recursive);
+        void DirectoryMove(string sourceDirName, string destDirName);
         string[] DirectoryGetFiles(string path, string searchPattern, SearchOption searchOption);
         DirectoryInfo CreateDirectoryInfo(string path);
 

@@ -46,6 +46,7 @@ namespace Shared.Core
             services.AddSingleton<LocalizationManager>();
             services.AddScoped<IPackFileContainerCacheHelper, PackFileContainerCacheHelper>();
             services.AddTransient<IPackFileContainerLoader, PackFileContainerLoader>();
+            services.AddTransient<IFileSystemWatcher, FileSystemWatcherWrapper>();
         }
     }
 
