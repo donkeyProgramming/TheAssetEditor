@@ -1,9 +1,10 @@
-﻿using Shared.Core.PackFiles.Models;
+﻿using Microsoft.Data.Sqlite;
+using Microsoft.EntityFrameworkCore;
+using Shared.Core.PackFiles.Models;
 using Shared.Core.PackFiles.Models.Containers;
 using Shared.Core.PackFiles.Models.FileSources;
 using Shared.Core.PackFiles.Serialization.CacheDatabase;
 using Shared.Core.PackFiles.Utility;
-using Microsoft.Data.Sqlite;
 
 namespace Shared.CoreTest.PackFiles.Models.Containers
 {
@@ -78,10 +79,12 @@ namespace Shared.CoreTest.PackFiles.Models.Containers
                     keepAliveConnection = new SqliteConnection(connectionString);
                     keepAliveConnection.Open();
 
-                    var cacheHelper = new PackFileContainerCacheHelper();
-                    var dbOptions = cacheHelper.CreateDbOptionsFromConnectionString(connectionString);
-                    cacheHelper.SaveCache("variants_fp", sourceContainer, dbOptions);
-                    container = cacheHelper.LoadContainerFromCache(dbOptions, "variants_fp")!;
+                    var dbOptions = new DbContextOptionsBuilder<CacheDbContext>()
+                        .UseSqlite(connectionString)
+                        .Options;
+                    var cached = new CachedPackFileContainer("variants_cache", dbOptions);
+                    cached.Save("variants_fp", sourceContainer);
+                    container = CachedPackFileContainer.CreateFromFingerPrint(dbOptions, "variants_fp")!;
                 }
                 else
                 {

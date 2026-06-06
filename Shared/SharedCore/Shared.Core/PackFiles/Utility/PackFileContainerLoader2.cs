@@ -148,13 +148,7 @@ namespace Shared.Core.PackFiles.Utility
 
                 if (type == PackFileContainerType.Cached)
                 {
-                    var dbOptions = _packFileContainerCacheHelper.CreateDbOptions(cacheFilePath);
-                    _packFileContainerCacheHelper.SaveCache(fingerprint, container, dbOptions);
-                    var cached = _packFileContainerCacheHelper.TryLoadFromCache(cacheFilePath, fingerprint);
-                    if(cached == null)
-                        throw new Exception($"Failed to load from cache after saving cache. PackFile {createdPackFileName}");
-
-                    return cached;
+                    return _packFileContainerCacheHelper.SaveAndLoadCache(fingerprint, container, cacheFilePath);
                 }
 
                 return container;

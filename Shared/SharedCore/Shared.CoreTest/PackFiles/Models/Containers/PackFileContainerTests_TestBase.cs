@@ -1,4 +1,5 @@
 ﻿using Microsoft.Data.Sqlite;
+using Microsoft.EntityFrameworkCore;
 using Shared.Core.PackFiles.Models;
 using Shared.Core.PackFiles.Models.Containers;
 using Shared.Core.PackFiles.Models.FileSources;
@@ -60,10 +61,12 @@ namespace Shared.CoreTest.PackFiles.Models.Containers
                 _cacheKeepAliveConnection = new SqliteConnection(connectionString);
                 _cacheKeepAliveConnection.Open();
 
-                var cacheHelper = new PackFileContainerCacheHelper();
-                var dbOptions = cacheHelper.CreateDbOptionsFromConnectionString(connectionString);
-                cacheHelper.SaveCache("test_fp", sourceContainer, dbOptions);
-                _container = cacheHelper.LoadContainerFromCache(dbOptions, "test_fp")!;
+                var dbOptions = new DbContextOptionsBuilder<CacheDbContext>()
+                    .UseSqlite(connectionString)
+                    .Options;
+                var cached = new CachedPackFileContainer("test_cache", dbOptions);
+                cached.Save("test_fp", sourceContainer);
+                _container = CachedPackFileContainer.CreateFromFingerPrint(dbOptions, "test_fp")!;
             }
             else
             {

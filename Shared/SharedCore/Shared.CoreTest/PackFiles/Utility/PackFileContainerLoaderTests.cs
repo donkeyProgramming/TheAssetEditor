@@ -1,6 +1,5 @@
 ﻿using Moq;
 using Shared.Core.Misc;
-using Shared.Core.PackFiles.Serialization.CacheDatabase;
 using Shared.Core.PackFiles.Utility;
 using Shared.Core.Services;
 using Shared.Core.Settings;
@@ -15,12 +14,11 @@ namespace Shared.CoreTest.PackFiles.Utility
         private Mock<IWaitCursor> _waitCursor;
         private LocalizationManager _localizationManager;
         private ApplicationSettingsService _settingsService;
+        private InMemoryPackFileContainerCacheHelper _cacheHelper;
 
         [SetUp]
         public void Setup()
         {
-            DirectoryHelper.EnsureCreated();
-
             _tempGameDir = Path.Combine(Path.GetTempPath(), "AE_LoaderTest_" + Guid.NewGuid().ToString("N"));
             Directory.CreateDirectory(_tempGameDir);
 
@@ -38,16 +36,20 @@ namespace Shared.CoreTest.PackFiles.Utility
 
             _settingsService = new ApplicationSettingsService(GameTypeEnum.Warhammer3);
             _settingsService.CurrentSettings.GameDirectories.Add(new ApplicationSettings.GamePathPair(GameTypeEnum.Warhammer3, _tempGameDir));
+
+            _cacheHelper = new InMemoryPackFileContainerCacheHelper();
         }
 
         [TearDown]
         public void TearDown()
         {
+            _cacheHelper.Dispose();
+
             if (Directory.Exists(_tempGameDir))
                 Directory.Delete(_tempGameDir, true);
         }
 
-        private PackFileContainerLoader CreateLoader() => new PackFileContainerLoader(_settingsService, _dialogs.Object, _localizationManager, new PackFileContainerCacheHelper());
+        private PackFileContainerLoader CreateLoader() => new PackFileContainerLoader(_settingsService, _dialogs.Object, _localizationManager, _cacheHelper);
 
         [Test]
         public void LoadAllCaFiles_MissingGameDirectory_ShowsErrorAndSkipsBuild()
@@ -105,17 +107,11 @@ namespace Shared.CoreTest.PackFiles.Utility
             var firstResult = loader.CreateFromGameEnum(PackFileContainerType.Cached, GameTypeEnum.Warhammer3);
             Assert.That(firstResult, Is.Not.Null);
 
-            // Find and corrupt the cache file
-            var cacheDir = DirectoryHelper.CacheDirectory;
-            var cacheFiles = Directory.GetFiles(cacheDir, "*.db", SearchOption.AllDirectories);
-            Assert.That(cacheFiles.Length, Is.GreaterThan(0), "Cache file should have been created");
-
-            // Corrupt all matching cache files
-            foreach (var cacheFile in cacheFiles)
-            {
-                if (cacheFile.Contains("Warhammer"))
-                    File.WriteAllText(cacheFile, "CORRUPTED DATA");
-            }
+            // Corrupt the cache via the in-memory helper
+            var packFiles = Directory.GetFiles(_tempGameDir, "*.pack").ToList();
+            var fingerprint = _cacheHelper.ComputeFingerprint(packFiles);
+            var cacheFilePath = _cacheHelper.GetCacheFilePath("All Game Packs - Warhammer III", fingerprint);
+            _cacheHelper.CorruptCache(cacheFilePath);
 
             _dialogs.Invocations.Clear();
 
