@@ -13,7 +13,7 @@
                 {
                     var items = line.Split('\t');
                     if (items[0].Contains(".pack"))
-                        output.Add(items[0].Trim());
+                        output.Add(Path.Combine(gameDataFolder, items[0].Trim()));
                 }
                 manifestFileFound = true;
                 return output;
@@ -21,8 +21,7 @@
             else
             {
                 var files = Directory.GetFiles(gameDataFolder)
-                    .Where(x => Path.GetExtension(x) == ".pack")
-                    .Select(x => Path.GetFileName(x))
+                    .Where(x => Path.GetExtension(x).ToLower() == ".pack")
                     .ToList();
 
                 manifestFileFound = false;

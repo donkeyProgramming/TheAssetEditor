@@ -2,34 +2,8 @@
 
 namespace Shared.Core.PackFiles.Utility
 {
-    public sealed record DirectoryFileEntry(string FileName, PackFile File);
-
-    public sealed record DirectoryEntriesSplitResult(
-        string DirectoryPath,
-        IReadOnlyList<string> SubFolders,
-        IReadOnlyList<DirectoryFileEntry> Files);
-
     public static class PackFileServiceUtility
     {
-        public static DirectoryEntriesSplitResult SplitDirectoryEntries(IPackFileContainer container, string directoryPath)
-        {
-            var packFileContainerInternal = PackFileService.CastContainer(container);
-
-            var files = packFileContainerInternal.GetDirectoryContent(directoryPath)
-                .Select(entry => new DirectoryFileEntry(entry.File.Name, entry.File))
-                .OrderBy(x => x.FileName, StringComparer.CurrentCultureIgnoreCase)
-                .ToList();
-
-            var subFolders = packFileContainerInternal.GetSubDirectories(directoryPath)
-                .OrderBy(x => x, StringComparer.CurrentCultureIgnoreCase)
-                .ToList();
-
-            return new DirectoryEntriesSplitResult(
-                directoryPath,
-                subFolders,
-                files);
-        }
-
         public static List<PackFile> GetAllAnimPacks(IPackFileService pfs)
         {
             var animPacks = FindAllWithExtention(pfs, @".animpack");

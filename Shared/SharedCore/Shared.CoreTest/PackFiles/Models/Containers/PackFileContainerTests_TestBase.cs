@@ -1,8 +1,6 @@
-﻿using Microsoft.Data.Sqlite;
-using Shared.Core.PackFiles.Models;
+﻿using Shared.Core.PackFiles.Models;
 using Shared.Core.PackFiles.Models.Containers;
 using Shared.Core.PackFiles.Models.FileSources;
-using Shared.Core.PackFiles.Serialization.CacheDatabase;
 using Shared.Core.PackFiles.Utility;
 
 namespace Shared.CoreTest.PackFiles.Models.Containers
@@ -11,9 +9,30 @@ namespace Shared.CoreTest.PackFiles.Models.Containers
     {
         private readonly bool _useCachedContainer;
 
-        private SqliteConnection? _cacheKeepAliveConnection;
         protected IPackFileContainerInternal _container = null!;
         protected bool IsCachedContainer => _useCachedContainer;
+
+        protected static readonly (string RelativePath, string FileName, long Offset, long Size, bool IsEncrypted, bool IsCompressed, CompressionFormat CompressionFormat, uint UncompressedSize)[] TestFiles =
+        [
+            ("folder\\file.txt", "file.txt", 100, 200, false, false, CompressionFormat.None, 0),
+            ("other\\data.bin", "data.bin", 300, 400, false, true, CompressionFormat.Lz4, 800),
+            ("audio\\sound.wem", "sound.wem", 700, 500, false, false, CompressionFormat.None, 0),
+            ("root_file.txt", "root_file.txt", 0, 10, false, false, CompressionFormat.None, 0),
+            ("models\\unit.model", "unit.model", 10, 20, false, false, CompressionFormat.None, 0),
+            ("models\\vehicle.model", "vehicle.model", 30, 40, false, false, CompressionFormat.None, 0),
+            ("models\\textures\\diffuse.dds", "diffuse.dds", 70, 50, false, false, CompressionFormat.None, 0),
+            ("models\\textures\\normal.dds", "normal.dds", 120, 60, false, false, CompressionFormat.None, 0),
+            ("models\\textures\\specular\\gloss.dds", "gloss.dds", 180, 30, false, false, CompressionFormat.None, 0),
+            ("audio\\music.wem", "music.wem", 210, 100, false, false, CompressionFormat.None, 0),
+            ("audio\\battle_sound.wem", "battle_sound.wem", 400, 300, false, false, CompressionFormat.None, 0),
+            ("scripts\\campaign_script.lua", "campaign_script.lua", 850, 80, false, false, CompressionFormat.None, 0),
+            ("folder_a\\shared.txt", "shared.txt", 900, 10, false, false, CompressionFormat.None, 0),
+            ("folder_b\\shared.txt", "shared.txt", 910, 20, false, false, CompressionFormat.None, 0),
+            ("compressed\\data.bin", "data.bin", 1000, 500, true, true, CompressionFormat.Lz4, 2000),
+            ("audio\\voice.wem_temp", "voice.wem_temp", 1500, 10, false, false, CompressionFormat.None, 0),
+            ("audio\\voice.wem.{sdf}", "voice.wem.{sdf}", 1510, 10, false, false, CompressionFormat.None, 0),
+            ("audio\\voice.txt", "voice.txt", 1520, 10, false, false, CompressionFormat.None, 0),
+        ];
 
         protected PackFileContainerTests_TestBase(Type containerType)
         {
@@ -23,64 +42,23 @@ namespace Shared.CoreTest.PackFiles.Models.Containers
         [SetUp]
         public void Setup()
         {
-            var sourceContainer = new PackFileContainer("TestCache")
-            {
-                IsCaPackFile = true,
-                SystemFilePath = @"c:\game\data"
-            };
-            sourceContainer.SourcePackFilePaths.Add(@"c:\game\data\pack1.pack");
-
-            var parent = new PackedFileSourceParent { FilePath = @"c:\game\data\pack1.pack" };
-            sourceContainer.AddOrUpdateFile("folder\\file.txt", new PackFile("file.txt",
-                new PackedFileSource(parent, 100, 200, false, false, CompressionFormat.None, 0)));
-            sourceContainer.AddOrUpdateFile("other\\data.bin", new PackFile("data.bin",
-                new PackedFileSource(parent, 300, 400, false, true, CompressionFormat.Lz4, 800)));
-            sourceContainer.AddOrUpdateFile("audio\\sound.wem", new PackFile("sound.wem",
-                new PackedFileSource(parent, 700, 500, false, false, CompressionFormat.None, 0)));
-            sourceContainer.AddOrUpdateFile("root_file.txt", new PackFile("root_file.txt",
-                new PackedFileSource(parent, 0, 10, false, false, CompressionFormat.None, 0)));
-            sourceContainer.AddOrUpdateFile("models\\unit.model", new PackFile("unit.model",
-                new PackedFileSource(parent, 10, 20, false, false, CompressionFormat.None, 0)));
-            sourceContainer.AddOrUpdateFile("models\\vehicle.model", new PackFile("vehicle.model",
-                new PackedFileSource(parent, 30, 40, false, false, CompressionFormat.None, 0)));
-            sourceContainer.AddOrUpdateFile("models\\textures\\diffuse.dds", new PackFile("diffuse.dds",
-                new PackedFileSource(parent, 70, 50, false, false, CompressionFormat.None, 0)));
-            sourceContainer.AddOrUpdateFile("models\\textures\\normal.dds", new PackFile("normal.dds",
-                new PackedFileSource(parent, 120, 60, false, false, CompressionFormat.None, 0)));
-            sourceContainer.AddOrUpdateFile("models\\textures\\specular\\gloss.dds", new PackFile("gloss.dds",
-                new PackedFileSource(parent, 180, 30, false, false, CompressionFormat.None, 0)));
-            sourceContainer.AddOrUpdateFile("audio\\music.wem", new PackFile("music.wem",
-                new PackedFileSource(parent, 210, 100, false, false, CompressionFormat.None, 0)));
-            sourceContainer.AddOrUpdateFile("audio\\battle_sound.wem", new PackFile("battle_sound.wem",
-                new PackedFileSource(parent, 400, 300, false, false, CompressionFormat.None, 0)));
-            sourceContainer.AddOrUpdateFile("scripts\\campaign_script.lua", new PackFile("campaign_script.lua",
-                new PackedFileSource(parent, 850, 80, false, false, CompressionFormat.None, 0)));
-            sourceContainer.AddOrUpdateFile("folder_a\\shared.txt", new PackFile("shared.txt",
-                new PackedFileSource(parent, 900, 10, false, false, CompressionFormat.None, 0)));
-            sourceContainer.AddOrUpdateFile("folder_b\\shared.txt", new PackFile("shared.txt",
-                new PackedFileSource(parent, 910, 20, false, false, CompressionFormat.None, 0)));
-            sourceContainer.AddOrUpdateFile("compressed\\data.bin", new PackFile("data.bin",
-                new PackedFileSource(parent, 1000, 500, true, true, CompressionFormat.Lz4, 2000)));
-
             if (_useCachedContainer)
             {
-                var dbName = "CachedContainerTests_" + Guid.NewGuid().ToString("N");
-                var connectionString = new SqliteConnectionStringBuilder
-                {
-                    DataSource = dbName,
-                    Mode = SqliteOpenMode.Memory,
-                    Cache = SqliteCacheMode.Shared
-                }.ToString();
-
-                _cacheKeepAliveConnection = new SqliteConnection(connectionString);
-                _cacheKeepAliveConnection.Open();
-
-                var dbOptions = PackFileContainerCacheHelper.CreateDbOptionsFromConnectionString(connectionString);
-                PackFileContainerCacheHelper.SaveCache("test_fp", sourceContainer, dbOptions);
-                _container = PackFileContainerCacheHelper.LoadContainerFromCache(dbOptions, "test_fp")!;
+                _container = CachedPackFileContainer.CreateFromFileList("TestCache", TestFiles, useInMemoryDb: true, systemFilePath: @"c:\game\data", sourcePackFilePath: @"c:\game\data\pack1.pack");
             }
             else
             {
+                var parent = new PackedFileSourceParent { FilePath = @"c:\game\data\pack1.pack" };
+                var sourceContainer = new PackFileContainer("TestCache")
+                {
+                    IsCaPackFile = true,
+                    SystemFilePath = @"c:\game\data"
+                };
+                sourceContainer.SourcePackFilePaths.Add(@"c:\game\data\pack1.pack");
+
+                foreach (var file in TestFiles)
+                    sourceContainer.AddOrUpdateFile(file.RelativePath, new PackFile(file.FileName, new PackedFileSource(parent, file.Offset, file.Size, file.IsEncrypted, file.IsCompressed, file.CompressionFormat, file.UncompressedSize)));
+
                 _container = sourceContainer;
             }
         }
@@ -88,8 +66,7 @@ namespace Shared.CoreTest.PackFiles.Models.Containers
         [TearDown]
         public void TearDown()
         {
-            _cacheKeepAliveConnection?.Dispose();
-            _cacheKeepAliveConnection = null;
+            (_container as IDisposable)?.Dispose();
         }
 
         protected void IgnoreIfNotCached(string scenario)

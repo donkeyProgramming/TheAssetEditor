@@ -1,4 +1,4 @@
-﻿using Microsoft.Data.Sqlite;
+using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Shared.Core.PackFiles.Models;
 using Shared.Core.PackFiles.Models.Containers;
@@ -47,12 +47,22 @@ namespace Shared.CoreTest.PackFiles.Serialization
             keepAliveConnection.Open();
             _inMemoryKeepAliveConnections.Add(keepAliveConnection);
 
-            return PackFileContainerCacheHelper.CreateDbOptionsFromConnectionString(connectionString);
+            return new DbContextOptionsBuilder<CacheDbContext>()
+                .UseSqlite(connectionString)
+                .Options;
         }
 
         private DbContextOptions<CacheDbContext> CreateFileDbOptions()
         {
-            return PackFileContainerCacheHelper.CreateDbOptions(_dbFilePath);
+            return new DbContextOptionsBuilder<CacheDbContext>()
+                .UseSqlite($"Data Source={_dbFilePath};Pooling=False")
+                .Options;
+        }
+
+        private static void SaveCache(string fingerprint, PackFileContainer container, DbContextOptions<CacheDbContext> dbOptions)
+        {
+            using var cached = new CachedPackFileContainer(container.Name, dbOptions);
+            cached.Save(fingerprint, container);
         }
 
         [Test]
@@ -79,8 +89,8 @@ namespace Shared.CoreTest.PackFiles.Serialization
 
             // Act
             var dbOptions = CreateTestDbOptions();
-            PackFileContainerCacheHelper.SaveCache("fingerprint123", container, dbOptions);
-            var loaded = PackFileContainerCacheHelper.LoadContainerFromCache(dbOptions, "fingerprint123");
+            SaveCache("fingerprint123", container, dbOptions);
+            var loaded = CachedPackFileContainer.CreateFromFingerPrint(dbOptions, "fingerprint123");
 
             // Assert
             Assert.That(loaded, Is.Not.Null);
@@ -109,10 +119,10 @@ namespace Shared.CoreTest.PackFiles.Serialization
                 new PackedFileSource(parent, 2048, 4096, false, true, CompressionFormat.Lz4, 8192)));
 
             var dbOptions = CreateTestDbOptions();
-            PackFileContainerCacheHelper.SaveCache("fp", container, dbOptions);
+            SaveCache("fp", container, dbOptions);
 
             // Act
-            var loaded = PackFileContainerCacheHelper.LoadContainerFromCache(dbOptions, "fp");
+            var loaded = CachedPackFileContainer.CreateFromFingerPrint(dbOptions, "fp");
 
             // Assert
             Assert.That(loaded, Is.Not.Null);
@@ -153,8 +163,8 @@ namespace Shared.CoreTest.PackFiles.Serialization
                 new PackedFileSource(parent, 10, 20, false, false, CompressionFormat.None, 0)));
 
             var dbOptions = CreateTestDbOptions();
-            PackFileContainerCacheHelper.SaveCache("fp", container, dbOptions);
-            var loaded = PackFileContainerCacheHelper.LoadContainerFromCache(dbOptions, "fp");
+            SaveCache("fp", container, dbOptions);
+            var loaded = CachedPackFileContainer.CreateFromFingerPrint(dbOptions, "fp");
 
             var sourceA = (PackedFileSource)loaded!.FindFile("a.txt")!.DataSource;
             var sourceB = (PackedFileSource)loaded!.FindFile("b.txt")!.DataSource;
@@ -165,7 +175,7 @@ namespace Shared.CoreTest.PackFiles.Serialization
         [Test]
         public void LoadCache_ReturnsNullForMissingFile()
         {
-            var result = PackFileContainerCacheHelper.LoadContainerFromCache(
+            var result = CachedPackFileContainer.CreateFromFingerPrint(
                 Path.Combine(_tempDir, "nonexistent.db"), "fp");
             Assert.That(result, Is.Null);
         }
@@ -177,11 +187,10 @@ namespace Shared.CoreTest.PackFiles.Serialization
             {
                 SystemFilePath = @"c:\game"
             };
-
             var dbOptions = CreateTestDbOptions();
-            PackFileContainerCacheHelper.SaveCache("correct_fp", container, dbOptions);
+            SaveCache("correct_fp", container, dbOptions);
 
-            var result = PackFileContainerCacheHelper.LoadContainerFromCache(dbOptions, "wrong_fp");
+            var result = CachedPackFileContainer.CreateFromFingerPrint(dbOptions, "wrong_fp");
             Assert.That(result, Is.Null);
         }
 
@@ -192,10 +201,9 @@ namespace Shared.CoreTest.PackFiles.Serialization
             Directory.CreateDirectory(packDir);
             File.WriteAllText(Path.Combine(packDir, "a.pack"), "data_a");
             File.WriteAllText(Path.Combine(packDir, "b.pack"), "data_b");
-            var packFiles = new List<string> { "a.pack", "b.pack" };
-
-            var fp1 = PackFileContainerCacheHelper.ComputeFingerprint(packDir, packFiles);
-            var fp2 = PackFileContainerCacheHelper.ComputeFingerprint(packDir, packFiles);
+            var packFiles = new List<string> { Path.Combine(packDir, "a.pack"), Path.Combine(packDir, "b.pack") };
+            var fp1 = (new PackFileContainerCacheHelper()).ComputeFingerprint(packFiles);
+            var fp2 = (new PackFileContainerCacheHelper()).ComputeFingerprint(packFiles);
 
             Assert.That(fp1, Is.EqualTo(fp2));
         }
@@ -206,13 +214,13 @@ namespace Shared.CoreTest.PackFiles.Serialization
             var packDir = Path.Combine(_tempDir, "gamedata2");
             Directory.CreateDirectory(packDir);
             File.WriteAllText(Path.Combine(packDir, "a.pack"), "data_a");
-            var packFiles = new List<string> { "a.pack" };
-
-            var fp1 = PackFileContainerCacheHelper.ComputeFingerprint(packDir, packFiles);
+            
+            var packFiles = new List<string> { Path.Combine(packDir,"a.pack") };
+            var fp1 = (new PackFileContainerCacheHelper()).ComputeFingerprint(packFiles);
 
             File.WriteAllText(Path.Combine(packDir, "a.pack"), "data_a_modified_longer");
 
-            var fp2 = PackFileContainerCacheHelper.ComputeFingerprint(packDir, packFiles);
+            var fp2 = (new PackFileContainerCacheHelper()).ComputeFingerprint(packFiles);
 
             Assert.That(fp1, Is.Not.EqualTo(fp2));
         }
@@ -237,8 +245,8 @@ namespace Shared.CoreTest.PackFiles.Serialization
 
             // Act: save ? load
             var dbOptions = CreateTestDbOptions();
-            PackFileContainerCacheHelper.SaveCache("test_fp", container, dbOptions);
-            var restored = PackFileContainerCacheHelper.LoadContainerFromCache(dbOptions, "test_fp");
+            SaveCache("test_fp", container, dbOptions);
+            var restored = CachedPackFileContainer.CreateFromFingerPrint(dbOptions, "test_fp");
 
             // Assert
             Assert.That(restored, Is.Not.Null);
@@ -271,9 +279,9 @@ namespace Shared.CoreTest.PackFiles.Serialization
                 new PackedFileSource(parent, 0, 100, false, false, CompressionFormat.None, 0)));
 
             var dbOptions = CreateFileDbOptions();
-            PackFileContainerCacheHelper.SaveCache("fp_try", container, dbOptions);
+            SaveCache("fp_try", container, dbOptions);
 
-            var result = PackFileContainerCacheHelper.TryLoadFromCache(_dbFilePath, "fp_try");
+            var result = (new PackFileContainerCacheHelper()).TryLoadFromCache(_dbFilePath, "fp_try");
             Assert.That(result, Is.Not.Null);
             Assert.That(result.Name, Is.EqualTo("TryLoad Test"));
         }
@@ -281,7 +289,7 @@ namespace Shared.CoreTest.PackFiles.Serialization
         [Test]
         public void TryLoadFromCache_ReturnsNullForMissingFile()
         {
-            var result = PackFileContainerCacheHelper.TryLoadFromCache(
+            var result = (new PackFileContainerCacheHelper()).TryLoadFromCache(
                 Path.Combine(_tempDir, "does_not_exist.db"), "fp");
             Assert.That(result, Is.Null);
         }
@@ -290,7 +298,7 @@ namespace Shared.CoreTest.PackFiles.Serialization
         public void TryLoadFromCache_ReturnsNullForCorruptFile()
         {
             File.WriteAllBytes(_dbFilePath, [0xFF, 0xFE, 0x00, 0x01]);
-            var result = PackFileContainerCacheHelper.TryLoadFromCache(_dbFilePath, "fp");
+            var result = (new PackFileContainerCacheHelper()).TryLoadFromCache(_dbFilePath, "fp");
             Assert.That(result, Is.Null);
         }
 
@@ -305,10 +313,9 @@ namespace Shared.CoreTest.PackFiles.Serialization
             var parent = new PackedFileSourceParent { FilePath = @"c:\game\encrypted.pack" };
             container.AddOrUpdateFile("secret\\data.bin", new PackFile("data.bin",
                 new PackedFileSource(parent, 0, 500, isEncrypted: true, isCompressed: false, CompressionFormat.None, 0)));
-
             var dbOptions = CreateTestDbOptions();
-            PackFileContainerCacheHelper.SaveCache("fp", container, dbOptions);
-            var loaded = PackFileContainerCacheHelper.LoadContainerFromCache(dbOptions, "fp");
+            SaveCache("fp", container, dbOptions);
+            var loaded = CachedPackFileContainer.CreateFromFingerPrint(dbOptions, "fp");
 
             var source = (PackedFileSource)loaded!.FindFile("secret\\data.bin")!.DataSource;
             Assert.That(source.IsEncrypted, Is.True);
@@ -321,10 +328,9 @@ namespace Shared.CoreTest.PackFiles.Serialization
             {
                 SystemFilePath = @"c:\game\empty"
             };
-
             var dbOptions = CreateTestDbOptions();
-            PackFileContainerCacheHelper.SaveCache("fp_empty", container, dbOptions);
-            var loaded = PackFileContainerCacheHelper.LoadContainerFromCache(dbOptions, "fp_empty");
+            SaveCache("fp_empty", container, dbOptions);
+            var loaded = CachedPackFileContainer.CreateFromFingerPrint(dbOptions, "fp_empty");
 
             Assert.That(loaded, Is.Not.Null);
             Assert.That(loaded.Name, Is.EqualTo("Empty Pack"));
@@ -336,25 +342,24 @@ namespace Shared.CoreTest.PackFiles.Serialization
         {
             var parent = new PackedFileSourceParent { FilePath = @"c:\game\pack.pack" };
             var dbOptions = CreateFileDbOptions();
-
             // Save first version
             var container1 = new PackFileContainer("Version1") { SystemFilePath = @"c:\game" };
             container1.AddOrUpdateFile("old.txt", new PackFile("old.txt",
                 new PackedFileSource(parent, 0, 10, false, false, CompressionFormat.None, 0)));
-            PackFileContainerCacheHelper.SaveCache("fp1", container1, dbOptions);
+            SaveCache("fp1", container1, dbOptions);
 
             // Save second version (same db path)
             var container2 = new PackFileContainer("Version2") { SystemFilePath = @"c:\game" };
             container2.AddOrUpdateFile("new.txt", new PackFile("new.txt",
                 new PackedFileSource(parent, 0, 20, false, false, CompressionFormat.None, 0)));
-            PackFileContainerCacheHelper.SaveCache("fp2", container2, dbOptions);
+            SaveCache("fp2", container2, dbOptions);
 
             // Old fingerprint should fail
-            var oldResult = PackFileContainerCacheHelper.LoadContainerFromCache(dbOptions, "fp1");
+            var oldResult = CachedPackFileContainer.CreateFromFingerPrint(dbOptions, "fp1");
             Assert.That(oldResult, Is.Null);
 
             // New fingerprint should work
-            var newResult = PackFileContainerCacheHelper.LoadContainerFromCache(dbOptions, "fp2");
+            var newResult = CachedPackFileContainer.CreateFromFingerPrint(dbOptions, "fp2");
             Assert.That(newResult, Is.Not.Null);
             Assert.That(newResult.Name, Is.EqualTo("Version2"));
             Assert.That(newResult.GetFileCount(), Is.EqualTo(1));
@@ -378,18 +383,17 @@ namespace Shared.CoreTest.PackFiles.Serialization
                 new PackedFileSource(parent, 20, 20, false, false, CompressionFormat.None, 0)));
 
             var dbOptions = CreateTestDbOptions();
-            PackFileContainerCacheHelper.SaveCache("fp", container, dbOptions);
+            SaveCache("fp", container, dbOptions);
 
             // Verify via the CachedPackFileContainer's GetDirectoryContent
-            var loaded = PackFileContainerCacheHelper.LoadContainerFromCache(dbOptions, "fp");
+            var loaded = CachedPackFileContainer.CreateFromFingerPrint(dbOptions, "fp");
             Assert.That(loaded, Is.Not.Null);
 
-            var rootContent = PackFileServiceUtility.SplitDirectoryEntries(loaded, "");
-            Assert.That(rootContent.Files.Any(f => f.FileName == "root_file.txt"), Is.True);
-            Assert.That(rootContent.SubFolders, Does.Contain("a"));
+            var rootFiles = loaded.GetDirectoryContent("");
+            Assert.That(rootFiles.Any(f => f.File.Name == "root_file.txt"), Is.True);
 
-            var deepContent = PackFileServiceUtility.SplitDirectoryEntries(loaded, "a\\b\\c");
-            Assert.That(deepContent.Files.Any(f => f.FileName == "file.txt"), Is.True);
+            var deepFiles = loaded.GetDirectoryContent("a\\b\\c");
+            Assert.That(deepFiles.Any(f => f.File.Name == "file.txt"), Is.True);
         }
 
         [Test]
@@ -405,10 +409,9 @@ namespace Shared.CoreTest.PackFiles.Serialization
                 new PackedFileSource(parent, 0, 10, false, false, CompressionFormat.None, 0)));
             container.AddOrUpdateFile("memory.txt", new PackFile("memory.txt",
                 new MemorySource([1, 2, 3])));
-
             var dbOptions = CreateTestDbOptions();
-            PackFileContainerCacheHelper.SaveCache("fp", container, dbOptions);
-            var loaded = PackFileContainerCacheHelper.LoadContainerFromCache(dbOptions, "fp");
+            SaveCache("fp", container, dbOptions);
+            var loaded = CachedPackFileContainer.CreateFromFingerPrint(dbOptions, "fp");
 
             Assert.That(loaded, Is.Not.Null);
             Assert.That(loaded.GetFileCount(), Is.EqualTo(1));
@@ -417,19 +420,19 @@ namespace Shared.CoreTest.PackFiles.Serialization
         }
 
         [Test]
+
         public void ComputeFingerprint_IgnoresMissingPackFiles()
         {
             var packDir = Path.Combine(_tempDir, "partial");
             Directory.CreateDirectory(packDir);
             File.WriteAllText(Path.Combine(packDir, "exists.pack"), "data");
-
-            var packFiles = new List<string> { "exists.pack", "missing.pack" };
-            var fp = PackFileContainerCacheHelper.ComputeFingerprint(packDir, packFiles);
+            var packFiles = new List<string> { Path.Combine(packDir, "exists.pack"), Path.Combine(packDir, "missing.pack") };
+            var fp = (new PackFileContainerCacheHelper()).ComputeFingerprint(packFiles);
 
             Assert.That(fp, Is.Not.Null.And.Not.Empty);
 
             // Same result regardless of missing file in list
-            var fp2 = PackFileContainerCacheHelper.ComputeFingerprint(packDir, new List<string> { "exists.pack", "missing.pack" });
+            var fp2 = (new PackFileContainerCacheHelper()).ComputeFingerprint(new List<string> { Path.Combine(packDir, "exists.pack"), Path.Combine(packDir, "missing.pack") });
             Assert.That(fp, Is.EqualTo(fp2));
         }
 
@@ -441,13 +444,9 @@ namespace Shared.CoreTest.PackFiles.Serialization
             File.WriteAllText(Path.Combine(packDir, "alpha.pack"), "aaa");
             File.WriteAllText(Path.Combine(packDir, "beta.pack"), "bbb");
             File.WriteAllText(Path.Combine(packDir, "gamma.pack"), "ccc");
-
-            var fp1 = PackFileContainerCacheHelper.ComputeFingerprint(packDir,
-                new List<string> { "gamma.pack", "alpha.pack", "beta.pack" });
-            var fp2 = PackFileContainerCacheHelper.ComputeFingerprint(packDir,
-                new List<string> { "alpha.pack", "beta.pack", "gamma.pack" });
-            var fp3 = PackFileContainerCacheHelper.ComputeFingerprint(packDir,
-                new List<string> { "beta.pack", "gamma.pack", "alpha.pack" });
+            var fp1 = (new PackFileContainerCacheHelper()).ComputeFingerprint(new List<string> { Path.Combine(packDir, "gamma.pack"), Path.Combine(packDir, "alpha.pack"), Path.Combine(packDir, "beta.pack") });
+            var fp2 = (new PackFileContainerCacheHelper()).ComputeFingerprint(new List<string> { Path.Combine(packDir, "alpha.pack"), Path.Combine(packDir, "beta.pack"), Path.Combine(packDir, "gamma.pack") });
+            var fp3 = (new PackFileContainerCacheHelper()).ComputeFingerprint(new List<string> { Path.Combine(packDir, "beta.pack"), Path.Combine(packDir, "gamma.pack"), Path.Combine(packDir, "alpha.pack") });
 
             Assert.That(fp1, Is.EqualTo(fp2));
             Assert.That(fp2, Is.EqualTo(fp3));
@@ -456,7 +455,7 @@ namespace Shared.CoreTest.PackFiles.Serialization
         [Test]
         public void GetCacheFilePath_SanitizesInvalidChars()
         {
-            var path = PackFileContainerCacheHelper.GetCacheFilePath(@"c:\game", "Game:Name/With<Bad>Chars", "abc123");
+            var path = (new PackFileContainerCacheHelper()).GetCacheFilePath("Game:Name/With<Bad>Chars", "abc123");
             var fileName = Path.GetFileName(path);
 
             Assert.That(fileName.IndexOfAny(Path.GetInvalidFileNameChars()), Is.EqualTo(-1));

@@ -73,7 +73,7 @@ namespace Editors.Reports.DeepSearch
                       {
                           using (var reader = new BinaryReader(fileStram, Encoding.ASCII))
                           {
-                              var pfc = _loader.Load(packFilePath);
+                              var pfc = _loader.CreateFromPackFile(PackFileContainerType.Normal, packFilePath, true);
 
                               _logger.Here().Information($"Searching through packfile {currentIndex}/{files.Count} -  {packFilePath} {pfc.GetFileCount()} files");
 

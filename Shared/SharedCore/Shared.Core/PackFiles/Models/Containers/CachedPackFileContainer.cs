@@ -1,6 +1,7 @@
-﻿using System.Diagnostics;
-using System.Windows.Forms;
+using System.Diagnostics;
+using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Infrastructure;
 using Shared.Core.ErrorHandling;
 using Shared.Core.PackFiles.Models.FileSources;
 using Shared.Core.PackFiles.Serialization.CacheDatabase;
@@ -9,24 +10,313 @@ using Shared.Core.Settings;
 
 namespace Shared.Core.PackFiles.Models.Containers
 {
-    internal class CachedPackFileContainer : IPackFileContainerInternal
+    internal enum CacheStorageMode
     {
-        private readonly ILogger _logger = Logging.Create<CachedPackFileContainer>();
+        File,
+        InMemory
+    }
 
-        private readonly CacheDbContext _db;
+    internal class CachedPackFileContainer : IPackFileContainerInternal, IDisposable
+    {
+        private static readonly ILogger _logger = Logging.CreateStatic(typeof(CachedPackFileContainer));
+        private const int CurrentSchemaVersion = 3;
+
+        private CacheDbContext _db;
+        private readonly DbContextOptions<CacheDbContext> _dbOptions;
         private readonly object _dbLock = new();
+        private SqliteConnection? _keepAliveConnection;
 
+        public CacheStorageMode StorageMode { get; }
+        public string? DbFilePath { get; }
         public string Name { get; set; }
         public bool IsCaPackFile { get => true; set { } }
         public string SystemFilePath { get; set; }
         public HashSet<string> SourcePackFilePaths { get; set; } = [];
 
+        /// <summary>
+        /// Creates a file-backed CachedPackFileContainer.
+        /// </summary>
+        public CachedPackFileContainer(string name, string dbFilePath)
+        {
+            Name = name;
+            SystemFilePath = string.Empty;
+            DbFilePath = dbFilePath;
+            StorageMode = CacheStorageMode.File;
+            _dbOptions = new DbContextOptionsBuilder<CacheDbContext>()
+                .UseSqlite($"Data Source={dbFilePath};Pooling=False")
+                .Options;
+            _db = new CacheDbContext(_dbOptions);
+            _db.ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking;
+        }
+
+        /// <summary>
+        /// Creates an in-memory CachedPackFileContainer.
+        /// </summary>
         public CachedPackFileContainer(string name, DbContextOptions<CacheDbContext> dbOptions)
         {
             Name = name;
             SystemFilePath = string.Empty;
+            DbFilePath = null;
+            StorageMode = CacheStorageMode.InMemory;
+            _dbOptions = dbOptions;
             _db = new CacheDbContext(dbOptions);
             _db.ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking;
+        }
+
+        /// <summary>
+        /// Saves the contents of a PackFileContainer into this cached container's database.
+        /// </summary>
+        public void Save(string fingerprint, PackFileContainer source)
+        {
+            _logger.Here().Information($"Saving cache for '{source.Name}' with {source.GetFileCount()} files");
+
+            // Use EF to create the schema
+            using (var db = new CacheDbContext(_dbOptions))
+            {
+                db.Database.EnsureDeleted();
+                db.Database.EnsureCreated();
+            }
+
+            var (connection, shouldDisposeConnection) = GetSqliteConnection(_dbOptions);
+            if (connection.State != System.Data.ConnectionState.Open)
+                connection.Open();
+
+            try
+            {
+                using var transaction = connection.BeginTransaction();
+
+                using (var cmd = connection.CreateCommand())
+                {
+                    cmd.Transaction = transaction;
+                    cmd.CommandText = @"INSERT INTO CacheInfo (SchemaVersion, Fingerprint, ContainerName, SystemFilePath, SourcePackFilePaths)
+                                    VALUES ($schemaVersion, $fingerprint, $containerName, $systemFilePath, $sourcePackFilePaths)";
+                    cmd.Parameters.AddWithValue("$schemaVersion", CurrentSchemaVersion);
+                    cmd.Parameters.AddWithValue("$fingerprint", fingerprint);
+                    cmd.Parameters.AddWithValue("$containerName", source.Name);
+                    cmd.Parameters.AddWithValue("$systemFilePath", source.SystemFilePath);
+                    cmd.Parameters.AddWithValue("$sourcePackFilePaths", string.Join("|", source.SourcePackFilePaths));
+                    cmd.ExecuteNonQuery();
+                }
+
+                using (var cmd = connection.CreateCommand())
+                {
+                    cmd.Transaction = transaction;
+                    cmd.CommandText = @"INSERT INTO FileList (RelativePath, FileName, Extension, FolderPath, SourcePackFilePath, Offset, Size, IsEncrypted, IsCompressed, CompressionFormat, UncompressedSize)
+                                    VALUES ($relativePath, $fileName, $extension, $folderPath, $sourcePackFilePath, $offset, $size, $isEncrypted, $isCompressed, $compressionFormat, $uncompressedSize)";
+
+                    var pRelativePath = cmd.Parameters.Add("$relativePath", SqliteType.Text);
+                    var pFileName = cmd.Parameters.Add("$fileName", SqliteType.Text);
+                    var pExtension = cmd.Parameters.Add("$extension", SqliteType.Text);
+                    var pFolderPath = cmd.Parameters.Add("$folderPath", SqliteType.Text);
+                    var pSourcePackFilePath = cmd.Parameters.Add("$sourcePackFilePath", SqliteType.Text);
+                    var pOffset = cmd.Parameters.Add("$offset", SqliteType.Integer);
+                    var pSize = cmd.Parameters.Add("$size", SqliteType.Integer);
+                    var pIsEncrypted = cmd.Parameters.Add("$isEncrypted", SqliteType.Integer);
+                    var pIsCompressed = cmd.Parameters.Add("$isCompressed", SqliteType.Integer);
+                    var pCompressionFormat = cmd.Parameters.Add("$compressionFormat", SqliteType.Integer);
+                    var pUncompressedSize = cmd.Parameters.Add("$uncompressedSize", SqliteType.Integer);
+
+                    cmd.Prepare();
+
+                    foreach (var (relativePath, packFile) in source.GetAllFiles())
+                    {
+                        if (packFile.DataSource is not PackedFileSource fileSource)
+                            continue;
+
+                        var lastSep = relativePath.LastIndexOf(Path.DirectorySeparatorChar);
+                        var folderPath = lastSep == -1 ? "" : relativePath.Substring(0, lastSep);
+
+                        pRelativePath.Value = relativePath;
+                        pFileName.Value = packFile.Name;
+                        pExtension.Value = Path.GetExtension(relativePath).ToLower();
+                        pFolderPath.Value = folderPath;
+                        pSourcePackFilePath.Value = fileSource.Parent.FilePath;
+                        pOffset.Value = fileSource.Offset;
+                        pSize.Value = fileSource.Size;
+                        pIsEncrypted.Value = fileSource.IsEncrypted ? 1 : 0;
+                        pIsCompressed.Value = fileSource.IsCompressed ? 1 : 0;
+                        pCompressionFormat.Value = (int)fileSource.CompressionFormat;
+                        pUncompressedSize.Value = (long)fileSource.UncompressedSize;
+
+                        cmd.ExecuteNonQuery();
+                    }
+                }
+
+                transaction.Commit();
+                _logger.Here().Information($"Cache saved successfully for '{source.Name}'");
+            }
+            finally
+            {
+                if (shouldDisposeConnection)
+                    connection.Dispose();
+            }
+
+            // Update this container's metadata from what was saved
+            Name = source.Name;
+            SystemFilePath = source.SystemFilePath ?? string.Empty;
+            SourcePackFilePaths = new HashSet<string>(source.SourcePackFilePaths);
+
+            // Recreate _db so this instance can be queried after Save()
+            _db.Dispose();
+            _db = new CacheDbContext(_dbOptions);
+            _db.ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking;
+        }
+
+        /// <summary>
+        /// Loads a CachedPackFileContainer from a file-backed database.
+        /// Returns null if the file doesn't exist, the DB is corrupt, or the fingerprint doesn't match.
+        /// </summary>
+        public static CachedPackFileContainer? CreateFromFingerPrint(string dbFilePath, string expectedFingerprint)
+        {
+            if (!File.Exists(dbFilePath))
+            {
+                _logger.Here().Information($"No cache file found at '{dbFilePath}'");
+                return null;
+            }
+
+            var dbOptions = new DbContextOptionsBuilder<CacheDbContext>()
+                .UseSqlite($"Data Source={dbFilePath};Pooling=False")
+                .Options;
+
+            return CreateFromFingerPrint(dbOptions, expectedFingerprint);
+        }
+
+        /// <summary>
+        /// Loads a CachedPackFileContainer from the given DbContextOptions (file or in-memory).
+        /// Returns null if the DB is corrupt or the fingerprint doesn't match.
+        /// </summary>
+        public static CachedPackFileContainer? CreateFromFingerPrint(DbContextOptions<CacheDbContext> dbOptions, string expectedFingerprint)
+        {
+            using var db = new CacheDbContext(dbOptions);
+
+            try
+            {
+                db.Database.EnsureCreated();
+            }
+            catch (Exception ex)
+            {
+                _logger.Here().Warning($"Failed to open cache database: {ex.Message}");
+                return null;
+            }
+
+            CacheInfoEntity? cacheInfo;
+            try
+            {
+                cacheInfo = db.CacheInfo.FirstOrDefault();
+            }
+            catch (Exception ex)
+            {
+                _logger.Here().Warning($"Failed to read cache info: {ex.Message}");
+                return null;
+            }
+
+            if (cacheInfo == null || cacheInfo.SchemaVersion != CurrentSchemaVersion || cacheInfo.Fingerprint != expectedFingerprint)
+            {
+                _logger.Here().Information($"Cache invalid - schema:{cacheInfo?.SchemaVersion} (expected {CurrentSchemaVersion}), fingerprint match:{cacheInfo?.Fingerprint == expectedFingerprint}");
+                return null;
+            }
+
+            var container = new CachedPackFileContainer(cacheInfo.ContainerName, dbOptions)
+            {
+                SystemFilePath = cacheInfo.SystemFilePath,
+            };
+
+            if (!string.IsNullOrEmpty(cacheInfo.SourcePackFilePaths))
+            {
+                foreach (var path in cacheInfo.SourcePackFilePaths.Split('|'))
+                    container.SourcePackFilePaths.Add(path);
+            }
+
+            _logger.Here().Information($"Loaded container '{container.Name}' from cache");
+            return container;
+        }
+
+        private static (SqliteConnection Connection, bool ShouldDisposeConnection) GetSqliteConnection(DbContextOptions<CacheDbContext> dbOptions)
+        {
+            var relationalOptions = dbOptions.Extensions
+                .OfType<RelationalOptionsExtension>()
+                .FirstOrDefault();
+
+            if (relationalOptions?.Connection is SqliteConnection sqliteConnection)
+                return (sqliteConnection, false);
+
+            var connectionString = relationalOptions?.ConnectionString;
+            if (string.IsNullOrWhiteSpace(connectionString))
+                throw new InvalidOperationException("Unable to resolve SQLite connection from DbContextOptions.");
+
+            return (new SqliteConnection(connectionString), true);
+        }
+
+        /// <summary>
+        /// Creates a CachedPackFileContainer from a list of file entries. Useful for testing.
+        /// </summary>
+        public static CachedPackFileContainer CreateFromFileList(
+            string containerName,
+            (string RelativePath, string FileName, long Offset, long Size, bool IsEncrypted, bool IsCompressed, CompressionFormat CompressionFormat, uint UncompressedSize)[] files,
+            bool useInMemoryDb,
+            string? dbFilePath = null,
+            string systemFilePath = "",
+            string? sourcePackFilePath = null)
+        {
+            var packParent = new PackedFileSourceParent { FilePath = sourcePackFilePath ?? @"c:\game\data\pack1.pack" };
+
+            var source = new PackFileContainer(containerName)
+            {
+                IsCaPackFile = true,
+                SystemFilePath = systemFilePath
+            };
+
+            if (sourcePackFilePath != null)
+                source.SourcePackFilePaths.Add(sourcePackFilePath);
+            else
+                source.SourcePackFilePaths.Add(packParent.FilePath);
+
+            foreach (var file in files)
+                source.AddOrUpdateFile(file.RelativePath, new PackFile(file.FileName, new PackedFileSource(packParent, file.Offset, file.Size, file.IsEncrypted, file.IsCompressed, file.CompressionFormat, file.UncompressedSize)));
+
+            DbContextOptions<CacheDbContext> dbOptions;
+            SqliteConnection? keepAlive = null;
+            if (useInMemoryDb)
+            {
+                var dbName = "CachedContainer_" + Guid.NewGuid().ToString("N");
+                var connectionString = new SqliteConnectionStringBuilder
+                {
+                    DataSource = dbName,
+                    Mode = SqliteOpenMode.Memory,
+                    Cache = SqliteCacheMode.Shared
+                }.ToString();
+
+                // Open a keep-alive connection for shared in-memory SQLite
+                keepAlive = new SqliteConnection(connectionString);
+                keepAlive.Open();
+
+                dbOptions = new DbContextOptionsBuilder<CacheDbContext>()
+                    .UseSqlite(connectionString)
+                    .Options;
+            }
+            else
+            {
+                dbOptions = new DbContextOptionsBuilder<CacheDbContext>()
+                    .UseSqlite($"Data Source={dbFilePath};Pooling=False")
+                    .Options;
+            }
+
+            var fingerprint = "factory_fp";
+            using (var temp = new CachedPackFileContainer(containerName, dbOptions))
+            {
+                temp.Save(fingerprint, source);
+            }
+
+            var result = CreateFromFingerPrint(dbOptions, fingerprint)!;
+            result._keepAliveConnection = keepAlive;
+            return result;
+        }
+
+        public void Dispose()
+        {
+            _db.Dispose();
+            _keepAliveConnection?.Dispose();
+            _keepAliveConnection = null;
         }
 
         public int GetFileCount()
@@ -132,23 +422,45 @@ namespace Shared.Core.PackFiles.Models.Containers
             return entries.Select(e => (e.RelativePath, ToPackFile(e))).ToList();
         }
 
+        public SortedDictionary<string, List<string>> GetAllFilesByFolder()
+        {
+            var time = Stopwatch.StartNew();
+            lock (_dbLock)
+            {
+
+              var rows = _db.Files
+           .Select(f => new
+           {
+               f.FolderPath,
+               f.FileName
+           })
+           .OrderBy(f => f.FolderPath)
+           .ThenBy(f => f.FileName)
+           .ToList();
+
+                var result = rows
+                    .GroupBy(f => f.FolderPath)
+                    .ToList();
+
+                var sorted = new SortedDictionary<string, List<string>>(StringComparer.InvariantCultureIgnoreCase);
+                foreach (var re in result)
+                {
+                    sorted[re.Key] = re.Select(f => f.FileName).OrderByDescending(f=>f).ToList();
+
+
+                }
+
+                _logger.Here().Information("Getting all files from cached container took {ElapsedMilliseconds} ms", time.ElapsedMilliseconds);
+                return sorted;
+            }
+        }
+
         public Dictionary<string, PackFile> GetAllFiles()
         {
             var time = Stopwatch.StartNew();
             List<CachedFileEntity> entries;
             lock (_dbLock)
             {
-              //var x = _db.Files
-              //    .GroupBy(x=>x.FolderPath)
-              //   .Select(g => new 
-              //   {
-              //       Folder = g.Key,
-              //       FileList = g.Select(x => x.FileName).ToList()
-              //   })
-              //    .ToList();
-              //    
-              //
-
                 entries = _db.Files.ToList();
             }
             _logger.Here().Information("Getting all files from cached container took {ElapsedMilliseconds} ms", time.ElapsedMilliseconds);
@@ -219,37 +531,6 @@ namespace Shared.Core.PackFiles.Models.Containers
                 .ToList();
 
             return files;
-        }
-
-        public List<string> GetSubDirectories(string directoryPath)
-        {
-            var prefix = string.IsNullOrEmpty(directoryPath) ? "" : directoryPath + "\\";
-            var prefixLength = prefix.Length;
-
-            List<string> folderPaths;
-            lock (_dbLock)
-            {
-                folderPaths = _db.Files
-                    .Where(f => string.IsNullOrEmpty(directoryPath)
-                        ? f.FolderPath != ""
-                        : f.FolderPath.StartsWith(prefix))
-                    .Select(f => f.FolderPath)
-                    .ToList();
-            }
-
-            return folderPaths
-                .Select(folderPath => string.IsNullOrEmpty(directoryPath)
-                    ? folderPath
-                    : folderPath.Substring(prefixLength))
-                .Select(candidate =>
-                {
-                    var separatorIndex = candidate.IndexOf('\\');
-                    return separatorIndex == -1 ? candidate : candidate.Substring(0, separatorIndex);
-                })
-                .Where(folderName => !string.IsNullOrWhiteSpace(folderName))
-                .Distinct(StringComparer.OrdinalIgnoreCase)
-                .OrderBy(x => x, StringComparer.CurrentCultureIgnoreCase)
-                .ToList();
         }
 
         public void AddOrUpdateFile(string path, PackFile file) =>

@@ -40,7 +40,7 @@ namespace Editors.Ipc
 
             try
             {
-                var container = _packFileContainerLoader.Load(normalizedDiskPath);
+                var container = _packFileContainerLoader.CreateFromPackFile(PackFileContainerType.Normal, normalizedDiskPath, true);
                 if (container == null)
                     return Task.FromResult(PackLoadResult.Fail("Pack file could not be loaded"));
 

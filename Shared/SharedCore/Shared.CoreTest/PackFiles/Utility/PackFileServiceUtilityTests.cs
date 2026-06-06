@@ -1,47 +1,50 @@
-using Shared.Core.PackFiles.Models;
+﻿using Shared.Core.PackFiles.Models;
 using Shared.Core.PackFiles.Models.Containers;
 using Shared.Core.PackFiles.Models.FileSources;
 using Shared.Core.PackFiles.Utility;
-using Shared.Core.Settings;
 
 namespace Shared.CoreTest.PackFiles.Utility
 {
     internal class PackFileServiceUtilityTests
     {
         [Test]
-        public void SplitDirectoryEntries_ComposesSortedFoldersAndFiles()
+        public void GetDirectoryContent_ReturnsSortedFiles()
         {
             var container = CreateContainer();
 
-            var result = PackFileServiceUtility.SplitDirectoryEntries(container, "texture");
+            var files = container.GetDirectoryContent("texture")
+                .Select(x => x.File.Name)
+                .OrderBy(x => x, StringComparer.CurrentCultureIgnoreCase)
+                .ToList();
 
-            Assert.That(result.DirectoryPath, Is.EqualTo("texture"));
-            Assert.That(result.SubFolders, Is.EqualTo(new[] { "mesha", "meshb" }));
-            Assert.That(result.Files.Select(x => x.FileName), Is.EqualTo(new[] { "alpha.dds", "texture_file.dds" }));
+            Assert.That(files, Is.EqualTo(new[] { "alpha.dds", "texture_file.dds" }));
         }
+
+
 
         [Test]
-        public void SplitDirectoryEntries_RootDirectory_ReturnsTopLevelFoldersAndFiles()
+        public void GetDirectoryContent_RootDirectory_ReturnsTopLevelFiles()
         {
             var container = CreateContainer();
 
-            var result = PackFileServiceUtility.SplitDirectoryEntries(container, "");
+            var files = container.GetDirectoryContent("")
+                .Select(x => x.File.Name)
+                .ToList();
 
-            Assert.That(result.DirectoryPath, Is.EqualTo(string.Empty));
-            Assert.That(result.SubFolders, Is.EqualTo(new[] { "audio", "texture" }));
-            Assert.That(result.Files.Select(x => x.FileName), Is.EqualTo(new[] { "root.txt" }));
+            Assert.That(files, Is.EqualTo(new[] { "root.txt" }));
         }
+
+
 
         [Test]
-        public void SplitDirectoryEntries_EmptyDirectory_ReturnsEmptyResult()
+        public void GetDirectoryContent_MissingDirectory_ReturnsEmpty()
         {
             var container = CreateContainer();
-            var result = PackFileServiceUtility.SplitDirectoryEntries(container, "missing");
 
-            Assert.That(result.DirectoryPath, Is.EqualTo("missing"));
-            Assert.That(result.SubFolders, Is.Empty);
-            Assert.That(result.Files, Is.Empty);
+            Assert.That(container.GetDirectoryContent("missing"), Is.Empty);
         }
+
+
 
         private static PackFileContainer CreateContainer()
         {

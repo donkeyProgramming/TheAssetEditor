@@ -6,6 +6,7 @@ using Shared.Core.Events;
 using Shared.Core.Events.Global;
 using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
+using Shared.Core.PackFiles.Serialization.CacheDatabase;
 using Shared.Core.PackFiles.Utility;
 using Shared.Core.Services;
 using Shared.Core.Settings;
@@ -32,9 +33,9 @@ namespace GameWorld.Core.Test.Services
                 .Returns(() => containers.ToList());
 
             var settingsService = new ApplicationSettingsService(GameTypeEnum.Warhammer3);
-            var loader = new PackFileContainerLoader(settingsService, new Mock<IStandardDialogs>().Object, new LocalizationManager());
+            var loader = new PackFileContainerLoader(settingsService, new Mock<IStandardDialogs>().Object, new LocalizationManager(), new PackFileContainerCacheHelper());
             var karlPackPath = PathHelper.GetDataFile("Karl_and_celestialgeneral.pack");
-            var karlContainer = loader.Load(karlPackPath);
+            var karlContainer = loader.CreateFromPackFile(PackFileContainerType.Normal, karlPackPath, false);
 
             Assert.That(karlContainer, Is.Not.Null);
 

@@ -100,7 +100,7 @@ namespace AssetEditor
             {
                 var packfileService = _serviceProvider.GetRequiredService<IPackFileService>();
                 var containerLoader = _serviceProvider.GetRequiredService<IPackFileContainerLoader>();
-                var loadRes = containerLoader.LoadAllCaFiles(settingsService.CurrentSettings.CurrentGame);
+                var loadRes = containerLoader.CreateFromGameEnum(PackFileContainerType.Cached, settingsService.CurrentSettings.CurrentGame);
 
                 if (loadRes == null)
                     MessageBox.Show($"Unable to load all CA packfiles in {gamePath}");

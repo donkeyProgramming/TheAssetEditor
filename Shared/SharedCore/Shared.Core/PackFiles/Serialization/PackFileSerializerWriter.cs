@@ -1,4 +1,6 @@
-﻿using System.Text;
+﻿using System.Diagnostics;
+using System.Text;
+using Shared.Core.ErrorHandling;
 using Shared.Core.PackFiles.Models;
 using Shared.Core.PackFiles.Models.Containers;
 using Shared.Core.PackFiles.Models.FileSources;
@@ -19,8 +21,16 @@ namespace Shared.Core.PackFiles.Serialization
 
     static class PackFileSerializerWriter
     {
+        private static readonly ILogger _logger = Logging.CreateStatic(typeof(PackFileSerializerWriter));
+
         public static void SaveToByteArray(string outputFileName, PackFileContainer container, BinaryWriter writer, GameInformation currentGameInformation)
         {
+            var stopWatch = Stopwatch.StartNew();
+
+            var numFiles = container.GetFileCount();
+            var packFileName = container.Name;
+            _logger.Here().Information("Saving packfile {PackFileName} v={PackFileVersion} with {NumFiles} files to {OutputFileName}. Current game = {Game}", packFileName, container.Header.Version, numFiles, outputFileName, currentGameInformation.DisplayName);
+
             if (container.Header.HasEncryptedData || container.Header.HasEncryptedIndex)
                 throw new InvalidOperationException("Saving encrypted packs is not supported.");
 
@@ -35,11 +45,16 @@ namespace Shared.Core.PackFiles.Serialization
             // Write the core of the file
             var fileMetaDataTable = BuildMetaDataTable(sortedFiles, container, currentGameInformation);
             SerializeFileTable(fileMetaDataTable, container, writer);
-            SerializeFileBlob(outputFileName, fileMetaDataTable, container, writer);    
+            SerializeFileBlob(outputFileName, fileMetaDataTable, container, writer);
+            
+            stopWatch.Stop();
+            _logger.Here().Information("Saving packfile {PackFileName} completed in {ElapsedMilliseconds} ms", packFileName, stopWatch.ElapsedMilliseconds);
         }
 
-        public static void WriteHeader(PFHeader header, uint fileContentSize, BinaryWriter writer)
+        static void WriteHeader(PFHeader header, uint fileContentSize, BinaryWriter writer)
         {
+            _logger.Here().Information("Starting write Header");
+
             var packFileTypeStr = PackFileVersionConverter.ToString(header.Version);        // 4
             foreach (var c in packFileTypeStr)
                 writer.Write(c);
@@ -82,6 +97,8 @@ namespace Shared.Core.PackFiles.Serialization
                 writer.Write(fileNameBytes);
                 writer.Write((byte)0);
             }
+
+            _logger.Here().Information("Finished writing");
         }
 
         static long ComputeFileHeaderSpecificByte(PackFileContainer container)
@@ -151,6 +168,8 @@ namespace Shared.Core.PackFiles.Serialization
 
         public static List<PackFileWriteInformation> BuildMetaDataTable(IList<KeyValuePair<string, PackFile>> sortedFiles, PackFileContainer container, GameInformation currentGameInformation)
         {
+            _logger.Here().Information("Starting to build FileTable");
+
             var filesToWrite = new List<PackFileWriteInformation>();
             foreach (var file in sortedFiles)
             {
@@ -159,11 +178,15 @@ namespace Shared.Core.PackFiles.Serialization
                 filesToWrite.Add(new PackFileWriteInformation(packFile, file.Key, 0, fileCompressionInfo));
             }
 
+            _logger.Here().Information("Finished building FileTable");
+
             return filesToWrite;
         }
 
-        public static void SerializeFileTable(List<PackFileWriteInformation> fileMetaData, PackFileContainer container, BinaryWriter writer)
+        static void SerializeFileTable(List<PackFileWriteInformation> fileMetaData, PackFileContainer container, BinaryWriter writer)
         {
+            _logger.Here().Information("Starting SerializeFileTable");
+
             // Write file table
             // FileStartPosition
             // TimeStamp
@@ -193,10 +216,14 @@ namespace Shared.Core.PackFiles.Serialization
                 writer.Write(fileNameBytes);
                 writer.Write((byte)0); // Zero terminator
             }
+
+            _logger.Here().Information("Finished SerializeFileTable");
         }
 
-        public static void SerializeFileBlob(string outputFileName, List<PackFileWriteInformation> fileMetaDataTabel, PackFileContainer container, BinaryWriter writer)
+        static void SerializeFileBlob(string outputFileName, List<PackFileWriteInformation> fileMetaDataTabel, PackFileContainer container, BinaryWriter writer)
         {
+            _logger.Here().Information("Starting SerializeFileBlob");
+
             foreach (var fileMetaData in fileMetaDataTabel)
             {
                 var packFile = fileMetaData.PackFile;
@@ -247,6 +274,8 @@ namespace Shared.Core.PackFiles.Serialization
                     fileMetaData.CompressionInfo.IntendedCompressionFormat,
                     uncompressedSize);
             }
+
+            _logger.Here().Information("Finished SerializeFileBlob");
         }
 
         

@@ -28,7 +28,7 @@ namespace Editor.VisualSkeletonEditor.DevConfig
             currentSettings.LoadCaPacksByDefault = false;
 
             var packFile = ResourceLoader.GetDevelopmentDataFolder() + "\\Karl_and_celestialgeneral.pack";
-            var container = _packFileContainerLoader.Load(packFile);
+            var container = _packFileContainerLoader.CreateFromPackFile(PackFileContainerType.Normal, packFile, true);
             Guard.IsNotNull(container, "Failed to load pack file container for development config.");   
             container.IsCaPackFile = true;
             _packFileService.AddContainer(container);
