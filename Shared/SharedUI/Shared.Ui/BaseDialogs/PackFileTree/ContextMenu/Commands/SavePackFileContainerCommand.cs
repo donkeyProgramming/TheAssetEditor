@@ -1,7 +1,9 @@
-using System;
+﻿using System;
+using System.IO;
 using Serilog;
 using Shared.Core.ErrorHandling;
 using Shared.Core.PackFiles;
+using Shared.Core.PackFiles.Models.Containers;
 using Shared.Core.Services;
 using Shared.Core.Settings;
 using Shared.Ui.BaseDialogs.PackFileTree.Utility;
@@ -59,6 +61,8 @@ namespace Shared.Ui.BaseDialogs.PackFileTree.ContextMenu.Commands
                 {
                     var gameInformation = GameInformationDatabase.GetGameById(applicationSettingsService.CurrentSettings.CurrentGame);
                     _logger.Here().Information($"Saving pack file container '{packDescription}' to '{systemPath}'");
+                    if (container is SystemFolderContainer)
+                        systemPath = Path.ChangeExtension(systemPath, ".pack");
                     packFileService.SavePackContainer(container, systemPath, false, gameInformation);
                     _logger.Here().Information($"Saved pack file container '{packDescription}' to '{systemPath}'");
                 }

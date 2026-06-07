@@ -35,7 +35,7 @@ namespace Shared.Core.Services
 
         public void FileMove(string sourceFileName, string destFileName)
         {
-            File.Move(sourceFileName, destFileName);
+            File.Move(sourceFileName, destFileName, overwrite: true);
             _logger.Here().Information($"Moved file '{sourceFileName}' to '{destFileName}'");
         }
 

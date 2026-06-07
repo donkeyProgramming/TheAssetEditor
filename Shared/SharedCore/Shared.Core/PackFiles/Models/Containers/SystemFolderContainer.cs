@@ -401,8 +401,6 @@ namespace Shared.Core.PackFiles.Models.Containers
                 PackFileSerializerWriter.SaveToByteArray(path, transientContainer, writer, gameInformation);
             }
 
-            if (_fileSystemAccess.FileExists(path))
-                _fileSystemAccess.FileDelete(path);
             _fileSystemAccess.FileMove(tempPath, path);
         }
 

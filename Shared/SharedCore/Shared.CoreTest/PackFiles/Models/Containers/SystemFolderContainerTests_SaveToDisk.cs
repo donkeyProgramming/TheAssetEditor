@@ -43,7 +43,7 @@ namespace Shared.CoreTest.PackFiles.Models.Containers
             _fileSystemAccess.Setup(x => x.FileDelete(It.IsAny<string>()))
                 .Callback((string p) => File.Delete(p));
             _fileSystemAccess.Setup(x => x.FileMove(It.IsAny<string>(), It.IsAny<string>()))
-                .Callback((string s, string d) => File.Move(s, d));
+                .Callback((string s, string d) => File.Move(s, d, overwrite: true));
 
             _container = new SystemFolderContainer(_tempDir, _fileSystemAccess.Object);
             _gameInfo = GameInformationDatabase.GetGameById(GameTypeEnum.Warhammer3);
