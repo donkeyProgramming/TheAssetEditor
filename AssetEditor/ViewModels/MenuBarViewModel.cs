@@ -18,6 +18,7 @@ using Shared.Core.Events;
 using Shared.Core.Misc;
 using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
+using Shared.Core.PackFiles.Models.Containers;
 using Shared.Core.PackFiles.Utility;
 using Shared.Core.Services;
 using Shared.Core.Settings;
@@ -36,6 +37,7 @@ namespace AssetEditor.ViewModels
         private readonly IFileSaveService _packFileSaveService;
         private readonly IPackFileContainerLoader _packFileContainerLoader;
         private readonly IStandardDialogs _standardDialogs;
+        private readonly IFileSystemAccess _fileSystemAccess;
 
         public ObservableCollection<RecentPackFileItem> RecentPackFiles { get; set; } = [];
         public ObservableCollection<EditorShortcutViewModel> Editors { get; set; } = [];
@@ -47,7 +49,8 @@ namespace AssetEditor.ViewModels
             TouchedFilesRecorder touchedFilesRecorder, 
             IFileSaveService packFileSaveService,
             IPackFileContainerLoader packFileContainerLoader,
-            IStandardDialogs standardDialogs)
+            IStandardDialogs standardDialogs,
+            IFileSystemAccess fileSystemAccess)
         {
             _packfileService = packfileService;
             _settingsService = settingsService;
@@ -57,6 +60,7 @@ namespace AssetEditor.ViewModels
             _packFileSaveService = packFileSaveService;
             _packFileContainerLoader = packFileContainerLoader;
             _standardDialogs = standardDialogs;
+            _fileSystemAccess = fileSystemAccess;
             var settings = settingsService.CurrentSettings;
             settings.RecentPackFilePaths.CollectionChanged += OnRecentPackFilePathsChanged;
             CreateRecentPackFilesItems();
@@ -77,20 +81,35 @@ namespace AssetEditor.ViewModels
         [RelayCommand] private void OpenPackFile() => _uiCommandFactory.Create<OpenPackFileCommand>().Execute();
         [RelayCommand] private void CreateNewPackFile()
         {
-            var window = new TextInputWindow("New Pack Name", "");
-            if (window.ShowDialog() == true)
+            var window = new NewPackFileWindow();
+            if (window.ShowDialog() != true)
+                return;
+
+            if (window.SelectedType == NewPackFileType.GamePack)
             {
-                if (string.IsNullOrWhiteSpace(window.TextValue))
+                if (string.IsNullOrWhiteSpace(window.PackName))
                 {
-                    _standardDialogs.ShowDialogBox($"'{window.TextValue}' is not a valid packfile name", "Error");
+                    _standardDialogs.ShowDialogBox($"'{window.PackName}' is not a valid pack name", "Error");
                     return;
                 }
 
                 var currentGame = _settingsService.CurrentSettings.CurrentGame;
-                var pfsVersion = GameInformationDatabase.Games[currentGame].PackFileVersion; 
+                var pfsVersion = GameInformationDatabase.Games[currentGame].PackFileVersion;
 
-                var newPackFile = _packfileService.CreateNewPackFileContainer(window.TextValue.Trim(), pfsVersion, PackFileCAType.MOD);
+                var newPackFile = _packfileService.CreateNewPackFileContainer(window.PackName.Trim(), pfsVersion, PackFileCAType.MOD);
                 _packfileService.SetEditablePack(newPackFile);
+            }
+            else
+            {
+                if (string.IsNullOrWhiteSpace(window.SelectedFolderPath))
+                {
+                    _standardDialogs.ShowDialogBox("No folder was selected", "Error");
+                    return;
+                }
+
+                var folderPack = new SystemFolderContainer(window.SelectedFolderPath, _fileSystemAccess);
+                _packfileService.AddContainer(folderPack);
+                _packfileService.SetEditablePack(folderPack);
             }
         }
         

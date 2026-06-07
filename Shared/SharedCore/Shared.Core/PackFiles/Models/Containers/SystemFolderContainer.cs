@@ -10,7 +10,7 @@ using Shared.Core.Settings;
 
 namespace Shared.Core.PackFiles.Models.Containers
 {
-    internal class SystemFolderContainer : IPackFileContainerInternal, IDisposable
+    public class SystemFolderContainer : IPackFileContainerInternal, IDisposable
     {
         private static readonly ILogger _logger = Logging.Create<SystemFolderContainer>();
 
