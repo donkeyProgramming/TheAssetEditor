@@ -4,7 +4,6 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using AssetEditor.UiCommands;
-using CommonControls.BaseDialogs;
 using CommunityToolkit.Mvvm.Input;
 using Editors.AnimationFragmentEditor.AnimationPack.Commands;
 using Editors.Reports.Animation;
@@ -18,7 +17,6 @@ using Shared.Core.Events;
 using Shared.Core.Misc;
 using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
-using Shared.Core.PackFiles.Models.Containers;
 using Shared.Core.PackFiles.Utility;
 using Shared.Core.Services;
 using Shared.Core.Settings;
@@ -37,7 +35,6 @@ namespace AssetEditor.ViewModels
         private readonly IFileSaveService _packFileSaveService;
         private readonly IPackFileContainerLoader _packFileContainerLoader;
         private readonly IStandardDialogs _standardDialogs;
-        private readonly IFileSystemAccess _fileSystemAccess;
 
         public ObservableCollection<RecentPackFileItem> RecentPackFiles { get; set; } = [];
         public ObservableCollection<EditorShortcutViewModel> Editors { get; set; } = [];
@@ -49,8 +46,7 @@ namespace AssetEditor.ViewModels
             TouchedFilesRecorder touchedFilesRecorder, 
             IFileSaveService packFileSaveService,
             IPackFileContainerLoader packFileContainerLoader,
-            IStandardDialogs standardDialogs,
-            IFileSystemAccess fileSystemAccess)
+            IStandardDialogs standardDialogs)
         {
             _packfileService = packfileService;
             _settingsService = settingsService;
@@ -60,7 +56,6 @@ namespace AssetEditor.ViewModels
             _packFileSaveService = packFileSaveService;
             _packFileContainerLoader = packFileContainerLoader;
             _standardDialogs = standardDialogs;
-            _fileSystemAccess = fileSystemAccess;
             var settings = settingsService.CurrentSettings;
             settings.RecentPackFilePaths.CollectionChanged += OnRecentPackFilePathsChanged;
             CreateRecentPackFilesItems();
@@ -79,39 +74,7 @@ namespace AssetEditor.ViewModels
 
         [RelayCommand] private void OpenSettingsWindow() => _uiCommandFactory.Create<OpenSettingsDialogCommand>().Execute();
         [RelayCommand] private void OpenPackFile() => _uiCommandFactory.Create<OpenPackFileCommand>().Execute();
-        [RelayCommand] private void CreateNewPackFile()
-        {
-            var window = new NewPackFileWindow();
-            if (window.ShowDialog() != true)
-                return;
-
-            if (window.SelectedType == NewPackFileType.GamePack)
-            {
-                if (string.IsNullOrWhiteSpace(window.PackName))
-                {
-                    _standardDialogs.ShowDialogBox($"'{window.PackName}' is not a valid pack name", "Error");
-                    return;
-                }
-
-                var currentGame = _settingsService.CurrentSettings.CurrentGame;
-                var pfsVersion = GameInformationDatabase.Games[currentGame].PackFileVersion;
-
-                var newPackFile = _packfileService.CreateNewPackFileContainer(window.PackName.Trim(), pfsVersion, PackFileCAType.MOD);
-                _packfileService.SetEditablePack(newPackFile);
-            }
-            else
-            {
-                if (string.IsNullOrWhiteSpace(window.SelectedFolderPath))
-                {
-                    _standardDialogs.ShowDialogBox("No folder was selected", "Error");
-                    return;
-                }
-
-                var folderPack = new SystemFolderContainer(window.SelectedFolderPath, _fileSystemAccess);
-                _packfileService.AddContainer(folderPack);
-                _packfileService.SetEditablePack(folderPack);
-            }
-        }
+        [RelayCommand] private void CreateNewPackFile() => _uiCommandFactory.Create<CreateNewPackFileCommand>().Execute();
         
         [RelayCommand] private void CreateAnimPackWarhammer3() => _uiCommandFactory.Create<CreateExampleAnimationDbCommand>().CreateAnimationDbWarhammer3();
         [RelayCommand] private void CreateAnimPack3k() => _uiCommandFactory.Create<CreateExampleAnimationDbCommand>().CreateAnimationDb3k();

@@ -212,5 +212,216 @@ namespace Shared.CoreTest.PackFiles.Models.Containers
 
             _mockEventHub.Verify(x => x.PublishGlobalEvent(It.IsAny<PackFileContainerFilesRemovedEvent>()), Times.Never);
         }
+
+        [Test]
+        public void ExternalFileCreated_InSubdirectory_PublishesFilesAddedEvent()
+        {
+            var subDir = Path.Combine(_tempDir, "models");
+            Directory.CreateDirectory(subDir);
+            var newFilePath = Path.Combine(subDir, "hero.mesh");
+            File.WriteAllText(newFilePath, "mesh data");
+
+            _mockWatcher.Raise(w => w.Created += null, new FileSystemEventArgs(WatcherChangeTypes.Created, subDir, "hero.mesh"));
+
+            _container.ProcessPendingEvents(null);
+
+            _mockEventHub.Verify(x => x.PublishGlobalEvent(It.Is<PackFileContainerFilesAddedEvent>(e =>
+                e.AddedFiles.Count == 1 && e.AddedFiles[0].Name == "hero.mesh"
+            )), Times.Once);
+
+            Assert.That(_container.ContainsFile(@"models\hero.mesh"), Is.True);
+        }
+
+        [Test]
+        public void ExternalFolderDeleted_RemovesAllContainedFiles()
+        {
+            // Set up container with files in a subfolder
+            var subDir = Path.Combine(_tempDir, "scripts");
+            Directory.CreateDirectory(subDir);
+            var file1 = Path.Combine(subDir, "main.lua");
+            var file2 = Path.Combine(subDir, "utils.lua");
+            File.WriteAllText(file1, "lua1");
+            File.WriteAllText(file2, "lua2");
+
+            // Re-create container with the subfolder files
+            _container.Dispose();
+            _fileSystemAccess.Setup(x => x.DirectoryGetFiles(_tempDir, "*.*", SearchOption.AllDirectories))
+                .Returns([Path.Combine(_tempDir, "existing.txt"), file1, file2]);
+            _mockWatcher = new Mock<IFileSystemWatcher>();
+            _mockEventHub = new Mock<IGlobalEventHub>();
+            _container = new SystemFolderContainer(_tempDir, _fileSystemAccess.Object, _mockWatcher.Object, _mockEventHub.Object);
+
+            Assert.That(_container.GetFileCount(), Is.EqualTo(3));
+
+            // Simulate folder deletion event — watcher fires a single event for the folder
+            _mockWatcher.Raise(w => w.Deleted += null, new FileSystemEventArgs(WatcherChangeTypes.Deleted, _tempDir, "scripts"));
+
+            _container.ProcessPendingEvents(null);
+
+            _mockEventHub.Verify(x => x.PublishGlobalEvent(It.Is<PackFileContainerFilesRemovedEvent>(e =>
+                e.RemovedFiles.Count == 2
+            )), Times.Once);
+
+            Assert.That(_container.GetFileCount(), Is.EqualTo(1));
+            Assert.That(_container.ContainsFile("existing.txt"), Is.True);
+            Assert.That(_container.ContainsFile(@"scripts\main.lua"), Is.False);
+            Assert.That(_container.ContainsFile(@"scripts\utils.lua"), Is.False);
+        }
+
+        [Test]
+        public void ExternalFolderRenamed_RemovesOldAndAddsNewFiles()
+        {
+            // Set up container with files in a subfolder
+            var oldDir = Path.Combine(_tempDir, "oldfolder");
+            var newDir = Path.Combine(_tempDir, "newfolder");
+            Directory.CreateDirectory(oldDir);
+            var oldFile = Path.Combine(oldDir, "data.bin");
+            File.WriteAllText(oldFile, "binary");
+
+            _container.Dispose();
+            _fileSystemAccess.Setup(x => x.DirectoryGetFiles(_tempDir, "*.*", SearchOption.AllDirectories))
+                .Returns([Path.Combine(_tempDir, "existing.txt"), oldFile]);
+            _mockWatcher = new Mock<IFileSystemWatcher>();
+            _mockEventHub = new Mock<IGlobalEventHub>();
+            _container = new SystemFolderContainer(_tempDir, _fileSystemAccess.Object, _mockWatcher.Object, _mockEventHub.Object);
+
+            Assert.That(_container.GetFileCount(), Is.EqualTo(2));
+
+            // Simulate the folder rename on disk (move oldfolder to newfolder)
+            Directory.Move(oldDir, newDir);
+
+            // Watcher raises a single Renamed event for the folder
+            var args = new RenamedEventArgs(WatcherChangeTypes.Renamed, _tempDir, "newfolder", "oldfolder");
+            _mockWatcher.Raise(w => w.Renamed += null, args);
+
+            _container.ProcessPendingEvents(null);
+
+            // Old file should be removed
+            _mockEventHub.Verify(x => x.PublishGlobalEvent(It.Is<PackFileContainerFilesRemovedEvent>(e =>
+                e.RemovedFiles.Count == 1 && e.RemovedFiles[0].Name == "data.bin"
+            )), Times.Once);
+
+            // New file should be added from the renamed folder
+            _mockEventHub.Verify(x => x.PublishGlobalEvent(It.Is<PackFileContainerFilesAddedEvent>(e =>
+                e.AddedFiles.Count == 1 && e.AddedFiles[0].Name == "data.bin"
+            )), Times.Once);
+
+            Assert.That(_container.ContainsFile(@"oldfolder\data.bin"), Is.False);
+            Assert.That(_container.ContainsFile(@"newfolder\data.bin"), Is.True);
+        }
+
+        [Test]
+        public void ExternalFileRenamed_InSubdirectory_UpdatesCorrectly()
+        {
+            // Set up container with a file in subfolder
+            var subDir = Path.Combine(_tempDir, "textures");
+            Directory.CreateDirectory(subDir);
+            var oldFile = Path.Combine(subDir, "diffuse.dds");
+            File.WriteAllText(oldFile, "texture");
+
+            _container.Dispose();
+            _fileSystemAccess.Setup(x => x.DirectoryGetFiles(_tempDir, "*.*", SearchOption.AllDirectories))
+                .Returns([Path.Combine(_tempDir, "existing.txt"), oldFile]);
+            _mockWatcher = new Mock<IFileSystemWatcher>();
+            _mockEventHub = new Mock<IGlobalEventHub>();
+            _container = new SystemFolderContainer(_tempDir, _fileSystemAccess.Object, _mockWatcher.Object, _mockEventHub.Object);
+
+            // Rename on disk
+            var newFile = Path.Combine(subDir, "normal.dds");
+            File.Move(oldFile, newFile);
+
+            // Watcher event
+            var args = new RenamedEventArgs(WatcherChangeTypes.Renamed, subDir, "normal.dds", "diffuse.dds");
+            _mockWatcher.Raise(w => w.Renamed += null, args);
+
+            _container.ProcessPendingEvents(null);
+
+            _mockEventHub.Verify(x => x.PublishGlobalEvent(It.Is<PackFileContainerFilesRemovedEvent>(e =>
+                e.RemovedFiles.Count == 1 && e.RemovedFiles[0].Name == "diffuse.dds"
+            )), Times.Once);
+
+            _mockEventHub.Verify(x => x.PublishGlobalEvent(It.Is<PackFileContainerFilesAddedEvent>(e =>
+                e.AddedFiles.Count == 1 && e.AddedFiles[0].Name == "normal.dds"
+            )), Times.Once);
+
+            Assert.That(_container.ContainsFile(@"textures\diffuse.dds"), Is.False);
+            Assert.That(_container.ContainsFile(@"textures\normal.dds"), Is.True);
+        }
+
+        [Test]
+        public void MultipleRapidDeletes_BatchedIntoSingleEvent()
+        {
+            // Set up container with multiple files
+            var file1 = Path.Combine(_tempDir, "a.txt");
+            var file2 = Path.Combine(_tempDir, "b.txt");
+            File.WriteAllText(file1, "a");
+            File.WriteAllText(file2, "b");
+
+            _container.Dispose();
+            _fileSystemAccess.Setup(x => x.DirectoryGetFiles(_tempDir, "*.*", SearchOption.AllDirectories))
+                .Returns([file1, file2]);
+            _mockWatcher = new Mock<IFileSystemWatcher>();
+            _mockEventHub = new Mock<IGlobalEventHub>();
+            _container = new SystemFolderContainer(_tempDir, _fileSystemAccess.Object, _mockWatcher.Object, _mockEventHub.Object);
+
+            // Simulate rapid deletes
+            _mockWatcher.Raise(w => w.Deleted += null, new FileSystemEventArgs(WatcherChangeTypes.Deleted, _tempDir, "a.txt"));
+            _mockWatcher.Raise(w => w.Deleted += null, new FileSystemEventArgs(WatcherChangeTypes.Deleted, _tempDir, "b.txt"));
+
+            _container.ProcessPendingEvents(null);
+
+            _mockEventHub.Verify(x => x.PublishGlobalEvent(It.Is<PackFileContainerFilesRemovedEvent>(e =>
+                e.RemovedFiles.Count == 2
+            )), Times.Once);
+
+            Assert.That(_container.GetFileCount(), Is.EqualTo(0));
+        }
+
+        [Test]
+        public void MixedCreateAndDelete_InSameBatch_PublishesBothEvents()
+        {
+            // Create a new file on disk
+            var newFile = Path.Combine(_tempDir, "added.txt");
+            File.WriteAllText(newFile, "new");
+
+            // Simulate: existing file deleted + new file created in same debounce window
+            _mockWatcher.Raise(w => w.Deleted += null, new FileSystemEventArgs(WatcherChangeTypes.Deleted, _tempDir, "existing.txt"));
+            _mockWatcher.Raise(w => w.Created += null, new FileSystemEventArgs(WatcherChangeTypes.Created, _tempDir, "added.txt"));
+
+            _container.ProcessPendingEvents(null);
+
+            _mockEventHub.Verify(x => x.PublishGlobalEvent(It.Is<PackFileContainerFilesRemovedEvent>(e =>
+                e.RemovedFiles.Count == 1 && e.RemovedFiles[0].Name == "existing.txt"
+            )), Times.Once);
+
+            _mockEventHub.Verify(x => x.PublishGlobalEvent(It.Is<PackFileContainerFilesAddedEvent>(e =>
+                e.AddedFiles.Count == 1 && e.AddedFiles[0].Name == "added.txt"
+            )), Times.Once);
+
+            Assert.That(_container.ContainsFile("existing.txt"), Is.False);
+            Assert.That(_container.ContainsFile("added.txt"), Is.True);
+        }
+
+        [Test]
+        public void ExternalDirectoryCreated_AddsAllFilesWithin()
+        {
+            // Simulate copying a folder into the watched directory
+            var newDir = Path.Combine(_tempDir, "imported");
+            Directory.CreateDirectory(newDir);
+            File.WriteAllText(Path.Combine(newDir, "model.rmv2"), "mesh");
+            File.WriteAllText(Path.Combine(newDir, "texture.dds"), "tex");
+
+            // Watcher fires Created for the directory
+            _mockWatcher.Raise(w => w.Created += null, new FileSystemEventArgs(WatcherChangeTypes.Created, _tempDir, "imported"));
+
+            _container.ProcessPendingEvents(null);
+
+            _mockEventHub.Verify(x => x.PublishGlobalEvent(It.Is<PackFileContainerFilesAddedEvent>(e =>
+                e.AddedFiles.Count == 2
+            )), Times.Once);
+
+            Assert.That(_container.ContainsFile(@"imported\model.rmv2"), Is.True);
+            Assert.That(_container.ContainsFile(@"imported\texture.dds"), Is.True);
+        }
     }
 }

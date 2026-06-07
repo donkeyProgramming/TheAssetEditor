@@ -466,7 +466,7 @@ namespace Shared.Core.PackFiles.Models.Containers
             }
 
             var addedFiles = new List<PackFile>();
-            var removedFiles = new List<PackFile>();
+            var keysToRemove = new List<string>();
 
             foreach (var e in events)
             {
@@ -476,27 +476,49 @@ namespace Shared.Core.PackFiles.Models.Containers
                         HandleExternalCreated(e.FullPath, addedFiles);
                         break;
                     case WatcherChangeTypes.Deleted:
-                        HandleExternalDeleted(e.FullPath, removedFiles);
+                        CollectExternalDeleted(e.FullPath, keysToRemove);
                         break;
                     case WatcherChangeTypes.Renamed:
                         var renamedArgs = (RenamedEventArgs)e;
-                        HandleExternalDeleted(renamedArgs.OldFullPath, removedFiles);
+                        CollectExternalDeleted(renamedArgs.OldFullPath, keysToRemove);
                         HandleExternalCreated(renamedArgs.FullPath, addedFiles);
                         break;
                 }
             }
 
-            if (addedFiles.Count > 0)
-                _eventHub?.PublishGlobalEvent(new PackFileContainerFilesAddedEvent(this, addedFiles));
+            // Publish removed event BEFORE removing from _fileList so that
+            // GetFullPath can still resolve paths for the tree view update.
+            var removedFiles = keysToRemove.Select(k => _fileList[k]).ToList();
             if (removedFiles.Count > 0)
                 _eventHub?.PublishGlobalEvent(new PackFileContainerFilesRemovedEvent(this, removedFiles));
+
+            // Now actually remove the entries
+            foreach (var key in keysToRemove)
+                _fileList.Remove(key);
+
+            if (addedFiles.Count > 0)
+                _eventHub?.PublishGlobalEvent(new PackFileContainerFilesAddedEvent(this, addedFiles));
         }
 
         private void HandleExternalCreated(string absolutePath, List<PackFile> addedFiles)
         {
-            // Skip directories — we only track files
+            // If this is a directory, scan and add all files within it
             if (Directory.Exists(absolutePath) && !File.Exists(absolutePath))
+            {
+                try
+                {
+                    var filesInDir = Directory.GetFiles(absolutePath, "*.*", SearchOption.AllDirectories);
+                    foreach (var filePath in filesInDir)
+                    {
+                        HandleExternalCreated(filePath, addedFiles);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    _logger.Here().Warning($"Failed to scan externally created directory '{absolutePath}': {ex.Message}");
+                }
                 return;
+            }
 
             var relativePath = Path.GetRelativePath(SystemFilePath!, absolutePath);
             var normalizedPath = PathNormalization.NormalizeFileName(relativePath);
@@ -518,30 +540,25 @@ namespace Shared.Core.PackFiles.Models.Containers
             }
         }
 
-        private void HandleExternalDeleted(string absolutePath, List<PackFile> removedFiles)
+        private void CollectExternalDeleted(string absolutePath, List<string> keysToRemove)
         {
             var relativePath = Path.GetRelativePath(SystemFilePath!, absolutePath);
             var normalizedPath = PathNormalization.NormalizeFileName(relativePath);
 
             // Check if this is an exact file match
-            if (_fileList.TryGetValue(normalizedPath, out var packFile))
+            if (_fileList.ContainsKey(normalizedPath))
             {
-                _fileList.Remove(normalizedPath);
-                removedFiles.Add(packFile);
+                keysToRemove.Add(normalizedPath);
                 return;
             }
 
-            // Handle folder deletion — remove all files with this prefix
+            // Handle folder deletion — collect all files with this prefix
             var folderPrefix = normalizedPath + "\\";
-            var keysToRemove = _fileList.Keys
+            var matchingKeys = _fileList.Keys
                 .Where(k => k.StartsWith(folderPrefix, StringComparison.InvariantCultureIgnoreCase))
                 .ToList();
 
-            foreach (var key in keysToRemove)
-            {
-                removedFiles.Add(_fileList[key]);
-                _fileList.Remove(key);
-            }
+            keysToRemove.AddRange(matchingKeys);
         }
 
         // --- Watcher suppression ---

@@ -21,6 +21,7 @@ namespace AssetEditor
             serviceCollection.AddScoped<MainViewModel>();
             serviceCollection.AddSingleton<IEditorManager, EditorManager>();
 
+            serviceCollection.AddTransient<CreateNewPackFileCommand>();
             serviceCollection.AddTransient<OpenGamePackCommand>();
             serviceCollection.AddTransient<OpenPackFileCommand>();
             serviceCollection.AddTransient<OpenSettingsDialogCommand>();

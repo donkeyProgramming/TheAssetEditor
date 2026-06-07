@@ -6,6 +6,7 @@ using Shared.Core.ErrorHandling.Exceptions;
 using Shared.Core.Events;
 using Shared.Core.Misc;
 using Shared.Core.PackFiles;
+using Shared.Core.PackFiles.Models.Containers;
 using Shared.Core.PackFiles.Serialization.CacheDatabase;
 using Shared.Core.PackFiles.Utility;
 using Shared.Core.Services;
@@ -47,6 +48,8 @@ namespace Shared.Core
             services.AddScoped<IPackFileContainerCacheHelper, PackFileContainerCacheHelper>();
             services.AddTransient<IPackFileContainerLoader, PackFileContainerLoader>();
             services.AddTransient<IFileSystemWatcher, FileSystemWatcherWrapper>();
+            services.AddSingleton<Func<IFileSystemWatcher>>(sp => () => sp.GetRequiredService<IFileSystemWatcher>());
+            services.AddSingleton<ISystemFolderContainerFactory, SystemFolderContainerFactory>();
         }
     }
 
