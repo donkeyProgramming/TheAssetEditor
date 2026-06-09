@@ -121,9 +121,11 @@ namespace Shared.Core.PackFiles
                 var newFile = new PackFile(file.Name, new MemorySource(data));
                 targetContainer.AddOrUpdateFile(lowerPath, newFile);
 
+                var storedFile = targetContainer.FindFile(lowerPath)!;
+
                 _logger.Here().Information($"Copied '{lowerPath}' from '{DescribeContainer(sourceContainer)}' to '{DescribeContainer(targetContainer)}'");
 
-                _globalEventHub?.PublishGlobalEvent(new PackFileContainerFilesAddedEvent(targetContainer, [newFile]));
+                _globalEventHub?.PublishGlobalEvent(new PackFileContainerFilesAddedEvent(targetContainer, [storedFile]));
             }
             else
             {

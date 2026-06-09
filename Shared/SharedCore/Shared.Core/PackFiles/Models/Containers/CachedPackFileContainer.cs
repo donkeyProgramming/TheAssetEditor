@@ -427,27 +427,16 @@ namespace Shared.Core.PackFiles.Models.Containers
             var time = Stopwatch.StartNew();
             lock (_dbLock)
             {
-
-              var rows = _db.Files
-           .Select(f => new
-           {
-               f.FolderPath,
-               f.FileName
-           })
-           .OrderBy(f => f.FolderPath)
-           .ThenBy(f => f.FileName)
-           .ToList();
-
-                var result = rows
-                    .GroupBy(f => f.FolderPath)
+                var rows = _db.Files
+                    .Select(f => new { f.FolderPath, f.FileName })
                     .ToList();
 
                 var sorted = new SortedDictionary<string, List<string>>(StringComparer.InvariantCultureIgnoreCase);
-                foreach (var re in result)
+                foreach (var group in rows.GroupBy(f => f.FolderPath))
                 {
-                    sorted[re.Key] = re.Select(f => f.FileName).OrderByDescending(f=>f).ToList();
-
-
+                    var files = group.Select(f => f.FileName).ToList();
+                    PackFileSortHelper.SortFileList(files);
+                    sorted[group.Key] = files;
                 }
 
                 _logger.Here().Information("Getting all files from cached container took {ElapsedMilliseconds} ms", time.ElapsedMilliseconds);

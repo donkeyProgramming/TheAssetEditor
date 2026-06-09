@@ -236,5 +236,53 @@ namespace Shared.CoreTest.PackFiles.Models.Containers
             _container.Dispose();
             Assert.That(_container.GetFileCount(), Is.EqualTo(0));
         }
+
+        [Test]
+        public void GetAllFilesByFolder_FilesWithinEachFolderAreSortedByOrdinal()
+        {
+            // Arrange: create a container with multiple files per folder in non-alphabetical order
+            var tempDir = Path.Combine(Path.GetTempPath(), "SortTest_" + Guid.NewGuid().ToString("N"));
+            Directory.CreateDirectory(tempDir);
+
+            var files = new[]
+            {
+                @"audio\zombie.wem",
+                @"audio\attack.wem",
+                @"audio\music.wem",
+                @"scripts\main.lua",
+                @"scripts\ai.lua",
+                @"scripts\campaign.lua",
+            };
+
+            foreach (var rel in files)
+            {
+                var abs = Path.Combine(tempDir, rel);
+                Directory.CreateDirectory(Path.GetDirectoryName(abs)!);
+                File.WriteAllText(abs, "data");
+            }
+
+            var fs = new Mock<IFileSystemAccess>();
+            fs.Setup(x => x.DirectoryExists(tempDir)).Returns(true);
+            // Return files in reverse order to simulate non-sorted filesystem enumeration
+            fs.Setup(x => x.DirectoryGetFiles(tempDir, "*.*", SearchOption.AllDirectories))
+                .Returns(files.Reverse().Select(r => Path.Combine(tempDir, r)).ToArray());
+
+            var container = new SystemFolderContainer(tempDir, fs.Object);
+
+            try
+            {
+                // Act
+                var result = container.GetAllFilesByFolder();
+
+                // Assert: files within each folder are sorted by StringComparer.Ordinal
+                Assert.That(result["audio"], Is.EqualTo(new[] { "attack.wem", "music.wem", "zombie.wem" }));
+                Assert.That(result["scripts"], Is.EqualTo(new[] { "ai.lua", "campaign.lua", "main.lua" }));
+            }
+            finally
+            {
+                container.Dispose();
+                Directory.Delete(tempDir, true);
+            }
+        }
     }
 }
