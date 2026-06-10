@@ -2,15 +2,19 @@
 using Shared.Core.PackFiles.Models.Containers;
 using Shared.Core.PackFiles.Models.FileSources;
 using Shared.Core.PackFiles.Utility;
+using Shared.Core.Services;
 
 namespace Shared.CoreTest.PackFiles.Models.Containers
 {
     internal abstract class PackFileContainerTests_TestBase
     {
-        private readonly bool _useCachedContainer;
+        private readonly Type _containerType;
 
         protected IPackFileContainerInternal _container = null!;
-        protected bool IsCachedContainer => _useCachedContainer;
+        protected bool IsCachedContainer => _containerType == typeof(CachedPackFileContainer);
+        protected bool IsSystemFolderContainer => _containerType == typeof(SystemFolderContainer);
+
+        private string? _tempDir;
 
         protected static readonly (string RelativePath, string FileName, long Offset, long Size, bool IsEncrypted, bool IsCompressed, CompressionFormat CompressionFormat, uint UncompressedSize)[] TestFiles =
         [
@@ -36,15 +40,32 @@ namespace Shared.CoreTest.PackFiles.Models.Containers
 
         protected PackFileContainerTests_TestBase(Type containerType)
         {
-            _useCachedContainer = containerType == typeof(CachedPackFileContainer);
+            _containerType = containerType;
         }
 
         [SetUp]
         public void Setup()
         {
-            if (_useCachedContainer)
+            if (_containerType == typeof(CachedPackFileContainer))
             {
                 _container = CachedPackFileContainer.CreateFromFileList("TestCache", TestFiles, useInMemoryDb: true, systemFilePath: @"c:\game\data", sourcePackFilePath: @"c:\game\data\pack1.pack");
+            }
+            else if (_containerType == typeof(SystemFolderContainer))
+            {
+                _tempDir = Path.Combine(Path.GetTempPath(), "PackFileContainerTests_" + Guid.NewGuid().ToString("N"));
+                Directory.CreateDirectory(_tempDir);
+
+                foreach (var file in TestFiles)
+                {
+                    var absolutePath = Path.Combine(_tempDir, file.RelativePath);
+                    Directory.CreateDirectory(Path.GetDirectoryName(absolutePath)!);
+                    // Write content with size matching the test data
+                    var content = new byte[file.Size];
+                    Array.Fill(content, (byte)'X');
+                    File.WriteAllBytes(absolutePath, content);
+                }
+
+                _container = new SystemFolderContainer(_tempDir, new FileSystemAccess());
             }
             else
             {
@@ -67,6 +88,9 @@ namespace Shared.CoreTest.PackFiles.Models.Containers
         public void TearDown()
         {
             (_container as IDisposable)?.Dispose();
+
+            if (_tempDir != null && Directory.Exists(_tempDir))
+                Directory.Delete(_tempDir, true);
         }
 
         protected void IgnoreIfNotCached(string scenario)

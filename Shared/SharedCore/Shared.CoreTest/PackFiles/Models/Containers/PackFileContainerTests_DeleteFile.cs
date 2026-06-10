@@ -1,10 +1,12 @@
 using Shared.Core.PackFiles.Models;
 using Shared.Core.PackFiles.Models.Containers;
+using Shared.Core.PackFiles.Models.FileSources;
 
 namespace Shared.CoreTest.PackFiles.Models.Containers
 {
     [TestFixture(typeof(CachedPackFileContainer))]
     [TestFixture(typeof(PackFileContainer))]
+    [TestFixture(typeof(SystemFolderContainer))]
     internal class PackFileContainerTests_DeleteFile : PackFileContainerTests_TestBase
     {
         public PackFileContainerTests_DeleteFile(Type containerType) : base(containerType) { }

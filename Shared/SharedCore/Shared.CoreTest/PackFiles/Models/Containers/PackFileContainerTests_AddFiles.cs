@@ -1,11 +1,13 @@
 using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
 using Shared.Core.PackFiles.Models.Containers;
+using Shared.Core.PackFiles.Models.FileSources;
 
 namespace Shared.CoreTest.PackFiles.Models.Containers
 {
     [TestFixture(typeof(CachedPackFileContainer))]
     [TestFixture(typeof(PackFileContainer))]
+    [TestFixture(typeof(SystemFolderContainer))]
     internal class PackFileContainerTests_AddFiles : PackFileContainerTests_TestBase
     {
         public PackFileContainerTests_AddFiles(Type containerType) : base(containerType) { }
@@ -15,8 +17,8 @@ namespace Shared.CoreTest.PackFiles.Models.Containers
         {
             var newFiles = new List<NewPackFileEntry>
             {
-                new("dir", new PackFile("a.txt", null)),
-                new("", new PackFile("root.txt", null))
+                new("dir", new PackFile("a.txt", new MemorySource([1]))),
+                new("", new PackFile("root.txt", new MemorySource([2])))
             };
 
             if (IsCachedContainer)
@@ -37,12 +39,12 @@ namespace Shared.CoreTest.PackFiles.Models.Containers
             if (IsCachedContainer)
             {
                 Assert.Throws<InvalidOperationException>(() =>
-                    _container.AddFiles([new NewPackFileEntry("dir", new PackFile("", null))]));
+                    _container.AddFiles([new NewPackFileEntry("dir", new PackFile("", new MemorySource([1])))]));
                 return;
             }
 
             Assert.Throws<Exception>(() =>
-                _container.AddFiles([new NewPackFileEntry("dir", new PackFile("", null))]));
+                _container.AddFiles([new NewPackFileEntry("dir", new PackFile("", new MemorySource([1])))]));
         }
     }
 }
