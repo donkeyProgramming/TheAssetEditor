@@ -509,6 +509,224 @@ namespace Shared.UiTest.BaseDialogs.PackFileTree
         }
 
         // ──────────────────────────────────────────────────────────────────────
+        // B1 — Duplicate filenames in different folders. Renaming / moving /
+        // deleting one of two identically-named files must affect ONLY the
+        // intended file on disk, in the container and in the tree. Exposes the
+        // GetFullPath name-fallback and reference-identity issues.
+        // ──────────────────────────────────────────────────────────────────────
+
+        [Test]
+        public void B1_DuplicateFileNames_RenameOne_OnlyTargetAffected()
+        {
+            CreateSystemFolderContainer();
+            SeedFile(@"folderA\data.bin", "AAA");
+            SeedFile(@"folderB\data.bin", "BBB");
+
+            // Rename folderA\data.bin -> folderA\data_a.bin
+            var target = _container.FindFile(@"folderA\data.bin")!;
+            _packFileService.RenameFile(_container, target, "data_a.bin");
+
+            // Container: only folderA changed; folderB intact
+            Assert.That(_container.ContainsFile(@"folderA\data.bin"), Is.False);
+            Assert.That(_container.ContainsFile(@"folderA\data_a.bin"), Is.True);
+            Assert.That(_container.ContainsFile(@"folderB\data.bin"), Is.True);
+
+            // Disk
+            Assert.That(File.Exists(Path.Combine(_tempDir, "folderA", "data_a.bin")), Is.True);
+            Assert.That(File.Exists(Path.Combine(_tempDir, "folderA", "data.bin")), Is.False);
+            Assert.That(File.Exists(Path.Combine(_tempDir, "folderB", "data.bin")), Is.True);
+
+            // Content integrity — folderB still holds "BBB", renamed file still holds "AAA"
+            Assert.That(System.Text.Encoding.ASCII.GetString(_container.FindFile(@"folderB\data.bin")!.DataSource.ReadData()), Is.EqualTo("BBB"));
+            Assert.That(System.Text.Encoding.ASCII.GetString(_container.FindFile(@"folderA\data_a.bin")!.DataSource.ReadData()), Is.EqualTo("AAA"));
+
+            // Tree: correct nodes
+            VerifyTreeNodeExists(@"foldera\data_a.bin");
+            VerifyTreeNodeDoesNotExist(@"foldera\data.bin");
+            VerifyTreeNodeExists(@"folderb\data.bin");
+        }
+
+        [Test]
+        public void B1_DuplicateFileNames_MoveOne_OnlyTargetAffected()
+        {
+            CreateSystemFolderContainer();
+            SeedFile(@"folderA\data.bin", "AAA");
+            SeedFile(@"folderB\data.bin", "BBB");
+
+            // Move folderB\data.bin -> folderC\ (a third folder; folderA still holds a
+            // file named data.bin, so a name-based resolution would pick the wrong one).
+            var target = _container.FindFile(@"folderB\data.bin")!;
+            _packFileService.MoveFile(_container, target, "folderC");
+
+            // Container
+            Assert.That(_container.ContainsFile(@"folderB\data.bin"), Is.False);
+            Assert.That(_container.ContainsFile(@"folderC\data.bin"), Is.True);
+            Assert.That(_container.ContainsFile(@"folderA\data.bin"), Is.True);
+
+            // The file now in folderC\data.bin must be the moved one (BBB); folderA keeps AAA
+            Assert.That(System.Text.Encoding.ASCII.GetString(_container.FindFile(@"folderC\data.bin")!.DataSource.ReadData()), Is.EqualTo("BBB"));
+            Assert.That(System.Text.Encoding.ASCII.GetString(_container.FindFile(@"folderA\data.bin")!.DataSource.ReadData()), Is.EqualTo("AAA"));
+
+            // Disk
+            Assert.That(File.Exists(Path.Combine(_tempDir, "folderB", "data.bin")), Is.False);
+            Assert.That(File.Exists(Path.Combine(_tempDir, "folderC", "data.bin")), Is.True);
+            Assert.That(File.Exists(Path.Combine(_tempDir, "folderA", "data.bin")), Is.True);
+
+            // Tree — node must appear under folderC, not duplicated under folderA
+            VerifyTreeNodeExists(@"folderc\data.bin");
+            VerifyTreeNodeExists(@"foldera\data.bin");
+            VerifyTreeNodeDoesNotExist(@"folderb\data.bin");
+        }
+
+        [Test]
+        public void B1_DuplicateFileNames_DeleteOne_OnlyTargetRemoved()
+        {
+            CreateSystemFolderContainer();
+            SeedFile(@"folderA\data.bin", "AAA");
+            SeedFile(@"folderB\data.bin", "BBB");
+
+            // Delete folderA\data.bin
+            var target = _container.FindFile(@"folderA\data.bin")!;
+            _packFileService.DeleteFile(_container, target);
+
+            // Container
+            Assert.That(_container.ContainsFile(@"folderA\data.bin"), Is.False);
+            Assert.That(_container.ContainsFile(@"folderB\data.bin"), Is.True);
+
+            // Disk
+            Assert.That(File.Exists(Path.Combine(_tempDir, "folderA", "data.bin")), Is.False);
+            Assert.That(File.Exists(Path.Combine(_tempDir, "folderB", "data.bin")), Is.True);
+
+            // Tree
+            VerifyTreeNodeDoesNotExist(@"foldera\data.bin");
+            VerifyTreeNodeExists(@"folderb\data.bin");
+        }
+
+        // ──────────────────────────────────────────────────────────────────────
+        // B3 — Reference identity: rename the same file twice in a row (no refresh
+        // between operations). The tree must end with a single, openable node.
+        // ──────────────────────────────────────────────────────────────────────
+
+        [Test]
+        public void B3_RenameFileTwice_TreeHasSingleNode()
+        {
+            CreateSystemFolderContainer();
+            SeedFile(@"docs\a.txt", "data");
+
+            var file = _container.FindFile(@"docs\a.txt")!;
+            _packFileService.RenameFile(_container, file, "b.txt");
+            // Re-use the SAME PackFile reference for the second rename (identity must survive).
+            _packFileService.RenameFile(_container, file, "c.txt");
+
+            // Container + disk
+            Assert.That(_container.ContainsFile(@"docs\a.txt"), Is.False);
+            Assert.That(_container.ContainsFile(@"docs\b.txt"), Is.False);
+            Assert.That(_container.ContainsFile(@"docs\c.txt"), Is.True);
+            Assert.That(File.Exists(Path.Combine(_tempDir, "docs", "c.txt")), Is.True);
+
+            // Tree: single node named c.txt, no leftovers
+            var node = PackFileBrowserViewModelTestHelper.GetFromPath(_rootNode, @"docs\c.txt");
+            Assert.That(node, Is.Not.Null);
+            Assert.That(node!.Name, Is.EqualTo("c.txt"));
+            VerifyTreeNodeDoesNotExist(@"docs\a.txt");
+            VerifyTreeNodeDoesNotExist(@"docs\b.txt");
+        }
+
+        // ──────────────────────────────────────────────────────────────────────
+        // B4 — Reference identity: move a file, then immediately operate on it
+        // again (rename) using the same reference. Both must succeed.
+        // ──────────────────────────────────────────────────────────────────────
+
+        [Test]
+        public void B4_MoveThenRename_SameReference_StaysConsistent()
+        {
+            CreateSystemFolderContainer();
+            SeedFile(@"models\hero.rmv2", "mesh");
+
+            var file = _container.FindFile(@"models\hero.rmv2")!;
+            _packFileService.MoveFile(_container, file, "textures");
+            // Operate again on the same reference without re-fetching.
+            _packFileService.RenameFile(_container, file, "hero_v2.rmv2");
+
+            // Container + disk
+            Assert.That(_container.ContainsFile(@"models\hero.rmv2"), Is.False);
+            Assert.That(_container.ContainsFile(@"textures\hero_v2.rmv2"), Is.True);
+            Assert.That(File.Exists(Path.Combine(_tempDir, "textures", "hero_v2.rmv2")), Is.True);
+            Assert.That(File.Exists(Path.Combine(_tempDir, "models", "hero.rmv2")), Is.False);
+
+            // Tree
+            VerifyTreeNodeExists(@"textures\hero_v2.rmv2");
+            VerifyTreeNodeDoesNotExist(@"models\hero.rmv2");
+        }
+
+        // ──────────────────────────────────────────────────────────────────────
+        // B5 — Copy a file from another pack into the folder container, then
+        // rename the just-copied file. Tree, disk and container stay in sync.
+        // ──────────────────────────────────────────────────────────────────────
+
+        [Test]
+        public void B5_CopyFromOtherPack_ThenRename_StaysConsistent()
+        {
+            CreateSystemFolderContainer();
+            SeedFile(@"placeholder.txt", "placeholder");
+
+            // Build a source pack with one file
+            var source = new PackFileContainer("source") { Header = new PFHeader("PFH5", PackFileCAType.MOD) };
+            source.AddOrUpdateFile(@"scripts\copied.lua", new PackFile("copied.lua", new MemorySource("lua content"u8.ToArray())));
+            _packFileService.AddContainer(source);
+
+            // Copy into the folder container
+            _packFileService.CopyFileFromOtherPackFile(source, @"scripts\copied.lua", _container);
+
+            Assert.That(_container.ContainsFile(@"scripts\copied.lua"), Is.True);
+            VerifyTreeNodeExists(@"scripts\copied.lua");
+
+            // Rename the copied file using the reference stored in the container
+            var copied = _container.FindFile(@"scripts\copied.lua")!;
+            _packFileService.RenameFile(_container, copied, "renamed.lua");
+
+            Assert.That(_container.ContainsFile(@"scripts\copied.lua"), Is.False);
+            Assert.That(_container.ContainsFile(@"scripts\renamed.lua"), Is.True);
+            Assert.That(File.Exists(Path.Combine(_tempDir, "scripts", "renamed.lua")), Is.True);
+
+            VerifyTreeNodeExists(@"scripts\renamed.lua");
+            VerifyTreeNodeDoesNotExist(@"scripts\copied.lua");
+        }
+
+        // ──────────────────────────────────────────────────────────────────────
+        // B9 — Mixed create + delete arriving in the same external (watcher) batch.
+        // Both changes must be reflected in the tree.
+        // ──────────────────────────────────────────────────────────────────────
+
+        [Test]
+        public void B9_ExternalMixedCreateAndDelete_InSameBatch_TreeUpdated()
+        {
+            CreateSystemFolderContainer();
+            SeedFile(@"keep.txt", "keep");
+            SeedFile(@"remove.txt", "remove");
+
+            // On disk: delete one, create another
+            File.Delete(Path.Combine(_tempDir, "remove.txt"));
+            var addedPath = Path.Combine(_tempDir, "added.txt");
+            File.WriteAllText(addedPath, "added");
+
+            // Both events in the same debounce batch
+            _mockWatcher.Raise(w => w.Deleted += null, new FileSystemEventArgs(WatcherChangeTypes.Deleted, _tempDir, "remove.txt"));
+            _mockWatcher.Raise(w => w.Created += null, new FileSystemEventArgs(WatcherChangeTypes.Created, _tempDir, "added.txt"));
+            _container.ProcessPendingEvents(null);
+
+            // Container
+            Assert.That(_container.ContainsFile("remove.txt"), Is.False);
+            Assert.That(_container.ContainsFile("added.txt"), Is.True);
+            Assert.That(_container.ContainsFile("keep.txt"), Is.True);
+
+            // Tree
+            VerifyTreeNodeDoesNotExist(@"remove.txt");
+            VerifyTreeNodeExists(@"added.txt");
+            VerifyTreeNodeExists(@"keep.txt");
+        }
+
+        // ──────────────────────────────────────────────────────────────────────
         // Helpers
         // ──────────────────────────────────────────────────────────────────────
 

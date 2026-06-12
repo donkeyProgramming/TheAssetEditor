@@ -81,8 +81,10 @@ namespace Shared.Core.PackFiles.Models.Containers
             if (!string.IsNullOrWhiteSpace(pathByReference))
                 return pathByReference;
 
-            var pathByName = _fileList.FirstOrDefault(x => string.Equals(x.Value.Name, file.Name, StringComparison.OrdinalIgnoreCase)).Key;
-            return string.IsNullOrWhiteSpace(pathByName) ? null : pathByName;
+            // Fallback: match by name, but only when it is unambiguous. Matching by name
+            // when several files share the same name could resolve to the wrong file.
+            var matchesByName = _fileList.Where(x => string.Equals(x.Value.Name, file.Name, StringComparison.OrdinalIgnoreCase)).ToList();
+            return matchesByName.Count == 1 ? matchesByName[0].Key : null;
         }
 
         public Dictionary<string, PackFile> GetAllFiles() => _fileList;
@@ -134,7 +136,7 @@ namespace Shared.Core.PackFiles.Models.Containers
                 results.Add((path, packFile));
             }
 
-            results.Sort((a, b) => StringComparer.OrdinalIgnoreCase.Compare(a.Path, b.Path));
+            results.Sort((a, b) => PackFileSortHelper.PathComparer.Compare(a.Path, b.Path));
             return results;
         }
 
@@ -151,7 +153,7 @@ namespace Shared.Core.PackFiles.Models.Containers
                     results.Add((path, packFile));
             }
 
-            results.Sort((a, b) => StringComparer.CurrentCultureIgnoreCase.Compare(a.Path, b.Path));
+            results.Sort((a, b) => PackFileSortHelper.PathComparer.Compare(a.Path, b.Path));
             return results;
         }
 
@@ -232,6 +234,10 @@ namespace Shared.Core.PackFiles.Models.Containers
         public void DeleteFolder(string folder)
         {
             var normalizedFolder = PathNormalization.NormalizeFileName(folder);
+            // Guard against empty / root input which would otherwise resolve to the
+            // source folder itself and recursively delete the entire container.
+            if (string.IsNullOrWhiteSpace(normalizedFolder) || normalizedFolder.Trim('\\').Length == 0)
+                return;
             var absoluteFolderPath = Path.Combine(SystemFilePath!, normalizedFolder);
 
             using (SuppressWatcher())
@@ -270,9 +276,11 @@ namespace Shared.Core.PackFiles.Models.Containers
             using (SuppressWatcher())
                 _fileSystemAccess.FileMove(oldAbsolutePath, newAbsolutePath);
 
+            // Keep the caller's PackFile instance so events that publish 'file'
+            // can still be resolved by reference (avoids ambiguous name matching).
             _fileList.Remove(oldKey);
-            var newPackFile = new PackFile(file.Name, new FileSystemSource(newAbsolutePath));
-            _fileList[newRelativePath] = newPackFile;
+            file.DataSource = new FileSystemSource(newAbsolutePath);
+            _fileList[newRelativePath] = file;
         }
 
         public string RenameDirectory(string currentNodeName, string newName)
@@ -332,10 +340,12 @@ namespace Shared.Core.PackFiles.Models.Containers
             using (SuppressWatcher())
                 _fileSystemAccess.FileMove(oldAbsolutePath, newAbsolutePath);
 
+            // Keep the caller's PackFile instance so events that publish 'file'
+            // can still be resolved by reference (avoids ambiguous name matching).
             _fileList.Remove(key);
             file.Name = newName;
-            var newPackFile = new PackFile(newName, new FileSystemSource(newAbsolutePath));
-            _fileList[newRelativePath] = newPackFile;
+            file.DataSource = new FileSystemSource(newAbsolutePath);
+            _fileList[newRelativePath] = file;
         }
 
         public void SaveFileData(PackFile file, byte[] data)
@@ -378,13 +388,16 @@ namespace Shared.Core.PackFiles.Models.Containers
                 transientContainer.AddOrUpdateFile(relativePath, memFile);
             }
 
-            using (var fileStream = new FileStream(tempPath, FileMode.Create))
+            using (SuppressWatcher())
             {
-                using var writer = new BinaryWriter(fileStream);
-                PackFileSerializerWriter.SaveToByteArray(path, transientContainer, writer, gameInformation);
-            }
+                using (var fileStream = new FileStream(tempPath, FileMode.Create))
+                {
+                    using var writer = new BinaryWriter(fileStream);
+                    PackFileSerializerWriter.SaveToByteArray(path, transientContainer, writer, gameInformation);
+                }
 
-            _fileSystemAccess.FileMove(tempPath, path);
+                _fileSystemAccess.FileMove(tempPath, path);
+            }
         }
 
         // --- FileSystemWatcher integration ---
@@ -439,6 +452,9 @@ namespace Shared.Core.PackFiles.Models.Containers
 
         internal void ProcessPendingEvents(object? state)
         {
+            if (_disposed)
+                return;
+
             List<FileSystemEventArgs> events;
             lock (_pendingEvents)
             {
@@ -469,12 +485,15 @@ namespace Shared.Core.PackFiles.Models.Containers
 
             // Publish removed event BEFORE removing from _fileList so that
             // GetFullPath can still resolve paths for the tree view update.
-            var removedFiles = keysToRemove.Select(k => _fileList[k]).ToList();
+            // Deduplicate keys: chatty/duplicate watcher events (or a folder delete
+            // combined with a child delete) can collect the same key more than once.
+            var distinctKeysToRemove = keysToRemove.Distinct().ToList();
+            var removedFiles = distinctKeysToRemove.Select(k => _fileList[k]).ToList();
             if (removedFiles.Count > 0)
                 _eventHub?.PublishGlobalEvent(new PackFileContainerFilesRemovedEvent(this, removedFiles));
 
             // Now actually remove the entries
-            foreach (var key in keysToRemove)
+            foreach (var key in distinctKeysToRemove)
                 _fileList.Remove(key);
 
             if (addedFiles.Count > 0)

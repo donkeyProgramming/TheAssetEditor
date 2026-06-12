@@ -334,5 +334,163 @@ namespace Shared.CoreTest.PackFiles.Models.Containers
             for (var i = 0; i < sysKeys.Count; i++)
                 Assert.That(sysKeys[i], Is.EqualTo(normKeys[i]), $"File order mismatch at index {i}");
         }
+
+        // ──────────────────────────────────────────────────────────────────────
+        // B6 — Sort-order consistency between GetDirectoryContent, SearchFiles and
+        //      the saved .pack. All three must use the same ordering so the tree,
+        //      search results and persisted pack agree. Uses names that sort
+        //      differently under ordinal vs current-culture rules (underscore,
+        //      mixed case, digits).
+        // ──────────────────────────────────────────────────────────────────────
+
+        [Test]
+        public void B6_GetDirectoryContent_SortOrder_IsOrdinal_AndConsistentWithSearchAndSavedPack()
+        {
+            // Arrange: root-level files whose ordinal and culture orderings differ
+            var rootFiles = new[]
+            {
+                "Zebra.txt",
+                "apple.txt",
+                "_underscore.txt",
+                "File1.txt",
+                "file10.txt",
+                "file2.txt",
+            };
+
+            foreach (var name in rootFiles)
+                File.WriteAllText(Path.Combine(_tempDir, name), $"content of {name}");
+
+            var eventHub = new Mock<IGlobalEventHub>();
+            var fileSystem = CreateRealFileSystemAccess();
+            var mockWatcher = new Mock<IFileSystemWatcher>();
+            var container = new SystemFolderContainer(_tempDir, fileSystem, mockWatcher.Object, eventHub.Object);
+
+            // Expected ordering: ordinal, matching PackFileSortHelper.PathComparer / serializer
+            var expectedOrder = rootFiles
+                .Select(n => n.ToLowerInvariant())
+                .OrderBy(n => n, StringComparer.Ordinal)
+                .ToList();
+
+            // Act
+            var directoryOrder = container.GetDirectoryContent("").Select(x => x.Path).ToList();
+            var searchOrder = container.SearchFiles(null, null).Select(x => x.Path).ToList();
+
+            // Assert: GetDirectoryContent matches the ordinal expectation ...
+            Assert.That(directoryOrder, Is.EqualTo(expectedOrder),
+                "GetDirectoryContent should sort using ordinal rules (consistent with the saved pack).");
+
+            // ... and is consistent with SearchFiles
+            Assert.That(directoryOrder, Is.EqualTo(searchOrder),
+                "GetDirectoryContent and SearchFiles must produce the same ordering.");
+
+            // ... and with the persisted pack
+            var pfs = new PackFileService(eventHub.Object);
+            pfs.MessageBoxProvider = new Mock<ISimpleMessageBox>().Object;
+            pfs.EnforceGameFilesMustBeLoaded = false;
+            pfs.AddContainer(container);
+
+            var packPath = Path.Combine(_tempDir, "sorted_output.pack");
+            var gameInfo = GameInformationDatabase.GetGameById(GameTypeEnum.Warhammer3);
+            pfs.SavePackContainer(container, packPath, false, gameInfo);
+
+            using var fs = File.OpenRead(packPath);
+            using var reader = new BinaryReader(fs);
+            var loaded = PackFileSerializerLoader.Load(packPath, fs.Length, reader, new CaPackDuplicateFileResolver());
+            var savedOrder = loaded.GetAllFiles().Keys.ToList();
+
+            Assert.That(directoryOrder, Is.EqualTo(savedOrder),
+                "GetDirectoryContent ordering must match the order files are written into the .pack.");
+        }
+
+        // ──────────────────────────────────────────────────────────────────────
+        // B7 — DeleteFolder with empty / whitespace input must NOT delete the
+        //      entire source folder. Guards against the destructive root-delete.
+        // ──────────────────────────────────────────────────────────────────────
+
+        [Test]
+        public void B7_DeleteFolder_EmptyOrWhitespace_DoesNotWipeSourceFolder()
+        {
+            // Arrange: seed files at root and in a subfolder
+            File.WriteAllText(Path.Combine(_tempDir, "keep.txt"), "keep");
+            var subDir = Path.Combine(_tempDir, "sub");
+            Directory.CreateDirectory(subDir);
+            File.WriteAllText(Path.Combine(subDir, "nested.txt"), "nested");
+
+            var eventHub = new Mock<IGlobalEventHub>();
+            var fileSystem = CreateRealFileSystemAccess();
+            var mockWatcher = new Mock<IFileSystemWatcher>();
+            var container = new SystemFolderContainer(_tempDir, fileSystem, mockWatcher.Object, eventHub.Object);
+
+            Assert.That(container.GetFileCount(), Is.EqualTo(2));
+
+            // Act: attempt to delete an empty / whitespace folder
+            foreach (var input in new[] { "", "   ", "\\" })
+                container.DeleteFolder(input);
+
+            // Assert: source folder and all files are intact on disk and in the container
+            Assert.That(Directory.Exists(_tempDir), Is.True, "Source folder must not be deleted.");
+            Assert.That(File.Exists(Path.Combine(_tempDir, "keep.txt")), Is.True, "Root file must survive.");
+            Assert.That(File.Exists(Path.Combine(subDir, "nested.txt")), Is.True, "Nested file must survive.");
+            Assert.That(container.GetFileCount(), Is.EqualTo(2), "Container must still track both files.");
+        }
+
+        // ──────────────────────────────────────────────────────────────────────
+        // B15 — Path edge cases: spaces, mixed case, deep nesting. Add / rename /
+        //       move / delete and save must round-trip; lookups stay case-insensitive.
+        // ──────────────────────────────────────────────────────────────────────
+
+        [Test]
+        public void B15_PathEdgeCases_SpacesMixedCaseAndDeepNesting_RoundTrip()
+        {
+            var eventHub = new Mock<IGlobalEventHub>();
+            var fileSystem = CreateRealFileSystemAccess();
+            var mockWatcher = new Mock<IFileSystemWatcher>();
+            var container = new SystemFolderContainer(_tempDir, fileSystem, mockWatcher.Object, eventHub.Object);
+
+            var pfs = new PackFileService(eventHub.Object);
+            pfs.MessageBoxProvider = new Mock<ISimpleMessageBox>().Object;
+            pfs.EnforceGameFilesMustBeLoaded = false;
+            pfs.AddContainer(container);
+
+            // Add a file into a folder with spaces and mixed case
+            var spaced = PackFile.CreateFromASCII("Mixed Case.TXT", "spaced content");
+            pfs.AddFilesToPack(container, [new NewPackFileEntry(@"My Folder", spaced)]);
+
+            // Add a deeply nested file
+            var deep = PackFile.CreateFromASCII("leaf.bin", "deep content");
+            pfs.AddFilesToPack(container, [new NewPackFileEntry(@"a\b\c\d\e\f", deep)]);
+
+            // Lookups are case-insensitive (paths normalize to lower case)
+            Assert.That(container.ContainsFile(@"my folder\mixed case.txt"), Is.True);
+            Assert.That(container.ContainsFile(@"MY FOLDER\MIXED CASE.TXT"), Is.True);
+            Assert.That(container.ContainsFile(@"a\b\c\d\e\f\leaf.bin"), Is.True);
+
+            // Disk reflects the paths
+            Assert.That(File.Exists(Path.Combine(_tempDir, "My Folder", "Mixed Case.TXT")), Is.True);
+            Assert.That(File.Exists(Path.Combine(_tempDir, "a", "b", "c", "d", "e", "f", "leaf.bin")), Is.True);
+
+            // Rename the spaced file
+            var toRename = container.FindFile(@"my folder\mixed case.txt")!;
+            pfs.RenameFile(container, toRename, "Renamed File.txt");
+            Assert.That(container.ContainsFile(@"my folder\renamed file.txt"), Is.True);
+            Assert.That(File.Exists(Path.Combine(_tempDir, "My Folder", "Renamed File.txt")), Is.True);
+
+            // Save and reload — structure and content preserved
+            var packPath = Path.Combine(_tempDir, "edgecases.pack");
+            var gameInfo = GameInformationDatabase.GetGameById(GameTypeEnum.Warhammer3);
+            pfs.SavePackContainer(container, packPath, false, gameInfo);
+
+            using var fs = File.OpenRead(packPath);
+            using var reader = new BinaryReader(fs);
+            var loaded = PackFileSerializerLoader.Load(packPath, fs.Length, reader, new CaPackDuplicateFileResolver());
+
+            Assert.That(loaded.FindFile(@"my folder\renamed file.txt"), Is.Not.Null);
+            Assert.That(loaded.FindFile(@"a\b\c\d\e\f\leaf.bin"), Is.Not.Null);
+
+            var deepData = loaded.FindFile(@"a\b\c\d\e\f\leaf.bin")!.DataSource.ReadData();
+            Assert.That(System.Text.Encoding.ASCII.GetString(deepData), Is.EqualTo("deep content"));
+
+            container.Dispose();
+        }
     }
 }

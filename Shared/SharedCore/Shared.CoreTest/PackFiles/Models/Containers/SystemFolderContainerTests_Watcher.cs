@@ -423,5 +423,90 @@ namespace Shared.CoreTest.PackFiles.Models.Containers
             Assert.That(_container.ContainsFile(@"imported\model.rmv2"), Is.True);
             Assert.That(_container.ContainsFile(@"imported\texture.dds"), Is.True);
         }
+
+        // ──────────────────────────────────────────────────────────────────────
+        // B10 — Chatty / duplicate watcher events must not produce duplicate
+        // entries in the published add/remove payloads.
+        // ──────────────────────────────────────────────────────────────────────
+
+        [Test]
+        public void B10_DuplicateDeleteEvents_RemovedFilePublishedOnce()
+        {
+            // Watcher commonly raises the same Deleted event more than once.
+            _mockWatcher.Raise(w => w.Deleted += null, new FileSystemEventArgs(WatcherChangeTypes.Deleted, _tempDir, "existing.txt"));
+            _mockWatcher.Raise(w => w.Deleted += null, new FileSystemEventArgs(WatcherChangeTypes.Deleted, _tempDir, "existing.txt"));
+
+            _container.ProcessPendingEvents(null);
+
+            _mockEventHub.Verify(x => x.PublishGlobalEvent(It.Is<PackFileContainerFilesRemovedEvent>(e =>
+                e.RemovedFiles.Count == 1 && e.RemovedFiles[0].Name == "existing.txt"
+            )), Times.Once);
+
+            Assert.That(_container.ContainsFile("existing.txt"), Is.False);
+        }
+
+        [Test]
+        public void B10_DuplicateCreateEvents_AddedFilePublishedOnce()
+        {
+            var newFilePath = Path.Combine(_tempDir, "dup.txt");
+            File.WriteAllText(newFilePath, "data");
+
+            _mockWatcher.Raise(w => w.Created += null, new FileSystemEventArgs(WatcherChangeTypes.Created, _tempDir, "dup.txt"));
+            _mockWatcher.Raise(w => w.Created += null, new FileSystemEventArgs(WatcherChangeTypes.Created, _tempDir, "dup.txt"));
+
+            _container.ProcessPendingEvents(null);
+
+            _mockEventHub.Verify(x => x.PublishGlobalEvent(It.Is<PackFileContainerFilesAddedEvent>(e =>
+                e.AddedFiles.Count == 1 && e.AddedFiles[0].Name == "dup.txt"
+            )), Times.Once);
+        }
+
+        [Test]
+        public void B10_FolderDeletePlusChildDelete_FilePublishedOnce()
+        {
+            // Re-create container with a subfolder file
+            var subDir = Path.Combine(_tempDir, "folder");
+            Directory.CreateDirectory(subDir);
+            var child = Path.Combine(subDir, "child.txt");
+            File.WriteAllText(child, "child");
+
+            _container.Dispose();
+            _fileSystemAccess.Setup(x => x.DirectoryGetFiles(_tempDir, "*.*", SearchOption.AllDirectories))
+                .Returns([Path.Combine(_tempDir, "existing.txt"), child]);
+            _mockWatcher = new Mock<IFileSystemWatcher>();
+            _mockEventHub = new Mock<IGlobalEventHub>();
+            _container = new SystemFolderContainer(_tempDir, _fileSystemAccess.Object, _mockWatcher.Object, _mockEventHub.Object);
+
+            // Both a folder delete and the child file delete arrive in the same batch.
+            _mockWatcher.Raise(w => w.Deleted += null, new FileSystemEventArgs(WatcherChangeTypes.Deleted, _tempDir, "folder"));
+            _mockWatcher.Raise(w => w.Deleted += null, new FileSystemEventArgs(WatcherChangeTypes.Deleted, subDir, "child.txt"));
+
+            _container.ProcessPendingEvents(null);
+
+            // child.txt must be reported exactly once, not twice.
+            _mockEventHub.Verify(x => x.PublishGlobalEvent(It.Is<PackFileContainerFilesRemovedEvent>(e =>
+                e.RemovedFiles.Count(f => f.Name == "child.txt") == 1
+            )), Times.Once);
+
+            Assert.That(_container.ContainsFile(@"folder\child.txt"), Is.False);
+        }
+
+        // ──────────────────────────────────────────────────────────────────────
+        // B12 — Watcher activity around dispose must not throw or publish.
+        // ──────────────────────────────────────────────────────────────────────
+
+        [Test]
+        public void B12_ProcessPendingEvents_AfterDispose_DoesNotThrowOrPublish()
+        {
+            // Queue an event, then dispose before processing.
+            var newFilePath = Path.Combine(_tempDir, "late.txt");
+            File.WriteAllText(newFilePath, "late");
+            _mockWatcher.Raise(w => w.Created += null, new FileSystemEventArgs(WatcherChangeTypes.Created, _tempDir, "late.txt"));
+
+            _container.Dispose();
+
+            Assert.DoesNotThrow(() => _container.ProcessPendingEvents(null));
+            _mockEventHub.Verify(x => x.PublishGlobalEvent(It.IsAny<PackFileContainerFilesAddedEvent>()), Times.Never);
+        }
     }
 }

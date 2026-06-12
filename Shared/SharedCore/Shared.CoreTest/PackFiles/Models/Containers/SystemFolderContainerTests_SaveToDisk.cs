@@ -1,4 +1,5 @@
 using Moq;
+using Shared.Core.Events;
 using Shared.Core.PackFiles.Models;
 using Shared.Core.PackFiles.Models.Containers;
 using Shared.Core.PackFiles.Models.FileSources;
@@ -143,6 +144,66 @@ namespace Shared.CoreTest.PackFiles.Models.Containers
 
             var dataB = ((PackedFileSource)fileB!.DataSource).ReadData(fileStream);
             Assert.That(dataB, Is.EqualTo(new byte[] { 1, 2, 3, 4, 5 }));
+        }
+
+        // ──────────────────────────────────────────────────────────────────────
+        // B2 — Saving the pack INTO the watched folder must not ingest the produced
+        // .pack into the container itself (watcher must be suppressed during save).
+        // ──────────────────────────────────────────────────────────────────────
+
+        [Test]
+        public void B2_SaveIntoWatchedFolder_DoesNotIngestOwnPack()
+        {
+            var mockWatcher = new Mock<IFileSystemWatcher>();
+            var eventHub = new Mock<IGlobalEventHub>();
+            var outputPath = Path.Combine(_tempDir, "selfsave.pack");
+
+            // Simulate the OS watcher firing a Created event for the new pack while the
+            // save is still in progress (i.e. while suppression should be active).
+            _fileSystemAccess.Setup(x => x.FileMove(It.IsAny<string>(), It.IsAny<string>()))
+                .Callback((string s, string d) =>
+                {
+                    File.Move(s, d, overwrite: true);
+                    mockWatcher.Raise(w => w.Created += null,
+                        new FileSystemEventArgs(WatcherChangeTypes.Created, _tempDir, Path.GetFileName(d)));
+                });
+
+            var container = new SystemFolderContainer(_tempDir, _fileSystemAccess.Object, mockWatcher.Object, eventHub.Object);
+            try
+            {
+                var initialCount = container.GetFileCount();
+
+                container.SaveToDisk(outputPath, false, _gameInfo);
+                container.ProcessPendingEvents(null);
+
+                Assert.That(container.ContainsFile("selfsave.pack"), Is.False,
+                    "The saved .pack must not be ingested into its own container.");
+                Assert.That(container.GetFileCount(), Is.EqualTo(initialCount));
+                eventHub.Verify(x => x.PublishGlobalEvent(It.IsAny<Shared.Core.Events.Global.PackFileContainerFilesAddedEvent>()), Times.Never);
+            }
+            finally
+            {
+                container.Dispose();
+            }
+        }
+
+        // ──────────────────────────────────────────────────────────────────────
+        // B14 — The saved pack header version is PFH5 (current intended behaviour).
+        // ──────────────────────────────────────────────────────────────────────
+
+        [Test]
+        public void B14_SaveToDisk_WritesPfh5Header()
+        {
+            var outputPath = Path.Combine(_outputDir, "versioned.pack");
+
+            _container.SaveToDisk(outputPath, false, _gameInfo);
+
+            using var fileStream = File.OpenRead(outputPath);
+            using var reader = new BinaryReader(fileStream);
+            var loaded = PackFileSerializerLoader.Load(outputPath, fileStream.Length, reader, new CaPackDuplicateFileResolver());
+
+            Assert.That(loaded.Header, Is.Not.Null);
+            Assert.That(loaded.Header!.Version, Is.EqualTo(PackFileVersion.PFH5));
         }
     }
 }
