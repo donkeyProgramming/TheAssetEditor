@@ -1,4 +1,4 @@
-using Shared.Core.Events;
+﻿using Shared.Core.Events;
 using Shared.Core.Events.Global;
 using Shared.Core.ErrorHandling;
 using Shared.Core.Misc;
@@ -27,6 +27,7 @@ namespace Shared.Core.PackFiles.Models.Containers
         public string Name { get; set; }
         public bool IsCaPackFile { get; set; } = false;
         public string? SystemFilePath { get; }
+        public PackFileContainerType ContainerType => PackFileContainerType.SystemFolder;
 
         public SystemFolderContainer(string folderPath, IFileSystemAccess fileSystemAccess, IFileSystemWatcher? watcher = null, IGlobalEventHub? eventHub = null, SynchronizationContext? syncContext = null)
         {

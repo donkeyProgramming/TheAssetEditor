@@ -1,10 +1,18 @@
 ﻿namespace Shared.Core.PackFiles.Models
 {
+    public enum PackFileContainerType
+    {
+        Database,
+        Normal,
+        SystemFolder
+    }
+
     public interface IPackFileContainer
     {
         string Name { get; }
         bool IsCaPackFile { get; set; }
         string? SystemFilePath { get; }
+        PackFileContainerType ContainerType { get; }
 
 
         int GetFileCount();

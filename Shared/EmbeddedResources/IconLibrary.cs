@@ -9,9 +9,14 @@ namespace Shared.EmbeddedResources
     public static class IconLibrary
     {
         [AllowNull] public static BitmapImage FolderIcon { get; private set; } 
-        [AllowNull]public static BitmapImage CollectionIcon { get; private set; }
         [AllowNull]public static BitmapImage FileIcon { get; private set; }
         [AllowNull] public static BitmapImage LockIcon { get; private set; }
+
+        // Container/root-node icons, selected by pack-file type.
+        [AllowNull] public static BitmapImage NormalModPackIcon { get; private set; }
+        [AllowNull] public static BitmapImage SystemFolderModPackIcon { get; private set; }
+        [AllowNull] public static BitmapImage DatabaseModPackIcon { get; private set; }
+        [AllowNull] public static BitmapImage MissingIcon { get => VertexDebuggerIcon; }
 
         [AllowNull]public static BitmapImage VmdIcon { get; private set; }
         [AllowNull]public static BitmapImage Rmv2ModelIcon { get; private set; }
@@ -63,9 +68,13 @@ namespace Shared.EmbeddedResources
         public static void Load()
         {
             FolderIcon = BitmapToImageSource("icons8-folder-48.png");
-            CollectionIcon =  BitmapToImageSource("icons8-collectibles-48.png");
             FileIcon = BitmapToImageSource("icons8-file-48.png");
             LockIcon  = BitmapToImageSource("icons8-lock-50.png");
+
+            // TODO: replace these placeholders with dedicated pack-type icon assets.
+            NormalModPackIcon = BitmapToImageSource("icons8-collectibles-48.png");
+            SystemFolderModPackIcon = BitmapToImageSource("icons8-computer-40.png");
+            DatabaseModPackIcon = BitmapToImageSource("icons8-database-2-48.png");
 
             VmdIcon = BitmapToImageSource("icons8-man-50.png");
             Rmv2ModelIcon = BitmapToImageSource("icons8-orthogonal-view-50.png");

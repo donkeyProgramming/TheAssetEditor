@@ -2,6 +2,7 @@
 using System.Reflection;
 using System.Text;
 using Shared.Core.ErrorHandling;
+using Shared.Core.Events;
 using Shared.Core.PackFiles.Models;
 using Shared.Core.PackFiles.Models.Containers;
 using Shared.Core.PackFiles.Serialization;
@@ -10,11 +11,29 @@ using Shared.Core.Services;
 using Shared.Core.Settings;
 
 namespace Shared.Core.PackFiles.Utility
-{ 
-    public enum PackFileContainerType
+{
+    public interface ISystemFolderContainerFactory
     {
-        Cached,
-        Normal,
+        IPackFileContainer Create(string folderPath);
+    }
+
+    public class SystemFolderContainerFactory : ISystemFolderContainerFactory
+    {
+        private readonly IFileSystemAccess _fileSystemAccess;
+        private readonly IGlobalEventHub _globalEventHub;
+        private readonly Func<IFileSystemWatcher> _watcherFactory;
+
+        public SystemFolderContainerFactory(IFileSystemAccess fileSystemAccess, IGlobalEventHub globalEventHub, Func<IFileSystemWatcher> watcherFactory)
+        {
+            _fileSystemAccess = fileSystemAccess;
+            _globalEventHub = globalEventHub;
+            _watcherFactory = watcherFactory;
+        }
+
+        public IPackFileContainer Create(string folderPath)
+        {
+            return new SystemFolderContainer(folderPath, _fileSystemAccess, _watcherFactory(), _globalEventHub);
+        }
     }
 
     public interface IPackFileContainerLoader
@@ -112,20 +131,20 @@ namespace Shared.Core.PackFiles.Utility
                 packfileResolver = new CustomPackDuplicateFileResolver();
             }
 
-            return CreateFromCollection(PackFileContainerType.Cached, gameDataFolder, fullPackFilePaths, $"All Game Packs - {gameName}", true, packfileResolver);
+            return CreateFromCollection(PackFileContainerType.Database, gameDataFolder, fullPackFilePaths, $"All Game Packs - {gameName}", true, packfileResolver);
         }
 
 
         public IPackFileContainer CreateFromCollection(PackFileContainerType type, string packFileSystemPath, List<string> fullPackFilePaths, string createdPackFileName, bool loadAsReadOnly, IDuplicateFileResolver duplicateFileResolver)
         {
-            if(type == PackFileContainerType.Cached && loadAsReadOnly == false)
+            if(type == PackFileContainerType.Database && loadAsReadOnly == false)
                 throw new InvalidOperationException($"Cannot load as writable if loading from cache. Caching is only supported for read-only containers. PackFile {createdPackFileName}");
 
             var fingerprint = _packFileContainerCacheHelper.ComputeFingerprint(fullPackFilePaths); 
             var cachePrefix = createdPackFileName;
             var cacheFilePath = _packFileContainerCacheHelper.GetCacheFilePath(cachePrefix, fingerprint);
 
-            if (type == PackFileContainerType.Cached)
+            if (type == PackFileContainerType.Database)
             {
                 var cached = _packFileContainerCacheHelper.TryLoadFromCache(cacheFilePath, fingerprint);
                 if (cached != null)
@@ -146,7 +165,7 @@ namespace Shared.Core.PackFiles.Utility
                 container.IsCaPackFile = loadAsReadOnly;
                 container.SystemFilePath = packFileSystemPath;
 
-                if (type == PackFileContainerType.Cached)
+                if (type == PackFileContainerType.Database)
                 {
                     return _packFileContainerCacheHelper.SaveAndLoadCache(fingerprint, container, cacheFilePath);
                 }

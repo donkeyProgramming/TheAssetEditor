@@ -15,6 +15,7 @@ using Shared.Core.DevConfig;
 using Shared.Core.ErrorHandling;
 using Shared.Core.Events;
 using Shared.Core.PackFiles;
+using Shared.Core.PackFiles.Models;
 using Shared.Core.PackFiles.Utility;
 using Shared.Core.Services;
 using Shared.Core.Settings;
@@ -100,7 +101,7 @@ namespace AssetEditor
             {
                 var packfileService = _serviceProvider.GetRequiredService<IPackFileService>();
                 var containerLoader = _serviceProvider.GetRequiredService<IPackFileContainerLoader>();
-                var loadRes = containerLoader.CreateFromGameEnum(PackFileContainerType.Cached, settingsService.CurrentSettings.CurrentGame);
+                var loadRes = containerLoader.CreateFromGameEnum(PackFileContainerType.Database, settingsService.CurrentSettings.CurrentGame);
 
                 if (loadRes == null)
                     MessageBox.Show($"Unable to load all CA packfiles in {gamePath}");

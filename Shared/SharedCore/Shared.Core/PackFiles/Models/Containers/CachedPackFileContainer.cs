@@ -1,4 +1,4 @@
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
@@ -31,6 +31,7 @@ namespace Shared.Core.PackFiles.Models.Containers
         public string Name { get; set; }
         public bool IsCaPackFile { get => true; set { } }
         public string SystemFilePath { get; set; }
+        public PackFileContainerType ContainerType => PackFileContainerType.Database;
         public HashSet<string> SourcePackFilePaths { get; set; } = [];
 
         /// <summary>

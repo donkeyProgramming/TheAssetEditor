@@ -16,6 +16,7 @@ namespace Shared.Core.PackFiles.Models.Containers
         public PFHeader Header { get; set; }
         public bool IsCaPackFile { get; set; } = false;
         public string? SystemFilePath { get; set; }
+        public PackFileContainerType ContainerType => PackFileContainerType.Normal;
         public long OriginalLoadByteSize { get; set; } = -1;
         public HashSet<string> SourcePackFilePaths { get; set; } = [];
 
