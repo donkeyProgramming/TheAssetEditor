@@ -128,7 +128,9 @@ namespace Shared.Core.PackFiles.Utility
                 packfileResolver = new CustomPackDuplicateFileResolver();
             }
 
-            return CreateFromCollection(PackFileContainerType.Database, gameDataFolder, fullPackFilePaths, $"All Game Packs - {gameName}", true, packfileResolver);
+            var container = CreateFromCollection(PackFileContainerType.Database, gameDataFolder, fullPackFilePaths, $"All Game Packs - {gameName}", true, packfileResolver);
+            container.IsCaPackFile = true;
+            return container;
         }
 
 
