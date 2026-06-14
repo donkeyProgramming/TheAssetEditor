@@ -102,7 +102,7 @@
   "SettingsWindow.GameDataPathHint": "Browse for game data location e.g. \"C:\\SteamLibrary\\steamapps\\common\\Total War WARHAMMER III\\data\"",
 
   "MenuBar.File": "_File",
-  "MenuBar.File.NewPack": "New Pack",
+  "MenuBar.File.NewPack": "New Project/Pack",
   "MenuBar.File.NewAnimPackWh3": "New AnimPack (Warhammer III)",
   "MenuBar.File.NewAnimPack3K": "New AnimPack (Three Kingdoms)",
   "MenuBar.File.SaveActivePack": "Save active pack",

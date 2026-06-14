@@ -1,17 +1,10 @@
-using System.Windows;
+﻿using System.Windows;
 using System.Windows.Input;
 
 namespace CommonControls.BaseDialogs
 {
-    public enum NewPackFileType
-    {
-        GamePack,
-        FolderPack
-    }
-
     public partial class NewPackFileWindow : Window
     {
-        public NewPackFileType SelectedType { get; private set; } = NewPackFileType.GamePack;
         public string PackName => NameTextBox.Text;
         public string? SelectedFolderPath { get; private set; }
 
@@ -19,25 +12,6 @@ namespace CommonControls.BaseDialogs
         {
             InitializeComponent();
             Owner = Application.Current.MainWindow;
-        }
-
-        private void PackType_Changed(object sender, RoutedEventArgs e)
-        {
-            if (GamePackRadio == null || FolderPackRadio == null)
-                return;
-
-            if (GamePackRadio.IsChecked == true)
-            {
-                SelectedType = NewPackFileType.GamePack;
-                NameTextBox.Visibility = Visibility.Visible;
-                BrowseFolderButton.Visibility = Visibility.Collapsed;
-            }
-            else
-            {
-                SelectedType = NewPackFileType.FolderPack;
-                NameTextBox.Visibility = Visibility.Collapsed;
-                BrowseFolderButton.Visibility = Visibility.Visible;
-            }
         }
 
         private void BrowseFolder_Click(object sender, RoutedEventArgs e)

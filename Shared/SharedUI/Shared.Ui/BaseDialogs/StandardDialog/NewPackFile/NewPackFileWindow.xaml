@@ -19,19 +19,16 @@
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
-        <TextBlock Grid.Row="0" Text="Select pack type:" Margin="0,0,0,8" FontWeight="SemiBold"/>
+        <TextBlock Grid.Row="0" Text="A packfile project is a folder on disk. Select the folder:" Margin="0,0,0,8" FontWeight="SemiBold"/>
 
-        <RadioButton x:Name="GamePackRadio" Grid.Row="1" Content="Game Pack — in-memory pack file (.pack)" 
-                     IsChecked="True" Margin="0,0,0,6" Checked="PackType_Changed"/>
-        <RadioButton x:Name="FolderPackRadio" Grid.Row="2" Content="Folder Pack — mirrors a folder on disk" 
-                     Margin="0,0,0,10" Checked="PackType_Changed"/>
+   
 
         <Grid Grid.Row="3" Margin="0,0,0,10">
             <TextBox x:Name="NameTextBox" VerticalAlignment="Top" Height="24"
                      Visibility="Visible" KeyDown="Key_Down"/>
             <Button x:Name="BrowseFolderButton" Content="Browse folder..." 
                     VerticalAlignment="Top" Height="24"
-                    Visibility="Collapsed" Click="BrowseFolder_Click"/>
+                 Click="BrowseFolder_Click"/>
         </Grid>
 
         <StackPanel Grid.Row="4" Orientation="Horizontal" HorizontalAlignment="Right">

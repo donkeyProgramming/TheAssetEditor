@@ -23,7 +23,7 @@
 
             <MenuItem Header="{loc:Loc MenuBar.File}" BorderThickness="1.5" WindowChrome.IsHitTestVisibleInChrome="True">
 
-                <MenuItem Header="{loc:Loc MenuBar.File.NewPack}" Command="{Binding MenuBar.CreateNewPackFileCommand}"/>
+                <MenuItem Header="{loc:Loc MenuBar.File.NewPack}" Command="{Binding MenuBar.CreateNewProjectCommand}"/>
                 <MenuItem Header="{loc:Loc MenuBar.File.NewAnimPackWh3}" Command="{Binding MenuBar.CreateAnimPackWarhammer3Command}"/>
                 <MenuItem Header="{loc:Loc MenuBar.File.NewAnimPack3K}" Command="{Binding MenuBar.CreateAnimPack3kCommand}"/>
 
