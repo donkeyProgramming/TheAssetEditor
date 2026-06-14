@@ -1,23 +1,21 @@
 ﻿using System.IO;
 using System.Windows.Forms;
-using CommonControls.BaseDialogs;
 using Shared.Core.Events;
 using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
-using Shared.Core.PackFiles.Models.Containers;
 using Shared.Core.PackFiles.Utility;
 using Shared.Core.Services;
 
 namespace AssetEditor.UiCommands
 {
-    public class OpenPackFileCommand : IAeCommand
+    public class ImportPackAsAsProjectCommand : IAeCommand
     {
         private readonly IPackFileService _packFileService;
         private readonly IPackFileContainerLoader _packFileContainerLoader;
         private readonly ISystemFolderContainerFactory _systemFolderContainerFactory;
         private readonly IStandardDialogs _standardDialogs;
 
-        public OpenPackFileCommand(
+        public ImportPackAsAsProjectCommand(
             IPackFileService packFileService,
             IPackFileContainerLoader packFileContainerLoader,
             ISystemFolderContainerFactory systemFolderContainerFactory,
@@ -30,56 +28,6 @@ namespace AssetEditor.UiCommands
         }
 
         public void Execute()
-        {
-            var optionsWindow = new OpenPackFileOptionsWindow();
-            if (optionsWindow.ShowDialog() != true)
-                return;
-
-            switch (optionsWindow.SelectedOption)
-            {
-                case OpenPackFileOption.OpenPackFile:
-                    OpenPackFile();
-                    break;
-                case OpenPackFileOption.OpenSystemFolder:
-                    OpenSystemFolder();
-                    break;
-                case OpenPackFileOption.ConvertToSystemFolder:
-                    ConvertPackToSystemFolder();
-                    break;
-            }
-        }
-
-        private void OpenPackFile()
-        {
-            using var dialog = new OpenFileDialog
-            {
-                Filter = "Pack files (*.pack)|*.pack|All files (*.*)|*.*"
-            };
-
-            if (dialog.ShowDialog() != DialogResult.OK)
-                return;
-
-            var container = _packFileContainerLoader.CreateFromPackFile(PackFileContainerType.Normal, dialog.FileName, false);
-            _packFileService.AddContainer(container, true);
-        }
-
-        private void OpenSystemFolder()
-        {
-            using var dialog = new FolderBrowserDialog
-            {
-                Description = "Select folder to open as a pack",
-                UseDescriptionForTitle = true
-            };
-
-            if (dialog.ShowDialog() != DialogResult.OK)
-                return;
-
-            var container = _systemFolderContainerFactory.Create(dialog.SelectedPath);
-            _packFileService.AddContainer(container);
-            _packFileService.SetEditablePack(container);
-        }
-
-        private void ConvertPackToSystemFolder()
         {
             // Step 1: Select the .pack file
             using var packDialog = new OpenFileDialog
@@ -122,6 +70,7 @@ namespace AssetEditor.UiCommands
             var systemContainer = _systemFolderContainerFactory.Create(destinationFolder);
             _packFileService.AddContainer(systemContainer);
             _packFileService.SetEditablePack(systemContainer);
+
         }
     }
 }

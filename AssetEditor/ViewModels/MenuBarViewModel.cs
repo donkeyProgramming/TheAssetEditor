@@ -73,7 +73,9 @@ namespace AssetEditor.ViewModels
         }
 
         [RelayCommand] private void OpenSettingsWindow() => _uiCommandFactory.Create<OpenSettingsDialogCommand>().Execute();
-        [RelayCommand] private void OpenPackFile() => _uiCommandFactory.Create<OpenPackFileCommand>().Execute();
+        [RelayCommand] private void OpenProjectFolder() => _uiCommandFactory.Create<OpenProjectCommand>().Execute();
+        [RelayCommand] private void ImportPackAsProject() => _uiCommandFactory.Create<ImportPackAsAsProjectCommand>().Execute();
+        [RelayCommand] private void ImportReferencePack() => _uiCommandFactory.Create<ImportReferencePackCommand>().Execute();
         [RelayCommand] private void CreateNewPackFile() => _uiCommandFactory.Create<CreateNewPackFileCommand>().Execute();
         
         [RelayCommand] private void CreateAnimPackWarhammer3() => _uiCommandFactory.Create<CreateExampleAnimationDbCommand>().CreateAnimationDbWarhammer3();
