@@ -55,12 +55,7 @@ namespace Shared.CoreTest.PackFiles.Serialization
 
             // Create packfile with the above files
             var outputContainerName = @"c:\fullpath\to\packfile.pack";
-            var packFileHeader = PackFileVersionConverter.ToString(outputPackFileVersion);
-            var container = new PackFileContainer("test")
-            {
-                Header = new PFHeader(packFileHeader, PackFileCAType.MOD),
-                SystemFilePath = "test.pack"
-            };
+            var container = PackFileContainer.CreatePackFile("test", "test.pack", outputPackFileVersion);
 
             foreach (var fileInfo in expectedFileInfo)
                 container.AddOrUpdateFile(fileInfo.FilePath, PackFile.CreateFromASCII(fileInfo.FileName, new string(fileInfo.Content, fileInfo.Length)));

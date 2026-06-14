@@ -1,4 +1,4 @@
-using Shared.Core.PackFiles;
+﻿using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
 using Shared.Core.PackFiles.Models.Containers;
 using Shared.Ui.BaseDialogs.PackFileTree;
@@ -184,7 +184,7 @@ namespace Shared.UiTest.BaseDialogs.PackFileTree
             vm.Filter.FilterText = "hero";
 
             // Act - add a new container
-            var container2 = new PackFileContainer("mod2") { IsCaPackFile = false, SystemFilePath = "c:\\mod2.pack" };
+            var container2 = PackFileContainer.CreatePackFile("mod2", "c:\\mod2.pack");
             var file1 = PackFile.CreateFromASCII("hero_shield.dds", "data");
             var file2 = PackFile.CreateFromASCII("enemy.dds", "data");
             container2.AddOrUpdateFile("textures\\hero_shield.dds", file1);

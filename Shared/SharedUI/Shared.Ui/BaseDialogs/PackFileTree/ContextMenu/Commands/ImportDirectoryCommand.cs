@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Shared.Core.PackFiles;
@@ -19,7 +19,7 @@ namespace Shared.Ui.BaseDialogs.PackFileTree.ContextMenu.Commands
         public bool ShouldAdd(TreeNode node)
         {
             var container = TreeNodeHelper.GetPackFileContainer(node);
-            return node.NodeType != NodeType.File && container is { IsCaPackFile: false };
+            return node.NodeType != NodeType.File && container is { IsReadOnly: false };
         }
 
         public bool IsEnabled(TreeNode node) => true;
@@ -41,10 +41,10 @@ namespace Shared.Ui.BaseDialogs.PackFileTree.ContextMenu.Commands
                 return;
             }
 
-            if (container.IsCaPackFile)
+            if (container.IsReadOnly)
             {
-                _logger.Here().Warning($"Import directory blocked for CA pack '{CommandLoggingHelper.DescribePack(container)}'");
-                standardDialogs.ShowDialogBox("Unable to edit CA packfile");
+                _logger.Here().Warning($"Import directory blocked for readonly pack '{CommandLoggingHelper.DescribePack(container)}'");
+                standardDialogs.ShowDialogBox("Unable to edit readonly packfile");
                 return;
             }
 

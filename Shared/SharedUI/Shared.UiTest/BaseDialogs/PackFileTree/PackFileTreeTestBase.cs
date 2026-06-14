@@ -44,7 +44,7 @@ namespace Shared.UiTest.BaseDialogs.PackFileTree
 
         protected IPackFileContainer AddPackFiles(bool isCa, string containerName, string fileSystemPath, params string[] files)
         {
-            var packfileContainer = new PackFileContainer(containerName) { IsCaPackFile = isCa, SystemFilePath = fileSystemPath };
+            var packfileContainer = isCa ? PackFileContainer.CreateCaPackFile(containerName, fileSystemPath) : PackFileContainer.CreatePackFile(containerName, fileSystemPath);
             foreach (var file in files)
             {
                 var packFile = PackFile.CreateFromASCII(Path.GetFileName(file), "content");

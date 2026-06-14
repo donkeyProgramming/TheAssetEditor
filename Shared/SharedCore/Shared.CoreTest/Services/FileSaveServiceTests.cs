@@ -29,10 +29,8 @@ namespace Shared.CoreTest.Services
             var dialogProvider = new Mock<ISimpleMessageBox>();
             _pfs = new PackFileService(_eventHub.Object);
             (_pfs as PackFileService).MessageBoxProvider = dialogProvider.Object;
-            var container = new PackFileContainer("MyTest");
-            container.SystemFilePath = "SystemPath";
-            container.IsCaPackFile = true;
-
+            var container = PackFileContainer.CreateCaPackFile("MyTest", "SystemPath");
+  
             _pfs.AddContainer(container);
             _container = _pfs.CreateNewPackFileContainer("Output", PackFileVersion.PFH5, PackFileCAType.MOD, true);
 

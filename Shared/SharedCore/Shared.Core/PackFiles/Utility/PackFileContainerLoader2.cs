@@ -73,10 +73,7 @@ namespace Shared.Core.PackFiles.Utility
             }
 
             var containerName = Path.GetFileName(packFileSystemPath);
-            var container = new PackFileContainer(containerName)
-            {
-                SystemFilePath = packFileSystemPath,
-            };
+            var container = PackFileContainer.CreatePackFile(containerName, packFileSystemPath);
             AddFolderContentToPackFile(container, packFileSystemPath, packFileSystemPath.ToLower() + "\\");
             return container;
         }
@@ -162,7 +159,7 @@ namespace Shared.Core.PackFiles.Utility
             {
                 var container = LoadPackFilesFromDisk(createdPackFileName, fullPackFilePaths, duplicateFileResolver);
                 container.Name = createdPackFileName;
-                container.IsCaPackFile = loadAsReadOnly;
+                container.IsReadOnly = loadAsReadOnly;
                 container.SystemFilePath = packFileSystemPath;
 
                 if (type == PackFileContainerType.Database)
@@ -223,7 +220,7 @@ namespace Shared.Core.PackFiles.Utility
             if (packList.Count == 1)
                 return packList.First();
 
-            var mergedPackFile = new PackFileContainer(createdPackFileName);
+            var mergedPackFile = PackFileContainer.CreatePackFile(createdPackFileName);
             var packFilesOrderedByGroup = packList.GroupBy(x => x.Header.LoadOrder).OrderBy(x => x.Key);
 
             foreach (var group in packFilesOrderedByGroup)

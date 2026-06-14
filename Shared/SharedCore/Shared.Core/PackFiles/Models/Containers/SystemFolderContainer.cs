@@ -25,6 +25,7 @@ namespace Shared.Core.PackFiles.Models.Containers
         private bool _disposed = false;
 
         public string Name { get; set; }
+        public bool IsReadOnly { get; set; } = false;
         public bool IsCaPackFile { get; set; } = false;
         public string? SystemFilePath { get; }
         public PackFileContainerType ContainerType => PackFileContainerType.SystemFolder;
@@ -376,11 +377,7 @@ namespace Shared.Core.PackFiles.Models.Containers
 
             // Build a transient PackFileContainer with in-memory data for serialization
             var versionString = PackFileVersionConverter.ToString(PackFileVersion.PFH5);
-            var transientContainer = new PackFileContainer(Name)
-            {
-                Header = new PFHeader(versionString, PackFileCAType.MOD),
-                SystemFilePath = path
-            };
+            var transientContainer = PackFileContainer.CreatePackFile(Name, path, PackFileVersion.PFH5);
 
             foreach (var (relativePath, packFile) in _fileList)
             {

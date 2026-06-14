@@ -1,4 +1,4 @@
-using Shared.Core.PackFiles.Models;
+﻿using Shared.Core.PackFiles.Models;
 using Shared.Core.PackFiles.Models.Containers;
 using Shared.Ui.BaseDialogs.PackFileTree;
 using Shared.Ui.BaseDialogs.PackFileTree.Utility;
@@ -10,7 +10,7 @@ namespace Shared.UiTest.BaseDialogs.PackFileTree
         [Test]
         public void DirectoryWithoutChildren_StartsEmpty()
         {
-            var container = new PackFileContainer("test.pack");
+            var container = PackFileContainer.CreatePackFile("test.pack", "test.pack");
 
             var directoryNode = new TreeNode("documents", NodeType.Directory, null);
 

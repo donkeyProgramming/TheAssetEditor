@@ -70,11 +70,7 @@ namespace Shared.CoreTest.PackFiles.Models.Containers
             else
             {
                 var parent = new PackedFileSourceParent { FilePath = @"c:\game\data\pack1.pack" };
-                var sourceContainer = new PackFileContainer("TestCache")
-                {
-                    IsCaPackFile = true,
-                    SystemFilePath = @"c:\game\data"
-                };
+                var sourceContainer = PackFileContainer.CreateCaPackFile("TestCache", @"c:\game\data");
                 sourceContainer.SourcePackFilePaths.Add(@"c:\game\data\pack1.pack");
 
                 foreach (var file in TestFiles)

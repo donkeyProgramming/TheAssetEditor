@@ -1,4 +1,4 @@
-using Moq;
+﻿using Moq;
 using Shared.Core.Events;
 using Shared.Core.Events.Global;
 using Shared.Core.PackFiles;
@@ -205,7 +205,7 @@ namespace Shared.CoreTest.PackFiles.Models.Containers
             var target = new SystemFolderContainer(_tempDir, fileSystem, mockWatcher.Object, eventHub.Object);
 
             // Create a source PackFileContainer
-            var source = new PackFileContainer("source") { Header = new PFHeader("PFH5", PackFileCAType.MOD) };
+            var source = PackFileContainer.CreatePackFile("source");
             source.AddOrUpdateFile(@"scripts\new_script.lua", new PackFile("new_script.lua", new MemorySource("lua content"u8.ToArray())));
 
             var pfs = new PackFileService(eventHub.Object);
@@ -241,7 +241,7 @@ namespace Shared.CoreTest.PackFiles.Models.Containers
             File.WriteAllText(Path.Combine(_tempDir, "initial.txt"), "initial");
             var target = new SystemFolderContainer(_tempDir, fileSystem, mockWatcher.Object, eventHub.Object);
 
-            var source = new PackFileContainer("source") { Header = new PFHeader("PFH5", PackFileCAType.MOD) };
+            var source = PackFileContainer.CreatePackFile("source"); 
             source.AddOrUpdateFile(@"data\added_file.bin", new PackFile("added_file.bin", new MemorySource(new byte[] { 1, 2, 3, 4 })));
 
             var pfs = new PackFileService(eventHub.Object);
@@ -298,7 +298,7 @@ namespace Shared.CoreTest.PackFiles.Models.Containers
             var sysContainer = new SystemFolderContainer(_tempDir, fileSystem, mockWatcher.Object, eventHub.Object);
 
             // Create equivalent PackFileContainer
-            var packContainer = new PackFileContainer("test") { Header = new PFHeader("PFH5", PackFileCAType.MOD), SystemFilePath = "test.pack" };
+            var packContainer = PackFileContainer.CreatePackFile("test", "test.pack");
             foreach (var path in filePaths)
                 packContainer.AddOrUpdateFile(path, PackFile.CreateFromASCII(Path.GetFileName(path), $"content of {path}"));
 

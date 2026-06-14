@@ -1,16 +1,7 @@
-﻿using System.IO;
-using System.Reflection.Metadata;
-using Moq;
-using Shared.Core.DependencyInjection;
-using Shared.Core.Events;
+﻿using Moq;
 using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
-using Shared.Core.PackFiles.Models.Containers;
-using Shared.Core.Settings;
-using Shared.Core.ToolCreation;
 using Shared.Ui.BaseDialogs.PackFileTree;
-using Shared.Ui.BaseDialogs.PackFileTree.ContextMenu;
-using Shared.Ui.BaseDialogs.PackFileTree.Utility;
 
 namespace Shared.UiTest.BaseDialogs.PackFileTree.ContextMenu.Commands
 {

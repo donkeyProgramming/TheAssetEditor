@@ -29,7 +29,8 @@ namespace Shared.Core.PackFiles.Models.Containers
         public CacheStorageMode StorageMode { get; }
         public string? DbFilePath { get; }
         public string Name { get; set; }
-        public bool IsCaPackFile { get => true; set { } }
+        public bool IsReadOnly { get => true; set { } }
+        public bool IsCaPackFile { get; set; } = false;
         public string SystemFilePath { get; set; }
         public PackFileContainerType ContainerType => PackFileContainerType.Database;
         public HashSet<string> SourcePackFilePaths { get; set; } = [];
@@ -261,11 +262,7 @@ namespace Shared.Core.PackFiles.Models.Containers
         {
             var packParent = new PackedFileSourceParent { FilePath = sourcePackFilePath ?? @"c:\game\data\pack1.pack" };
 
-            var source = new PackFileContainer(containerName)
-            {
-                IsCaPackFile = true,
-                SystemFilePath = systemFilePath
-            };
+            var source = PackFileContainer.CreateReadOnlyPackFile(containerName, systemFilePath);
 
             if (sourcePackFilePath != null)
                 source.SourcePackFilePaths.Add(sourcePackFilePath);

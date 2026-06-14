@@ -1,4 +1,4 @@
-using Test.TestingUtility.TestUtility;
+﻿using Test.TestingUtility.TestUtility;
 using Moq;
 using Shared.Core.Services;
 using Shared.Ui.BaseDialogs.PackFileTree;
@@ -33,27 +33,6 @@ namespace Shared.UiTest.BaseDialogs.PackFileTree.ContextMenu.Commands
             var command = new ImportFileCommand(_packFileService, new Mock<IStandardDialogs>().Object, new Mock<IFileSystemAccess>().Object, MockScopedLogger.Create());
 
             Assert.That(command.IsEnabled(root), Is.True);
-        }
-
-        [Test]
-        public void Execute_CaPackShowsErrorAndDoesNotImport()
-        {
-            // Arrange
-            AddPackFiles(true, "gamefile", "root", ["rootfolder\\file.txt"]);
-            var viewModel = PackFileBrowser();
-            var root = viewModel.Files.First();
-
-            var dialogs = new Mock<IStandardDialogs>();
-            var fileSystem = new Mock<IFileSystemAccess>();
-
-            // Act
-            var command = new ImportFileCommand(_packFileService, dialogs.Object, fileSystem.Object, MockScopedLogger.Create());
-            command.Configure(root);
-
-            command.Execute();
-
-            // Assert
-            dialogs.Verify(x => x.ShowDialogBox("Unable to edit CA packfile", "Error"), Times.Once);
         }
 
         [Test]

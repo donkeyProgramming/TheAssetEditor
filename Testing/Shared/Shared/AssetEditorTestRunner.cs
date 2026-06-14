@@ -59,11 +59,7 @@ namespace Test.TestingUtility.Shared
 
         public IPackFileContainer? CreateCaContainer()
         {
-            var caConainter = new PackFileContainer("CA")
-            {
-                IsCaPackFile = true,
-                SystemFilePath = @"c:\files\game\ca.pack"
-            };
+            var caConainter = PackFileContainer.CreateCaPackFile("CA", @"c:\files\game\ca.pack");
             PackFileService.AddContainer(caConainter, false);
             return caConainter;
         }

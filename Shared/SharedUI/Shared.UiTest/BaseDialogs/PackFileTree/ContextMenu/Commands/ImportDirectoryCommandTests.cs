@@ -36,26 +36,6 @@ namespace Shared.UiTest.BaseDialogs.PackFileTree.ContextMenu.Commands
         }
 
         [Test]
-        public void Execute_CaPackShowsErrorAndDoesNotImport()
-        {
-            // Arrange
-            AddPackFiles(true, "gamefile", "root", ["rootfolder\\file.txt"]);
-            var viewModel = PackFileBrowser();
-            var root = viewModel.Files.First();
-
-            var dialogs = new Mock<IStandardDialogs>();
-
-            // Act
-            var command = new ImportDirectoryCommand(_packFileService, dialogs.Object, new Mock<IFileSystemAccess>().Object, MockScopedLogger.Create());
-            command.Configure(root);
-
-            command.Execute();
-
-            // Assert
-            dialogs.Verify(x => x.ShowDialogBox("Unable to edit CA packfile", "Error"), Times.Once);
-        }
-
-        [Test]
         public void Execute_DialogCancelled_DoesNotImport()
         {
             // Arrange

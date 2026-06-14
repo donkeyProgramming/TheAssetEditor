@@ -10,6 +10,7 @@
     public interface IPackFileContainer
     {
         string Name { get; }
+        bool IsReadOnly { get; set; }
         bool IsCaPackFile { get; set; }
         string? SystemFilePath { get; }
         PackFileContainerType ContainerType { get; }

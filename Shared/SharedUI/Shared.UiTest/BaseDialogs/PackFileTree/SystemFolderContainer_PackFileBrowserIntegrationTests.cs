@@ -1,4 +1,4 @@
-// Integration tests for SystemFolderContainer + PackFileBrowserViewModel.
+﻿// Integration tests for SystemFolderContainer + PackFileBrowserViewModel.
 //
 // Validates that the tree view stays in sync with the container and the file system
 // across all mutation scenarios:
@@ -671,7 +671,7 @@ namespace Shared.UiTest.BaseDialogs.PackFileTree
             SeedFile(@"placeholder.txt", "placeholder");
 
             // Build a source pack with one file
-            var source = new PackFileContainer("source") { Header = new PFHeader("PFH5", PackFileCAType.MOD) };
+            var source = PackFileContainer.CreatePackFile("source", "source.pack");
             source.AddOrUpdateFile(@"scripts\copied.lua", new PackFile("copied.lua", new MemorySource("lua content"u8.ToArray())));
             _packFileService.AddContainer(source);
 

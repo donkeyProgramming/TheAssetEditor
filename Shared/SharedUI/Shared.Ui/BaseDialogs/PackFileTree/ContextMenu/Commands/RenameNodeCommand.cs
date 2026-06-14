@@ -1,4 +1,4 @@
-using System.Linq;
+﻿using System.Linq;
 using Serilog;
 using Shared.Core.ErrorHandling;
 using Shared.Core.PackFiles;
@@ -17,7 +17,7 @@ namespace Shared.Ui.BaseDialogs.PackFileTree.ContextMenu.Commands
         {
             var container = TreeNodeHelper.GetPackFileContainer(node);
             var packFile = TreeNodeHelper.GetPackFile(node);
-            return container is { IsCaPackFile: false } && ((node.NodeType == NodeType.File && packFile != null) || node.NodeType == NodeType.Directory);
+            return container is { IsReadOnly: false } && ((node.NodeType == NodeType.File && packFile != null) || node.NodeType == NodeType.Directory);
         }
 
         public bool IsEnabled(TreeNode node) => true;
@@ -39,10 +39,10 @@ namespace Shared.Ui.BaseDialogs.PackFileTree.ContextMenu.Commands
                 return;
             }
 
-            if (container.IsCaPackFile)
+            if (container.IsReadOnly)
             {
-                _logger.Here().Warning($"Rename blocked for CA pack node '{CommandLoggingHelper.DescribeNode(_node)}'");
-                standardDialogs.ShowDialogBox("Unable to edit CA packfile", "Error");
+                _logger.Here().Warning($"Rename blocked for readonly pack node '{CommandLoggingHelper.DescribeNode(_node)}'");
+                standardDialogs.ShowDialogBox("Unable to edit readonly packfile", "Error");
                 return;
             }
 

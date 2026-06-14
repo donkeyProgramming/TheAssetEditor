@@ -11,9 +11,9 @@ namespace Shared.CoreTest.PackFiles
         {
             // Arrange
             var pfs = new PackFileService(null);
-            pfs.AddContainer(new PackFileContainer("CaPackFile") { IsCaPackFile = true });
+            pfs.AddContainer(PackFileContainer.CreateCaPackFile("CaPackFile"));
 
-            var container = pfs.AddContainer(new PackFileContainer("Custom") { SystemFilePath = "SystemPath" }, true)!;
+            var container = pfs.AddContainer(PackFileContainer.CreatePackFile("Custom", "SystemPath"), true)!;
 
             var newFiles = new List<NewPackFileEntry>
             {
@@ -36,9 +36,9 @@ namespace Shared.CoreTest.PackFiles
         {
             // Arrange
             var pfs = new PackFileService(null);
-            pfs.AddContainer(new PackFileContainer("CaPackFile") { IsCaPackFile = true });
+            pfs.AddContainer(PackFileContainer.CreateCaPackFile("CaPackFile"));
 
-            var container = pfs.AddContainer(new PackFileContainer("Custom") { SystemFilePath = "SystemPath" }, true)!;
+            var container = pfs.AddContainer(PackFileContainer.CreatePackFile("Custom", "SystemPath"), true)!;
 
             var newFiles = new List<NewPackFileEntry>
             {
@@ -57,9 +57,9 @@ namespace Shared.CoreTest.PackFiles
         {
             // Arrange
             var pfs = new PackFileService(null);
-            pfs.AddContainer(new PackFileContainer("CaPackFile") { IsCaPackFile = true });
+            pfs.AddContainer(PackFileContainer.CreateCaPackFile("CaPackFile"));
 
-            var container = pfs.AddContainer(new PackFileContainer("Custom") { SystemFilePath = "SystemPath"}, true)!;
+            var container = pfs.AddContainer(PackFileContainer.CreatePackFile("Custom", "SystemPath"), true)!;
 
             var newFiles = new List<NewPackFileEntry>
             {
@@ -83,9 +83,9 @@ namespace Shared.CoreTest.PackFiles
         {
             // Arrange
             var pfs = new PackFileService(null);
-            pfs.AddContainer(new PackFileContainer("CaPackFile") { IsCaPackFile = true });
+            pfs.AddContainer(PackFileContainer.CreateCaPackFile("CaPackFile"));
 
-            var container = pfs.AddContainer(new PackFileContainer("Custom") { SystemFilePath = "SystemPath" }, true)!;
+            var container = pfs.AddContainer(PackFileContainer.CreatePackFile("Custom", "SystemPath"), true)!;
 
             var newFiles = new List<NewPackFileEntry>
             {
@@ -108,9 +108,9 @@ namespace Shared.CoreTest.PackFiles
         {
             // Arrange
             var pfs = new PackFileService(null);
-            pfs.AddContainer(new PackFileContainer("CaPackFile") { IsCaPackFile = true });
+            pfs.AddContainer(PackFileContainer.CreateCaPackFile("CaPackFile"));
 
-            var container = pfs.AddContainer(new PackFileContainer("Custom") { SystemFilePath = "SystemPath" }, true)!;
+            var container = pfs.AddContainer(PackFileContainer.CreatePackFile("Custom", "SystemPath"), true)!;
 
             var newFiles = new List<NewPackFileEntry>
             {
@@ -131,9 +131,9 @@ namespace Shared.CoreTest.PackFiles
         {
             // Arrange
             var pfs = new PackFileService(null);
-            pfs.AddContainer(new PackFileContainer("CaPackFile") { IsCaPackFile = true });
+            pfs.AddContainer(PackFileContainer.CreateCaPackFile("CaPackFile"));
 
-            var container = pfs.AddContainer(new PackFileContainer("Custom") { SystemFilePath = "SystemPath" }, true)!;
+            var container = pfs.AddContainer(PackFileContainer.CreatePackFile("Custom", "SystemPath"), true)!;
 
             var newFiles = new List<NewPackFileEntry>
             {
@@ -150,7 +150,25 @@ namespace Shared.CoreTest.PackFiles
         {
             // Arrange
             var pfs = new PackFileService(null);
-            var caPack = pfs.AddContainer(new PackFileContainer("CaPackFile") { IsCaPackFile = true });
+            var caPack = pfs.AddContainer(PackFileContainer.CreateCaPackFile("CaPackFile"));
+
+            var newFiles = new List<NewPackFileEntry>
+            {
+                new("Directory_0", new PackFile("file0", null)),
+            };
+
+            // Act
+            Assert.Throws<Exception>(() => pfs.AddFilesToPack(caPack, newFiles));
+        }
+
+
+        [Test]
+        public void AddFilesToPack_ReadonlyPackFile()
+        {
+            // Arrange
+            var pfs = new PackFileService(null);
+            pfs.EnforceGameFilesMustBeLoaded = false;
+            var caPack = pfs.AddContainer(PackFileContainer.CreateReadOnlyPackFile("CaPackFile"));
 
             var newFiles = new List<NewPackFileEntry>
             {

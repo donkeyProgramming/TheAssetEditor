@@ -14,19 +14,59 @@ namespace Shared.Core.PackFiles.Models.Containers
 
         public string Name { get; set; }
         public PFHeader Header { get; set; }
+        public bool IsReadOnly { get { return IsCaPackFile || field; } set; } = false;
         public bool IsCaPackFile { get; set; } = false;
         public string? SystemFilePath { get; set; }
         public PackFileContainerType ContainerType => PackFileContainerType.Normal;
         public long OriginalLoadByteSize { get; set; } = -1;
         public HashSet<string> SourcePackFilePaths { get; set; } = [];
-
+        
         public Dictionary<string, PackFile> FileList { get; set; } = [];
 
-        public PackFileContainer(string name)
+        protected PackFileContainer(string name, PackFileVersion version)
         {
             Name = name;
-            var v = PackFileVersionConverter.ToString(PackFileVersion.PFH5);
-            Header = new PFHeader(v, PackFileCAType.MOD);
+            var versionStr = PackFileVersionConverter.ToString(version);
+            Header = new PFHeader(versionStr, PackFileCAType.MOD);
+        }
+
+        public static PackFileContainer CreateCaPackFile(string name, string? systemFilePath = null, PackFileVersion version = PackFileVersion.PFH5)
+        {
+            return new PackFileContainer(name, version)
+            {
+                IsCaPackFile = true,
+                IsReadOnly = true,
+                SystemFilePath = systemFilePath
+            };
+        }
+
+        public static PackFileContainer CreateReadOnlyPackFile(string name, string? systemFilePath = null, PackFileVersion version = PackFileVersion.PFH5)
+        {
+            return new PackFileContainer(name, version)
+            {
+                IsCaPackFile = false,
+                IsReadOnly = true,
+                SystemFilePath = systemFilePath
+            };
+        }
+
+        public static PackFileContainer CreatePackFile(string name, string? systemFilePath = null, PackFileVersion version = PackFileVersion.PFH5)
+        {
+            return new PackFileContainer(name, version)
+            {
+                IsCaPackFile = false,
+                IsReadOnly = false,
+                SystemFilePath = systemFilePath
+            };
+        }
+
+        public static PackFileContainer CreatePackFile(string name, string systemFilePath, PFHeader header)
+        {
+            return new PackFileContainer(name, header.Version)
+            {
+                Header = header,
+                SystemFilePath = systemFilePath
+            };
         }
 
         public int GetFileCount() => FileList.Count;
