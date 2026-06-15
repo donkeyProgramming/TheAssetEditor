@@ -33,7 +33,7 @@ namespace GameWorld.Core.Test.Services
                 .Returns(() => containers.ToList());
 
             var settingsService = new ApplicationSettingsService(GameTypeEnum.Warhammer3);
-            var loader = new PackFileContainerLoader(settingsService, new Mock<IStandardDialogs>().Object, new LocalizationManager(), new PackFileContainerCacheHelper());
+            var loader = new PackFileContainerLoader(settingsService, new Mock<IStandardDialogs>().Object, new LocalizationManager(), new PackFileContainerCacheHelper(), new SimpleSystemFolderContainerFactory());
             var karlPackPath = PathHelper.GetDataFile("Karl_and_celestialgeneral.pack");
             var karlContainer = loader.CreateFromPackFile(PackFileContainerType.Normal, karlPackPath, false);
 

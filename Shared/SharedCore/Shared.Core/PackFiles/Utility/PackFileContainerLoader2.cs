@@ -36,6 +36,7 @@ namespace Shared.Core.PackFiles.Utility
         }
     }
 
+
     public interface IPackFileContainerLoader
     {
         IPackFileContainer CreateFromPackFile(PackFileContainerType type, string packFilePath, bool loadAsReadOnly);
@@ -52,8 +53,9 @@ namespace Shared.Core.PackFiles.Utility
         private readonly IStandardDialogs _standardDialogs;
         private readonly LocalizationManager _localizationManager;
         private readonly IPackFileContainerCacheHelper _packFileContainerCacheHelper;
+        private readonly ISystemFolderContainerFactory _systemFolderContainerFactory;
 
-        public PackFileContainerLoader(ApplicationSettingsService settingsService, IStandardDialogs standardDialogs, LocalizationManager localizationManager, IPackFileContainerCacheHelper packFileContainerCacheHelper)
+        public PackFileContainerLoader(ApplicationSettingsService settingsService, IStandardDialogs standardDialogs, LocalizationManager localizationManager, IPackFileContainerCacheHelper packFileContainerCacheHelper, ISystemFolderContainerFactory systemFolderContainerFactory)
         {
             // TODO : Handle context for logger
 
@@ -61,6 +63,7 @@ namespace Shared.Core.PackFiles.Utility
             _standardDialogs = standardDialogs;
             _localizationManager = localizationManager;
             _packFileContainerCacheHelper = packFileContainerCacheHelper;
+            _systemFolderContainerFactory = systemFolderContainerFactory;
         }
 
         public IPackFileContainer CreateFromSystemFolder(string packFileSystemPath)
@@ -72,29 +75,9 @@ namespace Shared.Core.PackFiles.Utility
                 throw new Exception($"Unable to find folder {packFileSystemPath}. Curret systempath is {loactionDir}");
             }
 
-            var containerName = Path.GetFileName(packFileSystemPath);
-            var container = PackFileContainer.CreatePackFile(containerName, packFileSystemPath);
-            AddFolderContentToPackFile(container, packFileSystemPath, packFileSystemPath.ToLower() + "\\");
+            var container = _systemFolderContainerFactory.Create(packFileSystemPath);
             return container;
         }
-
-        private static void AddFolderContentToPackFile(PackFileContainer container, string folderPath, string rootPath)
-        {
-            var files = Directory.GetFiles(folderPath);
-            foreach (var filePath in files)
-            {
-                var sanatizedFilePath = filePath.ToLower();
-                var relativePath = sanatizedFilePath.Replace(rootPath, "");
-                var fileName = Path.GetFileName(sanatizedFilePath);
-
-                container.AddOrUpdateFile(relativePath, PackFile.CreateFromFileSystem(fileName, sanatizedFilePath));
-            }
-
-            var folders = Directory.GetDirectories(folderPath);
-            foreach (var folder in folders)
-                AddFolderContentToPackFile(container, folder, rootPath);
-        }
-
 
         public IPackFileContainer CreateFromPackFile(PackFileContainerType type, string packFilePath, bool loadAsReadOnly)
         {
@@ -138,13 +121,15 @@ namespace Shared.Core.PackFiles.Utility
         {
             if(type == PackFileContainerType.Database && loadAsReadOnly == false)
                 throw new InvalidOperationException($"Cannot load as writable if loading from cache. Caching is only supported for read-only containers. PackFile {createdPackFileName}");
-
-            var fingerprint = _packFileContainerCacheHelper.ComputeFingerprint(fullPackFilePaths); 
-            var cachePrefix = createdPackFileName;
-            var cacheFilePath = _packFileContainerCacheHelper.GetCacheFilePath(cachePrefix, fingerprint);
-
+       
+            var fingerprint = string.Empty;
+            var cacheFilePath = string.Empty;
             if (type == PackFileContainerType.Database)
             {
+                fingerprint = _packFileContainerCacheHelper.ComputeFingerprint(fullPackFilePaths);
+                var cachePrefix = createdPackFileName;
+                cacheFilePath = _packFileContainerCacheHelper.GetCacheFilePath(cachePrefix, fingerprint);
+
                 var cached = _packFileContainerCacheHelper.TryLoadFromCache(cacheFilePath, fingerprint);
                 if (cached != null)
                     return cached;
@@ -154,7 +139,7 @@ namespace Shared.Core.PackFiles.Utility
                 //var reasonMessage = string.Format(_localizationManager.Get("PackFileCache.InvalidReason." + cacheInvalidReason), gameName);
                 //var buildingMessage = string.Format(_localizationManager.Get("PackFileCache.BuildingCache"), gameName);
                 //var cacheDescription = _localizationManager.Get("PackFileCache.Description");
-                _standardDialogs.ShowDialogBox("Failed to load from cache - make better error later");
+                _standardDialogs.ShowDialogBox("Failed to load from cache - Generating new cache");
             }
 
             using (_standardDialogs.ShowWaitCursor())

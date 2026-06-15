@@ -50,7 +50,7 @@ namespace Shared.CoreTest.PackFiles.Utility
                 Directory.Delete(_tempGameDir, true);
         }
 
-        private PackFileContainerLoader CreateLoader() => new PackFileContainerLoader(_settingsService, _dialogs.Object, _localizationManager, _cacheHelper);
+        private PackFileContainerLoader CreateLoader() => new PackFileContainerLoader(_settingsService, _dialogs.Object, _localizationManager, _cacheHelper, new SimpleSystemFolderContainerFactory());
 
         [Test]
         public void LoadAllCaFiles_MissingGameDirectory_ShowsErrorAndSkipsBuild()

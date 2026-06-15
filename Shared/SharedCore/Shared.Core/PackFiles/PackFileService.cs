@@ -47,14 +47,22 @@ namespace Shared.Core.PackFiles
                 }
             }
 
-            // Check if already added!
-            foreach (var packFile in _packFileContainers)
+            // Check if already added! Normalize paths so the same pack loaded via a
+            // differently-cased or non-canonical path is still detected as a duplicate.
+            if (string.IsNullOrEmpty(pf.SystemFilePath) == false)
             {
-                if (packFile.SystemFilePath != null && packFile.SystemFilePath == pf.SystemFilePath)
+                var newPath = NormalizeSystemPath(pf.SystemFilePath);
+                foreach (var packFile in _packFileContainers)
                 {
-                    _logger.Here().Warning($"Rejected loading duplicate pack file '{packFile.SystemFilePath}'");
-                    MessageBoxProvider.ShowDialogBox($"Pack file \"{packFile.SystemFilePath}\" is already loaded.", "Error");
-                    return null;
+                    if (string.IsNullOrEmpty(packFile.SystemFilePath))
+                        continue;
+
+                    if (NormalizeSystemPath(packFile.SystemFilePath) == newPath)
+                    {
+                        _logger.Here().Warning($"Rejected loading duplicate pack file '{packFile.SystemFilePath}'");
+                        MessageBoxProvider.ShowDialogBox($"Pack file \"{packFile.SystemFilePath}\" is already loaded.", "Error");
+                        return null;
+                    }
                 }
             }
 
@@ -343,6 +351,18 @@ namespace Shared.Core.PackFiles
 
             var concreteContainer = CastContainer(container);
             return concreteContainer.SystemFilePath ?? concreteContainer.Name;
+        }
+
+        private static string NormalizeSystemPath(string path)
+        {
+            try
+            {
+                return Path.GetFullPath(path).TrimEnd('\\', '/').ToLowerInvariant();
+            }
+            catch
+            {
+                return path.Replace('/', '\\').TrimEnd('\\').Trim().ToLowerInvariant();
+            }
         }
 
         private static string DescribeFile(IPackFileContainer container, PackFile file)

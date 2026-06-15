@@ -14,6 +14,7 @@ using Shared.Core.Services;
 using Shared.Core.Settings;
 using Shared.Ui.BaseDialogs.StandardDialog;
 using Shared.Ui.Common.MenuSystem;
+using Test.TestingUtility.TestUtility;
 
 namespace Test.TestingUtility.Shared
 {
@@ -109,6 +110,10 @@ namespace Test.TestingUtility.Shared
             var windowsd = new ServiceDescriptor(typeof(IWindowsKeyboard), typeof(WindowKeyboard), ServiceLifetime.Scoped);
             services.Remove(mouseDescriptor);
             services.AddScoped<IWindowsKeyboard>(x => new TestKeyboard());
+
+            var fileaccess = new ServiceDescriptor(typeof(ISystemFolderContainerFactory), typeof(SystemFolderContainerFactory), ServiceLifetime.Singleton);
+            services.Remove(fileaccess);
+            services.AddScoped<ISystemFolderContainerFactory>(x => new SimpleSystemFolderContainerFactory());
 
             Dialogs = new Mock<IStandardDialogs>();
             var dialogDescriptor = new ServiceDescriptor(typeof(IStandardDialogs), typeof(StandardDialogs), ServiceLifetime.Scoped);
