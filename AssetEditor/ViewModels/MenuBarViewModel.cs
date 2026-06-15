@@ -57,7 +57,7 @@ namespace AssetEditor.ViewModels
             _packFileContainerLoader = packFileContainerLoader;
             _standardDialogs = standardDialogs;
             var settings = settingsService.CurrentSettings;
-            settings.RecentPackFilePaths.CollectionChanged += OnRecentPackFilePathsChanged;
+            settings.RecentPackFiles.CollectionChanged += OnRecentPackFilePathsChanged;
             CreateRecentPackFilesItems();
             CreateTools();
         }
@@ -69,7 +69,7 @@ namespace AssetEditor.ViewModels
 
         public void Dispose()
         {
-            _settingsService.CurrentSettings.RecentPackFilePaths.CollectionChanged -= OnRecentPackFilePathsChanged;
+            _settingsService.CurrentSettings.RecentPackFiles.CollectionChanged -= OnRecentPackFilePathsChanged;
         }
 
         [RelayCommand] private void OpenSettingsWindow() => _uiCommandFactory.Create<OpenSettingsDialogCommand>().Execute();
@@ -148,14 +148,19 @@ namespace AssetEditor.ViewModels
             var settings = _settingsService.CurrentSettings;
 
             RecentPackFiles.Clear();
-            var menuItemViewModels = settings.RecentPackFilePaths.Select(path => new RecentPackFileItem(
-                path,
+            var menuItemViewModels = settings.RecentPackFiles.Select(info => new RecentPackFileItem(
+                info.Path,
+                info.ContainerType,
+                info.IsReadOnly,
                 () =>
                 {
-                    var container = _packFileContainerLoader.CreateFromPackFile(PackFileContainerType.Normal, path, false);
+                    var container = info.ContainerType == PackFileContainerType.SystemFolder
+                        ? _packFileContainerLoader.CreateFromSystemFolder(info.Path)
+                        : _packFileContainerLoader.CreateFromPackFile(info.ContainerType, info.Path, info.IsReadOnly);
+
                     if (container == null)
                     {
-                        System.Windows.MessageBox.Show($"Unable to load packfiles {path}");
+                        System.Windows.MessageBox.Show($"Unable to load packfiles {info.Path}");
                         return;
                     }
 

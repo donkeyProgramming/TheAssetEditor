@@ -25,7 +25,7 @@ namespace AssetEditor.Services
             if (string.IsNullOrEmpty(e.Container.SystemFilePath))
                 return;
 
-            _applicationSettingsService.AddRecentlyOpenedPackFile(e.Container.SystemFilePath);
+            _applicationSettingsService.AddRecentlyOpenedPackFile(e.Container.SystemFilePath, e.Container.ContainerType, e.Container.IsReadOnly);
             _applicationSettingsService.Save();
         }
 
