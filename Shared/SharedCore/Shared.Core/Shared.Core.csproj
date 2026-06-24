@@ -14,10 +14,7 @@
         <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="10.0.7" />
         <PackageReference Include="ZstdSharp.Port" Version="0.8.7" />
         <PackageReference Include="PixiEditor.ColorPicker" Version="3.4.2.2" />
-        <PackageReference Include="Serilog" Version="4.3.0" />
-        <PackageReference Include="Serilog.Enrichers.Thread" Version="4.0.0" />
-        <PackageReference Include="Serilog.Sinks.Console" Version="6.1.1" />
-        <PackageReference Include="Serilog.Sinks.File" Version="7.0.0" />
+
         <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="10.0.7" />
         <PackageReference Include="System.Drawing.Common" Version="10.0.1" />
         <PackageReference Include="FluentValidation" Version="12.1.1" />
@@ -38,6 +35,7 @@
 
     <ItemGroup>
             <ProjectReference Include="..\..\ByteParsing\Shared.ByteParsing\Shared.ByteParsing.csproj" />
+            <ProjectReference Include="..\..\Logging\Shared.Core.Logging\Shared.Core.Logging.csproj" />
     </ItemGroup>
 
 

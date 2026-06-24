@@ -1,6 +1,6 @@
 ﻿using Shared.Core.PackFiles.Models;
 
-namespace Shared.Core.Events.Global
+namespace Shared.Core.PackFiles.Events
 {
     public record PackFileSavedEvent(PackFile File);
     public record PackFileContainerSavedEvent(IPackFileContainer Container);

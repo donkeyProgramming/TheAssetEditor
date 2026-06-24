@@ -1,5 +1,6 @@
-using Moq;
+﻿using Moq;
 using Shared.Core.Events;
+using Shared.Core.PackFiles.Events;
 using Shared.Core.PackFiles.Models;
 using Shared.Core.PackFiles.Models.Containers;
 using Shared.Core.PackFiles.Models.FileSources;
@@ -179,7 +180,7 @@ namespace Shared.CoreTest.PackFiles.Models.Containers
                 Assert.That(container.ContainsFile("selfsave.pack"), Is.False,
                     "The saved .pack must not be ingested into its own container.");
                 Assert.That(container.GetFileCount(), Is.EqualTo(initialCount));
-                eventHub.Verify(x => x.PublishGlobalEvent(It.IsAny<Shared.Core.Events.Global.PackFileContainerFilesAddedEvent>()), Times.Never);
+                eventHub.Verify(x => x.PublishGlobalEvent(It.IsAny<PackFileContainerFilesAddedEvent>()), Times.Never);
             }
             finally
             {

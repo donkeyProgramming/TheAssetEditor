@@ -7,6 +7,7 @@ using Shared.Core.PackFiles.Serialization;
 using Shared.Core.PackFiles.Utility;
 using Shared.Core.Services;
 using Shared.Core.Settings;
+using Shared.Core.PackFiles.Events;
 
 namespace Shared.Core.PackFiles.Models.Containers
 {

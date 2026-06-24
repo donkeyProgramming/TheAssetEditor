@@ -17,18 +17,18 @@
 // SearchFilter only changes visibility and expansion state. It no longer relies on node
 // materialization or placeholder children.
 
-using System.Windows.Input;
 using System.IO;
 using AssetEditor.ViewModels;
 using Microsoft.Extensions.DependencyInjection;
 using Shared.Core.Events;
 using Shared.Core.PackFiles;
+using Shared.Core.PackFiles.Events;
 using Shared.Core.PackFiles.Models;
 using Shared.Core.Settings;
 using Shared.Ui.BaseDialogs.PackFileTree;
+using Shared.UiTest.BaseDialogs.PackFileTree.Utility;
 using Test.TestingUtility.Shared;
 using Test.TestingUtility.TestUtility;
-using Shared.UiTest.BaseDialogs.PackFileTree.Utility;
 
 namespace Shared.UiTest.BaseDialogs.PackFileTree
 {
@@ -474,7 +474,7 @@ namespace Shared.UiTest.BaseDialogs.PackFileTree
             // Simulate save via PFS — we can't call SavePackContainer without disk I/O,
             // so trigger the event directly through the event hub
             var eventHub = _runner.ServiceProvider.GetRequiredService<IEventHub>();
-            eventHub.PublishGlobalEvent(new Core.Events.Global.PackFileContainerSavedEvent(container));
+            eventHub.PublishGlobalEvent(new PackFileContainerSavedEvent(container));
 
             Assert.That(root.UnsavedChanged, Is.False, "Root should be cleared after save");
         }
@@ -499,7 +499,7 @@ namespace Shared.UiTest.BaseDialogs.PackFileTree
             };
 
             var eventHub = _runner.ServiceProvider.GetRequiredService<IEventHub>();
-            eventHub.PublishGlobalEvent(new Core.Events.Global.PackFileContainerSavedEvent(container));
+            eventHub.PublishGlobalEvent(new PackFileContainerSavedEvent(container));
 
             Assert.That(valueAtNotification, Is.Not.Null, "PropertyChanged should have fired for UnsavedChanged");
             Assert.That(valueAtNotification, Is.False, "UnsavedChanged should be false when PropertyChanged fires");
@@ -517,7 +517,7 @@ namespace Shared.UiTest.BaseDialogs.PackFileTree
             var childCountBeforeSave = root.Children.Count;
 
             var eventHub = _runner.ServiceProvider.GetRequiredService<IEventHub>();
-            eventHub.PublishGlobalEvent(new Core.Events.Global.PackFileContainerSavedEvent(container));
+            eventHub.PublishGlobalEvent(new PackFileContainerSavedEvent(container));
 
             Assert.That(root.IsNodeExpanded, Is.False, "Save should not expand collapsed branches.");
             Assert.That(root.Children.Count, Is.EqualTo(childCountBeforeSave), "Save should not rebuild the eager tree.");

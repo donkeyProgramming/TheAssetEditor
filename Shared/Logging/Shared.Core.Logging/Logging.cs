@@ -1,7 +1,7 @@
 ﻿using System.Runtime.CompilerServices;
+using Serilog;
 using Serilog.Events;
 using Serilog.Sinks.SystemConsole.Themes;
-using Shared.Core.Misc;
 
 namespace Shared.Core.ErrorHandling
 {
@@ -28,12 +28,12 @@ namespace Shared.Core.ErrorHandling
         public static string LogName { get; private set; } = string.Empty;
 
         public static CustomLoggingSink? CustomSink;
-        public static void Configure(LogEventLevel logEventLevel)
+        public static void Configure(LogEventLevel logEventLevel, string logDirectory)
         {
             if (IsConfigured)
                 return;
 
-            var logDirectory = DirectoryHelper.LogDirectory;
+     
             var logDate = DateTime.Now.Year + "_" + DateTime.Now.Month + "_" + DateTime.Now.Day;
             var fileName = logDirectory + "\\" + logDate + ".log";
             fileName = getNextFileName(fileName);

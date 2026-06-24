@@ -17,7 +17,6 @@ namespace Shared.Core.ErrorHandling
             _logLevel = logLevel;
         }
 
-
         public void Emit(LogEvent logEvent)
         {
             if (logEvent.Level >= _logLevel)

@@ -15,10 +15,10 @@ using Editors.Audio.AudioEditor.Events.AudioProjectExplorer;
 using Editors.Audio.WaveformVisualiser.Events;
 using Editors.Audio.AudioEditor.Presentation.Shared.Models;
 using Shared.Core.Events;
-using Shared.Core.Events.Global;
 using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
 using Shared.Ui.Common;
+using Shared.Core.PackFiles.Events;
 
 namespace Editors.Audio.AudioEditor.Presentation.AudioFilesExplorer
 {
