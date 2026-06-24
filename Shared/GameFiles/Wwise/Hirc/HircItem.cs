@@ -1,6 +1,4 @@
-﻿using Serilog;
-using Shared.ByteParsing;
-using Shared.Core.ErrorHandling;
+﻿using Shared.ByteParsing;
 using Shared.GameFormats.Wwise.Enums;
 
 namespace Shared.GameFormats.Wwise.Hirc

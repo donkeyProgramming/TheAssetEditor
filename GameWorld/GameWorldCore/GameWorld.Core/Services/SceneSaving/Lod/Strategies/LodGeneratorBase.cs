@@ -1,7 +1,6 @@
 ﻿using GameWorld.Core.Rendering.Materials.Capabilities;
 using GameWorld.Core.SceneNodes;
 using GameWorld.Core.Utility;
-using Serilog;
 using Shared.Core.ErrorHandling;
 using Shared.GameFormats.RigidModel;
 

@@ -5,7 +5,6 @@ using GameWorld.Core.SceneNodes;
 using GameWorld.Core.Services;
 using GameWorld.Core.Services.SceneSaving;
 using GameWorld.Core.Utility;
-using Serilog;
 using Shared.Core.ErrorHandling;
 using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;

@@ -1,7 +1,6 @@
 ﻿using System.Diagnostics;
 using System.Runtime;
 using System.Runtime.InteropServices;
-using Shared.Core.ErrorHandling;
 
 namespace Shared.Core.Misc
 {

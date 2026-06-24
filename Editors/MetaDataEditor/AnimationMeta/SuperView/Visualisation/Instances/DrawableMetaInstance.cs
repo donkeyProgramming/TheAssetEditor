@@ -2,8 +2,6 @@
 using GameWorld.Core.Animation;
 using GameWorld.Core.SceneNodes;
 using GameWorld.Core.Utility;
-using Serilog;
-using Shared.Core.ErrorHandling;
 
 namespace Editors.AnimationMeta.SuperView.Visualisation.Instances
 {

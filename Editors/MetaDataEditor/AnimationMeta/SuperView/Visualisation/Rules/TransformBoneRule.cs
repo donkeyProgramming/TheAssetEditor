@@ -1,9 +1,6 @@
-﻿using System;
-using GameWorld.Core.Animation;
+﻿using GameWorld.Core.Animation;
 using GameWorld.Core.Animation.AnimationChange;
 using Microsoft.Xna.Framework;
-using Serilog;
-using Shared.Core.ErrorHandling;
 using Shared.GameFormats.AnimationMeta.Definitions;
 
 namespace Editors.AnimationMeta.SuperView.Visualisation.Rules

@@ -1,7 +1,6 @@
 ﻿using System.Collections.ObjectModel;
 using System.Text.Json;
 using Microsoft.Xna.Framework;
-using Shared.Core.ErrorHandling;
 using Shared.Core.Misc;
 using Shared.Core.PackFiles.Models;
 

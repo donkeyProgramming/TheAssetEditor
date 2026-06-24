@@ -2,9 +2,6 @@
 using GameWorld.Core.Animation.AnimationChange;
 using GameWorld.Core.SceneNodes;
 using Microsoft.Xna.Framework;
-using Serilog;
-using Shared.Core.ErrorHandling;
-using System;
 
 namespace Editors.AnimationMeta.SuperView.Visualisation.Rules
 {

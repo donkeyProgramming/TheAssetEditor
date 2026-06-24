@@ -3,7 +3,7 @@ using Serilog;
 using Serilog.Events;
 using Serilog.Sinks.SystemConsole.Themes;
 
-namespace Shared.Core.ErrorHandling
+namespace Shared.CoreLog
 {
     public static class LoggerExtensions
     {

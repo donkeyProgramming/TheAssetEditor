@@ -2,7 +2,6 @@
 using System.Runtime.CompilerServices;
 using System.Text;
 using Microsoft.Xna.Framework.Graphics;
-using Serilog;
 using Shared.Core.DependencyInjection;
 using Shared.Core.ErrorHandling;
 

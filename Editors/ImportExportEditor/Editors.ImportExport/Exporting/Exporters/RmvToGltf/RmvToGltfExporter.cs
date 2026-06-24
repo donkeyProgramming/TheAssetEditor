@@ -1,12 +1,8 @@
-using System.Windows;
-using Editors.ImportExport.Common;
+﻿using System.Windows;
 using Editors.ImportExport.Exporting.Exporters.RmvToGltf.Helpers;
 using Editors.ImportExport.Misc;
 using GameWorld.Core.Services;
-using Serilog;
-using Shared.Core.ErrorHandling;
 using Shared.Core.PackFiles.Models;
-using Shared.GameFormats.Animation;
 using Shared.GameFormats.RigidModel;
 using SharpGLTF.Geometry;
 using SharpGLTF.Materials;

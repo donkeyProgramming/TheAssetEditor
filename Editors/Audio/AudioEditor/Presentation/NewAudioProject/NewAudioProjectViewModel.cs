@@ -1,12 +1,9 @@
-﻿using System;
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Editors.Audio.AudioEditor.Core;
 using Editors.Audio.Shared.AudioProject.Models;
 using Editors.Audio.Shared.GameInformation.Warhammer3;
-using Serilog;
-using Shared.Core.ErrorHandling;
 using Shared.Core.PackFiles;
 using Shared.Core.Services;
 using Shared.Core.Settings;

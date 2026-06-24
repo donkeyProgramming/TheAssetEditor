@@ -1,11 +1,8 @@
 ﻿using System.Runtime.InteropServices;
-using Serilog;
 using Shared.ByteParsing;
-using Shared.Core.ErrorHandling;
 using Shared.GameFormats.RigidModel.LodHeader;
 using Shared.GameFormats.RigidModel.MaterialHeaders;
 using Shared.GameFormats.RigidModel.Vertex;
-using SharpDX.MediaFoundation;
 
 namespace Shared.GameFormats.RigidModel
 {

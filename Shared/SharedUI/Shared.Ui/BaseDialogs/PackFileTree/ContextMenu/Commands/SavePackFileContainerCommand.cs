@@ -1,5 +1,4 @@
-﻿using System;
-using System.IO;
+﻿using System.IO;
 using Serilog;
 using Shared.Core.ErrorHandling;
 using Shared.Core.PackFiles;

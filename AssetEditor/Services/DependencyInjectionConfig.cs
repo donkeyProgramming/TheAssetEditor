@@ -1,7 +1,5 @@
-﻿using System;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 using Shared.Core.DependencyInjection;
-using Shared.Core.ErrorHandling;
 using Shared.Core.Misc;
 using Shared.Core.ToolCreation;
 

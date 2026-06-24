@@ -1,5 +1,4 @@
 ﻿using System.Windows;
-using Shared.Core.ErrorHandling;
 using Shared.Core.Events;
 using Shared.Core.PackFiles.Events;
 using Shared.Core.PackFiles.Models;

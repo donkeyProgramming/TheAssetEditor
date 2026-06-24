@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
+﻿using System.IO;
 using System.Windows.Forms;
 using System.Xml.Linq;
 using CommunityToolkit.Mvvm.ComponentModel;
@@ -12,8 +9,6 @@ using Editors.Audio.Shared.AudioProject.Models;
 using Editors.Audio.Shared.GameInformation.Warhammer3;
 using Editors.Audio.Shared.Storage;
 using Editors.Audio.Shared.Wwise.HircExploration;
-using Serilog;
-using Shared.Core.ErrorHandling;
 using Shared.Core.PackFiles.Models;
 using Shared.Core.Services;
 using Shared.Core.Settings;

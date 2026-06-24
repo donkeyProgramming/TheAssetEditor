@@ -1,5 +1,4 @@
 ﻿using GameWorld.Core.Components.Selection;
-using Serilog;
 using Shared.Core.ErrorHandling;
 using Shared.Core.Events;
 

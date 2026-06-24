@@ -1,5 +1,4 @@
 ﻿using CommunityToolkit.Diagnostics;
-using Shared.Core.ErrorHandling;
 using Shared.Core.Misc;
 using Shared.Core.PackFiles.Models.FileSources;
 using Shared.Core.PackFiles.Serialization;

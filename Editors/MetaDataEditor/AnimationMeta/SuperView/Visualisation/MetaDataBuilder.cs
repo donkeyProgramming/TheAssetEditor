@@ -10,8 +10,6 @@ using GameWorld.Core.Rendering.RenderItems;
 using GameWorld.Core.SceneNodes;
 using GameWorld.Core.Services;
 using Microsoft.Xna.Framework;
-using Serilog;
-using Shared.Core.ErrorHandling;
 using Shared.Core.Misc;
 using Shared.Core.PackFiles;
 using Shared.GameFormats.Animation;

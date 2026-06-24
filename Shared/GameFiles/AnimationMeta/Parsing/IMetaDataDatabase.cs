@@ -1,7 +1,4 @@
 ﻿using System.Reflection;
-using Serilog;
-using Shared.Core.ErrorHandling;
-using SharpDX.MediaFoundation;
 
 namespace Shared.GameFormats.AnimationMeta.Parsing
 {

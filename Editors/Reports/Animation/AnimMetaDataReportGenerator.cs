@@ -2,8 +2,6 @@
 using System.Globalization;
 using System.Windows;
 using CsvHelper;
-using Serilog;
-using Shared.Core.ErrorHandling;
 using Shared.Core.Events;
 using Shared.Core.Misc;
 using Shared.Core.PackFiles;

@@ -1,9 +1,6 @@
-﻿using System.Collections.Generic;
-using System.Data;
+﻿using System.Data;
 using Editors.Audio.AudioEditor.Core;
 using Editors.Audio.AudioEditor.Events.AudioProjectViewer.Table;
-using Serilog;
-using Shared.Core.ErrorHandling;
 using Shared.Core.Events;
 
 namespace Editors.Audio.AudioEditor.Commands.AudioProjectViewer

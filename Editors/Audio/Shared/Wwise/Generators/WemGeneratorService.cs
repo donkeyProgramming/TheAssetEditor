@@ -1,10 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
+﻿using System.IO;
 using Editors.Audio.Shared.AudioProject.Models;
-using Serilog;
-using Shared.Core.ErrorHandling;
 using Shared.Core.Misc;
 using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Utility;

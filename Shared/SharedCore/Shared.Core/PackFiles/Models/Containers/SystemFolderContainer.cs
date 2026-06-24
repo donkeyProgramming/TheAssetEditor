@@ -1,13 +1,11 @@
 ﻿using Shared.Core.Events;
-using Shared.Core.Events.Global;
-using Shared.Core.ErrorHandling;
 using Shared.Core.Misc;
+using Shared.Core.PackFiles.Events;
 using Shared.Core.PackFiles.Models.FileSources;
 using Shared.Core.PackFiles.Serialization;
 using Shared.Core.PackFiles.Utility;
 using Shared.Core.Services;
 using Shared.Core.Settings;
-using Shared.Core.PackFiles.Events;
 
 namespace Shared.Core.PackFiles.Models.Containers
 {

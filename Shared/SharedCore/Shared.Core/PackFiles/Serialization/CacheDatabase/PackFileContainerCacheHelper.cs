@@ -1,6 +1,5 @@
-using System.Security.Cryptography;
+﻿using System.Security.Cryptography;
 using System.Text;
-using Shared.Core.ErrorHandling;
 using Shared.Core.Misc;
 using Shared.Core.PackFiles.Models.Containers;
 

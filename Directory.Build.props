@@ -1,5 +1,9 @@
 <Project>
 
+  <PropertyGroup>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
   <ItemGroup>
     <!-- SQLitePCLRaw.lib.e_sqlite3 <= 2.1.11 has a known high severity vulnerability (GHSA-2m69-gcr7-jv3q / CVE-2025-6965).
          No patched version exists yet. Suppressed solution-wide until ericsink/SQLitePCL.raw ships a fix

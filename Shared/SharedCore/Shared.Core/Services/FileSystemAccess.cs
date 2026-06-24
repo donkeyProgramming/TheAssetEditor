@@ -1,7 +1,4 @@
-using System.Diagnostics;
-using System.IO;
-using Serilog;
-using Shared.Core.ErrorHandling;
+﻿using System.Diagnostics;
 
 namespace Shared.Core.Services
 {

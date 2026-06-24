@@ -1,11 +1,7 @@
-﻿using System;
-using System.Collections.ObjectModel;
-using GameWorld.Core.Animation;
+﻿using GameWorld.Core.Animation;
 using GameWorld.Core.Animation.AnimationChange;
 using GameWorld.Core.SceneNodes;
 using Microsoft.Xna.Framework;
-using Serilog;
-using Shared.Core.ErrorHandling;
 
 namespace Editors.AnimationMeta.SuperView.Visualisation.Rules
 {

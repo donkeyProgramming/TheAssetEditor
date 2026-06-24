@@ -8,7 +8,6 @@ using Editors.KitbasherEditor.ViewModels.SceneNodeEditor;
 using GameWorld.Core.Components;
 using GameWorld.Core.Services;
 using KitbasherEditor.ViewModels.MenuBarViews;
-using Serilog;
 using Shared.Core.ErrorHandling;
 using Shared.Core.Events;
 using Shared.Core.Events.Scoped;

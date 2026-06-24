@@ -2,8 +2,6 @@
 using System.Windows;
 using Editors.AnimationFragmentEditor.AnimationPack.Converters.AnimationBinWh3Converter;
 using Newtonsoft.Json;
-using Serilog;
-using Shared.Core.ErrorHandling;
 using Shared.Core.Events;
 using Shared.Core.Misc;
 using Shared.Core.PackFiles;

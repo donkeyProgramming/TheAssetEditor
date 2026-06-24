@@ -1,13 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
+﻿using System.IO;
 using System.Text;
 using System.Windows;
 using GameWorld.Core.Rendering.Materials.Serialization;
 using GameWorld.Core.Rendering.Materials.Shaders;
 using GameWorld.Core.SceneNodes;
-using Serilog;
 using Shared.Core.ErrorHandling;
 using Shared.Core.PackFiles;
 using Shared.Core.Services;

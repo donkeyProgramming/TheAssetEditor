@@ -1,5 +1,4 @@
 ﻿using System.Collections.ObjectModel;
-using System.Runtime.Intrinsics.Arm;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -10,8 +9,6 @@ using Editors.KitbasherEditor.Events;
 using GameWorld.Core.Components;
 using GameWorld.Core.Components.Selection;
 using GameWorld.Core.SceneNodes;
-using Serilog;
-using Shared.Core.ErrorHandling;
 using Shared.Core.Events;
 
 namespace KitbasherEditor.Views

@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Text;
 using System.Windows;
 using GameWorld.Core.Animation;
 using GameWorld.Core.Rendering.Geometry;
@@ -9,7 +6,6 @@ using GameWorld.Core.Rendering.Materials.Serialization;
 using GameWorld.Core.Rendering.Materials.Shaders;
 using GameWorld.Core.SceneNodes;
 using Microsoft.Xna.Framework;
-using Serilog;
 using Shared.Core.ErrorHandling;
 using Shared.Core.Services;
 using Shared.GameFormats.RigidModel;

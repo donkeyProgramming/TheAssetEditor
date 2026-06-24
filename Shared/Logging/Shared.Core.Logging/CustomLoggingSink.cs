@@ -2,7 +2,7 @@
 using Serilog.Events;
 using Serilog.Formatting.Display;
 
-namespace Shared.Core.ErrorHandling
+namespace Shared.CoreLog
 {
     public class CustomLoggingSink : ILogEventSink
     {

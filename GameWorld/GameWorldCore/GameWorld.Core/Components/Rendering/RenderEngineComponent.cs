@@ -6,7 +6,6 @@ using GameWorld.Core.Services;
 using GameWorld.Core.Utility;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Serilog;
 using Shared.Core.ErrorHandling;
 using Shared.Core.Events;
 using Shared.Core.Misc;

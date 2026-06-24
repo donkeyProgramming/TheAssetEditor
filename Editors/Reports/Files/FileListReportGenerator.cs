@@ -3,8 +3,6 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Windows;
-using Serilog;
-using Shared.Core.ErrorHandling;
 using Shared.Core.Events;
 using Shared.Core.Misc;
 using Shared.Core.PackFiles;

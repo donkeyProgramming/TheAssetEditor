@@ -2,7 +2,6 @@
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
-using Shared.Core.ErrorHandling;
 using Shared.Core.PackFiles.Models.FileSources;
 using Shared.Core.PackFiles.Serialization.CacheDatabase;
 using Shared.Core.PackFiles.Utility;

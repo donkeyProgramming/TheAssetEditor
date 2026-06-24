@@ -1,8 +1,5 @@
-﻿using GameWorld.Core.Commands;
-using GameWorld.Core.Components.Selection;
-using Serilog;
+﻿using GameWorld.Core.Components.Selection;
 using Shared.Core.ErrorHandling;
-using System.Collections.Generic;
 using Shared.Core.Events;
 
 namespace GameWorld.Core.Commands.Vertex

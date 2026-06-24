@@ -1,9 +1,7 @@
 ﻿using System.Diagnostics;
 using System.Reflection;
 using CommunityToolkit.Diagnostics;
-using Serilog;
 using Shared.ByteParsing;
-using Shared.Core.ErrorHandling;
 using Shared.Core.Misc;
 using Shared.Core.PackFiles.Models;
 

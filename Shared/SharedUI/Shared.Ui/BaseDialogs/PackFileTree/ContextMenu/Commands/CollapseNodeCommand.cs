@@ -1,6 +1,4 @@
-using Serilog;
-using Shared.Core.ErrorHandling;
-using Shared.Core.PackFiles.Models;
+﻿using Shared.Core.ErrorHandling;
 
 namespace Shared.Ui.BaseDialogs.PackFileTree.ContextMenu.Commands
 {

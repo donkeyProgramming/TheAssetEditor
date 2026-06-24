@@ -1,6 +1,5 @@
 ﻿using GameWorld.Core.Animation.AnimationChange;
 using Microsoft.Xna.Framework;
-using Shared.Core.ErrorHandling;
 using Shared.Core.Misc;
 
 namespace GameWorld.Core.Animation

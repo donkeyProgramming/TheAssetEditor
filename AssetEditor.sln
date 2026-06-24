@@ -124,7 +124,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Editor.CampaignAnimationCre
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Test.CampaignAnimationCreator", "Editors\CampaignAnimationCreator\Test.CampaignAnimationCreator\Test.CampaignAnimationCreator.csproj", "{91617891-AD16-423F-B56F-AC0D2CE82B95}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shared.Core.Logging", "Shared\Logging\Shared.Core.Logging\Shared.Core.Logging.csproj", "{C79EDB14-ED00-4474-B59F-9EED0AF39459}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shared.CoreLog", "Shared\Logging\Shared.Core.Logging\Shared.CoreLog.csproj", "{C79EDB14-ED00-4474-B59F-9EED0AF39459}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
