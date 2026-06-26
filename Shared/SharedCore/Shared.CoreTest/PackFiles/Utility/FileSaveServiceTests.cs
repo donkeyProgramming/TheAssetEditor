@@ -6,11 +6,12 @@ using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Events;
 using Shared.Core.PackFiles.Models;
 using Shared.Core.PackFiles.Models.Containers;
+using Shared.Core.PackFiles.Utility;
 using Shared.Core.Services;
 using Shared.Core.Settings;
 using Test.TestingUtility.TestUtility;
 
-namespace Shared.CoreTest.Services
+namespace Shared.CoreTest.PackFiles.Utility
 {
     internal class FileSaveServiceTests
     {

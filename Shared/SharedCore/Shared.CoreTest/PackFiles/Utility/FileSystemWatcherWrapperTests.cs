@@ -1,7 +1,7 @@
 ﻿using Shared.Core.PackFiles.Utility;
 using Shared.Core.Services;
 
-namespace Shared.CoreTest.Services
+namespace Shared.CoreTest.PackFiles.Utility
 {
     [TestFixture]
     internal class FileSystemWatcherWrapperTests
