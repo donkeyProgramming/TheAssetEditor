@@ -2,7 +2,7 @@
 using Shared.Core.PackFiles.Models.FileSources;
 using Shared.Core.PackFiles.Utility;
 
-namespace Shared.Core.ErrorHandling
+namespace Shared.Core.PackFiles.ErrorHandling
 {
     public class CompressionInformation(long diskSize = 0, long uncompressedSize = 0)
     {

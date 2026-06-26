@@ -6,7 +6,7 @@ using Shared.Core.ErrorHandling.Exceptions;
 using Shared.Core.Events;
 using Shared.Core.Misc;
 using Shared.Core.PackFiles;
-using Shared.Core.PackFiles.Models.Containers;
+using Shared.Core.PackFiles.ErrorHandling;
 using Shared.Core.PackFiles.Serialization.CacheDatabase;
 using Shared.Core.PackFiles.Utility;
 using Shared.Core.Services;
@@ -40,6 +40,7 @@ namespace Shared.Core
             services.AddSingleton<IGlobalEventHub, GlobalEventHub>();
             services.AddScoped<IExceptionService, ExceptionService>();
             services.AddScoped<IExceptionInformationProvider, BasicExceptionInformationProvider>();
+            services.AddScoped<IExceptionInformationProvider, PackFileExceptionInformationProvider>();
             services.AddTransient<DevelopmentConfigurationManager>();
 
 

@@ -1,8 +1,8 @@
 ﻿using System.Collections.Concurrent;
 using System.Reflection;
 using System.Text;
-using Shared.Core.ErrorHandling;
 using Shared.Core.Events;
+using Shared.Core.PackFiles.ErrorHandling;
 using Shared.Core.PackFiles.Models;
 using Shared.Core.PackFiles.Models.Containers;
 using Shared.Core.PackFiles.Serialization;

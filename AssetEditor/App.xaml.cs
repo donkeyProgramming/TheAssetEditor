@@ -12,6 +12,7 @@ using Shared.Core.DevConfig;
 using Shared.Core.ErrorHandling;
 using Shared.Core.Events;
 using Shared.Core.PackFiles;
+using Shared.Core.PackFiles.ErrorHandling;
 using Shared.Core.PackFiles.Models;
 using Shared.Core.PackFiles.Utility;
 using Shared.Core.Services;
