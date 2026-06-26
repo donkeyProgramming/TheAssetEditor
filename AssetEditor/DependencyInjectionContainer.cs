@@ -43,6 +43,7 @@ namespace AssetEditor
             serviceCollection.AddScoped<MainWindow>();
 
             serviceCollection.AddSingleton<RecentFilesTracker>();
+            serviceCollection.AddSingleton<TouchedFilesRecorder>();
 
             serviceCollection.AddScoped<IExceptionInformationProvider, CurrentEditorExceptionInfoProvider>();
 

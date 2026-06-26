@@ -4,7 +4,7 @@ using Shared.Core.PackFiles.Events;
 using Shared.Core.PackFiles.Models;
 using Shared.Core.Settings;
 
-namespace Shared.Core.Services
+namespace AssetEditor.Services
 {
     public class TouchedFilesRecorder
     {

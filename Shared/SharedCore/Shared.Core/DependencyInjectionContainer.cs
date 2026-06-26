@@ -31,7 +31,6 @@ namespace Shared.Core
             services.AddScoped<ScopeToken>();
             services.AddScoped<IScopedLogger, ScopedLogger>();
             services.AddSingleton<IScopeRepository, ScopeRepository>();
-            services.AddSingleton<TouchedFilesRecorder>();
             services.AddScoped<IUiCommandFactory, UiCommandFactory>();
             services.AddScoped<CommandManager>();
 
