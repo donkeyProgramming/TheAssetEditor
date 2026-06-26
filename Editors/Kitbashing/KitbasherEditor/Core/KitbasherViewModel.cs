@@ -7,13 +7,12 @@ using Editors.KitbasherEditor.ViewModels.SceneExplorer;
 using Editors.KitbasherEditor.ViewModels.SceneNodeEditor;
 using GameWorld.Core.Components;
 using GameWorld.Core.Services;
+using GameWorld.Core.WpfWindow;
 using KitbasherEditor.ViewModels.MenuBarViews;
-using Serilog;
 using Shared.Core.ErrorHandling;
 using Shared.Core.Events;
 using Shared.Core.Events.Scoped;
 using Shared.Core.PackFiles.Models;
-using Shared.Core.Services;
 using Shared.Core.ToolCreation;
 using Shared.Ui.Common;
 

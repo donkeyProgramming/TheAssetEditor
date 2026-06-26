@@ -2,6 +2,7 @@
 using System.Windows.Forms;
 using Shared.Core.Events;
 using Shared.Core.PackFiles;
+using Shared.Core.PackFiles.Models;
 using Shared.Core.PackFiles.Utility;
 using Shared.Core.Settings;
 using Shared.Ui.Common;
@@ -50,7 +51,7 @@ namespace AssetEditor.UiCommands
 
             using (new WaitCursor())
             {
-                var res = _packFileContainerLoader.CreateFromGameEnum(PackFileContainerType.Cached, _game);
+                var res = _packFileContainerLoader.CreateFromGameEnum(PackFileContainerType.Database, _game);
                 _packFileService.AddContainer(res);
             }
         }

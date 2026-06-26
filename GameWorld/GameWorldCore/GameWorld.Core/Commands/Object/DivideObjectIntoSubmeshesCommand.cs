@@ -1,13 +1,9 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using GameWorld.Core.Commands.Face;
-using GameWorld.Core.Components.Selection;
+﻿using GameWorld.Core.Components.Selection;
 using GameWorld.Core.SceneNodes;
 using GameWorld.Core.Services;
-using Serilog;
 using Shared.Core.ErrorHandling;
-using Shared.Ui.Common;
 using Shared.Core.Events;
+using Shared.Ui.Common;
 
 namespace GameWorld.Core.Commands.Object
 {

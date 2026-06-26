@@ -1,7 +1,5 @@
-﻿using GameWorld.Core.Commands.Face;
-using GameWorld.Core.Components.Selection;
+﻿using GameWorld.Core.Components.Selection;
 using GameWorld.Core.SceneNodes;
-using Serilog;
 using Shared.Core.ErrorHandling;
 using Shared.Core.Events;
 

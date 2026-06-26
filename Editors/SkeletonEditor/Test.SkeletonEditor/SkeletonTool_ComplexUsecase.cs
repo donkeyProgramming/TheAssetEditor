@@ -1,7 +1,7 @@
 ﻿using Editor.VisualSkeletonEditor.SkeletonEditor;
 using Editors.Shared.Core.Common.ReferenceModel;
 using Moq;
-using Shared.Core.Events.Global;
+using Shared.Core.Commands;
 using Shared.Core.Services;
 using Shared.Core.ToolCreation;
 using Shared.GameFormats.Animation;

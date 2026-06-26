@@ -7,8 +7,8 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using GameWorld.Core.Rendering;
 using GameWorld.Core.Services;
+using GameWorld.Core.WpfWindow;
 using Microsoft.Xna.Framework.Graphics;
-using Shared.Core.Services;
 
 namespace Editors.TextureEditor.ViewModels
 {

@@ -48,7 +48,7 @@ namespace Shared.CoreTest.PackFiles.Utility
 
         private static PackFileContainer CreateContainer()
         {
-            var container = new PackFileContainer("Test");
+            var container = PackFileContainer.CreatePackFile("Test");
             var parent = new PackedFileSourceParent { FilePath = @"c:\game\p.pack" };
 
             container.AddOrUpdateFile(@"root.txt", new PackFile("root.txt", new PackedFileSource(parent, 0, 1, false, false, CompressionFormat.None, 0)));

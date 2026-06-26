@@ -3,7 +3,6 @@ using System.IO;
 using System.Windows;
 using CommonControls.BaseDialogs.ErrorListDialog;
 using GameWorld.Core.Services;
-using Serilog;
 using Shared.Core.ErrorHandling;
 using Shared.Core.Misc;
 using Shared.Core.PackFiles;

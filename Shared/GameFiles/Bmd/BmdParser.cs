@@ -1,6 +1,4 @@
-using System.Text;
-using Serilog;
-using Shared.Core.ErrorHandling;
+﻿using System.Text;
 using Microsoft.Xna.Framework;
 using Shared.GameFormats.RigidModel.Transforms;
 

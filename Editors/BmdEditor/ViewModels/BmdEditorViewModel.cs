@@ -1,20 +1,21 @@
-﻿using System;
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
 using System.IO;
 using System.Windows.Input;
 using CommunityToolkit.Mvvm.Input;
+using Editors.BmdEditor.Services;
+using GameWorld.Core.Components;
+using GameWorld.Core.Components.Selection;
+using GameWorld.Core.Rendering.Materials;
+using GameWorld.Core.SceneNodes;
+using GameWorld.Core.Services;
+using GameWorld.Core.WpfWindow;
+using Shared.Core.Commands;
 using Shared.Core.Misc;
 using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
-using Shared.Core.ToolCreation;
 using Shared.Core.Services;
+using Shared.Core.ToolCreation;
 using Shared.GameFormats.Bmd;
-using GameWorld.Core.Services;
-using GameWorld.Core.Rendering.Materials;
-using GameWorld.Core.Components;
-using GameWorld.Core.Components.Selection;
-using GameWorld.Core.SceneNodes;
-using Editors.BmdEditor.Services;
 
 namespace Editors.BmdEditor.ViewModels
 {
@@ -235,7 +236,7 @@ namespace Editors.BmdEditor.ViewModels
                 if (referencedFile != null)
                 {
                     // Open the referenced file in the appropriate editor
-                    var openCommand = new Shared.Core.Events.Global.OpenEditorCommand(_editorCreator, _packFileService);
+                    var openCommand = new OpenEditorCommand(_editorCreator, _packFileService);
                     openCommand.Execute(referencedFile);
                 }
                 else

@@ -1,7 +1,6 @@
-﻿using System;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 using Shared.Core.DependencyInjection;
-using Shared.Core.ErrorHandling;
+using Shared.Core.Misc;
 using Shared.Core.ToolCreation;
 
 namespace AssetEditor.Services
@@ -69,7 +68,7 @@ namespace AssetEditor.Services
 
         private void ConfigureServices(IServiceCollection services, Action<IServiceCollection> replaceServices)
         {
-            Logging.Configure(Serilog.Events.LogEventLevel.Information);
+            Logging.Configure(Serilog.Events.LogEventLevel.Information, DirectoryHelper.LogDirectory);
 
             foreach (var container in _dependencyContainers)
                 container.Register(services);

@@ -6,6 +6,7 @@ using Editors.Shared.Core.Common;
 using GameWorld.Core.Services;
 using Shared.Core.Misc;
 using Shared.Core.PackFiles;
+using Shared.Core.PackFiles.Utility;
 using Shared.Core.Services;
 using Shared.GameFormats.Animation;
 

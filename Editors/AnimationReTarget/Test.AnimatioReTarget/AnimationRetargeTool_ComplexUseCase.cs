@@ -2,7 +2,7 @@
 using Editors.AnimatioReTarget.Editor.BoneHandling;
 using Editors.Shared.Core.Common;
 using GameWorld.Core.SceneNodes;
-using Shared.Core.Events.Global;
+using Shared.Core.Commands;
 using Shared.Core.PackFiles.Models;
 using Shared.Core.ToolCreation;
 using Test.TestingUtility.Shared;

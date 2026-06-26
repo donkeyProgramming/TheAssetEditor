@@ -1,7 +1,6 @@
 ﻿using System.Windows;
-using Shared.Core.ErrorHandling;
 using Shared.Core.Events;
-using Shared.Core.Events.Global;
+using Shared.Core.PackFiles.Events;
 using Shared.Core.PackFiles.Models;
 using Shared.Core.PackFiles.Models.Containers;
 using Shared.Core.PackFiles.Models.FileSources;
@@ -47,14 +46,22 @@ namespace Shared.Core.PackFiles
                 }
             }
 
-            // Check if already added!
-            foreach (var packFile in _packFileContainers)
+            // Check if already added! Normalize paths so the same pack loaded via a
+            // differently-cased or non-canonical path is still detected as a duplicate.
+            if (string.IsNullOrEmpty(pf.SystemFilePath) == false)
             {
-                if (packFile.SystemFilePath != null && packFile.SystemFilePath == pf.SystemFilePath)
+                var newPath = NormalizeSystemPath(pf.SystemFilePath);
+                foreach (var packFile in _packFileContainers)
                 {
-                    _logger.Here().Warning($"Rejected loading duplicate pack file '{packFile.SystemFilePath}'");
-                    MessageBoxProvider.ShowDialogBox($"Pack file \"{packFile.SystemFilePath}\" is already loaded.", "Error");
-                    return null;
+                    if (string.IsNullOrEmpty(packFile.SystemFilePath))
+                        continue;
+
+                    if (NormalizeSystemPath(packFile.SystemFilePath) == newPath)
+                    {
+                        _logger.Here().Warning($"Rejected loading duplicate pack file '{packFile.SystemFilePath}'");
+                        MessageBoxProvider.ShowDialogBox($"Pack file \"{packFile.SystemFilePath}\" is already loaded.", "Error");
+                        return null;
+                    }
                 }
             }
 
@@ -82,10 +89,7 @@ namespace Shared.Core.PackFiles
                 throw new Exception("Name can not be empty");
 
             var versionString = PackFileVersionConverter.ToString(packFileVersion);
-            var newPackFile = new PackFileContainer(name)
-            {
-                Header = new PFHeader(versionString, type),
-            };
+            var newPackFile = PackFileContainer.CreatePackFile(name, null, packFileVersion);
 
             _logger.Here().Information($"Creating new pack file container '{name}' with version '{versionString}' and type '{type}'");
             AddContainerInternal(newPackFile, setEditablePack);
@@ -96,8 +100,8 @@ namespace Shared.Core.PackFiles
         public void AddFilesToPack(IPackFileContainer container, List<NewPackFileEntry> newFiles)
         {
             var pf = CastContainer(container);
-            if (pf.IsCaPackFile)
-                throw new Exception("Can not add files to ca pack file");
+            if (pf.IsReadOnly)
+                throw new Exception("Can not add files to readonly pack file");
 
             _logger.Here().Information($"Adding {newFiles.Count} file(s) to '{DescribeContainer(pf)}'");
             var addedFiles = pf.AddFiles(newFiles);
@@ -108,8 +112,8 @@ namespace Shared.Core.PackFiles
         public void CopyFileFromOtherPackFile(IPackFileContainer source, string path, IPackFileContainer target)
         {
             var pf = CastContainer(target);
-            if (pf.IsCaPackFile)
-                throw new Exception("Can not add files to ca pack file");
+            if (pf.IsReadOnly)
+                throw new Exception("Can not add files to readonly pack file");
 
             var sourceContainer = CastContainer(source);
             var targetContainer = CastContainer(target);
@@ -121,9 +125,11 @@ namespace Shared.Core.PackFiles
                 var newFile = new PackFile(file.Name, new MemorySource(data));
                 targetContainer.AddOrUpdateFile(lowerPath, newFile);
 
+                var storedFile = targetContainer.FindFile(lowerPath)!;
+
                 _logger.Here().Information($"Copied '{lowerPath}' from '{DescribeContainer(sourceContainer)}' to '{DescribeContainer(targetContainer)}'");
 
-                _globalEventHub?.PublishGlobalEvent(new PackFileContainerFilesAddedEvent(targetContainer, [newFile]));
+                _globalEventHub?.PublishGlobalEvent(new PackFileContainerFilesAddedEvent(targetContainer, [storedFile]));
             }
             else
             {
@@ -133,8 +139,8 @@ namespace Shared.Core.PackFiles
 
         public void SetEditablePack(IPackFileContainer? pf)
         {
-            if (pf != null && pf.IsCaPackFile)
-                throw new Exception("Trying to set CA packfile container to be editable - this is not legal!");
+            if (pf != null && pf.IsReadOnly)
+                throw new Exception("Trying to set readonly packfile container to be editable - this is not legal!");
             _packFileContainerSelectedForEdit = pf != null ? CastContainer(pf) : null;
             _logger.Here().Information($"Editable pack set to '{DescribeContainer(_packFileContainerSelectedForEdit)}'");
             _globalEventHub?.PublishGlobalEvent(new PackFileContainerSetAsMainEditableEvent(pf));
@@ -161,6 +167,9 @@ namespace Shared.Core.PackFiles
 
             _logger.Here().Information($"Unloaded pack file container '{DescribeContainer(container)}'. Remaining containers: {_packFileContainers.Count}");
             _globalEventHub?.PublishGlobalEvent(new PackFileContainerRemovedEvent(container));
+
+            if (container is IDisposable disposable)
+                disposable.Dispose();
         }
 
         public List<(string FileName, PackFile Pack)> FindAllWithExtention(string extention, IPackFileContainer? pf = null)
@@ -180,8 +189,8 @@ namespace Shared.Core.PackFiles
         public void DeleteFolder(IPackFileContainer pf, string folder)
         {
             var container = CastContainer(pf);
-            if (container.IsCaPackFile)
-                throw new Exception("Can not delete folder inside CA pack file");
+            if (container.IsReadOnly)
+                throw new Exception("Can not delete folder inside readonly pack file");
 
             _logger.Here().Information($"Deleting folder '{folder}' from '{DescribeContainer(container)}'");
             _globalEventHub?.PublishGlobalEvent(new PackFileContainerFolderRemovedEvent(container, folder));
@@ -191,8 +200,8 @@ namespace Shared.Core.PackFiles
         public void DeleteFile(IPackFileContainer pf, PackFile file)
         {
             var container = CastContainer(pf);
-            if (container.IsCaPackFile)
-                throw new Exception("Can not delete files inside CA pack file");
+            if (container.IsReadOnly)
+                throw new Exception("Can not delete files inside readonly pack file");
 
             _logger.Here().Information($"Deleting file '{DescribeFile(container, file)}' from '{DescribeContainer(container)}'");
             _globalEventHub?.PublishGlobalEvent(new PackFileContainerFilesRemovedEvent(container, [file]));
@@ -202,8 +211,8 @@ namespace Shared.Core.PackFiles
         public void MoveFile(IPackFileContainer pf, PackFile file, string newFolderPath)
         {
             var container = CastContainer(pf);
-            if (container.IsCaPackFile)
-                throw new Exception("Can not move files inside CA pack file");
+            if (container.IsReadOnly)
+                throw new Exception("Can not move files inside readonly pack file");
 
             var key = container.GetFullPath(file);
             _globalEventHub?.PublishGlobalEvent(new PackFileContainerFilesRemovedEvent(container, [file]));
@@ -215,8 +224,8 @@ namespace Shared.Core.PackFiles
         public void RenameDirectory(IPackFileContainer pf, string currentNodeName, string newName)
         {
             var container = CastContainer(pf);
-            if (container.IsCaPackFile)
-                throw new Exception("Can not rename in ca pack file");
+            if (container.IsReadOnly)
+                throw new Exception("Can not rename in readonly pack file");
 
             if (string.IsNullOrWhiteSpace(newName))
                 throw new Exception("Name can not be empty");
@@ -229,8 +238,8 @@ namespace Shared.Core.PackFiles
         public void RenameFile(IPackFileContainer pf, PackFile file, string newName)
         {
             var container = CastContainer(pf);
-            if (container.IsCaPackFile)
-                throw new Exception("Can not rename file in ca pack file");
+            if (container.IsReadOnly)
+                throw new Exception("Can not rename file in readonly pack file");
 
             if (string.IsNullOrWhiteSpace(newName))
                 throw new Exception("Name can not be empty");
@@ -246,8 +255,8 @@ namespace Shared.Core.PackFiles
             var pf = _packFileContainerSelectedForEdit;
             if (pf == null)
                 throw new Exception("No editable pack file is set");
-            if (pf.IsCaPackFile)
-                throw new Exception("Can not save ca pack file");
+            if (pf.IsReadOnly)
+                throw new Exception("Can not save readonly pack file");
 
             _logger.Here().Information($"Saving file '{DescribeFile(pf, file)}' to '{DescribeContainer(pf)}' ({data.Length} bytes)");
             pf.SaveFileData(file, data);
@@ -258,8 +267,8 @@ namespace Shared.Core.PackFiles
         public void SavePackContainer(IPackFileContainer pf, string path, bool createBackup, GameInformation gameInformation)
         {
             var container = CastContainer(pf);
-            if (container.IsCaPackFile)
-                throw new Exception("Can not save ca pack file");
+            if (container.IsReadOnly)
+                throw new Exception("Can not save readonly pack file");
 
             _logger.Here().Information($"Saving pack file container '{DescribeContainer(container)}' to '{path}' (CreateBackup:{createBackup}, Game:{gameInformation.DisplayName})");
             container.SaveToDisk(path, createBackup, gameInformation);
@@ -341,6 +350,18 @@ namespace Shared.Core.PackFiles
 
             var concreteContainer = CastContainer(container);
             return concreteContainer.SystemFilePath ?? concreteContainer.Name;
+        }
+
+        private static string NormalizeSystemPath(string path)
+        {
+            try
+            {
+                return Path.GetFullPath(path).TrimEnd('\\', '/').ToLowerInvariant();
+            }
+            catch
+            {
+                return path.Replace('/', '\\').TrimEnd('\\').Trim().ToLowerInvariant();
+            }
         }
 
         private static string DescribeFile(IPackFileContainer container, PackFile file)

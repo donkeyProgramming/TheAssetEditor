@@ -1,13 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
 using System.IO;
-using System.Linq;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Shared.Core.Events;
-using Shared.Core.Events.Global;
 using Shared.Core.PackFiles;
+using Shared.Core.PackFiles.Events;
 using Shared.Core.PackFiles.Models;
 using Shared.Core.Services;
 using Shared.Core.Settings;
@@ -26,7 +23,6 @@ namespace Shared.Ui.BaseDialogs.PackFileTree
     {
         protected IPackFileService _packFileService;
         private readonly IEventHub? _eventHub;
-        private readonly IWindowsKeyboard _windowKeyboard;
         private readonly ApplicationSettingsService _applicationSettingsService;
         private readonly PackFileContextMenuComposer _contextMenuComposer;
         private readonly ContextMenuType _contextMenuType;
@@ -55,7 +51,6 @@ namespace Shared.Ui.BaseDialogs.PackFileTree
         {
             _packFileService = packFileService;
             _eventHub = eventHub;
-            _windowKeyboard = windowKeyboard;
             _applicationSettingsService = applicationSettingsService;
             _contextMenuComposer = contextMenuComposer;
             _contextMenuType = contextMenuType;

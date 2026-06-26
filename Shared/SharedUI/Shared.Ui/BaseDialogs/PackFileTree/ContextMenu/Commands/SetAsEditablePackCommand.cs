@@ -1,7 +1,5 @@
+﻿using Shared.Core.ErrorHandling;
 using Shared.Core.PackFiles;
-using Shared.Core.PackFiles.Models;
-using Serilog;
-using Shared.Core.ErrorHandling;
 using Shared.Ui.BaseDialogs.PackFileTree.Utility;
 
 namespace Shared.Ui.BaseDialogs.PackFileTree.ContextMenu.Commands
@@ -14,7 +12,7 @@ namespace Shared.Ui.BaseDialogs.PackFileTree.ContextMenu.Commands
         public bool ShouldAdd(TreeNode node)
         {
             var container = TreeNodeHelper.GetPackFileContainer(node);
-            return node.NodeType == NodeType.Root && container is { IsCaPackFile: false } && packFileService.GetEditablePack() != container;
+            return node.NodeType == NodeType.Root && container is { IsReadOnly: false } && packFileService.GetEditablePack() != container;
         }
 
         public bool IsEnabled(TreeNode node) => true;

@@ -2,7 +2,7 @@
 using GameWorld.Core.WpfWindow.Events;
 using Microsoft.Xna.Framework.Graphics;
 using Shared.Core.Events;
-using Shared.Core.Events.Global;
+using Shared.Core.PackFiles.Events;
 using Shared.Core.Services;
 
 namespace GameWorld.Core.Services

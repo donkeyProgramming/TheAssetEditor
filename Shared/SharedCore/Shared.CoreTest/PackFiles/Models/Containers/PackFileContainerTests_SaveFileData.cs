@@ -6,6 +6,7 @@ namespace Shared.CoreTest.PackFiles.Models.Containers
 {
     [TestFixture(typeof(CachedPackFileContainer))]
     [TestFixture(typeof(PackFileContainer))]
+    [TestFixture(typeof(SystemFolderContainer))]
     internal class PackFileContainerTests_SaveFileData : PackFileContainerTests_TestBase
     {
         public PackFileContainerTests_SaveFileData(Type containerType) : base(containerType) { }
@@ -17,6 +18,17 @@ namespace Shared.CoreTest.PackFiles.Models.Containers
             {
                 var cachedFile = _container.FindFile("folder\\file.txt")!;
                 Assert.Throws<InvalidOperationException>(() => _container.SaveFileData(cachedFile, [1, 2, 3]));
+                return;
+            }
+
+            if (IsSystemFolderContainer)
+            {
+                // SystemFolderContainer.AddOrUpdateFile creates a new PackFile internally,
+                // so we must re-fetch the stored reference after adding.
+                _container.AddOrUpdateFile("new.txt", new PackFile("new.txt", new MemorySource([1])));
+                var storedFile = _container.FindFile("new.txt")!;
+                _container.SaveFileData(storedFile, [9, 8, 7]);
+                Assert.That(storedFile.DataSource.ReadData(), Is.EqualTo(new byte[] { 9, 8, 7 }));
                 return;
             }
 

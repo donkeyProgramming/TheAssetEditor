@@ -4,7 +4,6 @@ using GameWorld.Core.Services;
 using GameWorld.Core.WpfWindow;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
-using Shared.Core.DependencyInjection;
 using Shared.Core.Events;
 using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
@@ -12,8 +11,10 @@ using Shared.Core.PackFiles.Models.Containers;
 using Shared.Core.PackFiles.Utility;
 using Shared.Core.Services;
 using Shared.Core.Settings;
+using Shared.Core.ToolCreation;
 using Shared.Ui.BaseDialogs.StandardDialog;
 using Shared.Ui.Common.MenuSystem;
+using Test.TestingUtility.TestUtility;
 
 namespace Test.TestingUtility.Shared
 {
@@ -59,11 +60,7 @@ namespace Test.TestingUtility.Shared
 
         public IPackFileContainer? CreateCaContainer()
         {
-            var caConainter = new PackFileContainer("CA")
-            {
-                IsCaPackFile = true,
-                SystemFilePath = @"c:\files\game\ca.pack"
-            };
+            var caConainter = PackFileContainer.CreateCaPackFile("CA", @"c:\files\game\ca.pack");
             PackFileService.AddContainer(caConainter, false);
             return caConainter;
         }
@@ -113,6 +110,10 @@ namespace Test.TestingUtility.Shared
             var windowsd = new ServiceDescriptor(typeof(IWindowsKeyboard), typeof(WindowKeyboard), ServiceLifetime.Scoped);
             services.Remove(mouseDescriptor);
             services.AddScoped<IWindowsKeyboard>(x => new TestKeyboard());
+
+            var fileaccess = new ServiceDescriptor(typeof(ISystemFolderContainerFactory), typeof(SystemFolderContainerFactory), ServiceLifetime.Singleton);
+            services.Remove(fileaccess);
+            services.AddScoped<ISystemFolderContainerFactory>(x => new SimpleSystemFolderContainerFactory());
 
             Dialogs = new Mock<IStandardDialogs>();
             var dialogDescriptor = new ServiceDescriptor(typeof(IStandardDialogs), typeof(StandardDialogs), ServiceLifetime.Scoped);

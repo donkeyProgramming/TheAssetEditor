@@ -1,5 +1,4 @@
 ﻿using CommunityToolkit.Diagnostics;
-using Shared.Core.ErrorHandling;
 using Shared.Core.Misc;
 using Shared.Core.PackFiles.Models.FileSources;
 using Shared.Core.PackFiles.Serialization;
@@ -14,18 +13,59 @@ namespace Shared.Core.PackFiles.Models.Containers
 
         public string Name { get; set; }
         public PFHeader Header { get; set; }
+        public bool IsReadOnly { get { return IsCaPackFile || field; } set; } = false;
         public bool IsCaPackFile { get; set; } = false;
         public string? SystemFilePath { get; set; }
+        public PackFileContainerType ContainerType => PackFileContainerType.Normal;
         public long OriginalLoadByteSize { get; set; } = -1;
         public HashSet<string> SourcePackFilePaths { get; set; } = [];
-
+        
         public Dictionary<string, PackFile> FileList { get; set; } = [];
 
-        public PackFileContainer(string name)
+        protected PackFileContainer(string name, PackFileVersion version)
         {
             Name = name;
-            var v = PackFileVersionConverter.ToString(PackFileVersion.PFH5);
-            Header = new PFHeader(v, PackFileCAType.MOD);
+            var versionStr = PackFileVersionConverter.ToString(version);
+            Header = new PFHeader(versionStr, PackFileCAType.MOD);
+        }
+
+        public static PackFileContainer CreateCaPackFile(string name, string? systemFilePath = null, PackFileVersion version = PackFileVersion.PFH5)
+        {
+            return new PackFileContainer(name, version)
+            {
+                IsCaPackFile = true,
+                IsReadOnly = true,
+                SystemFilePath = systemFilePath
+            };
+        }
+
+        public static PackFileContainer CreateReadOnlyPackFile(string name, string? systemFilePath = null, PackFileVersion version = PackFileVersion.PFH5)
+        {
+            return new PackFileContainer(name, version)
+            {
+                IsCaPackFile = false,
+                IsReadOnly = true,
+                SystemFilePath = systemFilePath
+            };
+        }
+
+        public static PackFileContainer CreatePackFile(string name, string? systemFilePath = null, PackFileVersion version = PackFileVersion.PFH5)
+        {
+            return new PackFileContainer(name, version)
+            {
+                IsCaPackFile = false,
+                IsReadOnly = false,
+                SystemFilePath = systemFilePath
+            };
+        }
+
+        public static PackFileContainer CreatePackFile(string name, string systemFilePath, PFHeader header)
+        {
+            return new PackFileContainer(name, header.Version)
+            {
+                Header = header,
+                SystemFilePath = systemFilePath
+            };
         }
 
         public int GetFileCount() => FileList.Count;
@@ -295,24 +335,7 @@ namespace Shared.Core.PackFiles.Models.Containers
 
         public SortedDictionary<string, List<string>> GetAllFilesByFolder()
         {
-            var result = new SortedDictionary<string, List<string>>(StringComparer.InvariantCultureIgnoreCase);
-
-            foreach (var fullPath in FileList.Keys)
-            {
-                var lastSep = fullPath.LastIndexOf('\\');
-                var folder = lastSep == -1 ? string.Empty : fullPath.Substring(0, lastSep);
-                var fileName = lastSep == -1 ? fullPath : fullPath.Substring(lastSep + 1);
-
-                if (!result.TryGetValue(folder, out var files))
-                {
-                    files = new List<string>();
-                    result[folder] = files;
-                }
-
-                files.Add(fileName);
-            }
-
-            return result;
+            return PackFileSortHelper.BuildSortedFilesByFolder(FileList.Keys);
         }
     }
 }

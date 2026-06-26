@@ -1,7 +1,5 @@
 ﻿using System.IO;
 using System.Reflection;
-using Serilog;
-using Shared.Core.ErrorHandling;
 using Shared.Core.Misc;
 using Shared.GameFormats.RigidModel.Types;
 

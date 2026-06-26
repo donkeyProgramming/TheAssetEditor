@@ -2,8 +2,6 @@
 using GameWorld.Core.Services;
 using Microsoft.Xna.Framework.Graphics;
 using Pfim;
-using Serilog;
-using Shared.Core.ErrorHandling;
 using Shared.Core.PackFiles;
 
 namespace GameWorld.Core.Utility

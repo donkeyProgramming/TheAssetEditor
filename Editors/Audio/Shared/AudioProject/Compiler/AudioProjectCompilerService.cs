@@ -1,13 +1,9 @@
-﻿using System.Collections.Generic;
-using System.Data;
+﻿using System.Data;
 using System.IO;
-using System.Linq;
 using Editors.Audio.Shared.AudioProject.Models;
 using Editors.Audio.Shared.Dat;
 using Editors.Audio.Shared.GameInformation.Warhammer3;
 using Editors.Audio.Shared.Wwise.Generators;
-using Serilog;
-using Shared.Core.ErrorHandling;
 using Shared.Core.Misc;
 using Shared.GameFormats.Wwise;
 

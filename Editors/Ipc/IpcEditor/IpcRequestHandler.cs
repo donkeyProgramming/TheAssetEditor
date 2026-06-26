@@ -1,7 +1,4 @@
-﻿using Serilog;
-using Shared.Core.ErrorHandling;
-
-namespace Editors.Ipc
+﻿namespace Editors.Ipc
 {
     public class IpcRequestHandler : IIpcRequestHandler
     {

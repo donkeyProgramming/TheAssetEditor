@@ -1,5 +1,4 @@
 ﻿using Shared.ByteParsing;
-using Shared.Core.ErrorHandling;
 using Shared.Core.PackFiles.Models;
 using Shared.Core.PackFiles.Models.Containers;
 using Shared.Core.PackFiles.Models.FileSources;
@@ -34,13 +33,9 @@ namespace Shared.Core.PackFiles.Serialization
             {
                 var fileNameBuffer = new byte[1024];
                 var name = Path.GetFileNameWithoutExtension(packFileSystemPath);
-                var output = new PackFileContainer(name)
-                {
-                    SystemFilePath = packFileSystemPath,
-                    Name = Path.GetFileNameWithoutExtension(packFileSystemPath),
-                    Header = ReadHeader(reader),
-                    OriginalLoadByteSize = packFileSize,
-                };
+                var header = ReadHeader(reader);
+                var output = PackFileContainer.CreatePackFile(name, packFileSystemPath, header);
+                output.OriginalLoadByteSize = packFileSize;
 
                 // If larger then int.max throw error
                 if (output.Header.FileCount > int.MaxValue)

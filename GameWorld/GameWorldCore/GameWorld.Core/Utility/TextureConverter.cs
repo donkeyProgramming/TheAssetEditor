@@ -1,11 +1,6 @@
-﻿using System;
-using System.IO;
+﻿using System.IO;
 using System.Reflection;
-using System.Threading;
-using Serilog;
-using Shared.Core.ErrorHandling;
 using Shared.Core.Misc;
-using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
 using Shared.GameFormats.RigidModel.Types;
 

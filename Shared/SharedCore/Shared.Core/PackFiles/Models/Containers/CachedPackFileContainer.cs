@@ -1,8 +1,7 @@
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
-using Shared.Core.ErrorHandling;
 using Shared.Core.PackFiles.Models.FileSources;
 using Shared.Core.PackFiles.Serialization.CacheDatabase;
 using Shared.Core.PackFiles.Utility;
@@ -29,8 +28,10 @@ namespace Shared.Core.PackFiles.Models.Containers
         public CacheStorageMode StorageMode { get; }
         public string? DbFilePath { get; }
         public string Name { get; set; }
-        public bool IsCaPackFile { get => true; set { } }
+        public bool IsReadOnly { get => true; set { } }
+        public bool IsCaPackFile { get; set; } = false;
         public string SystemFilePath { get; set; }
+        public PackFileContainerType ContainerType => PackFileContainerType.Database;
         public HashSet<string> SourcePackFilePaths { get; set; } = [];
 
         /// <summary>
@@ -260,11 +261,7 @@ namespace Shared.Core.PackFiles.Models.Containers
         {
             var packParent = new PackedFileSourceParent { FilePath = sourcePackFilePath ?? @"c:\game\data\pack1.pack" };
 
-            var source = new PackFileContainer(containerName)
-            {
-                IsCaPackFile = true,
-                SystemFilePath = systemFilePath
-            };
+            var source = PackFileContainer.CreateReadOnlyPackFile(containerName, systemFilePath);
 
             if (sourcePackFilePath != null)
                 source.SourcePackFilePaths.Add(sourcePackFilePath);
@@ -427,27 +424,16 @@ namespace Shared.Core.PackFiles.Models.Containers
             var time = Stopwatch.StartNew();
             lock (_dbLock)
             {
-
-              var rows = _db.Files
-           .Select(f => new
-           {
-               f.FolderPath,
-               f.FileName
-           })
-           .OrderBy(f => f.FolderPath)
-           .ThenBy(f => f.FileName)
-           .ToList();
-
-                var result = rows
-                    .GroupBy(f => f.FolderPath)
+                var rows = _db.Files
+                    .Select(f => new { f.FolderPath, f.FileName })
                     .ToList();
 
                 var sorted = new SortedDictionary<string, List<string>>(StringComparer.InvariantCultureIgnoreCase);
-                foreach (var re in result)
+                foreach (var group in rows.GroupBy(f => f.FolderPath))
                 {
-                    sorted[re.Key] = re.Select(f => f.FileName).OrderByDescending(f=>f).ToList();
-
-
+                    var files = group.Select(f => f.FileName).ToList();
+                    PackFileSortHelper.SortFileList(files);
+                    sorted[group.Key] = files;
                 }
 
                 _logger.Here().Information("Getting all files from cached container took {ElapsedMilliseconds} ms", time.ElapsedMilliseconds);

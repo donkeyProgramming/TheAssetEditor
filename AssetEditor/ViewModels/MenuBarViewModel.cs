@@ -3,8 +3,8 @@ using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using AssetEditor.Services;
 using AssetEditor.UiCommands;
-using CommonControls.BaseDialogs;
 using CommunityToolkit.Mvvm.Input;
 using Editors.AnimationFragmentEditor.AnimationPack.Commands;
 using Editors.Reports.Animation;
@@ -58,7 +58,7 @@ namespace AssetEditor.ViewModels
             _packFileContainerLoader = packFileContainerLoader;
             _standardDialogs = standardDialogs;
             var settings = settingsService.CurrentSettings;
-            settings.RecentPackFilePaths.CollectionChanged += OnRecentPackFilePathsChanged;
+            settings.RecentPackFiles.CollectionChanged += OnRecentPackFilePathsChanged;
             CreateRecentPackFilesItems();
             CreateTools();
         }
@@ -70,29 +70,14 @@ namespace AssetEditor.ViewModels
 
         public void Dispose()
         {
-            _settingsService.CurrentSettings.RecentPackFilePaths.CollectionChanged -= OnRecentPackFilePathsChanged;
+            _settingsService.CurrentSettings.RecentPackFiles.CollectionChanged -= OnRecentPackFilePathsChanged;
         }
 
         [RelayCommand] private void OpenSettingsWindow() => _uiCommandFactory.Create<OpenSettingsDialogCommand>().Execute();
-        [RelayCommand] private void OpenPackFile() => _uiCommandFactory.Create<OpenPackFileCommand>().Execute();
-        [RelayCommand] private void CreateNewPackFile()
-        {
-            var window = new TextInputWindow("New Pack Name", "");
-            if (window.ShowDialog() == true)
-            {
-                if (string.IsNullOrWhiteSpace(window.TextValue))
-                {
-                    _standardDialogs.ShowDialogBox($"'{window.TextValue}' is not a valid packfile name", "Error");
-                    return;
-                }
-
-                var currentGame = _settingsService.CurrentSettings.CurrentGame;
-                var pfsVersion = GameInformationDatabase.Games[currentGame].PackFileVersion; 
-
-                var newPackFile = _packfileService.CreateNewPackFileContainer(window.TextValue.Trim(), pfsVersion, PackFileCAType.MOD);
-                _packfileService.SetEditablePack(newPackFile);
-            }
-        }
+        [RelayCommand] private void OpenProjectFolder() => _uiCommandFactory.Create<OpenProjectCommand>().Execute();
+        [RelayCommand] private void ImportPackAsProject() => _uiCommandFactory.Create<ImportPackAsAsProjectCommand>().Execute();
+        [RelayCommand] private void ImportReferencePack() => _uiCommandFactory.Create<ImportReferencePackCommand>().Execute();
+        [RelayCommand] private void CreateNewProject() => _uiCommandFactory.Create<CreateNewProjectCommand>().Execute();
         
         [RelayCommand] private void CreateAnimPackWarhammer3() => _uiCommandFactory.Create<CreateExampleAnimationDbCommand>().CreateAnimationDbWarhammer3();
         [RelayCommand] private void CreateAnimPack3k() => _uiCommandFactory.Create<CreateExampleAnimationDbCommand>().CreateAnimationDb3k();
@@ -164,14 +149,19 @@ namespace AssetEditor.ViewModels
             var settings = _settingsService.CurrentSettings;
 
             RecentPackFiles.Clear();
-            var menuItemViewModels = settings.RecentPackFilePaths.Select(path => new RecentPackFileItem(
-                path,
+            var menuItemViewModels = settings.RecentPackFiles.Select(info => new RecentPackFileItem(
+                info.Path,
+                info.ContainerType,
+                info.IsReadOnly,
                 () =>
                 {
-                    var container = _packFileContainerLoader.CreateFromPackFile(PackFileContainerType.Normal, path, false);
+                    var container = info.ContainerType == PackFileContainerType.SystemFolder
+                        ? _packFileContainerLoader.CreateFromSystemFolder(info.Path)
+                        : _packFileContainerLoader.CreateFromPackFile(info.ContainerType, info.Path, info.IsReadOnly);
+
                     if (container == null)
                     {
-                        System.Windows.MessageBox.Show($"Unable to load packfiles {path}");
+                        System.Windows.MessageBox.Show($"Unable to load packfiles {info.Path}");
                         return;
                     }
 

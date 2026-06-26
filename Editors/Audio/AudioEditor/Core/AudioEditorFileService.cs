@@ -10,7 +10,7 @@ using Editors.Audio.Shared.GameInformation.Warhammer3;
 using Editors.Audio.Shared.Storage;
 using Shared.Core.Events;
 using Shared.Core.PackFiles.Models;
-using Shared.Core.Services;
+using Shared.Core.PackFiles.Utility;
 using Shared.Core.Settings;
 
 namespace Editors.Audio.AudioEditor.Core

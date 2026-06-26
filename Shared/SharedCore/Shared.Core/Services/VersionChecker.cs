@@ -1,6 +1,5 @@
 ﻿using System.Reflection;
 using Octokit;
-using Shared.Core.ErrorHandling;
 
 namespace Shared.Core.Services
 {

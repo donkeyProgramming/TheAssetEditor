@@ -1,5 +1,5 @@
-using Editors.AnimationMeta.Presentation;
-using Shared.Core.Events.Global;
+﻿using Editors.AnimationMeta.Presentation;
+using Shared.Core.Commands;
 using Shared.GameFormats.AnimationMeta.Parsing;
 using Test.TestingUtility.Shared;
 using Test.TestingUtility.TestUtility;

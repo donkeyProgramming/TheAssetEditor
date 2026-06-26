@@ -1,6 +1,6 @@
 ﻿using System;
 using Shared.Core.Events;
-using Shared.Core.Events.Global;
+using Shared.Core.PackFiles.Events;
 using Shared.Core.Settings;
 
 namespace AssetEditor.Services
@@ -25,7 +25,7 @@ namespace AssetEditor.Services
             if (string.IsNullOrEmpty(e.Container.SystemFilePath))
                 return;
 
-            _applicationSettingsService.AddRecentlyOpenedPackFile(e.Container.SystemFilePath);
+            _applicationSettingsService.AddRecentlyOpenedPackFile(e.Container.SystemFilePath, e.Container.ContainerType, e.Container.IsReadOnly);
             _applicationSettingsService.Save();
         }
 

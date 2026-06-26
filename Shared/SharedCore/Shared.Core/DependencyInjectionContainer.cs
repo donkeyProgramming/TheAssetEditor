@@ -6,6 +6,7 @@ using Shared.Core.ErrorHandling.Exceptions;
 using Shared.Core.Events;
 using Shared.Core.Misc;
 using Shared.Core.PackFiles;
+using Shared.Core.PackFiles.ErrorHandling;
 using Shared.Core.PackFiles.Serialization.CacheDatabase;
 using Shared.Core.PackFiles.Utility;
 using Shared.Core.Services;
@@ -30,7 +31,6 @@ namespace Shared.Core
             services.AddScoped<ScopeToken>();
             services.AddScoped<IScopedLogger, ScopedLogger>();
             services.AddSingleton<IScopeRepository, ScopeRepository>();
-            services.AddSingleton<TouchedFilesRecorder>();
             services.AddScoped<IUiCommandFactory, UiCommandFactory>();
             services.AddScoped<CommandManager>();
 
@@ -40,12 +40,16 @@ namespace Shared.Core
             services.AddSingleton<IGlobalEventHub, GlobalEventHub>();
             services.AddScoped<IExceptionService, ExceptionService>();
             services.AddScoped<IExceptionInformationProvider, BasicExceptionInformationProvider>();
+            services.AddScoped<IExceptionInformationProvider, PackFileExceptionInformationProvider>();
             services.AddTransient<DevelopmentConfigurationManager>();
 
 
             services.AddSingleton<LocalizationManager>();
             services.AddScoped<IPackFileContainerCacheHelper, PackFileContainerCacheHelper>();
             services.AddTransient<IPackFileContainerLoader, PackFileContainerLoader>();
+            services.AddTransient<IFileSystemWatcher, FileSystemWatcherWrapper>();
+            services.AddSingleton<Func<IFileSystemWatcher>>(sp => () => sp.GetRequiredService<IFileSystemWatcher>());
+            services.AddSingleton<ISystemFolderContainerFactory, SystemFolderContainerFactory>();
         }
     }
 

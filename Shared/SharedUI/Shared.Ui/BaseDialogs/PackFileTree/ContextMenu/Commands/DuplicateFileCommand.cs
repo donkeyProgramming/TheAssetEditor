@@ -1,10 +1,9 @@
-using System.IO;
+﻿using System.IO;
+using Shared.Core.ErrorHandling;
 using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
 using Shared.Core.PackFiles.Models.FileSources;
 using Shared.Core.Services;
-using Serilog;
-using Shared.Core.ErrorHandling;
 using Shared.Ui.BaseDialogs.PackFileTree.Utility;
 
 namespace Shared.Ui.BaseDialogs.PackFileTree.ContextMenu.Commands
@@ -18,7 +17,7 @@ namespace Shared.Ui.BaseDialogs.PackFileTree.ContextMenu.Commands
         {
             var container = TreeNodeHelper.GetPackFileContainer(node);
             var packFile = TreeNodeHelper.GetPackFile(node);
-            return node.NodeType == NodeType.File && packFile != null && container is { IsCaPackFile: false };
+            return node.NodeType == NodeType.File && packFile != null && container is { IsReadOnly: false };
         }
 
         public bool IsEnabled(TreeNode node) => true;

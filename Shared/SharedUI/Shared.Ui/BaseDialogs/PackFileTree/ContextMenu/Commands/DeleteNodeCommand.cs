@@ -1,8 +1,7 @@
-using Shared.Core.PackFiles;
-using Shared.Core.PackFiles.Models;
-using Shared.Core.Services;
-using Serilog;
+﻿using Serilog;
 using Shared.Core.ErrorHandling;
+using Shared.Core.PackFiles;
+using Shared.Core.Services;
 using Shared.Ui.BaseDialogs.PackFileTree.Utility;
 
 namespace Shared.Ui.BaseDialogs.PackFileTree.ContextMenu.Commands
@@ -16,7 +15,7 @@ namespace Shared.Ui.BaseDialogs.PackFileTree.ContextMenu.Commands
         {
             var container = TreeNodeHelper.GetPackFileContainer(node);
             var packFile = TreeNodeHelper.GetPackFile(node);
-            return container is { IsCaPackFile: false } && ((node.NodeType == NodeType.File && packFile != null) || node.NodeType == NodeType.Directory);
+            return container is { IsReadOnly: false } && ((node.NodeType == NodeType.File && packFile != null) || node.NodeType == NodeType.Directory);
         }
 
         public bool IsEnabled(TreeNode node) => true;
@@ -38,10 +37,10 @@ namespace Shared.Ui.BaseDialogs.PackFileTree.ContextMenu.Commands
                 return;
             }
 
-            if (container.IsCaPackFile)
+            if (container.IsReadOnly)
             {
-                _logger.Here().Warning($"Delete blocked for CA pack node '{CommandLoggingHelper.DescribeNode(_node)}'");
-                standardDialogs.ShowDialogBox("Unable to edit CA packfile", "Error");
+                _logger.Here().Warning($"Delete blocked for readonly pack node '{CommandLoggingHelper.DescribeNode(_node)}'");
+                standardDialogs.ShowDialogBox("Unable to edit readonly packfile", "Error");
                 return;
             }
 

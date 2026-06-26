@@ -5,10 +5,10 @@ using AssetEditor.Views;
 using AssetEditor.Views.Settings;
 using AssetEditor.Views.Updater;
 using Microsoft.Extensions.DependencyInjection;
+using Shared.Core.Commands;
 using Shared.Core.DependencyInjection;
 using Shared.Core.DevConfig;
 using Shared.Core.ErrorHandling.Exceptions;
-using Shared.Core.Events.Global;
 using Shared.Core.ToolCreation;
 
 namespace AssetEditor
@@ -21,8 +21,11 @@ namespace AssetEditor
             serviceCollection.AddScoped<MainViewModel>();
             serviceCollection.AddSingleton<IEditorManager, EditorManager>();
 
+            serviceCollection.AddTransient<CreateNewProjectCommand>();
             serviceCollection.AddTransient<OpenGamePackCommand>();
-            serviceCollection.AddTransient<OpenPackFileCommand>();
+            serviceCollection.AddTransient<ImportPackAsAsProjectCommand>();
+            serviceCollection.AddTransient<ImportReferencePackCommand>();
+            serviceCollection.AddTransient<OpenProjectCommand>();
             serviceCollection.AddTransient<OpenSettingsDialogCommand>();
             serviceCollection.AddTransient<OpenUpdaterWindowCommand>();
             serviceCollection.AddTransient<OpenWebpageCommand>();
@@ -40,6 +43,7 @@ namespace AssetEditor
             serviceCollection.AddScoped<MainWindow>();
 
             serviceCollection.AddSingleton<RecentFilesTracker>();
+            serviceCollection.AddSingleton<TouchedFilesRecorder>();
 
             serviceCollection.AddScoped<IExceptionInformationProvider, CurrentEditorExceptionInfoProvider>();
 

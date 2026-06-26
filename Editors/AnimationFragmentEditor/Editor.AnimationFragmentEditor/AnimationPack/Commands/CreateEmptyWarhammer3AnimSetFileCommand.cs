@@ -1,7 +1,7 @@
 ﻿using CommonControls.BaseDialogs;
 using CommonControls.Editors.AnimationPack;
 using Shared.Core.Events;
-using Shared.Core.Misc;
+using Shared.Core.PackFiles.Utility;
 using Shared.GameFormats.AnimationPack.AnimPackFileTypes;
 using Shared.GameFormats.AnimationPack.AnimPackFileTypes.Wh3;
 using static Shared.GameFormats.AnimationPack.AnimPackFileTypes.Wh3.AnimationBinEntry;

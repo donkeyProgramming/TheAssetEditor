@@ -4,6 +4,7 @@ namespace Shared.CoreTest.PackFiles.Models.Containers
 {
     [TestFixture(typeof(CachedPackFileContainer))]
     [TestFixture(typeof(PackFileContainer))]
+    [TestFixture(typeof(SystemFolderContainer))]
     internal class PackFileContainerTests_DeleteFolder : PackFileContainerTests_TestBase
     {
         public PackFileContainerTests_DeleteFolder(Type containerType) : base(containerType) { }

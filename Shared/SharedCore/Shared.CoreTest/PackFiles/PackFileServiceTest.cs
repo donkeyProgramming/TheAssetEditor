@@ -1,7 +1,7 @@
 ﻿using Moq;
 using Shared.Core.Events;
-using Shared.Core.Events.Global;
 using Shared.Core.PackFiles;
+using Shared.Core.PackFiles.Events;
 using Shared.Core.PackFiles.Models;
 using Shared.Core.PackFiles.Models.Containers;
 using Shared.Core.PackFiles.Models.FileSources;
@@ -22,7 +22,7 @@ namespace Shared.CoreTest.PackFiles
         private static PackFileService CreateServiceWithCaPack(Mock<IGlobalEventHub>? eventHub = null)
         {
             var pfs = CreateService(eventHub);
-            var ca = new PackFileContainer("CaPack") { IsCaPackFile = true, SystemFilePath = "ca_path" };
+            var ca = PackFileContainer.CreateCaPackFile("CaPack", "ca_path");
             pfs.AddContainer(ca);
             return pfs;
         }
@@ -32,10 +32,7 @@ namespace Shared.CoreTest.PackFiles
         {
             var eventHub = new Mock<IGlobalEventHub>();
             var pfs = new PackFileService(eventHub.Object);
-            var container = new PackFileContainer("MyTest");
-            container.SystemFilePath = "SystemPath";
-            container.IsCaPackFile = true;
-
+            var container = PackFileContainer.CreateCaPackFile("MyTest", "SystemPath");
             pfs.AddContainer(container);
 
             var containers = pfs.GetAllPackfileContainers();
@@ -51,10 +48,7 @@ namespace Shared.CoreTest.PackFiles
             var dialogProvider = new Mock<ISimpleMessageBox>();
             var pfs = new PackFileService(eventHub.Object);
             pfs.MessageBoxProvider = dialogProvider.Object;
-            var container = new PackFileContainer("MyTest");
-            container.SystemFilePath = "SystemPath";
-            container.IsCaPackFile = false;
-
+            var container = PackFileContainer.CreatePackFile("MyTest", "SystemPath");
             pfs.AddContainer(container);
 
             var containers = pfs.GetAllPackfileContainers();
@@ -69,13 +63,8 @@ namespace Shared.CoreTest.PackFiles
         {
             var eventHub = new Mock<IGlobalEventHub>();
             var pfs = new PackFileService(eventHub.Object);
-            var caContainer = new PackFileContainer("MyTest");
-            caContainer.SystemFilePath = "SystemPath";
-            caContainer.IsCaPackFile = true;
-
-            var customContainer = new PackFileContainer("MyTest");
-            customContainer.SystemFilePath = "SystemPath2";
-            customContainer.IsCaPackFile = false;
+            var caContainer = PackFileContainer.CreateCaPackFile("MyTest", "SystemPath");
+            var customContainer = PackFileContainer.CreatePackFile("MyTest", "SystemPath2");
 
             pfs.AddContainer(caContainer);
             pfs.AddContainer(customContainer, true);
@@ -95,13 +84,8 @@ namespace Shared.CoreTest.PackFiles
             var dialogProvider = new Mock<ISimpleMessageBox>();
             var pfs = new PackFileService(eventHub.Object);
             pfs.MessageBoxProvider = dialogProvider.Object;
-            var caContainer = new PackFileContainer("MyTest");
-            caContainer.SystemFilePath = "SystemPath";
-            caContainer.IsCaPackFile = true;
-
-            var customContainer = new PackFileContainer("MyTest");
-            customContainer.SystemFilePath = "SystemPath2";
-            customContainer.IsCaPackFile = false;
+            var caContainer = PackFileContainer.CreateCaPackFile("MyTest", "Systempath");
+            var customContainer = PackFileContainer.CreatePackFile("MyTest", "SystemPath2");
 
             pfs.AddContainer(caContainer);
             pfs.AddContainer(customContainer, true);
@@ -118,11 +102,9 @@ namespace Shared.CoreTest.PackFiles
         {
             var eventHub = new Mock<IGlobalEventHub>();
             var pfs = new PackFileService(eventHub.Object);
-            var container = new PackFileContainer("MyTest");
-            container.SystemFilePath = "SystemPath";
-            container.IsCaPackFile = true;
-
+            var container = PackFileContainer.CreateCaPackFile("MyTest", "SystemPath");
             pfs.AddContainer(container);
+
             var emptyPackFileContainer = pfs.CreateNewPackFileContainer("Custom", PackFileVersion.PFH5, PackFileCAType.MOD, true);
 
             var containers = pfs.GetAllPackfileContainers();
@@ -144,7 +126,7 @@ namespace Shared.CoreTest.PackFiles
         public void SaveFile_NoEditablePack_ThrowsDescriptiveException()
         {
             var pfs = new PackFileService(null);
-            pfs.AddContainer(new PackFileContainer("Ca") { IsCaPackFile = true });
+            pfs.AddContainer(PackFileContainer.CreateCaPackFile("Ca", "SystemPath"));
             var file = new PackFile("file.txt", new MemorySource([1, 2, 3]));
 
             var ex = Assert.Throws<Exception>(() => pfs.SaveFile(file, [4, 5, 6]));
@@ -157,11 +139,11 @@ namespace Shared.CoreTest.PackFiles
             var dialogProvider = new Mock<ISimpleMessageBox>();
             var pfs = new PackFileService(null);
             pfs.MessageBoxProvider = dialogProvider.Object;
-            var ca = new PackFileContainer("Ca") { IsCaPackFile = true };
+            var ca = PackFileContainer.CreateCaPackFile("Ca", "SystemPath");
             pfs.AddContainer(ca);
 
-            var container1 = new PackFileContainer("Pack1") { SystemFilePath = null };
-            var container2 = new PackFileContainer("Pack2") { SystemFilePath = null };
+            var container1 = PackFileContainer.CreatePackFile("Pack1");
+            var container2 = PackFileContainer.CreatePackFile("Pack2");
 
             pfs.AddContainer(container1);
             var result = pfs.AddContainer(container2);
@@ -176,7 +158,7 @@ namespace Shared.CoreTest.PackFiles
             var pfs = CreateService();
             pfs.EnforceGameFilesMustBeLoaded = false;
 
-            var container = new PackFileContainer("Custom") { IsCaPackFile = false, SystemFilePath = "path" };
+            var container = PackFileContainer.CreatePackFile("Custom", "path");
             var result = pfs.AddContainer(container);
 
             Assert.That(result, Is.Not.Null);
@@ -197,7 +179,7 @@ namespace Shared.CoreTest.PackFiles
         {
             var eventHub = new Mock<IGlobalEventHub>();
             var pfs = CreateServiceWithCaPack(eventHub);
-            var custom = new PackFileContainer("Custom") { SystemFilePath = "custom_path" };
+            var custom = PackFileContainer.CreatePackFile("Custom", "SystemPath");
             pfs.AddContainer(custom, true);
 
             Assert.That(pfs.GetEditablePack(), Is.EqualTo(custom));
@@ -210,7 +192,7 @@ namespace Shared.CoreTest.PackFiles
         {
             var eventHub = new Mock<IGlobalEventHub>();
             var pfs = CreateServiceWithCaPack(eventHub);
-            var custom = new PackFileContainer("Custom") { SystemFilePath = "custom_path" };
+            var custom = PackFileContainer.CreatePackFile("Custom", "SystemPath");
             pfs.AddContainer(custom, true);
 
             pfs.UnloadPackContainer(custom);
@@ -224,8 +206,8 @@ namespace Shared.CoreTest.PackFiles
         public void UnloadPackContainer_NonEditablePack_DoesNotClearEditable()
         {
             var pfs = CreateServiceWithCaPack();
-            var pack1 = new PackFileContainer("Pack1") { SystemFilePath = "path1" };
-            var pack2 = new PackFileContainer("Pack2") { SystemFilePath = "path2" };
+            var pack1 = PackFileContainer.CreatePackFile("Pack1", "path1");
+            var pack2 = PackFileContainer.CreatePackFile("Pack2", "path2");
             pfs.AddContainer(pack1, true);
             pfs.AddContainer(pack2);
 
@@ -240,7 +222,7 @@ namespace Shared.CoreTest.PackFiles
         {
             var eventHub = new Mock<IGlobalEventHub>();
             var pfs = CreateServiceWithCaPack(eventHub);
-            var container = new PackFileContainer("Custom") { SystemFilePath = "path" };
+            var container = PackFileContainer.CreatePackFile("Custom", "SystemPath");
             pfs.AddContainer(container, true);
 
             var newFiles = new List<NewPackFileEntry>
@@ -273,11 +255,11 @@ namespace Shared.CoreTest.PackFiles
             var eventHub = new Mock<IGlobalEventHub>();
             var pfs = CreateServiceWithCaPack(eventHub);
 
-            var source = new PackFileContainer("Source") { SystemFilePath = "source_path" };
+            var source = PackFileContainer.CreatePackFile("Source", "source_path");
             source.AddOrUpdateFile("data\\file.bin", new PackFile("file.bin", new MemorySource([10, 20, 30])));
             pfs.AddContainer(source);
 
-            var target = new PackFileContainer("Target") { SystemFilePath = "target_path" };
+            var target = PackFileContainer.CreatePackFile("Target", "target_path");
             pfs.AddContainer(target, true);
 
             pfs.CopyFileFromOtherPackFile(source, "data\\file.bin", target);
@@ -292,9 +274,9 @@ namespace Shared.CoreTest.PackFiles
         public void CopyFileFromOtherPackFile_MissingFile_DoesNothing()
         {
             var pfs = CreateServiceWithCaPack();
-            var source = new PackFileContainer("Source") { SystemFilePath = "source_path" };
+            var source = PackFileContainer.CreatePackFile("Source", "source_path");
             pfs.AddContainer(source);
-            var target = new PackFileContainer("Target") { SystemFilePath = "target_path" };
+            var target = PackFileContainer.CreatePackFile("Target", "target_path");
             pfs.AddContainer(target, true);
 
             pfs.CopyFileFromOtherPackFile(source, "nonexistent\\file.bin", target);
@@ -307,7 +289,7 @@ namespace Shared.CoreTest.PackFiles
         {
             var pfs = CreateServiceWithCaPack();
             var caPack = pfs.GetAllPackfileContainers().First();
-            var source = new PackFileContainer("Source") { SystemFilePath = "source_path" };
+            var source = PackFileContainer.CreatePackFile("Source", "source_path");
             source.AddOrUpdateFile("file.txt", new PackFile("file.txt", new MemorySource([1])));
             pfs.AddContainer(source);
 
@@ -319,7 +301,7 @@ namespace Shared.CoreTest.PackFiles
         {
             var eventHub = new Mock<IGlobalEventHub>();
             var pfs = CreateServiceWithCaPack(eventHub);
-            var container = new PackFileContainer("Custom") { SystemFilePath = "path" };
+            var container = PackFileContainer.CreatePackFile("Custom", "path");
             container.AddOrUpdateFile("folder\\test.txt", new PackFile("test.txt", new MemorySource([1])));
             pfs.AddContainer(container, true);
 
@@ -345,7 +327,7 @@ namespace Shared.CoreTest.PackFiles
         {
             var eventHub = new Mock<IGlobalEventHub>();
             var pfs = CreateServiceWithCaPack(eventHub);
-            var container = new PackFileContainer("Custom") { SystemFilePath = "path" };
+            var container = PackFileContainer.CreatePackFile("Custom", "path");
             container.AddOrUpdateFile("folder\\a.txt", new PackFile("a.txt", new MemorySource([1])));
             container.AddOrUpdateFile("folder\\b.txt", new PackFile("b.txt", new MemorySource([2])));
             container.AddOrUpdateFile("other\\c.txt", new PackFile("c.txt", new MemorySource([3])));
@@ -372,7 +354,7 @@ namespace Shared.CoreTest.PackFiles
         {
             var eventHub = new Mock<IGlobalEventHub>();
             var pfs = CreateServiceWithCaPack(eventHub);
-            var container = new PackFileContainer("Custom") { SystemFilePath = "path" };
+            var container = PackFileContainer.CreatePackFile("Custom", "path");
             container.AddOrUpdateFile("old\\test.txt", new PackFile("test.txt", new MemorySource([1, 2])));
             pfs.AddContainer(container, true);
 
@@ -398,7 +380,7 @@ namespace Shared.CoreTest.PackFiles
         {
             var eventHub = new Mock<IGlobalEventHub>();
             var pfs = CreateServiceWithCaPack(eventHub);
-            var container = new PackFileContainer("Custom") { SystemFilePath = "path" };
+            var container = PackFileContainer.CreatePackFile("Custom", "path");
             container.AddOrUpdateFile("folder\\old.txt", new PackFile("old.txt", new MemorySource([1])));
             pfs.AddContainer(container, true);
 
@@ -413,7 +395,7 @@ namespace Shared.CoreTest.PackFiles
         public void RenameFile_EmptyName_Throws()
         {
             var pfs = CreateServiceWithCaPack();
-            var container = new PackFileContainer("Custom") { SystemFilePath = "path" };
+            var container = PackFileContainer.CreatePackFile("Custom", "path");
             container.AddOrUpdateFile("folder\\file.txt", new PackFile("file.txt", new MemorySource([1])));
             pfs.AddContainer(container, true);
 
@@ -437,7 +419,7 @@ namespace Shared.CoreTest.PackFiles
         {
             var eventHub = new Mock<IGlobalEventHub>();
             var pfs = CreateServiceWithCaPack(eventHub);
-            var container = new PackFileContainer("Custom") { SystemFilePath = "path" };
+            var container = PackFileContainer.CreatePackFile("Custom", "path");
             container.AddOrUpdateFile("oldname\\file.txt", new PackFile("file.txt", new MemorySource([1])));
             pfs.AddContainer(container, true);
 
@@ -452,7 +434,7 @@ namespace Shared.CoreTest.PackFiles
         public void RenameDirectory_EmptyName_Throws()
         {
             var pfs = CreateServiceWithCaPack();
-            var container = new PackFileContainer("Custom") { SystemFilePath = "path" };
+            var container = PackFileContainer.CreatePackFile("Custom", "path");
             pfs.AddContainer(container, true);
 
             Assert.Throws<Exception>(() => pfs.RenameDirectory(container, "folder", ""));
@@ -471,7 +453,7 @@ namespace Shared.CoreTest.PackFiles
         public void FindFile_FindsAcrossContainers()
         {
             var pfs = CreateServiceWithCaPack();
-            var container = new PackFileContainer("Custom") { SystemFilePath = "path" };
+            var container = PackFileContainer.CreatePackFile("Custom", "path");
             container.AddOrUpdateFile("data\\file.txt", new PackFile("file.txt", new MemorySource([1, 2])));
             pfs.AddContainer(container, true);
 
@@ -492,11 +474,11 @@ namespace Shared.CoreTest.PackFiles
         public void FindFile_SpecificContainer_OnlySearchesThat()
         {
             var pfs = CreateServiceWithCaPack();
-            var container1 = new PackFileContainer("Pack1") { SystemFilePath = "path1" };
+            var container1 = PackFileContainer.CreatePackFile("Pack1", "path1");
             container1.AddOrUpdateFile("file.txt", new PackFile("file.txt", new MemorySource([1])));
             pfs.AddContainer(container1);
 
-            var container2 = new PackFileContainer("Pack2") { SystemFilePath = "path2" };
+            var container2 = PackFileContainer.CreatePackFile("Pack2", "path2");
             pfs.AddContainer(container2);
 
             var found = pfs.FindFile("file.txt", container2);
@@ -510,11 +492,11 @@ namespace Shared.CoreTest.PackFiles
         public void FindFile_LaterContainerTakesPriority()
         {
             var pfs = CreateServiceWithCaPack();
-            var container1 = new PackFileContainer("Pack1") { SystemFilePath = "path1" };
+            var container1 = PackFileContainer.CreatePackFile("Pack1", "path1");
             container1.AddOrUpdateFile("file.txt", new PackFile("file.txt", new MemorySource([1])));
             pfs.AddContainer(container1);
 
-            var container2 = new PackFileContainer("Pack2") { SystemFilePath = "path2" };
+            var container2 = PackFileContainer.CreatePackFile("Pack2", "path2");
             container2.AddOrUpdateFile("file.txt", new PackFile("file.txt", new MemorySource([2])));
             pfs.AddContainer(container2);
 
@@ -526,7 +508,7 @@ namespace Shared.CoreTest.PackFiles
         public void FindAllWithExtention_SearchesAllContainers()
         {
             var pfs = CreateServiceWithCaPack();
-            var container = new PackFileContainer("Custom") { SystemFilePath = "path" };
+            var container = PackFileContainer.CreatePackFile("Custom", "path");
             container.AddOrUpdateFile("a.txt", new PackFile("a.txt", new MemorySource([1])));
             container.AddOrUpdateFile("b.txt", new PackFile("b.txt", new MemorySource([2])));
             container.AddOrUpdateFile("c.bin", new PackFile("c.bin", new MemorySource([3])));
@@ -540,11 +522,11 @@ namespace Shared.CoreTest.PackFiles
         public void FindAllWithExtention_SpecificContainer()
         {
             var pfs = CreateServiceWithCaPack();
-            var container1 = new PackFileContainer("Pack1") { SystemFilePath = "path1" };
+            var container1 = PackFileContainer.CreatePackFile("Pack1", "path1");
             container1.AddOrUpdateFile("a.txt", new PackFile("a.txt", new MemorySource([1])));
             pfs.AddContainer(container1);
 
-            var container2 = new PackFileContainer("Pack2") { SystemFilePath = "path2" };
+            var container2 = PackFileContainer.CreatePackFile("Pack2", "path2");
             container2.AddOrUpdateFile("b.txt", new PackFile("b.txt", new MemorySource([2])));
             pfs.AddContainer(container2);
 
@@ -556,7 +538,7 @@ namespace Shared.CoreTest.PackFiles
         public void GetFullPath_ReturnsPath()
         {
             var pfs = CreateServiceWithCaPack();
-            var container = new PackFileContainer("Custom") { SystemFilePath = "path" };
+            var container = PackFileContainer.CreatePackFile("Custom", "path");
             container.AddOrUpdateFile("folder\\file.txt", new PackFile("file.txt", new MemorySource([1])));
             pfs.AddContainer(container, true);
 
@@ -578,7 +560,7 @@ namespace Shared.CoreTest.PackFiles
         public void GetPackFileContainer_ReturnsCorrectContainer()
         {
             var pfs = CreateServiceWithCaPack();
-            var container = new PackFileContainer("Custom") { SystemFilePath = "path" };
+            var container = PackFileContainer.CreatePackFile("Custom", "path");
             container.AddOrUpdateFile("file.txt", new PackFile("file.txt", new MemorySource([1])));
             pfs.AddContainer(container, true);
 
@@ -602,7 +584,7 @@ namespace Shared.CoreTest.PackFiles
         {
             var eventHub = new Mock<IGlobalEventHub>();
             var pfs = CreateServiceWithCaPack(eventHub);
-            var container = new PackFileContainer("Custom") { SystemFilePath = "path" };
+            var container = PackFileContainer.CreatePackFile("Custom", "path");
             container.AddOrUpdateFile("file.txt", new PackFile("file.txt", new MemorySource([1, 2, 3])));
             pfs.AddContainer(container, true);
 

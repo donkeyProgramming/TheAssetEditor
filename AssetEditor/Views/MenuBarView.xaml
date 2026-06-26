@@ -23,7 +23,7 @@
 
             <MenuItem Header="{loc:Loc MenuBar.File}" BorderThickness="1.5" WindowChrome.IsHitTestVisibleInChrome="True">
 
-                <MenuItem Header="{loc:Loc MenuBar.File.NewPack}" Command="{Binding MenuBar.CreateNewPackFileCommand}"/>
+                <MenuItem Header="{loc:Loc MenuBar.File.NewPack}" Command="{Binding MenuBar.CreateNewProjectCommand}"/>
                 <MenuItem Header="{loc:Loc MenuBar.File.NewAnimPackWh3}" Command="{Binding MenuBar.CreateAnimPackWarhammer3Command}"/>
                 <MenuItem Header="{loc:Loc MenuBar.File.NewAnimPack3K}" Command="{Binding MenuBar.CreateAnimPack3kCommand}"/>
 
@@ -31,7 +31,19 @@
                 <MenuItem Header="{loc:Loc MenuBar.File.SaveActivePack}" Command="{Binding MenuBar.SaveActivePackCommand}"/>
                 <Separator/>
 
-                <MenuItem Header="{loc:Loc MenuBar.File.OpenPack}" Command="{Binding MenuBar.OpenPackFileCommand}"/>
+                <MenuItem Header="{loc:Loc MenuBar.File.OpenProjectFolder}" Command="{Binding MenuBar.OpenProjectFolderCommand}"/>
+                <MenuItem Header="{loc:Loc MenuBar.File.ImportPackAsProject}" Command="{Binding MenuBar.ImportPackAsProjectCommand}"/>
+                <MenuItem Header="{loc:Loc MenuBar.File.ImportReferencePack}" Command="{Binding MenuBar.ImportReferencePackCommand}"/>
+                
+                <MenuItem Header="{loc:Loc MenuBar.File.OpenGamePacks}">
+                    <MenuItem Header="{loc:Loc MenuBar.File.GameAttila}" Command="{Binding MenuBar.OpenAttilaPacksCommand}"/>
+                    <MenuItem Header="{loc:Loc MenuBar.File.GameRomeRemastered}" Command="{Binding MenuBar.OpenRomeRemasteredPacksCommand}"/>
+                    <MenuItem Header="{loc:Loc MenuBar.File.GameThreeKingdoms}" Command="{Binding MenuBar.OpenThreeKingdomsPacksCommand}"/>
+                    <MenuItem Header="{loc:Loc MenuBar.File.GameWarhammer2}" Command="{Binding MenuBar.OpenWarhammer2PacksCommand}"/>
+                    <MenuItem Header="{loc:Loc MenuBar.File.GameWarhammer3}" Command="{Binding MenuBar.OpenWarhammer3PacksCommand}"/>
+                    <MenuItem Header="{loc:Loc MenuBar.File.GameTroy}" Command="{Binding MenuBar.OpenTroyPacksCommand}"/>
+                </MenuItem>
+
 
                 <MenuItem Header="{loc:Loc MenuBar.File.OpenRecentPacks}" ItemsSource="{Binding MenuBar.RecentPackFiles}">
                     <MenuItem.Style>
@@ -55,14 +67,7 @@
                     </MenuItem.ItemTemplate>
                 </MenuItem>
 
-                <MenuItem Header="{loc:Loc MenuBar.File.OpenGamePacks}">
-                    <MenuItem Header="{loc:Loc MenuBar.File.GameAttila}" Command="{Binding MenuBar.OpenAttilaPacksCommand}"/>
-                    <MenuItem Header="{loc:Loc MenuBar.File.GameRomeRemastered}" Command="{Binding MenuBar.OpenRomeRemasteredPacksCommand}"/>
-                    <MenuItem Header="{loc:Loc MenuBar.File.GameThreeKingdoms}" Command="{Binding MenuBar.OpenThreeKingdomsPacksCommand}"/>
-                    <MenuItem Header="{loc:Loc MenuBar.File.GameWarhammer2}" Command="{Binding MenuBar.OpenWarhammer2PacksCommand}"/>
-                    <MenuItem Header="{loc:Loc MenuBar.File.GameWarhammer3}" Command="{Binding MenuBar.OpenWarhammer3PacksCommand}"/>
-                    <MenuItem Header="{loc:Loc MenuBar.File.GameTroy}" Command="{Binding MenuBar.OpenTroyPacksCommand}"/>
-                </MenuItem>
+
 
                 <Separator/>
                 <MenuItem Header="{loc:Loc MenuBar.File.Settings}" Command="{Binding MenuBar.OpenSettingsWindowCommand}"/>

@@ -4,13 +4,12 @@ using GameWorld.Core.Components.Selection;
 using GameWorld.Core.Rendering;
 using GameWorld.Core.Services;
 using GameWorld.Core.Utility;
+using GameWorld.Core.WpfWindow;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Serilog;
 using Shared.Core.ErrorHandling;
 using Shared.Core.Events;
 using Shared.Core.Misc;
-using Shared.Core.Services;
 using Shared.Core.Settings;
 
 namespace GameWorld.Core.Components.Rendering

@@ -4,6 +4,7 @@ namespace Shared.CoreTest.PackFiles.Models.Containers
 {
     [TestFixture(typeof(CachedPackFileContainer))]
     [TestFixture(typeof(PackFileContainer))]
+    [TestFixture(typeof(SystemFolderContainer))]
     internal class PackFileContainerTests_GetFileCount : PackFileContainerTests_TestBase
     {
         public PackFileContainerTests_GetFileCount(Type containerType) : base(containerType) { }

@@ -1,6 +1,5 @@
 ﻿using System.Diagnostics;
 using System.Text;
-using Shared.Core.ErrorHandling;
 using Shared.Core.PackFiles.Models;
 using Shared.Core.PackFiles.Models.Containers;
 using Shared.Core.PackFiles.Models.FileSources;
@@ -34,7 +33,7 @@ namespace Shared.Core.PackFiles.Serialization
             if (container.Header.HasEncryptedData || container.Header.HasEncryptedIndex)
                 throw new InvalidOperationException("Saving encrypted packs is not supported.");
 
-            var sortedFiles = container.GetAllFiles().OrderBy(x => x.Key, StringComparer.Ordinal).ToList();
+            var sortedFiles = container.GetAllFiles().OrderBy(x => x.Key, PackFileSortHelper.PathComparer).ToList();
             var headerSpecificBytes = ComputeFileHeaderSpecificByte(container);
             var fileNamesOffset = ComputeFileNameOffset(headerSpecificBytes, sortedFiles);
 

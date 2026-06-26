@@ -1,9 +1,7 @@
-﻿using GameWorld.Core.Commands;
-using GameWorld.Core.Components.Selection;
+﻿using GameWorld.Core.Components.Selection;
 using GameWorld.Core.Rendering.Geometry;
 using GameWorld.Core.SceneNodes;
 using Microsoft.Xna.Framework;
-using Serilog;
 using Shared.Core.ErrorHandling;
 using Shared.Core.Events;
 

@@ -1,8 +1,8 @@
 ﻿using System.Collections.ObjectModel;
 using System.Text.Json;
 using Microsoft.Xna.Framework;
-using Shared.Core.ErrorHandling;
 using Shared.Core.Misc;
+using Shared.Core.PackFiles.Models;
 
 namespace Shared.Core.Settings
 {
@@ -12,11 +12,13 @@ namespace Shared.Core.Settings
         AssetEditorStyle,
     }
 
+    public record RecentPackFileInfo(string Path, PackFileContainerType ContainerType, bool IsReadOnly);
+
     public class ApplicationSettings
     {
         public record GamePathPair(GameTypeEnum Game, string Path);
 
-        public ObservableCollection<string> RecentPackFilePaths { get; set; } = [];
+        public ObservableCollection<RecentPackFileInfo> RecentPackFiles { get; set; } = [];
         public ThemeType Theme { get; set; } = ThemeType.DarkTheme;
         public BackgroundColour RenderEngineBackgroundColour { get; set; } = BackgroundColour.DarkGrey;
         public bool StartMaximised { get; set; } = false;
@@ -62,20 +64,22 @@ namespace Shared.Core.Settings
             return GetGamePathForGame(game);
         }
 
-        public void AddRecentlyOpenedPackFile(string path)
+        public void AddRecentlyOpenedPackFile(string path, PackFileContainerType containerType, bool isReadOnly)
         {
-            var recentPackFilePaths = CurrentSettings.RecentPackFilePaths;
+            var recentPackFiles = CurrentSettings.RecentPackFiles;
+            var newEntry = new RecentPackFileInfo(path, containerType, isReadOnly);
 
-            if (recentPackFilePaths.Any() && recentPackFilePaths.Last() == path)
+            if (recentPackFiles.Any() && recentPackFiles.Last() == newEntry)
                 return;
 
-            if (recentPackFilePaths.Contains(path))
-                recentPackFilePaths.Remove(path);
+            var existing = recentPackFiles.FirstOrDefault(x => x.Path == path);
+            if (existing != null)
+                recentPackFiles.Remove(existing);
 
-            recentPackFilePaths.Add(path);
+            recentPackFiles.Add(newEntry);
 
-            if (recentPackFilePaths.Count > 15)
-                recentPackFilePaths.RemoveAt(0);
+            if (recentPackFiles.Count > 15)
+                recentPackFiles.RemoveAt(0);
         }
 
         public string? GetGamePathForGame(GameTypeEnum game)
@@ -128,11 +132,11 @@ namespace Shared.Core.Settings
 
         void ValidateRecentPackFilePaths()
         {
-            var recentPackfilePaths = CurrentSettings.RecentPackFilePaths;
-            var invalidPacks = recentPackfilePaths.Where(path => !File.Exists(path)).ToList();
+            var recentPackFiles = CurrentSettings.RecentPackFiles;
+            var invalidPacks = recentPackFiles.Where(x => !File.Exists(x.Path) && !Directory.Exists(x.Path)).ToList();
 
-            foreach (var invalidPath in invalidPacks)
-                recentPackfilePaths.Remove(invalidPath);
+            foreach (var invalid in invalidPacks)
+                recentPackFiles.Remove(invalid);
         }
 
 

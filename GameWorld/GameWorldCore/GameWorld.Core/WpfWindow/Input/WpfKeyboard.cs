@@ -1,6 +1,4 @@
-﻿using GameWorld.Core.WpfWindow;
-using Microsoft.Xna.Framework.Input;
-using Shared.Core.Services;
+﻿using Microsoft.Xna.Framework.Input;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;

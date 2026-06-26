@@ -1,16 +1,16 @@
-using System;
+﻿using System;
 using System.Windows.Input;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
 using Shared.Core.ToolCreation;
-using Shared.Core.Services;
 using Shared.GameFormats.Bmd;
 using GameWorld.Core.Rendering.Materials;
 using GameWorld.Core.Services;
 using Editors.BmdEditor.Services;
 using Serilog;
+using GameWorld.Core.WpfWindow;
 
 namespace Editors.BmdEditor.ViewModels
 {

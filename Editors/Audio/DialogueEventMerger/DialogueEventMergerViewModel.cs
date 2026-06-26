@@ -1,15 +1,12 @@
 ﻿using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
-using System.Linq;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Editors.Audio.Shared.AudioProject.Compiler;
 using Editors.Audio.Shared.GameInformation.Warhammer3;
 using Editors.Audio.Shared.Storage;
 using Editors.Audio.Shared.Wwise.Generators;
-using Serilog;
-using Shared.Core.ErrorHandling;
 
 namespace Editors.Audio.DialogueEventMerger
 {

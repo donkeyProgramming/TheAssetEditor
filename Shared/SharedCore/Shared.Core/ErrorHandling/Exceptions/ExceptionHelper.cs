@@ -1,16 +1,9 @@
 ﻿using System.Text;
-using System.Windows;
 
 namespace Shared.Core.ErrorHandling.Exceptions
 {
     public class ExceptionHelper
     {
-        public static void ShowErrorBox(Exception e)
-        {
-            var errorStr = GetErrorString(e);
-            MessageBox.Show(errorStr, "Error");
-        }
-
         public static string GetErrorString(Exception e, string seperator = "\n")
         {
             var ss = new StringBuilder();
@@ -55,7 +48,5 @@ namespace Shared.Core.ErrorHandling.Exceptions
             return innerE;
         }
     }
-
-
 
 }

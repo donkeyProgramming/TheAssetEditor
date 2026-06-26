@@ -8,11 +8,11 @@ using GameWorld.Core.SceneNodes;
 using GameWorld.Core.Services;
 using Microsoft.Xna.Framework;
 using Shared.Core.Events;
-using Shared.Core.Events.Global;
 using Shared.GameFormats.Animation;
 using Shared.Ui.Editors.BoneMapping;
 using Test.KitbashEditor.LoadAndSave;
 using Test.TestingUtility.Shared;
+using Shared.Core.Commands;
 
 namespace Test.KitbashEditor.MeshFitter
 {

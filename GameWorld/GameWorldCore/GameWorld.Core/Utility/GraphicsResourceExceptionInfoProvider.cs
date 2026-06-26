@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using GameWorld.Core.Services;
-using Shared.Core.DependencyInjection;
 using Shared.Core.ErrorHandling.Exceptions;
 using Shared.Core.ToolCreation;
 

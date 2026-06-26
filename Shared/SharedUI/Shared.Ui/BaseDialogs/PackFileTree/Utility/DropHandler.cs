@@ -18,7 +18,7 @@ namespace Shared.Ui.BaseDialogs.PackFileTree.Utility
             if (sourceContainer == null || sourceContainer != targetContainer)
                 return false;
 
-            if (sourceContainer.IsCaPackFile)
+            if (sourceContainer.IsReadOnly)
                 return false;
 
             if (targetNode.NodeType == NodeType.File)

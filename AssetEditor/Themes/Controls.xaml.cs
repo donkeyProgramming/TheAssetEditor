@@ -1,9 +1,6 @@
-﻿using System;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.IO;
 using System.Windows;
-using Serilog;
-using Shared.Core.ErrorHandling;
 using WindowHandling;
 
 namespace AssetEditor.Themes

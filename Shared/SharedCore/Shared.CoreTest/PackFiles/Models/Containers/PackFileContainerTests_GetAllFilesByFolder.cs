@@ -4,6 +4,7 @@ namespace Shared.CoreTest.PackFiles.Models.Containers
 {
     [TestFixture(typeof(CachedPackFileContainer))]
     [TestFixture(typeof(PackFileContainer))]
+    [TestFixture(typeof(SystemFolderContainer))]
     internal class PackFileContainerTests_GetAllFilesByFolder : PackFileContainerTests_TestBase
     {
         public PackFileContainerTests_GetAllFilesByFolder(Type containerType) : base(containerType) { }
@@ -126,6 +127,32 @@ namespace Shared.CoreTest.PackFiles.Models.Containers
             var allFiles = _container.GetAllFiles();
 
             Assert.That(totalFiles, Is.EqualTo(allFiles.Count));
+        }
+
+        [Test]
+        public void GetAllFilesByFolder_FilesWithinEachFolderAreSorted()
+        {
+            var result = _container.GetAllFilesByFolder();
+
+            foreach (var (folder, files) in result)
+            {
+                for (var i = 1; i < files.Count; i++)
+                {
+                    Assert.That(StringComparer.Ordinal.Compare(files[i - 1], files[i]), Is.LessThan(0),
+                        $"Files not sorted in folder '{folder}': '{files[i - 1]}' should come before '{files[i]}'");
+                }
+            }
+        }
+
+        [Test]
+        public void GetAllFilesByFolder_AudioFolder_FilesAreSortedByOrdinal()
+        {
+            var result = _container.GetAllFilesByFolder();
+            var audioFiles = result["audio"];
+
+            // Ordinal sort: battle_sound.wem, music.wem, sound.wem, voice.txt, voice.wem.{sdf}, voice.wem_temp
+            var expected = new[] { "battle_sound.wem", "music.wem", "sound.wem", "voice.txt", "voice.wem.{sdf}", "voice.wem_temp" };
+            Assert.That(audioFiles, Is.EqualTo(expected));
         }
     }
 }

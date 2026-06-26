@@ -1,8 +1,8 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using GameWorld.Core.Services;
+using GameWorld.Core.WpfWindow;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Shared.Core.Services;
 using Shared.GameFormats.Twui.Data;
 
 //https://github.com/Apostolique/Apos.Gui/blob/main/Source/Dock.cs

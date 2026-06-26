@@ -1,4 +1,4 @@
-using Microsoft.Data.Sqlite;
+﻿using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Shared.Core.PackFiles.Models;
 using Shared.Core.PackFiles.Models.Containers;
@@ -69,12 +69,7 @@ namespace Shared.CoreTest.PackFiles.Serialization
         public void RoundTrip_PreservesMetadata()
         {
             // Arrange
-            var container = new PackFileContainer("All Game Packs - TestGame")
-            {
-                IsCaPackFile = true,
-                SystemFilePath = @"c:\game\data"
-            };
-
+            var container = PackFileContainer.CreateCaPackFile("All Game Packs - TestGame", @"c:\game\data");
             container.SourcePackFilePaths.Add(@"c:\game\data\pack1.pack");
             container.SourcePackFilePaths.Add(@"c:\game\data\pack2.pack");
 
@@ -104,12 +99,7 @@ namespace Shared.CoreTest.PackFiles.Serialization
         public void LoadCache_ReturnsCorrectFileData()
         {
             // Arrange
-            var container = new PackFileContainer("Test Container")
-            {
-                IsCaPackFile = true,
-                SystemFilePath = @"c:\game\data"
-            };
-
+            var container = PackFileContainer.CreateCaPackFile("Test Container", @"c:\game\data");
             container.SourcePackFilePaths.Add(@"c:\game\data\pack1.pack");
 
             var parent = new PackedFileSourceParent { FilePath = @"c:\game\data\pack1.pack" };
@@ -151,11 +141,7 @@ namespace Shared.CoreTest.PackFiles.Serialization
         [Test]
         public void LoadCache_PreservesSourcePackFilePath()
         {
-            var container = new PackFileContainer("Test")
-            {
-                SystemFilePath = @"c:\game"
-            };
-
+            var container = PackFileContainer.CreatePackFile("Test", @"c:\game");           
             var parent = new PackedFileSourceParent { FilePath = @"c:\pack.pack" };
             container.AddOrUpdateFile("a.txt", new PackFile("a.txt",
                 new PackedFileSource(parent, 0, 10, false, false, CompressionFormat.None, 0)));
@@ -183,10 +169,7 @@ namespace Shared.CoreTest.PackFiles.Serialization
         [Test]
         public void LoadCache_ReturnsNullForWrongFingerprint()
         {
-            var container = new PackFileContainer("Test")
-            {
-                SystemFilePath = @"c:\game"
-            };
+            var container = PackFileContainer.CreatePackFile("Test", @"c:\game");           
             var dbOptions = CreateTestDbOptions();
             SaveCache("correct_fp", container, dbOptions);
 
@@ -229,11 +212,7 @@ namespace Shared.CoreTest.PackFiles.Serialization
         public void RoundTrip_FullCycle()
         {
             // Arrange
-            var container = new PackFileContainer("Full Cycle Test")
-            {
-                IsCaPackFile = true,
-                SystemFilePath = @"c:\game\data"
-            };
+            var container = PackFileContainer.CreateCaPackFile("Full Cycle Test", @"c:\game\data");
 
             var parent = new PackedFileSourceParent { FilePath = @"c:\game\data\main.pack" };
             container.SourcePackFilePaths.Add(parent.FilePath);
@@ -251,7 +230,7 @@ namespace Shared.CoreTest.PackFiles.Serialization
             // Assert
             Assert.That(restored, Is.Not.Null);
             Assert.That(restored.Name, Is.EqualTo("Full Cycle Test"));
-            Assert.That(restored.IsCaPackFile, Is.True);
+            Assert.That(restored.IsReadOnly, Is.True);
             Assert.That(restored.SystemFilePath, Is.EqualTo(@"c:\game\data"));
             Assert.That(restored.GetFileCount(), Is.EqualTo(2));
 
@@ -269,10 +248,7 @@ namespace Shared.CoreTest.PackFiles.Serialization
         [Test]
         public void TryLoadFromCache_ReturnsContainerWhenValid()
         {
-            var container = new PackFileContainer("TryLoad Test")
-            {
-                SystemFilePath = @"c:\game\data"
-            };
+            var container = PackFileContainer.CreatePackFile("TryLoad Test", @"c:\game\data");
 
             var parent = new PackedFileSourceParent { FilePath = @"c:\game\data\pack.pack" };
             container.AddOrUpdateFile("test\\file.txt", new PackFile("file.txt",
@@ -305,10 +281,7 @@ namespace Shared.CoreTest.PackFiles.Serialization
         [Test]
         public void SaveCache_PreservesEncryptedFlag()
         {
-            var container = new PackFileContainer("Encrypted Test")
-            {
-                SystemFilePath = @"c:\game"
-            };
+            var container = PackFileContainer.CreatePackFile("Encrypted Test", @"c:\game");
 
             var parent = new PackedFileSourceParent { FilePath = @"c:\game\encrypted.pack" };
             container.AddOrUpdateFile("secret\\data.bin", new PackFile("data.bin",
@@ -324,10 +297,7 @@ namespace Shared.CoreTest.PackFiles.Serialization
         [Test]
         public void SaveCache_EmptyContainer_RoundTrips()
         {
-            var container = new PackFileContainer("Empty Pack")
-            {
-                SystemFilePath = @"c:\game\empty"
-            };
+            var container = PackFileContainer.CreatePackFile("Empty Pack", @"c:\game\empty");
             var dbOptions = CreateTestDbOptions();
             SaveCache("fp_empty", container, dbOptions);
             var loaded = CachedPackFileContainer.CreateFromFingerPrint(dbOptions, "fp_empty");
@@ -343,13 +313,13 @@ namespace Shared.CoreTest.PackFiles.Serialization
             var parent = new PackedFileSourceParent { FilePath = @"c:\game\pack.pack" };
             var dbOptions = CreateFileDbOptions();
             // Save first version
-            var container1 = new PackFileContainer("Version1") { SystemFilePath = @"c:\game" };
+            var container1 = PackFileContainer.CreatePackFile("Version1", @"c:\game");
             container1.AddOrUpdateFile("old.txt", new PackFile("old.txt",
                 new PackedFileSource(parent, 0, 10, false, false, CompressionFormat.None, 0)));
             SaveCache("fp1", container1, dbOptions);
 
             // Save second version (same db path)
-            var container2 = new PackFileContainer("Version2") { SystemFilePath = @"c:\game" };
+            var container2 = PackFileContainer.CreatePackFile("Version2", @"c:\game");
             container2.AddOrUpdateFile("new.txt", new PackFile("new.txt",
                 new PackedFileSource(parent, 0, 20, false, false, CompressionFormat.None, 0)));
             SaveCache("fp2", container2, dbOptions);
@@ -369,10 +339,7 @@ namespace Shared.CoreTest.PackFiles.Serialization
         [Test]
         public void SaveCache_StoresFolderPathCorrectly()
         {
-            var container = new PackFileContainer("FolderPath Test")
-            {
-                SystemFilePath = @"c:\game"
-            };
+            var container = PackFileContainer.CreatePackFile("FolderPath Test", @"c:\game");
 
             var parent = new PackedFileSourceParent { FilePath = @"c:\game\pack.pack" };
             container.AddOrUpdateFile("a\\folder_marker.txt", new PackFile("folder_marker.txt",
@@ -399,10 +366,7 @@ namespace Shared.CoreTest.PackFiles.Serialization
         [Test]
         public void SaveCache_SkipsNonPackedFileSources()
         {
-            var container = new PackFileContainer("Mixed Sources")
-            {
-                SystemFilePath = @"c:\game"
-            };
+            var container = PackFileContainer.CreatePackFile("Mixed Sources", @"c:\game");
 
             var parent = new PackedFileSourceParent { FilePath = @"c:\game\pack.pack" };
             container.AddOrUpdateFile("packed.txt", new PackFile("packed.txt",

@@ -6,6 +6,7 @@ namespace Shared.CoreTest.PackFiles.Models.Containers
 {
     [TestFixture(typeof(CachedPackFileContainer))]
     [TestFixture(typeof(PackFileContainer))]
+    [TestFixture(typeof(SystemFolderContainer))]
     internal class PackFileContainerTests_GetFullPath : PackFileContainerTests_TestBase
     {
         public PackFileContainerTests_GetFullPath(Type containerType) : base(containerType) { }

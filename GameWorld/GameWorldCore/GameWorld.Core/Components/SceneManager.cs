@@ -1,14 +1,10 @@
-﻿using GameWorld.Core.Components.Rendering;
+﻿using System.Text;
+using GameWorld.Core.Components.Rendering;
 using GameWorld.Core.SceneNodes;
 using GameWorld.Core.Utility;
 using Microsoft.Xna.Framework;
-using Serilog;
 using Shared.Core.ErrorHandling;
 using Shared.Core.Events;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace GameWorld.Core.Components
 {

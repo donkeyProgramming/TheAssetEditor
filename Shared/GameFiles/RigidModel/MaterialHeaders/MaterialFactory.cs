@@ -1,6 +1,4 @@
-﻿using Serilog;
-using Shared.Core.ErrorHandling;
-using Shared.Core.Misc;
+﻿using Shared.Core.Misc;
 
 namespace Shared.GameFormats.RigidModel.MaterialHeaders
 {

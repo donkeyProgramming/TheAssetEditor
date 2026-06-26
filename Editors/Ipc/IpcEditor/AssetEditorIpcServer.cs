@@ -3,8 +3,6 @@ using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Microsoft.Extensions.DependencyInjection;
-using Serilog;
-using Shared.Core.ErrorHandling;
 
 namespace Editors.Ipc
 {

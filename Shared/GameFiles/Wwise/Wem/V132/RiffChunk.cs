@@ -1,6 +1,4 @@
-﻿using Serilog;
-using Shared.ByteParsing;
-using Shared.Core.ErrorHandling;
+﻿using Shared.ByteParsing;
 
 namespace Shared.GameFormats.Wwise.Wem.V132
 {

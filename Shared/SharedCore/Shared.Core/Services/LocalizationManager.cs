@@ -1,6 +1,5 @@
 ﻿using System.Text.Json;
 using System.Windows;
-using Shared.Core.ErrorHandling;
 
 namespace Shared.Core.Services
 {

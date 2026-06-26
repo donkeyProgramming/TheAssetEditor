@@ -4,6 +4,7 @@ namespace Shared.CoreTest.PackFiles.Models.Containers
 {
     [TestFixture(typeof(CachedPackFileContainer))]
     [TestFixture(typeof(PackFileContainer))]
+    [TestFixture(typeof(SystemFolderContainer))]
     internal class PackFileContainerTests_RenameDirectory : PackFileContainerTests_TestBase
     {
         public PackFileContainerTests_RenameDirectory(Type containerType) : base(containerType) { }

@@ -1,7 +1,6 @@
 ﻿using CommunityToolkit.Diagnostics;
 using GameWorld.Core.Components.Selection;
 using GameWorld.Core.SceneNodes;
-using Serilog;
 using Shared.Core.ErrorHandling;
 using Shared.Core.Events;
 

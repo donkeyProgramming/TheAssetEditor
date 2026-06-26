@@ -6,6 +6,7 @@ namespace Shared.CoreTest.PackFiles.Models.Containers
 {
     [TestFixture(typeof(CachedPackFileContainer))]
     [TestFixture(typeof(PackFileContainer))]
+    [TestFixture(typeof(SystemFolderContainer))]
     internal class PackFileContainerTests_GetAllFiles : PackFileContainerTests_TestBase
     {
         public PackFileContainerTests_GetAllFiles(Type containerType) : base(containerType) { }
@@ -22,6 +23,12 @@ namespace Shared.CoreTest.PackFiles.Models.Containers
         [Test]
         public void GetAllFiles_PreservesCompressionMetadata()
         {
+            if (IsSystemFolderContainer)
+            {
+                Assert.That(_container.GetAllFiles()["compressed\\data.bin"].DataSource, Is.InstanceOf<FileSystemSource>());
+                return;
+            }
+
             var source = (PackedFileSource)_container.GetAllFiles()["compressed\\data.bin"].DataSource;
             Assert.That(source.CompressionFormat, Is.EqualTo(CompressionFormat.Lz4));
             Assert.That(source.UncompressedSize, Is.EqualTo(2000));
