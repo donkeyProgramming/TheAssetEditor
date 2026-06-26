@@ -1,4 +1,4 @@
-﻿namespace Shared.Core.DependencyInjection
+﻿namespace Shared.Core.ToolCreation
 {
     public interface IScopeOwnerAware
     {

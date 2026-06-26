@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
 using Editors.Audio.Shared.AudioProject.Models;
-using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
 using Shared.Core.PackFiles.Models.FileSources;
+using Shared.Core.PackFiles.Utility;
 using Shared.GameFormats.Dat;
 
 namespace Editors.Audio.Shared.Dat

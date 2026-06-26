@@ -3,9 +3,8 @@ using System.Reflection;
 using System.Text;
 using CommunityToolkit.Diagnostics;
 using Microsoft.Extensions.DependencyInjection;
-using Shared.Core.ToolCreation;
 
-namespace Shared.Core.DependencyInjection
+namespace Shared.Core.ToolCreation
 {
     public interface IScopeRepository
     {

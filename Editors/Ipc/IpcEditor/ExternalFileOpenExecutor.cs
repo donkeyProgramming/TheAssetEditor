@@ -5,9 +5,8 @@ using System.Threading.Tasks;
 using System.Windows;
 using Editors.KitbasherEditor.UiCommands;
 using Editors.KitbasherEditor.ViewModels;
-using Shared.Core.DependencyInjection;
+using Shared.Core.Commands;
 using Shared.Core.Events;
-using Shared.Core.Events.Global;
 using Shared.Core.PackFiles.Models;
 using Shared.Core.ToolCreation;
 

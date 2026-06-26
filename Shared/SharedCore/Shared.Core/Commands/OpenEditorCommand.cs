@@ -1,10 +1,11 @@
 ﻿using System.Diagnostics;
 using CommunityToolkit.Diagnostics;
+using Shared.Core.Events;
 using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
 using Shared.Core.ToolCreation;
 
-namespace Shared.Core.Events.Global
+namespace Shared.Core.Commands
 {
     public class OpenEditorCommand : IAeCommand
     {

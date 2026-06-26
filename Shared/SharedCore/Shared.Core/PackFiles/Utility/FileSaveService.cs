@@ -3,7 +3,7 @@ using Shared.Core.PackFiles.Models;
 using Shared.Core.PackFiles.Models.FileSources;
 using Shared.Core.Services;
 
-namespace Shared.Core.PackFiles
+namespace Shared.Core.PackFiles.Utility
 {
     public interface IFileSaveService
     {

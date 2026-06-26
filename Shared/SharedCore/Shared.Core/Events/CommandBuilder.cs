@@ -2,19 +2,19 @@
 {
     public class CommandBuilder<T> where T : IAeUndoCommandCommand
     {
-        private readonly CommandManager _commandExecutor;
+        private readonly CommandManager _commandManager;
         private readonly T _command;
         private bool _isUndoable = true;
 
         public CommandBuilder(CommandManager commandExecutor, T command)
         {
-            _commandExecutor = commandExecutor;
+            _commandManager = commandExecutor;
             _command = command;
         }
 
         public T Build() => _command;
 
-        public void BuildAndExecute() => _commandExecutor.ExecuteCommand(_command, _isUndoable);
+        public void BuildAndExecute() => _commandManager.ExecuteCommand(_command, _isUndoable);
 
         public CommandBuilder<T> Configure(Action<T> predicate)
         {

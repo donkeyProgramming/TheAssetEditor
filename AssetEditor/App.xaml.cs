@@ -8,7 +8,6 @@ using AssetEditor.Views;
 using CommunityToolkit.Diagnostics;
 using Editors.Ipc;
 using Microsoft.Extensions.DependencyInjection;
-using Shared.Core.DependencyInjection;
 using Shared.Core.DevConfig;
 using Shared.Core.ErrorHandling;
 using Shared.Core.Events;
@@ -17,6 +16,7 @@ using Shared.Core.PackFiles.Models;
 using Shared.Core.PackFiles.Utility;
 using Shared.Core.Services;
 using Shared.Core.Settings;
+using Shared.Core.ToolCreation;
 using Shared.Ui.Common;
 
 namespace AssetEditor

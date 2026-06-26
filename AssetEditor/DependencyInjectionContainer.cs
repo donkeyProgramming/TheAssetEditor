@@ -5,10 +5,10 @@ using AssetEditor.Views;
 using AssetEditor.Views.Settings;
 using AssetEditor.Views.Updater;
 using Microsoft.Extensions.DependencyInjection;
+using Shared.Core.Commands;
 using Shared.Core.DependencyInjection;
 using Shared.Core.DevConfig;
 using Shared.Core.ErrorHandling.Exceptions;
-using Shared.Core.Events.Global;
 using Shared.Core.ToolCreation;
 
 namespace AssetEditor

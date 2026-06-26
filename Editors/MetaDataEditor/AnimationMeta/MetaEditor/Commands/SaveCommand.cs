@@ -3,6 +3,7 @@ using Editors.AnimationMeta.Presentation;
 using Shared.Core.Events;
 using Shared.Core.Events.Scoped;
 using Shared.Core.PackFiles;
+using Shared.Core.PackFiles.Utility;
 using Shared.Core.Services;
 using Shared.GameFormats.AnimationMeta.Parsing;
 

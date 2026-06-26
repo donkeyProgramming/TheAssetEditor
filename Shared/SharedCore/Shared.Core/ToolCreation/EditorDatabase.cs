@@ -1,5 +1,4 @@
 ﻿using System.Text.RegularExpressions;
-using Shared.Core.DependencyInjection;
 using Shared.Core.ErrorHandling;
 
 namespace Shared.Core.ToolCreation

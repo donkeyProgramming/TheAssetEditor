@@ -1,11 +1,11 @@
 ﻿using System.Text;
 using System.Text.Json;
 using System.Windows;
-using Shared.Core.DependencyInjection;
 using Shared.Core.ErrorHandling.Exceptions;
 using Shared.Core.Events;
 using Shared.Core.Events.Global;
 using Shared.Core.Services;
+using Shared.Core.ToolCreation;
 
 namespace Shared.Ui.Common.Exceptions
 {
