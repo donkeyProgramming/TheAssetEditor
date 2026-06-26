@@ -1,10 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
+﻿using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
-using Serilog;
-using Shared.Core.ErrorHandling;
 using Shared.Core.PackFiles.Models;
 
 namespace Shared.Ui.BaseDialogs.PackFileTree
