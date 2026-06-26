@@ -3,6 +3,7 @@ using GameWorld.Core.Animation;
 using Microsoft.Xna.Framework;
 using Moq;
 using Shared.ByteParsing;
+using Shared.Core.PackFiles;
 using Shared.Core.Services;
 using Shared.GameFormats.Animation;
 using Shared.GameFormats.RigidModel.Transforms;

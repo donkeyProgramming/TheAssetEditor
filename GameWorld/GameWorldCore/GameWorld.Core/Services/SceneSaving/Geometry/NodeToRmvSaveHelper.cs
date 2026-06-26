@@ -7,7 +7,7 @@ using GameWorld.Core.Rendering.Materials.Shaders;
 using GameWorld.Core.SceneNodes;
 using Microsoft.Xna.Framework;
 using Shared.Core.ErrorHandling;
-using Shared.Core.Services;
+using Shared.Core.PackFiles;
 using Shared.GameFormats.RigidModel;
 using Shared.GameFormats.RigidModel.LodHeader;
 using Shared.GameFormats.RigidModel.Types;

@@ -1,5 +1,16 @@
-namespace Shared.Core.Services
+﻿namespace Shared.Core.PackFiles.Utility
 {
+    public interface IFileSystemWatcher : IDisposable
+    {
+        string Path { get; set; }
+        bool IncludeSubdirectories { get; set; }
+        bool EnableRaisingEvents { get; set; }
+
+        event FileSystemEventHandler? Created;
+        event FileSystemEventHandler? Deleted;
+        event RenamedEventHandler? Renamed;
+    }
+
     public class FileSystemWatcherWrapper : IFileSystemWatcher
     {
         private readonly FileSystemWatcher _watcher;

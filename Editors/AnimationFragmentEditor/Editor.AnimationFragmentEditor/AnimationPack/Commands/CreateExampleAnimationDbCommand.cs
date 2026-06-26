@@ -1,10 +1,9 @@
 ﻿using System.Windows;
 using CommonControls.BaseDialogs;
 using Shared.Core.Events;
-using Shared.Core.Misc;
 using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
-using Shared.Core.Services;
+using Shared.Core.PackFiles.Utility;
 using Shared.GameFormats.AnimationPack;
 
 

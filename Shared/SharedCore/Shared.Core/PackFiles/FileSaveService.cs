@@ -1,9 +1,9 @@
 ﻿using Shared.Core.ErrorHandling;
-using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
 using Shared.Core.PackFiles.Models.FileSources;
+using Shared.Core.Services;
 
-namespace Shared.Core.Services
+namespace Shared.Core.PackFiles
 {
     public interface IFileSaveService
     {

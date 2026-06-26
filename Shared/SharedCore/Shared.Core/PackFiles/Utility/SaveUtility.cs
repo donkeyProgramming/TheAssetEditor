@@ -1,6 +1,6 @@
 ﻿using Shared.Core.PackFiles;
 
-namespace Shared.Core.Misc
+namespace Shared.Core.PackFiles.Utility
 {
     public static class SaveUtility
     {

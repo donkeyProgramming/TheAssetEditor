@@ -40,9 +40,7 @@ namespace Shared.Core.PackFiles.Utility
     public interface IPackFileContainerLoader
     {
         IPackFileContainer CreateFromPackFile(PackFileContainerType type, string packFilePath, bool loadAsReadOnly);
-      //  IPackFileContainer CreateFromCollection(PackFileContainerType type, string packFileSystemPath, List<string> fullPackFilePaths, string createdPackFileName, bool loadAsReadOnly, IDuplicateFileResolver duplicateFileResolver);
         IPackFileContainer? CreateFromGameEnum(PackFileContainerType type, GameTypeEnum game);
-
         IPackFileContainer CreateFromSystemFolder(string folderPath);
     }
 
@@ -57,8 +55,6 @@ namespace Shared.Core.PackFiles.Utility
 
         public PackFileContainerLoader(ApplicationSettingsService settingsService, IStandardDialogs standardDialogs, LocalizationManager localizationManager, IPackFileContainerCacheHelper packFileContainerCacheHelper, ISystemFolderContainerFactory systemFolderContainerFactory)
         {
-            // TODO : Handle context for logger
-
             _settingsService = settingsService;
             _standardDialogs = standardDialogs;
             _localizationManager = localizationManager;
