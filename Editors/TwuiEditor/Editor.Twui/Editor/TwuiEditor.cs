@@ -2,10 +2,10 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using Editors.Twui.Editor.ComponentEditor;
 using Editors.Twui.Editor.Rendering;
+using GameWorld.Core.WpfWindow;
 using Shared.Core.Events;
 using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
-using Shared.Core.Services;
 using Shared.Core.ToolCreation;
 
 namespace Editors.Twui.Editor

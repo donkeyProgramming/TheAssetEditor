@@ -6,10 +6,10 @@ using Editors.Shared.Core.Common.AnimationPlayer;
 using Editors.Shared.Core.Common.ReferenceModel;
 using GameWorld.Core.Components;
 using GameWorld.Core.Services;
+using GameWorld.Core.WpfWindow;
 using GameWorld.Core.WpfWindow.Events;
 using Shared.Core.Events;
 using Shared.Core.Misc;
-using Shared.Core.Services;
 using Shared.Core.ToolCreation;
 using ICommand = System.Windows.Input.ICommand;
 

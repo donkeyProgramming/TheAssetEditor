@@ -15,6 +15,7 @@ using GameWorld.Core.Components;
 using GameWorld.Core.Components.Selection;
 using GameWorld.Core.SceneNodes;
 using Editors.BmdEditor.Services;
+using GameWorld.Core.WpfWindow;
 
 namespace Editors.BmdEditor.ViewModels
 {

@@ -1,7 +1,7 @@
 ﻿using Editors.Shared.Core.Common.AnimationPlayer;
 using GameWorld.Core.Components;
 using GameWorld.Core.Services;
-using Shared.Core.Services;
+using GameWorld.Core.WpfWindow;
 
 namespace Editors.Shared.Core.Common.BaseControl
 {

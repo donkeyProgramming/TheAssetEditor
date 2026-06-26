@@ -6,7 +6,6 @@ using System.Windows.Interop;
 using System.Windows.Media;
 using GameWorld.Core.WpfWindow.Internals;
 using Microsoft.Xna.Framework.Input;
-using Shared.Core.Services;
 
 namespace GameWorld.Core.WpfWindow.Input
 {

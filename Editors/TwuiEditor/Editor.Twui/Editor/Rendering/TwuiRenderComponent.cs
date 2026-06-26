@@ -1,9 +1,9 @@
 ﻿using GameWorld.Core.Components;
 using GameWorld.Core.Services;
+using GameWorld.Core.WpfWindow;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Shared.Core.Events;
-using Shared.Core.Services;
 
 //https://github.com/Apostolique/Apos.Gui/blob/main/Source/Dock.cs
 

@@ -30,7 +30,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Shared.Core.DependencyInjection;
 using Shared.Core.ErrorHandling;
 using Shared.Core.ErrorHandling.Exceptions;
-using Shared.Core.Services;
 
 namespace GameWorld.Core
 {

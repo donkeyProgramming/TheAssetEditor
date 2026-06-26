@@ -1,5 +1,5 @@
 ﻿using System.Windows;
-using Shared.Core.Services;
+using GameWorld.Core.WpfWindow;
 using WindowHandling;
 
 namespace Editors.KitbasherEditor.ChildEditors.VertexDebugger

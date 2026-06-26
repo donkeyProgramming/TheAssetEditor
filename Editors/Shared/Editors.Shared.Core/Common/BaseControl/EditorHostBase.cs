@@ -5,7 +5,7 @@ using CommunityToolkit.Mvvm.Input;
 using Editors.Shared.Core.Common.AnimationPlayer;
 using Editors.Shared.Core.Common.ReferenceModel;
 using GameWorld.Core.Services;
-using Shared.Core.Services;
+using GameWorld.Core.WpfWindow;
 using Shared.Core.ToolCreation;
 
 namespace Editors.Shared.Core.Common.BaseControl

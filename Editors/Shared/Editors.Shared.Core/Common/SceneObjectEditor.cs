@@ -3,11 +3,11 @@ using GameWorld.Core.Components;
 using GameWorld.Core.SceneNodes;
 using GameWorld.Core.Services;
 using GameWorld.Core.Utility;
+using GameWorld.Core.WpfWindow;
 using Microsoft.Xna.Framework;
 using Shared.Core.Events;
 using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
-using Shared.Core.Services;
 using Shared.GameFormats.Animation;
 
 namespace Editors.Shared.Core.Common
