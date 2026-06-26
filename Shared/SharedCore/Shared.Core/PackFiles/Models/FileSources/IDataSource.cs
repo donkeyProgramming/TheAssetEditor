@@ -1,7 +1,7 @@
 ﻿using Shared.ByteParsing;
 using Shared.Core.PackFiles.Utility;
 
-namespace Shared.Core.PackFiles.Models
+namespace Shared.Core.PackFiles.Models.FileSources
 {
     public interface IDataSource
     {
@@ -12,6 +12,4 @@ namespace Shared.Core.PackFiles.Models
 
         CompressionFormat CompressionFormat { get; }
     }
-
-
 }
