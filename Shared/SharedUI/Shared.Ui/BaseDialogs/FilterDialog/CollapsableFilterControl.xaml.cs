@@ -2,9 +2,13 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 
+using System;
 using System.Collections;
 using System.Windows;
 using System.Windows.Controls;
+using Microsoft.Extensions.DependencyInjection;
+using Shared.Core.Services;
+using Shared.Ui.Common;
 using static CommonControls.FilterDialog.FilterUserControl;
 
 namespace CommonControls.FilterDialog
@@ -22,13 +26,14 @@ namespace CommonControls.FilterDialog
             BrowseButton.Click += (a, b) => ToggleSearchFiled();
             ClearButton.Click += (a, b) => ClearSelection();
             FilterBox.Visibility = Visibility.Collapsed;
+            BrowseButton.Content = GetLocalizedString("Dialog.Filter.Browse");
         }
 
         void HandleItemDoubleClicked()
         {
             HandleOnItemSelected();
             FilterBox.Visibility = Visibility.Collapsed;
-            BrowseButton.Content = "Browse";
+            BrowseButton.Content = GetLocalizedString("Dialog.Filter.Browse");
         }
 
         void HandleOnItemSelected()
@@ -64,13 +69,23 @@ namespace CommonControls.FilterDialog
             if (FilterBox.Visibility == Visibility.Visible)
             {
                 FilterBox.Visibility = Visibility.Collapsed;
-                BrowseButton.Content = "Browse";
+                BrowseButton.Content = GetLocalizedString("Dialog.Filter.Browse");
             }
             else
             {
-                BrowseButton.Content = "Hide";
+                BrowseButton.Content = GetLocalizedString("Dialog.Filter.Hide");
                 FilterBox.Visibility = Visibility.Visible;
             }
+        }
+
+        private static string GetLocalizedString(string key)
+        {
+            if (Application.Current is IAssetEditorMain appMain)
+            {
+                var localizationManager = appMain.ServiceProvider.GetRequiredService<LocalizationManager>();
+                return localizationManager.Get(key);
+            }
+            return key;
         }
         #region properties
 

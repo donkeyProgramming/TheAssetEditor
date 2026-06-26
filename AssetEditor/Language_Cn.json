@@ -106,7 +106,9 @@
   "MenuBar.File.NewAnimPackWh3": "新建 AnimPack (战锤 III)",
   "MenuBar.File.NewAnimPack3K": "新建 AnimPack (三国)",
   "MenuBar.File.SaveActivePack": "保存当前 Pack",
-  "MenuBar.File.OpenPack": "打开 Pack",
+  "MenuBar.File.OpenProjectFolder": "打开项目",
+  "MenuBar.File.ImportPackAsProject": "将 Pack 导入为项目",
+  "MenuBar.File.ImportReferencePack": "导入参考项目",
   "MenuBar.File.OpenRecentPacks": "打开最近的 Pack",
   "MenuBar.File.OpenGamePacks": "打开游戏 Pack",
   "MenuBar.File.GameAttila": "阿提拉",
@@ -124,7 +126,7 @@
   "MenuBar.Tools": "工具",
   "MenuBar.Reports": "报告",
   "MenuBar.Reports.Rmv2": "Rmv2",
-  "MenuBar.Reports.RmvToText": "Rmv to Text",
+  "MenuBar.Reports.Bmd": "Bmd 地图报告",
   "MenuBar.Reports.MetaData": "元数据",
   "MenuBar.Reports.FileList": "文件列表",
   "MenuBar.Reports.MetaJsons": "元 Json",
@@ -568,6 +570,7 @@
   "FbxAnimationPanel.Browse": "浏览...",
 
   "Dialog.Filter.Browse": "浏览",
+  "Dialog.Filter.Hide": "隐藏",
 
   "KitbashTool.SaveDialog.Title": "保存",
   "KitbashTool.SaveDialog.Path": "路径:",
@@ -883,11 +886,11 @@
   "FbxSettingsDialog.Import": "导入",
   "FbxSettingsDialog.Cancel": "取消",
 
-  "PackFileCache.InvalidReason.Title": "Cache Rebuild Required",
-  "PackFileCache.InvalidReason.NotFound": "No cache found for {0}. Building cache for the first time - this may take a moment.",
-  "PackFileCache.InvalidReason.DataChanged": "Game files for {0} have changed since the cache was built. Rebuilding cache.",
-  "PackFileCache.InvalidReason.Corrupted": "Cache for {0} is corrupted and will be rebuilt.",
-  "PackFileCache.BuildingCache": "Building pack file cache for {0}. This may take some time, please wait...",
-  "PackFileCache.BuildingCache.Title": "Building Cache",
-  "PackFileCache.Description": "The cache allows faster startup times and reduces memory usage by storing pre-processed game file data on disk."
+  "PackFileCache.InvalidReason.Title": "需要重建缓存",
+  "PackFileCache.InvalidReason.NotFound": "未找到 {0} 的缓存。首次构建缓存 - 这可能需要一些时间。",
+  "PackFileCache.InvalidReason.DataChanged": "{0} 的游戏文件自缓存构建后已更改。正在重建缓存。",
+  "PackFileCache.InvalidReason.Corrupted": "{0} 的缓存已损坏，将被重建。",
+  "PackFileCache.BuildingCache": "正在为 {0} 构建 Pack 文件缓存。这可能需要一些时间，请稍候...",
+  "PackFileCache.BuildingCache.Title": "正在构建缓存",
+  "PackFileCache.Description": "缓存通过将预处理的游戏文件数据存储在磁盘上来加快启动速度并减少内存使用。"
 }
