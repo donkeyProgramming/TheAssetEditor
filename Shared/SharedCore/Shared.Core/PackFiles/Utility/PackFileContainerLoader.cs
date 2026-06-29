@@ -72,13 +72,17 @@ namespace Shared.Core.PackFiles.Utility
             }
 
             var container = _systemFolderContainerFactory.Create(packFileSystemPath);
+            if (container.PackFileSettings.GameVersion == null)
+                container.PackFileSettings.GameVersion = _settingsService.CurrentSettings.CurrentGame;
             return container;
         }
 
         public IPackFileContainer CreateFromPackFile(PackFileContainerType type, string packFilePath, bool loadAsReadOnly)
         {
             var packfileName = Path.GetFileNameWithoutExtension(packFilePath);
-            return CreateFromCollection(type, packFilePath, [packFilePath], packfileName, loadAsReadOnly, new CustomPackDuplicateFileResolver());
+            var container = CreateFromCollection(type, packFilePath, [packFilePath], packfileName, loadAsReadOnly, new CustomPackDuplicateFileResolver());
+            container.PackFileSettings.GameVersion = _settingsService.CurrentSettings.CurrentGame;
+            return container;
         }
 
         public IPackFileContainer? CreateFromGameEnum(PackFileContainerType type, GameTypeEnum gameEnum)
@@ -109,6 +113,7 @@ namespace Shared.Core.PackFiles.Utility
 
             var container = CreateFromCollection(PackFileContainerType.Database, gameDataFolder, fullPackFilePaths, $"All Game Packs - {gameName}", true, packfileResolver);
             container.IsCaPackFile = true;
+            container.PackFileSettings.GameVersion = gameEnum;
             return container;
         }
 

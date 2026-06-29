@@ -26,19 +26,27 @@ namespace Shared.Core.PackFiles.Serialization
         {
             var stopWatch = Stopwatch.StartNew();
 
-            var numFiles = container.GetFileCount();
+            var ignoredFilePaths = container.PackFileSettings.IgnoredFilesWhenSerializing
+                .Where(x => string.IsNullOrWhiteSpace(x) == false)
+                .Select(PathNormalization.NormalizeFileName)
+                .ToHashSet(StringComparer.OrdinalIgnoreCase);
+
+            var allFiles = container.GetAllFiles();
+            var filesToSerialize = allFiles.Where(x => ignoredFilePaths.Contains(x.Key) == false);
+            var sortedFiles = filesToSerialize.OrderBy(x => x.Key, PackFileSortHelper.PathComparer).ToList();
+
+            var numFiles = sortedFiles.Count;
             var packFileName = container.Name;
             _logger.Here().Information("Saving packfile {PackFileName} v={PackFileVersion} with {NumFiles} files to {OutputFileName}. Current game = {Game}", packFileName, container.Header.Version, numFiles, outputFileName, currentGameInformation.DisplayName);
 
             if (container.Header.HasEncryptedData || container.Header.HasEncryptedIndex)
                 throw new InvalidOperationException("Saving encrypted packs is not supported.");
 
-            var sortedFiles = container.GetAllFiles().OrderBy(x => x.Key, PackFileSortHelper.PathComparer).ToList();
             var headerSpecificBytes = ComputeFileHeaderSpecificByte(container);
             var fileNamesOffset = ComputeFileNameOffset(headerSpecificBytes, sortedFiles);
 
             // Update and write header
-            container.Header.FileCount = (uint)container.GetFileCount();
+            container.Header.FileCount = (uint)numFiles;
             WriteHeader(container.Header, (uint)fileNamesOffset, writer);
 
             // Write the core of the file

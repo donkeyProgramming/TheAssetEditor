@@ -39,6 +39,7 @@ namespace Shared.Core.PackFiles.Serialization.CacheDatabase
         public string ContainerName { get; set; } = "";
         public string SystemFilePath { get; set; } = "";
         public string SourcePackFilePaths { get; set; } = "";
+        public int? GameVersion { get; set; }
     }
 
     internal class CachedFileEntity

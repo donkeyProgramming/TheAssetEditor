@@ -10,12 +10,22 @@ namespace Shared.Core.PackFiles.Models.Containers
     internal class PackFileContainer : IPackFileContainerInternal
     {
         private static readonly ILogger _logger = Logging.Create<PackFileContainer>();    
+        private string? _systemFilePath;
 
         public string Name { get; set; }
         public PFHeader Header { get; set; }
         public bool IsReadOnly { get { return IsCaPackFile || field; } set; } = false;
         public bool IsCaPackFile { get; set; } = false;
-        public string? SystemFilePath { get; set; }
+        public string? SystemFilePath
+        {
+            get => _systemFilePath;
+            set
+            {
+                _systemFilePath = value;
+                PackFileSettings.SaveLocationPath = value;
+            }
+        }
+        public PackFileSettings PackFileSettings { get; } = new();
         public PackFileContainerType ContainerType => PackFileContainerType.Normal;
         public long OriginalLoadByteSize { get; set; } = -1;
         public HashSet<string> SourcePackFilePaths { get; set; } = [];
@@ -272,7 +282,17 @@ namespace Shared.Core.PackFiles.Models.Containers
 
         public virtual void SaveToDisk(string path, bool createBackup, GameInformation gameInformation)
         {
-            _logger.Here().Information("Saving pack file to disk at {Path}, createBackup = {createBackup} Game = {game}", path, createBackup, gameInformation.DisplayName);
+            var effectiveGameInformation = PackFileSettings.GameVersion.HasValue
+                ? GameInformationDatabase.GetGameById(PackFileSettings.GameVersion.Value)
+                : gameInformation;
+
+            if (Header.Version != effectiveGameInformation.PackFileVersion)
+            {
+                _logger.Here().Information("Overriding pack header version from {CurrentVersion} to {TargetVersion} based on PackFileSettings.GameVersion", Header.Version, effectiveGameInformation.PackFileVersion);
+                Header.Version = effectiveGameInformation.PackFileVersion;
+            }
+
+            _logger.Here().Information("Saving pack file to disk at {Path}, createBackup = {createBackup} Game = {game}", path, createBackup, effectiveGameInformation.DisplayName);
 
             if (File.Exists(path) && DirectoryHelper.IsFileLocked(path))
             {
@@ -303,7 +323,7 @@ namespace Shared.Core.PackFiles.Models.Containers
             using (var memoryStream = new FileStream(path + "_temp", FileMode.Create))
             {
                 using var writer = new BinaryWriter(memoryStream);
-                PackFileSerializerWriter.SaveToByteArray(path, this, writer, gameInformation);
+                PackFileSerializerWriter.SaveToByteArray(path, this, writer, effectiveGameInformation);
             }
 
             _logger.Here().Information("Finished writing pack file to temporary file, now replacing original file with the new one");

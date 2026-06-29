@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="DocumentationShared.css">
+    <script src="DocumentationShared.js" defer></script>
+    <title>PackFile Handling 2</title>
+</head>
+<body>
+    <h1>PackFile handling (updated)</h1>
+    <p>
+        This page describes how packfiles are used in AssetEditor today.
+        It covers normal .pack files, game reference packs, and system folder projects.
+    </p>
+
+    <h2>Pack types</h2>
+    <ul>
+        <li><b>Editable pack</b> - The pack/project you are currently editing.</li>
+        <li><b>Reference pack</b> - Read-only pack loaded for lookup/copy.</li>
+        <li><b>Game packs</b> - Read-only CA pack collection for the selected game.</li>
+        <li><b>System folder project</b> - A folder treated like an editable pack project.</li>
+    </ul>
+
+    <p><b>Image placeholder:</b> Pack explorer with one editable root and one read-only root.</p>
+    <p><i>Suggested image:</i> Editable root in bold text and a loaded reference/game pack beside it.</p>
+
+    <h2>Open or create content</h2>
+    <p>Common entry points:</p>
+    <ul>
+        <li><b>File => Create New Project</b> - Create/open a system folder as editable project.</li>
+        <li><b>File => Open Project Folder</b> - Open existing folder project.</li>
+        <li><b>File => Import Pack as Project</b> - Extract .pack to folder and open it as project.</li>
+        <li><b>File => Import Reference Pack</b> - Load a .pack as read-only reference.</li>
+        <li><b>File => Open Game Packs</b> - Load all game packs for a game as read-only.</li>
+        <li><b>File => Open Recent Pack</b> - Reopen recent pack/project.</li>
+    </ul>
+
+    <p><b>Image placeholder:</b> Menu locations for project and pack loading.</p>
+    <p><i>Suggested image:</i> Expanded File menu with the commands listed above.</p>
+
+    <h2>Main editable pack</h2>
+    <p>
+        AssetEditor always has one editable pack/project at a time.
+        To change it, right click a writable root and pick <b>Set as Editable Pack</b>.
+    </p>
+
+    <h2>PackFile explorer actions</h2>
+    <p>Right click menus include:</p>
+    <ul>
+        <li><b>Import File</b> and <b>Import Directory</b></li>
+        <li><b>Create Folder</b></li>
+        <li><b>Rename</b> and <b>Delete</b></li>
+        <li><b>Copy to editable pack</b> (when source is another loaded pack)</li>
+        <li><b>Export to system folder</b></li>
+        <li><b>Open in HxD/Notepad++</b> for file inspection</li>
+    </ul>
+
+    <p>Drag and drop can move files inside the same writable pack/project.</p>
+
+    <p><b>Image placeholder:</b> Root, folder, and file context menus.</p>
+    <p><i>Suggested image:</i> Three screenshots showing available actions per node type.</p>
+
+    <h2>Saving</h2>
+    <ul>
+        <li><b>Save</b> - Uses existing path if available. Otherwise asks for a .pack path.</li>
+        <li><b>Save As</b> - Always asks for target .pack path.</li>
+        <li><b>System folder project save</b> - Creates/updates a .pack file output, does not replace your source folder files.</li>
+    </ul>
+
+    <p>Unsaved changes are marked in the tree and cleared when save completes.</p>
+
+    <p><b>Image placeholder:</b> Unsaved marker before/after save.</p>
+    <p><i>Suggested image:</i> Same pack root before save (changed) and after save (clean).</p>
+
+    <h2>System folder project settings</h2>
+    <p>
+        System folder projects store settings in <b>project_ignore.json</b> in the project root.
+    </p>
+    <ul>
+        <li>Selected game version for serialization</li>
+        <li>Ignored files list for serialization</li>
+    </ul>
+    <p>
+        The settings file itself is auto-excluded from saved pack content.
+    </p>
+
+    <p><b>Image placeholder:</b> Project folder and settings file example.</p>
+    <p><i>Suggested image:</i> Folder tree with `project_ignore.json` and resulting saved pack file list.</p>
+
+    <h2>Known limitations and gotchas</h2>
+    <ul>
+        <li>Read-only containers (game/reference packs) cannot be edited directly.</li>
+        <li>If output file is locked by another process, save fails until the lock is released.</li>
+        <li>Ignore path matching supports case + slash-direction normalization, but not duplicate/leading separator canonicalization.</li>
+        <li>System folder save writes a .pack output path and keeps source project files unchanged.</li>
+    </ul>
+
+    <h2>Troubleshooting</h2>
+    <ul>
+        <li><b>Cannot edit</b> - Verify selected root is writable and set as editable.</li>
+        <li><b>Save fails</b> - Check file lock (game/tool/antivirus) on target file.</li>
+        <li><b>Wrong output version</b> - Check project game version setting.</li>
+        <li><b>Missing file after save</b> - Check ignored files list and normalized path.</li>
+    </ul>
+
+    <h2>Manual QA checklist</h2>
+    <p>
+        For a full manual verification list, see
+        <a href="PackFileHandling_Checklist.html">PackFileHandling_Checklist.html</a>.
+    </p>
+</body>
+</html>

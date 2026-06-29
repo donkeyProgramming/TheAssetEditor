@@ -5,6 +5,7 @@ using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
 using Shared.Core.PackFiles.Utility;
 using Shared.Core.Services;
+using Shared.Core.Settings;
 
 namespace AssetEditor.UiCommands
 {
@@ -14,17 +15,20 @@ namespace AssetEditor.UiCommands
         private readonly IPackFileContainerLoader _packFileContainerLoader;
         private readonly ISystemFolderContainerFactory _systemFolderContainerFactory;
         private readonly IStandardDialogs _standardDialogs;
+        private readonly ApplicationSettingsService _applicationSettingsService;
 
         public ImportPackAsAsProjectCommand(
             IPackFileService packFileService,
             IPackFileContainerLoader packFileContainerLoader,
             ISystemFolderContainerFactory systemFolderContainerFactory,
-            IStandardDialogs standardDialogs)
+            IStandardDialogs standardDialogs,
+            ApplicationSettingsService applicationSettingsService)
         {
             _packFileService = packFileService;
             _packFileContainerLoader = packFileContainerLoader;
             _systemFolderContainerFactory = systemFolderContainerFactory;
             _standardDialogs = standardDialogs;
+            _applicationSettingsService = applicationSettingsService;
         }
 
         public void Execute()
@@ -68,6 +72,8 @@ namespace AssetEditor.UiCommands
 
             // Step 4: Open the extracted folder as a SystemFolderContainer
             var systemContainer = _systemFolderContainerFactory.Create(destinationFolder);
+            if (systemContainer.PackFileSettings.GameVersion == null)
+                systemContainer.PackFileSettings.GameVersion = _applicationSettingsService.CurrentSettings.CurrentGame;
             _packFileService.AddContainer(systemContainer);
             _packFileService.SetEditablePack(systemContainer);
 

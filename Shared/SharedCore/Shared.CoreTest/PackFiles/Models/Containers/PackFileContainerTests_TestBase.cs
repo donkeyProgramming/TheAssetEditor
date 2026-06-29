@@ -16,7 +16,7 @@ namespace Shared.CoreTest.PackFiles.Models.Containers
 
         private string? _tempDir;
 
-        protected static readonly (string RelativePath, string FileName, long Offset, long Size, bool IsEncrypted, bool IsCompressed, CompressionFormat CompressionFormat, uint UncompressedSize)[] TestFiles =
+        public static readonly (string RelativePath, string FileName, long Offset, long Size, bool IsEncrypted, bool IsCompressed, CompressionFormat CompressionFormat, uint UncompressedSize)[] TestFiles =
         [
             ("folder\\file.txt", "file.txt", 100, 200, false, false, CompressionFormat.None, 0),
             ("other\\data.bin", "data.bin", 300, 400, false, true, CompressionFormat.Lz4, 800),

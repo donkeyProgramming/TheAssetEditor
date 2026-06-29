@@ -10,6 +10,31 @@ namespace Shared.CoreTest.PackFiles.Serialization
     [TestFixture]
     internal class PackFileSerializerWriterTests
     {
+        [Test]
+        public void SaveToByteArray_IgnoresFilesConfiguredInContainerSettings()
+        {
+            var gameInfo = GameInformationDatabase.GetGameById(GameTypeEnum.Warhammer3);
+            var outputContainerName = @"c:\fullpath\to\ignored-test.pack";
+            var container = PackFileContainer.CreatePackFile("test", "test.pack", PackFileVersion.PFH5);
+
+            container.AddOrUpdateFile("folder\\keep.txt", PackFile.CreateFromASCII("keep.txt", "KEEP"));
+            container.AddOrUpdateFile("folder\\ignore.txt", PackFile.CreateFromASCII("ignore.txt", "IGNORE"));
+            container.PackFileSettings.IgnoredFilesWhenSerializing.Add("Folder/IGNORE.txt");
+
+            using var writeMs = new MemoryStream();
+            using var writer = new BinaryWriter(writeMs);
+            PackFileSerializerWriter.SaveToByteArray(outputContainerName, container, writer, gameInfo);
+
+            using var readMs = new MemoryStream(writeMs.ToArray());
+            using var reader = new BinaryReader(readMs);
+            var loadedPack = PackFileSerializerLoader.Load(outputContainerName, readMs.Length, reader, new CaPackDuplicateFileResolver());
+
+            Assert.That(loadedPack.GetFileCount(), Is.EqualTo(1));
+            Assert.That(loadedPack.FindFile("folder\\keep.txt"), Is.Not.Null);
+            Assert.That(loadedPack.FindFile("folder\\ignore.txt"), Is.Null);
+            Assert.That(container.FindFile("folder\\ignore.txt"), Is.Not.Null);
+        }
+
         [TestCase(GameTypeEnum.Warhammer3, PackFileVersion.PFH4, "folder//filex.txt", CompressionFormat.Zstd, CompressionFormat.None, true)]
         [TestCase(GameTypeEnum.Warhammer3, PackFileVersion.PFH5, "folder//filex.txt", CompressionFormat.Zstd, CompressionFormat.Zstd, false)]
         [TestCase(GameTypeEnum.Warhammer3, PackFileVersion.PFH5, "folder//filex.txt", CompressionFormat.Lzma1, CompressionFormat.Zstd, true)]
@@ -70,11 +95,12 @@ namespace Shared.CoreTest.PackFiles.Serialization
             {
                 var containerFile = container.FindFile(fileInfo.FilePath);
                 Assert.That(containerFile, Is.Not.Null);
-                Assert.That(containerFile.DataSource, Is.Not.Null);
+                var nonNullContainerFile = containerFile!;
+                Assert.That(nonNullContainerFile.DataSource, Is.Not.Null);
 
-                var dataSourceInstance = containerFile.DataSource as PackedFileSource;
+                var dataSourceInstance = nonNullContainerFile.DataSource as PackedFileSource;
                 Assert.That(dataSourceInstance, Is.Not.Null);
-                Assert.That(dataSourceInstance.Parent.FilePath, Is.EqualTo(outputContainerName));
+                Assert.That(dataSourceInstance!.Parent.FilePath, Is.EqualTo(outputContainerName));
             }
 
             //  Load the file and assert
@@ -86,10 +112,13 @@ namespace Shared.CoreTest.PackFiles.Serialization
             {
                 var expectedFileInfoInstance = expectedFileInfo[i];
                 var packFile = loadedPackFile.FindFile(expectedFileInfoInstance.FilePath.ToLower());
+                Assert.That(packFile, Is.Not.Null);
 
                 // Bypass the filesystem lookup and go directly to stream
-                var packFileConentet = (packFile.DataSource as PackedFileSource).ReadData(readBackMs);
-                var parentName = (packFile.DataSource as PackedFileSource).Parent.FilePath;
+                var packedSource = packFile!.DataSource as PackedFileSource;
+                Assert.That(packedSource, Is.Not.Null);
+                var packFileConentet = packedSource!.ReadData(readBackMs);
+                var parentName = packedSource.Parent.FilePath;
 
                 // Assert that parent file has been updated correctly
                 Assert.That(parentName.ToLower(), Is.EqualTo(outputContainerName.ToLower()));

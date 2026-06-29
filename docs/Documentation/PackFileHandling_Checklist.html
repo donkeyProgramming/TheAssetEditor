@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="DocumentationShared.css">
+    <script src="DocumentationShared.js" defer></script>
+    <title>PackFile Handling Manual Checklist</title>
+</head>
+<body>
+    <h1>PackFile Handling manual checklist</h1>
+    <p>
+        Use this checklist when validating packfile behavior in AssetEditor builds.
+        Mark each item as Pass/Fail and include notes where needed.
+    </p>
+
+    <h2>Test setup</h2>
+    <ul>
+        <li>Build/version tested: ____________________</li>
+        <li>Game selected in settings: ____________________</li>
+        <li>Test data used (packs/projects): ____________________</li>
+        <li>Tester/date: ____________________</li>
+    </ul>
+
+    <h2>1. Load and create workflows</h2>
+    <ol>
+        <li>Create New Project opens selected folder as editable project. [Pass/Fail]</li>
+        <li>Open Project Folder opens existing folder project and sets editable. [Pass/Fail]</li>
+        <li>Import Pack as Project extracts files and opens folder project. [Pass/Fail]</li>
+        <li>Import Reference Pack loads as read-only container. [Pass/Fail]</li>
+        <li>Open Game Packs loads game references without editable rights. [Pass/Fail]</li>
+        <li>Open Recent Pack reopens expected item with correct mode. [Pass/Fail]</li>
+    </ol>
+
+    <h2>2. Editable pack behavior</h2>
+    <ol>
+        <li>Set as Editable Pack updates active editable root. [Pass/Fail]</li>
+        <li>Read-only roots cannot be set as editable. [Pass/Fail]</li>
+        <li>Changes are applied only to editable/writable target. [Pass/Fail]</li>
+    </ol>
+
+    <h2>3. Tree edit operations</h2>
+    <ol>
+        <li>Create Folder creates node and persists to container. [Pass/Fail]</li>
+        <li>Import File adds file under selected folder/root. [Pass/Fail]</li>
+        <li>Import Directory preserves folder structure. [Pass/Fail]</li>
+        <li>Rename file updates path and remains openable. [Pass/Fail]</li>
+        <li>Rename folder updates child paths correctly. [Pass/Fail]</li>
+        <li>Delete file removes it from tree and container. [Pass/Fail]</li>
+        <li>Delete folder removes full subtree. [Pass/Fail]</li>
+        <li>Drag-drop move works inside same writable container only. [Pass/Fail]</li>
+        <li>Copy to editable pack copies file/folder subtree from reference pack. [Pass/Fail]</li>
+    </ol>
+
+    <h2>4. Save and Save As</h2>
+    <ol>
+        <li>Save prompts for path when system path is unknown. [Pass/Fail]</li>
+        <li>Save uses existing path when known. [Pass/Fail]</li>
+        <li>Save As always prompts for destination path. [Pass/Fail]</li>
+        <li>After successful save, unsaved marker is cleared. [Pass/Fail]</li>
+        <li>Saved .pack can be reopened and expected files exist. [Pass/Fail]</li>
+    </ol>
+
+    <h2>5. System folder specific behavior</h2>
+    <ol>
+        <li>System folder project save outputs a .pack file and keeps source files. [Pass/Fail]</li>
+        <li>project_ignore.json is created/updated on settings changes. [Pass/Fail]</li>
+        <li>project_ignore.json is not included in saved .pack output. [Pass/Fail]</li>
+        <li>Open/close/reopen project retains ignored-file settings. [Pass/Fail]</li>
+        <li>External file create/delete/rename updates tree after watcher debounce. [Pass/Fail]</li>
+    </ol>
+
+    <h2>6. Version and ignore rules</h2>
+    <ol>
+        <li>Selected project/container game version is reflected in saved pack header version. [Pass/Fail]</li>
+        <li>Ignored files are excluded from serialization output. [Pass/Fail]</li>
+        <li>Ignore matching handles case and slash-direction normalization. [Pass/Fail]</li>
+    </ol>
+
+    <h2>7. Error handling and resilience</h2>
+    <ol>
+        <li>Save fails with clear error if output file is locked. [Pass/Fail]</li>
+        <li>After lock release, save succeeds without restarting. [Pass/Fail]</li>
+        <li>Read-only edit attempts are blocked with user feedback. [Pass/Fail]</li>
+        <li>Closing pack root removes it from tree and active set. [Pass/Fail]</li>
+    </ol>
+
+    <h2>8. Export and external open tools</h2>
+    <ol>
+        <li>Export to system folder writes selected root/folder/file output correctly. [Pass/Fail]</li>
+        <li>Open in HxD / Notepad++ creates temp file and launches tool (if installed). [Pass/Fail]</li>
+    </ol>
+
+    <h2>Notes and failures</h2>
+    <p>Issue links / repro notes:</p>
+    <p>______________________________________________________________</p>
+    <p>______________________________________________________________</p>
+    <p>______________________________________________________________</p>
+
+    <h2>Image placeholders (optional)</h2>
+    <p><b>Image placeholder:</b> Editable root and unsaved marker example.</p>
+    <p><i>Suggested image:</i> Before save and after save in PackFile explorer.</p>
+
+    <p><b>Image placeholder:</b> System folder project with project_ignore.json.</p>
+    <p><i>Suggested image:</i> Project folder tree and resulting pack content list.</p>
+</body>
+</html>

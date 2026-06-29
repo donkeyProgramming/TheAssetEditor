@@ -3,6 +3,7 @@ const documentationPages = [
     { title: 'Getting Started', fileName: 'GettingStarted.html' },
     { title: 'Camera Control', fileName: 'CameraControl.html' },
     { title: 'PackFile Handling', fileName: 'PackFileHandling.html' },
+    { title: 'PackFile Handling (Updated)', fileName: 'packfilehandling2.html' },
     {
         title: 'Kitbashing',
         children: [

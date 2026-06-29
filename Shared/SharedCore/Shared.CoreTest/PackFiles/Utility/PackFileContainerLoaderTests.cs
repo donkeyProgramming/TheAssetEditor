@@ -71,6 +71,7 @@ namespace Shared.CoreTest.PackFiles.Utility
             var result = loader.CreateFromGameEnum(PackFileContainerType.Database, GameTypeEnum.Warhammer3);
 
             Assert.That(result, Is.Not.Null);
+            Assert.That(result!.PackFileSettings.GameVersion, Is.EqualTo(GameTypeEnum.Warhammer3));
 
             // Single combined dialog: reason + building message
             _dialogs.Verify(d => d.ShowDialogBox(It.IsAny<string>(), It.IsAny<string>()), Times.Once);
@@ -97,6 +98,7 @@ namespace Shared.CoreTest.PackFiles.Utility
 
             _dialogs.Verify(d => d.ShowDialogBox(It.IsAny<string>(), It.IsAny<string>()), Times.Never);
             _dialogs.Verify(d => d.ShowWaitCursor(), Times.Never);
+            Assert.That(secondResult!.PackFileSettings.GameVersion, Is.EqualTo(GameTypeEnum.Warhammer3));
         }
 
         [Test]

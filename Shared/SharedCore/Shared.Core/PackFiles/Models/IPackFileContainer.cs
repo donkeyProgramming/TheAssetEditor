@@ -13,6 +13,7 @@
         bool IsReadOnly { get; set; }
         bool IsCaPackFile { get; set; }
         string? SystemFilePath { get; }
+        PackFileSettings PackFileSettings { get; }
         PackFileContainerType ContainerType { get; }
 
 

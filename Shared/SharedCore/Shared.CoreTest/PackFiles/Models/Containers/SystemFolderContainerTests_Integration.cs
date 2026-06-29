@@ -36,6 +36,322 @@ namespace Shared.CoreTest.PackFiles.Models.Containers
             return new FileSystemAccess();
         }
 
+        private static string GetDataFileFromWorkspace(string fileName)
+        {
+            var currentDirectory = TestContext.CurrentContext.TestDirectory;
+
+            while (true)
+            {
+                var directoryName = Path.GetFileName(currentDirectory);
+                if (string.IsNullOrWhiteSpace(directoryName))
+                    throw new Exception($"Unable to resolve workspace root for test directory '{TestContext.CurrentContext.TestDirectory}'");
+
+                if (string.Equals(directoryName, "TheAssetEditor", StringComparison.OrdinalIgnoreCase))
+                    break;
+
+                currentDirectory = Path.GetDirectoryName(currentDirectory)
+                    ?? throw new Exception($"Unable to resolve parent folder from '{currentDirectory}'");
+            }
+
+            var fullPath = Path.Combine(currentDirectory, "Data", fileName);
+            if (File.Exists(fullPath) == false)
+                throw new Exception($"Unable to find data file '{fileName}' in '{fullPath}'");
+
+            return fullPath;
+        }
+
+        [Test]
+        public void ComplexFlow_SystemFolderProject_FromKarlPack_PersistsIgnoreSettings_AndSavesExpectedPack()
+        {
+            // Arrange: load Karl pack as game pack
+            var karlPackPath = GetDataFileFromWorkspace("Karl_and_celestialgeneral.pack");
+            PackFileContainer karlContainer;
+            using (var fs = File.OpenRead(karlPackPath))
+            using (var reader = new BinaryReader(fs))
+            {
+                karlContainer = PackFileSerializerLoader.Load(karlPackPath, fs.Length, reader, new CustomPackDuplicateFileResolver());
+            }
+            karlContainer.IsCaPackFile = true;
+            karlContainer.IsReadOnly = true;
+
+            var eventHub = new Mock<IGlobalEventHub>();
+            var fileSystem = CreateRealFileSystemAccess();
+            var watcher = new Mock<IFileSystemWatcher>();
+
+            var projectContainer = new SystemFolderContainer(_tempDir, fileSystem, watcher.Object, eventHub.Object);
+            projectContainer.PackFileSettings.GameVersion = GameTypeEnum.Warhammer3;
+
+            var pfs = new PackFileService(eventHub.Object);
+            pfs.MessageBoxProvider = new Mock<ISimpleMessageBox>().Object;
+            pfs.EnforceGameFilesMustBeLoaded = false;
+            pfs.AddContainer(karlContainer);
+            pfs.AddContainer(projectContainer, true);
+
+            // Copy a few files from Karl into the project
+            var copiedPaths = karlContainer.GetAllFiles().Keys.OrderBy(x => x).Take(3).ToList();
+            Assert.That(copiedPaths.Count, Is.EqualTo(3), "Karl pack should have enough files for this integration test.");
+            foreach (var path in copiedPaths)
+                pfs.CopyFileFromOtherPackFile(karlContainer, path, projectContainer);
+
+            // Add two new files; one inside a folder and one at root
+            var inFolder = PackFile.CreateFromASCII("in_folder.txt", "folder-content");
+            var atRoot = PackFile.CreateFromASCII("at_root.txt", "root-content");
+            pfs.AddFilesToPack(projectContainer,
+            [
+                new NewPackFileEntry("new_folder", inFolder),
+                new NewPackFileEntry("", atRoot)
+            ]);
+
+            var ignoredPath = PathNormalization.NormalizeFileName(@"new_folder\in_folder.txt");
+            projectContainer.PackFileSettings.IgnoredFilesWhenSerializing.Add(ignoredPath);
+
+            // Act: save and reload the pack
+            var outputPackPath = Path.Combine(_tempDir, "complex_flow_output.pack");
+            var gameInfo = GameInformationDatabase.GetGameById(GameTypeEnum.Rome2); // should be ignored in favor of settings
+            pfs.SavePackContainer(projectContainer, outputPackPath, false, gameInfo);
+
+            PackFileContainer reloadedPack;
+            using (var outFs = File.OpenRead(outputPackPath))
+            using (var outReader = new BinaryReader(outFs))
+            {
+                reloadedPack = PackFileSerializerLoader.Load(outputPackPath, outFs.Length, outReader, new CaPackDuplicateFileResolver());
+            }
+
+            // Assert: version comes from project settings (Warhammer3 -> PFH5)
+            var expectedVersion = GameInformationDatabase.GetGameById(GameTypeEnum.Warhammer3).PackFileVersion;
+            Assert.That(reloadedPack.Header.Version, Is.EqualTo(expectedVersion));
+
+            // Assert: copied files and root file are present, ignored file is excluded
+            foreach (var copiedPath in copiedPaths)
+                Assert.That(reloadedPack.ContainsFile(copiedPath), Is.True, $"Expected copied file '{copiedPath}' in saved pack");
+
+            Assert.That(reloadedPack.ContainsFile("at_root.txt"), Is.True);
+            Assert.That(reloadedPack.ContainsFile(ignoredPath), Is.False);
+
+            var rootData = reloadedPack.FindFile("at_root.txt")!.DataSource.ReadData();
+            Assert.That(System.Text.Encoding.ASCII.GetString(rootData), Is.EqualTo("root-content"));
+
+            // Assert: project folder structure (excluding ignored + project settings json) matches saved pack content
+            var ignoredSet = projectContainer.PackFileSettings.IgnoredFilesWhenSerializing
+                .Select(PathNormalization.NormalizeFileName)
+                .ToHashSet(StringComparer.OrdinalIgnoreCase);
+
+            var diskFiles = Directory.GetFiles(_tempDir, "*.*", SearchOption.AllDirectories)
+                .Select(x => PathNormalization.NormalizeFileName(Path.GetRelativePath(_tempDir, x)))
+                .Where(x => !string.Equals(x, "project_ignore.json", StringComparison.OrdinalIgnoreCase))
+                .Where(x => !ignoredSet.Contains(x))
+                .Where(x => !x.EndsWith(".pack", StringComparison.OrdinalIgnoreCase))
+                .ToList();
+
+            var packFiles = reloadedPack.GetAllFiles().Keys.ToList();
+            Assert.That(diskFiles, Is.EquivalentTo(packFiles));
+
+            // Close + reopen project; ignore list should persist in project_ignore.json
+            projectContainer.Dispose();
+            var reopened = new SystemFolderContainer(_tempDir, fileSystem, watcher.Object, eventHub.Object);
+            Assert.That(reopened.PackFileSettings.IgnoredFilesWhenSerializing, Does.Contain(ignoredPath));
+            reopened.Dispose();
+        }
+
+        [Test]
+        public void ComplexFlow_CreateProjectFromPack_EditDeleteIgnore_Save_VerifyContent()
+        {
+            // Arrange: load source pack and create project folder by extracting files
+            var sourcePackPath = GetDataFileFromWorkspace("Karl_and_celestialgeneral.pack");
+            PackFileContainer sourcePack;
+            using (var fs = File.OpenRead(sourcePackPath))
+            using (var reader = new BinaryReader(fs))
+            {
+                sourcePack = PackFileSerializerLoader.Load(sourcePackPath, fs.Length, reader, new CustomPackDuplicateFileResolver());
+            }
+
+            var projectDir = Path.Combine(_tempDir, "project_from_pack");
+            Directory.CreateDirectory(projectDir);
+            foreach (var (relativePath, packFile) in sourcePack.GetAllFiles())
+            {
+                var absolutePath = Path.Combine(projectDir, relativePath);
+                Directory.CreateDirectory(Path.GetDirectoryName(absolutePath)!);
+                File.WriteAllBytes(absolutePath, packFile.DataSource.ReadData());
+            }
+
+            var eventHub = new Mock<IGlobalEventHub>();
+            var fileSystem = CreateRealFileSystemAccess();
+            var watcher = new Mock<IFileSystemWatcher>();
+            var projectContainer = new SystemFolderContainer(projectDir, fileSystem, watcher.Object, eventHub.Object);
+            projectContainer.PackFileSettings.GameVersion = GameTypeEnum.Warhammer3;
+
+            var pfs = new PackFileService(eventHub.Object);
+            pfs.MessageBoxProvider = new Mock<ISimpleMessageBox>().Object;
+            pfs.EnforceGameFilesMustBeLoaded = false;
+            pfs.AddContainer(projectContainer, true);
+
+            var candidatePaths = projectContainer.GetAllFiles().Keys.OrderBy(x => x).Take(3).ToList();
+            Assert.That(candidatePaths.Count, Is.EqualTo(3), "Project should contain at least 3 files");
+
+            var editedPath = candidatePaths[0];
+            var deletedPath = candidatePaths[1];
+            var ignoredPath = candidatePaths[2];
+
+            // Edit one file
+            var editedFile = projectContainer.FindFile(editedPath)!;
+            var editedBytes = System.Text.Encoding.UTF8.GetBytes("edited-from-integration-flow");
+            projectContainer.SaveFileData(editedFile, editedBytes);
+
+            // Delete one file
+            var fileToDelete = projectContainer.FindFile(deletedPath)!;
+            pfs.DeleteFile(projectContainer, fileToDelete);
+
+            // Ignore one existing file
+            projectContainer.PackFileSettings.IgnoredFilesWhenSerializing.Add(ignoredPath);
+
+            // Save
+            var outputPackPath = Path.Combine(_tempDir, "project_from_pack_output.pack");
+            var gameInfo = GameInformationDatabase.GetGameById(GameTypeEnum.Rome2); // overridden by settings
+            pfs.SavePackContainer(projectContainer, outputPackPath, false, gameInfo);
+
+            // Reload and verify
+            using var outFs = File.OpenRead(outputPackPath);
+            using var outReader = new BinaryReader(outFs);
+            var loaded = PackFileSerializerLoader.Load(outputPackPath, outFs.Length, outReader, new CaPackDuplicateFileResolver());
+
+            var expectedVersion = GameInformationDatabase.GetGameById(GameTypeEnum.Warhammer3).PackFileVersion;
+            Assert.That(loaded.Header.Version, Is.EqualTo(expectedVersion));
+
+            Assert.That(loaded.ContainsFile(deletedPath), Is.False, "Deleted file should not be in saved pack");
+            Assert.That(loaded.ContainsFile(ignoredPath), Is.False, "Ignored file should not be in saved pack");
+            Assert.That(loaded.ContainsFile(editedPath), Is.True, "Edited file should still be present");
+
+            var loadedEditedBytes = loaded.FindFile(editedPath)!.DataSource.ReadData();
+            Assert.That(loadedEditedBytes, Is.EqualTo(editedBytes));
+        }
+
+        [Test]
+        public void IgnoreList_PathNormalization_MixedCaseAndSlashDirection_AllIgnoredAtSave()
+        {
+            // Arrange
+            var eventHub = new Mock<IGlobalEventHub>();
+            var fileSystem = CreateRealFileSystemAccess();
+            var watcher = new Mock<IFileSystemWatcher>();
+            var container = new SystemFolderContainer(_tempDir, fileSystem, watcher.Object, eventHub.Object);
+
+            var pfs = new PackFileService(eventHub.Object);
+            pfs.MessageBoxProvider = new Mock<ISimpleMessageBox>().Object;
+            pfs.EnforceGameFilesMustBeLoaded = false;
+            pfs.AddContainer(container, true);
+
+            pfs.AddFilesToPack(container,
+            [
+                new NewPackFileEntry("FolderA", PackFile.CreateFromASCII("MixedCase.TXT", "a")),
+                new NewPackFileEntry("FolderB", PackFile.CreateFromASCII("slash_file.bin", "b")),
+                new NewPackFileEntry("FolderC", PackFile.CreateFromASCII("lead.txt", "c")),
+                new NewPackFileEntry("FolderD", PackFile.CreateFromASCII("keep.txt", "keep"))
+            ]);
+
+            // Intentionally use mixed separators/casing/leading slashes
+            container.PackFileSettings.IgnoredFilesWhenSerializing.Add(@"FOLDERA/MIXEDCASE.TXT");
+            container.PackFileSettings.IgnoredFilesWhenSerializing.Add(@"FolderB/slash_file.bin");
+            container.PackFileSettings.IgnoredFilesWhenSerializing.Add(@"FOLDERC/LEAD.TXT");
+
+            // Act
+            var outputPackPath = Path.Combine(_tempDir, "ignore_normalization.pack");
+            var gameInfo = GameInformationDatabase.GetGameById(GameTypeEnum.Warhammer3);
+            pfs.SavePackContainer(container, outputPackPath, false, gameInfo);
+
+            using var fs = File.OpenRead(outputPackPath);
+            using var reader = new BinaryReader(fs);
+            var loaded = PackFileSerializerLoader.Load(outputPackPath, fs.Length, reader, new CaPackDuplicateFileResolver());
+
+            // Assert
+            Assert.That(loaded.ContainsFile(@"foldera\mixedcase.txt"), Is.False);
+            Assert.That(loaded.ContainsFile(@"folderb\slash_file.bin"), Is.False);
+            Assert.That(loaded.ContainsFile(@"folderc\lead.txt"), Is.False);
+            Assert.That(loaded.ContainsFile(@"folderd\keep.txt"), Is.True);
+            Assert.That(loaded.GetFileCount(), Is.EqualTo(1));
+        }
+
+        [Test]
+        public void SaveFlow_UsesSaveLocationPathValueAsTarget_WhenProvidedByCaller()
+        {
+            // Arrange
+            var seedPath = Path.Combine(_tempDir, "data", "seed.txt");
+            Directory.CreateDirectory(Path.GetDirectoryName(seedPath)!);
+            File.WriteAllText(seedPath, "seed-data");
+
+            var eventHub = new Mock<IGlobalEventHub>();
+            var fileSystem = CreateRealFileSystemAccess();
+            var watcher = new Mock<IFileSystemWatcher>();
+            var container = new SystemFolderContainer(_tempDir, fileSystem, watcher.Object, eventHub.Object);
+            container.PackFileSettings.GameVersion = GameTypeEnum.Warhammer3;
+
+            var saveDir = Path.Combine(_tempDir, "save-target");
+            Directory.CreateDirectory(saveDir);
+            var overridePackPath = Path.Combine(saveDir, "override_location.pack");
+            container.PackFileSettings.SaveLocationPath = overridePackPath;
+
+            var pfs = new PackFileService(eventHub.Object);
+            pfs.MessageBoxProvider = new Mock<ISimpleMessageBox>().Object;
+            pfs.EnforceGameFilesMustBeLoaded = false;
+            pfs.AddContainer(container, true);
+
+            // Act: emulate caller honoring SaveLocationPath
+            var gameInfo = GameInformationDatabase.GetGameById(GameTypeEnum.Rome2); // overridden by settings game version
+            var targetPath = container.PackFileSettings.SaveLocationPath!;
+            pfs.SavePackContainer(container, targetPath, false, gameInfo);
+
+            // Assert: pack written to override path and source folder still represents project files
+            Assert.That(File.Exists(overridePackPath), Is.True);
+            Assert.That(File.Exists(seedPath), Is.True, "Saving a pack should not mutate source project files.");
+
+            using var fs = File.OpenRead(overridePackPath);
+            using var reader = new BinaryReader(fs);
+            var loaded = PackFileSerializerLoader.Load(overridePackPath, fs.Length, reader, new CaPackDuplicateFileResolver());
+
+            Assert.That(loaded.ContainsFile(@"data\seed.txt"), Is.True);
+            var expectedVersion = GameInformationDatabase.GetGameById(GameTypeEnum.Warhammer3).PackFileVersion;
+            Assert.That(loaded.Header.Version, Is.EqualTo(expectedVersion));
+        }
+
+        [Test]
+        public void SaveToDisk_FileLockedInProject_ThrowsButContainerRemainsUsable()
+        {
+            // Arrange
+            var lockPath = Path.Combine(_tempDir, "locked", "file.txt");
+            Directory.CreateDirectory(Path.GetDirectoryName(lockPath)!);
+            File.WriteAllText(lockPath, "locked-content");
+
+            var eventHub = new Mock<IGlobalEventHub>();
+            var fileSystem = CreateRealFileSystemAccess();
+            var watcher = new Mock<IFileSystemWatcher>();
+            var container = new SystemFolderContainer(_tempDir, fileSystem, watcher.Object, eventHub.Object);
+
+            var pfs = new PackFileService(eventHub.Object);
+            pfs.MessageBoxProvider = new Mock<ISimpleMessageBox>().Object;
+            pfs.EnforceGameFilesMustBeLoaded = false;
+            pfs.AddContainer(container, true);
+
+            var outputPackPath = Path.Combine(_tempDir, "locked_output.pack");
+            var gameInfo = GameInformationDatabase.GetGameById(GameTypeEnum.Warhammer3);
+            var beforeCount = container.GetFileCount();
+
+            // Hold an exclusive lock on one project file during save
+            using (new FileStream(lockPath, FileMode.Open, FileAccess.ReadWrite, FileShare.None))
+            {
+                Assert.Throws<IOException>(() => pfs.SavePackContainer(container, outputPackPath, false, gameInfo));
+            }
+
+            // Assert: no state corruption and save succeeds once lock is released
+            Assert.That(container.GetFileCount(), Is.EqualTo(beforeCount));
+            Assert.That(container.ContainsFile(@"locked\file.txt"), Is.True);
+
+            pfs.SavePackContainer(container, outputPackPath, false, gameInfo);
+            Assert.That(File.Exists(outputPackPath), Is.True);
+
+            using var fs = File.OpenRead(outputPackPath);
+            using var reader = new BinaryReader(fs);
+            var loaded = PackFileSerializerLoader.Load(outputPackPath, fs.Length, reader, new CaPackDuplicateFileResolver());
+            Assert.That(loaded.ContainsFile(@"locked\file.txt"), Is.True);
+        }
+
         [Test]
         public void FullWorkflow_CreateFolder_AddFile_DeleteFile_Save()
         {

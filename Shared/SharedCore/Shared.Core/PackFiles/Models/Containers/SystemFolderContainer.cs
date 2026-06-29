@@ -1,4 +1,8 @@
-﻿using Shared.Core.Events;
+﻿using System.Collections.ObjectModel;
+using System.Text;
+using System.Text.Json;
+using System.Text.Json.Serialization;
+using Shared.Core.Events;
 using Shared.Core.Misc;
 using Shared.Core.PackFiles.Events;
 using Shared.Core.PackFiles.Models.FileSources;
@@ -12,6 +16,12 @@ namespace Shared.Core.PackFiles.Models.Containers
     public class SystemFolderContainer : IPackFileContainerInternal, IDisposable
     {
         private static readonly ILogger _logger = Logging.Create<SystemFolderContainer>();
+        private const string ProjectSettingsFileName = "project_ignore.json";
+        private static readonly JsonSerializerOptions ProjectSettingsJsonOptions = new()
+        {
+            WriteIndented = true,
+            Converters = { new JsonStringEnumConverter() }
+        };
 
         private readonly IFileSystemAccess _fileSystemAccess;
         private readonly IFileSystemWatcher? _watcher;
@@ -21,12 +31,14 @@ namespace Shared.Core.PackFiles.Models.Containers
         private readonly List<FileSystemEventArgs> _pendingEvents = new();
         private Timer? _debounceTimer;
         internal volatile bool _suppressWatcher = false;
+        private bool _isApplyingProjectSettings = false;
         private bool _disposed = false;
 
         public string Name { get; set; }
         public bool IsReadOnly { get; set; } = false;
         public bool IsCaPackFile { get; set; } = false;
         public string? SystemFilePath { get; }
+        public PackFileSettings PackFileSettings { get; } = new();
         public PackFileContainerType ContainerType => PackFileContainerType.SystemFolder;
 
         public SystemFolderContainer(string folderPath, IFileSystemAccess fileSystemAccess, IFileSystemWatcher? watcher = null, IGlobalEventHub? eventHub = null, SynchronizationContext? syncContext = null)
@@ -41,6 +53,12 @@ namespace Shared.Core.PackFiles.Models.Containers
             _eventHub = eventHub;
             _syncContext = syncContext ?? SynchronizationContext.Current;
             SystemFilePath = folderPath;
+            PackFileSettings.SaveLocationPath = folderPath;
+
+            LoadProjectSettingsFromDisk();
+            EnsureProjectSettingsFileIsIgnored();
+            PackFileSettings.SettingsChanged += OnPackFileSettingsChanged;
+
             Name = Path.GetFileName(folderPath.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar));
 
             ScanFolder();
@@ -54,10 +72,102 @@ namespace Shared.Core.PackFiles.Models.Containers
             {
                 var relativePath = Path.GetRelativePath(SystemFilePath!, absolutePath);
                 var normalizedPath = PathNormalization.NormalizeFileName(relativePath);
+                if (IsProjectSettingsFilePath(normalizedPath))
+                    continue;
+
                 var fileName = Path.GetFileName(absolutePath);
                 var packFile = new PackFile(fileName, new FileSystemSource(absolutePath));
                 _fileList[normalizedPath] = packFile;
             }
+        }
+
+        private string GetProjectSettingsFilePath() => Path.Combine(SystemFilePath!, ProjectSettingsFileName);
+
+        private static bool IsProjectSettingsFilePath(string normalizedRelativePath)
+        {
+            return string.Equals(
+                normalizedRelativePath,
+                PathNormalization.NormalizeFileName(ProjectSettingsFileName),
+                StringComparison.OrdinalIgnoreCase);
+        }
+
+        private void EnsureProjectSettingsFileIsIgnored()
+        {
+            var normalizedSettingsFileName = PathNormalization.NormalizeFileName(ProjectSettingsFileName);
+            if (!PackFileSettings.IgnoredFilesWhenSerializing.Contains(normalizedSettingsFileName, StringComparer.OrdinalIgnoreCase))
+                PackFileSettings.IgnoredFilesWhenSerializing.Add(normalizedSettingsFileName);
+        }
+
+        private void LoadProjectSettingsFromDisk()
+        {
+            var projectSettingsPath = GetProjectSettingsFilePath();
+            if (!_fileSystemAccess.FileExists(projectSettingsPath))
+                return;
+
+            try
+            {
+                var settingsBytes = _fileSystemAccess.FileReadAllBytes(projectSettingsPath);
+                var json = Encoding.UTF8.GetString(settingsBytes);
+                var settings = JsonSerializer.Deserialize<SystemFolderProjectSettings>(json, ProjectSettingsJsonOptions);
+                if (settings == null)
+                    return;
+
+                _isApplyingProjectSettings = true;
+                PackFileSettings.GameVersion = settings.GameVersion;
+
+                var normalizedIgnoredFiles = (settings.IgnoredFilesWhenSerializing ?? [])
+                    .Where(x => string.IsNullOrWhiteSpace(x) == false)
+                    .Select(PathNormalization.NormalizeFileName)
+                    .Distinct(StringComparer.OrdinalIgnoreCase)
+                    .ToList();
+
+                PackFileSettings.IgnoredFilesWhenSerializing = new ObservableCollection<string>(normalizedIgnoredFiles);
+            }
+            catch (Exception ex)
+            {
+                _logger.Here().Warning("Failed to load system-folder project settings from {FilePath}. Error: {ErrorMessage}", projectSettingsPath, ex.Message);
+            }
+            finally
+            {
+                _isApplyingProjectSettings = false;
+            }
+        }
+
+        private void SaveProjectSettingsToDisk()
+        {
+            var projectSettingsPath = GetProjectSettingsFilePath();
+            try
+            {
+                var ignoredFiles = PackFileSettings.IgnoredFilesWhenSerializing
+                    .Where(x => string.IsNullOrWhiteSpace(x) == false)
+                    .Select(PathNormalization.NormalizeFileName)
+                    .Distinct(StringComparer.OrdinalIgnoreCase)
+                    .ToList();
+
+                if (!ignoredFiles.Contains(PathNormalization.NormalizeFileName(ProjectSettingsFileName), StringComparer.OrdinalIgnoreCase))
+                    ignoredFiles.Add(PathNormalization.NormalizeFileName(ProjectSettingsFileName));
+
+                var settings = new SystemFolderProjectSettings
+                {
+                    GameVersion = PackFileSettings.GameVersion,
+                    IgnoredFilesWhenSerializing = ignoredFiles
+                };
+
+                var json = JsonSerializer.Serialize(settings, ProjectSettingsJsonOptions);
+                _fileSystemAccess.FileWriteAllBytes(projectSettingsPath, Encoding.UTF8.GetBytes(json));
+            }
+            catch (Exception ex)
+            {
+                _logger.Here().Warning("Failed to save system-folder project settings to {FilePath}. Error: {ErrorMessage}", projectSettingsPath, ex.Message);
+            }
+        }
+
+        private void OnPackFileSettingsChanged()
+        {
+            if (_disposed || _isApplyingProjectSettings)
+                return;
+
+            SaveProjectSettingsToDisk();
         }
 
         // --- IPackFileContainer read operations ---
@@ -364,6 +474,10 @@ namespace Shared.Core.PackFiles.Models.Containers
 
         public void SaveToDisk(string path, bool createBackup, GameInformation gameInformation)
         {
+            var effectiveGameInformation = PackFileSettings.GameVersion.HasValue
+                ? GameInformationDatabase.GetGameById(PackFileSettings.GameVersion.Value)
+                : gameInformation;
+
             if (_fileSystemAccess.FileExists(path) && DirectoryHelper.IsFileLocked(path))
                 throw new IOException($"Cannot access {path} because another process has locked it.");
 
@@ -375,8 +489,9 @@ namespace Shared.Core.PackFiles.Models.Containers
                 SaveUtility.CreateFileBackup(path);
 
             // Build a transient PackFileContainer with in-memory data for serialization
-            var versionString = PackFileVersionConverter.ToString(PackFileVersion.PFH5);
-            var transientContainer = PackFileContainer.CreatePackFile(Name, path, PackFileVersion.PFH5);
+            var transientContainer = PackFileContainer.CreatePackFile(Name, path, effectiveGameInformation.PackFileVersion);
+            transientContainer.PackFileSettings.GameVersion = PackFileSettings.GameVersion;
+            transientContainer.PackFileSettings.IgnoredFilesWhenSerializing = new ObservableCollection<string>(PackFileSettings.IgnoredFilesWhenSerializing);
 
             foreach (var (relativePath, packFile) in _fileList)
             {
@@ -390,7 +505,7 @@ namespace Shared.Core.PackFiles.Models.Containers
                 using (var fileStream = new FileStream(tempPath, FileMode.Create))
                 {
                     using var writer = new BinaryWriter(fileStream);
-                    PackFileSerializerWriter.SaveToByteArray(path, transientContainer, writer, gameInformation);
+                    PackFileSerializerWriter.SaveToByteArray(path, transientContainer, writer, effectiveGameInformation);
                 }
 
                 _fileSystemAccess.FileMove(tempPath, path);
@@ -519,6 +634,8 @@ namespace Shared.Core.PackFiles.Models.Containers
 
             var relativePath = Path.GetRelativePath(SystemFilePath!, absolutePath);
             var normalizedPath = PathNormalization.NormalizeFileName(relativePath);
+            if (IsProjectSettingsFilePath(normalizedPath))
+                return;
 
             if (_fileList.ContainsKey(normalizedPath))
                 return; // Already tracked
@@ -541,6 +658,8 @@ namespace Shared.Core.PackFiles.Models.Containers
         {
             var relativePath = Path.GetRelativePath(SystemFilePath!, absolutePath);
             var normalizedPath = PathNormalization.NormalizeFileName(relativePath);
+            if (IsProjectSettingsFilePath(normalizedPath))
+                return;
 
             // Check if this is an exact file match
             if (_fileList.ContainsKey(normalizedPath))
@@ -588,9 +707,16 @@ namespace Shared.Core.PackFiles.Models.Containers
                 _watcher.EnableRaisingEvents = false;
                 _watcher.Dispose();
             }
+            PackFileSettings.SettingsChanged -= OnPackFileSettingsChanged;
             _debounceTimer?.Dispose();
             _debounceTimer = null;
             _fileList.Clear();
+        }
+
+        private class SystemFolderProjectSettings
+        {
+            public GameTypeEnum? GameVersion { get; set; }
+            public List<string>? IgnoredFilesWhenSerializing { get; set; }
         }
     }
 }

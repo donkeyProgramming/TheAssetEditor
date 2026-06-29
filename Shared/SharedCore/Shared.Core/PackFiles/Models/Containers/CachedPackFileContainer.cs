@@ -18,7 +18,7 @@ namespace Shared.Core.PackFiles.Models.Containers
     internal class CachedPackFileContainer : IPackFileContainerInternal, IDisposable
     {
         private static readonly ILogger _logger = Logging.CreateStatic(typeof(CachedPackFileContainer));
-        private const int CurrentSchemaVersion = 3;
+        private const int CurrentSchemaVersion = 4;
 
         private CacheDbContext _db;
         private readonly DbContextOptions<CacheDbContext> _dbOptions;
@@ -31,6 +31,7 @@ namespace Shared.Core.PackFiles.Models.Containers
         public bool IsReadOnly { get => true; set { } }
         public bool IsCaPackFile { get; set; } = false;
         public string SystemFilePath { get; set; }
+        public PackFileSettings PackFileSettings { get; } = new();
         public PackFileContainerType ContainerType => PackFileContainerType.Database;
         public HashSet<string> SourcePackFilePaths { get; set; } = [];
 
@@ -42,6 +43,7 @@ namespace Shared.Core.PackFiles.Models.Containers
             Name = name;
             SystemFilePath = string.Empty;
             DbFilePath = dbFilePath;
+            PackFileSettings.SaveLocationPath = dbFilePath;
             StorageMode = CacheStorageMode.File;
             _dbOptions = new DbContextOptionsBuilder<CacheDbContext>()
                 .UseSqlite($"Data Source={dbFilePath};Pooling=False")
@@ -57,8 +59,9 @@ namespace Shared.Core.PackFiles.Models.Containers
         {
             Name = name;
             SystemFilePath = string.Empty;
-            DbFilePath = null;
-            StorageMode = CacheStorageMode.InMemory;
+            DbFilePath = TryResolveFileDbPath(dbOptions);
+            PackFileSettings.SaveLocationPath = DbFilePath;
+            StorageMode = DbFilePath == null ? CacheStorageMode.InMemory : CacheStorageMode.File;
             _dbOptions = dbOptions;
             _db = new CacheDbContext(dbOptions);
             _db.ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking;
@@ -89,13 +92,14 @@ namespace Shared.Core.PackFiles.Models.Containers
                 using (var cmd = connection.CreateCommand())
                 {
                     cmd.Transaction = transaction;
-                    cmd.CommandText = @"INSERT INTO CacheInfo (SchemaVersion, Fingerprint, ContainerName, SystemFilePath, SourcePackFilePaths)
-                                    VALUES ($schemaVersion, $fingerprint, $containerName, $systemFilePath, $sourcePackFilePaths)";
+                    cmd.CommandText = @"INSERT INTO CacheInfo (SchemaVersion, Fingerprint, ContainerName, SystemFilePath, SourcePackFilePaths, GameVersion)
+                                    VALUES ($schemaVersion, $fingerprint, $containerName, $systemFilePath, $sourcePackFilePaths, $gameVersion)";
                     cmd.Parameters.AddWithValue("$schemaVersion", CurrentSchemaVersion);
                     cmd.Parameters.AddWithValue("$fingerprint", fingerprint);
                     cmd.Parameters.AddWithValue("$containerName", source.Name);
                     cmd.Parameters.AddWithValue("$systemFilePath", source.SystemFilePath);
                     cmd.Parameters.AddWithValue("$sourcePackFilePaths", string.Join("|", source.SourcePackFilePaths));
+                    cmd.Parameters.AddWithValue("$gameVersion", source.PackFileSettings.GameVersion is GameTypeEnum gameVersion ? (int)gameVersion : DBNull.Value);
                     cmd.ExecuteNonQuery();
                 }
 
@@ -156,6 +160,7 @@ namespace Shared.Core.PackFiles.Models.Containers
             Name = source.Name;
             SystemFilePath = source.SystemFilePath ?? string.Empty;
             SourcePackFilePaths = new HashSet<string>(source.SourcePackFilePaths);
+            PackFileSettings.GameVersion = source.PackFileSettings.GameVersion;
 
             // Recreate _db so this instance can be queried after Save()
             _db.Dispose();
@@ -221,6 +226,7 @@ namespace Shared.Core.PackFiles.Models.Containers
             {
                 SystemFilePath = cacheInfo.SystemFilePath,
             };
+            container.PackFileSettings.GameVersion = cacheInfo.GameVersion.HasValue ? (GameTypeEnum)cacheInfo.GameVersion.Value : null;
 
             if (!string.IsNullOrEmpty(cacheInfo.SourcePackFilePaths))
             {
@@ -248,6 +254,25 @@ namespace Shared.Core.PackFiles.Models.Containers
             return (new SqliteConnection(connectionString), true);
         }
 
+        private static string? TryResolveFileDbPath(DbContextOptions<CacheDbContext> dbOptions)
+        {
+            var relationalOptions = dbOptions.Extensions
+                .OfType<RelationalOptionsExtension>()
+                .FirstOrDefault();
+
+            var connectionString = relationalOptions?.Connection?.ConnectionString ?? relationalOptions?.ConnectionString;
+            if (string.IsNullOrWhiteSpace(connectionString))
+                return null;
+
+            var builder = new SqliteConnectionStringBuilder(connectionString);
+            if (builder.Mode == SqliteOpenMode.Memory)
+                return null;
+            if (string.Equals(builder.DataSource, ":memory:", StringComparison.OrdinalIgnoreCase))
+                return null;
+
+            return string.IsNullOrWhiteSpace(builder.DataSource) ? null : builder.DataSource;
+        }
+
         /// <summary>
         /// Creates a CachedPackFileContainer from a list of file entries. Useful for testing.
         /// </summary>
@@ -257,11 +282,13 @@ namespace Shared.Core.PackFiles.Models.Containers
             bool useInMemoryDb,
             string? dbFilePath = null,
             string systemFilePath = "",
-            string? sourcePackFilePath = null)
+            string? sourcePackFilePath = null,
+            GameTypeEnum? gameVersion = null)
         {
             var packParent = new PackedFileSourceParent { FilePath = sourcePackFilePath ?? @"c:\game\data\pack1.pack" };
 
             var source = PackFileContainer.CreateReadOnlyPackFile(containerName, systemFilePath);
+            source.PackFileSettings.GameVersion = gameVersion;
 
             if (sourcePackFilePath != null)
                 source.SourcePackFilePaths.Add(sourcePackFilePath);

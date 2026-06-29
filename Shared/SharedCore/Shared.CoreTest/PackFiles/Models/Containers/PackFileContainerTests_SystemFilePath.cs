@@ -15,10 +15,19 @@ namespace Shared.CoreTest.PackFiles.Models.Containers
             if (IsSystemFolderContainer)
             {
                 Assert.That(_container.SystemFilePath, Does.StartWith(Path.GetTempPath().TrimEnd('\\')));
+                Assert.That(_container.PackFileSettings.SaveLocationPath, Is.EqualTo(_container.SystemFilePath));
+                return;
+            }
+
+            if (IsCachedContainer)
+            {
+                Assert.That(_container.SystemFilePath, Is.EqualTo(@"c:\game\data"));
+                Assert.That(_container.PackFileSettings.SaveLocationPath, Is.Null);
                 return;
             }
 
             Assert.That(_container.SystemFilePath, Is.EqualTo(@"c:\game\data"));
+            Assert.That(_container.PackFileSettings.SaveLocationPath, Is.EqualTo(_container.SystemFilePath));
         }
     }
 }
