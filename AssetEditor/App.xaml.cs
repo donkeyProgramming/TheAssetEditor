@@ -1,4 +1,6 @@
 ﻿using System.Diagnostics;
+using System.Globalization;
+using System.IO;
 using System.Windows;
 using System.Windows.Threading;
 using AssetEditor.Services;
@@ -56,9 +58,18 @@ namespace AssetEditor
             settingsService.AllowSettingsUpdate = true;
             settingsService.Load();
 
+            // Auto-detect system language for first-time users
+            if (settingsService.CurrentSettings.IsFirstTimeStartingApplication)
+            {
+                var detectedLang = DetectSystemLanguage();
+                if (File.Exists($"Language_{detectedLang}.json"))
+                    settingsService.CurrentSettings.SelectedLangauge = detectedLang;
+                settingsService.Save();
+            }
+
             var localizationManager = _serviceProvider.GetRequiredService<LocalizationManager>();
             localizationManager.GetPossibleLanguages();
-            localizationManager.LoadLanguage("en");
+            localizationManager.LoadLanguage(settingsService.CurrentSettings.SelectedLangauge);
 
             // Show the settings window if its the first time the tool is ran
             if (settingsService.CurrentSettings.IsFirstTimeStartingApplication)
@@ -91,6 +102,18 @@ namespace AssetEditor
 
             settingsService.CurrentSettings.IsFirstTimeStartingApplication = false;
             settingsService.Save();
+        }
+
+        private static string DetectSystemLanguage()
+        {
+            var twoLetter = CultureInfo.CurrentUICulture.TwoLetterISOLanguageName;
+            return twoLetter switch
+            {
+                "zh" => "cn",
+                "en" => "en",
+                "fr" => "fr",
+                _ => "en"
+            };
         }
 
         private void LoadCAPackFiles(ApplicationSettingsService settingsService)
