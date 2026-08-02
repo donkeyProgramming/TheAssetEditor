@@ -12,7 +12,7 @@ namespace Editors.Audio.Shared.Wwise.HircExploration
     {
         private record ArgumentPathLookupKey(HircTreeNode ParentNode, int Depth, uint State);
 
-        public HircTreeChildrenParser(IAudioRepository audioRepository) : base(audioRepository)
+        public HircTreeChildrenParser(IAudioRepository audioRepository, bool lazyLoadChildren = false) : base(audioRepository, lazyLoadChildren)
         {
             HircProcessChildMap.Add(AkBkHircType.Event, ProcessEvent);
             HircProcessChildMap.Add(AkBkHircType.Action, ProcessAction);
@@ -79,7 +79,7 @@ namespace Editors.Audio.Shared.Wwise.HircExploration
         private void ProcessAction(HircItem item, HircTreeNode parent)
         {
             var action = GetAsType<ICAkAction>(item);
-            var node = new HircTreeNode() { DisplayName = $"{action.GetActionType()} Action", Hirc = item, IsExpanded = true };
+            var node = new HircTreeNode() { DisplayName = $"{action.GetActionType()} Action", Hirc = item, IsExpanded = !LazyLoadChildren };
             parent.Children.Add(node);
             var childId = action.GetChildId();
 
@@ -160,7 +160,7 @@ namespace Editors.Audio.Shared.Wwise.HircExploration
         private void ProcessRandomSequenceContainer(HircItem item, HircTreeNode parent)
         {
             var randomSequenceContainer = GetAsType<ICAkRanSeqCntr>(item);
-            var node = new HircTreeNode() { DisplayName = $"Random / Sequence Container", Hirc = item, IsExpanded = true };
+            var node = new HircTreeNode() { DisplayName = $"Random / Sequence Container", Hirc = item, IsExpanded = !LazyLoadChildren };
             parent.Children.Add(node);
             ProcessNext(randomSequenceContainer.GetChildren(), node);
         }
@@ -227,7 +227,7 @@ namespace Editors.Audio.Shared.Wwise.HircExploration
         private void ProcessMusicRandomSequenceContainer(HircItem item, HircTreeNode parent)
         {
             var musicRandomSequenceContainer = GetAsType<CAkMusicRanSeqCntr_V136>(item);
-            var node = new HircTreeNode() { DisplayName = $"Music Random / Sequence Container", Hirc = item, IsExpanded = true };
+            var node = new HircTreeNode() { DisplayName = $"Music Random / Sequence Container", Hirc = item, IsExpanded = !LazyLoadChildren };
             parent.Children.Add(node);
 
             if (musicRandomSequenceContainer.PlayList.Count != 0)

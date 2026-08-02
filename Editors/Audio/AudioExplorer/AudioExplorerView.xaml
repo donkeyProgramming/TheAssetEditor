@@ -197,14 +197,15 @@
                 ItemsSource="{Binding TreeList, UpdateSourceTrigger=PropertyChanged}"
                 VirtualizingPanel.IsVirtualizing="True"
                 VirtualizingPanel.VirtualizationMode="Recycling"
-                VirtualizingPanel.IsVirtualizingWhenGrouping="True">
+                VirtualizingPanel.IsVirtualizingWhenGrouping="True"
+                PreviewMouseDoubleClick="OnNodeDoubleClick">
 
                 <TreeView.ItemContainerStyle>
                     <Style 
                         TargetType="{x:Type TreeViewItem}">
                         <Setter 
                             Property="IsExpanded" 
-                            Value="{Binding IsExpanded}"/>
+                            Value="{Binding IsExpanded, Mode=TwoWay}"/>
                         <Setter 
                             Property="Template">
                             <Setter.Value>

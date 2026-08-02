@@ -158,8 +158,6 @@ namespace Editors.Audio.AudioExplorer
                 }
             }
 
-            ExpandNodes(selectedNode);
-
             _ = LoadWaveformForNodeAsync(selectedNode);
         }
 
@@ -197,38 +195,6 @@ namespace Editors.Audio.AudioExplorer
                 if (wemFile != null)
                     await WaveformVisualiserViewModel.LoadFromWemBytesAsync(wemFile.DataSource.ReadData(), node.DisplayName).ConfigureAwait(false);
             }
-        }
-
-        private static void ExpandNodes(HircTreeNode selectedNode)
-        {
-            // Expand ancestors and collapse siblings at branching levels
-            var currentNode = selectedNode;
-            while (currentNode.Parent != null)
-            {
-                var parentNode = currentNode.Parent;
-
-                parentNode.IsExpanded = true;
-
-                if (parentNode.Children != null && parentNode.Children.Count > 1)
-                {
-                    foreach (var siblingNode in parentNode.Children)
-                        siblingNode.IsExpanded = false;
-                }
-
-                currentNode.IsExpanded = true;
-                currentNode = parentNode;
-            }
-
-            // Expand where there's only one child
-            currentNode = selectedNode;
-            while (currentNode.Children != null && currentNode.Children.Count == 1)
-            {
-                currentNode.IsExpanded = true;
-                currentNode = currentNode.Children[0];
-            }
-
-            if (currentNode.Children != null && currentNode.Children.Count > 0)
-                currentNode.IsExpanded = true;
         }
 
         private void OnLanguagesCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
@@ -280,7 +246,7 @@ namespace Editors.Audio.AudioExplorer
 
             if (SearchByVOActor)
             {
-                var hircTreeChildrenParser = new HircTreeChildrenParser(_audioRepository);
+                var hircTreeChildrenParser = new HircTreeChildrenParser(_audioRepository, lazyLoadChildren: true);
 
                 SelectedNode = null;
                 TreeList.Clear();
@@ -297,7 +263,7 @@ namespace Editors.Audio.AudioExplorer
             }
             else
             {
-                var hircTreeChildrenParser = new HircTreeChildrenParser(_audioRepository);
+                var hircTreeChildrenParser = new HircTreeChildrenParser(_audioRepository, lazyLoadChildren: true);
 
                 SelectedNode = null;
                 TreeList.Clear();
@@ -306,6 +272,27 @@ namespace Editors.Audio.AudioExplorer
                 rootNode.IsExpanded = true;
 
                 TreeList.Add(rootNode);
+            }
+        }
+
+        public static void RunDepthFirstSearchToSound(HircTreeNode selectedNode)
+        {
+            var currentNode = selectedNode;
+            var visitedNodes = new System.Collections.Generic.HashSet<HircTreeNode>();
+
+            while (currentNode != null && visitedNodes.Add(currentNode))
+            {
+                if (currentNode.Hirc?.HircType == AkBkHircType.Sound)
+                    return;
+
+                // Expanding resolves this node's pending HIRCs in one breadth-first batch
+                currentNode.IsExpanded = true;
+
+                // A branch needs a user choice, only an unambiguous path goes deeper
+                if (currentNode.Children == null || currentNode.Children.Count != 1)
+                    return;
+
+                currentNode = currentNode.Children[0];
             }
         }
 

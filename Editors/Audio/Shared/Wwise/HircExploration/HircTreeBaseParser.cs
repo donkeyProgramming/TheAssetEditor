@@ -5,7 +5,7 @@ using Shared.GameFormats.Wwise.Hirc;
 
 namespace Editors.Audio.Shared.Wwise.HircExploration
 {
-    public abstract class HircTreeBaseParser(IAudioRepository audioRepository)
+    public abstract class HircTreeBaseParser(IAudioRepository audioRepository, bool lazyLoadChildren = false)
     {
         private sealed record PendingHircNode(uint HircId, HircTreeNode Parent);
 
@@ -13,12 +13,14 @@ namespace Editors.Audio.Shared.Wwise.HircExploration
         public readonly Dictionary<AkBkHircType, Action<HircItem, HircTreeNode>> HircProcessChildMap = [];
 
         private readonly List<PendingHircNode> _breadthFirstSearchFrontier = [];
+        protected bool LazyLoadChildren { get; } = lazyLoadChildren;
 
         public HircTreeNode BuildHierarchy(HircItem item)
         {
             var root = new HircTreeNode();
             ProcessHircObject(item, root);
-            RunBreadthFirstSearch();
+            if (!LazyLoadChildren)
+                RunBreadthFirstSearch();
 
             var actualRoot = root.Children.FirstOrDefault();
             actualRoot.Parent = null;
@@ -48,12 +50,38 @@ namespace Editors.Audio.Shared.Wwise.HircExploration
 
         private void ProcessHircObject(HircItem item, HircTreeNode parent)
         {
+            var firstNewChildIndex = parent.Children.Count;
+
             if (HircProcessChildMap.TryGetValue(item.HircType, out var func))
                 func(item, parent);
             else
             {
                 var unknownNode = new HircTreeNode() { DisplayName = $"Unknown node type {item.HircType} for ID {item.Id} in {item.BnkFilePath}", Hirc = item };
                 parent.Children.Add(unknownNode);
+            }
+
+            for (var i = firstNewChildIndex; i < parent.Children.Count; i++)
+                SetParentLinks(parent.Children[i], parent);
+        }
+
+        private static void SetParentLinks(HircTreeNode node, HircTreeNode parent)
+        {
+            var pendingNodes = new Stack<(HircTreeNode Node, HircTreeNode Parent)>();
+            var visitedNodes = new HashSet<HircTreeNode>();
+            pendingNodes.Push((node, parent));
+
+            while (pendingNodes.Count != 0)
+            {
+                var current = pendingNodes.Pop();
+                if (!visitedNodes.Add(current.Node))
+                    continue;
+
+                current.Node.Parent = current.Parent;
+                if (current.Node.Children == null)
+                    continue;
+
+                foreach (var child in current.Node.Children)
+                    pendingNodes.Push((child, current.Node));
             }
         }
 
@@ -62,13 +90,57 @@ namespace Editors.Audio.Shared.Wwise.HircExploration
             if (hircId == 0)
                 return;
 
-            _breadthFirstSearchFrontier.Add(new PendingHircNode(hircId, parent));
+            if (!LazyLoadChildren)
+            {
+                _breadthFirstSearchFrontier.Add(new PendingHircNode(hircId, parent));
+                return;
+            }
+
+            parent.PendingChildHircIds.Add(hircId);
+            if (parent.PendingChildHircIds.Count == 1)
+            {
+                parent.Children.Add(new HircTreeNode() { DisplayName = "Loading..." });
+                parent.ResolveChildrenCallback = ResolveChildren;
+            }
         }
 
         protected void ProcessNext(List<uint> ids, HircTreeNode parent)
         {
             foreach (var id in ids)
                 ProcessNext(id, parent);
+        }
+
+        private void ResolveChildren(HircTreeNode node)
+        {
+            var pendingIds = node.PendingChildHircIds;
+
+            var hircIds = pendingIds.Distinct().ToList();
+            var hircsById = AudioRepository.GetHircs(hircIds);
+
+            node.Children.Clear();
+
+            foreach (var hircId in pendingIds)
+            {
+                if (IsHircInAncestry(node, hircId))
+                    node.Children.Add(new HircTreeNode() { DisplayName = $"Circular HIRC reference to ID {hircId}" });
+                else if (hircsById.TryGetValue(hircId, out var hircs) && hircs.Count != 0)
+                    ProcessHircObject(hircs[0], node);
+                else
+                    node.Children.Add(new HircTreeNode() { DisplayName = $"Error: Unable to find Hirc with ID {hircId}" });
+            }
+
+            pendingIds.Clear();
+        }
+
+        private static bool IsHircInAncestry(HircTreeNode node, uint hircId)
+        {
+            for (var current = node; current != null; current = current.Parent)
+            {
+                if (current.Hirc?.Id == hircId)
+                    return true;
+            }
+
+            return false;
         }
 
         private void RunBreadthFirstSearch()
