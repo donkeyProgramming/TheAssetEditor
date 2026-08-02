@@ -203,6 +203,9 @@
                 <TreeView.ItemContainerStyle>
                     <Style 
                         TargetType="{x:Type TreeViewItem}">
+                        <EventSetter
+                            Event="Expanded"
+                            Handler="OnNodeExpanded"/>
                         <Setter 
                             Property="IsExpanded" 
                             Value="{Binding IsExpanded, Mode=TwoWay}"/>

@@ -163,38 +163,60 @@ namespace Editors.Audio.AudioExplorer
 
         private async Task LoadWaveformForNodeAsync(HircTreeNode node)
         {
+            var source = CreateWemWaveformSource(node);
+            if (source == null)
+                return;
+
+            await WaveformVisualiserViewModel.LoadFromWemSourceAsync(source, node.DisplayName);
+        }
+
+        public void PreloadWaveformsForNodes(IReadOnlyCollection<HircTreeNode> nodes)
+        {
+            var sources = nodes
+                .Select(CreateWemWaveformSource)
+                .Where(source => source != null)
+                .ToArray();
+
+            if (sources.Length != 0)
+                WaveformVisualiserViewModel.PreloadWemWaveforms(sources);
+        }
+
+        private WemWaveformSource CreateWemWaveformSource(HircTreeNode node)
+        {
             if (node?.Hirc is ICAkSound sound)
             {
-                byte[] wemBytes;
-
                 // From at least V136 and newer, AkMediaInformation no longer stores a FileOffset. To get the wem data you would search the DidxChunk
                 // for the SourceId. While some Warhammer 3 AkBankSourceData are AKBKSourceType.Data_BNK and therefore should appear in the DidxChunk,
                 // no Warhammer 3 wems are in there and instead all wems are stored in Packs so they're actually AKBKSourceType.Streaming.
                 // This could be explained by Wwiser's Enum for AKBKSourceType in V136 mapping incorrectly, or V136 not supporting data bnks but who knows?
                 // So, as there are no data wems in Warhammer 3, functionality to find wem data in V136 is not implemented as they can only be streamed.
-                if (sound.GetStreamType() == AKBKSourceType.Data_BNK && sound is CAkSound_V112 sound_V112)
+                if (sound.GetStreamType() == AKBKSourceType.Data_BNK && sound is CAkSound_V112 soundV112)
                 {
-                    wemBytes = _audioRepository.FindDataWem(
-                        sound_V112.AkBankSourceData.AkMediaInformation.FileId,
-                        (int)sound_V112.AkBankSourceData.AkMediaInformation.FileOffset,
-                        (int)sound_V112.AkBankSourceData.AkMediaInformation.InMemoryMediaSize);
-                }
-                else
-                {
-                    var wemFile = _audioRepository.FindWem(sound.GetSourceId().ToString());
-                    wemBytes = wemFile?.DataSource.ReadData();
+                    var mediaInformation = soundV112.AkBankSourceData.AkMediaInformation;
+                    return new WemWaveformSource(
+                        $"data-wem:{mediaInformation.FileId}:{mediaInformation.FileOffset}:{mediaInformation.InMemoryMediaSize}",
+                        () => _audioRepository.FindDataWem(mediaInformation.FileId, (int)mediaInformation.FileOffset, (int)mediaInformation.InMemoryMediaSize));
                 }
 
-                if (wemBytes != null)
-                    await WaveformVisualiserViewModel.LoadFromWemBytesAsync(wemBytes, node.DisplayName).ConfigureAwait(false);
+                var sourceId = sound.GetSourceId();
+                var wemFile = _audioRepository.FindWem(sourceId.ToString());
+                if (wemFile == null)
+                    return null;
+
+                return new WemWaveformSource($"wem:{sourceId}:{wemFile.Name}", wemFile.DataSource.ReadData);
             }
-            else if (node?.Hirc is ICAkMusicTrack musicTrack)
+
+            if (node?.Hirc is ICAkMusicTrack musicTrack)
             {
-                var musicTrackId = musicTrack.GetChildren().FirstOrDefault();
-                var wemFile = _audioRepository.FindWem(musicTrackId.ToString());
-                if (wemFile != null)
-                    await WaveformVisualiserViewModel.LoadFromWemBytesAsync(wemFile.DataSource.ReadData(), node.DisplayName).ConfigureAwait(false);
+                var sourceId = musicTrack.GetChildren().FirstOrDefault();
+                var wemFile = _audioRepository.FindWem(sourceId.ToString());
+                if (wemFile == null)
+                    return null;
+
+                return new WemWaveformSource($"wem:{sourceId}:{wemFile.Name}", wemFile.DataSource.ReadData);
             }
+
+            return null;
         }
 
         private void OnLanguagesCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)

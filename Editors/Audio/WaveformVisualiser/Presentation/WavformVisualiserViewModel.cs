@@ -127,12 +127,12 @@ namespace Editors.Audio.WaveformVisualiser.Presentation
             }
         }
 
-        public async Task LoadFromWemBytesAsync(byte[] wemBytes, string labelKey)
+        public async Task LoadFromWemSourceAsync(WemWaveformSource source, string labelKey)
         {
             StopWaveformPlayheadRendering();
             _soundEngine.Stop();
 
-            _currentWemBytes = wemBytes;
+            _currentWemBytes = null;
             _currentFilePathKey = string.Empty;
             _currentPlaylistFilePaths.Clear();
             _currentPlaylistIndex = -1;
@@ -145,9 +145,6 @@ namespace Editors.Audio.WaveformVisualiser.Presentation
 
             ResetWaveformPlayheadAndProgress();
 
-            if (wemBytes == null || wemBytes.Length == 0)
-                return;
-
             var previousCancellationToken = Interlocked.Exchange(ref _waveformRenderCancellationTokenSource, new CancellationTokenSource());
             if (previousCancellationToken != null)
             {
@@ -157,20 +154,42 @@ namespace Editors.Audio.WaveformVisualiser.Presentation
 
             var cancellationToken = _waveformRenderCancellationTokenSource.Token;
 
-            await _waveformRenderGate.WaitAsync(cancellationToken).ConfigureAwait(false);
             try
             {
-                var targetWidth = GetTargetWidth();
-                var result = await _waveformRendererService.RenderFromWemBytesAsync(wemBytes, targetWidth, cancellationToken).ConfigureAwait(false);
+                var wemBytes = await Task.Run(source.LoadBytes, cancellationToken);
+                cancellationToken.ThrowIfCancellationRequested();
+                if (wemBytes == null || wemBytes.Length == 0)
+                    return;
 
-                TotalPlaybackTime = result.TotalTime;
-                ApplyWaveformBitmaps(result.Visualisation.BaseImage, result.Visualisation.OverlayImage);
+                _currentWemBytes = wemBytes;
+
+                await _waveformRenderGate.WaitAsync(cancellationToken);
+                var targetWidth = GetTargetWidth();
+                var loadedSource = new WemWaveformSource(source.CacheKey, () => wemBytes);
+                try
+                {
+                    var result = await _waveformVisualisationCacheService
+                        .GetOrRenderWemAsync(loadedSource, targetWidth, _waveformRendererService, cancellationToken);
+
+                    TotalPlaybackTime = result.TotalTime;
+                    ApplyWaveformBitmaps(result.Visualisation.BaseImage, result.Visualisation.OverlayImage);
+                }
+                finally
+                {
+                    _waveformRenderGate.Release();
+                }
             }
             catch (OperationCanceledException) { }
-            finally
-            {
-                _waveformRenderGate.Release();
-            }
+        }
+
+        public void PreloadWemWaveforms(IEnumerable<WemWaveformSource> sources)
+        {
+            var targetWidth = GetTargetWidth();
+            _ = _waveformVisualisationCacheService.PreloadWemWaveformVisualisationsAsync(
+                sources,
+                targetWidth,
+                _waveformRendererService,
+                CancellationToken.None);
         }
 
         public void SetSelectedPlaylist(List<string> filePaths)
@@ -402,7 +421,10 @@ namespace Editors.Audio.WaveformVisualiser.Presentation
 
         private void OnCompositionTargetRenderingForWaveformPlayhead(object sender, EventArgs e)
         {
-            if (_soundEngine == null || WaveformPixelWidth <= 0)
+            if (!_isWaveformPlayheadRenderingEnabled ||
+                _soundEngine == null ||
+                _soundEngine.PlaybackState != PlaybackState.Playing ||
+                WaveformPixelWidth <= 0)
                 return;
 
             var totalTime = TotalPlaybackTime;
