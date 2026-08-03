@@ -388,6 +388,10 @@ namespace Editors.BmdEditor.Services
             });
             if (placeholderMesh != null)
             {
+                // Version > 3 carries a real transform matrix; version <= 3 has none (vertices are
+                // already baked into world space), matching BmdTerryProjectWriter's understanding.
+                if (polyMesh.PolyMeshVersion > 3)
+                    placeholderMesh.ModelMatrix = polyMesh.Transform;
                 meshNode.AddObject(placeholderMesh);
             }
 
@@ -516,7 +520,81 @@ namespace Editors.BmdEditor.Services
             return soundNode;
         }
 
-        
+        /// <summary>
+        /// Pushes an edited view model's transform (from a textbox edit or a gizmo drag) into its
+        /// scene node so the 3D view updates immediately, without rebuilding the scene. Each
+        /// component's visual reads its position/orientation from a different place (some from
+        /// their own ModelMatrix, some from bespoke fields the node's own Render reads directly -
+        /// see the corresponding CreateXxxNode above), so this mirrors that per-type. Sound and
+        /// world-space (PolyMeshVersion &lt;= 3) polymesh visuals need no push at all - they read
+        /// straight from the same array the view model already mutated in place.
+        /// </summary>
+        public void RefreshVisual(BmdElementViewModel element)
+        {
+            if (!ComponentNodes.TryGetValue(element, out var node))
+                return;
+
+            switch (element)
+            {
+                case PropInfoViewModel propVm:
+                    SetChildModelMatrix(node, propVm.Prop.Transform);
+                    break;
+
+                case VfxInfoViewModel vfxVm:
+                    SetChildModelMatrix(node, vfxVm.Vfx.Transform);
+                    break;
+
+                case CscInfoViewModel cscVm:
+                    SetChildModelMatrix(node, cscVm.Csc.Transform);
+                    break;
+
+                case PointLightInfoViewModel lightVm:
+                    SetChildModelMatrix(node, Matrix.CreateTranslation(lightVm.Light.Position.ToVector3()));
+                    break;
+
+                case LightProbeInfoViewModel probeVm:
+                    SetChildModelMatrix(node, Matrix.CreateTranslation(probeVm.Probe.Position.ToVector3()));
+                    break;
+
+                case SpotLightInfoViewModel spotVm:
+                {
+                    var cone = FindChild<SpotLightConeNode>(node);
+                    if (cone != null)
+                    {
+                        cone.Position = spotVm.Light.Position;
+                        cone.Quaternion = new Quaternion(spotVm.Light.QuartX, spotVm.Light.QuartY, spotVm.Light.QuartZ, spotVm.Light.QuartW);
+                    }
+                    break;
+                }
+
+                case TerrainHoleInfoViewModel holeVm:
+                {
+                    var edges = FindChild<TerrainHoleEdgesNode>(node);
+                    if (edges != null)
+                    {
+                        edges.FirstVert = holeVm.Hole.FirstVert;
+                        edges.SecondVert = holeVm.Hole.SecondVert;
+                        edges.ThirdVert = holeVm.Hole.ThirdVert;
+                    }
+                    break;
+                }
+
+                case PolyMeshInfoViewModel meshVm when meshVm.Mesh.PolyMeshVersion > 3:
+                    SetChildModelMatrix(node, meshVm.Mesh.Transform);
+                    break;
+            }
+        }
+
+        private static void SetChildModelMatrix(SceneNode node, Matrix matrix)
+        {
+            var child = node.Children.FirstOrDefault();
+            if (child != null)
+                child.ModelMatrix = matrix;
+        }
+
+        private static T? FindChild<T>(SceneNode node) where T : class, ISceneNode =>
+            node.Children.OfType<T>().FirstOrDefault();
+
         public void HighlightComponent(BmdElementViewModel component)
         {
             // Clear previous highlight
@@ -811,26 +889,5 @@ namespace Editors.BmdEditor.Services
             return boundaryNode;
         }
 
-    }
-
-    // Special key class for BMD reference tracking to prevent infinite recursion
-    public class BmdBmdReferenceKey : BmdElementViewModel
-    {
-        public string BmdPath { get; }
-
-        public BmdBmdReferenceKey(string bmdPath) : base("BMD_Reference", bmdPath, "BMD reference for recursion prevention")
-        {
-            BmdPath = bmdPath;
-        }
-
-        public override bool Equals(object? obj)
-        {
-            return obj is BmdBmdReferenceKey other && BmdPath == other.BmdPath;
-        }
-
-        public override int GetHashCode()
-        {
-            return BmdPath.GetHashCode();
-        }
     }
 }

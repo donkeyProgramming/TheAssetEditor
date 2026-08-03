@@ -10,6 +10,7 @@
       <ProjectReference Include="..\..\Shared\SharedCore\Shared.Core\Shared.Core.csproj" />
       <ProjectReference Include="..\..\Shared\GameFiles\Shared.GameFormats.csproj" />
       <ProjectReference Include="..\..\Shared\SharedUI\Shared.Ui\Shared.Ui.csproj" />
+      <ProjectReference Include="..\..\Shared\EmbeddedResources\Shared.EmbeddedResources.csproj" />
     </ItemGroup>
 
 </Project>

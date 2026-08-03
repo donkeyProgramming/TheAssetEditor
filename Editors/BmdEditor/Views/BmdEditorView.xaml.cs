@@ -82,5 +82,12 @@ namespace Editors.BmdEditor.Views
                 viewModel?.SelectComponent(selectedElement);
             }
         }
+
+        // Details-panel fields bound straight to the underlying domain object (flags, strings,
+        // enums) don't go through a dedicated view-model property, so they can't call
+        // RaiseModified() themselves - these mark the file dirty on commit instead.
+        private void AuxField_LostFocus(object sender, RoutedEventArgs e) => (DataContext as BmdEditorViewModel)?.OnAuxFieldModified();
+        private void AuxField_Click(object sender, RoutedEventArgs e) => (DataContext as BmdEditorViewModel)?.OnAuxFieldModified();
+        private void AuxField_SelectionChanged(object sender, SelectionChangedEventArgs e) => (DataContext as BmdEditorViewModel)?.OnAuxFieldModified();
     }
 }
