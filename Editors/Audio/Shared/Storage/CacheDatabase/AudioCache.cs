@@ -134,13 +134,15 @@ namespace Editors.Audio.Shared.Storage.CacheDatabase
 
         internal List<BnkHircReference> FindHircs(uint id, IReadOnlySet<string> resolvedBnkPaths)
         {
+            var databaseId = (long)id;
             List<BnkHircReference> references;
             lock (_dbLock)
             {
                 references = (
                     from hirc in _db.Hircs
                     join bnk in _db.Bnks on hirc.SoundBankId equals bnk.Id
-                    where hirc.HircId == id
+                    where hirc.HircId == databaseId
+                    orderby bnk.Path, hirc.IndexInBnk
                     select CreateHircReference(hirc, bnk))
                     .ToList();
             }
@@ -148,15 +150,35 @@ namespace Editors.Audio.Shared.Storage.CacheDatabase
             return references.Where(x => resolvedBnkPaths.Contains(x.BnkPath)).ToList();
         }
 
+        internal List<BnkHircReference> FindHircs(IReadOnlyCollection<uint> ids, string bnkFilePath, IReadOnlySet<string> resolvedBnkPaths)
+        {
+            if (ids.Count == 0 || string.IsNullOrWhiteSpace(bnkFilePath) || !resolvedBnkPaths.Contains(bnkFilePath))
+                return [];
+
+            var databaseIds = ids.Select(id => (long)id).ToArray();
+            lock (_dbLock)
+            {
+                return (
+                    from hirc in _db.Hircs
+                    join bnk in _db.Bnks on hirc.SoundBankId equals bnk.Id
+                    where bnk.Path == bnkFilePath && databaseIds.Contains(hirc.HircId)
+                    orderby hirc.IndexInBnk
+                    select CreateHircReference(hirc, bnk))
+                    .ToList();
+            }
+        }
+
         internal List<BnkHircReference> FindHircs(IReadOnlyCollection<uint> ids, IReadOnlySet<string> resolvedBnkPaths)
         {
+            var databaseIds = ids.Select(id => (long)id).ToArray();
             List<BnkHircReference> references;
             lock (_dbLock)
             {
                 references = (
                     from hirc in _db.Hircs
                     join bnk in _db.Bnks on hirc.SoundBankId equals bnk.Id
-                    where ids.Contains((uint)hirc.HircId)
+                    where databaseIds.Contains(hirc.HircId)
+                    orderby bnk.Path, hirc.IndexInBnk
                     select CreateHircReference(hirc, bnk))
                     .ToList();
             }

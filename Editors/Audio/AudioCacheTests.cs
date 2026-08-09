@@ -145,6 +145,65 @@ namespace Test.Audio
         }
 
         [Test]
+        public void FindHircs_BankBatchReturnsOnlyTheRequestedBankWhenIdsAreDuplicated()
+        {
+            const uint SharedId = 123456;
+            const string FirstBnkPath = @"audio\wwise\first.bnk";
+            const string SecondBnkPath = @"audio\wwise\second.bnk";
+            var firstBnk = PackFile.CreateFromBytes("first.bnk", CreateBnk(SharedId, 1, 0));
+            var secondBnk = PackFile.CreateFromBytes("second.bnk", CreateBnk(SharedId, 1, 0));
+            var container = CreateContainer(true, [(FirstBnkPath, firstBnk), (SecondBnkPath, secondBnk)]);
+
+            var dbOptions = CreateTestDbOptions();
+            SaveCache("fingerprint", [container.Object], dbOptions);
+            using var loaded = AudioCache.CreateFromFingerPrint(dbOptions, "fingerprint");
+            var resolvedPaths = new HashSet<string>([FirstBnkPath, SecondBnkPath], StringComparer.OrdinalIgnoreCase);
+
+            var results = loaded.FindHircs([SharedId], SecondBnkPath, resolvedPaths);
+
+            Assert.That(results, Has.Count.EqualTo(1));
+            Assert.That(results[0].BnkPath, Is.EqualTo(SecondBnkPath));
+        }
+
+        [Test]
+        public void FindHircs_ReturnsAmbiguousCandidatesInStableBnkPathOrder()
+        {
+            const uint SharedId = 123456;
+            const string FirstBnkPath = @"audio\wwise\a-first.bnk";
+            const string SecondBnkPath = @"audio\wwise\z-second.bnk";
+            var firstBnk = PackFile.CreateFromBytes("a-first.bnk", CreateBnk(SharedId, 1, 0));
+            var secondBnk = PackFile.CreateFromBytes("z-second.bnk", CreateBnk(SharedId, 1, 0));
+            var container = CreateContainer(true, [(SecondBnkPath, secondBnk), (FirstBnkPath, firstBnk)]);
+
+            var dbOptions = CreateTestDbOptions();
+            SaveCache("fingerprint", [container.Object], dbOptions);
+            using var loaded = AudioCache.CreateFromFingerPrint(dbOptions, "fingerprint");
+            var resolvedPaths = new HashSet<string>([SecondBnkPath, FirstBnkPath], StringComparer.OrdinalIgnoreCase);
+
+            var results = loaded.FindHircs(SharedId, resolvedPaths);
+
+            Assert.That(results.Select(result => result.BnkPath), Is.EqualTo(new[] { FirstBnkPath, SecondBnkPath }));
+        }
+
+        [Test]
+        public void FindHircs_CollectionLookupSupportsFullUIntIdRange()
+        {
+            const string BnkPath = @"audio\wwise\maximum-id.bnk";
+            var bnk = PackFile.CreateFromBytes("maximum-id.bnk", CreateBnk(uint.MaxValue, 1, 0));
+            var container = CreateContainer(true, [(BnkPath, bnk)]);
+
+            var dbOptions = CreateTestDbOptions();
+            SaveCache("fingerprint", [container.Object], dbOptions);
+            using var loaded = AudioCache.CreateFromFingerPrint(dbOptions, "fingerprint");
+            var resolvedPaths = new HashSet<string>([BnkPath], StringComparer.OrdinalIgnoreCase);
+
+            var results = loaded.FindHircs([uint.MaxValue], resolvedPaths);
+
+            Assert.That(results, Has.Count.EqualTo(1));
+            Assert.That(results[0].Id, Is.EqualTo(uint.MaxValue));
+        }
+
+        [Test]
         public void LoadCache_ReturnsNullForMissingFile()
         {
             var result = AudioCache.CreateFromFingerPrint(Path.Combine(_tempDir, "nonexistent.db"), "fingerprint");

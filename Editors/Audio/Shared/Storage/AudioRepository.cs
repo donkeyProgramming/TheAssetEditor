@@ -13,6 +13,8 @@ using Shared.GameFormats.Wwise.Hirc;
 
 namespace Editors.Audio.Shared.Storage
 {
+    public sealed record HircReferenceRequest(uint HircId, string ReferringBnkFilePath);
+
     public interface IAudioRepository
     {
         Dictionary<uint, List<HircItem>> HircsById { get; }
@@ -30,6 +32,7 @@ namespace Editors.Audio.Shared.Storage
         List<HircItem> GetHircs(uint id);
         List<HircItem> GetHircs(uint id, string owningFileName);
         Dictionary<uint, List<HircItem>> GetHircs(IReadOnlyCollection<uint> ids);
+        Dictionary<HircReferenceRequest, HircItem> ResolveHircReferences(IReadOnlyCollection<HircReferenceRequest> requests);
         string GetNameFromId(uint value);
         string GetNameFromId(uint value, out bool found);
         string GetNameFromId(uint? key);
@@ -50,6 +53,7 @@ namespace Editors.Audio.Shared.Storage
         private readonly IAudioCacheHelper _cacheHelper;
         private readonly BnkLoader _bnkLoader;
         private readonly IEventHub _eventHub;
+        private readonly ILogger _logger = Logging.Create<AudioRepository>();
 
         private readonly List<string> _loadedBnkDataLanguages = [];
         private readonly List<LoadedLayer> _loadedLayers = [];
@@ -57,6 +61,8 @@ namespace Editors.Audio.Shared.Storage
         private bool _allCachedHircsLoaded;
         private bool _allCachedDidxLoaded;
         private Dictionary<uint, List<HircItem>> _hircsById = [];
+        private Dictionary<uint, Dictionary<string, HircItem>> _hircByBnkPathById = [];
+        private Dictionary<uint, Dictionary<string, HircItem>> _resolvedHircByReferringBnkPathById = [];
         private Dictionary<AkBkHircType, List<HircItem>> _hircsByType = [];
         private Dictionary<uint, List<DidxAudio>> _didxAudioListById = [];
 
@@ -190,6 +196,8 @@ namespace Editors.Audio.Shared.Storage
             _allCachedHircsLoaded = false;
             _allCachedDidxLoaded = false;
             _hircsById = [];
+            _hircByBnkPathById = [];
+            _resolvedHircByReferringBnkPathById = [];
             _hircsByType = [];
             _didxAudioListById = [];
             PackFileByBnkName = [];
@@ -253,6 +261,43 @@ namespace Editors.Audio.Shared.Storage
 
         public List<HircItem> GetHircs(uint id, string owningFileName) => GetHircs(id).Where(x => x.BnkFilePath == owningFileName).ToList();
 
+        public Dictionary<HircReferenceRequest, HircItem> ResolveHircReferences(IReadOnlyCollection<HircReferenceRequest> requests)
+        {
+            var result = new Dictionary<HircReferenceRequest, HircItem>();
+            var unresolvedRequests = new List<HircReferenceRequest>();
+
+            foreach (var request in (requests ?? []).Where(request => request != null && request.HircId != 0).Distinct())
+            {
+                if (TryGetResolvedHirc(request.HircId, request.ReferringBnkFilePath, out var resolvedHirc))
+                {
+                    result[request] = resolvedHirc;
+                    continue;
+                }
+
+                if (TryGetCachedHirc(request.HircId, request.ReferringBnkFilePath, out var sameBankHirc))
+                {
+                    CacheResolvedHirc(request.HircId, request.ReferringBnkFilePath, sameBankHirc);
+                    result[request] = sameBankHirc;
+                    continue;
+                }
+
+                if (_hircsById.TryGetValue(request.HircId, out var cachedCandidates) && cachedCandidates.Count != 0)
+                {
+                    var selectedHirc = SelectCachedFallback(request, cachedCandidates);
+                    CacheResolvedHirc(request.HircId, request.ReferringBnkFilePath, selectedHirc);
+                    result[request] = selectedHirc;
+                    continue;
+                }
+
+                unresolvedRequests.Add(request);
+            }
+
+            if (unresolvedRequests.Count != 0 && _loadedLayers.Count != 0 && !_allCachedHircsLoaded)
+                ResolveUncachedHircReferences(unresolvedRequests, result);
+
+            return result;
+        }
+
         public Dictionary<uint, List<HircItem>> GetHircs(IReadOnlyCollection<uint> ids)
         {
             var resolvedHircsById = new Dictionary<uint, List<HircItem>>();
@@ -276,6 +321,7 @@ namespace Editors.Audio.Shared.Storage
                 foreach (var hircsForId in loadedHircs.GroupBy(hirc => hirc.Id))
                 {
                     var groupedHircs = hircsForId.ToList();
+                    CacheHircsByBnkPath(groupedHircs);
                     _hircsById[hircsForId.Key] = groupedHircs;
                     resolvedHircsById[hircsForId.Key] = groupedHircs;
                 }
@@ -454,6 +500,8 @@ namespace Editors.Audio.Shared.Storage
             _loadedLayers.Clear();
             _loadedLayers.AddRange(layers);
             _hircsById = [];
+            _hircByBnkPathById = [];
+            _resolvedHircByReferringBnkPathById = [];
             _hircsByType = [];
             _didxAudioListById = [];
             _allCachedHircsLoaded = false;
@@ -614,6 +662,163 @@ namespace Editors.Audio.Shared.Storage
         {
             foreach (var layer in layers)
                 layer.AudioCache.Dispose();
+        }
+
+        private void ResolveUncachedHircReferences(
+            IReadOnlyCollection<HircReferenceRequest> requests,
+            Dictionary<HircReferenceRequest, HircItem> result)
+        {
+            var selectedReferenceByRequest = new Dictionary<HircReferenceRequest, BnkHircReference>();
+
+            foreach (var requestsByBank in requests.GroupBy(request => request.ReferringBnkFilePath ?? string.Empty, StringComparer.OrdinalIgnoreCase))
+            {
+                var ids = requestsByBank.Select(request => request.HircId).Distinct().ToArray();
+                var sameBankReferences = new List<BnkHircReference>();
+                foreach (var layer in _loadedLayers)
+                    sameBankReferences.AddRange(layer.AudioCache.FindHircs(ids, requestsByBank.Key, layer.ResolvedBnkPaths));
+
+                var sameBankReferenceById = sameBankReferences
+                    .GroupBy(reference => reference.Id)
+                    .ToDictionary(group => group.Key, group => group.First());
+                foreach (var request in requestsByBank)
+                {
+                    if (sameBankReferenceById.TryGetValue(request.HircId, out var reference))
+                        selectedReferenceByRequest[request] = reference;
+                }
+            }
+
+            var fallbackRequests = requests.Where(request => !selectedReferenceByRequest.ContainsKey(request)).ToArray();
+            if (fallbackRequests.Length != 0)
+            {
+                var fallbackIds = fallbackRequests.Select(request => request.HircId).Distinct().ToArray();
+                var fallbackReferences = new List<BnkHircReference>();
+                foreach (var layer in _loadedLayers)
+                    fallbackReferences.AddRange(layer.AudioCache.FindHircs(fallbackIds, layer.ResolvedBnkPaths));
+
+                var fallbackReferencesById = fallbackReferences
+                    .GroupBy(reference => reference.Id)
+                    .ToDictionary(group => group.Key, group => group.ToList());
+                foreach (var request in fallbackRequests)
+                {
+                    if (!fallbackReferencesById.TryGetValue(request.HircId, out var candidates) || candidates.Count == 0)
+                        continue;
+
+                    WarnIfAmbiguousHircReference(request.HircId, request.ReferringBnkFilePath, candidates.Select(candidate => candidate.BnkPath));
+                    selectedReferenceByRequest[request] = candidates[0];
+                }
+            }
+
+            var referencesToLoad = new List<BnkHircReference>();
+            foreach (var (request, reference) in selectedReferenceByRequest)
+            {
+                if (TryGetCachedHirc(reference.Id, reference.BnkPath, out var cachedHirc))
+                {
+                    CacheResolvedHirc(request.HircId, request.ReferringBnkFilePath, cachedHirc);
+                    result[request] = cachedHirc;
+                }
+                else
+                {
+                    referencesToLoad.Add(reference);
+                }
+            }
+
+            if (referencesToLoad.Count != 0)
+                CacheHircsByBnkPath(_bnkLoader.LoadHircs(referencesToLoad.Distinct().ToList()));
+
+            foreach (var (request, reference) in selectedReferenceByRequest)
+            {
+                if (result.ContainsKey(request) || !TryGetCachedHirc(reference.Id, reference.BnkPath, out var loadedHirc))
+                    continue;
+
+                CacheResolvedHirc(request.HircId, request.ReferringBnkFilePath, loadedHirc);
+                result[request] = loadedHirc;
+            }
+        }
+
+        private HircItem SelectCachedFallback(HircReferenceRequest request, IEnumerable<HircItem> candidates)
+        {
+            var orderedCandidates = candidates
+                .OrderBy(candidate => candidate.BnkFilePath, StringComparer.OrdinalIgnoreCase)
+                .ThenBy(candidate => candidate.IndexInFile)
+                .ToList();
+            WarnIfAmbiguousHircReference(request.HircId, request.ReferringBnkFilePath, orderedCandidates.Select(candidate => candidate.BnkFilePath));
+            return orderedCandidates[0];
+        }
+
+        private bool TryGetCachedHirc(uint id, string bnkFilePath, out HircItem hirc)
+        {
+            hirc = null;
+            if (string.IsNullOrWhiteSpace(bnkFilePath))
+                return false;
+
+            if (_hircByBnkPathById.TryGetValue(id, out var hircByBnkPath) &&
+                hircByBnkPath.TryGetValue(bnkFilePath, out hirc))
+            {
+                return true;
+            }
+
+            if (!_hircsById.TryGetValue(id, out var hircs))
+                return false;
+
+            hirc = hircs.FirstOrDefault(candidate => string.Equals(candidate.BnkFilePath, bnkFilePath, StringComparison.OrdinalIgnoreCase));
+            if (hirc == null)
+                return false;
+
+            CacheHircsByBnkPath([hirc]);
+            return true;
+        }
+
+        private bool TryGetResolvedHirc(uint id, string referringBnkFilePath, out HircItem hirc)
+        {
+            hirc = null;
+            return !string.IsNullOrWhiteSpace(referringBnkFilePath) &&
+                   _resolvedHircByReferringBnkPathById.TryGetValue(id, out var hircByReferringBnkPath) &&
+                   hircByReferringBnkPath.TryGetValue(referringBnkFilePath, out hirc);
+        }
+
+        private void CacheResolvedHirc(uint id, string referringBnkFilePath, HircItem hirc)
+        {
+            if (hirc == null || string.IsNullOrWhiteSpace(referringBnkFilePath))
+                return;
+
+            if (!_resolvedHircByReferringBnkPathById.TryGetValue(id, out var hircByReferringBnkPath))
+            {
+                hircByReferringBnkPath = new Dictionary<string, HircItem>(StringComparer.OrdinalIgnoreCase);
+                _resolvedHircByReferringBnkPathById[id] = hircByReferringBnkPath;
+            }
+
+            hircByReferringBnkPath[referringBnkFilePath] = hirc;
+        }
+
+        private void CacheHircsByBnkPath(IEnumerable<HircItem> hircs)
+        {
+            foreach (var hirc in hircs)
+            {
+                if (hirc == null || string.IsNullOrWhiteSpace(hirc.BnkFilePath))
+                    continue;
+
+                if (!_hircByBnkPathById.TryGetValue(hirc.Id, out var hircByBnkPath))
+                {
+                    hircByBnkPath = new Dictionary<string, HircItem>(StringComparer.OrdinalIgnoreCase);
+                    _hircByBnkPathById[hirc.Id] = hircByBnkPath;
+                }
+
+                hircByBnkPath[hirc.BnkFilePath] = hirc;
+            }
+        }
+
+        private void WarnIfAmbiguousHircReference(uint id, string referringBnkFilePath, IEnumerable<string> candidateBnkPaths)
+        {
+            var paths = candidateBnkPaths
+                .Where(path => !string.IsNullOrWhiteSpace(path))
+                .Distinct(StringComparer.OrdinalIgnoreCase)
+                .ToList();
+            if (paths.Count <= 1)
+                return;
+
+            _logger.Here().Warning(
+                $"HIRC reference {id} from '{referringBnkFilePath}' was not found in its referring bank and matched multiple banks. " +
+                $"Using '{paths[0]}'. Candidates: {string.Join(", ", paths)}");
         }
 
         public void Dispose()
