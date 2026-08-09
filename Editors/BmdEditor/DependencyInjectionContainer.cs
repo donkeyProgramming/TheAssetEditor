@@ -1,4 +1,5 @@
-﻿using Editors.BmdEditor.ViewModels;
+﻿using Editors.BmdEditor.ContextMenu;
+using Editors.BmdEditor.ViewModels;
 using Editors.BmdEditor.Views;
 using Editors.BmdEditor.Services;
 using Microsoft.Extensions.DependencyInjection;
@@ -14,6 +15,7 @@ using GameWorld.Core.Rendering.Materials;
 using GameWorld.Core.Rendering.Geometry;
 using GameWorld.Core.WpfWindow;
 using GameWorld.Core.Components.Selection;
+using Shared.Ui.BaseDialogs.PackFileTree.ContextMenu;
 
 namespace Editors.BmdEditor
 {
@@ -23,18 +25,22 @@ namespace Editors.BmdEditor
         {
             // Views
             serviceCollection.AddTransient<BmdEditorView>();
-            serviceCollection.AddTransient<BmdSceneView>();
-            serviceCollection.AddTransient<Bmd3DSceneViewer>();
 
             // ViewModels
             serviceCollection.AddScoped<BmdEditorViewModel>();
-            serviceCollection.AddScoped<BmdSceneViewModel>();
             serviceCollection.AddScoped<IEditorInterface, BmdEditorViewModel>();
 
             // Services
             serviceCollection.AddScoped<BmdSceneCreator>();
             serviceCollection.AddScoped<SelectionManager>();
             serviceCollection.AddScoped<BmdElementLoader>();
+
+            // Game components (picked up by IComponentInserter)
+            RegisterGameComponent<BmdGizmoComponent>(serviceCollection);
+
+            // Context menu
+            serviceCollection.AddScoped<ExportBmdAsTerryProjectCommand>();
+            serviceCollection.AddSingleton<IPackFileContextMenuRegistration, BmdPackFileContextMenuRegistration>();
 
             RegisterAllAsInterface<IDeveloperConfiguration>(serviceCollection, ServiceLifetime.Transient);
         }
@@ -46,6 +52,14 @@ namespace Editors.BmdEditor
                 .AddExtention(".bmd", EditorPriorites.Default)
                 //.AddExtention(".bin", EditorPriorites.Default) // TODO: Re-enable when BMD parser is complete
                 .Build(editorDatabase);
+        }
+    }
+
+    public class BmdPackFileContextMenuRegistration : IPackFileContextMenuRegistration
+    {
+        public void Register(PackFileContextMenuRegistry registry)
+        {
+            registry.RegisterPackFileContextMenuItem<ExportBmdAsTerryProjectCommand>(ContextMenuType.MainApplication, path: "Export", priority: 40, ContextMenuCluster.Export);
         }
     }
 }

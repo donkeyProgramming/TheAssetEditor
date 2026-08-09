@@ -6,6 +6,16 @@ namespace Shared.GameFormats.Bmd
     public class BmdFile
     {
         public FastBinHeader Header { get; set; } = new FastBinHeader();
+
+        /// <summary>
+        /// Per-section header version numbers (e.g. "BattlefieldBuilding", "Prop", "SpotLight" -
+        /// see the keys <see cref="BmdParser"/> writes into this dictionary). These are read from
+        /// the stream purely to advance position - nothing in the parser branches on them - but
+        /// <see cref="BmdWriter"/> needs the original value back to reproduce the file byte-for-byte,
+        /// so they're captured here rather than discarded. Missing key = version 0 (used when a
+        /// section has no separate version field at all, e.g. GoOutline).
+        /// </summary>
+        public Dictionary<string, ushort> SectionVersions { get; set; } = [];
         public List<BattlefieldBuilding> BattlefieldBuildings { get; set; } = [];
         public List<BattlefieldBuildingFar> BattlefieldBuildingFars { get; set; } = [];
         public List<CaptureLocation> CaptureLocations { get; set; } = [];
@@ -56,6 +66,17 @@ namespace Shared.GameFormats.Bmd
     
     public struct CultureMask
     {
+        /// <summary>
+        /// The exact 8 bytes this was decoded from, when read by <see cref="BmdParser.ReadCultureMask"/>.
+        /// Several bit positions within these bytes aren't decoded into any named field below (real
+        /// vanilla files set them as part of an all-<c>0xFF</c> "no restriction" pattern), so
+        /// <see cref="BmdWriter"/> writes these raw bytes back directly when present instead of
+        /// reconstructing from the named bools alone, which would silently zero those bits. Null for
+        /// a mask built by other code (e.g. freshly constructed, not parsed) - <see cref="BmdWriter"/>
+        /// falls back to bit-reconstruction in that case.
+        /// </summary>
+        public byte[]? RawBytes { get; set; }
+
         // First byte
         public bool CultMaskBase { get; set; }
         public bool CultMaskBst { get; set; }
@@ -246,6 +267,16 @@ namespace Shared.GameFormats.Bmd
     {
         public ushort PropInfoVersion { get; set; }
         public string Rmv2Path { get; set; } = string.Empty;
+
+        /// <summary>
+        /// The prop's original index into the file's shared string table (only set for
+        /// <see cref="PropInfoVersion"/> &gt; 12, which reference <see cref="Rmv2Path"/> by index
+        /// rather than storing it inline). The table can contain duplicate paths in real files, so
+        /// <see cref="BmdWriter"/> prefers reusing this exact index over re-deriving one from
+        /// <see cref="Rmv2Path"/> alone, to avoid silently repointing a prop at a different (though
+        /// string-identical) table slot on an unedited save.
+        /// </summary>
+        public int? PropIndex { get; set; }
         public Matrix Transform { get; set; } = Matrix.Identity;
         public bool IsDecal { get; set; }
         public bool LogicalDecal { get; set; }
