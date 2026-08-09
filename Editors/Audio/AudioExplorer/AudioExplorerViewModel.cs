@@ -297,26 +297,108 @@ namespace Editors.Audio.AudioExplorer
             }
         }
 
-        public static void RunDepthFirstSearchToSound(HircTreeNode selectedNode)
+        public static void AutoExpandNode(HircTreeNode selectedNode)
         {
+            if (IsVoActorStateNode(selectedNode))
+                ExpandFirstStatePathAndAudioSubtree(selectedNode);
+            else if (HasSingleRouteToFirstAutoExpansionTarget(selectedNode))
+                ExpandAllDescendantPaths(selectedNode);
+            else
+                selectedNode.IsExpanded = true;
+        }
+
+        private static void ExpandFirstStatePathAndAudioSubtree(HircTreeNode selectedNode)
+        {
+            var visitedNodes = new HashSet<HircTreeNode>();
             var currentNode = selectedNode;
-            var visitedNodes = new System.Collections.Generic.HashSet<HircTreeNode>();
 
             while (currentNode != null && visitedNodes.Add(currentNode))
             {
-                if (currentNode.Hirc?.HircType == AkBkHircType.Sound)
-                    return;
-
-                // Expanding resolves this node's pending HIRCs in one breadth-first batch
                 currentNode.IsExpanded = true;
 
-                // A branch needs a user choice, only an unambiguous path goes deeper
-                if (currentNode.Children == null || currentNode.Children.Count != 1)
+                var firstStateChild = currentNode.Children?.FirstOrDefault(IsStatePathNode);
+                if (firstStateChild == null)
+                {
+                    ExpandAllDescendantPaths(currentNode);
                     return;
+                }
 
-                currentNode = currentNode.Children[0];
+                currentNode = firstStateChild;
             }
         }
+
+        private static void ExpandAllDescendantPaths(HircTreeNode selectedNode)
+        {
+            var visitedNodes = new HashSet<HircTreeNode>();
+            var nodesToExpand = new Stack<HircTreeNode>();
+            nodesToExpand.Push(selectedNode);
+
+            while (nodesToExpand.Count != 0)
+            {
+                var currentNode = nodesToExpand.Pop();
+                if (currentNode == null || !visitedNodes.Add(currentNode))
+                    continue;
+
+                currentNode.IsExpanded = true;
+
+                if (currentNode.Children == null)
+                    continue;
+
+                for (var childIndex = currentNode.Children.Count - 1; childIndex >= 0; childIndex--)
+                    nodesToExpand.Push(currentNode.Children[childIndex]);
+            }
+        }
+
+        private static bool HasSingleRouteToFirstAutoExpansionTarget(HircTreeNode selectedNode)
+        {
+            var visitedNodes = new HashSet<HircTreeNode>();
+            var nodesToVisit = new Stack<HircTreeNode>();
+            var targetCount = 0;
+            nodesToVisit.Push(selectedNode);
+
+            while (nodesToVisit.Count != 0)
+            {
+                var currentNode = nodesToVisit.Pop();
+                if (currentNode == null || !visitedNodes.Add(currentNode))
+                    continue;
+
+                if (IsAutoExpansionTarget(currentNode))
+                {
+                    targetCount++;
+                    if (targetCount > 1)
+                        return false;
+
+                    continue;
+                }
+
+                currentNode.ResolveChildren();
+                if (currentNode.Children == null)
+                    continue;
+
+                for (var childIndex = currentNode.Children.Count - 1; childIndex >= 0; childIndex--)
+                    nodesToVisit.Push(currentNode.Children[childIndex]);
+            }
+
+            return targetCount == 1;
+        }
+
+        private static bool IsAutoExpansionTarget(HircTreeNode node)
+        {
+            var hircType = node.Hirc?.HircType;
+            return hircType == AkBkHircType.Sound ||
+                   hircType == AkBkHircType.RandomSequenceContainer ||
+                   hircType == AkBkHircType.SwitchContainer ||
+                   hircType == AkBkHircType.Music_Random_Sequence ||
+                   hircType == AkBkHircType.Music_Switch;
+        }
+
+        private static bool IsVoActorStateNode(HircTreeNode node) =>
+            IsStatePathNode(node) &&
+            node.DisplayName.StartsWith("State [VO_Actor]", StringComparison.OrdinalIgnoreCase);
+
+        private static bool IsStatePathNode(HircTreeNode node) =>
+            node.IsMetaNode &&
+            node.DisplayName.StartsWith("State [", StringComparison.OrdinalIgnoreCase);
 
         private static bool FilterTreeByVOActor(HircTreeNode currentNode, string voActor)
         {

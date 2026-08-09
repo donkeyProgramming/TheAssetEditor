@@ -19,7 +19,15 @@ namespace Editors.Audio.AudioExplorer
 
         partial void OnIsExpandedChanged(bool value)
         {
-            if (!value || ResolveChildrenCallback == null)
+            if (!value)
+                return;
+
+            ResolveChildren();
+        }
+
+        internal void ResolveChildren()
+        {
+            if (ResolveChildrenCallback == null)
                 return;
 
             var resolveChildren = ResolveChildrenCallback;

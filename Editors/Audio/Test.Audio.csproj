@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net10.0-windows</TargetFramework>
@@ -22,6 +22,7 @@
 
   <ItemGroup>
     <Compile Include="AudioCacheTests.cs" />
+    <Compile Include="AudioExplorerTests.cs" />
     <Using Include="NUnit.Framework" />
   </ItemGroup>
 

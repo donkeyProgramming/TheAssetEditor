@@ -1,4 +1,5 @@
-﻿using System.Windows.Controls;
+﻿using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 
@@ -13,7 +14,7 @@ namespace Editors.Audio.AudioExplorer
 
         private void OnNodeDoubleClick(object sender, MouseButtonEventArgs e)
         {
-            if (e.OriginalSource is not System.Windows.DependencyObject source ||
+            if (e.OriginalSource is not DependencyObject source ||
                 FindAncestor<TreeViewItem>(source) is not TreeViewItem treeViewItem ||
                 treeViewItem.DataContext is not HircTreeNode node)
                 return;
@@ -21,13 +22,12 @@ namespace Editors.Audio.AudioExplorer
             if (node.IsExpanded)
                 node.IsExpanded = false;
             else
-                AudioExplorerViewModel.RunDepthFirstSearchToSound(node);
+                AudioExplorerViewModel.AutoExpandNode(node);
 
             e.Handled = true;
         }
 
-        private static T FindAncestor<T>(System.Windows.DependencyObject source)
-            where T : System.Windows.DependencyObject
+        private static T FindAncestor<T>(DependencyObject source) where T : DependencyObject
         {
             for (var current = source; current != null; current = VisualTreeHelper.GetParent(current))
             {
@@ -38,7 +38,7 @@ namespace Editors.Audio.AudioExplorer
             return null;
         }
 
-        private void OnNodeExpanded(object sender, System.Windows.RoutedEventArgs e)
+        private void OnNodeExpanded(object sender, RoutedEventArgs e)
         {
             if (!ReferenceEquals(sender, e.OriginalSource) ||
                 sender is not TreeViewItem treeViewItem ||
