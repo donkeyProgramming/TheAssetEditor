@@ -18,23 +18,19 @@ namespace Editors.Audio.Shared.Storage
         {
             public Dictionary<uint, string> NameById { get; set; } = [];
             public Dictionary<string, List<string>> StateGroupsByDialogueEvent { get; set; } = [];
-            public Dictionary<string, Dictionary<string, string>> QualifiedStateGroupByStateGroupByDialogueEvent { get; set; } = [];
             public Dictionary<string, List<string>> StatesByStateGroup { get; set; } = [];
         }
 
         private readonly IPackFileService _pfs = pfs;
         private readonly ApplicationSettingsService _applicationSettingsService = applicationSettingsService;
 
-        public Result LoadDatData()
+        public Result LoadDatData(List<IPackFileContainer> containers = null)
         {
-            var datDb = LoadDatFiles(_pfs, out var _);
-            var nameLookUp = BuildNameHelper(datDb);
+            var datDb = LoadDatFiles(containers, out var _);
+            var nameLookUp = BuildNameHelper(datDb, containers);
 
             var unprocessedDialogueEventsWithStateGroups = datDb.DialogueEventsWithStateGroups;
             var processedDialogueEventsWithStateGroups = ProcessDialogueEvents(unprocessedDialogueEventsWithStateGroups, nameLookUp);
-
-            // Add qualifiers to State Groups as some events have the same State Group twice e.g. VO_Actor.
-            var dialogueEventsWithStateGroupsWithQualifiersAndStateGroups = BuildDialogueEventsWithStateGroupsWithQualifiersAndStateGroups(processedDialogueEventsWithStateGroups);
 
             var stateGroupsWithStates0 = datDb.StateGroupsWithStates0;
             var stateGroupsWithStates1 = datDb.StateGroupsWithStates1;
@@ -45,7 +41,6 @@ namespace Editors.Audio.Shared.Storage
             {
                 NameById = nameLookUp,
                 StateGroupsByDialogueEvent = processedDialogueEventsWithStateGroups,
-                QualifiedStateGroupByStateGroupByDialogueEvent = dialogueEventsWithStateGroupsWithQualifiersAndStateGroups,
                 StatesByStateGroup = processedStateGroupsWithStates,
             };
         }
@@ -122,20 +117,20 @@ namespace Editors.Audio.Shared.Storage
             return dialogueEventsWithStateGroupsWithQualifiersAndStateGroups;
         }
 
-        public Dictionary<uint, string> BuildNameHelper(SoundDatFile wh3Db)
+        public Dictionary<uint, string> BuildNameHelper(SoundDatFile wh3Db, List<IPackFileContainer> containers = null)
         {
             var nameLookUp = new Dictionary<uint, string>();
             var wh3DbNameList = wh3Db.CreateFileNameList();
             AddNames(wh3DbNameList, nameLookUp);
 
-            var bnkFiles = PackFileServiceUtility.FindAllWithExtention(_pfs, ".bnk");
+            var bnkFiles = FindFiles(".bnk", containers);
             var bnkNames = bnkFiles.Select(x => x.Name.Replace(".bnk", "")).ToArray();
             AddNames(bnkNames, nameLookUp);
 
             var languages = new List<string> { "sfx", "chinese", "english(uk)", "french(france)", "german", "italian", "polish", "russian", "spanish(spain)" }.ToArray();
             AddNames(languages, nameLookUp);
 
-            var wwiseIdFiles = PackFileServiceUtility.FindAllWithExtention(_pfs, ".wwiseids");
+            var wwiseIdFiles = FindFiles(".wwiseids", containers);
             foreach (var item in wwiseIdFiles)
             {
                 var data = Encoding.UTF8.GetString(item.DataSource.ReadData());
@@ -147,10 +142,10 @@ namespace Editors.Audio.Shared.Storage
             return nameLookUp;
         }
 
-        private SoundDatFile LoadDatFiles(IPackFileService pfs, out List<string> failedFiles)
+        private SoundDatFile LoadDatFiles(List<IPackFileContainer> containers, out List<string> failedFiles)
         {
-            var datFiles = PackFileServiceUtility.FindAllWithExtention(pfs, ".dat");
-            datFiles = PackFileUtil.FilterUnvantedFiles(pfs, datFiles, ["bank_splits.dat", "campaign_music.dat", "battle_music.dat", "icudt61l.dat"], out var removedFiles);
+            var datFiles = FindFiles(".dat", containers);
+            datFiles = PackFileUtil.FilterUnvantedFiles(_pfs, datFiles, ["bank_splits.dat", "campaign_music.dat", "battle_music.dat", "icudt61l.dat"], out var removedFiles);
 
             var failedDatParsing = new List<(string, string)>();
             var masterDat = new SoundDatFile();
@@ -164,13 +159,30 @@ namespace Editors.Audio.Shared.Storage
                 }
                 catch (Exception e)
                 {
-                    var fullPath = pfs.GetFullPath(datFile);
+                    var fullPath = _pfs.GetFullPath(datFile);
                     failedDatParsing.Add((fullPath, e.Message));
                 }
             }
 
             failedFiles = failedDatParsing.Select(x => x.Item1).ToList();
             return masterDat;
+        }
+
+        private List<PackFile> FindFiles(string extension, List<IPackFileContainer> containers)
+        {
+            if (containers == null)
+                return PackFileServiceUtility.FindAllWithExtentionIncludePaths(_pfs, extension)
+                    .Select(x => x.Pack)
+                    .ToList();
+
+            var effectiveFiles = new Dictionary<string, PackFile>(StringComparer.OrdinalIgnoreCase);
+            foreach (var container in containers)
+            {
+                foreach (var (path, file) in container.SearchFiles(null, [extension]))
+                    effectiveFiles[path] = file;
+            }
+
+            return effectiveFiles.Values.ToList();
         }
 
         private SoundDatFile LoadDatFile(PackFile datFile)

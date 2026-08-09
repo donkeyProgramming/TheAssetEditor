@@ -342,3 +342,6 @@ healthchecksdb
 
 # MonoGame build outputs
 /GameWorld/ContentProject/Content/bin/
+
+# A folder for research stuff
+/Research

@@ -9,7 +9,6 @@ using Editors.Audio.Shared.AudioProject.Models;
 using Editors.Audio.Shared.GameInformation.Warhammer3;
 using Editors.Audio.Shared.Storage;
 using Editors.Audio.Shared.Wwise.HircExploration;
-using Shared.Core.PackFiles.Models;
 using Shared.Core.PackFiles.Utility;
 using Shared.Core.Services;
 using Shared.Core.Settings;
@@ -143,18 +142,18 @@ namespace Editors.Audio.AudioProjectConverter
 
         private static List<HircItem> GetHircItems(List<string> soundBankPaths)
         {
-            var parsedSoundBanks = new List<ParsedBnkFile>();
+            var parsedSoundBanks = new List<BnkFile>();
 
             foreach (var soundBankPath in soundBankPaths)
             {
                 var soundBankDataBytes = File.ReadAllBytes(soundBankPath);
-                var soundBankPackFile = PackFile.CreateFromBytes(soundBankPath, soundBankDataBytes);
-                var parsedSoundBank = BnkParser.Parse(soundBankPackFile, soundBankPath, false);
+                var parsedSoundBank = BnkFile.CreateFromBytes(soundBankDataBytes, soundBankPath, false);
                 parsedSoundBanks.Add(parsedSoundBank);
             }
 
             var hircItems = parsedSoundBanks
-                .SelectMany(soundBank => soundBank.HircChunk.HircItems)
+                .Where(soundBank => soundBank.HircChunk != null)
+                .SelectMany(soundBank => soundBank.HircChunk!.HircItems)
                 .ToList();
 
             return hircItems;

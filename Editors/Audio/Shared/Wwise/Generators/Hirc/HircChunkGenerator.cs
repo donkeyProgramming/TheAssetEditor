@@ -9,7 +9,7 @@ namespace Editors.Audio.Shared.Wwise.Generators.Hirc
     {
         public static HircChunk GenerateHircChunk(List<HircItem> hircItems)
         {
-            var chunkSize = HircChunk.ChunkHeaderSize + (uint)(hircItems.Sum(hirc => HircItem.HircHeaderSize + hirc.SectionSize));
+            var chunkSize = HircChunk.ChunkHeaderSize + (uint)(hircItems.Sum(hirc => HircHeader.PrefixSize + hirc.SectionSize));
             var hircChunk = new HircChunk
             {
                 ChunkHeader = ChunkHeaderGenerator.GenerateChunkHeader(BankChunkTypes.HIRC, chunkSize),

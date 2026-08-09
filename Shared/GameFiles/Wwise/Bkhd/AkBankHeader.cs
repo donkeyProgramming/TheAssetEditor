@@ -4,6 +4,8 @@ namespace Shared.GameFormats.Wwise.Bkhd
 {
     public class AkBankHeader
     {
+        public const int MinimumSize = 20;
+
         public uint BankGeneratorVersion { get; set; }
         public uint SoundBankId { get; set; }
         public uint LanguageId { get; set; }
@@ -13,15 +15,18 @@ namespace Shared.GameFormats.Wwise.Bkhd
 
         public void ReadData(ByteChunk chunk, uint chunkSize)
         {
+            if (chunkSize < MinimumSize)
+                throw new InvalidDataException($"BKHD chunk is only {chunkSize} bytes.");
+
             BankGeneratorVersion = chunk.ReadUInt32();
             SoundBankId = chunk.ReadUInt32();
             LanguageId = chunk.ReadUInt32();
             AltValues = chunk.ReadUInt32();
             ProjectId = chunk.ReadUInt32();
 
-            var headerDiff = (int)chunkSize - 20;
-            if (headerDiff > 0)
-                Padding = chunk.ReadBytes(headerDiff);
+            var headerDifference = (int)chunkSize - MinimumSize;
+            if (headerDifference > 0)
+                Padding = chunk.ReadBytes(headerDifference);
         }
 
         public byte[] WriteData()

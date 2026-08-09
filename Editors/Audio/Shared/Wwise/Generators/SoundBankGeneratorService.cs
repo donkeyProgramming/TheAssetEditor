@@ -88,9 +88,8 @@ namespace Editors.Audio.Shared.Wwise.Generators
             var dialogueEventHircs = GenerateDialogueEventHircs(soundBank);
             hircItems.AddRange(dialogueEventHircs);
 
-            var vanillaDialogueEvents = _audioRepository.GetHircsByType<ICAkDialogueEvent>()
-                .Select(hircItem => hircItem as HircItem)
-                .Where(hircItem => hircItem.IsCAHircItem == true);
+            var vanillaDialogueEvents = _audioRepository.GetHircs(AkBkHircType.Dialogue_Event)
+                .Where(hircItem => hircItem.IsCA == true);
 
             foreach (var hircItem in hircItems)
             {
@@ -443,7 +442,7 @@ namespace Editors.Audio.Shared.Wwise.Generators
             var bytes = memStream.ToArray();
 
             var bnkPackFile = new PackFile(fileName, new MemorySource(bytes));
-            var reparsedSanityFile = BnkParser.Parse(bnkPackFile, "test\\fakefilename.bnk", true);
+            var reparsedSanityFile = BnkFile.CreateFromBytes(bnkPackFile.DataSource.ReadData(), "test\\fakefilename.bnk", true);
 
             _fileSaveService.Save(filePath, bnkPackFile.DataSource.ReadData(), false);
         }

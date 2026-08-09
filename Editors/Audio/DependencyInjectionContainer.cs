@@ -25,6 +25,7 @@ using Editors.Audio.Shared.AudioProject.Compiler;
 using Editors.Audio.Shared.AudioProject.Factories;
 using Editors.Audio.Shared.Dat;
 using Editors.Audio.Shared.Storage;
+using Editors.Audio.Shared.Storage.CacheDatabase;
 using Editors.Audio.Shared.Utilities;
 using Editors.Audio.Shared.Wwise;
 using Editors.Audio.Shared.Wwise.Generators;
@@ -132,6 +133,7 @@ namespace Editors.Audio
 
             // Shared audio stuff 
             serviceCollection.AddScoped<IAudioRepository, AudioRepository>();
+            serviceCollection.AddScoped<IAudioCacheHelper, AudioCacheHelper>();
             serviceCollection.AddScoped<IMovieAudioResolver, MovieAudioResolver>();
             serviceCollection.AddSingleton<BnkLoader>();
             serviceCollection.AddSingleton<DatLoader>();

@@ -30,7 +30,8 @@ namespace Editors.Reports.Audio
 
         public void PrintInfo()
         {
-            var itemsToProcess = _audioRepository.GetHircsByType<HircItem>()
+            var itemsToProcess = _audioRepository.HircsById.Values
+                .SelectMany(hircs => hircs)
                 .Where(item => item is ICAkDialogueEvent or ICAkEvent)
                 .ToList();
 

@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-using System.IO;
-using System.Linq;
+﻿using System.IO;
 using Editors.Audio.Shared.Storage;
 using Shared.GameFormats.Wwise.Enums;
 using Shared.GameFormats.Wwise.Hirc;
@@ -50,9 +48,9 @@ namespace Editors.Audio.AudioExplorer
             {
                 var hircs = new List<HircItem>();
                 if (searchByActionEvent)
-                    hircs = _audioRepository.GetHircsByHircType(AkBkHircType.Event);
+                    hircs = _audioRepository.GetHircs(AkBkHircType.Event);
                 else if (searchByDialogueEvent)
-                    hircs = _audioRepository.GetHircsByHircType(AkBkHircType.Dialogue_Event);
+                    hircs = _audioRepository.GetHircs(AkBkHircType.Dialogue_Event);
 
                 selectedList = hircs
                     .Select(hirc => new ExplorerListItem

@@ -2,6 +2,7 @@
 using Editors.Audio.Shared.Storage;
 using Shared.Core.Events;
 using Shared.Core.Misc;
+using Shared.GameFormats.Wwise.Enums;
 using Shared.GameFormats.Wwise.Hirc;
 
 namespace Editors.Reports.Audio
@@ -30,7 +31,7 @@ namespace Editors.Reports.Audio
 
         public void PrintDialogueEventInfo()
         {
-            var dialogueEvents = _audioRepository.GetHircsByType<ICAkDialogueEvent>();
+            var dialogueEvents = _audioRepository.GetHircs(AkBkHircType.Dialogue_Event).OfType<ICAkDialogueEvent>();
             foreach (var dialogueEvent in dialogueEvents)
                 PrintDialogueEventInfo(dialogueEvent);
         }
