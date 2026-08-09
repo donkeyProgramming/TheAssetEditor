@@ -1,0 +1,45 @@
+<Window x:Class="Editors.CampaignAnimationSetEditor.Views.BattleFragmentPickerWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:local="clr-namespace:Editors.CampaignAnimationSetEditor.Views"
+        Style="{StaticResource CustomWindowStyle}"
+        Title="Generate from Battle Animation Set" Height="500" Width="600"
+        WindowStartupLocation="CenterOwner">
+    <Window.Resources>
+        <local:AnimationFragmentDisplayConverter x:Key="FragmentDisplayConverter"/>
+    </Window.Resources>
+    <Grid Margin="10">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <TextBox Grid.Row="0" Margin="0,0,0,5" Text="{Binding FilterText, UpdateSourceTrigger=PropertyChanged}"
+                 ToolTip="Filter by path"/>
+
+        <ListBox Grid.Row="1" ItemsSource="{Binding Fragments}" SelectedItem="{Binding SelectedFragment}"
+                 x:Name="FragmentListBox" MouseDoubleClick="FragmentListBox_MouseDoubleClick">
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <TextBlock Text="{Binding Converter={StaticResource FragmentDisplayConverter}}"/>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
+
+        <CheckBox Grid.Row="2" Margin="0,10,0,0" Content="Force ground animations (ignore flying)"
+                  IsChecked="{Binding ForceGroundAnimations}"
+                  ToolTip="If this set has flying animations (FLY_STAND etc.), they're used by default. Check this to always use the ground moveset instead - e.g. if you want a flying unit to walk around the campaign map rather than fly. Has no effect on a unit with no flying animations to begin with."/>
+
+        <CheckBox Grid.Row="3" Margin="0,10,0,0" Content="Freeze root bone for rider animations"
+                  IsChecked="{Binding FreezeRootForRiderAnimations}"
+                  ToolTip="Only applies if the selected set is detected as a rider (mounted) skeleton. Some older-style mount rigs bake the mount's movement into every animation - not just locomotion - and need the root bone zeroed across the board to sit still on the campaign map. Most Warhammer 3 rider rigs are already authored in place and don't need this, so it defaults to off."/>
+
+        <StackPanel Grid.Row="4" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,10,0,0">
+            <Button Content="Generate" Width="90" Margin="0,0,10,0" IsDefault="True" Click="Ok_Click"/>
+            <Button Content="Cancel" Width="90" IsCancel="True"/>
+        </StackPanel>
+    </Grid>
+</Window>
