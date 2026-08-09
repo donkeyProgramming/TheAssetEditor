@@ -154,6 +154,7 @@ namespace Shared.GameFormats.AnimationPack.AnimPackFileTypes.Wh3
 
         string IAnimationBinGenericFormat.Name { get => Name; }
         string IAnimationBinGenericFormat.SkeletonName { get => SkeletonName; }
+        string IAnimationBinGenericFormat.MountBin { get => MountBin; }
         List<AnimationBinEntryGenericFormat> IAnimationBinGenericFormat.Entries
         {
             get

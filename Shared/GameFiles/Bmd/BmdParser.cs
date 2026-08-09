@@ -121,102 +121,105 @@ namespace Shared.GameFormats.Bmd
                 {
                     // Some unknown thing that was removed for some ungodly reason
                     var some_version = _reader.ReadUInt16();
+                    bmdFile.SectionVersions["LegacyPreV22"] = some_version;
                     var some_length = _reader.ReadUInt32();
                     _logger.Here().Information($"BMD Parser - Some version: {some_version}, Some length: {some_length}");
                 }
 
                 // BattlefieldBuilding
                 var battlefieldBuildingVersion = _reader.ReadUInt16();
-                ReadCollection("BattlefieldBuilding", bmdFile.BattlefieldBuildings, ReadBattlefieldBuilding, battlefieldBuildingVersion);
+                ReadCollection(bmdFile, "BattlefieldBuilding", bmdFile.BattlefieldBuildings, ReadBattlefieldBuilding, battlefieldBuildingVersion);
 
                 // BattlefieldBuildingFar
                 var battlefieldBuildingFarVersion = _reader.ReadUInt16();
-                ReadCollection("BattlefieldBuildingFar", bmdFile.BattlefieldBuildingFars, ReadBattlefieldBuildingFar, battlefieldBuildingFarVersion);
+                ReadCollection(bmdFile, "BattlefieldBuildingFar", bmdFile.BattlefieldBuildingFars, ReadBattlefieldBuildingFar, battlefieldBuildingFarVersion);
 
                 // CaptureLocation
                 var captureLocationVersion = _reader.ReadUInt16();
-                ReadCollection("CaptureLocation", bmdFile.CaptureLocations, ReadCaptureLocation, captureLocationVersion);
+                ReadCollection(bmdFile, "CaptureLocation", bmdFile.CaptureLocations, ReadCaptureLocation, captureLocationVersion);
 
                 // EFLine
                 // no version
-                ReadCollection("EFLine", bmdFile.EFLines, ReadEFLine);
+                ReadCollection(bmdFile, "EFLine", bmdFile.EFLines, ReadEFLine);
 
                 // GoOutline
                 // no version
-                ReadCollection("GoOutline", bmdFile.GoOutlines, ReadGoOutline);
+                ReadCollection(bmdFile, "GoOutline", bmdFile.GoOutlines, ReadGoOutline);
 
                 // NonTerrainOutline
                 // no version
-                ReadCollection("NonTerrainOutline", bmdFile.NonTerrainOutlines, ReadNonTerrainOutline);
+                ReadCollection(bmdFile, "NonTerrainOutline", bmdFile.NonTerrainOutlines, ReadNonTerrainOutline);
 
                 // ZonesTemplate
                 var zonesTemplateVersion = _reader.ReadUInt16();
-                ReadCollection("ZonesTemplate", bmdFile.ZonesTemplates, ReadZonesTemplate, zonesTemplateVersion);
+                ReadCollection(bmdFile, "ZonesTemplate", bmdFile.ZonesTemplates, ReadZonesTemplate, zonesTemplateVersion);
 
                 // Bmd
                 var bmdVersion = _reader.ReadUInt16();
-                ReadCollection("BmdInfo", bmdFile.BmdInfos, ReadBmdInfo, bmdVersion);
+                ReadCollection(bmdFile, "BmdInfo", bmdFile.BmdInfos, ReadBmdInfo, bmdVersion);
 
                 // BmdOutlines
                 var bmdOutlineVersion = _reader.ReadUInt16();
-                ReadCollection("BmdOutline", bmdFile.BmdOutlines, ReadBmdOutline, bmdOutlineVersion);
+                ReadCollection(bmdFile, "BmdOutline", bmdFile.BmdOutlines, ReadBmdOutline, bmdOutlineVersion);
 
                 // TerrainOutlines
                 // no version
-                ReadCollection("TerrainOutline", bmdFile.TerrainOutlines, ReadTerrainOutline);
+                ReadCollection(bmdFile, "TerrainOutline", bmdFile.TerrainOutlines, ReadTerrainOutline);
 
                 // LiteBuildingOutlines
                 // no version
-                ReadCollection("LiteBuildingOutline", bmdFile.LiteBuildingOutlines, ReadLiteBuildingOutline);
+                ReadCollection(bmdFile, "LiteBuildingOutline", bmdFile.LiteBuildingOutlines, ReadLiteBuildingOutline);
 
                 if (_fastBinVersion > 4)
                 {
                     // CameraZones
                     var cameraZoneVersion = _reader.ReadUInt16();
-                    ReadCollection("CameraZone", bmdFile.CameraZones, ReadCameraZone, cameraZoneVersion);
+                    ReadCollection(bmdFile, "CameraZone", bmdFile.CameraZones, ReadCameraZone, cameraZoneVersion);
                 }
                 if (_fastBinVersion > 7)
                 {
                     // CivilianDeployments
                     // no version
-                    ReadCollection("CivilianDeployment", bmdFile.CivilianDeployments, ReadCivilianDeployment);
+                    ReadCollection(bmdFile, "CivilianDeployment", bmdFile.CivilianDeployments, ReadCivilianDeployment);
 
                     // CivilianShelters
                     // no version
-                    ReadCollection("CivilianShelter", bmdFile.CivilianShelters, ReadCivilianShelter);
+                    ReadCollection(bmdFile, "CivilianShelter", bmdFile.CivilianShelters, ReadCivilianShelter);
 
                     // Prop
                     var propVersion = _reader.ReadUInt16();
+                    bmdFile.SectionVersions["Prop"] = propVersion;
                     ReadPropInfos(propVersion, bmdFile);
                 }
                 if (_fastBinVersion > 8)
                 {
                     // Vfx
                     var vfxVersion = _reader.ReadUInt16();
-                    ReadCollection("VfxInfo", bmdFile.VfxInfos, ReadVfxInfo, vfxVersion);
+                    ReadCollection(bmdFile, "VfxInfo", bmdFile.VfxInfos, ReadVfxInfo, vfxVersion);
 
                     // AiHints
                     var aiHintsVersion = _reader.ReadUInt16();
+                    bmdFile.SectionVersions["AiHints"] = aiHintsVersion;
                     _logger.Here().Information($"BMD Parser - AiHints version: {aiHintsVersion}");
-                    bmdFile.AiHints = ReadAiHints();
+                    bmdFile.AiHints = ReadAiHints(bmdFile);
                 }
                 if (_fastBinVersion > 10)
                 {
                     // LightProbe
                     var lightProbeVersion = _reader.ReadUInt16();
-                    ReadCollection("LightProbe", bmdFile.LightProbes, ReadLightProbeInfo, lightProbeVersion);
+                    ReadCollection(bmdFile, "LightProbe", bmdFile.LightProbes, ReadLightProbeInfo, lightProbeVersion);
 
                     // TerrainHole
                     var terrainHoleVersion = _reader.ReadUInt16();
-                    ReadCollection("TerrainHole", bmdFile.TerrainHoles, ReadTerrainHoleInfo, terrainHoleVersion);
+                    ReadCollection(bmdFile, "TerrainHole", bmdFile.TerrainHoles, ReadTerrainHoleInfo, terrainHoleVersion);
 
                     // PointLight
                     var pointLightVersion = _reader.ReadUInt16();
-                    ReadCollection("PointLight", bmdFile.PointLights, ReadPointLightInfo, pointLightVersion);
+                    ReadCollection(bmdFile, "PointLight", bmdFile.PointLights, ReadPointLightInfo, pointLightVersion);
 
                     // BuildingProjectileEmitters
                     var buildingProjectileEmitterVersion = _reader.ReadUInt16();
-                    ReadCollection("BuildingProjectileEmitter", bmdFile.BuildingProjectileEmitters, ReadBuildingProjectileEmitter, buildingProjectileEmitterVersion);
+                    ReadCollection(bmdFile, "BuildingProjectileEmitter", bmdFile.BuildingProjectileEmitters, ReadBuildingProjectileEmitter, buildingProjectileEmitterVersion);
                 }
                 if (_fastBinVersion > 15)
                 {
@@ -228,69 +231,69 @@ namespace Shared.GameFormats.Bmd
                 {
                     // PolyMesh
                     var polyMeshVersion = _reader.ReadUInt16();
-                    ReadCollection("PolyMesh", bmdFile.PolyMeshes, ReadPolyMeshInfo, polyMeshVersion);
+                    ReadCollection(bmdFile, "PolyMesh", bmdFile.PolyMeshes, ReadPolyMeshInfo, polyMeshVersion);
                 }
                 if (_fastBinVersion > 17) //guess
                 {
                     // TerrainStencilBlendTriangles
                     var terrainStencilBlendTriangleVersion = _reader.ReadUInt16();
-                    ReadCollection("TerrainStencilBlendTriangle", bmdFile.TerrainStencilBlendTriangles, ReadTerrainStencilBlendTriangle, terrainStencilBlendTriangleVersion);
+                    ReadCollection(bmdFile, "TerrainStencilBlendTriangle", bmdFile.TerrainStencilBlendTriangles, ReadTerrainStencilBlendTriangle, terrainStencilBlendTriangleVersion);
                 }
                 if (_fastBinVersion > 18) //guess
                 {
                     // SpotLight
                     var spotLightVersion = _reader.ReadUInt16();
-                    ReadCollection("SpotLight", bmdFile.SpotLights, ReadSpotLightInfo, spotLightVersion);
+                    ReadCollection(bmdFile, "SpotLight", bmdFile.SpotLights, ReadSpotLightInfo, spotLightVersion);
                 }
                 if (_fastBinVersion > 19) //guess
                 {
                     // Sound
                     var soundVersion = _reader.ReadUInt16();
-                    ReadCollection("Sound", bmdFile.Sounds, ReadSoundInfo, soundVersion);
+                    ReadCollection(bmdFile, "Sound", bmdFile.Sounds, ReadSoundInfo, soundVersion);
                 }
                 if (_fastBinVersion > 20)
                 {
                     // CSC (Composite Scene Container)
                     var cscVersion = _reader.ReadUInt16();
-                    ReadCollection("CSC", bmdFile.CscInfos, ReadCscInfo, cscVersion);
+                    ReadCollection(bmdFile, "CSC", bmdFile.CscInfos, ReadCscInfo, cscVersion);
                 }
                 if (_fastBinVersion > 21)
                 {
                     // Deployment
                     var deploymentVersion = _reader.ReadUInt16();
-                    ReadCollection("Deployment", bmdFile.Deployments, ReadDeployment, deploymentVersion);
+                    ReadCollection(bmdFile, "Deployment", bmdFile.Deployments, ReadDeployment, deploymentVersion);
 
                     // BmdCachedAreas
                     var bmdCachedAreaVersion = _reader.ReadUInt16();
-                    ReadCollection("BmdCachedArea", bmdFile.BmdCachedAreas, ReadBmdCachedArea, bmdCachedAreaVersion);
+                    ReadCollection(bmdFile, "BmdCachedArea", bmdFile.BmdCachedAreas, ReadBmdCachedArea, bmdCachedAreaVersion);
                 }
                 if (_fastBinVersion > 23)
                 {
                     // ToggleableBuildingSlots
                     var toggleableBuildingSlotVersion = _reader.ReadUInt16();
-                    ReadCollection("ToggleableBuildingSlot", bmdFile.ToggleableBuildingSlots, ReadToggleableBuildingSlot, toggleableBuildingSlotVersion);
+                    ReadCollection(bmdFile, "ToggleableBuildingSlot", bmdFile.ToggleableBuildingSlots, ReadToggleableBuildingSlot, toggleableBuildingSlotVersion);
                 }
                 if (_fastBinVersion > 24)
                 {
                     // TerraindDecals
                     var terraindDecalVersion = _reader.ReadUInt16();
-                    ReadCollection("TerraindDecal", bmdFile.TerraindDecals, ReadTerraindDecal, terraindDecalVersion);
+                    ReadCollection(bmdFile, "TerraindDecal", bmdFile.TerraindDecals, ReadTerraindDecal, terraindDecalVersion);
                 }
                 if (_fastBinVersion > 25)
                 {
                     // TreeListReferences
                     var treeListReferenceVersion = _reader.ReadUInt16();
-                    ReadCollection("TreeListReference", bmdFile.TreeListReferences, ReadTreeListReference, treeListReferenceVersion);
+                    ReadCollection(bmdFile, "TreeListReference", bmdFile.TreeListReferences, ReadTreeListReference, treeListReferenceVersion);
 
                     // GrassListReferences
                     var grassListReferenceVersion = _reader.ReadUInt16();
-                    ReadCollection("GrassListReference", bmdFile.GrassListReferences, ReadGrassListReference, grassListReferenceVersion);
+                    ReadCollection(bmdFile, "GrassListReference", bmdFile.GrassListReferences, ReadGrassListReference, grassListReferenceVersion);
                 }
                 if (_fastBinVersion > 26)
                 {
                     // WaterOutlines
                     // no version
-                    ReadCollection("WaterOutline", bmdFile.WaterOutlines, ReadWaterOutline);
+                    ReadCollection(bmdFile, "WaterOutline", bmdFile.WaterOutlines, ReadWaterOutline);
                 }
 
                 return bmdFile;
@@ -311,12 +314,15 @@ namespace Shared.GameFormats.Bmd
             return parser.Parse();
         }
 
-        private void ReadCollection<T>(string collectionName, List<T> collection, Func<T> readFunc, ushort? version = null)
+        private void ReadCollection<T>(BmdFile bmdFile, string collectionName, List<T> collection, Func<T> readFunc, ushort? version = null)
         {
+            if (version.HasValue)
+                bmdFile.SectionVersions[collectionName] = version.Value;
+
             var count = _reader.ReadUInt32();
             var versionText = version.HasValue ? $" version: {version.Value}," : "";
             _logger.Here().Information($"BMD Parser - {collectionName}{versionText} count: {count}");
-            
+
             for (var i = 0; i < count; i++)
             {
                 if (_stream.Position >= _stream.Length) break;
@@ -623,6 +629,8 @@ namespace Shared.GameFormats.Bmd
                 }
             }
 
+            bmdFile.Props = propsList;
+
             // PropInfo
             var propInfoCount = _reader.ReadUInt32();
             _logger.Here().Information($"BMD Parser - PropInfo count: {propInfoCount}");
@@ -649,6 +657,7 @@ namespace Shared.GameFormats.Bmd
                 // Map the PropIndex to the actual RMV2 path from the props list
                 var propIndex = _reader.ReadUInt32();
                 prop.Rmv2Path = propsList[(int)propIndex];
+                prop.PropIndex = (int)propIndex;
             }
             
             prop.Transform = ReadRowMajorMatrix(false);
@@ -794,24 +803,24 @@ namespace Shared.GameFormats.Bmd
             return vfx;
         }
 
-        private AiHints ReadAiHints()
+        private AiHints ReadAiHints(BmdFile bmdFile)
         {
             var aiHints = new AiHints();
-            
+
             // Read Separators
-            _ = _reader.ReadUInt16(); // separatorsVersion - unused
+            bmdFile.SectionVersions["AiHints.Separators"] = _reader.ReadUInt16();
             var separatorsCount = _reader.ReadUInt32();
             if (separatorsCount > 0)
                 throw new NotImplementedException("AiHints-Separators parsing not implemented yet");
-            
+
             // Read DirectedPoints
-            _ = _reader.ReadUInt16(); // directedPointsVersion - unused
+            bmdFile.SectionVersions["AiHints.DirectedPoints"] = _reader.ReadUInt16();
             var directedPointsCount = _reader.ReadUInt32();
             if (directedPointsCount > 0)
                 throw new NotImplementedException("AiHints-DirectedPoints parsing not implemented yet");
-            
+
             // Read PolyLines
-            _ = _reader.ReadUInt16(); // polyLinesVersion - unused
+            bmdFile.SectionVersions["AiHints.PolyLines"] = _reader.ReadUInt16();
             var polyLinesCount = _reader.ReadUInt32();
             for (var i = 0; i < polyLinesCount; i++)
             {
@@ -842,7 +851,7 @@ namespace Shared.GameFormats.Bmd
             }
             
             // Read PolyLinesList
-            _ = _reader.ReadUInt16(); // polyLinesListVersion - unused
+            bmdFile.SectionVersions["AiHints.PolyLinesList"] = _reader.ReadUInt16();
             var polyLinesListCount = _reader.ReadUInt32();
             for (var i = 0; i < polyLinesListCount; i++)
             {
@@ -1057,10 +1066,10 @@ namespace Shared.GameFormats.Bmd
             light.Volumetric = _reader.ReadByte() != 0;
             light.HeightMode = ReadString();
 
-             if (light.Version > 3)
-                light.PdlcMask = _reader.ReadUInt32();
-            else if (light.Version > 4)
+            if (light.Version > 4)
                 light.PdlcMask = _reader.ReadUInt64();
+            else if (light.Version > 3)
+                light.PdlcMask = _reader.ReadUInt32();
 
             if (light.Version > 7)
                 light.Flags = ReadBmdComponentFlags();
@@ -1314,15 +1323,17 @@ namespace Shared.GameFormats.Bmd
         {
             var mask = new CultureMask();
             var bytes = _reader.ReadBytes(8);
-            
+
             _logger.Here().Information($"BMD Parser - ReadCultureMask: read {bytes.Length} bytes, expected 8");
-            
+
             if (bytes.Length < 8)
             {
                 _logger.Here().Error($"BMD Parser - ReadCultureMask: Not enough bytes. Got {bytes.Length}, expected 8. Stream position: {_stream.Position}, Length: {_stream.Length}");
                 throw new EndOfStreamException($"Not enough bytes to read CultureMask. Got {bytes.Length}, expected 8");
             }
-            
+
+            mask.RawBytes = bytes;
+
             // First byte
             mask.CultMaskBase = (bytes[0] & 0x01) != 0;
             mask.CultMaskBst = (bytes[0] & 0x02) != 0;

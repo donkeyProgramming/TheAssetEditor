@@ -1,12 +1,13 @@
-﻿using System.IO;
+using System.Collections.Generic;
+using System.IO;
 using CommonControls.BaseDialogs.ErrorListDialog;
 using Shared.Core.ErrorHandling;
 using Shared.Core.PackFiles;
 using Shared.GameFormats.AnimationPack;
 
-namespace Editors.AnimationFragmentEditor.CampaignAnimBin
+namespace Editors.CampaignAnimationSetEditor.Services
 {
-    static class Validator
+    static class CampaignAnimationSetValidator
     {
         public static bool ValidateAnimationData(CampaignAnimationBin campaignAnimation, IPackFileService pfs, string path)
         {
@@ -29,7 +30,7 @@ namespace Editors.AnimationFragmentEditor.CampaignAnimBin
                 if (item.Name == "status_normal" && !IsItemStatus_NormalFound) IsItemStatus_NormalFound = true;
                 if (item.Name == "global") IsItemGlobalFound = true;
 
-                foreach (var item2 in item.Transitions)
+                foreach (var item2 in item.Transitions ?? [])
                 {
                     if (!CollectionsNotFoundAnims.ContainsKey("Transition")) CollectionsNotFoundAnims["Transition"] = new List<string>();
                     if (!CollectionsNotFoundMeta.ContainsKey("Transition")) CollectionsNotFoundMeta["Transition"] = new List<string>();
@@ -45,7 +46,7 @@ namespace Editors.AnimationFragmentEditor.CampaignAnimBin
                     if (!IsSoundFound) CollectionsNotFoundSound["Transition"].Add(item2.SoundMeta);
                 }
 
-                foreach (var item2 in item.Idle)
+                foreach (var item2 in item.Idle ?? [])
                 {
                     if (!CollectionsNotFoundAnims.ContainsKey("Idle")) CollectionsNotFoundAnims["Idle"] = new List<string>();
                     if (!CollectionsNotFoundMeta.ContainsKey("Idle")) CollectionsNotFoundMeta["Idle"] = new List<string>();
@@ -61,7 +62,7 @@ namespace Editors.AnimationFragmentEditor.CampaignAnimBin
                     if (!IsSoundFound) CollectionsNotFoundSound["Idle"].Add(item2.SoundMeta);
                 }
 
-                foreach (var item2 in item.Docks)
+                foreach (var item2 in item.Docks ?? [])
                 {
                     if (item.Name == "global") IsDockDefined = true;
 
@@ -72,14 +73,14 @@ namespace Editors.AnimationFragmentEditor.CampaignAnimBin
                     var IsAnimFound = pfs.FindFile(item2.Animation) != null;
                     if (!IsAnimFound) CollectionsNotFoundAnims["Docks"].Add(item2.Animation);
 
-                    var IsMetaFound = item2.AnimationMeta == "" || item2.AnimationMeta == "global" || pfs.FindFile(item2.AnimationMeta) != null;
+                    var IsMetaFound = item2.AnimationMeta == "" || pfs.FindFile(item2.AnimationMeta) != null;
                     if (!IsMetaFound) CollectionsNotFoundMeta["Docks"].Add(item2.AnimationMeta);
 
                     var IsSoundFound = item2.SoundMeta == "" || pfs.FindFile(item2.SoundMeta) != null;
                     if (!IsSoundFound) CollectionsNotFoundSound["Docks"].Add(item2.SoundMeta);
                 }
 
-                foreach (var item2 in item.Selection)
+                foreach (var item2 in item.Selection ?? [])
                 {
                     if (!CollectionsNotFoundAnims.ContainsKey("Selection")) CollectionsNotFoundAnims["Selection"] = new List<string>();
                     if (!CollectionsNotFoundMeta.ContainsKey("Selection")) CollectionsNotFoundMeta["Selection"] = new List<string>();
@@ -95,7 +96,7 @@ namespace Editors.AnimationFragmentEditor.CampaignAnimBin
                     if (!IsSoundFound) CollectionsNotFoundSound["Selection"].Add(item2.SoundMeta);
                 }
 
-                foreach (var item2 in item.Action)
+                foreach (var item2 in item.Action ?? [])
                 {
                     if (!CollectionsNotFoundAnims.ContainsKey("Action")) CollectionsNotFoundAnims["Action"] = new List<string>();
                     if (!CollectionsNotFoundMeta.ContainsKey("Action")) CollectionsNotFoundMeta["Action"] = new List<string>();
@@ -111,7 +112,7 @@ namespace Editors.AnimationFragmentEditor.CampaignAnimBin
                     if (!IsSoundFound) CollectionsNotFoundSound["Action"].Add(item2.SoundMeta);
                 }
 
-                foreach (var item2 in item.Locomotion)
+                foreach (var item2 in item.Locomotion ?? [])
                 {
                     if (!CollectionsNotFoundAnims.ContainsKey("Locomotion")) CollectionsNotFoundAnims["Locomotion"] = new List<string>();
                     if (!CollectionsNotFoundMeta.ContainsKey("Locomotion")) CollectionsNotFoundMeta["Locomotion"] = new List<string>();
@@ -120,14 +121,14 @@ namespace Editors.AnimationFragmentEditor.CampaignAnimBin
                     var IsAnimFound = pfs.FindFile(item2.Animation) != null;
                     if (!IsAnimFound) CollectionsNotFoundAnims["Locomotion"].Add(item2.Animation);
 
-                    var IsMetaFound = item2.AnimationMeta == "" || item2.AnimationMeta == "global" || pfs.FindFile(item2.AnimationMeta) != null;
+                    var IsMetaFound = item2.AnimationMeta == "" || pfs.FindFile(item2.AnimationMeta) != null;
                     if (!IsMetaFound) CollectionsNotFoundMeta["Locomotion"].Add(item2.AnimationMeta);
 
                     var IsSoundFound = item2.SoundMeta == "" || pfs.FindFile(item2.SoundMeta) != null;
                     if (!IsSoundFound) CollectionsNotFoundSound["Locomotion"].Add(item2.SoundMeta);
                 }
 
-                foreach (var item2 in item.PersitantMetaData)
+                foreach (var item2 in item.PersitantMetaData ?? [])
                 {
                     if (!CollectionsNotFoundAnims.ContainsKey("PersitantMetaData")) CollectionsNotFoundAnims["PersitantMetaData"] = new List<string>();
                     if (!CollectionsNotFoundMeta.ContainsKey("PersitantMetaData")) CollectionsNotFoundMeta["PersitantMetaData"] = new List<string>();
@@ -136,14 +137,14 @@ namespace Editors.AnimationFragmentEditor.CampaignAnimBin
                     var IsAnimFound = item2.Animation == "" || pfs.FindFile(item2.Animation) != null;
                     if (!IsAnimFound) CollectionsNotFoundAnims["PersitantMetaData"].Add(item2.Animation);
 
-                    var IsMetaFound = item2.AnimationMeta == "" || item2.AnimationMeta == "global" || pfs.FindFile(item2.AnimationMeta) != null;
+                    var IsMetaFound = item2.AnimationMeta == "" || pfs.FindFile(item2.AnimationMeta) != null;
                     if (!IsMetaFound) CollectionsNotFoundMeta["PersitantMetaData"].Add(item2.AnimationMeta);
 
                     var IsSoundFound = item2.SoundMeta == "" || pfs.FindFile(item2.SoundMeta) != null;
                     if (!IsSoundFound) CollectionsNotFoundSound["PersitantMetaData"].Add(item2.SoundMeta);
                 }
 
-                foreach (var item2 in item.Poses)
+                foreach (var item2 in item.Poses ?? [])
                 {
                     if (!CollectionsNotFoundAnims.ContainsKey("Poses")) CollectionsNotFoundAnims["Poses"] = new List<string>();
                     if (!CollectionsNotFoundMeta.ContainsKey("Poses")) CollectionsNotFoundMeta["Poses"] = new List<string>();
@@ -152,7 +153,7 @@ namespace Editors.AnimationFragmentEditor.CampaignAnimBin
                     var IsAnimFound = pfs.FindFile(item2.Animation) != null;
                     if (!IsAnimFound) CollectionsNotFoundAnims["Poses"].Add(item2.Animation);
 
-                    var IsMetaFound = item2.AnimationMeta == "" || item2.AnimationMeta == "global" || pfs.FindFile(item2.AnimationMeta) != null;
+                    var IsMetaFound = item2.AnimationMeta == "" || pfs.FindFile(item2.AnimationMeta) != null;
                     if (!IsMetaFound) CollectionsNotFoundMeta["Poses"].Add(item2.AnimationMeta);
 
                     var IsSoundFound = item2.SoundMeta == "" || pfs.FindFile(item2.SoundMeta) != null;
@@ -173,10 +174,11 @@ namespace Editors.AnimationFragmentEditor.CampaignAnimBin
                 AreAllFilesOk &= item.Value.Count == 0;
             }
 
+            // Note: "global" is common but not required - vanilla ships files with no global status
+            // at all (e.g. cam_bi2_dlc27_preyton_boss.bin), so its absence is a warning, not an error.
             if (IsNameOk &&
                IsDockDefined &&
                IsItemStatus_NormalFound &&
-               IsItemGlobalFound &&
                IsSkeletonExist &&
                IsNotEmpty &&
                AreAllFilesOk &&
@@ -225,6 +227,11 @@ namespace Editors.AnimationFragmentEditor.CampaignAnimBin
             if (!IsDockDefined)
             {
                 errorItem.Warning("dock animation", "dock animations appear to be never defined");
+            }
+
+            if (!IsItemGlobalFound)
+            {
+                errorItem.Warning("no global status", "there is no 'global' status - this is valid for some units (e.g. simple monsters/mounts) but usually means docks and persistent metadata are missing");
             }
 
             if (!IsItemStatus_NormalFound)

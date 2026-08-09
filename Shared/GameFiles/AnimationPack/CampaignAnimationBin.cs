@@ -70,9 +70,9 @@ namespace Shared.GameFormats.AnimationPack
         public class TransitionEntry : ICampaignAnimationBinEntry
         {
             public string Animation { get; set; }
+            public string Type { get; set; }
             public string AnimationMeta { get; set; }
             public string SoundMeta { get; set; }
-            public string Type { get; set; }
             public float BlendTime { get; set; }
             public string TransitionTo { get; set; }
 
@@ -80,9 +80,9 @@ namespace Shared.GameFormats.AnimationPack
             {
                 var output = new TransitionEntry();
                 output.Animation = byteChunk.ReadStringTableIndex(stringTable);
+                output.Type = byteChunk.ReadStringTableIndex(stringTable);
                 output.AnimationMeta = byteChunk.ReadStringTableIndex(stringTable);
                 output.SoundMeta = byteChunk.ReadStringTableIndex(stringTable);
-                output.Type = byteChunk.ReadStringTableIndex(stringTable);
                 output.BlendTime = byteChunk.ReadSingle();
                 output.TransitionTo = byteChunk.ReadStringTableIndex(stringTable);
                 return output;
@@ -92,9 +92,9 @@ namespace Shared.GameFormats.AnimationPack
             {
                 var chuck = new ChuckWriter();
                 chuck.WriteStringTableIndex(Animation, ref stringTable);
+                chuck.WriteStringTableIndex(Type, ref stringTable);
                 chuck.WriteStringTableIndex(AnimationMeta, ref stringTable);
                 chuck.WriteStringTableIndex(SoundMeta, ref stringTable);
-                chuck.WriteStringTableIndex(Type, ref stringTable);
                 chuck.Write(BlendTime, ByteParsers.Single);
                 chuck.WriteStringTableIndex(TransitionTo, ref stringTable);
                 return chuck.GetBytes();
@@ -104,18 +104,18 @@ namespace Shared.GameFormats.AnimationPack
         public class PersistentMeta : ICampaignAnimationBinEntry
         {
             public string Animation { get; set; }
+            public string Type { get; set; }
             public string AnimationMeta { get; set; }
             public string SoundMeta { get; set; }
-            public string Type { get; set; }
             public float BlendTime { get; set; }
 
             public static PersistentMeta FromChunck(ByteChunk byteChunk, string[] stringTable)
             {
                 var output = new PersistentMeta();
                 output.Animation = byteChunk.ReadStringTableIndex(stringTable);
+                output.Type = byteChunk.ReadStringTableIndex(stringTable);
                 output.AnimationMeta = byteChunk.ReadStringTableIndex(stringTable);
                 output.SoundMeta = byteChunk.ReadStringTableIndex(stringTable);
-                output.Type = byteChunk.ReadStringTableIndex(stringTable);
                 output.BlendTime = byteChunk.ReadSingle();
                 return output;
             }
@@ -124,9 +124,9 @@ namespace Shared.GameFormats.AnimationPack
             {
                 var chuck = new ChuckWriter();
                 chuck.WriteStringTableIndex(Animation, ref stringTable);
+                chuck.WriteStringTableIndex(Type, ref stringTable);
                 chuck.WriteStringTableIndex(AnimationMeta, ref stringTable);
                 chuck.WriteStringTableIndex(SoundMeta, ref stringTable);
-                chuck.WriteStringTableIndex(Type, ref stringTable);
                 chuck.Write(BlendTime, ByteParsers.Single);
                 return chuck.GetBytes();
             }
@@ -135,9 +135,9 @@ namespace Shared.GameFormats.AnimationPack
         public class PersistentMeta_Pose : ICampaignAnimationBinEntry
         {
             public string Animation { get; set; }
+            public string Type { get; set; }
             public string AnimationMeta { get; set; }
             public string SoundMeta { get; set; }
-            public float Weight { get; set; }
             public float BlendTime { get; set; }
             public int PoseId { get; set; }
 
@@ -145,22 +145,21 @@ namespace Shared.GameFormats.AnimationPack
             {
                 var output = new PersistentMeta_Pose();
                 output.Animation = byteChunk.ReadStringTableIndex(stringTable);
+                output.Type = byteChunk.ReadStringTableIndex(stringTable);
                 output.AnimationMeta = byteChunk.ReadStringTableIndex(stringTable);
                 output.SoundMeta = byteChunk.ReadStringTableIndex(stringTable);
-                output.Weight = byteChunk.ReadSingle();
                 output.BlendTime = byteChunk.ReadSingle();
                 output.PoseId = byteChunk.ReadInt32();
                 return output;
             }
 
-
             public byte[] ToBytes(ref List<string> stringTable)
             {
                 var chuck = new ChuckWriter();
                 chuck.WriteStringTableIndex(Animation, ref stringTable);
+                chuck.WriteStringTableIndex(Type, ref stringTable);
                 chuck.WriteStringTableIndex(AnimationMeta, ref stringTable);
                 chuck.WriteStringTableIndex(SoundMeta, ref stringTable);
-                chuck.Write(Weight, ByteParsers.Single);
                 chuck.Write(BlendTime, ByteParsers.Single);
                 chuck.Write(PoseId, ByteParsers.Int32);
                 return chuck.GetBytes();
@@ -170,9 +169,9 @@ namespace Shared.GameFormats.AnimationPack
         public class PersistentMeta_Dock : ICampaignAnimationBinEntry
         {
             public string Animation { get; set; }
+            public string Type { get; set; }
             public string AnimationMeta { get; set; }
             public string SoundMeta { get; set; }
-            public float Weight { get; set; }
             public float BlendTime { get; set; }
             public string Dock { get; set; }
 
@@ -180,58 +179,59 @@ namespace Shared.GameFormats.AnimationPack
             {
                 var output = new PersistentMeta_Dock();
                 output.Animation = byteChunk.ReadStringTableIndex(stringTable);
+                output.Type = byteChunk.ReadStringTableIndex(stringTable);
                 output.AnimationMeta = byteChunk.ReadStringTableIndex(stringTable);
                 output.SoundMeta = byteChunk.ReadStringTableIndex(stringTable);
-                output.Weight = byteChunk.ReadSingle();
                 output.BlendTime = byteChunk.ReadSingle();
                 output.Dock = byteChunk.ReadStringTableIndex(stringTable).ToUpper();
                 return output;
             }
 
-
             public byte[] ToBytes(ref List<string> stringTable)
             {
                 var chuck = new ChuckWriter();
                 chuck.WriteStringTableIndex(Animation, ref stringTable);
+                chuck.WriteStringTableIndex(Type, ref stringTable);
                 chuck.WriteStringTableIndex(AnimationMeta, ref stringTable);
                 chuck.WriteStringTableIndex(SoundMeta, ref stringTable);
-                chuck.Write(Weight, ByteParsers.Single);
                 chuck.Write(BlendTime, ByteParsers.Single);
                 chuck.WriteStringTableIndex(Dock.ToUpper(), ref stringTable, false);
                 return chuck.GetBytes();
             }
         }
 
+        /// <summary>Structurally identical to <see cref="AnimationEntry"/>. Previously used generic
+        /// Value0-5 names because its shape hadn't been identified; confirmed against vanilla data.</summary>
         public class PortholeEntry : ICampaignAnimationBinEntry
         {
-            public string Value0 { get; set; }
-            public string Value1 { get; set; }
-            public string Value2 { get; set; }
-            public string Value3 { get; set; }
-            public float Value4 { get; set; }
-            public float Value5 { get; set; }
+            public string Animation { get; set; }
+            public string Type { get; set; }
+            public string AnimationMeta { get; set; }
+            public string SoundMeta { get; set; }
+            public float BlendTime { get; set; }
+            public float Weight { get; set; }
 
             public static PortholeEntry FromChunck(ByteChunk byteChunk, string[] stringTable)
             {
                 var output = new PortholeEntry();
-                output.Value0 = stringTable[byteChunk.ReadInt32()];
-                output.Value1 = stringTable[byteChunk.ReadInt32()];
-                output.Value2 = stringTable[byteChunk.ReadInt32()];
-                output.Value3 = stringTable[byteChunk.ReadInt32()];
-                output.Value4 = byteChunk.ReadSingle();
-                output.Value5 = byteChunk.ReadSingle();
+                output.Animation = byteChunk.ReadStringTableIndex(stringTable);
+                output.Type = byteChunk.ReadStringTableIndex(stringTable);
+                output.AnimationMeta = byteChunk.ReadStringTableIndex(stringTable);
+                output.SoundMeta = byteChunk.ReadStringTableIndex(stringTable);
+                output.BlendTime = byteChunk.ReadSingle();
+                output.Weight = byteChunk.ReadSingle();
                 return output;
             }
 
             public byte[] ToBytes(ref List<string> stringTable)
             {
                 var chuck = new ChuckWriter();
-                chuck.WriteStringTableIndex(Value0, ref stringTable);
-                chuck.WriteStringTableIndex(Value1, ref stringTable);
-                chuck.WriteStringTableIndex(Value2, ref stringTable);
-                chuck.WriteStringTableIndex(Value3, ref stringTable);
-                chuck.Write(Value4, ByteParsers.Single);
-                chuck.Write(Value5, ByteParsers.Single);
+                chuck.WriteStringTableIndex(Animation, ref stringTable);
+                chuck.WriteStringTableIndex(Type, ref stringTable);
+                chuck.WriteStringTableIndex(AnimationMeta, ref stringTable);
+                chuck.WriteStringTableIndex(SoundMeta, ref stringTable);
+                chuck.Write(BlendTime, ByteParsers.Single);
+                chuck.Write(Weight, ByteParsers.Single);
                 return chuck.GetBytes();
             }
         }
@@ -245,6 +245,8 @@ namespace Shared.GameFormats.AnimationPack
             public float BlendTime { get; set; }
             public string ActionType { get; set; }
             public int ActionId { get; set; }
+
+            /// <summary>Always false across ~1700 surveyed vanilla rows - purpose unknown.</summary>
             public bool Unknown { get; set; }
 
             public static ActionEntry FromChunck(ByteChunk byteChunk, string[] stringTable)
@@ -281,11 +283,21 @@ namespace Shared.GameFormats.AnimationPack
         public class LocomotionEntry : ICampaignAnimationBinEntry
         {
             public string Animation { get; set; }
+            public string Type { get; set; }
             public string AnimationMeta { get; set; }
             public string SoundMeta { get; set; }
-            public string Type { get; set; }
-            public float Weight { get; set; }
+
+            /// <summary>Surveyed values (0, 0.1-0.7, 1, 2) match the BlendTime pattern of every
+            /// other entry type, not a 0-1 blend weight - renamed from the original "Weight".</summary>
+            public float BlendTime { get; set; }
+
+            /// <summary>Always 1.0 in vanilla (660/661); doesn't appear to be used.</summary>
             public float ModelScale { get; set; }
+
+            /// <summary>Not a walk-vs-run distance threshold as the name suggests - values overlap
+            /// between walk/run/fly buckets, and MinDistance sometimes exceeds Distance for the same
+            /// clip. Probably a root-motion distance range for matching playback to movement speed,
+            /// but unconfirmed.</summary>
             public float DistanceTraveled { get; set; }
             public float DistanceMinTravled { get; set; }
 
@@ -293,10 +305,10 @@ namespace Shared.GameFormats.AnimationPack
             {
                 var output = new LocomotionEntry();
                 output.Animation = byteChunk.ReadStringTableIndex(stringTable);
+                output.Type = byteChunk.ReadStringTableIndex(stringTable);
                 output.AnimationMeta = byteChunk.ReadStringTableIndex(stringTable);
                 output.SoundMeta = byteChunk.ReadStringTableIndex(stringTable);
-                output.Type = byteChunk.ReadStringTableIndex(stringTable);
-                output.Weight = byteChunk.ReadSingle();
+                output.BlendTime = byteChunk.ReadSingle();
                 output.ModelScale = byteChunk.ReadSingle();
                 output.DistanceTraveled = byteChunk.ReadSingle();
                 output.DistanceMinTravled = byteChunk.ReadSingle();
@@ -307,10 +319,10 @@ namespace Shared.GameFormats.AnimationPack
             {
                 var chuck = new ChuckWriter();
                 chuck.WriteStringTableIndex(Animation, ref stringTable);
+                chuck.WriteStringTableIndex(Type, ref stringTable);
                 chuck.WriteStringTableIndex(AnimationMeta, ref stringTable);
                 chuck.WriteStringTableIndex(SoundMeta, ref stringTable);
-                chuck.WriteStringTableIndex(Type, ref stringTable);
-                chuck.Write(Weight, ByteParsers.Single);
+                chuck.Write(BlendTime, ByteParsers.Single);
                 chuck.Write(ModelScale, ByteParsers.Single);
                 chuck.Write(DistanceTraveled, ByteParsers.Single);
                 chuck.Write(DistanceMinTravled, ByteParsers.Single);
@@ -318,12 +330,15 @@ namespace Shared.GameFormats.AnimationPack
             }
         }
 
+        /// <summary>Rare - only 6 occurrences across 661 vanilla files, all one-off poses for rider
+        /// or vehicle-driver characters. Same shape as <see cref="AnimationEntry"/> plus a trailing
+        /// int (<see cref="Value"/>), which was 0 in every occurrence found.</summary>
         public class UnknownEntry : ICampaignAnimationBinEntry
         {
             public string Animation { get; set; }
+            public string Type { get; set; }
             public string AnimationMeta { get; set; }
             public string SoundMeta { get; set; }
-            public string Type { get; set; }
             public float BlendTime { get; set; }
             public float Weight { get; set; }
             public int Value { get; set; }
@@ -332,9 +347,9 @@ namespace Shared.GameFormats.AnimationPack
             {
                 var output = new UnknownEntry();
                 output.Animation = byteChunk.ReadStringTableIndex(stringTable);
+                output.Type = byteChunk.ReadStringTableIndex(stringTable);
                 output.AnimationMeta = byteChunk.ReadStringTableIndex(stringTable);
                 output.SoundMeta = byteChunk.ReadStringTableIndex(stringTable);
-                output.Type = byteChunk.ReadStringTableIndex(stringTable);
                 output.BlendTime = byteChunk.ReadSingle();
                 output.Weight = byteChunk.ReadSingle();
                 output.Value = byteChunk.ReadInt32();
@@ -345,12 +360,12 @@ namespace Shared.GameFormats.AnimationPack
             {
                 var chuck = new ChuckWriter();
                 chuck.WriteStringTableIndex(Animation, ref stringTable);
+                chuck.WriteStringTableIndex(Type, ref stringTable);
                 chuck.WriteStringTableIndex(AnimationMeta, ref stringTable);
                 chuck.WriteStringTableIndex(SoundMeta, ref stringTable);
-                chuck.WriteStringTableIndex(Type, ref stringTable);
                 chuck.Write(BlendTime, ByteParsers.Single);
                 chuck.Write(Weight, ByteParsers.Single);
-                chuck.Write(Value, ByteParsers.Single);
+                chuck.Write(Value, ByteParsers.Int32);
                 return chuck.GetBytes();
             }
         }

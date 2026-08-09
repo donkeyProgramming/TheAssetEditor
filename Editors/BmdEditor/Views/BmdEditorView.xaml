@@ -5,7 +5,8 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:vm="clr-namespace:Editors.BmdEditor.ViewModels"
              xmlns:views="clr-namespace:Editors.BmdEditor.Views"
-             mc:Ignorable="d" 
+             xmlns:resources="clr-namespace:Shared.EmbeddedResources;assembly=Shared.EmbeddedResources"
+             mc:Ignorable="d"
              d:DesignHeight="600" d:DesignWidth="800">
 
     <Grid>
@@ -19,7 +20,47 @@
         <ToolBar Grid.Row="0" Margin="0,0,0,5">
             <Button Content="Refresh" Command="{Binding RefreshCommand}" Padding="10,5"/>
             <Separator/>
+            <Button Content="Save" Command="{Binding SaveCommand}" Padding="10,5"/>
+            <Separator/>
             <Button Content="Export" Command="{Binding ExportCommand}" Padding="10,5"/>
+            <Separator/>
+            <Menu Background="Transparent" VerticalAlignment="Center">
+                <MenuItem Header="Add" Padding="8,3"
+                          Background="{DynamicResource Popup.Static.Background}"
+                          Foreground="{DynamicResource Popup.Static.Foreground}">
+                    <MenuItem.Resources>
+                        <!-- Forces dark-theme contrast on the dropdown items regardless of ambient
+                             styling, matching the CSC editor's Add menu. -->
+                        <Style TargetType="MenuItem">
+                            <Setter Property="Background" Value="{DynamicResource Popup.Static.Background}"/>
+                            <Setter Property="Foreground" Value="{DynamicResource Popup.Static.Foreground}"/>
+                        </Style>
+                    </MenuItem.Resources>
+                    <MenuItem Header="Prop..." Command="{Binding AddPropCommand}"/>
+                    <MenuItem Header="Decal..." Command="{Binding AddDecalCommand}"/>
+                    <MenuItem Header="VFX..." Command="{Binding AddVfxCommand}"/>
+                    <MenuItem Header="Sound..." Command="{Binding AddSoundCommand}"/>
+                    <MenuItem Header="Point light" Command="{Binding AddPointLightCommand}"/>
+                    <MenuItem Header="Spot light" Command="{Binding AddSpotLightCommand}"/>
+                    <MenuItem Header="Light probe" Command="{Binding AddLightProbeCommand}"/>
+                    <MenuItem Header="Terrain hole" Command="{Binding AddTerrainHoleCommand}"/>
+                    <MenuItem Header="Poly mesh..." Command="{Binding AddPolyMeshCommand}"/>
+                    <MenuItem Header="Composite scene..." Command="{Binding AddCscCommand}"/>
+                </MenuItem>
+            </Menu>
+            <Separator/>
+            <Button Command="{Binding GizmoTranslateCommand}" IsEnabled="{Binding HasSelection}" Padding="6,3" ToolTip="Move">
+                <Image Width="20" Height="20" Source="{Binding Source={x:Static resources:IconLibrary.Gizmo_MoveIcon}, UpdateSourceTrigger=PropertyChanged}"/>
+            </Button>
+            <Button Command="{Binding GizmoRotateCommand}" IsEnabled="{Binding SelectedComponent.SupportsRotate, FallbackValue=False}" Padding="6,3" ToolTip="Rotate">
+                <Image Width="20" Height="20" Source="{Binding Source={x:Static resources:IconLibrary.Gizmo_RotateIcon}, UpdateSourceTrigger=PropertyChanged}"/>
+            </Button>
+            <Button Command="{Binding GizmoScaleCommand}" IsEnabled="{Binding SelectedComponent.SupportsScale, FallbackValue=False}" Padding="6,3" ToolTip="Scale">
+                <Image Width="20" Height="20" Source="{Binding Source={x:Static resources:IconLibrary.Gizmo_ScaleIcon}, UpdateSourceTrigger=PropertyChanged}"/>
+            </Button>
+            <Button Command="{Binding GizmoOffCommand}" Padding="6,3" ToolTip="Gizmo off (selection only)">
+                <Image Width="20" Height="20" Source="{Binding Source={x:Static resources:IconLibrary.Gizmo_CursorIcon}, UpdateSourceTrigger=PropertyChanged}"/>
+            </Button>
         </ToolBar>
 
         <!-- Main Content -->
@@ -31,9 +72,9 @@
             </Grid.ColumnDefinitions>
             
             <Grid.RowDefinitions>
-                <RowDefinition Height="*"/>
+                <RowDefinition Height="*" MinHeight="80"/>
                 <RowDefinition Height="5"/>
-                <RowDefinition Height="200"/>
+                <RowDefinition Height="*" MinHeight="80"/>
             </Grid.RowDefinitions>
 
             <!-- 3D Scene (Main Content) -->
@@ -44,8 +85,11 @@
             
             <!-- Component List (Top Right) -->
             <GroupBox Grid.Column="2" Grid.Row="0" Header="Components">
-                <TreeView ItemsSource="{Binding AllElements}" SelectedItemChanged="ComponentsTreeView_SelectedItemChanged" x:Name="ComponentsTreeView">
+                <TreeView ItemsSource="{Binding ComponentGroups}" SelectedItemChanged="ComponentsTreeView_SelectedItemChanged" x:Name="ComponentsTreeView">
                     <TreeView.Resources>
+                        <HierarchicalDataTemplate DataType="{x:Type vm:BmdCategoryGroupViewModel}" ItemsSource="{Binding Items}">
+                            <TextBlock Text="{Binding Header}" FontWeight="Bold"/>
+                        </HierarchicalDataTemplate>
                         <HierarchicalDataTemplate DataType="{x:Type vm:BmdInfoViewModel}" ItemsSource="{Binding Children}">
                             <StackPanel Orientation="Horizontal">
                                 <TextBlock Text="{Binding ElementType}" FontWeight="Bold" Margin="0,0,5,0"/>
@@ -102,8 +146,384 @@
             
             <!-- Component Details (Bottom Right) -->
             <GroupBox Grid.Column="2" Grid.Row="2" Header="Details">
-                <ScrollViewer>
-                    <TextBlock Text="{Binding ComponentDetails}" Margin="5" FontFamily="Consolas"/>
+                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                    <ContentControl Content="{Binding SelectedComponent}" Margin="5">
+                        <ContentControl.Resources>
+
+                            <!-- Fallback: the original text dump, for every category outside the 10 editable ones -->
+                            <DataTemplate DataType="{x:Type vm:BmdElementViewModel}">
+                                <TextBlock Text="{Binding DataContext.ComponentDetails, RelativeSource={RelativeSource AncestorType=UserControl}}" FontFamily="Consolas"/>
+                            </DataTemplate>
+
+                            <DataTemplate DataType="{x:Type vm:PropInfoViewModel}">
+                                <StackPanel>
+                                    <TextBlock Text="Model Path" FontWeight="Bold"/>
+                                    <TextBox Text="{Binding Prop.Rmv2Path}" TextWrapping="Wrap" LostFocus="AuxField_LostFocus" Margin="0,0,0,5"/>
+
+                                    <TextBlock Text="Transform" FontWeight="Bold" Margin="0,4,0,0"/>
+                                    <UniformGrid Columns="6">
+                                        <TextBlock Text="Pos X"/><TextBox Text="{Binding PositionX, StringFormat=0.###}"/>
+                                        <TextBlock Text="Y"/><TextBox Text="{Binding PositionY, StringFormat=0.###}"/>
+                                        <TextBlock Text="Z"/><TextBox Text="{Binding PositionZ, StringFormat=0.###}"/>
+                                        <TextBlock Text="Rot X°"/><TextBox Text="{Binding RotationXDegrees, StringFormat=0.##}"/>
+                                        <TextBlock Text="Y°"/><TextBox Text="{Binding RotationYDegrees, StringFormat=0.##}"/>
+                                        <TextBlock Text="Z°"/><TextBox Text="{Binding RotationZDegrees, StringFormat=0.##}"/>
+                                        <TextBlock Text="Scale X"/><TextBox Text="{Binding ScaleX, StringFormat=0.###}"/>
+                                        <TextBlock Text="Y"/><TextBox Text="{Binding ScaleY, StringFormat=0.###}"/>
+                                        <TextBlock Text="Z"/><TextBox Text="{Binding ScaleZ, StringFormat=0.###}"/>
+                                    </UniformGrid>
+
+                                    <TextBlock Text="Flags" FontWeight="Bold" Margin="0,8,0,0"/>
+                                    <CheckBox Content="Is Decal" IsChecked="{Binding Prop.IsDecal}" Click="AuxField_Click"/>
+                                    <CheckBox Content="Animated" IsChecked="{Binding Prop.Animated}" Click="AuxField_Click"/>
+                                    <CheckBox Content="Casts Shadow" IsChecked="{Binding Prop.CastsShadow}" Click="AuxField_Click"/>
+                                    <CheckBox Content="Visible In Shroud" IsChecked="{Binding Prop.VisibleInShroud}" Click="AuxField_Click"/>
+                                    <CheckBox Content="Apply To Terrain" IsChecked="{Binding Prop.ApplyToTerrain}" Click="AuxField_Click"/>
+                                    <CheckBox Content="No Culling" IsChecked="{Binding Prop.NoCulling}" Click="AuxField_Click"/>
+                                    <CheckBox Content="Include In Fog" IsChecked="{Binding Prop.IncludeInFog}" Click="AuxField_Click"/>
+                                    <CheckBox Content="Render Above Snow" IsChecked="{Binding Prop.RenderAboveSnow}" Click="AuxField_Click"/>
+                                    <CheckBox Content="Use Dynamic Shadows" IsChecked="{Binding Prop.UseDynamicShadows}" Click="AuxField_Click"/>
+
+                                    <TextBlock Text="Render Flags" FontWeight="Bold" Margin="0,8,0,0"/>
+                                    <UniformGrid Columns="2">
+                                        <CheckBox Content="Allow In Outfield" IsChecked="{Binding Prop.Flags.AllowInOutfield}" Click="AuxField_Click"/>
+                                        <CheckBox Content="Clamp To Water" IsChecked="{Binding Prop.Flags.ClampToWaterSurface}" Click="AuxField_Click"/>
+                                        <CheckBox Content="Season Spring" IsChecked="{Binding Prop.Flags.SeasonSpring}" Click="AuxField_Click"/>
+                                        <CheckBox Content="Season Summer" IsChecked="{Binding Prop.Flags.SeasonSummer}" Click="AuxField_Click"/>
+                                        <CheckBox Content="Season Autumn" IsChecked="{Binding Prop.Flags.SeasonAutumn}" Click="AuxField_Click"/>
+                                        <CheckBox Content="Season Winter" IsChecked="{Binding Prop.Flags.SeasonWinter}" Click="AuxField_Click"/>
+                                        <CheckBox Content="Visible In Tactical" IsChecked="{Binding Prop.Flags.VisibleInTactical}" Click="AuxField_Click"/>
+                                        <CheckBox Content="Only Visible In Tactical" IsChecked="{Binding Prop.Flags.OnlyVisibleInTactical}" Click="AuxField_Click"/>
+                                    </UniformGrid>
+
+                                    <TextBlock Text="Height Mode" FontWeight="Bold" Margin="0,8,0,0"/>
+                                    <TextBox Text="{Binding Prop.HeightMode}" LostFocus="AuxField_LostFocus"/>
+                                </StackPanel>
+                            </DataTemplate>
+
+                            <DataTemplate DataType="{x:Type vm:VfxInfoViewModel}">
+                                <StackPanel>
+                                    <TextBlock Text="VFX Path" FontWeight="Bold"/>
+                                    <TextBox Text="{Binding Vfx.VfxString}" TextWrapping="Wrap" LostFocus="AuxField_LostFocus" Margin="0,0,0,5"/>
+
+                                    <TextBlock Text="Transform" FontWeight="Bold" Margin="0,4,0,0"/>
+                                    <UniformGrid Columns="6">
+                                        <TextBlock Text="Pos X"/><TextBox Text="{Binding PositionX, StringFormat=0.###}"/>
+                                        <TextBlock Text="Y"/><TextBox Text="{Binding PositionY, StringFormat=0.###}"/>
+                                        <TextBlock Text="Z"/><TextBox Text="{Binding PositionZ, StringFormat=0.###}"/>
+                                        <TextBlock Text="Rot X°"/><TextBox Text="{Binding RotationXDegrees, StringFormat=0.##}"/>
+                                        <TextBlock Text="Y°"/><TextBox Text="{Binding RotationYDegrees, StringFormat=0.##}"/>
+                                        <TextBlock Text="Z°"/><TextBox Text="{Binding RotationZDegrees, StringFormat=0.##}"/>
+                                        <TextBlock Text="Scale X"/><TextBox Text="{Binding ScaleX, StringFormat=0.###}"/>
+                                        <TextBlock Text="Y"/><TextBox Text="{Binding ScaleY, StringFormat=0.###}"/>
+                                        <TextBlock Text="Z"/><TextBox Text="{Binding ScaleZ, StringFormat=0.###}"/>
+                                    </UniformGrid>
+
+                                    <TextBlock Text="Properties" FontWeight="Bold" Margin="0,8,0,0"/>
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition/>
+                                            <RowDefinition/>
+                                            <RowDefinition/>
+                                        </Grid.RowDefinitions>
+                                        <TextBlock Grid.Row="0" Grid.Column="0" Text="Emission Rate" Margin="0,0,5,0"/>
+                                        <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding Vfx.EmissionRate, StringFormat=0.###}" LostFocus="AuxField_LostFocus"/>
+                                        <TextBlock Grid.Row="1" Grid.Column="0" Text="Instance Name" Margin="0,0,5,0"/>
+                                        <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding Vfx.InstanceName}" LostFocus="AuxField_LostFocus"/>
+                                        <TextBlock Grid.Row="2" Grid.Column="0" Text="Parent Id" Margin="0,0,5,0"/>
+                                        <TextBox Grid.Row="2" Grid.Column="1" Text="{Binding Vfx.ParentId}" LostFocus="AuxField_LostFocus"/>
+                                    </Grid>
+
+                                    <CheckBox Content="Autoplay" IsChecked="{Binding Vfx.Autoplay}" Click="AuxField_Click" Margin="0,8,0,0"/>
+                                    <CheckBox Content="Visible In Shroud" IsChecked="{Binding Vfx.VisibleInShroud}" Click="AuxField_Click"/>
+                                    <CheckBox Content="Visible In Shroud Only" IsChecked="{Binding Vfx.VisibleInShroudOnly}" Click="AuxField_Click"/>
+
+                                    <TextBlock Text="Render Flags" FontWeight="Bold" Margin="0,8,0,0"/>
+                                    <UniformGrid Columns="2">
+                                        <CheckBox Content="Allow In Outfield" IsChecked="{Binding Vfx.Flags.AllowInOutfield}" Click="AuxField_Click"/>
+                                        <CheckBox Content="Clamp To Water" IsChecked="{Binding Vfx.Flags.ClampToWaterSurface}" Click="AuxField_Click"/>
+                                        <CheckBox Content="Visible In Tactical" IsChecked="{Binding Vfx.Flags.VisibleInTactical}" Click="AuxField_Click"/>
+                                        <CheckBox Content="Only Visible In Tactical" IsChecked="{Binding Vfx.Flags.OnlyVisibleInTactical}" Click="AuxField_Click"/>
+                                    </UniformGrid>
+                                </StackPanel>
+                            </DataTemplate>
+
+                            <DataTemplate DataType="{x:Type vm:PointLightInfoViewModel}">
+                                <StackPanel>
+                                    <TextBlock Text="Transform" FontWeight="Bold"/>
+                                    <UniformGrid Columns="6">
+                                        <TextBlock Text="Pos X"/><TextBox Text="{Binding PositionX, StringFormat=0.###}"/>
+                                        <TextBlock Text="Y"/><TextBox Text="{Binding PositionY, StringFormat=0.###}"/>
+                                        <TextBlock Text="Z"/><TextBox Text="{Binding PositionZ, StringFormat=0.###}"/>
+                                    </UniformGrid>
+
+                                    <TextBlock Text="Properties" FontWeight="Bold" Margin="0,8,0,0"/>
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition/><RowDefinition/><RowDefinition/><RowDefinition/>
+                                            <RowDefinition/><RowDefinition/><RowDefinition/><RowDefinition/>
+                                        </Grid.RowDefinitions>
+                                        <TextBlock Grid.Row="0" Grid.Column="0" Text="Radius" Margin="0,0,5,0"/>
+                                        <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding Light.Radius, StringFormat=0.###}" LostFocus="AuxField_LostFocus"/>
+                                        <TextBlock Grid.Row="1" Grid.Column="0" Text="Color (R G B)" Margin="0,0,5,0"/>
+                                        <StackPanel Grid.Row="1" Grid.Column="1" Orientation="Horizontal">
+                                            <TextBox Width="50" Text="{Binding Light.Red, StringFormat=0.##}" LostFocus="AuxField_LostFocus"/>
+                                            <TextBox Width="50" Text="{Binding Light.Green, StringFormat=0.##}" LostFocus="AuxField_LostFocus"/>
+                                            <TextBox Width="50" Text="{Binding Light.Blue, StringFormat=0.##}" LostFocus="AuxField_LostFocus"/>
+                                        </StackPanel>
+                                        <TextBlock Grid.Row="2" Grid.Column="0" Text="Color Scale" Margin="0,0,5,0"/>
+                                        <TextBox Grid.Row="2" Grid.Column="1" Text="{Binding Light.ColorScale, StringFormat=0.###}" LostFocus="AuxField_LostFocus"/>
+                                        <TextBlock Grid.Row="3" Grid.Column="0" Text="Animation Type" Margin="0,0,5,0"/>
+                                        <ComboBox Grid.Row="3" Grid.Column="1" ItemsSource="{Binding AnimationTypeNames}" SelectedItem="{Binding AnimationTypeName}"/>
+                                        <TextBlock Grid.Row="4" Grid.Column="0" Text="Anim Speed 1" Margin="0,0,5,0"/>
+                                        <TextBox Grid.Row="4" Grid.Column="1" Text="{Binding Light.AnimationSpeedScale1, StringFormat=0.###}" LostFocus="AuxField_LostFocus"/>
+                                        <TextBlock Grid.Row="5" Grid.Column="0" Text="Anim Speed 2" Margin="0,0,5,0"/>
+                                        <TextBox Grid.Row="5" Grid.Column="1" Text="{Binding Light.AnimationSpeedScale2, StringFormat=0.###}" LostFocus="AuxField_LostFocus"/>
+                                        <TextBlock Grid.Row="6" Grid.Column="0" Text="Color Min" Margin="0,0,5,0"/>
+                                        <TextBox Grid.Row="6" Grid.Column="1" Text="{Binding Light.ColorMin, StringFormat=0.###}" LostFocus="AuxField_LostFocus"/>
+                                        <TextBlock Grid.Row="7" Grid.Column="0" Text="Random Offset" Margin="0,0,5,0"/>
+                                        <TextBox Grid.Row="7" Grid.Column="1" Text="{Binding Light.RandomOffset, StringFormat=0.###}" LostFocus="AuxField_LostFocus"/>
+                                    </Grid>
+
+                                    <CheckBox Content="Light Probe Only" IsChecked="{Binding Light.LightProbeOnly}" Click="AuxField_Click" Margin="0,8,0,0"/>
+
+                                    <TextBlock Text="Render Flags" FontWeight="Bold" Margin="0,8,0,0"/>
+                                    <UniformGrid Columns="2">
+                                        <CheckBox Content="Allow In Outfield" IsChecked="{Binding Light.Flags.AllowInOutfield}" Click="AuxField_Click"/>
+                                        <CheckBox Content="Clamp To Surface" IsChecked="{Binding Light.Flags.ClampToSurface}" Click="AuxField_Click"/>
+                                        <CheckBox Content="Clamp To Water" IsChecked="{Binding Light.Flags.ClampToWaterSurface}" Click="AuxField_Click"/>
+                                        <CheckBox Content="Visible In Tactical" IsChecked="{Binding Light.Flags.VisibleInTactical}" Click="AuxField_Click"/>
+                                    </UniformGrid>
+                                </StackPanel>
+                            </DataTemplate>
+
+                            <DataTemplate DataType="{x:Type vm:SpotLightInfoViewModel}">
+                                <StackPanel>
+                                    <TextBlock Text="Transform" FontWeight="Bold"/>
+                                    <UniformGrid Columns="6">
+                                        <TextBlock Text="Pos X"/><TextBox Text="{Binding PositionX, StringFormat=0.###}"/>
+                                        <TextBlock Text="Y"/><TextBox Text="{Binding PositionY, StringFormat=0.###}"/>
+                                        <TextBlock Text="Z"/><TextBox Text="{Binding PositionZ, StringFormat=0.###}"/>
+                                        <TextBlock Text="Rot X°"/><TextBox Text="{Binding RotationXDegrees, StringFormat=0.##}"/>
+                                        <TextBlock Text="Y°"/><TextBox Text="{Binding RotationYDegrees, StringFormat=0.##}"/>
+                                        <TextBlock Text="Z°"/><TextBox Text="{Binding RotationZDegrees, StringFormat=0.##}"/>
+                                    </UniformGrid>
+
+                                    <TextBlock Text="Properties" FontWeight="Bold" Margin="0,8,0,0"/>
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition/><RowDefinition/><RowDefinition/><RowDefinition/><RowDefinition/>
+                                        </Grid.RowDefinitions>
+                                        <TextBlock Grid.Row="0" Grid.Column="0" Text="Length" Margin="0,0,5,0"/>
+                                        <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding Light.Length, StringFormat=0.###}" LostFocus="AuxField_LostFocus"/>
+                                        <TextBlock Grid.Row="1" Grid.Column="0" Text="Inner Angle (rad)" Margin="0,0,5,0"/>
+                                        <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding Light.InnerAngleRadians, StringFormat=0.###}" LostFocus="AuxField_LostFocus"/>
+                                        <TextBlock Grid.Row="2" Grid.Column="0" Text="Outer Angle (rad)" Margin="0,0,5,0"/>
+                                        <TextBox Grid.Row="2" Grid.Column="1" Text="{Binding Light.OuterAngleRadians, StringFormat=0.###}" LostFocus="AuxField_LostFocus"/>
+                                        <TextBlock Grid.Row="3" Grid.Column="0" Text="Color (R G B)" Margin="0,0,5,0"/>
+                                        <StackPanel Grid.Row="3" Grid.Column="1" Orientation="Horizontal">
+                                            <TextBox Width="50" Text="{Binding Light.IntensityRed, StringFormat=0.##}" LostFocus="AuxField_LostFocus"/>
+                                            <TextBox Width="50" Text="{Binding Light.IntensityGreen, StringFormat=0.##}" LostFocus="AuxField_LostFocus"/>
+                                            <TextBox Width="50" Text="{Binding Light.IntensityBlue, StringFormat=0.##}" LostFocus="AuxField_LostFocus"/>
+                                        </StackPanel>
+                                        <TextBlock Grid.Row="4" Grid.Column="0" Text="Falloff" Margin="0,0,5,0"/>
+                                        <TextBox Grid.Row="4" Grid.Column="1" Text="{Binding Light.Falloff, StringFormat=0.###}" LostFocus="AuxField_LostFocus"/>
+                                    </Grid>
+
+                                    <CheckBox Content="Volumetric" IsChecked="{Binding Light.Volumetric}" Click="AuxField_Click" Margin="0,8,0,0"/>
+
+                                    <TextBlock Text="Render Flags" FontWeight="Bold" Margin="0,8,0,0"/>
+                                    <UniformGrid Columns="2">
+                                        <CheckBox Content="Allow In Outfield" IsChecked="{Binding Light.Flags.AllowInOutfield}" Click="AuxField_Click"/>
+                                        <CheckBox Content="Clamp To Surface" IsChecked="{Binding Light.Flags.ClampToSurface}" Click="AuxField_Click"/>
+                                        <CheckBox Content="Clamp To Water" IsChecked="{Binding Light.Flags.ClampToWaterSurface}" Click="AuxField_Click"/>
+                                        <CheckBox Content="Visible In Tactical" IsChecked="{Binding Light.Flags.VisibleInTactical}" Click="AuxField_Click"/>
+                                    </UniformGrid>
+                                </StackPanel>
+                            </DataTemplate>
+
+                            <DataTemplate DataType="{x:Type vm:SoundInfoViewModel}">
+                                <StackPanel>
+                                    <TextBlock Text="Sound Event" FontWeight="Bold"/>
+                                    <TextBox Text="{Binding Sound.SoundString}" TextWrapping="Wrap" LostFocus="AuxField_LostFocus" Margin="0,0,0,5"/>
+
+                                    <TextBlock Text="Type" FontWeight="Bold"/>
+                                    <ComboBox IsEditable="True" ItemsSource="{Binding TypeNames}" Text="{Binding Sound.TypeString, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" LostFocus="AuxField_LostFocus" SelectionChanged="AuxField_SelectionChanged"/>
+
+                                    <TextBlock Text="Properties" FontWeight="Bold" Margin="0,8,0,0"/>
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition/><RowDefinition/>
+                                        </Grid.RowDefinitions>
+                                        <TextBlock Grid.Row="0" Grid.Column="0" Text="Inner Radius" Margin="0,0,5,0"/>
+                                        <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding Sound.InnerRadius, StringFormat=0.###}" LostFocus="AuxField_LostFocus"/>
+                                        <TextBlock Grid.Row="1" Grid.Column="0" Text="Outer Radius" Margin="0,0,5,0"/>
+                                        <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding Sound.OuterRadius, StringFormat=0.###}" LostFocus="AuxField_LostFocus"/>
+                                    </Grid>
+
+                                    <TextBlock Text="Points (rigid-move via gizmo, or edit individually)" FontWeight="Bold" Margin="0,8,0,0" TextWrapping="Wrap"/>
+                                    <ItemsControl ItemsSource="{Binding Points}">
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate>
+                                                <StackPanel Orientation="Horizontal" Margin="0,2,0,0">
+                                                    <TextBlock Text="{Binding Index}" Width="20"/>
+                                                    <TextBox Width="55" Text="{Binding X, StringFormat=0.###}" LostFocus="AuxField_LostFocus"/>
+                                                    <TextBox Width="55" Text="{Binding Y, StringFormat=0.###}" LostFocus="AuxField_LostFocus"/>
+                                                    <TextBox Width="55" Text="{Binding Z, StringFormat=0.###}" LostFocus="AuxField_LostFocus"/>
+                                                </StackPanel>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+                                </StackPanel>
+                            </DataTemplate>
+
+                            <DataTemplate DataType="{x:Type vm:PolyMeshInfoViewModel}">
+                                <StackPanel>
+                                    <TextBlock Text="Material" FontWeight="Bold"/>
+                                    <TextBox Text="{Binding Mesh.MaterialString}" TextWrapping="Wrap" LostFocus="AuxField_LostFocus" Margin="0,0,0,5"/>
+                                    <TextBlock Text="{Binding Description}" TextWrapping="Wrap" Margin="0,0,0,5"/>
+
+                                    <TextBlock Text="Transform" FontWeight="Bold"/>
+                                    <TextBlock Text="Rotate/scale disabled below format v4 - vertices are baked to world space, position only" FontStyle="Italic" TextWrapping="Wrap"/>
+                                    <UniformGrid Columns="6">
+                                        <TextBlock Text="Pos X"/><TextBox Text="{Binding PositionX, StringFormat=0.###}"/>
+                                        <TextBlock Text="Y"/><TextBox Text="{Binding PositionY, StringFormat=0.###}"/>
+                                        <TextBlock Text="Z"/><TextBox Text="{Binding PositionZ, StringFormat=0.###}"/>
+                                        <TextBlock Text="Rot X°"/><TextBox Text="{Binding RotationXDegrees, StringFormat=0.##}" IsEnabled="{Binding HasTransform}"/>
+                                        <TextBlock Text="Y°"/><TextBox Text="{Binding RotationYDegrees, StringFormat=0.##}" IsEnabled="{Binding HasTransform}"/>
+                                        <TextBlock Text="Z°"/><TextBox Text="{Binding RotationZDegrees, StringFormat=0.##}" IsEnabled="{Binding HasTransform}"/>
+                                        <TextBlock Text="Scale X"/><TextBox Text="{Binding ScaleX, StringFormat=0.###}" IsEnabled="{Binding HasTransform}"/>
+                                        <TextBlock Text="Y"/><TextBox Text="{Binding ScaleY, StringFormat=0.###}" IsEnabled="{Binding HasTransform}"/>
+                                        <TextBlock Text="Z"/><TextBox Text="{Binding ScaleZ, StringFormat=0.###}" IsEnabled="{Binding HasTransform}"/>
+                                    </UniformGrid>
+
+                                    <CheckBox Content="Visible In Shroud" IsChecked="{Binding Mesh.VisibleInShroud}" Click="AuxField_Click" Margin="0,8,0,0"/>
+
+                                    <TextBlock Text="Render Flags" FontWeight="Bold" Margin="0,8,0,0"/>
+                                    <UniformGrid Columns="2">
+                                        <CheckBox Content="Allow In Outfield" IsChecked="{Binding Mesh.Flags.AllowInOutfield}" Click="AuxField_Click"/>
+                                        <CheckBox Content="Clamp To Water" IsChecked="{Binding Mesh.Flags.ClampToWaterSurface}" Click="AuxField_Click"/>
+                                        <CheckBox Content="Visible In Tactical" IsChecked="{Binding Mesh.Flags.VisibleInTactical}" Click="AuxField_Click"/>
+                                    </UniformGrid>
+                                </StackPanel>
+                            </DataTemplate>
+
+                            <DataTemplate DataType="{x:Type vm:LightProbeInfoViewModel}">
+                                <StackPanel>
+                                    <TextBlock Text="Transform" FontWeight="Bold"/>
+                                    <UniformGrid Columns="6">
+                                        <TextBlock Text="Pos X"/><TextBox Text="{Binding PositionX, StringFormat=0.###}"/>
+                                        <TextBlock Text="Y"/><TextBox Text="{Binding PositionY, StringFormat=0.###}"/>
+                                        <TextBlock Text="Z"/><TextBox Text="{Binding PositionZ, StringFormat=0.###}"/>
+                                    </UniformGrid>
+
+                                    <TextBlock Text="Properties" FontWeight="Bold" Margin="0,8,0,0"/>
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition/><RowDefinition/>
+                                        </Grid.RowDefinitions>
+                                        <TextBlock Grid.Row="0" Grid.Column="0" Text="Inner Radius" Margin="0,0,5,0"/>
+                                        <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding Probe.InnerRadius, StringFormat=0.###}" LostFocus="AuxField_LostFocus"/>
+                                        <TextBlock Grid.Row="1" Grid.Column="0" Text="Outer Radius" Margin="0,0,5,0"/>
+                                        <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding Probe.OuterRadius, StringFormat=0.###}" LostFocus="AuxField_LostFocus"/>
+                                    </Grid>
+
+                                    <CheckBox Content="Primary" IsChecked="{Binding Probe.Primary}" Click="AuxField_Click" Margin="0,8,0,0"/>
+                                </StackPanel>
+                            </DataTemplate>
+
+                            <DataTemplate DataType="{x:Type vm:TerrainHoleInfoViewModel}">
+                                <StackPanel>
+                                    <TextBlock Text="Vertices (each independently draggable)" FontWeight="Bold" TextWrapping="Wrap"/>
+                                    <UniformGrid Columns="6">
+                                        <TextBlock Text="V1 X"/><TextBox Text="{Binding FirstVertX, StringFormat=0.###}"/>
+                                        <TextBlock Text="Y"/><TextBox Text="{Binding FirstVertY, StringFormat=0.###}"/>
+                                        <TextBlock Text="Z"/><TextBox Text="{Binding FirstVertZ, StringFormat=0.###}"/>
+                                        <TextBlock Text="V2 X"/><TextBox Text="{Binding SecondVertX, StringFormat=0.###}"/>
+                                        <TextBlock Text="Y"/><TextBox Text="{Binding SecondVertY, StringFormat=0.###}"/>
+                                        <TextBlock Text="Z"/><TextBox Text="{Binding SecondVertZ, StringFormat=0.###}"/>
+                                        <TextBlock Text="V3 X"/><TextBox Text="{Binding ThirdVertX, StringFormat=0.###}"/>
+                                        <TextBlock Text="Y"/><TextBox Text="{Binding ThirdVertY, StringFormat=0.###}"/>
+                                        <TextBlock Text="Z"/><TextBox Text="{Binding ThirdVertZ, StringFormat=0.###}"/>
+                                    </UniformGrid>
+
+                                    <TextBlock Text="Render Flags" FontWeight="Bold" Margin="0,8,0,0"/>
+                                    <UniformGrid Columns="2">
+                                        <CheckBox Content="Allow In Outfield" IsChecked="{Binding Hole.Flags.AllowInOutfield}" Click="AuxField_Click"/>
+                                        <CheckBox Content="Clamp To Water" IsChecked="{Binding Hole.Flags.ClampToWaterSurface}" Click="AuxField_Click"/>
+                                        <CheckBox Content="Visible In Tactical" IsChecked="{Binding Hole.Flags.VisibleInTactical}" Click="AuxField_Click"/>
+                                    </UniformGrid>
+                                </StackPanel>
+                            </DataTemplate>
+
+                            <DataTemplate DataType="{x:Type vm:CscInfoViewModel}">
+                                <StackPanel>
+                                    <TextBlock Text="Scene File" FontWeight="Bold"/>
+                                    <TextBox Text="{Binding Csc.SceneFile}" TextWrapping="Wrap" LostFocus="AuxField_LostFocus" Margin="0,0,0,5"/>
+
+                                    <TextBlock Text="Transform" FontWeight="Bold"/>
+                                    <UniformGrid Columns="6">
+                                        <TextBlock Text="Pos X"/><TextBox Text="{Binding PositionX, StringFormat=0.###}"/>
+                                        <TextBlock Text="Y"/><TextBox Text="{Binding PositionY, StringFormat=0.###}"/>
+                                        <TextBlock Text="Z"/><TextBox Text="{Binding PositionZ, StringFormat=0.###}"/>
+                                        <TextBlock Text="Rot X°"/><TextBox Text="{Binding RotationXDegrees, StringFormat=0.##}"/>
+                                        <TextBlock Text="Y°"/><TextBox Text="{Binding RotationYDegrees, StringFormat=0.##}"/>
+                                        <TextBlock Text="Z°"/><TextBox Text="{Binding RotationZDegrees, StringFormat=0.##}"/>
+                                        <TextBlock Text="Scale X"/><TextBox Text="{Binding ScaleX, StringFormat=0.###}"/>
+                                        <TextBlock Text="Y"/><TextBox Text="{Binding ScaleY, StringFormat=0.###}"/>
+                                        <TextBlock Text="Z"/><TextBox Text="{Binding ScaleZ, StringFormat=0.###}"/>
+                                    </UniformGrid>
+
+                                    <TextBlock Text="Properties" FontWeight="Bold" Margin="0,8,0,0"/>
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition/><RowDefinition/>
+                                        </Grid.RowDefinitions>
+                                        <TextBlock Grid.Row="0" Grid.Column="0" Text="Script Id" Margin="0,0,5,0"/>
+                                        <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding Csc.ScriptId}" LostFocus="AuxField_LostFocus"/>
+                                        <TextBlock Grid.Row="1" Grid.Column="0" Text="Parent Script Id" Margin="0,0,5,0"/>
+                                        <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding Csc.ParentScriptId}" LostFocus="AuxField_LostFocus"/>
+                                    </Grid>
+
+                                    <UniformGrid Columns="2" Margin="0,8,0,0">
+                                        <CheckBox Content="Autoplay" IsChecked="{Binding Csc.Autoplay}" Click="AuxField_Click"/>
+                                        <CheckBox Content="Visible In Shroud" IsChecked="{Binding Csc.VisibleInShroud}" Click="AuxField_Click"/>
+                                        <CheckBox Content="No Culling" IsChecked="{Binding Csc.NoCulling}" Click="AuxField_Click"/>
+                                        <CheckBox Content="Visible Without Shroud" IsChecked="{Binding Csc.VisibleWithoutShroud}" Click="AuxField_Click"/>
+                                        <CheckBox Content="Visible In Tactical" IsChecked="{Binding Csc.VisibleInTacticalView}" Click="AuxField_Click"/>
+                                        <CheckBox Content="Only Visible In Tactical" IsChecked="{Binding Csc.VisibleInTacticalViewOnly}" Click="AuxField_Click"/>
+                                        <CheckBox Content="Hold First" IsChecked="{Binding Csc.HoldFirst}" Click="AuxField_Click"/>
+                                        <CheckBox Content="Hold Last" IsChecked="{Binding Csc.HoldLast}" Click="AuxField_Click"/>
+                                    </UniformGrid>
+                                </StackPanel>
+                            </DataTemplate>
+
+                        </ContentControl.Resources>
+                    </ContentControl>
                 </ScrollViewer>
             </GroupBox>
         </Grid>

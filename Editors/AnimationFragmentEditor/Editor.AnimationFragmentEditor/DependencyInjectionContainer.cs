@@ -3,7 +3,6 @@ using CommonControls.Editors.AnimationPack;
 using CommonControls.Editors.TextEditor;
 using Editors.AnimationFragmentEditor.AnimationFilePreviewEditor;
 using Editors.AnimationFragmentEditor.AnimationPack.Commands;
-using Editors.AnimationFragmentEditor.CampaignAnimBin;
 using Microsoft.Extensions.DependencyInjection;
 using Shared.Core.DependencyInjection;
 using Shared.Core.DevConfig;
@@ -27,7 +26,6 @@ namespace Editors.AnimationFragmentEditor
             services.AddTransient<RenameSelectedFileCommand>();
 
             RegisterAnimPack(services);
-            RegisterCampaignAnimBin(services);
             RegisterAnimFileViewer(services);
             RegisterBatchConverter(services);
 
@@ -41,12 +39,6 @@ namespace Editors.AnimationFragmentEditor
                 .AddExtention(".animpack", EditorPriorites.High)
                 .Build(database);
 
-            EditorInfoBuilder
-                .Create<TextEditorViewModel<CampaignAnimBinToXmlConverter>, TextEditorView>(EditorEnums.XML_CampaginBin_Edtior)
-                .AddExtention(".bin", EditorPriorites.High)
-                .ValidForFoldersContaining(@"animations\campaign\database")
-                .Build(database);
-        
             EditorInfoBuilder
                 .Create<TextEditorViewModel<AnimFileToTextConverter>, TextEditorView>(EditorEnums.XML_Anim_Editor)
                 .AddExtention(".anim", EditorPriorites.Default)
@@ -62,12 +54,6 @@ namespace Editors.AnimationFragmentEditor
                 .Create<AnimationBatchExportViewModel, AnimationBatchExportView>(EditorEnums.AnimationBatchExporter_Editor)
                 .AddToToolbar("Animation Batch Exporter")
                 .Build(database);
-        }
-
-        private static void RegisterCampaignAnimBin(IServiceCollection services)
-        {
-            services.AddTransient<CampaignAnimBinToXmlConverter>();
-            services.AddTransient<TextEditorViewModel<CampaignAnimBinToXmlConverter>>();
         }
 
         private static void RegisterAnimFileViewer(IServiceCollection services)

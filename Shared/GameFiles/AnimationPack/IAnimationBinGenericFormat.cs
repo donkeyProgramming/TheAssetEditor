@@ -6,6 +6,8 @@
         public string Name { get; }
         public string FullPath { get; }
         public string SkeletonName { get; }
+        /// <summary>Name of the mount's fragment. Only set on rider fragments; empty otherwise.</summary>
+        public string MountBin { get; }
         public List<AnimationBinEntryGenericFormat> Entries { get; }
     }
 

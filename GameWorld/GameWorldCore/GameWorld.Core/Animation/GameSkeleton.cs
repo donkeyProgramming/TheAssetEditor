@@ -2,7 +2,6 @@
 using Shared.GameFormats.Animation;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Xml.Linq;
 
@@ -288,9 +287,47 @@ namespace GameWorld.Core.Animation
 
         public void DeleteBone(int boneIndex, bool rebuildMatrix = true)
         {
-            var boneGraph = SkeletonBoneGraph.Create(this);
-            boneGraph.DeleteBone(boneIndex);
-            boneGraph.FlattenInto(this);
+            // Delete the bone and all of its descendants, keeping the relative order of the
+            // remaining bones unchanged. Rebuilding the list via a tree traversal (as before)
+            // reindexed every bone in DFS order, which doesn't necessarily match the original
+            // bone order and caused all bones to appear reordered after a single deletion.
+            var boneIndexesToRemove = new HashSet<int>(GetAllChildBones(boneIndex)) { boneIndex };
+
+            var oldToNewIndex = new Dictionary<int, int>();
+            var newIndex = 0;
+            for (var i = 0; i < BoneCount; i++)
+            {
+                if (boneIndexesToRemove.Contains(i))
+                    continue;
+                oldToNewIndex[i] = newIndex++;
+            }
+
+            var names = new List<string>();
+            var parentBones = new List<int>();
+            var translation = new List<Vector3>();
+            var rotations = new List<Quaternion>();
+            var scale = new List<float>();
+
+            for (var i = 0; i < BoneCount; i++)
+            {
+                if (boneIndexesToRemove.Contains(i))
+                    continue;
+
+                var oldParentIndex = GetParentBoneIndex(i);
+                var newParentIndex = oldParentIndex == -1 ? -1 : oldToNewIndex[oldParentIndex];
+
+                names.Add(BoneNames[i]);
+                parentBones.Add(newParentIndex);
+                translation.Add(Translation[i]);
+                rotations.Add(Rotation[i]);
+                scale.Add(Scale[i]);
+            }
+
+            BoneNames = names;
+            _parentBoneIds = parentBones;
+            Translation = translation;
+            Rotation = rotations;
+            Scale = scale;
 
             if (rebuildMatrix)
                 RebuildSkeletonMatrix();
@@ -326,103 +363,6 @@ namespace GameWorld.Core.Animation
                 return 1;
 
             return GetAccumulatedBoneScale(parentIndex) * Scale[boneIndex];
-        }
-
-        [DebuggerDisplay("SkeletonBoneGraph = {BoneId}-{UpdatedBoneId}")]
-        public class SkeletonBoneGraph
-        {
-            GameSkeleton _source;
-            public List<SkeletonBoneGraph> Children { get; set; } = new List<SkeletonBoneGraph>();
-            public int BoneId { get; set; }
-            public SkeletonBoneGraph Parent { get; set; }
-            public int UpdatedBoneId { get; set; }
-
-            public static SkeletonBoneGraph Create(GameSkeleton skeleton)
-            {
-                var output = new SkeletonBoneGraph()
-                {
-                    _source = skeleton,
-                    BoneId = 0,
-                    Parent = null,
-                };
-                for (var i = 1; i < skeleton.BoneCount; i++)
-                {
-                    Console.WriteLine($"Adding bone {i}");
-                    var parentBoneId = skeleton.GetParentBoneIndex(i);
-                    var parentBone = output.GetBone(parentBoneId);
-                    parentBone.Children.Add(new SkeletonBoneGraph() { _source = skeleton, BoneId = i, Parent = parentBone });
-                }
-
-                var startId = 0;
-                output.UpdateBoneId(ref startId);
-
-                return output;
-            }
-
-            public void DeleteBone(int boneIndex)
-            {
-                var bone = GetBone(boneIndex);
-                var parent = bone.Parent;
-                parent.Children.Remove(bone);
-                var startId = 0;
-                UpdateBoneId(ref startId);
-            }
-
-            public SkeletonBoneGraph GetBone(int id)
-            {
-                if (BoneId == id)
-                    return this;
-                foreach (var child in Children)
-                {
-                    if (child.BoneId == id)
-                        return child;
-
-                    var result = child.GetBone(id);
-                    if (result != null)
-                        return result;
-                }
-                return null;
-            }
-
-            void UpdateBoneId(ref int currentId)
-            {
-                UpdatedBoneId = currentId++;
-                Console.WriteLine($"Current = {BoneId} new = {UpdatedBoneId}");
-
-                foreach (var child in Children)
-                    child.UpdateBoneId(ref currentId);
-            }
-
-            public void FlattenInto(GameSkeleton gameSkeleton)
-            {
-                var names = new List<string>();
-                var parentBones = new List<int>();
-                var translation = new List<Vector3>();
-                var rotations = new List<Quaternion>();
-                var scale = new List<float>();
-                Flatten(ref names, ref parentBones, ref translation, ref rotations, ref scale);
-
-                gameSkeleton.BoneNames = names;
-                gameSkeleton._parentBoneIds = parentBones;
-                gameSkeleton.Translation = translation;
-                gameSkeleton.Rotation = rotations;
-                gameSkeleton.Scale = scale;
-            }
-
-            public void Flatten(ref List<string> boneNames, ref List<int> parentBones, ref List<Vector3> translation, ref List<Quaternion> rotations, ref List<float> scale)
-            {
-                if (Parent == null)
-                    parentBones.Add(-1);
-                else
-                    parentBones.Add(Parent.UpdatedBoneId);
-                boneNames.Add(_source.BoneNames[BoneId]);
-                translation.Add(_source.Translation[BoneId]);
-                rotations.Add(_source.Rotation[BoneId]);
-                scale.Add(_source.Scale[BoneId]);
-
-                foreach (var child in Children)
-                    child.Flatten(ref boneNames, ref parentBones, ref translation, ref rotations, ref scale);
-            }
         }
     }
 }
