@@ -120,6 +120,7 @@ namespace Shared.CoreTest.PackFiles
                 useInMemoryDb: true,
                 systemFilePath: Path.GetDirectoryName(sourcePackPath),
                 sourcePackFilePath: sourcePackPath);
+            cached.IsCaPackFile = true;
             pfs.AddContainer(cached);
 
             var result = pfs.IsPackFileLoaded(sourcePackPath);
