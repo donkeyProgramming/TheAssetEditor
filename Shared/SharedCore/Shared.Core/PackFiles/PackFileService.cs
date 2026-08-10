@@ -32,6 +32,31 @@ namespace Shared.Core.PackFiles
 
         public List<IPackFileContainer> GetAllPackfileContainers() => _packFileContainers.Cast<IPackFileContainer>().ToList();
 
+        public bool IsPackFileLoaded(string packFilePath)
+        {
+            if (string.IsNullOrWhiteSpace(packFilePath))
+                return false;
+
+            var normalizedPath = NormalizeSystemPath(packFilePath);
+            foreach (var container in _packFileContainers)
+            {
+                if (PathsEqual(container.SystemFilePath, normalizedPath))
+                    return true;
+
+                var sourcePackFilePaths = container switch
+                {
+                    PackFileContainer packFileContainer => packFileContainer.SourcePackFilePaths,
+                    CachedPackFileContainer cachedPackFileContainer => cachedPackFileContainer.SourcePackFilePaths,
+                    _ => []
+                };
+
+                if (sourcePackFilePaths.Any(path => PathsEqual(path, normalizedPath)))
+                    return true;
+            }
+
+            return false;
+        }
+
         public IPackFileContainer? AddContainer(IPackFileContainer container, bool setToMainPackIfFirst = false)
         {
             var pf = CastContainer(container);
@@ -386,6 +411,12 @@ namespace Shared.Core.PackFiles
             {
                 return path.Replace('/', '\\').TrimEnd('\\').Trim().ToLowerInvariant();
             }
+        }
+
+        private static bool PathsEqual(string? path, string normalizedPath)
+        {
+            return string.IsNullOrWhiteSpace(path) == false
+                && NormalizeSystemPath(path) == normalizedPath;
         }
 
         private static string DescribeFile(IPackFileContainer container, PackFile file)

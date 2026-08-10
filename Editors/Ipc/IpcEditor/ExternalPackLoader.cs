@@ -1,5 +1,4 @@
-﻿using System.Windows;
-using Shared.Core.PackFiles;
+﻿using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
 using Shared.Core.PackFiles.Utility;
 
@@ -10,59 +9,60 @@ namespace Editors.Ipc
         private readonly ILogger _logger = Logging.Create<ExternalPackLoader>();
         private readonly IPackFileService _packFileService;
         private readonly IPackFileContainerLoader _packFileContainerLoader;
+        private readonly IUiDispatcher _uiDispatcher;
 
-        public ExternalPackLoader(IPackFileService packFileService, IPackFileContainerLoader packFileContainerLoader)
+        public ExternalPackLoader(IPackFileService packFileService, IPackFileContainerLoader packFileContainerLoader, IUiDispatcher uiDispatcher)
         {
             _packFileService = packFileService;
             _packFileContainerLoader = packFileContainerLoader;
+            _uiDispatcher = uiDispatcher;
         }
 
-        public Task<PackLoadResult> EnsureLoadedAsync(string packPathOnDisk, CancellationToken cancellationToken)
+        public async Task<PackLoadResult> EnsureLoadedAsync(string packPathOnDisk, CancellationToken cancellationToken)
         {
             cancellationToken.ThrowIfCancellationRequested();
 
             if (string.IsNullOrWhiteSpace(packPathOnDisk))
-                return Task.FromResult(PackLoadResult.Ok());
+                return PackLoadResult.Ok();
 
             var normalizedDiskPath = NormalizeDiskPath(packPathOnDisk);
             if (string.IsNullOrWhiteSpace(normalizedDiskPath))
-                return Task.FromResult(PackLoadResult.Fail("Pack path is empty"));
-
-            var alreadyLoaded = _packFileService
-                .GetAllPackfileContainers()
-                .Any(x => x.GetAllFiles().ContainsKey(normalizedDiskPath));
-
-
-            if (alreadyLoaded)
-                return Task.FromResult(PackLoadResult.Ok());
+                return PackLoadResult.Fail("Pack path is empty");
 
             try
             {
-                var container = _packFileContainerLoader.CreateFromPackFile(PackFileContainerType.Normal, normalizedDiskPath, true);
-                if (container == null)
-                    return Task.FromResult(PackLoadResult.Fail("Pack file could not be loaded"));
-
-                var added = AddContainerOnUiThread(container);
-                if (added == null)
-                    return Task.FromResult(PackLoadResult.Fail("Pack file could not be added"));
-
-                _logger.Here().Information($"Externally loaded pack file {normalizedDiskPath}");
-                return Task.FromResult(PackLoadResult.Ok());
+                // The pack loader owns WPF wait-cursor handling, so both loading and
+                // publishing the new container must run on the application dispatcher.
+                return await _uiDispatcher.InvokeAsync(
+                    () => EnsureLoadedOnUiThread(normalizedDiskPath),
+                    cancellationToken);
+            }
+            catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+            {
+                throw;
             }
             catch (Exception ex)
             {
                 _logger.Here().Error(ex, $"Failed loading external pack file {normalizedDiskPath}");
-                return Task.FromResult(PackLoadResult.Fail("Pack file load failed"));
+                return PackLoadResult.Fail("Pack file load failed");
             }
         }
 
-        private IPackFileContainer AddContainerOnUiThread(IPackFileContainer container)
+        private PackLoadResult EnsureLoadedOnUiThread(string normalizedDiskPath)
         {
-            var app = Application.Current;
-            if (app?.Dispatcher == null || app.Dispatcher.CheckAccess())
-                return _packFileService.AddContainer(container, false);
+            if (_packFileService.IsPackFileLoaded(normalizedDiskPath))
+                return PackLoadResult.Ok();
 
-            return app.Dispatcher.Invoke(() => _packFileService.AddContainer(container, false));
+            var container = _packFileContainerLoader.CreateFromPackFile(PackFileContainerType.Normal, normalizedDiskPath, true);
+            if (container == null)
+                return PackLoadResult.Fail("Pack file could not be loaded");
+
+            var added = _packFileService.AddContainer(container, false);
+            if (added == null)
+                return PackLoadResult.Fail("Pack file could not be added");
+
+            _logger.Here().Information($"Externally loaded pack file {normalizedDiskPath}");
+            return PackLoadResult.Ok();
         }
 
         private static string NormalizeDiskPath(string input)
@@ -88,16 +88,6 @@ namespace Editors.Ipc
             {
                 return path;
             }
-        }
-
-        private static bool PathsEqual(string left, string right)
-        {
-            if (string.IsNullOrWhiteSpace(left) || string.IsNullOrWhiteSpace(right))
-                return false;
-
-            var normalizedLeft = left.Replace('/', '\\').Trim();
-            var normalizedRight = right.Replace('/', '\\').Trim();
-            return string.Equals(normalizedLeft, normalizedRight, StringComparison.OrdinalIgnoreCase);
         }
     }
 }

@@ -16,6 +16,7 @@ namespace Shared.Core.PackFiles
         void DeleteFolder(IPackFileContainer pf, string folder);
         PackFile? FindFile(string path, IPackFileContainer? container = null);
         List<IPackFileContainer> GetAllPackfileContainers();
+        bool IsPackFileLoaded(string packFilePath);
         IPackFileContainer? GetEditablePack();
         string GetFullPath(PackFile file, IPackFileContainer? container = null);
         IPackFileContainer? GetPackFileContainer(PackFile file);

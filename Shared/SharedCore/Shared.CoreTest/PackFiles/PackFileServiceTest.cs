@@ -98,6 +98,37 @@ namespace Shared.CoreTest.PackFiles
         }
 
         [Test]
+        public void IsPackFileLoaded_ReturnsTrue_ForContainerSystemPath()
+        {
+            var pfs = CreateService();
+            var packPath = Path.GetFullPath("direct.pack");
+            pfs.AddContainer(PackFileContainer.CreateCaPackFile("Direct", packPath));
+
+            var result = pfs.IsPackFileLoaded(packPath.ToUpperInvariant());
+
+            Assert.That(result, Is.True);
+        }
+
+        [Test]
+        public void IsPackFileLoaded_ReturnsTrue_ForSourcePackInCachedAggregate()
+        {
+            var pfs = CreateService();
+            var sourcePackPath = Path.GetFullPath("variants.pack");
+            using var cached = CachedPackFileContainer.CreateFromFileList(
+                "All Game Packs",
+                [],
+                useInMemoryDb: true,
+                systemFilePath: Path.GetDirectoryName(sourcePackPath),
+                sourcePackFilePath: sourcePackPath);
+            cached.IsCaPackFile = true;
+            pfs.AddContainer(cached);
+
+            var result = pfs.IsPackFileLoaded(sourcePackPath);
+
+            Assert.That(result, Is.True);
+        }
+
+        [Test]
         public void CreateNewPackFileContainer()
         {
             var eventHub = new Mock<IGlobalEventHub>();

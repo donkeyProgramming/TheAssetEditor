@@ -13,6 +13,7 @@ namespace Editors.Ipc
             serviceCollection.AddTransient<IIpcUserNotifier, IpcUserNotifier>();
             serviceCollection.AddTransient<IExternalFileOpenExecutor, ExternalFileOpenExecutor>();
             serviceCollection.AddTransient<IIpcRequestHandler, IpcRequestHandler>();
+            serviceCollection.AddSingleton<IUiDispatcher, WpfUiDispatcher>();
             serviceCollection.AddSingleton<AssetEditorIpcServer>();
         }
 
