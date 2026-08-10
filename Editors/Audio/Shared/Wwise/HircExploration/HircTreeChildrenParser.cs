@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using Editors.Audio.AudioExplorer;
+﻿using Editors.Audio.AudioExplorer;
 using Editors.Audio.Shared.Storage;
 using Shared.GameFormats.Wwise.Enums;
 using Shared.GameFormats.Wwise.Hirc;
@@ -12,7 +10,7 @@ namespace Editors.Audio.Shared.Wwise.HircExploration
     {
         private record ArgumentPathLookupKey(HircTreeNode ParentNode, int Depth, uint State);
 
-        public HircTreeChildrenParser(IAudioRepository audioRepository) : base(audioRepository)
+        public HircTreeChildrenParser(IAudioRepository audioRepository, bool lazyLoadChildren = false) : base(audioRepository, lazyLoadChildren)
         {
             HircProcessChildMap.Add(AkBkHircType.Event, ProcessEvent);
             HircProcessChildMap.Add(AkBkHircType.Action, ProcessAction);
@@ -79,7 +77,7 @@ namespace Editors.Audio.Shared.Wwise.HircExploration
         private void ProcessAction(HircItem item, HircTreeNode parent)
         {
             var action = GetAsType<ICAkAction>(item);
-            var node = new HircTreeNode() { DisplayName = $"{action.GetActionType()} Action", Hirc = item, IsExpanded = true };
+            var node = new HircTreeNode() { DisplayName = $"{action.GetActionType()} Action", Hirc = item, IsExpanded = !LazyLoadChildren };
             parent.Children.Add(node);
             var childId = action.GetChildId();
 
@@ -87,9 +85,7 @@ namespace Editors.Audio.Shared.Wwise.HircExploration
             if (action.GetActionType() == AkActionType.SetState)
             {
                 var stateGroupId = action.GetStateGroupId();
-                var musicSwitches = AudioRepository.HircsById
-                   .SelectMany(kvp => kvp.Value)
-                   .Where(hirc => hirc.HircType == AkBkHircType.Music_Switch)
+                var musicSwitches = AudioRepository.GetHircs(AkBkHircType.Music_Switch)
                    .DistinctBy(hirc => hirc.Id)
                    .Cast<CAkMusicSwitchCntr_V136>()
                    .ToList();
@@ -101,9 +97,7 @@ namespace Editors.Audio.Shared.Wwise.HircExploration
                         ProcessNext(musicSwitch.Id, node);
                 }
 
-                var normalSwitches = AudioRepository.HircsById
-                   .SelectMany(kvp => kvp.Value)
-                   .Where(hirc => hirc.HircType == AkBkHircType.SwitchContainer)
+                var normalSwitches = AudioRepository.GetHircs(AkBkHircType.SwitchContainer)
                    .DistinctBy(hirc => hirc.Id)
                    .Cast<CAkSwitchCntr_V136>()
                    .ToList();
@@ -164,7 +158,7 @@ namespace Editors.Audio.Shared.Wwise.HircExploration
         private void ProcessRandomSequenceContainer(HircItem item, HircTreeNode parent)
         {
             var randomSequenceContainer = GetAsType<ICAkRanSeqCntr>(item);
-            var node = new HircTreeNode() { DisplayName = $"Random / Sequence Container", Hirc = item, IsExpanded = true };
+            var node = new HircTreeNode() { DisplayName = $"Random / Sequence Container", Hirc = item, IsExpanded = !LazyLoadChildren };
             parent.Children.Add(node);
             ProcessNext(randomSequenceContainer.GetChildren(), node);
         }
@@ -231,7 +225,7 @@ namespace Editors.Audio.Shared.Wwise.HircExploration
         private void ProcessMusicRandomSequenceContainer(HircItem item, HircTreeNode parent)
         {
             var musicRandomSequenceContainer = GetAsType<CAkMusicRanSeqCntr_V136>(item);
-            var node = new HircTreeNode() { DisplayName = $"Music Random / Sequence Container", Hirc = item, IsExpanded = true };
+            var node = new HircTreeNode() { DisplayName = $"Music Random / Sequence Container", Hirc = item, IsExpanded = !LazyLoadChildren };
             parent.Children.Add(node);
 
             if (musicRandomSequenceContainer.PlayList.Count != 0)

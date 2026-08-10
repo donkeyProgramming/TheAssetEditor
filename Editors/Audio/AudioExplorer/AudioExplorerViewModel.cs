@@ -1,8 +1,6 @@
-﻿using System;
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
-using System.Linq;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using CommunityToolkit.Mvvm.ComponentModel;
@@ -160,77 +158,65 @@ namespace Editors.Audio.AudioExplorer
                 }
             }
 
-            ExpandNodes(selectedNode);
-
             _ = LoadWaveformForNodeAsync(selectedNode);
         }
 
-        private async System.Threading.Tasks.Task LoadWaveformForNodeAsync(HircTreeNode node)
+        private async Task LoadWaveformForNodeAsync(HircTreeNode node)
+        {
+            var source = CreateWemWaveformSource(node);
+            if (source == null)
+                return;
+
+            await WaveformVisualiserViewModel.LoadFromWemSourceAsync(source, node.DisplayName);
+        }
+
+        public void PreloadWaveformsForNodes(IReadOnlyCollection<HircTreeNode> nodes)
+        {
+            var sources = nodes
+                .Select(CreateWemWaveformSource)
+                .Where(source => source != null)
+                .ToArray();
+
+            if (sources.Length != 0)
+                WaveformVisualiserViewModel.PreloadWemWaveforms(sources);
+        }
+
+        private WemWaveformSource CreateWemWaveformSource(HircTreeNode node)
         {
             if (node?.Hirc is ICAkSound sound)
             {
-                byte[] wemBytes;
-
                 // From at least V136 and newer, AkMediaInformation no longer stores a FileOffset. To get the wem data you would search the DidxChunk
                 // for the SourceId. While some Warhammer 3 AkBankSourceData are AKBKSourceType.Data_BNK and therefore should appear in the DidxChunk,
                 // no Warhammer 3 wems are in there and instead all wems are stored in Packs so they're actually AKBKSourceType.Streaming.
                 // This could be explained by Wwiser's Enum for AKBKSourceType in V136 mapping incorrectly, or V136 not supporting data bnks but who knows?
                 // So, as there are no data wems in Warhammer 3, functionality to find wem data in V136 is not implemented as they can only be streamed.
-                if (sound.GetStreamType() == AKBKSourceType.Data_BNK && sound is CAkSound_V112 sound_V112)
+                if (sound.GetStreamType() == AKBKSourceType.Data_BNK && sound is CAkSound_V112 soundV112)
                 {
-                    wemBytes = _audioRepository.FindDataWem(
-                        sound_V112.AkBankSourceData.AkMediaInformation.FileId,
-                        (int)sound_V112.AkBankSourceData.AkMediaInformation.FileOffset,
-                        (int)sound_V112.AkBankSourceData.AkMediaInformation.InMemoryMediaSize);
-                }
-                else
-                {
-                    var wemFile = _audioRepository.FindWem(sound.GetSourceId().ToString());
-                    wemBytes = wemFile?.DataSource.ReadData();
+                    var mediaInformation = soundV112.AkBankSourceData.AkMediaInformation;
+                    return new WemWaveformSource(
+                        $"data-wem:{mediaInformation.FileId}:{mediaInformation.FileOffset}:{mediaInformation.InMemoryMediaSize}",
+                        () => _audioRepository.FindDataWem(mediaInformation.FileId, (int)mediaInformation.FileOffset, (int)mediaInformation.InMemoryMediaSize));
                 }
 
-                if (wemBytes != null)
-                    await WaveformVisualiserViewModel.LoadFromWemBytesAsync(wemBytes, node.DisplayName).ConfigureAwait(false);
+                var sourceId = sound.GetSourceId();
+                var wemFile = _audioRepository.FindWem(sourceId.ToString());
+                if (wemFile == null)
+                    return null;
+
+                return new WemWaveformSource($"wem:{sourceId}:{wemFile.Name}", wemFile.DataSource.ReadData);
             }
-            else if (node?.Hirc is ICAkMusicTrack musicTrack)
+
+            if (node?.Hirc is ICAkMusicTrack musicTrack)
             {
-                var musicTrackId = musicTrack.GetChildren().FirstOrDefault();
-                var wemFile = _audioRepository.FindWem(musicTrackId.ToString());
-                if (wemFile != null)
-                    await WaveformVisualiserViewModel.LoadFromWemBytesAsync(wemFile.DataSource.ReadData(), node.DisplayName).ConfigureAwait(false);
-            }
-        }
+                var sourceId = musicTrack.GetChildren().FirstOrDefault();
+                var wemFile = _audioRepository.FindWem(sourceId.ToString());
+                if (wemFile == null)
+                    return null;
 
-        private static void ExpandNodes(HircTreeNode selectedNode)
-        {
-            // Expand ancestors and collapse siblings at branching levels
-            var currentNode = selectedNode;
-            while (currentNode.Parent != null)
-            {
-                var parentNode = currentNode.Parent;
-
-                parentNode.IsExpanded = true;
-
-                if (parentNode.Children != null && parentNode.Children.Count > 1)
-                {
-                    foreach (var siblingNode in parentNode.Children)
-                        siblingNode.IsExpanded = false;
-                }
-
-                currentNode.IsExpanded = true;
-                currentNode = parentNode;
+                return new WemWaveformSource($"wem:{sourceId}:{wemFile.Name}", wemFile.DataSource.ReadData);
             }
 
-            // Expand where there's only one child
-            currentNode = selectedNode;
-            while (currentNode.Children != null && currentNode.Children.Count == 1)
-            {
-                currentNode.IsExpanded = true;
-                currentNode = currentNode.Children[0];
-            }
-
-            if (currentNode.Children != null && currentNode.Children.Count > 0)
-                currentNode.IsExpanded = true;
+            return null;
         }
 
         private void OnLanguagesCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
@@ -282,12 +268,12 @@ namespace Editors.Audio.AudioExplorer
 
             if (SearchByVOActor)
             {
-                var hircTreeChildrenParser = new HircTreeChildrenParser(_audioRepository);
+                var hircTreeChildrenParser = new HircTreeChildrenParser(_audioRepository, lazyLoadChildren: true);
 
                 SelectedNode = null;
                 TreeList.Clear();
 
-                var dialogueEvents = _audioRepository.GetHircsByHircType(AkBkHircType.Dialogue_Event);
+                var dialogueEvents = _audioRepository.GetHircs(AkBkHircType.Dialogue_Event);
                 foreach (var dialogueEvent in dialogueEvents)
                 {
                     var dialogueEventRootNode = hircTreeChildrenParser.BuildHierarchy(dialogueEvent);
@@ -299,7 +285,7 @@ namespace Editors.Audio.AudioExplorer
             }
             else
             {
-                var hircTreeChildrenParser = new HircTreeChildrenParser(_audioRepository);
+                var hircTreeChildrenParser = new HircTreeChildrenParser(_audioRepository, lazyLoadChildren: true);
 
                 SelectedNode = null;
                 TreeList.Clear();
@@ -310,6 +296,109 @@ namespace Editors.Audio.AudioExplorer
                 TreeList.Add(rootNode);
             }
         }
+
+        public static void AutoExpandNode(HircTreeNode selectedNode)
+        {
+            if (IsVoActorStateNode(selectedNode))
+                ExpandFirstStatePathAndAudioSubtree(selectedNode);
+            else if (HasSingleRouteToFirstAutoExpansionTarget(selectedNode))
+                ExpandAllDescendantPaths(selectedNode);
+            else
+                selectedNode.IsExpanded = true;
+        }
+
+        private static void ExpandFirstStatePathAndAudioSubtree(HircTreeNode selectedNode)
+        {
+            var visitedNodes = new HashSet<HircTreeNode>();
+            var currentNode = selectedNode;
+
+            while (currentNode != null && visitedNodes.Add(currentNode))
+            {
+                currentNode.IsExpanded = true;
+
+                var firstStateChild = currentNode.Children?.FirstOrDefault(IsStatePathNode);
+                if (firstStateChild == null)
+                {
+                    ExpandAllDescendantPaths(currentNode);
+                    return;
+                }
+
+                currentNode = firstStateChild;
+            }
+        }
+
+        private static void ExpandAllDescendantPaths(HircTreeNode selectedNode)
+        {
+            var visitedNodes = new HashSet<HircTreeNode>();
+            var nodesToExpand = new Stack<HircTreeNode>();
+            nodesToExpand.Push(selectedNode);
+
+            while (nodesToExpand.Count != 0)
+            {
+                var currentNode = nodesToExpand.Pop();
+                if (currentNode == null || !visitedNodes.Add(currentNode))
+                    continue;
+
+                currentNode.IsExpanded = true;
+
+                if (currentNode.Children == null)
+                    continue;
+
+                for (var childIndex = currentNode.Children.Count - 1; childIndex >= 0; childIndex--)
+                    nodesToExpand.Push(currentNode.Children[childIndex]);
+            }
+        }
+
+        private static bool HasSingleRouteToFirstAutoExpansionTarget(HircTreeNode selectedNode)
+        {
+            var visitedNodes = new HashSet<HircTreeNode>();
+            var nodesToVisit = new Stack<HircTreeNode>();
+            var targetCount = 0;
+            nodesToVisit.Push(selectedNode);
+
+            while (nodesToVisit.Count != 0)
+            {
+                var currentNode = nodesToVisit.Pop();
+                if (currentNode == null || !visitedNodes.Add(currentNode))
+                    continue;
+
+                if (IsAutoExpansionTarget(currentNode))
+                {
+                    targetCount++;
+                    if (targetCount > 1)
+                        return false;
+
+                    continue;
+                }
+
+                currentNode.ResolveChildren();
+                if (currentNode.Children == null)
+                    continue;
+
+                for (var childIndex = currentNode.Children.Count - 1; childIndex >= 0; childIndex--)
+                    nodesToVisit.Push(currentNode.Children[childIndex]);
+            }
+
+            return targetCount == 1;
+        }
+
+        private static bool IsAutoExpansionTarget(HircTreeNode node)
+        {
+            var hircType = node.Hirc?.HircType;
+            return hircType == AkBkHircType.Sound ||
+                   hircType == AkBkHircType.RandomSequenceContainer ||
+                   hircType == AkBkHircType.SwitchContainer ||
+                   hircType == AkBkHircType.Music_Random_Sequence ||
+                   hircType == AkBkHircType.Music_Switch;
+        }
+
+        private static bool IsVoActorStateNode(HircTreeNode node) =>
+            IsStatePathNode(node) &&
+            node.DisplayName.StartsWith("State [VO_Actor]", StringComparison.OrdinalIgnoreCase);
+
+        private static bool IsStatePathNode(HircTreeNode node) =>
+            node.IsMetaNode &&
+            node.DisplayName.StartsWith("State [", StringComparison.OrdinalIgnoreCase);
 
         private static bool FilterTreeByVOActor(HircTreeNode currentNode, string voActor)
         {

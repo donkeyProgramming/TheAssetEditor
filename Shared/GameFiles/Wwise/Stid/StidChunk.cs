@@ -4,11 +4,14 @@ namespace Shared.GameFormats.Wwise.Stid
 {
     public class StidChunk
     {
-        public static ChunkHeader ReadData(string fileName, ByteChunk chunk)
+        public ChunkHeader ChunkHeader { get; set; } = new ChunkHeader();
+        public ByteChunk Data { get; set; } = new ByteChunk([]);
+
+        public static StidChunk ReadData(string fileName, ByteChunk chunk)
         {
-            var chunkHeader = ChunkHeader.ReadData(chunk);
-            chunk.Index += (int)chunkHeader.ChunkSize;
-            return chunkHeader;
+            var stidChunk = new StidChunk { ChunkHeader = ChunkHeader.ReadData(chunk) };
+            stidChunk.Data = chunk.CreateSub((int)stidChunk.ChunkHeader.ChunkSize);
+            return stidChunk;
         }
     }
 }

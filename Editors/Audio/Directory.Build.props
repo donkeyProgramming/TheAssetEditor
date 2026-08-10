@@ -1,0 +1,14 @@
+<Project>
+
+  <PropertyGroup>
+    <ParentDirectoryBuildPropsPath>$([MSBuild]::GetPathOfFileAbove('Directory.Build.props', '$(MSBuildThisFileDirectory)../'))</ParentDirectoryBuildPropsPath>
+  </PropertyGroup>
+
+  <Import Project="$(ParentDirectoryBuildPropsPath)" Condition="'$(ParentDirectoryBuildPropsPath)' != ''" />
+
+  <PropertyGroup Condition="'$(MSBuildProjectName)' == 'Test.Audio'">
+    <BaseIntermediateOutputPath>obj\Test.Audio\</BaseIntermediateOutputPath>
+    <BaseOutputPath>bin\Test.Audio\</BaseOutputPath>
+  </PropertyGroup>
+
+</Project>

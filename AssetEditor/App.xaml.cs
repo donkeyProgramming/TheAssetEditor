@@ -8,6 +8,7 @@ using AssetEditor.UiCommands;
 using AssetEditor.ViewModels;
 using AssetEditor.Views;
 using CommunityToolkit.Diagnostics;
+using Editors.Audio.Shared.Storage;
 using Editors.Ipc;
 using Microsoft.Extensions.DependencyInjection;
 using Shared.Core.DevConfig;
@@ -128,7 +129,23 @@ namespace AssetEditor
                 if (loadRes == null)
                     MessageBox.Show($"Unable to load all CA packfiles in {gamePath}");
                 else
+                {
                     packfileService.AddContainer(loadRes);
+                    BuildGameFilesAudioCache();
+                }
+            }
+        }
+
+        private void BuildGameFilesAudioCache()
+        {
+            try
+            {
+                var audioRepository = _serviceProvider!.GetRequiredService<IAudioRepository>();
+                audioRepository.EnsureGameFilesCache();
+            }
+            catch (Exception exception)
+            {
+                Logging.Create<App>().Here().Warning($"Failed to build the game-files audio cache: {exception.Message}");
             }
         }
 

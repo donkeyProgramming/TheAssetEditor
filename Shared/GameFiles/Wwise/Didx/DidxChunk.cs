@@ -1,21 +1,30 @@
-﻿using System.Text;
-using Shared.ByteParsing;
+﻿using Shared.ByteParsing;
 
 namespace Shared.GameFormats.Wwise.Didx
 {
     public partial class DidxChunk
     {
+        public ChunkHeader ChunkHeader { get; set; } = new ChunkHeader();
         public List<MediaHeader> MediaList { get; set; } = [];
 
         public static DidxChunk ReadData(string fileName, ByteChunk chunk)
         {
-            var tag = Encoding.UTF8.GetString(chunk.ReadBytes(4));
-            var chunkSize = chunk.ReadUInt32();
-            var numItems = chunkSize / MediaHeader.ByteSize;
-            var mediaList = Enumerable.Range(0, (int)numItems)
-                .Select(item => MediaHeader.ReadData(chunk))
-                .ToList();
-            return new DidxChunk { MediaList = mediaList };
+            var didxChunk = new DidxChunk { ChunkHeader = ChunkHeader.ReadData(chunk) };
+            didxChunk.MediaList = ReadMediaHeaders(chunk, didxChunk.ChunkHeader.ChunkSize);
+            return didxChunk;
+        }
+
+        public static List<MediaHeader> ReadMediaHeaders(ByteChunk chunk, uint chunkSize)
+        {
+            if (chunkSize % MediaHeader.ByteSize != 0)
+                throw new InvalidDataException($"DIDX chunk size {chunkSize} is not a multiple of {MediaHeader.ByteSize}.");
+
+            var items = chunkSize / MediaHeader.ByteSize;
+            var mediaHeaders = new List<MediaHeader>((int)items);
+            for (var itemIndex = 0; itemIndex < items; itemIndex++)
+                mediaHeaders.Add(MediaHeader.ReadData(chunk));
+
+            return mediaHeaders;
         }
     }
 }

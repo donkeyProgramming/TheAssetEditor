@@ -1,9 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Security.Cryptography;
+using System.Text;
 using Editors.Audio.Shared.GameInformation.Warhammer3;
-using Shared.Core.Misc;
+using Editors.Audio.Shared.Storage.CacheDatabase;
+using Shared.Core.Events;
 using Shared.Core.PackFiles;
+using Shared.Core.PackFiles.Events;
 using Shared.Core.PackFiles.Models;
 using Shared.Core.Settings;
 using Shared.GameFormats.Wwise.Didx;
@@ -12,6 +13,8 @@ using Shared.GameFormats.Wwise.Hirc;
 
 namespace Editors.Audio.Shared.Storage
 {
+    public sealed record HircReferenceRequest(uint HircId, string ReferringBnkFilePath);
+
     public interface IAudioRepository
     {
         Dictionary<uint, List<HircItem>> HircsById { get; }
@@ -22,12 +25,14 @@ namespace Editors.Audio.Shared.Storage
         Dictionary<string, Dictionary<string, string>> QualifiedStateGroupByStateGroupByDialogueEvent { get; }
         Dictionary<string, List<string>> StatesByStateGroup { get; }
 
-        void Load(List<string> languages); 
+        void EnsureGameFilesCache();
+        void Load(List<string> languages);
         void Clear();
-        List<T> GetHircsByType<T>() where T : class;
-        List<HircItem> GetHircsByHircType(AkBkHircType type);
+        List<HircItem> GetHircs(AkBkHircType type);
         List<HircItem> GetHircs(uint id);
         List<HircItem> GetHircs(uint id, string owningFileName);
+        Dictionary<uint, List<HircItem>> GetHircs(IReadOnlyCollection<uint> ids);
+        Dictionary<HircReferenceRequest, HircItem> ResolveHircReferences(IReadOnlyCollection<HircReferenceRequest> requests);
         string GetNameFromId(uint value);
         string GetNameFromId(uint value, out bool found);
         string GetNameFromId(uint? key);
@@ -41,111 +46,291 @@ namespace Editors.Audio.Shared.Storage
         byte[] FindDataWem(uint dataSoundbankId, int fileOffset, int byteCount);
     }
 
-    public class AudioRepository(
-        ApplicationSettingsService applicationSettingsService,
-        BnkLoader bnkLoader,
-        DatLoader datLoader,
-        IPackFileService packFileService) : IAudioRepository, IDisposable
+    internal class AudioRepository : IAudioRepository, IDisposable
     {
-        private readonly ApplicationSettingsService _applicationSettingsService = applicationSettingsService;
-        private readonly BnkLoader _bnkLoader = bnkLoader;
-        private readonly DatLoader _datLoader = datLoader;
-        private readonly IPackFileService _packFileService = packFileService;
+        private readonly ApplicationSettingsService _applicationSettingsService;
+        private readonly IPackFileService _packFileService;
+        private readonly IAudioCacheHelper _cacheHelper;
+        private readonly BnkLoader _bnkLoader;
+        private readonly IEventHub _eventHub;
+        private readonly ILogger _logger = Logging.Create<AudioRepository>();
 
         private readonly List<string> _loadedBnkDataLanguages = [];
-        private bool _isDatDataLoaded = false;
+        private readonly List<LoadedLayer> _loadedLayers = [];
+        private string _loadedFingerprint = "";
+        private bool _allCachedHircsLoaded;
+        private bool _allCachedDidxLoaded;
+        private Dictionary<uint, List<HircItem>> _hircsById = [];
+        private Dictionary<uint, Dictionary<string, HircItem>> _hircByBnkPathById = [];
+        private Dictionary<uint, Dictionary<string, HircItem>> _resolvedHircByReferringBnkPathById = [];
+        private Dictionary<AkBkHircType, List<HircItem>> _hircsByType = [];
+        private Dictionary<uint, List<DidxAudio>> _didxAudioListById = [];
 
-        public Dictionary<uint, List<HircItem>> HircsById { get; set; }
-        public Dictionary<uint, List<DidxAudio>> DidxAudioListById { get; set; }
-        public Dictionary<string, PackFile> PackFileByBnkName { get; set; }
-        public Dictionary<uint, string> NameById { get; set; }
-        public Dictionary<string, List<string>> StateGroupsByDialogueEvent { get; set; }
-        public Dictionary<string, Dictionary<string, string>> QualifiedStateGroupByStateGroupByDialogueEvent { get; set; }
-        public Dictionary<string, List<string>> StatesByStateGroup { get; set; }
+        public Dictionary<uint, List<HircItem>> HircsById => GetAllCachedHircs();
+        public Dictionary<uint, List<DidxAudio>> DidxAudioListById => GetAllCachedDidx();
+        public Dictionary<string, PackFile> PackFileByBnkName { get; private set; } = [];
+        public Dictionary<uint, string> NameById { get; private set; } = [];
+        public Dictionary<string, List<string>> StateGroupsByDialogueEvent { get; private set; } = [];
+        public Dictionary<string, Dictionary<string, string>> QualifiedStateGroupByStateGroupByDialogueEvent { get; private set; } = [];
+        public Dictionary<string, List<string>> StatesByStateGroup { get; private set; } = [];
+
+        public AudioRepository(
+            ApplicationSettingsService applicationSettingsService,
+            IPackFileService packFileService,
+            IAudioCacheHelper cacheHelper,
+            BnkLoader bnkLoader,
+            IEventHub eventHub)
+        {
+            _applicationSettingsService = applicationSettingsService;
+            _packFileService = packFileService;
+            _cacheHelper = cacheHelper;
+            _bnkLoader = bnkLoader;
+            _eventHub = eventHub;
+            _eventHub.Register<PackFileContainerSetAsMainEditableEvent>(this, OnPackFileContainerSetAsMainEditable);
+        }
+
+        private void OnPackFileContainerSetAsMainEditable(PackFileContainerSetAsMainEditableEvent e)
+        {
+            if (e.Container == null || e.Container.IsCaPackFile || _loadedLayers.Count == 0)
+                return;
+
+            Load([]);
+        }
+
+        public void EnsureGameFilesCache()
+        {
+            var source = CreateGameFilesCacheSource();
+            if (source == null)
+                return;
+
+            using var repository = LoadCachedRepository(source);
+        }
 
         public void Load(List<string> languages)
         {
-            var loadedData = false;
+            var requestedLanguages = _loadedBnkDataLanguages
+                .Union(languages, StringComparer.OrdinalIgnoreCase)
+                .Distinct(StringComparer.OrdinalIgnoreCase)
+                .ToList();
 
             var gameInformation = GameInformationDatabase.GetGameById(_applicationSettingsService.CurrentSettings.CurrentGame);
-            var gameBankGeneratorVersion = gameInformation.BankGeneratorVersion;
+            if (gameInformation.BankGeneratorVersion == GameBnkVersion.Unsupported)
+                return;
 
-            if (gameBankGeneratorVersion != GameBnkVersion.Unsupported)
+            var cacheSources = CreateCacheSources();
+            if (cacheSources.Count == 0)
+                return;
+
+            LoadCacheSources(cacheSources, requestedLanguages);
+        }
+
+        internal void LoadCacheSources(List<AudioCacheSource> cacheSources, List<string> requestedLanguages)
+        {
+            var fingerprint = CreateCombinedFingerprint(cacheSources);
+            if (_loadedLayers.Count != 0
+                && fingerprint == _loadedFingerprint
+                && requestedLanguages.All(
+                    language => _loadedBnkDataLanguages.Contains(
+                        language,
+                        StringComparer.OrdinalIgnoreCase)))
             {
-                var loadDatData = !_isDatDataLoaded;
-                var loadBnkData = !languages.All(language => _loadedBnkDataLanguages.Contains(language, StringComparer.OrdinalIgnoreCase));
-
-                if (loadDatData || loadBnkData)
-                    MemoryOptimiser.LogMemory("Before loading AudioRepository");
-
-                if (loadDatData)
-                {
-                    LoadDatData();
-                    loadedData = true;
-                }
-
-                if (loadBnkData)
-                {
-                    LoadBnkData(languages);
-                    loadedData = true;
-                }
+                return;
             }
 
-            if (loadedData)
+            var layers = LoadLayers(cacheSources);
+            try
             {
-                MemoryOptimiser.Optimise();
-                MemoryOptimiser.LogMemory("After loading AudioRepository");
+                var resolvedBnks = CreateEffectiveBnks(layers, requestedLanguages);
+                foreach (var bnk in resolvedBnks.Values)
+                    bnk.Layer.ResolvedBnkPaths.Add(bnk.Bnk.Path);
+
+                var datData = MergeDatData(layers.Select(layer => layer.AudioCache.LoadDatData()));
+                ApplyLoadedLayers(
+                    layers,
+                    resolvedBnks.Keys.ToList(),
+                    datData,
+                    requestedLanguages,
+                    fingerprint);
             }
+            catch
+            {
+                DisposeLayers(layers);
+                throw;
+            }
+
         }
 
-        private void LoadDatData()
+        internal List<AudioCacheSource> CreateCacheSources()
         {
-            var result = _datLoader.LoadDatData();
-            NameById = result.NameById ?? [];
-            StateGroupsByDialogueEvent = result.StateGroupsByDialogueEvent ?? [];
-            QualifiedStateGroupByStateGroupByDialogueEvent = result.QualifiedStateGroupByStateGroupByDialogueEvent ?? [];
-            StatesByStateGroup = result.StatesByStateGroup ?? [];
+            var allContainers = _packFileService.GetAllPackfileContainers();
+            var gameFileContainers = allContainers.Where(container => container.IsCaPackFile).ToList();
+            if (gameFileContainers.Count == 0)
+                return [];
 
-            _isDatDataLoaded = true;
+            var sources = new List<AudioCacheSource> { CreateGameFilesCacheSource(gameFileContainers) };
+
+            var projectFileContainers = allContainers.Where(container => !container.IsCaPackFile).ToList();
+            if (!HasRelevantAudioFiles(projectFileContainers))
+                return sources;
+
+            var projectFilesFingerprint = _cacheHelper.ComputeFingerprint(projectFileContainers, "project files");
+            var editableContainer = _packFileService.GetEditablePack();
+            var cacheOwner = editableContainer ?? projectFileContainers[^1];
+            var projectFilesLabel = cacheOwner.Name;
+
+            sources.Add(new AudioCacheSource(
+                _cacheHelper.GetCacheFilePath(projectFilesLabel, projectFilesFingerprint),
+                projectFilesFingerprint,
+                false,
+                projectFileContainers,
+                projectFileContainers));
+            return sources;
         }
 
-        private void LoadBnkData(List<string> languages)
+        public void Clear()
         {
-            var allLanguages = Wh3LanguageInformation.GetAllLanguages();
-            var languageToFilterOut = allLanguages
-                .Where(language => !languages.Contains(language))
-                .ToList();
-            var result = _bnkLoader.LoadBnkFiles(languageToFilterOut);
-            HircsById = result.HircsById ?? [];
-            DidxAudioListById = result.DidxAudioListById ?? [];
-            PackFileByBnkName = result.PackFileByBnkName ?? [];
+            DisposeLayers(_loadedLayers);
+            _loadedLayers.Clear();
+            _loadedBnkDataLanguages.Clear();
+            _loadedFingerprint = "";
+            _allCachedHircsLoaded = false;
+            _allCachedDidxLoaded = false;
+            _hircsById = [];
+            _hircByBnkPathById = [];
+            _resolvedHircByReferringBnkPathById = [];
+            _hircsByType = [];
+            _didxAudioListById = [];
+            PackFileByBnkName = [];
+            NameById = [];
+            StateGroupsByDialogueEvent = [];
+            QualifiedStateGroupByStateGroupByDialogueEvent = [];
+            StatesByStateGroup = [];
 
-            _loadedBnkDataLanguages.AddRange(languages);
         }
 
-        public List<T> GetHircsByType<T>() where T : class
+        public List<HircItem> GetHircs(AkBkHircType hircType)
         {
-            return HircsById.Values
-                .SelectMany(items => items)
-                .OfType<T>()
-                .ToList();
-        }
+            if (_loadedLayers.Count != 0 && !_allCachedHircsLoaded)
+            {
+                if (_hircsByType.TryGetValue(hircType, out var cachedHircs))
+                    return cachedHircs;
 
-        public List<HircItem> GetHircsByHircType(AkBkHircType hircType)
-        {
-            return HircsById.SelectMany(x => x.Value)
+                var references = new List<BnkHircReference>();
+                foreach (var layer in _loadedLayers)
+                {
+                    references.AddRange(
+                        layer.AudioCache.FindHircs(
+                            hircType,
+                            layer.ResolvedBnkPaths));
+                }
+
+                var hircs = _bnkLoader.LoadHircs(references);
+                _hircsByType[hircType] = hircs;
+                return hircs;
+            }
+
+            return _hircsById
+                .SelectMany(entry => entry.Value)
                 .Where(hirc => hirc.HircType == hircType)
                 .ToList();
         }
 
         public List<HircItem> GetHircs(uint id)
         {
-            if (HircsById.TryGetValue(id, out var value))
-                return value;
+            if (_hircsById.TryGetValue(id, out var hircs))
+                return hircs;
+
+            if (_loadedLayers.Count != 0 && !_allCachedHircsLoaded)
+            {
+                var references = new List<BnkHircReference>();
+                foreach (var layer in _loadedLayers)
+                {
+                    references.AddRange(
+                        layer.AudioCache.FindHircs(
+                            id,
+                            layer.ResolvedBnkPaths));
+                }
+
+                hircs = _bnkLoader.LoadHircs(references);
+                _hircsById[id] = hircs;
+                return hircs;
+            }
+
             return [];
         }
 
         public List<HircItem> GetHircs(uint id, string owningFileName) => GetHircs(id).Where(x => x.BnkFilePath == owningFileName).ToList();
+
+        public Dictionary<HircReferenceRequest, HircItem> ResolveHircReferences(IReadOnlyCollection<HircReferenceRequest> requests)
+        {
+            var result = new Dictionary<HircReferenceRequest, HircItem>();
+            var unresolvedRequests = new List<HircReferenceRequest>();
+
+            foreach (var request in (requests ?? []).Where(request => request != null && request.HircId != 0).Distinct())
+            {
+                if (TryGetResolvedHirc(request.HircId, request.ReferringBnkFilePath, out var resolvedHirc))
+                {
+                    result[request] = resolvedHirc;
+                    continue;
+                }
+
+                if (TryGetCachedHirc(request.HircId, request.ReferringBnkFilePath, out var sameBankHirc))
+                {
+                    CacheResolvedHirc(request.HircId, request.ReferringBnkFilePath, sameBankHirc);
+                    result[request] = sameBankHirc;
+                    continue;
+                }
+
+                if (_hircsById.TryGetValue(request.HircId, out var cachedCandidates) && cachedCandidates.Count != 0)
+                {
+                    var selectedHirc = SelectCachedFallback(request, cachedCandidates);
+                    CacheResolvedHirc(request.HircId, request.ReferringBnkFilePath, selectedHirc);
+                    result[request] = selectedHirc;
+                    continue;
+                }
+
+                unresolvedRequests.Add(request);
+            }
+
+            if (unresolvedRequests.Count != 0 && _loadedLayers.Count != 0 && !_allCachedHircsLoaded)
+                ResolveUncachedHircReferences(unresolvedRequests, result);
+
+            return result;
+        }
+
+        public Dictionary<uint, List<HircItem>> GetHircs(IReadOnlyCollection<uint> ids)
+        {
+            var resolvedHircsById = new Dictionary<uint, List<HircItem>>();
+            var uncachedIds = new HashSet<uint>();
+
+            foreach (var id in ids)
+            {
+                if (_hircsById.TryGetValue(id, out var cachedHircs))
+                    resolvedHircsById[id] = cachedHircs;
+                else
+                    uncachedIds.Add(id);
+            }
+
+            if (uncachedIds.Count != 0 && _loadedLayers.Count != 0 && !_allCachedHircsLoaded)
+            {
+                var references = new List<BnkHircReference>();
+                foreach (var layer in _loadedLayers)
+                    references.AddRange(layer.AudioCache.FindHircs(uncachedIds, layer.ResolvedBnkPaths));
+
+                var loadedHircs = _bnkLoader.LoadHircs(references);
+                foreach (var hircsForId in loadedHircs.GroupBy(hirc => hirc.Id))
+                {
+                    var groupedHircs = hircsForId.ToList();
+                    CacheHircsByBnkPath(groupedHircs);
+                    _hircsById[hircsForId.Key] = groupedHircs;
+                    resolvedHircsById[hircsForId.Key] = groupedHircs;
+                }
+            }
+
+            return resolvedHircsById;
+        }
+
+        public string GetNameFromId(uint value) => GetNameFromId(value, out var _);
 
         public string GetNameFromId(uint value, out bool found)
         {
@@ -154,8 +339,6 @@ namespace Editors.Audio.Shared.Storage
                 return NameById[value];
             return value.ToString();
         }
-
-        public string GetNameFromId(uint value) => GetNameFromId(value, out var _);
 
         public string GetNameFromId(uint? key)
         {
@@ -167,27 +350,40 @@ namespace Editors.Audio.Shared.Storage
 
         public HashSet<uint> GetUsedVanillaHircIdsByLanguageId(uint languageId)
         {
+            if (_loadedLayers.Count != 0 && !_allCachedHircsLoaded)
+            {
+                var result = new HashSet<uint>();
+                foreach (var layer in _loadedLayers)
+                {
+                    result.UnionWith(
+                        layer.AudioCache.FindHircIds(
+                            languageId,
+                            true,
+                            layer.ResolvedBnkPaths));
+                }
+                return result;
+            }
+
             return HircsById
-                .SelectMany(hircLookupEntry => hircLookupEntry.Value
-                    .Where(hirc => hirc.LanguageId == languageId && hirc.IsCAHircItem == true)
-                    .Select(_ => hircLookupEntry.Key))
+                .SelectMany(
+                    entry => entry.Value
+                        .Where(hirc => hirc.LanguageId == languageId && hirc.IsCA == true)
+                        .Select(_ => entry.Key))
                 .ToHashSet();
         }
 
         public HashSet<uint> GetUsedVanillaSourceIdsByLanguageId(uint languageId)
         {
-            return HircsById
-                .SelectMany(hircLookupEntry => hircLookupEntry.Value
-                    .Where(hirc => hirc.LanguageId == languageId && hirc is ICAkSound && hirc.IsCAHircItem == true)
-                    .Select(hirc => ((ICAkSound)hirc).GetSourceId()))
+            return GetHircs(AkBkHircType.Sound)
+                .Where(hirc => hirc.LanguageId == languageId && hirc is ICAkSound && hirc.IsCA == true)
+                .Select(hirc => ((ICAkSound)hirc).GetSourceId())
                 .ToHashSet();
         }
 
         public Dictionary<string, Dictionary<string, List<HircItem>>> GetVanillaDialogueEventsByBnkByLanguage()
         {
-            return GetHircsByType<ICAkDialogueEvent>()
-                .Select(hirc => hirc as HircItem)
-                .Where(hirc => hirc.IsCAHircItem)
+            return GetHircs(AkBkHircType.Dialogue_Event)
+                .Where(hirc => hirc.IsCA)
                 .GroupBy(hirc => GetNameFromId(hirc.LanguageId))
                 .ToDictionary(
                     languageGroup => languageGroup.Key,
@@ -201,7 +397,7 @@ namespace Editors.Audio.Shared.Storage
         {
             return HircsById
                 .SelectMany(hirc => hirc.Value)
-                .Where(hirc => hirc.IsCAHircItem == false)
+                .Where(hirc => hirc.IsCA == false)
                 .GroupBy(hirc => GetNameFromId(hirc.LanguageId))
                 .ToDictionary(
                     languageGroup => languageGroup.Key,
@@ -213,9 +409,8 @@ namespace Editors.Audio.Shared.Storage
 
         public Dictionary<string, List<HircItem>> GetModdedDialogueEventsByLanguage(List<string> moddedSoundBanks)
         {
-            return GetHircsByType<ICAkDialogueEvent>()
-                .Select(hirc => hirc as HircItem)
-                .Where(hirc => hirc.IsCAHircItem == false && moddedSoundBanks.Contains(hirc.BnkFilePath))
+            return GetHircs(AkBkHircType.Dialogue_Event)
+                .Where(hirc => hirc.IsCA == false && moddedSoundBanks.Contains(hirc.BnkFilePath))
                 .GroupBy(hirc => GetNameFromId(hirc.LanguageId))
                 .ToDictionary(group => group.Key, group => group.ToList());
         }
@@ -223,55 +418,12 @@ namespace Editors.Audio.Shared.Storage
         public List<string> GetModdedSoundBankFilePaths(string bnkNameSubstring)
         {
             return HircsById
-                .SelectMany(hircDictionaryEntry => hircDictionaryEntry.Value) 
-                .Where(hirc => hirc.IsCAHircItem == false && hirc.BnkFilePath.Contains(bnkNameSubstring))
-                .Select(hirc => hirc.BnkFilePath ) 
+                .SelectMany(hircDictionaryEntry => hircDictionaryEntry.Value)
+                .Where(hirc => hirc.IsCA == false && hirc.BnkFilePath.Contains(bnkNameSubstring))
+                .Select(hirc => hirc.BnkFilePath )
                 .Distinct(StringComparer.OrdinalIgnoreCase)
                 .OrderBy(bnkFilePath => bnkFilePath, StringComparer.OrdinalIgnoreCase)
                 .ToList();
-        }
-
-        public void Clear()
-        {
-            MemoryOptimiser.LogMemory("Before clearing AudioRepository");
-
-            if (HircsById != null)
-            {
-                foreach (var list in HircsById.Values)
-                {
-                    list?.Clear();
-                    list?.TrimExcess();
-                }
-                HircsById.Clear();
-                HircsById = null;
-            }
-
-            if (DidxAudioListById != null)
-            {
-                foreach (var list in DidxAudioListById.Values)
-                {
-                    list?.Clear();
-                    list?.TrimExcess();
-                }
-                DidxAudioListById.Clear();
-                DidxAudioListById = null;
-            }
-
-            _loadedBnkDataLanguages?.Clear();
-            _isDatDataLoaded = false;
-            PackFileByBnkName?.Clear();
-            PackFileByBnkName = null;
-            NameById?.Clear();
-            NameById = null;
-            StateGroupsByDialogueEvent?.Clear();
-            StateGroupsByDialogueEvent = null;
-            QualifiedStateGroupByStateGroupByDialogueEvent?.Clear();
-            QualifiedStateGroupByStateGroupByDialogueEvent = null;
-            StatesByStateGroup?.Clear();
-            StatesByStateGroup = null;
-
-            MemoryOptimiser.Optimise();
-            MemoryOptimiser.LogMemory("After clearing AudioRepository");
         }
 
         public PackFile FindWem(string wemId)
@@ -305,6 +457,382 @@ namespace Editors.Audio.Shared.Storage
             return byteChunk.ReadBytes(byteCount);
         }
 
-        public void Dispose() => Clear();
+        private AudioCacheSource CreateGameFilesCacheSource()
+        {
+            var gameFileContainers = _packFileService
+                .GetAllPackfileContainers()
+                .Where(container => container.IsCaPackFile)
+                .ToList();
+            return gameFileContainers.Count == 0 ? null : CreateGameFilesCacheSource(gameFileContainers);
+        }
+
+        private AudioCacheSource CreateGameFilesCacheSource(List<IPackFileContainer> gameFileContainers)
+        {
+            var fingerprint = _cacheHelper.ComputeFingerprint(gameFileContainers, "game files");
+            var label = gameFileContainers[0].Name;
+            return new AudioCacheSource(_cacheHelper.GetCacheFilePath(label, fingerprint), fingerprint, true, gameFileContainers, gameFileContainers);
+        }
+
+        private AudioCache LoadCachedRepository(AudioCacheSource source)
+        {
+            return _cacheHelper.TryLoadFromCache(source.CacheFilePath, source.Fingerprint) ?? _cacheHelper.SaveAndLoadCache(source);
+        }
+
+        private List<LoadedLayer> LoadLayers(List<AudioCacheSource> sources)
+        {
+            var layers = new List<LoadedLayer>();
+            try
+            {
+                foreach (var source in sources)
+                    layers.Add(new LoadedLayer(LoadCachedRepository(source)));
+                return layers;
+            }
+            catch
+            {
+                DisposeLayers(layers);
+                throw;
+            }
+        }
+
+        private void ApplyLoadedLayers(List<LoadedLayer> layers, List<string> bnkPaths, CachedAudioDatData datData, List<string> languages, string fingerprint)
+        {
+            DisposeLayers(_loadedLayers);
+            _loadedLayers.Clear();
+            _loadedLayers.AddRange(layers);
+            _hircsById = [];
+            _hircByBnkPathById = [];
+            _resolvedHircByReferringBnkPathById = [];
+            _hircsByType = [];
+            _didxAudioListById = [];
+            _allCachedHircsLoaded = false;
+            _allCachedDidxLoaded = false;
+            NameById = datData.NameById;
+            StateGroupsByDialogueEvent = datData.StateGroupsByDialogueEvent;
+
+            // Add qualifiers to State Groups as some events have the same State Group twice e.g. VO_Actor.
+            QualifiedStateGroupByStateGroupByDialogueEvent = DatLoader.BuildDialogueEventsWithStateGroupsWithQualifiersAndStateGroups(StateGroupsByDialogueEvent);
+            StatesByStateGroup = datData.StatesByStateGroup;
+            _loadedBnkDataLanguages.Clear();
+            _loadedBnkDataLanguages.AddRange(languages);
+            _loadedFingerprint = fingerprint;
+            SetCurrentBnkFiles(bnkPaths);
+        }
+
+        internal static CachedAudioDatData MergeDatData(IEnumerable<CachedAudioDatData> layers)
+        {
+            var result = new CachedAudioDatData();
+            foreach (var layer in layers)
+            {
+                foreach (var (id, name) in layer.NameById)
+                    result.NameById[id] = name;
+
+                AppendLists(result.StateGroupsByDialogueEvent, layer.StateGroupsByDialogueEvent);
+                AppendLists(result.StatesByStateGroup, layer.StatesByStateGroup);
+            }
+
+            return result;
+        }
+
+        private static void AppendLists(Dictionary<string, List<string>> target, Dictionary<string, List<string>> source)
+        {
+            foreach (var (key, values) in source)
+            {
+                if (!target.TryGetValue(key, out var targetValues))
+                {
+                    targetValues = [];
+                    target[key] = targetValues;
+                }
+
+                targetValues.AddRange(values);
+            }
+        }
+
+        private void SetCurrentBnkFiles(List<string> bnkPaths)
+        {
+            PackFileByBnkName = [];
+            foreach (var bnkPath in bnkPaths)
+            {
+                var bnk = _packFileService.FindFile(bnkPath);
+                if (bnk != null)
+                    PackFileByBnkName.TryAdd(bnk.Name, bnk);
+            }
+        }
+
+        private static Dictionary<string, ResolvedBnk> CreateEffectiveBnks(List<LoadedLayer> layers, List<string> languages)
+        {
+            var result = new Dictionary<string, ResolvedBnk>(StringComparer.OrdinalIgnoreCase);
+            foreach (var layer in layers)
+            {
+                foreach (var bnk in layer.AudioCache.GetBnks())
+                {
+                    if (IsLanguageIncluded(bnk.Path, languages))
+                        result[bnk.Path] = new ResolvedBnk(layer, bnk);
+                }
+            }
+            return result;
+        }
+
+        private void EnsureAllCachedHircsLoaded()
+        {
+            if (_loadedLayers.Count == 0 || _allCachedHircsLoaded)
+                return;
+
+            var references = new List<BnkHircReference>();
+            foreach (var layer in _loadedLayers)
+                references.AddRange(layer.AudioCache.FindAllHircs(layer.ResolvedBnkPaths));
+
+            _hircsById = _bnkLoader
+                .LoadHircs(references)
+                .GroupBy(hirc => hirc.Id)
+                .ToDictionary(group => group.Key, group => group.ToList());
+            _hircsByType.Clear();
+            _allCachedHircsLoaded = true;
+        }
+
+        private Dictionary<uint, List<HircItem>> GetAllCachedHircs()
+        {
+            EnsureAllCachedHircsLoaded();
+            return _hircsById;
+        }
+
+        private void EnsureAllCachedDidxLoaded()
+        {
+            if (_loadedLayers.Count == 0 || _allCachedDidxLoaded)
+                return;
+
+            var didxById = new Dictionary<uint, List<DidxAudio>>();
+            foreach (var layer in _loadedLayers)
+            {
+                var references = layer.AudioCache.FindDidx(
+                    layer.ResolvedBnkPaths);
+                foreach (var reference in references)
+                {
+                    var didx = _bnkLoader.LoadDidx(reference);
+                    if (didx == null)
+                        continue;
+
+                    if (!didxById.TryGetValue(didx.Id, out var entries))
+                    {
+                        entries = [];
+                        didxById[didx.Id] = entries;
+                    }
+                    entries.Add(didx);
+                }
+            }
+
+            _didxAudioListById = didxById;
+            _allCachedDidxLoaded = true;
+        }
+
+        private Dictionary<uint, List<DidxAudio>> GetAllCachedDidx()
+        {
+            EnsureAllCachedDidxLoaded();
+            return _didxAudioListById;
+        }
+
+        private static string CreateCombinedFingerprint(List<AudioCacheSource> sources)
+        {
+            return Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(string.Join("|", sources.Select(source => source.Fingerprint)))));
+        }
+
+        private static bool HasRelevantAudioFiles(List<IPackFileContainer> containers)
+        {
+            return containers.Any(container => container.SearchFiles(null, [".bnk", ".dat", ".wwiseids"]).Count != 0);
+        }
+
+        private static bool IsLanguageIncluded(string bnkPath, List<string> languages)
+        {
+            if (languages.Count == 0)
+                return true;
+
+            var normalisedPath = bnkPath.Replace('/', '\\');
+            var localisedLanguages = Wh3LanguageInformation.GetAllLanguages().Where(language => !language.Equals("sfx", StringComparison.OrdinalIgnoreCase));
+            foreach (var language in localisedLanguages)
+            {
+                if (!normalisedPath.Contains($"\\{language}\\", StringComparison.OrdinalIgnoreCase))
+                    continue;
+
+                return languages.Contains(language, StringComparer.OrdinalIgnoreCase);
+            }
+
+            return true;
+        }
+
+        private static void DisposeLayers(List<LoadedLayer> layers)
+        {
+            foreach (var layer in layers)
+                layer.AudioCache.Dispose();
+        }
+
+        private void ResolveUncachedHircReferences(
+            IReadOnlyCollection<HircReferenceRequest> requests,
+            Dictionary<HircReferenceRequest, HircItem> result)
+        {
+            var selectedReferenceByRequest = new Dictionary<HircReferenceRequest, BnkHircReference>();
+
+            foreach (var requestsByBank in requests.GroupBy(request => request.ReferringBnkFilePath ?? string.Empty, StringComparer.OrdinalIgnoreCase))
+            {
+                var ids = requestsByBank.Select(request => request.HircId).Distinct().ToArray();
+                var sameBankReferences = new List<BnkHircReference>();
+                foreach (var layer in _loadedLayers)
+                    sameBankReferences.AddRange(layer.AudioCache.FindHircs(ids, requestsByBank.Key, layer.ResolvedBnkPaths));
+
+                var sameBankReferenceById = sameBankReferences
+                    .GroupBy(reference => reference.Id)
+                    .ToDictionary(group => group.Key, group => group.First());
+                foreach (var request in requestsByBank)
+                {
+                    if (sameBankReferenceById.TryGetValue(request.HircId, out var reference))
+                        selectedReferenceByRequest[request] = reference;
+                }
+            }
+
+            var fallbackRequests = requests.Where(request => !selectedReferenceByRequest.ContainsKey(request)).ToArray();
+            if (fallbackRequests.Length != 0)
+            {
+                var fallbackIds = fallbackRequests.Select(request => request.HircId).Distinct().ToArray();
+                var fallbackReferences = new List<BnkHircReference>();
+                foreach (var layer in _loadedLayers)
+                    fallbackReferences.AddRange(layer.AudioCache.FindHircs(fallbackIds, layer.ResolvedBnkPaths));
+
+                var fallbackReferencesById = fallbackReferences
+                    .GroupBy(reference => reference.Id)
+                    .ToDictionary(group => group.Key, group => group.ToList());
+                foreach (var request in fallbackRequests)
+                {
+                    if (!fallbackReferencesById.TryGetValue(request.HircId, out var candidates) || candidates.Count == 0)
+                        continue;
+
+                    WarnIfAmbiguousHircReference(request.HircId, request.ReferringBnkFilePath, candidates.Select(candidate => candidate.BnkPath));
+                    selectedReferenceByRequest[request] = candidates[0];
+                }
+            }
+
+            var referencesToLoad = new List<BnkHircReference>();
+            foreach (var (request, reference) in selectedReferenceByRequest)
+            {
+                if (TryGetCachedHirc(reference.Id, reference.BnkPath, out var cachedHirc))
+                {
+                    CacheResolvedHirc(request.HircId, request.ReferringBnkFilePath, cachedHirc);
+                    result[request] = cachedHirc;
+                }
+                else
+                {
+                    referencesToLoad.Add(reference);
+                }
+            }
+
+            if (referencesToLoad.Count != 0)
+                CacheHircsByBnkPath(_bnkLoader.LoadHircs(referencesToLoad.Distinct().ToList()));
+
+            foreach (var (request, reference) in selectedReferenceByRequest)
+            {
+                if (result.ContainsKey(request) || !TryGetCachedHirc(reference.Id, reference.BnkPath, out var loadedHirc))
+                    continue;
+
+                CacheResolvedHirc(request.HircId, request.ReferringBnkFilePath, loadedHirc);
+                result[request] = loadedHirc;
+            }
+        }
+
+        private HircItem SelectCachedFallback(HircReferenceRequest request, IEnumerable<HircItem> candidates)
+        {
+            var orderedCandidates = candidates
+                .OrderBy(candidate => candidate.BnkFilePath, StringComparer.OrdinalIgnoreCase)
+                .ThenBy(candidate => candidate.IndexInFile)
+                .ToList();
+            WarnIfAmbiguousHircReference(request.HircId, request.ReferringBnkFilePath, orderedCandidates.Select(candidate => candidate.BnkFilePath));
+            return orderedCandidates[0];
+        }
+
+        private bool TryGetCachedHirc(uint id, string bnkFilePath, out HircItem hirc)
+        {
+            hirc = null;
+            if (string.IsNullOrWhiteSpace(bnkFilePath))
+                return false;
+
+            if (_hircByBnkPathById.TryGetValue(id, out var hircByBnkPath) &&
+                hircByBnkPath.TryGetValue(bnkFilePath, out hirc))
+            {
+                return true;
+            }
+
+            if (!_hircsById.TryGetValue(id, out var hircs))
+                return false;
+
+            hirc = hircs.FirstOrDefault(candidate => string.Equals(candidate.BnkFilePath, bnkFilePath, StringComparison.OrdinalIgnoreCase));
+            if (hirc == null)
+                return false;
+
+            CacheHircsByBnkPath([hirc]);
+            return true;
+        }
+
+        private bool TryGetResolvedHirc(uint id, string referringBnkFilePath, out HircItem hirc)
+        {
+            hirc = null;
+            return !string.IsNullOrWhiteSpace(referringBnkFilePath) &&
+                   _resolvedHircByReferringBnkPathById.TryGetValue(id, out var hircByReferringBnkPath) &&
+                   hircByReferringBnkPath.TryGetValue(referringBnkFilePath, out hirc);
+        }
+
+        private void CacheResolvedHirc(uint id, string referringBnkFilePath, HircItem hirc)
+        {
+            if (hirc == null || string.IsNullOrWhiteSpace(referringBnkFilePath))
+                return;
+
+            if (!_resolvedHircByReferringBnkPathById.TryGetValue(id, out var hircByReferringBnkPath))
+            {
+                hircByReferringBnkPath = new Dictionary<string, HircItem>(StringComparer.OrdinalIgnoreCase);
+                _resolvedHircByReferringBnkPathById[id] = hircByReferringBnkPath;
+            }
+
+            hircByReferringBnkPath[referringBnkFilePath] = hirc;
+        }
+
+        private void CacheHircsByBnkPath(IEnumerable<HircItem> hircs)
+        {
+            foreach (var hirc in hircs)
+            {
+                if (hirc == null || string.IsNullOrWhiteSpace(hirc.BnkFilePath))
+                    continue;
+
+                if (!_hircByBnkPathById.TryGetValue(hirc.Id, out var hircByBnkPath))
+                {
+                    hircByBnkPath = new Dictionary<string, HircItem>(StringComparer.OrdinalIgnoreCase);
+                    _hircByBnkPathById[hirc.Id] = hircByBnkPath;
+                }
+
+                hircByBnkPath[hirc.BnkFilePath] = hirc;
+            }
+        }
+
+        private void WarnIfAmbiguousHircReference(uint id, string referringBnkFilePath, IEnumerable<string> candidateBnkPaths)
+        {
+            var paths = candidateBnkPaths
+                .Where(path => !string.IsNullOrWhiteSpace(path))
+                .Distinct(StringComparer.OrdinalIgnoreCase)
+                .ToList();
+            if (paths.Count <= 1)
+                return;
+
+            _logger.Here().Warning(
+                $"HIRC reference {id} from '{referringBnkFilePath}' was not found in its referring bank and matched multiple banks. " +
+                $"Using '{paths[0]}'. Candidates: {string.Join(", ", paths)}");
+        }
+
+        public void Dispose()
+        {
+            _eventHub.UnRegister(this);
+            Clear();
+        }
+
+        private sealed class LoadedLayer(AudioCache audioCache)
+        {
+            public AudioCache AudioCache { get; } = audioCache;
+            public HashSet<string> ResolvedBnkPaths { get; } = new(StringComparer.OrdinalIgnoreCase);
+        }
+
+        private sealed record ResolvedBnk(LoadedLayer Layer, AudioCache.CachedAudioBnk Bnk);
     }
 }
