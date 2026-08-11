@@ -11,6 +11,13 @@ This document describes the current IPC endpoint implemented by `AssetEditor`.
 ## Pipe Path (Windows)
 - `\\.\pipe\TheAssetEditor.Ipc`
 
+## Multiple AssetEditor Instances
+- IPC starts automatically; the `Start_IPC` command-line argument is no longer required
+- Every AssetEditor instance participates in ownership of the fixed pipe
+- A per-session named mutex (`Local\TheAssetEditor.Ipc.Owner`) ensures only one instance hosts the pipe at a time
+- Other instances wait without repeatedly trying to create the pipe
+- When the owner exits, one waiting instance takes ownership and starts serving IPC requests
+
 ## Request Format
 Send one JSON object followed by a newline.
 
