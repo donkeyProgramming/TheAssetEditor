@@ -9,6 +9,7 @@ namespace Editors.Ipc
     public class AssetEditorIpcServer : IDisposable
     {
         public const string PipeName = "TheAssetEditor.Ipc";
+        public const string OwnershipMutexName = @"Local\TheAssetEditor.Ipc.Owner";
 
         private static readonly JsonSerializerOptions SerializerOptions = new()
         {
@@ -21,9 +22,9 @@ namespace Editors.Ipc
         private readonly IServiceScopeFactory _scopeFactory;
         private readonly object _syncLock = new();
 
-        private CancellationTokenSource _cancellationTokenSource;
-        private Task _serverTask;
-        private NamedPipeServerStream _activePipe;
+        private CancellationTokenSource? _cancellationTokenSource;
+        private Thread? _serverThread;
+        private NamedPipeServerStream? _activePipe;
         private bool _disposed;
 
         public AssetEditorIpcServer(IServiceScopeFactory scopeFactory)
@@ -38,11 +39,81 @@ namespace Editors.Ipc
                 if (_disposed)
                     throw new ObjectDisposedException(nameof(AssetEditorIpcServer));
 
-                if (_serverTask != null)
+                if (_serverThread != null)
                     return;
 
-                _cancellationTokenSource = new CancellationTokenSource();
-                _serverTask = Task.Run(() => RunServerLoopAsync(_cancellationTokenSource.Token));
+                var cancellationTokenSource = new CancellationTokenSource();
+                var serverThread = new Thread(() => RunOwnershipLoop(cancellationTokenSource.Token))
+                {
+                    IsBackground = true,
+                    Name = "AssetEditor IPC ownership"
+                };
+
+                _cancellationTokenSource = cancellationTokenSource;
+                _serverThread = serverThread;
+
+                try
+                {
+                    serverThread.Start();
+                }
+                catch
+                {
+                    _cancellationTokenSource = null;
+                    _serverThread = null;
+                    cancellationTokenSource.Dispose();
+                    throw;
+                }
+            }
+        }
+
+        private void RunOwnershipLoop(CancellationToken cancellationToken)
+        {
+            try
+            {
+                using var ownershipMutex = new Mutex(false, OwnershipMutexName);
+                _logger.Here().Information($"Waiting for IPC ownership on {OwnershipMutexName}");
+
+                var ownsMutex = false;
+                try
+                {
+                    int waitResult;
+                    try
+                    {
+                        waitResult = WaitHandle.WaitAny([ownershipMutex, cancellationToken.WaitHandle]);
+                    }
+                    catch (AbandonedMutexException ex) when (ex.MutexIndex == 0)
+                    {
+                        // The previous owner exited without releasing the mutex. Windows
+                        // grants ownership to this thread, so it is safe to start the pipe.
+                        waitResult = 0;
+                        _logger.Here().Warning("Taking over IPC ownership from an exited Asset Editor instance");
+                    }
+
+                    if (waitResult != 0)
+                        return;
+
+                    ownsMutex = true;
+                    _logger.Here().Information("Acquired IPC ownership");
+
+                    // A Windows mutex must be released by the thread that acquired it.
+                    // Keep this thread alive while the async server loop runs elsewhere.
+                    RunServerLoopAsync(cancellationToken).GetAwaiter().GetResult();
+                }
+                finally
+                {
+                    if (ownsMutex)
+                    {
+                        ownershipMutex.ReleaseMutex();
+                        _logger.Here().Information("Released IPC ownership");
+                    }
+                }
+            }
+            catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+            {
+            }
+            catch (Exception ex)
+            {
+                _logger.Here().Error(ex, "IPC ownership coordinator stopped unexpectedly");
             }
         }
 
@@ -52,10 +123,16 @@ namespace Editors.Ipc
 
             while (cancellationToken.IsCancellationRequested == false)
             {
-                NamedPipeServerStream pipe = null;
+                NamedPipeServerStream? pipe = null;
+                var retryAfterFailure = false;
                 try
                 {
-                    pipe = new NamedPipeServerStream(PipeName, PipeDirection.InOut, 1, PipeTransmissionMode.Byte, PipeOptions.Asynchronous);
+                    pipe = new NamedPipeServerStream(
+                        PipeName,
+                        PipeDirection.InOut,
+                        1,
+                        PipeTransmissionMode.Byte,
+                        PipeOptions.Asynchronous | PipeOptions.CurrentUserOnly);
                     SetActivePipe(pipe);
 
                     await pipe.WaitForConnectionAsync(cancellationToken);
@@ -74,11 +151,26 @@ namespace Editors.Ipc
                 catch (Exception ex)
                 {
                     _logger.Here().Error(ex, "Unhandled exception in IPC server loop");
+                    retryAfterFailure = true;
                 }
                 finally
                 {
-                    ClearActivePipe(pipe);
+                    if (pipe != null)
+                        ClearActivePipe(pipe);
+
                     pipe?.Dispose();
+                }
+
+                if (retryAfterFailure)
+                {
+                    try
+                    {
+                        await Task.Delay(TimeSpan.FromSeconds(1), cancellationToken);
+                    }
+                    catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+                    {
+                        break;
+                    }
                 }
             }
 
@@ -93,7 +185,7 @@ namespace Editors.Ipc
             if (string.IsNullOrWhiteSpace(line))
                 return IpcResponse.Failure("Empty request");
 
-            IpcRequest request;
+            IpcRequest? request;
             try
             {
                 request = JsonSerializer.Deserialize<IpcRequest>(line, SerializerOptions);
@@ -154,9 +246,9 @@ namespace Editors.Ipc
 
         public void Dispose()
         {
-            CancellationTokenSource cancellationTokenSource;
-            Task serverTask;
-            NamedPipeServerStream activePipe;
+            CancellationTokenSource? cancellationTokenSource;
+            Thread? serverThread;
+            NamedPipeServerStream? activePipe;
 
             lock (_syncLock)
             {
@@ -165,11 +257,11 @@ namespace Editors.Ipc
 
                 _disposed = true;
                 cancellationTokenSource = _cancellationTokenSource;
-                serverTask = _serverTask;
+                serverThread = _serverThread;
                 activePipe = _activePipe;
 
                 _cancellationTokenSource = null;
-                _serverTask = null;
+                _serverThread = null;
                 _activePipe = null;
             }
 
@@ -189,18 +281,21 @@ namespace Editors.Ipc
             {
             }
 
-            if (serverTask != null)
+            var serverStopped = true;
+            if (serverThread != null)
             {
                 try
                 {
-                    _ = serverTask.Wait(TimeSpan.FromSeconds(2));
+                    serverStopped = serverThread.Join(TimeSpan.FromSeconds(2));
                 }
                 catch
                 {
+                    serverStopped = false;
                 }
             }
 
-            cancellationTokenSource?.Dispose();
+            if (serverStopped)
+                cancellationTokenSource?.Dispose();
         }
     }
 }
