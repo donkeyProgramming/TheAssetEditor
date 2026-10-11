@@ -144,7 +144,7 @@ namespace GameWorld.Core.WpfWindow
         {
             try
             {
-                // just run as fast as possible, WPF itself is limited to 60 FPS so that's the max we will get
+                // just run as fast as possible, WPF raises one frame per display refresh so that's the max we will get
                 Update(time);
                 Draw(time);
             }
