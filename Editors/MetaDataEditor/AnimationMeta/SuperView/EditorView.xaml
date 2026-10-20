@@ -10,6 +10,11 @@
              d:DesignHeight="450" d:DesignWidth="800">
     <DockPanel>
         <Button Margin="5" Content="{loc:Loc MetadataEditor.Buttons.Refresh}" Click="{s:MethodBinding RefreshAction}" DockPanel.Dock="Top"/>
+        <CheckBox Margin="5" Content="{loc:Loc SuperView.ShowVfx}" IsChecked="{Binding ShowVfx, UpdateSourceTrigger=PropertyChanged}" DockPanel.Dock="Top"/>
+        <DockPanel Margin="5,0,5,5" DockPanel.Dock="Top" ToolTip="{loc:Loc SuperView.VfxFilter.Tooltip}">
+            <TextBlock Text="{loc:Loc SuperView.VfxFilter}" VerticalAlignment="Center" Margin="0,0,5,0"/>
+            <ComboBox ItemsSource="{Binding VfxFilterIds}" SelectedItem="{Binding VfxFilterId}"/>
+        </DockPanel>
 
         <TabControl DockPanel.Dock="Top" SelectedIndex="{Binding SelectedTabControllerIndex, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">
             <TabItem Header="{loc:Loc MetadataEditor.Tabs.Persistent}">
