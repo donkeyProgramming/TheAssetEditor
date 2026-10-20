@@ -22,6 +22,7 @@ namespace GameWorld.Core.Rendering.Materials.Shaders.MetalRough
 
             _renderingTechniqueMap[RenderingTechnique.Normal] = "BasicColorDrawing";
             _renderingTechniqueMap[RenderingTechnique.Emissive] = "GlowDrawing";
+            _renderingTechniqueMap[RenderingTechnique.Depth] = "DepthDrawing";
         }
 
         protected override void OnApply(Effect effect)

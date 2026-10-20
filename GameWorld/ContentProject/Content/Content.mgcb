@@ -74,6 +74,12 @@
 /processorParam:DebugMode=Auto
 /build:Shaders/Pbr/SpecGloss/SpecGloss_main.fx
 
+#begin Shaders/Particle.fx
+/importer:EffectImporter
+/processor:EffectProcessor
+/processorParam:DebugMode=Auto
+/build:Shaders/Particle.fx
+
 #begin Shaders/TexturePreview.fx
 /importer:EffectImporter
 /processor:EffectProcessor

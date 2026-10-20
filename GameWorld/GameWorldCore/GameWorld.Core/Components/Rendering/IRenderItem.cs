@@ -10,13 +10,16 @@ namespace GameWorld.Core.Components.Rendering
         Selection,
         Font,
         Texture2D,
-        Grid
+        Grid,
+        Transparent,
     }
 
     public enum RenderingTechnique
     {
         Normal,
         Emissive,
+        /// <summary>The view depth of what is drawn, for soft particles to fade against; drawn only by what supports it.</summary>
+        Depth,
     }
 
     enum RasterizerStateEnum

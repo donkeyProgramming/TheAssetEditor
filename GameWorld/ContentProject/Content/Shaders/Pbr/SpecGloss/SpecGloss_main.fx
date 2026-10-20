@@ -83,14 +83,41 @@ float4 mainPS(in PixelInputType input, bool bIsFrontFace : SV_IsFrontFace) : SV_
 
     // Apply global constant light colour so the scene lighting can be globally tuned
     hdr_linear_col *= Constant_LightColour;
+
+    // The VFX preview's light particles, each lit as the sun is (scaled as standard_lighting_model_directional_light scales
+    // the sun), without the sun's environment light.
+    float3 reflectedView = reflect(normalizedViewDirection, standard_mat.Normal);
+    for (int i = 0; i < PointLightCount; i++)
+    {
+        float3 toLight;
+        float3 pointColour = PointLightAt(i, input.worldPosition, toLight) * directlightIntensity * 500.0f * LightMult;
+        hdr_linear_col += standard_lighting_model_directional_light_SM4_private(pointColour, toLight, normalizedViewDirection, reflectedView, standard_mat);
+    }
     
     //  Tone-map the pixel...            
     float3 ldr_linear_col = saturate(tone_map_linear_hdr_pixel_value(hdr_linear_col*exposure));        
     
 	//  Return gamma corrected value...
-    return float4( _gamma(ldr_linear_col), 1.0f);
+    return float4( _gamma(ldr_linear_col * ModelColour.rgb), ModelColour.a);
 }
 
+
+// RenderingTechnique.Depth: the view depth the VFX preview's soft particles fade against, cut where the texture is cut.
+float4 DepthPixelShader(in PixelInputType input) : SV_TARGET0
+{
+    if (UseAlpha == 1)
+        alpha_test(GetMaterial(input).diffuse.a);
+    return float4(-mul(float4(input.worldPosition, 1), View).z, 0, 0, 1);
+}
+
+technique DepthDrawing
+{
+    pass P0
+    {
+        VertexShader = compile vs_5_0 MainVertexShader();
+        PixelShader = compile ps_5_0 DepthPixelShader();
+    }
+};
 
 technique BasicColorDrawing
 {
