@@ -1,0 +1,286 @@
+<UserControl x:Class="Editors.VfxEditor.Views.VfxEditorView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="clr-namespace:Editors.VfxEditor.ViewModels"
+             xmlns:doc="clr-namespace:Editors.VfxEditor.Document">
+    <UserControl.InputBindings>
+        <KeyBinding Modifiers="Ctrl" Key="S" Command="{Binding SaveFileCommand}"/>
+        <KeyBinding Modifiers="Ctrl" Key="Z" Command="{Binding UndoCommand}"/>
+        <KeyBinding Modifiers="Ctrl" Key="Y" Command="{Binding RedoCommand}"/>
+    </UserControl.InputBindings>
+    <UserControl.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolToVis"/>
+
+        <DataTemplate DataType="{x:Type vm:CurveEditor}">
+            <StackPanel Margin="12,4,0,8">
+                <StackPanel Orientation="Horizontal" Margin="0,0,0,4">
+                    <TextBlock Text="Channel" VerticalAlignment="Center" Margin="0,0,6,0"/>
+                    <ComboBox ItemsSource="{Binding Channels}" SelectedItem="{Binding SelectedChannel}" DisplayMemberPath="Name" MinWidth="110"/>
+                    <Button Content="Copy channel" Command="{Binding AddChannelCommand}" Margin="8,0,0,0" Padding="6,0"
+                            ToolTip="Copies the picked channel to the end of the list; point the mapping at it to use it"/>
+                    <Button Content="Remove channel" Command="{Binding RemoveChannelCommand}" Margin="4,0,0,0" Padding="6,0"
+                            ToolTip="Refused while the mapping reads the channel"/>
+                    <Button Content="Add key" Command="{Binding AddKeyCommand}" Margin="8,0,0,0" Padding="6,0"
+                            ToolTip="Copies the picked key to a time halfway to the next one"/>
+                    <Button Content="Delete key" Command="{Binding DeleteKeyCommand}" Margin="4,0,0,0" Padding="6,0"/>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" Margin="4,0,0,2" Opacity="0.7">
+                    <TextBlock Text="Time" Width="62"/>
+                    <TextBlock Text="Value" Width="62"/>
+                    <TextBlock Text="In" Width="92"/>
+                    <TextBlock Text="Out" Width="92"/>
+                    <TextBlock Text="Tan in X" Width="62"/>
+                    <TextBlock Text="Tan in Y" Width="62"/>
+                    <TextBlock Text="Tan out X" Width="62"/>
+                    <TextBlock Text="Tan out Y" Width="62"/>
+                    <TextBlock Text="Flag" Width="52"/>
+                </StackPanel>
+                <ListBox ItemsSource="{Binding Keys}" SelectedItem="{Binding SelectedKey}">
+                    <ListBox.ItemContainerStyle>
+                        <Style TargetType="{x:Type ListBoxItem}">
+                            <EventSetter Event="PreviewGotKeyboardFocus" Handler="KeyRow_PreviewGotKeyboardFocus"/>
+                        </Style>
+                    </ListBox.ItemContainerStyle>
+                    <ListBox.ItemTemplate>
+                        <DataTemplate DataType="{x:Type vm:CurveKeyRow}">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBox Width="60" Margin="0,0,2,0" Text="{Binding Time}"/>
+                                <TextBox Width="60" Margin="0,0,2,0" Text="{Binding Value}"/>
+                                <ComboBox Width="90" Margin="0,0,2,0" ItemsSource="{x:Static doc:CurveText.Interpolations}" SelectedItem="{Binding In}"/>
+                                <ComboBox Width="90" Margin="0,0,2,0" ItemsSource="{x:Static doc:CurveText.Interpolations}" SelectedItem="{Binding Out}"/>
+                                <TextBox Width="60" Margin="0,0,2,0" Text="{Binding TanInX}"/>
+                                <TextBox Width="60" Margin="0,0,2,0" Text="{Binding TanInY}"/>
+                                <TextBox Width="60" Margin="0,0,2,0" Text="{Binding TanOutX}"/>
+                                <TextBox Width="60" Margin="0,0,2,0" Text="{Binding TanOutY}"/>
+                                <TextBox Width="50" Text="{Binding Flag}"/>
+                            </StackPanel>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+                <StackPanel Orientation="Horizontal" Margin="0,4,0,0">
+                    <TextBlock Text="Mapping" VerticalAlignment="Center" Margin="0,0,6,0"/>
+                    <TextBox Text="{Binding Mapping}" MinWidth="220"
+                             ToolTip="output,random;min,max for each output, joined by |. min and max are channel numbers from 0; random 1 draws a point between them, 0 uses min."/>
+                </StackPanel>
+                <Border BorderBrush="#40808080" BorderThickness="1" Width="302" Height="82" HorizontalAlignment="Left" Margin="0,6,0,0">
+                    <ItemsControl ItemsSource="{Binding Lines}">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <Grid/>
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate DataType="{x:Type vm:CurveLine}">
+                                <Polyline Points="{Binding Points}" Stroke="{Binding Colour}" StrokeThickness="{Binding Thickness}" ToolTip="{Binding Name}"/>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </Border>
+                <TextBlock Text="{Binding Range, StringFormat='Over the particle or emitter life, 0 to 1; values {0}'}" Opacity="0.7" Margin="0,2,0,0"/>
+            </StackPanel>
+        </DataTemplate>
+    </UserControl.Resources>
+
+    <DockPanel>
+        <ToolBar DockPanel.Dock="Top">
+            <Button Content="New" Command="{Binding NewFileCommand}" ToolTip="A new effect with nothing in it yet. Save asks where it goes."/>
+            <Button Content="Open" Command="{Binding OpenFileCommand}" ToolTip="Pick a vfx\*.xml from the loaded packs"/>
+            <Separator/>
+            <Button Content="Save" Command="{Binding SaveFileCommand}" ToolTip="Ctrl+S: into the editable pack, at this file's path"/>
+            <Button Content="Save As" Command="{Binding SaveFileAsCommand}"/>
+            <Separator/>
+            <Button Content="Undo" Command="{Binding UndoCommand}" ToolTip="Ctrl+Z"/>
+            <Button Content="Redo" Command="{Binding RedoCommand}" ToolTip="Ctrl+Y"/>
+            <Separator/>
+            <TextBlock Text="Quality" VerticalAlignment="Center" Margin="4,0"/>
+            <ComboBox ItemsSource="{Binding TierNames}" SelectedIndex="{Binding Tier}" Width="90"/>
+            <CheckBox Content="This tier only" IsChecked="{Binding ThisTierOnly}" Margin="8,0,0,0" VerticalAlignment="Center"
+                      ToolTip="Off: an edit also reaches every tier that held the same value. On: only the tier shown changes."/>
+        </ToolBar>
+        <TextBlock DockPanel.Dock="Bottom" Text="{Binding Status}" Margin="6,3" TextTrimming="CharacterEllipsis"/>
+        <Grid>
+            <TextBlock Text="{Binding LoadError}" TextWrapping="Wrap" Margin="12"
+                       Visibility="{Binding HasLoadError, Converter={StaticResource BoolToVis}}"/>
+            <Grid Visibility="{Binding IsLoaded, Converter={StaticResource BoolToVis}}">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="260" MinWidth="150"/>
+                    <ColumnDefinition Width="5"/>
+                    <ColumnDefinition Width="2*" MinWidth="250"/>
+                    <ColumnDefinition Width="5"/>
+                    <ColumnDefinition Width="3*" MinWidth="200"/>
+                </Grid.ColumnDefinitions>
+                <TreeView ItemsSource="{Binding Tree}" SelectedItemChanged="Tree_SelectedItemChanged">
+                    <TreeView.ItemContainerStyle>
+                        <Style TargetType="{x:Type TreeViewItem}">
+                            <Setter Property="IsSelected" Value="{Binding IsSelected, Mode=TwoWay}"/>
+                            <Setter Property="IsExpanded" Value="{Binding IsExpanded, Mode=TwoWay}"/>
+                        </Style>
+                    </TreeView.ItemContainerStyle>
+                    <TreeView.ItemTemplate>
+                        <HierarchicalDataTemplate DataType="{x:Type vm:VfxTreeNode}" ItemsSource="{Binding Children}">
+                            <TextBlock Text="{Binding Label}"/>
+                        </HierarchicalDataTemplate>
+                    </TreeView.ItemTemplate>
+                </TreeView>
+                <GridSplitter Grid.Column="1" HorizontalAlignment="Stretch"/>
+                <DockPanel Grid.Column="2">
+                    <StackPanel DockPanel.Dock="Top" Margin="4">
+                        <StackPanel Orientation="Horizontal" Margin="0,2" Visibility="{Binding CanAddProperty, Converter={StaticResource BoolToVis}}">
+                            <ComboBox ItemsSource="{Binding PropertyNameChoices}" SelectedItem="{Binding NewPropertyName}" Width="220"/>
+                            <Button Content="Add property" Command="{Binding AddPropertyCommand}" Margin="4,0,0,0" Padding="6,0"
+                                    ToolTip="Written the way vanilla most often writes it"/>
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal" Margin="0,2" Visibility="{Binding IsChainNode, Converter={StaticResource BoolToVis}}">
+                            <ComboBox ItemsSource="{Binding FragmentChoices}" SelectedItem="{Binding NewFragment}" Width="220"/>
+                            <Button Content="Add modifier" Command="{Binding AddModifierCommand}" Margin="4,0,0,0" Padding="6,0"
+                                    ToolTip="With the properties vanilla most often gives this fragment"/>
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal" Margin="0,2" Visibility="{Binding IsBlockMissing, Converter={StaticResource BoolToVis}}">
+                            <TextBlock Text="No modifiers at this tier, so it draws nothing." Foreground="OrangeRed" VerticalAlignment="Center"/>
+                            <Button Content="Copy Ultra's block here" Command="{Binding CopyUltraBlockCommand}" Margin="6,0,0,0" Padding="6,0"/>
+                        </StackPanel>
+                        <Button Content="Remove modifier" Command="{Binding RemoveModifierCommand}" HorizontalAlignment="Left" Padding="6,0" Margin="0,2"
+                                Visibility="{Binding IsModifierNode, Converter={StaticResource BoolToVis}}"/>
+                        <StackPanel Orientation="Horizontal" Margin="0,2" Visibility="{Binding IsEmitterNode, Converter={StaticResource BoolToVis}}">
+                            <TextBox Text="{Binding NewEmitterId, UpdateSourceTrigger=PropertyChanged}" Width="220"/>
+                            <Button Content="Duplicate emitter" Command="{Binding DuplicateEmitterCommand}" Margin="4,0,0,0" Padding="6,0"
+                                    ToolTip="Copies the emitter, its behaviour chain and its render stack under this id"/>
+                            <Button Content="Rename" Command="{Binding RenameEmitterCommand}" Margin="4,0,0,0" Padding="6,0"
+                                    ToolTip="Gives the emitter, its behaviour chain and its render stack this id. A reference to this effect from another file keeps the old one."/>
+                            <Button Content="Remove emitter" Command="{Binding RemoveEmitterCommand}" Margin="4,0,0,0" Padding="6,0"/>
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal" Margin="0,2" Visibility="{Binding IsEmitterNode, Converter={StaticResource BoolToVis}}">
+                            <TextBlock Text="Type" VerticalAlignment="Center" Margin="0,0,6,0"/>
+                            <ComboBox ItemsSource="{Binding EmitterTypes}" SelectedItem="{Binding EmitterType}" Width="160"
+                                      ToolTip="continuous_mesh draws quads; continuous_rigid draws models. Vanilla uses no other type."/>
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal" Margin="0,2" Visibility="{Binding IsEmittersNode, Converter={StaticResource BoolToVis}}">
+                            <TextBox Text="{Binding NewEmitterId, UpdateSourceTrigger=PropertyChanged}" Width="160"/>
+                            <ComboBox ItemsSource="{Binding EmitterTypes}" SelectedItem="{Binding NewEmitterType}" Width="140" Margin="4,0,0,0"/>
+                            <Button Content="New emitter" Command="{Binding NewEmitterCommand}" Margin="4,0,0,0" Padding="6,0"
+                                    ToolTip="An emitter, its behaviour chain at every tier and its render stack, with what at least half of vanilla's emitters of this type carry"/>
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal" Margin="0,2" Visibility="{Binding IsReferencesNode, Converter={StaticResource BoolToVis}}">
+                            <ComboBox IsEditable="True" ItemsSource="{Binding EffectChoices}" Text="{Binding NewReferenceTarget, UpdateSourceTrigger=PropertyChanged}" Width="260">
+                                <ComboBox.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <VirtualizingStackPanel/>
+                                    </ItemsPanelTemplate>
+                                </ComboBox.ItemsPanel>
+                            </ComboBox>
+                            <Button Content="Add reference" Command="{Binding AddReferenceCommand}" Margin="4,0,0,0" Padding="6,0"/>
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal" Margin="0,2" Visibility="{Binding IsReferenceNode, Converter={StaticResource BoolToVis}}">
+                            <ComboBox ItemsSource="{Binding OverrideChoices}" SelectedItem="{Binding NewOverrideName}" Width="180"/>
+                            <Button Content="Add override" Command="{Binding AddOverrideCommand}" Margin="4,0,0,0" Padding="6,0"/>
+                            <Button Content="All on" Command="{Binding AllOverridesOnCommand}" Margin="8,0,0,0" Padding="6,0"/>
+                            <Button Content="All off" Command="{Binding AllOverridesOffCommand}" Margin="4,0,0,0" Padding="6,0"/>
+                            <Button Content="Remove reference" Command="{Binding RemoveReferenceCommand}" Margin="8,0,0,0" Padding="6,0"/>
+                        </StackPanel>
+                        <Button Content="Remove override" Command="{Binding RemoveOverrideCommand}" HorizontalAlignment="Left" Padding="6,0" Margin="0,2"
+                                Visibility="{Binding IsOverrideNode, Converter={StaticResource BoolToVis}}"/>
+                    </StackPanel>
+                    <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
+                        <ItemsControl ItemsSource="{Binding Rows}" Margin="4">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate DataType="{x:Type vm:PropertyRow}">
+                                    <Grid Margin="0,2">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="220"/>
+                                            <ColumnDefinition Width="*" MinWidth="120"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="Auto"/>
+                                        </Grid.RowDefinitions>
+                                        <TextBlock Text="{Binding Label}" ToolTip="{Binding Label}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
+                                        <CheckBox Grid.Column="1" IsChecked="{Binding BoolValue}" VerticalAlignment="Center"
+                                                  Visibility="{Binding IsBool, Converter={StaticResource BoolToVis}}"/>
+                                        <ComboBox Grid.Column="1" ItemsSource="{Binding Choices}" SelectedItem="{Binding Value}"
+                                                  Visibility="{Binding IsChoice, Converter={StaticResource BoolToVis}}"/>
+                                        <TextBox Grid.Column="1" Text="{Binding Value}" Visibility="{Binding IsTextual, Converter={StaticResource BoolToVis}}">
+                                            <TextBox.Style>
+                                                <Style TargetType="{x:Type TextBox}" BasedOn="{StaticResource {x:Type TextBox}}">
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding IsInvalid}" Value="True">
+                                                            <Setter Property="BorderBrush" Value="Red"/>
+                                                            <Setter Property="ToolTip" Value="Not a number, so the file keeps its old value"/>
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </TextBox.Style>
+                                        </TextBox>
+                                        <StackPanel Grid.Column="2" Orientation="Horizontal">
+                                            <Button Content="Browse" Padding="6,0" Margin="4,0,0,0" ToolTip="Pick the file from the loaded packs"
+                                                    Visibility="{Binding IsPath, Converter={StaticResource BoolToVis}}"
+                                                    Command="{Binding DataContext.BrowseFileCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                    CommandParameter="{Binding}"/>
+                                            <Button Content="Open" Padding="6,0" Margin="4,0,0,0" ToolTip="Open the file in the app (a material opens in the text editor)"
+                                                    Visibility="{Binding IsPath, Converter={StaticResource BoolToVis}}"
+                                                    Command="{Binding DataContext.OpenPathCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                    CommandParameter="{Binding}"/>
+                                            <TextBlock Text="{Binding Note}" Margin="6,0" VerticalAlignment="Center" Opacity="0.7"/>
+                                        </StackPanel>
+                                        <Button Grid.Column="3" Content="Remove" Padding="6,0" ToolTip="Remove this property"
+                                                Visibility="{Binding CanRemove, Converter={StaticResource BoolToVis}}"
+                                                Command="{Binding DataContext.RemovePropertyCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                CommandParameter="{Binding}"/>
+                                        <ContentControl Grid.Row="1" Grid.ColumnSpan="4" Content="{Binding Curve}"/>
+                                        <Image Grid.Row="1" Grid.Column="1" Source="{Binding Thumbnail}" MaxHeight="64" MaxWidth="128" HorizontalAlignment="Left" Margin="0,2" Stretch="Uniform"/>
+                                    </Grid>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </ScrollViewer>
+                </DockPanel>
+                <GridSplitter Grid.Column="3" HorizontalAlignment="Stretch"/>
+                <Grid Grid.Column="4">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+                    <ContentControl Content="{Binding Scene, Mode=OneTime}"/>
+                    <DockPanel Grid.Row="1" Margin="4">
+                        <ToggleButton DockPanel.Dock="Left" Content="Play" IsChecked="{Binding IsPlaying}" Width="50"/>
+                        <CheckBox DockPanel.Dock="Left" Content="Loop at" IsChecked="{Binding Loop}" Margin="8,0,4,0" VerticalAlignment="Center"/>
+                        <TextBox DockPanel.Dock="Left" Text="{Binding LoopLength}" Width="40"/>
+                        <TextBlock DockPanel.Dock="Left" Text="s" Margin="2,0,8,0" VerticalAlignment="Center"/>
+                        <TextBlock DockPanel.Dock="Left" Text="Speed" Margin="0,0,4,0" VerticalAlignment="Center"/>
+                        <TextBox DockPanel.Dock="Left" Text="{Binding Speed}" Width="40"/>
+                        <CheckBox DockPanel.Dock="Left" Content="Grid" IsChecked="{Binding ShowGrid}" Margin="10,0,0,0" VerticalAlignment="Center"
+                                  ToolTip="The ground grid and its axis lines"/>
+                        <TextBlock DockPanel.Dock="Right" Text="{Binding PreviewTime, StringFormat='{}{0:0.00} s'}" Width="55" Margin="6,0,0,0" VerticalAlignment="Center"/>
+                        <Slider Minimum="0" Maximum="{Binding LoopLength}" Value="{Binding PreviewTime}" Margin="8,0" VerticalAlignment="Center"/>
+                    </DockPanel>
+                    <WrapPanel Grid.Row="2" Margin="4,0,4,4">
+                        <CheckBox Content="Projectile" IsChecked="{Binding Projectile}" VerticalAlignment="Center"
+                                  ToolTip="Fly the effect in a straight line, crossing the origin halfway through each loop. World-space emitters leave their particles behind as a trail; local-space ones move with it."/>
+                        <TextBlock Text="Velocity" Margin="10,0,4,0" VerticalAlignment="Center"/>
+                        <TextBox Text="{Binding ProjectileSpeed}" Width="50"
+                                 ToolTip="Metres a second, as projectiles_tables.muzzle_velocity: vanilla median 67, arrows 54, muskets 100, fastest 300"/>
+                        <TextBlock Text="m/s" Margin="2,0,10,0" VerticalAlignment="Center"/>
+                        <TextBlock Text="Axis" Margin="0,0,4,0" VerticalAlignment="Center"/>
+                        <ComboBox ItemsSource="{Binding AxisNames}" SelectedIndex="{Binding ProjectileAxis}" Width="55"
+                                  ToolTip="The effect's local axis the projectile flies along"/>
+                        <CheckBox Content="Static" IsChecked="{Binding StaticView}" Margin="10,0,0,0" VerticalAlignment="Center"
+                                  ToolTip="Watch from the projectile: it and the guide model hold the centre of the view while the trail streams back behind them. Unticked, they fly across the view."/>
+                        <Button Content="Model..." Command="{Binding LoadModelCommand}" Margin="10,0,0,0" Padding="6,0"
+                                ToolTip="A .rigid_model_v2 from the loaded packs to stand where the effect is, as a guide. The preview only; nothing is written to the file."/>
+                        <TextBlock Text="{Binding ModelName}" Margin="6,0" VerticalAlignment="Center"/>
+                        <Button Content="Clear" Command="{Binding ClearModelCommand}" Padding="6,0"/>
+                        <Button Content="Lighting..." Command="{Binding OpenRenderSettingsCommand}" Margin="10,0,0,0" Padding="6,0"
+                                ToolTip="The Kitbash editor's render settings: the light's intensity, colour and turn, which lit smoke takes as the models do, and the grid"/>
+                        <Button Content="Screenshot" Command="{Binding TakeScreenshotCommand}" Margin="4,0,0,0" Padding="6,0"
+                                ToolTip="Saves the next frame at twice the view's size where the Kitbash editor's PhotoStudio saves its screenshots, and opens that folder"/>
+                    </WrapPanel>
+                    <ListBox Grid.Row="3" ItemsSource="{Binding PreviewLines}" MaxHeight="110" ToolTip="What the preview could not find, and what it leaves out"
+                             Visibility="{Binding HasItems, RelativeSource={RelativeSource Self}, Converter={StaticResource BoolToVis}}"/>
+                </Grid>
+            </Grid>
+        </Grid>
+    </DockPanel>
+</UserControl>

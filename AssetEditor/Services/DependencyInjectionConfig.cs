@@ -37,6 +37,7 @@ namespace AssetEditor.Services
                 new Editors.Ipc.DependencyInjectionContainer(),
                 new Editors.BmdEditor.DependencyInjectionContainer(),
                 new Editors.CscEditor.DependencyInjectionContainer(),
+                new Editors.VfxEditor.DependencyInjectionContainer(),
                 new Editors.CampaignAnimationSetEditor.DependencyInjectionContainer(),
 
                 // Host application
