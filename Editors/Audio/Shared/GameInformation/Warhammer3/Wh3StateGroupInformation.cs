@@ -29,9 +29,10 @@ namespace Editors.Audio.Shared.GameInformation.Warhammer3
         /// the strongest alliance's culture by looking its hash up here (the call that fills
         /// Feedback_Highest_BOP_Alliance_Subculture in Warhammer3.exe). A culture whose audio_state is
         /// not registered here reaches battle_music.dat as an empty string, so the script never posts
-        /// its music_b_faction_ event and the in-battle music has nothing to play. Measured in game in
-        /// October 2026: prebattle played a new culture's music, the battle was silent, and the
-        /// script logged "no culture has been set".
+        /// its music_b_faction_ event and the in-battle music has nothing to play - the script's
+        /// "no culture has been set" path. Measured in game in October 2026: prebattle played a new
+        /// culture's music and the battle was silent until it was registered here. The script's
+        /// LogMessage output was not seen; no game log holds it.
         /// </summary>
         public const string CultureAudioStateGroup = "Generic_Faction_Player";
 
