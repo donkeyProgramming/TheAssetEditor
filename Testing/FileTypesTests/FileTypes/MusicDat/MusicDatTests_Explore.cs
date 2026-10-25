@@ -91,45 +91,50 @@ namespace FileTypesTests.FileTypes.MusicDat
             Assert.That(incomplete, Is.Empty);
         }
 
-        // Music Marker's dispatch chain is the clearest real case of many sibling if-arms
-        // sharing one body via a "goto" to a common handler, with transition_allowed /
-        // dynamic_states arms interleaved among them, breaking the run into several
-        // separate consecutive groups rather than one big one - pinning its shape guards
-        // that the merge stops at the first differently-bodied arm instead of reaching
-        // past it (only strictly consecutive arms merge), that a still-mergeable
-        // goto-only arm folds in with the real body its label sits in, and that gotos left
-        // over from arms that didn't merge get their short target inlined in place with
-        // the label dropped, rather than staying as a bare "goto L;".
+        // Wwise_cues (which Music Marker hands every marker to) is the clearest real case of
+        // many sibling if-arms sharing one body via a "goto" to a common handler, with arms
+        // of their own interleaved among them, breaking the run into several separate
+        // consecutive groups rather than one big one - pinning its shape guards that the
+        // merge stops at the first differently-bodied arm instead of reaching past it (only
+        // strictly consecutive arms merge), that a still-mergeable goto-only arm folds in
+        // with the real body its label sits in, and that gotos left over from arms that
+        // didn't merge get their short target inlined in place with the label dropped,
+        // rather than staying as a bare "goto L;". Its second branch also reaches that
+        // target through a second jump ("L26260: goto L25302;"), which a single inlining
+        // pass used to leave behind.
         [Test]
         public void AdjacentIfArmsWithIdenticalBodiesMergeIntoOneOrCondition()
         {
             var file = Load("battle_music.dat");
-            var function = MusicDatDisassembler.Disassemble(file).First(f => f.Name == "Music Marker");
+            var function = MusicDatDisassembler.Disassemble(file).First(f => f.Name == "Wwise_cues");
 
             var text = MusicDatDecompiler.ToText(file, function);
 
             Assert.Multiple(() =>
             {
-                // update_segment (the real body's own arm) and update_trackend (a goto to
+                // update_trackstart (the real body's own arm) and update_segment (a goto to
                 // it) are consecutive, so they merge.
-                Assert.That(text, Does.Contain("if (marker_type == \"update_segment\" || marker_type == \"update_trackend\")"));
+                Assert.That(text, Does.Contain("if (marker_type == \"update_trackstart\" || marker_type == \"update_segment\")"));
 
-                // update_transition_allowed sits right after that pair and has its own
-                // distinct body, so the run stops there rather than reaching past it - the
-                // next four marker types (also goto-only, also consecutive with each
-                // other) form their own separate merged group instead of joining the first.
-                Assert.That(text, Does.Contain(
-                    "if (marker_type == \"update_trackstart\" || marker_type == \"update_segmentend\" || " +
-                    "marker_type == \"update_dynamicstart\" || marker_type == \"update_dynamicend\")"));
-                Assert.That(text, Does.Not.Contain(
-                    "update_trackend\" || marker_type == \"update_trackstart\""));
+                // "in" sits right after that pair and has its own distinct body, so the run
+                // stops there - update_ender and segment, which jump to the same handler,
+                // form their own separate merged group instead of joining the first.
+                Assert.That(text, Does.Contain("if (marker_type == \"update_ender\" || marker_type == \"segment\")"));
+                Assert.That(text, Does.Contain("if (marker_type == \"in\")"));
+                Assert.That(text, Does.Not.Contain("update_segment\" || marker_type == \"in\""));
+
+                // update_trackend, update_dynamicstart and update_dynamicend each call a
+                // different cues_ handler, so none of them merge with a neighbour.
+                Assert.That(text, Does.Contain("if (marker_type == \"update_trackend\")"));
+                Assert.That(text, Does.Contain("if (marker_type == \"update_dynamicstart\")"));
+                Assert.That(text, Does.Contain("if (marker_type == \"update_dynamicend\")"));
+                Assert.That(text, Does.Contain("if (marker_type == \"update_segmentend\" || marker_type == \"segment_end\")"));
 
                 // No goto/label survives: every goto-only arm either merged with the arm
-                // holding the label, or - for the ones separated from it by a
-                // differently-bodied arm - had the label's short target code (3 lines)
+                // holding the label, or had the label's short target code (3 lines)
                 // inlined in its place instead.
                 Assert.That(text, Does.Not.Contain("goto L"));
-                Assert.That(text, Does.Not.Contain("L791"));
+                Assert.That(text, Does.Not.Match(@"(?m)^\s*L\d+:\r?$"), "a label survived inlining");
 
                 // Arms with their own distinct body must never be folded into a neighbour's.
                 Assert.That(text, Does.Contain("if (marker_type == \"update_transition_allowed\")"));
@@ -141,10 +146,11 @@ namespace FileTypesTests.FileTypes.MusicDat
                 Assert.That(text, Does.Contain("if (marker_type == \"enable_dynamic_states\")"));
                 Assert.That(text, Does.Contain("dynamic_states_allowed = 1;"));
 
-                // Every merged group still renders its shared body (Update_StartEnd +
-                // LogMessage + return) rather than dropping it.
-                Assert.That(text.Split("Update_StartEnd(marker_type);").Length - 1, Is.EqualTo(8),
-                    "expected 4 merged dispatch groups per branch (2 branches x 4 groups)");
+                // Every arm that reaches the cues_TrackStart handler still renders it rather
+                // than dropping it: trackstart/segment, ender/segment and "out"'s nested
+                // check, once in each of the two branches on marker_details.
+                Assert.That(text.Split("cues_TrackStart();").Length - 1, Is.EqualTo(6),
+                    "expected 3 cues_TrackStart call sites per branch (2 branches x 3)");
             });
         }
 
@@ -270,14 +276,14 @@ namespace FileTypesTests.FileTypes.MusicDat
             });
         }
 
-        // Update(float) is the other half of the same rule: a lone numeric parameter sits at
-        // -4, not -1, so a flat stride left a delta-time accumulator reading from an
+        // update_timers(float) is the other half of the same rule: a lone numeric parameter
+        // sits at -4, not -1, so a flat stride left a delta-time accumulator reading from an
         // anonymous frame cell instead of from its own argument.
         [Test]
         public void LoneNumericParameterIsRecognisedAtItsSizedOffset()
         {
             var file = Load("battle_music.dat");
-            var function = MusicDatDisassembler.Disassemble(file).First(f => f.Name == "Update");
+            var function = MusicDatDisassembler.Disassemble(file).First(f => f.Name == "update_timers");
 
             Assert.That(MusicDatDecompiler.ToText(file, function),
                 Does.Contain("action_battle_length_level_3_timer = arg1 + action_battle_length_level_3_timer;"));
@@ -297,13 +303,13 @@ namespace FileTypesTests.FileTypes.MusicDat
             Assert.That(file.Functions.SelectMany(f => f.ReturnOrLocalTypes), Is.All.Not.EqualTo(2u),
                 "a string-typed result would not be four units wide");
 
-            // Check_Battle_End_Status declares two, and its caller reads both - so both ends
+            // update_Check_Battle_End_Status declares two, and its caller reads both - so both ends
             // of the convention should be named rather than showing raw frame offsets.
             if (name != "battle_music.dat")
                 return;
 
             var text = MusicDatDecompiler.ToText(file,
-                MusicDatDisassembler.Disassemble(file).First(f => f.Name == "Check_Battle_End_Status"));
+                MusicDatDisassembler.Disassemble(file).First(f => f.Name == "update_Check_Battle_End_Status"));
 
             Assert.Multiple(() =>
             {
@@ -358,8 +364,7 @@ namespace FileTypesTests.FileTypes.MusicDat
         [TestCase("battle_music.dat", new[]
         {
             "On Showing Results:1",
-            "Request_Culture:1",
-            "{999eace4-3f22-43cb-b8e4-0255397bbce0}:1",
+            "cues_TrackEnd_post_culture_events:1",
         })]
         [TestCase("campaign_music.dat", new[]
         {
@@ -398,7 +403,7 @@ namespace FileTypesTests.FileTypes.MusicDat
         // have the wizard promise a choice that silently does nothing in game.
         [TestCase("battle_music.dat", new[]
         {
-            "music_b_faction_:3:negotiable",
+            "music_b_faction_:2:negotiable",
         })]
         [TestCase("campaign_music.dat", new[]
         {

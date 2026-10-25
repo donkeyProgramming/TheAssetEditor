@@ -75,8 +75,20 @@ namespace Shared.GameFormats.MusicDat
             ctx.EmitRange(0, function.Instructions.Count, 1);
             ctx.Emit(-1, 0, "}");
             var lines = MergeAdjacentIdenticalIfChains(ctx.Finish());
-            lines = InlineShortGotoTargets(lines);
-            lines = RemoveUnreferencedLabels(lines);
+
+            // Repeated because a goto can land on an arm that is itself only a label and a
+            // second goto (battle Wwise_cues: "L26260: goto L25302;"). That arm isn't
+            // goto-only until the label is found unreferenced and dropped, so a single pass
+            // leaves the second goto in place. Capped in case a short target ever jumps back
+            // into itself, which would otherwise grow on every pass.
+            for (var pass = 0; pass < MaxInlinePasses; pass++)
+            {
+                var next = RemoveUnreferencedLabels(InlineShortGotoTargets(lines));
+                var changed = next.Count != lines.Count || !next.Select(l => l.Text).SequenceEqual(lines.Select(l => l.Text));
+                lines = next;
+                if (!changed)
+                    break;
+            }
             return new DecompiledFunction(lines, ctx.IsComplete);
         }
 
@@ -214,6 +226,7 @@ namespace Shared.GameFormats.MusicDat
         /// label itself is left for <see cref="RemoveUnreferencedLabels"/> to drop once no
         /// <c>goto</c> anywhere still needs it.</summary>
         const int MaxInlineGotoLines = 5;
+        const int MaxInlinePasses = 4;
 
         static List<Line> InlineShortGotoTargets(List<Line> lines)
         {
@@ -390,7 +403,7 @@ namespace Shared.GameFormats.MusicDat
             /// declaring one entry touches exactly one slot below its parameters, every
             /// function declaring two touches exactly two, and functions declaring none
             /// touch none. The caller side of the same convention is the run of zeroed
-            /// placeholders EmitCallOrExpr claims, and the two agree - Check_Battle_End_Status
+            /// placeholders EmitCallOrExpr claims, and the two agree - update_Check_Battle_End_Status
             /// writes its "end battle" result to the deeper slot, which is the placeholder its
             /// caller tests second.</summary>
             static int[] ReturnOffsets(MusicDatFile file, MusicDatDisassembler.Function function)
@@ -963,17 +976,17 @@ namespace Shared.GameFormats.MusicDat
             /// case. One preceded by two or more placeholders is a different, equally real
             /// convention: the callee has no BIND_ARG-consumed parameters at all and
             /// communicates purely by writing into its own leading frame slots, which alias
-            /// the caller's placeholder cells (see Check_Battle_End_Status, which
-            /// unconditionally assigns <c>frame[-4]</c> and <c>frame[-8]</c> on every return
-            /// path, and is called from three unrelated functions across both files, always
-            /// with exactly two zeroed placeholders immediately ahead of it - the same shape
+            /// the caller's placeholder cells (see battle's update_Check_Battle_End_Status,
+            /// which unconditionally assigns <c>frame[-4]</c> and <c>frame[-8]</c> on every
+            /// return path, and is called with exactly two zeroed placeholders immediately
+            /// ahead of it - the same shape
             /// as every other 0-arg call preceded by 2+ placeholders in this corpus, not a
             /// one-off). There is no single "the return value" to fold into an expression
             /// there, so the call stays its own statement and each placeholder is renamed to
             /// identify which of the callee's outputs a later consumer reads - the
             /// alternative, leaving it as a bare literal <c>0</c>, is indistinguishable from
             /// genuine hardcoded-disabled code and was exactly how this looked before this
-            /// pattern was identified (<c>if (Check_Battle_End_Status())</c> followed by a
+            /// pattern was identified (<c>if (update_Check_Battle_End_Status())</c> followed by a
             /// sibling <c>if (0)</c> that was really reading the same call's second output).
             ///
             /// Only a bare <c>0</c> is recognised as a placeholder at all - every confirmed

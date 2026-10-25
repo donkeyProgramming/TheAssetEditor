@@ -44,7 +44,7 @@ namespace FileTypesTests.FileTypes.MusicDat
                 .ToDictionary(f => f.Name, f => Normalise(MusicDatDecompiler.ToText(file, f)));
 
         [TestCase("campaign_music.dat", "subculture_to_musical_culture", "wh2_main_sc_skv_skaven", "skaven", false)]
-        [TestCase("battle_music.dat", "Request_Culture", "skaven", "skaven", true)]
+        [TestCase("battle_music.dat", "cues_TrackEnd_post_culture_events", "skaven", "skaven", true)]
         public void FindsTheCultureChain(string name, string expectedFunction, string knownKey,
             string knownCulture, bool expectSoundEvents)
         {
@@ -161,7 +161,7 @@ namespace FileTypesTests.FileTypes.MusicDat
         // is repeated once per randomised PICK_ONE_OF variant - so one pass splices in twenty-odd
         // arms whose addresses all shift each other. Every chain of every slot has to come out
         // with the new key in it, not just the first one of each.
-        [TestCase("battle_music.dat", 3)]
+        [TestCase("battle_music.dat", 2)]
         [TestCase("campaign_music.dat", 21)]
         public void AddingToEverySlotPatchesEveryChainOfEach(string name, int expectedInsertions)
         {

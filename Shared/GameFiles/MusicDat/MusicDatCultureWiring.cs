@@ -11,9 +11,9 @@ namespace Shared.GameFormats.MusicDat
     /// culture" name and returning. In campaign_music.dat that is
     /// <c>subculture_to_musical_culture</c>, matching the database subculture key
     /// (wh2_main_sc_def_dark_elves) and assigning <c>pending_Subculture</c>. In
-    /// battle_music.dat it is <c>Request_Culture</c>, matching the shorter key the engine
-    /// puts in <c>Feedback_Highest_BOP_Alliance_Subculture</c> (dark_elves) and additionally
-    /// posting a <c>music_b_faction_*</c> Wwise event.
+    /// battle_music.dat it is <c>cues_TrackEnd_post_culture_events</c>, matching the shorter
+    /// key the engine puts in <c>Feedback_Highest_BOP_Alliance_Subculture</c> (dark_elves)
+    /// and additionally posting a <c>music_b_faction_*</c> Wwise event.
     ///
     /// Nothing downstream of that chain needs touching, which is what makes this a tractable
     /// edit rather than a compiler problem. The campaign script never names a culture's
@@ -132,9 +132,11 @@ namespace Shared.GameFormats.MusicDat
         /// Wiring a culture into a music script means more than the one chain that decides a
         /// battle's theme: each shipped file reaches the same decision from several
         /// directions, and a culture missing from any of them falls back to something wrong
-        /// or to nothing. battle_music.dat has the automatic chain in Request_Culture, a
-        /// second one a bespoke battle script drives by name, and a third for the results
-        /// screen. campaign_music.dat has the map-theme chain plus one each for the victory
+        /// or to nothing. battle_music.dat has the theme chain in
+        /// cues_TrackEnd_post_culture_events - which both the automatic choice and a bespoke
+        /// battle's override reach, through cues_TrackEnd_check_culture_change (earlier
+        /// builds gave each a copy of its own) - and a second for the results screen.
+        /// campaign_music.dat has the map-theme chain plus one each for the victory
         /// and defeat resolution screens, and two more that pick ambient fragments and
         /// enemy-proximity percussion.
         ///

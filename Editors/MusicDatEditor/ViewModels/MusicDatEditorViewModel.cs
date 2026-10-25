@@ -228,9 +228,13 @@ namespace Editors.MusicDatEditor.ViewModels
             return (battlePackFile, ResolveFile(battlePackFile), campaignPackFile, ResolveFile(campaignPackFile));
         }
 
+        /// <summary>The copy the game would load: containers are listed in load order, so the
+        /// last match wins, the same precedence <see cref="IPackFileService.FindFile"/> uses.
+        /// Taking the first would hand the wizard vanilla's script even when the mod pack
+        /// already holds a patched one, and saving would quietly drop the earlier culture.</summary>
         PackFile? FindMusicDatFile(string name) =>
             _packFileService.FindAllWithExtention(".dat")
-                .FirstOrDefault(x => string.Equals(Path.GetFileName(x.FileName), name, StringComparison.OrdinalIgnoreCase))
+                .LastOrDefault(x => string.Equals(Path.GetFileName(x.FileName), name, StringComparison.OrdinalIgnoreCase))
                 .Pack;
 
         MusicDatFile? ResolveFile(PackFile? packFile)
@@ -267,11 +271,16 @@ namespace Editors.MusicDatEditor.ViewModels
 
             var bytes = MusicDatParser.Write(edited);
             var path = _packFileService.GetFullPath(packFile);
-            _fileSaveService.Save(path, bytes, prompOnConflict: false);
+            var saved = _fileSaveService.Save(path, bytes, prompOnConflict: false);
+            if (saved == null)
+                return $"{packFile.Name} NOT saved";
 
+            // A script that came from a vanilla pack is saved as a new file in the mod pack,
+            // so a tab showing the vanilla one has to move over to it rather than re-read the
+            // unpatched original.
             foreach (var editor in _editorManager.GetAllEditors())
                 if (editor is MusicDatEditorViewModel vm && ReferenceEquals(vm.CurrentFile, packFile))
-                    vm.LoadFile(packFile);
+                    vm.LoadFile(saved);
 
             return $"{packFile.Name} (patched directly)";
         }
