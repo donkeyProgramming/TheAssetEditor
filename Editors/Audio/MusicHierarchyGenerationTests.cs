@@ -2,6 +2,7 @@ using Editors.Audio.Shared.AudioProject.Models;
 using Editors.Audio.Shared.GameInformation.Warhammer3;
 using Editors.Audio.Shared.Wwise.Generators.Hirc.V136;
 using Shared.ByteParsing;
+using Shared.GameFormats.Wwise;
 using Shared.GameFormats.Wwise.Enums;
 using Shared.GameFormats.Wwise.Hirc.V136;
 
@@ -39,6 +40,76 @@ namespace Test.Audio
                 // segment ends before or after the file does.
                 Assert.That(segment.ArrayMarkersList[2].Id, Is.EqualTo(Wh3MusicHierarchyInformation.ExitCueMarkerId));
                 Assert.That(segment.ArrayMarkersList[2].Position, Is.EqualTo(DurationMs));
+            });
+        }
+
+        // battle_music.dat ignores Update_PreBattle and drives its state machine off track start and
+        // track end cues, so the copy of a segment under the in-battle container carries those. The
+        // copy under any other container keeps the campaign's cue.
+        [Test]
+        public void ASegmentUnderTheInBattleContainerCarriesTheBattleScriptsTrackCues()
+        {
+            var inBattle = (CAkMusicSegment_V136)new CAkMusicSegmentGenerator_V136()
+                .GenerateHirc(CreateMusicSegment(), CreateSoundBank(Wh3MusicHierarchyInformation.InBattleMusicSwitchContainerId));
+            var results = (CAkMusicSegment_V136)new CAkMusicSegmentGenerator_V136()
+                .GenerateHirc(CreateMusicSegment(), CreateSoundBank(26264058));
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(inBattle.ArrayMarkersList.Select(marker => marker.Id), Is.EqualTo(new[]
+                {
+                    Wh3MusicHierarchyInformation.EntryCueMarkerId,
+                    Wh3MusicHierarchyInformation.TrackStartCueMarkerId,
+                    Wh3MusicHierarchyInformation.TrackEndCueMarkerId,
+                    Wh3MusicHierarchyInformation.ExitCueMarkerId
+                }));
+                Assert.That(inBattle.ArrayMarkersList[1].Position, Is.EqualTo(0));
+                Assert.That(inBattle.ArrayMarkersList[2].Position, Is.EqualTo(DurationMs - Wh3MusicHierarchyInformation.TrackEndCueLeadMs));
+                Assert.That(inBattle.ArrayMarkersList[3].Position, Is.EqualTo(DurationMs));
+
+                Assert.That(results.ArrayMarkersList[1].MarkerName, Is.EqualTo(Wh3MusicHierarchyInformation.CustomCueName));
+            });
+        }
+
+        // The ids are not looked up anywhere, but vanilla's are the hash of the name and the battle
+        // script is handed the name - a mismatch would mean one of the two constants is mistyped.
+        [TestCase(Wh3MusicHierarchyInformation.CustomCueMarkerId, Wh3MusicHierarchyInformation.CustomCueName)]
+        [TestCase(Wh3MusicHierarchyInformation.TrackStartCueMarkerId, Wh3MusicHierarchyInformation.TrackStartCueName)]
+        [TestCase(Wh3MusicHierarchyInformation.TrackEndCueMarkerId, Wh3MusicHierarchyInformation.TrackEndCueName)]
+        public void ANamedCuesIdIsTheHashOfItsName(uint id, string name)
+        {
+            Assert.That(WwiseHash.Compute(name.TrimEnd('\0')), Is.EqualTo(id));
+        }
+
+        // On a short piece the lead would put the track end in the first half, where vanilla never has
+        // one, so it stops at a share of the way through instead.
+        [Test]
+        public void AShortPiecesTrackEndCueStaysNearItsEnd()
+        {
+            var musicSegment = CreateMusicSegment();
+            musicSegment.DurationMs = 8000;
+
+            var segment = (CAkMusicSegment_V136)new CAkMusicSegmentGenerator_V136()
+                .GenerateHirc(musicSegment, CreateSoundBank(Wh3MusicHierarchyInformation.InBattleMusicSwitchContainerId));
+
+            Assert.That(segment.ArrayMarkersList[2].Position, Is.EqualTo(8000 * Wh3MusicHierarchyInformation.TrackEndCueEarliestShare));
+        }
+
+        [Test]
+        public void TheInBattleSegmentSurvivesAWriteReadRoundTrip()
+        {
+            var segment = (CAkMusicSegment_V136)new CAkMusicSegmentGenerator_V136()
+                .GenerateHirc(CreateMusicSegment(), CreateSoundBank(Wh3MusicHierarchyInformation.InBattleMusicSwitchContainerId));
+
+            var reloaded = new CAkMusicSegment_V136();
+            reloaded.ReadHirc(new ByteChunk(segment.WriteData()));
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(reloaded.ArrayMarkersList, Has.Count.EqualTo(4));
+                Assert.That(reloaded.ArrayMarkersList[1].MarkerName, Is.EqualTo(Wh3MusicHierarchyInformation.TrackStartCueName));
+                Assert.That(reloaded.ArrayMarkersList[2].MarkerName, Is.EqualTo(Wh3MusicHierarchyInformation.TrackEndCueName));
+                Assert.That(reloaded.MusicNodeParams.Children.ChildIds, Is.EqualTo(new[] { TrackId }));
             });
         }
 
@@ -238,6 +309,17 @@ namespace Test.Audio
                     PlaylistItemId = 12346 + index
                 })]
             };
+        }
+
+        /// <summary>A bank holding the segment's Random Sequence under the given container.</summary>
+        static SoundBank CreateSoundBank(uint switchContainerId)
+        {
+            var musicRandomSequence = CreateRandomSequence(SegmentId);
+            musicRandomSequence.DirectParentId = switchContainerId;
+
+            var soundBank = new SoundBank("test_music", Wh3SoundBank.None, Wh3LanguageInformation.GetLanguageAsString(Wh3Language.Sfx));
+            soundBank.MusicRandomSequences.Add(musicRandomSequence);
+            return soundBank;
         }
 
         static MusicSegment CreateMusicSegment()

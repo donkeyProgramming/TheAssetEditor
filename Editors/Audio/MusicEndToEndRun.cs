@@ -81,6 +81,7 @@ namespace Test.Audio
             ReportPackContents(modPack);
             AssertTheScriptsAndTheBankAgree(packFileService, compiledProject);
             AssertTheMergedContainersKeepVanilla(packFileService, provider.GetRequiredService<IAudioRepository>(), compiledProject);
+            AssertEachSegmentCarriesTheCuesItsScriptReads(packFileService, compiledProject);
             AssertThePulseTracksCarryTheNewCulture(packFileService, provider.GetRequiredService<IAudioRepository>(), compiledProject);
             AssertTheFragmentsReachTheNewCulturesAudio(packFileService, provider.GetRequiredService<IAudioRepository>(), compiledProject);
 
@@ -455,6 +456,53 @@ namespace Test.Audio
             Console.WriteLine(
                 $"\nfragments: '{MusicalCulture}' -> key switch {amsFragment.KeySwitchContainerId} " +
                 $"({keySwitch.SwitchList.Count} keys) -> {amsFragment.TargetHircId} -> {amsFragment.SoundIds.Count} sound(s)");
+        }
+
+        /// <summary>
+        /// battle_music.dat runs its state machine off track start and track end cues and ignores
+        /// the campaign's Update_PreBattle, so the copy of the music under the in-battle container
+        /// has to carry those and every other copy keeps the campaign's cue.
+        /// </summary>
+        static void AssertEachSegmentCarriesTheCuesItsScriptReads(IPackFileService packFileService, AudioProjectFile compiledProject)
+        {
+            var musicSoundBank = compiledProject.SoundBanks.Single(soundBank => soundBank.MusicRandomSequences.Count != 0);
+            // Only the mod's own: vanilla defines some of its segments in more than one .bnk.
+            var modSegmentIds = musicSoundBank.MusicSegments.Select(musicSegment => musicSegment.Id).ToHashSet();
+            var shippedSegments = ShippedBanks(packFileService)
+                .SelectMany(path => ReadHircs(packFileService, path))
+                .OfType<CAkMusicSegment_V136>()
+                .Where(segment => modSegmentIds.Contains(segment.Id))
+                .ToLookup(segment => segment.Id);
+
+            Assert.Multiple(() =>
+            {
+                foreach (var musicRandomSequence in musicSoundBank.MusicRandomSequences)
+                {
+                    var expected = musicRandomSequence.DirectParentId == InBattleContainerId
+                        ? new[] { Wh3MusicHierarchyInformation.TrackStartCueName, Wh3MusicHierarchyInformation.TrackEndCueName }
+                        : [Wh3MusicHierarchyInformation.CustomCueName];
+
+                    foreach (var musicSegment in musicSoundBank.GetMusicSegments(musicRandomSequence))
+                    {
+                        Assert.That(shippedSegments[musicSegment.Id].Count(), Is.EqualTo(1),
+                            $"segment {musicSegment.Id} under container {musicRandomSequence.DirectParentId} should ship exactly once");
+                        var shipped = shippedSegments[musicSegment.Id].FirstOrDefault();
+                        if (shipped == null)
+                            continue;
+
+                        var named = shipped.ArrayMarkersList
+                            .Where(marker => !string.IsNullOrEmpty(marker.MarkerName))
+                            .Select(marker => marker.MarkerName)
+                            .ToList();
+                        Assert.That(named, Is.EqualTo(expected),
+                            $"segment {musicSegment.Id} under container {musicRandomSequence.DirectParentId}");
+
+                        Console.WriteLine($"segment {musicSegment.Id} under {musicRandomSequence.DirectParentId}: " +
+                            string.Join(", ", shipped.ArrayMarkersList.Select(marker =>
+                                $"{marker.MarkerName?.TrimEnd('\0') ?? marker.Id.ToString()} @ {marker.Position:0}")));
+                    }
+                }
+            });
         }
 
         /// <summary>

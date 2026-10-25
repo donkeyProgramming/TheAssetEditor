@@ -85,7 +85,7 @@ namespace Editors.Audio.Shared.GameInformation.Warhammer3
         public static IReadOnlyList<uint> GetMusicSwitchContainerIds(string stateGroupName) => stateGroupName switch
         {
             "WH3_Campaign_Subcultures" => [698158058],
-            "Battle_Music_WH3_Culture" => [26264058, 67383790],
+            "Battle_Music_WH3_Culture" => [26264058, InBattleMusicSwitchContainerId],
             _ => []
         };
 
@@ -148,6 +148,37 @@ namespace Editors.Audio.Shared.GameInformation.Warhammer3
 
         /// <summary>The named cue's name, which is stored null terminated on disk.</summary>
         public const string CustomCueName = "Update_PreBattle\0";
+
+        /// <summary>The adaptive container playing during a battle - see <see cref="GetMusicSwitchContainerIds"/>.</summary>
+        public const uint InBattleMusicSwitchContainerId = 67383790;
+
+        /// <summary>
+        /// The named cues a segment under <see cref="InBattleMusicSwitchContainerId"/> carries instead
+        /// of <see cref="CustomCueName"/>, which battle_music.dat does not recognise. A marker id is
+        /// the Wwise hash of its name, the same as for the three above.
+        ///
+        /// battle_music.dat's Wwise_cues splits a marker name at the colon and runs a handler for the
+        /// part before it. update_trackstart is where the script makes a pending track type current
+        /// and allows transitions again; update_trackend is where it disallows mid-track transitions,
+        /// checks for a culture change and forces a key change. Without them the script never learns
+        /// that a track began or ended, so it never notices the strongest culture changing.
+        ///
+        /// Vanilla's stems carry update_dynamicstart and update_dynamicend instead, but those bracket
+        /// a stretch the script holds every transition back for, which over a whole piece of music
+        /// would hold it back for minutes. Vanilla's own whole tracks carry just these two, measured
+        /// in October 2026 with MusicShippedPackDiagnosis.WhatMarkersTheCultureContainersSegmentsCarry:
+        /// the start 0 to 3.5 seconds in, the end 3 to 10 seconds before the exit cue, median 5.5,
+        /// and never earlier than 69% of the way through.
+        /// </summary>
+        public const uint TrackStartCueMarkerId = 2376622016;
+        public const string TrackStartCueName = "Update_TrackStart:\0";
+        public const uint TrackEndCueMarkerId = 2301724853;
+        public const string TrackEndCueName = "Update_TrackEnd:\0";
+
+        /// <summary>How long before the exit cue the track end cue sits, unless that would put it
+        /// earlier than <see cref="TrackEndCueEarliestShare"/> of the way through a short piece.</summary>
+        public const double TrackEndCueLeadMs = 5000;
+        public const double TrackEndCueEarliestShare = 0.8;
 
         /// <summary>
         /// The musical grid a music transition is scheduled against, in milliseconds.

@@ -132,7 +132,7 @@ namespace Editors.Audio.Shared.Wwise.Generators
                 foreach (var musicSegment in soundBank.GetMusicSegments(musicRandomSequence))
                 {
                     hircItems.Add(new CAkMusicTrackGenerator_V136().GenerateHirc(musicSegment));
-                    hircItems.Add(_hircGeneratorServiceFactory.GenerateHirc(musicSegment));
+                    hircItems.Add(_hircGeneratorServiceFactory.GenerateHirc(musicSegment, soundBank));
                 }
 
                 hircItems.Add(_hircGeneratorServiceFactory.GenerateHirc(musicRandomSequence));
