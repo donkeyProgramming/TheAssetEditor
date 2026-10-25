@@ -43,10 +43,7 @@ namespace Editors.Audio.Shared.Storage
         Dictionary<string, Dictionary<string, List<HircItem>>> GetVanillaDialogueEventsByBnkByLanguage();
         Dictionary<string, Dictionary<string, List<HircItem>>> GetModdedHircsByBnkByLanguage();
         Dictionary<string, List<HircItem>> GetModdedDialogueEventsByLanguage(List<string> moddedSoundBanks);
-        Dictionary<string, List<HircItem>> GetVanillaMusicSwitchContainersByBnk();
-        List<HircItem> GetModdedMusicSwitchContainers(List<string> moddedSoundBanks);
         List<CAkMusicTrack_V136> GetVanillaAmsPulseTracks(string stateGroupName);
-        List<HircItem> GetModdedMusicTracks(List<string> moddedSoundBanks);
         List<string> GetModdedSoundBankFilePaths(string bnkNameSubstring);
         PackFile FindWem(string wemId);
         byte[] FindDataWem(uint dataSoundbankId, int fileOffset, int byteCount);
@@ -421,23 +418,6 @@ namespace Editors.Audio.Shared.Storage
                 .ToDictionary(group => group.Key, group => group.ToList());
         }
 
-        // Not grouped by language the way Dialogue Events are: music is sfx, so there is only ever
-        // one language to group by, and the .bnk a container came from is what a merge needs anyway.
-        public Dictionary<string, List<HircItem>> GetVanillaMusicSwitchContainersByBnk()
-        {
-            return GetHircs(AkBkHircType.Music_Switch)
-                .Where(hirc => hirc.IsCA)
-                .GroupBy(hirc => hirc.BnkFilePath)
-                .ToDictionary(bnkGroup => bnkGroup.Key, bnkGroup => bnkGroup.ToList());
-        }
-
-        public List<HircItem> GetModdedMusicSwitchContainers(List<string> moddedSoundBanks)
-        {
-            return GetHircs(AkBkHircType.Music_Switch)
-                .Where(hirc => hirc.IsCA == false && moddedSoundBanks.Contains(hirc.BnkFilePath))
-                .ToList();
-        }
-
         /// <summary>
         /// The vanilla switch tracks that pick a pulse layer on a State Group. Found by asking which
         /// tracks name the Group rather than from a table of ids, since there are nine per Group and
@@ -453,13 +433,6 @@ namespace Editors.Audio.Shared.Storage
                 .OfType<CAkMusicTrack_V136>()
                 .Where(track => track.SwitchParams != null && track.SwitchParams.GroupId == stateGroupId)
                 .OrderBy(track => track.Id)
-                .ToList();
-        }
-
-        public List<HircItem> GetModdedMusicTracks(List<string> moddedSoundBanks)
-        {
-            return GetHircs(AkBkHircType.Music_Track)
-                .Where(hirc => hirc.IsCA == false && moddedSoundBanks.Contains(hirc.BnkFilePath))
                 .ToList();
         }
 

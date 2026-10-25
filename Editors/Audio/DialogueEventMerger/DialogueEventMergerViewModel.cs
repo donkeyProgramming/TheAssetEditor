@@ -86,11 +86,9 @@ namespace Editors.Audio.DialogueEventMerger
         {
             _logger.Here().Information($"Generating merged Dialogue Event SoundBanks");
 
+            // Music is not merged: every culture lives in the one music project the mixer mod's
+            // maintainer keeps, which is rebuilt whole - see IMusicScriptBuildService.
             _soundBankGeneratorService.GenerateMergedDialogueEventSoundBanks(SelectedModdedSoundBanks.ToList(), SoundBankSuffix);
-
-            // Music merges out of the same merging .bnks and has the same problem, so it goes through
-            // the same button rather than a second one the modder has to know to press.
-            _soundBankGeneratorService.GenerateMergedMusicSoundBanks(SelectedModdedSoundBanks.ToList(), SoundBankSuffix);
 
             CloseWindowAction();
         }
