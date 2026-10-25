@@ -2,12 +2,14 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using Editors.Audio.Shared.AudioProject.Compiler;
 using Editors.Audio.Shared.AudioProject.Factories;
 using Editors.Audio.Shared.AudioProject.Models;
 using Editors.Audio.Shared.GameInformation.Warhammer3;
 using Editors.Audio.Shared.Storage;
 using Shared.Core.Misc;
+using Shared.GameFormats.Wwise;
 using Shared.GameFormats.Wwise.Enums;
 
 namespace Editors.Audio.Shared.AudioProject
@@ -40,6 +42,10 @@ namespace Editors.Audio.Shared.AudioProject
         /// <summary>An empty music project, ready for cultures.</summary>
         AudioProjectFile CreateNew();
 
+        /// <summary>Loads the game's audio data and the vanilla ids new items must not reuse, which
+        /// takes a while, so a UI can start it early off the UI thread. Everything else here waits
+        /// for it if it is still running, and does it itself if it was never started.</summary>
+        Task WarmUpAsync();
 
         /// <summary>Adds the culture and the events it needs. A culture already in the project with
         /// the same Audio State and subculture key - or <paramref name="replacing"/>, when editing one
@@ -80,6 +86,13 @@ namespace Editors.Audio.Shared.AudioProject
 
         private readonly ILogger _logger = Logging.Create<MusicAudioProjectService>();
 
+        // The vanilla ids, fetched once. Reading them out of the audio cache takes over ten seconds
+        // and the game's own packs do not change while a project is open, so asking again for every
+        // event made adding one culture take a minute.
+        private readonly object _vanillaIdsLock = new();
+        private HashSet<uint> _vanillaHircIds;
+        private HashSet<uint> _vanillaSourceIds;
+
         // Music always lives in the Sfx language folder regardless of what a project is otherwise
         // set to (global_music declares Sfx as its RequiredLanguage), so the project is Sfx outright
         // - that keeps the ID uniqueness scope, which is per language, the same one the SoundBank
@@ -93,15 +106,17 @@ namespace Editors.Audio.Shared.AudioProject
             return audioProject;
         }
 
+        public Task WarmUpAsync() => Task.Run(EnsureVanillaIds);
+
         public MusicCultureAddResult AddCulture(AudioProjectFile audioProject, MusicCulture musicCulture, MusicCulture replacing = null)
         {
             ArgumentNullException.ThrowIfNull(audioProject);
             ArgumentNullException.ThrowIfNull(musicCulture);
 
-            // Populates the repository so GenerateActionEventId can see vanilla IDs and refuse a name
-            // that already exists - adding a culture called "empire" would otherwise silently produce
-            // a second music_b_faction_empire shadowing the real one.
-            TryLoadAudioRepository();
+            // Lets GenerateActionEventId see vanilla IDs and refuse a name that already exists -
+            // adding a culture called "empire" would otherwise silently produce a second
+            // music_b_faction_empire shadowing the real one.
+            EnsureVanillaIds();
 
             // Kept in its place, since the scripts are built with the cultures in project order.
             audioProject.MusicCultures ??= [];
@@ -117,6 +132,7 @@ namespace Editors.Audio.Shared.AudioProject
                 RemoveEventsNoCultureNeeds(audioProject);
 
             var soundBank = GetOrCreateMusicSoundBank(audioProject);
+            var usedHircIds = GetUsedHircIds(audioProject);
             var created = new List<string>();
             var skipped = new List<(string, string)>();
 
@@ -129,7 +145,7 @@ namespace Editors.Audio.Shared.AudioProject
 
                 try
                 {
-                    AddMusicEvent(audioProject, soundBank, eventName);
+                    AddMusicEvent(audioProject, soundBank, eventName, usedHircIds);
                     created.Add(eventName);
                 }
                 catch (Exception e)
@@ -209,7 +225,7 @@ namespace Editors.Audio.Shared.AudioProject
                 throw new InvalidOperationException(
                     $"'{eventName}' sets {stateGroupName}, which nothing in the game branches on in a way a mod can extend, so audio given to it could never be reached.");
 
-            TryLoadAudioRepository();
+            EnsureVanillaIds();
 
             // Resolved before the old branch goes, so a wav it shares with the new list keeps its id.
             var audioFiles = GetOrCreateAudioFiles(audioProject, wavPackFilePaths);
@@ -221,7 +237,8 @@ namespace Editors.Audio.Shared.AudioProject
 
         private List<AudioFile> GetOrCreateAudioFiles(AudioProjectFile audioProject, IReadOnlyList<string> wavPackFilePaths)
         {
-            var usedSourceIds = IdGenerator.GetUsedSourceIds(_audioRepository, audioProject);
+            var usedSourceIds = new HashSet<uint>(_vanillaSourceIds);
+            usedSourceIds.UnionWith(audioProject.GetAudioFileIds());
 
             var audioFiles = new List<AudioFile>();
             foreach (var wavPackFilePath in wavPackFilePaths)
@@ -277,14 +294,12 @@ namespace Editors.Audio.Shared.AudioProject
             return soundBank;
         }
 
-        private void AddMusicEvent(AudioProjectFile audioProject, SoundBank soundBank, string eventName)
+        private void AddMusicEvent(AudioProjectFile audioProject, SoundBank soundBank, string eventName, HashSet<uint> usedHircIds)
         {
             if (!Wh3MusicEventInformation.TryResolveStateTarget(eventName, out var stateGroupName, out var stateName))
                 throw new InvalidOperationException(
                     $"'{eventName}' does not follow any of the vanilla music event patterns ({string.Join(", ", Wh3MusicEventInformation.KnownEventPrefixes)}), " +
                     "so there is no way to tell which State Group it should set.");
-
-            var usedHircIds = IdGenerator.GetUsedHircIds(_audioRepository, audioProject);
 
             var result = _actionEventFactory.CreateSetStateActionEvent(
                 usedHircIds,
@@ -353,7 +368,7 @@ namespace Editors.Audio.Shared.AudioProject
                 return;
             }
 
-            var usedHircIds = IdGenerator.GetUsedHircIds(_audioRepository, audioProject);
+            var usedHircIds = GetUsedHircIds(audioProject);
 
             var fragmentContainerId = Wh3MusicHierarchyInformation.GetAmsFragmentContainerId(stateGroupName);
             if (fragmentContainerId != null)
@@ -554,17 +569,37 @@ namespace Editors.Audio.Shared.AudioProject
             }
         }
 
+        /// <summary>The same set <see cref="IdGenerator.GetUsedHircIds"/> builds, from the vanilla
+        /// ids fetched once rather than every time.</summary>
+        private HashSet<uint> GetUsedHircIds(AudioProjectFile audioProject)
+        {
+            var usedHircIds = new HashSet<uint>(_vanillaHircIds);
+            usedHircIds.UnionWith(audioProject.GetGeneratableItemIds());
+            return usedHircIds;
+        }
+
         // Failure here is not fatal: without game files the repository simply reports nothing used,
         // which costs the collision check but still yields a valid project.
-        private void TryLoadAudioRepository()
+        private void EnsureVanillaIds()
         {
-            try
+            lock (_vanillaIdsLock)
             {
-                _audioRepository.Load([Language]);
-            }
-            catch (Exception e)
-            {
-                _logger.Here().Warning($"Could not load audio data, so generated ids cannot be checked against vanilla: {e.Message}");
+                if (_vanillaHircIds != null)
+                    return;
+
+                try
+                {
+                    _audioRepository.Load([Language]);
+                    var languageId = WwiseHash.Compute(Language);
+                    _vanillaHircIds = _audioRepository.GetUsedVanillaHircIdsByLanguageId(languageId);
+                    _vanillaSourceIds = _audioRepository.GetUsedVanillaSourceIdsByLanguageId(languageId);
+                }
+                catch (Exception e)
+                {
+                    _logger.Here().Warning($"Could not load audio data, so generated ids cannot be checked against vanilla: {e.Message}");
+                    _vanillaHircIds = [];
+                    _vanillaSourceIds = [];
+                }
             }
         }
     }

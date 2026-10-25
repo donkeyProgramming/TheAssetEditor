@@ -111,6 +111,10 @@ namespace Editors.MusicProjectEditor.ViewModels
             IsProjectLoaded = true;
             HasUnsavedChanges = false;
             RebuildCultures();
+
+            // Over ten seconds of reading the audio cache, started now so it is done by the time
+            // the wizard has been filled in rather than freezing the tool when Add is pressed.
+            _ = _musicAudioProjectService.WarmUpAsync();
         }
 
         [RelayCommand]

@@ -198,8 +198,18 @@ namespace Editors.MusicProjectEditor.ViewModels
             _previewDebounce.Start();
         }
 
-        void RecomputePreviews()
+        // Bumped on every recompute, so a slow preview that finishes after a newer one started is
+        // dropped instead of overwriting it.
+        int _previewVersion;
+
+        /// <summary>The event lines are cheap and set straight away. The pseudocode previews are not -
+        /// about two seconds for all six rows - so they are worked out off the UI thread, from the
+        /// inputs as they were when this ran. The files themselves are only ever read here.</summary>
+        async void RecomputePreviews()
         {
+            var version = ++_previewVersion;
+            var work = new List<(CultureSlotViewModel Row, Func<string> Preview)>();
+
             foreach (var row in Slots)
             {
                 var key = KeyFor(row.Slot);
@@ -218,8 +228,33 @@ namespace Editors.MusicProjectEditor.ViewModels
                 }
 
                 row.EventInfo = row.EventLine(MusicalCulture);
-                row.Preview = MusicDatCultureWiring.PreviewSlot(FileFor(row.Slot), row.Slot, key, MusicalCulture,
-                    row.UseExistingAudio ? row.ReferenceCulture : null);
+
+                var file = FileFor(row.Slot);
+                var slot = row.Slot;
+                var musicalCulture = MusicalCulture;
+                var reference = row.UseExistingAudio ? row.ReferenceCulture : null;
+                work.Add((row, () => MusicDatCultureWiring.PreviewSlot(file, slot, key, musicalCulture, reference)));
+            }
+
+            var previews = await Task.Run(() => work.Select(item => TryPreview(item.Preview)).ToList());
+            if (version != _previewVersion)
+                return;
+
+            for (var i = 0; i < work.Count; i++)
+                work[i].Row.Preview = previews[i];
+        }
+
+        // Off the UI thread an exception would take the app down rather than reach a handler, and a
+        // preview is only ever informational.
+        static string TryPreview(Func<string> preview)
+        {
+            try
+            {
+                return preview();
+            }
+            catch (Exception e)
+            {
+                return $"The preview could not be built: {e.Message}";
             }
         }
 
