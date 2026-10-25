@@ -1,4 +1,5 @@
 using System.Collections.ObjectModel;
+using System.IO;
 using System.Text.RegularExpressions;
 using System.Windows.Input;
 using CommunityToolkit.Mvvm.ComponentModel;
@@ -75,26 +76,18 @@ namespace Editors.MusicDatEditor.ViewModels
         }
 
         /// <summary>Lets a modder switch (or, from an empty tab, choose) which music script
-        /// this viewer is looking at, scoped to the one folder either script actually lives
-        /// in - the general pack browser has no folder-scoped variant of its own, so this
-        /// filters what it returns rather than adding a second copy of that dialog.</summary>
+        /// this viewer is looking at. The browser only lists .dat files in the one folder either
+        /// script lives in - the sound bank .dats in audio\wwise share the extension, and the
+        /// browser's own extension match would otherwise show .data files too.</summary>
         void Open()
         {
-            var result = _dialogs.DisplayBrowseDialog([".dat"]);
-            if (!result.Result)
-                return;
-
-            var path = _packFileService.GetFullPath(result.File);
-            if (!IsInRestrictedFolder(path))
-            {
-                _dialogs.ShowDialogBox(
-                    $"'{result.File.Name}' is not inside {RestrictedToFolder.Replace('\\', '/')}/ - this viewer only opens music scripts from there.",
-                    "Open");
-                return;
-            }
-
-            LoadFile(result.File);
+            var result = _dialogs.DisplayBrowseDialog([".dat"], IsMusicScript);
+            if (result.Result)
+                LoadFile(result.File);
         }
+
+        static bool IsMusicScript(string path) =>
+            IsInRestrictedFolder(path) && string.Equals(Path.GetExtension(path), ".dat", StringComparison.OrdinalIgnoreCase);
 
         static bool IsInRestrictedFolder(string path) =>
             path.Replace('/', '\\').StartsWith(RestrictedToFolder + "\\", StringComparison.OrdinalIgnoreCase);
