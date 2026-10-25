@@ -11,29 +11,40 @@ using Shared.Core.PackFiles;
 
 namespace Editors.Audio.Shared.AudioProject
 {
+    /// <param name="MusicCultures">Every culture the project now holds, in the order the scripts
+    /// are built with them.</param>
     public record MusicAudioProjectResult(
         string FilePath,
         IReadOnlyList<string> CreatedEvents,
-        IReadOnlyList<(string EventName, string Reason)> SkippedEvents);
+        IReadOnlyList<(string EventName, string Reason)> SkippedEvents,
+        IReadOnlyList<MusicCulture> MusicCultures);
 
     /// <summary>
-    /// Builds an Audio Project containing one music Action Event per named event, shaped the way
-    /// vanilla shapes them.
+    /// Keeps the music project: the cultures it wires into the music scripts, and one music Action
+    /// Event per event those cultures post, shaped the way vanilla shapes them.
     ///
     /// A vanilla music event is a single SetState action against one of the music State Groups -
     /// music_b_faction_empire sets Battle_Music_WH3_Culture to Empire - and holds no Sound, no
     /// container and no audio file. What makes a State audible is the music hierarchy branching on
     /// it, which lives in the game's own banks; the event's whole job is to select a branch.
     ///
-    /// So this generates the events and the States they select and stops there. The audio comes
-    /// later, in the Audio Editor, where picking wavs for an event builds the branch its State
-    /// selects - and only for State Groups a mod can actually extend, which of the six these events
-    /// target is just WH3_Campaign_Subcultures. See
-    /// <see cref="Wh3MusicHierarchyInformation.GetMusicSwitchContainerIds"/> for why.
+    /// So this records the culture and generates its events and the States they select, and stops
+    /// there. The audio comes later, in the Audio Editor, where picking wavs for an event builds
+    /// the branch its State selects; compiling the project then rebuilds the scripts from vanilla
+    /// with every culture in it - see <see cref="IMusicScriptBuildService"/>. See
+    /// <see cref="Wh3MusicHierarchyInformation.GetMusicSwitchContainerIds"/> for which State Groups
+    /// can carry audio of their own.
+    ///
+    /// One project is meant to hold every culture: it is kept by whoever maintains the audio mixer
+    /// mod, who adds a culture when its mod's team asks and supplies their wavs.
     /// </summary>
     public interface IMusicAudioProjectService
     {
-        MusicAudioProjectResult CreateForMusicEvents(string projectName, string directory, IReadOnlyList<string> eventNames);
+        /// <summary>Adds the culture to the project at <paramref name="directory"/>\<paramref name="projectName"/>.aproj,
+        /// creating the project if the editable pack has none there yet, and adds the events it
+        /// needs. A culture already in the project with the same Audio State and subculture key is
+        /// replaced, so running the wizard again for it updates it.</summary>
+        MusicAudioProjectResult AddCulture(string projectName, string directory, MusicCulture musicCulture, IReadOnlyList<string> eventNames);
     }
 
     public class MusicAudioProjectService(
@@ -49,21 +60,34 @@ namespace Editors.Audio.Shared.AudioProject
 
         private readonly ILogger _logger = Logging.Create<MusicAudioProjectService>();
 
-        public MusicAudioProjectResult CreateForMusicEvents(string projectName, string directory, IReadOnlyList<string> eventNames)
+        public MusicAudioProjectResult AddCulture(string projectName, string directory, MusicCulture musicCulture, IReadOnlyList<string> eventNames)
         {
             ArgumentException.ThrowIfNullOrWhiteSpace(projectName);
             ArgumentException.ThrowIfNullOrWhiteSpace(directory);
+            ArgumentNullException.ThrowIfNull(musicCulture);
             ArgumentNullException.ThrowIfNull(eventNames);
 
             if (_packFileService.GetEditablePack() == null)
                 throw new InvalidOperationException("No editable pack is loaded, so the audio project has nowhere to be written.");
+
+            var fileName = $"{projectName}.aproj";
+            var filePath = $"{directory}\\{fileName}";
 
             // Music always lives in the Sfx language folder regardless of what a project is
             // otherwise set to (global_music declares Sfx as its RequiredLanguage), so the
             // project is created as Sfx outright - that keeps the ID uniqueness scope, which
             // is per language, the same one the SoundBank will actually be compiled into.
             var language = Wh3LanguageInformation.GetLanguageAsString(Wh3Language.Sfx);
-            var audioProject = AudioProjectFile.CreateNew(language, projectName);
+            var existing = _packFileService.FindFile(filePath);
+            var audioProject = existing != null
+                ? _audioProjectFileService.DeserialiseAudioProject(existing)
+                : AudioProjectFile.CreateNew(language, projectName);
+
+            audioProject.MusicCultures ??= [];
+            audioProject.MusicCultures.RemoveAll(other =>
+                string.Equals(other.AudioState, musicCulture.AudioState, StringComparison.OrdinalIgnoreCase)
+                && string.Equals(other.SubcultureKey, musicCulture.SubcultureKey, StringComparison.OrdinalIgnoreCase));
+            audioProject.MusicCultures.Add(musicCulture);
 
             // Populates the repository so GenerateActionEventId can see vanilla IDs and refuse
             // a name that already exists - adding a culture called "empire" would otherwise
@@ -72,15 +96,24 @@ namespace Editors.Audio.Shared.AudioProject
             // which costs the collision check but still yields a valid project.
             TryLoadAudioRepository(language);
 
+            // A saved project leaves out empty SoundBanks, so a reopened one may not have it.
             var soundBankName = $"{Wh3SoundBankInformation.GetName(Wh3SoundBank.GlobalMusic)}_{projectName}";
-            var soundBank = audioProject.GetSoundBank(soundBankName)
-                ?? throw new InvalidOperationException($"Newly created audio project has no '{soundBankName}' SoundBank.");
+            var soundBank = audioProject.GetSoundBank(soundBankName);
+            if (soundBank == null)
+            {
+                soundBank = new SoundBank(soundBankName, Wh3SoundBank.GlobalMusic, language);
+                audioProject.SoundBanks.Add(soundBank);
+            }
 
             var created = new List<string>();
             var skipped = new List<(string, string)>();
 
             foreach (var eventName in eventNames.Distinct(StringComparer.OrdinalIgnoreCase))
             {
+                // Already there from an earlier run for this culture, possibly with audio picked.
+                if (soundBank.ActionEvents.Any(actionEvent => string.Equals(actionEvent.Name, eventName, StringComparison.OrdinalIgnoreCase)))
+                    continue;
+
                 try
                 {
                     AddMusicEvent(audioProject, soundBank, eventName);
@@ -96,11 +129,9 @@ namespace Editors.Audio.Shared.AudioProject
                 }
             }
 
-            var fileName = $"{projectName}.aproj";
-            var filePath = $"{directory}\\{fileName}";
             _audioProjectFileService.Save(audioProject, fileName, filePath);
 
-            return new MusicAudioProjectResult(filePath, created, skipped);
+            return new MusicAudioProjectResult(filePath, created, skipped, audioProject.MusicCultures);
         }
 
         private void AddMusicEvent(AudioProjectFile audioProject, SoundBank soundBank, string eventName)
@@ -132,6 +163,14 @@ namespace Editors.Audio.Shared.AudioProject
         private void AddStateToStateGroup(AudioProjectFile audioProject, string stateGroupName, string stateName)
         {
             var stateGroup = audioProject.StateGroups.FirstOrDefault(stateGroup => stateGroup.Name == stateGroupName);
+
+            // A saved project leaves out empty Groups, so a reopened one may not have it.
+            if (stateGroup == null && Wh3StateGroupInformation.ModdableStateGroups.Contains(stateGroupName))
+            {
+                stateGroup = StateGroup.CreateForAudioProjectFile(stateGroupName, []);
+                audioProject.StateGroups.TryAdd(stateGroup);
+            }
+
             if (stateGroup == null)
                 return;
 

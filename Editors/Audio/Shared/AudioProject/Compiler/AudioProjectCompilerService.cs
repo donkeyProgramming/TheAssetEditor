@@ -20,17 +20,28 @@ namespace Editors.Audio.Shared.AudioProject.Compiler
         ISoundBankGeneratorService soundBankGeneratorService,
         IWemGeneratorService wemGeneratorService,
         IDatGeneratorService datGeneratorService,
-        IAudioRepository audioRepository) : IAudioProjectCompilerService
+        IAudioRepository audioRepository,
+        IMusicScriptBuildService musicScriptBuildService) : IAudioProjectCompilerService
     {
         private readonly ISoundBankGeneratorService _soundBankGeneratorService = soundBankGeneratorService;
         private readonly IWemGeneratorService _wemGeneratorService = wemGeneratorService;
         private readonly IDatGeneratorService _datGeneratorService = datGeneratorService;
         private readonly IAudioRepository _audioRepository = audioRepository;
+        private readonly IMusicScriptBuildService _musicScriptBuildService = musicScriptBuildService;
 
         private readonly ILogger _logger = Logging.Create<AudioProjectCompilerService>();
 
         public void Compile(AudioProjectFile audioProject, string audioProjectFileName, string audioProjectFilePath)
         {
+            // Ahead of the check below: a culture that only borrows existing audio has no
+            // SoundBank of its own but still has to be wired into the scripts.
+            if (audioProject.MusicCultures is { Count: > 0 })
+            {
+                var problems = _musicScriptBuildService.BuildAndSave(audioProject.MusicCultures);
+                if (problems.Count != 0)
+                    throw new InvalidOperationException("The music scripts could not be built:\n  " + string.Join("\n  ", problems));
+            }
+
             if (audioProject.SoundBanks.Count == 0)
                 return;
 

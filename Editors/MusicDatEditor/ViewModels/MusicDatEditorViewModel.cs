@@ -7,6 +7,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Editors.Audio.AudioExplorer;
 using Editors.Audio.Shared.AudioProject;
+using Editors.Audio.Shared.AudioProject.Compiler;
 using Editors.MusicDatEditor.Views;
 using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
@@ -43,6 +44,7 @@ namespace Editors.MusicDatEditor.ViewModels
         readonly IStandardDialogs _dialogs;
         readonly IEditorManager _editorManager;
         readonly IMusicAudioProjectService _musicAudioProjectService;
+        readonly IMusicScriptBuildService _musicScriptBuildService;
 
         MusicDatFile? _file;
         IReadOnlyDictionary<int, string> _functionNamesByOffset = new Dictionary<int, string>();
@@ -87,13 +89,15 @@ namespace Editors.MusicDatEditor.ViewModels
         public ICommand AddCultureCommand { get; }
 
         public MusicDatEditorViewModel(IPackFileService packFileService, IFileSaveService fileSaveService,
-            IStandardDialogs dialogs, IEditorManager editorManager, IMusicAudioProjectService musicAudioProjectService)
+            IStandardDialogs dialogs, IEditorManager editorManager, IMusicAudioProjectService musicAudioProjectService,
+            IMusicScriptBuildService musicScriptBuildService)
         {
             _packFileService = packFileService;
             _fileSaveService = fileSaveService;
             _dialogs = dialogs;
             _editorManager = editorManager;
             _musicAudioProjectService = musicAudioProjectService;
+            _musicScriptBuildService = musicScriptBuildService;
             OpenCommand = new RelayCommand(Open);
             SaveCommand = new RelayCommand(() => Save());
             FindInAudioExplorerCommand = new RelayCommand<SymbolListItemViewModel>(FindInAudioExplorer);
@@ -125,17 +129,18 @@ namespace Editors.MusicDatEditor.ViewModels
         static bool IsInRestrictedFolder(string path) =>
             path.Replace('/', '\\').StartsWith(RestrictedToFolder + "\\", StringComparison.OrdinalIgnoreCase);
 
-        /// <summary>Adds a culture everywhere either script decides one, by copying existing
-        /// entries. The wizard hands back an already-validated copy of each file, so this
-        /// either adopts a known-good result or leaves the current one untouched.
+        /// <summary>Adds a culture to the music project and rebuilds both scripts from the game's
+        /// own copies with every culture the project holds. The wizard validates the edit against
+        /// the scripts as they are first, so a culture that cannot be wired is turned away before
+        /// the project is touched.
         ///
         /// A culture has to be wired into both music scripts to work, so both are always
         /// located and offered together (see <see cref="FindPair"/>) regardless of which one,
         /// if either, this tab happens to have open - this is also how the command works when
         /// the editor was opened from the Tools menu with nothing loaded at all. Whichever
-        /// file is the one already open in this tab gets its edit left pending like any other
-        /// change here; the other has no tab to review it in, so it is committed straight into
-        /// the pack the same way the Save button would, and any tab already showing it is
+        /// file is the one already open in this tab gets the rebuilt copy left pending like any
+        /// other change here; the other has no tab to review it in, so it is committed straight
+        /// into the pack the same way the Save button would, and any tab already showing it is
         /// refreshed so it does not go stale.</summary>
         void AddCulture()
         {
@@ -156,65 +161,51 @@ namespace Editors.MusicDatEditor.ViewModels
             }
 
             var wizard = AddCultureWizardWindow.ShowDialog(Application.Current?.MainWindow, battleFile, campaignFile);
-            if (wizard == null)
+            if (wizard == null || (wizard.EditedBattle == null && wizard.EditedCampaign == null))
                 return;
 
-            var battle = wizard.EditedBattle;
-            var campaign = wizard.EditedCampaign;
-            if (battle == null && campaign == null)
-                return;
-
-            var parts = new List<string>();
-            if (battle != null)
-                parts.Add(Commit(battlePackFile!, battle));
-            if (campaign != null)
-                parts.Add(Commit(campaignPackFile!, campaign));
-
-            if (wizard.CreateAudioProject)
-                parts.Add(CreateAudioProject(wizard));
-
-            StatusText = "Added a culture - " + string.Join("; ", parts);
-        }
-
-        /// <summary>Generates the audio project holding the events the splice now posts. Run
-        /// after the scripts are committed, and reported rather than thrown: the wiring is the
-        /// part that had to be all-or-nothing, and it has already succeeded by this point, so
-        /// failing to produce the Wwise-side companion is a setback to describe, not a reason
-        /// to leave the modder thinking the whole thing came apart.</summary>
-        string CreateAudioProject(AddCultureWizardViewModel wizard)
-        {
-            var events = wizard.EventsNeedingAudio;
-            if (events.Count == 0)
-                return "no audio project needed (every slot borrows existing audio)";
-
+            MusicAudioProjectResult result;
             try
             {
-                var result = _musicAudioProjectService.CreateForMusicEvents(
-                    wizard.AudioProjectName, AudioProjectFolder, events);
-
-                var summary = $"wrote {result.FilePath} with {result.CreatedEvents.Count} music event(s)";
-                if (result.SkippedEvents.Count == 0)
-                    return summary;
-
-                // Nearly always a name that already exists in vanilla, which means the culture
-                // is reusing a shipped event rather than getting its own - worth saying out
-                // loud, since the script will still post it and it will still play something.
-                _dialogs.ShowDialogBox(
-                    "The music scripts were wired up, but these events could not be added to the audio project:\n\n  " +
-                    string.Join("\n  ", result.SkippedEvents.Select(x => $"{x.EventName} - {x.Reason}")),
-                    "Add Culture");
-                return summary + $", {result.SkippedEvents.Count} skipped";
+                result = _musicAudioProjectService.AddCulture(
+                    AddCultureWizardViewModel.AudioProjectName, AudioProjectFolder, wizard.ToMusicCulture(), wizard.EventsNeedingAudio);
             }
             catch (Exception e)
             {
-                _logger.Here().Error($"Could not create the audio project: {e.Message}");
-                _dialogs.ShowDialogBox(
-                    "The music scripts were wired up successfully, but the audio project could not be created:\n\n" +
-                    e.Message +
-                    "\n\nThe events the scripts now post still need to exist in a sound bank for anything to play.",
-                    "Add Culture");
-                return "audio project failed";
+                _logger.Here().Error($"Could not add the culture to the music project: {e.Message}");
+                _dialogs.ShowDialogBox($"The culture could not be added to the music project, so nothing was changed:\n\n{e.Message}", "Add Culture");
+                return;
             }
+
+            // Nearly always a name that already exists in vanilla, which means the culture is
+            // reusing a shipped event rather than getting its own - worth saying out loud, since
+            // the script will still post it and it will still play something.
+            if (result.SkippedEvents.Count != 0)
+                _dialogs.ShowDialogBox(
+                    "These events could not be added to the music project:\n\n  " +
+                    string.Join("\n  ", result.SkippedEvents.Select(x => $"{x.EventName} - {x.Reason}")),
+                    "Add Culture");
+
+            var parts = new List<string>
+            {
+                $"added to {result.FilePath} ({result.MusicCultures.Count} culture(s), {result.CreatedEvents.Count} new event(s))"
+            };
+
+            var build = _musicScriptBuildService.Build(result.MusicCultures);
+            if (build.Problems.Count != 0)
+            {
+                _logger.Here().Error($"Music scripts not rebuilt: {string.Join("; ", build.Problems)}");
+                _dialogs.ShowDialogBox(
+                    "The culture was added to the music project, but the scripts could not be rebuilt from it:\n\n  " +
+                    string.Join("\n  ", build.Problems.Take(10)),
+                    "Add Culture");
+                StatusText = "Added a culture - " + parts[0] + "; scripts NOT rebuilt";
+                return;
+            }
+
+            parts.Add(Commit(battlePackFile, MusicScriptBuildService.BattleScriptPath, build.Battle));
+            parts.Add(Commit(campaignPackFile, MusicScriptBuildService.CampaignScriptPath, build.Campaign));
+            StatusText = "Added a culture - " + string.Join("; ", parts);
         }
 
         /// <summary>Locates both halves of the pair by name across the loaded packs, and
@@ -259,9 +250,9 @@ namespace Editors.MusicDatEditor.ViewModels
         /// already open here, or writes it straight into the pack (the same way the Save
         /// button would) otherwise - refreshing any other tab already showing it so that one
         /// does not go stale.</summary>
-        string Commit(PackFile packFile, MusicDatFile edited)
+        string Commit(PackFile? packFile, string path, MusicDatFile edited)
         {
-            if (_file != null && ReferenceEquals(packFile, CurrentFile))
+            if (packFile != null && _file != null && ReferenceEquals(packFile, CurrentFile))
             {
                 _file = edited;
                 RebuildAll();
@@ -270,19 +261,20 @@ namespace Editors.MusicDatEditor.ViewModels
             }
 
             var bytes = MusicDatParser.Write(edited);
-            var path = _packFileService.GetFullPath(packFile);
-            var saved = _fileSaveService.Save(path, bytes, prompOnConflict: false);
+            var saved = _fileSaveService.Save(packFile != null ? _packFileService.GetFullPath(packFile) : path, bytes, prompOnConflict: false);
+            var name = Path.GetFileName(path);
             if (saved == null)
-                return $"{packFile.Name} NOT saved";
+                return $"{name} NOT saved";
 
             // A script that came from a vanilla pack is saved as a new file in the mod pack,
             // so a tab showing the vanilla one has to move over to it rather than re-read the
             // unpatched original.
-            foreach (var editor in _editorManager.GetAllEditors())
-                if (editor is MusicDatEditorViewModel vm && ReferenceEquals(vm.CurrentFile, packFile))
-                    vm.LoadFile(saved);
+            if (packFile != null)
+                foreach (var editor in _editorManager.GetAllEditors())
+                    if (editor is MusicDatEditorViewModel vm && ReferenceEquals(vm.CurrentFile, packFile))
+                        vm.LoadFile(saved);
 
-            return $"{packFile.Name} (patched directly)";
+            return $"{name} (rebuilt)";
         }
 
         /// <summary>Opens a fresh Audio Explorer tab pre-filtered to this event name and selects

@@ -112,10 +112,8 @@
         </ScrollViewer>
 
         <StackPanel Grid.Row="4" Margin="0,8,0,0">
-            <CheckBox IsChecked="{Binding CreateAudioProject}"
-                      Content="Also create an audio project with placeholder audio for the events above"/>
             <TextBlock Text="{Binding AudioProjectHelp}" TextWrapping="Wrap"
-                       FontSize="11" Opacity="0.7" Margin="20,4,0,0"/>
+                       FontSize="11" Opacity="0.7"/>
             <TextBlock Text="{Binding Error}" TextWrapping="Wrap" Foreground="#D9534F" Margin="0,8,0,0"/>
         </StackPanel>
 

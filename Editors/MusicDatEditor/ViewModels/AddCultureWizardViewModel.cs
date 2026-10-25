@@ -1,6 +1,7 @@
 using System.Collections.ObjectModel;
 using System.Windows.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
+using Editors.Audio.Shared.AudioProject.Models;
 using Shared.GameFormats.MusicDat;
 
 namespace Editors.MusicDatEditor.ViewModels
@@ -31,7 +32,6 @@ namespace Editors.MusicDatEditor.ViewModels
         [ObservableProperty] string _audioState = "";
         [ObservableProperty] string _subcultureKey = "";
         [ObservableProperty] string _error = "";
-        [ObservableProperty] bool _createAudioProject = true;
 
         readonly DispatcherTimer _previewDebounce = new() { Interval = TimeSpan.FromMilliseconds(300) };
 
@@ -80,16 +80,33 @@ namespace Editors.MusicDatEditor.ViewModels
                  .Select(s => s.Slot.EventFor(MusicalCulture))
                  .ToList();
 
-        /// <summary>Name for the generated audio project, and so for the SoundBank compiled out
-        /// of it - kept distinct per culture so two runs of this wizard do not collide.</summary>
-        public string AudioProjectName => $"music_{MusicalCulture}";
+        /// <summary>The one music project every culture is added to - kept by whoever maintains
+        /// the audio mixer mod, and rebuilt whole each time a culture is added.</summary>
+        public const string AudioProjectName = "music";
 
         public string AudioProjectHelp =>
-            "Creates an audio project holding one Music event per row above, built the way vanilla " +
-            "builds them: each event sets a Wwise State naming this culture, rather than playing a " +
-            "file directly. Open it in the Audio Editor to attach audio and compile it, or to add " +
-            "more events by hand. Only rows marked as able to carry their own audio can be given " +
-            "files there - see the note on each row.";
+            $"Adds this culture to the music project (audio\\audio_projects\\{AudioProjectName}.aproj, created " +
+            "if the pack has none yet) with one Music event per row above, built the way vanilla builds " +
+            "them: each event sets a Wwise State naming this culture rather than playing a file directly. " +
+            "Both music scripts are then rebuilt from the game's own copies with every culture in the " +
+            "project. Open the project in the Audio Editor to give the events their wavs and compile it. " +
+            "Only rows marked as able to carry their own audio can be given files there - see the note on each row.";
+
+        /// <summary>What the wizard was given, as the music project keeps it so the scripts can be
+        /// rebuilt from vanilla later.</summary>
+        public MusicCulture ToMusicCulture() => new()
+        {
+            AudioState = AudioState.Trim(),
+            SubcultureKey = SubcultureKey.Trim(),
+            Slots = Slots
+                .Where(row => row.Include)
+                .Select(row => new MusicCultureSlot
+                {
+                    EventPrefix = row.Slot.EventPrefix,
+                    ReferenceMatchKey = row.UseExistingAudio ? row.ReferenceCulture : null
+                })
+                .ToList()
+        };
 
         public string MissingFileWarning =>
             _battle == null ? "battle_music.dat could not be found in this pack, so only the campaign wiring will be added." :

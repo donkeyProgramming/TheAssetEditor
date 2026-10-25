@@ -33,6 +33,7 @@
     <Compile Include="MusicShippedPackDiagnosis.cs" />
     <Compile Include="MusicHierarchyFactoryTests.cs" />
     <Compile Include="MusicHierarchyGenerationTests.cs" />
+    <Compile Include="MusicProjectBuildTests.cs" />
     <Compile Include="MusicSwitchContainerMergeTests.cs" />
     <Compile Include="MusicHircRoundTripResearch.cs" />
     <Compile Include="SetStateActionGenerationTests.cs" />

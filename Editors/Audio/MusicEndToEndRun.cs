@@ -72,7 +72,7 @@ namespace Test.Audio
             var modPack = packFileService.CreateNewPackFileContainer(
                 "araby_music", PackFileVersion.PFH5, PackFileCAType.MOD, setEditablePack: true);
 
-            var wizard = RunTheWizard(packFileService, provider.GetRequiredService<IFileSaveService>());
+            var wizard = RunTheWizard(packFileService);
             var audioProjectPath = WriteTheAudioProject(provider, wizard);
 
             var audioFile = ImportTheWav(packFileService, provider.GetRequiredService<IAudioRepository>());
@@ -94,11 +94,10 @@ namespace Test.Audio
         }
 
         /// <summary>
-        /// The Add Culture wizard, driven the way the window drives it. Both patched scripts are
-        /// committed into the mod pack, which is what the editor does for whichever file is not
-        /// open in a tab - and here neither is.
+        /// The Add Culture wizard, driven the way the window drives it. It only validates here:
+        /// the scripts are built from the music project when it is compiled, the same as a rebuild.
         /// </summary>
-        static AddCultureWizardViewModel RunTheWizard(IPackFileService packFileService, IFileSaveService fileSaveService)
+        static AddCultureWizardViewModel RunTheWizard(IPackFileService packFileService)
         {
             var battlePackFile = FindMusicDat(packFileService, "battle_music.dat");
             var campaignPackFile = FindMusicDat(packFileService, "campaign_music.dat");
@@ -115,27 +114,19 @@ namespace Test.Audio
             Assert.That(wizard.CanApply, Is.True);
             Assert.That(wizard.TryApply(), Is.True, wizard.Error);
 
-            Commit(packFileService, fileSaveService, battlePackFile, wizard.EditedBattle);
-            Commit(packFileService, fileSaveService, campaignPackFile, wizard.EditedCampaign);
-
             Console.WriteLine($"Wizard wants audio for: {string.Join(", ", wizard.EventsNeedingAudio)}");
             return wizard;
-        }
-
-        static void Commit(IPackFileService packFileService, IFileSaveService fileSaveService, PackFile vanillaFile, MusicDatFile edited)
-        {
-            var path = packFileService.GetFullPath(vanillaFile);
-            fileSaveService.Save(path, MusicDatParser.Write(edited), prompOnConflict: false);
         }
 
         static string WriteTheAudioProject(ServiceProvider provider, AddCultureWizardViewModel wizard)
         {
             var result = provider.GetRequiredService<IMusicAudioProjectService>()
-                .CreateForMusicEvents(wizard.AudioProjectName, AudioProjectFolder, wizard.EventsNeedingAudio);
+                .AddCulture(AddCultureWizardViewModel.AudioProjectName, AudioProjectFolder, wizard.ToMusicCulture(), wizard.EventsNeedingAudio);
 
             Assert.That(result.SkippedEvents, Is.Empty,
                 string.Join("; ", result.SkippedEvents.Select(skipped => $"{skipped.EventName}: {skipped.Reason}")));
             Assert.That(result.CreatedEvents, Is.EquivalentTo(wizard.EventsNeedingAudio));
+            Assert.That(result.MusicCultures.Select(culture => culture.SubcultureKey), Is.EqualTo(new[] { SubcultureKey }));
 
             return result.FilePath;
         }

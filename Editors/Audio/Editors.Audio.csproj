@@ -23,6 +23,7 @@
 	  <Compile Remove="MusicShippedPackDiagnosis.cs" />
 	  <Compile Remove="MusicHierarchyFactoryTests.cs" />
 	  <Compile Remove="MusicHierarchyGenerationTests.cs" />
+	  <Compile Remove="MusicProjectBuildTests.cs" />
 	  <Compile Remove="MusicSwitchContainerMergeTests.cs" />
 	  <Compile Remove="MusicHircRoundTripResearch.cs" />
 	  <Compile Remove="SetStateActionGenerationTests.cs" />
