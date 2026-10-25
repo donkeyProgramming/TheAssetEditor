@@ -252,11 +252,18 @@ namespace Editors.Audio.AudioEditor.Presentation.AudioProjectEditor
             {
                 var actionEventName = TableHelpers.GetActionEventNameFromRow(row);
                 var actionEventSuffix = TableHelpers.RemoveActionEventPrefix(actionEventName);
-                // Music gets none of these. A music Action Event sets a State, and every vanilla one
-                // is a single SetState - music is stopped and resumed by setting a different State,
-                // not by a Pause action against the Event. Adding them here would write the same
-                // State, and so the same branch, four times over.
-                if (selectedAudioProjectExplorerNode.IsBattleAbilityActionEvent())
+                if (selectedAudioProjectExplorerNode.IsMusicActionEvent())
+                {
+                    var pauseActionEventRow = TableHelpers.CreateRow(Table, $"Pause_{actionEventSuffix}");
+                    rows.Add(pauseActionEventRow);
+
+                    var resumeActionEventRow = TableHelpers.CreateRow(Table, $"Resume_{actionEventSuffix}");
+                    rows.Add(resumeActionEventRow);
+
+                    var stopActionEventRow = TableHelpers.CreateRow(Table, $"Stop_{actionEventSuffix}");
+                    rows.Add(stopActionEventRow);
+                }
+                else if (selectedAudioProjectExplorerNode.IsBattleAbilityActionEvent())
                 {
                     var stopActionEventRow = TableHelpers.CreateRow(Table, $"Stop_{actionEventSuffix}");
                     rows.Add(stopActionEventRow);
@@ -315,14 +322,13 @@ namespace Editors.Audio.AudioEditor.Presentation.AudioProjectEditor
         private bool AreAudioFilesSet()
         {
             var selectedAudioProjectExplorerNode = _audioEditorStateService.SelectedAudioProjectExplorerNode;
+            if (!selectedAudioProjectExplorerNode.IsStateGroup())
+            {
+                if (_audioEditorStateService.AudioFiles.Count == 0)
+                    return false;
+            }
 
-            // A music Action Event sets a State rather than playing a Sound, so like a State Group
-            // it has no audio of its own to wait for - requiring one here would leave the Add
-            // button permanently disabled.
-            if (selectedAudioProjectExplorerNode.IsStateGroup() || selectedAudioProjectExplorerNode.IsMusicActionEvent())
-                return true;
-
-            return _audioEditorStateService.AudioFiles.Count != 0;
+            return true;
         }
 
         private bool DoesRowExist()

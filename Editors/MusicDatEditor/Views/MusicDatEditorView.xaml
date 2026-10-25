@@ -16,24 +16,6 @@
         <DockPanel Grid.Row="0" Margin="6">
             <Button DockPanel.Dock="Left" Content="Open" Command="{Binding OpenCommand}" Padding="12,3" Margin="0,0,6,0"
                     ToolTip="Open a music script. Restricted to audio/scripts/, the only folder either one lives in."/>
-            <Button DockPanel.Dock="Left" Content="Save" Command="{Binding SaveCommand}" Padding="12,3" Margin="0,0,6,0"/>
-            <Button DockPanel.Dock="Left" Command="{Binding AddCultureCommand}"
-                    IsEnabled="{Binding CanAddCulture}" Padding="12,3" Margin="0,0,10,0"
-                    ToolTip="Add a new culture or subculture to this script's culture chain, by copying an existing one.">
-                <TextBlock Text="Add Subculture Wizard" TextTrimming="None"/>
-            </Button>
-            <TextBlock DockPanel.Dock="Left" Text="* unsaved changes" VerticalAlignment="Center" Margin="0,0,10,0" FontWeight="Bold">
-                <TextBlock.Style>
-                    <Style TargetType="TextBlock">
-                        <Setter Property="Visibility" Value="Collapsed"/>
-                        <Style.Triggers>
-                            <DataTrigger Binding="{Binding HasUnsavedChanges}" Value="True">
-                                <Setter Property="Visibility" Value="Visible"/>
-                            </DataTrigger>
-                        </Style.Triggers>
-                    </Style>
-                </TextBlock.Style>
-            </TextBlock>
             <TextBlock Text="{Binding StatusText}" VerticalAlignment="Center" Opacity="0.8"/>
         </DockPanel>
 
@@ -147,7 +129,7 @@
                         <DockPanel>
                             <TextBlock DockPanel.Dock="Top" TextWrapping="Wrap" FontSize="11" Opacity="0.75" Margin="0,0,0,6">
                                 <Run Text="Read-only." FontWeight="Bold"/>
-                                <Run Text="A decompiled reading view of the Instructions tab, not the source of truth - reconstructing structured code from raw bytecode is inherently approximate, so goto/label artifacts and odd merges can turn up here. Edits are made only through the wizards on the toolbar (Add Culture...)."/>
+                                <Run Text="A decompiled reading view of the Instructions tab, not the source of truth - reconstructing structured code from raw bytecode is inherently approximate, so goto/label artifacts and odd merges can turn up here. To add a culture, use the Music Project tool, which rebuilds both scripts."/>
                             </TextBlock>
                             <TextBox Text="{Binding Pseudocode, Mode=OneWay}" IsReadOnly="True"
                                      FontFamily="Consolas" FontSize="12" TextWrapping="NoWrap"
@@ -158,7 +140,7 @@
                         <DockPanel>
                             <TextBlock DockPanel.Dock="Top" TextWrapping="Wrap" FontSize="11" Opacity="0.75" Margin="0,0,0,6">
                                 <Run Text="Read-only." FontWeight="Bold"/>
-                                <Run Text="The raw decoded instruction stream. Edits are made only through the wizards on the toolbar (Add Culture...), never here directly."/>
+                                <Run Text="The raw decoded instruction stream. To add a culture, use the Music Project tool, which rebuilds both scripts."/>
                             </TextBlock>
                             <DataGrid ItemsSource="{Binding Instructions}" AutoGenerateColumns="False" CanUserAddRows="False" IsReadOnly="True"
                                       GridLinesVisibility="Horizontal" HeadersVisibility="Column" FontFamily="Consolas">

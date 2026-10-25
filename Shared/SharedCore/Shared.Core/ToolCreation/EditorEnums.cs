@@ -24,6 +24,7 @@
         BMD_Editor,
         Csc_Editor,
         MusicDat_Editor,
+        MusicProject_Editor,
         None,
     }
 }

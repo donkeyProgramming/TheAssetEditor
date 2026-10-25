@@ -4,7 +4,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using Editors.Audio.Shared.AudioProject.Models;
 using Shared.GameFormats.MusicDat;
 
-namespace Editors.MusicDatEditor.ViewModels
+namespace Editors.MusicProjectEditor.ViewModels
 {
     /// <summary>Backs the Add Culture wizard: name the new culture once, then decide per slot
     /// whether it gets its own audio or borrows an existing culture's.
@@ -80,17 +80,12 @@ namespace Editors.MusicDatEditor.ViewModels
                  .Select(s => s.Slot.EventFor(MusicalCulture))
                  .ToList();
 
-        /// <summary>The one music project every culture is added to - kept by whoever maintains
-        /// the audio mixer mod, and rebuilt whole each time a culture is added.</summary>
-        public const string AudioProjectName = "music";
-
         public string AudioProjectHelp =>
-            $"Adds this culture to the music project (audio\\audio_projects\\{AudioProjectName}.aproj, created " +
-            "if the pack has none yet) with one Music event per row above, built the way vanilla builds " +
-            "them: each event sets a Wwise State naming this culture rather than playing a file directly. " +
-            "Both music scripts are then rebuilt from the game's own copies with every culture in the " +
-            "project. Open the project in the Audio Editor to give the events their wavs and compile it. " +
-            "Only rows marked as able to carry their own audio can be given files there - see the note on each row.";
+            "Adds this culture to the music project with one Music event per row above that brings its own audio, " +
+            "built the way vanilla builds them: each event sets a Wwise State naming this culture rather than playing " +
+            "a file directly. Nothing is built yet - give the events their wavs in the Music Project tool, then Build " +
+            "it to rebuild both music scripts from the game's own copies with every culture in the project. Only rows " +
+            "marked as able to carry their own audio can be given files - see the note on each row.";
 
         /// <summary>What the wizard was given, as the music project keeps it so the scripts can be
         /// rebuilt from vanilla later.</summary>
@@ -107,6 +102,25 @@ namespace Editors.MusicDatEditor.ViewModels
                 })
                 .ToList()
         };
+
+        /// <summary>Fills the wizard in from a culture already in the project, so running it again
+        /// edits that culture rather than starting from nothing. A slot the culture is not wired
+        /// into is left unticked.</summary>
+        public void LoadFrom(MusicCulture musicCulture)
+        {
+            AudioState = musicCulture.AudioState ?? "";
+            SubcultureKey = musicCulture.SubcultureKey ?? "";
+
+            foreach (var row in Slots)
+            {
+                var slot = musicCulture.Slots.FirstOrDefault(slot => slot.EventPrefix == row.Slot.EventPrefix);
+                row.Include = slot != null;
+
+                // The culture first, so ticking the box does not pick a default over it.
+                row.ReferenceCulture = slot?.ReferenceMatchKey ?? "";
+                row.UseExistingAudio = slot?.ReferenceMatchKey != null;
+            }
+        }
 
         public string MissingFileWarning =>
             _battle == null ? "battle_music.dat could not be found in this pack, so only the campaign wiring will be added." :

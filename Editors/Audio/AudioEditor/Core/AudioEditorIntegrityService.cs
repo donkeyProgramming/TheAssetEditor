@@ -9,7 +9,6 @@ using Editors.Audio.Shared.GameInformation.Warhammer3;
 using Editors.Audio.Shared.Storage;
 using Shared.GameFormats.Wwise;
 using Shared.Core.PackFiles;
-using Shared.GameFormats.Wwise.Enums;
 using Shared.GameFormats.Wwise.Hirc;
 
 namespace Editors.Audio.AudioEditor.Core
@@ -310,15 +309,6 @@ namespace Editors.Audio.AudioEditor.Core
                     if (action.Id == 0)
                         throw new InvalidOperationException($"Action.Id should not be 0.");
 
-                    // A SetState action selects a State rather than playing anything, so it has no
-                    // Sound, no container and no bank to load - vanilla music actions carry a zero
-                    // bank id and empty property bundles. The checks below all assume a play target.
-                    if (action.ActionType == AkActionType.SetState)
-                    {
-                        ResolveSetStateActionIntegrity(actionEvent, action);
-                        continue;
-                    }
-
                     if (action.BankId == 0)
                         throw new InvalidOperationException($"Action.BankId should not be 0.");
 
@@ -358,27 +348,6 @@ namespace Editors.Audio.AudioEditor.Core
                     }
                 }
             }
-        }
-
-        /// <summary>
-        /// What a music Action Event has instead of a play target: the State Group it sets and the
-        /// State it sets it to, both resolved by Wwise hash. The State does not have to exist in
-        /// vanilla - adding one is the point - but the ids do have to match the names they were
-        /// hashed from, or the event will silently select nothing.
-        /// </summary>
-        private static void ResolveSetStateActionIntegrity(ActionEvent actionEvent, Shared.AudioProject.Models.Action action)
-        {
-            if (string.IsNullOrWhiteSpace(action.StateGroupName))
-                throw new InvalidOperationException($"Action.StateGroupName should not be empty for SetState Action Event '{actionEvent.Name}'.");
-
-            if (string.IsNullOrWhiteSpace(action.StateName))
-                throw new InvalidOperationException($"Action.StateName should not be empty for SetState Action Event '{actionEvent.Name}'.");
-
-            if (action.StateGroupId != WwiseHash.Compute(action.StateGroupName))
-                throw new InvalidOperationException($"Action.StateGroupId does not match the hash of '{action.StateGroupName}' for '{actionEvent.Name}'.");
-
-            if (action.IdExt != WwiseHash.Compute(action.StateName))
-                throw new InvalidOperationException($"Action.IdExt does not match the hash of State '{action.StateName}' for '{actionEvent.Name}'.");
         }
 
         private static void ResolveDialogueEventDataIntegrity(HashSet<uint> usedHircIds, HashSet<uint> usedSourceIds, SoundBank soundBank)

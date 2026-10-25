@@ -1,11 +1,9 @@
-using Editors.Audio.AudioEditor.Core;
-using Editors.Audio.AudioEditor.Core.AudioProjectMutation;
 using Editors.Audio.Shared.AudioProject;
 using Editors.Audio.Shared.AudioProject.Compiler;
 using Editors.Audio.Shared.AudioProject.Models;
 using Editors.Audio.Shared.GameInformation.Warhammer3;
 using Editors.Audio.Shared.Storage;
-using Editors.MusicDatEditor.ViewModels;
+using Editors.MusicProjectEditor.ViewModels;
 using Microsoft.Extensions.DependencyInjection;
 using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
@@ -21,9 +19,9 @@ using Shared.GameFormats.Wwise.Hirc.V136.Shared;
 namespace Test.Audio
 {
     /// <summary>
-    /// One run of the whole thing, in the order a modder does it: the MusicDat wizard wires a new
-    /// culture into both music scripts and writes the audio project holding the events they now
-    /// post, then the Audio Editor gives those events audio and compiles them.
+    /// One run of the whole thing, in the order a modder does it in the Music Project tool: the Add
+    /// Culture wizard wires a new culture into the music project, the events it now posts are given
+    /// audio, and the project is built.
     ///
     /// The unit tests all work on hircs in memory, and a bank that is perfectly well formed is still
     /// silent if no script posts its event. What this run adds is the join: the .dat and the .bnk
@@ -45,7 +43,6 @@ namespace Test.Audio
         /// it, since that is what the shipped scripts do.</summary>
         const string MusicalCulture = "araby";
 
-        const string AudioProjectFolder = @"audio\audio_projects";
         const uint CampaignSubcultureContainerId = 698158058;
         const uint BattleCultureContainerId = 26264058;
         const uint InBattleContainerId = 67383790;
@@ -73,10 +70,10 @@ namespace Test.Audio
                 "araby_music", PackFileVersion.PFH5, PackFileCAType.MOD, setEditablePack: true);
 
             var wizard = RunTheWizard(packFileService);
-            var audioProjectPath = WriteTheAudioProject(provider, wizard);
+            var audioProject = AddTheCulture(provider, wizard);
 
-            var audioFile = ImportTheWav(packFileService, provider.GetRequiredService<IAudioRepository>());
-            var compiledProject = GiveEveryEventTheWavAndCompile(provider, audioProjectPath, audioFile);
+            var wavPackFilePath = ImportTheWav(packFileService);
+            var compiledProject = GiveEveryEventTheWavAndBuild(provider, audioProject, wavPackFilePath);
 
             ReportPackContents(modPack);
             AssertTheScriptsAndTheBankAgree(packFileService, compiledProject);
@@ -118,20 +115,21 @@ namespace Test.Audio
             return wizard;
         }
 
-        static string WriteTheAudioProject(ServiceProvider provider, AddCultureWizardViewModel wizard)
+        static AudioProjectFile AddTheCulture(ServiceProvider provider, AddCultureWizardViewModel wizard)
         {
-            var result = provider.GetRequiredService<IMusicAudioProjectService>()
-                .AddCulture(AddCultureWizardViewModel.AudioProjectName, AudioProjectFolder, wizard.ToMusicCulture(), wizard.EventsNeedingAudio);
+            var service = provider.GetRequiredService<IMusicAudioProjectService>();
+            var audioProject = service.CreateNew();
+            var result = service.AddCulture(audioProject, wizard.ToMusicCulture());
 
             Assert.That(result.SkippedEvents, Is.Empty,
                 string.Join("; ", result.SkippedEvents.Select(skipped => $"{skipped.EventName}: {skipped.Reason}")));
             Assert.That(result.CreatedEvents, Is.EquivalentTo(wizard.EventsNeedingAudio));
-            Assert.That(result.MusicCultures.Select(culture => culture.SubcultureKey), Is.EqualTo(new[] { SubcultureKey }));
+            Assert.That(audioProject.MusicCultures.Select(culture => culture.SubcultureKey), Is.EqualTo(new[] { SubcultureKey }));
 
-            return result.FilePath;
+            return audioProject;
         }
 
-        static AudioFile ImportTheWav(IPackFileService packFileService, IAudioRepository audioRepository)
+        static string ImportTheWav(IPackFileService packFileService)
         {
             // A wav has to be in the pack before it can be picked, the same as importing one in the
             // editor - the wem generator reads it from there, not from disk.
@@ -142,43 +140,29 @@ namespace Test.Audio
             var wavPackFilePath = $"audio\\wwise\\{wavPackFileName}";
             Assert.That(packFileService.FindFile(wavPackFilePath), Is.Not.Null, "the wav was not added to the mod pack");
 
-            var language = Wh3LanguageInformation.GetLanguageAsString(Wh3Language.Sfx);
-            audioRepository.Load([language]);
-
-            var ids = IdGenerator.GenerateIds(audioRepository.GetUsedVanillaSourceIdsByLanguageId(WwiseHash.Compute(language)));
-            return new AudioFile(ids.Guid, ids.Id, wavPackFileName, wavPackFilePath);
+            return wavPackFilePath;
         }
 
         /// <summary>
-        /// Opens the wizard's audio project and gives every event the same wav, which at the service
-        /// level is what editing a row in the viewer does: the row is removed and re-added, this
-        /// time with audio picked in the Audio Files Explorer.
+        /// Gives every event that can carry audio of its own the same wav, saves the project and
+        /// builds it, the way the tool's Add wav and Build buttons do.
         /// </summary>
-        static AudioProjectFile GiveEveryEventTheWavAndCompile(ServiceProvider provider, string audioProjectPath, AudioFile audioFile)
+        static AudioProjectFile GiveEveryEventTheWavAndBuild(ServiceProvider provider, AudioProjectFile audioProject, string wavPackFilePath)
         {
-            var fileName = Path.GetFileName(audioProjectPath);
-            var loaded = provider.GetRequiredService<IAudioProjectFileService>().Load(fileName, audioProjectPath);
-
-            var stateService = provider.GetRequiredService<IAudioEditorStateService>();
-            stateService.StoreAudioProject(loaded.AudioProject);
-            stateService.StoreAudioProjectFileName(fileName);
-
-            var actionEventService = provider.GetRequiredService<IActionEventService>();
-            var musicSoundBank = loaded.AudioProject.SoundBanks.Single(soundBank => soundBank.ActionEvents.Count != 0);
-            var actionEventTypeName = Wh3ActionEventInformation.GetName(Wh3ActionEventType.Music);
-
-            foreach (var actionEvent in musicSoundBank.ActionEvents.ToList())
+            var service = provider.GetRequiredService<IMusicAudioProjectService>();
+            foreach (var actionEvent in audioProject.GetActionEvents())
             {
-                var setStateAction = actionEvent.Actions.Single();
-                actionEventService.RemoveActionEvent(actionEventTypeName, actionEvent.Name);
-                actionEventService.AddSetStateActionEvent(actionEventTypeName, actionEvent.Name,
-                    setStateAction.StateGroupName, setStateAction.StateName, [audioFile]);
+                if (Wh3MusicHierarchyInformation.CanCarryOwnAudio(actionEvent.Actions.Single().StateGroupName))
+                    service.SetAudio(audioProject, actionEvent.Name, [wavPackFilePath]);
             }
 
-            // The editor compiles the cleaned project, not the live one.
-            var compiledProject = loaded.AudioProject.Clean();
+            const string filePath = MusicAudioProjectService.ProjectFilePath;
+            provider.GetRequiredService<IAudioProjectFileService>().Save(audioProject, Path.GetFileName(filePath), filePath);
+
+            // The tool compiles the cleaned project, not the live one.
+            var compiledProject = audioProject.Clean();
             provider.GetRequiredService<IAudioProjectCompilerService>()
-                .Compile(compiledProject, fileName, audioProjectPath);
+                .Compile(compiledProject, Path.GetFileName(filePath), filePath);
 
             return compiledProject;
         }

@@ -1,8 +1,9 @@
 using System.Windows;
-using Editors.MusicDatEditor.ViewModels;
+using Editors.Audio.Shared.AudioProject.Models;
+using Editors.MusicProjectEditor.ViewModels;
 using Shared.GameFormats.MusicDat;
 
-namespace Editors.MusicDatEditor.Views
+namespace Editors.MusicProjectEditor.Views
 {
     public partial class AddCultureWizardWindow : Window
     {
@@ -16,13 +17,23 @@ namespace Editors.MusicDatEditor.Views
         ///
         /// Both files are taken together because a culture has to be wired into both to work:
         /// battle_music.dat decides a battle's theme, campaign_music.dat the map theme and the
-        /// ambient layers. Either may be null when the editor only has one of the pair open,
-        /// and the wizard says so rather than silently doing half the job.</summary>
+        /// ambient layers. Either may be null when only one of the pair could be found, and the
+        /// wizard says so rather than silently doing half the job.
+        ///
+        /// Given a culture to edit, the wizard starts filled in from it.</summary>
         public static AddCultureWizardViewModel? ShowDialog(
-            Window? owner, MusicDatFile? battle, MusicDatFile? campaign)
+            Window? owner, MusicDatFile? battle, MusicDatFile? campaign, MusicCulture? editing = null)
         {
             var viewModel = new AddCultureWizardViewModel(battle, campaign);
-            var window = new AddCultureWizardWindow { DataContext = viewModel, Owner = owner };
+            if (editing != null)
+                viewModel.LoadFrom(editing);
+
+            var window = new AddCultureWizardWindow
+            {
+                DataContext = viewModel,
+                Owner = owner,
+                Title = editing == null ? "Add Culture" : $"Edit Culture - {editing.AudioState}"
+            };
             return window.ShowDialog() == true ? viewModel : null;
         }
 

@@ -14,7 +14,6 @@
 	  <None Remove="C:\Users\george\.nuget\packages\naudio.vorbis\1.5.0\contentFiles\any\netstandard2.0\README.md" />
 	  <Compile Remove="AudioCacheTests.cs" />
 	  <Compile Remove="AudioExplorerTests.cs" />
-	  <Compile Remove="MusicActionEventIntegrityTests.cs" />
 	  <Compile Remove="MusicAudioProjectServiceTests.cs" />
 	  <Compile Remove="AmsFragmentMergeTests.cs" />
 	  <Compile Remove="AmsPulseTrackMergeTests.cs" />

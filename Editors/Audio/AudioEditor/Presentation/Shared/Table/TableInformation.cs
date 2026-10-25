@@ -5,6 +5,5 @@
         public const string ActionEventColumnName = "Action Event";
         public const string BrowseMovieColumnName = "Browse Movie";
         public const string StateColumnName = "State";
-        public const string StateGroupColumnName = "State Group";
     }
 }

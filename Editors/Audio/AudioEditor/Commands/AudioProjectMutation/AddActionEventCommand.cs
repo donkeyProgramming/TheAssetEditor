@@ -28,16 +28,6 @@ namespace Editors.Audio.AudioEditor.Commands.AudioProjectMutation
             var hircSettings = _audioEditorStateService.HircSettings;
             var actionEventName = TableHelpers.GetActionEventNameFromRow(_row);
 
-            // Music Action Events arrive with no prefix at all - vanilla music events set a State
-            // rather than playing a Sound - so they are routed by the node type instead of by name.
-            if (_audioEditorStateService.SelectedAudioProjectExplorerNode.IsMusicActionEvent())
-            {
-                var stateGroupName = TableHelpers.GetValueFromRow(_row, TableInformation.StateGroupColumnName);
-                var stateName = TableHelpers.GetStateNameFromRow(_row);
-                _actionEventService.AddSetStateActionEvent(actionEventTypeName, actionEventName, stateGroupName, stateName, audioFiles);
-                return;
-            }
-
             if (actionEventName.StartsWith("Play_"))
                 _actionEventService.AddPlayActionEvent(actionEventTypeName, actionEventName, audioFiles, hircSettings);
             else if (actionEventName.StartsWith("Pause_") || actionEventName.StartsWith("Resume_") || actionEventName.StartsWith("Stop_"))

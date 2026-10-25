@@ -1,0 +1,109 @@
+<UserControl x:Class="Editors.MusicProjectEditor.Views.MusicProjectEditorView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             mc:Ignorable="d"
+             d:DesignHeight="600" d:DesignWidth="1000">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- Toolbar -->
+        <DockPanel Grid.Row="0" Margin="6">
+            <Button DockPanel.Dock="Left" Content="New" Command="{Binding NewCommand}" Padding="12,3" Margin="0,0,6,0"
+                    ToolTip="Start a new, empty music project."/>
+            <Button DockPanel.Dock="Left" Content="Open" Command="{Binding OpenCommand}" Padding="12,3" Margin="0,0,6,0"
+                    ToolTip="Open a music project from the loaded packs."/>
+            <Button DockPanel.Dock="Left" Content="Save" Command="{Binding SaveProjectCommand}" Padding="12,3" Margin="0,0,6,0"
+                    IsEnabled="{Binding IsProjectLoaded}"/>
+            <Button DockPanel.Dock="Left" Content="Build" Command="{Binding BuildCommand}" Padding="12,3" Margin="0,0,10,0"
+                    IsEnabled="{Binding IsProjectLoaded}" FontWeight="Bold"
+                    ToolTip="Save, then rebuild battle_music.dat and campaign_music.dat from the game's own copies with every culture in the project, and compile the music banks, wems and event data into the editable pack."/>
+            <TextBlock DockPanel.Dock="Left" Text="* unsaved changes" VerticalAlignment="Center" Margin="0,0,10,0" FontWeight="Bold"
+                       Visibility="{Binding HasUnsavedChanges, Converter={StaticResource BoolToCollapsedConverter}}"/>
+            <TextBlock Text="{Binding StatusText}" VerticalAlignment="Center" Opacity="0.8" TextTrimming="CharacterEllipsis"/>
+        </DockPanel>
+
+        <TextBlock Grid.Row="1" Text="{Binding EmptyText}" TextWrapping="Wrap" Margin="12" Opacity="0.75">
+            <TextBlock.Style>
+                <Style TargetType="TextBlock">
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding IsProjectLoaded}" Value="True">
+                            <Setter Property="Visibility" Value="Collapsed"/>
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </TextBlock.Style>
+        </TextBlock>
+
+        <Grid Grid.Row="1" Visibility="{Binding IsProjectLoaded, Converter={StaticResource BoolToCollapsedConverter}}">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="320"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- Left: the cultures in the project -->
+            <DockPanel Grid.Column="0" Margin="6,0,6,6">
+                <TextBlock DockPanel.Dock="Top" Text="{Binding FilePathText}" FontSize="11" Opacity="0.6" Margin="0,0,0,4" TextTrimming="CharacterEllipsis"/>
+                <TextBlock DockPanel.Dock="Top" Text="Cultures" FontWeight="Bold" Margin="0,0,0,4"/>
+                <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" Margin="0,6,0,0">
+                    <Button Content="Add..." Command="{Binding AddCultureCommand}" Padding="12,3" Margin="0,0,6,0"
+                            ToolTip="Wire a new culture into both music scripts."/>
+                    <Button Content="Edit..." Command="{Binding EditCultureCommand}" Padding="12,3" Margin="0,0,6,0"
+                            IsEnabled="{Binding HasSelectedCulture}"
+                            ToolTip="Run the wizard again for this culture, starting from what it has now. Audio already given to events it keeps is kept."/>
+                    <Button Content="Remove" Command="{Binding RemoveCultureCommand}" Padding="12,3"
+                            IsEnabled="{Binding HasSelectedCulture}"/>
+                </StackPanel>
+                <DataGrid ItemsSource="{Binding Cultures}" SelectedItem="{Binding SelectedCulture}"
+                          AutoGenerateColumns="False" IsReadOnly="True" CanUserAddRows="False"
+                          GridLinesVisibility="None" HeadersVisibility="Column">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="Audio State" Binding="{Binding AudioState}" Width="*" ElementStyle="{DynamicResource {x:Type TextBlock}}"/>
+                        <DataGridTextColumn Header="Subculture" Binding="{Binding SubcultureKey}" Width="*" ElementStyle="{DynamicResource {x:Type TextBlock}}"/>
+                        <DataGridTextColumn Header="Events" Binding="{Binding Summary}" Width="Auto" ElementStyle="{DynamicResource {x:Type TextBlock}}"/>
+                    </DataGrid.Columns>
+                </DataGrid>
+            </DockPanel>
+
+            <!-- Right: the selected culture's slots, and the audio of the selected one -->
+            <Grid Grid.Column="1" Margin="0,0,6,6">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <DockPanel Grid.Row="0">
+                    <TextBlock DockPanel.Dock="Top" Text="Events" FontWeight="Bold" Margin="0,0,0,4"/>
+                    <DataGrid ItemsSource="{Binding SelectedCulture.Events}" SelectedItem="{Binding SelectedEvent}"
+                              AutoGenerateColumns="False" IsReadOnly="True" CanUserAddRows="False"
+                              GridLinesVisibility="None" HeadersVisibility="Column">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="Slot" Binding="{Binding Title}" Width="2*" ElementStyle="{DynamicResource {x:Type TextBlock}}"/>
+                            <DataGridTextColumn Header="Event" Binding="{Binding EventText}" Width="2*" ElementStyle="{DynamicResource {x:Type TextBlock}}"/>
+                            <DataGridTextColumn Header="State Group" Binding="{Binding StateGroupName}" Width="2*" ElementStyle="{DynamicResource {x:Type TextBlock}}"/>
+                            <DataGridTextColumn Header="State" Binding="{Binding StateName}" Width="*" ElementStyle="{DynamicResource {x:Type TextBlock}}"/>
+                            <DataGridTextColumn Header="Audio" Binding="{Binding AudioSummary}" Width="80" ElementStyle="{DynamicResource {x:Type TextBlock}}"/>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </DockPanel>
+
+                <DockPanel Grid.Row="1" Margin="0,8,0,0" Height="220"
+                           Visibility="{Binding SelectedEvent, Converter={StaticResource NullToVisibilityConverter}}">
+                    <TextBlock DockPanel.Dock="Top" Text="{Binding SelectedEvent.Title}" FontWeight="Bold" Margin="0,0,0,2"/>
+                    <TextBlock DockPanel.Dock="Top" Text="{Binding SelectedEvent.Note}" TextWrapping="Wrap" FontSize="11" Opacity="0.8" Margin="0,0,0,6"/>
+                    <StackPanel DockPanel.Dock="Right" Margin="6,0,0,0" IsEnabled="{Binding CanEditSelectedEventAudio}">
+                        <Button Content="Add wav..." Command="{Binding AddAudioCommand}" Padding="12,3" Margin="0,0,0,6"
+                                ToolTip="Pick a wav from the loaded packs. A wav only on disk has to be added to the editable pack first."/>
+                        <Button Content="Remove" Command="{Binding RemoveAudioCommand}" Padding="12,3"/>
+                    </StackPanel>
+                    <ListBox ItemsSource="{Binding SelectedEvent.AudioFiles}" SelectedItem="{Binding SelectedAudioFile}"
+                             IsEnabled="{Binding CanEditSelectedEventAudio}"/>
+                </DockPanel>
+            </Grid>
+        </Grid>
+    </Grid>
+</UserControl>

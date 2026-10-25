@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using System.Text.Json.Serialization;
 
 namespace Editors.Audio.Shared.AudioProject.Models
@@ -29,6 +30,13 @@ namespace Editors.Audio.Shared.AudioProject.Models
         /// <summary>The Audio State as the scripts match it and as event names are built from it:
         /// trimmed and lower-cased, since the database has it both ways.</summary>
         [JsonIgnore] public string MusicalCulture => AudioState?.Trim().ToLowerInvariant() ?? "";
+
+        /// <summary>The events the scripts post for this culture that the project has to hold - one
+        /// per slot that brings its own audio. A borrowing slot posts the borrowed culture's event,
+        /// which already exists.</summary>
+        public IEnumerable<string> GetOwnEventNames() => Slots
+            .Where(slot => slot.ReferenceMatchKey == null)
+            .Select(slot => slot.EventPrefix + MusicalCulture);
     }
 
     public class MusicCultureSlot

@@ -2,7 +2,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using Editors.Audio.Shared.GameInformation.Warhammer3;
 using Shared.GameFormats.MusicDat;
 
-namespace Editors.MusicDatEditor.ViewModels
+namespace Editors.MusicProjectEditor.ViewModels
 {
     /// <summary>One row of the Add Culture wizard: a thing the new culture needs wiring for,
     /// named by the Wwise event it ends up posting.
@@ -58,7 +58,7 @@ namespace Editors.MusicDatEditor.ViewModels
             get
             {
                 if (!CanCarryOwnAudio)
-                    return "This event can only select music that already exists - the Audio Editor cannot give it " +
+                    return "This event can only select music that already exists - the Music Project tool cannot give it " +
                            "files of its own, because nothing in the game branches on its State Group in a way a " +
                            "mod can extend. Point it at an existing culture's music instead.";
 
@@ -66,13 +66,13 @@ namespace Editors.MusicDatEditor.ViewModels
                 // piece of music in its own right, so what a modder should supply is quite different -
                 // worth saying before they pick a five minute track for it.
                 if (Wh3MusicHierarchyInformation.IsAmsPulseStateGroup(StateGroupName))
-                    return "Audio can be added to this event in the Audio Editor. This is an adaptive music pulse - " +
+                    return "Audio can be added to this event in the Music Project tool. This is an adaptive music pulse - " +
                            "a rhythmic layer played over the campaign theme, not a theme itself - and the game has " +
                            "nine slots for it. Supply one short loop and it is used for all nine, or up to nine to " +
                            "vary it across the piece. Anything longer than a slot is trimmed to fit.";
 
                 if (Wh3MusicHierarchyInformation.GetAmsFragmentContainerId(StateGroupName) != null)
-                    return "Audio can be added to this event in the Audio Editor. These are ambient fragments - short " +
+                    return "Audio can be added to this event in the Music Project tool. These are ambient fragments - short " +
                            "sounds laid over the campaign music rather than music itself. Vanilla varies them by the " +
                            "musical key the score is in; anything added here plays in every key, since only the " +
                            "composer of a piece can meaningfully write a fragment per key.";
@@ -81,11 +81,11 @@ namespace Editors.MusicDatEditor.ViewModels
                 // battle music branches on the result above the culture, and vanilla has no default
                 // result, so one culture's music is written under all three outcomes alike.
                 if (StateGroupName == BattleCultureStateGroup)
-                    return "Audio can be added to this event in the Audio Editor. The same music will play " +
+                    return "Audio can be added to this event in the Music Project tool. The same music will play " +
                            "whether the battle is won, lost or drawn - vanilla splits those three, but a " +
                            "single event cannot tell them apart.";
 
-                return "Audio can be added to this event in the Audio Editor.";
+                return "Audio can be added to this event in the Music Project tool.";
             }
         }
 

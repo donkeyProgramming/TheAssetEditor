@@ -18,13 +18,12 @@
 
   <ItemGroup>
     <ProjectReference Include="Editors.Audio.csproj" />
-    <ProjectReference Include="..\MusicDatEditor\Editors.MusicDatEditor.csproj" />
+    <ProjectReference Include="..\MusicProjectEditor\Editors.MusicProjectEditor.csproj" />
   </ItemGroup>
 
   <ItemGroup>
     <Compile Include="AudioCacheTests.cs" />
     <Compile Include="AudioExplorerTests.cs" />
-    <Compile Include="MusicActionEventIntegrityTests.cs" />
     <Compile Include="MusicAudioProjectServiceTests.cs" />
     <Compile Include="AmsFragmentMergeTests.cs" />
     <Compile Include="AmsPulseTrackMergeTests.cs" />

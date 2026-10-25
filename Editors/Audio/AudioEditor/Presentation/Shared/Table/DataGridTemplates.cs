@@ -195,11 +195,7 @@ namespace Editors.Audio.AudioEditor.Presentation.Shared.Table
             return template;
         }
 
-        /// <param name="forcePlayPrefix">Whether to rewrite whatever is typed so that it starts with
-        /// "Play_". Every Action Event the editor could previously create targeted a Sound, so the
-        /// prefix was always correct. Music Action Events don't - vanilla drives music by setting a
-        /// State, and none of those events are named Play_anything - so they opt out.</param>
-        public static DataTemplate CreateEditableEventTextBoxTemplate(IEventHub eventHub, string columnHeader, bool forcePlayPrefix = true)
+        public static DataTemplate CreateEditableEventTextBoxTemplate(IEventHub eventHub, string columnHeader)
         {
             var template = new DataTemplate();
             var factory = new FrameworkElementFactory(typeof(TextBox));
@@ -216,7 +212,7 @@ namespace Editors.Audio.AudioEditor.Presentation.Shared.Table
             {
                 if (sender is TextBox textBox)
                 {
-                    if (forcePlayPrefix && !textBox.Text.StartsWith("Play_"))
+                    if (!textBox.Text.StartsWith("Play_"))
                     {
                         var caretPosition = textBox.SelectionStart;
                         if (textBox.Text.StartsWith("Play"))
