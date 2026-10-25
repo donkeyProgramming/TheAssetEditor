@@ -61,5 +61,32 @@ namespace Test.Audio
                     $"'{prefix}' maps to '{stateGroupName}', which is not in MusicStateGroups");
             }
         }
+
+        [Test]
+        public void ABattleCultureIsAlsoRegisteredAsACultureAudioState()
+        {
+            // The battle hands battle_music.dat the strongest side's culture by turning its audio_state
+            // hash back into a name through Generic_Faction_Player. A new culture missing from that
+            // Group arrives as an empty string and the in-battle music goes silent.
+            Wh3MusicEventInformation.TryResolveStateTarget("music_b_faction_test_culture", out var stateGroupName, out _);
+
+            var stateGroups = Wh3StateGroupInformation.GetStateGroupsToRegisterIn(stateGroupName);
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(stateGroups, Is.EqualTo(new[] { "Battle_Music_WH3_Culture", "Generic_Faction_Player" }));
+                Assert.That(Wh3StateGroupInformation.ModdableStateGroups, Does.Contain("Generic_Faction_Player"),
+                    "a new project would have no Group to register the culture in");
+            });
+        }
+
+        [TestCase("music_c_subculture_test_culture")]
+        [TestCase("music_c_ams_pulse_perc_test_culture")]
+        public void OtherMusicStatesAreRegisteredInTheirOwnGroupOnly(string eventName)
+        {
+            Wh3MusicEventInformation.TryResolveStateTarget(eventName, out var stateGroupName, out _);
+
+            Assert.That(Wh3StateGroupInformation.GetStateGroupsToRegisterIn(stateGroupName), Is.EqualTo(new[] { stateGroupName }));
+        }
     }
 }

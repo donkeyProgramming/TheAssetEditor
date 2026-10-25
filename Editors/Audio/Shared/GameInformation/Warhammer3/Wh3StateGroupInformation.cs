@@ -24,6 +24,30 @@ namespace Editors.Audio.Shared.GameInformation.Warhammer3
         ];
 
         /// <summary>
+        /// The State Group the game turns a culture's audio_state back into a name through. Its States
+        /// are the audio_state values of cultures_tables (Tomb_Kings, Undead, ...), and the battle reads
+        /// the strongest alliance's culture by looking its hash up here (the call that fills
+        /// Feedback_Highest_BOP_Alliance_Subculture in Warhammer3.exe). A culture whose audio_state is
+        /// not registered here reaches battle_music.dat as an empty string, so the script never posts
+        /// its music_b_faction_ event and the in-battle music has nothing to play. Measured in game in
+        /// October 2026: prebattle played a new culture's music, the battle was silent, and the
+        /// script logged "no culture has been set".
+        /// </summary>
+        public const string CultureAudioStateGroup = "Generic_Faction_Player";
+
+        /// <summary>
+        /// The State Groups a State has to be registered in when an Action Event sets it in
+        /// <paramref name="stateGroupName"/>: that Group, and for a battle culture also
+        /// <see cref="CultureAudioStateGroup"/>, since a new battle culture's State is also its
+        /// culture's audio_state - the wizard builds both from the one Audio State field.
+        /// </summary>
+        public static IReadOnlyList<string> GetStateGroupsToRegisterIn(string stateGroupName) => stateGroupName switch
+        {
+            "Battle_Music_WH3_Culture" => [stateGroupName, CultureAudioStateGroup],
+            _ => [stateGroupName]
+        };
+
+        /// <summary>
         /// State Groups a mod can add its own States to. Adding a State only registers a name
         /// against its Wwise hash - nothing is written into the game's State Group definitions -
         /// so what makes a new State do anything is a SetState Action Event pointing at it and a
@@ -35,7 +59,8 @@ namespace Editors.Audio.Shared.GameInformation.Warhammer3
         public static readonly List<string> ModdableStateGroups =
         [
             .. VoStateGroups,
-            .. MusicStateGroups
+            .. MusicStateGroups,
+            CultureAudioStateGroup
         ];
     }
 }

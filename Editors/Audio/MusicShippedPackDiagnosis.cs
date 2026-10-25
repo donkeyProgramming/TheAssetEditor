@@ -1101,6 +1101,147 @@ namespace Test.Audio
         }
 
         /// <summary>
+        /// Two packs holding the same .bnk under two names, to settle whether a .bnk overrides
+        /// another by loading after it.
+        ///
+        /// Traced in the running game (bank_trace.py, October 2026): entering a campaign loads every
+        /// .bnk whose name starts with "campaign", one folder at a time and in ascending name order
+        /// within it, mod files merged in among vanilla's - so campaign_music_1_..._for_testing.bnk
+        /// loads just before campaign_music__core.bnk, never after it. The testing .bnk naming
+        /// assumes the opposite. The silenced Cathay pack above made the same bet for global_music
+        /// and lost, so if the same order holds there, the later of two .bnks defining an id is
+        /// the one Wwise keeps.
+        ///
+        /// The bytes are identical; only the name differs, and with it the side of
+        /// global_music__core.bnk it sorts on ('1' sorts before '_', 'z' after). Each holds vanilla's
+        /// two culture containers with Cathay's branches and the defaults taken out, and nothing
+        /// generated, so a Cathay campaign map is silent if that .bnk wins and plays as usual if
+        /// not. Load one pack at a time:
+        ///
+        ///   A silent, B silent - a .bnk overrides whichever side it sorts on
+        ///   A plays,  B silent - the later .bnk wins; naming mod .bnks to sort after fixes this
+        ///   A plays,  B plays  - a .bnk cannot override another by load order at all
+        ///   A silent, B plays  - the earlier .bnk wins, which contradicts the result above
+        ///
+        /// Both played, and a trace from launch showed B loaded straight after global_music__core.bnk
+        /// - so the name prefix loader does pick it up. C settles what that means: the same two
+        /// containers spliced into vanilla's own global_music__core.bnk and shipped under its name,
+        /// which is the file the game reads.
+        ///
+        ///   C silent - the edit works, so a second .bnk defining an id vanilla already loaded is
+        ///              ignored, whichever side it loads on; only replacing vanilla's .bnk changes it
+        ///   C plays  - Cathay's campaign map music does not come from these containers, and every
+        ///              silencing test so far, August's included, was editing something unheard
+        /// </summary>
+        [Test]
+        public void BuildTwoCathaySilencingPacksThatDifferOnlyInLoadOrder()
+        {
+            using var provider = VanillaBankReader.CreateProvider(GameDirectory);
+            var packFileService = provider.GetRequiredService<IPackFileService>();
+
+            var vanilla = VanillaBankReader.ReadMusicBanks(Path.Combine(GameDirectory, "data", "audio_base_bnk.pack"))
+                .First(bank => bank.Path.EndsWith("global_music__core.bnk", StringComparison.OrdinalIgnoreCase));
+
+            foreach (var (packName, bankName) in new[]
+            {
+                ("music_order_test_a_before.pack", "global_music_1_cathay_silenced"),
+                ("music_order_test_b_after.pack", "global_music_zz_cathay_silenced"),
+                ("music_order_test_c_replaces.pack", "global_music__core"),
+                ("music_order_test_d_before_with_parents.pack", "global_music_1_cathay_silenced_with_parents"),
+            })
+            {
+                // Read afresh for each pack, since the branches are removed in place.
+                var bnk = BnkFile.CreateFromBytes(vanilla.Bytes, vanilla.Path, false);
+                var containers = bnk.HircChunk.HircItems.OfType<CAkMusicSwitchCntr_V136>()
+                    .Where(container => container.Id is 698158058 or 26264058)
+                    .ToList();
+                Assert.That(containers, Has.Count.EqualTo(2), "a culture container moved out of global_music__core.bnk");
+
+                foreach (var container in containers)
+                {
+                    // Only at the culture level. 698158058 is two deep since the October 2026 update, and
+                    // its second level is nothing but defaults - removing defaults at every depth empties
+                    // every subculture's branch, not just Cathay's.
+                    var cultureLevel = container.Arguments.FindIndex(argument =>
+                        argument.GroupId == WwiseHash.Compute("WH3_Campaign_Subcultures") ||
+                        argument.GroupId == WwiseHash.Compute("Battle_Music_WH3_Culture"));
+                    Assert.That(cultureLevel, Is.Not.EqualTo(-1), $"{container.Id} no longer branches on culture");
+                    var leavesBefore = new List<uint>();
+                    CollectLeaves(container.AkDecisionTree.DecisionTree, leavesBefore);
+                    var removed = RemoveBranchesAtDepth(container.AkDecisionTree.DecisionTree, cultureLevel,
+                        [WwiseHash.Compute("cathay"), DefaultKey]);
+
+                    // Vanilla's own child list less whatever only the removed branches pointed at, so
+                    // nothing changes but Cathay - including children vanilla claims and no leaf names.
+                    var leaves = new List<uint>();
+                    CollectLeaves(container.AkDecisionTree.DecisionTree, leaves);
+                    var vanillaChildIds = container.MusicTransNodeParams.MusicNodeParams.Children.ChildIds;
+                    var childIds = vanillaChildIds.Where(id => leaves.Contains(id) || !leavesBefore.Contains(id)).ToList();
+                    container.MusicTransNodeParams.MusicNodeParams.Children = new Children_V136
+                    {
+                        NumChilds = (uint)childIds.Count,
+                        ChildIds = childIds
+                    };
+
+                    container.AkDecisionTree.Nodes = AkDecisionTree_V136.FlattenDecisionTree(container.AkDecisionTree.DecisionTree);
+                    container.TreeDataSize = container.AkDecisionTree.GetSize();
+                    container.UpdateSectionSize();
+
+                    Console.WriteLine($"{bankName}: container {container.Id}, removed {removed} branch(es), " +
+                        $"{childIds.Count} of vanilla's {vanillaChildIds.Count} children kept");
+                }
+
+                byte[] rebuilt;
+                if (bankName == "global_music__core")
+                {
+                    // Vanilla's bytes with only the two containers swapped, so nothing else in the
+                    // file goes through a writer.
+                    rebuilt = SpliceHircs(vanilla.Bytes, containers.ToDictionary(container => container.Id, container => (HircItem)container), []);
+                    Assert.That(BnkFile.CreateFromBytes(rebuilt, bankName, false).HircChunk.HircItems,
+                        Has.Count.EqualTo(bnk.HircChunk.HircItems.Count));
+                }
+                else
+                {
+                    // Wwise tracks loaded banks by this id, so it follows the name - two .bnks sharing
+                    // one would have the second skipped as already loaded, whatever its name.
+                    bnk.BkhdChunk.AkBankHeader.SoundBankId = WwiseHash.Compute(bankName);
+
+                    var bkhdChunkBytes = Shared.GameFormats.Wwise.Bkhd.BkhdChunk.WriteData(bnk.BkhdChunk);
+                    // D carries the containers' vanilla ancestors unchanged, after them the way vanilla
+                    // orders a child ahead of its parent, so the edited containers do not load into a
+                    // hierarchy whose parents are still missing.
+                    var hircs = containers.Cast<HircItem>().ToList();
+                    if (bankName.EndsWith("_with_parents", StringComparison.Ordinal))
+                        hircs.AddRange(AncestorIds.Select(id => bnk.HircChunk.HircItems.Single(hirc => hirc.Id == id)));
+
+                    var hircChunkBytes = HircChunk.WriteData(
+                        Editors.Audio.Shared.Wwise.Generators.Hirc.HircChunkGenerator.GenerateHircChunk(hircs),
+                        bnk.BkhdChunk.AkBankHeader.BankGeneratorVersion);
+
+                    using var memStream = new MemoryStream();
+                    memStream.Write(bkhdChunkBytes);
+                    memStream.Write(hircChunkBytes);
+                    rebuilt = memStream.ToArray();
+                    Assert.That(BnkFile.CreateFromBytes(rebuilt, bankName, false).HircChunk.HircItems, Has.Count.EqualTo(hircs.Count));
+                }
+
+                var pack = packFileService.CreateNewPackFileContainer(
+                    Path.GetFileNameWithoutExtension(packName), Shared.Core.Settings.PackFileVersion.PFH5, Shared.Core.PackFiles.Models.PackFileCAType.MOD, setEditablePack: true);
+                packFileService.AddFilesToPack(pack,
+                [
+                    new NewPackFileEntry("audio\\wwise",
+                        new Shared.Core.PackFiles.Models.PackFile($"{bankName}.bnk",
+                            new Shared.Core.PackFiles.Models.FileSources.MemorySource(rebuilt)))
+                ]);
+
+                var outputPath = Path.Combine(Path.GetDirectoryName(ModPackPath)!, packName);
+                packFileService.SavePackContainer(pack, outputPath, false,
+                    Shared.Core.Settings.GameInformationDatabase.GetGameById(Shared.Core.Settings.GameTypeEnum.Warhammer3));
+                Console.WriteLine($"Wrote {outputPath}");
+            }
+        }
+
+        /// <summary>
         /// A pack that ships no .bnk of its own at all - every hirc the mod defines goes into the
         /// vanilla .bnk it belongs in, and those .bnks ship at vanilla's own paths. There is no second
         /// .bnk whose load order, override behaviour or duplicate ids could also be the reason for
@@ -1390,103 +1531,25 @@ namespace Test.Audio
             return output.ToArray();
         }
 
+        /// <summary>See <see cref="Editors.Audio.Shared.Wwise.Generators.VanillaSoundBankSplicer"/>, which
+        /// is what the compiler ships with.</summary>
+        static byte[] SpliceHircs(byte[] vanillaBytes, Dictionary<uint, HircItem> replacements, List<HircItem> additions) =>
+            Editors.Audio.Shared.Wwise.Generators.VanillaSoundBankSplicer.Splice(vanillaBytes, replacements, additions);
+
         /// <summary>
-        /// Vanilla's .bnk bytes with some hircs swapped and others appended, spliced rather than
-        /// rebuilt. Re-serialising the whole file would put every one of its five thousand hircs
-        /// through writers that have only ever been asked to write generated ones, and a single type
-        /// that does not round trip byte for byte misaligns everything after it. Only the hircs
-        /// actually being changed are written, so vanilla's bytes are carried across untouched.
+        /// The parents of the two culture containers up to the root, all in global_music__core.bnk:
+        /// 698158058 under 1042256876, 26264058 under 67383790, both of those under 148962132.
         /// </summary>
-        static byte[] SpliceHircs(byte[] vanillaBytes, Dictionary<uint, HircItem> replacements, List<HircItem> additions)
+        static readonly uint[] AncestorIds = [1042256876, 67383790, 148962132];
+
+        /// <summary>Drops every branch keyed on one of the given keys at one depth of the tree, 0 being
+        /// the root's children.</summary>
+        static int RemoveBranchesAtDepth(AkDecisionTree_V136.Node_V136 node, int depth, uint[] keys)
         {
-            // The HIRC chunk, found by walking the top level chunk table.
-            var offset = 0;
-            var hircChunkStart = -1;
-            uint hircChunkSize = 0;
+            if (depth == 0)
+                return node.Nodes.RemoveAll(child => keys.Contains(child.Key));
 
-            while (offset + 8 <= vanillaBytes.Length)
-            {
-                var tag = System.Text.Encoding.ASCII.GetString(vanillaBytes, offset, 4);
-                var length = BitConverter.ToUInt32(vanillaBytes, offset + 4);
-
-                if (tag == "HIRC")
-                {
-                    hircChunkStart = offset;
-                    hircChunkSize = length;
-                    break;
-                }
-
-                offset += 8 + (int)length;
-            }
-
-            if (hircChunkStart == -1)
-                throw new InvalidDataException("no HIRC chunk");
-
-            var itemCount = BitConverter.ToUInt32(vanillaBytes, hircChunkStart + 8);
-            var cursor = hircChunkStart + 12;
-
-            using var body = new MemoryStream();
-            var replaced = 0;
-            var written = false;
-
-            // Vanilla never puts a hirc after something that claims it as a child - across both music
-            // .bnks, all 5282 parent-child relations run the other way. So the additions go in ahead of
-            // the first hirc being replaced, since a replaced hirc is the only thing that can name one
-            // of them, rather than on the end where they would sit after their own parents.
-            void WriteAdditions()
-            {
-                if (written)
-                    return;
-
-                foreach (var addition in additions)
-                {
-                    addition.UpdateSectionSize();
-                    body.Write(addition.WriteData());
-                }
-
-                written = true;
-            }
-
-            for (uint index = 0; index < itemCount; index++)
-            {
-                var sectionSize = BitConverter.ToUInt32(vanillaBytes, cursor + 1);
-                var id = BitConverter.ToUInt32(vanillaBytes, cursor + 5);
-                var totalLength = 5 + (int)sectionSize;
-
-                if (replacements.TryGetValue(id, out var replacement))
-                {
-                    WriteAdditions();
-                    replacement.UpdateSectionSize();
-                    body.Write(replacement.WriteData());
-                    replaced++;
-                }
-                else
-                    body.Write(vanillaBytes, cursor, totalLength);
-
-                cursor += totalLength;
-            }
-
-            if (replaced != replacements.Count)
-                throw new InvalidDataException($"only {replaced} of {replacements.Count} hircs to replace were found");
-
-            // Nothing claims them, so the end is as good a place as any.
-            WriteAdditions();
-
-            var bodyBytes = body.ToArray();
-
-            using var output = new MemoryStream();
-            output.Write(vanillaBytes, 0, hircChunkStart);
-            output.Write(System.Text.Encoding.ASCII.GetBytes("HIRC"));
-            output.Write(BitConverter.GetBytes((uint)(bodyBytes.Length + 4)));
-            output.Write(BitConverter.GetBytes(itemCount + (uint)additions.Count));
-            output.Write(bodyBytes);
-
-            // Whatever followed the HIRC chunk in the original file.
-            var afterHirc = hircChunkStart + 8 + (int)hircChunkSize;
-            if (afterHirc < vanillaBytes.Length)
-                output.Write(vanillaBytes, afterHirc, vanillaBytes.Length - afterHirc);
-
-            return output.ToArray();
+            return node.Nodes.Sum(child => RemoveBranchesAtDepth(child, depth - 1, keys));
         }
 
         /// <summary>Drops every branch keyed on one of the given keys, at whatever depth it sits.</summary>
@@ -2384,6 +2447,252 @@ namespace Test.Audio
                     Console.WriteLine($"    level {level}  {groupName,-28} {keys.Count,4} keys, " +
                         $"{withDefault}/{blocks} blocks offer a default" +
                         (notes.Count == 0 ? "" : $"   {string.Join(", ", notes)}"));
+                }
+            }
+        }
+
+        /// <summary>
+        /// Every culture-level block of the adaptive battle container, with the keys above it named.
+        ///
+        /// Araby's battle music is silent rather than falling back to another culture's, with the
+        /// battle Event in battle_music__core.bnk and 26264058 merged. A State that falls through to a
+        /// block without a default selects nothing at all, and 3 of this container's 45 culture
+        /// blocks have no default - so this asks which ones, and whether they are where battle goes.
+        /// Keys are named by hashing every string the battle script holds.
+        /// </summary>
+        [Test]
+        public void WhereTheAdaptiveBattleContainerHasNoDefault()
+        {
+            var vanilla = VanillaBankReader.ReadMusicBanks(Path.Combine(GameDirectory, "data", "audio_base_bnk.pack"))
+                .First(bank => bank.Path.EndsWith("global_music__core.bnk", StringComparison.OrdinalIgnoreCase));
+            var container = BnkFile.CreateFromBytes(vanilla.Bytes, vanilla.Path, false)
+                .HircChunk.HircItems.OfType<CAkMusicSwitchCntr_V136>().Single(hirc => hirc.Id == 67383790);
+
+            var script = MusicDatParser.Parse(File.ReadAllBytes(Path.Combine(
+                TestContext.CurrentContext.TestDirectory, "..", "..", "..", "..", "..", "..", "Data", "Music", "battle_music.dat")));
+            var names = new Dictionary<uint, string> { [0] = "<default>" };
+            foreach (var text in script.StringConstants.Concat(script.StringVariables.Select(variable => variable.InitialValue))
+                         .Concat(script.StringVariables.Select(variable => variable.Name))
+                         .Concat(["Battle_Music_WH3_Culture", "araby", "cathay"]))
+                names.TryAdd(WwiseHash.Compute(text), text);
+
+            string Name(uint key) => names.TryGetValue(key, out var name) ? name : key.ToString();
+
+            var cultureLevel = container.Arguments.FindIndex(argument => argument.GroupId == WwiseHash.Compute("Battle_Music_WH3_Culture"));
+            Console.WriteLine("levels: " + string.Join(" / ", container.Arguments.Select(argument => Name(argument.GroupId))));
+
+            void Walk(AkDecisionTree_V136.Node_V136 node, int depth, List<string> above)
+            {
+                if (depth == cultureLevel)
+                {
+                    var keys = node.Nodes.Select(child => child.Key).ToList();
+                    Console.WriteLine($"  {string.Join(" / ", above),-50} default: {(keys.Contains(0) ? "yes" : "NO "),-3}  " +
+                        $"araby: {(keys.Contains(WwiseHash.Compute("araby")) ? "yes" : "no")}  {keys.Count} cultures: " +
+                        string.Join(", ", keys.Where(key => key != 0).Select(Name)));
+                    return;
+                }
+
+                foreach (var child in node.Nodes)
+                    Walk(child, depth + 1, [.. above, Name(child.Key)]);
+            }
+
+            Walk(container.AkDecisionTree.DecisionTree, 0, []);
+        }
+
+        /// <summary>
+        /// The three containers Araby has a branch in, out of the pack that ships: their transition
+        /// rules and meter, and one leaf each for Araby and a vanilla culture walked down to the
+        /// segments' markers.
+        ///
+        /// Araby's battle music stays silent with a branch in every culture block of 67383790, while
+        /// the same hierarchy shape plays in prebattle through 698158058. A branch can be found and
+        /// still never start - a transition timed against a cue or grid the target lacks never
+        /// happens - so this sets what the battle container asks of its targets beside what the
+        /// working one does.
+        /// </summary>
+        [Test]
+        public void WhatTheBattleContainerAsksOfWhatItSwitchesTo()
+        {
+            using var provider = VanillaBankReader.CreateProvider(GameDirectory);
+            // The end to end run's own output. The playable copy RPFM re-saved with the culture tables
+            // holds the same .bnks, but this loader reads no files out of it.
+            var modPack = VanillaBankReader.OpenPack(provider, ModPackPath, markAsCa: false);
+
+            var hircs = new Dictionary<uint, HircItem>();
+            foreach (var (path, file) in modPack.GetAllFiles().Where(file => file.Key.EndsWith(".bnk", StringComparison.OrdinalIgnoreCase)))
+            {
+                var items = BnkFile.CreateFromBytes(file.DataSource.ReadData(), path, false).HircChunk.HircItems;
+                Console.WriteLine($"{path}: {file.DataSource.Size} bytes, {items.Count} hircs, " +
+                    $"{items.OfType<CAkMusicSwitchCntr_V136>().Count()} music switches, {items.Count(item => item.Id == 67383790)} with id 67383790 " +
+                    $"({string.Join(", ", items.Where(item => item.Id == 67383790).Select(item => item.GetType().Name))})");
+                foreach (var hirc in items)
+                    hircs.TryAdd(hirc.Id, hirc);
+            }
+            Assert.That(hircs, Does.ContainKey(67383790u), "the shipped pack has no global_music__core.bnk");
+
+            var araby = WwiseHash.Compute("araby");
+            var cathay = WwiseHash.Compute("cathay");
+
+            static string Rules(MusicTransNodeParams_V136 parameters) => string.Join("\n", parameters.PlayList.Select(rule =>
+                $"      src [{string.Join(",", rule.SrcIdList)}] -> dst [{string.Join(",", rule.DstIdList)}]: " +
+                $"sync {rule.AkMusicTransSrcRule.SyncType}, src cue filter {rule.AkMusicTransSrcRule.CueFilterHash}, " +
+                $"post-exit {rule.AkMusicTransSrcRule.PlayPostExit}, fade out {rule.AkMusicTransSrcRule.TransitionTime}ms | " +
+                $"entry {rule.AkMusicTransDstRule.EntryType}, dst cue filter {rule.AkMusicTransDstRule.CueFilterHash}, " +
+                $"match src cue {rule.AkMusicTransDstRule.DestMatchSourceCueName}, jump {rule.AkMusicTransDstRule.JumpToId}/{rule.AkMusicTransDstRule.JumpToType}, " +
+                $"pre-entry {rule.AkMusicTransDstRule.PlayPreEntry}, fade in {rule.AkMusicTransDstRule.TransitionTime}ms" +
+                (rule.AkMusicTransitionObject == null ? "" : $", transition segment {rule.AkMusicTransitionObject.SegmentId}")));
+
+            static string Meter(MusicNodeParams_V136 parameters) =>
+                $"flags {parameters.Flags}, meter flag {parameters.MeterInfoFlag}, grid {parameters.AkMeterInfo.GridPeriod}/{parameters.AkMeterInfo.GridOffset}, " +
+                $"tempo {parameters.AkMeterInfo.Tempo}, {parameters.AkMeterInfo.TimeSigNumBeatsBar}/{parameters.AkMeterInfo.TimeSigBeatValue}, " +
+                $"parent {parameters.NodeBaseParams.DirectParentId}, bus {parameters.NodeBaseParams.OverrideBusId}";
+
+            void Describe(uint id, string indent, int depth)
+            {
+                if (!hircs.TryGetValue(id, out var hirc))
+                {
+                    Console.WriteLine($"{indent}{id}: NOT IN ANY SHIPPED .BNK");
+                    return;
+                }
+
+                switch (hirc)
+                {
+                    case CAkMusicRanSeqCntr_V136 sequence:
+                        Console.WriteLine($"{indent}RanSeq {id}: {Meter(sequence.MusicTransNodeParams.MusicNodeParams)}, " +
+                            $"{sequence.PlayList.Count} playlist items, {sequence.MusicTransNodeParams.PlayList.Count} rules");
+                        Console.WriteLine(Rules(sequence.MusicTransNodeParams));
+                        if (depth < 3)
+                            foreach (var childId in sequence.MusicTransNodeParams.MusicNodeParams.Children.ChildIds.Take(2))
+                                Describe(childId, indent + "  ", depth + 1);
+                        break;
+                    case CAkMusicSegment_V136 segment:
+                        Console.WriteLine($"{indent}Segment {id}: {Meter(segment.MusicNodeParams)}, duration {segment.Duration:0}ms, markers " +
+                            string.Join(", ", segment.ArrayMarkersList.Select(marker => $"{marker.Id}@{marker.Position:0}{(string.IsNullOrEmpty(marker.MarkerName) ? "" : $"'{marker.MarkerName.TrimEnd('\0')}'")}")));
+                        break;
+                    case CAkMusicSwitchCntr_V136 inner:
+                        Console.WriteLine($"{indent}Switch {id}: {Meter(inner.MusicTransNodeParams.MusicNodeParams)}, depth {inner.TreeDepth}");
+                        break;
+                    default:
+                        Console.WriteLine($"{indent}{hirc.HircType} {id}");
+                        break;
+                }
+            }
+
+            static uint? LeafUnder(AkDecisionTree_V136.Node_V136 node, int depth, int cultureLevel, uint culture, bool matched)
+            {
+                foreach (var child in node.Nodes)
+                {
+                    var nowMatched = matched || (depth == cultureLevel && child.Key == culture);
+                    if (depth == cultureLevel && child.Key != culture)
+                        continue;
+                    if (child.Nodes.Count == 0)
+                        return nowMatched && child.AudioNodeId != 0 ? child.AudioNodeId : null;
+                    var found = LeafUnder(child, depth + 1, cultureLevel, culture, nowMatched);
+                    if (found != null)
+                        return found;
+                }
+                return null;
+            }
+
+            foreach (var containerId in new uint[] { 698158058, 26264058, 67383790 })
+            {
+                var container = (CAkMusicSwitchCntr_V136)hircs[containerId];
+                Console.WriteLine($"\n======== container {containerId}: mode {container.Mode}, continue playback {container.IsContinuePlayback}, " +
+                    Meter(container.MusicTransNodeParams.MusicNodeParams));
+                Console.WriteLine("    rules:");
+                Console.WriteLine(Rules(container.MusicTransNodeParams));
+
+                var cultureLevel = container.Arguments.FindIndex(argument =>
+                    argument.GroupId == WwiseHash.Compute("Battle_Music_WH3_Culture") || argument.GroupId == WwiseHash.Compute("WH3_Campaign_Subcultures"));
+
+                foreach (var (name, key) in new[] { ("cathay", cathay), ("araby", araby) })
+                {
+                    var leaf = LeafUnder(container.AkDecisionTree.DecisionTree, 0, cultureLevel, key, false);
+                    Console.WriteLine($"  {name} leaf:");
+                    if (leaf != null)
+                        Describe(leaf.Value, "    ", 0);
+                    else
+                        Console.WriteLine("    none");
+                }
+            }
+        }
+
+        /// <summary>
+        /// Which cue markers the segments under each culture container carry, and where.
+        ///
+        /// The battle script steers itself on markers: Wwise_cues routes update_dynamicstart to the
+        /// code that ends a transition and update_dynamicend to the code that allows the next one. A
+        /// generated segment without them leaves the script stuck in "transition is in progress",
+        /// which is what the in-battle trace showed. Positions are given relative to the entry and
+        /// exit cues and as a share of the segment, so a rule for a segment of any length can be read
+        /// off them rather than copied from one example.
+        /// </summary>
+        [Test]
+        public void WhatMarkersTheCultureContainersSegmentsCarry()
+        {
+            var vanilla = VanillaBankReader.ReadMusicBanks(Path.Combine(GameDirectory, "data", "audio_base_bnk.pack"))
+                .First(bank => bank.Path.EndsWith("global_music__core.bnk", StringComparison.OrdinalIgnoreCase));
+            var hircs = BnkFile.CreateFromBytes(vanilla.Bytes, vanilla.Path, false).HircChunk.HircItems
+                .GroupBy(hirc => hirc.Id).ToDictionary(group => group.Key, group => group.First());
+
+            IEnumerable<CAkMusicSegment_V136> SegmentsUnder(uint id, HashSet<uint> seen)
+            {
+                if (!seen.Add(id) || !hircs.TryGetValue(id, out var hirc))
+                    yield break;
+
+                IEnumerable<uint> children = hirc switch
+                {
+                    CAkMusicSegment_V136 segment => [],
+                    CAkMusicRanSeqCntr_V136 sequence => sequence.MusicTransNodeParams.MusicNodeParams.Children.ChildIds,
+                    CAkMusicSwitchCntr_V136 inner => inner.MusicTransNodeParams.MusicNodeParams.Children.ChildIds,
+                    _ => []
+                };
+
+                if (hirc is CAkMusicSegment_V136 found)
+                    yield return found;
+
+                foreach (var child in children)
+                    foreach (var segment in SegmentsUnder(child, seen))
+                        yield return segment;
+            }
+
+            foreach (var containerId in new uint[] { 698158058, 26264058, 67383790 })
+            {
+                var container = (CAkMusicSwitchCntr_V136)hircs[containerId];
+                var seen = new HashSet<uint> { containerId };
+                var segments = container.MusicTransNodeParams.MusicNodeParams.Children.ChildIds
+                    .SelectMany(child => SegmentsUnder(child, seen))
+                    .ToList();
+
+                Console.WriteLine($"\n======== container {containerId}: {segments.Count} segments");
+
+                foreach (var signature in segments
+                    .GroupBy(segment => string.Join(", ", segment.ArrayMarkersList.Select(marker =>
+                        string.IsNullOrEmpty(marker.MarkerName) ? marker.Id.ToString() : $"{marker.Id}'{marker.MarkerName.TrimEnd('\0')}'")))
+                    .OrderByDescending(group => group.Count()))
+                    Console.WriteLine($"  {signature.Count(),4} x  {signature.Key}");
+
+                // Every named marker, against the entry cue (the first marker) and the exit cue (the last).
+                var named = segments
+                    .SelectMany(segment => segment.ArrayMarkersList
+                        .Where(marker => !string.IsNullOrEmpty(marker.MarkerName))
+                        .Select(marker => (Name: marker.MarkerName!.TrimEnd('\0'),
+                            FromEntry: marker.Position - segment.ArrayMarkersList.First().Position,
+                            BeforeExit: segment.ArrayMarkersList.Last().Position - marker.Position,
+                            Share: segment.Duration == 0 ? 0 : marker.Position / segment.Duration)))
+                    .GroupBy(entry => entry.Name);
+
+                foreach (var marker in named)
+                {
+                    static string Spread(IEnumerable<double> values)
+                    {
+                        var sorted = values.OrderBy(value => value).ToList();
+                        return $"min {sorted[0]:0}, median {sorted[sorted.Count / 2]:0}, max {sorted[^1]:0}";
+                    }
+
+                    Console.WriteLine($"  '{marker.Key}' x{marker.Count()}: from entry {Spread(marker.Select(entry => entry.FromEntry))}; " +
+                        $"before exit {Spread(marker.Select(entry => entry.BeforeExit))}; " +
+                        $"share of segment {Spread(marker.Select(entry => entry.Share * 100))}%");
                 }
             }
         }

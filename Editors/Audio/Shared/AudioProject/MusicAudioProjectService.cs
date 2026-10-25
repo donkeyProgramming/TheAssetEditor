@@ -29,7 +29,7 @@ namespace Editors.Audio.Shared.AudioProject
     /// later, in the Audio Editor, where picking wavs for an event builds the branch its State
     /// selects - and only for State Groups a mod can actually extend, which of the six these events
     /// target is just WH3_Campaign_Subcultures. See
-    /// <see cref="Wh3MusicHierarchyInformation.GetMusicSwitchContainerId"/> for why.
+    /// <see cref="Wh3MusicHierarchyInformation.GetMusicSwitchContainerIds"/> for why.
     /// </summary>
     public interface IMusicAudioProjectService
     {
@@ -120,7 +120,8 @@ namespace Editors.Audio.Shared.AudioProject
                 stateName);
 
             soundBank.ActionEvents.InsertAlphabetically(result.ActionEvent);
-            AddStateToStateGroup(audioProject, stateGroupName, stateName);
+            foreach (var stateGroupToRegisterIn in Wh3StateGroupInformation.GetStateGroupsToRegisterIn(stateGroupName))
+                AddStateToStateGroup(audioProject, stateGroupToRegisterIn, stateName);
         }
 
         /// <summary>

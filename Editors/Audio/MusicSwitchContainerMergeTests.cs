@@ -349,6 +349,105 @@ namespace Test.Audio
         /// <summary>Vanilla declares every node its tree names as a child of the container, and
         /// only children are resolved, so the fixtures have to do the same or the merged child
         /// list has nothing to be wrong about.</summary>
+        // The in-battle container 67383790 in miniature: a phase level above the culture level and a
+        // musical key level below it. Its "fight" phase lists every culture with no default, which is
+        // where a culture missing from it gets silence; its "bespoke" phase plays the same thing for
+        // every culture and lists none.
+        [Test]
+        public void ABattleCultureGoesIntoEveryBlockThatListsCulturesAndNoOther()
+        {
+            var merged = new MusicSwitchContainerMergeService()
+                .MergeBranches(CreateVanillaAdaptiveContainer(), [new MusicBranch(BattleCultureStateGroup, "Araby", NewRanSeqId)]);
+
+            var araby = WwiseHash.Compute("Araby");
+            var phases = merged.AkDecisionTree.DecisionTree.Nodes.ToDictionary(node => node.Key);
+            var fight = phases[WwiseHash.Compute("fight")].Nodes.SingleOrDefault(node => node.Key == araby);
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(fight, Is.Not.Null, "the phase listing every culture has no branch for the new one");
+                Assert.That(phases[WwiseHash.Compute("bespoke")].Nodes.Select(node => node.Key), Is.EqualTo(new[] { 0u }),
+                    "the culture-neutral phase gained a culture");
+                Assert.That(phases.Keys, Has.Count.EqualTo(2), "a phase was added");
+
+                // Below the culture level the branch takes the default, so it plays whatever key the
+                // music is in - vanilla's own branches have no default there to fall back on.
+                Assert.That(fight!.Nodes.Select(node => node.Key), Is.EqualTo(new[] { 0u }));
+                Assert.That(fight.Nodes.Single().AudioNodeId, Is.EqualTo(NewRanSeqId));
+                Assert.That(merged.MusicTransNodeParams.MusicNodeParams.Children.ChildIds, Does.Contain(NewRanSeqId));
+            });
+        }
+
+        [Test]
+        public void TheVanillaPathsOfTheAdaptiveContainerAreUntouched()
+        {
+            var vanilla = CreateVanillaAdaptiveContainer();
+            var merged = new MusicSwitchContainerMergeService()
+                .MergeBranches(vanilla, [new MusicBranch(BattleCultureStateGroup, "Araby", NewRanSeqId)]);
+
+            var before = PathsOf(vanilla.AkDecisionTree.DecisionTree);
+            var after = PathsOf(merged.AkDecisionTree.DecisionTree);
+
+            Assert.That(before.Where(path => !after.TryGetValue(path.Key, out var audioNodeId) || audioNodeId != path.Value), Is.Empty);
+            Assert.That(after.Count - before.Count, Is.EqualTo(1), "the new culture should add exactly one path");
+        }
+
+        static Dictionary<string, uint> PathsOf(AkDecisionTree_V136.Node_V136 node, string prefix = "")
+        {
+            var paths = new Dictionary<string, uint>();
+            foreach (var child in node.Nodes)
+            {
+                var path = $"{prefix}/{child.Key}";
+                if (child.Nodes.Count == 0)
+                    paths[path] = child.AudioNodeId;
+                else
+                    foreach (var (childPath, audioNodeId) in PathsOf(child, path))
+                        paths[childPath] = audioNodeId;
+            }
+            return paths;
+        }
+
+        static CAkMusicSwitchCntr_V136 CreateVanillaAdaptiveContainer()
+        {
+            var container = new CAkMusicSwitchCntr_V136
+            {
+                Id = 67383790,
+                HircType = AkBkHircType.Music_Switch,
+                TreeDepth = 3
+            };
+
+            foreach (var group in new[] { "Battle_Phase", BattleCultureStateGroup, "Musical_Key" })
+                container.Arguments.Add(new AkGameSync_V136 { GroupId = WwiseHash.Compute(group), GroupType = AkGroupType.State });
+
+            var audioNodeId = 200u;
+            var fight = CreateBranch(WwiseHash.Compute("fight"), 0);
+            foreach (var culture in new[] { "Empire", "Cathay" })
+            {
+                var cultureNode = CreateBranch(WwiseHash.Compute(culture), 0);
+                foreach (var key in new[] { "c", "eb" })
+                    cultureNode.Nodes.Add(CreateBranch(WwiseHash.Compute(key), audioNodeId++));
+                fight.Nodes.Add(cultureNode);
+            }
+
+            var bespokeCulture = CreateBranch(0, 0);
+            bespokeCulture.Nodes.Add(CreateBranch(0, audioNodeId++));
+            var bespoke = CreateBranch(WwiseHash.Compute("bespoke"), 0);
+            bespoke.Nodes.Add(bespokeCulture);
+
+            var root = new AkDecisionTree_V136.Node_V136 { Nodes = [fight, bespoke] };
+            DeclareLeavesAsChildren(container, root);
+
+            container.AkDecisionTree = new AkDecisionTree_V136
+            {
+                DecisionTree = root,
+                Nodes = AkDecisionTree_V136.FlattenDecisionTree(root)
+            };
+            container.TreeDataSize = container.AkDecisionTree.GetSize();
+            container.UpdateSectionSize();
+
+            return container;
+        }
+
         static void DeclareLeavesAsChildren(CAkMusicSwitchCntr_V136 container, AkDecisionTree_V136.Node_V136 root)
         {
             var childIds = new SortedSet<uint>(LeavesOf(root).Where(audioNodeId => audioNodeId != 0));

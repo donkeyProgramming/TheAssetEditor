@@ -48,6 +48,7 @@ namespace Test.Audio
         const string AudioProjectFolder = @"audio\audio_projects";
         const uint CampaignSubcultureContainerId = 698158058;
         const uint BattleCultureContainerId = 26264058;
+        const uint InBattleContainerId = 67383790;
 
         static string OutputDirectory => Path.Combine(Path.GetTempPath(), "ArabyMusicRun");
 
@@ -192,12 +193,13 @@ namespace Test.Audio
 
         /// <summary>
         /// The join between the two halves. Every event the scripts now post has to exist as an
-        /// Event hirc in a compiled .bnk, or the script posts a name into nothing.
+        /// Event hirc in a compiled .bnk, or the script posts a name into nothing - and in the .bnk
+        /// its vanilla siblings live in, or the context that posts it never has it loaded.
         /// </summary>
         static void AssertTheScriptsAndTheBankAgree(IPackFileService packFileService, AudioProjectFile compiledProject)
         {
-            var musicSoundBank = compiledProject.SoundBanks.Single(soundBank => soundBank.ActionEvents.Count != 0);
-            var hircs = ReadHircs(packFileService, musicSoundBank.FilePath);
+            var hircsByBank = ShippedBanks(packFileService).ToDictionary(path => path, path => ReadHircs(packFileService, path));
+            var hircs = hircsByBank.Values.SelectMany(bankHircs => bankHircs).ToList();
 
             var battle = MusicDatParser.Parse(packFileService.FindFile(@"audio\scripts\battle_music.dat"));
             var campaign = MusicDatParser.Parse(packFileService.FindFile(@"audio\scripts\campaign_music.dat"));
@@ -215,16 +217,23 @@ namespace Test.Audio
                     var eventHirc = hircs.FirstOrDefault(hirc => hirc.Id == WwiseHash.Compute(eventName));
                     Assert.That(eventHirc, Is.Not.Null, $"the scripts post '{eventName}' but no .bnk defines it");
                     Assert.That(eventHirc.HircType, Is.EqualTo(AkBkHircType.Event));
+
+                    var expectedBank = eventName.StartsWith("music_b_", StringComparison.Ordinal)
+                        ? "battle_music__core.bnk"
+                        : "campaign_music__core.bnk";
+                    Assert.That(hircsByBank.Single(bank => bank.Value.Contains(eventHirc)).Key, Does.EndWith(expectedBank),
+                        $"'{eventName}' is not in the .bnk its vanilla siblings live in");
                 }
             });
 
-            Console.WriteLine($"\nScripts post {postedEvents.Count} event(s), all defined in {musicSoundBank.FilePath}:");
+            Console.WriteLine($"\nScripts post {postedEvents.Count} event(s):");
             foreach (var eventName in postedEvents)
-                Console.WriteLine($"  {eventName} -> {WwiseHash.Compute(eventName)}");
+                Console.WriteLine($"  {eventName} -> {WwiseHash.Compute(eventName)} in " +
+                    hircsByBank.Single(bank => bank.Value.Any(hirc => hirc.Id == WwiseHash.Compute(eventName))).Key);
         }
 
         /// <summary>
-        /// The testing .bnks replace the vanilla ones outright, so a branch lost in the merge is not
+        /// The shipped .bnks replace the vanilla ones outright, so a branch lost in the merge is not
         /// merely missing - it is a culture that had music and now has none.
         /// </summary>
         static void AssertTheMergedContainersKeepVanilla(
@@ -236,8 +245,8 @@ namespace Test.Audio
                 .Distinct()
                 .ToList();
 
-            Assert.That(containerIds, Is.EquivalentTo(new[] { CampaignSubcultureContainerId, BattleCultureContainerId }),
-                "expected a branch in both the campaign subculture and the battle culture container");
+            Assert.That(containerIds, Is.EquivalentTo(new[] { CampaignSubcultureContainerId, BattleCultureContainerId, InBattleContainerId }),
+                "expected a branch in the campaign subculture container and both battle culture containers");
 
             // Only the ids the mod invented are its own to place. Vanilla's children stay wherever
             // vanilla put them, so they are not something a testing .bnk has to carry.
@@ -245,30 +254,30 @@ namespace Test.Audio
                 .Select(randomSequence => randomSequence.Id)
                 .ToHashSet();
 
-            var testingBankPaths = packFileService.GetEditablePack().GetAllFiles()
-                .Select(file => file.Key)
-                .Where(path => path.EndsWith("_for_testing.bnk"))
-                .ToList();
+            var testingBankPaths = ShippedBanks(packFileService);
 
             var hircsByTestingBank = testingBankPaths
                 .ToDictionary(path => path, path => ReadHircs(packFileService, path));
 
-            var mergedContainers = hircsByTestingBank.Values
-                .SelectMany(hircs => hircs)
+            // Looked up in the .bnk vanilla's copy came from: some containers are defined in more
+            // than one vanilla .bnk, and only that one is merged.
+            CAkMusicSwitchCntr_V136 MergedContainer(CAkMusicSwitchCntr_V136 vanilla) => hircsByTestingBank
+                .Where(bank => string.Equals(bank.Key.Replace('/', '\\'), vanilla.BnkFilePath.Replace('/', '\\'), StringComparison.OrdinalIgnoreCase))
+                .SelectMany(bank => bank.Value)
                 .OfType<CAkMusicSwitchCntr_V136>()
-                .ToDictionary(container => container.Id);
+                .SingleOrDefault(container => container.Id == vanilla.Id);
 
             Assert.Multiple(() =>
             {
                 foreach (var containerId in containerIds)
                 {
-                    Assert.That(mergedContainers.ContainsKey(containerId), Is.True,
-                        $"no testing .bnk carries container {containerId}");
-
                     var vanilla = (CAkMusicSwitchCntr_V136)audioRepository.GetHircs(AkBkHircType.Music_Switch)
-                        .Single(hirc => hirc.Id == containerId && hirc.IsCA);
+                        .First(hirc => hirc.Id == containerId && hirc.IsCA);
 
-                    var merged = mergedContainers[containerId];
+                    var merged = MergedContainer(vanilla);
+                    Assert.That(merged, Is.Not.Null, $"no shipped .bnk carries container {containerId}");
+                    if (merged == null)
+                        continue;
 
                     // The tree is only readable against the arguments and depth declared alongside
                     // it, so the copy the merge builds has to carry them over unchanged.
@@ -277,6 +286,18 @@ namespace Test.Audio
                         Is.EqualTo(vanilla.Arguments.Select(argument => argument.GroupId)));
 
                     AssertVanillaBranchesSurvive(vanilla.AkDecisionTree.DecisionTree, merged.AkDecisionTree.DecisionTree, containerId);
+
+                    // The culture has to be in every block where vanilla tells cultures apart: three
+                    // of the in-battle container's phases list every culture with no default, so a
+                    // block it misses is a battle phase where it gets silence.
+                    var cultureLevel = vanilla.Arguments.FindIndex(argument => argument.GroupId == WwiseHash.Compute("Battle_Music_WH3_Culture"));
+                    if (cultureLevel != -1)
+                    {
+                        var missing = CultureBlocks(merged.AkDecisionTree.DecisionTree, cultureLevel)
+                            .Where(block => block.Any(key => key != 0) && !block.Contains(WwiseHash.Compute(MusicalCulture)))
+                            .Count();
+                        Assert.That(missing, Is.Zero, $"container {containerId}: {missing} culture block(s) have no '{MusicalCulture}' branch");
+                    }
 
                     // Nothing the tree names plays unless the container also claims it as a child,
                     // and a missing child is silent rather than an error - the container just takes
@@ -293,7 +314,7 @@ namespace Test.Audio
                     // container, so a testing .bnk that carries the container without the hierarchy
                     // under it is not a shape the game is ever asked to load.
                     var bankHircIds = hircsByTestingBank
-                        .Single(bank => bank.Value.Any(hirc => hirc.Id == containerId))
+                        .Single(bank => bank.Value.Contains(merged))
                         .Value.Select(hirc => hirc.Id)
                         .ToHashSet();
 
@@ -308,7 +329,7 @@ namespace Test.Audio
             });
 
             foreach (var path in testingBankPaths)
-                Console.WriteLine($"\n{path}: {string.Join(", ", ReadHircs(packFileService, path).Select(hirc => $"{hirc.HircType} {hirc.Id}"))}");
+                Console.WriteLine($"\n{path}: {hircsByTestingBank[path].Count} hircs");
         }
 
         /// <summary>
@@ -323,12 +344,15 @@ namespace Test.Audio
             var musicSoundBank = compiledProject.SoundBanks.Single(soundBank => soundBank.AmsPulses.Count != 0);
             var stateId = WwiseHash.Compute(MusicalCulture);
 
-            var mergedTracks = packFileService.GetEditablePack().GetAllFiles()
-                .Select(file => file.Key)
-                .Where(path => path.EndsWith("_for_testing.bnk"))
-                .SelectMany(path => ReadHircs(packFileService, path))
-                .OfType<CAkMusicTrack_V136>()
-                .ToDictionary(track => track.Id);
+            // Some tracks are defined in more than one vanilla .bnk, so each is looked up in the
+            // shipped copy of the .bnk vanilla's came from - the only one the compile edits.
+            var hircsByBank = new Dictionary<string, List<HircItem>>(StringComparer.OrdinalIgnoreCase);
+            CAkMusicTrack_V136 MergedTrack(CAkMusicTrack_V136 vanillaTrack)
+            {
+                if (!hircsByBank.TryGetValue(vanillaTrack.BnkFilePath, out var hircs))
+                    hircsByBank[vanillaTrack.BnkFilePath] = hircs = ShippedHircsReplacing(packFileService, vanillaTrack.BnkFilePath);
+                return hircs.OfType<CAkMusicTrack_V136>().SingleOrDefault(track => track.Id == vanillaTrack.Id);
+            }
 
             Assert.Multiple(() =>
             {
@@ -339,10 +363,11 @@ namespace Test.Audio
 
                     foreach (var vanillaTrack in vanillaTracks)
                     {
-                        Assert.That(mergedTracks.ContainsKey(vanillaTrack.Id), Is.True,
-                            $"{amsPulse.StateGroupName}: track {vanillaTrack.Id} was not re-emitted");
+                        var mergedTrack = MergedTrack(vanillaTrack);
+                        Assert.That(mergedTrack, Is.Not.Null, $"{amsPulse.StateGroupName}: track {vanillaTrack.Id} was not re-emitted");
+                        if (mergedTrack == null)
+                            continue;
 
-                        var mergedTrack = mergedTracks[vanillaTrack.Id];
                         var subTrack = mergedTrack.SwitchParams!.SwitchAssoc.IndexOf(stateId);
 
                         Assert.That(subTrack, Is.Not.EqualTo(-1),
@@ -378,15 +403,12 @@ namespace Test.Audio
                 .OfType<CAkSwitchCntr_V136>()
                 .Single(container => container.IsCA);
 
-            var mergedContainer = packFileService.GetEditablePack().GetAllFiles()
-                .Select(file => file.Key)
-                .Where(path => path.EndsWith("_for_testing.bnk"))
-                .SelectMany(path => ReadHircs(packFileService, path))
+            var mergedContainer = ShippedHircsReplacing(packFileService, vanillaContainer.BnkFilePath)
                 .OfType<CAkSwitchCntr_V136>()
                 .Single(container => container.Id == amsFragment.FactionSwitchContainerId);
 
-            // The mod's own .bnk, since the key switch and the sounds are all new ids.
-            var moddedHircs = ReadHircs(packFileService, musicSoundBank.FilePath);
+            // The key switch and the sounds are new ids, spliced into the same .bnk as the container.
+            var moddedHircs = ShippedBanks(packFileService).SelectMany(path => ReadHircs(packFileService, path)).ToList();
             var keySwitch = moddedHircs.OfType<CAkSwitchCntr_V136>().Single(c => c.Id == amsFragment.KeySwitchContainerId);
 
             Assert.Multiple(() =>
@@ -435,6 +457,39 @@ namespace Test.Audio
                 $"({keySwitch.SwitchList.Count} keys) -> {amsFragment.TargetHircId} -> {amsFragment.SoundIds.Count} sound(s)");
         }
 
+        /// <summary>
+        /// Every .bnk the compile put in the pack. Music ships only spliced copies of vanilla .bnks
+        /// under vanilla's names - a .bnk of the mod's own beside them never overrides vanilla, and
+        /// would define the same ids a second time - so anything else here is a regression.
+        /// </summary>
+        static List<string> ShippedBanks(IPackFileService packFileService)
+        {
+            var banks = packFileService.GetEditablePack().GetAllFiles()
+                .Select(file => file.Key)
+                .Where(path => path.EndsWith(".bnk", StringComparison.OrdinalIgnoreCase))
+                .ToList();
+
+            Assert.That(banks.Where(path => !path.EndsWith("__core.bnk", StringComparison.OrdinalIgnoreCase)), Is.Empty,
+                "the compile shipped a .bnk that is not a replacement for a vanilla one");
+            return banks;
+        }
+
+        /// <summary>The hircs of the shipped .bnk that replaces the vanilla .bnk at this path.</summary>
+        static List<HircItem> ShippedHircsReplacing(IPackFileService packFileService, string vanillaBnkFilePath)
+        {
+            var path = ShippedBanks(packFileService).SingleOrDefault(shipped =>
+                string.Equals(shipped.Replace('/', '\\'), vanillaBnkFilePath.Replace('/', '\\'), StringComparison.OrdinalIgnoreCase));
+
+            Assert.That(path, Is.Not.Null, $"nothing replaces {vanillaBnkFilePath}");
+            return ReadHircs(packFileService, path);
+        }
+
+        /// <summary>The keys of every block at one level of a tree.</summary>
+        static IEnumerable<List<uint>> CultureBlocks(AkDecisionTree_V136.Node_V136 node, int level) =>
+            level == 0
+                ? [node.Nodes.Select(child => child.Key).ToList()]
+                : node.Nodes.SelectMany(child => CultureBlocks(child, level - 1));
+
         static IEnumerable<uint> LeavesOf(AkDecisionTree_V136.Node_V136 node) =>
             node.Nodes.SelectMany(child => child.Nodes.Count == 0 ? [child.AudioNodeId] : LeavesOf(child));
 
@@ -479,7 +534,7 @@ namespace Test.Audio
         static PackFile FindMusicDat(IPackFileService packFileService, string name)
         {
             var packFile = packFileService.FindAllWithExtention(".dat")
-                .FirstOrDefault(file => string.Equals(Path.GetFileName(file.FileName), name, StringComparison.OrdinalIgnoreCase))
+                .LastOrDefault(file => string.Equals(Path.GetFileName(file.FileName), name, StringComparison.OrdinalIgnoreCase))
                 .Pack;
 
             Assert.That(packFile, Is.Not.Null, $"{name} was not found in the loaded packs");

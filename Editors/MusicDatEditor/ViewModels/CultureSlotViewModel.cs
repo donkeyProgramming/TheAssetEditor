@@ -39,7 +39,7 @@ namespace Editors.MusicDatEditor.ViewModels
         /// already exists. An event sets a Wwise State, and a State only reaches new audio if the
         /// Music Switch container branching on its State Group can take a branch. Every container in
         /// the game was enumerated to establish this - see
-        /// <see cref="Wh3MusicHierarchyInformation.GetMusicSwitchContainerId"/> - and only the
+        /// <see cref="Wh3MusicHierarchyInformation.GetMusicSwitchContainerIds"/> - and only the
         /// campaign subculture slot qualifies. The rest still work as wiring; they just cannot bring
         /// their own files, so saying nothing here would let a modder spend an evening picking wavs
         /// that can never be reached.

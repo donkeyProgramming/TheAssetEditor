@@ -107,7 +107,8 @@ namespace Editors.Audio.AudioEditor.Core.AudioProjectMutation
             var result = _actionEventFactory.CreateSetStateActionEvent(usedHircIds, actionEventType, actionEventName, stateGroupName, stateName);
             soundBank.ActionEvents.InsertAlphabetically(result.ActionEvent);
 
-            AddStateToStateGroup(stateGroupName, stateName);
+            foreach (var stateGroupToRegisterIn in Wh3StateGroupInformation.GetStateGroupsToRegisterIn(stateGroupName))
+                AddStateToStateGroup(stateGroupToRegisterIn, stateName);
             AddMusicBranch(soundBank, stateGroupName, stateName, audioFiles, usedHircIds);
         }
 
@@ -137,27 +138,38 @@ namespace Editors.Audio.AudioEditor.Core.AudioProjectMutation
                 return;
             }
 
-            var musicSwitchContainerId = Wh3MusicHierarchyInformation.GetMusicSwitchContainerId(stateGroupName);
-            if (musicSwitchContainerId == null)
+            var musicSwitchContainerIds = Wh3MusicHierarchyInformation.GetMusicSwitchContainerIds(stateGroupName);
+            if (musicSwitchContainerIds.Count == 0)
             {
                 _logger.Here().Error($"State Group {stateGroupName} has no known Music Switch container, so its audio cannot be reached and was not added");
                 return;
             }
 
-            // A branch per State, matched on its Group as well as its name - "Empire" is a State in
-            // both the campaign subculture Group and the battle culture one, and they are different
-            // branches in different containers.
+            // One hierarchy per container: a music node has a single parent, so battle culture music
+            // needs its own copy under the results container and under the in-battle one, both
+            // playing the same audio.
+            foreach (var musicSwitchContainerId in musicSwitchContainerIds)
+                AddMusicBranch(soundBank, musicSwitchContainerId, stateGroupName, stateName, audioFiles, usedHircIds);
+        }
+
+        private void AddMusicBranch(SoundBank soundBank, uint musicSwitchContainerId, string stateGroupName, string stateName,
+            List<AudioFile> audioFiles, HashSet<uint> usedHircIds)
+        {
+            // A branch per State and container, matched on its Group as well as its name - "Empire" is
+            // a State in both the campaign subculture Group and the battle culture one, and they are
+            // different branches in different containers.
             //
             // Picking more audio for a State that already has a branch extends its playlist rather
             // than starting a second one, since the decision tree can only point at one place.
             var existingRandomSequence = soundBank.MusicRandomSequences
                 .FirstOrDefault(musicRandomSequence =>
-                    musicRandomSequence.StateName == stateName && musicRandomSequence.StateGroupName == stateGroupName);
+                    musicRandomSequence.StateName == stateName && musicRandomSequence.StateGroupName == stateGroupName
+                    && musicRandomSequence.DirectParentId == musicSwitchContainerId);
 
             if (existingRandomSequence != null)
             {
                 var addedSegments = _musicHierarchyFactory
-                    .CreateMusicBranch(usedHircIds, musicSwitchContainerId.Value, stateGroupName, stateName, audioFiles, soundBank.Language)
+                    .CreateMusicBranch(usedHircIds, musicSwitchContainerId, stateGroupName, stateName, audioFiles, soundBank.Language)
                     .MusicSegments;
 
                 foreach (var musicSegment in addedSegments)
@@ -174,7 +186,7 @@ namespace Editors.Audio.AudioEditor.Core.AudioProjectMutation
                 return;
             }
 
-            var branch = _musicHierarchyFactory.CreateMusicBranch(usedHircIds, musicSwitchContainerId.Value, stateGroupName, stateName, audioFiles, soundBank.Language);
+            var branch = _musicHierarchyFactory.CreateMusicBranch(usedHircIds, musicSwitchContainerId, stateGroupName, stateName, audioFiles, soundBank.Language);
             soundBank.MusicRandomSequences.Add(branch.MusicRandomSequence);
             AddMusicSegments(soundBank, branch.MusicSegments, audioFiles);
         }
@@ -355,6 +367,13 @@ namespace Editors.Audio.AudioEditor.Core.AudioProjectMutation
         {
             var stateGroup = _audioEditorStateService.AudioProject.StateGroups
                 .FirstOrDefault(stateGroup => stateGroup.Name == stateGroupName);
+
+            // Projects made before a Group became moddable do not have it yet.
+            if (stateGroup == null && Wh3StateGroupInformation.ModdableStateGroups.Contains(stateGroupName))
+            {
+                stateGroup = StateGroup.CreateForAudioProjectFile(stateGroupName, []);
+                _audioEditorStateService.AudioProject.StateGroups.TryAdd(stateGroup);
+            }
 
             if (stateGroup == null)
                 return;

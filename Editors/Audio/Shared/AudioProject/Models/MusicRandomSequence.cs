@@ -14,7 +14,7 @@ namespace Editors.Audio.Shared.AudioProject.Models
     public class MusicRandomSequence : AudioProjectItem
     {
         /// <summary>The vanilla Music Switch container this branch is merged into - see
-        /// <see cref="GameInformation.Warhammer3.Wh3MusicHierarchyInformation.GetMusicSwitchContainerId"/>.</summary>
+        /// <see cref="GameInformation.Warhammer3.Wh3MusicHierarchyInformation.GetMusicSwitchContainerIds"/>.</summary>
         public uint DirectParentId { get; set; }
 
         /// <summary>The State that selects this branch - the same State the Action Event sets. The

@@ -180,15 +180,18 @@ namespace Editors.Audio.Shared.Wwise.Generators
         }
 
         /// <summary>
-        /// The key to use at each level of the tree, as one path per combination. The level that
-        /// branches on the State Group being set gets the State; every other level is filled in from
-        /// what vanilla already does there, because the branch has to be reachable no matter what
-        /// those other States happen to be at the time.
+        /// The key to use at each level of the tree, as one path per combination.
         ///
-        /// Where vanilla has a default at a level, that one key covers everything and is the whole
-        /// answer. Where it does not - battle result is lose, win or draw with no default - the
-        /// branch is repeated once per key instead, which is how vanilla itself lists every culture
-        /// under all three results.
+        /// Above the level that branches on the State Group being set, the branch goes into every
+        /// block where vanilla tells that Group's States apart - every block listing at least one of
+        /// them by name. A block holding only the default is one where vanilla plays the same thing
+        /// whatever the State, such as the per-battle tracks in the adaptive battle container, and
+        /// the new State follows that the same as every vanilla one does. Battle result is lose, win
+        /// or draw with every culture listed under all three, so the branch goes under all three.
+        ///
+        /// Below it, each level is filled in from what vanilla does there, because the branch has to
+        /// be reachable whatever those States are at the time: the default where vanilla has one,
+        /// which covers everything, or else every key vanilla uses.
         /// </summary>
         private static List<List<uint>> BuildKeyPaths(CAkMusicSwitchCntr_V136 vanillaContainer, MusicBranch branch)
         {
@@ -203,9 +206,13 @@ namespace Editors.Audio.Shared.Wwise.Generators
                     $"Music Switch container {vanillaContainer.Id} does not branch on State Group " +
                     $"'{branch.StateGroupName}', so a State from it selects nothing there.");
 
-            var keyPaths = new List<List<uint>> { new() };
+            var keyPaths = PathsToBlocksListingStates(vanillaTree, branchLevel);
+            if (keyPaths.Count == 0)
+                throw new NotSupportedException(
+                    $"Music Switch container {vanillaContainer.Id} never lists a State of '{branch.StateGroupName}' by name, " +
+                    "so there is no block a new one belongs in.");
 
-            for (var level = 0; level < vanillaContainer.TreeDepth; level++)
+            for (var level = branchLevel; level < vanillaContainer.TreeDepth; level++)
             {
                 List<uint> keysForLevel = level == branchLevel
                     ? [WwiseHash.Compute(branch.StateName)]
@@ -215,6 +222,29 @@ namespace Editors.Audio.Shared.Wwise.Generators
             }
 
             return keyPaths;
+        }
+
+        /// <summary>The key paths down to every block at <paramref name="level"/> that names at least
+        /// one key other than the default.</summary>
+        private static List<List<uint>> PathsToBlocksListingStates(AkDecisionTree_V136.Node_V136 vanillaTree, int level)
+        {
+            var paths = new List<List<uint>>();
+
+            void Walk(AkDecisionTree_V136.Node_V136 node, int depth, List<uint> path)
+            {
+                if (depth == level)
+                {
+                    if (node.Nodes.Any(child => child.Key != DefaultKey))
+                        paths.Add(path);
+                    return;
+                }
+
+                foreach (var child in node.Nodes)
+                    Walk(child, depth + 1, [.. path, child.Key]);
+            }
+
+            Walk(vanillaTree, 0, []);
+            return paths;
         }
 
         /// <summary>

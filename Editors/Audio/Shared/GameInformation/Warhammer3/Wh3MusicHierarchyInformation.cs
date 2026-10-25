@@ -11,8 +11,9 @@ namespace Editors.Audio.Shared.GameInformation.Warhammer3
     ///
     /// The branch vanilla builds for one culture, taken from WH3_Campaign_Subcultures / 'Dwarfs':
     ///
-    ///   MusicSwitch 698158058           args=[State WH3_Campaign_Subcultures], depth 1
-    ///     node key=hash('Dwarfs')       -> audioNodeId = the Music Random Sequence below
+    ///   MusicSwitch 698158058           args=[State WH3_Campaign_Subcultures, 781561792], depth 2
+    ///     node key=hash('Dwarfs')
+    ///       node key=0 (default)        -> audioNodeId = the Music Random Sequence below
     ///       Music_Random_Sequence       parent = the switch container, one playlist root
     ///         Music_Segment             parent = the random sequence, one child, one track
     ///           3 markers               entry at the segment start, a named cue, exit at the end
@@ -26,28 +27,36 @@ namespace Editors.Audio.Shared.GameInformation.Warhammer3
     public static class Wh3MusicHierarchyInformation
     {
         /// <summary>
-        /// The Music Switch container whose decision tree branches on a given State Group, keyed by
-        /// State Group name. These are vanilla hirc ids, so a merge has to re-emit the whole
-        /// container the way the Dialogue Event merge re-emits a whole dialogue event.
+        /// The Music Switch containers whose decision trees a State Group's States get a branch in,
+        /// keyed by State Group name. These are vanilla hirc ids, so a merge has to re-emit the whole
+        /// container the way the Dialogue Event merge re-emits a whole dialogue event. A music node
+        /// has one parent, so each container gets a hierarchy of its own over the same audio.
         ///
         /// Every Music Switch container in the game was enumerated with
         /// MusicEventShapeResearch.DumpEveryMusicSwitchContainer, and the multi argument ones dumped
         /// in full. Of the six State Groups the music events target, two can be served:
         ///
-        ///   WH3_Campaign_Subcultures                     698158058, depth 1              -> listed
+        ///   WH3_Campaign_Subcultures                     698158058, subculture x 781561792 -> listed
         ///   Battle_Music_WH3_Culture                     26264058,  result x culture     -> listed
         ///   WH3_Campaign_Subcultures                     145953291, subculture x resolution
-        ///   Battle_Music_WH3_Culture                     67383790,  six arguments deep
+        ///   Battle_Music_WH3_Culture                     67383790,  six arguments deep   -> listed
         ///   WH3_Campaign_Music_AMS_Fragments_Faction     read elsewhere, see below
         ///   WH3_AMS_Pulse_Percussion_Options             read elsewhere, see below
         ///   WH3_AMS_Pulse_Pitched_Orchestral_Options     read elsewhere, see below
         ///   WH3_AMS_Pulse_Pitched_Ethnic_Options         read elsewhere, see below
         ///
-        /// 67383790 is left out although it names the culture, because it names it as the default:
-        /// the culture level of that tree is a single key 0 node, and the three levels below it are
-        /// musical key, segment and dynamic state. That is the adaptive battle music, which is
-        /// authored as a set of stems per key and mix rather than as one piece of music, so a branch
-        /// there would need a whole stem set rather than a file.
+        /// Measured on the October 2026 banks with MusicShippedPackDiagnosis
+        /// .WhatKeysEachLevelOfTheBattleContainersOffer: 698158058 is two deep, its second level
+        /// (781561792, 5 keys) defaulted in every block, and the merge fills that level in from the
+        /// default like any other level it does not branch on.
+        ///
+        /// 67383790 is the music heard during a battle. Its culture level is the third of six; three
+        /// of its six battle phases list all 17 vanilla cultures and offer no default, so a culture
+        /// missing from them is silence rather than a fallback - which is what Araby got in game in
+        /// October 2026 with only 26264058 merged, prebattle playing and the battle silent. Vanilla's
+        /// branches below the culture level are stem sets per musical key, segment and mix; the mod's
+        /// branch takes the default at each of those levels instead, so the same music plays whatever
+        /// they are. See MusicSwitchContainerMergeService for which blocks get the branch.
         ///
         /// 145953291 is left out for a different reason: it is reachable, but it is post battle
         /// campaign music rather than the subculture's theme, and giving it the same audio as the
@@ -73,11 +82,11 @@ namespace Editors.Audio.Shared.GameInformation.Warhammer3
         /// new culture that skips these still gets Cathay's percussion pulse and no pitched pulses or
         /// ambient fragments, which is a thinner mix rather than a failure.
         /// </summary>
-        public static uint? GetMusicSwitchContainerId(string stateGroupName) => stateGroupName switch
+        public static IReadOnlyList<uint> GetMusicSwitchContainerIds(string stateGroupName) => stateGroupName switch
         {
-            "WH3_Campaign_Subcultures" => 698158058,
-            "Battle_Music_WH3_Culture" => 26264058,
-            _ => null
+            "WH3_Campaign_Subcultures" => [698158058],
+            "Battle_Music_WH3_Culture" => [26264058, 67383790],
+            _ => []
         };
 
         /// <summary>
@@ -109,7 +118,7 @@ namespace Editors.Audio.Shared.GameInformation.Warhammer3
         /// can pick wavs and have them reached.
         /// </summary>
         public static bool CanCarryOwnAudio(string stateGroupName) =>
-            GetMusicSwitchContainerId(stateGroupName) != null
+            GetMusicSwitchContainerIds(stateGroupName).Count != 0
             || IsAmsPulseStateGroup(stateGroupName)
             || GetAmsFragmentContainerId(stateGroupName) != null;
 
