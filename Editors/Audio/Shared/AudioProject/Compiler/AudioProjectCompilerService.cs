@@ -74,12 +74,10 @@ namespace Editors.Audio.Shared.AudioProject.Compiler
                 else
                     soundBank.FilePath = $"audio\\wwise\\{soundBank.Language}\\{soundBank.FileName}";
 
-                // Both Dialogue Events and music re-emit hircs that already exist in vanilla, so both
-                // need somewhere to put them other than the .bnk the modder keeps. Music names its
-                // testing .bnks after the vanilla .bnks it overrides rather than after this one, so
-                // only the merging name is shared.
-                if (soundBank.DialogueEvents.Count != 0 || soundBank.MusicRandomSequences.Count != 0 || soundBank.AmsPulses.Count != 0
-                    || soundBank.AmsFragments.Count != 0)
+                // Dialogue Events re-emit hircs that already exist in vanilla, so they need somewhere
+                // to put them other than the .bnk the modder keeps. Music does too, but ships them
+                // spliced into the vanilla .bnks under vanilla's own names, so it needs neither name.
+                if (soundBank.DialogueEvents.Count != 0)
                 {
                     // In WH3 .bnk files are loaded in descending name order. When a .bnk is loaded it overrides hircs with the same ID in .bnks loaded
                     // before it so the .bnk with the lowest alphanumeric name takes priority.
@@ -128,8 +126,10 @@ namespace Editors.Audio.Shared.AudioProject.Compiler
         {
             foreach (var musicSegment in soundBank.MusicSegments)
             {
+                // Battle culture music has a segment per container over the same audio, which only
+                // needs encoding once.
                 var audioFile = audioProject.GetAudioFile(musicSegment.SourceId);
-                if (audioFile == null)
+                if (audioFile == null || audioFiles.Contains(audioFile))
                     continue;
 
                 SetSoundData(audioFile, soundBank);
@@ -323,6 +323,16 @@ namespace Editors.Audio.Shared.AudioProject.Compiler
                 if (soundBank.ActionEvents.Count != 0 || soundBank.DialogueEvents.Count != 0
                     || soundBank.MusicRandomSequences.Count != 0 || soundBank.AmsPulses.Count != 0)
                 {
+                    // Music only works spliced into the vanilla .bnks themselves, so a music bank
+                    // compiles to those and nothing else: the mod's own .bnk would define every one of
+                    // the same hircs a second time, and the merging .bnk would too since its name puts
+                    // it in the same load as the music .bnks. See GenerateMusicReplacementSoundBanks.
+                    if (soundBank.MusicRandomSequences.Count != 0 || soundBank.AmsPulses.Count != 0 || soundBank.AmsFragments.Count != 0)
+                    {
+                        _soundBankGeneratorService.GenerateMusicReplacementSoundBanks(soundBank);
+                        continue;
+                    }
+
                     _logger.Here().Information($"Generating SoundBank {soundBank.FilePath}");
 
                     // Create the .bnk that modders should keep
@@ -335,15 +345,7 @@ namespace Editors.Audio.Shared.AudioProject.Compiler
                         _soundBankGeneratorService.GenerateDialogueEventsForTestingSoundBank(soundBank);
                     }
 
-                    if (soundBank.MusicRandomSequences.Count != 0 || soundBank.AmsPulses.Count != 0 || soundBank.AmsFragments.Count != 0)
-                    {
-                        // The same for music: the mod's branches merged into the vanilla Music Switch
-                        // containers, in .bnks named to override the vanilla ones they came from
-                        _soundBankGeneratorService.GenerateMusicSwitchContainersForTestingSoundBanks(soundBank);
-                    }
-
-                    if (soundBank.DialogueEvents.Count != 0 || soundBank.MusicRandomSequences.Count != 0
-                        || soundBank.AmsPulses.Count != 0 || soundBank.AmsFragments.Count != 0)
+                    if (soundBank.DialogueEvents.Count != 0)
                     {
                         // Create the .bnk that modders should give to the merger
                         _logger.Here().Information($"Generating SoundBank {soundBank.MergingFilePath}");

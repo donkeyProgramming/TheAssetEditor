@@ -32,6 +32,10 @@ namespace Test.Audio
             settings.CurrentSettings.GameDirectories.Add(
                 new ApplicationSettings.GamePathPair(GameTypeEnum.Warhammer3, gameDirectory));
 
+            // The probes often open a mod pack on its own. With this on, the service refuses it and
+            // puts up a modal message box from inside the test run, and the probe sees an empty pack.
+            provider.GetRequiredService<IPackFileService>().EnforceGameFilesMustBeLoaded = false;
+
             return provider;
         }
 

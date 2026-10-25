@@ -153,6 +153,30 @@ namespace Test.Audio
                 Is.SubsetOf(childIds));
         }
 
+        // Vanilla trees also point at nodes their container does not claim - four of the six
+        // containers in campaign_music__core.bnk do, by up to 349 nodes. Claiming those as well
+        // gives them a second parent, and made a container merged with only itself come back larger.
+        [Test]
+        public void ANodeVanillaPointsAtButDoesNotClaimStaysUnclaimed()
+        {
+            const uint UnclaimedNodeId = 777;
+            var vanillaContainer = CreateVanillaContainer();
+            vanillaContainer.AkDecisionTree.DecisionTree.Nodes.Add(CreateBranch(WwiseHash.Compute("Empire"), UnclaimedNodeId));
+            vanillaContainer.AkDecisionTree.Nodes = AkDecisionTree_V136.FlattenDecisionTree(vanillaContainer.AkDecisionTree.DecisionTree);
+            var vanillaChildIds = vanillaContainer.MusicTransNodeParams.MusicNodeParams.Children.ChildIds.ToList();
+
+            var service = new MusicSwitchContainerMergeService();
+            var merged = service.MergeBranches(vanillaContainer, [new MusicBranch(SubcultureStateGroup, "Araby", NewRanSeqId)]);
+            var selfMerged = service.MergeContainers(vanillaContainer, vanillaContainer);
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(merged.MusicTransNodeParams.MusicNodeParams.Children.ChildIds, Does.Contain(NewRanSeqId));
+                Assert.That(merged.MusicTransNodeParams.MusicNodeParams.Children.ChildIds, Does.Not.Contain(UnclaimedNodeId));
+                Assert.That(selfMerged.MusicTransNodeParams.MusicNodeParams.Children.ChildIds, Is.EqualTo(vanillaChildIds));
+            });
+        }
+
         [Test]
         public void TheChildListIsNotSharedWithTheVanillaContainer()
         {

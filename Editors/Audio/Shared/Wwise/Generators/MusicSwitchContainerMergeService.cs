@@ -99,7 +99,8 @@ namespace Editors.Audio.Shared.Wwise.Generators
             {
                 Id = vanillaContainer.Id,
                 HircType = vanillaContainer.HircType,
-                MusicTransNodeParams = CopyWithChildren(vanillaContainer.MusicTransNodeParams, decisionTree),
+                MusicTransNodeParams = CopyWithChildren(vanillaContainer.MusicTransNodeParams,
+                    vanillaContainer.AkDecisionTree.DecisionTree, decisionTree),
                 IsContinuePlayback = vanillaContainer.IsContinuePlayback,
                 TreeDepth = vanillaContainer.TreeDepth,
                 Arguments = [.. vanillaContainer.Arguments],
@@ -123,16 +124,24 @@ namespace Editors.Audio.Shared.Wwise.Generators
         /// its default - which for a new culture means vanilla music keeps playing. Vanilla lists
         /// its children in ascending id order and this keeps to that.
         ///
+        /// Only leaves the merge introduced are added - ones the base container's own tree did not
+        /// already point at. Vanilla trees also point at nodes they do not claim: four of the six
+        /// containers in campaign_music__core.bnk name up to 349 nodes missing from their child
+        /// lists, presumably claimed by another container. Claiming those as well made a container
+        /// merged with nothing but itself come back larger, and handed those nodes a second parent.
+        ///
         /// Everything but the child list is shared with the vanilla hirc rather than copied, which
         /// is safe only because nothing here writes to it.
         /// </summary>
-        private static MusicTransNodeParams_V136 CopyWithChildren(MusicTransNodeParams_V136 vanillaParams, AkDecisionTree_V136.Node_V136 decisionTree)
+        private static MusicTransNodeParams_V136 CopyWithChildren(MusicTransNodeParams_V136 vanillaParams,
+            AkDecisionTree_V136.Node_V136 vanillaTree, AkDecisionTree_V136.Node_V136 decisionTree)
         {
             var childIds = new SortedSet<uint>(vanillaParams.MusicNodeParams.Children.ChildIds);
+            var alreadyReferenced = new HashSet<uint>(CollectAudioNodeIds(vanillaTree));
             foreach (var audioNodeId in CollectAudioNodeIds(decisionTree))
             {
                 // The default at a level is stored as a key of zero with no node behind it.
-                if (audioNodeId != 0)
+                if (audioNodeId != 0 && !alreadyReferenced.Contains(audioNodeId))
                     childIds.Add(audioNodeId);
             }
 
