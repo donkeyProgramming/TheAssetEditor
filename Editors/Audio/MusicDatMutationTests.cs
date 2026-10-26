@@ -156,17 +156,17 @@ namespace Test.Audio
         }
 
         // Patching everything is the default the wizard offers, and the case most likely to go
-        // wrong: a slot can span several chains - nine for ambient fragments, since that chain
-        // is repeated once per randomised PICK_ONE_OF variant - so one pass splices in twenty-odd
-        // arms whose addresses all shift each other. Every chain of every slot has to come out
-        // with the new key in it, not just the first one of each.
-        [TestCase("battle_music.dat", 2)]
-        [TestCase("campaign_music.dat", 21)]
-        public void AddingToEverySlotPatchesEveryChainOfEach(string name, int expectedInsertions)
+        // wrong: a slot can span several chains - the ambient fragment chain is repeated once per
+        // randomised PICK_ONE_OF variant - so one pass splices in many arms whose addresses all
+        // shift each other. Every chain of every slot has to come out with the new key in it.
+        // How many there are is pinned in MusicDatTests_Explore, not here.
+        [TestCase("battle_music.dat")]
+        [TestCase("campaign_music.dat")]
+        public void AddingToEverySlotPatchesEveryChainOfEach(string name)
         {
             var file = Load(name);
             var before = MusicDatCultureWiring.FindSlots(file);
-            Assert.That(before.Sum(s => s.InsertionCount), Is.EqualTo(expectedInsertions));
+            Assert.That(before.Any(s => s.InsertionCount > 1), Is.True, "needs a slot spanning several chains to be meaningful");
 
             var problems = MusicDatCultureWiring.AddCulture(file, NewSubcultureKey, NewMusicalCulture,
                 before.Select(s => new MusicDatCultureWiring.SlotPlan(s.EventPrefix, true, null)).ToList());
@@ -212,11 +212,9 @@ namespace Test.Audio
             });
         }
 
-        // Bretonnia's own arm in vanilla is just "goto the shared body", the same redirector
-        // shape a borrowed culture's clone gets - so the preview of borrowing Bretonnia has
-        // to resolve to Empire's actual body, which physically lives at a different address
-        // than the new arm itself. An address-range preview window used to stop right after
-        // the opening brace here, showing an empty block.
+        // Bretonnia's own arm in vanilla is just "goto the shared body", so the preview of
+        // borrowing it has to show Empire's body, which lives at a different address than the
+        // new arm. Bounding the preview by address shows an empty block here.
         [Test]
         public void PreviewOfABorrowedRedirectorArmShowsTheSharedBody()
         {
@@ -361,10 +359,11 @@ namespace Test.Audio
         public void InsertCodeRejectsAnAddressThatIsNotAnInstructionBoundary()
         {
             var file = Load("battle_music.dat");
-            var second = MusicDatDisassembler.Disassemble(file)[0].Instructions[0];
+            var multiWord = MusicDatDisassembler.Disassemble(file)
+                .SelectMany(f => f.Instructions)
+                .First(i => i.Operands.Length != 0);
 
-            Assert.That(second.Operands, Is.Not.Empty, "need a multi-word instruction to aim at");
-            Assert.Throws<ArgumentException>(() => MusicDatCodeEditor.InsertCode(file, second.Address + 1, [0]));
+            Assert.Throws<ArgumentException>(() => MusicDatCodeEditor.InsertCode(file, multiWord.Address + 1, [0]));
         }
 
         [Test]
@@ -372,13 +371,15 @@ namespace Test.Audio
         {
             var file = Load("battle_music.dat");
             var count = file.StringConstants.Count;
+            var existing = file.StringConstants[^1];
 
-            var reused = MusicDatCodeEditor.AddStringConstant(file, file.StringConstants[5]);
+            var reused = MusicDatCodeEditor.AddStringConstant(file, existing);
             var added = MusicDatCodeEditor.AddStringConstant(file, "a string that is definitely not present");
 
             Assert.Multiple(() =>
             {
-                Assert.That(reused, Is.EqualTo(5));
+                // The first entry holding it, in case the table has duplicates.
+                Assert.That(reused, Is.EqualTo(file.StringConstants.IndexOf(existing)));
                 Assert.That(added, Is.EqualTo(count));
                 Assert.That(file.StringConstants, Has.Count.EqualTo(count + 1));
             });

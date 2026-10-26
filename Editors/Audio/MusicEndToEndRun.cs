@@ -1,4 +1,4 @@
-﻿using Editors.Audio.Shared.AudioProject;
+using Editors.Audio.Shared.AudioProject;
 using Editors.Audio.Shared.AudioProject.Compiler;
 using Editors.Audio.Shared.AudioProject.Models;
 using Editors.Audio.Shared.GameInformation.Warhammer3;
@@ -31,7 +31,6 @@ namespace Test.Audio
     [Explicit("End to end run, needs a WH3 install and a wav on disk, run manually")]
     internal class MusicEndToEndRun
     {
-        const string GameDirectory = @"D:\SteamLibrary\steamapps\common\Total War WARHAMMER III";
         const string WavDiskFilePath = @"C:\Users\rob\Desktop\tw modding\projects\araby audio projects\music\241 Adrian von Ziegler - Hual Hadi.wav";
 
         // What a modder types into the wizard. The Audio State is also what event names are built
@@ -49,17 +48,20 @@ namespace Test.Audio
 
         static string OutputDirectory => Path.Combine(Path.GetTempPath(), "ArabyMusicRun");
 
+        [SetUp]
+        public void RequireInstall() => VanillaBankReader.RequireOnDisk(VanillaBankReader.GameDirectory, WavDiskFilePath);
+
         [Test]
         public void AddArabyThroughTheWizardThenGiveItAudioAndCompile()
         {
-            using var provider = VanillaBankReader.CreateProvider(GameDirectory);
+            using var provider = VanillaBankReader.CreateProvider(VanillaBankReader.GameDirectory);
             var packFileService = provider.GetRequiredService<IPackFileService>();
             var containerLoader = provider.GetRequiredService<IPackFileContainerLoader>();
 
             foreach (var packName in new[] { "audio_base_bnk.pack", "audio_base.pack" })
             {
                 var container = containerLoader.CreateFromPackFile(
-                    PackFileContainerType.Normal, Path.Combine(GameDirectory, "data", packName), true);
+                    PackFileContainerType.Normal, Path.Combine(VanillaBankReader.GameDirectory, "data", packName), true);
                 container.IsCaPackFile = true;
                 packFileService.AddContainer(container);
             }

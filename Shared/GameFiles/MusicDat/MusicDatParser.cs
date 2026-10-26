@@ -74,7 +74,7 @@ namespace Shared.GameFormats.MusicDat
                 output.Instructions.Add(chunk.ReadUInt32());
 
             if (chunk.BytesLeft != 0)
-                throw new Exception($"MusicDat parse finished with {chunk.BytesLeft} bytes remaining of {bytes.Length}");
+                throw new InvalidDataException($"MusicDat parse finished with {chunk.BytesLeft} bytes remaining of {bytes.Length}");
 
             return output;
         }
@@ -149,7 +149,14 @@ namespace Shared.GameFormats.MusicDat
 
         static string ReadStr32(ByteChunk chunk)
         {
+            var offset = chunk.Index;
             var length = chunk.ReadInt32();
+
+            // A layout change makes some other value land here, so fail clearly rather than
+            // trying to allocate whatever it happens to be.
+            if (length < 0 || length > chunk.BytesLeft)
+                throw new InvalidDataException($"MusicDat string at offset {offset} claims {length} bytes, but only {chunk.BytesLeft} remain");
+
             return Encoding.UTF8.GetString(chunk.ReadBytes(length));
         }
 

@@ -28,6 +28,7 @@
 	  <Compile Remove="MusicDatFixtures.cs" />
 	  <Compile Remove="MusicDatMutationTests.cs" />
 	  <Compile Remove="MusicDatTests_Explore.cs" />
+	  <Compile Remove="VanillaMusicRoundTripRun.cs" />
 	</ItemGroup>
 
     <ItemGroup>

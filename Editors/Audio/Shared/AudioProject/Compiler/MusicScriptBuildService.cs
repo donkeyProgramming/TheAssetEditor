@@ -43,21 +43,27 @@ namespace Editors.Audio.Shared.AudioProject.Compiler
         {
             var problems = new List<string>();
 
-            var battle = ReadVanillaScript(BattleScriptPath);
-            var campaign = ReadVanillaScript(CampaignScriptPath);
-            if (battle == null)
-                problems.Add($"{BattleScriptPath} was not found in the game's packs");
-            if (campaign == null)
-                problems.Add($"{CampaignScriptPath} was not found in the game's packs");
+            var battle = ReadVanillaScript(BattleScriptPath, problems);
+            var campaign = ReadVanillaScript(CampaignScriptPath, problems);
             if (problems.Count != 0)
                 return new MusicScriptBuildResult(null, null, problems);
 
+            // Found by shape, not by function name, so a rename in a game update is harmless. A slot
+            // the project uses that neither script has any more is not: the culture would silently
+            // lose that music, so it is reported.
+            var battleSlots = MusicDatCultureWiring.FindSlots(battle).Select(slot => slot.EventPrefix).ToHashSet();
+            var campaignSlots = MusicDatCultureWiring.FindSlots(campaign).Select(slot => slot.EventPrefix).ToHashSet();
+
             foreach (var musicCulture in musicCultures)
             {
+                foreach (var missing in musicCulture.Slots.Select(slot => slot.EventPrefix).Where(prefix => !battleSlots.Contains(prefix) && !campaignSlots.Contains(prefix)))
+                    problems.Add($"'{musicCulture.AudioState}': neither music script has a {missing} culture chain any more. " +
+                                 "The game may have restructured its music scripts; edit this culture to see which slots they offer now");
+
                 // The battle chains match the culture's audio_state and the campaign ones its
-                // subculture key; each slot is reported by exactly one of the two files.
-                problems.AddRange(Wire(battle, musicCulture, musicCulture.MusicalCulture));
-                problems.AddRange(Wire(campaign, musicCulture, musicCulture.SubcultureKey));
+                // subculture key; each slot is in exactly one of the two files.
+                problems.AddRange(Wire(battle, battleSlots, musicCulture, musicCulture.MusicalCulture));
+                problems.AddRange(Wire(campaign, campaignSlots, musicCulture, musicCulture.SubcultureKey));
             }
 
             return new MusicScriptBuildResult(battle, campaign, problems);
@@ -79,9 +85,8 @@ namespace Editors.Audio.Shared.AudioProject.Compiler
             return [];
         }
 
-        private static IReadOnlyList<string> Wire(MusicDatFile file, MusicCulture musicCulture, string matchKey)
+        private static IReadOnlyList<string> Wire(MusicDatFile file, HashSet<string> slotPrefixes, MusicCulture musicCulture, string matchKey)
         {
-            var slotPrefixes = MusicDatCultureWiring.FindSlots(file).Select(slot => slot.EventPrefix).ToHashSet();
             var plans = musicCulture.Slots
                 .Where(slot => slotPrefixes.Contains(slot.EventPrefix))
                 .Select(slot => new MusicDatCultureWiring.SlotPlan(slot.EventPrefix, true, slot.ReferenceMatchKey))
@@ -100,20 +105,29 @@ namespace Editors.Audio.Shared.AudioProject.Compiler
         /// <summary>The game's own copy, never a mod's - the mod pack holds the last build's, and
         /// building on that would wire every culture in twice. The last game pack holding it wins,
         /// the same as for any other file.</summary>
-        private MusicDatFile ReadVanillaScript(string path)
+        private MusicDatFile ReadVanillaScript(string path, List<string> problems)
         {
-            var gameContainers = _packFileService.GetAllPackfileContainers()
+            var file = _packFileService.GetAllPackfileContainers()
                 .Where(container => container.IsCaPackFile)
-                .Reverse();
+                .Reverse()
+                .Select(container => _packFileService.FindFile(path, container))
+                .FirstOrDefault(packFile => packFile != null);
 
-            foreach (var container in gameContainers)
+            if (file == null)
             {
-                var file = _packFileService.FindFile(path, container);
-                if (file != null)
-                    return MusicDatParser.Parse(file);
+                problems.Add($"{path} was not found in the game's packs");
+                return null;
             }
 
-            return null;
+            try
+            {
+                return MusicDatParser.Parse(file);
+            }
+            catch (Exception e)
+            {
+                problems.Add($"{path} from the game could not be read, so its format may have changed in a game update: {e.Message}");
+                return null;
+            }
         }
     }
 }

@@ -8,6 +8,10 @@ namespace Test.Audio
     {
         static readonly string Scratch = Path.Combine(Path.GetTempPath(), "MusicDatDumps");
 
+        const string InventoryChangedMessage =
+            "The culture chains in this script changed. If the game was just updated, " +
+            "check the new chains in the WriteDumps output and update the expected list; otherwise the classifier regressed.";
+
         static byte[] RawBytes(string name) => MusicDatFixtures.ReadBytes(name);
 
         static MusicDatFile Load(string name) => MusicDatParser.Parse(RawBytes(name));
@@ -15,6 +19,21 @@ namespace Test.Audio
         [TestCase("battle_music.dat")]
         [TestCase("campaign_music.dat")]
         public void ParsesWholeFile(string name) => Load(name);
+
+        // What a layout change in a game update looks like to the reader: some other value lands
+        // where a string length is expected. It has to fail with where, not try to allocate it.
+        [Test]
+        public void AStringLengthRunningPastTheFileFailsClearly()
+        {
+            var bytes = RawBytes("battle_music.dat");
+            Assert.That(MusicDatParser.Parse(bytes).Triggers, Is.Not.Empty, "needs a trigger name to corrupt");
+
+            // Version, trigger count, then the first trigger's name length.
+            BitConverter.GetBytes(int.MaxValue).CopyTo(bytes, 8);
+
+            var error = Assert.Throws<InvalidDataException>(() => MusicDatParser.Parse(bytes));
+            Assert.That(error!.Message, Does.Contain("offset 8"));
+        }
 
         // Write() must reproduce the exact original bytes - the guard that lets the
         // editor round-trip a file without silently corrupting anything it doesn't
@@ -69,13 +88,9 @@ namespace Test.Audio
             Assert.That(offenders, Is.Empty, $"jump targets not on instruction boundaries: {string.Join(", ", offenders.Take(10))}");
         }
 
-        // Every function in both shipped files now resolves every value back to what
-        // produced it - no slot is left showing as a bare slotN. That was not true while
-        // FLOAT_TO_STRING and STRING_TO_INT were mis-decoded as zero-operand opcodes: the
-        // three functions using them (Update_Load, {b6374121-...}, MM_update_from_music_marker)
-        // each had a value the dataflow could not follow, which is the symptom that led back
-        // to the wrong arity. Holding the bar at zero is therefore a real guard on the opcode
-        // table as much as on the binding model - any regression in either shows up here.
+        // Every value in every function resolves back to what produced it - no bare slotN.
+        // A wrong operand count in the opcode table shows up here as a value the dataflow
+        // cannot follow, so this guards the opcode table as much as the binding model.
         [TestCase("battle_music.dat")]
         [TestCase("campaign_music.dat")]
         public void EveryFunctionFullyDecompiles(string name)
@@ -90,22 +105,16 @@ namespace Test.Audio
             Assert.That(incomplete, Is.Empty);
         }
 
-        // Wwise_cues (which Music Marker hands every marker to) is the clearest real case of
-        // many sibling if-arms sharing one body via a "goto" to a common handler, with arms
-        // of their own interleaved among them, breaking the run into several separate
-        // consecutive groups rather than one big one - pinning its shape guards that the
-        // merge stops at the first differently-bodied arm instead of reaching past it (only
-        // strictly consecutive arms merge), that a still-mergeable goto-only arm folds in
-        // with the real body its label sits in, and that gotos left over from arms that
-        // didn't merge get their short target inlined in place with the label dropped,
-        // rather than staying as a bare "goto L;". Its second branch also reaches that
-        // target through a second jump ("L26260: goto L25302;"), which a single inlining
-        // pass used to leave behind.
+        // Wwise_cues is the clearest real case of sibling if-arms sharing one body through a
+        // goto, with arms of their own interleaved. Pins that only strictly consecutive arms
+        // merge, that a goto-only arm folds in with the body its label sits in, and that
+        // leftover gotos - including one reached through a second goto - are inlined rather
+        // than left as a bare "goto L;".
         [Test]
         public void AdjacentIfArmsWithIdenticalBodiesMergeIntoOneOrCondition()
         {
             var file = Load("battle_music.dat");
-            var function = MusicDatDisassembler.Disassemble(file).First(f => f.Name == "Wwise_cues");
+            var function = MusicDatFixtures.RequireFunction(file, "Wwise_cues");
 
             var text = MusicDatDecompiler.ToText(file, function);
 
@@ -229,7 +238,7 @@ namespace Test.Audio
         public void PickOneOfRendersAsNamedChoiceWithRealCaseConditions()
         {
             var file = Load("campaign_music.dat");
-            var function = MusicDatDisassembler.Disassemble(file).First(f => f.Name == "GMM_change_key");
+            var function = MusicDatFixtures.RequireFunction(file, "GMM_change_key");
 
             var text = MusicDatDecompiler.ToText(file, function);
 
@@ -261,7 +270,7 @@ namespace Test.Audio
         public void ParametersAreNamedByTheirSizedFrameOffset()
         {
             var file = Load("campaign_music.dat");
-            var function = MusicDatDisassembler.Disassemble(file).First(f => f.Name == "AMM_drone_RTPC_Updater");
+            var function = MusicDatFixtures.RequireFunction(file, "AMM_drone_RTPC_Updater");
 
             var text = MusicDatDecompiler.ToText(file, function);
 
@@ -282,7 +291,7 @@ namespace Test.Audio
         public void LoneNumericParameterIsRecognisedAtItsSizedOffset()
         {
             var file = Load("battle_music.dat");
-            var function = MusicDatDisassembler.Disassemble(file).First(f => f.Name == "update_timers");
+            var function = MusicDatFixtures.RequireFunction(file, "update_timers");
 
             Assert.That(MusicDatDecompiler.ToText(file, function),
                 Does.Contain("action_battle_length_level_3_timer = arg1 + action_battle_length_level_3_timer;"));
@@ -308,7 +317,7 @@ namespace Test.Audio
                 return;
 
             var text = MusicDatDecompiler.ToText(file,
-                MusicDatDisassembler.Disassemble(file).First(f => f.Name == "update_Check_Battle_End_Status"));
+                MusicDatFixtures.RequireFunction(file, "update_Check_Battle_End_Status"));
 
             Assert.Multiple(() =>
             {
@@ -326,12 +335,11 @@ namespace Test.Audio
         public void OperandsBindAcrossFreeAndStaleSlots()
         {
             var file = Load("campaign_music.dat");
-            var functions = MusicDatDisassembler.Disassemble(file);
 
             // One stale operand (ams_pulse_type, left over from the previous arm) paired with
             // one freshly loaded operand ("both"). Preferring free operands as a whole group
             // never rebinds the stale one, leaving the previous arm's comparison in its place.
-            var pulses = MusicDatDecompiler.ToText(file, functions.First(f => f.Name == "AMM_pulses_choose_percussion"));
+            var pulses = MusicDatDecompiler.ToText(file, MusicDatFixtures.RequireFunction(file, "AMM_pulses_choose_percussion"));
             Assert.Multiple(() =>
             {
                 Assert.That(pulses, Does.Contain("if (ams_pulse_type == \"both\")"));
@@ -343,7 +351,7 @@ namespace Test.Audio
                 // it is only being read. Treating stale as freely writable lets it swallow the
                 // log string that belonged to the genuinely free operand beside it.
                 var resolution = MusicDatDecompiler.ToText(file,
-                    functions.First(f => f.Name == "{601bc71f-4687-4dee-affb-28164d968dd1}"));
+                    MusicDatFixtures.RequireFunction(file, "{601bc71f-4687-4dee-affb-28164d968dd1}"));
                 Assert.That(resolution, Does.Contain(
                     "LogMessage(\"campaign resolution: player subculture error, we don't know what this is: \" + Feedback_Subculture_Player);"));
             });
@@ -355,11 +363,13 @@ namespace Test.Audio
         // from one of them falls back to something wrong or to nothing.
         //
         // Pinned exactly because both directions are bugs. A chain disappearing means the
-        // wizard silently stops patching somewhere it used to. A new one appearing means
-        // either a real chain was previously being missed, or - more likely - the classifier
-        // has started dragging in one of the same-shaped chains that dispatch on musical keys
-        // ("c"/"eb"/"gb"), transition states or gameplay triggers, which are a different
-        // operation and must not be offered as culture slots.
+        // wizard silently stops patching somewhere. A new one appearing means either a real
+        // chain is being missed, or - more likely - the classifier has started dragging in one
+        // of the same-shaped chains that dispatch on musical keys ("c"/"eb"/"gb"), transition
+        // states or gameplay triggers, which must not be offered as culture slots.
+        //
+        // Expected to need updating after a game update: compare
+        // against the WriteDumps output before changing the list.
         [TestCase("battle_music.dat", new[]
         {
             "On Showing Results:1",
@@ -388,7 +398,7 @@ namespace Test.Audio
                 .OrderBy(x => x, StringComparer.Ordinal)
                 .ToList();
 
-            Assert.That(found, Is.EqualTo(expected.OrderBy(x => x, StringComparer.Ordinal).ToList()));
+            Assert.That(found, Is.EqualTo(expected.OrderBy(x => x, StringComparer.Ordinal).ToList()), InventoryChangedMessage);
         }
 
         // The chains above, grouped into the decisions a modder actually makes - one per Wwise
@@ -422,7 +432,7 @@ namespace Test.Audio
 
             Assert.Multiple(() =>
             {
-                Assert.That(slots, Is.EqualTo(expected));
+                Assert.That(slots, Is.EqualTo(expected), InventoryChangedMessage);
 
                 // Every chain has to land in exactly one slot - a chain that fell out during
                 // grouping would be a place the wizard silently never patches.

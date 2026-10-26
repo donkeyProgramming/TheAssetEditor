@@ -38,6 +38,7 @@
     <Compile Include="MusicDatFixtures.cs" />
     <Compile Include="MusicDatMutationTests.cs" />
     <Compile Include="MusicDatTests_Explore.cs" />
+    <Compile Include="VanillaMusicRoundTripRun.cs" />
     <Using Include="NUnit.Framework" />
   </ItemGroup>
 

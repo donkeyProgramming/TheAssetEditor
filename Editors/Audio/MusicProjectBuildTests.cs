@@ -1,4 +1,4 @@
-﻿using Editors.Audio.Shared.AudioProject;
+using Editors.Audio.Shared.AudioProject;
 using Editors.Audio.Shared.AudioProject.Compiler;
 using Editors.Audio.Shared.AudioProject.Models;
 using Editors.Audio.Shared.GameInformation.Warhammer3;
@@ -11,8 +11,8 @@ using Shared.GameFormats.MusicDat;
 namespace Test.Audio
 {
     // The music project is the one file a mixer mod's maintainer keeps: every culture is added to
-    // it, and the scripts are rebuilt from vanilla with all of them. These run on the .dat fixtures
-    // in Data/Music standing in for the game's copies, so they need no install.
+    // it, and the scripts are rebuilt from vanilla with all of them. The installed game's scripts
+    // stand in a pack of their own; tests that build them are skipped without an install.
     internal class MusicProjectBuildTests
     {
         ServiceProvider _provider;
@@ -25,11 +25,14 @@ namespace Test.Audio
             _packFileService = _provider.GetRequiredService<IPackFileService>();
 
             var game = _packFileService.CreateNewPackFileContainer("game", PackFileVersion.PFH5, PackFileCAType.RELEASE);
-            _packFileService.AddFilesToPack(game,
-            [
-                new NewPackFileEntry(@"audio\scripts", PackFile.CreateFromBytes("battle_music.dat", MusicDatFixtures.ReadBytes("battle_music.dat"))),
-                new NewPackFileEntry(@"audio\scripts", PackFile.CreateFromBytes("campaign_music.dat", MusicDatFixtures.ReadBytes("campaign_music.dat")))
-            ]);
+            if (VanillaBankReader.HasInstall)
+            {
+                _packFileService.AddFilesToPack(game,
+                [
+                    new NewPackFileEntry(MusicDatFixtures.ScriptFolder, PackFile.CreateFromBytes("battle_music.dat", MusicDatFixtures.ReadBytes("battle_music.dat"))),
+                    new NewPackFileEntry(MusicDatFixtures.ScriptFolder, PackFile.CreateFromBytes("campaign_music.dat", MusicDatFixtures.ReadBytes("campaign_music.dat")))
+                ]);
+            }
             game.IsCaPackFile = true; // read-only from here on
 
             _packFileService.CreateNewPackFileContainer("mod", PackFileVersion.PFH5, PackFileCAType.MOD, setEditablePack: true);
@@ -64,6 +67,37 @@ namespace Test.Audio
             var secondBuild = _packFileService.FindFile(MusicScriptBuildService.BattleScriptPath, _packFileService.GetEditablePack()).DataSource.ReadData();
 
             Assert.That(secondBuild, Is.EqualTo(firstBuild));
+        }
+
+        // A game update that renames a function is harmless, since chains are found by shape. One
+        // that removes or restructures a chain the project uses must not silently drop the culture
+        // from it.
+        [Test]
+        public void ASlotNeitherScriptHasAnyMoreIsReported()
+        {
+            MusicDatFixtures.RequireInstall();
+            var culture = BattleCulture("First_Culture", "first_sc");
+            culture.Slots.Add(new MusicCultureSlot { EventPrefix = "music_c_removed_in_an_update_" });
+
+            var build = Build().Build([culture]);
+
+            Assert.That(build.Problems, Has.Some.Contains("music_c_removed_in_an_update_").And.Contains("First_Culture"));
+        }
+
+        [Test]
+        public void AGameScriptThatCannotBeReadIsReportedRatherThanThrown()
+        {
+            var corrupted = MusicDatFixtures.ReadBytes("battle_music.dat");
+            BitConverter.GetBytes(int.MaxValue).CopyTo(corrupted, 8); // the first string's length
+
+            // A later game pack, so its copy is the one the game would load.
+            var patch = _packFileService.CreateNewPackFileContainer("patch", PackFileVersion.PFH5, PackFileCAType.RELEASE);
+            _packFileService.AddFilesToPack(patch, [new NewPackFileEntry(@"audio\scripts", PackFile.CreateFromBytes("battle_music.dat", corrupted))]);
+            patch.IsCaPackFile = true;
+
+            var build = Build().Build([Culture("First_Culture", "first_sc")]);
+
+            Assert.That(build.Problems, Has.Some.Contains(MusicScriptBuildService.BattleScriptPath).And.Contains("could not be read"));
         }
 
         // Music lives on the project's own Music object, so an Audio Editor project saves exactly
@@ -291,7 +325,7 @@ namespace Test.Audio
             return fileService.DeserialiseAudioProject(_packFileService.FindFile(filePath));
         }
 
-        const string FirstWav = @"audio\wwiseirst.wav";
+        const string FirstWav = @"audio\wwise\first.wav";
         const string SecondWav = @"audio\wwise\second.wav";
 
         /// <summary>A culture in the battle culture slot only, bringing its own audio.</summary>

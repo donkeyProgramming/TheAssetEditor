@@ -13,6 +13,24 @@ namespace Test.Audio
     // what the editor sees. Only the UI-facing services are stubbed.
     internal static class VanillaBankReader
     {
+        /// <summary>The WH3 install the game-data tests read. Set WH3_GAME_DIRECTORY to point them at
+        /// another one; without an install they are skipped.</summary>
+        public static string GameDirectory =>
+            Environment.GetEnvironmentVariable("WH3_GAME_DIRECTORY") ?? @"D:\SteamLibrary\steamapps\common\Total War WARHAMMER III";
+
+        public static bool HasInstall => Directory.Exists(Path.Combine(GameDirectory, "data"));
+
+        /// <summary>Skips, rather than errors, a manual run on a machine without the install or files
+        /// it hard-codes, saying which constant to change.</summary>
+        public static void RequireOnDisk(string gameDirectory, params string[] files)
+        {
+            if (!Directory.Exists(Path.Combine(gameDirectory, "data")))
+                Assert.Ignore($"No WH3 install at {gameDirectory}; set WH3_GAME_DIRECTORY to run this.");
+
+            foreach (var file in files.Where(file => !File.Exists(file)))
+                Assert.Ignore($"{file} not found; point the constant naming it at a file on this machine.");
+        }
+
         public static ServiceProvider CreateProvider(string gameDirectory)
         {
             var services = new ServiceCollection();

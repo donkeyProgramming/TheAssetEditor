@@ -1,4 +1,4 @@
-﻿using Editors.Audio.Shared.AudioProject;
+using Editors.Audio.Shared.AudioProject;
 using Editors.Audio.Shared.AudioProject.Compiler;
 using Editors.Audio.Shared.AudioProject.Models;
 using Editors.Audio.Shared.GameInformation.Warhammer3;
@@ -24,19 +24,21 @@ namespace Test.Audio
     [Explicit("End to end run, needs a WH3 install and a wav on disk, run manually")]
     internal class MusicTreeEndToEndRun
     {
-        const string GameDirectory = @"D:\SteamLibrary\steamapps\common\Total War WARHAMMER III";
         const string WavDiskFilePath = @"C:\Users\rob\Desktop\tw modding\projects\araby audio projects\music\241 Adrian von Ziegler - Hual Hadi.wav";
         const string BattleEvent = "music_b_faction_araby";
         const uint PreBattleContainerId = 26264058;
         const uint InBattleContainerId = 67383790;
 
+        [SetUp]
+        public void RequireInstall() => VanillaBankReader.RequireOnDisk(VanillaBankReader.GameDirectory, WavDiskFilePath);
+
         [Test]
         public void EachPartOfTheTreeIsReachedWhereItSaysInTheShippedBanks()
         {
-            using var provider = VanillaBankReader.CreateProvider(GameDirectory);
+            using var provider = VanillaBankReader.CreateProvider(VanillaBankReader.GameDirectory);
             var packFileService = provider.GetRequiredService<IPackFileService>();
             foreach (var packName in new[] { "audio_base_bnk.pack", "audio_base.pack" })
-                VanillaBankReader.OpenPack(provider, Path.Combine(GameDirectory, "data", packName));
+                VanillaBankReader.OpenPack(provider, Path.Combine(VanillaBankReader.GameDirectory, "data", packName));
             packFileService.CreateNewPackFileContainer("araby_tree", PackFileVersion.PFH5, PackFileCAType.MOD, setEditablePack: true);
 
             var everywhereWav = ImportWav(packFileService, "araby_everywhere.wav");
@@ -103,10 +105,10 @@ namespace Test.Audio
         [Test]
         public void TheCampaignAndAdaptiveTreesAreBuiltTheWayTheGameIsLaidOut()
         {
-            using var provider = VanillaBankReader.CreateProvider(GameDirectory);
+            using var provider = VanillaBankReader.CreateProvider(VanillaBankReader.GameDirectory);
             var packFileService = provider.GetRequiredService<IPackFileService>();
             foreach (var packName in new[] { "audio_base_bnk.pack", "audio_base.pack" })
-                VanillaBankReader.OpenPack(provider, Path.Combine(GameDirectory, "data", packName));
+                VanillaBankReader.OpenPack(provider, Path.Combine(VanillaBankReader.GameDirectory, "data", packName));
             packFileService.CreateNewPackFileContainer("araby_campaign_tree", PackFileVersion.PFH5, PackFileCAType.MOD, setEditablePack: true);
 
             var everywhereWav = ImportWav(packFileService, "araby_everywhere.wav");

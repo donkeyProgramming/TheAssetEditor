@@ -17,9 +17,10 @@ namespace Shared.GameFormats.MusicDat
     ///
     /// Nothing downstream of that chain needs touching, which is what makes this a tractable
     /// edit rather than a compiler problem. The campaign script never names a culture's
-    /// event: it builds it at runtime as <c>"music_c_subculture_" + pending_Subculture</c>,
-    /// at all 37 sites. The battle script does name its events, so a battle entry carries a
-    /// sound event string too.
+    /// event: it builds it at runtime as <c>"music_c_subculture_" + pending_Subculture</c>.
+    /// The battle script does name its events, so a battle entry carries a sound event string too.
+    ///
+    /// Function names are only ever reported, never looked up: CA renames them between builds.
     ///
     /// A new entry is produced by copying an existing arm verbatim and substituting only its
     /// string constants, so whatever else the arm does - posting an event, setting the
@@ -73,12 +74,11 @@ namespace Shared.GameFormats.MusicDat
         /// <summary>One thing a culture needs wiring for, identified by the Wwise event it
         /// ends up posting.
         ///
-        /// Grouping by event rather than by function is what makes this explicable: the three
-        /// battle chains are three routes to the same <c>music_b_faction_*</c> event and are
-        /// one decision for a modder, while the ambient and pulse chains are separate
-        /// decisions that happen to live in the same file. It also collapses the randomised
-        /// variants - the ambient-fragment chain is repeated nine times, once per PICK_ONE_OF
-        /// case, but all nine post the same event and want the same answer.</summary>
+        /// Grouped by event rather than by function: the battle chains are several routes to the
+        /// same <c>music_b_faction_*</c> event and are one decision for a modder, while the
+        /// ambient and pulse chains are separate decisions in the same file. It also collapses
+        /// the randomised variants - the ambient-fragment chain is repeated once per PICK_ONE_OF
+        /// case, but every copy posts the same event and wants the same answer.</summary>
         public record CultureSlot(
             string EventPrefix,
             string Title,
@@ -97,15 +97,10 @@ namespace Shared.GameFormats.MusicDat
 
             public IReadOnlyList<string> FunctionNames => Chains.Select(c => c.FunctionName).Distinct().ToList();
 
-            /// <summary>Every culture that can be borrowed from and will actually resolve in
-            /// <em>every</em> chain this slot has, for a picker UI. A slot can span several
-            /// chains - the battle theme is decided in three different functions - and they
-            /// do not necessarily carry the same set of arms; the smaller results-screen
-            /// chain, say, may not have its own arm for a niche mercenary culture that the
-            /// main dispatch chain does. Offering only the intersection is what keeps every
-            /// name in the list actually usable: borrowing across a whole slot has to
-            /// succeed in each of its chains or not at all, so a name that would fail in even
-            /// one of them is not offered.</summary>
+            /// <summary>Every culture that can be borrowed from in <em>every</em> chain this slot
+            /// has, for a picker UI. A slot's chains do not necessarily carry the same arms - the
+            /// smaller results-screen chain may lack one the main chain has - and borrowing has to
+            /// succeed in all of them or none, so only the intersection is offered.</summary>
             public IReadOnlyList<string> ReferenceCandidates =>
                 Chains
                     .Select(c => (IEnumerable<string>)c.CloneableCases.Select(cc => cc.MatchKey))
@@ -129,22 +124,19 @@ namespace Shared.GameFormats.MusicDat
 
         /// <summary>Every culture chain in the file, not just the longest.
         ///
-        /// Wiring a culture into a music script means more than the one chain that decides a
-        /// battle's theme: each shipped file reaches the same decision from several
-        /// directions, and a culture missing from any of them falls back to something wrong
-        /// or to nothing. battle_music.dat has the theme chain in
-        /// cues_TrackEnd_post_culture_events - which both the automatic choice and a bespoke
-        /// battle's override reach, through cues_TrackEnd_check_culture_change (earlier
-        /// builds gave each a copy of its own) - and a second for the results screen.
-        /// campaign_music.dat has the map-theme chain plus one each for the victory
-        /// and defeat resolution screens, and two more that pick ambient fragments and
-        /// enemy-proximity percussion.
+        /// Each shipped file reaches the same "whose music is this" decision from several
+        /// directions, and a culture missing from any of them falls back to something wrong or
+        /// to nothing. battle_music.dat has the theme chain and a second for the results screen;
+        /// campaign_music.dat has the map-theme chain, one each for the victory and defeat
+        /// screens, and the ambient fragment and enemy-proximity pulse chains.
         ///
-        /// The last two live inside PICK_ONE_OF case bodies, so their chain is repeated once
-        /// per randomised variant - ten and five times respectively. Those repeats are
-        /// separate chains here and are grouped back together by <see cref="FindSlots"/>,
-        /// since a caller wants to decide about "ambient fragments" once rather than ten
-        /// times.</summary>
+        /// The fragment and pulse chains live inside PICK_ONE_OF case bodies, so each is repeated
+        /// once per randomised variant. The repeats are separate chains here and are grouped back
+        /// together by <see cref="FindSlots"/>.
+        ///
+        /// A function that does not disassemble exactly (an opcode this reader does not know) is
+        /// skipped, so a chain inside one disappears; <c>MusicScriptBuildService</c> reports a
+        /// slot that has gone missing that way.</summary>
         public static IReadOnlyList<CultureChain> FindAll(MusicDatFile file) =>
             MusicDatDisassembler.Disassemble(file)
                 .Where(f => f.DecodedExactly)
@@ -287,9 +279,6 @@ namespace Shared.GameFormats.MusicDat
             return subcultureKeyed * 2 > chain.Cases.Count || factionEvented * 2 > chain.Cases.Count;
         }
 
-        static CultureChain? FindChainIn(MusicDatFile file, MusicDatDisassembler.Function function) =>
-            FindChainsIn(file, function).OrderByDescending(c => c.CloneableCases.Count).FirstOrDefault();
-
         static List<CultureChain> FindChainsIn(MusicDatFile file, MusicDatDisassembler.Function function)
         {
             var body = function.Instructions;
@@ -424,7 +413,7 @@ namespace Shared.GameFormats.MusicDat
             }
 
             for (var j = headIndex; j >= 0; j--)
-                if (function.Instructions[j].Opcode == 41 && function.Instructions[j].Operands[0] < file.StringVariables.Count)
+                if (function.Instructions[j].Opcode == OpLoadStringVar && function.Instructions[j].Operands[0] < file.StringVariables.Count)
                     return file.StringVariables[(int)function.Instructions[j].Operands[0]].Name;
 
             return $"slot{slot}";
@@ -450,12 +439,9 @@ namespace Shared.GameFormats.MusicDat
         /// been touched rather than half-way through.
         ///
         /// A chain that already has an arm for <paramref name="matchKey"/> is left alone
-        /// rather than given a second, unreachable one. This matters for re-running the
-        /// wizard once per subculture of a new culture: the battle chains key on the short
-        /// Audio State, which is the same for every subculture unless it has its own
-        /// override, so the second run's Audio State collides with the first and should
-        /// just no-op there while still adding the campaign chains, which key on the
-        /// subculture's own unique full key and so never collide.</summary>
+        /// rather than given a second, unreachable one. That is the normal case for a second
+        /// subculture of one culture: the battle chains key on the shared Audio State, the
+        /// campaign chains on each subculture's own key.</summary>
         public static IReadOnlyList<string> AddCulture(MusicDatFile file, string matchKey,
             string musicalCulture, IReadOnlyList<SlotPlan> plans)
         {
@@ -603,13 +589,10 @@ namespace Shared.GameFormats.MusicDat
             if (first < 0)
                 return "(no preview available)";
 
-            // Found by matching braces from the header rather than by address range: a
-            // borrowed arm that itself was only ever a "goto the shared body" redirector
-            // renders merged with whichever arm actually owns that body (see
-            // MergeAdjacentIdenticalIfChains), and that body's real lines carry the
-            // addresses of wherever it physically lives in the function - not this arm's
-            // own narrow range. An address-bounded search would stop right after the
-            // opening brace and show an empty block.
+            // Found by matching braces from the header rather than by address range: a borrowed
+            // arm that is only a "goto the shared body" renders merged with the arm that owns
+            // that body (see MergeAdjacentIdenticalIfChains), whose lines carry addresses outside
+            // this arm's own range.
             var last = first;
             if (lines[first].Text.StartsWith("if (", StringComparison.Ordinal) &&
                 first + 1 < lines.Count && lines[first + 1].Text == "{")
@@ -641,9 +624,9 @@ namespace Shared.GameFormats.MusicDat
         ///
         /// This is what a new culture needs on the Wwise side: campaign_music.dat never names
         /// a per-culture event, it builds <c>"music_c_subculture_" + pending_Subculture</c>
-        /// at each of its 37 posting sites, so adding a culture here only works if an event
-        /// of that name exists. Restricted to strings that look like event names, since the
-        /// same variable is also concatenated into log messages.</summary>
+        /// wherever it posts one, so adding a culture here only works if an event of that name
+        /// exists. Restricted to strings that look like event names, since the same variable
+        /// is also concatenated into log messages.</summary>
         public static IReadOnlyList<string> FindRuntimeEventPrefixes(MusicDatFile file, CultureChain chain)
         {
             var target = file.StringVariables.FindIndex(v => v.Name == chain.TargetVariable);
