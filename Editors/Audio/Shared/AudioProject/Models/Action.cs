@@ -1,4 +1,5 @@
-﻿using Shared.GameFormats.Wwise;
+﻿using System.Text.Json.Serialization;
+using Shared.GameFormats.Wwise;
 using Shared.GameFormats.Wwise.Enums;
 
 namespace Editors.Audio.Shared.AudioProject.Models
@@ -12,7 +13,8 @@ namespace Editors.Audio.Shared.AudioProject.Models
         public uint BankId { get; set; }
 
         /// <summary>Only meaningful for SetState actions, where it names the State Group the
-        /// target State belongs to.</summary>
+        /// target State belongs to. Left out of the JSON otherwise.</summary>
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public uint StateGroupId { get; set; }
 
         /// <summary>The names the SetState ids were hashed from, kept so the editor can show what

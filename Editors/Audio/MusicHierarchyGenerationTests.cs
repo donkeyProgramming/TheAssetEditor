@@ -50,9 +50,9 @@ namespace Test.Audio
         public void ASegmentUnderTheInBattleContainerCarriesTheBattleScriptsTrackCues()
         {
             var inBattle = (CAkMusicSegment_V136)new CAkMusicSegmentGenerator_V136()
-                .GenerateHirc(CreateMusicSegment(), CreateSoundBank(Wh3MusicHierarchyInformation.InBattleMusicSwitchContainerId));
+                .GenerateHirc(CreateMusicSegment(), Wh3MusicHierarchyInformation.InBattleMusicSwitchContainerId);
             var results = (CAkMusicSegment_V136)new CAkMusicSegmentGenerator_V136()
-                .GenerateHirc(CreateMusicSegment(), CreateSoundBank(26264058));
+                .GenerateHirc(CreateMusicSegment(), 26264058);
 
             Assert.Multiple(() =>
             {
@@ -90,7 +90,7 @@ namespace Test.Audio
             musicSegment.DurationMs = 8000;
 
             var segment = (CAkMusicSegment_V136)new CAkMusicSegmentGenerator_V136()
-                .GenerateHirc(musicSegment, CreateSoundBank(Wh3MusicHierarchyInformation.InBattleMusicSwitchContainerId));
+                .GenerateHirc(musicSegment, Wh3MusicHierarchyInformation.InBattleMusicSwitchContainerId);
 
             Assert.That(segment.ArrayMarkersList[2].Position, Is.EqualTo(8000 * Wh3MusicHierarchyInformation.TrackEndCueEarliestShare));
         }
@@ -99,7 +99,7 @@ namespace Test.Audio
         public void TheInBattleSegmentSurvivesAWriteReadRoundTrip()
         {
             var segment = (CAkMusicSegment_V136)new CAkMusicSegmentGenerator_V136()
-                .GenerateHirc(CreateMusicSegment(), CreateSoundBank(Wh3MusicHierarchyInformation.InBattleMusicSwitchContainerId));
+                .GenerateHirc(CreateMusicSegment(), Wh3MusicHierarchyInformation.InBattleMusicSwitchContainerId);
 
             var reloaded = new CAkMusicSegment_V136();
             reloaded.ReadHirc(new ByteChunk(segment.WriteData()));
@@ -311,16 +311,6 @@ namespace Test.Audio
             };
         }
 
-        /// <summary>A bank holding the segment's Random Sequence under the given container.</summary>
-        static SoundBank CreateSoundBank(uint switchContainerId)
-        {
-            var musicRandomSequence = CreateRandomSequence(SegmentId);
-            musicRandomSequence.DirectParentId = switchContainerId;
-
-            var soundBank = new SoundBank("test_music", Wh3SoundBank.None, Wh3LanguageInformation.GetLanguageAsString(Wh3Language.Sfx));
-            soundBank.MusicRandomSequences.Add(musicRandomSequence);
-            return soundBank;
-        }
 
         static MusicSegment CreateMusicSegment()
         {

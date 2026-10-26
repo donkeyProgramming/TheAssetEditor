@@ -1,14 +1,11 @@
 ﻿using System.Data;
 using System.IO;
 using Editors.Audio.AudioEditor.Core;
-using Editors.Audio.Shared.AudioProject;
 using Editors.Audio.Shared.AudioProject.Models;
 using Editors.Audio.Shared.GameInformation.Warhammer3;
 using Editors.Audio.Shared.Storage;
 using Editors.Audio.Shared.Wwise.Generators.Bkhd;
 using Editors.Audio.Shared.Wwise.Generators.Hirc;
-using Editors.Audio.Shared.Wwise.Generators.Hirc.V136;
-using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
 using Shared.Core.PackFiles.Models.FileSources;
 using Shared.Core.PackFiles.Utility;
@@ -26,7 +23,6 @@ namespace Editors.Audio.Shared.Wwise.Generators
     {
         void GenerateSoundBankWithoutDialogueEvents(SoundBank soundBank);
         void GenerateDialogueEventsForTestingSoundBank(SoundBank soundBank);
-        void GenerateMusicReplacementSoundBanks(SoundBank soundBank);
         void GenerateMergingSoundBank(SoundBank soundBank);
         void GenerateMergedDialogueEventSoundBanks(List<string> moddedSoundBanks, string soundBankSuffix);
     }
@@ -34,38 +30,23 @@ namespace Editors.Audio.Shared.Wwise.Generators
     public class SoundBankGeneratorService : ISoundBankGeneratorService
     {
         private readonly IFileSaveService _fileSaveService;
-        private readonly IPackFileService _packFileService;
         private readonly ApplicationSettingsService _applicationSettingsService;
         private readonly IAudioRepository _audioRepository;
         private readonly HircGeneratorServiceFactory _hircGeneratorServiceFactory;
         private readonly IAudioEditorIntegrityService _audioEditorIntegrityService;
-        private readonly IMusicSwitchContainerMergeService _musicSwitchContainerMergeService;
-        private readonly IAmsPulseTrackMergeService _amsPulseTrackMergeService;
-        private readonly IAmsFragmentMergeService _amsFragmentMergeService;
-        private readonly IAmsMusicLayout _amsMusicLayout;
 
         private readonly ILogger _logger = Logging.Create<SoundBankGeneratorService>();
 
         public SoundBankGeneratorService(
             IFileSaveService fileSaveService,
-            IPackFileService packFileService,
             ApplicationSettingsService applicationSettingsService,
             IAudioRepository audioRepository,
-            IAudioEditorIntegrityService audioEditorIntegrityService,
-            IMusicSwitchContainerMergeService musicSwitchContainerMergeService,
-            IAmsPulseTrackMergeService amsPulseTrackMergeService,
-            IAmsFragmentMergeService amsFragmentMergeService,
-            IAmsMusicLayout amsMusicLayout)
+            IAudioEditorIntegrityService audioEditorIntegrityService)
         {
             _fileSaveService = fileSaveService;
-            _packFileService = packFileService;
             _applicationSettingsService = applicationSettingsService;
             _audioRepository = audioRepository;
             _audioEditorIntegrityService = audioEditorIntegrityService;
-            _musicSwitchContainerMergeService = musicSwitchContainerMergeService;
-            _amsPulseTrackMergeService = amsPulseTrackMergeService;
-            _amsFragmentMergeService = amsFragmentMergeService;
-            _amsMusicLayout = amsMusicLayout;
 
             var bankGeneratorVersion = (uint)GameInformationDatabase.GetGameById(_applicationSettingsService.CurrentSettings.CurrentGame).BankGeneratorVersion;
             _hircGeneratorServiceFactory = HircGeneratorServiceFactory.CreateFactory(bankGeneratorVersion);
@@ -98,428 +79,6 @@ namespace Editors.Audio.Shared.Wwise.Generators
             SortHircs(hircItems);
 
             WriteSoundBank(soundBank.Id, soundBank.LanguageId, soundBank.FileName, soundBank.FilePath, hircItems);
-        }
-
-        /// <summary>
-        /// The music hierarchy under the sequences a container's branches reach: tracks before their
-        /// segments, segments before the sequence over them. Vanilla never splits a music container
-        /// from its children across two .bnks - every one of the 32 children of the two containers
-        /// this touches sits in the same .bnk as its parent - so these go in the .bnk the container does.
-        /// </summary>
-        private List<HircItem> GenerateMusicHierarchyHircs(SoundBank soundBank, IEnumerable<MusicRandomSequence> musicRandomSequences)
-        {
-            var hircItems = new List<HircItem>();
-
-            foreach (var musicRandomSequence in musicRandomSequences)
-            {
-                foreach (var musicSegment in soundBank.GetMusicSegments(musicRandomSequence))
-                {
-                    hircItems.Add(new CAkMusicTrackGenerator_V136().GenerateHirc(musicSegment));
-                    hircItems.Add(_hircGeneratorServiceFactory.GenerateHirc(musicSegment, soundBank));
-                }
-
-                hircItems.Add(_hircGeneratorServiceFactory.GenerateHirc(musicRandomSequence));
-            }
-
-            return hircItems;
-        }
-
-        /// <summary>The vanilla Music Switch containers the mod adds branches to.</summary>
-        private static List<uint> GetMusicContainerIds(SoundBank soundBank) =>
-            [.. soundBank.MusicRandomSequences.Select(musicRandomSequence => musicRandomSequence.DirectParentId).Distinct()];
-
-        /// <summary>
-        /// The branches the mod adds to one container, and the sequences they reach.
-        ///
-        /// Each sequence is reached only by the paths its State's <see cref="MusicTree"/> gives its node
-        /// in this container - see <see cref="MusicSwitchContainerMergeService.BuildTreeKeyPaths"/>.
-        /// One the tree never leads to here, because a branch below it covers everything it would,
-        /// is left out rather than shipped where nothing can reach it.
-        /// </summary>
-        private static (List<MusicBranch> Branches, List<MusicRandomSequence> Reached) GetMusicBranches(SoundBank soundBank, CAkMusicSwitchCntr_V136 vanillaContainer)
-        {
-            var branches = new List<MusicBranch>();
-            var reached = new List<MusicRandomSequence>();
-            var pathsByTree = new Dictionary<MusicTree, Dictionary<int, List<List<uint>>>>();
-
-            foreach (var musicRandomSequence in soundBank.MusicRandomSequences.Where(sequence => sequence.DirectParentId == vanillaContainer.Id))
-            {
-                var tree = soundBank.MusicTrees.FirstOrDefault(musicTree =>
-                    musicTree.StateGroupName == musicRandomSequence.StateGroupName && musicTree.StateName == musicRandomSequence.StateName);
-                if (tree == null)
-                    continue;
-
-                if (!pathsByTree.TryGetValue(tree, out var pathsByNodeId))
-                    pathsByTree[tree] = pathsByNodeId = MusicSwitchContainerMergeService.BuildTreeKeyPaths(vanillaContainer, tree);
-
-                if (!pathsByNodeId.TryGetValue(musicRandomSequence.TreeNodeId, out var keyPaths))
-                    continue;
-
-                branches.Add(new MusicBranch(musicRandomSequence.StateGroupName, musicRandomSequence.StateName, musicRandomSequence.Id, keyPaths));
-                reached.Add(musicRandomSequence);
-            }
-
-            return (branches, reached);
-        }
-
-        private CAkMusicSwitchCntr_V136 GetVanillaMusicSwitchContainer(uint containerId)
-        {
-            var vanillaContainer = _audioRepository.GetHircs(AkBkHircType.Music_Switch)
-                .FirstOrDefault(hircItem => hircItem.Id == containerId && hircItem.IsCA) as CAkMusicSwitchCntr_V136;
-
-            if (vanillaContainer == null)
-                _logger.Here().Error($"Music Switch container {containerId} was not found in the vanilla data, so its branches cannot be merged");
-
-            return vanillaContainer;
-        }
-
-        /// <summary>
-        /// Every vanilla .bnk the music touches, rebuilt from the game's own copy with the mod spliced
-        /// in and shipped under the vanilla .bnk's name.
-        ///
-        /// A .bnk of the mod's own cannot do this. Measured in game (October 2026) with Cathay's
-        /// branches removed from the two culture containers: a separate .bnk holding the edited
-        /// containers changed nothing whether it loaded before or after global_music__core.bnk, or
-        /// carried the containers' parents with it, while the same edit spliced into
-        /// global_music__core.bnk itself silenced Cathay's prebattle music.
-        ///
-        /// Each edited vanilla hirc replaces its original in the .bnk it was read from: the Music
-        /// Switch containers with the mod's branches merged in, the pulse switch tracks with the mod's
-        /// sub-tracks, and the ambient fragments container with the mod's cultures. New hircs go into
-        /// the same .bnk as the vanilla hirc that names them, since vanilla never splits a music
-        /// container from its children across two .bnks. Each Action Event goes into the .bnk its
-        /// vanilla siblings live in - see <see cref="GetVanillaSoundBankFilePath(ActionEvent, SoundBank)"/>.
-        /// This is the layout of the August 2026 "eventbanks" pack, which played the mod's music in
-        /// prebattle.
-        /// </summary>
-        public void GenerateMusicReplacementSoundBanks(SoundBank soundBank)
-        {
-            var plans = new Dictionary<string, (Dictionary<uint, HircItem> Replacements, List<HircItem> Additions)>(StringComparer.OrdinalIgnoreCase);
-
-            (Dictionary<uint, HircItem> Replacements, List<HircItem> Additions) PlanFor(string vanillaBnkFilePath)
-            {
-                var key = vanillaBnkFilePath.Replace('/', '\\');
-                if (!plans.TryGetValue(key, out var plan))
-                    plans[key] = plan = ([], []);
-                return plan;
-            }
-
-            var actionEventToHircLookup = new Dictionary<ActionEvent, HircItem>();
-            GenerateActionEventHircs(soundBank, actionEventToHircLookup);
-            GenerateActionHircs(soundBank, actionEventToHircLookup);
-
-            var playTargets = GenerateSourceHircsFromPlayActions(soundBank);
-            if (playTargets.Count != 0)
-                PlanFor(GetVanillaSoundBankFilePath(soundBank)).Additions.AddRange(playTargets);
-
-            foreach (var actionEvent in soundBank.ActionEvents)
-            {
-                var eventHirc = actionEventToHircLookup[actionEvent];
-                var additions = PlanFor(GetVanillaSoundBankFilePath(actionEvent, soundBank)).Additions;
-
-                // An Event and the Actions it fires travel together, since the Event claims them,
-                // and the Actions go first so nothing claims a hirc that comes after it.
-                if (eventHirc.HircChildren != null)
-                    additions.AddRange(eventHirc.HircChildren.OrderBy(action => action.Id));
-                additions.Add(eventHirc);
-            }
-
-            foreach (var containerId in GetMusicContainerIds(soundBank))
-            {
-                var vanillaContainer = GetVanillaMusicSwitchContainer(containerId);
-                if (vanillaContainer == null)
-                    continue;
-
-                var (branches, reached) = GetMusicBranches(soundBank, vanillaContainer);
-                if (branches.Count == 0)
-                    continue;
-
-                var plan = PlanFor(vanillaContainer.BnkFilePath);
-                plan.Additions.AddRange(GenerateMusicHierarchyHircs(soundBank, reached));
-                plan.Replacements[containerId] = _musicSwitchContainerMergeService.MergeBranches(vanillaContainer, branches);
-            }
-
-            foreach (var moddedTrack in GenerateModdedAmsPulseTracks(soundBank))
-                PlanFor(moddedTrack.BnkFilePath).Replacements[moddedTrack.Id] = moddedTrack;
-
-            foreach (var moddedFragmentContainer in GenerateModdedAmsFragmentContainers(soundBank))
-            {
-                var plan = PlanFor(moddedFragmentContainer.BnkFilePath);
-                plan.Additions.AddRange(GenerateAmsFragmentHircs(soundBank, soundBank.AmsFragments
-                    .Where(fragment => fragment.FactionSwitchContainerId == moddedFragmentContainer.Id)));
-                plan.Replacements[moddedFragmentContainer.Id] = moddedFragmentContainer;
-            }
-
-            foreach (var (vanillaBnkFilePath, (replacements, additions)) in plans)
-            {
-                var vanillaBytes = ReadVanillaSoundBank(vanillaBnkFilePath);
-                if (vanillaBytes == null)
-                {
-                    _logger.Here().Error($"{vanillaBnkFilePath} was not found in the game's packs, so the music meant for it cannot be compiled");
-                    continue;
-                }
-
-                // A clash means the mod generated an id vanilla already uses for something else,
-                // and splicing it in would hand Wwise two definitions in one .bnk.
-                var vanillaIds = VanillaSoundBankSplicer.ReadHircIds(vanillaBytes);
-                var clashes = additions.Where(addition => vanillaIds.Contains(addition.Id)).Select(addition => addition.Id).ToList();
-                if (clashes.Count != 0)
-                    throw new InvalidOperationException(
-                        $"{vanillaBnkFilePath} already holds hirc id(s) {string.Join(", ", clashes)} that this project also generates");
-
-                var bytes = VanillaSoundBankSplicer.Splice(vanillaBytes, replacements, additions);
-                BnkFile.CreateFromBytes(bytes, vanillaBnkFilePath, false); // throws if the splice is unreadable
-
-                _logger.Here().Information(
-                    $"Generating SoundBank {vanillaBnkFilePath}: vanilla with {replacements.Count} hirc(s) replaced and {additions.Count} added");
-                _fileSaveService.Save(vanillaBnkFilePath, bytes, false);
-            }
-        }
-
-        /// <summary>The vanilla .bnk a bank is named after.</summary>
-        private static string GetVanillaSoundBankFilePath(SoundBank soundBank) =>
-            GetSoundBankFilePath($"{Wh3SoundBankInformation.GetName(soundBank.GameSoundBank)}__core.bnk", soundBank.Language);
-
-        /// <summary>
-        /// The vanilla .bnk holding the vanilla Events of the same family as this one - the ones
-        /// sharing its prefix. Vanilla splits music Events by the context that posts them:
-        /// music_b_faction_* in battle_music__core.bnk, music_c_* in campaign_music__core.bnk. An
-        /// Event in a .bnk that context never loads is never answered, which is why the August 2026
-        /// packs played the mod's music in prebattle but not in battle until this was done. Read
-        /// from the game rather than listed here so it follows a patch moving them.
-        /// </summary>
-        private string GetVanillaSoundBankFilePath(ActionEvent actionEvent, SoundBank soundBank)
-        {
-            var prefix = Wh3MusicEventInformation.KnownEventPrefixes
-                .FirstOrDefault(knownPrefix => actionEvent.Name.StartsWith(knownPrefix, StringComparison.OrdinalIgnoreCase));
-            if (prefix == null)
-                return GetVanillaSoundBankFilePath(soundBank);
-
-            var siblingBnkFilePath = _audioRepository.GetHircs(AkBkHircType.Event)
-                .Where(hircItem => hircItem.IsCA)
-                .Where(hircItem => _audioRepository.GetNameFromId(hircItem.Id, out var found) is var name && found
-                    && name.StartsWith(prefix, StringComparison.OrdinalIgnoreCase))
-                .GroupBy(hircItem => hircItem.BnkFilePath, StringComparer.OrdinalIgnoreCase)
-                .OrderByDescending(group => group.Count())
-                .Select(group => group.Key)
-                .FirstOrDefault();
-
-            if (siblingBnkFilePath != null)
-                return siblingBnkFilePath;
-
-            _logger.Here().Warning($"No vanilla Event starts with {prefix}, so {actionEvent.Name} goes in the .bnk its SoundBank is named after");
-            return GetVanillaSoundBankFilePath(soundBank);
-        }
-
-        /// <summary>
-        /// The game's own copy of a .bnk, never a mod's - the edited pack may already hold a
-        /// replacement from an earlier compile, and splicing into that would apply the mod twice.
-        /// The last game pack holding it wins, the same as for any other file.
-        /// </summary>
-        private byte[] ReadVanillaSoundBank(string bnkFilePath)
-        {
-            var gameContainers = _packFileService.GetAllPackfileContainers()
-                .Where(container => container.IsCaPackFile)
-                .Reverse();
-
-            foreach (var container in gameContainers)
-            {
-                var file = _packFileService.FindFile(bnkFilePath, container);
-                if (file != null)
-                    return file.DataSource.ReadData();
-            }
-
-            return null;
-        }
-
-        /// <summary>
-        /// The vanilla pulse switch tracks re-emitted with this mod's sub-tracks added.
-        ///
-        /// Clips are spread across the tracks in order and cycled when a mod supplies fewer than the
-        /// game has, so one wav means the same pulse under every segment - which is thin, but is the
-        /// only thing that can be done without inventing material.
-        /// </summary>
-        private List<CAkMusicTrack_V136> GenerateModdedAmsPulseTracks(SoundBank soundBank)
-        {
-            var moddedTracks = new List<CAkMusicTrack_V136>();
-
-            foreach (var pulsesByStateGroup in soundBank.AmsPulses.GroupBy(amsPulse => amsPulse.StateGroupName))
-            {
-                var slots = _amsMusicLayout.GetPulseSlots(pulsesByStateGroup.Key);
-                if (slots.Count == 0)
-                {
-                    _logger.Here().Error(
-                        $"No vanilla switch track reads State Group {pulsesByStateGroup.Key}, so its audio cannot be reached");
-                    continue;
-                }
-
-                var branchesByTrackId = slots.ToDictionary(slot => slot.Track.Id, _ => new List<AmsPulseBranch>());
-
-                foreach (var amsPulse in pulsesByStateGroup)
-                {
-                    var tree = soundBank.MusicTrees.FirstOrDefault(musicTree =>
-                        musicTree.StateGroupName == amsPulse.StateGroupName && musicTree.StateName == amsPulse.StateName);
-                    if (tree == null)
-                        continue;
-
-                    // Each track is one key and one variation; the tree says which node plays there, and
-                    // a node playing in several tracks hands them its wavs in turn, so one wav is a valid
-                    // answer and a key's three wavs become its three variations.
-                    var slotsByNode = slots
-                        .Select(slot => (Slot: slot, Node: tree.Evaluate(level =>
-                            level == Wh3MusicTreeLevelInformation.AmsKeyLevel ? slot.Key :
-                            level == Wh3MusicTreeLevelInformation.PulseVariationLevel ? slot.Variation.ToString() :
-                            null)))
-                        .Where(entry => entry.Node != null)
-                        .GroupBy(entry => entry.Node);
-
-                    foreach (var nodeSlots in slotsByNode)
-                    {
-                        var clips = nodeSlots.Key.AudioFileIds
-                            .Select(sourceId => amsPulse.Clips.FirstOrDefault(clip => clip.SourceId == sourceId))
-                            .Where(clip => clip != null)
-                            .ToList();
-                        if (clips.Count == 0)
-                            continue;
-
-                        var index = 0;
-                        foreach (var (slot, _) in nodeSlots)
-                            branchesByTrackId[slot.Track.Id].Add(new AmsPulseBranch(amsPulse.StateName, clips[index++ % clips.Count]));
-                    }
-                }
-
-                foreach (var slot in slots)
-                {
-                    var branches = branchesByTrackId[slot.Track.Id];
-                    if (branches.Count == 0)
-                        continue;
-
-                    var moddedTrack = _amsPulseTrackMergeService.AddSubTracks(slot.Track, branches, GetSegmentDurationMs(slot.Track));
-
-                    // Carried over so the track is spliced into the .bnk it was read from; the merged
-                    // track is a new object and would otherwise have no provenance.
-                    moddedTrack.BnkFilePath = slot.Track.BnkFilePath;
-                    moddedTracks.Add(moddedTrack);
-                }
-            }
-
-            return moddedTracks;
-        }
-
-        /// <summary>
-        /// The ambient fragment hierarchy under a vanilla faction container: the Switch container on
-        /// the musical key Group, and the Sounds and any container under it. All new ids - it is only
-        /// the faction container above them that clashes with vanilla.
-        /// </summary>
-        private List<HircItem> GenerateAmsFragmentHircs(SoundBank soundBank, IEnumerable<AmsFragment> amsFragments)
-        {
-            var hircItems = new List<HircItem>();
-            var lookup = new AudioRepositorySwitchLookup(_audioRepository);
-
-            foreach (var amsFragment in amsFragments)
-            {
-                var vanillaContainer = GetVanillaAmsFragmentContainer(amsFragment.FactionSwitchContainerId);
-                if (vanillaContainer == null)
-                    continue;
-
-                foreach (var soundId in amsFragment.SoundIds)
-                {
-                    var sound = soundBank.GetSound(soundId);
-                    if (sound != null)
-                        hircItems.Add(_hircGeneratorServiceFactory.GenerateHirc(sound, soundBank));
-                }
-
-                foreach (var container in amsFragment.ContainerIds.Select(soundBank.GetRandomSequenceContainer).Where(container => container != null))
-                    hircItems.Add(_hircGeneratorServiceFactory.GenerateHirc(container, soundBank));
-
-                foreach (var callResponse in amsFragment.CallResponseSwitches)
-                {
-                    hircItems.Add(_amsFragmentMergeService.CreateCallResponseSwitchContainer(
-                        vanillaContainer, lookup, callResponse.Id, amsFragment.KeySwitchContainerId, callResponse.CallTargetHircId, callResponse.ResponseTargetHircId));
-                }
-
-                // The game's key values come in threes, C_01 to C_03; each is pointed at its key's switch.
-                var switchesByKey = amsFragment.Keys.ToDictionary(key => key.Key, key => key.CallResponseSwitchId, StringComparer.OrdinalIgnoreCase);
-                hircItems.Add(_amsFragmentMergeService.CreateKeySwitchContainer(
-                    vanillaContainer, lookup, amsFragment.KeySwitchContainerId,
-                    keySwitchId => AmsMusicLayout.GetKey(_audioRepository.GetNameFromId(keySwitchId)) is string key && switchesByKey.TryGetValue(key, out var target) ? target : 0));
-            }
-
-            return hircItems;
-        }
-
-        /// <summary>
-        /// The vanilla ambient fragments containers re-emitted with this mod's cultures added. These
-        /// keep their vanilla ids, so like the Music Switch containers they replace vanilla's in the
-        /// .bnk they were read from.
-        /// </summary>
-        private List<CAkSwitchCntr_V136> GenerateModdedAmsFragmentContainers(SoundBank soundBank)
-        {
-            var moddedContainers = new List<CAkSwitchCntr_V136>();
-
-            foreach (var fragmentsByContainer in soundBank.AmsFragments.GroupBy(fragment => fragment.FactionSwitchContainerId))
-            {
-                var vanillaContainer = GetVanillaAmsFragmentContainer(fragmentsByContainer.Key);
-                if (vanillaContainer == null)
-                    continue;
-
-                var branches = fragmentsByContainer
-                    .Select(fragment => new AmsFragmentBranch(fragment.StateName, fragment.KeySwitchContainerId))
-                    .ToList();
-
-                var moddedContainer = _amsFragmentMergeService.AddCultures(vanillaContainer, branches);
-                moddedContainer.BnkFilePath = vanillaContainer.BnkFilePath;
-                moddedContainers.Add(moddedContainer);
-            }
-
-            return moddedContainers;
-        }
-
-        private CAkSwitchCntr_V136 GetVanillaAmsFragmentContainer(uint containerId)
-        {
-            var vanillaContainer = _audioRepository.GetHircs(containerId)
-                .OfType<CAkSwitchCntr_V136>()
-                .FirstOrDefault(container => container.IsCA);
-
-            if (vanillaContainer == null)
-                _logger.Here().Error(
-                    $"Switch container {containerId} was not found in the vanilla data, so its cultures cannot be merged");
-
-            return vanillaContainer;
-        }
-
-        /// <summary>The one lookup the fragment merge needs, so it does not take the whole
-        /// repository interface to read a sibling's musical keys.</summary>
-        private sealed class AudioRepositorySwitchLookup(IAudioRepository audioRepository) : IAudioRepositoryLookup
-        {
-            public CAkSwitchCntr_V136 FindSwitchContainer(uint id) =>
-                audioRepository.GetHircs(id).OfType<CAkSwitchCntr_V136>().FirstOrDefault();
-        }
-
-        /// <summary>
-        /// How long the segment above a switch track runs. Every vanilla pulse clip is trimmed to
-        /// this rather than played whole, because a clip running past the segment overlaps the next.
-        /// </summary>
-        private double GetSegmentDurationMs(CAkMusicTrack_V136 vanillaTrack)
-        {
-            var segment = _audioRepository.GetHircs(vanillaTrack.NodeBaseParams.DirectParentId)
-                .OfType<CAkMusicSegment_V136>()
-                .FirstOrDefault();
-
-            if (segment != null)
-                return segment.Duration;
-
-            _logger.Here().Warning(
-                $"Music Track {vanillaTrack.Id} has no parent segment, so its clips cannot be trimmed to one");
-            return double.MaxValue;
-        }
-
-        private static string GetSoundBankFilePath(string fileName, string language)
-        {
-            if (language == Wh3LanguageInformation.GetLanguageAsString(Wh3Language.Sfx))
-                return $"audio\\wwise\\{fileName}";
-
-            return $"audio\\wwise\\{language}\\{fileName}";
         }
 
         public void GenerateDialogueEventsForTestingSoundBank(SoundBank soundBank)

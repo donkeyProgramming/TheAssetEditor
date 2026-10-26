@@ -1,4 +1,4 @@
-using Editors.Audio.Shared.AudioProject;
+﻿using Editors.Audio.Shared.AudioProject;
 using Editors.Audio.Shared.AudioProject.Compiler;
 using Editors.Audio.Shared.AudioProject.Models;
 using Editors.Audio.Shared.GameInformation.Warhammer3;
@@ -64,10 +64,9 @@ namespace Test.Audio
             const string filePath = MusicAudioProjectService.ProjectFilePath;
             provider.GetRequiredService<IAudioProjectFileService>().Save(audioProject, Path.GetFileName(filePath), filePath);
             var compiledProject = audioProject.Clean();
-            provider.GetRequiredService<IAudioProjectCompilerService>().Compile(compiledProject, Path.GetFileName(filePath), filePath);
+            provider.GetRequiredService<IMusicProjectCompilerService>().Compile(compiledProject, Path.GetFileName(filePath));
 
-            var soundBank = compiledProject.SoundBanks.Single(bank => bank.ActionEvents.Count != 0);
-            uint SequenceFor(uint containerId, int nodeId) => soundBank.MusicRandomSequences
+            uint SequenceFor(uint containerId, int nodeId) => compiledProject.Music.RandomSequences
                 .Single(sequence => sequence.DirectParentId == containerId && sequence.TreeNodeId == nodeId).Id;
 
             var preBattleContainer = ShippedContainer(packFileService, PreBattleContainerId);
@@ -87,12 +86,12 @@ namespace Test.Audio
 
                 // The pre-battle sequence for the in-battle branch's root would never be reached there,
                 // so it is not shipped: each container carries what its tree reaches and nothing else.
-                Assert.That(soundBank.MusicRandomSequences.Any(sequence => sequence.DirectParentId == PreBattleContainerId && sequence.TreeNodeId == action), Is.False);
+                Assert.That(compiledProject.Music.RandomSequences.Any(sequence => sequence.DirectParentId == PreBattleContainerId && sequence.TreeNodeId == action), Is.False);
             });
 
-            foreach (var sequence in soundBank.MusicRandomSequences)
+            foreach (var sequence in compiledProject.Music.RandomSequences)
                 Console.WriteLine($"{Wh3MusicTreeLevelInformation.GetContainerName(sequence.DirectParentId)}: node {sequence.TreeNodeId} -> sequence {sequence.Id}, " +
-                    $"{string.Join(", ", soundBank.GetMusicSegments(sequence).Select(segment => compiledProject.GetAudioFile(segment.SourceId)?.WavPackFileName))}");
+                    $"{string.Join(", ", compiledProject.Music.GetSegments(sequence).Select(segment => compiledProject.GetAudioFile(segment.SourceId)?.WavPackFileName))}");
         }
 
         /// <summary>
@@ -151,13 +150,12 @@ namespace Test.Audio
             const string filePath = MusicAudioProjectService.ProjectFilePath;
             provider.GetRequiredService<IAudioProjectFileService>().Save(audioProject, Path.GetFileName(filePath), filePath);
             var compiledProject = audioProject.Clean();
-            provider.GetRequiredService<IAudioProjectCompilerService>().Compile(compiledProject, Path.GetFileName(filePath), filePath);
+            provider.GetRequiredService<IMusicProjectCompilerService>().Compile(compiledProject, Path.GetFileName(filePath));
 
-            var soundBank = compiledProject.SoundBanks.Single(bank => bank.ActionEvents.Count != 0);
             var everywhereId = compiledProject.GetAudioFile(everywhereWav).Id;
             var specialId = compiledProject.GetAudioFile(specialWav).Id;
             var themeRoot = service.GetTree(audioProject, themeEvent).Root.Id;
-            uint SequenceFor(uint containerId, int nodeId) => soundBank.MusicRandomSequences
+            uint SequenceFor(uint containerId, int nodeId) => compiledProject.Music.RandomSequences
                 .Single(sequence => sequence.DirectParentId == containerId && sequence.TreeNodeId == nodeId).Id;
 
             var shipped = ShippedHircs(packFileService);
@@ -165,7 +163,7 @@ namespace Test.Audio
             var resolutionContainer = shipped.OfType<CAkMusicSwitchCntr_V136>().Single(hirc => hirc.Id == Wh3MusicHierarchyInformation.CampaignResolutionMusicSwitchContainerId);
 
             // The fragments, walked from the culture's key switch down to each Sound's source.
-            var amsFragment = soundBank.AmsFragments.Single();
+            var amsFragment = compiledProject.Music.AmsFragments.Single();
             var keySwitch = shipped.OfType<CAkSwitchCntr_V136>().Single(hirc => hirc.Id == amsFragment.KeySwitchContainerId);
             var audioRepository = provider.GetRequiredService<Editors.Audio.Shared.Storage.IAudioRepository>();
             List<uint> SourcesFor(string keyName, string callOrResponse)

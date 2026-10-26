@@ -27,15 +27,11 @@ namespace Editors.Audio.Shared.AudioProject
     /// container and no audio file. What makes a State audible is the music hierarchy branching on
     /// it, which lives in the game's own banks; the event's whole job is to select a branch. So the
     /// audio given to an event becomes the branch its State selects rather than something the event
-    /// plays. See <see cref="Wh3MusicHierarchyInformation.GetMusicSwitchContainerIds"/> for which
-    /// State Groups can carry audio of their own.
+    /// plays. See <see cref="Wh3MusicHierarchyInformation.CanCarryOwnAudio"/> for which State Groups
+    /// can carry audio of their own.
     ///
-    /// One project is meant to hold every culture: it is kept by whoever maintains the audio mixer
-    /// mod, who adds a culture when its mod's team asks and supplies their wavs. Compiling it
-    /// rebuilds the scripts from vanilla with every culture in it - see
-    /// <see cref="IMusicScriptBuildService"/>.
-    ///
-    /// Everything here works on a project in memory; loading and saving it is the caller's.
+    /// One project holds every culture (see <see cref="MusicCulture"/>). Everything here works on
+    /// a project in memory; loading and saving it is the caller's.
     /// </summary>
     public interface IMusicAudioProjectService
     {
@@ -126,7 +122,7 @@ namespace Editors.Audio.Shared.AudioProject
         public AudioProjectFile CreateNew()
         {
             var audioProject = AudioProjectFile.CreateNew(Language, ProjectName);
-            audioProject.MusicCultures = [];
+            audioProject.Music = new MusicProjectData();
             return audioProject;
         }
 
@@ -143,12 +139,12 @@ namespace Editors.Audio.Shared.AudioProject
             EnsureVanillaIds();
 
             // Kept in its place, since the scripts are built with the cultures in project order.
-            audioProject.MusicCultures ??= [];
-            var index = audioProject.MusicCultures.FindIndex(other =>
+            var cultures = Music(audioProject).Cultures;
+            var index = cultures.FindIndex(other =>
                 IsSameCulture(other, musicCulture) || (replacing != null && IsSameCulture(other, replacing)));
-            var replacedCount = audioProject.MusicCultures.RemoveAll(other =>
+            var replacedCount = cultures.RemoveAll(other =>
                 IsSameCulture(other, musicCulture) || (replacing != null && IsSameCulture(other, replacing)));
-            audioProject.MusicCultures.Insert(index < 0 ? audioProject.MusicCultures.Count : index, musicCulture);
+            cultures.Insert(index < 0 ? cultures.Count : index, musicCulture);
 
             // Removed only after the new entry is in, so an event both versions need is kept along
             // with any audio it was given.
@@ -190,7 +186,7 @@ namespace Editors.Audio.Shared.AudioProject
             ArgumentNullException.ThrowIfNull(audioProject);
             ArgumentNullException.ThrowIfNull(musicCulture);
 
-            audioProject.MusicCultures?.RemoveAll(other => IsSameCulture(other, musicCulture));
+            audioProject.Music?.Cultures.RemoveAll(other => IsSameCulture(other, musicCulture));
             RemoveEventsNoCultureNeeds(audioProject);
         }
 
@@ -236,11 +232,11 @@ namespace Editors.Audio.Shared.AudioProject
             var stateGroupName = setStateAction.StateGroupName;
             var stateName = setStateAction.StateName;
 
-            var tree = soundBank.MusicTrees.FirstOrDefault(musicTree => IsFor(musicTree.StateGroupName, musicTree.StateName, stateGroupName, stateName));
+            var tree = Music(audioProject).Trees.FirstOrDefault(musicTree => IsFor(musicTree.StateGroupName, musicTree.StateName, stateGroupName, stateName));
             if (tree == null)
             {
                 tree = new MusicTree { StateGroupName = stateGroupName, StateName = stateName };
-                soundBank.MusicTrees.Add(tree);
+                Music(audioProject).Trees.Add(tree);
             }
 
             return tree;
@@ -371,8 +367,8 @@ namespace Editors.Audio.Shared.AudioProject
 
                     var branch = _musicHierarchyFactory.CreateMusicBranch(usedHircIds, containerId, tree.StateGroupName, tree.StateName, audioFiles, soundBank.Language);
                     branch.MusicRandomSequence.TreeNodeId = node.Id;
-                    soundBank.MusicRandomSequences.Add(branch.MusicRandomSequence);
-                    soundBank.MusicSegments.AddRange(branch.MusicSegments);
+                    Music(audioProject).RandomSequences.Add(branch.MusicRandomSequence);
+                    Music(audioProject).Segments.AddRange(branch.MusicSegments);
                 }
 
                 foreach (var audioFile in audioFiles)
@@ -441,6 +437,9 @@ namespace Editors.Audio.Shared.AudioProject
                 .ToList();
         }
 
+        // A project opened from an older or hand-made file may not have one yet.
+        private static MusicProjectData Music(AudioProjectFile audioProject) => audioProject.Music ??= new MusicProjectData();
+
         private static SoundBank GetMusicSoundBank(AudioProjectFile audioProject) =>
             audioProject.SoundBanks.FirstOrDefault(soundBank => soundBank.GameSoundBank == Wh3SoundBank.GlobalMusic);
 
@@ -490,7 +489,7 @@ namespace Editors.Audio.Shared.AudioProject
             if (soundBank == null)
                 return;
 
-            var neededEventNames = (audioProject.MusicCultures ?? [])
+            var neededEventNames = (audioProject.Music?.Cultures ?? [])
                 .SelectMany(musicCulture => musicCulture.GetOwnEventNames())
                 .ToHashSet(StringComparer.OrdinalIgnoreCase);
 
@@ -511,7 +510,7 @@ namespace Editors.Audio.Shared.AudioProject
                         continue;
 
                     RemoveMusicBranch(audioProject, soundBank, setStateAction.StateGroupName, setStateAction.StateName);
-                    soundBank.MusicTrees.RemoveAll(tree => IsFor(tree.StateGroupName, tree.StateName, setStateAction.StateGroupName, setStateAction.StateName));
+                    Music(audioProject).Trees.RemoveAll(tree => IsFor(tree.StateGroupName, tree.StateName, setStateAction.StateGroupName, setStateAction.StateName));
                     RemoveStateFromStateGroups(audioProject, soundBank, setStateAction.StateGroupName, setStateAction.StateName);
                 }
             }
@@ -527,7 +526,7 @@ namespace Editors.Audio.Shared.AudioProject
         /// <summary>
         /// A pulse's clips: every wav anywhere in its tree, once. Each vanilla pulse track is one key and
         /// one variation, and the compile asks the tree which node plays in each and hands the track one
-        /// of that node's wavs - see <see cref="Wwise.Generators.SoundBankGeneratorService"/>.
+        /// of that node's wavs - see <see cref="Wwise.Generators.MusicSoundBankGeneratorService"/>.
         /// </summary>
         private static void RegenerateAmsPulse(AudioProjectFile audioProject, SoundBank soundBank, MusicTree tree, Func<MusicTreeNode, List<AudioFile>> audioFilesOf)
         {
@@ -542,7 +541,7 @@ namespace Editors.Audio.Shared.AudioProject
                 AddAudioFile(audioProject, audioFile);
             }
 
-            soundBank.AmsPulses.Add(amsPulse);
+            Music(audioProject).AmsPulses.Add(amsPulse);
         }
 
         /// <summary>
@@ -628,16 +627,16 @@ namespace Editors.Audio.Shared.AudioProject
             }
 
             if (amsFragment.Keys.Count != 0)
-                soundBank.AmsFragments.Add(amsFragment);
+                Music(audioProject).AmsFragments.Add(amsFragment);
         }
 
         /// <summary>Whatever the State selects, in every container that branches on it, and any
         /// audio file nothing else in the project plays.</summary>
         private static void RemoveMusicBranch(AudioProjectFile audioProject, SoundBank soundBank, string stateGroupName, string stateName)
         {
-            soundBank.AmsPulses.RemoveAll(amsPulse => IsFor(amsPulse.StateGroupName, amsPulse.StateName, stateGroupName, stateName));
+            Music(audioProject).AmsPulses.RemoveAll(amsPulse => IsFor(amsPulse.StateGroupName, amsPulse.StateName, stateGroupName, stateName));
 
-            foreach (var amsFragment in soundBank.AmsFragments.Where(fragment => IsFor(fragment.StateGroupName, fragment.StateName, stateGroupName, stateName)).ToList())
+            foreach (var amsFragment in Music(audioProject).AmsFragments.Where(fragment => IsFor(fragment.StateGroupName, fragment.StateName, stateGroupName, stateName)).ToList())
             {
                 foreach (var sound in amsFragment.SoundIds.Select(soundBank.GetSound).Where(sound => sound != null))
                 {
@@ -648,15 +647,15 @@ namespace Editors.Audio.Shared.AudioProject
                 foreach (var container in amsFragment.ContainerIds.Select(soundBank.GetRandomSequenceContainer).Where(container => container != null))
                     soundBank.RandomSequenceContainers.Remove(container);
 
-                soundBank.AmsFragments.Remove(amsFragment);
+                Music(audioProject).AmsFragments.Remove(amsFragment);
             }
 
-            foreach (var musicRandomSequence in soundBank.MusicRandomSequences.Where(randomSequence => IsFor(randomSequence.StateGroupName, randomSequence.StateName, stateGroupName, stateName)).ToList())
+            foreach (var musicRandomSequence in Music(audioProject).RandomSequences.Where(randomSequence => IsFor(randomSequence.StateGroupName, randomSequence.StateName, stateGroupName, stateName)).ToList())
             {
-                foreach (var musicSegment in soundBank.GetMusicSegments(musicRandomSequence))
-                    soundBank.MusicSegments.Remove(musicSegment);
+                foreach (var musicSegment in Music(audioProject).GetSegments(musicRandomSequence))
+                    Music(audioProject).Segments.Remove(musicSegment);
 
-                soundBank.MusicRandomSequences.Remove(musicRandomSequence);
+                Music(audioProject).RandomSequences.Remove(musicRandomSequence);
             }
 
             RemoveUnplayedAudioFiles(audioProject);
@@ -664,10 +663,7 @@ namespace Editors.Audio.Shared.AudioProject
 
         private static void RemoveUnplayedAudioFiles(AudioProjectFile audioProject)
         {
-            var playedSourceIds = audioProject.SoundBanks
-                .SelectMany(soundBank => soundBank.MusicSegments.Select(musicSegment => musicSegment.SourceId)
-                    .Concat(soundBank.AmsPulses.SelectMany(amsPulse => amsPulse.Clips).Select(clip => clip.SourceId)))
-                .ToHashSet();
+            var playedSourceIds = Music(audioProject).GetDirectSourceIds().ToHashSet();
 
             audioProject.AudioFiles.RemoveAll(audioFile => audioFile.Sounds.Count == 0 && !playedSourceIds.Contains(audioFile.Id));
         }
@@ -725,11 +721,12 @@ namespace Editors.Audio.Shared.AudioProject
         }
 
         /// <summary>The same set <see cref="IdGenerator.GetUsedHircIds"/> builds, from the vanilla
-        /// ids fetched once rather than every time.</summary>
+        /// ids fetched once rather than every time, plus the music's own.</summary>
         private HashSet<uint> GetUsedHircIds(AudioProjectFile audioProject)
         {
             var usedHircIds = new HashSet<uint>(_vanillaHircIds);
             usedHircIds.UnionWith(audioProject.GetGeneratableItemIds());
+            usedHircIds.UnionWith(Music(audioProject).GetUsedHircIds());
             return usedHircIds;
         }
 

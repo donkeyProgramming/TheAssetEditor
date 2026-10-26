@@ -50,12 +50,6 @@ namespace Editors.Audio.Shared.Wwise.Generators
             instance.RegisterGenerator(AkBkHircType.Action, () => new ActionHircGenerator_V136());
             instance.RegisterGenerator(AkBkHircType.Event, () => new CAkEventGenerator_V136());
             instance.RegisterGenerator(AkBkHircType.Dialogue_Event, () => new CAkDialogueEventGenerator_V136());
-            instance.RegisterGenerator(AkBkHircType.Music_Segment, () => new CAkMusicSegmentGenerator_V136());
-            instance.RegisterGenerator(AkBkHircType.Music_Random_Sequence, () => new CAkMusicRanSeqCntrGenerator_V136());
-
-            // Music_Track is deliberately absent. The factory dispatches on the audio project item's
-            // HircType, and a track has no item of its own - it is generated from the same
-            // MusicSegment as the segment itself, so its generator is called directly.
             return instance;
         }
     }

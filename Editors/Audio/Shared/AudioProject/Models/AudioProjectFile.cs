@@ -14,9 +14,8 @@ namespace Editors.Audio.Shared.AudioProject.Models
         public List<StateGroup> StateGroups { get; set; } = [];
         public List<AudioFile> AudioFiles { get; set; } = [];
 
-        /// <summary>The cultures a music project wires into the music scripts. Null rather than
-        /// empty for any other project, so it is left out of the .aproj.</summary>
-        public List<MusicCulture> MusicCultures { get; set; }
+        /// <summary>Only set in a music project (.mproj); null, and so not written, in an .aproj.</summary>
+        public MusicProjectData Music { get; set; }
 
         public static AudioProjectFile CreateNew(string language, string audioProjectNameWithoutExtension)
         {
@@ -111,7 +110,7 @@ namespace Editors.Audio.Shared.AudioProject.Models
                 .ToList();
 
             var clean = CreateFromExisting(Language, cleanSoundBanks, cleanStateGroups, AudioFiles);
-            clean.MusicCultures = MusicCultures;
+            clean.Music = Music?.Clean();
             return clean;
         }
 
@@ -209,26 +208,7 @@ namespace Editors.Audio.Shared.AudioProject.Models
             return audioFiles;
         }
 
-        public HashSet<uint> GetGeneratableItemIds()
-        {
-            var generatableItemIds = GetGeneratableItems().Select(item => item.Id).ToHashSet();
-
-            // A Music Track is generated from its segment rather than being an item in its own
-            // right, so its id is not in the item list - but it is just as much in use as the
-            // segment's, and reusing it would put two hircs in the bank under one id.
-            generatableItemIds.UnionWith(SoundBanks
-                .SelectMany(soundBank => soundBank.MusicSegments)
-                .Select(musicSegment => musicSegment.TrackId));
-
-            // The same for the fragment switches, which are built at compile time from these ids.
-            foreach (var amsFragment in SoundBanks.SelectMany(soundBank => soundBank.AmsFragments))
-            {
-                generatableItemIds.Add(amsFragment.KeySwitchContainerId);
-                generatableItemIds.UnionWith(amsFragment.CallResponseSwitches.Select(callResponse => callResponse.Id));
-            }
-
-            return generatableItemIds;
-        }
+        public HashSet<uint> GetGeneratableItemIds() => GetGeneratableItems().Select(item => item.Id).ToHashSet();
 
         public List<AudioProjectItem> GetGeneratableItems()
         {
@@ -240,7 +220,6 @@ namespace Editors.Audio.Shared.AudioProject.Models
                 generatableItems.AddRange(GetSoundBankGeneratableItems(soundBank, addedAudioProjectItemIds));
                 generatableItems.AddRange(GetActionEventGeneratableItems(soundBank, addedAudioProjectItemIds));
                 generatableItems.AddRange(GetDialogueEventGeneratableItems(soundBank, addedAudioProjectItemIds));
-                generatableItems.AddRange(GetMusicGeneratableItems(soundBank, addedAudioProjectItemIds));
             }
 
             return generatableItems;
@@ -284,27 +263,6 @@ namespace Editors.Audio.Shared.AudioProject.Models
 
             if (action.TargetHircTypeIsRandomSequenceContainer())
                 audioProjectItems.AddRange(GetRandomSequenceContainerTargetGeneratableItems(soundBank, action.TargetHircId, addedAudioProjectItemIds));
-
-            return audioProjectItems;
-        }
-
-        // Music is not reached from an Event the way everything else here is - the decision tree
-        // points at the random sequence - so it is walked from the SoundBank's own lists instead.
-        private static List<AudioProjectItem> GetMusicGeneratableItems(SoundBank soundBank, HashSet<uint> addedAudioProjectItemIds)
-        {
-            var audioProjectItems = new List<AudioProjectItem>();
-
-            foreach (var musicRandomSequence in soundBank.MusicRandomSequences)
-            {
-                if (addedAudioProjectItemIds.Add(musicRandomSequence.Id))
-                    audioProjectItems.Add(musicRandomSequence);
-            }
-
-            foreach (var musicSegment in soundBank.MusicSegments)
-            {
-                if (addedAudioProjectItemIds.Add(musicSegment.Id))
-                    audioProjectItems.Add(musicSegment);
-            }
 
             return audioProjectItems;
         }

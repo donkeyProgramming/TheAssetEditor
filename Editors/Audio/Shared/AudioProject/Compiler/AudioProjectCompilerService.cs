@@ -7,7 +7,6 @@ using Editors.Audio.Shared.Storage;
 using Editors.Audio.Shared.Wwise.Generators;
 using Shared.Core.Misc;
 using Shared.GameFormats.Wwise;
-using Shared.GameFormats.Wwise.Wem.V132;
 
 namespace Editors.Audio.Shared.AudioProject.Compiler
 {
@@ -20,28 +19,17 @@ namespace Editors.Audio.Shared.AudioProject.Compiler
         ISoundBankGeneratorService soundBankGeneratorService,
         IWemGeneratorService wemGeneratorService,
         IDatGeneratorService datGeneratorService,
-        IAudioRepository audioRepository,
-        IMusicScriptBuildService musicScriptBuildService) : IAudioProjectCompilerService
+        IAudioRepository audioRepository) : IAudioProjectCompilerService
     {
         private readonly ISoundBankGeneratorService _soundBankGeneratorService = soundBankGeneratorService;
         private readonly IWemGeneratorService _wemGeneratorService = wemGeneratorService;
         private readonly IDatGeneratorService _datGeneratorService = datGeneratorService;
         private readonly IAudioRepository _audioRepository = audioRepository;
-        private readonly IMusicScriptBuildService _musicScriptBuildService = musicScriptBuildService;
 
         private readonly ILogger _logger = Logging.Create<AudioProjectCompilerService>();
 
         public void Compile(AudioProjectFile audioProject, string audioProjectFileName, string audioProjectFilePath)
         {
-            // Ahead of the check below: a culture that only borrows existing audio has no
-            // SoundBank of its own but still has to be wired into the scripts.
-            if (audioProject.MusicCultures is { Count: > 0 })
-            {
-                var problems = _musicScriptBuildService.BuildAndSave(audioProject.MusicCultures);
-                if (problems.Count != 0)
-                    throw new InvalidOperationException("The music scripts could not be built:\n  " + string.Join("\n  ", problems));
-            }
-
             if (audioProject.SoundBanks.Count == 0)
                 return;
 
@@ -84,9 +72,6 @@ namespace Editors.Audio.Shared.AudioProject.Compiler
                 else
                     soundBank.FilePath = $"audio\\wwise\\{soundBank.Language}\\{soundBank.FileName}";
 
-                // Dialogue Events re-emit hircs that already exist in vanilla, so they need somewhere
-                // to put them other than the .bnk the modder keeps. Music does too, but ships them
-                // spliced into the vanilla .bnks under vanilla's own names, so it needs neither name.
                 if (soundBank.DialogueEvents.Count != 0)
                 {
                     // In WH3 .bnk files are loaded in descending name order. When a .bnk is loaded it overrides hircs with the same ID in .bnks loaded
@@ -121,27 +106,6 @@ namespace Editors.Audio.Shared.AudioProject.Compiler
 
                 if (soundBank.DialogueEvents.Count != 0)
                     SetDialogueEventData(audioProject, audioFiles, sounds, soundBank);
-
-                SetMusicData(audioProject, audioFiles, soundBank);
-            }
-        }
-
-        // Music segments and pulse clips carry their audio directly rather than through a Sound, so
-        // they need the same wem paths setting but have no Sound to add alongside. Battle culture
-        // music has a segment per container over the same audio, which only needs encoding once.
-        private static void SetMusicData(AudioProjectFile audioProject, List<AudioFile> audioFiles, SoundBank soundBank)
-        {
-            var sourceIds = soundBank.MusicSegments.Select(musicSegment => musicSegment.SourceId)
-                .Concat(soundBank.AmsPulses.SelectMany(amsPulse => amsPulse.Clips).Select(clip => clip.SourceId));
-
-            foreach (var sourceId in sourceIds)
-            {
-                var audioFile = audioProject.GetAudioFile(sourceId);
-                if (audioFile == null || audioFiles.Contains(audioFile))
-                    continue;
-
-                SetSoundData(audioFile, soundBank);
-                audioFiles.Add(audioFile);
             }
         }
 
@@ -238,48 +202,7 @@ namespace Editors.Audio.Shared.AudioProject.Compiler
                 _wemGeneratorService.GenerateWems(audioFiles);
                 _wemGeneratorService.SaveWemsToPack(audioFiles);
                 UpdateSoundInMemoryMediaSize(audioProject, sounds);
-                UpdateMusicAudioData(audioProject);
             }
-        }
-
-        /// <summary>
-        /// A music segment's or pulse clip's duration has to match its audio: it sets the segment
-        /// length, the exit cue position and the clip's source duration, and a wrong value
-        /// desynchronises the music from the file rather than failing. The encoded wem is the
-        /// authority - it is what ships - so the sample count and rate are read back out of it
-        /// rather than off the source wav.
-        /// </summary>
-        private static void UpdateMusicAudioData(AudioProjectFile audioProject)
-        {
-            foreach (var soundBank in audioProject.SoundBanks)
-            {
-                foreach (var musicSegment in soundBank.MusicSegments)
-                {
-                    if (TryReadWemAudioData(audioProject, musicSegment.SourceId, out var size, out var durationMs))
-                        (musicSegment.InMemoryMediaSize, musicSegment.DurationMs) = (size, durationMs);
-                }
-
-                foreach (var clip in soundBank.AmsPulses.SelectMany(amsPulse => amsPulse.Clips))
-                {
-                    if (TryReadWemAudioData(audioProject, clip.SourceId, out var size, out var durationMs))
-                        (clip.InMemoryMediaSize, clip.DurationMs) = (size, durationMs);
-                }
-            }
-        }
-
-        private static bool TryReadWemAudioData(AudioProjectFile audioProject, uint sourceId, out long size, out double durationMs)
-        {
-            (size, durationMs) = (0, 0);
-            var audioFile = audioProject.GetAudioFile(sourceId);
-            if (audioFile == null || !File.Exists(audioFile.WemDiskFilePath))
-                return false;
-
-            var wemBytes = File.ReadAllBytes(audioFile.WemDiskFilePath);
-            var wemFile = WemFile.CreateFromWemBytes(wemBytes);
-
-            size = wemBytes.Length;
-            durationMs = wemFile.FmtChunk.SampleCount / (double)wemFile.FmtChunk.SampleRate * 1000;
-            return true;
         }
 
         private static void UpdateSoundInMemoryMediaSize(AudioProjectFile audioProject, List<Sound> sounds)
@@ -297,15 +220,6 @@ namespace Editors.Audio.Shared.AudioProject.Compiler
         {
             foreach (var soundBank in audioProject.SoundBanks)
             {
-                // Music only works spliced into the vanilla .bnks themselves, so a music bank compiles
-                // to those and nothing else: the mod's own .bnk would define every one of the same
-                // hircs a second time. See GenerateMusicReplacementSoundBanks.
-                if (soundBank.MusicRandomSequences.Count != 0 || soundBank.AmsPulses.Count != 0 || soundBank.AmsFragments.Count != 0)
-                {
-                    _soundBankGeneratorService.GenerateMusicReplacementSoundBanks(soundBank);
-                    continue;
-                }
-
                 if (soundBank.ActionEvents.Count != 0 || soundBank.DialogueEvents.Count != 0)
                 {
                     _logger.Here().Information($"Generating SoundBank {soundBank.FilePath}");

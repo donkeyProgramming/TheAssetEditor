@@ -1,4 +1,4 @@
-using Editors.Audio.Shared.AudioProject;
+﻿using Editors.Audio.Shared.AudioProject;
 using Editors.Audio.Shared.AudioProject.Compiler;
 using Editors.Audio.Shared.AudioProject.Models;
 using Editors.Audio.Shared.GameInformation.Warhammer3;
@@ -66,6 +66,28 @@ namespace Test.Audio
             Assert.That(secondBuild, Is.EqualTo(firstBuild));
         }
 
+        // Music lives on the project's own Music object, so an Audio Editor project saves exactly
+        // what it did before music existed.
+        [Test]
+        public void ADialogueProjectSavesNoMusicFields()
+        {
+            const string filePath = @"audio\audio_projects\dialogue.aproj";
+            var audioProject = AudioProjectFile.CreateNew("english(uk)", "dialogue");
+            var playAction = Editors.Audio.Shared.AudioProject.Models.Action.CreatePlay(1, global::Shared.GameFormats.Wwise.Enums.AkBkHircType.Sound, 2, 3);
+            audioProject.SoundBanks[0].ActionEvents.Add(new ActionEvent(10, "Play_dialogue", [playAction], Wh3ActionEventType.BattleAbilities));
+
+            _provider.GetRequiredService<IAudioProjectFileService>().Save(audioProject, Path.GetFileName(filePath), filePath);
+            var json = System.Text.Encoding.UTF8.GetString(_packFileService.FindFile(filePath)!.DataSource.ReadData());
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(json, Does.Contain("Play_dialogue"), "the project was not saved");
+                Assert.That(json, Does.Not.Contain("Music"));
+                Assert.That(json, Does.Not.Contain("Ams"));
+                Assert.That(json, Does.Not.Contain("StateGroupId"));
+            });
+        }
+
         [Test]
         public void EveryCultureIsKeptInTheOneProject()
         {
@@ -78,7 +100,7 @@ namespace Test.Audio
             var reloaded = SaveAndReload(audioProject);
             Assert.Multiple(() =>
             {
-                Assert.That(reloaded.MusicCultures.Select(culture => culture.AudioState), Is.EqualTo(new[] { "First_Culture", "Second_Culture" }));
+                Assert.That(reloaded.Music.Cultures.Select(culture => culture.AudioState), Is.EqualTo(new[] { "First_Culture", "Second_Culture" }));
                 Assert.That(reloaded.GetActionEvents().Select(actionEvent => actionEvent.Name),
                     Is.EquivalentTo(new[] { "music_b_faction_first_culture", "music_b_faction_second_culture" }));
             });
@@ -100,7 +122,7 @@ namespace Test.Audio
             Assert.Multiple(() =>
             {
                 Assert.That(result.CreatedEvents, Is.Empty);
-                Assert.That(audioProject.MusicCultures.Select(culture => culture.AudioState), Is.EqualTo(new[] { "First_Culture", "Second_Culture" }));
+                Assert.That(audioProject.Music.Cultures.Select(culture => culture.AudioState), Is.EqualTo(new[] { "First_Culture", "Second_Culture" }));
                 Assert.That(audioProject.GetActionEvents().Select(actionEvent => actionEvent.Name),
                     Is.EquivalentTo(new[] { "music_b_faction_first_culture", "music_b_faction_second_culture" }));
             });
@@ -150,16 +172,16 @@ namespace Test.Audio
             service.AddCulture(audioProject, culture);
             service.SetAudio(audioProject, "music_b_faction_first_culture", [FirstWav]);
             var soundBank = audioProject.SoundBanks.Single(bank => bank.ActionEvents.Count != 0);
-            Assert.That(soundBank.MusicRandomSequences, Has.Count.GreaterThan(1), "expected a branch per battle container");
+            Assert.That(audioProject.Music.RandomSequences, Has.Count.GreaterThan(1), "expected a branch per battle container");
 
             service.RemoveCulture(audioProject, culture);
 
             Assert.Multiple(() =>
             {
-                Assert.That(audioProject.MusicCultures, Is.Empty);
+                Assert.That(audioProject.Music.Cultures, Is.Empty);
                 Assert.That(soundBank.ActionEvents, Is.Empty);
-                Assert.That(soundBank.MusicRandomSequences, Is.Empty);
-                Assert.That(soundBank.MusicSegments, Is.Empty);
+                Assert.That(audioProject.Music.RandomSequences, Is.Empty);
+                Assert.That(audioProject.Music.Segments, Is.Empty);
                 Assert.That(audioProject.AudioFiles, Is.Empty);
                 Assert.That(audioProject.StateGroups.SelectMany(stateGroup => stateGroup.States), Is.Empty);
             });
@@ -182,7 +204,7 @@ namespace Test.Audio
             var branchId = service.AddBranch(audioProject, BattleEvent, tree.Root.Id, Wh3MusicTreeLevelInformation.ContainerLevel, PreBattleContainerId.ToString());
             service.SetNodeAudio(audioProject, BattleEvent, branchId, [SecondWav]);
 
-            var sequences = MusicSoundBank(audioProject).MusicRandomSequences;
+            var sequences = audioProject.Music.RandomSequences;
             Assert.Multiple(() =>
             {
                 Assert.That(sequences.Where(sequence => sequence.DirectParentId == PreBattleContainerId).Select(sequence => sequence.TreeNodeId),
@@ -206,7 +228,7 @@ namespace Test.Audio
             Assert.Multiple(() =>
             {
                 Assert.That(tree.Root.SplitBy, Is.Null);
-                Assert.That(MusicSoundBank(audioProject).MusicRandomSequences.Select(sequence => sequence.TreeNodeId).Distinct(), Is.EqualTo(new[] { tree.Root.Id }));
+                Assert.That(audioProject.Music.RandomSequences.Select(sequence => sequence.TreeNodeId).Distinct(), Is.EqualTo(new[] { tree.Root.Id }));
                 Assert.That(audioProject.AudioFiles.Select(audioFile => audioFile.WavPackFilePath), Is.EqualTo(new[] { FirstWav }));
             });
         }
@@ -245,7 +267,7 @@ namespace Test.Audio
                 Assert.That(reloadedRoot.SplitBy, Is.EqualTo("Battle_Result_State"));
                 Assert.That(reloadedRoot.Branches.Select(branch => branch.Value), Is.EqualTo(new[] { "win", null }));
                 Assert.That(service.GetNodeAudio(reloaded, BattleEvent, win).Select(audioFile => audioFile.WavPackFilePath), Is.EqualTo(new[] { FirstWav }));
-                Assert.That(MusicSoundBank(reloaded).MusicRandomSequences.Select(sequence => sequence.TreeNodeId).Distinct(), Is.EqualTo(new[] { win }));
+                Assert.That(reloaded.Music.RandomSequences.Select(sequence => sequence.TreeNodeId).Distinct(), Is.EqualTo(new[] { win }));
             });
         }
 
@@ -256,9 +278,6 @@ namespace Test.Audio
             service.AddCulture(audioProject, BattleCulture("First_Culture", "first_sc"));
             return (service, audioProject);
         }
-
-        static SoundBank MusicSoundBank(AudioProjectFile audioProject) =>
-            audioProject.SoundBanks.Single(soundBank => soundBank.ActionEvents.Count != 0);
 
         IMusicScriptBuildService Build() => _provider.GetRequiredService<IMusicScriptBuildService>();
 

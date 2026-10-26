@@ -34,7 +34,7 @@ namespace Editors.MusicProjectEditor.ViewModels
         readonly IAudioProjectFileService _audioProjectFileService;
         readonly IMusicAudioProjectService _musicAudioProjectService;
         readonly IMusicScriptBuildService _musicScriptBuildService;
-        readonly IAudioProjectCompilerService _audioProjectCompilerService;
+        readonly IMusicProjectCompilerService _musicProjectCompilerService;
         readonly IMusicVanillaReferenceService _musicVanillaReferenceService;
         readonly IAudioRepository _audioRepository;
 
@@ -121,7 +121,7 @@ namespace Editors.MusicProjectEditor.ViewModels
             IAudioProjectFileService audioProjectFileService,
             IMusicAudioProjectService musicAudioProjectService,
             IMusicScriptBuildService musicScriptBuildService,
-            IAudioProjectCompilerService audioProjectCompilerService,
+            IMusicProjectCompilerService musicProjectCompilerService,
             IMusicVanillaReferenceService musicVanillaReferenceService,
             IAudioRepository audioRepository,
             WaveformVisualiserViewModel waveformVisualiserViewModel)
@@ -131,7 +131,7 @@ namespace Editors.MusicProjectEditor.ViewModels
             _audioProjectFileService = audioProjectFileService;
             _musicAudioProjectService = musicAudioProjectService;
             _musicScriptBuildService = musicScriptBuildService;
-            _audioProjectCompilerService = audioProjectCompilerService;
+            _musicProjectCompilerService = musicProjectCompilerService;
             _musicVanillaReferenceService = musicVanillaReferenceService;
             _audioRepository = audioRepository;
             WaveformVisualiserViewModel = waveformVisualiserViewModel;
@@ -148,7 +148,7 @@ namespace Editors.MusicProjectEditor.ViewModels
                 var audioProject = _audioProjectFileService.DeserialiseAudioProject(file);
                 CurrentFile = file;
                 Show(audioProject, _packFileService.GetFullPath(file));
-                StatusText = $"{audioProject.MusicCultures.Count} culture(s)";
+                StatusText = $"{(audioProject.Music?.Cultures.Count ?? 0)} culture(s)";
             }
             catch (Exception e)
             {
@@ -159,7 +159,7 @@ namespace Editors.MusicProjectEditor.ViewModels
 
         void Show(AudioProjectFile audioProject, string filePath)
         {
-            audioProject.MusicCultures ??= [];
+            audioProject.Music ??= new MusicProjectData();
             _audioProject = audioProject;
             _filePath = filePath;
 
@@ -253,7 +253,7 @@ namespace Editors.MusicProjectEditor.ViewModels
 
         void RunWizard(MusicCulture? editing)
         {
-            var otherCultures = _audioProject!.MusicCultures.Where(musicCulture => musicCulture != editing).ToList();
+            var otherCultures = _audioProject!.Music.Cultures.Where(musicCulture => musicCulture != editing).ToList();
             var build = _musicScriptBuildService.Build(otherCultures);
             if (build.Problems.Count != 0)
             {
@@ -380,7 +380,7 @@ namespace Editors.MusicProjectEditor.ViewModels
             try
             {
                 using (_dialogs.ShowWaitCursor())
-                    _audioProjectCompilerService.Compile(_audioProject.Clean(), Path.GetFileName(_filePath), _filePath);
+                    _musicProjectCompilerService.Compile(_audioProject.Clean(), Path.GetFileName(_filePath));
 
                 StatusText = $"Built {MusicScriptBuildService.BattleScriptPath}, {MusicScriptBuildService.CampaignScriptPath} " +
                              $"and the music banks into {_packFileService.GetEditablePack()!.Name}";
@@ -402,7 +402,7 @@ namespace Editors.MusicProjectEditor.ViewModels
             if (_audioProject == null)
                 return;
 
-            foreach (var musicCulture in _audioProject.MusicCultures)
+            foreach (var musicCulture in _audioProject.Music.Cultures)
             {
                 var events = musicCulture.Slots
                     .Select(slot => CreateEvent(musicCulture, slot))

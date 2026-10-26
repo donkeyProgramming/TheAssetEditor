@@ -130,6 +130,8 @@ namespace Editors.Audio
             serviceCollection.AddScoped<IAudioProjectCompilerService, AudioProjectCompilerService>();
             serviceCollection.AddScoped<ISoundBankGeneratorService, SoundBankGeneratorService>();
             serviceCollection.AddScoped<IMusicScriptBuildService, MusicScriptBuildService>();
+            serviceCollection.AddScoped<IMusicProjectCompilerService, MusicProjectCompilerService>();
+            serviceCollection.AddScoped<IMusicSoundBankGeneratorService, MusicSoundBankGeneratorService>();
             serviceCollection.AddScoped<IWemGeneratorService, WemGeneratorService>();
             serviceCollection.AddScoped<IMusicSwitchContainerMergeService, MusicSwitchContainerMergeService>();
             serviceCollection.AddScoped<IAmsPulseTrackMergeService, AmsPulseTrackMergeService>();

@@ -1,4 +1,4 @@
-using Editors.Audio.Shared.AudioProject;
+﻿using Editors.Audio.Shared.AudioProject;
 using Editors.Audio.Shared.AudioProject.Compiler;
 using Editors.Audio.Shared.AudioProject.Models;
 using Editors.Audio.Shared.GameInformation.Warhammer3;
@@ -124,7 +124,7 @@ namespace Test.Audio
             Assert.That(result.SkippedEvents, Is.Empty,
                 string.Join("; ", result.SkippedEvents.Select(skipped => $"{skipped.EventName}: {skipped.Reason}")));
             Assert.That(result.CreatedEvents, Is.EquivalentTo(wizard.EventsNeedingAudio));
-            Assert.That(audioProject.MusicCultures.Select(culture => culture.SubcultureKey), Is.EqualTo(new[] { SubcultureKey }));
+            Assert.That(audioProject.Music.Cultures.Select(culture => culture.SubcultureKey), Is.EqualTo(new[] { SubcultureKey }));
 
             return audioProject;
         }
@@ -161,8 +161,8 @@ namespace Test.Audio
 
             // The tool compiles the cleaned project, not the live one.
             var compiledProject = audioProject.Clean();
-            provider.GetRequiredService<IAudioProjectCompilerService>()
-                .Compile(compiledProject, Path.GetFileName(filePath), filePath);
+            provider.GetRequiredService<IMusicProjectCompilerService>()
+                .Compile(compiledProject, Path.GetFileName(filePath));
 
             return compiledProject;
         }
@@ -215,8 +215,8 @@ namespace Test.Audio
         static void AssertTheMergedContainersKeepVanilla(
             IPackFileService packFileService, IAudioRepository audioRepository, AudioProjectFile compiledProject)
         {
-            var musicSoundBank = compiledProject.SoundBanks.Single(soundBank => soundBank.MusicRandomSequences.Count != 0);
-            var containerIds = musicSoundBank.MusicRandomSequences
+            var music = compiledProject.Music;
+            var containerIds = music.RandomSequences
                 .Select(randomSequence => randomSequence.DirectParentId)
                 .Distinct()
                 .ToList();
@@ -230,7 +230,7 @@ namespace Test.Audio
 
             // Only the ids the mod invented are its own to place. Vanilla's children stay wherever
             // vanilla put them, so they are not something a testing .bnk has to carry.
-            var newHircIds = musicSoundBank.MusicRandomSequences
+            var newHircIds = music.RandomSequences
                 .Select(randomSequence => randomSequence.Id)
                 .ToHashSet();
 
@@ -321,7 +321,7 @@ namespace Test.Audio
         static void AssertThePulseTracksCarryTheNewCulture(
             IPackFileService packFileService, IAudioRepository audioRepository, AudioProjectFile compiledProject)
         {
-            var musicSoundBank = compiledProject.SoundBanks.Single(soundBank => soundBank.AmsPulses.Count != 0);
+            var music = compiledProject.Music;
             var stateId = WwiseHash.Compute(MusicalCulture);
 
             // Some tracks are defined in more than one vanilla .bnk, so each is looked up in the
@@ -336,7 +336,7 @@ namespace Test.Audio
 
             Assert.Multiple(() =>
             {
-                foreach (var amsPulse in musicSoundBank.AmsPulses)
+                foreach (var amsPulse in music.AmsPulses)
                 {
                     var vanillaTracks = audioRepository.GetVanillaAmsPulseTracks(amsPulse.StateGroupName);
                     Assert.That(vanillaTracks, Is.Not.Empty, $"no vanilla switch track reads {amsPulse.StateGroupName}");
@@ -376,8 +376,8 @@ namespace Test.Audio
         static void AssertTheFragmentsReachTheNewCulturesAudio(
             IPackFileService packFileService, IAudioRepository audioRepository, AudioProjectFile compiledProject)
         {
-            var musicSoundBank = compiledProject.SoundBanks.Single(soundBank => soundBank.AmsFragments.Count != 0);
-            var amsFragment = musicSoundBank.AmsFragments.Single();
+            var music = compiledProject.Music;
+            var amsFragment = music.AmsFragments.Single();
 
             var vanillaContainer = audioRepository.GetHircs(amsFragment.FactionSwitchContainerId)
                 .OfType<CAkSwitchCntr_V136>()
@@ -443,8 +443,17 @@ namespace Test.Audio
                 }
 
                 foreach (var soundId in amsFragment.SoundIds)
+                {
                     Assert.That(moddedHircs.Any(hirc => hirc.Id == soundId && hirc.HircType == AkBkHircType.Sound), Is.True,
                         $"Sound {soundId} was not generated");
+
+                    // A Sound is only reached through its fragment, never a Play action, so its audio
+                    // has to be encoded by the music compile itself.
+                    var sourceId = compiledProject.SoundBanks.Select(soundBank => soundBank.GetSound(soundId)).First(sound => sound != null).SourceId;
+                    var wemPackFilePath = compiledProject.GetAudioFile(sourceId)?.WemPackFilePath;
+                    Assert.That(wemPackFilePath != null && packFileService.FindFile(wemPackFilePath, packFileService.GetEditablePack()) != null, Is.True,
+                        $"Sound {soundId} plays {sourceId}.wem, which was not shipped");
+                }
             });
 
             Console.WriteLine(
@@ -459,9 +468,9 @@ namespace Test.Audio
         /// </summary>
         static void AssertEachSegmentCarriesTheCuesItsScriptReads(IPackFileService packFileService, AudioProjectFile compiledProject)
         {
-            var musicSoundBank = compiledProject.SoundBanks.Single(soundBank => soundBank.MusicRandomSequences.Count != 0);
+            var music = compiledProject.Music;
             // Only the mod's own: vanilla defines some of its segments in more than one .bnk.
-            var modSegmentIds = musicSoundBank.MusicSegments.Select(musicSegment => musicSegment.Id).ToHashSet();
+            var modSegmentIds = music.Segments.Select(musicSegment => musicSegment.Id).ToHashSet();
             var shippedSegments = ShippedBanks(packFileService)
                 .SelectMany(path => ReadHircs(packFileService, path))
                 .OfType<CAkMusicSegment_V136>()
@@ -470,13 +479,13 @@ namespace Test.Audio
 
             Assert.Multiple(() =>
             {
-                foreach (var musicRandomSequence in musicSoundBank.MusicRandomSequences)
+                foreach (var musicRandomSequence in music.RandomSequences)
                 {
                     var expected = musicRandomSequence.DirectParentId == InBattleContainerId
                         ? new[] { Wh3MusicHierarchyInformation.TrackStartCueName, Wh3MusicHierarchyInformation.TrackEndCueName }
                         : [Wh3MusicHierarchyInformation.CustomCueName];
 
-                    foreach (var musicSegment in musicSoundBank.GetMusicSegments(musicRandomSequence))
+                    foreach (var musicSegment in music.GetSegments(musicRandomSequence))
                     {
                         Assert.That(shippedSegments[musicSegment.Id].Count(), Is.EqualTo(1),
                             $"segment {musicSegment.Id} under container {musicRandomSequence.DirectParentId} should ship exactly once");

@@ -1,8 +1,6 @@
 using System;
-using System.Linq;
 using Editors.Audio.Shared.AudioProject.Models;
 using Editors.Audio.Shared.GameInformation.Warhammer3;
-using Shared.GameFormats.Wwise.Hirc;
 using Shared.GameFormats.Wwise.Hirc.V136;
 using Shared.GameFormats.Wwise.Hirc.V136.Shared;
 
@@ -14,12 +12,12 @@ namespace Editors.Audio.Shared.Wwise.Generators.Hirc.V136
     /// same in every shipped segment - three, or four under the in-battle container, whose script
     /// reads different ones (see <see cref="Wh3MusicHierarchyInformation.TrackStartCueName"/>).
     /// </summary>
-    public class CAkMusicSegmentGenerator_V136 : IHircGeneratorService
+    public class CAkMusicSegmentGenerator_V136
     {
-        public HircItem GenerateHirc(AudioProjectItem audioProjectItem, SoundBank soundBank = null)
+        /// <param name="containerId">The vanilla Music Switch container the segment's branch is merged
+        /// into. Battle culture music has a copy of the segment under each of its containers.</param>
+        public CAkMusicSegment_V136 GenerateHirc(MusicSegment musicSegment, uint containerId = 0)
         {
-            var musicSegment = audioProjectItem as MusicSegment;
-
             var segmentHirc = new CAkMusicSegment_V136
             {
                 Id = musicSegment.Id,
@@ -32,7 +30,7 @@ namespace Editors.Audio.Shared.Wwise.Generators.Hirc.V136
             // is where vanilla puts it on a segment that starts at zero. Under the in-battle
             // container the battle script's track cues take its place.
             segmentHirc.ArrayMarkersList.Add(CreateMarker(Wh3MusicHierarchyInformation.EntryCueMarkerId, 0, null));
-            if (IsUnderInBattleContainer(musicSegment, soundBank))
+            if (containerId == Wh3MusicHierarchyInformation.InBattleMusicSwitchContainerId)
             {
                 var trackEndPosition = Math.Max(
                     musicSegment.DurationMs - Wh3MusicHierarchyInformation.TrackEndCueLeadMs,
@@ -47,14 +45,6 @@ namespace Editors.Audio.Shared.Wwise.Generators.Hirc.V136
             segmentHirc.UpdateSectionSize();
             return segmentHirc;
         }
-
-        /// <summary>Whether the Music Random Sequence over this segment branches out of the in-battle
-        /// container. Battle culture music has a copy of the segment under each of its containers,
-        /// so this is decided per copy.</summary>
-        private static bool IsUnderInBattleContainer(MusicSegment musicSegment, SoundBank soundBank) =>
-            soundBank?.MusicRandomSequences
-                .FirstOrDefault(musicRandomSequence => musicRandomSequence.Id == musicSegment.DirectParentId)
-                ?.DirectParentId == Wh3MusicHierarchyInformation.InBattleMusicSwitchContainerId;
 
         private static MusicNodeParams_V136 CreateMusicNodeParams(MusicSegment musicSegment)
         {
