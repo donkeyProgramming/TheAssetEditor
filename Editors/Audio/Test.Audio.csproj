@@ -28,17 +28,16 @@
     <Compile Include="AmsFragmentMergeTests.cs" />
     <Compile Include="AmsPulseTrackMergeTests.cs" />
     <Compile Include="MusicEndToEndRun.cs" />
-    <Compile Include="MusicEventShapeResearch.cs" />
-    <Compile Include="MusicShippedPackDiagnosis.cs" />
     <Compile Include="MusicHierarchyFactoryTests.cs" />
     <Compile Include="MusicHierarchyGenerationTests.cs" />
     <Compile Include="MusicProjectBuildTests.cs" />
     <Compile Include="MusicSwitchContainerMergeTests.cs" />
-    <Compile Include="MusicHircRoundTripResearch.cs" />
     <Compile Include="SetStateActionGenerationTests.cs" />
     <Compile Include="VanillaBankReader.cs" />
     <Compile Include="MusicTreeEndToEndRun.cs" />
-    <Compile Include="MusicVanillaReferenceResearch.cs" />
+    <Compile Include="MusicDatFixtures.cs" />
+    <Compile Include="MusicDatMutationTests.cs" />
+    <Compile Include="MusicDatTests_Explore.cs" />
     <Using Include="NUnit.Framework" />
   </ItemGroup>
 

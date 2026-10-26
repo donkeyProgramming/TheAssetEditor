@@ -18,17 +18,16 @@
 	  <Compile Remove="AmsFragmentMergeTests.cs" />
 	  <Compile Remove="AmsPulseTrackMergeTests.cs" />
 	  <Compile Remove="MusicEndToEndRun.cs" />
-	  <Compile Remove="MusicEventShapeResearch.cs" />
-	  <Compile Remove="MusicShippedPackDiagnosis.cs" />
 	  <Compile Remove="MusicHierarchyFactoryTests.cs" />
 	  <Compile Remove="MusicHierarchyGenerationTests.cs" />
 	  <Compile Remove="MusicProjectBuildTests.cs" />
 	  <Compile Remove="MusicSwitchContainerMergeTests.cs" />
-	  <Compile Remove="MusicHircRoundTripResearch.cs" />
 	  <Compile Remove="SetStateActionGenerationTests.cs" />
 	  <Compile Remove="VanillaBankReader.cs" />
 	  <Compile Remove="MusicTreeEndToEndRun.cs" />
-	  <Compile Remove="MusicVanillaReferenceResearch.cs" />
+	  <Compile Remove="MusicDatFixtures.cs" />
+	  <Compile Remove="MusicDatMutationTests.cs" />
+	  <Compile Remove="MusicDatTests_Explore.cs" />
 	</ItemGroup>
 
     <ItemGroup>

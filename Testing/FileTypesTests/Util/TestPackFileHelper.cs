@@ -1,6 +1,5 @@
 ﻿using System.Text;
 using Shared.Core.PackFiles.Models;
-using Shared.Core.PackFiles.Models.FileSources;
 
 namespace FileTypesTests.Util
 {

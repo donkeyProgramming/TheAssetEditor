@@ -27,8 +27,8 @@ namespace Test.Audio
             var game = _packFileService.CreateNewPackFileContainer("game", PackFileVersion.PFH5, PackFileCAType.RELEASE);
             _packFileService.AddFilesToPack(game,
             [
-                new NewPackFileEntry(@"audio\scripts", PackFile.CreateFromBytes("battle_music.dat", Fixture("battle_music.dat"))),
-                new NewPackFileEntry(@"audio\scripts", PackFile.CreateFromBytes("campaign_music.dat", Fixture("campaign_music.dat")))
+                new NewPackFileEntry(@"audio\scripts", PackFile.CreateFromBytes("battle_music.dat", MusicDatFixtures.ReadBytes("battle_music.dat"))),
+                new NewPackFileEntry(@"audio\scripts", PackFile.CreateFromBytes("campaign_music.dat", MusicDatFixtures.ReadBytes("campaign_music.dat")))
             ]);
             game.IsCaPackFile = true; // read-only from here on
 
@@ -307,17 +307,6 @@ namespace Test.Audio
 
         static byte[] Write(MusicDatFile file) => MusicDatParser.Write(file);
 
-        static MusicDatFile Load(string name) => MusicDatParser.Parse(Fixture(name));
-
-        static byte[] Fixture(string name)
-        {
-            for (var directory = new DirectoryInfo(TestContext.CurrentContext.TestDirectory); directory != null; directory = directory.Parent)
-            {
-                var path = Path.Combine(directory.FullName, "Data", "Music", name);
-                if (File.Exists(path))
-                    return File.ReadAllBytes(path);
-            }
-            throw new FileNotFoundException($"Data\\Music\\{name} not found above {TestContext.CurrentContext.TestDirectory}");
-        }
+        static MusicDatFile Load(string name) => MusicDatFixtures.Load(name);
     }
 }

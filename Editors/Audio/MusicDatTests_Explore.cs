@@ -1,7 +1,6 @@
 using Shared.GameFormats.MusicDat;
-using Test.TestingUtility.TestUtility;
 
-namespace FileTypesTests.FileTypes.MusicDat
+namespace Test.Audio
 {
     // Coverage for campaign_music.dat / battle_music.dat: the container parse/write and
     // the bytecode disassembly of the embedded music script.
@@ -9,7 +8,7 @@ namespace FileTypesTests.FileTypes.MusicDat
     {
         static readonly string Scratch = Path.Combine(Path.GetTempPath(), "MusicDatDumps");
 
-        static byte[] RawBytes(string name) => PathHelper.GetFileAsBytes($@"Music\{name}");
+        static byte[] RawBytes(string name) => MusicDatFixtures.ReadBytes(name);
 
         static MusicDatFile Load(string name) => MusicDatParser.Parse(RawBytes(name));
 

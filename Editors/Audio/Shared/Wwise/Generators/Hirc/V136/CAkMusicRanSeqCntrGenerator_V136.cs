@@ -8,7 +8,7 @@ namespace Editors.Audio.Shared.Wwise.Generators.Hirc.V136
 {
     /// <summary>
     /// Builds the Music Random Sequence a decision tree branch points at, matching the vanilla
-    /// subculture branches dumped by MusicEventShapeResearch: parented to the Music Switch container
+    /// subculture branches in the shipped banks: parented to the Music Switch container
     /// the branch is merged into, one playlist root over the segments, and one transition rule.
     /// </summary>
     public class CAkMusicRanSeqCntrGenerator_V136 : IHircGeneratorService

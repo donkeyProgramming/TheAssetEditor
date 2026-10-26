@@ -8,9 +8,9 @@ using Shared.Core.Settings;
 
 namespace Test.Audio
 {
-    // Shared plumbing for the audio research probes: opens a shipped .pack through the app's own
-    // container loader rather than re-reading the format by hand, so what the probes see is what
-    // the editor sees. Only the UI-facing services are stubbed.
+    // Shared plumbing for the audio tests that read real game data: opens a shipped .pack through the
+    // app's own container loader rather than re-reading the format by hand, so what the tests see is
+    // what the editor sees. Only the UI-facing services are stubbed.
     internal static class VanillaBankReader
     {
         public static ServiceProvider CreateProvider(string gameDirectory)
@@ -32,8 +32,8 @@ namespace Test.Audio
             settings.CurrentSettings.GameDirectories.Add(
                 new ApplicationSettings.GamePathPair(GameTypeEnum.Warhammer3, gameDirectory));
 
-            // The probes often open a mod pack on its own. With this on, the service refuses it and
-            // puts up a modal message box from inside the test run, and the probe sees an empty pack.
+            // The tests often open a mod pack on its own. With this on, the service refuses it and puts
+            // up a modal message box from inside the test run, and the test sees an empty pack.
             provider.GetRequiredService<IPackFileService>().EnforceGameFilesMustBeLoaded = false;
 
             return provider;

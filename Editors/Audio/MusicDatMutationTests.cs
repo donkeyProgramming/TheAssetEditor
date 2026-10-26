@@ -1,8 +1,7 @@
 using System.Text.RegularExpressions;
 using Shared.GameFormats.MusicDat;
-using Test.TestingUtility.TestUtility;
 
-namespace FileTypesTests.FileTypes.MusicDat
+namespace Test.Audio
 {
     // Coverage for the two pieces that let the editor change a music script rather than
     // only read one: the code splice with its address relocation, and the culture chain
@@ -12,7 +11,7 @@ namespace FileTypesTests.FileTypes.MusicDat
         const string NewSubcultureKey = "mod_sc_test_new_culture";
         const string NewMusicalCulture = "testculture";
 
-        static MusicDatFile Load(string name) => MusicDatParser.Parse(PathHelper.GetFileAsBytes($@"Music\{name}"));
+        static MusicDatFile Load(string name) => MusicDatFixtures.Load(name);
 
         static MusicDatCultureWiring.CultureChain RequireChain(MusicDatFile file)
         {

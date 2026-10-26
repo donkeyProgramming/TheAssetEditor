@@ -8,8 +8,8 @@ using Shared.GameFormats.Wwise.Hirc.V136;
 
 namespace Test.Audio
 {
-    // The shape asserted here is the vanilla one, read out of the shipped banks with
-    // MusicEventShapeResearch and recorded in Wh3MusicHierarchyInformation. The round-trip checks
+    // The shape asserted here is the vanilla one, read out of the shipped banks and
+    // recorded in Wh3MusicHierarchyInformation. The round-trip checks
     // matter as much as the field checks: a generated hirc has no parsed SectionSize to fall back
     // on, so if the size arithmetic is wrong the bank is corrupt from the next hirc onwards.
     internal class MusicHierarchyGenerationTests

@@ -8,7 +8,7 @@ using Action = Editors.Audio.Shared.AudioProject.Models.Action;
 
 namespace Test.Audio
 {
-    // The shape asserted here was read out of the shipped banks with MusicEventShapeResearch:
+    // The shape asserted here was read out of the shipped banks:
     // every culture music Action Event in battle_music__core.bnk / campaign_music__core.bnk holds
     // exactly one SetState action, with the state id in IdExt as well as in the state params, both
     // property bundles empty, and a section size of 21.

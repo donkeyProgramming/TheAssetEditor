@@ -1,8 +1,8 @@
 namespace Editors.Audio.Shared.GameInformation.Warhammer3
 {
     /// <summary>
-    /// The shape of a vanilla music branch, read out of the shipped banks with
-    /// MusicEventShapeResearch.ProbeVanillaMusicEventShape rather than inferred.
+    /// The shape of a vanilla music branch, read out of the shipped banks rather
+    /// than inferred.
     ///
     /// A music Action Event only sets a State. What turns that State into audio is a branch in one
     /// of the Music Switch containers, and a mod adds music by merging a branch of its own into
@@ -32,9 +32,8 @@ namespace Editors.Audio.Shared.GameInformation.Warhammer3
         /// container the way the Dialogue Event merge re-emits a whole dialogue event. A music node
         /// has one parent, so each container gets a hierarchy of its own over the same audio.
         ///
-        /// Every Music Switch container in the game was enumerated with
-        /// MusicEventShapeResearch.DumpEveryMusicSwitchContainer, and the multi argument ones dumped
-        /// in full. Of the six State Groups the music events target, two can be served:
+        /// Every Music Switch container in the game was enumerated, and the multi argument ones
+        /// dumped in full. Of the six State Groups the music events target, two can be served:
         ///
         ///   WH3_Campaign_Subcultures                     698158058, subculture x 781561792 -> listed
         ///   Battle_Music_WH3_Culture                     26264058,  result x culture     -> listed
@@ -45,8 +44,7 @@ namespace Editors.Audio.Shared.GameInformation.Warhammer3
         ///   WH3_AMS_Pulse_Pitched_Orchestral_Options     read elsewhere, see below
         ///   WH3_AMS_Pulse_Pitched_Ethnic_Options         read elsewhere, see below
         ///
-        /// Measured on the October 2026 banks with MusicShippedPackDiagnosis
-        /// .WhatKeysEachLevelOfTheBattleContainersOffer: 698158058 is two deep, its second level
+        /// Measured on the October 2026 banks: 698158058 is two deep, its second level
         /// (781561792, 5 keys) defaulted in every block, and the merge fills that level in from the
         /// default like any other level it does not branch on.
         ///
@@ -65,8 +63,8 @@ namespace Editors.Audio.Shared.GameInformation.Warhammer3
         /// resolution state, will do nothing with markers"), so the segments need no cues of their own.
         ///
         /// The four with no container are the adaptive music system. They are not unused and they are
-        /// not all the same: MusicEventShapeResearch.DumpWhatReadsTheAmsStateGroups counted what
-        /// actually reads each one, and it is two different mechanisms, neither of them a tree.
+        /// not all the same: what actually reads each one is two different mechanisms, neither of
+        /// them a tree.
         ///
         ///   the three Pulse Groups    9 switch tracks each, one per music track that carries pulses.
         ///                             A switch track holds a sub-track per culture with its own
@@ -171,7 +169,7 @@ namespace Editors.Audio.Shared.GameInformation.Warhammer3
         /// Vanilla's stems carry update_dynamicstart and update_dynamicend instead, but those bracket
         /// a stretch the script holds every transition back for, which over a whole piece of music
         /// would hold it back for minutes. Vanilla's own whole tracks carry just these two, measured
-        /// in October 2026 with MusicShippedPackDiagnosis.WhatMarkersTheCultureContainersSegmentsCarry:
+        /// in October 2026:
         /// the start 0 to 3.5 seconds in, the end 3 to 10 seconds before the exit cue, median 5.5,
         /// and never earlier than 69% of the way through.
         /// </summary>

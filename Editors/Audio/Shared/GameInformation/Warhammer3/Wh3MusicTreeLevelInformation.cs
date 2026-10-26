@@ -5,8 +5,7 @@ namespace Editors.Audio.Shared.GameInformation.Warhammer3
 {
     /// <summary>
     /// What to call the levels of the vanilla culture music containers, and their values, for a
-    /// modder. Read off the containers with MusicVanillaReferenceResearch.WhatTheLevelsOfACultureContainerAre
-    /// (October 2026 banks):
+    /// modder. Read off the containers in the October 2026 banks:
     ///
     ///   26264058  Battle_Result_State > Battle_Music_WH3_Culture
     ///   67383790  Battle_Music_Intensity > Battle_Music_Cindy_Scenes > Battle_Music_WH3_Culture

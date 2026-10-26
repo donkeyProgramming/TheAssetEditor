@@ -34,8 +34,8 @@ namespace Shared.GameFormats.MusicDat
         // Separately: an earlier solve had 34 and 51 taking no operands, so their operand
         // word got misread as an opcode of its own, producing phantom "opcodes" 24, 30 and
         // 39 that appeared nowhere except right after a 34 or a 51. Giving 34/51 their
-        // operand back removed all three and made the surrounding code decode sensibly -
-        // see MusicDatResearch for the site dump this was read from. That's unrelated to
+        // operand back removed all three and made the surrounding code decode sensibly.
+        // That's unrelated to
         // 24 and 30 being pencilled in above - those are separate, later guesses that the
         // numbers simply happen to share.
 
