@@ -22,9 +22,7 @@ namespace Editors.Audio.Shared.Wwise.Generators
 
     public interface IMusicSwitchContainerMergeService
     {
-        CAkMusicSwitchCntr_V136 CreateModdedContainer(CAkMusicSwitchCntr_V136 vanillaContainer, IReadOnlyList<MusicBranch> branches);
         CAkMusicSwitchCntr_V136 MergeBranches(CAkMusicSwitchCntr_V136 vanillaContainer, IReadOnlyList<MusicBranch> branches);
-        CAkMusicSwitchCntr_V136 MergeContainers(CAkMusicSwitchCntr_V136 baseContainer, CAkMusicSwitchCntr_V136 mergingContainer);
     }
 
     /// <summary>
@@ -34,61 +32,26 @@ namespace Editors.Audio.Shared.Wwise.Generators
     ///
     /// A music Action Event only sets a State. Nothing plays until that State selects a branch here,
     /// so this is what turns a generated music hierarchy into audio the game will actually reach.
-    ///
-    /// Two forms, because the Dialogue Event path needs both and music needs them for the same
-    /// reasons: <see cref="CreateModdedContainer"/> carries the mod's branches alone and goes in the
-    /// merging .bnk, so several mods can be combined before vanilla is folded in;
-    /// <see cref="MergeBranches"/> folds vanilla in immediately and goes in the testing .bnk, so one
-    /// mod can be played on its own.
     /// </summary>
     public class MusicSwitchContainerMergeService : IMusicSwitchContainerMergeService
     {
-        public CAkMusicSwitchCntr_V136 CreateModdedContainer(CAkMusicSwitchCntr_V136 vanillaContainer, IReadOnlyList<MusicBranch> branches)
+        public CAkMusicSwitchCntr_V136 MergeBranches(CAkMusicSwitchCntr_V136 vanillaContainer, IReadOnlyList<MusicBranch> branches)
         {
             ArgumentNullException.ThrowIfNull(vanillaContainer);
             ArgumentNullException.ThrowIfNull(branches);
 
             var moddedRoot = new AkDecisionTree_V136.Node_V136();
-
             foreach (var branch in branches)
             {
                 foreach (var keyPath in branch.KeyPaths ?? BuildKeyPaths(vanillaContainer, branch))
                     InsertBranch(moddedRoot, keyPath, branch.RandomSequenceId);
             }
 
-            return CopyWithDecisionTree(vanillaContainer, moddedRoot);
-        }
-
-        public CAkMusicSwitchCntr_V136 MergeBranches(CAkMusicSwitchCntr_V136 vanillaContainer, IReadOnlyList<MusicBranch> branches)
-        {
-            var moddedContainer = CreateModdedContainer(vanillaContainer, branches);
-
             // The modded tree is the base so that a branch for a State vanilla already covers
             // replaces it, which is what a modder replacing a culture's music is asking for.
-            var mergedTree = AkDecisionTree_V136.MergeDecisionTrees(
-                moddedContainer.AkDecisionTree.DecisionTree,
-                vanillaContainer.AkDecisionTree.DecisionTree);
+            var mergedTree = AkDecisionTree_V136.MergeDecisionTrees(moddedRoot, vanillaContainer.AkDecisionTree.DecisionTree);
 
             return CopyWithDecisionTree(vanillaContainer, mergedTree);
-        }
-
-        /// <summary>
-        /// Folds one container's branches into another's, for the merger combining several mods.
-        /// The base takes priority where both claim the same State, and everything outside the tree
-        /// comes from the base. The merger starts from vanilla, so vanilla is what wins - the same
-        /// tie break the Dialogue Event merge uses. Branches normally add a subculture vanilla does
-        /// not have, so nothing collides and the order does not come up.
-        /// </summary>
-        public CAkMusicSwitchCntr_V136 MergeContainers(CAkMusicSwitchCntr_V136 baseContainer, CAkMusicSwitchCntr_V136 mergingContainer)
-        {
-            ArgumentNullException.ThrowIfNull(baseContainer);
-            ArgumentNullException.ThrowIfNull(mergingContainer);
-
-            var mergedTree = AkDecisionTree_V136.MergeDecisionTrees(
-                baseContainer.AkDecisionTree.DecisionTree,
-                mergingContainer.AkDecisionTree.DecisionTree);
-
-            return CopyWithDecisionTree(baseContainer, mergedTree);
         }
 
         /// <summary>

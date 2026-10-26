@@ -98,29 +98,6 @@ namespace Test.Audio
             });
         }
 
-        [Test]
-        public void TheContainerForTheMergingSoundBankCarriesOnlyTheModsBranches()
-        {
-            // The merging .bnk is combined with other mods' before vanilla is folded in, so carrying
-            // vanilla here would make every mod look like it had deliberately set the same branches
-            // and the merger could not tell which mod actually claimed a culture.
-            var modded = new MusicSwitchContainerMergeService()
-                .CreateModdedContainer(CreateVanillaContainer(), [new MusicBranch(SubcultureStateGroup, "Araby", NewRanSeqId)]);
-
-            var branch = modded.AkDecisionTree.DecisionTree.Nodes.Single();
-
-            Assert.Multiple(() =>
-            {
-                Assert.That(branch.Key, Is.EqualTo(WwiseHash.Compute("Araby")));
-                Assert.That(branch.AudioNodeId, Is.EqualTo(NewRanSeqId));
-
-                // Everything outside the tree still has to be vanilla's, or the game is being handed
-                // a container it never asked for.
-                Assert.That(modded.Id, Is.EqualTo(SwitchContainerId));
-                Assert.That(modded.Arguments.Single().GroupId, Is.EqualTo(WwiseHash.Compute("WH3_Campaign_Subcultures")));
-            });
-        }
-
         // A container only resolves a decision tree leaf to a node it also claims as a child. A
         // branch added without the matching child is not an error - the container just falls
         // through to its default, so the new culture silently gets vanilla's music. That is what
@@ -168,7 +145,7 @@ namespace Test.Audio
 
             var service = new MusicSwitchContainerMergeService();
             var merged = service.MergeBranches(vanillaContainer, [new MusicBranch(SubcultureStateGroup, "Araby", NewRanSeqId)]);
-            var selfMerged = service.MergeContainers(vanillaContainer, vanillaContainer);
+            var selfMerged = service.MergeBranches(vanillaContainer, []);
 
             Assert.Multiple(() =>
             {
@@ -206,49 +183,6 @@ namespace Test.Audio
         }
 
         [Test]
-        public void CombiningTwoModsKeepsBothSubcultures()
-        {
-            // What the merger does with two modders' merging .bnks. Each adds a subculture vanilla
-            // does not have, which is the normal case - nothing collides, and both have to come
-            // through alongside everything vanilla already covers.
-            var mergeService = new MusicSwitchContainerMergeService();
-            var vanillaContainer = CreateVanillaContainer();
-
-            var firstMod = mergeService.CreateModdedContainer(vanillaContainer, [new MusicBranch(SubcultureStateGroup, "Araby", NewRanSeqId)]);
-            var secondMod = mergeService.CreateModdedContainer(vanillaContainer, [new MusicBranch(SubcultureStateGroup, "Cathay", 6000)]);
-
-            var merged = mergeService.MergeContainers(
-                mergeService.MergeContainers(vanillaContainer, firstMod), secondMod);
-
-            var branchesByKey = merged.AkDecisionTree.DecisionTree.Nodes.ToDictionary(node => node.Key);
-
-            Assert.Multiple(() =>
-            {
-                Assert.That(branchesByKey[WwiseHash.Compute("Araby")].AudioNodeId, Is.EqualTo(NewRanSeqId));
-                Assert.That(branchesByKey[WwiseHash.Compute("Cathay")].AudioNodeId, Is.EqualTo(6000u));
-                Assert.That(branchesByKey[WwiseHash.Compute("Dwarfs")].AudioNodeId, Is.EqualTo(1056018414u));
-                Assert.That(branchesByKey.ContainsKey(0u), "the default branch survives");
-            });
-        }
-
-        [Test]
-        public void VanillaWinsAStateAModAlsoClaims()
-        {
-            // Only reachable if a mod deliberately keys a branch on a subculture vanilla already
-            // has. The Dialogue Event merge breaks the tie this way, so this one does too.
-            var mergeService = new MusicSwitchContainerMergeService();
-            var vanillaContainer = CreateVanillaContainer();
-
-            var modded = mergeService.CreateModdedContainer(vanillaContainer, [new MusicBranch(SubcultureStateGroup, "Dwarfs", NewRanSeqId)]);
-            var merged = mergeService.MergeContainers(vanillaContainer, modded);
-
-            var dwarfBranch = merged.AkDecisionTree.DecisionTree.Nodes
-                .Single(node => node.Key == WwiseHash.Compute("Dwarfs"));
-
-            Assert.That(dwarfBranch.AudioNodeId, Is.EqualTo(1056018414u));
-        }
-
-        [Test]
         public void ABattleCultureGetsAPathUnderEveryResult()
         {
             // Battle music branches on the result before the culture, and vanilla has no default
@@ -278,16 +212,13 @@ namespace Test.Audio
         {
             // An intermediate node carrying an audio id is read as a leaf, which would make the
             // culture level below it unreachable and hand every battle the same music.
-            var modded = new MusicSwitchContainerMergeService()
-                .CreateModdedContainer(CreateVanillaBattleContainer(), [new MusicBranch(BattleCultureStateGroup, "Araby", NewRanSeqId)]);
+            var merged = new MusicSwitchContainerMergeService()
+                .MergeBranches(CreateVanillaBattleContainer(), [new MusicBranch(BattleCultureStateGroup, "Araby", NewRanSeqId)]);
 
             Assert.Multiple(() =>
             {
-                foreach (var resultNode in modded.AkDecisionTree.DecisionTree.Nodes)
-                {
+                foreach (var resultNode in merged.AkDecisionTree.DecisionTree.Nodes)
                     Assert.That(resultNode.AudioNodeId, Is.EqualTo(0u), "a result node is not a leaf");
-                    Assert.That(resultNode.Nodes, Has.Count.EqualTo(1));
-                }
             });
         }
 
@@ -668,7 +599,7 @@ namespace Test.Audio
         }
 
         // Stands in for the vanilla WH3_Campaign_Subcultures container: one argument, a default
-        // branch and one culture, matching what MusicEventShapeResearch reports.
+        // branch and one culture, matching the shipped bank.
         static CAkMusicSwitchCntr_V136 CreateVanillaContainer()
         {
             var container = new CAkMusicSwitchCntr_V136

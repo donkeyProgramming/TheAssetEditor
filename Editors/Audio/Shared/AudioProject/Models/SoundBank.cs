@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json.Serialization;
@@ -19,13 +19,6 @@ namespace Editors.Audio.Shared.AudioProject.Models
         [JsonIgnore] public uint MergingId { get; set; }
         [JsonIgnore] public string MergingFileName { get; set; }
         [JsonIgnore] public string MergingFilePath { get; set; }
-
-        /// <summary>
-        /// The audio project this bank was compiled from, without its extension. Testing .bnks are
-        /// named after the vanilla .bnk they override rather than after this bank, so they need the
-        /// project name separately to stay distinguishable between mods.
-        /// </summary>
-        [JsonIgnore] public string AudioProjectName { get; set; }
         public Wh3SoundBank GameSoundBank { get; set; }
         public List<DialogueEvent> DialogueEvents { get; set; } = [];
         public List<ActionEvent> ActionEvents { get; set; } = [];
@@ -103,7 +96,6 @@ namespace Editors.Audio.Shared.AudioProject.Models
             {
                 FileName = FileName,
                 FilePath = FilePath,
-                AudioProjectName = AudioProjectName,
                 TestingId = TestingId,
                 TestingFileName = TestingFileName,
                 TestingFilePath = TestingFilePath,

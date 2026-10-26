@@ -1,4 +1,4 @@
-using System.Data;
+﻿using System.Data;
 using System.IO;
 using Editors.Audio.Shared.AudioProject.Models;
 using Editors.Audio.Shared.Dat;
@@ -79,7 +79,6 @@ namespace Editors.Audio.Shared.AudioProject.Compiler
             foreach (var soundBank in audioProject.SoundBanks)
             {
                 soundBank.FileName = $"{soundBank.Name}.bnk";
-                soundBank.AudioProjectName = audioProjectNameWithoutExtension;
                 if (soundBank.Language == Wh3LanguageInformation.GetLanguageAsString(Wh3Language.Sfx))
                     soundBank.FilePath = $"audio\\wwise\\{soundBank.FileName}";
                 else
@@ -123,49 +122,26 @@ namespace Editors.Audio.Shared.AudioProject.Compiler
                 if (soundBank.DialogueEvents.Count != 0)
                     SetDialogueEventData(audioProject, audioFiles, sounds, soundBank);
 
-                if (soundBank.MusicSegments.Count != 0)
-                    SetMusicData(audioProject, audioFiles, soundBank);
-
-                if (soundBank.AmsPulses.Count != 0)
-                    SetAmsPulseData(audioProject, audioFiles, soundBank);
+                SetMusicData(audioProject, audioFiles, soundBank);
             }
         }
 
-        // Music segments carry their audio directly rather than through a Sound, so they need the
-        // same wem paths setting but have no Sound to add alongside.
+        // Music segments and pulse clips carry their audio directly rather than through a Sound, so
+        // they need the same wem paths setting but have no Sound to add alongside. Battle culture
+        // music has a segment per container over the same audio, which only needs encoding once.
         private static void SetMusicData(AudioProjectFile audioProject, List<AudioFile> audioFiles, SoundBank soundBank)
         {
-            foreach (var musicSegment in soundBank.MusicSegments)
+            var sourceIds = soundBank.MusicSegments.Select(musicSegment => musicSegment.SourceId)
+                .Concat(soundBank.AmsPulses.SelectMany(amsPulse => amsPulse.Clips).Select(clip => clip.SourceId));
+
+            foreach (var sourceId in sourceIds)
             {
-                // Battle culture music has a segment per container over the same audio, which only
-                // needs encoding once.
-                var audioFile = audioProject.GetAudioFile(musicSegment.SourceId);
+                var audioFile = audioProject.GetAudioFile(sourceId);
                 if (audioFile == null || audioFiles.Contains(audioFile))
                     continue;
 
                 SetSoundData(audioFile, soundBank);
                 audioFiles.Add(audioFile);
-            }
-        }
-
-        /// <summary>
-        /// Pulse clips carry their audio directly, the same as a music segment, and need the same wem
-        /// paths setting. They have no Sound and no segment hirc of their own - the clip becomes a row
-        /// in a vanilla switch track - so this only has the audio file to prepare.
-        /// </summary>
-        private static void SetAmsPulseData(AudioProjectFile audioProject, List<AudioFile> audioFiles, SoundBank soundBank)
-        {
-            foreach (var amsPulse in soundBank.AmsPulses)
-            {
-                foreach (var clip in amsPulse.Clips)
-                {
-                    var audioFile = audioProject.GetAudioFile(clip.SourceId);
-                    if (audioFile == null)
-                        continue;
-
-                    SetSoundData(audioFile, soundBank);
-                    audioFiles.Add(audioFile);
-                }
             }
         }
 
@@ -262,58 +238,48 @@ namespace Editors.Audio.Shared.AudioProject.Compiler
                 _wemGeneratorService.GenerateWems(audioFiles);
                 _wemGeneratorService.SaveWemsToPack(audioFiles);
                 UpdateSoundInMemoryMediaSize(audioProject, sounds);
-                UpdateMusicSegmentAudioData(audioProject);
-                UpdateAmsPulseAudioData(audioProject);
+                UpdateMusicAudioData(audioProject);
             }
         }
 
         /// <summary>
-        /// A music segment's duration has to match its audio: it sets the segment length, the exit
-        /// cue position and the clip's source duration, and a wrong value desynchronises the segment
-        /// from the file rather than failing. The encoded wem is the authority - it is what ships -
-        /// so the sample count and rate are read back out of it rather than off the source wav.
+        /// A music segment's or pulse clip's duration has to match its audio: it sets the segment
+        /// length, the exit cue position and the clip's source duration, and a wrong value
+        /// desynchronises the music from the file rather than failing. The encoded wem is the
+        /// authority - it is what ships - so the sample count and rate are read back out of it
+        /// rather than off the source wav.
         /// </summary>
-        private static void UpdateMusicSegmentAudioData(AudioProjectFile audioProject)
+        private static void UpdateMusicAudioData(AudioProjectFile audioProject)
         {
             foreach (var soundBank in audioProject.SoundBanks)
             {
                 foreach (var musicSegment in soundBank.MusicSegments)
                 {
-                    var audioFile = audioProject.GetAudioFile(musicSegment.SourceId);
-                    if (audioFile == null || !File.Exists(audioFile.WemDiskFilePath))
-                        continue;
+                    if (TryReadWemAudioData(audioProject, musicSegment.SourceId, out var size, out var durationMs))
+                        (musicSegment.InMemoryMediaSize, musicSegment.DurationMs) = (size, durationMs);
+                }
 
-                    var wemBytes = File.ReadAllBytes(audioFile.WemDiskFilePath);
-                    var wemFile = WemFile.CreateFromWemBytes(wemBytes);
-
-                    musicSegment.InMemoryMediaSize = wemBytes.Length;
-                    musicSegment.DurationMs = wemFile.FmtChunk.SampleCount / (double)wemFile.FmtChunk.SampleRate * 1000;
+                foreach (var clip in soundBank.AmsPulses.SelectMany(amsPulse => amsPulse.Clips))
+                {
+                    if (TryReadWemAudioData(audioProject, clip.SourceId, out var size, out var durationMs))
+                        (clip.InMemoryMediaSize, clip.DurationMs) = (size, durationMs);
                 }
             }
         }
 
-        /// <summary>
-        /// The same reckoning as a music segment's, for the same reason: the clip declares how long
-        /// its audio runs and how much of it to stream, and a wrong value desynchronises the pulse
-        /// from the music rather than failing. The encoded wem is the authority since it is what ships.
-        /// </summary>
-        private static void UpdateAmsPulseAudioData(AudioProjectFile audioProject)
+        private static bool TryReadWemAudioData(AudioProjectFile audioProject, uint sourceId, out long size, out double durationMs)
         {
-            foreach (var soundBank in audioProject.SoundBanks)
-            {
-                foreach (var clip in soundBank.AmsPulses.SelectMany(amsPulse => amsPulse.Clips))
-                {
-                    var audioFile = audioProject.GetAudioFile(clip.SourceId);
-                    if (audioFile == null || !File.Exists(audioFile.WemDiskFilePath))
-                        continue;
+            (size, durationMs) = (0, 0);
+            var audioFile = audioProject.GetAudioFile(sourceId);
+            if (audioFile == null || !File.Exists(audioFile.WemDiskFilePath))
+                return false;
 
-                    var wemBytes = File.ReadAllBytes(audioFile.WemDiskFilePath);
-                    var wemFile = WemFile.CreateFromWemBytes(wemBytes);
+            var wemBytes = File.ReadAllBytes(audioFile.WemDiskFilePath);
+            var wemFile = WemFile.CreateFromWemBytes(wemBytes);
 
-                    clip.InMemoryMediaSize = wemBytes.Length;
-                    clip.DurationMs = wemFile.FmtChunk.SampleCount / (double)wemFile.FmtChunk.SampleRate * 1000;
-                }
-            }
+            size = wemBytes.Length;
+            durationMs = wemFile.FmtChunk.SampleCount / (double)wemFile.FmtChunk.SampleRate * 1000;
+            return true;
         }
 
         private static void UpdateSoundInMemoryMediaSize(AudioProjectFile audioProject, List<Sound> sounds)
@@ -331,35 +297,29 @@ namespace Editors.Audio.Shared.AudioProject.Compiler
         {
             foreach (var soundBank in audioProject.SoundBanks)
             {
-                if (soundBank.ActionEvents.Count != 0 || soundBank.DialogueEvents.Count != 0
-                    || soundBank.MusicRandomSequences.Count != 0 || soundBank.AmsPulses.Count != 0)
+                // Music only works spliced into the vanilla .bnks themselves, so a music bank compiles
+                // to those and nothing else: the mod's own .bnk would define every one of the same
+                // hircs a second time. See GenerateMusicReplacementSoundBanks.
+                if (soundBank.MusicRandomSequences.Count != 0 || soundBank.AmsPulses.Count != 0 || soundBank.AmsFragments.Count != 0)
                 {
-                    // Music only works spliced into the vanilla .bnks themselves, so a music bank
-                    // compiles to those and nothing else: the mod's own .bnk would define every one of
-                    // the same hircs a second time, and the merging .bnk would too since its name puts
-                    // it in the same load as the music .bnks. See GenerateMusicReplacementSoundBanks.
-                    if (soundBank.MusicRandomSequences.Count != 0 || soundBank.AmsPulses.Count != 0 || soundBank.AmsFragments.Count != 0)
-                    {
-                        _soundBankGeneratorService.GenerateMusicReplacementSoundBanks(soundBank);
-                        continue;
-                    }
+                    _soundBankGeneratorService.GenerateMusicReplacementSoundBanks(soundBank);
+                    continue;
+                }
 
+                if (soundBank.ActionEvents.Count != 0 || soundBank.DialogueEvents.Count != 0)
+                {
                     _logger.Here().Information($"Generating SoundBank {soundBank.FilePath}");
 
                     // Create the .bnk that modders should keep
-                    _soundBankGeneratorService.GenerateSoundBankWithoutMergedHircs(soundBank);
+                    _soundBankGeneratorService.GenerateSoundBankWithoutDialogueEvents(soundBank);
 
                     if (soundBank.DialogueEvents.Count != 0)
                     {
                         // Create a .bnk of the compiled Dialogue Events merged with vanilla Dialogue Events for modders to test
-                        _logger.Here().Information($"Generating SoundBank {soundBank.TestingFilePath}");
+                        _logger.Here().Information($"Generating SoundBank {soundBank.TestingFilePath} and {soundBank.MergingFilePath}");
                         _soundBankGeneratorService.GenerateDialogueEventsForTestingSoundBank(soundBank);
-                    }
 
-                    if (soundBank.DialogueEvents.Count != 0)
-                    {
                         // Create the .bnk that modders should give to the merger
-                        _logger.Here().Information($"Generating SoundBank {soundBank.MergingFilePath}");
                         _soundBankGeneratorService.GenerateMergingSoundBank(soundBank);
                     }
                 }

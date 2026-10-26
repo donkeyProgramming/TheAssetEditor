@@ -1,4 +1,4 @@
-using Shared.ByteParsing;
+﻿using Shared.ByteParsing;
 
 namespace Shared.GameFormats.Wwise.Hirc
 {

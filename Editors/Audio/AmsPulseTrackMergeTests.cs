@@ -10,7 +10,7 @@ using Shared.GameFormats.Wwise.Hirc.V136.Shared;
 namespace Test.Audio
 {
     // Adding a culture to the adaptive music system's pulse layers. The shape asserted here was read
-    // out of the shipped banks with MusicEventShapeResearch.DumpEveryPulseSwitchTrack: sixteen
+    // out of the shipped banks (October 2026): sixteen
     // sub-tracks, fifteen with a clip and a clipless 'Off', and an association array indexed by
     // sub-track. That indexing is what makes this delicate - the array is positional, so getting it
     // wrong re-points other cultures rather than failing.
@@ -154,62 +154,6 @@ namespace Test.Audio
                 () => new AmsPulseTrackMergeService().AddSubTracks(
                     normalTrack, [new AmsPulseBranch("Araby", CreateClip(900, 41600))], SegmentDurationMs),
                 Throws.TypeOf<NotSupportedException>());
-        }
-
-        [Test]
-        public void CombiningTwoModsGivesEachCultureAnIndexOfItsOwn()
-        {
-            // The merger's job. Both mods appended at sub-track 3 in their own copy, so concatenating
-            // the lists would give two cultures the same index and lose one of them.
-            var vanillaTrack = CreateVanillaTrack();
-            var firstMod = Merge(vanillaTrack, CreateClip(sourceId: 900, durationMs: 41600), "Araby");
-            var secondMod = Merge(vanillaTrack, CreateClip(sourceId: 901, durationMs: 41600), "Nippon");
-
-            var service = new AmsPulseTrackMergeService();
-            var merged = service.MergeTracks(vanillaTrack, vanillaTrack, firstMod);
-            merged = service.MergeTracks(merged, vanillaTrack, secondMod);
-
-            Assert.Multiple(() =>
-            {
-                Assert.That(merged.SwitchParams.SwitchAssoc, Has.Count.EqualTo(5));
-                Assert.That(merged.SwitchParams.SwitchAssoc[3], Is.EqualTo(WwiseHash.Compute("Araby")));
-                Assert.That(merged.SwitchParams.SwitchAssoc[4], Is.EqualTo(WwiseHash.Compute("Nippon")));
-
-                Assert.That(merged.PlaylistList.Single(item => item.TrackId == 3).SourceId, Is.EqualTo(900));
-                Assert.That(merged.PlaylistList.Single(item => item.TrackId == 4).SourceId, Is.EqualTo(901));
-                Assert.That(merged.NumSubTrack, Is.EqualTo(5));
-            });
-        }
-
-        [Test]
-        public void TheFirstModWinsACultureBothClaim()
-        {
-            var vanillaTrack = CreateVanillaTrack();
-            var firstMod = Merge(vanillaTrack, CreateClip(sourceId: 900, durationMs: 41600), "Araby");
-            var secondMod = Merge(vanillaTrack, CreateClip(sourceId: 901, durationMs: 41600), "Araby");
-
-            var service = new AmsPulseTrackMergeService();
-            var merged = service.MergeTracks(vanillaTrack, vanillaTrack, firstMod);
-            merged = service.MergeTracks(merged, vanillaTrack, secondMod);
-
-            Assert.Multiple(() =>
-            {
-                Assert.That(merged.SwitchParams.SwitchAssoc, Has.Count.EqualTo(4));
-                Assert.That(merged.PlaylistList.Single(item => item.TrackId == 3).SourceId, Is.EqualTo(900));
-            });
-        }
-
-        [Test]
-        public void AVanillaCultureIsNotReAddedByTheMerger()
-        {
-            // A mod replacing a vanilla culture's stem edits an existing sub-track rather than adding
-            // one, so the merger must not mistake it for something new and append a duplicate.
-            var vanillaTrack = CreateVanillaTrack();
-            var moddedTrack = Merge(vanillaTrack, CreateClip(sourceId: 900, durationMs: 41600), "Cathay");
-
-            var merged = new AmsPulseTrackMergeService().MergeTracks(vanillaTrack, vanillaTrack, moddedTrack);
-
-            Assert.That(merged.SwitchParams.SwitchAssoc, Has.Count.EqualTo(3));
         }
 
         static CAkMusicTrack_V136 Merge(CAkMusicTrack_V136 vanillaTrack, AmsPulseClip clip, string stateName)

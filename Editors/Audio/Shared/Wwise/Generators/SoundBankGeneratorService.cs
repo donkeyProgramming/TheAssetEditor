@@ -1,4 +1,4 @@
-using System.Data;
+﻿using System.Data;
 using System.IO;
 using Editors.Audio.AudioEditor.Core;
 using Editors.Audio.Shared.AudioProject;
@@ -24,7 +24,7 @@ namespace Editors.Audio.Shared.Wwise.Generators
 {
     public interface ISoundBankGeneratorService
     {
-        void GenerateSoundBankWithoutMergedHircs(SoundBank soundBank);
+        void GenerateSoundBankWithoutDialogueEvents(SoundBank soundBank);
         void GenerateDialogueEventsForTestingSoundBank(SoundBank soundBank);
         void GenerateMusicReplacementSoundBanks(SoundBank soundBank);
         void GenerateMergingSoundBank(SoundBank soundBank);
@@ -71,13 +71,7 @@ namespace Editors.Audio.Shared.Wwise.Generators
             _hircGeneratorServiceFactory = HircGeneratorServiceFactory.CreateFactory(bankGeneratorVersion);
         }
 
-        /// <summary>
-        /// The .bnk the modder keeps. It leaves out everything that shares an id with vanilla -
-        /// Dialogue Events and Music Switch containers - because those cannot simply be shipped
-        /// alongside vanilla, they have to be merged into it. They live in the testing and merging
-        /// .bnks instead.
-        /// </summary>
-        public void GenerateSoundBankWithoutMergedHircs(SoundBank soundBank)
+        public void GenerateSoundBankWithoutDialogueEvents(SoundBank soundBank)
         {
             var actionEventToHircLookup = new Dictionary<ActionEvent, HircItem>();
             var hircItems = new List<HircItem>();
@@ -103,28 +97,14 @@ namespace Editors.Audio.Shared.Wwise.Generators
 
             SortHircs(hircItems);
 
-            // Appended after sorting rather than run through it. SortHircs orders Play targets and
-            // Events, and music is neither - it is reached through the decision tree, so it has its
-            // own ordering: tracks before their segments, segments before the sequence over them.
-            hircItems.AddRange(GenerateMusicHierarchyHircs(soundBank));
-            hircItems.AddRange(GenerateAmsFragmentHircs(soundBank));
-
             WriteSoundBank(soundBank.Id, soundBank.LanguageId, soundBank.FileName, soundBank.FilePath, hircItems);
         }
 
         /// <summary>
-        /// The music hierarchy this bank contributes. These are all new ids so they can ship as they
-        /// are - it is only the Music Switch container above them that clashes with vanilla.
-        /// </summary>
-        private List<HircItem> GenerateMusicHierarchyHircs(SoundBank soundBank)
-            => GenerateMusicHierarchyHircs(soundBank, soundBank.MusicRandomSequences);
-
-        /// <summary>
-        /// The same hierarchy for a chosen few of the sequences, so a testing .bnk can carry exactly
-        /// the ones the container it overrides names as children. Vanilla never splits a music
-        /// container from its children across two .bnks - every one of the 32 children of the two
-        /// containers this touches sits in the same .bnk as its parent - so a testing .bnk holding a
-        /// container alone is not the shape the game is built to load.
+        /// The music hierarchy under the sequences a container's branches reach: tracks before their
+        /// segments, segments before the sequence over them. Vanilla never splits a music container
+        /// from its children across two .bnks - every one of the 32 children of the two containers
+        /// this touches sits in the same .bnk as its parent - so these go in the .bnk the container does.
         /// </summary>
         private List<HircItem> GenerateMusicHierarchyHircs(SoundBank soundBank, IEnumerable<MusicRandomSequence> musicRandomSequences)
         {
@@ -355,12 +335,6 @@ namespace Editors.Audio.Shared.Wwise.Generators
         /// <summary>
         /// The vanilla pulse switch tracks re-emitted with this mod's sub-tracks added.
         ///
-        /// Unlike the Music Switch containers there is no mod-only form of these. A sub-track is
-        /// identified by its position in the association array, so a track holding only the mod's
-        /// sub-tracks would number them from zero and mean something entirely different. Both the
-        /// testing and the merging .bnk therefore get the full merged track, and the merger works out
-        /// what each mod added by diffing against vanilla.
-        ///
         /// Clips are spread across the tracks in order and cycled when a mod supplies fewer than the
         /// game has, so one wav means the same pulse under every segment - which is thin, but is the
         /// only thing that can be done without inventing material.
@@ -422,8 +396,8 @@ namespace Editors.Audio.Shared.Wwise.Generators
 
                     var moddedTrack = _amsPulseTrackMergeService.AddSubTracks(slot.Track, branches, GetSegmentDurationMs(slot.Track));
 
-                    // Carried over so the testing .bnk can be named after the .bnk it overrides; the
-                    // merged track is a new object and would otherwise have no provenance.
+                    // Carried over so the track is spliced into the .bnk it was read from; the merged
+                    // track is a new object and would otherwise have no provenance.
                     moddedTrack.BnkFilePath = slot.Track.BnkFilePath;
                     moddedTracks.Add(moddedTrack);
                 }
@@ -433,13 +407,10 @@ namespace Editors.Audio.Shared.Wwise.Generators
         }
 
         /// <summary>
-        /// The ambient fragment hierarchy this bank contributes: the Switch container on the musical
-        /// key Group, and the Sounds and any container under it. All new ids, so these ship in the
-        /// mod's own .bnk - it is only the vanilla faction container above them that clashes.
+        /// The ambient fragment hierarchy under a vanilla faction container: the Switch container on
+        /// the musical key Group, and the Sounds and any container under it. All new ids - it is only
+        /// the faction container above them that clashes with vanilla.
         /// </summary>
-        private List<HircItem> GenerateAmsFragmentHircs(SoundBank soundBank)
-            => GenerateAmsFragmentHircs(soundBank, soundBank.AmsFragments);
-
         private List<HircItem> GenerateAmsFragmentHircs(SoundBank soundBank, IEnumerable<AmsFragment> amsFragments)
         {
             var hircItems = new List<HircItem>();
@@ -479,8 +450,8 @@ namespace Editors.Audio.Shared.Wwise.Generators
 
         /// <summary>
         /// The vanilla ambient fragments containers re-emitted with this mod's cultures added. These
-        /// keep their vanilla ids, so like the Music Switch containers they belong in the testing and
-        /// merging .bnks rather than the mod's own.
+        /// keep their vanilla ids, so like the Music Switch containers they replace vanilla's in the
+        /// .bnk they were read from.
         /// </summary>
         private List<CAkSwitchCntr_V136> GenerateModdedAmsFragmentContainers(SoundBank soundBank)
         {
@@ -541,41 +512,6 @@ namespace Editors.Audio.Shared.Wwise.Generators
             _logger.Here().Warning(
                 $"Music Track {vanillaTrack.Id} has no parent segment, so its clips cannot be trimmed to one");
             return double.MaxValue;
-        }
-
-        /// <summary>
-        /// The Music Switch containers carrying only the mod's own branches, for the merging .bnk.
-        /// Vanilla is deliberately left out: the merger folds it in once, after it has combined the
-        /// branches from every mod it was given.
-        /// </summary>
-        private List<HircItem> GenerateModdedMusicSwitchContainers(SoundBank soundBank)
-        {
-            var hircItems = new List<HircItem>();
-
-            foreach (var containerId in GetMusicContainerIds(soundBank))
-            {
-                var vanillaContainer = GetVanillaMusicSwitchContainer(containerId);
-                if (vanillaContainer == null)
-                    continue;
-
-                var (branches, _) = GetMusicBranches(soundBank, vanillaContainer);
-                if (branches.Count != 0)
-                    hircItems.Add(_musicSwitchContainerMergeService.CreateModdedContainer(vanillaContainer, branches));
-            }
-
-            return hircItems;
-        }
-
-        /// <summary>
-        /// The name a modded .bnk has to be built on to override the vanilla one, taken from the
-        /// vanilla .bnk the hirc was read out of. Vanilla names its .bnks '{base}__core', so the base
-        /// is what comes before the double underscore.
-        /// </summary>
-        private static string GetSoundBankNameBase(string bnkFilePath)
-        {
-            var fileName = Path.GetFileNameWithoutExtension(bnkFilePath);
-            var separatorIndex = fileName.IndexOf("__");
-            return separatorIndex == -1 ? fileName : fileName[..separatorIndex];
         }
 
         private static string GetSoundBankFilePath(string fileName, string language)
@@ -650,14 +586,6 @@ namespace Editors.Audio.Shared.Wwise.Generators
             }
 
             SortHircs(hircItems);
-
-            // Same ordering exception as the modder's .bnk. The containers go in carrying the mod's
-            // branches alone so the merger can combine several mods before folding vanilla in.
-            hircItems.AddRange(GenerateMusicHierarchyHircs(soundBank));
-            hircItems.AddRange(GenerateModdedMusicSwitchContainers(soundBank));
-            hircItems.AddRange(GenerateModdedAmsPulseTracks(soundBank));
-            hircItems.AddRange(GenerateAmsFragmentHircs(soundBank));
-            hircItems.AddRange(GenerateModdedAmsFragmentContainers(soundBank));
 
             WriteSoundBank(soundBank.MergingId, soundBank.LanguageId, soundBank.MergingFileName, soundBank.MergingFilePath, hircItems);
         }

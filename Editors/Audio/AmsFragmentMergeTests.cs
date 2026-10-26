@@ -8,7 +8,7 @@ using Shared.GameFormats.Wwise.Hirc.V136.Shared;
 namespace Test.Audio
 {
     // Adding a culture to the ambient fragments Switch container. The shape asserted here was read
-    // out of campaign_music__core.bnk with MusicEventShapeResearch.DumpTheFragmentsSwitchContainer:
+    // out of campaign_music__core.bnk (October 2026):
     // a faction container whose children are themselves Switch containers keyed on the musical key
     // the score is in, and two cultures pointing at the same child where vanilla shares a fragment
     // set between them. Below the key, a culture splits again on call or response.
@@ -204,51 +204,6 @@ namespace Test.Audio
 
         static Dictionary<uint, uint> PackagesOf(CAkSwitchCntr_V136 container) =>
             container.SwitchList.Cast<CAkSwitchCntr_V136.CAkSwitchPackage_V136>().ToDictionary(package => package.SwitchId, package => package.NodeIdList.Single());
-
-        [Test]
-        public void CombiningTwoModsKeepsBothCultures()
-        {
-            var vanillaContainer = CreateVanillaContainer();
-            var service = new AmsFragmentMergeService();
-
-            var firstMod = service.AddCultures(vanillaContainer, [new AmsFragmentBranch("Araby", 5000)]);
-            var secondMod = service.AddCultures(vanillaContainer, [new AmsFragmentBranch("Nippon", 5001)]);
-
-            var merged = service.MergeContainers(vanillaContainer, firstMod);
-            merged = service.MergeContainers(merged, secondMod);
-
-            var switchIds = merged.SwitchList
-                .Cast<CAkSwitchCntr_V136.CAkSwitchPackage_V136>()
-                .Select(package => package.SwitchId)
-                .ToList();
-
-            Assert.Multiple(() =>
-            {
-                Assert.That(switchIds, Does.Contain(WwiseHash.Compute("Araby")));
-                Assert.That(switchIds, Does.Contain(WwiseHash.Compute("Nippon")));
-                Assert.That(merged.Children.ChildIds, Does.Contain(5000u));
-                Assert.That(merged.Children.ChildIds, Does.Contain(5001u));
-            });
-        }
-
-        [Test]
-        public void TheBaseWinsACultureBothModsClaim()
-        {
-            var vanillaContainer = CreateVanillaContainer();
-            var service = new AmsFragmentMergeService();
-
-            var firstMod = service.AddCultures(vanillaContainer, [new AmsFragmentBranch("Araby", 5000)]);
-            var secondMod = service.AddCultures(vanillaContainer, [new AmsFragmentBranch("Araby", 5001)]);
-
-            var merged = service.MergeContainers(vanillaContainer, firstMod);
-            merged = service.MergeContainers(merged, secondMod);
-
-            var arabySwitch = merged.SwitchList
-                .Cast<CAkSwitchCntr_V136.CAkSwitchPackage_V136>()
-                .Single(package => package.SwitchId == WwiseHash.Compute("Araby"));
-
-            Assert.That(arabySwitch.NodeIdList, Is.EqualTo(new[] { 5000u }));
-        }
 
         /// <summary>Cut down from the real thing: two cultures sharing one fragment set, which is
         /// what vanilla does for Empire and WH1_2, plus the 'None' default.</summary>

@@ -16,7 +16,6 @@ namespace Editors.Audio.Shared.Wwise.Generators
     public interface IAmsPulseTrackMergeService
     {
         CAkMusicTrack_V136 AddSubTracks(CAkMusicTrack_V136 vanillaTrack, IReadOnlyList<AmsPulseBranch> branches, double segmentDurationMs);
-        CAkMusicTrack_V136 MergeTracks(CAkMusicTrack_V136 baseTrack, CAkMusicTrack_V136 vanillaTrack, CAkMusicTrack_V136 moddedTrack);
     }
 
     /// <summary>
@@ -25,8 +24,8 @@ namespace Editors.Audio.Shared.Wwise.Generators
     /// A switch track is one Music Track holding a sub-track per culture: the source list and the
     /// playlist both grow by one row, and the association table - which is indexed by sub-track -
     /// gets the State that selects it. There is no hirc of our own anywhere in this; the track keeps
-    /// its vanilla id and is re-emitted whole, exactly as the Music Switch container merge does,
-    /// which is why the result has to go in the testing and merging .bnks rather than the mod's own.
+    /// its vanilla id and is re-emitted whole, exactly as the Music Switch container merge does, and
+    /// replaces vanilla's in the .bnk it was read from.
     ///
     /// Sub-tracks are appended rather than inserted. The association array is positional, so
     /// inserting in the middle would silently re-point every culture below the insertion at the
@@ -63,68 +62,6 @@ namespace Editors.Audio.Shared.Wwise.Generators
                 mergedTrack.SwitchParams.SwitchAssoc.Add(stateId);
                 mergedTrack.SourceList.Add(CreateSource(branch.Clip));
                 mergedTrack.PlaylistList.Add(CreateClip(subTrackIndex, branch.Clip, segmentDurationMs));
-                mergedTrack.NumSubTrack = (uint)mergedTrack.SwitchParams.SwitchAssoc.Count;
-            }
-
-            mergedTrack.UpdateSectionSize();
-            return mergedTrack;
-        }
-
-        /// <summary>
-        /// Folds one mod's track into another's, for the merger combining several mods.
-        ///
-        /// A decision tree can be merged by key, but a switch track cannot: its association array is
-        /// indexed by sub-track, so two mods that each appended a culture both claim the same index
-        /// and the lists cannot simply be concatenated. What is stable is the vanilla track, so this
-        /// works out what a mod added by diffing its associations against vanilla's and re-appends
-        /// those onto the base - which gives every mod an index of its own however many came before.
-        ///
-        /// The base takes priority where two mods claim the same State, the same tie break the
-        /// Dialogue Event and Music Switch container merges use.
-        /// </summary>
-        public CAkMusicTrack_V136 MergeTracks(
-            CAkMusicTrack_V136 baseTrack, CAkMusicTrack_V136 vanillaTrack, CAkMusicTrack_V136 moddedTrack)
-        {
-            ArgumentNullException.ThrowIfNull(baseTrack);
-            ArgumentNullException.ThrowIfNull(vanillaTrack);
-            ArgumentNullException.ThrowIfNull(moddedTrack);
-
-            var mergedTrack = CopyTrack(baseTrack);
-            var vanillaStateIds = vanillaTrack.SwitchParams!.SwitchAssoc.ToHashSet();
-
-            for (var subTrack = 0; subTrack < moddedTrack.SwitchParams!.SwitchAssoc.Count; subTrack++)
-            {
-                var stateId = moddedTrack.SwitchParams.SwitchAssoc[subTrack];
-                if (vanillaStateIds.Contains(stateId) || mergedTrack.SwitchParams!.SwitchAssoc.Contains(stateId))
-                    continue;
-
-                var moddedClip = moddedTrack.PlaylistList.FirstOrDefault(item => item.TrackId == subTrack);
-                if (moddedClip == null)
-                    continue;
-
-                var moddedSource = moddedTrack.SourceList
-                    .FirstOrDefault(source => source.AkMediaInformation.SourceId == moddedClip.SourceId);
-
-                if (moddedSource == null)
-                    continue;
-
-                var newSubTrackIndex = (uint)mergedTrack.SwitchParams!.SwitchAssoc.Count;
-                mergedTrack.SwitchParams.SwitchAssoc.Add(stateId);
-                mergedTrack.SourceList.Add(moddedSource);
-
-                // The clip is re-indexed rather than copied as-is: it carried the sub-track number it
-                // had in the mod's own track, which is not the one it has here.
-                mergedTrack.PlaylistList.Add(new CAkMusicTrack_V136.AkTrackSrcInfo_V136
-                {
-                    TrackId = newSubTrackIndex,
-                    SourceId = moddedClip.SourceId,
-                    EventId = moddedClip.EventId,
-                    PlayAt = moddedClip.PlayAt,
-                    BeginTrimOffset = moddedClip.BeginTrimOffset,
-                    EndTrimOffset = moddedClip.EndTrimOffset,
-                    SrcDuration = moddedClip.SrcDuration
-                });
-
                 mergedTrack.NumSubTrack = (uint)mergedTrack.SwitchParams.SwitchAssoc.Count;
             }
 

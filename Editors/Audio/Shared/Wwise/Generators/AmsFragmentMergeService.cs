@@ -14,7 +14,6 @@ namespace Editors.Audio.Shared.Wwise.Generators
     public interface IAmsFragmentMergeService
     {
         CAkSwitchCntr_V136 AddCultures(CAkSwitchCntr_V136 vanillaContainer, IReadOnlyList<AmsFragmentBranch> branches);
-        CAkSwitchCntr_V136 MergeContainers(CAkSwitchCntr_V136 baseContainer, CAkSwitchCntr_V136 mergingContainer);
         CAkSwitchCntr_V136 CreateKeySwitchContainer(
             CAkSwitchCntr_V136 vanillaContainer, IAudioRepositoryLookup lookup, uint keySwitchContainerId, Func<uint, uint> targetForKeySwitchId);
         CAkSwitchCntr_V136 CreateCallResponseSwitchContainer(
@@ -72,45 +71,6 @@ namespace Editors.Audio.Shared.Wwise.Generators
 
                 if (!merged.Children.ChildIds.Contains(branch.KeySwitchContainerId))
                     merged.Children.ChildIds.Add(branch.KeySwitchContainerId);
-            }
-
-            merged.NumSwitchGroups = (uint)merged.SwitchList.Count;
-            merged.Children.NumChilds = (uint)merged.Children.ChildIds.Count;
-            merged.UpdateSectionSize();
-            return merged;
-        }
-
-        /// <summary>
-        /// Folds one mod's container into another's. The base takes priority where two claim the same
-        /// culture, the same tie break every other merge here uses.
-        /// </summary>
-        public CAkSwitchCntr_V136 MergeContainers(CAkSwitchCntr_V136 baseContainer, CAkSwitchCntr_V136 mergingContainer)
-        {
-            ArgumentNullException.ThrowIfNull(baseContainer);
-            ArgumentNullException.ThrowIfNull(mergingContainer);
-
-            var merged = CopyContainer(baseContainer);
-            var claimedSwitchIds = merged.SwitchList
-                .Cast<CAkSwitchCntr_V136.CAkSwitchPackage_V136>()
-                .Select(switchPackage => switchPackage.SwitchId)
-                .ToHashSet();
-
-            foreach (var switchPackage in mergingContainer.SwitchList.Cast<CAkSwitchCntr_V136.CAkSwitchPackage_V136>())
-            {
-                if (claimedSwitchIds.Contains(switchPackage.SwitchId))
-                    continue;
-
-                merged.SwitchList.Add(new CAkSwitchCntr_V136.CAkSwitchPackage_V136
-                {
-                    SwitchId = switchPackage.SwitchId,
-                    NodeIdList = [.. switchPackage.NodeIdList]
-                });
-
-                foreach (var nodeId in switchPackage.NodeIdList)
-                {
-                    if (!merged.Children.ChildIds.Contains(nodeId))
-                        merged.Children.ChildIds.Add(nodeId);
-                }
             }
 
             merged.NumSwitchGroups = (uint)merged.SwitchList.Count;

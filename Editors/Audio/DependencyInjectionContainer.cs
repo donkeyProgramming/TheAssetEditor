@@ -1,4 +1,4 @@
-using Editors.Audio.AudioEditor.Commands.AudioFilesExplorer;
+﻿using Editors.Audio.AudioEditor.Commands.AudioFilesExplorer;
 using Editors.Audio.AudioEditor.Commands.AudioProjectEditor;
 using Editors.Audio.AudioEditor.Commands.AudioProjectMutation;
 using Editors.Audio.AudioEditor.Commands.AudioProjectViewer;
