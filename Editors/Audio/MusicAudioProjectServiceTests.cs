@@ -3,7 +3,7 @@ using Editors.Audio.Shared.GameInformation.Warhammer3;
 namespace Test.Audio
 {
     // Pins the event-name to State Group mapping the wizard depends on. The pairings were read
-    // out of the shipped banks with MusicEventShapeResearch, not inferred from the names.
+    // out of the shipped banks, not inferred from the names.
     internal class MusicAudioProjectServiceTests
     {
         [TestCase("music_b_faction_empire", "Battle_Music_WH3_Culture", "empire")]
@@ -75,8 +75,8 @@ namespace Test.Audio
             Assert.Multiple(() =>
             {
                 Assert.That(stateGroups, Is.EqualTo(new[] { "Battle_Music_WH3_Culture", "Generic_Faction_Player" }));
-                Assert.That(Wh3StateGroupInformation.ModdableStateGroups, Does.Contain("Generic_Faction_Player"),
-                    "a new project would have no Group to register the culture in");
+                Assert.That(Wh3StateGroupInformation.IsMusicProjectStateGroup("Generic_Faction_Player"),
+                    "a project would have no Group to register the culture in");
             });
         }
 

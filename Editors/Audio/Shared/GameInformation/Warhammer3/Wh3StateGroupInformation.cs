@@ -1,11 +1,10 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace Editors.Audio.Shared.GameInformation.Warhammer3
 {
     public static class Wh3StateGroupInformation
     {
-        public static readonly List<string> VoStateGroups =
-            ["VO_Actor", "VO_Culture", "VO_Faction_Leader", "VO_Battle_Selection", "VO_Battle_Special_Ability"];
+        public static readonly List<string> ModdableStateGroups = ["VO_Actor", "VO_Culture", "VO_Faction_Leader", "VO_Battle_Selection", "VO_Battle_Special_Ability"];
 
         /// <summary>
         /// The State Groups vanilla music Action Events set. Every culture-specific music event in
@@ -48,20 +47,10 @@ namespace Editors.Audio.Shared.GameInformation.Warhammer3
             _ => [stateGroupName]
         };
 
-        /// <summary>
-        /// State Groups a mod can add its own States to. Adding a State only registers a name
-        /// against its Wwise hash - nothing is written into the game's State Group definitions -
-        /// so what makes a new State do anything is a SetState Action Event pointing at it and a
-        /// music hierarchy that branches on it.
-        ///
-        /// Declared after the two lists it is built from: static fields initialise in declaration
-        /// order, so putting this first leaves both spreads reading null.
-        /// </summary>
-        public static readonly List<string> ModdableStateGroups =
-        [
-            .. VoStateGroups,
-            .. MusicStateGroups,
-            CultureAudioStateGroup
-        ];
+        /// <summary>The State Groups a music project adds its own States to. Adding a State only
+        /// registers a name against its Wwise hash, so what makes a new State do anything is a SetState
+        /// Action Event pointing at it and a music hierarchy that branches on it.</summary>
+        public static bool IsMusicProjectStateGroup(string stateGroupName) =>
+            MusicStateGroups.Contains(stateGroupName) || stateGroupName == CultureAudioStateGroup;
     }
 }

@@ -686,8 +686,8 @@ namespace Editors.Audio.Shared.AudioProject
         {
             var stateGroup = audioProject.GetStateGroup(stateGroupName);
 
-            // A saved project leaves out empty Groups, so a reopened one may not have it.
-            if (stateGroup == null && Wh3StateGroupInformation.ModdableStateGroups.Contains(stateGroupName))
+            // Music Groups are added on first use, and a saved project leaves out empty Groups.
+            if (stateGroup == null && Wh3StateGroupInformation.IsMusicProjectStateGroup(stateGroupName))
             {
                 stateGroup = StateGroup.CreateForAudioProjectFile(stateGroupName, []);
                 audioProject.StateGroups.TryAdd(stateGroup);
