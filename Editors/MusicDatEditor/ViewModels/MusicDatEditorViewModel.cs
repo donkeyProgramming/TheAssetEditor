@@ -19,7 +19,7 @@ namespace Editors.MusicDatEditor.ViewModels
     /// left, and the decompiled instruction stream of the selected function on the right, with
     /// symbol-table reference panels to look up what a raw operand index means.
     ///
-    /// Read-only throughout. The scripts are never edited by hand: the Music Project tool
+    /// Read-only throughout. The scripts are never edited by hand: the Music Project Editor
     /// rebuilds both from the game's own copies with every culture its project holds, so any
     /// edit made to them directly would be lost on the next build.</summary>
     public partial class MusicDatEditorViewModel : ObservableObject, IEditorInterface, IFileEditor

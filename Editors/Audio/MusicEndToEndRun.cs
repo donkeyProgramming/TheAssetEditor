@@ -19,7 +19,7 @@ using Shared.GameFormats.Wwise.Hirc.V136.Shared;
 namespace Test.Audio
 {
     /// <summary>
-    /// One run of the whole thing, in the order a modder does it in the Music Project tool: the Add
+    /// One run of the whole thing, in the order a modder does it in the Music Project Editor: the Add
     /// Culture wizard wires a new culture into the music project, the events it now posts are given
     /// audio, and the project is built.
     ///

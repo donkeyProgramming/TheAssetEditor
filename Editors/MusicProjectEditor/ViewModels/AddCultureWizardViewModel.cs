@@ -82,7 +82,7 @@ namespace Editors.MusicProjectEditor.ViewModels
         public string AudioProjectHelp =>
             "Adds this culture to the music project with one Music event per row above that brings its own audio, " +
             "built the way vanilla builds them: each event sets a Wwise State naming this culture rather than playing " +
-            "a file directly. Nothing is built yet - give the events their wavs in the Music Project tool, then Build " +
+            "a file directly. Nothing is built yet - give the events their wavs in the Music Project Editor, then Build " +
             "it to rebuild both music scripts from the game's own copies with every culture in the project. Only rows " +
             "marked as able to carry their own audio can be given files - see the note on each row.";
 

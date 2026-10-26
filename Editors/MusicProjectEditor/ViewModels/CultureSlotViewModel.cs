@@ -55,7 +55,7 @@ namespace Editors.MusicProjectEditor.ViewModels
             get
             {
                 if (!CanCarryOwnAudio)
-                    return "This event can only select music that already exists - the Music Project tool cannot give it " +
+                    return "This event can only select music that already exists - the Music Project Editor cannot give it " +
                            "files of its own, because nothing in the game branches on its State Group in a way a " +
                            "mod can extend. Point it at an existing culture's music instead.";
 
@@ -63,16 +63,16 @@ namespace Editors.MusicProjectEditor.ViewModels
                 // piece of music in its own right, so what a modder should supply is quite different -
                 // worth saying before they pick a five minute track for it.
                 if (Wh3MusicHierarchyInformation.IsAmsPulseStateGroup(StateGroupName))
-                    return "Audio can be added to this event in the Music Project tool. This is an adaptive music pulse - " +
+                    return "Audio can be added to this event in the Music Project Editor. This is an adaptive music pulse - " +
                            "a rhythmic layer played over the campaign theme, in whichever key the score is in, with " +
                            "three variations per key. One short loop works everywhere; a pitched one only sounds right " +
                            "written per key.";
 
                 if (Wh3MusicHierarchyInformation.GetAmsFragmentContainerId(StateGroupName) != null)
-                    return "Audio can be added to this event in the Music Project tool. These are ambient fragments - short " +
+                    return "Audio can be added to this event in the Music Project Editor. These are ambient fragments - short " +
                            "phrases laid over the campaign music, which vanilla writes per key and as a call and a response.";
 
-                return "Audio can be added to this event in the Music Project tool, and split by what the game tells " +
+                return "Audio can be added to this event in the Music Project Editor, and split by what the game tells " +
                        "apart here - the part of the game, the result, the phase and so on.";
             }
         }

@@ -129,7 +129,7 @@
                         <DockPanel>
                             <TextBlock DockPanel.Dock="Top" TextWrapping="Wrap" FontSize="11" Opacity="0.75" Margin="0,0,0,6">
                                 <Run Text="Read-only." FontWeight="Bold"/>
-                                <Run Text="A decompiled reading view of the Instructions tab, not the source of truth - reconstructing structured code from raw bytecode is inherently approximate, so goto/label artifacts and odd merges can turn up here. To add a culture, use the Music Project tool, which rebuilds both scripts."/>
+                                <Run Text="A decompiled reading view of the Instructions tab, not the source of truth - reconstructing structured code from raw bytecode is inherently approximate, so goto/label artifacts and odd merges can turn up here. To add a culture, use the Music Project Editor, which rebuilds both scripts."/>
                             </TextBlock>
                             <TextBox Text="{Binding Pseudocode, Mode=OneWay}" IsReadOnly="True"
                                      FontFamily="Consolas" FontSize="12" TextWrapping="NoWrap"
@@ -140,7 +140,7 @@
                         <DockPanel>
                             <TextBlock DockPanel.Dock="Top" TextWrapping="Wrap" FontSize="11" Opacity="0.75" Margin="0,0,0,6">
                                 <Run Text="Read-only." FontWeight="Bold"/>
-                                <Run Text="The raw decoded instruction stream. To add a culture, use the Music Project tool, which rebuilds both scripts."/>
+                                <Run Text="The raw decoded instruction stream. To add a culture, use the Music Project Editor, which rebuilds both scripts."/>
                             </TextBlock>
                             <DataGrid ItemsSource="{Binding Instructions}" AutoGenerateColumns="False" CanUserAddRows="False" IsReadOnly="True"
                                       GridLinesVisibility="Horizontal" HeadersVisibility="Column" FontFamily="Consolas">
