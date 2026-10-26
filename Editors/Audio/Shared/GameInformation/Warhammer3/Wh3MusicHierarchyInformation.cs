@@ -38,7 +38,7 @@ namespace Editors.Audio.Shared.GameInformation.Warhammer3
         ///
         ///   WH3_Campaign_Subcultures                     698158058, subculture x 781561792 -> listed
         ///   Battle_Music_WH3_Culture                     26264058,  result x culture     -> listed
-        ///   WH3_Campaign_Subcultures                     145953291, subculture x resolution
+        ///   WH3_Campaign_Subcultures                     145953291, subculture x resolution -> listed
         ///   Battle_Music_WH3_Culture                     67383790,  six arguments deep   -> listed
         ///   WH3_Campaign_Music_AMS_Fragments_Faction     read elsewhere, see below
         ///   WH3_AMS_Pulse_Percussion_Options             read elsewhere, see below
@@ -58,9 +58,11 @@ namespace Editors.Audio.Shared.GameInformation.Warhammer3
         /// branch takes the default at each of those levels instead, so the same music plays whatever
         /// they are. See MusicSwitchContainerMergeService for which blocks get the branch.
         ///
-        /// 145953291 is left out for a different reason: it is reachable, but it is post battle
-        /// campaign music rather than the subculture's theme, and giving it the same audio as the
-        /// theme is a decision for whoever wires it up rather than a consequence of this table.
+        /// 145953291 is the campaign victory and defeat resolution screens, culture > faction > won or
+        /// lost. Vanilla gives each culture its own tracks there, so a culture's tree reaches it too:
+        /// its root plays there unless the tree gives the resolution its own branch. The campaign
+        /// script ignores every music marker while a resolution screen is up ("we're in campaign
+        /// resolution state, will do nothing with markers"), so the segments need no cues of their own.
         ///
         /// The four with no container are the adaptive music system. They are not unused and they are
         /// not all the same: MusicEventShapeResearch.DumpWhatReadsTheAmsStateGroups counted what
@@ -84,7 +86,7 @@ namespace Editors.Audio.Shared.GameInformation.Warhammer3
         /// </summary>
         public static IReadOnlyList<uint> GetMusicSwitchContainerIds(string stateGroupName) => stateGroupName switch
         {
-            "WH3_Campaign_Subcultures" => [698158058],
+            "WH3_Campaign_Subcultures" => [698158058, CampaignResolutionMusicSwitchContainerId],
             "Battle_Music_WH3_Culture" => [26264058, InBattleMusicSwitchContainerId],
             _ => []
         };
@@ -148,6 +150,9 @@ namespace Editors.Audio.Shared.GameInformation.Warhammer3
 
         /// <summary>The named cue's name, which is stored null terminated on disk.</summary>
         public const string CustomCueName = "Update_PreBattle\0";
+
+        /// <summary>The campaign victory and defeat screens - see <see cref="GetMusicSwitchContainerIds"/>.</summary>
+        public const uint CampaignResolutionMusicSwitchContainerId = 145953291;
 
         /// <summary>The adaptive container playing during a battle - see <see cref="GetMusicSwitchContainerIds"/>.</summary>
         public const uint InBattleMusicSwitchContainerId = 67383790;

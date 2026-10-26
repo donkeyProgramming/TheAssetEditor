@@ -3,6 +3,8 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:vm="clr-namespace:Editors.MusicProjectEditor.ViewModels"
+             xmlns:waveform="clr-namespace:Editors.Audio.WaveformVisualiser.Presentation;assembly=Editors.Audio"
              mc:Ignorable="d"
              d:DesignHeight="600" d:DesignWidth="1000">
     <Grid>
@@ -74,6 +76,7 @@
                 <Grid.RowDefinitions>
                     <RowDefinition Height="*"/>
                     <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
                 </Grid.RowDefinitions>
 
                 <DockPanel Grid.Row="0">
@@ -91,18 +94,87 @@
                     </DataGrid>
                 </DockPanel>
 
-                <DockPanel Grid.Row="1" Margin="0,8,0,0" Height="220"
-                           Visibility="{Binding SelectedEvent, Converter={StaticResource NullToVisibilityConverter}}">
-                    <TextBlock DockPanel.Dock="Top" Text="{Binding SelectedEvent.Title}" FontWeight="Bold" Margin="0,0,0,2"/>
-                    <TextBlock DockPanel.Dock="Top" Text="{Binding SelectedEvent.Note}" TextWrapping="Wrap" FontSize="11" Opacity="0.8" Margin="0,0,0,6"/>
-                    <StackPanel DockPanel.Dock="Right" Margin="6,0,0,0" IsEnabled="{Binding CanEditSelectedEventAudio}">
-                        <Button Content="Add wav..." Command="{Binding AddAudioCommand}" Padding="12,3" Margin="0,0,0,6"
-                                ToolTip="Pick a wav from the loaded packs. A wav only on disk has to be added to the editable pack first."/>
-                        <Button Content="Remove" Command="{Binding RemoveAudioCommand}" Padding="12,3"/>
-                    </StackPanel>
-                    <ListBox ItemsSource="{Binding SelectedEvent.AudioFiles}" SelectedItem="{Binding SelectedAudioFile}"
-                             IsEnabled="{Binding CanEditSelectedEventAudio}"/>
-                </DockPanel>
+                <!-- The selected slot: what this culture plays there, and what vanilla cultures play there. -->
+                <TabControl Grid.Row="1" Margin="0,8,0,0" Height="340"
+                            Visibility="{Binding SelectedEvent, Converter={StaticResource NullToVisibilityConverter}}">
+                    <TabItem Header="This culture's audio">
+                        <DockPanel Margin="4">
+                            <TextBlock DockPanel.Dock="Top" Text="{Binding SelectedEvent.Title}" FontWeight="Bold" Margin="0,0,0,2"/>
+                            <TextBlock DockPanel.Dock="Top" Text="{Binding SelectedEvent.Note}" TextWrapping="Wrap" FontSize="11" Opacity="0.8" Margin="0,0,0,6"/>
+
+                            <!-- The decision tree, for the slots whose music is one. Each branch narrows down
+                                 when its wavs play; one with none plays its parent's. -->
+                            <TreeView DockPanel.Dock="Left" Width="300" Margin="0,0,8,0" ItemsSource="{Binding TreeRoots}"
+                                      SelectedItemChanged="OnTreeSelectedItemChanged"
+                                      Visibility="{Binding HasSelectedTree, Converter={StaticResource BoolToCollapsedConverter}}">
+                                <TreeView.Resources>
+                                    <HierarchicalDataTemplate DataType="{x:Type vm:MusicTreeNodeViewModel}" ItemsSource="{Binding Children}">
+                                        <StackPanel Orientation="Horizontal">
+                                            <TextBlock Text="{Binding Label}"/>
+                                            <TextBlock Text="{Binding Summary, StringFormat=' ({0})'}" Opacity="0.65"/>
+                                        </StackPanel>
+                                    </HierarchicalDataTemplate>
+                                    <Style TargetType="{x:Type TreeViewItem}" BasedOn="{StaticResource {x:Type TreeViewItem}}">
+                                        <Setter Property="IsExpanded" Value="{Binding IsExpanded, Mode=TwoWay}"/>
+                                        <Setter Property="IsSelected" Value="{Binding IsSelected, Mode=TwoWay}"/>
+                                    </Style>
+                                </TreeView.Resources>
+                            </TreeView>
+
+                            <StackPanel DockPanel.Dock="Top" Margin="0,0,0,6"
+                                        Visibility="{Binding HasSelectedTree, Converter={StaticResource BoolToCollapsedConverter}}">
+                                <TextBlock Text="{Binding SelectedTreeNode.Label}" FontWeight="Bold" Margin="0,0,0,4"/>
+                                <StackPanel Orientation="Horizontal" Margin="0,0,0,4">
+                                    <TextBlock Text="Split by" VerticalAlignment="Center" Margin="0,0,6,0"/>
+                                    <ComboBox MinWidth="140" ItemsSource="{Binding SplitLevels}" SelectedItem="{Binding SelectedSplitLevel}" DisplayMemberPath="DisplayName"/>
+                                    <ComboBox MinWidth="180" Margin="6,0,0,0" ItemsSource="{Binding SplitValues}" SelectedItem="{Binding SelectedSplitValue}" DisplayMemberPath="DisplayName"/>
+                                    <Button Content="Add branch" Command="{Binding AddBranchCommand}" IsEnabled="{Binding CanAddBranch}" Padding="10,2" Margin="6,0,0,0"/>
+                                    <Button Content="Remove branch" Command="{Binding RemoveBranchCommand}" IsEnabled="{Binding CanRemoveBranch}" Padding="10,2" Margin="6,0,0,0"/>
+                                </StackPanel>
+                                <TextBlock Text="{Binding SplitHelp}" TextWrapping="Wrap" FontSize="11" Opacity="0.7"/>
+                            </StackPanel>
+
+                            <StackPanel DockPanel.Dock="Right" Margin="6,0,0,0" IsEnabled="{Binding CanEditSelectedEventAudio}">
+                                <Button Content="Add wav..." Command="{Binding AddAudioCommand}" Padding="12,3" Margin="0,0,0,6"
+                                        ToolTip="Pick a wav from the loaded packs. A wav only on disk has to be added to the editable pack first."/>
+                                <Button Content="Remove" Command="{Binding RemoveAudioCommand}" Padding="12,3"/>
+                            </StackPanel>
+                            <ListBox ItemsSource="{Binding SelectedAudioFiles}" SelectedItem="{Binding SelectedAudioFile}"
+                                     IsEnabled="{Binding CanEditSelectedEventAudio}"
+                                     ToolTip="Select a wav to load it into the player below."/>
+                        </DockPanel>
+                    </TabItem>
+                    <TabItem Header="Vanilla reference">
+                        <DockPanel Margin="4">
+                            <DockPanel DockPanel.Dock="Top" Margin="0,0,0,4">
+                                <TextBlock DockPanel.Dock="Left" Text="Vanilla culture" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                                <ComboBox DockPanel.Dock="Left" MinWidth="200" ItemsSource="{Binding VanillaStates}" SelectedItem="{Binding SelectedVanillaState}"
+                                          ToolTip="Every vanilla culture with music of its own in this slot. The choice is kept when you pick another slot, to compare one culture across them."/>
+                                <TextBlock/>
+                            </DockPanel>
+                            <TextBlock DockPanel.Dock="Top" Text="{Binding VanillaSummary}" TextWrapping="Wrap" FontSize="11" Opacity="0.85" Margin="0,0,0,4"/>
+                            <DataGrid ItemsSource="{Binding VanillaClips}" SelectedItem="{Binding SelectedVanillaClip}"
+                                      AutoGenerateColumns="False" IsReadOnly="True" CanUserAddRows="False"
+                                      GridLinesVisibility="None" HeadersVisibility="Column"
+                                      ToolTip="Select a file to load it into the player below.">
+                                <DataGrid.Columns>
+                                    <DataGridTextColumn Header="Where it plays" Binding="{Binding Where}" Width="3*" ElementStyle="{DynamicResource {x:Type TextBlock}}"/>
+                                    <DataGridTextColumn Header="Length" Binding="{Binding Length}" Width="70" ElementStyle="{DynamicResource {x:Type TextBlock}}"/>
+                                    <DataGridTemplateColumn Header="Also played for" Width="2*">
+                                        <DataGridTemplateColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <TextBlock Text="{Binding Shared}" ToolTip="{Binding SharedToolTip}" TextTrimming="CharacterEllipsis"/>
+                                            </DataTemplate>
+                                        </DataGridTemplateColumn.CellTemplate>
+                                    </DataGridTemplateColumn>
+                                </DataGrid.Columns>
+                            </DataGrid>
+                        </DockPanel>
+                    </TabItem>
+                </TabControl>
+
+                <waveform:WaveformVisualiserView Grid.Row="2" Margin="0,6,0,0" DataContext="{Binding WaveformVisualiserViewModel}"
+                                                 Visibility="{Binding DataContext.SelectedEvent, RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource NullToVisibilityConverter}}"/>
             </Grid>
         </Grid>
     </Grid>

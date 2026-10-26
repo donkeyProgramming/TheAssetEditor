@@ -57,18 +57,41 @@ namespace Editors.Audio.Shared.AudioProject
         /// project still needs.</summary>
         void RemoveCulture(AudioProjectFile audioProject, MusicCulture musicCulture);
 
-        /// <summary>The audio the event's State currently selects, in playlist order.</summary>
+        /// <summary>The audio at the root of the event's <see cref="MusicTree"/>, in playlist order.</summary>
         IReadOnlyList<AudioFile> GetAudio(AudioProjectFile audioProject, string eventName);
 
-        /// <summary>Replaces the audio the event's State selects with the wavs at these pack paths,
-        /// in playlist order. An empty list leaves the event with nothing of its own to play.</summary>
+        /// <summary>Replaces the audio at the root of the event's <see cref="MusicTree"/> with the wavs at
+        /// these pack paths, in playlist order.</summary>
         void SetAudio(AudioProjectFile audioProject, string eventName, IReadOnlyList<string> wavPackFilePaths);
+
+        /// <summary>The event's decision tree, saying which of its audio plays when; null for an event
+        /// that cannot carry audio of its own. An event that has none yet gets an empty root.
+        ///
+        /// Every slot has one, though only the battle and campaign themes compile to a Wwise decision
+        /// tree: the pulses and the fragments are laid out differently in the game, and their trees
+        /// split by what those layouts tell apart - see <see cref="AmsMusicLayout"/>.</summary>
+        MusicTree GetTree(AudioProjectFile audioProject, string eventName);
+
+        IReadOnlyList<AudioFile> GetNodeAudio(AudioProjectFile audioProject, string eventName, int nodeId);
+
+        /// <summary>Replaces one tree node's audio and regenerates the music it plays.</summary>
+        void SetNodeAudio(AudioProjectFile audioProject, string eventName, int nodeId, IReadOnlyList<string> wavPackFilePaths);
+
+        /// <summary>Adds a branch for <paramref name="value"/> of <paramref name="level"/> under a node,
+        /// which then splits on that level; null <paramref name="value"/> adds its "any other value"
+        /// branch. A new branch has no audio, so it plays its parent's until it is given some.
+        /// Returns its id.</summary>
+        int AddBranch(AudioProjectFile audioProject, string eventName, int parentNodeId, string level, string value);
+
+        /// <summary>Removes a branch and everything below it. The root cannot be removed.</summary>
+        void RemoveBranch(AudioProjectFile audioProject, string eventName, int nodeId);
     }
 
     public class MusicAudioProjectService(
         IActionEventFactory actionEventFactory,
         IMusicHierarchyFactory musicHierarchyFactory,
-        IAudioRepository audioRepository) : IMusicAudioProjectService
+        IAudioRepository audioRepository,
+        IAmsMusicLayout amsMusicLayout) : IMusicAudioProjectService
     {
         /// <summary>The one music project, named so its SoundBank is global_music_music.</summary>
         public const string ProjectName = "music";
@@ -83,6 +106,7 @@ namespace Editors.Audio.Shared.AudioProject
         private readonly IActionEventFactory _actionEventFactory = actionEventFactory;
         private readonly IMusicHierarchyFactory _musicHierarchyFactory = musicHierarchyFactory;
         private readonly IAudioRepository _audioRepository = audioRepository;
+        private readonly IAmsMusicLayout _amsMusicLayout = amsMusicLayout;
 
         private readonly ILogger _logger = Logging.Create<MusicAudioProjectService>();
 
@@ -180,34 +204,9 @@ namespace Editors.Audio.Shared.AudioProject
             var stateGroupName = setStateAction.StateGroupName;
             var stateName = setStateAction.StateName;
 
-            if (Wh3MusicHierarchyInformation.IsAmsPulseStateGroup(stateGroupName))
-            {
-                var sourceIds = soundBank.AmsPulses
-                    .Where(amsPulse => IsFor(amsPulse.StateGroupName, amsPulse.StateName, stateGroupName, stateName))
-                    .SelectMany(amsPulse => amsPulse.Clips)
-                    .Select(clip => clip.SourceId);
-                return GetAudioFiles(audioProject, sourceIds);
-            }
-
-            var amsFragment = soundBank.AmsFragments
-                .FirstOrDefault(fragment => IsFor(fragment.StateGroupName, fragment.StateName, stateGroupName, stateName));
-            if (amsFragment != null)
-            {
-                var sourceIds = amsFragment.SoundIds
-                    .Select(soundBank.GetSound)
-                    .Where(sound => sound != null)
-                    .Select(sound => sound.SourceId);
-                return GetAudioFiles(audioProject, sourceIds);
-            }
-
-            // A battle culture has a copy of its branch under each of the containers that branch on
-            // it, all over the same audio, so one of them says what it plays.
-            var musicRandomSequence = soundBank.MusicRandomSequences
-                .FirstOrDefault(randomSequence => IsFor(randomSequence.StateGroupName, randomSequence.StateName, stateGroupName, stateName));
-            if (musicRandomSequence == null)
-                return [];
-
-            return GetAudioFiles(audioProject, soundBank.GetMusicSegments(musicRandomSequence).Select(musicSegment => musicSegment.SourceId));
+            return Wh3MusicHierarchyInformation.CanCarryOwnAudio(stateGroupName)
+                ? GetNodeAudio(audioProject, eventName, GetTree(audioProject, eventName).Root.Id)
+                : [];
         }
 
         public void SetAudio(AudioProjectFile audioProject, string eventName, IReadOnlyList<string> wavPackFilePaths)
@@ -219,20 +218,187 @@ namespace Editors.Audio.Shared.AudioProject
                 ?? throw new InvalidOperationException($"The music project has no event called '{eventName}'.");
 
             var stateGroupName = setStateAction.StateGroupName;
-            var stateName = setStateAction.StateName;
 
             if (!Wh3MusicHierarchyInformation.CanCarryOwnAudio(stateGroupName))
                 throw new InvalidOperationException(
                     $"'{eventName}' sets {stateGroupName}, which nothing in the game branches on in a way a mod can extend, so audio given to it could never be reached.");
 
+            SetNodeAudio(audioProject, eventName, GetTree(audioProject, eventName).Root.Id, wavPackFilePaths);
+        }
+
+        public MusicTree GetTree(AudioProjectFile audioProject, string eventName)
+        {
+            var soundBank = GetMusicSoundBank(audioProject);
+            var setStateAction = GetSetStateAction(soundBank, eventName);
+            if (setStateAction == null || !HasTree(setStateAction.StateGroupName))
+                return null;
+
+            var stateGroupName = setStateAction.StateGroupName;
+            var stateName = setStateAction.StateName;
+
+            var tree = soundBank.MusicTrees.FirstOrDefault(musicTree => IsFor(musicTree.StateGroupName, musicTree.StateName, stateGroupName, stateName));
+            if (tree == null)
+            {
+                tree = new MusicTree { StateGroupName = stateGroupName, StateName = stateName };
+                soundBank.MusicTrees.Add(tree);
+            }
+
+            return tree;
+        }
+
+        public IReadOnlyList<AudioFile> GetNodeAudio(AudioProjectFile audioProject, string eventName, int nodeId)
+        {
+            var node = RequireNode(audioProject, eventName, nodeId, out _, out _);
+            return GetAudioFiles(audioProject, node.AudioFileIds);
+        }
+
+        public void SetNodeAudio(AudioProjectFile audioProject, string eventName, int nodeId, IReadOnlyList<string> wavPackFilePaths)
+        {
+            ArgumentNullException.ThrowIfNull(wavPackFilePaths);
+
+            var node = RequireNode(audioProject, eventName, nodeId, out var soundBank, out var tree);
             EnsureVanillaIds();
 
-            // Resolved before the old branch goes, so a wav it shares with the new list keeps its id.
             var audioFiles = GetOrCreateAudioFiles(audioProject, wavPackFilePaths);
+            node.AudioFileIds = [.. audioFiles.Select(audioFile => audioFile.Id)];
+            RegenerateTreeHierarchy(audioProject, soundBank, tree, audioFiles);
+        }
 
-            RemoveMusicBranch(audioProject, soundBank, stateGroupName, stateName);
-            if (audioFiles.Count != 0)
-                AddMusicBranch(audioProject, soundBank, stateGroupName, stateName, audioFiles);
+        public int AddBranch(AudioProjectFile audioProject, string eventName, int parentNodeId, string level, string value)
+        {
+            ArgumentException.ThrowIfNullOrWhiteSpace(level);
+
+            var parent = RequireNode(audioProject, eventName, parentNodeId, out _, out var tree);
+
+            if (parent.SplitBy != null && parent.SplitBy != level)
+                throw new InvalidOperationException($"This part of the tree already splits by {Wh3MusicTreeLevelInformation.GetLevelName(parent.SplitBy)}.");
+
+            // Splitting on a level an ancestor already split on can only ever see the one value that
+            // ancestor's branch is for, so it would say nothing.
+            for (var ancestor = tree.GetParent(parent); ancestor != null; ancestor = tree.GetParent(ancestor))
+            {
+                if (ancestor.SplitBy == level)
+                    throw new InvalidOperationException($"A branch above this one already splits by {Wh3MusicTreeLevelInformation.GetLevelName(level)}.");
+            }
+
+            if (parent.Branches.Any(branch => branch.Value == value))
+                throw new InvalidOperationException($"This part of the tree already has a branch for {Wh3MusicTreeLevelInformation.GetValueName(level, value)}.");
+
+            var node = new MusicTreeNode { Id = tree.NextNodeId(), Value = value };
+            parent.SplitBy = level;
+            parent.Branches.Add(node);
+
+            // Nothing to regenerate: with no audio of its own the branch plays its parent's, which is
+            // what played there before it existed.
+            return node.Id;
+        }
+
+        public void RemoveBranch(AudioProjectFile audioProject, string eventName, int nodeId)
+        {
+            var node = RequireNode(audioProject, eventName, nodeId, out var soundBank, out var tree);
+            var parent = tree.GetParent(node)
+                ?? throw new InvalidOperationException("The root of the tree cannot be removed; remove its audio instead.");
+
+            parent.Branches.Remove(node);
+            if (parent.Branches.Count == 0)
+                parent.SplitBy = null;
+
+            EnsureVanillaIds();
+            RegenerateTreeHierarchy(audioProject, soundBank, tree, []);
+        }
+
+        private static bool HasTree(string stateGroupName) => Wh3MusicHierarchyInformation.CanCarryOwnAudio(stateGroupName);
+
+        private MusicTreeNode RequireNode(AudioProjectFile audioProject, string eventName, int nodeId, out SoundBank soundBank, out MusicTree tree)
+        {
+            tree = GetTree(audioProject, eventName)
+                ?? throw new InvalidOperationException($"'{eventName}' is not a music event with a decision tree.");
+            soundBank = GetMusicSoundBank(audioProject);
+            return tree.GetNode(nodeId)
+                ?? throw new InvalidOperationException($"'{eventName}' has no tree node {nodeId}.");
+        }
+
+        /// <summary>
+        /// What a State plays, regenerated from its tree. The three layers are built differently,
+        /// because the game lays them out differently:
+        ///
+        ///   decision trees  a random sequence per node that has audio, in each container that node can
+        ///                   play in. Which paths reach each is worked out at compile time - see
+        ///                   <see cref="Wwise.Generators.MusicSwitchContainerMergeService.BuildTreeKeyPaths"/>.
+        ///   pulses          only the clips; which vanilla track each goes in is decided at compile time
+        ///                   from the tree, since the tracks are the game's.
+        ///   fragments       the whole hierarchy below the faction container - see <see cref="AmsFragment"/>.
+        /// </summary>
+        private void RegenerateTreeHierarchy(AudioProjectFile audioProject, SoundBank soundBank, MusicTree tree, IEnumerable<AudioFile> newAudioFiles)
+        {
+            // Taken before the old hierarchy goes, since that drops audio files nothing plays any more.
+            var audioFilesById = audioProject.AudioFiles
+                .Concat(newAudioFiles)
+                .DistinctBy(audioFile => audioFile.Id)
+                .ToDictionary(audioFile => audioFile.Id);
+
+            List<AudioFile> AudioFilesOf(MusicTreeNode node) => [.. node.AudioFileIds
+                .Select(audioFileId => audioFilesById.GetValueOrDefault(audioFileId))
+                .Where(audioFile => audioFile != null)];
+
+            RemoveMusicBranch(audioProject, soundBank, tree.StateGroupName, tree.StateName);
+
+            if (Wh3MusicHierarchyInformation.IsAmsPulseStateGroup(tree.StateGroupName))
+            {
+                RegenerateAmsPulse(audioProject, soundBank, tree, AudioFilesOf);
+                return;
+            }
+
+            if (Wh3MusicHierarchyInformation.GetAmsFragmentContainerId(tree.StateGroupName) is uint fragmentContainerId)
+            {
+                RegenerateAmsFragment(audioProject, soundBank, tree, AudioFilesOf, fragmentContainerId);
+                return;
+            }
+
+            var usedHircIds = GetUsedHircIds(audioProject);
+            foreach (var node in tree.GetNodes().Where(node => node.AudioFileIds.Count != 0))
+            {
+                var audioFiles = AudioFilesOf(node);
+                if (audioFiles.Count == 0)
+                    continue;
+
+                // A music node has one parent, so a node playing in both battle containers needs a
+                // copy of its hierarchy under each.
+                foreach (var containerId in Wh3MusicHierarchyInformation.GetMusicSwitchContainerIds(tree.StateGroupName))
+                {
+                    if (!CanPlayIn(tree, node, containerId))
+                        continue;
+
+                    var branch = _musicHierarchyFactory.CreateMusicBranch(usedHircIds, containerId, tree.StateGroupName, tree.StateName, audioFiles, soundBank.Language);
+                    branch.MusicRandomSequence.TreeNodeId = node.Id;
+                    soundBank.MusicRandomSequences.Add(branch.MusicRandomSequence);
+                    soundBank.MusicSegments.AddRange(branch.MusicSegments);
+                }
+
+                foreach (var audioFile in audioFiles)
+                    AddAudioFile(audioProject, audioFile);
+            }
+        }
+
+        /// <summary>Whether a node is on the container's side of every split on the part of the game
+        /// above it. Its paths are worked out at compile time; this only saves generating a hierarchy
+        /// in a container it can never play in.</summary>
+        private static bool CanPlayIn(MusicTree tree, MusicTreeNode node, uint containerId)
+        {
+            var containerValue = containerId.ToString();
+            for (var child = node; tree.GetParent(child) is { } parent; child = parent)
+            {
+                if (parent.SplitBy != Wh3MusicTreeLevelInformation.ContainerLevel)
+                    continue;
+
+                if (child.Value != null && child.Value != containerValue)
+                    return false;
+
+                if (child.Value == null && parent.Branches.Any(sibling => sibling.Value == containerValue))
+                    return false;
+            }
+
+            return true;
         }
 
         private List<AudioFile> GetOrCreateAudioFiles(AudioProjectFile audioProject, IReadOnlyList<string> wavPackFilePaths)
@@ -345,6 +511,7 @@ namespace Editors.Audio.Shared.AudioProject
                         continue;
 
                     RemoveMusicBranch(audioProject, soundBank, setStateAction.StateGroupName, setStateAction.StateName);
+                    soundBank.MusicTrees.RemoveAll(tree => IsFor(tree.StateGroupName, tree.StateName, setStateAction.StateGroupName, setStateAction.StateName));
                     RemoveStateFromStateGroups(audioProject, soundBank, setStateAction.StateGroupName, setStateAction.StateName);
                 }
             }
@@ -357,55 +524,21 @@ namespace Editors.Audio.Shared.AudioProject
                 .Any(action => action.ActionType == AkActionType.SetState && IsFor(action.StateGroupName, action.StateName, stateGroupName, stateName));
         }
 
-        private void AddMusicBranch(AudioProjectFile audioProject, SoundBank soundBank, string stateGroupName, string stateName, List<AudioFile> audioFiles)
-        {
-            // The pulse Groups are not reached through a decision tree at all - a State there picks a
-            // sub-track inside vanilla Music Tracks - so their audio is modelled and generated
-            // differently even though a modder picks wavs for them the same way.
-            if (Wh3MusicHierarchyInformation.IsAmsPulseStateGroup(stateGroupName))
-            {
-                AddAmsPulse(audioProject, soundBank, stateGroupName, stateName, audioFiles);
-                return;
-            }
-
-            var usedHircIds = GetUsedHircIds(audioProject);
-
-            var fragmentContainerId = Wh3MusicHierarchyInformation.GetAmsFragmentContainerId(stateGroupName);
-            if (fragmentContainerId != null)
-            {
-                AddAmsFragment(audioProject, soundBank, stateGroupName, stateName, audioFiles, usedHircIds, fragmentContainerId.Value);
-                return;
-            }
-
-            // One hierarchy per container: a music node has a single parent, so battle culture music
-            // needs its own copy under the results container and under the in-battle one, both
-            // playing the same audio.
-            foreach (var musicSwitchContainerId in Wh3MusicHierarchyInformation.GetMusicSwitchContainerIds(stateGroupName))
-            {
-                var branch = _musicHierarchyFactory.CreateMusicBranch(usedHircIds, musicSwitchContainerId, stateGroupName, stateName, audioFiles, soundBank.Language);
-                soundBank.MusicRandomSequences.Add(branch.MusicRandomSequence);
-                soundBank.MusicSegments.AddRange(branch.MusicSegments);
-            }
-
-            foreach (var audioFile in audioFiles)
-                AddAudioFile(audioProject, audioFile);
-        }
-
         /// <summary>
-        /// Audio for one of the pulse Groups. Every wav becomes a clip, and the clips are spread over
-        /// the vanilla switch tracks at compile time rather than here - which track a clip lands in
-        /// depends on how many the game has, and that is not something the project should record.
+        /// A pulse's clips: every wav anywhere in its tree, once. Each vanilla pulse track is one key and
+        /// one variation, and the compile asks the tree which node plays in each and hands the track one
+        /// of that node's wavs - see <see cref="Wwise.Generators.SoundBankGeneratorService"/>.
         /// </summary>
-        private static void AddAmsPulse(AudioProjectFile audioProject, SoundBank soundBank, string stateGroupName, string stateName, List<AudioFile> audioFiles)
+        private static void RegenerateAmsPulse(AudioProjectFile audioProject, SoundBank soundBank, MusicTree tree, Func<MusicTreeNode, List<AudioFile>> audioFilesOf)
         {
-            var amsPulse = new AmsPulse { StateGroupName = stateGroupName, StateName = stateName };
-            foreach (var audioFile in audioFiles.DistinctBy(audioFile => audioFile.Id))
+            var audioFiles = tree.GetNodes().SelectMany(audioFilesOf).DistinctBy(audioFile => audioFile.Id).ToList();
+            if (audioFiles.Count == 0)
+                return;
+
+            var amsPulse = new AmsPulse { StateGroupName = tree.StateGroupName, StateName = tree.StateName };
+            foreach (var audioFile in audioFiles)
             {
-                amsPulse.Clips.Add(new AmsPulseClip
-                {
-                    SourceId = audioFile.Id,
-                    Language = soundBank.Language
-                });
+                amsPulse.Clips.Add(new AmsPulseClip { SourceId = audioFile.Id, Language = soundBank.Language });
                 AddAudioFile(audioProject, audioFile);
             }
 
@@ -413,66 +546,89 @@ namespace Editors.Audio.Shared.AudioProject
         }
 
         /// <summary>
-        /// Audio for the ambient fragments Group. This one does build a hierarchy: the wavs become
-        /// Sounds, a Random Sequence container over them when there is more than one, and a Switch
-        /// container on the musical key Group that the vanilla faction container will point at.
+        /// The fragment hierarchy, in vanilla's shape: per key, a Switch on Call or Response over what
+        /// the tree plays for each. Keys that would play the same pair share a switch, the way vanilla's
+        /// C_01, C_02 and C_03 share one branch. A key the tree gives nothing plays nothing.
         ///
-        /// The Sounds go in the bank's own Sound list, which is where the compiler already looks for
-        /// wem paths, so they need no special handling beyond being generated.
+        /// A Sound has one parent, so a node playing under two switches gets its Sounds twice.
         /// </summary>
-        private static void AddAmsFragment(
-            AudioProjectFile audioProject, SoundBank soundBank, string stateGroupName, string stateName, List<AudioFile> audioFiles,
-            HashSet<uint> usedHircIds, uint fragmentContainerId)
+        private void RegenerateAmsFragment(
+            AudioProjectFile audioProject, SoundBank soundBank, MusicTree tree, Func<MusicTreeNode, List<AudioFile>> audioFilesOf, uint fragmentContainerId)
         {
-            var sounds = new List<Sound>();
-            foreach (var audioFile in audioFiles)
+            var usedHircIds = GetUsedHircIds(audioProject);
+            var amsFragment = new AmsFragment
             {
-                var soundIds = IdGenerator.GenerateIds(usedHircIds);
-                sounds.Add(Sound.CreateContainerSound(
-                    soundIds.Guid, soundIds.Id, directParentId: 0, playlistOrder: sounds.Count,
-                    sourceId: audioFile.Id, language: soundBank.Language));
-                AddAudioFile(audioProject, audioFile);
-            }
-
-            var keySwitchIds = IdGenerator.GenerateIds(usedHircIds);
-
-            // One Sound needs nothing over it; several need a container to pick between them, which
-            // is the same shape a Play Action Event uses for a set of variations, played at random.
-            uint targetHircId;
-            if (sounds.Count == 1)
-            {
-                targetHircId = sounds[0].Id;
-            }
-            else
-            {
-                var containerIds = IdGenerator.GenerateIds(usedHircIds);
-                targetHircId = containerIds.Id;
-
-                soundBank.RandomSequenceContainers.TryAdd(new RandomSequenceContainer(
-                    containerIds.Guid, containerIds.Id, overrideBusId: 0, directParentId: keySwitchIds.Id,
-                    hircSettings: new HircSettings(),
-                    children: [.. sounds.Select(sound => sound.Id)]));
-            }
-
-            foreach (var sound in sounds)
-            {
-                sound.DirectParentId = sounds.Count == 1 ? keySwitchIds.Id : targetHircId;
-                soundBank.Sounds.TryAdd(sound);
-
-                var audioFile = audioProject.GetAudioFile(sound.SourceId);
-                if (!audioFile.Sounds.Contains(sound.Id))
-                    audioFile.Sounds.Add(sound.Id);
-            }
-
-            soundBank.AmsFragments.Add(new AmsFragment
-            {
-                StateGroupName = stateGroupName,
-                StateName = stateName,
+                StateGroupName = tree.StateGroupName,
+                StateName = tree.StateName,
                 FactionSwitchContainerId = fragmentContainerId,
-                KeySwitchContainerId = keySwitchIds.Id,
-                TargetHircId = targetHircId,
-                SoundIds = [.. sounds.Select(sound => sound.Id)]
-            });
+                KeySwitchContainerId = IdGenerator.GenerateIds(usedHircIds).Id
+            };
+
+            uint CreateTarget(MusicTreeNode node, uint parentId)
+            {
+                var audioFiles = node == null ? [] : audioFilesOf(node);
+                if (audioFiles.Count == 0)
+                    return 0;
+
+                uint containerId = 0;
+                if (audioFiles.Count > 1)
+                {
+                    var containerIds = IdGenerator.GenerateIds(usedHircIds);
+                    containerId = containerIds.Id;
+                    amsFragment.ContainerIds.Add(containerId);
+                    soundBank.RandomSequenceContainers.TryAdd(new RandomSequenceContainer(
+                        containerIds.Guid, containerIds.Id, overrideBusId: 0, directParentId: parentId, hircSettings: new HircSettings(), children: []));
+                }
+
+                foreach (var audioFile in audioFiles)
+                {
+                    var soundIds = IdGenerator.GenerateIds(usedHircIds);
+                    var sound = Sound.CreateContainerSound(
+                        soundIds.Guid, soundIds.Id, directParentId: containerId == 0 ? parentId : containerId,
+                        playlistOrder: amsFragment.SoundIds.Count, sourceId: audioFile.Id, language: soundBank.Language);
+                    soundBank.Sounds.TryAdd(sound);
+                    amsFragment.SoundIds.Add(sound.Id);
+                    soundBank.GetRandomSequenceContainer(containerId)?.Children.Add(sound.Id);
+
+                    AddAudioFile(audioProject, audioFile);
+                    var projectAudioFile = audioProject.GetAudioFile(audioFile.Id);
+                    if (!projectAudioFile.Sounds.Contains(sound.Id))
+                        projectAudioFile.Sounds.Add(sound.Id);
+                }
+
+                return containerId != 0 ? containerId : amsFragment.SoundIds[^1];
+            }
+
+            var switchesByNodes = new Dictionary<(int? Call, int? Response), AmsFragmentCallResponse>();
+            foreach (var key in _amsMusicLayout.GetFragmentKeys(fragmentContainerId))
+            {
+                MusicTreeNode NodeFor(string callOrResponse) => tree.Evaluate(level =>
+                    level == Wh3MusicTreeLevelInformation.AmsKeyLevel ? key :
+                    level == AmsMusicLayout.CallResponseStateGroupName ? callOrResponse :
+                    null);
+
+                var call = NodeFor(AmsMusicLayout.Call);
+                var response = NodeFor(AmsMusicLayout.Response);
+                if (call == null && response == null)
+                    continue;
+
+                if (!switchesByNodes.TryGetValue((call?.Id, response?.Id), out var callResponse))
+                {
+                    callResponse = new AmsFragmentCallResponse { Id = IdGenerator.GenerateIds(usedHircIds).Id };
+                    callResponse.CallTargetHircId = CreateTarget(call, callResponse.Id);
+
+                    // The same node under both shares one target, which still has the one parent.
+                    callResponse.ResponseTargetHircId = response == call ? callResponse.CallTargetHircId : CreateTarget(response, callResponse.Id);
+
+                    switchesByNodes[(call?.Id, response?.Id)] = callResponse;
+                    amsFragment.CallResponseSwitches.Add(callResponse);
+                }
+
+                amsFragment.Keys.Add(new AmsFragmentKey { Key = key, CallResponseSwitchId = callResponse.Id });
+            }
+
+            if (amsFragment.Keys.Count != 0)
+                soundBank.AmsFragments.Add(amsFragment);
         }
 
         /// <summary>Whatever the State selects, in every container that branches on it, and any
@@ -489,8 +645,7 @@ namespace Editors.Audio.Shared.AudioProject
                     audioProject.GetAudioFile(sound.SourceId)?.Sounds.Remove(sound.Id);
                 }
 
-                var container = soundBank.GetRandomSequenceContainer(amsFragment.TargetHircId);
-                if (container != null)
+                foreach (var container in amsFragment.ContainerIds.Select(soundBank.GetRandomSequenceContainer).Where(container => container != null))
                     soundBank.RandomSequenceContainers.Remove(container);
 
                 soundBank.AmsFragments.Remove(amsFragment);

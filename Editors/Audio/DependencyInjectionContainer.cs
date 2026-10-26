@@ -120,6 +120,8 @@ namespace Editors.Audio
             serviceCollection.AddSingleton<IStatePathFactory, StatePathFactory>();
             serviceCollection.AddSingleton<IMusicHierarchyFactory, MusicHierarchyFactory>();
             serviceCollection.AddScoped<IMusicAudioProjectService, MusicAudioProjectService>();
+            serviceCollection.AddScoped<IMusicVanillaReferenceService, MusicVanillaReferenceService>();
+            serviceCollection.AddScoped<IAmsMusicLayout, AmsMusicLayout>();
             serviceCollection.AddScoped<IActionEventService, ActionEventService>();
             serviceCollection.AddScoped<IDialogueEventService, DialogueEventService>();
             serviceCollection.AddScoped<IStateService, StateService>();

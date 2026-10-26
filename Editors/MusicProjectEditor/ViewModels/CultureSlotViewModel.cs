@@ -67,29 +67,19 @@ namespace Editors.MusicProjectEditor.ViewModels
                 // worth saying before they pick a five minute track for it.
                 if (Wh3MusicHierarchyInformation.IsAmsPulseStateGroup(StateGroupName))
                     return "Audio can be added to this event in the Music Project tool. This is an adaptive music pulse - " +
-                           "a rhythmic layer played over the campaign theme, not a theme itself - and the game has " +
-                           "nine slots for it. Supply one short loop and it is used for all nine, or up to nine to " +
-                           "vary it across the piece. Anything longer than a slot is trimmed to fit.";
+                           "a rhythmic layer played over the campaign theme, in whichever key the score is in, with " +
+                           "three variations per key. One short loop works everywhere; a pitched one only sounds right " +
+                           "written per key.";
 
                 if (Wh3MusicHierarchyInformation.GetAmsFragmentContainerId(StateGroupName) != null)
                     return "Audio can be added to this event in the Music Project tool. These are ambient fragments - short " +
-                           "sounds laid over the campaign music rather than music itself. Vanilla varies them by the " +
-                           "musical key the score is in; anything added here plays in every key, since only the " +
-                           "composer of a piece can meaningfully write a fragment per key.";
+                           "phrases laid over the campaign music, which vanilla writes per key and as a call and a response.";
 
-                // Worth saying because the decision tree makes it so rather than anyone choosing it:
-                // battle music branches on the result above the culture, and vanilla has no default
-                // result, so one culture's music is written under all three outcomes alike.
-                if (StateGroupName == BattleCultureStateGroup)
-                    return "Audio can be added to this event in the Music Project tool. The same music will play " +
-                           "whether the battle is won, lost or drawn - vanilla splits those three, but a " +
-                           "single event cannot tell them apart.";
-
-                return "Audio can be added to this event in the Music Project tool.";
+                return "Audio can be added to this event in the Music Project tool, and split by what the game tells " +
+                       "apart here - the part of the game, the result, the phase and so on.";
             }
         }
 
-        const string BattleCultureStateGroup = "Battle_Music_WH3_Culture";
 
         public CultureSlotViewModel(MusicDatCultureWiring.CultureSlot slot, Action changed)
         {

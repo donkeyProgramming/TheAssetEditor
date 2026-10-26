@@ -6,6 +6,9 @@ using CommunityToolkit.Mvvm.Input;
 using Editors.Audio.Shared.AudioProject;
 using Editors.Audio.Shared.AudioProject.Compiler;
 using Editors.Audio.Shared.AudioProject.Models;
+using Editors.Audio.Shared.GameInformation.Warhammer3;
+using Editors.Audio.Shared.Storage;
+using Editors.Audio.WaveformVisualiser.Presentation;
 using Editors.MusicProjectEditor.Views;
 using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
@@ -32,6 +35,8 @@ namespace Editors.MusicProjectEditor.ViewModels
         readonly IMusicAudioProjectService _musicAudioProjectService;
         readonly IMusicScriptBuildService _musicScriptBuildService;
         readonly IAudioProjectCompilerService _audioProjectCompilerService;
+        readonly IMusicVanillaReferenceService _musicVanillaReferenceService;
+        readonly IAudioRepository _audioRepository;
 
         AudioProjectFile? _audioProject;
         string _filePath = MusicAudioProjectService.ProjectFilePath;
@@ -53,12 +58,58 @@ namespace Editors.MusicProjectEditor.ViewModels
 
         [ObservableProperty] string? _selectedAudioFile;
 
+        /// <summary>The wavs of whatever the audio list is showing: the selected tree node's for an
+        /// event with a tree, the event's own for the rest.</summary>
+        public ObservableCollection<string> SelectedAudioFiles { get; } = [];
+
+        // The tree editor, for the selected event when its audio is a decision tree.
+        MusicTree? _selectedTree;
+        IReadOnlyList<MusicTreeLevel> _treeLevels = [];
+        string? _treeLevelsStateGroupName;
+        // The node to select once the rows are rebuilt after an edit, for the event it belongs to:
+        // the rebuild passes through other events first, which must not use it up.
+        (string EventName, int NodeId)? _treeNodeToSelect;
+        public ObservableCollection<MusicTreeNodeViewModel> TreeRoots { get; } = [];
+        public ObservableCollection<MusicTreeLevel> SplitLevels { get; } = [];
+        public ObservableCollection<BranchValueOption> SplitValues { get; } = [];
+
+        [ObservableProperty, NotifyPropertyChangedFor(nameof(CanEditSelectedEventAudio), nameof(CanRemoveBranch), nameof(SplitHelp))]
+        MusicTreeNodeViewModel? _selectedTreeNode;
+
+        [ObservableProperty, NotifyPropertyChangedFor(nameof(CanAddBranch))]
+        MusicTreeLevel? _selectedSplitLevel;
+
+        [ObservableProperty, NotifyPropertyChangedFor(nameof(CanAddBranch))]
+        BranchValueOption? _selectedSplitValue;
+
+        public bool HasSelectedTree => _selectedTree != null;
+        public bool CanAddBranch => SelectedTreeNode != null && SelectedSplitLevel != null && SelectedSplitValue != null;
+        public bool CanRemoveBranch => SelectedTreeNode is { IsRoot: false };
+
+        public string SplitHelp => SelectedTreeNode?.Node.SplitBy is string splitBy
+            ? $"This branch splits by {Wh3MusicTreeLevelInformation.GetLevelName(splitBy)}; add more of its values, or remove the branches below to split by something else."
+            : "Give this branch its own music for one value of something, e.g. the battle result being a win. Anything not given its own plays this branch's wavs.";
+
+        // The vanilla reference panel: what the game gives each culture for the selected slot.
+        string? _vanillaStateGroupName;
+        int _vanillaVersion;
+        [ObservableProperty] string? _selectedVanillaState;
+        [ObservableProperty] VanillaClipViewModel? _selectedVanillaClip;
+        [ObservableProperty] string _vanillaSummary = "";
+
+        public ObservableCollection<string> VanillaStates { get; } = [];
+        public ObservableCollection<VanillaClipViewModel> VanillaClips { get; } = [];
+
+        /// <summary>The Audio Explorer's player, for the vanilla clips and the project's own wavs.</summary>
+        public WaveformVisualiserViewModel WaveformVisualiserViewModel { get; }
+
         public PackFile CurrentFile { get; private set; } = null!;
 
         public ObservableCollection<MusicCultureViewModel> Cultures { get; } = [];
 
         public bool HasSelectedCulture => SelectedCulture != null;
-        public bool CanEditSelectedEventAudio => SelectedEvent is { IsBorrowed: false, CanCarryOwnAudio: true };
+        public bool CanEditSelectedEventAudio =>
+            SelectedEvent is { IsBorrowed: false, CanCarryOwnAudio: true } && (!SelectedEvent.HasTree || SelectedTreeNode != null);
 
         public string EmptyText =>
             $"No music project is open. New starts one, saved to {MusicAudioProjectService.ProjectFilePath} in the editable pack; " +
@@ -70,7 +121,10 @@ namespace Editors.MusicProjectEditor.ViewModels
             IAudioProjectFileService audioProjectFileService,
             IMusicAudioProjectService musicAudioProjectService,
             IMusicScriptBuildService musicScriptBuildService,
-            IAudioProjectCompilerService audioProjectCompilerService)
+            IAudioProjectCompilerService audioProjectCompilerService,
+            IMusicVanillaReferenceService musicVanillaReferenceService,
+            IAudioRepository audioRepository,
+            WaveformVisualiserViewModel waveformVisualiserViewModel)
         {
             _packFileService = packFileService;
             _dialogs = dialogs;
@@ -78,6 +132,9 @@ namespace Editors.MusicProjectEditor.ViewModels
             _musicAudioProjectService = musicAudioProjectService;
             _musicScriptBuildService = musicScriptBuildService;
             _audioProjectCompilerService = audioProjectCompilerService;
+            _musicVanillaReferenceService = musicVanillaReferenceService;
+            _audioRepository = audioRepository;
+            WaveformVisualiserViewModel = waveformVisualiserViewModel;
 
             var existing = _packFileService.FindFile(MusicAudioProjectService.ProjectFilePath);
             if (existing != null)
@@ -269,7 +326,7 @@ namespace Editors.MusicProjectEditor.ViewModels
                 return;
 
             var wavPackFilePath = _packFileService.GetFullPath(result.File);
-            SetSelectedEventAudio([.. SelectedEvent!.AudioFiles, wavPackFilePath]);
+            SetSelectedEventAudio([.. SelectedAudioFiles, wavPackFilePath]);
         }
 
         [RelayCommand]
@@ -278,7 +335,7 @@ namespace Editors.MusicProjectEditor.ViewModels
             if (!CanEditSelectedEventAudio || SelectedAudioFile == null)
                 return;
 
-            var remaining = SelectedEvent!.AudioFiles.ToList();
+            var remaining = SelectedAudioFiles.ToList();
             remaining.Remove(SelectedAudioFile);
             SetSelectedEventAudio(remaining);
         }
@@ -288,7 +345,15 @@ namespace Editors.MusicProjectEditor.ViewModels
             var musicEvent = SelectedEvent!;
             try
             {
-                _musicAudioProjectService.SetAudio(_audioProject!, musicEvent.EventName!, wavPackFilePaths);
+                if (SelectedTreeNode != null)
+                {
+                    _treeNodeToSelect = (musicEvent.EventName!, SelectedTreeNode.Node.Id);
+                    _musicAudioProjectService.SetNodeAudio(_audioProject!, musicEvent.EventName!, SelectedTreeNode.Node.Id, wavPackFilePaths);
+                }
+                else
+                {
+                    _musicAudioProjectService.SetAudio(_audioProject!, musicEvent.EventName!, wavPackFilePaths);
+                }
             }
             catch (Exception e)
             {
@@ -352,11 +417,11 @@ namespace Editors.MusicProjectEditor.ViewModels
 
         MusicEventViewModel CreateEvent(MusicCulture musicCulture, MusicCultureSlot slot)
         {
-            var audioFiles = slot.ReferenceMatchKey == null
-                ? _musicAudioProjectService.GetAudio(_audioProject!, slot.EventPrefix + musicCulture.MusicalCulture)
-                : [];
+            var eventName = slot.EventPrefix + musicCulture.MusicalCulture;
+            var audioFiles = slot.ReferenceMatchKey == null ? _musicAudioProjectService.GetAudio(_audioProject!, eventName) : [];
+            var tree = slot.ReferenceMatchKey == null ? _musicAudioProjectService.GetTree(_audioProject!, eventName) : null;
 
-            return new MusicEventViewModel(slot, musicCulture.MusicalCulture, GetSlotTitles().GetValueOrDefault(slot.EventPrefix), audioFiles);
+            return new MusicEventViewModel(slot, musicCulture.MusicalCulture, GetSlotTitles().GetValueOrDefault(slot.EventPrefix), audioFiles, tree);
         }
 
         IReadOnlyDictionary<string, string> GetSlotTitles()
@@ -375,7 +440,302 @@ namespace Editors.MusicProjectEditor.ViewModels
 
         partial void OnSelectedCultureChanged(MusicCultureViewModel? value) => SelectedEvent = value?.Events.FirstOrDefault();
 
-        partial void OnSelectedEventChanged(MusicEventViewModel? value) => SelectedAudioFile = null;
+        partial void OnSelectedEventChanged(MusicEventViewModel? value)
+        {
+            SelectedAudioFile = null;
+            LoadTree(value);
+            LoadVanillaStates(value?.SlotStateGroupName);
+        }
+
+        /// <summary>Shows the event's tree, keeping the node that was selected where it still exists -
+        /// every edit rebuilds the rows, and losing your place in the tree after each would be maddening.</summary>
+        void LoadTree(MusicEventViewModel? musicEvent)
+        {
+            var previousTree = _selectedTree;
+            var previousNodeId = SelectedTreeNode?.Node.Id;
+
+            TreeRoots.Clear();
+            _selectedTree = musicEvent is { HasTree: true, EventName: not null } ? _musicAudioProjectService.GetTree(_audioProject!, musicEvent.EventName) : null;
+            OnPropertyChanged(nameof(HasSelectedTree));
+
+            if (_selectedTree == null)
+            {
+                SelectedTreeNode = null;
+                RefreshSelectedAudioFiles();
+                return;
+            }
+
+            int? nodeToSelect = null;
+            if (_treeNodeToSelect is var (pendingEventName, pendingNodeId) && pendingEventName == musicEvent!.EventName)
+            {
+                nodeToSelect = pendingNodeId;
+                _treeNodeToSelect = null;
+            }
+            else if (previousTree != null && previousTree.StateGroupName == _selectedTree.StateGroupName && previousTree.StateName == _selectedTree.StateName)
+            {
+                nodeToSelect = previousNodeId;
+            }
+
+            // Another slot's levels must not be offered, or added, while this one's load.
+            if (_treeLevelsStateGroupName != _selectedTree.StateGroupName)
+            {
+                _treeLevels = [];
+                _treeLevelsStateGroupName = null;
+            }
+
+            var root = new MusicTreeNodeViewModel(_selectedTree.Root, null);
+            TreeRoots.Add(root);
+            var selected = root.SelfAndDescendants().FirstOrDefault(node => node.Node.Id == nodeToSelect) ?? root;
+            selected.IsSelected = true;
+            SelectedTreeNode = selected;
+
+            LoadTreeLevels(_selectedTree.StateGroupName);
+        }
+
+        /// <summary>The levels the tree can split on come from the game's containers, so they wait for
+        /// the warm-up the same way the vanilla reference does.</summary>
+        async void LoadTreeLevels(string stateGroupName)
+        {
+            await _musicAudioProjectService.WarmUpAsync();
+            if (_selectedTree?.StateGroupName != stateGroupName)
+                return;
+
+            try
+            {
+                using (_dialogs.ShowWaitCursor())
+                    _treeLevels = _musicVanillaReferenceService.GetTreeLevels(stateGroupName);
+                _treeLevelsStateGroupName = stateGroupName;
+            }
+            catch (Exception e)
+            {
+                _logger.Error(e, "Failed to read the levels of {StateGroup}", stateGroupName);
+                _treeLevels = [];
+            }
+
+            RefreshSplitLevels();
+        }
+
+        partial void OnSelectedTreeNodeChanged(MusicTreeNodeViewModel? value)
+        {
+            RefreshSelectedAudioFiles();
+            RefreshSplitLevels();
+        }
+
+        void RefreshSelectedAudioFiles()
+        {
+            SelectedAudioFiles.Clear();
+            IEnumerable<string> wavPackFilePaths = SelectedTreeNode != null && SelectedEvent?.EventName != null
+                ? _musicAudioProjectService.GetNodeAudio(_audioProject!, SelectedEvent.EventName, SelectedTreeNode.Node.Id).Select(audioFile => audioFile.WavPackFilePath)
+                : SelectedEvent?.AudioFiles ?? [];
+            foreach (var wavPackFilePath in wavPackFilePaths)
+                SelectedAudioFiles.Add(wavPackFilePath);
+        }
+
+        /// <summary>What the selected node can split by: the level it already splits by, or any level
+        /// not split by above it that exists in a part of the game this node can play in.</summary>
+        void RefreshSplitLevels()
+        {
+            SplitLevels.Clear();
+            var node = SelectedTreeNode;
+            if (node == null)
+            {
+                RefreshSplitValues();
+                return;
+            }
+
+            var splitAbove = node.LevelsSplitAbove().ToHashSet();
+            var levels = node.Node.SplitBy != null
+                ? _treeLevels.Where(level => level.Name == node.Node.SplitBy)
+                : _treeLevels.Where(level => !splitAbove.Contains(level.Name)
+                    && (level.ContainerIds.Count == 0 || level.ContainerIds.Any(containerId => !node.IsLimitedToContainerOtherThan(containerId))));
+
+            foreach (var level in levels)
+                SplitLevels.Add(level);
+            SelectedSplitLevel = SplitLevels.FirstOrDefault();
+            RefreshSplitValues();
+        }
+
+        partial void OnSelectedSplitLevelChanged(MusicTreeLevel? value) => RefreshSplitValues();
+
+        /// <summary>The values not given a branch yet, then "any other value" if that has none.</summary>
+        void RefreshSplitValues()
+        {
+            SplitValues.Clear();
+            var node = SelectedTreeNode?.Node;
+            if (node == null || SelectedSplitLevel == null)
+            {
+                SelectedSplitValue = null;
+                return;
+            }
+
+            var level = SelectedSplitLevel;
+            foreach (var value in level.Values.Where(value => !node.Branches.Any(branch => branch.Value == value)))
+                SplitValues.Add(new BranchValueOption(value, Wh3MusicTreeLevelInformation.GetValueName(level.Name, value)));
+            if (node.Branches.Count != 0 && !node.Branches.Any(branch => branch.Value == null))
+                SplitValues.Add(new BranchValueOption(null, "Any other value"));
+
+            SelectedSplitValue = SplitValues.FirstOrDefault();
+        }
+
+        [RelayCommand]
+        void AddBranch()
+        {
+            if (!CanAddBranch || SelectedEvent?.EventName == null)
+                return;
+
+            try
+            {
+                _treeNodeToSelect = (SelectedEvent.EventName, _musicAudioProjectService.AddBranch(_audioProject!, SelectedEvent.EventName, SelectedTreeNode!.Node.Id, SelectedSplitLevel!.Name, SelectedSplitValue!.Value));
+            }
+            catch (Exception e)
+            {
+                _dialogs.ShowDialogBox($"The branch could not be added:\n\n{e.Message}", "Music Project");
+                return;
+            }
+
+            HasUnsavedChanges = true;
+            RebuildCultures();
+        }
+
+        [RelayCommand]
+        void RemoveBranch()
+        {
+            if (!CanRemoveBranch || SelectedEvent?.EventName == null)
+                return;
+
+            var node = SelectedTreeNode!;
+            var below = node.SelfAndDescendants().Count() - 1;
+            if (_dialogs.ShowYesNoBox(
+                    below == 0 ? $"Remove the branch '{node.Label}' and its audio?" : $"Remove the branch '{node.Label}', the {below} below it, and their audio?",
+                    "Remove Branch") != ShowMessageBoxResult.OK)
+                return;
+
+            try
+            {
+                _treeNodeToSelect = (SelectedEvent.EventName, node.Parent!.Node.Id);
+                _musicAudioProjectService.RemoveBranch(_audioProject!, SelectedEvent.EventName, node.Node.Id);
+            }
+            catch (Exception e)
+            {
+                _dialogs.ShowDialogBox($"The branch could not be removed:\n\n{e.Message}", "Music Project");
+                return;
+            }
+
+            HasUnsavedChanges = true;
+            RebuildCultures();
+        }
+
+        partial void OnSelectedAudioFileChanged(string? value)
+        {
+            if (value != null)
+                WaveformVisualiserViewModel.SetSelectedPlaylist([value]);
+        }
+
+        /// <summary>The vanilla cultures for the slot's State Group, keeping the one picked before
+        /// where it is still there - comparing two cultures across slots is the point of the panel.
+        ///
+        /// Waits for the warm-up first: that reads the repository on another thread, and the
+        /// repository cannot be read from two at once. The reading here is then done on this
+        /// thread, under a wait cursor - about a second for the first Group, nothing after.</summary>
+        async void LoadVanillaStates(string? stateGroupName)
+        {
+            if (stateGroupName == _vanillaStateGroupName)
+                return;
+
+            var version = ++_vanillaVersion;
+            _vanillaStateGroupName = stateGroupName;
+            var previous = SelectedVanillaState;
+            VanillaStates.Clear();
+            VanillaClips.Clear();
+            VanillaSummary = stateGroupName == null ? "" : "Reading the game's music...";
+            if (stateGroupName == null)
+                return;
+
+            await _musicAudioProjectService.WarmUpAsync();
+            if (version != _vanillaVersion)
+                return;
+
+            IReadOnlyList<string> states;
+            try
+            {
+                using (_dialogs.ShowWaitCursor())
+                    states = _musicVanillaReferenceService.GetStates(stateGroupName);
+            }
+            catch (Exception e)
+            {
+                _logger.Error(e, "Failed to read vanilla music for {StateGroup}", stateGroupName);
+                VanillaSummary = $"The game's music could not be read: {e.Message}";
+                _vanillaStateGroupName = null; // so selecting the slot again retries
+                return;
+            }
+
+            foreach (var state in states)
+                VanillaStates.Add(state);
+
+            if (states.Count == 0)
+                VanillaSummary = "No vanilla culture has music of its own here - are the game's packs loaded?";
+
+            SelectedVanillaState = states.FirstOrDefault(state => string.Equals(state, previous, StringComparison.OrdinalIgnoreCase))
+                ?? states.FirstOrDefault();
+        }
+
+        partial void OnSelectedVanillaStateChanged(string? value)
+        {
+            VanillaClips.Clear();
+            if (value == null || _vanillaStateGroupName == null)
+                return;
+
+            IReadOnlyList<VanillaMusicClip> clips;
+            try
+            {
+                using (_dialogs.ShowWaitCursor())
+                    clips = _musicVanillaReferenceService.GetClips(_vanillaStateGroupName, value);
+            }
+            catch (Exception e)
+            {
+                _logger.Error(e, "Failed to read vanilla music for {State}", value);
+                VanillaSummary = $"The game's music could not be read: {e.Message}";
+                return;
+            }
+
+            foreach (var clip in clips)
+                VanillaClips.Add(new VanillaClipViewModel(clip));
+
+            VanillaSummary = Summarise(clips);
+        }
+
+        /// <summary>The numbers a modder wants before supplying their own: how many files, in how
+        /// many places, how long they run, and how many are not this culture's alone.</summary>
+        static string Summarise(IReadOnlyList<VanillaMusicClip> clips)
+        {
+            if (clips.Count == 0)
+                return "Nothing found for this culture.";
+
+            var files = clips.Select(clip => clip.SourceId).Distinct().Count();
+            var places = clips.Select(clip => clip.Where).Distinct().Count();
+            var parts = new List<string> { $"{files} file(s) in {places} place(s)" };
+
+            var lengths = clips.Where(clip => clip.DurationMs != null).Select(clip => clip.DurationMs!.Value).Order().ToList();
+            if (lengths.Count != 0)
+                parts.Add($"{VanillaClipViewModel.FormatSeconds(lengths[0])} to {VanillaClipViewModel.FormatSeconds(lengths[^1])}, " +
+                          $"typically {VanillaClipViewModel.FormatSeconds(lengths[lengths.Count / 2])}");
+
+            var shared = clips.Where(clip => clip.AlsoUsedBy.Count != 0).Select(clip => clip.SourceId).Distinct().Count();
+            if (shared != 0)
+                parts.Add($"{shared} shared with other cultures");
+
+            return string.Join(" · ", parts);
+        }
+
+        partial void OnSelectedVanillaClipChanged(VanillaClipViewModel? value)
+        {
+            if (value == null)
+                return;
+
+            var sourceId = value.Clip.SourceId.ToString();
+            var source = new WemWaveformSource($"wem:{sourceId}", () => _audioRepository.FindWem(sourceId)?.DataSource.ReadData());
+            _ = WaveformVisualiserViewModel.LoadFromWemSourceAsync(source, $"{SelectedVanillaState} - {value.Where}");
+        }
 
         public void Close()
         {

@@ -1,6 +1,7 @@
 using Editors.Audio.Shared.AudioProject;
 using Editors.Audio.Shared.AudioProject.Compiler;
 using Editors.Audio.Shared.AudioProject.Models;
+using Editors.Audio.Shared.GameInformation.Warhammer3;
 using Microsoft.Extensions.DependencyInjection;
 using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
@@ -163,6 +164,101 @@ namespace Test.Audio
                 Assert.That(audioProject.StateGroups.SelectMany(stateGroup => stateGroup.States), Is.Empty);
             });
         }
+
+        // --- Music trees ---
+
+        const string BattleEvent = "music_b_faction_first_culture";
+        const uint PreBattleContainerId = 26264058;
+        const uint InBattleContainerId = 67383790;
+
+        // Audio for one part of the game is only generated in that part's container; the root's
+        // goes in both, and the compile works out where each is reached.
+        [Test]
+        public void ABranchForOnePartOfTheGameIsOnlyGeneratedThere()
+        {
+            var (service, audioProject) = ProjectWithABattleCulture();
+            var tree = service.GetTree(audioProject, BattleEvent);
+            service.SetNodeAudio(audioProject, BattleEvent, tree.Root.Id, [FirstWav]);
+            var branchId = service.AddBranch(audioProject, BattleEvent, tree.Root.Id, Wh3MusicTreeLevelInformation.ContainerLevel, PreBattleContainerId.ToString());
+            service.SetNodeAudio(audioProject, BattleEvent, branchId, [SecondWav]);
+
+            var sequences = MusicSoundBank(audioProject).MusicRandomSequences;
+            Assert.Multiple(() =>
+            {
+                Assert.That(sequences.Where(sequence => sequence.DirectParentId == PreBattleContainerId).Select(sequence => sequence.TreeNodeId),
+                    Is.EquivalentTo(new[] { tree.Root.Id, branchId }));
+                Assert.That(sequences.Where(sequence => sequence.DirectParentId == InBattleContainerId).Select(sequence => sequence.TreeNodeId),
+                    Is.EquivalentTo(new[] { tree.Root.Id }));
+            });
+        }
+
+        [Test]
+        public void RemovingABranchRemovesItsMusicAndTheAudioOnlyItPlayed()
+        {
+            var (service, audioProject) = ProjectWithABattleCulture();
+            var tree = service.GetTree(audioProject, BattleEvent);
+            service.SetNodeAudio(audioProject, BattleEvent, tree.Root.Id, [FirstWav]);
+            var branchId = service.AddBranch(audioProject, BattleEvent, tree.Root.Id, "Battle_Result_State", "win");
+            service.SetNodeAudio(audioProject, BattleEvent, branchId, [SecondWav]);
+
+            service.RemoveBranch(audioProject, BattleEvent, branchId);
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(tree.Root.SplitBy, Is.Null);
+                Assert.That(MusicSoundBank(audioProject).MusicRandomSequences.Select(sequence => sequence.TreeNodeId).Distinct(), Is.EqualTo(new[] { tree.Root.Id }));
+                Assert.That(audioProject.AudioFiles.Select(audioFile => audioFile.WavPackFilePath), Is.EqualTo(new[] { FirstWav }));
+            });
+        }
+
+        [Test]
+        public void ANodeSplitsByOneLevelAndNeverByOneAboveIt()
+        {
+            var (service, audioProject) = ProjectWithABattleCulture();
+            var root = service.GetTree(audioProject, BattleEvent).Root;
+            var win = service.AddBranch(audioProject, BattleEvent, root.Id, "Battle_Result_State", "win");
+
+            Assert.Multiple(() =>
+            {
+                Assert.Throws<InvalidOperationException>(() => service.AddBranch(audioProject, BattleEvent, root.Id, "Battle_Music_Key", "C"), "a second level at the same node");
+                Assert.Throws<InvalidOperationException>(() => service.AddBranch(audioProject, BattleEvent, root.Id, "Battle_Result_State", "win"), "the same value twice");
+                Assert.Throws<InvalidOperationException>(() => service.AddBranch(audioProject, BattleEvent, win, "Battle_Result_State", "lose"), "a level an ancestor splits by");
+                Assert.DoesNotThrow(() => service.AddBranch(audioProject, BattleEvent, win, "Battle_Music_Key", "C"));
+                Assert.Throws<InvalidOperationException>(() => service.RemoveBranch(audioProject, BattleEvent, root.Id), "the root");
+            });
+        }
+
+        [Test]
+        public void TheTreeIsKeptInTheProjectFile()
+        {
+            var (service, audioProject) = ProjectWithABattleCulture();
+            var root = service.GetTree(audioProject, BattleEvent).Root;
+            var win = service.AddBranch(audioProject, BattleEvent, root.Id, "Battle_Result_State", "win");
+            service.SetNodeAudio(audioProject, BattleEvent, win, [FirstWav]);
+            service.AddBranch(audioProject, BattleEvent, root.Id, "Battle_Result_State", null);
+
+            var reloaded = SaveAndReload(audioProject);
+            var reloadedRoot = service.GetTree(reloaded, BattleEvent).Root;
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(reloadedRoot.SplitBy, Is.EqualTo("Battle_Result_State"));
+                Assert.That(reloadedRoot.Branches.Select(branch => branch.Value), Is.EqualTo(new[] { "win", null }));
+                Assert.That(service.GetNodeAudio(reloaded, BattleEvent, win).Select(audioFile => audioFile.WavPackFilePath), Is.EqualTo(new[] { FirstWav }));
+                Assert.That(MusicSoundBank(reloaded).MusicRandomSequences.Select(sequence => sequence.TreeNodeId).Distinct(), Is.EqualTo(new[] { win }));
+            });
+        }
+
+        (IMusicAudioProjectService Service, AudioProjectFile AudioProject) ProjectWithABattleCulture()
+        {
+            var service = Service();
+            var audioProject = service.CreateNew();
+            service.AddCulture(audioProject, BattleCulture("First_Culture", "first_sc"));
+            return (service, audioProject);
+        }
+
+        static SoundBank MusicSoundBank(AudioProjectFile audioProject) =>
+            audioProject.SoundBanks.Single(soundBank => soundBank.ActionEvents.Count != 0);
 
         IMusicScriptBuildService Build() => _provider.GetRequiredService<IMusicScriptBuildService>();
 

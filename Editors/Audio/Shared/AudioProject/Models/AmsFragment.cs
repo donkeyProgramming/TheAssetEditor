@@ -3,18 +3,18 @@ using System.Collections.Generic;
 namespace Editors.Audio.Shared.AudioProject.Models
 {
     /// <summary>
-    /// Audio contributed to the adaptive music system's ambient fragments for one State.
+    /// The ambient fragment hierarchy one State's <see cref="MusicTree"/> generates, laid out the way
+    /// vanilla lays out a culture's - see <see cref="AmsMusicLayout"/>:
     ///
-    /// The odd one out among the four AMS State Groups. The other three are read by switch tracks
-    /// inside the music; this one is read by a plain Switch container - the fragments are Sounds laid
-    /// over the music rather than part of it - and that container's children are themselves Switch
-    /// containers keyed on a second Group, the musical key the score is currently in.
+    ///   the vanilla faction Switch container   gains a switch for the State, pointing at
+    ///     a Switch on the musical key            one per culture, every key of a group pointing alike
+    ///       a Switch on Call or Response         one per distinct pair of things a key plays
+    ///         a Sound, or a Random container     per node of the tree that plays there
     ///
-    /// So a culture here is a small hierarchy rather than a clip: a Switch container on the key Group
-    /// that the vanilla faction container points at, and the audio below it. The key switch is built
-    /// by mirroring the keys an existing culture uses rather than assuming what they are, and every
-    /// key is pointed at the same audio - authoring a fragment per musical key is something only the
-    /// composer of the piece can meaningfully do.
+    /// Vanilla's "None" key and "None" call/response branch hold a silent placeholder; here they are
+    /// left out, which plays nothing the same way. Everything is generated afresh when the tree
+    /// changes, so this only records the ids, for the compile to build the switches from and for a
+    /// later change to remove.
     /// </summary>
     public class AmsFragment
     {
@@ -25,16 +25,33 @@ namespace Editors.Audio.Shared.AudioProject.Models
         /// branches on <see cref="StateGroupName"/>.</summary>
         public uint FactionSwitchContainerId { get; set; }
 
-        /// <summary>The generated Switch container on the musical key Group. This is what the vanilla
-        /// container's new switch points at, and it is a new id so it ships in the mod's own .bnk.</summary>
+        /// <summary>The generated Switch container on the musical key, which the faction container's
+        /// new switch points at.</summary>
         public uint KeySwitchContainerId { get; set; }
 
-        /// <summary>What every key on that switch resolves to - a Random Sequence container when the
-        /// modder picked several files, or the single Sound when they picked one.</summary>
-        public uint TargetHircId { get; set; }
+        /// <summary>Which call/response Switch each key plays; a key not listed plays nothing.</summary>
+        public List<AmsFragmentKey> Keys { get; set; } = [];
 
-        /// <summary>The Sounds underneath, by id. Held here so removing the Event can find them
-        /// again; the Sounds themselves live in the SoundBank's own list.</summary>
+        public List<AmsFragmentCallResponse> CallResponseSwitches { get; set; } = [];
+
+        /// <summary>Every Sound and Random container generated, all in the SoundBank's own lists.</summary>
         public List<uint> SoundIds { get; set; } = [];
+        public List<uint> ContainerIds { get; set; } = [];
+    }
+
+    public class AmsFragmentKey
+    {
+        /// <summary>C, Eb or Gb - see <see cref="AmsMusicLayout.GetKey"/>.</summary>
+        public string Key { get; set; }
+        public uint CallResponseSwitchId { get; set; }
+    }
+
+    /// <summary>A generated Switch on Call or Response, and what each plays: a Sound or a Random
+    /// container, or 0 for nothing.</summary>
+    public class AmsFragmentCallResponse
+    {
+        public uint Id { get; set; }
+        public uint CallTargetHircId { get; set; }
+        public uint ResponseTargetHircId { get; set; }
     }
 }

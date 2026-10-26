@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Editors.Audio.Shared.AudioProject.Models;
 using Editors.Audio.Shared.GameInformation.Warhammer3;
 using Shared.GameFormats.Wwise;
 using Shared.GameFormats.Wwise.Hirc.V136;
@@ -12,8 +13,12 @@ namespace Editors.Audio.Shared.Wwise.Generators
     /// One branch to add to a vanilla Music Switch container's decision tree. The State Group is
     /// carried alongside the State because a container can branch on more than one Group, and the
     /// merge has to know which level of the tree this State belongs at.
+    ///
+    /// <paramref name="KeyPaths"/> are the full paths from the root that reach the branch, when a
+    /// <see cref="MusicTree"/> has decided them - see <see cref="MusicSwitchContainerMergeService.BuildTreeKeyPaths"/>.
+    /// Without them the branch is reached by every path below the State.
     /// </summary>
-    public record MusicBranch(string StateGroupName, string StateName, uint RandomSequenceId);
+    public record MusicBranch(string StateGroupName, string StateName, uint RandomSequenceId, IReadOnlyList<List<uint>> KeyPaths = null);
 
     public interface IMusicSwitchContainerMergeService
     {
@@ -47,7 +52,7 @@ namespace Editors.Audio.Shared.Wwise.Generators
 
             foreach (var branch in branches)
             {
-                foreach (var keyPath in BuildKeyPaths(vanillaContainer, branch))
+                foreach (var keyPath in branch.KeyPaths ?? BuildKeyPaths(vanillaContainer, branch))
                     InsertBranch(moddedRoot, keyPath, branch.RandomSequenceId);
             }
 
@@ -224,6 +229,132 @@ namespace Editors.Audio.Shared.Wwise.Generators
             return keyPaths;
         }
 
+        /// <summary>
+        /// Every full decision tree path, per node of the tree, that reaches the node's audio in this
+        /// container. A node that is never reached here - its audio is for the other container, or
+        /// every combination it covers is claimed by a branch below it - has no entry.
+        ///
+        /// The modder's tree can split on the levels in any order and can leave any level out, but
+        /// Wwise reads a container's levels in a fixed order, preferring an exact key to the default
+        /// at each one. A path per tree branch would not be read the same way: a split on the battle
+        /// situation above a split on the key would lose to it, since the key comes first. So this
+        /// writes out every combination of the values the tree names, plus the default, and asks
+        /// the modder's tree which node each one reaches. With every combination present Wwise always
+        /// finds the exact one, and it leads where the modder's tree would.
+        ///
+        /// The levels above the culture are not chosen here: the culture's branch goes in every block
+        /// vanilla lists cultures in, the same as without a tree, and the tree is asked with that
+        /// block's values. Below the culture, a level the tree never names takes the default where
+        /// vanilla has one and every vanilla key where it has not, again the same as without one.
+        /// </summary>
+        public static Dictionary<int, List<List<uint>>> BuildTreeKeyPaths(CAkMusicSwitchCntr_V136 vanillaContainer, MusicTree tree)
+        {
+            ArgumentNullException.ThrowIfNull(vanillaContainer);
+            ArgumentNullException.ThrowIfNull(tree);
+
+            var levelGroupIds = vanillaContainer.Arguments.Select(argument => argument.GroupId).ToList();
+            var cultureLevel = levelGroupIds.IndexOf(WwiseHash.Compute(tree.StateGroupName));
+            if (cultureLevel == -1)
+                throw new NotSupportedException(
+                    $"Music Switch container {vanillaContainer.Id} does not branch on State Group '{tree.StateGroupName}'.");
+
+            var vanillaTree = vanillaContainer.AkDecisionTree.DecisionTree;
+            var prefixes = PathsToBlocksListingStates(vanillaTree, cultureLevel);
+            if (prefixes.Count == 0)
+                throw new NotSupportedException(
+                    $"Music Switch container {vanillaContainer.Id} never lists a State of '{tree.StateGroupName}' by name, " +
+                    "so there is no block a new one belongs in.");
+
+            var namedKeysByGroupId = tree.GetNodes()
+                .Where(node => node.SplitBy != null && node.SplitBy != Wh3MusicTreeLevelInformation.ContainerLevel)
+                .GroupBy(node => WwiseHash.Compute(node.SplitBy))
+                .ToDictionary(
+                    group => group.Key,
+                    group => group.SelectMany(node => node.Branches).Where(branch => branch.Value != null).Select(branch => WwiseHash.Compute(branch.Value)).ToList());
+
+            var keysBelowCulture = new List<List<uint>>();
+            for (var level = cultureLevel + 1; level < vanillaContainer.TreeDepth; level++)
+            {
+                var keys = GetVanillaKeysAtLevel(vanillaTree, level);
+                if (namedKeysByGroupId.TryGetValue(levelGroupIds[level], out var namedKeys))
+                    keys = [.. keys.Union(namedKeys)];
+                keysBelowCulture.Add(keys);
+            }
+
+            var stateKey = WwiseHash.Compute(tree.StateName);
+            var pathsByNodeId = new Dictionary<int, List<List<uint>>>();
+
+            foreach (var prefix in prefixes)
+            {
+                foreach (var keysBelow in CartesianProduct(keysBelowCulture))
+                {
+                    List<uint> keyPath = [.. prefix, stateKey, .. keysBelow];
+
+                    uint? KeyFor(uint groupId)
+                    {
+                        var level = levelGroupIds.IndexOf(groupId);
+                        return level == -1 ? null : keyPath[level];
+                    }
+
+                    var node = Evaluate(tree.Root, KeyFor, vanillaContainer.Id);
+                    if (node == null)
+                        continue;
+
+                    if (!pathsByNodeId.TryGetValue(node.Id, out var paths))
+                        pathsByNodeId[node.Id] = paths = [];
+                    paths.Add(keyPath);
+                }
+            }
+
+            return pathsByNodeId;
+        }
+
+        /// <summary>
+        /// The node a modder's tree leads to for one combination: down through the branches matching
+        /// it, falling back to the "any other value" branch, and stopping at a split on a level this
+        /// container does not have. The deepest node on the way that has audio is the one that plays;
+        /// null when none has.
+        /// </summary>
+        public static MusicTreeNode Evaluate(MusicTreeNode root, Func<uint, uint?> keyForGroupId, uint containerId)
+        {
+            var selected = root.AudioFileIds.Count != 0 ? root : null;
+            var node = root;
+
+            while (node.SplitBy != null)
+            {
+                MusicTreeNode next;
+                if (node.SplitBy == Wh3MusicTreeLevelInformation.ContainerLevel)
+                {
+                    next = node.Branches.FirstOrDefault(branch => branch.Value == containerId.ToString());
+                }
+                else
+                {
+                    if (keyForGroupId(WwiseHash.Compute(node.SplitBy)) is not uint key)
+                        break;
+
+                    next = key == DefaultKey ? null : node.Branches.FirstOrDefault(branch => branch.Value != null && WwiseHash.Compute(branch.Value) == key);
+                }
+
+                next ??= node.Branches.FirstOrDefault(branch => branch.Value == null);
+                if (next == null)
+                    break;
+
+                node = next;
+                if (node.AudioFileIds.Count != 0)
+                    selected = node;
+            }
+
+            return selected;
+        }
+
+        private static IEnumerable<List<uint>> CartesianProduct(List<List<uint>> keysPerLevel)
+        {
+            IEnumerable<List<uint>> combinations = [[]];
+            foreach (var keys in keysPerLevel)
+                combinations = combinations.SelectMany(combination => keys.Select(key => new List<uint>(combination) { key }));
+            return combinations;
+        }
+
         /// <summary>The key paths down to every block at <paramref name="level"/> that names at least
         /// one key other than the default.</summary>
         private static List<List<uint>> PathsToBlocksListingStates(AkDecisionTree_V136.Node_V136 vanillaTree, int level)
@@ -275,7 +406,7 @@ namespace Editors.Audio.Shared.Wwise.Generators
         /// branch share every level above the one that differs, which is what keeps three battle
         /// results from producing three separate copies of the levels above them.
         /// </summary>
-        private static void InsertBranch(AkDecisionTree_V136.Node_V136 moddedRoot, List<uint> keyPath, uint randomSequenceId)
+        private static void InsertBranch(AkDecisionTree_V136.Node_V136 moddedRoot, IReadOnlyList<uint> keyPath, uint randomSequenceId)
         {
             var node = moddedRoot;
 

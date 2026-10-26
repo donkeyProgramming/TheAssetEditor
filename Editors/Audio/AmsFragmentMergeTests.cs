@@ -11,12 +11,13 @@ namespace Test.Audio
     // out of campaign_music__core.bnk with MusicEventShapeResearch.DumpTheFragmentsSwitchContainer:
     // a faction container whose children are themselves Switch containers keyed on the musical key
     // the score is in, and two cultures pointing at the same child where vanilla shares a fragment
-    // set between them.
+    // set between them. Below the key, a culture splits again on call or response.
     internal class AmsFragmentMergeTests
     {
         const uint FactionContainerId = 418295225;
         const uint KeyGroupId = 2939663928;
         const uint NewKeySwitchId = 5000;
+        static readonly uint CallResponseGroupId = WwiseHash.Compute("WH3_Campaign_Music_AMS_Fragments_CallResponse");
 
         [Test]
         public void ANewCultureBecomesASwitchAndAChild()
@@ -107,55 +108,102 @@ namespace Test.Audio
         {
             // Which keys the score uses is the game's business, so they are copied from a sibling
             // rather than written down - a table would go stale the moment a patch added one.
-            var vanillaContainer = CreateVanillaContainer();
             var keySwitch = new AmsFragmentMergeService().CreateKeySwitchContainer(
-                vanillaContainer, new SiblingLookup(), NewKeySwitchId, targetHircId: 6000);
+                CreateVanillaContainer(), new SiblingLookup(), NewKeySwitchId, KeyTargets);
 
             Assert.Multiple(() =>
             {
                 Assert.That(keySwitch.Id, Is.EqualTo(NewKeySwitchId));
                 Assert.That(keySwitch.GroupId, Is.EqualTo(KeyGroupId));
+                Assert.That(keySwitch.DefaultSwitch, Is.EqualTo(WwiseHash.Compute("None")));
                 Assert.That(keySwitch.NodeBaseParams.DirectParentId, Is.EqualTo(FactionContainerId));
-                Assert.That(keySwitch.SwitchList.Cast<CAkSwitchCntr_V136.CAkSwitchPackage_V136>().Select(x => x.SwitchId),
-                    Is.EqualTo(new[] { WwiseHash.Compute("None"), WwiseHash.Compute("C_01"), WwiseHash.Compute("C_02") }));
+                Assert.That(PackagesOf(keySwitch), Is.EquivalentTo(new Dictionary<uint, uint>
+                {
+                    [WwiseHash.Compute("C_01")] = 6000,
+                    [WwiseHash.Compute("C_02")] = 6000,
+                    [WwiseHash.Compute("Eb_01")] = 6001
+                }));
+                Assert.That(keySwitch.Children.ChildIds, Is.EqualTo(new[] { 6000u, 6001u }));
+            });
+        }
 
-                // Every key resolves to the same audio: vanilla varies the fragment by key because
-                // the fragments are written against the score, and a mod supplying one set cannot.
-                foreach (var switchPackage in keySwitch.SwitchList.Cast<CAkSwitchCntr_V136.CAkSwitchPackage_V136>())
-                    Assert.That(switchPackage.NodeIdList, Is.EqualTo(new[] { 6000u }));
+        // Vanilla's None key plays a silent placeholder. Leaving it out, with the default kept as
+        // None, plays nothing the same way, and so does a key the tree gave nothing.
+        [Test]
+        public void AKeyGivenNothingIsLeftOut()
+        {
+            var keySwitch = new AmsFragmentMergeService().CreateKeySwitchContainer(
+                CreateVanillaContainer(), new SiblingLookup(), NewKeySwitchId, KeyTargets);
 
-                Assert.That(keySwitch.Children.ChildIds, Is.EqualTo(new[] { 6000u }));
+            Assert.That(PackagesOf(keySwitch).Keys, Does.Not.Contain(WwiseHash.Compute("None")));
+        }
+
+        [Test]
+        public void TheCallResponseSwitchIsMirroredFromVanillasAndPointsCallAndResponseApart()
+        {
+            var callResponse = new AmsFragmentMergeService().CreateCallResponseSwitchContainer(
+                CreateVanillaContainer(), new SiblingLookup(), 6000, NewKeySwitchId, callTargetId: 7000, responseTargetId: 7001);
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(callResponse.GroupId, Is.EqualTo(CallResponseGroupId));
+                Assert.That(callResponse.NodeBaseParams.DirectParentId, Is.EqualTo(NewKeySwitchId));
+                Assert.That(PackagesOf(callResponse), Is.EquivalentTo(new Dictionary<uint, uint>
+                {
+                    [WwiseHash.Compute("Call")] = 7000,
+                    [WwiseHash.Compute("Response")] = 7001
+                }));
+                Assert.That(callResponse.Children.ChildIds, Is.EqualTo(new[] { 7000u, 7001u }));
             });
         }
 
         [Test]
-        public void TheKeySwitchSurvivesAWriteReadRoundTrip()
+        public void ACallWithNoResponseLeavesTheResponseSilent()
         {
-            var keySwitch = new AmsFragmentMergeService().CreateKeySwitchContainer(
-                CreateVanillaContainer(), new SiblingLookup(), NewKeySwitchId, targetHircId: 6000);
+            var callResponse = new AmsFragmentMergeService().CreateCallResponseSwitchContainer(
+                CreateVanillaContainer(), new SiblingLookup(), 6000, NewKeySwitchId, callTargetId: 7000, responseTargetId: 0);
 
-            var reloaded = new CAkSwitchCntr_V136();
-            reloaded.ReadHirc(new ByteChunk(keySwitch.WriteData()));
+            Assert.That(PackagesOf(callResponse).Keys, Is.EqualTo(new[] { WwiseHash.Compute("Call") }));
+        }
 
-            Assert.Multiple(() =>
+        [Test]
+        public void TheSwitchesSurviveAWriteReadRoundTrip()
+        {
+            var service = new AmsFragmentMergeService();
+            var keySwitch = service.CreateKeySwitchContainer(CreateVanillaContainer(), new SiblingLookup(), NewKeySwitchId, KeyTargets);
+            var callResponse = service.CreateCallResponseSwitchContainer(CreateVanillaContainer(), new SiblingLookup(), 6000, NewKeySwitchId, 7000, 7001);
+
+            foreach (var original in new[] { keySwitch, callResponse })
             {
-                Assert.That(reloaded.Id, Is.EqualTo(NewKeySwitchId));
-                Assert.That(reloaded.GroupId, Is.EqualTo(KeyGroupId));
-                Assert.That(reloaded.SwitchList, Has.Count.EqualTo(3));
-                Assert.That(reloaded.Children.ChildIds, Is.EqualTo(new[] { 6000u }));
-            });
+                var reloaded = new CAkSwitchCntr_V136();
+                reloaded.ReadHirc(new ByteChunk(original.WriteData()));
+
+                Assert.Multiple(() =>
+                {
+                    Assert.That(reloaded.Id, Is.EqualTo(original.Id));
+                    Assert.That(reloaded.GroupId, Is.EqualTo(original.GroupId));
+                    Assert.That(PackagesOf(reloaded), Is.EquivalentTo(PackagesOf(original)));
+                    Assert.That(reloaded.Children.ChildIds, Is.EqualTo(original.Children.ChildIds));
+                });
+            }
         }
 
         [Test]
         public void AContainerWithNoSiblingToCopyKeysFromIsRefused()
         {
-            var vanillaContainer = CreateVanillaContainer();
-
             Assert.That(
-                () => new AmsFragmentMergeService().CreateKeySwitchContainer(
-                    vanillaContainer, new EmptyLookup(), NewKeySwitchId, targetHircId: 6000),
+                () => new AmsFragmentMergeService().CreateKeySwitchContainer(CreateVanillaContainer(), new EmptyLookup(), NewKeySwitchId, KeyTargets),
                 Throws.TypeOf<NotSupportedException>());
         }
+
+        /// <summary>C plays one call/response switch, Eb another, and None nothing.</summary>
+        static uint KeyTargets(uint keySwitchId) =>
+            keySwitchId == WwiseHash.Compute("C_01") || keySwitchId == WwiseHash.Compute("C_02") ? 6000u :
+            keySwitchId == WwiseHash.Compute("Eb_01") ? 6001u :
+            0;
+
+        static Dictionary<uint, uint> PackagesOf(CAkSwitchCntr_V136 container) =>
+            container.SwitchList.Cast<CAkSwitchCntr_V136.CAkSwitchPackage_V136>().ToDictionary(package => package.SwitchId, package => package.NodeIdList.Single());
 
         [Test]
         public void CombiningTwoModsKeepsBothCultures()
@@ -232,33 +280,32 @@ namespace Test.Audio
             return container;
         }
 
-        /// <summary>A vanilla culture's key switch, which is what a new culture's is modelled on.</summary>
+        /// <summary>A vanilla culture's key switch and the call/response switch under it, which are
+        /// what a new culture's are modelled on.</summary>
         sealed class SiblingLookup : IAudioRepositoryLookup
         {
-            public CAkSwitchCntr_V136 FindSwitchContainer(uint id)
+            public CAkSwitchCntr_V136 FindSwitchContainer(uint id) => id switch
             {
-                if (id != 1001)
-                    return null;
+                1001 => CreateSwitch(1001, KeyGroupId, ["None", "C_01", "C_02", "Eb_01"], 2001),
+                2001 => CreateSwitch(2001, CallResponseGroupId, ["None", "Call", "Response"], 3001),
+                _ => null
+            };
 
-                var keySwitch = new CAkSwitchCntr_V136
+            static CAkSwitchCntr_V136 CreateSwitch(uint id, uint groupId, string[] switchNames, uint nodeId)
+            {
+                var container = new CAkSwitchCntr_V136
                 {
-                    Id = 1001,
+                    Id = id,
                     EGroupType = AkGroupType.State,
-                    GroupId = KeyGroupId,
+                    GroupId = groupId,
                     DefaultSwitch = WwiseHash.Compute("None"),
                     NodeBaseParams = new NodeBaseParams_V136()
                 };
 
-                foreach (var keyName in new[] { "None", "C_01", "C_02" })
-                {
-                    keySwitch.SwitchList.Add(new CAkSwitchCntr_V136.CAkSwitchPackage_V136
-                    {
-                        SwitchId = WwiseHash.Compute(keyName),
-                        NodeIdList = [2001u]
-                    });
-                }
+                foreach (var switchName in switchNames)
+                    container.SwitchList.Add(new CAkSwitchCntr_V136.CAkSwitchPackage_V136 { SwitchId = WwiseHash.Compute(switchName), NodeIdList = [nodeId] });
 
-                return keySwitch;
+                return container;
             }
         }
 

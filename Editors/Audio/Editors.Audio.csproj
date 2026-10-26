@@ -27,6 +27,8 @@
 	  <Compile Remove="MusicHircRoundTripResearch.cs" />
 	  <Compile Remove="SetStateActionGenerationTests.cs" />
 	  <Compile Remove="VanillaBankReader.cs" />
+	  <Compile Remove="MusicTreeEndToEndRun.cs" />
+	  <Compile Remove="MusicVanillaReferenceResearch.cs" />
 	</ItemGroup>
 
     <ItemGroup>

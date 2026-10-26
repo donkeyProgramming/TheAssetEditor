@@ -221,8 +221,12 @@ namespace Test.Audio
                 .Distinct()
                 .ToList();
 
-            Assert.That(containerIds, Is.EquivalentTo(new[] { CampaignSubcultureContainerId, BattleCultureContainerId, InBattleContainerId }),
-                "expected a branch in the campaign subculture container and both battle culture containers");
+            Assert.That(containerIds, Is.EquivalentTo(new[]
+                {
+                    CampaignSubcultureContainerId, Wh3MusicHierarchyInformation.CampaignResolutionMusicSwitchContainerId,
+                    BattleCultureContainerId, InBattleContainerId
+                }),
+                "expected a branch in both campaign containers - the map and the resolution screens - and both battle culture containers");
 
             // Only the ids the mod invented are its own to place. Vanilla's children stay wherever
             // vanilla put them, so they are not something a testing .bnk has to carry.
@@ -414,14 +418,29 @@ namespace Test.Audio
 
                 Assert.That(keySwitch.GroupId, Is.EqualTo(vanillaSibling.GroupId));
                 Assert.That(keySwitch.NodeBaseParams.DirectParentId, Is.EqualTo(amsFragment.FactionSwitchContainerId));
-                Assert.That(keySwitch.SwitchList, Has.Count.EqualTo(vanillaSibling.SwitchList.Count));
+                // Every key but None, which vanilla gives a silent placeholder and this leaves out.
+                var vanillaKeys = vanillaSibling.SwitchList.Cast<CAkSwitchCntr_V136.CAkSwitchPackage_V136>()
+                    .Where(package => AmsMusicLayout.GetKey(audioRepository.GetNameFromId(package.SwitchId)) != null)
+                    .Select(package => package.SwitchId);
+                Assert.That(keySwitch.SwitchList.Cast<CAkSwitchCntr_V136.CAkSwitchPackage_V136>().Select(package => package.SwitchId),
+                    Is.EquivalentTo(vanillaKeys));
 
+                // Each key leads to a switch on call or response, and each of those to audio in the bank.
                 foreach (var keyPackage in keySwitch.SwitchList.Cast<CAkSwitchCntr_V136.CAkSwitchPackage_V136>())
-                    Assert.That(keyPackage.NodeIdList, Is.EqualTo(new[] { amsFragment.TargetHircId }));
+                {
+                    var callResponse = moddedHircs.OfType<CAkSwitchCntr_V136>().SingleOrDefault(hirc => hirc.Id == keyPackage.NodeIdList.Single());
+                    Assert.That(callResponse, Is.Not.Null, $"key {keyPackage.SwitchId} points at {keyPackage.NodeIdList.Single()}, which is in no .bnk");
+                    if (callResponse == null)
+                        continue;
 
-                // And the bottom of the chain: whatever the keys point at has to be in the bank.
-                Assert.That(moddedHircs.Any(hirc => hirc.Id == amsFragment.TargetHircId), Is.True,
-                    $"the key switch points at {amsFragment.TargetHircId}, which is in no .bnk");
+                    Assert.That(callResponse.NodeBaseParams.DirectParentId, Is.EqualTo(keySwitch.Id));
+                    Assert.That(callResponse.SwitchList.Cast<CAkSwitchCntr_V136.CAkSwitchPackage_V136>().Select(package => package.SwitchId),
+                        Is.EquivalentTo(new[] { WwiseHash.Compute(AmsMusicLayout.Call), WwiseHash.Compute(AmsMusicLayout.Response) }),
+                        "the wav at the top of the tree plays for both the call and the response");
+
+                    foreach (var target in callResponse.SwitchList.Cast<CAkSwitchCntr_V136.CAkSwitchPackage_V136>().SelectMany(package => package.NodeIdList))
+                        Assert.That(moddedHircs.Any(hirc => hirc.Id == target), Is.True, $"the call/response switch points at {target}, which is in no .bnk");
+                }
 
                 foreach (var soundId in amsFragment.SoundIds)
                     Assert.That(moddedHircs.Any(hirc => hirc.Id == soundId && hirc.HircType == AkBkHircType.Sound), Is.True,
@@ -430,7 +449,7 @@ namespace Test.Audio
 
             Console.WriteLine(
                 $"\nfragments: '{MusicalCulture}' -> key switch {amsFragment.KeySwitchContainerId} " +
-                $"({keySwitch.SwitchList.Count} keys) -> {amsFragment.TargetHircId} -> {amsFragment.SoundIds.Count} sound(s)");
+                $"({keySwitch.SwitchList.Count} keys) -> {amsFragment.CallResponseSwitches.Count} call/response switch(es) -> {amsFragment.SoundIds.Count} sound(s)");
         }
 
         /// <summary>

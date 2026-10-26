@@ -1,4 +1,5 @@
-﻿using Editors.Audio.Shared.GameInformation.Warhammer3;
+﻿using Editors.Audio.Shared.AudioProject.Models;
+using Editors.Audio.Shared.GameInformation.Warhammer3;
 using Editors.Audio.Shared.Wwise.Generators;
 using Shared.ByteParsing;
 using Shared.GameFormats.Wwise;
@@ -390,6 +391,166 @@ namespace Test.Audio
 
             Assert.That(before.Where(path => !after.TryGetValue(path.Key, out var audioNodeId) || audioNodeId != path.Value), Is.Empty);
             Assert.That(after.Count - before.Count, Is.EqualTo(1), "the new culture should add exactly one path");
+        }
+
+        // --- Music trees: the modder's say over which audio plays below the culture ---
+
+        const int RootNodeId = 0;
+
+        // A tree that is only a root is what every event was before trees: the same audio under
+        // every path, exactly where the merge without a tree puts it.
+        [Test]
+        public void ARootOnlyTreeReachesTheSamePathsAsNoTree()
+        {
+            var container = CreateVanillaBattleContainer();
+            var tree = Tree(BattleCultureStateGroup, "Araby", Node(RootNodeId, audio: 1));
+
+            var treePaths = MusicSwitchContainerMergeService.BuildTreeKeyPaths(container, tree);
+            var withTree = new MusicSwitchContainerMergeService().MergeBranches(container,
+                [new MusicBranch(BattleCultureStateGroup, "Araby", NewRanSeqId, treePaths[RootNodeId])]);
+            var withoutTree = new MusicSwitchContainerMergeService().MergeBranches(container,
+                [new MusicBranch(BattleCultureStateGroup, "Araby", NewRanSeqId)]);
+
+            Assert.That(PathsOf(withTree.AkDecisionTree.DecisionTree), Is.EqualTo(PathsOf(withoutTree.AkDecisionTree.DecisionTree)));
+        }
+
+        [Test]
+        public void ASplitAboveTheCulturePicksAudioPerBlock()
+        {
+            var root = Node(RootNodeId, audio: 1, splitBy: BattleResultStateGroup);
+            root.Branches.Add(Node(1, audio: 2, value: "win"));
+
+            var paths = MusicSwitchContainerMergeService.BuildTreeKeyPaths(CreateVanillaBattleContainer(), Tree(BattleCultureStateGroup, "Araby", root));
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(paths[1], Is.EquivalentTo(new[] { Keys("win", "Araby") }));
+                Assert.That(paths[RootNodeId], Is.EquivalentTo(new[] { Keys("lose", "Araby"), Keys("draw", "Araby") }));
+            });
+        }
+
+        // Wwise reads the levels in the container's order and prefers an exact key at each, so a
+        // path per tree branch would let a split on the key beat a split on the situation even where
+        // the modder put the situation first. Every combination is written out instead.
+        [Test]
+        public void TheModdersOrderOfSplitsWinsOverTheContainersOrderOfLevels()
+        {
+            var container = CreateContainerBelowTheCulture();
+            var root = Node(RootNodeId, audio: 1, splitBy: "Situation");
+            root.Branches.Add(Node(1, audio: 2, value: "winning"));
+            var anyOther = Node(2, splitBy: "Key");
+            anyOther.Branches.Add(Node(3, audio: 3, value: "c"));
+            root.Branches.Add(anyOther);
+
+            var paths = MusicSwitchContainerMergeService.BuildTreeKeyPaths(container, Tree(BattleCultureStateGroup, "Araby", root));
+            var merged = new MusicSwitchContainerMergeService().MergeBranches(container,
+                [.. paths.Select(entry => new MusicBranch(BattleCultureStateGroup, "Araby", 9000 + (uint)entry.Key, entry.Value))]);
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(Lookup(merged, "Araby", "c", "winning"), Is.EqualTo(9001), "winning is split on first, so it wins in the key of C too");
+                Assert.That(Lookup(merged, "Araby", "eb", "winning"), Is.EqualTo(9001));
+                Assert.That(Lookup(merged, "Araby", "c", "losing"), Is.EqualTo(9003));
+                Assert.That(Lookup(merged, "Araby", "eb", "losing"), Is.EqualTo(9000));
+                Assert.That(paths.ContainsKey(2), Is.False, "a node without audio plays its parent's, so nothing reaches it by itself");
+            });
+        }
+
+        [Test]
+        public void ASplitOnThePartOfTheGameKeepsEachContainersAudioApart()
+        {
+            var root = Node(RootNodeId, audio: 1, splitBy: Wh3MusicTreeLevelInformation.ContainerLevel);
+            root.Branches.Add(Node(1, audio: 2, value: BattleContainerId.ToString()));
+            var tree = Tree(BattleCultureStateGroup, "Araby", root);
+
+            var battlePaths = MusicSwitchContainerMergeService.BuildTreeKeyPaths(CreateVanillaBattleContainer(), tree);
+            var adaptivePaths = MusicSwitchContainerMergeService.BuildTreeKeyPaths(CreateVanillaAdaptiveContainer(), tree);
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(battlePaths.Keys, Is.EquivalentTo(new[] { 1 }));
+                Assert.That(adaptivePaths.Keys, Is.EquivalentTo(new[] { RootNodeId }));
+            });
+        }
+
+        // The in-battle container has no battle result, so a split on it there is passed over and
+        // the node above it plays.
+        [Test]
+        public void ASplitOnALevelTheContainerDoesNotHaveIsIgnoredThere()
+        {
+            var root = Node(RootNodeId, audio: 1, splitBy: BattleResultStateGroup);
+            root.Branches.Add(Node(1, audio: 2, value: "win"));
+            root.Branches.Add(Node(2, audio: 3));
+
+            var paths = MusicSwitchContainerMergeService.BuildTreeKeyPaths(CreateVanillaAdaptiveContainer(), Tree(BattleCultureStateGroup, "Araby", root));
+
+            Assert.That(paths.Keys, Is.EquivalentTo(new[] { RootNodeId }));
+        }
+
+        [Test]
+        public void ATreeWithNoAudioAnywhereReachesNothing()
+        {
+            var paths = MusicSwitchContainerMergeService.BuildTreeKeyPaths(CreateVanillaBattleContainer(),
+                Tree(BattleCultureStateGroup, "Araby", Node(RootNodeId)));
+
+            Assert.That(paths, Is.Empty);
+        }
+
+        static MusicTree Tree(string stateGroupName, string stateName, MusicTreeNode root) =>
+            new() { StateGroupName = stateGroupName, StateName = stateName, Root = root };
+
+        static MusicTreeNode Node(int id, uint? audio = null, string value = null, string splitBy = null) => new()
+        {
+            Id = id,
+            Value = value,
+            SplitBy = splitBy,
+            AudioFileIds = audio is uint audioFileId ? [audioFileId] : []
+        };
+
+        static List<uint> Keys(params string[] names) => [.. names.Select(WwiseHash.Compute)];
+
+        /// <summary>What Wwise would pick for a runtime combination: the exact key at each level,
+        /// otherwise the default.</summary>
+        static uint Lookup(CAkMusicSwitchCntr_V136 container, params string[] values)
+        {
+            var node = container.AkDecisionTree.DecisionTree;
+            foreach (var value in values)
+            {
+                node = node.Nodes.FirstOrDefault(child => child.Key == WwiseHash.Compute(value))
+                    ?? node.Nodes.FirstOrDefault(child => child.Key == 0);
+                if (node == null)
+                    return 0;
+            }
+            return node.AudioNodeId;
+        }
+
+        // Culture > Key > Situation, every vanilla block with a default at the two lower levels.
+        static CAkMusicSwitchCntr_V136 CreateContainerBelowTheCulture()
+        {
+            var container = new CAkMusicSwitchCntr_V136 { Id = 1234, HircType = AkBkHircType.Music_Switch, TreeDepth = 3 };
+            foreach (var group in new[] { BattleCultureStateGroup, "Key", "Situation" })
+                container.Arguments.Add(new AkGameSync_V136 { GroupId = WwiseHash.Compute(group), GroupType = AkGroupType.State });
+
+            var audioNodeId = 300u;
+            var root = new AkDecisionTree_V136.Node_V136();
+            foreach (var culture in new[] { "Empire", "Cathay" })
+            {
+                var cultureNode = CreateBranch(WwiseHash.Compute(culture), 0);
+                foreach (var key in new uint[] { WwiseHash.Compute("c"), WwiseHash.Compute("eb"), 0 })
+                {
+                    var keyNode = CreateBranch(key, 0);
+                    foreach (var situation in new uint[] { WwiseHash.Compute("winning"), WwiseHash.Compute("losing"), 0 })
+                        keyNode.Nodes.Add(CreateBranch(situation, audioNodeId++));
+                    cultureNode.Nodes.Add(keyNode);
+                }
+                root.Nodes.Add(cultureNode);
+            }
+
+            DeclareLeavesAsChildren(container, root);
+            container.AkDecisionTree = new AkDecisionTree_V136 { DecisionTree = root, Nodes = AkDecisionTree_V136.FlattenDecisionTree(root) };
+            container.TreeDataSize = container.AkDecisionTree.GetSize();
+            container.UpdateSectionSize();
+            return container;
         }
 
         static Dictionary<string, uint> PathsOf(AkDecisionTree_V136.Node_V136 node, string prefix = "")

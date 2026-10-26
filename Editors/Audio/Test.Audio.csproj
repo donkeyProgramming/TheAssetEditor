@@ -37,6 +37,8 @@
     <Compile Include="MusicHircRoundTripResearch.cs" />
     <Compile Include="SetStateActionGenerationTests.cs" />
     <Compile Include="VanillaBankReader.cs" />
+    <Compile Include="MusicTreeEndToEndRun.cs" />
+    <Compile Include="MusicVanillaReferenceResearch.cs" />
     <Using Include="NUnit.Framework" />
   </ItemGroup>
 

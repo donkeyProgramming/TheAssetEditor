@@ -15,7 +15,10 @@ namespace Editors.Audio.Shared.Wwise.Generators
     {
         CAkSwitchCntr_V136 AddCultures(CAkSwitchCntr_V136 vanillaContainer, IReadOnlyList<AmsFragmentBranch> branches);
         CAkSwitchCntr_V136 MergeContainers(CAkSwitchCntr_V136 baseContainer, CAkSwitchCntr_V136 mergingContainer);
-        CAkSwitchCntr_V136 CreateKeySwitchContainer(CAkSwitchCntr_V136 vanillaContainer, IAudioRepositoryLookup lookup, uint keySwitchContainerId, uint targetHircId);
+        CAkSwitchCntr_V136 CreateKeySwitchContainer(
+            CAkSwitchCntr_V136 vanillaContainer, IAudioRepositoryLookup lookup, uint keySwitchContainerId, Func<uint, uint> targetForKeySwitchId);
+        CAkSwitchCntr_V136 CreateCallResponseSwitchContainer(
+            CAkSwitchCntr_V136 vanillaContainer, IAudioRepositoryLookup lookup, uint id, uint parentId, uint callTargetId, uint responseTargetId);
     }
 
     /// <summary>Just enough of the repository for the key switch to be mirrored from a sibling,
@@ -117,51 +120,86 @@ namespace Editors.Audio.Shared.Wwise.Generators
         }
 
         /// <summary>
-        /// The Switch container on the musical key Group that a culture's audio hangs off.
-        ///
-        /// The keys are mirrored from a vanilla sibling rather than written down here. What the key
-        /// Group is, and which keys the score actually uses, are the game's business and would go
-        /// stale the moment a patch added one; a sibling always has the current answer.
+        /// The Switch container on the musical key Group that a culture's fragments hang off, with the
+        /// keys an existing culture's key switch lists, each pointing where
+        /// <paramref name="targetForKeySwitchId"/> says. A key it gives 0 is left out, so it plays
+        /// nothing the way vanilla's silent "None" branch does; the default is kept as vanilla's.
         /// </summary>
         public CAkSwitchCntr_V136 CreateKeySwitchContainer(
-            CAkSwitchCntr_V136 vanillaContainer, IAudioRepositoryLookup lookup, uint keySwitchContainerId, uint targetHircId)
+            CAkSwitchCntr_V136 vanillaContainer, IAudioRepositoryLookup lookup, uint keySwitchContainerId, Func<uint, uint> targetForKeySwitchId)
         {
-            var sibling = vanillaContainer.Children.ChildIds
-                .Select(lookup.FindSwitchContainer)
-                .FirstOrDefault(child => child != null && child.SwitchList.Count != 0);
+            var sibling = FindKeySwitch(vanillaContainer, lookup);
 
-            if (sibling == null)
-                throw new NotSupportedException(
-                    $"Switch container {vanillaContainer.Id} has no child Switch container to take the musical keys from, " +
-                    "so a new culture's fragments cannot be keyed the way vanilla's are.");
-
-            var keySwitch = new CAkSwitchCntr_V136
-            {
-                Id = keySwitchContainerId,
-                HircType = AkBkHircType.SwitchContainer,
-                EGroupType = sibling.EGroupType,
-                GroupId = sibling.GroupId,
-                DefaultSwitch = sibling.DefaultSwitch,
-                BIsContinuousValidation = sibling.BIsContinuousValidation,
-                NodeBaseParams = new NodeBaseParams_V136 { DirectParentId = vanillaContainer.Id }
-            };
-
-            // Every key resolves to the same audio. Vanilla varies the fragment by key because the
-            // fragments are written against the score; a mod supplying one set has nothing to vary.
+            var keySwitch = CreateSwitchLike(sibling, keySwitchContainerId, vanillaContainer.Id);
             foreach (var siblingSwitch in sibling.SwitchList.Cast<CAkSwitchCntr_V136.CAkSwitchPackage_V136>())
             {
-                keySwitch.SwitchList.Add(new CAkSwitchCntr_V136.CAkSwitchPackage_V136
-                {
-                    SwitchId = siblingSwitch.SwitchId,
-                    NodeIdList = [targetHircId]
-                });
+                var target = targetForKeySwitchId(siblingSwitch.SwitchId);
+                if (target != 0)
+                    keySwitch.SwitchList.Add(new CAkSwitchCntr_V136.CAkSwitchPackage_V136 { SwitchId = siblingSwitch.SwitchId, NodeIdList = [target] });
             }
 
-            keySwitch.Children.ChildIds.Add(targetHircId);
-            keySwitch.Children.NumChilds = 1;
-            keySwitch.NumSwitchGroups = (uint)keySwitch.SwitchList.Count;
-            keySwitch.UpdateSectionSize();
-            return keySwitch;
+            return Finish(keySwitch);
+        }
+
+        /// <summary>
+        /// The Switch on Call or Response under a key, mirrored from the one vanilla puts under an
+        /// existing culture's keys, with Call and Response each pointing at what the tree plays there.
+        /// A 0 target is left out, and plays nothing.
+        /// </summary>
+        public CAkSwitchCntr_V136 CreateCallResponseSwitchContainer(
+            CAkSwitchCntr_V136 vanillaContainer, IAudioRepositoryLookup lookup, uint id, uint parentId, uint callTargetId, uint responseTargetId)
+        {
+            var sibling = FindKeySwitch(vanillaContainer, lookup).SwitchList
+                .Cast<CAkSwitchCntr_V136.CAkSwitchPackage_V136>()
+                .SelectMany(package => package.NodeIdList)
+                .Select(lookup.FindSwitchContainer)
+                .FirstOrDefault(child => child != null && child.SwitchList.Count != 0)
+                ?? throw new NotSupportedException(
+                    $"No culture under Switch container {vanillaContainer.Id} splits its fragments by call and response, so there is none to mirror.");
+
+            var callResponse = CreateSwitchLike(sibling, id, parentId);
+            foreach (var (name, target) in new[] { (AudioProject.AmsMusicLayout.Call, callTargetId), (AudioProject.AmsMusicLayout.Response, responseTargetId) })
+            {
+                if (target != 0)
+                    callResponse.SwitchList.Add(new CAkSwitchCntr_V136.CAkSwitchPackage_V136 { SwitchId = WwiseHash.Compute(name), NodeIdList = [target] });
+            }
+
+            return Finish(callResponse);
+        }
+
+        private static CAkSwitchCntr_V136 FindKeySwitch(CAkSwitchCntr_V136 vanillaContainer, IAudioRepositoryLookup lookup) =>
+            vanillaContainer.Children.ChildIds
+                .Select(lookup.FindSwitchContainer)
+                .Where(child => child != null && child.SwitchList.Count != 0)
+                .OrderByDescending(child => child.SwitchList.Count)
+                .FirstOrDefault()
+            ?? throw new NotSupportedException(
+                $"Switch container {vanillaContainer.Id} has no child Switch container to take the musical keys from, " +
+                "so a new culture's fragments cannot be keyed the way vanilla's are.");
+
+        private static CAkSwitchCntr_V136 CreateSwitchLike(CAkSwitchCntr_V136 sibling, uint id, uint parentId) => new()
+        {
+            Id = id,
+            HircType = AkBkHircType.SwitchContainer,
+            EGroupType = sibling.EGroupType,
+            GroupId = sibling.GroupId,
+            DefaultSwitch = sibling.DefaultSwitch,
+            BIsContinuousValidation = sibling.BIsContinuousValidation,
+            NodeBaseParams = new NodeBaseParams_V136 { DirectParentId = parentId }
+        };
+
+        /// <summary>The children are the distinct nodes the switches name, as Wwise requires.</summary>
+        private static CAkSwitchCntr_V136 Finish(CAkSwitchCntr_V136 container)
+        {
+            container.Children.ChildIds.AddRange(container.SwitchList
+                .Cast<CAkSwitchCntr_V136.CAkSwitchPackage_V136>()
+                .SelectMany(package => package.NodeIdList)
+                .Distinct()
+                .Order());
+            container.Children.NumChilds = (uint)container.Children.ChildIds.Count;
+            container.NumSwitchGroups = (uint)container.SwitchList.Count;
+            container.UpdateSectionSize();
+            return container;
         }
 
         private static CAkSwitchCntr_V136 CopyContainer(CAkSwitchCntr_V136 source)

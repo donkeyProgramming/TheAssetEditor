@@ -39,6 +39,10 @@ namespace Editors.Audio.Shared.AudioProject.Models
 
         public List<MusicPlaylistEntry> Segments { get; set; } = [];
 
+        /// <summary>The node of the State's <see cref="MusicTree"/> this plays the audio of, which is
+        /// what decides the decision tree paths that reach it.</summary>
+        public int TreeNodeId { get; set; }
+
         public MusicRandomSequence()
         {
             HircType = AkBkHircType.Music_Random_Sequence;

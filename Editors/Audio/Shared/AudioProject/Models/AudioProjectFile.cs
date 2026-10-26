@@ -220,6 +220,13 @@ namespace Editors.Audio.Shared.AudioProject.Models
                 .SelectMany(soundBank => soundBank.MusicSegments)
                 .Select(musicSegment => musicSegment.TrackId));
 
+            // The same for the fragment switches, which are built at compile time from these ids.
+            foreach (var amsFragment in SoundBanks.SelectMany(soundBank => soundBank.AmsFragments))
+            {
+                generatableItemIds.Add(amsFragment.KeySwitchContainerId);
+                generatableItemIds.UnionWith(amsFragment.CallResponseSwitches.Select(callResponse => callResponse.Id));
+            }
+
             return generatableItemIds;
         }
 

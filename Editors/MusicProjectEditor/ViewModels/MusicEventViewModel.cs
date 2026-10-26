@@ -24,6 +24,10 @@ namespace Editors.MusicProjectEditor.ViewModels
         public string? StateGroupName { get; }
         public string? StateName { get; }
 
+        /// <summary>The State Group every culture's event for this slot sets, borrowing or not -
+        /// what the vanilla reference panel lists cultures from.</summary>
+        public string? SlotStateGroupName { get; }
+
         public bool IsBorrowed => Slot.ReferenceMatchKey != null;
         public bool CanCarryOwnAudio { get; }
 
@@ -48,29 +52,35 @@ namespace Editors.MusicProjectEditor.ViewModels
                            "State Group in a way a mod can extend, so it cannot be given wavs of its own. Edit the culture " +
                            "to borrow an existing culture's music here instead.";
 
+                // These layer over the campaign score and follow its key, which is what to tell a modder
+                // before they pick a five minute track for one.
                 if (Wh3MusicHierarchyInformation.IsAmsPulseStateGroup(StateGroupName))
                     return "An adaptive music pulse - a rhythmic layer played over the campaign theme, not a theme itself. " +
-                           "The game has nine slots for it: one short loop is used for all nine, or up to nine vary it " +
-                           "across the piece. Anything longer than a slot is trimmed to fit.";
+                           "The game plays it in the key the score is in (C, Eb or Gb), with three 41.6 s variations per " +
+                           "key, so nine places in all; a branch's wavs are handed to the places it covers in turn. " +
+                           "Pitched pulses only sound right written per key - split by Key for that. Anything longer " +
+                           "than a variation is trimmed to fit.";
 
                 if (Wh3MusicHierarchyInformation.GetAmsFragmentContainerId(StateGroupName) != null)
-                    return "Ambient fragments - short sounds laid over the campaign music rather than music itself. " +
-                           "Vanilla varies them by the musical key the score is in; anything added here plays in every key.";
+                    return "Ambient fragments - short phrases laid over the campaign music, picked at random. Vanilla writes " +
+                           "them per key the score is in (C, Eb, Gb) and as a call and a response; split by Key and by Call " +
+                           "or response to do the same, or leave the wavs at the top to play everywhere.";
 
-                if (StateGroupName == BattleCultureStateGroup)
-                    return "The same music plays whether the battle is won, lost or drawn - vanilla splits those three, " +
-                           "but a single event cannot tell them apart.";
-
-                return "The wavs below play, one picked at random each time, whenever the scripts post this event.";
+                return "The tree says which wavs play when. With only the top of the tree given wavs they play everywhere, one " +
+                       "picked at random each time; split a branch by something - the part of the game, the result, the " +
+                       "phase, the key - to give that part its own.";
             }
         }
 
-        const string BattleCultureStateGroup = "Battle_Music_WH3_Culture";
 
-        public MusicEventViewModel(MusicCultureSlot slot, string musicalCulture, string? title, IEnumerable<AudioFile> audioFiles)
+        public MusicEventViewModel(MusicCultureSlot slot, string musicalCulture, string? title, IEnumerable<AudioFile> audioFiles, MusicTree? tree)
         {
             Slot = slot;
             Title = title ?? slot.EventPrefix;
+
+            // Only the suffix differs between cultures, so any culture name resolves the Group.
+            if (Wh3MusicEventInformation.TryResolveStateTarget(slot.EventPrefix + "placeholder", out var slotStateGroupName, out _))
+                SlotStateGroupName = slotStateGroupName;
 
             if (!IsBorrowed)
             {
@@ -83,21 +93,22 @@ namespace Editors.MusicProjectEditor.ViewModels
                 }
             }
 
-            SetAudioFiles(audioFiles);
-        }
-
-        public void SetAudioFiles(IEnumerable<AudioFile> audioFiles)
-        {
-            AudioFiles.Clear();
+            HasTree = tree != null;
             foreach (var audioFile in audioFiles)
                 AudioFiles.Add(audioFile.WavPackFilePath);
 
+            // A tree's audio is spread over its branches, so the row counts all of it.
+            var wavCount = tree?.GetNodes().SelectMany(node => node.AudioFileIds).Distinct().Count() ?? AudioFiles.Count;
+            var branchCount = (tree?.GetNodes().Count() ?? 1) - 1;
             AudioSummary =
                 IsBorrowed ? "borrowed" :
                 !CanCarryOwnAudio ? "-" :
-                AudioFiles.Count == 0 ? "none yet" :
-                AudioFiles.Count == 1 ? "1 wav" :
-                $"{AudioFiles.Count} wavs";
+                wavCount == 0 ? "none yet" :
+                (wavCount == 1 ? "1 wav" : $"{wavCount} wavs") + (branchCount == 0 ? "" : branchCount == 1 ? ", 1 branch" : $", {branchCount} branches");
         }
+
+        /// <summary>Whether the event's audio is a decision tree - the battle theme and the campaign
+        /// map theme - rather than one list.</summary>
+        public bool HasTree { get; }
     }
 }

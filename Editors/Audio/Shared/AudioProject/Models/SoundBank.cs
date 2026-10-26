@@ -54,6 +54,12 @@ namespace Editors.Audio.Shared.AudioProject.Models
         /// </summary>
         public List<AmsFragment> AmsFragments { get; set; } = [];
 
+        /// <summary>
+        /// Which audio each music event plays when, one tree per State the bank's events set. The
+        /// music hierarchy above is generated from these - see <see cref="MusicTree"/>.
+        /// </summary>
+        public List<MusicTree> MusicTrees { get; set; } = [];
+
         public SoundBank(string name, Wh3SoundBank gameSoundBank, string language)
         {
             Id = WwiseHash.Compute(name);
@@ -111,7 +117,8 @@ namespace Editors.Audio.Shared.AudioProject.Models
                 MusicRandomSequences = cleanedMusicRandomSequences,
                 MusicSegments = MusicSegments.ToList(),
                 AmsPulses = cleanedAmsPulses,
-                AmsFragments = cleanedAmsFragments
+                AmsFragments = cleanedAmsFragments,
+                MusicTrees = MusicTrees.ToList()
             };
         }
 
