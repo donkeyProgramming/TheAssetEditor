@@ -78,9 +78,7 @@ namespace Editors.MusicProjectEditor.ViewModels
             Slot = slot;
             Title = title ?? slot.EventPrefix;
 
-            // Only the suffix differs between cultures, so any culture name resolves the Group.
-            if (Wh3MusicEventInformation.TryResolveStateTarget(slot.EventPrefix + "placeholder", out var slotStateGroupName, out _))
-                SlotStateGroupName = slotStateGroupName;
+            SlotStateGroupName = Wh3MusicEventInformation.GetStateGroupForPrefix(slot.EventPrefix);
 
             if (!IsBorrowed)
             {

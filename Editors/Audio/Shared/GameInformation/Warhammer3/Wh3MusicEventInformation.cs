@@ -57,6 +57,11 @@ namespace Editors.Audio.Shared.GameInformation.Warhammer3
             return false;
         }
 
+        /// <summary>The State Group every culture's event with this prefix sets, or null if the
+        /// prefix matches no vanilla pattern.</summary>
+        public static string GetStateGroupForPrefix(string eventPrefix) =>
+            s_stateGroupByEventPrefix.FirstOrDefault(entry => eventPrefix?.StartsWith(entry.Prefix, StringComparison.OrdinalIgnoreCase) == true).StateGroup;
+
         public static IReadOnlyList<string> KnownEventPrefixes =>
             s_stateGroupByEventPrefix.Select(entry => entry.Prefix).ToList();
     }

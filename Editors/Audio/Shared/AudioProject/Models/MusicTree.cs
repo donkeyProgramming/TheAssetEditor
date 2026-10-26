@@ -84,8 +84,6 @@ namespace Editors.Audio.Shared.AudioProject.Models
 
         public List<MusicTreeNode> Branches { get; set; } = [];
 
-        public bool IsAnyOtherValue(MusicTreeNode parent) => parent != null && Value == null;
-
         public IEnumerable<MusicTreeNode> GetNodes() => new[] { this }.Concat(Branches.SelectMany(branch => branch.GetNodes()));
     }
 }

@@ -47,11 +47,8 @@ namespace Editors.MusicProjectEditor.ViewModels
         public bool CanCarryOwnAudio => Wh3MusicHierarchyInformation.CanCarryOwnAudio(StateGroupName);
 
         /// <summary>The State Group this row's event sets, or null if the name matches no vanilla
-        /// pattern. Resolved from a placeholder culture because the name only differs by suffix.</summary>
-        string StateGroupName =>
-            Wh3MusicEventInformation.TryResolveStateTarget(Slot.EventFor("placeholder"), out var stateGroupName, out _)
-                ? stateGroupName
-                : null;
+        /// pattern.</summary>
+        string StateGroupName => Wh3MusicEventInformation.GetStateGroupForPrefix(Slot.EventPrefix);
 
         public string AudioSupportNote
         {

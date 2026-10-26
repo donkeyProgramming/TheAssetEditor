@@ -3,9 +3,7 @@ using Shared.GameFormats.MusicDat;
 namespace Editors.MusicDatEditor.ViewModels
 {
     /// <summary>One instruction row in the decompiled view - a read-only rendering of one word
-    /// group in <see cref="MusicDatFile.Instructions"/>. This editor never writes to the file
-    /// directly; the only sanctioned edits go through the wizards on the toolbar (Add
-    /// Culture...), which validate a whole splice before adopting it.</summary>
+    /// group in <see cref="MusicDatFile.Instructions"/>.</summary>
     public class InstructionRowViewModel
     {
         public int Address { get; }

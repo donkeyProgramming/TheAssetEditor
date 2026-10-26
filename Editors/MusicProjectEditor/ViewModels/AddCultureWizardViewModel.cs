@@ -35,7 +35,6 @@ namespace Editors.MusicProjectEditor.ViewModels
 
         readonly DispatcherTimer _previewDebounce = new() { Interval = TimeSpan.FromMilliseconds(300) };
 
-        public bool HasBattle => _battle != null;
         public bool HasCampaign => _campaign != null;
 
         /// <summary>The Audio State as it is actually matched and built into event names -
