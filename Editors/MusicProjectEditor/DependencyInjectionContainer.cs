@@ -20,7 +20,7 @@ namespace Editors.MusicProjectEditor
             EditorInfoBuilder
                 .Create<MusicProjectEditorViewModel, MusicProjectEditorView>(EditorEnums.MusicProject_Editor)
                 .AddExtention(MusicAudioProjectService.FileExtension, EditorPriorites.High)
-                .AddToToolbar("Music Project")
+                .AddToToolbar("Music Project Editor")
                 .Build(factory);
         }
     }
