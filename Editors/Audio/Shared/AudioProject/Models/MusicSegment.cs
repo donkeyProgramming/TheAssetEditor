@@ -26,10 +26,9 @@ namespace Editors.Audio.Shared.AudioProject.Models
         public string Language { get; set; }
 
         /// <summary>
-        /// Length of the audio in milliseconds. It sets the segment duration, the exit cue position
-        /// and the clip's source duration, so all three stay consistent with the file. Vanilla
-        /// stores these as f64 and they are routinely fractional (28800.02267573696), so this is a
-        /// double rather than an integer count of milliseconds.
+        /// Length of the audio in milliseconds, read from the encoded wem at compile time. It sets the
+        /// segment duration, the exit cue position and the clip's source duration. Fractional, as
+        /// vanilla's are.
         /// </summary>
         public double DurationMs { get; set; }
 

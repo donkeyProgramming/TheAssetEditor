@@ -55,8 +55,7 @@ namespace Shared.GameFormats.Wwise.Hirc.V136
             memStream.Write(ByteParsers.Byte.EncodeValue(BIsContinuousValidation, out _));
             memStream.Write(Children.WriteData());
 
-            // Counts are taken from the lists rather than the fields they were read into, so an
-            // edit that adds a switch cannot leave the count behind and desynchronise the parse.
+            // Counts come from the lists rather than the parsed count fields, so edits keep them in step.
             memStream.Write(ByteParsers.UInt32.EncodeValue((uint)SwitchList.Count, out _));
             foreach (var switchPackage in SwitchList.Cast<CAkSwitchPackage_V136>())
                 memStream.Write(switchPackage.WriteData());

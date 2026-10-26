@@ -24,9 +24,7 @@ namespace Shared.GameFormats.Wwise.Hirc.V136.Shared
         {
             using var memStream = new MemoryStream();
 
-            // Props before groups, matching ReadData. The previous version wrote these the other
-            // way round, which only went unnoticed because it refused to write anything but the
-            // empty case, where both counts are zero and the swap is invisible.
+            // Props before groups, the order ReadData reads them in.
             memStream.Write(ByteParsers.Byte.EncodeValue((byte)StateProps.Count, out _));
             foreach (var stateProp in StateProps)
                 memStream.Write(stateProp.WriteData());

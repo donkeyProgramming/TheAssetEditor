@@ -38,7 +38,7 @@ namespace Shared.GameFormats.Wwise.Hirc.V136
                 + 4 // NumMarkers
                 + (uint)ArrayMarkersList.Sum(marker => marker.GetSize());
 
-            // The id is inside the section, the type and size prefix are not.
+            // The id counts towards the section size; the type and size prefix do not.
             SectionSize = size + ByteHelper.GetPropertyTypeSize(Id);
         }
 
@@ -55,10 +55,6 @@ namespace Shared.GameFormats.Wwise.Hirc.V136
                 akMusicMarkerWwise.Id = chunk.ReadUInt32();
                 akMusicMarkerWwise.Position = BitConverter.Int64BitsToDouble(chunk.ReadInt64());
 
-                // uStringSize genuinely is on disk between the position and the name. It used to
-                // be left at its default of zero and then used to size the name read, so every
-                // marker name came back empty and the following four bytes were skipped by the
-                // per-item resync in HircItem.ReadHirc rather than being read.
                 akMusicMarkerWwise.StringSize = chunk.ReadUInt32();
                 akMusicMarkerWwise.MarkerName = Encoding.UTF8.GetString(chunk.ReadBytes((int)akMusicMarkerWwise.StringSize));
                 return akMusicMarkerWwise;

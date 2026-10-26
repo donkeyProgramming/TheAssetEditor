@@ -49,8 +49,7 @@ namespace Shared.GameFormats.Wwise.Hirc.V136
             SectionSize = size + ByteHelper.GetPropertyTypeSize(Id);
         }
 
-        // The count on disk is the total number of nodes in the flattened run, so it has to be
-        // recomputed from the whole tree rather than taken from the number of roots.
+        // Every node in the flattened run, not just the roots - see ReadData.
         private uint CountPlaylistItems() => (uint)PlayList.Sum(playlistItem => playlistItem.CountSelfAndDescendants());
 
         public class AkMusicRanSeqPlaylistItem_V136

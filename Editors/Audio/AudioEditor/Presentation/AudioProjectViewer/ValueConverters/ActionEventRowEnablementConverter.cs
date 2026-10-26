@@ -25,10 +25,8 @@ namespace Editors.Audio.AudioEditor.Presentation.AudioProjectViewer.ValueConvert
             if (row.RowState == DataRowState.Detached || row.RowState == DataRowState.Deleted)
                 return false;
 
-            // The selected node changes before the grid swaps its rows over, so for one layout pass
-            // this can be handed a row belonging to the previously selected node's table - a State
-            // Group row, say, which has no Action Event column. Indexing it by name throws rather
-            // than returning null, so the column has to be checked for.
+            // For one layout pass after the selected node changes, this can be handed a row from the
+            // previous node's table (a State Group row, say) that has no Action Event column.
             if (!row.Table.Columns.Contains(TableInformation.ActionEventColumnName))
                 return false;
 

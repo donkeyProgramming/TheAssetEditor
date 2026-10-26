@@ -27,60 +27,24 @@ namespace Editors.Audio.Shared.GameInformation.Warhammer3
     public static class Wh3MusicHierarchyInformation
     {
         /// <summary>
-        /// The Music Switch containers whose decision trees a State Group's States get a branch in,
-        /// keyed by State Group name. These are vanilla hirc ids, so a merge has to re-emit the whole
-        /// container the way the Dialogue Event merge re-emits a whole dialogue event. A music node
-        /// has one parent, so each container gets a hierarchy of its own over the same audio.
+        /// The vanilla Music Switch containers whose decision trees a State Group's States get a
+        /// branch in. A merge re-emits the whole container, and since a music node has one parent,
+        /// each container gets a hierarchy of its own over the same audio.
         ///
-        /// Every Music Switch container in the game was enumerated, and the multi argument ones
-        /// dumped in full. Of the six State Groups the music events target, two can be served:
+        ///   698158058   campaign map theme, subculture x a second level that is always defaulted
+        ///   145953291   campaign victory/defeat screens, culture > faction > won or lost
+        ///   26264058    battle results (prebattle), result x culture, no default at either level
+        ///   67383790    in-battle, culture is level 3 of 6; three of its phases have no default,
+        ///               so a culture missing there is silence. Levels below culture are stem sets
+        ///               per key/segment/mix, which a mod's branch takes the default of.
         ///
-        ///   WH3_Campaign_Subcultures                     698158058, subculture x 781561792 -> listed
-        ///   Battle_Music_WH3_Culture                     26264058,  result x culture     -> listed
-        ///   WH3_Campaign_Subcultures                     145953291, subculture x resolution -> listed
-        ///   Battle_Music_WH3_Culture                     67383790,  six arguments deep   -> listed
-        ///   WH3_Campaign_Music_AMS_Fragments_Faction     read elsewhere, see below
-        ///   WH3_AMS_Pulse_Percussion_Options             read elsewhere, see below
-        ///   WH3_AMS_Pulse_Pitched_Orchestral_Options     read elsewhere, see below
-        ///   WH3_AMS_Pulse_Pitched_Ethnic_Options         read elsewhere, see below
+        /// The four AMS State Groups have no container here: the pulse Groups are read by switch
+        /// tracks (<see cref="IsAmsPulseStateGroup"/>) and the fragments Group by a plain Switch
+        /// container (<see cref="GetAmsFragmentContainerId"/>). A State none of them lists falls back
+        /// to that Group's default, so a culture that skips them gets a thinner mix, not silence.
         ///
-        /// Measured on the October 2026 banks: 698158058 is two deep, its second level
-        /// (781561792, 5 keys) defaulted in every block, and the merge fills that level in from the
-        /// default like any other level it does not branch on.
-        ///
-        /// 67383790 is the music heard during a battle. Its culture level is the third of six; three
-        /// of its six battle phases list all 17 vanilla cultures and offer no default, so a culture
-        /// missing from them is silence rather than a fallback - which is what Araby got in game in
-        /// October 2026 with only 26264058 merged, prebattle playing and the battle silent. Vanilla's
-        /// branches below the culture level are stem sets per musical key, segment and mix; the mod's
-        /// branch takes the default at each of those levels instead, so the same music plays whatever
-        /// they are. See MusicSwitchContainerMergeService for which blocks get the branch.
-        ///
-        /// 145953291 is the campaign victory and defeat resolution screens, culture > faction > won or
-        /// lost. Vanilla gives each culture its own tracks there, so a culture's tree reaches it too:
-        /// its root plays there unless the tree gives the resolution its own branch. The campaign
-        /// script ignores every music marker while a resolution screen is up ("we're in campaign
-        /// resolution state, will do nothing with markers"), so the segments need no cues of their own.
-        ///
-        /// The four with no container are the adaptive music system. They are not unused and they are
-        /// not all the same: what actually reads each one is two different mechanisms, neither of
-        /// them a tree.
-        ///
-        ///   the three Pulse Groups    9 switch tracks each, one per music track that carries pulses.
-        ///                             A switch track holds a sub-track per culture with its own
-        ///                             source - 16 for percussion, 11 orchestral, 6 ethnic - and
-        ///                             picks between them on the State. Adding a culture means adding
-        ///                             a sub-track, a source and an association to nine vanilla
-        ///                             Music_Tracks, three times over.
-        ///
-        ///   AMS_Fragments_Faction     one plain Switch container, 418295225 in campaign_music__core,
-        ///                             with 17 switches over 16 children. Not in the music hierarchy
-        ///                             at all - the ambient fragments are sounds laid over the music.
-        ///
-        /// Setting a State none of them lists is harmless rather than broken: each falls back to its
-        /// own default, which is 'Cathay' for percussion and 'Off' / 'None' for the other three. So a
-        /// new culture that skips these still gets Cathay's percussion pulse and no pitched pulses or
-        /// ambient fragments, which is a thinner mix rather than a failure.
+        /// These ids can change in a game update; the build reports a missing one rather than
+        /// shipping without it.
         /// </summary>
         public static IReadOnlyList<uint> GetMusicSwitchContainerIds(string stateGroupName) => stateGroupName switch
         {
@@ -90,14 +54,10 @@ namespace Editors.Audio.Shared.GameInformation.Warhammer3
         };
 
         /// <summary>
-        /// The three State Groups read by switch tracks rather than by a decision tree. A State here
+        /// The three State Groups read by switch tracks rather than by a decision tree: a State
         /// selects a sub-track inside vanilla Music Tracks, so serving one means adding a sub-track
-        /// to each of those tracks - see
-        /// <see cref="Wwise.Generators.AmsPulseTrackMergeService"/>.
-        ///
-        /// The tracks themselves are deliberately not listed. There are nine per Group and they are
-        /// found by asking the repository which switch tracks name the Group, so this survives a
-        /// patch adding or moving one in a way a table of ids would not.
+        /// to each - see <see cref="Wwise.Generators.AmsPulseTrackMergeService"/>. The tracks are
+        /// found by which ones name the Group rather than listed, so a patch moving one is harmless.
         /// </summary>
         public static bool IsAmsPulseStateGroup(string stateGroupName) => stateGroupName switch
         {
@@ -109,13 +69,7 @@ namespace Editors.Audio.Shared.GameInformation.Warhammer3
 
         /// <summary>
         /// Whether a mod can give a State Group's States their own audio. False means an Action Event
-        /// setting one of its States still works and still fires, but has to select audio that
-        /// already exists rather than bring its own.
-        ///
-        /// Two different mechanisms answer true here, and they produce quite different things: a
-        /// Group with a Music Switch container gets a whole music hierarchy of its own, while a pulse
-        /// Group gets a sub-track added to vanilla tracks. What they have in common is that a modder
-        /// can pick wavs and have them reached.
+        /// setting one of its States still fires, but can only select audio that already exists.
         /// </summary>
         public static bool CanCarryOwnAudio(string stateGroupName) =>
             GetMusicSwitchContainerIds(stateGroupName).Count != 0
@@ -123,12 +77,9 @@ namespace Editors.Audio.Shared.GameInformation.Warhammer3
             || GetAmsFragmentContainerId(stateGroupName) != null;
 
         /// <summary>
-        /// The plain Switch container that branches on the ambient fragments State Group. Unlike the
-        /// pulses this is a single container rather than a set of tracks, and it is not in the music
-        /// hierarchy at all - the fragments are Sounds laid over the music.
-        ///
-        /// Its children are themselves Switch containers on the musical key, which is why serving
-        /// this Group builds a small hierarchy rather than adding a clip. See
+        /// The plain Switch container (in campaign_music__core) that branches on the ambient fragments
+        /// State Group. It is outside the music hierarchy - the fragments are Sounds laid over the
+        /// music - and its children are Switch containers on the musical key. See
         /// <see cref="Wwise.Generators.AmsFragmentMergeService"/>.
         /// </summary>
         public static uint? GetAmsFragmentContainerId(string stateGroupName) => stateGroupName switch
@@ -166,12 +117,9 @@ namespace Editors.Audio.Shared.GameInformation.Warhammer3
         /// checks for a culture change and forces a key change. Without them the script never learns
         /// that a track began or ended, so it never notices the strongest culture changing.
         ///
-        /// Vanilla's stems carry update_dynamicstart and update_dynamicend instead, but those bracket
-        /// a stretch the script holds every transition back for, which over a whole piece of music
-        /// would hold it back for minutes. Vanilla's own whole tracks carry just these two, measured
-        /// in October 2026:
-        /// the start 0 to 3.5 seconds in, the end 3 to 10 seconds before the exit cue, median 5.5,
-        /// and never earlier than 69% of the way through.
+        /// Vanilla's stems carry update_dynamicstart/end instead, but those hold every transition back
+        /// for the stretch they bracket, which over a whole piece would be minutes. Vanilla's whole
+        /// tracks carry just these two: the start 0 to 3.5 s in, the end 3 to 10 s before the exit cue.
         /// </summary>
         public const uint TrackStartCueMarkerId = 2376622016;
         public const string TrackStartCueName = "Update_TrackStart:\0";
@@ -184,17 +132,10 @@ namespace Editors.Audio.Shared.GameInformation.Warhammer3
         public const double TrackEndCueEarliestShare = 0.8;
 
         /// <summary>
-        /// The musical grid a music transition is scheduled against, in milliseconds.
-        ///
-        /// This is not decoration. A transition into a node is timed against its grid, so a node
-        /// that declares a period of zero gives Wwise no point in time to make the switch on and
-        /// simply never starts - the container selects the branch and nothing is heard.
-        ///
-        /// Every vanilla child of the containers this touches carries a non-zero period. The ones
-        /// that override the meter derive it from their tempo (four bars: four times the beats in a
-        /// bar, at 60000/tempo per beat, scaled by the beat value); the ones that do not override it
-        /// carry Wwise's own default of 1000 instead. Nothing here knows the tempo of the wav a
-        /// modder supplies, so it does not override the meter, and takes the default with it.
+        /// The musical grid a transition is scheduled against, in milliseconds. A node with a period
+        /// of zero gives Wwise no point to switch on, so it never starts and nothing is heard. Vanilla
+        /// nodes that do not override the meter carry Wwise's default of 1000; nothing here knows the
+        /// tempo of a modder's wav, so generated nodes do the same.
         /// </summary>
         public const double DefaultGridPeriod = 1000;
 

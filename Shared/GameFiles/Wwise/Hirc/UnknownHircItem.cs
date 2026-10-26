@@ -3,12 +3,8 @@
 namespace Shared.GameFormats.Wwise.Hirc
 {
     /// <summary>
-    /// A hirc this codebase has no reader for, kept as the bytes it was read from.
-    ///
-    /// The payload is retained rather than skipped so that a .bnk containing types nothing here
-    /// models can still be written back out. Replacing a vanilla .bnk means shipping every hirc it
-    /// held, and vanilla .bnks carry types the editor has never needed to read - without this, one
-    /// unmodelled hirc anywhere in the file makes the whole .bnk unwritable.
+    /// A hirc type with no reader, kept as its raw bytes so that a .bnk holding one can still be
+    /// written back out unchanged - needed when a whole vanilla .bnk is re-shipped with edits.
     /// </summary>
     public class UnknownHircItem : HircItem
     {
@@ -22,8 +18,7 @@ namespace Shared.GameFormats.Wwise.Hirc
             Payload = chunk.ReadBytes((int)SectionSize - 4);
         }
 
-        // The size is whatever it was when read. Nothing can edit a hirc it cannot interpret, so
-        // there is never anything to recompute.
+        // The payload is never edited, so this is always the size it was read with.
         public override void UpdateSectionSize() => SectionSize = (uint)Payload.Length + 4;
 
         public override byte[] WriteData()

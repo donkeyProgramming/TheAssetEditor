@@ -28,11 +28,12 @@ namespace Shared.GameFormats.Wwise.Hirc.V112.Shared
         {
             using var memStream = new MemoryStream();
             memStream.Write(ByteParsers.Byte.EncodeValue((byte)PropsList.Count, out _));
+
+            // All the types first.
             foreach (var value in PropsList)
                 memStream.Write(ByteParsers.Byte.EncodeValue((byte)value.Type, out _));
 
-            // These are floats and must not be cast to byte on the way out - doing so truncated
-            // the fraction and wrapped anything negative, so a min of -1 was written back as 255.
+            // Then all the min and max values.
             foreach (var value in PropsList)
             {
                 memStream.Write(ByteParsers.Single.EncodeValue(value.Min, out _));

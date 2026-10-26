@@ -3,18 +3,10 @@ using System.Collections.Generic;
 namespace Editors.Audio.Shared.AudioProject.Models
 {
     /// <summary>
-    /// Audio contributed to the adaptive music system's pulse layers for one State.
-    ///
-    /// These State Groups are not read by a decision tree, so a State set against one selects no
-    /// branch and there is nothing for a <see cref="MusicRandomSequence"/> to be. They are read by
-    /// switch tracks: a vanilla Music Track that holds one sub-track per culture, each with its own
-    /// clip, and picks between them on the State. Serving a new culture means adding a sub-track to
-    /// every one of those vanilla tracks rather than adding a hirc of our own - which is why this
-    /// carries clips and no ids, and why nothing here generates a hirc.
-    ///
-    /// Vanilla gives each culture a different stem in each of the nine tracks, since each track sits
-    /// under a different segment of the loop. A mod supplying fewer than nine has them cycled, so one
-    /// file is a valid answer - the same pulse over every segment - and nine is the full treatment.
+    /// Audio contributed to the adaptive music system's pulse layers for one State. These State
+    /// Groups are read by vanilla switch tracks, which hold one sub-track per culture, so a culture
+    /// is served by adding a sub-track to each of them rather than by a hirc of its own - hence
+    /// clips and no ids. Fewer clips than tracks are cycled, so a single file is a valid answer.
     /// </summary>
     public class AmsPulse
     {
@@ -29,9 +21,8 @@ namespace Editors.Audio.Shared.AudioProject.Models
     }
 
     /// <summary>
-    /// One clip handed to a switch track. This is deliberately not a <see cref="MusicSegment"/>: a
-    /// segment owns a Music Track hirc of its own, whereas this is only ever a row in a vanilla
-    /// track's source and playlist lists.
+    /// One clip handed to a switch track. Not a <see cref="MusicSegment"/>: it owns no hirc, it is
+    /// only a row in a vanilla track's source and playlist lists.
     /// </summary>
     public class AmsPulseClip
     {

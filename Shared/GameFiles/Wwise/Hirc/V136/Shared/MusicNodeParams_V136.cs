@@ -58,11 +58,8 @@ namespace Shared.GameFormats.Wwise.Hirc.V136.Shared
             // 8 + 8 + 4 + 1 + 1
             public const uint Size = 22;
 
-            // These are IEEE doubles on disk. There is no double parser in ByteParsing, so the
-            // eight bytes are moved across as int64 bits rather than converted numerically -
-            // reading them as an integer and assigning to a double (which is what this used to
-            // do) both misreports the value and loses precision above 2^53, since a grid period
-            // stored as a double has a bit pattern far larger than that when read as an integer.
+            // The grid fields are IEEE doubles on disk. ByteParsing has no double parser, so the
+            // bits are moved through an int64 rather than converted numerically.
             public void ReadData(ByteChunk chunk)
             {
                 GridPeriod = BitConverter.Int64BitsToDouble(chunk.ReadInt64());

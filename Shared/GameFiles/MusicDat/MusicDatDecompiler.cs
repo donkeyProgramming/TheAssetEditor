@@ -724,10 +724,8 @@ namespace Shared.GameFormats.MusicDat
             /// the next case's test otherwise. Its body always ends in a return or a jump to
             /// a shared epilogue rather than reaching <c>nextCase</c> by falling through.
             ///
-            /// Rendering it as a bare goto - which the decompiler used to do - made every
-            /// case but the last look like unreachable code sitting after an unconditional
-            /// jump (see debug_controls, where six real, differently-valued debug
-            /// configurations all rendered as dead).
+            /// Rendered as a bare goto, every case but the last would look like unreachable code
+            /// after an unconditional jump.
             ///
             /// The condition is a genuine one: valueSlot is bound by the PICK_ONE_OF that
             /// opens the chain (see EmitStatement case 54), so this reads back as

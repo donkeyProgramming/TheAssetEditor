@@ -38,9 +38,7 @@ namespace Shared.GameFormats.Wwise.Hirc.V136
             TrackType = chunk.ReadByte();
 
             // A switch track carries its switch association table and transition rule between
-            // the track type and the look-ahead time. This used to be skipped entirely, so for
-            // the 63 switch tracks in the shipped banks LookAheadTime was read from the middle
-            // of the switch params and the rest was silently dropped by the per-item resync.
+            // the track type and the look-ahead time.
             if (TrackType == SwitchTrackType)
             {
                 SwitchParams = AkMusicTrackSwitchParams_V136.ReadData(chunk);
@@ -68,9 +66,7 @@ namespace Shared.GameFormats.Wwise.Hirc.V136
             foreach (var playlistItem in PlaylistList)
                 memStream.Write(playlistItem.WriteData());
 
-            // The sub-track count is only on disk when there is a playlist, which is the same
-            // condition ReadData branches on - writing it unconditionally would add four bytes
-            // to every track that has no playlist.
+            // The sub-track count is only on disk when there is a playlist, as in ReadData.
             if (PlaylistList.Count > 0)
                 memStream.Write(ByteParsers.UInt32.EncodeValue(NumSubTrack, out _));
 

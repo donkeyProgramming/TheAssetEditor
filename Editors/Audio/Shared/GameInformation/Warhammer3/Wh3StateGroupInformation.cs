@@ -23,15 +23,10 @@ namespace Editors.Audio.Shared.GameInformation.Warhammer3
         ];
 
         /// <summary>
-        /// The State Group the game turns a culture's audio_state back into a name through. Its States
-        /// are the audio_state values of cultures_tables (Tomb_Kings, Undead, ...), and the battle reads
-        /// the strongest alliance's culture by looking its hash up here (the call that fills
-        /// Feedback_Highest_BOP_Alliance_Subculture in Warhammer3.exe). A culture whose audio_state is
-        /// not registered here reaches battle_music.dat as an empty string, so the script never posts
-        /// its music_b_faction_ event and the in-battle music has nothing to play - the script's
-        /// "no culture has been set" path. Measured in game in October 2026: prebattle played a new
-        /// culture's music and the battle was silent until it was registered here. The script's
-        /// LogMessage output was not seen; no game log holds it.
+        /// The State Group the game uses to turn the strongest alliance's audio_state hash back into
+        /// the name battle_music.dat reads (Feedback_Highest_BOP_Alliance_Subculture). A culture whose
+        /// audio_state is not registered here reaches the script as an empty string, so its
+        /// music_b_faction_ event is never posted and the battle is silent - confirmed in game.
         /// </summary>
         public const string CultureAudioStateGroup = "Generic_Faction_Player";
 

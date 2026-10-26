@@ -14,10 +14,9 @@ namespace Shared.GameFormats.Wwise.Wem.V132
         public List<WemAudioPacket> AudioPackets { get; set; } = [];
 
         /// <summary>
-        /// Bytes after the last packet that are too few to be one. Some shipped WH3 music wems (all in
-        /// audio_base_m.pack, about one in ten of its music) end their data chunk 4 to 9 bytes past
-        /// their last complete packet; the length those bytes would give runs far past the chunk.
-        /// Kept as they are so the file writes back unchanged.
+        /// Bytes after the last complete packet that cannot be one. About one in ten WH3 music wems
+        /// end their data chunk a few bytes past the last packet, with a length prefix that would run
+        /// past the chunk. Kept so the file writes back unchanged.
         /// </summary>
         public byte[] TrailingBytes { get; set; } = [];
         public FmtChunk? FmtChunk { get; set; }

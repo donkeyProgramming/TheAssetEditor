@@ -85,9 +85,8 @@ namespace Shared.GameFormats.Wwise.Hirc.V136.Shared
                 memStream.Write(ByteParsers.UInt32.EncodeValue(StateGroupIdCustom, out _));
                 memStream.Write(ByteParsers.UInt32.EncodeValue(StateIdCustom, out _));
 
-                // The flag is what tells the reader whether a transition object follows, so it
-                // has to be derived from whether one is actually held rather than from the byte
-                // that was parsed - they can only disagree if the object was added or removed.
+                // Derived from the object rather than the parsed flag, so adding or removing a
+                // transition object keeps the two in step.
                 var hasTransitionObject = AkMusicTransitionObject != null;
                 memStream.Write(ByteParsers.Byte.EncodeValue((byte)(hasTransitionObject ? 1 : 0), out _));
                 if (hasTransitionObject)
