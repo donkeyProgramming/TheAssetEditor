@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="DocumentationShared.css">
+    <script src="DocumentationShared.js" defer></script>
+</head>
+<body>
+    <h1>Music Project Editor</h1>
+    <p>The Music Project Editor gives a culture its own music in Warhammer 3: its battle theme, its campaign map theme, and the campaign's ambient music layers. It is meant to be used by one person, typically whoever maintains an audio mixer mod. Every culture goes into one music project, and building that project produces everything the game needs.</p>
+    <p>
+        General workflow:
+        <br>
+        <b>Add a culture => Give its events wavs => Build => Ship the editable pack as a mod</b>
+    </p>
+
+    <h2>Before you start</h2>
+    <ul>
+        <li>Load the game's packs. The editor reads the vanilla music scripts and music banks from them.</li>
+        <li>Select an editable pack. The project and everything Build makes are saved into it.</li>
+        <li>Add the wavs you want to use to the editable pack. The editor only picks wavs from the loaded packs, not from disk.</li>
+        <li>The culture's own mod has to set the culture's <b>audio_state</b> in <b>cultures_tables</b>. The music scripts match on that name. The editor does not change any database tables.</li>
+    </ul>
+
+    <h2>Opening a project</h2>
+    <p>Open the editor from the <b>Music Project Editor</b> button on the toolbar, or by opening a <b>.mproj</b> file from the pack file tree.</p>
+    <ul>
+        <li><b>New</b> - starts an empty project, saved to <b>audio\audio_projects\music.mproj</b> in the editable pack.</li>
+        <li><b>Open</b> - picks an existing .mproj file from the loaded packs.</li>
+        <li><b>Save</b> - saves the project. Unsaved changes are shown next to the buttons.</li>
+        <li><b>Build</b> - saves, then builds the mod. See <a href="#building">Building</a>.</li>
+    </ul>
+
+    <h2>Adding a culture</h2>
+    <p>Click <b>Add...</b> under Cultures. The Add Culture window asks for:</p>
+    <ul>
+        <li><b>Audio State</b> - the culture's audio_state from cultures_tables, for example <b>Tomb_Kings</b>. battle_music.dat matches on this, and the new event names are built from it in lower case.</li>
+        <li><b>Subculture key</b> - the full subculture key, for example <b>wh2_dlc09_sc_tmb_tomb_kings</b>. campaign_music.dat matches on this.</li>
+    </ul>
+    <p>Below that is one row per music slot. Tick the slots the culture should be in:</p>
+    <ul>
+        <li><b>Battle theme</b> - the music in a battle with this culture, including prebattle and the results screen.</li>
+        <li><b>Campaign map theme</b> - the music on the campaign map, and on the campaign victory and defeat screens.</li>
+        <li><b>Ambient fragments</b> - short phrases layered over the campaign's ambient music.</li>
+        <li><b>Enemy pulse - percussion, orchestral, ethnic</b> - layers that play when a hostile army of this culture is near you on the campaign map. If skipped, percussion falls back to a generic pulse and the other two are silent.</li>
+    </ul>
+    <p>For each ticked slot you can either give the culture its own music, or tick <b>Borrow an existing culture's audio instead of authoring new</b> and pick a culture. A borrowing culture plays that culture's music in that slot and needs no wavs. This is how vanilla shares one battle theme between Bretonnia, Dwarfs and Empire.</p>
+    <p><b>Advanced</b> on each row shows the script code that row will add. Click <b>Add</b> to add the culture.</p>
+    <p>A culture with several subcultures is added once per subculture, with the same Audio State each time. The battle slots are shared between them; the campaign slots are per subculture.</p>
+    <ul>
+        <li><b>Edit...</b> - runs the window again for the selected culture. Audio already given to the events it keeps is kept.</li>
+        <li><b>Remove</b> - removes the culture and the audio its events were given.</li>
+    </ul>
+
+    <h2>Giving events their audio</h2>
+    <p>Selecting a culture lists its <b>Events</b>: one per slot that has its own music, with the event name, the State it sets and how much audio it has. Select an event, then use the <b>This culture's audio</b> tab:</p>
+    <ul>
+        <li><b>Add wav...</b> - adds a wav from the loaded packs. With several wavs, the game picks between them.</li>
+        <li><b>Remove</b> - removes the selected wav.</li>
+        <li>Selecting a wav loads it into the player at the bottom.</li>
+    </ul>
+    <p>The tree on the left decides which wavs play when. Its top entry plays everywhere this event plays. To give one part its own music, select an entry, pick what to <b>Split by</b> and a value, then click <b>Add branch</b> and give the new branch its own wavs. A branch without wavs plays its parent's.</p>
+    <p>For example, to give a culture separate victory music: select the top entry, split by <b>Battle result</b>, choose <b>win</b>, add the branch, and give it a wav. Every other result keeps playing the top entry's wavs.</p>
+    <p>What you can split by depends on the slot. It includes <b>Part of the game</b> (pre-battle and results, in battle, campaign map, campaign resolution), <b>Battle result</b>, <b>Battle phase</b>, <b>Battle situation</b>, <b>Key</b>, <b>Campaign result</b> and <b>Faction</b>. The ambient fragments split by <b>Key</b> and <b>Call or response</b>, and the pulses by <b>Key</b> and <b>Variation</b>.</p>
+    <p>The <b>Vanilla reference</b> tab shows what a vanilla culture has in the selected slot: each file, where it plays and how long it is. Select a file to hear it. This is a guide to how much music a slot normally gets.</p>
+
+    <h2 id="building">Building</h2>
+    <p><b>Build</b> saves the project, then writes the following into the editable pack:</p>
+    <ul>
+        <li><b>battle_music.dat</b> and <b>campaign_music.dat</b>, rebuilt from the game's own copies with every culture in the project.</li>
+        <li>The wavs, encoded to .wem.</li>
+        <li>Copies of the vanilla music .bnk files, under their vanilla names, with the cultures' music added.</li>
+        <li>The event data .dat.</li>
+    </ul>
+    <p>Things to know:</p>
+    <ul>
+        <li>Build always starts from the game's copies. Building twice does not add a culture twice, and removing a culture and building again takes it out.</li>
+        <li>The mod replaces the game's music scripts and music banks, so only one music mod made this way can be active at a time. That is why one project holds every culture.</li>
+        <li><b>Rebuild after every game update.</b> A built mod contains the game's scripts and banks as they were when it was built. If an update removed something the build relies on, Build stops and lists what is missing instead of making a mod that plays nothing.</li>
+    </ul>
+
+    <h2>Music Script Viewer</h2>
+    <p>The <b>Music Script Viewer</b> on the toolbar shows battle_music.dat or campaign_music.dat as readable code, which helps with understanding what a slot does. <b>Open</b> picks a script from <b>audio\scripts</b>.</p>
+    <ul>
+        <li>The function list is on the left. Functions marked ▶ are called directly by the game.</li>
+        <li>The selected function is shown as <b>Pseudocode</b> or as raw <b>Instructions</b>.</li>
+        <li>The Triggers, Vars, StrVars and Strings tabs list the script's tables. Right-click a string that looks like a Wwise event name to search for it in the Audio Explorer.</li>
+    </ul>
+    <p>The viewer is read-only. Build rebuilds both scripts whole from the game's copies, so any edit made directly to a script would be lost.</p>
+
+</body>
+</html>

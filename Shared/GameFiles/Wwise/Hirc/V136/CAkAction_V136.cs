@@ -52,6 +52,8 @@ namespace Shared.GameFormats.Wwise.Hirc.V136
                 memStream.Write(ActiveActionParams!.WriteData(ActionType));
             else if (ActionType == AkActionType.Stop_E_O)
                 memStream.Write(ActiveActionParams!.WriteData(ActionType));
+            else if (ActionType == AkActionType.SetState)
+                memStream.Write(StateActionParams!.WriteData());
 
             var byteArray = memStream.ToArray();
 
@@ -64,33 +66,22 @@ namespace Shared.GameFormats.Wwise.Hirc.V136
 
         public override void UpdateSectionSize()
         {
-            var idSize = ByteHelper.GetPropertyTypeSize(Id);
-            var actionTypeSize = ByteHelper.GetPropertyTypeSize(ActionType);
-            var idExtSize = ByteHelper.GetPropertyTypeSize(IdExt);
-            var idExt4Size = ByteHelper.GetPropertyTypeSize(IdExt4);
-            var akPropBundle0Size = AkPropBundle0.GetSize();
-            var akPropBundle1Size = AkPropBundle1.GetSize();
+            var commonSize = ByteHelper.GetPropertyTypeSize(Id)
+                + ByteHelper.GetPropertyTypeSize(ActionType)
+                + ByteHelper.GetPropertyTypeSize(IdExt)
+                + ByteHelper.GetPropertyTypeSize(IdExt4)
+                + AkPropBundle0.GetSize()
+                + AkPropBundle1.GetSize();
 
+            uint actionParamsSize = 0;
             if (ActionType == AkActionType.Play)
-            {
-                var playActionParamsSize = PlayActionParams!.GetSize();
-                SectionSize = (ushort)(idSize + actionTypeSize + idExtSize + idExt4Size + akPropBundle0Size + akPropBundle1Size + playActionParamsSize);
-            }
-            else if (ActionType == AkActionType.Pause_E_O)
-            {
-                var pauseActionParamsSize = ActiveActionParams!.GetSize(AkActionType.Pause_E_O);
-                SectionSize = (ushort)(idSize + actionTypeSize + idExtSize + idExt4Size + akPropBundle0Size + akPropBundle1Size + pauseActionParamsSize);
-            }
-            else if (ActionType == AkActionType.Resume_E_O)
-            {
-                var resumeActionParamsSize = ActiveActionParams!.GetSize(AkActionType.Resume_E_O);
-                SectionSize = (ushort)(idSize + actionTypeSize + idExtSize + idExt4Size + akPropBundle0Size + akPropBundle1Size + resumeActionParamsSize);
-            }
-            else if (ActionType == AkActionType.Stop_E_O)
-            {
-                var stopActionParamsSize = ActiveActionParams!.GetSize(AkActionType.Stop_E_O);
-                SectionSize = (ushort)(idSize + actionTypeSize + idExtSize + idExt4Size + akPropBundle0Size + akPropBundle1Size + stopActionParamsSize);
-            }
+                actionParamsSize = PlayActionParams!.GetSize();
+            else if (ActionType == AkActionType.Pause_E_O || ActionType == AkActionType.Resume_E_O || ActionType == AkActionType.Stop_E_O)
+                actionParamsSize = ActiveActionParams!.GetSize(ActionType);
+            else if (ActionType == AkActionType.SetState)
+                actionParamsSize = StateActionParams_V136.Size;
+
+            SectionSize = commonSize + actionParamsSize;
         }
 
         public AkActionType GetActionType() => ActionType;
@@ -326,6 +317,8 @@ namespace Shared.GameFormats.Wwise.Hirc.V136
             public uint StateGroupId { get; set; }
             public uint TargetStateId { get; set; }
 
+            public const uint Size = 8;
+
             public static StateActionParams_V136 ReadData(ByteChunk chunk)
             {
                 return new StateActionParams_V136()
@@ -333,6 +326,14 @@ namespace Shared.GameFormats.Wwise.Hirc.V136
                     StateGroupId = chunk.ReadUInt32(),
                     TargetStateId = chunk.ReadUInt32()
                 };
+            }
+
+            public byte[] WriteData()
+            {
+                using var memStream = new MemoryStream();
+                memStream.Write(ByteParsers.UInt32.EncodeValue(StateGroupId, out _));
+                memStream.Write(ByteParsers.UInt32.EncodeValue(TargetStateId, out _));
+                return memStream.ToArray();
             }
         }
     }

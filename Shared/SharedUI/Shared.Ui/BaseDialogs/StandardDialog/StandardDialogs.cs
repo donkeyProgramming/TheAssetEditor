@@ -43,9 +43,11 @@ namespace Shared.Ui.BaseDialogs.StandardDialog
             return new SaveDialogResult(false, null, null);
         }
 
-        public BrowseDialogResultFile DisplayBrowseDialog(List<string> extensions)
+        public BrowseDialogResultFile DisplayBrowseDialog(List<string> extensions) => DisplayBrowseDialog(extensions, null);
+
+        public BrowseDialogResultFile DisplayBrowseDialog(List<string> extensions, Func<string, bool>? pathFilter)
         {
-            using var browser = new PackFileBrowserWindow(_packFileBrowserBuilder, extensions, showCaFiles: true, showFoldersOnly: false);
+            using var browser = new PackFileBrowserWindow(_packFileBrowserBuilder, extensions, showCaFiles: true, showFoldersOnly: false, pathFilter);
 
             var saveResult = browser.ShowDialog();
             var output = new BrowseDialogResultFile(saveResult, browser.SelectedFile);

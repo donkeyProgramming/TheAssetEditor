@@ -24,13 +24,21 @@ namespace Shared.GameFormats.Wwise.Hirc.V136.Shared
             ReflectionsAuxBus = chunk.ReadUInt32();
         }
 
+        // Bit 3 is "has aux busses"; the four bus ids are only present when it is set, which is
+        // the same condition ReadData branches on.
+        bool HasAuxBusses => (BitVector >> 3 & 1) == 1;
+
         public byte[] WriteData()
         {
-            if (BitVector != 0)
-                throw new NotSupportedException("Users probably don't need this complexity.");
-
             using var memStream = new MemoryStream();
             memStream.Write(ByteParsers.Byte.EncodeValue(BitVector, out _));
+            if (HasAuxBusses)
+            {
+                memStream.Write(ByteParsers.UInt32.EncodeValue(AuxBus0, out _));
+                memStream.Write(ByteParsers.UInt32.EncodeValue(AuxBus1, out _));
+                memStream.Write(ByteParsers.UInt32.EncodeValue(AuxBus2, out _));
+                memStream.Write(ByteParsers.UInt32.EncodeValue(AuxBus3, out _));
+            }
             memStream.Write(ByteParsers.UInt32.EncodeValue(ReflectionsAuxBus, out _));
             return memStream.ToArray();
         }
@@ -38,11 +46,9 @@ namespace Shared.GameFormats.Wwise.Hirc.V136.Shared
         public uint GetSize()
         {
             var bitVectorSize = ByteHelper.GetPropertyTypeSize(BitVector);
-            if (BitVector != 0)
-                throw new NotSupportedException("Users probably don't need this complexity.");
-
             var reflectionsAuxBusSize = ByteHelper.GetPropertyTypeSize(ReflectionsAuxBus);
-            return bitVectorSize + reflectionsAuxBusSize;
+            var auxBusSize = HasAuxBusses ? 4 * ByteHelper.GetPropertyTypeSize(AuxBus0) : 0;
+            return bitVectorSize + auxBusSize + reflectionsAuxBusSize;
         }
     }
 }

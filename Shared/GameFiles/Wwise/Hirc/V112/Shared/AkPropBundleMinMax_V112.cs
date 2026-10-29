@@ -28,17 +28,18 @@ namespace Shared.GameFormats.Wwise.Hirc.V112.Shared
         {
             using var memStream = new MemoryStream();
             memStream.Write(ByteParsers.Byte.EncodeValue((byte)PropsList.Count, out _));
+
+            // All the types first.
             foreach (var value in PropsList)
                 memStream.Write(ByteParsers.Byte.EncodeValue((byte)value.Type, out _));
 
-            // Read all the Ids first 
+            // Then all the min and max values.
             foreach (var value in PropsList)
             {
-                memStream.Write(ByteParsers.Single.EncodeValue((byte)value.Min, out _));
-                memStream.Write(ByteParsers.Single.EncodeValue((byte)value.Max, out _));
+                memStream.Write(ByteParsers.Single.EncodeValue(value.Min, out _));
+                memStream.Write(ByteParsers.Single.EncodeValue(value.Max, out _));
             }
 
-            // Then read the all min and max values.
             var byteArray = memStream.ToArray();
             if (byteArray.Length != GetSize())
                 throw new Exception("Invalid size");

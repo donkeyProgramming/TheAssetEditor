@@ -4,6 +4,7 @@ const documentationPages = [
     { title: 'Camera Control', fileName: 'CameraControl.html' },
     { title: 'PackFile Handling', fileName: 'PackFileHandling.html' },
     { title: 'glTF/GLB Export', fileName: 'GltfExport.html' },
+    { title: 'Music Project Editor', fileName: 'MusicProjectEditor.html' },
     {
         title: 'Kitbashing',
         children: [

@@ -47,6 +47,28 @@ namespace Shared.UiTest.BaseDialogs.PackFileTree
         }
 
         [Test]
+        public void Filter_PathFilter_NarrowsTheExtensionMatch()
+        {
+            // Arrange
+            var container = AddPackFiles("mod", "c:\\mod.pack",
+                "audio\\scripts\\battle_music.dat",
+                "audio\\scripts\\notes.data",
+                "audio\\wwise\\event_data__core.dat");
+
+            var vm = CreateBrowser();
+
+            // Act
+            vm.Filter.SetExtensions([".dat"], path =>
+                path.StartsWith("audio\\scripts\\", StringComparison.OrdinalIgnoreCase) && path.EndsWith(".dat", StringComparison.OrdinalIgnoreCase));
+
+            // Assert
+            var root = vm.Files.First();
+            Assert.That(FindFileNode(root, "battle_music.dat")?.IsVisible, Is.True);
+            Assert.That(FindFileNode(root, "notes.data")?.IsVisible, Is.False);
+            Assert.That(FindFileNode(root, "event_data__core.dat")?.IsVisible, Is.False);
+        }
+
+        [Test]
         public void Filter_FewResults_AllNodesExpanded()
         {
             // Arrange

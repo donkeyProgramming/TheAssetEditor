@@ -1,0 +1,82 @@
+using Microsoft.Extensions.DependencyInjection;
+using Moq;
+using Shared.Core.PackFiles;
+using Shared.Core.PackFiles.Models;
+using Shared.Core.PackFiles.Utility;
+using Shared.Core.Services;
+using Shared.Core.Settings;
+
+namespace Test.Audio
+{
+    // Shared plumbing for the audio tests that read real game data: opens a shipped .pack through the
+    // app's own container loader rather than re-reading the format by hand, so what the tests see is
+    // what the editor sees. Only the UI-facing services are stubbed.
+    internal static class VanillaBankReader
+    {
+        /// <summary>The WH3 install the game-data tests read. Set WH3_GAME_DIRECTORY to point them at
+        /// another one; without an install they are skipped.</summary>
+        public static string GameDirectory =>
+            Environment.GetEnvironmentVariable("WH3_GAME_DIRECTORY") ?? @"D:\SteamLibrary\steamapps\common\Total War WARHAMMER III";
+
+        public static bool HasInstall => Directory.Exists(Path.Combine(GameDirectory, "data"));
+
+        /// <summary>Skips, rather than errors, a manual run on a machine without the install or files
+        /// it hard-codes, saying which constant to change.</summary>
+        public static void RequireOnDisk(string gameDirectory, params string[] files)
+        {
+            if (!Directory.Exists(Path.Combine(gameDirectory, "data")))
+                Assert.Ignore($"No WH3 install at {gameDirectory}; set WH3_GAME_DIRECTORY to run this.");
+
+            foreach (var file in files.Where(file => !File.Exists(file)))
+                Assert.Ignore($"{file} not found; point the constant naming it at a file on this machine.");
+        }
+
+        public static ServiceProvider CreateProvider(string gameDirectory)
+        {
+            var services = new ServiceCollection();
+            new Shared.Core.DependencyInjectionContainer().Register(services);
+            new Editors.Audio.DependencyInjectionContainer().Register(services);
+
+            var dialogs = new Mock<IStandardDialogs>();
+            dialogs.Setup(x => x.ShowWaitCursor()).Returns(new Mock<IWaitCursor>().Object);
+            services.AddSingleton(dialogs.Object);
+            services.AddSingleton<IFileSystemAccess, FileSystemAccess>();
+
+            var provider = services.BuildServiceProvider();
+
+            var settings = provider.GetRequiredService<ApplicationSettingsService>();
+            settings.CurrentSettings.CurrentGame = GameTypeEnum.Warhammer3;
+            settings.CurrentSettings.GameDirectories.Clear();
+            settings.CurrentSettings.GameDirectories.Add(
+                new ApplicationSettings.GamePathPair(GameTypeEnum.Warhammer3, gameDirectory));
+
+            // The tests often open a mod pack on its own. With this on, the service refuses it and puts
+            // up a modal message box from inside the test run, and the test sees an empty pack.
+            provider.GetRequiredService<IPackFileService>().EnforceGameFilesMustBeLoaded = false;
+
+            return provider;
+        }
+
+        public static IPackFileContainer OpenPack(ServiceProvider provider, string packPath, bool markAsCa = true)
+        {
+            var container = provider.GetRequiredService<IPackFileContainerLoader>()
+                .CreateFromPackFile(PackFileContainerType.Normal, packPath, true);
+            container.IsCaPackFile = markAsCa;
+            provider.GetRequiredService<IPackFileService>().AddContainer(container);
+            return container;
+        }
+
+        /// <summary>Every .bnk in the given pack, as (path, raw bytes).</summary>
+        public static List<(string Path, byte[] Bytes)> ReadMusicBanks(string packPath)
+        {
+            var gameDirectory = Path.GetDirectoryName(Path.GetDirectoryName(packPath))!;
+            using var provider = CreateProvider(gameDirectory);
+            var container = OpenPack(provider, packPath);
+
+            return container.GetAllFiles()
+                .Where(x => x.Key.EndsWith(".bnk", StringComparison.OrdinalIgnoreCase))
+                .Select(x => (x.Key, x.Value.DataSource.ReadData()))
+                .ToList();
+        }
+    }
+}
