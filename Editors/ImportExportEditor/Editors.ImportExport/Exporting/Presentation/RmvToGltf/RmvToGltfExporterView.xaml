@@ -20,6 +20,10 @@
             <RowDefinition Height="25"/>
             <RowDefinition Height="25"/>
             <RowDefinition Height="25"/>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="*" MinHeight="140"/>
         </Grid.RowDefinitions>
 
         <TextBlock Grid.Row="0" Grid.Column="0" Text="{loc:Loc RmvToGltfExporter.ExportTextures}" HorizontalAlignment="Left" VerticalAlignment="Center"/>
@@ -43,6 +47,31 @@
         <TextBlock Grid.Row="3" Grid.Column="0" Text="{loc:Loc RmvToGltfExporter.ExportAnimations}" HorizontalAlignment="Left" VerticalAlignment="Center"/>
         <TextBlock Grid.Row="3" Grid.Column="1" Text=" : " VerticalAlignment="Center"/>
         <CheckBox Grid.Row="3" Grid.Column="2" HorizontalAlignment="Left" IsChecked="{Binding ExportAnimations, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
+
+        <TextBlock Grid.Row="4" Grid.ColumnSpan="4" Text="{Binding SkeletonStatus}" TextWrapping="Wrap" Margin="0,4,0,0"/>
+
+        <TextBlock Grid.Row="5" Grid.ColumnSpan="4" Text="{Binding ResolutionStatus}" TextWrapping="Wrap" Foreground="DarkOrange"/>
+
+        <DockPanel Grid.Row="6" Grid.ColumnSpan="4" LastChildFill="False">
+            <TextBlock Text="{loc:Loc RmvToGltfExporter.Animations}" VerticalAlignment="Center"/>
+            <TextBlock Text="{Binding AnimationStatus}" VerticalAlignment="Center" Margin="2,0,8,0"/>
+            <Button Content="{loc:Loc RmvToGltfExporter.SelectAll}" Command="{Binding SelectAllAnimationsCommand}" IsEnabled="{Binding ExportAnimations}" Margin="2,0" Padding="6,0"/>
+            <Button Content="{loc:Loc RmvToGltfExporter.SelectNone}" Command="{Binding SelectNoneAnimationsCommand}" IsEnabled="{Binding ExportAnimations}" Margin="2,0" Padding="6,0"/>
+            <TextBox Text="{Binding AnimationSearch, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" Width="180" Margin="8,0,0,0" ToolTip="{loc:Loc RmvToGltfExporter.FilterAnimations}"/>
+        </DockPanel>
+
+        <ListBox Grid.Row="7" Grid.ColumnSpan="4"
+                 ItemsSource="{Binding FilteredAnimationOptions}"
+                 IsEnabled="{Binding ExportAnimations}"
+                 ScrollViewer.VerticalScrollBarVisibility="Auto">
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <CheckBox IsChecked="{Binding IsSelected, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">
+                        <TextBlock Text="{Binding DisplayName}" ToolTip="{Binding ContainerName}"/>
+                    </CheckBox>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
     </Grid>
 
 </UserControl>

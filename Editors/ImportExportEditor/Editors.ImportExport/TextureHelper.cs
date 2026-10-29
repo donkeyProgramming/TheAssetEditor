@@ -29,41 +29,15 @@ namespace MeshImportExport
                 throw new NotSupportedException($"Unsupported DDS format: {image.Format}");
             }
 
-            // Pfim returns BGRA data for Rgba32, but Bitmap expects ARGB
-            // We need to swap the R and B channels
-            byte[] correctedData = new byte[image.DataLen];
-
-            if (image.Format == Pfim.ImageFormat.Rgba32)
-            {
-                // BGRA -> ARGB conversion
-                for (int i = 0; i < image.DataLen; i += 4)
-                {
-                    correctedData[i] = image.Data[i + 2];     // B -> R
-                    correctedData[i + 1] = image.Data[i + 1]; // G -> G
-                    correctedData[i + 2] = image.Data[i];     // R -> B
-                    correctedData[i + 3] = image.Data[i + 3]; // A -> A
-                }
-            }
-            else if (image.Format == Pfim.ImageFormat.Rgb24)
-            {
-                // BGR -> RGB conversion
-                for (int i = 0; i < image.DataLen; i += 3)
-                {
-                    correctedData[i] = image.Data[i + 2];     // B -> R
-                    correctedData[i + 1] = image.Data[i + 1]; // G -> G
-                    correctedData[i + 2] = image.Data[i];     // R -> B
-                }
-            }
-            else
-            {
-                // For other formats, use the data as-is
-                correctedData = image.Data;
-            }
-
             using var bitmap = new Bitmap(image.Width, image.Height, pixelFormat);
 
             var bitmapData = bitmap.LockBits(new Rectangle(0, 0, image.Width, image.Height), ImageLockMode.WriteOnly, pixelFormat);
-            System.Runtime.InteropServices.Marshal.Copy(correctedData, 0, bitmapData.Scan0, correctedData.Length);
+            // Pfim's decoded data is already laid out in the byte order expected by
+            // the corresponding Bitmap pixel format (BGRA for Format32bppArgb and
+            // BGR for Format24bppRgb). The bitmap encoder interprets the locked
+            // memory using that same layout, so swapping R/B here would invert the
+            // exported image channels.
+            System.Runtime.InteropServices.Marshal.Copy(image.Data, 0, bitmapData.Scan0, image.DataLen);
             bitmap.UnlockBits(bitmapData);
 
             using var b = new MemoryStream();

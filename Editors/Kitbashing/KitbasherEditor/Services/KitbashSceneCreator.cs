@@ -25,6 +25,7 @@ namespace Editors.KitbasherEditor.Services
         private readonly ComplexMeshLoader _complexMeshLoader;
         private readonly SceneManager _sceneManager;
         private readonly Rmv2ModelNodeLoader _rmv2ModelNodeLoader;
+        private readonly IModelAssetResolver _modelAssetResolver;
         private readonly GeometrySaveSettings _saveSettings;
 
         public KitbashSceneCreator(
@@ -35,7 +36,8 @@ namespace Editors.KitbasherEditor.Services
             IPackFileService packFileService,
             Rmv2ModelNodeLoader rmv2ModelNodeLoader,
             GeometrySaveSettings saveSettings,
-            IScopedLogger scopedLogger)
+            IScopedLogger scopedLogger,
+            IModelAssetResolver? modelAssetResolver = null)
         {
             _logger = scopedLogger.ForContext<KitbashSceneCreator>();
             _packFileService = packFileService;
@@ -45,6 +47,7 @@ namespace Editors.KitbasherEditor.Services
             _sceneManager = sceneManager;
             _rmv2ModelNodeLoader = rmv2ModelNodeLoader;
             _saveSettings = saveSettings;
+            _modelAssetResolver = modelAssetResolver ?? new ModelAssetResolver(packFileService);
         }
 
         public void CreateFromPackFile(PackFile file)
@@ -69,20 +72,10 @@ namespace Editors.KitbasherEditor.Services
                 return;
             }
 
-            WsModelFile? wsModel = null;
-            RmvFile rmv;
-            if (extension == ".wsmodel")
-            {
-                wsModel = new WsModelFile(file);
-                var rmvPackFile = _packFileService.FindFile(wsModel.GeometryPath);
-                rmv = ModelFactory.Create().Load(rmvPackFile.DataSource.ReadData());
-            }
-            else
-            {
-                rmv = ModelFactory.Create().Load(file.DataSource.ReadData());
-            }
-
-            var lodNodes = _rmv2ModelNodeLoader.CreateModelNodesFromFile(rmv, modelFullPath, false, wsModel);
+            var resolvedAsset = _modelAssetResolver.Resolve(file);
+            var rmv = resolvedAsset.Model;
+            var geometryFullPath = _packFileService.GetFullPath(resolvedAsset.GeometryFile);
+            var lodNodes = _rmv2ModelNodeLoader.CreateModelNodesFromAsset(resolvedAsset, geometryFullPath, false);
             foreach (var lodNode in lodNodes)
             {
                 SceneNodeHelper

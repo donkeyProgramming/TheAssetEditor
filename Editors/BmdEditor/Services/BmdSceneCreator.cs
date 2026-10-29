@@ -26,6 +26,7 @@ namespace Editors.BmdEditor.Services
         private readonly IPackFileService _packFileService;
         private readonly GameWorld.Core.Components.SceneManager _sceneManager;
         private readonly GameWorld.Core.SceneNodes.Rmv2ModelNodeLoader _rmv2ModelNodeLoader;
+        private readonly IModelAssetResolver _modelAssetResolver;
         private readonly ResourceLibrary _resourceLibrary;
         private readonly GameWorld.Core.Services.MeshBuilderService _meshBuilderService;
 
@@ -38,11 +39,13 @@ namespace Editors.BmdEditor.Services
             GameWorld.Core.Components.SceneManager sceneManager,
             GameWorld.Core.SceneNodes.Rmv2ModelNodeLoader rmv2ModelNodeLoader,
             ResourceLibrary resourceLibrary,
-            GameWorld.Core.Services.MeshBuilderService meshBuilderService)
+            GameWorld.Core.Services.MeshBuilderService meshBuilderService,
+            IModelAssetResolver? modelAssetResolver = null)
         {
             _packFileService = packFileService;
             _sceneManager = sceneManager;
             _rmv2ModelNodeLoader = rmv2ModelNodeLoader;
+            _modelAssetResolver = modelAssetResolver ?? new ModelAssetResolver(packFileService);
             _resourceLibrary = resourceLibrary;
             _meshBuilderService = meshBuilderService;
         }
@@ -148,33 +151,12 @@ namespace Editors.BmdEditor.Services
 
             try
             {
-                // Handle wsmodel files by getting the actual rigid_model_v2 path
-                var actualModelFile = modelFile;
-                var actualModelPath = propPath;
-                
-                if (Path.GetExtension(propPath).ToLower() == ".wsmodel")
-                {
-                    var wsModel = new WsModelFile(modelFile);
-                    if (string.IsNullOrEmpty(wsModel.GeometryPath))
-                    {
-                        return CreatePlaceholderProp(propPath, propInfo, propsGroup, instanceIndex, "WsModel has no geometry path");
-                    }
-
-                    actualModelPath = wsModel.GeometryPath;
-                    actualModelFile = _packFileService.FindFile(actualModelPath);
-                    if (actualModelFile == null)
-                    {
-                        return CreatePlaceholderProp(propPath, propInfo, propsGroup, instanceIndex, $"Referenced file not found: {actualModelPath}");
-                    }
-                }
-
-                // Load the RMV2 model
-                var modelData = actualModelFile.DataSource.ReadData();
-                var rmv = ModelFactory.Create().Load(modelData);
+                var resolvedAsset = _modelAssetResolver.Resolve(modelFile);
+                var rmv = resolvedAsset.Model;
 
                 // Create RMV2 model nodes
-                var modelFullPath = _packFileService.GetFullPath(actualModelFile);
-                var lodNodes = _rmv2ModelNodeLoader.CreateModelNodesFromFile(rmv, modelFullPath, false, null);
+                var modelFullPath = _packFileService.GetFullPath(resolvedAsset.GeometryFile);
+                var lodNodes = _rmv2ModelNodeLoader.CreateModelNodesFromAsset(resolvedAsset, modelFullPath, false);
 
                 var lodNode = lodNodes.FirstOrDefault();
                 if (lodNode == null)

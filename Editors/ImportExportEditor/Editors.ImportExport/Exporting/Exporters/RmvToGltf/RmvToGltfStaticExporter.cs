@@ -1,5 +1,6 @@
 ﻿using Editors.ImportExport.Exporting.Exporters.RmvToGltf.Helpers;
 using Editors.ImportExport.Misc;
+using GameWorld.Core.Services;
 using Shared.Core.PackFiles.Models;
 using Shared.GameFormats.RigidModel;
 using SharpGLTF.Geometry;
@@ -14,12 +15,18 @@ namespace Editors.ImportExport.Exporting.Exporters.RmvToGltf
         private readonly IGltfSceneSaver _gltfSaver;
         private readonly GltfStaticMeshBuilder _gltfMeshBuilder;
         private readonly IGltfTextureHandler _gltfTextureHandler;
+        private readonly IModelAssetResolver _modelAssetResolver;
 
-        public RmvToGltfStaticExporter(IGltfSceneSaver gltfSaver, GltfStaticMeshBuilder gltfMeshBuilder, IGltfTextureHandler gltfTextureHandler)
+        public RmvToGltfStaticExporter(
+            IGltfSceneSaver gltfSaver,
+            GltfStaticMeshBuilder gltfMeshBuilder,
+            IGltfTextureHandler gltfTextureHandler,
+            IModelAssetResolver? modelAssetResolver = null)
         {
             _gltfSaver = gltfSaver;
             _gltfMeshBuilder = gltfMeshBuilder;
             _gltfTextureHandler = gltfTextureHandler;
+            _modelAssetResolver = modelAssetResolver ?? new ModelAssetResolver();
         }
 
         internal ExportSupportEnum CanExportFile(PackFile file)
@@ -27,7 +34,7 @@ namespace Editors.ImportExport.Exporting.Exporters.RmvToGltf
             if (FileExtensionHelper.IsRmvFile(file.Name))
                 return ExportSupportEnum.Supported;
             if (FileExtensionHelper.IsWsModelFile(file.Name))
-                return ExportSupportEnum.NotSupported;
+                return ExportSupportEnum.Supported;
             return ExportSupportEnum.NotSupported;
         }
 
@@ -35,17 +42,29 @@ namespace Editors.ImportExport.Exporting.Exporters.RmvToGltf
         {
             LogSettings(settings);
 
-            var rmv2 = new ModelFactory().Load(settings.InputModelFile.DataSource.ReadData());
+            var resolvedAsset = _modelAssetResolver.Resolve(settings.InputModelFile);
+            foreach (var diagnostic in resolvedAsset.Diagnostics)
+                _logger.Here().Warning(diagnostic);
+
             var outputScene = ModelRoot.CreateModel();
 
-            var textures = _gltfTextureHandler.HandleTextures(rmv2, settings);
-            var meshes = _gltfMeshBuilder.Build(rmv2, textures, settings);
+            var textureSession = new GltfTextureExportSession(collisionSafe: false);
+            var textures = _gltfTextureHandler.HandleTextures(resolvedAsset, settings, textureSession);
+            var meshes = _gltfMeshBuilder.Build(resolvedAsset, textures, settings);
 
             _logger.Here().Information($"Static Export - MeshCount={meshes.Count()} TextureCount={textures.Count()}");
-            BuildGltfScene(meshes, settings, outputScene);
+            BuildGltfScene(
+                meshes,
+                settings,
+                outputScene,
+                textures.Select(x => x.SystemFilePath).ToArray());
         }
 
-        void BuildGltfScene(List<IMeshBuilder<MaterialBuilder>> meshBuilders, RmvToGltfExporterSettings settings, ModelRoot outputScene)
+        void BuildGltfScene(
+            List<IMeshBuilder<MaterialBuilder>> meshBuilders,
+            RmvToGltfExporterSettings settings,
+            ModelRoot outputScene,
+            IReadOnlyCollection<string>? generatedTexturePaths = null)
         {
             var scene = outputScene.UseScene("default");
             foreach (var meshBuilder in meshBuilders)
@@ -54,7 +73,7 @@ namespace Editors.ImportExport.Exporting.Exporters.RmvToGltf
                 scene.CreateNode(mesh.Name).WithMesh(mesh);
             }
 
-            _gltfSaver.Save(outputScene, settings.OutputPath);
+            _gltfSaver.Save(outputScene, settings.OutputPath, generatedTexturePaths ?? Array.Empty<string>());
         }
 
         void LogSettings(RmvToGltfExporterSettings settings)

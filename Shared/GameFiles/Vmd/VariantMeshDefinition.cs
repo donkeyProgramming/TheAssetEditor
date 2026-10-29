@@ -58,7 +58,7 @@ namespace Shared.GameFormats.Vmd
 
 
             [XmlElement("SLOT")]
-            public List<SLOT> ChildSlots { get; set; }
+            public List<SLOT> ChildSlots { get; set; } = [];
 
             [XmlElement("META_DATA")]
             public List<MetaData> MetaDataList { get; set; }
@@ -67,7 +67,7 @@ namespace Shared.GameFormats.Vmd
             {
                 if (ModelReference != null)
                     ModelReference = ModelReference.ToLower().Replace("//", "\\");
-                foreach (var item in ChildSlots)
+                foreach (var item in ChildSlots ?? [])
                     item.FixStrings();
             }
         }
@@ -107,20 +107,20 @@ namespace Shared.GameFormats.Vmd
 
 
             [XmlElement("VARIANT_MESH")]
-            public List<VariantMesh> ChildMeshes { get; set; }
+            public List<VariantMesh> ChildMeshes { get; set; } = [];
 
             [XmlElement("VARIANT_MESH_REFERENCE")]
-            public List<VariantMeshRef> ChildReferences { get; set; }
+            public List<VariantMeshRef> ChildReferences { get; set; } = [];
 
             public void FixStrings()
             {
                 if (Name != null)
                     Name = Name.ToLower().Replace("//", "\\");
 
-                foreach (var item in ChildMeshes)
+                foreach (var item in ChildMeshes ?? [])
                     item.FixStrings();
 
-                foreach (var item in ChildReferences)
+                foreach (var item in ChildReferences ?? [])
                     item.FixStrings();
             }
         }

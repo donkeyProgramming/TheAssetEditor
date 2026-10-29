@@ -1,6 +1,7 @@
 using System.IO;
 using System.Numerics;
 using Editors.ImportExport.Common;
+using GameWorld.Core.Services;
 using Shared.GameFormats.RigidModel;
 using Shared.GameFormats.RigidModel.Vertex;
 using SharpGLTF.Geometry;
@@ -13,6 +14,33 @@ namespace Editors.ImportExport.Exporting.Exporters.RmvToGltf.Helpers
     public class GltfMeshBuilder
     {
         public List<IMeshBuilder<MaterialBuilder>> Build(RmvFile rmv2, List<TextureResult> textures, RmvToGltfExporterSettings settings, bool willHaveSkeleton = true)
+            => Build(rmv2, textures, settings, willHaveSkeleton, null);
+
+        // Keep the original public signature for existing callers and binary
+        // consumers. Composed VMD exports use the overload below to provide a
+        // stable per-part name prefix.
+        public List<IMeshBuilder<MaterialBuilder>> Build(
+            ResolvedModelAsset asset,
+            List<TextureResult> textures,
+            RmvToGltfExporterSettings settings,
+            bool willHaveSkeleton = true)
+            => Build(asset, textures, settings, willHaveSkeleton, null);
+
+        public List<IMeshBuilder<MaterialBuilder>> Build(
+            ResolvedModelAsset asset,
+            List<TextureResult> textures,
+            RmvToGltfExporterSettings settings,
+            bool willHaveSkeleton,
+            string? namePrefix)
+            => Build(asset.Model, textures, settings, willHaveSkeleton, asset.FirstLod.Select(x => x.Material).ToArray(), namePrefix);
+
+        private List<IMeshBuilder<MaterialBuilder>> Build(
+            RmvFile rmv2,
+            List<TextureResult> textures,
+            RmvToGltfExporterSettings settings,
+            bool willHaveSkeleton,
+            IReadOnlyList<ResolvedModelMaterial>? effectiveMaterials,
+            string? namePrefix = null)
         {
             var lodLevel = rmv2.ModelList.First();
             var hasSkeleton = willHaveSkeleton && string.IsNullOrWhiteSpace(rmv2.Header.SkeletonName) == false;
@@ -22,8 +50,15 @@ namespace Editors.ImportExport.Exporting.Exporters.RmvToGltf.Helpers
             {
                 var rmvMesh = lodLevel[i];
                 var meshTextures = textures.Where(x=>x.MeshIndex == i).ToList();
-                var gltfMaterial = Create(settings, rmvMesh.Material.ModelName + "_Material", meshTextures);
-                var gltfMesh = GenerateMesh(rmvMesh.Mesh, rmvMesh.Material.ModelName, gltfMaterial, hasSkeleton, settings.MirrorMesh);
+                var effectiveMaterial = effectiveMaterials != null && i < effectiveMaterials.Count ? effectiveMaterials[i] : null;
+                var baseName = string.IsNullOrWhiteSpace(rmvMesh.Material.ModelName)
+                    ? $"Part_{i}"
+                    : rmvMesh.Material.ModelName;
+                var modelName = string.IsNullOrWhiteSpace(namePrefix)
+                    ? baseName
+                    : $"{namePrefix}_{i:D3}_{baseName}";
+                var gltfMaterial = Create(settings, modelName + "_Material", meshTextures, effectiveMaterial);
+                var gltfMesh = GenerateMesh(rmvMesh.Mesh, modelName, gltfMaterial, hasSkeleton, settings.MirrorMesh);
                 meshes.Add(gltfMesh);
             }
             return meshes;
@@ -59,17 +94,22 @@ namespace Editors.ImportExport.Exporting.Exporters.RmvToGltf.Helpers
                     {
                         glTfvertex = SetVertexInfluences(vertex, glTfvertex);
                     }
-                    else if (hasAnyWeights)
+                    else
                     {
-                        // If some vertices have weights in this mesh we enabled validation.
-                        // Ensure vertices without weights get a default binding so validation passes.
+                        // VertexJoints4 still carries a JOINTS/WEIGHTS attribute
+                        // even for an otherwise rigid mesh. Give those vertices
+                        // a valid neutral binding whenever a skeleton is in the
+                        // scene, including the all-unweighted case, so the
+                        // SharpGLTF validator does not reject zero-sum weights.
                         glTfvertex.Skinning.SetBindings((0, 1), (0, 0), (0, 0), (0, 0));
                     }
                 }
-                else if (hasAnyWeights)
+                else
                 {
-                    // Model has weight data but no skeleton is available.
-                    // Set default binding to prevent validation errors.
+                    // The exporter uses VertexJoints4 for every dynamic mesh,
+                    // even when no skeleton is available. Keep its optional
+                    // weight attribute valid for both weighted and completely
+                    // rigid meshes so SharpGLTF can validate the primitive.
                     glTfvertex.Skinning.SetBindings((0, 1), (0, 0), (0, 0), (0, 0));
                 }
 
@@ -163,12 +203,23 @@ namespace Editors.ImportExport.Exporting.Exporters.RmvToGltf.Helpers
             return glTfvertex;
         }
 
-        MaterialBuilder Create(RmvToGltfExporterSettings settings, string materialName, List<TextureResult> texturesForModel)
+        MaterialBuilder Create(
+            RmvToGltfExporterSettings settings,
+            string materialName,
+            List<TextureResult> texturesForModel,
+            ResolvedModelMaterial? effectiveMaterial = null)
         {
             var material = new MaterialBuilder(materialName)
                   .WithDoubleSide(true)
-                  .WithMetallicRoughness()
-                  .WithAlpha(AlphaMode.MASK);
+                  .WithMetallicRoughness();
+
+            // Keep the existing RMV2 export behavior (masked material) when
+            // the source material has no usable alpha flag. Weighted RMV2 and
+            // WSModel materials both expose an explicit effective value.
+            var alphaMode = effectiveMaterial?.HasExplicitAlpha == true
+                ? (effectiveMaterial.Alpha ? AlphaMode.MASK : AlphaMode.OPAQUE)
+                : AlphaMode.MASK;
+            material.WithAlpha(alphaMode);
 
             foreach (var texture in texturesForModel)
             {

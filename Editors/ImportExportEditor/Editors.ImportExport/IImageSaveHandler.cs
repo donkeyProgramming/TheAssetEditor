@@ -1,5 +1,4 @@
-﻿using System.Drawing;
-using System.IO;
+﻿using System.IO;
 
 namespace Editors.ImportExport
 {
@@ -11,11 +10,6 @@ namespace Editors.ImportExport
     public class SystemImageSaveHandler : IImageSaveHandler
     {
         public void Save(byte[] pngData, string systemFilePath)
-        {
-            var ms = new MemoryStream(pngData);
-            using var img = Image.FromStream(ms);
-            using var bitmap = new Bitmap(img);
-            bitmap.Save(systemFilePath, System.Drawing.Imaging.ImageFormat.Png);
-        }
+            => File.WriteAllBytes(systemFilePath, pngData);
     }
 }

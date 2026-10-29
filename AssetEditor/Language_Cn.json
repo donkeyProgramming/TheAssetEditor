@@ -449,6 +449,10 @@
   "RmvToGltfExporter.ConvertMaterial": "转换材质",
   "RmvToGltfExporter.ConvertNormal": "转换法线",
   "RmvToGltfExporter.ExportAnimations": "导出动画",
+  "RmvToGltfExporter.Animations": "动画：",
+  "RmvToGltfExporter.SelectAll": "全选",
+  "RmvToGltfExporter.SelectNone": "全部取消",
+  "RmvToGltfExporter.FilterAnimations": "筛选动画",
   "RmvToGltfExporter.Tooltips.ConvertMaterial": "将材质纹理转换为 Blender 喜欢的版本",
   "RmvToGltfExporter.Tooltips.ConvertNormal": "将法线贴图转换为蓝色版本 - 许多软件使用，包括 Blender",
 

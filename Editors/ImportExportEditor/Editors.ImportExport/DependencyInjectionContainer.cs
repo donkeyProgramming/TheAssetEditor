@@ -41,6 +41,7 @@ namespace Editors.ImportExport
             services.AddTransient<DdsToPngExporter>();
             services.AddTransient<IDdsToNormalPngExporter, DdsToNormalPngExporter>();
             services.AddTransient<RmvToGltfExporter>();
+            services.AddTransient<IRmvToGltfExporter>(x => x.GetRequiredService<RmvToGltfExporter>());
             services.AddTransient<RmvToGltfStaticExporter>();
 
             // Importer ViewModels
@@ -71,6 +72,7 @@ namespace Editors.ImportExport
             services.AddTransient<IGltfSceneLoader, GltfSceneLoader>();
             services.AddTransient<GltfSkeletonBuilder>();
             services.AddTransient<GltfAnimationBuilder>();
+            services.AddTransient<IGltfAnimationCatalogResolver, GltfAnimationCatalogResolver>();
 
             services.AddSingleton<IPackFileContextMenuRegistration, ImportExportPackFileContextMenuRegistration>();
 

@@ -56,6 +56,8 @@ namespace GameWorld.Core
             serviceCollection.AddScoped<ViewOnlySelectedService>();
             serviceCollection.AddScoped<FocusSelectableObjectService>();
             serviceCollection.AddScoped<ComplexMeshLoader>();
+            serviceCollection.AddScoped<IModelAssetResolver, ModelAssetResolver>();
+            serviceCollection.AddScoped<IVariantMeshCompositionResolver, VariantMeshCompositionResolver>();
             serviceCollection.AddTransient<WsModelGeneratorService>();
             serviceCollection.AddTransient<MaterialToWsMaterialFactory>();
             serviceCollection.AddScoped<IExceptionInformationProvider, GraphicsResourceExceptionInfoProvider>();

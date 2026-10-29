@@ -449,6 +449,10 @@
   "RmvToGltfExporter.ConvertMaterial": "Convert Material",
   "RmvToGltfExporter.ConvertNormal": "Convert Normal",
   "RmvToGltfExporter.ExportAnimations": "Export Animations",
+  "RmvToGltfExporter.Animations": "Animations: ",
+  "RmvToGltfExporter.SelectAll": "Select all",
+  "RmvToGltfExporter.SelectNone": "Select none",
+  "RmvToGltfExporter.FilterAnimations": "Filter animations",
   "RmvToGltfExporter.Tooltips.ConvertMaterial": "Convert the Material texture into the version Blender prefers",
   "RmvToGltfExporter.Tooltips.ConvertNormal": "Convert the normal map texture into blue version - used by a lot of software, including blender",
 
@@ -917,4 +921,3 @@
   "PackFileCache.BuildingCache.Title": "Building Cache",
   "PackFileCache.Description": "The cache allows faster startup times and reduces memory usage by storing pre-processed game file data on disk."
 }
-

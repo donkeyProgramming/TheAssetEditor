@@ -30,9 +30,10 @@ namespace Editors.ImportExport.Exporting.Exporters.DdsToMaterialPng
             if (packFile == null)            
                 return "";
 
-            var fileName = Path.GetFileNameWithoutExtension(filePath);
-            var outDirectory = Path.GetDirectoryName(outputPath);
-            var outFilePath = outDirectory + "/" + fileName + ".png";
+            var fileName = Path.GetFileNameWithoutExtension(
+                filePath.Replace('\\', Path.DirectorySeparatorChar));
+            var outDirectory = Path.GetDirectoryName(outputPath) ?? string.Empty;
+            var outFilePath = Path.Combine(outDirectory, fileName + ".png");
 
             var bytes = packFile.DataSource.ReadData();
             if (bytes == null || !bytes.Any())
@@ -44,7 +45,7 @@ namespace Editors.ImportExport.Exporting.Exporters.DdsToMaterialPng
 
             if (convertToBlenderFormat)
             {
-                imgBytes = ConvertToBlenderFormat(imgBytes, outputPath, outFilePath);
+                imgBytes = ConvertToBlenderFormat(imgBytes);
             }
 
             _imageSaveHandler.Save(imgBytes, outFilePath);
@@ -61,37 +62,23 @@ namespace Editors.ImportExport.Exporting.Exporters.DdsToMaterialPng
             return ExportSupportEnum.NotSupported;
         }
 
-        byte[] ConvertToBlenderFormat(byte[] imgBytes, string outputPath, string fileDirectory)
+        private static byte[] ConvertToBlenderFormat(byte[] imgBytes)
         {
-            var ms = new MemoryStream(imgBytes);
+            using var ms = new MemoryStream(imgBytes);
 
             using var image = Image.FromStream(ms);
             using var bitmap = new Bitmap(image);
+            var pixels = BitmapPixelBuffer.ReadBgra(bitmap);
+            for (var index = 0; index < pixels.Length; index += 4)
             {
-                for (int x = 0; x < bitmap.Width; x++)
-                {
-                    for (int y = 0; y < bitmap.Height; y++)
-                    {
-                        var pixel = bitmap.GetPixel(x, y);
-                        var R = pixel.R;
-                        var G = pixel.G;
-                        var B = pixel.B;
-                        var newColor = Color.FromArgb(255, B, G, R);
-                        bitmap.SetPixel(x, y, newColor);
-                    }
-                }
-
-                // get raw PNG bytes
-                using var b = new MemoryStream();
-                bitmap.Save(b, System.Drawing.Imaging.ImageFormat.Png);
-
-                return b.ToArray();
+                (pixels[index], pixels[index + 2]) = (pixels[index + 2], pixels[index]);
+                pixels[index + 3] = 255;
             }
-        }
 
-        void DoNotConvertExport(byte[] imgBytes, string outputPath, string fileDirectory)
-        {
-            _imageSaveHandler.Save(imgBytes, fileDirectory);
+            using var converted = BitmapPixelBuffer.CreateBitmap(bitmap.Width, bitmap.Height, pixels);
+            using var output = new MemoryStream();
+            converted.Save(output, System.Drawing.Imaging.ImageFormat.Png);
+            return output.ToArray();
         }
     }
 }

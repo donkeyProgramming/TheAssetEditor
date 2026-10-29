@@ -23,6 +23,7 @@ namespace Editors.ImportExport.Exporting.Presentation.RmvToGltf
 
         public string DisplayName => "GLTF Static Pose Export";
         public string OutputExtension => ".gltf";
+        public string OutputFilter => "glTF (*.gltf)|*.gltf|Binary glTF (*.glb)|*.glb";
 
         public RmvToGltfStaticExporterViewModel(RmvToGltfStaticExporter exporter)
         {

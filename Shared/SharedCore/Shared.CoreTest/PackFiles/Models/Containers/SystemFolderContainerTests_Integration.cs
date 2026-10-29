@@ -9,6 +9,7 @@ using Shared.Core.PackFiles.Serialization;
 using Shared.Core.PackFiles.Utility;
 using Shared.Core.Services;
 using Shared.Core.Settings;
+using Test.TestingUtility.TestUtility;
 
 namespace Shared.CoreTest.PackFiles.Models.Containers
 {
@@ -41,30 +42,6 @@ namespace Shared.CoreTest.PackFiles.Models.Containers
         private static IFileSystemAccess CreateRealFileSystemAccess()
         {
             return new FileSystemAccess();
-        }
-
-        private static string GetDataFileFromWorkspace(string fileName)
-        {
-            var currentDirectory = TestContext.CurrentContext.TestDirectory;
-
-            while (true)
-            {
-                var directoryName = Path.GetFileName(currentDirectory);
-                if (string.IsNullOrWhiteSpace(directoryName))
-                    throw new Exception($"Unable to resolve workspace root for test directory '{TestContext.CurrentContext.TestDirectory}'");
-
-                if (string.Equals(directoryName, "TheAssetEditor", StringComparison.OrdinalIgnoreCase))
-                    break;
-
-                currentDirectory = Path.GetDirectoryName(currentDirectory)
-                    ?? throw new Exception($"Unable to resolve parent folder from '{currentDirectory}'");
-            }
-
-            var fullPath = Path.Combine(currentDirectory, "Data", fileName);
-            if (File.Exists(fullPath) == false)
-                throw new Exception($"Unable to find data file '{fileName}' in '{fullPath}'");
-
-            return fullPath;
         }
 
         [Test]
@@ -138,7 +115,7 @@ namespace Shared.CoreTest.PackFiles.Models.Containers
         public void ComplexFlow_SystemFolderProject_FromKarlPack_PersistsIgnoreSettings_AndSavesExpectedPack()
         {
             // Arrange: load Karl pack as game pack
-            var karlPackPath = GetDataFileFromWorkspace("Karl_and_celestialgeneral.pack");
+            var karlPackPath = PathHelper.GetDataFile("Karl_and_celestialgeneral.pack");
             PackFileContainer karlContainer;
             using (var fs = File.OpenRead(karlPackPath))
             using (var reader = new BinaryReader(fs))
@@ -233,7 +210,7 @@ namespace Shared.CoreTest.PackFiles.Models.Containers
         public void ComplexFlow_CreateProjectFromPack_EditDeleteIgnore_Save_VerifyContent()
         {
             // Arrange: load source pack and create project folder by extracting files
-            var sourcePackPath = GetDataFileFromWorkspace("Karl_and_celestialgeneral.pack");
+            var sourcePackPath = PathHelper.GetDataFile("Karl_and_celestialgeneral.pack");
             PackFileContainer sourcePack;
             using (var fs = File.OpenRead(sourcePackPath))
             using (var reader = new BinaryReader(fs))
