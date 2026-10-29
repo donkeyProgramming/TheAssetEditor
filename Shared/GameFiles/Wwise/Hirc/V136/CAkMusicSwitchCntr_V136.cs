@@ -36,7 +36,38 @@ namespace Shared.GameFormats.Wwise.Hirc.V136
             AkDecisionTree.ReadData(chunk, TreeDataSize, TreeDepth);
         }
 
-        public override byte[] WriteData() => throw new NotSupportedException("Users probably don't need this complexity.");
-        public override void UpdateSectionSize() => throw new NotSupportedException("Users probably don't need this complexity.");
+        public override byte[] WriteData()
+        {
+            var memStream = WriteHeader();
+            memStream.Write(MusicTransNodeParams.WriteData());
+            memStream.Write(ByteParsers.Byte.EncodeValue(IsContinuePlayback, out _));
+            memStream.Write(ByteParsers.UInt32.EncodeValue((uint)Arguments.Count, out _));
+
+            // The arguments are stored as two parallel runs - every group id, then every group
+            // type - rather than interleaved per argument.
+            foreach (var argument in Arguments)
+                memStream.Write(ByteParsers.UInt32.EncodeValue(argument.GroupId, out _));
+
+            foreach (var argument in Arguments)
+                memStream.Write(ByteParsers.Byte.EncodeValue((byte)argument.GroupType, out _));
+
+            memStream.Write(ByteParsers.UInt32.EncodeValue(AkDecisionTree.GetSize(), out _));
+            memStream.Write(ByteParsers.Byte.EncodeValue(Mode, out _));
+            memStream.Write(AkDecisionTree.WriteData());
+            return memStream.ToArray();
+        }
+
+        public override void UpdateSectionSize()
+        {
+            var size = MusicTransNodeParams.GetSize()
+                + 1 // IsContinuePlayback
+                + 4 // TreeDepth
+                + (uint)Arguments.Sum(argument => argument.GetSize())
+                + 4 // TreeDataSize
+                + 1 // Mode
+                + AkDecisionTree.GetSize();
+
+            SectionSize = size + ByteHelper.GetPropertyTypeSize(Id);
+        }
     }
 }

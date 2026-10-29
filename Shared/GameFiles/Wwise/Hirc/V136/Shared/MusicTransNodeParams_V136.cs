@@ -20,6 +20,21 @@ namespace Shared.GameFormats.Wwise.Hirc.V136.Shared
             }
         }
 
+        public byte[] WriteData()
+        {
+            using var memStream = new MemoryStream();
+            memStream.Write(MusicNodeParams.WriteData());
+            memStream.Write(ByteParsers.UInt32.EncodeValue((uint)PlayList.Count, out _));
+            foreach (var rule in PlayList)
+                memStream.Write(rule.WriteData());
+            return memStream.ToArray();
+        }
+
+        public uint GetSize() =>
+            MusicNodeParams.GetSize()
+            + 4 // NumRules
+            + (uint)PlayList.Sum(rule => rule.GetSize());
+
         public class AkMusicTransitionRule_V136
         {
             public uint NumSrc { get; set; }
@@ -54,6 +69,42 @@ namespace Shared.GameFormats.Wwise.Hirc.V136.Shared
                     AkMusicTransitionObject = AkMusicTransitionObject_V136.ReadData(chunk);
             }
 
+            public byte[] WriteData()
+            {
+                using var memStream = new MemoryStream();
+                memStream.Write(ByteParsers.UInt32.EncodeValue((uint)SrcIdList.Count, out _));
+                foreach (var srcId in SrcIdList)
+                    memStream.Write(ByteParsers.UInt32.EncodeValue(srcId, out _));
+
+                memStream.Write(ByteParsers.UInt32.EncodeValue((uint)DstIdList.Count, out _));
+                foreach (var dstId in DstIdList)
+                    memStream.Write(ByteParsers.UInt32.EncodeValue(dstId, out _));
+
+                memStream.Write(AkMusicTransSrcRule.WriteData());
+                memStream.Write(AkMusicTransDstRule.WriteData());
+                memStream.Write(ByteParsers.UInt32.EncodeValue(StateGroupIdCustom, out _));
+                memStream.Write(ByteParsers.UInt32.EncodeValue(StateIdCustom, out _));
+
+                // Derived from the object rather than the parsed flag, so adding or removing a
+                // transition object keeps the two in step.
+                var hasTransitionObject = AkMusicTransitionObject != null;
+                memStream.Write(ByteParsers.Byte.EncodeValue((byte)(hasTransitionObject ? 1 : 0), out _));
+                if (hasTransitionObject)
+                    memStream.Write(AkMusicTransitionObject!.WriteData());
+
+                return memStream.ToArray();
+            }
+
+            public uint GetSize() =>
+                4 + (uint)SrcIdList.Count * 4
+                + 4 + (uint)DstIdList.Count * 4
+                + AkMusicTransSrcRule_V136.Size
+                + AkMusicTransDstRule_V136.Size
+                + 4 // StateGroupIdCustom
+                + 4 // StateIdCustom
+                + 1 // AllocTransObjectFlag
+                + (AkMusicTransitionObject != null ? AkMusicTransitionObject_V136.Size : 0u);
+
             public class AkMusicTransSrcRule_V136
             {
                 public int TransitionTime { get; set; }
@@ -63,6 +114,9 @@ namespace Shared.GameFormats.Wwise.Hirc.V136.Shared
                 public uint CueFilterHash { get; set; }
                 public byte PlayPostExit { get; set; }
 
+                // 5 x 4 + 1
+                public const uint Size = 21;
+
                 public void ReadData(ByteChunk chunk)
                 {
                     TransitionTime = chunk.ReadInt32();
@@ -71,6 +125,18 @@ namespace Shared.GameFormats.Wwise.Hirc.V136.Shared
                     SyncType = chunk.ReadUInt32();
                     CueFilterHash = chunk.ReadUInt32();
                     PlayPostExit = chunk.ReadByte();
+                }
+
+                public byte[] WriteData()
+                {
+                    using var memStream = new MemoryStream();
+                    memStream.Write(ByteParsers.Int32.EncodeValue(TransitionTime, out _));
+                    memStream.Write(ByteParsers.UInt32.EncodeValue(FadeCurve, out _));
+                    memStream.Write(ByteParsers.Int32.EncodeValue(FadeOffset, out _));
+                    memStream.Write(ByteParsers.UInt32.EncodeValue(SyncType, out _));
+                    memStream.Write(ByteParsers.UInt32.EncodeValue(CueFilterHash, out _));
+                    memStream.Write(ByteParsers.Byte.EncodeValue(PlayPostExit, out _));
+                    return memStream.ToArray();
                 }
             }
 
@@ -86,6 +152,9 @@ namespace Shared.GameFormats.Wwise.Hirc.V136.Shared
                 public byte PlayPreEntry { get; set; }
                 public byte DestMatchSourceCueName { get; set; }
 
+                // 5 x 4 + 2 x 2 + 2 x 1
+                public const uint Size = 26;
+
                 public void ReadData(ByteChunk chunk)
                 {
                     TransitionTime = chunk.ReadInt32();
@@ -98,15 +167,33 @@ namespace Shared.GameFormats.Wwise.Hirc.V136.Shared
                     PlayPreEntry = chunk.ReadByte();
                     DestMatchSourceCueName = chunk.ReadByte();
                 }
+
+                public byte[] WriteData()
+                {
+                    using var memStream = new MemoryStream();
+                    memStream.Write(ByteParsers.Int32.EncodeValue(TransitionTime, out _));
+                    memStream.Write(ByteParsers.UInt32.EncodeValue(FadeCurve, out _));
+                    memStream.Write(ByteParsers.Int32.EncodeValue(FadeOffset, out _));
+                    memStream.Write(ByteParsers.UInt32.EncodeValue(CueFilterHash, out _));
+                    memStream.Write(ByteParsers.UInt32.EncodeValue(JumpToId, out _));
+                    memStream.Write(ByteParsers.UShort.EncodeValue(JumpToType, out _));
+                    memStream.Write(ByteParsers.UShort.EncodeValue(EntryType, out _));
+                    memStream.Write(ByteParsers.Byte.EncodeValue(PlayPreEntry, out _));
+                    memStream.Write(ByteParsers.Byte.EncodeValue(DestMatchSourceCueName, out _));
+                    return memStream.ToArray();
+                }
             }
 
             public class AkMusicTransitionObject_V136
             {
                 public int SegmentId { get; set; }
-                public AkMusicFade_V136 FadeInParams { get; set; }
-                public AkMusicFade_V136 FadeOutParams { get; set; }
+                public AkMusicFade_V136 FadeInParams { get; set; } = new AkMusicFade_V136();
+                public AkMusicFade_V136 FadeOutParams { get; set; } = new AkMusicFade_V136();
                 public byte PlayPreEntry { get; set; }
                 public byte PlayPostExit { get; set; }
+
+                // SegmentId + two fades (12 each) + 2 x 1
+                public const uint Size = 30;
 
                 public static AkMusicTransitionObject_V136 ReadData(ByteChunk chunk)
                 {
@@ -118,6 +205,17 @@ namespace Shared.GameFormats.Wwise.Hirc.V136.Shared
                         PlayPreEntry = chunk.ReadByte(),
                         PlayPostExit = chunk.ReadByte()
                     };
+                }
+
+                public byte[] WriteData()
+                {
+                    using var memStream = new MemoryStream();
+                    memStream.Write(ByteParsers.Int32.EncodeValue(SegmentId, out _));
+                    memStream.Write(FadeInParams.WriteData());
+                    memStream.Write(FadeOutParams.WriteData());
+                    memStream.Write(ByteParsers.Byte.EncodeValue(PlayPreEntry, out _));
+                    memStream.Write(ByteParsers.Byte.EncodeValue(PlayPostExit, out _));
+                    return memStream.ToArray();
                 }
 
                 public class AkMusicFade_V136
@@ -134,6 +232,15 @@ namespace Shared.GameFormats.Wwise.Hirc.V136.Shared
                             FadeCurve = chunk.ReadUInt32(),
                             FadeOffset = chunk.ReadInt32()
                         };
+                    }
+
+                    public byte[] WriteData()
+                    {
+                        using var memStream = new MemoryStream();
+                        memStream.Write(ByteParsers.Int32.EncodeValue(TransitionTime, out _));
+                        memStream.Write(ByteParsers.UInt32.EncodeValue(FadeCurve, out _));
+                        memStream.Write(ByteParsers.Int32.EncodeValue(FadeOffset, out _));
+                        return memStream.ToArray();
                     }
                 }
             }

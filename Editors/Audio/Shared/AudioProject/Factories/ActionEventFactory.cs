@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Editors.Audio.Shared.AudioProject.Compiler;
 using Editors.Audio.Shared.AudioProject.Models;
 using Editors.Audio.Shared.GameInformation.Warhammer3;
+using Shared.GameFormats.Wwise;
 using Shared.GameFormats.Wwise.Enums;
 using Action = Editors.Audio.Shared.AudioProject.Models.Action;
 
@@ -28,6 +29,12 @@ namespace Editors.Audio.Shared.AudioProject.Factories
             HircSettings hircSettings,
             uint soundBankId,
             string language);
+        ActionEventFactoryResult CreateSetStateActionEvent(
+            HashSet<uint> usedHircIds,
+            Wh3ActionEventType actionEventType,
+            string actionEventName,
+            string stateGroupName,
+            string stateName);
         ActionEventFactoryResult CreatePauseActionEvent(HashSet<uint> usedHircIds, ActionEvent playActionEvent);
         ActionEventFactoryResult CreateResumeActionEvent(HashSet<uint> usedHircIds, ActionEvent playActionEvent);
         ActionEventFactoryResult CreateStopActionEvent(HashSet<uint> usedHircIds, ActionEvent playActionEvent);
@@ -80,6 +87,34 @@ namespace Editors.Audio.Shared.AudioProject.Factories
             actionEventFactoryResult.ActionEvent = actionEvent;
             actionEventFactoryResult.Actions = actions;
             return actionEventFactoryResult;
+        }
+
+        /// <summary>
+        /// A music Action Event, built the way vanilla builds them: a single SetState action against
+        /// one of the music State Groups, with no Sound, no container and no bank reference. Both
+        /// the State Group and the State are identified by the Wwise hash of their name, so a State
+        /// that does not exist in vanilla works exactly the same way as one that does - what makes
+        /// it audible is a music hierarchy that branches on it.
+        /// </summary>
+        public ActionEventFactoryResult CreateSetStateActionEvent(
+            HashSet<uint> usedHircIds,
+            Wh3ActionEventType actionEventType,
+            string actionEventName,
+            string stateGroupName,
+            string stateName)
+        {
+            var actionEventId = IdGenerator.GenerateActionEventId(usedHircIds, actionEventName);
+            var actionIds = IdGenerator.GenerateIds(usedHircIds);
+
+            var setStateAction = Action.CreateSetState(actionIds.Id, stateGroupName, stateName);
+            var actions = new List<Action> { setStateAction };
+
+            var actionEvent = new ActionEvent(actionEventId, actionEventName, actions, actionEventType);
+            return new ActionEventFactoryResult
+            {
+                ActionEvent = actionEvent,
+                Actions = actions
+            };
         }
 
         public ActionEventFactoryResult CreatePauseActionEvent(HashSet<uint> usedHircIds, ActionEvent playActionEvent)

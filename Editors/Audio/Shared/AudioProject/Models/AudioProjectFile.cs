@@ -14,6 +14,9 @@ namespace Editors.Audio.Shared.AudioProject.Models
         public List<StateGroup> StateGroups { get; set; } = [];
         public List<AudioFile> AudioFiles { get; set; } = [];
 
+        /// <summary>Only set in a music project (.mproj); null, and so not written, in an .aproj.</summary>
+        public MusicProjectData Music { get; set; }
+
         public static AudioProjectFile CreateNew(string language, string audioProjectNameWithoutExtension)
         {
             return new AudioProjectFile
@@ -106,7 +109,9 @@ namespace Editors.Audio.Shared.AudioProject.Models
                 .Where(stateGroup => stateGroup != null)
                 .ToList();
 
-            return CreateFromExisting(Language, cleanSoundBanks, cleanStateGroups, AudioFiles);
+            var clean = CreateFromExisting(Language, cleanSoundBanks, cleanStateGroups, AudioFiles);
+            clean.Music = Music?.Clean();
+            return clean;
         }
 
         public List<SoundBank> GetEditedActionEventSoundBanks()

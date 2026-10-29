@@ -18,11 +18,27 @@
 
   <ItemGroup>
     <ProjectReference Include="Editors.Audio.csproj" />
+    <ProjectReference Include="..\MusicProjectEditor\Editors.MusicProjectEditor.csproj" />
   </ItemGroup>
 
   <ItemGroup>
     <Compile Include="AudioCacheTests.cs" />
     <Compile Include="AudioExplorerTests.cs" />
+    <Compile Include="MusicAudioProjectServiceTests.cs" />
+    <Compile Include="AmsFragmentMergeTests.cs" />
+    <Compile Include="AmsPulseTrackMergeTests.cs" />
+    <Compile Include="MusicEndToEndRun.cs" />
+    <Compile Include="MusicHierarchyFactoryTests.cs" />
+    <Compile Include="MusicHierarchyGenerationTests.cs" />
+    <Compile Include="MusicProjectBuildTests.cs" />
+    <Compile Include="MusicSwitchContainerMergeTests.cs" />
+    <Compile Include="SetStateActionGenerationTests.cs" />
+    <Compile Include="VanillaBankReader.cs" />
+    <Compile Include="MusicTreeEndToEndRun.cs" />
+    <Compile Include="MusicDatFixtures.cs" />
+    <Compile Include="MusicDatMutationTests.cs" />
+    <Compile Include="MusicDatTests_Explore.cs" />
+    <Compile Include="VanillaMusicRoundTripRun.cs" />
     <Using Include="NUnit.Framework" />
   </ItemGroup>
 

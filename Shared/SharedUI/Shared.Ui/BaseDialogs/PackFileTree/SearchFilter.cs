@@ -56,8 +56,14 @@ namespace Shared.Ui.BaseDialogs.PackFileTree
         }
 
         List<string>? _extensionFilter;
+
+        // Narrows the extension match further by full path. The extension match is a substring
+        // match on purpose (legacy .wem variants), so this is how a caller asks for something
+        // stricter, or for one folder only.
+        Func<string, bool>? _pathFilter;
+
         public int AutoExapandResultsAfterLimitedCount { get; set; } = 25;
-        public bool HasActiveFilter => !string.IsNullOrWhiteSpace(FilterText) || ShowFoldersOnly || (_extensionFilter?.Count > 0);
+        public bool HasActiveFilter => !string.IsNullOrWhiteSpace(FilterText) || ShowFoldersOnly || (_extensionFilter?.Count > 0) || _pathFilter != null;
         public Action? FilterCleared { get; set; }
 
         internal SearchFilter(ObservableCollection<RootTreeNode> nodes, IStandardDialogs? standardDialogs = null)
@@ -97,7 +103,7 @@ namespace Shared.Ui.BaseDialogs.PackFileTree
             if (HasActiveFilter)
             {
                 var textFilter = string.IsNullOrWhiteSpace(text) ? null : text;
-                var hasSearchFilter = textFilter != null || (_extensionFilter?.Count > 0);
+                var hasSearchFilter = textFilter != null || (_extensionFilter?.Count > 0) || _pathFilter != null;
 
                 if (hasSearchFilter)
                 {
@@ -105,6 +111,8 @@ namespace Shared.Ui.BaseDialogs.PackFileTree
                     {
                         var container = rootNode.Owner;
                         var matchingFiles = container.SearchFiles(textFilter, _extensionFilter);
+                        if (_pathFilter != null)
+                            matchingFiles = matchingFiles.Where(file => _pathFilter(file.Path)).ToList();
                         RebuildTreeFromSearchResults(rootNode, matchingFiles);
                     }
                 }
@@ -150,9 +158,10 @@ namespace Shared.Ui.BaseDialogs.PackFileTree
             ApplyFilter(FilterText);
         }
 
-        public void SetExtensions(List<string> extentions)
+        public void SetExtensions(List<string> extentions, Func<string, bool>? pathFilter = null)
         {
             _extensionFilter = extentions;
+            _pathFilter = pathFilter;
             ApplyFilter(FilterText);
         }
 

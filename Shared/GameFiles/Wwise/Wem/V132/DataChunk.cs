@@ -12,6 +12,13 @@ namespace Shared.GameFormats.Wwise.Wem.V132
         public List<WemSeekTableRecord> SeekTable { get; set; } = [];
         public byte[] SetupPacket { get; set; } = [];
         public List<WemAudioPacket> AudioPackets { get; set; } = [];
+
+        /// <summary>
+        /// Bytes after the last complete packet that cannot be one. About one in ten WH3 music wems
+        /// end their data chunk a few bytes past the last packet, with a length prefix that would run
+        /// past the chunk. Kept so the file writes back unchanged.
+        /// </summary>
+        public byte[] TrailingBytes { get; set; } = [];
         public FmtChunk? FmtChunk { get; set; }
 
         public DataChunk()
@@ -37,7 +44,17 @@ namespace Shared.GameFormats.Wwise.Wem.V132
                 chunk.Advance(audioStart - bytesConsumed);
 
             while (chunk.BytesLeft >= WemAudioPacket.LengthPrefixSize)
+            {
+                var packetStart = chunk.Index;
+                var packetSize = chunk.ReadUShort();
+                chunk.Index = packetStart;
+                if (packetSize > chunk.BytesLeft - WemAudioPacket.LengthPrefixSize)
+                    break;
+
                 AudioPackets.Add(WemAudioPacket.ReadData(chunk));
+            }
+
+            TrailingBytes = chunk.ReadBytes(chunk.BytesLeft);
         }
 
         public override byte[] WriteData()
@@ -52,6 +69,8 @@ namespace Shared.GameFormats.Wwise.Wem.V132
 
             foreach (var packet in AudioPackets)
                 stream.Write(packet.WriteData());
+
+            stream.Write(TrailingBytes);
 
             var byteArray = stream.ToArray();
             if (FmtChunk != null)

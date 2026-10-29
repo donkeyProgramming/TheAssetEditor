@@ -38,6 +38,8 @@ namespace AssetEditor.Services
                 new Editors.BmdEditor.DependencyInjectionContainer(),
                 new Editors.CscEditor.DependencyInjectionContainer(),
                 new Editors.CampaignAnimationSetEditor.DependencyInjectionContainer(),
+                new Editors.MusicDatEditor.DependencyInjectionContainer(),
+                new Editors.MusicProjectEditor.DependencyInjectionContainer(),
 
                 // Host application
                 new DependencyInjectionContainer(),

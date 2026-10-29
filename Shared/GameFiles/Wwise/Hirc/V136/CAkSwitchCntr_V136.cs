@@ -45,8 +45,41 @@ namespace Shared.GameFormats.Wwise.Hirc.V136
             }
         }
 
-        public override byte[] WriteData() => throw new NotSupportedException("Users probably don't need this complexity.");
-        public override void UpdateSectionSize() => throw new NotSupportedException("Users probably don't need this complexity.");
+        public override byte[] WriteData()
+        {
+            var memStream = WriteHeader();
+            memStream.Write(NodeBaseParams.WriteData());
+            memStream.Write(ByteParsers.Byte.EncodeValue((byte)EGroupType, out _));
+            memStream.Write(ByteParsers.UInt32.EncodeValue(GroupId, out _));
+            memStream.Write(ByteParsers.UInt32.EncodeValue(DefaultSwitch, out _));
+            memStream.Write(ByteParsers.Byte.EncodeValue(BIsContinuousValidation, out _));
+            memStream.Write(Children.WriteData());
+
+            // Counts come from the lists rather than the parsed count fields, so edits keep them in step.
+            memStream.Write(ByteParsers.UInt32.EncodeValue((uint)SwitchList.Count, out _));
+            foreach (var switchPackage in SwitchList.Cast<CAkSwitchPackage_V136>())
+                memStream.Write(switchPackage.WriteData());
+
+            memStream.Write(ByteParsers.UInt32.EncodeValue((uint)Parameters.Count, out _));
+            foreach (var parameter in Parameters)
+                memStream.Write(parameter.WriteData());
+
+            return memStream.ToArray();
+        }
+
+        public override void UpdateSectionSize()
+        {
+            var size = NodeBaseParams.GetSize()
+                + 1 // EGroupType
+                + 4 // GroupId
+                + 4 // DefaultSwitch
+                + 1 // BIsContinuousValidation
+                + Children.GetSize()
+                + 4 + (uint)SwitchList.Cast<CAkSwitchPackage_V136>().Sum(x => x.GetSize())
+                + 4 + (uint)Parameters.Count * AkSwitchNodeParams_V136.Size;
+
+            SectionSize = size + ByteHelper.GetPropertyTypeSize(Id);
+        }
 
         public class CAkSwitchPackage_V136 : ICAkSwitchPackage
         {
@@ -60,6 +93,18 @@ namespace Shared.GameFormats.Wwise.Hirc.V136
                 for (var i = 0; i < numChildren; i++)
                     NodeIdList.Add(chunk.ReadUInt32());
             }
+
+            public byte[] WriteData()
+            {
+                using var memStream = new MemoryStream();
+                memStream.Write(ByteParsers.UInt32.EncodeValue(SwitchId, out _));
+                memStream.Write(ByteParsers.UInt32.EncodeValue((uint)NodeIdList.Count, out _));
+                foreach (var nodeId in NodeIdList)
+                    memStream.Write(ByteParsers.UInt32.EncodeValue(nodeId, out _));
+                return memStream.ToArray();
+            }
+
+            public uint GetSize() => 8 + (uint)NodeIdList.Count * 4;
         }
 
         public class AkSwitchNodeParams_V136
@@ -70,6 +115,9 @@ namespace Shared.GameFormats.Wwise.Hirc.V136
             public float FadeOutTime { get; set; }
             public float FadeInTime { get; set; }
 
+            // id + two bit vectors + two floats
+            public const uint Size = 14;
+
             public void ReadData(ByteChunk chunk)
             {
                 NodeId = chunk.ReadUInt32();
@@ -77,6 +125,17 @@ namespace Shared.GameFormats.Wwise.Hirc.V136
                 BitVector1 = chunk.ReadByte();
                 FadeOutTime = chunk.ReadSingle();
                 FadeInTime = chunk.ReadSingle();
+            }
+
+            public byte[] WriteData()
+            {
+                using var memStream = new MemoryStream();
+                memStream.Write(ByteParsers.UInt32.EncodeValue(NodeId, out _));
+                memStream.Write(ByteParsers.Byte.EncodeValue(BitVector0, out _));
+                memStream.Write(ByteParsers.Byte.EncodeValue(BitVector1, out _));
+                memStream.Write(ByteParsers.Single.EncodeValue(FadeOutTime, out _));
+                memStream.Write(ByteParsers.Single.EncodeValue(FadeInTime, out _));
+                return memStream.ToArray();
             }
         }
     }
