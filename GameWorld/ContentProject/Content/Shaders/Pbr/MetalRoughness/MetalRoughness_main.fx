@@ -100,6 +100,15 @@ float4 DefaultPixelShader(in PixelInputType input, bool bIsFrontFace : SV_IsFron
     // Apply global constant light colour so the scene lighting can be globally tuned
     hdr_linear_col *= Constant_LightColour;
 
+    // The VFX preview's light particles, each lit as the sun is, without the sun's environment light.
+    float3 reflectedView = reflect(normalizedViewDirection, slm_uncompressed.Normal);
+    for (int i = 0; i < PointLightCount; i++)
+    {
+        float3 toLight;
+        float3 pointColour = PointLightAt(i, input.worldPosition, toLight) * get_sun_colour() * unchartedSunFactor;
+        hdr_linear_col += standard_lighting_model_directional_light_SM4_private(pointColour, toLight, normalizedViewDirection, reflectedView, slm_uncompressed);
+    }
+
     //  Tone-map the pixel...            
     //float3 ldr_linear_col = saturate(tone_map_linear_hdr_to_linear_ldr_reinhard(hdr_linear_col));    
     float3 ldr_linear_col = saturate(Uncharted2ToneMapping(hdr_linear_col));    
@@ -109,7 +118,7 @@ float4 DefaultPixelShader(in PixelInputType input, bool bIsFrontFace : SV_IsFron
     // Combine all colours
     float3 color = ldr_linear_col + emissiveColour;	
     
-    return float4(_gamma(color), 1.0f);
+    return float4(_gamma(color * ModelColour.rgb), ModelColour.a);
 }
 
 float4 EmissiveLayerPixelShader(in PixelInputType input, bool bIsFrontFace : SV_IsFrontFace) : SV_TARGET0
@@ -121,8 +130,25 @@ float4 EmissiveLayerPixelShader(in PixelInputType input, bool bIsFrontFace : SV_
     if (UseAlpha == 1)
         alpha_test(material.diffuse.a);
    
-    return float4(emissiveColour, 1);
+    return float4(emissiveColour * ModelColour.rgb, ModelColour.a);
 }
+
+// RenderingTechnique.Depth: the view depth the VFX preview's soft particles fade against, cut where the texture is cut.
+float4 DepthPixelShader(in PixelInputType input) : SV_TARGET0
+{
+    if (UseAlpha == 1)
+        alpha_test(GetMaterial(input).diffuse.a);
+    return float4(-mul(float4(input.worldPosition, 1), View).z, 0, 0, 1);
+}
+
+technique DepthDrawing
+{
+    pass P0
+    {
+        VertexShader = compile vs_5_0 MainVertexShader();
+        PixelShader = compile ps_5_0 DepthPixelShader();
+    }
+};
 
 technique BasicColorDrawing
 {

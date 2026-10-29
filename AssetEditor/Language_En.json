@@ -409,6 +409,9 @@
   "TextureEditor.Labels.NumMipMaps": "Num MipMaps",
 
   "MetadataEditor.Buttons.Refresh": "Refresh",
+  "SuperView.ShowVfx": "Show VFX",
+  "SuperView.VfxFilter": "VFX filter:",
+  "SuperView.VfxFilter.Tooltip": "The unit's vfx_filter_id in battle_entities. An effect tag whose id is neither 0 nor this does not play on it: a unit and its Regiment of Renown often share one meta, with id 1 and id 2.",
   "MetadataEditor.Buttons.New": "New",
   "MetadataEditor.Buttons.Delete": "Delete",
   "MetadataEditor.Buttons.Up": "Up",

@@ -7,3 +7,4 @@
 [assembly: InternalsVisibleTo("Shared.UiTest")]
 [assembly: InternalsVisibleTo("Test.ImportExport")]
 [assembly: InternalsVisibleTo("Test.AnimatioReTarget")]
+[assembly: InternalsVisibleTo("Test.VfxEditor")]

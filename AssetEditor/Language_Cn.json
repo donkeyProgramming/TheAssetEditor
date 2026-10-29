@@ -409,6 +409,9 @@
   "TextureEditor.Labels.NumMipMaps": "MipMap 数量",
 
   "MetadataEditor.Buttons.Refresh": "刷新",
+  "SuperView.ShowVfx": "显示特效",
+  "SuperView.VfxFilter": "特效过滤：",
+  "SuperView.VfxFilter.Tooltip": "单位在 battle_entities 中的 vfx_filter_id。特效标签的 id 若不是 0 也不是此值，就不会在该单位上播放：单位和它的传奇军团常共用一个元数据文件，分别用 id 1 和 id 2。",
   "MetadataEditor.Buttons.New": "新建",
   "MetadataEditor.Buttons.Delete": "删除",
   "MetadataEditor.Buttons.Up": "上移",

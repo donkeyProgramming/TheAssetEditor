@@ -3879,6 +3879,8 @@
     <Style x:Key="{x:Static ToolBar.ToggleButtonStyleKey}" TargetType="{x:Type ToggleButton}" BasedOn="{StaticResource {x:Type ToggleButton}}"/>
     <Style x:Key="{x:Static ToolBar.CheckBoxStyleKey}"     TargetType="{x:Type CheckBox}"     BasedOn="{StaticResource {x:Type CheckBox}}"/>
     <Style x:Key="{x:Static ToolBar.RadioButtonStyleKey}"  TargetType="{x:Type RadioButton}"  BasedOn="{StaticResource {x:Type RadioButton}}"/>
+    <Style x:Key="{x:Static ToolBar.ComboBoxStyleKey}"     TargetType="{x:Type ComboBox}"     BasedOn="{StaticResource {x:Type ComboBox}}"/>
+    <Style x:Key="{x:Static ToolBar.TextBoxStyleKey}"      TargetType="{x:Type TextBox}"      BasedOn="{StaticResource {x:Type TextBox}}"/>
 
     <Style TargetType="{x:Type ToolBarTray}">
         <Setter Property="Background" Value="{DynamicResource ToolBarTrayBackground}"/>

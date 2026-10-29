@@ -18,7 +18,8 @@ namespace GameWorld.Core.Services
         BloomFilter,
         Grid,
         VertexPoint,
-        EdgeQuad
+        EdgeQuad,
+        Particle
     }
 
     public class ResourceLibrary
@@ -62,6 +63,7 @@ namespace GameWorld.Core.Services
                 LoadEffect("Shaders\\InstancingShader", ShaderTypes.GeometryInstance);
                 LoadEffect("Shaders\\VertexPointShader", ShaderTypes.VertexPoint);
                 LoadEffect("Shaders\\EdgeQuadShader", ShaderTypes.EdgeQuad);
+                var particle = LoadEffect("Shaders\\Particle", ShaderTypes.Particle);
 
                 _pbrDiffuse = _content.Load<TextureCube>("textures\\phazer\\DiffuseAmbientLightCubeMap");
                 _pbrSpecular= _content.Load<TextureCube>("textures\\phazer\\SpecularAmbientLightCubemap");
@@ -73,6 +75,8 @@ namespace GameWorld.Core.Services
                 sg.Parameters["tex_cube_diffuse"]?.SetValue(_pbrDiffuse);
                 sg.Parameters["tex_cube_specular"]?.SetValue(_pbrSpecular);
                 sg.Parameters["specularBRDF_LUT"]?.SetValue(_pbrLut);
+                // A lit particle takes the sky's light off the cube a model takes it off.
+                particle.Parameters["AmbientCube"]?.SetValue(_pbrDiffuse);
             }
             catch (Exception e)
             {

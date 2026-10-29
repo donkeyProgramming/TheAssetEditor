@@ -23,6 +23,7 @@
         Twui_Editor,
         BMD_Editor,
         Csc_Editor,
+        Vfx_Editor,
         MusicDat_Editor,
         MusicProject_Editor,
         None,
