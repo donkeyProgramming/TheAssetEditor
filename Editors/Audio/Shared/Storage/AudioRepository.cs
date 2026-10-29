@@ -7,9 +7,11 @@ using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Events;
 using Shared.Core.PackFiles.Models;
 using Shared.Core.Settings;
+using Shared.GameFormats.Wwise;
 using Shared.GameFormats.Wwise.Didx;
 using Shared.GameFormats.Wwise.Enums;
 using Shared.GameFormats.Wwise.Hirc;
+using Shared.GameFormats.Wwise.Hirc.V136;
 
 namespace Editors.Audio.Shared.Storage
 {
@@ -41,6 +43,7 @@ namespace Editors.Audio.Shared.Storage
         Dictionary<string, Dictionary<string, List<HircItem>>> GetVanillaDialogueEventsByBnkByLanguage();
         Dictionary<string, Dictionary<string, List<HircItem>>> GetModdedHircsByBnkByLanguage();
         Dictionary<string, List<HircItem>> GetModdedDialogueEventsByLanguage(List<string> moddedSoundBanks);
+        List<CAkMusicTrack_V136> GetVanillaAmsPulseTracks(string stateGroupName);
         List<string> GetModdedSoundBankFilePaths(string bnkNameSubstring);
         PackFile FindWem(string wemId);
         byte[] FindDataWem(uint dataSoundbankId, int fileOffset, int byteCount);
@@ -413,6 +416,24 @@ namespace Editors.Audio.Shared.Storage
                 .Where(hirc => hirc.IsCA == false && moddedSoundBanks.Contains(hirc.BnkFilePath))
                 .GroupBy(hirc => GetNameFromId(hirc.LanguageId))
                 .ToDictionary(group => group.Key, group => group.ToList());
+        }
+
+        /// <summary>
+        /// The vanilla switch tracks that pick a pulse layer on a State Group. Found by asking which
+        /// tracks name the Group rather than from a table of ids, since there are nine per Group and
+        /// a table would go stale the moment a patch moved one. Ordered by id so a mod supplying
+        /// fewer clips than there are tracks distributes them the same way on every compile.
+        /// </summary>
+        public List<CAkMusicTrack_V136> GetVanillaAmsPulseTracks(string stateGroupName)
+        {
+            var stateGroupId = WwiseHash.Compute(stateGroupName);
+
+            return GetHircs(AkBkHircType.Music_Track)
+                .Where(hirc => hirc.IsCA)
+                .OfType<CAkMusicTrack_V136>()
+                .Where(track => track.SwitchParams != null && track.SwitchParams.GroupId == stateGroupId)
+                .OrderBy(track => track.Id)
+                .ToList();
         }
 
         public List<string> GetModdedSoundBankFilePaths(string bnkNameSubstring)

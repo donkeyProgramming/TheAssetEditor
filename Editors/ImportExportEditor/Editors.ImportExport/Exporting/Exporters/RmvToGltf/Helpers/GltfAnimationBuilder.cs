@@ -26,7 +26,7 @@ namespace Editors.ImportExport.Exporting.Exporters.RmvToGltf.Helpers
             _packFileService = packFileServoce;            
         }
 
-        public void Build(AnimationFile animSkeleton, RmvToGltfExporterSettings settings, ProcessedGltfSkeleton gltfSkeleton, ModelRoot outputScene)
+        public virtual void Build(AnimationFile animSkeleton, RmvToGltfExporterSettings settings, ProcessedGltfSkeleton gltfSkeleton, ModelRoot outputScene)
         {                     
             foreach (var animationPackFile in settings.InputAnimationFiles)
             {

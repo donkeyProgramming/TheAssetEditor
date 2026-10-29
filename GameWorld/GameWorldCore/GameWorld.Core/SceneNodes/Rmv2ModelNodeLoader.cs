@@ -13,30 +13,43 @@ namespace GameWorld.Core.SceneNodes
     {
         private readonly ILogger _logger;
         private readonly MeshBuilderService _meshBuilderService;
-        private readonly IPackFileService _packFileService;
         private readonly CapabilityMaterialFactory _capabilityMaterialFactory;
-        private readonly IStandardDialogs _standardDialogs;
+        private readonly IModelAssetResolver _modelAssetResolver;
 
-        public Rmv2ModelNodeLoader(MeshBuilderService meshBuilderService, IPackFileService packFileService, CapabilityMaterialFactory materialFactory, IStandardDialogs exceptionService, IScopedLogger scopedLogger)
+        public Rmv2ModelNodeLoader(
+            MeshBuilderService meshBuilderService,
+            IPackFileService packFileService,
+            CapabilityMaterialFactory materialFactory,
+            IStandardDialogs exceptionService,
+            IScopedLogger scopedLogger,
+            IModelAssetResolver? modelAssetResolver = null)
         {
             _logger = scopedLogger.ForContext<Rmv2ModelNodeLoader>();
             _meshBuilderService = meshBuilderService;
-            _packFileService = packFileService;
             _capabilityMaterialFactory = materialFactory;
-            _standardDialogs = exceptionService;
+            _modelAssetResolver = modelAssetResolver ?? new ModelAssetResolver(packFileService);
         }
 
         public List<Rmv2LodNode> CreateModelNodesFromFile(RmvFile model, string modelFullPath, bool onlyLoadRootNode, WsModelFile? wsModel = null)
         {
-            WsModelMaterialProvider wsMaterialProvider;
-            if(wsModel != null)
-                wsMaterialProvider = WsModelMaterialProvider.CreateFromWsModel(_packFileService, _capabilityMaterialFactory, _standardDialogs, wsModel);
-            else
-                wsMaterialProvider = WsModelMaterialProvider.CreateFromModelPath(_packFileService, _capabilityMaterialFactory, _standardDialogs,  modelFullPath);
+            var resolvedMaterials = _modelAssetResolver.ResolveMaterials(model, wsModel, modelFullPath);
+            LogResolutionDiagnostics(resolvedMaterials.Diagnostics);
+            return CreateModelNodes(model, modelFullPath, onlyLoadRootNode, resolvedMaterials.PartsByLod);
+        }
 
-            var meshCountInLods = model.ModelList.Select(x => x.Count()).ToArray();
-            wsMaterialProvider.ValidateWsModelMaterial(meshCountInLods);
+        public List<Rmv2LodNode> CreateModelNodesFromAsset(ResolvedModelAsset asset, string modelFullPath, bool onlyLoadRootNode)
+        {
+            ArgumentNullException.ThrowIfNull(asset);
+            LogResolutionDiagnostics(asset.Diagnostics);
+            return CreateModelNodes(asset.Model, modelFullPath, onlyLoadRootNode, asset.PartsByLod);
+        }
 
+        private List<Rmv2LodNode> CreateModelNodes(
+            RmvFile model,
+            string modelFullPath,
+            bool onlyLoadRootNode,
+            IReadOnlyList<IReadOnlyList<ResolvedModelPart>> resolvedPartsByLod)
+        {
             var output = new List<Rmv2LodNode>();
             for (var lodIndex = 0; lodIndex < model.Header.LodCount; lodIndex++)
             {
@@ -48,7 +61,12 @@ namespace GameWorld.Core.SceneNodes
                     var rmvModel = model.ModelList[lodIndex][modelIndex];
                     var geometry = _meshBuilderService.BuildMeshFromRmvModel(rmvModel, model.Header.SkeletonName);
 
-                    var shader = wsMaterialProvider.ConstructMaterial(lodIndex, modelIndex, rmvModel.Material);
+                    var resolvedPart = resolvedPartsByLod.Count > lodIndex && resolvedPartsByLod[lodIndex].Count > modelIndex
+                        ? resolvedPartsByLod[lodIndex][modelIndex]
+                        : null;
+                    var shader = resolvedPart == null
+                        ? _capabilityMaterialFactory.Create(rmvModel.Material)
+                        : _capabilityMaterialFactory.Create(resolvedPart.Material.SourceMaterial, resolvedPart.Material.WsModelMaterial);
     
                     // This if statement is for Pharaoh Total War, the base game models do not have a model name by default so I am grabbing it
                     // from the model file path.
@@ -68,7 +86,12 @@ namespace GameWorld.Core.SceneNodes
 
             return output;
         }
+
+        private void LogResolutionDiagnostics(IReadOnlyList<string> diagnostics)
+        {
+            foreach (var diagnostic in diagnostics)
+                _logger.Here().Warning(diagnostic);
+        }
     }
 }
-
 

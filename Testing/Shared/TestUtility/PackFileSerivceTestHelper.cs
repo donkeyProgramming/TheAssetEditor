@@ -1,5 +1,6 @@
 ﻿using Moq;
 using Shared.Core.PackFiles;
+using Shared.Core.PackFiles.Models;
 using Shared.Core.PackFiles.Serialization.CacheDatabase;
 using Shared.Core.PackFiles.Utility;
 using Shared.Core.Services;
@@ -17,7 +18,17 @@ namespace Shared.TestUtility
             var container = loader.CreateFromSystemFolder(path);
             container.IsCaPackFile = true;
             pfs.AddContainer(container);
-            
+
+            return pfs;
+        }
+
+        public static IPackFileService CreateFromPackFile(string path, GameTypeEnum gameTypeEnum = GameTypeEnum.Warhammer3)
+        {
+            var pfs = new PackFileService(null);
+            var loader = new PackFileContainerLoader(new ApplicationSettingsService(gameTypeEnum), new Mock<IStandardDialogs>().Object, new LocalizationManager(), new PackFileContainerCacheHelper(), new SimpleSystemFolderContainerFactory());
+            var container = loader.CreateFromPackFile(PackFileContainerType.Normal, path, loadAsReadOnly: true);
+            container.IsCaPackFile = true;
+            pfs.AddContainer(container);
             return pfs;
         }
 

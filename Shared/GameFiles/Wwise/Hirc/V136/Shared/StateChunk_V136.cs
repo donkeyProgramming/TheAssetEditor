@@ -22,23 +22,27 @@ namespace Shared.GameFormats.Wwise.Hirc.V136.Shared
 
         public byte[] WriteData()
         {
-            if (StateChunks.Count != 0 || StateProps.Count != 0)
-                throw new NotSupportedException("Users probably don't need this complexity.");
-
             using var memStream = new MemoryStream();
-            memStream.Write(ByteParsers.Byte.EncodeValue((byte)StateChunks.Count, out _));
+
+            // Props before groups, the order ReadData reads them in.
             memStream.Write(ByteParsers.Byte.EncodeValue((byte)StateProps.Count, out _));
+            foreach (var stateProp in StateProps)
+                memStream.Write(stateProp.WriteData());
+
+            memStream.Write(ByteParsers.Byte.EncodeValue((byte)StateChunks.Count, out _));
+            foreach (var stateChunk in StateChunks)
+                memStream.Write(stateChunk.WriteData());
+
             return memStream.ToArray();
         }
 
         public uint GetSize()
         {
-            if (StateChunks.Count != 0 || StateProps.Count != 0)
-                throw new NotSupportedException("Users probably don't need this complexity.");
-
             var numStatePropsSize = ByteHelper.GetPropertyTypeSize(NumStateProps);
             var numStateGroupsSize = ByteHelper.GetPropertyTypeSize(NumStateGroups);
-            return numStatePropsSize + numStateGroupsSize;
+            return numStatePropsSize + numStateGroupsSize
+                + (uint)StateProps.Count * AkStatePropertyInfo_V136.Size
+                + (uint)StateChunks.Sum(x => x.GetSize());
         }
 
         public class AkStatePropertyInfo_V136
@@ -46,6 +50,8 @@ namespace Shared.GameFormats.Wwise.Hirc.V136.Shared
             public byte PropertyId { get; set; }
             public byte Type { get; set; }
             public byte InDb { get; set; }
+
+            public const uint Size = 3;
 
             public static AkStatePropertyInfo_V136 ReadData(ByteChunk chunk)
             {
@@ -55,6 +61,15 @@ namespace Shared.GameFormats.Wwise.Hirc.V136.Shared
                     Type = chunk.ReadByte(),
                     InDb = chunk.ReadByte()
                 };
+            }
+
+            public byte[] WriteData()
+            {
+                using var memStream = new MemoryStream();
+                memStream.Write(ByteParsers.Byte.EncodeValue(PropertyId, out _));
+                memStream.Write(ByteParsers.Byte.EncodeValue(Type, out _));
+                memStream.Write(ByteParsers.Byte.EncodeValue(InDb, out _));
+                return memStream.ToArray();
             }
         }
 
@@ -79,12 +94,28 @@ namespace Shared.GameFormats.Wwise.Hirc.V136.Shared
 
                 return instance;
             }
+
+            public byte[] WriteData()
+            {
+                using var memStream = new MemoryStream();
+                memStream.Write(ByteParsers.UInt32.EncodeValue(StateGroupId, out _));
+                memStream.Write(ByteParsers.Byte.EncodeValue(StateSyncType, out _));
+                memStream.Write(ByteParsers.Byte.EncodeValue((byte)States.Count, out _));
+                foreach (var state in States)
+                    memStream.Write(state.WriteData());
+                return memStream.ToArray();
+            }
+
+            // 4 (StateGroupId) + 1 (StateSyncType) + 1 (NumStates), then the states.
+            public uint GetSize() => 6 + (uint)States.Count * AkState_V136.Size;
         }
 
         public class AkState_V136
         {
             public uint StateId { get; set; }
             public uint StateInstanceId { get; set; }
+
+            public const uint Size = 8;
 
             public static AkState_V136 ReadData(ByteChunk chunk)
             {
@@ -93,6 +124,14 @@ namespace Shared.GameFormats.Wwise.Hirc.V136.Shared
                     StateId = chunk.ReadUInt32(),
                     StateInstanceId = chunk.ReadUInt32()
                 };
+            }
+
+            public byte[] WriteData()
+            {
+                using var memStream = new MemoryStream();
+                memStream.Write(ByteParsers.UInt32.EncodeValue(StateId, out _));
+                memStream.Write(ByteParsers.UInt32.EncodeValue(StateInstanceId, out _));
+                return memStream.ToArray();
             }
         }
     }

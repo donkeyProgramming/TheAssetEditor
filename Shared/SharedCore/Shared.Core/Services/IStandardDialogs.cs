@@ -8,6 +8,10 @@ namespace Shared.Core.Services
     {
         SaveDialogResult DisplaySaveDialog(IPackFileService pfs, List<string> extensions);
         BrowseDialogResultFile DisplayBrowseDialog(List<string> extensions);
+
+        /// <summary>Only shows files whose pack path also passes <paramref name="pathFilter"/>. The
+        /// extension match alone is a substring match, so ".dat" also shows ".data" files.</summary>
+        BrowseDialogResultFile DisplayBrowseDialog(List<string> extensions, Func<string, bool>? pathFilter);
         BrowseDialogResultFolder DisplayBrowseFolderDialog();
         SystemOpenFileDialogResult ShowSystemOpenFileDialog(bool multiselect = false, string filter = "All files|*.*");
         SystemSaveFileDialogResult ShowSystemSaveFileDialog(string initialFileName, string filter, string defaultExt);

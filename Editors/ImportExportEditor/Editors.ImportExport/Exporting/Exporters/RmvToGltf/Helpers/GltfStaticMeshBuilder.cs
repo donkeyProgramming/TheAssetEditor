@@ -1,7 +1,9 @@
 using System.IO;
 using System.Numerics;
 using Editors.ImportExport.Common;
+using GameWorld.Core.Services;
 using Shared.GameFormats.RigidModel;
+using Shared.GameFormats.RigidModel.Types;
 using SharpGLTF.Geometry;
 using SharpGLTF.Geometry.VertexTypes;
 using SharpGLTF.Materials;
@@ -12,6 +14,16 @@ namespace Editors.ImportExport.Exporting.Exporters.RmvToGltf.Helpers
     public class GltfStaticMeshBuilder
     {
         public List<IMeshBuilder<MaterialBuilder>> Build(RmvFile rmv2, List<TextureResult> textures, RmvToGltfExporterSettings settings)
+            => Build(rmv2, textures, settings, null);
+
+        public List<IMeshBuilder<MaterialBuilder>> Build(ResolvedModelAsset asset, List<TextureResult> textures, RmvToGltfExporterSettings settings)
+            => Build(asset.Model, textures, settings, asset.FirstLod.Select(x => x.Material).ToArray());
+
+        private List<IMeshBuilder<MaterialBuilder>> Build(
+            RmvFile rmv2,
+            List<TextureResult> textures,
+            RmvToGltfExporterSettings settings,
+            IReadOnlyList<ResolvedModelMaterial>? effectiveMaterials)
         {
             var lodLevel = rmv2.ModelList.First();
 
@@ -20,7 +32,16 @@ namespace Editors.ImportExport.Exporting.Exporters.RmvToGltf.Helpers
             {
                 var rmvMesh = lodLevel[i];
                 var meshTextures = textures.Where(x => x.MeshIndex == i).ToList();
-                var gltfMaterial = Create(settings, rmvMesh.Material.ModelName + "_Material", meshTextures);
+                var effectiveMaterial = effectiveMaterials != null && i < effectiveMaterials.Count ? effectiveMaterials[i] : null;
+                // Masks are exported as auxiliary files, not glTF channels, but
+                // still participate in the existing masked-material heuristic.
+                // Prefer the effective material so an explicit empty WSModel
+                // mask override is not replaced by the RMV fallback.
+                var maskTexturePath = effectiveMaterial != null
+                    ? effectiveMaterial.GetTexture(TextureType.Mask)
+                    : rmvMesh.Material.GetTexture(TextureType.Mask)?.Path;
+                var hasMaskTexture = !string.IsNullOrWhiteSpace(maskTexturePath);
+                var gltfMaterial = Create(settings, rmvMesh.Material.ModelName + "_Material", meshTextures, effectiveMaterial, hasMaskTexture);
                 var gltfMesh = GenerateStaticMesh(rmvMesh.Mesh, rmvMesh.Material.ModelName, gltfMaterial, settings.MirrorMesh);
                 meshes.Add(gltfMesh);
             }
@@ -113,7 +134,7 @@ namespace Editors.ImportExport.Exporting.Exporters.RmvToGltf.Helpers
                 tangentXYZ = Vector3.Normalize(tangentXYZ);
             }
 
-            // Ensure tangent handedness is valid (W should be ±1, typically 1 for right-handed)
+            // Ensure tangent handedness is valid (W should be -1, typically 1 for right-handed)
             float handedness = tangent.W;
             if (Math.Abs(handedness) < 0.5f)
             {
@@ -144,7 +165,12 @@ namespace Editors.ImportExport.Exporting.Exporters.RmvToGltf.Helpers
             return Vector3.Normalize(tangent);
         }
 
-        MaterialBuilder Create(RmvToGltfExporterSettings settings, string materialName, List<TextureResult> texturesForModel)
+        MaterialBuilder Create(
+            RmvToGltfExporterSettings settings,
+            string materialName,
+            List<TextureResult> texturesForModel,
+            ResolvedModelMaterial? effectiveMaterial = null,
+            bool hasMaskTexture = false)
         {
             // Option 4: Material Enhancement with proper PBR setup
             var material = new MaterialBuilder(materialName)
@@ -155,7 +181,8 @@ namespace Editors.ImportExport.Exporting.Exporters.RmvToGltf.Helpers
             bool hasAlphaMaskedTexture = texturesForModel.Any(t => t.HasAlphaChannel);
             bool hasMaskInName = texturesForModel.Any(t => 
                 t.SystemFilePath.Contains("mask", StringComparison.OrdinalIgnoreCase) ||
-                t.SystemFilePath.Contains("_m.", StringComparison.OrdinalIgnoreCase));
+                t.SystemFilePath.Contains("_m.", StringComparison.OrdinalIgnoreCase))
+                || hasMaskTexture;
             bool hasTransparency = texturesForModel.Any(t => 
                 t.SystemFilePath.Contains("alpha", StringComparison.OrdinalIgnoreCase) ||
                 t.SystemFilePath.Contains("transparent", StringComparison.OrdinalIgnoreCase));
@@ -171,7 +198,11 @@ namespace Editors.ImportExport.Exporting.Exporters.RmvToGltf.Helpers
                                      materialName.Contains("chain", StringComparison.OrdinalIgnoreCase);
 
             // Set appropriate alpha mode
-            if (hasTransparency)
+            if (effectiveMaterial?.HasExplicitAlpha == true)
+            {
+                material.WithAlpha(effectiveMaterial.Alpha ? AlphaMode.MASK : AlphaMode.OPAQUE);
+            }
+            else if (hasTransparency)
             {
                 material.WithAlpha(AlphaMode.BLEND);
             }

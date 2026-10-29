@@ -1,28 +1,57 @@
 using System.IO;
+using System.Security.Cryptography;
+using System.Text;
 using Editors.ImportExport.Exporting.Exporters.DdsToMaterialPng;
 using Editors.ImportExport.Exporting.Exporters.DdsToNormalPng;
+using GameWorld.Core.Services;
 using Shared.GameFormats.RigidModel;
 using Shared.GameFormats.RigidModel.Types;
 using Shared.Core.PackFiles;
+using Editors.ImportExport.Misc;
 using SharpGLTF.Materials;
 
 namespace Editors.ImportExport.Exporting.Exporters.RmvToGltf.Helpers
 {
-    public record TextureResult(int MeshIndex, string SystemFilePath, KnownChannel GlftTexureType, bool HasAlphaChannel = false);
+    public record TextureResult(
+        int MeshIndex,
+        string SystemFilePath,
+        KnownChannel GlftTexureType,
+        bool HasAlphaChannel = false);
     public record MaskTextureResult(int MeshIndex, string SystemFilePath);
+
+    /// <summary>
+    /// Conversion cache owned by one export operation.  Composed VMD exports
+    /// share this instance across all component models so the same source is
+    /// converted once and different source paths with the same basename get
+    /// distinct output files.
+    /// </summary>
+    public sealed class GltfTextureExportSession
+    {
+        public GltfTextureExportSession(bool collisionSafe = true)
+        {
+            CollisionSafe = collisionSafe;
+        }
+
+        internal Dictionary<string, string> ExportedTextures { get; } = new(StringComparer.OrdinalIgnoreCase);
+        internal bool CollisionSafe { get; }
+    }
 
     public interface IGltfTextureHandler
     {
         public List<TextureResult> HandleTextures(RmvFile rmvFile, RmvToGltfExporterSettings settings);
+        public List<TextureResult> HandleTextures(ResolvedModelAsset asset, RmvToGltfExporterSettings settings)
+            => HandleTextures(asset.Model, settings);
+        public List<TextureResult> HandleTextures(ResolvedModelAsset asset, RmvToGltfExporterSettings settings, GltfTextureExportSession session)
+            => HandleTextures(asset, settings);
     }
 
     public class GltfTextureHandler : IGltfTextureHandler
     {
         private readonly IDdsToNormalPngExporter _ddsToNormalPngExporter;
         private readonly IDdsToMaterialPngExporter _ddsToMaterialPngExporter;
-        private readonly IPackFileService _packFileService;
+        private readonly IPackFileService? _packFileService;
 
-        public GltfTextureHandler(IDdsToNormalPngExporter ddsToNormalPngExporter, IDdsToMaterialPngExporter ddsToMaterialPngExporter, IPackFileService packFileService = null)
+        public GltfTextureHandler(IDdsToNormalPngExporter ddsToNormalPngExporter, IDdsToMaterialPngExporter ddsToMaterialPngExporter, IPackFileService? packFileService = null)
         {
             _ddsToNormalPngExporter = ddsToNormalPngExporter;
             _ddsToMaterialPngExporter = ddsToMaterialPngExporter;
@@ -37,7 +66,7 @@ namespace Editors.ImportExport.Exporting.Exporters.RmvToGltf.Helpers
             if (!settings.ExportMaterials)
                 return output;
 
-            var exportedTextures = new Dictionary<string, string>();    // To avoid exporting same texture multiple times
+            var session = new GltfTextureExportSession(collisionSafe: false);
 
             int lodICounnt = 1;
             for (var lodIndex = 0; lodIndex < lodICounnt; lodIndex++)
@@ -49,25 +78,42 @@ namespace Editors.ImportExport.Exporting.Exporters.RmvToGltf.Helpers
 
                     foreach (var tex in textures)
                     {
-                        switch (tex.Type)
-                        {
-                            case TextureType.Normal: DoTextureConversionNormalMap(settings, output, exportedTextures, meshIndex, tex); break;
-                            case TextureType.MaterialMap: DoTextureConversionMaterialMap(settings, output, exportedTextures, meshIndex, tex); break;
-                            case TextureType.BaseColour: 
-                            case TextureType.Diffuse: 
-                                DoTextureDefault(KnownChannel.BaseColor, settings, output, exportedTextures, meshIndex, tex);
-                                break;
-                            case TextureType.Mask: DoTextureMask(settings, output, exportedTextures, meshIndex, tex); break;
-                            case TextureType.Specular: DoTextureDefault(KnownChannel.SpecularColor, settings, output, exportedTextures, meshIndex, tex); break;
-                            case TextureType.Gloss: DoTextureDefault(KnownChannel.MetallicRoughness, settings, output, exportedTextures, meshIndex, tex); break;
-                            case TextureType.Ambient_occlusion: DoTextureDefault(KnownChannel.Occlusion, settings, output, exportedTextures, meshIndex, tex); break;
-                            case TextureType.Emissive: DoTextureDefault(KnownChannel.Emissive, settings, output, exportedTextures, meshIndex, tex); break;
-                            case TextureType.EmissiveDistortion: DoTextureDefault(KnownChannel.Emissive, settings, output, exportedTextures, meshIndex, tex); break;
-                        }
+                        HandleTexture(settings, output, session, meshIndex, tex);
                     }
                 }
 
 
+            }
+
+            return output;
+        }
+
+        /// <summary>
+        /// Exports textures from the effective material for each LOD0 part.  A
+        /// resolved WSModel material contains only its overrides; the resolver
+        /// has already merged those values with the RMV2 material, matching the
+        /// viewport's fallback behavior.
+        /// </summary>
+        public List<TextureResult> HandleTextures(ResolvedModelAsset asset, RmvToGltfExporterSettings settings)
+            => HandleTextures(asset, settings, new GltfTextureExportSession(collisionSafe: false));
+
+        public List<TextureResult> HandleTextures(ResolvedModelAsset asset, RmvToGltfExporterSettings settings, GltfTextureExportSession session)
+        {
+            var output = new List<TextureResult>();
+
+            if (!settings.ExportMaterials)
+                return output;
+
+            foreach (var part in asset.FirstLod)
+            {
+                foreach (var texture in part.Material.Textures)
+                {
+                    if (string.IsNullOrWhiteSpace(texture.Value))
+                        continue;
+
+                    var input = new MaterialBuilderTextureInput(texture.Value, texture.Key);
+                    HandleTexture(settings, output, session, part.PartIndex, input);
+                }
             }
 
             return output;
@@ -90,37 +136,139 @@ namespace Editors.ImportExport.Exporting.Exporters.RmvToGltf.Helpers
 
         record MaterialBuilderTextureInput(string Path, TextureType Type);
 
-        private void DoTextureConversionMaterialMap(RmvToGltfExporterSettings settings, List<TextureResult> output, Dictionary<string, string> exportedTextures, int meshIndex, MaterialBuilderTextureInput text)
-        {
-            if (exportedTextures.ContainsKey(text.Path) == false)
-                exportedTextures[text.Path] = _ddsToMaterialPngExporter.Export(text.Path, settings.OutputPath, settings.ConvertMaterialTextureToBlender);
+        private static string CacheKey(MaterialBuilderTextureInput texture, string conversion, bool option = false)
+            => $"{NormalizeTexturePath(texture.Path)}|{conversion}|{option}";
 
-            var systemPath = exportedTextures[text.Path];
-            if (systemPath != null)
+        private static string NormalizeTexturePath(string path)
+            => path.Replace('\\', '/').Trim().ToLowerInvariant();
+
+        private static string FinalizeTexturePath(
+            GltfTextureExportSession session,
+            string cacheKey,
+            string sourcePath,
+            string? exportedPath)
+        {
+            if (string.IsNullOrWhiteSpace(exportedPath) || !session.CollisionSafe)
+                return exportedPath ?? string.Empty;
+
+            var directory = Path.GetDirectoryName(exportedPath) ?? string.Empty;
+            var extension = Path.GetExtension(exportedPath);
+            var stem = Path.GetFileNameWithoutExtension(exportedPath);
+            var hash = Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(
+                $"{NormalizeTexturePath(sourcePath)}|{cacheKey}"))).ToLowerInvariant()[..10];
+            var targetPath = Path.Combine(directory, $"{stem}_{hash}{extension}");
+
+            // The DDS exporters choose their own basename. Move the completed
+            // file immediately so a later component with the same basename
+            // cannot overwrite it. Mocks may return a path without a file;
+            // returning the deterministic target still keeps glTF references
+            // distinct in those cases.
+            if (!string.Equals(exportedPath, targetPath, StringComparison.OrdinalIgnoreCase)
+                && File.Exists(exportedPath))
+            {
+                if (File.Exists(targetPath))
+                    File.Delete(targetPath);
+                File.Move(exportedPath, targetPath);
+            }
+
+            return targetPath;
+        }
+
+        private static string GetCollisionSafeStem(
+            GltfTextureExportSession session,
+            string cacheKey,
+            string sourcePath,
+            string stem)
+        {
+            if (!session.CollisionSafe)
+                return stem;
+
+            var hash = Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(
+                $"{NormalizeTexturePath(sourcePath)}|{cacheKey}"))).ToLowerInvariant()[..10];
+            return $"{stem}_{hash}";
+        }
+
+        private void HandleTexture(
+            RmvToGltfExporterSettings settings,
+            List<TextureResult> output,
+            GltfTextureExportSession session,
+            int meshIndex,
+            MaterialBuilderTextureInput texture)
+        {
+            switch (texture.Type)
+            {
+                case TextureType.Normal:
+                    DoTextureConversionNormalMap(settings, output, session, meshIndex, texture);
+                    break;
+                case TextureType.MaterialMap:
+                    DoTextureConversionMaterialMap(settings, output, session, meshIndex, texture);
+                    break;
+                case TextureType.BaseColour:
+                case TextureType.Diffuse:
+                    DoTextureDefault(KnownChannel.BaseColor, settings, output, session, meshIndex, texture);
+                    break;
+                case TextureType.Mask:
+                    DoTextureMask(settings, session, texture);
+                    break;
+                case TextureType.Specular:
+                    DoTextureDefault(KnownChannel.SpecularColor, settings, output, session, meshIndex, texture);
+                    break;
+                case TextureType.Gloss:
+                    DoTextureDefault(KnownChannel.MetallicRoughness, settings, output, session, meshIndex, texture);
+                    break;
+                case TextureType.Ambient_occlusion:
+                    DoTextureDefault(KnownChannel.Occlusion, settings, output, session, meshIndex, texture);
+                    break;
+                case TextureType.Emissive:
+                case TextureType.EmissiveDistortion:
+                    DoTextureDefault(KnownChannel.Emissive, settings, output, session, meshIndex, texture);
+                    break;
+            }
+        }
+
+        private void DoTextureConversionMaterialMap(RmvToGltfExporterSettings settings, List<TextureResult> output, GltfTextureExportSession session, int meshIndex, MaterialBuilderTextureInput text)
+        {
+            var cacheKey = CacheKey(text, "material", settings.ConvertMaterialTextureToBlender);
+            if (session.ExportedTextures.ContainsKey(cacheKey) == false)
+            {
+                var exportedPath = _ddsToMaterialPngExporter.Export(text.Path, settings.OutputPath, settings.ConvertMaterialTextureToBlender);
+                session.ExportedTextures[cacheKey] = FinalizeTexturePath(session, cacheKey, text.Path, exportedPath);
+            }
+
+            var systemPath = session.ExportedTextures[cacheKey];
+            if (string.IsNullOrWhiteSpace(systemPath) == false)
                 output.Add(new TextureResult(meshIndex, systemPath, KnownChannel.MetallicRoughness));
         }
 
-        private void DoTextureDefault(KnownChannel textureType, RmvToGltfExporterSettings settings, List<TextureResult> output, Dictionary<string, string> exportedTextures, int meshIndex, MaterialBuilderTextureInput text)
+        private void DoTextureDefault(KnownChannel textureType, RmvToGltfExporterSettings settings, List<TextureResult> output, GltfTextureExportSession session, int meshIndex, MaterialBuilderTextureInput text)
         {
-            if (exportedTextures.ContainsKey(text.Path) == false)
+            var cacheKey = CacheKey(text, "default");
+            if (session.ExportedTextures.ContainsKey(cacheKey) == false)
             {
-                exportedTextures[text.Path] = _ddsToMaterialPngExporter.Export(text.Path, settings.OutputPath, false);
+                var exportedPath = _ddsToMaterialPngExporter.Export(text.Path, settings.OutputPath, false);
+                session.ExportedTextures[cacheKey] = FinalizeTexturePath(session, cacheKey, text.Path, exportedPath);
 
                 // For 3D printing: Export alpha channel as a separate mask for base color/diffuse
                 if (settings.ExportDisplacementMaps && textureType == KnownChannel.BaseColor)
                 {
-                    ExportAlphaMask(text.Path, settings.OutputPath);
+                    ExportAlphaMask(
+                        text.Path,
+                        settings.OutputPath,
+                        session.CollisionSafe
+                            ? GetCollisionSafeStem(session, cacheKey, text.Path, Path.GetFileNameWithoutExtension(text.Path))
+                            : null);
                 }
             }
 
-            var systemPath = exportedTextures[text.Path];
-            if (systemPath != null)
-                output.Add(new TextureResult(meshIndex, systemPath, textureType, false));
+            var systemPath = session.ExportedTextures[cacheKey];
+            if (string.IsNullOrWhiteSpace(systemPath) == false)
+                output.Add(new TextureResult(meshIndex, systemPath, textureType));
         }
 
-        private void DoTextureMask(RmvToGltfExporterSettings settings, List<TextureResult> output, Dictionary<string, string> exportedTextures, int meshIndex, MaterialBuilderTextureInput text)
+        private void DoTextureMask(RmvToGltfExporterSettings settings, GltfTextureExportSession session, MaterialBuilderTextureInput text)
         {
-            if (exportedTextures.ContainsKey(text.Path) == false)
+            var cacheKey = CacheKey(text, "mask");
+            if (session.ExportedTextures.ContainsKey(cacheKey) == false)
             {
                 // Export mask as separate PNG - name it with _mask suffix for clarity
                 var exportedPath = _ddsToMaterialPngExporter.Export(text.Path, settings.OutputPath, false);
@@ -130,10 +278,11 @@ namespace Editors.ImportExport.Exporting.Exporters.RmvToGltf.Helpers
                     // Invert the mask values for proper alpha channel usage
                     // Game masks are often inverted (black=show, white=hide)
                     // Alpha channels need (black=transparent, white=opaque)
-                    InvertMaskImage(exportedPath);
+                    if (File.Exists(exportedPath))
+                        InvertMaskImage(exportedPath);
 
                     // Rename to have _mask suffix
-                    var directory = Path.GetDirectoryName(exportedPath);
+                    var directory = Path.GetDirectoryName(exportedPath) ?? string.Empty;
                     var fileNameWithoutExt = Path.GetFileNameWithoutExtension(exportedPath);
                     var newFileName = fileNameWithoutExt + "_mask.png";
                     var newPath = Path.Combine(directory, newFileName);
@@ -147,16 +296,14 @@ namespace Editors.ImportExport.Exporting.Exporters.RmvToGltf.Helpers
                     }
                 }
 
-                exportedTextures[text.Path] = exportedPath;
+                session.ExportedTextures[cacheKey] = FinalizeTexturePath(session, cacheKey, text.Path, exportedPath);
             }
 
-            var systemPath = exportedTextures[text.Path];
-            if (systemPath != null)
-            {
-                // Export mask as a regular texture - user will connect it manually in Blender
-                // We'll add it as a separate texture that doesn't get auto-connected but is available
-                output.Add(new TextureResult(meshIndex, systemPath, KnownChannel.BaseColor, false));
-            }
+            // The mask is an auxiliary/manual export. There is no standard
+            // glTF material channel for this RMV texture type, so do not expose
+            // it as BaseColor: doing so would replace the actual diffuse/base-
+            // colour image when both textures are present. The converted PNG
+            // remains available at the cached path for manual downstream use.
         }
 
         private void InvertMaskImage(string imagePath)
@@ -175,54 +322,57 @@ namespace Editors.ImportExport.Exporting.Exporters.RmvToGltf.Helpers
             using var imageStream = new MemoryStream(imageBytes);
             using var image = System.Drawing.Image.FromStream(imageStream);
             using var bitmap = new System.Drawing.Bitmap(image);
+            var pixels = BitmapPixelBuffer.ReadBgra(bitmap);
 
             // Invert all pixel values (255 - value)
-            for (int x = 0; x < bitmap.Width; x++)
+            for (var index = 0; index < pixels.Length; index += 4)
             {
-                for (int y = 0; y < bitmap.Height; y++)
-                {
-                    var pixel = bitmap.GetPixel(x, y);
-                    var invertedR = 255 - pixel.R;
-                    var invertedG = 255 - pixel.G;
-                    var invertedB = 255 - pixel.B;
-                    var invertedColor = System.Drawing.Color.FromArgb(pixel.A, invertedR, invertedG, invertedB);
-                    bitmap.SetPixel(x, y, invertedColor);
-                }
+                pixels[index] = (byte)(255 - pixels[index]);
+                pixels[index + 1] = (byte)(255 - pixels[index + 1]);
+                pixels[index + 2] = (byte)(255 - pixels[index + 2]);
             }
 
+            BitmapPixelBuffer.WriteBgra(bitmap, pixels);
             // Save back to the same file
             bitmap.Save(imagePath, System.Drawing.Imaging.ImageFormat.Png);
         }
 
-        private void DoTextureConversionNormalMap(RmvToGltfExporterSettings settings, List<TextureResult> output, Dictionary<string, string> exportedTextures, int meshIndex, MaterialBuilderTextureInput text)
+        private void DoTextureConversionNormalMap(RmvToGltfExporterSettings settings, List<TextureResult> output, GltfTextureExportSession session, int meshIndex, MaterialBuilderTextureInput text)
         {
-            if (exportedTextures.ContainsKey(text.Path) == false)
+            var cacheKey = CacheKey(text, "normal", settings.ConvertNormalTextureToBlue || settings.ExportDisplacementMaps);
+            if (session.ExportedTextures.ContainsKey(cacheKey) == false)
             {
                 // Only export displacement maps for 3D printing workflow
                 if (settings.ExportDisplacementMaps)
                 {
                     // Export normal map variants with proper YCoCg decoding
-                    ExportNormalMapVariants(text.Path, settings.OutputPath);
-                    ExportDisplacementFromNormalMap(text.Path, settings.OutputPath, settings);
+                    var outputStem = session.CollisionSafe
+                        ? GetCollisionSafeStem(session, cacheKey, text.Path, Path.GetFileNameWithoutExtension(text.Path))
+                        : Path.GetFileNameWithoutExtension(text.Path);
+                    ExportNormalMapVariants(text.Path, settings.OutputPath, outputStem);
+                    ExportDisplacementFromNormalMap(text.Path, settings.OutputPath, settings, outputStem);
 
                     // Set the path to the raw normal map
-                    var fileName = Path.GetFileNameWithoutExtension(text.Path);
-                    var outDirectory = Path.GetDirectoryName(settings.OutputPath);
-                    exportedTextures[text.Path] = Path.Combine(outDirectory, fileName + "_raw.png");
+                    var outDirectory = Path.GetDirectoryName(settings.OutputPath) ?? string.Empty;
+                    var rawNormalPath = Path.Combine(outDirectory, outputStem + "_raw.png");
+                    session.ExportedTextures[cacheKey] = session.CollisionSafe
+                        ? rawNormalPath
+                        : FinalizeTexturePath(session, cacheKey, text.Path, rawNormalPath);
                 }
                 else
                 {
                     // Regular export: use the standard DDS to PNG exporter
-                    exportedTextures[text.Path] = _ddsToNormalPngExporter.Export(text.Path, settings.OutputPath, settings.ConvertNormalTextureToBlue);
+                    var exportedPath = _ddsToNormalPngExporter.Export(text.Path, settings.OutputPath, settings.ConvertNormalTextureToBlue);
+                    session.ExportedTextures[cacheKey] = FinalizeTexturePath(session, cacheKey, text.Path, exportedPath);
                 }
             }
 
-            var systemPath = exportedTextures[text.Path];
-            if (systemPath != null)
+            var systemPath = session.ExportedTextures[cacheKey];
+            if (string.IsNullOrWhiteSpace(systemPath) == false)
                 output.Add(new TextureResult(meshIndex, systemPath, KnownChannel.Normal));
         }
 
-        private void ExportNormalMapVariants(string packFilePath, string outputPath)
+        private void ExportNormalMapVariants(string packFilePath, string outputPath, string? outputStem = null)
         {
             if (_packFileService == null)
                 return;
@@ -231,8 +381,8 @@ namespace Editors.ImportExport.Exporting.Exporters.RmvToGltf.Helpers
             if (packFile == null)
                 return;
 
-            var fileName = Path.GetFileNameWithoutExtension(packFilePath);
-            var outDirectory = Path.GetDirectoryName(outputPath);
+            var fileName = outputStem ?? Path.GetFileNameWithoutExtension(packFilePath);
+            var outDirectory = Path.GetDirectoryName(outputPath) ?? string.Empty;
 
             var bytes = packFile.DataSource.ReadData();
             if (bytes != null && bytes.Any())
@@ -242,7 +392,7 @@ namespace Editors.ImportExport.Exporting.Exporters.RmvToGltf.Helpers
             }
         }
 
-        private void ExportAlphaMask(string packFilePath, string outputPath)
+        private void ExportAlphaMask(string packFilePath, string outputPath, string? outputStem = null)
         {
             if (_packFileService == null)
                 return;
@@ -251,8 +401,8 @@ namespace Editors.ImportExport.Exporting.Exporters.RmvToGltf.Helpers
             if (packFile == null)
                 return;
 
-            var fileName = Path.GetFileNameWithoutExtension(packFilePath);
-            var outDirectory = Path.GetDirectoryName(outputPath);
+            var fileName = outputStem ?? Path.GetFileNameWithoutExtension(packFilePath);
+            var outDirectory = Path.GetDirectoryName(outputPath) ?? string.Empty;
 
             var bytes = packFile.DataSource.ReadData();
             if (bytes == null || !bytes.Any())
@@ -299,10 +449,21 @@ namespace Editors.ImportExport.Exporting.Exporters.RmvToGltf.Helpers
             maskBitmap.Save(maskPath, System.Drawing.Imaging.ImageFormat.Png);
         }
 
-        public void ExportDisplacementFromNormalMap(string normalMapPath, string outputPath, RmvToGltfExporterSettings settings)
+        // Preserve the original public signature for existing callers.
+        public void ExportDisplacementFromNormalMap(
+            string normalMapPath,
+            string outputPath,
+            RmvToGltfExporterSettings settings)
+            => ExportDisplacementFromNormalMap(normalMapPath, outputPath, settings, null);
+
+        public void ExportDisplacementFromNormalMap(
+            string normalMapPath,
+            string outputPath,
+            RmvToGltfExporterSettings settings,
+            string? outputStem)
         {
-            var fileName = Path.GetFileNameWithoutExtension(normalMapPath);
-            var outDirectory = Path.GetDirectoryName(outputPath);
+            var fileName = outputStem ?? Path.GetFileNameWithoutExtension(normalMapPath);
+            var outDirectory = Path.GetDirectoryName(outputPath) ?? string.Empty;
 
             if (_packFileService == null)
                 return;

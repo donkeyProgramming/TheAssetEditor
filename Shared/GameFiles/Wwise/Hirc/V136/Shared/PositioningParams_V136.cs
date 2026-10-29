@@ -43,24 +43,56 @@ namespace Shared.GameFormats.Wwise.Hirc.V136.Shared
             }
         }
 
+        // Mirrors ReadData's branching exactly: the 3D byte is only present when positioning and
+        // 3D are both set, and the automation block only when the position type is non-zero.
+        bool HasPositioning => (BitsPositioning >> 0 & 1) == 1;
+        bool Has3D => (BitsPositioning >> 1 & 1) == 1;
+        bool HasBits3D => HasPositioning && Has3D;
+        bool HasAutomation => HasBits3D && (BitsPositioning >> 5 & 3) != 0;
+
         public byte[] WriteData()
         {
-            if (BitsPositioning == 0x03 && Bits3D == 0x08)
-                return [0x03, 0x08];
-            else if (BitsPositioning == 0x00)
-                return [0x00];
-            else
-                throw new NotSupportedException("Users probably don't need this complexity.");
+            using var memStream = new MemoryStream();
+            memStream.Write(ByteParsers.Byte.EncodeValue(BitsPositioning, out _));
+
+            if (!HasBits3D)
+                return memStream.ToArray();
+
+            memStream.Write(ByteParsers.Byte.EncodeValue(Bits3D, out _));
+
+            if (!HasAutomation)
+                return memStream.ToArray();
+
+            memStream.Write(ByteParsers.Byte.EncodeValue(PathMode, out _));
+            memStream.Write(ByteParsers.Single.EncodeValue(TransitionTime, out _));
+
+            memStream.Write(ByteParsers.UInt32.EncodeValue((uint)VertexList.Count, out _));
+            foreach (var vertex in VertexList)
+                memStream.Write(vertex.WriteData());
+
+            memStream.Write(ByteParsers.UInt32.EncodeValue((uint)PlayListItems.Count, out _));
+            foreach (var playListItem in PlayListItems)
+                memStream.Write(playListItem.WriteData());
+
+            foreach (var param in Params)
+                memStream.Write(param.WriteData());
+
+            return memStream.ToArray();
         }
 
         public uint GetSize()
         {
-            if (BitsPositioning == 0x03 && Bits3D == 0x08)
-                return 2;
-            else if (BitsPositioning == 0x00)
+            if (!HasBits3D)
                 return 1;
-            else
-                throw new NotSupportedException("Users probably don't need this complexity.");
+            if (!HasAutomation)
+                return 2;
+
+            return 2
+                + 1 // PathMode
+                + 4 // TransitionTime
+                + 4 + (uint)VertexList.Count * AkPathVertex_V136.Size
+                + 4 + (uint)PlayListItems.Count * AkPathListItemOffset_V136.Size
+                + (uint)Params.Count * Ak3DAutomationParams_V136.Size;
         }
 
         public class AkPathVertex_V136
@@ -69,6 +101,8 @@ namespace Shared.GameFormats.Wwise.Hirc.V136.Shared
             public float Y { get; set; }
             public float Z { get; set; }
             public int Duration { get; set; }
+
+            public const uint Size = 16;
 
             public static AkPathVertex_V136 ReadData(ByteChunk chunk)
             {
@@ -80,12 +114,24 @@ namespace Shared.GameFormats.Wwise.Hirc.V136.Shared
                     Duration = chunk.ReadInt32()
                 };
             }
+
+            public byte[] WriteData()
+            {
+                using var memStream = new MemoryStream();
+                memStream.Write(ByteParsers.Single.EncodeValue(X, out _));
+                memStream.Write(ByteParsers.Single.EncodeValue(Y, out _));
+                memStream.Write(ByteParsers.Single.EncodeValue(Z, out _));
+                memStream.Write(ByteParsers.Int32.EncodeValue(Duration, out _));
+                return memStream.ToArray();
+            }
         }
 
         public class AkPathListItemOffset_V136
         {
             public uint VerticesOffset { get; set; }
             public uint NumVertices { get; set; }
+
+            public const uint Size = 8;
 
             public static AkPathListItemOffset_V136 ReadData(ByteChunk chunk)
             {
@@ -95,6 +141,14 @@ namespace Shared.GameFormats.Wwise.Hirc.V136.Shared
                     NumVertices = chunk.ReadUInt32()
                 };
             }
+
+            public byte[] WriteData()
+            {
+                using var memStream = new MemoryStream();
+                memStream.Write(ByteParsers.UInt32.EncodeValue(VerticesOffset, out _));
+                memStream.Write(ByteParsers.UInt32.EncodeValue(NumVertices, out _));
+                return memStream.ToArray();
+            }
         }
 
         public class Ak3DAutomationParams_V136
@@ -102,6 +156,8 @@ namespace Shared.GameFormats.Wwise.Hirc.V136.Shared
             public float X { get; set; }
             public float Y { get; set; }
             public float Z { get; set; }
+
+            public const uint Size = 12;
 
             public static Ak3DAutomationParams_V136 ReadData(ByteChunk chunk)
             {
@@ -111,6 +167,15 @@ namespace Shared.GameFormats.Wwise.Hirc.V136.Shared
                     Y = chunk.ReadSingle(),
                     Z = chunk.ReadSingle()
                 };
+            }
+
+            public byte[] WriteData()
+            {
+                using var memStream = new MemoryStream();
+                memStream.Write(ByteParsers.Single.EncodeValue(X, out _));
+                memStream.Write(ByteParsers.Single.EncodeValue(Y, out _));
+                memStream.Write(ByteParsers.Single.EncodeValue(Z, out _));
+                return memStream.ToArray();
             }
         }
     }

@@ -22,11 +22,35 @@ namespace Shared.GameFormats.Wwise.Hirc.V136
             //   node[5]          ch=0    // parent: [0]
             //   node[6]          ch=1    // parent: [0]
             //     node[7]        ch=0    // parent: [6]
-            PlayList.Add(AkMusicRanSeqPlaylistItem_V136.ReadData(chunk));
+            //
+            // NumPlaylistItems counts every node in that flat run, not just the roots, so reading
+            // the root recursively consumes exactly the whole run. A container with no playlist at
+            // all has no root to read.
+            if (NumPlaylistItems > 0)
+                PlayList.Add(AkMusicRanSeqPlaylistItem_V136.ReadData(chunk));
         }
 
-        public override byte[] WriteData() => throw new NotSupportedException("Users probably don't need this complexity.");
-        public override void UpdateSectionSize() => throw new NotSupportedException("Users probably don't need this complexity.");
+        public override byte[] WriteData()
+        {
+            var memStream = WriteHeader();
+            memStream.Write(MusicTransNodeParams.WriteData());
+            memStream.Write(ByteParsers.UInt32.EncodeValue(CountPlaylistItems(), out _));
+            foreach (var playlistItem in PlayList)
+                memStream.Write(playlistItem.WriteData());
+            return memStream.ToArray();
+        }
+
+        public override void UpdateSectionSize()
+        {
+            var size = MusicTransNodeParams.GetSize()
+                + 4 // NumPlaylistItems
+                + CountPlaylistItems() * AkMusicRanSeqPlaylistItem_V136.Size;
+
+            SectionSize = size + ByteHelper.GetPropertyTypeSize(Id);
+        }
+
+        // Every node in the flattened run, not just the roots - see ReadData.
+        private uint CountPlaylistItems() => (uint)PlayList.Sum(playlistItem => playlistItem.CountSelfAndDescendants());
 
         public class AkMusicRanSeqPlaylistItem_V136
         {
@@ -42,6 +66,9 @@ namespace Shared.GameFormats.Wwise.Hirc.V136
             public byte IsUsingWeight { get; set; }
             public byte IsShuffle { get; set; }
             public List<AkMusicRanSeqPlaylistItem_V136> PlayList { get; set; } = [];
+
+            // 4 + 4 + 4 + 4 + 2 + 2 + 2 + 4 + 2 + 1 + 1, children excluded
+            public const uint Size = 30;
 
             public static AkMusicRanSeqPlaylistItem_V136 ReadData(ByteChunk chunk)
             {
@@ -65,6 +92,29 @@ namespace Shared.GameFormats.Wwise.Hirc.V136
 
                 return akMusicRanSeqPlaylistItem;
             }
+
+            public byte[] WriteData()
+            {
+                using var memStream = new MemoryStream();
+                memStream.Write(ByteParsers.UInt32.EncodeValue(SegmentId, out _));
+                memStream.Write(ByteParsers.Int32.EncodeValue(PlaylistItemId, out _));
+                memStream.Write(ByteParsers.UInt32.EncodeValue((uint)PlayList.Count, out _));
+                memStream.Write(ByteParsers.UInt32.EncodeValue(RsType, out _));
+                memStream.Write(ByteParsers.Short.EncodeValue(Loop, out _));
+                memStream.Write(ByteParsers.Short.EncodeValue(LoopMin, out _));
+                memStream.Write(ByteParsers.Short.EncodeValue(LoopMax, out _));
+                memStream.Write(ByteParsers.UInt32.EncodeValue(Weight, out _));
+                memStream.Write(ByteParsers.UShort.EncodeValue(AvoidRepeatCount, out _));
+                memStream.Write(ByteParsers.Byte.EncodeValue(IsUsingWeight, out _));
+                memStream.Write(ByteParsers.Byte.EncodeValue(IsShuffle, out _));
+
+                foreach (var child in PlayList)
+                    memStream.Write(child.WriteData());
+
+                return memStream.ToArray();
+            }
+
+            public uint CountSelfAndDescendants() => 1 + (uint)PlayList.Sum(child => child.CountSelfAndDescendants());
         }
     }
 }

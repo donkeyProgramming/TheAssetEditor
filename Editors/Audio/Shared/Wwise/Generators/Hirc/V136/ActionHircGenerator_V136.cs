@@ -24,6 +24,8 @@ namespace Editors.Audio.Shared.Wwise.Generators.Hirc.V136
                 actionHirc.ActiveActionParams = CreateResumeActionParams();
             else if (audioProjectActionEvent.ActionType == AkActionType.Stop_E_O)
                 actionHirc.ActiveActionParams = CreateStopActionParams();
+            else if (audioProjectActionEvent.ActionType == AkActionType.SetState)
+                actionHirc.StateActionParams = CreateStateActionParams(audioProjectActionEvent.StateGroupId, audioProjectActionEvent.IdExt);
 
             actionHirc.UpdateSectionSize();
 
@@ -40,7 +42,10 @@ namespace Editors.Audio.Shared.Wwise.Generators.Hirc.V136
                 IdExt = audioProjectActionEvent.IdExt
             };
 
-            if (soundBankSubType == Wh3SoundBank.GlobalMusic)
+            // Vanilla SetState actions carry no properties at all - every culture music action in
+            // the shipped banks has both prop bundles empty - so they stay out of the global music
+            // transition-time case below.
+            if (soundBankSubType == Wh3SoundBank.GlobalMusic && audioProjectActionEvent.ActionType != AkActionType.SetState)
             {
                 action.AkPropBundle0.PropsList.Add(new PropBundleInstance_V136
                 {
@@ -58,6 +63,15 @@ namespace Editors.Audio.Shared.Wwise.Generators.Hirc.V136
             {
                 BitVector = 4,
                 BankId = bankId
+            };
+        }
+
+        private static CAkAction_V136.StateActionParams_V136 CreateStateActionParams(uint stateGroupId, uint stateId)
+        {
+            return new CAkAction_V136.StateActionParams_V136
+            {
+                StateGroupId = stateGroupId,
+                TargetStateId = stateId
             };
         }
 

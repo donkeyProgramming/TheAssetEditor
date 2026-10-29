@@ -32,6 +32,8 @@
         <ProjectReference Include="..\Editors\CscEditor\Editors.CscEditor\Editors.CscEditor.csproj" />
         <ProjectReference Include="..\Editors\VfxEditor\Editors.VfxEditor\Editors.VfxEditor.csproj" />
         <ProjectReference Include="..\Editors\CampaignAnimationSetEditor\Editors.CampaignAnimationSetEditor\Editors.CampaignAnimationSetEditor.csproj" />
+        <ProjectReference Include="..\Editors\MusicDatEditor\Editors.MusicDatEditor.csproj" />
+        <ProjectReference Include="..\Editors\MusicProjectEditor\Editors.MusicProjectEditor.csproj" />
         <ProjectReference Include="..\GameWorld\GameWorldCore\GameWorld.Core\GameWorld.Core.csproj" />
         <ProjectReference Include="..\Shared\EmbeddedResources\Shared.EmbeddedResources.csproj" />
         <ProjectReference Include="..\Shared\SharedUI\Shared.Ui\Shared.Ui.csproj" />

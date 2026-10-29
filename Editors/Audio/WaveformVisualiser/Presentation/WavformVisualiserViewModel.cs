@@ -14,6 +14,7 @@ using Editors.Audio.Shared.Wwise;
 using Editors.Audio.WaveformVisualiser.Events;
 using NAudio.Wave;
 using Shared.Core.Events;
+using Shared.Core.Misc;
 using Shared.Core.Services;
 using Shared.Ui.Common;
 
@@ -21,6 +22,8 @@ namespace Editors.Audio.WaveformVisualiser.Presentation
 {
     public partial class WaveformVisualiserViewModel : ObservableObject, IDisposable
     {
+        private readonly ILogger _logger = Logging.Create<WaveformVisualiserViewModel>();
+
         private readonly IEventHub _eventHub;
         private readonly LocalizationManager _localisationManager;
         private readonly ISoundEngine _soundEngine;
@@ -302,10 +305,19 @@ namespace Editors.Audio.WaveformVisualiser.Presentation
 
             if (_soundEngine.PlaybackState == PlaybackState.Stopped)
             {
-                if (_currentWemBytes != null)
-                    _soundEngine.LoadFromWemBytes(_currentWemBytes);
-                else
-                    _soundEngine.LoadFromFilePath(_currentFilePathKey);
+                // A file the decoder cannot read is reported rather than left to take the app down.
+                try
+                {
+                    if (_currentWemBytes != null)
+                        _soundEngine.LoadFromWemBytes(_currentWemBytes);
+                    else
+                        _soundEngine.LoadFromFilePath(_currentFilePathKey);
+                }
+                catch (Exception e)
+                {
+                    _logger.Here().Error($"Could not play '{WaveformVisualiserLabel}': {e.Message}");
+                    return;
+                }
 
                 _visualSeconds = 0;
                 CurrentPlaybackTime = TimeSpan.Zero;

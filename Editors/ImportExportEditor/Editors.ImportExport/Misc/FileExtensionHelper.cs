@@ -5,7 +5,8 @@ namespace Editors.ImportExport.Misc
     {
         public static bool IsGltfFile(string fileName)
         {            
-            return fileName.EndsWith(".gltf", StringComparison.InvariantCultureIgnoreCase);
+            return fileName.EndsWith(".gltf", StringComparison.InvariantCultureIgnoreCase) ||
+                   fileName.EndsWith(".glb", StringComparison.InvariantCultureIgnoreCase);
         }
 
         public static bool IsDdsFile(string fileName)

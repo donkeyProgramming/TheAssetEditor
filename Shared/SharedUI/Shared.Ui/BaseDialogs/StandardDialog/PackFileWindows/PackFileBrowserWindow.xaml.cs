@@ -14,12 +14,13 @@ namespace Shared.Ui.BaseDialogs.StandardDialog.PackFile
 
         public PackFileBrowserViewModel ViewModel { get; set; }
 
-        public PackFileBrowserWindow(PackFileTreeViewFactory packFileBrowserBuilder, List<string>? extensions, bool showCaFiles, bool showFoldersOnly)
+        public PackFileBrowserWindow(PackFileTreeViewFactory packFileBrowserBuilder, List<string>? extensions, bool showCaFiles, bool showFoldersOnly,
+            Func<string, bool>? pathFilter = null)
         {
             Create(packFileBrowserBuilder, showCaFiles, showFoldersOnly);
 
             if (extensions != null)
-                ViewModel.Filter.SetExtensions(extensions);
+                ViewModel.Filter.SetExtensions(extensions, pathFilter);
         }
 
         void Create(PackFileTreeViewFactory packFileBrowserBuilder, bool showCaFiles, bool showFoldersOnly)

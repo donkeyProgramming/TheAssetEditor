@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="DocumentationShared.css">
+    <script src="DocumentationShared.js" defer></script>
+</head>
+<body>
+    <h1>Exporting models to glTF and GLB</h1>
+
+    <p>AssetEditor can export <code>.rigid_model_v2</code>, <code>.wsmodel</code>, and
+    <code>.variantmeshdefinition</code> files. A VariantMeshDefinition is exported as one
+    composed scene using its first renderable/default slot choices.</p>
+
+    <h2>Export a model</h2>
+    <ol>
+        <li>Load the packs containing the model and its referenced textures, skeleton, and animations.</li>
+        <li>In the PackFile explorer, right-click the model file.</li>
+        <li>Select <b>Export &gt; Advanced Export</b>.</li>
+        <li>Select <code>Rmv_to_Gltf</code>.</li>
+        <li>Choose texture and animation options. Select the animation clips to include.</li>
+        <li>Select <b>Browse</b>, then choose glTF (<code>.gltf</code>) or Binary glTF (<code>.glb</code>) in the save dialog.</li>
+        <li>Select <b>Export</b>.</li>
+    </ol>
+
+    <p>If a <code>stand_idle</code> animation is available, it is selected by default. Use
+    <b>Select all</b>, <b>Select none</b>, or the filter box to change the selection. If the
+    panel reports that the skeleton or animations are unavailable, load the required game or
+    mod packs before reopening the export window.</p>
+
+    <h2>glTF or GLB?</h2>
+    <ul>
+        <li><b>glTF</b> writes a <code>.gltf</code> file with supporting image and buffer files. Keep the files together.</li>
+        <li><b>GLB</b> embeds the standard glTF resources in one <code>.glb</code> file. Temporary embedded texture PNGs are removed after a successful save.</li>
+    </ul>
+
+    <p>Auxiliary files made for manual workflows, such as Warhammer mask or displacement
+    images, can remain next to a GLB because they are not standard glTF material channels.</p>
+
+    <h2>What is exported</h2>
+    <ul>
+        <li>LOD0 geometry, UVs, normals, tangents, and supported material textures.</li>
+        <li>The effective WSModel material overrides used by AssetEditor, including when an RMV2 has a valid sibling WSModel.</li>
+        <li>For VMD files, nested model components, one compatible shared skeleton, and bone attachments.</li>
+        <li>Only the animation clips selected in the export panel.</li>
+    </ul>
+
+    <h2>Limitations</h2>
+    <ul>
+        <li>Only LOD0 and one default VMD composition are exported.</li>
+        <li>Total War faction tint and other custom shader effects cannot be represented exactly by standard glTF.</li>
+        <li>A Warhammer mask texture is exported as an auxiliary <code>*_mask.png</code>; it is not connected as base color or alpha.</li>
+        <li>A VMD component using a different skeleton from the shared skeleton is exported without skinning.</li>
+        <li>All referenced files must be available in the packs currently loaded by AssetEditor.</li>
+    </ul>
+
+    <h2>Viewing the result</h2>
+    <p>Open the exported file in a glTF-capable application such as Blender or the Khronos
+    glTF Sample Viewer. For <code>.gltf</code>, do not separate the main file from its sidecars.</p>
+</body>
+</html>

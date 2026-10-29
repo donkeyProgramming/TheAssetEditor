@@ -28,7 +28,11 @@ namespace Shared.GameFormats.Wwise.Hirc.V136.Shared
             memStream.Write(ByteParsers.Byte.EncodeValue(NumFx, out _));
 
             if (NumFx != 0)
-                throw new NotSupportedException("Users probably don't need this complexity.");
+            {
+                memStream.Write(ByteParsers.Byte.EncodeValue(BitsFxBypass, out _));
+                foreach (var fxChunk in FxChunk)
+                    memStream.Write(fxChunk.WriteData());
+            }
 
             return memStream.ToArray();
         }
@@ -38,10 +42,11 @@ namespace Shared.GameFormats.Wwise.Hirc.V136.Shared
             var isOverrideParentFxSize = ByteHelper.GetPropertyTypeSize(IsOverrideParentFx);
             var numFxSize = ByteHelper.GetPropertyTypeSize(NumFx);
 
-            if (NumFx != 0)
-                throw new NotSupportedException("Users probably don't need this complexity.");
+            if (NumFx == 0)
+                return isOverrideParentFxSize + numFxSize;
 
-            return isOverrideParentFxSize + numFxSize;
+            var bitsFxBypassSize = ByteHelper.GetPropertyTypeSize(BitsFxBypass);
+            return isOverrideParentFxSize + numFxSize + bitsFxBypassSize + (uint)FxChunk.Count * FxChunk_V136.Size;
         }
     }
 }

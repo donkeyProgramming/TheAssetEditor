@@ -39,6 +39,8 @@ namespace AssetEditor.Services
                 new Editors.CscEditor.DependencyInjectionContainer(),
                 new Editors.VfxEditor.DependencyInjectionContainer(),
                 new Editors.CampaignAnimationSetEditor.DependencyInjectionContainer(),
+                new Editors.MusicDatEditor.DependencyInjectionContainer(),
+                new Editors.MusicProjectEditor.DependencyInjectionContainer(),
 
                 // Host application
                 new DependencyInjectionContainer(),

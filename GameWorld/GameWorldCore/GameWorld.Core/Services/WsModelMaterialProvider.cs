@@ -8,6 +8,12 @@ using Shared.GameFormats.WsModel;
 
 namespace GameWorld.Core.Services
 {
+    /// <summary>
+    /// Compatibility adapter for older callers. New scene loading resolves
+    /// geometry and materials through <see cref="IModelAssetResolver"/> and
+    /// should not create this provider directly.
+    /// </summary>
+    [Obsolete("Use IModelAssetResolver and CapabilityMaterialFactory instead.")]
     public class WsModelMaterialProvider
     {
         private readonly IPackFileService _packFileService;
@@ -69,15 +75,15 @@ namespace GameWorld.Core.Services
         public CapabilityMaterial ConstructMaterial(int lodIndex, int partIndex, IRmvMaterial fallbackMaterial)
         {
             if (_wsModelFile == null)
-                return _materialFactory.Create(fallbackMaterial, null);
+                return CreateResolvedMaterial(fallbackMaterial, null);
 
             var materialPath = _wsModelFile.MaterialList.FirstOrDefault(x => x.LodIndex == lodIndex && x.PartIndex == partIndex);
             if (materialPath == null)
-                return _materialFactory.Create(fallbackMaterial, null);
+                return CreateResolvedMaterial(fallbackMaterial, null);
 
             var wsMaterialPath = _packFileService.FindFile(materialPath.MaterialPath);
             if (wsMaterialPath == null)
-                return _materialFactory.Create(fallbackMaterial, null);
+                return CreateResolvedMaterial(fallbackMaterial, null);
 
             var found =_materialCache.TryGetValue(materialPath.MaterialPath, out var capMaterial);
             if (found)
@@ -88,7 +94,8 @@ namespace GameWorld.Core.Services
             {
                 var mFile = new WsModelMaterialFile(wsMaterialPath);
                 var wsModelMaterial = mFile;
-                shader = _materialFactory.Create(fallbackMaterial, wsModelMaterial);
+                var resolvedMaterial = ResolvedModelMaterial.Create(fallbackMaterial, wsModelMaterial, materialPath.MaterialPath);
+                shader = _materialFactory.Create(resolvedMaterial.SourceMaterial, resolvedMaterial.WsModelMaterial);
             }
             catch (Exception e)
             {
@@ -104,7 +111,11 @@ namespace GameWorld.Core.Services
             _materialCache.Add(materialPath.MaterialPath, shader);
             return shader;
         }
+
+        private CapabilityMaterial CreateResolvedMaterial(IRmvMaterial fallbackMaterial, WsModelMaterialFile? wsModelMaterial)
+        {
+            var resolvedMaterial = ResolvedModelMaterial.Create(fallbackMaterial, wsModelMaterial);
+            return _materialFactory.Create(resolvedMaterial.SourceMaterial, resolvedMaterial.WsModelMaterial);
+        }
     }
 }
-
-
