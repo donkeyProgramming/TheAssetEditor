@@ -168,11 +168,8 @@ namespace Shared.GameFormats.Bmd
         public bool SettlementLevelConfigurable { get; set; }
         public bool HideTooltip { get; set; }
         public bool IncludeInFog { get; set; }
-        /// <summary>Version 12 on (10-11 not seen). Vanilla values like 0.43 and 0.55; possibly the building's
-        /// blend_edges_with_terrain, which props gained around the same time.</summary>
-        public float UnknownFloat { get; set; }
-        /// <summary>Version 13 on.</summary>
-        public bool UnknownFlag { get; set; }
+        public float BlendEdges { get; set; }
+        public bool ReceiveDecals { get; set; }
     }
 
     public class BattlefieldBuildingFar

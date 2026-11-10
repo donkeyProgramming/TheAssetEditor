@@ -323,9 +323,9 @@ namespace Shared.GameFormats.Bmd
                 writer.Write(Bool(properties.IncludeInFog));
             }
             if (properties.Version > 11)
-                writer.Write(properties.UnknownFloat);
+                writer.Write(properties.BlendEdges);
             if (properties.Version > 12)
-                writer.Write(Bool(properties.UnknownFlag));
+                writer.Write(Bool(properties.ReceiveDecals));
         }
 
         private static void WriteBuildingFlags(BinaryWriter writer, BuildingProperties properties)
@@ -523,14 +523,19 @@ namespace Shared.GameFormats.Bmd
                 writer.Write(Bool(prop.UsesTerrainVertexOffset));
 
             if (prop.PropInfoVersion > 25)
-            {
                 writer.Write(prop.BlendEdges);
+            if (prop.PropInfoVersion > 26)
+            {
                 writer.Write(prop.DecalFadeStart);
                 writer.Write(prop.DecalAngleThreshold);
+            }
+            if (prop.PropInfoVersion > 27)
+            {
                 writer.Write(Bool(prop.DecalMirrorX));
                 writer.Write(Bool(prop.DecalMirrorZ));
-                writer.Write(prop.DecalLayer);
             }
+            if (prop.PropInfoVersion > 28)
+                writer.Write(prop.DecalLayer);
             if (prop.PropInfoVersion > 29)
                 writer.Write(Bool(prop.DecalTilingAlpha));
         }

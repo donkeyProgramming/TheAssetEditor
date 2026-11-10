@@ -418,11 +418,11 @@ namespace Shared.GameFormats.Bmd
                 properties.HideTooltip = _reader.ReadByte() != 0;
                 properties.IncludeInFog = _reader.ReadByte() != 0;
             }
-            // Vanilla WH3 has versions 12 and 13 only (2,569 battlefield buildings, all parsing to the end of the file).
-            if (properties.Version > 11)
-                properties.UnknownFloat = _reader.ReadSingle();
+            // Names from Terry's .bmd.xml (property_override, version 13). Vanilla WH3 has versions 12 and 13 only.
+            if (properties.Version > 11) //guess (10 and 11 not seen)
+                properties.BlendEdges = _reader.ReadSingle();
             if (properties.Version > 12)
-                properties.UnknownFlag = _reader.ReadByte() != 0;
+                properties.ReceiveDecals = _reader.ReadByte() != 0;
             return properties;
         }
 
@@ -749,17 +749,22 @@ namespace Shared.GameFormats.Bmd
             if (prop.PropInfoVersion > 24)
                 prop.UsesTerrainVertexOffset = _reader.ReadByte() != 0;
 
-            // Field names from Terry's .bmd.xml for a version 30 prop. Vanilla's version 29 props have
-            // all but the last; versions 26-28 have not been seen, so which of those added the rest is not known.
-            if (prop.PropInfoVersion > 25)
-            {
+            // Field names from Terry's .bmd.xml for a version 30 prop; vanilla's version 29 props have all but
+            // decal_tiling_alpha. Versions 26-28 have not been seen.
+            if (prop.PropInfoVersion > 25) //guess
                 prop.BlendEdges = _reader.ReadSingle();
+            if (prop.PropInfoVersion > 26) //guess
+            {
                 prop.DecalFadeStart = _reader.ReadSingle();
                 prop.DecalAngleThreshold = _reader.ReadSingle();
+            }
+            if (prop.PropInfoVersion > 27) //guess
+            {
                 prop.DecalMirrorX = _reader.ReadByte() != 0;
                 prop.DecalMirrorZ = _reader.ReadByte() != 0;
-                prop.DecalLayer = _reader.ReadInt32();
             }
+            if (prop.PropInfoVersion > 28) //guess
+                prop.DecalLayer = _reader.ReadInt32();
             if (prop.PropInfoVersion > 29)
                 prop.DecalTilingAlpha = _reader.ReadByte() != 0;
 
