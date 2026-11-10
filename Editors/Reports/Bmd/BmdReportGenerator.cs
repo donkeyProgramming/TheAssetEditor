@@ -305,7 +305,7 @@ namespace Editors.Reports.Bmd
                         vfxRecord.Autoplay = vfx.Autoplay;
                         vfxRecord.VisibleInShroud = vfx.VisibleInShroud;
                         vfxRecord.ParentId = vfx.ParentId;
-                        vfxRecord.VisibleInShroudOnly = vfx.VisibleInShroudOnly;
+                        vfxRecord.VisibleWithoutShroud = vfx.VisibleWithoutShroud;
                         vfxRecord.FlagsVersion = vfx.Flags.FlagVersion;
                         vfxRecord.AllowInOutfield = vfx.Flags.AllowInOutfield;
                         vfxRecord.ClampToSurface = vfx.Flags.ClampToSurface;

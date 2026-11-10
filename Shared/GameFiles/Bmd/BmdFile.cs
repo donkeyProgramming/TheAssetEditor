@@ -336,7 +336,7 @@ namespace Shared.GameFormats.Bmd
         public bool Autoplay { get; set; }
         public bool VisibleInShroud { get; set; }
         public int ParentId { get; set; }
-        public bool VisibleInShroudOnly { get; set; }
+        public bool VisibleWithoutShroud { get; set; }
         public bool NoCulling { get; set; }
 
         // Early version 4 specific fields

@@ -209,6 +209,8 @@ namespace Editors.BmdEditor.Exporting
         {
             var t = TerryTransform.Decompose(vfx.Transform);
             var cultureMask = TerryCultureMask.PreferInherited(TerryCultureMask.Format(vfx.CultureMask), inheritedCultureMask);
+            // Version >9 only: as with props, the stored bit is "visible without shroud" (Terry inverts it on compile).
+            var visibleInShroudOnly = vfx.VfxInfoVersion > 9 && !vfx.VisibleWithoutShroud;
 
             return NewEntity(
                 new XElement("ECVisibilitySettingsCampaign",
@@ -222,7 +224,7 @@ namespace Editors.BmdEditor.Exporting
                     new XAttribute("instance_name", vfx.InstanceName)),
                 new XElement("ECCampaignProperties",
                     new XAttribute("visible_in_shroud", Bool(vfx.VisibleInShroud)),
-                    new XAttribute("visible_in_shroud_only", Bool(vfx.VisibleInShroudOnly)),
+                    new XAttribute("visible_in_shroud_only", Bool(visibleInShroudOnly)),
                     new XAttribute("culture_mask", cultureMask)),
                 BuildTransformElement(t));
         }

@@ -240,7 +240,7 @@
 
                                     <CheckBox Content="Autoplay" IsChecked="{Binding Vfx.Autoplay}" Click="AuxField_Click" Margin="0,8,0,0"/>
                                     <CheckBox Content="Visible In Shroud" IsChecked="{Binding Vfx.VisibleInShroud}" Click="AuxField_Click"/>
-                                    <CheckBox Content="Visible In Shroud Only" IsChecked="{Binding Vfx.VisibleInShroudOnly}" Click="AuxField_Click"/>
+                                    <CheckBox Content="Visible Without Shroud" IsChecked="{Binding Vfx.VisibleWithoutShroud}" Click="AuxField_Click"/>
 
                                     <TextBlock Text="Render Flags" FontWeight="Bold" Margin="0,8,0,0"/>
                                     <UniformGrid Columns="2">

@@ -811,7 +811,7 @@ namespace Shared.GameFormats.Bmd
                 vfx.ParentId = _reader.ReadInt32();
 
             if (vfx.VfxInfoVersion > 9)
-                vfx.VisibleInShroudOnly = _reader.ReadByte() != 0;
+                vfx.VisibleWithoutShroud = _reader.ReadByte() != 0;
             if (vfx.VfxInfoVersion > 10)
                 vfx.NoCulling = _reader.ReadByte() != 0;
             

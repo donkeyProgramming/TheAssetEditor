@@ -572,7 +572,7 @@ namespace Shared.GameFormats.Bmd
                 writer.Write(vfx.ParentId);
 
             if (vfx.VfxInfoVersion > 9)
-                writer.Write(Bool(vfx.VisibleInShroudOnly));
+                writer.Write(Bool(vfx.VisibleWithoutShroud));
             if (vfx.VfxInfoVersion > 10)
                 writer.Write(Bool(vfx.NoCulling));
         }
