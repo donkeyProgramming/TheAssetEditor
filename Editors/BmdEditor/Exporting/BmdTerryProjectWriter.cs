@@ -45,7 +45,7 @@ namespace Editors.BmdEditor.Exporting
         {
             var entitiesByCategory = new Dictionary<string, List<XElement>>();
             var visited = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-            CollectEntities(rootBmd, entitiesByCategory, resolveReferencedBmd, visited);
+            CollectEntities(rootBmd, "", entitiesByCategory, resolveReferencedBmd, visited);
 
             var entitiesRoot = new XElement("entities");
             var logical = new XElement("Logical");
@@ -95,34 +95,34 @@ namespace Editors.BmdEditor.Exporting
             return new TerryProject(ToXmlString(terryDoc), ToXmlString(layerDoc), layerEntityId);
         }
 
-        private static void CollectEntities(BmdFile bmd, Dictionary<string, List<XElement>> entitiesByCategory, Func<string, BmdFile?> resolveReferencedBmd, HashSet<string> visited)
+        private static void CollectEntities(BmdFile bmd, string inheritedCultureMask, Dictionary<string, List<XElement>> entitiesByCategory, Func<string, BmdFile?> resolveReferencedBmd, HashSet<string> visited)
         {
             foreach (var prop in bmd.PropInfos)
-                Add(entitiesByCategory, prop.IsDecal ? "decals" : "props", BuildPropEntity(prop));
+                Add(entitiesByCategory, prop.IsDecal ? "decals" : "props", BuildPropEntity(prop, inheritedCultureMask));
 
             foreach (var vfx in bmd.VfxInfos)
-                Add(entitiesByCategory, "vfx", BuildVfxEntity(vfx));
+                Add(entitiesByCategory, "vfx", BuildVfxEntity(vfx, inheritedCultureMask));
 
             foreach (var probe in bmd.LightProbes)
                 Add(entitiesByCategory, "light_probes", BuildLightProbeEntity(probe));
 
             foreach (var hole in bmd.TerrainHoles)
-                Add(entitiesByCategory, "terrain_holes", BuildTerrainHoleEntity(hole));
+                Add(entitiesByCategory, "terrain_holes", BuildTerrainHoleEntity(hole, inheritedCultureMask));
 
             foreach (var light in bmd.PointLights)
-                Add(entitiesByCategory, "point_lights", BuildPointLightEntity(light));
+                Add(entitiesByCategory, "point_lights", BuildPointLightEntity(light, inheritedCultureMask));
 
             foreach (var mesh in bmd.PolyMeshes)
-                Add(entitiesByCategory, "poly_meshes", BuildPolyMeshEntity(mesh));
+                Add(entitiesByCategory, "poly_meshes", BuildPolyMeshEntity(mesh, inheritedCultureMask));
 
             foreach (var light in bmd.SpotLights)
-                Add(entitiesByCategory, "spot_lights", BuildSpotLightEntity(light));
+                Add(entitiesByCategory, "spot_lights", BuildSpotLightEntity(light, inheritedCultureMask));
 
             foreach (var sound in bmd.Sounds)
                 Add(entitiesByCategory, "sounds", BuildSoundEntity(sound));
 
             foreach (var csc in bmd.CscInfos)
-                Add(entitiesByCategory, "composite_scenes", BuildCscEntity(csc));
+                Add(entitiesByCategory, "composite_scenes", BuildCscEntity(csc, inheritedCultureMask));
 
             foreach (var childRef in bmd.BmdInfos)
             {
@@ -133,7 +133,9 @@ namespace Editors.BmdEditor.Exporting
                 if (childBmd == null)
                     continue;
 
-                CollectEntities(childBmd, entitiesByCategory, resolveReferencedBmd, visited);
+                // In global_props.bin, where BMDs nest inside BMDs, a reference's campaign_type_mask
+                // carries its child's culture as prefab_types bits. Terry-compiled prefabs leave it 0.
+                CollectEntities(childBmd, TerryCultureMask.Format(childRef.CampaignTypeMask), entitiesByCategory, resolveReferencedBmd, visited);
             }
         }
 
@@ -160,10 +162,10 @@ namespace Editors.BmdEditor.Exporting
                     new XAttribute("map_barrier_record_key", ""),
                     new XAttribute("ground_melee_attack_allowed", "true")));
 
-        private static XElement BuildPropEntity(PropInfo prop)
+        private static XElement BuildPropEntity(PropInfo prop, string inheritedCultureMask)
         {
             var t = TerryTransform.Decompose(prop.Transform);
-            var cultureMask = TerryCultureMask.Format(prop.CultureMask);
+            var cultureMask = TerryCultureMask.PreferOwn(TerryCultureMask.Format(prop.CultureMask), inheritedCultureMask);
             // Version >19 only: the stored bit is "visible without shroud", so shroud-only visibility is its inverse.
             var visibleInShroudOnly = prop.PropInfoVersion > 19 && !prop.VisibleWithoutShroud;
 
@@ -220,10 +222,10 @@ namespace Editors.BmdEditor.Exporting
             return entity;
         }
 
-        private static XElement BuildVfxEntity(VfxInfo vfx)
+        private static XElement BuildVfxEntity(VfxInfo vfx, string inheritedCultureMask)
         {
             var t = TerryTransform.Decompose(vfx.Transform);
-            var cultureMask = TerryCultureMask.Format(vfx.CultureMask);
+            var cultureMask = TerryCultureMask.PreferInherited(TerryCultureMask.Format(vfx.CultureMask), inheritedCultureMask);
             // Version >9 only: as with props, the stored bit is "visible without shroud" (Terry inverts it on compile).
             var visibleInShroudOnly = vfx.VfxInfoVersion > 9 && !vfx.VisibleWithoutShroud;
 
@@ -260,7 +262,7 @@ namespace Editors.BmdEditor.Exporting
                     new XAttribute("outer_radius", Fmt(probe.OuterRadius))));
         }
 
-        private static XElement BuildTerrainHoleEntity(TerrainHoleTriangleInfo hole)
+        private static XElement BuildTerrainHoleEntity(TerrainHoleTriangleInfo hole, string inheritedCultureMask)
         {
             var (position, eulerDegrees, localV2, localV3) = TerryTransform.FlattenTriangle(hole.FirstVert.ToVector3(), hole.SecondVert.ToVector3(), hole.ThirdVert.ToVector3());
 
@@ -277,7 +279,7 @@ namespace Editors.BmdEditor.Exporting
                 new XElement("ECCampaignProperties",
                     new XAttribute("visible_in_shroud", "true"),
                     new XAttribute("no_culling", "true"),
-                    new XAttribute("culture_mask", "")),
+                    new XAttribute("culture_mask", inheritedCultureMask)),
                 new XElement("ECPolyline",
                     new XElement("polyline", new XAttribute("closed", "true"),
                         new XElement("point", new XAttribute("x", Fmt(0)), new XAttribute("y", Fmt(0))),
@@ -285,7 +287,7 @@ namespace Editors.BmdEditor.Exporting
                         new XElement("point", new XAttribute("x", Fmt(localV3.X)), new XAttribute("y", Fmt(localV3.Z))))));
         }
 
-        private static XElement BuildPointLightEntity(PointLightInfo light)
+        private static XElement BuildPointLightEntity(PointLightInfo light, string inheritedCultureMask)
         {
             var animType = light.AnimationTypeEnum switch
             {
@@ -308,7 +310,7 @@ namespace Editors.BmdEditor.Exporting
                 new XElement("ECVisibilitySettingsCampaign",
                     new XAttribute("visible_in_tactical_view", "false"),
                     new XAttribute("visible_in_tactical_view_only", "false")),
-                new XElement("ECCampaignProperties", new XAttribute("culture_mask", "")),
+                new XElement("ECCampaignProperties", new XAttribute("culture_mask", inheritedCultureMask)),
                 new XElement("ECTransform",
                     new XAttribute("position", FormatVec(light.Position.ToVector3())),
                     new XAttribute("rotation", "0 0 0"),
@@ -316,7 +318,7 @@ namespace Editors.BmdEditor.Exporting
                     new XAttribute("pivot", "0 0 0")));
         }
 
-        private static XElement BuildPolyMeshEntity(PolyMeshInfo mesh)
+        private static XElement BuildPolyMeshEntity(PolyMeshInfo mesh, string inheritedCultureMask)
         {
             TerryTransform.Decomposed t;
             bool visibleInShroud;
@@ -346,12 +348,12 @@ namespace Editors.BmdEditor.Exporting
                 new XElement("ECCampaignProperties",
                     new XAttribute("visible_in_shroud", Bool(visibleInShroud)),
                     new XAttribute("no_culling", "true"),
-                    new XAttribute("culture_mask", "")),
+                    new XAttribute("culture_mask", inheritedCultureMask)),
                 BuildTransformElement(t),
                 new XElement("ECPolyline", polyline));
         }
 
-        private static XElement BuildSpotLightEntity(SpotLightInfo light)
+        private static XElement BuildSpotLightEntity(SpotLightInfo light, string inheritedCultureMask)
         {
             var eulerDegrees = TerryTransform.QuaternionToEulerDegrees(light.QuartX, light.QuartY, light.QuartZ, light.QuartW);
 
@@ -377,7 +379,7 @@ namespace Editors.BmdEditor.Exporting
                 new XElement("ECVisibilitySettingsCampaign",
                     new XAttribute("visible_in_tactical_view", "false"),
                     new XAttribute("visible_in_tactical_view_only", "false")),
-                new XElement("ECCampaignProperties", new XAttribute("culture_mask", "")),
+                new XElement("ECCampaignProperties", new XAttribute("culture_mask", inheritedCultureMask)),
                 new XElement("ECTransform",
                     new XAttribute("position", FormatVec(light.Position.ToVector3())),
                     new XAttribute("rotation", FormatVec(eulerDegrees)),
@@ -431,7 +433,7 @@ namespace Editors.BmdEditor.Exporting
             return entity;
         }
 
-        private static XElement BuildCscEntity(CscInfo csc)
+        private static XElement BuildCscEntity(CscInfo csc, string inheritedCultureMask)
         {
             var t = TerryTransform.Decompose(csc.Transform);
             // Version >9 only: same "visible without shroud" bit-inversion as PropInfo above.
@@ -450,7 +452,7 @@ namespace Editors.BmdEditor.Exporting
                     new XAttribute("visible_in_shroud", Bool(csc.VisibleInShroud)),
                     new XAttribute("visible_in_shroud_only", Bool(visibleInShroudOnly)),
                     new XAttribute("no_culling", Bool(csc.NoCulling)),
-                    new XAttribute("culture_mask", "")));
+                    new XAttribute("culture_mask", inheritedCultureMask)));
         }
 
         private static XElement NewEntity(params object[] components) =>
