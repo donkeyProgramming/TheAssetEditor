@@ -198,6 +198,10 @@ namespace Editors.BmdEditor.Exporting
                 entity.Add(new XElement("ECPropMesh"));
                 entity.Add(new XElement("ECMesh", new XAttribute("model_path", prop.Rmv2Path), new XAttribute("opacity", "1")));
                 var renderSettings = new XElement("ECMeshRenderSettings", new XAttribute("receive_decals", Bool(prop.ApplyToPropsOrReceiveDecal)));
+                if (prop.PropInfoVersion > 11 || prop.PropInfoVersion == 9)
+                    renderSettings.Add(new XAttribute("cast_shadow", Bool(prop.CastsShadow)));
+                if (prop.PropInfoVersion > 18)
+                    renderSettings.Add(new XAttribute("render_into_skydome_fog", Bool(prop.IncludeInFog)));
                 if (prop.PropInfoVersion > 25)
                     renderSettings.Add(new XAttribute("blend_edges_with_terrain", Fmt(prop.BlendEdges)));
                 entity.Add(renderSettings);
@@ -233,15 +237,16 @@ namespace Editors.BmdEditor.Exporting
                 new XElement("ECVisibilitySettingsCampaign",
                     new XAttribute("visible_in_tactical_view", Bool(vfx.Flags.VisibleInTactical)),
                     new XAttribute("visible_in_tactical_view_only", Bool(vfx.Flags.OnlyVisibleInTactical))),
-                // autoplay/scale are hardcoded here to match the reference export scripts, not vfx.Autoplay/the transform scale.
+                // The scale is already in the transform, so the effect's own scale stays 1.
                 new XElement("ECVFX",
                     new XAttribute("vfx", vfx.VfxString),
-                    new XAttribute("autoplay", "true"),
+                    new XAttribute("autoplay", Bool(vfx.VfxInfoVersion < 5 || vfx.Autoplay)),
                     new XAttribute("scale", "1"),
                     new XAttribute("instance_name", vfx.InstanceName)),
                 new XElement("ECCampaignProperties",
                     new XAttribute("visible_in_shroud", Bool(vfx.VisibleInShroud)),
                     new XAttribute("visible_in_shroud_only", Bool(visibleInShroudOnly)),
+                    new XAttribute("no_culling", Bool(vfx.NoCulling)),
                     new XAttribute("culture_mask", cultureMask)),
                 BuildTransformElement(t));
         }
@@ -250,6 +255,7 @@ namespace Editors.BmdEditor.Exporting
         {
             var innerRadius = probe.Version > 2 ? probe.InnerRadius : probe.OuterRadius;
 
+            // A cylinder probe's height isn't stored in the BMD, so Terry's default stands.
             return NewEntity(
                 new XElement("ECLightProbe", new XAttribute("primary", Bool(probe.Primary))),
                 new XElement("ECTransform",
@@ -257,7 +263,7 @@ namespace Editors.BmdEditor.Exporting
                     new XAttribute("rotation", "0 0 0"),
                     new XAttribute("scale", "1 1 1"),
                     new XAttribute("pivot", "0 0 0")),
-                new XElement("ECDoubleSphere",
+                new XElement(probe.IsCylinder ? "ECDoubleCylinder" : "ECDoubleSphere",
                     new XAttribute("inner_radius", Fmt(innerRadius)),
                     new XAttribute("outer_radius", Fmt(probe.OuterRadius))));
         }
@@ -273,9 +279,7 @@ namespace Editors.BmdEditor.Exporting
                     new XAttribute("rotation", FormatVec(eulerDegrees)),
                     new XAttribute("scale", "1 1 1"),
                     new XAttribute("pivot", "0 0 0")),
-                new XElement("ECVisibilitySettingsCampaign",
-                    new XAttribute("visible_in_tactical_view", "false"),
-                    new XAttribute("visible_in_tactical_view_only", "false")),
+                TacticalVisibility(hole.Flags),
                 new XElement("ECCampaignProperties",
                     new XAttribute("visible_in_shroud", "true"),
                     new XAttribute("no_culling", "true"),
@@ -307,9 +311,7 @@ namespace Editors.BmdEditor.Exporting
                     new XAttribute("random_offset", Fmt(light.RandomOffset)),
                     new XAttribute("falloff_type", light.FalloffType),
                     new XAttribute("for_light_probes_only", Bool(light.LightProbeOnly))),
-                new XElement("ECVisibilitySettingsCampaign",
-                    new XAttribute("visible_in_tactical_view", "false"),
-                    new XAttribute("visible_in_tactical_view_only", "false")),
+                TacticalVisibility(light.Flags),
                 new XElement("ECCampaignProperties", new XAttribute("culture_mask", inheritedCultureMask)),
                 new XElement("ECTransform",
                     new XAttribute("position", FormatVec(light.Position.ToVector3())),
@@ -345,10 +347,7 @@ namespace Editors.BmdEditor.Exporting
                 new XElement("ECVisibilitySettingsCampaign",
                     new XAttribute("visible_in_tactical_view", Bool(mesh.Flags.VisibleInTactical)),
                     new XAttribute("visible_in_tactical_view_only", Bool(mesh.Flags.OnlyVisibleInTactical))),
-                new XElement("ECCampaignProperties",
-                    new XAttribute("visible_in_shroud", Bool(visibleInShroud)),
-                    new XAttribute("no_culling", "true"),
-                    new XAttribute("culture_mask", inheritedCultureMask)),
+                PolyMeshCampaignProperties(mesh, visibleInShroud, inheritedCultureMask),
                 BuildTransformElement(t),
                 new XElement("ECPolyline", polyline));
         }
@@ -376,9 +375,7 @@ namespace Editors.BmdEditor.Exporting
                     new XAttribute("falloff", Fmt(light.Falloff)),
                     new XAttribute("volumetric", Bool(light.Volumetric)),
                     new XAttribute("gobo", light.Gobo)),
-                new XElement("ECVisibilitySettingsCampaign",
-                    new XAttribute("visible_in_tactical_view", "false"),
-                    new XAttribute("visible_in_tactical_view_only", "false")),
+                TacticalVisibility(light.Flags),
                 new XElement("ECCampaignProperties", new XAttribute("culture_mask", inheritedCultureMask)),
                 new XElement("ECTransform",
                     new XAttribute("position", FormatVec(light.Position.ToVector3())),
@@ -390,7 +387,9 @@ namespace Editors.BmdEditor.Exporting
         private static XElement BuildSoundEntity(SoundInfo sound)
         {
             var origin = sound.CoordList.Length > 0 ? sound.CoordList[0].ToVector3() : Vector3.Zero;
-            var cultureMask = TerryCultureMask.Format(sound.CultureMask);
+            // A sound's culture goes in its campaign_type_mask, the first of its two masks (AtlasWH3 builds
+            // global_props_sound.bin that way, byte for byte against BOB); the pdlc mask after it is unrelated.
+            var cultureMask = TerryCultureMask.Format(sound.CampaignTypeMask);
 
             var entity = NewEntity(
                 new XElement("ECSoundMarker", new XAttribute("key", sound.SoundString)),
@@ -442,17 +441,43 @@ namespace Editors.BmdEditor.Exporting
             return NewEntity(
                 new XElement("ECCompositeScene",
                     new XAttribute("path", csc.SceneFile),
-                    new XAttribute("script_id", ""),
-                    new XAttribute("autoplay", "true")),
+                    new XAttribute("script_id", csc.ScriptId),
+                    new XAttribute("autoplay", Bool(csc.Version < 3 || csc.Autoplay)),
+                    new XAttribute("hold_first_frame", Bool(csc.HoldFirst)),
+                    new XAttribute("hold_last_frame", Bool(csc.HoldLast))),
                 new XElement("ECVisibilitySettingsCampaign",
-                    new XAttribute("visible_in_tactical_view", "false"),
-                    new XAttribute("visible_in_tactical_view_only", "false")),
+                    new XAttribute("visible_in_tactical_view", Bool(csc.VisibleInTacticalView)),
+                    new XAttribute("visible_in_tactical_view_only", Bool(csc.VisibleInTacticalViewOnly))),
                 BuildTransformElement(t),
                 new XElement("ECCampaignProperties",
                     new XAttribute("visible_in_shroud", Bool(csc.VisibleInShroud)),
                     new XAttribute("visible_in_shroud_only", Bool(visibleInShroudOnly)),
                     new XAttribute("no_culling", Bool(csc.NoCulling)),
                     new XAttribute("culture_mask", inheritedCultureMask)));
+        }
+
+        private static XElement TacticalVisibility(BmdComponentFlags flags) =>
+            new XElement("ECVisibilitySettingsCampaign",
+                new XAttribute("visible_in_tactical_view", Bool(flags.VisibleInTactical)),
+                new XAttribute("visible_in_tactical_view_only", Bool(flags.OnlyVisibleInTactical)));
+
+        private static XElement PolyMeshCampaignProperties(PolyMeshInfo mesh, bool visibleInShroud, string inheritedCultureMask)
+        {
+            var properties = new XElement("ECCampaignProperties");
+            // Version >3 only: the region flags and "visible without shroud" (inverted, as for props) came with the transform.
+            if (mesh.PolyMeshVersion > 3)
+                properties.Add(
+                    new XAttribute("visible_inside_snow_region", Bool(mesh.VisibleInsideSnowRegion)),
+                    new XAttribute("visible_outside_snow_region", Bool(mesh.VisibleOutsideSnowRegion)),
+                    new XAttribute("visible_inside_destruction_region", Bool(mesh.VisibleInsideDestructionRegion)),
+                    new XAttribute("visible_outside_destruction_region", Bool(mesh.VisibleOutsideDestructionRegion)));
+            properties.Add(new XAttribute("visible_in_shroud", Bool(visibleInShroud)));
+            if (mesh.PolyMeshVersion > 3)
+                properties.Add(new XAttribute("visible_in_shroud_only", Bool(!mesh.VisibleWithoutShroud)));
+            properties.Add(
+                new XAttribute("no_culling", "true"),
+                new XAttribute("culture_mask", inheritedCultureMask));
+            return properties;
         }
 
         private static XElement NewEntity(params object[] components) =>
