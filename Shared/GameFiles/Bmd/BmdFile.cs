@@ -308,6 +308,13 @@ namespace Shared.GameFormats.Bmd
         public bool SomeWeirdThing2 { get; set; } // for Version 22
         public bool UseDynamicShadows { get; set; }
         public bool UsesTerrainVertexOffset { get; set; }
+        public float BlendEdges { get; set; }
+        public float DecalFadeStart { get; set; }
+        public float DecalAngleThreshold { get; set; }
+        public bool DecalMirrorX { get; set; }
+        public bool DecalMirrorZ { get; set; }
+        public int DecalLayer { get; set; }
+        public bool DecalTilingAlpha { get; set; }
         
         // Early version 4 specific fields
         public byte[] EarlyVersionUnknownBytes { get; set; } = new byte[23];
@@ -330,6 +337,7 @@ namespace Shared.GameFormats.Bmd
         public bool VisibleInShroud { get; set; }
         public int ParentId { get; set; }
         public bool VisibleInShroudOnly { get; set; }
+        public bool NoCulling { get; set; }
 
         // Early version 4 specific fields
         public byte[] EarlyVersionUnknownBytes { get; set; } = new byte[12];

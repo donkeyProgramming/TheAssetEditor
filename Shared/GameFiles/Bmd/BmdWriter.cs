@@ -519,6 +519,17 @@ namespace Shared.GameFormats.Bmd
                 writer.Write(Bool(prop.UseDynamicShadows));
             if (prop.PropInfoVersion > 24)
                 writer.Write(Bool(prop.UsesTerrainVertexOffset));
+
+            if (prop.PropInfoVersion > 25)
+            {
+                writer.Write(prop.BlendEdges);
+                writer.Write(prop.DecalFadeStart);
+                writer.Write(prop.DecalAngleThreshold);
+                writer.Write(Bool(prop.DecalMirrorX));
+                writer.Write(Bool(prop.DecalMirrorZ));
+                writer.Write(prop.DecalLayer);
+                writer.Write(Bool(prop.DecalTilingAlpha));
+            }
         }
 
         private static void WriteVfxInfo(BinaryWriter writer, VfxInfo vfx)
@@ -562,6 +573,8 @@ namespace Shared.GameFormats.Bmd
 
             if (vfx.VfxInfoVersion > 9)
                 writer.Write(Bool(vfx.VisibleInShroudOnly));
+            if (vfx.VfxInfoVersion > 10)
+                writer.Write(Bool(vfx.NoCulling));
         }
 
         private static void WriteAiHints(BinaryWriter writer, BmdFile bmdFile)

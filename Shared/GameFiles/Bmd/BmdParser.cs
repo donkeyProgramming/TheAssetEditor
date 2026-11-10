@@ -749,7 +749,20 @@ namespace Shared.GameFormats.Bmd
                 prop.UseDynamicShadows = _reader.ReadByte() != 0;
             if (prop.PropInfoVersion > 24)
                 prop.UsesTerrainVertexOffset = _reader.ReadByte() != 0;
-            
+
+            // Field names from Terry's .bmd.xml for a version 30 prop. Versions 26-29 have not
+            // been seen, so which version added which of these is not known.
+            if (prop.PropInfoVersion > 25)
+            {
+                prop.BlendEdges = _reader.ReadSingle();
+                prop.DecalFadeStart = _reader.ReadSingle();
+                prop.DecalAngleThreshold = _reader.ReadSingle();
+                prop.DecalMirrorX = _reader.ReadByte() != 0;
+                prop.DecalMirrorZ = _reader.ReadByte() != 0;
+                prop.DecalLayer = _reader.ReadInt32();
+                prop.DecalTilingAlpha = _reader.ReadByte() != 0;
+            }
+
             return prop;
         }
 
@@ -799,6 +812,8 @@ namespace Shared.GameFormats.Bmd
 
             if (vfx.VfxInfoVersion > 9)
                 vfx.VisibleInShroudOnly = _reader.ReadByte() != 0;
+            if (vfx.VfxInfoVersion > 10)
+                vfx.NoCulling = _reader.ReadByte() != 0;
             
             return vfx;
         }
