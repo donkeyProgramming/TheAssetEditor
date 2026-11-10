@@ -112,6 +112,7 @@ namespace Shared.GameFormats.Bmd
         public bool CultMaskCth { get; set; }
         public bool CultMaskNor { get; set; }
         public bool CultMaskChd { get; set; }
+        public bool CultMaskNag { get; set; }
     }
 
     public class BmdComponentFlags

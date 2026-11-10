@@ -995,7 +995,7 @@ namespace Shared.GameFormats.Bmd
             var bytes = new byte[8];
 
             if (mask.CultMaskBase) bytes[0] |= 0x01;
-            if (mask.CultMaskBst) bytes[0] |= 0x02;
+            if (mask.CultMaskBst) bytes[0] |= 0x40;
             if (mask.CultMaskBrt) bytes[0] |= 0x80;
 
             if (mask.CultMaskChs) bytes[1] |= 0x01;
@@ -1024,6 +1024,7 @@ namespace Shared.GameFormats.Bmd
             if (mask.CultMaskCth) bytes[4] |= 0x01;
             if (mask.CultMaskNor) bytes[4] |= 0x02;
             if (mask.CultMaskChd) bytes[4] |= 0x04;
+            if (mask.CultMaskNag) bytes[4] |= 0x08;
 
             writer.Write(bytes);
         }

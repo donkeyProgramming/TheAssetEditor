@@ -11,12 +11,12 @@ namespace Editors.BmdEditor.Exporting
     /// </summary>
     public static class TerryCultureMask
     {
-        // Ideally these bit->culture names would be looked up from the game DB (e.g. a
-        // "prefab_types_tables"-style table) instead of hardcoded here. AssetEditor has no live
-        // DB-table-reading path to do that with, though: Shared/GameFiles/DB (SchemaManager,
-        // SimpleSchema) is schema-driven table-decoding scaffolding, but every class in it is
-        // commented out/dead, so there's nothing to hook into short of building that
-        // infrastructure from scratch. Hardcoded here instead, matching the reference scripts.
+        // Bit i is the prefab_types_tables row with value i + 1 (value 0, NONE, is bit 63), copied
+        // from vanilla WH3's db/prefab_types_tables/data__ (table version 3, 40 rows). Rows without
+        // a culture (BASE, the BUILDING_* states, ABANDONED) are left out: Terry's culture_mask text
+        // can't name them. KISLEV_PROLOGUE (wh3_main_pro_ksl_kislev) shares Kislev's bit. Mods can
+        // add rows, but AssetEditor has no DB-reading path to look them up with
+        // (Shared/GameFiles/DB is dead scaffolding).
         private static readonly Dictionary<int, string> BitNames = new()
         {
             [6] = "wh_dlc03_bst_beastmen",
@@ -44,6 +44,7 @@ namespace Editors.BmdEditor.Exporting
             [32] = "wh3_main_cth_cathay",
             [33] = "wh_dlc08_nor_norsca",
             [34] = "wh3_dlc23_chd_chaos_dwarfs",
+            [35] = "wh3_dlc29_nag_undead_legions",
             [63] = "*",
         };
 
@@ -70,6 +71,9 @@ namespace Editors.BmdEditor.Exporting
 
         public static string Format(CultureMask mask)
         {
+            if (mask.RawBytes is { Length: >= 8 } raw)
+                return Format(raw);
+
             var bits = 0UL;
             if (mask.CultMaskBst) bits |= 1UL << 6;
             if (mask.CultMaskBrt) bits |= 1UL << 7;
@@ -96,6 +100,7 @@ namespace Editors.BmdEditor.Exporting
             if (mask.CultMaskCth) bits |= 1UL << 32;
             if (mask.CultMaskNor) bits |= 1UL << 33;
             if (mask.CultMaskChd) bits |= 1UL << 34;
+            if (mask.CultMaskNag) bits |= 1UL << 35;
             return Format(bits);
         }
 

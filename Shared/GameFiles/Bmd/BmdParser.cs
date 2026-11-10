@@ -1354,7 +1354,7 @@ namespace Shared.GameFormats.Bmd
 
             // First byte
             mask.CultMaskBase = (bytes[0] & 0x01) != 0;
-            mask.CultMaskBst = (bytes[0] & 0x02) != 0;
+            mask.CultMaskBst = (bytes[0] & 0x40) != 0;
             mask.CultMaskBrt = (bytes[0] & 0x80) != 0;
 
             // Second byte
@@ -1387,6 +1387,7 @@ namespace Shared.GameFormats.Bmd
             mask.CultMaskCth = (bytes[4] & 0x01) != 0;
             mask.CultMaskNor = (bytes[4] & 0x02) != 0;
             mask.CultMaskChd = (bytes[4] & 0x04) != 0;
+            mask.CultMaskNag = (bytes[4] & 0x08) != 0;
 
             return mask;
         }
