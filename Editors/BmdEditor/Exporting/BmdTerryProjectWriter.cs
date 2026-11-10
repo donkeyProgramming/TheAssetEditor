@@ -172,18 +172,33 @@ namespace Editors.BmdEditor.Exporting
             {
                 entity.Add(new XElement("ECDecal",
                     new XAttribute("model_path", prop.Rmv2Path),
-                    new XAttribute("parallax_scale", "0"),
-                    new XAttribute("tiling", "0"),
+                    new XAttribute("parallax_scale", Fmt(prop.DecalParallaxScale)),
+                    new XAttribute("tiling", Fmt(prop.DecalTiling)),
                     new XAttribute("normal_mode", "DNM_BLEND"),
                     new XAttribute("apply_to_terrain", Bool(prop.ApplyToTerrain)),
                     new XAttribute("apply_to_objects", Bool(prop.ApplyToPropsOrReceiveDecal)),
                     new XAttribute("render_above_snow", Bool(prop.RenderAboveSnow))));
+                // Fields added by prop version 30; older props keep Terry's own defaults.
+                if (prop.PropInfoVersion > 25)
+                {
+                    var decal = entity.Element("ECDecal")!;
+                    decal.Add(
+                        new XAttribute("tiling_alpha_enabled", Bool(prop.DecalTilingAlpha)),
+                        new XAttribute("fade_start", Fmt(prop.DecalFadeStart)),
+                        new XAttribute("mirror_x", Bool(prop.DecalMirrorX)),
+                        new XAttribute("mirror_z", Bool(prop.DecalMirrorZ)),
+                        new XAttribute("angle_threshold", Fmt(prop.DecalAngleThreshold)),
+                        new XAttribute("layer", prop.DecalLayer.ToString(CultureInfo.InvariantCulture)));
+                }
             }
             else
             {
                 entity.Add(new XElement("ECPropMesh"));
                 entity.Add(new XElement("ECMesh", new XAttribute("model_path", prop.Rmv2Path), new XAttribute("opacity", "1")));
-                entity.Add(new XElement("ECMeshRenderSettings", new XAttribute("receive_decals", Bool(prop.ApplyToPropsOrReceiveDecal))));
+                var renderSettings = new XElement("ECMeshRenderSettings", new XAttribute("receive_decals", Bool(prop.ApplyToPropsOrReceiveDecal)));
+                if (prop.PropInfoVersion > 25)
+                    renderSettings.Add(new XAttribute("blend_edges_with_terrain", Fmt(prop.BlendEdges)));
+                entity.Add(renderSettings);
             }
 
             entity.Add(new XElement("ECVisibilitySettingsCampaign",
