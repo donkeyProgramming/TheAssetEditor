@@ -64,7 +64,6 @@ namespace Shared.GameFormats.Bmd
                     // Read early props entries
                     for (var i = 0; i < early_props_length; i++)
                     {
-                        if (_stream.Position >= _stream.Length) break;
                         
                         var earlyProp = new PropInfo();
                         
@@ -96,7 +95,6 @@ namespace Shared.GameFormats.Bmd
                     // Read early vfx entries
                     for (var i = 0; i < early_vfxs_length; i++)
                     {
-                        if (_stream.Position >= _stream.Length) break;
 
                         var earlyVfx = new VfxInfo
                         {
@@ -296,6 +294,13 @@ namespace Shared.GameFormats.Bmd
                     ReadCollection(bmdFile, "WaterOutline", bmdFile.WaterOutlines, ReadWaterOutline);
                 }
 
+                // A record read a few bytes short shifts everything after it without necessarily running off
+                // the end, so a parse that doesn't land exactly on the end of the file has misread something.
+                if (_stream.Position != _stream.Length)
+                    throw new InvalidDataException(
+                        $"BMD parse ended at byte {_stream.Position} of {_stream.Length}: {_stream.Length - _stream.Position} bytes were not read, " +
+                        "so a record version this parser doesn't know has probably changed size.");
+
                 return bmdFile;
             }
             catch (Exception ex)
@@ -325,7 +330,6 @@ namespace Shared.GameFormats.Bmd
 
             for (var i = 0; i < count; i++)
             {
-                if (_stream.Position >= _stream.Length) break;
                 collection.Add(readFunc());
             }
         }
@@ -372,53 +376,8 @@ namespace Shared.GameFormats.Bmd
                 building.Transform = ReadRowMajorMatrix(false);
             }
             
-            // Properties
-            if (building.Version < 4)
-            {
-                //No properties version
-                building.StartingDamageUnary = _reader.ReadSingle();
-                building.OnFire = _reader.ReadByte() != 0;
-                building.StartDisabled = _reader.ReadByte() != 0;
-                building.WeakPoint = _reader.ReadByte() != 0;
-                building.AiBreachable = _reader.ReadByte() != 0;
-                building.Indestructible = _reader.ReadByte() != 0;
-                building.Dockable = _reader.ReadByte() != 0;
-                building.Toggleable = _reader.ReadByte() != 0;
-                building.Lite = _reader.ReadByte() != 0;
-            }
-            else
-            {
-                building.PropertiesVersion = _reader.ReadUInt16();
-                building.PropertiesBuildingId = ReadString();
-                building.StartingDamageUnary = _reader.ReadSingle();
-                if (building.PropertiesVersion > 1)
-                {
-                    building.OnFire = _reader.ReadByte() != 0;
-                    building.StartDisabled = _reader.ReadByte() != 0;
-                    building.WeakPoint = _reader.ReadByte() != 0;
-                    building.AiBreachable = _reader.ReadByte() != 0;
-                    building.Indestructible = _reader.ReadByte() != 0;
-                    building.Dockable = _reader.ReadByte() != 0;
-                    building.Toggleable = _reader.ReadByte() != 0;
-                    building.Lite = _reader.ReadByte() != 0;
-                }
-                if (building.PropertiesVersion > 2)
-                    building.CastShadows = _reader.ReadByte() != 0;
-                if (building.PropertiesVersion > 3)
-                    building.KeyBuilding = _reader.ReadByte() != 0;
-                if (building.PropertiesVersion > 5)
-                {
-                    building.KeyBuildingUseFort = _reader.ReadByte() != 0;
-                    building.IsPropInOutfield = _reader.ReadByte() != 0;
-                }
-                if (building.PropertiesVersion > 8)
-                {
-                    building.SettlementLevelConfigurable = _reader.ReadByte() != 0;
-                    building.HideTooltip = _reader.ReadByte() != 0;
-                    building.IncludeInFog = _reader.ReadByte() != 0;
-                }
-            }
-            
+            building.Properties = ReadBuildingProperties(versioned: building.Version > 3);
+
             // Back to normal stuff
             if (building.Version > 7)
                 building.HeightMode = ReadString();
@@ -426,6 +385,57 @@ namespace Shared.GameFormats.Bmd
                 building.Uid = _reader.ReadInt64();
             
             return building;
+        }
+
+        private BuildingProperties ReadBuildingProperties(bool versioned)
+        {
+            var properties = new BuildingProperties();
+            if (!versioned)
+            {
+                // Battlefield buildings before version 4: no version or id, and the flags start right away
+                properties.StartingDamageUnary = _reader.ReadSingle();
+                ReadBuildingFlags(properties);
+                return properties;
+            }
+
+            properties.Version = _reader.ReadUInt16();
+            properties.BuildingId = ReadString();
+            properties.StartingDamageUnary = _reader.ReadSingle();
+            if (properties.Version > 1)
+                ReadBuildingFlags(properties);
+            if (properties.Version > 2)
+                properties.CastShadows = _reader.ReadByte() != 0;
+            if (properties.Version > 3)
+                properties.KeyBuilding = _reader.ReadByte() != 0;
+            if (properties.Version > 5)
+            {
+                properties.KeyBuildingUseFort = _reader.ReadByte() != 0;
+                properties.IsPropInOutfield = _reader.ReadByte() != 0;
+            }
+            if (properties.Version > 8)
+            {
+                properties.SettlementLevelConfigurable = _reader.ReadByte() != 0;
+                properties.HideTooltip = _reader.ReadByte() != 0;
+                properties.IncludeInFog = _reader.ReadByte() != 0;
+            }
+            // Vanilla WH3 has versions 12 and 13 only (2,569 battlefield buildings, all parsing to the end of the file).
+            if (properties.Version > 11)
+                properties.UnknownFloat = _reader.ReadSingle();
+            if (properties.Version > 12)
+                properties.UnknownFlag = _reader.ReadByte() != 0;
+            return properties;
+        }
+
+        private void ReadBuildingFlags(BuildingProperties properties)
+        {
+            properties.OnFire = _reader.ReadByte() != 0;
+            properties.StartDisabled = _reader.ReadByte() != 0;
+            properties.WeakPoint = _reader.ReadByte() != 0;
+            properties.AiBreachable = _reader.ReadByte() != 0;
+            properties.Indestructible = _reader.ReadByte() != 0;
+            properties.Dockable = _reader.ReadByte() != 0;
+            properties.Toggleable = _reader.ReadByte() != 0;
+            properties.Lite = _reader.ReadByte() != 0;
         }
 
         private BattlefieldBuildingFar ReadBattlefieldBuildingFar()
@@ -547,19 +557,10 @@ namespace Shared.GameFormats.Bmd
             bmd.BmdString = ReadString();
             bmd.Transform = ReadRowMajorMatrix(true);
 
-            //not sure how this works, it's 0 (empty) 99.99% of the time
-            bmd.PropertyOverrides = _reader.ReadUInt32();
-            if (bmd.PropertyOverrides == 1) //can there be multple? is this a length? I've only seen it as 1
-            {
-                var propertyOverridesVersion = _reader.ReadUInt16();
-                ReadString();
-                _reader.ReadSingle();
-                _reader.ReadBytes(8);
-                if (propertyOverridesVersion > 2)
-                    _reader.ReadByte();
-                if (propertyOverridesVersion > 3)
-                    _reader.ReadByte();
-            }
+            // One building-properties block per overridden building of the child prefab (battle prefabs only)
+            var overrideCount = _reader.ReadUInt32();
+            for (var i = 0; i < overrideCount; i++)
+                bmd.PropertyOverrides.Add(ReadBuildingProperties(versioned: true));
 
             if (bmd.Version == 4)
                 _reader.ReadBytes(6);
@@ -624,7 +625,6 @@ namespace Shared.GameFormats.Bmd
                 
                 for (var i = 0; i < propCount; i++)
                 {
-                    if (_stream.Position >= _stream.Length) break;
                     propsList.Add(ReadString());
                 }
             }
@@ -637,7 +637,6 @@ namespace Shared.GameFormats.Bmd
             
             for (var i = 0; i < propInfoCount; i++)
             {
-                if (_stream.Position >= _stream.Length) break;
                 bmdFile.PropInfos.Add(ReadPropInfo(propsList));
             }
         }
@@ -750,8 +749,8 @@ namespace Shared.GameFormats.Bmd
             if (prop.PropInfoVersion > 24)
                 prop.UsesTerrainVertexOffset = _reader.ReadByte() != 0;
 
-            // Field names from Terry's .bmd.xml for a version 30 prop. Versions 26-29 have not
-            // been seen, so which version added which of these is not known.
+            // Field names from Terry's .bmd.xml for a version 30 prop. Vanilla's version 29 props have
+            // all but the last; versions 26-28 have not been seen, so which of those added the rest is not known.
             if (prop.PropInfoVersion > 25)
             {
                 prop.BlendEdges = _reader.ReadSingle();
@@ -760,8 +759,9 @@ namespace Shared.GameFormats.Bmd
                 prop.DecalMirrorX = _reader.ReadByte() != 0;
                 prop.DecalMirrorZ = _reader.ReadByte() != 0;
                 prop.DecalLayer = _reader.ReadInt32();
-                prop.DecalTilingAlpha = _reader.ReadByte() != 0;
             }
+            if (prop.PropInfoVersion > 29)
+                prop.DecalTilingAlpha = _reader.ReadByte() != 0;
 
             return prop;
         }

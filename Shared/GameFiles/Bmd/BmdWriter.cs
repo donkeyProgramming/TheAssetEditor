@@ -13,8 +13,8 @@ namespace Shared.GameFormats.Bmd
     /// edited one only changes what was actually touched.
     ///
     /// A handful of sections BmdParser reads bytes for and then discards without storing anywhere
-    /// (see the guards below, e.g. <see cref="BmdInfo.PropertyOverrides"/> == 1, PropInfo/BmdInfo's
-    /// oldest versions, CaptureLocation version &gt; 2) genuinely cannot be reproduced - the writer
+    /// (see the guards below, e.g. PropInfo/BmdInfo's oldest versions, CaptureLocation version &gt; 2)
+    /// genuinely cannot be reproduced - the writer
     /// throws a clear <see cref="NotSupportedException"/> for those rather than guessing/corrupting
     /// data. Every section BmdParser can only read when empty (its Read* always throws
     /// NotImplementedException otherwise) is written back as "version + count 0" and guarded the
@@ -285,55 +285,59 @@ namespace Shared.GameFormats.Bmd
                 WriteRowMajorMatrix(writer, building.Transform, is4x4: false);
             }
 
-            if (building.Version < 4)
-            {
-                writer.Write(building.StartingDamageUnary);
-                writer.Write(Bool(building.OnFire));
-                writer.Write(Bool(building.StartDisabled));
-                writer.Write(Bool(building.WeakPoint));
-                writer.Write(Bool(building.AiBreachable));
-                writer.Write(Bool(building.Indestructible));
-                writer.Write(Bool(building.Dockable));
-                writer.Write(Bool(building.Toggleable));
-                writer.Write(Bool(building.Lite));
-            }
-            else
-            {
-                writer.Write(building.PropertiesVersion);
-                WriteString(writer, building.PropertiesBuildingId);
-                writer.Write(building.StartingDamageUnary);
-                if (building.PropertiesVersion > 1)
-                {
-                    writer.Write(Bool(building.OnFire));
-                    writer.Write(Bool(building.StartDisabled));
-                    writer.Write(Bool(building.WeakPoint));
-                    writer.Write(Bool(building.AiBreachable));
-                    writer.Write(Bool(building.Indestructible));
-                    writer.Write(Bool(building.Dockable));
-                    writer.Write(Bool(building.Toggleable));
-                    writer.Write(Bool(building.Lite));
-                }
-                if (building.PropertiesVersion > 2)
-                    writer.Write(Bool(building.CastShadows));
-                if (building.PropertiesVersion > 3)
-                    writer.Write(Bool(building.KeyBuilding));
-                if (building.PropertiesVersion > 5)
-                {
-                    writer.Write(Bool(building.KeyBuildingUseFort));
-                    writer.Write(Bool(building.IsPropInOutfield));
-                }
-                if (building.PropertiesVersion > 8)
-                {
-                    writer.Write(Bool(building.SettlementLevelConfigurable));
-                    writer.Write(Bool(building.HideTooltip));
-                    writer.Write(Bool(building.IncludeInFog));
-                }
-            }
+            WriteBuildingProperties(writer, building.Properties, versioned: building.Version > 3);
 
             if (building.Version > 7)
                 WriteString(writer, building.HeightMode);
             if (building.Version > 8)
                 writer.Write(building.Uid);
+        }
+
+        private static void WriteBuildingProperties(BinaryWriter writer, BuildingProperties properties, bool versioned)
+        {
+            if (!versioned)
+            {
+                writer.Write(properties.StartingDamageUnary);
+                WriteBuildingFlags(writer, properties);
+                return;
+            }
+
+            writer.Write(properties.Version);
+            WriteString(writer, properties.BuildingId);
+            writer.Write(properties.StartingDamageUnary);
+            if (properties.Version > 1)
+                WriteBuildingFlags(writer, properties);
+            if (properties.Version > 2)
+                writer.Write(Bool(properties.CastShadows));
+            if (properties.Version > 3)
+                writer.Write(Bool(properties.KeyBuilding));
+            if (properties.Version > 5)
+            {
+                writer.Write(Bool(properties.KeyBuildingUseFort));
+                writer.Write(Bool(properties.IsPropInOutfield));
+            }
+            if (properties.Version > 8)
+            {
+                writer.Write(Bool(properties.SettlementLevelConfigurable));
+                writer.Write(Bool(properties.HideTooltip));
+                writer.Write(Bool(properties.IncludeInFog));
+            }
+            if (properties.Version > 11)
+                writer.Write(properties.UnknownFloat);
+            if (properties.Version > 12)
+                writer.Write(Bool(properties.UnknownFlag));
+        }
+
+        private static void WriteBuildingFlags(BinaryWriter writer, BuildingProperties properties)
+        {
+            writer.Write(Bool(properties.OnFire));
+            writer.Write(Bool(properties.StartDisabled));
+            writer.Write(Bool(properties.WeakPoint));
+            writer.Write(Bool(properties.AiBreachable));
+            writer.Write(Bool(properties.Indestructible));
+            writer.Write(Bool(properties.Dockable));
+            writer.Write(Bool(properties.Toggleable));
+            writer.Write(Bool(properties.Lite));
         }
 
         private static void WriteCaptureLocation(BinaryWriter writer, CaptureLocation location)
@@ -381,17 +385,15 @@ namespace Shared.GameFormats.Bmd
 
         private static void WriteBmdInfo(BinaryWriter writer, BmdInfo bmd)
         {
-            if (bmd.PropertyOverrides == 1)
-                throw new NotSupportedException(
-                    "BmdInfo.PropertyOverrides == 1 carries data BmdParser reads and discards (never stored on " +
-                    "BmdInfo) - cannot be written back. BmdParser's own comment notes this is ~0.01% of real files.");
             if (bmd.Version is 4 or 5 or 6 or 7)
                 throw new NotSupportedException($"BmdInfo version {bmd.Version} has filler bytes BmdParser reads and discards (never stored) - cannot be written back.");
 
             writer.Write(bmd.Version);
             WriteString(writer, bmd.BmdString);
             WriteRowMajorMatrix(writer, bmd.Transform, is4x4: true);
-            writer.Write(bmd.PropertyOverrides);
+            writer.Write(bmd.PropertyOverrides.Count);
+            foreach (var properties in bmd.PropertyOverrides)
+                WriteBuildingProperties(writer, properties, versioned: true);
 
             if (bmd.Version > 7)
             {
@@ -528,8 +530,9 @@ namespace Shared.GameFormats.Bmd
                 writer.Write(Bool(prop.DecalMirrorX));
                 writer.Write(Bool(prop.DecalMirrorZ));
                 writer.Write(prop.DecalLayer);
-                writer.Write(Bool(prop.DecalTilingAlpha));
             }
+            if (prop.PropInfoVersion > 29)
+                writer.Write(Bool(prop.DecalTilingAlpha));
         }
 
         private static void WriteVfxInfo(BinaryWriter writer, VfxInfo vfx)

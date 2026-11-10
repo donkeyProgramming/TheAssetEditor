@@ -180,12 +180,13 @@ namespace Editors.BmdEditor.Exporting
                     new XAttribute("apply_to_terrain", Bool(prop.ApplyToTerrain)),
                     new XAttribute("apply_to_objects", Bool(prop.ApplyToPropsOrReceiveDecal)),
                     new XAttribute("render_above_snow", Bool(prop.RenderAboveSnow))));
-                // Fields added by prop version 30; older props keep Terry's own defaults.
+                // Fields added after prop version 25; older props keep Terry's own defaults.
+                var decal = entity.Element("ECDecal")!;
+                if (prop.PropInfoVersion > 29)
+                    decal.Add(new XAttribute("tiling_alpha_enabled", Bool(prop.DecalTilingAlpha)));
                 if (prop.PropInfoVersion > 25)
                 {
-                    var decal = entity.Element("ECDecal")!;
                     decal.Add(
-                        new XAttribute("tiling_alpha_enabled", Bool(prop.DecalTilingAlpha)),
                         new XAttribute("fade_start", Fmt(prop.DecalFadeStart)),
                         new XAttribute("mirror_x", Bool(prop.DecalMirrorX)),
                         new XAttribute("mirror_z", Bool(prop.DecalMirrorZ)),

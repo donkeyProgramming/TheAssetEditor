@@ -137,10 +137,21 @@ namespace Shared.GameFormats.Bmd
         public string BuildingKey { get; set; } = string.Empty;
         public string PositionType { get; set; } = string.Empty;
         public Matrix Transform { get; set; } = Matrix.Identity;
-        
-        // Properties
-        public ushort PropertiesVersion { get; set; }
-        public string PropertiesBuildingId { get; set; } = string.Empty;
+        public BuildingProperties Properties { get; set; } = new();
+        public string HeightMode { get; set; } = string.Empty;
+        public long Uid { get; set; }
+    }
+
+    /// <summary>
+    /// A building's settings (Terry's ECBuilding/ECWall). Battlefield buildings carry one, and a prefab
+    /// instance carries one per building of its child prefab whose settings it overrides, keyed by
+    /// <see cref="BuildingId"/> (Terry's &lt;override name=...&gt;).
+    /// </summary>
+    public class BuildingProperties
+    {
+        /// <summary>0 for the unversioned block of battlefield buildings older than version 4.</summary>
+        public ushort Version { get; set; }
+        public string BuildingId { get; set; } = string.Empty;
         public float StartingDamageUnary { get; set; }
         public bool OnFire { get; set; }
         public bool StartDisabled { get; set; }
@@ -157,9 +168,11 @@ namespace Shared.GameFormats.Bmd
         public bool SettlementLevelConfigurable { get; set; }
         public bool HideTooltip { get; set; }
         public bool IncludeInFog { get; set; }
-        
-        public string HeightMode { get; set; } = string.Empty;
-        public long Uid { get; set; }
+        /// <summary>Version 12 on (10-11 not seen). Vanilla values like 0.43 and 0.55; possibly the building's
+        /// blend_edges_with_terrain, which props gained around the same time.</summary>
+        public float UnknownFloat { get; set; }
+        /// <summary>Version 13 on.</summary>
+        public bool UnknownFlag { get; set; }
     }
 
     public class BattlefieldBuildingFar
@@ -221,7 +234,8 @@ namespace Shared.GameFormats.Bmd
         public ushort Version { get; set; }
         public string BmdString { get; set; } = string.Empty;
         public Matrix Transform { get; set; } = Matrix.Identity;
-        public uint PropertyOverrides { get; set; } //this has to correspond to <property_overrides/>
+        /// <summary>Terry's &lt;property_overrides&gt;: settings for buildings inside the referenced prefab.</summary>
+        public List<BuildingProperties> PropertyOverrides { get; set; } = [];
         public CultureMask CampaignTypeMask { get; set; }
         public string RegionString { get; set; } = string.Empty;
         public string HeightMode { get; set; } = string.Empty;
