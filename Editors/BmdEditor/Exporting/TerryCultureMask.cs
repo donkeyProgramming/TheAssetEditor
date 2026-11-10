@@ -4,10 +4,8 @@ namespace Editors.BmdEditor.Exporting
 {
     /// <summary>
     /// Formats BMD culture masks into Terry's comma-separated culture_mask attribute text
-    /// (e.g. "wh3_main_cth_cathay,wh3_main_ksl_kislev"), and resolves how an entity's own mask
-    /// combines with the mask inherited from an enclosing BmdInfo reference. The per-type
-    /// combination rules (prefer own vs. prefer inherited vs. own-only) mirror what the reference
-    /// Terry-export scripts do for each BMD component type.
+    /// (e.g. "wh3_main_cth_cathay,wh3_main_ksl_kislev"). Culture belongs to a whole BMD: an entity takes
+    /// the mask of the reference its BMD was reached through, and its own masks are ignored.
     /// </summary>
     public static class TerryCultureMask
     {
@@ -103,14 +101,5 @@ namespace Editors.BmdEditor.Exporting
             if (mask.CultMaskNag) bits |= 1UL << 35;
             return Format(bits);
         }
-
-        /// <summary>Props: keep the prop's own mask; only fall back to the inherited (BmdInfo)
-        /// mask when the prop itself carries no restriction (global_props.bin gives its objects a
-        /// placeholder mask of 1, which names no culture).</summary>
-        public static string PreferOwn(string own, string inherited) => own.Length > 0 ? own : inherited;
-
-        /// <summary>VFX: the inherited (BmdInfo) mask wins whenever it's non-empty, regardless of
-        /// the VFX's own mask.</summary>
-        public static string PreferInherited(string own, string inherited) => inherited.Length > 0 ? inherited : own;
     }
 }

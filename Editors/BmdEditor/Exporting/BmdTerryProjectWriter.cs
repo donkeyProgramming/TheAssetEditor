@@ -119,7 +119,7 @@ namespace Editors.BmdEditor.Exporting
                 Add(entitiesByCategory, "spot_lights", BuildSpotLightEntity(light, inheritedCultureMask));
 
             foreach (var sound in bmd.Sounds)
-                Add(entitiesByCategory, "sounds", BuildSoundEntity(sound));
+                Add(entitiesByCategory, "sounds", BuildSoundEntity(sound, inheritedCultureMask));
 
             foreach (var csc in bmd.CscInfos)
                 Add(entitiesByCategory, "composite_scenes", BuildCscEntity(csc, inheritedCultureMask));
@@ -162,10 +162,9 @@ namespace Editors.BmdEditor.Exporting
                     new XAttribute("map_barrier_record_key", ""),
                     new XAttribute("ground_melee_attack_allowed", "true")));
 
-        private static XElement BuildPropEntity(PropInfo prop, string inheritedCultureMask)
+        private static XElement BuildPropEntity(PropInfo prop, string cultureMask)
         {
             var t = TerryTransform.Decompose(prop.Transform);
-            var cultureMask = TerryCultureMask.PreferOwn(TerryCultureMask.Format(prop.CultureMask), inheritedCultureMask);
             // Version >19 only: the stored bit is "visible without shroud", so shroud-only visibility is its inverse.
             var visibleInShroudOnly = prop.PropInfoVersion > 19 && !prop.VisibleWithoutShroud;
 
@@ -184,15 +183,14 @@ namespace Editors.BmdEditor.Exporting
                 var decal = entity.Element("ECDecal")!;
                 if (prop.PropInfoVersion > 29)
                     decal.Add(new XAttribute("tiling_alpha_enabled", Bool(prop.DecalTilingAlpha)));
-                if (prop.PropInfoVersion > 25)
-                {
-                    decal.Add(
-                        new XAttribute("fade_start", Fmt(prop.DecalFadeStart)),
-                        new XAttribute("mirror_x", Bool(prop.DecalMirrorX)),
-                        new XAttribute("mirror_z", Bool(prop.DecalMirrorZ)),
-                        new XAttribute("angle_threshold", Fmt(prop.DecalAngleThreshold)),
-                        new XAttribute("layer", prop.DecalLayer.ToString(CultureInfo.InvariantCulture)));
-                }
+                if (prop.PropInfoVersion > 26)
+                    decal.Add(new XAttribute("fade_start", Fmt(prop.DecalFadeStart)));
+                if (prop.PropInfoVersion > 27)
+                    decal.Add(new XAttribute("mirror_x", Bool(prop.DecalMirrorX)), new XAttribute("mirror_z", Bool(prop.DecalMirrorZ)));
+                if (prop.PropInfoVersion > 26)
+                    decal.Add(new XAttribute("angle_threshold", Fmt(prop.DecalAngleThreshold)));
+                if (prop.PropInfoVersion > 28)
+                    decal.Add(new XAttribute("layer", prop.DecalLayer.ToString(CultureInfo.InvariantCulture)));
             }
             else
             {
@@ -227,10 +225,9 @@ namespace Editors.BmdEditor.Exporting
             return entity;
         }
 
-        private static XElement BuildVfxEntity(VfxInfo vfx, string inheritedCultureMask)
+        private static XElement BuildVfxEntity(VfxInfo vfx, string cultureMask)
         {
             var t = TerryTransform.Decompose(vfx.Transform);
-            var cultureMask = TerryCultureMask.PreferInherited(TerryCultureMask.Format(vfx.CultureMask), inheritedCultureMask);
             // Version >9 only: as with props, the stored bit is "visible without shroud" (Terry inverts it on compile).
             var visibleInShroudOnly = vfx.VfxInfoVersion > 9 && !vfx.VisibleWithoutShroud;
 
@@ -385,12 +382,9 @@ namespace Editors.BmdEditor.Exporting
                     new XAttribute("pivot", "0 0 0")));
         }
 
-        private static XElement BuildSoundEntity(SoundInfo sound)
+        private static XElement BuildSoundEntity(SoundInfo sound, string cultureMask)
         {
             var origin = sound.CoordList.Length > 0 ? sound.CoordList[0].ToVector3() : Vector3.Zero;
-            // A sound's culture goes in its campaign_type_mask, the first of its two masks (AtlasWH3 builds
-            // global_props_sound.bin that way, byte for byte against BOB); the pdlc mask after it is unrelated.
-            var cultureMask = TerryCultureMask.Format(sound.CampaignTypeMask);
 
             var entity = NewEntity(
                 new XElement("ECSoundMarker", new XAttribute("key", sound.SoundString)),
