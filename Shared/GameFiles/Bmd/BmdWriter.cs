@@ -104,7 +104,10 @@ namespace Shared.GameFormats.Bmd
 
                     writer.Write(GetVersion(bmdFile, "PointLight"));
                     WriteCollection(writer, bmdFile.PointLights, WritePointLightInfo);
+                }
 
+                if (v > 14)
+                {
                     writer.Write(GetVersion(bmdFile, "BuildingProjectileEmitter"));
                     WriteCollection(writer, bmdFile.BuildingProjectileEmitters, WriteBuildingProjectileEmitter);
                 }
@@ -143,9 +146,10 @@ namespace Shared.GameFormats.Bmd
                 {
                     writer.Write(GetVersion(bmdFile, "Deployment"));
                     WriteCollection(writer, bmdFile.Deployments, WriteDeployment);
-
-                    WriteEmptyOnlyCollection(writer, bmdFile, "BmdCachedArea", bmdFile.BmdCachedAreas, hasVersion: true);
                 }
+
+                if (v > 22)
+                    WriteEmptyOnlyCollection(writer, bmdFile, "BmdCachedArea", bmdFile.BmdCachedAreas, hasVersion: true);
 
                 if (v > 23)
                     WriteEmptyOnlyCollection(writer, bmdFile, "ToggleableBuildingSlot", bmdFile.ToggleableBuildingSlots, hasVersion: true);
@@ -257,7 +261,7 @@ namespace Shared.GameFormats.Bmd
             writer.Write(building.Version);
             WriteString(writer, building.BuildingId);
 
-            if (building.Version > 8)
+            if (building.Version > 10)
                 writer.Write(building.ParentId);
             else if (building.Version > 6)
                 writer.Write((short)building.ParentId);
@@ -285,51 +289,23 @@ namespace Shared.GameFormats.Bmd
                 WriteRowMajorMatrix(writer, building.Transform, is4x4: false);
             }
 
-            WriteBuildingProperties(writer, building.Properties, versioned: building.Version > 3);
+            if (building.Version > 3)
+                WriteBuildingProperties(writer, building.Properties);
+            else
+                WriteLegacyBuildingProperties(writer, building.Properties, building.Version);
 
             if (building.Version > 7)
                 WriteString(writer, building.HeightMode);
-            if (building.Version > 8)
+            if (building.Version > 9)
                 writer.Write(building.Uid);
         }
 
-        private static void WriteBuildingProperties(BinaryWriter writer, BuildingProperties properties, bool versioned)
+        private static void WriteBuildingProperties(BinaryWriter writer, BuildingProperties properties)
         {
-            if (!versioned)
-            {
-                writer.Write(properties.StartingDamageUnary);
-                WriteBuildingFlags(writer, properties);
-                return;
-            }
-
             writer.Write(properties.Version);
-            WriteString(writer, properties.BuildingId);
-            writer.Write(properties.StartingDamageUnary);
             if (properties.Version > 1)
-                WriteBuildingFlags(writer, properties);
-            if (properties.Version > 2)
-                writer.Write(Bool(properties.CastShadows));
-            if (properties.Version > 3)
-                writer.Write(Bool(properties.KeyBuilding));
-            if (properties.Version > 5)
-            {
-                writer.Write(Bool(properties.KeyBuildingUseFort));
-                writer.Write(Bool(properties.IsPropInOutfield));
-            }
-            if (properties.Version > 8)
-            {
-                writer.Write(Bool(properties.SettlementLevelConfigurable));
-                writer.Write(Bool(properties.HideTooltip));
-                writer.Write(Bool(properties.IncludeInFog));
-            }
-            if (properties.Version > 11)
-                writer.Write(properties.BlendEdges);
-            if (properties.Version > 12)
-                writer.Write(Bool(properties.ReceiveDecals));
-        }
-
-        private static void WriteBuildingFlags(BinaryWriter writer, BuildingProperties properties)
-        {
+                WriteString(writer, properties.BuildingId);
+            writer.Write(properties.StartingDamageUnary);
             writer.Write(Bool(properties.OnFire));
             writer.Write(Bool(properties.StartDisabled));
             writer.Write(Bool(properties.WeakPoint));
@@ -338,6 +314,41 @@ namespace Shared.GameFormats.Bmd
             writer.Write(Bool(properties.Dockable));
             writer.Write(Bool(properties.Toggleable));
             writer.Write(Bool(properties.Lite));
+            if (properties.Version is > 2 and < 8)
+                writer.Write(Bool(properties.ClampToSurface));
+            if (properties.Version > 3)
+                writer.Write(Bool(properties.CastShadows));
+            if (properties.Version > 4)
+                writer.Write(Bool(properties.KeyBuilding));
+            if (properties.Version > 5)
+                writer.Write(Bool(properties.KeyBuildingUseFort));
+            if (properties.Version > 6)
+                writer.Write(Bool(properties.IsPropInOutfield));
+            if (properties.Version > 8)
+                writer.Write(Bool(properties.SettlementLevelConfigurable));
+            if (properties.Version > 9)
+                writer.Write(Bool(properties.HideTooltip));
+            if (properties.Version > 10)
+                writer.Write(Bool(properties.IncludeInFog));
+            if (properties.Version > 11)
+                writer.Write(properties.BlendEdges);
+            if (properties.Version > 12)
+                writer.Write(Bool(properties.ReceiveDecals));
+        }
+
+        private static void WriteLegacyBuildingProperties(BinaryWriter writer, BuildingProperties properties, ushort buildingVersion)
+        {
+            writer.Write(properties.StartingDamageUnary);
+            writer.Write(Bool(properties.OnFire));
+            writer.Write(Bool(properties.StartDisabled));
+            writer.Write(Bool(properties.WeakPoint));
+            writer.Write(Bool(properties.AiBreachable));
+            writer.Write(Bool(properties.Indestructible));
+            writer.Write(Bool(properties.Dockable));
+            if (buildingVersion > 1)
+                writer.Write(Bool(properties.Toggleable));
+            if (buildingVersion > 2)
+                writer.Write(Bool(properties.Lite));
         }
 
         private static void WriteCaptureLocation(BinaryWriter writer, CaptureLocation location)
@@ -385,21 +396,23 @@ namespace Shared.GameFormats.Bmd
 
         private static void WriteBmdInfo(BinaryWriter writer, BmdInfo bmd)
         {
-            if (bmd.Version is 4 or 5 or 6 or 7)
-                throw new NotSupportedException($"BmdInfo version {bmd.Version} has filler bytes BmdParser reads and discards (never stored) - cannot be written back.");
-
             writer.Write(bmd.Version);
             WriteString(writer, bmd.BmdString);
             WriteRowMajorMatrix(writer, bmd.Transform, is4x4: true);
-            writer.Write(bmd.PropertyOverrides.Count);
-            foreach (var properties in bmd.PropertyOverrides)
-                WriteBuildingProperties(writer, properties, versioned: true);
-
-            if (bmd.Version > 7)
+            if (bmd.Version > 1)
             {
-                WriteCultureMask(writer, bmd.CampaignTypeMask);
-                WriteString(writer, bmd.RegionString);
+                writer.Write(bmd.PropertyOverrides.Count);
+                foreach (var properties in bmd.PropertyOverrides)
+                    WriteBuildingProperties(writer, properties);
             }
+            if (bmd.Version > 6)
+                WriteCultureMask(writer, bmd.CampaignTypeMask);
+            else if (bmd.Version > 2)
+                WriteCultureMask(writer, bmd.CampaignTypeMask, 4);
+            if (bmd.Version > 3)
+                WriteString(writer, bmd.RegionString);
+            if (bmd.Version is > 4 and < 8)
+                writer.Write(Bool(bmd.ClampToSurface));
             if (bmd.Version > 5)
                 WriteString(writer, bmd.HeightMode);
             if (bmd.Version > 8)
@@ -480,8 +493,9 @@ namespace Shared.GameFormats.Bmd
             WriteBmdComponentFlags(writer, prop.Flags);
 
             if (prop.PropInfoVersion > 4)
-            {
                 writer.Write(Bool(prop.VisibleInShroud));
+            if (prop.PropInfoVersion > 5)
+            {
                 writer.Write(Bool(prop.ApplyToTerrain));
                 writer.Write(Bool(prop.ApplyToPropsOrReceiveDecal));
                 writer.Write(Bool(prop.RenderAboveSnow));
@@ -496,7 +510,9 @@ namespace Shared.GameFormats.Bmd
                 writer.Write(prop.CultureMask, 0, 4);
             // else (<=10): BmdParser reads nothing for the culture mask at this version - write nothing.
 
-            if (prop.PropInfoVersion > 11 || prop.PropInfoVersion == 9)
+            if (prop.PropInfoVersion == 9)
+                writer.Write(Bool(prop.DecalApplyToRigids));
+            if (prop.PropInfoVersion > 11)
                 writer.Write(Bool(prop.CastsShadow));
             if (prop.PropInfoVersion > 13)
                 writer.Write(Bool(prop.NoCulling));
@@ -509,13 +525,10 @@ namespace Shared.GameFormats.Bmd
             if (prop.PropInfoVersion > 19)
                 writer.Write(Bool(prop.VisibleWithoutShroud));
 
-            if (prop.PropInfoVersion == 21)
-                writer.Write(Bool(prop.SomeWeirdThing));
+            if (prop.PropInfoVersion is 21 or 22)
+                writer.Write(Bool(prop.VisibleInTacticalView));
             if (prop.PropInfoVersion == 22)
-            {
-                writer.Write(Bool(prop.SomeWeirdThing));
-                writer.Write(Bool(prop.SomeWeirdThing2));
-            }
+                writer.Write(Bool(prop.VisibleInTacticalViewOnly));
 
             if (prop.PropInfoVersion > 23)
                 writer.Write(Bool(prop.UseDynamicShadows));
@@ -525,12 +538,10 @@ namespace Shared.GameFormats.Bmd
             if (prop.PropInfoVersion > 25)
                 writer.Write(prop.BlendEdges);
             if (prop.PropInfoVersion > 26)
-            {
                 writer.Write(prop.DecalFadeStart);
-                writer.Write(prop.DecalAngleThreshold);
-            }
             if (prop.PropInfoVersion > 27)
             {
+                writer.Write(prop.DecalAngleThreshold);
                 writer.Write(Bool(prop.DecalMirrorX));
                 writer.Write(Bool(prop.DecalMirrorZ));
             }
@@ -563,7 +574,7 @@ namespace Shared.GameFormats.Bmd
                 WriteString(writer, vfx.HeightMode);
             if (vfx.VfxInfoVersion > 3)
             {
-                if (vfx.VfxInfoVersion > 5)
+                if (vfx.VfxInfoVersion > 6)
                     WriteFixedBytes(writer, vfx.CultureMask, 8);
                 else
                     writer.Write(vfx.CultureMask, 0, 4);
@@ -651,7 +662,8 @@ namespace Shared.GameFormats.Bmd
             }
 
             writer.Write(Bool(probe.Primary));
-            WriteString(writer, probe.HeightMode);
+            if (probe.Version > 1)
+                WriteString(writer, probe.HeightMode);
         }
 
         private static void WriteTerrainHoleInfo(BinaryWriter writer, TerrainHoleTriangleInfo hole)
@@ -774,10 +786,11 @@ namespace Shared.GameFormats.Bmd
             writer.Write(light.IntensityBlue);
             writer.Write(light.Falloff);
             WriteString(writer, light.Gobo);
-            writer.Write(Bool(light.Volumetric));
-            WriteString(writer, light.HeightMode);
-
-            if (light.Version > 4)
+            if (light.Version > 1)
+                writer.Write(Bool(light.Volumetric));
+            if (light.Version > 2)
+                WriteString(writer, light.HeightMode);
+            if (light.Version > 6)
                 writer.Write(light.PdlcMask);
             else if (light.Version > 3)
                 writer.Write((uint)light.PdlcMask);
@@ -804,25 +817,29 @@ namespace Shared.GameFormats.Bmd
             WriteVector3(writer, sound.OuterCubeBoundingBox.Min);
             WriteVector3(writer, sound.OuterCubeBoundingBox.Max);
 
-            writer.Write((uint)sound.RiverNodeList.Length);
-            foreach (var node in sound.RiverNodeList)
+            if (sound.Version > 1)
             {
-                writer.Write(node.Version);
-                WriteVector3(writer, node.Position);
-                writer.Write(node.Width);
-                writer.Write(node.FlowSpeed);
+                writer.Write((uint)sound.RiverNodeList.Length);
+                foreach (var node in sound.RiverNodeList)
+                {
+                    writer.Write(node.Version);
+                    WriteVector3(writer, node.Position);
+                    writer.Write(node.Width);
+                    writer.Write(node.FlowSpeed);
+                }
             }
-
-            writer.Write(sound.ClampToSurface);
-            WriteString(writer, sound.HeightMode);
-
+            if (sound.Version > 2)
+                writer.Write(sound.ClampToSurface);
+            if (sound.Version > 3)
+                WriteString(writer, sound.HeightMode);
             if (sound.Version > 9)
                 writer.Write(sound.CampaignTypeMask);
-            else
+            else if (sound.Version > 4)
                 writer.Write((uint)sound.CampaignTypeMask);
-
-            if (sound.Version > 5)
+            if (sound.Version > 6)
                 WriteCultureMask(writer, sound.CultureMask);
+            else if (sound.Version > 5)
+                WriteCultureMask(writer, sound.CultureMask, 4);
             if (sound.Version > 7)
             {
                 WriteVector3(writer, sound.DirectionVector);
@@ -837,20 +854,21 @@ namespace Shared.GameFormats.Bmd
             writer.Write(csc.Version);
             WriteRowMajorMatrix(writer, csc.Transform, is4x4: false);
             WriteString(writer, csc.SceneFile);
-            WriteString(writer, csc.HeightMode);
-
-            if (csc.Version > 2)
-            {
+            if (csc.Version > 1)
+                WriteString(writer, csc.HeightMode);
+            if (csc.Version > 6)
                 writer.Write(csc.PdlcMask);
-                writer.Write(Bool(csc.Autoplay));
+            else if (csc.Version > 2)
+                writer.Write((uint)csc.PdlcMask);
+            writer.Write(Bool(csc.Autoplay));
+            if (csc.Version > 4)
                 writer.Write(Bool(csc.VisibleInShroud));
+            if (csc.Version > 5)
                 writer.Write(Bool(csc.NoCulling));
-            }
             if (csc.Version > 7)
-            {
                 WriteString(writer, csc.ScriptId);
+            if (csc.Version > 8)
                 WriteString(writer, csc.ParentScriptId);
-            }
             if (csc.Version > 9)
                 writer.Write(Bool(csc.VisibleWithoutShroud));
             if (csc.Version > 10)
@@ -992,14 +1010,13 @@ namespace Shared.GameFormats.Bmd
             }
         }
 
-        private static void WriteCultureMask(BinaryWriter writer, CultureMask mask)
+        private static void WriteCultureMask(BinaryWriter writer, CultureMask mask, int size = 8)
         {
             if (mask.RawBytes is { Length: 8 } raw)
             {
-                writer.Write(raw);
+                writer.Write(raw, 0, size);
                 return;
             }
-
             var bytes = new byte[8];
 
             if (mask.CultMaskBase) bytes[0] |= 0x01;
@@ -1034,7 +1051,7 @@ namespace Shared.GameFormats.Bmd
             if (mask.CultMaskChd) bytes[4] |= 0x04;
             if (mask.CultMaskNag) bytes[4] |= 0x08;
 
-            writer.Write(bytes);
+            writer.Write(bytes, 0, size);
         }
     }
 }

@@ -187,7 +187,7 @@ namespace Editors.BmdEditor.Exporting
                     decal.Add(new XAttribute("fade_start", Fmt(prop.DecalFadeStart)));
                 if (prop.PropInfoVersion > 27)
                     decal.Add(new XAttribute("mirror_x", Bool(prop.DecalMirrorX)), new XAttribute("mirror_z", Bool(prop.DecalMirrorZ)));
-                if (prop.PropInfoVersion > 26)
+                if (prop.PropInfoVersion > 27)
                     decal.Add(new XAttribute("angle_threshold", Fmt(prop.DecalAngleThreshold)));
                 if (prop.PropInfoVersion > 28)
                     decal.Add(new XAttribute("layer", prop.DecalLayer.ToString(CultureInfo.InvariantCulture)));
@@ -197,7 +197,7 @@ namespace Editors.BmdEditor.Exporting
                 entity.Add(new XElement("ECPropMesh"));
                 entity.Add(new XElement("ECMesh", new XAttribute("model_path", prop.Rmv2Path), new XAttribute("opacity", "1")));
                 var renderSettings = new XElement("ECMeshRenderSettings", new XAttribute("receive_decals", Bool(prop.ApplyToPropsOrReceiveDecal)));
-                if (prop.PropInfoVersion > 11 || prop.PropInfoVersion == 9)
+                if (prop.PropInfoVersion > 11)
                     renderSettings.Add(new XAttribute("cast_shadow", Bool(prop.CastsShadow)));
                 if (prop.PropInfoVersion > 18)
                     renderSettings.Add(new XAttribute("render_into_skydome_fog", Bool(prop.IncludeInFog)));

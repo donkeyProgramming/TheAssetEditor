@@ -161,6 +161,8 @@ namespace Shared.GameFormats.Bmd
         public bool Dockable { get; set; }
         public bool Toggleable { get; set; }
         public bool Lite { get; set; }
+        /// <summary>Versions 3-7 only.</summary>
+        public bool ClampToSurface { get; set; }
         public bool CastShadows { get; set; }
         public bool KeyBuilding { get; set; }
         public bool KeyBuildingUseFort { get; set; }
@@ -235,6 +237,8 @@ namespace Shared.GameFormats.Bmd
         public List<BuildingProperties> PropertyOverrides { get; set; } = [];
         public CultureMask CampaignTypeMask { get; set; }
         public string RegionString { get; set; } = string.Empty;
+        /// <summary>Versions 5-7 only.</summary>
+        public bool ClampToSurface { get; set; }
         public string HeightMode { get; set; } = string.Empty;
         public byte[] Uid { get; set; } = new byte[8];
     }
@@ -316,8 +320,12 @@ namespace Shared.GameFormats.Bmd
         public bool ApplyHeightPatch { get; set; }
         public bool IncludeInFog { get; set; }
         public bool VisibleWithoutShroud { get; set; }
-        public bool SomeWeirdThing { get; set; } // for Version 21/22
-        public bool SomeWeirdThing2 { get; set; } // for Version 22
+        /// <summary>Versions 21-22 only (the flags carry these from 23 on).</summary>
+        public bool VisibleInTacticalView { get; set; }
+        /// <summary>Version 22 only.</summary>
+        public bool VisibleInTacticalViewOnly { get; set; }
+        /// <summary>Version 9 only.</summary>
+        public bool DecalApplyToRigids { get; set; }
         public bool UseDynamicShadows { get; set; }
         public bool UsesTerrainVertexOffset { get; set; }
         public float BlendEdges { get; set; }
