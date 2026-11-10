@@ -569,7 +569,7 @@ namespace Shared.GameFormats.Bmd
                 _reader.ReadBytes(11); //weird because this is larger than version 8
             else if (bmd.Version > 7)
             {
-                bmd.CultureMask = ReadCultureMask();
+                bmd.CampaignTypeMask = ReadCultureMask();
                 bmd.RegionString = ReadString();
             }
 
@@ -814,7 +814,7 @@ namespace Shared.GameFormats.Bmd
                 vfx.VisibleWithoutShroud = _reader.ReadByte() != 0;
             if (vfx.VfxInfoVersion > 10)
                 vfx.NoCulling = _reader.ReadByte() != 0;
-            
+
             return vfx;
         }
 
@@ -919,7 +919,7 @@ namespace Shared.GameFormats.Bmd
             if (probe.Version > 2)
             {
                 probe.InnerRadius = _reader.ReadSingle();
-                probe.SomeZero = _reader.ReadByte();
+                probe.IsCylinder = _reader.ReadByte() != 0;
             }
 
             probe.Primary = _reader.ReadByte() != 0;
@@ -1016,10 +1016,10 @@ namespace Shared.GameFormats.Bmd
             {
                 if (area.PlayableAreaVersion > 2)
                     area.FlagVersion = _reader.ReadUInt16();
-                area.Flag1 = _reader.ReadByte() != 0;
-                area.Flag2 = _reader.ReadByte() != 0;
-                area.Flag3 = _reader.ReadByte() != 0;
-                area.Flag4 = _reader.ReadByte() != 0;
+                area.ValidNorth = _reader.ReadByte() != 0;
+                area.ValidSouth = _reader.ReadByte() != 0;
+                area.ValidEast = _reader.ReadByte() != 0;
+                area.ValidWest = _reader.ReadByte() != 0;
             }
             
             return area;
@@ -1048,9 +1048,12 @@ namespace Shared.GameFormats.Bmd
             if (mesh.PolyMeshVersion > 3)
             {
                 mesh.Transform = ReadRowMajorMatrix(false);
-                mesh.Booleans = _reader.ReadBytes(4);
+                mesh.VisibleInsideSnowRegion = _reader.ReadByte() != 0;
+                mesh.VisibleOutsideSnowRegion = _reader.ReadByte() != 0;
+                mesh.VisibleInsideDestructionRegion = _reader.ReadByte() != 0;
+                mesh.VisibleOutsideDestructionRegion = _reader.ReadByte() != 0;
                 mesh.VisibleInShroud = _reader.ReadByte() != 0;
-                mesh.MoreBooleans = _reader.ReadBytes(1);
+                mesh.VisibleWithoutShroud = _reader.ReadByte() != 0;
             }
             
             return mesh;
@@ -1135,8 +1138,8 @@ namespace Shared.GameFormats.Bmd
                 {
                     Version = _reader.ReadUInt16(),
                     Position = ReadRmvVector3(),
-                    Something1 = _reader.ReadSingle(),
-                    Something2 = _reader.ReadSingle()
+                    Width = _reader.ReadSingle(),
+                    FlowSpeed = _reader.ReadSingle()
                 };
             }
             

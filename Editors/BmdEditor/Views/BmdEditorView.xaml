@@ -414,6 +414,7 @@
                                     </UniformGrid>
 
                                     <CheckBox Content="Visible In Shroud" IsChecked="{Binding Mesh.VisibleInShroud}" Click="AuxField_Click" Margin="0,8,0,0"/>
+                                    <CheckBox Content="Visible Without Shroud" IsChecked="{Binding Mesh.VisibleWithoutShroud}" Click="AuxField_Click"/>
 
                                     <TextBlock Text="Render Flags" FontWeight="Bold" Margin="0,8,0,0"/>
                                     <UniformGrid Columns="2">
@@ -449,6 +450,7 @@
                                     </Grid>
 
                                     <CheckBox Content="Primary" IsChecked="{Binding Probe.Primary}" Click="AuxField_Click" Margin="0,8,0,0"/>
+                                    <CheckBox Content="Is Cylinder" IsChecked="{Binding Probe.IsCylinder}" Click="AuxField_Click"/>
                                 </StackPanel>
                             </DataTemplate>
 

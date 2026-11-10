@@ -103,8 +103,11 @@ namespace Editors.BmdEditor.Services
             HeightMode = DefaultHeightMode,
             Flags = DefaultFlags(),
             Transform = Matrix.Identity,
-            Booleans = new byte[4],
-            MoreBooleans = new byte[1],
+            VisibleInsideSnowRegion = true,
+            VisibleOutsideSnowRegion = true,
+            VisibleInsideDestructionRegion = true,
+            VisibleOutsideDestructionRegion = true,
+            VisibleWithoutShroud = true,
         };
 
         public static LightProbeInfo CreateLightProbe() => new()

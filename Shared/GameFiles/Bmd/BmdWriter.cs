@@ -395,7 +395,7 @@ namespace Shared.GameFormats.Bmd
 
             if (bmd.Version > 7)
             {
-                WriteCultureMask(writer, bmd.CultureMask);
+                WriteCultureMask(writer, bmd.CampaignTypeMask);
                 WriteString(writer, bmd.RegionString);
             }
             if (bmd.Version > 5)
@@ -639,7 +639,7 @@ namespace Shared.GameFormats.Bmd
             if (probe.Version > 2)
             {
                 writer.Write(probe.InnerRadius);
-                writer.Write(probe.SomeZero);
+                writer.Write(Bool(probe.IsCylinder));
             }
 
             writer.Write(Bool(probe.Primary));
@@ -715,10 +715,10 @@ namespace Shared.GameFormats.Bmd
             {
                 if (area.PlayableAreaVersion > 2)
                     writer.Write(area.FlagVersion);
-                writer.Write(Bool(area.Flag1));
-                writer.Write(Bool(area.Flag2));
-                writer.Write(Bool(area.Flag3));
-                writer.Write(Bool(area.Flag4));
+                writer.Write(Bool(area.ValidNorth));
+                writer.Write(Bool(area.ValidSouth));
+                writer.Write(Bool(area.ValidEast));
+                writer.Write(Bool(area.ValidWest));
             }
         }
 
@@ -741,9 +741,12 @@ namespace Shared.GameFormats.Bmd
             if (mesh.PolyMeshVersion > 3)
             {
                 WriteRowMajorMatrix(writer, mesh.Transform, is4x4: false);
-                WriteFixedBytes(writer, mesh.Booleans, 4);
+                writer.Write(Bool(mesh.VisibleInsideSnowRegion));
+                writer.Write(Bool(mesh.VisibleOutsideSnowRegion));
+                writer.Write(Bool(mesh.VisibleInsideDestructionRegion));
+                writer.Write(Bool(mesh.VisibleOutsideDestructionRegion));
                 writer.Write(Bool(mesh.VisibleInShroud));
-                WriteFixedBytes(writer, mesh.MoreBooleans, 1);
+                writer.Write(Bool(mesh.VisibleWithoutShroud));
             }
         }
 
@@ -798,8 +801,8 @@ namespace Shared.GameFormats.Bmd
             {
                 writer.Write(node.Version);
                 WriteVector3(writer, node.Position);
-                writer.Write(node.Something1);
-                writer.Write(node.Something2);
+                writer.Write(node.Width);
+                writer.Write(node.FlowSpeed);
             }
 
             writer.Write(sound.ClampToSurface);

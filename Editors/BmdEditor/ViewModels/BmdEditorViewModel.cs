@@ -743,10 +743,10 @@ namespace Editors.BmdEditor.ViewModels
                     details.AppendLine($"  Has Been Set: {playableArea.PlayableArea.HasBeenSet}");
                     details.AppendLine($"  Bounding Box: ({playableArea.PlayableArea.BoundingBox[0]:F2}, {playableArea.PlayableArea.BoundingBox[1]:F2}, {playableArea.PlayableArea.BoundingBox[2]:F2}, {playableArea.PlayableArea.BoundingBox[3]:F2})");
                     details.AppendLine($"  Flag Version: {playableArea.PlayableArea.FlagVersion}");
-                    details.AppendLine($"  Flag 1: {playableArea.PlayableArea.Flag1}");
-                    details.AppendLine($"  Flag 2: {playableArea.PlayableArea.Flag2}");
-                    details.AppendLine($"  Flag 3: {playableArea.PlayableArea.Flag3}");
-                    details.AppendLine($"  Flag 4: {playableArea.PlayableArea.Flag4}");
+                    details.AppendLine($"  Valid North: {playableArea.PlayableArea.ValidNorth}");
+                    details.AppendLine($"  Valid South: {playableArea.PlayableArea.ValidSouth}");
+                    details.AppendLine($"  Valid East: {playableArea.PlayableArea.ValidEast}");
+                    details.AppendLine($"  Valid West: {playableArea.PlayableArea.ValidWest}");
                     break;
 
                 case DeploymentViewModel deployment:

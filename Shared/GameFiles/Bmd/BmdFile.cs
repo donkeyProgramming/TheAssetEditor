@@ -221,7 +221,7 @@ namespace Shared.GameFormats.Bmd
         public string BmdString { get; set; } = string.Empty;
         public Matrix Transform { get; set; } = Matrix.Identity;
         public uint PropertyOverrides { get; set; } //this has to correspond to <property_overrides/>
-        public CultureMask CultureMask { get; set; } //"campaign_type_mask"?
+        public CultureMask CampaignTypeMask { get; set; }
         public string RegionString { get; set; } = string.Empty;
         public string HeightMode { get; set; } = string.Empty;
         public byte[] Uid { get; set; } = new byte[8];
@@ -315,7 +315,7 @@ namespace Shared.GameFormats.Bmd
         public bool DecalMirrorZ { get; set; }
         public int DecalLayer { get; set; }
         public bool DecalTilingAlpha { get; set; }
-        
+
         // Early version 4 specific fields
         public byte[] EarlyVersionUnknownBytes { get; set; } = new byte[23];
         public bool EarlyVersionUnknownBool { get; set; }
@@ -393,7 +393,7 @@ namespace Shared.GameFormats.Bmd
         public RmvVector3 Position { get; set; }
         public float OuterRadius { get; set; }
         public float InnerRadius { get; set; }
-        public byte SomeZero { get; set; }
+        public bool IsCylinder { get; set; }
         public bool Primary { get; set; }
         public string HeightMode { get; set; } = string.Empty;
     }
@@ -446,10 +446,10 @@ namespace Shared.GameFormats.Bmd
         public bool HasBeenSet { get; set; }
         public float[] BoundingBox { get; set; } = [0, 0, 0, 0];
         public ushort FlagVersion { get; set; }
-        public bool Flag1 { get; set; }
-        public bool Flag2 { get; set; }
-        public bool Flag3 { get; set; }
-        public bool Flag4 { get; set; }
+        public bool ValidNorth { get; set; }
+        public bool ValidSouth { get; set; }
+        public bool ValidEast { get; set; }
+        public bool ValidWest { get; set; }
     }
 
     public class PolyMeshInfo
@@ -461,9 +461,12 @@ namespace Shared.GameFormats.Bmd
         public string HeightMode { get; set; } = string.Empty;
         public BmdComponentFlags Flags { get; set; } = new();
         public Matrix Transform { get; set; } = Matrix.Identity;
-        public byte[] Booleans { get; set; } = new byte[4];
+        public bool VisibleInsideSnowRegion { get; set; }
+        public bool VisibleOutsideSnowRegion { get; set; }
+        public bool VisibleInsideDestructionRegion { get; set; }
+        public bool VisibleOutsideDestructionRegion { get; set; }
         public bool VisibleInShroud { get; set; }
-        public byte[] MoreBooleans { get; set; } = new byte[1];
+        public bool VisibleWithoutShroud { get; set; }
     }
 
     public class TerrainStencilBlendTriangle
@@ -498,8 +501,8 @@ namespace Shared.GameFormats.Bmd
     {
         public ushort Version { get; set; }
         public RmvVector3 Position { get; set; }
-        public float Something1 { get; set; }
-        public float Something2 { get; set; }
+        public float Width { get; set; }
+        public float FlowSpeed { get; set; }
     }
 
     public class SoundInfo

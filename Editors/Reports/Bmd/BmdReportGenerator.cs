@@ -413,10 +413,10 @@ namespace Editors.Reports.Bmd
                         playableAreaRecord.BoundingBoxMaxY = parsedFile.PlayableArea.BoundingBox.Length > 3 ? parsedFile.PlayableArea.BoundingBox[3] : 0;
                         playableAreaRecord.HasBeenSet = parsedFile.PlayableArea.HasBeenSet;
                         playableAreaRecord.FlagVersion = parsedFile.PlayableArea.FlagVersion;
-                        playableAreaRecord.Flag1 = parsedFile.PlayableArea.Flag1;
-                        playableAreaRecord.Flag2 = parsedFile.PlayableArea.Flag2;
-                        playableAreaRecord.Flag3 = parsedFile.PlayableArea.Flag3;
-                        playableAreaRecord.Flag4 = parsedFile.PlayableArea.Flag4;
+                        playableAreaRecord.ValidNorth = parsedFile.PlayableArea.ValidNorth;
+                        playableAreaRecord.ValidSouth = parsedFile.PlayableArea.ValidSouth;
+                        playableAreaRecord.ValidEast = parsedFile.PlayableArea.ValidEast;
+                        playableAreaRecord.ValidWest = parsedFile.PlayableArea.ValidWest;
                         playableAreaRecords.Add(playableAreaRecord);
                     }
 
