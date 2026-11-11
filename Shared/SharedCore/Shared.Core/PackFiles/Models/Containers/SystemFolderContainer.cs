@@ -576,56 +576,76 @@ namespace Shared.Core.PackFiles.Models.Containers
                 _pendingEvents.Clear();
             }
 
-            var addedFiles = new List<PackFile>();
-            var keysToRemove = new List<string>();
-
+            // The batch is replayed in order against the listed names and only the net change is applied. A program that saves
+            // over a file (Photoshop and most image editors: a temp file renamed into the original's place) deletes the name
+            // and creates it again within one batch; applying every delete after every create dropped that file off the list.
+            var listed = new HashSet<string>(_fileList.Keys);
+            var createdAt = new Dictionary<string, string>();
             foreach (var e in events)
             {
                 switch (e.ChangeType)
                 {
                     case WatcherChangeTypes.Created:
-                        HandleExternalCreated(e.FullPath, addedFiles);
+                        MarkCreated(e.FullPath, listed, createdAt);
                         break;
                     case WatcherChangeTypes.Deleted:
-                        CollectExternalDeleted(e.FullPath, keysToRemove);
+                        MarkDeleted(e.FullPath, listed);
                         break;
                     case WatcherChangeTypes.Renamed:
                         var renamedArgs = (RenamedEventArgs)e;
-                        CollectExternalDeleted(renamedArgs.OldFullPath, keysToRemove);
-                        HandleExternalCreated(renamedArgs.FullPath, addedFiles);
+                        MarkDeleted(renamedArgs.OldFullPath, listed);
+                        MarkCreated(renamedArgs.FullPath, listed, createdAt);
                         break;
                 }
             }
 
             // Publish removed event BEFORE removing from _fileList so that
             // GetFullPath can still resolve paths for the tree view update.
-            // Deduplicate keys: chatty/duplicate watcher events (or a folder delete
-            // combined with a child delete) can collect the same key more than once.
-            var distinctKeysToRemove = keysToRemove.Distinct().ToList();
-            var removedFiles = distinctKeysToRemove.Select(k => _fileList[k]).ToList();
+            var keysToRemove = _fileList.Keys.Where(k => !listed.Contains(k)).ToList();
+            var removedFiles = keysToRemove.Select(k => _fileList[k]).ToList();
             if (removedFiles.Count > 0)
                 FilesRemovedExternally?.Invoke(this, new SystemFolderContainerFilesChangedEventArgs(removedFiles));
 
             // Now actually remove the entries
-            foreach (var key in distinctKeysToRemove)
+            foreach (var key in keysToRemove)
                 _fileList.Remove(key);
+
+            var addedFiles = new List<PackFile>();
+            foreach (var (key, absolutePath) in createdAt)
+            {
+                if (!listed.Contains(key))
+                    continue; // created and gone again in the same batch, like a save's temp file: not opened, so no warning per save
+                try
+                {
+                    if (_fileList.TryGetValue(key, out var replaced))
+                    {
+                        replaced.DataSource = new FileSystemSource(absolutePath); // saved over: same entry, the new file's size
+                        continue;
+                    }
+                    var packFile = new PackFile(Path.GetFileName(absolutePath), new FileSystemSource(absolutePath));
+                    _fileList[key] = packFile;
+                    addedFiles.Add(packFile);
+                }
+                catch (Exception ex)
+                {
+                    // File may be locked or still being written by another process
+                    _logger.Here().Warning($"Failed to add externally created file '{absolutePath}': {ex.Message}");
+                }
+            }
 
             if (addedFiles.Count > 0)
                 FilesAddedExternally?.Invoke(this, new SystemFolderContainerFilesChangedEventArgs(addedFiles));
         }
 
-        private void HandleExternalCreated(string absolutePath, List<PackFile> addedFiles)
+        private void MarkCreated(string absolutePath, HashSet<string> listed, Dictionary<string, string> createdAt)
         {
             // If this is a directory, scan and add all files within it
             if (Directory.Exists(absolutePath) && !File.Exists(absolutePath))
             {
                 try
                 {
-                    var filesInDir = Directory.GetFiles(absolutePath, "*.*", SearchOption.AllDirectories);
-                    foreach (var filePath in filesInDir)
-                    {
-                        HandleExternalCreated(filePath, addedFiles);
-                    }
+                    foreach (var filePath in Directory.GetFiles(absolutePath, "*.*", SearchOption.AllDirectories))
+                        MarkCreated(filePath, listed, createdAt);
                 }
                 catch (Exception ex)
                 {
@@ -634,49 +654,23 @@ namespace Shared.Core.PackFiles.Models.Containers
                 return;
             }
 
-            var relativePath = Path.GetRelativePath(SystemFilePath!, absolutePath);
-            var normalizedPath = PathNormalization.NormalizeFileName(relativePath);
+            var normalizedPath = PathNormalization.NormalizeFileName(Path.GetRelativePath(SystemFilePath!, absolutePath));
             if (IsProjectSettingsFilePath(normalizedPath))
                 return;
 
-            if (_fileList.ContainsKey(normalizedPath))
-                return; // Already tracked
-
-            try
-            {
-                var fileName = Path.GetFileName(absolutePath);
-                var packFile = new PackFile(fileName, new FileSystemSource(absolutePath));
-                _fileList[normalizedPath] = packFile;
-                addedFiles.Add(packFile);
-            }
-            catch (Exception ex)
-            {
-                // File may be locked or still being written by another process
-                _logger.Here().Warning($"Failed to add externally created file '{absolutePath}': {ex.Message}");
-            }
+            listed.Add(normalizedPath);
+            createdAt[normalizedPath] = absolutePath;
         }
 
-        private void CollectExternalDeleted(string absolutePath, List<string> keysToRemove)
+        private void MarkDeleted(string absolutePath, HashSet<string> listed)
         {
-            var relativePath = Path.GetRelativePath(SystemFilePath!, absolutePath);
-            var normalizedPath = PathNormalization.NormalizeFileName(relativePath);
+            var normalizedPath = PathNormalization.NormalizeFileName(Path.GetRelativePath(SystemFilePath!, absolutePath));
             if (IsProjectSettingsFilePath(normalizedPath))
                 return;
 
-            // Check if this is an exact file match
-            if (_fileList.ContainsKey(normalizedPath))
-            {
-                keysToRemove.Add(normalizedPath);
-                return;
-            }
-
-            // Handle folder deletion — collect all files with this prefix
-            var folderPrefix = normalizedPath + "\\";
-            var matchingKeys = _fileList.Keys
-                .Where(k => k.StartsWith(folderPrefix, StringComparison.InvariantCultureIgnoreCase))
-                .ToList();
-
-            keysToRemove.AddRange(matchingKeys);
+            // A file, or else a folder: every file under it
+            if (!listed.Remove(normalizedPath))
+                listed.RemoveWhere(k => k.StartsWith(normalizedPath + "\\", StringComparison.InvariantCultureIgnoreCase));
         }
 
         // --- Watcher suppression ---
