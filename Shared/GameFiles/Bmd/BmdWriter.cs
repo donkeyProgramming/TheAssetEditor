@@ -37,9 +37,9 @@ namespace Shared.GameFormats.Bmd
 
                 if (v < 22)
                 {
-                    // BmdParser refuses a non-empty legacy deployment manager, so it is always empty here.
-                    writer.Write(GetVersion(bmdFile, "LegacyPreV22"));
-                    writer.Write((uint)0);
+                    var managerVersion = GetVersion(bmdFile, "LegacyPreV22");
+                    writer.Write(managerVersion);
+                    WriteCollection(writer, bmdFile.LegacyDeploymentAreas, (w, area) => WriteLegacyDeploymentArea(w, area, managerVersion));
                 }
 
                 writer.Write(GetVersion(bmdFile, "BattlefieldBuilding"));
@@ -50,7 +50,8 @@ namespace Shared.GameFormats.Bmd
 
                 var captureLocationVersion = GetVersion(bmdFile, "CaptureLocation");
                 writer.Write(captureLocationVersion);
-                WriteCollection(writer, bmdFile.CaptureLocations, (w, l) => WriteCaptureLocation(w, l, captureLocationVersion));
+                WriteCollection(writer, bmdFile.CaptureLocationLists, (w, list) =>
+                    WriteCollection(w, list.Locations, (w2, l) => WriteCaptureLocation(w2, l, captureLocationVersion)));
 
                 WriteCollection(writer, bmdFile.EFLines, WriteEFLine);
                 WriteCollection(writer, bmdFile.GoOutlines, (w, o) => WritePoints(w, o.VertexList));
@@ -205,7 +206,8 @@ namespace Shared.GameFormats.Bmd
             }
 
             CheckCount(nameof(BmdFile.BattlefieldBuildings), source.BattlefieldBuildings.Count, reread.BattlefieldBuildings.Count);
-            CheckCount(nameof(BmdFile.CaptureLocations), source.CaptureLocations.Count, reread.CaptureLocations.Count);
+            CheckCount(nameof(BmdFile.CaptureLocationLists), source.CaptureLocationLists.Count, reread.CaptureLocationLists.Count);
+            CheckCount("CaptureLocations", source.CaptureLocationLists.Sum(l => l.Locations.Count), reread.CaptureLocationLists.Sum(l => l.Locations.Count));
             CheckCount(nameof(BmdFile.GoOutlines), source.GoOutlines.Count, reread.GoOutlines.Count);
             CheckCount(nameof(BmdFile.NonTerrainOutlines), source.NonTerrainOutlines.Count, reread.NonTerrainOutlines.Count);
             CheckCount(nameof(BmdFile.ZonesTemplates), source.ZonesTemplates.Count, reread.ZonesTemplates.Count);
@@ -221,6 +223,7 @@ namespace Shared.GameFormats.Bmd
             CheckCount(nameof(BmdFile.Sounds), source.Sounds.Count, reread.Sounds.Count);
             CheckCount(nameof(BmdFile.CscInfos), source.CscInfos.Count, reread.CscInfos.Count);
             CheckCount(nameof(BmdFile.Deployments), source.Deployments.Count, reread.Deployments.Count);
+            CheckCount(nameof(BmdFile.LegacyDeploymentAreas), source.LegacyDeploymentAreas.Count, reread.LegacyDeploymentAreas.Count);
             CheckCount(nameof(BmdFile.BattlefieldBuildingFars), source.BattlefieldBuildingFars.Count, reread.BattlefieldBuildingFars.Count);
             CheckCount(nameof(BmdFile.EFLines), source.EFLines.Count, reread.EFLines.Count);
             CheckCount(nameof(BmdFile.BmdOutlines), source.BmdOutlines.Count, reread.BmdOutlines.Count);
@@ -273,6 +276,30 @@ namespace Shared.GameFormats.Bmd
         // ---------------------------------------------------------------------
         // Item writers (mirror BmdParser's Read* methods one-for-one)
         // ---------------------------------------------------------------------
+
+        private static void WriteLegacyDeploymentArea(BinaryWriter writer, LegacyDeploymentArea area, ushort managerVersion)
+        {
+            writer.Write(area.TypeX);
+            writer.Write(area.TypeY);
+            WriteCollection(writer, area.Collections, (w, collection) =>
+            {
+                WriteLegacyDeploymentZones(w, collection.Alliance0, managerVersion);
+                WriteLegacyDeploymentZones(w, collection.Alliance1, managerVersion);
+            });
+        }
+
+        private static void WriteLegacyDeploymentZones(BinaryWriter writer, List<LegacyDeploymentZone> zones, ushort managerVersion)
+        {
+            WriteCollection(writer, zones, (w, zone) =>
+            {
+                WriteCollection(w, zone.Boundaries, (w2, boundary) => { WriteString(w2, boundary.Type); WritePoints(w2, boundary.Points); });
+                WriteString(w, zone.Category);
+                w.Write(zone.Orientation);
+                w.Write(Bool(zone.SnapFacing));
+                if (managerVersion >= 2)
+                    w.Write(zone.Id);
+            });
+        }
 
         private static void WriteBattlefieldBuilding(BinaryWriter writer, BattlefieldBuilding building)
         {
@@ -476,21 +503,14 @@ namespace Shared.GameFormats.Bmd
         private static void WriteBmdCachedArea(BinaryWriter writer, BmdCachedArea area)
         {
             writer.Write(area.Version);
+            WriteString(writer, area.Name);
             for (var i = 0; i < 4; i++)
                 writer.Write(area.Aabb[i]);
-            writer.Write(area.InfieldCentreX);
-            writer.Write(area.InfieldCentreY);
-            writer.Write((uint)area.DeploymentIndices.Count);
-            foreach (var index in area.DeploymentIndices)
-                writer.Write(index);
-            WriteVector2(writer, area.AttackDirectionForFirstDeployment);
-            WriteString(writer, area.BattleRedirection);
-            if (area.Version >= 2)
+            if (area.Version >= 6)
+            {
+                WriteString(writer, area.BattleType);
                 WriteString(writer, area.DefendingFactionRestriction);
-            if (area.Version >= 3)
-                WriteString(writer, area.Name);
-            if (area.Version >= 4)
-                WriteString(writer, area.RedirectionCatchment);
+            }
             if (area.Version >= 5)
             {
                 var flags = area.ValidLocationFlags;
@@ -852,7 +872,8 @@ namespace Shared.GameFormats.Bmd
             WriteVector3(writer, hole.FirstVert);
             WriteVector3(writer, hole.SecondVert);
             WriteVector3(writer, hole.ThirdVert);
-            WriteString(writer, hole.HeightMode);
+            if (hole.TerrainHoleVersion > 1)
+                WriteString(writer, hole.HeightMode);
 
             if (hole.TerrainHoleVersion > 2)
                 WriteBmdComponentFlags(writer, hole.Flags);

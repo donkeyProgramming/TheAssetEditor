@@ -16,9 +16,11 @@ namespace Shared.GameFormats.Bmd
         /// section has no separate version field at all, e.g. GoOutline).
         /// </summary>
         public Dictionary<string, ushort> SectionVersions { get; set; } = [];
+        /// <summary>FASTBIN &lt; 22 only.</summary>
+        public List<LegacyDeploymentArea> LegacyDeploymentAreas { get; set; } = [];
         public List<BattlefieldBuilding> BattlefieldBuildings { get; set; } = [];
         public List<BattlefieldBuilding> BattlefieldBuildingFars { get; set; } = [];
-        public List<CaptureLocation> CaptureLocations { get; set; } = [];
+        public List<CaptureLocationList> CaptureLocationLists { get; set; } = [];
         public List<EFLine> EFLines { get; set; } = [];
         public List<GoOutline> GoOutlines { get; set; } = [];
         public List<NonTerrainOutline> NonTerrainOutlines { get; set; } = [];
@@ -55,6 +57,40 @@ namespace Shared.GameFormats.Bmd
         //Pharaoh Exclusive classes (for Pharaoh's version of the version 25 BMD format)
         public CameraZoneNew CameraZoneNew { get; set; } = new();
         public MiscParams MiscParams { get; set; } = new();
+    }
+
+    /// <summary>
+    /// One item of the kit's BATTLE_DEPLOYMENT_AREA_MANAGER, the deployment format FASTBIN &lt; 22 used
+    /// before <see cref="Deployment"/> replaced it. Keyed by a BATTLE_DEPLOYMENT_AREA_TYPE (two ints).
+    /// </summary>
+    public class LegacyDeploymentArea
+    {
+        public int TypeX { get; set; }
+        public int TypeY { get; set; }
+        public List<LegacyDeploymentAreaCollection> Collections { get; set; } = [];
+    }
+
+    public class LegacyDeploymentAreaCollection
+    {
+        public List<LegacyDeploymentZone> Alliance0 { get; set; } = [];
+        public List<LegacyDeploymentZone> Alliance1 { get; set; } = [];
+    }
+
+    /// <summary>Unversioned; gates on the manager version (<c>SectionVersions["LegacyPreV22"]</c>).</summary>
+    public class LegacyDeploymentZone
+    {
+        public List<LegacyDeploymentBoundary> Boundaries { get; set; } = [];
+        public string Category { get; set; } = string.Empty;
+        public float Orientation { get; set; }
+        public bool SnapFacing { get; set; }
+        /// <summary>Manager version 2 and up.</summary>
+        public uint Id { get; set; }
+    }
+
+    public class LegacyDeploymentBoundary
+    {
+        public string Type { get; set; } = string.Empty;
+        public List<RmvVector2> Points { get; set; } = [];
     }
 
     public class FastBinHeader
@@ -175,8 +211,17 @@ namespace Shared.GameFormats.Bmd
     }
 
     /// <summary>
+    /// One CAPTURE_LOCATION_LIST of the kit's CAPTURE_LOCATION_SET: the set is a vector of these lists,
+    /// and each list is a vector of capture locations.
+    /// </summary>
+    public class CaptureLocationList
+    {
+        public List<CaptureLocation> Locations { get; set; } = [];
+    }
+
+    /// <summary>
     /// A capture point (the kit's CAPTURE_LOCATION). Its records carry no version of their own: every
-    /// gated field follows the CAPTURE_LOCATION_SET list version (<c>SectionVersions["CaptureLocation"]</c>).
+    /// gated field follows the CAPTURE_LOCATION_SET version (<c>SectionVersions["CaptureLocation"]</c>).
     /// </summary>
     public class CaptureLocation
     {
@@ -654,19 +699,13 @@ namespace Shared.GameFormats.Bmd
     public class BmdCachedArea
     {
         public ushort Version { get; set; }
-        /// <summary>min_x, min_y, max_x, max_y.</summary>
-        public int[] Aabb { get; set; } = [0, 0, 0, 0];
-        public int InfieldCentreX { get; set; }
-        public int InfieldCentreY { get; set; }
-        public List<ushort> DeploymentIndices { get; set; } = [];
-        public RmvVector2 AttackDirectionForFirstDeployment { get; set; }
-        public string BattleRedirection { get; set; } = string.Empty;
-        /// <summary>Version 2 and up.</summary>
-        public string DefendingFactionRestriction { get; set; } = string.Empty;
-        /// <summary>Version 3 and up.</summary>
         public string Name { get; set; } = string.Empty;
-        /// <summary>Version 4 and up.</summary>
-        public string RedirectionCatchment { get; set; } = string.Empty;
+        /// <summary>min_x, min_y, max_x, max_y.</summary>
+        public float[] Aabb { get; set; } = [0, 0, 0, 0];
+        /// <summary>Version 6 and up.</summary>
+        public string BattleType { get; set; } = string.Empty;
+        /// <summary>Version 6 and up.</summary>
+        public string DefendingFactionRestriction { get; set; } = string.Empty;
         /// <summary>Version 5 and up.</summary>
         public ValidLocationFlags ValidLocationFlags { get; set; } = new();
     }

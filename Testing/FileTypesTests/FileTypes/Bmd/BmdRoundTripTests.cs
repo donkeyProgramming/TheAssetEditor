@@ -25,7 +25,7 @@ namespace FileTypesTests.FileTypes.Bmd
 
             Assert.That(rewritten, Is.EqualTo(bytes));
 
-            var location = reread.CaptureLocations.Single();
+            var location = reread.CaptureLocationLists.Single().Locations.Single();
             Assert.That(location.DatabaseKey, Is.EqualTo("cap_key"));
             Assert.That(location.Radius, Is.EqualTo(12.5f));
             Assert.That(location.LocationPoints, Has.Count.EqualTo(2));
@@ -50,6 +50,7 @@ namespace FileTypesTests.FileTypes.Bmd
             Assert.That(reread.AiHints.PolyLinesList.Select(p => p.District), Is.EqualTo(new uint[] { 0, 9 }));
             Assert.That(reread.TerrainStencilBlendTriangles.Single().HeightMode, Is.EqualTo("HM_TERRAIN"));
             Assert.That(reread.BmdCachedAreas.Single().ValidLocationFlags.ValidWest, Is.True);
+            Assert.That(reread.BmdCachedAreas.Single().BattleType, Is.EqualTo("land_normal"));
             Assert.That(reread.TerraindDecals.Single().Splines.Single().Cp3.Z, Is.EqualTo(3f));
             Assert.That(reread.TreeListReferences.Single().Climate, Is.EqualTo("temperate"));
             Assert.That(reread.GrassListReferences.Single().File, Is.EqualTo("grass.xml"));
@@ -127,7 +128,7 @@ namespace FileTypesTests.FileTypes.Bmd
                 Properties = new BuildingProperties { Version = 13 },
             });
 
-            file.CaptureLocations.Add(new CaptureLocation
+            file.CaptureLocationLists.Add(new CaptureLocationList { Locations = [new CaptureLocation
             {
                 Location = new RmvVector2(10, 20),
                 Radius = 12.5f,
@@ -148,7 +149,7 @@ namespace FileTypesTests.FileTypes.Bmd
                 ScriptId = captureLocationVersion >= 9 ? "script" : "",
                 IsTimeBased = captureLocationVersion >= 10,
                 InitialOwnerType = captureLocationVersion > 11 ? "owner" : "",
-            });
+            }] });
 
             file.EFLines.Add(new EFLine { Label = "line", End1 = new RmvVector3(1, 2, 3), End2 = new RmvVector3(4, 5, 6), Direction = new RmvVector3(0, 0, 1), Purpose = "purpose" });
             file.ZonesTemplates.Add(new ZonesTemplate
@@ -175,16 +176,11 @@ namespace FileTypesTests.FileTypes.Bmd
 
             file.BmdCachedAreas.Add(new BmdCachedArea
             {
-                Version = 5,
-                Aabb = [-1, -2, 3, 4],
-                InfieldCentreX = 1,
-                InfieldCentreY = 2,
-                DeploymentIndices = [0, 1],
-                AttackDirectionForFirstDeployment = new RmvVector2(1, 0),
-                BattleRedirection = "br",
+                Version = 6,
+                Aabb = [-1.5f, -2, 3, 4.5f],
                 DefendingFactionRestriction = "dfr",
                 Name = "name",
-                RedirectionCatchment = "rc",
+                BattleType = "land_normal",
                 ValidLocationFlags = new ValidLocationFlags { Version = 1, ValidNorth = true, ValidWest = true },
             });
 

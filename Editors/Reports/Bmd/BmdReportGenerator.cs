@@ -98,7 +98,7 @@ namespace Editors.Reports.Bmd
                     summaryRecord.FastBinVersion = parsedFile.Header.FastBinVersion;
                     summaryRecord.BattlefieldBuildingCount = parsedFile.BattlefieldBuildings.Count;
                     summaryRecord.BattlefieldBuildingFarCount = parsedFile.BattlefieldBuildingFars.Count;
-                    summaryRecord.CaptureLocationCount = parsedFile.CaptureLocations.Count;
+                    summaryRecord.CaptureLocationCount = parsedFile.CaptureLocationLists.Sum(l => l.Locations.Count);
                     summaryRecord.EFLineCount = parsedFile.EFLines.Count;
                     summaryRecord.GoOutlineCount = parsedFile.GoOutlines.Count;
                     summaryRecord.NonTerrainOutlineCount = parsedFile.NonTerrainOutlines.Count;
@@ -162,7 +162,7 @@ namespace Editors.Reports.Bmd
                     }
 
                     // Capture Location records
-                    foreach (var captureLocation in parsedFile.CaptureLocations)
+                    foreach (var captureLocation in parsedFile.CaptureLocationLists.SelectMany(l => l.Locations))
                     {
                         dynamic captureLocationRecord = new ExpandoObject();
                         captureLocationRecord.Path = path;

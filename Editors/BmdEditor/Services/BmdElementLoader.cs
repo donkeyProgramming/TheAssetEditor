@@ -193,7 +193,7 @@ namespace Editors.BmdEditor.Services
         private static void LoadCaptureLocations(BmdFile bmdFile, ObservableCollection<CaptureLocationViewModel> captureLocations, 
             ObservableCollection<BmdElementViewModel> allElements)
         {
-            foreach (var captureLocation in bmdFile.CaptureLocations)
+            foreach (var captureLocation in bmdFile.CaptureLocationLists.SelectMany(l => l.Locations))
             {
                 var vm = new CaptureLocationViewModel(captureLocation);
                 captureLocations.Add(vm);

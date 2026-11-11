@@ -10,6 +10,8 @@ namespace Shared.GameFormats.Bmd
         private readonly Stream _stream;
         private readonly ushort _fastBinVersion;
         private readonly ILogger _logger = Logging.Create<BmdParser>();
+        /// <summary>Where the parse is, so a failure names the section that misread.</summary>
+        private string _section = "header";
 
         public BmdParser(Stream stream)
         {
@@ -117,14 +119,9 @@ namespace Shared.GameFormats.Bmd
                 
                 if (_fastBinVersion < 22)
                 {
-                    // The kit's BATTLE_DEPLOYMENT_AREA_MANAGER (namespaced DEPRECATED there; Deployments replaced it
-                    // at FASTBIN 22). Every vanilla file has it empty, and its item layout can't be read reliably from
-                    // the kit, so a non-empty one is refused rather than misparsed.
+                    // The kit's BATTLE_DEPLOYMENT_AREA_MANAGER (namespaced DEPRECATED there; Deployments replaced it at FASTBIN 22)
                     var legacyDeploymentVersion = _reader.ReadUInt16();
-                    bmdFile.SectionVersions["LegacyPreV22"] = legacyDeploymentVersion;
-                    var legacyDeploymentCount = _reader.ReadUInt32();
-                    if (legacyDeploymentCount != 0)
-                        throw new NotSupportedException($"BMD has {legacyDeploymentCount} pre-FASTBIN-22 deployment area item(s) (BATTLE_DEPLOYMENT_AREA_MANAGER); that layout isn't supported.");
+                    ReadCollection(bmdFile, "LegacyPreV22", bmdFile.LegacyDeploymentAreas, () => ReadLegacyDeploymentArea(legacyDeploymentVersion), legacyDeploymentVersion);
                 }
 
                 // BattlefieldBuilding
@@ -135,9 +132,16 @@ namespace Shared.GameFormats.Bmd
                 var battlefieldBuildingFarVersion = _reader.ReadUInt16();
                 ReadCollection(bmdFile, "BattlefieldBuildingFar", bmdFile.BattlefieldBuildingFars, ReadBattlefieldBuilding, battlefieldBuildingFarVersion);
 
-                // CaptureLocation: the records are unversioned and gate on the list version
+                // CaptureLocation: a set (version + count) of lists (count) of unversioned locations, which gate on the set version
                 var captureLocationVersion = _reader.ReadUInt16();
-                ReadCollection(bmdFile, "CaptureLocation", bmdFile.CaptureLocations, () => ReadCaptureLocation(captureLocationVersion), captureLocationVersion);
+                ReadCollection(bmdFile, "CaptureLocation", bmdFile.CaptureLocationLists, () =>
+                {
+                    var list = new CaptureLocationList();
+                    var count = _reader.ReadUInt32();
+                    for (var i = 0; i < count; i++)
+                        list.Locations.Add(ReadCaptureLocation(captureLocationVersion));
+                    return list;
+                }, captureLocationVersion);
 
                 // EFLine
                 // no version
@@ -190,6 +194,7 @@ namespace Shared.GameFormats.Bmd
                     // Prop
                     var propVersion = _reader.ReadUInt16();
                     bmdFile.SectionVersions["Prop"] = propVersion;
+                    _section = "Prop";
                     ReadPropInfos(propVersion, bmdFile);
                 }
                 if (_fastBinVersion > 8)
@@ -202,6 +207,7 @@ namespace Shared.GameFormats.Bmd
                     var aiHintsVersion = _reader.ReadUInt16();
                     bmdFile.SectionVersions["AiHints"] = aiHintsVersion;
                     _logger.Here().Information($"BMD Parser - AiHints version: {aiHintsVersion}");
+                    _section = "AiHints";
                     bmdFile.AiHints = ReadAiHints(bmdFile);
                 }
                 if (_fastBinVersion > 10)
@@ -212,7 +218,7 @@ namespace Shared.GameFormats.Bmd
 
                     // TerrainHole
                     var terrainHoleVersion = _reader.ReadUInt16();
-                    ReadCollection(bmdFile, "TerrainHole", bmdFile.TerrainHoles, ReadTerrainHoleInfo, terrainHoleVersion);
+                    ReadCollection(bmdFile, "TerrainHole", bmdFile.TerrainHoles, ReadTerrainHoleTriangleInfo, terrainHoleVersion);
 
                     // PointLight
                     var pointLightVersion = _reader.ReadUInt16();
@@ -230,6 +236,7 @@ namespace Shared.GameFormats.Bmd
                 {
                     // PlayableArea
                     _logger.Here().Information($"BMD Parser - PlayableArea");
+                    _section = "PlayableArea";
                     bmdFile.PlayableArea = ReadPlayableArea();
                 }
                 if (_fastBinVersion > 16)
@@ -317,7 +324,9 @@ namespace Shared.GameFormats.Bmd
                 _logger.Here().Error($"BMD Parser - Exception caught: {ex.Message}");
                 _logger.Here().Error($"BMD Parser - Stream position: {_stream.Position}, Length: {_stream.Length}");
                 _logger.Here().Error($"BMD Parser - Stack trace: {ex.StackTrace}");
-                throw;
+                if (ex is NotSupportedException)
+                    throw;
+                throw new InvalidDataException($"BMD parse failed in {_section} at byte {_stream.Position} of {_stream.Length}: {ex.Message}", ex);
             }
         }
 
@@ -339,8 +348,45 @@ namespace Shared.GameFormats.Bmd
 
             for (var i = 0; i < count; i++)
             {
+                _section = $"{collectionName}[{i} of {count}]";
                 collection.Add(readFunc());
             }
+            _section = $"after {collectionName}";
+        }
+
+        private LegacyDeploymentArea ReadLegacyDeploymentArea(ushort managerVersion)
+        {
+            var area = new LegacyDeploymentArea { TypeX = _reader.ReadInt32(), TypeY = _reader.ReadInt32() };
+            var collectionCount = _reader.ReadUInt32();
+            for (var i = 0; i < collectionCount; i++)
+            {
+                area.Collections.Add(new LegacyDeploymentAreaCollection
+                {
+                    Alliance0 = ReadLegacyDeploymentZones(managerVersion),
+                    Alliance1 = ReadLegacyDeploymentZones(managerVersion),
+                });
+            }
+            return area;
+        }
+
+        private List<LegacyDeploymentZone> ReadLegacyDeploymentZones(ushort managerVersion)
+        {
+            var zones = new List<LegacyDeploymentZone>();
+            var zoneCount = _reader.ReadUInt32();
+            for (var i = 0; i < zoneCount; i++)
+            {
+                var zone = new LegacyDeploymentZone();
+                var boundaryCount = _reader.ReadUInt32();
+                for (var j = 0; j < boundaryCount; j++)
+                    zone.Boundaries.Add(new LegacyDeploymentBoundary { Type = ReadString(), Points = ReadPoints() });
+                zone.Category = ReadString();
+                zone.Orientation = _reader.ReadSingle();
+                zone.SnapFacing = _reader.ReadByte() != 0;
+                if (managerVersion >= 2)
+                    zone.Id = _reader.ReadUInt32();
+                zones.Add(zone);
+            }
+            return zones;
         }
 
         private BattlefieldBuilding ReadBattlefieldBuilding()
@@ -641,6 +687,7 @@ namespace Shared.GameFormats.Bmd
             
             for (var i = 0; i < propInfoCount; i++)
             {
+                _section = $"Prop[{i} of {propInfoCount}]";
                 bmdFile.PropInfos.Add(ReadPropInfo(propsList));
             }
         }
@@ -1115,22 +1162,6 @@ namespace Shared.GameFormats.Bmd
             return light;
         }
 
-        private TerrainHoleTriangleInfo ReadTerrainHoleInfo()
-        {
-            var hole = new TerrainHoleTriangleInfo();
-            hole.TerrainHoleVersion = _reader.ReadUInt16();
-            hole.FirstVert = ReadRmvVector3();
-            hole.SecondVert = ReadRmvVector3();
-            hole.ThirdVert = ReadRmvVector3();
-            hole.HeightMode = ReadString();
-            
-            if (hole.TerrainHoleVersion > 2)
-            {
-                hole.Flags = ReadBmdComponentFlags();
-            }
-            
-            return hole;
-        }
 
         private SoundInfo ReadSoundInfo()
         {
@@ -1299,21 +1330,14 @@ namespace Shared.GameFormats.Bmd
         {
             var area = new BmdCachedArea();
             area.Version = _reader.ReadUInt16();
+            area.Name = ReadString();
             for (var i = 0; i < 4; i++)
-                area.Aabb[i] = _reader.ReadInt32();
-            area.InfieldCentreX = _reader.ReadInt32();
-            area.InfieldCentreY = _reader.ReadInt32();
-            var indexCount = _reader.ReadUInt32();
-            for (var i = 0; i < indexCount; i++)
-                area.DeploymentIndices.Add(_reader.ReadUInt16());
-            area.AttackDirectionForFirstDeployment = ReadVector2();
-            area.BattleRedirection = ReadString();
-            if (area.Version >= 2)
+                area.Aabb[i] = _reader.ReadSingle();
+            if (area.Version >= 6)
+            {
+                area.BattleType = ReadString();
                 area.DefendingFactionRestriction = ReadString();
-            if (area.Version >= 3)
-                area.Name = ReadString();
-            if (area.Version >= 4)
-                area.RedirectionCatchment = ReadString();
+            }
             if (area.Version >= 5)
             {
                 area.ValidLocationFlags = new ValidLocationFlags
