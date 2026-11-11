@@ -302,10 +302,21 @@ namespace Shared.GameFormats.Bmd
         public bool VisibleInsideDestructionRegion { get; set; }
         public bool VisibleOutsideDestructionRegion { get; set; }
         public bool Animated { get; set; }
+        /// <summary>Versions 1-2 only.</summary>
+        public float DecalParallax { get; set; }
+        /// <summary>Versions 1-2 only.</summary>
+        public RmvVector3 DecalScale { get; set; }
+        /// <summary>Versions 1-2 only.</summary>
+        public bool DecalTiled { get; set; }
         public float DecalParallaxScale { get; set; }
         public float DecalTiling { get; set; }
         public bool DecalOverrideGbufferNormal { get; set; }
-        
+        /// <summary>
+        /// Version 3 props in vanilla store junk (e.g. 0x8D) in this bool, apparently uninitialised memory
+        /// in the exporter. The raw byte is kept so an unedited save reproduces the file exactly.
+        /// </summary>
+        public byte? DecalOverrideGbufferNormalRawByte { get; set; }
+
         public BmdComponentFlags Flags { get; set; } = new();
 
         public bool VisibleInShroud { get; set; }
@@ -336,7 +347,7 @@ namespace Shared.GameFormats.Bmd
         public int DecalLayer { get; set; }
         public bool DecalTilingAlpha { get; set; }
 
-        // Early version 4 specific fields
+        // The undecoded tail of a FASTBIN < 11 prop (the kit can't decode that layout)
         public byte[] EarlyVersionUnknownBytes { get; set; } = new byte[23];
         public bool EarlyVersionUnknownBool { get; set; }
     }

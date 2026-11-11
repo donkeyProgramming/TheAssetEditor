@@ -674,24 +674,37 @@ namespace Shared.GameFormats.Bmd
 
             if (prop.PropInfoVersion < 4)
             {
-                //There's less mystery bytes for the later version (version 3 seen)
-                if (prop.PropInfoVersion == 1)
-                    _reader.ReadBytes(30); //proto-props version 3 (last seen) only had 28 mystery bytes
-                else if (prop.PropInfoVersion == 2)
+                // Before the flags block (version 4) these fields sat inline; the flag-like ones are kept on Flags.
+                prop.Flags.ClampToSurface = _reader.ReadByte() != 0;
+                prop.IsDecal = _reader.ReadByte() != 0;
+                prop.LogicalDecal = _reader.ReadByte() != 0;
+                if (prop.PropInfoVersion <= 2)
                 {
-                    _reader.ReadBytes(7);
-
-                    //3 floats, some position thing
-                    _reader.ReadSingle();
-                    _reader.ReadSingle();
-                    _reader.ReadSingle();
-
-                    _reader.ReadBytes(11);
-                    _reader.ReadByte(); //one extra compared to version 1
+                    prop.DecalParallax = _reader.ReadSingle();
+                    prop.DecalScale = ReadRmvVector3();
+                    prop.DecalTiled = _reader.ReadByte() != 0;
                 }
-                else if (prop.PropInfoVersion == 3)
-                    _reader.ReadBytes(23); //proto-props version 1 had 23 mystery bytes, clue?
-                
+                prop.Flags.AllowInOutfield = _reader.ReadByte() != 0;
+                prop.IsFauna = _reader.ReadByte() != 0;
+                prop.VisibleInsideSnowRegion = _reader.ReadByte() != 0;
+                prop.VisibleOutsideSnowRegion = _reader.ReadByte() != 0;
+                prop.VisibleInsideDestructionRegion = _reader.ReadByte() != 0;
+                prop.VisibleOutsideDestructionRegion = _reader.ReadByte() != 0;
+                prop.Flags.SeasonSpring = _reader.ReadByte() != 0;
+                prop.Flags.SeasonSummer = _reader.ReadByte() != 0;
+                prop.Flags.SeasonAutumn = _reader.ReadByte() != 0;
+                prop.Flags.SeasonWinter = _reader.ReadByte() != 0;
+                if (prop.PropInfoVersion >= 2)
+                    prop.Animated = _reader.ReadByte() != 0;
+                if (prop.PropInfoVersion >= 3)
+                {
+                    prop.DecalParallaxScale = _reader.ReadSingle();
+                    prop.DecalTiling = _reader.ReadSingle();
+                    var overrideGbufferNormal = _reader.ReadByte();
+                    prop.DecalOverrideGbufferNormal = overrideGbufferNormal != 0;
+                    if (overrideGbufferNormal > 1)
+                        prop.DecalOverrideGbufferNormalRawByte = overrideGbufferNormal;
+                }
                 return prop;
             }
             prop.IsDecal = _reader.ReadByte() != 0;

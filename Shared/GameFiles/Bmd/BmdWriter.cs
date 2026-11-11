@@ -454,11 +454,6 @@ namespace Shared.GameFormats.Bmd
 
         private static void WritePropInfo(BinaryWriter writer, PropInfo prop, List<string> propsList, Dictionary<string, int> propIndexLookup)
         {
-            if (prop.PropInfoVersion < 4)
-                throw new NotSupportedException(
-                    $"PropInfo version {prop.PropInfoVersion} predates the fields BmdParser stores (several bytes " +
-                    "are read and discarded, never kept on PropInfo) - cannot be written back.");
-
             writer.Write(prop.PropInfoVersion);
             if (prop.PropInfoVersion <= 12)
             {
@@ -477,6 +472,41 @@ namespace Shared.GameFormats.Bmd
             }
 
             WriteRowMajorMatrix(writer, prop.Transform, is4x4: false);
+
+            if (prop.PropInfoVersion < 4)
+            {
+                writer.Write(Bool(prop.Flags.ClampToSurface));
+                writer.Write(Bool(prop.IsDecal));
+                writer.Write(Bool(prop.LogicalDecal));
+                if (prop.PropInfoVersion <= 2)
+                {
+                    writer.Write(prop.DecalParallax);
+                    WriteVector3(writer, prop.DecalScale);
+                    writer.Write(Bool(prop.DecalTiled));
+                }
+                writer.Write(Bool(prop.Flags.AllowInOutfield));
+                writer.Write(Bool(prop.IsFauna));
+                writer.Write(Bool(prop.VisibleInsideSnowRegion));
+                writer.Write(Bool(prop.VisibleOutsideSnowRegion));
+                writer.Write(Bool(prop.VisibleInsideDestructionRegion));
+                writer.Write(Bool(prop.VisibleOutsideDestructionRegion));
+                writer.Write(Bool(prop.Flags.SeasonSpring));
+                writer.Write(Bool(prop.Flags.SeasonSummer));
+                writer.Write(Bool(prop.Flags.SeasonAutumn));
+                writer.Write(Bool(prop.Flags.SeasonWinter));
+                if (prop.PropInfoVersion >= 2)
+                    writer.Write(Bool(prop.Animated));
+                if (prop.PropInfoVersion >= 3)
+                {
+                    writer.Write(prop.DecalParallaxScale);
+                    writer.Write(prop.DecalTiling);
+                    // Keep vanilla's junk byte unless the bool has been edited since.
+                    writer.Write(prop.DecalOverrideGbufferNormalRawByte is { } raw && prop.DecalOverrideGbufferNormal
+                        ? raw
+                        : Bool(prop.DecalOverrideGbufferNormal));
+                }
+                return;
+            }
 
             writer.Write(Bool(prop.IsDecal));
             writer.Write(Bool(prop.LogicalDecal));
