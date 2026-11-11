@@ -95,6 +95,7 @@ namespace Editors.BmdEditor.ViewModels
         public ICommand AddLightProbeCommand { get; }
         public ICommand AddTerrainHoleCommand { get; }
         public ICommand AddCscCommand { get; }
+        public ICommand DeleteSelectedCommand { get; }
 
         private BmdElementViewModel? _selectedComponent;
         public BmdElementViewModel? SelectedComponent
@@ -104,10 +105,12 @@ namespace Editors.BmdEditor.ViewModels
             {
                 SetAndNotify(ref _selectedComponent, value);
                 NotifyPropertyChanged(nameof(HasSelection));
+                NotifyPropertyChanged(nameof(CanDeleteSelection));
             }
         }
 
         public bool HasSelection => SelectedComponent != null;
+        public bool CanDeleteSelection => FindInFile(SelectedComponent) != null;
 
         private string _componentDetails = "Select a component to view details";
         public string ComponentDetails
@@ -172,6 +175,7 @@ namespace Editors.BmdEditor.ViewModels
             AddLightProbeCommand = new RelayCommand(AddLightProbe);
             AddTerrainHoleCommand = new RelayCommand(AddTerrainHole);
             AddCscCommand = new RelayCommand(AddCsc);
+            DeleteSelectedCommand = new RelayCommand(DeleteSelected);
 
             _eventHub.Register<SelectionChangedEvent>(this, OnSelectionChanged);
         }
@@ -314,6 +318,44 @@ namespace Editors.BmdEditor.ViewModels
 
             BmdFile.CscInfos.Add(BmdElementFactory.CreateCsc(_packFileService.GetFullPath(result.File)));
             FinishAdd(() => CscInfos.LastOrDefault());
+        }
+
+        // Only elements in this file's own lists: the children of a referenced BMD belong to that file.
+        private (System.Collections.IList List, object Item)? FindInFile(BmdElementViewModel? element)
+        {
+            if (BmdFile == null)
+                return null;
+
+            (System.Collections.IList List, object Item)? entry = element switch
+            {
+                PropInfoViewModel prop => (BmdFile.PropInfos, prop.Prop),
+                VfxInfoViewModel vfx => (BmdFile.VfxInfos, vfx.Vfx),
+                PointLightInfoViewModel light => (BmdFile.PointLights, light.Light),
+                SpotLightInfoViewModel light => (BmdFile.SpotLights, light.Light),
+                SoundInfoViewModel sound => (BmdFile.Sounds, sound.Sound),
+                PolyMeshInfoViewModel mesh => (BmdFile.PolyMeshes, mesh.Mesh),
+                LightProbeInfoViewModel probe => (BmdFile.LightProbes, probe.Probe),
+                TerrainHoleInfoViewModel hole => (BmdFile.TerrainHoles, hole.Hole),
+                CscInfoViewModel csc => (BmdFile.CscInfos, csc.Csc),
+                _ => null,
+            };
+            return entry is { } found && found.List.Contains(found.Item) ? entry : null;
+        }
+
+        private void DeleteSelected()
+        {
+            if (FindInFile(SelectedComponent) is not { } entry)
+                return;
+
+            entry.List.Remove(entry.Item);
+            _gizmo.SetTarget(null);
+            _selectionManager.GetState<ObjectSelectionState>()?.Clear();
+            SelectedComponent = null;
+            ComponentDetails = "Select a component to view details";
+
+            _bmdSceneCreator.CreateSceneFromBmd(BmdFile!, CurrentFile);
+            PopulateViewModels();
+            HasUnsavedChanges = true;
         }
 
         public bool Save()

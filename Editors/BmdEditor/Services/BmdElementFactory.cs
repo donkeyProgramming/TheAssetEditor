@@ -16,8 +16,6 @@ namespace Editors.BmdEditor.Services
         // hide the new element from every culture.
         private static byte[] WildcardCultureMaskBytes() => [0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF];
 
-        private static BmdComponentFlags DefaultFlags() => new() { FlagVersion = 4 };
-
         private static BmdComponentFlags AllSeasonsFlags() => new()
         {
             FlagVersion = 4,
@@ -49,7 +47,7 @@ namespace Editors.BmdEditor.Services
             VfxInfoVersion = 10,
             VfxString = vfxString,
             Transform = Matrix.Identity,
-            Flags = DefaultFlags(),
+            Flags = AllSeasonsFlags(),
             HeightMode = DefaultHeightMode,
             CultureMask = WildcardCultureMaskBytes(),
             Autoplay = true,
@@ -66,7 +64,7 @@ namespace Editors.BmdEditor.Services
             Blue = 1,
             ColorScale = 1,
             HeightMode = DefaultHeightMode,
-            Flags = DefaultFlags(),
+            Flags = AllSeasonsFlags(),
         };
 
         public static SpotLightInfo CreateSpotLight() => new()
@@ -85,7 +83,7 @@ namespace Editors.BmdEditor.Services
             IntensityBlue = 1,
             Falloff = 1,
             HeightMode = DefaultHeightMode,
-            Flags = DefaultFlags(),
+            Flags = AllSeasonsFlags(),
         };
 
         public static SoundInfo CreateSound(string soundString) => new()
@@ -105,7 +103,7 @@ namespace Editors.BmdEditor.Services
             TriangleList = [0, 1, 2],
             MaterialString = materialString,
             HeightMode = DefaultHeightMode,
-            Flags = DefaultFlags(),
+            Flags = AllSeasonsFlags(),
             Transform = Matrix.Identity,
             VisibleInsideSnowRegion = true,
             VisibleOutsideSnowRegion = true,
@@ -130,7 +128,7 @@ namespace Editors.BmdEditor.Services
             SecondVert = new RmvVector3(1, 0, 0),
             ThirdVert = new RmvVector3(0, 1, 0),
             HeightMode = DefaultHeightMode,
-            Flags = DefaultFlags(),
+            Flags = AllSeasonsFlags(),
         };
 
         public static CscInfo CreateCsc(string sceneFile) => new()

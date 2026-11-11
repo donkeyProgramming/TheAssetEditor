@@ -48,6 +48,7 @@
                     <MenuItem Header="Composite scene..." Command="{Binding AddCscCommand}"/>
                 </MenuItem>
             </Menu>
+            <Button Content="Delete" Command="{Binding DeleteSelectedCommand}" IsEnabled="{Binding CanDeleteSelection}" Padding="10,5" ToolTip="Delete the selected element (Del in the component list)"/>
             <Separator/>
             <Button Command="{Binding GizmoTranslateCommand}" IsEnabled="{Binding HasSelection}" Padding="6,3" ToolTip="Move">
                 <Image Width="20" Height="20" Source="{Binding Source={x:Static resources:IconLibrary.Gizmo_MoveIcon}, UpdateSourceTrigger=PropertyChanged}"/>
@@ -86,6 +87,9 @@
             <!-- Component List (Top Right) -->
             <GroupBox Grid.Column="2" Grid.Row="0" Header="Components">
                 <TreeView ItemsSource="{Binding ComponentGroups}" SelectedItemChanged="ComponentsTreeView_SelectedItemChanged" x:Name="ComponentsTreeView">
+                    <TreeView.InputBindings>
+                        <KeyBinding Key="Delete" Command="{Binding DeleteSelectedCommand}"/>
+                    </TreeView.InputBindings>
                     <TreeView.Resources>
                         <HierarchicalDataTemplate DataType="{x:Type vm:BmdCategoryGroupViewModel}" ItemsSource="{Binding Items}">
                             <TextBlock Text="{Binding Header}" FontWeight="Bold"/>
