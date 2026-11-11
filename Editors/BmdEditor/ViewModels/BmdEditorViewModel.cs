@@ -703,16 +703,23 @@ namespace Editors.BmdEditor.ViewModels
                 case BattlefieldBuildingFarViewModel buildingFar:
                     details.AppendLine("Battlefield Building Far Details:");
                     details.AppendLine($"  Version: {buildingFar.BuildingFar.Version}");
+                    details.AppendLine($"  Key: {buildingFar.BuildingFar.BuildingKey}");
                     break;
 
                 case CaptureLocationViewModel captureLocation:
+                    var location = captureLocation.CaptureLocation;
                     details.AppendLine("Capture Location Details:");
-                    details.AppendLine($"  Version: {captureLocation.CaptureLocation.Version}");
+                    details.AppendLine($"  Key: {location.DatabaseKey}");
+                    details.AppendLine($"  Type: {location.CapturePointType}");
+                    details.AppendLine($"  Location: ({location.Location.X:F2}, {location.Location.Y:F2})");
+                    details.AppendLine($"  Radius: {location.Radius:F2}");
+                    details.AppendLine($"  Building Links: {location.BuildingLinks.Count}");
                     break;
 
                 case EFLineViewModel efLine:
                     details.AppendLine("EF Line Details:");
-                    details.AppendLine($"  Version: {efLine.EFLine.Version}");
+                    details.AppendLine($"  Label: {efLine.EFLine.Label}");
+                    details.AppendLine($"  Purpose: {efLine.EFLine.Purpose}");
                     break;
 
                 case GoOutlineViewModel goOutline:
@@ -735,6 +742,7 @@ namespace Editors.BmdEditor.ViewModels
                 case ZonesTemplateViewModel zonesTemplate:
                     details.AppendLine("Zones Template Details:");
                     details.AppendLine($"  Outline Points: {zonesTemplate.ZonesTemplate.Outline.Count}");
+                    details.AppendLine($"  Lines: {zonesTemplate.ZonesTemplate.Lines.Count}");
                     break;
 
                 case PlayableAreaViewModel playableArea:
@@ -1324,17 +1332,17 @@ namespace Editors.BmdEditor.ViewModels
         public override void ApplyScaleFactor(float factor) => SetScale(ScaleX * factor, ScaleY * factor, ScaleZ * factor);
     }
 
-    public class BattlefieldBuildingFarViewModel(BattlefieldBuildingFar buildingFar) : BmdElementViewModel("Battlefield Building Far", "", $"Version: {buildingFar.Version}")
+    public class BattlefieldBuildingFarViewModel(BattlefieldBuilding buildingFar) : BmdElementViewModel("Battlefield Building Far", buildingFar.BuildingKey, $"Version: {buildingFar.Version}")
     {
-        public BattlefieldBuildingFar BuildingFar { get; } = buildingFar;
+        public BattlefieldBuilding BuildingFar { get; } = buildingFar;
     }
 
-    public class CaptureLocationViewModel(CaptureLocation captureLocation) : BmdElementViewModel("Capture Location", "", $"Version: {captureLocation.Version}")
+    public class CaptureLocationViewModel(CaptureLocation captureLocation) : BmdElementViewModel("Capture Location", captureLocation.DatabaseKey, $"Type: {captureLocation.CapturePointType}")
     {
         public CaptureLocation CaptureLocation { get; } = captureLocation;
     }
 
-    public class EFLineViewModel(EFLine efLine) : BmdElementViewModel("EF Line", "", $"Version: {efLine.Version}")
+    public class EFLineViewModel(EFLine efLine) : BmdElementViewModel("EF Line", efLine.Label, $"Purpose: {efLine.Purpose}")
     {
         public EFLine EFLine { get; } = efLine;
     }

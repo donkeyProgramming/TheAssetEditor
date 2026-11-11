@@ -117,24 +117,27 @@ namespace Shared.GameFormats.Bmd
                 
                 if (_fastBinVersion < 22)
                 {
-                    // Some unknown thing that was removed for some ungodly reason
-                    var some_version = _reader.ReadUInt16();
-                    bmdFile.SectionVersions["LegacyPreV22"] = some_version;
-                    var some_length = _reader.ReadUInt32();
-                    _logger.Here().Information($"BMD Parser - Some version: {some_version}, Some length: {some_length}");
+                    // The kit's BATTLE_DEPLOYMENT_AREA_MANAGER (namespaced DEPRECATED there; Deployments replaced it
+                    // at FASTBIN 22). Every vanilla file has it empty, and its item layout can't be read reliably from
+                    // the kit, so a non-empty one is refused rather than misparsed.
+                    var legacyDeploymentVersion = _reader.ReadUInt16();
+                    bmdFile.SectionVersions["LegacyPreV22"] = legacyDeploymentVersion;
+                    var legacyDeploymentCount = _reader.ReadUInt32();
+                    if (legacyDeploymentCount != 0)
+                        throw new NotSupportedException($"BMD has {legacyDeploymentCount} pre-FASTBIN-22 deployment area item(s) (BATTLE_DEPLOYMENT_AREA_MANAGER); that layout isn't supported.");
                 }
 
                 // BattlefieldBuilding
                 var battlefieldBuildingVersion = _reader.ReadUInt16();
                 ReadCollection(bmdFile, "BattlefieldBuilding", bmdFile.BattlefieldBuildings, ReadBattlefieldBuilding, battlefieldBuildingVersion);
 
-                // BattlefieldBuildingFar
+                // BattlefieldBuildingFar: the same records as the near list
                 var battlefieldBuildingFarVersion = _reader.ReadUInt16();
-                ReadCollection(bmdFile, "BattlefieldBuildingFar", bmdFile.BattlefieldBuildingFars, ReadBattlefieldBuildingFar, battlefieldBuildingFarVersion);
+                ReadCollection(bmdFile, "BattlefieldBuildingFar", bmdFile.BattlefieldBuildingFars, ReadBattlefieldBuilding, battlefieldBuildingFarVersion);
 
-                // CaptureLocation
+                // CaptureLocation: the records are unversioned and gate on the list version
                 var captureLocationVersion = _reader.ReadUInt16();
-                ReadCollection(bmdFile, "CaptureLocation", bmdFile.CaptureLocations, ReadCaptureLocation, captureLocationVersion);
+                ReadCollection(bmdFile, "CaptureLocation", bmdFile.CaptureLocations, () => ReadCaptureLocation(captureLocationVersion), captureLocationVersion);
 
                 // EFLine
                 // no version
@@ -275,7 +278,7 @@ namespace Shared.GameFormats.Bmd
                 {
                     // ToggleableBuildingSlots
                     var toggleableBuildingSlotVersion = _reader.ReadUInt16();
-                    ReadCollection(bmdFile, "ToggleableBuildingSlot", bmdFile.ToggleableBuildingSlots, ReadToggleableBuildingSlot, toggleableBuildingSlotVersion);
+                    ReadCollection(bmdFile, "ToggleableBuildingSlot", bmdFile.ToggleableBuildingSlots, () => ReadToggleableBuildingSlot(toggleableBuildingSlotVersion), toggleableBuildingSlotVersion);
                 }
                 if (_fastBinVersion > 24)
                 {
@@ -449,113 +452,103 @@ namespace Shared.GameFormats.Bmd
             return properties;
         }
 
-        private BattlefieldBuildingFar ReadBattlefieldBuildingFar()
-        {
-            throw new NotImplementedException("BmdOutline parsing not implemented yet");
-        }
-
-        private CaptureLocation ReadCaptureLocation()
+        private CaptureLocation ReadCaptureLocation(ushort listVersion)
         {
             var location = new CaptureLocation();
-            location.Version = _reader.ReadUInt16();
-            location.Zero = _reader.ReadUInt16();
-            location.Something1 = _reader.ReadSingle();
-            location.Something2 = _reader.ReadSingle();
-            location.Something3 = _reader.ReadInt32();
-            location.Something4 = _reader.ReadInt32();
-            location.Something5 = _reader.ReadInt32();
-            location.Str = ReadString();
-
-            if (location.Version > 2)
-                location.Str2 = ReadString();
-            
-            var coordCount = _reader.ReadUInt32();
-            location.Coords = new float[coordCount * 2];
-            for (var i = 0; i < location.Coords.Length; i++)
-            {
-                location.Coords[i] = _reader.ReadSingle();
-            }
-            
-            location.Str3 = ReadString();
-            location.Something6 = _reader.ReadSingle();
-            location.Something7 = _reader.ReadSingle();
-            location.Bools = _reader.ReadBytes(4); //redo this 
-            if (location.Version > 2)
-            {
-                location.Bools = _reader.ReadBytes(3); //redo this 
-                location.Something8 = _reader.ReadUInt16();
-                location.Something9 = _reader.ReadSingle();
-                location.Something10 = _reader.ReadSingle();
-            }
+            location.Location = ReadVector2();
+            location.Radius = _reader.ReadSingle();
+            location.ValidForMinNumPlayers = _reader.ReadUInt32();
+            location.ValidForMaxNumPlayers = _reader.ReadUInt32();
+            location.CapturePointType = ReadString();
+            if (listVersion > 2)
+                location.RestoreType = ReadString();
+            location.LocationPoints = ReadPoints();
+            if (listVersion == 1)
+                location.BuildingIndices = ReadUInt32List();
+            location.DatabaseKey = ReadString();
+            location.FlagFacing = ReadVector2();
+            // The kit reads these three in this order, not in version order.
+            if (listVersion >= 4)
+                location.DestroyBuildingOnCapture = _reader.ReadByte() != 0;
+            if (listVersion >= 6)
+                location.DisableBuildingAbilitiesWhenNoOriginalOwner = _reader.ReadByte() != 0;
+            if (listVersion >= 5)
+                location.AbilitiesAffectGlobally = _reader.ReadByte() != 0;
+            if (listVersion > 1)
+                location.BuildingLinks = ReadBuildingLinks();
+            if (listVersion >= 7)
+                location.ToggleSlotsLinks = ReadUInt32List();
+            if (listVersion >= 8)
+                location.AiHintsLinks = ReadUInt32List();
+            if (listVersion >= 9)
+                location.ScriptId = ReadString();
+            if (listVersion >= 10)
+                location.IsTimeBased = _reader.ReadByte() != 0;
+            if (listVersion > 11)
+                location.InitialOwnerType = ReadString();
             return location;
+        }
+
+        private List<BuildingLink> ReadBuildingLinks()
+        {
+            var count = _reader.ReadUInt32();
+            var links = new List<BuildingLink>();
+            for (var i = 0; i < count; i++)
+            {
+                var link = new BuildingLink();
+                link.Version = _reader.ReadUInt16();
+                link.BuildingIndex = _reader.ReadInt32();
+                link.PrefabIndex = _reader.ReadInt32();
+                link.PrefabBuildingKey = ReadString();
+                if (link.Version >= 2)
+                    link.Uid = _reader.ReadUInt64();
+                if (link.Version >= 3)
+                    link.PrefabUid = _reader.ReadUInt64();
+                links.Add(link);
+            }
+            return links;
         }
 
         private EFLine ReadEFLine()
         {
-            throw new NotImplementedException("BmdOutline parsing not implemented yet");
-        }
-
-        private GoOutline ReadGoOutline()
-        {
-            var goOutline = new GoOutline();
-
-            //no version
-            
-            var vertexListLength = _reader.ReadUInt32();
-            goOutline.VertexList = [];
-            for (var i = 0; i < vertexListLength; i++)
+            return new EFLine
             {
-                var x = _reader.ReadSingle();
-                var y = _reader.ReadSingle();
-                goOutline.VertexList.Add(new RmvVector2(x, y));
-            }
-            
-            return goOutline;
+                Label = ReadString(),
+                End1 = ReadRmvVector3(),
+                End2 = ReadRmvVector3(),
+                Direction = ReadRmvVector3(),
+                Purpose = ReadString(),
+            };
         }
 
-        private NonTerrainOutline ReadNonTerrainOutline()
-        {
-            var ntOutline = new NonTerrainOutline();
+        private GoOutline ReadGoOutline() => new() { VertexList = ReadPoints() };
 
-            //no version
-            
-            var vertexListLength = _reader.ReadUInt32();
-            ntOutline.VertexList = [];
-            for (var i = 0; i < vertexListLength; i++)
-            {
-                var x = _reader.ReadSingle();
-                var y = _reader.ReadSingle();
-                ntOutline.VertexList.Add(new RmvVector2(x, y));
-            }
-            
-            return ntOutline;
-        }
+        private NonTerrainOutline ReadNonTerrainOutline() => new() { VertexList = ReadPoints() };
 
         private ZonesTemplate ReadZonesTemplate()
         {
             var template = new ZonesTemplate();
 
             //no version
-            
-            var outlineLength = _reader.ReadUInt32();
-            for (uint i = 0; i < outlineLength; i++)
-            {
-                var coord = new RmvVector2
-                {
-                    X = _reader.ReadSingle(),
-                    Y = _reader.ReadSingle()
-                };
-                template.Outline.Add(coord);
-            }
-            
+            template.Outline = ReadPoints();
             template.ZoneName = ReadString();
             template.EntityFormationTemplateName = ReadString();
-            
-            template.LinesLength = _reader.ReadUInt32();
-            //template.LinesData = blah blah; //skip the actual Lines data since structure is unknown
-            
+
+            var lineCount = _reader.ReadUInt32();
+            for (var i = 0; i < lineCount; i++)
+            {
+                template.Lines.Add(new ZoneLine
+                {
+                    Label = ReadString(),
+                    Start = ReadRmvVector3(),
+                    End = ReadRmvVector3(),
+                    Purpose = ReadString(),
+                    Orientation = _reader.ReadSingle(),
+                });
+            }
+
             template.Transform = ReadRowMajorMatrix(true);
-            
+
             return template;
         }
 
@@ -593,34 +586,34 @@ namespace Shared.GameFormats.Bmd
             return bmd;
         }
 
-        private BmdOutline ReadBmdOutline()
-        {
-            throw new NotImplementedException("BmdOutline parsing not implemented yet");
-        }
+        private BmdOutline ReadBmdOutline() => new() { Version = _reader.ReadUInt16(), Points = ReadPoints() };
 
-        private TerrainOutline ReadTerrainOutline()
-        {
-            throw new NotImplementedException("TerrainOutline parsing not implemented yet");
-        }
+        private TerrainOutline ReadTerrainOutline() => new() { VertexList = ReadPoints() };
 
-        private LiteBuildingOutline ReadLiteBuildingOutline()
-        {
-            throw new NotImplementedException("LiteBuildingOutline parsing not implemented yet");
-        }
+        private LiteBuildingOutline ReadLiteBuildingOutline() => new() { VertexList = ReadPoints() };
 
-        private CameraZone ReadCameraZone()
-        {
-            throw new NotImplementedException("CameraZone parsing not implemented yet");
-        }
+        private CameraZone ReadCameraZone() => new() { Version = _reader.ReadUInt16(), Points = ReadPoints() };
 
         private CivilianDeployment ReadCivilianDeployment()
         {
-            throw new NotImplementedException("CivilianDeployment parsing not implemented yet");
+            return new CivilianDeployment
+            {
+                Version = _reader.ReadUInt16(),
+                CivilianType = ReadString(),
+                CivilianAmount = ReadString(),
+                Outline = ReadPoints(),
+            };
         }
 
         private CivilianShelter ReadCivilianShelter()
         {
-            throw new NotImplementedException("CivilianShelter parsing not implemented yet");
+            return new CivilianShelter
+            {
+                Version = _reader.ReadUInt16(),
+                Position = ReadVector2(),
+                Entrance = ReadVector2(),
+                CivilianDeploymentLink = _reader.ReadInt32(),
+            };
         }
 
 
@@ -846,14 +839,29 @@ namespace Shared.GameFormats.Bmd
             // Read Separators
             bmdFile.SectionVersions["AiHints.Separators"] = _reader.ReadUInt16();
             var separatorsCount = _reader.ReadUInt32();
-            if (separatorsCount > 0)
-                throw new NotImplementedException("AiHints-Separators parsing not implemented yet");
+            for (var i = 0; i < separatorsCount; i++)
+            {
+                aiHints.Separators.Add(new Separator
+                {
+                    Version = _reader.ReadUInt16(),
+                    Type = ReadString(),
+                    Points = ReadPoints(),
+                });
+            }
 
             // Read DirectedPoints
             bmdFile.SectionVersions["AiHints.DirectedPoints"] = _reader.ReadUInt16();
             var directedPointsCount = _reader.ReadUInt32();
-            if (directedPointsCount > 0)
-                throw new NotImplementedException("AiHints-DirectedPoints parsing not implemented yet");
+            for (var i = 0; i < directedPointsCount; i++)
+            {
+                aiHints.DirectedPoints.Add(new DirectedPoint
+                {
+                    Version = _reader.ReadUInt16(),
+                    Type = ReadString(),
+                    Position = ReadVector2(),
+                    Direction = ReadVector2(),
+                });
+            }
 
             // Read PolyLines
             bmdFile.SectionVersions["AiHints.PolyLines"] = _reader.ReadUInt16();
@@ -894,32 +902,13 @@ namespace Shared.GameFormats.Bmd
                 var polyLineList = new HintPolyLineList();
                 polyLineList.Version = _reader.ReadUInt16();
                 
-                // Read type string
-                var typeLength = _reader.ReadUInt16();
-                if (typeLength > 0)
-                    polyLineList.Type = Encoding.UTF8.GetString(_reader.ReadBytes(typeLength));
-                
-                // Read district
-                polyLineList.District = _reader.ReadUInt32();
-                
-                // Read polygon list
+                polyLineList.Type = ReadString();
+                if (polyLineList.Version >= 2)
+                    polyLineList.District = _reader.ReadUInt32();
+
                 var polygonListLength = _reader.ReadUInt32();
                 for (var j = 0; j < polygonListLength; j++)
-                {
-                    var polygon = new Polygon();
-                    
-                    // Read points for this polygon
-                    var pointsLength = _reader.ReadUInt32();
-                    for (var k = 0; k < pointsLength; k++)
-                    {
-                        var point = new RmvVector2();
-                        point.X = _reader.ReadSingle();
-                        point.Y = _reader.ReadSingle();
-                        polygon.Points.Add(point);
-                    }
-                    
-                    polyLineList.PolygonList.Add(polygon);
-                }
+                    polyLineList.PolygonList.Add(new Polygon { Points = ReadPoints() });
                 
                 aiHints.PolyLinesList.Add(polyLineList);
             }
@@ -1083,7 +1072,14 @@ namespace Shared.GameFormats.Bmd
 
         private TerrainStencilBlendTriangle ReadTerrainStencilBlendTriangle()
         {
-            throw new NotImplementedException("TerrainStencilBlendTriangle parsing not implemented yet");
+            var triangle = new TerrainStencilBlendTriangle();
+            triangle.Version = _reader.ReadUInt16();
+            triangle.Position0 = ReadRmvVector3();
+            triangle.Position1 = ReadRmvVector3();
+            triangle.Position2 = ReadRmvVector3();
+            if (triangle.Version >= 2)
+                triangle.HeightMode = ReadString();
+            return triangle;
         }
 
         private SpotLightInfo ReadSpotLightInfo()
@@ -1301,33 +1297,100 @@ namespace Shared.GameFormats.Bmd
 
         private BmdCachedArea ReadBmdCachedArea()
         {
-            throw new NotImplementedException("BmdCachedArea parsing not implemented yet");
+            var area = new BmdCachedArea();
+            area.Version = _reader.ReadUInt16();
+            for (var i = 0; i < 4; i++)
+                area.Aabb[i] = _reader.ReadInt32();
+            area.InfieldCentreX = _reader.ReadInt32();
+            area.InfieldCentreY = _reader.ReadInt32();
+            var indexCount = _reader.ReadUInt32();
+            for (var i = 0; i < indexCount; i++)
+                area.DeploymentIndices.Add(_reader.ReadUInt16());
+            area.AttackDirectionForFirstDeployment = ReadVector2();
+            area.BattleRedirection = ReadString();
+            if (area.Version >= 2)
+                area.DefendingFactionRestriction = ReadString();
+            if (area.Version >= 3)
+                area.Name = ReadString();
+            if (area.Version >= 4)
+                area.RedirectionCatchment = ReadString();
+            if (area.Version >= 5)
+            {
+                area.ValidLocationFlags = new ValidLocationFlags
+                {
+                    Version = _reader.ReadUInt16(),
+                    ValidNorth = _reader.ReadByte() != 0,
+                    ValidSouth = _reader.ReadByte() != 0,
+                    ValidEast = _reader.ReadByte() != 0,
+                    ValidWest = _reader.ReadByte() != 0,
+                };
+            }
+            return area;
         }
 
-        private ToggleableBuildingSlot ReadToggleableBuildingSlot()
+        private ToggleableBuildingSlot ReadToggleableBuildingSlot(ushort listVersion)
         {
-            throw new NotImplementedException("ToggleableBuildingSlot parsing not implemented yet");
+            var slot = new ToggleableBuildingSlot();
+            if (listVersion > 1)
+                slot.ToggleableSlotType = ReadString();
+            slot.BuildingLinks = ReadBuildingLinks();
+            if (listVersion >= 3)
+            {
+                var sceneCount = _reader.ReadUInt32();
+                for (var i = 0; i < sceneCount; i++)
+                    slot.CompositeScenes.Add(ReadCscInfo());
+
+                var outlineCount = _reader.ReadUInt32();
+                for (var i = 0; i < outlineCount; i++)
+                    slot.Outlines.Add(ReadPoints());
+            }
+            if (listVersion >= 4)
+                slot.ScriptId = ReadString();
+            if (listVersion >= 5)
+                slot.MapBarrierRecordKey = ReadString();
+            if (listVersion == 6)
+                slot.MeleeAttackAllowed = _reader.ReadByte() != 0;
+            if (listVersion >= 7)
+                slot.GroundMeleeAttackAllowed = _reader.ReadByte() != 0;
+            return slot;
         }
 
         private TerraindDecal ReadTerraindDecal()
         {
-            throw new NotImplementedException("TerraindDecal parsing not implemented yet");
+            var decal = new TerraindDecal();
+            decal.Version = _reader.ReadUInt16();
+            decal.SplineVersion = _reader.ReadUInt16();
+            decal.VertexSpacing = ReadVector2();
+            decal.UvScale = _reader.ReadSingle();
+
+            var splineCount = _reader.ReadUInt32();
+            for (var i = 0; i < splineCount; i++)
+            {
+                decal.Splines.Add(new TerrainDecalSpline
+                {
+                    Version = _reader.ReadUInt16(),
+                    StartWidth = _reader.ReadSingle(),
+                    EndWidth = _reader.ReadSingle(),
+                    Cp0 = ReadRmvVector3(),
+                    Cp1 = ReadRmvVector3(),
+                    Cp2 = ReadRmvVector3(),
+                    Cp3 = ReadRmvVector3(),
+                });
+            }
+
+            decal.Material = ReadString();
+            if (decal.Version >= 2)
+                decal.Transform = ReadRowMajorMatrix(false);
+            return decal;
         }
 
-        private TreeListReference ReadTreeListReference()
-        {
-            throw new NotImplementedException("TreeListReference parsing not implemented yet");
-        }
+        private TreeListReference ReadTreeListReference() =>
+            new() { Version = _reader.ReadUInt16(), File = ReadString(), Climate = ReadString() };
 
-        private GrassListReference ReadGrassListReference()
-        {
-            throw new NotImplementedException("GrassListReference parsing not implemented yet");
-        }
+        private GrassListReference ReadGrassListReference() =>
+            new() { Version = _reader.ReadUInt16(), File = ReadString(), Climate = ReadString() };
 
-        private WaterOutline ReadWaterOutline()
-        {
-            throw new NotImplementedException("WaterOutline parsing not implemented yet");
-        }
+        private WaterOutline ReadWaterOutline() => new() { VertexList = ReadPoints() };
 
 
 
@@ -1425,6 +1488,27 @@ namespace Shared.GameFormats.Bmd
             mask.CultMaskNag = (bytes[4] & 0x08) != 0;
 
             return mask;
+        }
+
+        private RmvVector2 ReadVector2() => new(_reader.ReadSingle(), _reader.ReadSingle());
+
+        /// <summary>A u32 count of vec2 points (the kit's outline / points vector).</summary>
+        private List<RmvVector2> ReadPoints()
+        {
+            var count = _reader.ReadUInt32();
+            var points = new List<RmvVector2>();
+            for (var i = 0; i < count; i++)
+                points.Add(ReadVector2());
+            return points;
+        }
+
+        private List<uint> ReadUInt32List()
+        {
+            var count = _reader.ReadUInt32();
+            var values = new List<uint>();
+            for (var i = 0; i < count; i++)
+                values.Add(_reader.ReadUInt32());
+            return values;
         }
 
         private RmvVector3 ReadRmvVector3()
