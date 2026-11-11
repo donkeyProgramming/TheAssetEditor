@@ -5,21 +5,11 @@ using Shared.GameFormats.RigidModel.Transforms;
 namespace Shared.GameFormats.Bmd
 {
     /// <summary>
-    /// Serializes a <see cref="BmdFile"/> back to FASTBIN0 bytes, mirroring <see cref="BmdParser"/>
-    /// section-by-section in the exact same order/<see cref="FastBinHeader.FastBinVersion"/> gates.
-    /// Writes the WHOLE file, not just the categories the editor exposes for editing - every other
-    /// section (BattlefieldBuildings, Deployments, PlayableArea, AiHints, ...) is written back from
-    /// whatever BmdParser stored, so saving an unedited file reproduces it exactly and saving an
-    /// edited one only changes what was actually touched.
-    ///
-    /// A handful of sections BmdParser reads bytes for and then discards without storing anywhere
-    /// (see the guards below, e.g. <see cref="BmdInfo.PropertyOverrides"/> == 1, PropInfo/BmdInfo's
-    /// oldest versions, CaptureLocation version &gt; 2) genuinely cannot be reproduced - the writer
-    /// throws a clear <see cref="NotSupportedException"/> for those rather than guessing/corrupting
-    /// data. Every section BmdParser can only read when empty (its Read* always throws
-    /// NotImplementedException otherwise) is written back as "version + count 0" and guarded the
-    /// same way. <see cref="BmdParser.Parse(byte[])"/> re-reads the output as a self-check before
-    /// returning, so a bug here fails loudly instead of silently corrupting a file on disk.
+    /// Serializes a <see cref="BmdFile"/> back to FASTBIN0 bytes, mirroring <see cref="BmdParser"/> section
+    /// by section. It writes the whole file, not only what the editor exposes, so saving an unedited file
+    /// reproduces it exactly. Record layouts follow the WH3 assembly kit's serialisers; the one exception is
+    /// FASTBIN &lt; 11, whose early prop/vfx block BmdParser only partly decodes and which can't be written.
+    /// The output is re-parsed as a self-check before it is returned.
     /// </summary>
     public static class BmdWriter
     {
@@ -41,29 +31,25 @@ namespace Shared.GameFormats.Bmd
 
                 if (v < 22)
                 {
-                    // "some_length" is read by BmdParser but never stored and never used to gate any
-                    // subsequent read, so it's always safe to write 0 regardless of the original value.
-                    writer.Write(GetVersion(bmdFile, "LegacyPreV22"));
-                    writer.Write((uint)0);
+                    var managerVersion = GetVersion(bmdFile, "LegacyPreV22");
+                    writer.Write(managerVersion);
+                    WriteCollection(writer, bmdFile.LegacyDeploymentAreas, (w, area) => WriteLegacyDeploymentArea(w, area, managerVersion));
                 }
 
                 writer.Write(GetVersion(bmdFile, "BattlefieldBuilding"));
                 WriteCollection(writer, bmdFile.BattlefieldBuildings, WriteBattlefieldBuilding);
 
-                WriteEmptyOnlyCollection(writer, bmdFile, "BattlefieldBuildingFar", bmdFile.BattlefieldBuildingFars, hasVersion: true);
+                writer.Write(GetVersion(bmdFile, "BattlefieldBuildingFar"));
+                WriteCollection(writer, bmdFile.BattlefieldBuildingFars, WriteBattlefieldBuilding);
 
-                writer.Write(GetVersion(bmdFile, "CaptureLocation"));
-                WriteCollection(writer, bmdFile.CaptureLocations, WriteCaptureLocation);
+                var captureLocationVersion = GetVersion(bmdFile, "CaptureLocation");
+                writer.Write(captureLocationVersion);
+                WriteCollection(writer, bmdFile.CaptureLocationLists, (w, list) =>
+                    WriteCollection(w, list.Locations, (w2, l) => WriteCaptureLocation(w2, l, captureLocationVersion)));
 
-                WriteEmptyOnlyCollection(writer, bmdFile, "EFLine", bmdFile.EFLines, hasVersion: false);
-
-                writer.Write((uint)bmdFile.GoOutlines.Count);
-                foreach (var outline in bmdFile.GoOutlines)
-                    WriteOutlinePoints(writer, outline.VertexList);
-
-                writer.Write((uint)bmdFile.NonTerrainOutlines.Count);
-                foreach (var outline in bmdFile.NonTerrainOutlines)
-                    WriteOutlinePoints(writer, outline.VertexList);
+                WriteCollection(writer, bmdFile.EFLines, WriteEFLine);
+                WriteCollection(writer, bmdFile.GoOutlines, (w, o) => WritePoints(w, o.VertexList));
+                WriteCollection(writer, bmdFile.NonTerrainOutlines, (w, o) => WritePoints(w, o.VertexList));
 
                 writer.Write(GetVersion(bmdFile, "ZonesTemplate"));
                 WriteCollection(writer, bmdFile.ZonesTemplates, WriteZonesTemplate);
@@ -71,17 +57,21 @@ namespace Shared.GameFormats.Bmd
                 writer.Write(GetVersion(bmdFile, "BmdInfo"));
                 WriteCollection(writer, bmdFile.BmdInfos, WriteBmdInfo);
 
-                WriteEmptyOnlyCollection(writer, bmdFile, "BmdOutline", bmdFile.BmdOutlines, hasVersion: true);
-                WriteEmptyOnlyCollection(writer, bmdFile, "TerrainOutline", bmdFile.TerrainOutlines, hasVersion: false);
-                WriteEmptyOnlyCollection(writer, bmdFile, "LiteBuildingOutline", bmdFile.LiteBuildingOutlines, hasVersion: false);
+                writer.Write(GetVersion(bmdFile, "BmdOutline"));
+                WriteCollection(writer, bmdFile.BmdOutlines, (w, o) => { w.Write(o.Version); WritePoints(w, o.Points); });
+                WriteCollection(writer, bmdFile.TerrainOutlines, (w, o) => WritePoints(w, o.VertexList));
+                WriteCollection(writer, bmdFile.LiteBuildingOutlines, (w, o) => WritePoints(w, o.VertexList));
 
                 if (v > 4)
-                    WriteEmptyOnlyCollection(writer, bmdFile, "CameraZone", bmdFile.CameraZones, hasVersion: true);
+                {
+                    writer.Write(GetVersion(bmdFile, "CameraZone"));
+                    WriteCollection(writer, bmdFile.CameraZones, (w, z) => { w.Write(z.Version); WritePoints(w, z.Points); });
+                }
 
                 if (v > 7)
                 {
-                    WriteEmptyOnlyCollection(writer, bmdFile, "CivilianDeployment", bmdFile.CivilianDeployments, hasVersion: false);
-                    WriteEmptyOnlyCollection(writer, bmdFile, "CivilianShelter", bmdFile.CivilianShelters, hasVersion: false);
+                    WriteCollection(writer, bmdFile.CivilianDeployments, WriteCivilianDeployment);
+                    WriteCollection(writer, bmdFile.CivilianShelters, WriteCivilianShelter);
                     WritePropInfos(writer, bmdFile);
                 }
 
@@ -104,7 +94,10 @@ namespace Shared.GameFormats.Bmd
 
                     writer.Write(GetVersion(bmdFile, "PointLight"));
                     WriteCollection(writer, bmdFile.PointLights, WritePointLightInfo);
+                }
 
+                if (v > 14)
+                {
                     writer.Write(GetVersion(bmdFile, "BuildingProjectileEmitter"));
                     WriteCollection(writer, bmdFile.BuildingProjectileEmitters, WriteBuildingProjectileEmitter);
                 }
@@ -119,7 +112,10 @@ namespace Shared.GameFormats.Bmd
                 }
 
                 if (v > 17)
-                    WriteEmptyOnlyCollection(writer, bmdFile, "TerrainStencilBlendTriangle", bmdFile.TerrainStencilBlendTriangles, hasVersion: true);
+                {
+                    writer.Write(GetVersion(bmdFile, "TerrainStencilBlendTriangle"));
+                    WriteCollection(writer, bmdFile.TerrainStencilBlendTriangles, WriteTerrainStencilBlendTriangle);
+                }
 
                 if (v > 18)
                 {
@@ -143,24 +139,37 @@ namespace Shared.GameFormats.Bmd
                 {
                     writer.Write(GetVersion(bmdFile, "Deployment"));
                     WriteCollection(writer, bmdFile.Deployments, WriteDeployment);
+                }
 
-                    WriteEmptyOnlyCollection(writer, bmdFile, "BmdCachedArea", bmdFile.BmdCachedAreas, hasVersion: true);
+                if (v > 22)
+                {
+                    writer.Write(GetVersion(bmdFile, "BmdCachedArea"));
+                    WriteCollection(writer, bmdFile.BmdCachedAreas, WriteBmdCachedArea);
                 }
 
                 if (v > 23)
-                    WriteEmptyOnlyCollection(writer, bmdFile, "ToggleableBuildingSlot", bmdFile.ToggleableBuildingSlots, hasVersion: true);
+                {
+                    var slotVersion = GetVersion(bmdFile, "ToggleableBuildingSlot");
+                    writer.Write(slotVersion);
+                    WriteCollection(writer, bmdFile.ToggleableBuildingSlots, (w, s) => WriteToggleableBuildingSlot(w, s, slotVersion));
+                }
 
                 if (v > 24)
-                    WriteEmptyOnlyCollection(writer, bmdFile, "TerraindDecal", bmdFile.TerraindDecals, hasVersion: true);
+                {
+                    writer.Write(GetVersion(bmdFile, "TerraindDecal"));
+                    WriteCollection(writer, bmdFile.TerraindDecals, WriteTerraindDecal);
+                }
 
                 if (v > 25)
                 {
-                    WriteEmptyOnlyCollection(writer, bmdFile, "TreeListReference", bmdFile.TreeListReferences, hasVersion: true);
-                    WriteEmptyOnlyCollection(writer, bmdFile, "GrassListReference", bmdFile.GrassListReferences, hasVersion: true);
+                    writer.Write(GetVersion(bmdFile, "TreeListReference"));
+                    WriteCollection(writer, bmdFile.TreeListReferences, (w, r) => { w.Write(r.Version); WriteString(w, r.File); WriteString(w, r.Climate); });
+                    writer.Write(GetVersion(bmdFile, "GrassListReference"));
+                    WriteCollection(writer, bmdFile.GrassListReferences, (w, r) => { w.Write(r.Version); WriteString(w, r.File); WriteString(w, r.Climate); });
                 }
 
                 if (v > 26)
-                    WriteEmptyOnlyCollection(writer, bmdFile, "WaterOutline", bmdFile.WaterOutlines, hasVersion: false);
+                    WriteCollection(writer, bmdFile.WaterOutlines, (w, o) => WritePoints(w, o.VertexList));
             }
 
             var bytes = stream.ToArray();
@@ -168,9 +177,7 @@ namespace Shared.GameFormats.Bmd
             return bytes;
         }
 
-        // ---------------------------------------------------------------------
         // Self-check
-        // ---------------------------------------------------------------------
 
         private static void SelfCheck(BmdFile source, byte[] bytes)
         {
@@ -191,7 +198,8 @@ namespace Shared.GameFormats.Bmd
             }
 
             CheckCount(nameof(BmdFile.BattlefieldBuildings), source.BattlefieldBuildings.Count, reread.BattlefieldBuildings.Count);
-            CheckCount(nameof(BmdFile.CaptureLocations), source.CaptureLocations.Count, reread.CaptureLocations.Count);
+            CheckCount(nameof(BmdFile.CaptureLocationLists), source.CaptureLocationLists.Count, reread.CaptureLocationLists.Count);
+            CheckCount("CaptureLocations", source.CaptureLocationLists.Sum(l => l.Locations.Count), reread.CaptureLocationLists.Sum(l => l.Locations.Count));
             CheckCount(nameof(BmdFile.GoOutlines), source.GoOutlines.Count, reread.GoOutlines.Count);
             CheckCount(nameof(BmdFile.NonTerrainOutlines), source.NonTerrainOutlines.Count, reread.NonTerrainOutlines.Count);
             CheckCount(nameof(BmdFile.ZonesTemplates), source.ZonesTemplates.Count, reread.ZonesTemplates.Count);
@@ -207,13 +215,29 @@ namespace Shared.GameFormats.Bmd
             CheckCount(nameof(BmdFile.Sounds), source.Sounds.Count, reread.Sounds.Count);
             CheckCount(nameof(BmdFile.CscInfos), source.CscInfos.Count, reread.CscInfos.Count);
             CheckCount(nameof(BmdFile.Deployments), source.Deployments.Count, reread.Deployments.Count);
+            CheckCount(nameof(BmdFile.LegacyDeploymentAreas), source.LegacyDeploymentAreas.Count, reread.LegacyDeploymentAreas.Count);
+            CheckCount(nameof(BmdFile.BattlefieldBuildingFars), source.BattlefieldBuildingFars.Count, reread.BattlefieldBuildingFars.Count);
+            CheckCount(nameof(BmdFile.EFLines), source.EFLines.Count, reread.EFLines.Count);
+            CheckCount(nameof(BmdFile.BmdOutlines), source.BmdOutlines.Count, reread.BmdOutlines.Count);
+            CheckCount(nameof(BmdFile.TerrainOutlines), source.TerrainOutlines.Count, reread.TerrainOutlines.Count);
+            CheckCount(nameof(BmdFile.LiteBuildingOutlines), source.LiteBuildingOutlines.Count, reread.LiteBuildingOutlines.Count);
+            CheckCount(nameof(BmdFile.CameraZones), source.CameraZones.Count, reread.CameraZones.Count);
+            CheckCount(nameof(BmdFile.CivilianDeployments), source.CivilianDeployments.Count, reread.CivilianDeployments.Count);
+            CheckCount(nameof(BmdFile.CivilianShelters), source.CivilianShelters.Count, reread.CivilianShelters.Count);
+            CheckCount(nameof(BmdFile.TerrainStencilBlendTriangles), source.TerrainStencilBlendTriangles.Count, reread.TerrainStencilBlendTriangles.Count);
+            CheckCount(nameof(BmdFile.BmdCachedAreas), source.BmdCachedAreas.Count, reread.BmdCachedAreas.Count);
+            CheckCount(nameof(BmdFile.ToggleableBuildingSlots), source.ToggleableBuildingSlots.Count, reread.ToggleableBuildingSlots.Count);
+            CheckCount(nameof(BmdFile.TerraindDecals), source.TerraindDecals.Count, reread.TerraindDecals.Count);
+            CheckCount(nameof(BmdFile.TreeListReferences), source.TreeListReferences.Count, reread.TreeListReferences.Count);
+            CheckCount(nameof(BmdFile.GrassListReferences), source.GrassListReferences.Count, reread.GrassListReferences.Count);
+            CheckCount(nameof(BmdFile.WaterOutlines), source.WaterOutlines.Count, reread.WaterOutlines.Count);
+            CheckCount("AiHints.Separators", source.AiHints.Separators.Count, reread.AiHints.Separators.Count);
+            CheckCount("AiHints.DirectedPoints", source.AiHints.DirectedPoints.Count, reread.AiHints.DirectedPoints.Count);
             CheckCount("AiHints.PolyLines", source.AiHints.PolyLines.Count, reread.AiHints.PolyLines.Count);
             CheckCount("AiHints.PolyLinesList", source.AiHints.PolyLinesList.Count, reread.AiHints.PolyLinesList.Count);
         }
 
-        // ---------------------------------------------------------------------
         // Section-level helpers
-        // ---------------------------------------------------------------------
 
         private static ushort GetVersion(BmdFile bmdFile, string key) =>
             bmdFile.SectionVersions.TryGetValue(key, out var version) ? version : (ushort)0;
@@ -225,39 +249,52 @@ namespace Shared.GameFormats.Bmd
                 writeItem(writer, item);
         }
 
-        private static void WriteEmptyOnlyCollection<T>(BinaryWriter writer, BmdFile bmdFile, string sectionName, List<T> items, bool hasVersion)
-        {
-            if (items.Count > 0)
-                throw new NotSupportedException(
-                    $"BmdWriter: '{sectionName}' has {items.Count} item(s), but BmdParser can't read even one " +
-                    $"(its reader always throws NotImplementedException for this type) - so this section can only " +
-                    "be safely written when empty. Remove them before saving.");
-
-            if (hasVersion)
-                writer.Write(GetVersion(bmdFile, sectionName));
-            writer.Write((uint)0);
-        }
-
-        private static void WriteOutlinePoints(BinaryWriter writer, List<RmvVector2> points)
+        private static void WritePoints(BinaryWriter writer, List<RmvVector2> points)
         {
             writer.Write((uint)points.Count);
             foreach (var p in points)
-            {
-                writer.Write(p.X);
-                writer.Write(p.Y);
-            }
+                WriteVector2(writer, p);
         }
 
-        // ---------------------------------------------------------------------
-        // Item writers (mirror BmdParser's Read* methods one-for-one)
-        // ---------------------------------------------------------------------
+        private static void WriteUInt32List(BinaryWriter writer, List<uint> values)
+        {
+            writer.Write((uint)values.Count);
+            foreach (var value in values)
+                writer.Write(value);
+        }
+
+        // Item writers (mirror BmdParser's Read* methods)
+
+        private static void WriteLegacyDeploymentArea(BinaryWriter writer, LegacyDeploymentArea area, ushort managerVersion)
+        {
+            writer.Write(area.TypeX);
+            writer.Write(area.TypeY);
+            WriteCollection(writer, area.Collections, (w, collection) =>
+            {
+                WriteLegacyDeploymentZones(w, collection.Alliance0, managerVersion);
+                WriteLegacyDeploymentZones(w, collection.Alliance1, managerVersion);
+            });
+        }
+
+        private static void WriteLegacyDeploymentZones(BinaryWriter writer, List<LegacyDeploymentZone> zones, ushort managerVersion)
+        {
+            WriteCollection(writer, zones, (w, zone) =>
+            {
+                WriteCollection(w, zone.Boundaries, (w2, boundary) => { WriteString(w2, boundary.Type); WritePoints(w2, boundary.Points); });
+                WriteString(w, zone.Category);
+                w.Write(zone.Orientation);
+                w.Write(Bool(zone.SnapFacing));
+                if (managerVersion >= 2)
+                    w.Write(zone.Id);
+            });
+        }
 
         private static void WriteBattlefieldBuilding(BinaryWriter writer, BattlefieldBuilding building)
         {
             writer.Write(building.Version);
             WriteString(writer, building.BuildingId);
 
-            if (building.Version > 8)
+            if (building.Version > 10)
                 writer.Write(building.ParentId);
             else if (building.Version > 6)
                 writer.Write((short)building.ParentId);
@@ -269,9 +306,7 @@ namespace Shared.GameFormats.Bmd
 
             if (building.Version < 6)
             {
-                // Inverse of the old raw position/rotation/scale composition
-                // (scaleMatrix * rotationMatrix * translationMatrix) - Matrix.Decompose assumes
-                // exactly this row-vector TRS order, so it exactly undoes it.
+                // Matrix.Decompose undoes the parser's scale * rotation * translation composition.
                 building.Transform.Decompose(out var scale, out var rotation, out var translation);
                 WriteVector3(writer, translation);
                 writer.Write(rotation.X);
@@ -285,119 +320,251 @@ namespace Shared.GameFormats.Bmd
                 WriteRowMajorMatrix(writer, building.Transform, is4x4: false);
             }
 
-            if (building.Version < 4)
-            {
-                writer.Write(building.StartingDamageUnary);
-                writer.Write(Bool(building.OnFire));
-                writer.Write(Bool(building.StartDisabled));
-                writer.Write(Bool(building.WeakPoint));
-                writer.Write(Bool(building.AiBreachable));
-                writer.Write(Bool(building.Indestructible));
-                writer.Write(Bool(building.Dockable));
-                writer.Write(Bool(building.Toggleable));
-                writer.Write(Bool(building.Lite));
-            }
+            if (building.Version > 3)
+                WriteBuildingProperties(writer, building.Properties);
             else
-            {
-                writer.Write(building.PropertiesVersion);
-                WriteString(writer, building.PropertiesBuildingId);
-                writer.Write(building.StartingDamageUnary);
-                if (building.PropertiesVersion > 1)
-                {
-                    writer.Write(Bool(building.OnFire));
-                    writer.Write(Bool(building.StartDisabled));
-                    writer.Write(Bool(building.WeakPoint));
-                    writer.Write(Bool(building.AiBreachable));
-                    writer.Write(Bool(building.Indestructible));
-                    writer.Write(Bool(building.Dockable));
-                    writer.Write(Bool(building.Toggleable));
-                    writer.Write(Bool(building.Lite));
-                }
-                if (building.PropertiesVersion > 2)
-                    writer.Write(Bool(building.CastShadows));
-                if (building.PropertiesVersion > 3)
-                    writer.Write(Bool(building.KeyBuilding));
-                if (building.PropertiesVersion > 5)
-                {
-                    writer.Write(Bool(building.KeyBuildingUseFort));
-                    writer.Write(Bool(building.IsPropInOutfield));
-                }
-                if (building.PropertiesVersion > 8)
-                {
-                    writer.Write(Bool(building.SettlementLevelConfigurable));
-                    writer.Write(Bool(building.HideTooltip));
-                    writer.Write(Bool(building.IncludeInFog));
-                }
-            }
+                WriteLegacyBuildingProperties(writer, building.Properties, building.Version);
 
             if (building.Version > 7)
                 WriteString(writer, building.HeightMode);
-            if (building.Version > 8)
+            if (building.Version > 9)
                 writer.Write(building.Uid);
         }
 
-        private static void WriteCaptureLocation(BinaryWriter writer, CaptureLocation location)
+        private static void WriteBuildingProperties(BinaryWriter writer, BuildingProperties properties)
         {
-            if (location.Version > 2)
-                throw new NotSupportedException(
-                    "CaptureLocation version > 2 has a 4-byte field BmdParser reads and then overwrites/discards " +
-                    "before storing (see the 'redo this' comments in ReadCaptureLocation) - cannot be reproduced.");
+            writer.Write(properties.Version);
+            if (properties.Version > 1)
+                WriteString(writer, properties.BuildingId);
+            writer.Write(properties.StartingDamageUnary);
+            writer.Write(Bool(properties.OnFire));
+            writer.Write(Bool(properties.StartDisabled));
+            writer.Write(Bool(properties.WeakPoint));
+            writer.Write(Bool(properties.AiBreachable));
+            writer.Write(Bool(properties.Indestructible));
+            writer.Write(Bool(properties.Dockable));
+            writer.Write(Bool(properties.Toggleable));
+            writer.Write(Bool(properties.Lite));
+            if (properties.Version is > 2 and < 8)
+                writer.Write(Bool(properties.ClampToSurface));
+            if (properties.Version > 3)
+                writer.Write(Bool(properties.CastShadows));
+            if (properties.Version > 4)
+                writer.Write(Bool(properties.KeyBuilding));
+            if (properties.Version > 5)
+                writer.Write(Bool(properties.KeyBuildingUseFort));
+            if (properties.Version > 6)
+                writer.Write(Bool(properties.IsPropInOutfield));
+            if (properties.Version > 8)
+                writer.Write(Bool(properties.SettlementLevelConfigurable));
+            if (properties.Version > 9)
+                writer.Write(Bool(properties.HideTooltip));
+            if (properties.Version > 10)
+                writer.Write(Bool(properties.IncludeInFog));
+            if (properties.Version > 11)
+                writer.Write(properties.BlendEdges);
+            if (properties.Version > 12)
+                writer.Write(Bool(properties.ReceiveDecals));
+        }
 
-            writer.Write(location.Version);
-            writer.Write(location.Zero);
-            writer.Write(location.Something1);
-            writer.Write(location.Something2);
-            writer.Write(location.Something3);
-            writer.Write(location.Something4);
-            writer.Write(location.Something5);
-            WriteString(writer, location.Str);
-            writer.Write((uint)(location.Coords.Length / 2));
-            foreach (var f in location.Coords)
-                writer.Write(f);
-            WriteString(writer, location.Str3);
-            writer.Write(location.Something6);
-            writer.Write(location.Something7);
-            WriteFixedBytes(writer, location.Bools, 4);
+        private static void WriteLegacyBuildingProperties(BinaryWriter writer, BuildingProperties properties, ushort buildingVersion)
+        {
+            writer.Write(properties.StartingDamageUnary);
+            writer.Write(Bool(properties.OnFire));
+            writer.Write(Bool(properties.StartDisabled));
+            writer.Write(Bool(properties.WeakPoint));
+            writer.Write(Bool(properties.AiBreachable));
+            writer.Write(Bool(properties.Indestructible));
+            writer.Write(Bool(properties.Dockable));
+            if (buildingVersion > 1)
+                writer.Write(Bool(properties.Toggleable));
+            if (buildingVersion > 2)
+                writer.Write(Bool(properties.Lite));
+        }
+
+        private static void WriteCaptureLocation(BinaryWriter writer, CaptureLocation location, ushort listVersion)
+        {
+            WriteVector2(writer, location.Location);
+            writer.Write(location.Radius);
+            writer.Write(location.ValidForMinNumPlayers);
+            writer.Write(location.ValidForMaxNumPlayers);
+            WriteString(writer, location.CapturePointType);
+            if (listVersion > 2)
+                WriteString(writer, location.RestoreType);
+            WritePoints(writer, location.LocationPoints);
+            if (listVersion == 1)
+                WriteUInt32List(writer, location.BuildingIndices);
+            WriteString(writer, location.DatabaseKey);
+            WriteVector2(writer, location.FlagFacing);
+            if (listVersion >= 4)
+                writer.Write(Bool(location.DestroyBuildingOnCapture));
+            if (listVersion >= 6)
+                writer.Write(Bool(location.DisableBuildingAbilitiesWhenNoOriginalOwner));
+            if (listVersion >= 5)
+                writer.Write(Bool(location.AbilitiesAffectGlobally));
+            if (listVersion > 1)
+                WriteBuildingLinks(writer, location.BuildingLinks);
+            if (listVersion >= 7)
+                WriteUInt32List(writer, location.ToggleSlotsLinks);
+            if (listVersion >= 8)
+                WriteUInt32List(writer, location.AiHintsLinks);
+            if (listVersion >= 9)
+                WriteString(writer, location.ScriptId);
+            if (listVersion >= 10)
+                writer.Write(Bool(location.IsTimeBased));
+            if (listVersion > 11)
+                WriteString(writer, location.InitialOwnerType);
+        }
+
+        private static void WriteBuildingLinks(BinaryWriter writer, List<BuildingLink> links)
+        {
+            writer.Write((uint)links.Count);
+            foreach (var link in links)
+            {
+                writer.Write(link.Version);
+                writer.Write(link.BuildingIndex);
+                writer.Write(link.PrefabIndex);
+                WriteString(writer, link.PrefabBuildingKey);
+                if (link.Version >= 2)
+                    writer.Write(link.Uid);
+                if (link.Version >= 3)
+                    writer.Write(link.PrefabUid);
+            }
+        }
+
+        private static void WriteEFLine(BinaryWriter writer, EFLine line)
+        {
+            WriteString(writer, line.Label);
+            WriteVector3(writer, line.End1);
+            WriteVector3(writer, line.End2);
+            WriteVector3(writer, line.Direction);
+            WriteString(writer, line.Purpose);
         }
 
         private static void WriteZonesTemplate(BinaryWriter writer, ZonesTemplate template)
         {
-            writer.Write((uint)template.Outline.Count);
-            foreach (var p in template.Outline)
-            {
-                writer.Write(p.X);
-                writer.Write(p.Y);
-            }
-
+            WritePoints(writer, template.Outline);
             WriteString(writer, template.ZoneName);
             WriteString(writer, template.EntityFormationTemplateName);
 
-            if (template.LinesLength != 0)
-                throw new NotSupportedException("ZonesTemplate has a non-zero LinesLength - that data's structure is unknown to BmdParser (skipped, not stored), so it can't be written back.");
-            writer.Write((uint)0);
+            writer.Write((uint)template.Lines.Count);
+            foreach (var line in template.Lines)
+            {
+                WriteString(writer, line.Label);
+                WriteVector3(writer, line.Start);
+                WriteVector3(writer, line.End);
+                WriteString(writer, line.Purpose);
+                writer.Write(line.Orientation);
+            }
 
             WriteRowMajorMatrix(writer, template.Transform, is4x4: true);
         }
 
+        private static void WriteCivilianDeployment(BinaryWriter writer, CivilianDeployment deployment)
+        {
+            writer.Write(deployment.Version);
+            WriteString(writer, deployment.CivilianType);
+            WriteString(writer, deployment.CivilianAmount);
+            WritePoints(writer, deployment.Outline);
+        }
+
+        private static void WriteCivilianShelter(BinaryWriter writer, CivilianShelter shelter)
+        {
+            writer.Write(shelter.Version);
+            WriteVector2(writer, shelter.Position);
+            WriteVector2(writer, shelter.Entrance);
+            writer.Write(shelter.CivilianDeploymentLink);
+        }
+
+        private static void WriteTerrainStencilBlendTriangle(BinaryWriter writer, TerrainStencilBlendTriangle triangle)
+        {
+            writer.Write(triangle.Version);
+            WriteVector3(writer, triangle.Position0);
+            WriteVector3(writer, triangle.Position1);
+            WriteVector3(writer, triangle.Position2);
+            if (triangle.Version >= 2)
+                WriteString(writer, triangle.HeightMode);
+        }
+
+        private static void WriteBmdCachedArea(BinaryWriter writer, BmdCachedArea area)
+        {
+            writer.Write(area.Version);
+            WriteString(writer, area.Name);
+            for (var i = 0; i < 4; i++)
+                writer.Write(area.Aabb[i]);
+            if (area.Version >= 6)
+            {
+                WriteString(writer, area.BattleType);
+                WriteString(writer, area.DefendingFactionRestriction);
+            }
+            if (area.Version >= 5)
+            {
+                var flags = area.ValidLocationFlags;
+                writer.Write(flags.Version);
+                writer.Write(Bool(flags.ValidNorth));
+                writer.Write(Bool(flags.ValidSouth));
+                writer.Write(Bool(flags.ValidEast));
+                writer.Write(Bool(flags.ValidWest));
+            }
+        }
+
+        private static void WriteToggleableBuildingSlot(BinaryWriter writer, ToggleableBuildingSlot slot, ushort listVersion)
+        {
+            if (listVersion > 1)
+                WriteString(writer, slot.ToggleableSlotType);
+            WriteBuildingLinks(writer, slot.BuildingLinks);
+            if (listVersion >= 3)
+            {
+                WriteCollection(writer, slot.CompositeScenes, WriteCscInfo);
+                WriteCollection(writer, slot.Outlines, WritePoints);
+            }
+            if (listVersion >= 4)
+                WriteString(writer, slot.ScriptId);
+            if (listVersion >= 5)
+                WriteString(writer, slot.MapBarrierRecordKey);
+            if (listVersion == 6)
+                writer.Write(Bool(slot.MeleeAttackAllowed));
+            if (listVersion >= 7)
+                writer.Write(Bool(slot.GroundMeleeAttackAllowed));
+        }
+
+        private static void WriteTerraindDecal(BinaryWriter writer, TerraindDecal decal)
+        {
+            writer.Write(decal.Version);
+            writer.Write(decal.SplineVersion);
+            WriteVector2(writer, decal.VertexSpacing);
+            writer.Write(decal.UvScale);
+            writer.Write((uint)decal.Splines.Count);
+            foreach (var spline in decal.Splines)
+            {
+                writer.Write(spline.Version);
+                writer.Write(spline.StartWidth);
+                writer.Write(spline.EndWidth);
+                WriteVector3(writer, spline.Cp0);
+                WriteVector3(writer, spline.Cp1);
+                WriteVector3(writer, spline.Cp2);
+                WriteVector3(writer, spline.Cp3);
+            }
+            WriteString(writer, decal.Material);
+            if (decal.Version >= 2)
+                WriteRowMajorMatrix(writer, decal.Transform, is4x4: false);
+        }
+
         private static void WriteBmdInfo(BinaryWriter writer, BmdInfo bmd)
         {
-            if (bmd.PropertyOverrides == 1)
-                throw new NotSupportedException(
-                    "BmdInfo.PropertyOverrides == 1 carries data BmdParser reads and discards (never stored on " +
-                    "BmdInfo) - cannot be written back. BmdParser's own comment notes this is ~0.01% of real files.");
-            if (bmd.Version is 4 or 5 or 6 or 7)
-                throw new NotSupportedException($"BmdInfo version {bmd.Version} has filler bytes BmdParser reads and discards (never stored) - cannot be written back.");
-
             writer.Write(bmd.Version);
             WriteString(writer, bmd.BmdString);
             WriteRowMajorMatrix(writer, bmd.Transform, is4x4: true);
-            writer.Write(bmd.PropertyOverrides);
-
-            if (bmd.Version > 7)
-            {
-                WriteCultureMask(writer, bmd.CultureMask);
+            if (bmd.Version > 1)
+                WriteCollection(writer, bmd.PropertyOverrides, WriteBuildingProperties);
+            if (bmd.Version > 6)
+                WriteCultureMask(writer, bmd.CampaignTypeMask);
+            else if (bmd.Version > 2)
+                WriteCultureMask(writer, bmd.CampaignTypeMask, 4);
+            if (bmd.Version > 3)
                 WriteString(writer, bmd.RegionString);
-            }
+            if (bmd.Version is > 4 and < 8)
+                writer.Write(Bool(bmd.ClampToSurface));
             if (bmd.Version > 5)
                 WriteString(writer, bmd.HeightMode);
             if (bmd.Version > 8)
@@ -412,9 +579,8 @@ namespace Shared.GameFormats.Bmd
             var propsList = new List<string>();
             if (propVersion > 1)
             {
-                // Preserve the original shared string table's order/entries for byte-identical
-                // round-trips on unedited files; append any Rmv2Path a PropInfo now references
-                // that wasn't already in it (e.g. a path changed via editing).
+                // Keep the original string table so unedited files round-trip exactly; append any path a
+                // prop now references that isn't in it.
                 propsList.AddRange(bmdFile.Props);
                 var known = new HashSet<string>(propsList, StringComparer.Ordinal);
                 foreach (var prop in bmdFile.PropInfos)
@@ -439,11 +605,6 @@ namespace Shared.GameFormats.Bmd
 
         private static void WritePropInfo(BinaryWriter writer, PropInfo prop, List<string> propsList, Dictionary<string, int> propIndexLookup)
         {
-            if (prop.PropInfoVersion < 4)
-                throw new NotSupportedException(
-                    $"PropInfo version {prop.PropInfoVersion} predates the fields BmdParser stores (several bytes " +
-                    "are read and discarded, never kept on PropInfo) - cannot be written back.");
-
             writer.Write(prop.PropInfoVersion);
             if (prop.PropInfoVersion <= 12)
             {
@@ -451,10 +612,8 @@ namespace Shared.GameFormats.Bmd
             }
             else
             {
-                // Real prop tables can contain duplicate paths - prefer the prop's own original
-                // index (when it still points at the right string) over a fresh string lookup, so
-                // an unedited save doesn't silently repoint it at a different, merely
-                // string-identical, table slot.
+                // The table can hold duplicate paths, so keep the prop's own index while it still points at
+                // the right string.
                 var index = prop.PropIndex is { } original && original < propsList.Count && propsList[original] == prop.Rmv2Path
                     ? original
                     : propIndexLookup[prop.Rmv2Path];
@@ -462,6 +621,41 @@ namespace Shared.GameFormats.Bmd
             }
 
             WriteRowMajorMatrix(writer, prop.Transform, is4x4: false);
+
+            if (prop.PropInfoVersion < 4)
+            {
+                writer.Write(Bool(prop.Flags.ClampToSurface));
+                writer.Write(Bool(prop.IsDecal));
+                writer.Write(Bool(prop.LogicalDecal));
+                if (prop.PropInfoVersion <= 2)
+                {
+                    writer.Write(prop.DecalParallax);
+                    WriteVector3(writer, prop.DecalScale);
+                    writer.Write(Bool(prop.DecalTiled));
+                }
+                writer.Write(Bool(prop.Flags.AllowInOutfield));
+                writer.Write(Bool(prop.IsFauna));
+                writer.Write(Bool(prop.VisibleInsideSnowRegion));
+                writer.Write(Bool(prop.VisibleOutsideSnowRegion));
+                writer.Write(Bool(prop.VisibleInsideDestructionRegion));
+                writer.Write(Bool(prop.VisibleOutsideDestructionRegion));
+                writer.Write(Bool(prop.Flags.SeasonSpring));
+                writer.Write(Bool(prop.Flags.SeasonSummer));
+                writer.Write(Bool(prop.Flags.SeasonAutumn));
+                writer.Write(Bool(prop.Flags.SeasonWinter));
+                if (prop.PropInfoVersion >= 2)
+                    writer.Write(Bool(prop.Animated));
+                if (prop.PropInfoVersion >= 3)
+                {
+                    writer.Write(prop.DecalParallaxScale);
+                    writer.Write(prop.DecalTiling);
+                    // Keep vanilla's junk byte unless the bool has been edited since.
+                    writer.Write(prop.DecalOverrideGbufferNormalRawByte is { } raw && prop.DecalOverrideGbufferNormal
+                        ? raw
+                        : Bool(prop.DecalOverrideGbufferNormal));
+                }
+                return;
+            }
 
             writer.Write(Bool(prop.IsDecal));
             writer.Write(Bool(prop.LogicalDecal));
@@ -478,8 +672,9 @@ namespace Shared.GameFormats.Bmd
             WriteBmdComponentFlags(writer, prop.Flags);
 
             if (prop.PropInfoVersion > 4)
-            {
                 writer.Write(Bool(prop.VisibleInShroud));
+            if (prop.PropInfoVersion > 5)
+            {
                 writer.Write(Bool(prop.ApplyToTerrain));
                 writer.Write(Bool(prop.ApplyToPropsOrReceiveDecal));
                 writer.Write(Bool(prop.RenderAboveSnow));
@@ -492,9 +687,10 @@ namespace Shared.GameFormats.Bmd
                 WriteFixedBytes(writer, prop.CultureMask, 8);
             else if (prop.PropInfoVersion > 10)
                 writer.Write(prop.CultureMask, 0, 4);
-            // else (<=10): BmdParser reads nothing for the culture mask at this version - write nothing.
 
-            if (prop.PropInfoVersion > 11 || prop.PropInfoVersion == 9)
+            if (prop.PropInfoVersion == 9)
+                writer.Write(Bool(prop.DecalApplyToRigids));
+            if (prop.PropInfoVersion > 11)
                 writer.Write(Bool(prop.CastsShadow));
             if (prop.PropInfoVersion > 13)
                 writer.Write(Bool(prop.NoCulling));
@@ -507,18 +703,30 @@ namespace Shared.GameFormats.Bmd
             if (prop.PropInfoVersion > 19)
                 writer.Write(Bool(prop.VisibleWithoutShroud));
 
-            if (prop.PropInfoVersion == 21)
-                writer.Write(Bool(prop.SomeWeirdThing));
+            if (prop.PropInfoVersion is 21 or 22)
+                writer.Write(Bool(prop.VisibleInTacticalView));
             if (prop.PropInfoVersion == 22)
-            {
-                writer.Write(Bool(prop.SomeWeirdThing));
-                writer.Write(Bool(prop.SomeWeirdThing2));
-            }
+                writer.Write(Bool(prop.VisibleInTacticalViewOnly));
 
             if (prop.PropInfoVersion > 23)
                 writer.Write(Bool(prop.UseDynamicShadows));
             if (prop.PropInfoVersion > 24)
                 writer.Write(Bool(prop.UsesTerrainVertexOffset));
+
+            if (prop.PropInfoVersion > 25)
+                writer.Write(prop.BlendEdges);
+            if (prop.PropInfoVersion > 26)
+                writer.Write(prop.DecalFadeStart);
+            if (prop.PropInfoVersion > 27)
+            {
+                writer.Write(prop.DecalAngleThreshold);
+                writer.Write(Bool(prop.DecalMirrorX));
+                writer.Write(Bool(prop.DecalMirrorZ));
+            }
+            if (prop.PropInfoVersion > 28)
+                writer.Write(prop.DecalLayer);
+            if (prop.PropInfoVersion > 29)
+                writer.Write(Bool(prop.DecalTilingAlpha));
         }
 
         private static void WriteVfxInfo(BinaryWriter writer, VfxInfo vfx)
@@ -531,9 +739,9 @@ namespace Shared.GameFormats.Bmd
 
             if (vfx.VfxInfoVersion == 1)
             {
-                // BmdParser names these locals "one"/"zero" - always these literal values.
-                writer.Write((ushort)1);
-                writer.Write((uint)0);
+                writer.Write(Bool(vfx.Autoplay));
+                writer.Write(vfx.Scale);
+                writer.Write(Bool(vfx.Flags.AllowInOutfield));
             }
             else
             {
@@ -544,7 +752,7 @@ namespace Shared.GameFormats.Bmd
                 WriteString(writer, vfx.HeightMode);
             if (vfx.VfxInfoVersion > 3)
             {
-                if (vfx.VfxInfoVersion > 5)
+                if (vfx.VfxInfoVersion > 6)
                     WriteFixedBytes(writer, vfx.CultureMask, 8);
                 else
                     writer.Write(vfx.CultureMask, 0, 4);
@@ -561,7 +769,9 @@ namespace Shared.GameFormats.Bmd
                 writer.Write(vfx.ParentId);
 
             if (vfx.VfxInfoVersion > 9)
-                writer.Write(Bool(vfx.VisibleInShroudOnly));
+                writer.Write(Bool(vfx.VisibleWithoutShroud));
+            if (vfx.VfxInfoVersion > 10)
+                writer.Write(Bool(vfx.NoCulling));
         }
 
         private static void WriteAiHints(BinaryWriter writer, BmdFile bmdFile)
@@ -569,10 +779,16 @@ namespace Shared.GameFormats.Bmd
             var aiHints = bmdFile.AiHints;
 
             writer.Write(GetVersion(bmdFile, "AiHints.Separators"));
-            writer.Write((uint)0); // BmdParser throws if Separators is ever non-empty
+            WriteCollection(writer, aiHints.Separators, (w, s) => { w.Write(s.Version); WriteString(w, s.Type); WritePoints(w, s.Points); });
 
             writer.Write(GetVersion(bmdFile, "AiHints.DirectedPoints"));
-            writer.Write((uint)0); // BmdParser throws if DirectedPoints is ever non-empty
+            WriteCollection(writer, aiHints.DirectedPoints, (w, p) =>
+            {
+                w.Write(p.Version);
+                WriteString(w, p.Type);
+                WriteVector2(w, p.Position);
+                WriteVector2(w, p.Direction);
+            });
 
             writer.Write(GetVersion(bmdFile, "AiHints.PolyLines"));
             writer.Write((uint)aiHints.PolyLines.Count);
@@ -603,17 +819,11 @@ namespace Shared.GameFormats.Bmd
             {
                 writer.Write(polyLineList.Version);
                 WriteString(writer, polyLineList.Type);
-                writer.Write(polyLineList.District);
+                if (polyLineList.Version >= 2)
+                    writer.Write(polyLineList.District);
                 writer.Write((uint)polyLineList.PolygonList.Count);
                 foreach (var polygon in polyLineList.PolygonList)
-                {
-                    writer.Write((uint)polygon.Points.Count);
-                    foreach (var p in polygon.Points)
-                    {
-                        writer.Write(p.X);
-                        writer.Write(p.Y);
-                    }
-                }
+                    WritePoints(writer, polygon.Points);
             }
         }
 
@@ -626,11 +836,12 @@ namespace Shared.GameFormats.Bmd
             if (probe.Version > 2)
             {
                 writer.Write(probe.InnerRadius);
-                writer.Write(probe.SomeZero);
+                writer.Write(Bool(probe.IsCylinder));
             }
 
             writer.Write(Bool(probe.Primary));
-            WriteString(writer, probe.HeightMode);
+            if (probe.Version > 1)
+                WriteString(writer, probe.HeightMode);
         }
 
         private static void WriteTerrainHoleInfo(BinaryWriter writer, TerrainHoleTriangleInfo hole)
@@ -639,7 +850,8 @@ namespace Shared.GameFormats.Bmd
             WriteVector3(writer, hole.FirstVert);
             WriteVector3(writer, hole.SecondVert);
             WriteVector3(writer, hole.ThirdVert);
-            WriteString(writer, hole.HeightMode);
+            if (hole.TerrainHoleVersion > 1)
+                WriteString(writer, hole.HeightMode);
 
             if (hole.TerrainHoleVersion > 2)
                 WriteBmdComponentFlags(writer, hole.Flags);
@@ -702,10 +914,10 @@ namespace Shared.GameFormats.Bmd
             {
                 if (area.PlayableAreaVersion > 2)
                     writer.Write(area.FlagVersion);
-                writer.Write(Bool(area.Flag1));
-                writer.Write(Bool(area.Flag2));
-                writer.Write(Bool(area.Flag3));
-                writer.Write(Bool(area.Flag4));
+                writer.Write(Bool(area.ValidNorth));
+                writer.Write(Bool(area.ValidSouth));
+                writer.Write(Bool(area.ValidEast));
+                writer.Write(Bool(area.ValidWest));
             }
         }
 
@@ -728,9 +940,12 @@ namespace Shared.GameFormats.Bmd
             if (mesh.PolyMeshVersion > 3)
             {
                 WriteRowMajorMatrix(writer, mesh.Transform, is4x4: false);
-                WriteFixedBytes(writer, mesh.Booleans, 4);
+                writer.Write(Bool(mesh.VisibleInsideSnowRegion));
+                writer.Write(Bool(mesh.VisibleOutsideSnowRegion));
+                writer.Write(Bool(mesh.VisibleInsideDestructionRegion));
+                writer.Write(Bool(mesh.VisibleOutsideDestructionRegion));
                 writer.Write(Bool(mesh.VisibleInShroud));
-                WriteFixedBytes(writer, mesh.MoreBooleans, 1);
+                writer.Write(Bool(mesh.VisibleWithoutShroud));
             }
         }
 
@@ -750,10 +965,11 @@ namespace Shared.GameFormats.Bmd
             writer.Write(light.IntensityBlue);
             writer.Write(light.Falloff);
             WriteString(writer, light.Gobo);
-            writer.Write(Bool(light.Volumetric));
-            WriteString(writer, light.HeightMode);
-
-            if (light.Version > 4)
+            if (light.Version > 1)
+                writer.Write(Bool(light.Volumetric));
+            if (light.Version > 2)
+                WriteString(writer, light.HeightMode);
+            if (light.Version > 6)
                 writer.Write(light.PdlcMask);
             else if (light.Version > 3)
                 writer.Write((uint)light.PdlcMask);
@@ -780,25 +996,29 @@ namespace Shared.GameFormats.Bmd
             WriteVector3(writer, sound.OuterCubeBoundingBox.Min);
             WriteVector3(writer, sound.OuterCubeBoundingBox.Max);
 
-            writer.Write((uint)sound.RiverNodeList.Length);
-            foreach (var node in sound.RiverNodeList)
+            if (sound.Version > 1)
             {
-                writer.Write(node.Version);
-                WriteVector3(writer, node.Position);
-                writer.Write(node.Something1);
-                writer.Write(node.Something2);
+                writer.Write((uint)sound.RiverNodeList.Length);
+                foreach (var node in sound.RiverNodeList)
+                {
+                    writer.Write(node.Version);
+                    WriteVector3(writer, node.Position);
+                    writer.Write(node.Width);
+                    writer.Write(node.FlowSpeed);
+                }
             }
-
-            writer.Write(sound.ClampToSurface);
-            WriteString(writer, sound.HeightMode);
-
+            if (sound.Version > 2)
+                writer.Write(sound.ClampToSurface);
+            if (sound.Version > 3)
+                WriteString(writer, sound.HeightMode);
             if (sound.Version > 9)
                 writer.Write(sound.CampaignTypeMask);
-            else
+            else if (sound.Version > 4)
                 writer.Write((uint)sound.CampaignTypeMask);
-
-            if (sound.Version > 5)
+            if (sound.Version > 6)
                 WriteCultureMask(writer, sound.CultureMask);
+            else if (sound.Version > 5)
+                WriteCultureMask(writer, sound.CultureMask, 4);
             if (sound.Version > 7)
             {
                 WriteVector3(writer, sound.DirectionVector);
@@ -813,20 +1033,21 @@ namespace Shared.GameFormats.Bmd
             writer.Write(csc.Version);
             WriteRowMajorMatrix(writer, csc.Transform, is4x4: false);
             WriteString(writer, csc.SceneFile);
-            WriteString(writer, csc.HeightMode);
-
-            if (csc.Version > 2)
-            {
+            if (csc.Version > 1)
+                WriteString(writer, csc.HeightMode);
+            if (csc.Version > 6)
                 writer.Write(csc.PdlcMask);
-                writer.Write(Bool(csc.Autoplay));
+            else if (csc.Version > 2)
+                writer.Write((uint)csc.PdlcMask);
+            writer.Write(Bool(csc.Autoplay));
+            if (csc.Version > 4)
                 writer.Write(Bool(csc.VisibleInShroud));
+            if (csc.Version > 5)
                 writer.Write(Bool(csc.NoCulling));
-            }
             if (csc.Version > 7)
-            {
                 WriteString(writer, csc.ScriptId);
+            if (csc.Version > 8)
                 WriteString(writer, csc.ParentScriptId);
-            }
             if (csc.Version > 9)
                 writer.Write(Bool(csc.VisibleWithoutShroud));
             if (csc.Version > 10)
@@ -882,9 +1103,7 @@ namespace Shared.GameFormats.Bmd
             }
         }
 
-        // ---------------------------------------------------------------------
-        // Primitive helpers (mirror BmdParser's Read helpers one-for-one)
-        // ---------------------------------------------------------------------
+        // Primitive helpers (mirror BmdParser's Read helpers)
 
         private static byte Bool(bool b) => (byte)(b ? 1 : 0);
 
@@ -904,6 +1123,12 @@ namespace Shared.GameFormats.Bmd
             if (bytes.Length != expectedLength)
                 throw new InvalidOperationException($"Expected exactly {expectedLength} bytes but got {bytes.Length}.");
             writer.Write(bytes);
+        }
+
+        private static void WriteVector2(BinaryWriter writer, RmvVector2 v)
+        {
+            writer.Write(v.X);
+            writer.Write(v.Y);
         }
 
         private static void WriteVector3(BinaryWriter writer, RmvVector3 v)
@@ -968,18 +1193,17 @@ namespace Shared.GameFormats.Bmd
             }
         }
 
-        private static void WriteCultureMask(BinaryWriter writer, CultureMask mask)
+        private static void WriteCultureMask(BinaryWriter writer, CultureMask mask, int size = 8)
         {
             if (mask.RawBytes is { Length: 8 } raw)
             {
-                writer.Write(raw);
+                writer.Write(raw, 0, size);
                 return;
             }
-
             var bytes = new byte[8];
 
             if (mask.CultMaskBase) bytes[0] |= 0x01;
-            if (mask.CultMaskBst) bytes[0] |= 0x02;
+            if (mask.CultMaskBst) bytes[0] |= 0x40;
             if (mask.CultMaskBrt) bytes[0] |= 0x80;
 
             if (mask.CultMaskChs) bytes[1] |= 0x01;
@@ -1008,8 +1232,9 @@ namespace Shared.GameFormats.Bmd
             if (mask.CultMaskCth) bytes[4] |= 0x01;
             if (mask.CultMaskNor) bytes[4] |= 0x02;
             if (mask.CultMaskChd) bytes[4] |= 0x04;
+            if (mask.CultMaskNag) bytes[4] |= 0x08;
 
-            writer.Write(bytes);
+            writer.Write(bytes, 0, size);
         }
     }
 }

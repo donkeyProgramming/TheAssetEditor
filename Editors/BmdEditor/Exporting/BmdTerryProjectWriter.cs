@@ -9,12 +9,9 @@ using Shared.GameFormats.Bmd;
 namespace Editors.BmdEditor.Exporting
 {
     /// <summary>
-    /// Builds a Terry project (.terry) and its accompanying layer (.layer) from a parsed
-    /// <see cref="BmdFile"/>, in the XML shape read by the Total War editor "Terry". BmdInfo
-    /// references are recursively flattened into the same layer (their own Transform is not
-    /// composed into descendants - only their culture mask is inherited - matching the reference
-    /// Python export scripts this was ported from), so the result contains everything reachable
-    /// from the root .bmd.
+    /// Builds a Terry project (.terry) and its layer (.layer) from a parsed <see cref="BmdFile"/>.
+    /// BmdInfo references are flattened into the same layer: a child's entities inherit the reference's
+    /// culture mask, but its transform is not applied to them.
     /// </summary>
     public static class BmdTerryProjectWriter
     {
@@ -23,10 +20,7 @@ namespace Editors.BmdEditor.Exporting
 
         public readonly record struct TerryProject(string TerryXml, string LayerXml, string LayerEntityId);
 
-        // Fixed display order for the logical layers grouping the flattened entities by component
-        // type (matches the real editor's own "group by kind" habit, e.g. pyre_rock.*.layer, though
-        // that sample groups by spatial batch rather than type - this groups by type instead since
-        // that's what was asked for).
+        // Display order of the logical layers, which group the flattened entities by component type.
         private static readonly (string Key, string DisplayName)[] LayerCategories =
         {
             ("props", "Props"),
@@ -119,7 +113,7 @@ namespace Editors.BmdEditor.Exporting
                 Add(entitiesByCategory, "spot_lights", BuildSpotLightEntity(light, inheritedCultureMask));
 
             foreach (var sound in bmd.Sounds)
-                Add(entitiesByCategory, "sounds", BuildSoundEntity(sound));
+                Add(entitiesByCategory, "sounds", BuildSoundEntity(sound, inheritedCultureMask));
 
             foreach (var csc in bmd.CscInfos)
                 Add(entitiesByCategory, "composite_scenes", BuildCscEntity(csc, inheritedCultureMask));
@@ -133,7 +127,9 @@ namespace Editors.BmdEditor.Exporting
                 if (childBmd == null)
                     continue;
 
-                CollectEntities(childBmd, TerryCultureMask.Format(childRef.CultureMask), entitiesByCategory, resolveReferencedBmd, visited);
+                // In global_props.bin, where BMDs nest inside BMDs, a reference's campaign_type_mask
+                // carries its child's culture as prefab_types bits. Terry-compiled prefabs leave it 0.
+                CollectEntities(childBmd, TerryCultureMask.Format(childRef.CampaignTypeMask), entitiesByCategory, resolveReferencedBmd, visited);
             }
         }
 
@@ -160,35 +156,52 @@ namespace Editors.BmdEditor.Exporting
                     new XAttribute("map_barrier_record_key", ""),
                     new XAttribute("ground_melee_attack_allowed", "true")));
 
-        private static XElement BuildPropEntity(PropInfo prop, string inheritedCultureMask)
+        private static XElement BuildPropEntity(PropInfo prop, string cultureMask)
         {
             var t = TerryTransform.Decompose(prop.Transform);
-            var cultureMask = TerryCultureMask.PreferOwn(TerryCultureMask.Format(prop.CultureMask), inheritedCultureMask);
             // Version >19 only: the stored bit is "visible without shroud", so shroud-only visibility is its inverse.
             var visibleInShroudOnly = prop.PropInfoVersion > 19 && !prop.VisibleWithoutShroud;
 
             var entity = NewEntity();
             if (prop.IsDecal)
             {
-                entity.Add(new XElement("ECDecal",
+                var decal = new XElement("ECDecal",
                     new XAttribute("model_path", prop.Rmv2Path),
-                    new XAttribute("parallax_scale", "0"),
-                    new XAttribute("tiling", "0"),
+                    new XAttribute("parallax_scale", Fmt(prop.DecalParallaxScale)),
+                    new XAttribute("tiling", Fmt(prop.DecalTiling)),
                     new XAttribute("normal_mode", "DNM_BLEND"),
                     new XAttribute("apply_to_terrain", Bool(prop.ApplyToTerrain)),
                     new XAttribute("apply_to_objects", Bool(prop.ApplyToPropsOrReceiveDecal)),
-                    new XAttribute("render_above_snow", Bool(prop.RenderAboveSnow))));
+                    new XAttribute("render_above_snow", Bool(prop.RenderAboveSnow)));
+                // Fields added after prop version 25; older props keep Terry's own defaults.
+                if (prop.PropInfoVersion > 29)
+                    decal.Add(new XAttribute("tiling_alpha_enabled", Bool(prop.DecalTilingAlpha)));
+                if (prop.PropInfoVersion > 26)
+                    decal.Add(new XAttribute("fade_start", Fmt(prop.DecalFadeStart)));
+                if (prop.PropInfoVersion > 27)
+                    decal.Add(
+                        new XAttribute("mirror_x", Bool(prop.DecalMirrorX)),
+                        new XAttribute("mirror_z", Bool(prop.DecalMirrorZ)),
+                        new XAttribute("angle_threshold", Fmt(prop.DecalAngleThreshold)));
+                if (prop.PropInfoVersion > 28)
+                    decal.Add(new XAttribute("layer", prop.DecalLayer.ToString(CultureInfo.InvariantCulture)));
+                entity.Add(decal);
             }
             else
             {
                 entity.Add(new XElement("ECPropMesh"));
                 entity.Add(new XElement("ECMesh", new XAttribute("model_path", prop.Rmv2Path), new XAttribute("opacity", "1")));
-                entity.Add(new XElement("ECMeshRenderSettings", new XAttribute("receive_decals", Bool(prop.ApplyToPropsOrReceiveDecal))));
+                var renderSettings = new XElement("ECMeshRenderSettings", new XAttribute("receive_decals", Bool(prop.ApplyToPropsOrReceiveDecal)));
+                if (prop.PropInfoVersion > 11)
+                    renderSettings.Add(new XAttribute("cast_shadow", Bool(prop.CastsShadow)));
+                if (prop.PropInfoVersion > 18)
+                    renderSettings.Add(new XAttribute("render_into_skydome_fog", Bool(prop.IncludeInFog)));
+                if (prop.PropInfoVersion > 25)
+                    renderSettings.Add(new XAttribute("blend_edges_with_terrain", Fmt(prop.BlendEdges)));
+                entity.Add(renderSettings);
             }
 
-            entity.Add(new XElement("ECVisibilitySettingsCampaign",
-                new XAttribute("visible_in_tactical_view", Bool(prop.Flags.VisibleInTactical)),
-                new XAttribute("visible_in_tactical_view_only", Bool(prop.Flags.OnlyVisibleInTactical))));
+            entity.Add(TacticalVisibility(prop.Flags));
             entity.Add(new XElement("ECPropHeightPatch",
                 new XAttribute("apply_height_patch", Bool(prop.ApplyHeightPatch)),
                 new XAttribute("for_camera_height_map_only", "false")));
@@ -205,24 +218,24 @@ namespace Editors.BmdEditor.Exporting
             return entity;
         }
 
-        private static XElement BuildVfxEntity(VfxInfo vfx, string inheritedCultureMask)
+        private static XElement BuildVfxEntity(VfxInfo vfx, string cultureMask)
         {
             var t = TerryTransform.Decompose(vfx.Transform);
-            var cultureMask = TerryCultureMask.PreferInherited(TerryCultureMask.Format(vfx.CultureMask), inheritedCultureMask);
+            // Version >9 only: as with props, the stored bit is "visible without shroud" (Terry inverts it on compile).
+            var visibleInShroudOnly = vfx.VfxInfoVersion > 9 && !vfx.VisibleWithoutShroud;
 
             return NewEntity(
-                new XElement("ECVisibilitySettingsCampaign",
-                    new XAttribute("visible_in_tactical_view", Bool(vfx.Flags.VisibleInTactical)),
-                    new XAttribute("visible_in_tactical_view_only", Bool(vfx.Flags.OnlyVisibleInTactical))),
-                // autoplay/scale are hardcoded here to match the reference export scripts, not vfx.Autoplay/the transform scale.
+                TacticalVisibility(vfx.Flags),
+                // The scale is already in the transform, so the effect's own scale stays 1.
                 new XElement("ECVFX",
                     new XAttribute("vfx", vfx.VfxString),
-                    new XAttribute("autoplay", "true"),
+                    new XAttribute("autoplay", Bool(vfx.VfxInfoVersion is > 1 and < 5 || vfx.Autoplay)),
                     new XAttribute("scale", "1"),
                     new XAttribute("instance_name", vfx.InstanceName)),
                 new XElement("ECCampaignProperties",
                     new XAttribute("visible_in_shroud", Bool(vfx.VisibleInShroud)),
-                    new XAttribute("visible_in_shroud_only", Bool(vfx.VisibleInShroudOnly)),
+                    new XAttribute("visible_in_shroud_only", Bool(visibleInShroudOnly)),
+                    new XAttribute("no_culling", Bool(vfx.NoCulling)),
                     new XAttribute("culture_mask", cultureMask)),
                 BuildTransformElement(t));
         }
@@ -231,6 +244,7 @@ namespace Editors.BmdEditor.Exporting
         {
             var innerRadius = probe.Version > 2 ? probe.InnerRadius : probe.OuterRadius;
 
+            // A cylinder probe's height isn't stored in the BMD, so Terry's default stands.
             return NewEntity(
                 new XElement("ECLightProbe", new XAttribute("primary", Bool(probe.Primary))),
                 new XElement("ECTransform",
@@ -238,7 +252,7 @@ namespace Editors.BmdEditor.Exporting
                     new XAttribute("rotation", "0 0 0"),
                     new XAttribute("scale", "1 1 1"),
                     new XAttribute("pivot", "0 0 0")),
-                new XElement("ECDoubleSphere",
+                new XElement(probe.IsCylinder ? "ECDoubleCylinder" : "ECDoubleSphere",
                     new XAttribute("inner_radius", Fmt(innerRadius)),
                     new XAttribute("outer_radius", Fmt(probe.OuterRadius))));
         }
@@ -254,9 +268,7 @@ namespace Editors.BmdEditor.Exporting
                     new XAttribute("rotation", FormatVec(eulerDegrees)),
                     new XAttribute("scale", "1 1 1"),
                     new XAttribute("pivot", "0 0 0")),
-                new XElement("ECVisibilitySettingsCampaign",
-                    new XAttribute("visible_in_tactical_view", "false"),
-                    new XAttribute("visible_in_tactical_view_only", "false")),
+                TacticalVisibility(hole.Flags),
                 new XElement("ECCampaignProperties",
                     new XAttribute("visible_in_shroud", "true"),
                     new XAttribute("no_culling", "true"),
@@ -288,9 +300,7 @@ namespace Editors.BmdEditor.Exporting
                     new XAttribute("random_offset", Fmt(light.RandomOffset)),
                     new XAttribute("falloff_type", light.FalloffType),
                     new XAttribute("for_light_probes_only", Bool(light.LightProbeOnly))),
-                new XElement("ECVisibilitySettingsCampaign",
-                    new XAttribute("visible_in_tactical_view", "false"),
-                    new XAttribute("visible_in_tactical_view_only", "false")),
+                TacticalVisibility(light.Flags),
                 new XElement("ECCampaignProperties", new XAttribute("culture_mask", inheritedCultureMask)),
                 new XElement("ECTransform",
                     new XAttribute("position", FormatVec(light.Position.ToVector3())),
@@ -323,13 +333,8 @@ namespace Editors.BmdEditor.Exporting
                 new XElement("ECPolygonMesh",
                     new XAttribute("material", mesh.MaterialString),
                     new XAttribute("affects_mesh_optimization", "false")),
-                new XElement("ECVisibilitySettingsCampaign",
-                    new XAttribute("visible_in_tactical_view", Bool(mesh.Flags.VisibleInTactical)),
-                    new XAttribute("visible_in_tactical_view_only", Bool(mesh.Flags.OnlyVisibleInTactical))),
-                new XElement("ECCampaignProperties",
-                    new XAttribute("visible_in_shroud", Bool(visibleInShroud)),
-                    new XAttribute("no_culling", "true"),
-                    new XAttribute("culture_mask", inheritedCultureMask)),
+                TacticalVisibility(mesh.Flags),
+                PolyMeshCampaignProperties(mesh, visibleInShroud, inheritedCultureMask),
                 BuildTransformElement(t),
                 new XElement("ECPolyline", polyline));
         }
@@ -357,9 +362,7 @@ namespace Editors.BmdEditor.Exporting
                     new XAttribute("falloff", Fmt(light.Falloff)),
                     new XAttribute("volumetric", Bool(light.Volumetric)),
                     new XAttribute("gobo", light.Gobo)),
-                new XElement("ECVisibilitySettingsCampaign",
-                    new XAttribute("visible_in_tactical_view", "false"),
-                    new XAttribute("visible_in_tactical_view_only", "false")),
+                TacticalVisibility(light.Flags),
                 new XElement("ECCampaignProperties", new XAttribute("culture_mask", inheritedCultureMask)),
                 new XElement("ECTransform",
                     new XAttribute("position", FormatVec(light.Position.ToVector3())),
@@ -368,10 +371,9 @@ namespace Editors.BmdEditor.Exporting
                     new XAttribute("pivot", "0 0 0")));
         }
 
-        private static XElement BuildSoundEntity(SoundInfo sound)
+        private static XElement BuildSoundEntity(SoundInfo sound, string cultureMask)
         {
             var origin = sound.CoordList.Length > 0 ? sound.CoordList[0].ToVector3() : Vector3.Zero;
-            var cultureMask = TerryCultureMask.Format(sound.CultureMask);
 
             var entity = NewEntity(
                 new XElement("ECSoundMarker", new XAttribute("key", sound.SoundString)),
@@ -423,17 +425,43 @@ namespace Editors.BmdEditor.Exporting
             return NewEntity(
                 new XElement("ECCompositeScene",
                     new XAttribute("path", csc.SceneFile),
-                    new XAttribute("script_id", ""),
-                    new XAttribute("autoplay", "true")),
+                    new XAttribute("script_id", csc.ScriptId),
+                    new XAttribute("autoplay", Bool(csc.Autoplay)),
+                    new XAttribute("hold_first_frame", Bool(csc.HoldFirst)),
+                    new XAttribute("hold_last_frame", Bool(csc.HoldLast))),
                 new XElement("ECVisibilitySettingsCampaign",
-                    new XAttribute("visible_in_tactical_view", "false"),
-                    new XAttribute("visible_in_tactical_view_only", "false")),
+                    new XAttribute("visible_in_tactical_view", Bool(csc.VisibleInTacticalView)),
+                    new XAttribute("visible_in_tactical_view_only", Bool(csc.VisibleInTacticalViewOnly))),
                 BuildTransformElement(t),
                 new XElement("ECCampaignProperties",
                     new XAttribute("visible_in_shroud", Bool(csc.VisibleInShroud)),
                     new XAttribute("visible_in_shroud_only", Bool(visibleInShroudOnly)),
                     new XAttribute("no_culling", Bool(csc.NoCulling)),
                     new XAttribute("culture_mask", inheritedCultureMask)));
+        }
+
+        private static XElement TacticalVisibility(BmdComponentFlags flags) =>
+            new XElement("ECVisibilitySettingsCampaign",
+                new XAttribute("visible_in_tactical_view", Bool(flags.VisibleInTactical)),
+                new XAttribute("visible_in_tactical_view_only", Bool(flags.OnlyVisibleInTactical)));
+
+        private static XElement PolyMeshCampaignProperties(PolyMeshInfo mesh, bool visibleInShroud, string inheritedCultureMask)
+        {
+            var properties = new XElement("ECCampaignProperties");
+            // Version >3 only: the region flags and "visible without shroud" (inverted, as for props) came with the transform.
+            if (mesh.PolyMeshVersion > 3)
+                properties.Add(
+                    new XAttribute("visible_inside_snow_region", Bool(mesh.VisibleInsideSnowRegion)),
+                    new XAttribute("visible_outside_snow_region", Bool(mesh.VisibleOutsideSnowRegion)),
+                    new XAttribute("visible_inside_destruction_region", Bool(mesh.VisibleInsideDestructionRegion)),
+                    new XAttribute("visible_outside_destruction_region", Bool(mesh.VisibleOutsideDestructionRegion)));
+            properties.Add(new XAttribute("visible_in_shroud", Bool(visibleInShroud)));
+            if (mesh.PolyMeshVersion > 3)
+                properties.Add(new XAttribute("visible_in_shroud_only", Bool(!mesh.VisibleWithoutShroud)));
+            properties.Add(
+                new XAttribute("no_culling", "true"),
+                new XAttribute("culture_mask", inheritedCultureMask));
+            return properties;
         }
 
         private static XElement NewEntity(params object[] components) =>

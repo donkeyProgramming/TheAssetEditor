@@ -4,19 +4,17 @@ namespace Editors.BmdEditor.Exporting
 {
     /// <summary>
     /// Formats BMD culture masks into Terry's comma-separated culture_mask attribute text
-    /// (e.g. "wh3_main_cth_cathay,wh3_main_ksl_kislev"), and resolves how an entity's own mask
-    /// combines with the mask inherited from an enclosing BmdInfo reference. The per-type
-    /// combination rules (prefer own vs. prefer inherited vs. own-only) mirror what the reference
-    /// Terry-export scripts do for each BMD component type.
+    /// (e.g. "wh3_main_cth_cathay,wh3_main_ksl_kislev"). Culture belongs to a whole BMD: an entity takes
+    /// the mask of the reference its BMD was reached through, and its own masks are ignored.
     /// </summary>
     public static class TerryCultureMask
     {
-        // Ideally these bit->culture names would be looked up from the game DB (e.g. a
-        // "prefab_types_tables"-style table) instead of hardcoded here. AssetEditor has no live
-        // DB-table-reading path to do that with, though: Shared/GameFiles/DB (SchemaManager,
-        // SimpleSchema) is schema-driven table-decoding scaffolding, but every class in it is
-        // commented out/dead, so there's nothing to hook into short of building that
-        // infrastructure from scratch. Hardcoded here instead, matching the reference scripts.
+        // Bit i is the prefab_types_tables row with value i + 1 (value 0, NONE, is bit 63), copied
+        // from vanilla WH3's db/prefab_types_tables/data__ (table version 3, 40 rows). Rows without
+        // a culture (BASE, the BUILDING_* states, ABANDONED) are left out: Terry's culture_mask text
+        // can't name them. KISLEV_PROLOGUE (wh3_main_pro_ksl_kislev) shares Kislev's bit. Mods can
+        // add rows, but AssetEditor has no DB-reading path to look them up with
+        // (Shared/GameFiles/DB is dead scaffolding).
         private static readonly Dictionary<int, string> BitNames = new()
         {
             [6] = "wh_dlc03_bst_beastmen",
@@ -44,6 +42,7 @@ namespace Editors.BmdEditor.Exporting
             [32] = "wh3_main_cth_cathay",
             [33] = "wh_dlc08_nor_norsca",
             [34] = "wh3_dlc23_chd_chaos_dwarfs",
+            [35] = "wh3_dlc29_nag_undead_legions",
             [63] = "*",
         };
 
@@ -70,6 +69,9 @@ namespace Editors.BmdEditor.Exporting
 
         public static string Format(CultureMask mask)
         {
+            if (mask.RawBytes is { Length: >= 8 } raw)
+                return Format(raw);
+
             var bits = 0UL;
             if (mask.CultMaskBst) bits |= 1UL << 6;
             if (mask.CultMaskBrt) bits |= 1UL << 7;
@@ -96,15 +98,8 @@ namespace Editors.BmdEditor.Exporting
             if (mask.CultMaskCth) bits |= 1UL << 32;
             if (mask.CultMaskNor) bits |= 1UL << 33;
             if (mask.CultMaskChd) bits |= 1UL << 34;
+            if (mask.CultMaskNag) bits |= 1UL << 35;
             return Format(bits);
         }
-
-        /// <summary>Props: keep the prop's own mask; only fall back to the inherited (BmdInfo)
-        /// mask when the prop itself carries no restriction.</summary>
-        public static string PreferOwn(string own, string inherited) => own.Length > 0 ? own : inherited;
-
-        /// <summary>VFX: the inherited (BmdInfo) mask wins whenever it's non-empty, regardless of
-        /// the VFX's own mask.</summary>
-        public static string PreferInherited(string own, string inherited) => inherited.Length > 0 ? inherited : own;
     }
 }

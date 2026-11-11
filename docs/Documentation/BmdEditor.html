@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="DocumentationShared.css">
+    <script src="DocumentationShared.js" defer></script>
+</head>
+<body>
+    <h1>BMD Editor</h1>
+
+    <p>A BMD (battle map definition) lists the things placed on a map: props, decals, VFX, lights,
+    sounds, composite scenes and, on battle maps, buildings, capture locations and deployment
+    zones. The BMD Editor shows a BMD in 3D, lets you edit and add the common element types, and
+    can export a prefab as a Terry project.</p>
+
+    <h2>Which files it opens</h2>
+    <ul>
+        <li><b>Prefabs</b>: <code>.bmd</code> files, such as the ones under <code>prefabs/</code>.</li>
+        <li><b>Battle-map BMDs</b>: <code>.bin</code> files under <code>terrain/tiles/battle</code>
+        whose name contains <code>bmd_data</code>, <code>bmd_nogo_data</code> or
+        <code>bmd_objects_sound</code>, or ends in <code>_bmd.bin</code>. Other <code>.bin</code>
+        files are not BMDs and are left to their own editors.</li>
+    </ul>
+    <p>Double-click a file in the PackFile explorer to open it. Every version used by Warhammer 3
+    can be opened. Files older than FASTBIN version 11 can be viewed but not saved.</p>
+
+    <h2>The editor window</h2>
+    <ul>
+        <li><b>3D view</b> (left): the map contents. Props are drawn with their models; other
+        elements are drawn as markers such as cubes, spheres, cones and outlines. Click an element
+        to select it.</li>
+        <li><b>Components</b> (top right): everything in the file, grouped by type with a count,
+        for example <i>Props (12)</i>. A referenced BMD lists the contents of the file it points
+        to underneath it.</li>
+        <li><b>Details</b> (bottom right): the fields of the selected element.</li>
+    </ul>
+
+    <h2>Editing elements</h2>
+    <p>These ten types have editable fields in the Details panel: props, decals, VFX, point
+    lights, spot lights, sounds, poly meshes, light probes, terrain holes and composite scenes.
+    All other types are shown as read-only text.</p>
+
+    <p>To move an element, select it and pick a gizmo mode on the toolbar: <b>Move</b>,
+    <b>Rotate</b> or <b>Scale</b>. Rotate and Scale are only enabled for types that store them:</p>
+    <ul>
+        <li>Props, decals, VFX, composite scenes and newer poly meshes: move, rotate and scale.</li>
+        <li>Spot lights: move and rotate.</li>
+        <li>Point lights, light probes and older poly meshes: move only.</li>
+        <li>Sounds: the gizmo moves all points together; single points are edited in the Details panel.</li>
+        <li>Terrain holes: the gizmo moves the whole triangle; single corners are edited in the Details panel.</li>
+    </ul>
+    <p>The last gizmo button turns the gizmo off, leaving selection only. Transform values can
+    also be typed directly into the Details panel.</p>
+
+    <h2>Adding elements</h2>
+    <p>Use the <b>Add</b> menu on the toolbar. The new element is placed at the origin, selected,
+    and can then be moved.</p>
+    <ul>
+        <li><b>Prop</b> and <b>Decal</b>: browse for a <code>.rigid_model_v2</code> or <code>.wsmodel</code>.</li>
+        <li><b>VFX</b>: type the effect name.</li>
+        <li><b>Sound</b>: type the sound event name.</li>
+        <li><b>Poly mesh</b>: type the material name.</li>
+        <li><b>Composite scene</b>: browse for a <code>.csc</code>.</li>
+        <li><b>Point light</b>, <b>Spot light</b>, <b>Light probe</b>, <b>Terrain hole</b>: added directly.</li>
+    </ul>
+    <p>New elements are visible in every season, and new props, VFX, sounds and composite scenes
+    are not restricted to any culture.</p>
+
+    <h2>Deleting elements</h2>
+    <p>Select an element of one of the ten editable types and select <b>Delete</b> on the toolbar,
+    or press <b>Del</b> in the Components list. Elements listed under a referenced BMD belong to
+    that other file and cannot be deleted from here. There is no undo: use <b>Refresh</b> before
+    saving to get the file back as it was.</p>
+
+    <h2>Saving</h2>
+    <p><b>Save</b> writes the whole file back to the editable pack, at the same path. Sections the
+    editor does not let you edit are written back unchanged. <b>Refresh</b> reloads the file and
+    discards unsaved edits.</p>
+
+    <h2>Exporting to Terry</h2>
+    <p>A <code>.bmd</code> prefab can be exported as a project for Terry, the Assembly Kit's map
+    editor:</p>
+    <ol>
+        <li>Select <b>Export</b> on the toolbar, or right-click the <code>.bmd</code> in the
+        PackFile explorer and select <b>Export as Terry project</b>.</li>
+        <li>Choose an output folder.</li>
+    </ol>
+    <p>This writes a <code>.terry</code> file and a <code>.layer</code> file. The entities are
+    grouped into layers by type: Props, Decals, VFX, Light Probes, Terrain Holes, Point Lights,
+    Polygon Meshes, Spot Lights, Sounds and Composite Scenes.</p>
+
+    <h3>Limitations</h3>
+    <ul>
+        <li>Only <code>.bmd</code> prefabs can be exported. Battle-map <code>.bin</code> BMDs cannot.</li>
+        <li>Only the ten types listed above are exported. Buildings, capture locations, deployment
+        zones and outlines are not.</li>
+        <li>BMDs referenced by the prefab are flattened into the same layer. Their culture mask is
+        carried over to their contents, but the reference's own position is not applied.</li>
+        <li>Referenced BMDs must be in the packs currently loaded by AssetEditor.</li>
+    </ul>
+</body>
+</html>

@@ -30,7 +30,6 @@ namespace Editors.BmdEditor.Services
         private readonly ResourceLibrary _resourceLibrary;
         private readonly GameWorld.Core.Services.MeshBuilderService _meshBuilderService;
 
-        // Store direct references between view models and scene nodes
         public readonly Dictionary<BmdElementViewModel, GameWorld.Core.SceneNodes.SceneNode> ComponentNodes = new();
         private GameWorld.Core.SceneNodes.SceneNode? _currentHighlightedNode;
 
@@ -62,14 +61,11 @@ namespace Editors.BmdEditor.Services
 
             try
             {
-                // Clear existing scene
                 ClearScene();
 
-                // Create scene structure
                 var rootNode = _sceneManager.RootNode;
                 var bmdRootNode = rootNode.AddObject(new GroupNode("BMD_Scene") { IsEditable = false });
 
-                // Create groups for later reference
                 _propsGroup = bmdRootNode.AddObject(new GroupNode("Props") { IsEditable = false });
                 _otherGroup = bmdRootNode.AddObject(new GroupNode("Other") { IsEditable = false });
 
@@ -89,10 +85,8 @@ namespace Editors.BmdEditor.Services
 
             try
             {
-                // Load props as RMV2 models
                 LoadProps(bmdFile, _propsGroup, allElements.OfType<PropInfoViewModel>().ToList());
 
-                // Load other components
                 LoadOtherComponents(bmdFile, _otherGroup, allElements);
 
                 _logger.Information($"BMD scene content loaded successfully");
@@ -106,14 +100,12 @@ namespace Editors.BmdEditor.Services
 
         private void ClearScene()
         {
-            // Remove existing BMD scene nodes
             var existingBmdNodes = _sceneManager.RootNode.Children.Where(x => x.Name == "BMD_Scene").ToList();
             foreach (var node in existingBmdNodes)
             {
                 _sceneManager.RootNode.Children.Remove(node);
             }
             
-            // Clear node references
             ComponentNodes.Clear();
             _currentHighlightedNode = null;
         }
@@ -129,7 +121,7 @@ namespace Editors.BmdEditor.Services
 
                 try
                 {
-                    var node = LoadSingleProp(propPath, propInfo, propsGroup, i); // Pass instance index
+                    var node = LoadSingleProp(propPath, propInfo, propsGroup, i);
                     var viewModel = propViewModels[i];
                     ComponentNodes[viewModel] = node;
                 }
@@ -154,7 +146,6 @@ namespace Editors.BmdEditor.Services
                 var resolvedAsset = _modelAssetResolver.Resolve(modelFile);
                 var rmv = resolvedAsset.Model;
 
-                // Create RMV2 model nodes
                 var modelFullPath = _packFileService.GetFullPath(resolvedAsset.GeometryFile);
                 var lodNodes = _rmv2ModelNodeLoader.CreateModelNodesFromAsset(resolvedAsset, modelFullPath, false);
 
@@ -168,7 +159,6 @@ namespace Editors.BmdEditor.Services
                 // This ensures all components (mesh, materials, etc.) are transformed together
                 lodNode.ModelMatrix = propInfo.Transform;
 
-                // Create a simple group for the prop
                 var propName = $"Prop_{instanceIndex}_{Path.GetFileNameWithoutExtension(propPath)}";
                 var propGroup = propsGroup.AddObject(new GroupNode(propName) { IsEditable = false });
                 propGroup.AddObject(lodNode);
@@ -579,7 +569,6 @@ namespace Editors.BmdEditor.Services
 
         public void HighlightComponent(BmdElementViewModel component)
         {
-            // Clear previous highlight
             ClearHighlight();
             
             if (ComponentNodes.TryGetValue(component, out var node))
@@ -611,7 +600,6 @@ namespace Editors.BmdEditor.Services
             var bmdName = $"BMD_{index}_{Path.GetFileNameWithoutExtension(bmdInfo.BmdString)}";
             var bmdNode = bmdGroup.AddObject(new GroupNode(bmdName) { IsEditable = false });
 
-            // Create placeholder node for the BMD reference
             var placeholderMesh = CreatePlaceholderNode(() => new BmdInfoPlaceholderNode("BMD_Info_Placeholder")
             {
                 ReferencedBmdPath = bmdInfo.BmdString
@@ -621,7 +609,6 @@ namespace Editors.BmdEditor.Services
                 bmdNode.AddObject(placeholderMesh);
             }
 
-            // Try to load the referenced BMD file recursively
             try
             {
                 LoadReferencedBmd(bmdInfo.BmdString, bmdNode, index);
@@ -644,7 +631,6 @@ namespace Editors.BmdEditor.Services
 
             // Prevent infinite recursion - this will be handled differently with direct references
 
-            // Find the referenced BMD file
             var referencedBmdFile = _packFileService.FindFile(bmdPath);
             if (referencedBmdFile == null)
             {
@@ -654,16 +640,13 @@ namespace Editors.BmdEditor.Services
 
             try
             {
-                // Parse the referenced BMD file
                 var referencedBmdData = referencedBmdFile.DataSource.ReadData();
                 var referencedBmd = BmdParser.Parse(referencedBmdData);
 
                 // Reference will be stored by BmdElementLoader after view model is created
 
-                // Create a group for the referenced BMD content
                 var referencedBmdGroup = parentNode.AddObject(new GroupNode($"Referenced_Content_{Path.GetFileNameWithoutExtension(bmdPath)}") { IsEditable = false });
 
-                // Load props from the referenced BMD
                 if (referencedBmd.PropInfos.Count > 0)
                 {
                     var propsGroup = referencedBmdGroup.AddObject(new GroupNode($"Referenced_Props ({referencedBmd.PropInfos.Count})") { IsEditable = false });
@@ -763,7 +746,6 @@ namespace Editors.BmdEditor.Services
                     var viewModel = deploymentViewModels[i];
                     ComponentNodes[viewModel] = deploymentNode;
 
-                    // Load deployment zones and their boundaries
                     LoadDeploymentZones(deployment.DeploymentZones, deploymentNode, viewModel.Children.OfType<DeploymentZoneViewModel>().ToList());
                 }
                 catch (Exception ex)
@@ -784,7 +766,6 @@ namespace Editors.BmdEditor.Services
                     var zoneViewModel = zoneViewModels[i];
                     ComponentNodes[zoneViewModel] = zoneNode;
 
-                    // Load deployment zone regions and their boundaries
                     LoadDeploymentZoneRegions(deploymentZone.DeploymentZoneRegions, zoneNode, zoneViewModel.Children.OfType<DeploymentZoneRegionViewModel>().ToList());
                 }
                 catch (Exception ex)
@@ -805,7 +786,6 @@ namespace Editors.BmdEditor.Services
                     var regionViewModel = regionViewModels[i];
                     ComponentNodes[regionViewModel] = regionNode;
 
-                    // Load boundaries
                     LoadBoundaries(deploymentZoneRegion.Boundaries, regionNode, regionViewModel.Children.OfType<BoundaryViewModel>().ToList());
                 }
                 catch (Exception ex)

@@ -9,16 +9,18 @@ namespace Shared.GameFormats.Bmd
 
         /// <summary>
         /// Per-section header version numbers (e.g. "BattlefieldBuilding", "Prop", "SpotLight" -
-        /// see the keys <see cref="BmdParser"/> writes into this dictionary). These are read from
-        /// the stream purely to advance position - nothing in the parser branches on them - but
-        /// <see cref="BmdWriter"/> needs the original value back to reproduce the file byte-for-byte,
-        /// so they're captured here rather than discarded. Missing key = version 0 (used when a
+        /// see the keys <see cref="BmdParser"/> writes into this dictionary). Most sections' records
+        /// carry their own version and ignore this one; the records of "CaptureLocation",
+        /// "ToggleableBuildingSlot" and "LegacyPreV22" are unversioned and gate on it instead.
+        /// <see cref="BmdWriter"/> writes every value back. Missing key = version 0 (used when a
         /// section has no separate version field at all, e.g. GoOutline).
         /// </summary>
         public Dictionary<string, ushort> SectionVersions { get; set; } = [];
+        /// <summary>FASTBIN &lt; 22 only.</summary>
+        public List<LegacyDeploymentArea> LegacyDeploymentAreas { get; set; } = [];
         public List<BattlefieldBuilding> BattlefieldBuildings { get; set; } = [];
-        public List<BattlefieldBuildingFar> BattlefieldBuildingFars { get; set; } = [];
-        public List<CaptureLocation> CaptureLocations { get; set; } = [];
+        public List<BattlefieldBuilding> BattlefieldBuildingFars { get; set; } = [];
+        public List<CaptureLocationList> CaptureLocationLists { get; set; } = [];
         public List<EFLine> EFLines { get; set; } = [];
         public List<GoOutline> GoOutlines { get; set; } = [];
         public List<NonTerrainOutline> NonTerrainOutlines { get; set; } = [];
@@ -57,6 +59,40 @@ namespace Shared.GameFormats.Bmd
         public MiscParams MiscParams { get; set; } = new();
     }
 
+    /// <summary>
+    /// One item of the kit's BATTLE_DEPLOYMENT_AREA_MANAGER, the deployment format FASTBIN &lt; 22 used
+    /// before <see cref="Deployment"/> replaced it. Keyed by a BATTLE_DEPLOYMENT_AREA_TYPE (two ints).
+    /// </summary>
+    public class LegacyDeploymentArea
+    {
+        public int TypeX { get; set; }
+        public int TypeY { get; set; }
+        public List<LegacyDeploymentAreaCollection> Collections { get; set; } = [];
+    }
+
+    public class LegacyDeploymentAreaCollection
+    {
+        public List<LegacyDeploymentZone> Alliance0 { get; set; } = [];
+        public List<LegacyDeploymentZone> Alliance1 { get; set; } = [];
+    }
+
+    /// <summary>Unversioned; gates on the manager version (<c>SectionVersions["LegacyPreV22"]</c>).</summary>
+    public class LegacyDeploymentZone
+    {
+        public List<LegacyDeploymentBoundary> Boundaries { get; set; } = [];
+        public string Category { get; set; } = string.Empty;
+        public float Orientation { get; set; }
+        public bool SnapFacing { get; set; }
+        /// <summary>Manager version 2 and up.</summary>
+        public uint Id { get; set; }
+    }
+
+    public class LegacyDeploymentBoundary
+    {
+        public string Type { get; set; } = string.Empty;
+        public List<RmvVector2> Points { get; set; } = [];
+    }
+
     public class FastBinHeader
     {
         public string FastBin0 { get; set; } = string.Empty;
@@ -67,13 +103,9 @@ namespace Shared.GameFormats.Bmd
     public struct CultureMask
     {
         /// <summary>
-        /// The exact 8 bytes this was decoded from, when read by <see cref="BmdParser.ReadCultureMask"/>.
-        /// Several bit positions within these bytes aren't decoded into any named field below (real
-        /// vanilla files set them as part of an all-<c>0xFF</c> "no restriction" pattern), so
-        /// <see cref="BmdWriter"/> writes these raw bytes back directly when present instead of
-        /// reconstructing from the named bools alone, which would silently zero those bits. Null for
-        /// a mask built by other code (e.g. freshly constructed, not parsed) - <see cref="BmdWriter"/>
-        /// falls back to bit-reconstruction in that case.
+        /// The 8 bytes this was parsed from. Some bits have no named field below (vanilla's all-<c>0xFF</c>
+        /// "no restriction" pattern sets them), so <see cref="BmdWriter"/> writes these back when present and
+        /// only rebuilds from the bools when this is null.
         /// </summary>
         public byte[]? RawBytes { get; set; }
 
@@ -112,6 +144,7 @@ namespace Shared.GameFormats.Bmd
         public bool CultMaskCth { get; set; }
         public bool CultMaskNor { get; set; }
         public bool CultMaskChd { get; set; }
+        public bool CultMaskNag { get; set; }
     }
 
     public class BmdComponentFlags
@@ -136,10 +169,21 @@ namespace Shared.GameFormats.Bmd
         public string BuildingKey { get; set; } = string.Empty;
         public string PositionType { get; set; } = string.Empty;
         public Matrix Transform { get; set; } = Matrix.Identity;
-        
-        // Properties
-        public ushort PropertiesVersion { get; set; }
-        public string PropertiesBuildingId { get; set; } = string.Empty;
+        public BuildingProperties Properties { get; set; } = new();
+        public string HeightMode { get; set; } = string.Empty;
+        public long Uid { get; set; }
+    }
+
+    /// <summary>
+    /// A building's settings (Terry's ECBuilding/ECWall). Battlefield buildings carry one, and a prefab
+    /// instance carries one per building of its child prefab whose settings it overrides, keyed by
+    /// <see cref="BuildingId"/> (Terry's &lt;override name=...&gt;).
+    /// </summary>
+    public class BuildingProperties
+    {
+        /// <summary>0 for the unversioned block of battlefield buildings older than version 4.</summary>
+        public ushort Version { get; set; }
+        public string BuildingId { get; set; } = string.Empty;
         public float StartingDamageUnary { get; set; }
         public bool OnFire { get; set; }
         public bool StartDisabled { get; set; }
@@ -149,6 +193,8 @@ namespace Shared.GameFormats.Bmd
         public bool Dockable { get; set; }
         public bool Toggleable { get; set; }
         public bool Lite { get; set; }
+        /// <summary>Versions 3-7 only.</summary>
+        public bool ClampToSurface { get; set; }
         public bool CastShadows { get; set; }
         public bool KeyBuilding { get; set; }
         public bool KeyBuildingUseFort { get; set; }
@@ -156,44 +202,78 @@ namespace Shared.GameFormats.Bmd
         public bool SettlementLevelConfigurable { get; set; }
         public bool HideTooltip { get; set; }
         public bool IncludeInFog { get; set; }
-        
-        public string HeightMode { get; set; } = string.Empty;
-        public long Uid { get; set; }
+        public float BlendEdges { get; set; }
+        public bool ReceiveDecals { get; set; }
     }
 
-    public class BattlefieldBuildingFar
+    /// <summary>
+    /// One CAPTURE_LOCATION_LIST of the kit's CAPTURE_LOCATION_SET: the set is a vector of these lists,
+    /// and each list is a vector of capture locations.
+    /// </summary>
+    public class CaptureLocationList
     {
-        //TODO: Not properly implemented
-        public ushort Version { get; set; }
-        
+        public List<CaptureLocation> Locations { get; set; } = [];
     }
 
+    /// <summary>
+    /// A capture point (the kit's CAPTURE_LOCATION). Its records carry no version of their own: every
+    /// gated field follows the CAPTURE_LOCATION_SET version (<c>SectionVersions["CaptureLocation"]</c>).
+    /// </summary>
     public class CaptureLocation
     {
-        //TODO: Not properly implemented
-        public ushort Version { get; set; }
-        public ushort Zero { get; set; }
-        public float Something1 { get; set; }
-        public float Something2 { get; set; }
-        public int Something3 { get; set; }
-        public int Something4 { get; set; }
-        public int Something5 { get; set; }
-        public string Str { get; set; } = string.Empty;
-        public string Str2 { get; set; } = string.Empty;
-        public float[] Coords { get; set; } = [];
-        public string Str3 { get; set; } = string.Empty;
-        public float Something6 { get; set; }
-        public float Something7 { get; set; }
-        public byte[] Bools { get; set; } = new byte[7];
-        public ushort Something8 { get; set; }
-        public float Something9 { get; set; }
-        public float Something10 { get; set; }
+        public RmvVector2 Location { get; set; }
+        public float Radius { get; set; }
+        public uint ValidForMinNumPlayers { get; set; }
+        public uint ValidForMaxNumPlayers { get; set; }
+        public string CapturePointType { get; set; } = string.Empty;
+        /// <summary>List version 3 and up.</summary>
+        public string RestoreType { get; set; } = string.Empty;
+        public List<RmvVector2> LocationPoints { get; set; } = [];
+        /// <summary>List version 1 only (building links replace it from 2).</summary>
+        public List<uint> BuildingIndices { get; set; } = [];
+        public string DatabaseKey { get; set; } = string.Empty;
+        public RmvVector2 FlagFacing { get; set; }
+        /// <summary>List version 4 and up.</summary>
+        public bool DestroyBuildingOnCapture { get; set; }
+        /// <summary>List version 6 and up.</summary>
+        public bool DisableBuildingAbilitiesWhenNoOriginalOwner { get; set; }
+        /// <summary>List version 5 and up.</summary>
+        public bool AbilitiesAffectGlobally { get; set; }
+        /// <summary>List version 2 and up.</summary>
+        public List<BuildingLink> BuildingLinks { get; set; } = [];
+        /// <summary>List version 7 and up.</summary>
+        public List<uint> ToggleSlotsLinks { get; set; } = [];
+        /// <summary>List version 8 and up.</summary>
+        public List<uint> AiHintsLinks { get; set; } = [];
+        /// <summary>List version 9 and up.</summary>
+        public string ScriptId { get; set; } = string.Empty;
+        /// <summary>List version 10 and up.</summary>
+        public bool IsTimeBased { get; set; }
+        /// <summary>List version 12 and up.</summary>
+        public string InitialOwnerType { get; set; } = string.Empty;
     }
 
+    /// <summary>A reference from a capture location or toggleable slot to a building, possibly one inside a prefab.</summary>
+    public class BuildingLink
+    {
+        public ushort Version { get; set; }
+        public int BuildingIndex { get; set; }
+        public int PrefabIndex { get; set; }
+        public string PrefabBuildingKey { get; set; } = string.Empty;
+        /// <summary>Version 2 and up.</summary>
+        public ulong Uid { get; set; }
+        /// <summary>Version 3 and up.</summary>
+        public ulong PrefabUid { get; set; }
+    }
+
+    /// <summary>An entity-formation line (the kit's LINE). Unversioned.</summary>
     public class EFLine
     {
-        //TODO: Not properly implemented
-        public ushort Version { get; set; }
+        public string Label { get; set; } = string.Empty;
+        public RmvVector3 End1 { get; set; }
+        public RmvVector3 End2 { get; set; }
+        public RmvVector3 Direction { get; set; }
+        public string Purpose { get; set; } = string.Empty;
     }
 
     public class GoOutline
@@ -211,56 +291,71 @@ namespace Shared.GameFormats.Bmd
         public List<RmvVector2> Outline { get; set; } = [];
         public string ZoneName { get; set; } = string.Empty;
         public string EntityFormationTemplateName { get; set; } = string.Empty;
-        public uint LinesLength { get; set; }
-        public byte[] LinesData { get; set; } = []; // Raw data since Lines structure is unknown
-        public Matrix Transform { get; set; } = Matrix.Identity;} //4x4
+        public List<ZoneLine> Lines { get; set; } = [];
+        public Matrix Transform { get; set; } = Matrix.Identity; //4x4
+    }
+
+    /// <summary>A line inside a zones template. Unversioned.</summary>
+    public class ZoneLine
+    {
+        public string Label { get; set; } = string.Empty;
+        public RmvVector3 Start { get; set; }
+        public RmvVector3 End { get; set; }
+        public string Purpose { get; set; } = string.Empty;
+        public float Orientation { get; set; }
+    }
     
     public class BmdInfo
     {
         public ushort Version { get; set; }
         public string BmdString { get; set; } = string.Empty;
         public Matrix Transform { get; set; } = Matrix.Identity;
-        public uint PropertyOverrides { get; set; } //this has to correspond to <property_overrides/>
-        public CultureMask CultureMask { get; set; } //"campaign_type_mask"?
+        /// <summary>Terry's &lt;property_overrides&gt;: settings for buildings inside the referenced prefab.</summary>
+        public List<BuildingProperties> PropertyOverrides { get; set; } = [];
+        public CultureMask CampaignTypeMask { get; set; }
         public string RegionString { get; set; } = string.Empty;
+        /// <summary>Versions 5-7 only.</summary>
+        public bool ClampToSurface { get; set; }
         public string HeightMode { get; set; } = string.Empty;
         public byte[] Uid { get; set; } = new byte[8];
     }
 
     public class BmdOutline
     {
-        //TODO: Not properly implemented
         public ushort Version { get; set; }
+        public List<RmvVector2> Points { get; set; } = [];
     }
 
     public class TerrainOutline
     {
-        //TODO: Not properly implemented
-        public ushort Version { get; set; }
+        public List<RmvVector2> VertexList { get; set; } = [];
     }
 
     public class LiteBuildingOutline
     {
-        //TODO: Not properly implemented
-        public ushort Version { get; set; }
+        public List<RmvVector2> VertexList { get; set; } = [];
     }
 
     public class CameraZone
     {
-        //TODO: Not properly implemented
         public ushort Version { get; set; }
+        public List<RmvVector2> Points { get; set; } = [];
     }
 
     public class CivilianDeployment
     {
-        //TODO: Not properly implemented
         public ushort Version { get; set; }
+        public string CivilianType { get; set; } = string.Empty;
+        public string CivilianAmount { get; set; } = string.Empty;
+        public List<RmvVector2> Outline { get; set; } = [];
     }
 
     public class CivilianShelter
     {
-        //TODO: Not properly implemented
         public ushort Version { get; set; }
+        public RmvVector2 Position { get; set; }
+        public RmvVector2 Entrance { get; set; }
+        public int CivilianDeploymentLink { get; set; }
     }
 
     public class PropInfo
@@ -269,12 +364,9 @@ namespace Shared.GameFormats.Bmd
         public string Rmv2Path { get; set; } = string.Empty;
 
         /// <summary>
-        /// The prop's original index into the file's shared string table (only set for
-        /// <see cref="PropInfoVersion"/> &gt; 12, which reference <see cref="Rmv2Path"/> by index
-        /// rather than storing it inline). The table can contain duplicate paths in real files, so
-        /// <see cref="BmdWriter"/> prefers reusing this exact index over re-deriving one from
-        /// <see cref="Rmv2Path"/> alone, to avoid silently repointing a prop at a different (though
-        /// string-identical) table slot on an unedited save.
+        /// The prop's index into the file's string table (<see cref="PropInfoVersion"/> &gt; 12 only). The
+        /// table can hold duplicate paths, so <see cref="BmdWriter"/> reuses this index rather than looking
+        /// <see cref="Rmv2Path"/> up again.
         /// </summary>
         public int? PropIndex { get; set; }
         public Matrix Transform { get; set; } = Matrix.Identity;
@@ -286,10 +378,21 @@ namespace Shared.GameFormats.Bmd
         public bool VisibleInsideDestructionRegion { get; set; }
         public bool VisibleOutsideDestructionRegion { get; set; }
         public bool Animated { get; set; }
+        /// <summary>Versions 1-2 only.</summary>
+        public float DecalParallax { get; set; }
+        /// <summary>Versions 1-2 only.</summary>
+        public RmvVector3 DecalScale { get; set; }
+        /// <summary>Versions 1-2 only.</summary>
+        public bool DecalTiled { get; set; }
         public float DecalParallaxScale { get; set; }
         public float DecalTiling { get; set; }
         public bool DecalOverrideGbufferNormal { get; set; }
-        
+        /// <summary>
+        /// Version 3 props in vanilla store junk (e.g. 0x8D) in this bool, apparently uninitialised memory
+        /// in the exporter. The raw byte is kept so an unedited save reproduces the file exactly.
+        /// </summary>
+        public byte? DecalOverrideGbufferNormalRawByte { get; set; }
+
         public BmdComponentFlags Flags { get; set; } = new();
 
         public bool VisibleInShroud { get; set; }
@@ -304,12 +407,23 @@ namespace Shared.GameFormats.Bmd
         public bool ApplyHeightPatch { get; set; }
         public bool IncludeInFog { get; set; }
         public bool VisibleWithoutShroud { get; set; }
-        public bool SomeWeirdThing { get; set; } // for Version 21/22
-        public bool SomeWeirdThing2 { get; set; } // for Version 22
+        /// <summary>Versions 21-22 only (the flags carry these from 23 on).</summary>
+        public bool VisibleInTacticalView { get; set; }
+        /// <summary>Version 22 only.</summary>
+        public bool VisibleInTacticalViewOnly { get; set; }
+        /// <summary>Version 9 only.</summary>
+        public bool DecalApplyToRigids { get; set; }
         public bool UseDynamicShadows { get; set; }
         public bool UsesTerrainVertexOffset { get; set; }
-        
-        // Early version 4 specific fields
+        public float BlendEdges { get; set; }
+        public float DecalFadeStart { get; set; }
+        public float DecalAngleThreshold { get; set; }
+        public bool DecalMirrorX { get; set; }
+        public bool DecalMirrorZ { get; set; }
+        public int DecalLayer { get; set; }
+        public bool DecalTilingAlpha { get; set; }
+
+        // The undecoded tail of a FASTBIN < 11 prop (the kit can't decode that layout)
         public byte[] EarlyVersionUnknownBytes { get; set; } = new byte[23];
         public bool EarlyVersionUnknownBool { get; set; }
     }
@@ -321,6 +435,8 @@ namespace Shared.GameFormats.Bmd
         public Matrix Transform { get; set; } = Matrix.Identity;
         public float EmissionRate { get; set; }
         public string InstanceName { get; set; } = string.Empty;
+        /// <summary>Version 1 only.</summary>
+        public float Scale { get; set; } = 1;
         
         public BmdComponentFlags Flags { get; set; } = new();
 
@@ -329,9 +445,10 @@ namespace Shared.GameFormats.Bmd
         public bool Autoplay { get; set; }
         public bool VisibleInShroud { get; set; }
         public int ParentId { get; set; }
-        public bool VisibleInShroudOnly { get; set; }
+        public bool VisibleWithoutShroud { get; set; }
+        public bool NoCulling { get; set; }
 
-        // Early version 4 specific fields
+        // The undecoded tail of a FASTBIN < 11 VFX
         public byte[] EarlyVersionUnknownBytes { get; set; } = new byte[12];
     }
 
@@ -345,14 +462,17 @@ namespace Shared.GameFormats.Bmd
 
     public class Separator
     {
-        //TODO: Not properly implemented
         public ushort Version { get; set; }
+        public string Type { get; set; } = string.Empty;
+        public List<RmvVector2> Points { get; set; } = [];
     }
 
     public class DirectedPoint
     {
-        //TODO: Not properly implemented
         public ushort Version { get; set; }
+        public string Type { get; set; } = string.Empty;
+        public RmvVector2 Position { get; set; }
+        public RmvVector2 Direction { get; set; }
     }
 
     public class HintPolyLine
@@ -370,6 +490,7 @@ namespace Shared.GameFormats.Bmd
     {
         public ushort Version { get; set; }
         public string Type { get; set; } = string.Empty;
+        /// <summary>Version 2 and up.</summary>
         public uint District { get; set; }
         public List<Polygon> PolygonList { get; set; } = [];
     }
@@ -385,7 +506,7 @@ namespace Shared.GameFormats.Bmd
         public RmvVector3 Position { get; set; }
         public float OuterRadius { get; set; }
         public float InnerRadius { get; set; }
-        public byte SomeZero { get; set; }
+        public bool IsCylinder { get; set; }
         public bool Primary { get; set; }
         public string HeightMode { get; set; } = string.Empty;
     }
@@ -438,10 +559,10 @@ namespace Shared.GameFormats.Bmd
         public bool HasBeenSet { get; set; }
         public float[] BoundingBox { get; set; } = [0, 0, 0, 0];
         public ushort FlagVersion { get; set; }
-        public bool Flag1 { get; set; }
-        public bool Flag2 { get; set; }
-        public bool Flag3 { get; set; }
-        public bool Flag4 { get; set; }
+        public bool ValidNorth { get; set; }
+        public bool ValidSouth { get; set; }
+        public bool ValidEast { get; set; }
+        public bool ValidWest { get; set; }
     }
 
     public class PolyMeshInfo
@@ -453,15 +574,22 @@ namespace Shared.GameFormats.Bmd
         public string HeightMode { get; set; } = string.Empty;
         public BmdComponentFlags Flags { get; set; } = new();
         public Matrix Transform { get; set; } = Matrix.Identity;
-        public byte[] Booleans { get; set; } = new byte[4];
+        public bool VisibleInsideSnowRegion { get; set; }
+        public bool VisibleOutsideSnowRegion { get; set; }
+        public bool VisibleInsideDestructionRegion { get; set; }
+        public bool VisibleOutsideDestructionRegion { get; set; }
         public bool VisibleInShroud { get; set; }
-        public byte[] MoreBooleans { get; set; } = new byte[1];
+        public bool VisibleWithoutShroud { get; set; }
     }
 
     public class TerrainStencilBlendTriangle
     {
-        //TODO: Not properly implemented
         public ushort Version { get; set; }
+        public RmvVector3 Position0 { get; set; }
+        public RmvVector3 Position1 { get; set; }
+        public RmvVector3 Position2 { get; set; }
+        /// <summary>Version 2 and up.</summary>
+        public string HeightMode { get; set; } = string.Empty;
     }
 
     public class SpotLightInfo
@@ -490,8 +618,8 @@ namespace Shared.GameFormats.Bmd
     {
         public ushort Version { get; set; }
         public RmvVector3 Position { get; set; }
-        public float Something1 { get; set; }
-        public float Something2 { get; set; }
+        public float Width { get; set; }
+        public float FlowSpeed { get; set; }
     }
 
     public class SoundInfo
@@ -562,40 +690,93 @@ namespace Shared.GameFormats.Bmd
         public List<RmvVector2> PointList { get; set; } = [];
     }
 
+    /// <summary>The kit's BMD_CATCHMENT_AREA.</summary>
     public class BmdCachedArea
     {
-        //TODO: Not properly implemented
         public ushort Version { get; set; }
+        public string Name { get; set; } = string.Empty;
+        /// <summary>min_x, min_y, max_x, max_y.</summary>
+        public float[] Aabb { get; set; } = [0, 0, 0, 0];
+        /// <summary>Version 6 and up.</summary>
+        public string BattleType { get; set; } = string.Empty;
+        /// <summary>Version 6 and up.</summary>
+        public string DefendingFactionRestriction { get; set; } = string.Empty;
+        /// <summary>Version 5 and up.</summary>
+        public ValidLocationFlags ValidLocationFlags { get; set; } = new();
     }
 
+    public class ValidLocationFlags
+    {
+        public ushort Version { get; set; }
+        public bool ValidNorth { get; set; }
+        public bool ValidSouth { get; set; }
+        public bool ValidEast { get; set; }
+        public bool ValidWest { get; set; }
+    }
+
+    /// <summary>
+    /// The kit's TOGGLEABLE_BUILDINGS_SLOT. Its records carry no version of their own: the gates follow
+    /// the list version (<c>SectionVersions["ToggleableBuildingSlot"]</c>).
+    /// </summary>
     public class ToggleableBuildingSlot
     {
-        //TODO: Not properly implemented
-        public ushort Version { get; set; }
+        /// <summary>List version 2 and up.</summary>
+        public string ToggleableSlotType { get; set; } = string.Empty;
+        public List<BuildingLink> BuildingLinks { get; set; } = [];
+        /// <summary>List version 3 and up.</summary>
+        public List<CscInfo> CompositeScenes { get; set; } = [];
+        /// <summary>List version 3 and up.</summary>
+        public List<List<RmvVector2>> Outlines { get; set; } = [];
+        /// <summary>List version 4 and up.</summary>
+        public string ScriptId { get; set; } = string.Empty;
+        /// <summary>List version 5 and up.</summary>
+        public string MapBarrierRecordKey { get; set; } = string.Empty;
+        /// <summary>List version 6 only.</summary>
+        public bool MeleeAttackAllowed { get; set; }
+        /// <summary>List version 7 and up.</summary>
+        public bool GroundMeleeAttackAllowed { get; set; }
     }
 
     public class TerraindDecal
     {
-        //TODO: Not properly implemented
         public ushort Version { get; set; }
+        public ushort SplineVersion { get; set; }
+        public RmvVector2 VertexSpacing { get; set; }
+        public float UvScale { get; set; }
+        public List<TerrainDecalSpline> Splines { get; set; } = [];
+        public string Material { get; set; } = string.Empty;
+        /// <summary>Version 2 and up (4x3).</summary>
+        public Matrix Transform { get; set; } = Matrix.Identity;
+    }
+
+    public class TerrainDecalSpline
+    {
+        public ushort Version { get; set; }
+        public float StartWidth { get; set; }
+        public float EndWidth { get; set; }
+        public RmvVector3 Cp0 { get; set; }
+        public RmvVector3 Cp1 { get; set; }
+        public RmvVector3 Cp2 { get; set; }
+        public RmvVector3 Cp3 { get; set; }
     }
 
     public class TreeListReference
     {
-        //TODO: Not properly implemented
         public ushort Version { get; set; }
+        public string File { get; set; } = string.Empty;
+        public string Climate { get; set; } = string.Empty;
     }
 
     public class GrassListReference
     {
-        //TODO: Not properly implemented
         public ushort Version { get; set; }
+        public string File { get; set; } = string.Empty;
+        public string Climate { get; set; } = string.Empty;
     }
 
     public class WaterOutline
     {
-        //TODO: Not properly implemented
-        public ushort Version { get; set; }
+        public List<RmvVector2> VertexList { get; set; } = [];
     }
 
 

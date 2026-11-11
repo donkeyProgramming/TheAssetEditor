@@ -28,7 +28,9 @@ namespace Editors.Reports.Bmd
             var timeStamp = DateTime.Now.ToString("yyyyMMddHHmmssfff");
             outputDir = $"{DirectoryHelper.ReportsDirectory}\\Bmd\\{gameName}_{timeStamp}\\";
             
-            var filesWithPaths = PackFileServiceUtility.FindAllWithExtentionIncludePaths(_pfs, ".bmd");
+            var filesWithPaths = PackFileServiceUtility.FindAllWithExtentionIncludePaths(_pfs, BmdFileNames.BmdExtension);
+            filesWithPaths.AddRange(PackFileServiceUtility.FindAllWithExtentionIncludePaths(_pfs, BmdFileNames.BinExtension)
+                .Where(x => BmdFileNames.IsBmd(x.FileName)));
             var fileList = filesWithPaths.Select(x => x.Pack).ToList();
             
             // Create a mapping from PackFile to its correct path
@@ -98,7 +100,7 @@ namespace Editors.Reports.Bmd
                     summaryRecord.FastBinVersion = parsedFile.Header.FastBinVersion;
                     summaryRecord.BattlefieldBuildingCount = parsedFile.BattlefieldBuildings.Count;
                     summaryRecord.BattlefieldBuildingFarCount = parsedFile.BattlefieldBuildingFars.Count;
-                    summaryRecord.CaptureLocationCount = parsedFile.CaptureLocations.Count;
+                    summaryRecord.CaptureLocationCount = parsedFile.CaptureLocationLists.Sum(l => l.Locations.Count);
                     summaryRecord.EFLineCount = parsedFile.EFLines.Count;
                     summaryRecord.GoOutlineCount = parsedFile.GoOutlines.Count;
                     summaryRecord.NonTerrainOutlineCount = parsedFile.NonTerrainOutlines.Count;
@@ -129,24 +131,24 @@ namespace Editors.Reports.Bmd
                         buildingRecord.PositionX = building.Transform.M41;
                         buildingRecord.PositionY = building.Transform.M42;
                         buildingRecord.PositionZ = building.Transform.M43;
-                        buildingRecord.PropertiesVersion = building.PropertiesVersion;
-                        buildingRecord.PropertiesBuildingId = building.PropertiesBuildingId;
-                        buildingRecord.StartingDamageUnary = building.StartingDamageUnary;
-                        buildingRecord.OnFire = building.OnFire;
-                        buildingRecord.StartDisabled = building.StartDisabled;
-                        buildingRecord.WeakPoint = building.WeakPoint;
-                        buildingRecord.AiBreachable = building.AiBreachable;
-                        buildingRecord.Indestructible = building.Indestructible;
-                        buildingRecord.Dockable = building.Dockable;
-                        buildingRecord.Toggleable = building.Toggleable;
-                        buildingRecord.Lite = building.Lite;
-                        buildingRecord.CastShadows = building.CastShadows;
-                        buildingRecord.KeyBuilding = building.KeyBuilding;
-                        buildingRecord.KeyBuildingUseFort = building.KeyBuildingUseFort;
-                        buildingRecord.IsPropInOutfield = building.IsPropInOutfield;
-                        buildingRecord.SettlementLevelConfigurable = building.SettlementLevelConfigurable;
-                        buildingRecord.HideTooltip = building.HideTooltip;
-                        buildingRecord.IncludeInFog = building.IncludeInFog;
+                        buildingRecord.PropertiesVersion = building.Properties.Version;
+                        buildingRecord.PropertiesBuildingId = building.Properties.BuildingId;
+                        buildingRecord.StartingDamageUnary = building.Properties.StartingDamageUnary;
+                        buildingRecord.OnFire = building.Properties.OnFire;
+                        buildingRecord.StartDisabled = building.Properties.StartDisabled;
+                        buildingRecord.WeakPoint = building.Properties.WeakPoint;
+                        buildingRecord.AiBreachable = building.Properties.AiBreachable;
+                        buildingRecord.Indestructible = building.Properties.Indestructible;
+                        buildingRecord.Dockable = building.Properties.Dockable;
+                        buildingRecord.Toggleable = building.Properties.Toggleable;
+                        buildingRecord.Lite = building.Properties.Lite;
+                        buildingRecord.CastShadows = building.Properties.CastShadows;
+                        buildingRecord.KeyBuilding = building.Properties.KeyBuilding;
+                        buildingRecord.KeyBuildingUseFort = building.Properties.KeyBuildingUseFort;
+                        buildingRecord.IsPropInOutfield = building.Properties.IsPropInOutfield;
+                        buildingRecord.SettlementLevelConfigurable = building.Properties.SettlementLevelConfigurable;
+                        buildingRecord.HideTooltip = building.Properties.HideTooltip;
+                        buildingRecord.IncludeInFog = building.Properties.IncludeInFog;
                         buildingRecord.HeightMode = building.HeightMode;
                         buildingRecord.Uid = building.Uid;
                         battlefieldBuildingRecords.Add(buildingRecord);
@@ -162,13 +164,14 @@ namespace Editors.Reports.Bmd
                     }
 
                     // Capture Location records
-                    foreach (var captureLocation in parsedFile.CaptureLocations)
+                    foreach (var captureLocation in parsedFile.CaptureLocationLists.SelectMany(l => l.Locations))
                     {
                         dynamic captureLocationRecord = new ExpandoObject();
                         captureLocationRecord.Path = path;
-                        captureLocationRecord.PositionX = captureLocation.Coords.Length > 0 ? captureLocation.Coords[0] : 0;
-                        captureLocationRecord.PositionY = captureLocation.Coords.Length > 1 ? captureLocation.Coords[1] : 0;
-                        captureLocationRecord.Str = captureLocation.Str;
+                        captureLocationRecord.PositionX = captureLocation.Location.X;
+                        captureLocationRecord.PositionY = captureLocation.Location.Y;
+                        captureLocationRecord.DatabaseKey = captureLocation.DatabaseKey;
+                        captureLocationRecord.CapturePointType = captureLocation.CapturePointType;
                         captureLocationRecords.Add(captureLocationRecord);
                     }
 
@@ -177,7 +180,8 @@ namespace Editors.Reports.Bmd
                     {
                         dynamic efLineRecord = new ExpandoObject();
                         efLineRecord.Path = path;
-                        efLineRecord.Version = efLine.Version;
+                        efLineRecord.Label = efLine.Label;
+                        efLineRecord.Purpose = efLine.Purpose;
                         efLineRecords.Add(efLineRecord);
                     }
 
@@ -236,7 +240,7 @@ namespace Editors.Reports.Bmd
                     {
                         dynamic terrainOutlineRecord = new ExpandoObject();
                         terrainOutlineRecord.Path = path;
-                        terrainOutlineRecord.Version = terrainOutline.Version;
+                        terrainOutlineRecord.VertexCount = terrainOutline.VertexList.Count;
                         terrainOutlineRecords.Add(terrainOutlineRecord);
                     }
 
@@ -245,7 +249,7 @@ namespace Editors.Reports.Bmd
                     {
                         dynamic liteBuildingOutlineRecord = new ExpandoObject();
                         liteBuildingOutlineRecord.Path = path;
-                        liteBuildingOutlineRecord.Version = liteBuildingOutline.Version;
+                        liteBuildingOutlineRecord.VertexCount = liteBuildingOutline.VertexList.Count;
                         liteBuildingOutlineRecords.Add(liteBuildingOutlineRecord);
                     }
 
@@ -305,7 +309,7 @@ namespace Editors.Reports.Bmd
                         vfxRecord.Autoplay = vfx.Autoplay;
                         vfxRecord.VisibleInShroud = vfx.VisibleInShroud;
                         vfxRecord.ParentId = vfx.ParentId;
-                        vfxRecord.VisibleInShroudOnly = vfx.VisibleInShroudOnly;
+                        vfxRecord.VisibleWithoutShroud = vfx.VisibleWithoutShroud;
                         vfxRecord.FlagsVersion = vfx.Flags.FlagVersion;
                         vfxRecord.AllowInOutfield = vfx.Flags.AllowInOutfield;
                         vfxRecord.ClampToSurface = vfx.Flags.ClampToSurface;
@@ -413,10 +417,10 @@ namespace Editors.Reports.Bmd
                         playableAreaRecord.BoundingBoxMaxY = parsedFile.PlayableArea.BoundingBox.Length > 3 ? parsedFile.PlayableArea.BoundingBox[3] : 0;
                         playableAreaRecord.HasBeenSet = parsedFile.PlayableArea.HasBeenSet;
                         playableAreaRecord.FlagVersion = parsedFile.PlayableArea.FlagVersion;
-                        playableAreaRecord.Flag1 = parsedFile.PlayableArea.Flag1;
-                        playableAreaRecord.Flag2 = parsedFile.PlayableArea.Flag2;
-                        playableAreaRecord.Flag3 = parsedFile.PlayableArea.Flag3;
-                        playableAreaRecord.Flag4 = parsedFile.PlayableArea.Flag4;
+                        playableAreaRecord.ValidNorth = parsedFile.PlayableArea.ValidNorth;
+                        playableAreaRecord.ValidSouth = parsedFile.PlayableArea.ValidSouth;
+                        playableAreaRecord.ValidEast = parsedFile.PlayableArea.ValidEast;
+                        playableAreaRecord.ValidWest = parsedFile.PlayableArea.ValidWest;
                         playableAreaRecords.Add(playableAreaRecord);
                     }
 
@@ -584,7 +588,8 @@ namespace Editors.Reports.Bmd
                     {
                         dynamic toggleableBuildingSlotRecord = new ExpandoObject();
                         toggleableBuildingSlotRecord.Path = path;
-                        toggleableBuildingSlotRecord.Version = toggleableBuildingSlot.Version;
+                        toggleableBuildingSlotRecord.ToggleableSlotType = toggleableBuildingSlot.ToggleableSlotType;
+                        toggleableBuildingSlotRecord.BuildingLinkCount = toggleableBuildingSlot.BuildingLinks.Count;
                         toggleableBuildingSlotRecords.Add(toggleableBuildingSlotRecord);
                     }
 
@@ -620,7 +625,7 @@ namespace Editors.Reports.Bmd
                     {
                         dynamic waterOutlineRecord = new ExpandoObject();
                         waterOutlineRecord.Path = path;
-                        waterOutlineRecord.Version = waterOutline.Version;
+                        waterOutlineRecord.VertexCount = waterOutline.VertexList.Count;
                         waterOutlineRecords.Add(waterOutlineRecord);
                     }
                 }
@@ -741,8 +746,6 @@ namespace Editors.Reports.Bmd
                 errors.Add("Corrupted BattlefieldBuilding version detected");
             if (parsedFile.BattlefieldBuildingFars.Any(b => b.Version > 100))
                 errors.Add("Corrupted BattlefieldBuildingFar version detected");
-            if (parsedFile.CaptureLocations.Any(c => c.Version > 100))
-                errors.Add("Corrupted CaptureLocation version detected");
             if (parsedFile.BmdInfos.Any(b => b.Version > 100))
                 errors.Add("Corrupted BmdInfo version detected");
             if (parsedFile.PropInfos.Any(p => p.PropInfoVersion > 100))
@@ -771,16 +774,12 @@ namespace Editors.Reports.Bmd
                 errors.Add("Corrupted Deployment version detected");
             if (parsedFile.BmdCachedAreas.Any(b => b.Version > 100))
                 errors.Add("Corrupted BmdCachedArea version detected");
-            if (parsedFile.ToggleableBuildingSlots.Any(t => t.Version > 100))
-                errors.Add("Corrupted ToggleableBuildingSlot version detected");
             if (parsedFile.TerraindDecals.Any(t => t.Version > 100))
                 errors.Add("Corrupted TerraindDecal version detected");
             if (parsedFile.TreeListReferences.Any(t => t.Version > 100))
                 errors.Add("Corrupted TreeListReference version detected");
             if (parsedFile.GrassListReferences.Any(g => g.Version > 100))
                 errors.Add("Corrupted GrassListReference version detected");
-            if (parsedFile.WaterOutlines.Any(w => w.Version > 100))
-                errors.Add("Corrupted WaterOutline version detected");
             
             // Check single object versions
             if (parsedFile.PlayableArea != null && parsedFile.PlayableArea.PlayableAreaVersion > 100)

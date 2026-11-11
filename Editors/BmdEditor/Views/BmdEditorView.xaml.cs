@@ -6,9 +6,6 @@ using System.Windows.Controls.Primitives;
 
 namespace Editors.BmdEditor.Views
 {
-    /// <summary>
-    /// Interaction logic for BmdEditorView.xaml
-    /// </summary>
     public partial class BmdEditorView : UserControl
     {
         public BmdEditorView()
@@ -44,7 +41,6 @@ namespace Editors.BmdEditor.Views
 
         private void SelectTreeViewItem(BmdElementViewModel component)
         {
-            // Find the TreeViewItem for the component
             var treeViewItem = FindTreeViewItem(ComponentsTreeView, component);
             if (treeViewItem != null)
             {
@@ -63,7 +59,6 @@ namespace Editors.BmdEditor.Views
                     return (TreeViewItem)container.ItemContainerGenerator.ContainerFromItem(item);
                 }
 
-                // Check if it's a container with children
                 if (container.ItemContainerGenerator.ContainerFromItem(item) is ItemsControl childContainer)
                 {
                     var result = FindTreeViewItem(childContainer, component);

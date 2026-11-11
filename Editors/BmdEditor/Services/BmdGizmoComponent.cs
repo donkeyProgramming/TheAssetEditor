@@ -13,15 +13,10 @@ using Microsoft.Xna.Framework.Input;
 namespace Editors.BmdEditor.Services
 {
     /// <summary>
-    /// A BMD-specific transform gizmo, ported from <c>CscGizmoComponent</c>. The stock
-    /// <see cref="GizmoComponent"/> bakes transforms into mesh vertices, which is wrong here -
-    /// moving a BMD element means editing its own position/rotation/scale fields. This component
-    /// reuses the low-level <see cref="Gizmo"/> widget and routes its deltas into whichever
-    /// element is currently selected in the tree, via the gizmo-support members on
-    /// <see cref="BmdElementViewModel"/>. Unlike Csc, BMD has no timeline and no parent/attach
-    /// hierarchy (every scene group node is an identity transform), so world delta == local delta
-    /// and there's no need to re-evaluate a world matrix every frame - the view model's own
-    /// position/orientation is already the ground truth.
+    /// A BMD transform gizmo, ported from <c>CscGizmoComponent</c>. The stock <see cref="GizmoComponent"/>
+    /// bakes transforms into mesh vertices; this one routes the <see cref="Gizmo"/> widget's deltas into the
+    /// selected element's own position/rotation/scale via <see cref="BmdElementViewModel"/>. BMD scene
+    /// groups are all identity transforms, so a world delta is a local delta.
     /// </summary>
     public class BmdGizmoComponent : BaseComponent, IDisposable
     {
