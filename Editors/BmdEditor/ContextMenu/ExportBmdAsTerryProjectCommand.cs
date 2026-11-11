@@ -23,7 +23,7 @@ namespace Editors.BmdEditor.ContextMenu
         public bool IsEnabled(TreeNode node)
         {
             var packFile = TreeNodeHelper.GetPackFile(node);
-            return packFile != null && packFile.Name.EndsWith(".bmd", StringComparison.OrdinalIgnoreCase);
+            return packFile != null && BmdFileNames.IsBmd(packFile.Name);
         }
 
         private TreeNode _node = null!;
