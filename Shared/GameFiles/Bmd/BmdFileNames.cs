@@ -14,11 +14,13 @@ namespace Shared.GameFormats.Bmd
 
         public static readonly string[] BinNameParts = ["bmd_data", "bmd_nogo_data", "bmd_objects_sound", "_bmd.bin"];
 
+        public static bool IsPrefab(string fileName) => fileName.EndsWith(BmdExtension, StringComparison.OrdinalIgnoreCase);
+
         public static bool IsBmd(string fileName)
         {
-            var name = Path.GetFileName(fileName).ToLowerInvariant();
-            if (name.EndsWith(BmdExtension))
+            if (IsPrefab(fileName))
                 return true;
+            var name = Path.GetFileName(fileName).ToLowerInvariant();
             return name.EndsWith(BinExtension) && BinNameParts.Any(name.Contains);
         }
     }

@@ -28,7 +28,9 @@ namespace Editors.Reports.Bmd
             var timeStamp = DateTime.Now.ToString("yyyyMMddHHmmssfff");
             outputDir = $"{DirectoryHelper.ReportsDirectory}\\Bmd\\{gameName}_{timeStamp}\\";
             
-            var filesWithPaths = PackFileServiceUtility.FindAllWithExtentionIncludePaths(_pfs, ".bmd");
+            var filesWithPaths = PackFileServiceUtility.FindAllWithExtentionIncludePaths(_pfs, BmdFileNames.BmdExtension);
+            filesWithPaths.AddRange(PackFileServiceUtility.FindAllWithExtentionIncludePaths(_pfs, BmdFileNames.BinExtension)
+                .Where(x => BmdFileNames.IsBmd(x.FileName)));
             var fileList = filesWithPaths.Select(x => x.Pack).ToList();
             
             // Create a mapping from PackFile to its correct path

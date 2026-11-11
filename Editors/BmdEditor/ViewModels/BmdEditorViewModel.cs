@@ -81,7 +81,7 @@ namespace Editors.BmdEditor.ViewModels
 
         // Commands
         public ICommand RefreshCommand { get; }
-        public ICommand ExportCommand { get; }
+        public IRelayCommand ExportCommand { get; }
         public ICommand SaveCommand { get; }
         public ICommand NavigateToReferencedFileCommand { get; }
         public ICommand GizmoTranslateCommand { get; }
@@ -159,7 +159,8 @@ namespace Editors.BmdEditor.ViewModels
             componentInserter.Execute();
 
             RefreshCommand = new RelayCommand(Refresh);
-            ExportCommand = new RelayCommand(Export);
+            // The Terry export writes a campaign prefab project, so battle-map .bin BMDs are left out.
+            ExportCommand = new RelayCommand(Export, () => CurrentFile != null && BmdFileNames.IsPrefab(CurrentFile.Name));
             SaveCommand = new RelayCommand(() => Save());
             NavigateToReferencedFileCommand = new RelayCommand<string>(NavigateToReferencedFile);
             GizmoTranslateCommand = new RelayCommand(() => _gizmo.SetMode(GameWorld.Core.Components.Gizmo.GizmoMode.Translate));
@@ -179,6 +180,7 @@ namespace Editors.BmdEditor.ViewModels
 
             // Subscribe to selection changes from 3D view
             _eventHub.Register<SelectionChangedEvent>(this, OnSelectionChanged);
+            ExportCommand.NotifyCanExecuteChanged();
         }
 
         public void LoadFile(PackFile packFile)
