@@ -6,9 +6,9 @@ using Shared.GameFormats.RigidModel.Transforms;
 namespace FileTypesTests.FileTypes.Bmd
 {
     /// <summary>
-    /// No vanilla WH3 .bmd has data in the battle-only sections (capture locations, toggleable slots, catchment
-    /// areas, ...), so these tests are the only thing exercising their readers and writers. They check that the
-    /// parser and writer agree with each other; the layouts themselves come from the assembly kit's serialisers.
+    /// Exercises the battle-only sections (capture locations, toggleable slots, catchment areas, ...), which no
+    /// vanilla WH3 .bmd prefab has data in, and old record versions. These check that the parser and writer
+    /// agree with each other; the layouts themselves come from the assembly kit's serialisers.
     /// </summary>
     public class BmdRoundTripTests
     {

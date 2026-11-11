@@ -5,17 +5,11 @@ using Shared.GameFormats.RigidModel.Transforms;
 namespace Shared.GameFormats.Bmd
 {
     /// <summary>
-    /// Serializes a <see cref="BmdFile"/> back to FASTBIN0 bytes, mirroring <see cref="BmdParser"/>
-    /// section-by-section in the exact same order/<see cref="FastBinHeader.FastBinVersion"/> gates.
-    /// Writes the WHOLE file, not just the categories the editor exposes for editing - every other
-    /// section (BattlefieldBuildings, Deployments, PlayableArea, AiHints, ...) is written back from
-    /// whatever BmdParser stored, so saving an unedited file reproduces it exactly and saving an
-    /// edited one only changes what was actually touched.
-    ///
-    /// Every record layout follows the WH3 assembly kit's serialisers. The one thing that can't be
-    /// written is a FASTBIN &lt; 11 file, whose early prop/vfx block BmdParser only partly decodes.
-    /// <see cref="BmdParser.Parse(byte[])"/> re-reads the output as a self-check before returning,
-    /// so a bug here fails loudly instead of silently corrupting a file on disk.
+    /// Serializes a <see cref="BmdFile"/> back to FASTBIN0 bytes, mirroring <see cref="BmdParser"/> section
+    /// by section. It writes the whole file, not only what the editor exposes, so saving an unedited file
+    /// reproduces it exactly. Record layouts follow the WH3 assembly kit's serialisers; the one exception is
+    /// FASTBIN &lt; 11, whose early prop/vfx block BmdParser only partly decodes and which can't be written.
+    /// The output is re-parsed as a self-check before it is returned.
     /// </summary>
     public static class BmdWriter
     {
@@ -183,9 +177,7 @@ namespace Shared.GameFormats.Bmd
             return bytes;
         }
 
-        // ---------------------------------------------------------------------
         // Self-check
-        // ---------------------------------------------------------------------
 
         private static void SelfCheck(BmdFile source, byte[] bytes)
         {
@@ -245,9 +237,7 @@ namespace Shared.GameFormats.Bmd
             CheckCount("AiHints.PolyLinesList", source.AiHints.PolyLinesList.Count, reread.AiHints.PolyLinesList.Count);
         }
 
-        // ---------------------------------------------------------------------
         // Section-level helpers
-        // ---------------------------------------------------------------------
 
         private static ushort GetVersion(BmdFile bmdFile, string key) =>
             bmdFile.SectionVersions.TryGetValue(key, out var version) ? version : (ushort)0;
@@ -273,9 +263,7 @@ namespace Shared.GameFormats.Bmd
                 writer.Write(value);
         }
 
-        // ---------------------------------------------------------------------
-        // Item writers (mirror BmdParser's Read* methods one-for-one)
-        // ---------------------------------------------------------------------
+        // Item writers (mirror BmdParser's Read* methods)
 
         private static void WriteLegacyDeploymentArea(BinaryWriter writer, LegacyDeploymentArea area, ushort managerVersion)
         {
@@ -318,9 +306,7 @@ namespace Shared.GameFormats.Bmd
 
             if (building.Version < 6)
             {
-                // Inverse of the old raw position/rotation/scale composition
-                // (scaleMatrix * rotationMatrix * translationMatrix) - Matrix.Decompose assumes
-                // exactly this row-vector TRS order, so it exactly undoes it.
+                // Matrix.Decompose undoes the parser's scale * rotation * translation composition.
                 building.Transform.Decompose(out var scale, out var rotation, out var translation);
                 WriteVector3(writer, translation);
                 writer.Write(rotation.X);
@@ -593,9 +579,8 @@ namespace Shared.GameFormats.Bmd
             var propsList = new List<string>();
             if (propVersion > 1)
             {
-                // Preserve the original shared string table's order/entries for byte-identical
-                // round-trips on unedited files; append any Rmv2Path a PropInfo now references
-                // that wasn't already in it (e.g. a path changed via editing).
+                // Keep the original string table so unedited files round-trip exactly; append any path a
+                // prop now references that isn't in it.
                 propsList.AddRange(bmdFile.Props);
                 var known = new HashSet<string>(propsList, StringComparer.Ordinal);
                 foreach (var prop in bmdFile.PropInfos)
@@ -627,10 +612,8 @@ namespace Shared.GameFormats.Bmd
             }
             else
             {
-                // Real prop tables can contain duplicate paths - prefer the prop's own original
-                // index (when it still points at the right string) over a fresh string lookup, so
-                // an unedited save doesn't silently repoint it at a different, merely
-                // string-identical, table slot.
+                // The table can hold duplicate paths, so keep the prop's own index while it still points at
+                // the right string.
                 var index = prop.PropIndex is { } original && original < propsList.Count && propsList[original] == prop.Rmv2Path
                     ? original
                     : propIndexLookup[prop.Rmv2Path];
@@ -704,7 +687,6 @@ namespace Shared.GameFormats.Bmd
                 WriteFixedBytes(writer, prop.CultureMask, 8);
             else if (prop.PropInfoVersion > 10)
                 writer.Write(prop.CultureMask, 0, 4);
-            // else (<=10): BmdParser reads nothing for the culture mask at this version - write nothing.
 
             if (prop.PropInfoVersion == 9)
                 writer.Write(Bool(prop.DecalApplyToRigids));
@@ -1121,9 +1103,7 @@ namespace Shared.GameFormats.Bmd
             }
         }
 
-        // ---------------------------------------------------------------------
-        // Primitive helpers (mirror BmdParser's Read helpers one-for-one)
-        // ---------------------------------------------------------------------
+        // Primitive helpers (mirror BmdParser's Read helpers)
 
         private static byte Bool(bool b) => (byte)(b ? 1 : 0);
 

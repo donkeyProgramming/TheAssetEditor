@@ -9,12 +9,9 @@ using Shared.GameFormats.Bmd;
 namespace Editors.BmdEditor.Exporting
 {
     /// <summary>
-    /// Builds a Terry project (.terry) and its accompanying layer (.layer) from a parsed
-    /// <see cref="BmdFile"/>, in the XML shape read by the Total War editor "Terry". BmdInfo
-    /// references are recursively flattened into the same layer (their own Transform is not
-    /// composed into descendants - only their culture mask is inherited - matching the reference
-    /// Python export scripts this was ported from), so the result contains everything reachable
-    /// from the root .bmd.
+    /// Builds a Terry project (.terry) and its layer (.layer) from a parsed <see cref="BmdFile"/>.
+    /// BmdInfo references are flattened into the same layer: a child's entities inherit the reference's
+    /// culture mask, but its transform is not applied to them.
     /// </summary>
     public static class BmdTerryProjectWriter
     {
@@ -23,10 +20,7 @@ namespace Editors.BmdEditor.Exporting
 
         public readonly record struct TerryProject(string TerryXml, string LayerXml, string LayerEntityId);
 
-        // Fixed display order for the logical layers grouping the flattened entities by component
-        // type (matches the real editor's own "group by kind" habit, e.g. pyre_rock.*.layer, though
-        // that sample groups by spatial batch rather than type - this groups by type instead since
-        // that's what was asked for).
+        // Display order of the logical layers, which group the flattened entities by component type.
         private static readonly (string Key, string DisplayName)[] LayerCategories =
         {
             ("props", "Props"),
@@ -185,13 +179,13 @@ namespace Editors.BmdEditor.Exporting
                 if (prop.PropInfoVersion > 26)
                     decal.Add(new XAttribute("fade_start", Fmt(prop.DecalFadeStart)));
                 if (prop.PropInfoVersion > 27)
-                entity.Add(decal);
                     decal.Add(
                         new XAttribute("mirror_x", Bool(prop.DecalMirrorX)),
                         new XAttribute("mirror_z", Bool(prop.DecalMirrorZ)),
                         new XAttribute("angle_threshold", Fmt(prop.DecalAngleThreshold)));
                 if (prop.PropInfoVersion > 28)
                     decal.Add(new XAttribute("layer", prop.DecalLayer.ToString(CultureInfo.InvariantCulture)));
+                entity.Add(decal);
             }
             else
             {

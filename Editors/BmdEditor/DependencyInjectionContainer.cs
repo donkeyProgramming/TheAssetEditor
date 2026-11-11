@@ -24,14 +24,11 @@ namespace Editors.BmdEditor
     {
         public override void Register(IServiceCollection serviceCollection)
         {
-            // Views
             serviceCollection.AddTransient<BmdEditorView>();
 
-            // ViewModels
             serviceCollection.AddScoped<BmdEditorViewModel>();
             serviceCollection.AddScoped<IEditorInterface, BmdEditorViewModel>();
 
-            // Services
             serviceCollection.AddScoped<BmdSceneCreator>();
             serviceCollection.AddScoped<SelectionManager>();
             serviceCollection.AddScoped<BmdElementLoader>();
@@ -39,7 +36,6 @@ namespace Editors.BmdEditor
             // Game components (picked up by IComponentInserter)
             RegisterGameComponent<BmdGizmoComponent>(serviceCollection);
 
-            // Context menu
             serviceCollection.AddScoped<ExportBmdAsTerryProjectCommand>();
             serviceCollection.AddSingleton<IPackFileContextMenuRegistration, BmdPackFileContextMenuRegistration>();
 

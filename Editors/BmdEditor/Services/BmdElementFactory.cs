@@ -5,18 +5,15 @@ using Shared.GameFormats.RigidModel.Transforms;
 namespace Editors.BmdEditor.Services
 {
     /// <summary>
-    /// Builds default POCOs for the "Add" menu. Every field version is picked to be the highest
-    /// one <see cref="BmdWriter"/> understands for that type (so nothing gets silently truncated
-    /// on save) - each item carries its own version tag, so this doesn't need to match whatever
-    /// version the file's other, pre-existing entries happen to use.
+    /// Builds default elements for the "Add" menu, each at the highest version <see cref="BmdWriter"/>
+    /// writes for its type. Every record carries its own version, so it needn't match the file's others.
     /// </summary>
     public static class BmdElementFactory
     {
         private const string DefaultHeightMode = "HM_TERRAIN";
 
-        // All-0xFF = "no culture restriction" - real vanilla files use this as the wildcard
-        // pattern (see CultureMask.RawBytes); an all-zero mask would make a new prop invisible to
-        // every culture, which would look like a bug to whoever placed it.
+        // All-0xFF is the "no culture restriction" pattern vanilla files use; an all-zero mask would
+        // hide the new element from every culture.
         private static byte[] WildcardCultureMaskBytes() => [0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF];
 
         private static BmdComponentFlags DefaultFlags() => new() { FlagVersion = 4 };
@@ -37,14 +34,14 @@ namespace Editors.BmdEditor.Services
             Transform = Matrix.Identity,
             IsDecal = isDecal,
             Flags = AllSeasonsFlags(),
+            HeightMode = "BHM_PARENT",
+            CultureMask = WildcardCultureMaskBytes(),
+            CastsShadow = true,
             VisibleInsideSnowRegion = true,
             VisibleOutsideSnowRegion = true,
             VisibleInsideDestructionRegion = true,
             VisibleOutsideDestructionRegion = true,
             VisibleWithoutShroud = true,
-            HeightMode = "BHM_PARENT",
-            CultureMask = WildcardCultureMaskBytes(),
-            CastsShadow = true,
         };
 
         public static VfxInfo CreateVfx(string vfxString) => new()
@@ -52,11 +49,11 @@ namespace Editors.BmdEditor.Services
             VfxInfoVersion = 10,
             VfxString = vfxString,
             Transform = Matrix.Identity,
-            Autoplay = true,
-            VisibleWithoutShroud = true,
             Flags = DefaultFlags(),
             HeightMode = DefaultHeightMode,
             CultureMask = WildcardCultureMaskBytes(),
+            Autoplay = true,
+            VisibleWithoutShroud = true,
         };
 
         public static PointLightInfo CreatePointLight() => new()
@@ -139,11 +136,11 @@ namespace Editors.BmdEditor.Services
         public static CscInfo CreateCsc(string sceneFile) => new()
         {
             Version = 12,
-            Autoplay = true,
-            VisibleWithoutShroud = true,
             SceneFile = sceneFile,
             Transform = Matrix.Identity,
             HeightMode = DefaultHeightMode,
+            Autoplay = true,
+            VisibleWithoutShroud = true,
         };
     }
 }

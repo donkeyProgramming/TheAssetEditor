@@ -9,10 +9,10 @@ namespace Shared.GameFormats.Bmd
 
         /// <summary>
         /// Per-section header version numbers (e.g. "BattlefieldBuilding", "Prop", "SpotLight" -
-        /// see the keys <see cref="BmdParser"/> writes into this dictionary). These are read from
-        /// the stream purely to advance position - nothing in the parser branches on them - but
-        /// <see cref="BmdWriter"/> needs the original value back to reproduce the file byte-for-byte,
-        /// so they're captured here rather than discarded. Missing key = version 0 (used when a
+        /// see the keys <see cref="BmdParser"/> writes into this dictionary). Most sections' records
+        /// carry their own version and ignore this one; the records of "CaptureLocation",
+        /// "ToggleableBuildingSlot" and "LegacyPreV22" are unversioned and gate on it instead.
+        /// <see cref="BmdWriter"/> writes every value back. Missing key = version 0 (used when a
         /// section has no separate version field at all, e.g. GoOutline).
         /// </summary>
         public Dictionary<string, ushort> SectionVersions { get; set; } = [];
@@ -103,13 +103,9 @@ namespace Shared.GameFormats.Bmd
     public struct CultureMask
     {
         /// <summary>
-        /// The exact 8 bytes this was decoded from, when read by <see cref="BmdParser.ReadCultureMask"/>.
-        /// Several bit positions within these bytes aren't decoded into any named field below (real
-        /// vanilla files set them as part of an all-<c>0xFF</c> "no restriction" pattern), so
-        /// <see cref="BmdWriter"/> writes these raw bytes back directly when present instead of
-        /// reconstructing from the named bools alone, which would silently zero those bits. Null for
-        /// a mask built by other code (e.g. freshly constructed, not parsed) - <see cref="BmdWriter"/>
-        /// falls back to bit-reconstruction in that case.
+        /// The 8 bytes this was parsed from. Some bits have no named field below (vanilla's all-<c>0xFF</c>
+        /// "no restriction" pattern sets them), so <see cref="BmdWriter"/> writes these back when present and
+        /// only rebuilds from the bools when this is null.
         /// </summary>
         public byte[]? RawBytes { get; set; }
 
@@ -368,12 +364,9 @@ namespace Shared.GameFormats.Bmd
         public string Rmv2Path { get; set; } = string.Empty;
 
         /// <summary>
-        /// The prop's original index into the file's shared string table (only set for
-        /// <see cref="PropInfoVersion"/> &gt; 12, which reference <see cref="Rmv2Path"/> by index
-        /// rather than storing it inline). The table can contain duplicate paths in real files, so
-        /// <see cref="BmdWriter"/> prefers reusing this exact index over re-deriving one from
-        /// <see cref="Rmv2Path"/> alone, to avoid silently repointing a prop at a different (though
-        /// string-identical) table slot on an unedited save.
+        /// The prop's index into the file's string table (<see cref="PropInfoVersion"/> &gt; 12 only). The
+        /// table can hold duplicate paths, so <see cref="BmdWriter"/> reuses this index rather than looking
+        /// <see cref="Rmv2Path"/> up again.
         /// </summary>
         public int? PropIndex { get; set; }
         public Matrix Transform { get; set; } = Matrix.Identity;
@@ -435,8 +428,6 @@ namespace Shared.GameFormats.Bmd
         public bool EarlyVersionUnknownBool { get; set; }
     }
 
-        /// <summary>Version 1 only.</summary>
-        public float Scale { get; set; } = 1;
     public class VfxInfo
     {
         public ushort VfxInfoVersion { get; set; }
@@ -444,6 +435,8 @@ namespace Shared.GameFormats.Bmd
         public Matrix Transform { get; set; } = Matrix.Identity;
         public float EmissionRate { get; set; }
         public string InstanceName { get; set; } = string.Empty;
+        /// <summary>Version 1 only.</summary>
+        public float Scale { get; set; } = 1;
         
         public BmdComponentFlags Flags { get; set; } = new();
 
@@ -455,7 +448,7 @@ namespace Shared.GameFormats.Bmd
         public bool VisibleWithoutShroud { get; set; }
         public bool NoCulling { get; set; }
 
-        // Early version 4 specific fields
+        // The undecoded tail of a FASTBIN < 11 VFX
         public byte[] EarlyVersionUnknownBytes { get; set; } = new byte[12];
     }
 

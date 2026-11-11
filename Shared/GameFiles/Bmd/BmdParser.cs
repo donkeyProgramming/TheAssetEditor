@@ -18,7 +18,6 @@ namespace Shared.GameFormats.Bmd
             _stream = stream;
             _reader = new BinaryReader(stream, Encoding.UTF8);
             
-            // Read header
             _fastBinVersion = ReadFastBinHeader();
         }
 
@@ -28,7 +27,6 @@ namespace Shared.GameFormats.Bmd
             var fastBin0 = Encoding.UTF8.GetString(fastBin0Bytes);
             var fastBinVersion = _reader.ReadUInt16();
             
-            // Validate the FASTBIN0 magic number
             if (fastBin0 != "FASTBIN0")
             {
                 throw new InvalidOperationException($"Invalid file format. Expected 'FASTBIN0' but got '{fastBin0}'. This is not a valid BMD file.");
@@ -59,11 +57,9 @@ namespace Shared.GameFormats.Bmd
                     //(and it was eventually moved down?)
 
                     //Props (the modern version of props is way down the page)
-                    //no version
                     var early_props_length = _reader.ReadUInt32();
                     _logger.Here().Information($"BMD Parser - Early props length: {early_props_length}");
                     
-                    // Read early props entries
                     for (var i = 0; i < early_props_length; i++)
                     {
                         
@@ -90,11 +86,9 @@ namespace Shared.GameFormats.Bmd
                     }
 
                     //VFX (the modern version of VFX is way down the page)
-                    //no version
                     var early_vfxs_length = _reader.ReadUInt32();
                     _logger.Here().Information($"BMD Parser - Early vfxs length: {early_vfxs_length}");
 
-                    // Read early vfx entries
                     for (var i = 0; i < early_vfxs_length; i++)
                     {
 
@@ -124,15 +118,13 @@ namespace Shared.GameFormats.Bmd
                     ReadCollection(bmdFile, "LegacyPreV22", bmdFile.LegacyDeploymentAreas, () => ReadLegacyDeploymentArea(legacyDeploymentVersion), legacyDeploymentVersion);
                 }
 
-                // BattlefieldBuilding
                 var battlefieldBuildingVersion = _reader.ReadUInt16();
                 ReadCollection(bmdFile, "BattlefieldBuilding", bmdFile.BattlefieldBuildings, ReadBattlefieldBuilding, battlefieldBuildingVersion);
 
-                // BattlefieldBuildingFar: the same records as the near list
                 var battlefieldBuildingFarVersion = _reader.ReadUInt16();
                 ReadCollection(bmdFile, "BattlefieldBuildingFar", bmdFile.BattlefieldBuildingFars, ReadBattlefieldBuilding, battlefieldBuildingFarVersion);
 
-                // CaptureLocation: a set (version + count) of lists (count) of unversioned locations, which gate on the set version
+                // A set (version + count) of lists (count) of unversioned locations, which gate on the set version
                 var captureLocationVersion = _reader.ReadUInt16();
                 ReadCollection(bmdFile, "CaptureLocation", bmdFile.CaptureLocationLists, () =>
                 {
@@ -143,55 +135,36 @@ namespace Shared.GameFormats.Bmd
                     return list;
                 }, captureLocationVersion);
 
-                // EFLine
-                // no version
                 ReadCollection(bmdFile, "EFLine", bmdFile.EFLines, ReadEFLine);
 
-                // GoOutline
-                // no version
                 ReadCollection(bmdFile, "GoOutline", bmdFile.GoOutlines, ReadGoOutline);
 
-                // NonTerrainOutline
-                // no version
                 ReadCollection(bmdFile, "NonTerrainOutline", bmdFile.NonTerrainOutlines, ReadNonTerrainOutline);
 
-                // ZonesTemplate
                 var zonesTemplateVersion = _reader.ReadUInt16();
                 ReadCollection(bmdFile, "ZonesTemplate", bmdFile.ZonesTemplates, ReadZonesTemplate, zonesTemplateVersion);
 
-                // Bmd
                 var bmdVersion = _reader.ReadUInt16();
                 ReadCollection(bmdFile, "BmdInfo", bmdFile.BmdInfos, ReadBmdInfo, bmdVersion);
 
-                // BmdOutlines
                 var bmdOutlineVersion = _reader.ReadUInt16();
                 ReadCollection(bmdFile, "BmdOutline", bmdFile.BmdOutlines, ReadBmdOutline, bmdOutlineVersion);
 
-                // TerrainOutlines
-                // no version
                 ReadCollection(bmdFile, "TerrainOutline", bmdFile.TerrainOutlines, ReadTerrainOutline);
 
-                // LiteBuildingOutlines
-                // no version
                 ReadCollection(bmdFile, "LiteBuildingOutline", bmdFile.LiteBuildingOutlines, ReadLiteBuildingOutline);
 
                 if (_fastBinVersion > 4)
                 {
-                    // CameraZones
                     var cameraZoneVersion = _reader.ReadUInt16();
                     ReadCollection(bmdFile, "CameraZone", bmdFile.CameraZones, ReadCameraZone, cameraZoneVersion);
                 }
                 if (_fastBinVersion > 7)
                 {
-                    // CivilianDeployments
-                    // no version
                     ReadCollection(bmdFile, "CivilianDeployment", bmdFile.CivilianDeployments, ReadCivilianDeployment);
 
-                    // CivilianShelters
-                    // no version
                     ReadCollection(bmdFile, "CivilianShelter", bmdFile.CivilianShelters, ReadCivilianShelter);
 
-                    // Prop
                     var propVersion = _reader.ReadUInt16();
                     bmdFile.SectionVersions["Prop"] = propVersion;
                     _section = "Prop";
@@ -199,11 +172,9 @@ namespace Shared.GameFormats.Bmd
                 }
                 if (_fastBinVersion > 8)
                 {
-                    // Vfx
                     var vfxVersion = _reader.ReadUInt16();
                     ReadCollection(bmdFile, "VfxInfo", bmdFile.VfxInfos, ReadVfxInfo, vfxVersion);
 
-                    // AiHints
                     var aiHintsVersion = _reader.ReadUInt16();
                     bmdFile.SectionVersions["AiHints"] = aiHintsVersion;
                     _logger.Here().Information($"BMD Parser - AiHints version: {aiHintsVersion}");
@@ -212,15 +183,12 @@ namespace Shared.GameFormats.Bmd
                 }
                 if (_fastBinVersion > 10)
                 {
-                    // LightProbe
                     var lightProbeVersion = _reader.ReadUInt16();
                     ReadCollection(bmdFile, "LightProbe", bmdFile.LightProbes, ReadLightProbeInfo, lightProbeVersion);
 
-                    // TerrainHole
                     var terrainHoleVersion = _reader.ReadUInt16();
                     ReadCollection(bmdFile, "TerrainHole", bmdFile.TerrainHoles, ReadTerrainHoleTriangleInfo, terrainHoleVersion);
 
-                    // PointLight
                     var pointLightVersion = _reader.ReadUInt16();
                     ReadCollection(bmdFile, "PointLight", bmdFile.PointLights, ReadPointLightInfo, pointLightVersion);
                 }
@@ -228,85 +196,71 @@ namespace Shared.GameFormats.Bmd
                 // empireutility.modder.x64.dll).
                 if (_fastBinVersion > 14)
                 {
-                    // BuildingProjectileEmitters
                     var buildingProjectileEmitterVersion = _reader.ReadUInt16();
                     ReadCollection(bmdFile, "BuildingProjectileEmitter", bmdFile.BuildingProjectileEmitters, ReadBuildingProjectileEmitter, buildingProjectileEmitterVersion);
                 }
                 if (_fastBinVersion > 15)
                 {
-                    // PlayableArea
                     _logger.Here().Information($"BMD Parser - PlayableArea");
                     _section = "PlayableArea";
                     bmdFile.PlayableArea = ReadPlayableArea();
                 }
                 if (_fastBinVersion > 16)
                 {
-                    // PolyMesh
                     var polyMeshVersion = _reader.ReadUInt16();
                     ReadCollection(bmdFile, "PolyMesh", bmdFile.PolyMeshes, ReadPolyMeshInfo, polyMeshVersion);
                 }
                 if (_fastBinVersion > 17)
                 {
-                    // TerrainStencilBlendTriangles
                     var terrainStencilBlendTriangleVersion = _reader.ReadUInt16();
                     ReadCollection(bmdFile, "TerrainStencilBlendTriangle", bmdFile.TerrainStencilBlendTriangles, ReadTerrainStencilBlendTriangle, terrainStencilBlendTriangleVersion);
                 }
                 if (_fastBinVersion > 18)
                 {
-                    // SpotLight
                     var spotLightVersion = _reader.ReadUInt16();
                     ReadCollection(bmdFile, "SpotLight", bmdFile.SpotLights, ReadSpotLightInfo, spotLightVersion);
                 }
                 if (_fastBinVersion > 19)
                 {
-                    // Sound
                     var soundVersion = _reader.ReadUInt16();
                     ReadCollection(bmdFile, "Sound", bmdFile.Sounds, ReadSoundInfo, soundVersion);
                 }
                 if (_fastBinVersion > 20)
                 {
-                    // CSC (Composite Scene Container)
                     var cscVersion = _reader.ReadUInt16();
                     ReadCollection(bmdFile, "CSC", bmdFile.CscInfos, ReadCscInfo, cscVersion);
                 }
                 if (_fastBinVersion > 21)
                 {
-                    // Deployment
                     var deploymentVersion = _reader.ReadUInt16();
                     ReadCollection(bmdFile, "Deployment", bmdFile.Deployments, ReadDeployment, deploymentVersion);
                 }
                 if (_fastBinVersion > 22)
                 {
-                    // BmdCachedAreas (the kit's BMD_CATCHMENT_AREA_LIST)
+                    // The kit's BMD_CATCHMENT_AREA_LIST
                     var bmdCachedAreaVersion = _reader.ReadUInt16();
                     ReadCollection(bmdFile, "BmdCachedArea", bmdFile.BmdCachedAreas, ReadBmdCachedArea, bmdCachedAreaVersion);
                 }
                 if (_fastBinVersion > 23)
                 {
-                    // ToggleableBuildingSlots
                     var toggleableBuildingSlotVersion = _reader.ReadUInt16();
                     ReadCollection(bmdFile, "ToggleableBuildingSlot", bmdFile.ToggleableBuildingSlots, () => ReadToggleableBuildingSlot(toggleableBuildingSlotVersion), toggleableBuildingSlotVersion);
                 }
                 if (_fastBinVersion > 24)
                 {
-                    // TerraindDecals
                     var terraindDecalVersion = _reader.ReadUInt16();
                     ReadCollection(bmdFile, "TerraindDecal", bmdFile.TerraindDecals, ReadTerraindDecal, terraindDecalVersion);
                 }
                 if (_fastBinVersion > 25)
                 {
-                    // TreeListReferences
                     var treeListReferenceVersion = _reader.ReadUInt16();
                     ReadCollection(bmdFile, "TreeListReference", bmdFile.TreeListReferences, ReadTreeListReference, treeListReferenceVersion);
 
-                    // GrassListReferences
                     var grassListReferenceVersion = _reader.ReadUInt16();
                     ReadCollection(bmdFile, "GrassListReference", bmdFile.GrassListReferences, ReadGrassListReference, grassListReferenceVersion);
                 }
                 if (_fastBinVersion > 26)
                 {
-                    // WaterOutlines
-                    // no version
                     ReadCollection(bmdFile, "WaterOutline", bmdFile.WaterOutlines, ReadWaterOutline);
                 }
 
@@ -407,7 +361,6 @@ namespace Shared.GameFormats.Bmd
 
             if (building.Version < 6)
             {
-                // Raw position / rotation / scale
                 var position = ReadRmvVector3();
                 var translationMatrix = Matrix.CreateTranslation(position.ToVector3());
 
@@ -425,13 +378,11 @@ namespace Shared.GameFormats.Bmd
             }
             else
             {
-                //Transformation matrix
                 building.Transform = ReadRowMajorMatrix(false);
             }
             
             building.Properties = building.Version > 3 ? ReadBuildingProperties() : ReadLegacyBuildingProperties(building.Version);
 
-            // Back to normal stuff
             if (building.Version > 7)
                 building.HeightMode = ReadString();
             if (building.Version > 9)
@@ -573,7 +524,6 @@ namespace Shared.GameFormats.Bmd
         {
             var template = new ZonesTemplate();
 
-            //no version
             template.Outline = ReadPoints();
             template.ZoneName = ReadString();
             template.EntityFormationTemplateName = ReadString();
@@ -679,7 +629,6 @@ namespace Shared.GameFormats.Bmd
 
             bmdFile.Props = propsList;
 
-            // PropInfo
             var propInfoCount = _reader.ReadUInt32();
             _logger.Here().Information($"BMD Parser - PropInfo count: {propInfoCount}");
             
@@ -697,12 +646,10 @@ namespace Shared.GameFormats.Bmd
             
             if (prop.PropInfoVersion <= 12)
             {
-                //Read string directly for old versions
                 prop.Rmv2Path = ReadString();
             }
             else
             {
-                // Map the PropIndex to the actual RMV2 path from the props list
                 var propIndex = _reader.ReadUInt32();
                 prop.Rmv2Path = propsList[(int)propIndex];
                 prop.PropIndex = (int)propIndex;
@@ -831,7 +778,6 @@ namespace Shared.GameFormats.Bmd
             vfx.VfxInfoVersion = _reader.ReadUInt16();
             vfx.VfxString = ReadString();
             
-            // Read transform matrix (3x4 matrix stored in row-major order)
             vfx.Transform = ReadRowMajorMatrix(false);
             
             vfx.EmissionRate = _reader.ReadSingle();
@@ -883,7 +829,6 @@ namespace Shared.GameFormats.Bmd
         {
             var aiHints = new AiHints();
 
-            // Read Separators
             bmdFile.SectionVersions["AiHints.Separators"] = _reader.ReadUInt16();
             var separatorsCount = _reader.ReadUInt32();
             for (var i = 0; i < separatorsCount; i++)
@@ -896,7 +841,6 @@ namespace Shared.GameFormats.Bmd
                 });
             }
 
-            // Read DirectedPoints
             bmdFile.SectionVersions["AiHints.DirectedPoints"] = _reader.ReadUInt16();
             var directedPointsCount = _reader.ReadUInt32();
             for (var i = 0; i < directedPointsCount; i++)
@@ -910,7 +854,6 @@ namespace Shared.GameFormats.Bmd
                 });
             }
 
-            // Read PolyLines
             bmdFile.SectionVersions["AiHints.PolyLines"] = _reader.ReadUInt16();
             var polyLinesCount = _reader.ReadUInt32();
             for (var i = 0; i < polyLinesCount; i++)
@@ -941,7 +884,6 @@ namespace Shared.GameFormats.Bmd
                 aiHints.PolyLines.Add(polyLine);
             }
             
-            // Read PolyLinesList
             bmdFile.SectionVersions["AiHints.PolyLinesList"] = _reader.ReadUInt16();
             var polyLinesListCount = _reader.ReadUInt32();
             for (var i = 0; i < polyLinesListCount; i++)
@@ -1417,8 +1359,6 @@ namespace Shared.GameFormats.Bmd
         private WaterOutline ReadWaterOutline() => new() { VertexList = ReadPoints() };
 
 
-
-        //Helper Functions
         private BmdComponentFlags ReadBmdComponentFlags()
         {
             var flags = new BmdComponentFlags();
@@ -1432,7 +1372,6 @@ namespace Shared.GameFormats.Bmd
                 flags.ClampToSurface = _reader.ReadByte() != 0;
             flags.ClampToWaterSurface = _reader.ReadByte() != 0;
 
-            //Seasons
             flags.SeasonSpring = _reader.ReadByte() != 0;
             flags.SeasonSummer = _reader.ReadByte() != 0;
             flags.SeasonAutumn = _reader.ReadByte() != 0;
@@ -1466,12 +1405,10 @@ namespace Shared.GameFormats.Bmd
 
             mask.RawBytes = bytes;
 
-            // First byte
             mask.CultMaskBase = (bytes[0] & 0x01) != 0;
             mask.CultMaskBst = (bytes[0] & 0x40) != 0;
             mask.CultMaskBrt = (bytes[0] & 0x80) != 0;
 
-            // Second byte
             mask.CultMaskChs = (bytes[1] & 0x01) != 0;
             mask.CultMaskDwf = (bytes[1] & 0x02) != 0;
             mask.CultMaskEmp = (bytes[1] & 0x04) != 0;
@@ -1479,7 +1416,6 @@ namespace Shared.GameFormats.Bmd
             mask.CultMaskVmp = (bytes[1] & 0x10) != 0;
             mask.CultMaskWef = (bytes[1] & 0x20) != 0;
 
-            // Third byte
             mask.CultMaskDef = (bytes[2] & 0x02) != 0;
             mask.CultMaskHef = (bytes[2] & 0x04) != 0;
             mask.CultMaskLzd = (bytes[2] & 0x08) != 0;
@@ -1488,7 +1424,6 @@ namespace Shared.GameFormats.Bmd
             mask.CultMaskRogue = (bytes[2] & 0x40) != 0;
             mask.CultMaskKsl = (bytes[2] & 0x80) != 0;
 
-            // Fourth byte
             mask.CultMaskOgr = (bytes[3] & 0x01) != 0;
             mask.CultMaskCst = (bytes[3] & 0x02) != 0;
             mask.CultMaskKho = (bytes[3] & 0x08) != 0;
@@ -1497,7 +1432,6 @@ namespace Shared.GameFormats.Bmd
             mask.CultMaskSla = (bytes[3] & 0x40) != 0;
             mask.CultMaskDae = (bytes[3] & 0x80) != 0;
 
-            // Fifth byte
             mask.CultMaskCth = (bytes[4] & 0x01) != 0;
             mask.CultMaskNor = (bytes[4] & 0x02) != 0;
             mask.CultMaskChd = (bytes[4] & 0x04) != 0;
@@ -1541,41 +1475,37 @@ namespace Shared.GameFormats.Bmd
         {
             var matrix = new Matrix();
             
-            // Row 1
-            matrix.M11 = _reader.ReadSingle();  // Row 1, Column 1
-            matrix.M12 = _reader.ReadSingle();  // Row 1, Column 2
-            matrix.M13 = _reader.ReadSingle();  // Row 1, Column 3
+            matrix.M11 = _reader.ReadSingle();
+            matrix.M12 = _reader.ReadSingle();
+            matrix.M13 = _reader.ReadSingle();
             if (is4x4)
-                matrix.M14 = _reader.ReadSingle();  // Row 1, Column 4
+                matrix.M14 = _reader.ReadSingle();
             else
-                matrix.M14 = 0f;  // Row 1, Column 4 (default for 3x4)
+                matrix.M14 = 0f;
             
-            // Row 2
-            matrix.M21 = _reader.ReadSingle();  // Row 2, Column 1
-            matrix.M22 = _reader.ReadSingle();  // Row 2, Column 2
-            matrix.M23 = _reader.ReadSingle();  // Row 2, Column 3
+            matrix.M21 = _reader.ReadSingle();
+            matrix.M22 = _reader.ReadSingle();
+            matrix.M23 = _reader.ReadSingle();
             if (is4x4)
-                matrix.M24 = _reader.ReadSingle();  // Row 2, Column 4
+                matrix.M24 = _reader.ReadSingle();
             else
-                matrix.M24 = 0f;  // Row 2, Column 4 (default for 3x4)
+                matrix.M24 = 0f;
             
-            // Row 3
-            matrix.M31 = _reader.ReadSingle();  // Row 3, Column 1
-            matrix.M32 = _reader.ReadSingle();  // Row 3, Column 2
-            matrix.M33 = _reader.ReadSingle();  // Row 3, Column 3
+            matrix.M31 = _reader.ReadSingle();
+            matrix.M32 = _reader.ReadSingle();
+            matrix.M33 = _reader.ReadSingle();
             if (is4x4)
-                matrix.M34 = _reader.ReadSingle();  // Row 3, Column 4
+                matrix.M34 = _reader.ReadSingle();
             else
-                matrix.M34 = 0f;  // Row 3, Column 4 (default for 3x4)
+                matrix.M34 = 0f;
             
-            // Row 4
-            matrix.M41 = _reader.ReadSingle();  // Row 4, Column 1 (position X)
-            matrix.M42 = _reader.ReadSingle();  // Row 4, Column 2 (position Y)
-            matrix.M43 = _reader.ReadSingle();  // Row 4, Column 3 (position Z)
+            matrix.M41 = _reader.ReadSingle();
+            matrix.M42 = _reader.ReadSingle();
+            matrix.M43 = _reader.ReadSingle();
             if (is4x4)
-                matrix.M44 = _reader.ReadSingle();  // Row 4, Column 4
+                matrix.M44 = _reader.ReadSingle();
             else
-                matrix.M44 = 1f;  // Row 4, Column 4 (default for 3x4)
+                matrix.M44 = 1f;
             
             return matrix;
         }
