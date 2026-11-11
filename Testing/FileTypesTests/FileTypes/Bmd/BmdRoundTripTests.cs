@@ -100,6 +100,23 @@ namespace FileTypesTests.FileTypes.Bmd
             Assert.That(reread.Flags.SeasonSpring, Is.False);
         }
 
+        // The kit's VFX serialiser reads autoplay, scale and enable_in_outfield in place of the flags block for version 1.
+        [Test]
+        public void Version1VfxRoundTrips()
+        {
+            var file = BuildFile(12, 7);
+            file.VfxInfos.Add(new VfxInfo { VfxInfoVersion = 1, VfxString = "fx", Autoplay = true, Scale = 2.5f, Flags = new BmdComponentFlags { AllowInOutfield = true } });
+            var without = BmdWriter.Write(BuildFile(12, 7));
+
+            var bytes = BmdWriter.Write(file);
+            var reread = BmdParser.Parse(bytes).VfxInfos.Single();
+
+            Assert.That(bytes.Length - without.Length, Is.EqualTo(2 + 2 + 2 + 48 + 4 + 2 + 6)); // version, "fx", transform, emission rate, empty name, the three fields
+            Assert.That(reread.Autoplay, Is.True);
+            Assert.That(reread.Scale, Is.EqualTo(2.5f));
+            Assert.That(reread.Flags.AllowInOutfield, Is.True);
+        }
+
         private static BmdFile WithProp(BmdFile file, PropInfo prop)
         {
             file.PropInfos.Add(prop);

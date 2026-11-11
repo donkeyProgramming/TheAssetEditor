@@ -324,8 +324,6 @@ namespace Shared.GameFormats.Bmd
                 _logger.Here().Error($"BMD Parser - Exception caught: {ex.Message}");
                 _logger.Here().Error($"BMD Parser - Stream position: {_stream.Position}, Length: {_stream.Length}");
                 _logger.Here().Error($"BMD Parser - Stack trace: {ex.StackTrace}");
-                if (ex is NotSupportedException)
-                    throw;
                 throw new InvalidDataException($"BMD parse failed in {_section} at byte {_stream.Position} of {_stream.Length}: {ex.Message}", ex);
             }
         }
@@ -841,8 +839,10 @@ namespace Shared.GameFormats.Bmd
 
             if (vfx.VfxInfoVersion == 1)
             {
-                _reader.ReadUInt16(); //one
-                _reader.ReadUInt32(); //zero
+                // Before the flags block (version 2) these sat inline; outfield is kept on Flags.
+                vfx.Autoplay = _reader.ReadByte() != 0;
+                vfx.Scale = _reader.ReadSingle();
+                vfx.Flags.AllowInOutfield = _reader.ReadByte() != 0;
             }
             else
                 vfx.Flags = ReadBmdComponentFlags();
@@ -1463,14 +1463,6 @@ namespace Shared.GameFormats.Bmd
             if (read.Length < size)
                 throw new EndOfStreamException($"Not enough bytes to read CultureMask. Got {read.Length}, expected {size}");
             Array.Copy(read, bytes, size);
-
-            _logger.Here().Information($"BMD Parser - ReadCultureMask: read {bytes.Length} bytes, expected 8");
-
-            if (bytes.Length < 8)
-            {
-                _logger.Here().Error($"BMD Parser - ReadCultureMask: Not enough bytes. Got {bytes.Length}, expected 8. Stream position: {_stream.Position}, Length: {_stream.Length}");
-                throw new EndOfStreamException($"Not enough bytes to read CultureMask. Got {bytes.Length}, expected 8");
-            }
 
             mask.RawBytes = bytes;
 

@@ -570,11 +570,7 @@ namespace Shared.GameFormats.Bmd
             WriteString(writer, bmd.BmdString);
             WriteRowMajorMatrix(writer, bmd.Transform, is4x4: true);
             if (bmd.Version > 1)
-            {
-                writer.Write(bmd.PropertyOverrides.Count);
-                foreach (var properties in bmd.PropertyOverrides)
-                    WriteBuildingProperties(writer, properties);
-            }
+                WriteCollection(writer, bmd.PropertyOverrides, WriteBuildingProperties);
             if (bmd.Version > 6)
                 WriteCultureMask(writer, bmd.CampaignTypeMask);
             else if (bmd.Version > 2)
@@ -761,9 +757,9 @@ namespace Shared.GameFormats.Bmd
 
             if (vfx.VfxInfoVersion == 1)
             {
-                // BmdParser names these locals "one"/"zero" - always these literal values.
-                writer.Write((ushort)1);
-                writer.Write((uint)0);
+                writer.Write(Bool(vfx.Autoplay));
+                writer.Write(vfx.Scale);
+                writer.Write(Bool(vfx.Flags.AllowInOutfield));
             }
             else
             {

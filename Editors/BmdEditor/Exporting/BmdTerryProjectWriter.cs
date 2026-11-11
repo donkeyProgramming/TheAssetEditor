@@ -171,24 +171,25 @@ namespace Editors.BmdEditor.Exporting
             var entity = NewEntity();
             if (prop.IsDecal)
             {
-                entity.Add(new XElement("ECDecal",
+                var decal = new XElement("ECDecal",
                     new XAttribute("model_path", prop.Rmv2Path),
                     new XAttribute("parallax_scale", Fmt(prop.DecalParallaxScale)),
                     new XAttribute("tiling", Fmt(prop.DecalTiling)),
                     new XAttribute("normal_mode", "DNM_BLEND"),
                     new XAttribute("apply_to_terrain", Bool(prop.ApplyToTerrain)),
                     new XAttribute("apply_to_objects", Bool(prop.ApplyToPropsOrReceiveDecal)),
-                    new XAttribute("render_above_snow", Bool(prop.RenderAboveSnow))));
+                    new XAttribute("render_above_snow", Bool(prop.RenderAboveSnow)));
                 // Fields added after prop version 25; older props keep Terry's own defaults.
-                var decal = entity.Element("ECDecal")!;
                 if (prop.PropInfoVersion > 29)
                     decal.Add(new XAttribute("tiling_alpha_enabled", Bool(prop.DecalTilingAlpha)));
                 if (prop.PropInfoVersion > 26)
                     decal.Add(new XAttribute("fade_start", Fmt(prop.DecalFadeStart)));
                 if (prop.PropInfoVersion > 27)
-                    decal.Add(new XAttribute("mirror_x", Bool(prop.DecalMirrorX)), new XAttribute("mirror_z", Bool(prop.DecalMirrorZ)));
-                if (prop.PropInfoVersion > 27)
-                    decal.Add(new XAttribute("angle_threshold", Fmt(prop.DecalAngleThreshold)));
+                entity.Add(decal);
+                    decal.Add(
+                        new XAttribute("mirror_x", Bool(prop.DecalMirrorX)),
+                        new XAttribute("mirror_z", Bool(prop.DecalMirrorZ)),
+                        new XAttribute("angle_threshold", Fmt(prop.DecalAngleThreshold)));
                 if (prop.PropInfoVersion > 28)
                     decal.Add(new XAttribute("layer", prop.DecalLayer.ToString(CultureInfo.InvariantCulture)));
             }
@@ -206,9 +207,7 @@ namespace Editors.BmdEditor.Exporting
                 entity.Add(renderSettings);
             }
 
-            entity.Add(new XElement("ECVisibilitySettingsCampaign",
-                new XAttribute("visible_in_tactical_view", Bool(prop.Flags.VisibleInTactical)),
-                new XAttribute("visible_in_tactical_view_only", Bool(prop.Flags.OnlyVisibleInTactical))));
+            entity.Add(TacticalVisibility(prop.Flags));
             entity.Add(new XElement("ECPropHeightPatch",
                 new XAttribute("apply_height_patch", Bool(prop.ApplyHeightPatch)),
                 new XAttribute("for_camera_height_map_only", "false")));
@@ -232,13 +231,11 @@ namespace Editors.BmdEditor.Exporting
             var visibleInShroudOnly = vfx.VfxInfoVersion > 9 && !vfx.VisibleWithoutShroud;
 
             return NewEntity(
-                new XElement("ECVisibilitySettingsCampaign",
-                    new XAttribute("visible_in_tactical_view", Bool(vfx.Flags.VisibleInTactical)),
-                    new XAttribute("visible_in_tactical_view_only", Bool(vfx.Flags.OnlyVisibleInTactical))),
+                TacticalVisibility(vfx.Flags),
                 // The scale is already in the transform, so the effect's own scale stays 1.
                 new XElement("ECVFX",
                     new XAttribute("vfx", vfx.VfxString),
-                    new XAttribute("autoplay", Bool(vfx.VfxInfoVersion < 5 || vfx.Autoplay)),
+                    new XAttribute("autoplay", Bool(vfx.VfxInfoVersion is > 1 and < 5 || vfx.Autoplay)),
                     new XAttribute("scale", "1"),
                     new XAttribute("instance_name", vfx.InstanceName)),
                 new XElement("ECCampaignProperties",
@@ -342,9 +339,7 @@ namespace Editors.BmdEditor.Exporting
                 new XElement("ECPolygonMesh",
                     new XAttribute("material", mesh.MaterialString),
                     new XAttribute("affects_mesh_optimization", "false")),
-                new XElement("ECVisibilitySettingsCampaign",
-                    new XAttribute("visible_in_tactical_view", Bool(mesh.Flags.VisibleInTactical)),
-                    new XAttribute("visible_in_tactical_view_only", Bool(mesh.Flags.OnlyVisibleInTactical))),
+                TacticalVisibility(mesh.Flags),
                 PolyMeshCampaignProperties(mesh, visibleInShroud, inheritedCultureMask),
                 BuildTransformElement(t),
                 new XElement("ECPolyline", polyline));
@@ -437,7 +432,7 @@ namespace Editors.BmdEditor.Exporting
                 new XElement("ECCompositeScene",
                     new XAttribute("path", csc.SceneFile),
                     new XAttribute("script_id", csc.ScriptId),
-                    new XAttribute("autoplay", Bool(csc.Version < 3 || csc.Autoplay)),
+                    new XAttribute("autoplay", Bool(csc.Autoplay)),
                     new XAttribute("hold_first_frame", Bool(csc.HoldFirst)),
                     new XAttribute("hold_last_frame", Bool(csc.HoldLast))),
                 new XElement("ECVisibilitySettingsCampaign",

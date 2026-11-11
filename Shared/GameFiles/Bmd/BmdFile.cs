@@ -435,6 +435,8 @@ namespace Shared.GameFormats.Bmd
         public bool EarlyVersionUnknownBool { get; set; }
     }
 
+        /// <summary>Version 1 only.</summary>
+        public float Scale { get; set; } = 1;
     public class VfxInfo
     {
         public ushort VfxInfoVersion { get; set; }
