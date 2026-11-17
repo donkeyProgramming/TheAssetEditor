@@ -6,6 +6,7 @@ namespace GameWorld.Core.SceneNodes
 {
     public abstract class SceneNode : NotifyPropertyChangedImpl, ISceneNode
     {
+        private static readonly ILogger s_logger = Logging.CreateStatic(typeof(SceneNode));
         public string Id { get; set; } = Guid.NewGuid().ToString();
         public SceneManager SceneManager { get; set; }
 
@@ -83,7 +84,7 @@ namespace GameWorld.Core.SceneNodes
 
         public void Print(string context = "")
         {
-            Console.WriteLine($"\nPrinting the scene graph {context}: \n");
+            s_logger.Here().Information($"Printing the scene graph {context}:");
             var root = SceneManager.RootNode;
             PrintChildren(root, 0, this);
         }
@@ -94,7 +95,7 @@ namespace GameWorld.Core.SceneNodes
             if (startNode == node)
                 isStartNodeForPrint = " <--- SELECTED";
 
-            Console.WriteLine($"{new string(' ', indent)} [{node.GetType().Name}]{node.Name}-{node.Id} {isStartNodeForPrint}");
+            s_logger.Here().Information($"{new string(' ', indent)} [{node.GetType().Name}]{node.Name}-{node.Id} {isStartNodeForPrint}");
 
             foreach (var child in node.Children)
                 PrintChildren(child, indent + 3, startNode);

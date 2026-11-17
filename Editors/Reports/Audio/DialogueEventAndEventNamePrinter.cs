@@ -13,6 +13,7 @@ namespace Editors.Reports.Audio
 
     public class DialogueEventAndEventNamePrinter
     {
+        private readonly ILogger _logger = Logging.Create<DialogueEventAndEventNamePrinter>();
         private readonly IAudioRepository _audioRepository;
 
         public DialogueEventAndEventNamePrinter(IAudioRepository audioRepository)
@@ -42,7 +43,7 @@ namespace Editors.Reports.Audio
         private void ProcessItem(HircItem item)
         {
             var itemName = _audioRepository.GetNameFromId(item.Id);
-            Console.WriteLine(itemName);
+            _logger.Here().Information(itemName);
 
             var filePath = $"{DirectoryHelper.ReportsDirectory}\\dialogue_event_and_event_names.txt";
             File.AppendAllText(filePath, itemName + Environment.NewLine);
