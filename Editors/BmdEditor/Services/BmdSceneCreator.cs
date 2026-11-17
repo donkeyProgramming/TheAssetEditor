@@ -1,245 +1,115 @@
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using Microsoft.Xna.Framework;
-using Shared.Core.PackFiles;
-using Shared.Core.PackFiles.Models;
 using Shared.GameFormats.Bmd;
-using Shared.GameFormats.RigidModel;
 using Shared.GameFormats.RigidModel.Transforms;
-using Shared.GameFormats.WsModel;
-using GameWorld.Core.Components;
 using GameWorld.Core.SceneNodes;
-using GameWorld.Core.Services;
 using Serilog;
 using Editors.BmdEditor.ViewModels;
-using Shared.Core.Events;
-using GameWorld.Core.Components.Selection;
 
 namespace Editors.BmdEditor.Services
 {
-    public class BmdSceneCreator
+    /// <summary>
+    /// Builds the 3D view of a BMD: its own elements, plus the content of each BMD it references.
+    ///
+    /// The scene is flat: groups keep an identity ModelMatrix, and each drawn node carries its full
+    /// world matrix (its own placement, times the reference's placement for referenced content).
+    /// Two reasons. Picking tests a mesh against its own ModelMatrix only, ignoring its parents, so
+    /// a prop placed through a parent group would be picked as if it stood at the origin. And the
+    /// scene manager multiplies parent matrices in the wrong order for nested placements
+    /// (parent * child), which only gives the right result while at most one level is non-identity.
+    /// </summary>
+    public class BmdSceneCreator(GameWorld.Core.Components.SceneManager sceneManager, BmdPropMeshCache propMeshCache)
     {
-        private readonly ILogger _logger = Serilog.Log.ForContext<BmdSceneCreator>();
-        private readonly IPackFileService _packFileService;
-        private readonly GameWorld.Core.Components.SceneManager _sceneManager;
-        private readonly GameWorld.Core.SceneNodes.Rmv2ModelNodeLoader _rmv2ModelNodeLoader;
-        private readonly IModelAssetResolver _modelAssetResolver;
-        private readonly ResourceLibrary _resourceLibrary;
-        private readonly GameWorld.Core.Services.MeshBuilderService _meshBuilderService;
+        private readonly ILogger _logger = Log.ForContext<BmdSceneCreator>();
 
-        public readonly Dictionary<BmdElementViewModel, GameWorld.Core.SceneNodes.SceneNode> ComponentNodes = new();
-        private GameWorld.Core.SceneNodes.SceneNode? _currentHighlightedNode;
+        public readonly Dictionary<BmdElementViewModel, SceneNode> ComponentNodes = new();
+        private GroupNode? _bmdRootNode;
+        private SceneNode? _currentHighlightedNode;
 
-        public BmdSceneCreator(
-            IPackFileService packFileService,
-            GameWorld.Core.Components.SceneManager sceneManager,
-            GameWorld.Core.SceneNodes.Rmv2ModelNodeLoader rmv2ModelNodeLoader,
-            ResourceLibrary resourceLibrary,
-            GameWorld.Core.Services.MeshBuilderService meshBuilderService,
-            IModelAssetResolver? modelAssetResolver = null)
+        /// <summary>
+        /// Replaces the scene with one built from <paramref name="bmdFile"/> and its view models
+        /// (<paramref name="allElements"/>, with each referenced BMD's elements under its
+        /// <see cref="BmdInfoViewModel"/>). With <paramref name="reuseLoadedModels"/>, the new
+        /// scene is built before the old one is removed, so prop models both use are not reloaded;
+        /// without it, everything is read from the packs again.
+        /// </summary>
+        public void BuildScene(BmdFile bmdFile, IReadOnlyList<BmdElementViewModel> allElements, bool reuseLoadedModels)
         {
-            _packFileService = packFileService;
-            _sceneManager = sceneManager;
-            _rmv2ModelNodeLoader = rmv2ModelNodeLoader;
-            _modelAssetResolver = modelAssetResolver ?? new ModelAssetResolver(packFileService);
-            _resourceLibrary = resourceLibrary;
-            _meshBuilderService = meshBuilderService;
-        }
-
-        private GroupNode? _propsGroup;
-        private GroupNode? _otherGroup;
-
-        public GroupNode GetPropsGroup() => _propsGroup!;
-        public GroupNode GetOtherGroup() => _otherGroup!;
-
-        public void CreateSceneFromBmd(BmdFile bmdFile, PackFile bmdPackFile)
-        {
-            _logger.Information("Creating 3D scene from BMD file: {FileName}", bmdPackFile.Name);
-
-            try
+            var oldRoot = _bmdRootNode;
+            if (!reuseLoadedModels)
             {
-                ClearScene();
-
-                var rootNode = _sceneManager.RootNode;
-                var bmdRootNode = rootNode.AddObject(new GroupNode("BMD_Scene") { IsEditable = false });
-
-                _propsGroup = bmdRootNode.AddObject(new GroupNode("Props") { IsEditable = false });
-                _otherGroup = bmdRootNode.AddObject(new GroupNode("Other") { IsEditable = false });
-
-                _logger.Information($"BMD scene structure created successfully");
+                RemoveFromScene(oldRoot);
+                oldRoot = null;
+                propMeshCache.RemoveUnused(includeFailures: true);
             }
-            catch (Exception ex)
-            {
-                _logger.Error($"Failed to create BMD scene: {ex.Message}");
-                throw;
-            }
-        }
 
-        public void LoadSceneContent(BmdFile bmdFile, ObservableCollection<BmdElementViewModel> allElements)
-        {
-            if (_propsGroup == null || _otherGroup == null)
-                throw new InvalidOperationException("Scene groups not initialized. Call CreateSceneFromBmd first.");
-
-            try
-            {
-                LoadProps(bmdFile, _propsGroup, allElements.OfType<PropInfoViewModel>().ToList());
-
-                LoadOtherComponents(bmdFile, _otherGroup, allElements);
-
-                _logger.Information($"BMD scene content loaded successfully");
-            }
-            catch (Exception ex)
-            {
-                _logger.Error($"Failed to load BMD scene content: {ex.Message}");
-                throw;
-            }
-        }
-
-        private void ClearScene()
-        {
-            var existingBmdNodes = _sceneManager.RootNode.Children.Where(x => x.Name == "BMD_Scene").ToList();
-            foreach (var node in existingBmdNodes)
-            {
-                _sceneManager.RootNode.Children.Remove(node);
-            }
-            
             ComponentNodes.Clear();
             _currentHighlightedNode = null;
+
+            var root = new GroupNode("BMD_Scene") { IsEditable = false };
+            LoadContent(bmdFile, allElements, root, Matrix.Identity);
+            _bmdRootNode = sceneManager.RootNode.AddObject(root);
+
+            RemoveFromScene(oldRoot);
+            propMeshCache.RemoveUnused(includeFailures: false);
         }
 
-        private void LoadProps(BmdFile bmdFile, GroupNode propsGroup, List<PropInfoViewModel> propViewModels)
+        // RemoveObject, unlike Children.Remove, tells every node it left the scene, which is what
+        // frees their GPU buffers.
+        private void RemoveFromScene(GroupNode? node)
         {
-            _logger.Information($"Loading {bmdFile.PropInfos.Count} props");
-
-            for (int i = 0; i < bmdFile.PropInfos.Count; i++)
-            {
-                var propInfo = bmdFile.PropInfos[i];
-                var propPath = propInfo.Rmv2Path;
-
-                try
-                {
-                    var node = LoadSingleProp(propPath, propInfo, propsGroup, i);
-                    var viewModel = propViewModels[i];
-                    ComponentNodes[viewModel] = node;
-                }
-                catch (Exception ex)
-                {
-                    _logger.Error(ex, $"Failed to load prop at index {i}");
-                }
-            }
+            if (node != null)
+                sceneManager.RootNode.RemoveObject(node);
         }
 
-        private SceneNode LoadSingleProp(string propPath, PropInfo propInfo, GroupNode propsGroup, int instanceIndex)
+        /// <summary>Adds the "Props" and "Other" groups for one BMD file under <paramref name="parent"/>,
+        /// placing everything at <paramref name="world"/>.</summary>
+        private void LoadContent(BmdFile bmdFile, IReadOnlyList<BmdElementViewModel> elements, GroupNode parent, Matrix world)
         {
-            var modelFile = _packFileService.FindFile(propPath);
-            if (modelFile == null)
-            {
-                _logger.Warning($"Prop model file not found: {propPath}");
-                return CreatePlaceholderProp(propPath, propInfo, propsGroup, instanceIndex, "File not found");
-            }
+            var propsGroup = parent.AddObject(new GroupNode("Props") { IsEditable = false });
+            var otherGroup = parent.AddObject(new GroupNode("Other") { IsEditable = false });
 
-            try
-            {
-                var resolvedAsset = _modelAssetResolver.Resolve(modelFile);
-                var rmv = resolvedAsset.Model;
+            LoadComponents(bmdFile.PropInfos, elements.OfType<PropInfoViewModel>().ToList(), propsGroup, "Prop", (c, _, g, i) => CreatePropNode(c, g, i, world));
 
-                var modelFullPath = _packFileService.GetFullPath(resolvedAsset.GeometryFile);
-                var lodNodes = _rmv2ModelNodeLoader.CreateModelNodesFromAsset(resolvedAsset, modelFullPath, false);
-
-                var lodNode = lodNodes.FirstOrDefault();
-                if (lodNode == null)
-                {
-                    return CreatePlaceholderProp(propPath, propInfo, propsGroup, instanceIndex, "No LOD nodes found");
-                }
-
-                // Apply the prop transformation directly to the RMV2 node
-                // This ensures all components (mesh, materials, etc.) are transformed together
-                lodNode.ModelMatrix = propInfo.Transform;
-
-                var propName = $"Prop_{instanceIndex}_{Path.GetFileNameWithoutExtension(propPath)}";
-                var propGroup = propsGroup.AddObject(new GroupNode(propName) { IsEditable = false });
-                propGroup.AddObject(lodNode);
-
-                _logger.Debug($"Loaded prop: {propPath} at {propInfo.Transform.Translation}");
-                return propGroup;
-            }
-            catch (Exception ex)
-            {
-                _logger.Error(ex, $"Error loading prop '{propPath}': {ex.Message}");
-                return CreatePlaceholderProp(propPath, propInfo, propsGroup, instanceIndex, ex.Message);
-            }
-        }
-
-        private SceneNode CreatePlaceholderProp(string propPath, PropInfo propInfo, GroupNode propsGroup, int instanceIndex, string reason)
-        {
-            var propName = $"Prop_{instanceIndex}_{Path.GetFileNameWithoutExtension(propPath)}";
-            var propGroup = propsGroup.AddObject(new GroupNode(propName) { IsEditable = false });
-
-            var placeholderMesh = CreatePlaceholderNode(() => new PropPlaceholderNode("Prop_Placeholder")
-            {
-                FailedModelPath = propPath
-            }, propInfo.Transform);
-            
-            if (placeholderMesh != null)
-            {
-                propGroup.AddObject(placeholderMesh);
-            }
-
-            _logger.Debug($"Created placeholder prop: {propPath} ({reason}) at {propInfo.Transform.Translation}");
-            return propGroup;
-        }
-
-        
-        
-        private void LoadOtherComponents(BmdFile bmdFile, GroupNode otherGroup, ObservableCollection<BmdElementViewModel> allElements)
-        {
-            _logger.Information("Loading other BMD components");
-            
             var componentLoaders = new (string Name, int Count, Action<GroupNode> Loader)[]
             {
-                ("Point_Lights", bmdFile.PointLights.Count, group => LoadComponents(bmdFile.PointLights, group, "PointLight", CreatePointLightPlaceholderNode, allElements.OfType<PointLightInfoViewModel>().ToList())),
-                ("Spot_Lights", bmdFile.SpotLights.Count, group => LoadComponents(bmdFile.SpotLights, group, "SpotLight", CreateSpotLightPlaceholderNode, allElements.OfType<SpotLightInfoViewModel>().ToList())),
-                ("Sounds", bmdFile.Sounds.Count, group => LoadComponents(bmdFile.Sounds, group, "Sound", CreateSoundPlaceholderNode, allElements.OfType<SoundInfoViewModel>().ToList())),
-                ("VFX", bmdFile.VfxInfos.Count, group => LoadComponents(bmdFile.VfxInfos, group, "VFX", CreateVfxPlaceholderNode, allElements.OfType<VfxInfoViewModel>().ToList())),
-                ("CSC", bmdFile.CscInfos.Count, group => LoadComponents(bmdFile.CscInfos, group, "CSC", CreateCscPlaceholderNode, allElements.OfType<CscInfoViewModel>().ToList())),
-                ("Light_Probes", bmdFile.LightProbes.Count, group => LoadComponents(bmdFile.LightProbes, group, "LightProbe", CreateLightProbePlaceholderNode, allElements.OfType<LightProbeInfoViewModel>().ToList())),
-                ("Building_Projectile_Emitters", bmdFile.BuildingProjectileEmitters.Count, group => LoadComponents(bmdFile.BuildingProjectileEmitters, group, "BuildingProjectileEmitter", CreateBuildingProjectileEmitterPlaceholderNode, allElements.OfType<BuildingProjectileEmitterViewModel>().ToList())),
-                ("Terrain_Holes", bmdFile.TerrainHoles.Count, group => LoadComponents(bmdFile.TerrainHoles, group, "TerrainHole", CreateTerrainHoleNode, allElements.OfType<TerrainHoleInfoViewModel>().ToList())),
-                ("PolyMeshes", bmdFile.PolyMeshes.Count, group => LoadComponents(bmdFile.PolyMeshes, group, "PolyMesh", CreatePolyMeshNode, allElements.OfType<PolyMeshInfoViewModel>().ToList())),
-                ("Go_Outlines", bmdFile.GoOutlines.Count, group => LoadComponents(bmdFile.GoOutlines, group, "GoOutline", CreateGoOutlineNode, allElements.OfType<GoOutlineViewModel>().ToList())),
-                ("NonTerrain_Outlines", bmdFile.NonTerrainOutlines.Count, group => LoadComponents(bmdFile.NonTerrainOutlines, group, "NonTerrainOutline", CreateNonTerrainOutlineNode, allElements.OfType<NonTerrainOutlineViewModel>().ToList())),
-                ("Battlefield_Buildings", bmdFile.BattlefieldBuildings.Count, group => LoadComponents(bmdFile.BattlefieldBuildings, group, "BattlefieldBuilding", CreateBattlefieldBuildingPlaceholderNode, allElements.OfType<BattlefieldBuildingViewModel>().ToList())),
-                ("BMD_References", bmdFile.BmdInfos.Count, group => LoadComponents(bmdFile.BmdInfos, group, "BMD", CreateBmdInfoNode, allElements.OfType<BmdInfoViewModel>().ToList())),
-                ("Deployments", bmdFile.Deployments.Count, group => LoadDeploymentComponents(bmdFile.Deployments, group, allElements.OfType<DeploymentViewModel>().ToList()))
+                ("Point_Lights", bmdFile.PointLights.Count, g => LoadComponents(bmdFile.PointLights, elements.OfType<PointLightInfoViewModel>().ToList(), g, "PointLight", (c, _, gg, i) => CreatePointLightNode(c, gg, i, world))),
+                ("Spot_Lights", bmdFile.SpotLights.Count, g => LoadComponents(bmdFile.SpotLights, elements.OfType<SpotLightInfoViewModel>().ToList(), g, "SpotLight", (c, _, gg, i) => CreateSpotLightNode(c, gg, i, world))),
+                ("Sounds", bmdFile.Sounds.Count, g => LoadComponents(bmdFile.Sounds, elements.OfType<SoundInfoViewModel>().ToList(), g, "Sound", (c, _, gg, i) => CreateSoundNode(c, gg, i, world))),
+                ("VFX", bmdFile.VfxInfos.Count, g => LoadComponents(bmdFile.VfxInfos, elements.OfType<VfxInfoViewModel>().ToList(), g, "VFX", (c, _, gg, i) => CreateVfxNode(c, gg, i, world))),
+                ("CSC", bmdFile.CscInfos.Count, g => LoadComponents(bmdFile.CscInfos, elements.OfType<CscInfoViewModel>().ToList(), g, "CSC", (c, _, gg, i) => CreateCscNode(c, gg, i, world))),
+                ("Light_Probes", bmdFile.LightProbes.Count, g => LoadComponents(bmdFile.LightProbes, elements.OfType<LightProbeInfoViewModel>().ToList(), g, "LightProbe", (c, _, gg, i) => CreateLightProbeNode(c, gg, i, world))),
+                ("Building_Projectile_Emitters", bmdFile.BuildingProjectileEmitters.Count, g => LoadComponents(bmdFile.BuildingProjectileEmitters, elements.OfType<BuildingProjectileEmitterViewModel>().ToList(), g, "BuildingProjectileEmitter", (c, _, gg, i) => CreateBuildingProjectileEmitterNode(c, gg, i, world))),
+                ("Terrain_Holes", bmdFile.TerrainHoles.Count, g => LoadComponents(bmdFile.TerrainHoles, elements.OfType<TerrainHoleInfoViewModel>().ToList(), g, "TerrainHole", (c, _, gg, i) => CreateTerrainHoleNode(c, gg, i, world))),
+                ("PolyMeshes", bmdFile.PolyMeshes.Count, g => LoadComponents(bmdFile.PolyMeshes, elements.OfType<PolyMeshInfoViewModel>().ToList(), g, "PolyMesh", (c, _, gg, i) => CreatePolyMeshNode(c, gg, i, world))),
+                ("Go_Outlines", bmdFile.GoOutlines.Count, g => LoadComponents(bmdFile.GoOutlines, elements.OfType<GoOutlineViewModel>().ToList(), g, "GoOutline", (c, _, gg, i) => CreateGoOutlineNode(c, gg, i, world))),
+                ("NonTerrain_Outlines", bmdFile.NonTerrainOutlines.Count, g => LoadComponents(bmdFile.NonTerrainOutlines, elements.OfType<NonTerrainOutlineViewModel>().ToList(), g, "NonTerrainOutline", (c, _, gg, i) => CreateNonTerrainOutlineNode(c, gg, i, world))),
+                ("Battlefield_Buildings", bmdFile.BattlefieldBuildings.Count, g => LoadComponents(bmdFile.BattlefieldBuildings, elements.OfType<BattlefieldBuildingViewModel>().ToList(), g, "BattlefieldBuilding", (c, _, gg, i) => CreateBattlefieldBuildingNode(c, gg, i, world))),
+                ("BMD_References", bmdFile.BmdInfos.Count, g => LoadComponents(bmdFile.BmdInfos, elements.OfType<BmdInfoViewModel>().ToList(), g, "BMD", (c, vm, gg, i) => CreateBmdInfoNode(c, vm, gg, i, world))),
+                ("Deployments", bmdFile.Deployments.Count, g => LoadDeployments(bmdFile.Deployments, elements.OfType<DeploymentViewModel>().ToList(), g, world)),
             };
 
             foreach (var (name, count, loader) in componentLoaders)
             {
-                if (count > 0)
-                {
-                    _logger.Information($"Creating {name} group ({count} items)");
-                    var group = otherGroup.AddObject(new GroupNode($"{name} ({count})") { IsEditable = false });
-                    loader(group);
-                }
+                if (count == 0)
+                    continue;
+                var group = otherGroup.AddObject(new GroupNode($"{name} ({count})") { IsEditable = false });
+                loader(group);
             }
         }
 
-        private void LoadComponents<T, TViewModel>(IList<T> components, GroupNode group, string prefix, Func<T, GroupNode, int, SceneNode> nodeCreator, IList<TViewModel> viewModels)
+        private void LoadComponents<T, TViewModel>(IList<T> components, IList<TViewModel> viewModels, GroupNode group, string prefix,
+            Func<T, TViewModel, GroupNode, int, SceneNode> nodeCreator)
             where TViewModel : BmdElementViewModel
         {
-            _logger.Information($"Loading {components.Count} {prefix} components");
-
-            for (int i = 0; i < components.Count && i < viewModels.Count; i++)
+            for (var i = 0; i < components.Count && i < viewModels.Count; i++)
             {
                 try
                 {
-                    var component = components[i];
-                    var node = nodeCreator(component, group, i);
-                    var viewModel = viewModels[i];
-                    ComponentNodes[viewModel] = node;
+                    ComponentNodes[viewModels[i]] = nodeCreator(components[i], viewModels[i], group, i);
                 }
                 catch (Exception ex)
                 {
@@ -248,248 +118,219 @@ namespace Editors.BmdEditor.Services
             }
         }
 
-        private SceneNode CreateVfxPlaceholderNode(VfxInfo vfxInfo, GroupNode vfxGroup, int index)
+        private static T Placed<T>(T node, Matrix modelMatrix) where T : SceneNode
         {
-            var vfxName = $"VFX_{index}_{Path.GetFileNameWithoutExtension(vfxInfo.VfxString)}";
-            var vfxNode = vfxGroup.AddObject(new GroupNode(vfxName) { IsEditable = false });
-
-            var placeholderMesh = CreatePlaceholderNode(() => new VfxPlaceholderNode("VFX_Placeholder"), vfxInfo.Transform);
-            if (placeholderMesh != null)
-            {
-                vfxNode.AddObject(placeholderMesh);
-            }
-
-            return vfxNode;
+            node.IsEditable = false;
+            node.ModelMatrix = modelMatrix;
+            return node;
         }
 
-        private SceneNode CreateCscPlaceholderNode(CscInfo cscInfo, GroupNode cscGroup, int index)
-        {
-            var cscName = $"CSC_{index}_{Path.GetFileNameWithoutExtension(cscInfo.SceneFile)}";
-            var cscNode = cscGroup.AddObject(new GroupNode(cscName) { IsEditable = false });
+        private static GroupNode AddElementGroup(GroupNode parent, string name) =>
+            parent.AddObject(new GroupNode(name) { IsEditable = false });
 
-            var placeholderMesh = CreatePlaceholderNode(() => new CscPlaceholderNode("CSC_Placeholder"), cscInfo.Transform);
-            if (placeholderMesh != null)
+        private SceneNode CreatePropNode(PropInfo propInfo, GroupNode propsGroup, int index, Matrix world)
+        {
+            var propPath = propInfo.Rmv2Path;
+            var propGroup = AddElementGroup(propsGroup, $"Prop_{index}_{Path.GetFileNameWithoutExtension(propPath)}");
+            var placement = propInfo.Transform * world;
+
+            var model = propMeshCache.Get(propPath);
+            if (model.FailureReason == null)
             {
-                cscNode.AddObject(placeholderMesh);
+                foreach (var mesh in propMeshCache.CreateInstance(model))
+                {
+                    mesh.ModelMatrix = placement;
+                    propGroup.AddObject(mesh);
+                }
+            }
+            else
+            {
+                propGroup.AddObject(Placed(new PropPlaceholderNode("Prop_Placeholder") { FailedModelPath = propPath }, placement));
+                _logger.Debug($"Created placeholder prop: {propPath} ({model.FailureReason})");
             }
 
-            return cscNode;
+            return propGroup;
         }
 
-        private SceneNode CreateLightProbePlaceholderNode(LightProbeInfo lightProbeInfo, GroupNode lightProbeGroup, int index)
+        private static SceneNode CreateVfxNode(VfxInfo vfxInfo, GroupNode group, int index, Matrix world)
         {
-            var lightProbeName = $"LightProbe_{index}";
-            var lightProbeNode = lightProbeGroup.AddObject(new GroupNode(lightProbeName) { IsEditable = false });
+            var node = AddElementGroup(group, $"VFX_{index}_{Path.GetFileNameWithoutExtension(vfxInfo.VfxString)}");
+            node.AddObject(Placed(new VfxPlaceholderNode("VFX_Placeholder"), vfxInfo.Transform * world));
+            return node;
+        }
 
-            var positionVector = new Vector3(lightProbeInfo.Position.X, lightProbeInfo.Position.Y, lightProbeInfo.Position.Z);
-            var transform = Matrix.CreateTranslation(positionVector);
-            var placeholderMesh = CreatePlaceholderNode(() => new LightProbePlaceholderNode("LightProbe_Placeholder")
+        private static SceneNode CreateCscNode(CscInfo cscInfo, GroupNode group, int index, Matrix world)
+        {
+            var node = AddElementGroup(group, $"CSC_{index}_{Path.GetFileNameWithoutExtension(cscInfo.SceneFile)}");
+            node.AddObject(Placed(new CscPlaceholderNode("CSC_Placeholder"), cscInfo.Transform * world));
+            return node;
+        }
+
+        private static SceneNode CreateLightProbeNode(LightProbeInfo lightProbeInfo, GroupNode group, int index, Matrix world)
+        {
+            var node = AddElementGroup(group, $"LightProbe_{index}");
+            var placeholder = new LightProbePlaceholderNode("LightProbe_Placeholder")
             {
                 OuterRadius = lightProbeInfo.OuterRadius,
                 InnerRadius = lightProbeInfo.InnerRadius
-            }, transform);
-            if (placeholderMesh != null)
-            {
-                lightProbeNode.AddObject(placeholderMesh);
-            }
-
-            return lightProbeNode;
+            };
+            node.AddObject(Placed(placeholder, Matrix.CreateTranslation(lightProbeInfo.Position.ToVector3()) * world));
+            return node;
         }
 
-        private SceneNode CreateBuildingProjectileEmitterPlaceholderNode(BuildingProjectileEmitter emitterInfo, GroupNode emitterGroup, int index)
+        private static SceneNode CreateBuildingProjectileEmitterNode(BuildingProjectileEmitter emitterInfo, GroupNode group, int index, Matrix world)
         {
-            var emitterName = $"BuildingProjectileEmitter_{index}";
-            var emitterNode = emitterGroup.AddObject(new GroupNode(emitterName) { IsEditable = false });
-
-            var positionVector = new Vector3(emitterInfo.Location.X, emitterInfo.Location.Y, emitterInfo.Location.Z);
-            var transform = Matrix.CreateTranslation(positionVector);
-            var placeholderMesh = CreatePlaceholderNode(() => new BuildingProjectileEmitterPlaceholderNode("BuildingProjectileEmitter_Placeholder"), transform);
-            if (placeholderMesh != null)
-            {
-                emitterNode.AddObject(placeholderMesh);
-            }
-
-            return emitterNode;
+            var node = AddElementGroup(group, $"BuildingProjectileEmitter_{index}");
+            var position = new Vector3(emitterInfo.Location.X, emitterInfo.Location.Y, emitterInfo.Location.Z);
+            node.AddObject(Placed(new BuildingProjectileEmitterPlaceholderNode("BuildingProjectileEmitter_Placeholder"), Matrix.CreateTranslation(position) * world));
+            return node;
         }
 
-        private SceneNode? CreatePlaceholderNode(Func<SceneNode> nodeFactory, Matrix transform)
+        private static SceneNode CreateTerrainHoleNode(TerrainHoleTriangleInfo terrainHole, GroupNode group, int index, Matrix world)
         {
-            try
-            {
-                var node = nodeFactory();
-                node.IsEditable = false;
-                node.ModelMatrix = transform;
-                return node;
-            }
-            catch (Exception ex)
-            {
-                _logger.Error($"Failed to create placeholder node: {ex.Message}");
-                return null;
-            }
-        }
-
-        private SceneNode CreateTerrainHoleNode(TerrainHoleTriangleInfo terrainHole, GroupNode terrainHoleGroup, int index)
-        {
-            var holeName = $"TerrainHole_{index}";
-            var holeNode = terrainHoleGroup.AddObject(new GroupNode(holeName) { IsEditable = false });
-
-            var placeholderMesh = CreateSpecializedNode(() => new TerrainHoleEdgesNode("TerrainHole_Edges")
+            var node = AddElementGroup(group, $"TerrainHole_{index}");
+            var edges = new TerrainHoleEdgesNode("TerrainHole_Edges")
             {
                 FirstVert = terrainHole.FirstVert,
                 SecondVert = terrainHole.SecondVert,
                 ThirdVert = terrainHole.ThirdVert
-            });
-            if (placeholderMesh != null)
-            {
-                holeNode.AddObject(placeholderMesh);
-            }
-
-            return holeNode;
+            };
+            node.AddObject(Placed(edges, world));
+            return node;
         }
 
-        private SceneNode CreatePolyMeshNode(PolyMeshInfo polyMesh, GroupNode polyMeshGroup, int index)
+        private static SceneNode CreatePolyMeshNode(PolyMeshInfo polyMesh, GroupNode group, int index, Matrix world)
         {
-            var meshName = $"PolyMesh_{index}_{Path.GetFileNameWithoutExtension(polyMesh.MaterialString)}";
-            var meshNode = polyMeshGroup.AddObject(new GroupNode(meshName) { IsEditable = false });
-
-            var placeholderMesh = CreateSpecializedNode(() => new PolyMeshTrianglesNode("PolyMesh_Triangles")
+            var node = AddElementGroup(group, $"PolyMesh_{index}_{Path.GetFileNameWithoutExtension(polyMesh.MaterialString)}");
+            var triangles = new PolyMeshTrianglesNode("PolyMesh_Triangles")
             {
                 Vertices = polyMesh.VertexList,
                 Triangles = polyMesh.TriangleList,
                 MaterialString = polyMesh.MaterialString
-            });
-            if (placeholderMesh != null)
-            {
-                // Version > 3 carries a real transform matrix; version <= 3 has none (vertices are
-                // already baked into world space), matching BmdTerryProjectWriter's understanding.
-                if (polyMesh.PolyMeshVersion > 3)
-                    placeholderMesh.ModelMatrix = polyMesh.Transform;
-                meshNode.AddObject(placeholderMesh);
-            }
+            };
 
-            return meshNode;
+            // Version > 3 carries a real transform matrix; version <= 3 has none (vertices are
+            // already baked into world space), matching BmdTerryProjectWriter's understanding.
+            var local = polyMesh.PolyMeshVersion > 3 ? polyMesh.Transform : Matrix.Identity;
+            node.AddObject(Placed(triangles, local * world));
+            return node;
         }
 
-        private SceneNode CreateBattlefieldBuildingPlaceholderNode(BattlefieldBuilding buildingInfo, GroupNode buildingsGroup, int index)
+        private static SceneNode CreateBattlefieldBuildingNode(BattlefieldBuilding buildingInfo, GroupNode group, int index, Matrix world)
         {
-            var buildingName = $"BattlefieldBuilding_{index}_{buildingInfo.BuildingId}";
-            var buildingNode = buildingsGroup.AddObject(new GroupNode(buildingName) { IsEditable = false });
-
-            var placeholderMesh = CreatePlaceholderNode(() => new BattlefieldBuildingPlaceholderNode("BattlefieldBuilding_Placeholder"), buildingInfo.Transform);
-            if (placeholderMesh != null)
-            {
-                buildingNode.AddObject(placeholderMesh);
-            }
-
-            return buildingNode;
+            var node = AddElementGroup(group, $"BattlefieldBuilding_{index}_{buildingInfo.BuildingId}");
+            node.AddObject(Placed(new BattlefieldBuildingPlaceholderNode("BattlefieldBuilding_Placeholder"), buildingInfo.Transform * world));
+            return node;
         }
 
-        private SceneNode? CreateSpecializedNode(Func<SceneNode> nodeFactory)
+        private static SceneNode CreateGoOutlineNode(GoOutline outlineInfo, GroupNode group, int index, Matrix world)
         {
-            try
-            {
-                var node = nodeFactory();
-                node.IsEditable = false;
-                return node;
-            }
-            catch (Exception ex)
-            {
-                _logger.Error($"Failed to create specialized node: {ex.Message}");
-                return null;
-            }
+            var node = AddElementGroup(group, $"GoOutline_{index}");
+            node.AddObject(Placed(new GoOutlineNode("GoOutline_Placeholder") { VertexList = outlineInfo.VertexList }, world));
+            return node;
         }
 
-        private SceneNode CreateGoOutlineNode(GoOutline outlineInfo, GroupNode goOutlineGroup, int index)
+        private static SceneNode CreateNonTerrainOutlineNode(NonTerrainOutline outlineInfo, GroupNode group, int index, Matrix world)
         {
-            var outlineName = $"GoOutline_{index}";
-            var outlineNode = goOutlineGroup.AddObject(new GroupNode(outlineName) { IsEditable = false });
-
-            var placeholderMesh = CreateSpecializedNode(() => new GoOutlineNode("GoOutline_Placeholder")
-            {
-                VertexList = outlineInfo.VertexList
-            });
-            if (placeholderMesh != null)
-            {
-                outlineNode.AddObject(placeholderMesh);
-            }
-
-            return outlineNode;
+            var node = AddElementGroup(group, $"NonTerrainOutline_{index}");
+            node.AddObject(Placed(new NonTerrainOutlineNode("NonTerrainOutline_Placeholder") { VertexList = outlineInfo.VertexList }, world));
+            return node;
         }
 
-        private SceneNode CreateNonTerrainOutlineNode(NonTerrainOutline outlineInfo, GroupNode nonTerrainOutlineGroup, int index)
+        private static SceneNode CreatePointLightNode(PointLightInfo pointLightInfo, GroupNode group, int index, Matrix world)
         {
-            var outlineName = $"NonTerrainOutline_{index}";
-            var outlineNode = nonTerrainOutlineGroup.AddObject(new GroupNode(outlineName) { IsEditable = false });
-
-            var placeholderMesh = CreateSpecializedNode(() => new NonTerrainOutlineNode("NonTerrainOutline_Placeholder")
-            {
-                VertexList = outlineInfo.VertexList
-            });
-            if (placeholderMesh != null)
-            {
-                outlineNode.AddObject(placeholderMesh);
-            }
-
-            return outlineNode;
+            var node = AddElementGroup(group, $"PointLight_{index}");
+            var sphere = new PointLightSphereNode("PointLight_Sphere") { Radius = pointLightInfo.Radius };
+            node.AddObject(Placed(sphere, Matrix.CreateTranslation(pointLightInfo.Position.ToVector3()) * world));
+            return node;
         }
 
-        private SceneNode CreatePointLightPlaceholderNode(PointLightInfo pointLightInfo, GroupNode pointLightGroup, int index)
+        private static SceneNode CreateSpotLightNode(SpotLightInfo spotLightInfo, GroupNode group, int index, Matrix world)
         {
-            var pointLightName = $"PointLight_{index}";
-            var pointLightNode = pointLightGroup.AddObject(new GroupNode(pointLightName) { IsEditable = false });
-
-            var positionVector = new Vector3(pointLightInfo.Position.X, pointLightInfo.Position.Y, pointLightInfo.Position.Z);
-            var transform = Matrix.CreateTranslation(positionVector);
-            var placeholderMesh = CreateSpecializedNode(() => new PointLightSphereNode("PointLight_Sphere")
-            {
-                Radius = pointLightInfo.Radius
-            });
-            if (placeholderMesh != null)
-            {
-                placeholderMesh.ModelMatrix = transform;
-                pointLightNode.AddObject(placeholderMesh);
-            }
-
-            return pointLightNode;
-        }
-
-        private SceneNode CreateSpotLightPlaceholderNode(SpotLightInfo spotLightInfo, GroupNode spotLightGroup, int index)
-        {
-            var spotLightName = $"SpotLight_{index}";
-            var spotLightNode = spotLightGroup.AddObject(new GroupNode(spotLightName) { IsEditable = false });
-
-            var placeholderMesh = CreateSpecializedNode(() => new SpotLightConeNode("SpotLight_Cone")
+            var node = AddElementGroup(group, $"SpotLight_{index}");
+            var cone = new SpotLightConeNode("SpotLight_Cone")
             {
                 Length = spotLightInfo.Length,
                 InnerAngle = spotLightInfo.InnerAngleRadians,
                 OuterAngle = spotLightInfo.OuterAngleRadians,
                 Position = spotLightInfo.Position,
                 Quaternion = new Quaternion(spotLightInfo.QuartX, spotLightInfo.QuartY, spotLightInfo.QuartZ, spotLightInfo.QuartW)
-            });
-            if (placeholderMesh != null)
-            {
-                spotLightNode.AddObject(placeholderMesh);
-            }
-
-            return spotLightNode;
+            };
+            node.AddObject(Placed(cone, world));
+            return node;
         }
 
-        private SceneNode CreateSoundPlaceholderNode(SoundInfo soundInfo, GroupNode soundGroup, int index)
+        private static SceneNode CreateSoundNode(SoundInfo soundInfo, GroupNode group, int index, Matrix world)
         {
-            var soundName = $"Sound_{index}_{Path.GetFileNameWithoutExtension(soundInfo.SoundString)}";
-            var soundNode = soundGroup.AddObject(new GroupNode(soundName) { IsEditable = false });
-
-            var placeholderMesh = CreateSpecializedNode(() => new SoundPlaceholderNode("Sound_Placeholder")
+            var node = AddElementGroup(group, $"Sound_{index}_{Path.GetFileNameWithoutExtension(soundInfo.SoundString)}");
+            var placeholder = new SoundPlaceholderNode("Sound_Placeholder")
             {
                 SoundType = soundInfo.TypeString,
                 CoordList = soundInfo.CoordList
-            });
-            if (placeholderMesh != null)
+            };
+            node.AddObject(Placed(placeholder, world));
+            return node;
+        }
+
+        /// <summary>The reference's own marker, plus (for a reference the loader parsed) the
+        /// referenced file's content placed at the reference's transform. The loader only parses
+        /// references one level deep, so nested references show just their marker.</summary>
+        private SceneNode CreateBmdInfoNode(BmdInfo bmdInfo, BmdInfoViewModel viewModel, GroupNode group, int index, Matrix world)
+        {
+            var name = Path.GetFileNameWithoutExtension(bmdInfo.BmdString);
+            var node = AddElementGroup(group, $"BMD_{index}_{name}");
+            var placement = bmdInfo.Transform * world;
+            node.AddObject(Placed(new BmdInfoPlaceholderNode("BMD_Info_Placeholder") { ReferencedBmdPath = bmdInfo.BmdString }, placement));
+
+            if (viewModel.ReferencedBmd != null)
             {
-                soundNode.AddObject(placeholderMesh);
+                var contentGroup = AddElementGroup(node, $"Referenced_Content_{name}");
+                LoadContent(viewModel.ReferencedBmd, viewModel.ChildElements, contentGroup, placement);
             }
 
-            return soundNode;
+            return node;
+        }
+
+        private void LoadDeployments(List<Deployment> deployments, List<DeploymentViewModel> viewModels, GroupNode group, Matrix world)
+        {
+            for (var i = 0; i < deployments.Count && i < viewModels.Count; i++)
+            {
+                try
+                {
+                    var deployment = deployments[i];
+                    var deploymentNode = AddElementGroup(group, $"Deployment_{i}_{deployment.Category}");
+                    ComponentNodes[viewModels[i]] = deploymentNode;
+
+                    var zoneViewModels = viewModels[i].Children.OfType<DeploymentZoneViewModel>().ToList();
+                    for (var z = 0; z < deployment.DeploymentZones.Count && z < zoneViewModels.Count; z++)
+                    {
+                        var zone = deployment.DeploymentZones[z];
+                        var zoneNode = AddElementGroup(deploymentNode, $"DeploymentZone_{z}");
+                        ComponentNodes[zoneViewModels[z]] = zoneNode;
+
+                        var regionViewModels = zoneViewModels[z].Children.OfType<DeploymentZoneRegionViewModel>().ToList();
+                        for (var r = 0; r < zone.DeploymentZoneRegions.Count && r < regionViewModels.Count; r++)
+                        {
+                            var region = zone.DeploymentZoneRegions[r];
+                            var regionNode = AddElementGroup(zoneNode, $"DeploymentZoneRegion_{region.Id}");
+                            ComponentNodes[regionViewModels[r]] = regionNode;
+
+                            var boundaryViewModels = regionViewModels[r].Children.OfType<BoundaryViewModel>().ToList();
+                            for (var b = 0; b < region.Boundaries.Count && b < boundaryViewModels.Count; b++)
+                            {
+                                var boundary = region.Boundaries[b];
+                                var boundaryNode = AddElementGroup(regionNode, $"Boundary_{b}_{boundary.BoundaryType}");
+                                boundaryNode.AddObject(Placed(new BoundaryNode("Boundary_Placeholder") { PointList = boundary.PointList }, world));
+                                ComponentNodes[boundaryViewModels[b]] = boundaryNode;
+                            }
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    _logger.Warning($"Failed to create deployment component at index {i}: {ex.Message}");
+                }
+            }
         }
 
         /// <summary>
@@ -500,6 +341,8 @@ namespace Editors.BmdEditor.Services
         /// see the corresponding CreateXxxNode above), so this mirrors that per-type. Sound and
         /// world-space (PolyMeshVersion &lt;= 3) polymesh visuals need no push at all - they read
         /// straight from the same array the view model already mutated in place.
+        /// Only the open file's own elements are edited, so the placements here are the file's own,
+        /// without a reference's transform.
         /// </summary>
         public void RefreshVisual(BmdElementViewModel element)
         {
@@ -509,7 +352,9 @@ namespace Editors.BmdEditor.Services
             switch (element)
             {
                 case PropInfoViewModel propVm:
-                    SetChildModelMatrix(node, propVm.Prop.Transform);
+                    // Every child is either one mesh of the model, or the one placeholder.
+                    foreach (var child in node.Children)
+                        child.ModelMatrix = propVm.Prop.Transform;
                     break;
 
                 case VfxInfoViewModel vfxVm:
@@ -570,7 +415,7 @@ namespace Editors.BmdEditor.Services
         public void HighlightComponent(BmdElementViewModel component)
         {
             ClearHighlight();
-            
+
             if (ComponentNodes.TryGetValue(component, out var node))
             {
                 // TODO: Implement actual highlighting logic
@@ -584,7 +429,6 @@ namespace Editors.BmdEditor.Services
             }
         }
 
-        
         public void ClearHighlight()
         {
             if (_currentHighlightedNode != null)
@@ -594,262 +438,5 @@ namespace Editors.BmdEditor.Services
                 _currentHighlightedNode = null;
             }
         }
-
-        private SceneNode CreateBmdInfoNode(BmdInfo bmdInfo, GroupNode bmdGroup, int index)
-        {
-            var bmdName = $"BMD_{index}_{Path.GetFileNameWithoutExtension(bmdInfo.BmdString)}";
-            var bmdNode = bmdGroup.AddObject(new GroupNode(bmdName) { IsEditable = false });
-
-            var placeholderMesh = CreatePlaceholderNode(() => new BmdInfoPlaceholderNode("BMD_Info_Placeholder")
-            {
-                ReferencedBmdPath = bmdInfo.BmdString
-            }, bmdInfo.Transform);
-            if (placeholderMesh != null)
-            {
-                bmdNode.AddObject(placeholderMesh);
-            }
-
-            try
-            {
-                LoadReferencedBmd(bmdInfo.BmdString, bmdNode, index);
-            }
-            catch (Exception ex)
-            {
-                _logger.Warning($"Failed to load referenced BMD '{bmdInfo.BmdString}' at index {index}: {ex.Message}");
-            }
-
-            return bmdNode;
-        }
-
-        private void LoadReferencedBmd(string bmdPath, GroupNode parentNode, int parentIndex)
-        {
-            if (string.IsNullOrEmpty(bmdPath))
-            {
-                _logger.Warning($"Empty BMD path for parent index {parentIndex}");
-                return;
-            }
-
-            // Prevent infinite recursion - this will be handled differently with direct references
-
-            var referencedBmdFile = _packFileService.FindFile(bmdPath);
-            if (referencedBmdFile == null)
-            {
-                _logger.Warning($"Referenced BMD file not found: {bmdPath}");
-                return;
-            }
-
-            try
-            {
-                var referencedBmdData = referencedBmdFile.DataSource.ReadData();
-                var referencedBmd = BmdParser.Parse(referencedBmdData);
-
-                // Reference will be stored by BmdElementLoader after view model is created
-
-                var referencedBmdGroup = parentNode.AddObject(new GroupNode($"Referenced_Content_{Path.GetFileNameWithoutExtension(bmdPath)}") { IsEditable = false });
-
-                if (referencedBmd.PropInfos.Count > 0)
-                {
-                    var propsGroup = referencedBmdGroup.AddObject(new GroupNode($"Referenced_Props ({referencedBmd.PropInfos.Count})") { IsEditable = false });
-                    LoadReferencedProps(referencedBmd, propsGroup, parentIndex);
-                }
-
-                // Load other components from the referenced BMD (excluding BmdInfos to prevent infinite recursion)
-                LoadReferencedOtherComponents(referencedBmd, referencedBmdGroup, parentIndex);
-
-                _logger.Information($"Successfully loaded referenced BMD: {bmdPath}");
-            }
-            catch (Exception ex)
-            {
-                _logger.Error($"Failed to parse referenced BMD '{bmdPath}': {ex.Message}");
-            }
-        }
-
-        private void LoadReferencedProps(BmdFile referencedBmd, GroupNode propsGroup, int parentIndex)
-        {
-            _logger.Information($"Loading {referencedBmd.PropInfos.Count} props from referenced BMD");
-
-            for (int i = 0; i < referencedBmd.PropInfos.Count; i++)
-            {
-                try
-                {
-                    var propInfo = referencedBmd.PropInfos[i];
-                    LoadSingleProp(propInfo.Rmv2Path, propInfo, propsGroup, parentIndex * 1000 + i); // Use unique index to avoid conflicts
-                }
-                catch (Exception ex)
-                {
-                    _logger.Error($"Failed to load referenced prop at index {i}: {ex.Message}");
-                }
-            }
-        }
-
-        private void LoadReferencedOtherComponents(BmdFile referencedBmd, GroupNode otherGroup, int parentIndex)
-        {
-            _logger.Information("Loading other components from referenced BMD");
-
-            var componentLoaders = new (string Name, int Count, Action<GroupNode> Loader)[]
-            {
-                ("Referenced_Point_Lights", referencedBmd.PointLights.Count, group => LoadReferencedComponents(referencedBmd.PointLights, group, "Referenced_PointLight", CreatePointLightPlaceholderNode, parentIndex)),
-                ("Referenced_Spot_Lights", referencedBmd.SpotLights.Count, group => LoadReferencedComponents(referencedBmd.SpotLights, group, "Referenced_SpotLight", CreateSpotLightPlaceholderNode, parentIndex)),
-                ("Referenced_Sounds", referencedBmd.Sounds.Count, group => LoadReferencedComponents(referencedBmd.Sounds, group, "Referenced_Sound", CreateSoundPlaceholderNode, parentIndex)),
-                ("Referenced_VFX", referencedBmd.VfxInfos.Count, group => LoadReferencedComponents(referencedBmd.VfxInfos, group, "Referenced_VFX", CreateVfxPlaceholderNode, parentIndex)),
-                ("Referenced_CSC", referencedBmd.CscInfos.Count, group => LoadReferencedComponents(referencedBmd.CscInfos, group, "Referenced_CSC", CreateCscPlaceholderNode, parentIndex)),
-                ("Referenced_Light_Probes", referencedBmd.LightProbes.Count, group => LoadReferencedComponents(referencedBmd.LightProbes, group, "Referenced_LightProbe", CreateLightProbePlaceholderNode, parentIndex)),
-                ("Referenced_Building_Projectile_Emitters", referencedBmd.BuildingProjectileEmitters.Count, group => LoadReferencedComponents(referencedBmd.BuildingProjectileEmitters, group, "Referenced_BuildingProjectileEmitter", CreateBuildingProjectileEmitterPlaceholderNode, parentIndex)),
-                ("Referenced_Terrain_Holes", referencedBmd.TerrainHoles.Count, group => LoadReferencedComponents(referencedBmd.TerrainHoles, group, "Referenced_TerrainHole", CreateTerrainHoleNode, parentIndex)),
-                ("Referenced_PolyMeshes", referencedBmd.PolyMeshes.Count, group => LoadReferencedComponents(referencedBmd.PolyMeshes, group, "Referenced_PolyMesh", CreatePolyMeshNode, parentIndex)),
-                ("Referenced_Go_Outlines", referencedBmd.GoOutlines.Count, group => LoadReferencedComponents(referencedBmd.GoOutlines, group, "Referenced_GoOutline", CreateGoOutlineNode, parentIndex)),
-                ("Referenced_NonTerrain_Outlines", referencedBmd.NonTerrainOutlines.Count, group => LoadReferencedComponents(referencedBmd.NonTerrainOutlines, group, "Referenced_NonTerrainOutline", CreateNonTerrainOutlineNode, parentIndex)),
-                ("Referenced_Battlefield_Buildings", referencedBmd.BattlefieldBuildings.Count, group => LoadReferencedComponents(referencedBmd.BattlefieldBuildings, group, "Referenced_BattlefieldBuilding", CreateBattlefieldBuildingPlaceholderNode, parentIndex))
-                // Note: We intentionally exclude BmdInfos here to prevent infinite recursion
-            };
-
-            foreach (var (name, count, loader) in componentLoaders)
-            {
-                if (count > 0)
-                {
-                    _logger.Information($"Creating {name} group ({count} items)");
-                    var group = otherGroup.AddObject(new GroupNode($"{name} ({count})") { IsEditable = false });
-                    loader(group);
-                }
-            }
-        }
-
-        private void LoadReferencedComponents<T>(IList<T> components, GroupNode group, string prefix, Func<T, GroupNode, int, SceneNode> nodeCreator, int parentIndex)
-        {
-            _logger.Information($"Loading {components.Count} {prefix} components from referenced BMD");
-
-            for (int i = 0; i < components.Count; i++)
-            {
-                try
-                {
-                    var component = components[i];
-                    var node = nodeCreator(component, group, parentIndex * 1000 + i); // Use unique index to avoid conflicts
-                    // Reference will be stored by BmdElementLoader after view model is created
-                }
-                catch (Exception ex)
-                {
-                    _logger.Warning($"Failed to create referenced {prefix} component at index {i}: {ex.Message}");
-                }
-            }
-        }
-
-        private void LoadDeploymentComponents(List<Deployment> deployments, GroupNode deploymentGroup, List<DeploymentViewModel> deploymentViewModels)
-        {
-            _logger.Information($"Loading {deployments.Count} deployment components");
-
-            for (int i = 0; i < deployments.Count && i < deploymentViewModels.Count; i++)
-            {
-                try
-                {
-                    var deployment = deployments[i];
-                    var deploymentNode = CreateDeploymentNode(deployment, deploymentGroup, i);
-                    var viewModel = deploymentViewModels[i];
-                    ComponentNodes[viewModel] = deploymentNode;
-
-                    LoadDeploymentZones(deployment.DeploymentZones, deploymentNode, viewModel.Children.OfType<DeploymentZoneViewModel>().ToList());
-                }
-                catch (Exception ex)
-                {
-                    _logger.Warning($"Failed to create deployment component at index {i}: {ex.Message}");
-                }
-            }
-        }
-
-        private void LoadDeploymentZones(List<DeploymentZone> deploymentZones, SceneNode deploymentNode, List<DeploymentZoneViewModel> zoneViewModels)
-        {
-            for (int i = 0; i < deploymentZones.Count && i < zoneViewModels.Count; i++)
-            {
-                try
-                {
-                    var deploymentZone = deploymentZones[i];
-                    var zoneNode = CreateDeploymentZoneNode(deploymentZone, deploymentNode, i);
-                    var zoneViewModel = zoneViewModels[i];
-                    ComponentNodes[zoneViewModel] = zoneNode;
-
-                    LoadDeploymentZoneRegions(deploymentZone.DeploymentZoneRegions, zoneNode, zoneViewModel.Children.OfType<DeploymentZoneRegionViewModel>().ToList());
-                }
-                catch (Exception ex)
-                {
-                    _logger.Warning($"Failed to create deployment zone component at index {i}: {ex.Message}");
-                }
-            }
-        }
-
-        private void LoadDeploymentZoneRegions(List<DeploymentZoneRegion> deploymentZoneRegions, SceneNode zoneNode, List<DeploymentZoneRegionViewModel> regionViewModels)
-        {
-            for (int i = 0; i < deploymentZoneRegions.Count && i < regionViewModels.Count; i++)
-            {
-                try
-                {
-                    var deploymentZoneRegion = deploymentZoneRegions[i];
-                    var regionNode = CreateDeploymentZoneRegionNode(deploymentZoneRegion, zoneNode, i);
-                    var regionViewModel = regionViewModels[i];
-                    ComponentNodes[regionViewModel] = regionNode;
-
-                    LoadBoundaries(deploymentZoneRegion.Boundaries, regionNode, regionViewModel.Children.OfType<BoundaryViewModel>().ToList());
-                }
-                catch (Exception ex)
-                {
-                    _logger.Warning($"Failed to create deployment zone region component at index {i}: {ex.Message}");
-                }
-            }
-        }
-
-        private void LoadBoundaries(List<Boundary> boundaries, SceneNode regionNode, List<BoundaryViewModel> boundaryViewModels)
-        {
-            for (int i = 0; i < boundaries.Count && i < boundaryViewModels.Count; i++)
-            {
-                try
-                {
-                    var boundary = boundaries[i];
-                    var boundaryNode = CreateBoundaryNode(boundary, regionNode, i);
-                    var boundaryViewModel = boundaryViewModels[i];
-                    ComponentNodes[boundaryViewModel] = boundaryNode;
-                }
-                catch (Exception ex)
-                {
-                    _logger.Warning($"Failed to create boundary component at index {i}: {ex.Message}");
-                }
-            }
-        }
-
-        private SceneNode CreateDeploymentNode(Deployment deployment, GroupNode deploymentGroup, int index)
-        {
-            var deploymentName = $"Deployment_{index}_{deployment.Category}";
-            var deploymentNode = deploymentGroup.AddObject(new GroupNode(deploymentName) { IsEditable = false });
-            return deploymentNode;
-        }
-
-        private SceneNode CreateDeploymentZoneNode(DeploymentZone deploymentZone, SceneNode deploymentNode, int index)
-        {
-            var zoneName = $"DeploymentZone_{index}";
-            var zoneNode = deploymentNode.AddObject(new GroupNode(zoneName) { IsEditable = false });
-            return zoneNode;
-        }
-
-        private SceneNode CreateDeploymentZoneRegionNode(DeploymentZoneRegion deploymentZoneRegion, SceneNode zoneNode, int index)
-        {
-            var regionName = $"DeploymentZoneRegion_{deploymentZoneRegion.Id}";
-            var regionNode = zoneNode.AddObject(new GroupNode(regionName) { IsEditable = false });
-            return regionNode;
-        }
-
-        private SceneNode CreateBoundaryNode(Boundary boundary, SceneNode regionNode, int index)
-        {
-            var boundaryName = $"Boundary_{index}_{boundary.BoundaryType}";
-            var boundaryNode = regionNode.AddObject(new GroupNode(boundaryName) { IsEditable = false });
-
-            var boundaryMesh = CreateSpecializedNode(() => new BoundaryNode("Boundary_Placeholder")
-            {
-                PointList = boundary.PointList
-            });
-            if (boundaryMesh != null)
-            {
-                boundaryNode.AddObject(boundaryMesh);
-            }
-
-            return boundaryNode;
-        }
-
     }
 }
