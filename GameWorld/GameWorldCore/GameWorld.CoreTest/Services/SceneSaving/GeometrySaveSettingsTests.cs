@@ -139,5 +139,38 @@ namespace GameWorld.Core.Test.Services.SceneSaving
                 Assert.That(settings.LodSettingsPerLod[i].OptimizeVertex, Is.EqualTo(shouldBeOptimized[i]));
             }
         }
+
+        [TestCase]
+        public void RememberAsDefaults_NextSettingsForSameGameStartFromThem()
+        {
+            var gameSettings = new ApplicationSettingsService(GameTypeEnum.Warhammer3);
+            var first = new GeometrySaveSettings(gameSettings)
+            {
+                GeometryOutputType = GeometryStrategy.Rmv6,
+                MaterialOutputType = MaterialStrategy.None,
+                LodGenerationMethod = LodStrategy.Lod0ForAll,
+                OnlySaveVisible = false,
+            };
+            first.RememberAsDefaults();
+
+            var next = new GeometrySaveSettings(gameSettings);
+
+            Assert.That(next.GeometryOutputType, Is.EqualTo(GeometryStrategy.Rmv6));
+            Assert.That(next.MaterialOutputType, Is.EqualTo(MaterialStrategy.None));
+            Assert.That(next.LodGenerationMethod, Is.EqualTo(LodStrategy.Lod0ForAll));
+            Assert.That(next.OnlySaveVisible, Is.False);
+        }
+
+        [TestCase]
+        public void RememberAsDefaults_OtherGamesKeepTheirOwnDefaults()
+        {
+            var gameSettings = new ApplicationSettingsService(GameTypeEnum.Warhammer3);
+            new GeometrySaveSettings(gameSettings) { MaterialOutputType = MaterialStrategy.None }.RememberAsDefaults();
+
+            gameSettings.CurrentSettings.CurrentGame = GameTypeEnum.Warhammer2;
+            var wh2 = new GeometrySaveSettings(gameSettings);
+
+            Assert.That(wh2.MaterialOutputType, Is.EqualTo(MaterialStrategy.WsModel_Warhammer2));
+        }
     }
 }
