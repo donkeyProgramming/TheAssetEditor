@@ -61,8 +61,11 @@ namespace Shared.Core.PackFiles.Serialization
                     if (output.Header.HasIndexWithTimeStamp)
                         reader.ReadUInt32();
 
+                    // PFH5 and PFH6 index entries both carry an is-compressed byte before the name.
+                    // Skipping it for PFH6 shifted every later entry by a byte, giving garbage
+                    // names, sizes and offsets for PFH6 packs (Pharaoh DLC, #259 / #360).
                     var isCompressed = false;
-                    if (headerVersion == PackFileVersion.PFH5)
+                    if (headerVersion == PackFileVersion.PFH5 || headerVersion == PackFileVersion.PFH6)
                         isCompressed = reader.ReadBoolean();
 
                     var fullPackedFileName = IOFunctions.ReadZeroTerminatedAscii(reader, fileNameBuffer).ToLower();
