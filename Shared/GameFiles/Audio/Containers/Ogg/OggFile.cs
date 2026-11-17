@@ -8,7 +8,6 @@ namespace Shared.GameFormats.Audio.Containers.Ogg
     {
         private const int OggDefaultSerialNumber = 1;
         private const int VorbisHeaderPacketCount = 3;
-        private const double MillisecondsPerSecond = 1000.0;
         private const int OggMaxSegmentSize = 255;
         private const int OggCrcFieldByteOffset = 22;
         private const int OggCrc32TableSize = 256;
@@ -35,13 +34,7 @@ namespace Shared.GameFormats.Audio.Containers.Ogg
             for (var packetIndex = 0; packetIndex < vorbisAudio.Packets.Count; packetIndex++)
             {
                 var packetData = vorbisAudio.Packets[packetIndex].Data;
-                long nextTimestampMilliseconds;
-                if (packetIndex + 1 < vorbisAudio.Packets.Count)
-                    nextTimestampMilliseconds = vorbisAudio.Packets[packetIndex + 1].TimestampMilliseconds;
-                else
-                    nextTimestampMilliseconds = (long)Math.Round(vorbisAudio.SampleCount * MillisecondsPerSecond / vorbisAudio.SampleRate);
-
-                var granulePosition = (long)Math.Round(nextTimestampMilliseconds * vorbisAudio.SampleRate / MillisecondsPerSecond);
+                var granulePosition = vorbisAudio.Packets[packetIndex].GranulePosition;
                 if (packetIndex == vorbisAudio.Packets.Count - 1)
                     granulePosition = vorbisAudio.SampleCount;
 
