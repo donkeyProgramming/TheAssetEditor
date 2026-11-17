@@ -199,7 +199,19 @@
                 VirtualizingPanel.IsVirtualizing="True"
                 VirtualizingPanel.VirtualizationMode="Recycling"
                 VirtualizingPanel.IsVirtualizingWhenGrouping="True"
-                PreviewMouseDoubleClick="OnNodeDoubleClick">
+                PreviewMouseDoubleClick="OnNodeDoubleClick"
+                PreviewMouseRightButtonDown="OnNodeRightClick">
+
+                <TreeView.ContextMenu>
+                    <ContextMenu>
+                        <MenuItem
+                            Header="Export as .wav..."
+                            Command="{Binding ExportSelectedAsWavCommand}"/>
+                        <MenuItem
+                            Header="Export as .wem..."
+                            Command="{Binding ExportSelectedAsWemCommand}"/>
+                    </ContextMenu>
+                </TreeView.ContextMenu>
 
                 <TreeView.ItemContainerStyle>
                     <Style 

@@ -1,6 +1,7 @@
 ﻿using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
+using System.IO;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using CommunityToolkit.Mvvm.ComponentModel;
@@ -9,7 +10,11 @@ using Editors.Audio.Shared.GameInformation.Warhammer3;
 using Editors.Audio.Shared.Storage;
 using Editors.Audio.Shared.Wwise.HircExploration;
 using Editors.Audio.WaveformVisualiser.Presentation;
+using NAudio.Vorbis;
+using NAudio.Wave;
+using NAudio.Wave.SampleProviders;
 using Shared.Core.ToolCreation;
+using Shared.GameFormats.Audio.Containers.Ogg;
 using Shared.GameFormats.Wwise.Enums;
 using Shared.GameFormats.Wwise.Hirc;
 using Shared.GameFormats.Wwise.Hirc.V112;
@@ -30,7 +35,10 @@ namespace Editors.Audio.AudioExplorer
 
         [ObservableProperty] private ExplorerListSelectionFilter _explorerFilter;
         [ObservableProperty] private ObservableCollection<HircTreeNode> _treeList = [];
-        [ObservableProperty] private HircTreeNode _selectedNode;
+        [ObservableProperty]
+        [NotifyCanExecuteChangedFor(nameof(ExportSelectedAsWavCommand))]
+        [NotifyCanExecuteChangedFor(nameof(ExportSelectedAsWemCommand))]
+        private HircTreeNode _selectedNode;
         [ObservableProperty] private string _selectedNodeText = string.Empty; 
         [ObservableProperty] private string _wwiseObjectLabel;
         [ObservableProperty] private ObservableCollection<AudioLanguage> _languages = [];
@@ -193,6 +201,67 @@ namespace Editors.Audio.AudioExplorer
 
             if (await LoadWaveformForNodeAsync(node))
                 WaveformVisualiserViewModel.PlayCommand.Execute(null);
+        }
+
+        private bool CanExportSelected() => IsPlayableNode(SelectedNode);
+
+        [RelayCommand(CanExecute = nameof(CanExportSelected))]
+        private void ExportSelectedAsWav() => ExportSelected(".wav", "WAV audio (*.wav)|*.wav", (wemBytes, path) => File.WriteAllBytes(path, ConvertWemToWav(wemBytes)));
+
+        /// <summary>Decodes a Vorbis WEM to a 16-bit PCM WAV.</summary>
+        public static byte[] ConvertWemToWav(byte[] wemBytes)
+        {
+            var oggBytes = OggFile.CreateFromWemBytes(wemBytes).WriteData();
+            using var oggStream = new MemoryStream(oggBytes, writable: false);
+            using var reader = new VorbisWaveReader(oggStream);
+            using var wavStream = new MemoryStream();
+            WaveFileWriter.WriteWavFileToStream(wavStream, new SampleToWaveProvider16(reader));
+            return wavStream.ToArray();
+        }
+
+        [RelayCommand(CanExecute = nameof(CanExportSelected))]
+        private void ExportSelectedAsWem() => ExportSelected(".wem", "Wwise audio (*.wem)|*.wem", (wemBytes, path) => File.WriteAllBytes(path, wemBytes));
+
+        private void ExportSelected(string extension, string filter, Action<byte[], string> write)
+        {
+            var node = SelectedNode;
+            var source = CreateWemWaveformSource(node);
+            if (source == null)
+            {
+                var missingWemId = GetMissingWemId(node);
+                _logger.Here().Warning(missingWemId != null
+                    ? $"Audio Explorer: cannot export '{node?.DisplayName}', {missingWemId}.wem was not found in the loaded game files or packs"
+                    : $"Audio Explorer: no audio found to export for '{node?.DisplayName}'");
+                return;
+            }
+
+            var dialog = new Microsoft.Win32.SaveFileDialog
+            {
+                FileName = GetWemSourceId(node)?.ToString() ?? "sound",
+                DefaultExt = extension,
+                Filter = filter,
+            };
+            if (dialog.ShowDialog() != true)
+                return;
+
+            try
+            {
+                write(source.LoadBytes(), dialog.FileName);
+                _logger.Here().Information($"Audio Explorer: exported '{node.DisplayName}' to '{dialog.FileName}'");
+            }
+            catch (Exception e)
+            {
+                _logger.Here().Error($"Audio Explorer: failed to export '{node.DisplayName}' to '{dialog.FileName}': {e.Message}");
+            }
+        }
+
+        private static uint? GetWemSourceId(HircTreeNode node)
+        {
+            if (node?.Hirc is ICAkSound sound)
+                return sound.GetSourceId();
+            if (node?.Hirc is ICAkMusicTrack musicTrack)
+                return musicTrack.GetChildren().FirstOrDefault();
+            return null;
         }
 
         /// <summary>The streamed WEM id the node refers to when that WEM cannot be found, otherwise null.</summary>
