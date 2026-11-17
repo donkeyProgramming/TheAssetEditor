@@ -57,7 +57,7 @@ namespace AssetEditor.ViewModels
             ToolsFactory = toolFactory;
 
             ApplicationTitle = $"AssetEditor v{VersionChecker.GetCurrentVersion()}";
-            CurrentGame = $"Current Game: {GameInformationDatabase.GetGameById(applicationSettingsService.CurrentSettings.CurrentGame).DisplayName}";
+            CurrentGame = $"Current game: {GameInformationDatabase.GetGameById(applicationSettingsService.CurrentSettings.CurrentGame).DisplayName}";
         }
 
         void OpenFile(PackFile file) => _uiCommandFactory.Create<OpenEditorCommand>().Execute(file);
@@ -89,7 +89,7 @@ namespace AssetEditor.ViewModels
 
         private void SetStatusBarEditablePackFile(PackFileContainerSetAsMainEditableEvent e)
         {
-            EditablePackFile = e.Container != null ? $"Editable Pack: {e.Container.Name}" : "Editable Pack: None Set";
+            EditablePackFile = e.Container != null ? $"Active project: {e.Container.Name}" : "Active project: None set";
         }
     }
 }
