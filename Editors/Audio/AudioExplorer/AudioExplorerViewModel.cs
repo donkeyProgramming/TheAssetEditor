@@ -161,9 +161,7 @@ namespace Editors.Audio.AudioExplorer
 
             var missingWemId = GetMissingWemId(selectedNode);
             if (missingWemId != null)
-                SelectedNodeText = $"WEM not found: {missingWemId}.wem is not in the loaded game files or packs.
-
-" + SelectedNodeText;
+                SelectedNodeText = $"WEM not found: {missingWemId}.wem is not in the loaded game files or packs.\n\n" + SelectedNodeText;
 
             _ = LoadWaveformForNodeAsync(selectedNode);
         }
