@@ -66,6 +66,7 @@ namespace Editors.BmdEditor.Services
             ColorScale = 1,
             HeightMode = DefaultHeightMode,
             Flags = AllSeasonsFlags(),
+            PdlcMask = AllDlcs,
         };
 
         public static SpotLightInfo CreateSpotLight() => new()
@@ -85,6 +86,7 @@ namespace Editors.BmdEditor.Services
             Falloff = 1,
             HeightMode = DefaultHeightMode,
             Flags = AllSeasonsFlags(),
+            PdlcMask = AllDlcs,
         };
 
         public static SoundInfo CreateSound(string soundString) => new()
@@ -138,6 +140,7 @@ namespace Editors.BmdEditor.Services
             SceneFile = sceneFile,
             Transform = Matrix.Identity,
             HeightMode = DefaultHeightMode,
+            PdlcMask = AllDlcs,
             Autoplay = true,
             VisibleWithoutShroud = true,
         };

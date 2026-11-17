@@ -63,8 +63,16 @@
         <li><b>Composite scene</b>: browse for a <code>.csc</code>.</li>
         <li><b>Point light</b>, <b>Spot light</b>, <b>Light probe</b>, <b>Terrain hole</b>: added directly.</li>
     </ul>
-    <p>New elements are visible in every season, and new props, VFX, sounds and composite scenes
-    are not restricted to any culture.</p>
+    <p>New elements are visible in every season, and new props, decals, VFX, lights, sounds and
+    composite scenes are given every DLC in their DLC mask (see below).</p>
+
+    <h3>The DLC mask</h3>
+    <p>Props, decals, VFX, point and spot lights, sounds and composite scenes each store a DLC
+    mask: the Assembly Kit's <code>pdlc_mask</code>, which Terry sets from an entity's DLC mask
+    setting. Vanilla doesn't use it. Every vanilla prefab leaves it at every DLC, and the
+    campaign map's <code>global_props.bin</code> leaves it at 1.</p>
+    <p>It is not a culture mask. Culture belongs to a whole BMD. When one BMD references another,
+    the reference's campaign type mask carries the culture of the file it points to.</p>
 
     <h2>Deleting elements</h2>
     <p>Select an element of one of the ten editable types and select <b>Delete</b> on the toolbar,
