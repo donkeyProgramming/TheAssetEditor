@@ -64,7 +64,7 @@ namespace Editors.KitbasherEditor.ViewModels.SceneExplorer.Nodes.Rmv2
         void SetDefaultParentMatrix()
         {
             _weightedMaterial.ParentMatrixIndex = -1;
-            ParentMatrixIndex.Value = _weightedMaterial.MatrixIndex;
+            ParentMatrixIndex.Value = _weightedMaterial.ParentMatrixIndex;
         }
     }
 }

@@ -35,7 +35,7 @@ namespace Shared.GameFormats.RigidModel.Vertex.Formats
                 Uv = VertexLoadHelper.CreatVector2HalfFloat(vertexData.uv).ToVector2(),
                 Uv1 = VertexLoadHelper.CreatVector2HalfFloat(vertexData.uvExtra).ToVector2(),
 
-                Colour = VertexLoadHelper.CreatVector4Byte(vertexData.RGBA).ToVector4(),
+                Colour = VertexLoadHelper.CreateColourFromBytes(vertexData.RGBA),
 
                 BoneIndex = new byte[0],
                 BoneWeight = new float[0]
@@ -49,11 +49,8 @@ namespace Shared.GameFormats.RigidModel.Vertex.Formats
             if (vertex.WeightCount != 0 || vertex.BoneIndex.Length != 0 || vertex.BoneWeight.Length != 0)
                 throw new Exception($"Unexpected vertex weights for {Type}");
 
-            byte[] position;
-            if(rmvVersion != RmvVersionEnum.RMV2_V8)
-                position = VertexLoadHelper.CreatePositionVector4ExtraPrecision(vertex.Position);
-            else
-                position = VertexLoadHelper.CreatePositionVector4(vertex.Position);
+            var half = VertexLoadHelper.CreatePositionForVersion(vertex.Position, rmvVersion, isSkinned: false);
+            var position = VertexLoadHelper.CreatePositionVector4(new Vector4(half.X, half.Y, half.Z, half.W));
 
             var typedVert = new Data()
             {
@@ -66,9 +63,15 @@ namespace Shared.GameFormats.RigidModel.Vertex.Formats
                 tangent = VertexLoadHelper.CreateNormalVector3(SwapXZ(vertex.Tangent)),
                 biNormal = VertexLoadHelper.CreateNormalVector3(SwapXZ(vertex.BiNormal)),
 
-                RGBA = VertexLoadHelper.CreatePositionVector4(vertex.Position),
+                RGBA = ColourToBytes(vertex.Colour),
             };
             return ByteHelper.GetBytes(typedVert);
+        }
+
+        private static byte[] ColourToBytes(Vector4 colour)
+        {
+            var bytes = VertexLoadHelper.CreateColourBytes(colour);
+            return [bytes.X, bytes.Y, bytes.Z, bytes.W];
         }
 
         private static Vector3 SwapXZ(Vector3 v) => new Vector3(v.Z, v.Y, v.X);

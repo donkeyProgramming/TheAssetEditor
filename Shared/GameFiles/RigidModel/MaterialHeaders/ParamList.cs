@@ -57,7 +57,7 @@ namespace Shared.GameFormats.RigidModel.MaterialHeaders
         public ParamList<T> Clone()
         { 
             var output = new ParamList<T>();
-            output.Values = output.Values.ToList();
+            output.Values = Values.ToList();
             return output;
         }
 

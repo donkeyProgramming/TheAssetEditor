@@ -14,7 +14,8 @@ namespace Shared.GameFormats.RigidModel.Vertex.Formats
             return (uint)ByteHelper.GetSize<Data>();
         }
 
-        public bool ForceComputeNormals => true;
+        // The file stores a float3 normal per vertex, so there is nothing to recompute
+        public bool ForceComputeNormals => false;
 
         public CommonVertex[] ReadArray(RmvVersionEnum rmvVersion, byte[] buffer, int offset, int vertexSize, int vertexCount)
         {
@@ -30,8 +31,8 @@ namespace Shared.GameFormats.RigidModel.Vertex.Formats
 
             var vertex = new CommonVertex()
             {
-                Position = VertexLoadHelper.CreatVector4Float(vertexData.position).ToVector4(1),
-                Normal = Vector3.UnitY, //VertexLoadHelper.CreatVector4Byte(vertexData.normal).ToVector3(),
+                Position = new Vector4(ReadVector3(vertexData.position), 1),
+                Normal = ReadVector3(vertexData.normal),
                 BiNormal = Vector3.UnitY,
                 Tangent = Vector3.UnitY,
 
@@ -48,16 +49,25 @@ namespace Shared.GameFormats.RigidModel.Vertex.Formats
 
         public byte[] Write(RmvVersionEnum rmvVersion, CommonVertex vertex)
         {
-            throw new NotImplementedException();
+            var typedVert = new Data()
+            {
+                position = WriteVector3(new Vector3(vertex.Position.X, vertex.Position.Y, vertex.Position.Z)),
+                normal = WriteVector3(vertex.Normal),
+            };
+            return ByteHelper.GetBytes(typedVert);
         }
+
+        static Vector3 ReadVector3(byte[] data) => new(BitConverter.ToSingle(data, 0), BitConverter.ToSingle(data, 4), BitConverter.ToSingle(data, 8));
+
+        static byte[] WriteVector3(Vector3 value) => [.. BitConverter.GetBytes(value.X), .. BitConverter.GetBytes(value.Y), .. BitConverter.GetBytes(value.Z)];
 
         public struct Data //24
         {
             [MarshalAs(UnmanagedType.ByValArray, SizeConst = 12)]
-            public byte[] position;     // 4 x 3
+            public byte[] position;     // float3, not scaled by a W
 
             [MarshalAs(UnmanagedType.ByValArray, SizeConst = 12)]
-            public byte[] normal;     // 4 x 3
+            public byte[] normal;       // float3
         }
     }
 }
