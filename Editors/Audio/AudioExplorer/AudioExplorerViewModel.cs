@@ -25,6 +25,7 @@ namespace Editors.Audio.AudioExplorer
 
     public partial class AudioExplorerViewModel : ObservableObject, IEditorInterface
     {
+        private readonly ILogger _logger = Logging.Create<AudioExplorerViewModel>();
         private readonly IAudioRepository _audioRepository;
 
         [ObservableProperty] private ExplorerListSelectionFilter _explorerFilter;
@@ -158,16 +159,57 @@ namespace Editors.Audio.AudioExplorer
                 }
             }
 
+            var missingWemId = GetMissingWemId(selectedNode);
+            if (missingWemId != null)
+                SelectedNodeText = $"WEM not found: {missingWemId}.wem is not in the loaded game files or packs.
+
+" + SelectedNodeText;
+
             _ = LoadWaveformForNodeAsync(selectedNode);
         }
 
-        private async Task LoadWaveformForNodeAsync(HircTreeNode node)
+        private async Task<bool> LoadWaveformForNodeAsync(HircTreeNode node)
         {
             var source = CreateWemWaveformSource(node);
             if (source == null)
-                return;
+                return false;
 
             await WaveformVisualiserViewModel.LoadFromWemSourceAsync(source, node.DisplayName);
+            return true;
+        }
+
+        /// <summary>True when the node is a sound or music track, i.e. something that can be played.</summary>
+        public static bool IsPlayableNode(HircTreeNode node) => node?.Hirc is ICAkSound || node?.Hirc is ICAkMusicTrack;
+
+        public async Task PlayNodeAsync(HircTreeNode node)
+        {
+            if (!IsPlayableNode(node))
+                return;
+
+            var missingWemId = GetMissingWemId(node);
+            if (missingWemId != null)
+            {
+                _logger.Here().Warning($"Audio Explorer: cannot play '{node.DisplayName}', {missingWemId}.wem was not found in the loaded game files or packs");
+                return;
+            }
+
+            if (await LoadWaveformForNodeAsync(node))
+                WaveformVisualiserViewModel.PlayCommand.Execute(null);
+        }
+
+        /// <summary>The streamed WEM id the node refers to when that WEM cannot be found, otherwise null.</summary>
+        private uint? GetMissingWemId(HircTreeNode node)
+        {
+            uint? sourceId = null;
+            if (node?.Hirc is ICAkSound sound && sound.GetStreamType() != AKBKSourceType.Data_BNK)
+                sourceId = sound.GetSourceId();
+            else if (node?.Hirc is ICAkMusicTrack musicTrack)
+                sourceId = musicTrack.GetChildren().FirstOrDefault();
+
+            if (sourceId == null || sourceId == 0)
+                return null;
+
+            return _audioRepository.FindWem(sourceId.Value.ToString()) == null ? sourceId : null;
         }
 
         public void PreloadWaveformsForNodes(IReadOnlyCollection<HircTreeNode> nodes)

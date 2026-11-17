@@ -19,7 +19,10 @@ namespace Editors.Audio.AudioExplorer
                 treeViewItem.DataContext is not HircTreeNode node)
                 return;
 
-            if (node.IsExpanded)
+            // Sounds have nothing to expand, so double-click plays them instead
+            if (AudioExplorerViewModel.IsPlayableNode(node) && DataContext is AudioExplorerViewModel viewModel)
+                _ = viewModel.PlayNodeAsync(node);
+            else if (node.IsExpanded)
                 node.IsExpanded = false;
             else
                 AudioExplorerViewModel.AutoExpandNode(node);
