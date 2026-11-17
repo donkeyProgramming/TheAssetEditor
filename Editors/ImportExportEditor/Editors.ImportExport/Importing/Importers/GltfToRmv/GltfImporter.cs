@@ -166,7 +166,9 @@ namespace Editors.ImportExport.Importing.Importers.GltfToRmv
             if (nodeSearchResult == null || !nodeSearchResult.Any())
                 return "";
 
-            var skeletonName = nodeSearchResult.First().Name.TrimStart(Value.ToCharArray());
+            // Strip the prefix itself. TrimStart(chars) also ate leading name letters from the
+            // set "/skeleton", turning e.g. "snake01" into "ake01".
+            var skeletonName = nodeSearchResult.First().Name.Substring(Value.Length);
 
             return skeletonName.ToLower();
         }
