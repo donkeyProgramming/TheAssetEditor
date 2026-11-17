@@ -31,13 +31,14 @@ namespace Shared.GameFormats.Wwise.Wem.V132.Encoding
             uint waveSurroundChannelMask = 63;
             uint waveFullSurroundChannelMask = 255;
 
+            OggVorbisEncoderFixes.EnsureApplied();
             var info = OggVorbisEncoder.VorbisInfo.InitVariableBitRate(channels, sampleRate, EncodingSettings.Quality);
             var comments = new OggVorbisEncoder.Comments();
             var identificationPacket = OggVorbisEncoder.HeaderPacketBuilder.BuildInfoPacket(info);
             var booksPacket = OggVorbisEncoder.HeaderPacketBuilder.BuildBooksPacket(info);
             OggVorbisEncoder.HeaderPacketBuilder.BuildCommentsPacket(comments);
 
-            var processingState = OggVorbisEncoder.ProcessingState.Create(info);
+            var processingState = OggVorbisEncoderFixes.CreateProcessingState(info);
             var sampleCount = perChannelSamples[0].Length;
             for (var readOffset = 0; readOffset < sampleCount; readOffset += EncodingWriteBufferSize)
             {
