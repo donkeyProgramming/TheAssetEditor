@@ -287,11 +287,18 @@ namespace Shared.Core.Misc
             return new Vector3((float)heading, (float)attitude, (float)bank);
         }
 
+        /// <summary>
+        /// Rotation in degrees about the X, Y and Z axes, in that component order.
+        /// QuaternionToEuler returns (heading = about Y, attitude = about Z, bank = about X),
+        /// which UIs showed as X/Y/Z, so a value typed into Z ended up as a rotation about X.
+        /// </summary>
         public static Vector3 QuaternionToEulerDegree(Quaternion quaternions)
         {
             var euler = QuaternionToEuler(quaternions);
-            var degrees = new Vector3(MathHelper.ToDegrees(euler.X), MathHelper.ToDegrees(euler.Y), MathHelper.ToDegrees(euler.Z));
-            return degrees;
+            var heading = MathHelper.ToDegrees(euler.X);
+            var attitude = MathHelper.ToDegrees(euler.Y);
+            var bank = MathHelper.ToDegrees(euler.Z);
+            return new Vector3(bank, heading, attitude);
         }
 
         public static Quaternion EulerToQuaternions(double heading, double attitude, double bank)
@@ -312,12 +319,13 @@ namespace Shared.Core.Misc
             return new Quaternion((float)x, (float)y, (float)z, (float)w);
         }
 
+        /// <summary>Inverse of <see cref="QuaternionToEulerDegree"/>: degrees about the X, Y and Z axes.</summary>
         public static Quaternion EulerDegreesToQuaternion(Vector3 eulerDegrees)
         {
-            var x = MathHelper.ToRadians(eulerDegrees.X);
-            var y = MathHelper.ToRadians(eulerDegrees.Y);
-            var z = MathHelper.ToRadians(eulerDegrees.Z);
-            return EulerToQuaternions(x, y, z);
+            var bank = MathHelper.ToRadians(eulerDegrees.X);
+            var heading = MathHelper.ToRadians(eulerDegrees.Y);
+            var attitude = MathHelper.ToRadians(eulerDegrees.Z);
+            return EulerToQuaternions(heading, attitude, bank);
         }
 
 
