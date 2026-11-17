@@ -400,7 +400,8 @@ namespace Shared.GameFormats.Bmd
         public bool ApplyToPropsOrReceiveDecal { get; set; }
         public bool RenderAboveSnow { get; set; }
         public string HeightMode { get; set; } = string.Empty;
-        public byte[] CultureMask { get; set; } = new byte[8];
+        /// <summary>The kit's pdlc_mask: 1 plus the bits of the DLCs the entity's ECDLCMask names (all bits in a Terry-compiled prefab). Not a culture mask: culture belongs to the whole BMD.</summary>
+        public ulong PdlcMask { get; set; }
         public bool CastsShadow { get; set; }
         public bool NoCulling { get; set; }
         public bool HasHeightPatch { get; set; }
@@ -441,7 +442,8 @@ namespace Shared.GameFormats.Bmd
         public BmdComponentFlags Flags { get; set; } = new();
 
         public string HeightMode { get; set; } = string.Empty;
-        public byte[] CultureMask { get; set; } = new byte[8];
+        /// <summary>The kit's pdlc_mask: 1 plus the bits of the DLCs the entity's ECDLCMask names (all bits in a Terry-compiled prefab). Not a culture mask: culture belongs to the whole BMD.</summary>
+        public ulong PdlcMask { get; set; }
         public bool Autoplay { get; set; }
         public bool VisibleInShroud { get; set; }
         public int ParentId { get; set; }
@@ -636,7 +638,8 @@ namespace Shared.GameFormats.Bmd
         public byte ClampToSurface { get; set; }
         public string HeightMode { get; set; } = string.Empty;
         public ulong CampaignTypeMask { get; set; }
-        public CultureMask CultureMask { get; set; }
+        /// <summary>The kit's pdlc_mask: 1 plus the bits of the DLCs the entity's ECDLCMask names (all bits in a Terry-compiled prefab). Not a culture mask: culture belongs to the whole BMD.</summary>
+        public ulong PdlcMask { get; set; }
         public RmvVector3 DirectionVector { get; set; }
         public RmvVector3 UpVector { get; set; }
         public string Scope { get; set; } = string.Empty;

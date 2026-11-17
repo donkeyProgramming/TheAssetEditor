@@ -719,15 +719,9 @@ namespace Shared.GameFormats.Bmd
                 prop.HeightMode = ReadString();
             
             if (prop.PropInfoVersion > 15)
-                prop.CultureMask = _reader.ReadBytes(8);
+                prop.PdlcMask = _reader.ReadUInt64();
             else if (prop.PropInfoVersion > 10)
-            {
-                prop.CultureMask = new byte[8];
-                var oldMask = _reader.ReadBytes(4);
-                Array.Copy(oldMask, prop.CultureMask, 4);
-            }
-            else
-                prop.CultureMask = new byte[8]; //no culture mask in the binary
+                prop.PdlcMask = _reader.ReadUInt32();
 
             if (prop.PropInfoVersion == 9)
                 prop.DecalApplyToRigids = _reader.ReadByte() != 0;
@@ -798,13 +792,9 @@ namespace Shared.GameFormats.Bmd
             if (vfx.VfxInfoVersion > 3)
             {
                 if (vfx.VfxInfoVersion > 6)
-                    vfx.CultureMask = _reader.ReadBytes(8);
+                    vfx.PdlcMask = _reader.ReadUInt64();
                 else
-                {
-                    vfx.CultureMask = new byte[8];
-                    var oldMask = _reader.ReadBytes(4);
-                    Array.Copy(oldMask, vfx.CultureMask, 4);
-                }
+                    vfx.PdlcMask = _reader.ReadUInt32();
             }
             if (vfx.VfxInfoVersion > 4)
             {
@@ -1147,9 +1137,9 @@ namespace Shared.GameFormats.Bmd
                 sound.CampaignTypeMask = _reader.ReadUInt32();
 
             if (sound.Version > 6)
-                sound.CultureMask = ReadCultureMask();
+                sound.PdlcMask = _reader.ReadUInt64();
             else if (sound.Version > 5)
-                sound.CultureMask = ReadCultureMask(4);
+                sound.PdlcMask = _reader.ReadUInt32();
             if (sound.Version > 7)
             {
                 sound.DirectionVector = ReadRmvVector3();

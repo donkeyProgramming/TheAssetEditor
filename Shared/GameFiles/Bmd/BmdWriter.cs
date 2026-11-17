@@ -684,9 +684,9 @@ namespace Shared.GameFormats.Bmd
                 WriteString(writer, prop.HeightMode);
 
             if (prop.PropInfoVersion > 15)
-                WriteFixedBytes(writer, prop.CultureMask, 8);
+                writer.Write(prop.PdlcMask);
             else if (prop.PropInfoVersion > 10)
-                writer.Write(prop.CultureMask, 0, 4);
+                writer.Write((uint)prop.PdlcMask);
 
             if (prop.PropInfoVersion == 9)
                 writer.Write(Bool(prop.DecalApplyToRigids));
@@ -753,9 +753,9 @@ namespace Shared.GameFormats.Bmd
             if (vfx.VfxInfoVersion > 3)
             {
                 if (vfx.VfxInfoVersion > 6)
-                    WriteFixedBytes(writer, vfx.CultureMask, 8);
+                    writer.Write(vfx.PdlcMask);
                 else
-                    writer.Write(vfx.CultureMask, 0, 4);
+                    writer.Write((uint)vfx.PdlcMask);
             }
             if (vfx.VfxInfoVersion > 4)
             {
@@ -1016,9 +1016,9 @@ namespace Shared.GameFormats.Bmd
             else if (sound.Version > 4)
                 writer.Write((uint)sound.CampaignTypeMask);
             if (sound.Version > 6)
-                WriteCultureMask(writer, sound.CultureMask);
+                writer.Write(sound.PdlcMask);
             else if (sound.Version > 5)
-                WriteCultureMask(writer, sound.CultureMask, 4);
+                writer.Write((uint)sound.PdlcMask);
             if (sound.Version > 7)
             {
                 WriteVector3(writer, sound.DirectionVector);
