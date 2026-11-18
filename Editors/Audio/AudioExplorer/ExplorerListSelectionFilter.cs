@@ -19,7 +19,8 @@ namespace Editors.Audio.AudioExplorer
             ExplorerList = new FilterCollection<ExplorerListItem>([])
             {
                 // Plain substring match anywhere in the name. Display names contain "(bank.bnk)", which
-                // as a regex would stop matching the item the user just picked.
+                // as a regex would stop matching the item the user just picked, and a half-typed "(" is not a valid regex.
+                IsPlainTextFilter = true,
                 SearchFilter = (value, _) => MatchesFilter(value, ExplorerList.Filter)
             };
 
