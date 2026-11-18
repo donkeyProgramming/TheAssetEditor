@@ -21,16 +21,23 @@ namespace Shared.CoreLog
         {
             if (logEvent.Level >= _logLevel)
             {
-                if (_queue.Count == 30)
-                    _queue.Dequeue();
-
                 using var _textWriter = new StringWriter();
                 _formater.Format(logEvent, _textWriter);
-               
-                _queue.Enqueue(_textWriter.ToString());
+
+                // Background work (the startup audio cache build) logs while the UI thread does
+                lock (_queue)
+                {
+                    if (_queue.Count == 30)
+                        _queue.Dequeue();
+                    _queue.Enqueue(_textWriter.ToString());
+                }
             }
         }
 
-        public List<string> GetHistory() => _queue.ToList();
+        public List<string> GetHistory()
+        {
+            lock (_queue)
+                return _queue.ToList();
+        }
     }
 }
