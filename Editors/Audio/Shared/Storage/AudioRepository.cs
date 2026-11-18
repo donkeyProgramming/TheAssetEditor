@@ -658,7 +658,7 @@ namespace Editors.Audio.Shared.Storage
 
         private static bool HasRelevantAudioFiles(List<IPackFileContainer> containers)
         {
-            return containers.Any(container => container.SearchFiles(null, [".bnk", ".dat", ".wwiseids"]).Count != 0);
+            return containers.Any(container => AudioCacheHelper.FindAudioDataFiles(container).Count != 0);
         }
 
         private static bool IsLanguageIncluded(string bnkPath, List<string> languages)

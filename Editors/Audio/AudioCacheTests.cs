@@ -265,6 +265,35 @@ namespace Test.Audio
         }
 
         [Test]
+        public void ComputeFingerprint_IgnoresFilesWhoseExtensionOnlyContainsDat()
+        {
+            // The real containers match extensions as substrings, so ".dat" also returns terrain ".data" files.
+            static IPackFileContainer CreateSubstringMatchingContainer(bool includeHeightMap)
+            {
+                var files = new List<(string Path, PackFile File)> { (@"audio\wwise\test.bnk", PackFile.CreateFromBytes("test.bnk", CreateBnk(1, 1, 0))) };
+                if (includeHeightMap)
+                    files.Add((@"terrain\tiles\battle\tile\hf_height_map.data", PackFile.CreateFromBytes("hf_height_map.data", [1, 2, 3, 4])));
+
+                var container = new Mock<IPackFileContainer>();
+                container.SetupGet(x => x.IsCaPackFile).Returns(true);
+                container.SetupGet(x => x.ContainerType).Returns(PackFileContainerType.Normal);
+                container
+                    .Setup(x => x.SearchFiles(It.IsAny<string?>(), It.IsAny<IReadOnlyList<string>?>()))
+                    .Returns((string? _, IReadOnlyList<string>? extensions) => files
+                        .Where(x => extensions == null || extensions.Any(extension => x.File.Name.Contains(extension, StringComparison.OrdinalIgnoreCase)))
+                        .ToList());
+                return container.Object;
+            }
+
+            var helper = CreateAudioCacheHelper();
+            var withoutHeightMap = helper.ComputeFingerprint([CreateSubstringMatchingContainer(false)], "game files");
+            var withHeightMap = helper.ComputeFingerprint([CreateSubstringMatchingContainer(true)], "game files");
+
+            Assert.That(withHeightMap, Is.EqualTo(withoutHeightMap));
+            Assert.That(AudioCacheHelper.FindAudioDataFiles(CreateSubstringMatchingContainer(true)).Select(x => x.Path), Is.EqualTo(new[] { @"audio\wwise\test.bnk" }));
+        }
+
+        [Test]
         public void ComputeFingerprint_MissingBackingFile()
         {
             var packParent = new PackedFileSourceParent { FilePath = Path.Combine(_tempDir, "missing.pack") };

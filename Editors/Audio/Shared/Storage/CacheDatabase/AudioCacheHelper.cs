@@ -40,7 +40,7 @@ namespace Editors.Audio.Shared.Storage.CacheDatabase
             for (var containerIndex = 0; containerIndex < containers.Count; containerIndex++)
             {
                 var container = containers[containerIndex];
-                var relevantFiles = container.SearchFiles(null, [".bnk", ".dat", ".wwiseids"]);
+                var relevantFiles = FindAudioDataFiles(container);
                 foreach (var (path, file) in relevantFiles.OrderBy(x => x.Path, StringComparer.OrdinalIgnoreCase))
                 {
                     Append(hash, $"{containerIndex}|{container.IsCaPackFile}|{path}|");
@@ -156,6 +156,16 @@ namespace Editors.Audio.Shared.Storage.CacheDatabase
                     _logger.Here().Warning($"Failed to remove stale audio cache '{cacheFile}': {exception.Message}");
                 }
             }
+        }
+
+        private static readonly string[] s_audioDataExtensions = [".bnk", ".dat", ".wwiseids"];
+
+        // SearchFiles matches extensions as substrings (".dat" also returns ".data" terrain files), so re-check the real extension.
+        internal static List<(string Path, PackFile File)> FindAudioDataFiles(IPackFileContainer container)
+        {
+            return container.SearchFiles(null, s_audioDataExtensions)
+                .Where(x => s_audioDataExtensions.Any(extension => x.Path.EndsWith(extension, StringComparison.OrdinalIgnoreCase)))
+                .ToList();
         }
 
         private static void Append(IncrementalHash hash, string value)
