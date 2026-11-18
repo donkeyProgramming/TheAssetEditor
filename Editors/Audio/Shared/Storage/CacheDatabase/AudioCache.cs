@@ -53,11 +53,17 @@ namespace Editors.Audio.Shared.Storage.CacheDatabase
             try
             {
                 using var transaction = connection.BeginTransaction();
+
+                // Keeping the HIRC indexes up to date row by row makes the insert several times slower
+                // (WH3: ~60s vs ~10s for 3.5M rows), so drop them for the bulk insert and rebuild them once at the end.
+                var deferredIndexes = DropIndexes(connection, transaction, ["Hircs", "Didx"]);
+
                 InsertCacheInfo(connection, transaction, fingerprint);
                 var (bnkCount, hircCount) = IndexAndInsertBnks(bnkContainers, isGameFiles, bnkLoader, connection, transaction);
 
                 InsertDatData(connection, transaction, datData);
 
+                RecreateIndexes(connection, transaction, deferredIndexes);
                 transaction.Commit();
                 s_logger.Here().Information($"Saved audio cache '{DbFilePath}' with {bnkCount} banks and {hircCount} HIRC references");
             }
@@ -369,6 +375,43 @@ namespace Editors.Audio.Shared.Storage.CacheDatabase
                 return null;
 
             return string.IsNullOrWhiteSpace(builder.DataSource) ? null : builder.DataSource;
+        }
+
+        private static List<string> DropIndexes(SqliteConnection connection, SqliteTransaction transaction, string[] tableNames)
+        {
+            var indexes = new List<(string Name, string Sql)>();
+            using (var command = connection.CreateCommand())
+            {
+                command.Transaction = transaction;
+                command.CommandText = $"SELECT name, sql FROM sqlite_master WHERE type = 'index' AND sql IS NOT NULL AND tbl_name IN ({string.Join(", ", tableNames.Select((_, i) => $"$table{i}"))})";
+                for (var i = 0; i < tableNames.Length; i++)
+                    command.Parameters.AddWithValue($"$table{i}", tableNames[i]);
+
+                using var reader = command.ExecuteReader();
+                while (reader.Read())
+                    indexes.Add((reader.GetString(0), reader.GetString(1)));
+            }
+
+            foreach (var (name, _) in indexes)
+            {
+                using var command = connection.CreateCommand();
+                command.Transaction = transaction;
+                command.CommandText = $"DROP INDEX \"{name.Replace("\"", "\"\"")}\"";
+                command.ExecuteNonQuery();
+            }
+
+            return indexes.Select(x => x.Sql).ToList();
+        }
+
+        private static void RecreateIndexes(SqliteConnection connection, SqliteTransaction transaction, List<string> indexSql)
+        {
+            foreach (var sql in indexSql)
+            {
+                using var command = connection.CreateCommand();
+                command.Transaction = transaction;
+                command.CommandText = sql;
+                command.ExecuteNonQuery();
+            }
         }
 
         private static void InsertCacheInfo(SqliteConnection connection, SqliteTransaction transaction, string fingerprint)

@@ -265,6 +265,39 @@ namespace Test.Audio
         }
 
         [Test]
+        public void Save_RecreatesHircAndDidxIndexesAfterBulkInsert()
+        {
+            var bnk = PackFile.CreateFromBytes("bnk1.bnk", CreateBnk(1, 111, 0));
+            var container = CreateContainer(true, [(@"audio\wwise\bnk1.bnk", bnk)]);
+            var dbOptions = CreateFileDbOptions();
+
+            using (var expected = new AudioCacheDbContext(dbOptions))
+                expected.Database.EnsureCreated();
+            var expectedIndexes = ReadIndexNames(_dbFilePath);
+            SqliteConnection.ClearAllPools();
+            File.Delete(_dbFilePath);
+
+            SaveCache("fingerprint123", [container.Object], dbOptions);
+
+            Assert.That(expectedIndexes, Has.Some.StartsWith("IX_Hircs_"));
+            Assert.That(expectedIndexes, Has.Some.StartsWith("IX_Didx_"));
+            Assert.That(ReadIndexNames(_dbFilePath), Is.EquivalentTo(expectedIndexes));
+        }
+
+        private static List<string> ReadIndexNames(string dbFilePath)
+        {
+            using var connection = new SqliteConnection($"Data Source={dbFilePath};Pooling=False");
+            connection.Open();
+            using var command = connection.CreateCommand();
+            command.CommandText = "SELECT name FROM sqlite_master WHERE type = 'index' AND sql IS NOT NULL";
+            using var reader = command.ExecuteReader();
+            var names = new List<string>();
+            while (reader.Read())
+                names.Add(reader.GetString(0));
+            return names;
+        }
+
+        [Test]
         public void ComputeFingerprint_IgnoresFilesWhoseExtensionOnlyContainsDat()
         {
             // The real containers match extensions as substrings, so ".dat" also returns terrain ".data" files.
