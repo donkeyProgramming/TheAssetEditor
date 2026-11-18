@@ -38,7 +38,7 @@ namespace Test.KitbashEditor.LoadAndSave
 
             // Verify the generated RMV2 file
             uint[] expectedMeshCountPerLod = [4, 4, 2, 2];
-            uint[] vertexCount = [36150, 27174, 18075, 9039];
+            uint[] vertexCount = [36150, 23574, 10845, 3795];
             VertexFormat[][] expectedVertexType = [
                 [VertexFormat.Cinematic, VertexFormat.Cinematic, VertexFormat.Cinematic, VertexFormat.Weighted],
                 [VertexFormat.Cinematic, VertexFormat.Cinematic, VertexFormat.Cinematic, VertexFormat.Weighted],

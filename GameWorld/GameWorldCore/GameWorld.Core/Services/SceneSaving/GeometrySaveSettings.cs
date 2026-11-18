@@ -1,7 +1,6 @@
 ﻿using GameWorld.Core.Services.SceneSaving.Geometry;
 using GameWorld.Core.Services.SceneSaving.Lod;
 using GameWorld.Core.Services.SceneSaving.Material;
-using Microsoft.Xna.Framework;
 using Shared.Core.Settings;
 using Shared.GameFormats.RigidModel.LodHeader;
 using Shared.GameFormats.RigidModel.Types;
@@ -65,13 +64,21 @@ namespace GameWorld.Core.Services.SceneSaving
             }
         }
 
+        // Defaults from a 1,500-model sample of vanilla WH3 unit models (variantmeshes\wh_variantmodels),
+        // 92% of which have 4 LODs:
+        //  - Camera distance: the most common set is 10, 20, 30, 10000, and the last LOD is always
+        //    10000 (or 1e6), i.e. it is used at any distance.
+        //  - Quality: 2 for LOD0, 0 for the rest.
+        //  - Triangles kept relative to LOD0 (median per LOD): 1, 0.65, 0.31, 0.105, and 0.027 for a
+        //    fifth LOD.
+        public const float LastLodCameraDistance = 10000;
+        static readonly float[] s_defaultLodReductionFactors = [1, 0.65f, 0.3f, 0.1f, 0.03f];
+
         LodGenerationSettings GenerateLodSettingsForIndex(int lodIndex, int lodCount, RmvLodHeader[]? lodHeaders)
         {
-            int[] possibleCameraDistances = [20, 80, 100, 10000, 10000, 10000];
-            byte[] possibleQualityValues = [2, 0, 0, 0, 0, 0, 0];
-
-            float cameraDistance = possibleCameraDistances[lodIndex];
-            var qualityLvl = possibleQualityValues[lodIndex];
+            var isLastLod = lodIndex == lodCount - 1;
+            var cameraDistance = isLastLod ? LastLodCameraDistance : 10 * (lodIndex + 1);
+            var qualityLvl = (byte)(lodIndex == 0 ? 2 : 0);
 
             if (lodHeaders != null)
             {
@@ -88,20 +95,11 @@ namespace GameWorld.Core.Services.SceneSaving
             {
                 CameraDistance = cameraDistance,
                 QualityLvl = qualityLvl,
-                LodRectionFactor = GetDefaultLodReductionValue(lodCount, lodIndex),
+                LodRectionFactor = s_defaultLodReductionFactors[Math.Min(lodIndex, s_defaultLodReductionFactors.Length - 1)],
                 OptimizeAlpha = lodIndex >= 2,
                 OptimizeVertex = lodIndex >= 2,
             };
             return setting;
-        }
-
-        static float GetDefaultLodReductionValue(int numLods, int currentLodIndex)
-        {
-            var lerpValue = (1.0f / (numLods - 1)) * (numLods - 1 - currentLodIndex);
-            if (float.IsNaN(lerpValue))
-                lerpValue = 1;
-            var deductionRatio = MathHelper.Lerp(0.25f, 1, lerpValue);
-            return deductionRatio;
         }
     }
 
