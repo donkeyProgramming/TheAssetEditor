@@ -377,27 +377,33 @@ namespace Shared.Core.PackFiles.Models.Containers
             }
         }
 
+        public string? GetExactFullPath(PackFile file)
+        {
+            if (file.DataSource is not PackedFileSource source)
+                return null;
+
+            CachedFileEntity? entry;
+            lock (_dbLock)
+            {
+                entry = _db.Files.FirstOrDefault(f =>
+                    f.SourcePackFilePath == source.Parent.FilePath &&
+                    f.Offset == source.Offset &&
+                    f.Size == source.Size &&
+                    f.IsEncrypted == source.IsEncrypted &&
+                    f.IsCompressed == source.IsCompressed &&
+                    f.CompressionFormat == (int)source.CompressionFormat &&
+                    f.UncompressedSize == source.UncompressedSize &&
+                    f.FileName.ToLower() == file.Name.ToLower());
+            }
+
+            return entry?.RelativePath;
+        }
+
         public string? GetFullPath(PackFile file)
         {
-            if (file.DataSource is PackedFileSource source)
-            {
-                CachedFileEntity? entry;
-                lock (_dbLock)
-                {
-                    entry = _db.Files.FirstOrDefault(f =>
-                        f.SourcePackFilePath == source.Parent.FilePath &&
-                        f.Offset == source.Offset &&
-                        f.Size == source.Size &&
-                        f.IsEncrypted == source.IsEncrypted &&
-                        f.IsCompressed == source.IsCompressed &&
-                        f.CompressionFormat == (int)source.CompressionFormat &&
-                        f.UncompressedSize == source.UncompressedSize &&
-                        f.FileName.ToLower() == file.Name.ToLower());
-                }
-
-                if (entry != null)
-                    return entry.RelativePath;
-            }
+            var exactPath = GetExactFullPath(file);
+            if (exactPath != null)
+                return exactPath;
 
             List<string> matchingPaths;
             lock (_dbLock)

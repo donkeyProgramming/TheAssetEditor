@@ -147,10 +147,16 @@ namespace Shared.Core.PackFiles.Models.Containers
             return _fileList.ContainsKey(normalizedPath);
         }
 
-        public string? GetFullPath(PackFile file)
+        public string? GetExactFullPath(PackFile file)
         {
             var pathByReference = _fileList.FirstOrDefault(x => ReferenceEquals(x.Value, file)).Key;
-            if (!string.IsNullOrWhiteSpace(pathByReference))
+            return string.IsNullOrWhiteSpace(pathByReference) ? null : pathByReference;
+        }
+
+        public string? GetFullPath(PackFile file)
+        {
+            var pathByReference = GetExactFullPath(file);
+            if (pathByReference != null)
                 return pathByReference;
 
             // Fallback: match by name, but only when it is unambiguous. Matching by name
