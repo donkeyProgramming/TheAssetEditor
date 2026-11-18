@@ -1,9 +1,11 @@
-using GameWorld.Core.Rendering;
+﻿using GameWorld.Core.Rendering;
 using GameWorld.Core.Rendering.Geometry;
+using GameWorld.Core.Services;
 using GameWorld.Core.Services.SceneSaving.Lod.MeshDecimatorIntegration;
 using GameWorld.Core.Test.TestUtility;
 using Microsoft.Xna.Framework;
 using Shared.GameFormats.RigidModel;
+using Test.TestingUtility.TestUtility;
 
 namespace GameWorld.Core.Test.Services.SceneSaving
 {
@@ -66,6 +68,30 @@ namespace GameWorld.Core.Test.Services.SceneSaving
 
             var keptFraction = (reduced.IndexArray.Length / 3) / (double)originalTriangles;
             Assert.That(keptFraction, Is.EqualTo(factor).Within(0.05), $"Kept {keptFraction:P1} of triangles for factor {factor}");
+        }
+
+        // This head's merged hard-edge vertices give near-singular quadrics (det ~1e-17). Their solved
+        // "optimal" collapse point came from floating-point noise and threw a vertex 17% of the model's
+        // size outside it at factor 0.3. Collapse points now have to stay near their edge.
+        [TestCase(0.65f)]
+        [TestCase(0.3f)]
+        public void GetReducedMeshCopies_NearSingularQuadrics_NoVertexThrownOutsideTheModel(float factor)
+        {
+            var path = PathHelper.GetDataFile("Karl_and_celestialgeneral_Pack//variantmeshes//wh_variantmodels//hu1e//cth//cth_celestial_general//cth_celestial_general_head_05.rigid_model_v2");
+            var rmv = ModelFactory.Create().Load(File.ReadAllBytes(path));
+            var builder = new MeshBuilderService(new TestGeometryGraphicsContextFactory());
+            var meshes = rmv.ModelList[0].Select(m => builder.BuildMeshFromRmvModel(m, "x")).ToList();
+            var positions = meshes.SelectMany(m => m.VertexArray).Select(v => new Vector3(v.Position.X, v.Position.Y, v.Position.Z)).ToList();
+            var min = positions.Aggregate(Vector3.Min);
+            var max = positions.Aggregate(Vector3.Max);
+            var modelSize = Vector3.Distance(min, max);
+
+            var reduced = DecimatorMeshOptimizer.GetReducedMeshCopies(meshes, factor);
+
+            var furthestOutside = reduced.SelectMany(m => m.VertexArray)
+                .Select(v => new Vector3(v.Position.X, v.Position.Y, v.Position.Z))
+                .Max(p => Vector3.Distance(p, Vector3.Clamp(p, min, max)));
+            Assert.That(furthestOutside / modelSize, Is.LessThan(0.01), "A vertex was thrown outside the model");
         }
     }
 }

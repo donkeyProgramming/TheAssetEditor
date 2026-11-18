@@ -419,6 +419,12 @@ namespace MeshDecimator.Algorithms
             bool border = (vert0.border & vert1.border);
             double error = 0.0;
             double det = q.Determinant1();
+
+            // When q is nearly singular (the surrounding planes are nearly parallel, as on flat or thin
+            // geometry), its "optimal" point can be far away along the direction the planes don't
+            // constrain, at almost no error. Only use it when it stays near the edge.
+            bool useOptimal = false;
+            result = new Vector3d();
             if (det != 0.0 && !border)
             {
                 // q_delta is invertible
@@ -426,6 +432,13 @@ namespace MeshDecimator.Algorithms
                     -1.0 / det * q.Determinant2(),  // vx = A41/det(q_delta)
                     1.0 / det * q.Determinant3(),   // vy = A42/det(q_delta)
                     -1.0 / det * q.Determinant4()); // vz = A43/det(q_delta)
+                Vector3d midpoint = (vert0.p + vert1.p) * 0.5;
+                double edgeLengthSqr = (vert1.p - vert0.p).MagnitudeSqr;
+                useOptimal = (result - midpoint).MagnitudeSqr <= edgeLengthSqr;
+            }
+
+            if (useOptimal)
+            {
                 error = VertexError(ref q, result.x, result.y, result.z);
                 resultIndex = 2;
             }
