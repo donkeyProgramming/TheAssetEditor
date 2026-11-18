@@ -11,7 +11,7 @@ namespace GameWorld.Core.Test.Services.SceneSaving
     {
         // A bumpy grid has ~0.5 vertices per triangle, so a factor applied to the vertex count instead
         // of the triangle count would keep about half as many triangles as asked for.
-        static MeshObject CreateBumpyGrid(int quadsPerSide)
+        internal static MeshObject CreateBumpyGrid(int quadsPerSide)
         {
             var vertsPerSide = quadsPerSide + 1;
             var vertices = new VertexPositionNormalTextureCustom[vertsPerSide * vertsPerSide];
