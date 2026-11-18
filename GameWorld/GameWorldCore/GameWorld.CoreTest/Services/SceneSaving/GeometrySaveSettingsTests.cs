@@ -127,6 +127,60 @@ namespace GameWorld.Core.Test.Services.SceneSaving
         }
 
 
+        [TestCase]
+        public void RefreshLodSettings_4_Lods_UsesVanillaDefaults()
+        {
+            // Arrange
+            var saveSettings = new GeometrySaveSettings(new ApplicationSettingsService(GameTypeEnum.Warhammer3));
+            saveSettings.NumberOfLodsToGenerate = 4;
+
+            // Act
+            saveSettings.RefreshLodSettings();
+
+            // Assert: the most common vanilla WH3 unit model setup
+            var lods = saveSettings.LodSettingsPerLod;
+            Assert.That(lods.Select(x => x.CameraDistance), Is.EqualTo(new float[] { 10, 20, 30, 10000 }));
+            Assert.That(lods.Select(x => x.QualityLvl), Is.EqualTo(new byte[] { 2, 0, 0, 0 }));
+            Assert.That(lods.Select(x => x.LodRectionFactor), Is.EqualTo(new float[] { 1, 0.65f, 0.3f, 0.1f }));
+        }
+
+        [TestCase(1)]
+        [TestCase(2)]
+        [TestCase(3)]
+        [TestCase(5)]
+        public void RefreshLodSettings_LastLodIsUsedAtAnyDistance(int lodCount)
+        {
+            // Arrange
+            var saveSettings = new GeometrySaveSettings(new ApplicationSettingsService(GameTypeEnum.Warhammer3));
+            saveSettings.NumberOfLodsToGenerate = lodCount;
+
+            // Act
+            saveSettings.RefreshLodSettings();
+
+            // Assert (WH3 is an RMV2 v7 game)
+            var lods = saveSettings.LodSettingsPerLod;
+            Assert.That(lods.Last().CameraDistance, Is.EqualTo(GeometrySaveSettings.LastLodCameraDistance));
+            Assert.That(lods.Select(x => x.CameraDistance), Is.Ordered.Ascending);
+            Assert.That(lods.Select(x => x.LodRectionFactor), Is.Ordered.Descending);
+        }
+
+        [TestCase(GameTypeEnum.Rome2)]
+        [TestCase(GameTypeEnum.Attila)]
+        public void RefreshLodSettings_Rmv6Game_UsesRome2EraDistances(GameTypeEnum game)
+        {
+            // Arrange
+            var saveSettings = new GeometrySaveSettings(new ApplicationSettingsService(game));
+            Assert.That(saveSettings.GeometryOutputType, Is.EqualTo(GeometryStrategy.Rmv6), "Precondition");
+            saveSettings.NumberOfLodsToGenerate = 4;
+
+            // Act
+            saveSettings.RefreshLodSettings();
+
+            // Assert: vanilla Rome 2/Attila unit models use 100, 200, 400, 500
+            Assert.That(saveSettings.LodSettingsPerLod.Select(x => x.CameraDistance), Is.EqualTo(new float[] { 100, 200, 400, 500 }));
+            Assert.That(saveSettings.LodSettingsPerLod.Select(x => x.LodRectionFactor), Is.EqualTo(new float[] { 1, 0.65f, 0.3f, 0.1f }));
+        }
+
         void AssertLodHeaderSettings(GeometrySaveSettings settings, int expectedCount, bool[] shouldBeOptimized)
         {
             Assert.That(settings.LodSettingsPerLod.Count, Is.EqualTo(expectedCount));

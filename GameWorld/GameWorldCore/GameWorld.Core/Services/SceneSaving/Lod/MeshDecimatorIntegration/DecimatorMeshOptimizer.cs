@@ -38,7 +38,9 @@ namespace GameWorld.Core.Services.SceneSaving.Lod.MeshDecimatorIntegration
                       0, 0, 0, 0)).ToArray();
             }
 
-            var currentTriangleCount = sourceVertices.Length;
+            // The factor is the fraction of triangles to keep. This used the vertex count, which made
+            // the result depend on the mesh's vertices-per-triangle (0.6-1.4 on vanilla meshes).
+            var currentTriangleCount = sourceSubMeshIndices.Length / 3;
             var targetTriangleCount = (int)Math.Ceiling(currentTriangleCount * quality);
 
             var algorithm = MeshDecimation.CreateAlgorithm(Algorithm.FastQuadricMesh);
