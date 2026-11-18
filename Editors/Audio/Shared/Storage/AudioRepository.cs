@@ -102,6 +102,11 @@ namespace Editors.Audio.Shared.Storage
 
         public void EnsureGameFilesCache()
         {
+            // Load never reads a cache for these games, so building one would only cost minutes of disk and CPU
+            var gameInformation = GameInformationDatabase.GetGameById(_applicationSettingsService.CurrentSettings.CurrentGame);
+            if (gameInformation.BankGeneratorVersion == GameBnkVersion.Unsupported)
+                return;
+
             var source = CreateGameFilesCacheSource();
             if (source == null)
                 return;
