@@ -111,14 +111,38 @@ namespace GameWorld.Core.Test.Rendering.Shaders.SpecGloss
 
             Assert.That(typedMaterial.Vec4Params.Values.Count, Is.EqualTo(1));
 
-            Assert.That(typedMaterial.TexturesParams[5].TexureType, Is.EqualTo(TextureType.Decal_dirtmap));
-            Assert.That(typedMaterial.TexturesParams[5].Path, Is.EqualTo("variantmeshes/_variantmodels/man/shield/tex/default_decaldirtmap.dds"));
+            // Same order as CA's file (decal_dirtmap: 0,1,13,14,11,3,12,15)
+            Assert.That(typedMaterial.TexturesParams.Select(x => x.TexureType), Is.EqualTo(new[]
+            {
+                TextureType.Diffuse, TextureType.Normal, TextureType.Decal_dirtmap, TextureType.Decal_dirtmask,
+                TextureType.Specular, TextureType.Mask, TextureType.Gloss, TextureType.Decal_mask
+            }));
 
-            Assert.That(typedMaterial.TexturesParams[6].TexureType, Is.EqualTo(TextureType.Decal_dirtmask));
-            Assert.That(typedMaterial.TexturesParams[6].Path, Is.EqualTo("variantmeshes/_variantmodels/man/shield/tex/test_black.dds"));
-
-            Assert.That(typedMaterial.TexturesParams[7].TexureType, Is.EqualTo(TextureType.Decal_mask));
+            Assert.That(typedMaterial.TexturesParams[2].Path, Is.EqualTo("variantmeshes/_variantmodels/man/shield/tex/default_decaldirtmap.dds"));
+            Assert.That(typedMaterial.TexturesParams[3].Path, Is.EqualTo("variantmeshes/_variantmodels/man/shield/tex/test_black.dds"));
             Assert.That(typedMaterial.TexturesParams[7].Path, Is.EqualTo("variantmeshes/_variantmodels/man/shield/tex/celtic_oval_shield_decalmask.dds"));
+        }
+
+        [Test]
+        public void Dirt_GenerateRmvMaterial_UsesCaTextureOrder()
+        {
+            // Arrange
+            var path = PathHelper.GetDataFile("Rome_Man_And_Shield_Pack//variantmeshes//_variantmodels//man//helmets//carthaginian_pylos.rigid_model_v2");
+            var packFile = PackFile.CreateFromFileSystem("mymodel.rigid_model_v2", path);
+            var rmvFile = ModelFactory.Create().Load(packFile.DataSource.ReadData());
+
+            var settings = new ApplicationSettingsService(GameTypeEnum.Attila);
+            var material = new CapabilityMaterialFactory(settings, null).Create(rmvFile.ModelList[0][0].Material, null);
+
+            // Act
+            var typedMaterial = new MaterialToRmvSerializer().CreateMaterialFromCapabilityMaterial(material) as WeightedMaterial;
+
+            // Assert: same order as CA's file (weighted_dirtmap: 0,1,13,14,11,3,12)
+            Assert.That(typedMaterial!.TexturesParams.Select(x => x.TexureType), Is.EqualTo(new[]
+            {
+                TextureType.Diffuse, TextureType.Normal, TextureType.Decal_dirtmap, TextureType.Decal_dirtmask,
+                TextureType.Specular, TextureType.Mask, TextureType.Gloss
+            }));
         }
     }
 }

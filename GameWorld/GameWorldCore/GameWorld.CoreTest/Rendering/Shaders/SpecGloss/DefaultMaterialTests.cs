@@ -191,6 +191,12 @@ namespace GameWorld.Core.Test.Rendering.Shaders.SpecGloss
             Assert.That(createdRmvMaterial.GetTexture(TextureType.Diffuse).Value.Path, Is.EqualTo($"texturePath/{TextureType.Diffuse}.dds"));
             Assert.That(createdRmvMaterial.GetTexture(TextureType.Normal).Value.Path, Is.EqualTo($"texturePath/{TextureType.Normal}.dds"));
             Assert.That(createdRmvMaterial.GetTexture(TextureType.Mask).Value.Path, Is.EqualTo($"texturePath/{TextureType.Mask}.dds"));
+
+            // Same order as CA's spec/gloss weighted models (0,1,11,3,12)
+            Assert.That(createdRmvMaterial.TexturesParams.Select(x => x.TexureType), Is.EqualTo(new[]
+            {
+                TextureType.Diffuse, TextureType.Normal, TextureType.Specular, TextureType.Mask, TextureType.Gloss
+            }));
         }
 
         [Test]
