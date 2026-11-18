@@ -393,6 +393,38 @@ namespace Test.Audio
         }
 
         [Test]
+        public void LoadOrBuildCache_ConcurrentCallersShareOneBuild()
+        {
+            // The startup prebuild runs on a background thread while an audio tool may ask for the same cache.
+            const string bnkPath = @"audio\wwise\test.bnk";
+            const uint eventId = 555;
+            var bnk = PackFile.CreateFromBytes("test.bnk", CreateBnk(eventId, 1, 0));
+            var container = CreateContainer(true, [(bnkPath, bnk)]);
+            var packFileService = new Mock<IPackFileService>();
+            packFileService.Setup(x => x.GetAllPackfileContainers()).Returns([container.Object]);
+            var settings = new ApplicationSettingsService(GameTypeEnum.Warhammer3);
+            var helper = new AudioCacheHelper(settings, new DatLoader(packFileService.Object, settings), new BnkLoader(packFileService.Object));
+            var source = new AudioCacheSource(_dbFilePath, "fingerprint", true, [container.Object], [container.Object]);
+            var resolvedBnkPaths = new HashSet<string>([bnkPath], StringComparer.OrdinalIgnoreCase);
+
+            var tasks = Enumerable.Range(0, 4)
+                .Select(_ => Task.Run(() => helper.LoadOrBuildCache(source)))
+                .ToList();
+            var caches = tasks.Select(task => task.GetAwaiter().GetResult()).ToList();
+
+            try
+            {
+                foreach (var cache in caches)
+                    Assert.That(cache.FindHircs(eventId, resolvedBnkPaths), Has.Count.EqualTo(1));
+            }
+            finally
+            {
+                foreach (var cache in caches)
+                    cache.Dispose();
+            }
+        }
+
+        [Test]
         public void TryLoadFromCache_ReturnsCacheWhenValid()
         {
             var container = CreateContainer(true, []);

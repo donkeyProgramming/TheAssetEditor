@@ -496,7 +496,7 @@ namespace Editors.Audio.Shared.Storage
 
         private AudioCache LoadCachedRepository(AudioCacheSource source)
         {
-            return _cacheHelper.TryLoadFromCache(source.CacheFilePath, source.Fingerprint) ?? _cacheHelper.SaveAndLoadCache(source);
+            return _cacheHelper.LoadOrBuildCache(source);
         }
 
         private List<LoadedLayer> LoadLayers(List<AudioCacheSource> sources)
