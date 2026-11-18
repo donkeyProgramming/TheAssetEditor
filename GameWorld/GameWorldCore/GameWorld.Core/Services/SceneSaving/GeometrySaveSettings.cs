@@ -71,13 +71,27 @@ namespace GameWorld.Core.Services.SceneSaving
         //  - Quality: 2 for LOD0, 0 for the rest.
         //  - Triangles kept relative to LOD0 (median per LOD): 1, 0.65, 0.31, 0.105, and 0.027 for a
         //    fifth LOD.
+        // Rome 2/Attila-era unit models (RMV2 v6) use different distances: 100, 200, 400, 500 on every
+        // multi-LOD unit model in the Rome_Man_And_Shield test pack, with the last LOD at 500. Their
+        // reduction per LOD is close to WH3's (median 1, 0.65, 0.29, 0.16 over 12 models).
         public const float LastLodCameraDistance = 10000;
         static readonly float[] s_defaultLodReductionFactors = [1, 0.65f, 0.3f, 0.1f, 0.03f];
+        static readonly float[] s_rmv6LodCameraDistances = [100, 200, 400, 500];
+
+        float GetDefaultCameraDistance(int lodIndex, int lodCount)
+        {
+            if (GeometryOutputType == GeometryStrategy.Rmv6)
+                return lodIndex < s_rmv6LodCameraDistances.Length
+                    ? s_rmv6LodCameraDistances[lodIndex]
+                    : s_rmv6LodCameraDistances[^1] + 100 * (lodIndex - s_rmv6LodCameraDistances.Length + 1);
+
+            var isLastLod = lodIndex == lodCount - 1;
+            return isLastLod ? LastLodCameraDistance : 10 * (lodIndex + 1);
+        }
 
         LodGenerationSettings GenerateLodSettingsForIndex(int lodIndex, int lodCount, RmvLodHeader[]? lodHeaders)
         {
-            var isLastLod = lodIndex == lodCount - 1;
-            var cameraDistance = isLastLod ? LastLodCameraDistance : 10 * (lodIndex + 1);
+            var cameraDistance = GetDefaultCameraDistance(lodIndex, lodCount);
             var qualityLvl = (byte)(lodIndex == 0 ? 2 : 0);
 
             if (lodHeaders != null)

@@ -157,11 +157,28 @@ namespace GameWorld.Core.Test.Services.SceneSaving
             // Act
             saveSettings.RefreshLodSettings();
 
-            // Assert
+            // Assert (WH3 is an RMV2 v7 game)
             var lods = saveSettings.LodSettingsPerLod;
             Assert.That(lods.Last().CameraDistance, Is.EqualTo(GeometrySaveSettings.LastLodCameraDistance));
             Assert.That(lods.Select(x => x.CameraDistance), Is.Ordered.Ascending);
             Assert.That(lods.Select(x => x.LodRectionFactor), Is.Ordered.Descending);
+        }
+
+        [TestCase(GameTypeEnum.Rome2)]
+        [TestCase(GameTypeEnum.Attila)]
+        public void RefreshLodSettings_Rmv6Game_UsesRome2EraDistances(GameTypeEnum game)
+        {
+            // Arrange
+            var saveSettings = new GeometrySaveSettings(new ApplicationSettingsService(game));
+            Assert.That(saveSettings.GeometryOutputType, Is.EqualTo(GeometryStrategy.Rmv6), "Precondition");
+            saveSettings.NumberOfLodsToGenerate = 4;
+
+            // Act
+            saveSettings.RefreshLodSettings();
+
+            // Assert: vanilla Rome 2/Attila unit models use 100, 200, 400, 500
+            Assert.That(saveSettings.LodSettingsPerLod.Select(x => x.CameraDistance), Is.EqualTo(new float[] { 100, 200, 400, 500 }));
+            Assert.That(saveSettings.LodSettingsPerLod.Select(x => x.LodRectionFactor), Is.EqualTo(new float[] { 1, 0.65f, 0.3f, 0.1f }));
         }
 
         void AssertLodHeaderSettings(GeometrySaveSettings settings, int expectedCount, bool[] shouldBeOptimized)
