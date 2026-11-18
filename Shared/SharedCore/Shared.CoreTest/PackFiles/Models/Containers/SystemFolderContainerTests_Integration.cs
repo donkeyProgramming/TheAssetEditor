@@ -86,6 +86,36 @@ namespace Shared.CoreTest.PackFiles.Models.Containers
             container.Dispose();
         }
 
+        // Saving into the project folder, then reopening the project, makes the folder scan pick up the
+        // output pack as a project file. It must not be packed into the next save: that nests every
+        // previous save, doubling the pack per session until it passes 2GB and can't be read.
+        [Test]
+        public void SaveToDisk_OutputPackInsideProjectFolder_IsNotPackedIntoItself()
+        {
+            var fileSystem = CreateRealFileSystemAccess();
+            var watcher = new Mock<IFileSystemWatcher>();
+            File.WriteAllText(Path.Combine(_tempDir, "data.txt"), "content");
+            var outputPath = Path.Combine(_tempDir, "mymod.pack");
+            var gameInfo = GameInformationDatabase.GetGameById(GameTypeEnum.Warhammer3);
+
+            var container = new SystemFolderContainer(_tempDir, fileSystem, watcher.Object);
+            container.SaveToDisk(outputPath, false, gameInfo);
+            container.Dispose();
+
+            var reopened = new SystemFolderContainer(_tempDir, fileSystem, watcher.Object);
+            Assert.That(reopened.ContainsFile("mymod.pack"), Is.True, "Precondition: the rescan picks up the output pack");
+            reopened.SaveToDisk(outputPath, false, gameInfo);
+            reopened.Dispose();
+
+            PackFileContainer savedPack;
+            using (var fs = File.OpenRead(outputPath))
+            using (var reader = new BinaryReader(fs))
+                savedPack = PackFileSerializerLoader.Load(outputPath, fs.Length, reader, new CustomPackDuplicateFileResolver());
+
+            Assert.That(savedPack.FindFile("data.txt"), Is.Not.Null);
+            Assert.That(savedPack.FindFile("mymod.pack"), Is.Null);
+        }
+
                 [Test]
                 public void ProjectSettings_LegacyProjectIgnoreJson_LoadsAndWritesAeProjectJson()
                 {
