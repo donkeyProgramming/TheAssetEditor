@@ -203,6 +203,26 @@ namespace MeshDecimator.Math
                 a.m9 + b.m9
             );
         }
+
+        /// <summary>
+        /// Scales the matrix by a scalar value.
+        /// </summary>
+        public static SymmetricMatrix operator *(SymmetricMatrix m, double s)
+        {
+            return new SymmetricMatrix(
+                m.m0 * s, m.m1 * s, m.m2 * s, m.m3 * s,
+                m.m4 * s, m.m5 * s, m.m6 * s,
+                m.m7 * s, m.m8 * s,
+                m.m9 * s);
+        }
+
+        /// <summary>
+        /// Scales the matrix by a scalar value.
+        /// </summary>
+        public static SymmetricMatrix operator *(double s, SymmetricMatrix m)
+        {
+            return m * s;
+        }
         #endregion
 
         #region Internal Methods
