@@ -1,5 +1,7 @@
-using Editors.Audio.AudioExplorer;
+using NAudio.Vorbis;
 using NAudio.Wave;
+using NAudio.Wave.SampleProviders;
+using Shared.GameFormats.Audio.Containers.Ogg;
 using Shared.GameFormats.Wwise.Wem.V132;
 using Shared.GameFormats.Wwise.Wem.V132.Encoding;
 
@@ -22,7 +24,7 @@ namespace Test.Audio
                 {
                     var input = CreateTestSignal(channels, sampleRate, seconds: 1.0);
                     var wem = WemFile.CreateFromWavBytes(ToWav(input, channels, sampleRate), new WemEncodingSettings { Quality = quality }).WriteData();
-                    var output = ReadWav(AudioExplorerViewModel.ConvertWemToWav(wem), out var outChannels);
+                    var output = ReadWav(DecodeWemToWav(wem), out var outChannels);
 
                     var label = $"{channels}ch {sampleRate}Hz q{quality}";
                     if (outChannels != channels || output.Length != input.Length)
@@ -65,6 +67,16 @@ namespace Test.Audio
             using (var writer = new WaveFileWriter(stream, new WaveFormat(sampleRate, 16, channels)))
                 writer.WriteSamples(samples.Select(x => (short)Math.Clamp(x * short.MaxValue, short.MinValue, short.MaxValue)).ToArray(), 0, samples.Length);
             return stream.ToArray();
+        }
+
+        // The same WEM -> Ogg -> PCM path the app uses for playback
+        static byte[] DecodeWemToWav(byte[] wemBytes)
+        {
+            var oggBytes = OggFile.CreateFromWemBytes(wemBytes).WriteData();
+            using var reader = new VorbisWaveReader(new MemoryStream(oggBytes, writable: false));
+            using var wavStream = new MemoryStream();
+            WaveFileWriter.WriteWavFileToStream(wavStream, new SampleToWaveProvider16(reader));
+            return wavStream.ToArray();
         }
 
         static float[] ReadWav(byte[] wav, out int channels)
