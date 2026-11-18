@@ -274,6 +274,9 @@ namespace MeshDecimator.Algorithms
 
         private int remainingVertices = 0;
 
+        private bool removeParts = false;
+        private double maxRemovablePartTriangleShare = 0.05;
+
         // Version counter per vertex for heap stale detection (Blender-style).
         // Incremented when a vertex is modified by edge collapse.
         // Heap entries store the version at creation time; stale entries have mismatched versions.
@@ -332,6 +335,31 @@ namespace MeshDecimator.Algorithms
         {
             get { return agressiveness; }
             set { agressiveness = value; }
+        }
+
+        /// <summary>
+        /// Gets or sets if whole disconnected parts (fur tufts, feathers, hair cards, small trinkets) may be
+        /// removed. Removing a part competes with edge collapses in the same queue: its cost is the error of
+        /// collapsing the whole part to its centre, measured with the same vertex quadrics as an edge
+        /// collapse. Parts made of open edges (cards) can't be simplified by edge collapses when borders
+        /// are preserved, so this is the only way to reduce them.
+        /// Default value: false
+        /// </summary>
+        public bool RemoveParts
+        {
+            get { return removeParts; }
+            set { removeParts = value; }
+        }
+
+        /// <summary>
+        /// Gets or sets the largest part that may be removed, as a share of the starting triangle count.
+        /// Missing the triangle target is better than deleting a large piece of the model.
+        /// Default value: 0.05
+        /// </summary>
+        public double MaxRemovablePartTriangleShare
+        {
+            get { return maxRemovablePartTriangleShare; }
+            set { maxRemovablePartTriangleShare = value; }
         }
 
         /// <summary>
@@ -835,6 +863,124 @@ namespace MeshDecimator.Algorithms
         }
         #endregion
 
+        #region Part Removal
+        /// <summary>
+        /// Splits the (linked) mesh into connected parts and queues the ones small enough to be removed,
+        /// by the cost of collapsing each part to its centre.
+        /// </summary>
+        private PriorityQueue<int, double> BuildPartHeap(int startTrisCount, out List<int[]> parts)
+        {
+            var triangles = this.triangles.Data;
+            int triangleCount = this.triangles.Length;
+            int vertexCount = this.vertices.Length;
+
+            var parent = new int[vertexCount];
+            for (int i = 0; i < vertexCount; i++)
+                parent[i] = i;
+            int Find(int x)
+            {
+                while (parent[x] != x)
+                    x = parent[x] = parent[parent[x]];
+                return x;
+            }
+
+            for (int t = 0; t < triangleCount; t++)
+            {
+                if (triangles[t].deleted)
+                    continue;
+                parent[Find(triangles[t].v0)] = Find(triangles[t].v1);
+                parent[Find(triangles[t].v1)] = Find(triangles[t].v2);
+            }
+
+            var trianglesByRoot = new Dictionary<int, List<int>>();
+            for (int t = 0; t < triangleCount; t++)
+            {
+                if (triangles[t].deleted)
+                    continue;
+                int root = Find(triangles[t].v0);
+                if (!trianglesByRoot.TryGetValue(root, out var list))
+                    trianglesByRoot[root] = list = new List<int>();
+                list.Add(t);
+            }
+
+            parts = new List<int[]>();
+            var heap = new PriorityQueue<int, double>();
+            if (trianglesByRoot.Count < 2)
+                return heap;    // never remove the whole mesh
+
+            int maxPartTriangles = (int)(startTrisCount * maxRemovablePartTriangleShare);
+            foreach (var partTriangles in trianglesByRoot.Values)
+            {
+                if (partTriangles.Count > maxPartTriangles)
+                    continue;
+                parts.Add(partTriangles.ToArray());
+                heap.Enqueue(parts.Count - 1, PartRemovalCost(parts[parts.Count - 1], out _));
+            }
+            return heap;
+        }
+
+        /// <summary>
+        /// The error of collapsing a part to its centre: its live vertices' quadrics evaluated there.
+        /// These are the same quadrics edge collapses are costed with, including the boundary
+        /// constraint planes, which is what makes removing an open card (whose own face planes all pass
+        /// through its centre) cost something in proportion to its size.
+        /// </summary>
+        private double PartRemovalCost(int[] partTriangles, out int liveTriangles)
+        {
+            var triangles = this.triangles.Data;
+            var vertices = this.vertices.Data;
+            var partVertices = new HashSet<int>();
+            liveTriangles = 0;
+            foreach (int t in partTriangles)
+            {
+                if (triangles[t].deleted)
+                    continue;
+                liveTriangles++;
+                partVertices.Add(triangles[t].v0);
+                partVertices.Add(triangles[t].v1);
+                partVertices.Add(triangles[t].v2);
+            }
+            if (liveTriangles == 0)
+                return 0;
+
+            var centre = new Vector3d();
+            foreach (int v in partVertices)
+                centre += vertices[v].p;
+            centre = centre * (1.0 / partVertices.Count);
+
+            double cost = 0;
+            foreach (int v in partVertices)
+                cost += System.Math.Abs(VertexError(ref vertices[v].q, centre.x, centre.y, centre.z));
+            return cost;
+        }
+
+        private void RemovePart(int[] partTriangles, ref int deletedTriangles)
+        {
+            var triangles = this.triangles.Data;
+            var vertices = this.vertices.Data;
+            var partVertices = new HashSet<int>();
+            foreach (int t in partTriangles)
+            {
+                if (triangles[t].deleted)
+                    continue;
+                triangles[t].deleted = true;
+                ++deletedTriangles;
+                partVertices.Add(triangles[t].v0);
+                partVertices.Add(triangles[t].v1);
+                partVertices.Add(triangles[t].v2);
+            }
+
+            foreach (int v in partVertices)
+            {
+                if (vertices[v].tcount == 0)
+                    continue;
+                vertices[v].tcount = 0;     // dead: its queued edges are skipped
+                vertexVersion[v]++;
+                --remainingVertices;
+            }
+        }
+        #endregion
+
         #region Is Degenerate Topology
         /// <summary>
         /// Check if collapsing edge (i0,i1) would create duplicate faces.
@@ -972,6 +1118,17 @@ namespace MeshDecimator.Algorithms
 
             if (enableSmartLink)
             {
+                // Only link vertices of the same sub-mesh. Sub-meshes are separate meshes with their own
+                // materials; linking across them would let a collapse give one mesh's triangles another
+                // mesh's UVs.
+                var vertexSubMesh = new int[vertexCount];
+                for (int t = 0; t < triangleCount; t++)
+                {
+                    vertexSubMesh[triangles[t].v0] = triangles[t].subMeshIndex;
+                    vertexSubMesh[triangles[t].v1] = triangles[t].subMeshIndex;
+                    vertexSubMesh[triangles[t].v2] = triangles[t].subMeshIndex;
+                }
+
                 var borderVertices = new BorderVertex[borderVertexCount];
                 int borderIndexCount = 0;
                 double borderAreaWidth = borderMaxX - borderMinX;
@@ -1004,6 +1161,8 @@ namespace MeshDecimator.Algorithms
                             continue;
                         else if ((borderVertices[j].hash - borderVertices[i].hash) > hashMaxDistance)
                             break;
+                        else if (vertexSubMesh[myIndex] != vertexSubMesh[otherIndex])
+                            continue;
 
                         var otherPoint = vertices[otherIndex].p;
                         var sqrX = ((myPoint.x - otherPoint.x) * (myPoint.x - otherPoint.x));
@@ -1463,46 +1622,58 @@ namespace MeshDecimator.Algorithms
             var heap = new PriorityQueue<EdgeEntry, double>();
             BuildEdgeCosts(heap, vertexVersion);
 
+            // Whole parts that may be removed, in the same cost units as edge collapses
+            List<int[]> parts = null;
+            var partHeap = removeParts ? BuildPartHeap(startTrisCount, out parts) : null;
+
             // Phase 6: Iterative edge collapse (Blender BM_mesh_decimate_collapse main loop)
             int deletedTris = 0;
             var deleted0 = new bool[64];
             var deleted1 = new bool[64];
             int collapseCount = 0;
 
-            // Diagnostic counters
-            int diagTotal = 0, diagStale = 0, diagDead = 0;
-            int diagBorderMismatch = 0;
-            int diagPreserveBorder = 0, diagPreserveSeam = 0, diagPreserveFoldover = 0;
-            int diagFlip0 = 0, diagFlip1 = 0, diagTopology = 0, diagSuccess = 0;
-
-            while ((startTrisCount - deletedTris) > targetTrisCount && heap.Count > 0)
+            while ((startTrisCount - deletedTris) > targetTrisCount && (heap.Count > 0 || (partHeap != null && partHeap.Count > 0)))
             {
+                // Remove a whole part when that is cheaper than the cheapest queued edge collapse
+                if (partHeap != null && partHeap.TryPeek(out int partIndex, out double queuedPartCost) &&
+                    (!heap.TryPeek(out _, out double edgeCost) || queuedPartCost <= edgeCost))
+                {
+                    partHeap.Dequeue();
+                    double partCost = PartRemovalCost(parts[partIndex], out int liveTriangles);
+                    if (liveTriangles == 0)
+                        continue;
+                    if (liveTriangles >= startTrisCount - deletedTris)
+                        continue;   // never remove what is left of the mesh
+                    if (partCost > queuedPartCost * (1 + 1e-9) + 1e-12)
+                    {
+                        // Collapses inside the part changed its cost; queue it again at the new cost
+                        partHeap.Enqueue(partIndex, partCost);
+                        continue;
+                    }
+
+                    RemovePart(parts[partIndex], ref deletedTris);
+                    continue;
+                }
+
                 var entry = heap.Dequeue();
-                diagTotal++;
 
                 // Stale check: vertex versions must match entry's versions
                 if (vertexVersion[entry.v0] != entry.version0 || vertexVersion[entry.v1] != entry.version1)
-                {
-                    diagStale++;
                     continue;
-                }
 
                 // Both vertices must still be alive
                 vertices = this.vertices.Data;
                 if (vertices[entry.v0].tcount == 0 || vertices[entry.v1].tcount == 0)
-                {
-                    diagDead++;
                     continue;
-                }
 
                 int i0 = entry.v0;
                 int i1 = entry.v1;
 
                 // Constraint checks (same as Forstmann, checked at collapse time)
-                if (vertices[i0].border != vertices[i1].border) { diagBorderMismatch++; continue; }
-                if (base.PreserveBorders && vertices[i0].border) { diagPreserveBorder++; continue; }
-                if (preserveSeams && vertices[i0].seam) { diagPreserveSeam++; continue; }
-                if (preserveFoldovers && vertices[i0].foldover) { diagPreserveFoldover++; continue; }
+                if (vertices[i0].border != vertices[i1].border) continue;
+                if (base.PreserveBorders && vertices[i0].border) continue;
+                if (preserveSeams && vertices[i0].seam) continue;
+                if (preserveFoldovers && vertices[i0].foldover) continue;
 
                 // Compute optimal collapse position
                 Vector3d p;
@@ -1517,22 +1688,13 @@ namespace MeshDecimator.Algorithms
 
                 // Flip check (Blender bm_edge_collapse_is_degenerate_flip)
                 if (Flipped(ref p, i0, i1, ref vertices[i0], deleted0))
-                {
-                    diagFlip0++;
                     continue;
-                }
                 if (Flipped(ref p, i1, i0, ref vertices[i1], deleted1))
-                {
-                    diagFlip1++;
                     continue;
-                }
 
                 // Degenerate topology check (Blender bm_edge_collapse_is_degenerate_topology)
                 if (IsDegenerateTopology(i0, i1))
-                {
-                    diagTopology++;
                     continue;
-                }
 
                 // Find attribute indices from a triangle containing edge (i0, i1)
                 int ia0 = i0, ia1 = i1;
@@ -1623,19 +1785,11 @@ namespace MeshDecimator.Algorithms
                     break;
 
                 collapseCount++;
-                diagSuccess++;
                 if (collapseCount % 500 == 0)
                 {
                     ReportStatus(collapseCount / 500, startTrisCount, startTrisCount - deletedTris, targetTrisCount);
                 }
             }
-
-            // Diagnostic output
-            System.Console.WriteLine(
-                $"[LOD Diag] target={targetTrisCount} start={startTrisCount} final={startTrisCount - deletedTris} success={diagSuccess} heapRemain={heap.Count}\n" +
-                $"  stale={diagStale} dead={diagDead} borderMismatch={diagBorderMismatch}\n" +
-                $"  preserveBorder={diagPreserveBorder} preserveSeam={diagPreserveSeam} preserveFoldover={diagPreserveFoldover}\n" +
-                $"  flip0={diagFlip0} flip1={diagFlip1} topology={diagTopology} totalPopped={diagTotal}");
 
             CompactMesh();
         }
