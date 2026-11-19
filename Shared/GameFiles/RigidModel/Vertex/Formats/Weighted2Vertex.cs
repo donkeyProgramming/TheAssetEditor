@@ -43,7 +43,7 @@ namespace Shared.GameFormats.RigidModel.Vertex.Formats
 
             if (rmvVersion == RmvVersionEnum.RMV2_V8)
             {
-                var typedVert = RmvWeighted2ColourVertex.ToRmv(vertex);
+                var typedVert = RmvWeighted2ColourVertex.ToRmv(rmvVersion, vertex);
 
                 return ByteHelper.GetBytes(typedVert);
             }
@@ -75,7 +75,7 @@ namespace Shared.GameFormats.RigidModel.Vertex.Formats
                     BiNormal = VertexLoadHelper.CreatVector3_FromByte(item.BiNormal),
                     Tangent = VertexLoadHelper.CreatVector3_FromByte(item.Tangent),
                     Uv = new Vector2(item.Uv.X, item.Uv.Y),
-                    Colour = VertexLoadHelper.CreatVector4_FromByte(item.Colour),
+                    Colour = VertexLoadHelper.CreateColourFromBytes(item.Colour.X, item.Colour.Y, item.Colour.Z, item.Colour.W),
 
                     BoneIndex = [item.BoneIndex.X, item.BoneIndex.Y],
                     BoneWeight = [item.BoneWeight.X / 255.0f, item.BoneWeight.Y / 255.0f],
@@ -83,19 +83,11 @@ namespace Shared.GameFormats.RigidModel.Vertex.Formats
                 };
             }
 
-            public static RmvWeighted2ColourVertex ToRmv(CommonVertex vertex)
+            public static RmvWeighted2ColourVertex ToRmv(RmvVersionEnum version, CommonVertex vertex)
             {
-                var newPos = vertex.Position;
-                newPos.W = 0;
                 return new RmvWeighted2ColourVertex()
                 {
-                    Position = new HalfVector4()
-                    {
-                        X = new SharpDX.Half(vertex.Position.X),
-                        Y = new SharpDX.Half(vertex.Position.Y),
-                        Z = new SharpDX.Half(vertex.Position.Z),
-                        W = new SharpDX.Half(vertex.Position.W)
-                    },
+                    Position = VertexLoadHelper.CreatePositionForVersion(vertex.Position, version, isSkinned: true),
                     BoneIndex = new ByteVector2()
                     {
                         X = vertex.BoneIndex[0],
@@ -118,7 +110,7 @@ namespace Shared.GameFormats.RigidModel.Vertex.Formats
 
                     BiNormal = VertexLoadHelper.CreateNormalVector3_v2(vertex.BiNormal),
                     Tangent = VertexLoadHelper.CreateNormalVector3_v2(vertex.Tangent),
-                    Colour = VertexLoadHelper.Create4BytesFromVector4_v2(vertex.Colour),
+                    Colour = VertexLoadHelper.CreateColourBytes(vertex.Colour),
                 };
             }
         }
@@ -143,7 +135,7 @@ namespace Shared.GameFormats.RigidModel.Vertex.Formats
                     BiNormal = VertexLoadHelper.CreatVector3_FromByte(item.BiNormal),
                     Tangent = VertexLoadHelper.CreatVector3_FromByte(item.Tangent),
                     Uv = new Vector2(item.Uv.X, item.Uv.Y),
-                    Colour = new Vector4(0, 0, 0, 1),
+                    Colour = Vector4.Zero,
 
                     BoneIndex = [item.BoneIndex.X, item.BoneIndex.Y],
                     BoneWeight = [item.BoneWeight.X / 255.0f, item.BoneWeight.Y / 255.0f],
@@ -153,17 +145,9 @@ namespace Shared.GameFormats.RigidModel.Vertex.Formats
 
             public static RmvWeighted2Vertex ToRmv(RmvVersionEnum version, CommonVertex vertex)
             {
-                var newPos = vertex.Position;
-                newPos.W = 0;
-                HalfVector4 pos;
-                if (version == RmvVersionEnum.RMV2_V6)
-                    pos = new HalfVector4() { X = vertex.Position.X, Y = vertex.Position.Y, Z = vertex.Position.Z, W = 1 };
-                else
-                    pos = VertexLoadHelper.CreatePositionVector4ExtraPrecision_v2(newPos);
-
                 return new RmvWeighted2Vertex()
                 {
-                    Position = pos,
+                    Position = VertexLoadHelper.CreatePositionForVersion(vertex.Position, version, isSkinned: true),
                     BoneIndex = new ByteVector2()
                     {
                         X = vertex.BoneIndex[0],

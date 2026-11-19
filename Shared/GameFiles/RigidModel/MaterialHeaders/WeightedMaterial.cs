@@ -33,8 +33,20 @@ namespace Shared.GameFormats.RigidModel.MaterialHeaders
         public string Filters { get; set; } = "";
         public RmvTransform OriginalTransform { get; set; } = RmvTransform.CreateIdentity();
 
+        /// <summary>The bone this mesh is welded to, -1 for none.</summary>
         public int MatrixIndex { get; set; } = -1;
+
+        /// <summary>Not a parent of MatrixIndex: the bone a cloth collider (a collider_* mesh) follows, -1 elsewhere.</summary>
         public int ParentMatrixIndex { get; set; } = -1;
+
+        /// <summary>Alignment before the pivot, holding stale memory. Kept so a re-save doesn't change it.</summary>
+        public byte[] AlignmentPadding { get; set; } = new byte[2];
+
+        /// <summary>
+        /// The block cloth, collision and rope materials have after the weighted header
+        /// (<see cref="ModelMaterialEnumHelper.HasPhysicsBlock"/>). Kept as raw bytes; empty for other materials.
+        /// </summary>
+        public byte[] PhysicsBlock { get; set; } = [];
 
         public List<RmvAttachmentPoint> AttachmentPointParams { get; set; } = [];
         public List<RmvTexture> TexturesParams { get; set; } = [];
@@ -50,6 +62,8 @@ namespace Shared.GameFormats.RigidModel.MaterialHeaders
                 BinaryVertexFormat = BinaryVertexFormat,
                 MatrixIndex = MatrixIndex,
                 ParentMatrixIndex = ParentMatrixIndex,
+                AlignmentPadding = AlignmentPadding.ToArray(),
+                PhysicsBlock = PhysicsBlock.ToArray(),
                 MaterialId = MaterialId,
                 MaterialHint = MaterialHint,
 
@@ -86,7 +100,8 @@ namespace Shared.GameFormats.RigidModel.MaterialHeaders
                 // Variable + index
                 IntParams.GetByteSize(4) +
                 FloatParams.GetByteSize(4) +
-                Vec4Params.GetByteSize(4 * 4));
+                Vec4Params.GetByteSize(4 * 4) +
+                PhysicsBlock.Length);
 
             return headerDataSize;
         }
@@ -223,8 +238,11 @@ namespace Shared.GameFormats.RigidModel.MaterialHeaders
 
     public class WeighterMaterialCreator : IMaterialCreator
     {
-        public IRmvMaterial Create(ModelMaterialEnum materialId, RmvVersionEnum rmvType, byte[] dataArray, int dataOffset)
+        public IRmvMaterial Create(ModelMaterialEnum materialId, RmvVersionEnum rmvType, byte[] dataArray, int dataOffset) => Create(materialId, rmvType, dataArray, dataOffset, null);
+
+        public IRmvMaterial Create(ModelMaterialEnum materialId, RmvVersionEnum rmvType, byte[] dataArray, int dataOffset, long? expectedMaterialSize)
         {
+            var materialStart = dataOffset;
             var header = ByteHelper.ByteArrayToStructure<WeightedMaterialStruct>(dataArray, dataOffset);
             dataOffset += ByteHelper.GetSize<WeightedMaterialStruct>();
             var material = new WeightedMaterial()
@@ -242,10 +260,16 @@ namespace Shared.GameFormats.RigidModel.MaterialHeaders
                 Filters = StringSanitizer.FixedString(Encoding.ASCII.GetString(header.Filters)),
                 MatrixIndex = header.MatrixIndex,
                 ParentMatrixIndex = header.ParentMatrixIndex,
+                AlignmentPadding = [header.PaddingByte0, header.PaddingByte1],
                 PivotPoint = header.Transform.Pivot.ToVector3(),
                 TextureDirectory = StringSanitizer.FixedString(Encoding.ASCII.GetString(header._textureDir)),
                 OriginalTransform = header.Transform,
             };
+
+            // The physics block is whatever the section declares beyond the weighted header.
+            var weightedEnd = dataOffset - materialStart;
+            if (expectedMaterialSize.HasValue && ModelMaterialEnumHelper.HasPhysicsBlock(materialId) && expectedMaterialSize.Value > weightedEnd)
+                material.PhysicsBlock = dataArray.AsSpan(dataOffset, (int)(expectedMaterialSize.Value - weightedEnd)).ToArray();
 
             material.DetermineMaterial();
 
@@ -288,6 +312,8 @@ namespace Shared.GameFormats.RigidModel.MaterialHeaders
                 _modelName = ByteHelper.CreateFixLengthString(typedMaterial.ModelName, 32),
                 _textureDir = ByteHelper.CreateFixLengthString(typedMaterial.TextureDirectory, 256),
                 Filters = ByteHelper.CreateFixLengthString(typedMaterial.Filters, 256),
+                PaddingByte0 = typedMaterial.AlignmentPadding.ElementAtOrDefault(0),
+                PaddingByte1 = typedMaterial.AlignmentPadding.ElementAtOrDefault(1),
                 Transform = new RmvTransform()
                 {
                     Pivot = new RmvVector3(typedMaterial.PivotPoint),
@@ -348,6 +374,8 @@ namespace Shared.GameFormats.RigidModel.MaterialHeaders
                 writer.Write(ByteParsers.Single.EncodeValue(param.Value.W, out _));
             }
 
+            writer.Write(typedMaterial.PhysicsBlock);
+
             var bytes = ms.ToArray();
             var expectedSize = material.ComputeSize();
             if (bytes.Length != expectedSize)
@@ -396,13 +424,13 @@ namespace Shared.GameFormats.RigidModel.MaterialHeaders
         [MarshalAs(UnmanagedType.ByValArray, SizeConst = 256)]
         public byte[] Filters;  // Always zero?
 
-        public byte PaddingByte0;
+        public byte PaddingByte0;       // See WeightedMaterial.AlignmentPadding
         public byte PaddingByte1;
 
         public RmvTransform Transform;
 
         public int MatrixIndex;         // Used when meshes should be attached to a bone, eg for buildings being destroyed 
-        public int ParentMatrixIndex;   // Always -1 it seems
+        public int ParentMatrixIndex;   // See WeightedMaterial.ParentMatrixIndex
         public uint AttachmentPointCount;
         public uint TextureCount;
         public uint StringParamCount;

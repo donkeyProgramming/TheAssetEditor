@@ -37,7 +37,7 @@ namespace Shared.GameFormats.RigidModel
                 var lodHeader = LodHeaders[lodIndex];
 
                 lodHeader.MeshCount = (uint)ModelList[lodIndex].Length;
-                lodHeader.TotalLodVertexSize = (uint)ModelList[lodIndex].Sum(x => x.CommonHeader.VertexCount * VertexFactory.Create().GetVertexSize(x.Material.BinaryVertexFormat, Header.Version));
+                lodHeader.TotalLodVertexSize = (uint)ModelList[lodIndex].Sum(x => x.Mesh.GetVertexBlockSize(x.Material.BinaryVertexFormat, Header.Version));
                 lodHeader.TotalLodIndexSize = (uint)ModelList[lodIndex].Sum(x => x.CommonHeader.IndexCount * sizeof(ushort));
                 lodHeader.FirstMeshOffset = headerOffset + modelOffset;
                 LodHeaders[lodIndex] = lodHeader;
@@ -49,19 +49,19 @@ namespace Shared.GameFormats.RigidModel
         void UpdateModelHeader(RmvModel model, RmvVersionEnum rmvVersion)
         {
             var headerDataSize = ByteHelper.GetSize<RmvCommonHeader>() + model.Material.ComputeSize();
-            var vertexSize = VertexFactory.Create().GetVertexSize(model.Material.BinaryVertexFormat, rmvVersion);
-
             var header = model.CommonHeader;
 
-            header.VertexCount = (uint)model.Mesh.VertexList.Length;
+            // A mesh with no decoded vertices keeps the count its header declared, see ModelFactory.LoadMesh
+            if (model.Mesh.VertexList.Length != 0)
+                header.VertexCount = (uint)model.Mesh.VertexList.Length;
             header.IndexCount = (uint)model.Mesh.IndexList.Length;
 
-            var totalVertSize = vertexSize * header.VertexCount;
+            var totalVertSize = model.Mesh.GetVertexBlockSize(model.Material.BinaryVertexFormat, rmvVersion);
             var totalIndexSize = header.IndexCount * sizeof(ushort);
 
             header.VertexOffset = (uint)headerDataSize;
             header.IndexOffset = header.VertexOffset + totalVertSize;
-            header.MeshSectionSize = (uint)headerDataSize + totalVertSize + totalIndexSize;
+            header.MeshSectionSize = (uint)headerDataSize + totalVertSize + totalIndexSize + (uint)model.Mesh.SectionTail.Length;
 
             model.CommonHeader = header;
         }

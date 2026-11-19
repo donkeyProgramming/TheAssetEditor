@@ -5,6 +5,7 @@ using Shared.Core.ErrorHandling;
 using Shared.Core.PackFiles;
 using Shared.Core.Services;
 using Shared.GameFormats.RigidModel;
+using Shared.GameFormats.RigidModel.MaterialHeaders;
 using Shared.GameFormats.WsModel;
 
 namespace GameWorld.Core.SceneNodes
@@ -59,6 +60,14 @@ namespace GameWorld.Core.SceneNodes
                 for (var modelIndex = 0; modelIndex < model.LodHeaders[lodIndex].MeshCount; modelIndex++)
                 {
                     var rmvModel = model.ModelList[lodIndex][modelIndex];
+
+                    // The scene can only show weighted materials whose vertices have a tool vertex format
+                    if (rmvModel.Material is not WeightedMaterial || rmvModel.Mesh.VertexList.Length == 0 || rmvModel.Mesh.VertexLayout != null)
+                    {
+                        _logger.Here().Warning($"Skipping mesh {modelIndex} in lod {lodIndex} of {modelFullPath} - {rmvModel.Material.MaterialId} ({rmvModel.Material.GetType().Name}) with {rmvModel.Mesh.VertexList.Length} decoded vertices can not be shown");
+                        continue;
+                    }
+
                     var geometry = _meshBuilderService.BuildMeshFromRmvModel(rmvModel, model.Header.SkeletonName);
 
                     var resolvedPart = resolvedPartsByLod.Count > lodIndex && resolvedPartsByLod[lodIndex].Count > modelIndex

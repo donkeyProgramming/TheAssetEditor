@@ -77,6 +77,9 @@ namespace Shared.GameFormats.RigidModel.LodHeader
         public float _lodCameraDistance;
         public uint _lodLevel;
         public byte _qualityLvl;
+
+        // Not a field: alignment after the uint8 quality level, holding stale memory.
+        // Files written here get 125, 136, 174 unless a source header is copied.
         public byte _padding0;
         public byte _padding1;
         public byte _padding2;

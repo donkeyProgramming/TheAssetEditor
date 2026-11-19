@@ -101,7 +101,9 @@ namespace GameWorld.Core.Services.SceneSaving.Geometry
                 Mesh = _meshBuilderService.CreateRmvMeshFromGeometry(geometry, lodIndex, meshId, modelName)
             };
 
-            newModel.UpdateBoundingBox(geometry.BoundingBox);
+            // CA's bounding box is in model space, so it includes the pivot
+            var boundingBox = geometry.BoundingBox;
+            newModel.UpdateBoundingBox(new BoundingBox(boundingBox.Min + pivotPoint, boundingBox.Max + pivotPoint));
             newModel.UpdateModelTypeFlag(newModel.Material.MaterialId);
 
      

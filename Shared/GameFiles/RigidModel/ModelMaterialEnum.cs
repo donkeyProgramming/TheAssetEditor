@@ -69,6 +69,13 @@
             return weightedMaterials;
         }
 
+        /// <summary>A weighted header followed by a physics block, see <see cref="MaterialHeaders.WeightedMaterial.PhysicsBlock"/>.</summary>
+        public static bool HasPhysicsBlock(ModelMaterialEnum material) => material is
+            ModelMaterialEnum.weighted_cloth or
+            ModelMaterialEnum.cloth or
+            ModelMaterialEnum.collision_shape or
+            ModelMaterialEnum.rope;
+
         public static UiVertexFormat GetToolVertexFormat(VertexFormat format)
         {
             return format switch
@@ -101,6 +108,11 @@
 
         Position16_bit,
         CustomTerrain,
+
+        // Unnamed ids CA writes, resolved to a layout by stride (see VertexFactory.ResolveLayout)
+        Rome2Tree = 7,      // tree billboards (stride 28) and tree cards (stride 12)
+        Rome2Water = 8,     // water planes, stride 12
+        Sway = 12,          // Warhammer's wind-swayed props, stride 20
 
         CustomTerrain2 = 13,
     };

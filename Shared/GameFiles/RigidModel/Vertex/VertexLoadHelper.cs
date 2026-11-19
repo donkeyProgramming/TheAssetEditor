@@ -311,6 +311,36 @@ namespace Shared.GameFormats.RigidModel.Vertex
             };
         }
 
+        /// <summary>
+        /// Encodes a half4 position as CA does. W scales XYZ, and CA only uses that for extra precision in v8.
+        /// Before v8, W is 1 on static and 0 on skinned vertices; a mesh written with the trick rendered
+        /// scrambled in game (Attila). See rmv2_anim_blender_import_export, docs/FORMATS.md "Vertex layouts".
+        /// </summary>
+        static public HalfVector4 CreatePositionForVersion(Vector4 position, RmvVersionEnum rmvVersion, bool isSkinned)
+        {
+            if (rmvVersion == RmvVersionEnum.RMV2_V8)
+                return CreatePositionVector4ExtraPrecision_v2(position);
+
+            return new HalfVector4()
+            {
+                X = new Half(position.X),
+                Y = new Half(position.Y),
+                Z = new Half(position.Z),
+                W = new Half(isSkinned ? 0 : 1),
+            };
+        }
+
+        /// <summary>Vertex colour is four unorm bytes (byte / 255), not packed like a normal.</summary>
+        static public Vector4 CreateColourFromBytes(byte r, byte g, byte b, byte a) => new(r / 255.0f, g / 255.0f, b / 255.0f, a / 255.0f);
+
+        static public Vector4 CreateColourFromBytes(byte[] rgba) => CreateColourFromBytes(rgba[0], rgba[1], rgba[2], rgba[3]);
+
+        static public ByteVector4 CreateColourBytes(Vector4 colour)
+        {
+            static byte ToByte(float value) => (byte)Math.Clamp(Math.Round(value * 255.0f), 0, 255);
+            return new ByteVector4() { X = ToByte(colour.X), Y = ToByte(colour.Y), Z = ToByte(colour.Z), W = ToByte(colour.W) };
+        }
+
         static public byte[] CreatePositionVector2(Microsoft.Xna.Framework.Vector2 vector)
         {
             var output = new byte[4];

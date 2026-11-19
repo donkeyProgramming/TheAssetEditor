@@ -27,6 +27,9 @@ namespace Shared.GameFormats.RigidModel.Vertex
         public float[] BoneWeight { get; set; }
         public int WeightCount { get; set; } = 0;
 
+        /// <summary>Layout-specific channels with no field above, see ExtraVertexLayout. Empty for the common layouts.</summary>
+        public float[] Extra { get; set; } = [];
+
         public Vector3 GetPosistionAsVec3() => new Vector3(Position.X, Position.Y, Position.Z);
     }
 
@@ -47,34 +50,50 @@ namespace Shared.GameFormats.RigidModel.Vertex
 
         public static VertexFactory Create() => new VertexFactory();
 
-        public CommonVertex[] CreateVertexFromBytes(RmvVersionEnum rmvVersion, VertexFormat format, byte[] buffer, int vertexCount, int vertexStart, int vertexSize)
-        {
-            var creator = _vertexCreators[format];
-
-            //if (format == VertexFormat.Cinematic)
-            //{
-            //    var verts = ByteHelper.P<Weighted4VertexCreator.DataWithColour2>(buffer, vertexStart, vertexSize * vertexCount);
-            //    var processedVerts = Weighted4VertexCreator.Process(verts, rmvVersion);
-            //    return processedVerts;
-            //}
-            //else
-            {
-                var vertexList = creator.ReadArray(rmvVersion, buffer, vertexStart, vertexSize, vertexCount);
-                return vertexList;
-            }
-        }
-
         public uint GetVertexSize(VertexFormat format, RmvVersionEnum rmvVersion) => _vertexCreators[format].GetVertexSize(rmvVersion);
 
         public bool IsKnownVertex(VertexFormat format) => _vertexCreators.ContainsKey(format);
 
+        // The layout for a declared format id and the file's stride, null when nothing matches
+        public IVertexCreator? ResolveLayout(VertexFormat declared, uint stride, RmvVersionEnum version)
+        {
+            if (_vertexCreators.TryGetValue(declared, out var creator) && creator.GetVertexSize(version) == stride)
+                return creator;
+
+            // A material with no vertex-format field (banners, bow waves) is resolved by stride alone
+            if (declared == VertexFormat.Unknown)
+            {
+                return stride switch
+                {
+                    8 => new PositionHalfVertexLayout(),
+                    12 => new PositionUvVertexLayout(VertexFormat.Rome2Water),
+                    20 => new SwayVertexLayout(),
+                    24 => new BowWaveVertexLayout(),
+                    28 => new StaticNoUv2VertexLayout(),
+                    60 => new VegetationVertexLayout(),
+                    _ => _vertexCreators.Values.FirstOrDefault(x => x.GetVertexSize(version) == stride && x is not Weighted2VertexCreator && x is not Weighted4VertexCreator),
+                };
+            }
+
+            return (declared, stride) switch
+            {
+                (VertexFormat.Sway, 20) => new SwayVertexLayout(),
+                (VertexFormat.Sway, 16) => _vertexCreators[VertexFormat.Position16_bit],     // Attila's campaign vegetation
+                (VertexFormat.CustomTerrain, 60) => new VegetationVertexLayout(),
+                (VertexFormat.Position16_bit, 28) => new GrassVertexLayout(),
+                (VertexFormat.Position16_bit, 8) => new PositionHalfVertexLayout(),
+                (VertexFormat.Rome2Tree, 28) => new TreeBillboardVertexLayout(),
+                (VertexFormat.Rome2Tree, 12) => new PositionUvVertexLayout(VertexFormat.Rome2Tree),
+                (VertexFormat.Rome2Water, 12) => new PositionUvVertexLayout(VertexFormat.Rome2Water),
+                _ => null,
+            };
+        }
+
         public byte[] Save(RmvVersionEnum rmvVersion, VertexFormat vertexType, CommonVertex vertex) => _vertexCreators[vertexType].Write(rmvVersion, vertex);
 
-        public void ReComputeNormals(VertexFormat binaryVertexFormat, ref CommonVertex[] vertexList, ref ushort[] indexList)
+        /// <summary>Sets every vertex's normal from the triangles that use it, for layouts that store none.</summary>
+        public static void ComputeFaceNormals(CommonVertex[] vertexList, ushort[] indexList)
         {
-            if (!_vertexCreators[binaryVertexFormat].ForceComputeNormals)
-                return;
-
             for (var i = 0; i < indexList.Length; i += 3)
             {
                 var index0 = indexList[i + 0];
