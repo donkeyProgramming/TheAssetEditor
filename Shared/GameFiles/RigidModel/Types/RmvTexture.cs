@@ -36,6 +36,9 @@ namespace Shared.GameFormats.RigidModel.Types
     [DebuggerDisplay("{TexureType} - {Path}")]
     public struct RmvTexture
     {
+        /// <summary>Bytes of UTF-8 the 256-byte path field holds, leaving room for the terminator.</summary>
+        public const int MaxPathLength = 255;
+
         public TextureType TexureType;
         [MarshalAs(UnmanagedType.ByValArray, SizeConst = 256)]
         byte[] _path;
@@ -51,11 +54,14 @@ namespace Shared.GameFormats.RigidModel.Types
             }
             set
             {
+                var byteValues = Encoding.UTF8.GetBytes(value);
+                if (byteValues.Length > MaxPathLength)
+                    throw new ArgumentException($"Texture path is {byteValues.Length} bytes, but a model can store at most {MaxPathLength}: {value}");
+
                 _path = new byte[256];
                 for (var i = 0; i < 256; i++)
                     _path[i] = 0;
 
-                var byteValues = Encoding.UTF8.GetBytes(value);
                 for (var i = 0; i < byteValues.Length; i++)
                 {
                     _path[i] = byteValues[i];

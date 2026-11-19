@@ -48,17 +48,13 @@ namespace GameWorld.Core.Services
                 .Where(x => x != null)
                 .ToList();
 
+            errorMessages = ModelCombiner.GetVertexLimitErrors(objs);
+            if (errorMessages.HasData)
+                return false;
+
             var result = ModelCombiner.HasPotentialCombineMeshes(objs, out errorMessages);
             if (result)
             {
-                var totalIndexCount = objs.Sum(x => (long)x.Geometry.GetIndexCount());
-                if (totalIndexCount > ushort.MaxValue)
-                {
-                    errorMessages = new ErrorList();
-                    errorMessages.Error("Index limit exceeded", $"Combined mesh would have {totalIndexCount} indices, which exceeds the maximum of {ushort.MaxValue}. Reduce the number of meshes or their complexity before combining.");
-                    return false;
-                }
-
                 errorMessages = new ErrorList();
                 _commandFactory.CreateWithBuilder<CombineMeshCommand>().Configure(x => x.Configure(objectSelectionState.SelectedObjects())).BuildAndExecute();
             }
