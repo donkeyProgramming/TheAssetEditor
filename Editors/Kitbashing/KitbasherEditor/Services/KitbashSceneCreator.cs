@@ -106,15 +106,13 @@ namespace Editors.KitbasherEditor.Services
             _saveSettings.InitializeLodSettings(rmv.LodHeaders);
         }
 
-        // Saving rebuilds the file from the scene and writes every mesh as a plain weighted mesh. Meshes the scene
-        // could not show (decals, terrain tiles, lights, undecoded vertex layouts) are left out, and cloth, collision
-        // and rope meshes lose their physics data, so tell the user before they save over a vanilla-style model.
+        // Saving rebuilds the file from the scene as plain weighted meshes, dropping what the scene skipped and any physics data
         void WarnAboutMeshesLostOnSave(RmvFile rmv, List<Rmv2LodNode> lodNodes, string modelFullPath)
         {
             var fileMeshCount = rmv.ModelList.Sum(lod => lod.Length);
             var loadedMeshes = lodNodes.SelectMany(lodNode => SceneNodeHelper.GetChildrenOfType<Rmv2MeshNode>(lodNode)).ToList();
             var skippedCount = fileMeshCount - loadedMeshes.Count;
-            var physicsCount = loadedMeshes.Count(x => x.RmvMaterial.MaterialId is ModelMaterialEnum.cloth or ModelMaterialEnum.collision_shape or ModelMaterialEnum.rope);
+            var physicsCount = loadedMeshes.Count(x => ModelMaterialEnumHelper.HasPhysicsBlock(x.RmvMaterial.MaterialId));
             if (skippedCount <= 0 && physicsCount == 0)
                 return;
 

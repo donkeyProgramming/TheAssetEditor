@@ -69,11 +69,7 @@
             return weightedMaterials;
         }
 
-        /// <summary>
-        /// Cloth, weighted cloth, collision shapes and ropes are a weighted material followed by
-        /// a block of their own (see <see cref="MaterialHeaders.WeightedMaterial.PhysicsBlock"/>).
-        /// The game simulates all four in model space and ignores their pivot.
-        /// </summary>
+        /// <summary>A weighted header followed by a physics block, see <see cref="MaterialHeaders.WeightedMaterial.PhysicsBlock"/>.</summary>
         public static bool HasPhysicsBlock(ModelMaterialEnum material) => material is
             ModelMaterialEnum.weighted_cloth or
             ModelMaterialEnum.cloth or
@@ -113,8 +109,7 @@
         Position16_bit,
         CustomTerrain,
 
-        // Ids CA writes that no reference names. Each is resolved to a layout together with the
-        // stride, see VertexFactory.ResolveLayout
+        // Unnamed ids CA writes, resolved to a layout by stride (see VertexFactory.ResolveLayout)
         Rome2Tree = 7,      // tree billboards (stride 28) and tree cards (stride 12)
         Rome2Water = 8,     // water planes, stride 12
         Sway = 12,          // Warhammer's wind-swayed props, stride 20

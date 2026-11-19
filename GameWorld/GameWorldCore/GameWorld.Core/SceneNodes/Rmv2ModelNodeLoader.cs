@@ -61,16 +61,14 @@ namespace GameWorld.Core.SceneNodes
                 {
                     var rmvModel = model.ModelList[lodIndex][modelIndex];
 
-                    // The scene only renders the weighted material family, and only meshes whose vertices were decoded.
-                    // Decals, terrain tiles, banners, point lights and undecoded vertex layouts load and save as files,
-                    // and vegetation, grass and sway vertices have no tool vertex format, so they have nothing to put in the scene.
+                    // The scene can only show weighted materials whose vertices have a tool vertex format
                     if (rmvModel.Material is not WeightedMaterial || rmvModel.Mesh.VertexList.Length == 0 || rmvModel.Mesh.VertexLayout != null)
                     {
                         _logger.Here().Warning($"Skipping mesh {modelIndex} in lod {lodIndex} of {modelFullPath} - {rmvModel.Material.MaterialId} ({rmvModel.Material.GetType().Name}) with {rmvModel.Mesh.VertexList.Length} decoded vertices can not be shown");
                         continue;
                     }
 
-                    var geometry =_meshBuilderService.BuildMeshFromRmvModel(rmvModel, model.Header.SkeletonName);
+                    var geometry = _meshBuilderService.BuildMeshFromRmvModel(rmvModel, model.Header.SkeletonName);
 
                     var resolvedPart = resolvedPartsByLod.Count > lodIndex && resolvedPartsByLod[lodIndex].Count > modelIndex
                         ? resolvedPartsByLod[lodIndex][modelIndex]

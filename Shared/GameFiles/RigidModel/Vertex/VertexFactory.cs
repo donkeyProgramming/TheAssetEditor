@@ -54,12 +54,7 @@ namespace Shared.GameFormats.RigidModel.Vertex
 
         public bool IsKnownVertex(VertexFormat format) => _vertexCreators.ContainsKey(format);
 
-        /// <summary>
-        /// The layout for a declared format id and the stride the file actually has. The common
-        /// layouts are taken when their size matches; otherwise the pair picks one of the layouts
-        /// several ids share (vegetation declares CustomTerrain, grass and terrain bases declare
-        /// Position16, ...). Null when nothing matches; the block is then kept as raw bytes.
-        /// </summary>
+        // The layout for a declared format id and the file's stride, null when nothing matches
         public IVertexCreator? ResolveLayout(VertexFormat declared, uint stride, RmvVersionEnum version)
         {
             if (_vertexCreators.TryGetValue(declared, out var creator) && creator.GetVertexSize(version) == stride)

@@ -7,11 +7,7 @@ namespace Test.TestingUtility.Shared
     {
         public static readonly ushort[] CubeIndices = Enumerable.Range(0, 6).SelectMany(face => new[] { 0, 1, 2, 2, 3, 0 }.Select(i => (ushort)(face * 4 + i))).ToArray();
 
-        /// <summary>
-        /// A single-mesh v8 file laid out like Warhammer 3's rigidmodels/decals/chd/chd_coal_decal_01:
-        /// material 100, a 256-byte texture path, 24 declared vertices with no vertex block, and the
-        /// 36 indices of a unit cube.
-        /// </summary>
+        /// <summary>A one-mesh v8 decal laid out like Warhammer 3's rigidmodels/decals/chd/chd_coal_decal_01.</summary>
         public static byte[] BuildWarhammer3Decal(string texturePath)
         {
             using var stream = new MemoryStream();

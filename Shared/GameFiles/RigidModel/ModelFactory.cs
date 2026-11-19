@@ -90,15 +90,12 @@ namespace Shared.GameFormats.RigidModel
             var vertexFactory = VertexFactory.Create();
             var indexList = ReadIndices(dataArray, commonHeader, modelStartOffset);
 
-            // Some meshes ship no vertex block: a rope declares no vertices (the game sweeps a tube
-            // along the node chain in its material's physics block), and Warhammer 3's decals and
-            // static point lights declare a count but leave the geometry for the game to build.
-            // The header's count is kept, so the file saves back as it was read.
+            // Ropes, Warhammer 3's decals and static point lights have no vertex block; the game builds their geometry.
+            // The header's vertex count is kept, so the file saves back as read.
             if (commonHeader.VertexCount == 0 || commonHeader.IndexOffset == commonHeader.VertexOffset)
                 return new RmvMesh() { VertexList = [], IndexList = indexList };
 
-            // An indices-first section's size stops at its vertex block, so the vertices run past the
-            // section; such a mesh is always the last in the file, so they run to its end.
+            // An indices-first section's size stops at its vertices, which run to the end of the file (it is always the last mesh)
             var vertexStart = (int)(commonHeader.VertexOffset + modelStartOffset);
             var vertexBlockSize = indicesFirst ? dataArray.Length - vertexStart : (int)(commonHeader.IndexOffset - commonHeader.VertexOffset);
             if (vertexBlockSize % commonHeader.VertexCount != 0)
@@ -194,10 +191,8 @@ namespace Shared.GameFormats.RigidModel
             if (expectedMeshCount != file.LodHeaders[lodIndex].MeshCount)
                 throw new Exception("Unexpected MeshCount");
 
-            // The two byte totals are not always right in CA's own files: bow waves ship them zeroed, and the
-            // physics models (cloth sails, ropes) disagree with their geometry. The game walks the file by the
-            // mesh sections, so a vanilla file's totals are written back as they were read. RecalculateOffsets
-            // sets them correctly for anything built here.
+            // CA's own totals are not always right (zero on bow waves, off on cloth and ropes). The game walks the mesh
+            // sections, so they are written back as read; RecalculateOffsets sets them for anything built here.
             var expectedIndexSize = file.ModelList[lodIndex].Sum(x => x.Mesh.IndexList.Length) * sizeof(ushort);
             var expectedVertexSize = file.ModelList[lodIndex].Sum(x => x.Mesh.GetVertexBlockSize(x.Material.BinaryVertexFormat, file.Header.Version));
             if (expectedIndexSize != file.LodHeaders[lodIndex].TotalLodIndexSize || expectedVertexSize != file.LodHeaders[lodIndex].TotalLodVertexSize)
@@ -255,8 +250,7 @@ namespace Shared.GameFormats.RigidModel
                 binaryWriter.Write(model.Mesh.SectionTail);
             }
 
-            // An indices-first section's declared size does not cover its vertices (the birch tree's stops 24 bytes into a
-            // 96-byte block), so it is kept as read. Every other section is exactly what was written.
+            // An indices-first section's declared size doesn't cover its vertices, so it is kept as read
             var modelBytes = modelStream.ToArray();
             if (model.Mesh.IndicesFirst == false && model.CommonHeader.MeshSectionSize != modelBytes.Length)
                 throw new Exception("Unexpected MeshSectionSize");

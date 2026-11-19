@@ -3,17 +3,9 @@ using Half = SharpDX.Half;
 
 namespace Shared.GameFormats.RigidModel.Vertex.Formats
 {
-    /*
-     * The vertex layouts that the material's declared format id does not identify on its own.
-     * Several ids cover more than one layout and the game tells them apart by stride, so a
-     * layout is resolved from the pair (declared id, stride); see VertexFactory.ResolveLayout.
-     * The file's declared id stays on the material and is written back unchanged.
-     *
-     * Channels with no field in CommonVertex ride in CommonVertex.Extra, in the order listed on
-     * each layout, so the mesh saves back as it was read.
-     *
-     * Layouts and their evidence: rmv2_anim_blender_import_export, docs/FORMATS.md "Vertex layouts".
-     */
+    // Layouts the declared format id doesn't identify alone, resolved by (id, stride) in VertexFactory.ResolveLayout.
+    // Channels CommonVertex has no field for go in CommonVertex.Extra, in the order each layout lists.
+    // Layouts: rmv2_anim_blender_import_export, docs/FORMATS.md "Vertex layouts".
     public abstract class ExtraVertexLayout : IVertexCreator
     {
         public abstract VertexFormat Type { get; }
@@ -92,9 +84,8 @@ namespace Shared.GameFormats.RigidModel.Vertex.Formats
     }
 
     /// <summary>
-    /// Warhammer's wind-swayed props (hanging cloth, bone cages, leaf cards), declared format 12,
-    /// stride 20: half3 position + U, half3 normal + V, then a colour whose alpha is the sway
-    /// weight. The position is NOT scaled by W, because W is the U coordinate.
+    /// Warhammer's swaying props, format 12, stride 20: half3 position + U, half3 normal + V, then a colour whose
+    /// alpha is the sway weight. W is the U coordinate, not a scale.
     /// </summary>
     public class SwayVertexLayout : ExtraVertexLayout
     {

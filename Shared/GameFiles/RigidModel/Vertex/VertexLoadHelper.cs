@@ -312,14 +312,9 @@ namespace Shared.GameFormats.RigidModel.Vertex
         }
 
         /// <summary>
-        /// Encodes a half4 position the way CA's own files do. The W component is a scale the
-        /// reader multiplies XYZ by, and CA only uses it for extra precision (a W in [1, 2)
-        /// picked per vertex) in v8: Warhammer 3's v8 meshes use it on static and skinned
-        /// vertices alike. Before v8 every vanilla file stores XYZ as-is, with W = 1 on static
-        /// vertices and W = 0 on skinned ones (every one of 61,627 skinned vertices in a sample
-        /// of Warhammer 3's v7 models), and a pre-v8 mesh written with the trick was observed
-        /// to render scrambled in game (Attila).
-        /// Source: rmv2_anim_blender_import_export, docs/FORMATS.md "Vertex layouts".
+        /// Encodes a half4 position as CA does. W scales XYZ, and CA only uses that for extra precision in v8.
+        /// Before v8, W is 1 on static and 0 on skinned vertices; a mesh written with the trick rendered
+        /// scrambled in game (Attila). See rmv2_anim_blender_import_export, docs/FORMATS.md "Vertex layouts".
         /// </summary>
         static public HalfVector4 CreatePositionForVersion(Vector4 position, RmvVersionEnum rmvVersion, bool isSkinned)
         {
@@ -335,11 +330,7 @@ namespace Shared.GameFormats.RigidModel.Vertex
             };
         }
 
-        /// <summary>
-        /// Vertex colour is four plain unorm bytes, each channel byte / 255. It is not packed
-        /// like a normal: reading it through the normal decoder mapped it to [-1, 1] and
-        /// multiplied RGB by alpha, which no file could survive a re-save through.
-        /// </summary>
+        /// <summary>Vertex colour is four unorm bytes (byte / 255), not packed like a normal.</summary>
         static public Vector4 CreateColourFromBytes(byte r, byte g, byte b, byte a) => new(r / 255.0f, g / 255.0f, b / 255.0f, a / 255.0f);
 
         static public Vector4 CreateColourFromBytes(byte[] rgba) => CreateColourFromBytes(rgba[0], rgba[1], rgba[2], rgba[3]);

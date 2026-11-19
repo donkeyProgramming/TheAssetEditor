@@ -36,28 +36,15 @@ namespace Shared.GameFormats.RigidModel.MaterialHeaders
         /// <summary>The bone this mesh is welded to, -1 for none.</summary>
         public int MatrixIndex { get; set; } = -1;
 
-        /// <summary>
-        /// Despite the name, not a parent of <see cref="MatrixIndex"/>: it is the bone a
-        /// cloth-physics collider follows. Across all 132,246 meshes in Warhammer 3 it is -1
-        /// except on 81 meshes named collider_*, all in *_cloth_cloak_01 models, each of which
-        /// has MatrixIndex -1 and, where the mesh is named after a body part, names exactly
-        /// that bone (collider_spine_2 -> spine_2). Source: rmv2_anim_blender_import_export,
-        /// docs/FORMATS.md.
-        /// </summary>
+        /// <summary>Not a parent of MatrixIndex: the bone a cloth collider (a collider_* mesh) follows, -1 elsewhere.</summary>
         public int ParentMatrixIndex { get; set; } = -1;
 
-        /// <summary>
-        /// The two bytes after the filters field. They exist only to align the pivot to four
-        /// bytes and hold whatever was in CA's memory; kept so a re-save does not change them.
-        /// </summary>
+        /// <summary>Alignment before the pivot, holding stale memory. Kept so a re-save doesn't change it.</summary>
         public byte[] AlignmentPadding { get; set; } = new byte[2];
 
         /// <summary>
-        /// Cloth, weighted cloth, collision shapes and ropes (<see cref="ModelMaterialEnumHelper.HasPhysicsBlock"/>)
-        /// follow the weighted header with a block of their own: a cloth's simulation graph, a
-        /// weighted cloth's skeleton, a collision shape's sphere, a rope's node chain. It is not
-        /// interpreted here, only kept so the model loads and re-saves. Always empty for any
-        /// other material.
+        /// The block cloth, collision and rope materials have after the weighted header
+        /// (<see cref="ModelMaterialEnumHelper.HasPhysicsBlock"/>). Kept as raw bytes; empty for other materials.
         /// </summary>
         public byte[] PhysicsBlock { get; set; } = [];
 
@@ -437,13 +424,13 @@ namespace Shared.GameFormats.RigidModel.MaterialHeaders
         [MarshalAs(UnmanagedType.ByValArray, SizeConst = 256)]
         public byte[] Filters;  // Always zero?
 
-        public byte PaddingByte0;       // Alignment for the pivot, holds stale memory. See WeightedMaterial.AlignmentPadding
+        public byte PaddingByte0;       // See WeightedMaterial.AlignmentPadding
         public byte PaddingByte1;
 
         public RmvTransform Transform;
 
         public int MatrixIndex;         // Used when meshes should be attached to a bone, eg for buildings being destroyed 
-        public int ParentMatrixIndex;   // The bone a cloth-physics collider follows, -1 everywhere else. See WeightedMaterial.ParentMatrixIndex
+        public int ParentMatrixIndex;   // See WeightedMaterial.ParentMatrixIndex
         public uint AttachmentPointCount;
         public uint TextureCount;
         public uint StringParamCount;
