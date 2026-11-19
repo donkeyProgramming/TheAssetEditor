@@ -212,6 +212,8 @@ namespace GameWorld.Core.Rendering.Geometry
         public void Merge(List<MeshObject> others)
         {
             var newVertexBufferSize = others.Sum(x => x.VertexCount()) + VertexCount();
+            if (newVertexBufferSize > RmvMesh.MaxVertexCount)
+                throw new InvalidOperationException($"Merged mesh would have {newVertexBufferSize} vertices, but a mesh can have at most {RmvMesh.MaxVertexCount}");
             var newVertexArray = new VertexPositionNormalTextureCustom[newVertexBufferSize];
 
             // Copy current vertex buffer
@@ -231,7 +233,7 @@ namespace GameWorld.Core.Rendering.Geometry
             // Copy others into main
             foreach (var geo in others)
             {
-                var geoOffset = (ushort)currentVertexIndex;
+                var geoOffset = currentVertexIndex;
                 var geoVertexIndex = 0;
                 for (; geoVertexIndex < geo.VertexCount();)
                     newVertexArray[currentVertexIndex++] = geo.VertexArray[geoVertexIndex++];
