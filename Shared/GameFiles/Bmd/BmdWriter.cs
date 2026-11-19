@@ -5,11 +5,8 @@ using Shared.GameFormats.RigidModel.Transforms;
 namespace Shared.GameFormats.Bmd
 {
     /// <summary>
-    /// Serializes a <see cref="BmdFile"/> back to FASTBIN0 bytes, mirroring <see cref="BmdParser"/> section
-    /// by section. It writes the whole file, not only what the editor exposes, so saving an unedited file
-    /// reproduces it exactly. Record layouts follow the WH3 assembly kit's serialisers; the one exception is
-    /// FASTBIN &lt; 11, whose early prop/vfx block BmdParser only partly decodes and which can't be written.
-    /// The output is re-parsed as a self-check before it is returned.
+    /// Writes a <see cref="BmdFile"/> back to FASTBIN0, mirroring <see cref="BmdParser"/>, so an unedited file saves
+    /// as read. FASTBIN &lt; 11 can't be written. The output is re-parsed as a self-check.
     /// </summary>
     public static class BmdWriter
     {

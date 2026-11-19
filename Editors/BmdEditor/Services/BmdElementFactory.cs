@@ -12,9 +12,7 @@ namespace Editors.BmdEditor.Services
     {
         private const string DefaultHeightMode = "HM_TERRAIN";
 
-        // All-0xFF is the "no culture restriction" pattern vanilla files use; an all-zero mask would
-        // hide the new element from every culture.
-        /// <summary>The pdlc_mask Terry gives a prefab's entities: every bit.</summary>
+        // What vanilla and Terry use; an all-zero mask would hide the element from everyone
         private const ulong AllDlcs = ulong.MaxValue;
 
         private static BmdComponentFlags AllSeasonsFlags() => new()

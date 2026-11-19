@@ -1,15 +1,10 @@
 using Microsoft.Xna.Framework;
-using NUnit.Framework;
 using Shared.GameFormats.Bmd;
 using Shared.GameFormats.RigidModel.Transforms;
 
-namespace FileTypesTests.FileTypes.Bmd
+namespace GameWorld.Core.Test.GameFormats
 {
-    /// <summary>
-    /// Exercises the battle-only sections (capture locations, toggleable slots, catchment areas, ...), which no
-    /// vanilla WH3 .bmd prefab has data in, and old record versions. These check that the parser and writer
-    /// agree with each other; the layouts themselves come from the assembly kit's serialisers.
-    /// </summary>
+    // The battle-only sections no vanilla .bmd prefab has data in, and old record versions
     public class BmdRoundTripTests
     {
         [TestCase((ushort)12, (ushort)7)]

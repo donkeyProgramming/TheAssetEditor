@@ -1,11 +1,8 @@
 namespace Shared.GameFormats.Bmd
 {
     /// <summary>
-    /// Which files are BMDs. Prefabs use <c>.bmd</c>, but battle maps keep theirs as <c>.bin</c> files under
-    /// terrain/tiles/battle (bmd_data.bin, catchment_NN_layer_bmd_data.bin, *_procedural_bmd_data.bin, ...).
-    /// <c>.bin</c> is shared with other formats (even other FASTBIN0 ones such as battle_locations_map.bin and
-    /// tile_list.bin), so a <c>.bin</c> only counts when its name matches one of <see cref="BinNameParts"/>.
-    /// In vanilla WH3 these cover all 15,871 BMD <c>.bin</c> files and nothing else.
+    /// Which files are BMDs: <c>.bmd</c> prefabs, and battle maps' <c>.bin</c> files under terrain/tiles/battle.
+    /// <c>.bin</c> is shared with other formats, so a <c>.bin</c> only counts when its name matches <see cref="BinNameParts"/>.
     /// </summary>
     public static class BmdFileNames
     {
