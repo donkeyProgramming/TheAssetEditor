@@ -163,7 +163,7 @@ namespace GameWorld.Core.Test.Rendering.Materials.Serialization
             var materialCount = repo.ExistingMaterialsCount();
 
             // Assert
-            Assert.That(materialCount, Is.EqualTo(18));
+            Assert.That(materialCount, Is.EqualTo(17)); // the path now holds the new content, so the old content no longer maps to it
             Assert.That(newPath, Is.EqualTo(path));
             Assert.That(isNew, Is.True);
         }
