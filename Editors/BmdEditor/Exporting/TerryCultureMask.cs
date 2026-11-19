@@ -9,12 +9,9 @@ namespace Editors.BmdEditor.Exporting
     /// </summary>
     public static class TerryCultureMask
     {
-        // Bit i is the prefab_types_tables row with value i + 1 (value 0, NONE, is bit 63), copied
-        // from vanilla WH3's db/prefab_types_tables/data__ (table version 3, 40 rows). Rows without
-        // a culture (BASE, the BUILDING_* states, ABANDONED) are left out: Terry's culture_mask text
-        // can't name them. KISLEV_PROLOGUE (wh3_main_pro_ksl_kislev) shares Kislev's bit. Mods can
-        // add rows, but AssetEditor has no DB-reading path to look them up with
-        // (Shared/GameFiles/DB is dead scaffolding).
+        // Bit i is the row of vanilla WH3's db/prefab_types_tables with value i + 1 (NONE, value 0, is bit 63).
+        // Rows without a culture are left out: Terry's culture_mask can't name them. Rows added by mods
+        // aren't known, as AssetEditor has no way to read DB tables.
         private static readonly Dictionary<int, string> BitNames = new()
         {
             [6] = "wh_dlc03_bst_beastmen",

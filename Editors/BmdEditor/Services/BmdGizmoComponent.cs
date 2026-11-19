@@ -13,10 +13,8 @@ using Microsoft.Xna.Framework.Input;
 namespace Editors.BmdEditor.Services
 {
     /// <summary>
-    /// A BMD transform gizmo, ported from <c>CscGizmoComponent</c>. The stock <see cref="GizmoComponent"/>
-    /// bakes transforms into mesh vertices; this one routes the <see cref="Gizmo"/> widget's deltas into the
-    /// selected element's own position/rotation/scale via <see cref="BmdElementViewModel"/>. BMD scene
-    /// groups are all identity transforms, so a world delta is a local delta.
+    /// Ported from <c>CscGizmoComponent</c>. Unlike <see cref="GizmoComponent"/>, which bakes transforms into the
+    /// vertices, it applies the gizmo's deltas to the selected element's own transform.
     /// </summary>
     public class BmdGizmoComponent : BaseComponent, IDisposable
     {
