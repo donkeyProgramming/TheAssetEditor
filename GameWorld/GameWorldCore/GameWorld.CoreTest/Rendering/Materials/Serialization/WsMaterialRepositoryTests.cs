@@ -1,5 +1,6 @@
 ﻿using GameWorld.Core.Rendering.Materials.Serialization;
 using Shared.Core.PackFiles;
+using Shared.Core.PackFiles.Models;
 using Shared.Core.Settings;
 using Shared.TestUtility;
 using Test.TestingUtility.TestUtility;
@@ -163,7 +164,7 @@ namespace GameWorld.Core.Test.Rendering.Materials.Serialization
             var materialCount = repo.ExistingMaterialsCount();
 
             // Assert
-            Assert.That(materialCount, Is.EqualTo(18));
+            Assert.That(materialCount, Is.EqualTo(17)); // the old content no longer maps to the overwritten path
             Assert.That(newPath, Is.EqualTo(path));
             Assert.That(isNew, Is.True);
         }
@@ -190,6 +191,45 @@ namespace GameWorld.Core.Test.Rendering.Materials.Serialization
             Assert.That(isNew, Is.False);
         }
 
+        [TestCase]
+        public void LoadExistingMaterials_SameContentInTwoPacks_UsesLastLoadedPack()
+        {
+            // Arrange
+            var pfs = new PackFileService(null);
+            var firstPack = pfs.CreateNewPackFileContainer("first", PackFileVersion.PFH5, PackFileCAType.RELEASE, false);
+            var lastPack = pfs.CreateNewPackFileContainer("last", PackFileVersion.PFH5, PackFileCAType.MOD, true);
+            var content = "PreContent0<name> customMaterialName </name>PostContent0";
+            pfs.AddFilesToPack(firstPack, [new NewPackFileEntry("first/materials", PackFile.CreateFromASCII("material0.xml.material", content))]);
+            pfs.AddFilesToPack(lastPack, [new NewPackFileEntry("last/materials", PackFile.CreateFromASCII("material0.xml.material", content))]);
+
+            // Act
+            var repo = new WsMaterialRepository(pfs);
+            var finalPath = repo.GetExistingOrAddMaterial(content, "content/material1.xml.material", out var isNew);
+
+            // Assert
+            Assert.That(finalPath, Is.EqualTo(@"last\materials\material0.xml.material"));
+            Assert.That(isNew, Is.False);
+        }
+
+        [TestCase]
+        public void LoadExistingMaterials_PathOverriddenByLaterPack_OldContentNotOffered()
+        {
+            // Arrange
+            var pfs = new PackFileService(null);
+            var firstPack = pfs.CreateNewPackFileContainer("first", PackFileVersion.PFH5, PackFileCAType.RELEASE, false);
+            var lastPack = pfs.CreateNewPackFileContainer("last", PackFileVersion.PFH5, PackFileCAType.MOD, true);
+            var shadowedContent = "PreContent0<name> customMaterialName </name>PostContent0";
+            pfs.AddFilesToPack(firstPack, [new NewPackFileEntry("content", PackFile.CreateFromASCII("material0.xml.material", shadowedContent))]);
+            pfs.AddFilesToPack(lastPack, [new NewPackFileEntry("content", PackFile.CreateFromASCII("material0.xml.material", "PreContent1<name> customMaterialName </name>PostContent1"))]);
+
+            // Act
+            var repo = new WsMaterialRepository(pfs);
+            var finalPath = repo.GetExistingOrAddMaterial(shadowedContent, "content/material1.xml.material", out var isNew);
+
+            // Assert
+            Assert.That(finalPath, Is.EqualTo("content/material1.xml.material"));
+            Assert.That(isNew, Is.True);
+        }
 
         [TestCase]
         public void AddMaterial_NameMissingFromFile()
