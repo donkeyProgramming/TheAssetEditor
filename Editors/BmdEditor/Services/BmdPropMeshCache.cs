@@ -12,10 +12,8 @@ using Shared.GameFormats.RigidModel.MaterialHeaders;
 namespace Editors.BmdEditor.Services
 {
     /// <summary>
-    /// Loads each prop model once and shares its LOD 0 geometry between every prop that uses it, so
-    /// a BMD with 200 copies of a fence builds one set of vertex and index buffers, not 200.
-    /// Scene nodes count their uses (see <see cref="SharedPropMeshNode"/>): a model's GPU buffers
-    /// are freed, and the model forgotten, when the last node using it leaves the scene.
+    /// Loads each prop model once and shares its LOD 0 geometry between every prop that uses it. A model's GPU
+    /// buffers are freed when the last <see cref="SharedPropMeshNode"/> using it leaves the scene.
     /// </summary>
     public class BmdPropMeshCache(IPackFileService packFileService, Rmv2ModelNodeLoader rmv2ModelNodeLoader, IModelAssetResolver modelAssetResolver)
     {
@@ -76,10 +74,8 @@ namespace Editors.BmdEditor.Services
                 _models.Remove(model.Path);
         }
 
-        /// <summary>Forgets models no scene node uses, freeing geometry that was built but never
-        /// added to the scene. Models that failed to load are kept unless
-        /// <paramref name="includeFailures"/> is set, so an Add or Delete rebuild doesn't retry
-        /// them all; a reload from the packs passes true to try them again.</summary>
+        /// <summary>Forgets models no scene node uses. Failed loads are only forgotten with
+        /// <paramref name="includeFailures"/>, so an Add or Delete rebuild doesn't retry them all.</summary>
         public void RemoveUnused(bool includeFailures)
         {
             foreach (var model in _models.Values.Where(m => m.UseCount <= 0 && (includeFailures || m.FailureReason == null)).ToList())
@@ -122,9 +118,8 @@ namespace Editors.BmdEditor.Services
         }
     }
 
-    /// <summary>A prop mesh drawing geometry shared through <see cref="BmdPropMeshCache"/>. Where a
-    /// plain <see cref="Rmv2MeshNode"/> frees its own buffers when it leaves the scene, this one
-    /// only gives up its use of the shared ones, which are freed when the last user leaves.</summary>
+    /// <summary>A prop mesh drawing geometry shared through <see cref="BmdPropMeshCache"/>. Leaving the scene
+    /// only gives up its use of the buffers, which are freed when the last user leaves.</summary>
     public class SharedPropMeshNode : Rmv2MeshNode
     {
         private readonly BmdPropMeshCache _cache;

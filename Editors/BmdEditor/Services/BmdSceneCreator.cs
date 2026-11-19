@@ -13,13 +13,8 @@ namespace Editors.BmdEditor.Services
 {
     /// <summary>
     /// Builds the 3D view of a BMD: its own elements, plus the content of each BMD it references.
-    ///
-    /// The scene is flat: groups keep an identity ModelMatrix, and each drawn node carries its full
-    /// world matrix (its own placement, times the reference's placement for referenced content).
-    /// Two reasons. Picking tests a mesh against its own ModelMatrix only, ignoring its parents, so
-    /// a prop placed through a parent group would be picked as if it stood at the origin. And the
-    /// scene manager multiplies parent matrices in the wrong order for nested placements
-    /// (parent * child), which only gives the right result while at most one level is non-identity.
+    /// The scene is flat (groups keep an identity ModelMatrix, each node carries its full world matrix), because
+    /// picking ignores parent matrices and the scene manager composes nested ones in the wrong order.
     /// </summary>
     public class BmdSceneCreator(GameWorld.Core.Components.SceneManager sceneManager, BmdPropMeshCache propMeshCache)
     {
@@ -30,11 +25,8 @@ namespace Editors.BmdEditor.Services
         private SceneNode? _currentHighlightedNode;
 
         /// <summary>
-        /// Replaces the scene with one built from <paramref name="bmdFile"/> and its view models
-        /// (<paramref name="allElements"/>, with each referenced BMD's elements under its
-        /// <see cref="BmdInfoViewModel"/>). With <paramref name="reuseLoadedModels"/>, the new
-        /// scene is built before the old one is removed, so prop models both use are not reloaded;
-        /// without it, everything is read from the packs again.
+        /// Replaces the scene. With <paramref name="reuseLoadedModels"/> the new scene is built before the old one is
+        /// removed, so the prop models both use are not reloaded; without it everything is read from the packs again.
         /// </summary>
         public void BuildScene(BmdFile bmdFile, IReadOnlyList<BmdElementViewModel> allElements, bool reuseLoadedModels)
         {
@@ -272,9 +264,8 @@ namespace Editors.BmdEditor.Services
             return node;
         }
 
-        /// <summary>The reference's own marker, plus (for a reference the loader parsed) the
-        /// referenced file's content placed at the reference's transform. The loader only parses
-        /// references one level deep, so nested references show just their marker.</summary>
+        /// <summary>The reference's marker, plus the referenced file's content for a reference the loader parsed
+        /// (one level deep only).</summary>
         private SceneNode CreateBmdInfoNode(BmdInfo bmdInfo, BmdInfoViewModel viewModel, GroupNode group, int index, Matrix world)
         {
             var name = Path.GetFileNameWithoutExtension(bmdInfo.BmdString);
