@@ -9,9 +9,6 @@ namespace Test.GameWorld.Core.WsMaterialTemplate
         {
 
         }
-        protected override CapabilityMaterial CreateCloneInstance()
-        {
-            throw new NotImplementedException();
-        }
+        protected override CapabilityMaterial CreateCloneInstance() => new CapabilityMaterialMock(Type);
     }
 }

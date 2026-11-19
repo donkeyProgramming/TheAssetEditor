@@ -3,6 +3,7 @@ using System.Linq;
 using GameWorld.Core.Rendering.Materials.Shaders;
 using GameWorld.Core.SceneNodes;
 using Shared.Core.ErrorHandling;
+using Shared.GameFormats.RigidModel;
 
 namespace GameWorld.Core.Utility
 {
@@ -68,23 +69,33 @@ namespace GameWorld.Core.Utility
             return combinedMeshes;
         }
 
-        static List<List<Rmv2MeshNode>> SortMeshesIntoCombinableGroups(List<Rmv2MeshNode> meshList)
+        // One error per set of combinable meshes whose vertices together are more than one mesh can address
+        public static ErrorList GetVertexLimitErrors(List<Rmv2MeshNode> meshList)
+        {
+            var errors = new ErrorList();
+            foreach (var group in SortMeshesIntoCombinableGroups(meshList, int.MaxValue))
+            {
+                var vertexCount = group.Sum(x => x.Geometry.VertexCount());
+                if (vertexCount > RmvMesh.MaxVertexCount)
+                    errors.Error("Vertex limit exceeded", $"Combining {string.Join(", ", group.Select(x => x.Name))} would make a mesh with {vertexCount} vertices, but a mesh can have at most {RmvMesh.MaxVertexCount}");
+            }
+
+            return errors;
+        }
+
+        // A mesh joins the first group it can combine with that still has room for its vertices
+        static List<List<Rmv2MeshNode>> SortMeshesIntoCombinableGroups(List<Rmv2MeshNode> meshList, int maxVertexCount = RmvMesh.MaxVertexCount)
         {
             var groupedOutput = new List<List<Rmv2MeshNode>>();
             foreach (var currentMesh in meshList)
             {
-                var foundMeshToCombineWith = false;
-                foreach (var potentialCombineTargetGroup in groupedOutput)
-                {
-                    var canCombine = CanCombine(potentialCombineTargetGroup.First(), currentMesh, out _);
-                    if (canCombine)
-                    {
-                        potentialCombineTargetGroup.Add(currentMesh);
-                        foundMeshToCombineWith = true;
-                    }
-                }
+                var group = groupedOutput.FirstOrDefault(x =>
+                    CanCombine(x.First(), currentMesh, out _) &&
+                    x.Sum(mesh => mesh.Geometry.VertexCount()) + currentMesh.Geometry.VertexCount() <= maxVertexCount);
 
-                if (foundMeshToCombineWith == false)
+                if (group != null)
+                    group.Add(currentMesh);
+                else
                     groupedOutput.Add(new List<Rmv2MeshNode>() { currentMesh });
             }
 
