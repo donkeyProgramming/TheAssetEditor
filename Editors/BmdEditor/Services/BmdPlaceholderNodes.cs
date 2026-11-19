@@ -442,7 +442,7 @@ namespace Editors.BmdEditor.Services
                 var rotationMatrix = Matrix.CreateFromQuaternion(Quaternion);
                 var translationMatrix = Matrix.CreateTranslation(positionVector);
                 var localTransform = rotationMatrix * translationMatrix;
-                var worldTransform = localTransform * parentWorld;
+                var worldTransform = localTransform * ModelMatrix * parentWorld;
                 
                 var outerConeLines = CreateWireframeCone(worldTransform, NodeColour, Length, OuterAngle, 16);
                 renderEngine.AddRenderLines(outerConeLines);

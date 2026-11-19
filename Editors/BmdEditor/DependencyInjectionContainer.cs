@@ -30,6 +30,7 @@ namespace Editors.BmdEditor
             serviceCollection.AddScoped<IEditorInterface, BmdEditorViewModel>();
 
             serviceCollection.AddScoped<BmdSceneCreator>();
+            serviceCollection.AddScoped<BmdPropMeshCache>();
             serviceCollection.AddScoped<SelectionManager>();
             serviceCollection.AddScoped<BmdElementLoader>();
 

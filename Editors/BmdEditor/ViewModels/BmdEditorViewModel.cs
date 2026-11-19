@@ -194,9 +194,18 @@ namespace Editors.BmdEditor.ViewModels
             BmdFile = parser.Parse();
             HasUnsavedChanges = false;
 
-            _bmdSceneCreator.CreateSceneFromBmd(BmdFile!, packFile);
-
+            // A (re)load reads everything from the packs again, referenced BMDs and prop models included.
+            _bmdElementLoader.ClearReferencedBmdCache();
             PopulateViewModels();
+            _bmdSceneCreator.BuildScene(BmdFile!, AllElements, reuseLoadedModels: false);
+        }
+
+        /// <summary>After an element is added or deleted: rebuilds the view models and the scene from
+        /// the in-memory BmdFile, reusing the referenced BMDs and prop models already loaded.</summary>
+        private void RebuildAfterEdit()
+        {
+            PopulateViewModels();
+            _bmdSceneCreator.BuildScene(BmdFile!, AllElements, reuseLoadedModels: true);
         }
 
         // "Add" menu: add a default element to its BmdFile list, rebuild the scene and view models
@@ -207,8 +216,7 @@ namespace Editors.BmdEditor.ViewModels
             if (BmdFile == null)
                 return;
 
-            _bmdSceneCreator.CreateSceneFromBmd(BmdFile, CurrentFile);
-            PopulateViewModels();
+            RebuildAfterEdit();
             HasUnsavedChanges = true;
 
             var newElement = findNewElement();
@@ -353,8 +361,7 @@ namespace Editors.BmdEditor.ViewModels
             SelectedComponent = null;
             ComponentDetails = "Select a component to view details";
 
-            _bmdSceneCreator.CreateSceneFromBmd(BmdFile!, CurrentFile);
-            PopulateViewModels();
+            RebuildAfterEdit();
             HasUnsavedChanges = true;
         }
 
@@ -423,8 +430,28 @@ namespace Editors.BmdEditor.ViewModels
             foreach (var element in AllElements)
                 element.Modified += () => OnElementModified(element);
 
+            _referencedElements.Clear();
+            foreach (var reference in BmdInfos)
+                AddReferencedElements(reference.ChildElements);
+
             RebuildComponentGroups();
         }
+
+        // Elements of the BMDs this file references. They are shown, but belong to other files, so
+        // the gizmo doesn't move them.
+        private readonly HashSet<BmdElementViewModel> _referencedElements = [];
+
+        private void AddReferencedElements(IEnumerable<BmdElementViewModel> elements)
+        {
+            foreach (var element in elements)
+            {
+                _referencedElements.Add(element);
+                AddReferencedElements(element.Children);
+            }
+        }
+
+        private void SetGizmoTarget(BmdElementViewModel? component) =>
+            _gizmo.SetTarget(component != null && _referencedElements.Contains(component) ? null : component);
 
         /// <summary>Splits the flat typed collections into named, collapsible sections for the
         /// component tree - including separating decal props from regular props.</summary>
@@ -516,7 +543,7 @@ namespace Editors.BmdEditor.ViewModels
         {
             SelectedComponent = component;
             ComponentDetails = GenerateComponentDetails(component);
-            _gizmo.SetTarget(component);
+            SetGizmoTarget(component);
 
             SelectComponentIn3DScene(component);
         }
@@ -871,7 +898,7 @@ namespace Editors.BmdEditor.ViewModels
                         // Update the selected component in the UI without triggering another selection change
                         SelectedComponent = component;
                         ComponentDetails = GenerateComponentDetails(component);
-                        _gizmo.SetTarget(component);
+                        SetGizmoTarget(component);
                     }
                 }
             }
@@ -1385,6 +1412,10 @@ namespace Editors.BmdEditor.ViewModels
     public class BmdInfoViewModel(BmdInfo bmd) : BmdElementViewModel("BMD", bmd.BmdString, $"Version: {bmd.Version}, Region: {bmd.RegionString}")
     {
         public BmdInfo Bmd { get; } = bmd;
+
+        /// <summary>The referenced file, parsed; null when it is missing or failed to parse. Its
+        /// elements are the <see cref="ChildElements"/>, and the 3D view draws them at <see cref="BmdInfo.Transform"/>.</summary>
+        public BmdFile? ReferencedBmd { get; set; }
         public ObservableCollection<BmdElementViewModel> ChildElements { get; } = [];
         public bool IsExpanded { get; set; } = false;
         public bool HasChildren { get; set; } = false;
