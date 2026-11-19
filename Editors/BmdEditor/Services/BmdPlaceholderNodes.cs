@@ -21,7 +21,6 @@ namespace Editors.BmdEditor.Services
                 var drawColour = NodeColour;
                 var worldTransform = Matrix.CreateScale(Scale) * ModelMatrix * parentWorld;
                 
-                // Render a small cube as the placeholder
                 renderEngine.AddRenderLines(GameWorld.Core.Rendering.LineHelper.CreateCube(worldTransform, drawColour));
             }
         }
@@ -53,7 +52,6 @@ namespace Editors.BmdEditor.Services
                 var drawColour = NodeColour;
                 var worldTransform = Matrix.CreateScale(Scale) * ModelMatrix * parentWorld;
                 
-                // Render a small cube as the placeholder
                 renderEngine.AddRenderLines(GameWorld.Core.Rendering.LineHelper.CreateCube(worldTransform, drawColour));
             }
         }
@@ -83,12 +81,10 @@ namespace Editors.BmdEditor.Services
         {
             if (IsVisible)
             {
-                // Render outer sphere
                 var outerTransform = Matrix.CreateScale(OuterRadius) * ModelMatrix * parentWorld;
                 var outerSphereLines = PointLightSphereNode.CreateWireframeSphere(outerTransform, NodeColour, 16);
                 renderEngine.AddRenderLines(outerSphereLines);
                 
-                // Render inner sphere
                 var innerTransform = Matrix.CreateScale(InnerRadius) * ModelMatrix * parentWorld;
                 var innerSphereLines = PointLightSphereNode.CreateWireframeSphere(innerTransform, SelectedNodeColour, 16);
                 renderEngine.AddRenderLines(innerSphereLines);
@@ -123,7 +119,6 @@ namespace Editors.BmdEditor.Services
                 var drawColour = NodeColour;
                 var worldTransform = Matrix.CreateScale(Scale) * ModelMatrix * parentWorld;
                 
-                // Render a small cube as the placeholder
                 renderEngine.AddRenderLines(GameWorld.Core.Rendering.LineHelper.CreateCube(worldTransform, drawColour));
             }
         }
@@ -155,7 +150,6 @@ namespace Editors.BmdEditor.Services
                 var drawColour = NodeColour;
                 var worldTransform = Matrix.CreateScale(Scale) * ModelMatrix * parentWorld;
                 
-                // Render a cube as the placeholder
                 renderEngine.AddRenderLines(GameWorld.Core.Rendering.LineHelper.CreateCube(worldTransform, drawColour));
             }
         }
@@ -187,7 +181,6 @@ namespace Editors.BmdEditor.Services
                 var drawColour = NodeColour;
                 var worldTransform = ModelMatrix * parentWorld;
 
-                // Create lines connecting all vertices in order, including closing the loop
                 var lineVertices = new List<VertexPositionColor>();
 
                 for (var i = 0; i < VertexList.Count; i++)
@@ -201,7 +194,6 @@ namespace Editors.BmdEditor.Services
                     var worldStart = Vector3.Transform(startPos, worldTransform);
                     var worldEnd = Vector3.Transform(endPos, worldTransform);
 
-                    // Add two vertices for each line segment
                     lineVertices.Add(new VertexPositionColor(worldStart, drawColour));
                     lineVertices.Add(new VertexPositionColor(worldEnd, drawColour));
                 }
@@ -240,7 +232,6 @@ namespace Editors.BmdEditor.Services
                 var drawColour = NodeColour;
                 var worldTransform = ModelMatrix * parentWorld;
 
-                // Create lines connecting all vertices in order, including closing the loop
                 var lineVertices = new List<VertexPositionColor>();
 
                 for (var i = 0; i < VertexList.Count; i++)
@@ -254,7 +245,6 @@ namespace Editors.BmdEditor.Services
                     var worldStart = Vector3.Transform(startPos, worldTransform);
                     var worldEnd = Vector3.Transform(endPos, worldTransform);
 
-                    // Add two vertices for each line segment
                     lineVertices.Add(new VertexPositionColor(worldStart, drawColour));
                     lineVertices.Add(new VertexPositionColor(worldEnd, drawColour));
                 }
@@ -293,7 +283,6 @@ namespace Editors.BmdEditor.Services
                 var drawColour = NodeColour;
                 var worldTransform = ModelMatrix * parentWorld;
                 
-                // Create lines connecting all points in order, including closing the loop
                 var lineVertices = new List<VertexPositionColor>();
                 
                 for (var i = 0; i < PointList.Count; i++)
@@ -307,7 +296,6 @@ namespace Editors.BmdEditor.Services
                     var worldStart = Vector3.Transform(startPos, worldTransform);
                     var worldEnd = Vector3.Transform(endPos, worldTransform);
                     
-                    // Add two vertices for each line segment
                     lineVertices.Add(new VertexPositionColor(worldStart, drawColour));
                     lineVertices.Add(new VertexPositionColor(worldEnd, drawColour));
                 }
@@ -346,7 +334,6 @@ namespace Editors.BmdEditor.Services
                 var drawColour = NodeColour;
                 var worldTransform = Matrix.CreateScale(Radius) * ModelMatrix * parentWorld;
                 
-                // Render a wireframe sphere as the point light indicator
                 var sphereLines = CreateWireframeSphere(worldTransform, drawColour, 16);
                 renderEngine.AddRenderLines(sphereLines);
             }
@@ -451,18 +438,15 @@ namespace Editors.BmdEditor.Services
         {
             if (IsVisible)
             {
-                // Create transform from position and quaternion rotation
                 var positionVector = new Vector3(Position.X, Position.Y, Position.Z);
                 var rotationMatrix = Matrix.CreateFromQuaternion(Quaternion);
                 var translationMatrix = Matrix.CreateTranslation(positionVector);
                 var localTransform = rotationMatrix * translationMatrix;
                 var worldTransform = localTransform * parentWorld;
                 
-                // Render outer cone (larger, more transparent)
                 var outerConeLines = CreateWireframeCone(worldTransform, NodeColour, Length, OuterAngle, 16);
                 renderEngine.AddRenderLines(outerConeLines);
                 
-                // Render inner cone (smaller, more visible)
                 var innerConeLines = CreateWireframeCone(worldTransform, SelectedNodeColour, Length, InnerAngle, 16);
                 renderEngine.AddRenderLines(innerConeLines);
             }
@@ -543,12 +527,10 @@ namespace Editors.BmdEditor.Services
                 var v2 = new Vector3(SecondVert.X, SecondVert.Y, SecondVert.Z);
                 var v3 = new Vector3(ThirdVert.X, ThirdVert.Y, ThirdVert.Z);
                 
-                // Transform vertices to world space
                 v1 = Vector3.Transform(v1, worldTransform);
                 v2 = Vector3.Transform(v2, worldTransform);
                 v3 = Vector3.Transform(v3, worldTransform);
                 
-                // Draw triangle edges
                 renderEngine.AddRenderLines([
                     new VertexPositionColor(v1, drawColour),
                     new VertexPositionColor(v2, drawColour),
@@ -591,7 +573,6 @@ namespace Editors.BmdEditor.Services
                 var drawColour = NodeColour;
                 var worldTransform = ModelMatrix * parentWorld;
                 
-                // Convert vertices to world space
                 var worldVertices = new Vector3[Vertices.Length];
                 for (var i = 0; i < Vertices.Length; i++)
                 {
@@ -612,7 +593,6 @@ namespace Editors.BmdEditor.Services
                         
                         if (idx1 < worldVertices.Length && idx2 < worldVertices.Length && idx3 < worldVertices.Length)
                         {
-                            // Add triangle edges
                             lineVertices.Add(new VertexPositionColor(worldVertices[idx1], drawColour));
                             lineVertices.Add(new VertexPositionColor(worldVertices[idx2], drawColour));
                             lineVertices.Add(new VertexPositionColor(worldVertices[idx2], drawColour));
@@ -660,7 +640,6 @@ namespace Editors.BmdEditor.Services
                 var drawColour = NodeColour;
                 var worldTransform = Matrix.CreateScale(Scale) * ModelMatrix * parentWorld;
                 
-                // Render a larger cube as the BMD reference placeholder
                 renderEngine.AddRenderLines(GameWorld.Core.Rendering.LineHelper.CreateCube(worldTransform, drawColour));
             }
         }
@@ -694,7 +673,6 @@ namespace Editors.BmdEditor.Services
                 var drawColour = NodeColour;
                 var worldTransform = Matrix.CreateScale(Scale) * ModelMatrix * parentWorld;
                 
-                // Render a cube as the prop placeholder
                 renderEngine.AddRenderLines(GameWorld.Core.Rendering.LineHelper.CreateCube(worldTransform, drawColour));
             }
         }
@@ -729,7 +707,6 @@ namespace Editors.BmdEditor.Services
                 var drawColour = NodeColour;
                 var worldTransform = ModelMatrix * parentWorld;
 
-                // Render cubes at all coordinates
                 foreach (var coord in CoordList)
                 {
                     var position = new Vector3(coord.X, coord.Y, coord.Z);
@@ -753,7 +730,6 @@ namespace Editors.BmdEditor.Services
                         var worldStart = Vector3.Transform(startPos, worldTransform);
                         var worldEnd = Vector3.Transform(endPos, worldTransform);
                         
-                        // Add two vertices for each line segment
                         lineVertices.Add(new VertexPositionColor(worldStart, drawColour));
                         lineVertices.Add(new VertexPositionColor(worldEnd, drawColour));
                     }

@@ -7,18 +7,12 @@ using Editors.BmdEditor.ViewModels;
 
 namespace Editors.BmdEditor.Services
 {
-    /// <summary>
-    /// Service for recursively loading BMD elements and their child elements
-    /// </summary>
     public class BmdElementLoader(IPackFileService packFileService, BmdSceneCreator bmdSceneCreator)
     {
         private readonly IPackFileService _packFileService = packFileService;
         private readonly ILogger _logger = Serilog.Log.ForContext<BmdElementLoader>();
         private readonly BmdSceneCreator _bmdSceneCreator = bmdSceneCreator;
 
-        /// <summary>
-        /// Loads all elements from a BMD file into the provided collections
-        /// </summary>
         public void LoadElements(BmdFile bmdFile, 
             ObservableCollection<BmdElementViewModel> allElements,
             ObservableCollection<BmdInfoViewModel> bmdInfos,
@@ -45,7 +39,6 @@ namespace Editors.BmdEditor.Services
         {
             if (bmdFile == null) return;
 
-            // Load all element types using helper methods
             LoadBmdInfos(bmdFile, bmdInfos, allElements, loadChildBmds);
             LoadBattlefieldBuildings(bmdFile, battlefieldBuildings, allElements);
             LoadBattlefieldBuildingFars(bmdFile, battlefieldBuildingFars, allElements);
@@ -67,13 +60,9 @@ namespace Editors.BmdEditor.Services
             LoadCscInfos(bmdFile, cscInfos, allElements);
             LoadDeployments(bmdFile, deployments, allElements);
 
-            // After all view models are created, load the 3D scene with direct references
             _bmdSceneCreator.LoadSceneContent(bmdFile, allElements);
         }
 
-        /// <summary>
-        /// Loads child elements for a BmdInfoViewModel by recursively loading the referenced BMD file
-        /// </summary>
         public void LoadChildElements(BmdInfoViewModel parentViewModel, BmdFile referencedBmd)
         {
             if (parentViewModel == null || referencedBmd == null) return;
@@ -84,7 +73,6 @@ namespace Editors.BmdEditor.Services
             _logger.Information($"Loading child elements for BMD: {parentViewModel.Bmd.BmdString}");
             _logger.Information($"Referenced BMD has {referencedBmd.PropInfos.Count} props, {referencedBmd.VfxInfos.Count} VFX, {referencedBmd.PointLights.Count} lights");
 
-            // Create temporary collections for child elements
             var childAllElements = new ObservableCollection<BmdElementViewModel>();
             var childBmdInfos = new ObservableCollection<BmdInfoViewModel>();
             var childBattlefieldBuildings = new ObservableCollection<BattlefieldBuildingViewModel>();
@@ -116,7 +104,6 @@ namespace Editors.BmdEditor.Services
                 childTerrainHoles, childPlayableAreas, childCscInfos, childDeployments,
                 loadChildBmds: false);
 
-            // Add all loaded elements to the parent's Children collection
             foreach (var element in childAllElements)
             {
                 parentViewModel.ChildElements.Add(element);
@@ -137,7 +124,6 @@ namespace Editors.BmdEditor.Services
                 _logger.Information($"Processing BMD reference: {bmd.BmdString}");
                 var vm = new BmdInfoViewModel(bmd);
                 
-                // Load child elements if requested
                 if (loadChildBmds)
                 {
                     try
@@ -193,7 +179,7 @@ namespace Editors.BmdEditor.Services
         private static void LoadCaptureLocations(BmdFile bmdFile, ObservableCollection<CaptureLocationViewModel> captureLocations, 
             ObservableCollection<BmdElementViewModel> allElements)
         {
-            foreach (var captureLocation in bmdFile.CaptureLocations)
+            foreach (var captureLocation in bmdFile.CaptureLocationLists.SelectMany(l => l.Locations))
             {
                 var vm = new CaptureLocationViewModel(captureLocation);
                 captureLocations.Add(vm);
