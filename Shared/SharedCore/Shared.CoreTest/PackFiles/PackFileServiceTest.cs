@@ -578,6 +578,39 @@ namespace Shared.CoreTest.PackFiles
             Assert.That(path, Is.EqualTo("folder\\file.txt"));
         }
 
+        // A mod's tech skeleton often has the same file name as a vanilla skeleton
+        static (PackFileService Pfs, PackFile VanillaFile, PackFile ModFile, IPackFileContainer Mod) CreateSameNameInTwoPacks()
+        {
+            var pfs = CreateService();
+            var ca = PackFileContainer.CreateCaPackFile("CaPack", "ca_path");
+            var vanillaFile = new PackFile("foo01.anim", new MemorySource([1]));
+            ca.AddOrUpdateFile("animations\\skeletons\\foo01.anim", vanillaFile);
+            pfs.AddContainer(ca);
+
+            var mod = PackFileContainer.CreatePackFile("Mod", "mod_path");
+            var modFile = new PackFile("foo01.anim", new MemorySource([2]));
+            mod.AddOrUpdateFile("variantmeshes\\foo\\tech\\foo01.anim", modFile);
+            pfs.AddContainer(mod, true);
+            return (pfs, vanillaFile, modFile, mod);
+        }
+
+        [Test]
+        public void GetFullPath_SameNameInEarlierContainer_ReturnsOwnPath()
+        {
+            var (pfs, vanillaFile, modFile, _) = CreateSameNameInTwoPacks();
+
+            Assert.That(pfs.GetFullPath(modFile), Is.EqualTo("variantmeshes\\foo\\tech\\foo01.anim"));
+            Assert.That(pfs.GetFullPath(vanillaFile), Is.EqualTo("animations\\skeletons\\foo01.anim"));
+        }
+
+        [Test]
+        public void GetPackFileContainer_SameNameInEarlierContainer_ReturnsOwningContainer()
+        {
+            var (pfs, _, modFile, mod) = CreateSameNameInTwoPacks();
+
+            Assert.That(pfs.GetPackFileContainer(modFile), Is.EqualTo(mod));
+        }
+
         [Test]
         public void GetFullPath_UnknownFile_Throws()
         {

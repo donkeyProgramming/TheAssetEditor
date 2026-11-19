@@ -327,13 +327,31 @@ namespace Shared.Core.PackFiles
 
         public IPackFileContainer? GetPackFileContainer(PackFile file)
         {
+            var found = ResolveFile(file);
+            if (found != null)
+                return found.Value.Container;
+
+            _logger.Here().Warning($"Unknown packfile container for file '{file.Name}'");
+            return null;
+        }
+
+        // An exact match in any container wins over a name match, or a mod file named like a vanilla one resolves to the vanilla path
+        (IPackFileContainerInternal Container, string Path)? ResolveFile(PackFile file)
+        {
+            foreach (var pf in _packFileContainers)
+            {
+                var exactPath = pf.GetExactFullPath(file);
+                if (exactPath != null)
+                    return (pf, exactPath);
+            }
+
             foreach (var pf in _packFileContainers)
             {
                 var path = pf.GetFullPath(file);
                 if (path != null)
-                    return pf;
+                    return (pf, path);
             }
-            _logger.Here().Warning($"Unknown packfile container for file '{file.Name}'");
+
             return null;
         }
 
@@ -373,12 +391,9 @@ namespace Shared.Core.PackFiles
         {
             if (container == null)
             {
-                foreach (var pf in _packFileContainers)
-                {
-                    var res = pf.GetFullPath(file);
-                    if (res != null)
-                        return res;
-                }
+                var found = ResolveFile(file);
+                if (found != null)
+                    return found.Value.Path;
             }
             else
             {
