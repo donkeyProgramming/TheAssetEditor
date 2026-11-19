@@ -8,10 +8,7 @@ namespace GameWorld.Core.Rendering.Materials.Serialization
 {
     public class MaterialToRmvSerializer
     {
-        // The order CA's spec/gloss weighted models list their textures in, e.g.
-        // weighted:          Diffuse, Normal, Specular, Mask, Gloss                                      (0,1,11,3,12)
-        // weighted_dirtmap:  Diffuse, Normal, Decal_dirtmap, Decal_dirtmask, Specular, Mask, Gloss       (0,1,13,14,11,3,12)
-        // decal_dirtmap:     ...the same, then Decal_mask                                                (0,1,13,14,11,3,12,15)
+        // The order CA's spec/gloss weighted models list their textures in
         static readonly TextureType[] s_specGlossTextureOrder =
         [
             TextureType.Diffuse,
@@ -37,7 +34,7 @@ namespace GameWorld.Core.Rendering.Materials.Serialization
             return newMaterial;
         }
 
-        // Stable sort: textures not in the order list keep their relative order, after the listed ones.
+        // Stable: unlisted textures keep their relative order, after the listed ones
         static void SortTextures(WeightedMaterial material, TextureType[] order)
         {
             int Rank(RmvTexture texture)

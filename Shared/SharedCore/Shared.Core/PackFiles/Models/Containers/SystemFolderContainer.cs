@@ -463,9 +463,7 @@ namespace Shared.Core.PackFiles.Models.Containers
             transientContainer.PackFileSettings.IgnoredFilesWhenSerializing = new ObservableCollection<string>(PackFileSettings.IgnoredFilesWhenSerializing);
             transientContainer.PackFileSettings.EnablePackFileCorruptionDetection = PackFileSettings.EnablePackFileCorruptionDetection;
 
-            // The output pack may be inside the project folder, in which case a rescan picks it up as
-            // a project file. Packing it into itself would nest the previous save inside the new one,
-            // doubling the pack each session until it exceeds 2GB and can no longer be read.
+            // An output pack inside the project folder is picked up as a project file; don't pack it into itself
             var outputFullPath = Path.GetFullPath(path);
             var tempFullPath = Path.GetFullPath(tempPath);
 

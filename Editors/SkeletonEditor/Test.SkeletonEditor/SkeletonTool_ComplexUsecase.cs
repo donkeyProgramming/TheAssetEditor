@@ -44,8 +44,6 @@ namespace Test.SkeletonEditor
         }
 
 
-        // A mod's tech skeleton is often named like the vanilla skeleton it extends with ap_ bones.
-        // Opening it must load that file, not animations\skeletons\<same name>.anim.
         [Test]
         public void OpenTechSkeleton_SameNameAsVanillaSkeleton_LoadsTechSkeleton()
         {
