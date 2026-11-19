@@ -110,8 +110,7 @@ namespace GameWorld.Core.Rendering.Materials.Serialization
 
         void LoadAllExistingMaterials()
         {
-            // Walk the packs in lookup order (last loaded wins) so a path overridden by a later pack
-            // is registered with the content the game will actually read.
+            // Last loaded pack wins, as in FindFile: for a path, and for identical content at different paths
             var containers = _packFileService.GetAllPackfileContainers();
             var seenPaths = new HashSet<string>();
             for (var i = containers.Count - 1; i >= 0; i--)
@@ -125,8 +124,9 @@ namespace GameWorld.Core.Rendering.Materials.Serialization
                     try
                     {
                         var bytes = pack.DataSource.ReadData();
-                        var content = Encoding.UTF8.GetString(bytes);
-                        Register(SanatizeMaterial(content), fileName);
+                        var content = SanatizeMaterial(Encoding.UTF8.GetString(bytes));
+                        if (_map.ContainsKey(content) == false)
+                            Register(content, fileName);
                     }
                     catch (Exception e)
                     {
