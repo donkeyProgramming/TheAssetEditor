@@ -1,7 +1,6 @@
 ﻿using GameWorld.Core.Services.SceneSaving.Geometry;
 using GameWorld.Core.Services.SceneSaving.Lod;
 using GameWorld.Core.Services.SceneSaving.Material;
-using Microsoft.Xna.Framework;
 using Shared.Core.Settings;
 using Shared.GameFormats.RigidModel.LodHeader;
 using Shared.GameFormats.RigidModel.Types;
@@ -98,13 +97,28 @@ namespace GameWorld.Core.Services.SceneSaving
             }
         }
 
+        // Medians over vanilla WH3 unit models: camera distances 10, 20, 30 with the last LOD at 10000, quality 2
+        // for LOD0 and 0 after, triangles kept 1, 0.65, 0.31, 0.105, 0.027. Rome 2/Attila unit models (RMV2 v6)
+        // use distances 100, 200, 400, 500 and reduce about as much.
+        public const float LastLodCameraDistance = 10000;
+        static readonly float[] s_defaultLodReductionFactors = [1, 0.65f, 0.3f, 0.1f, 0.03f];
+        static readonly float[] s_rmv6LodCameraDistances = [100, 200, 400, 500];
+
+        float GetDefaultCameraDistance(int lodIndex, int lodCount)
+        {
+            if (GeometryOutputType == GeometryStrategy.Rmv6)
+                return lodIndex < s_rmv6LodCameraDistances.Length
+                    ? s_rmv6LodCameraDistances[lodIndex]
+                    : s_rmv6LodCameraDistances[^1] + 100 * (lodIndex - s_rmv6LodCameraDistances.Length + 1);
+
+            var isLastLod = lodIndex == lodCount - 1;
+            return isLastLod ? LastLodCameraDistance : 10 * (lodIndex + 1);
+        }
+
         LodGenerationSettings GenerateLodSettingsForIndex(int lodIndex, int lodCount, RmvLodHeader[]? lodHeaders)
         {
-            int[] possibleCameraDistances = [20, 80, 100, 10000, 10000, 10000];
-            byte[] possibleQualityValues = [2, 0, 0, 0, 0, 0, 0];
-
-            float cameraDistance = possibleCameraDistances[lodIndex];
-            var qualityLvl = possibleQualityValues[lodIndex];
+            var cameraDistance = GetDefaultCameraDistance(lodIndex, lodCount);
+            var qualityLvl = (byte)(lodIndex == 0 ? 2 : 0);
 
             if (lodHeaders != null)
             {
@@ -121,20 +135,11 @@ namespace GameWorld.Core.Services.SceneSaving
             {
                 CameraDistance = cameraDistance,
                 QualityLvl = qualityLvl,
-                LodRectionFactor = GetDefaultLodReductionValue(lodCount, lodIndex),
+                LodRectionFactor = s_defaultLodReductionFactors[Math.Min(lodIndex, s_defaultLodReductionFactors.Length - 1)],
                 OptimizeAlpha = lodIndex >= 2,
                 OptimizeVertex = lodIndex >= 2,
             };
             return setting;
-        }
-
-        static float GetDefaultLodReductionValue(int numLods, int currentLodIndex)
-        {
-            var lerpValue = (1.0f / (numLods - 1)) * (numLods - 1 - currentLodIndex);
-            if (float.IsNaN(lerpValue))
-                lerpValue = 1;
-            var deductionRatio = MathHelper.Lerp(0.25f, 1, lerpValue);
-            return deductionRatio;
         }
     }
 

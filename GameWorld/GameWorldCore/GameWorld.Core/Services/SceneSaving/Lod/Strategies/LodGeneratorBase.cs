@@ -17,6 +17,13 @@ namespace GameWorld.Core.Services.SceneSaving.Lod.Strategies
 
         protected abstract void ReduceMesh(Rmv2MeshNode rmv2MeshNode, float deductionRatio);
 
+        // Reduces each mesh on its own unless a strategy reduces the model as a whole
+        protected virtual void ReduceMeshes(List<Rmv2MeshNode> meshes, float deductionRatio)
+        {
+            foreach (var mesh in meshes)
+                ReduceMesh(mesh, deductionRatio);
+        }
+
         private void DeleteAllLods(List<Rmv2LodNode> lodRootNodes)
         {
             _logger.Here().Information($"Deleting all lods");
@@ -128,10 +135,20 @@ namespace GameWorld.Core.Services.SceneSaving.Lod.Strategies
 
             // Reduce the polygon count
             foreach (var mesh in originalMeshClone)
-            {
                 mesh.Name = mesh.Name.Replace(" - Clone", "");
-                if (mesh.ReduceMeshOnLodGeneration && settings.LodRectionFactor != 1)
-                    ReduceMesh(mesh, deductionRatio);
+
+            if (settings.LodRectionFactor != 1)
+            {
+                ReduceMeshes(originalMeshClone.Where(x => x.ReduceMeshOnLodGeneration).ToList(), deductionRatio);
+
+                // Whole-model reduction can remove every part of a mesh (all of a fur card set, say)
+                var emptyMeshes = originalMeshClone.Where(x => x.Geometry.IndexArray.Length == 0).ToList();
+                foreach (var mesh in emptyMeshes)
+                {
+                    _logger.Here().Information($"LOD {lodIndex}: mesh {mesh.Name} was reduced away entirely");
+                    mesh.Geometry.RemoveGraphicsCardResources();
+                    originalMeshClone.Remove(mesh);
+                }
             }
 
             _logger.Here().Information($"Completed Creating LOD {lodIndex} with settings: Deduction Ratio {settings.LodRectionFactor}, Optimize Alpha {settings.OptimizeAlpha}, Optimize Vertex {settings.OptimizeVertex}");
