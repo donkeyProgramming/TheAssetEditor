@@ -114,7 +114,7 @@ namespace Editors.KitbasherEditor.Services
             var fileMeshCount = rmv.ModelList.Sum(lod => lod.Length);
             var loadedMeshes = lodNodes.SelectMany(lodNode => SceneNodeHelper.GetChildrenOfType<Rmv2MeshNode>(lodNode)).ToList();
             var skippedCount = fileMeshCount - loadedMeshes.Count;
-            var physicsCount = loadedMeshes.Count(x => x.RmvMaterial.MaterialId is ModelMaterialEnum.cloth or ModelMaterialEnum.collision_shape or ModelMaterialEnum.rope);
+            var physicsCount = loadedMeshes.Count(x => ModelMaterialEnumHelper.HasPhysicsBlock(x.RmvMaterial.MaterialId));
             if (skippedCount <= 0 && physicsCount == 0)
                 return;
 
