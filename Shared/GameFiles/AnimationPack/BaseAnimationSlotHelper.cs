@@ -19,7 +19,7 @@ namespace Shared.GameFormats.AnimationPack
                     break;
 
                 case GameTypeEnum.Warhammer3:
-                    Load("Resources.AnimationSlots.Warhammer3AnimationSlots_dlc24.txt");
+                    Load("Resources.AnimationSlots.Warhammer3AnimationSlots_patch9.txt");
                     break;
 
                 case GameTypeEnum.Troy:
