@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using Shared.Core.PackFiles;
 using Shared.GameFormats.Bmd;
@@ -7,11 +8,17 @@ using Editors.BmdEditor.ViewModels;
 
 namespace Editors.BmdEditor.Services
 {
-    public class BmdElementLoader(IPackFileService packFileService, BmdSceneCreator bmdSceneCreator)
+    public class BmdElementLoader(IPackFileService packFileService)
     {
         private readonly IPackFileService _packFileService = packFileService;
         private readonly ILogger _logger = Serilog.Log.ForContext<BmdElementLoader>();
-        private readonly BmdSceneCreator _bmdSceneCreator = bmdSceneCreator;
+
+        // Referenced BMDs parsed so far, by path (null = missing or unparsable). Kept across Add and
+        // Delete rebuilds so a reference is parsed once, not once per rebuild or per reference.
+        private readonly Dictionary<string, BmdFile?> _referencedBmds = new(StringComparer.OrdinalIgnoreCase);
+
+        /// <summary>Forgets every parsed referenced BMD, so the next load reads them from the packs again.</summary>
+        public void ClearReferencedBmdCache() => _referencedBmds.Clear();
 
         public void LoadElements(BmdFile bmdFile, 
             ObservableCollection<BmdElementViewModel> allElements,
@@ -59,8 +66,6 @@ namespace Editors.BmdEditor.Services
             LoadPlayableAreas(bmdFile, playableAreas, allElements);
             LoadCscInfos(bmdFile, cscInfos, allElements);
             LoadDeployments(bmdFile, deployments, allElements);
-
-            _bmdSceneCreator.LoadSceneContent(bmdFile, allElements);
         }
 
         public void LoadChildElements(BmdInfoViewModel parentViewModel, BmdFile referencedBmd)
@@ -69,9 +74,6 @@ namespace Editors.BmdEditor.Services
 
             parentViewModel.ChildElements.Clear();
             parentViewModel.HasChildren = false;
-
-            _logger.Information($"Loading child elements for BMD: {parentViewModel.Bmd.BmdString}");
-            _logger.Information($"Referenced BMD has {referencedBmd.PropInfos.Count} props, {referencedBmd.VfxInfos.Count} VFX, {referencedBmd.PointLights.Count} lights");
 
             var childAllElements = new ObservableCollection<BmdElementViewModel>();
             var childBmdInfos = new ObservableCollection<BmdInfoViewModel>();
@@ -109,8 +111,31 @@ namespace Editors.BmdEditor.Services
                 parentViewModel.ChildElements.Add(element);
                 parentViewModel.HasChildren = true;
             }
+        }
 
-            _logger.Information($"Successfully loaded {parentViewModel.ChildElements.Count} child elements for BMD: {parentViewModel.Bmd.BmdString}");
+        private BmdFile? GetReferencedBmd(string path)
+        {
+            if (string.IsNullOrEmpty(path))
+                return null;
+            if (_referencedBmds.TryGetValue(path, out var cached))
+                return cached;
+
+            BmdFile? parsed = null;
+            try
+            {
+                var file = _packFileService.FindFile(path);
+                if (file == null)
+                    _logger.Warning($"Referenced BMD file not found: {path}");
+                else
+                    parsed = BmdParser.Parse(file.DataSource.ReadData());
+            }
+            catch (Exception ex)
+            {
+                _logger.Warning($"Failed to load referenced BMD '{path}': {ex.Message}");
+            }
+
+            _referencedBmds[path] = parsed;
+            return parsed;
         }
 
         #region Helper Methods for Loading Specific Element Types
@@ -121,33 +146,14 @@ namespace Editors.BmdEditor.Services
             for (var i = 0; i < bmdFile.BmdInfos.Count; i++)
             {
                 var bmd = bmdFile.BmdInfos[i];
-                _logger.Information($"Processing BMD reference: {bmd.BmdString}");
                 var vm = new BmdInfoViewModel(bmd);
-                
-                if (loadChildBmds)
+
+                if (loadChildBmds && GetReferencedBmd(bmd.BmdString) is { } referencedBmd)
                 {
-                    try
-                    {
-                        var referencedBmdFile = _packFileService.FindFile(bmd.BmdString);
-                        if (referencedBmdFile != null)
-                        {
-                            _logger.Information($"Found referenced BMD file: {bmd.BmdString}");
-                            var referencedBmdData = referencedBmdFile.DataSource.ReadData();
-                            var referencedBmd = BmdParser.Parse(referencedBmdData);
-                            LoadChildElements(vm, referencedBmd);
-                            _logger.Information($"Successfully loaded {vm.ChildElements.Count} child elements for BMD: {bmd.BmdString}");
-                        }
-                        else
-                        {
-                            _logger.Warning($"Referenced BMD file not found: {bmd.BmdString}");
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        _logger.Warning($"Failed to load referenced BMD '{bmd.BmdString}' for UI: {ex.Message}");
-                    }
+                    vm.ReferencedBmd = referencedBmd;
+                    LoadChildElements(vm, referencedBmd);
                 }
-                
+
                 bmdInfos.Add(vm);
                 allElements.Add(vm);
             }
