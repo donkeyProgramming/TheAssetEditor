@@ -134,8 +134,7 @@ namespace AssetEditor
             }
         }
 
-        // Building the game files audio cache takes minutes after a game update, so it must not block the main window.
-        // The audio tools build it themselves on first use if this has not finished, waiting for this build if it is still running.
+        // Takes minutes after a game update, so don't block the main window. Audio tools wait for it or build it on first use.
         private void StartGameFilesAudioCacheBuild()
         {
             var scopeFactory = _serviceProvider!.GetRequiredService<IServiceScopeFactory>();
