@@ -96,6 +96,30 @@ namespace Shared.CoreTest.PackFiles.Serialization
         }
 
         [Test]
+        public void SaveAndLoadCache_DeletesOnlyOlderFingerprintsOfTheSameCache()
+        {
+            var currentFingerprint = new string('A', 64);
+            var currentPath = Path.Combine(_tempDir, $"CachedGameFiles_All Game Packs - Warhammer III_{currentFingerprint}.db");
+            var stalePath = Path.Combine(_tempDir, $"CachedGameFiles_All Game Packs - Warhammer III_{new string('B', 64)}.db");
+            var otherGamePath = Path.Combine(_tempDir, $"CachedGameFiles_All Game Packs - Warhammer III Extra_{new string('C', 64)}.db");
+            var notAFingerprintPath = Path.Combine(_tempDir, "CachedGameFiles_All Game Packs - Warhammer III_backup.db");
+            foreach (var path in new[] { stalePath, otherGamePath, notAFingerprintPath })
+                File.WriteAllText(path, "old");
+
+            var container = PackFileContainer.CreateCaPackFile("All Game Packs - Warhammer III", @"c:\game\data");
+            var parent = new PackedFileSourceParent { FilePath = @"c:\game\data\pack1.pack" };
+            container.AddOrUpdateFile("folder\\file.txt", new PackFile("file.txt", new PackedFileSource(parent, 0, 10, false, false, CompressionFormat.None, 0)));
+
+            using (var loaded = new PackFileContainerCacheHelper().SaveAndLoadCache(currentFingerprint, container, currentPath))
+                Assert.That(loaded.GetFileCount(), Is.EqualTo(1));
+
+            Assert.That(File.Exists(currentPath), Is.True);
+            Assert.That(File.Exists(stalePath), Is.False);
+            Assert.That(File.Exists(otherGamePath), Is.True);
+            Assert.That(File.Exists(notAFingerprintPath), Is.True);
+        }
+
+        [Test]
         public void LoadCache_ReturnsCorrectFileData()
         {
             // Arrange

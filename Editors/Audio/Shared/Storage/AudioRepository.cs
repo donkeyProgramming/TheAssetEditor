@@ -102,6 +102,11 @@ namespace Editors.Audio.Shared.Storage
 
         public void EnsureGameFilesCache()
         {
+            // Load never reads a cache for these games, so building one would only cost minutes of disk and CPU
+            var gameInformation = GameInformationDatabase.GetGameById(_applicationSettingsService.CurrentSettings.CurrentGame);
+            if (gameInformation.BankGeneratorVersion == GameBnkVersion.Unsupported)
+                return;
+
             var source = CreateGameFilesCacheSource();
             if (source == null)
                 return;
@@ -496,7 +501,7 @@ namespace Editors.Audio.Shared.Storage
 
         private AudioCache LoadCachedRepository(AudioCacheSource source)
         {
-            return _cacheHelper.TryLoadFromCache(source.CacheFilePath, source.Fingerprint) ?? _cacheHelper.SaveAndLoadCache(source);
+            return _cacheHelper.LoadOrBuildCache(source);
         }
 
         private List<LoadedLayer> LoadLayers(List<AudioCacheSource> sources)
@@ -658,7 +663,7 @@ namespace Editors.Audio.Shared.Storage
 
         private static bool HasRelevantAudioFiles(List<IPackFileContainer> containers)
         {
-            return containers.Any(container => container.SearchFiles(null, [".bnk", ".dat", ".wwiseids"]).Count != 0);
+            return containers.Any(container => AudioCacheHelper.FindAudioDataFiles(container).Count != 0);
         }
 
         private static bool IsLanguageIncluded(string bnkPath, List<string> languages)

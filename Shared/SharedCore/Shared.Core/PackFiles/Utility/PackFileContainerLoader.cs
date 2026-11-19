@@ -143,7 +143,8 @@ namespace Shared.Core.PackFiles.Utility
                 //var reasonMessage = string.Format(_localizationManager.Get("PackFileCache.InvalidReason." + cacheInvalidReason), gameName);
                 //var buildingMessage = string.Format(_localizationManager.Get("PackFileCache.BuildingCache"), gameName);
                 //var cacheDescription = _localizationManager.Get("PackFileCache.Description");
-                _standardDialogs.ShowDialogBox("Failed to load from cache - Generating new cache");
+                // Not an error: there is no cache yet, or the game was updated since it was built.
+                _standardDialogs.ShowDialogBox($"Building the file cache for {createdPackFileName}.\n\nThis happens the first time and after each game update, and can take a minute.");
             }
 
             using (_standardDialogs.ShowWaitCursor())

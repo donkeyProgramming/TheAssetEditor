@@ -39,15 +39,11 @@ namespace GameWorld.Core.Services
         private readonly Dictionary<IPackFileContainer, HashSet<string>> _containerToSkeletonPaths = [];
         private readonly ObservableCollection<string> _skeletonFileNames = [];
 
+        // Empty (0 byte) .anim files are skipped without being listed here; WH3 ships 15 of them in anim2.pack.
+        // This entry predates WH3 and is not in its packs, so why it is broken could not be checked.
         private static readonly HashSet<string> BrokenFiles = new(StringComparer.OrdinalIgnoreCase)
         {
             "rigidmodels\\buildings\\roman_aqueduct_straight\\roman_aqueduct_straight_piece01_destruct01_anim.anim",
-            "animations\\battle\\raptor02\\subset\\colossal_squig\\deaths\\rp2_colossalsquig_death_01.anim",
-            "animations\\battle\\humanoid13b\\golgfag\\docking\\hu13b_golgfag_docking_armed_02.anim",
-            "animations\\battle\\humanoid13\\ogre\\rider\\hq3b_stonehorn_wb\\sword_and_crossbow\\missile_action\\crossbow\\hu13_hq3b_swc_rider1_shoot_back_crossbow_01.anim",
-            "animations\\battle\\humanoid13\\ogre\\rider\\hq3b_stonehorn_wb\\sword_and_crossbow\\missile_action\\crossbow\\hu13_hq3b_swc_rider1_reload_crossbow_01.anim",
-            "animations\\battle\\humanoid13\\ogre\\rider\\hq3b_stonehorn_wb\\sword_and_crossbow\\missile_action\\crossbow\\hu13_hq3b_sp_rider1_shoot_ready_crossbow_01.anim",
-            "animations\\battle\\humanoid01c\\sayl_staff_and_skull\\stand\\props\\hu1c_sayl_staff_and_skull_staff_stand_idle_02.anim"
         };
 
         public SkeletonAnimationLookUpHelper(IPackFileService packFileService, IGlobalEventHub globalEventHub)
@@ -181,6 +177,7 @@ namespace GameWorld.Core.Services
             var stopwatch = Stopwatch.StartNew();
             var skeletonFileNameList = new ConcurrentBag<string>();
             var animationList = new ConcurrentDictionary<string, ConcurrentBag<AnimationReference>>(StringComparer.OrdinalIgnoreCase);
+            var emptyFiles = new ConcurrentBag<string>();
 
             var allAnimations = PackFileServiceUtility.FindAllWithExtentionIncludePaths(_packFileService, ".anim", packFileContainer);
 
@@ -216,20 +213,23 @@ namespace GameWorld.Core.Services
                     if (bytes.Length > 100)
                         Array.Resize(ref bytes, 100);
 
-                    FileDiscovered(bytes, packFileContainer, file.FullPath, skeletonFileNameList, animationList);
+                    FileDiscovered(bytes, packFileContainer, file.FullPath, skeletonFileNameList, animationList, emptyFiles);
                 }
             });
 
             // Handle all in memory files 
             Parallel.ForEach(allAnimsOtherFiles, animation =>
             {
-                FileDiscovered(animation.DataSource.PeekData(100), packFileContainer, animation.FullPath, skeletonFileNameList, animationList);
+                FileDiscovered(animation.DataSource.PeekData(100), packFileContainer, animation.FullPath, skeletonFileNameList, animationList, emptyFiles);
             });
 
             var resultAnimations = animationList.ToDictionary(
                 x => x.Key,
                 x => x.Value.ToList(),
                 StringComparer.OrdinalIgnoreCase);
+
+            if (!emptyFiles.IsEmpty)
+                _logger.Here().Information("Skipped {EmptyFileCount} empty animation files in [{ContainerName}]: {EmptyFiles}", emptyFiles.Count, packFileContainer.Name, string.Join(", ", emptyFiles.OrderBy(x => x, StringComparer.OrdinalIgnoreCase)));
 
             stopwatch.Stop();
             _logger.Here().Information(
@@ -247,8 +247,15 @@ namespace GameWorld.Core.Services
             IPackFileContainer container,
             string fullPath,
             ConcurrentBag<string> skeletonFileNameList,
-            ConcurrentDictionary<string, ConcurrentBag<AnimationReference>> animationList)
+            ConcurrentDictionary<string, ConcurrentBag<AnimationReference>> animationList,
+            ConcurrentBag<string> emptyFiles)
         {
+            if (byteChunk.Length == 0)
+            {
+                emptyFiles.Add(fullPath);
+                return;
+            }
+
             if (BrokenFiles.Contains(fullPath))
             {
                 _logger.Here().Warning("Skipping loading of known broken file - " + fullPath);
@@ -257,11 +264,6 @@ namespace GameWorld.Core.Services
 
             try
             {
-                if (byteChunk.Length == 0)
-                {
-                    throw new Exception("File empty.");
-                }
-
                 var animationSkeletonName = AnimationFile.GetAnimationName(byteChunk);
                 var animationReference = new AnimationReference(fullPath, container);
                 animationList.GetOrAdd(animationSkeletonName, _ => []).Add(animationReference);
