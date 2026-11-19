@@ -327,13 +327,34 @@ namespace Shared.Core.PackFiles
 
         public IPackFileContainer? GetPackFileContainer(PackFile file)
         {
+            var found = ResolveFile(file);
+            if (found != null)
+                return found.Value.Container;
+
+            _logger.Here().Warning($"Unknown packfile container for file '{file.Name}'");
+            return null;
+        }
+
+        // The container holding this exact file wins over any container's match-by-name fallback.
+        // Otherwise a mod file sharing its name with a vanilla file (a tech skeleton named like a
+        // skeleton under animations\skeletons, say) resolves to the vanilla path, because the CA
+        // container is asked first.
+        (IPackFileContainerInternal Container, string Path)? ResolveFile(PackFile file)
+        {
+            foreach (var pf in _packFileContainers)
+            {
+                var exactPath = pf.GetExactFullPath(file);
+                if (exactPath != null)
+                    return (pf, exactPath);
+            }
+
             foreach (var pf in _packFileContainers)
             {
                 var path = pf.GetFullPath(file);
                 if (path != null)
-                    return pf;
+                    return (pf, path);
             }
-            _logger.Here().Warning($"Unknown packfile container for file '{file.Name}'");
+
             return null;
         }
 
@@ -373,12 +394,9 @@ namespace Shared.Core.PackFiles
         {
             if (container == null)
             {
-                foreach (var pf in _packFileContainers)
-                {
-                    var res = pf.GetFullPath(file);
-                    if (res != null)
-                        return res;
-                }
+                var found = ResolveFile(file);
+                if (found != null)
+                    return found.Value.Path;
             }
             else
             {

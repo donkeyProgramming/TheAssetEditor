@@ -147,10 +147,16 @@ namespace Shared.Core.PackFiles.Models.Containers
             return _fileList.ContainsKey(normalizedPath);
         }
 
-        public string? GetFullPath(PackFile file)
+        public string? GetExactFullPath(PackFile file)
         {
             var pathByReference = _fileList.FirstOrDefault(x => ReferenceEquals(x.Value, file)).Key;
-            if (!string.IsNullOrWhiteSpace(pathByReference))
+            return string.IsNullOrWhiteSpace(pathByReference) ? null : pathByReference;
+        }
+
+        public string? GetFullPath(PackFile file)
+        {
+            var pathByReference = GetExactFullPath(file);
+            if (pathByReference != null)
                 return pathByReference;
 
             // Fallback: match by name, but only when it is unambiguous. Matching by name
@@ -457,8 +463,19 @@ namespace Shared.Core.PackFiles.Models.Containers
             transientContainer.PackFileSettings.IgnoredFilesWhenSerializing = new ObservableCollection<string>(PackFileSettings.IgnoredFilesWhenSerializing);
             transientContainer.PackFileSettings.EnablePackFileCorruptionDetection = PackFileSettings.EnablePackFileCorruptionDetection;
 
+            // The output pack may be inside the project folder, in which case a rescan picks it up as
+            // a project file. Packing it into itself would nest the previous save inside the new one,
+            // doubling the pack each session until it exceeds 2GB and can no longer be read.
+            var outputFullPath = Path.GetFullPath(path);
+            var tempFullPath = Path.GetFullPath(tempPath);
+
             foreach (var (relativePath, packFile) in _fileList)
             {
+                var absolutePath = Path.GetFullPath(Path.Combine(SystemFilePath!, relativePath));
+                if (string.Equals(absolutePath, outputFullPath, StringComparison.OrdinalIgnoreCase)
+                    || string.Equals(absolutePath, tempFullPath, StringComparison.OrdinalIgnoreCase))
+                    continue;
+
                 var data = packFile.DataSource.ReadData();
                 var memFile = new PackFile(packFile.Name, new MemorySource(data));
                 transientContainer.AddOrUpdateFile(relativePath, memFile);

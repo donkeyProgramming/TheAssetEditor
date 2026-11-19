@@ -1,7 +1,11 @@
 ﻿using Editor.VisualSkeletonEditor.SkeletonEditor;
 using Editors.Shared.Core.Common.ReferenceModel;
+using GameWorld.Core.Animation;
 using Moq;
 using Shared.Core.Commands;
+using Shared.Core.PackFiles;
+using Shared.Core.PackFiles.Models;
+using Shared.Core.PackFiles.Models.FileSources;
 using Shared.Core.Services;
 using Shared.Core.ToolCreation;
 using Shared.GameFormats.Animation;
@@ -39,6 +43,34 @@ namespace Test.SkeletonEditor
             Save(runner, skeletonTool);
         }
 
+
+        // A mod's tech skeleton is often named like the vanilla skeleton it extends with ap_ bones.
+        // Opening it must load that file, not animations\skeletons\<same name>.anim.
+        [Test]
+        public void OpenTechSkeleton_SameNameAsVanillaSkeleton_LoadsTechSkeleton()
+        {
+            var runner = new AssetEditorTestRunner();
+            runner.CreateCaContainer();
+            var outputPackFile = runner.LoadPackFile(_inputPackFileKarl, true)!;
+
+            var vanillaFile = runner.PackFileService.FindFile("animations\\skeletons\\humanoid01.anim")!;
+            var vanillaAnim = AnimationFile.Create(vanillaFile.DataSource.ReadDataAsChunk());
+            var techSkeleton = new GameSkeleton(vanillaAnim, null);
+            techSkeleton.CreateChildBone(0);
+            techSkeleton.BoneNames[^1] = "ap_test";
+            var techAnim = AnimationClip.CreateSkeletonAnimation(techSkeleton).ConvertToFileFormat(techSkeleton);
+            techAnim.Header.SkeletonName = vanillaAnim.Header.SkeletonName;
+
+            var techFile = new PackFile("humanoid01.anim", new MemorySource(AnimationFile.ConvertToBytes(techAnim)));
+            runner.PackFileService.AddFilesToPack(outputPackFile, [new NewPackFileEntry("variantmeshes\\test\\tech", techFile)]);
+
+            runner.CommandFactory.Create<OpenEditorCommand>().Execute(techFile, EditorEnums.VisualSkeletonEditor);
+            var skeletonTool = runner.GetRequiredServiceInCurrentEditorScope<SkeletonEditorViewModel>();
+
+            Assert.That(skeletonTool.SkeletonName, Is.EqualTo("variantmeshes\\test\\tech\\humanoid01.anim"));
+            Assert.That(skeletonTool.SceneObjects.First().Data.Skeleton.BoneCount, Is.EqualTo(vanillaAnim.Bones.Length + 1));
+            Assert.That(SkeletonToolHelpers.GetSkeletonNodeFromName("ap_test", skeletonTool.Bones), Is.Not.Null);
+        }
 
         void LoadReferenceMesh(AssetEditorTestRunner runner, SkeletonEditorViewModel skeletonEditor)
         {

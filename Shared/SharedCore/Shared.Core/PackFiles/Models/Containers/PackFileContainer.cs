@@ -221,10 +221,16 @@ namespace Shared.Core.PackFiles.Models.Containers
             return FileList.ContainsKey(lowerPath);
         }
 
-        public virtual string? GetFullPath(PackFile file)
+        public string? GetExactFullPath(PackFile file)
         {
             var pathByReference = FileList.FirstOrDefault(x => ReferenceEquals(x.Value, file)).Key;
-            if (!string.IsNullOrWhiteSpace(pathByReference))
+            return string.IsNullOrWhiteSpace(pathByReference) ? null : pathByReference;
+        }
+
+        public virtual string? GetFullPath(PackFile file)
+        {
+            var pathByReference = GetExactFullPath(file);
+            if (pathByReference != null)
                 return pathByReference;
 
             var pathByName = FileList.FirstOrDefault(x => string.Equals(x.Value.Name, file.Name, StringComparison.OrdinalIgnoreCase)).Key;

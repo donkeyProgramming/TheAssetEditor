@@ -17,6 +17,9 @@ namespace Shared.Core.PackFiles.Models
         List<(string FileName, PackFile Pack)> FindAllWithExtention(string extention);
         List<(string Path, PackFile File)> GetDirectoryContent(string directoryPath);
 
-    
+        /// <summary>The path of this exact file in this container, or null. Unlike GetFullPath
+        /// it never falls back to matching by file name, which can resolve to a different file.</summary>
+        string? GetExactFullPath(PackFile file);
+
     }
 }
