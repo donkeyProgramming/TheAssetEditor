@@ -5,18 +5,11 @@ using Shared.GameFormats.RigidModel.Types;
 
 namespace Shared.GameFormats.RigidModel.MaterialHeaders
 {
-    /*
-     * The material families that use a short header of their own instead of the weighted layout.
-     * Ids are not stable across the series (terrain tiles are 66, 96 or 97 in the Rome 2 era and
-     * 101 in Warhammer; decals run 67, 87, 95 and 100), so a family is picked by id AND by the
-     * header size its section implies - see ShortHeaderMaterials.TryCreate.
-     *
-     * Every layout here and its corpus evidence comes from rmv2_anim_blender_import_export,
-     * docs/FORMATS.md "The short material headers". Fixed-width strings keep the bytes CA left
-     * after the terminator, so an unchanged name is written back exactly as it was read.
-     */
+    // Materials with a short header of their own instead of the weighted layout. Their ids differ between games,
+    // so ShortHeaderMaterials.TryCreate picks a family by id and header size.
+    // Layouts: rmv2_anim_blender_import_export, docs/FORMATS.md "The short material headers".
 
-    /// <summary>A zero-padded fixed-width UTF-8 string that remembers its original bytes.</summary>
+    /// <summary>A zero-padded fixed-width UTF-8 string. Keeps CA's bytes after the terminator, so an unchanged value saves as read.</summary>
     public class FixedWidthString
     {
         readonly byte[] _raw;
@@ -59,10 +52,7 @@ namespace Shared.GameFormats.RigidModel.MaterialHeaders
     {
         public ModelMaterialEnum MaterialId { get; set; }
 
-        /// <summary>
-        /// None of these headers has a vertex-format field. Decals and terrain tiles carry a
-        /// float4 position (stride 16); a mesh whose stride does not match is kept as raw bytes.
-        /// </summary>
+        // None of these headers has a vertex-format field. Decals and terrain tiles use a float4 position.
         public VertexFormat BinaryVertexFormat { get; set; } = VertexFormat.Unknown;
         public virtual Vector3 PivotPoint { get; set; } = Vector3.Zero;
         public virtual string ModelName { get; set; } = "";
@@ -84,12 +74,8 @@ namespace Shared.GameFormats.RigidModel.MaterialHeaders
     }
 
     /// <summary>
-    /// A projected decal (ids 67, 87, 95, 100): a 256-byte texture path, then a run of floats
-    /// whose count grows with the id - one for 67, nine for 87 (two vec3 that read as placement
-    /// and extent, then three zeros), ten for 95 (the last an angle), none for Warhammer 3's 100.
-    /// The layout is certain; what the floats mean is not. Warhammer 3's decals ship no vertex
-    /// block: the mesh is a unit cube (-0.5 to 0.5) whose 24 vertices the game supplies, and the
-    /// file holds only its 36 indices.
+    /// A projected decal (ids 67, 87, 95, 100): a 256-byte texture path, then 1, 9, 10 or 0 floats of unclear
+    /// meaning. Warhammer 3's decals have no vertex block, only the 36 indices of a unit cube.
     /// </summary>
     public class DecalMaterial : ShortHeaderMaterial
     {
@@ -114,11 +100,7 @@ namespace Shared.GameFormats.RigidModel.MaterialHeaders
         };
     }
 
-    /// <summary>
-    /// The terrain-tile material: a 64-byte name (TerrainBase0) and five or six words of unknown
-    /// meaning. Warhammer's id 101 carries six; Rome 2 and Attila ship id 66 with five and ids 96
-    /// and 97 with six.
-    /// </summary>
+    /// <summary>Terrain tiles: a 64-byte name (TerrainBase0), then five (id 66) or six unknown words.</summary>
     public class TerrainTileMaterial : ShortHeaderMaterial
     {
         public const int NameWidth = 64;
@@ -142,10 +124,7 @@ namespace Shared.GameFormats.RigidModel.MaterialHeaders
         };
     }
 
-    /// <summary>
-    /// The 3D interface banners (ids 29 and 30): a 256-byte model name such as
-    /// "army_banner_strength_fill_lod1", then eight words that are zero in every observed file.
-    /// </summary>
+    /// <summary>3D interface banners (ids 29, 30): a 256-byte model name, then eight words that are always zero.</summary>
     public class BannerMaterial : ShortHeaderMaterial
     {
         public const int NameWidth = 256;
@@ -169,9 +148,8 @@ namespace Shared.GameFormats.RigidModel.MaterialHeaders
     }
 
     /// <summary>
-    /// A static point light (id 45): a 256-byte light preset name ("orange_10m_glow"), a second
-    /// 256-byte field that is empty in every observed file, and the light's position in model
-    /// space, read as the pivot. Like Warhammer 3's decals the mesh ships indices but no vertices.
+    /// A static point light (id 45): a 256-byte preset name, a second 256-byte field (always empty) and the
+    /// light's position, read as the pivot. The mesh has indices but no vertices.
     /// </summary>
     public class StaticPointLightMaterial : ShortHeaderMaterial
     {
@@ -201,10 +179,7 @@ namespace Shared.GameFormats.RigidModel.MaterialHeaders
         }
     }
 
-    /// <summary>
-    /// No header at all: the section goes straight from the common header to the vertices, so
-    /// there is no vertex-format field either. Bow waves do this in the Rome 2 era.
-    /// </summary>
+    /// <summary>No material header at all (Rome 2-era bow waves).</summary>
     public class NoHeaderMaterial : ShortHeaderMaterial
     {
         public override uint ComputeSize() => 0;
@@ -218,11 +193,7 @@ namespace Shared.GameFormats.RigidModel.MaterialHeaders
         static readonly ModelMaterialEnum[] s_decalIds = [ModelMaterialEnum.projected_decal, ModelMaterialEnum.projected_decal_v2, ModelMaterialEnum.projected_decal_v3, ModelMaterialEnum.alpha_blend];
         static readonly ModelMaterialEnum[] s_bannerIds = [ModelMaterialEnum.texture_combo_vertex_wind, ModelMaterialEnum.texture_combo];
 
-        /// <summary>
-        /// Reads a short header when the id and the section's header size both say it is one.
-        /// Anything else, including these ids carrying a full weighted header (Warhammer's id 97
-        /// on wind-swayed props, for one), is left to the weighted layout.
-        /// </summary>
+        // Only when id and size agree: these ids can also carry a full weighted header (Warhammer's 97 on swaying props)
         public static bool TryCreate(ModelMaterialEnum materialId, byte[] data, int offset, long size, out ShortHeaderMaterial material)
         {
             material = null;
