@@ -70,9 +70,7 @@ namespace GameWorld.Core.Test.Services.SceneSaving
             Assert.That(keptFraction, Is.EqualTo(factor).Within(0.05), $"Kept {keptFraction:P1} of triangles for factor {factor}");
         }
 
-        // This head's merged hard-edge vertices give near-singular quadrics (det ~1e-17). Their solved
-        // "optimal" collapse point came from floating-point noise and threw a vertex 17% of the model's
-        // size outside it at factor 0.3. Collapse points now have to stay near their edge.
+        // This head's merged hard-edge vertices give near-singular quadrics (det ~1e-17)
         [TestCase(0.65f)]
         [TestCase(0.3f)]
         public void GetReducedMeshCopies_NearSingularQuadrics_NoVertexThrownOutsideTheModel(float factor)

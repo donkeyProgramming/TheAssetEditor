@@ -7,8 +7,6 @@ using Shared.GameFormats.RigidModel;
 
 namespace GameWorld.Core.Test.Services.SceneSaving
 {
-    // DecimatorMeshOptimizer.GetReducedMeshCopies reduces all of a LOD's meshes together against one
-    // triangle target, with whole-part removal competing with edge collapses in the same queue.
     internal class WholeModelLodReductionTests
     {
         static MeshObject CreateMesh(List<VertexPositionNormalTextureCustom> vertices, List<ushort> indices)
