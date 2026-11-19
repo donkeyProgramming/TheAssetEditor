@@ -76,7 +76,7 @@ namespace GameWorld.Core.Utility
             foreach (var group in SortMeshesIntoCombinableGroups(meshList, int.MaxValue))
             {
                 var vertexCount = group.Sum(x => x.Geometry.VertexCount());
-                if (vertexCount > RmvMesh.MaxVertexCount)
+                if (group.Count > 1 && vertexCount > RmvMesh.MaxVertexCount)
                     errors.Error("Vertex limit exceeded", $"Combining {string.Join(", ", group.Select(x => x.Name))} would make a mesh with {vertexCount} vertices, but a mesh can have at most {RmvMesh.MaxVertexCount}");
             }
 

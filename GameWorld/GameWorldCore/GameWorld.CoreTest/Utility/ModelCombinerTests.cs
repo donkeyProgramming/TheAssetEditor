@@ -75,6 +75,19 @@ namespace GameWorld.Core.Test.Utility
             Assert.That(errors.Errors[0].Description, Does.Contain("a, b").And.Contain("80000"));
         }
 
+        [Test]
+        public void GetVertexLimitErrors_IgnoresAMeshOverTheLimitWithNothingToCombineWith()
+        {
+            var meshes = new List<Rmv2MeshNode>
+            {
+                CreateNode("too_big", 70_000, CapabilityMaterialsEnum.MetalRoughPbr_Default),
+                CreateNode("a", 100),
+                CreateNode("b", 100),
+            };
+
+            Assert.That(ModelCombiner.GetVertexLimitErrors(meshes).HasData, Is.False);
+        }
+
         static MeshObject CreateMesh(int vertexCount, int? indexCount = null)
         {
             var mesh = new MeshObject(new TestGeometryGraphicsContextFactory().Create(), "test_skeleton");
