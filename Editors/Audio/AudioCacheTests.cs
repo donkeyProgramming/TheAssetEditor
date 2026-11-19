@@ -265,6 +265,68 @@ namespace Test.Audio
         }
 
         [Test]
+        public void Save_RecreatesHircAndDidxIndexesAfterBulkInsert()
+        {
+            var bnk = PackFile.CreateFromBytes("bnk1.bnk", CreateBnk(1, 111, 0));
+            var container = CreateContainer(true, [(@"audio\wwise\bnk1.bnk", bnk)]);
+            var dbOptions = CreateFileDbOptions();
+
+            using (var expected = new AudioCacheDbContext(dbOptions))
+                expected.Database.EnsureCreated();
+            var expectedIndexes = ReadIndexNames(_dbFilePath);
+            SqliteConnection.ClearAllPools();
+            File.Delete(_dbFilePath);
+
+            SaveCache("fingerprint123", [container.Object], dbOptions);
+
+            Assert.That(expectedIndexes, Has.Some.StartsWith("IX_Hircs_"));
+            Assert.That(expectedIndexes, Has.Some.StartsWith("IX_Didx_"));
+            Assert.That(ReadIndexNames(_dbFilePath), Is.EquivalentTo(expectedIndexes));
+        }
+
+        private static List<string> ReadIndexNames(string dbFilePath)
+        {
+            using var connection = new SqliteConnection($"Data Source={dbFilePath};Pooling=False");
+            connection.Open();
+            using var command = connection.CreateCommand();
+            command.CommandText = "SELECT name FROM sqlite_master WHERE type = 'index' AND sql IS NOT NULL";
+            using var reader = command.ExecuteReader();
+            var names = new List<string>();
+            while (reader.Read())
+                names.Add(reader.GetString(0));
+            return names;
+        }
+
+        [Test]
+        public void ComputeFingerprint_IgnoresFilesWhoseExtensionOnlyContainsDat()
+        {
+            // The real containers match extensions as substrings, so ".dat" also returns terrain ".data" files.
+            static IPackFileContainer CreateSubstringMatchingContainer(bool includeHeightMap)
+            {
+                var files = new List<(string Path, PackFile File)> { (@"audio\wwise\test.bnk", PackFile.CreateFromBytes("test.bnk", CreateBnk(1, 1, 0))) };
+                if (includeHeightMap)
+                    files.Add((@"terrain\tiles\battle\tile\hf_height_map.data", PackFile.CreateFromBytes("hf_height_map.data", [1, 2, 3, 4])));
+
+                var container = new Mock<IPackFileContainer>();
+                container.SetupGet(x => x.IsCaPackFile).Returns(true);
+                container.SetupGet(x => x.ContainerType).Returns(PackFileContainerType.Normal);
+                container
+                    .Setup(x => x.SearchFiles(It.IsAny<string?>(), It.IsAny<IReadOnlyList<string>?>()))
+                    .Returns((string? _, IReadOnlyList<string>? extensions) => files
+                        .Where(x => extensions == null || extensions.Any(extension => x.File.Name.Contains(extension, StringComparison.OrdinalIgnoreCase)))
+                        .ToList());
+                return container.Object;
+            }
+
+            var helper = CreateAudioCacheHelper();
+            var withoutHeightMap = helper.ComputeFingerprint([CreateSubstringMatchingContainer(false)], "game files");
+            var withHeightMap = helper.ComputeFingerprint([CreateSubstringMatchingContainer(true)], "game files");
+
+            Assert.That(withHeightMap, Is.EqualTo(withoutHeightMap));
+            Assert.That(AudioCacheHelper.FindAudioDataFiles(CreateSubstringMatchingContainer(true)).Select(x => x.Path), Is.EqualTo(new[] { @"audio\wwise\test.bnk" }));
+        }
+
+        [Test]
         public void ComputeFingerprint_MissingBackingFile()
         {
             var packParent = new PackedFileSourceParent { FilePath = Path.Combine(_tempDir, "missing.pack") };
@@ -328,6 +390,38 @@ namespace Test.Audio
 
             Assert.That(File.Exists(_dbFilePath), Is.True);
             Assert.That(cache.FindHircs(eventId, new HashSet<string>([bnkPath], StringComparer.OrdinalIgnoreCase)), Has.Count.EqualTo(1));
+        }
+
+        [Test]
+        public void LoadOrBuildCache_ConcurrentCallersShareOneBuild()
+        {
+            // The startup prebuild runs on a background thread while an audio tool may ask for the same cache.
+            const string bnkPath = @"audio\wwise\test.bnk";
+            const uint eventId = 555;
+            var bnk = PackFile.CreateFromBytes("test.bnk", CreateBnk(eventId, 1, 0));
+            var container = CreateContainer(true, [(bnkPath, bnk)]);
+            var packFileService = new Mock<IPackFileService>();
+            packFileService.Setup(x => x.GetAllPackfileContainers()).Returns([container.Object]);
+            var settings = new ApplicationSettingsService(GameTypeEnum.Warhammer3);
+            var helper = new AudioCacheHelper(settings, new DatLoader(packFileService.Object, settings), new BnkLoader(packFileService.Object));
+            var source = new AudioCacheSource(_dbFilePath, "fingerprint", true, [container.Object], [container.Object]);
+            var resolvedBnkPaths = new HashSet<string>([bnkPath], StringComparer.OrdinalIgnoreCase);
+
+            var tasks = Enumerable.Range(0, 4)
+                .Select(_ => Task.Run(() => helper.LoadOrBuildCache(source)))
+                .ToList();
+            var caches = tasks.Select(task => task.GetAwaiter().GetResult()).ToList();
+
+            try
+            {
+                foreach (var cache in caches)
+                    Assert.That(cache.FindHircs(eventId, resolvedBnkPaths), Has.Count.EqualTo(1));
+            }
+            finally
+            {
+                foreach (var cache in caches)
+                    cache.Dispose();
+            }
         }
 
         [Test]

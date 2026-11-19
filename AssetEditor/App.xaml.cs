@@ -129,22 +129,28 @@ namespace AssetEditor
                 else
                 {
                     packfileService.AddContainer(loadRes);
-                    BuildGameFilesAudioCache();
+                    StartGameFilesAudioCacheBuild();
                 }
             }
         }
 
-        private void BuildGameFilesAudioCache()
+        // Takes minutes after a game update, so don't block the main window. Audio tools wait for it or build it on first use.
+        private void StartGameFilesAudioCacheBuild()
         {
-            try
+            var scopeFactory = _serviceProvider!.GetRequiredService<IServiceScopeFactory>();
+            _ = Task.Run(() =>
             {
-                var audioRepository = _serviceProvider!.GetRequiredService<IAudioRepository>();
-                audioRepository.EnsureGameFilesCache();
-            }
-            catch (Exception exception)
-            {
-                Logging.Create<App>().Here().Warning($"Failed to build the game-files audio cache: {exception.Message}");
-            }
+                try
+                {
+                    // IAudioRepository is scoped; resolving it from the root provider fails when scope validation is on.
+                    using var scope = scopeFactory.CreateScope();
+                    scope.ServiceProvider.GetRequiredService<IAudioRepository>().EnsureGameFilesCache();
+                }
+                catch (Exception exception)
+                {
+                    Logging.Create<App>().Here().Warning($"Failed to build the game-files audio cache: {exception.Message}");
+                }
+            });
         }
 
         void ShowMainWindow()

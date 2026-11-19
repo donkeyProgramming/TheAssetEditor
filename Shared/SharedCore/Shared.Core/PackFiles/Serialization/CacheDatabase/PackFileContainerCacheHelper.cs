@@ -69,8 +69,39 @@ namespace Shared.Core.PackFiles.Serialization.CacheDatabase
             if (loaded == null)
                 throw new Exception($"Failed to load from cache after saving. CacheFile: {cacheFilePath}");
 
+            DeleteStaleCaches(cacheFilePath, fingerprint);
             return loaded;
         }
+
+        // Each game update changes the fingerprint, and so the file name, leaving the old cache (~300MB for WH3) behind
+        private void DeleteStaleCaches(string cacheFilePath, string fingerprint)
+        {
+            var cacheDirectory = Path.GetDirectoryName(cacheFilePath);
+            var fileName = Path.GetFileName(cacheFilePath);
+            var fingerprintSuffix = $"{fingerprint}.db";
+            if (cacheDirectory == null || !Directory.Exists(cacheDirectory) || !fileName.EndsWith(fingerprintSuffix, StringComparison.OrdinalIgnoreCase))
+                return;
+
+            var prefix = fileName[..^fingerprintSuffix.Length];
+            foreach (var candidate in Directory.EnumerateFiles(cacheDirectory, $"{prefix}*.db"))
+            {
+                var candidateFingerprint = Path.GetFileNameWithoutExtension(candidate)[prefix.Length..];
+                if (candidateFingerprint.Equals(fingerprint, StringComparison.OrdinalIgnoreCase) || !IsFingerprint(candidateFingerprint))
+                    continue;
+
+                try
+                {
+                    File.Delete(candidate);
+                    _logger.Here().Information($"Removed stale pack file cache '{candidate}'");
+                }
+                catch (Exception ex)
+                {
+                    _logger.Here().Warning($"Failed to remove stale pack file cache '{candidate}': {ex.Message}");
+                }
+            }
+        }
+
+        private static bool IsFingerprint(string value) => value.Length == 64 && value.All(Uri.IsHexDigit);
 
         public CachedPackFileContainer? TryLoadFromCache(string cacheFilePath, string fingerprint)
         {

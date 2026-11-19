@@ -14,6 +14,7 @@ namespace Editors.Audio.Shared.Storage.CacheDatabase
         string GetCacheFilePath(string label, string fingerprint);
         AudioCache TryLoadFromCache(string cacheFilePath, string fingerprint);
         AudioCache SaveAndLoadCache(AudioCacheSource source);
+        AudioCache LoadOrBuildCache(AudioCacheSource source);
     }
 
     internal sealed record AudioCacheSource(string CacheFilePath, string Fingerprint, bool IsGameFiles, List<IPackFileContainer> BnkContainers, List<IPackFileContainer> DatContainers);
@@ -24,6 +25,9 @@ namespace Editors.Audio.Shared.Storage.CacheDatabase
         private readonly DatLoader _datLoader = datLoader;
         private readonly BnkLoader _bnkLoader = bnkLoader;
         private readonly ILogger _logger = Logging.Create<AudioCacheHelper>();
+
+        // The game files cache is built in the background at startup; callers wait for it rather than build it twice
+        private static readonly object s_buildLock = new();
 
         public string GetCacheFilePath(string label, string fingerprint)
         {
@@ -40,7 +44,7 @@ namespace Editors.Audio.Shared.Storage.CacheDatabase
             for (var containerIndex = 0; containerIndex < containers.Count; containerIndex++)
             {
                 var container = containers[containerIndex];
-                var relevantFiles = container.SearchFiles(null, [".bnk", ".dat", ".wwiseids"]);
+                var relevantFiles = FindAudioDataFiles(container);
                 foreach (var (path, file) in relevantFiles.OrderBy(x => x.Path, StringComparer.OrdinalIgnoreCase))
                 {
                     Append(hash, $"{containerIndex}|{container.IsCaPackFile}|{path}|");
@@ -49,6 +53,13 @@ namespace Editors.Audio.Shared.Storage.CacheDatabase
             }
 
             return Convert.ToHexString(hash.GetHashAndReset());
+        }
+
+        public AudioCache LoadOrBuildCache(AudioCacheSource source)
+        {
+            // Load under the lock too, or it can race another thread's EnsureDeleted/EnsureCreated
+            lock (s_buildLock)
+                return TryLoadFromCache(source.CacheFilePath, source.Fingerprint) ?? SaveAndLoadCache(source);
         }
 
         public AudioCache SaveAndLoadCache(AudioCacheSource source)
@@ -156,6 +167,16 @@ namespace Editors.Audio.Shared.Storage.CacheDatabase
                     _logger.Here().Warning($"Failed to remove stale audio cache '{cacheFile}': {exception.Message}");
                 }
             }
+        }
+
+        private static readonly string[] s_audioDataExtensions = [".bnk", ".dat", ".wwiseids"];
+
+        // SearchFiles matches extensions as substrings (".dat" also finds ".data")
+        internal static List<(string Path, PackFile File)> FindAudioDataFiles(IPackFileContainer container)
+        {
+            return container.SearchFiles(null, s_audioDataExtensions)
+                .Where(x => s_audioDataExtensions.Any(extension => x.Path.EndsWith(extension, StringComparison.OrdinalIgnoreCase)))
+                .ToList();
         }
 
         private static void Append(IncrementalHash hash, string value)

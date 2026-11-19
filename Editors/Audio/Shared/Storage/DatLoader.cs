@@ -21,6 +21,10 @@ namespace Editors.Audio.Shared.Storage
             public Dictionary<string, List<string>> StatesByStateGroup { get; set; } = [];
         }
 
+        // .dat files with other layouts (bank splits, music scripts, ICU data)
+        private static readonly string[] s_nonSoundDatFiles = ["bank_splits.dat", "campaign_music.dat", "battle_music.dat", "icudt61l.dat"];
+
+        private readonly ILogger _logger = Logging.Create<DatLoader>();
         private readonly IPackFileService _pfs = pfs;
         private readonly ApplicationSettingsService _applicationSettingsService = applicationSettingsService;
 
@@ -124,7 +128,7 @@ namespace Editors.Audio.Shared.Storage
             AddNames(wh3DbNameList, nameLookUp);
 
             var bnkFiles = FindFiles(".bnk", containers);
-            var bnkNames = bnkFiles.Select(x => x.Name.Replace(".bnk", "")).ToArray();
+            var bnkNames = bnkFiles.Select(x => x.File.Name.Replace(".bnk", "")).ToArray();
             AddNames(bnkNames, nameLookUp);
 
             var languages = new List<string> { "sfx", "chinese", "english(uk)", "french(france)", "german", "italian", "polish", "russian", "spanish(spain)" }.ToArray();
@@ -133,7 +137,7 @@ namespace Editors.Audio.Shared.Storage
             var wwiseIdFiles = FindFiles(".wwiseids", containers);
             foreach (var item in wwiseIdFiles)
             {
-                var data = Encoding.UTF8.GetString(item.DataSource.ReadData());
+                var data = Encoding.UTF8.GetString(item.File.DataSource.ReadData());
                 data = data.Replace("\r", "");
                 var splitData = data.Split("\n");
                 AddNames(splitData, nameLookUp);
@@ -144,13 +148,15 @@ namespace Editors.Audio.Shared.Storage
 
         private SoundDatFile LoadDatFiles(List<IPackFileContainer> containers, out List<string> failedFiles)
         {
-            var datFiles = FindFiles(".dat", containers);
-            datFiles = PackFileUtil.FilterUnvantedFiles(_pfs, datFiles, ["bank_splits.dat", "campaign_music.dat", "battle_music.dat", "icudt61l.dat"], out var removedFiles);
+            // Filter on the paths we have: GetFullPath is a table scan per file on the cached game container
+            var datFiles = FindFiles(".dat", containers)
+                .Where(x => !s_nonSoundDatFiles.Any(name => x.Path.Contains(name, StringComparison.OrdinalIgnoreCase)))
+                .ToList();
 
-            var failedDatParsing = new List<(string, string)>();
+            var failedDatParsing = new List<(string Path, string Error)>();
             var masterDat = new SoundDatFile();
 
-            foreach (var datFile in datFiles)
+            foreach (var (path, datFile) in datFiles)
             {
                 try
                 {
@@ -159,30 +165,34 @@ namespace Editors.Audio.Shared.Storage
                 }
                 catch (Exception e)
                 {
-                    var fullPath = _pfs.GetFullPath(datFile);
-                    failedDatParsing.Add((fullPath, e.Message));
+                    failedDatParsing.Add((path, e.Message));
                 }
             }
 
-            failedFiles = failedDatParsing.Select(x => x.Item1).ToList();
+            if (failedDatParsing.Count != 0)
+                _logger.Here().Warning($"{failedDatParsing.Count} sound .dat files could not be parsed: {string.Join(Environment.NewLine, failedDatParsing.Select(x => $"{x.Path}: {x.Error}"))}");
+
+            failedFiles = failedDatParsing.Select(x => x.Path).ToList();
             return masterDat;
         }
 
-        private List<PackFile> FindFiles(string extension, List<IPackFileContainer> containers)
+        private List<(string Path, PackFile File)> FindFiles(string extension, List<IPackFileContainer> containers)
         {
             if (containers == null)
-                return PackFileServiceUtility.FindAllWithExtentionIncludePaths(_pfs, extension)
-                    .Select(x => x.Pack)
-                    .ToList();
+                return PackFileServiceUtility.FindAllWithExtentionIncludePaths(_pfs, extension);
 
+            // SearchFiles matches extensions as substrings (".dat" also finds ".data")
             var effectiveFiles = new Dictionary<string, PackFile>(StringComparer.OrdinalIgnoreCase);
             foreach (var container in containers)
             {
                 foreach (var (path, file) in container.SearchFiles(null, [extension]))
-                    effectiveFiles[path] = file;
+                {
+                    if (path.EndsWith(extension, StringComparison.OrdinalIgnoreCase))
+                        effectiveFiles[path] = file;
+                }
             }
 
-            return effectiveFiles.Values.ToList();
+            return effectiveFiles.Select(x => (x.Key, x.Value)).ToList();
         }
 
         private SoundDatFile LoadDatFile(PackFile datFile)
