@@ -51,6 +51,12 @@ namespace MeshDecimator.Algorithms
     {
         #region Consts
         private const double DoubleEpsilon = 1.0E-3;
+        // Blender: boundary edge constraint plane weight (bmesh_decimate_collapse.cc line 54)
+        private const double BoundaryPreserveWeight = 100.0;
+        // Blender: threshold below which QEM cost is considered noise in flat regions
+        private const double TopologyFallbackEps = 1e-12;
+        // Scale for topology fallback cost in flat regions: edge_length² * this value.
+        private const double TopologyFallbackScale = 1e-2;
         #endregion
 
         #region Classes
@@ -221,6 +227,28 @@ namespace MeshDecimator.Algorithms
             }
         }
         #endregion
+
+        #region Edge Entry
+        // Heap entry for Blender-style min-heap edge collapse (bmesh_decimate_collapse.cc).
+        // Uses version-based stale detection: when a vertex is modified during collapse,
+        // its version increments, invalidating all heap entries referencing the old version.
+        // This avoids floating-point equality issues that plagued cost-based stale detection.
+        private struct EdgeEntry
+        {
+            public int v0; // always < v1
+            public int v1;
+            public long version0; // vertexVersion[v0] when this entry was created
+            public long version1; // vertexVersion[v1] when this entry was created
+
+            public EdgeEntry(int v0, int v1, long version0, long version1)
+            {
+                this.v0 = v0;
+                this.v1 = v1;
+                this.version0 = version0;
+                this.version1 = version1;
+            }
+        }
+        #endregion
         #endregion
 
         #region Fields
@@ -246,9 +274,10 @@ namespace MeshDecimator.Algorithms
 
         private int remainingVertices = 0;
 
-        // Pre-allocated buffers
-        private double[] errArr = new double[3];
-        private int[] attributeIndexArr = new int[3];
+        // Version counter per vertex for heap stale detection (Blender-style).
+        // Incremented when a vertex is modified by edge collapse.
+        // Heap entries store the version at creation time; stale entries have mismatched versions.
+        private long[] vertexVersion;
         #endregion
 
         #region Properties
@@ -409,7 +438,12 @@ namespace MeshDecimator.Algorithms
 
         #region Flipped
         /// <summary>
-        /// Check if a triangle flips when this edge is removed
+        /// Check if a triangle flips when this edge is removed.
+        /// Uses Blender's area-weighted flip detection (bmesh_decimate_collapse.cc line 190):
+        /// Compares unnormalized cross products with relative threshold.
+        /// Large triangles get stricter protection (structurally important),
+        /// small triangles get more flexibility. When collapse changes triangle area
+        /// significantly, the check becomes stricter — protecting thin features.
         /// </summary>
         private bool Flipped(ref Vector3d p, int i0, int i1, ref Vertex v0, bool[] deleted)
         {
@@ -417,6 +451,8 @@ namespace MeshDecimator.Algorithms
             var refs = this.refs.Data;
             var triangles = this.triangles.Data;
             var vertices = this.vertices.Data;
+            Vector3d v0pos = v0.p;
+
             for (int k = 0; k < tcount; k++)
             {
                 Ref r = refs[v0.tstart + k];
@@ -432,20 +468,35 @@ namespace MeshDecimator.Algorithms
                     continue;
                 }
 
-                Vector3d d1 = vertices[id1].p - p;
-                d1.Normalize();
-                Vector3d d2 = vertices[id2].p - p;
-                d2.Normalize();
-                double dot = Vector3d.Dot(ref d1, ref d2);
-                if (System.Math.Abs(dot) > 0.999)
+                // BEFORE-collapse normal (unnormalized cross product)
+                Vector3d d1_before = vertices[id1].p - v0pos;
+                Vector3d d2_before = vertices[id2].p - v0pos;
+                Vector3d cross_before;
+                Vector3d.Cross(ref d1_before, ref d2_before, out cross_before);
+                if (cross_before.MagnitudeSqr < 1e-20)
                     return true;
 
-                Vector3d n;
-                Vector3d.Cross(ref d1, ref d2, out n);
-                n.Normalize();
+                // AFTER-collapse normal (unnormalized cross product)
+                Vector3d d1_after = vertices[id1].p - p;
+                Vector3d d2_after = vertices[id2].p - p;
+                Vector3d cross_after;
+                Vector3d.Cross(ref d1_after, ref d2_after, out cross_after);
+
                 deleted[k] = false;
-                dot = Vector3d.Dot(ref n, ref triangles[r.tid].n);
-                if (dot < 0.2)
+
+                // Reject degenerate triangles (near-zero area)
+                double optimMagSq = cross_after.MagnitudeSqr;
+                if (optimMagSq < 1e-20)
+                    return true;
+
+                // Blender area-weighted flip detection:
+                // dot(cross_before, cross_after) <= (|cross_before|² + |cross_after|²) * 0.01
+                // For equal-area triangles: allows ~89° rotation
+                // For 10x area change: becomes ~84° (stricter, protects thin features)
+                double existMagSq = cross_before.MagnitudeSqr;
+                double dotBA = (cross_before.x * cross_after.x + cross_before.y * cross_after.y + cross_before.z * cross_after.z);
+
+                if (dotBA <= (existMagSq + optimMagSq) * 0.01)
                     return true;
             }
 
@@ -455,15 +506,13 @@ namespace MeshDecimator.Algorithms
 
         #region Update Triangles
         /// <summary>
-        /// Update triangle connections and edge error after a edge is collapsed.
+        /// Update triangle connections after an edge is collapsed.
+        /// Simplified for min-heap approach: no error computation (costs managed by heap).
         /// </summary>
-        private void UpdateTriangles(int i0, int ia0, ref Vertex v, ResizableArray<bool> deleted, ref int deletedTriangles)
+        private void UpdateTriangles(int i0, int ia0, ref Vertex v, bool[] deleted, ref int deletedTriangles)
         {
-            Vector3d p;
-            int pIndex;
             int tcount = v.tcount;
             var triangles = this.triangles.Data;
-            var vertices = this.vertices.Data;
             for (int k = 0; k < tcount; k++)
             {
                 Ref r = refs[v.tstart + k];
@@ -486,10 +535,6 @@ namespace MeshDecimator.Algorithms
                 }
 
                 t.dirty = true;
-                t.err0 = CalculateError(ref vertices[t.v0], ref vertices[t.v1], out p, out pIndex);
-                t.err1 = CalculateError(ref vertices[t.v1], ref vertices[t.v2], out p, out pIndex);
-                t.err2 = CalculateError(ref vertices[t.v2], ref vertices[t.v0], out p, out pIndex);
-                t.err3 = MathHelper.Min(t.err0, t.err1, t.err2);
                 triangles[tid] = t;
                 refs.Add(r);
             }
@@ -550,15 +595,46 @@ namespace MeshDecimator.Algorithms
             }
         }
 
-        private void MergeVertexAttributes(int i0, int i1)
+        /// <summary>
+        /// Calculate interpolation factor: where the optimal point falls on the edge [0,1].
+        /// 0 = p0, 1 = p1. Used for weighted attribute blending (Blender USE_VERT_NORMAL_INTERP).
+        /// </summary>
+        private double CalculateInterpolationFactor(ref Vector3d optimal, ref Vector3d p0, ref Vector3d p1)
         {
+            Vector3d edge = p1 - p0;
+            double edgeLenSqr = edge.MagnitudeSqr;
+            if (edgeLenSqr < 1e-20)
+                return 0.5;
+            Vector3d diff = optimal - p0;
+            double t = Vector3d.Dot(ref diff, ref edge) / edgeLenSqr;
+            return System.Math.Max(0.0, System.Math.Min(1.0, t));
+        }
+
+        private void MergeVertexAttributes(int i0, int i1, double t)
+        {
+            // Blender USE_VERT_NORMAL_INTERP: interpolate by edge-parametric factor t
+            // instead of simple 0.5 average, for smoother normals
             if (vertNormals != null)
             {
-                vertNormals[i0] = (vertNormals[i0] + vertNormals[i1]) * 0.5f;
+                var n0 = vertNormals[i0];
+                var n1 = vertNormals[i1];
+                var merged = new Vector3(
+                    (float)(n0.x * (1 - t) + n1.x * t),
+                    (float)(n0.y * (1 - t) + n1.y * t),
+                    (float)(n0.z * (1 - t) + n1.z * t));
+                float len = (float)System.Math.Sqrt(merged.x * merged.x + merged.y * merged.y + merged.z * merged.z);
+                if (len > 0) merged = new Vector3(merged.x / len, merged.y / len, merged.z / len);
+                vertNormals[i0] = merged;
             }
             if (vertTangents != null)
             {
-                vertTangents[i0] = (vertTangents[i0] + vertTangents[i1]) * 0.5f;
+                var t0 = vertTangents[i0];
+                var t1 = vertTangents[i1];
+                vertTangents[i0] = new Vector4(
+                    (float)(t0.x * (1 - t) + t1.x * t),
+                    (float)(t0.y * (1 - t) + t1.y * t),
+                    (float)(t0.z * (1 - t) + t1.z * t),
+                    (float)(t0.w * (1 - t) + t1.w * t));
             }
             if (vertUV2D != null)
             {
@@ -567,7 +643,11 @@ namespace MeshDecimator.Algorithms
                     var vertUV = vertUV2D[i];
                     if (vertUV != null)
                     {
-                        vertUV[i0] = (vertUV[i0] + vertUV[i1]) * 0.5f;
+                        var uv0 = vertUV[i0];
+                        var uv1 = vertUV[i1];
+                        vertUV[i0] = new Vector2(
+                            (float)(uv0.x * (1 - t) + uv1.x * t),
+                            (float)(uv0.y * (1 - t) + uv1.y * t));
                     }
                 }
             }
@@ -578,7 +658,12 @@ namespace MeshDecimator.Algorithms
                     var vertUV = vertUV3D[i];
                     if (vertUV != null)
                     {
-                        vertUV[i0] = (vertUV[i0] + vertUV[i1]) * 0.5f;
+                        var uv0 = vertUV[i0];
+                        var uv1 = vertUV[i1];
+                        vertUV[i0] = new Vector3(
+                            (float)(uv0.x * (1 - t) + uv1.x * t),
+                            (float)(uv0.y * (1 - t) + uv1.y * t),
+                            (float)(uv0.z * (1 - t) + uv1.z * t));
                     }
                 }
             }
@@ -589,13 +674,25 @@ namespace MeshDecimator.Algorithms
                     var vertUV = vertUV4D[i];
                     if (vertUV != null)
                     {
-                        vertUV[i0] = (vertUV[i0] + vertUV[i1]) * 0.5f;
+                        var uv0 = vertUV[i0];
+                        var uv1 = vertUV[i1];
+                        vertUV[i0] = new Vector4(
+                            (float)(uv0.x * (1 - t) + uv1.x * t),
+                            (float)(uv0.y * (1 - t) + uv1.y * t),
+                            (float)(uv0.z * (1 - t) + uv1.z * t),
+                            (float)(uv0.w * (1 - t) + uv1.w * t));
                     }
                 }
             }
             if (vertColors != null)
             {
-                vertColors[i0] = (vertColors[i0] + vertColors[i1]) * 0.5f;
+                var c0 = vertColors[i0];
+                var c1 = vertColors[i1];
+                vertColors[i0] = new Vector4(
+                    (float)(c0.x * (1 - t) + c1.x * t),
+                    (float)(c0.y * (1 - t) + c1.y * t),
+                    (float)(c0.z * (1 - t) + c1.z * t),
+                    (float)(c0.w * (1 - t) + c1.w * t));
             }
 
             // TODO: Do we have to blend bone weights at all or can we just keep them as it is in this scenario?
@@ -642,357 +739,392 @@ namespace MeshDecimator.Algorithms
         }
         #endregion
 
-        #region Remove Vertex Pass
+        #region Compute Edge Cost
         /// <summary>
-        /// Remove vertices and mark deleted triangles
+        /// Compute edge collapse cost using QEM (Garland-Heckbert).
+        /// Uses Blender's topology fallback for flat regions (bmesh_decimate_collapse.cc:287-309).
         /// </summary>
-        private void RemoveVertexPass(int startTrisCount, int targetTrisCount, double threshold, ResizableArray<bool> deleted0, ResizableArray<bool> deleted1, ref int deletedTris)
+        private double ComputeEdgeCost(int va, int vb)
+        {
+            var vertices = this.vertices.Data;
+            Vector3d dummy;
+            int dummy2;
+            double cost = System.Math.Abs(CalculateError(ref vertices[va], ref vertices[vb], out dummy, out dummy2));
+
+            // Topology fallback for flat regions (Blender USE_TOPOLOGY_FALLBACK):
+            // When QEM cost is near zero (flat surface), use edge length² as tiebreaker
+            // so shorter edges collapse first → even distribution.
+            if (cost < TopologyFallbackEps)
+            {
+                double lenSqr = (vertices[va].p - vertices[vb].p).MagnitudeSqr;
+                cost = lenSqr * TopologyFallbackScale;
+            }
+
+            return cost;
+        }
+        #endregion
+
+        #region Push Edge Cost
+        /// <summary>
+        /// Compute cost for edge (a,b) and push to heap with current vertex versions.
+        /// Does not check border/seam constraints — those are checked at collapse time.
+        /// </summary>
+        private void PushEdgeCost(PriorityQueue<EdgeEntry, double> heap, long[] version, int a, int b)
+        {
+            if (a == b) return;
+            int va = System.Math.Min(a, b);
+            int vb = System.Math.Max(a, b);
+
+            var vertices = this.vertices.Data;
+            if (vertices[va].tcount == 0 || vertices[vb].tcount == 0) return;
+
+            double cost = ComputeEdgeCost(va, vb);
+            var entry = new EdgeEntry(va, vb, version[va], version[vb]);
+            heap.Enqueue(entry, cost);
+        }
+        #endregion
+
+        #region Build Edge Costs
+        /// <summary>
+        /// Build initial edge costs for all edges in the mesh.
+        /// Iterates over all triangles and pushes each edge to the heap.
+        /// Duplicate edges (manifold edges shared by 2 triangles) may be pushed twice,
+        /// but version-based stale detection handles this correctly.
+        /// </summary>
+        private void BuildEdgeCosts(PriorityQueue<EdgeEntry, double> heap, long[] version)
         {
             var triangles = this.triangles.Data;
             int triangleCount = this.triangles.Length;
-            var vertices = this.vertices.Data;
-
-            bool preserveBorders = base.PreserveBorders;
-            int maxVertexCount = base.MaxVertexCount;
-            if (maxVertexCount <= 0)
-                maxVertexCount = int.MaxValue;
-
-            Vector3d p;
-            int pIndex;
-            for (int tid = 0; tid < triangleCount; tid++)
+            for (int i = 0; i < triangleCount; i++)
             {
-                if (triangles[tid].dirty || triangles[tid].deleted || triangles[tid].err3 > threshold)
-                    continue;
+                var t = triangles[i];
+                if (t.deleted) continue;
 
-                triangles[tid].GetErrors(errArr);
-                triangles[tid].GetAttributeIndices(attributeIndexArr);
-                for (int edgeIndex = 0; edgeIndex < 3; edgeIndex++)
-                {
-                    if (errArr[edgeIndex] > threshold)
-                        continue;
-
-                    int nextEdgeIndex = ((edgeIndex + 1) % 3);
-                    int i0 = triangles[tid][edgeIndex];
-                    int i1 = triangles[tid][nextEdgeIndex];
-
-                    // Border check
-                    if (vertices[i0].border != vertices[i1].border)
-                        continue;
-                    // Seam check
-                    else if (vertices[i0].seam != vertices[i1].seam)
-                        continue;
-                    // Foldover check
-                    else if (vertices[i0].foldover != vertices[i1].foldover)
-                        continue;
-                    // If borders should be preserved
-                    else if (preserveBorders && vertices[i0].border)
-                        continue;
-                    // If seams should be preserved
-                    else if (preserveSeams && vertices[i0].seam)
-                        continue;
-                    // If foldovers should be preserved
-                    else if (preserveFoldovers && vertices[i0].foldover)
-                        continue;
-
-                    // Compute vertex to collapse to
-                    CalculateError(ref vertices[i0], ref vertices[i1], out p, out pIndex);
-                    deleted0.Resize(vertices[i0].tcount); // normals temporarily
-                    deleted1.Resize(vertices[i1].tcount); // normals temporarily
-
-                    // Don't remove if flipped
-                    if (Flipped(ref p, i0, i1, ref vertices[i0], deleted0.Data))
-                        continue;
-                    if (Flipped(ref p, i1, i0, ref vertices[i1], deleted1.Data))
-                        continue;
-
-                    int ia0 = attributeIndexArr[edgeIndex];
-
-                    // Not flipped, so remove edge
-                    vertices[i0].p = p;
-                    vertices[i0].q += vertices[i1].q;
-
-                    if (pIndex == 1)
-                    {
-                        // Move vertex attributes from ia1 to ia0
-                        int ia1 = attributeIndexArr[nextEdgeIndex];
-                        MoveVertexAttributes(ia0, ia1);
-                    }
-                    else if (pIndex == 2)
-                    {
-                        // Merge vertex attributes ia0 and ia1 into ia0
-                        int ia1 = attributeIndexArr[nextEdgeIndex];
-                        MergeVertexAttributes(ia0, ia1);
-                    }
-
-                    if (vertices[i0].seam)
-                    {
-                        ia0 = -1;
-                    }
-
-                    int tstart = refs.Length;
-                    UpdateTriangles(i0, ia0, ref vertices[i0], deleted0, ref deletedTris);
-                    UpdateTriangles(i0, ia0, ref vertices[i1], deleted1, ref deletedTris);
-
-                    int tcount = refs.Length - tstart;
-                    if (tcount <= vertices[i0].tcount)
-                    {
-                        // save ram
-                        if (tcount > 0)
-                        {
-                            var refsArr = refs.Data;
-                            Array.Copy(refsArr, tstart, refsArr, vertices[i0].tstart, tcount);
-                        }
-                    }
-                    else
-                    {
-                        // append
-                        vertices[i0].tstart = tstart;
-                    }
-
-                    vertices[i0].tcount = tcount;
-                    --remainingVertices;
-                    break;
-                }
-
-                // Check if we are already done
-                if ((startTrisCount - deletedTris) <= targetTrisCount && remainingVertices < maxVertexCount)
-                    break;
+                PushEdgeCost(heap, version, t.v0, t.v1);
+                PushEdgeCost(heap, version, t.v1, t.v2);
+                PushEdgeCost(heap, version, t.v2, t.v0);
             }
         }
         #endregion
 
-        #region Update Mesh
+        #region Update Neighbor Costs
         /// <summary>
-        /// Compact triangles, compute edge error and build reference list.
+        /// After collapsing an edge, recompute and push costs for all edges
+        /// touching the kept vertex. This is Blender's approach:
+        /// after bm_edge_collapse, update costs for all edges in v_other's disk cycle.
         /// </summary>
-        /// <param name="iteration">The iteration index.</param>
-        private void UpdateMesh(int iteration)
+        private void UpdateNeighborCosts(int v0, PriorityQueue<EdgeEntry, double> heap, long[] version)
         {
+            var vertData = this.vertices.Data;
+            var refsData = this.refs.Data;
+            var triData = this.triangles.Data;
+
+            int tstart = vertData[v0].tstart;
+            int tcount = vertData[v0].tcount;
+
+            for (int k = 0; k < tcount; k++)
+            {
+                Ref r = refsData[tstart + k];
+                var t = triData[r.tid];
+                if (t.deleted) continue;
+
+                PushEdgeCost(heap, version, t.v0, t.v1);
+                PushEdgeCost(heap, version, t.v1, t.v2);
+                PushEdgeCost(heap, version, t.v2, t.v0);
+            }
+        }
+        #endregion
+
+        #region Is Degenerate Topology
+        /// <summary>
+        /// Check if collapsing edge (i0,i1) would create duplicate faces.
+        /// Blender bmesh_decimate_collapse.cc:857-937: tag-based overlap detection.
+        /// For each non-shared triangle of i0, check if i1 has a matching triangle
+        /// with the same "other" two vertices → would become identical after collapse.
+        /// </summary>
+        private bool IsDegenerateTopology(int i0, int i1)
+        {
+            var refsData = this.refs.Data;
+            var trisData = this.triangles.Data;
+            var vertsData = this.vertices.Data;
+
+            int tcount0 = vertsData[i0].tcount;
+            int tstart0 = vertsData[i0].tstart;
+
+            for (int a = 0; a < tcount0; a++)
+            {
+                Ref ra = refsData[tstart0 + a];
+                var ta = trisData[ra.tid];
+                if (ta.deleted) continue;
+                if (ta.v0 == i1 || ta.v1 == i1 || ta.v2 == i1) continue;
+                int sa = ra.tvertex;
+                int na0 = ta[(sa + 1) % 3];
+                int na1 = ta[(sa + 2) % 3];
+
+                int tcount1 = vertsData[i1].tcount;
+                int tstart1 = vertsData[i1].tstart;
+
+                for (int b = 0; b < tcount1; b++)
+                {
+                    Ref rb = refsData[tstart1 + b];
+                    var tb = trisData[rb.tid];
+                    if (tb.deleted) continue;
+                    if (tb.v0 == i0 || tb.v1 == i0 || tb.v2 == i0) continue;
+                    int sb = rb.tvertex;
+                    int nb0 = tb[(sb + 1) % 3];
+                    int nb1 = tb[(sb + 2) % 3];
+
+                    if ((na0 == nb0 && na1 == nb1) || (na0 == nb1 && na1 == nb0))
+                        return true;
+                }
+            }
+
+            return false;
+        }
+        #endregion
+
+        #region Get Vertex Attribute Index
+        private static int GetVertexAttrIndex(ref Triangle t, int vertexPos)
+        {
+            return vertexPos == 0 ? t.va0 : (vertexPos == 1 ? t.va1 : t.va2);
+        }
+        #endregion
+
+        #region Init Borders And Smart Link
+        /// <summary>
+        /// One-time border detection and smart link.
+        /// Extracted from the original UpdateMesh iteration==0 block.
+        /// </summary>
+        private void InitBordersAndSmartLink(int vertexCount, int triangleCount)
+        {
+            var refs = this.refs.Data;
             var triangles = this.triangles.Data;
             var vertices = this.vertices.Data;
 
-            int triangleCount = this.triangles.Length;
-            int vertexCount = this.vertices.Length;
-            if (iteration > 0) // compact triangles
+            var vcount = new List<int>(8);
+            var vids = new List<int>(8);
+            int vsize = 0;
+            for (int i = 0; i < vertexCount; i++)
             {
-                int dst = 0;
-                for (int i = 0; i < triangleCount; i++)
-                {
-                    if (!triangles[i].deleted)
-                    {
-                        if (dst != i)
-                        {
-                            triangles[dst] = triangles[i];
-                        }
-                        dst++;
-                    }
-                }
-                this.triangles.Resize(dst);
-                triangles = this.triangles.Data;
-                triangleCount = dst;
+                vertices[i].border = false;
+                vertices[i].seam = false;
+                vertices[i].foldover = false;
             }
 
-            UpdateReferences();
-
-            // Identify boundary : vertices[].border=0,1
-            if (iteration == 0)
+            int ofs;
+            int id;
+            int borderVertexCount = 0;
+            double borderMinX = double.MaxValue;
+            double borderMaxX = double.MinValue;
+            for (int i = 0; i < vertexCount; i++)
             {
-                var refs = this.refs.Data;
+                int tstart = vertices[i].tstart;
+                int tcount = vertices[i].tcount;
+                vcount.Clear();
+                vids.Clear();
+                vsize = 0;
 
-                var vcount = new List<int>(8);
-                var vids = new List<int>(8);
-                int vsize = 0;
-                for (int i = 0; i < vertexCount; i++)
+                for (int j = 0; j < tcount; j++)
                 {
-                    vertices[i].border = false;
-                    vertices[i].seam = false;
-                    vertices[i].foldover = false;
+                    int tid = refs[tstart + j].tid;
+                    for (int k = 0; k < 3; k++)
+                    {
+                        ofs = 0;
+                        id = triangles[tid][k];
+                        while (ofs < vsize)
+                        {
+                            if (vids[ofs] == id)
+                                break;
+                            ++ofs;
+                        }
+
+                        if (ofs == vsize)
+                        {
+                            vcount.Add(1);
+                            vids.Add(id);
+                            ++vsize;
+                        }
+                        else
+                        {
+                            ++vcount[ofs];
+                        }
+                    }
                 }
 
-                int ofs;
-                int id;
-                int borderVertexCount = 0;
-                double borderMinX = double.MaxValue;
-                double borderMaxX = double.MinValue;
+                for (int j = 0; j < vsize; j++)
+                {
+                    if (vcount[j] == 1)
+                    {
+                        id = vids[j];
+                        vertices[id].border = true;
+                        ++borderVertexCount;
+
+                        if (enableSmartLink)
+                        {
+                            if (vertices[id].p.x < borderMinX)
+                                borderMinX = vertices[id].p.x;
+                            if (vertices[id].p.x > borderMaxX)
+                                borderMaxX = vertices[id].p.x;
+                        }
+                    }
+                }
+            }
+
+            if (enableSmartLink)
+            {
+                var borderVertices = new BorderVertex[borderVertexCount];
+                int borderIndexCount = 0;
+                double borderAreaWidth = borderMaxX - borderMinX;
                 for (int i = 0; i < vertexCount; i++)
                 {
-                    int tstart = vertices[i].tstart;
-                    int tcount = vertices[i].tcount;
-                    vcount.Clear();
-                    vids.Clear();
-                    vsize = 0;
-
-                    for (int j = 0; j < tcount; j++)
+                    if (vertices[i].border)
                     {
-                        int tid = refs[tstart + j].tid;
-                        for (int k = 0; k < 3; k++)
+                        int vertexHash = (int)(((((vertices[i].p.x - borderMinX) / borderAreaWidth) * 2.0) - 1.0) * int.MaxValue);
+                        borderVertices[borderIndexCount] = new BorderVertex(i, vertexHash);
+                        ++borderIndexCount;
+                    }
+                }
+
+                Array.Sort(borderVertices, 0, borderIndexCount, BorderVertexComparer.instance);
+
+                double vertexLinkDistance = System.Math.Sqrt(vertexLinkDistanceSqr);
+                int hashMaxDistance = System.Math.Max((int)((vertexLinkDistance / borderAreaWidth) * int.MaxValue), 1);
+
+                for (int i = 0; i < borderIndexCount; i++)
+                {
+                    int myIndex = borderVertices[i].index;
+                    if (myIndex == -1)
+                        continue;
+
+                    var myPoint = vertices[myIndex].p;
+                    for (int j = i + 1; j < borderIndexCount; j++)
+                    {
+                        int otherIndex = borderVertices[j].index;
+                        if (otherIndex == -1)
+                            continue;
+                        else if ((borderVertices[j].hash - borderVertices[i].hash) > hashMaxDistance)
+                            break;
+
+                        var otherPoint = vertices[otherIndex].p;
+                        var sqrX = ((myPoint.x - otherPoint.x) * (myPoint.x - otherPoint.x));
+                        var sqrY = ((myPoint.y - otherPoint.y) * (myPoint.y - otherPoint.y));
+                        var sqrZ = ((myPoint.z - otherPoint.z) * (myPoint.z - otherPoint.z));
+                        var sqrMagnitude = sqrX + sqrY + sqrZ;
+
+                        if (sqrMagnitude <= vertexLinkDistanceSqr)
                         {
-                            ofs = 0;
-                            id = triangles[tid][k];
-                            while (ofs < vsize)
-                            {
-                                if (vids[ofs] == id)
-                                    break;
+                            borderVertices[j].index = -1;
+                            vertices[myIndex].border = false;
+                            vertices[otherIndex].border = false;
 
-                                ++ofs;
-                            }
-
-                            if (ofs == vsize)
+                            if (AreUVsTheSame(0, myIndex, otherIndex))
                             {
-                                vcount.Add(1);
-                                vids.Add(id);
-                                ++vsize;
+                                vertices[myIndex].foldover = true;
+                                vertices[otherIndex].foldover = true;
                             }
                             else
                             {
-                                ++vcount[ofs];
+                                vertices[myIndex].seam = true;
+                                vertices[otherIndex].seam = true;
                             }
-                        }
-                    }
 
-                    for (int j = 0; j < vsize; j++)
-                    {
-                        if (vcount[j] == 1)
-                        {
-                            id = vids[j];
-                            vertices[id].border = true;
-                            ++borderVertexCount;
-
-                            if (enableSmartLink)
+                            int otherTriangleCount = vertices[otherIndex].tcount;
+                            int otherTriangleStart = vertices[otherIndex].tstart;
+                            for (int k = 0; k < otherTriangleCount; k++)
                             {
-                                if (vertices[id].p.x < borderMinX)
-                                {
-                                    borderMinX = vertices[id].p.x;
-                                }
-                                if (vertices[id].p.x > borderMaxX)
-                                {
-                                    borderMaxX = vertices[id].p.x;
-                                }
+                                var r = refs[otherTriangleStart + k];
+                                triangles[r.tid][r.tvertex] = myIndex;
                             }
                         }
                     }
                 }
+            }
+        }
+        #endregion
 
-                if (enableSmartLink)
+        #region Init Quadrics And Boundary Constraints
+        /// <summary>
+        /// Build quadrics from face planes and add boundary constraint planes.
+        /// Blender bmesh_decimate_collapse.cc:75-128: build quadrics once, add boundary
+        /// constraints with BOUNDARY_PRESERVE_WEIGHT.
+        /// </summary>
+        private void InitQuadricsAndBoundaryConstraints(int vertexCount, int triangleCount)
+        {
+            var vertices = this.vertices.Data;
+            var triangles = this.triangles.Data;
+            var refsData = this.refs.Data;
+
+            // Reset all quadrics
+            for (int i = 0; i < vertexCount; i++)
+                vertices[i].q = new SymmetricMatrix();
+
+            // Build quadrics from face planes
+            int v0, v1, v2;
+            Vector3d n, p0, p1, p2, p10, p20;
+            SymmetricMatrix sm;
+            for (int i = 0; i < triangleCount; i++)
+            {
+                v0 = triangles[i].v0;
+                v1 = triangles[i].v1;
+                v2 = triangles[i].v2;
+
+                p0 = vertices[v0].p;
+                p1 = vertices[v1].p;
+                p2 = vertices[v2].p;
+                p10 = p1 - p0;
+                p20 = p2 - p0;
+                Vector3d.Cross(ref p10, ref p20, out n);
+                n.Normalize();
+                triangles[i].n = n;
+
+                sm = new SymmetricMatrix(n.x, n.y, n.z, -Vector3d.Dot(ref n, ref p0));
+                vertices[v0].q += sm;
+                vertices[v1].q += sm;
+                vertices[v2].q += sm;
+            }
+
+            // Boundary edge constraints (Blender bmesh_decimate_collapse.cc:101-127):
+            // For each boundary edge, add a perpendicular constraint plane with high weight.
+            for (int i = 0; i < triangleCount; i++)
+            {
+                var tri = triangles[i];
+                int[] edgePairs = { tri.v0, tri.v1, tri.v1, tri.v2, tri.v2, tri.v0 };
+                for (int e = 0; e < 6; e += 2)
                 {
-                    // First find all border vertices
-                    var borderVertices = new BorderVertex[borderVertexCount];
-                    int borderIndexCount = 0;
-                    double borderAreaWidth = borderMaxX - borderMinX;
-                    for (int i = 0; i < vertexCount; i++)
+                    int va = edgePairs[e];
+                    int vb = edgePairs[e + 1];
+                    if (va > vb) continue;
+                    if (!vertices[va].border || !vertices[vb].border) continue;
+
+                    // Check if this is a boundary edge (shared by exactly one triangle)
+                    int sharedCount = 0;
+                    int tstartA = vertices[va].tstart;
+                    int tcountA = vertices[va].tcount;
+                    for (int j = 0; j < tcountA; j++)
                     {
-                        if (vertices[i].border)
-                        {
-                            int vertexHash = (int)(((((vertices[i].p.x - borderMinX) / borderAreaWidth) * 2.0) - 1.0) * int.MaxValue);
-                            borderVertices[borderIndexCount] = new BorderVertex(i, vertexHash);
-                            ++borderIndexCount;
-                        }
+                        int tid = refsData[tstartA + j].tid;
+                        var t = triangles[tid];
+                        if (t.v0 == vb || t.v1 == vb || t.v2 == vb)
+                            sharedCount++;
                     }
+                    if (sharedCount != 1) continue;
 
-                    // Sort the border vertices by hash
-                    Array.Sort(borderVertices, 0, borderIndexCount, BorderVertexComparer.instance);
-
-                    // Calculate the maximum hash distance based on the maximum vertex link distance
-                    double vertexLinkDistance = System.Math.Sqrt(vertexLinkDistanceSqr);
-                    int hashMaxDistance = System.Math.Max((int)((vertexLinkDistance / borderAreaWidth) * int.MaxValue), 1);
-
-                    // Then find identical border vertices and bind them together as one
-                    for (int i = 0; i < borderIndexCount; i++)
+                    // Compute perpendicular constraint plane
+                    Vector3d edgeVec = vertices[vb].p - vertices[va].p;
+                    Vector3d faceNormal = tri.n;
+                    Vector3d constraintNormal;
+                    Vector3d.Cross(ref edgeVec, ref faceNormal, out constraintNormal);
+                    double constraintMagSqr = constraintNormal.MagnitudeSqr;
+                    if (constraintMagSqr > 1e-20)
                     {
-                        int myIndex = borderVertices[i].index;
-                        if (myIndex == -1)
-                            continue;
-
-                        var myPoint = vertices[myIndex].p;
-                        for (int j = i + 1; j < borderIndexCount; j++)
-                        {
-                            int otherIndex = borderVertices[j].index;
-                            if (otherIndex == -1)
-                                continue;
-                            else if ((borderVertices[j].hash - borderVertices[i].hash) > hashMaxDistance) // There is no point to continue beyond this point
-                                break;
-
-                            var otherPoint = vertices[otherIndex].p;
-                            var sqrX = ((myPoint.x - otherPoint.x) * (myPoint.x - otherPoint.x));
-                            var sqrY = ((myPoint.y - otherPoint.y) * (myPoint.y - otherPoint.y));
-                            var sqrZ = ((myPoint.z - otherPoint.z) * (myPoint.z - otherPoint.z));
-                            var sqrMagnitude = sqrX + sqrY + sqrZ;
-
-                            if (sqrMagnitude <= vertexLinkDistanceSqr)
-                            {
-                                borderVertices[j].index = -1; // NOTE: This makes sure that the "other" vertex is not processed again
-                                vertices[myIndex].border = false;
-                                vertices[otherIndex].border = false;
-
-                                if (AreUVsTheSame(0, myIndex, otherIndex))
-                                {
-                                    vertices[myIndex].foldover = true;
-                                    vertices[otherIndex].foldover = true;
-                                }
-                                else
-                                {
-                                    vertices[myIndex].seam = true;
-                                    vertices[otherIndex].seam = true;
-                                }
-
-                                int otherTriangleCount = vertices[otherIndex].tcount;
-                                int otherTriangleStart = vertices[otherIndex].tstart;
-                                for (int k = 0; k < otherTriangleCount; k++)
-                                {
-                                    var r = refs[otherTriangleStart + k];
-                                    triangles[r.tid][r.tvertex] = myIndex;
-                                }
-                            }
-                        }
+                        constraintNormal = constraintNormal * (1.0 / System.Math.Sqrt(constraintMagSqr));
+                        double d = -Vector3d.Dot(ref constraintNormal, ref vertices[va].p);
+                        SymmetricMatrix constraint = new SymmetricMatrix(
+                            constraintNormal.x, constraintNormal.y, constraintNormal.z, d);
+                        constraint = constraint * BoundaryPreserveWeight;
+                        vertices[va].q += constraint;
+                        vertices[vb].q += constraint;
                     }
-
-                    // Update the references again
-                    UpdateReferences();
-                }
-
-                // Init Quadrics by Plane & Edge Errors
-                //
-                // required at the beginning ( iteration == 0 )
-                // recomputing during the simplification is not required,
-                // but mostly improves the result for closed meshes
-                for (int i = 0; i < vertexCount; i++)
-                {
-                    vertices[i].q = new SymmetricMatrix();
-                }
-
-                int v0, v1, v2;
-                Vector3d n, p0, p1, p2, p10, p20, dummy;
-                int dummy2;
-                SymmetricMatrix sm;
-                for (int i = 0; i < triangleCount; i++)
-                {
-                    v0 = triangles[i].v0;
-                    v1 = triangles[i].v1;
-                    v2 = triangles[i].v2;
-
-                    p0 = vertices[v0].p;
-                    p1 = vertices[v1].p;
-                    p2 = vertices[v2].p;
-                    p10 = p1 - p0;
-                    p20 = p2 - p0;
-                    Vector3d.Cross(ref p10, ref p20, out n);
-                    n.Normalize();
-                    triangles[i].n = n;
-
-                    sm = new SymmetricMatrix(n.x, n.y, n.z, -Vector3d.Dot(ref n, ref p0));
-                    vertices[v0].q += sm;
-                    vertices[v1].q += sm;
-                    vertices[v2].q += sm;
-                }
-
-                for (int i = 0; i < triangleCount; i++)
-                {
-                    // Calc Edge Error
-                    var triangle = triangles[i];
-                    triangles[i].err0 = CalculateError(ref vertices[triangle.v0], ref vertices[triangle.v1], out dummy, out dummy2);
-                    triangles[i].err1 = CalculateError(ref vertices[triangle.v1], ref vertices[triangle.v2], out dummy, out dummy2);
-                    triangles[i].err2 = CalculateError(ref vertices[triangle.v2], ref vertices[triangle.v0], out dummy, out dummy2);
-                    triangles[i].err3 = MathHelper.Min(triangles[i].err0, triangles[i].err1, triangles[i].err2);
                 }
             }
         }
@@ -1293,61 +1425,217 @@ namespace MeshDecimator.Algorithms
 
         #region Decimate Mesh
         /// <summary>
-        /// Decimates the mesh.
+        /// Decimates the mesh using Blender-style min-heap edge collapse.
+        /// Single pass: build heap once, greedily collapse cheapest edge,
+        /// update only affected neighbors (bmesh_decimate_collapse.cc:1357-1383).
+        /// Quadrics are accumulated during collapse, not rebuilt from scratch.
         /// </summary>
-        /// <param name="targetTrisCount">The target triangle count.</param>
         public override void DecimateMesh(int targetTrisCount)
         {
             if (targetTrisCount < 0)
                 throw new ArgumentOutOfRangeException("targetTrisCount");
 
-            int deletedTris = 0;
-            ResizableArray<bool> deleted0 = new ResizableArray<bool>(20);
-            ResizableArray<bool> deleted1 = new ResizableArray<bool>(20);
-            var triangles = this.triangles.Data;
+            int vertexCount = this.vertices.Length;
+            var vertices = this.vertices.Data;
             int triangleCount = this.triangles.Length;
             int startTrisCount = triangleCount;
-            var vertices = this.vertices.Data;
 
             int maxVertexCount = base.MaxVertexCount;
-            if (maxVertexCount <= 0)
-                maxVertexCount = int.MaxValue;
 
-            for (int iteration = 0; iteration < maxIterationCount; iteration++)
+            // Phase 1: Build reference list
+            UpdateReferences();
+
+            // Phase 2: Detect borders + smart link (one-time, like Blender initialization)
+            InitBordersAndSmartLink(vertexCount, triangleCount);
+            vertices = this.vertices.Data; // refresh after modification
+
+            // Phase 3: Build quadrics + boundary constraints (one-time)
+            InitQuadricsAndBoundaryConstraints(vertexCount, triangleCount);
+            vertices = this.vertices.Data;
+
+            // Phase 4: Rebuild references after smart link modified triangle vertices
+            UpdateReferences();
+            vertices = this.vertices.Data;
+            triangleCount = this.triangles.Length;
+
+            // Phase 5: Initialize version counters and build heap
+            vertexVersion = new long[vertexCount];
+            var heap = new PriorityQueue<EdgeEntry, double>();
+            BuildEdgeCosts(heap, vertexVersion);
+
+            // Phase 6: Iterative edge collapse (Blender BM_mesh_decimate_collapse main loop)
+            int deletedTris = 0;
+            var deleted0 = new bool[64];
+            var deleted1 = new bool[64];
+            int collapseCount = 0;
+
+            // Diagnostic counters
+            int diagTotal = 0, diagStale = 0, diagDead = 0;
+            int diagBorderMismatch = 0;
+            int diagPreserveBorder = 0, diagPreserveSeam = 0, diagPreserveFoldover = 0;
+            int diagFlip0 = 0, diagFlip1 = 0, diagTopology = 0, diagSuccess = 0;
+
+            while ((startTrisCount - deletedTris) > targetTrisCount && heap.Count > 0)
             {
-                ReportStatus(iteration, startTrisCount, (startTrisCount - deletedTris), targetTrisCount);
-                if ((startTrisCount - deletedTris) <= targetTrisCount && remainingVertices < maxVertexCount)
+                var entry = heap.Dequeue();
+                diagTotal++;
+
+                // Stale check: vertex versions must match entry's versions
+                if (vertexVersion[entry.v0] != entry.version0 || vertexVersion[entry.v1] != entry.version1)
+                {
+                    diagStale++;
+                    continue;
+                }
+
+                // Both vertices must still be alive
+                vertices = this.vertices.Data;
+                if (vertices[entry.v0].tcount == 0 || vertices[entry.v1].tcount == 0)
+                {
+                    diagDead++;
+                    continue;
+                }
+
+                int i0 = entry.v0;
+                int i1 = entry.v1;
+
+                // Constraint checks (same as Forstmann, checked at collapse time)
+                if (vertices[i0].border != vertices[i1].border) { diagBorderMismatch++; continue; }
+                if (base.PreserveBorders && vertices[i0].border) { diagPreserveBorder++; continue; }
+                if (preserveSeams && vertices[i0].seam) { diagPreserveSeam++; continue; }
+                if (preserveFoldovers && vertices[i0].foldover) { diagPreserveFoldover++; continue; }
+
+                // Compute optimal collapse position
+                Vector3d p;
+                int pIndex;
+                CalculateError(ref vertices[i0], ref vertices[i1], out p, out pIndex);
+
+                // Resize deleted arrays if needed
+                int tcount0 = vertices[i0].tcount;
+                int tcount1 = vertices[i1].tcount;
+                if (tcount0 > deleted0.Length) deleted0 = new bool[tcount0];
+                if (tcount1 > deleted1.Length) deleted1 = new bool[tcount1];
+
+                // Flip check (Blender bm_edge_collapse_is_degenerate_flip)
+                if (Flipped(ref p, i0, i1, ref vertices[i0], deleted0))
+                {
+                    diagFlip0++;
+                    continue;
+                }
+                if (Flipped(ref p, i1, i0, ref vertices[i1], deleted1))
+                {
+                    diagFlip1++;
+                    continue;
+                }
+
+                // Degenerate topology check (Blender bm_edge_collapse_is_degenerate_topology)
+                if (IsDegenerateTopology(i0, i1))
+                {
+                    diagTopology++;
+                    continue;
+                }
+
+                // Find attribute indices from a triangle containing edge (i0, i1)
+                int ia0 = i0, ia1 = i1;
+                {
+                    var refsData = this.refs.Data;
+                    var triData = this.triangles.Data;
+                    int ts0 = vertices[i0].tstart;
+                    int tc0 = vertices[i0].tcount;
+                    bool found = false;
+                    for (int k = 0; k < tc0 && !found; k++)
+                    {
+                        Ref r = refsData[ts0 + k];
+                        var t = triData[r.tid];
+                        if (t.deleted) continue;
+                        int s = r.tvertex;
+                        int next = (s + 1) % 3;
+                        int prev = (s + 2) % 3;
+                        if (t[next] == i1)
+                        {
+                            ia0 = GetVertexAttrIndex(ref t, s);
+                            ia1 = GetVertexAttrIndex(ref t, next);
+                            found = true;
+                        }
+                        else if (t[prev] == i1)
+                        {
+                            ia0 = GetVertexAttrIndex(ref t, s);
+                            ia1 = GetVertexAttrIndex(ref t, prev);
+                            found = true;
+                        }
+                    }
+                }
+
+                // Compute interpolation factor (Blender USE_VERT_NORMAL_INTERP)
+                double interpFactor = 0.5;
+                if (pIndex == 2)
+                {
+                    interpFactor = CalculateInterpolationFactor(ref p, ref vertices[i0].p, ref vertices[i1].p);
+                }
+
+                // === COLLAPSE: merge v1 into v0 ===
+                vertices[i0].p = p;
+                vertices[i0].q += vertices[i1].q; // Accumulate quadric (Blender approach)
+
+                // Update vertex attributes
+                if (pIndex == 1)
+                {
+                    MoveVertexAttributes(ia0, ia1);
+                }
+                else if (pIndex == 2)
+                {
+                    MergeVertexAttributes(ia0, ia1, interpFactor);
+                }
+
+                int ia0Param = ia0;
+                if (vertices[i0].seam)
+                    ia0Param = -1;
+
+                int tstart = refs.Length;
+                UpdateTriangles(i0, ia0Param, ref vertices[i0], deleted0, ref deletedTris);
+                UpdateTriangles(i0, ia0Param, ref vertices[i1], deleted1, ref deletedTris);
+
+                int newTcount = refs.Length - tstart;
+                if (newTcount <= vertices[i0].tcount)
+                {
+                    if (newTcount > 0)
+                    {
+                        var refsArr = refs.Data;
+                        Array.Copy(refsArr, tstart, refsArr, vertices[i0].tstart, newTcount);
+                    }
+                }
+                else
+                {
+                    vertices[i0].tstart = tstart;
+                }
+
+                vertices[i0].tcount = newTcount;
+                --remainingVertices;
+
+                // Increment versions for both vertices (invalidates all old heap entries)
+                vertexVersion[i0]++;
+                vertexVersion[i1]++;
+
+                // Update costs for neighbor edges touching the kept vertex
+                UpdateNeighborCosts(i0, heap, vertexVersion);
+
+                // Check vertex count limit
+                if (maxVertexCount > 0 && remainingVertices < maxVertexCount)
                     break;
 
-                // Update mesh once in a while
-                if ((iteration % 5) == 0)
+                collapseCount++;
+                diagSuccess++;
+                if (collapseCount % 500 == 0)
                 {
-                    UpdateMesh(iteration);
-                    triangles = this.triangles.Data;
-                    triangleCount = this.triangles.Length;
-                    vertices = this.vertices.Data;
+                    ReportStatus(collapseCount / 500, startTrisCount, startTrisCount - deletedTris, targetTrisCount);
                 }
-
-                // Clear dirty flag
-                for (int i = 0; i < triangleCount; i++)
-                {
-                    triangles[i].dirty = false;
-                }
-
-                // All triangles with edges below the threshold will be removed
-                //
-                // The following numbers works well for most models.
-                // If it does not, try to adjust the 3 parameters
-                double threshold = 0.000000001 * System.Math.Pow(iteration + 3, agressiveness);
-
-                if (Verbose && (iteration % 5) == 0)
-                {
-                    Logging.LogVerbose("iteration {0} - triangles {1} threshold {2}", iteration, (startTrisCount - deletedTris), threshold);
-                }
-
-                // Remove vertices & mark deleted triangles
-                RemoveVertexPass(startTrisCount, targetTrisCount, threshold, deleted0, deleted1, ref deletedTris);
             }
+
+            // Diagnostic output
+            System.Console.WriteLine(
+                $"[LOD Diag] target={targetTrisCount} start={startTrisCount} final={startTrisCount - deletedTris} success={diagSuccess} heapRemain={heap.Count}\n" +
+                $"  stale={diagStale} dead={diagDead} borderMismatch={diagBorderMismatch}\n" +
+                $"  preserveBorder={diagPreserveBorder} preserveSeam={diagPreserveSeam} preserveFoldover={diagPreserveFoldover}\n" +
+                $"  flip0={diagFlip0} flip1={diagFlip1} topology={diagTopology} totalPopped={diagTotal}");
 
             CompactMesh();
         }
@@ -1356,52 +1644,152 @@ namespace MeshDecimator.Algorithms
         #region Decimate Mesh Lossless
         /// <summary>
         /// Decimates the mesh without losing any quality.
+        /// Uses min-heap: collapse all edges with cost below DoubleEpsilon.
         /// </summary>
         public override void DecimateMeshLossless()
         {
-            int deletedTris = 0;
-            ResizableArray<bool> deleted0 = new ResizableArray<bool>(0);
-            ResizableArray<bool> deleted1 = new ResizableArray<bool>(0);
-            var triangles = this.triangles.Data;
+            int vertexCount = this.vertices.Length;
+            var vertices = this.vertices.Data;
             int triangleCount = this.triangles.Length;
             int startTrisCount = triangleCount;
-            var vertices = this.vertices.Data;
+
+            UpdateReferences();
+            InitBordersAndSmartLink(vertexCount, triangleCount);
+            vertices = this.vertices.Data;
+
+            InitQuadricsAndBoundaryConstraints(vertexCount, triangleCount);
+            vertices = this.vertices.Data;
+
+            UpdateReferences();
+            vertices = this.vertices.Data;
+            triangleCount = this.triangles.Length;
+
+            vertexVersion = new long[vertexCount];
+            var heap = new PriorityQueue<EdgeEntry, double>();
+            BuildEdgeCosts(heap, vertexVersion);
+
+            int deletedTris = 0;
+            var deleted0 = new bool[64];
+            var deleted1 = new bool[64];
 
             ReportStatus(0, startTrisCount, startTrisCount, -1);
-            for (int iteration = 0; iteration < 9999; iteration++)
+
+            while (heap.Count > 0)
             {
-                // Update mesh constantly
-                UpdateMesh(iteration);
-                triangles = this.triangles.Data;
-                triangleCount = this.triangles.Length;
-                vertices = this.vertices.Data;
-
-                ReportStatus(iteration, startTrisCount, triangleCount, -1);
-
-                // Clear dirty flag
-                for (int i = 0; i < triangleCount; i++)
-                {
-                    triangles[i].dirty = false;
-                }
-
-                // All triangles with edges below the threshold will be removed
-                //
-                // The following numbers works well for most models.
-                // If it does not, try to adjust the 3 parameters
-                double threshold = DoubleEpsilon;
-
-                if (Verbose)
-                {
-                    Logging.LogVerbose("Lossless iteration {0}", iteration);
-                }
-
-                // Remove vertices & mark deleted triangles
-                RemoveVertexPass(startTrisCount, 0, threshold, deleted0, deleted1, ref deletedTris);
-
-                if (deletedTris <= 0)
+                // Peek at cheapest — if above threshold, stop
+                if (heap.TryPeek(out _, out double topCost) && topCost > DoubleEpsilon)
                     break;
 
-                deletedTris = 0;
+                var entry = heap.Dequeue();
+
+                if (vertexVersion[entry.v0] != entry.version0 || vertexVersion[entry.v1] != entry.version1)
+                    continue;
+
+                vertices = this.vertices.Data;
+                if (vertices[entry.v0].tcount == 0 || vertices[entry.v1].tcount == 0)
+                    continue;
+
+                int i0 = entry.v0;
+                int i1 = entry.v1;
+
+                if (vertices[i0].border != vertices[i1].border) continue;
+                if (vertices[i0].seam != vertices[i1].seam) continue;
+                if (vertices[i0].foldover != vertices[i1].foldover) continue;
+                if (base.PreserveBorders && vertices[i0].border) continue;
+                if (preserveSeams && vertices[i0].seam) continue;
+                if (preserveFoldovers && vertices[i0].foldover) continue;
+
+                Vector3d p;
+                int pIndex;
+                CalculateError(ref vertices[i0], ref vertices[i1], out p, out pIndex);
+
+                int tcount0 = vertices[i0].tcount;
+                int tcount1 = vertices[i1].tcount;
+                if (tcount0 > deleted0.Length) deleted0 = new bool[tcount0];
+                if (tcount1 > deleted1.Length) deleted1 = new bool[tcount1];
+
+                if (Flipped(ref p, i0, i1, ref vertices[i0], deleted0))
+                    continue;
+                if (Flipped(ref p, i1, i0, ref vertices[i1], deleted1))
+                    continue;
+
+                if (IsDegenerateTopology(i0, i1))
+                    continue;
+
+                int ia0 = i0, ia1 = i1;
+                {
+                    var refsData = this.refs.Data;
+                    var triData = this.triangles.Data;
+                    int ts0 = vertices[i0].tstart;
+                    int tc0 = vertices[i0].tcount;
+                    bool found = false;
+                    for (int k = 0; k < tc0 && !found; k++)
+                    {
+                        Ref r = refsData[ts0 + k];
+                        var t = triData[r.tid];
+                        if (t.deleted) continue;
+                        int s = r.tvertex;
+                        int next = (s + 1) % 3;
+                        int prev = (s + 2) % 3;
+                        if (t[next] == i1)
+                        {
+                            ia0 = GetVertexAttrIndex(ref t, s);
+                            ia1 = GetVertexAttrIndex(ref t, next);
+                            found = true;
+                        }
+                        else if (t[prev] == i1)
+                        {
+                            ia0 = GetVertexAttrIndex(ref t, s);
+                            ia1 = GetVertexAttrIndex(ref t, prev);
+                            found = true;
+                        }
+                    }
+                }
+
+                double interpFactor = 0.5;
+                if (pIndex == 2)
+                    interpFactor = CalculateInterpolationFactor(ref p, ref vertices[i0].p, ref vertices[i1].p);
+
+                vertices[i0].p = p;
+                vertices[i0].q += vertices[i1].q;
+
+                if (pIndex == 1)
+                    MoveVertexAttributes(ia0, ia1);
+                else if (pIndex == 2)
+                    MergeVertexAttributes(ia0, ia1, interpFactor);
+
+                int ia0Param = ia0;
+                if (vertices[i0].seam)
+                    ia0Param = -1;
+
+                int tstart = refs.Length;
+                UpdateTriangles(i0, ia0Param, ref vertices[i0], deleted0, ref deletedTris);
+                UpdateTriangles(i0, ia0Param, ref vertices[i1], deleted1, ref deletedTris);
+
+                int newTcount = refs.Length - tstart;
+                if (newTcount <= vertices[i0].tcount)
+                {
+                    if (newTcount > 0)
+                    {
+                        var refsArr = refs.Data;
+                        Array.Copy(refsArr, tstart, refsArr, vertices[i0].tstart, newTcount);
+                    }
+                }
+                else
+                {
+                    vertices[i0].tstart = tstart;
+                }
+
+                vertices[i0].tcount = newTcount;
+                --remainingVertices;
+
+                vertexVersion[i0]++;
+                vertexVersion[i1]++;
+
+                UpdateNeighborCosts(i0, heap, vertexVersion);
+
+                if (Verbose)
+                    Logging.LogVerbose("Lossless collapse {0} - triangles {1}", deletedTris, startTrisCount - deletedTris);
             }
 
             CompactMesh();
