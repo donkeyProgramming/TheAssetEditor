@@ -20,11 +20,21 @@ namespace GameWorld.Core.Services.SceneSaving.Lod.Strategies
             CreateLodsForRootNode(mainNode, settings);
         }
 
-        protected override void ReduceMesh(Rmv2MeshNode rmv2MeshNode, float deductionRatio)
+        protected override void ReduceMesh(Rmv2MeshNode rmv2MeshNode, float deductionRatio) => ReduceMeshes([rmv2MeshNode], deductionRatio);
+
+        // The LOD's triangle budget is for the whole model, not each mesh: all meshes are decimated
+        // together so the cheapest reductions anywhere in the model are made first.
+        protected override void ReduceMeshes(List<Rmv2MeshNode> meshes, float deductionRatio)
         {
-            var reducedMesh = DecimatorMeshOptimizer.GetReducedMeshCopy(rmv2MeshNode.Geometry, deductionRatio);
-            rmv2MeshNode.Geometry.RemoveGraphicsCardResources();
-            rmv2MeshNode.Geometry = reducedMesh;
+            if (meshes.Count == 0)
+                return;
+
+            var reducedMeshes = DecimatorMeshOptimizer.GetReducedMeshCopies(meshes.Select(x => x.Geometry).ToList(), deductionRatio);
+            for (var i = 0; i < meshes.Count; i++)
+            {
+                meshes[i].Geometry.RemoveGraphicsCardResources();
+                meshes[i].Geometry = reducedMeshes[i];
+            }
         }
     }
 }
