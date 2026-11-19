@@ -165,9 +165,7 @@ namespace GameWorld.Core.Animation
             output.AnimationParts.Add(new AnimationPart());
 
             output.Bones = new BoneInfo[skeleton.BoneCount];
-            // A single-frame clip is a pose. Vanilla never has exactly one dynamic frame (the game
-            // crashes on it, #159): poses (docking, faces, hand poses...) store every bone in the
-            // static frame, have no dynamic frames and play for 0.1s.
+            // One dynamic frame crashes the game. Vanilla poses keep every bone in the static frame and play for 0.1s
             var isPose = DynamicFrames.Count == 1;
             const int staticMappingOffset = 10000;
 

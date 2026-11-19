@@ -49,9 +49,7 @@ namespace Editors.Audio.Shared.Wwise.Generators
             _audioEditorIntegrityService = audioEditorIntegrityService;
         }
 
-        // Created on first use rather than in the constructor: this service is built whenever the
-        // Audio Editor opens, and throwing there took the whole editor down for games without a
-        // supported bank generator (#297). Now only generating a bank needs a supported game.
+        // Created on first use: throwing in the constructor stopped the Audio Editor opening for unsupported games
         private HircGeneratorServiceFactory HircGeneratorFactory
         {
             get

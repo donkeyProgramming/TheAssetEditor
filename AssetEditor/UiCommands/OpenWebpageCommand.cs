@@ -18,8 +18,7 @@ namespace AssetEditor.UiCommands
 
         public void Execute()
         {
-            // Let the shell resolve the target directly. Going through "cmd /c start" split
-            // local paths on spaces (e.g. C:\Program Files\...) and mangled URLs containing '&'.
+            // "cmd /c start" split paths on spaces and mangled URLs containing '&'
             Process.Start(new ProcessStartInfo(_url) { UseShellExecute = true });
         }
     }

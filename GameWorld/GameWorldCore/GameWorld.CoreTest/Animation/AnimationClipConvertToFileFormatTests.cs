@@ -38,8 +38,7 @@ namespace GameWorld.Core.Test.Animation
             return clip;
         }
 
-        // #159: a one-frame clip must be written the way vanilla writes poses - everything in the
-        // static frame, no dynamic frames - as a single dynamic frame crashes the game.
+        // #159
         [Test]
         public void SingleFrameClip_IsWrittenAsStaticPose()
         {
