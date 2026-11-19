@@ -62,7 +62,7 @@ namespace Shared.Core.PackFiles.Serialization
                         reader.ReadUInt32();
 
                     var isCompressed = false;
-                    if (headerVersion == PackFileVersion.PFH5)
+                    if (headerVersion == PackFileVersion.PFH5 || headerVersion == PackFileVersion.PFH6)
                         isCompressed = reader.ReadBoolean();
 
                     var fullPackedFileName = IOFunctions.ReadZeroTerminatedAscii(reader, fileNameBuffer).ToLower();

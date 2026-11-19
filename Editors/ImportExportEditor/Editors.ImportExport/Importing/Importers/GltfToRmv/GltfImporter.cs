@@ -166,7 +166,7 @@ namespace Editors.ImportExport.Importing.Importers.GltfToRmv
             if (nodeSearchResult == null || !nodeSearchResult.Any())
                 return "";
 
-            var skeletonName = nodeSearchResult.First().Name.TrimStart(Value.ToCharArray());
+            var skeletonName = nodeSearchResult.First().Name.Substring(Value.Length);
 
             return skeletonName.ToLower();
         }

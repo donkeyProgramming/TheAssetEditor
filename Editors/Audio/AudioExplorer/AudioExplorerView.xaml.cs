@@ -19,12 +19,25 @@ namespace Editors.Audio.AudioExplorer
                 treeViewItem.DataContext is not HircTreeNode node)
                 return;
 
-            if (node.IsExpanded)
+            // Sounds have nothing to expand, so double-click plays them instead
+            if (AudioExplorerViewModel.IsPlayableNode(node) && DataContext is AudioExplorerViewModel viewModel)
+                _ = viewModel.PlayNodeAsync(node);
+            else if (node.IsExpanded)
                 node.IsExpanded = false;
             else
                 AudioExplorerViewModel.AutoExpandNode(node);
 
             e.Handled = true;
+        }
+
+        // WPF tree views don't select on right-click, so the context menu would act on the previous selection
+        private void OnNodeRightClick(object sender, MouseButtonEventArgs e)
+        {
+            if (e.OriginalSource is DependencyObject source && FindAncestor<TreeViewItem>(source) is TreeViewItem treeViewItem)
+            {
+                treeViewItem.IsSelected = true;
+                treeViewItem.Focus();
+            }
         }
 
         private static T FindAncestor<T>(DependencyObject source) where T : DependencyObject

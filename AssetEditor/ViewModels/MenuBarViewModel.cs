@@ -124,7 +124,6 @@ namespace AssetEditor.ViewModels
         {
             var appDirectory = AppDomain.CurrentDomain.BaseDirectory;
             var fullPath = Path.Combine(appDirectory, "Doc", "index.html");
-            Console.WriteLine(fullPath);
             _uiCommandFactory.Create<OpenWebpageCommand>(x => x.Configure(fullPath)).Execute();
         }
         [RelayCommand] private void OpenModdingWiki() => _uiCommandFactory.Create<OpenWebpageCommand>(x => x.Configure("https://tw-modding.com/index.php/Tutorial:AssetEditor")).Execute();

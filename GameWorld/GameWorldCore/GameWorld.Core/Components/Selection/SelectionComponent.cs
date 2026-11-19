@@ -19,6 +19,7 @@ namespace GameWorld.Core.Components.Selection
 {
     public class SelectionComponent : BaseComponent, IDisposable
     {
+        private static readonly ILogger s_logger = Logging.CreateStatic(typeof(SelectionComponent));
         //SpriteBatch _spriteBatch;
         Texture2D _textTexture;
         bool _isMouseDown = false;
@@ -158,7 +159,7 @@ namespace GameWorld.Core.Components.Selection
                 {
                     foreach (var bone in bones)
                     {
-                        Console.WriteLine($"bone id: {bone}");
+                        s_logger.Here().Debug($"Selected bone id: {bone}");
                     }
                     _commandFactory.CreateWithBuilder<BoneSelectionCommand>().Configure(x => x.Configure(bones, isSelectionModification, removeSelection)).BuildAndExecute();
                     return;

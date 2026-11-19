@@ -80,8 +80,9 @@
                     Grid.Row="1"
                     Height="25"
                     IsEditable="True"
-                    IsTextSearchEnabled="true"
+                    IsTextSearchEnabled="False"
                     DisplayMemberPath="DisplayName"
+                    Text="{Binding ExplorerFilter.ExplorerList.Filter, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
                     ItemsSource="{Binding ExplorerFilter.ExplorerList.Values}"
                     SelectedItem="{Binding ExplorerFilter.ExplorerList.SelectedItem, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
                     <ComboBox.ItemsPanel>
@@ -198,7 +199,19 @@
                 VirtualizingPanel.IsVirtualizing="True"
                 VirtualizingPanel.VirtualizationMode="Recycling"
                 VirtualizingPanel.IsVirtualizingWhenGrouping="True"
-                PreviewMouseDoubleClick="OnNodeDoubleClick">
+                PreviewMouseDoubleClick="OnNodeDoubleClick"
+                PreviewMouseRightButtonDown="OnNodeRightClick">
+
+                <TreeView.ContextMenu>
+                    <ContextMenu>
+                        <MenuItem
+                            Header="Export as .wav..."
+                            Command="{Binding ExportSelectedAsWavCommand}"/>
+                        <MenuItem
+                            Header="Export as .wem..."
+                            Command="{Binding ExportSelectedAsWemCommand}"/>
+                    </ContextMenu>
+                </TreeView.ContextMenu>
 
                 <TreeView.ItemContainerStyle>
                     <Style 

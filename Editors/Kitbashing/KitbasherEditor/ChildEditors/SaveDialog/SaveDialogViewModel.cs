@@ -101,6 +101,7 @@ namespace KitbasherEditor.ViewModels.SaveDialog
             _saveSettings.MaterialOutputType = SelectedWsModelStrategy.Value;
             _saveSettings.LodGenerationMethod = SelectedLodStrategy.Value;
             _saveSettings.NumberOfLodsToGenerate = NumberOfLodsToGenerate;
+            _saveSettings.RememberAsDefaults();
         }
 
         [RelayCommand]

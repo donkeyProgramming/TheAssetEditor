@@ -287,11 +287,14 @@ namespace Shared.Core.Misc
             return new Vector3((float)heading, (float)attitude, (float)bank);
         }
 
+        // Degrees about X, Y and Z. QuaternionToEuler returns (heading = Y, attitude = Z, bank = X)
         public static Vector3 QuaternionToEulerDegree(Quaternion quaternions)
         {
             var euler = QuaternionToEuler(quaternions);
-            var degrees = new Vector3(MathHelper.ToDegrees(euler.X), MathHelper.ToDegrees(euler.Y), MathHelper.ToDegrees(euler.Z));
-            return degrees;
+            var heading = MathHelper.ToDegrees(euler.X);
+            var attitude = MathHelper.ToDegrees(euler.Y);
+            var bank = MathHelper.ToDegrees(euler.Z);
+            return new Vector3(bank, heading, attitude);
         }
 
         public static Quaternion EulerToQuaternions(double heading, double attitude, double bank)
@@ -314,10 +317,10 @@ namespace Shared.Core.Misc
 
         public static Quaternion EulerDegreesToQuaternion(Vector3 eulerDegrees)
         {
-            var x = MathHelper.ToRadians(eulerDegrees.X);
-            var y = MathHelper.ToRadians(eulerDegrees.Y);
-            var z = MathHelper.ToRadians(eulerDegrees.Z);
-            return EulerToQuaternions(x, y, z);
+            var bank = MathHelper.ToRadians(eulerDegrees.X);
+            var heading = MathHelper.ToRadians(eulerDegrees.Y);
+            var attitude = MathHelper.ToRadians(eulerDegrees.Z);
+            return EulerToQuaternions(heading, attitude, bank);
         }
 
 

@@ -32,7 +32,7 @@ namespace Editors.Audio.Shared.Wwise.Generators
         private readonly IFileSaveService _fileSaveService;
         private readonly ApplicationSettingsService _applicationSettingsService;
         private readonly IAudioRepository _audioRepository;
-        private readonly HircGeneratorServiceFactory _hircGeneratorServiceFactory;
+        private HircGeneratorServiceFactory _hircGeneratorServiceFactoryInstance;
         private readonly IAudioEditorIntegrityService _audioEditorIntegrityService;
 
         private readonly ILogger _logger = Logging.Create<SoundBankGeneratorService>();
@@ -47,9 +47,23 @@ namespace Editors.Audio.Shared.Wwise.Generators
             _applicationSettingsService = applicationSettingsService;
             _audioRepository = audioRepository;
             _audioEditorIntegrityService = audioEditorIntegrityService;
+        }
 
-            var bankGeneratorVersion = (uint)GameInformationDatabase.GetGameById(_applicationSettingsService.CurrentSettings.CurrentGame).BankGeneratorVersion;
-            _hircGeneratorServiceFactory = HircGeneratorServiceFactory.CreateFactory(bankGeneratorVersion);
+        // Created on first use: throwing in the constructor stopped the Audio Editor opening for unsupported games
+        private HircGeneratorServiceFactory HircGeneratorFactory
+        {
+            get
+            {
+                if (_hircGeneratorServiceFactoryInstance != null)
+                    return _hircGeneratorServiceFactoryInstance;
+
+                var game = GameInformationDatabase.GetGameById(_applicationSettingsService.CurrentSettings.CurrentGame);
+                if (game.BankGeneratorVersion == GameBnkVersion.Unsupported)
+                    throw new Exception($"Generating sound banks is not supported for {game.DisplayName}. Select a supported game (e.g. Warhammer III) in the settings.");
+
+                _hircGeneratorServiceFactoryInstance = HircGeneratorServiceFactory.CreateFactory((uint)game.BankGeneratorVersion);
+                return _hircGeneratorServiceFactoryInstance;
+            }
         }
 
         public void GenerateSoundBankWithoutDialogueEvents(SoundBank soundBank)
@@ -191,7 +205,7 @@ namespace Editors.Audio.Shared.Wwise.Generators
             var hircItems = new List<HircItem>();
             foreach (var actionEvent in soundBank.ActionEvents)
             {
-                var actionEventHirc = _hircGeneratorServiceFactory.GenerateHirc(actionEvent);
+                var actionEventHirc = HircGeneratorFactory.GenerateHirc(actionEvent);
                 hircItems.Add(actionEventHirc);
                 actionEventToHircLookup[actionEvent] = actionEventHirc;
             }
@@ -211,7 +225,7 @@ namespace Editors.Audio.Shared.Wwise.Generators
 
                 foreach (var action in actionEvent.Actions)
                 {
-                    var actionHirc = _hircGeneratorServiceFactory.GenerateHirc(action, soundBank);
+                    var actionHirc = HircGeneratorFactory.GenerateHirc(action, soundBank);
                     hircItems.Add(actionHirc);
 
                     if (actionEventHirc.HircChildren == null)
@@ -257,7 +271,7 @@ namespace Editors.Audio.Shared.Wwise.Generators
             var hircItems = new List<HircItem>();
             foreach (var dialogueEvent in soundBank.DialogueEvents)
             {
-                var dialogueEventHirc = _hircGeneratorServiceFactory.GenerateHirc(dialogueEvent);
+                var dialogueEventHirc = HircGeneratorFactory.GenerateHirc(dialogueEvent);
                 hircItems.Add(dialogueEventHirc);
             }
             return hircItems;
@@ -294,7 +308,7 @@ namespace Editors.Audio.Shared.Wwise.Generators
         {
             var hircItems = new List<HircItem>();
 
-            var soundHirc = _hircGeneratorServiceFactory.GenerateHirc(sound);
+            var soundHirc = HircGeneratorFactory.GenerateHirc(sound);
             soundHirc.IsTarget = true;
             hircItems.Add(soundHirc);
             return hircItems;
@@ -304,7 +318,7 @@ namespace Editors.Audio.Shared.Wwise.Generators
         {
             var hircItems = new List<HircItem>();
 
-            var randomSequenceContainerHirc = _hircGeneratorServiceFactory.GenerateHirc(randomSequenceContainer, soundBank);
+            var randomSequenceContainerHirc = HircGeneratorFactory.GenerateHirc(randomSequenceContainer, soundBank);
             hircItems.Add(randomSequenceContainerHirc);
 
             randomSequenceContainerHirc.IsTarget = true;
@@ -314,7 +328,7 @@ namespace Editors.Audio.Shared.Wwise.Generators
             var sounds = soundBank.GetSounds(randomSequenceContainer.Children);
             foreach (var sound in sounds)
             {
-                var soundHirc = _hircGeneratorServiceFactory.GenerateHirc(sound);
+                var soundHirc = HircGeneratorFactory.GenerateHirc(sound);
                 hircItems.Add(soundHirc);
                 randomSequenceContainerHirc.HircChildren.Add(soundHirc);
             }

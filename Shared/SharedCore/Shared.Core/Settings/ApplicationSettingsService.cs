@@ -18,6 +18,9 @@ namespace Shared.Core.Settings
     {
         public record GamePathPair(GameTypeEnum Game, string Path);
 
+        // Kitbash save dialog choices. Stored by name: the enums are in GameWorld, which Shared.Core can't reference
+        public record ModelSaveDefaults(GameTypeEnum Game, string GeometryStrategy, string MaterialStrategy, string LodStrategy, bool OnlySaveVisible);
+
         public ObservableCollection<RecentPackFileInfo> RecentPackFiles { get; set; } = [];
         public ThemeType Theme { get; set; } = ThemeType.DarkTheme;
         public BackgroundColour RenderEngineBackgroundColour { get; set; } = BackgroundColour.DarkGrey;
@@ -33,6 +36,7 @@ namespace Shared.Core.Settings
         public Vector3 VertexSelectionColour { get; set; } = new Vector3(1.0f, 0.47f, 0.0f);
         public string SelectedLangauge { get; set; } = "en";
         public CameraControlMode CameraControlMode { get; set; } = CameraControlMode.AssetEditorStyle;
+        public List<ModelSaveDefaults> ModelSaveDefaultsPerGame { get; set; } = [];
     }
 
     public class ApplicationSettingsService

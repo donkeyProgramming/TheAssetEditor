@@ -43,7 +43,10 @@ namespace Shared.Ui.Common
         public delegate bool FilterDelegate(T value, Regex regex);
         public delegate void FilterExtendedDelegate(FilterCollection<T> sender, Regex regex);
 
-        public FilterDelegate SearchFilter { get; set; } 
+        public FilterDelegate SearchFilter { get; set; }
+
+        // No regex is built (the delegates get null), so the SearchFilter must read Filter itself
+        public bool IsPlainTextFilter { get; set; }
         public FilterExtendedDelegate SearchFilterExtended { get; set; }
 
 
@@ -88,7 +91,7 @@ namespace Shared.Ui.Common
             {
                 if (filterValue == null)
                     filterValue = "";
-                var rx = new Regex(filterValue, RegexOptions.Compiled | RegexOptions.IgnoreCase);
+                var rx = IsPlainTextFilter ? null : new Regex(filterValue, RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
                 if (SearchFilterExtended != null)
                 {

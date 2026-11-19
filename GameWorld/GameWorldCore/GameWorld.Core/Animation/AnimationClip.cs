@@ -165,6 +165,10 @@ namespace GameWorld.Core.Animation
             output.AnimationParts.Add(new AnimationPart());
 
             output.Bones = new BoneInfo[skeleton.BoneCount];
+            // One dynamic frame crashes the game. Vanilla poses keep every bone in the static frame and play for 0.1s
+            var isPose = DynamicFrames.Count == 1;
+            const int staticMappingOffset = 10000;
+
             for (var i = 0; i < skeleton.BoneCount; i++)
             {
                 output.Bones[i] = new BoneInfo()
@@ -174,10 +178,18 @@ namespace GameWorld.Core.Animation
                     ParentId = skeleton.GetParentBoneIndex(i)
                 };
 
-                output.AnimationParts[0].RotationMappings.Add(new AnimationBoneMapping(i));
-                output.AnimationParts[0].TranslationMappings.Add(new AnimationBoneMapping(i));
+                var mappingValue = isPose ? staticMappingOffset + i : i;
+                output.AnimationParts[0].RotationMappings.Add(new AnimationBoneMapping(mappingValue));
+                output.AnimationParts[0].TranslationMappings.Add(new AnimationBoneMapping(mappingValue));
             }
 
+            if (isPose)
+            {
+                output.AnimationParts[0].StaticFrame = CreateFrameFromKeyFrame(0, skeleton);
+                if (output.Header.AnimationTotalPlayTimeInSec <= 0)
+                    output.Header.AnimationTotalPlayTimeInSec = 0.1f;
+                return output;
+            }
 
             for (var i = 0; i < DynamicFrames.Count; i++)
                 output.AnimationParts[0].DynamicFrames.Add(CreateFrameFromKeyFrame(i, skeleton));
