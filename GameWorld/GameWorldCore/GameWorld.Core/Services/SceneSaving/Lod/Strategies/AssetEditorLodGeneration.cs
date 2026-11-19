@@ -22,8 +22,7 @@ namespace GameWorld.Core.Services.SceneSaving.Lod.Strategies
 
         protected override void ReduceMesh(Rmv2MeshNode rmv2MeshNode, float deductionRatio) => ReduceMeshes([rmv2MeshNode], deductionRatio);
 
-        // The LOD's triangle budget is for the whole model, not each mesh: all meshes are decimated
-        // together so the cheapest reductions anywhere in the model are made first.
+        // The triangle budget is for the whole model, not each mesh
         protected override void ReduceMeshes(List<Rmv2MeshNode> meshes, float deductionRatio)
         {
             if (meshes.Count == 0)

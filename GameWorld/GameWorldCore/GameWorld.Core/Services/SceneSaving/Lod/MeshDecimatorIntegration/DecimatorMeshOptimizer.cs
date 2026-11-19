@@ -11,10 +11,8 @@ namespace GameWorld.Core.Services.SceneSaving.Lod.MeshDecimatorIntegration
         public static MeshObject GetReducedMeshCopy(MeshObject original, float factor) => GetReducedMeshCopies([original], factor)[0];
 
         /// <summary>
-        /// Reduces a whole model in one pass: all meshes are decimated together against one triangle
-        /// target, so the cheapest reductions anywhere in the model go first. A dense mesh can lose more
-        /// than the factor while a sparse one (or a large feather card) loses less or nothing. The
-        /// result has one mesh per input mesh, in the same order; a mesh can end up with no triangles.
+        /// Reduces all meshes together against one triangle target, so the cheapest reductions anywhere in the model
+        /// go first. Returns one mesh per input mesh, in order; a mesh can end up with no triangles.
         /// </summary>
         public static List<MeshObject> GetReducedMeshCopies(IReadOnlyList<MeshObject> originals, float factor)
         {

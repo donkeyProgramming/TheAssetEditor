@@ -64,16 +64,9 @@ namespace GameWorld.Core.Services.SceneSaving
             }
         }
 
-        // Defaults from a 1,500-model sample of vanilla WH3 unit models (variantmeshes\wh_variantmodels),
-        // 92% of which have 4 LODs:
-        //  - Camera distance: the most common set is 10, 20, 30, 10000, and the last LOD is always
-        //    10000 (or 1e6), i.e. it is used at any distance.
-        //  - Quality: 2 for LOD0, 0 for the rest.
-        //  - Triangles kept relative to LOD0 (median per LOD): 1, 0.65, 0.31, 0.105, and 0.027 for a
-        //    fifth LOD.
-        // Rome 2/Attila-era unit models (RMV2 v6) use different distances: 100, 200, 400, 500 on every
-        // multi-LOD unit model in the Rome_Man_And_Shield test pack, with the last LOD at 500. Their
-        // reduction per LOD is close to WH3's (median 1, 0.65, 0.29, 0.16 over 12 models).
+        // Medians over vanilla WH3 unit models: camera distances 10, 20, 30 with the last LOD at 10000, quality 2
+        // for LOD0 and 0 after, triangles kept 1, 0.65, 0.31, 0.105, 0.027. Rome 2/Attila unit models (RMV2 v6)
+        // use distances 100, 200, 400, 500 and reduce about as much.
         public const float LastLodCameraDistance = 10000;
         static readonly float[] s_defaultLodReductionFactors = [1, 0.65f, 0.3f, 0.1f, 0.03f];
         static readonly float[] s_rmv6LodCameraDistances = [100, 200, 400, 500];

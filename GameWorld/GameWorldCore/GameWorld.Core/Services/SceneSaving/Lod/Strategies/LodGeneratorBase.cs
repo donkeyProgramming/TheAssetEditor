@@ -17,10 +17,7 @@ namespace GameWorld.Core.Services.SceneSaving.Lod.Strategies
 
         protected abstract void ReduceMesh(Rmv2MeshNode rmv2MeshNode, float deductionRatio);
 
-        /// <summary>
-        /// Reduces all of a LOD's meshes. By default each mesh is reduced on its own; a strategy can
-        /// override this to reduce the model as a whole.
-        /// </summary>
+        // Reduces each mesh on its own unless a strategy reduces the model as a whole
         protected virtual void ReduceMeshes(List<Rmv2MeshNode> meshes, float deductionRatio)
         {
             foreach (var mesh in meshes)

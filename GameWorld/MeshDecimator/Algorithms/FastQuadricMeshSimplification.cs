@@ -338,11 +338,8 @@ namespace MeshDecimator.Algorithms
         }
 
         /// <summary>
-        /// Gets or sets if whole disconnected parts (fur tufts, feathers, hair cards, small trinkets) may be
-        /// removed. Removing a part competes with edge collapses in the same queue: its cost is the error of
-        /// collapsing the whole part to its centre, measured with the same vertex quadrics as an edge
-        /// collapse. Parts made of open edges (cards) can't be simplified by edge collapses when borders
-        /// are preserved, so this is the only way to reduce them.
+        /// Gets or sets if whole disconnected parts (fur tufts, feathers, cards) may be removed, at the cost of
+        /// collapsing the part to its centre. With borders preserved this is the only way to reduce open cards.
         /// Default value: false
         /// </summary>
         public bool RemoveParts
@@ -353,7 +350,6 @@ namespace MeshDecimator.Algorithms
 
         /// <summary>
         /// Gets or sets the largest part that may be removed, as a share of the starting triangle count.
-        /// Missing the triangle target is better than deleting a large piece of the model.
         /// Default value: 0.05
         /// </summary>
         public double MaxRemovablePartTriangleShare
@@ -420,9 +416,8 @@ namespace MeshDecimator.Algorithms
             double error = 0.0;
             double det = q.Determinant1();
 
-            // When q is nearly singular (the surrounding planes are nearly parallel, as on flat or thin
-            // geometry), its "optimal" point can be far away along the direction the planes don't
-            // constrain, at almost no error. Only use it when it stays near the edge.
+            // A nearly singular q (flat or thin geometry) can put the "optimal" point far from the edge at almost
+            // no error, so only use it when it stays near the edge
             bool useOptimal = false;
             result = new Vector3d();
             if (det != 0.0 && !border)
@@ -933,10 +928,8 @@ namespace MeshDecimator.Algorithms
         }
 
         /// <summary>
-        /// The error of collapsing a part to its centre: its live vertices' quadrics evaluated there.
-        /// These are the same quadrics edge collapses are costed with, including the boundary
-        /// constraint planes, which is what makes removing an open card (whose own face planes all pass
-        /// through its centre) cost something in proportion to its size.
+        /// The error of collapsing a part to its centre, from the same quadrics edge collapses use. Their
+        /// boundary planes are what make removing an open card cost something in proportion to its size.
         /// </summary>
         private double PartRemovalCost(int[] partTriangles, out int liveTriangles)
         {
@@ -1131,9 +1124,7 @@ namespace MeshDecimator.Algorithms
 
             if (enableSmartLink)
             {
-                // Only link vertices of the same sub-mesh. Sub-meshes are separate meshes with their own
-                // materials; linking across them would let a collapse give one mesh's triangles another
-                // mesh's UVs.
+                // Only link vertices of the same sub-mesh, or a collapse can give one mesh's triangles another's UVs
                 var vertexSubMesh = new int[vertexCount];
                 for (int t = 0; t < triangleCount; t++)
                 {
