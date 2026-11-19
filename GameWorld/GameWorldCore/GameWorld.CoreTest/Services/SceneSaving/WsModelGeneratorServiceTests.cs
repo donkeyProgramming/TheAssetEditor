@@ -15,9 +15,7 @@ using Test.TestingUtility.TestUtility;
 
 namespace GameWorld.Core.Test.Services.SceneSaving
 {
-    // Each GenerateWsModel call here stands for one save in the editor: a fresh
-    // serializer (and so a fresh material repository) every time, like the
-    // WsModel strategies create.
+    // Each Save() is one editor save: a fresh serializer and repository, as the WsModel strategies create
     internal class WsModelGeneratorServiceTests
     {
         const string ModelFolder = "variantmeshes/wh3_main_mod/shields/";

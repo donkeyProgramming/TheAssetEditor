@@ -49,9 +49,7 @@ namespace GameWorld.Core.Rendering.Materials.Serialization
 
         public void AddMaterial(string wsMaterialContent, string wsMaterialPath) => Register(SanatizeMaterial(wsMaterialContent), wsMaterialPath);
 
-        // Material files are shared: wsmodels reuse identical materials, and materials are named
-        // after the mesh, so other models can point at the same path. Only overwrite a file when
-        // nothing but the model being saved can be using it.
+        // Materials are shared (dedup, mesh-based names), so only overwrite one nothing else can be using
         public bool CanWriteMaterial(string wsMaterialPath, string ownerWsModelPath)
         {
             var editablePack = _packFileService.GetEditablePack();
@@ -74,7 +72,7 @@ namespace GameWorld.Core.Rendering.Materials.Serialization
 
         void Register(string sanitizedWsMaterial, string wsMaterialPath)
         {
-            // The file at this path no longer holds its old content, so stop handing it out for that content
+            // The path no longer holds its old content, so stop offering it for that content
             var pathKey = PathNormalization.NormalizeFileName(wsMaterialPath);
             if (_contentByPath.TryGetValue(pathKey, out var oldContent) && _map.TryGetValue(oldContent, out var oldPath) && PathNormalization.NormalizeFileName(oldPath) == pathKey)
                 _map.Remove(oldContent);
@@ -97,7 +95,7 @@ namespace GameWorld.Core.Rendering.Materials.Serialization
             }
 
             // a few wsmodels are very strange, just ignore them.
-            // The result will just be more generated wsmodels.
+            // The result will just be more generated wsmodels. 
             // Not a huge issue.
             return wsMaterialContent;
         }
