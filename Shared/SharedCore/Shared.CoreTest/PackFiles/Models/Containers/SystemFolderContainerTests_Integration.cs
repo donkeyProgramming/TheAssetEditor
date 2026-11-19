@@ -86,9 +86,6 @@ namespace Shared.CoreTest.PackFiles.Models.Containers
             container.Dispose();
         }
 
-        // Saving into the project folder, then reopening the project, makes the folder scan pick up the
-        // output pack as a project file. It must not be packed into the next save: that nests every
-        // previous save, doubling the pack per session until it passes 2GB and can't be read.
         [Test]
         public void SaveToDisk_OutputPackInsideProjectFolder_IsNotPackedIntoItself()
         {

@@ -335,10 +335,7 @@ namespace Shared.Core.PackFiles
             return null;
         }
 
-        // The container holding this exact file wins over any container's match-by-name fallback.
-        // Otherwise a mod file sharing its name with a vanilla file (a tech skeleton named like a
-        // skeleton under animations\skeletons, say) resolves to the vanilla path, because the CA
-        // container is asked first.
+        // An exact match in any container wins over a name match, or a mod file named like a vanilla one resolves to the vanilla path
         (IPackFileContainerInternal Container, string Path)? ResolveFile(PackFile file)
         {
             foreach (var pf in _packFileContainers)

@@ -578,9 +578,7 @@ namespace Shared.CoreTest.PackFiles
             Assert.That(path, Is.EqualTo("folder\\file.txt"));
         }
 
-        // A mod's tech skeleton often shares its file name with a vanilla skeleton. The file that
-        // was actually passed in must win over an earlier container's match-by-name fallback,
-        // otherwise opening the tech skeleton silently loads the vanilla one.
+        // A mod's tech skeleton often has the same file name as a vanilla skeleton
         static (PackFileService Pfs, PackFile VanillaFile, PackFile ModFile, IPackFileContainer Mod) CreateSameNameInTwoPacks()
         {
             var pfs = CreateService();
