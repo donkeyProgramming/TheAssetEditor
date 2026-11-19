@@ -41,6 +41,40 @@ namespace GameWorld.Core.Services.SceneSaving
                 GameTypeEnum.Pharaoh => MaterialStrategy.WsModel_Pharaoh,
                 _ => MaterialStrategy.None,
             };
+
+            ApplyRememberedDefaults();
+        }
+
+        void ApplyRememberedDefaults()
+        {
+            var settings = _applicationSettingsService.CurrentSettings;
+            var defaults = settings.ModelSaveDefaultsPerGame?.FirstOrDefault(x => x.Game == settings.CurrentGame);
+            if (defaults == null)
+                return;
+
+            if (Enum.TryParse<GeometryStrategy>(defaults.GeometryStrategy, out var geometry))
+                GeometryOutputType = geometry;
+            if (Enum.TryParse<MaterialStrategy>(defaults.MaterialStrategy, out var material))
+                MaterialOutputType = material;
+            if (Enum.TryParse<LodStrategy>(defaults.LodStrategy, out var lod))
+                LodGenerationMethod = lod;
+            OnlySaveVisible = defaults.OnlySaveVisible;
+        }
+
+        /// <summary>Stores the current strategy choices as the starting point for the next model
+        /// saved for this game, including in new editors and after a restart.</summary>
+        public void RememberAsDefaults()
+        {
+            var settings = _applicationSettingsService.CurrentSettings;
+            settings.ModelSaveDefaultsPerGame ??= [];
+            settings.ModelSaveDefaultsPerGame.RemoveAll(x => x.Game == settings.CurrentGame);
+            settings.ModelSaveDefaultsPerGame.Add(new ApplicationSettings.ModelSaveDefaults(
+                settings.CurrentGame,
+                GeometryOutputType.ToString(),
+                MaterialOutputType.ToString(),
+                LodGenerationMethod.ToString(),
+                OnlySaveVisible));
+            _applicationSettingsService.Save();
         }
 
         public void RefreshLodSettings()

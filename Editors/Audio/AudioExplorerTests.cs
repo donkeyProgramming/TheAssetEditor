@@ -128,5 +128,39 @@ namespace Test.Audio
                 Times.Once);
             Assert.That(tree.Children.Select(node => node.Hirc), Is.EquivalentTo(new[] { firstChild, secondChild }));
         }
+
+        [Test]
+        public void ConvertWemToWav_DecodesAnEncodedWemBackToPlayablePcm()
+        {
+            const int sampleRate = 44100;
+            const int channels = 2;
+            var samples = Enumerable.Range(0, sampleRate * channels)
+                .Select(i => (short)(Math.Sin(2 * Math.PI * 440 * (i / channels) / sampleRate) * short.MaxValue * 0.5))
+                .ToArray();
+            var sourceWav = CreatePcm16Wav(samples, sampleRate, channels);
+            var wemBytes = global::Shared.GameFormats.Wwise.Wem.V132.WemFile.CreateFromWavBytes(sourceWav).WriteData();
+
+            var wavBytes = AudioExplorerViewModel.ConvertWemToWav(wemBytes);
+
+            using var reader = new NAudio.Wave.WaveFileReader(new MemoryStream(wavBytes));
+            Assert.That(reader.WaveFormat.Encoding, Is.EqualTo(NAudio.Wave.WaveFormatEncoding.Pcm));
+            Assert.That(reader.WaveFormat.BitsPerSample, Is.EqualTo(16));
+            Assert.That(reader.WaveFormat.SampleRate, Is.EqualTo(sampleRate));
+            Assert.That(reader.WaveFormat.Channels, Is.EqualTo(channels));
+            Assert.That(reader.TotalTime.TotalSeconds, Is.EqualTo(1).Within(0.05));
+
+            var decoded = new byte[reader.Length];
+            reader.ReadExactly(decoded);
+            var peak = Enumerable.Range(0, decoded.Length / 2).Max(i => Math.Abs((int)BitConverter.ToInt16(decoded, i * 2)));
+            Assert.That(peak, Is.GreaterThan(short.MaxValue / 4), "Decoded audio should not be silent");
+        }
+
+        private static byte[] CreatePcm16Wav(short[] samples, int sampleRate, int channels)
+        {
+            using var stream = new MemoryStream();
+            using (var writer = new NAudio.Wave.WaveFileWriter(stream, new NAudio.Wave.WaveFormat(sampleRate, 16, channels)))
+                writer.WriteSamples(samples, 0, samples.Length);
+            return stream.ToArray();
+        }
     }
 }

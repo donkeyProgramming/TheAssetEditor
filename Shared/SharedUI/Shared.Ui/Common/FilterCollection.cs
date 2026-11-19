@@ -43,7 +43,12 @@ namespace Shared.Ui.Common
         public delegate bool FilterDelegate(T value, Regex regex);
         public delegate void FilterExtendedDelegate(FilterCollection<T> sender, Regex regex);
 
-        public FilterDelegate SearchFilter { get; set; } 
+        public FilterDelegate SearchFilter { get; set; }
+
+        /// <summary>The filter text is not a regex: no regex is built (the filter delegates get null), so text
+        /// like "Play_x (wh3" filters normally instead of marking the filter invalid. Needs a SearchFilter
+        /// or SearchFilterExtended that reads <see cref="Filter"/> itself.</summary>
+        public bool IsPlainTextFilter { get; set; }
         public FilterExtendedDelegate SearchFilterExtended { get; set; }
 
 
@@ -88,7 +93,7 @@ namespace Shared.Ui.Common
             {
                 if (filterValue == null)
                     filterValue = "";
-                var rx = new Regex(filterValue, RegexOptions.Compiled | RegexOptions.IgnoreCase);
+                var rx = IsPlainTextFilter ? null : new Regex(filterValue, RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
                 if (SearchFilterExtended != null)
                 {

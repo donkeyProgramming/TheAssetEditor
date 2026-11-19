@@ -6,6 +6,7 @@ namespace Shared.Core.Misc
 {
     public class DirectoryHelper
     {
+        private static readonly ILogger s_logger = Logging.CreateStatic(typeof(DirectoryHelper));
         private const string ExplorerWindowClass = "CabinetWClass";
 
         private delegate bool EnumWindowsProc(IntPtr hWnd, IntPtr lParam);
@@ -98,7 +99,7 @@ namespace Shared.Core.Misc
 
             if (!Directory.Exists(folderPath))
             {
-                Console.WriteLine("Folder does not exist.");
+                s_logger.Here().Warning($"Folder '{folderPath}' does not exist");
                 return;
             }
 
@@ -132,12 +133,12 @@ namespace Shared.Core.Misc
             if (foundHandle != IntPtr.Zero)
             {
                 SetForegroundWindow(foundHandle);
-                Console.WriteLine("Folder already open → brought to front.");
+                s_logger.Here().Debug($"Folder '{folderPath}' already open, brought to front");
             }
             else
             {
                 Process.Start("explorer.exe", folderPath);
-                Console.WriteLine("Folder not open → opened now.");
+                s_logger.Here().Debug($"Folder '{folderPath}' opened");
             }
         }
 

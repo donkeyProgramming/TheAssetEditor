@@ -14,6 +14,7 @@ namespace Editors.Reports.Audio
 
     public class DialogueEventInfoPrinter
     {
+        private readonly ILogger _logger = Logging.Create<DialogueEventInfoPrinter>();
         private readonly IAudioRepository _audioRepository;
 
         public DialogueEventInfoPrinter(IAudioRepository audioRepository)
@@ -47,7 +48,7 @@ namespace Editors.Reports.Audio
             var stateGroupsJoined = string.Join(", ", stateGroups);
 
             var info = $"{_audioRepository.GetNameFromId(hircItem.Id)} : {stateGroupsJoined}";
-            Console.WriteLine(info);
+            _logger.Here().Information(info);
 
             var filePath = $"{DirectoryHelper.ReportsDirectory}\\dialogue_event_info.txt";
             File.AppendAllText(filePath, info + Environment.NewLine);

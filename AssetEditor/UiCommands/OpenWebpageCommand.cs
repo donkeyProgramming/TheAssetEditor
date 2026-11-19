@@ -18,7 +18,9 @@ namespace AssetEditor.UiCommands
 
         public void Execute()
         {
-            Process.Start(new ProcessStartInfo("cmd", $"/c start {_url}") { CreateNoWindow = true });
+            // Let the shell resolve the target directly. Going through "cmd /c start" split
+            // local paths on spaces (e.g. C:\Program Files\...) and mangled URLs containing '&'.
+            Process.Start(new ProcessStartInfo(_url) { UseShellExecute = true });
         }
     }
 }

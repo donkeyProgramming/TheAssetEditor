@@ -18,10 +18,23 @@ namespace Editors.Audio.AudioExplorer
 
             ExplorerList = new FilterCollection<ExplorerListItem>([])
             {
-                SearchFilter = (value, regex) => regex.Match(value.DisplayName).Success || regex.Match(value.Id.ToString()).Success
+                // Plain substring match anywhere in the name. Display names contain "(bank.bnk)", which
+                // as a regex would stop matching the item the user just picked, and a half-typed "(" is not a valid regex.
+                IsPlainTextFilter = true,
+                SearchFilter = (value, _) => MatchesFilter(value, ExplorerList.Filter)
             };
 
             Refresh(searchByActionEvent, searchByDialogueEvent, searchByHircId, searchByVOActor);
+        }
+
+        private static bool MatchesFilter(ExplorerListItem item, string filter)
+        {
+            if (string.IsNullOrWhiteSpace(filter))
+                return true;
+
+            filter = filter.Trim();
+            return (item.DisplayName?.Contains(filter, StringComparison.OrdinalIgnoreCase) ?? false)
+                || item.Id.ToString().Contains(filter, StringComparison.Ordinal);
         }
 
         public void Refresh(bool searchByActionEvent, bool searchByDialogueEvent, bool searchByHircId, bool searchByVOActor)

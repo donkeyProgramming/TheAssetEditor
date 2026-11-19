@@ -13,6 +13,7 @@ namespace GameWorld.Core.Commands.Bone
 {
     public class TransformBoneCommand : IAeUndoCommandCommand
     {
+        private static readonly ILogger s_logger = Logging.CreateStatic(typeof(TransformBoneCommand));
         List<int> _selectedBones;
         BoneSelectionState _boneSelectionState;
         int _currentFrame;
@@ -59,7 +60,7 @@ namespace GameWorld.Core.Commands.Bone
 
             var matrixDelta = newPosition - _oldTransform;
             _oldTransform = newPosition;
-            Console.WriteLine($" gizmo moved: {Transform.Translation}");
+            s_logger.Here().Debug($"Gizmo moved: {Transform.Translation}");
             //Console.WriteLine($" gizmo pivotPoint: {PivotPoint}");
             foreach (var selectedBone in _selectedBones)
             {
@@ -70,7 +71,7 @@ namespace GameWorld.Core.Commands.Bone
                 currentBoneWorldTransform.Translation += matrixDelta.Translation;
                 var newBoneTransform = GetSkeletonAnimatedBoneFromWorld(currentAnimFrame, _boneSelectionState.Skeleton, selectedBone, currentBoneWorldTransform);
 
-                Console.WriteLine(_boneSelectionState.CurrentAnimation.DynamicFrames[_currentFrame].Position[selectedBone]);
+                s_logger.Here().Debug($"Bone {selectedBone} position: {_boneSelectionState.CurrentAnimation.DynamicFrames[_currentFrame].Position[selectedBone]}");
                 newBoneTransform.Decompose(out var scale, out var rot, out var trans);
                 newPosition.Decompose(out var newScale, out var rot2, out var trans2);
                 var modifiedTransform = _boneSelectionState.CurrentAnimation.DynamicFrames[_currentFrame].Clone();
@@ -221,7 +222,7 @@ namespace GameWorld.Core.Commands.Bone
                 var rotDiff = A.Rotation[j].ToVector4() - B.Rotation[j].ToVector4();
                 var scaleDiff = A.Scale[j] - B.Scale[j];
                 if (posDiff != new Vector3(0) || rotDiff != new Vector4(0) || scaleDiff != new Vector3(0))
-                    Console.WriteLine($"Bone {j}: Position difference: {posDiff}, Rotation difference: {rotDiff}, Scale difference: {scaleDiff}");
+                    s_logger.Here().Debug($"Bone {j}: Position difference: {posDiff}, Rotation difference: {rotDiff}, Scale difference: {scaleDiff}");
             }
         }
 
