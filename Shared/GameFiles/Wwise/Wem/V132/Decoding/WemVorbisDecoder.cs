@@ -49,9 +49,10 @@ namespace Shared.GameFormats.Wwise.Wem.V132.Decoding
             }
 
             var packetTimestamps = ComputePacketTimestampsMilliseconds(perPacketBlockSizes, decodeResult, wemFile.FmtChunk.SampleCount, wemFile.FmtChunk.SampleRate);
+            var packetGranules = ComputePacketGranulePositions(perPacketBlockSizes, decodeResult, wemFile.FmtChunk.SampleCount);
             var vorbisPackets = new List<VorbisAudioPacket>();
             for (var i = 0; i < rebuiltPackets.Count; i++)
-                vorbisPackets.Add(new VorbisAudioPacket { Data = rebuiltPackets[i], TimestampMilliseconds = packetTimestamps[i] });
+                vorbisPackets.Add(new VorbisAudioPacket { Data = rebuiltPackets[i], TimestampMilliseconds = packetTimestamps[i], GranulePosition = packetGranules[i] });
 
             return new VorbisAudio
             {
@@ -147,6 +148,30 @@ namespace Shared.GameFormats.Wwise.Wem.V132.Decoding
                 var modeNumber = firstByte & modeMask;
                 return decodeResult.ModeConfig.ModeBlockSizes[modeNumber];
             }
+        }
+
+        // Exact granules, as libvorbis writes them. Converting the rounded millisecond timestamps back drifted.
+        private static long[] ComputePacketGranulePositions(List<bool> blockSizesPerPacket, VorbisDecodeResult decodeResult, int sampleCount)
+        {
+            var granuleOverlapDivisor = 4;
+            var granules = new long[blockSizesPerPacket.Count];
+
+            long accumulatedSamples = 0;
+            int? previousBlockSize = null;
+            for (var index = 0; index < blockSizesPerPacket.Count; index++)
+            {
+                var currentBlockSize = blockSizesPerPacket[index] ? decodeResult.LargeBlockSize : decodeResult.SmallBlockSize;
+                if (previousBlockSize.HasValue)
+                    accumulatedSamples += (previousBlockSize.Value + currentBlockSize) / granuleOverlapDivisor;
+                previousBlockSize = currentBlockSize;
+
+                granules[index] = sampleCount > 0 ? Math.Min(accumulatedSamples, sampleCount) : accumulatedSamples;
+            }
+
+            if (granules.Length > 0 && sampleCount > 0)
+                granules[^1] = sampleCount;
+
+            return granules;
         }
 
         private static long[] ComputePacketTimestampsMilliseconds(List<bool> blockSizesPerPacket, VorbisDecodeResult decodeResult, int sampleCount, uint sampleRate)
