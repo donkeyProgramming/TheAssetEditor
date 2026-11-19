@@ -30,8 +30,7 @@ namespace Editors.Audio.AudioExplorer
             e.Handled = true;
         }
 
-        // WPF tree views don't select on right-click, so the context menu would act on the
-        // previously selected node instead of the one under the mouse.
+        // WPF tree views don't select on right-click, so the context menu would act on the previous selection
         private void OnNodeRightClick(object sender, MouseButtonEventArgs e)
         {
             if (e.OriginalSource is DependencyObject source && FindAncestor<TreeViewItem>(source) is TreeViewItem treeViewItem)

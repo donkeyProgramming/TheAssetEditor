@@ -6,9 +6,8 @@ namespace Shared.CoreTest.PackFiles.Serialization
 {
     internal class PackFileSerializerLoaderPfh6Tests
     {
-        // Layout as in CA's own PFH6 packs (checked against Pharaoh Dynasties' data\_.pack, which RPFM
-        // also reads this way): 24-byte base header, u32 timestamp, 280-byte subheader starting with
-        // 0x12345678, then per file: u32 size, u8 is_compressed, zero-terminated path.
+        // As in Pharaoh Dynasties' data\_.pack: 24-byte header, u32 timestamp, 280-byte subheader,
+        // then per file: u32 size, u8 is_compressed, zero-terminated path
         static byte[] CreatePfh6Pack(params (string Path, byte[] Data)[] files)
         {
             using var index = new MemoryStream();

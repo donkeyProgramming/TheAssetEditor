@@ -18,8 +18,7 @@ namespace Shared.Core.Settings
     {
         public record GamePathPair(GameTypeEnum Game, string Path);
 
-        /// <summary>Last choices made in the Kitbash save dialog, per game. Strategies are stored by
-        /// enum name because their enums live in GameWorld, which Shared.Core cannot reference.</summary>
+        // Kitbash save dialog choices. Stored by name: the enums are in GameWorld, which Shared.Core can't reference
         public record ModelSaveDefaults(GameTypeEnum Game, string GeometryStrategy, string MaterialStrategy, string LodStrategy, bool OnlySaveVisible);
 
         public ObservableCollection<RecentPackFileInfo> RecentPackFiles { get; set; } = [];

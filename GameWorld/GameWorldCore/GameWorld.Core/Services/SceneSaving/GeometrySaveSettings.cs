@@ -61,8 +61,7 @@ namespace GameWorld.Core.Services.SceneSaving
             OnlySaveVisible = defaults.OnlySaveVisible;
         }
 
-        /// <summary>Stores the current strategy choices as the starting point for the next model
-        /// saved for this game, including in new editors and after a restart.</summary>
+        // The defaults for the next model saved for this game, persisted in the settings
         public void RememberAsDefaults()
         {
             var settings = _applicationSettingsService.CurrentSettings;
