@@ -4,25 +4,14 @@ using OggVorbisEncoder.Setup;
 namespace Shared.GameFormats.Wwise.Wem.V132.Encoding
 {
     /// <summary>
-    /// Runtime corrections for the OggVorbisEncoder package (1.2.2, the latest release), a C# port of
-    /// libvorbis's encoder. Its residue setup tables differ from libvorbis's own
-    /// (lib/modes/residue_44.h, residue_44u.h, residue_16.h, residue_8.h), which made it write broken
-    /// audio for several common inputs. Confirmed by diffing its setup headers against ffmpeg's
-    /// libvorbis and decoding the output with both NVorbis and ffmpeg:
-    ///
-    /// 1. Mono ("uncoupled") quality to residue tables. For example, 44.1/48kHz mono at quality 0.2-0.4
-    ///    used the 10-class residue with 8-class classbooks, so every partition decoded as the wrong
-    ///    class. That is mono 44.1kHz at the Audio Editor's default 0.4: near silence or noise.
-    /// 2. Residue44High_Coupled held the values of the low residue (9 partitions instead of 10), which
-    ///    quietened stereo at quality 0.6 and above; and stereo 16/22kHz's upper-quality residue was
-    ///    type 1 instead of type 2.
-    /// 3. ResidueEntry.Clone shares its arrays with the static template it was cloned from, and every
-    ///    encode writes its book layout into them, so one encode could corrupt the next (crashes and
-    ///    garbage that depended on what had been encoded earlier in the session).
-    /// 4. Every encode dropped its first half long block of audio (see CreateProcessingState).
-    ///
-    /// Each table fix is only applied while the library still holds the known-wrong entry, so a fixed
-    /// library version is left alone.
+    /// Runtime fixes for OggVorbisEncoder 1.2.2 (the latest release), whose setup tables differ from
+    /// libvorbis's (lib/modes/residue_*.h). Checked against ffmpeg's libvorbis, decoding with NVorbis and ffmpeg:
+    /// 1. Wrong mono residue tables: 44.1/48kHz mono at quality 0.2-0.4 (0.4 is the Audio Editor's default) decoded as noise.
+    /// 2. Residue44High_Coupled holds the low residue, quietening stereo from quality 0.6; stereo 16/22kHz's
+    ///    upper-quality residue is type 1 instead of 2.
+    /// 3. ResidueEntry.Clone shares its arrays with the static template, so one encode could corrupt the next.
+    /// 4. Every encode dropped its first half long block (see CreateProcessingState).
+    /// A table fix is only applied while the library still holds the known-wrong entry.
     /// </summary>
     internal static class OggVorbisEncoderFixes
     {
@@ -55,12 +44,8 @@ namespace Shared.GameFormats.Wwise.Wem.V132.Encoding
         private static readonly FieldInfo? s_pcmCurrentField = typeof(OggVorbisEncoder.ProcessingState).GetField("_pcmCurrent", BindingFlags.Instance | BindingFlags.NonPublic);
         private static readonly FieldInfo? s_centerWindowField = typeof(OggVorbisEncoder.ProcessingState).GetField("_centerWindow", BindingFlags.Instance | BindingFlags.NonPublic);
 
-        /// <summary>
-        /// ProcessingState.Create, plus libvorbis's starting write position. libvorbis starts writing input
-        /// at centerW (half the long block, _vds_shared_init: pcm_current = centerW); the port starts at 0,
-        /// so the first half block of input landed in the pre-roll that PreExtrapolate then overwrites,
-        /// and every encode lost its first 1024 samples (at 44.1kHz) - the attack of every sound.
-        /// </summary>
+        // libvorbis starts writing input at centerW (_vds_shared_init); the port starts at 0, so the first
+        // half block landed in the pre-roll that PreExtrapolate overwrites
         public static OggVorbisEncoder.ProcessingState CreateProcessingState(OggVorbisEncoder.VorbisInfo info)
         {
             var state = OggVorbisEncoder.ProcessingState.Create(info);
@@ -133,8 +118,7 @@ namespace Shared.GameFormats.Wwise.Wem.V132.Encoding
                         var template = residueTemplates[r];
                         var entry = ReferenceEquals(template.Residue, highCoupled) ? correctHighCoupled : template.Residue;
 
-                        // Every template gets its own entry with fresh book arrays (see 3. above). An
-                        // encode then only ever writes the same books into the same template's arrays.
+                        // Every template gets its own entry with fresh book arrays (see 3. above)
                         residueTemplates[r] = new ResidueTemplate(template.ResidueType, template.LimitType, template.Grouping, CopyEntry(entry),
                             template.BookAux, template.BookAuxManaged, template.BooksBase, template.BooksBaseManaged);
                     }
@@ -156,9 +140,7 @@ namespace Shared.GameFormats.Wwise.Wem.V132.Encoding
             }
         }
 
-        // The template definitions all start with empty second stages and a book list of { -1 };
-        // FillBooks fills them in during setup, so start from that rather than whatever an earlier
-        // encode may already have written into the shared arrays.
+        // The templates are defined with empty second stages and books { -1 }, which FillBooks fills in during setup
         private static ResidueEntry CopyEntry(ResidueEntry entry) => new(entry.Begin, entry.End, entry.Grouping, entry.Partitions, entry.PartitionValues, entry.GroupBook,
             [0], [-1], entry.ClassMetric1.ToArray(), entry.ClassMetric2.ToArray(), entry.ResidueType);
 
