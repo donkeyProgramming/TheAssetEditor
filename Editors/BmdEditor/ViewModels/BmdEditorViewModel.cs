@@ -45,14 +45,12 @@ namespace Editors.BmdEditor.ViewModels
             set => SetAndNotify(ref _hasUnsavedChanges, value);
         }
 
-        // BMD File Properties
         public BmdFile? BmdFile
         {
             get => _bmdFile;
             set => SetAndNotify(ref _bmdFile, value);
         }
 
-        // Collections for different element types
         public ObservableCollection<BmdElementViewModel> AllElements { get; } = [];
         public ObservableCollection<BattlefieldBuildingViewModel> BattlefieldBuildings { get; } = [];
         public ObservableCollection<BattlefieldBuildingFarViewModel> BattlefieldBuildingFars { get; } = [];
@@ -79,9 +77,8 @@ namespace Editors.BmdEditor.ViewModels
         /// typed collections above whenever they're (re)loaded.</summary>
         public ObservableCollection<BmdCategoryGroupViewModel> ComponentGroups { get; } = [];
 
-        // Commands
         public ICommand RefreshCommand { get; }
-        public ICommand ExportCommand { get; }
+        public IRelayCommand ExportCommand { get; }
         public ICommand SaveCommand { get; }
         public ICommand NavigateToReferencedFileCommand { get; }
         public ICommand GizmoTranslateCommand { get; }
@@ -98,8 +95,8 @@ namespace Editors.BmdEditor.ViewModels
         public ICommand AddLightProbeCommand { get; }
         public ICommand AddTerrainHoleCommand { get; }
         public ICommand AddCscCommand { get; }
+        public ICommand DeleteSelectedCommand { get; }
 
-        // Selected component for details display
         private BmdElementViewModel? _selectedComponent;
         public BmdElementViewModel? SelectedComponent
         {
@@ -108,12 +105,13 @@ namespace Editors.BmdEditor.ViewModels
             {
                 SetAndNotify(ref _selectedComponent, value);
                 NotifyPropertyChanged(nameof(HasSelection));
+                NotifyPropertyChanged(nameof(CanDeleteSelection));
             }
         }
 
         public bool HasSelection => SelectedComponent != null;
+        public bool CanDeleteSelection => FindInFile(SelectedComponent) != null;
 
-        // Component details for display
         private string _componentDetails = "Select a component to view details";
         public string ComponentDetails
         {
@@ -159,7 +157,8 @@ namespace Editors.BmdEditor.ViewModels
             componentInserter.Execute();
 
             RefreshCommand = new RelayCommand(Refresh);
-            ExportCommand = new RelayCommand(Export);
+            // The Terry export writes a campaign prefab project, so battle-map .bin BMDs are left out.
+            ExportCommand = new RelayCommand(Export, () => CurrentFile != null && BmdFileNames.IsPrefab(CurrentFile.Name));
             SaveCommand = new RelayCommand(() => Save());
             NavigateToReferencedFileCommand = new RelayCommand<string>(NavigateToReferencedFile);
             GizmoTranslateCommand = new RelayCommand(() => _gizmo.SetMode(GameWorld.Core.Components.Gizmo.GizmoMode.Translate));
@@ -176,8 +175,8 @@ namespace Editors.BmdEditor.ViewModels
             AddLightProbeCommand = new RelayCommand(AddLightProbe);
             AddTerrainHoleCommand = new RelayCommand(AddTerrainHole);
             AddCscCommand = new RelayCommand(AddCsc);
+            DeleteSelectedCommand = new RelayCommand(DeleteSelected);
 
-            // Subscribe to selection changes from 3D view
             _eventHub.Register<SelectionChangedEvent>(this, OnSelectionChanged);
         }
 
@@ -185,6 +184,7 @@ namespace Editors.BmdEditor.ViewModels
         {
             CurrentFile = packFile;
             DisplayName = packFile.Name;
+            ExportCommand.NotifyCanExecuteChanged();
 
             var data = packFile.DataSource.ReadData();
 
@@ -194,19 +194,13 @@ namespace Editors.BmdEditor.ViewModels
             BmdFile = parser.Parse();
             HasUnsavedChanges = false;
 
-            // Create 3D scene structure first
             _bmdSceneCreator.CreateSceneFromBmd(BmdFile!, packFile);
 
-            // Update collections (this will load scene content)
             PopulateViewModels();
         }
 
-        // -------------------------------------------------------------------
-        // "Add" menu - creates a default element in the corresponding BmdFile
-        // list, then rebuilds the scene/view models from the (already-edited,
-        // in-memory) BmdFile - same rebuild the initial load does, just
-        // without re-reading from disk - and selects the new element.
-        // -------------------------------------------------------------------
+        // "Add" menu: add a default element to its BmdFile list, rebuild the scene and view models
+        // from the in-memory BmdFile, and select the new element.
 
         private void FinishAdd(Func<BmdElementViewModel?> findNewElement)
         {
@@ -326,6 +320,44 @@ namespace Editors.BmdEditor.ViewModels
             FinishAdd(() => CscInfos.LastOrDefault());
         }
 
+        // Only elements in this file's own lists: the children of a referenced BMD belong to that file.
+        private (System.Collections.IList List, object Item)? FindInFile(BmdElementViewModel? element)
+        {
+            if (BmdFile == null)
+                return null;
+
+            (System.Collections.IList List, object Item)? entry = element switch
+            {
+                PropInfoViewModel prop => (BmdFile.PropInfos, prop.Prop),
+                VfxInfoViewModel vfx => (BmdFile.VfxInfos, vfx.Vfx),
+                PointLightInfoViewModel light => (BmdFile.PointLights, light.Light),
+                SpotLightInfoViewModel light => (BmdFile.SpotLights, light.Light),
+                SoundInfoViewModel sound => (BmdFile.Sounds, sound.Sound),
+                PolyMeshInfoViewModel mesh => (BmdFile.PolyMeshes, mesh.Mesh),
+                LightProbeInfoViewModel probe => (BmdFile.LightProbes, probe.Probe),
+                TerrainHoleInfoViewModel hole => (BmdFile.TerrainHoles, hole.Hole),
+                CscInfoViewModel csc => (BmdFile.CscInfos, csc.Csc),
+                _ => null,
+            };
+            return entry is { } found && found.List.Contains(found.Item) ? entry : null;
+        }
+
+        private void DeleteSelected()
+        {
+            if (FindInFile(SelectedComponent) is not { } entry)
+                return;
+
+            entry.List.Remove(entry.Item);
+            _gizmo.SetTarget(null);
+            _selectionManager.GetState<ObjectSelectionState>()?.Clear();
+            SelectedComponent = null;
+            ComponentDetails = "Select a component to view details";
+
+            _bmdSceneCreator.CreateSceneFromBmd(BmdFile!, CurrentFile);
+            PopulateViewModels();
+            HasUnsavedChanges = true;
+        }
+
         public bool Save()
         {
             if (BmdFile == null)
@@ -356,7 +388,6 @@ namespace Editors.BmdEditor.ViewModels
         {
             if (BmdFile == null) return;
 
-            // Clear existing collections
             AllElements.Clear();
             BattlefieldBuildings.Clear();
             BattlefieldBuildingFars.Clear();
@@ -379,7 +410,6 @@ namespace Editors.BmdEditor.ViewModels
             CscInfos.Clear();
             Deployments.Clear();
 
-            // Use the BmdElementLoader to populate all collections
             _bmdElementLoader.LoadElements(BmdFile,
                 AllElements, BmdInfos, BattlefieldBuildings, BattlefieldBuildingFars,
                 CaptureLocations, EFLines, GoOutlines, NonTerrainOutlines,
@@ -474,11 +504,9 @@ namespace Editors.BmdEditor.ViewModels
         {
             if (string.IsNullOrEmpty(fileName)) return;
 
-            // Try to find the referenced file in the pack file system
             var referencedFile = _packFileService.FindFile(fileName);
             if (referencedFile != null)
             {
-                // Open the referenced file in the appropriate editor
                 var openCommand = new OpenEditorCommand(_editorCreator, _packFileService);
                 openCommand.Execute(referencedFile);
             }
@@ -490,7 +518,6 @@ namespace Editors.BmdEditor.ViewModels
             ComponentDetails = GenerateComponentDetails(component);
             _gizmo.SetTarget(component);
 
-            // Select the component in the 3D scene using SelectionManager
             SelectComponentIn3DScene(component);
         }
 
@@ -502,7 +529,6 @@ namespace Editors.BmdEditor.ViewModels
                 var selectableNode = FindFirstSelectableNode(sceneNode);
                 if (selectableNode != null)
                 {
-                    // Clear current selection and select the new object
                     var objectSelection = _selectionManager.GetState<ObjectSelectionState>();
                     if (objectSelection != null)
                     {
@@ -515,11 +541,9 @@ namespace Editors.BmdEditor.ViewModels
 
         private static ISelectable? FindFirstSelectableNode(ISceneNode sceneNode)
         {
-            // Check if the current node is selectable
             if (sceneNode is ISelectable selectable)
                 return selectable;
             
-            // Recursively search children
             foreach (var child in sceneNode.Children)
             {
                 var found = FindFirstSelectableNode(child);
@@ -538,7 +562,6 @@ namespace Editors.BmdEditor.ViewModels
             details.AppendLine($"Description: {component.Description}");
             details.AppendLine();
 
-            // Add type-specific details
             switch (component)
             {
                 case PropInfoViewModel prop:
@@ -703,16 +726,23 @@ namespace Editors.BmdEditor.ViewModels
                 case BattlefieldBuildingFarViewModel buildingFar:
                     details.AppendLine("Battlefield Building Far Details:");
                     details.AppendLine($"  Version: {buildingFar.BuildingFar.Version}");
+                    details.AppendLine($"  Key: {buildingFar.BuildingFar.BuildingKey}");
                     break;
 
                 case CaptureLocationViewModel captureLocation:
+                    var location = captureLocation.CaptureLocation;
                     details.AppendLine("Capture Location Details:");
-                    details.AppendLine($"  Version: {captureLocation.CaptureLocation.Version}");
+                    details.AppendLine($"  Key: {location.DatabaseKey}");
+                    details.AppendLine($"  Type: {location.CapturePointType}");
+                    details.AppendLine($"  Location: ({location.Location.X:F2}, {location.Location.Y:F2})");
+                    details.AppendLine($"  Radius: {location.Radius:F2}");
+                    details.AppendLine($"  Building Links: {location.BuildingLinks.Count}");
                     break;
 
                 case EFLineViewModel efLine:
                     details.AppendLine("EF Line Details:");
-                    details.AppendLine($"  Version: {efLine.EFLine.Version}");
+                    details.AppendLine($"  Label: {efLine.EFLine.Label}");
+                    details.AppendLine($"  Purpose: {efLine.EFLine.Purpose}");
                     break;
 
                 case GoOutlineViewModel goOutline:
@@ -735,6 +765,7 @@ namespace Editors.BmdEditor.ViewModels
                 case ZonesTemplateViewModel zonesTemplate:
                     details.AppendLine("Zones Template Details:");
                     details.AppendLine($"  Outline Points: {zonesTemplate.ZonesTemplate.Outline.Count}");
+                    details.AppendLine($"  Lines: {zonesTemplate.ZonesTemplate.Lines.Count}");
                     break;
 
                 case PlayableAreaViewModel playableArea:
@@ -743,10 +774,10 @@ namespace Editors.BmdEditor.ViewModels
                     details.AppendLine($"  Has Been Set: {playableArea.PlayableArea.HasBeenSet}");
                     details.AppendLine($"  Bounding Box: ({playableArea.PlayableArea.BoundingBox[0]:F2}, {playableArea.PlayableArea.BoundingBox[1]:F2}, {playableArea.PlayableArea.BoundingBox[2]:F2}, {playableArea.PlayableArea.BoundingBox[3]:F2})");
                     details.AppendLine($"  Flag Version: {playableArea.PlayableArea.FlagVersion}");
-                    details.AppendLine($"  Flag 1: {playableArea.PlayableArea.Flag1}");
-                    details.AppendLine($"  Flag 2: {playableArea.PlayableArea.Flag2}");
-                    details.AppendLine($"  Flag 3: {playableArea.PlayableArea.Flag3}");
-                    details.AppendLine($"  Flag 4: {playableArea.PlayableArea.Flag4}");
+                    details.AppendLine($"  Valid North: {playableArea.PlayableArea.ValidNorth}");
+                    details.AppendLine($"  Valid South: {playableArea.PlayableArea.ValidSouth}");
+                    details.AppendLine($"  Valid East: {playableArea.PlayableArea.ValidEast}");
+                    details.AppendLine($"  Valid West: {playableArea.PlayableArea.ValidWest}");
                     break;
 
                 case DeploymentViewModel deployment:
@@ -801,10 +832,8 @@ namespace Editors.BmdEditor.ViewModels
 
         public void Close() 
         {
-            // Clear any active highlights
             _bmdSceneCreator.ClearHighlight();
             
-            // Cleanup resources
             AllElements.Clear();
             BattlefieldBuildings.Clear();
             BattlefieldBuildingFars.Clear();
@@ -836,7 +865,6 @@ namespace Editors.BmdEditor.ViewModels
                 var selectedObject = objectSelection.GetSingleSelectedObject();
                 if (selectedObject != null)
                 {
-                    // Find the corresponding BMD element for this scene node
                     var component = FindComponentBySceneNode(selectedObject);
                     if (component != null)
                     {
@@ -851,7 +879,6 @@ namespace Editors.BmdEditor.ViewModels
 
         private BmdElementViewModel? FindComponentBySceneNode(ISelectable sceneNode)
         {
-            // Direct lookup using the ComponentNodes dictionary
             foreach (var kvp in _bmdSceneCreator.ComponentNodes)
             {
                 var component = kvp.Key;
@@ -867,11 +894,9 @@ namespace Editors.BmdEditor.ViewModels
 
         private static bool IsNodeOrDescendant(ISceneNode node, ISelectable target)
         {
-            // Check if the node itself is the target
             if (node == target)
                 return true;
             
-            // Check if any descendant matches the target
             foreach (var child in node.Children)
             {
                 if (IsNodeOrDescendant(child, target))
@@ -884,16 +909,13 @@ namespace Editors.BmdEditor.ViewModels
 
         public void Dispose()
         {
-            // Clear any active highlights
             _bmdSceneCreator.ClearHighlight();
             
-            // Unregister from events
             _eventHub?.UnRegister(this);
             GC.SuppressFinalize(this);
         }
     }
 
-    // Base class for all BMD element view models
     public abstract class BmdElementViewModel(string elementType, string displayName, string description = "") : NotifyPropertyChangedImpl
     {
         public string ElementType { get; } = elementType;
@@ -907,11 +929,8 @@ namespace Editors.BmdEditor.ViewModels
         public event Action? Modified;
         protected void RaiseModified() => Modified?.Invoke();
 
-        // -------------------------------------------------------------------
-        // Gizmo support - every one of the 10 editable categories can be
-        // translated; rotation/scale are only exposed where the format
-        // actually carries that data (see the per-category overrides below).
-        // -------------------------------------------------------------------
+        // Gizmo support: every editable category can be translated; rotation and scale are only
+        // exposed where the format carries them (see the per-category overrides).
         public virtual bool SupportsRotate => false;
         public virtual bool SupportsScale => false;
         public virtual Vector3 GizmoPosition { get => Vector3.Zero; set { } }
@@ -929,7 +948,6 @@ namespace Editors.BmdEditor.ViewModels
         public IReadOnlyCollection<BmdElementViewModel> Items { get; } = items;
     }
 
-    // View models for specific element types
     public class BattlefieldBuildingViewModel(BattlefieldBuilding building) : BmdElementViewModel("Battlefield Building", building.BuildingKey, $"Version: {building.Version}")
     {
         public BattlefieldBuilding Building { get; } = building;
@@ -1324,17 +1342,17 @@ namespace Editors.BmdEditor.ViewModels
         public override void ApplyScaleFactor(float factor) => SetScale(ScaleX * factor, ScaleY * factor, ScaleZ * factor);
     }
 
-    public class BattlefieldBuildingFarViewModel(BattlefieldBuildingFar buildingFar) : BmdElementViewModel("Battlefield Building Far", "", $"Version: {buildingFar.Version}")
+    public class BattlefieldBuildingFarViewModel(BattlefieldBuilding buildingFar) : BmdElementViewModel("Battlefield Building Far", buildingFar.BuildingKey, $"Version: {buildingFar.Version}")
     {
-        public BattlefieldBuildingFar BuildingFar { get; } = buildingFar;
+        public BattlefieldBuilding BuildingFar { get; } = buildingFar;
     }
 
-    public class CaptureLocationViewModel(CaptureLocation captureLocation) : BmdElementViewModel("Capture Location", "", $"Version: {captureLocation.Version}")
+    public class CaptureLocationViewModel(CaptureLocation captureLocation) : BmdElementViewModel("Capture Location", captureLocation.DatabaseKey, $"Type: {captureLocation.CapturePointType}")
     {
         public CaptureLocation CaptureLocation { get; } = captureLocation;
     }
 
-    public class EFLineViewModel(EFLine efLine) : BmdElementViewModel("EF Line", "", $"Version: {efLine.Version}")
+    public class EFLineViewModel(EFLine efLine) : BmdElementViewModel("EF Line", efLine.Label, $"Purpose: {efLine.Purpose}")
     {
         public EFLine EFLine { get; } = efLine;
     }
@@ -1383,7 +1401,6 @@ namespace Editors.BmdEditor.ViewModels
         {
             DeploymentZone = deploymentZone;
             
-            // Add child regions
             foreach (var region in deploymentZone.DeploymentZoneRegions)
             {
                 Children.Add(new DeploymentZoneRegionViewModel(region));
@@ -1400,7 +1417,6 @@ namespace Editors.BmdEditor.ViewModels
         {
             DeploymentZoneRegion = deploymentZoneRegion;
             
-            // Add child boundaries
             foreach (var boundary in deploymentZoneRegion.Boundaries)
             {
                 Children.Add(new BoundaryViewModel(boundary));
@@ -1422,7 +1438,6 @@ namespace Editors.BmdEditor.ViewModels
         {
             Deployment = deployment;
             
-            // Add child zones
             for (var i = 0; i < deployment.DeploymentZones.Count; i++)
             {
                 Children.Add(new DeploymentZoneViewModel(deployment.DeploymentZones[i], i));

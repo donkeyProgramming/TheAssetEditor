@@ -48,6 +48,7 @@
                     <MenuItem Header="Composite scene..." Command="{Binding AddCscCommand}"/>
                 </MenuItem>
             </Menu>
+            <Button Content="Delete" Command="{Binding DeleteSelectedCommand}" IsEnabled="{Binding CanDeleteSelection}" Padding="10,5" ToolTip="Delete the selected element (Del in the component list)"/>
             <Separator/>
             <Button Command="{Binding GizmoTranslateCommand}" IsEnabled="{Binding HasSelection}" Padding="6,3" ToolTip="Move">
                 <Image Width="20" Height="20" Source="{Binding Source={x:Static resources:IconLibrary.Gizmo_MoveIcon}, UpdateSourceTrigger=PropertyChanged}"/>
@@ -86,6 +87,9 @@
             <!-- Component List (Top Right) -->
             <GroupBox Grid.Column="2" Grid.Row="0" Header="Components">
                 <TreeView ItemsSource="{Binding ComponentGroups}" SelectedItemChanged="ComponentsTreeView_SelectedItemChanged" x:Name="ComponentsTreeView">
+                    <TreeView.InputBindings>
+                        <KeyBinding Key="Delete" Command="{Binding DeleteSelectedCommand}"/>
+                    </TreeView.InputBindings>
                     <TreeView.Resources>
                         <HierarchicalDataTemplate DataType="{x:Type vm:BmdCategoryGroupViewModel}" ItemsSource="{Binding Items}">
                             <TextBlock Text="{Binding Header}" FontWeight="Bold"/>
@@ -240,7 +244,7 @@
 
                                     <CheckBox Content="Autoplay" IsChecked="{Binding Vfx.Autoplay}" Click="AuxField_Click" Margin="0,8,0,0"/>
                                     <CheckBox Content="Visible In Shroud" IsChecked="{Binding Vfx.VisibleInShroud}" Click="AuxField_Click"/>
-                                    <CheckBox Content="Visible In Shroud Only" IsChecked="{Binding Vfx.VisibleInShroudOnly}" Click="AuxField_Click"/>
+                                    <CheckBox Content="Visible Without Shroud" IsChecked="{Binding Vfx.VisibleWithoutShroud}" Click="AuxField_Click"/>
 
                                     <TextBlock Text="Render Flags" FontWeight="Bold" Margin="0,8,0,0"/>
                                     <UniformGrid Columns="2">
@@ -414,6 +418,7 @@
                                     </UniformGrid>
 
                                     <CheckBox Content="Visible In Shroud" IsChecked="{Binding Mesh.VisibleInShroud}" Click="AuxField_Click" Margin="0,8,0,0"/>
+                                    <CheckBox Content="Visible Without Shroud" IsChecked="{Binding Mesh.VisibleWithoutShroud}" Click="AuxField_Click"/>
 
                                     <TextBlock Text="Render Flags" FontWeight="Bold" Margin="0,8,0,0"/>
                                     <UniformGrid Columns="2">
@@ -449,6 +454,7 @@
                                     </Grid>
 
                                     <CheckBox Content="Primary" IsChecked="{Binding Probe.Primary}" Click="AuxField_Click" Margin="0,8,0,0"/>
+                                    <CheckBox Content="Is Cylinder" IsChecked="{Binding Probe.IsCylinder}" Click="AuxField_Click"/>
                                 </StackPanel>
                             </DataTemplate>
 

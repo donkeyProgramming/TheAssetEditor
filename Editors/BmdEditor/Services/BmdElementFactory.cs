@@ -5,21 +5,17 @@ using Shared.GameFormats.RigidModel.Transforms;
 namespace Editors.BmdEditor.Services
 {
     /// <summary>
-    /// Builds default POCOs for the "Add" menu. Every field version is picked to be the highest
-    /// one <see cref="BmdWriter"/> understands for that type (so nothing gets silently truncated
-    /// on save) - each item carries its own version tag, so this doesn't need to match whatever
-    /// version the file's other, pre-existing entries happen to use.
+    /// Builds default elements for the "Add" menu, each at the highest version <see cref="BmdWriter"/>
+    /// writes for its type. Every record carries its own version, so it needn't match the file's others.
     /// </summary>
     public static class BmdElementFactory
     {
         private const string DefaultHeightMode = "HM_TERRAIN";
 
-        // All-0xFF = "no culture restriction" - real vanilla files use this as the wildcard
-        // pattern (see CultureMask.RawBytes); an all-zero mask would make a new prop invisible to
-        // every culture, which would look like a bug to whoever placed it.
-        private static byte[] WildcardCultureMaskBytes() => [0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF];
-
-        private static BmdComponentFlags DefaultFlags() => new() { FlagVersion = 4 };
+        // All-0xFF is the "no culture restriction" pattern vanilla files use; an all-zero mask would
+        // hide the new element from every culture.
+        /// <summary>The pdlc_mask Terry gives a prefab's entities: every bit.</summary>
+        private const ulong AllDlcs = ulong.MaxValue;
 
         private static BmdComponentFlags AllSeasonsFlags() => new()
         {
@@ -38,8 +34,13 @@ namespace Editors.BmdEditor.Services
             IsDecal = isDecal,
             Flags = AllSeasonsFlags(),
             HeightMode = "BHM_PARENT",
-            CultureMask = WildcardCultureMaskBytes(),
+            PdlcMask = AllDlcs,
             CastsShadow = true,
+            VisibleInsideSnowRegion = true,
+            VisibleOutsideSnowRegion = true,
+            VisibleInsideDestructionRegion = true,
+            VisibleOutsideDestructionRegion = true,
+            VisibleWithoutShroud = true,
         };
 
         public static VfxInfo CreateVfx(string vfxString) => new()
@@ -47,9 +48,11 @@ namespace Editors.BmdEditor.Services
             VfxInfoVersion = 10,
             VfxString = vfxString,
             Transform = Matrix.Identity,
-            Flags = DefaultFlags(),
+            Flags = AllSeasonsFlags(),
             HeightMode = DefaultHeightMode,
-            CultureMask = WildcardCultureMaskBytes(),
+            PdlcMask = AllDlcs,
+            Autoplay = true,
+            VisibleWithoutShroud = true,
         };
 
         public static PointLightInfo CreatePointLight() => new()
@@ -62,7 +65,8 @@ namespace Editors.BmdEditor.Services
             Blue = 1,
             ColorScale = 1,
             HeightMode = DefaultHeightMode,
-            Flags = DefaultFlags(),
+            Flags = AllSeasonsFlags(),
+            PdlcMask = AllDlcs,
         };
 
         public static SpotLightInfo CreateSpotLight() => new()
@@ -81,7 +85,8 @@ namespace Editors.BmdEditor.Services
             IntensityBlue = 1,
             Falloff = 1,
             HeightMode = DefaultHeightMode,
-            Flags = DefaultFlags(),
+            Flags = AllSeasonsFlags(),
+            PdlcMask = AllDlcs,
         };
 
         public static SoundInfo CreateSound(string soundString) => new()
@@ -91,7 +96,7 @@ namespace Editors.BmdEditor.Services
             TypeString = "SST_POINT",
             CoordList = [new RmvVector3(0, 0, 0)],
             HeightMode = DefaultHeightMode,
-            CultureMask = new CultureMask { RawBytes = WildcardCultureMaskBytes() },
+            PdlcMask = AllDlcs,
         };
 
         public static PolyMeshInfo CreatePolyMesh(string materialString) => new()
@@ -101,10 +106,13 @@ namespace Editors.BmdEditor.Services
             TriangleList = [0, 1, 2],
             MaterialString = materialString,
             HeightMode = DefaultHeightMode,
-            Flags = DefaultFlags(),
+            Flags = AllSeasonsFlags(),
             Transform = Matrix.Identity,
-            Booleans = new byte[4],
-            MoreBooleans = new byte[1],
+            VisibleInsideSnowRegion = true,
+            VisibleOutsideSnowRegion = true,
+            VisibleInsideDestructionRegion = true,
+            VisibleOutsideDestructionRegion = true,
+            VisibleWithoutShroud = true,
         };
 
         public static LightProbeInfo CreateLightProbe() => new()
@@ -123,7 +131,7 @@ namespace Editors.BmdEditor.Services
             SecondVert = new RmvVector3(1, 0, 0),
             ThirdVert = new RmvVector3(0, 1, 0),
             HeightMode = DefaultHeightMode,
-            Flags = DefaultFlags(),
+            Flags = AllSeasonsFlags(),
         };
 
         public static CscInfo CreateCsc(string sceneFile) => new()
@@ -132,6 +140,9 @@ namespace Editors.BmdEditor.Services
             SceneFile = sceneFile,
             Transform = Matrix.Identity,
             HeightMode = DefaultHeightMode,
+            PdlcMask = AllDlcs,
+            Autoplay = true,
+            VisibleWithoutShroud = true,
         };
     }
 }

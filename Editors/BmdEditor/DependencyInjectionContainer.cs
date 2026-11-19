@@ -9,6 +9,7 @@ using Shared.Core.ToolCreation;
 using Shared.Core.ErrorHandling;
 using Shared.Core.Services;
 using Shared.Core.Events;
+using Shared.GameFormats.Bmd;
 using GameWorld.Core.Services;
 using GameWorld.Core.Components.Rendering;
 using GameWorld.Core.Rendering.Materials;
@@ -23,14 +24,11 @@ namespace Editors.BmdEditor
     {
         public override void Register(IServiceCollection serviceCollection)
         {
-            // Views
             serviceCollection.AddTransient<BmdEditorView>();
 
-            // ViewModels
             serviceCollection.AddScoped<BmdEditorViewModel>();
             serviceCollection.AddScoped<IEditorInterface, BmdEditorViewModel>();
 
-            // Services
             serviceCollection.AddScoped<BmdSceneCreator>();
             serviceCollection.AddScoped<SelectionManager>();
             serviceCollection.AddScoped<BmdElementLoader>();
@@ -38,7 +36,6 @@ namespace Editors.BmdEditor
             // Game components (picked up by IComponentInserter)
             RegisterGameComponent<BmdGizmoComponent>(serviceCollection);
 
-            // Context menu
             serviceCollection.AddScoped<ExportBmdAsTerryProjectCommand>();
             serviceCollection.AddSingleton<IPackFileContextMenuRegistration, BmdPackFileContextMenuRegistration>();
 
@@ -47,11 +44,16 @@ namespace Editors.BmdEditor
 
         public override void RegisterTools(IEditorDatabase editorDatabase)
         {
-            EditorInfoBuilder
+            // Folder rules are path-substring checks that apply to every extension below, so ".bmd" keeps
+            // prefabs and the name parts keep only the battle-map BMDs among .bin files (see BmdFileNames).
+            var builder = EditorInfoBuilder
                 .Create<BmdEditorViewModel, BmdEditorView>(EditorEnums.BMD_Editor)
-                .AddExtention(".bmd", EditorPriorites.Default)
-                //.AddExtention(".bin", EditorPriorites.Default) // TODO: Re-enable when BMD parser is complete
-                .Build(editorDatabase);
+                .AddExtention(BmdFileNames.BmdExtension, EditorPriorites.Default)
+                .AddExtention(BmdFileNames.BinExtension, EditorPriorites.Default)
+                .ValidForFoldersContaining(BmdFileNames.BmdExtension);
+            foreach (var namePart in BmdFileNames.BinNameParts)
+                builder.ValidForFoldersContaining(namePart);
+            builder.Build(editorDatabase);
         }
     }
 
