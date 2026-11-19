@@ -21,7 +21,7 @@ namespace Editors.Audio.Shared.Storage
             public Dictionary<string, List<string>> StatesByStateGroup { get; set; } = [];
         }
 
-        // .dat files that are not sound dat files: bank_splits and the music scripts use other layouts, icudt61l is ICU unicode data.
+        // .dat files with other layouts (bank splits, music scripts, ICU data)
         private static readonly string[] s_nonSoundDatFiles = ["bank_splits.dat", "campaign_music.dat", "battle_music.dat", "icudt61l.dat"];
 
         private readonly ILogger _logger = Logging.Create<DatLoader>();
@@ -148,7 +148,7 @@ namespace Editors.Audio.Shared.Storage
 
         private SoundDatFile LoadDatFiles(List<IPackFileContainer> containers, out List<string> failedFiles)
         {
-            // Filter on the paths we already have. Looking each file up again through GetFullPath costs a full table scan per file on the cached game container.
+            // Filter on the paths we have: GetFullPath is a table scan per file on the cached game container
             var datFiles = FindFiles(".dat", containers)
                 .Where(x => !s_nonSoundDatFiles.Any(name => x.Path.Contains(name, StringComparison.OrdinalIgnoreCase)))
                 .ToList();
@@ -181,7 +181,7 @@ namespace Editors.Audio.Shared.Storage
             if (containers == null)
                 return PackFileServiceUtility.FindAllWithExtentionIncludePaths(_pfs, extension);
 
-            // SearchFiles matches extensions as substrings, so ".dat" would also return the terrain "hf_height_map.data" files.
+            // SearchFiles matches extensions as substrings (".dat" also finds ".data")
             var effectiveFiles = new Dictionary<string, PackFile>(StringComparer.OrdinalIgnoreCase);
             foreach (var container in containers)
             {

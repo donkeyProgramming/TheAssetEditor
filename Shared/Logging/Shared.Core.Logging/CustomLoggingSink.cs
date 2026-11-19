@@ -24,7 +24,7 @@ namespace Shared.CoreLog
                 using var _textWriter = new StringWriter();
                 _formater.Format(logEvent, _textWriter);
 
-                // Background work (the startup audio cache build) logs while the UI thread does
+                // Background threads log too
                 lock (_queue)
                 {
                     if (_queue.Count == 30)

@@ -54,8 +54,7 @@ namespace Editors.Audio.Shared.Storage.CacheDatabase
             {
                 using var transaction = connection.BeginTransaction();
 
-                // Keeping the HIRC indexes up to date row by row makes the insert several times slower
-                // (WH3: ~60s vs ~10s for 3.5M rows), so drop them for the bulk insert and rebuild them once at the end.
+                // Updating the indexes row by row makes the bulk insert several times slower (WH3: ~60s vs ~10s)
                 var deferredIndexes = DropIndexes(connection, transaction, ["Hircs", "Didx"]);
 
                 InsertCacheInfo(connection, transaction, fingerprint);

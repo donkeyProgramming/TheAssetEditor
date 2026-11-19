@@ -39,8 +39,7 @@ namespace GameWorld.Core.Services
         private readonly Dictionary<IPackFileContainer, HashSet<string>> _containerToSkeletonPaths = [];
         private readonly ObservableCollection<string> _skeletonFileNames = [];
 
-        // Empty (0 byte) .anim files are skipped without being listed here; WH3 ships 15 of them in anim2.pack.
-        // This entry predates WH3 and is not in its packs, so why it is broken could not be checked.
+        // Empty .anim files are skipped separately, see FileDiscovered
         private static readonly HashSet<string> BrokenFiles = new(StringComparer.OrdinalIgnoreCase)
         {
             "rigidmodels\\buildings\\roman_aqueduct_straight\\roman_aqueduct_straight_piece01_destruct01_anim.anim",

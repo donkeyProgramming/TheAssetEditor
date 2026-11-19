@@ -26,8 +26,7 @@ namespace Editors.Audio.Shared.Storage.CacheDatabase
         private readonly BnkLoader _bnkLoader = bnkLoader;
         private readonly ILogger _logger = Logging.Create<AudioCacheHelper>();
 
-        // The game files cache is prebuilt on a background thread at startup. Anything that needs a cache while
-        // that build is running waits for it here instead of building the same file a second time.
+        // The game files cache is built in the background at startup; callers wait for it rather than build it twice
         private static readonly object s_buildLock = new();
 
         public string GetCacheFilePath(string label, string fingerprint)
@@ -58,7 +57,7 @@ namespace Editors.Audio.Shared.Storage.CacheDatabase
 
         public AudioCache LoadOrBuildCache(AudioCacheSource source)
         {
-            // Load under the lock too: opening a cache file while another thread is recreating it can race its EnsureDeleted/EnsureCreated.
+            // Load under the lock too, or it can race another thread's EnsureDeleted/EnsureCreated
             lock (s_buildLock)
                 return TryLoadFromCache(source.CacheFilePath, source.Fingerprint) ?? SaveAndLoadCache(source);
         }
@@ -172,7 +171,7 @@ namespace Editors.Audio.Shared.Storage.CacheDatabase
 
         private static readonly string[] s_audioDataExtensions = [".bnk", ".dat", ".wwiseids"];
 
-        // SearchFiles matches extensions as substrings (".dat" also returns ".data" terrain files), so re-check the real extension.
+        // SearchFiles matches extensions as substrings (".dat" also finds ".data")
         internal static List<(string Path, PackFile File)> FindAudioDataFiles(IPackFileContainer container)
         {
             return container.SearchFiles(null, s_audioDataExtensions)

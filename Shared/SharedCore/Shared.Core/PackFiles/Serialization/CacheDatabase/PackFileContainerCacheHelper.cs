@@ -73,8 +73,7 @@ namespace Shared.Core.PackFiles.Serialization.CacheDatabase
             return loaded;
         }
 
-        // Every game update changes the fingerprint and so the cache file name. Without this, each patch leaves a
-        // ~300MB cache behind for Warhammer III. Only files named exactly like this cache with another fingerprint are removed.
+        // Each game update changes the fingerprint, and so the file name, leaving the old cache (~300MB for WH3) behind
         private void DeleteStaleCaches(string cacheFilePath, string fingerprint)
         {
             var cacheDirectory = Path.GetDirectoryName(cacheFilePath);
