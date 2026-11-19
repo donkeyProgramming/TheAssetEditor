@@ -1,9 +1,8 @@
 using Microsoft.Xna.Framework;
-using NUnit.Framework;
 using Shared.GameFormats.Bmd;
 using Shared.GameFormats.RigidModel.Transforms;
 
-namespace FileTypesTests.FileTypes.Bmd
+namespace GameWorld.Core.Test.GameFormats
 {
     // The battle-only sections no vanilla .bmd prefab has data in, and old record versions
     public class BmdRoundTripTests
