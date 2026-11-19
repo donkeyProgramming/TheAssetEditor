@@ -18,6 +18,9 @@ namespace Shared.GameFormats.RigidModel
         byte[] _skeletonName;
 
 
+        /// <summary>Bytes of UTF-8 the 128-byte name field holds, leaving room for the terminator.</summary>
+        public const int MaxSkeletonNameLength = 127;
+
         public static int HeaderSize { get => ByteHelper.GetSize(typeof(RmvFileHeader)); }
 
         public string SkeletonName
@@ -48,12 +51,15 @@ namespace Shared.GameFormats.RigidModel
 
         void SetSkeletonName(string skeletonName)
         {
+            var byteValues = Encoding.UTF8.GetBytes(skeletonName);
+            if (byteValues.Length > MaxSkeletonNameLength)
+                throw new ArgumentException($"Skeleton name is {byteValues.Length} bytes, but a model can store at most {MaxSkeletonNameLength}: {skeletonName}");
+
             _skeletonName = new byte[128];
 
             for (var i = 0; i < 128; i++)
                 _skeletonName[i] = 0;
 
-            var byteValues = Encoding.UTF8.GetBytes(skeletonName);
             for (var i = 0; i < byteValues.Length; i++)
             {
                 _skeletonName[i] = byteValues[i];
