@@ -16,7 +16,11 @@ namespace Shared.GameFormats.RigidModel.MaterialHeaders
             foreach (var enumValue in weightedEnums)
                 _materialCreators[enumValue] = new WeighterMaterialCreator();
 
-            _materialCreators[ModelMaterialEnum.TerrainTiles] = new TerrainTileMaterialCreator();
+            // The physics materials are a weighted header plus a trailing block
+            _materialCreators[ModelMaterialEnum.cloth] = new WeighterMaterialCreator();
+            _materialCreators[ModelMaterialEnum.collision_shape] = new WeighterMaterialCreator();
+            _materialCreators[ModelMaterialEnum.rope] = new WeighterMaterialCreator();
+
             _materialCreators[ModelMaterialEnum.custom_terrain] = new CustomTerrainMaterialCreator();
         }
 
@@ -24,9 +28,13 @@ namespace Shared.GameFormats.RigidModel.MaterialHeaders
         {
             try
             {
+                // Decals, terrain tiles, banners, point lights and header-less meshes, picked by id and size
+                if (ShortHeaderMaterials.TryCreate(modelTypeEnum, data, offset, expectedMaterialSize, out var shortHeaderMaterial))
+                    return shortHeaderMaterial;
+
                 if (_materialCreators.ContainsKey(modelTypeEnum))
                 {
-                    var material = _materialCreators[modelTypeEnum].Create(modelTypeEnum, rmvType, data, offset);
+                    var material = Create(_materialCreators[modelTypeEnum], modelTypeEnum, rmvType, data, offset, expectedMaterialSize);
                     var actualMaterialSize = material.ComputeSize();
 
                     var bytesLeft = expectedMaterialSize - actualMaterialSize;
@@ -43,7 +51,7 @@ namespace Shared.GameFormats.RigidModel.MaterialHeaders
                 else
                 {
                     _logger.Here().Error($"Could not load {modelTypeEnum} material, atttempting to load using default");
-                    var material = _materialCreators[ModelMaterialEnum.default_type].Create(modelTypeEnum, rmvType, data, offset);
+                    var material = Create(_materialCreators[ModelMaterialEnum.default_type], modelTypeEnum, rmvType, data, offset, expectedMaterialSize);
                     var actualMaterialSize = material.ComputeSize();
 
                     var bytesLeft = expectedMaterialSize - actualMaterialSize;
@@ -64,6 +72,13 @@ namespace Shared.GameFormats.RigidModel.MaterialHeaders
             }
         }
 
+        static IRmvMaterial Create(IMaterialCreator creator, ModelMaterialEnum modelTypeEnum, RmvVersionEnum rmvType, byte[] data, int offset, long expectedMaterialSize)
+        {
+            if (creator is WeighterMaterialCreator weightedCreator)
+                return weightedCreator.Create(modelTypeEnum, rmvType, data, offset, expectedMaterialSize);
+            return creator.Create(modelTypeEnum, rmvType, data, offset);
+        }
+
         public IRmvMaterial CreateMaterial(ModelMaterialEnum modelTypeEnum)
         {
             if (_materialCreators.ContainsKey(modelTypeEnum))
@@ -77,7 +92,13 @@ namespace Shared.GameFormats.RigidModel.MaterialHeaders
 
         public byte[] Save(ModelMaterialEnum modelTypeEnum, IRmvMaterial material)
         {
-            return _materialCreators[modelTypeEnum].Save(material);
+            if (material is ShortHeaderMaterial shortHeaderMaterial)
+                return shortHeaderMaterial.Save();
+
+            // An id with no creator of its own was loaded with the weighted layout (see LoadMaterial), so save it the same way
+            if (_materialCreators.TryGetValue(modelTypeEnum, out var creator) == false)
+                creator = _materialCreators[ModelMaterialEnum.default_type];
+            return creator.Save(material);
         }
 
         public List<ModelMaterialEnum> GetSupportedMaterials() => _materialCreators.Keys.Select(x => x).ToList();

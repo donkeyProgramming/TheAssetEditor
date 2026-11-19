@@ -8,6 +8,7 @@ using GameWorld.Core.Utility;
 using Shared.Core.ErrorHandling;
 using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
+using Shared.Core.Services;
 using Shared.Core.Settings;
 using Shared.GameFormats.RigidModel;
 using Shared.GameFormats.RigidModel.MaterialHeaders;
@@ -27,6 +28,7 @@ namespace Editors.KitbasherEditor.Services
         private readonly Rmv2ModelNodeLoader _rmv2ModelNodeLoader;
         private readonly IModelAssetResolver _modelAssetResolver;
         private readonly GeometrySaveSettings _saveSettings;
+        private readonly IStandardDialogs _standardDialogs;
 
         public KitbashSceneCreator(
             ApplicationSettingsService settingsService,
@@ -37,9 +39,11 @@ namespace Editors.KitbasherEditor.Services
             Rmv2ModelNodeLoader rmv2ModelNodeLoader,
             GeometrySaveSettings saveSettings,
             IScopedLogger scopedLogger,
+            IStandardDialogs standardDialogs,
             IModelAssetResolver? modelAssetResolver = null)
         {
             _logger = scopedLogger.ForContext<KitbashSceneCreator>();
+            _standardDialogs = standardDialogs;
             _packFileService = packFileService;
             _settingsService = settingsService;
             _kitbasherRootScene = kitbasherRootScene;
@@ -87,6 +91,8 @@ namespace Editors.KitbasherEditor.Services
             foreach(var lodNode in lodNodes)
                 mainNode.AddObject(lodNode);
 
+            WarnAboutMeshesLostOnSave(rmv, lodNodes, geometryFullPath);
+
             _kitbasherRootScene.SetSkeletonFromName(rmv.Header.SkeletonName);
 
             var attachmentPointList = GetAttachmentPointsFromFirstModel(rmv);
@@ -98,6 +104,29 @@ namespace Editors.KitbasherEditor.Services
                 _saveSettings.OutputName = dirPath + "\\";
             _saveSettings.OutputName+= Path.GetFileNameWithoutExtension(fullPath) + ".rigid_model_v2";
             _saveSettings.InitializeLodSettings(rmv.LodHeaders);
+        }
+
+        // Saving rebuilds the file from the scene and writes every mesh as a plain weighted mesh. Meshes the scene
+        // could not show (decals, terrain tiles, lights, undecoded vertex layouts) are left out, and cloth, collision
+        // and rope meshes lose their physics data, so tell the user before they save over a vanilla-style model.
+        void WarnAboutMeshesLostOnSave(RmvFile rmv, List<Rmv2LodNode> lodNodes, string modelFullPath)
+        {
+            var fileMeshCount = rmv.ModelList.Sum(lod => lod.Length);
+            var loadedMeshes = lodNodes.SelectMany(lodNode => SceneNodeHelper.GetChildrenOfType<Rmv2MeshNode>(lodNode)).ToList();
+            var skippedCount = fileMeshCount - loadedMeshes.Count;
+            var physicsCount = loadedMeshes.Count(x => x.RmvMaterial.MaterialId is ModelMaterialEnum.cloth or ModelMaterialEnum.collision_shape or ModelMaterialEnum.rope);
+            if (skippedCount <= 0 && physicsCount == 0)
+                return;
+
+            var message = $"{Path.GetFileName(modelFullPath)} contains meshes the Kitbash editor can not save:\n";
+            if (skippedCount > 0)
+                message += $"\n- {skippedCount} mesh(es) that can not be shown (decals, terrain, lights or unsupported vertex layouts) are not loaded and will be missing from the saved file.";
+            if (physicsCount > 0)
+                message += $"\n- {physicsCount} cloth, collision or rope mesh(es) will be saved as ordinary weighted meshes without their physics data.";
+            message += "\n\nSave under a new name if you need to keep the original.";
+
+            _logger.Here().Warning(message);
+            _standardDialogs.ShowDialogBox(message, "Model not fully supported");
         }
 
         List<RmvAttachmentPoint> GetAttachmentPointsFromFirstModel(RmvFile file)

@@ -77,6 +77,11 @@ namespace Shared.GameFormats.RigidModel.LodHeader
         public float _lodCameraDistance;
         public uint _lodLevel;
         public byte _qualityLvl;
+
+        // Not a field: CA's quality_level is a lone uint8_t, and these three bytes are the
+        // compiler's alignment after it. They hold whatever was in memory (gen_tree_oak_large_03
+        // repeats one triple across all its LODs while the quality byte varies), so the game
+        // cannot be reading them. Files written here get 125, 136, 174 unless a source header is copied.
         public byte _padding0;
         public byte _padding1;
         public byte _padding2;

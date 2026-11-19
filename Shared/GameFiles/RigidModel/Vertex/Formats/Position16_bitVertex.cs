@@ -30,7 +30,8 @@ namespace Shared.GameFormats.RigidModel.Vertex.Formats
 
             var vertex = new CommonVertex()
             {
-                Position = VertexLoadHelper.CreatVector4Float(vertexData.position).ToVector4(1),
+                Position = new Vector4(ReadScaled(vertexData.position, out var w), 1),
+                Extra = w == 1 ? [] : [w],
                 Normal = Vector3.UnitY, //VertexLoadHelper.CreatVector4Byte(vertexData.normal).ToVector3(),
                 BiNormal = Vector3.UnitY,
                 Tangent = Vector3.UnitY,
@@ -46,9 +47,24 @@ namespace Shared.GameFormats.RigidModel.Vertex.Formats
         }
 
 
+        // Float4 position whose W, when positive, is a scale on XYZ. Most files store 1, but some
+        // Attila terrain tiles and campaign vegetation do not, so the file's W is kept in Extra
+        static Vector3 ReadScaled(byte[] data, out float w)
+        {
+            w = BitConverter.ToSingle(data, 12);
+            var scale = w > 0 ? w : 1;
+            return new Vector3(BitConverter.ToSingle(data, 0), BitConverter.ToSingle(data, 4), BitConverter.ToSingle(data, 8)) * scale;
+        }
+
         public byte[] Write(RmvVersionEnum rmvVersion, CommonVertex vertex)
         {
-            throw new NotImplementedException();
+            var w = vertex.Extra.Length == 1 ? vertex.Extra[0] : 1;
+            var scale = w > 0 ? w : 1;
+            var typedVert = new Data()
+            {
+                position = [.. BitConverter.GetBytes(vertex.Position.X / scale), .. BitConverter.GetBytes(vertex.Position.Y / scale), .. BitConverter.GetBytes(vertex.Position.Z / scale), .. BitConverter.GetBytes(w)],
+            };
+            return ByteHelper.GetBytes(typedVert);
         }
 
         public struct Data //16

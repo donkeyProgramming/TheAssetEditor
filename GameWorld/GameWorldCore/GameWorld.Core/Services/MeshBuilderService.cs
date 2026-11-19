@@ -81,7 +81,8 @@ namespace GameWorld.Core.Services
                     BiNormal = x.BiNormal,
                     Tangent = x.Tangent,
 
-                    Colour = new Vector4(0, 0, 0, 1),
+                    // The scene keeps no vertex colour. Zero is what CA's own skinned meshes store.
+                    Colour = Vector4.Zero,
                     Uv = x.TextureCoordinate,
                     Uv1 = x.TextureCoordinate1,
 
