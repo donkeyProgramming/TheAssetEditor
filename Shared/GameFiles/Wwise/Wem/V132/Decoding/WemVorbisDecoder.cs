@@ -150,9 +150,7 @@ namespace Shared.GameFormats.Wwise.Wem.V132.Decoding
             }
         }
 
-        // Exact Vorbis granules, as libvorbis writes them. The millisecond timestamps below are
-        // rescaled to the sample count and rounded, so turning them back into granules drifted
-        // from the real values and some streams (e.g. mono 44.1kHz) no longer decoded.
+        // Exact granules, as libvorbis writes them. Converting the rounded millisecond timestamps back drifted.
         private static long[] ComputePacketGranulePositions(List<bool> blockSizesPerPacket, VorbisDecodeResult decodeResult, int sampleCount)
         {
             var granuleOverlapDivisor = 4;

@@ -10,10 +10,7 @@ namespace Test.Audio
     [TestFixture]
     internal class WemVorbisEncoderTests
     {
-        // Covers the OggVorbisEncoder defects patched in OggVorbisEncoderFixes: mono at 44.1/48kHz
-        // encoded to noise at most qualities (0.4 is the default), stereo lost level from 0.6 up, the
-        // first half block of every encode was dropped, and encodes corrupted later encodes in the same
-        // process. All formats run in one test so a leak between encodes would show up too.
+        // Covers the defects patched in OggVorbisEncoderFixes. One test for all formats, so a leak between encodes shows up too.
         [Test]
         public void EncodedWems_DecodeBackToTheInput_ForEveryFormatAndQuality()
         {
