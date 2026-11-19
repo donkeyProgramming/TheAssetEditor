@@ -8,12 +8,8 @@ namespace Shared.GameFormats.Bmd
         public FastBinHeader Header { get; set; } = new FastBinHeader();
 
         /// <summary>
-        /// Per-section header version numbers (e.g. "BattlefieldBuilding", "Prop", "SpotLight" -
-        /// see the keys <see cref="BmdParser"/> writes into this dictionary). Most sections' records
-        /// carry their own version and ignore this one; the records of "CaptureLocation",
-        /// "ToggleableBuildingSlot" and "LegacyPreV22" are unversioned and gate on it instead.
-        /// <see cref="BmdWriter"/> writes every value back. Missing key = version 0 (used when a
-        /// section has no separate version field at all, e.g. GoOutline).
+        /// Section header versions, keyed by the names <see cref="BmdParser"/> uses. Most records carry their own version;
+        /// "CaptureLocation", "ToggleableBuildingSlot" and "LegacyPreV22" gate on these instead. A missing key is version 0.
         /// </summary>
         public Dictionary<string, ushort> SectionVersions { get; set; } = [];
         /// <summary>FASTBIN &lt; 22 only.</summary>
