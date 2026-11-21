@@ -72,6 +72,22 @@ namespace Editors.Shared.Core.Common.ReferenceModel
             FragmentList.UpdatePossibleValues(allPossibleFragments);
         }
 
+        /// <summary>Reloads the bin list, keeping the selected bin and <paramref name="slot"/> where they're still there.</summary>
+        public void ReloadFragments(AnimationBinEntryGenericFormat? slot)
+        {
+            var selectedBin = FragmentList.SelectedItem?.FullPath;
+            if (_sceneObject.Skeleton == null)
+                return;
+
+            FragmentList.UpdatePossibleValues(LoadFragmentsForSkeleton(Path.GetFileNameWithoutExtension(_sceneObject.SkeletonName.Value)));
+            if (selectedBin == null)
+                return;
+
+            FragmentList.SelectedItem = FragmentList.PossibleValues.FirstOrDefault(x => x.FullPath == selectedBin);
+            if (FragmentList.SelectedItem != null && slot != null)
+                FragmentSlotList.SelectedItem = FragmentSlotList.PossibleValues.FirstOrDefault(x => x.SlotName == slot.SlotName && x.AnimationFile == slot.AnimationFile);
+        }
+
         List<IAnimationBinGenericFormat> LoadFragmentsForSkeleton(string skeletonName, bool onlyPacksThatCanBeSaved = false)
         {
             var outputFragments = new List<IAnimationBinGenericFormat>();
@@ -120,8 +136,10 @@ namespace Editors.Shared.Core.Common.ReferenceModel
 
             if (string.IsNullOrWhiteSpace(value?.AnimationFile) == false)
             {
+                // Some vanilla bin entries name animations that don't exist; they load as none
                 var file = _pfs.FindFile(value.AnimationFile);
-                animationReference = _skeletonAnimationLookUpHelper.FindAnimationRefFromPackFile(file);
+                if (file != null)
+                    animationReference = _skeletonAnimationLookUpHelper.FindAnimationRefFromPackFile(file);
             }
 
             if (string.IsNullOrWhiteSpace(value?.MetaFile) == false)
