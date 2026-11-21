@@ -117,35 +117,25 @@ namespace AnimationEditor.MountAnimationCreator.ViewModels
 
         private void MountTagSeleted(AnimationBinEntryGenericFormat value)
         {
-           //if (value != null)
-           //{
-           //    var file = _pfs.FindFile(value.AnimationFile);
-           //    var animationRef = _skeletonAnimationLookUpHelper.FindAnimationRefFromPackFile(file);
-           //    _assetViewModelEditor.SetAnimation(_mount, animationRef);
-           //
-           //    var lookUp = "RIDER_" + value.SlotName;
-           //    SelectedRiderTag.Filter = "";
-           //    SelectedRiderTag.SelectedItem = SelectedRiderTag.Values.FirstOrDefault(x => x.SlotName == lookUp);
-           //}
-           //_validateAction();
+            if (value != null)
+            {
+                _assetViewModelEditor.SetAnimation(_mount, FindAnimation(value.AnimationFile));
+
+                var lookUp = "RIDER_" + value.SlotName;
+                SelectedRiderTag.Filter = "";
+                SelectedRiderTag.SelectedItem = SelectedRiderTag.Values.FirstOrDefault(x => x.SlotName == lookUp);
+            }
+            _validateAction();
         }
 
         private void RiderTagSelected(AnimationBinEntryGenericFormat value)
         {
-          // if (value != null)
-          // {
-          //     var file = _pfs.FindFile(value.AnimationFile);
-          //     if (file == null)
-          //     {
-          //         _assetViewModelEditor.SetAnimation(_rider, null);
-          //     }
-          //     else
-          //     {
-          //         var animationRef = _skeletonAnimationLookUpHelper.FindAnimationRefFromPackFile(file);
-          //         _assetViewModelEditor.SetAnimation(_rider, animationRef);
-          //     }
-          // }
-          // _validateAction();
+            if (value != null)
+                _assetViewModelEditor.SetAnimation(_rider, FindAnimation(value.AnimationFile));
+            _validateAction();
         }
+
+        // Bin entries can name animations that don't exist (vanilla has some); those load as no animation.
+        string FindAnimation(string path) => string.IsNullOrWhiteSpace(path) || _pfs.FindFile(path) == null ? null : path;
     }
 }
