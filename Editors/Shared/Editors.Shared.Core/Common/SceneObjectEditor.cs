@@ -193,7 +193,11 @@ namespace Editors.Shared.Core.Common
                 return;
             }
             
-            var file = _packFileService.FindFile(animationFileName);
+            SetAnimation(assetViewModel, _packFileService.FindFile(animationFileName), animationFileName);
+        }
+
+        public void SetAnimation(SceneObject assetViewModel, PackFile file, string animationFileName)
+        {
             var animation = AnimationFile.Create(file);
 
             if (assetViewModel.Skeleton == null)

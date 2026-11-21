@@ -106,6 +106,7 @@
                     <CheckBox Visibility="Hidden"/>
                     <Label  Width ="{StaticResource labelWidth}" Content="{loc:Loc ReferenceModel.SceneObject.AnimationFile}"/>
                     <Label  Content=":"/>
+                    <Button DockPanel.Dock="Right" Width="70" Content="{loc:Loc ReferenceModel.SceneObject.Browse}" Click="{s:MethodBinding BrowseAnimation}" />
                     <TextBox Text="{Binding FragAndSlotSelection.AnimationFileName, UpdateSourceTrigger=PropertyChanged}" IsReadOnly="true" VerticalContentAlignment="Center"/>
                 </DockPanel>
 

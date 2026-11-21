@@ -27,6 +27,8 @@ namespace Editors.Shared.Core.Common.ReferenceModel
         [ObservableProperty] string? _metaDataPersistName;
         [ObservableProperty] string? _animationFileName;
 
+        bool _isSettingAnimationFile;
+
         public BinAnimationViewModel(SceneObjectEditor sceneObjectEditor, IPackFileService pfs, ISkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper, SceneObject sceneObject, IUiCommandFactory uiCommandFactory)
         {
             _sceneObjectEditor = sceneObjectEditor;
@@ -111,8 +113,28 @@ namespace Editors.Shared.Core.Common.ReferenceModel
             animationSlotsCollection.UpdatePossibleValues(value.Entries);
         }
 
+        // An animation picked straight from the packs, not through a bin slot. The slot (and the
+        // slot's meta, which belongs to that slot's animation) is cleared; the persistent meta
+        // belongs to the fragment, so it stays.
+        public void SetAnimationFile(PackFile file)
+        {
+            _isSettingAnimationFile = true;
+            FragmentSlotList.SelectedItem = null;
+            _isSettingAnimationFile = false;
+
+            var fullPath = _pfs.GetFullPath(file);
+            _sceneObjectEditor.SetAnimation(_sceneObject, file, fullPath);
+            _sceneObjectEditor.SetMetaFile(_sceneObject, null, _sceneObject.PersistMetaData);
+
+            MetaDataName = null;
+            AnimationFileName = "[" + _pfs.GetPackFileContainer(file)?.Name + "] " + fullPath;
+        }
+
         void OnAnimationSlotSelected(AnimationBinEntryGenericFormat value)
         {
+            if (_isSettingAnimationFile)
+                return;
+
             AnimationReference? animationReference = null;
             PackFile? meta = null;
             PackFile? persistMeta = null;
