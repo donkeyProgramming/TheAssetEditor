@@ -27,6 +27,7 @@ using Editors.AnimationVisualEditors.MountAnimationCreator.Services;
 using GameWorld.Core.Services;
 using Shared.Core.Commands;
 using Shared.Core.PackFiles.Utility;
+using Shared.Core.Services;
 
 
 namespace AnimationEditor.MountAnimationCreator
@@ -43,6 +44,7 @@ namespace AnimationEditor.MountAnimationCreator
         public override Type EditorViewModelType => typeof(EditorView);
         private readonly IFileSaveService _fileSaveService;
         private readonly IUiCommandFactory _uiCommandFactory;
+        private readonly IStandardDialogs _standardDialogs;
         private readonly AnimationPlayerViewModel _animationPlayerViewModel;
         private readonly IPackFileService _pfs;
         private readonly SelectionManager _selectionManager;
@@ -57,6 +59,7 @@ namespace AnimationEditor.MountAnimationCreator
 
         public AnimationSettingsViewModel AnimationSettings { get; set; } = new AnimationSettingsViewModel();
         public MountLinkViewModel MountLinkController { get; set; }
+        public AttachedRiderConversionViewModel AttachedRiders { get; set; }
 
         public FilterCollection<SkeletonBoneNode> SelectedRiderBone { get; set; }
 
@@ -83,8 +86,10 @@ namespace AnimationEditor.MountAnimationCreator
             SelectionManager selectionManager,
             AnimationPlayerViewModel animationPlayerViewModel,
             IFileSaveService fileSaveService,
-            IUiCommandFactory uiCommandFactory) : base(editorHostParameters)
+            IUiCommandFactory uiCommandFactory,
+            IStandardDialogs standardDialogs) : base(editorHostParameters)
         {
+            _standardDialogs = standardDialogs;
             DisplayName = "Mount Animation Creator";
             _animationPlayerViewModel = animationPlayerViewModel;
             _fileSaveService = fileSaveService;
@@ -145,6 +150,7 @@ namespace AnimationEditor.MountAnimationCreator
             _rider.AnimationChanged += TryReGenerateAnimation;
 
             MountLinkController = new MountLinkViewModel(_sceneObjectEditor, _pfs, _skeletonAnimationLookUpHelper, rider, mount, UpdateCanSaveAndPreviewStates);
+            AttachedRiders = new AttachedRiderConversionViewModel(rider, mount, newAnimation, _sceneObjectEditor, _standardDialogs, _pfs, _fileSaveService, _skeletonAnimationLookUpHelper, this);
 
             MountSkeletonChanged(_mount.Skeleton);
             RiderSkeletonChanges(_rider.Skeleton);

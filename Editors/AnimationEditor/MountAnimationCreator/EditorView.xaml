@@ -18,14 +18,16 @@
             <RowDefinition Height="auto"/>
             <RowDefinition Height="auto"/>
             <RowDefinition Height="auto"/>
+            <RowDefinition Height="auto"/>
         </Grid.RowDefinitions>
 
         <local:RiderAttachmentSubView Grid.Row="0" />
         <views:AnimationSettingsView Grid.Row="1" DataContext="{Binding AnimationSettings, Mode=OneTime}"/>
         <local:MountLinkSubView Grid.Row="2" />
         <views:SaveAndPreviewView Grid.Row="3"/>
-        <local:VisualisationHelperSubView  Grid.Row="4" />
-        <Button Content="{loc:Loc MountAnimationCreator.Buttons.RefreshTool}" Click="{s:MethodBinding RefreshViewAction}" Grid.Row="5" Margin="10,0,10,0"/>
-        <Button Content="{loc:Loc MountAnimationCreator.Buttons.CopyRiderAnimationFrames}" Click="{s:MethodBinding CopyAnimation}" Grid.Row="6" Margin="10,0,10,0"/>
+        <views:AttachedRiderConversionView Grid.Row="4" DataContext="{Binding AttachedRiders, Mode=OneTime}"/>
+        <local:VisualisationHelperSubView  Grid.Row="5" />
+        <Button Content="{loc:Loc MountAnimationCreator.Buttons.RefreshTool}" Click="{s:MethodBinding RefreshViewAction}" Grid.Row="6" Margin="10,0,10,0"/>
+        <Button Content="{loc:Loc MountAnimationCreator.Buttons.CopyRiderAnimationFrames}" Click="{s:MethodBinding CopyAnimation}" Grid.Row="7" Margin="10,0,10,0"/>
     </Grid>
 </UserControl>

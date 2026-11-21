@@ -64,23 +64,6 @@
                 <CheckBox VerticalContentAlignment="Center" IsChecked="{Binding AnimationSettings.FreezeUnmapped.Value, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" Content="{loc:Loc AnimationTransfer.Settings.ZeroUnmappedBones}" ToolTip="{loc:Loc AnimationTransfer.Settings.ZeroUnmappedBonesTooltip}"/>
             </DockPanel>
 
-          
-            <DockPanel>
-                <StackPanel>
-                    <DockPanel>
-                        <Label Content="{loc:Loc AnimationTransfer.Settings.RootBoneWarBeast}" Width ="300"/>
-                        <Label Content=":"/>
-                        <ComboBox Grid.Column="2" Grid.ColumnSpan="2" Grid.Row="0" 
-                          IsEditable="True"
-                          IsTextSearchEnabled="false"
-                          DisplayMemberPath="BoneName"
-                          Text="{Binding ModelBoneList.Filter, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" 
-                          ItemsSource="{Binding ModelBoneList.Values}" 
-                          SelectedItem="{Binding ModelBoneList.SelectedItem, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
-                    </DockPanel>
-                    <Button  Content="{loc:Loc AnimationTransfer.Settings.ConvertToWarBeast}" Click="{s:MethodBinding FreezePositionAndRotation}" Margin="2" />
-                </StackPanel>
-            </DockPanel>
 
         </StackPanel>
     </Expander>

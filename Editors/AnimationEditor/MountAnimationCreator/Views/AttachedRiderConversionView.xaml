@@ -1,0 +1,47 @@
+<UserControl x:Class="AnimationEditor.MountAnimationCreator.Views.AttachedRiderConversionView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:s="http://schemas.singulink.com/xaml"
+             xmlns:loc="clr-namespace:Shared.Ui.Common;assembly=Shared.Ui"
+             mc:Ignorable="d" 
+             d:DesignHeight="200" d:DesignWidth="400">
+
+    <Expander Header="{loc:Loc MountAnimationCreator.AttachedRiders}" IsExpanded="true">
+        <Grid Margin="10,5,10,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="auto"/>
+                <ColumnDefinition Width="auto"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="auto"/>
+                <RowDefinition Height="auto"/>
+                <RowDefinition Height="auto"/>
+                <RowDefinition Height="auto"/>
+                <RowDefinition Height="auto"/>
+            </Grid.RowDefinitions>
+
+            <TextBlock Grid.Row="0" Grid.ColumnSpan="3" TextWrapping="Wrap" Margin="0,0,0,5" Text="{loc:Loc MountAnimationCreator.AttachedRiders.Help}"/>
+
+            <Label Grid.Row="1" Grid.Column="0" Content="{loc:Loc MountAnimationCreator.AttachedRiders.TechSkeleton}"/>
+            <Label Grid.Row="1" Grid.Column="1" Content=":"/>
+            <DockPanel Grid.Row="1" Grid.Column="2">
+                <Button DockPanel.Dock="Right" Width="70" Margin="3,0,0,0" Content="{loc:Loc ReferenceModel.SceneObject.Browse}" Click="{s:MethodBinding BrowseAttachSkeleton}"/>
+                <TextBox IsReadOnly="True" VerticalContentAlignment="Center" Text="{Binding AttachSkeletonName.Value, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}"/>
+            </DockPanel>
+
+            <Label Grid.Row="2" Grid.Column="0" Content="{loc:Loc MountAnimationCreator.AttachedRiders.AttachBone}"/>
+            <Label Grid.Row="2" Grid.Column="1" Content=":"/>
+            <ComboBox Grid.Row="2" Grid.Column="2" ItemsSource="{Binding AttachBones}" SelectedItem="{Binding SelectedAttachBone.Value, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
+
+            <UniformGrid Grid.Row="3" Grid.ColumnSpan="3" Columns="2" Margin="0,5,0,0">
+                <Button Margin="0,0,2,0" Content="{loc:Loc MountAnimationCreator.Buttons.ToAttached}" Click="{s:MethodBinding ConvertRiderToAttached}" IsEnabled="{Binding CanConvert.Value, UpdateSourceTrigger=PropertyChanged}"/>
+                <Button Margin="2,0,0,0" Content="{loc:Loc MountAnimationCreator.Buttons.ToSynchronized}" Click="{s:MethodBinding ConvertRiderToSynchronized}" IsEnabled="{Binding CanConvert.Value, UpdateSourceTrigger=PropertyChanged}"/>
+            </UniformGrid>
+
+            <Button Grid.Row="4" Grid.ColumnSpan="3" Margin="0,3,0,5" Content="{loc:Loc MountAnimationCreator.Buttons.SaveConverted}" Click="{s:MethodBinding SaveConvertedAnimation}" IsEnabled="{Binding CanSave.Value, UpdateSourceTrigger=PropertyChanged}"/>
+        </Grid>
+    </Expander>
+</UserControl>
