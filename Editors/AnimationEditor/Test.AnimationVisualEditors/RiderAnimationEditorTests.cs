@@ -119,7 +119,7 @@ namespace Test.AnimationVisualEditors
             Assert.That(saved, Does.EndWith("new_" + Path.GetFileName(tool.Rider.AnimationName.Value)));
 
             // The other tab takes the preview back
-            tool.Editor.SelectedModeTab.Value = MountAnimationCreatorViewModel.MountChangeTab;
+            tool.Editor.SelectedModeTab.Value = MountAnimationCreatorViewModel.SynchronizedMountChangeTab;
             Assert.That(converter.CanSave.Value, Is.False);
             Assert.That(preview.Offset, Is.EqualTo(Matrix.Identity));
         }
@@ -262,7 +262,7 @@ namespace Test.AnimationVisualEditors
                 Assert.That(World(preview.Skeleton, preview.AnimationClip, f, root) - World(tool.Rider.Skeleton, tool.Rider.AnimationClip, f, root), Is.EqualTo(new Vector3(0, 0.1f, 0)).Using<Vector3>((a, b) => (a - b).Length() < 1e-4f), $"frame {f}");
 
             // The other tabs take the preview back
-            tool.Editor.SelectedModeTab.Value = MountAnimationCreatorViewModel.MountChangeTab;
+            tool.Editor.SelectedModeTab.Value = MountAnimationCreatorViewModel.SynchronizedMountChangeTab;
             Assert.That(preview.Offset, Is.EqualTo(Matrix.Identity));
         }
 
@@ -319,7 +319,7 @@ namespace Test.AnimationVisualEditors
         }
 
         [Test]
-        public void MountChange_GluesTheRiderToTheNewMountsVertex()
+        public void SynchronizedMountChange_GluesTheRiderToTheNewMountsVertex()
         {
             var tool = Open(SynchronizedSet);
             PickMountSlot(tool, "RUN_1");
@@ -352,7 +352,7 @@ namespace Test.AnimationVisualEditors
         }
 
         [Test]
-        public void MountChange_RefitsTheWholeRiderSet()
+        public void SynchronizedMountChange_RefitsTheWholeRiderSet()
         {
             var tool = Open(SynchronizedSet);
             Assert.That(tool.Editor.CanBatchProcess.Value, Is.False);

@@ -39,9 +39,9 @@ namespace AnimationEditor.MountAnimationCreator
     }
 
     /// <summary>
-    /// The Rider Animation Editor, for mounted rider animation sets. Mount Change tab: refits a synchronized rider set
-    /// made for one mount onto another by gluing a rider bone to a vertex of the new mount. Attached Mount Change tab:
-    /// moves an attached rider set onto another mount. Synchronized ↔ Attached tab: converts riders between the two.
+    /// The Rider Animation Editor, for mounted rider animation sets. Synchronized Mount Change tab: refits a synchronized
+    /// rider set made for one mount onto another by gluing a rider bone to a vertex of the new mount. Attached Mount
+    /// Change tab: moves an attached rider set onto another mount. Synchronized ↔ Attached tab: converts between the two.
     /// </summary>
     public class MountAnimationCreatorViewModel : EditorHostBase, IDisposable
     {
@@ -85,7 +85,7 @@ namespace AnimationEditor.MountAnimationCreator
         public NotifyAttr<string> SelectedVertexesText { get; set; } = new NotifyAttr<string>("");
 
         public NotifyAttr<int> SelectedModeTab { get; }
-        public static int MountChangeTab => 0;
+        public static int SynchronizedMountChangeTab => 0;
         public static int AttachedMountChangeTab => 1;
         public static int AttachConversionTab => 2;
 
@@ -113,7 +113,7 @@ namespace AnimationEditor.MountAnimationCreator
 
             DisplayGeneratedSkeleton = new NotifyAttr<bool>(true, (value) => _newAnimation.ShowSkeleton.Value = value);
             DisplayGeneratedMesh = new NotifyAttr<bool>(true, (value) => { if (_newAnimation.MainNode != null) _newAnimation.ShowMesh.Value = value; });
-            SelectedModeTab = new NotifyAttr<int>(MountChangeTab, OnModeTabChanged);
+            SelectedModeTab = new NotifyAttr<int>(SynchronizedMountChangeTab, OnModeTabChanged);
             SelectedVertexesText.Value = _loc.Get("MountAnimationCreator.RiderAttachment.NoVertex");
 
             SelectedRiderBone = new FilterCollection<SkeletonBoneNode>(null, (x) => UpdateCanSaveAndPreviewStates());

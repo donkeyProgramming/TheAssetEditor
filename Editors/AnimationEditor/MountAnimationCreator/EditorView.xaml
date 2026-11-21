@@ -57,6 +57,14 @@
     <StackPanel Margin="5">
         <TextBlock Text="{loc:Loc MountAnimationCreator.Title}" FontSize="18" FontWeight="Bold"/>
         <TextBlock Style="{StaticResource Info}" Text="{loc:Loc MountAnimationCreator.Intro}"/>
+        <TextBlock Style="{StaticResource Info}">
+            <Run FontWeight="Bold" Text="{loc:Loc MountAnimationCreator.Kinds.Synchronized}"/>
+            <Run Text="{loc:Loc MountAnimationCreator.Kinds.Synchronized.Info}"/>
+        </TextBlock>
+        <TextBlock Style="{StaticResource Info}">
+            <Run FontWeight="Bold" Text="{loc:Loc MountAnimationCreator.Kinds.Attached}"/>
+            <Run Text="{loc:Loc MountAnimationCreator.Kinds.Attached.Info}"/>
+        </TextBlock>
 
         <TabControl Margin="0,8,0,0" SelectedIndex="{Binding SelectedModeTab.Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
             <TabItem Header="{loc:Loc MountAnimationCreator.Tabs.MountChange}" ToolTip="{loc:Loc MountAnimationCreator.Tabs.MountChange.ToolTip}">
