@@ -158,7 +158,6 @@ namespace AnimationEditor.MountAnimationCreator.Services
                 "STAND",
                 "MISSING_ANIM" ,
                 "RIDER_SHOOT_READY",
-                "RIDER_COMBAT_READY",
                 "RIDER_RELOAD",
                 "RIDER_STAND_TO_RIDER_COMBAT_READY",
                 "RIDER_COMBAT_READY_TO_RIDER_STAND",

@@ -371,7 +371,11 @@ namespace Test.AnimationVisualEditors
             Assert.That(made.Entries.Select(x => x.SlotName), Is.EqualTo(original.Entries.Select(x => x.SlotName)), "every slot and variant of the rider set");
             string File(IAnimationBinGenericFormat set, string slot) => set.Entries.First(x => x.SlotName == slot).AnimationFile;
             Assert.That(File(made, "RIDER_RUN_1"), Does.Contain("new_"));
-            Assert.That(File(made, "RIDER_COMBAT_READY"), Is.EqualTo(File(original, "RIDER_COMBAT_READY")), "plays the same on any mount");
+            Assert.That(File(made, "RIDER_MOVING_ATTACK_1"), Is.EqualTo(File(original, "RIDER_MOVING_ATTACK_1")), "the game blends it over the riding motion");
+
+            // Combat ready plays with the mount's own COMBAT_READY like any synchronized slot (in this set it's the
+            // RIDER_STAND animation), so it's refitted too
+            Assert.That(File(made, "RIDER_COMBAT_READY"), Does.Contain("new_"));
         }
 
         [Test]

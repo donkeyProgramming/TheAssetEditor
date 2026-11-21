@@ -95,7 +95,7 @@
         <li><b>Refit the whole rider set to this mount</b> - asks for a name, then makes a new rider set for the new mount. Every <code>RIDER_</code> animation whose slot the new mount's set has is refitted with these settings and saved. The rest keep their original animation:
             <ul>
                 <li>slots that aren't <code>RIDER_</code> slots, and <code>RIDER_</code> slots whose mount slot the new mount doesn't have</li>
-                <li>slots the tool treats as playing the same on any mount: <code>RIDER_COMBAT_READY</code>, <code>RIDER_SHOOT_READY</code>, <code>RIDER_RELOAD</code> and the transitions between them and <code>RIDER_STAND</code>, and every <code>RIDER_CAST_SPELL_</code>, <code>RIDER_MOVING_ATTACK_</code>, <code>RIDER_CELEBRATE_</code> and <code>RIDER_FIRE_</code> slot</li>
+                <li>slots the game plays over the riding motion instead of with a mount animation of their own, so the rider's legs and pelvis in them aren't used: <code>RIDER_SHOOT_READY</code>, <code>RIDER_RELOAD</code>, the transitions between them, <code>RIDER_STAND</code> and <code>RIDER_COMBAT_READY</code>, and every <code>RIDER_CAST_SPELL_</code>, <code>RIDER_MOVING_ATTACK_</code>, <code>RIDER_CELEBRATE_</code> and <code>RIDER_FIRE_</code> slot</li>
             </ul>
         </li>
     </ul>
