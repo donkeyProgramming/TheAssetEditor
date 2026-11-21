@@ -123,24 +123,31 @@ namespace Test.AnimationVisualEditors
             Assert.That(preview.Offset, Is.EqualTo(Matrix.Identity));
         }
 
-        [TestCase(true)]
-        [TestCase(false)]
-        public void Attached_ConvertsTheWholeSet(bool toAttached)
+        // Converts the picked rider set into "test_riders" and returns the log
+        static ErrorList ConvertSet(Tool tool, bool toAttached)
         {
-            // Empire is synchronized and Kislev attached; each converts to the other
-            var tool = Open(toAttached ? SynchronizedSet : AttachedSet);
             var converter = tool.Editor.AttachedRiders;
             tool.Runner.Dialogs.Setup(x => x.ShowTextInputDialog(It.IsAny<string>(), It.IsAny<string>())).Returns(new TextInputDialogResult(true, "test_riders"));
-            ErrorList log = null;
+            ErrorList? log = null;
             tool.Runner.Dialogs.Setup(x => x.ShowErrorViewDialog(It.IsAny<string>(), It.IsAny<ErrorList>(), It.IsAny<bool>())).Callback<string, ErrorList, bool>((_, l, _) => log = l);
 
-            Assert.That(converter.CanConvertSet.Value, Is.False, "no tech skeleton yet");
             converter.SetAttachSkeleton(tool.Runner.PackFileService.FindFile(TechSkeleton)!);
             Assert.That(converter.CanConvertSet.Value, Is.True);
             if (toAttached) converter.ConvertSetToAttached(); else converter.ConvertSetToSynchronized();
             foreach (var line in log!.Errors)
                 TestContext.Out.WriteLine($"{line.ErrorType} {line.ItemName}: {line.Description}");
             Assert.That(log.Errors.Where(x => x.IsError), Is.Empty);
+            return log;
+        }
+
+        [TestCase(true)]
+        [TestCase(false)]
+        public void Attached_ConvertsTheWholeSet(bool toAttached)
+        {
+            // Empire is synchronized and Kislev attached; each converts to the other
+            var tool = Open(toAttached ? SynchronizedSet : AttachedSet);
+            Assert.That(tool.Editor.AttachedRiders.CanConvertSet.Value, Is.False, "no tech skeleton yet");
+            ConvertSet(tool, toAttached);
 
             var pfs = tool.Runner.PackFileService;
             var original = (AnimationBinWh3)tool.Editor.MountLinkController.AnimationSetForRider.SelectedItem!;
@@ -173,6 +180,22 @@ namespace Test.AnimationVisualEditors
             // The new set shows up in the set list, and the picked set stays picked
             Assert.That(tool.Editor.MountLinkController.AnimationSetForRider.PossibleValues.Select(x => x.Name), Does.Contain("test_riders"));
             Assert.That(tool.Editor.MountLinkController.AnimationSetForRider.SelectedItem?.Name, Is.EqualTo(original.Name));
+        }
+
+        // A rider animation shared by slots whose mount animations differ is converted once per mount animation.
+        // With unique names off, those conversions must still go to separate files.
+        [TestCase(true)]
+        [TestCase(false)]
+        public void Attached_ConvertsTheWholeSet_WithoutUniqueNames_GivesEachMountAnimationItsOwnFile(bool toAttached)
+        {
+            var tool = Open(toAttached ? SynchronizedSet : AttachedSet);
+            tool.Editor.Output.EnsureUniqueFileName.Value = false;
+            var log = ConvertSet(tool, toAttached);
+
+            var saved = log.Errors.Where(x => x.Description.StartsWith("Saved ")).Select(x => x.Description[6..].Split(" (")[0]).ToList();
+            Assert.That(saved, Is.Unique);
+            Assert.That(saved, Has.Some.Contains("new_1_"), "a rider animation was converted against two mount animations");
+            Assert.That(SavedFiles(tool).Count(x => x.EndsWith(".anim")), Is.EqualTo(saved.Count));
         }
 
         [Test]

@@ -59,6 +59,8 @@ namespace Editors.AnimationVisualEditors.MountAnimationCreator.Services
             var mountSlots = mountSet.Entries.GroupBy(x => x.SlotName).ToDictionary(x => x.Key, x => x.ToList());
             // Slots often share an animation: one new file per rider and mount animation pair
             var made = new Dictionary<(string Rider, string Mount), string>(new PathPairComparer());
+            // A rider animation shared with different mount animations is made more than once, under different names
+            var madePaths = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
             var newBin = new AnimationBinWh3($"animations/database/battle/bin/{newSetName}.bin")
             {
@@ -134,7 +136,7 @@ namespace Editors.AnimationVisualEditors.MountAnimationCreator.Services
                         continue;
                     }
 
-                    newRef.AnimationFile = _output.Save(_pfs, _fileSaveService, _skeletonLookUp, result.Clip, riderSkeleton, animation.AnimationFile);
+                    newRef.AnimationFile = _output.Save(_pfs, _fileSaveService, _skeletonLookUp, result.Clip, riderSkeleton, animation.AnimationFile, madePaths);
                     made[(animation.AnimationFile, mountAnimation)] = newRef.AnimationFile;
                     log.Ok(item, $"Saved {newRef.AnimationFile}{(string.IsNullOrEmpty(result.Note) ? "" : " (" + result.Note + ")")}");
                 }
