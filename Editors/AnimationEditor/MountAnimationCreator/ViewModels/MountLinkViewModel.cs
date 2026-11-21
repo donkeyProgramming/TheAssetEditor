@@ -50,28 +50,27 @@ namespace AnimationEditor.MountAnimationCreator.ViewModels
             ReloadFragments();
         }
 
+        /// <summary>Reloads the set lists, keeping the selected sets and slots where they're still there.</summary>
         public void ReloadFragments(bool rider = true, bool mount = true)
         {
             if (mount)
-            {
-                var mountSkeletonName = Path.GetFileNameWithoutExtension(_mount.SkeletonName.Value);
-                var allPossibleMount = LoadAnimationSetForSkeleton(mountSkeletonName);
-                AnimationSetForMount.UpdatePossibleValues(allPossibleMount);
-            }
-
+                Reload(AnimationSetForMount, SelectedMountTag, _mount.SkeletonName.Value);
             if (rider)
-            {
-                var selectedSlotId = SelectedRiderTag.SelectedItem?.SlotIndex;
-                var selectedRider = AnimationSetForRider.SelectedItem?.FullPath;
-                var riderSkeletonName = Path.GetFileNameWithoutExtension(_rider.SkeletonName.Value);
-                var allPossibleRider = LoadAnimationSetForSkeleton(riderSkeletonName);
-                AnimationSetForRider.UpdatePossibleValues(allPossibleRider);
-                if (selectedRider != null)
-                    AnimationSetForRider.SelectedItem = AnimationSetForRider.Values.FirstOrDefault(x => x.Name == selectedRider);
+                Reload(AnimationSetForRider, SelectedRiderTag, _rider.SkeletonName.Value);
+        }
 
-                if (selectedSlotId != null)
-                    SelectedRiderTag.SelectedItem = SelectedRiderTag.Values.FirstOrDefault(x => x.SlotIndex == selectedSlotId.Value);
-            }
+        void Reload(FilterCollection<IAnimationBinGenericFormat> sets, FilterCollection<AnimationBinEntryGenericFormat> slots, string skeletonPath)
+        {
+            var selectedSet = sets.SelectedItem?.FullPath;
+            var selectedSlot = slots.SelectedItem;
+
+            sets.UpdatePossibleValues(LoadAnimationSetForSkeleton(Path.GetFileNameWithoutExtension(skeletonPath)));
+            if (selectedSet == null)
+                return;
+
+            sets.SelectedItem = sets.PossibleValues.FirstOrDefault(x => x.FullPath == selectedSet);
+            if (sets.SelectedItem != null && selectedSlot != null)
+                slots.SelectedItem = slots.PossibleValues.FirstOrDefault(x => x.SlotName == selectedSlot.SlotName && x.AnimationFile == selectedSlot.AnimationFile);
         }
 
         public List<IAnimationBinGenericFormat> LoadAnimationSetForSkeleton(string skeletonName, bool onlyPacksThatCanBeSaved = false)
