@@ -30,7 +30,7 @@ namespace AnimationEditor.MountAnimationCreator.ViewModels
         private readonly IFileSaveService _fileSaveService;
         private readonly ISkeletonAnimationLookUpHelper _skeletonLookUp;
         private readonly AnimationOutputSettings _output;
-        private readonly MountLinkViewModel _sets;
+        private readonly RiderAndMountSets _sets;
         private readonly LocalizationManager _loc;
 
         GameSkeleton _attachSkeleton;
@@ -53,7 +53,7 @@ namespace AnimationEditor.MountAnimationCreator.ViewModels
 
         public AttachedRiderConversionViewModel(SceneObject rider, SceneObject mount, SceneObject preview, SceneObjectEditor sceneObjectEditor,
             IStandardDialogs dialogs, IPackFileService pfs, IFileSaveService fileSaveService, ISkeletonAnimationLookUpHelper skeletonLookUp,
-            AnimationOutputSettings output, MountLinkViewModel sets, LocalizationManager loc)
+            AnimationOutputSettings output, RiderAndMountSets sets, LocalizationManager loc)
         {
             _rider = rider;
             _mount = mount;
@@ -109,8 +109,8 @@ namespace AnimationEditor.MountAnimationCreator.ViewModels
 
             var setMissing = new List<string>();
             if (_attachSkeleton == null || SelectedAttachBone.Value == null) setMissing.Add(_loc.Get("MountAnimationCreator.Needs.TechSkeleton"));
-            if (_sets.AnimationSetForRider.SelectedItem == null) setMissing.Add(_loc.Get("MountAnimationCreator.Needs.RiderSet"));
-            if (_sets.AnimationSetForMount.SelectedItem == null) setMissing.Add(_loc.Get("MountAnimationCreator.Needs.MountSet"));
+            if (_sets.RiderSet == null) setMissing.Add(_loc.Get("MountAnimationCreator.Needs.RiderSet"));
+            if (_sets.MountSet == null) setMissing.Add(_loc.Get("MountAnimationCreator.Needs.MountSet"));
             CanConvertSet.Value = setMissing.Count == 0;
             ConvertSetStatus.Value = Needs(setMissing);
         }
@@ -204,8 +204,8 @@ namespace AnimationEditor.MountAnimationCreator.ViewModels
             if (!CanConvertSet.Value)
                 return;
 
-            var riderSet = _sets.AnimationSetForRider.SelectedItem;
-            var mountSet = _sets.AnimationSetForMount.SelectedItem;
+            var riderSet = _sets.RiderSet;
+            var mountSet = _sets.MountSet;
             var name = _dialogs.ShowTextInputDialog(_loc.Get("MountAnimationCreator.Batch.NameTitle"), _output.SavePrefix.Value + riderSet.Name);
             if (name == null || !name.Result || string.IsNullOrWhiteSpace(name.Text))
                 return;

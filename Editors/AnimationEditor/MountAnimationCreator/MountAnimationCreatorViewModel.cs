@@ -39,14 +39,14 @@ namespace AnimationEditor.MountAnimationCreator
     }
 
     /// <summary>
-    /// The Rider Animation Editor. Synchronized tab: glues a rider animation to a mount vertex. Attached tab: converts
-    /// riders to and from attached (war beast) riding.
+    /// The Rider Animation Editor, for mounted rider animation sets. Mount Change tab: refits a synchronized rider set
+    /// made for one mount onto another by gluing a rider bone to a vertex of the new mount. Synchronized ↔ Attached tab:
+    /// converts riders between synchronized and attached (war beast) riding.
     /// </summary>
     public class MountAnimationCreatorViewModel : EditorHostBase, IDisposable
     {
         public override Type EditorViewModelType => typeof(EditorView);
         private readonly IFileSaveService _fileSaveService;
-        private readonly IUiCommandFactory _uiCommandFactory;
         private readonly IStandardDialogs _standardDialogs;
         private readonly AnimationPlayerViewModel _animationPlayerViewModel;
         private readonly IPackFileService _pfs;
@@ -66,7 +66,7 @@ namespace AnimationEditor.MountAnimationCreator
 
         public AnimationSettingsViewModel AnimationSettings { get; set; } = new AnimationSettingsViewModel();
         public AnimationOutputSettings Output { get; } = new();
-        public MountLinkViewModel MountLinkController { get; set; }
+        public RiderAndMountSets Sets { get; private set; }
         public AttachedRiderConversionViewModel AttachedRiders { get; set; }
 
         public FilterCollection<SkeletonBoneNode> SelectedRiderBone { get; set; }
@@ -83,8 +83,8 @@ namespace AnimationEditor.MountAnimationCreator
         public NotifyAttr<string> SelectedVertexesText { get; set; } = new NotifyAttr<string>("");
 
         public NotifyAttr<int> SelectedModeTab { get; }
-        public static int SynchronizedTab => 0;
-        public static int AttachedTab => 1;
+        public static int MountChangeTab => 0;
+        public static int AttachConversionTab => 1;
 
         public MountAnimationCreatorViewModel(IEditorHostParameters editorHostParameters,
             IPackFileService pfs,
@@ -92,7 +92,6 @@ namespace AnimationEditor.MountAnimationCreator
             SelectionManager selectionManager,
             AnimationPlayerViewModel animationPlayerViewModel,
             IFileSaveService fileSaveService,
-            IUiCommandFactory uiCommandFactory,
             IStandardDialogs standardDialogs,
             IGlobalEventHub globalEventHub,
             IEditorManager editorManager,
@@ -102,7 +101,6 @@ namespace AnimationEditor.MountAnimationCreator
             DisplayName = "Rider Animation Editor";
             _animationPlayerViewModel = animationPlayerViewModel;
             _fileSaveService = fileSaveService;
-            _uiCommandFactory = uiCommandFactory;
             _pfs = pfs;
             _skeletonAnimationLookUpHelper = skeletonAnimationLookUpHelper;
             _selectionManager = selectionManager;
@@ -112,7 +110,7 @@ namespace AnimationEditor.MountAnimationCreator
 
             DisplayGeneratedSkeleton = new NotifyAttr<bool>(true, (value) => _newAnimation.ShowSkeleton.Value = value);
             DisplayGeneratedMesh = new NotifyAttr<bool>(true, (value) => { if (_newAnimation.MainNode != null) _newAnimation.ShowMesh.Value = value; });
-            SelectedModeTab = new NotifyAttr<int>(SynchronizedTab, OnModeTabChanged);
+            SelectedModeTab = new NotifyAttr<int>(MountChangeTab, OnModeTabChanged);
             SelectedVertexesText.Value = _loc.Get("MountAnimationCreator.RiderAttachment.NoVertex");
 
             SelectedRiderBone = new FilterCollection<SkeletonBoneNode>(null, (x) => UpdateCanSaveAndPreviewStates());
@@ -143,6 +141,8 @@ namespace AnimationEditor.MountAnimationCreator
             var propAsset = _sceneObjectEditor.CreateAsset(MountToolIds.Generated, "Preview", Color.Red);
             _animationPlayerViewModel.RegisterAsset(propAsset);
 
+            Sets = new RiderAndMountSets(riderItem.FragAndSlotSelection, mountItem.FragAndSlotSelection, UpdateCanSaveAndPreviewStates);
+
             Create(riderItem.Data, mountItem.Data, propAsset);
             SceneObjects.Add(riderItem);
             SceneObjects.Add(mountItem);
@@ -159,8 +159,7 @@ namespace AnimationEditor.MountAnimationCreator
             _rider.SkeletonChanged += RiderSkeletonChanges;
             _rider.AnimationChanged += TryReGenerateAnimation;
 
-            MountLinkController = new MountLinkViewModel(_sceneObjectEditor, _pfs, _skeletonAnimationLookUpHelper, rider, mount, UpdateCanSaveAndPreviewStates);
-            AttachedRiders = new AttachedRiderConversionViewModel(rider, mount, newAnimation, _sceneObjectEditor, _standardDialogs, _pfs, _fileSaveService, _skeletonAnimationLookUpHelper, Output, MountLinkController, _loc);
+            AttachedRiders = new AttachedRiderConversionViewModel(rider, mount, newAnimation, _sceneObjectEditor, _standardDialogs, _pfs, _fileSaveService, _skeletonAnimationLookUpHelper, Output, Sets, _loc);
 
             MountSkeletonChanged(_mount.Skeleton);
             RiderSkeletonChanges(_rider.Skeleton);
@@ -169,8 +168,8 @@ namespace AnimationEditor.MountAnimationCreator
         // The tabs share the preview rider, each filling it with its own result
         void OnModeTabChanged(int tab)
         {
-            AttachedRiders.IsActive = tab == AttachedTab;
-            if (tab == AttachedTab)
+            AttachedRiders.IsActive = tab == AttachConversionTab;
+            if (tab == AttachConversionTab)
                 AttachedRiders.ClearPreview();
             else
                 TryReGenerateAnimation(null);
@@ -179,7 +178,7 @@ namespace AnimationEditor.MountAnimationCreator
         private void TryReGenerateAnimation(AnimationClip newValue = null)
         {
             UpdateCanSaveAndPreviewStates();
-            if (SelectedModeTab.Value == AttachedTab)
+            if (SelectedModeTab.Value == AttachConversionTab)
             {
                 AttachedRiders.OnSourceChanged();
                 return;
@@ -194,7 +193,6 @@ namespace AnimationEditor.MountAnimationCreator
         private void MountSkeletonChanged(GameSkeleton newValue)
         {
             UpdateCanSaveAndPreviewStates();
-            MountLinkController.ReloadFragments(false, true);
         }
 
         private void RiderSkeletonChanges(GameSkeleton newValue)
@@ -212,7 +210,6 @@ namespace AnimationEditor.MountAnimationCreator
             if (AnimationSettings.IsRootNodeAnimation == false)
                 SelectedRiderBone.SelectedItem = SelectedRiderBone.PossibleValues.FirstOrDefault(x => string.Equals("bn_hips", x.BoneName, StringComparison.OrdinalIgnoreCase));
 
-            MountLinkController.ReloadFragments(true, false);
             UpdateCanSaveAndPreviewStates();
         }
 
@@ -220,7 +217,7 @@ namespace AnimationEditor.MountAnimationCreator
         void OnPackFilesChanged(List<PackFile> files)
         {
             if (files.Any(x => x.Name.EndsWith(".animpack", StringComparison.OrdinalIgnoreCase)))
-                MountLinkController.ReloadFragments();
+                Sets.Reload();
         }
 
         void UpdateCanSaveAndPreviewStates()
@@ -235,8 +232,8 @@ namespace AnimationEditor.MountAnimationCreator
             PreviewStatus.Value = Needs(missing);
 
             var batchMissing = new List<string>();
-            if (MountLinkController?.AnimationSetForRider?.SelectedItem == null) batchMissing.Add(_loc.Get("MountAnimationCreator.Needs.RiderSet"));
-            if (MountLinkController?.AnimationSetForMount?.SelectedItem == null) batchMissing.Add(_loc.Get("MountAnimationCreator.Needs.MountSet"));
+            if (Sets?.RiderSet == null) batchMissing.Add(_loc.Get("MountAnimationCreator.Needs.RiderSet"));
+            if (Sets?.MountSet == null) batchMissing.Add(_loc.Get("MountAnimationCreator.Needs.MountSet"));
             if (SelectedRiderBone.SelectedItem == null) batchMissing.Add(_loc.Get("MountAnimationCreator.Needs.RiderBone"));
             if (_mountVertexes.Count == 0) batchMissing.Add(_loc.Get("MountAnimationCreator.Needs.MountVertex"));
             CanBatchProcess.Value = batchMissing.Count == 0;
@@ -284,18 +281,6 @@ namespace AnimationEditor.MountAnimationCreator
             return new MountAnimationGeneratorService(AnimationSettings, _mountVertexOwner, _mountVertexes.First(), SelectedRiderBone.SelectedItem.BoneIndex, _rider, _mount);
         }
 
-        public void ViewMountFragmentAction() => ViewAnimationSet(MountLinkController.AnimationSetForMount.SelectedItem);
-        public void ViewRiderFragmentAction() => ViewAnimationSet(MountLinkController.AnimationSetForRider.SelectedItem);
-
-        void ViewAnimationSet(IAnimationBinGenericFormat animationSet)
-        {
-            if (animationSet != null)
-            {
-                var animpackFileName = animationSet.PackFileReference.FileName;
-                _uiCommandFactory.Create<OpenEditorCommand>().ExecuteAsWindow(animpackFileName, 800, 900);
-            }
-        }
-
         /// <summary>Starts over with an empty tool, in the same tab position.</summary>
         public void ResetTool()
         {
@@ -322,8 +307,8 @@ namespace AnimationEditor.MountAnimationCreator
             if (!CanBatchProcess.Value)
                 return;
 
-            var mountSet = MountLinkController.AnimationSetForMount.SelectedItem;
-            var riderSet = MountLinkController.AnimationSetForRider.SelectedItem;
+            var mountSet = Sets.MountSet;
+            var riderSet = Sets.RiderSet;
             var name = _standardDialogs.ShowTextInputDialog(_loc.Get("MountAnimationCreator.Batch.NameTitle"), Output.SavePrefix.Value + riderSet.Name);
             if (name == null || !name.Result || string.IsNullOrWhiteSpace(name.Text))
                 return;

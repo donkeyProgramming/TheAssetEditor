@@ -36,17 +36,17 @@ namespace Test.AnimationVisualEditors
             sceneObjectEditor.SetMesh(rider, runner.PackFileService.FindFile(RiderMesh)!);
             sceneObjectEditor.SetMesh(mount, runner.PackFileService.FindFile(MountMesh)!);
 
-            var sets = editor.MountLinkController;
-            sets.AnimationSetForMount.SelectedItem = sets.AnimationSetForMount.PossibleValues.First(x => x.Name == MountSet);
-            sets.AnimationSetForRider.SelectedItem = sets.AnimationSetForRider.PossibleValues.First(x => x.Name == riderSet);
+            var sets = editor.Sets;
+            sets.Mount.FragmentList.SelectedItem = sets.Mount.FragmentList.PossibleValues.First(x => x.Name == MountSet);
+            sets.Rider.FragmentList.SelectedItem = sets.Rider.FragmentList.PossibleValues.First(x => x.Name == riderSet);
             return new Tool(runner, output, editor, rider, mount);
         }
 
         static void PickMountSlot(Tool tool, string slot)
         {
-            var sets = tool.Editor.MountLinkController;
-            sets.SelectedMountTag.SelectedItem = sets.SelectedMountTag.PossibleValues.First(x => x.SlotName == slot);
-            Assert.That(sets.SelectedRiderTag.SelectedItem?.SlotName, Is.EqualTo("RIDER_" + slot), "the matching rider slot is picked with it");
+            var sets = tool.Editor.Sets;
+            sets.Mount.FragmentSlotList.SelectedItem = sets.Mount.FragmentSlotList.PossibleValues.First(x => x.SlotName == slot);
+            Assert.That(sets.Rider.FragmentSlotList.SelectedItem?.SlotName, Is.EqualTo("RIDER_" + slot), "the matching rider slot is picked with it");
         }
 
         static RiderAttachmentConverter Converter(Tool tool)
@@ -78,11 +78,11 @@ namespace Test.AnimationVisualEditors
         }
 
         [Test]
-        public void Attached_ConvertsTheRiderAndFollowsTheSlot()
+        public void AttachConversion_ConvertsTheRiderAndFollowsTheSlot()
         {
             var tool = Open(AttachedSet);
             var converter = tool.Editor.AttachedRiders;
-            tool.Editor.SelectedModeTab.Value = MountAnimationCreatorViewModel.AttachedTab;
+            tool.Editor.SelectedModeTab.Value = MountAnimationCreatorViewModel.AttachConversionTab;
 
             Assert.That(converter.CanConvert.Value, Is.False);
             Assert.That(converter.ConvertStatus.Value, Is.Not.Empty, "says what's missing");
@@ -119,7 +119,7 @@ namespace Test.AnimationVisualEditors
             Assert.That(saved, Does.EndWith("new_" + Path.GetFileName(tool.Rider.AnimationName.Value)));
 
             // The other tab takes the preview back
-            tool.Editor.SelectedModeTab.Value = MountAnimationCreatorViewModel.SynchronizedTab;
+            tool.Editor.SelectedModeTab.Value = MountAnimationCreatorViewModel.MountChangeTab;
             Assert.That(converter.CanSave.Value, Is.False);
             Assert.That(preview.Offset, Is.EqualTo(Matrix.Identity));
         }
@@ -143,7 +143,7 @@ namespace Test.AnimationVisualEditors
 
         [TestCase(true)]
         [TestCase(false)]
-        public void Attached_ConvertsTheWholeSet(bool toAttached)
+        public void AttachConversion_ConvertsTheWholeSet(bool toAttached)
         {
             // Empire is synchronized and Kislev attached; each converts to the other
             var tool = Open(toAttached ? SynchronizedSet : AttachedSet);
@@ -151,7 +151,7 @@ namespace Test.AnimationVisualEditors
             ConvertSet(tool, toAttached);
 
             var pfs = tool.Runner.PackFileService;
-            var original = (AnimationBinWh3)tool.Editor.MountLinkController.AnimationSetForRider.SelectedItem!;
+            var original = (AnimationBinWh3)tool.Editor.Sets.Rider.FragmentList.SelectedItem!;
             var converted = SavedSet(tool, "test_riders");
             Assert.That(converted.Name, Is.EqualTo("test_riders"));
             Assert.That(converted.MountBin, Is.EqualTo(MountSet));
@@ -179,15 +179,15 @@ namespace Test.AnimationVisualEditors
             }
 
             // The new set shows up in the set list, and the picked set stays picked
-            Assert.That(tool.Editor.MountLinkController.AnimationSetForRider.PossibleValues.Select(x => x.Name), Does.Contain("test_riders"));
-            Assert.That(tool.Editor.MountLinkController.AnimationSetForRider.SelectedItem?.Name, Is.EqualTo(original.Name));
+            Assert.That(tool.Editor.Sets.Rider.FragmentList.PossibleValues.Select(x => x.Name), Does.Contain("test_riders"));
+            Assert.That(tool.Editor.Sets.Rider.FragmentList.SelectedItem?.Name, Is.EqualTo(original.Name));
         }
 
         // A rider animation shared by slots whose mount animations differ is converted once per mount animation.
         // With unique names off, those conversions must still go to separate files.
         [TestCase(true)]
         [TestCase(false)]
-        public void Attached_ConvertsTheWholeSet_WithoutUniqueNames_GivesEachMountAnimationItsOwnFile(bool toAttached)
+        public void AttachConversion_ConvertsTheWholeSet_WithoutUniqueNames_GivesEachMountAnimationItsOwnFile(bool toAttached)
         {
             var tool = Open(toAttached ? SynchronizedSet : AttachedSet);
             tool.Editor.Output.EnsureUniqueFileName.Value = false;
@@ -204,12 +204,12 @@ namespace Test.AnimationVisualEditors
         {
             var tool = Open(SynchronizedSet);
             PickMountSlot(tool, "RUN_1");
-            var sets = tool.Editor.MountLinkController;
-            sets.SelectedRiderTag.SelectedItem = sets.SelectedRiderTag.PossibleValues.First(x => x.SlotName == "RIDER_WALK_1");
+            var sets = tool.Editor.Sets;
+            sets.Rider.FragmentSlotList.SelectedItem = sets.Rider.FragmentSlotList.PossibleValues.First(x => x.SlotName == "RIDER_WALK_1");
             var riderAnimation = tool.Rider.AnimationName.Value;
 
             // Saving an animpack reloads the set lists
-            var riderBin = (AnimationBinWh3)sets.AnimationSetForRider.SelectedItem!;
+            var riderBin = (AnimationBinWh3)sets.Rider.FragmentList.SelectedItem!;
             var animPack = new AnimationPackFileDatabase("test_reload");
             animPack.AddFile(new AnimationBinWh3("animations/database/battle/bin/test_reload.bin")
             {
@@ -225,14 +225,14 @@ namespace Test.AnimationVisualEditors
             var fileSaveService = (IFileSaveService)tool.Runner.ServiceProvider.GetService(typeof(IFileSaveService))!;
             fileSaveService.Save(RiderSetBatchService.AnimPackPath("test_reload"), AnimationPackSerializer.ConvertToBytes(animPack), false);
 
-            Assert.That(sets.AnimationSetForRider.PossibleValues.Select(x => x.Name), Does.Contain("test_reload"), "the set lists were reloaded");
-            Assert.That(sets.SelectedMountTag.SelectedItem?.SlotName, Is.EqualTo("RUN_1"));
-            Assert.That(sets.SelectedRiderTag.SelectedItem?.SlotName, Is.EqualTo("RIDER_WALK_1"));
+            Assert.That(sets.Rider.FragmentList.PossibleValues.Select(x => x.Name), Does.Contain("test_reload"), "the set lists were reloaded");
+            Assert.That(sets.Mount.FragmentSlotList.SelectedItem?.SlotName, Is.EqualTo("RUN_1"));
+            Assert.That(sets.Rider.FragmentSlotList.SelectedItem?.SlotName, Is.EqualTo("RIDER_WALK_1"));
             Assert.That(tool.Rider.AnimationName.Value, Is.EqualTo(riderAnimation));
         }
 
         [Test]
-        public void Synchronized_GluesTheRiderToTheMountVertex()
+        public void MountChange_GluesTheRiderToTheNewMountsVertex()
         {
             var tool = Open(SynchronizedSet);
             PickMountSlot(tool, "RUN_1");
@@ -260,12 +260,12 @@ namespace Test.AnimationVisualEditors
             Assert.That(SavedFiles(tool).Single(), Does.EndWith("new_" + Path.GetFileName(tool.Rider.AnimationName.Value)));
 
             // The other tab clears it
-            tool.Editor.SelectedModeTab.Value = MountAnimationCreatorViewModel.AttachedTab;
+            tool.Editor.SelectedModeTab.Value = MountAnimationCreatorViewModel.AttachConversionTab;
             Assert.That(preview.AnimationClip, Is.Null);
         }
 
         [Test]
-        public void Synchronized_MakesTheWholeSet()
+        public void MountChange_RefitsTheWholeRiderSet()
         {
             var tool = Open(SynchronizedSet);
             Assert.That(tool.Editor.CanBatchProcess.Value, Is.False);
@@ -278,7 +278,7 @@ namespace Test.AnimationVisualEditors
             tool.Editor.BatchProcessUsingFragmentsAction();
             tool.Runner.Dialogs.Verify(x => x.ShowErrorViewDialog(It.IsAny<string>(), It.IsAny<ErrorList>(), false), Times.Once);
 
-            var original = (IAnimationBinGenericFormat)tool.Editor.MountLinkController.AnimationSetForRider.SelectedItem!;
+            var original = (IAnimationBinGenericFormat)tool.Editor.Sets.Rider.FragmentList.SelectedItem!;
             var made = (IAnimationBinGenericFormat)SavedSet(tool, "test_riders");
             Assert.That(made.MountBin, Is.EqualTo(MountSet));
             Assert.That(made.Entries.Select(x => x.SlotName), Is.EqualTo(original.Entries.Select(x => x.SlotName)), "every slot and variant of the rider set");
@@ -301,7 +301,7 @@ namespace Test.AnimationVisualEditors
             var fresh = (MountAnimationCreatorViewModel)open[0];
             Assert.That(fresh, Is.Not.SameAs(tool.Editor));
             Assert.That(fresh.GetSceneObjectFromId(MountToolIds.Rider)!.Data.MeshName.Value, Is.Empty);
-            Assert.That(fresh.MountLinkController.AnimationSetForRider.SelectedItem, Is.Null);
+            Assert.That(fresh.Sets.Rider.FragmentList.SelectedItem, Is.Null);
         }
     }
 }

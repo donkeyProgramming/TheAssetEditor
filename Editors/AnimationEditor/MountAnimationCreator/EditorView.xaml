@@ -58,18 +58,16 @@
         <TextBlock Text="{loc:Loc MountAnimationCreator.Title}" FontSize="18" FontWeight="Bold"/>
         <TextBlock Style="{StaticResource Info}" Text="{loc:Loc MountAnimationCreator.Intro}"/>
 
-        <local:MountLinkSubView/>
-
         <TabControl Margin="0,8,0,0" SelectedIndex="{Binding SelectedModeTab.Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
-            <TabItem Header="{loc:Loc MountAnimationCreator.Tabs.Synchronized}" ToolTip="{loc:Loc MountAnimationCreator.Tabs.Synchronized.ToolTip}">
+            <TabItem Header="{loc:Loc MountAnimationCreator.Tabs.MountChange}" ToolTip="{loc:Loc MountAnimationCreator.Tabs.MountChange.ToolTip}">
                 <StackPanel>
-                    <TextBlock Style="{StaticResource Info}" Text="{loc:Loc MountAnimationCreator.Synchronized.Intro}"/>
+                    <TextBlock Style="{StaticResource Info}" Text="{loc:Loc MountAnimationCreator.MountChange.Intro}"/>
                     <local:RiderAttachmentSubView/>
                     <views:AnimationSettingsView DataContext="{Binding AnimationSettings, Mode=OneTime}"/>
                     <views:SaveAndPreviewView/>
                 </StackPanel>
             </TabItem>
-            <TabItem Header="{loc:Loc MountAnimationCreator.Tabs.Attached}" ToolTip="{loc:Loc MountAnimationCreator.Tabs.Attached.ToolTip}">
+            <TabItem Header="{loc:Loc MountAnimationCreator.Tabs.AttachConversion}" ToolTip="{loc:Loc MountAnimationCreator.Tabs.AttachConversion.ToolTip}">
                 <views:AttachedRiderConversionView DataContext="{Binding AttachedRiders, Mode=OneTime}"/>
             </TabItem>
         </TabControl>

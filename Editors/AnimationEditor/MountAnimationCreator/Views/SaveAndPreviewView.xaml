@@ -8,19 +8,29 @@
              mc:Ignorable="d"
              d:DesignHeight="200" d:DesignWidth="450">
 
-    <Expander>
-        <Expander.Header>
-            <TextBlock Style="{DynamicResource SectionHeader}" Text="{loc:Loc MountAnimationCreator.SaveAndPreview}"/>
-        </Expander.Header>
-        <StackPanel Margin="10,0,0,0">
-            <UniformGrid Columns="2">
-                <Button Content="{loc:Loc MountAnimationCreator.Buttons.UpdatePreview}" ToolTip="{loc:Loc MountAnimationCreator.Buttons.UpdatePreview.ToolTip}" Click="{s:MethodBinding CreateMountAnimationAction}" IsEnabled="{Binding CanPreview.Value, UpdateSourceTrigger=PropertyChanged}"/>
-                <Button Content="{loc:Loc MountAnimationCreator.Buttons.SaveCurrent}" ToolTip="{loc:Loc MountAnimationCreator.Buttons.SaveCurrent.ToolTip}" Click="{s:MethodBinding SaveCurrentAnimationAction}" IsEnabled="{Binding CanSave.Value, UpdateSourceTrigger=PropertyChanged}"/>
-            </UniformGrid>
-            <TextBlock Style="{DynamicResource Status}" Text="{Binding PreviewStatus.Value, UpdateSourceTrigger=PropertyChanged}"/>
+    <StackPanel>
+        <Expander>
+            <Expander.Header>
+                <TextBlock Style="{DynamicResource SectionHeader}" Text="{loc:Loc MountAnimationCreator.ThisSlot}"/>
+            </Expander.Header>
+            <StackPanel Margin="10,0,0,0">
+                <UniformGrid Columns="2">
+                    <Button Content="{loc:Loc MountAnimationCreator.Buttons.UpdatePreview}" ToolTip="{loc:Loc MountAnimationCreator.Buttons.UpdatePreview.ToolTip}" Click="{s:MethodBinding CreateMountAnimationAction}" IsEnabled="{Binding CanPreview.Value, UpdateSourceTrigger=PropertyChanged}"/>
+                    <Button Content="{loc:Loc MountAnimationCreator.Buttons.SaveCurrent}" ToolTip="{loc:Loc MountAnimationCreator.Buttons.SaveCurrent.ToolTip}" Click="{s:MethodBinding SaveCurrentAnimationAction}" IsEnabled="{Binding CanSave.Value, UpdateSourceTrigger=PropertyChanged}"/>
+                </UniformGrid>
+                <TextBlock Style="{DynamicResource Status}" Text="{Binding PreviewStatus.Value, UpdateSourceTrigger=PropertyChanged}"/>
+            </StackPanel>
+        </Expander>
 
-            <Button Content="{loc:Loc MountAnimationCreator.Buttons.BatchSaveFragment}" ToolTip="{loc:Loc MountAnimationCreator.Buttons.BatchSaveFragment.ToolTip}" Click="{s:MethodBinding BatchProcessUsingFragmentsAction}" IsEnabled="{Binding CanBatchProcess.Value, UpdateSourceTrigger=PropertyChanged}"/>
-            <TextBlock Style="{DynamicResource Status}" Text="{Binding BatchStatus.Value, UpdateSourceTrigger=PropertyChanged}"/>
-        </StackPanel>
-    </Expander>
+        <Expander>
+            <Expander.Header>
+                <TextBlock Style="{DynamicResource SectionHeader}" Text="{loc:Loc MountAnimationCreator.WholeSet}"/>
+            </Expander.Header>
+            <StackPanel Margin="10,0,0,0">
+                <TextBlock Style="{DynamicResource Info}" Text="{loc:Loc MountAnimationCreator.MountChange.WholeSet.Info}"/>
+                <Button Content="{loc:Loc MountAnimationCreator.Buttons.RefitSet}" ToolTip="{loc:Loc MountAnimationCreator.Buttons.RefitSet.ToolTip}" Click="{s:MethodBinding BatchProcessUsingFragmentsAction}" IsEnabled="{Binding CanBatchProcess.Value, UpdateSourceTrigger=PropertyChanged}"/>
+                <TextBlock Style="{DynamicResource Status}" Text="{Binding BatchStatus.Value, UpdateSourceTrigger=PropertyChanged}"/>
+            </StackPanel>
+        </Expander>
+    </StackPanel>
 </UserControl>

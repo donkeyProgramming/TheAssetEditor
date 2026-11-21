@@ -37,7 +37,7 @@
 
         <Expander>
             <Expander.Header>
-                <TextBlock Style="{DynamicResource SectionHeader}" Text="{loc:Loc MountAnimationCreator.AttachedRiders.ThisAnimation}"/>
+                <TextBlock Style="{DynamicResource SectionHeader}" Text="{loc:Loc MountAnimationCreator.ThisSlot}"/>
             </Expander.Header>
             <StackPanel Margin="10,0,0,0">
                 <UniformGrid Columns="2">
@@ -51,7 +51,7 @@
 
         <Expander>
             <Expander.Header>
-                <TextBlock Style="{DynamicResource SectionHeader}" Text="{loc:Loc MountAnimationCreator.AttachedRiders.WholeSet}"/>
+                <TextBlock Style="{DynamicResource SectionHeader}" Text="{loc:Loc MountAnimationCreator.WholeSet}"/>
             </Expander.Header>
             <StackPanel Margin="10,0,0,0">
                 <TextBlock Style="{DynamicResource Info}" Text="{loc:Loc MountAnimationCreator.AttachedRiders.WholeSet.Info}"/>
