@@ -30,7 +30,6 @@ namespace Editors.AnimationVisualEditors.AnimationKeyframeEditor
     {
         public static string Rider => "Rider";
         public static string Mount => "Mount";
-        public static string Generated => "Generated";
     }
 
     public class AnimationKeyframeEditorViewModel : EditorHostBase, IDisposable
@@ -59,7 +58,6 @@ namespace Editors.AnimationVisualEditors.AnimationKeyframeEditor
         public CommandManager CommandManager { get => _commandExecutor; private set { _commandExecutor = value; } }
         private CommandManager _commandExecutor;
         private readonly IFileSaveService _packFileSaveService;
-        private SceneObject _newAnimation;
 
         public SceneObject Mount { get => _mount; private set { _mount = value; } }
         private SceneObject _mount;
@@ -125,8 +123,8 @@ namespace Editors.AnimationVisualEditors.AnimationKeyframeEditor
         }
         private string _txtEditDurationInSeconds = "";
 
-        public NotifyAttr<string> SelectedFrameAInterpolation { get; set; } = new("Not set");
-        public NotifyAttr<string> SelectedFrameBInterpolation { get; set; } = new("Not set");
+        public NotifyAttr<string> SelectedFrameAInterpolation { get; set; } = new("-");
+        public NotifyAttr<string> SelectedFrameBInterpolation { get; set; } = new("-");
 
         public bool PreviewInterpolation
         {
@@ -216,10 +214,7 @@ namespace Editors.AnimationVisualEditors.AnimationKeyframeEditor
             var mountItem = _sceneObjectViewModelBuilder.CreateAsset(KeyframeEditorIds.Mount, true, "Mount", Color.Black, null);
             mountItem.Data.IsSelectable = true;
 
-            var propAsset = _sceneObjectEditor.CreateAsset(KeyframeEditorIds.Generated, "New Anim", Color.Red);
-            _animationPlayerViewModel.RegisterAsset(propAsset);
-
-            Create(riderItem.Data, mountItem.Data, propAsset);
+            Create(riderItem.Data, mountItem.Data);
             SceneObjects.Add(riderItem);
             SceneObjects.Add(mountItem);
 
@@ -227,11 +222,13 @@ namespace Editors.AnimationVisualEditors.AnimationKeyframeEditor
             _copyPastePose = new(this);
             _copyPasteClipboardPose = new(this);
             _interpolateBetweenPose = new(this);
+
+            // After the gizmo toolbox's handler, which clears the bone selection on every frame change
+            _rider.Player.OnFrameChanged += RiderOnFrameStepped;
         }
 
-        internal void Create(SceneObject rider, SceneObject mount, SceneObject newAnimation)
+        internal void Create(SceneObject rider, SceneObject mount)
         {
-            _newAnimation = newAnimation;
             _mount = mount;
             _rider = rider;
 
@@ -259,6 +256,22 @@ namespace Editors.AnimationVisualEditors.AnimationKeyframeEditor
                 CurrentFrameNumber.Value = _rider.Player.CurrentFrame.ToString();
                 TotalFrameNumber.Value = _rider.Player.AnimationClip.DynamicFrames.Count.ToString();
             }
+            else
+            {
+                CurrentFrameNumber.Value = "";
+                TotalFrameNumber.Value = "";
+            }
+        }
+
+        // Frames are stepped with the animation controls under the viewport, or by a paste that moves on a frame
+        private void RiderOnFrameStepped(int currentFrame)
+        {
+            if (_rider.Player.IsPlaying || _rider.AnimationClip == null)
+                return;
+
+            if (AutoSelectPreviousBonesOnFrameChange.Value && GetSelectedBones()?.Count > 0)
+                SelectPreviousBones();
+            EnableInterpolationSliderWithinRange();
         }
 
         private void MountSkeletonChanged(GameSkeleton newValue)
@@ -268,8 +281,7 @@ namespace Editors.AnimationVisualEditors.AnimationKeyframeEditor
 
         private void TryReGenerateAnimation(AnimationClip newValue = null)
         {
-            if (_newAnimation != null)
-                _sceneObjectEditor.SetAnimation(_newAnimation, null);
+            RiderOnFrameChanged(_rider.Player.CurrentFrame);
 
             if (newValue != null)
             {
@@ -542,81 +554,12 @@ namespace Editors.AnimationVisualEditors.AnimationKeyframeEditor
             IsDirty.Value = true;
         }
 
-        public void FirstFrame()
-        {
-            if (_rider.AnimationClip == null)
-            {
-                MessageBox.Show("animation not loaded!", "warn", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                return;
-            }
-
-            Pause();
-            _rider.Player.CurrentFrame = 0;
-            if (_mount.AnimationClip != null) _mount.Player.CurrentFrame = 0;
-            if (AutoSelectPreviousBonesOnFrameChange.Value)
-            {
-                SelectPreviousBones();
-            }
-        }
-
-        public void PrevFrame()
-        {
-            if (_rider.AnimationClip == null)
-            {
-                MessageBox.Show("animation not loaded!", "warn", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                return;
-            }
-
-            Pause();
-            _rider.Player.CurrentFrame--;
-            if (_mount.AnimationClip != null) _mount.Player.CurrentFrame--;
-            if (AutoSelectPreviousBonesOnFrameChange.Value)
-            {
-                SelectPreviousBones();
-            }
-            EnableInterpolationSliderWithinRange();
-        }
         public void NextFrame()
         {
-            if (_rider.AnimationClip == null)
-            {
-                MessageBox.Show("animation not loaded!", "warn", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                return;
-            }
-
             Pause();
             _rider.Player.CurrentFrame++;
             if (_mount.AnimationClip != null) _mount.Player.CurrentFrame++;
-            if (AutoSelectPreviousBonesOnFrameChange.Value)
-            {
-                SelectPreviousBones();
-            }
-            EnableInterpolationSliderWithinRange();
         }
-
-        public void LastFrame()
-        {
-            if (_rider.AnimationClip == null)
-            {
-                MessageBox.Show("animation not loaded!", "warn", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                return;
-            }
-
-            _rider.Player.CurrentFrame = _rider.AnimationClip.DynamicFrames.Count - 2;
-            _rider.Player.CurrentFrame++;
-            if (_mount.AnimationClip != null)
-            {
-                _mount.Player.CurrentFrame = _mount.AnimationClip.DynamicFrames.Count - 2;
-                _mount.Player.CurrentFrame++;
-            }
-            Pause();
-            if (AutoSelectPreviousBonesOnFrameChange.Value)
-            {
-                SelectPreviousBones();
-            }
-            ResetInterpolationSlider();
-        }
-
 
         public void SetFrameLengthMax()
         {
@@ -685,11 +628,6 @@ namespace Editors.AnimationVisualEditors.AnimationKeyframeEditor
             _interpolateBetweenPose.ApplySingleFrame();
         }
 
-        public void ApplyInterpolationAcrossFrames()
-        {
-            MessageBox.Show("not available yet, in the meantime you can do it manually using the slider");
-        }
-
         public void Save()
         {
             if (_rider.AnimationClip == null)
@@ -740,6 +678,7 @@ namespace Editors.AnimationVisualEditors.AnimationKeyframeEditor
                 _rider.SkeletonChanged -= RiderSkeletonChanges;
                 _rider.AnimationChanged -= TryReGenerateAnimation;
                 _rider.Player.OnFrameChanged -= RiderOnFrameChanged;
+                _rider.Player.OnFrameChanged -= RiderOnFrameStepped;
             }
         }
     }
