@@ -39,9 +39,8 @@ namespace AnimationEditor.MountAnimationCreator
     }
 
     /// <summary>
-    /// The Rider Animation Editor. Its two tabs make the two kinds of WH3 rider animation: Synchronized makes riders
-    /// that share the mount's ground frame by gluing a rider animation to a point on the mount; Attached converts
-    /// riders to and from attached (war beast) riding, where the game glues the rider to an attach bone.
+    /// The Rider Animation Editor. Synchronized tab: glues a rider animation to a mount vertex. Attached tab: converts
+    /// riders to and from attached (war beast) riding.
     /// </summary>
     public class MountAnimationCreatorViewModel : EditorHostBase, IDisposable
     {
@@ -83,7 +82,6 @@ namespace AnimationEditor.MountAnimationCreator
 
         public NotifyAttr<string> SelectedVertexesText { get; set; } = new NotifyAttr<string>("");
 
-        /// <summary>0: Synchronized, 1: Attached.</summary>
         public NotifyAttr<int> SelectedModeTab { get; }
         public static int SynchronizedTab => 0;
         public static int AttachedTab => 1;
@@ -168,7 +166,7 @@ namespace AnimationEditor.MountAnimationCreator
             RiderSkeletonChanges(_rider.Skeleton);
         }
 
-        // The two tabs share the preview rider: each tab fills it with its own result.
+        // The tabs share the preview rider, each filling it with its own result
         void OnModeTabChanged(int tab)
         {
             AttachedRiders.IsActive = tab == AttachedTab;

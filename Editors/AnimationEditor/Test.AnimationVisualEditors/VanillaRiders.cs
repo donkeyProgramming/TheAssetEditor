@@ -11,8 +11,7 @@ using Test.TestingUtility.Shared;
 
 namespace Test.AnimationVisualEditors
 {
-    // Vanilla WH3 riders, read from the game's packs in the data folder in WH3_DATA; the tests are skipped without it.
-    // Two ways of riding the same horse (hr1_warhorse):
+    // Vanilla WH3 riders, read from the packs in WH3_DATA (tests skip without it). Two ways of riding hr1_warhorse:
     //   hu1_empire_hr1_warhorse_hammer      synchronized: animroot moves with the mount's, the rider sits at saddle height
     //   hu1_wh3_kislev_hr1_warhorse_sword   attached: animroot at the origin, glued to ap_riderposition_0 of the tech skeleton
     static class VanillaRiders
@@ -25,8 +24,7 @@ namespace Test.AnimationVisualEditors
         public const string RiderMesh = @"variantmeshes\wh_variantmodels\hu1\emp\emp_arch_lector\cape\emp_arch_lector_cape_01.rigid_model_v2";
         public const string MountMesh = @"variantmeshes\wh_variantmodels\hr1\emp\emp_boris_todbringer_mount\emp_boris_todbringer_mount_01.rigid_model_v2";
 
-        // anim.pack: the animation sets. anim2.pack: animations and skeletons. variants.pack: the horse mesh and its
-        // tech skeleton. variants4.pack: a humanoid mesh.
+        // Sets; animations and skeletons; the horse mesh and tech skeleton; a humanoid mesh
         static readonly string[] Packs = ["anim.pack", "anim2.pack", "variants.pack", "variants4.pack"];
 
         public static AssetEditorTestRunner Load()

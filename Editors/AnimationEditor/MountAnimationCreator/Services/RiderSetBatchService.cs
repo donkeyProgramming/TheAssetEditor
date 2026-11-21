@@ -25,10 +25,8 @@ namespace Editors.AnimationVisualEditors.MountAnimationCreator.Services
     }
 
     /// <summary>
-    /// Makes a new animation set from a rider set: every animation of a RIDER_ slot whose mount slot is in the mount
-    /// set goes through a processor, which makes the new animation or keeps the original. The new set has every slot
-    /// and variant of the rider set, pointing at the new animations where there are some, and names the mount set as
-    /// its mount. It's saved as an animpack in animations\database\battle\bin.
+    /// Makes a new animation set from a rider set, passing each mounted RIDER_ animation through a processor. Every
+    /// slot and variant of the rider set is kept, and the mount set is named as its mount.
     /// </summary>
     public class RiderSetBatchService
     {
@@ -59,7 +57,7 @@ namespace Editors.AnimationVisualEditors.MountAnimationCreator.Services
             var riderSkeleton = new GameSkeleton(_skeletonLookUp.GetSkeletonFileFromName(riderSet.SkeletonName), null);
             var mountSkeleton = new GameSkeleton(_skeletonLookUp.GetSkeletonFileFromName(mountSet.SkeletonName), null);
             var mountSlots = mountSet.Entries.GroupBy(x => x.SlotName).ToDictionary(x => x.Key, x => x.ToList());
-            // Slots often share an animation (RIDER_STAND and RIDER_COMBAT_READY, say): one new file per rider and mount animation pair
+            // Slots often share an animation: one new file per rider and mount animation pair
             var made = new Dictionary<(string Rider, string Mount), string>(new PathPairComparer());
 
             var newBin = new AnimationBinWh3($"animations/database/battle/bin/{newSetName}.bin")
@@ -128,7 +126,7 @@ namespace Editors.AnimationVisualEditors.MountAnimationCreator.Services
                         continue;
                     }
 
-                    // The processor decides per slot, so a shared animation can be kept in one slot and remade in another
+                    // Checked after the processor, which may keep a shared animation in one slot and remake it in another
                     if (made.TryGetValue((animation.AnimationFile, mountAnimation), out var madeEarlier))
                     {
                         newRef.AnimationFile = madeEarlier;

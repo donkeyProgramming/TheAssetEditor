@@ -11,7 +11,7 @@
              d:DesignHeight="800" d:DesignWidth="450">
 
     <UserControl.Resources>
-        <!-- Shared by the sub views: text wraps instead of being cut off when the panel is narrow -->
+        <!-- Shared by the sub views: text wraps in a narrow panel -->
         <DataTemplate x:Key="WrappingText">
             <TextBlock Text="{Binding}" TextWrapping="Wrap" TextAlignment="Center"/>
         </DataTemplate>

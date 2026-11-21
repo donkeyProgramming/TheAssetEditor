@@ -6,8 +6,7 @@ using static Test.AnimationVisualEditors.VanillaRiders;
 
 namespace Test.AnimationVisualEditors
 {
-    // The same performance can't be compared bone for bone across the two vanilla riders (they're different
-    // animations), so they're compared on where the pelvis sits; a round trip is compared exactly.
+    // The two vanilla riders are different performances, so they're compared on the pelvis; a round trip exactly
     public class RiderAttachmentConverterTests
     {
         // Slots where the two vanilla riders do the same thing, so their poses are comparable
@@ -57,9 +56,8 @@ namespace Test.AnimationVisualEditors
             Assert.That(RiderAttachmentConverter.IsAttached(converted), Is.True);
         }
 
-        // Every bone but animroot comes back. Animroot can't after synchronized -> attached: an attached animation keeps
-        // it at the origin, so vanilla's own synchronized animroot motion (it wanders in turns, combat idles and deaths)
-        // has nowhere to go. The rebuilt one follows the mount's, which leaves every other bone where it was.
+        // Animroot can't come back from attached, which keeps it at the origin, so vanilla's own wandering
+        // synchronized animroot is lost. The rebuilt one follows the mount's; every other bone comes back.
         [TestCaseSource(nameof(Slots))]
         public void RoundTrip_KeepsEveryBoneButAnimroot(string slot)
         {
@@ -68,8 +66,7 @@ namespace Test.AnimationVisualEditors
                 (p.Attached, p.Converter.ToAttached(p.Converter.ToSynchronized(p.Attached))),
                 (p.Synchronized, p.Converter.ToSynchronized(p.Converter.ToAttached(p.Synchronized))) })
             {
-                // Compared with the input's animroot and its children normalised: vanilla stores them slightly off unit length
-                // (8-bit quantised), which no rewritten pose keeps.
+                // Vanilla stores animroot and its children slightly off unit length, which no rewritten pose keeps
                 var normalised = original.Clone();
                 foreach (var frame in normalised.DynamicFrames)
                     foreach (var bone in p.Rider.GetDirectChildBones(0).Append(0))

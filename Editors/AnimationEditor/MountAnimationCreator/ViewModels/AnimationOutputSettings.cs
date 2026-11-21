@@ -17,7 +17,7 @@ namespace AnimationEditor.MountAnimationCreator.ViewModels
         public ObservableCollection<uint> AnimationOutputFormats { get; } = [5, 6, 7];
         public NotifyAttr<uint> SelectedAnimationOutputFormat { get; } = new(7);
 
-        /// <summary>Next to the animation it was made from, with the prefix; with a number added if the name is taken and unique names are on.</summary>
+        /// <summary>Next to the source, with the prefix, numbered if taken and unique names are on.</summary>
         public string OutputPath(IPackFileService pfs, string sourcePath)
         {
             var directory = Path.GetDirectoryName(sourcePath);

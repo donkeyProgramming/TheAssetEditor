@@ -120,7 +120,7 @@ namespace AnimationEditor.MountAnimationCreator.ViewModels
         public void ConvertRiderToAttached() => Convert(toAttached: true);
         public void ConvertRiderToSynchronized() => Convert(toAttached: false);
 
-        /// <summary>A new rider or mount animation, or attach bone: the last conversion is redone on it.</summary>
+        /// <summary>Redoes the last conversion on a new rider or mount animation, or attach bone.</summary>
         public void OnSourceChanged()
         {
             UpdateStates();

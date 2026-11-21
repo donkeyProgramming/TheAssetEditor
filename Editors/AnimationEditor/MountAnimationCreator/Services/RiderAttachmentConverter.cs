@@ -6,13 +6,9 @@ using Microsoft.Xna.Framework;
 namespace AnimationEditor.MountAnimationCreator.Services
 {
     /// <summary>
-    /// Converts a rider animation between the two ways WH3 puts a rider on a mount.
-    /// Synchronized: rider and mount share the ground frame; the rider's animroot moves with the
-    /// mount's and the rider sits at saddle height (e.g. hu1_empire_hr1_warhorse_hammer).
-    /// Attached: the game glues the rider's animroot to an ap_ bone of the mount's tech skeleton
-    /// (e.g. ap_riderposition_0 in emp_warbeast_horse_01's tech skeleton), so the animroot stays at
-    /// the origin and the rider sits on it (e.g. hu1_wh3_kislev_hr1_warhorse_sword).
-    /// Both directions need the mount animation the rider plays with: the attach bone moves with it.
+    /// Converts a rider animation between WH3's two ways of riding. Synchronized: the rider's animroot moves with
+    /// the mount's. Attached: the game glues the rider's animroot to an ap_ bone of the mount's tech skeleton, so
+    /// it stays at the origin. Both need the mount animation, which moves the attach bone.
     /// </summary>
     public class RiderAttachmentConverter
     {
@@ -29,20 +25,18 @@ namespace AnimationEditor.MountAnimationCreator.Services
             _mountSkeleton = mountSkeleton;
             _mountClip = mountClip;
 
-            // The attach bone isn't animated: it's its rest transform under its parent, which the
-            // mount animation moves. The parent has to be the same bone in the mount skeleton.
+            // The attach bone isn't animated: it rides at its rest transform on a parent the mount skeleton must share
             _attachParentBone = attachSkeleton.GetParentBoneIndex(attachBone);
             if (_attachParentBone < 0 || _attachParentBone >= mountSkeleton.BoneCount ||
                 !string.Equals(attachSkeleton.BoneNames[_attachParentBone], mountSkeleton.BoneNames[_attachParentBone], StringComparison.OrdinalIgnoreCase))
                 throw new ArgumentException($"The attach bone '{attachSkeleton.BoneNames[attachBone]}' hangs off a bone the mount skeleton '{mountSkeleton.SkeletonName}' doesn't have at the same index.");
 
-            // Normalised: vanilla tech skeletons store it slightly off unit length (emp_warbeast_horse_01: |q|² ≈ 0.9997).
+            // Normalised: vanilla tech skeletons store it slightly off unit length
             _attachLocal = Matrix.CreateFromQuaternion(Quaternion.Normalize(attachSkeleton.Rotation[attachBone])) * Matrix.CreateTranslation(attachSkeleton.Translation[attachBone]);
         }
 
-        /// <summary>The attach bone's world transform at <paramref name="riderFrame"/> of a rider clip with
-        /// <paramref name="riderFrameCount"/> frames. The mount is sampled at the same point in time, so
-        /// clips of different lengths line up start to end.</summary>
+        /// <summary>The attach bone's world transform at a rider frame. The mount is sampled at the same normalised
+        /// time, so clips of different lengths line up start to end.</summary>
         public Matrix AttachPointWorld(int riderFrame, int riderFrameCount)
         {
             var mountFrame = AnimationSampler.Sample(NormalisedTime(riderFrame, riderFrameCount), _mountSkeleton, _mountClip);
@@ -57,8 +51,7 @@ namespace AnimationEditor.MountAnimationCreator.Services
 
         static float NormalisedTime(int frame, int frameCount) => frameCount <= 1 ? 0 : frame / (float)(frameCount - 1);
 
-        /// <summary>Synchronized to attached: the rider keeps its pose relative to the attach bone and
-        /// its animroot becomes the identity, as in vanilla attached animations.</summary>
+        /// <summary>Keeps the rider's pose relative to the attach bone and zeroes its animroot.</summary>
         public AnimationClip ToAttached(AnimationClip synchronized)
         {
             var output = synchronized.Clone();
@@ -75,15 +68,14 @@ namespace AnimationEditor.MountAnimationCreator.Services
             return output;
         }
 
-        /// <summary>Attached to synchronized: the rider ends up where the attach bone puts it in the
-        /// mount's ground frame. Its new animroot follows the mount's animroot, offset to sit under
-        /// the attach point, which is how vanilla synchronized riders carry their locomotion.</summary>
+        /// <summary>Puts the rider where the attach bone holds it, under a new animroot that follows the mount's,
+        /// offset to sit under the attach point.</summary>
         public AnimationClip ToSynchronized(AnimationClip attached)
         {
             var output = attached.Clone();
             var frameCount = output.DynamicFrames.Count;
 
-            // The attach point's ground position relative to the mount's animroot, taken at the start.
+            // The attach point's ground position relative to the mount's animroot, at the start
             var startOffset = (AttachPointWorld(0, frameCount) * Matrix.Invert(MountRootWorld(0, frameCount))).Translation;
             var groundOffset = Matrix.CreateTranslation(startOffset.X, 0, startOffset.Z);
 
@@ -101,19 +93,16 @@ namespace AnimationEditor.MountAnimationCreator.Services
             return output;
         }
 
-        /// <summary>Attached animations keep animroot at the origin on every frame. Synchronized ones never
-        /// do: vanilla puts it on the ground under the saddle, about half a metre ahead of the mount's.</summary>
+        /// <summary>Attached animations keep animroot at the origin on every frame; synchronized ones never do.</summary>
         public static bool IsAttached(AnimationClip clip) =>
             clip.DynamicFrames.All(f => f.Position[0].LengthSquared() < 1e-8f && Math.Abs(Math.Abs(Quaternion.Normalize(f.Rotation[0]).W) - 1) < 1e-5f);
 
-        /// <summary>Slots vanilla keeps synchronized in attached sets (hu1_wh3_kislev_hr1_warhorse_sword):
-        /// deaths, where the rider falls off, and the matched combat kills (RIDER_COMBAT_1 and so on).</summary>
+        /// <summary>Slots vanilla attached sets keep synchronized: deaths and the RIDER_COMBAT_&lt;n&gt; kills.</summary>
         public static bool StaysSynchronized(string riderSlot) =>
             riderSlot.StartsWith("RIDER_DEATH_", StringComparison.OrdinalIgnoreCase) ||
             (riderSlot.StartsWith("RIDER_COMBAT_", StringComparison.OrdinalIgnoreCase) && riderSlot.Length > 13 && riderSlot[13..].All(char.IsDigit));
 
-        // Moves every bone directly under animroot (the pelvis "root" and the be_prop_ bones) from the
-        // old animroot's space into the new one's, keeping where they end up in the world.
+        // Moves the bones directly under animroot into the new animroot's space, keeping their world placement
         void Reparent(AnimationClip.KeyFrame frame, Matrix oldToNewAnimRootSpace)
         {
             foreach (var child in _riderSkeleton.GetDirectChildBones(0).Where(x => x < frame.Position.Count))
@@ -124,8 +113,7 @@ namespace AnimationEditor.MountAnimationCreator.Services
             }
         }
 
-        // Normalised: animroot rotations are stored 8-bit quantised (|q|² is up to ~0.7% off in vanilla
-        // turns), which as a matrix is a small distortion no stored pose can keep.
+        // Normalised: animroot rotations are 8-bit quantised, and off unit length they'd distort the matrix
         static Matrix LocalMatrix(AnimationClip.KeyFrame frame, int bone) =>
             Matrix.CreateFromQuaternion(Quaternion.Normalize(frame.Rotation[bone])) * Matrix.CreateTranslation(frame.Position[bone]);
     }
