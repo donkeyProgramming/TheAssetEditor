@@ -15,7 +15,6 @@ namespace Editors.AnimationVisualEditors
         {
             serviceCollection.AddScoped<MountAnimationCreatorViewModel>();
 
-            serviceCollection.AddScoped<EditorHost<AnimationKeyframeEditorViewModel>>();
             serviceCollection.AddScoped<AnimationKeyframeEditorViewModel>();
 
             RegisterAllAsInterface<IDeveloperConfiguration>(serviceCollection, ServiceLifetime.Transient);
@@ -29,8 +28,8 @@ namespace Editors.AnimationVisualEditors
                 .Build(database);
         
             EditorInfoBuilder
-              .Create<EditorHost<AnimationKeyframeEditorViewModel>, EditorHostView>(EditorEnums.AnimationKeyFrame_Editor)
-              .AddToToolbar("KeyFrame Tool", false)
+              .Create<AnimationKeyframeEditorViewModel, EditorHostView>(EditorEnums.AnimationKeyFrame_Editor)
+              .AddToToolbar("KeyFrame Tool", true)
               .Build(database);
         }
     }
