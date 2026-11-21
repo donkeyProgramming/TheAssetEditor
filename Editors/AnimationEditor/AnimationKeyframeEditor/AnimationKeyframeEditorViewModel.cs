@@ -223,7 +223,7 @@ namespace Editors.AnimationVisualEditors.AnimationKeyframeEditor
             _copyPasteClipboardPose = new(this);
             _interpolateBetweenPose = new(this);
 
-            // After the gizmo toolbox's handler, which clears the bone selection on every frame change
+            // After the gizmo toolbox handler, which clears the bone selection on frame change
             _rider.Player.OnFrameChanged += RiderOnFrameStepped;
         }
 
@@ -263,7 +263,7 @@ namespace Editors.AnimationVisualEditors.AnimationKeyframeEditor
             }
         }
 
-        // Frames are stepped with the animation controls under the viewport, or by a paste that moves on a frame
+        // A paused frame change: a step in the viewport controls, or a paste moving on a frame
         private void RiderOnFrameStepped(int currentFrame)
         {
             if (_rider.Player.IsPlaying || _rider.AnimationClip == null)

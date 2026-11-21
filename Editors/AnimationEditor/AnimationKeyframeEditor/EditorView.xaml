@@ -12,7 +12,7 @@
     <UserControl.Resources>
         <controls:BooleanToVisibilityConverter x:Key="boolConv"/>
 
-        <!-- Button and checkbox text wraps instead of being cut off when the panel is narrow -->
+        <!-- Button and checkbox text wraps in a narrow panel -->
         <DataTemplate x:Key="WrappingText">
             <TextBlock Text="{Binding}" TextWrapping="Wrap" TextAlignment="Center"/>
         </DataTemplate>

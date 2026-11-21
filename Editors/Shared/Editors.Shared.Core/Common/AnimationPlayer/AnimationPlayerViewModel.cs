@@ -111,7 +111,7 @@ namespace Editors.Shared.Core.Common.AnimationPlayer
             SelectedAnimationMaxTime.Value = (float)SelectedMainAnimation.Asset.Player.GetAnimationLengthUs() / 1_000_000;
             SelectedAnimationFps.Value = SelectedMainAnimation.Asset.Player.GetFps();
 
-            // Playback reached the end. Stepping onto the last frame isn't the end: a frame starts before it ends.
+            // Playback reached the end. Stepping onto the last frame lands on its start, so it doesn't count
             var player = SelectedMainAnimation.Asset.Player;
             if (player.GetAnimationLengthUs() > 0 && player.GetTimeUs() >= player.GetAnimationLengthUs())
             {

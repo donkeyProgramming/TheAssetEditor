@@ -16,7 +16,7 @@
                     <Button Content="{loc:Loc MountAnimationCreator.Buttons.UpdatePreview}" Click="{s:MethodBinding CreateMountAnimationAction}" IsEnabled="{Binding CanPreview.Value, UpdateSourceTrigger=PropertyChanged}"/>
                 </DockPanel>
 
-                <!-- Save to fragment still targets the WH2 fragment format (see AddAnimationToFragment), so it's hidden until it's rewritten for WH3 bins. -->
+                <!-- Hidden: AddAnimationToFragment still writes WH2 fragments -->
                 <DockPanel Grid.Row="2" Margin="10,5,10,0" Visibility="Collapsed">
                     <Label DockPanel.Dock="Left" Content="{loc:Loc MountAnimationCreator.Labels.SelectedFragment}" HorizontalContentAlignment="Center"/>
                     <Button DockPanel.Dock="Right" Content=".." Width="25" Margin="2" Click="{s:MethodBinding ViewOutputFragmentAction}" />

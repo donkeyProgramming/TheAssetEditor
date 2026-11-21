@@ -135,7 +135,7 @@ namespace AnimationEditor.MountAnimationCreator.ViewModels
             _validateAction();
         }
 
-        // Bin entries can name animations that don't exist (vanilla has some); those load as no animation.
+        // Some vanilla bin entries name animations that don't exist; they load as none
         string FindAnimation(string path) => string.IsNullOrWhiteSpace(path) || _pfs.FindFile(path) == null ? null : path;
     }
 }
