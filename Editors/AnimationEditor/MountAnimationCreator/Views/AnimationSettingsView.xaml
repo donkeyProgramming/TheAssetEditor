@@ -24,8 +24,6 @@
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
 
             <CheckBox Grid.Row="0" Grid.ColumnSpan="2" Content="{loc:Loc MountAnimationCreator.Settings.FitAnimation}" ToolTip="{loc:Loc MountAnimationCreator.Settings.FitAnimation.ToolTip}" IsChecked="{Binding FitAnimation, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
@@ -50,8 +48,6 @@
                 </b:Interaction.Behaviors>
             </TextBox>
 
-            <CheckBox Grid.Row="5" Grid.ColumnSpan="2" Content="{loc:Loc MountAnimationCreator.Settings.KeepRiderRot}" ToolTip="{loc:Loc MountAnimationCreator.Settings.KeepRiderRot.ToolTip}" IsChecked="{Binding KeepRiderRotation, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
-            <CheckBox Grid.Row="6" Grid.ColumnSpan="2" Content="{loc:Loc MountAnimationCreator.Settings.IsRootNodeAnim}" ToolTip="{loc:Loc MountAnimationCreator.Settings.IsRootNodeAnim.ToolTip}" IsChecked="{Binding IsRootNodeAnimation, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
         </Grid>
     </Expander>
 </UserControl>

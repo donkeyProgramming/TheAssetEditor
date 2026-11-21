@@ -52,13 +52,7 @@ namespace AnimationEditor.MountAnimationCreator.ViewModels
             set { SetAndNotify(ref _scale, value); SettingsChanged?.Invoke(); }
         }
 
-        bool _keepRiderRotation = true;
-        public bool KeepRiderRotation
-        {
-            get { return _keepRiderRotation; }
-            set { SetAndNotify(ref _keepRiderRotation, value); SettingsChanged?.Invoke(); }
-        }
-
+        // Set by the tool from the rider skeleton: on when the glued bone hangs off animroot, as on every WH3 rider
         bool _isRootNodeAnimation = false;
         public bool IsRootNodeAnimation
         {

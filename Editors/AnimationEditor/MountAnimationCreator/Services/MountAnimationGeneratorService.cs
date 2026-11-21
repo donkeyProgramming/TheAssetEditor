@@ -64,13 +64,10 @@ namespace AnimationEditor.MountAnimationCreator.Services
                     newRiderAnim.DynamicFrames[i].Rotation[0] = Quaternion.Identity;
                 }
 
-                var origianlRotation = Quaternion.Identity;
-                if (_animationSettings.KeepRiderRotation)
-                {
-                    var riderFrame = AnimationSampler.Sample(i, 0, _riderSkeleton, newRiderAnim);
-                    var riderBoneWorldmatrix = riderFrame.GetSkeletonAnimatedWorld(_riderSkeleton, _riderBoneIndex);
-                    riderBoneWorldmatrix.Decompose(out var _, out origianlRotation, out var _);
-                }
+                // The bone keeps its own rotation: without it, a vanilla rider's pelvis is about 120 degrees off
+                var riderFrame = AnimationSampler.Sample(i, 0, _riderSkeleton, newRiderAnim);
+                var riderBoneWorldmatrix = riderFrame.GetSkeletonAnimatedWorld(_riderSkeleton, _riderBoneIndex);
+                riderBoneWorldmatrix.Decompose(out var _, out var origianlRotation, out var _);
 
                 var originalPosition = newRiderAnim.DynamicFrames[i].Position[_riderBoneIndex];
                 var originalRotation = newRiderAnim.DynamicFrames[i].Rotation[_riderBoneIndex];
