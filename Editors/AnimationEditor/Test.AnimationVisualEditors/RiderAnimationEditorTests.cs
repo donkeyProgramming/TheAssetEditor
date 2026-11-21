@@ -292,7 +292,9 @@ namespace Test.AnimationVisualEditors
         {
             var tool = Open(SynchronizedSet);
             var editors = tool.Runner.ServiceProvider.GetService(typeof(IEditorManager)) as IEditorManager;
+            tool.Runner.Dialogs.Setup(x => x.ShowYesNoBox(It.IsAny<string>(), It.IsAny<string>())).Returns(ShowMessageBoxResult.OK);
             tool.Editor.ResetTool();
+            tool.Runner.Dialogs.Verify(x => x.ShowYesNoBox(It.IsAny<string>(), It.IsAny<string>()), Times.Once);
 
             var open = editors!.GetAllEditors();
             Assert.That(open, Has.Count.EqualTo(1));
