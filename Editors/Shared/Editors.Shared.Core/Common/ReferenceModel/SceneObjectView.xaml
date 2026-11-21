@@ -22,7 +22,7 @@
             </StackPanel>
         </Expander.Header>
 
-        <!-- One grid, so every field ends at the same edge and every button sits in the same column -->
+        <!-- One grid, so the fields and buttons of every row line up -->
         <Grid Margin="5,0,0,0">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="18"/>

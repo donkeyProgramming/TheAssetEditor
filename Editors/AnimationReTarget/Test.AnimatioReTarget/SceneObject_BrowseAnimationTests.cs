@@ -10,9 +10,7 @@ using Test.TestingUtility.TestUtility;
 
 namespace Test.AnimatioReTarget
 {
-    // The scene object panel (used by ReTarget, SuperView, Campaign Animation Creator) lets
-    // you browse for any animation of the loaded skeleton, not only ones reachable through a
-    // fragment + slot. It was hidden in v0.50 (b8679ab0) and removed in v0.58 (d588c232).
+    // The scene object panel can load any animation of its skeleton, not only one in a bin slot
     public class SceneObject_BrowseAnimationTests
     {
         const string KarlMesh = @"variantmeshes\wh_variantmodels\hu1\emp\emp_karl_franz\emp_karl_franz.wsmodel";

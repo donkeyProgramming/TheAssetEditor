@@ -113,9 +113,7 @@ namespace Editors.Shared.Core.Common.ReferenceModel
             animationSlotsCollection.UpdatePossibleValues(value.Entries);
         }
 
-        // An animation picked straight from the packs, not through a bin slot. The slot (and the
-        // slot's meta, which belongs to that slot's animation) is cleared; the persistent meta
-        // belongs to the fragment, so it stays.
+        // An animation picked from the packs, not a slot: clears the slot and its meta, keeps the fragment's persistent meta
         public void SetAnimationFile(PackFile file)
         {
             _isSettingAnimationFile = true;
