@@ -101,6 +101,17 @@ namespace AnimationEditor.MountAnimationCreator.Services
             return output;
         }
 
+        /// <summary>Attached animations keep animroot at the origin on every frame. Synchronized ones never
+        /// do: vanilla puts it on the ground under the saddle, about half a metre ahead of the mount's.</summary>
+        public static bool IsAttached(AnimationClip clip) =>
+            clip.DynamicFrames.All(f => f.Position[0].LengthSquared() < 1e-8f && Math.Abs(Math.Abs(Quaternion.Normalize(f.Rotation[0]).W) - 1) < 1e-5f);
+
+        /// <summary>Slots vanilla keeps synchronized in attached sets (hu1_wh3_kislev_hr1_warhorse_sword):
+        /// deaths, where the rider falls off, and the matched combat kills (RIDER_COMBAT_1 and so on).</summary>
+        public static bool StaysSynchronized(string riderSlot) =>
+            riderSlot.StartsWith("RIDER_DEATH_", StringComparison.OrdinalIgnoreCase) ||
+            (riderSlot.StartsWith("RIDER_COMBAT_", StringComparison.OrdinalIgnoreCase) && riderSlot.Length > 13 && riderSlot[13..].All(char.IsDigit));
+
         // Moves every bone directly under animroot (the pelvis "root" and the be_prop_ bones) from the
         // old animroot's space into the new one's, keeping where they end up in the world.
         void Reparent(AnimationClip.KeyFrame frame, Matrix oldToNewAnimRootSpace)
