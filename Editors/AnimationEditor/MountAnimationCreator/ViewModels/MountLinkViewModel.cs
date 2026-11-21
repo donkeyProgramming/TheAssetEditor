@@ -53,16 +53,20 @@ namespace AnimationEditor.MountAnimationCreator.ViewModels
         /// <summary>Reloads the set lists, keeping the selected sets and slots where they're still there.</summary>
         public void ReloadFragments(bool rider = true, bool mount = true)
         {
+            // Taken first: re-selecting the mount slot also picks its RIDER_ slot, over the one the user picked
+            var riderSlot = SelectedRiderTag.SelectedItem;
+
             if (mount)
-                Reload(AnimationSetForMount, SelectedMountTag, _mount.SkeletonName.Value);
+                Reload(AnimationSetForMount, SelectedMountTag, _mount.SkeletonName.Value, SelectedMountTag.SelectedItem);
             if (rider)
-                Reload(AnimationSetForRider, SelectedRiderTag, _rider.SkeletonName.Value);
+                Reload(AnimationSetForRider, SelectedRiderTag, _rider.SkeletonName.Value, riderSlot);
+            else if (riderSlot != null && SelectedRiderTag.SelectedItem != riderSlot)
+                Reselect(SelectedRiderTag, riderSlot);
         }
 
-        void Reload(FilterCollection<IAnimationBinGenericFormat> sets, FilterCollection<AnimationBinEntryGenericFormat> slots, string skeletonPath)
+        void Reload(FilterCollection<IAnimationBinGenericFormat> sets, FilterCollection<AnimationBinEntryGenericFormat> slots, string skeletonPath, AnimationBinEntryGenericFormat selectedSlot)
         {
             var selectedSet = sets.SelectedItem?.FullPath;
-            var selectedSlot = slots.SelectedItem;
 
             sets.UpdatePossibleValues(LoadAnimationSetForSkeleton(Path.GetFileNameWithoutExtension(skeletonPath)));
             if (selectedSet == null)
@@ -70,8 +74,11 @@ namespace AnimationEditor.MountAnimationCreator.ViewModels
 
             sets.SelectedItem = sets.PossibleValues.FirstOrDefault(x => x.FullPath == selectedSet);
             if (sets.SelectedItem != null && selectedSlot != null)
-                slots.SelectedItem = slots.PossibleValues.FirstOrDefault(x => x.SlotName == selectedSlot.SlotName && x.AnimationFile == selectedSlot.AnimationFile);
+                Reselect(slots, selectedSlot);
         }
+
+        static void Reselect(FilterCollection<AnimationBinEntryGenericFormat> slots, AnimationBinEntryGenericFormat slot) =>
+            slots.SelectedItem = slots.PossibleValues.FirstOrDefault(x => x.SlotName == slot.SlotName && x.AnimationFile == slot.AnimationFile);
 
         public List<IAnimationBinGenericFormat> LoadAnimationSetForSkeleton(string skeletonName, bool onlyPacksThatCanBeSaved = false)
         {

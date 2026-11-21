@@ -10,6 +10,7 @@ using Moq;
 using Shared.Core.Commands;
 using Shared.Core.ErrorHandling;
 using Shared.Core.PackFiles.Models;
+using Shared.Core.PackFiles.Utility;
 using Shared.Core.Services;
 using Shared.Core.ToolCreation;
 using Shared.GameFormats.Animation;
@@ -196,6 +197,38 @@ namespace Test.AnimationVisualEditors
             Assert.That(saved, Is.Unique);
             Assert.That(saved, Has.Some.Contains("new_1_"), "a rider animation was converted against two mount animations");
             Assert.That(SavedFiles(tool).Count(x => x.EndsWith(".anim")), Is.EqualTo(saved.Count));
+        }
+
+        [Test]
+        public void ReloadingTheSets_KeepsBothPickedSlots()
+        {
+            var tool = Open(SynchronizedSet);
+            PickMountSlot(tool, "RUN_1");
+            var sets = tool.Editor.MountLinkController;
+            sets.SelectedRiderTag.SelectedItem = sets.SelectedRiderTag.PossibleValues.First(x => x.SlotName == "RIDER_WALK_1");
+            var riderAnimation = tool.Rider.AnimationName.Value;
+
+            // Saving an animpack reloads the set lists
+            var riderBin = (AnimationBinWh3)sets.AnimationSetForRider.SelectedItem!;
+            var animPack = new AnimationPackFileDatabase("test_reload");
+            animPack.AddFile(new AnimationBinWh3("animations/database/battle/bin/test_reload.bin")
+            {
+                TableVersion = riderBin.TableVersion,
+                TableSubVersion = riderBin.TableSubVersion,
+                Name = "test_reload",
+                MountBin = MountSet,
+                Unknown = riderBin.Unknown,
+                SkeletonName = riderBin.SkeletonName,
+                LocomotionGraph = riderBin.LocomotionGraph,
+                UnknownValue1 = riderBin.UnknownValue1,
+            });
+            var fileSaveService = (IFileSaveService)tool.Runner.ServiceProvider.GetService(typeof(IFileSaveService))!;
+            fileSaveService.Save(RiderSetBatchService.AnimPackPath("test_reload"), AnimationPackSerializer.ConvertToBytes(animPack), false);
+
+            Assert.That(sets.AnimationSetForRider.PossibleValues.Select(x => x.Name), Does.Contain("test_reload"), "the set lists were reloaded");
+            Assert.That(sets.SelectedMountTag.SelectedItem?.SlotName, Is.EqualTo("RUN_1"));
+            Assert.That(sets.SelectedRiderTag.SelectedItem?.SlotName, Is.EqualTo("RIDER_WALK_1"));
+            Assert.That(tool.Rider.AnimationName.Value, Is.EqualTo(riderAnimation));
         }
 
         [Test]
