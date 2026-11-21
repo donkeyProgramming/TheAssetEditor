@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="DocumentationShared.css">
+    <script src="DocumentationShared.js" defer></script>
+</head>
+<body>
+    <h1>Rider Animation Editor</h1>
+    <p>The Rider Animation Editor makes animation sets for mounted riders in Warhammer 3. It never changes a mount's animations. It takes a rider set made for one mount and makes a new set that fits another mount, or converts a rider set between the game's two kinds of riding.</p>
+    <p>
+        General workflow:
+        <br>
+        <b>Load the rider and the mount => Pick their animation sets => Fit one slot in the tab you need => Make the whole set => Ship the editable pack</b>
+    </p>
+
+    <h2>Synchronized and attached riders</h2>
+    <p>Warhammer 3 puts a rider on a mount in one of two ways, and a rider animation is made for one or the other:</p>
+    <ul>
+        <li><b>Synchronized</b> - the rider's animroot moves with the mount's, and the rider sits at saddle height. Example: the Empire horse riders, <code>hu1_empire_hr1_warhorse_hammer</code> on <code>hr1_warhorse</code>.</li>
+        <li><b>Attached</b> - war beast riders. The rider's animroot stays at the origin on every frame, and the game glues it to an attach bone (<code>ap_</code>, usually <code>ap_riderposition_0</code>) of the mount's tech skeleton. Example: the Kislev horse riders, <code>hu1_wh3_kislev_hr1_warhorse_sword</code> on the same <code>hr1_warhorse</code>.</li>
+    </ul>
+    <p>The tech skeleton is an <code>.anim</code> in a <code>tech</code> folder next to the mount's meshes, for example <code>variantmeshes\wh_variantmodels\hr1\emp\emp_warbeast_horse\tech\emp_warbeast_horse_01.anim</code>. It is the mount's skeleton with the attach bones added.</p>
+    <p>An attached set is not attached in every slot. Vanilla keeps its deaths (<code>RIDER_DEATH_...</code>) and its matched kills (<code>RIDER_COMBAT_1</code>, <code>RIDER_COMBAT_2</code> and so on) synchronized. The tool does the same.</p>
+
+    <h2>Which tab to use</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>You have</th>
+                <th>You want</th>
+                <th>Tab</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>A synchronized rider set for one mount (horse riders)</td>
+                <td>The same riders on another mount (a cold one), still synchronized</td>
+                <td><a href="#synchronized-mount-change">Synchronized Mount Change</a></td>
+            </tr>
+            <tr>
+                <td>An attached rider set for one mount</td>
+                <td>The same riders on another mount, still attached</td>
+                <td><a href="#attached-mount-change">Attached Mount Change</a></td>
+            </tr>
+            <tr>
+                <td>A rider set of one kind</td>
+                <td>The same riders on the same mount, as the other kind</td>
+                <td><a href="#synchronized-attached">Synchronized ↔ Attached</a></td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h2>Before you start</h2>
+    <ul>
+        <li>Load the game's packs. The tool reads the animation sets, animations, skeletons and meshes from them.</li>
+        <li>Select an editable pack. Every animation and set the tool makes is saved into it.</li>
+        <li>Open the tool from the <b>Rider Animation Editor</b> button on the toolbar.</li>
+    </ul>
+
+    <h2>Loading the rider and the mount</h2>
+    <p>The <b>Rider</b> and <b>Mount</b> panels above the tabs hold the two models and their animations. Every tab works on what is picked here.</p>
+    <ul>
+        <li><b>Mesh</b> - <b>Browse</b> picks a model. Its skeleton loads with it, and <b>Fragment</b> then lists the animation sets for that skeleton.</li>
+        <li><b>Fragment</b> - the animation set. In the Rider panel, pick the rider set you start from. In the Mount panel, pick the mount's own set. In the mount change tabs, that is the <b>new</b> mount. <b>...</b> opens the set in its editor.</li>
+        <li><b>Slot</b> - picking a slot in the Mount panel loads its animation on the mount, and picks the rider slot of the same name in the Rider panel: <code>RIDER_</code> and the mount slot, so <b>RUN_1</b> picks <b>RIDER_RUN_1</b>. You can pick a different rider slot by hand afterwards.</li>
+    </ul>
+    <p>A slot that names an animation that doesn't exist (a few vanilla ones do) loads as no animation. When an animpack is added, changed or removed, the set lists reload by themselves and keep what you picked, so a set the tool has just made shows up in the list.</p>
+    <p>The animation controls under the viewport play the rider, the mount and the red <b>Preview</b> rider together. The preview is what the current tab makes from the picked slots.</p>
+
+    <h2 id="synchronized-mount-change">Synchronized Mount Change</h2>
+    <p>Refits a synchronized rider set made for one mount onto another, still synchronized. For example, horse riders onto a cold one. The rider bone (usually the pelvis) is glued to a point on the new mount, on every frame of the new mount's animation for the same slot.</p>
+    <ol>
+        <li>In the Rider panel, load the rider and pick the rider set made for the old mount.</li>
+        <li>In the Mount panel, load the new mount and pick its set.</li>
+        <li>Pick a mount slot, for example <b>RUN_1</b>.</li>
+        <li><b>Rider bone</b> - the rider bone that is glued to the mount. It is set to <b>root</b> (the pelvis) when the skeleton has one, which every Warhammer 3 rider skeleton does.</li>
+        <li><b>Mount vertex</b> - click the mount in the viewport, press <b>F3</b> for vertex selection, click a vertex on the saddle, then <b>Set</b>. <b>F1</b> goes back to object selection. If several vertices are selected, the first one is used.</li>
+    </ol>
+    <p>The preview is made as soon as everything is there, and remade whenever a slot, the vertex or a setting changes. Anything still missing is listed in orange under the buttons.</p>
+
+    <h3>Fit to the new mount</h3>
+    <ul>
+        <li><b>Stretch to the mount animation's length</b> - resamples the rider animation to the mount animation's frame count and duration. Off: frames are matched one to one.</li>
+        <li><b>Plays</b> - how many times the rider animation plays back to back before it's fitted. 1 plays it once.</li>
+        <li><b>Position offset</b> - moves the rider bone away from the vertex, in metres (X, Y, Z).</li>
+        <li><b>Rotation offset</b> - turns the rider bone, in degrees (yaw, pitch, roll).</li>
+        <li><b>Mount scale</b> - scales the mount, and with it where the vertex is.</li>
+    </ul>
+
+    <h3>This slot and the whole set</h3>
+    <ul>
+        <li><b>Update preview</b> - makes the preview again. It also updates by itself.</li>
+        <li><b>Save this slot</b> - saves the picked slot's refitted animation. See <a href="#output">Output</a>.</li>
+        <li><b>Refit the whole rider set to this mount</b> - asks for a name, then makes a new rider set for the new mount. Every <code>RIDER_</code> animation whose slot the new mount's set has is refitted with these settings and saved. The rest keep their original animation:
+            <ul>
+                <li>slots that aren't <code>RIDER_</code> slots, and <code>RIDER_</code> slots whose mount slot the new mount doesn't have</li>
+                <li>slots the tool treats as playing the same on any mount: <code>RIDER_COMBAT_READY</code>, <code>RIDER_SHOOT_READY</code>, <code>RIDER_RELOAD</code> and the transitions between them and <code>RIDER_STAND</code>, and every <code>RIDER_CAST_SPELL_</code>, <code>RIDER_MOVING_ATTACK_</code>, <code>RIDER_CELEBRATE_</code> and <code>RIDER_FIRE_</code> slot</li>
+            </ul>
+        </li>
+    </ul>
+
+    <div class="note">
+        The pelvis is locked to the vertex on every frame, so the rider's own movement on the saddle is lost. The pelvis keeps its own rotation, with the new saddle's tilt added on top. Because the old saddle's tilt is already in the rider animation, the rotation ends up a few degrees off. Refitting the vanilla Empire set back onto its own horse shows how much this costs: the pelvis loses up to 24 cm of movement in <b>ATTACK_1</b> (rising in the stirrups), 12 cm in <b>CHARGE</b> and 5 cm in <b>RUN_1</b>, and its rotation is 3 to 8 degrees off on average. To touch an animation up, use <b>Copy the preview for the Keyframe Editor</b> (see <a href="#preview">Preview</a>).
+    </div>
+
+    <h2 id="attached-mount-change">Attached Mount Change</h2>
+    <p>Moves an attached rider set made for one mount onto another, still attached. The game puts an attached rider on the new mount's attach bone, so the animations carry over as they are. The tab only changes them if you stretch them to the new mount's animations, play them more than once, or offset them. No vertex is needed.</p>
+    <ol>
+        <li>In the Rider panel, load the rider and pick the attached rider set made for the old mount.</li>
+        <li>In the Mount panel, load the new mount and pick its set.</li>
+        <li>Pick a mount slot to see it in the preview.</li>
+        <li><b>Attach point</b> (optional) - <b>Browse</b> for the new mount's tech skeleton. Only <code>tech</code> folders are listed. The attach bone is picked for you, preferring one with <b>rider</b> in its name. The tech skeleton is only used for the preview: with it, the preview shows the rider on the attach bone, frame by frame, as the game would.</li>
+    </ol>
+
+    <h3>Fit to the new mount</h3>
+    <ul>
+        <li><b>Stretch to the mount animation's length</b> - on by default. Resamples each attached rider animation to the new mount animation's frame count and duration. An animation that already has the same length is left alone.</li>
+        <li><b>Plays</b> - how many times the rider animation plays back to back.</li>
+        <li><b>Position offset</b> - moves the rider away from the attach bone, in metres (X, Y, Z). Use it if the new mount's attach bone doesn't sit where the rider should.</li>
+        <li><b>Rotation offset</b> - turns the rider around the attach bone, in degrees (yaw, pitch, roll).</li>
+    </ul>
+    <p>The animroot stays at the origin whatever the settings, so the results are still attached.</p>
+
+    <h3>This slot and the whole set</h3>
+    <ul>
+        <li><b>Save this slot</b> - saves the picked slot's animation with these settings applied.</li>
+        <li><b>Refit the whole rider set to this mount</b> - asks for a name, then makes a new rider set for the new mount:
+            <ul>
+                <li>an attached <code>RIDER_</code> animation whose slot the new mount's set has is saved with these settings, or kept if they change nothing</li>
+                <li>synchronized slots (the deaths and matched kills) are copied unchanged</li>
+                <li><code>RIDER_</code> slots whose mount slot the new mount doesn't have, and slots that aren't <code>RIDER_</code> slots, are kept</li>
+            </ul>
+        </li>
+    </ul>
+    <div class="warning">
+        <p>The copied deaths and kills were made for the old mount's height and length. If one looks wrong on the new mount, refit it on its own in the <b>Synchronized Mount Change</b> tab: pick the slot, set a vertex, <b>Save this slot</b>, then point the new set's slot at the saved file in the animation set editor (<b>...</b> next to <b>Fragment</b>).</p>
+        <p>Whether the game needs an attached rider animation to be as long as the mount animation hasn't been checked in game. If the riders look right without it, turn <b>Stretch</b> off and the set keeps the original animations.</p>
+    </div>
+
+    <h2 id="synchronized-attached">Synchronized ↔ Attached</h2>
+    <p>Converts a rider set, or the picked slot, between synchronized and attached, on the same mount. The conversion needs the mount animation each rider animation plays with, because the attach bone moves with it.</p>
+    <ul>
+        <li><b>Attach point</b> - <b>Browse</b> for the mount's tech skeleton, and check the <b>Attach bone</b>. This is required here. It is shared with Attached Mount Change, so it only has to be picked once. If the tech skeleton doesn't fit the mount's skeleton, the conversion stops and says why.</li>
+    </ul>
+
+    <h3>This slot</h3>
+    <ul>
+        <li><b>To attached</b> / <b>To synchronized</b> - converts the picked rider slot's animation against the mount slot's animation. The preview shows the result where the game would put it: an attached result on the attach bone, frame by frame. Slots picked after this are converted the same way, until you switch tabs.</li>
+        <li><b>Save</b> - saves the converted animation.</li>
+    </ul>
+
+    <h3>Whole set</h3>
+    <ul>
+        <li><b>Convert set to attached</b> / <b>Convert set to synchronized</b> - asks for a name, then makes a new rider set. Every <code>RIDER_</code> animation whose slot the mount's set has is converted against that slot's mount animation. Kept as they are:
+            <ul>
+                <li>animations already of the kind you're converting to</li>
+                <li>when converting to attached, the deaths and the matched kills, as in vanilla attached sets</li>
+                <li>slots without a mount slot, and slots that aren't <code>RIDER_</code> slots</li>
+            </ul>
+        </li>
+    </ul>
+    <div class="note">
+        Converting there and back gives the same animation for every bone but the animroot. An attached animation keeps the animroot at the origin, so going to attached loses the synchronized animroot's own movement. Vanilla synchronized animroots wander on their own (up to 2.4 m in the deaths, 1 m in combat idles). The animroot made when going to synchronized follows the mount's animroot instead, which leaves every other bone where it was. On vanilla locomotion slots (stand, walk, run, charge, turn), the Kislev riders converted to synchronized sit within 10 cm of where the Empire riders sit, and the Empire riders converted to attached sit within 10 cm of the Kislev riders.
+    </div>
+
+    <h2 id="output">Output</h2>
+    <ul>
+        <li><b>Prefix</b> - <b>new_</b> by default. A saved animation goes next to the animation it was made from, with the prefix in front of its name. The name box for a new set also starts with it.</li>
+        <li><b>Animation version</b> - the <code>.anim</code> version to save. Warhammer 3 uses 7.</li>
+        <li><b>Never overwrite: number the name if it's taken</b> - adds a number when a file of that name exists (<b>new_1_</b>, <b>new_2_</b>...). Off: the existing file is overwritten. Making a whole set never overwrites a file it made earlier in the same run, even with this off, because one rider animation can be refitted against several mount animations.</li>
+    </ul>
+    <p>A new set is saved as <code>animations\database\battle\bin\&lt;name&gt;.animpack</code>, holding one set called <code>&lt;name&gt;</code>. It keeps every slot and variant of the rider set it was made from, with their blend, weight, weapon and meta values, and names the Mount panel's set as its mount. When slots share a rider animation and a mount animation, the new animation is made once and shared too.</p>
+    <p>After a whole set is made, a results window lists every slot: what was saved, what was kept and why, and warnings, such as an animation that can't be found, or a mount slot the rider set has no animation for.</p>
+
+    <h2 id="preview">Preview</h2>
+    <ul>
+        <li><b>Show the preview's mesh</b> / <b>Show the preview's skeleton</b> - show or hide the red preview rider.</li>
+        <li><b>Copy the preview for the Keyframe Editor</b> - copies every frame of the preview to the clipboard. In the Keyframe Editor, <b>Paste</b> under <b>Copy between Keyframe Editors</b> puts them into the animation open there, to touch them up before saving.</li>
+    </ul>
+
+    <h2>Reset</h2>
+    <p><b>Reset</b> closes the tool and opens an empty one in its place: no models, animations or settings. Anything not saved is lost, so it asks first.</p>
+</body>
+</html>
