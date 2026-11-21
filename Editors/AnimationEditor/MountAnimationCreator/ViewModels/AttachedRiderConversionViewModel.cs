@@ -1,7 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
 using AnimationEditor.MountAnimationCreator.Services;
 using Editors.AnimationVisualEditors.MountAnimationCreator.Services;
 using Editors.Shared.Core.Common;
@@ -10,15 +8,13 @@ using GameWorld.Core.Services;
 using Microsoft.Xna.Framework;
 using Shared.Core.Misc;
 using Shared.Core.PackFiles;
-using Shared.Core.PackFiles.Models;
 using Shared.Core.PackFiles.Utility;
 using Shared.Core.Services;
-using Shared.GameFormats.Animation;
 
 namespace AnimationEditor.MountAnimationCreator.ViewModels
 {
-    /// <summary>The Attached tab: converts rider animations between synchronized and attached (war beast) riding,
-    /// see <see cref="RiderAttachmentConverter"/>. A single conversion goes into the tool's preview rider.</summary>
+    /// <summary>The Synchronized ↔ Attached tab: converts rider animations between synchronized and attached (war beast)
+    /// riding, see <see cref="RiderAttachmentConverter"/>. A single conversion goes into the tool's preview rider.</summary>
     public class AttachedRiderConversionViewModel : NotifyPropertyChangedImpl
     {
         private readonly SceneObject _rider;
@@ -33,27 +29,24 @@ namespace AnimationEditor.MountAnimationCreator.ViewModels
         private readonly RiderAndMountSets _sets;
         private readonly LocalizationManager _loc;
 
-        GameSkeleton _attachSkeleton;
         RiderAttachmentConverter _converter;
         AnimationClip _converted;
         bool? _direction;   // the last conversion asked for: true to attached, false to synchronized
         bool _previewIsAttached;
 
-        public NotifyAttr<string> AttachSkeletonName { get; } = new("");
-        public ObservableCollection<string> AttachBones { get; } = [];
-        public NotifyAttr<string> SelectedAttachBone { get; }
+        public AttachPointViewModel AttachPoint { get; }
         public NotifyAttr<bool> CanConvert { get; } = new(false);
         public NotifyAttr<bool> CanSave { get; } = new(false);
         public NotifyAttr<bool> CanConvertSet { get; } = new(false);
         public NotifyAttr<string> ConvertStatus { get; } = new("");
         public NotifyAttr<string> ConvertSetStatus { get; } = new("");
 
-        /// <summary>Set while the Attached tab is showing; the preview belongs to the other tab otherwise.</summary>
+        /// <summary>Set while this tab is showing; the preview belongs to another tab otherwise.</summary>
         public bool IsActive { get; set; }
 
         public AttachedRiderConversionViewModel(SceneObject rider, SceneObject mount, SceneObject preview, SceneObjectEditor sceneObjectEditor,
             IStandardDialogs dialogs, IPackFileService pfs, IFileSaveService fileSaveService, ISkeletonAnimationLookUpHelper skeletonLookUp,
-            AnimationOutputSettings output, RiderAndMountSets sets, LocalizationManager loc)
+            AnimationOutputSettings output, RiderAndMountSets sets, AttachPointViewModel attachPoint, LocalizationManager loc)
         {
             _rider = rider;
             _mount = mount;
@@ -66,49 +59,25 @@ namespace AnimationEditor.MountAnimationCreator.ViewModels
             _output = output;
             _sets = sets;
             _loc = loc;
+            AttachPoint = attachPoint;
 
-            SelectedAttachBone = new NotifyAttr<string>(null, _ => OnSourceChanged());
+            AttachPoint.Changed += OnSourceChanged;
             _preview.AnimationChanged += OnPreviewAnimationChanged;
             _preview.Player.OnFrameChanged += OnPreviewFrameChanged;
             UpdateStates();
         }
 
-        public void BrowseAttachSkeleton()
-        {
-            var result = _dialogs.DisplayBrowseDialog([".anim"], path => path.Contains(@"\tech\", StringComparison.OrdinalIgnoreCase));
-            if (result.Result && result.File != null)
-                SetAttachSkeleton(result.File);
-        }
-
-        public void SetAttachSkeleton(PackFile file)
-        {
-            var skeleton = new GameSkeleton(AnimationFile.Create(file), null);
-            var attachBones = skeleton.BoneNames.Where(x => x.StartsWith("ap_", StringComparison.OrdinalIgnoreCase)).ToList();
-            if (attachBones.Count == 0)
-            {
-                _dialogs.ShowDialogBox(string.Format(_loc.Get("MountAnimationCreator.AttachedRiders.NoAttachBones"), file.Name), _loc.Get("MountAnimationCreator.AttachedRiders.NoAttachBones.Title"));
-                return;
-            }
-
-            _attachSkeleton = skeleton;
-            AttachSkeletonName.Value = _pfs.GetFullPath(file);
-            AttachBones.Clear();
-            foreach (var bone in attachBones)
-                AttachBones.Add(bone);
-            SelectedAttachBone.Value = attachBones.FirstOrDefault(x => x.Contains("rider", StringComparison.OrdinalIgnoreCase)) ?? attachBones[0];
-        }
-
         public void UpdateStates()
         {
             var missing = new List<string>();
-            if (_attachSkeleton == null || SelectedAttachBone.Value == null) missing.Add(_loc.Get("MountAnimationCreator.Needs.TechSkeleton"));
+            if (!AttachPoint.IsSet) missing.Add(_loc.Get("MountAnimationCreator.Needs.TechSkeleton"));
             if (_rider.AnimationClip == null || _rider.Skeleton == null) missing.Add(_loc.Get("MountAnimationCreator.Needs.RiderAnimation"));
             if (_mount.AnimationClip == null || _mount.Skeleton == null) missing.Add(_loc.Get("MountAnimationCreator.Needs.MountAnimation"));
             CanConvert.Value = missing.Count == 0;
             ConvertStatus.Value = Needs(missing);
 
             var setMissing = new List<string>();
-            if (_attachSkeleton == null || SelectedAttachBone.Value == null) setMissing.Add(_loc.Get("MountAnimationCreator.Needs.TechSkeleton"));
+            if (!AttachPoint.IsSet) setMissing.Add(_loc.Get("MountAnimationCreator.Needs.TechSkeleton"));
             if (_sets.RiderSet == null) setMissing.Add(_loc.Get("MountAnimationCreator.Needs.RiderSet"));
             if (_sets.MountSet == null) setMissing.Add(_loc.Get("MountAnimationCreator.Needs.MountSet"));
             CanConvertSet.Value = setMissing.Count == 0;
@@ -140,9 +109,6 @@ namespace AnimationEditor.MountAnimationCreator.ViewModels
             OnPreviewAnimationChanged(null);
         }
 
-        RiderAttachmentConverter CreateConverter(GameSkeleton riderSkeleton, GameSkeleton mountSkeleton, AnimationClip mountClip) =>
-            new(riderSkeleton, mountSkeleton, mountClip, _attachSkeleton, _attachSkeleton.GetBoneIndexByName(SelectedAttachBone.Value));
-
         void Convert(bool toAttached)
         {
             UpdateStates();
@@ -151,7 +117,7 @@ namespace AnimationEditor.MountAnimationCreator.ViewModels
 
             try
             {
-                _converter = CreateConverter(_rider.Skeleton, _mount.Skeleton, _mount.AnimationClip);
+                _converter = AttachPoint.CreateConverter(_rider.Skeleton, _mount.Skeleton, _mount.AnimationClip);
             }
             catch (ArgumentException e)
             {
@@ -183,6 +149,8 @@ namespace AnimationEditor.MountAnimationCreator.ViewModels
         // An attached rider is shown where the game puts it: on the attach bone.
         void OnPreviewFrameChanged(int frame)
         {
+            if (!IsActive)
+                return;
             _preview.Offset = _previewIsAttached && _converted != null
                 ? _converter.AttachPointWorld(frame, _converted.DynamicFrames.Count)
                 : Matrix.Identity;
@@ -225,7 +193,7 @@ namespace AnimationEditor.MountAnimationCreator.ViewModels
             if (toAttached && RiderAttachmentConverter.StaysSynchronized(slot.RiderSlot))
                 return RiderSlotResult.Keep("vanilla attached sets keep this slot synchronized");
 
-            var converter = CreateConverter(slot.RiderSkeleton, slot.MountSkeleton, slot.Mount);
+            var converter = AttachPoint.CreateConverter(slot.RiderSkeleton, slot.MountSkeleton, slot.Mount);
             return new RiderSlotResult(toAttached ? converter.ToAttached(slot.Rider) : converter.ToSynchronized(slot.Rider), "");
         }
     }

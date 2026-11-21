@@ -87,9 +87,9 @@ namespace Test.AnimationVisualEditors
             Assert.That(converter.CanConvert.Value, Is.False);
             Assert.That(converter.ConvertStatus.Value, Is.Not.Empty, "says what's missing");
 
-            converter.SetAttachSkeleton(tool.Runner.PackFileService.FindFile(TechSkeleton)!);
-            Assert.That(converter.AttachBones, Is.EqualTo(new[] { AttachBone }));
-            Assert.That(converter.SelectedAttachBone.Value, Is.EqualTo(AttachBone));
+            tool.Editor.AttachPoint.SetAttachSkeleton(tool.Runner.PackFileService.FindFile(TechSkeleton)!);
+            Assert.That(tool.Editor.AttachPoint.AttachBones, Is.EqualTo(new[] { AttachBone }));
+            Assert.That(tool.Editor.AttachPoint.SelectedAttachBone.Value, Is.EqualTo(AttachBone));
             PickMountSlot(tool, "RUN_1");
             Assert.That(converter.CanConvert.Value, Is.True);
             Assert.That(converter.ConvertStatus.Value, Is.Empty);
@@ -132,7 +132,7 @@ namespace Test.AnimationVisualEditors
             ErrorList? log = null;
             tool.Runner.Dialogs.Setup(x => x.ShowErrorViewDialog(It.IsAny<string>(), It.IsAny<ErrorList>(), It.IsAny<bool>())).Callback<string, ErrorList, bool>((_, l, _) => log = l);
 
-            converter.SetAttachSkeleton(tool.Runner.PackFileService.FindFile(TechSkeleton)!);
+            tool.Editor.AttachPoint.SetAttachSkeleton(tool.Runner.PackFileService.FindFile(TechSkeleton)!);
             Assert.That(converter.CanConvertSet.Value, Is.True);
             if (toAttached) converter.ConvertSetToAttached(); else converter.ConvertSetToSynchronized();
             foreach (var line in log!.Errors)
@@ -229,6 +229,93 @@ namespace Test.AnimationVisualEditors
             Assert.That(sets.Mount.FragmentSlotList.SelectedItem?.SlotName, Is.EqualTo("RUN_1"));
             Assert.That(sets.Rider.FragmentSlotList.SelectedItem?.SlotName, Is.EqualTo("RIDER_WALK_1"));
             Assert.That(tool.Rider.AnimationName.Value, Is.EqualTo(riderAnimation));
+        }
+
+        [Test]
+        public void AttachedMountChange_PreviewsTheRiderOnTheAttachBone()
+        {
+            var tool = Open(AttachedSet);
+            var tab = tool.Editor.AttachedMountChange;
+            tool.Editor.SelectedModeTab.Value = MountAnimationCreatorViewModel.AttachedMountChangeTab;
+            tab.Settings.FitAnimation = false;
+            PickMountSlot(tool, "RUN_1");
+
+            var preview = tool.Editor.Preview;
+            Assert.That(preview.AnimationClip, Is.Not.Null);
+            Assert.That(RiderAttachmentConverter.IsAttached(preview.AnimationClip), Is.True);
+            Assert.That(tab.PreviewStatus.Value, Is.Not.Empty, "asks for the tech skeleton");
+            Assert.That(preview.Offset, Is.EqualTo(Matrix.Identity));
+
+            tool.Editor.AttachPoint.SetAttachSkeleton(tool.Runner.PackFileService.FindFile(TechSkeleton)!);
+            Assert.That(tab.PreviewStatus.Value, Is.Empty);
+            foreach (var frame in new[] { 7, 3 })
+            {
+                preview.Player.CurrentFrame = frame;
+                Assert.That(preview.Offset, Is.EqualTo(Converter(tool).AttachPointWorld(frame, preview.AnimationClip.DynamicFrames.Count)));
+            }
+
+            // An offset moves the rider away from the attach bone; animroot stays on it
+            tab.Settings.Translation.Set(0, 0.1f, 0);
+            Assert.That(RiderAttachmentConverter.IsAttached(preview.AnimationClip), Is.True);
+            var root = tool.Rider.Skeleton.GetBoneIndexByName("root");
+            for (var f = 0; f < preview.AnimationClip.DynamicFrames.Count; f++)
+                Assert.That(World(preview.Skeleton, preview.AnimationClip, f, root) - World(tool.Rider.Skeleton, tool.Rider.AnimationClip, f, root), Is.EqualTo(new Vector3(0, 0.1f, 0)).Using<Vector3>((a, b) => (a - b).Length() < 1e-4f), $"frame {f}");
+
+            // The other tabs take the preview back
+            tool.Editor.SelectedModeTab.Value = MountAnimationCreatorViewModel.MountChangeTab;
+            Assert.That(preview.Offset, Is.EqualTo(Matrix.Identity));
+        }
+
+        [Test]
+        public void AttachedMountChange_MovesTheWholeSet()
+        {
+            var tool = Open(AttachedSet);
+            tool.Runner.Dialogs.Setup(x => x.ShowTextInputDialog(It.IsAny<string>(), It.IsAny<string>())).Returns(new TextInputDialogResult(true, "test_riders"));
+            ErrorList? log = null;
+            tool.Runner.Dialogs.Setup(x => x.ShowErrorViewDialog(It.IsAny<string>(), It.IsAny<ErrorList>(), It.IsAny<bool>())).Callback<string, ErrorList, bool>((_, l, _) => log = l);
+
+            // Stretched to the mount, and moved up so every attached animation changes
+            tool.Editor.AttachedMountChange.Settings.Translation.Set(0, 0.05f, 0);
+            tool.Editor.AttachedMountChange.RefitSet();
+            foreach (var line in log!.Errors)
+                TestContext.Out.WriteLine($"{line.ErrorType} {line.ItemName}: {line.Description}");
+            Assert.That(log.Errors.Where(x => x.IsError), Is.Empty);
+
+            var pfs = tool.Runner.PackFileService;
+            var original = (IAnimationBinGenericFormat)tool.Editor.Sets.RiderSet!;
+            var made = (IAnimationBinGenericFormat)SavedSet(tool, "test_riders");
+            var mountSet = Set(pfs, MountSet);
+            var rider = Skeleton(pfs, @"animations\skeletons\humanoid01.anim");
+            Assert.That(made.MountBin, Is.EqualTo(MountSet));
+            Assert.That(made.Entries.Select(x => x.SlotName), Is.EqualTo(original.Entries.Select(x => x.SlotName)));
+
+            var changedCount = 0;
+            for (var i = 0; i < made.Entries.Count; i++)
+            {
+                var slot = made.Entries[i].SlotName;
+                var changed = made.Entries[i].AnimationFile != original.Entries[i].AnimationFile;
+                if (pfs.FindFile(original.Entries[i].AnimationFile) == null)
+                {
+                    Assert.That(changed, Is.False, $"{slot} names a missing animation");
+                    continue;
+                }
+                var originalClip = Clip(pfs, original.Entries[i].AnimationFile, rider);
+                var hasMountSlot = slot.StartsWith("RIDER_") && mountSet.Entries.Any(x => x.SlotName == slot[6..]);
+                Assert.That(changed, Is.EqualTo(hasMountSlot && RiderAttachmentConverter.IsAttached(originalClip)), slot);
+                Assert.That(made.Entries[i].MetaFile, Is.EqualTo(original.Entries[i].MetaFile), slot);
+                if (!changed)
+                    continue;
+
+                changedCount++;
+                var newClip = Clip(pfs, made.Entries[i].AnimationFile, rider);
+                Assert.That(RiderAttachmentConverter.IsAttached(newClip), Is.True, slot);
+                var mountVariants = mountSet.Entries.Where(x => x.SlotName == slot[6..]).ToList();
+                if (mountVariants.Count == 1)
+                    Assert.That(newClip.DynamicFrames.Count, Is.EqualTo(Clip(pfs, mountVariants[0].AnimationFile, Skeleton(pfs, @"animations\skeletons\horse01.anim")).DynamicFrames.Count), $"{slot} stretched to the mount");
+            }
+            Assert.That(changedCount, Is.GreaterThan(10));
+            Assert.That(made.Entries.Where(x => RiderAttachmentConverter.StaysSynchronized(x.SlotName)).Select(x => x.AnimationFile),
+                Is.EqualTo(original.Entries.Where(x => RiderAttachmentConverter.StaysSynchronized(x.SlotName)).Select(x => x.AnimationFile)), "deaths and kills copied unchanged");
         }
 
         [Test]

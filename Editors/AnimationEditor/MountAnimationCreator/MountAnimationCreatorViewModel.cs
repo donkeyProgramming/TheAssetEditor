@@ -40,8 +40,8 @@ namespace AnimationEditor.MountAnimationCreator
 
     /// <summary>
     /// The Rider Animation Editor, for mounted rider animation sets. Mount Change tab: refits a synchronized rider set
-    /// made for one mount onto another by gluing a rider bone to a vertex of the new mount. Synchronized ↔ Attached tab:
-    /// converts riders between synchronized and attached (war beast) riding.
+    /// made for one mount onto another by gluing a rider bone to a vertex of the new mount. Attached Mount Change tab:
+    /// moves an attached rider set onto another mount. Synchronized ↔ Attached tab: converts riders between the two.
     /// </summary>
     public class MountAnimationCreatorViewModel : EditorHostBase, IDisposable
     {
@@ -67,6 +67,8 @@ namespace AnimationEditor.MountAnimationCreator
         public AnimationSettingsViewModel AnimationSettings { get; set; } = new AnimationSettingsViewModel();
         public AnimationOutputSettings Output { get; } = new();
         public RiderAndMountSets Sets { get; private set; }
+        public AttachPointViewModel AttachPoint { get; private set; }
+        public AttachedMountChangeViewModel AttachedMountChange { get; private set; }
         public AttachedRiderConversionViewModel AttachedRiders { get; set; }
 
         public FilterCollection<SkeletonBoneNode> SelectedRiderBone { get; set; }
@@ -84,7 +86,8 @@ namespace AnimationEditor.MountAnimationCreator
 
         public NotifyAttr<int> SelectedModeTab { get; }
         public static int MountChangeTab => 0;
-        public static int AttachConversionTab => 1;
+        public static int AttachedMountChangeTab => 1;
+        public static int AttachConversionTab => 2;
 
         public MountAnimationCreatorViewModel(IEditorHostParameters editorHostParameters,
             IPackFileService pfs,
@@ -159,7 +162,9 @@ namespace AnimationEditor.MountAnimationCreator
             _rider.SkeletonChanged += RiderSkeletonChanges;
             _rider.AnimationChanged += TryReGenerateAnimation;
 
-            AttachedRiders = new AttachedRiderConversionViewModel(rider, mount, newAnimation, _sceneObjectEditor, _standardDialogs, _pfs, _fileSaveService, _skeletonAnimationLookUpHelper, Output, Sets, _loc);
+            AttachPoint = new AttachPointViewModel(_standardDialogs, _pfs, _loc);
+            AttachedMountChange = new AttachedMountChangeViewModel(rider, mount, newAnimation, _sceneObjectEditor, _standardDialogs, _pfs, _fileSaveService, _skeletonAnimationLookUpHelper, Output, Sets, AttachPoint, _loc);
+            AttachedRiders = new AttachedRiderConversionViewModel(rider, mount, newAnimation, _sceneObjectEditor, _standardDialogs, _pfs, _fileSaveService, _skeletonAnimationLookUpHelper, Output, Sets, AttachPoint, _loc);
 
             MountSkeletonChanged(_mount.Skeleton);
             RiderSkeletonChanges(_rider.Skeleton);
@@ -168,7 +173,9 @@ namespace AnimationEditor.MountAnimationCreator
         // The tabs share the preview rider, each filling it with its own result
         void OnModeTabChanged(int tab)
         {
+            AttachedMountChange.IsActive = tab == AttachedMountChangeTab;
             AttachedRiders.IsActive = tab == AttachConversionTab;
+            _newAnimation.Offset = Matrix.Identity;
             if (tab == AttachConversionTab)
                 AttachedRiders.ClearPreview();
             else
@@ -181,6 +188,11 @@ namespace AnimationEditor.MountAnimationCreator
             if (SelectedModeTab.Value == AttachConversionTab)
             {
                 AttachedRiders.OnSourceChanged();
+                return;
+            }
+            if (SelectedModeTab.Value == AttachedMountChangeTab)
+            {
+                AttachedMountChange.OnSourceChanged();
                 return;
             }
 
@@ -240,6 +252,7 @@ namespace AnimationEditor.MountAnimationCreator
             BatchStatus.Value = Needs(batchMissing);
 
             AttachedRiders?.UpdateStates();
+            AttachedMountChange?.UpdateStates();
         }
 
         string Needs(List<string> missing) => missing.Count == 0 ? "" : _loc.Get("MountAnimationCreator.Needs") + " " + string.Join(", ", missing);
