@@ -208,15 +208,46 @@ namespace Editors.AnimationVisualEditors.AnimationKeyframeEditor
         public FilterCollection<AnimationBinEntryGenericFormat> ActiveFragmentSlot { get; private set; }
         public MountLinkViewModel MountLinkController { get; private set; }
 
+        // Off: one model, the one being edited. On: that model is a rider, and a mount stands next to it as a
+        // reference. The mount is never edited, copied, pasted or saved
+        public bool WithMount
+        {
+            get => _withMount;
+            set
+            {
+                if (SetProperty(ref _withMount, value))
+                {
+                    OnPropertyChanged(nameof(SingleModel));
+                    ApplyMountMode();
+                }
+            }
+        }
+        private bool _withMount;
+
+        // For the other radio button
+        public bool SingleModel
+        {
+            get => !_withMount;
+            set
+            {
+                if (value)
+                    WithMount = false;
+            }
+        }
+
+        private SceneObjectViewModel _riderItem;
+        private SceneObjectViewModel _mountItem;
+
         void Initialize()
         {
-            var riderItem = _sceneObjectViewModelBuilder.CreateAsset(KeyframeEditorIds.Rider, true, "Rider", Color.Black, null);
-            var mountItem = _sceneObjectViewModelBuilder.CreateAsset(KeyframeEditorIds.Mount, true, "Mount", Color.Black, null);
-            mountItem.Data.IsSelectable = true;
+            // The mount is only registered with the animation controls while it's shown
+            _riderItem = _sceneObjectViewModelBuilder.CreateAsset(KeyframeEditorIds.Rider, true, "Model", Color.Black, null);
+            _mountItem = _sceneObjectViewModelBuilder.CreateAsset(KeyframeEditorIds.Mount, false, "Mount", Color.Black, null);
+            _mountItem.Data.IsSelectable = true;
+            _mountItem.IsVisible = false;
 
-            Create(riderItem.Data, mountItem.Data);
-            SceneObjects.Add(riderItem);
-            SceneObjects.Add(mountItem);
+            Create(_riderItem.Data, _mountItem.Data);
+            SceneObjects.Add(_riderItem);
 
             _gizmoToolbox = new(this);
             _copyPastePose = new(this);
@@ -225,6 +256,37 @@ namespace Editors.AnimationVisualEditors.AnimationKeyframeEditor
 
             // After the gizmo toolbox handler, which clears the bone selection on frame change
             _rider.Player.OnFrameChanged += RiderOnFrameStepped;
+        }
+
+        private void ApplyMountMode()
+        {
+            var name = _withMount ? "Rider" : "Model";
+            _riderItem.HeaderName = name + ":";
+            _rider.Description = name;
+            Player.RefreshAsset(_rider);
+
+            _mountItem.IsVisible = _withMount;
+            if (_withMount)
+            {
+                // Registering restarts every animation from frame 0 when the controls are on; put a paused rider back
+                var frame = _rider.Player.CurrentFrame;
+                var wasPlaying = _rider.Player.IsPlaying;
+                SceneObjects.Add(_mountItem);
+                Player.RegisterAsset(_mount);
+                if (!wasPlaying)
+                {
+                    Pause();
+                    _rider.Player.CurrentFrame = frame;
+                    if (_mount.AnimationClip != null)
+                        _mount.Player.CurrentFrame = frame;
+                }
+            }
+            else
+            {
+                _mount.Player.Pause();
+                Player.UnregisterAsset(_mount);
+                SceneObjects.Remove(_mountItem);
+            }
         }
 
         internal void Create(SceneObject rider, SceneObject mount)

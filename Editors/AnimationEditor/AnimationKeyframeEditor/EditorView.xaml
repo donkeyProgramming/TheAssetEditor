@@ -36,7 +36,7 @@
             <Setter Property="FontSize" Value="14"/>
             <Setter Property="FontWeight" Value="Bold"/>
         </Style>
-        <Style x:Key="Info" TargetType="TextBlock">
+        <Style x:Key="Info" TargetType="TextBlock" BasedOn="{StaticResource {x:Type TextBlock}}">
             <Setter Property="TextWrapping" Value="Wrap"/>
             <Setter Property="Margin" Value="4,2,4,4"/>
             <Setter Property="Opacity" Value="0.8"/>
@@ -45,6 +45,13 @@
 
     <StackPanel Margin="5">
         <TextBlock Text="{loc:Loc AnimationKeyframeEditor.Title}" FontSize="18" FontWeight="Bold" Margin="0,0,0,4"/>
+
+        <WrapPanel Margin="0,0,0,2">
+            <RadioButton GroupName="KeyframeScene" Margin="2,2,12,2" Content="{loc:Loc AnimationKeyframeEditor.Scene.SingleModel}" ToolTip="{loc:Loc AnimationKeyframeEditor.Scene.SingleModel.ToolTip}" IsChecked="{Binding SingleModel, Mode=TwoWay}"/>
+            <RadioButton GroupName="KeyframeScene" Margin="2" Content="{loc:Loc AnimationKeyframeEditor.Scene.RiderAndMount}" ToolTip="{loc:Loc AnimationKeyframeEditor.Scene.RiderAndMount.ToolTip}" IsChecked="{Binding WithMount, Mode=TwoWay}"/>
+        </WrapPanel>
+        <TextBlock Style="{StaticResource Info}" Text="{loc:Loc AnimationKeyframeEditor.Scene.MountInfo}"
+                   Visibility="{Binding WithMount, Converter={StaticResource boolConv}}"/>
 
         <StackPanel Orientation="Horizontal" ToolTip="{loc:Loc AnimationKeyframeEditor.Frame.ToolTip}">
             <TextBlock FontSize="16" FontWeight="Bold" Text="{loc:Loc AnimationKeyframeEditor.Frame.Label}"/>
