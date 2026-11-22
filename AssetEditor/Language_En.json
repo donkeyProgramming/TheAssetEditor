@@ -212,6 +212,8 @@
   "MainWindow.TabContextMenu.CloseAllTabs": "Close All Tabs",
   "MainWindow.TabContextMenu.CloseTabsToLeft": "Close Tabs To Left",
   "MainWindow.TabContextMenu.CloseTabsToRight": "Close Tabs To Right",
+  "MainWindow.StatusBar.DirectPack": "Active pack (editing .pack directly): {0} — saves use {1} rules",
+  "MainWindow.StatusBar.NoBackup": " — no backup",
 
   "Dialog.TextInput.Title": "TextInputWindow",
   "Dialog.TextInput.OkButton": "Ok",

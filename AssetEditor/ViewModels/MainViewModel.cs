@@ -20,6 +20,8 @@ namespace AssetEditor.ViewModels
     public partial class MainViewModel : ObservableObject, IDropTarget<IEditorInterface, bool>
     {
         private readonly IUiCommandFactory _uiCommandFactory;
+        private readonly ApplicationSettingsService _settingsService;
+        private readonly LocalizationManager _localizationManager;
 
         public PackFileBrowserViewModel FileTree { get; private set; }
         public MenuBarViewModel MenuBar { get; set; }
@@ -42,9 +44,12 @@ namespace AssetEditor.ViewModels
                 IEditorDatabase toolFactory, 
                 IUiCommandFactory uiCommandFactory, 
                 IEventHub eventHub,
-                ApplicationSettingsService applicationSettingsService)
+                ApplicationSettingsService applicationSettingsService,
+                LocalizationManager localizationManager)
         {
             MenuBar = menuViewModel;
+            _settingsService = applicationSettingsService;
+            _localizationManager = localizationManager;
 
             EditorManager = editorManager;
             _uiCommandFactory = uiCommandFactory;
@@ -89,7 +94,20 @@ namespace AssetEditor.ViewModels
 
         private void SetStatusBarEditablePackFile(PackFileContainerSetAsMainEditableEvent e)
         {
-            EditablePackFile = e.Container != null ? $"Active project: {e.Container.Name}" : "Active project: None set";
+            var container = e.Container;
+            if (container == null || container.ContainerType != PackFileContainerType.Normal)
+            {
+                EditablePackFile = container != null ? $"Active project: {container.Name}" : "Active project: None set";
+                return;
+            }
+
+            // Editing a .pack in place: say so, which game's rules a save follows, and when there is no backup
+            var gameType = container.PackFileSettings.GameVersion ?? _settingsService.CurrentSettings.CurrentGame;
+            var gameName = GameInformationDatabase.GetGameById(gameType).DisplayName;
+            var text = string.Format(_localizationManager.Get("MainWindow.StatusBar.DirectPack"), container.Name, gameName);
+            if (_settingsService.CurrentSettings.BackupPacksOnOpen == false)
+                text += _localizationManager.Get("MainWindow.StatusBar.NoBackup");
+            EditablePackFile = text;
         }
     }
 }
