@@ -42,8 +42,9 @@ namespace Shared.Core.Settings
         // turning it on means accepting responsibility for the packs edited this way.
         public bool EnableDirectPackEditing { get; set; } = false;
 
-        // With direct editing, copy a pack to AssetEditorBackups next to it each time it is opened for editing
-        public bool BackupPacksOnOpen { get; set; } = true;
+        // With direct editing, the first save after a pack is opened or reloaded keeps the version on disk
+        // next to it as <name>.pack1, like Blender's .blend1
+        public bool BackupPacksOnFirstSave { get; set; } = true;
     }
 
     public class ApplicationSettingsService

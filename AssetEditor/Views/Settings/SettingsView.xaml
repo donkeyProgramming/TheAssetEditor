@@ -185,8 +185,8 @@
             <TextBlock Grid.Row="2" Grid.Column="0" Text="{loc:Loc SettingsWindow.EnableDirectPackEditing}" Margin="5, 0, 0, 0" ToolTip="{loc:Loc SettingsWindow.EnableDirectPackEditingTooltip}"/>
             <CheckBox Grid.Row="2" Grid.Column="1" Margin="-1, 0, 0, 5" IsChecked="{Binding EnableDirectPackEditing, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" ToolTip="{loc:Loc SettingsWindow.EnableDirectPackEditingTooltip}"/>
 
-            <TextBlock Grid.Row="3" Grid.Column="0" Text="{loc:Loc SettingsWindow.BackupPacksOnOpen}" Margin="5, 0, 0, 0" ToolTip="{loc:Loc SettingsWindow.BackupPacksOnOpenTooltip}"/>
-            <CheckBox Grid.Row="3" Grid.Column="1" Margin="-1, 0, 0, 5" IsChecked="{Binding BackupPacksOnOpen, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" IsEnabled="{Binding EnableDirectPackEditing}" ToolTip="{loc:Loc SettingsWindow.BackupPacksOnOpenTooltip}"/>
+            <TextBlock Grid.Row="3" Grid.Column="0" Text="{loc:Loc SettingsWindow.BackupPacksOnFirstSave}" Margin="5, 0, 0, 0" ToolTip="{loc:Loc SettingsWindow.BackupPacksOnFirstSaveTooltip}"/>
+            <CheckBox Grid.Row="3" Grid.Column="1" Margin="-1, 0, 0, 5" IsChecked="{Binding BackupPacksOnFirstSave, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" IsEnabled="{Binding EnableDirectPackEditing}" ToolTip="{loc:Loc SettingsWindow.BackupPacksOnFirstSaveTooltip}"/>
         </Grid>
 
     </Grid>

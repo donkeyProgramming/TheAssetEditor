@@ -2,6 +2,7 @@
 using Serilog;
 using Shared.Core.ErrorHandling;
 using Shared.Core.PackFiles;
+using Shared.Core.PackFiles.ErrorHandling;
 using Shared.Core.PackFiles.Models.Containers;
 using Shared.Core.PackFiles.Models;
 using Shared.Core.Services;
@@ -13,7 +14,9 @@ namespace Shared.Ui.BaseDialogs.PackFileTree.ContextMenu.Commands
     public class SavePackFileContainerCommand(
         IPackFileService packFileService,
         IStandardDialogs standardDialogs,
-        ApplicationSettingsService applicationSettingsService, IScopedLogger scopedLogger) : IContextMenuCommand
+        ApplicationSettingsService applicationSettingsService,
+        LocalizationManager localizationManager,
+        IScopedLogger scopedLogger) : IContextMenuCommand
     {
         private readonly ILogger _logger = scopedLogger.ForContext<SavePackFileContainerCommand>();
         public string GetDisplayName(TreeNode node) => "Save";
@@ -50,21 +53,7 @@ namespace Shared.Ui.BaseDialogs.PackFileTree.ContextMenu.Commands
             if (!ValidateSaveLocation(systemPath))
                 return;
 
-            using (standardDialogs.ShowWaitCursor())
-            {
-                try
-                {
-                    var gameInformation = GameInformationDatabase.GetGameById(applicationSettingsService.CurrentSettings.CurrentGame);
-                    _logger.Here().Information($"Saving pack file container '{packDescription}' to '{systemPath}'");
-                    packFileService.SavePackContainer(container, systemPath, false, gameInformation);
-                    _logger.Here().Information($"Saved pack file container '{packDescription}' to '{systemPath}'");
-                }
-                catch (Exception e)
-                {
-                    _logger.Here().Error(e, "Exception while saving");
-                    standardDialogs.ShowDialogBox("Error saving:\n\n" + e.Message, "Error");
-                }
-            }
+            Save(container, systemPath, packDescription);
         }
 
         public void ExecuteForEditablePack()
@@ -85,19 +74,60 @@ namespace Shared.Ui.BaseDialogs.PackFileTree.ContextMenu.Commands
             if (!ValidateSaveLocation(systemPath))
                 return;
 
+            Save(pack, systemPath, packDescription);
+        }
+
+        private void Save(IPackFileContainer container, string systemPath, string packDescription)
+        {
+            var gameInformation = GameInformationDatabase.GetGameById(applicationSettingsService.CurrentSettings.CurrentGame);
+            var backupFailure = TrySave(container, systemPath, packDescription, ShouldKeepBackup(container), gameInformation);
+            if (backupFailure == null)
+                return;
+
+            // Nothing has been written yet: the user decides whether to save without the .pack1
+            var message = string.Format(localizationManager.Get("SavePackFileContainerCommand.BackupFailed"),
+                Path.GetFileName(backupFailure.PackFilePath), Path.GetFileName(backupFailure.BackupPath), backupFailure.InnerException?.Message);
+            if (standardDialogs.ShowYesNoBox(message, localizationManager.Get("SavePackFileContainerCommand.BackupFailedTitle")) != ShowMessageBoxResult.OK)
+            {
+                _logger.Here().Information($"Save of '{packDescription}' cancelled after its backup failed");
+                return;
+            }
+
+            TrySave(container, systemPath, packDescription, false, gameInformation);
+        }
+
+        // A .pack edited directly keeps its previous version as .pack1 on its first save. A project's
+        // output pack is rebuilt from its folder, so it needs none.
+        private bool ShouldKeepBackup(IPackFileContainer container)
+        {
+            var settings = applicationSettingsService.CurrentSettings;
+            return container.ContainerType == PackFileContainerType.Normal
+                && settings.EnableDirectPackEditing
+                && settings.BackupPacksOnFirstSave;
+        }
+
+        // Shows any error except a failed backup, which is returned so the user can be asked about it
+        private PackBackupFailedException? TrySave(IPackFileContainer container, string systemPath, string packDescription, bool createBackup, GameInformation gameInformation)
+        {
             using (standardDialogs.ShowWaitCursor())
             {
                 try
                 {
-                    var gameInformation = GameInformationDatabase.GetGameById(applicationSettingsService.CurrentSettings.CurrentGame);
-                    _logger.Here().Information($"Saving editable pack '{packDescription}' to '{systemPath}'");
-                    packFileService.SavePackContainer(pack, systemPath, false, gameInformation);
-                    _logger.Here().Information($"Saved editable pack '{packDescription}' to '{systemPath}'");
+                    _logger.Here().Information($"Saving pack file container '{packDescription}' to '{systemPath}'");
+                    packFileService.SavePackContainer(container, systemPath, createBackup, gameInformation);
+                    _logger.Here().Information($"Saved pack file container '{packDescription}' to '{systemPath}'");
+                    return null;
+                }
+                catch (PackBackupFailedException e)
+                {
+                    _logger.Here().Warning(e, $"Couldn't back up '{packDescription}' before saving it");
+                    return e;
                 }
                 catch (Exception e)
                 {
                     _logger.Here().Error(e, "Exception while saving");
                     standardDialogs.ShowDialogBox("Error saving:\n\n" + e.Message, "Error");
+                    return null;
                 }
             }
         }

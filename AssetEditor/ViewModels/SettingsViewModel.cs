@@ -38,7 +38,7 @@ namespace AssetEditor.ViewModels
         [ObservableProperty] private bool _onlyLoadLod0ForReferenceMeshes;
         [ObservableProperty] private CameraControlMode _selectedCameraMode;
         [ObservableProperty] private bool _enableDirectPackEditing;
-        [ObservableProperty] private bool _backupPacksOnOpen;
+        [ObservableProperty] private bool _backupPacksOnFirstSave;
 
         private bool _isLoading = true;
 
@@ -66,7 +66,7 @@ namespace AssetEditor.ViewModels
             OnlyLoadLod0ForReferenceMeshes = _settingsService.CurrentSettings.OnlyLoadLod0ForReferenceMeshes;
             SelectedCameraMode = _settingsService.CurrentSettings.CameraControlMode;
             EnableDirectPackEditing = _settingsService.CurrentSettings.EnableDirectPackEditing;
-            BackupPacksOnOpen = _settingsService.CurrentSettings.BackupPacksOnOpen;
+            BackupPacksOnFirstSave = _settingsService.CurrentSettings.BackupPacksOnFirstSave;
 
             foreach (var game in GameInformationDatabase.Games.Values.OrderBy(game => game.DisplayName))
             {
@@ -92,13 +92,13 @@ namespace AssetEditor.ViewModels
                 EnableDirectPackEditing = false;
         }
 
-        partial void OnBackupPacksOnOpenChanged(bool value)
+        partial void OnBackupPacksOnFirstSaveChanged(bool value)
         {
             if (_isLoading || value)
                 return;
 
             if (ConfirmRisk("SettingsWindow.DisableBackupsConfirm") == false)
-                BackupPacksOnOpen = true;
+                BackupPacksOnFirstSave = true;
         }
 
         private bool ConfirmRisk(string messageKey)
@@ -129,7 +129,7 @@ namespace AssetEditor.ViewModels
             _settingsService.CurrentSettings.GameDirectories.Clear();
             _settingsService.CurrentSettings.CameraControlMode = SelectedCameraMode;
             _settingsService.CurrentSettings.EnableDirectPackEditing = EnableDirectPackEditing;
-            _settingsService.CurrentSettings.BackupPacksOnOpen = BackupPacksOnOpen;
+            _settingsService.CurrentSettings.BackupPacksOnFirstSave = BackupPacksOnFirstSave;
 
             foreach (var item in GameDirectores)
                 _settingsService.CurrentSettings.GameDirectories.Add(new ApplicationSettings.GamePathPair(item.GameType, item.Path));

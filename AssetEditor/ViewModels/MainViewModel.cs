@@ -105,7 +105,7 @@ namespace AssetEditor.ViewModels
             var gameType = container.PackFileSettings.GameVersion ?? _settingsService.CurrentSettings.CurrentGame;
             var gameName = GameInformationDatabase.GetGameById(gameType).DisplayName;
             var text = string.Format(_localizationManager.Get("MainWindow.StatusBar.DirectPack"), container.Name, gameName);
-            if (_settingsService.CurrentSettings.BackupPacksOnOpen == false)
+            if (_settingsService.CurrentSettings.BackupPacksOnFirstSave == false)
                 text += _localizationManager.Get("MainWindow.StatusBar.NoBackup");
             EditablePackFile = text;
         }

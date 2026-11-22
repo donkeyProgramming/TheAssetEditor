@@ -125,7 +125,7 @@ namespace E2EVerification
         [Test]
         public void Open_BackupsOff_AddsItWithoutBackup()
         {
-            _settings.CurrentSettings.BackupPacksOnOpen = false;
+            _settings.CurrentSettings.BackupPacksOnFirstSave = false;
             var container = LoaderReturns(isReadOnly: false);
 
             CreateCommand().Open(_packPath);

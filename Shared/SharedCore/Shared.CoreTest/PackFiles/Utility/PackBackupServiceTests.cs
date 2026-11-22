@@ -66,7 +66,7 @@ namespace Shared.CoreTest.PackFiles.Utility
         [Test]
         public void BackupOnOpen_BackupsTurnedOff_WritesNothing()
         {
-            _settings.CurrentSettings.BackupPacksOnOpen = false;
+            _settings.CurrentSettings.BackupPacksOnFirstSave = false;
 
             var backupPath = new PackBackupService(_settings).BackupOnOpen(_packPath);
 

@@ -16,7 +16,7 @@ namespace Shared.Core.PackFiles.Utility
             _settingsService = settingsService;
         }
 
-        public bool IsEnabled => _settingsService.CurrentSettings.BackupPacksOnOpen;
+        public bool IsEnabled => _settingsService.CurrentSettings.BackupPacksOnFirstSave;
 
         public static string GetBackupPath(string packPath)
         {
