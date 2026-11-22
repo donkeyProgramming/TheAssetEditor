@@ -28,7 +28,7 @@ namespace Test.AnimationVisualEditors
         {
             var (_, rider, controls) = Open();
             var last = rider.Player.FrameCount() - 1;
-            Assert.That(controls.PlayerItems.Select(x => x.SlotName.Value), Is.EqualTo(new[] { "Rider", "Mount" }), "one row each, named before the mount has an animation");
+            Assert.That(controls.PlayerItems.Select(x => x.SlotName.Value), Is.EqualTo(new[] { "Model" }), "no mount row until a mount is asked for");
 
             controls.SetAnimationFirstFrame();
             controls.SetAnimationPrivFrame();
@@ -72,6 +72,61 @@ namespace Test.AnimationVisualEditors
             Assert.That(editor.IsDirty.Value, Is.True);
             controls.SetAnimationNextFrame();
             Assert.That(editor.CurrentFrameNumber.Value, Is.EqualTo("31"));
+        }
+
+        [Test]
+        public void TheMountOnlyShowsUpWhenAskedFor()
+        {
+            var (editor, rider, controls) = Open();
+            Assert.That(editor.WithMount, Is.False);
+            Assert.That(editor.SceneObjects.Select(x => x.HeaderName), Is.EqualTo(new[] { "Model:" }));
+
+            editor.Pause();
+            rider.Player.CurrentFrame = 5;
+            editor.WithMount = true;
+            Assert.That(editor.SceneObjects.Select(x => x.HeaderName), Is.EqualTo(new[] { "Rider:", "Mount:" }));
+            Assert.That(controls.PlayerItems.Select(x => x.SlotName.Value), Is.EqualTo(new[] { "Rider", "Mount" }));
+            Assert.That(rider.Player.CurrentFrame, Is.EqualTo(5), "showing the mount leaves a paused rider where it was");
+            Assert.That(rider.Player.IsPlaying, Is.False);
+            Assert.That(editor.Mount.ShowMesh.Value, Is.True);
+
+            controls.SetAnimationNextFrame();
+            Assert.That(rider.Player.CurrentFrame, Is.EqualTo(6));
+
+            editor.WithMount = false;
+            Assert.That(editor.SceneObjects.Select(x => x.HeaderName), Is.EqualTo(new[] { "Model:" }));
+            Assert.That(controls.PlayerItems.Select(x => x.SlotName.Value), Is.EqualTo(new[] { "Model" }));
+            Assert.That(controls.SelectedMainAnimation.Asset, Is.SameAs(rider));
+            Assert.That(editor.Mount.ShowMesh.Value, Is.False);
+
+            controls.SetAnimationNextFrame();
+            Assert.That(rider.Player.CurrentFrame, Is.EqualTo(7), "the controls still step the model on its own");
+        }
+
+        [Test]
+        public void LoadingAMountAnimationLeavesTheRiderEditAlone()
+        {
+            var runner = VanillaRiders.Load();
+            var editor = (AnimationKeyframeEditorViewModel)runner.CommandFactory.Create<OpenEditorCommand>().Execute(EditorEnums.AnimationKeyFrame_Editor);
+            var sceneObjectEditor = runner.GetRequiredServiceInCurrentEditorScope<SceneObjectEditor>();
+            sceneObjectEditor.SetMesh(editor.Rider, runner.PackFileService.FindFile(RiderMesh)!);
+            sceneObjectEditor.SetAnimation(editor.Rider, RiderAnimation);
+            var riderDuration = editor.Rider.AnimationClip.PlayTimeInSec;
+
+            editor.FramesDurationInSeconds = "2";
+            editor.ApplyDuration();
+            Assert.That(editor.IsDirty.Value, Is.True);
+
+            editor.WithMount = true;
+            sceneObjectEditor.SetMesh(editor.Mount, runner.PackFileService.FindFile(MountMesh)!);
+            var mountAnimation = Set(runner.PackFileService, MountSet).Entries.First(x => x.SlotName == "RUN_1").AnimationFile;
+            sceneObjectEditor.SetAnimation(editor.Mount, mountAnimation);
+            Assert.That(editor.Mount.AnimationClip.PlayTimeInSec, Is.Not.EqualTo(riderDuration).Within(0.01f), "precondition: the two durations tell the clips apart");
+
+            Assert.That(editor.IsDirty.Value, Is.True, "the rider's edit is still unsaved");
+            Assert.That(editor.FramesDurationInSeconds, Is.EqualTo("2"));
+            editor.ResetDuration();
+            Assert.That(editor.Rider.AnimationClip.PlayTimeInSec, Is.EqualTo(riderDuration), "Reset goes back to the rider's own duration");
         }
     }
 }
