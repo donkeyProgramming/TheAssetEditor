@@ -18,6 +18,9 @@ namespace Shared.Core.PackFiles.Serialization
         public FileCompressionInfo CompressionInfo { get; set; } = compressionInfo;
     }
 
+    // The data source a saved file should read from once the new pack is in place
+    record PackFileSourceUpdate(PackFile PackFile, PackedFileSource NewSource);
+
     static class PackFileSerializerWriter
     {
         private static readonly ILogger _logger = Logging.CreateStatic(typeof(PackFileSerializerWriter));
@@ -28,7 +31,9 @@ namespace Shared.Core.PackFiles.Serialization
             (@"zzzz_packfile_corruction_detection\packfile_corruction_detection_3.txt", "This file is here to validate that the packfile has not been corrupted while saving. This is check 3")
         ];
 
-        public static void SaveToByteArray(string outputFileName, PackFileContainer container, BinaryWriter writer, GameInformation currentGameInformation)
+        // Returns the new data sources rather than applying them: they point into outputFileName,
+        // which only holds this layout once the caller has moved the written file into place
+        public static IReadOnlyList<PackFileSourceUpdate> SaveToByteArray(string outputFileName, PackFileContainer container, BinaryWriter writer, GameInformation currentGameInformation)
         {
             var stopWatch = Stopwatch.StartNew();
 
@@ -62,13 +67,14 @@ namespace Shared.Core.PackFiles.Serialization
             // Write the core of the file
             var fileMetaDataTable = BuildMetaDataTable(sortedFiles, container, currentGameInformation);
             SerializeFileTable(fileMetaDataTable, container, writer);
-            SerializeFileBlob(outputFileName, fileMetaDataTable, container, writer);
+            var sourceUpdates = SerializeFileBlob(outputFileName, fileMetaDataTable, writer);
 
             if (enableCorruptionDetection)
                 ValidateCorruptionDetectionFiles(outputFileName, writer);
             
             stopWatch.Stop();
             _logger.Here().Information("Saving packfile {PackFileName} completed in {ElapsedMilliseconds} ms", packFileName, stopWatch.ElapsedMilliseconds);
+            return sourceUpdates;
         }
 
         private static bool IsCorruptionDetectionFile(string relativePath)
@@ -286,9 +292,12 @@ namespace Shared.Core.PackFiles.Serialization
             _logger.Here().Information("Finished SerializeFileTable");
         }
 
-        static void SerializeFileBlob(string outputFileName, List<PackFileWriteInformation> fileMetaDataTabel, PackFileContainer container, BinaryWriter writer)
+        static List<PackFileSourceUpdate> SerializeFileBlob(string outputFileName, List<PackFileWriteInformation> fileMetaDataTabel, BinaryWriter writer)
         {
             _logger.Here().Information("Starting SerializeFileBlob");
+
+            var sourceUpdates = new List<PackFileSourceUpdate>(fileMetaDataTabel.Count);
+            var packedFileSourceParent = new PackedFileSourceParent { FilePath = outputFileName };
 
             foreach (var fileMetaData in fileMetaDataTabel)
             {
@@ -329,9 +338,7 @@ namespace Shared.Core.PackFiles.Serialization
                 writer.Write(data.Length);
                 writer.BaseStream.Position = currentPosition;
 
-                // Update DataSource
-                var packedFileSourceParent = new PackedFileSourceParent { FilePath = outputFileName };
-                packFile.DataSource = new PackedFileSource(
+                var newSource = new PackedFileSource(
                     packedFileSourceParent,
                     offset,
                     data.Length,
@@ -339,9 +346,11 @@ namespace Shared.Core.PackFiles.Serialization
                     shouldCompress,
                     fileMetaData.CompressionInfo.IntendedCompressionFormat,
                     uncompressedSize);
+                sourceUpdates.Add(new PackFileSourceUpdate(packFile, newSource));
             }
 
             _logger.Here().Information("Finished SerializeFileBlob");
+            return sourceUpdates;
         }
 
         

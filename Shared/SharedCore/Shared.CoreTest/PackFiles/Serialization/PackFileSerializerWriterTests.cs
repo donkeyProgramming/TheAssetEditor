@@ -135,20 +135,20 @@ namespace Shared.CoreTest.PackFiles.Serialization
 
             using var writeMs = new MemoryStream();
             using var writer = new BinaryWriter(writeMs);
-            PackFileSerializerWriter.SaveToByteArray(outputContainerName, container, writer, gameInfo);
+            var sourceUpdates = PackFileSerializerWriter.SaveToByteArray(outputContainerName, container, writer, gameInfo);
             var data = writeMs.ToArray();
 
-            // Asser that the internal file references have been updated
+            // The writer hands back the new sources for the caller to apply once the file is in place,
+            // and leaves the container's files reading from where they were
             foreach (var fileInfo in expectedFileInfo)
             {
                 var containerFile = container.FindFile(fileInfo.FilePath);
                 Assert.That(containerFile, Is.Not.Null);
-                var nonNullContainerFile = containerFile!;
-                Assert.That(nonNullContainerFile.DataSource, Is.Not.Null);
+                Assert.That(containerFile!.DataSource, Is.InstanceOf<MemorySource>());
 
-                var dataSourceInstance = nonNullContainerFile.DataSource as PackedFileSource;
-                Assert.That(dataSourceInstance, Is.Not.Null);
-                Assert.That(dataSourceInstance!.Parent.FilePath, Is.EqualTo(outputContainerName));
+                var update = sourceUpdates.SingleOrDefault(x => ReferenceEquals(x.PackFile, containerFile));
+                Assert.That(update, Is.Not.Null);
+                Assert.That(update!.NewSource.Parent.FilePath, Is.EqualTo(outputContainerName));
             }
 
             //  Load the file and assert

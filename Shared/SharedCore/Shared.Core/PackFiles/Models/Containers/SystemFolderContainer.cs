@@ -484,6 +484,7 @@ namespace Shared.Core.PackFiles.Models.Containers
                 using (var fileStream = new FileStream(tempPath, FileMode.Create))
                 {
                     using var writer = new BinaryWriter(fileStream);
+                    // The new sources would only re-point the throwaway in-memory copies, so they are dropped
                     PackFileSerializerWriter.SaveToByteArray(path, transientContainer, writer, effectiveGameInformation);
                 }
 
