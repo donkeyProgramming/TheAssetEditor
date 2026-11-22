@@ -8,7 +8,8 @@ using Shared.Core.Settings;
 
 namespace Shared.Core.PackFiles.Serialization
 {
-    record FileCompressionInfo(CompressionFormat IntendedCompressionFormat, bool DecompressBeforeSaving);
+    // CopyAsIs: the bytes stored in the source pack are written unchanged, compressed or not
+    record FileCompressionInfo(CompressionFormat IntendedCompressionFormat, bool DecompressBeforeSaving, bool CopyAsIs = false);
 
     class PackFileWriteInformation(PackFile pf, string fullFileName, long sizePosition, FileCompressionInfo compressionInfo)
     {
@@ -246,13 +247,32 @@ namespace Shared.Core.PackFiles.Serialization
             foreach (var file in sortedFiles)
             {
                 var packFile = file.Value;
-                var fileCompressionInfo = DetermineFileCompression(container.Header.Version, currentGameInformation, file.Key, packFile.DataSource.CompressionFormat);
+                var fileCompressionInfo = CanCopyAsIs(packFile.DataSource, container.Header.Version, currentGameInformation)
+                    ? new FileCompressionInfo(packFile.DataSource.CompressionFormat, false, CopyAsIs: true)
+                    : DetermineFileCompression(container.Header.Version, currentGameInformation, file.Key, packFile.DataSource.CompressionFormat);
                 filesToWrite.Add(new PackFileWriteInformation(packFile, file.Key, 0, fileCompressionInfo));
             }
 
             _logger.Here().Information("Finished building FileTable");
 
             return filesToWrite;
+        }
+
+        // A file that was read from a pack and not edited goes back exactly as it was stored.
+        // Re-encoding content nobody touched can only change it; RPFM also leaves most files uncompressed.
+        // Only new or edited files follow DetermineFileCompression.
+        static bool CanCopyAsIs(IDataSource source, PackFileVersion outputVersion, GameInformation gameInformation)
+        {
+            if (source is not PackedFileSource { IsEncrypted: false } packed)
+                return false;
+
+            if (packed.IsCompressed == false)
+                return true;
+
+            // Stored compressed: the output needs PFH5's per-file compression flag and a format the game reads
+            return outputVersion == PackFileVersion.PFH5
+                && packed.CompressionFormat != CompressionFormat.None
+                && gameInformation.CompressionFormats.Contains(packed.CompressionFormat);
         }
 
         static void SerializeFileTable(List<PackFileWriteInformation> fileMetaData, PackFileContainer container, BinaryWriter writer)
@@ -304,16 +324,25 @@ namespace Shared.Core.PackFiles.Serialization
                 var packFile = fileMetaData.PackFile;
                 byte[] data;
                 uint uncompressedSize = 0;
+                var shouldCompress = fileMetaData.CompressionInfo.IntendedCompressionFormat != CompressionFormat.None;
 
-                // Read file data
-                if (fileMetaData.CompressionInfo.DecompressBeforeSaving == false && packFile.DataSource is PackedFileSource packedFileSource)
-                    data = packedFileSource.ReadDataWithoutDecompressing();
+                if (fileMetaData.CompressionInfo.CopyAsIs)
+                {
+                    var stored = (PackedFileSource)packFile.DataSource;
+                    data = stored.ReadDataWithoutDecompressing();
+                    uncompressedSize = stored.UncompressedSize;
+                }
                 else
-                    data = packFile.DataSource.ReadData();
+                {
+                    // Read file data
+                    if (fileMetaData.CompressionInfo.DecompressBeforeSaving == false && packFile.DataSource is PackedFileSource packedFileSource)
+                        data = packedFileSource.ReadDataWithoutDecompressing();
+                    else
+                        data = packFile.DataSource.ReadData();
+                }
 
                 // Compress if needed
-                var shouldCompress = fileMetaData.CompressionInfo.IntendedCompressionFormat != CompressionFormat.None;
-                if (shouldCompress)
+                if (shouldCompress && fileMetaData.CompressionInfo.CopyAsIs == false)
                 {
                     var uncompressedData = packFile.DataSource.ReadData();
                     uncompressedSize = (uint)uncompressedData.Length;

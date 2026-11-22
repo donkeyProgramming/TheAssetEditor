@@ -108,6 +108,60 @@ namespace Shared.CoreTest.PackFiles.Models.Containers
             Assert.That(ReadText(pack, s_files[0].Path), Is.EqualTo(s_files[0].Content));
         }
 
+        [Test]
+        public void SaveToDisk_UntouchedFiles_StoredBytesUnchanged_EditedFilesFollowCompressionRules()
+        {
+            var pack = LoadFromDisk(_packPath);
+            var storedBefore = s_files.ToDictionary(x => x.Path, x => StoredBytes(pack, x.Path));
+
+            // An uncompressed entry, as RPFM stores most files; AE's rules would compress a .lua
+            var blobPath = Path.Combine(_dir, "blob.bin");
+            var luaContent = new string('S', 600);
+            File.WriteAllText(blobPath, luaContent);
+            var blobParent = new PackedFileSourceParent { FilePath = blobPath };
+            pack.AddOrUpdateFile(@"script\mymod.lua", new PackFile("mymod.lua", new PackedFileSource(blobParent, 0, luaContent.Length, false, false, CompressionFormat.None, 0)));
+
+            pack.AddOrUpdateFile(@"script\edited.lua", PackFile.CreateFromASCII("edited.lua", new string('E', 600)));
+            pack.SaveToDisk(_packPath, false, s_wh3);
+
+            var reloaded = LoadFromDisk(_packPath);
+            foreach (var (path, _) in s_files)
+                Assert.That(StoredBytes(reloaded, path), Is.EqualTo(storedBefore[path]), path);
+
+            var lua = (PackedFileSource)reloaded.FindFile(@"script\mymod.lua")!.DataSource;
+            Assert.That(lua.IsCompressed, Is.False);
+            Assert.That(ReadText(reloaded, @"script\mymod.lua"), Is.EqualTo(luaContent));
+
+            var edited = (PackedFileSource)reloaded.FindFile(@"script\edited.lua")!.DataSource;
+            Assert.That(edited.CompressionFormat, Is.EqualTo(CompressionFormat.Zstd));
+        }
+
+        [Test]
+        public void SaveToDisk_ForGameWithoutTheStoredFormat_ConvertsCompression()
+        {
+            var pack = LoadFromDisk(_packPath);
+            var wh3Formats = s_files
+                .Select(x => ((PackedFileSource)pack.FindFile(x.Path)!.DataSource).CompressionFormat)
+                .ToList();
+            Assert.That(wh3Formats, Has.Some.EqualTo(CompressionFormat.Zstd).Or.Some.EqualTo(CompressionFormat.Lz4));
+
+            var wh2PackPath = Path.Combine(_dir, "mymod_wh2.pack");
+            pack.SaveToDisk(wh2PackPath, false, GameInformationDatabase.GetGameById(GameTypeEnum.Warhammer2));
+
+            var reloaded = LoadFromDisk(wh2PackPath);
+            foreach (var (path, content) in s_files)
+            {
+                var format = ((PackedFileSource)reloaded.FindFile(path)!.DataSource).CompressionFormat;
+                Assert.That(format, Is.AnyOf(CompressionFormat.None, CompressionFormat.Lzma1), path);
+                Assert.That(ReadText(reloaded, path), Is.EqualTo(content), path);
+            }
+        }
+
+        private static byte[] StoredBytes(PackFileContainer pack, string path)
+        {
+            return ((PackedFileSource)pack.FindFile(path)!.DataSource).ReadDataWithoutDecompressing();
+        }
+
         // Mirrors PackFileContainerLoader.CreateFromPackFile
         internal static PackFileContainer LoadFromDisk(string packPath, bool trackChanges = true)
         {
