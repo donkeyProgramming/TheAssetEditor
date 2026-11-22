@@ -1,5 +1,7 @@
 ﻿using System.Text.RegularExpressions;
 using System.Windows;
+using System.Windows.Input;
+using CommunityToolkit.Mvvm.Input;
 using Shared.Core.Misc;
 using Shared.Core.Services;
 using Shared.Ui.Common;
@@ -21,12 +23,17 @@ namespace Shared.Ui.Editors.BoneMapping
         public NotifyAttr<bool> ShowTransformSection { get; set; } = new NotifyAttr<bool>(false);
         public NotifyAttr<bool> ShowApplyButton { get; set; } = new NotifyAttr<bool>(false);
 
+        public ICommand ClearMeshBonesFilterCommand { get; }
+        public ICommand ClearParentModelBonesFilterCommand { get; }
+
         public BoneMappingViewModel(LocalizationManager localizationManager)
         {
             _localizationManager = localizationManager;
             MeshBones = new FilterCollection<AnimatedBone>(null, OnBoneSelected);
             ParentModelBones = new FilterCollection<AnimatedBone>(null, OnParentBoneSelected);
             OnlyShowUsedBones = new NotifyAttr<bool>(true, (x) => MeshBones.RefreshFilter());
+            ClearMeshBonesFilterCommand = new RelayCommand(() => MeshBones.Filter = "");
+            ClearParentModelBonesFilterCommand = new RelayCommand(() => ParentModelBones.Filter = "");
         }
 
         public void Initialize(/*IAssetEditorWindow parentWindow,*/ RemappedAnimatedBoneConfiguration configuration)

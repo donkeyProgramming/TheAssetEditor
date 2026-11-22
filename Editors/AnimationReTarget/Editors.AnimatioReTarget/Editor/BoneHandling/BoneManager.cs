@@ -27,6 +27,9 @@ namespace Editors.AnimatioReTarget.Editor.BoneHandling
         [ObservableProperty] SkeletonBoneNode_new? _selectedBone;
         [ObservableProperty] ObservableCollection<SkeletonBoneNode_new> _bones = [];
 
+        /// <summary>Every bone in <see cref="Bones"/>, depth first, for the "Is relative to" picker.</summary>
+        [ObservableProperty] List<SkeletonBoneNode_new> _flatBones = [];
+
         public BoneManager(
             IStandardDialogs standardDialogs, 
             IAbstractFormFactory<BoneMappingWindow> boneMappingWindowFactory,
@@ -105,6 +108,7 @@ namespace Editors.AnimatioReTarget.Editor.BoneHandling
             {
                 Bones = SkeletonBoneNodeHelper.Build(_sourceSkeleton.Data);
             }
+            FlatBones = Flatten(Bones).ToList();
             SelectedBone = Bones.FirstOrDefault();
             _activeConfig = null;
         }
@@ -156,9 +160,40 @@ namespace Editors.AnimatioReTarget.Editor.BoneHandling
             }
         }
 
+        static IEnumerable<SkeletonBoneNode_new> Flatten(IEnumerable<SkeletonBoneNode_new> nodes)
+        {
+            foreach (var node in nodes)
+            {
+                yield return node;
+                foreach (var child in Flatten(node.Children))
+                    yield return child;
+            }
+        }
+
+        [RelayCommand] void ClearRelativeBone()
+        {
+            if (SelectedBone != null)
+                SelectedBone.SelectedRelativeBone = null;
+        }
+
+        /// <summary>Puts the selected bone's settings back to their defaults. Its bone mapping is
+        /// left alone, since that's set in the bone mapping window rather than here.</summary>
         [RelayCommand] void ResetSelectedBone()
         {
-            _standardDialogs.ShowDialogBox("Button pressed");
+            if (SelectedBone == null)
+                return;
+
+            SelectedBone.IsLocalOffset = false;
+            SelectedBone.BoneLengthMult = 1;
+            SelectedBone.RotationOffset = new(0, 0, 0);
+            SelectedBone.TranslationOffset = new(0, 0, 0);
+            SelectedBone.ForceSnapToWorld = false;
+            SelectedBone.FreezeTranslation = false;
+            SelectedBone.FreezeRotation = false;
+            SelectedBone.FreezeRotationZ = false;
+            SelectedBone.ApplyTranslation = true;
+            SelectedBone.ApplyRotation = true;
+            SelectedBone.SelectedRelativeBone = null;
         }
 
 

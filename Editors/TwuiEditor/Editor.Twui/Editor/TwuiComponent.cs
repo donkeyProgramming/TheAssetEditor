@@ -38,6 +38,10 @@ namespace Editors.Twui.Editor
         [ObservableProperty] public partial bool IsSelected { get; set; } = false;
         [ObservableProperty] public partial bool ShowInPreviewRenderer { get; set; } = true;
 
+        /// <summary>False when the hierarchy filter hides this component - it matches neither
+        /// itself nor through any of its children.</summary>
+        [ObservableProperty] public partial bool IsVisibleInHierarchy { get; set; } = true;
+
     }
 
     public partial class TwuiLocation : ObservableObject
