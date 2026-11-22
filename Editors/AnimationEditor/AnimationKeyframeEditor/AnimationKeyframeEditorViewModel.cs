@@ -19,6 +19,7 @@ using Shared.Core.Events;
 using Shared.Core.Misc;
 using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Utility;
+using Shared.Core.Services;
 using Shared.GameFormats.Animation;
 using Shared.GameFormats.AnimationPack;
 using Shared.Ui.Common;
@@ -58,6 +59,8 @@ namespace Editors.AnimationVisualEditors.AnimationKeyframeEditor
         public CommandManager CommandManager { get => _commandExecutor; private set { _commandExecutor = value; } }
         private CommandManager _commandExecutor;
         private readonly IFileSaveService _packFileSaveService;
+        private readonly IEventHub _eventHub;
+        private readonly LocalizationManager _localizationManager;
 
         public SceneObject Mount { get => _mount; private set { _mount = value; } }
         private SceneObject _mount;
@@ -109,6 +112,7 @@ namespace Editors.AnimationVisualEditors.AnimationKeyframeEditor
 
         public NotifyAttr<string> CurrentFrameNumber { get; set; } = new("");
         public NotifyAttr<string> TotalFrameNumber { get; set; } = new("");
+        public NotifyAttr<string> SelectedBonesText { get; set; } = new("");
 
         public string FrameNrLength { get => _frameNrLength; set => SetProperty(ref _frameNrLength, value); }
         private string _frameNrLength = "0";
@@ -172,7 +176,9 @@ namespace Editors.AnimationVisualEditors.AnimationKeyframeEditor
             SelectionManager selectionManager,
             GizmoComponent gizmoComponent,
             CommandManager commandExecutor,
-            IFileSaveService packFileSaveService) : base(editorHostParameters)
+            IFileSaveService packFileSaveService,
+            IEventHub eventHub,
+            LocalizationManager localizationManager) : base(editorHostParameters)
         {
             DisplayName = "Keyframe Editor";
             _animationPlayerViewModel = animationPlayerViewModel;
@@ -187,6 +193,8 @@ namespace Editors.AnimationVisualEditors.AnimationKeyframeEditor
             _gizmoComponent = gizmoComponent;
             _commandExecutor = commandExecutor;
             _packFileSaveService = packFileSaveService;
+            _eventHub = eventHub;
+            _localizationManager = localizationManager;
 
             SelectedRiderBone = new FilterCollection<SkeletonBoneNode>(null, (x) => UpdateCanSaveAndPreviewStates());
 
@@ -250,6 +258,8 @@ namespace Editors.AnimationVisualEditors.AnimationKeyframeEditor
             SceneObjects.Add(_riderItem);
 
             _gizmoToolbox = new(this);
+            _eventHub.Register<SelectionChangedEvent>(this, _ => UpdateSelectedBonesText());
+            UpdateSelectedBonesText();
             _copyPastePose = new(this);
             _copyPasteClipboardPose = new(this);
             _interpolateBetweenPose = new(this);
@@ -327,6 +337,8 @@ namespace Editors.AnimationVisualEditors.AnimationKeyframeEditor
         // A paused frame change: a step in the viewport controls, or a paste moving on a frame
         private void RiderOnFrameStepped(int currentFrame)
         {
+            // The gizmo toolbox clears the selected bones on a frame change without an event
+            UpdateSelectedBonesText();
             if (_rider.Player.IsPlaying || _rider.AnimationClip == null)
                 return;
 
@@ -726,8 +738,28 @@ namespace Editors.AnimationVisualEditors.AnimationKeyframeEditor
             IsDirty.Value = false;
         }
 
+        // Every bone selection change, undo included, comes through SelectionChangedEvent
+        private void UpdateSelectedBonesText()
+        {
+            var state = _selectionManager.GetState<BoneSelectionState>();
+            if (state == null)
+            {
+                SelectedBonesText.Value = _localizationManager.Get("AnimationKeyframeEditor.SelectedBones.Off");
+                return;
+            }
+
+            var skeleton = state.Skeleton ?? _rider.Skeleton;
+            // The gizmo toolbox drops animroot after this event when it isn't allowed
+            var names = state.SelectedBones.Where(x => x != 0 || AllowToSelectAnimRoot.Value).Select(x => skeleton != null && x < skeleton.BoneCount ? skeleton.BoneNames[x] : x.ToString()).ToList();
+            SelectedBonesText.Value = names.Count == 0
+                ? _localizationManager.Get("AnimationKeyframeEditor.SelectedBones.None")
+                : string.Join(", ", names);
+        }
+
         public void Dispose()
         {
+            _eventHub.UnRegister(this);
+
             if (_mount != null)
             {
                 _mount.SkeletonChanged -= MountSkeletonChanged;

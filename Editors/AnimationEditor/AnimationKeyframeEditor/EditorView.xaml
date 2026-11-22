@@ -109,10 +109,19 @@
                 <TextBlock Style="{StaticResource SectionHeader}" Text="{loc:Loc AnimationKeyframeEditor.Bones.Header}"/>
             </Expander.Header>
             <StackPanel Margin="10,0,0,0">
+                <TextBlock Style="{StaticResource Info}" Text="{loc:Loc AnimationKeyframeEditor.Bones.Info}"/>
                 <UniformGrid Columns="2">
                     <Button Content="{loc:Loc AnimationKeyframeEditor.Buttons.Select}" ToolTip="{loc:Loc AnimationKeyframeEditor.Buttons.Select.ToolTip}" Click="{s:MethodBinding EnterSelectMode}"/>
                     <Button Content="{loc:Loc AnimationKeyframeEditor.Buttons.SelectPreviousBones}" ToolTip="{loc:Loc AnimationKeyframeEditor.Buttons.SelectPreviousBones.ToolTip}" Click="{s:MethodBinding SelectPreviousBones}"/>
                 </UniformGrid>
+                <Grid Margin="2,2,2,4" ToolTip="{loc:Loc AnimationKeyframeEditor.SelectedBones.ToolTip}">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Column="0" FontWeight="Bold" Margin="0,0,6,0" Text="{loc:Loc AnimationKeyframeEditor.SelectedBones.Label}"/>
+                    <TextBlock Grid.Column="1" TextWrapping="Wrap" Text="{Binding SelectedBonesText.Value, Mode=OneWay}"/>
+                </Grid>
                 <UniformGrid Columns="3">
                     <Button Content="{loc:Loc AnimationKeyframeEditor.Buttons.Move}" ToolTip="{loc:Loc AnimationKeyframeEditor.Buttons.Move.ToolTip}" Click="{s:MethodBinding EnterMoveMode}"/>
                     <Button Content="{loc:Loc AnimationKeyframeEditor.Buttons.Rotate}" ToolTip="{loc:Loc AnimationKeyframeEditor.Buttons.Rotate.ToolTip}" Click="{s:MethodBinding EnterRotateMode}"/>
