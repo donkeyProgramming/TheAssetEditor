@@ -25,10 +25,10 @@ namespace Shared.GameFormats.Animation
         // bytes decode to the same float, and only the original says which one the file had.
         public static sbyte Encode(float value, float scale, float centre, sbyte? original)
         {
+            if (scale == 0)
+                return 0;   // the channel can only say its centre (a refit of a constant channel)
             if (original.HasValue && Decode(original.Value, scale, centre) == value)
                 return original.Value;
-            if (scale == 0)
-                return 0;   // the channel can only say its centre
             var n = Math.Round(((double)value - centre) / scale * 127.0, MidpointRounding.ToEven);
             return (sbyte)Math.Clamp(n, -128, 127);
         }
