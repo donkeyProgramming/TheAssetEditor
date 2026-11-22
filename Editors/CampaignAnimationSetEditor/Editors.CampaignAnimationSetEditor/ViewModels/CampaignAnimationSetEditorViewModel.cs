@@ -278,6 +278,40 @@ namespace Editors.CampaignAnimationSetEditor.ViewModels
             HasUnsavedChanges = true;
         }
 
+        /// <summary>Standalone one-off conversion, independent of the open set. Formerly its own
+        /// Campaign Animation Tool. Picks an .anim, zeroes animroot on every frame, and saves the
+        /// result into the editable pack through the usual Save As dialog.</summary>
+        [RelayCommand]
+        void FreezeAnimRootInAnimation()
+        {
+            if (_packFileService.GetEditablePack() == null)
+            {
+                _dialogs.ShowDialogBox("No editable pack file is selected - pick one in the Pack File Explorer first.", "No editable pack");
+                return;
+            }
+
+            var browseResult = _dialogs.DisplayBrowseDialog([".anim"]);
+            if (browseResult.Result == false || browseResult.File == null)
+                return;
+
+            byte[]? frozenBytes;
+            try
+            {
+                frozenBytes = _generatorService.FreezeAnimationFile(browseResult.File);
+            }
+            catch (Exception e)
+            {
+                _logger.Error(e, "Failed to freeze animroot in {Name}", browseResult.File.Name);
+                _dialogs.ShowDialogBox($"Failed to freeze animroot in this animation:\n{e.Message}", "Freeze animroot failed");
+                return;
+            }
+
+            if (frozenBytes == null)
+                return;
+
+            _fileSaveService.SaveAs(".anim", frozenBytes);
+        }
+
         public void Close()
         {
         }

@@ -355,9 +355,8 @@
   "AnimationBatchExporter.Buttons.Apply": "应用",
   "AnimationBatchExporter.Messages.CannotBatchActivePackfile": "注意：无法批量处理当前 Pack 文件",
 
-  "CampaignAnimationCreator.RootBone": "根部骨骼",
-  "CampaignAnimationCreator.Buttons.Convert": "转换",
-  "CampaignAnimationCreator.Buttons.Save": "保存",
+  "CampaignAnimationSetEditor.FreezeAnimRoot": "冻结 .anim 的 Animroot",
+  "CampaignAnimationSetEditor.FreezeAnimRoot.Tooltip": "选择一个 .anim，将其 animroot 骨骼在每一帧上归零以使其原地播放，并将结果保存到可编辑的 Pack 中。",
 
   "MountAnimationCreator.AnimationSettings": "动画设置:",
   "MountAnimationCreator.VisualisationHelp": "可视化帮助:",
