@@ -3,8 +3,8 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-             xmlns:sys="clr-namespace:System;assembly=System.Runtime"
              xmlns:conv="clr-namespace:Shared.Ui.Common.ValueConverters;assembly=Shared.Ui"
+             xmlns:loc="clr-namespace:Shared.Ui.Common;assembly=Shared.Ui"
              xmlns:local="clr-namespace:Editors.CampaignAnimationSetEditor.Views"
              xmlns:services="clr-namespace:Editors.CampaignAnimationSetEditor.Services"
              mc:Ignorable="d"
@@ -17,7 +17,6 @@
         <local:PathTailConverter x:Key="PathTailConverter"/>
         <local:PoseIdDisplayConverter x:Key="PoseIdDisplayConverter"/>
 
-        <sys:String x:Key="TypeColumnTooltip">Which status this animation was originally authored for. Rows often show a different value than the status they live under - a row inside status_battle commonly shows Type=status_normal, meaning it reuses status_normal's authored animation. Vanilla files only ever use "global" or "status_normal" here.</sys:String>
 
         <!-- Bold, larger headers so each category reads clearly when all sections are stacked. -->
         <Style x:Key="SectionGroupBoxStyle" TargetType="GroupBox">
@@ -48,24 +47,24 @@
 
         <!-- Toolbar -->
         <ToolBar Grid.Row="0">
-            <Button Content="Open" Command="{Binding OpenCommand}" Padding="10,5" Height="44" VerticalContentAlignment="Center"
-                    ToolTip="Open a different campaign animation set .bin file in this editor."/>
-            <Button Content="Save" Command="{Binding SaveClickedCommand}" Padding="10,5" Height="44" VerticalContentAlignment="Center"/>
-            <Button Content="Save As" Command="{Binding SaveAsClickedCommand}" Padding="10,5" Height="44" VerticalContentAlignment="Center"/>
+            <Button Content="{loc:Loc CampaignAnimationSetEditor.Open}" Command="{Binding OpenCommand}" Padding="10,5" Height="44" VerticalContentAlignment="Center"
+                    ToolTip="{loc:Loc CampaignAnimationSetEditor.OpenADifferentCampaignAnimationSet}"/>
+            <Button Content="{loc:Loc CampaignAnimationSetEditor.Save}" Command="{Binding SaveClickedCommand}" Padding="10,5" Height="44" VerticalContentAlignment="Center"/>
+            <Button Content="{loc:Loc CampaignAnimationSetEditor.SaveAs}" Command="{Binding SaveAsClickedCommand}" Padding="10,5" Height="44" VerticalContentAlignment="Center"/>
             <Separator/>
             <Button Command="{Binding GenerateFromBattleSetCommand}" Padding="10,5" Height="44">
-                <TextBlock Text="Generate from Battle Animation Set" TextWrapping="Wrap" TextAlignment="Center" Width="120"/>
+                <TextBlock Text="{loc:Loc CampaignAnimationSetEditor.GenerateFromBattleAnimationSet}" TextWrapping="Wrap" TextAlignment="Center" Width="120"/>
             </Button>
             <Separator/>
             <StackPanel Orientation="Vertical" VerticalAlignment="Center" Margin="5,0">
                 <StackPanel Orientation="Horizontal"
-                            ToolTip="The name stored inside the .bin itself. Kept in sync with the file's own name automatically on Save - not meant to be edited directly.">
-                    <TextBlock Text="Reference: " VerticalAlignment="Center"/>
+                            ToolTip="{loc:Loc CampaignAnimationSetEditor.TheNameStoredInsideTheBin}">
+                    <TextBlock Text="{loc:Loc CampaignAnimationSetEditor.Reference}" VerticalAlignment="Center"/>
                     <TextBlock Text="{Binding Bin.Reference}" VerticalAlignment="Center" FontWeight="Bold"/>
                 </StackPanel>
                 <StackPanel Orientation="Horizontal"
-                            ToolTip="Fixed to the skeleton every animation in this set is authored against - set automatically from the battle set used to generate it (or inherited as-is from an existing file). Never meant to be edited by hand.">
-                    <TextBlock Text="Skeleton: " VerticalAlignment="Center"/>
+                            ToolTip="{loc:Loc CampaignAnimationSetEditor.FixedToTheSkeletonEveryAnimation}">
+                    <TextBlock Text="{loc:Loc CampaignAnimationSetEditor.Skeleton}" VerticalAlignment="Center"/>
                     <TextBlock Text="{Binding Bin.SkeletonName}" VerticalAlignment="Center" FontWeight="Bold"/>
                 </StackPanel>
             </StackPanel>
@@ -88,12 +87,12 @@
             <!-- Status list -->
             <DockPanel Grid.Column="0">
                 <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" Margin="5">
-                    <Button Content="Add" Command="{Binding AddStatusCommand}" Width="60" Margin="0,0,5,0"/>
-                    <Button Content="Remove" Command="{Binding RemoveStatusCommand}" CommandParameter="{Binding SelectedStatus}" Width="60"/>
+                    <Button Content="{loc:Loc CampaignAnimationSetEditor.Add}" Command="{Binding AddStatusCommand}" Width="60" Margin="0,0,5,0"/>
+                    <Button Content="{loc:Loc CampaignAnimationSetEditor.Remove}" Command="{Binding RemoveStatusCommand}" CommandParameter="{Binding SelectedStatus}" Width="60"/>
                 </StackPanel>
-                <TextBlock DockPanel.Dock="Top" Text="Statuses" FontWeight="Bold" FontSize="14" Margin="5,5,5,0"/>
+                <TextBlock DockPanel.Dock="Top" Text="{loc:Loc CampaignAnimationSetEditor.Statuses}" FontWeight="Bold" FontSize="14" Margin="5,5,5,0"/>
                 <TextBlock DockPanel.Dock="Top" Margin="5,2,5,5" TextWrapping="Wrap" Opacity="0.7" FontStyle="Italic"
-                           Text="Hover a status for what it means."/>
+                           Text="{loc:Loc CampaignAnimationSetEditor.HoverAStatusForWhatIt}"/>
                 <ListBox ItemsSource="{Binding Statuses}" SelectedItem="{Binding SelectedStatus}">
                     <ListBox.ItemTemplate>
                         <DataTemplate>
@@ -113,15 +112,15 @@
                 <ScrollViewer Visibility="{Binding IsGlobal, Converter={StaticResource BoolToVisibilityConverter}}"
                               VerticalScrollBarVisibility="Auto">
                     <StackPanel>
-                        <GroupBox Header="Persistent metadata" Style="{StaticResource SectionGroupBoxStyle}">
+                        <GroupBox Header="{loc:Loc CampaignAnimationSetEditor.PersistentMetadata}" Style="{StaticResource SectionGroupBoxStyle}">
                             <DockPanel>
                                 <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" Margin="0,5,0,0">
-                                    <Button Content="Add" Command="{Binding AddPersistentMetaDataCommand}" Width="60" Margin="0,0,5,0"/>
-                                    <Button Content="Remove" Command="{Binding RemovePersistentMetaDataCommand}" CommandParameter="{Binding SelectedItem, ElementName=PersistentMetaGrid}" Width="60"/>
+                                    <Button Content="{loc:Loc CampaignAnimationSetEditor.Add}" Command="{Binding AddPersistentMetaDataCommand}" Width="60" Margin="0,0,5,0"/>
+                                    <Button Content="{loc:Loc CampaignAnimationSetEditor.Remove}" Command="{Binding RemovePersistentMetaDataCommand}" CommandParameter="{Binding SelectedItem, ElementName=PersistentMetaGrid}" Width="60"/>
                                 </StackPanel>
                                 <DataGrid x:Name="PersistentMetaGrid" ItemsSource="{Binding PersistentMetaData}" AutoGenerateColumns="False" MaxHeight="260">
                                     <DataGrid.Columns>
-                                        <DataGridTemplateColumn Header="Animation" Width="3*">
+                                        <DataGridTemplateColumn Header="{loc:Loc CampaignAnimationSetEditor.Animation}" Width="3*">
                                             <DataGridTemplateColumn.CellTemplate>
                                                 <DataTemplate>
                                                     <TextBlock Text="{Binding Animation, Converter={StaticResource PathTailConverter}}" Style="{StaticResource PathCellTextStyle}"/>
@@ -135,10 +134,10 @@
                                         </DataGridTemplateColumn>
                                         <DataGridTextColumn Binding="{Binding Type}" Width="*">
                                             <DataGridTextColumn.Header>
-                                                <TextBlock Text="Type" ToolTip="{StaticResource TypeColumnTooltip}"/>
+                                                <TextBlock Text="{loc:Loc CampaignAnimationSetEditor.Type}" ToolTip="{loc:Loc CampaignAnimationSetEditor.TypeColumnTooltip}"/>
                                             </DataGridTextColumn.Header>
                                         </DataGridTextColumn>
-                                        <DataGridTemplateColumn Header="Animation meta" Width="2*">
+                                        <DataGridTemplateColumn Header="{loc:Loc CampaignAnimationSetEditor.AnimationMeta}" Width="2*">
                                             <DataGridTemplateColumn.CellTemplate>
                                                 <DataTemplate>
                                                     <TextBlock Text="{Binding AnimationMeta, Converter={StaticResource PathTailConverter}}" Style="{StaticResource PathCellTextStyle}"/>
@@ -150,7 +149,7 @@
                                                 </DataTemplate>
                                             </DataGridTemplateColumn.CellEditingTemplate>
                                         </DataGridTemplateColumn>
-                                        <DataGridTemplateColumn Header="Sound meta" Width="2*">
+                                        <DataGridTemplateColumn Header="{loc:Loc CampaignAnimationSetEditor.SoundMeta}" Width="2*">
                                             <DataGridTemplateColumn.CellTemplate>
                                                 <DataTemplate>
                                                     <TextBlock Text="{Binding SoundMeta, Converter={StaticResource PathTailConverter}}" Style="{StaticResource PathCellTextStyle}"/>
@@ -162,21 +161,21 @@
                                                 </DataTemplate>
                                             </DataGridTemplateColumn.CellEditingTemplate>
                                         </DataGridTemplateColumn>
-                                        <DataGridTextColumn Header="Blend time" Binding="{Binding BlendTime}" Width="70"/>
+                                        <DataGridTextColumn Header="{loc:Loc CampaignAnimationSetEditor.BlendTime}" Binding="{Binding BlendTime}" Width="70"/>
                                     </DataGrid.Columns>
                                 </DataGrid>
                             </DockPanel>
                         </GroupBox>
 
-                        <GroupBox Header="Poses" Style="{StaticResource SectionGroupBoxStyle}">
+                        <GroupBox Header="{loc:Loc CampaignAnimationSetEditor.Poses}" Style="{StaticResource SectionGroupBoxStyle}">
                             <DockPanel>
                                 <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" Margin="0,5,0,0">
-                                    <Button Content="Add" Command="{Binding AddPoseCommand}" Width="60" Margin="0,0,5,0"/>
-                                    <Button Content="Remove" Command="{Binding RemovePoseCommand}" CommandParameter="{Binding SelectedItem, ElementName=PosesGrid}" Width="60"/>
+                                    <Button Content="{loc:Loc CampaignAnimationSetEditor.Add}" Command="{Binding AddPoseCommand}" Width="60" Margin="0,0,5,0"/>
+                                    <Button Content="{loc:Loc CampaignAnimationSetEditor.Remove}" Command="{Binding RemovePoseCommand}" CommandParameter="{Binding SelectedItem, ElementName=PosesGrid}" Width="60"/>
                                 </StackPanel>
                                 <DataGrid x:Name="PosesGrid" ItemsSource="{Binding Poses}" AutoGenerateColumns="False" MaxHeight="260">
                                     <DataGrid.Columns>
-                                        <DataGridTemplateColumn Header="Animation" Width="3*">
+                                        <DataGridTemplateColumn Header="{loc:Loc CampaignAnimationSetEditor.Animation}" Width="3*">
                                             <DataGridTemplateColumn.CellTemplate>
                                                 <DataTemplate>
                                                     <TextBlock Text="{Binding Animation, Converter={StaticResource PathTailConverter}}" Style="{StaticResource PathCellTextStyle}"/>
@@ -190,10 +189,10 @@
                                         </DataGridTemplateColumn>
                                         <DataGridTextColumn Binding="{Binding Type}" Width="*">
                                             <DataGridTextColumn.Header>
-                                                <TextBlock Text="Type" ToolTip="{StaticResource TypeColumnTooltip}"/>
+                                                <TextBlock Text="{loc:Loc CampaignAnimationSetEditor.Type}" ToolTip="{loc:Loc CampaignAnimationSetEditor.TypeColumnTooltip}"/>
                                             </DataGridTextColumn.Header>
                                         </DataGridTextColumn>
-                                        <DataGridTemplateColumn Header="Animation meta" Width="2*">
+                                        <DataGridTemplateColumn Header="{loc:Loc CampaignAnimationSetEditor.AnimationMeta}" Width="2*">
                                             <DataGridTemplateColumn.CellTemplate>
                                                 <DataTemplate>
                                                     <TextBlock Text="{Binding AnimationMeta, Converter={StaticResource PathTailConverter}}" Style="{StaticResource PathCellTextStyle}"/>
@@ -205,7 +204,7 @@
                                                 </DataTemplate>
                                             </DataGridTemplateColumn.CellEditingTemplate>
                                         </DataGridTemplateColumn>
-                                        <DataGridTemplateColumn Header="Sound meta" Width="2*">
+                                        <DataGridTemplateColumn Header="{loc:Loc CampaignAnimationSetEditor.SoundMeta}" Width="2*">
                                             <DataGridTemplateColumn.CellTemplate>
                                                 <DataTemplate>
                                                     <TextBlock Text="{Binding SoundMeta, Converter={StaticResource PathTailConverter}}" Style="{StaticResource PathCellTextStyle}"/>
@@ -217,8 +216,8 @@
                                                 </DataTemplate>
                                             </DataGridTemplateColumn.CellEditingTemplate>
                                         </DataGridTemplateColumn>
-                                        <DataGridTextColumn Header="Blend time" Binding="{Binding BlendTime}" Width="70"/>
-                                        <DataGridTemplateColumn Header="Pose id" Width="2*">
+                                        <DataGridTextColumn Header="{loc:Loc CampaignAnimationSetEditor.BlendTime}" Binding="{Binding BlendTime}" Width="70"/>
+                                        <DataGridTemplateColumn Header="{loc:Loc CampaignAnimationSetEditor.PoseId}" Width="2*">
                                             <DataGridTemplateColumn.CellTemplate>
                                                 <DataTemplate>
                                                     <TextBlock Text="{Binding PoseId, Converter={StaticResource PoseIdDisplayConverter}}" Style="{StaticResource PathCellTextStyle}"/>
@@ -229,7 +228,7 @@
                                                     <ComboBox ItemsSource="{x:Static services:KnownPoseIdOptions.All}"
                                                               DisplayMemberPath="Name" SelectedValuePath="Value"
                                                               SelectedValue="{Binding PoseId, UpdateSourceTrigger=PropertyChanged}"
-                                                              ToolTip="Corresponds to a specific hand/face pose slot on the battle skeleton - see KnownPoseId for how this was confirmed. Unlike Status/Action type, this is a closed set: pick one rather than typing a custom value."/>
+                                                              ToolTip="{loc:Loc CampaignAnimationSetEditor.CorrespondsToASpecificHandFace}"/>
                                                 </DataTemplate>
                                             </DataGridTemplateColumn.CellEditingTemplate>
                                         </DataGridTemplateColumn>
@@ -238,16 +237,16 @@
                             </DockPanel>
                         </GroupBox>
 
-                        <GroupBox Header="Docks" Style="{StaticResource SectionGroupBoxStyle}">
+                        <GroupBox Header="{loc:Loc CampaignAnimationSetEditor.Docks}" Style="{StaticResource SectionGroupBoxStyle}">
                             <DockPanel>
                                 <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" Margin="0,5,0,0">
-                                    <Button Content="Add" Command="{Binding AddDockCommand}" Width="60" Margin="0,0,5,0"/>
-                                    <Button Content="Remove" Command="{Binding RemoveDockCommand}" CommandParameter="{Binding SelectedItem, ElementName=DocksGrid}" Width="60"/>
+                                    <Button Content="{loc:Loc CampaignAnimationSetEditor.Add}" Command="{Binding AddDockCommand}" Width="60" Margin="0,0,5,0"/>
+                                    <Button Content="{loc:Loc CampaignAnimationSetEditor.Remove}" Command="{Binding RemoveDockCommand}" CommandParameter="{Binding SelectedItem, ElementName=DocksGrid}" Width="60"/>
                                 </StackPanel>
                                 <DataGrid x:Name="DocksGrid" ItemsSource="{Binding Docks}" AutoGenerateColumns="False" MaxHeight="260">
                                     <DataGrid.Columns>
-                                        <DataGridTextColumn Header="Dock" Binding="{Binding Dock}" Width="1.5*"/>
-                                        <DataGridTemplateColumn Header="Animation" Width="3*">
+                                        <DataGridTextColumn Header="{loc:Loc CampaignAnimationSetEditor.Dock}" Binding="{Binding Dock}" Width="1.5*"/>
+                                        <DataGridTemplateColumn Header="{loc:Loc CampaignAnimationSetEditor.Animation}" Width="3*">
                                             <DataGridTemplateColumn.CellTemplate>
                                                 <DataTemplate>
                                                     <TextBlock Text="{Binding Animation, Converter={StaticResource PathTailConverter}}" Style="{StaticResource PathCellTextStyle}"/>
@@ -261,10 +260,10 @@
                                         </DataGridTemplateColumn>
                                         <DataGridTextColumn Binding="{Binding Type}" Width="*">
                                             <DataGridTextColumn.Header>
-                                                <TextBlock Text="Type" ToolTip="{StaticResource TypeColumnTooltip}"/>
+                                                <TextBlock Text="{loc:Loc CampaignAnimationSetEditor.Type}" ToolTip="{loc:Loc CampaignAnimationSetEditor.TypeColumnTooltip}"/>
                                             </DataGridTextColumn.Header>
                                         </DataGridTextColumn>
-                                        <DataGridTemplateColumn Header="Animation meta" Width="2*">
+                                        <DataGridTemplateColumn Header="{loc:Loc CampaignAnimationSetEditor.AnimationMeta}" Width="2*">
                                             <DataGridTemplateColumn.CellTemplate>
                                                 <DataTemplate>
                                                     <TextBlock Text="{Binding AnimationMeta, Converter={StaticResource PathTailConverter}}" Style="{StaticResource PathCellTextStyle}"/>
@@ -276,7 +275,7 @@
                                                 </DataTemplate>
                                             </DataGridTemplateColumn.CellEditingTemplate>
                                         </DataGridTemplateColumn>
-                                        <DataGridTemplateColumn Header="Sound meta" Width="2*">
+                                        <DataGridTemplateColumn Header="{loc:Loc CampaignAnimationSetEditor.SoundMeta}" Width="2*">
                                             <DataGridTemplateColumn.CellTemplate>
                                                 <DataTemplate>
                                                     <TextBlock Text="{Binding SoundMeta, Converter={StaticResource PathTailConverter}}" Style="{StaticResource PathCellTextStyle}"/>
@@ -288,7 +287,7 @@
                                                 </DataTemplate>
                                             </DataGridTemplateColumn.CellEditingTemplate>
                                         </DataGridTemplateColumn>
-                                        <DataGridTextColumn Header="Blend time" Binding="{Binding BlendTime}" Width="70"/>
+                                        <DataGridTextColumn Header="{loc:Loc CampaignAnimationSetEditor.BlendTime}" Binding="{Binding BlendTime}" Width="70"/>
                                     </DataGrid.Columns>
                                 </DataGrid>
                             </DockPanel>
@@ -301,15 +300,15 @@
                 <ScrollViewer Visibility="{Binding IsNormal, Converter={StaticResource BoolToVisibilityConverter}}"
                               VerticalScrollBarVisibility="Auto">
                     <StackPanel>
-                        <GroupBox Header="Idle" Style="{StaticResource SectionGroupBoxStyle}">
+                        <GroupBox Header="{loc:Loc CampaignAnimationSetEditor.Idle}" Style="{StaticResource SectionGroupBoxStyle}">
                             <DockPanel>
                                 <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" Margin="0,5,0,0">
-                                    <Button Content="Add" Command="{Binding AddIdleCommand}" Width="60" Margin="0,0,5,0"/>
-                                    <Button Content="Remove" Command="{Binding RemoveIdleCommand}" CommandParameter="{Binding SelectedItem, ElementName=IdleGrid}" Width="60"/>
+                                    <Button Content="{loc:Loc CampaignAnimationSetEditor.Add}" Command="{Binding AddIdleCommand}" Width="60" Margin="0,0,5,0"/>
+                                    <Button Content="{loc:Loc CampaignAnimationSetEditor.Remove}" Command="{Binding RemoveIdleCommand}" CommandParameter="{Binding SelectedItem, ElementName=IdleGrid}" Width="60"/>
                                 </StackPanel>
                                 <DataGrid x:Name="IdleGrid" ItemsSource="{Binding Idle}" AutoGenerateColumns="False" MaxHeight="260">
                                     <DataGrid.Columns>
-                                        <DataGridTemplateColumn Header="Animation" Width="3*">
+                                        <DataGridTemplateColumn Header="{loc:Loc CampaignAnimationSetEditor.Animation}" Width="3*">
                                             <DataGridTemplateColumn.CellTemplate>
                                                 <DataTemplate>
                                                     <TextBlock Text="{Binding Animation, Converter={StaticResource PathTailConverter}}" Style="{StaticResource PathCellTextStyle}"/>
@@ -323,10 +322,10 @@
                                         </DataGridTemplateColumn>
                                         <DataGridTextColumn Binding="{Binding Type}" Width="*">
                                             <DataGridTextColumn.Header>
-                                                <TextBlock Text="Type" ToolTip="{StaticResource TypeColumnTooltip}"/>
+                                                <TextBlock Text="{loc:Loc CampaignAnimationSetEditor.Type}" ToolTip="{loc:Loc CampaignAnimationSetEditor.TypeColumnTooltip}"/>
                                             </DataGridTextColumn.Header>
                                         </DataGridTextColumn>
-                                        <DataGridTemplateColumn Header="Meta" Width="2*">
+                                        <DataGridTemplateColumn Header="{loc:Loc CampaignAnimationSetEditor.Meta}" Width="2*">
                                             <DataGridTemplateColumn.CellTemplate>
                                                 <DataTemplate>
                                                     <TextBlock Text="{Binding MetaFile, Converter={StaticResource PathTailConverter}}" Style="{StaticResource PathCellTextStyle}"/>
@@ -338,7 +337,7 @@
                                                 </DataTemplate>
                                             </DataGridTemplateColumn.CellEditingTemplate>
                                         </DataGridTemplateColumn>
-                                        <DataGridTemplateColumn Header="Sound meta" Width="2*">
+                                        <DataGridTemplateColumn Header="{loc:Loc CampaignAnimationSetEditor.SoundMeta}" Width="2*">
                                             <DataGridTemplateColumn.CellTemplate>
                                                 <DataTemplate>
                                                     <TextBlock Text="{Binding SoundMeta, Converter={StaticResource PathTailConverter}}" Style="{StaticResource PathCellTextStyle}"/>
@@ -350,22 +349,22 @@
                                                 </DataTemplate>
                                             </DataGridTemplateColumn.CellEditingTemplate>
                                         </DataGridTemplateColumn>
-                                        <DataGridTextColumn Header="Blend time" Binding="{Binding BlendTime}" Width="70"/>
-                                        <DataGridTextColumn Header="Weight" Binding="{Binding Weight}" Width="70"/>
+                                        <DataGridTextColumn Header="{loc:Loc CampaignAnimationSetEditor.BlendTime}" Binding="{Binding BlendTime}" Width="70"/>
+                                        <DataGridTextColumn Header="{loc:Loc CampaignAnimationSetEditor.Weight}" Binding="{Binding Weight}" Width="70"/>
                                     </DataGrid.Columns>
                                 </DataGrid>
                             </DockPanel>
                         </GroupBox>
 
-                        <GroupBox Header="Selection" Style="{StaticResource SectionGroupBoxStyle}">
+                        <GroupBox Header="{loc:Loc CampaignAnimationSetEditor.Selection}" Style="{StaticResource SectionGroupBoxStyle}">
                             <DockPanel>
                                 <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" Margin="0,5,0,0">
-                                    <Button Content="Add" Command="{Binding AddSelectionCommand}" Width="60" Margin="0,0,5,0"/>
-                                    <Button Content="Remove" Command="{Binding RemoveSelectionCommand}" CommandParameter="{Binding SelectedItem, ElementName=SelectionGrid}" Width="60"/>
+                                    <Button Content="{loc:Loc CampaignAnimationSetEditor.Add}" Command="{Binding AddSelectionCommand}" Width="60" Margin="0,0,5,0"/>
+                                    <Button Content="{loc:Loc CampaignAnimationSetEditor.Remove}" Command="{Binding RemoveSelectionCommand}" CommandParameter="{Binding SelectedItem, ElementName=SelectionGrid}" Width="60"/>
                                 </StackPanel>
                                 <DataGrid x:Name="SelectionGrid" ItemsSource="{Binding Selection}" AutoGenerateColumns="False" MaxHeight="260">
                                     <DataGrid.Columns>
-                                        <DataGridTemplateColumn Header="Animation" Width="3*">
+                                        <DataGridTemplateColumn Header="{loc:Loc CampaignAnimationSetEditor.Animation}" Width="3*">
                                             <DataGridTemplateColumn.CellTemplate>
                                                 <DataTemplate>
                                                     <TextBlock Text="{Binding Animation, Converter={StaticResource PathTailConverter}}" Style="{StaticResource PathCellTextStyle}"/>
@@ -379,10 +378,10 @@
                                         </DataGridTemplateColumn>
                                         <DataGridTextColumn Binding="{Binding Type}" Width="*">
                                             <DataGridTextColumn.Header>
-                                                <TextBlock Text="Type" ToolTip="{StaticResource TypeColumnTooltip}"/>
+                                                <TextBlock Text="{loc:Loc CampaignAnimationSetEditor.Type}" ToolTip="{loc:Loc CampaignAnimationSetEditor.TypeColumnTooltip}"/>
                                             </DataGridTextColumn.Header>
                                         </DataGridTextColumn>
-                                        <DataGridTemplateColumn Header="Meta" Width="2*">
+                                        <DataGridTemplateColumn Header="{loc:Loc CampaignAnimationSetEditor.Meta}" Width="2*">
                                             <DataGridTemplateColumn.CellTemplate>
                                                 <DataTemplate>
                                                     <TextBlock Text="{Binding MetaFile, Converter={StaticResource PathTailConverter}}" Style="{StaticResource PathCellTextStyle}"/>
@@ -394,7 +393,7 @@
                                                 </DataTemplate>
                                             </DataGridTemplateColumn.CellEditingTemplate>
                                         </DataGridTemplateColumn>
-                                        <DataGridTemplateColumn Header="Sound meta" Width="2*">
+                                        <DataGridTemplateColumn Header="{loc:Loc CampaignAnimationSetEditor.SoundMeta}" Width="2*">
                                             <DataGridTemplateColumn.CellTemplate>
                                                 <DataTemplate>
                                                     <TextBlock Text="{Binding SoundMeta, Converter={StaticResource PathTailConverter}}" Style="{StaticResource PathCellTextStyle}"/>
@@ -406,22 +405,22 @@
                                                 </DataTemplate>
                                             </DataGridTemplateColumn.CellEditingTemplate>
                                         </DataGridTemplateColumn>
-                                        <DataGridTextColumn Header="Blend time" Binding="{Binding BlendTime}" Width="70"/>
-                                        <DataGridTextColumn Header="Weight" Binding="{Binding Weight}" Width="70"/>
+                                        <DataGridTextColumn Header="{loc:Loc CampaignAnimationSetEditor.BlendTime}" Binding="{Binding BlendTime}" Width="70"/>
+                                        <DataGridTextColumn Header="{loc:Loc CampaignAnimationSetEditor.Weight}" Binding="{Binding Weight}" Width="70"/>
                                     </DataGrid.Columns>
                                 </DataGrid>
                             </DockPanel>
                         </GroupBox>
 
-                        <GroupBox Header="Locomotion" Style="{StaticResource SectionGroupBoxStyle}">
+                        <GroupBox Header="{loc:Loc CampaignAnimationSetEditor.Locomotion}" Style="{StaticResource SectionGroupBoxStyle}">
                             <DockPanel>
                                 <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" Margin="0,5,0,0">
-                                    <Button Content="Add" Command="{Binding AddLocomotionCommand}" Width="60" Margin="0,0,5,0"/>
-                                    <Button Content="Remove" Command="{Binding RemoveLocomotionCommand}" CommandParameter="{Binding SelectedItem, ElementName=LocomotionGrid}" Width="60"/>
+                                    <Button Content="{loc:Loc CampaignAnimationSetEditor.Add}" Command="{Binding AddLocomotionCommand}" Width="60" Margin="0,0,5,0"/>
+                                    <Button Content="{loc:Loc CampaignAnimationSetEditor.Remove}" Command="{Binding RemoveLocomotionCommand}" CommandParameter="{Binding SelectedItem, ElementName=LocomotionGrid}" Width="60"/>
                                 </StackPanel>
                                 <DataGrid x:Name="LocomotionGrid" ItemsSource="{Binding Locomotion}" AutoGenerateColumns="False" MaxHeight="260">
                                     <DataGrid.Columns>
-                                        <DataGridTemplateColumn Header="Animation" Width="3*">
+                                        <DataGridTemplateColumn Header="{loc:Loc CampaignAnimationSetEditor.Animation}" Width="3*">
                                             <DataGridTemplateColumn.CellTemplate>
                                                 <DataTemplate>
                                                     <TextBlock Text="{Binding Animation, Converter={StaticResource PathTailConverter}}" Style="{StaticResource PathCellTextStyle}"/>
@@ -435,10 +434,10 @@
                                         </DataGridTemplateColumn>
                                         <DataGridTextColumn Binding="{Binding Type}" Width="2*">
                                             <DataGridTextColumn.Header>
-                                                <TextBlock Text="Type" ToolTip="{StaticResource TypeColumnTooltip}"/>
+                                                <TextBlock Text="{loc:Loc CampaignAnimationSetEditor.Type}" ToolTip="{loc:Loc CampaignAnimationSetEditor.TypeColumnTooltip}"/>
                                             </DataGridTextColumn.Header>
                                         </DataGridTextColumn>
-                                        <DataGridTemplateColumn Header="Animation meta" Width="*">
+                                        <DataGridTemplateColumn Header="{loc:Loc CampaignAnimationSetEditor.AnimationMeta}" Width="*">
                                             <DataGridTemplateColumn.CellTemplate>
                                                 <DataTemplate>
                                                     <TextBlock Text="{Binding AnimationMeta, Converter={StaticResource PathTailConverter}}" Style="{StaticResource PathCellTextStyle}"/>
@@ -450,7 +449,7 @@
                                                 </DataTemplate>
                                             </DataGridTemplateColumn.CellEditingTemplate>
                                         </DataGridTemplateColumn>
-                                        <DataGridTemplateColumn Header="Sound meta" Width="2*">
+                                        <DataGridTemplateColumn Header="{loc:Loc CampaignAnimationSetEditor.SoundMeta}" Width="2*">
                                             <DataGridTemplateColumn.CellTemplate>
                                                 <DataTemplate>
                                                     <TextBlock Text="{Binding SoundMeta, Converter={StaticResource PathTailConverter}}" Style="{StaticResource PathCellTextStyle}"/>
@@ -462,24 +461,24 @@
                                                 </DataTemplate>
                                             </DataGridTemplateColumn.CellEditingTemplate>
                                         </DataGridTemplateColumn>
-                                        <DataGridTextColumn Header="Blend time" Binding="{Binding BlendTime}" Width="70"/>
-                                        <DataGridTextColumn Header="Model scale" Binding="{Binding ModelScale}" Width="80"/>
-                                        <DataGridTextColumn Header="Distance" Binding="{Binding DistanceTraveled}" Width="70"/>
-                                        <DataGridTextColumn Header="Min distance" Binding="{Binding DistanceMinTravled}" Width="80"/>
+                                        <DataGridTextColumn Header="{loc:Loc CampaignAnimationSetEditor.BlendTime}" Binding="{Binding BlendTime}" Width="70"/>
+                                        <DataGridTextColumn Header="{loc:Loc CampaignAnimationSetEditor.ModelScale}" Binding="{Binding ModelScale}" Width="80"/>
+                                        <DataGridTextColumn Header="{loc:Loc CampaignAnimationSetEditor.Distance}" Binding="{Binding DistanceTraveled}" Width="70"/>
+                                        <DataGridTextColumn Header="{loc:Loc CampaignAnimationSetEditor.MinDistance}" Binding="{Binding DistanceMinTravled}" Width="80"/>
                                     </DataGrid.Columns>
                                 </DataGrid>
                             </DockPanel>
                         </GroupBox>
 
-                        <GroupBox Header="Transitions" Style="{StaticResource SectionGroupBoxStyle}">
+                        <GroupBox Header="{loc:Loc CampaignAnimationSetEditor.Transitions}" Style="{StaticResource SectionGroupBoxStyle}">
                             <DockPanel>
                                 <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" Margin="0,5,0,0">
-                                    <Button Content="Add" Command="{Binding AddTransitionCommand}" Width="60" Margin="0,0,5,0"/>
-                                    <Button Content="Remove" Command="{Binding RemoveTransitionCommand}" CommandParameter="{Binding SelectedItem, ElementName=TransitionsGrid}" Width="60"/>
+                                    <Button Content="{loc:Loc CampaignAnimationSetEditor.Add}" Command="{Binding AddTransitionCommand}" Width="60" Margin="0,0,5,0"/>
+                                    <Button Content="{loc:Loc CampaignAnimationSetEditor.Remove}" Command="{Binding RemoveTransitionCommand}" CommandParameter="{Binding SelectedItem, ElementName=TransitionsGrid}" Width="60"/>
                                 </StackPanel>
                                 <DataGrid x:Name="TransitionsGrid" ItemsSource="{Binding Transitions}" AutoGenerateColumns="False" MaxHeight="260">
                                     <DataGrid.Columns>
-                                        <DataGridTemplateColumn Header="Animation" Width="3*">
+                                        <DataGridTemplateColumn Header="{loc:Loc CampaignAnimationSetEditor.Animation}" Width="3*">
                                             <DataGridTemplateColumn.CellTemplate>
                                                 <DataTemplate>
                                                     <TextBlock Text="{Binding Animation, Converter={StaticResource PathTailConverter}}" Style="{StaticResource PathCellTextStyle}"/>
@@ -493,10 +492,10 @@
                                         </DataGridTemplateColumn>
                                         <DataGridTextColumn Binding="{Binding Type}" Width="2*">
                                             <DataGridTextColumn.Header>
-                                                <TextBlock Text="Type" ToolTip="{StaticResource TypeColumnTooltip}"/>
+                                                <TextBlock Text="{loc:Loc CampaignAnimationSetEditor.Type}" ToolTip="{loc:Loc CampaignAnimationSetEditor.TypeColumnTooltip}"/>
                                             </DataGridTextColumn.Header>
                                         </DataGridTextColumn>
-                                        <DataGridTemplateColumn Header="Animation meta" Width="2*">
+                                        <DataGridTemplateColumn Header="{loc:Loc CampaignAnimationSetEditor.AnimationMeta}" Width="2*">
                                             <DataGridTemplateColumn.CellTemplate>
                                                 <DataTemplate>
                                                     <TextBlock Text="{Binding AnimationMeta, Converter={StaticResource PathTailConverter}}" Style="{StaticResource PathCellTextStyle}"/>
@@ -508,7 +507,7 @@
                                                 </DataTemplate>
                                             </DataGridTemplateColumn.CellEditingTemplate>
                                         </DataGridTemplateColumn>
-                                        <DataGridTemplateColumn Header="Sound meta" Width="2*">
+                                        <DataGridTemplateColumn Header="{loc:Loc CampaignAnimationSetEditor.SoundMeta}" Width="2*">
                                             <DataGridTemplateColumn.CellTemplate>
                                                 <DataTemplate>
                                                     <TextBlock Text="{Binding SoundMeta, Converter={StaticResource PathTailConverter}}" Style="{StaticResource PathCellTextStyle}"/>
@@ -520,22 +519,22 @@
                                                 </DataTemplate>
                                             </DataGridTemplateColumn.CellEditingTemplate>
                                         </DataGridTemplateColumn>
-                                        <DataGridTextColumn Header="Blend time" Binding="{Binding BlendTime}" Width="70"/>
-                                        <DataGridTextColumn Header="Transition to" Binding="{Binding TransitionTo}" Width="*"/>
+                                        <DataGridTextColumn Header="{loc:Loc CampaignAnimationSetEditor.BlendTime}" Binding="{Binding BlendTime}" Width="70"/>
+                                        <DataGridTextColumn Header="{loc:Loc CampaignAnimationSetEditor.TransitionTo}" Binding="{Binding TransitionTo}" Width="*"/>
                                     </DataGrid.Columns>
                                 </DataGrid>
                             </DockPanel>
                         </GroupBox>
 
-                        <GroupBox Header="Action" Style="{StaticResource SectionGroupBoxStyle}">
+                        <GroupBox Header="{loc:Loc CampaignAnimationSetEditor.Action}" Style="{StaticResource SectionGroupBoxStyle}">
                             <DockPanel>
                                 <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" Margin="0,5,0,0">
-                                    <Button Content="Add" Command="{Binding AddActionCommand}" Width="60" Margin="0,0,5,0"/>
-                                    <Button Content="Remove" Command="{Binding RemoveActionCommand}" CommandParameter="{Binding SelectedItem, ElementName=ActionGrid}" Width="60"/>
+                                    <Button Content="{loc:Loc CampaignAnimationSetEditor.Add}" Command="{Binding AddActionCommand}" Width="60" Margin="0,0,5,0"/>
+                                    <Button Content="{loc:Loc CampaignAnimationSetEditor.Remove}" Command="{Binding RemoveActionCommand}" CommandParameter="{Binding SelectedItem, ElementName=ActionGrid}" Width="60"/>
                                 </StackPanel>
                                 <DataGrid x:Name="ActionGrid" ItemsSource="{Binding Action}" AutoGenerateColumns="False" MaxHeight="260">
                                     <DataGrid.Columns>
-                                        <DataGridTemplateColumn Header="Animation" Width="3*">
+                                        <DataGridTemplateColumn Header="{loc:Loc CampaignAnimationSetEditor.Animation}" Width="3*">
                                             <DataGridTemplateColumn.CellTemplate>
                                                 <DataTemplate>
                                                     <TextBlock Text="{Binding Animation, Converter={StaticResource PathTailConverter}}" Style="{StaticResource PathCellTextStyle}"/>
@@ -549,10 +548,10 @@
                                         </DataGridTemplateColumn>
                                         <DataGridTextColumn Binding="{Binding Type}" Width="*">
                                             <DataGridTextColumn.Header>
-                                                <TextBlock Text="Type" ToolTip="{StaticResource TypeColumnTooltip}"/>
+                                                <TextBlock Text="{loc:Loc CampaignAnimationSetEditor.Type}" ToolTip="{loc:Loc CampaignAnimationSetEditor.TypeColumnTooltip}"/>
                                             </DataGridTextColumn.Header>
                                         </DataGridTextColumn>
-                                        <DataGridTemplateColumn Header="Meta" Width="2*">
+                                        <DataGridTemplateColumn Header="{loc:Loc CampaignAnimationSetEditor.Meta}" Width="2*">
                                             <DataGridTemplateColumn.CellTemplate>
                                                 <DataTemplate>
                                                     <TextBlock Text="{Binding Meta, Converter={StaticResource PathTailConverter}}" Style="{StaticResource PathCellTextStyle}"/>
@@ -564,7 +563,7 @@
                                                 </DataTemplate>
                                             </DataGridTemplateColumn.CellEditingTemplate>
                                         </DataGridTemplateColumn>
-                                        <DataGridTemplateColumn Header="Sound meta" Width="2*">
+                                        <DataGridTemplateColumn Header="{loc:Loc CampaignAnimationSetEditor.SoundMeta}" Width="2*">
                                             <DataGridTemplateColumn.CellTemplate>
                                                 <DataTemplate>
                                                     <TextBlock Text="{Binding SoundMeta, Converter={StaticResource PathTailConverter}}" Style="{StaticResource PathCellTextStyle}"/>
@@ -576,8 +575,8 @@
                                                 </DataTemplate>
                                             </DataGridTemplateColumn.CellEditingTemplate>
                                         </DataGridTemplateColumn>
-                                        <DataGridTextColumn Header="Blend time" Binding="{Binding BlendTime}" Width="70"/>
-                                        <DataGridTemplateColumn Header="Action type" Width="2*">
+                                        <DataGridTextColumn Header="{loc:Loc CampaignAnimationSetEditor.BlendTime}" Binding="{Binding BlendTime}" Width="70"/>
+                                        <DataGridTemplateColumn Header="{loc:Loc CampaignAnimationSetEditor.ActionType}" Width="2*">
                                             <DataGridTemplateColumn.CellTemplate>
                                                 <DataTemplate>
                                                     <TextBlock Text="{Binding ActionType}" Style="{StaticResource PathCellTextStyle}"/>
@@ -588,7 +587,7 @@
                                                     <ComboBox ItemsSource="{x:Static services:KnownActionTypeNames.All}"
                                                               Text="{Binding ActionType, UpdateSourceTrigger=PropertyChanged}"
                                                               IsEditable="True" IsTextSearchEnabled="True"
-                                                              ToolTip="Pick a known vanilla action type, or type a custom/modded name."/>
+                                                              ToolTip="{loc:Loc CampaignAnimationSetEditor.PickAKnownVanillaActionType}"/>
                                                 </DataTemplate>
                                             </DataGridTemplateColumn.CellEditingTemplate>
                                         </DataGridTemplateColumn>
@@ -606,15 +605,15 @@
                             </DockPanel>
                         </GroupBox>
 
-                        <GroupBox Header="Porthole" Style="{StaticResource SectionGroupBoxStyle}">
+                        <GroupBox Header="{loc:Loc CampaignAnimationSetEditor.Porthole}" Style="{StaticResource SectionGroupBoxStyle}">
                             <DockPanel>
                                 <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" Margin="0,5,0,0">
-                                    <Button Content="Add" Command="{Binding AddPortholeCommand}" Width="60" Margin="0,0,5,0"/>
-                                    <Button Content="Remove" Command="{Binding RemovePortholeCommand}" CommandParameter="{Binding SelectedItem, ElementName=PortholeGrid}" Width="60"/>
+                                    <Button Content="{loc:Loc CampaignAnimationSetEditor.Add}" Command="{Binding AddPortholeCommand}" Width="60" Margin="0,0,5,0"/>
+                                    <Button Content="{loc:Loc CampaignAnimationSetEditor.Remove}" Command="{Binding RemovePortholeCommand}" CommandParameter="{Binding SelectedItem, ElementName=PortholeGrid}" Width="60"/>
                                 </StackPanel>
                                 <DataGrid x:Name="PortholeGrid" ItemsSource="{Binding Porthole}" AutoGenerateColumns="False" MaxHeight="260">
                                     <DataGrid.Columns>
-                                        <DataGridTemplateColumn Header="Animation" Width="3*">
+                                        <DataGridTemplateColumn Header="{loc:Loc CampaignAnimationSetEditor.Animation}" Width="3*">
                                             <DataGridTemplateColumn.CellTemplate>
                                                 <DataTemplate>
                                                     <TextBlock Text="{Binding Animation, Converter={StaticResource PathTailConverter}}" Style="{StaticResource PathCellTextStyle}"/>
@@ -628,10 +627,10 @@
                                         </DataGridTemplateColumn>
                                         <DataGridTextColumn Binding="{Binding Type}" Width="*">
                                             <DataGridTextColumn.Header>
-                                                <TextBlock Text="Type" ToolTip="{StaticResource TypeColumnTooltip}"/>
+                                                <TextBlock Text="{loc:Loc CampaignAnimationSetEditor.Type}" ToolTip="{loc:Loc CampaignAnimationSetEditor.TypeColumnTooltip}"/>
                                             </DataGridTextColumn.Header>
                                         </DataGridTextColumn>
-                                        <DataGridTemplateColumn Header="Animation meta" Width="2*">
+                                        <DataGridTemplateColumn Header="{loc:Loc CampaignAnimationSetEditor.AnimationMeta}" Width="2*">
                                             <DataGridTemplateColumn.CellTemplate>
                                                 <DataTemplate>
                                                     <TextBlock Text="{Binding AnimationMeta, Converter={StaticResource PathTailConverter}}" Style="{StaticResource PathCellTextStyle}"/>
@@ -643,7 +642,7 @@
                                                 </DataTemplate>
                                             </DataGridTemplateColumn.CellEditingTemplate>
                                         </DataGridTemplateColumn>
-                                        <DataGridTemplateColumn Header="Sound meta" Width="2*">
+                                        <DataGridTemplateColumn Header="{loc:Loc CampaignAnimationSetEditor.SoundMeta}" Width="2*">
                                             <DataGridTemplateColumn.CellTemplate>
                                                 <DataTemplate>
                                                     <TextBlock Text="{Binding SoundMeta, Converter={StaticResource PathTailConverter}}" Style="{StaticResource PathCellTextStyle}"/>
@@ -655,22 +654,22 @@
                                                 </DataTemplate>
                                             </DataGridTemplateColumn.CellEditingTemplate>
                                         </DataGridTemplateColumn>
-                                        <DataGridTextColumn Header="Blend time" Binding="{Binding BlendTime}" Width="70"/>
-                                        <DataGridTextColumn Header="Weight" Binding="{Binding Weight}" Width="70"/>
+                                        <DataGridTextColumn Header="{loc:Loc CampaignAnimationSetEditor.BlendTime}" Binding="{Binding BlendTime}" Width="70"/>
+                                        <DataGridTextColumn Header="{loc:Loc CampaignAnimationSetEditor.Weight}" Binding="{Binding Weight}" Width="70"/>
                                     </DataGrid.Columns>
                                 </DataGrid>
                             </DockPanel>
                         </GroupBox>
 
-                        <GroupBox Header="Unknown" Style="{StaticResource SectionGroupBoxStyle}">
+                        <GroupBox Header="{loc:Loc CampaignAnimationSetEditor.Unknown}" Style="{StaticResource SectionGroupBoxStyle}">
                             <DockPanel>
                                 <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" Margin="0,5,0,0">
-                                    <Button Content="Add" Command="{Binding AddUnknownCommand}" Width="60" Margin="0,0,5,0"/>
-                                    <Button Content="Remove" Command="{Binding RemoveUnknownCommand}" CommandParameter="{Binding SelectedItem, ElementName=UnknownGrid}" Width="60"/>
+                                    <Button Content="{loc:Loc CampaignAnimationSetEditor.Add}" Command="{Binding AddUnknownCommand}" Width="60" Margin="0,0,5,0"/>
+                                    <Button Content="{loc:Loc CampaignAnimationSetEditor.Remove}" Command="{Binding RemoveUnknownCommand}" CommandParameter="{Binding SelectedItem, ElementName=UnknownGrid}" Width="60"/>
                                 </StackPanel>
                                 <DataGrid x:Name="UnknownGrid" ItemsSource="{Binding Unknown}" AutoGenerateColumns="False" MaxHeight="260">
                                     <DataGrid.Columns>
-                                        <DataGridTemplateColumn Header="Animation" Width="3*">
+                                        <DataGridTemplateColumn Header="{loc:Loc CampaignAnimationSetEditor.Animation}" Width="3*">
                                             <DataGridTemplateColumn.CellTemplate>
                                                 <DataTemplate>
                                                     <TextBlock Text="{Binding Animation, Converter={StaticResource PathTailConverter}}" Style="{StaticResource PathCellTextStyle}"/>
@@ -684,10 +683,10 @@
                                         </DataGridTemplateColumn>
                                         <DataGridTextColumn Binding="{Binding Type}" Width="2*">
                                             <DataGridTextColumn.Header>
-                                                <TextBlock Text="Type" ToolTip="{StaticResource TypeColumnTooltip}"/>
+                                                <TextBlock Text="{loc:Loc CampaignAnimationSetEditor.Type}" ToolTip="{loc:Loc CampaignAnimationSetEditor.TypeColumnTooltip}"/>
                                             </DataGridTextColumn.Header>
                                         </DataGridTextColumn>
-                                        <DataGridTemplateColumn Header="Animation meta" Width="2*">
+                                        <DataGridTemplateColumn Header="{loc:Loc CampaignAnimationSetEditor.AnimationMeta}" Width="2*">
                                             <DataGridTemplateColumn.CellTemplate>
                                                 <DataTemplate>
                                                     <TextBlock Text="{Binding AnimationMeta, Converter={StaticResource PathTailConverter}}" Style="{StaticResource PathCellTextStyle}"/>
@@ -699,7 +698,7 @@
                                                 </DataTemplate>
                                             </DataGridTemplateColumn.CellEditingTemplate>
                                         </DataGridTemplateColumn>
-                                        <DataGridTemplateColumn Header="Sound meta" Width="2*">
+                                        <DataGridTemplateColumn Header="{loc:Loc CampaignAnimationSetEditor.SoundMeta}" Width="2*">
                                             <DataGridTemplateColumn.CellTemplate>
                                                 <DataTemplate>
                                                     <TextBlock Text="{Binding SoundMeta, Converter={StaticResource PathTailConverter}}" Style="{StaticResource PathCellTextStyle}"/>
@@ -711,9 +710,9 @@
                                                 </DataTemplate>
                                             </DataGridTemplateColumn.CellEditingTemplate>
                                         </DataGridTemplateColumn>
-                                        <DataGridTextColumn Header="Blend time" Binding="{Binding BlendTime}" Width="70"/>
-                                        <DataGridTextColumn Header="Weight" Binding="{Binding Weight}" Width="70"/>
-                                        <DataGridTextColumn Header="Value" Binding="{Binding Value}" Width="70"/>
+                                        <DataGridTextColumn Header="{loc:Loc CampaignAnimationSetEditor.BlendTime}" Binding="{Binding BlendTime}" Width="70"/>
+                                        <DataGridTextColumn Header="{loc:Loc CampaignAnimationSetEditor.Weight}" Binding="{Binding Weight}" Width="70"/>
+                                        <DataGridTextColumn Header="{loc:Loc CampaignAnimationSetEditor.Value}" Binding="{Binding Value}" Width="70"/>
                                     </DataGrid.Columns>
                                 </DataGrid>
                             </DockPanel>
