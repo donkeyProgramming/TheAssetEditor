@@ -82,6 +82,8 @@ namespace Shared.Core.PackFiles.Utility
         {
             var packfileName = Path.GetFileNameWithoutExtension(packFilePath);
             var container = CreateFromCollection(type, packFilePath, [packFilePath], packfileName, loadAsReadOnly, new CustomPackDuplicateFileResolver());
+            if (container is PackFileContainer packFileContainer)
+                packFileContainer.TrackChangesOnDisk();
             container.PackFileSettings.GameVersion = _settingsService.CurrentSettings.CurrentGame;
             container.SaveSettings();
             return container;

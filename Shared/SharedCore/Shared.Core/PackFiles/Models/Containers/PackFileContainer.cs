@@ -44,6 +44,23 @@ namespace Shared.Core.PackFiles.Models.Containers
             PackFileSettings.Save();
         }
 
+        // Notes the size and write time of each pack the files are read from, so reading or saving
+        // fails with a clear error once another program (e.g. RPFM) rewrites it, instead of reading stale offsets
+        internal void TrackChangesOnDisk()
+        {
+            foreach (var parent in GetPackedFileSourceParents())
+                parent.ExpectedStamp = PackFileStamp.Read(parent.FilePath);
+        }
+
+        private IEnumerable<PackedFileSourceParent> GetPackedFileSourceParents()
+        {
+            return FileList.Values
+                .Select(x => x.DataSource)
+                .OfType<PackedFileSource>()
+                .Select(x => x.Parent)
+                .Distinct();
+        }
+
         public static PackFileContainer CreateCaPackFile(string name, string? systemFilePath = null, PackFileVersion version = PackFileVersion.PFH5)
         {
             return new PackFileContainer(name, version)
@@ -319,6 +336,10 @@ namespace Shared.Core.PackFiles.Models.Containers
                 throw new IOException(msg);
             }
 
+            // Files still read from the packs they were loaded from; a rewritten pack would feed the save garbage
+            foreach (var parent in GetPackedFileSourceParents())
+                parent.EnsureUnchanged();
+
             if (createBackup)
                 SaveUtility.CreateFileBackup(path);
 
@@ -338,6 +359,7 @@ namespace Shared.Core.PackFiles.Models.Containers
             // Only now does the file at path hold the offsets the new sources point at
             foreach (var update in sourceUpdates)
                 update.PackFile.DataSource = update.NewSource;
+            TrackChangesOnDisk();
 
             SystemFilePath = path;
             OriginalLoadByteSize = new FileInfo(path).Length;

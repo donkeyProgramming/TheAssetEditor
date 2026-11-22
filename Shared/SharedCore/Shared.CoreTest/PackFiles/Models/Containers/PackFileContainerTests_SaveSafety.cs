@@ -1,5 +1,6 @@
 using System.Text;
 using Shared.ByteParsing;
+using Shared.Core.PackFiles.ErrorHandling;
 using Shared.Core.PackFiles.Models;
 using Shared.Core.PackFiles.Models.Containers;
 using Shared.Core.PackFiles.Models.FileSources;
@@ -79,11 +80,45 @@ namespace Shared.CoreTest.PackFiles.Models.Containers
             Assert.That(reloaded.GetFileCount(), Is.EqualTo(s_files.Length + 1));
         }
 
-        internal static PackFileContainer LoadFromDisk(string packPath)
+        [Test]
+        public void PackRewrittenOnDisk_SameLength_ReadsAndSaveRefuse()
         {
-            using var stream = File.OpenRead(packPath);
-            using var reader = new BinaryReader(stream, Encoding.ASCII);
-            return PackFileSerializerLoader.Load(packPath, stream.Length, reader, new CaPackDuplicateFileResolver());
+            var pack = LoadFromDisk(_packPath);
+            pack.AddOrUpdateFile(@"variantmeshes\edited.txt", PackFile.CreateFromASCII("edited.txt", "EDIT"));
+
+            // Another program saves the pack: same length, so the old size-only check let this through
+            var rewritten = File.ReadAllBytes(_packPath);
+            rewritten[^1] ^= 0xFF;
+            File.WriteAllBytes(_packPath, rewritten);
+            File.SetLastWriteTimeUtc(_packPath, DateTime.UtcNow.AddMinutes(1));
+
+            var file = pack.FindFile(s_files[0].Path)!;
+            Assert.Throws<PackFileChangedOnDiskException>(() => file.DataSource.ReadData());
+            Assert.Throws<PackFileChangedOnDiskException>(() => pack.SaveToDisk(_packPath, false, s_wh3));
+            Assert.That(File.ReadAllBytes(_packPath), Is.EqualTo(rewritten));
+        }
+
+        [Test]
+        public void PackRewrittenOnDisk_UntrackedPack_StillReads()
+        {
+            // CA packs and other containers that never asked for tracking are not checked
+            var pack = LoadFromDisk(_packPath, trackChanges: false);
+            File.SetLastWriteTimeUtc(_packPath, DateTime.UtcNow.AddMinutes(1));
+
+            Assert.That(ReadText(pack, s_files[0].Path), Is.EqualTo(s_files[0].Content));
+        }
+
+        // Mirrors PackFileContainerLoader.CreateFromPackFile
+        internal static PackFileContainer LoadFromDisk(string packPath, bool trackChanges = true)
+        {
+            PackFileContainer pack;
+            using (var stream = File.OpenRead(packPath))
+            using (var reader = new BinaryReader(stream, Encoding.ASCII))
+                pack = PackFileSerializerLoader.Load(packPath, stream.Length, reader, new CaPackDuplicateFileResolver());
+
+            if (trackChanges)
+                pack.TrackChangesOnDisk();
+            return pack;
         }
 
         internal static string ReadText(PackFileContainer pack, string path)
