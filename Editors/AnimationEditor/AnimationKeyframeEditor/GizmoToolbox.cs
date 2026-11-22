@@ -131,6 +131,10 @@ namespace AnimationEditor.AnimationKeyframeEditor
         {
             if (_parent.Rider.MainNode.Children.Count <= 1) return;
 
+            // With the animation controls off there's no current frame, so no joint to pick or pose
+            if (!_parent.Player.IsEnabled.Value)
+                _parent.Player.IsEnabled.Value = true;
+
             var variantMeshRoot = _parent.Rider.MainNode.Children[1];
             if (variantMeshRoot.Children.Count == 0) return;
             var selectableNode = FindSelectableObject(variantMeshRoot);
