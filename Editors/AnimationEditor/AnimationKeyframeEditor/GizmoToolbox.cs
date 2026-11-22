@@ -150,6 +150,7 @@ namespace AnimationEditor.AnimationKeyframeEditor
         public void SelectMode()
         {
             if (_parent.Rider.MainNode.Children.Count <= 1) return;
+            if (_parent.Rider.AnimationClip == null) return;
 
             // With the animation controls off there's no current frame, so no joint to pick or pose
             if (!_parent.Player.IsEnabled.Value)

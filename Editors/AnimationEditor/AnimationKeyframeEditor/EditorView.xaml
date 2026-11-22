@@ -64,6 +64,20 @@
                    Text="{loc:Loc AnimationKeyframeEditor.DirtyWarning}"
                    Visibility="{Binding IsDirty.Value, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource boolConv}}"/>
 
+        <!-- Until the model has an animation, the editing sections below are greyed out -->
+        <TextBlock Text="{loc:Loc AnimationKeyframeEditor.NoAnimation}" FontWeight="Bold" TextWrapping="Wrap" Margin="0,4,0,0">
+            <TextBlock.Style>
+                <Style TargetType="TextBlock" BasedOn="{StaticResource {x:Type TextBlock}}">
+                    <Setter Property="Visibility" Value="Collapsed"/>
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding HasAnimation.Value}" Value="False">
+                            <Setter Property="Visibility" Value="Visible"/>
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </TextBlock.Style>
+        </TextBlock>
+
         <!-- Options -->
         <Expander>
             <Expander.Header>
@@ -77,7 +91,7 @@
         </Expander>
 
         <!-- Frames -->
-        <Expander>
+        <Expander IsEnabled="{Binding HasAnimation.Value}">
             <Expander.Header>
                 <TextBlock Style="{StaticResource SectionHeader}" Text="{loc:Loc AnimationKeyframeEditor.Frames.Header}"/>
             </Expander.Header>
@@ -104,7 +118,7 @@
         </Expander>
 
         <!-- Bones -->
-        <Expander>
+        <Expander IsEnabled="{Binding HasAnimation.Value}">
             <Expander.Header>
                 <TextBlock Style="{StaticResource SectionHeader}" Text="{loc:Loc AnimationKeyframeEditor.Bones.Header}"/>
             </Expander.Header>
@@ -135,7 +149,7 @@
         </Expander>
 
         <!-- Copy and paste within this animation -->
-        <Expander>
+        <Expander IsEnabled="{Binding HasAnimation.Value}">
             <Expander.Header>
                 <TextBlock Style="{StaticResource SectionHeader}" Text="{loc:Loc AnimationKeyframeEditor.CopyPaste.Header}"/>
             </Expander.Header>
@@ -156,7 +170,7 @@
         </Expander>
 
         <!-- Copy and paste between Keyframe Editors -->
-        <Expander>
+        <Expander IsEnabled="{Binding HasAnimation.Value}">
             <Expander.Header>
                 <TextBlock Style="{StaticResource SectionHeader}" Text="{loc:Loc AnimationKeyframeEditor.Clipboard.Header}"/>
             </Expander.Header>
@@ -187,7 +201,7 @@
         </Expander>
 
         <!-- Interpolation -->
-        <Expander>
+        <Expander IsEnabled="{Binding HasAnimation.Value}">
             <Expander.Header>
                 <TextBlock Style="{StaticResource SectionHeader}" Text="{loc:Loc AnimationKeyframeEditor.Interpolation.Title}"/>
             </Expander.Header>
@@ -230,7 +244,7 @@
         </Expander>
 
         <Separator Margin="0,8,0,4"/>
-        <UniformGrid Columns="2">
+        <UniformGrid Columns="2" IsEnabled="{Binding HasAnimation.Value}">
             <Button Content="{loc:Loc AnimationKeyframeEditor.Buttons.Save}" ToolTip="{loc:Loc AnimationKeyframeEditor.Buttons.Save.ToolTip}" Click="{s:MethodBinding Save}"/>
             <Button Content="{loc:Loc AnimationKeyframeEditor.Buttons.SaveAs}" ToolTip="{loc:Loc AnimationKeyframeEditor.Buttons.SaveAs.ToolTip}" Click="{s:MethodBinding SaveAs}"/>
         </UniformGrid>

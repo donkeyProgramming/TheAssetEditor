@@ -107,6 +107,9 @@ namespace Editors.AnimationVisualEditors.AnimationKeyframeEditor
 
         public NotifyAttr<bool> IsDirty { get; set; } = new(false);
 
+        // The editing sections are greyed out until the model has an animation
+        public NotifyAttr<bool> HasAnimation { get; set; } = new(false);
+
         public NotifyAttr<bool> EnableFrameNrStartTextboxOnPaste { get; set; } = new(false);
         public NotifyAttr<bool> AutoSelectPreviousBonesOnFrameChange { get; set; } = new(false);
 
@@ -358,9 +361,30 @@ namespace Editors.AnimationVisualEditors.AnimationKeyframeEditor
             UpdateSelectedBonesText();
         }
 
+        // Bone selection keeps the animation and skeleton it started with; a new one makes it stale
+        private void RefreshBoneSelection()
+        {
+            var state = _selectionManager.GetState<BoneSelectionState>();
+            if (state == null)
+                return;
+
+            if (_rider.AnimationClip == null)
+            {
+                _selectionComponent.SetObjectSelectionMode();
+                return;
+            }
+
+            state.CurrentAnimation = _rider.AnimationClip;
+            state.Skeleton = _rider.Skeleton;
+            state.CurrentFrame = _rider.Player.CurrentFrame;
+            state.Clear();
+        }
+
         private void TryReGenerateAnimation(AnimationClip newValue = null)
         {
             RiderOnFrameChanged(_rider.Player.CurrentFrame);
+            HasAnimation.Value = _rider.AnimationClip != null;
+            RefreshBoneSelection();
 
             if (newValue != null)
             {

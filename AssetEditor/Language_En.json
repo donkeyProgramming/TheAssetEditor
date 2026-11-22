@@ -274,6 +274,7 @@
   "AnimationKeyframeEditor.Frame.Label": "Frame",
   "AnimationKeyframeEditor.Frame.ToolTip": "The animation's current frame and frame count. Step through frames with the animation controls under the viewport",
   "AnimationKeyframeEditor.DirtyWarning": "Unsaved changes: picking another animation discards them",
+  "AnimationKeyframeEditor.NoAnimation": "Load an animation for the model in Scene Content to edit it",
   "AnimationKeyframeEditor.Options.Header": "Options",
   "AnimationKeyframeEditor.Options.AllowAnimRoot": "Allow selecting animroot",
   "AnimationKeyframeEditor.Options.AllowAnimRoot.ToolTip": "Let bone selection include animroot. Moving it moves the whole model, so it's left out by default",

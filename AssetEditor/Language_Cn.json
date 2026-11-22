@@ -274,6 +274,7 @@
   "AnimationKeyframeEditor.Frame.Label": "帧",
   "AnimationKeyframeEditor.Frame.ToolTip": "动画的当前帧和总帧数。用视口下方的动画控件切换帧",
   "AnimationKeyframeEditor.DirtyWarning": "有未保存的更改：选择其他动画会丢弃这些更改",
+  "AnimationKeyframeEditor.NoAnimation": "在场景内容中为模型加载一个动画后即可编辑",
   "AnimationKeyframeEditor.Options.Header": "选项",
   "AnimationKeyframeEditor.Options.AllowAnimRoot": "允许选择 animroot",
   "AnimationKeyframeEditor.Options.AllowAnimRoot.ToolTip": "骨骼选择包含 animroot。移动它会移动整个模型，因此默认不包含",

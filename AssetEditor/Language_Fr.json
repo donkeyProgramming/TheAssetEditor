@@ -256,6 +256,7 @@
     "AnimationKeyframeEditor.Frame.Label":  "Image",
     "AnimationKeyframeEditor.Frame.ToolTip":  "L'image courante de l'animation et le nombre d'images. Changez d'image avec les commandes d'animation sous la vue",
     "AnimationKeyframeEditor.DirtyWarning":  "Modifications non enregistrées : choisir une autre animation les annule",
+    "AnimationKeyframeEditor.NoAnimation":  "Chargez une animation pour le modèle dans « Scene content » pour la modifier",
     "AnimationKeyframeEditor.Options.Header":  "Options",
     "AnimationKeyframeEditor.Options.AllowAnimRoot":  "Permettre de sélectionner animroot",
     "AnimationKeyframeEditor.Options.AllowAnimRoot.ToolTip":  "Inclure animroot dans la sélection d'os. Le déplacer déplace tout le modèle, il est donc exclu par défaut",
