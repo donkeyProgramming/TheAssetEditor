@@ -704,6 +704,8 @@
     "KitbashTool.SaveDialog.Save":  "Save",
     "KitbashTool.SaveDialog.DisplayDialogOnNextSave":  "Afficher la boÃ®te de dialogue Ã  la prochaine sauvegarde",
     "KitbashTool.SaveDialog.OnlySaveVisibleNodes":  "Only save visible nodes",
+    "KitbashTool.SaveDialog.RegenerateMaterials":  "Regenerate all materials",
+    "KitbashTool.SaveDialog.Tooltips.RegenerateMaterials":  "Writes every material from Asset Editor's template for this save, also the ones it would otherwise keep as they were loaded. A material file at the name Asset Editor gives it is overwritten when only this model uses it.",
     "KitbashTool.SaveDialog.Tooltips.NumberOfLods":  "Number of lods that will be generated. Normal is 4, large models have 5 and some special models have 1",
     "KitbashTool.SaveDialog.Columns.Index":  "Index",
     "KitbashTool.SaveDialog.Columns.Distance":  "Distance",

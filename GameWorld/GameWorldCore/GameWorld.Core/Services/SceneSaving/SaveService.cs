@@ -54,7 +54,8 @@ namespace GameWorld.Core.Services.SceneSaving
             }
 
             var generatedRmvFile = _geometryStrategyProvider.GetStrategy(settings.GeometryOutputType).Generate(mainNode, settings);
-            var materialResult = _materialStrategyProvider.GetStrategy(settings.MaterialOutputType).Generate(mainNode, outputPath, settings.OnlySaveVisible);
+            var materialResult = _materialStrategyProvider.GetStrategy(settings.MaterialOutputType).Generate(mainNode, outputPath, settings.OnlySaveVisible, settings.RegenerateMaterials);
+            settings.RegenerateMaterials = false;
 
             _eventHub.Publish(new ScopedFileSavedEvent() { NewPath = outputPath });
 

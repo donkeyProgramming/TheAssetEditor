@@ -97,6 +97,8 @@
             <CheckBox Margin="2" DockPanel.Dock="Bottom" FlowDirection="RightToLeft" IsChecked="{Binding DisplayDialogOnNextSave, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" Content="{loc:Loc KitbashTool.SaveDialog.DisplayDialogOnNextSave}"/>
 
             <CheckBox Margin="2" DockPanel.Dock="Bottom" FlowDirection="RightToLeft" IsChecked="{Binding OnlySaveVisible, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" Content="{loc:Loc KitbashTool.SaveDialog.OnlySaveVisibleNodes}"/>
+
+            <CheckBox Margin="2" DockPanel.Dock="Bottom" FlowDirection="RightToLeft" IsChecked="{Binding RegenerateMaterials, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" Content="{loc:Loc KitbashTool.SaveDialog.RegenerateMaterials}" ToolTip="{loc:Loc KitbashTool.SaveDialog.Tooltips.RegenerateMaterials}"/>
         </DockPanel>
     </Grid>
 </windowhandling:AssetEditorWindow>

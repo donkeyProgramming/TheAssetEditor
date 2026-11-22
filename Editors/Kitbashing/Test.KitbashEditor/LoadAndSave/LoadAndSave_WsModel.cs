@@ -100,6 +100,26 @@ namespace Test.KitbashEditor.LoadAndSave
             Assert.That(ReadFile(runner, KarlBodyMaterial, outputPackFile), Is.EqualTo(tunedContent));
         }
 
+        [Test]
+        public void Warhammer3_SaveKarl_RegenerateMaterialsAppliesToOneSave()
+        {
+            var (runner, outputPackFile, _, _) = OpenKarlWithHandTunedBody();
+            var saveSettings = runner.GetRequiredServiceInCurrentEditorScope<GeometrySaveSettings>();
+
+            saveSettings.RegenerateMaterials = true;
+            Save(runner);
+
+            var regeneratedPath = GetMaterialPath(runner, outputPackFile, 0, 0);
+            var regenerated = ReadFile(runner, regeneratedPath, outputPackFile);
+            Assert.That(regenerated, Does.Not.Contain("_hair.xml.shader"));
+            Assert.That(regenerated, Does.Not.Contain("hand_tuned_sheen"));
+            Assert.That(saveSettings.RegenerateMaterials, Is.False);
+
+            // The next save keeps what the first one wrote
+            Save(runner);
+            Assert.That(GetMaterialPath(runner, outputPackFile, 0, 0), Is.EqualTo(regeneratedPath));
+        }
+
         // Karl with his body material tuned by hand in the output pack: a shader and a param the template has no place for
         (AssetEditorTestRunner Runner, IPackFileContainer Output, KitbasherViewModel Editor, string TunedContent) OpenKarlWithHandTunedBody()
         {

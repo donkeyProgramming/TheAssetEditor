@@ -20,10 +20,10 @@ namespace GameWorld.Core.Services.SceneSaving.Material.Strategies
             _wsMaterialGeneratorFactory = wsMaterialGeneratorFactory;
         }
 
-        public WsMaterialResult Generate(MainEditableNode mainNode, string outputPath, bool onlyVisibleNodes)
+        public WsMaterialResult Generate(MainEditableNode mainNode, string outputPath, bool onlyVisibleNodes, bool regenerateMaterials)
         {
             var input = WsModelGeneratorInputHelper.Create(mainNode, onlyVisibleNodes);
-            var res = _wsModelGeneratorService.GenerateWsModel(_wsMaterialGeneratorFactory.CreateInstance(GameTypeEnum.Warhammer3), outputPath, input);
+            var res = _wsModelGeneratorService.GenerateWsModel(_wsMaterialGeneratorFactory.CreateInstance(GameTypeEnum.Warhammer3), outputPath, input, regenerateMaterials);
             return res;
         }
     }

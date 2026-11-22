@@ -65,12 +65,14 @@ namespace GameWorld.Core.Test.Services.SceneSaving
         void Save(string modelPath, params (string MeshName, CapabilityMaterial Material)[] meshes)
             => SaveMeshes(modelPath, meshes.Select(x => new Mesh(x.MeshName, x.Material)).ToArray());
 
-        void SaveMeshes(string modelPath, params Mesh[] meshes)
+        void SaveMeshes(string modelPath, params Mesh[] meshes) => SaveMeshes(modelPath, false, meshes);
+
+        void SaveMeshes(string modelPath, bool regenerateMaterials, params Mesh[] meshes)
         {
             var input = meshes
                 .Select((mesh, index) => new WsModelGeneratorInput(0, index, mesh.Name, mesh.VertexFormat, mesh.Material))
                 .ToList();
-            _generator.GenerateWsModel(_serializerFactory.CreateInstance(_game), modelPath, input);
+            _generator.GenerateWsModel(_serializerFactory.CreateInstance(_game), modelPath, input, regenerateMaterials);
         }
 
         (string FileName, string Content) GenerateMaterialFile(string meshName, UiVertexFormat vertexFormat, CapabilityMaterial material)
@@ -503,6 +505,34 @@ namespace GameWorld.Core.Test.Services.SceneSaving
             Assert.That(GetMaterialPath(ElephantModel, 1), Is.EqualTo(rimPath));
             Assert.That(GetBaseColour(ElephantModel, 1), Is.EqualTo("textures/rim.dds"));
             Assert.That(GetBaseColour(ElephantModel, 0), Is.EqualTo("textures/new_rim.dds"));
+        }
+
+        // Regenerate all materials
+
+        [Test]
+        public void Regenerate_HandTunedMaterialAtGeneratedName_IsOverwrittenFromTheTemplate()
+        {
+            var tunedPath = SaveThenHandTune(ElephantModel, "shield", "textures/elephant_skin.dds");
+
+            SaveMeshes(ElephantModel, true, new Mesh("shield", LoadMaterial(tunedPath)));
+
+            Assert.That(GetMaterialPath(ElephantModel, 0), Is.EqualTo(tunedPath));
+            Assert.That(GetShader(ElephantModel), Is.EqualTo("shaders/weighted2_character.xml.shader"));
+            Assert.That(ReadFile(tunedPath), Does.Not.Contain("hand_tuned_sheen"));
+            Assert.That(GetBaseColour(ElephantModel), Is.EqualTo("textures/elephant_skin.dds"));
+        }
+
+        [Test]
+        public void Regenerate_VanillaMaterial_IsGeneratedIntoTheMod()
+        {
+            var vanillaPath = AddVanillaMaterial("karl_body", "textures/karl_body.dds");
+            var vanillaContent = ReadFile(vanillaPath);
+
+            SaveMeshes(ElephantModel, true, new Mesh("shield", LoadMaterial(vanillaPath)));
+
+            Assert.That(GetMaterialPath(ElephantModel, 0), Is.Not.EqualTo(vanillaPath));
+            Assert.That(GetShader(ElephantModel), Is.EqualTo("shaders/weighted2_character.xml.shader"));
+            Assert.That(ReadFile(vanillaPath), Is.EqualTo(vanillaContent));
         }
 
         [Test]
