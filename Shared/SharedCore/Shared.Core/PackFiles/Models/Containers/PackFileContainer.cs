@@ -52,6 +52,71 @@ namespace Shared.Core.PackFiles.Models.Containers
                 parent.ExpectedStamp = PackFileStamp.Read(parent.FilePath);
         }
 
+        internal bool HasChangedOnDisk() => GetPackedFileSourceParents().Any(x => x.HasChangedOnDisk);
+
+        // Files whose content isn't read from this pack's file: edited, added or copied in AE since the last save
+        internal List<PackFile> GetUnsavedFiles()
+        {
+            var isReadFromThisPack = CreateIsReadFromThisPack();
+            return FileList.Values.Where(x => isReadFromThisPack(x) == false).ToList();
+        }
+
+        private Func<PackFile, bool> CreateIsReadFromThisPack()
+        {
+            if (string.IsNullOrWhiteSpace(SystemFilePath))
+                return _ => false;
+
+            var packPath = Path.GetFullPath(SystemFilePath);
+            return file => file.DataSource is PackedFileSource packed
+                && string.Equals(Path.GetFullPath(packed.Parent.FilePath), packPath, StringComparison.OrdinalIgnoreCase);
+        }
+
+        // Re-reads the pack after another program (e.g. RPFM) saved it. Files AE has edited, added or copied
+        // but not saved stay on top of the new version; everything else now reads from the new file. PackFile
+        // instances are kept for paths that still exist, so open editors keep valid references. Renames and
+        // deletions AE hasn't saved are undone, since the new version still has those files.
+        // Returns the unsaved files that were kept.
+        internal List<PackFile> ReloadFromDisk()
+        {
+            Guard.IsNotNullOrWhiteSpace(SystemFilePath, "Only a pack opened from disk can be reloaded");
+
+            var isReadFromThisPack = CreateIsReadFromThisPack();
+            var unsaved = FileList.Where(x => isReadFromThisPack(x.Value) == false).ToList();
+            var unsavedPaths = unsaved.Select(x => x.Key).ToHashSet(StringComparer.OrdinalIgnoreCase);
+
+            PackFileContainer fresh;
+            using (var stream = File.OpenRead(SystemFilePath))
+            using (var reader = new BinaryReader(stream, System.Text.Encoding.ASCII))
+                fresh = PackFileSerializerLoader.Load(SystemFilePath, stream.Length, reader, new RecordingDuplicateFileResolver());
+
+            var reloaded = new Dictionary<string, PackFile>(fresh.FileList.Count + unsaved.Count);
+            foreach (var (path, freshFile) in fresh.FileList)
+            {
+                if (unsavedPaths.Contains(path))
+                    continue;
+
+                if (FileList.TryGetValue(path, out var existing))
+                {
+                    existing.DataSource = freshFile.DataSource;
+                    reloaded[path] = existing;
+                }
+                else
+                {
+                    reloaded[path] = freshFile;
+                }
+            }
+
+            foreach (var (path, file) in unsaved)
+                reloaded[path] = file;
+
+            FileList = reloaded;
+            Header = fresh.Header;
+            OriginalLoadByteSize = fresh.OriginalLoadByteSize;
+            TrackChangesOnDisk();
+
+            return unsaved.Select(x => x.Value).ToList();
+        }
+
         // Why PackFileSerializerWriter can't write this pack back, or null if it can.
         // Checked when a pack is opened for editing, so nobody finds out on the first save.
         internal string? WhyCannotBeSaved()

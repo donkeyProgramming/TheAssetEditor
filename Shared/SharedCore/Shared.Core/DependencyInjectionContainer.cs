@@ -48,6 +48,7 @@ namespace Shared.Core
             services.AddScoped<IPackFileContainerCacheHelper, PackFileContainerCacheHelper>();
             services.AddTransient<IPackFileContainerLoader, PackFileContainerLoader>();
             services.AddTransient<PackBackupService>();
+            services.AddTransient<PackReloader>();
             services.AddTransient<IFileSystemWatcher, FileSystemWatcherWrapper>();
             services.AddSingleton<Func<IFileSystemWatcher>>(sp => () => sp.GetRequiredService<IFileSystemWatcher>());
             services.AddSingleton<ISystemFolderContainerFactory, SystemFolderContainerFactory>();

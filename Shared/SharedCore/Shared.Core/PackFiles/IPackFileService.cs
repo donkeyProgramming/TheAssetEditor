@@ -27,6 +27,11 @@ namespace Shared.Core.PackFiles
         void SavePackContainer(IPackFileContainer pf, string path, bool createBackup, GameInformation gameInformation);
         void SetEditablePack(IPackFileContainer? pf);
         void UnloadPackContainer(IPackFileContainer pf);
+
+        // For packs opened from a .pack file: whether another program has rewritten it since AE loaded or saved it
+        bool HasChangedOnDisk(IPackFileContainer pf);
+        bool HasUnsavedChanges(IPackFileContainer pf);
+        void ReloadPackContainer(IPackFileContainer pf);
         List<(string FileName, PackFile Pack)> FindAllWithExtention(string extention, IPackFileContainer? container = null);
     }
 }

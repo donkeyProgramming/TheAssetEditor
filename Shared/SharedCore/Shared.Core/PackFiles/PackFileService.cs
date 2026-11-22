@@ -210,6 +210,21 @@ namespace Shared.Core.PackFiles
                 disposable.Dispose();
         }
 
+        public bool HasChangedOnDisk(IPackFileContainer pf) => CastContainer(pf) is PackFileContainer container && container.HasChangedOnDisk();
+
+        public bool HasUnsavedChanges(IPackFileContainer pf) => CastContainer(pf) is PackFileContainer container && container.GetUnsavedFiles().Count > 0;
+
+        public void ReloadPackContainer(IPackFileContainer pf)
+        {
+            if (CastContainer(pf) is not PackFileContainer container)
+                throw new InvalidOperationException($"Only packs opened from a .pack file can be reloaded ('{DescribeContainer(pf)}')");
+
+            _logger.Here().Information($"Reloading '{DescribeContainer(container)}' from disk");
+            var keptUnsaved = container.ReloadFromDisk();
+            _logger.Here().Information($"Reloaded '{DescribeContainer(container)}': {container.GetFileCount()} files, {keptUnsaved.Count} unsaved AE edit(s) kept");
+            _globalEventHub?.PublishGlobalEvent(new PackFileContainerReloadedEvent(container, keptUnsaved));
+        }
+
         private void OnSystemFolderContainerFilesAddedExternally(object? sender, SystemFolderContainerFilesChangedEventArgs e)
         {
             if (sender is IPackFileContainer container)

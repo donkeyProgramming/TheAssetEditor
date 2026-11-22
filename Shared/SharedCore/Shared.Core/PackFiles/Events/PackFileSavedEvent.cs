@@ -16,6 +16,9 @@ namespace Shared.Core.PackFiles.Events
     public record PackFileContainerFolderRemovedEvent(IPackFileContainer Container, string Folder) : PackFileContainerManipulationEvent;
     public record PackFileContainerFolderRenamedEvent(IPackFileContainer Container, string OldNodePath, string NewNodePath) : PackFileContainerManipulationEvent;
 
+    // The pack was re-read after another program saved it. UnsavedFiles are the AE edits kept on top of the new version.
+    public record PackFileContainerReloadedEvent(IPackFileContainer Container, List<PackFile> UnsavedFiles) : PackFileContainerManipulationEvent;
+
     public class BeforePackFileContainerRemovedEvent(IPackFileContainer removed)
     {
         public IPackFileContainer Removed { get; internal set; } = removed;

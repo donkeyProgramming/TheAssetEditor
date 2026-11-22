@@ -161,6 +161,7 @@ namespace AssetEditor
             var mainWindow = _serviceProvider.GetRequiredService<MainWindow>();
             MainWindow = mainWindow;
             mainWindow.DataContext = _serviceProvider.GetRequiredService<MainViewModel>();
+            _ = _serviceProvider.GetRequiredService<PackChangedOnDiskChecker>(); // Checks open packs for outside changes whenever AE regains focus
             mainWindow.Closed += OnMainWindowClosed;
             mainWindow.Show();
 
