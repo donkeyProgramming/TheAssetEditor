@@ -15,8 +15,8 @@
 
     <DockPanel LastChildFill="False">
         <Label  DockPanel.Dock="Top" Content="{loc:Loc AnimationKeyframeEditor.Title}" FontSize="18" FontWeight="Bold"/>
-        <Label  DockPanel.Dock="Top" FontSize="10">{loc:Loc AnimationKeyframeEditor.RevealButtonsHint}</Label>
-        <Label  DockPanel.Dock="Top" FontSize="20" Foreground="Red" Visibility="{Binding IsDirty.Value, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource boolConv}}" >{loc:Loc AnimationKeyframeEditor.DirtyWarning}</Label>
+        <Label  DockPanel.Dock="Top" FontSize="10" Content="{loc:Loc AnimationKeyframeEditor.RevealButtonsHint}"/>
+        <Label  DockPanel.Dock="Top" FontSize="20" Foreground="Red" Visibility="{Binding IsDirty.Value, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource boolConv}}" Content="{loc:Loc AnimationKeyframeEditor.DirtyWarning}"/>
         <Grid  DockPanel.Dock="Top">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="20*"/>
@@ -39,7 +39,7 @@
                 <CheckBox DockPanel.Dock="Top" Content="{loc:Loc AnimationKeyframeEditor.Options.IncrementFrame}" IsChecked="{Binding IncrementFrameAfterCopyOperation.Value, UpdateSourceTrigger=PropertyChanged}"  />
                 <CheckBox DockPanel.Dock="Top" Content="{loc:Loc AnimationKeyframeEditor.Options.SelectPreviousBones}" IsChecked="{Binding AutoSelectPreviousBonesOnFrameChange.Value, UpdateSourceTrigger=PropertyChanged}"  />
                 <CheckBox DockPanel.Dock="Top" Content="{loc:Loc AnimationKeyframeEditor.Options.EnableIK}" IsChecked="{Binding EnableInverseKinematics.Value, UpdateSourceTrigger=PropertyChanged}"  IsEnabled="false"  />
-                <Label>{loc:Loc AnimationKeyframeEditor.Options.IkEndBone}</Label>
+                <Label Content="{loc:Loc AnimationKeyframeEditor.Options.IkEndBone}"/>
                 <ComboBox  
                           IsEditable="True"
                           IsTextSearchEnabled="false"
@@ -106,7 +106,7 @@
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
             <DockPanel>
-                <Label>{loc:Loc AnimationKeyframeEditor.PasteOptions.Title}</Label>
+                <Label Content="{loc:Loc AnimationKeyframeEditor.PasteOptions.Title}"/>
                 <CheckBox DockPanel.Dock="Top" Content="{loc:Loc AnimationKeyframeEditor.PasteOptions.Position}" IsChecked="{Binding PastePosition.Value, UpdateSourceTrigger=PropertyChanged}"  />
                 <CheckBox DockPanel.Dock="Top" Content="{loc:Loc AnimationKeyframeEditor.PasteOptions.Rotation}" IsChecked="{Binding PasteRotation.Value, UpdateSourceTrigger=PropertyChanged}"  />
                 <CheckBox DockPanel.Dock="Top" Content="{loc:Loc AnimationKeyframeEditor.PasteOptions.Scale}" IsChecked="{Binding PasteScale.Value, UpdateSourceTrigger=PropertyChanged}"  />
@@ -151,11 +151,11 @@
 
                     </Grid.ColumnDefinitions>
 
-                    <Label Grid.Column="0">{loc:Loc AnimationKeyframeEditor.Duration.Label}</Label>
+                    <Label Grid.Column="0" Content="{loc:Loc AnimationKeyframeEditor.Duration.Label}"/>
                     <TextBox Grid.Column="1" PreviewTextInput="AnimationTextInputPreview" Text="{Binding FramesDurationInSeconds, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"></TextBox>
-                    <Label Grid.Column="2">{loc:Loc AnimationKeyframeEditor.Duration.Seconds}</Label>
-                    <Button Grid.Column="3"  Click="{s:MethodBinding ResetDuration}">{loc:Loc AnimationKeyframeEditor.Buttons.Reset}</Button>
-                    <Button Grid.Column="4" Click="{s:MethodBinding ApplyDuration}">{loc:Loc AnimationKeyframeEditor.Buttons.Apply}</Button>
+                    <Label Grid.Column="2" Content="{loc:Loc AnimationKeyframeEditor.Duration.Seconds}"/>
+                    <Button Grid.Column="3"  Click="{s:MethodBinding ResetDuration}" Content="{loc:Loc AnimationKeyframeEditor.Buttons.Reset}"/>
+                    <Button Grid.Column="4" Click="{s:MethodBinding ApplyDuration}" Content="{loc:Loc AnimationKeyframeEditor.Buttons.Apply}"/>
                 </Grid>
             </DockPanel>
 
@@ -167,8 +167,8 @@
         
         <Grid DockPanel.Dock="Top" Margin="5,5,5,0">
             <StackPanel>
-                <Label>{loc:Loc AnimationKeyframeEditor.RangeCopy.InfoLine1}</Label>
-                <Label>{loc:Loc AnimationKeyframeEditor.RangeCopy.InfoLine2}</Label>
+                <Label Content="{loc:Loc AnimationKeyframeEditor.RangeCopy.InfoLine1}"/>
+                <Label Content="{loc:Loc AnimationKeyframeEditor.RangeCopy.InfoLine2}"/>
             </StackPanel>
         </Grid>
 
@@ -192,7 +192,7 @@
                 <ColumnDefinition Width="70"/>
                 <ColumnDefinition Width="120"/>
             </Grid.ColumnDefinitions>
-            <Label Grid.Column="0">{loc:Loc AnimationKeyframeEditor.RangeCopy.PasteLength}</Label>
+            <Label Grid.Column="0" Content="{loc:Loc AnimationKeyframeEditor.RangeCopy.PasteLength}"/>
             <TextBox Grid.Column="1" PreviewTextInput="FrameNrPreviewTextInput" TextChanged="FrameNrCantBeEmpty" IsEnabled="{Binding CopyMoreThanSingleFrame}" Text="{Binding FrameNrLength}"></TextBox>
             <Button Grid.Column="2" Content="{loc:Loc AnimationKeyframeEditor.Buttons.SetMax}"  Click="{s:MethodBinding SetFrameLengthMax}" Margin="2,0,0,0"/>
             <Button Grid.Column="3" Content="{loc:Loc AnimationKeyframeEditor.Buttons.FromClipboard}"  Click="{s:MethodBinding SetFrameLengthFromClipboard}" Margin="2,0,0,0"/>
@@ -216,19 +216,19 @@
 
         <Grid DockPanel.Dock="Top" Margin="5,5,5,0">
             <StackPanel>
-                <Label>{loc:Loc AnimationKeyframeEditor.Interpolation.Title}</Label>
+                <Label Content="{loc:Loc AnimationKeyframeEditor.Interpolation.Title}"/>
                 <StackPanel Orientation="Horizontal">
-                    <Label>{loc:Loc AnimationKeyframeEditor.Interpolation.SelectedFrameA}</Label>
+                    <Label Content="{loc:Loc AnimationKeyframeEditor.Interpolation.SelectedFrameA}"/>
                     <Label Content="{Binding SelectedFrameAInterpolation.Value, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}"></Label>
                 </StackPanel>
                 <StackPanel Orientation="Horizontal">
-                    <Label>{loc:Loc AnimationKeyframeEditor.Interpolation.SelectedFrameB}</Label>
+                    <Label Content="{loc:Loc AnimationKeyframeEditor.Interpolation.SelectedFrameB}"/>
                     <Label Content="{Binding SelectedFrameBInterpolation.Value, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}"></Label>
                 </StackPanel>
                 <StackPanel>
-                    <Label>{loc:Loc AnimationKeyframeEditor.Interpolation.InfoLine1}</Label>
-                    <Label>{loc:Loc AnimationKeyframeEditor.Interpolation.InfoLine2}</Label>
-                    <Label>{loc:Loc AnimationKeyframeEditor.Interpolation.InfoLine3}</Label>
+                    <Label Content="{loc:Loc AnimationKeyframeEditor.Interpolation.InfoLine1}"/>
+                    <Label Content="{loc:Loc AnimationKeyframeEditor.Interpolation.InfoLine2}"/>
+                    <Label Content="{loc:Loc AnimationKeyframeEditor.Interpolation.InfoLine3}"/>
                 </StackPanel>
             </StackPanel>
         </Grid>

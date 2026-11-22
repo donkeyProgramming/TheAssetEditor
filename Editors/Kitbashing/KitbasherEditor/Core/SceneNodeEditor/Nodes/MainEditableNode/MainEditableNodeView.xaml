@@ -16,7 +16,7 @@
     <DockPanel  LastChildFill="False">
 
         <DockPanel DockPanel.Dock="Top">
-            <TextBlock  FontSize="20" FontWeight="Bold" >{loc:Loc KitbashTool.MainNode.Title}</TextBlock>
+            <TextBlock  FontSize="20" FontWeight="Bold" Text="{loc:Loc KitbashTool.MainNode.Title}"/>
         </DockPanel>
         <Expander IsExpanded="True" Header="{loc:Loc KitbashTool.MainNode.General}" DockPanel.Dock="Top">
             <DockPanel DockPanel.Dock="Top">

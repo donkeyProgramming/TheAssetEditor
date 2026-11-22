@@ -39,7 +39,7 @@
                 <basedialogs:AeAttribute DockPanel.Dock="Top" LabelText="{loc:Loc KitbashTool.TintView.TintColour}" LabelWidth="{StaticResource labelWidth}"  >
                     <DockPanel>
                         <colourpickerbutton:ColourPickerButtonView DataContext="{Binding TintColour}" HorizontalAlignment="Left" Width="20" Height="20"/>
-                        <Label>{loc:Loc KitbashTool.TintView.Variation}</Label>
+                        <Label Content="{loc:Loc KitbashTool.TintView.Variation}"/>
                         <TextBox Margin="3" Text="{Binding TintVariation, UpdateSourceTrigger=LostFocus}" VerticalContentAlignment="Center" Width="50" HorizontalAlignment="Left" HorizontalContentAlignment="Right"/>
                     </DockPanel>
                 </basedialogs:AeAttribute>

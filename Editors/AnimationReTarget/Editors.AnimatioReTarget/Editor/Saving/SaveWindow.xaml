@@ -34,13 +34,13 @@
         </DockPanel>
 
         <DockPanel>
-            <Button Click="SaveButtonClick">{loc:Loc AnimationReTarget.Save.Save}</Button>
+            <Button Click="SaveButtonClick" Content="{loc:Loc AnimationReTarget.Save.Save}"/>
         </DockPanel>
         <DockPanel IsEnabled="False">
             <Button>{loc:Loc AnimationReTarget.Save.BatchExport}</Button>
         </DockPanel>
         <DockPanel>
-            <Button Click="CloseButtonClick">{loc:Loc AnimationReTarget.Save.Close}</Button>
+            <Button Click="CloseButtonClick" Content="{loc:Loc AnimationReTarget.Save.Close}"/>
         </DockPanel>
     </StackPanel>
 
