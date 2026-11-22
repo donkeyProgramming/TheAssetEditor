@@ -258,7 +258,7 @@ namespace Editors.AnimationVisualEditors.AnimationKeyframeEditor
             SceneObjects.Add(_riderItem);
 
             _gizmoToolbox = new(this);
-            _eventHub.Register<SelectionChangedEvent>(this, _ => UpdateSelectedBonesText());
+            _eventHub.Register<SelectionChangedEvent>(this, OnSelectionStateChanged);
             UpdateSelectedBonesText();
             _copyPastePose = new(this);
             _copyPasteClipboardPose = new(this);
@@ -350,6 +350,12 @@ namespace Editors.AnimationVisualEditors.AnimationKeyframeEditor
         private void MountSkeletonChanged(GameSkeleton newValue)
         {
             MountLinkController.ReloadFragments(false, true);
+        }
+
+        private void OnSelectionStateChanged(SelectionChangedEvent e)
+        {
+            _gizmoToolbox.HookState(e.NewState);
+            UpdateSelectedBonesText();
         }
 
         private void TryReGenerateAnimation(AnimationClip newValue = null)
