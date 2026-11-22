@@ -1,0 +1,34 @@
+<UserControl x:Class="AnimationEditor.MountAnimationCreator.Views.OutputSettingsView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:loc="clr-namespace:Shared.Ui.Common;assembly=Shared.Ui"
+             mc:Ignorable="d"
+             d:DesignHeight="120" d:DesignWidth="450">
+
+    <Expander>
+        <Expander.Header>
+            <TextBlock Style="{DynamicResource SectionHeader}" Text="{loc:Loc MountAnimationCreator.Output}"/>
+        </Expander.Header>
+        <Grid Margin="10,0,0,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <Label Grid.Row="0" Grid.Column="0" Content="{loc:Loc MountAnimationCreator.Labels.SavePrefix}" ToolTip="{loc:Loc MountAnimationCreator.Labels.SavePrefix.ToolTip}"/>
+            <TextBox Grid.Row="0" Grid.Column="1" Margin="0,1" VerticalContentAlignment="Center" ToolTip="{loc:Loc MountAnimationCreator.Labels.SavePrefix.ToolTip}" Text="{Binding SavePrefix.Value, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
+
+            <Label Grid.Row="1" Grid.Column="0" Content="{loc:Loc MountAnimationCreator.Labels.AnimVersion}" ToolTip="{loc:Loc MountAnimationCreator.Labels.AnimVersion.ToolTip}"/>
+            <ComboBox Grid.Row="1" Grid.Column="1" Margin="0,1" HorizontalAlignment="Left" MinWidth="60" ToolTip="{loc:Loc MountAnimationCreator.Labels.AnimVersion.ToolTip}" ItemsSource="{Binding AnimationOutputFormats}" SelectedItem="{Binding SelectedAnimationOutputFormat.Value, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
+
+            <CheckBox Grid.Row="2" Grid.ColumnSpan="2" Content="{loc:Loc MountAnimationCreator.Labels.EnsureUnique}" ToolTip="{loc:Loc MountAnimationCreator.Labels.EnsureUnique.ToolTip}" IsChecked="{Binding EnsureUniqueFileName.Value, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
+        </Grid>
+    </Expander>
+</UserControl>

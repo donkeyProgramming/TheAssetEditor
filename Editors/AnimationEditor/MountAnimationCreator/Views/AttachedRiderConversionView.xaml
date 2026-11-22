@@ -1,0 +1,45 @@
+<UserControl x:Class="AnimationEditor.MountAnimationCreator.Views.AttachedRiderConversionView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:s="http://schemas.singulink.com/xaml"
+             xmlns:local="clr-namespace:AnimationEditor.MountAnimationCreator.Views"
+             xmlns:loc="clr-namespace:Shared.Ui.Common;assembly=Shared.Ui"
+             mc:Ignorable="d"
+             d:DesignHeight="300" d:DesignWidth="450">
+
+    <StackPanel>
+        <TextBlock Style="{DynamicResource Info}" Text="{loc:Loc MountAnimationCreator.AttachedRiders.Help}"/>
+
+        <local:AttachPointView DataContext="{Binding AttachPoint, Mode=OneTime}"/>
+
+        <Expander>
+            <Expander.Header>
+                <TextBlock Style="{DynamicResource SectionHeader}" Text="{loc:Loc MountAnimationCreator.ThisSlot}"/>
+            </Expander.Header>
+            <StackPanel Margin="10,0,0,0">
+                <UniformGrid Columns="2">
+                    <Button Content="{loc:Loc MountAnimationCreator.Buttons.ToAttached}" ToolTip="{loc:Loc MountAnimationCreator.Buttons.ToAttached.ToolTip}" Click="{s:MethodBinding ConvertRiderToAttached}" IsEnabled="{Binding CanConvert.Value, UpdateSourceTrigger=PropertyChanged}"/>
+                    <Button Content="{loc:Loc MountAnimationCreator.Buttons.ToSynchronized}" ToolTip="{loc:Loc MountAnimationCreator.Buttons.ToSynchronized.ToolTip}" Click="{s:MethodBinding ConvertRiderToSynchronized}" IsEnabled="{Binding CanConvert.Value, UpdateSourceTrigger=PropertyChanged}"/>
+                </UniformGrid>
+                <TextBlock Style="{DynamicResource Status}" Text="{Binding ConvertStatus.Value, UpdateSourceTrigger=PropertyChanged}"/>
+                <Button Content="{loc:Loc MountAnimationCreator.Buttons.SaveConverted}" ToolTip="{loc:Loc MountAnimationCreator.Buttons.SaveConverted.ToolTip}" Click="{s:MethodBinding SaveConvertedAnimation}" IsEnabled="{Binding CanSave.Value, UpdateSourceTrigger=PropertyChanged}"/>
+            </StackPanel>
+        </Expander>
+
+        <Expander>
+            <Expander.Header>
+                <TextBlock Style="{DynamicResource SectionHeader}" Text="{loc:Loc MountAnimationCreator.WholeSet}"/>
+            </Expander.Header>
+            <StackPanel Margin="10,0,0,0">
+                <TextBlock Style="{DynamicResource Info}" Text="{loc:Loc MountAnimationCreator.AttachedRiders.WholeSet.Info}"/>
+                <UniformGrid Columns="2">
+                    <Button Content="{loc:Loc MountAnimationCreator.Buttons.SetToAttached}" ToolTip="{loc:Loc MountAnimationCreator.Buttons.SetToAttached.ToolTip}" Click="{s:MethodBinding ConvertSetToAttached}" IsEnabled="{Binding CanConvertSet.Value, UpdateSourceTrigger=PropertyChanged}"/>
+                    <Button Content="{loc:Loc MountAnimationCreator.Buttons.SetToSynchronized}" ToolTip="{loc:Loc MountAnimationCreator.Buttons.SetToSynchronized.ToolTip}" Click="{s:MethodBinding ConvertSetToSynchronized}" IsEnabled="{Binding CanConvertSet.Value, UpdateSourceTrigger=PropertyChanged}"/>
+                </UniformGrid>
+                <TextBlock Style="{DynamicResource Status}" Text="{Binding ConvertSetStatus.Value, UpdateSourceTrigger=PropertyChanged}"/>
+            </StackPanel>
+        </Expander>
+    </StackPanel>
+</UserControl>

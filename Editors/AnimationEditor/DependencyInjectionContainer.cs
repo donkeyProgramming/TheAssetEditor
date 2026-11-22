@@ -24,7 +24,7 @@ namespace Editors.AnimationVisualEditors
         {
             EditorInfoBuilder
                 .Create<MountAnimationCreatorViewModel, EditorHostView>(EditorEnums.MountTool_Editor)
-                .AddToToolbar("Mount Tool", true)
+                .AddToToolbar("Rider Animation Editor", true)
                 .Build(database);
         
             EditorInfoBuilder

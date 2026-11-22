@@ -6,6 +6,7 @@ const documentationPages = [
     { title: 'glTF/GLB Export', fileName: 'GltfExport.html' },
     { title: 'Music Project Editor', fileName: 'MusicProjectEditor.html' },
     { title: 'BMD Editor', fileName: 'BmdEditor.html' },
+    { title: 'Rider Animation Editor', fileName: 'RiderAnimationEditor.html' },
     {
         title: 'Kitbashing',
         children: [

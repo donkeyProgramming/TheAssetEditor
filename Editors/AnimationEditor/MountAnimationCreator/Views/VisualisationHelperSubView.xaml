@@ -1,42 +1,21 @@
 ﻿<UserControl x:Class="AnimationEditor.MountAnimationCreator.VisualisationHelperSubView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:local="clr-namespace:AnimationEditor.MountAnimationCreator"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:s="http://schemas.singulink.com/xaml"
              xmlns:loc="clr-namespace:Shared.Ui.Common;assembly=Shared.Ui"
-             mc:Ignorable="d" 
-             d:DesignHeight="450" d:DesignWidth="800">
-    <Expander Grid.Row="4" Header="{loc:Loc MountAnimationCreator.VisualisationHelp}" IsExpanded="True">
-        <Border BorderBrush="Gray" BorderThickness="0" Margin="10,5,10,0">
-            <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="auto"/>
-                    <ColumnDefinition Width="auto"/>
-                    <ColumnDefinition Width="auto"/>
-                    <ColumnDefinition Width="*"/>
-                </Grid.ColumnDefinitions>
+             mc:Ignorable="d"
+             d:DesignHeight="120" d:DesignWidth="450">
 
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="auto"/>
-                    <RowDefinition Height="auto"/>
-                    <RowDefinition Height="auto"/>
-                </Grid.RowDefinitions>
-
-
-                <Label Grid.Column="0" Grid.Row="0" Content="{loc:Loc MountAnimationCreator.Visualisation.SnapCameraToBone}"/>
-                <Label Grid.Column="1" Grid.Row="0" Content=":"/>
-                <CheckBox Grid.Column="2" Grid.Row="0" VerticalContentAlignment="Center" IsEnabled="False"/>
-
-                <Label Grid.Column="0" Grid.Row="1" Content="{loc:Loc MountAnimationCreator.Visualisation.DisplayPreviewMesh}"/>
-                <Label Grid.Column="1" Grid.Row="1" Content=":"/>
-                <CheckBox  Grid.Column="2" Grid.Row="1"  VerticalContentAlignment="Center" IsChecked="{Binding DisplayGeneratedMesh.Value, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
-
-                <Label Grid.Column="0" Grid.Row="2" Content="{loc:Loc MountAnimationCreator.Visualisation.DisplayPreviewSkeleton}"/>
-                <Label Grid.Column="1" Grid.Row="2" Content=":"/>
-                <CheckBox  Grid.Column="2" Grid.Row="2"  VerticalContentAlignment="Center" IsChecked="{Binding DisplayGeneratedSkeleton.Value, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
-
-            </Grid>
-        </Border>
+    <Expander>
+        <Expander.Header>
+            <TextBlock Style="{DynamicResource SectionHeader}" Text="{loc:Loc MountAnimationCreator.VisualisationHelp}"/>
+        </Expander.Header>
+        <StackPanel Margin="10,0,0,0">
+            <CheckBox Content="{loc:Loc MountAnimationCreator.Visualisation.DisplayPreviewMesh}" ToolTip="{loc:Loc MountAnimationCreator.Visualisation.DisplayPreviewMesh.ToolTip}" IsChecked="{Binding DisplayGeneratedMesh.Value, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
+            <CheckBox Content="{loc:Loc MountAnimationCreator.Visualisation.DisplayPreviewSkeleton}" ToolTip="{loc:Loc MountAnimationCreator.Visualisation.DisplayPreviewSkeleton.ToolTip}" IsChecked="{Binding DisplayGeneratedSkeleton.Value, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
+            <Button Content="{loc:Loc MountAnimationCreator.Buttons.CopyRiderAnimationFrames}" ToolTip="{loc:Loc MountAnimationCreator.Buttons.CopyRiderAnimationFrames.ToolTip}" Click="{s:MethodBinding CopyAnimation}"/>
+        </StackPanel>
     </Expander>
 </UserControl>

@@ -12,4 +12,15 @@
     <ProjectReference Include="..\Shared\Editors.Shared.Core\Editors.Shared.Core.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Compile Remove="Test.AnimationVisualEditors\**" />
+    <EmbeddedResource Remove="Test.AnimationVisualEditors\**" />
+    <None Remove="Test.AnimationVisualEditors\**" />
+    <Page Remove="Test.AnimationVisualEditors\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="Test.AnimationVisualEditors" />
+  </ItemGroup>
+
 </Project>
