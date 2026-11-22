@@ -21,7 +21,7 @@ namespace GameWorld.Core.Rendering.Materials.Serialization
 
         public IMaterialToWsMaterialSerializer CreateInstance(GameTypeEnum preferedGameHint)
         {
-            var repository = new WsMaterialRepository(_packFileServic);
+            var repository = new WsMaterialRepository(_packFileServic, preferedGameHint);
             var instance = new MaterialToWsMaterialSerializer(_fileSaveService, repository, preferedGameHint);
             return instance;
         }
@@ -29,6 +29,9 @@ namespace GameWorld.Core.Rendering.Materials.Serialization
 
     public interface IMaterialToWsMaterialSerializer
     {
+        // Call for every mesh before any ProsessMaterial. Returns the file the material was loaded from when it still holds
+        // the material, and keeps the rest of the save from overwriting that file or a loaded one AE did not write.
+        string? ReserveLoadedMaterial(string meshName, UiVertexFormat meshVertexFormat, CapabilityMaterial material);
         string ProsessMaterial(string modelFilePath, string meshName, UiVertexFormat meshVertexFormat, CapabilityMaterial material);
     }
 
@@ -38,12 +41,45 @@ namespace GameWorld.Core.Rendering.Materials.Serialization
         private readonly IFileSaveService _fileSaveService;
         private readonly IWsMaterialRepository _repository;
         private readonly HashSet<string> _materialPathsUsedBySave = [];
+        private readonly ILogger _logger = Logging.Create<MaterialToWsMaterialSerializer>();
 
         public MaterialToWsMaterialSerializer(IFileSaveService fileSaveService, IWsMaterialRepository wsMaterialRepository, GameTypeEnum preferedGameHint)
         {
             _repository = wsMaterialRepository;
             _fileSaveService = fileSaveService;
             _preferedGameHint = preferedGameHint;
+        }
+
+        public string? ReserveLoadedMaterial(string meshName, UiVertexFormat meshVertexFormat, CapabilityMaterial material)
+        {
+            var loadedFrom = material.LoadedFrom;
+            if (loadedFrom == null || _repository.CanReferenceMaterial(loadedFrom.Path) == false)
+                return null;
+
+            // Compare what would be written, not the file: it can hold shaders and params the template has no place for
+            string loadedContent;
+            try
+            {
+                loadedContent = CreateMaterialFile(meshName, loadedFrom.VertexFormat, loadedFrom.Material).Content;
+            }
+            catch (Exception e)
+            {
+                // No template for the material as loaded, so nothing to compare: generate it like any other
+                _logger.Here().Warning(e, "Unable to compare the material loaded from {MaterialPath}", loadedFrom.Path);
+                return null;
+            }
+
+            var isUnchanged = loadedFrom.VertexFormat == meshVertexFormat && CreateMaterialFile(meshName, meshVertexFormat, material).Content == loadedContent;
+            if (isUnchanged)
+            {
+                _materialPathsUsedBySave.Add(PathNormalization.NormalizeFileName(loadedFrom.Path));
+                return loadedFrom.Path;
+            }
+
+            // Edited, so it gets a generated file. Never one written over a file AE could not have written.
+            if (_repository.HoldsMaterial(loadedFrom.Path, loadedContent) == false)
+                _materialPathsUsedBySave.Add(PathNormalization.NormalizeFileName(loadedFrom.Path));
+            return null;
         }
 
         public string ProsessMaterial(string modelFilePath, string meshName, UiVertexFormat meshVertexFormat, CapabilityMaterial material)

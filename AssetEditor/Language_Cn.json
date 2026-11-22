@@ -745,6 +745,8 @@
   "KitbashTool.SaveDialog.Save": "保存",
   "KitbashTool.SaveDialog.DisplayDialogOnNextSave": "下次保存时显示对话框",
   "KitbashTool.SaveDialog.OnlySaveVisibleNodes": "仅保存可见节点",
+  "KitbashTool.SaveDialog.RegenerateMaterials": "重新生成所有材质",
+  "KitbashTool.SaveDialog.Tooltips.RegenerateMaterials": "本次保存时按 Asset Editor 的模板写出所有材质，包括原本会按加载时原样保留的材质。若仅此模型使用，位于 Asset Editor 所给名称处的材质文件将被覆盖。",
   "KitbashTool.SaveDialog.Tooltips.NumberOfLods": "将生成的 LOD 数量。正常为 4，大型模型为 5，某些特殊模型为 1",
   "KitbashTool.SaveDialog.Columns.Index": "索引",
   "KitbashTool.SaveDialog.Columns.Distance": "距离",

@@ -21,6 +21,7 @@ namespace GameWorld.Core.Services.SceneSaving
         public int NumberOfLodsToGenerate { get; set; } = 4;
         public List<RmvAttachmentPoint> AttachmentPoints { get; set; } = [];
         public bool DisplayDialogOnNextSave { get; set; } = true;
+        public bool RegenerateMaterials { get; set; } = false;  // For the next save only, never remembered
 
         public GeometrySaveSettings(ApplicationSettingsService applicationSettingsService)
         {

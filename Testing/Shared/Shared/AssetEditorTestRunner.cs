@@ -47,10 +47,12 @@ namespace Test.TestingUtility.Shared
             Keyboard = ServiceProvider.GetRequiredService<IWindowsKeyboard>() as TestKeyboard;
         }
 
-        public IPackFileContainer? LoadPackFile(string path, bool createOutputPackFile = true)
+        // loadAsGamePack: the pack stands in for the game's own packs, as when AE loads the game's data
+        public IPackFileContainer? LoadPackFile(string path, bool createOutputPackFile = true, bool loadAsGamePack = false)
         {
             var loader = ServiceProvider.GetRequiredService<IPackFileContainerLoader>();
             var container = loader.CreateFromPackFile(PackFileContainerType.Normal, path, false);
+            container.IsCaPackFile = loadAsGamePack;
             PackFileService.AddContainer(container);
 
             if (createOutputPackFile)

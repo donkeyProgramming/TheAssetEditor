@@ -13,7 +13,7 @@ namespace GameWorld.Core.Services.SceneSaving.Material.Strategies
 
         }
 
-        public WsMaterialResult Generate(MainEditableNode mainNode, string outputPath, bool onlyVisibleNodes)
+        public WsMaterialResult Generate(MainEditableNode mainNode, string outputPath, bool onlyVisibleNodes, bool regenerateMaterials)
         {
             return new WsMaterialResult(true, null, null);
         }

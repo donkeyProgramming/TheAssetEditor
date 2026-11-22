@@ -26,7 +26,8 @@ namespace GameWorld.Core.Services.SceneSaving.Material
             _packFileSaveService = packFileSaveService;
         }
 
-        public WsMaterialResult GenerateWsModel(IMaterialToWsMaterialSerializer wsMaterialGenerator, string modelFilePath, List<WsModelGeneratorInput> meshInformation)
+        // regenerateMaterials: write every material from the template, also those a save would otherwise keep as loaded
+        public WsMaterialResult GenerateWsModel(IMaterialToWsMaterialSerializer wsMaterialGenerator, string modelFilePath, List<WsModelGeneratorInput> meshInformation, bool regenerateMaterials = false)
         {
             try
             {
@@ -36,7 +37,7 @@ namespace GameWorld.Core.Services.SceneSaving.Material
                     return new WsMaterialResult(false, null, null); 
                 }
                
-                var wsModelData = CreateWsModel(wsMaterialGenerator, modelFilePath, meshInformation);
+                var wsModelData = CreateWsModel(wsMaterialGenerator, modelFilePath, meshInformation, regenerateMaterials);
 
                 var wsModelPath = Path.ChangeExtension(modelFilePath, ".wsmodel");
                 var existingWsModelFile = _packFileService.FindFile(wsModelPath, _packFileService.GetEditablePack());
@@ -52,7 +53,7 @@ namespace GameWorld.Core.Services.SceneSaving.Material
             }
         }
 
-        static string CreateWsModel(IMaterialToWsMaterialSerializer wsMaterialGenerator, string modelFilePath, List<WsModelGeneratorInput> meshInformation)
+        static string CreateWsModel(IMaterialToWsMaterialSerializer wsMaterialGenerator, string modelFilePath, List<WsModelGeneratorInput> meshInformation, bool regenerateMaterials)
         {
             var meshesWithUniqeNames = EnsureUniqueMeshNames(meshInformation);
             var orderedMeshInfo = meshesWithUniqeNames
@@ -65,10 +66,21 @@ namespace GameWorld.Core.Services.SceneSaving.Material
             sb.Append($"\t<geometry>{modelFilePath}</geometry>\n");
             sb.Append("\t\t<materials>\n");
 
-            foreach (var meshInfo in orderedMeshInfo)
+            // All meshes first, so no mesh's generated material can take a file a later mesh keeps
+            var keptMaterialPaths = orderedMeshInfo
+                .Select(x => regenerateMaterials ? null : wsMaterialGenerator.ReserveLoadedMaterial(x.MeshName, x.MeshVertexFormat, x.Material))
+                .ToList();
+
+            for (var i = 0; i < orderedMeshInfo.Count; i++)
             {
-                var materialPath = wsMaterialGenerator.ProsessMaterial(modelFilePath, meshInfo.MeshName, meshInfo.MeshVertexFormat, meshInfo.Material);
-             
+                var meshInfo = orderedMeshInfo[i];
+                var materialPath = keptMaterialPaths[i] ?? wsMaterialGenerator.ProsessMaterial(modelFilePath, meshInfo.MeshName, meshInfo.MeshVertexFormat, meshInfo.Material);
+
+                // Regenerated on purpose, so later saves compare against what this one wrote, not the file the model was
+                // opened with: that one would still match and be kept again. Other saves keep the loaded file reserved.
+                if (regenerateMaterials)
+                    meshInfo.Material.RememberLoadedFrom(materialPath, meshInfo.MeshVertexFormat);
+
                 sb.Append($"\t\t\t<material lod_index=\"{meshInfo.LodIndex}\" part_index=\"{meshInfo.MeshIndex}\">");
                 sb.Append(materialPath);
                 sb.Append("</material>\n");

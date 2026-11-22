@@ -3,6 +3,7 @@ using System.Text.RegularExpressions;
 using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
 using Shared.Core.PackFiles.Utility;
+using Shared.Core.Settings;
 using Shared.GameFormats.WsModel;
 
 namespace GameWorld.Core.Rendering.Materials.Serialization
@@ -12,19 +13,24 @@ namespace GameWorld.Core.Rendering.Materials.Serialization
         bool TryGetExistingMaterial(string wsMaterialContent, out string wsMaterialPath);
         void AddMaterial(string wsMaterialContent, string wsMaterialPath);
         bool CanWriteMaterial(string wsMaterialPath, string ownerWsModelPath);
+        bool CanReferenceMaterial(string wsMaterialPath);
+        bool HoldsMaterial(string wsMaterialPath, string wsMaterialContent);
     }
 
     class WsMaterialRepository : IWsMaterialRepository
     {
         private readonly IPackFileService _packFileService;
+        private readonly GameTypeEnum? _targetGame;
         private readonly Dictionary<string, string> _map = [];
         private readonly Dictionary<string, string> _contentByPath = [];
         private Dictionary<string, HashSet<string>>? _wsModelsByMaterialPath;
         private readonly ILogger _logger = Logging.Create<WsMaterialRepository>();
 
-        public WsMaterialRepository(IPackFileService packFileService)
+        // targetGame: the game the wsmodel is saved for. Only that game's packs ship with it; null accepts any game's packs.
+        public WsMaterialRepository(IPackFileService packFileService, GameTypeEnum? targetGame = null)
         {
             _packFileService = packFileService;
+            _targetGame = targetGame;
             LoadAllExistingMaterials();
         }
 
@@ -70,6 +76,47 @@ namespace GameWorld.Core.Rendering.Materials.Serialization
             return users.All(x => x == owner);
         }
 
+        // Whether a wsmodel in the editable pack can point at the file without copying it: it ships in that pack or with the game.
+        // A file from any other pack (another mod, another game's packs opened for porting) may not be there when the mod is used.
+        public bool CanReferenceMaterial(string wsMaterialPath)
+        {
+            var file = _packFileService.FindFile(wsMaterialPath);
+            if (file == null)
+                return false;
+
+            var container = _packFileService.GetPackFileContainer(file);
+            return container != null && CanReferenceFrom(container);
+        }
+
+        bool CanReferenceFrom(IPackFileContainer container)
+        {
+            if (container == _packFileService.GetEditablePack())
+                return true;
+
+            // Game packs carry their game when AE loads them, so another game's (File > Open ... packs) don't count
+            var game = container.PackFileSettings.GameVersion;
+            return container.IsCaPackFile && (game == null || _targetGame == null || game == _targetGame);
+        }
+
+        // Whether the file the game would read at the path has this content, ignoring the name and whitespace
+        public bool HoldsMaterial(string wsMaterialPath, string wsMaterialContent)
+        {
+            var file = _packFileService.FindFile(wsMaterialPath);
+            if (file == null)
+                return false;
+
+            try
+            {
+                var fileContent = Encoding.UTF8.GetString(file.DataSource.ReadData());
+                return SanatizeMaterial(fileContent) == SanatizeMaterial(wsMaterialContent);
+            }
+            catch (Exception e)
+            {
+                _logger.Here().Error(e, "Failed to read material {MaterialPath}", wsMaterialPath);
+                return false;
+            }
+        }
+
         void Register(string sanitizedWsMaterial, string wsMaterialPath)
         {
             // The path no longer holds its old content, so stop offering it for that content
@@ -113,6 +160,10 @@ namespace GameWorld.Core.Rendering.Materials.Serialization
             var seenPaths = new HashSet<string>();
             for (var i = containers.Count - 1; i >= 0; i--)
             {
+                // Reusing a file from any other pack would make the mod depend on it
+                if (CanReferenceFrom(containers[i]) == false)
+                    continue;
+
                 var materialPacks = PackFileServiceUtility.FindAllWithExtentionIncludePaths(_packFileService, ".material", containers[i]);
                 foreach (var (fileName, pack) in materialPacks.Where(x => x.Pack.Name.Contains(".xml.material")))
                 {

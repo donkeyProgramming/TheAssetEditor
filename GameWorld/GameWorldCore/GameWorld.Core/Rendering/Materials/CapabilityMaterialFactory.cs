@@ -161,6 +161,7 @@ namespace GameWorld.Core.Rendering.Materials
         public CapabilityMaterial ChangeMaterial(CapabilityMaterial source, CapabilityMaterialsEnum newMaterialType)
         {
             var newMaterial = CreateMaterial(newMaterialType);
+            newMaterial.LoadedFrom = source.LoadedFrom; // A save compares what it would write, so a changed type still regenerates
 
             for (var sourceCapIndex = 0; sourceCapIndex < source.Capabilities.Length; sourceCapIndex++)
             {
