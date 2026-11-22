@@ -5,6 +5,7 @@ using GameWorld.Core.SceneNodes;
 using Shared.Core.Commands;
 using Shared.Core.PackFiles.Models;
 using Shared.Core.ToolCreation;
+using Shared.GameFormats.Animation;
 using Test.TestingUtility.Shared;
 using Test.TestingUtility.TestUtility;
 
@@ -37,6 +38,7 @@ namespace Test.AnimatioReTarget
             Step3_ApplyDefaultMapping(runner, editor!);
             Step4_GenerateAnimation(runner, editor!);
             Step5_UpdateAnimationSettingsAndGenerateAnimation(runner, editor!, outputPackFile);
+            Step6_SaveAsVersion8(editor!, outputPackFile);
             // UpdateSouceAndValidate(runner, editor!);
             // UpdateTargetAndValidate(runner, editor!);
             // Close
@@ -123,6 +125,19 @@ namespace Test.AnimatioReTarget
             Assert.That(outputPackFile.FindFile("animations\\battle\\humanoid01e\\2handed_hammer\\stand\\prefix_hu1_2hh_stand_idle_01.anim"), Is.Not.Null);
         }
 
+        private void Step6_SaveAsVersion8(AnimationRetargetEditor editor, IPackFileContainer outputPackFile)
+        {
+            editor.SaveManager.Settings.AnimationFormat = 8;
+            editor.SaveManager.Settings.SavePrefix = "v8_";
+            editor.SaveManager.SaveAnimation(false);
+
+            var saved = outputPackFile.FindFile("animations\\battle\\humanoid01e\\2handed_hammer\\stand\\v8_hu1_2hh_stand_idle_01.anim");
+            Assert.That(saved, Is.Not.Null);
+            var file = AnimationFile.Create(saved!);
+            Assert.That(file.Header.Version, Is.EqualTo(8));
+            Assert.That(file.Header.UnknownValue_v8, Is.EqualTo(6));
+            Assert.That(file.AnimationParts.Single().DynamicFrames, Is.Not.Empty);
+        }
     }
 }
 

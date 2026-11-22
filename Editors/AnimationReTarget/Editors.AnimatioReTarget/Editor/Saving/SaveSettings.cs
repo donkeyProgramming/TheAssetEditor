@@ -4,7 +4,7 @@ namespace Editors.AnimatioReTarget.Editor.Saving
 {
     public partial class SaveSettings : ObservableObject
     {
-        public List<uint> PossibleAnimationFormats = [5, 6, 7];
+        public List<uint> PossibleAnimationFormats { get; } = [5, 6, 7, 8];   // a property: WPF cannot bind to a field
 
         [ObservableProperty] string _savePrefix = "prefix_";
         [ObservableProperty] uint _animationFormat = 7;

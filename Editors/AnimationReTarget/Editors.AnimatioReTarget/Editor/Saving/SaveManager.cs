@@ -63,13 +63,15 @@ namespace Editors.AnimatioReTarget.Editor.Saving
             var animationName = _source.AnimationName.Value;
             var clip = _generated.AnimationClip;
            
-            var animFile = clip.ConvertToFileFormat(_generated.Skeleton);
+            var animFile = Settings.AnimationFormat == 8
+                ? ConvertToVersionEight(clip, animationName)
+                : clip.ConvertToFileFormat(_generated.Skeleton);
 
              var orgSkeleton = _source.Skeleton.SkeletonName;
              var newSkeleton = _target.Skeleton.SkeletonName;
              var newPath = animationName.Replace(orgSkeleton, newSkeleton);
 
-            if (Settings.AnimationFormat != 7)
+            if (Settings.AnimationFormat is not 7 and not 8)
             {
                 var skeleton = _skeletonAnimationLookUpHelper.GetSkeletonFileFromName(animFile.Header.SkeletonName);
                 animFile.ConvertToVersion(Settings.AnimationFormat, skeleton, _pfs);
@@ -82,6 +84,16 @@ namespace Editors.AnimatioReTarget.Editor.Saving
             _saveService.Save(newPath, AnimationFile.ConvertToBytes(animFile), prompOnConflict);
 
         }
+        // The retargeted clip is on another skeleton, so only the source's header values carry over (flags, unknown_v8),
+        // never its packing
+        AnimationFile ConvertToVersionEight(GameWorld.Core.Animation.AnimationClip clip, string sourcePath)
+        {
+            var sourceFile = _pfs.FindFile(sourcePath);
+            var header = sourceFile == null ? null : AnimationFile.Create(sourceFile).Header;   // the header alone can run past what GetAnimationHeader peeks
+            var unknownValueV8 = header?.Version == 8 ? header.UnknownValue_v8 : (uint?)null;
+            return clip.ConvertToFileFormat(_generated.Skeleton, 8, unknownValueV8, header?.FlagVariables);
+        }
+
         [RelayCommand] void ShowSaveSettings()
         {
             var window = _settingsWindowFactory.Create();
