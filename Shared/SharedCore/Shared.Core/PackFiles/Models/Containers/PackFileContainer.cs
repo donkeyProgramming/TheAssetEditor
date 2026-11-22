@@ -331,18 +331,9 @@ namespace Shared.Core.PackFiles.Models.Containers
                     throw new Exception("File has been changed outside of AssetEditor. Can not save the file as it will cause corruptions");
             }
 
-            IReadOnlyList<PackFileSourceUpdate> sourceUpdates;
-            using (var memoryStream = new FileStream(path + "_temp", FileMode.Create))
-            {
-                using var writer = new BinaryWriter(memoryStream);
-                sourceUpdates = PackFileSerializerWriter.SaveToByteArray(path, this, writer, effectiveGameInformation);
-            }
-
-            _logger.Here().Information("Finished writing pack file to temporary file, now replacing original file with the new one");
-            File.Delete(path);
-
-            _logger.Here().Information("Original file deleted, now moving temporary file to original file path");
-            File.Move(path + "_temp", path);
+            var sourceUpdates = SaveUtility.WriteThroughTempFile(path,
+                writer => PackFileSerializerWriter.SaveToByteArray(path, this, writer, effectiveGameInformation));
+            _logger.Here().Information("Pack file written and moved into place");
 
             // Only now does the file at path hold the offsets the new sources point at
             foreach (var update in sourceUpdates)

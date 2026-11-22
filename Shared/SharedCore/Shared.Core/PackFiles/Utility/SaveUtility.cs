@@ -29,6 +29,34 @@ namespace Shared.Core.PackFiles.Utility
             return text;
         }
 
+        // Writes path_temp, then moves it over path in one step, so path only ever holds the old
+        // file or the complete new one. The temp file is removed if anything fails.
+        public static T WriteThroughTempFile<T>(string path, Func<BinaryWriter, T> write)
+        {
+            var tempPath = path + "_temp";
+            try
+            {
+                T result;
+                using (var stream = new FileStream(tempPath, FileMode.Create))
+                using (var writer = new BinaryWriter(stream))
+                    result = write(writer);
+
+                File.Move(tempPath, path, overwrite: true);
+                return result;
+            }
+            catch
+            {
+                try
+                {
+                    if (File.Exists(tempPath))
+                        File.Delete(tempPath);
+                }
+                catch (IOException) { }
+                catch (UnauthorizedAccessException) { }
+                throw;
+            }
+        }
+
         public static void CreateFileBackup(string originalFileName)
         {
             if (File.Exists(originalFileName))

@@ -58,6 +58,7 @@ namespace Shared.CoreTest.PackFiles.Models.Containers
             Assert.Throws<IOException>(() => pack.SaveToDisk(_packPath, false, s_wh3));
 
             Assert.That(File.ReadAllBytes(_packPath), Is.EqualTo(bytesBefore));
+            Assert.That(File.Exists(_packPath + "_temp"), Is.False);
             foreach (var (path, content) in s_files)
                 Assert.That(ReadText(pack, path), Is.EqualTo(content), path);
         }
