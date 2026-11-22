@@ -1,5 +1,6 @@
 ﻿using System.IO;
 using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using Editors.Twui.Editor.ComponentEditor;
 using Editors.Twui.Editor.Rendering;
 using GameWorld.Core.WpfWindow;
@@ -21,6 +22,7 @@ namespace Editors.Twui.Editor
         public PackFile CurrentFile { get; set; }
 
         [ObservableProperty] public partial TwuiContext? ParsedTwuiFile { get; set; }
+        [ObservableProperty] public partial string HierarchyFilter { get; set; } = "";
         [ObservableProperty] ComponentManger _componentManager;
         [ObservableProperty] IWpfGame _scene;
         private readonly IPackFileService _packFileService;
@@ -53,6 +55,32 @@ namespace Editors.Twui.Editor
 
             ComponentManager.SetFile(ParsedTwuiFile);
             _renderComponent.SetFile(ParsedTwuiFile);
+            ApplyHierarchyFilter();
+        }
+
+        /// <summary>Shows components whose name contains the filter text, along with their
+        /// parents so they can still be reached in the tree. An empty filter shows everything.</summary>
+        [RelayCommand]
+        public void ApplyHierarchyFilter()
+        {
+            if (ParsedTwuiFile == null)
+                return;
+
+            var filter = HierarchyFilter.Trim();
+            foreach (var component in ParsedTwuiFile.Componenets)
+                ApplyHierarchyFilter(component, filter);
+        }
+
+        static bool ApplyHierarchyFilter(TwuiComponent component, string filter)
+        {
+            var anyChildVisible = false;
+            foreach (var child in component.Children ?? [])
+                anyChildVisible |= ApplyHierarchyFilter(child, filter);
+
+            component.IsVisibleInHierarchy = filter.Length == 0
+                || anyChildVisible
+                || component.Name.Contains(filter, StringComparison.OrdinalIgnoreCase);
+            return component.IsVisibleInHierarchy;
         }
     }
 }
