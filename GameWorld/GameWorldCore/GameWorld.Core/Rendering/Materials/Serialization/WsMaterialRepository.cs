@@ -3,6 +3,7 @@ using System.Text.RegularExpressions;
 using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
 using Shared.Core.PackFiles.Utility;
+using Shared.Core.Settings;
 using Shared.GameFormats.WsModel;
 
 namespace GameWorld.Core.Rendering.Materials.Serialization
@@ -19,14 +20,17 @@ namespace GameWorld.Core.Rendering.Materials.Serialization
     class WsMaterialRepository : IWsMaterialRepository
     {
         private readonly IPackFileService _packFileService;
+        private readonly GameTypeEnum? _targetGame;
         private readonly Dictionary<string, string> _map = [];
         private readonly Dictionary<string, string> _contentByPath = [];
         private Dictionary<string, HashSet<string>>? _wsModelsByMaterialPath;
         private readonly ILogger _logger = Logging.Create<WsMaterialRepository>();
 
-        public WsMaterialRepository(IPackFileService packFileService)
+        // targetGame: the game the wsmodel is saved for. Only that game's packs ship with it; null accepts any game's packs.
+        public WsMaterialRepository(IPackFileService packFileService, GameTypeEnum? targetGame = null)
         {
             _packFileService = packFileService;
+            _targetGame = targetGame;
             LoadAllExistingMaterials();
         }
 
@@ -84,7 +88,15 @@ namespace GameWorld.Core.Rendering.Materials.Serialization
             return container != null && CanReferenceFrom(container);
         }
 
-        bool CanReferenceFrom(IPackFileContainer container) => container.IsCaPackFile || container == _packFileService.GetEditablePack();
+        bool CanReferenceFrom(IPackFileContainer container)
+        {
+            if (container == _packFileService.GetEditablePack())
+                return true;
+
+            // Game packs carry their game when AE loads them, so another game's (File > Open ... packs) don't count
+            var game = container.PackFileSettings.GameVersion;
+            return container.IsCaPackFile && (game == null || _targetGame == null || game == _targetGame);
+        }
 
         // Whether the file the game would read at the path has this content, ignoring the name and whitespace
         public bool HoldsMaterial(string wsMaterialPath, string wsMaterialContent)

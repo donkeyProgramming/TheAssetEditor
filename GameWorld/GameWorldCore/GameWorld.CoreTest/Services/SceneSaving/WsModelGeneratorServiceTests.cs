@@ -30,6 +30,7 @@ namespace GameWorld.Core.Test.Services.SceneSaving
         IPackFileService _pfs;
         IPackFileContainer _vanillaPack;
         IPackFileContainer _otherPack;
+        IPackFileContainer _warhammer2Pack;
         IPackFileContainer _editablePack;
         FileSaveService _saveService;
         WsModelGeneratorService _generator;
@@ -46,6 +47,10 @@ namespace GameWorld.Core.Test.Services.SceneSaving
             _vanillaPack.IsCaPackFile = true;
             _otherPack = _pfs.CreateNewPackFileContainer("other_mod", PackFileVersion.PFH5, PackFileCAType.MOD, false);
             _otherPack.IsReadOnly = true;
+            _vanillaPack.PackFileSettings.GameVersion = _game;
+            _warhammer2Pack = _pfs.CreateNewPackFileContainer("warhammer2", PackFileVersion.PFH5, PackFileCAType.RELEASE, false);
+            _warhammer2Pack.IsCaPackFile = true;
+            _warhammer2Pack.PackFileSettings.GameVersion = GameTypeEnum.Warhammer2;
             _editablePack = _pfs.CreateNewPackFileContainer("output", PackFileVersion.PFH5, PackFileCAType.MOD, true);
 
             _saveService = new FileSaveService(_pfs, null, MockScopedLogger.Create());
@@ -315,6 +320,31 @@ namespace GameWorld.Core.Test.Services.SceneSaving
             Assert.That(GetShader(ElephantModel), Is.EqualTo("shaders/weighted2_character.xml.shader"));
             Assert.That(GetBaseColour(ElephantModel), Is.EqualTo("textures/karl_body.dds"));
             Assert.That(ReadFile(otherPath), Is.EqualTo(otherContent));
+        }
+
+        [Test]
+        public void OtherGamesMaterial_Unchanged_IsGeneratedIntoTheMod()
+        {
+            // File > Open Warhammer2 packs, to port a WH2 model to WH3
+            var warhammer2Path = AddVanillaMaterial("karl_body", "textures/karl_body.dds", pack: _warhammer2Pack);
+
+            Save(ElephantModel, ("shield", LoadMaterial(warhammer2Path)));
+
+            Assert.That(GetMaterialPath(ElephantModel, 0), Is.Not.EqualTo(warhammer2Path));
+            Assert.That(GetShader(ElephantModel), Is.EqualTo("shaders/weighted2_character.xml.shader"));
+            Assert.That(GetBaseColour(ElephantModel), Is.EqualTo("textures/karl_body.dds"));
+        }
+
+        [Test]
+        public void IdenticalMaterialInOtherGamesPacks_IsNotReused()
+        {
+            var material = CreateMaterial("textures/elephant_skin.dds");
+            var (fileName, content) = GenerateMaterialFile("karl_shield", UiVertexFormat.Weighted, material);
+            AddToReadOnlyPack(_warhammer2Pack, VanillaMaterialFolder, PackFile.CreateFromASCII(fileName, content));
+
+            Save(ElephantModel, ("shield", material));
+
+            Assert.That(_pfs.FindFile(GetMaterialPath(ElephantModel, 0), _editablePack), Is.Not.Null);
         }
 
         [Test]

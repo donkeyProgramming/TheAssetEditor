@@ -21,7 +21,7 @@ namespace GameWorld.Core.Rendering.Materials.Serialization
 
         public IMaterialToWsMaterialSerializer CreateInstance(GameTypeEnum preferedGameHint)
         {
-            var repository = new WsMaterialRepository(_packFileServic);
+            var repository = new WsMaterialRepository(_packFileServic, preferedGameHint);
             var instance = new MaterialToWsMaterialSerializer(_fileSaveService, repository, preferedGameHint);
             return instance;
         }
