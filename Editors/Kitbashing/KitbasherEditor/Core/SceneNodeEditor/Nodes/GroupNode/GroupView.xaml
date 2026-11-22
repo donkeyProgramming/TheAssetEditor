@@ -11,7 +11,7 @@
         <Label Content="{loc:Loc KitbashTool.GroupView.Title}" FontSize="20" FontWeight="Bold" DockPanel.Dock="Top"/>
 
         <DockPanel DockPanel.Dock="Top">
-            <Label Width="100" DockPanel.Dock="Left">{loc:Loc KitbashTool.GroupView.GroupName}</Label>
+            <Label Width="100" DockPanel.Dock="Left" Content="{loc:Loc KitbashTool.GroupView.GroupName}"/>
             <Label DockPanel.Dock="Left">:</Label>
             <TextBox Text="{Binding GroupName, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" VerticalAlignment="Center"/>
         </DockPanel>

@@ -20,7 +20,7 @@
             <GroupBox>
                 <StackPanel>
                     <StackPanel Orientation="Horizontal" DockPanel.Dock="Top">
-                        <Label Width="{StaticResource labelWidth}">{loc:Loc TextureEditor.Labels.UvChannels}</Label>
+                        <Label Width="{StaticResource labelWidth}" Content="{loc:Loc TextureEditor.Labels.UvChannels}"/>
                         <Label>:</Label>
                         <ComboBox  HorizontalAlignment="Center" VerticalAlignment="Center" 
                                    SelectedValue="{Binding Path=ViewModel.UvChannelSelectedValue.Value, UpdateSourceTrigger=PropertyChanged}" 
@@ -28,25 +28,25 @@
                     </StackPanel>
 
                     <StackPanel Orientation="Horizontal" DockPanel.Dock="Top">
-                        <Label Width="{StaticResource labelWidth}">{loc:Loc TextureEditor.Labels.Format}</Label>
+                        <Label Width="{StaticResource labelWidth}" Content="{loc:Loc TextureEditor.Labels.Format}"/>
                         <Label>:</Label>
                         <Label  HorizontalAlignment="Center" VerticalAlignment="Center" Content="{Binding Path=ViewModel.Format.Value, UpdateSourceTrigger=PropertyChanged}"/>
                     </StackPanel>
 
                     <StackPanel Orientation="Horizontal" DockPanel.Dock="Top">
-                        <Label Width="{StaticResource labelWidth}">{loc:Loc TextureEditor.Labels.Width}</Label>
+                        <Label Width="{StaticResource labelWidth}" Content="{loc:Loc TextureEditor.Labels.Width}"/>
                         <Label>:</Label>
                         <Label  HorizontalAlignment="Center" VerticalAlignment="Center" Content="{Binding Path=ViewModel.Width.Value, UpdateSourceTrigger=PropertyChanged}"/>
                     </StackPanel>
 
                     <StackPanel Orientation="Horizontal" DockPanel.Dock="Top">
-                        <Label Width="{StaticResource labelWidth}">{loc:Loc TextureEditor.Labels.Height}</Label>
+                        <Label Width="{StaticResource labelWidth}" Content="{loc:Loc TextureEditor.Labels.Height}"/>
                         <Label>:</Label>
                         <Label  HorizontalAlignment="Center" VerticalAlignment="Center" Content="{Binding Path=ViewModel.Height.Value, UpdateSourceTrigger=PropertyChanged}"/>
                     </StackPanel>
 
                     <StackPanel Orientation="Horizontal" DockPanel.Dock="Top">
-                        <Label Width="{StaticResource labelWidth}">{loc:Loc TextureEditor.Labels.NumMipMaps}</Label>
+                        <Label Width="{StaticResource labelWidth}" Content="{loc:Loc TextureEditor.Labels.NumMipMaps}"/>
                         <Label>:</Label>
                         <Label  HorizontalAlignment="Center" VerticalAlignment="Center" Content="{Binding ViewModel.NumMipMaps.Value, UpdateSourceTrigger=PropertyChanged}"/>
                     </StackPanel>

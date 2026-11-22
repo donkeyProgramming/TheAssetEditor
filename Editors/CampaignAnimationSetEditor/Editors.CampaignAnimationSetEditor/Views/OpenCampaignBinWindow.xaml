@@ -1,8 +1,9 @@
 <Window x:Class="Editors.CampaignAnimationSetEditor.Views.OpenCampaignBinWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:loc="clr-namespace:Shared.Ui.Common;assembly=Shared.Ui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Style="{StaticResource CustomWindowStyle}"
-        Title="Open Campaign Animation Set" Height="500" Width="600"
+        Title="{loc:Loc CampaignAnimationSetEditor.OpenCampaignBin.OpenCampaignAnimationSet}" Height="500" Width="600"
         WindowStartupLocation="CenterOwner">
     <Grid Margin="10">
         <Grid.RowDefinitions>
@@ -12,15 +13,15 @@
         </Grid.RowDefinitions>
 
         <TextBox Grid.Row="0" Margin="0,0,0,5" Text="{Binding FilterText, UpdateSourceTrigger=PropertyChanged}"
-                 ToolTip="Filter by path"/>
+                 ToolTip="{loc:Loc CampaignAnimationSetEditor.OpenCampaignBin.FilterByPath}"/>
 
         <ListBox Grid.Row="1" ItemsSource="{Binding Files}" SelectedItem="{Binding SelectedFile}"
                  DisplayMemberPath="Path"
                  x:Name="FileListBox" MouseDoubleClick="FileListBox_MouseDoubleClick"/>
 
         <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,10,0,0">
-            <Button Content="Open" Width="90" Margin="0,0,10,0" IsDefault="True" Click="Ok_Click"/>
-            <Button Content="Cancel" Width="90" IsCancel="True"/>
+            <Button Content="{loc:Loc CampaignAnimationSetEditor.OpenCampaignBin.Open}" Width="90" Margin="0,0,10,0" IsDefault="True" Click="Ok_Click"/>
+            <Button Content="{loc:Loc CampaignAnimationSetEditor.OpenCampaignBin.Cancel}" Width="90" IsCancel="True"/>
         </StackPanel>
     </Grid>
 </Window>

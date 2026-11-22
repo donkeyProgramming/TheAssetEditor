@@ -1,5 +1,6 @@
 <UserControl x:Class="Editors.CscEditor.Views.CscEditorView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:loc="clr-namespace:Shared.Ui.Common;assembly=Shared.Ui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -23,10 +24,10 @@
 
         <!-- Toolbar -->
         <ToolBar Grid.Row="0">
-            <Button Content="Save" Command="{Binding SaveCommand}" Padding="8,3"/>
+            <Button Content="{loc:Loc CscEditor.Save}" Command="{Binding SaveCommand}" Padding="8,3"/>
             <Separator/>
             <Menu Background="Transparent" VerticalAlignment="Center">
-                <MenuItem Header="Add" Padding="8,3"
+                <MenuItem Header="{loc:Loc CscEditor.Add}" Padding="8,3"
                           Background="{DynamicResource Popup.Static.Background}"
                           Foreground="{DynamicResource Popup.Static.Foreground}">
                     <MenuItem.Resources>
@@ -39,38 +40,38 @@
                             <Setter Property="Foreground" Value="{DynamicResource Popup.Static.Foreground}"/>
                         </Style>
                     </MenuItem.Resources>
-                    <MenuItem Header="Model..." Command="{Binding AddModelCommand}"/>
-                    <MenuItem Header="Variant model..." Command="{Binding AddVariantModelCommand}"/>
-                    <MenuItem Header="VFX..." Command="{Binding AddVfxCommand}"/>
-                    <MenuItem Header="SFX..." Command="{Binding AddSfxCommand}"/>
-                    <MenuItem Header="Animation..." Command="{Binding AddAnimationCommand}"/>
-                    <MenuItem Header="Point light" Command="{Binding AddPointLightCommand}"/>
-                    <MenuItem Header="Spot light" Command="{Binding AddSpotLightCommand}"/>
-                    <MenuItem Header="Camera" Command="{Binding AddCameraCommand}"/>
-                    <MenuItem Header="Composite scene..." Command="{Binding AddCompositeSceneCommand}"/>
-                    <MenuItem Header="Prefab..." Command="{Binding AddPrefabCommand}"/>
-                    <MenuItem Header="Group (empty)" Command="{Binding AddLocatorCommand}"/>
+                    <MenuItem Header="{loc:Loc CscEditor.Model}" Command="{Binding AddModelCommand}"/>
+                    <MenuItem Header="{loc:Loc CscEditor.VariantModel}" Command="{Binding AddVariantModelCommand}"/>
+                    <MenuItem Header="{loc:Loc CscEditor.VFX}" Command="{Binding AddVfxCommand}"/>
+                    <MenuItem Header="{loc:Loc CscEditor.SFX}" Command="{Binding AddSfxCommand}"/>
+                    <MenuItem Header="{loc:Loc CscEditor.Animation}" Command="{Binding AddAnimationCommand}"/>
+                    <MenuItem Header="{loc:Loc CscEditor.PointLight}" Command="{Binding AddPointLightCommand}"/>
+                    <MenuItem Header="{loc:Loc CscEditor.SpotLight}" Command="{Binding AddSpotLightCommand}"/>
+                    <MenuItem Header="{loc:Loc CscEditor.Camera}" Command="{Binding AddCameraCommand}"/>
+                    <MenuItem Header="{loc:Loc CscEditor.CompositeScene}" Command="{Binding AddCompositeSceneCommand}"/>
+                    <MenuItem Header="{loc:Loc CscEditor.Prefab}" Command="{Binding AddPrefabCommand}"/>
+                    <MenuItem Header="{loc:Loc CscEditor.GroupEmpty}" Command="{Binding AddLocatorCommand}"/>
                 </MenuItem>
             </Menu>
-            <Button Content="Delete" Command="{Binding DeleteSelectedCommand}" IsEnabled="{Binding HasSelection}" Padding="8,3"/>
+            <Button Content="{loc:Loc CscEditor.Delete}" Command="{Binding DeleteSelectedCommand}" IsEnabled="{Binding HasSelection}" Padding="8,3"/>
             <Separator/>
-            <Button Command="{Binding GizmoTranslateCommand}" IsEnabled="{Binding HasSelection}" Padding="6,3" ToolTip="Move">
+            <Button Command="{Binding GizmoTranslateCommand}" IsEnabled="{Binding HasSelection}" Padding="6,3" ToolTip="{loc:Loc CscEditor.Move}">
                 <Image Width="20" Height="20" Source="{Binding Source={x:Static resources:IconLibrary.Gizmo_MoveIcon}, UpdateSourceTrigger=PropertyChanged}"/>
             </Button>
-            <Button Command="{Binding GizmoRotateCommand}" IsEnabled="{Binding HasSelection}" Padding="6,3" ToolTip="Rotate">
+            <Button Command="{Binding GizmoRotateCommand}" IsEnabled="{Binding HasSelection}" Padding="6,3" ToolTip="{loc:Loc CscEditor.Rotate}">
                 <Image Width="20" Height="20" Source="{Binding Source={x:Static resources:IconLibrary.Gizmo_RotateIcon}, UpdateSourceTrigger=PropertyChanged}"/>
             </Button>
-            <Button Command="{Binding GizmoScaleCommand}" IsEnabled="{Binding HasSelection}" Padding="6,3" ToolTip="Scale">
+            <Button Command="{Binding GizmoScaleCommand}" IsEnabled="{Binding HasSelection}" Padding="6,3" ToolTip="{loc:Loc CscEditor.Scale}">
                 <Image Width="20" Height="20" Source="{Binding Source={x:Static resources:IconLibrary.Gizmo_ScaleIcon}, UpdateSourceTrigger=PropertyChanged}"/>
             </Button>
-            <Button Command="{Binding GizmoOffCommand}" Padding="6,3" ToolTip="Gizmo off (selection only)">
+            <Button Command="{Binding GizmoOffCommand}" Padding="6,3" ToolTip="{loc:Loc CscEditor.GizmoOffSelectionOnly}">
                 <Image Width="20" Height="20" Source="{Binding Source={x:Static resources:IconLibrary.Gizmo_CursorIcon}, UpdateSourceTrigger=PropertyChanged}"/>
             </Button>
             <Separator/>
-            <Button Content="Focus" Command="{Binding FocusSelectedCommand}" IsEnabled="{Binding HasSelection}" Padding="8,3"/>
-            <Button Content="Look through camera" Command="{Binding LookThroughCameraCommand}"
+            <Button Content="{loc:Loc CscEditor.Focus}" Command="{Binding FocusSelectedCommand}" IsEnabled="{Binding HasSelection}" Padding="8,3"/>
+            <Button Content="{loc:Loc CscEditor.LookThroughCamera}" Command="{Binding LookThroughCameraCommand}"
                     IsEnabled="{Binding SelectedElement.IsCamera, FallbackValue=False}" Padding="8,3"/>
-            <Button Content="Reset view" Command="{Binding ResetViewCommand}"
+            <Button Content="{loc:Loc CscEditor.ResetView}" Command="{Binding ResetViewCommand}"
                     IsEnabled="{Binding IsLookingThroughCamera}" Padding="8,3"/>
         </ToolBar>
 
@@ -131,7 +132,7 @@
                 </Grid.RowDefinitions>
 
                 <!-- Component tree -->
-                <GroupBox Grid.Row="0" Header="Components (drag onto a node to re-parent, drop on Root or empty space to detach)">
+                <GroupBox Grid.Row="0" Header="{loc:Loc CscEditor.ComponentsDragOntoANodeTo}">
                     <TreeView x:Name="ComponentTree"
                               ItemsSource="{Binding SceneRootItems}"
                               SelectedItemChanged="ComponentTree_SelectedItemChanged"
@@ -170,9 +171,9 @@
                         </TreeView.ItemContainerStyle>
                         <TreeView.ContextMenu>
                             <ContextMenu>
-                                <MenuItem Header="Detach (make top-level)" Command="{Binding DetachSelectedCommand}"/>
-                                <MenuItem Header="Delete" Command="{Binding DeleteSelectedCommand}"/>
-                                <MenuItem Header="Focus in 3D view" Command="{Binding FocusSelectedCommand}"/>
+                                <MenuItem Header="{loc:Loc CscEditor.DetachMakeTopLevel}" Command="{Binding DetachSelectedCommand}"/>
+                                <MenuItem Header="{loc:Loc CscEditor.Delete}" Command="{Binding DeleteSelectedCommand}"/>
+                                <MenuItem Header="{loc:Loc CscEditor.FocusIn3DView}" Command="{Binding FocusSelectedCommand}"/>
                             </ContextMenu>
                         </TreeView.ContextMenu>
                     </TreeView>
@@ -181,7 +182,7 @@
                 <GridSplitter Grid.Row="1" HorizontalAlignment="Stretch" Background="#FF606060"/>
 
                 <!-- Details -->
-                <GroupBox Grid.Row="2" Header="Details">
+                <GroupBox Grid.Row="2" Header="{loc:Loc CscEditor.Details}">
                     <ScrollViewer VerticalScrollBarVisibility="Auto" MaxHeight="420">
                         <ScrollViewer.Resources>
                             <BooleanToVisibilityConverter x:Key="PanelBoolToVis"/>
@@ -218,7 +219,7 @@
                                     <ColumnDefinition Width="Auto"/>
                                     <ColumnDefinition Width="*"/>
                                 </Grid.ColumnDefinitions>
-                                <TextBlock Text="Event 1 (stop)"/>
+                                <TextBlock Text="{loc:Loc CscEditor.Event1Stop}"/>
                                 <TextBox Grid.Column="1" Text="{Binding SfxStopEvent}"/>
                             </Grid>
 
@@ -228,7 +229,7 @@
                                         <ColumnDefinition Width="Auto"/>
                                         <ColumnDefinition Width="*"/>
                                     </Grid.ColumnDefinitions>
-                                    <TextBlock Text="Event 2 (start)"/>
+                                    <TextBlock Text="{loc:Loc CscEditor.Event2Start}"/>
                                     <TextBox Grid.Column="1" Text="{Binding SfxEvent2Start}"/>
                                 </Grid>
                                 <Grid>
@@ -236,16 +237,16 @@
                                         <ColumnDefinition Width="Auto"/>
                                         <ColumnDefinition Width="*"/>
                                     </Grid.ColumnDefinitions>
-                                    <TextBlock Text="Event 2 (stop)"/>
+                                    <TextBlock Text="{loc:Loc CscEditor.Event2Stop}"/>
                                     <TextBox Grid.Column="1" Text="{Binding SfxEvent2Stop}"/>
                                 </Grid>
                             </StackPanel>
 
                             <!-- Timing -->
-                            <TextBlock FontWeight="Bold" Text="Timing" Margin="2,8,2,0"/>
+                            <TextBlock FontWeight="Bold" Text="{loc:Loc CscEditor.Timing}" Margin="2,8,2,0"/>
                             <UniformGrid Columns="4">
-                                <TextBlock Text="Begin"/><TextBox Text="{Binding Begin}"/>
-                                <TextBlock Text="End"/><TextBox Text="{Binding End}"/>
+                                <TextBlock Text="{loc:Loc CscEditor.Begin}"/><TextBox Text="{Binding Begin}"/>
+                                <TextBlock Text="{loc:Loc CscEditor.End}"/><TextBox Text="{Binding End}"/>
                             </UniformGrid>
                             <UniformGrid Columns="2">
                                 <ComboBox Margin="2" SelectedValue="{Binding TimingMode}" SelectedValuePath="Content">
@@ -263,7 +264,7 @@
 
                             <!-- ELEMENT_PERIOD: (flag, speed multiplier, time offset) - in-game confirmed -->
                             <StackPanel Visibility="{Binding HasPeriod, Converter={StaticResource BoolToVis}, FallbackValue=Collapsed}">
-                                <TextBlock FontWeight="Bold" Text="Period" Margin="2,8,2,0"/>
+                                <TextBlock FontWeight="Bold" Text="{loc:Loc CscEditor.Period}" Margin="2,8,2,0"/>
                                 <Grid>
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition Width="Auto"/>
@@ -274,33 +275,33 @@
                                         <ColumnDefinition Width="*"/>
                                     </Grid.ColumnDefinitions>
                                     <CheckBox VerticalAlignment="Center" IsChecked="{Binding PeriodFlag}"/>
-                                    <TextBlock Grid.Column="1" Text="flag" VerticalAlignment="Center" Margin="2,0,8,0"/>
-                                    <TextBlock Grid.Column="2" Text="Speed×"/>
+                                    <TextBlock Grid.Column="1" Text="{loc:Loc CscEditor.Flag}" VerticalAlignment="Center" Margin="2,0,8,0"/>
+                                    <TextBlock Grid.Column="2" Text="{loc:Loc CscEditor.Speed}"/>
                                     <TextBox Grid.Column="3" Text="{Binding PeriodSpeedMultiplier, StringFormat=0.###}"/>
-                                    <TextBlock Grid.Column="4" Text="Offset s" Margin="8,0,2,0"/>
+                                    <TextBlock Grid.Column="4" Text="{loc:Loc CscEditor.OffsetS}" Margin="8,0,2,0"/>
                                     <TextBox Grid.Column="5" Text="{Binding PeriodTimeOffset, StringFormat=0.###}"/>
                                 </Grid>
                             </StackPanel>
 
                             <!-- Transform -->
-                            <TextBlock FontWeight="Bold" Text="Transform (channels)" Margin="2,8,2,0"/>
+                            <TextBlock FontWeight="Bold" Text="{loc:Loc CscEditor.TransformChannels}" Margin="2,8,2,0"/>
                             <UniformGrid Columns="6">
-                                <TextBlock Text="Pos X"/><TextBox Text="{Binding PositionX, StringFormat=0.###}"/>
+                                <TextBlock Text="{loc:Loc CscEditor.PosX}"/><TextBox Text="{Binding PositionX, StringFormat=0.###}"/>
                                 <TextBlock Text="Y"/><TextBox Text="{Binding PositionY, StringFormat=0.###}"/>
                                 <TextBlock Text="Z"/><TextBox Text="{Binding PositionZ, StringFormat=0.###}"/>
-                                <TextBlock Text="Rot X°"/><TextBox Text="{Binding RotationXDegrees, StringFormat=0.##}"/>
+                                <TextBlock Text="{loc:Loc CscEditor.RotX}"/><TextBox Text="{Binding RotationXDegrees, StringFormat=0.##}"/>
                                 <TextBlock Text="Y°"/><TextBox Text="{Binding RotationYDegrees, StringFormat=0.##}"/>
                                 <TextBlock Text="Z°"/><TextBox Text="{Binding RotationZDegrees, StringFormat=0.##}"/>
-                                <TextBlock Text="Scale"/><TextBox Text="{Binding ScaleValue, StringFormat=0.###}"/>
-                                <TextBlock Text="Weight"/><TextBox Text="{Binding WeightValue, StringFormat=0.###}"/>
+                                <TextBlock Text="{loc:Loc CscEditor.Scale}"/><TextBox Text="{Binding ScaleValue, StringFormat=0.###}"/>
+                                <TextBlock Text="{loc:Loc CscEditor.Weight}"/><TextBox Text="{Binding WeightValue, StringFormat=0.###}"/>
                             </UniformGrid>
 
-                            <TextBlock FontWeight="Bold" Text="Base placement" Margin="2,8,2,0"/>
+                            <TextBlock FontWeight="Bold" Text="{loc:Loc CscEditor.BasePlacement}" Margin="2,8,2,0"/>
                             <UniformGrid Columns="6">
-                                <TextBlock Text="Pos X"/><TextBox Text="{Binding BasePositionX, StringFormat=0.###}"/>
+                                <TextBlock Text="{loc:Loc CscEditor.PosX}"/><TextBox Text="{Binding BasePositionX, StringFormat=0.###}"/>
                                 <TextBlock Text="Y"/><TextBox Text="{Binding BasePositionY, StringFormat=0.###}"/>
                                 <TextBlock Text="Z"/><TextBox Text="{Binding BasePositionZ, StringFormat=0.###}"/>
-                                <TextBlock Text="Rot X°"/><TextBox Text="{Binding BaseRotationXDegrees, StringFormat=0.##}"/>
+                                <TextBlock Text="{loc:Loc CscEditor.RotX}"/><TextBox Text="{Binding BaseRotationXDegrees, StringFormat=0.##}"/>
                                 <TextBlock Text="Y°"/><TextBox Text="{Binding BaseRotationYDegrees, StringFormat=0.##}"/>
                                 <TextBlock Text="Z°"/><TextBox Text="{Binding BaseRotationZDegrees, StringFormat=0.##}"/>
                             </UniformGrid>
@@ -315,7 +316,7 @@
                                     <ColumnDefinition Width="*"/>
                                 </Grid.ColumnDefinitions>
                                 <CheckBox VerticalAlignment="Center" IsChecked="{Binding ElementTrailingBool}"/>
-                                <TextBlock Grid.Column="1" Text="Trailing flag (meaning unconfirmed)" VerticalAlignment="Center" Margin="4,0,0,0"/>
+                                <TextBlock Grid.Column="1" Text="{loc:Loc CscEditor.TrailingFlagMeaningUnconfirmed}" VerticalAlignment="Center" Margin="4,0,0,0"/>
                             </Grid>
 
                             <!-- Attachment -->
@@ -324,7 +325,7 @@
                                     <ColumnDefinition Width="Auto"/>
                                     <ColumnDefinition Width="*"/>
                                 </Grid.ColumnDefinitions>
-                                <TextBlock Text="Attach bone index (-1 = origin)"/>
+                                <TextBlock Text="{loc:Loc CscEditor.AttachBoneIndex1Origin}"/>
                                 <TextBox Grid.Column="1" Text="{Binding AttachBoneIndex}"/>
                             </Grid>
 
@@ -334,16 +335,16 @@
                                  element's own fields above are editable. Edit the referenced file
                                  directly instead. -->
                             <StackPanel Visibility="{Binding HasSubScene, Converter={StaticResource BoolToVis}, FallbackValue=Collapsed}" IsEnabled="False">
-                                <TextBlock FontWeight="Bold" Text="Referenced scene (read-only)" Margin="2,8,2,0"/>
+                                <TextBlock FontWeight="Bold" Text="{loc:Loc CscEditor.ReferencedSceneReadOnly}" Margin="2,8,2,0"/>
                                 <Grid>
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition Width="Auto"/>
                                         <ColumnDefinition Width="*"/>
                                     </Grid.ColumnDefinitions>
-                                    <TextBlock Text="Duration (s)"/>
+                                    <TextBlock Text="{loc:Loc CscEditor.DurationS}"/>
                                     <TextBox Grid.Column="1" Text="{Binding SubSceneDuration, StringFormat=0.###, Mode=OneWay}"/>
                                 </Grid>
-                                <TextBlock Text="Focus point" Margin="2,4,2,0"/>
+                                <TextBlock Text="{loc:Loc CscEditor.FocusPoint}" Margin="2,4,2,0"/>
                                 <UniformGrid Columns="6">
                                     <TextBlock Text="X"/><TextBox Text="{Binding SubSceneFocusPointX, StringFormat=0.###, Mode=OneWay}"/>
                                     <TextBlock Text="Y"/><TextBox Text="{Binding SubSceneFocusPointY, StringFormat=0.###, Mode=OneWay}"/>
@@ -354,7 +355,7 @@
                                         <ColumnDefinition Width="Auto"/>
                                         <ColumnDefinition Width="*"/>
                                     </Grid.ColumnDefinitions>
-                                    <TextBlock Text="Radius/distance"/>
+                                    <TextBlock Text="{loc:Loc CscEditor.RadiusDistance}"/>
                                     <TextBox Grid.Column="1" Text="{Binding SubSceneRadius, StringFormat=0.###, Mode=OneWay}"/>
                                 </Grid>
                                 <Grid Visibility="{Binding SubSceneHasWeatherPath, Converter={StaticResource BoolToVis}, FallbackValue=Collapsed}" Margin="0,4,0,0">
@@ -362,35 +363,35 @@
                                         <ColumnDefinition Width="Auto"/>
                                         <ColumnDefinition Width="*"/>
                                     </Grid.ColumnDefinitions>
-                                    <TextBlock Text="Weather/environment"/>
+                                    <TextBlock Text="{loc:Loc CscEditor.WeatherEnvironment}"/>
                                     <TextBox Grid.Column="1" Text="{Binding SubSceneWeatherPath, Mode=OneWay}"/>
                                 </Grid>
                             </StackPanel>
 
                             <!-- Lights -->
                             <StackPanel Visibility="{Binding IsLight, Converter={StaticResource BoolToVis}, FallbackValue=Collapsed}">
-                                <TextBlock FontWeight="Bold" Text="Light" Margin="2,8,2,0"/>
+                                <TextBlock FontWeight="Bold" Text="{loc:Loc CscEditor.Light}" Margin="2,8,2,0"/>
                                 <UniformGrid Columns="6">
                                     <TextBlock Text="R"/><TextBox Text="{Binding LightColourR, StringFormat=0.###}"/>
                                     <TextBlock Text="G"/><TextBox Text="{Binding LightColourG, StringFormat=0.###}"/>
                                     <TextBlock Text="B"/><TextBox Text="{Binding LightColourB, StringFormat=0.###}"/>
-                                    <TextBlock Text="Intensity"/><TextBox Text="{Binding LightIntensity, StringFormat=0.###}"/>
-                                    <TextBlock Text="Range/Len"/><TextBox Text="{Binding LightRange, StringFormat=0.###}"/>
+                                    <TextBlock Text="{loc:Loc CscEditor.Intensity}"/><TextBox Text="{Binding LightIntensity, StringFormat=0.###}"/>
+                                    <TextBlock Text="{loc:Loc CscEditor.RangeLen}"/><TextBox Text="{Binding LightRange, StringFormat=0.###}"/>
                                 </UniformGrid>
                                 <UniformGrid Columns="4" Visibility="{Binding IsSpotLight, Converter={StaticResource BoolToVis}, FallbackValue=Collapsed}">
-                                    <TextBlock Text="Inner°"/><TextBox Text="{Binding SpotInnerAngleDegrees, StringFormat=0.##}"/>
-                                    <TextBlock Text="Outer°"/><TextBox Text="{Binding SpotOuterAngleDegrees, StringFormat=0.##}"/>
+                                    <TextBlock Text="{loc:Loc CscEditor.Inner}"/><TextBox Text="{Binding SpotInnerAngleDegrees, StringFormat=0.##}"/>
+                                    <TextBlock Text="{loc:Loc CscEditor.Outer}"/><TextBox Text="{Binding SpotOuterAngleDegrees, StringFormat=0.##}"/>
                                 </UniformGrid>
                             </StackPanel>
 
                             <!-- Camera -->
                             <StackPanel Visibility="{Binding IsCamera, Converter={StaticResource BoolToVis}, FallbackValue=Collapsed}">
-                                <TextBlock FontWeight="Bold" Text="Camera" Margin="2,8,2,0"/>
+                                <TextBlock FontWeight="Bold" Text="{loc:Loc CscEditor.Camera}" Margin="2,8,2,0"/>
                                 <UniformGrid Columns="6">
-                                    <TextBlock Text="FOV°"/><TextBox Text="{Binding CameraFov, StringFormat=0.##}"/>
-                                    <TextBlock Text="Roll°"/><TextBox Text="{Binding CameraRollDegrees, StringFormat=0.##}"/>
-                                    <TextBlock Text="Near"/><TextBox Text="{Binding CameraNear, StringFormat=0.###}"/>
-                                    <TextBlock Text="Far"/><TextBox Text="{Binding CameraFar, StringFormat=0.###}"/>
+                                    <TextBlock Text="{loc:Loc CscEditor.FOV}"/><TextBox Text="{Binding CameraFov, StringFormat=0.##}"/>
+                                    <TextBlock Text="{loc:Loc CscEditor.Roll}"/><TextBox Text="{Binding CameraRollDegrees, StringFormat=0.##}"/>
+                                    <TextBlock Text="{loc:Loc CscEditor.Near}"/><TextBox Text="{Binding CameraNear, StringFormat=0.###}"/>
+                                    <TextBlock Text="{loc:Loc CscEditor.Far}"/><TextBox Text="{Binding CameraFar, StringFormat=0.###}"/>
                                 </UniformGrid>
 
                                 <!-- CAMERA_ELEMENT carries an extra Bool between the roll and near
@@ -401,14 +402,14 @@
                                         <ColumnDefinition Width="*"/>
                                     </Grid.ColumnDefinitions>
                                     <CheckBox VerticalAlignment="Center" IsChecked="{Binding CameraUnknownFlag}"/>
-                                    <TextBlock Grid.Column="1" Text="Unknown flag (meaning unconfirmed)" VerticalAlignment="Center" Margin="4,0,0,0"/>
+                                    <TextBlock Grid.Column="1" Text="{loc:Loc CscEditor.UnknownFlagMeaningUnconfirmed}" VerticalAlignment="Center" Margin="4,0,0,0"/>
                                 </Grid>
                             </StackPanel>
 
                             <!-- ANIMATION_SPLICE_ELEMENT: sibling record alongside ANIMATION_ELEMENT -->
                             <StackPanel Visibility="{Binding HasSplice, Converter={StaticResource BoolToVis}, FallbackValue=Collapsed}">
-                                <TextBlock FontWeight="Bold" Text="Splice" Margin="2,8,2,0"/>
-                                <TextBlock Text="Splices this .anim onto the given bone and its descendants. Bone id is a fairly confident guess; the depth fields and everything after them are less certain."
+                                <TextBlock FontWeight="Bold" Text="{loc:Loc CscEditor.Splice}" Margin="2,8,2,0"/>
+                                <TextBlock Text="{loc:Loc CscEditor.SplicesThisAnimOntoTheGiven}"
                                            TextWrapping="Wrap" Foreground="#FF999999" FontStyle="Italic" Margin="2,0,2,4"/>
                                 <Grid>
                                     <Grid.ColumnDefinitions>
@@ -419,11 +420,11 @@
                                         <ColumnDefinition Width="Auto"/>
                                         <ColumnDefinition Width="*"/>
                                     </Grid.ColumnDefinitions>
-                                    <TextBlock Text="Bone id"/>
+                                    <TextBlock Text="{loc:Loc CscEditor.BoneId}"/>
                                     <TextBox Grid.Column="1" Text="{Binding SpliceBoneId}" LostFocus="AuxField_LostFocus"/>
-                                    <TextBlock Grid.Column="2" Text="Depth A" Margin="8,2,2,2"/>
+                                    <TextBlock Grid.Column="2" Text="{loc:Loc CscEditor.DepthA}" Margin="8,2,2,2"/>
                                     <TextBox Grid.Column="3" Text="{Binding SpliceDepthA}" LostFocus="AuxField_LostFocus"/>
-                                    <TextBlock Grid.Column="4" Text="Depth B" Margin="8,2,2,2"/>
+                                    <TextBlock Grid.Column="4" Text="{loc:Loc CscEditor.DepthB}" Margin="8,2,2,2"/>
                                     <TextBox Grid.Column="5" Text="{Binding SpliceDepthB}" LostFocus="AuxField_LostFocus"/>
                                 </Grid>
                                 <TextBlock Text="{Binding SpliceRemainingFieldsDisplay}" TextWrapping="Wrap" Foreground="#FF888888" FontSize="10" Margin="2,2,2,0"/>
@@ -432,8 +433,8 @@
                             <!-- ANIMATION_NODE_TRANSFORM_ELEMENT: this element's own kind - its Transform
                                  (channels) section above drives the bone named here. -->
                             <StackPanel Visibility="{Binding IsAnimationNodeTransform, Converter={StaticResource BoolToVis}, FallbackValue=Collapsed}">
-                                <TextBlock FontWeight="Bold" Text="Node Transform" Margin="2,8,2,0"/>
-                                <TextBlock Text="This element's Transform curves above drive the named bone (and its descendants) instead of placing the element itself."
+                                <TextBlock FontWeight="Bold" Text="{loc:Loc CscEditor.NodeTransform}" Margin="2,8,2,0"/>
+                                <TextBlock Text="{loc:Loc CscEditor.ThisElementSTransformCurvesAbove}"
                                            TextWrapping="Wrap" Foreground="#FF999999" FontStyle="Italic" Margin="2,0,2,4"/>
                                 <Grid>
                                     <Grid.ColumnDefinitions>
@@ -442,9 +443,9 @@
                                         <ColumnDefinition Width="Auto"/>
                                         <ColumnDefinition Width="*"/>
                                     </Grid.ColumnDefinitions>
-                                    <TextBlock Text="Bone id"/>
+                                    <TextBlock Text="{loc:Loc CscEditor.BoneId}"/>
                                     <TextBox Grid.Column="1" Text="{Binding NodeTransformBoneId}" LostFocus="AuxField_LostFocus"/>
-                                    <TextBlock Grid.Column="2" Text="2nd (signed)" Margin="8,2,2,2"/>
+                                    <TextBlock Grid.Column="2" Text="{loc:Loc CscEditor.2ndSigned}" Margin="8,2,2,2"/>
                                     <TextBox Grid.Column="3" Text="{Binding NodeTransformSecondValue}" LostFocus="AuxField_LostFocus"/>
                                 </Grid>
                             </StackPanel>
@@ -464,8 +465,8 @@
                                 </Style>
                             </StackPanel.Resources>
 
-                            <TextBlock FontWeight="Bold" Text="Composite Scene"/>
-                            <TextBlock Text="ROOT header fields - independent of the computed playback duration shown next to the tree's Root item."
+                            <TextBlock FontWeight="Bold" Text="{loc:Loc CscEditor.CompositeScene2}"/>
+                            <TextBlock Text="{loc:Loc CscEditor.ROOTHeaderFieldsIndependentOfThe}"
                                        TextWrapping="Wrap" Foreground="#FF999999" FontStyle="Italic" Margin="2,2,2,4"/>
 
                             <Grid>
@@ -473,11 +474,11 @@
                                     <ColumnDefinition Width="Auto"/>
                                     <ColumnDefinition Width="*"/>
                                 </Grid.ColumnDefinitions>
-                                <TextBlock Text="Duration (s)"/>
+                                <TextBlock Text="{loc:Loc CscEditor.DurationS}"/>
                                 <TextBox Grid.Column="1" Text="{Binding SceneDuration, StringFormat=0.###}"/>
                             </Grid>
 
-                            <TextBlock FontWeight="Bold" Text="Focus point" Margin="2,8,2,0"/>
+                            <TextBlock FontWeight="Bold" Text="{loc:Loc CscEditor.FocusPoint}" Margin="2,8,2,0"/>
                             <UniformGrid Columns="6">
                                 <TextBlock Text="X"/><TextBox Text="{Binding FocusPointX, StringFormat=0.###}"/>
                                 <TextBlock Text="Y"/><TextBox Text="{Binding FocusPointY, StringFormat=0.###}"/>
@@ -489,7 +490,7 @@
                                     <ColumnDefinition Width="Auto"/>
                                     <ColumnDefinition Width="*"/>
                                 </Grid.ColumnDefinitions>
-                                <TextBlock Text="Radius/distance"/>
+                                <TextBlock Text="{loc:Loc CscEditor.RadiusDistance}"/>
                                 <TextBox Grid.Column="1" Text="{Binding Radius, StringFormat=0.###}"/>
                             </Grid>
 
@@ -498,7 +499,7 @@
                                     <ColumnDefinition Width="Auto"/>
                                     <ColumnDefinition Width="*"/>
                                 </Grid.ColumnDefinitions>
-                                <TextBlock Text="Weather/environment"/>
+                                <TextBlock Text="{loc:Loc CscEditor.WeatherEnvironment}"/>
                                 <TextBox Grid.Column="1" Text="{Binding WeatherPath}"/>
                             </Grid>
                         </StackPanel>
@@ -524,16 +525,16 @@
                 <Button Command="{Binding PlayPauseCommand}" Width="60" Margin="0,0,4,0">
                     <Button.Style>
                         <Style TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
-                            <Setter Property="Content" Value="Play"/>
+                            <Setter Property="Content" Value="{loc:Loc CscEditor.Play}"/>
                             <Style.Triggers>
                                 <DataTrigger Binding="{Binding IsPlaying}" Value="True">
-                                    <Setter Property="Content" Value="Pause"/>
+                                    <Setter Property="Content" Value="{loc:Loc CscEditor.Pause}"/>
                                 </DataTrigger>
                             </Style.Triggers>
                         </Style>
                     </Button.Style>
                 </Button>
-                <Button Content="Stop" Command="{Binding StopCommand}" Width="50"/>
+                <Button Content="{loc:Loc CscEditor.Stop}" Command="{Binding StopCommand}" Width="50"/>
             </StackPanel>
 
             <!-- Time readout only - scrubbing happens on the curve editor's own ruler below, so
@@ -576,7 +577,7 @@
                 <TextBlock Text="{Binding StatusText}"/>
             </StatusBarItem>
             <StatusBarItem HorizontalAlignment="Right">
-                <TextBlock Text="Unsaved changes" Foreground="Orange">
+                <TextBlock Text="{loc:Loc CscEditor.UnsavedChanges}" Foreground="Orange">
                     <TextBlock.Style>
                         <Style TargetType="TextBlock">
                             <Setter Property="Visibility" Value="Collapsed"/>

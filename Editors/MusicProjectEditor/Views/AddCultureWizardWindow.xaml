@@ -1,11 +1,12 @@
 <Window x:Class="Editors.MusicProjectEditor.Views.AddCultureWizardWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:loc="clr-namespace:Shared.Ui.Common;assembly=Shared.Ui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d"
         Style="{StaticResource CustomWindowStyle}"
-        Title="Add Culture" Height="760" Width="900">
+        Title="{loc:Loc MusicProjectEditor.AddCultureWizard.AddCulture}" Height="760" Width="900">
     <Grid Margin="12">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
@@ -46,13 +47,13 @@
                 <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
 
-            <TextBlock Grid.Row="0" Grid.Column="0" Text="Audio State" VerticalAlignment="Center" Margin="0,0,10,2"/>
+            <TextBlock Grid.Row="0" Grid.Column="0" Text="{loc:Loc MusicProjectEditor.AddCultureWizard.AudioState}" VerticalAlignment="Center" Margin="0,0,10,2"/>
             <TextBox Grid.Row="0" Grid.Column="1" Margin="0,0,0,2"
                      Text="{Binding AudioState, UpdateSourceTrigger=PropertyChanged}"/>
             <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding AudioStateHelp}" TextWrapping="Wrap"
                        FontSize="11" Opacity="0.75" Margin="0,0,0,8"/>
 
-            <TextBlock Grid.Row="2" Grid.Column="0" Text="Subculture key" VerticalAlignment="Center" Margin="0,0,10,2"/>
+            <TextBlock Grid.Row="2" Grid.Column="0" Text="{loc:Loc MusicProjectEditor.AddCultureWizard.SubcultureKey}" VerticalAlignment="Center" Margin="0,0,10,2"/>
             <TextBox Grid.Row="2" Grid.Column="1" Margin="0,0,0,2"
                      IsEnabled="{Binding HasCampaign}"
                      Text="{Binding SubcultureKey, UpdateSourceTrigger=PropertyChanged}"/>
@@ -84,16 +85,16 @@
 
                                 <StackPanel Margin="20,0,0,0" Orientation="Horizontal" IsEnabled="{Binding Include}">
                                     <CheckBox IsChecked="{Binding UseExistingAudio}"
-                                              Content="Borrow an existing culture's audio instead of authoring new"
-                                              ToolTip="Copies that culture's entry wholesale, so nothing new is needed in Wwise. This is what vanilla does to share one battle theme between Bretonnia, Dwarfs and Empire."/>
+                                              Content="{loc:Loc MusicProjectEditor.AddCultureWizard.BorrowAnExistingCultureSAudio}"
+                                              ToolTip="{loc:Loc MusicProjectEditor.AddCultureWizard.CopiesThatCultureSEntryWholesale}"/>
                                     <ComboBox Margin="10,0,0,0" MinWidth="220" VerticalAlignment="Center"
                                               Visibility="{Binding UseExistingAudio, Converter={StaticResource BoolToCollapsedConverter}}"
                                               ItemsSource="{Binding ReferenceCandidates}"
                                               SelectedItem="{Binding ReferenceCulture, UpdateSourceTrigger=PropertyChanged}"
-                                              ToolTip="An existing culture already wired into this slot."/>
+                                              ToolTip="{loc:Loc MusicProjectEditor.AddCultureWizard.AnExistingCultureAlreadyWiredInto}"/>
                                 </StackPanel>
 
-                                <Expander Header="Advanced" Margin="20,8,0,0" IsExpanded="False">
+                                <Expander Header="{loc:Loc MusicProjectEditor.AddCultureWizard.Advanced}" Margin="20,8,0,0" IsExpanded="False">
                                     <StackPanel Margin="0,4,0,0">
                                         <TextBlock Text="{Binding Scope}" TextWrapping="Wrap"
                                                    FontSize="11" Opacity="0.6" Margin="0,0,0,4"/>
@@ -118,9 +119,9 @@
         </StackPanel>
 
         <StackPanel Grid.Row="5" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,12,0,0">
-            <Button Content="Add" Width="90" Padding="0,4" Margin="0,0,8,0" IsDefault="True"
+            <Button Content="{loc:Loc MusicProjectEditor.AddCultureWizard.Add}" Width="90" Padding="0,4" Margin="0,0,8,0" IsDefault="True"
                     IsEnabled="{Binding CanApply}" Click="OnAddClick"/>
-            <Button Content="Cancel" Width="90" Padding="0,4" IsCancel="True" Click="OnCancelClick"/>
+            <Button Content="{loc:Loc MusicProjectEditor.AddCultureWizard.Cancel}" Width="90" Padding="0,4" IsCancel="True" Click="OnCancelClick"/>
         </StackPanel>
     </Grid>
 </Window>
