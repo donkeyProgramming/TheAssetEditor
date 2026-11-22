@@ -22,6 +22,8 @@ namespace AssetEditor
             serviceCollection.AddSingleton<IEditorManager, EditorManager>();
 
             serviceCollection.AddTransient<CreateNewProjectCommand>();
+            serviceCollection.AddTransient<OpenPackForEditingCommand>();
+            serviceCollection.AddTransient<CreateNewPackCommand>();
             serviceCollection.AddTransient<OpenGamePackCommand>();
             serviceCollection.AddTransient<ImportPackAsAsProjectCommand>();
             serviceCollection.AddTransient<ImportReferencePackCommand>();

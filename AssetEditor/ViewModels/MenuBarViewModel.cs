@@ -81,6 +81,11 @@ namespace AssetEditor.ViewModels
         [RelayCommand] private void ImportPackAsProject() => _uiCommandFactory.Create<ImportPackAsAsProjectCommand>().Execute();
         [RelayCommand] private void ImportReferencePack() => _uiCommandFactory.Create<ImportReferencePackCommand>().Execute();
         [RelayCommand] private void CreateNewProject() => _uiCommandFactory.Create<CreateNewProjectCommand>().Execute();
+        [RelayCommand] private void OpenPackForEditing() => _uiCommandFactory.Create<OpenPackForEditingCommand>().Execute();
+        [RelayCommand] private void CreateNewPack() => _uiCommandFactory.Create<CreateNewPackCommand>().Execute();
+
+        // Read once: changing settings already asks for a restart
+        public bool IsDirectPackEditingEnabled => _settingsService.CurrentSettings.EnableDirectPackEditing;
         
         [RelayCommand] private void CreateAnimPackWarhammer3() => _uiCommandFactory.Create<CreateExampleAnimationDbCommand>().CreateAnimationDbWarhammer3();
         [RelayCommand] private void CreateAnimPack3k() => _uiCommandFactory.Create<CreateExampleAnimationDbCommand>().CreateAnimationDb3k();

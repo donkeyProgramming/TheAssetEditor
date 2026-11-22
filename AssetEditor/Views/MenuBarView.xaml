@@ -33,6 +33,11 @@
             
                 <MenuItem Header="{loc:Loc MenuBar.File.ImportReferencePack}" Command="{Binding MenuBar.ImportReferencePackCommand}"/>
 
+                <MenuItem Header="{loc:Loc MenuBar.File.OpenPackDirect}" Command="{Binding MenuBar.OpenPackForEditingCommand}"
+                          Visibility="{Binding MenuBar.IsDirectPackEditingEnabled, Converter={StaticResource BoolToVisibility}}"/>
+                <MenuItem Header="{loc:Loc MenuBar.File.NewPackDirect}" Command="{Binding MenuBar.CreateNewPackCommand}"
+                          Visibility="{Binding MenuBar.IsDirectPackEditingEnabled, Converter={StaticResource BoolToVisibility}}"/>
+
                 <MenuItem Header="{loc:Loc MenuBar.File.OpenGamePacks}">
                     <MenuItem Header="{loc:Loc MenuBar.File.GameAttila}" Command="{Binding MenuBar.OpenAttilaPacksCommand}"/>
                     <MenuItem Header="{loc:Loc MenuBar.File.GameRomeRemastered}" Command="{Binding MenuBar.OpenRomeRemasteredPacksCommand}"/>
