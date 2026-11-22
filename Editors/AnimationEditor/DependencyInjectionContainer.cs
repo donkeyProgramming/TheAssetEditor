@@ -24,12 +24,12 @@ namespace Editors.AnimationVisualEditors
         {
             EditorInfoBuilder
                 .Create<MountAnimationCreatorViewModel, EditorHostView>(EditorEnums.MountTool_Editor)
-                .AddToToolbar("Rider Animation Editor", true)
+                .AddToToolbar("Rider Animation Editor", true, ToolsMenuSection.Animation)
                 .Build(database);
         
             EditorInfoBuilder
               .Create<AnimationKeyframeEditorViewModel, EditorHostView>(EditorEnums.AnimationKeyFrame_Editor)
-              .AddToToolbar("Keyframe Editor", true)
+              .AddToToolbar("Keyframe Editor", true, ToolsMenuSection.Animation)
               .Build(database);
         }
     }

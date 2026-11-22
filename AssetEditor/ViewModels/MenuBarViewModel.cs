@@ -34,9 +34,12 @@ namespace AssetEditor.ViewModels
         private readonly IFileSaveService _packFileSaveService;
         private readonly IPackFileContainerLoader _packFileContainerLoader;
         private readonly IStandardDialogs _standardDialogs;
+        private readonly LocalizationManager _localizationManager;
 
         public ObservableCollection<RecentPackFileItem> RecentPackFiles { get; set; } = [];
-        public ObservableCollection<EditorShortcutViewModel> Editors { get; set; } = [];
+        /// <summary>Tools menu entries: <see cref="EditorShortcutViewModel"/>s, with a
+        /// <see cref="ToolsMenuSectionHeaderViewModel"/> before each titled section.</summary>
+        public ObservableCollection<object> Editors { get; set; } = [];
 
         public MenuBarViewModel(IPackFileService packfileService, 
             ApplicationSettingsService settingsService, 
@@ -45,7 +48,8 @@ namespace AssetEditor.ViewModels
             TouchedFilesRecorder touchedFilesRecorder, 
             IFileSaveService packFileSaveService,
             IPackFileContainerLoader packFileContainerLoader,
-            IStandardDialogs standardDialogs)
+            IStandardDialogs standardDialogs,
+            LocalizationManager localizationManager)
         {
             _packfileService = packfileService;
             _settingsService = settingsService;
@@ -55,6 +59,7 @@ namespace AssetEditor.ViewModels
             _packFileSaveService = packFileSaveService;
             _packFileContainerLoader = packFileContainerLoader;
             _standardDialogs = standardDialogs;
+            _localizationManager = localizationManager;
             var settings = settingsService.CurrentSettings;
             settings.RecentPackFiles.CollectionChanged += OnRecentPackFilePathsChanged;
             CreateRecentPackFilesItems();
@@ -174,14 +179,20 @@ namespace AssetEditor.ViewModels
 
         void CreateTools()
         {
-            var infos = _editorDatabase
+            var sections = _editorDatabase
                 .GetEditorInfos()
-                .OrderBy(x=>x.ToolbarName)
-                .Where(x=>x.AddToolbarButton)
-                .ToList();
+                .Where(x => x.AddToolbarButton)
+                .GroupBy(x => x.ToolsMenuSection)
+                .OrderBy(x => x.Key);
 
-            foreach (var item in infos)
-                Editors.Add(new EditorShortcutViewModel(item, _uiCommandFactory));   
+            foreach (var section in sections)
+            {
+                if (section.Key != ToolsMenuSection.Top)
+                    Editors.Add(new ToolsMenuSectionHeaderViewModel(_localizationManager.Get($"MenuBar.Tools.Section.{section.Key}")));
+
+                foreach (var item in section.OrderBy(x => x.ToolbarName))
+                    Editors.Add(new EditorShortcutViewModel(item, _uiCommandFactory));
+            }
         }
     }
 }

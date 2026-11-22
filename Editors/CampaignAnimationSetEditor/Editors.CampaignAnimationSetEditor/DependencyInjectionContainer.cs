@@ -29,7 +29,7 @@ namespace Editors.CampaignAnimationSetEditor
                 .Create<CampaignAnimationSetEditorViewModel, CampaignAnimationSetEditorView>(EditorEnums.XML_CampaginBin_Edtior)
                 .AddExtention(".bin", EditorPriorites.High)
                 .ValidForFoldersContaining(@"animations\campaign\database")
-                .AddToToolbar("Campaign Animation Set Editor", true)
+                .AddToToolbar("Campaign Animation Set Editor", true, ToolsMenuSection.Animation)
                 .Build(editorDatabase);
         }
     }
