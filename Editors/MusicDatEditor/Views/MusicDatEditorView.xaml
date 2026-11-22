@@ -1,6 +1,7 @@
 <UserControl x:Class="Editors.MusicDatEditor.Views.MusicDatEditorView"
              x:Name="Root"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:loc="clr-namespace:Shared.Ui.Common;assembly=Shared.Ui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -14,8 +15,8 @@
 
         <!-- Toolbar -->
         <DockPanel Grid.Row="0" Margin="6">
-            <Button DockPanel.Dock="Left" Content="Open" Command="{Binding OpenCommand}" Padding="12,3" Margin="0,0,6,0"
-                    ToolTip="Open a music script. Restricted to audio/scripts/, the only folder either one lives in."/>
+            <Button DockPanel.Dock="Left" Content="{loc:Loc MusicDatEditor.Open}" Command="{Binding OpenCommand}" Padding="12,3" Margin="0,0,6,0"
+                    ToolTip="{loc:Loc MusicDatEditor.OpenAMusicScriptRestrictedTo}"/>
             <TextBlock Text="{Binding StatusText}" VerticalAlignment="Center" Opacity="0.8"/>
         </DockPanel>
 
@@ -33,13 +34,13 @@
                 </Grid.RowDefinitions>
 
                 <DockPanel Grid.Row="0">
-                    <TextBlock DockPanel.Dock="Top" Text="Functions" FontWeight="Bold" Margin="0,0,0,4"/>
+                    <TextBlock DockPanel.Dock="Top" Text="{loc:Loc MusicDatEditor.Functions}" FontWeight="Bold" Margin="0,0,0,4"/>
                     <DataGrid ItemsSource="{Binding Functions}" SelectedItem="{Binding SelectedFunction}"
                               AutoGenerateColumns="False" IsReadOnly="True" CanUserAddRows="False"
                               GridLinesVisibility="None" HeadersVisibility="Column"
-                              ToolTip="▶ = called directly by the game engine (never called from within the script itself) - confirmed by cross-referencing both campaign_music.dat and battle_music.dat">
+                              ToolTip="{loc:Loc MusicDatEditor.CalledDirectlyByTheGameEngine}">
                         <DataGrid.Columns>
-                            <DataGridTextColumn Header="Name" Binding="{Binding DisplayName}" Width="*" ElementStyle="{DynamicResource {x:Type TextBlock}}">
+                            <DataGridTextColumn Header="{loc:Loc MusicDatEditor.Name}" Binding="{Binding DisplayName}" Width="*" ElementStyle="{DynamicResource {x:Type TextBlock}}">
                                 <DataGridTextColumn.CellStyle>
                                     <Style TargetType="DataGridCell" BasedOn="{StaticResource {x:Type DataGridCell}}">
                                         <Style.Triggers>
@@ -48,58 +49,58 @@
                                             </DataTrigger>
                                             <DataTrigger Binding="{Binding IsLikelyUnreachable}" Value="True">
                                                 <Setter Property="Opacity" Value="0.55"/>
-                                                <Setter Property="ToolTip" Value="Never called by any other function in this file, and not a known engine entry point - likely dead/legacy code."/>
+                                                <Setter Property="ToolTip" Value="{loc:Loc MusicDatEditor.NeverCalledByAnyOtherFunction}"/>
                                             </DataTrigger>
                                         </Style.Triggers>
                                     </Style>
                                 </DataGridTextColumn.CellStyle>
                             </DataGridTextColumn>
-                            <DataGridTextColumn Header="Instr" Binding="{Binding InstructionCount}" Width="50" ElementStyle="{DynamicResource {x:Type TextBlock}}"/>
+                            <DataGridTextColumn Header="{loc:Loc MusicDatEditor.Instr}" Binding="{Binding InstructionCount}" Width="50" ElementStyle="{DynamicResource {x:Type TextBlock}}"/>
                         </DataGrid.Columns>
                     </DataGrid>
                 </DockPanel>
 
                 <TabControl Grid.Row="1" Margin="0,6,0,0">
-                    <TabItem Header="Triggers">
+                    <TabItem Header="{loc:Loc MusicDatEditor.Triggers}">
                         <DataGrid ItemsSource="{Binding Triggers}" AutoGenerateColumns="False" IsReadOnly="True" CanUserAddRows="False" GridLinesVisibility="None">
                             <DataGrid.Columns>
                                 <DataGridTextColumn Header="#" Binding="{Binding Index}" Width="30" ElementStyle="{DynamicResource {x:Type TextBlock}}"/>
-                                <DataGridTextColumn Header="Name" Binding="{Binding Name}" Width="*" ElementStyle="{DynamicResource {x:Type TextBlock}}"/>
-                                <DataGridTextColumn Header="Init" Binding="{Binding Value}" Width="50" ElementStyle="{DynamicResource {x:Type TextBlock}}"/>
+                                <DataGridTextColumn Header="{loc:Loc MusicDatEditor.Name}" Binding="{Binding Name}" Width="*" ElementStyle="{DynamicResource {x:Type TextBlock}}"/>
+                                <DataGridTextColumn Header="{loc:Loc MusicDatEditor.Init}" Binding="{Binding Value}" Width="50" ElementStyle="{DynamicResource {x:Type TextBlock}}"/>
                             </DataGrid.Columns>
                         </DataGrid>
                     </TabItem>
-                    <TabItem Header="Vars">
+                    <TabItem Header="{loc:Loc MusicDatEditor.Vars}">
                         <DataGrid ItemsSource="{Binding Variables}" AutoGenerateColumns="False" IsReadOnly="True" CanUserAddRows="False" GridLinesVisibility="None">
                             <DataGrid.Columns>
                                 <DataGridTextColumn Header="#" Binding="{Binding Index}" Width="30" ElementStyle="{DynamicResource {x:Type TextBlock}}"/>
-                                <DataGridTextColumn Header="Name" Binding="{Binding Name}" Width="*" ElementStyle="{DynamicResource {x:Type TextBlock}}"/>
-                                <DataGridTextColumn Header="Init" Binding="{Binding Value}" Width="60" ElementStyle="{DynamicResource {x:Type TextBlock}}"/>
+                                <DataGridTextColumn Header="{loc:Loc MusicDatEditor.Name}" Binding="{Binding Name}" Width="*" ElementStyle="{DynamicResource {x:Type TextBlock}}"/>
+                                <DataGridTextColumn Header="{loc:Loc MusicDatEditor.Init}" Binding="{Binding Value}" Width="60" ElementStyle="{DynamicResource {x:Type TextBlock}}"/>
                             </DataGrid.Columns>
                         </DataGrid>
                     </TabItem>
-                    <TabItem Header="StrVars">
+                    <TabItem Header="{loc:Loc MusicDatEditor.StrVars}">
                         <DataGrid ItemsSource="{Binding StringVariables}" AutoGenerateColumns="False" IsReadOnly="True" CanUserAddRows="False" GridLinesVisibility="None">
                             <DataGrid.Columns>
                                 <DataGridTextColumn Header="#" Binding="{Binding Index}" Width="30" ElementStyle="{DynamicResource {x:Type TextBlock}}"/>
-                                <DataGridTextColumn Header="Name" Binding="{Binding Name}" Width="*" ElementStyle="{DynamicResource {x:Type TextBlock}}"/>
-                                <DataGridTextColumn Header="Init" Binding="{Binding Value}" Width="90" ElementStyle="{DynamicResource {x:Type TextBlock}}"/>
+                                <DataGridTextColumn Header="{loc:Loc MusicDatEditor.Name}" Binding="{Binding Name}" Width="*" ElementStyle="{DynamicResource {x:Type TextBlock}}"/>
+                                <DataGridTextColumn Header="{loc:Loc MusicDatEditor.Init}" Binding="{Binding Value}" Width="90" ElementStyle="{DynamicResource {x:Type TextBlock}}"/>
                             </DataGrid.Columns>
                         </DataGrid>
                     </TabItem>
-                    <TabItem Header="Strings">
+                    <TabItem Header="{loc:Loc MusicDatEditor.Strings}">
                         <DataGrid ItemsSource="{Binding StringConstants}" AutoGenerateColumns="False" IsReadOnly="True" CanUserAddRows="False" GridLinesVisibility="None"
-                                  ToolTip="Right-click a string that looks like a Wwise event name to search for it in Audio Explorer">
+                                  ToolTip="{loc:Loc MusicDatEditor.RightClickAStringThatLooks}">
                             <DataGrid.Columns>
                                 <DataGridTextColumn Header="#" Binding="{Binding Name}" Width="40" ElementStyle="{DynamicResource {x:Type TextBlock}}"/>
-                                <DataGridTextColumn Header="Text" Binding="{Binding Value}" Width="*" ElementStyle="{DynamicResource {x:Type TextBlock}}"/>
+                                <DataGridTextColumn Header="{loc:Loc MusicDatEditor.Text}" Binding="{Binding Value}" Width="*" ElementStyle="{DynamicResource {x:Type TextBlock}}"/>
                             </DataGrid.Columns>
                             <DataGrid.RowStyle>
                                 <Style TargetType="DataGridRow" BasedOn="{StaticResource {x:Type DataGridRow}}">
                                     <Setter Property="ContextMenu">
                                         <Setter.Value>
                                             <ContextMenu>
-                                                <MenuItem Header="Find in Audio Explorer"
+                                                <MenuItem Header="{loc:Loc MusicDatEditor.FindInAudioExplorer}"
                                                           Command="{Binding DataContext.FindInAudioExplorerCommand, ElementName=Root}"
                                                           CommandParameter="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu}}"/>
                                             </ContextMenu>
@@ -109,12 +110,12 @@
                             </DataGrid.RowStyle>
                         </DataGrid>
                     </TabItem>
-                    <TabItem Header="Calls">
+                    <TabItem Header="{loc:Loc MusicDatEditor.Calls}">
                         <DataGrid ItemsSource="{Binding Intrinsics}" AutoGenerateColumns="False" IsReadOnly="True" CanUserAddRows="False" GridLinesVisibility="None">
                             <DataGrid.Columns>
                                 <DataGridTextColumn Header="#" Binding="{Binding Index}" Width="30" ElementStyle="{DynamicResource {x:Type TextBlock}}"/>
-                                <DataGridTextColumn Header="Name" Binding="{Binding Name}" Width="*" ElementStyle="{DynamicResource {x:Type TextBlock}}"/>
-                                <DataGridTextColumn Header="Args" Binding="{Binding Value}" Width="60" ElementStyle="{DynamicResource {x:Type TextBlock}}"/>
+                                <DataGridTextColumn Header="{loc:Loc MusicDatEditor.Name}" Binding="{Binding Name}" Width="*" ElementStyle="{DynamicResource {x:Type TextBlock}}"/>
+                                <DataGridTextColumn Header="{loc:Loc MusicDatEditor.Args}" Binding="{Binding Value}" Width="60" ElementStyle="{DynamicResource {x:Type TextBlock}}"/>
                             </DataGrid.Columns>
                         </DataGrid>
                     </TabItem>
@@ -125,29 +126,29 @@
             <DockPanel Grid.Column="1" Margin="0,0,6,6">
                 <TextBlock DockPanel.Dock="Top" Text="{Binding SelectedFunction.Name, StringFormat='Function: {0}'}" FontWeight="Bold" Margin="0,0,0,4"/>
                 <TabControl>
-                    <TabItem Header="Pseudocode">
+                    <TabItem Header="{loc:Loc MusicDatEditor.Pseudocode}">
                         <DockPanel>
                             <TextBlock DockPanel.Dock="Top" TextWrapping="Wrap" FontSize="11" Opacity="0.75" Margin="0,0,0,6">
-                                <Run Text="Read-only." FontWeight="Bold"/>
-                                <Run Text="A decompiled reading view of the Instructions tab, not the source of truth - reconstructing structured code from raw bytecode is inherently approximate, so goto/label artifacts and odd merges can turn up here. To add a culture, use the Music Project Editor, which rebuilds both scripts."/>
+                                <Run Text="{loc:Loc MusicDatEditor.ReadOnly}" FontWeight="Bold"/>
+                                <Run Text="{loc:Loc MusicDatEditor.ADecompiledReadingViewOfThe}"/>
                             </TextBlock>
                             <TextBox Text="{Binding Pseudocode, Mode=OneWay}" IsReadOnly="True"
                                      FontFamily="Consolas" FontSize="12" TextWrapping="NoWrap"
                                      VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto"/>
                         </DockPanel>
                     </TabItem>
-                    <TabItem Header="Instructions">
+                    <TabItem Header="{loc:Loc MusicDatEditor.Instructions}">
                         <DockPanel>
                             <TextBlock DockPanel.Dock="Top" TextWrapping="Wrap" FontSize="11" Opacity="0.75" Margin="0,0,0,6">
-                                <Run Text="Read-only." FontWeight="Bold"/>
-                                <Run Text="The raw decoded instruction stream. To add a culture, use the Music Project Editor, which rebuilds both scripts."/>
+                                <Run Text="{loc:Loc MusicDatEditor.ReadOnly}" FontWeight="Bold"/>
+                                <Run Text="{loc:Loc MusicDatEditor.TheRawDecodedInstructionStreamTo}"/>
                             </TextBlock>
                             <DataGrid ItemsSource="{Binding Instructions}" AutoGenerateColumns="False" CanUserAddRows="False" IsReadOnly="True"
                                       GridLinesVisibility="Horizontal" HeadersVisibility="Column" FontFamily="Consolas">
                                 <DataGrid.Columns>
-                                    <DataGridTextColumn Header="Addr" Binding="{Binding Address}" Width="55" ElementStyle="{DynamicResource {x:Type TextBlock}}"/>
-                                    <DataGridTextColumn Header="Op" Binding="{Binding Mnemonic}" Width="120" ElementStyle="{DynamicResource {x:Type TextBlock}}"/>
-                                    <DataGridTextColumn Header="Op0" Binding="{Binding Operand0Text}" Width="80" ElementStyle="{DynamicResource {x:Type TextBlock}}">
+                                    <DataGridTextColumn Header="{loc:Loc MusicDatEditor.Addr}" Binding="{Binding Address}" Width="55" ElementStyle="{DynamicResource {x:Type TextBlock}}"/>
+                                    <DataGridTextColumn Header="{loc:Loc MusicDatEditor.Op}" Binding="{Binding Mnemonic}" Width="120" ElementStyle="{DynamicResource {x:Type TextBlock}}"/>
+                                    <DataGridTextColumn Header="{loc:Loc MusicDatEditor.Op0}" Binding="{Binding Operand0Text}" Width="80" ElementStyle="{DynamicResource {x:Type TextBlock}}">
                                         <DataGridTextColumn.CellStyle>
                                             <Style TargetType="DataGridCell" BasedOn="{StaticResource {x:Type DataGridCell}}">
                                                 <Style.Triggers>
@@ -158,7 +159,7 @@
                                             </Style>
                                         </DataGridTextColumn.CellStyle>
                                     </DataGridTextColumn>
-                                    <DataGridTextColumn Header="Op1" Binding="{Binding Operand1Text}" Width="80" ElementStyle="{DynamicResource {x:Type TextBlock}}">
+                                    <DataGridTextColumn Header="{loc:Loc MusicDatEditor.Op1}" Binding="{Binding Operand1Text}" Width="80" ElementStyle="{DynamicResource {x:Type TextBlock}}">
                                         <DataGridTextColumn.CellStyle>
                                             <Style TargetType="DataGridCell" BasedOn="{StaticResource {x:Type DataGridCell}}">
                                                 <Style.Triggers>
@@ -169,7 +170,7 @@
                                             </Style>
                                         </DataGridTextColumn.CellStyle>
                                     </DataGridTextColumn>
-                                    <DataGridTextColumn Header="Op2" Binding="{Binding Operand2Text}" Width="80" ElementStyle="{DynamicResource {x:Type TextBlock}}">
+                                    <DataGridTextColumn Header="{loc:Loc MusicDatEditor.Op2}" Binding="{Binding Operand2Text}" Width="80" ElementStyle="{DynamicResource {x:Type TextBlock}}">
                                         <DataGridTextColumn.CellStyle>
                                             <Style TargetType="DataGridCell" BasedOn="{StaticResource {x:Type DataGridCell}}">
                                                 <Style.Triggers>
@@ -180,7 +181,7 @@
                                             </Style>
                                         </DataGridTextColumn.CellStyle>
                                     </DataGridTextColumn>
-                                    <DataGridTextColumn Header="Annotation" Binding="{Binding Annotation}" Width="*" ElementStyle="{DynamicResource {x:Type TextBlock}}"/>
+                                    <DataGridTextColumn Header="{loc:Loc MusicDatEditor.Annotation}" Binding="{Binding Annotation}" Width="*" ElementStyle="{DynamicResource {x:Type TextBlock}}"/>
                                 </DataGrid.Columns>
                             </DataGrid>
                         </DockPanel>
