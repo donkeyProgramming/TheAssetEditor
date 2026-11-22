@@ -24,6 +24,7 @@
 	  <Compile Remove="MusicProjectBuildTests.cs" />
 	  <Compile Remove="MusicSwitchContainerMergeTests.cs" />
 	  <Compile Remove="SetStateActionGenerationTests.cs" />
+	  <Compile Remove="SoundEnginePlaybackFormatTests.cs" />
 	  <Compile Remove="VanillaBankReader.cs" />
 	  <Compile Remove="MusicTreeEndToEndRun.cs" />
 	  <Compile Remove="MusicDatFixtures.cs" />

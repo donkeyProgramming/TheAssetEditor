@@ -34,6 +34,7 @@
     <Compile Include="MusicProjectBuildTests.cs" />
     <Compile Include="MusicSwitchContainerMergeTests.cs" />
     <Compile Include="SetStateActionGenerationTests.cs" />
+    <Compile Include="SoundEnginePlaybackFormatTests.cs" />
     <Compile Include="VanillaBankReader.cs" />
     <Compile Include="MusicTreeEndToEndRun.cs" />
     <Compile Include="MusicDatFixtures.cs" />
