@@ -31,11 +31,16 @@ using Shared.Core.PackFiles.Utility;
 
 namespace AnimationEditor.MountAnimationCreator
 {
-    public class MountAnimationCreatorViewModel : NotifyPropertyChangedImpl, IHostedEditor<MountAnimationCreatorViewModel>, IDisposable
+    public static class MountToolIds
     {
-        public Type EditorViewModelType => typeof(EditorView);
-        private readonly SceneObjectViewModelBuilder _sceneObjectViewModelBuilder;
-        private readonly SceneObjectEditor _sceneObjectBuilder;
+        public static string Rider => "Rider";
+        public static string Mount => "Mount";
+        public static string Generated => "Generated";
+    }
+
+    public class MountAnimationCreatorViewModel : EditorHostBase, IDisposable
+    {
+        public override Type EditorViewModelType => typeof(EditorView);
         private readonly IFileSaveService _fileSaveService;
         private readonly IUiCommandFactory _uiCommandFactory;
         private readonly AnimationPlayerViewModel _animationPlayerViewModel;
@@ -50,12 +55,8 @@ namespace AnimationEditor.MountAnimationCreator
         List<int> _mountVertexes = new();
         Rmv2MeshNode _mountVertexOwner;
 
-        AnimationToolInput _inputRiderData;
-        AnimationToolInput _inputMountData;
-
         public AnimationSettingsViewModel AnimationSettings { get; set; } = new AnimationSettingsViewModel();
         public MountLinkViewModel MountLinkController { get; set; }
-        public string EditorName => "Mount Animation Creator";
 
         public FilterCollection<SkeletonBoneNode> SelectedRiderBone { get; set; }
 
@@ -76,18 +77,16 @@ namespace AnimationEditor.MountAnimationCreator
         public FilterCollection<IAnimationBinGenericFormat> ActiveOutputFragment { get; set; }
         public FilterCollection<AnimationBinEntryGenericFormat> ActiveFragmentSlot { get; set; }
 
-        public MountAnimationCreatorViewModel(IPackFileService pfs,
+        public MountAnimationCreatorViewModel(IEditorHostParameters editorHostParameters,
+            IPackFileService pfs,
             ISkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper, 
             SelectionManager selectionManager,
-            SceneObjectViewModelBuilder sceneObjectViewModelBuilder,
             AnimationPlayerViewModel animationPlayerViewModel,
-            SceneObjectEditor sceneObjectBuilder,
             IFileSaveService fileSaveService,
-            IUiCommandFactory uiCommandFactory)
+            IUiCommandFactory uiCommandFactory) : base(editorHostParameters)
         {
-            _sceneObjectViewModelBuilder = sceneObjectViewModelBuilder;
+            DisplayName = "Mount Animation Creator";
             _animationPlayerViewModel = animationPlayerViewModel;
-            _sceneObjectBuilder = sceneObjectBuilder;
             _fileSaveService = fileSaveService;
             _uiCommandFactory = uiCommandFactory;
             _pfs = pfs;
@@ -108,26 +107,30 @@ namespace AnimationEditor.MountAnimationCreator
             ActiveFragmentSlot.SearchFilter = (value, rx) => { return rx.Match(value.SlotName).Success; };
 
             AnimationSettings.SettingsChanged += () => TryReGenerateAnimation(null);
+
+            Initialize();
         }
 
         public void SetDebugInputParameters(AnimationToolInput rider, AnimationToolInput mount)
         {
-            _inputRiderData = rider;
-            _inputMountData = mount;
+            if (rider?.Mesh != null)
+                _sceneObjectEditor.SetMesh(_rider, rider.Mesh);
+            if (mount?.Mesh != null)
+                _sceneObjectEditor.SetMesh(_mount, mount.Mesh);
         }
 
-        public void Initialize(EditorHost<MountAnimationCreatorViewModel> owner)
+        void Initialize()
         {
-           // var riderItem = _sceneObjectViewModelBuilder.CreateAsset(true, "Rider", Color.Black, _inputRiderData);
-           // var mountItem = _sceneObjectViewModelBuilder.CreateAsset(true, "Mount", Color.Black, _inputMountData);
-           // mountItem.Data.IsSelectable = true;
-           //
-           // var propAsset = _sceneObjectBuilder.CreateAsset("New Anim", Color.Red);
-           // _animationPlayerViewModel.RegisterAsset(propAsset);
-           //
-           // Create(riderItem.Data, mountItem.Data, propAsset);
-           // owner.SceneObjects.Add(riderItem);
-           // owner.SceneObjects.Add(mountItem);
+            var riderItem = _sceneObjectViewModelBuilder.CreateAsset(MountToolIds.Rider, true, "Rider", Color.Black, null);
+            var mountItem = _sceneObjectViewModelBuilder.CreateAsset(MountToolIds.Mount, true, "Mount", Color.Black, null);
+            mountItem.Data.IsSelectable = true;
+
+            var propAsset = _sceneObjectEditor.CreateAsset(MountToolIds.Generated, "New Anim", Color.Red);
+            _animationPlayerViewModel.RegisterAsset(propAsset);
+
+            Create(riderItem.Data, mountItem.Data, propAsset);
+            SceneObjects.Add(riderItem);
+            SceneObjects.Add(mountItem);
         }
 
         internal void Create(SceneObject rider, SceneObject mount, SceneObject newAnimation)
@@ -141,7 +144,7 @@ namespace AnimationEditor.MountAnimationCreator
             _rider.SkeletonChanged += RiderSkeletonChanges;
             _rider.AnimationChanged += TryReGenerateAnimation;
 
-            MountLinkController = new MountLinkViewModel(_sceneObjectBuilder, _pfs, _skeletonAnimationLookUpHelper, rider, mount, UpdateCanSaveAndPreviewStates);
+            MountLinkController = new MountLinkViewModel(_sceneObjectEditor, _pfs, _skeletonAnimationLookUpHelper, rider, mount, UpdateCanSaveAndPreviewStates);
 
             MountSkeletonChanged(_mount.Skeleton);
             RiderSkeletonChanges(_rider.Skeleton);
@@ -149,14 +152,14 @@ namespace AnimationEditor.MountAnimationCreator
 
         private void TryReGenerateAnimation(AnimationClip newValue = null)
         {
-           // UpdateCanSaveAndPreviewStates();
-           // if (CanPreview.Value)
-           //     CreateMountAnimationAction();
-           // else
-           // {
-           //     if (_newAnimation != null)
-           //         _sceneObjectBuilder.SetAnimation(_newAnimation, null);
-           // }
+            UpdateCanSaveAndPreviewStates();
+            if (CanPreview.Value)
+                CreateMountAnimationAction();
+            else
+            {
+                if (_newAnimation != null)
+                    _sceneObjectEditor.SetAnimation(_newAnimation, null);
+            }
         }
 
         private void MountSkeletonChanged(GameSkeleton newValue)
@@ -232,14 +235,13 @@ namespace AnimationEditor.MountAnimationCreator
 
         public void CreateMountAnimationAction()
         {
-           //var newRiderAnim = CreateAnimationGenerator().GenerateMountAnimation(_mount.AnimationClip, _rider.AnimationClip);
-           //
-           //// Apply
-           //_sceneObjectBuilder.CopyMeshFromOther(_newAnimation, _rider);
-           //_sceneObjectBuilder.SetAnimationClip(_newAnimation, newRiderAnim, new SkeletonAnimationLookUpHelper.AnimationReference("Generated animation", null));
-           //_newAnimation.ShowSkeleton.Value = DisplayGeneratedSkeleton.Value;
-           //_newAnimation.ShowMesh.Value = DisplayGeneratedMesh.Value;
-           //UpdateCanSaveAndPreviewStates();
+            var newRiderAnim = CreateAnimationGenerator().GenerateMountAnimation(_mount.AnimationClip, _rider.AnimationClip);
+
+            _sceneObjectEditor.CopyMeshFromOther(_newAnimation, _rider);
+            _sceneObjectEditor.SetAnimationClip(_newAnimation, newRiderAnim, "Generated animation");
+            _newAnimation.ShowSkeleton.Value = DisplayGeneratedSkeleton.Value;
+            _newAnimation.ShowMesh.Value = DisplayGeneratedMesh.Value;
+            UpdateCanSaveAndPreviewStates();
         }
 
         MountAnimationGeneratorService CreateAnimationGenerator()
@@ -301,8 +303,8 @@ namespace AnimationEditor.MountAnimationCreator
 
         public void SaveCurrentAnimationAction()
         {
-           // var service = new BatchProcessorService(_pfs, _skeletonAnimationLookUpHelper, CreateAnimationGenerator(), new BatchProcessOptions { SavePrefix = SavePrefixText.Value }, _fileSaveService, SelectedAnimationOutputFormat.Value);
-           // service.SaveSingleAnim(_mount.AnimationClip, _rider.AnimationClip, _rider.AnimationName.Value.AnimationFile);
+            var service = new BatchProcessorService(_pfs, _skeletonAnimationLookUpHelper, CreateAnimationGenerator(), new BatchProcessOptions { SavePrefix = SavePrefixText.Value }, _fileSaveService, SelectedAnimationOutputFormat.Value);
+            service.SaveSingleAnim(_mount.AnimationClip, _rider.AnimationClip, _rider.AnimationName.Value);
         }
 
         public void BatchProcessUsingFragmentsAction()

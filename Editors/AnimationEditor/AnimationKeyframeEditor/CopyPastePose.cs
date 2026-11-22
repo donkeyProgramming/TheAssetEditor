@@ -46,7 +46,7 @@ namespace AnimationEditor.AnimationKeyframeEditor
             _parent.CommandFactory.CreateWithBuilder<PasteWholeTransformBoneCommand>().Configure(x => x.Configure(
                 _parent.Rider.AnimationClip.DynamicFrames[_frameNrToCopy].Clone(),
                 _parent.Rider.AnimationClip, currentFrame,
-                _parent.PastePosition.Value, _parent.PasteRotation.Value, _parent.PasteScale.Value)).BuildAndExecute();
+                _parent.PastePosition.Value, _parent.PasteRotation.Value, true)).BuildAndExecute();
 
             if (_parent.IncrementFrameAfterCopyOperation.Value)
             {
@@ -76,7 +76,7 @@ namespace AnimationEditor.AnimationKeyframeEditor
             _parent.CommandFactory.CreateWithBuilder<PasteIntoSelectedBonesTransformBoneCommand>().Configure(x => x.Configure(
                 _parent.Rider.AnimationClip.DynamicFrames[_frameNrToCopy].Clone(),
                 _parent.Rider.AnimationClip, currentFrame, _parent.GetSelectedBones(),
-                _parent.PastePosition.Value, _parent.PasteRotation.Value, _parent.PasteScale.Value)).BuildAndExecute();
+                _parent.PastePosition.Value, _parent.PasteRotation.Value, true)).BuildAndExecute();
 
             if (_parent.IncrementFrameAfterCopyOperation.Value)
             {
@@ -104,7 +104,7 @@ namespace AnimationEditor.AnimationKeyframeEditor
             _parent.CommandFactory.CreateWithBuilder<PasteIntoSelectedBonesTransformBoneCommand>().Configure(x => x.Configure(
                 _parent.Rider.AnimationClip.DynamicFrames[_parent.GetModifiedFrameNr()].Clone(),
                 _parent.Rider.AnimationClip, currentFrame, _parent.GetModifiedBones(),
-                _parent.PastePosition.Value, _parent.PasteRotation.Value, _parent.PasteScale.Value)).BuildAndExecute();
+                _parent.PastePosition.Value, _parent.PasteRotation.Value, true)).BuildAndExecute();
 
             if (_parent.IncrementFrameAfterCopyOperation.Value)
             {

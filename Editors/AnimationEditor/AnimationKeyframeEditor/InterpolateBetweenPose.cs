@@ -36,8 +36,8 @@ namespace AnimationEditor.AnimationKeyframeEditor
         {
             _keyframeNrA = -1;
             _keyframeNrB = -1;
-            _parent.SelectedFrameAInterpolation.Value = "Not set";
-            _parent.SelectedFrameBInterpolation.Value = "Not set";
+            _parent.SelectedFrameAInterpolation.Value = "-";
+            _parent.SelectedFrameBInterpolation.Value = "-";
         }
 
         private bool Check()
@@ -105,7 +105,7 @@ namespace AnimationEditor.AnimationKeyframeEditor
                 _parent.InterpolationValue,
                 _parent.PastePosition.Value,
                 _parent.PasteRotation.Value,
-                _parent.PasteScale.Value)).BuildAndExecute();
+                true)).BuildAndExecute();
         }
 
         private void ApplyOnCurrentFrameSelectedBones()
@@ -123,7 +123,7 @@ namespace AnimationEditor.AnimationKeyframeEditor
             _parent.GetSelectedBones(),
             _parent.PastePosition.Value,
             _parent.PasteRotation.Value,
-            _parent.PasteScale.Value)).BuildAndExecute();
+            true)).BuildAndExecute();
         }
 
         private void ApplyAcrossFrames()

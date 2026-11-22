@@ -19,7 +19,6 @@ namespace Editors.AnimationMeta
             serviceCollection.AddTransient<MainEditorView>();
             serviceCollection.AddTransient<MetaDataEditorViewModel>();
 
-            serviceCollection.AddScoped<EditorHost<SuperViewViewModel>>();
             serviceCollection.AddScoped<SuperViewViewModel>();
 
             serviceCollection.AddScoped<IMetaDataBuilder, MetaDataBuilder>(); // Needs heavy refactorying!

@@ -1,296 +1,250 @@
 ﻿<UserControl x:Class="AnimationEditor.AnimationKeyframeEditor.EditorView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:s="http://schemas.singulink.com/xaml"
              xmlns:controls="clr-namespace:System.Windows.Controls;assembly=PresentationFramework"
              xmlns:loc="clr-namespace:Shared.Ui.Common;assembly=Shared.Ui"
-             mc:Ignorable="d" 
-             d:DesignHeight="1200" d:DesignWidth="800">
+             mc:Ignorable="d"
+             d:DesignHeight="1200" d:DesignWidth="450">
 
     <UserControl.Resources>
         <controls:BooleanToVisibilityConverter x:Key="boolConv"/>
+
+        <!-- Button and checkbox text wraps in a narrow panel -->
+        <DataTemplate x:Key="WrappingText">
+            <TextBlock Text="{Binding}" TextWrapping="Wrap" TextAlignment="Center"/>
+        </DataTemplate>
+        <DataTemplate x:Key="WrappingTextLeft">
+            <TextBlock Text="{Binding}" TextWrapping="Wrap"/>
+        </DataTemplate>
+        <Style TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
+            <Setter Property="Margin" Value="2"/>
+            <Setter Property="Padding" Value="4,2"/>
+            <Setter Property="ContentTemplate" Value="{StaticResource WrappingText}"/>
+        </Style>
+        <Style TargetType="CheckBox" BasedOn="{StaticResource {x:Type CheckBox}}">
+            <Setter Property="Margin" Value="2"/>
+            <Setter Property="ContentTemplate" Value="{StaticResource WrappingTextLeft}"/>
+        </Style>
+        <Style TargetType="Expander" BasedOn="{StaticResource {x:Type Expander}}">
+            <Setter Property="IsExpanded" Value="True"/>
+            <Setter Property="Margin" Value="0,4,0,0"/>
+        </Style>
+        <Style x:Key="SectionHeader" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+        </Style>
+        <Style x:Key="Info" TargetType="TextBlock" BasedOn="{StaticResource {x:Type TextBlock}}">
+            <Setter Property="TextWrapping" Value="Wrap"/>
+            <Setter Property="Margin" Value="4,2,4,4"/>
+            <Setter Property="Opacity" Value="0.8"/>
+        </Style>
     </UserControl.Resources>
 
-    <DockPanel LastChildFill="False">
-        <Label  DockPanel.Dock="Top" Content="{loc:Loc AnimationKeyframeEditor.Title}" FontSize="18" FontWeight="Bold"/>
-        <Label  DockPanel.Dock="Top" FontSize="10">{loc:Loc AnimationKeyframeEditor.RevealButtonsHint}</Label>
-        <Label  DockPanel.Dock="Top" FontSize="20" Foreground="Red" Visibility="{Binding IsDirty.Value, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource boolConv}}" >{loc:Loc AnimationKeyframeEditor.DirtyWarning}</Label>
-        <Grid  DockPanel.Dock="Top">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="20*"/>
-                <ColumnDefinition Width="2*"/>
-                <ColumnDefinition Width="2*"/>
-                <ColumnDefinition Width="2*"/>
-            </Grid.ColumnDefinitions>
-            <Label Grid.Column="0"  Content="{loc:Loc AnimationKeyframeEditor.CurrentFrameLabel}" FontSize="18" FontWeight="Bold"/>
-            <Label Grid.Column="1" Content="{Binding CurrentFrameNumber.Value, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}" FontSize="18" FontWeight="Bold"/>
-            <Label Grid.Column="2" Content="/" FontSize="18" FontWeight="Bold"/>
-            <Label Grid.Column="3" Content="{Binding TotalFrameNumber.Value, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}" FontSize="18" FontWeight="Bold"/>
-        </Grid>
+    <StackPanel Margin="5">
+        <TextBlock Text="{loc:Loc AnimationKeyframeEditor.Title}" FontSize="18" FontWeight="Bold" Margin="0,0,0,4"/>
 
-        <Grid DockPanel.Dock="Top" Margin="5,5,5,5">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"/>
-            </Grid.ColumnDefinitions>
-            <DockPanel>
-                <CheckBox DockPanel.Dock="Top" Content="{loc:Loc AnimationKeyframeEditor.Options.AllowAnimRoot}" IsChecked="{Binding AllowToSelectAnimRoot.Value, UpdateSourceTrigger=PropertyChanged}"  />
-                <CheckBox DockPanel.Dock="Top" Content="{loc:Loc AnimationKeyframeEditor.Options.IncrementFrame}" IsChecked="{Binding IncrementFrameAfterCopyOperation.Value, UpdateSourceTrigger=PropertyChanged}"  />
-                <CheckBox DockPanel.Dock="Top" Content="{loc:Loc AnimationKeyframeEditor.Options.SelectPreviousBones}" IsChecked="{Binding AutoSelectPreviousBonesOnFrameChange.Value, UpdateSourceTrigger=PropertyChanged}"  />
-                <CheckBox DockPanel.Dock="Top" Content="{loc:Loc AnimationKeyframeEditor.Options.EnableIK}" IsChecked="{Binding EnableInverseKinematics.Value, UpdateSourceTrigger=PropertyChanged}"  IsEnabled="false"  />
-                <Label>{loc:Loc AnimationKeyframeEditor.Options.IkEndBone}</Label>
-                <ComboBox  
-                          IsEditable="True"
-                          IsTextSearchEnabled="false"
-                          DisplayMemberPath="BoneName"
-                          Text="{Binding ModelBoneListForIKEndBone.Filter, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" 
-                          ItemsSource="{Binding ModelBoneListForIKEndBone.Values}" 
-                          IsEnabled="false" 
-                          SelectedItem="{Binding ModelBoneListForIKEndBone.SelectedItem, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
-                <!-- "{Binding EnableInverseKinematics.Value}" -->
-            </DockPanel>
-        </Grid>
+        <WrapPanel Margin="0,0,0,2">
+            <RadioButton GroupName="KeyframeScene" Margin="2,2,12,2" Content="{loc:Loc AnimationKeyframeEditor.Scene.SingleModel}" ToolTip="{loc:Loc AnimationKeyframeEditor.Scene.SingleModel.ToolTip}" IsChecked="{Binding SingleModel, Mode=TwoWay}"/>
+            <RadioButton GroupName="KeyframeScene" Margin="2" Content="{loc:Loc AnimationKeyframeEditor.Scene.RiderAndMount}" ToolTip="{loc:Loc AnimationKeyframeEditor.Scene.RiderAndMount.ToolTip}" IsChecked="{Binding WithMount, Mode=TwoWay}"/>
+        </WrapPanel>
+        <TextBlock Style="{StaticResource Info}" Text="{loc:Loc AnimationKeyframeEditor.Scene.MountInfo}"
+                   Visibility="{Binding WithMount, Converter={StaticResource boolConv}}"/>
 
-        <Grid DockPanel.Dock="Top" Margin="5,5,5,0">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="*"/>
-            </Grid.ColumnDefinitions>
+        <StackPanel Orientation="Horizontal" ToolTip="{loc:Loc AnimationKeyframeEditor.Frame.ToolTip}">
+            <TextBlock FontSize="16" FontWeight="Bold" Text="{loc:Loc AnimationKeyframeEditor.Frame.Label}"/>
+            <TextBlock FontSize="16" FontWeight="Bold" Margin="6,0,0,0" Text="{Binding CurrentFrameNumber.Value, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}"/>
+            <TextBlock FontSize="16" FontWeight="Bold" Text=" / "/>
+            <TextBlock FontSize="16" FontWeight="Bold" Text="{Binding TotalFrameNumber.Value, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}"/>
+        </StackPanel>
 
-            <Button Grid.Column="0" Content="{loc:Loc AnimationKeyframeEditor.Buttons.FirstFrame}"  Click="{s:MethodBinding FirstFrame}" Margin="0,0,2,0"/>
-            <Button Grid.Column="1" Content="{loc:Loc AnimationKeyframeEditor.Buttons.PrevFrame}"  Click="{s:MethodBinding PrevFrame}"  Margin="2,0,2,0"/>
-            <Button Grid.Column="2" Content="{loc:Loc AnimationKeyframeEditor.Buttons.NextFrame}"  Click="{s:MethodBinding NextFrame}" Margin="2,0,0,0"/>
-            <Button Grid.Column="3" Content="{loc:Loc AnimationKeyframeEditor.Buttons.LastFrame}"  Click="{s:MethodBinding LastFrame}" Margin="2,0,0,0"/>
-        </Grid>
+        <TextBlock Foreground="Red" FontWeight="Bold" TextWrapping="Wrap" Margin="0,4,0,0"
+                   Text="{loc:Loc AnimationKeyframeEditor.DirtyWarning}"
+                   Visibility="{Binding IsDirty.Value, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource boolConv}}"/>
 
-        <Grid DockPanel.Dock="Top" Margin="5,5,5,0">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="*"/>
-            </Grid.ColumnDefinitions>
+        <!-- Until the model has an animation, the editing sections below are greyed out -->
+        <TextBlock Text="{loc:Loc AnimationKeyframeEditor.NoAnimation}" FontWeight="Bold" TextWrapping="Wrap" Margin="0,4,0,0">
+            <TextBlock.Style>
+                <Style TargetType="TextBlock" BasedOn="{StaticResource {x:Type TextBlock}}">
+                    <Setter Property="Visibility" Value="Collapsed"/>
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding HasAnimation.Value}" Value="False">
+                            <Setter Property="Visibility" Value="Visible"/>
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </TextBlock.Style>
+        </TextBlock>
 
-            <Button Grid.Column="0" Content="{loc:Loc AnimationKeyframeEditor.Buttons.DuplicateFrame}"  Click="{s:MethodBinding DuplicateFrame}" Margin="0,0,2,0"/>
-            <Button Grid.Column="1" Content="{loc:Loc AnimationKeyframeEditor.Buttons.RemoveFrame}"  Click="{s:MethodBinding RemoveFrame}"  Margin="2,0,2,0"/>
-            <Button Grid.Column="2" Content="{loc:Loc AnimationKeyframeEditor.Buttons.ResetPose}"  Click="{s:MethodBinding ResetPose}" Margin="2,0,0,0"/>
-            <Button Grid.Column="3" Content="{loc:Loc AnimationKeyframeEditor.Buttons.UndoPose}"  Click="{s:MethodBinding UndoPose}" Margin="2,0,0,0"/>
-        </Grid>
+        <!-- Options -->
+        <Expander>
+            <Expander.Header>
+                <TextBlock Style="{StaticResource SectionHeader}" Text="{loc:Loc AnimationKeyframeEditor.Options.Header}"/>
+            </Expander.Header>
+            <StackPanel Margin="10,0,0,0">
+                <CheckBox Content="{loc:Loc AnimationKeyframeEditor.Options.AllowAnimRoot}" ToolTip="{loc:Loc AnimationKeyframeEditor.Options.AllowAnimRoot.ToolTip}" IsChecked="{Binding AllowToSelectAnimRoot.Value, UpdateSourceTrigger=PropertyChanged}"/>
+                <CheckBox Content="{loc:Loc AnimationKeyframeEditor.Options.IncrementFrame}" ToolTip="{loc:Loc AnimationKeyframeEditor.Options.IncrementFrame.ToolTip}" IsChecked="{Binding IncrementFrameAfterCopyOperation.Value, UpdateSourceTrigger=PropertyChanged}"/>
+                <CheckBox Content="{loc:Loc AnimationKeyframeEditor.Options.SelectPreviousBones}" ToolTip="{loc:Loc AnimationKeyframeEditor.Options.SelectPreviousBones.ToolTip}" IsChecked="{Binding AutoSelectPreviousBonesOnFrameChange.Value, UpdateSourceTrigger=PropertyChanged}"/>
+            </StackPanel>
+        </Expander>
 
+        <!-- Frames -->
+        <Expander IsEnabled="{Binding HasAnimation.Value}">
+            <Expander.Header>
+                <TextBlock Style="{StaticResource SectionHeader}" Text="{loc:Loc AnimationKeyframeEditor.Frames.Header}"/>
+            </Expander.Header>
+            <StackPanel Margin="10,0,0,0">
+                <UniformGrid Columns="2">
+                    <Button Content="{loc:Loc AnimationKeyframeEditor.Buttons.DuplicateFrame}" ToolTip="{loc:Loc AnimationKeyframeEditor.Buttons.DuplicateFrame.ToolTip}" Click="{s:MethodBinding DuplicateFrame}"/>
+                    <Button Content="{loc:Loc AnimationKeyframeEditor.Buttons.RemoveFrame}" ToolTip="{loc:Loc AnimationKeyframeEditor.Buttons.RemoveFrame.ToolTip}" Click="{s:MethodBinding RemoveFrame}"/>
+                </UniformGrid>
+                <Grid Margin="0,4,0,0" ToolTip="{loc:Loc AnimationKeyframeEditor.Duration.ToolTip}">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="70"/>
+                        <ColumnDefinition Width="70"/>
+                    </Grid.ColumnDefinitions>
+                    <Label Grid.Column="0" Content="{loc:Loc AnimationKeyframeEditor.Duration.Label}"/>
+                    <TextBox Grid.Column="1" VerticalContentAlignment="Center" Margin="2" PreviewTextInput="AnimationTextInputPreview" Text="{Binding FramesDurationInSeconds, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
+                    <Label Grid.Column="2" Content="{loc:Loc AnimationKeyframeEditor.Duration.Seconds}"/>
+                    <Button Grid.Column="3" Content="{loc:Loc AnimationKeyframeEditor.Buttons.Reset}" ToolTip="{loc:Loc AnimationKeyframeEditor.Buttons.ResetDuration.ToolTip}" Click="{s:MethodBinding ResetDuration}"/>
+                    <Button Grid.Column="4" Content="{loc:Loc AnimationKeyframeEditor.Buttons.Apply}" ToolTip="{loc:Loc AnimationKeyframeEditor.Buttons.ApplyDuration.ToolTip}" Click="{s:MethodBinding ApplyDuration}"/>
+                </Grid>
+            </StackPanel>
+        </Expander>
 
-        <Grid DockPanel.Dock="Top" Margin="5,5,5,0">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="*"/>
-            </Grid.ColumnDefinitions>
+        <!-- Bones -->
+        <Expander IsEnabled="{Binding HasAnimation.Value}">
+            <Expander.Header>
+                <TextBlock Style="{StaticResource SectionHeader}" Text="{loc:Loc AnimationKeyframeEditor.Bones.Header}"/>
+            </Expander.Header>
+            <StackPanel Margin="10,0,0,0">
+                <TextBlock Style="{StaticResource Info}" Text="{loc:Loc AnimationKeyframeEditor.Bones.Info}"/>
+                <UniformGrid Columns="2">
+                    <Button Content="{loc:Loc AnimationKeyframeEditor.Buttons.Select}" ToolTip="{loc:Loc AnimationKeyframeEditor.Buttons.Select.ToolTip}" Click="{s:MethodBinding EnterSelectMode}"/>
+                    <Button Content="{loc:Loc AnimationKeyframeEditor.Buttons.SelectPreviousBones}" ToolTip="{loc:Loc AnimationKeyframeEditor.Buttons.SelectPreviousBones.ToolTip}" Click="{s:MethodBinding SelectPreviousBones}"/>
+                </UniformGrid>
+                <Grid Margin="2,2,2,4" ToolTip="{loc:Loc AnimationKeyframeEditor.SelectedBones.ToolTip}">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Column="0" FontWeight="Bold" Margin="0,0,6,0" Text="{loc:Loc AnimationKeyframeEditor.SelectedBones.Label}"/>
+                    <TextBlock Grid.Column="1" TextWrapping="Wrap" Text="{Binding SelectedBonesText.Value, Mode=OneWay}"/>
+                </Grid>
+                <UniformGrid Columns="2">
+                    <Button Content="{loc:Loc AnimationKeyframeEditor.Buttons.Move}" ToolTip="{loc:Loc AnimationKeyframeEditor.Buttons.Move.ToolTip}" Click="{s:MethodBinding EnterMoveMode}"/>
+                    <Button Content="{loc:Loc AnimationKeyframeEditor.Buttons.Rotate}" ToolTip="{loc:Loc AnimationKeyframeEditor.Buttons.Rotate.ToolTip}" Click="{s:MethodBinding EnterRotateMode}"/>
+                </UniformGrid>
+                <UniformGrid Columns="2">
+                    <Button Content="{loc:Loc AnimationKeyframeEditor.Buttons.ResetPose}" ToolTip="{loc:Loc AnimationKeyframeEditor.Buttons.ResetPose.ToolTip}" Click="{s:MethodBinding ResetPose}"/>
+                    <Button Content="{loc:Loc AnimationKeyframeEditor.Buttons.UndoPose}" ToolTip="{loc:Loc AnimationKeyframeEditor.Buttons.UndoPose.ToolTip}" Click="{s:MethodBinding UndoPose}"/>
+                </UniformGrid>
+            </StackPanel>
+        </Expander>
 
-            <Button Grid.Column="0" Content="{loc:Loc AnimationKeyframeEditor.Buttons.Select}"  Click="{s:MethodBinding EnterSelectMode}" Margin="0,0,2,0"/>
-            <Button Grid.Column="1" Content="{loc:Loc AnimationKeyframeEditor.Buttons.SelectPreviousBones}"  Click="{s:MethodBinding SelectPreviousBones}" Margin="0,0,2,0"/>
-            <Button Grid.Column="2" Content="{loc:Loc AnimationKeyframeEditor.Buttons.Move}"  Click="{s:MethodBinding EnterMoveMode}" Margin="0,0,2,0"/>
-            <Button Grid.Column="3" Content="{loc:Loc AnimationKeyframeEditor.Buttons.Rotate}"  Click="{s:MethodBinding EnterRotateMode}"  Margin="2,0,2,0" />
-            <Button Grid.Column="4" Content="{loc:Loc AnimationKeyframeEditor.Buttons.Scale}"  Click="{s:MethodBinding EnterScaleMode}" Margin="2,0,0,0"/>
-        </Grid>
+        <!-- Copy and paste within this animation -->
+        <Expander IsEnabled="{Binding HasAnimation.Value}">
+            <Expander.Header>
+                <TextBlock Style="{StaticResource SectionHeader}" Text="{loc:Loc AnimationKeyframeEditor.CopyPaste.Header}"/>
+            </Expander.Header>
+            <StackPanel Margin="10,0,0,0">
+                <WrapPanel ToolTip="{loc:Loc AnimationKeyframeEditor.PasteOptions.Title.ToolTip}">
+                    <Label Content="{loc:Loc AnimationKeyframeEditor.PasteOptions.Title}"/>
+                    <CheckBox VerticalAlignment="Center" Content="{loc:Loc AnimationKeyframeEditor.PasteOptions.Position}" IsChecked="{Binding PastePosition.Value, UpdateSourceTrigger=PropertyChanged}"/>
+                    <CheckBox VerticalAlignment="Center" Content="{loc:Loc AnimationKeyframeEditor.PasteOptions.Rotation}" IsChecked="{Binding PasteRotation.Value, UpdateSourceTrigger=PropertyChanged}"/>
+                </WrapPanel>
+                <UniformGrid Columns="2">
+                    <Button Content="{loc:Loc AnimationKeyframeEditor.Buttons.CopyPose}" ToolTip="{loc:Loc AnimationKeyframeEditor.Buttons.CopyPose.ToolTip}" Click="{s:MethodBinding CopyCurrentPose}"/>
+                    <Button Content="{loc:Loc AnimationKeyframeEditor.Buttons.PastePose}" ToolTip="{loc:Loc AnimationKeyframeEditor.Buttons.PastePose.ToolTip}" Click="{s:MethodBinding PasteIntoCurrentFrame}"/>
+                    <Button Content="{loc:Loc AnimationKeyframeEditor.Buttons.PastePoseSelectedNodes}" ToolTip="{loc:Loc AnimationKeyframeEditor.Buttons.PastePoseSelectedNodes.ToolTip}" Click="{s:MethodBinding PasteIntoSelectedCurrentNode}"/>
+                    <Button Content="{loc:Loc AnimationKeyframeEditor.Buttons.CopyPastePreviousNodes}" ToolTip="{loc:Loc AnimationKeyframeEditor.Buttons.CopyPastePreviousNodes.ToolTip}" Click="{s:MethodBinding PastePreviousEditedNodesIntoCurrentPose}"/>
+                </UniformGrid>
+            </StackPanel>
+        </Expander>
 
-        <Grid DockPanel.Dock="Top" Margin="5,5,5,0">
-            <Separator Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}" />
-        </Grid>
+        <!-- Copy and paste between Keyframe Editors -->
+        <Expander IsEnabled="{Binding HasAnimation.Value}">
+            <Expander.Header>
+                <TextBlock Style="{StaticResource SectionHeader}" Text="{loc:Loc AnimationKeyframeEditor.Clipboard.Header}"/>
+            </Expander.Header>
+            <StackPanel Margin="10,0,0,0">
+                <TextBlock Style="{StaticResource Info}" Text="{loc:Loc AnimationKeyframeEditor.Clipboard.Info}"/>
+                <CheckBox Content="{loc:Loc AnimationKeyframeEditor.RangeCopy.MultipleFrames}" ToolTip="{loc:Loc AnimationKeyframeEditor.RangeCopy.MultipleFrames.ToolTip}" IsChecked="{Binding CopyMoreThanSingleFrame, UpdateSourceTrigger=PropertyChanged}"/>
+                <CheckBox Content="{loc:Loc AnimationKeyframeEditor.RangeCopy.UseFrameRanges}" ToolTip="{loc:Loc AnimationKeyframeEditor.RangeCopy.UseFrameRanges.ToolTip}" IsChecked="{Binding PasteUsingFormBelow, UpdateSourceTrigger=PropertyChanged}" IsEnabled="{Binding CopyMoreThanSingleFrame}"/>
+                <Grid IsEnabled="{Binding CopyMoreThanSingleFrame}" ToolTip="{loc:Loc AnimationKeyframeEditor.RangeCopy.PasteLength.ToolTip}">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <Label Grid.Column="0" Content="{loc:Loc AnimationKeyframeEditor.RangeCopy.PasteLength}"/>
+                    <TextBox Grid.Column="1" Margin="2" VerticalContentAlignment="Center" PreviewTextInput="FrameNrPreviewTextInput" TextChanged="FrameNrCantBeEmpty" Text="{Binding FrameNrLength}"/>
+                    <Button Grid.Column="2" Content="{loc:Loc AnimationKeyframeEditor.Buttons.SetMax}" ToolTip="{loc:Loc AnimationKeyframeEditor.Buttons.SetMax.ToolTip}" Click="{s:MethodBinding SetFrameLengthMax}"/>
+                    <Button Grid.Column="3" Content="{loc:Loc AnimationKeyframeEditor.Buttons.FromClipboard}" ToolTip="{loc:Loc AnimationKeyframeEditor.Buttons.FromClipboard.ToolTip}" Click="{s:MethodBinding SetFrameLengthFromClipboard}"/>
+                </Grid>
+                <CheckBox Content="{loc:Loc AnimationKeyframeEditor.RangeCopy.IgnoreDifferentSkeletons}" ToolTip="{loc:Loc AnimationKeyframeEditor.RangeCopy.IgnoreDifferentSkeletons.ToolTip}" IsChecked="{Binding DontWarnDifferentSkeletons.Value, UpdateSourceTrigger=PropertyChanged}"/>
+                <CheckBox Content="{loc:Loc AnimationKeyframeEditor.RangeCopy.IgnoreLongerIncoming}" ToolTip="{loc:Loc AnimationKeyframeEditor.RangeCopy.IgnoreLongerIncoming.ToolTip}" IsChecked="{Binding DontWarnIncomingFramesBigger.Value, UpdateSourceTrigger=PropertyChanged}"/>
+                <UniformGrid Columns="3">
+                    <Button Content="{loc:Loc AnimationKeyframeEditor.Buttons.CopyGlobalClipboard}" ToolTip="{loc:Loc AnimationKeyframeEditor.Buttons.CopyGlobalClipboard.ToolTip}" Click="{s:MethodBinding CopyPoseInRangeToClipboard}"/>
+                    <Button Content="{loc:Loc AnimationKeyframeEditor.Buttons.PasteGlobalClipboard}" ToolTip="{loc:Loc AnimationKeyframeEditor.Buttons.PasteGlobalClipboard.ToolTip}" Click="{s:MethodBinding PastePoseInRangeFromClipboard}"/>
+                    <Button Content="{loc:Loc AnimationKeyframeEditor.Buttons.PasteSelectedGlobalClipboard}" ToolTip="{loc:Loc AnimationKeyframeEditor.Buttons.PasteSelectedGlobalClipboard.ToolTip}" Click="{s:MethodBinding PasteIntoInRangeSelectedCurrentNodeFromClipboard}"/>
+                </UniformGrid>
+            </StackPanel>
+        </Expander>
 
-        <Grid DockPanel.Dock="Top" Margin="5,5,5,5">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"/>
-            </Grid.ColumnDefinitions>
-            <DockPanel>
-                <Label>{loc:Loc AnimationKeyframeEditor.PasteOptions.Title}</Label>
-                <CheckBox DockPanel.Dock="Top" Content="{loc:Loc AnimationKeyframeEditor.PasteOptions.Position}" IsChecked="{Binding PastePosition.Value, UpdateSourceTrigger=PropertyChanged}"  />
-                <CheckBox DockPanel.Dock="Top" Content="{loc:Loc AnimationKeyframeEditor.PasteOptions.Rotation}" IsChecked="{Binding PasteRotation.Value, UpdateSourceTrigger=PropertyChanged}"  />
-                <CheckBox DockPanel.Dock="Top" Content="{loc:Loc AnimationKeyframeEditor.PasteOptions.Scale}" IsChecked="{Binding PasteScale.Value, UpdateSourceTrigger=PropertyChanged}"  />
-            </DockPanel>
-        </Grid>
-        
-        <Grid DockPanel.Dock="Top" Margin="5,5,5,0">
-            <Separator Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}" />
-        </Grid>
-
-        <Grid DockPanel.Dock="Top" Margin="5,5,5,0">
-
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="*"/>
-            </Grid.ColumnDefinitions>
-
-            <Button Grid.Column="0" Content="{loc:Loc AnimationKeyframeEditor.Buttons.CopyPose}"  Click="{s:MethodBinding CopyCurrentPose}" Margin="2,0,0,0"/>
-            <Button Grid.Column="1" Content="{loc:Loc AnimationKeyframeEditor.Buttons.PastePose}"  Click="{s:MethodBinding PasteIntoCurrentFrame}" Margin="2,0,0,0" />
-            <Button Grid.Column="2" Content="{loc:Loc AnimationKeyframeEditor.Buttons.PastePoseSelectedNodes}"  Click="{s:MethodBinding PasteIntoSelectedCurrentNode}" Margin="2,0,0,0" />
-            <Button Grid.Column="3" Content="{loc:Loc AnimationKeyframeEditor.Buttons.CopyPastePreviousNodes}"  Click="{s:MethodBinding PastePreviousEditedNodesIntoCurrentPose}" Margin="2,0,0,0" />
-        </Grid>
-
-        <Grid DockPanel.Dock="Top" Margin="5,5,5,0">
-            <Separator Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}" />
-        </Grid>
-
-        <Grid DockPanel.Dock="Top" Margin="5,5,5,0">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"/>
-            </Grid.ColumnDefinitions>
-            <DockPanel>
+        <!-- Interpolation -->
+        <Expander IsEnabled="{Binding HasAnimation.Value}">
+            <Expander.Header>
+                <TextBlock Style="{StaticResource SectionHeader}" Text="{loc:Loc AnimationKeyframeEditor.Interpolation.Title}"/>
+            </Expander.Header>
+            <StackPanel Margin="10,0,0,0">
+                <TextBlock Style="{StaticResource Info}" Text="{loc:Loc AnimationKeyframeEditor.Interpolation.Info}"/>
                 <Grid>
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="200"/>
-                        <ColumnDefinition Width="200"/>
-                        <ColumnDefinition Width="100"/>
-                        <ColumnDefinition Width="100"/>
-                        <ColumnDefinition Width="100"/>
-
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
-
-                    <Label Grid.Column="0">{loc:Loc AnimationKeyframeEditor.Duration.Label}</Label>
-                    <TextBox Grid.Column="1" PreviewTextInput="AnimationTextInputPreview" Text="{Binding FramesDurationInSeconds, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"></TextBox>
-                    <Label Grid.Column="2">{loc:Loc AnimationKeyframeEditor.Duration.Seconds}</Label>
-                    <Button Grid.Column="3"  Click="{s:MethodBinding ResetDuration}">{loc:Loc AnimationKeyframeEditor.Buttons.Reset}</Button>
-                    <Button Grid.Column="4" Click="{s:MethodBinding ApplyDuration}">{loc:Loc AnimationKeyframeEditor.Buttons.Apply}</Button>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+                    <Label Grid.Row="0" Grid.Column="0" Content="{loc:Loc AnimationKeyframeEditor.Interpolation.SelectedFrameA}"/>
+                    <Label Grid.Row="0" Grid.Column="1" Content="{Binding SelectedFrameAInterpolation.Value, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}"/>
+                    <Button Grid.Row="0" Grid.Column="2" Content="{loc:Loc AnimationKeyframeEditor.Interpolation.UseCurrentFrame}" ToolTip="{loc:Loc AnimationKeyframeEditor.Interpolation.SelectFrameA.ToolTip}" Click="{s:MethodBinding SelectFrameAInterpolation}"/>
+                    <Label Grid.Row="1" Grid.Column="0" Content="{loc:Loc AnimationKeyframeEditor.Interpolation.SelectedFrameB}"/>
+                    <Label Grid.Row="1" Grid.Column="1" Content="{Binding SelectedFrameBInterpolation.Value, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}"/>
+                    <Button Grid.Row="1" Grid.Column="2" Content="{loc:Loc AnimationKeyframeEditor.Interpolation.UseCurrentFrame}" ToolTip="{loc:Loc AnimationKeyframeEditor.Interpolation.SelectFrameB.ToolTip}" Click="{s:MethodBinding SelectFrameBInterpolation}"/>
                 </Grid>
-            </DockPanel>
-
-        </Grid>
-
-        <Grid DockPanel.Dock="Top" Margin="5,5,5,0">
-            <Separator Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}" />
-        </Grid>
-        
-        <Grid DockPanel.Dock="Top" Margin="5,5,5,0">
-            <StackPanel>
-                <Label>{loc:Loc AnimationKeyframeEditor.RangeCopy.InfoLine1}</Label>
-                <Label>{loc:Loc AnimationKeyframeEditor.RangeCopy.InfoLine2}</Label>
+                <Grid Margin="0,4,0,0" ToolTip="{loc:Loc AnimationKeyframeEditor.Interpolation.Slider.ToolTip}">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <Label Grid.Column="0" Content="A"/>
+                    <Slider Grid.Column="1" VerticalAlignment="Center" Minimum="0" Maximum="1" TickFrequency="0.1" IsSnapToTickEnabled="True" TickPlacement="BottomRight" Value="{Binding InterpolationValue, UpdateSourceTrigger=PropertyChanged}"/>
+                    <Label Grid.Column="2" Content="B"/>
+                </Grid>
+                <CheckBox Content="{loc:Loc AnimationKeyframeEditor.Interpolation.LivePreview}" ToolTip="{loc:Loc AnimationKeyframeEditor.Interpolation.LivePreview.ToolTip}" IsChecked="{Binding PreviewInterpolation, UpdateSourceTrigger=PropertyChanged}"/>
+                <CheckBox Content="{loc:Loc AnimationKeyframeEditor.Interpolation.OnlySelectedBones}" ToolTip="{loc:Loc AnimationKeyframeEditor.Interpolation.OnlySelectedBones.ToolTip}" IsChecked="{Binding InterpolationOnlyOnSelectedBones, UpdateSourceTrigger=PropertyChanged}"/>
+                <UniformGrid Columns="2">
+                    <Button Content="{loc:Loc AnimationKeyframeEditor.Interpolation.ResetSlider}" ToolTip="{loc:Loc AnimationKeyframeEditor.Interpolation.ResetSlider.ToolTip}" Click="{s:MethodBinding ResetInterpolationSlider}"/>
+                    <Button Content="{loc:Loc AnimationKeyframeEditor.Interpolation.ApplyCurrent}" ToolTip="{loc:Loc AnimationKeyframeEditor.Interpolation.ApplyCurrent.ToolTip}" Click="{s:MethodBinding ApplyInterpolationOnCurrentFrame}"/>
+                </UniformGrid>
             </StackPanel>
-        </Grid>
+        </Expander>
 
-        <Grid DockPanel.Dock="Top" Margin="5,5,5,0">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"/>
-            </Grid.ColumnDefinitions>
-
-            <DockPanel>
-                <CheckBox DockPanel.Dock="Top" Content="{loc:Loc AnimationKeyframeEditor.RangeCopy.MultipleFrames}" IsChecked="{Binding CopyMoreThanSingleFrame, UpdateSourceTrigger=PropertyChanged}"  />
-                <CheckBox DockPanel.Dock="Top" Content="{loc:Loc AnimationKeyframeEditor.RangeCopy.IgnoreDifferentSkeletons}" IsChecked="{Binding DontWarnDifferentSkeletons.Value, UpdateSourceTrigger=PropertyChanged}"  />
-                <CheckBox DockPanel.Dock="Top" Content="{loc:Loc AnimationKeyframeEditor.RangeCopy.IgnoreLongerIncoming}" IsChecked="{Binding DontWarnIncomingFramesBigger.Value, UpdateSourceTrigger=PropertyChanged}"  />
-                <CheckBox DockPanel.Dock="Top" Content="{loc:Loc AnimationKeyframeEditor.RangeCopy.UseFrameRanges}" IsChecked="{Binding PasteUsingFormBelow, UpdateSourceTrigger=PropertyChanged}"  IsEnabled="{Binding CopyMoreThanSingleFrame}"/>
-            </DockPanel>
-        </Grid>
-
-        <Grid DockPanel.Dock="Top" Margin="5,5,5,0">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="110"/>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="70"/>
-                <ColumnDefinition Width="120"/>
-            </Grid.ColumnDefinitions>
-            <Label Grid.Column="0">{loc:Loc AnimationKeyframeEditor.RangeCopy.PasteLength}</Label>
-            <TextBox Grid.Column="1" PreviewTextInput="FrameNrPreviewTextInput" TextChanged="FrameNrCantBeEmpty" IsEnabled="{Binding CopyMoreThanSingleFrame}" Text="{Binding FrameNrLength}"></TextBox>
-            <Button Grid.Column="2" Content="{loc:Loc AnimationKeyframeEditor.Buttons.SetMax}"  Click="{s:MethodBinding SetFrameLengthMax}" Margin="2,0,0,0"/>
-            <Button Grid.Column="3" Content="{loc:Loc AnimationKeyframeEditor.Buttons.FromClipboard}"  Click="{s:MethodBinding SetFrameLengthFromClipboard}" Margin="2,0,0,0"/>
-        </Grid>
-
-        <Grid DockPanel.Dock="Top" Margin="5,5,5,0">
-
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="*"/>
-            </Grid.ColumnDefinitions>
-            <Button Grid.Column="0" Content="{loc:Loc AnimationKeyframeEditor.Buttons.CopyGlobalClipboard}"  Click="{s:MethodBinding CopyPoseInRangeToClipboard}" Margin="2,0,0,0"/>
-            <Button Grid.Column="1" Content="{loc:Loc AnimationKeyframeEditor.Buttons.PasteGlobalClipboard}"  Click="{s:MethodBinding PastePoseInRangeFromClipboard}" Margin="2,0,0,0" />
-            <Button Grid.Column="2" Content="{loc:Loc AnimationKeyframeEditor.Buttons.PasteSelectedGlobalClipboard}"  Click="{s:MethodBinding PasteIntoInRangeSelectedCurrentNodeFromClipboard}" Margin="2,0,0,0" />
-        </Grid>
-
-        <Grid DockPanel.Dock="Top" Margin="5,5,5,0">
-            <Separator Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}" />
-        </Grid>
-
-        <Grid DockPanel.Dock="Top" Margin="5,5,5,0">
-            <StackPanel>
-                <Label>{loc:Loc AnimationKeyframeEditor.Interpolation.Title}</Label>
-                <StackPanel Orientation="Horizontal">
-                    <Label>{loc:Loc AnimationKeyframeEditor.Interpolation.SelectedFrameA}</Label>
-                    <Label Content="{Binding SelectedFrameAInterpolation.Value, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}"></Label>
-                </StackPanel>
-                <StackPanel Orientation="Horizontal">
-                    <Label>{loc:Loc AnimationKeyframeEditor.Interpolation.SelectedFrameB}</Label>
-                    <Label Content="{Binding SelectedFrameBInterpolation.Value, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}"></Label>
-                </StackPanel>
-                <StackPanel>
-                    <Label>{loc:Loc AnimationKeyframeEditor.Interpolation.InfoLine1}</Label>
-                    <Label>{loc:Loc AnimationKeyframeEditor.Interpolation.InfoLine2}</Label>
-                    <Label>{loc:Loc AnimationKeyframeEditor.Interpolation.InfoLine3}</Label>
-                </StackPanel>
-            </StackPanel>
-        </Grid>
-
-        <Grid DockPanel.Dock="Top" Margin="5,5,5,0">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="*"/>
-            </Grid.ColumnDefinitions>
-
-            <Button Grid.Column="0" Content="{loc:Loc AnimationKeyframeEditor.Buttons.FirstFrame}"  Click="{s:MethodBinding FirstFrame}" Margin="0,0,2,0"/>
-            <Button Grid.Column="1" Content="{loc:Loc AnimationKeyframeEditor.Buttons.PrevFrame}"  Click="{s:MethodBinding PrevFrame}"   Margin="2,0,2,0"/>
-            <Button Grid.Column="2" Content="{loc:Loc AnimationKeyframeEditor.Buttons.NextFrame}"  Click="{s:MethodBinding NextFrame}"   Margin="2,0,0,0"/>
-            <Button Grid.Column="3" Content="{loc:Loc AnimationKeyframeEditor.Buttons.LastFrame}"  Click="{s:MethodBinding LastFrame}"   Margin="2,0,0,0"/>
-        </Grid>
-        
-        <Grid DockPanel.Dock="Top" Margin="5,5,5,0">
-
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="*"/>
-            </Grid.ColumnDefinitions>
-
-            <Button Grid.Column="0" Content="{loc:Loc AnimationKeyframeEditor.Interpolation.SelectFrameA}"  Click="{s:MethodBinding SelectFrameAInterpolation}" Margin="0,0,2,0"/>
-            <Button Grid.Column="1" Content="{loc:Loc AnimationKeyframeEditor.Interpolation.SelectFrameB}"  Click="{s:MethodBinding SelectFrameBInterpolation}" Margin="2,0,2,0"/>
-            <Button Grid.Column="2" Content="{loc:Loc AnimationKeyframeEditor.Interpolation.ApplyCurrent}"  Click="{s:MethodBinding ApplyInterpolationOnCurrentFrame}" Margin="2,0,0,0"/>
-            <Button Grid.Column="3" Content="{loc:Loc AnimationKeyframeEditor.Interpolation.ApplyAcross}"  Click="{s:MethodBinding ApplyInterpolationAcrossFrames}" Margin="2,0,0,0"/>
-        </Grid>
-
-        <Grid DockPanel.Dock="Top" Margin="5,5,5,0">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"/>
-            </Grid.ColumnDefinitions>
-
-            <DockPanel>
-                <CheckBox DockPanel.Dock="Top" Content="{loc:Loc AnimationKeyframeEditor.Interpolation.LivePreview}" IsChecked="{Binding PreviewInterpolation, UpdateSourceTrigger=PropertyChanged}"  />
-                <CheckBox DockPanel.Dock="Top" Content="{loc:Loc AnimationKeyframeEditor.Interpolation.OnlySelectedBones}" IsChecked="{Binding InterpolationOnlyOnSelectedBones, UpdateSourceTrigger=PropertyChanged}"  />
-            </DockPanel>
-        </Grid>
-        <Grid DockPanel.Dock="Top" Margin="5,5,5,0">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="100"/>
-                <ColumnDefinition Width="*"/>
-            </Grid.ColumnDefinitions>
-            <Button Grid.Column="0" Content="{loc:Loc AnimationKeyframeEditor.Buttons.Reset}"  Click="{s:MethodBinding ResetInterpolationSlider}" Margin="2,0,0,0"/>
-            <Slider Grid.Column="1" Minimum="0" Maximum="1" TickFrequency="0.1" Value="{Binding InterpolationValue, UpdateSourceTrigger=PropertyChanged}" IsSnapToTickEnabled="true" TickPlacement="BottomRight" >
-                <Slider.LayoutTransform>
-                    <ScaleTransform ScaleX="2" ScaleY="2"/>
-                </Slider.LayoutTransform>
-            </Slider>
-        </Grid>
-
-        <Grid DockPanel.Dock="Top" Margin="5,5,5,0">
-            <Separator Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}" />
-        </Grid>
-
-        <Button DockPanel.Dock="Top" Margin="5" Content="{loc:Loc AnimationKeyframeEditor.Buttons.Save}" Click="{s:MethodBinding Save}"/>
-        <Button DockPanel.Dock="Top" Margin="5" Content="{loc:Loc AnimationKeyframeEditor.Buttons.SaveAs}" Click="{s:MethodBinding SaveAs}"/>
-
-    </DockPanel>
+        <Separator Margin="0,8,0,4"/>
+        <UniformGrid Columns="2" IsEnabled="{Binding HasAnimation.Value}">
+            <Button Content="{loc:Loc AnimationKeyframeEditor.Buttons.Save}" ToolTip="{loc:Loc AnimationKeyframeEditor.Buttons.Save.ToolTip}" Click="{s:MethodBinding Save}"/>
+            <Button Content="{loc:Loc AnimationKeyframeEditor.Buttons.SaveAs}" ToolTip="{loc:Loc AnimationKeyframeEditor.Buttons.SaveAs.ToolTip}" Click="{s:MethodBinding SaveAs}"/>
+        </UniformGrid>
+    </StackPanel>
 </UserControl>
