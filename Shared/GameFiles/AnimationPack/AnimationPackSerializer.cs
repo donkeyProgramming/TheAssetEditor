@@ -114,7 +114,9 @@ namespace Shared.GameFormats.AnimationPack
             }
             catch
             {
-                return new UnknownAnimFile(animationInfoDataFile.Name, data.Buffer);
+                // Keep just this child's bytes; the whole pack buffer would be written back as the child on save
+                var childBytes = data.GetBytesFromBuffer(animationInfoDataFile.StartOffset, animationInfoDataFile.Size);
+                return new UnknownAnimFile(animationInfoDataFile.Name, childBytes);
             }
         }
 
