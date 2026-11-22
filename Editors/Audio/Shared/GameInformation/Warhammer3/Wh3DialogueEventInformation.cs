@@ -300,6 +300,7 @@ namespace Editors.Audio.Shared.GameInformation.Warhammer3
 
             new("campaign_vo_cs_enemy_region_generic", CampaignVOConversational, [TypeShowAll, CharacterEnvironment], [ProfileShowAll, ..LordHeroCompleteProfiles]),
             new("campaign_vo_cs_in_forest", CampaignVOConversational, [TypeShowAll, CharacterEnvironment], [ProfileShowAll, ..LordHeroCompleteProfiles]),
+            new("campaign_vo_cs_in_devastation", CampaignVOConversational, [TypeShowAll, CharacterEnvironment], [ProfileShowAll, ..LordHeroCompleteProfiles]),
             new("campaign_vo_cs_in_mountains", CampaignVOConversational, [TypeShowAll, CharacterEnvironment], [ProfileShowAll, ..LordHeroCompleteProfiles]),
             new("campaign_vo_cs_in_rain", CampaignVOConversational, [TypeShowAll, CharacterEnvironment], [ProfileShowAll, ..LordHeroCompleteProfiles]),
             new("campaign_vo_cs_in_snow", CampaignVOConversational, [TypeShowAll, CharacterEnvironment], [ProfileShowAll, ..LordHeroCompleteProfiles]),
@@ -318,6 +319,9 @@ namespace Editors.Audio.Shared.GameInformation.Warhammer3
             new("campaign_vo_cs_city_public_order_low", CampaignVOConversational, [TypeShowAll, CityDetails], [ProfileShowAll, ..LordHeroCompleteProfiles, CultureRecommended]),
             new("campaign_vo_cs_city_riot", CampaignVOConversational, [TypeShowAll, CityDetails], [ProfileShowAll, ..LordHeroCompleteProfiles, CultureRecommended]),
             new("campaign_vo_cs_city_under_siege", CampaignVOConversational, [TypeShowAll, CityDetails], [ProfileShowAll, ..LordHeroCompleteProfiles, CultureRecommended]),
+            new("campaign_vo_cs_end_times_structure_chaos", CampaignVOConversational, [TypeShowAll, CityDetails], [ProfileShowAll, LordComplete]),
+            new("campaign_vo_cs_end_times_structure_nagash", CampaignVOConversational, [TypeShowAll, CityDetails], [ProfileShowAll, LordComplete]),
+            new("campaign_vo_cs_end_times_structure_vermintide", CampaignVOConversational, [TypeShowAll, CityDetails], [ProfileShowAll, LordComplete]),
 
             new("campaign_vo_cs_pre_battle_fight_battle", CampaignVOConversational, [TypeShowAll, BattleAction], [ProfileShowAll, LordComplete]),
             new("campaign_vo_cs_pre_battle_siege_continue", CampaignVOConversational, [TypeShowAll, BattleAction], [ProfileShowAll, LordComplete]),
@@ -337,6 +341,10 @@ namespace Editors.Audio.Shared.GameInformation.Warhammer3
             new("campaign_vo_cs_post_battle_captives_release", CampaignVOConversational, [TypeShowAll, PostBattleCaptivesAction], [ProfileShowAll, LordComplete]),
 
             new("campaign_vo_cs_post_battle_settlement_do_nothing", CampaignVOConversational, [TypeShowAll, PostBattleSettlementAction], [ProfileShowAll, LordComplete]),
+            new("campaign_vo_cs_post_battle_settlement_burial_chambers", CampaignVOConversational, [TypeShowAll, PostBattleSettlementAction], [ProfileShowAll, LordComplete]),
+            new("campaign_vo_cs_post_battle_settlement_mausoleum", CampaignVOConversational, [TypeShowAll, PostBattleSettlementAction], [ProfileShowAll, LordComplete]),
+            new("campaign_vo_cs_post_battle_settlement_necropolis", CampaignVOConversational, [TypeShowAll, PostBattleSettlementAction], [ProfileShowAll, LordComplete]),
+            new("campaign_vo_cs_post_battle_settlement_pirate_cove", CampaignVOConversational, [TypeShowAll, PostBattleSettlementAction], [ProfileShowAll, LordComplete]),
             new("campaign_vo_cs_post_battle_settlement_establish_foreign_slot" , CampaignVOConversational, [TypeShowAll, PostBattleSettlementAction], [ProfileShowAll, LordComplete]),
             new("campaign_vo_cs_post_battle_settlement_loot", CampaignVOConversational, [TypeShowAll, PostBattleSettlementAction], [ProfileShowAll, LordComplete]),
             new("campaign_vo_cs_post_battle_settlement_occupy", CampaignVOConversational, [TypeShowAll, PostBattleSettlementAction], [ProfileShowAll, LordComplete]),
@@ -373,6 +381,17 @@ namespace Editors.Audio.Shared.GameInformation.Warhammer3
             new("campaign_vo_cs_other_character_details_panel_low_loyalty", CampaignVOConversational, [TypeShowAll, CharacterDetails], [ProfileShowAll, LordComplete]),
             new("campaign_vo_cs_other_character_details_panel_neutral", CampaignVOConversational, [TypeShowAll, CharacterDetails], [ProfileShowAll, LordComplete]),
             new("campaign_vo_cs_other_character_details_panel_positive", CampaignVOConversational, [TypeShowAll, CharacterDetails], [ProfileShowAll, LordComplete]),
+
+            new("campaign_vo_cs_vmp_confederate_ghorst", CampaignVOConversational, [TypeShowAll, DiplomacyBarks], [ProfileShowAll, LordComplete]),
+            new("campaign_vo_cs_vmp_confederate_kemmler", CampaignVOConversational, [TypeShowAll, DiplomacyBarks], [ProfileShowAll, LordComplete]),
+            new("campaign_vo_cs_vmp_confederate_mannfred", CampaignVOConversational, [TypeShowAll, DiplomacyBarks], [ProfileShowAll, LordComplete]),
+            new("campaign_vo_cs_vmp_confederate_neferata", CampaignVOConversational, [TypeShowAll, DiplomacyBarks], [ProfileShowAll, LordComplete]),
+            new("campaign_vo_cs_vmp_confederate_von_carstein", CampaignVOConversational, [TypeShowAll, DiplomacyBarks], [ProfileShowAll, LordComplete]),
+            new("campaign_vo_cs_vmp_empower_bloodline_blood_dragon", CampaignVOConversational, [TypeShowAll, CharacterMisc], [ProfileShowAll, LordComplete]),
+            new("campaign_vo_cs_vmp_empower_bloodline_lahmian", CampaignVOConversational, [TypeShowAll, CharacterMisc], [ProfileShowAll, LordComplete]),
+            new("campaign_vo_cs_vmp_empower_bloodline_necrarch", CampaignVOConversational, [TypeShowAll, CharacterMisc], [ProfileShowAll, LordComplete]),
+            new("campaign_vo_cs_vmp_empower_bloodline_strigoi", CampaignVOConversational, [TypeShowAll, CharacterMisc], [ProfileShowAll, LordComplete]),
+            new("campaign_vo_cs_vmp_empower_bloodline_von_carstein", CampaignVOConversational, [TypeShowAll, CharacterMisc], [ProfileShowAll, LordComplete]),
 
             new("Campaign_CS_Nur_Plague_Infect", CampaignVOConversational, [TypeShowAll, PlaguesOfNurgleMechanic], [ProfileShowAll, LordComplete]),
             new("Campaign_CS_Nur_Plague_Summon_Cultist", CampaignVOConversational, [TypeShowAll, PlaguesOfNurgleMechanic], [ProfileShowAll, LordComplete]),
@@ -470,6 +489,7 @@ namespace Editors.Audio.Shared.GameInformation.Warhammer3
 
         public static List<Wh3BattleVOConversationalDefinition> BattleConversational { get; } =
         [
+            new("battle_vo_conversation_environment_devastation", BattleVOConversational, [TypeShowAll, UnitEnvironment], [ProfileShowAll, ..CompleteProfiles]),
             new("battle_vo_conversation_environment_ground_type_forest", BattleVOConversational, [TypeShowAll, UnitEnvironment], [ProfileShowAll, ..CompleteProfiles]),
             new("battle_vo_conversation_environment_ground_type_mud", BattleVOConversational, [TypeShowAll, UnitEnvironment], [ProfileShowAll, ..CompleteProfiles]),
             new("battle_vo_conversation_environment_in_cave", BattleVOConversational, [TypeShowAll, UnitEnvironment], [ProfileShowAll, ..CompleteProfiles]),
