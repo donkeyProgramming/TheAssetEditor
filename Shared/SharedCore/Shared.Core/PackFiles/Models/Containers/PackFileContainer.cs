@@ -52,6 +52,19 @@ namespace Shared.Core.PackFiles.Models.Containers
                 parent.ExpectedStamp = PackFileStamp.Read(parent.FilePath);
         }
 
+        // Why PackFileSerializerWriter can't write this pack back, or null if it can.
+        // Checked when a pack is opened for editing, so nobody finds out on the first save.
+        internal string? WhyCannotBeSaved()
+        {
+            if (Header.HasEncryptedIndex || Header.HasEncryptedData)
+                return "it is encrypted";
+            if (Header.Version == PackFileVersion.PFH6)
+                return "it is a PFH6 pack, which AssetEditor can read but not write";
+            if (Header.HasExtendedHeader)
+                return "its header has an extended section AssetEditor can't write";
+            return null;
+        }
+
         private IEnumerable<PackedFileSourceParent> GetPackedFileSourceParents()
         {
             return FileList.Values

@@ -14,6 +14,23 @@ namespace Shared.Core.PackFiles.Utility
         public bool KeepDuplicateFile(string fileName) => false;
     }
 
+    // For packs opened for editing: keeps the first copy of a duplicated path and records it, rather than
+    // offering to rename the duplicate (a GUID-suffixed name that a save would then write into the pack)
+    public class RecordingDuplicateFileResolver : IDuplicateFileResolver
+    {
+        private readonly List<string> _duplicates = [];
+
+        public bool CheckForDuplicates => true;
+        public IReadOnlyList<string> Duplicates { get { lock (_duplicates) return _duplicates.ToList(); } }
+
+        public bool KeepDuplicateFile(string fileName)
+        {
+            lock (_duplicates)
+                _duplicates.Add(fileName);
+            return false;
+        }
+    }
+
     public class CustomPackDuplicateFileResolver : IDuplicateFileResolver
     {
         public bool CheckForDuplicates => true;

@@ -1,6 +1,7 @@
 ﻿using Moq;
 using Shared.Core.Misc;
 using Shared.Core.PackFiles.Models;
+using Shared.Core.PackFiles.Models.Containers;
 using Shared.Core.PackFiles.Utility;
 using Shared.Core.Services;
 using Shared.Core.Settings;
@@ -182,6 +183,59 @@ namespace Shared.CoreTest.PackFiles.Utility
             Assert.That(dialogShownBeforeWaitCursor, Is.True, "Dialog should be shown before wait cursor starts");
             Assert.That(waitCursorCreated, Is.True, "Wait cursor should have been created");
             Assert.That(waitCursorDisposed, Is.True, "Wait cursor should have been disposed");
+        }
+
+        private string WritePack(string fileName, params (string Path, string Content)[] files)
+        {
+            var path = Path.Combine(_tempGameDir, fileName);
+            var container = PackFileContainer.CreatePackFile(Path.GetFileNameWithoutExtension(fileName), path, PackFileVersion.PFH5);
+            foreach (var (filePath, content) in files)
+                container.AddOrUpdateFile(filePath, PackFile.CreateFromASCII(Path.GetFileName(filePath), content));
+            container.SaveToDisk(path, false, GameInformationDatabase.GetGameById(GameTypeEnum.Warhammer3));
+            return path;
+        }
+
+        [Test]
+        public void CreateFromPackFile_Editable_OrdinaryPack_StaysEditable()
+        {
+            var path = WritePack("mymod.pack", (@"variantmeshes\a.wsmodel", "AAAA"));
+
+            var container = CreateLoader().CreateFromPackFile(PackFileContainerType.Normal, path, false);
+
+            Assert.That(container.IsReadOnly, Is.False);
+            _dialogs.Verify(d => d.ShowDialogBox(It.IsAny<string>(), It.IsAny<string>()), Times.Never);
+        }
+
+        [Test]
+        public void CreateFromPackFile_Editable_DuplicatePaths_OpensReadOnly()
+        {
+            var path = WritePack("dupes.pack", (@"variantmeshes\a1.wsmodel", "AAAA"), (@"variantmeshes\a2.wsmodel", "BBBB"));
+
+            // Make the second index entry name the same path as the first
+            var bytes = File.ReadAllBytes(path);
+            var second = System.Text.Encoding.ASCII.GetBytes(@"variantmeshes\a2.wsmodel");
+            var at = bytes.AsSpan().IndexOf(second);
+            Assert.That(at, Is.GreaterThan(0));
+            bytes[at + second.Length - ".wsmodel".Length - 1] = (byte)'1';
+            File.WriteAllBytes(path, bytes);
+
+            var container = CreateLoader().CreateFromPackFile(PackFileContainerType.Normal, path, false);
+
+            Assert.That(container.IsReadOnly, Is.True);
+            Assert.That(container.GetFileCount(), Is.EqualTo(1));
+            _dialogs.Verify(d => d.ShowDialogBox(It.Is<string>(m => m.Contains("more than once")), "Opened read-only"), Times.Once);
+        }
+
+        [Test]
+        public void CreateFromPackFile_Editable_Pfh6_OpensReadOnly()
+        {
+            var path = Path.Combine(_tempGameDir, "movie.pack");
+            File.WriteAllBytes(path, Serialization.PackFileSerializerLoaderPfh6Tests.CreatePfh6Pack((@"terrain\map_info.xml", new byte[] { 1, 2, 3 })));
+
+            var container = CreateLoader().CreateFromPackFile(PackFileContainerType.Normal, path, false);
+
+            Assert.That(container.IsReadOnly, Is.True);
+            _dialogs.Verify(d => d.ShowDialogBox(It.Is<string>(m => m.Contains("PFH6")), "Opened read-only"), Times.Once);
         }
     }
 }
