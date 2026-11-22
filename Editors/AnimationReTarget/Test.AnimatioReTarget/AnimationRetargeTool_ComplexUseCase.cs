@@ -82,6 +82,14 @@ namespace Test.AnimatioReTarget
             Assert.That(generated.Data.SkeletonName.Value, Is.EqualTo(@"animations\skeletons\humanoid01e.anim"));
             var meshCount = SceneNodeHelper.GetChildrenOfType<Rmv2MeshNode>(generated.Data.ModelNode);
             Assert.That(meshCount, Is.Not.Zero);
+
+            // A weapon slot on the target survives the copy into generated, attached to generated's own skeleton.
+            // The celestial general has no slot meshes, so give one mesh a slot.
+            SceneNodeHelper.GetChildrenOfType<Rmv2MeshNode>(targetNode.Data.ModelNode).First().AttachmentPointName = "hand_right";
+            sceneObjectEditor.CopyMeshFromOther(generated.Data, targetNode.Data);
+            var slotMesh = SceneNodeHelper.GetChildrenOfType<Rmv2MeshNode>(generated.Data.ModelNode).First();
+            Assert.That(slotMesh.AttachmentPointName, Is.EqualTo("hand_right"));
+            Assert.That(slotMesh.AttachmentBoneResolver, Is.Not.Null);
         }
 
         private void Step2_TryGeneratingAnimation(AssetEditorTestRunner runner, AnimationRetargetEditor editor)
