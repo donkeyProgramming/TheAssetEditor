@@ -162,9 +162,20 @@ namespace AssetEditor.ViewModels
                 info.IsReadOnly,
                 () =>
                 {
+                    // A pack last opened editable reopens for editing (and gets backed up) only while direct
+                    // editing is on; otherwise it opens read-only like a reference pack
+                    var openForEditing = info.ContainerType != PackFileContainerType.SystemFolder
+                        && info.IsReadOnly == false
+                        && _settingsService.CurrentSettings.EnableDirectPackEditing;
+                    if (openForEditing)
+                    {
+                        _uiCommandFactory.Create<OpenPackForEditingCommand>().Open(info.Path);
+                        return;
+                    }
+
                     var container = info.ContainerType == PackFileContainerType.SystemFolder
                         ? _packFileContainerLoader.CreateFromSystemFolder(info.Path)
-                        : _packFileContainerLoader.CreateFromPackFile(info.ContainerType, info.Path, info.IsReadOnly);
+                        : _packFileContainerLoader.CreateFromPackFile(info.ContainerType, info.Path, true);
 
                     if (container == null)
                     {

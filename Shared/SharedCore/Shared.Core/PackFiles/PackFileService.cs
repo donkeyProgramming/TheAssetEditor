@@ -107,7 +107,8 @@ namespace Shared.Core.PackFiles
             _logger.Here().Information($"Added pack file container '{DescribeContainer(container)}' (CA:{container.IsCaPackFile}). Loaded containers: {_packFileContainers.Count}, editable containers: {notCaPacksLoaded}");
             _globalEventHub?.PublishGlobalEvent(new PackFileContainerAddedEvent(container));
 
-            if (container.IsCaPackFile == false && setToMainPackIfFirst)
+            // A read-only pack can't be the editable one; SetEditablePack would throw after it was already added
+            if (container.IsCaPackFile == false && container.IsReadOnly == false && setToMainPackIfFirst)
             {
                 _logger.Here().Information($"Setting '{DescribeContainer(container)}' as editable pack after load");
                 SetEditablePack(container);
