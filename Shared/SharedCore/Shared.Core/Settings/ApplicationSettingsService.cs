@@ -38,8 +38,7 @@ namespace Shared.Core.Settings
         public CameraControlMode CameraControlMode { get; set; } = CameraControlMode.AssetEditorStyle;
         public List<ModelSaveDefaults> ModelSaveDefaultsPerGame { get; set; } = [];
 
-        // Opening a .pack for editing in place instead of through a project folder. Off by default:
-        // turning it on means accepting responsibility for the packs edited this way.
+        // Opening a .pack for editing in place instead of through a project folder. Off by default.
         public bool EnableDirectPackEditing { get; set; } = false;
 
         // With direct editing, the first save after a pack is opened or reloaded keeps the version on disk

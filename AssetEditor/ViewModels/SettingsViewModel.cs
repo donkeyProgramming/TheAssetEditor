@@ -40,8 +40,6 @@ namespace AssetEditor.ViewModels
         [ObservableProperty] private bool _enableDirectPackEditing;
         [ObservableProperty] private bool _backupPacksOnFirstSave;
 
-        private bool _isLoading = true;
-
         public SettingsViewModel(ApplicationSettingsService settingsService, LocalizationManager localizationManager)
         {
             _settingsService = settingsService;
@@ -79,37 +77,6 @@ namespace AssetEditor.ViewModels
                     });
             }
 
-            _isLoading = false;
-        }
-
-        // Turning direct editing on, and turning its backups off, each ask the user to accept the risk
-        partial void OnEnableDirectPackEditingChanged(bool value)
-        {
-            if (_isLoading || value == false)
-                return;
-
-            if (ConfirmRisk("SettingsWindow.EnableDirectPackEditingConfirm") == false)
-                EnableDirectPackEditing = false;
-        }
-
-        partial void OnBackupPacksOnFirstSaveChanged(bool value)
-        {
-            if (_isLoading || value)
-                return;
-
-            if (ConfirmRisk("SettingsWindow.DisableBackupsConfirm") == false)
-                BackupPacksOnFirstSave = true;
-        }
-
-        private bool ConfirmRisk(string messageKey)
-        {
-            var result = System.Windows.MessageBox.Show(
-                _localizationManager.Get(messageKey),
-                _localizationManager.Get("SettingsWindow.ConfirmRiskTitle"),
-                System.Windows.MessageBoxButton.YesNo,
-                System.Windows.MessageBoxImage.Warning,
-                System.Windows.MessageBoxResult.No);
-            return result == System.Windows.MessageBoxResult.Yes;
         }
 
 
