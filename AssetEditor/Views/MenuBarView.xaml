@@ -82,7 +82,7 @@
 
                 <Separator/>
 
-                <MenuItem Header="{loc:Loc MenuBar.File.Exit}" />
+                <MenuItem Header="{loc:Loc MenuBar.File.Exit}" Click="ExitMenuItem_Click"/>
             </MenuItem>
 
             <MenuItem Header="{loc:Loc MenuBar.View}" BorderThickness="1.5" WindowChrome.IsHitTestVisibleInChrome="True">
