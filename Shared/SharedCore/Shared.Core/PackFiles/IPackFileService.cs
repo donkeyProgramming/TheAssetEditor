@@ -24,6 +24,8 @@ namespace Shared.Core.PackFiles
         void RenameDirectory(IPackFileContainer pf, string currentNodeName, string newName);
         void RenameFile(IPackFileContainer pf, PackFile file, string newName);
         void SaveFile(PackFile file, byte[] data);
+        // createBackup: a .pack edited directly keeps the version it replaces as <name>.pack1 on its first save
+        // after opening or reloading, and throws PackBackupFailedException, with nothing written, if it can't
         void SavePackContainer(IPackFileContainer pf, string path, bool createBackup, GameInformation gameInformation);
         void SetEditablePack(IPackFileContainer? pf);
         void UnloadPackContainer(IPackFileContainer pf);

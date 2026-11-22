@@ -32,6 +32,10 @@ namespace Shared.Core.PackFiles.Models.Containers
         
         public Dictionary<string, PackFile> FileList { get; set; } = [];
 
+        // The file AE last wrote and how it looked afterwards. A save over anything else (the pack as
+        // it was opened or reloaded) is the first one, the one that keeps a backup.
+        private (string Path, PackFileStamp? Stamp)? _lastSave;
+
         protected PackFileContainer(string name, PackFileVersion version)
         {
             Name = name;
@@ -113,6 +117,9 @@ namespace Shared.Core.PackFiles.Models.Containers
             Header = fresh.Header;
             OriginalLoadByteSize = fresh.OriginalLoadByteSize;
             TrackChangesOnDisk();
+
+            // The other program's version is now the one to keep on the next save
+            _lastSave = null;
 
             return unsaved.Select(x => x.Value).ToList();
         }
@@ -418,8 +425,11 @@ namespace Shared.Core.PackFiles.Models.Containers
             foreach (var parent in GetPackedFileSourceParents())
                 parent.EnsureUnchanged();
 
-            if (createBackup)
-                SaveUtility.CreateFileBackup(path);
+            // createBackup keeps the file being replaced as <name>.pack1, but only on the first save since
+            // the pack was opened or reloaded: later saves would only back up what AE itself wrote
+            var backupPath = createBackup && File.Exists(path) && IsFirstSaveOver(path)
+                ? SaveUtility.GetPackBackupPath(path)
+                : null;
 
             if (OriginalLoadByteSize != -1)
             {
@@ -431,8 +441,11 @@ namespace Shared.Core.PackFiles.Models.Containers
             }
 
             var sourceUpdates = SaveUtility.WriteThroughTempFile(path,
-                writer => PackFileSerializerWriter.SaveToByteArray(path, this, writer, effectiveGameInformation));
-            _logger.Here().Information("Pack file written and moved into place");
+                writer => PackFileSerializerWriter.SaveToByteArray(path, this, writer, effectiveGameInformation),
+                backupPath);
+            _logger.Here().Information(backupPath == null
+                ? "Pack file written and moved into place"
+                : $"Pack file written and moved into place, the previous version kept as '{backupPath}'");
 
             // Only now does the file at path hold the offsets the new sources point at
             foreach (var update in sourceUpdates)
@@ -441,8 +454,16 @@ namespace Shared.Core.PackFiles.Models.Containers
 
             SystemFilePath = path;
             OriginalLoadByteSize = new FileInfo(path).Length;
+            _lastSave = (Path.GetFullPath(path), PackFileStamp.Read(path));
 
             _logger.Here().Information("SaveToDisk completed");
+        }
+
+        private bool IsFirstSaveOver(string path)
+        {
+            return _lastSave is not { } last
+                || string.Equals(last.Path, Path.GetFullPath(path), StringComparison.OrdinalIgnoreCase) == false
+                || last.Stamp != PackFileStamp.Read(path);
         }
 
         private static string BuildPackPath(string? directoryPath, string fileName)
