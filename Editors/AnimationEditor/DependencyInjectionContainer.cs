@@ -29,7 +29,7 @@ namespace Editors.AnimationVisualEditors
         
             EditorInfoBuilder
               .Create<AnimationKeyframeEditorViewModel, EditorHostView>(EditorEnums.AnimationKeyFrame_Editor)
-              .AddToToolbar("KeyFrame Tool", true)
+              .AddToToolbar("Keyframe Editor", true)
               .Build(database);
         }
     }
