@@ -1,4 +1,5 @@
 ﻿using Shared.ByteParsing;
+using Shared.Core.PackFiles.ErrorHandling;
 using Shared.Core.PackFiles.Utility;
 
 namespace Shared.Core.PackFiles.Models.FileSources
@@ -6,6 +7,24 @@ namespace Shared.Core.PackFiles.Models.FileSources
     public class PackedFileSourceParent
     {
         public required string FilePath { get; set; }
+
+        // The pack as AE last loaded or saved it. Null for packs that are never checked (CA packs).
+        public PackFileStamp? ExpectedStamp { get; set; }
+
+        public void EnsureUnchanged()
+        {
+            if (ExpectedStamp != null && ExpectedStamp != PackFileStamp.Read(FilePath))
+                throw new PackFileChangedOnDiskException(FilePath);
+        }
+    }
+
+    public record PackFileStamp(long Length, DateTime LastWriteTimeUtc)
+    {
+        public static PackFileStamp? Read(string path)
+        {
+            var info = new FileInfo(path);
+            return info.Exists ? new PackFileStamp(info.Length, info.LastWriteTimeUtc) : null;
+        }
     }
 
     public record PackedFileSource : IDataSource
@@ -38,6 +57,7 @@ namespace Shared.Core.PackFiles.Models.FileSources
 
         public byte[] ReadData()
         {
+            Parent.EnsureUnchanged();
             using var stream = File.Open(Parent.FilePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
             return ReadData(stream);
         }
@@ -65,6 +85,7 @@ namespace Shared.Core.PackFiles.Models.FileSources
         {
             byte[] data;
 
+            Parent.EnsureUnchanged();
             using (var stream = File.Open(Parent.FilePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
             {
                 stream.Seek(Offset, SeekOrigin.Begin);
@@ -98,6 +119,7 @@ namespace Shared.Core.PackFiles.Models.FileSources
         {
             var data = new byte[Size];
 
+            Parent.EnsureUnchanged();
             using (var stream = File.Open(Parent.FilePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
             {
                 stream.Seek(Offset, SeekOrigin.Begin);

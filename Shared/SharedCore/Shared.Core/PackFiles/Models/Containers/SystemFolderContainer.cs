@@ -479,17 +479,10 @@ namespace Shared.Core.PackFiles.Models.Containers
                 transientContainer.AddOrUpdateFile(relativePath, memFile);
             }
 
+            // The new sources would only re-point the throwaway in-memory copies, so they are dropped
             using (SuppressWatcher())
-            {
-                using (var fileStream = new FileStream(tempPath, FileMode.Create))
-                {
-                    using var writer = new BinaryWriter(fileStream);
-                    PackFileSerializerWriter.SaveToByteArray(path, transientContainer, writer, effectiveGameInformation);
-                }
-
-                File.Copy(tempPath, path, true);
-                _fileSystemAccess.FileDelete(tempPath);
-            }
+                SaveUtility.WriteThroughTempFile(path,
+                    writer => PackFileSerializerWriter.SaveToByteArray(path, transientContainer, writer, effectiveGameInformation));
         }
 
         private void ValidateSaveLocation(string path)

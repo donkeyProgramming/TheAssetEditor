@@ -44,6 +44,36 @@ namespace Shared.Core.PackFiles.Models.Containers
             PackFileSettings.Save();
         }
 
+        // Notes the size and write time of each pack the files are read from, so reading or saving
+        // fails with a clear error once another program (e.g. RPFM) rewrites it, instead of reading stale offsets
+        internal void TrackChangesOnDisk()
+        {
+            foreach (var parent in GetPackedFileSourceParents())
+                parent.ExpectedStamp = PackFileStamp.Read(parent.FilePath);
+        }
+
+        // Why PackFileSerializerWriter can't write this pack back, or null if it can.
+        // Checked when a pack is opened for editing, so nobody finds out on the first save.
+        internal string? WhyCannotBeSaved()
+        {
+            if (Header.HasEncryptedIndex || Header.HasEncryptedData)
+                return "it is encrypted";
+            if (Header.Version == PackFileVersion.PFH6)
+                return "it is a PFH6 pack, which AssetEditor can read but not write";
+            if (Header.HasExtendedHeader)
+                return "its header has an extended section AssetEditor can't write";
+            return null;
+        }
+
+        private IEnumerable<PackedFileSourceParent> GetPackedFileSourceParents()
+        {
+            return FileList.Values
+                .Select(x => x.DataSource)
+                .OfType<PackedFileSource>()
+                .Select(x => x.Parent)
+                .Distinct();
+        }
+
         public static PackFileContainer CreateCaPackFile(string name, string? systemFilePath = null, PackFileVersion version = PackFileVersion.PFH5)
         {
             return new PackFileContainer(name, version)
@@ -319,6 +349,10 @@ namespace Shared.Core.PackFiles.Models.Containers
                 throw new IOException(msg);
             }
 
+            // Files still read from the packs they were loaded from; a rewritten pack would feed the save garbage
+            foreach (var parent in GetPackedFileSourceParents())
+                parent.EnsureUnchanged();
+
             if (createBackup)
                 SaveUtility.CreateFileBackup(path);
 
@@ -331,17 +365,14 @@ namespace Shared.Core.PackFiles.Models.Containers
                     throw new Exception("File has been changed outside of AssetEditor. Can not save the file as it will cause corruptions");
             }
 
-            using (var memoryStream = new FileStream(path + "_temp", FileMode.Create))
-            {
-                using var writer = new BinaryWriter(memoryStream);
-                PackFileSerializerWriter.SaveToByteArray(path, this, writer, effectiveGameInformation);
-            }
+            var sourceUpdates = SaveUtility.WriteThroughTempFile(path,
+                writer => PackFileSerializerWriter.SaveToByteArray(path, this, writer, effectiveGameInformation));
+            _logger.Here().Information("Pack file written and moved into place");
 
-            _logger.Here().Information("Finished writing pack file to temporary file, now replacing original file with the new one");
-            File.Delete(path);
-
-            _logger.Here().Information("Original file deleted, now moving temporary file to original file path");
-            File.Move(path + "_temp", path);
+            // Only now does the file at path hold the offsets the new sources point at
+            foreach (var update in sourceUpdates)
+                update.PackFile.DataSource = update.NewSource;
+            TrackChangesOnDisk();
 
             SystemFilePath = path;
             OriginalLoadByteSize = new FileInfo(path).Length;

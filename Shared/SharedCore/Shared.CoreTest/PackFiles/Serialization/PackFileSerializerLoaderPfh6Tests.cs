@@ -8,7 +8,7 @@ namespace Shared.CoreTest.PackFiles.Serialization
     {
         // As in Pharaoh Dynasties' data\_.pack: 24-byte header, u32 timestamp, 280-byte subheader,
         // then per file: u32 size, u8 is_compressed, zero-terminated path
-        static byte[] CreatePfh6Pack(params (string Path, byte[] Data)[] files)
+        internal static byte[] CreatePfh6Pack(params (string Path, byte[] Data)[] files)
         {
             using var index = new MemoryStream();
             using (var indexWriter = new BinaryWriter(index, Encoding.ASCII, leaveOpen: true))

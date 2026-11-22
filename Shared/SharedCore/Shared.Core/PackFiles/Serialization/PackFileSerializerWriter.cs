@@ -8,7 +8,8 @@ using Shared.Core.Settings;
 
 namespace Shared.Core.PackFiles.Serialization
 {
-    record FileCompressionInfo(CompressionFormat IntendedCompressionFormat, bool DecompressBeforeSaving);
+    // CopyAsIs: the bytes stored in the source pack are written unchanged, compressed or not
+    record FileCompressionInfo(CompressionFormat IntendedCompressionFormat, bool DecompressBeforeSaving, bool CopyAsIs = false);
 
     class PackFileWriteInformation(PackFile pf, string fullFileName, long sizePosition, FileCompressionInfo compressionInfo)
     {
@@ -17,6 +18,9 @@ namespace Shared.Core.PackFiles.Serialization
         public long SizePosition { get; set; } = sizePosition;
         public FileCompressionInfo CompressionInfo { get; set; } = compressionInfo;
     }
+
+    // The data source a saved file should read from once the new pack is in place
+    record PackFileSourceUpdate(PackFile PackFile, string Path, PackedFileSource NewSource);
 
     static class PackFileSerializerWriter
     {
@@ -28,7 +32,9 @@ namespace Shared.Core.PackFiles.Serialization
             (@"zzzz_packfile_corruction_detection\packfile_corruction_detection_3.txt", "This file is here to validate that the packfile has not been corrupted while saving. This is check 3")
         ];
 
-        public static void SaveToByteArray(string outputFileName, PackFileContainer container, BinaryWriter writer, GameInformation currentGameInformation)
+        // Returns the new data sources rather than applying them: they point into outputFileName,
+        // which only holds this layout once the caller has moved the written file into place
+        public static IReadOnlyList<PackFileSourceUpdate> SaveToByteArray(string outputFileName, PackFileContainer container, BinaryWriter writer, GameInformation currentGameInformation)
         {
             var stopWatch = Stopwatch.StartNew();
 
@@ -62,13 +68,55 @@ namespace Shared.Core.PackFiles.Serialization
             // Write the core of the file
             var fileMetaDataTable = BuildMetaDataTable(sortedFiles, container, currentGameInformation);
             SerializeFileTable(fileMetaDataTable, container, writer);
-            SerializeFileBlob(outputFileName, fileMetaDataTable, container, writer);
+            var sourceUpdates = SerializeFileBlob(outputFileName, fileMetaDataTable, writer);
+            VerifyWrittenPack(outputFileName, writer, sourceUpdates);
 
             if (enableCorruptionDetection)
                 ValidateCorruptionDetectionFiles(outputFileName, writer);
             
             stopWatch.Stop();
             _logger.Here().Information("Saving packfile {PackFileName} completed in {ElapsedMilliseconds} ms", packFileName, stopWatch.ElapsedMilliseconds);
+            return sourceUpdates;
+        }
+
+        // Reads back the index just written and checks it lists exactly the files written, at the offsets
+        // and sizes they were written with, all inside the file. Only the index is read, so it is cheap,
+        // and unlike the corruption detection files it adds nothing to the pack.
+        internal static void VerifyWrittenPack(string outputFileName, BinaryWriter writer, IReadOnlyList<PackFileSourceUpdate> written)
+        {
+            writer.Flush();
+            var stream = writer.BaseStream;
+            if (!stream.CanRead || !stream.CanSeek)
+                throw new InvalidOperationException("Verifying a saved pack requires a readable, seekable output stream.");
+
+            var originalPosition = stream.Position;
+            PackFileContainer readBack;
+            try
+            {
+                stream.Position = 0;
+                using var reader = new BinaryReader(stream, Encoding.UTF8, leaveOpen: true);
+                readBack = PackFileSerializerLoader.Load(outputFileName, stream.Length, reader, new CaPackDuplicateFileResolver());
+            }
+            catch (Exception e)
+            {
+                throw new InvalidDataException($"The saved pack could not be read back, so it was not used: {e.Message}", e);
+            }
+            finally
+            {
+                stream.Position = originalPosition;
+            }
+
+            if (readBack.GetFileCount() != written.Count)
+                throw new InvalidDataException($"The saved pack lists {readBack.GetFileCount()} files but {written.Count} were written, so it was not used.");
+
+            foreach (var file in written)
+            {
+                if (readBack.FindFile(file.Path)?.DataSource is not PackedFileSource entry)
+                    throw new InvalidDataException($"The saved pack is missing '{file.Path}', so it was not used.");
+
+                if (entry.Offset != file.NewSource.Offset || entry.Size != file.NewSource.Size || entry.Offset + entry.Size > stream.Length)
+                    throw new InvalidDataException($"The saved pack's entry for '{file.Path}' does not match the data written, so it was not used.");
+            }
         }
 
         private static bool IsCorruptionDetectionFile(string relativePath)
@@ -240,13 +288,32 @@ namespace Shared.Core.PackFiles.Serialization
             foreach (var file in sortedFiles)
             {
                 var packFile = file.Value;
-                var fileCompressionInfo = DetermineFileCompression(container.Header.Version, currentGameInformation, file.Key, packFile.DataSource.CompressionFormat);
+                var fileCompressionInfo = CanCopyAsIs(packFile.DataSource, container.Header.Version, currentGameInformation)
+                    ? new FileCompressionInfo(packFile.DataSource.CompressionFormat, false, CopyAsIs: true)
+                    : DetermineFileCompression(container.Header.Version, currentGameInformation, file.Key, packFile.DataSource.CompressionFormat);
                 filesToWrite.Add(new PackFileWriteInformation(packFile, file.Key, 0, fileCompressionInfo));
             }
 
             _logger.Here().Information("Finished building FileTable");
 
             return filesToWrite;
+        }
+
+        // A file that was read from a pack and not edited goes back exactly as it was stored.
+        // Re-encoding content nobody touched can only change it; RPFM also leaves most files uncompressed.
+        // Only new or edited files follow DetermineFileCompression.
+        static bool CanCopyAsIs(IDataSource source, PackFileVersion outputVersion, GameInformation gameInformation)
+        {
+            if (source is not PackedFileSource { IsEncrypted: false } packed)
+                return false;
+
+            if (packed.IsCompressed == false)
+                return true;
+
+            // Stored compressed: the output needs PFH5's per-file compression flag and a format the game reads
+            return outputVersion == PackFileVersion.PFH5
+                && packed.CompressionFormat != CompressionFormat.None
+                && gameInformation.CompressionFormats.Contains(packed.CompressionFormat);
         }
 
         static void SerializeFileTable(List<PackFileWriteInformation> fileMetaData, PackFileContainer container, BinaryWriter writer)
@@ -286,25 +353,37 @@ namespace Shared.Core.PackFiles.Serialization
             _logger.Here().Information("Finished SerializeFileTable");
         }
 
-        static void SerializeFileBlob(string outputFileName, List<PackFileWriteInformation> fileMetaDataTabel, PackFileContainer container, BinaryWriter writer)
+        static List<PackFileSourceUpdate> SerializeFileBlob(string outputFileName, List<PackFileWriteInformation> fileMetaDataTabel, BinaryWriter writer)
         {
             _logger.Here().Information("Starting SerializeFileBlob");
+
+            var sourceUpdates = new List<PackFileSourceUpdate>(fileMetaDataTabel.Count);
+            var packedFileSourceParent = new PackedFileSourceParent { FilePath = outputFileName };
 
             foreach (var fileMetaData in fileMetaDataTabel)
             {
                 var packFile = fileMetaData.PackFile;
                 byte[] data;
                 uint uncompressedSize = 0;
+                var shouldCompress = fileMetaData.CompressionInfo.IntendedCompressionFormat != CompressionFormat.None;
 
-                // Read file data
-                if (fileMetaData.CompressionInfo.DecompressBeforeSaving == false && packFile.DataSource is PackedFileSource packedFileSource)
-                    data = packedFileSource.ReadDataWithoutDecompressing();
+                if (fileMetaData.CompressionInfo.CopyAsIs)
+                {
+                    var stored = (PackedFileSource)packFile.DataSource;
+                    data = stored.ReadDataWithoutDecompressing();
+                    uncompressedSize = stored.UncompressedSize;
+                }
                 else
-                    data = packFile.DataSource.ReadData();
+                {
+                    // Read file data
+                    if (fileMetaData.CompressionInfo.DecompressBeforeSaving == false && packFile.DataSource is PackedFileSource packedFileSource)
+                        data = packedFileSource.ReadDataWithoutDecompressing();
+                    else
+                        data = packFile.DataSource.ReadData();
+                }
 
                 // Compress if needed
-                var shouldCompress = fileMetaData.CompressionInfo.IntendedCompressionFormat != CompressionFormat.None;
-                if (shouldCompress)
+                if (shouldCompress && fileMetaData.CompressionInfo.CopyAsIs == false)
                 {
                     var uncompressedData = packFile.DataSource.ReadData();
                     uncompressedSize = (uint)uncompressedData.Length;
@@ -329,9 +408,7 @@ namespace Shared.Core.PackFiles.Serialization
                 writer.Write(data.Length);
                 writer.BaseStream.Position = currentPosition;
 
-                // Update DataSource
-                var packedFileSourceParent = new PackedFileSourceParent { FilePath = outputFileName };
-                packFile.DataSource = new PackedFileSource(
+                var newSource = new PackedFileSource(
                     packedFileSourceParent,
                     offset,
                     data.Length,
@@ -339,9 +416,11 @@ namespace Shared.Core.PackFiles.Serialization
                     shouldCompress,
                     fileMetaData.CompressionInfo.IntendedCompressionFormat,
                     uncompressedSize);
+                sourceUpdates.Add(new PackFileSourceUpdate(packFile, fileMetaData.FullFileName, newSource));
             }
 
             _logger.Here().Information("Finished SerializeFileBlob");
+            return sourceUpdates;
         }
 
         

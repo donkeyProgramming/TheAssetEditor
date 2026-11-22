@@ -81,10 +81,33 @@ namespace Shared.Core.PackFiles.Utility
         public IPackFileContainer CreateFromPackFile(PackFileContainerType type, string packFilePath, bool loadAsReadOnly)
         {
             var packfileName = Path.GetFileNameWithoutExtension(packFilePath);
-            var container = CreateFromCollection(type, packFilePath, [packFilePath], packfileName, loadAsReadOnly, new CustomPackDuplicateFileResolver());
+            var duplicates = new RecordingDuplicateFileResolver();
+            IDuplicateFileResolver duplicateResolver = loadAsReadOnly ? new CustomPackDuplicateFileResolver() : duplicates;
+            var container = CreateFromCollection(type, packFilePath, [packFilePath], packfileName, loadAsReadOnly, duplicateResolver);
+            if (container is PackFileContainer packFileContainer)
+            {
+                packFileContainer.TrackChangesOnDisk();
+                if (loadAsReadOnly == false)
+                    OpenReadOnlyIfUnsavable(packFileContainer, duplicates.Duplicates);
+            }
             container.PackFileSettings.GameVersion = _settingsService.CurrentSettings.CurrentGame;
             container.SaveSettings();
             return container;
+        }
+
+        // A pack opened for editing has to be one AE can write back, or one that a save won't change
+        // beyond the user's edits. Otherwise it opens read-only, and the user hears why before doing any work.
+        private void OpenReadOnlyIfUnsavable(PackFileContainer container, IReadOnlyList<string> duplicatePaths)
+        {
+            var reason = container.WhyCannotBeSaved();
+            if (reason == null && duplicatePaths.Count > 0)
+                reason = $"it lists {duplicatePaths.Count} file path(s) more than once (e.g. '{duplicatePaths[0]}'), and saving would drop the extra copies";
+            if (reason == null)
+                return;
+
+            container.IsReadOnly = true;
+            _logger.Here().Warning($"Opened '{container.SystemFilePath}' read-only: {reason}");
+            _standardDialogs.ShowDialogBox($"'{container.Name}' was opened read-only because AssetEditor can't save it safely: {reason}.", "Opened read-only");
         }
 
         public IPackFileContainer? CreateFromGameEnum(PackFileContainerType type, GameTypeEnum gameEnum)
