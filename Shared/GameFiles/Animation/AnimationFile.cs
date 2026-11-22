@@ -420,9 +420,10 @@ namespace Shared.GameFormats.Animation
             for (var i = 0; i < input.Header.SkeletonName.Length; i++)
                 writer.Write(input.Header.SkeletonName[i]);
 
-            if (input.Header.Version == 7 || input.Header.Version == 6)
+            // Flags exist from v7 on, same as GetAnimationHeader reads them
+            if (input.Header.Version > 6)
             {
-                writer.Write(input.Header.FlagCount);
+                writer.Write((uint)input.Header.FlagVariables.Count);
                 foreach (var flag in input.Header.FlagVariables)
                     writer.Write(ByteParsers.String.WriteCaString(flag));
             }
