@@ -12,6 +12,8 @@ namespace GameWorld.Core.Rendering.Materials.Serialization
         bool TryGetExistingMaterial(string wsMaterialContent, out string wsMaterialPath);
         void AddMaterial(string wsMaterialContent, string wsMaterialPath);
         bool CanWriteMaterial(string wsMaterialPath, string ownerWsModelPath);
+        bool MaterialExists(string wsMaterialPath);
+        bool HoldsMaterial(string wsMaterialPath, string wsMaterialContent);
     }
 
     class WsMaterialRepository : IWsMaterialRepository
@@ -68,6 +70,27 @@ namespace GameWorld.Core.Rendering.Materials.Serialization
 
             var owner = PathNormalization.NormalizeFileName(ownerWsModelPath);
             return users.All(x => x == owner);
+        }
+
+        public bool MaterialExists(string wsMaterialPath) => _packFileService.FindFile(wsMaterialPath) != null;
+
+        // Whether the file the game would read at the path has this content, ignoring the name and whitespace
+        public bool HoldsMaterial(string wsMaterialPath, string wsMaterialContent)
+        {
+            var file = _packFileService.FindFile(wsMaterialPath);
+            if (file == null)
+                return false;
+
+            try
+            {
+                var fileContent = Encoding.UTF8.GetString(file.DataSource.ReadData());
+                return SanatizeMaterial(fileContent) == SanatizeMaterial(wsMaterialContent);
+            }
+            catch (Exception e)
+            {
+                _logger.Here().Error(e, "Failed to read material {MaterialPath}", wsMaterialPath);
+                return false;
+            }
         }
 
         void Register(string sanitizedWsMaterial, string wsMaterialPath)

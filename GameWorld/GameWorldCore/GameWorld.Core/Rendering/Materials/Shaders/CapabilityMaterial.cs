@@ -6,6 +6,7 @@ using GameWorld.Core.Rendering.Materials.Capabilities;
 using GameWorld.Core.Services;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Shared.GameFormats.RigidModel;
 using Shared.GameFormats.RigidModel.MaterialHeaders;
 using Shared.GameFormats.WsModel;
 
@@ -20,6 +21,10 @@ namespace GameWorld.Core.Rendering.Materials.Shaders
         SpecGlossPbr_Advanced,
     }
 
+    // The .xml.material file a material was loaded from, with the material and mesh vertex format as they were then.
+    // Material is a snapshot and is never edited.
+    public record LoadedWsMaterial(string Path, UiVertexFormat VertexFormat, CapabilityMaterial Material);
+
     public abstract class CapabilityMaterial : IShader
     {
         protected readonly IScopedResourceLibrary _resourceLibrary;
@@ -28,6 +33,11 @@ namespace GameWorld.Core.Rendering.Materials.Shaders
 
         public ICapability[] Capabilities { get; protected set; } = [];
         public CapabilityMaterialsEnum Type { get; protected set; }
+
+        // Lets a save keep pointing at the loaded file while nothing it would write has changed
+        public LoadedWsMaterial? LoadedFrom { get; set; }
+
+        public void RememberLoadedFrom(string wsMaterialPath, UiVertexFormat vertexFormat) => LoadedFrom = new LoadedWsMaterial(wsMaterialPath, vertexFormat, Clone());
 
         protected CapabilityMaterial(CapabilityMaterialsEnum materialType, ShaderTypes shaderType, IScopedResourceLibrary resourceLibrary)
         {
@@ -106,6 +116,7 @@ namespace GameWorld.Core.Rendering.Materials.Shaders
         {
             var copy = CreateCloneInstance();
             copy.Capabilities = CloneCapabilities();
+            copy.LoadedFrom = LoadedFrom;
             return copy;
         }
 

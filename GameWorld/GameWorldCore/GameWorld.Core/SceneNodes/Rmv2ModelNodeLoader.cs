@@ -76,7 +76,11 @@ namespace GameWorld.Core.SceneNodes
                     var shader = resolvedPart == null
                         ? _capabilityMaterialFactory.Create(rmvModel.Material)
                         : _capabilityMaterialFactory.Create(resolvedPart.Material.SourceMaterial, resolvedPart.Material.WsModelMaterial);
-    
+
+                    var wsMaterialPath = resolvedPart?.Material.WsModelMaterialPath;
+                    if (resolvedPart?.Material.WsModelMaterial != null && string.IsNullOrWhiteSpace(wsMaterialPath) == false)
+                        shader.RememberLoadedFrom(wsMaterialPath, geometry.VertexFormat);
+
                     // This if statement is for Pharaoh Total War, the base game models do not have a model name by default so I am grabbing it
                     // from the model file path.
                     if (string.IsNullOrWhiteSpace(rmvModel.Material.ModelName))

@@ -65,10 +65,16 @@ namespace GameWorld.Core.Services.SceneSaving.Material
             sb.Append($"\t<geometry>{modelFilePath}</geometry>\n");
             sb.Append("\t\t<materials>\n");
 
-            foreach (var meshInfo in orderedMeshInfo)
+            // All meshes first, so no mesh's generated material can take a file a later mesh keeps
+            var keptMaterialPaths = orderedMeshInfo
+                .Select(x => wsMaterialGenerator.ReserveLoadedMaterial(x.MeshName, x.MeshVertexFormat, x.Material))
+                .ToList();
+
+            for (var i = 0; i < orderedMeshInfo.Count; i++)
             {
-                var materialPath = wsMaterialGenerator.ProsessMaterial(modelFilePath, meshInfo.MeshName, meshInfo.MeshVertexFormat, meshInfo.Material);
-             
+                var meshInfo = orderedMeshInfo[i];
+                var materialPath = keptMaterialPaths[i] ?? wsMaterialGenerator.ProsessMaterial(modelFilePath, meshInfo.MeshName, meshInfo.MeshVertexFormat, meshInfo.Material);
+
                 sb.Append($"\t\t\t<material lod_index=\"{meshInfo.LodIndex}\" part_index=\"{meshInfo.MeshIndex}\">");
                 sb.Append(materialPath);
                 sb.Append("</material>\n");
