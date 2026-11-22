@@ -1,5 +1,15 @@
 ﻿namespace Shared.Core.ToolCreation
 {
+    /// <summary>Where a tool sits in the Tools menu. Sections are shown in declaration order,
+    /// each under a small titled rule except <see cref="Top"/>, which has no title.</summary>
+    public enum ToolsMenuSection
+    {
+        Top,
+        Audio,
+        Animation,
+        Misc,
+    }
+
     public class EditorInfo
     {
         public record ExtentionInfo(string Extention, int Priority);
@@ -15,6 +25,7 @@
         public string ToolbarName { get; set; } = "";
         public bool AddToolbarButton { get; set; } = false;
         public bool IsToolbarButtonEnabled { get; set; } = false;
+        public ToolsMenuSection ToolsMenuSection { get; set; } = ToolsMenuSection.Misc;
         public EditorEnums EditorEnum { get; }
         public Type View { get; }
         public Type ViewModel { get; }
@@ -41,11 +52,12 @@
             return new EditorInfoBuilder(editorType, typeof(TView), typeof(TViewModel));
         }
 
-        public EditorInfoBuilder AddToToolbar(string toolbarLabel, bool enabled = true)
+        public EditorInfoBuilder AddToToolbar(string toolbarLabel, bool enabled = true, ToolsMenuSection section = ToolsMenuSection.Misc)
         {
             _instance.ToolbarName = toolbarLabel;
             _instance.AddToolbarButton = true;
             _instance.IsToolbarButtonEnabled = enabled;
+            _instance.ToolsMenuSection = section;
             return this;
         }
 

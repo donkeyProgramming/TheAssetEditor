@@ -25,7 +25,7 @@ namespace Editors.MusicDatEditor
                 .AddExtention(".dat", EditorPriorites.High)
                 .ValidForFoldersContaining("campaign_music.dat")
                 .ValidForFoldersContaining("battle_music.dat")
-                .AddToToolbar("Music Script Viewer")
+                .AddToToolbar("Music Script Viewer", section: ToolsMenuSection.Audio)
                 .Build(factory);
         }
     }

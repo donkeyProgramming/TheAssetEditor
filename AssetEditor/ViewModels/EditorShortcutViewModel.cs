@@ -12,6 +12,7 @@ namespace AssetEditor.ViewModels
 
         public string DisplayName { get; set; }
         public bool IsEnabled{ get; set; }
+        public bool IsSectionHeader => false;
 
         public EditorShortcutViewModel(EditorInfo editorInfo, IUiCommandFactory commandFactory)
         {
@@ -22,5 +23,12 @@ namespace AssetEditor.ViewModels
         }
 
         [RelayCommand] private void OpenEditor() => _uiCommandFactory.Create<OpenEditorCommand>().Execute(_editor);
+    }
+
+    /// <summary>A non-clickable rule and small title between groups of tools in the Tools menu.</summary>
+    public class ToolsMenuSectionHeaderViewModel(string title)
+    {
+        public string Title { get; } = title;
+        public bool IsSectionHeader => true;
     }
 }

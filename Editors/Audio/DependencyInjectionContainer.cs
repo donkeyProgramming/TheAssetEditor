@@ -160,12 +160,12 @@ namespace Editors.Audio
         {
             EditorInfoBuilder
                 .Create<AudioEditorViewModel, AudioEditorView>(EditorEnums.Audio_Editor)
-                .AddToToolbar("Audio Editor")
+                .AddToToolbar("Audio Editor", section: ToolsMenuSection.Audio)
                 .Build(factory);
 
             EditorInfoBuilder
                 .Create<AudioExplorerViewModel, AudioExplorerView>(EditorEnums.AudioExplorer_Editor)
-                .AddToToolbar("Audio Explorer")
+                .AddToToolbar("Audio Explorer", section: ToolsMenuSection.Audio)
                 .Build(factory);
         }
     }

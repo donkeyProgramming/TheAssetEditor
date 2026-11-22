@@ -38,7 +38,7 @@ namespace Editors.AnimationMeta
         {
             EditorInfoBuilder
                 .Create<SuperViewViewModel, EditorHostView>(EditorEnums.SuperView_Editor)
-                .AddToToolbar("SuperView")
+                .AddToToolbar("SuperView", section: ToolsMenuSection.Top)
                 .Build(factory);
 
             EditorInfoBuilder

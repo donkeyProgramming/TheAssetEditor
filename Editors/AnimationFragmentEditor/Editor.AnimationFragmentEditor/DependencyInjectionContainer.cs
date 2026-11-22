@@ -52,7 +52,7 @@ namespace Editors.AnimationFragmentEditor
 
             EditorInfoBuilder
                 .Create<AnimationBatchExportViewModel, AnimationBatchExportView>(EditorEnums.AnimationBatchExporter_Editor)
-                .AddToToolbar("Animation Batch Exporter")
+                .AddToToolbar("Animation Batch Exporter", section: ToolsMenuSection.Animation)
                 .Build(database);
         }
 
