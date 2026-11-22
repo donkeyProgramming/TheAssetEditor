@@ -84,8 +84,10 @@ namespace AssetEditor.ViewModels
         [RelayCommand] private void OpenPackForEditing() => _uiCommandFactory.Create<OpenPackForEditingCommand>().Execute();
         [RelayCommand] private void CreateNewPack() => _uiCommandFactory.Create<CreateNewPackCommand>().Execute();
 
-        // Read once: changing settings already asks for a restart
+        // Read once: changing settings already asks for a restart. With direct editing on, the File menu
+        // leads with the pack items, Open Recent and Save; the project items follow.
         public bool IsDirectPackEditingEnabled => _settingsService.CurrentSettings.EnableDirectPackEditing;
+        public bool IsDirectPackEditingDisabled => IsDirectPackEditingEnabled == false;
         
         [RelayCommand] private void CreateAnimPackWarhammer3() => _uiCommandFactory.Create<CreateExampleAnimationDbCommand>().CreateAnimationDbWarhammer3();
         [RelayCommand] private void CreateAnimPack3k() => _uiCommandFactory.Create<CreateExampleAnimationDbCommand>().CreateAnimationDb3k();

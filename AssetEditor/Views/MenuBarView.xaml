@@ -11,6 +11,30 @@
 
     <UserControl.Resources>
         <BooleanToVisibilityConverter x:Key="BoolToVisibility" />
+
+        <!-- Open Recent sits in a different place depending on whether direct pack editing is on -->
+        <Style x:Key="RecentPacksMenuItem" TargetType="{x:Type MenuItem}" BasedOn="{StaticResource {x:Type MenuItem}}">
+            <Setter Property="ItemsSource" Value="{Binding MenuBar.RecentPackFiles}" />
+            <Setter Property="ItemContainerStyle">
+                <Setter.Value>
+                    <Style TargetType="{x:Type MenuItem}" BasedOn="{StaticResource {x:Type MenuItem}}">
+                        <Setter Property="Command" Value="{Binding Command}" />
+                    </Style>
+                </Setter.Value>
+            </Setter>
+            <Setter Property="ItemTemplate">
+                <Setter.Value>
+                    <HierarchicalDataTemplate DataType="{x:Type viewModels:RecentPackFileItem}" ItemsSource="{Binding Path=MenuItems}">
+                        <TextBlock Text="{Binding Header}"/>
+                    </HierarchicalDataTemplate>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <Trigger Property="HasItems" Value="False">
+                    <Setter Property="IsEnabled" Value="False" />
+                </Trigger>
+            </Style.Triggers>
+        </Style>
     </UserControl.Resources>
 
     <DockPanel>
@@ -23,6 +47,17 @@
 
             <MenuItem Header="{loc:Loc MenuBar.File}" BorderThickness="1.5" WindowChrome.IsHitTestVisibleInChrome="True">
 
+                <!-- With direct pack editing on, the pack items lead like a standard File menu; the project items follow -->
+                <MenuItem Header="{loc:Loc MenuBar.File.NewPackDirect}" Command="{Binding MenuBar.CreateNewPackCommand}"
+                          Visibility="{Binding MenuBar.IsDirectPackEditingEnabled, Converter={StaticResource BoolToVisibility}}"/>
+                <MenuItem Header="{loc:Loc MenuBar.File.OpenPackDirect}" Command="{Binding MenuBar.OpenPackForEditingCommand}"
+                          Visibility="{Binding MenuBar.IsDirectPackEditingEnabled, Converter={StaticResource BoolToVisibility}}"/>
+                <MenuItem Header="{loc:Loc MenuBar.File.OpenRecentPacks}" Style="{StaticResource RecentPacksMenuItem}"
+                          Visibility="{Binding MenuBar.IsDirectPackEditingEnabled, Converter={StaticResource BoolToVisibility}}"/>
+                <MenuItem Header="{loc:Loc MenuBar.File.SaveActive}" Command="{Binding MenuBar.SaveActivePackCommand}"
+                          Visibility="{Binding MenuBar.IsDirectPackEditingEnabled, Converter={StaticResource BoolToVisibility}}"/>
+                <Separator Visibility="{Binding MenuBar.IsDirectPackEditingEnabled, Converter={StaticResource BoolToVisibility}}"/>
+
                 <MenuItem Header="{loc:Loc MenuBar.File.NewPack}" Command="{Binding MenuBar.CreateNewProjectCommand}"/>
                 <MenuItem Header="{loc:Loc MenuBar.File.ImportPackAsProject}" Command="{Binding MenuBar.ImportPackAsProjectCommand}"/>
 
@@ -30,13 +65,9 @@
 
 
                 <MenuItem Header="{loc:Loc MenuBar.File.OpenProjectFolder}" Command="{Binding MenuBar.OpenProjectFolderCommand}"/>
-            
-                <MenuItem Header="{loc:Loc MenuBar.File.ImportReferencePack}" Command="{Binding MenuBar.ImportReferencePackCommand}"/>
+                <Separator Visibility="{Binding MenuBar.IsDirectPackEditingEnabled, Converter={StaticResource BoolToVisibility}}"/>
 
-                <MenuItem Header="{loc:Loc MenuBar.File.OpenPackDirect}" Command="{Binding MenuBar.OpenPackForEditingCommand}"
-                          Visibility="{Binding MenuBar.IsDirectPackEditingEnabled, Converter={StaticResource BoolToVisibility}}"/>
-                <MenuItem Header="{loc:Loc MenuBar.File.NewPackDirect}" Command="{Binding MenuBar.CreateNewPackCommand}"
-                          Visibility="{Binding MenuBar.IsDirectPackEditingEnabled, Converter={StaticResource BoolToVisibility}}"/>
+                <MenuItem Header="{loc:Loc MenuBar.File.ImportReferencePack}" Command="{Binding MenuBar.ImportReferencePackCommand}"/>
 
                 <MenuItem Header="{loc:Loc MenuBar.File.OpenGamePacks}">
                     <MenuItem Header="{loc:Loc MenuBar.File.GameAttila}" Command="{Binding MenuBar.OpenAttilaPacksCommand}"/>
@@ -47,30 +78,12 @@
                     <MenuItem Header="{loc:Loc MenuBar.File.GameTroy}" Command="{Binding MenuBar.OpenTroyPacksCommand}"/>
                 </MenuItem>
                 
-                <MenuItem Header="{loc:Loc MenuBar.File.OpenRecentPacks}" ItemsSource="{Binding MenuBar.RecentPackFiles}">
-                    <MenuItem.Style>
-                        <Style TargetType="{x:Type MenuItem}" BasedOn="{StaticResource {x:Type MenuItem}}">
-                            <Style.Triggers>
-                                <Trigger Property="HasItems" Value="False">
-                                    <Setter Property="IsEnabled" Value="False" />
-                                </Trigger>
-                            </Style.Triggers>
-                        </Style>
-                    </MenuItem.Style>
-                    <MenuItem.ItemContainerStyle>
-                        <Style TargetType="{x:Type MenuItem}" BasedOn="{StaticResource {x:Type MenuItem}}">
-                            <Setter Property="Command" Value="{Binding Command}" />
-                        </Style>
-                    </MenuItem.ItemContainerStyle>
-                    <MenuItem.ItemTemplate>
-                        <HierarchicalDataTemplate DataType="{x:Type viewModels:RecentPackFileItem}" ItemsSource="{Binding Path=MenuItems}">
-                            <TextBlock Text="{Binding Header}"/>
-                        </HierarchicalDataTemplate>
-                    </MenuItem.ItemTemplate>
-                </MenuItem>
+                <MenuItem Header="{loc:Loc MenuBar.File.OpenRecentPacks}" Style="{StaticResource RecentPacksMenuItem}"
+                          Visibility="{Binding MenuBar.IsDirectPackEditingDisabled, Converter={StaticResource BoolToVisibility}}"/>
 
-                <Separator/>
-                <MenuItem Header="{loc:Loc MenuBar.File.SaveActivePack}" Command="{Binding MenuBar.SaveActivePackCommand}"/>
+                <Separator Visibility="{Binding MenuBar.IsDirectPackEditingDisabled, Converter={StaticResource BoolToVisibility}}"/>
+                <MenuItem Header="{loc:Loc MenuBar.File.SaveActivePack}" Command="{Binding MenuBar.SaveActivePackCommand}"
+                          Visibility="{Binding MenuBar.IsDirectPackEditingDisabled, Converter={StaticResource BoolToVisibility}}"/>
                 <Separator/>
 
 
