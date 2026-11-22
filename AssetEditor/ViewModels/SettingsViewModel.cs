@@ -37,6 +37,10 @@ namespace AssetEditor.ViewModels
         [ObservableProperty] private bool _showCAWemFiles;
         [ObservableProperty] private bool _onlyLoadLod0ForReferenceMeshes;
         [ObservableProperty] private CameraControlMode _selectedCameraMode;
+        [ObservableProperty] private bool _enableDirectPackEditing;
+        [ObservableProperty] private bool _backupPacksOnOpen;
+
+        private bool _isLoading = true;
 
         public SettingsViewModel(ApplicationSettingsService settingsService, LocalizationManager localizationManager)
         {
@@ -61,6 +65,8 @@ namespace AssetEditor.ViewModels
             ShowCAWemFiles = _settingsService.CurrentSettings.ShowCAWemFiles;
             OnlyLoadLod0ForReferenceMeshes = _settingsService.CurrentSettings.OnlyLoadLod0ForReferenceMeshes;
             SelectedCameraMode = _settingsService.CurrentSettings.CameraControlMode;
+            EnableDirectPackEditing = _settingsService.CurrentSettings.EnableDirectPackEditing;
+            BackupPacksOnOpen = _settingsService.CurrentSettings.BackupPacksOnOpen;
 
             foreach (var game in GameInformationDatabase.Games.Values.OrderBy(game => game.DisplayName))
             {
@@ -72,6 +78,38 @@ namespace AssetEditor.ViewModels
                         Path = _settingsService.CurrentSettings.GameDirectories.FirstOrDefault(x => x.Game == game.Type)?.Path
                     });
             }
+
+            _isLoading = false;
+        }
+
+        // Turning direct editing on, and turning its backups off, each ask the user to accept the risk
+        partial void OnEnableDirectPackEditingChanged(bool value)
+        {
+            if (_isLoading || value == false)
+                return;
+
+            if (ConfirmRisk("SettingsWindow.EnableDirectPackEditingConfirm") == false)
+                EnableDirectPackEditing = false;
+        }
+
+        partial void OnBackupPacksOnOpenChanged(bool value)
+        {
+            if (_isLoading || value)
+                return;
+
+            if (ConfirmRisk("SettingsWindow.DisableBackupsConfirm") == false)
+                BackupPacksOnOpen = true;
+        }
+
+        private bool ConfirmRisk(string messageKey)
+        {
+            var result = System.Windows.MessageBox.Show(
+                _localizationManager.Get(messageKey),
+                _localizationManager.Get("SettingsWindow.ConfirmRiskTitle"),
+                System.Windows.MessageBoxButton.YesNo,
+                System.Windows.MessageBoxImage.Warning,
+                System.Windows.MessageBoxResult.No);
+            return result == System.Windows.MessageBoxResult.Yes;
         }
 
 
@@ -90,6 +128,8 @@ namespace AssetEditor.ViewModels
             _settingsService.CurrentSettings.OnlyLoadLod0ForReferenceMeshes = OnlyLoadLod0ForReferenceMeshes;
             _settingsService.CurrentSettings.GameDirectories.Clear();
             _settingsService.CurrentSettings.CameraControlMode = SelectedCameraMode;
+            _settingsService.CurrentSettings.EnableDirectPackEditing = EnableDirectPackEditing;
+            _settingsService.CurrentSettings.BackupPacksOnOpen = BackupPacksOnOpen;
 
             foreach (var item in GameDirectores)
                 _settingsService.CurrentSettings.GameDirectories.Add(new ApplicationSettings.GamePathPair(item.GameType, item.Path));

@@ -30,6 +30,7 @@
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
         <Grid Grid.Row="0">
@@ -162,6 +163,30 @@
                     </DataTemplate>
                 </ItemsControl.ItemTemplate>
             </ItemsControl>
+        </Grid>
+
+        <Grid Grid.Row="3">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="230"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <TextBlock Grid.Row="0" Text="{loc:Loc SettingsWindow.PackFiles}" Margin="5, 10, 0, 0" FontSize="15"/>
+            <Separator Grid.Row="1" Grid.ColumnSpan="3" Height="1" Margin="5, 5, 10, 10"/>
+
+            <TextBlock Grid.Row="2" Grid.Column="0" Text="{loc:Loc SettingsWindow.EnableDirectPackEditing}" Margin="5, 0, 0, 0" ToolTip="{loc:Loc SettingsWindow.EnableDirectPackEditingTooltip}"/>
+            <CheckBox Grid.Row="2" Grid.Column="1" Margin="-1, 0, 0, 5" IsChecked="{Binding EnableDirectPackEditing, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" ToolTip="{loc:Loc SettingsWindow.EnableDirectPackEditingTooltip}"/>
+
+            <TextBlock Grid.Row="3" Grid.Column="0" Text="{loc:Loc SettingsWindow.BackupPacksOnOpen}" Margin="5, 0, 0, 0" ToolTip="{loc:Loc SettingsWindow.BackupPacksOnOpenTooltip}"/>
+            <CheckBox Grid.Row="3" Grid.Column="1" Margin="-1, 0, 0, 5" IsChecked="{Binding BackupPacksOnOpen, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" IsEnabled="{Binding EnableDirectPackEditing}" ToolTip="{loc:Loc SettingsWindow.BackupPacksOnOpenTooltip}"/>
         </Grid>
 
     </Grid>
