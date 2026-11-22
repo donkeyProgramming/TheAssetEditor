@@ -136,10 +136,9 @@
                     <TextBlock Grid.Column="0" FontWeight="Bold" Margin="0,0,6,0" Text="{loc:Loc AnimationKeyframeEditor.SelectedBones.Label}"/>
                     <TextBlock Grid.Column="1" TextWrapping="Wrap" Text="{Binding SelectedBonesText.Value, Mode=OneWay}"/>
                 </Grid>
-                <UniformGrid Columns="3">
+                <UniformGrid Columns="2">
                     <Button Content="{loc:Loc AnimationKeyframeEditor.Buttons.Move}" ToolTip="{loc:Loc AnimationKeyframeEditor.Buttons.Move.ToolTip}" Click="{s:MethodBinding EnterMoveMode}"/>
                     <Button Content="{loc:Loc AnimationKeyframeEditor.Buttons.Rotate}" ToolTip="{loc:Loc AnimationKeyframeEditor.Buttons.Rotate.ToolTip}" Click="{s:MethodBinding EnterRotateMode}"/>
-                    <Button Content="{loc:Loc AnimationKeyframeEditor.Buttons.Scale}" ToolTip="{loc:Loc AnimationKeyframeEditor.Buttons.Scale.ToolTip}" Click="{s:MethodBinding EnterScaleMode}"/>
                 </UniformGrid>
                 <UniformGrid Columns="2">
                     <Button Content="{loc:Loc AnimationKeyframeEditor.Buttons.ResetPose}" ToolTip="{loc:Loc AnimationKeyframeEditor.Buttons.ResetPose.ToolTip}" Click="{s:MethodBinding ResetPose}"/>
@@ -158,7 +157,6 @@
                     <Label Content="{loc:Loc AnimationKeyframeEditor.PasteOptions.Title}"/>
                     <CheckBox VerticalAlignment="Center" Content="{loc:Loc AnimationKeyframeEditor.PasteOptions.Position}" IsChecked="{Binding PastePosition.Value, UpdateSourceTrigger=PropertyChanged}"/>
                     <CheckBox VerticalAlignment="Center" Content="{loc:Loc AnimationKeyframeEditor.PasteOptions.Rotation}" IsChecked="{Binding PasteRotation.Value, UpdateSourceTrigger=PropertyChanged}"/>
-                    <CheckBox VerticalAlignment="Center" Content="{loc:Loc AnimationKeyframeEditor.PasteOptions.Scale}" IsChecked="{Binding PasteScale.Value, UpdateSourceTrigger=PropertyChanged}"/>
                 </WrapPanel>
                 <UniformGrid Columns="2">
                     <Button Content="{loc:Loc AnimationKeyframeEditor.Buttons.CopyPose}" ToolTip="{loc:Loc AnimationKeyframeEditor.Buttons.CopyPose.ToolTip}" Click="{s:MethodBinding CopyCurrentPose}"/>

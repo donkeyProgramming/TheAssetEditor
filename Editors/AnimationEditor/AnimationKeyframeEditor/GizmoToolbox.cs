@@ -213,10 +213,6 @@ namespace AnimationEditor.AnimationKeyframeEditor
                 case GizmoMode.Rotate:
                     RotateMode();
                     break;
-                case GizmoMode.NonUniformScale:
-                case GizmoMode.UniformScale:
-                    ScaleMode();
-                    break;
                 default:
                     break;
             }
@@ -236,19 +232,6 @@ namespace AnimationEditor.AnimationKeyframeEditor
             _parent.GizmoComponent.ResetScale();
             _parent.GizmoComponent.SetGizmoMode(GizmoMode.Rotate);
             _lastGizmoTool = GizmoMode.Rotate;
-        }
-
-        public void ScaleMode()
-        {
-            if (_parent.EnableInverseKinematics.Value)
-            {
-                MessageBox.Show("cannot use scale mode when IK is enabled!", "error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                return;
-            }
-            if (_parent.SelectionManager.GetState().Mode != GeometrySelectionMode.Bone) return;
-            _parent.GizmoComponent.ResetScale();
-            _parent.GizmoComponent.SetGizmoMode(GizmoMode.NonUniformScale);
-            _lastGizmoTool = GizmoMode.NonUniformScale;
         }
     }
 }

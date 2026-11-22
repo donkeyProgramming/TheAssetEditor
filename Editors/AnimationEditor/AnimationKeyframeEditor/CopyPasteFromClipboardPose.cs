@@ -93,7 +93,7 @@ namespace AnimationEditor.AnimationKeyframeEditor
                     parsedClipboardFrame,
                     _parent.Rider.AnimationClip, 
                     currentFrame, 1, 
-                    _parent.PastePosition.Value, _parent.PasteRotation.Value, _parent.PasteScale.Value)).BuildAndExecute();
+                    _parent.PastePosition.Value, _parent.PasteRotation.Value, true)).BuildAndExecute();
 
                 if (_parent.IncrementFrameAfterCopyOperation.Value)
                 {
@@ -152,7 +152,7 @@ namespace AnimationEditor.AnimationKeyframeEditor
                     parsedClipboardFrame,
                    _parent.Rider.AnimationClip,
                    currentFrame, pastedFramesLength,
-                   _parent.PastePosition.Value, _parent.PasteRotation.Value, _parent.PasteScale.Value)).BuildAndExecute();
+                   _parent.PastePosition.Value, _parent.PasteRotation.Value, true)).BuildAndExecute();
 
                 if (_parent.IncrementFrameAfterCopyOperation.Value)
                 {
@@ -204,7 +204,7 @@ namespace AnimationEditor.AnimationKeyframeEditor
                     skeleton, 
                     parsedClipboardFrame, 
                     _parent.Rider.AnimationClip,
-                    _parent.PastePosition.Value, _parent.PasteRotation.Value, _parent.PasteScale.Value)).BuildAndExecute();
+                    _parent.PastePosition.Value, _parent.PasteRotation.Value, true)).BuildAndExecute();
 
                 if (_parent.IncrementFrameAfterCopyOperation.Value)
                 {
@@ -270,7 +270,7 @@ namespace AnimationEditor.AnimationKeyframeEditor
                     parsedClipboardFrame, 
                     _parent.Rider.AnimationClip,
                     _parent.GetSelectedBones(), 
-                    _parent.PastePosition.Value, _parent.PasteRotation.Value, _parent.PasteScale.Value)).BuildAndExecute();
+                    _parent.PastePosition.Value, _parent.PasteRotation.Value, true)).BuildAndExecute();
 
                 if (_parent.IncrementFrameAfterCopyOperation.Value)
                 {
@@ -337,7 +337,7 @@ namespace AnimationEditor.AnimationKeyframeEditor
                     _parent.Rider.AnimationClip,
                     currentFrame, pastedFramesLength, 
                     _parent.GetSelectedBones(), 
-                    _parent.PastePosition.Value, _parent.PasteRotation.Value, _parent.PasteScale.Value)).BuildAndExecute();
+                    _parent.PastePosition.Value, _parent.PasteRotation.Value, true)).BuildAndExecute();
 
                 if (_parent.IncrementFrameAfterCopyOperation.Value)
                 {
@@ -385,7 +385,7 @@ namespace AnimationEditor.AnimationKeyframeEditor
                     _parent.Rider.AnimationClip,
                     currentFrame, 1, 
                     _parent.GetSelectedBones(),
-                    _parent.PastePosition.Value, _parent.PasteRotation.Value, _parent.PasteScale.Value)).BuildAndExecute();
+                    _parent.PastePosition.Value, _parent.PasteRotation.Value, true)).BuildAndExecute();
 
                 if (_parent.IncrementFrameAfterCopyOperation.Value)
                 {

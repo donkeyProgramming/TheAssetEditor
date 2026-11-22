@@ -103,7 +103,6 @@ namespace Editors.AnimationVisualEditors.AnimationKeyframeEditor
 
         public NotifyAttr<bool> PastePosition { get; set; } = new(true);
         public NotifyAttr<bool> PasteRotation { get; set; } = new(true);
-        public NotifyAttr<bool> PasteScale { get; set; } = new(true);
 
         public NotifyAttr<bool> IsDirty { get; set; } = new(false);
 
@@ -496,11 +495,6 @@ namespace Editors.AnimationVisualEditors.AnimationKeyframeEditor
         public void EnterRotateMode()
         {
             _gizmoToolbox.RotateMode();
-        }
-
-        public void EnterScaleMode()
-        {
-            _gizmoToolbox.ScaleMode();
         }
 
         public void UndoPose()

@@ -105,7 +105,7 @@ namespace AnimationEditor.AnimationKeyframeEditor
                 _parent.InterpolationValue,
                 _parent.PastePosition.Value,
                 _parent.PasteRotation.Value,
-                _parent.PasteScale.Value)).BuildAndExecute();
+                true)).BuildAndExecute();
         }
 
         private void ApplyOnCurrentFrameSelectedBones()
@@ -123,7 +123,7 @@ namespace AnimationEditor.AnimationKeyframeEditor
             _parent.GetSelectedBones(),
             _parent.PastePosition.Value,
             _parent.PasteRotation.Value,
-            _parent.PasteScale.Value)).BuildAndExecute();
+            true)).BuildAndExecute();
         }
 
         private void ApplyAcrossFrames()
