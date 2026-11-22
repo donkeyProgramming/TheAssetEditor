@@ -19,7 +19,6 @@
   "PackReloader.ChangedOnDisk": "'{0}' was changed on disk by another program (e.g. RPFM).\n\nReload it now? Your unsaved edits in AssetEditor are kept on top of the new version; renames and deletions you haven't saved are undone.\n\nUntil it is reloaded, AssetEditor won't open or save files from this pack. You can reload it later by right-clicking the pack and choosing \"Reload from disk\".",
   "PackReloader.ConfirmReload": "Reload '{0}' from disk?\n\nYour unsaved edits in AssetEditor are kept on top of the version on disk; renames and deletions you haven't saved are undone.",
   "PackReloader.ReloadFailed": "AssetEditor couldn't reload '{0}':\n\n{1}",
-  "PackReloader.BackupFailed": "'{0}' was reloaded, but AssetEditor couldn't back it up:\n\n{1}",
 
   "UpdaterWindow.Title": "Updater",
   "UpdaterWindow.UpdateInfo": "A new version of AssetEditor is available!\n\nYour current version is {0}. Update to version {1} to get the latest changes detailed below.",
@@ -163,8 +162,6 @@
   "OpenPackForEditingCommand.AlreadyOpen": "This pack is already open:\n\n{0}",
   "SavePackFileContainerCommand.BackupFailedTitle": "Backup failed",
   "SavePackFileContainerCommand.BackupFailed": "AssetEditor couldn't keep the current '{0}' as '{1}' before saving over it:\n\n{2}\n\nNothing has been saved. Save without a backup?",
-  "OpenPackForEditingCommand.BackupFailedTitle": "Backup failed",
-  "OpenPackForEditingCommand.BackupFailed": "AssetEditor couldn't back up '{0}' before opening it:\n\n{1}\n\nOpen it for editing without a backup?",
   "CreateNewPackCommand.Title": "New pack name",
   "CreateNewPackCommand.InvalidName": "'{0}' is not a valid pack name.",
 

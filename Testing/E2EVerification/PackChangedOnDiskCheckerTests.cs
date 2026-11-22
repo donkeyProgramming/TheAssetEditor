@@ -4,7 +4,6 @@ using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
 using Shared.Core.PackFiles.Utility;
 using Shared.Core.Services;
-using Shared.Core.Settings;
 
 namespace E2EVerification
 {
@@ -36,8 +35,7 @@ namespace E2EVerification
             _packFileService.Setup(x => x.HasChangedOnDisk(_container.Object)).Returns(true);
             _dialogs = new Mock<IStandardDialogs>();
 
-            var backups = new PackBackupService(new ApplicationSettingsService(GameTypeEnum.Warhammer3));
-            var reloader = new PackReloader(_packFileService.Object, backups, _dialogs.Object, new LocalizationManager());
+            var reloader = new PackReloader(_packFileService.Object, _dialogs.Object, new LocalizationManager());
             _checker = new PackChangedOnDiskChecker(_packFileService.Object, reloader);
         }
 
@@ -63,14 +61,13 @@ namespace E2EVerification
         }
 
         [Test]
-        public void EditablePackChanged_UserAccepts_ReloadedAndBackedUp()
+        public void EditablePackChanged_UserAccepts_Reloaded()
         {
             UserAnswers(ShowMessageBoxResult.OK);
 
             _checker.CheckAll();
 
             _packFileService.Verify(x => x.ReloadPackContainer(_container.Object), Times.Once);
-            Assert.That(File.Exists(PackBackupService.GetBackupPath(_packPath)), Is.True);
         }
 
         [Test]

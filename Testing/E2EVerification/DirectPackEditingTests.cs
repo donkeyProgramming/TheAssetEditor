@@ -8,12 +8,12 @@ using Shared.Core.Settings;
 
 namespace E2EVerification
 {
-    // Opening a pack for direct editing: when it is backed up, and when it is added editable
+    // Opening a pack for direct editing: when it is added editable. Opening writes nothing to disk;
+    // the pack's backup is kept by its first save.
     public class DirectPackEditingTests
     {
         private string _dataDir = null!;
         private string _packPath = null!;
-        private string _backupPath = null!;
         private ApplicationSettingsService _settings = null!;
         private Mock<IPackFileService> _packFileService = null!;
         private Mock<IPackFileContainerLoader> _loader = null!;
@@ -26,7 +26,6 @@ namespace E2EVerification
             Directory.CreateDirectory(_dataDir);
             _packPath = Path.Combine(_dataDir, "mymod.pack");
             File.WriteAllBytes(_packPath, [1, 2, 3]);
-            _backupPath = PackBackupService.GetBackupPath(_packPath);
 
             _settings = new ApplicationSettingsService(GameTypeEnum.Warhammer3);
             _settings.CurrentSettings.EnableDirectPackEditing = true;
@@ -42,7 +41,7 @@ namespace E2EVerification
                 Directory.Delete(_dataDir, true);
         }
 
-        private OpenPackForEditingCommand CreateCommand() => new(_packFileService.Object, _loader.Object, new PackBackupService(_settings), _dialogs.Object, _settings, new LocalizationManager());
+        private OpenPackForEditingCommand CreateCommand() => new(_packFileService.Object, _loader.Object, _dialogs.Object, _settings, new LocalizationManager());
 
         private Mock<IPackFileContainer> LoaderReturns(bool isReadOnly)
         {
@@ -53,14 +52,14 @@ namespace E2EVerification
         }
 
         [Test]
-        public void Open_EditablePack_BacksUpThenAddsItEditable()
+        public void Open_EditablePack_AddsItEditable_WritesNothing()
         {
             var container = LoaderReturns(isReadOnly: false);
 
             CreateCommand().Open(_packPath);
 
-            Assert.That(File.ReadAllBytes(_backupPath), Is.EqualTo(new byte[] { 1, 2, 3 }));
             _packFileService.Verify(x => x.AddContainer(container.Object, true), Times.Once);
+            Assert.That(Directory.GetFileSystemEntries(_dataDir), Is.EqualTo(new[] { _packPath }));
         }
 
         [Test]
@@ -71,67 +70,28 @@ namespace E2EVerification
             CreateCommand().Open(_packPath);
 
             _loader.VerifyNoOtherCalls();
-            Assert.That(File.Exists(_backupPath), Is.False);
+            _packFileService.Verify(x => x.AddContainer(It.IsAny<IPackFileContainer>(), It.IsAny<bool>()), Times.Never);
         }
 
         [Test]
-        public void Open_AlreadyOpen_KeepsTheExistingBackup()
+        public void Open_AlreadyOpen_NotLoadedAgain()
         {
-            Directory.CreateDirectory(Path.GetDirectoryName(_backupPath)!);
-            File.WriteAllBytes(_backupPath, [7]);
             _packFileService.Setup(x => x.IsPackFileLoaded(_packPath)).Returns(true);
 
             CreateCommand().Open(_packPath);
 
             _loader.VerifyNoOtherCalls();
-            Assert.That(File.ReadAllBytes(_backupPath), Is.EqualTo(new byte[] { 7 }));
+            _dialogs.Verify(x => x.ShowDialogBox(It.IsAny<string>(), It.IsAny<string>()), Times.Once);
         }
 
         [Test]
-        public void Open_PackFailsToLoad_KeepsTheExistingBackup()
-        {
-            Directory.CreateDirectory(Path.GetDirectoryName(_backupPath)!);
-            File.WriteAllBytes(_backupPath, [7]);
-            _loader.Setup(x => x.CreateFromPackFile(PackFileContainerType.Normal, _packPath, false)).Throws(new InvalidDataException("unreadable index"));
-
-            Assert.Throws<InvalidDataException>(() => CreateCommand().Open(_packPath));
-
-            Assert.That(File.ReadAllBytes(_backupPath), Is.EqualTo(new byte[] { 7 }));
-        }
-
-        [Test]
-        public void Open_LoaderMadeItReadOnly_AddsItWithoutBackup()
+        public void Open_LoaderMadeItReadOnly_AddsItReadOnly()
         {
             var container = LoaderReturns(isReadOnly: true);
 
             CreateCommand().Open(_packPath);
 
-            Assert.That(File.Exists(_backupPath), Is.False);
             _packFileService.Verify(x => x.AddContainer(container.Object, false), Times.Once);
-        }
-
-        [Test]
-        public void Open_BackupFails_UserDeclines_PackNotOpened()
-        {
-            var container = LoaderReturns(isReadOnly: false);
-            _dialogs.Setup(x => x.ShowYesNoBox(It.IsAny<string>(), It.IsAny<string>())).Returns(ShowMessageBoxResult.Cancel);
-
-            using (new FileStream(_packPath, FileMode.Open, FileAccess.ReadWrite, FileShare.None))
-                CreateCommand().Open(_packPath);
-
-            _packFileService.Verify(x => x.AddContainer(It.IsAny<IPackFileContainer>(), It.IsAny<bool>()), Times.Never);
-        }
-
-        [Test]
-        public void Open_BackupsOff_AddsItWithoutBackup()
-        {
-            _settings.CurrentSettings.BackupPacksOnFirstSave = false;
-            var container = LoaderReturns(isReadOnly: false);
-
-            CreateCommand().Open(_packPath);
-
-            Assert.That(File.Exists(_backupPath), Is.False);
-            _packFileService.Verify(x => x.AddContainer(container.Object, true), Times.Once);
         }
     }
 }

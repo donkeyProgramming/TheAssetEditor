@@ -3,7 +3,6 @@ using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
 using Shared.Core.PackFiles.Utility;
 using Shared.Core.Services;
-using Shared.Core.Settings;
 
 namespace Shared.CoreTest.PackFiles.Utility
 {
@@ -31,8 +30,7 @@ namespace Shared.CoreTest.PackFiles.Utility
             _container.SetupGet(x => x.Name).Returns("mymod");
             _container.SetupGet(x => x.SystemFilePath).Returns(_packPath);
 
-            var backups = new PackBackupService(new ApplicationSettingsService(GameTypeEnum.Warhammer3));
-            _reloader = new PackReloader(_packFileService.Object, backups, _dialogs.Object, new LocalizationManager());
+            _reloader = new PackReloader(_packFileService.Object, _dialogs.Object, new LocalizationManager());
         }
 
         [TearDown]
@@ -44,24 +42,14 @@ namespace Shared.CoreTest.PackFiles.Utility
 
         private void UserAnswers(ShowMessageBoxResult answer) => _dialogs.Setup(x => x.ShowYesNoBox(It.IsAny<string>(), It.IsAny<string>())).Returns(answer);
 
+        // The backup is kept by the next save, so reloading writes nothing to disk
         [Test]
-        public void Reload_EditablePack_ReloadsThenBacksUpTheNewVersion()
+        public void Reload_EditablePack_ReloadsWithoutWritingABackup()
         {
             Assert.That(_reloader.Reload(_container.Object), Is.True);
 
             _packFileService.Verify(x => x.ReloadPackContainer(_container.Object), Times.Once);
-            Assert.That(File.Exists(PackBackupService.GetBackupPath(_packPath)), Is.True);
-        }
-
-        [Test]
-        public void Reload_ReadOnlyPack_NoBackup()
-        {
-            _container.SetupGet(x => x.IsReadOnly).Returns(true);
-
-            _reloader.Reload(_container.Object);
-
-            _packFileService.Verify(x => x.ReloadPackContainer(_container.Object), Times.Once);
-            Assert.That(File.Exists(PackBackupService.GetBackupPath(_packPath)), Is.False);
+            Assert.That(Directory.GetFileSystemEntries(_dataDir), Is.EqualTo(new[] { _packPath }));
         }
 
         [Test]
@@ -72,7 +60,6 @@ namespace Shared.CoreTest.PackFiles.Utility
             Assert.That(_reloader.Reload(_container.Object), Is.False);
 
             _dialogs.Verify(x => x.ShowDialogBox(It.IsAny<string>(), It.IsAny<string>()), Times.Once);
-            Assert.That(File.Exists(PackBackupService.GetBackupPath(_packPath)), Is.False);
         }
 
         [Test]

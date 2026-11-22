@@ -19,7 +19,6 @@
   "PackReloader.ChangedOnDisk": "“{0}”已在磁盘上被其他程序（例如 RPFM）修改。\n\n现在重新加载吗？你在 AssetEditor 中未保存的编辑会保留在新版本之上；尚未保存的重命名和删除将被撤销。\n\n在重新加载之前，AssetEditor 不会打开或保存此 pack 中的文件。你也可以稍后右键单击该 pack 并选择“从磁盘重新加载”。",
   "PackReloader.ConfirmReload": "要从磁盘重新加载“{0}”吗？\n\n你在 AssetEditor 中未保存的编辑会保留在磁盘版本之上；尚未保存的重命名和删除将被撤销。",
   "PackReloader.ReloadFailed": "AssetEditor 无法重新加载“{0}”：\n\n{1}",
-  "PackReloader.BackupFailed": "“{0}”已重新加载，但 AssetEditor 无法对其进行备份：\n\n{1}",
 
   "UpdaterWindow.Title": "更新器",
   "UpdaterWindow.UpdateInfo": "AssetEditor 有新版本可用！\n\n当前版本为 {0}。更新到版本 {1} 以获取以下最新更改。",
@@ -163,8 +162,6 @@
   "OpenPackForEditingCommand.AlreadyOpen": "此 pack 已经打开：\n\n{0}",
   "SavePackFileContainerCommand.BackupFailedTitle": "备份失败",
   "SavePackFileContainerCommand.BackupFailed": "AssetEditor 无法在覆盖保存之前将当前的“{0}”保留为“{1}”：\n\n{2}\n\n尚未保存任何内容。要在没有备份的情况下保存吗？",
-  "OpenPackForEditingCommand.BackupFailedTitle": "备份失败",
-  "OpenPackForEditingCommand.BackupFailed": "AssetEditor 无法在打开“{0}”之前对其进行备份：\n\n{1}\n\n要在没有备份的情况下打开它进行编辑吗？",
   "CreateNewPackCommand.Title": "新 pack 名称",
   "CreateNewPackCommand.InvalidName": "“{0}”不是有效的 pack 名称。",
 

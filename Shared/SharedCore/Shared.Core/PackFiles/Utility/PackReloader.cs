@@ -8,14 +8,12 @@ namespace Shared.Core.PackFiles.Utility
     {
         private readonly ILogger _logger = Logging.Create<PackReloader>();
         private readonly IPackFileService _packFileService;
-        private readonly PackBackupService _packBackupService;
         private readonly IStandardDialogs _standardDialogs;
         private readonly LocalizationManager _localizationManager;
 
-        public PackReloader(IPackFileService packFileService, PackBackupService packBackupService, IStandardDialogs standardDialogs, LocalizationManager localizationManager)
+        public PackReloader(IPackFileService packFileService, IStandardDialogs standardDialogs, LocalizationManager localizationManager)
         {
             _packFileService = packFileService;
-            _packBackupService = packBackupService;
             _standardDialogs = standardDialogs;
             _localizationManager = localizationManager;
         }
@@ -41,13 +39,13 @@ namespace Shared.Core.PackFiles.Utility
             return Reload(container);
         }
 
-        // An editable pack is backed up again afterwards, as when it was opened: the backup should hold
-        // the newest version AE loaded, not the one from before the other program's save
+        // The next save of an editable pack keeps the reloaded version as its .pack1, as after opening it
         public bool Reload(IPackFileContainer container)
         {
             try
             {
                 _packFileService.ReloadPackContainer(container);
+                return true;
             }
             catch (Exception e)
             {
@@ -55,19 +53,6 @@ namespace Shared.Core.PackFiles.Utility
                 _standardDialogs.ShowDialogBox(string.Format(_localizationManager.Get("PackReloader.ReloadFailed"), container.Name, e.Message), _localizationManager.Get("PackReloader.Title"));
                 return false;
             }
-
-            if (container.IsReadOnly || string.IsNullOrWhiteSpace(container.SystemFilePath))
-                return true;
-
-            try
-            {
-                _packBackupService.BackupOnOpen(container.SystemFilePath);
-            }
-            catch (Exception e) when (e is IOException or UnauthorizedAccessException)
-            {
-                _standardDialogs.ShowDialogBox(string.Format(_localizationManager.Get("PackReloader.BackupFailed"), container.Name, e.Message), _localizationManager.Get("PackReloader.Title"));
-            }
-            return true;
         }
     }
 }
