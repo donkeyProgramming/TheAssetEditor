@@ -295,7 +295,6 @@ namespace Editors.AnimationVisualEditors.AnimationKeyframeEditor
             _rider = rider;
 
             _mount.SkeletonChanged += MountSkeletonChanged;
-            _mount.AnimationChanged += TryReGenerateAnimation;
             _rider.SkeletonChanged += RiderSkeletonChanges;
             _rider.AnimationChanged += TryReGenerateAnimation;
 
@@ -732,7 +731,6 @@ namespace Editors.AnimationVisualEditors.AnimationKeyframeEditor
             if (_mount != null)
             {
                 _mount.SkeletonChanged -= MountSkeletonChanged;
-                _mount.AnimationChanged -= TryReGenerateAnimation;
             }
 
             if (_rider != null)
