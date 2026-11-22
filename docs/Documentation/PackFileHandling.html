@@ -104,6 +104,7 @@
         Each time a pack is opened for editing (and each time it is reloaded), AssetEditor copies it to an <b>AssetEditorBackups</b> folder next to the pack,
         replacing the previous copy. For a mod in the game's data folder that is <b>data\AssetEditorBackups\mymod.pack</b>.
         To restore it, close the pack and copy the backup back over it.<br />
+        If a save went wrong, restore the backup <b>before</b> opening the pack in AssetEditor again: opening or reloading it replaces the backup with the pack as it is now.<br />
         Backups are on by default. Turning them off (Settings &rarr; Pack files) asks you to confirm again, and the status bar then says "no backup".
     </p>
 
