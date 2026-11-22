@@ -134,8 +134,9 @@ namespace Shared.GameFormats.Dat
 
         static byte[] WriteStr32(string str)
         {
-            var buffer = ByteParsers.Int32.EncodeValue(str.Length, out _).ToList();
+            // ReadStr32 reads a byte count, which differs from str.Length for non-ASCII text
             var strBytes = Encoding.UTF8.GetBytes(str);
+            var buffer = ByteParsers.Int32.EncodeValue(strBytes.Length, out _).ToList();
             buffer.AddRange(strBytes);
             return buffer.ToArray();
         }
