@@ -297,7 +297,11 @@ public static class EsfReader
         {
             var checkpoint = r.BaseStream.Position;
             var lastByte = r.ReadByte();
-            if (lastByte != 0x9C)
+            // Keep the 0x9C in the value: the writer emits the value's bytes as they are, so dropping
+            // it here would lose it on every save
+            if (lastByte == 0x9C)
+                data.Add(lastByte);
+            else
                 r.BaseStream.Position = checkpoint;
         }
 
