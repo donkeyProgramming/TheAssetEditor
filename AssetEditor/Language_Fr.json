@@ -173,6 +173,7 @@
     "MenuBar.Help.Discord":  "Discord",
     "WindowChrome.Minimise":  "Minimise",
     "WindowChrome.Maximise":  "Maximise",
+    "WindowChrome.Restore":  "Restaurer",
     "WindowChrome.Help":  "Help",
     "WindowChrome.Close":  "Close",
     "MainWindow.TabContextMenu.Close":  "Close",

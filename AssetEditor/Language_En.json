@@ -183,6 +183,7 @@
 
   "WindowChrome.Minimise": "Minimise",
   "WindowChrome.Maximise": "Maximise",
+  "WindowChrome.Restore": "Restore",
   "WindowChrome.Help": "Help",
   "WindowChrome.Close": "Close",
 
