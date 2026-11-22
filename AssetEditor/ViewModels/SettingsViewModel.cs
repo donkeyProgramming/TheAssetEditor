@@ -37,6 +37,8 @@ namespace AssetEditor.ViewModels
         [ObservableProperty] private bool _showCAWemFiles;
         [ObservableProperty] private bool _onlyLoadLod0ForReferenceMeshes;
         [ObservableProperty] private CameraControlMode _selectedCameraMode;
+        [ObservableProperty] private bool _enableDirectPackEditing;
+        [ObservableProperty] private bool _backupPacksOnFirstSave;
 
         public SettingsViewModel(ApplicationSettingsService settingsService, LocalizationManager localizationManager)
         {
@@ -61,6 +63,8 @@ namespace AssetEditor.ViewModels
             ShowCAWemFiles = _settingsService.CurrentSettings.ShowCAWemFiles;
             OnlyLoadLod0ForReferenceMeshes = _settingsService.CurrentSettings.OnlyLoadLod0ForReferenceMeshes;
             SelectedCameraMode = _settingsService.CurrentSettings.CameraControlMode;
+            EnableDirectPackEditing = _settingsService.CurrentSettings.EnableDirectPackEditing;
+            BackupPacksOnFirstSave = _settingsService.CurrentSettings.BackupPacksOnFirstSave;
 
             foreach (var game in GameInformationDatabase.Games.Values.OrderBy(game => game.DisplayName))
             {
@@ -72,6 +76,7 @@ namespace AssetEditor.ViewModels
                         Path = _settingsService.CurrentSettings.GameDirectories.FirstOrDefault(x => x.Game == game.Type)?.Path
                     });
             }
+
         }
 
 
@@ -90,6 +95,8 @@ namespace AssetEditor.ViewModels
             _settingsService.CurrentSettings.OnlyLoadLod0ForReferenceMeshes = OnlyLoadLod0ForReferenceMeshes;
             _settingsService.CurrentSettings.GameDirectories.Clear();
             _settingsService.CurrentSettings.CameraControlMode = SelectedCameraMode;
+            _settingsService.CurrentSettings.EnableDirectPackEditing = EnableDirectPackEditing;
+            _settingsService.CurrentSettings.BackupPacksOnFirstSave = BackupPacksOnFirstSave;
 
             foreach (var item in GameDirectores)
                 _settingsService.CurrentSettings.GameDirectories.Add(new ApplicationSettings.GamePathPair(item.GameType, item.Path));

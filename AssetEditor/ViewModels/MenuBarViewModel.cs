@@ -81,6 +81,13 @@ namespace AssetEditor.ViewModels
         [RelayCommand] private void ImportPackAsProject() => _uiCommandFactory.Create<ImportPackAsAsProjectCommand>().Execute();
         [RelayCommand] private void ImportReferencePack() => _uiCommandFactory.Create<ImportReferencePackCommand>().Execute();
         [RelayCommand] private void CreateNewProject() => _uiCommandFactory.Create<CreateNewProjectCommand>().Execute();
+        [RelayCommand] private void OpenPackForEditing() => _uiCommandFactory.Create<OpenPackForEditingCommand>().Execute();
+        [RelayCommand] private void CreateNewPack() => _uiCommandFactory.Create<CreateNewPackCommand>().Execute();
+
+        // Read once: changing settings already asks for a restart. With direct editing on, the File menu
+        // leads with the pack items, Open Recent and Save; the project items follow.
+        public bool IsDirectPackEditingEnabled => _settingsService.CurrentSettings.EnableDirectPackEditing;
+        public bool IsDirectPackEditingDisabled => IsDirectPackEditingEnabled == false;
         
         [RelayCommand] private void CreateAnimPackWarhammer3() => _uiCommandFactory.Create<CreateExampleAnimationDbCommand>().CreateAnimationDbWarhammer3();
         [RelayCommand] private void CreateAnimPack3k() => _uiCommandFactory.Create<CreateExampleAnimationDbCommand>().CreateAnimationDb3k();
@@ -157,9 +164,20 @@ namespace AssetEditor.ViewModels
                 info.IsReadOnly,
                 () =>
                 {
+                    // A pack last opened editable reopens for editing (and gets backed up) only while direct
+                    // editing is on; otherwise it opens read-only like a reference pack
+                    var openForEditing = info.ContainerType != PackFileContainerType.SystemFolder
+                        && info.IsReadOnly == false
+                        && _settingsService.CurrentSettings.EnableDirectPackEditing;
+                    if (openForEditing)
+                    {
+                        _uiCommandFactory.Create<OpenPackForEditingCommand>().Open(info.Path);
+                        return;
+                    }
+
                     var container = info.ContainerType == PackFileContainerType.SystemFolder
                         ? _packFileContainerLoader.CreateFromSystemFolder(info.Path)
-                        : _packFileContainerLoader.CreateFromPackFile(info.ContainerType, info.Path, info.IsReadOnly);
+                        : _packFileContainerLoader.CreateFromPackFile(info.ContainerType, info.Path, true);
 
                     if (container == null)
                     {

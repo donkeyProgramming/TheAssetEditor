@@ -67,6 +67,7 @@ namespace Shared.Ui.BaseDialogs.PackFileTree
             _eventHub?.Register<PackFileContainerFolderRemovedEvent>(this, x => OnPackFileContainerFolderRemovedEvent(x.Container, x.Folder));
             _eventHub?.Register<PackFileContainerFolderRenamedEvent>(this, x => OnPackFileContainerFolderRenamedEvent(x.Container, x.OldNodePath, x.NewNodePath));
             _eventHub?.Register<PackFileContainerSavedEvent>(this, OnPackFileContainerSavedEvent);
+            _eventHub?.Register<PackFileContainerReloadedEvent>(this, OnPackFileContainerReloadedEvent);
 
             Filter = new SearchFilter(Files, standardDialogs)
             {
@@ -135,6 +136,24 @@ namespace Shared.Ui.BaseDialogs.PackFileTree
 
             root.UnsavedChanges.ClearAll();
             Filter.Reapply();
+        }
+
+        // Rebuilt rather than patched file by file, which would mark every reloaded file as an unsaved change.
+        // Only the AE edits kept on top of the new version are marked.
+        private void OnPackFileContainerReloadedEvent(PackFileContainerReloadedEvent e)
+        {
+            if (Files.Any(x => x.Owner == e.Container) == false)
+                return;
+
+            ReloadTree(e.Container);
+
+            var root = GetRootNode(e.Container);
+            foreach (var file in e.UnsavedFiles)
+            {
+                var node = GetNodeFromPackFile(e.Container, file, false);
+                if (node != null)
+                    root.UnsavedChanges.MarkChangedWithAncestors(node, root);
+            }
         }
 
         private void OnPackFileContainerFilesRemovedEvent(IPackFileContainer container, List<PackFile> files)
@@ -294,13 +313,16 @@ namespace Shared.Ui.BaseDialogs.PackFileTree
 
         private void ReloadTree(IPackFileContainer container)
         {
-            foreach (var file in Files)
+            // A container that is already shown keeps its place in the tree
+            var index = -1;
+            for (var i = 0; i < Files.Count; i++)
             {
-                if (file.Owner == container)
+                if (Files[i].Owner == container)
                 {
-                    Files.Remove(file);
+                    index = i;
+                    Files.RemoveAt(i);
                     break;
-                }  
+                }
             }
 
             var skipWemFiles = container.IsCaPackFile && _applicationSettingsService.CurrentSettings.ShowCAWemFiles == false;
@@ -309,7 +331,10 @@ namespace Shared.Ui.BaseDialogs.PackFileTree
             PackFileTreeBuilder.BuildTreeFromFiles(root, container, skipWemFiles);
             root.IsMainEditabelPack = _packFileService.GetEditablePack() == container;
 
-            Files.Add(root);
+            if (index >= 0)
+                Files.Insert(index, root);
+            else
+                Files.Add(root);
             Filter.Reapply();
         }
 

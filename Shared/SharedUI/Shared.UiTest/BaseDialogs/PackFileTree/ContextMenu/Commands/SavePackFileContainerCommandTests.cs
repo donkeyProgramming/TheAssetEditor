@@ -2,6 +2,7 @@ using System.IO;
 using Test.TestingUtility.TestUtility;
 using Moq;
 using Shared.Core.PackFiles;
+using Shared.Core.PackFiles.ErrorHandling;
 using Shared.Core.PackFiles.Models;
 using Shared.Core.Services;
 using Shared.Core.Settings;
@@ -20,7 +21,7 @@ namespace Shared.UiTest.BaseDialogs.PackFileTree.ContextMenu.Commands
             var viewModel = PackFileBrowser();
             var root = viewModel.Files.First();
 
-            var command = new SavePackFileContainerCommand(_packFileService, new Mock<IStandardDialogs>().Object, new ApplicationSettingsService(GameTypeEnum.Warhammer3), MockScopedLogger.Create());
+            var command = new SavePackFileContainerCommand(_packFileService, new Mock<IStandardDialogs>().Object, new ApplicationSettingsService(GameTypeEnum.Warhammer3), new LocalizationManager(), MockScopedLogger.Create());
 
             Assert.That(command.ShouldAdd(root), Is.True);
         }
@@ -32,7 +33,7 @@ namespace Shared.UiTest.BaseDialogs.PackFileTree.ContextMenu.Commands
             var viewModel = PackFileBrowser();
             var root = viewModel.Files.First();
 
-            var command = new SavePackFileContainerCommand(_packFileService, new Mock<IStandardDialogs>().Object, new ApplicationSettingsService(GameTypeEnum.Warhammer3), MockScopedLogger.Create());
+            var command = new SavePackFileContainerCommand(_packFileService, new Mock<IStandardDialogs>().Object, new ApplicationSettingsService(GameTypeEnum.Warhammer3), new LocalizationManager(), MockScopedLogger.Create());
 
             Assert.That(command.IsEnabled(root), Is.True);
         }
@@ -49,7 +50,7 @@ namespace Shared.UiTest.BaseDialogs.PackFileTree.ContextMenu.Commands
             var appSettings = new ApplicationSettingsService(GameTypeEnum.Warhammer3);
 
             // Act
-            var command = new SavePackFileContainerCommand(_packFileService, dialogs.Object, appSettings, MockScopedLogger.Create());
+            var command = new SavePackFileContainerCommand(_packFileService, dialogs.Object, appSettings, new LocalizationManager(), MockScopedLogger.Create());
             command.Configure(root);
 
             command.Execute();
@@ -68,7 +69,7 @@ namespace Shared.UiTest.BaseDialogs.PackFileTree.ContextMenu.Commands
             var appSettings = new ApplicationSettingsService(GameTypeEnum.Warhammer3);
 
             // Act
-            var command = new SavePackFileContainerCommand(_packFileService, dialogs.Object, appSettings, MockScopedLogger.Create());
+            var command = new SavePackFileContainerCommand(_packFileService, dialogs.Object, appSettings, new LocalizationManager(), MockScopedLogger.Create());
             command.Execute();
 
             // Assert
@@ -86,7 +87,7 @@ namespace Shared.UiTest.BaseDialogs.PackFileTree.ContextMenu.Commands
             var appSettings = new ApplicationSettingsService(GameTypeEnum.Warhammer3);
 
             // Act
-            var command = new SavePackFileContainerCommand(_packFileService, dialogs.Object, appSettings, MockScopedLogger.Create());
+            var command = new SavePackFileContainerCommand(_packFileService, dialogs.Object, appSettings, new LocalizationManager(), MockScopedLogger.Create());
             command.Execute();
 
             // Assert - SavePackContainer was invoked (it will throw internally due to file I/O, caught by the command)
@@ -114,7 +115,7 @@ namespace Shared.UiTest.BaseDialogs.PackFileTree.ContextMenu.Commands
                 dialogs.Setup(x => x.ShowWaitCursor()).Returns(new Mock<IWaitCursor>().Object);
                 var packFileService = new Mock<IPackFileService>();
 
-                var command = new SavePackFileContainerCommand(packFileService.Object, dialogs.Object, new ApplicationSettingsService(GameTypeEnum.Warhammer3), MockScopedLogger.Create());
+                var command = new SavePackFileContainerCommand(packFileService.Object, dialogs.Object, new ApplicationSettingsService(GameTypeEnum.Warhammer3), new LocalizationManager(), MockScopedLogger.Create());
                 command.Configure(root);
 
                 command.Execute();
@@ -125,6 +126,62 @@ namespace Shared.UiTest.BaseDialogs.PackFileTree.ContextMenu.Commands
             {
                 Directory.Delete(outputDir, true);
             }
+        }
+
+        private static (Mock<IPackFileContainer> Container, RootTreeNode Root) DirectPack(string packPath)
+        {
+            var container = new Mock<IPackFileContainer>();
+            container.SetupGet(x => x.Name).Returns("mymod");
+            container.SetupGet(x => x.SystemFilePath).Returns(packPath);
+            container.SetupGet(x => x.ContainerType).Returns(PackFileContainerType.Normal);
+            container.SetupGet(x => x.PackFileSettings).Returns(new PackFileSettings());
+            container.SetupProperty(x => x.IsReadOnly, false);
+            return (container, new RootTreeNode("mymod", container.Object));
+        }
+
+        private static ApplicationSettingsService Settings(bool directEditing, bool backups)
+        {
+            var settings = new ApplicationSettingsService(GameTypeEnum.Warhammer3);
+            settings.CurrentSettings.EnableDirectPackEditing = directEditing;
+            settings.CurrentSettings.BackupPacksOnFirstSave = backups;
+            return settings;
+        }
+
+        [TestCase(true, true, true)]
+        [TestCase(true, false, false)]
+        [TestCase(false, true, false)]
+        public void Execute_DirectPack_KeepsBackupOnlyWhenTurnedOn(bool directEditing, bool backups, bool expectBackup)
+        {
+            var packPath = Path.Combine(Path.GetTempPath(), "mymod.pack");
+            var (container, root) = DirectPack(packPath);
+            var packFileService = new Mock<IPackFileService>();
+            var command = new SavePackFileContainerCommand(packFileService.Object, new Mock<IStandardDialogs>().Object, Settings(directEditing, backups), new LocalizationManager(), MockScopedLogger.Create());
+            command.Configure(root);
+
+            command.Execute();
+
+            packFileService.Verify(x => x.SavePackContainer(container.Object, packPath, expectBackup, It.IsAny<GameInformation>()), Times.Once);
+        }
+
+        [TestCase(ShowMessageBoxResult.OK, 1)]
+        [TestCase(ShowMessageBoxResult.Cancel, 0)]
+        public void Execute_BackupFails_AsksBeforeSavingWithoutOne(ShowMessageBoxResult answer, int savesWithoutBackup)
+        {
+            var packPath = Path.Combine(Path.GetTempPath(), "mymod.pack");
+            var (container, root) = DirectPack(packPath);
+            var packFileService = new Mock<IPackFileService>();
+            packFileService.Setup(x => x.SavePackContainer(container.Object, packPath, true, It.IsAny<GameInformation>()))
+                .Throws(new PackBackupFailedException(packPath, packPath + "1", new IOException("in use")));
+            var dialogs = new Mock<IStandardDialogs>();
+            dialogs.Setup(x => x.ShowYesNoBox(It.IsAny<string>(), It.IsAny<string>())).Returns(answer);
+            var command = new SavePackFileContainerCommand(packFileService.Object, dialogs.Object, Settings(true, true), new LocalizationManager(), MockScopedLogger.Create());
+            command.Configure(root);
+
+            command.Execute();
+
+            dialogs.Verify(x => x.ShowYesNoBox(It.IsAny<string>(), It.IsAny<string>()), Times.Once);
+            dialogs.Verify(x => x.ShowDialogBox(It.IsAny<string>(), It.IsAny<string>()), Times.Never);
+            packFileService.Verify(x => x.SavePackContainer(container.Object, packPath, false, It.IsAny<GameInformation>()), Times.Exactly(savesWithoutBackup));
         }
     }
 }

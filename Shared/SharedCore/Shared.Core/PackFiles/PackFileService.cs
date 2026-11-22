@@ -107,7 +107,8 @@ namespace Shared.Core.PackFiles
             _logger.Here().Information($"Added pack file container '{DescribeContainer(container)}' (CA:{container.IsCaPackFile}). Loaded containers: {_packFileContainers.Count}, editable containers: {notCaPacksLoaded}");
             _globalEventHub?.PublishGlobalEvent(new PackFileContainerAddedEvent(container));
 
-            if (container.IsCaPackFile == false && setToMainPackIfFirst)
+            // A read-only pack can't be the editable one; SetEditablePack would throw after it was already added
+            if (container.IsCaPackFile == false && container.IsReadOnly == false && setToMainPackIfFirst)
             {
                 _logger.Here().Information($"Setting '{DescribeContainer(container)}' as editable pack after load");
                 SetEditablePack(container);
@@ -207,6 +208,21 @@ namespace Shared.Core.PackFiles
 
             if (container is IDisposable disposable)
                 disposable.Dispose();
+        }
+
+        public bool HasChangedOnDisk(IPackFileContainer pf) => CastContainer(pf) is PackFileContainer container && container.HasChangedOnDisk();
+
+        public bool HasUnsavedChanges(IPackFileContainer pf) => CastContainer(pf) is PackFileContainer container && container.GetUnsavedFiles().Count > 0;
+
+        public void ReloadPackContainer(IPackFileContainer pf)
+        {
+            if (CastContainer(pf) is not PackFileContainer container)
+                throw new InvalidOperationException($"Only packs opened from a .pack file can be reloaded ('{DescribeContainer(pf)}')");
+
+            _logger.Here().Information($"Reloading '{DescribeContainer(container)}' from disk");
+            var keptUnsaved = container.ReloadFromDisk();
+            _logger.Here().Information($"Reloaded '{DescribeContainer(container)}': {container.GetFileCount()} files, {keptUnsaved.Count} unsaved AE edit(s) kept");
+            _globalEventHub?.PublishGlobalEvent(new PackFileContainerReloadedEvent(container, keptUnsaved));
         }
 
         private void OnSystemFolderContainerFilesAddedExternally(object? sender, SystemFolderContainerFilesChangedEventArgs e)

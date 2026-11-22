@@ -42,6 +42,21 @@ namespace Shared.CoreTest.PackFiles
         }
 
         [Test]
+        public void AddContainer_ReadOnlyPackWithSetAsEditable_AddedButNotMadeEditable()
+        {
+            // Recent Packs reopens every entry with setToMainPackIfFirst, including read-only reference packs
+            var pfs = CreateServiceWithCaPack();
+            var editable = PackFileContainer.CreatePackFile("Editable", "editable.pack");
+            pfs.AddContainer(editable, true);
+            var reference = PackFileContainer.CreateReadOnlyPackFile("Reference", "reference.pack");
+
+            pfs.AddContainer(reference, true);
+
+            Assert.That(pfs.GetAllPackfileContainers(), Does.Contain(reference));
+            Assert.That(pfs.GetEditablePack(), Is.EqualTo(editable));
+        }
+
+        [Test]
         public void AddContainer_CaPackFileNotSet()
         {
             var eventHub = new Mock<IGlobalEventHub>();

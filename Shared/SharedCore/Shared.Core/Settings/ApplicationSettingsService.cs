@@ -37,6 +37,13 @@ namespace Shared.Core.Settings
         public string SelectedLangauge { get; set; } = "en";
         public CameraControlMode CameraControlMode { get; set; } = CameraControlMode.AssetEditorStyle;
         public List<ModelSaveDefaults> ModelSaveDefaultsPerGame { get; set; } = [];
+
+        // Opening a .pack for editing in place instead of through a project folder. Off by default.
+        public bool EnableDirectPackEditing { get; set; } = false;
+
+        // With direct editing, the first save after a pack is opened or reloaded keeps the version on disk
+        // next to it as <name>.pack1, like Blender's .blend1
+        public bool BackupPacksOnFirstSave { get; set; } = true;
     }
 
     public class ApplicationSettingsService

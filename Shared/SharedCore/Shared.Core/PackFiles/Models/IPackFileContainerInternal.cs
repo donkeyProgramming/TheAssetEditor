@@ -12,6 +12,8 @@ namespace Shared.Core.PackFiles.Models
         string RenameDirectory(string currentNodeName, string newName);
         void RenameFile(PackFile file, string newName);
         void SaveFileData(PackFile file, byte[] data);
+        // createBackup keeps a copy of the file being replaced: a .pack edited directly keeps it as
+        // <name>.pack1 on its first save after opening or reloading; a project keeps numbered copies in Backup\
         void SaveToDisk(string path, bool createBackup, GameInformation gameInformation);
 
         List<(string FileName, PackFile Pack)> FindAllWithExtention(string extention);

@@ -11,9 +11,11 @@ namespace Shared.Core.PackFiles.Models.FileSources
         // The pack as AE last loaded or saved it. Null for packs that are never checked (CA packs).
         public PackFileStamp? ExpectedStamp { get; set; }
 
+        public bool HasChangedOnDisk => ExpectedStamp != null && ExpectedStamp != PackFileStamp.Read(FilePath);
+
         public void EnsureUnchanged()
         {
-            if (ExpectedStamp != null && ExpectedStamp != PackFileStamp.Read(FilePath))
+            if (HasChangedOnDisk)
                 throw new PackFileChangedOnDiskException(FilePath);
         }
     }

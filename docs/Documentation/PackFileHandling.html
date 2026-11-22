@@ -78,6 +78,39 @@
     </p>
     <img src="Images\AssetEditor_packfilewithchanges.png">
 
+    <h2>Editing .pack files directly (advanced)</h2>
+    <p>
+        If you would rather edit a .pack in place, for example because you also work on it in RPFM, turn on <b>Settings &rarr; Pack files &rarr; Also edit .pack files directly</b>.
+        Restart AssetEditor afterwards. Projects keep working as before; you can use both.<br />
+        The File menu then starts with <b>New Pack...</b>, <b>Open Pack...</b>, <b>Open Recent</b> and <b>Save active pack or project</b>, with the project items below them.
+        The status bar shows "Active pack (editing .pack directly)" and which game's rules a save follows.
+    </p>
+    <p>
+        Edits stay in AssetEditor until you save the pack (File &rarr; Save active pack or project, or right-click the pack &rarr; Save).
+        Files you didn't edit are written back exactly as they were stored. A pack AssetEditor can't write back safely
+        (encrypted, PFH6, an extended header, or the same file path listed twice) opens read-only, with a message saying why.
+    </p>
+
+    <h3>Working alongside RPFM</h3>
+    <p>
+        If the pack is saved in RPFM while it is open in AssetEditor, AssetEditor notices when you switch back to it and offers to reload it.
+        Your unsaved edits in AssetEditor are kept on top of the new version; renames and deletions you haven't saved are undone.
+        Until it is reloaded, AssetEditor won't open or save files from that pack. You can also reload at any time: right-click the pack &rarr; <b>Reload from disk</b>.<br />
+        If RPFM also has the pack open, reload it there after saving in AssetEditor, so RPFM doesn't later save its older copy over your changes.
+    </p>
+
+    <h3>Backups</h3>
+    <p>
+        The first time you save a pack after opening it, AssetEditor keeps the version that was on disk next to it as <b>mymod.pack1</b>, like Blender's .blend1,
+        replacing any previous one. Later saves leave it alone, so it holds the pack as it was before you started editing.
+        Opening a pack without saving it doesn't touch the backup.<br />
+        After a reload (for example after saving in RPFM), the next save keeps the reloaded version instead, so the other program's changes are in the backup.<br />
+        To restore it, close the pack in AssetEditor, delete or move the broken mymod.pack, and rename mymod.pack1 to mymod.pack.
+        If a save went wrong, restore the backup <b>before</b> you save the pack again after reopening it: that save replaces the backup.<br />
+        If AssetEditor can't make the backup (for example another program has the .pack1 open), nothing is saved, and you are asked whether to save without one.<br />
+        Backups are on by default. You can turn them off in Settings &rarr; Pack files; the status bar then says "no backup".
+    </p>
+
     <h3>Best practises</h3>
     <p>It is recommended to use a version control system like GIT to keep track of changes in your project. This allows you to easily revert changes, collaborate with others, and maintain a history of your project.Its easy to configure and makes the modding process much safer and enjoyable. </p>
 
@@ -86,6 +119,7 @@
     <ul>
         <li><b>Cannot edit</b> - Verify selected root is writable and set as editable.</li>
         <li><b>Save fails</b> - Check file lock (game/tool/antivirus) on target file.</li>
+        <li><b>"was changed on disk by another program"</b> - The pack was saved by another tool after AssetEditor opened it. Right-click the pack &rarr; Reload from disk.</li>
         <li><b>Wrong output version</b> - Check project game version setting.</li>
         <li><b>Missing file after save</b> - Check ignored files list and normalized path.</li>
         <li>

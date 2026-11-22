@@ -22,6 +22,8 @@ namespace AssetEditor
             serviceCollection.AddSingleton<IEditorManager, EditorManager>();
 
             serviceCollection.AddTransient<CreateNewProjectCommand>();
+            serviceCollection.AddTransient<OpenPackForEditingCommand>();
+            serviceCollection.AddTransient<CreateNewPackCommand>();
             serviceCollection.AddTransient<OpenGamePackCommand>();
             serviceCollection.AddTransient<ImportPackAsAsProjectCommand>();
             serviceCollection.AddTransient<ImportReferencePackCommand>();
@@ -43,6 +45,7 @@ namespace AssetEditor
             serviceCollection.AddScoped<MainWindow>();
 
             serviceCollection.AddSingleton<RecentFilesTracker>();
+            serviceCollection.AddScoped<PackChangedOnDiskChecker>();
             serviceCollection.AddSingleton<TouchedFilesRecorder>();
 
             serviceCollection.AddScoped<IExceptionInformationProvider, CurrentEditorExceptionInfoProvider>();
