@@ -101,10 +101,13 @@
 
     <h3>Backups</h3>
     <p>
-        Each time a pack is opened for editing (and each time it is reloaded), AssetEditor copies it to an <b>AssetEditorBackups</b> folder next to the pack,
-        replacing the previous copy. For a mod in the game's data folder that is <b>data\AssetEditorBackups\mymod.pack</b>.
-        To restore it, close the pack and copy the backup back over it.<br />
-        If a save went wrong, restore the backup <b>before</b> opening the pack in AssetEditor again: opening or reloading it replaces the backup with the pack as it is now.<br />
+        The first time you save a pack after opening it, AssetEditor keeps the version that was on disk next to it as <b>mymod.pack1</b>, like Blender's .blend1,
+        replacing any previous one. Later saves leave it alone, so it holds the pack as it was before you started editing.
+        Opening a pack without saving it doesn't touch the backup.<br />
+        After a reload (for example after saving in RPFM), the next save keeps the reloaded version instead, so the other program's changes are in the backup.<br />
+        To restore it, close the pack in AssetEditor, delete or move the broken mymod.pack, and rename mymod.pack1 to mymod.pack.
+        If a save went wrong, restore the backup <b>before</b> you save the pack again after reopening it: that save replaces the backup.<br />
+        If AssetEditor can't make the backup (for example another program has the .pack1 open), nothing is saved, and you are asked whether to save without one.<br />
         Backups are on by default. Turning them off (Settings &rarr; Pack files) asks you to confirm again, and the status bar then says "no backup".
     </p>
 
