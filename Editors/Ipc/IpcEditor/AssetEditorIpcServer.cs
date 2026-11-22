@@ -11,6 +11,12 @@ namespace Editors.Ipc
         public const string PipeName = "TheAssetEditor.Ipc";
         public const string OwnershipMutexName = @"Local\TheAssetEditor.Ipc.Owner";
 
+        // The pipe serves one client at a time, so a client that never finishes its request, or sends an
+        // endless one, would otherwise hold it (and the memory for the request) forever.
+        internal const int MaxRequestChars = 64 * 1024;
+        internal static readonly TimeSpan ReadTimeout = TimeSpan.FromSeconds(5);
+        internal static readonly TimeSpan WriteTimeout = TimeSpan.FromSeconds(5);
+
         private static readonly JsonSerializerOptions SerializerOptions = new()
         {
             PropertyNameCaseInsensitive = true,
@@ -138,7 +144,7 @@ namespace Editors.Ipc
                     await pipe.WaitForConnectionAsync(cancellationToken);
 
                     var response = await ProcessRequestAsync(pipe, cancellationToken);
-                    await WriteResponseAsync(pipe, response);
+                    await WriteResponseAsync(pipe, response, cancellationToken);
                 }
                 catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
                 {
@@ -179,8 +185,24 @@ namespace Editors.Ipc
 
         private async Task<IpcResponse> ProcessRequestAsync(NamedPipeServerStream pipe, CancellationToken cancellationToken)
         {
-            using var reader = new StreamReader(pipe, new UTF8Encoding(false), detectEncodingFromByteOrderMarks: false, bufferSize: 1024, leaveOpen: true);
-            var line = await reader.ReadLineAsync();
+            string? line;
+            using (var readTimeout = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken))
+            {
+                readTimeout.CancelAfter(ReadTimeout);
+                using var reader = new StreamReader(pipe, new UTF8Encoding(false), detectEncodingFromByteOrderMarks: false, bufferSize: 1024, leaveOpen: true);
+                try
+                {
+                    line = await ReadBoundedLineAsync(reader, MaxRequestChars, readTimeout.Token);
+                }
+                catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested == false)
+                {
+                    return IpcResponse.Failure("Timed out waiting for the request");
+                }
+                catch (InvalidDataException)
+                {
+                    return IpcResponse.Failure($"Request is longer than {MaxRequestChars} characters");
+                }
+            }
 
             if (string.IsNullOrWhiteSpace(line))
                 return IpcResponse.Failure("Empty request");
@@ -216,15 +238,60 @@ namespace Editors.Ipc
             }
         }
 
-        private static async Task WriteResponseAsync(NamedPipeServerStream pipe, IpcResponse response)
+        private static async Task WriteResponseAsync(NamedPipeServerStream pipe, IpcResponse response, CancellationToken cancellationToken)
         {
-            using var writer = new StreamWriter(pipe, new UTF8Encoding(false), bufferSize: 1024, leaveOpen: true)
-            {
-                AutoFlush = true
-            };
+            using var writeTimeout = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+            writeTimeout.CancelAfter(WriteTimeout);
 
+            using var writer = new StreamWriter(pipe, new UTF8Encoding(false), bufferSize: 1024, leaveOpen: true);
             var json = JsonSerializer.Serialize(response, SerializerOptions);
-            await writer.WriteLineAsync(json);
+            await writer.WriteLineAsync(json.AsMemory(), writeTimeout.Token);
+            await writer.FlushAsync(writeTimeout.Token);
+        }
+
+        /// <summary>One request line, ended by \n (a \r before it is dropped). Null at the end of the stream
+        /// with nothing read. Throws InvalidDataException once the line passes maxChars.</summary>
+        internal static async Task<string?> ReadBoundedLineAsync(TextReader reader, int maxChars, CancellationToken cancellationToken)
+        {
+            var buffer = new char[1024];
+            var line = new StringBuilder();
+            var pendingCarriageReturn = false;
+
+            void Append(char character)
+            {
+                line.Append(character);
+                if (line.Length > maxChars)
+                    throw new InvalidDataException($"IPC request is longer than {maxChars} characters");
+            }
+
+            while (true)
+            {
+                var charsRead = await reader.ReadAsync(buffer.AsMemory(), cancellationToken);
+                if (charsRead == 0)
+                {
+                    if (pendingCarriageReturn)
+                        Append('\r');
+                    return line.Length == 0 ? null : line.ToString();
+                }
+
+                for (var i = 0; i < charsRead; i++)
+                {
+                    var character = buffer[i];
+                    if (character == '\n')
+                        return line.ToString();
+
+                    if (pendingCarriageReturn)
+                    {
+                        Append('\r');
+                        pendingCarriageReturn = false;
+                    }
+
+                    if (character == '\r')
+                        pendingCarriageReturn = true;
+                    else
+                        Append(character);
+                }
+            }
         }
 
         private void SetActivePipe(NamedPipeServerStream pipe)
