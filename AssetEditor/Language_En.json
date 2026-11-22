@@ -408,9 +408,8 @@
   "AnimationBatchExporter.Buttons.Apply": "Apply",
   "AnimationBatchExporter.Messages.CannotBatchActivePackfile": "Note: Can not batch process the active packfile",
 
-  "CampaignAnimationCreator.RootBone": "Root bone",
-  "CampaignAnimationCreator.Buttons.Convert": "Convert",
-  "CampaignAnimationCreator.Buttons.Save": "Save",
+  "CampaignAnimationSetEditor.FreezeAnimRoot": "Freeze Animroot in .anim",
+  "CampaignAnimationSetEditor.FreezeAnimRoot.Tooltip": "Pick an .anim, zero its animroot bone on every frame so it plays in place, and save the result into the editable pack.",
 
   "MountAnimationCreator.Title": "Rider Animation Editor",
   "MountAnimationCreator.Intro": "Makes mounted rider animation sets. Load the rider and the mount in the Rider and Mount panels above, and pick their animation sets and slots there. Picking a mount slot also picks the rider slot of the same name (RIDER_ and the mount slot).",

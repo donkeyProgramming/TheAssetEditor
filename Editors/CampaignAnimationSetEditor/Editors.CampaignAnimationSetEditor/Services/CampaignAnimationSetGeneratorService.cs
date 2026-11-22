@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using GameWorld.Core.Animation;
 using Shared.Core.PackFiles;
+using Shared.Core.PackFiles.Models;
 using Shared.GameFormats.Animation;
 using Shared.GameFormats.AnimationPack;
 
@@ -320,16 +321,39 @@ namespace Editors.CampaignAnimationSetEditor.Services
             if (sourceFile == null)
                 return null;
 
-            var animationFile = AnimationFile.Create(sourceFile);
-            var clip = new AnimationClip(animationFile, skeleton);
+            var frozenBytes = FreezeToBytes(AnimationFile.Create(sourceFile), skeleton, rootBoneIndex);
+            if (frozenBytes == null)
+                return null;
 
+            var newPath = BuildCampaignAnimationPath(sourcePath);
+            return new PendingAnimationWrite(newPath, frozenBytes);
+        }
+
+        /// <summary>Freezes animroot in a single standalone .anim, outside of set generation. The
+        /// skeleton comes from the file's own header, so any .anim can be picked. Returns null if
+        /// <see cref="FreezeRootBoneCommand"/> rejected the clip (it has already told the user why).</summary>
+        public byte[]? FreezeAnimationFile(PackFile animationPackFile)
+        {
+            var animationFile = AnimationFile.Create(animationPackFile);
+            var skeletonName = animationFile.Header.SkeletonName;
+            var skeletonFile = _packFileService.FindFile($"animations/skeletons/{skeletonName}.anim")
+                ?? throw new Exception($"Could not find the skeleton '{skeletonName}' this animation uses under animations/skeletons/");
+
+            var skeleton = new GameSkeleton(AnimationFile.Create(skeletonFile), new AnimationPlayer());
+            var rootBoneIndex = skeleton.BoneNames.FindIndex(x => string.Equals(x, "animroot", StringComparison.OrdinalIgnoreCase));
+            if (rootBoneIndex < 0)
+                throw new Exception($"The skeleton '{skeletonName}' has no animroot bone");
+
+            return FreezeToBytes(animationFile, skeleton, rootBoneIndex);
+        }
+
+        byte[]? FreezeToBytes(AnimationFile animationFile, GameSkeleton skeleton, int rootBoneIndex)
+        {
+            var clip = new AnimationClip(animationFile, skeleton);
             if (!_freezeRootBoneCommand.Execute(clip, rootBoneIndex, "animroot", out var frozenClip) || frozenClip == null)
                 return null;
 
-            var frozenFile = frozenClip.ConvertToFileFormat(skeleton);
-            var frozenBytes = AnimationFile.ConvertToBytes(frozenFile);
-            var newPath = BuildCampaignAnimationPath(sourcePath);
-            return new PendingAnimationWrite(newPath, frozenBytes);
+            return AnimationFile.ConvertToBytes(frozenClip.ConvertToFileFormat(skeleton));
         }
 
         /// <summary>Mirrors vanilla's convention of nesting a campaign derivative under a "campaign"

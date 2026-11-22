@@ -16,7 +16,6 @@
         AnimationRetarget_Editor,
         Texture_Editor,
         AnimationKeyFrame_Editor,
-        CampaginAnimation_Editor,
         AnimationPack_Editor,
         AudioExplorer_Editor,
         Audio_Editor,

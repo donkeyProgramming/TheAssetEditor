@@ -5,6 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:sys="clr-namespace:System;assembly=System.Runtime"
              xmlns:conv="clr-namespace:Shared.Ui.Common.ValueConverters;assembly=Shared.Ui"
+             xmlns:loc="clr-namespace:Shared.Ui.Common;assembly=Shared.Ui"
              xmlns:local="clr-namespace:Editors.CampaignAnimationSetEditor.Views"
              xmlns:services="clr-namespace:Editors.CampaignAnimationSetEditor.Services"
              mc:Ignorable="d"
@@ -55,6 +56,10 @@
             <Separator/>
             <Button Command="{Binding GenerateFromBattleSetCommand}" Padding="10,5" Height="44">
                 <TextBlock Text="Generate from Battle Animation Set" TextWrapping="Wrap" TextAlignment="Center" Width="120"/>
+            </Button>
+            <Button Command="{Binding FreezeAnimRootInAnimationCommand}" Padding="10,5" Height="44"
+                    ToolTip="{loc:Loc CampaignAnimationSetEditor.FreezeAnimRoot.Tooltip}">
+                <TextBlock Text="{loc:Loc CampaignAnimationSetEditor.FreezeAnimRoot}" TextWrapping="Wrap" TextAlignment="Center" Width="100"/>
             </Button>
             <Separator/>
             <StackPanel Orientation="Vertical" VerticalAlignment="Center" Margin="5,0">
