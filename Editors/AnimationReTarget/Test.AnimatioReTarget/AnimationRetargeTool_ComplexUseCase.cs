@@ -99,7 +99,7 @@ namespace Test.AnimatioReTarget
             var count1 = SkeletonBoneNodeHelper.CountMappedBones(editor.BoneManager.Bones);
 
             Assert.That(count0, Is.EqualTo(0));
-            Assert.That(count1, Is.EqualTo(57));
+            Assert.That(count1, Is.EqualTo(64));   // humanoid01e bones mapped by name; 57 when the tree was wrongly built from the source
         }
 
         private void Step4_GenerateAnimation(AssetEditorTestRunner runner, AnimationRetargetEditor editor)
@@ -114,7 +114,7 @@ namespace Test.AnimatioReTarget
         {
             Assert.That(outputPackFile.GetFileCount(), Is.EqualTo(0));
 
-            var bone = SkeletonBoneNodeHelper.GetNodeFromName("skirt_back_0", editor.BoneManager.Bones);
+            var bone = SkeletonBoneNodeHelper.GetNodeFromName("skirt_back_left_0", editor.BoneManager.Bones);   // a target (humanoid01e) bone
             bone.TranslationOffset.X.Value = 10;
 
             editor.UpdateAnimation();
