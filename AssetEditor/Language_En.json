@@ -244,8 +244,6 @@
   "ReferenceModel.SceneObject.MetaFile": "Meta File",
   "ReferenceModel.SceneObject.PersistMetaFile": "Persist Meta File",
 
-  "EditorHost.Menu.General": "General",
-  "EditorHost.Menu.SaveShortcutFile": "Save shortcut file",
   "EditorHost.Menu.Camera": "Camera",
   "EditorHost.Menu.FocusSelection": "Focus Selection",
   "EditorHost.Menu.Reset": "Reset",
@@ -537,9 +535,7 @@
   "AnimationReTarget.Save.SavePrefix": "Save Prefix",
   "AnimationReTarget.Save.Format": "Format:",
   "AnimationReTarget.Save.UseGeneratedSkeleton": "Use generated skeleton",
-  "AnimationReTarget.Save.ExportScaledMesh": "Export Mesh/skeleton at scale",
   "AnimationReTarget.Save.Save": "Save",
-  "AnimationReTarget.Save.BatchExport": "Batch export",
   "AnimationReTarget.Save.Close": "Close",
   "AnimationReTarget.SelectedBone.SettingsForSelectedBone": "Settings for selected Bone: ",
   "AnimationReTarget.SelectedBone.TranslationOffset": "Translation offset",

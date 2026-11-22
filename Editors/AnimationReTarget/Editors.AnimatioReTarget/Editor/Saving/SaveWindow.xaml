@@ -29,15 +29,11 @@
             <Label Content="{loc:Loc AnimationReTarget.Save.UseGeneratedSkeleton}" Width ="{StaticResource labelWidth}"/>
             <Label Content=":"/>
             <CheckBox VerticalContentAlignment="Center" IsChecked="{Binding UseScaledSkeletonName, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
-            <Button Content="{loc:Loc AnimationReTarget.Save.ExportScaledMesh}" Command="{Binding ExportScaledMesh}"  DockPanel.Dock="Right" Margin="2"/>
             <TextBox Text="{Binding ScaledSkeletonName, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" VerticalAlignment="Center"/>
         </DockPanel>
 
         <DockPanel>
             <Button Click="SaveButtonClick">{loc:Loc AnimationReTarget.Save.Save}</Button>
-        </DockPanel>
-        <DockPanel IsEnabled="False">
-            <Button>{loc:Loc AnimationReTarget.Save.BatchExport}</Button>
         </DockPanel>
         <DockPanel>
             <Button Click="CloseButtonClick">{loc:Loc AnimationReTarget.Save.Close}</Button>

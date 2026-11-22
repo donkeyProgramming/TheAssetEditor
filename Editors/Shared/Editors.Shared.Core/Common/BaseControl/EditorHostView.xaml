@@ -28,9 +28,6 @@
         </Grid.RowDefinitions>
 
         <Menu Grid.Row="1" Grid.Column="0">
-            <MenuItem Header="{loc:Loc EditorHost.Menu.General}" IsEnabled="False">
-                <MenuItem Header="{loc:Loc EditorHost.Menu.SaveShortcutFile}" />
-            </MenuItem>
             <MenuItem Header="{loc:Loc EditorHost.Menu.Camera}">
                 <MenuItem Header="{loc:Loc EditorHost.Menu.FocusSelection}" Command="{Binding FocusCameraCommand}"/>
                 <MenuItem Header="{loc:Loc EditorHost.Menu.Reset}" Command="{Binding ResetCameraCommand}"/>

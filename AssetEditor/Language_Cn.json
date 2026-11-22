@@ -244,8 +244,6 @@
   "ReferenceModel.SceneObject.MetaFile": "元文件",
   "ReferenceModel.SceneObject.PersistMetaFile": "持久元文件",
 
-  "EditorHost.Menu.General": "常规",
-  "EditorHost.Menu.SaveShortcutFile": "保存快捷方式文件",
   "EditorHost.Menu.Camera": "相机",
   "EditorHost.Menu.FocusSelection": "聚焦选中项",
   "EditorHost.Menu.Reset": "重置",
@@ -537,9 +535,7 @@
   "AnimationReTarget.Save.SavePrefix": "保存前缀",
   "AnimationReTarget.Save.Format": "格式:",
   "AnimationReTarget.Save.UseGeneratedSkeleton": "使用生成的 Skeleton",
-  "AnimationReTarget.Save.ExportScaledMesh": "按比例导出 Mesh/Skeleton",
   "AnimationReTarget.Save.Save": "保存",
-  "AnimationReTarget.Save.BatchExport": "批量导出",
   "AnimationReTarget.Save.Close": "关闭",
   "AnimationReTarget.SelectedBone.SettingsForSelectedBone": "选中骨骼设置: ",
   "AnimationReTarget.SelectedBone.TranslationOffset": "位移偏移",
