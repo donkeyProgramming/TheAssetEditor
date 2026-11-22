@@ -164,6 +164,11 @@ namespace GameWorld.Core.Components.Selection
                     _commandFactory.CreateWithBuilder<BoneSelectionCommand>().Configure(x => x.Configure(bones, isSelectionModification, removeSelection)).BuildAndExecute();
                     return;
                 }
+
+                // A box around no joints clears the bones, as a click on nothing does, and stays in bone mode
+                if (!isSelectionModification && !removeSelection && boneState.SelectionCount() != 0)
+                    _commandFactory.CreateWithBuilder<BoneSelectionCommand>().Configure(x => x.Configure(new List<int>(), false, false)).BuildAndExecute();
+                return;
             }
 
             var selectedObjects = _sceneManger.SelectObjects(unprojectedSelectionRect);
@@ -202,6 +207,19 @@ namespace GameWorld.Core.Components.Selection
                     _commandFactory.CreateWithBuilder<VertexSelectionCommand>().Configure(x => x.Configure(new List<int>() { selecteVert }, isSelectionModification, removeSelection)).BuildAndExecute();
                     return;
                 }
+            }
+
+            // Bone mode stays on whatever is clicked: a joint selects its bone, anything else clears the bones
+            if (currentState is BoneSelectionState boneState && boneState.RenderObject is Rmv2MeshNode boneMesh && boneState.CurrentAnimation != null)
+            {
+                var viewProjection = _camera.ViewMatrix * _camera.ProjectionMatrix;
+                var viewport = _deviceResolverComponent.Device.Viewport;
+                if (IntersectionMath.IntersectBone(mousePosition, boneMesh, boneState.Skeleton, boneMesh.RenderMatrix,
+                    viewProjection, viewport.Width, viewport.Height, out var selectedBone) != null)
+                    _commandFactory.CreateWithBuilder<BoneSelectionCommand>().Configure(x => x.Configure(new List<int>() { selectedBone }, isSelectionModification, removeSelection)).BuildAndExecute();
+                else if (!isSelectionModification && !removeSelection && boneState.SelectionCount() != 0)
+                    _commandFactory.CreateWithBuilder<BoneSelectionCommand>().Configure(x => x.Configure(new List<int>(), false, false)).BuildAndExecute();
+                return;
             }
 
             // Pick object

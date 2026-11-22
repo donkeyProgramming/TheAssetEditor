@@ -60,6 +60,45 @@ namespace GameWorld.Core.Utility
             return bestDist;
         }
 
+        // The bone whose animated joint is nearest the mouse on screen, within the same distance as IntersectVertex
+        public static float? IntersectBone(Vector2 mouseScreenPos, Rmv2MeshNode sceneNode, GameSkeleton skeleton, Matrix modelMatrix,
+            Matrix viewProjection, float viewportWidth, float viewportHeight, out int selectedBone)
+        {
+            selectedBone = -1;
+            var currentFrame = sceneNode.AnimationPlayer?.GetCurrentAnimationFrame();
+            if (currentFrame == null || skeleton == null)
+                return null;
+
+            const float pixelThreshold = 25.0f;
+            var bestDist = float.MaxValue;
+
+            for (var boneIdx = 0; boneIdx < currentFrame.BoneTransforms.Count; boneIdx++)
+            {
+                var worldPos = Vector3.Transform(currentFrame.GetSkeletonAnimatedWorld(skeleton, boneIdx).Translation, modelMatrix);
+                var clipPos = Vector4.Transform(new Vector4(worldPos, 1.0f), viewProjection);
+                if (clipPos.W <= 0.0f)
+                    continue;
+
+                var invW = 1.0f / clipPos.W;
+                var screenX = (clipPos.X * invW + 1.0f) * 0.5f * viewportWidth;
+                var screenY = (1.0f - clipPos.Y * invW) * 0.5f * viewportHeight;
+                var dist = MathF.Abs(screenX - mouseScreenPos.X) + MathF.Abs(screenY - mouseScreenPos.Y);
+                if (dist < bestDist)
+                {
+                    bestDist = dist;
+                    selectedBone = boneIdx;
+                }
+            }
+
+            if (selectedBone == -1 || bestDist > pixelThreshold)
+            {
+                selectedBone = -1;
+                return null;
+            }
+
+            return bestDist;
+        }
+
         public static float? IntersectFace(Ray ray, MeshObject geometry, Matrix matrix, out int? face)
         {
             face = null;
