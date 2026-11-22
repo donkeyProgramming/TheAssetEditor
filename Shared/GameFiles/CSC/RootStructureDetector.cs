@@ -33,6 +33,10 @@ namespace Shared.GameFormats.Csc;
 ///   v3 (464 files):  + Ascii                                                              (4 fields, same length as v2)
 ///   v4 (255 files):  + F32, Ascii, U32                                                    (7 fields)
 ///   v5 (738 files):  + Coord3d, Coord3d, F32                                              (10 fields)
+///   v6 (329 files, newer than the counts above): + F32, Bool                              (12 fields)
+///     The two new fields' meaning is unknown: the F32 is 1 and the Bool false in 313 of 329 vanilla
+///     files (0.75/true and 1/true in 8 each). They are kept as read; the field kinds are checked so a
+///     later layout isn't mistaken for this one.
 ///
 /// ElementGroup's ELEMENT record carries its own leading U32 as a per-ROOT element id (field
 /// index 0, all versions) - confirmed by cross-referencing the attachment tree below, where
@@ -72,7 +76,15 @@ public static class RootStructureDetector
         [3] = 4,
         [4] = 7,
         [5] = 10,
+        [6] = 12,
     };
+
+    private static readonly EsfNodeKind[] Version6HeaderKinds =
+    [
+        EsfNodeKind.F32, EsfNodeKind.Coord3d, EsfNodeKind.F32, EsfNodeKind.Ascii,
+        EsfNodeKind.F32, EsfNodeKind.Ascii, EsfNodeKind.U32, EsfNodeKind.Coord3d,
+        EsfNodeKind.Coord3d, EsfNodeKind.F32, EsfNodeKind.F32, EsfNodeKind.Bool,
+    ];
 
     public sealed record ElementGroupInfo(int StartIndex, int FieldCount, string Label, IReadOnlyList<EsfNode> Records);
 
@@ -96,6 +108,9 @@ public static class RootStructureDetector
     public static StructureInfo? Detect(IReadOnlyList<EsfNode> siblings, byte version)
     {
         if (!HeaderLengthByVersion.TryGetValue(version, out var headerLength))
+            return null;
+
+        if (version == 6 && !siblings.Take(headerLength).Select(field => field.Kind).SequenceEqual(Version6HeaderKinds))
             return null;
 
         var i = headerLength;
