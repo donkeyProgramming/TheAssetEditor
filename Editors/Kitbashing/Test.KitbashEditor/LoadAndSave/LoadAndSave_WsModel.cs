@@ -28,7 +28,7 @@ namespace Test.KitbashEditor.LoadAndSave
         {
             var runner = new AssetEditorTestRunner();
             runner.CreateCaContainer();
-            var outputPackFile = runner.LoadPackFile(TestFiles.KarlPackFile, true);
+            var outputPackFile = runner.LoadPackFile(TestFiles.KarlPackFile, true, loadAsGamePack: true);
 
             // Load the a rmv2 and open the kitbash editor
             var originalRmv2File = runner.PackFileService.FindFile(TestFiles.RmvFilePathKarl);
@@ -105,7 +105,7 @@ namespace Test.KitbashEditor.LoadAndSave
         {
             var runner = new AssetEditorTestRunner();
             runner.CreateCaContainer();
-            var outputPackFile = runner.LoadPackFile(TestFiles.KarlPackFile, true)!;
+            var outputPackFile = runner.LoadPackFile(TestFiles.KarlPackFile, true, loadAsGamePack: true)!;
 
             var vanillaContent = ReadFile(runner, KarlBodyMaterial);
             var tunedContent = Regex.Replace(vanillaContent, @"(<shader>[^<]*)\.xml\.shader</shader>", "$1_hair.xml.shader</shader>");

@@ -81,8 +81,10 @@ namespace GameWorld.Core.Rendering.Materials.Serialization
                 return false;
 
             var container = _packFileService.GetPackFileContainer(file);
-            return container != null && (container.IsCaPackFile || container == _packFileService.GetEditablePack());
+            return container != null && CanReferenceFrom(container);
         }
+
+        bool CanReferenceFrom(IPackFileContainer container) => container.IsCaPackFile || container == _packFileService.GetEditablePack();
 
         // Whether the file the game would read at the path has this content, ignoring the name and whitespace
         public bool HoldsMaterial(string wsMaterialPath, string wsMaterialContent)
@@ -146,6 +148,10 @@ namespace GameWorld.Core.Rendering.Materials.Serialization
             var seenPaths = new HashSet<string>();
             for (var i = containers.Count - 1; i >= 0; i--)
             {
+                // Reusing a file from any other pack would make the mod depend on it
+                if (CanReferenceFrom(containers[i]) == false)
+                    continue;
+
                 var materialPacks = PackFileServiceUtility.FindAllWithExtentionIncludePaths(_packFileService, ".material", containers[i]);
                 foreach (var (fileName, pack) in materialPacks.Where(x => x.Pack.Name.Contains(".xml.material")))
                 {

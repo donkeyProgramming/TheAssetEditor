@@ -1,4 +1,4 @@
-using System.Text;
+﻿using System.Text;
 using System.Text.RegularExpressions;
 using GameWorld.Core.Rendering.Materials;
 using GameWorld.Core.Rendering.Materials.Capabilities;
@@ -240,6 +240,34 @@ namespace GameWorld.Core.Test.Services.SceneSaving
 
             Assert.That(_pfs.FindFile(vanillaPath, _editablePack), Is.Null);
             Assert.That(GetBaseColour(ElephantModel), Is.EqualTo("textures/elephant_skin.dds"));
+        }
+
+        [Test]
+        public void IdenticalMaterialInAnotherPack_IsNotReused()
+        {
+            // Another mod ships exactly what this save would write, at its own path
+            var material = CreateMaterial("textures/elephant_skin.dds");
+            var (fileName, content) = GenerateMaterialFile("other_shield", UiVertexFormat.Weighted, material);
+            AddToReadOnlyPack(_otherPack, "variantmeshes/other_mod/materials", PackFile.CreateFromASCII(fileName, content));
+
+            Save(ElephantModel, ("shield", material));
+
+            var materialPath = GetMaterialPath(ElephantModel, 0);
+            Assert.That(materialPath.Replace('\\', '/'), Does.StartWith(ModelFolder));
+            Assert.That(_pfs.FindFile(materialPath, _editablePack), Is.Not.Null);
+        }
+
+        [Test]
+        public void IdenticalVanillaMaterial_IsReused()
+        {
+            var material = CreateMaterial("textures/elephant_skin.dds");
+            var (fileName, content) = GenerateMaterialFile("karl_shield", UiVertexFormat.Weighted, material);
+            AddToReadOnlyPack(_vanillaPack, VanillaMaterialFolder, PackFile.CreateFromASCII(fileName, content));
+
+            Save(ElephantModel, ("shield", material));
+
+            Assert.That(GetMaterialPath(ElephantModel, 0).Replace('\\', '/'), Is.EqualTo(VanillaMaterialFolder + "/" + fileName));
+            Assert.That(_editablePack.GetFileCount(), Is.EqualTo(1)); // only the wsmodel
         }
 
         // Materials loaded from a file, and left alone, keep that file
