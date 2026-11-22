@@ -12,7 +12,7 @@ namespace GameWorld.Core.Rendering.Materials.Serialization
         bool TryGetExistingMaterial(string wsMaterialContent, out string wsMaterialPath);
         void AddMaterial(string wsMaterialContent, string wsMaterialPath);
         bool CanWriteMaterial(string wsMaterialPath, string ownerWsModelPath);
-        bool MaterialExists(string wsMaterialPath);
+        bool CanReferenceMaterial(string wsMaterialPath);
         bool HoldsMaterial(string wsMaterialPath, string wsMaterialContent);
     }
 
@@ -72,7 +72,17 @@ namespace GameWorld.Core.Rendering.Materials.Serialization
             return users.All(x => x == owner);
         }
 
-        public bool MaterialExists(string wsMaterialPath) => _packFileService.FindFile(wsMaterialPath) != null;
+        // Whether a wsmodel in the editable pack can point at the file without copying it: it ships in that pack or with the game.
+        // A file from any other pack (another mod, another game's packs opened for porting) may not be there when the mod is used.
+        public bool CanReferenceMaterial(string wsMaterialPath)
+        {
+            var file = _packFileService.FindFile(wsMaterialPath);
+            if (file == null)
+                return false;
+
+            var container = _packFileService.GetPackFileContainer(file);
+            return container != null && (container.IsCaPackFile || container == _packFileService.GetEditablePack());
+        }
 
         // Whether the file the game would read at the path has this content, ignoring the name and whitespace
         public bool HoldsMaterial(string wsMaterialPath, string wsMaterialContent)

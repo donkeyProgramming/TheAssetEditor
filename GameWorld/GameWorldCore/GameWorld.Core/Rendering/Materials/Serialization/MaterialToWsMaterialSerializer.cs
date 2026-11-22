@@ -53,7 +53,7 @@ namespace GameWorld.Core.Rendering.Materials.Serialization
         public string? ReserveLoadedMaterial(string meshName, UiVertexFormat meshVertexFormat, CapabilityMaterial material)
         {
             var loadedFrom = material.LoadedFrom;
-            if (loadedFrom == null || _repository.MaterialExists(loadedFrom.Path) == false)
+            if (loadedFrom == null || _repository.CanReferenceMaterial(loadedFrom.Path) == false)
                 return null;
 
             // Compare what would be written, not the file: it can hold shaders and params the template has no place for

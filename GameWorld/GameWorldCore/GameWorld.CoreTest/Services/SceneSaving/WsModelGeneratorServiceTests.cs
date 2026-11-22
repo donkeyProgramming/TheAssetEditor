@@ -29,6 +29,7 @@ namespace GameWorld.Core.Test.Services.SceneSaving
         readonly GameTypeEnum _game = GameTypeEnum.Warhammer3;
         IPackFileService _pfs;
         IPackFileContainer _vanillaPack;
+        IPackFileContainer _otherPack;
         IPackFileContainer _editablePack;
         FileSaveService _saveService;
         WsModelGeneratorService _generator;
@@ -42,6 +43,9 @@ namespace GameWorld.Core.Test.Services.SceneSaving
         {
             _pfs = new PackFileService(null);
             _vanillaPack = _pfs.CreateNewPackFileContainer("vanilla", PackFileVersion.PFH5, PackFileCAType.RELEASE, false);
+            _vanillaPack.IsCaPackFile = true;
+            _otherPack = _pfs.CreateNewPackFileContainer("other_mod", PackFileVersion.PFH5, PackFileCAType.MOD, false);
+            _otherPack.IsReadOnly = true;
             _editablePack = _pfs.CreateNewPackFileContainer("output", PackFileVersion.PFH5, PackFileCAType.MOD, true);
 
             _saveService = new FileSaveService(_pfs, null, MockScopedLogger.Create());
@@ -87,13 +91,22 @@ namespace GameWorld.Core.Test.Services.SceneSaving
             return tuned;
         }
 
-        // A vanilla material with a shader the template would not write
-        string AddVanillaMaterial(string meshName, string baseColourTexture, UiVertexFormat vertexFormat = UiVertexFormat.Weighted)
+        // Adds a file to a pack loaded read-only (the game's, or one opened for reference)
+        void AddToReadOnlyPack(IPackFileContainer pack, string folder, PackFile file)
+        {
+            var isCaPackFile = pack.IsCaPackFile;
+            pack.IsCaPackFile = false;
+            pack.IsReadOnly = false;
+            _pfs.AddFilesToPack(pack, [new NewPackFileEntry(folder, file)]);
+            pack.IsReadOnly = true;
+            pack.IsCaPackFile = isCaPackFile;
+        }
+
+        // A material with a shader the template would not write, in the game's packs or another read-only pack
+        string AddVanillaMaterial(string meshName, string baseColourTexture, UiVertexFormat vertexFormat = UiVertexFormat.Weighted, IPackFileContainer? pack = null)
         {
             var (fileName, content) = GenerateMaterialFile(meshName, vertexFormat, CreateMaterial(baseColourTexture));
-            _vanillaPack.IsReadOnly = false;
-            _pfs.AddFilesToPack(_vanillaPack, [new NewPackFileEntry(VanillaMaterialFolder, PackFile.CreateFromASCII(fileName, HandTune(content)))]);
-            _vanillaPack.IsReadOnly = true;
+            AddToReadOnlyPack(pack ?? _vanillaPack, VanillaMaterialFolder, PackFile.CreateFromASCII(fileName, HandTune(content)));
             return VanillaMaterialFolder + "/" + fileName;
         }
 
@@ -220,8 +233,7 @@ namespace GameWorld.Core.Test.Services.SceneSaving
             var vanillaFileName = template.AddTemplateHeader("shield", UiVertexFormat.Weighted, vanillaMaterial);
             foreach (var cap in vanillaMaterial.Capabilities)
                 cap.SerializeToWsModel(template);
-            _pfs.AddFilesToPack(_vanillaPack, [new NewPackFileEntry(ModelFolder + "materials", PackFile.CreateFromASCII(vanillaFileName, template.GetCompletedMaterialString()))]);
-            _vanillaPack.IsReadOnly = true;
+            AddToReadOnlyPack(_vanillaPack, ModelFolder + "materials", PackFile.CreateFromASCII(vanillaFileName, template.GetCompletedMaterialString()));
             var vanillaPath = ModelFolder + "materials/" + vanillaFileName;
 
             Save(ElephantModel, ("shield", CreateMaterial("textures/elephant_skin.dds")));
@@ -256,6 +268,23 @@ namespace GameWorld.Core.Test.Services.SceneSaving
             Assert.That(GetMaterialPath(ElephantModel, 0), Is.EqualTo(vanillaPath));
             Assert.That(GetShader(ElephantModel), Is.EqualTo("shaders/weighted2_character_hair.xml.shader"));
             Assert.That(_editablePack.GetFileCount(), Is.EqualTo(1)); // only the wsmodel
+        }
+
+        [Test]
+        public void OtherPacksMaterial_Unchanged_IsGeneratedIntoTheMod()
+        {
+            // Another mod, or another game's pack opened to port from: the file may not be there when this mod is used
+            var otherPath = AddVanillaMaterial("karl_body", "textures/karl_body.dds", pack: _otherPack);
+            var otherContent = ReadFile(otherPath);
+
+            Save(ElephantModel, ("shield", LoadMaterial(otherPath)));
+
+            var materialPath = GetMaterialPath(ElephantModel, 0);
+            Assert.That(materialPath, Is.Not.EqualTo(otherPath));
+            Assert.That(_pfs.FindFile(materialPath, _editablePack), Is.Not.Null);
+            Assert.That(GetShader(ElephantModel), Is.EqualTo("shaders/weighted2_character.xml.shader"));
+            Assert.That(GetBaseColour(ElephantModel), Is.EqualTo("textures/karl_body.dds"));
+            Assert.That(ReadFile(otherPath), Is.EqualTo(otherContent));
         }
 
         [Test]
