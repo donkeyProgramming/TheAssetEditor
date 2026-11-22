@@ -78,6 +78,35 @@
     </p>
     <img src="Images\AssetEditor_packfilewithchanges.png">
 
+    <h2>Editing .pack files directly (advanced)</h2>
+    <p>
+        If you would rather edit a .pack in place, for example because you also work on it in RPFM, turn on <b>Settings &rarr; Pack files &rarr; Edit .pack files directly</b>.
+        You are asked to confirm first: you are responsible for any pack you edit this way. Restart AssetEditor afterwards.<br />
+        The File menu then has <b>Open Pack (edit directly)...</b> and <b>New Pack (edit directly)...</b>.
+        The status bar shows "Active pack (editing .pack directly)" and which game's rules a save follows.
+    </p>
+    <p>
+        Edits stay in AssetEditor until you save the pack (File &rarr; Save active pack, or right-click the pack &rarr; Save).
+        Files you didn't edit are written back exactly as they were stored. A pack AssetEditor can't write back safely
+        (encrypted, PFH6, an extended header, or the same file path listed twice) opens read-only, with a message saying why.
+    </p>
+
+    <h3>Working alongside RPFM</h3>
+    <p>
+        If the pack is saved in RPFM while it is open in AssetEditor, AssetEditor notices when you switch back to it and offers to reload it.
+        Your unsaved edits in AssetEditor are kept on top of the new version; renames and deletions you haven't saved are undone.
+        Until it is reloaded, AssetEditor won't open or save files from that pack. You can also reload at any time: right-click the pack &rarr; <b>Reload from disk</b>.<br />
+        If RPFM also has the pack open, reload it there after saving in AssetEditor, so RPFM doesn't later save its older copy over your changes.
+    </p>
+
+    <h3>Backups</h3>
+    <p>
+        Each time a pack is opened for editing (and each time it is reloaded), AssetEditor copies it to an <b>AssetEditorBackups</b> folder next to the pack,
+        replacing the previous copy. For a mod in the game's data folder that is <b>data\AssetEditorBackups\mymod.pack</b>.
+        To restore it, close the pack and copy the backup back over it.<br />
+        Backups are on by default. Turning them off (Settings &rarr; Pack files) asks you to confirm again, and the status bar then says "no backup".
+    </p>
+
     <h3>Best practises</h3>
     <p>It is recommended to use a version control system like GIT to keep track of changes in your project. This allows you to easily revert changes, collaborate with others, and maintain a history of your project.Its easy to configure and makes the modding process much safer and enjoyable. </p>
 
@@ -86,6 +115,7 @@
     <ul>
         <li><b>Cannot edit</b> - Verify selected root is writable and set as editable.</li>
         <li><b>Save fails</b> - Check file lock (game/tool/antivirus) on target file.</li>
+        <li><b>"was changed on disk by another program"</b> - The pack was saved by another tool after AssetEditor opened it. Right-click the pack &rarr; Reload from disk.</li>
         <li><b>Wrong output version</b> - Check project game version setting.</li>
         <li><b>Missing file after save</b> - Check ignored files list and normalized path.</li>
         <li>
