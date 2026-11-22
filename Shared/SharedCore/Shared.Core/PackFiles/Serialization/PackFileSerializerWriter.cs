@@ -20,7 +20,7 @@ namespace Shared.Core.PackFiles.Serialization
     }
 
     // The data source a saved file should read from once the new pack is in place
-    record PackFileSourceUpdate(PackFile PackFile, PackedFileSource NewSource);
+    record PackFileSourceUpdate(PackFile PackFile, string Path, PackedFileSource NewSource);
 
     static class PackFileSerializerWriter
     {
@@ -69,6 +69,7 @@ namespace Shared.Core.PackFiles.Serialization
             var fileMetaDataTable = BuildMetaDataTable(sortedFiles, container, currentGameInformation);
             SerializeFileTable(fileMetaDataTable, container, writer);
             var sourceUpdates = SerializeFileBlob(outputFileName, fileMetaDataTable, writer);
+            VerifyWrittenPack(outputFileName, writer, sourceUpdates);
 
             if (enableCorruptionDetection)
                 ValidateCorruptionDetectionFiles(outputFileName, writer);
@@ -76,6 +77,46 @@ namespace Shared.Core.PackFiles.Serialization
             stopWatch.Stop();
             _logger.Here().Information("Saving packfile {PackFileName} completed in {ElapsedMilliseconds} ms", packFileName, stopWatch.ElapsedMilliseconds);
             return sourceUpdates;
+        }
+
+        // Reads back the index just written and checks it lists exactly the files written, at the offsets
+        // and sizes they were written with, all inside the file. Only the index is read, so it is cheap,
+        // and unlike the corruption detection files it adds nothing to the pack.
+        internal static void VerifyWrittenPack(string outputFileName, BinaryWriter writer, IReadOnlyList<PackFileSourceUpdate> written)
+        {
+            writer.Flush();
+            var stream = writer.BaseStream;
+            if (!stream.CanRead || !stream.CanSeek)
+                throw new InvalidOperationException("Verifying a saved pack requires a readable, seekable output stream.");
+
+            var originalPosition = stream.Position;
+            PackFileContainer readBack;
+            try
+            {
+                stream.Position = 0;
+                using var reader = new BinaryReader(stream, Encoding.UTF8, leaveOpen: true);
+                readBack = PackFileSerializerLoader.Load(outputFileName, stream.Length, reader, new CaPackDuplicateFileResolver());
+            }
+            catch (Exception e)
+            {
+                throw new InvalidDataException($"The saved pack could not be read back, so it was not used: {e.Message}", e);
+            }
+            finally
+            {
+                stream.Position = originalPosition;
+            }
+
+            if (readBack.GetFileCount() != written.Count)
+                throw new InvalidDataException($"The saved pack lists {readBack.GetFileCount()} files but {written.Count} were written, so it was not used.");
+
+            foreach (var file in written)
+            {
+                if (readBack.FindFile(file.Path)?.DataSource is not PackedFileSource entry)
+                    throw new InvalidDataException($"The saved pack is missing '{file.Path}', so it was not used.");
+
+                if (entry.Offset != file.NewSource.Offset || entry.Size != file.NewSource.Size || entry.Offset + entry.Size > stream.Length)
+                    throw new InvalidDataException($"The saved pack's entry for '{file.Path}' does not match the data written, so it was not used.");
+            }
         }
 
         private static bool IsCorruptionDetectionFile(string relativePath)
@@ -375,7 +416,7 @@ namespace Shared.Core.PackFiles.Serialization
                     shouldCompress,
                     fileMetaData.CompressionInfo.IntendedCompressionFormat,
                     uncompressedSize);
-                sourceUpdates.Add(new PackFileSourceUpdate(packFile, newSource));
+                sourceUpdates.Add(new PackFileSourceUpdate(packFile, fileMetaData.FullFileName, newSource));
             }
 
             _logger.Here().Information("Finished SerializeFileBlob");

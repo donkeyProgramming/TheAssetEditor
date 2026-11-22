@@ -189,6 +189,50 @@ namespace Shared.CoreTest.PackFiles.Serialization
 
         }
 
+        private const string VerifyPackName = @"c:\fullpath\to\verify.pack";
+
+        private static (MemoryStream Stream, BinaryWriter Writer, IReadOnlyList<PackFileSourceUpdate> Written) WriteSmallPack()
+        {
+            var container = PackFileContainer.CreatePackFile("test", "test.pack", PackFileVersion.PFH5);
+            container.AddOrUpdateFile(@"db\units_tables\mymod", PackFile.CreateFromASCII("mymod", new string('D', 300)));
+            container.AddOrUpdateFile(@"variantmeshes\unit.rigid_model_v2", PackFile.CreateFromASCII("unit.rigid_model_v2", new string('M', 300)));
+
+            var stream = new MemoryStream();
+            var writer = new BinaryWriter(stream);
+            var written = PackFileSerializerWriter.SaveToByteArray(VerifyPackName, container, writer, GameInformationDatabase.GetGameById(GameTypeEnum.Warhammer3));
+            return (stream, writer, written);
+        }
+
+        [Test]
+        public void VerifyWrittenPack_TruncatedOutput_Throws()
+        {
+            var (stream, writer, written) = WriteSmallPack();
+            stream.SetLength(stream.Length - 4);
+
+            Assert.Throws<InvalidDataException>(() => PackFileSerializerWriter.VerifyWrittenPack(VerifyPackName, writer, written));
+        }
+
+        [Test]
+        public void VerifyWrittenPack_IndexDisagreesWithWrittenData_Throws()
+        {
+            var (_, writer, written) = WriteSmallPack();
+            var first = written[0].NewSource;
+            var shifted = written
+                .Select((x, i) => i == 0 ? x with { NewSource = new PackedFileSource(first.Parent, first.Offset + 1, first.Size, false, first.IsCompressed, first.CompressionFormat, first.UncompressedSize) } : x)
+                .ToList();
+
+            Assert.Throws<InvalidDataException>(() => PackFileSerializerWriter.VerifyWrittenPack(VerifyPackName, writer, shifted));
+        }
+
+        [Test]
+        public void VerifyWrittenPack_FileMissingFromIndex_Throws()
+        {
+            var (_, writer, written) = WriteSmallPack();
+            var withExtra = written.Append(written[0] with { Path = @"variantmeshes\not_written.wsmodel" }).ToList();
+
+            Assert.Throws<InvalidDataException>(() => PackFileSerializerWriter.VerifyWrittenPack(VerifyPackName, writer, withExtra));
+        }
+
         private static PackFileContainer LoadFromMemory(string outputContainerName, byte[] data)
         {
             using var readMs = new MemoryStream(data);
