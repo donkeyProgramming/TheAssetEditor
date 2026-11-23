@@ -8,6 +8,7 @@ using System.Windows.Media;
 using Editors.CscEditor.Data;
 using Shared.Core.Misc;
 using Shared.GameFormats.Esf;
+using Shared.Ui.Common.Timeline;
 
 namespace Editors.CscEditor.Views
 {
@@ -32,7 +33,7 @@ namespace Editors.CscEditor.Views
     /// </summary>
     public class CurveEditorControl : FrameworkElement
     {
-        const double RulerHeight = 18;
+        const double RulerHeight = TimeAxis.RulerHeight;
         const double KeySize = 7;
         const double HitRadius = 8;
 
@@ -70,6 +71,18 @@ namespace Editors.CscEditor.Views
         public static readonly DependencyProperty ElementTimingModeProperty = DependencyProperty.Register(
             nameof(ElementTimingMode), typeof(string), typeof(CurveEditorControl),
             new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.AffectsRender));
+
+        static readonly DependencyPropertyKey ViewStartPropertyKey = DependencyProperty.RegisterReadOnly(
+            nameof(ViewStart), typeof(double), typeof(CurveEditorControl), new PropertyMetadata(0.0));
+        public static readonly DependencyProperty ViewStartProperty = ViewStartPropertyKey.DependencyProperty;
+
+        static readonly DependencyPropertyKey ViewEndPropertyKey = DependencyProperty.RegisterReadOnly(
+            nameof(ViewEnd), typeof(double), typeof(CurveEditorControl), new PropertyMetadata(1.0));
+        public static readonly DependencyProperty ViewEndProperty = ViewEndPropertyKey.DependencyProperty;
+
+        /// <summary>The time span last drawn (see <see cref="TimeRange"/>), so a control above can line up with it.</summary>
+        public double ViewStart => (double)GetValue(ViewStartProperty);
+        public double ViewEnd => (double)GetValue(ViewEndProperty);
 
         public ObservableCollection<CurveSeries>? SeriesSource
         {
@@ -228,21 +241,15 @@ namespace Editors.CscEditor.Views
             return (min, max);
         }
 
-        double TimeToX(double time)
+        TimeAxis Axis()
         {
             var (min, max) = TimeRange();
-            var span = max - min;
-            return span <= 0 ? 0 : (time - min) / span * ActualWidth;
+            return new TimeAxis(min, max, ActualWidth);
         }
 
-        double XToTime(double x)
-        {
-            var (min, max) = TimeRange();
-            var span = max - min;
-            if (ActualWidth <= 0 || span <= 0)
-                return min;
-            return min + Math.Clamp(x / ActualWidth, 0, 1) * span;
-        }
+        double TimeToX(double time) => Axis().TimeToX(time);
+
+        double XToTime(double x) => Axis().XToTime(x);
 
         double ValueToY(double value, (double Min, double Max) range)
         {
@@ -271,10 +278,14 @@ namespace Editors.CscEditor.Views
 
             var range = ValueRange();
             var timeRange = TimeRange();
+            if (ViewStart != timeRange.Min)
+                SetValue(ViewStartPropertyKey, timeRange.Min);
+            if (ViewEnd != timeRange.Max)
+                SetValue(ViewEndPropertyKey, timeRange.Max);
             DrawGrid(dc, range, timeRange);
             DrawOutOfBoundsShading(dc, timeRange);
             DrawAliveWindowShading(dc);
-            DrawRuler(dc, timeRange);
+            DrawRuler(dc, timeRange, ActualWidth);
 
             foreach (var series in VisibleSeries())
                 DrawSeries(dc, series, range, series == SelectedSeries);
@@ -283,8 +294,7 @@ namespace Editors.CscEditor.Views
                 DrawTangentHandles(dc, _selectedKeySeries, _selectedKey, range);
 
             // Timeline cursor.
-            var cursorX = TimeToX(CurrentTime);
-            dc.DrawLine(new Pen(Brushes.OrangeRed, 1.5), new Point(cursorX, 0), new Point(cursorX, ActualHeight));
+            Axis().DrawPlayhead(dc, CurrentTime, ActualHeight, Brushes.OrangeRed);
         }
 
         void DrawGrid(DrawingContext dc, (double Min, double Max) range, (double Min, double Max) timeRange)
@@ -370,17 +380,8 @@ namespace Editors.CscEditor.Views
             }
         }
 
-        void DrawRuler(DrawingContext dc, (double Min, double Max) timeRange)
-        {
-            var rulerBrush = new SolidColorBrush(Color.FromRgb(45, 45, 52));
-            dc.DrawRectangle(rulerBrush, null, new Rect(0, 0, ActualWidth, RulerHeight));
-
-            var textBrush = new SolidColorBrush(Color.FromRgb(170, 170, 180));
-            var timeStep = NiceStep(timeRange.Max - timeRange.Min, 10);
-            var startTime = Math.Floor(timeRange.Min / timeStep) * timeStep;
-            for (var t = startTime; t <= timeRange.Max + 0.001; t += timeStep)
-                DrawText(dc, t.ToString("0.##"), textBrush, new Point(TimeToX(t) + 2, 2), 10);
-        }
+        static void DrawRuler(DrawingContext dc, (double Min, double Max) timeRange, double width) =>
+            new TimeAxis(timeRange.Min, timeRange.Max, width).DrawRuler(dc);
 
         void DrawSeries(DrawingContext dc, CurveSeries series, (double Min, double Max) range, bool isSelected)
         {
@@ -491,24 +492,10 @@ namespace Editors.CscEditor.Views
             return geometry;
         }
 
-        static void DrawText(DrawingContext dc, string text, Brush brush, Point origin, double size)
-        {
-            var formatted = new FormattedText(
-                text, System.Globalization.CultureInfo.InvariantCulture, FlowDirection.LeftToRight,
-                new Typeface("Segoe UI"), size, brush, 1.0);
-            dc.DrawText(formatted, origin);
-        }
+        static void DrawText(DrawingContext dc, string text, Brush brush, Point origin, double size) =>
+            TimeAxis.DrawText(dc, text, brush, origin, size);
 
-        static double NiceStep(double span, int targetSteps)
-        {
-            if (span <= 0)
-                return 1;
-            var raw = span / targetSteps;
-            var magnitude = Math.Pow(10, Math.Floor(Math.Log10(raw)));
-            var normalized = raw / magnitude;
-            var nice = normalized < 1.5 ? 1 : normalized < 3.5 ? 2 : normalized < 7.5 ? 5 : 10;
-            return nice * magnitude;
-        }
+        static double NiceStep(double span, int targetSteps) => TimeAxis.NiceStep(span, targetSteps);
 
         // ---------------------------------------------------------------------
         // Interaction

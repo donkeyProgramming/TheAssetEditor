@@ -1,5 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using Editors.AnimationMeta.Presentation;
+using Editors.AnimationMeta.SuperView.Timeline;
 using Editors.AnimationMeta.SuperView.Visualisation;
 using Editors.Shared.Core.Common;
 using Editors.Shared.Core.Common.BaseControl;
@@ -10,8 +11,10 @@ using Shared.Core.Events.Scoped;
 using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Events;
 using Shared.Core.PackFiles.Models;
+using Shared.Core.Services;
 using Shared.Core.ToolCreation;
 using Shared.GameFormats.AnimationMeta.Parsing;
+using Shared.Ui.Common.Timeline;
 
 namespace Editors.AnimationMeta.SuperView
 {
@@ -26,6 +29,7 @@ namespace Editors.AnimationMeta.SuperView
         private readonly IEventHub _eventHub;
         private readonly IGlobalEventHub _globalEventHub;
         private readonly IUiCommandFactory _uiCommandFactory;
+        private readonly LocalizationManager _localizationManager;
 
         [ObservableProperty] string _persistentMetaFilePath = "";
         [ObservableProperty] string _metaFilePath = "";
@@ -62,7 +66,8 @@ namespace Editors.AnimationMeta.SuperView
             SceneObjectEditor sceneObjectBuilder,
             IEditorHostParameters editorHostParameters,
             MetaDataFileParser metaDataFileParser,
-            IMetaDataBuilder metaDataFactory)
+            IMetaDataBuilder metaDataFactory,
+            LocalizationManager localizationManager)
             : base(editorHostParameters)
         {
             DisplayName = "Super view";
@@ -73,6 +78,7 @@ namespace Editors.AnimationMeta.SuperView
             _sceneObjectBuilder = sceneObjectBuilder;
             _metaDataFileParser = metaDataFileParser;
             _metaDataFactory = metaDataFactory;
+            _localizationManager = localizationManager;
             Initialize();
             eventHub.Register<ScopedFileSavedEvent>(this, OnFileSaved);
             eventHub.Register<SceneObjectUpdateEvent>(this, OnSceneObjectUpdated);
@@ -98,9 +104,21 @@ namespace Editors.AnimationMeta.SuperView
             RecreateMetaDataInformation();
         }
 
-        private void OnSelectedMetaDataAttributeChanged(SelecteMetaDataAttributeChangedEvent @event) => RecreateMetaDataInformation();
-        void OnMetaDataAttributeChanged(MetaDataAttributeChangedEvent @event) => RecreateMetaDataInformation();
+        private void OnSelectedMetaDataAttributeChanged(SelecteMetaDataAttributeChangedEvent @event)
+        {
+            RecreateMetaDataInformation();
+            ShowTimelineSelection();
+        }
+
+        void OnMetaDataAttributeChanged(MetaDataAttributeChangedEvent @event)
+        {
+            RecreateMetaDataInformation();
+            RebuildTimeline();
+        }
+
         void OnMetaDataChanged(SceneObject sceneObject) => RecreateMetaDataInformation();
+
+        partial void OnSelectedTabControllerIndexChanged(int value) => ShowTimelineSelection();
 
         partial void OnShowVfxChanged(bool value)
         {
@@ -136,6 +154,12 @@ namespace Editors.AnimationMeta.SuperView
             SceneObjects.Add(assetViewModel);
 
             assetViewModel.Data.MetaDataChanged += OnMetaDataChanged;
+            assetViewModel.Data.AnimationChanged += OnAnimationChanged;
+
+            // New, delete, move and paste rebuild an editor's Tags
+            PersistentMetaEditor.Tags.CollectionChanged += OnTagsChanged;
+            MetaEditor.Tags.CollectionChanged += OnTagsChanged;
+            Player.TimelineItemClicked += OnTimelineItemClicked;
 
             _asset = assetViewModel;
             OnSceneObjectUpdated(new SceneObjectUpdateEvent(_asset.Data, false, false, false, true));
@@ -173,6 +197,64 @@ namespace Editors.AnimationMeta.SuperView
             MetaEditor.LoadFile(e.Owner.MetaData);
 
             RecreateMetaDataInformation();
+            RebuildTimeline();
+        }
+
+        void OnAnimationChanged(GameWorld.Core.Animation.AnimationClip? clip) => RebuildTimeline();
+        void OnTagsChanged(object? sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e) => RebuildTimeline();
+
+        // One marker per timed tag in both META files, on the animation player's scrub bar.
+        void RebuildTimeline()
+        {
+            if (_asset == null)
+                return;
+
+            var sources = PersistentMetaEditor.Tags.Select(x => new MetaDataInspectionSource(x._input, MetaDataDocumentOwner.Persistent, x.HasError() == null))
+                .Concat(MetaEditor.Tags.Select(x => new MetaDataInspectionSource(x._input, MetaDataDocumentOwner.Animation, x.HasError() == null)));
+            var index = MetaDataInspectionIndex.Create(sources);
+
+            var clipDuration = _asset.Data.Player.GetAnimationLengthUs() / 1_000_000.0;
+            var persistentName = _localizationManager.Get("MetadataEditor.Tabs.Persistent");
+            var animationName = _localizationManager.Get("MetadataEditor.Tabs.Animation");
+            var wholeAnimation = _localizationManager.Get("SuperView.Timeline.WholeAnimation");
+
+            Player.SelectedTimelineItem = null;
+            Player.TimelineItems.Clear();
+            foreach (var item in index.Items.Where(x => x.MarkerKind != null))
+            {
+                var ownerName = item.Owner == MetaDataDocumentOwner.Persistent ? persistentName : animationName;
+                Player.TimelineItems.Add(new MetaDataTimelineItem(item, clipDuration, ownerName, wholeAnimation));
+            }
+            ShowTimelineSelection();
+        }
+
+        // Highlights the marker of the tag selected on the open tab
+        void ShowTimelineSelection()
+        {
+            if (Player == null || PersistentMetaEditor == null || MetaEditor == null)
+                return;
+            var (owner, editor) = SelectedTabControllerIndex == 0
+                ? (MetaDataDocumentOwner.Persistent, PersistentMetaEditor)
+                : (MetaDataDocumentOwner.Animation, MetaEditor);
+            var selected = editor.SelectedAttribute;
+            Player.SelectedTimelineItem = selected == null
+                ? null
+                : Player.TimelineItems.OfType<MetaDataTimelineItem>().FirstOrDefault(x => x.Item.Owner == owner && ReferenceEquals(x.Item.Source, selected));
+        }
+
+        // A clicked marker opens its tag: its tab, the tag selected, and the animation at the tag's start
+        void OnTimelineItemClicked(ITimelineItem clicked)
+        {
+            if (clicked is not MetaDataTimelineItem item)
+                return;
+
+            var isPersistent = item.Item.Owner == MetaDataDocumentOwner.Persistent;
+            var editor = isPersistent ? PersistentMetaEditor : MetaEditor;
+            SelectedTabControllerIndex = isPersistent ? 0 : 1;
+            var tag = editor.Tags.FirstOrDefault(x => ReferenceEquals(x._input, item.Item.Source));
+            if (tag != null)
+                editor.SelectedTag = tag;
+            Player.SetAnimationTime(item.Start);
         }
 
         public void Load(AnimationToolInput debugDataToLoad)
@@ -196,6 +278,10 @@ namespace Editors.AnimationMeta.SuperView
         public override void Close()
         {
             _eventHub?.UnRegister(this);
+            Player.TimelineItemClicked -= OnTimelineItemClicked;
+            PersistentMetaEditor.Tags.CollectionChanged -= OnTagsChanged;
+            MetaEditor.Tags.CollectionChanged -= OnTagsChanged;
+            _asset.Data.AnimationChanged -= OnAnimationChanged;
             _globalEventHub.UnRegister(this);
             base.Close();
         }

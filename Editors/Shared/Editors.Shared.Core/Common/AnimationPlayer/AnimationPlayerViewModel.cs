@@ -1,7 +1,10 @@
 ﻿using System.Collections.ObjectModel;
 using System.Windows;
+using System.Windows.Input;
+using CommunityToolkit.Mvvm.Input;
 using GameWorld.Core.Animation;
 using Shared.Core.Misc;
+using Shared.Ui.Common.Timeline;
 
 namespace Editors.Shared.Core.Common.AnimationPlayer
 {
@@ -19,6 +22,23 @@ namespace Editors.Shared.Core.Common.AnimationPlayer
         public NotifyAttr<bool> IsEnabled { get; set; } = new();
         public NotifyAttr<bool> LoopAnimation { get; set; } = new(true);
 
+        /// <summary>The main animation's time, for the scrub bar. Setting it pauses every asset on the nearest frame.</summary>
+        public double ScrubTime
+        {
+            get => SelectedAnimationCurrentTime.Value;
+            set => SetAnimationTime(value);
+        }
+
+        /// <summary>Markers an editor shows on the scrub bar (the SuperView's META tags). Empty for a plain scrub bar.</summary>
+        public ObservableCollection<ITimelineItem> TimelineItems { get; } = [];
+
+        ITimelineItem? _selectedTimelineItem;
+        public ITimelineItem? SelectedTimelineItem { get => _selectedTimelineItem; set => SetAndNotifyWhenChanged(ref _selectedTimelineItem, value); }
+
+        /// <summary>Raised when the user clicks a marker on the scrub bar.</summary>
+        public event Action<ITimelineItem>? TimelineItemClicked;
+        public ICommand TimelineItemClickCommand { get; }
+
         public NotifyAttr<Visibility> PlayerControlsVisibility { get; private set; } = new(Visibility.Collapsed);
 
         public ObservableCollection<AssetPlayerItem> PlayerItems { get; private set; } = new ObservableCollection<AssetPlayerItem>();
@@ -28,6 +48,11 @@ namespace Editors.Shared.Core.Common.AnimationPlayer
 
         public AnimationPlayerViewModel()
         {
+            TimelineItemClickCommand = new RelayCommand<ITimelineItem>(item =>
+            {
+                if (item != null)
+                    TimelineItemClicked?.Invoke(item);
+            });
             IsEnabled.Value = false;
             IsEnabled.PropertyChanged += (x, y) => OnAnimationPlayerEnabled(IsEnabled.Value);
         }
@@ -38,6 +63,7 @@ namespace Editors.Shared.Core.Common.AnimationPlayer
                 oldAnimation.Asset.Player.OnFrameChanged -= OnAnimationFrameChanged;
 
             SelectedAnimationFrameCount.Value = mainAnimation.MaxFrames.Value;
+            SelectedAnimationMaxTime.Value = LengthInSeconds(mainAnimation.Asset);
             mainAnimation.Asset.Player.OnFrameChanged += OnAnimationFrameChanged;
         }
 
@@ -96,7 +122,12 @@ namespace Editors.Shared.Core.Common.AnimationPlayer
             playerItem.AnimationName.Value = asset.AnimationName.Value;
             playerItem.SlotName.Value = asset.Description;
             playerItem.MaxFrames.Value = asset.Player.FrameCount();
+            if (playerItem == SelectedMainAnimation)
+                SelectedAnimationMaxTime.Value = LengthInSeconds(asset);
         }
+
+        static float LengthInSeconds(SceneObject asset) => (float)asset.Player.GetAnimationLengthUs() / 1_000_000;
+
 
         public void ToggleAnimationPausePlay()
         {
@@ -105,7 +136,7 @@ namespace Editors.Shared.Core.Common.AnimationPlayer
                 if (item.Player.IsPlaying)
                     Pause(item);
                 else
-                    Play(item);
+                    Resume(item);
             }
         }
 
@@ -128,6 +159,17 @@ namespace Editors.Shared.Core.Common.AnimationPlayer
                 _assetList.ForEach(x => PrivFrame(x));
         }
 
+        public void SetAnimationTime(double timeInSeconds)
+        {
+            var main = SelectedMainAnimation?.Asset.Player;
+            if (main == null || main.FrameCount() == 0 || main.AnimationClip.MicrosecondsPerFrame <= 0)
+                return;
+
+            var frame = (int)Math.Round(timeInSeconds * 1_000_000 / main.AnimationClip.MicrosecondsPerFrame);
+            frame = Math.Clamp(frame, 0, main.FrameCount() - 1);
+            _assetList.ForEach(x => SetFrame(x, frame));
+        }
+
         public void SetAnimationFirstFrame() => _assetList.ForEach(x => SetFrame(x, 0));
 
         public void SetAnimationLastFrame()
@@ -143,6 +185,7 @@ namespace Editors.Shared.Core.Common.AnimationPlayer
             SelectedAnimationCurrentTime.Value = (float)SelectedMainAnimation.Asset.Player.GetTimeUs() / 1_000_000;
             SelectedAnimationMaxTime.Value = (float)SelectedMainAnimation.Asset.Player.GetAnimationLengthUs() / 1_000_000;
             SelectedAnimationFps.Value = SelectedMainAnimation.Asset.Player.GetFps();
+            NotifyPropertyChanged(nameof(ScrubTime));
 
             // Playback reached the end. Stepping onto the last frame lands on its start, so it doesn't count
             var player = SelectedMainAnimation.Asset.Player;
@@ -188,6 +231,21 @@ namespace Editors.Shared.Core.Common.AnimationPlayer
                     metaItem.Player.Play();
                 }
             }
+        }
+
+        // Plays on from the current frame (scrubbed or stepped to); from the start once the end was reached
+        void Resume(SceneObject asset)
+        {
+            var player = asset.Player;
+            if (player.GetAnimationLengthUs() > 0 && player.GetTimeUs() >= player.GetAnimationLengthUs())
+            {
+                Play(asset);
+                return;
+            }
+
+            player.Play();
+            foreach (var metaItem in asset.MetaDataItems)
+                metaItem.Player?.Play();
         }
 
         void Pause(SceneObject asset)

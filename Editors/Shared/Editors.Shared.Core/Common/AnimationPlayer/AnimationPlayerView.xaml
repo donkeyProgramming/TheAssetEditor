@@ -6,6 +6,7 @@
              xmlns:local="clr-namespace:AnimationEditor.Common.AnimationPlayer"
               xmlns:loc="clr-namespace:Shared.Ui.Common;assembly=Shared.Ui"
               xmlns:s="http://schemas.singulink.com/xaml"
+              xmlns:timeline="clr-namespace:Shared.Ui.Common.Timeline;assembly=Shared.Ui"
              mc:Ignorable="d" 
               d:DesignWidth="800">
     <Grid>
@@ -21,8 +22,20 @@
                 <ColumnDefinition Width="5"/>
                 <ColumnDefinition Width=".3*"/>
             </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition/>
+            </Grid.RowDefinitions>
 
-            <Grid Grid.Column="0" VerticalAlignment="Top">
+            <timeline:TimelineControl Grid.Row="0" Grid.ColumnSpan="3" Margin="10,1,10,4"
+                                      MaxVisibleRows="8"
+                                      Duration="{Binding SelectedAnimationMaxTime.Value}"
+                                      CurrentTime="{Binding ScrubTime, Mode=TwoWay}"
+                                      ItemsSource="{Binding TimelineItems}"
+                                      SelectedItem="{Binding SelectedTimelineItem, Mode=TwoWay}"
+                                      ItemClickCommand="{Binding TimelineItemClickCommand}"/>
+
+            <Grid Grid.Row="1" Grid.Column="0" VerticalAlignment="Top">
                 <Grid.RowDefinitions>
                     <RowDefinition/>
                     <RowDefinition/>
@@ -66,7 +79,7 @@
                 <CheckBox IsChecked="{Binding LoopAnimation.Value, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" Grid.Row="4" Content="{loc:Loc AnimationPlayer.Loop}" HorizontalAlignment="Center"/>
             </Grid>
 
-            <ListView  Grid.Column="2" ItemsSource="{Binding PlayerItems, UpdateSourceTrigger=PropertyChanged}">
+            <ListView  Grid.Row="1" Grid.Column="2" ItemsSource="{Binding PlayerItems, UpdateSourceTrigger=PropertyChanged}">
                 <ListView.View>
                     <GridView>
                         <GridViewColumn Header="{loc:Loc AnimationPlayer.Column.Player}" Width="auto">
