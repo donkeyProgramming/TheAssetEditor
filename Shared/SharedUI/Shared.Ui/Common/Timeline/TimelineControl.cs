@@ -16,7 +16,7 @@ namespace Shared.Ui.Common.Timeline
     /// A time ruler with a playhead, and below it rows of range bars and instant ticks (<see cref="ITimelineItem"/>).
     /// Drag on the ruler or on empty track space to scrub <see cref="CurrentTime"/>. Click an item to select it,
     /// double-click to raise <see cref="ItemDoubleClicked"/>. Hovering an item shows its tooltip.
-    /// With no items it is a plain scrub bar.
+    /// With no items it is a plain scrub bar. <see cref="MaxVisibleRows"/> caps the height; the mouse wheel scrolls the rest.
     /// </summary>
     public class TimelineControl : FrameworkElement
     {
@@ -48,6 +48,10 @@ namespace Shared.Ui.Common.Timeline
         public static readonly DependencyProperty RowHeightProperty = DependencyProperty.Register(
             nameof(RowHeight), typeof(double), typeof(TimelineControl),
             new FrameworkPropertyMetadata(12.0, FrameworkPropertyMetadataOptions.AffectsMeasure | FrameworkPropertyMetadataOptions.AffectsRender));
+
+        public static readonly DependencyProperty MaxVisibleRowsProperty = DependencyProperty.Register(
+            nameof(MaxVisibleRows), typeof(int), typeof(TimelineControl),
+            new FrameworkPropertyMetadata(0, FrameworkPropertyMetadataOptions.AffectsMeasure | FrameworkPropertyMetadataOptions.AffectsRender));
 
         public static readonly DependencyProperty ShowRulerProperty = DependencyProperty.Register(
             nameof(ShowRuler), typeof(bool), typeof(TimelineControl),
@@ -103,6 +107,13 @@ namespace Shared.Ui.Common.Timeline
             set => SetValue(RowHeightProperty, value);
         }
 
+        /// <summary>When above 0, at most this many rows show and the mouse wheel scrolls the rest.</summary>
+        public int MaxVisibleRows
+        {
+            get => (int)GetValue(MaxVisibleRowsProperty);
+            set => SetValue(MaxVisibleRowsProperty, value);
+        }
+
         public bool ShowRuler
         {
             get => (bool)GetValue(ShowRulerProperty);
@@ -140,6 +151,8 @@ namespace Shared.Ui.Common.Timeline
         TimelineLayoutResult _layout = new([], 0, []);
         ITimelineItem? _hovered;
         bool _scrubbing;
+        int _firstVisibleRow;
+        bool _scrollToSelection;
 
         public TimelineControl()
         {
@@ -213,6 +226,25 @@ namespace Shared.Ui.Common.Timeline
                 if (item.IsSelected != isSelected)
                     item.IsSelected = isSelected;
             }
+            control._scrollToSelection = e.NewValue != null;
+            control.ScrollSelectionIntoView();
+        }
+
+        // Done once the selection has been laid out, which may be after it was set (a selection made before the view was shown).
+        void ScrollSelectionIntoView()
+        {
+            if (!_scrollToSelection || SelectedItem == null)
+                return;
+            var placement = _layout.Placements.FirstOrDefault(p => ReferenceEquals(p.Item, SelectedItem));
+            if (placement.Item == null)
+                return;
+            _scrollToSelection = false;
+            var visibleRows = VisibleRowCount;
+            if (placement.Row < _firstVisibleRow)
+                _firstVisibleRow = placement.Row;
+            else if (placement.Row >= _firstVisibleRow + visibleRows)
+                _firstVisibleRow = placement.Row - visibleRows + 1;
+            InvalidateVisual();
         }
 
         // ---------------------------------------------------------------------
@@ -223,9 +255,15 @@ namespace Shared.Ui.Common.Timeline
         {
             var width = double.IsFinite(availableSize.Width) ? availableSize.Width : ActualWidth;
             _layout = TimelineLayout.Pack(Items, Axis(width));
-            var trackHeight = _layout.RowCount == 0 ? EmptyTrackHeight : _layout.RowCount * RowHeight + TrackPadding * 2;
+            ClampFirstVisibleRow();
+            ScrollSelectionIntoView();
+            var trackHeight = _layout.RowCount == 0 ? EmptyTrackHeight : VisibleRowCount * RowHeight + TrackPadding * 2;
             return new Size(width, RulerHeight + trackHeight);
         }
+
+        int VisibleRowCount => MaxVisibleRows > 0 ? Math.Min(_layout.RowCount, MaxVisibleRows) : _layout.RowCount;
+
+        void ClampFirstVisibleRow() => _firstVisibleRow = Math.Clamp(_firstVisibleRow, 0, Math.Max(0, _layout.RowCount - VisibleRowCount));
 
         protected override void OnRenderSizeChanged(SizeChangedInfo sizeInfo)
         {
@@ -234,11 +272,14 @@ namespace Shared.Ui.Common.Timeline
                 return;
             var rowCount = _layout.RowCount;
             _layout = TimelineLayout.Pack(Items, Axis(ActualWidth));
+            ClampFirstVisibleRow();
             if (_layout.RowCount != rowCount)
                 InvalidateMeasure();
         }
 
-        double RowTop(int row) => RulerHeight + TrackPadding + row * RowHeight;
+        double RowTop(int row) => RulerHeight + TrackPadding + (row - _firstVisibleRow) * RowHeight;
+
+        bool IsRowVisible(int row) => row >= _firstVisibleRow && row < _firstVisibleRow + VisibleRowCount;
 
         // ---------------------------------------------------------------------
         // Rendering
@@ -248,6 +289,7 @@ namespace Shared.Ui.Common.Timeline
         static readonly Brush OutOfRangeBrush = Frozen(new SolidColorBrush(Color.FromArgb(150, 15, 15, 17)));
         static readonly Pen GridPen = Frozen(new Pen(Frozen(new SolidColorBrush(Color.FromRgb(48, 48, 54))), 1));
         static readonly Pen LaneSeparatorPen = Frozen(new Pen(Frozen(new SolidColorBrush(Color.FromRgb(62, 62, 70))), 1));
+        static readonly Brush ScrollThumbBrush = Frozen(new SolidColorBrush(Color.FromArgb(150, 220, 220, 230)));
         static readonly Pen SelectedPen = Frozen(new Pen(Brushes.White, 1.5));
         static readonly Pen HoverPen = Frozen(new Pen(Frozen(new SolidColorBrush(Color.FromArgb(200, 255, 255, 255))), 1));
 
@@ -271,21 +313,38 @@ namespace Shared.Ui.Common.Timeline
 
             for (var i = 1; i < _layout.LaneFirstRows.Count; i++)
             {
+                if (!IsRowVisible(_layout.LaneFirstRows[i]))
+                    continue;
                 var y = Math.Floor(RowTop(_layout.LaneFirstRows[i])) + 0.5;
                 dc.DrawLine(LaneSeparatorPen, new Point(0, y), new Point(width, y));
             }
 
             // Wide bars first so ticks and short bars stay on top, selection last.
             var ordered = _layout.Placements
+                .Where(p => IsRowVisible(p.Row))
                 .OrderBy(p => p.IsInstant)
                 .ThenByDescending(p => p.Width)
                 .ThenBy(p => p.Item.IsSelected);
             foreach (var placement in ordered)
                 DrawItem(dc, axis, placement);
+            DrawScrollIndicator(dc, width);
 
             if (ShowRuler)
                 axis.DrawRuler(dc);
             axis.DrawPlayhead(dc, CurrentTime, height, Brushes.OrangeRed);
+        }
+
+        // A thin thumb on the right edge when rows are scrolled out of view.
+        void DrawScrollIndicator(DrawingContext dc, double width)
+        {
+            var visibleRows = VisibleRowCount;
+            if (visibleRows == 0 || _layout.RowCount <= visibleRows)
+                return;
+            var trackTop = RulerHeight + TrackPadding;
+            var trackHeight = visibleRows * RowHeight;
+            var thumbHeight = Math.Max(4, trackHeight * visibleRows / _layout.RowCount);
+            var thumbTop = trackTop + (trackHeight - thumbHeight) * _firstVisibleRow / (_layout.RowCount - visibleRows);
+            dc.DrawRoundedRectangle(ScrollThumbBrush, null, new Rect(width - 4, thumbTop, 3, thumbHeight), 1.5, 1.5);
         }
 
         void DrawGrid(DrawingContext dc, TimeAxis axis, double height)
@@ -345,6 +404,7 @@ namespace Shared.Ui.Common.Timeline
 
             // Ticks before bars, then the narrowest, so a short item over a long one stays clickable.
             return _layout.Placements
+                .Where(p => IsRowVisible(p.Row))
                 .Where(p => position.X >= p.Left && position.X <= p.Right
                     && position.Y >= RowTop(p.Row) && position.Y < RowTop(p.Row) + RowHeight)
                 .OrderByDescending(p => p.IsInstant)
@@ -407,6 +467,18 @@ namespace Shared.Ui.Common.Timeline
         {
             base.OnLostMouseCapture(e);
             EndScrub();
+        }
+
+        protected override void OnMouseWheel(MouseWheelEventArgs e)
+        {
+            base.OnMouseWheel(e);
+            var maxFirstRow = _layout.RowCount - VisibleRowCount;
+            if (maxFirstRow <= 0)
+                return;
+            _firstVisibleRow = Math.Clamp(_firstVisibleRow - Math.Sign(e.Delta), 0, maxFirstRow);
+            SetHovered(HitTestItem(e.GetPosition(this)));
+            InvalidateVisual();
+            e.Handled = true;
         }
 
         protected override void OnMouseLeave(MouseEventArgs e)

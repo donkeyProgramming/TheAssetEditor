@@ -28,6 +28,7 @@
             </Grid.RowDefinitions>
 
             <timeline:TimelineControl Grid.Row="0" Grid.ColumnSpan="3" Margin="10,1,10,4"
+                                      MaxVisibleRows="8"
                                       Duration="{Binding SelectedAnimationMaxTime.Value}"
                                       CurrentTime="{Binding ScrubTime, Mode=TwoWay}"
                                       ItemsSource="{Binding TimelineItems}"
