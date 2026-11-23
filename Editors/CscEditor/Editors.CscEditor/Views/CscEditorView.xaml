@@ -196,7 +196,7 @@
 
                 <!-- Details -->
                 <GroupBox Grid.Row="2" Header="{loc:Loc CscEditor.Details}">
-                    <ScrollViewer VerticalScrollBarVisibility="Auto" MaxHeight="420">
+                    <ScrollViewer VerticalScrollBarVisibility="Auto" MaxHeight="420" Background="{DynamicResource TreeView.Static.Background}">
                         <ScrollViewer.Resources>
                             <BooleanToVisibilityConverter x:Key="PanelBoolToVis"/>
                         </ScrollViewer.Resources>
