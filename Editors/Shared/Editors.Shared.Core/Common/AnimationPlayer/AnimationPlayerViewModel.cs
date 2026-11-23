@@ -1,7 +1,10 @@
 ﻿using System.Collections.ObjectModel;
 using System.Windows;
+using System.Windows.Input;
+using CommunityToolkit.Mvvm.Input;
 using GameWorld.Core.Animation;
 using Shared.Core.Misc;
+using Shared.Ui.Common.Timeline;
 
 namespace Editors.Shared.Core.Common.AnimationPlayer
 {
@@ -26,6 +29,16 @@ namespace Editors.Shared.Core.Common.AnimationPlayer
             set => SetAnimationTime(value);
         }
 
+        /// <summary>Markers an editor shows on the scrub bar (the SuperView's META tags). Empty for a plain scrub bar.</summary>
+        public ObservableCollection<ITimelineItem> TimelineItems { get; } = [];
+
+        ITimelineItem? _selectedTimelineItem;
+        public ITimelineItem? SelectedTimelineItem { get => _selectedTimelineItem; set => SetAndNotifyWhenChanged(ref _selectedTimelineItem, value); }
+
+        /// <summary>Raised when the user clicks a marker on the scrub bar.</summary>
+        public event Action<ITimelineItem>? TimelineItemClicked;
+        public ICommand TimelineItemClickCommand { get; }
+
         public NotifyAttr<Visibility> PlayerControlsVisibility { get; private set; } = new(Visibility.Collapsed);
 
         public ObservableCollection<AssetPlayerItem> PlayerItems { get; private set; } = new ObservableCollection<AssetPlayerItem>();
@@ -35,6 +48,11 @@ namespace Editors.Shared.Core.Common.AnimationPlayer
 
         public AnimationPlayerViewModel()
         {
+            TimelineItemClickCommand = new RelayCommand<ITimelineItem>(item =>
+            {
+                if (item != null)
+                    TimelineItemClicked?.Invoke(item);
+            });
             IsEnabled.Value = false;
             IsEnabled.PropertyChanged += (x, y) => OnAnimationPlayerEnabled(IsEnabled.Value);
         }

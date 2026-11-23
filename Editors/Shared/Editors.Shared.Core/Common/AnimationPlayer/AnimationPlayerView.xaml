@@ -29,7 +29,10 @@
 
             <timeline:TimelineControl Grid.Row="0" Grid.ColumnSpan="3" Margin="10,1,10,4"
                                       Duration="{Binding SelectedAnimationMaxTime.Value}"
-                                      CurrentTime="{Binding ScrubTime, Mode=TwoWay}"/>
+                                      CurrentTime="{Binding ScrubTime, Mode=TwoWay}"
+                                      ItemsSource="{Binding TimelineItems}"
+                                      SelectedItem="{Binding SelectedTimelineItem, Mode=TwoWay}"
+                                      ItemClickCommand="{Binding TimelineItemClickCommand}"/>
 
             <Grid Grid.Row="1" Grid.Column="0" VerticalAlignment="Top">
                 <Grid.RowDefinitions>
