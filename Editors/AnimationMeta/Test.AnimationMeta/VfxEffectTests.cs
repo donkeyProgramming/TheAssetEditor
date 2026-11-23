@@ -63,6 +63,31 @@ namespace Test.AnimationMeta
             _root = new GroupNode("root");
         }
 
+        // The scene object updates its META instances every frame; they take seconds, so an EFFECT reads its bone at
+        // the frame shown and not at the frame index read as seconds.
+        [Test]
+        public void SceneObject_HandsItsMetaInstancesTheTimeInSeconds()
+        {
+            var recorder = new TimeRecorder();
+            var scene = new SceneObject("test") { Player = _player, ParentNode = new GroupNode("parent") };
+            scene.MetaDataItems.Add(recorder);
+            _player.Pause();
+            _player.CurrentFrame = 10;
+
+            scene.Update(new GameTime());
+
+            Assert.That(recorder.Time, Is.EqualTo(_player.GetTimeUs() / 1_000_000f).Within(1e-4f));
+            Assert.That(recorder.Time, Is.LessThan(2f));
+        }
+
+        class TimeRecorder : IMetaDataInstance
+        {
+            public float? Time { get; private set; }
+            public AnimationPlayer Player => null!;
+            public void Update(float currentTime) => Time = currentTime;
+            public void CleanUp() { }
+        }
+
         static AnimationFile SkeletonFile()
         {
             var file = new AnimationFile();
