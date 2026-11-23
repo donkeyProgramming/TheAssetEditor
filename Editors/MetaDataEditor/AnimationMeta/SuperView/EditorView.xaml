@@ -9,6 +9,9 @@
              xmlns:resources="clr-namespace:Shared.EmbeddedResources;assembly=Shared.EmbeddedResources"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
+    <UserControl.Resources>
+        <BooleanToVisibilityConverter x:Key="ProblemsVisibility"/>
+    </UserControl.Resources>
     <DockPanel>
         <!-- One toolbar for the view and the 3D tools. It wraps by group rather than hiding what does not fit in the
              overflow menu, since the side panel is often narrower than the row. -->
@@ -60,6 +63,30 @@
                 </StackPanel>
             </WrapPanel>
         </Border>
+
+        <!-- What is wrong in the two META files; shown only when something is. Clicking a line opens its tag. -->
+        <Expander DockPanel.Dock="Bottom" Margin="5,2,5,5" IsExpanded="True" Header="{Binding ProblemsHeader}"
+                  ToolTip="{loc:Loc SuperView.Problems.Tooltip}"
+                  Visibility="{Binding HasProblems, Converter={StaticResource ProblemsVisibility}}">
+            <ListBox ItemsSource="{Binding Problems}" SelectedItem="{Binding SelectedProblem}" MaxHeight="160"
+                     ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <TextBlock Text="{Binding Text}" TextWrapping="Wrap" ToolTip="{Binding Text}">
+                            <TextBlock.Style>
+                                <Style TargetType="TextBlock">
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding IsError}" Value="True">
+                                            <Setter Property="Foreground" Value="IndianRed"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </TextBlock.Style>
+                        </TextBlock>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+        </Expander>
 
         <TabControl DockPanel.Dock="Top" SelectedIndex="{Binding SelectedTabControllerIndex, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">
             <TabItem Header="{loc:Loc MetadataEditor.Tabs.Persistent}">

@@ -30,6 +30,8 @@ namespace Editors.AnimationMeta.SuperView.Visualisation
         int? VfxFilterId { get; set; }
         /// <summary>Lets go of what was loaded from these pack paths, so the next Create reads them again.</summary>
         void Forget(IEnumerable<string> paths);
+        /// <summary>What the last Create could not draw, tag by tag.</summary>
+        IReadOnlyList<MetaDataBuildProblem> Problems { get; }
         List<IMetaDataInstance> Create(ParsedMetadataFile? persistent, ParsedMetadataFile? metaData, ParsedMetadataAttribute? selectedMetaDataAttribute, SceneNode root, ISkeletonProvider skeleton, AnimationPlayer rootPlayer, IAnimationBinGenericFormat fragment);
     }
 
@@ -56,7 +58,7 @@ namespace Editors.AnimationMeta.SuperView.Visualisation
         // each on that Taurus. One whose tag values, colour, vfx toggle, clip and skeleton are as they were, and which is still
         // in the scene, is kept as built; the caller cleans up only what Create no longer returns.
         record KeptAs(string Values, bool Picked, bool ShowVfx, AnimationClip? Clip, GameSkeleton? Skeleton);
-        record Kept(KeptAs As, ISceneNode Node, IMetaDataInstance Instance);
+        record Kept(KeptAs As, ISceneNode Node, IMetaDataInstance Instance, MetaDataBuildProblem[] Problems);
         Dictionary<ParsedMetadataAttribute, Kept> _kept = new(ReferenceEqualityComparer.Instance);
         Dictionary<ParsedMetadataAttribute, Kept> _previous = new(ReferenceEqualityComparer.Instance);
         static readonly Dictionary<Type, PropertyInfo[]> s_tagValues = [];
@@ -67,6 +69,9 @@ namespace Editors.AnimationMeta.SuperView.Visualisation
 
         public bool ShowVfx { get; set; } = true;
         public int? VfxFilterId { get; set; }
+
+        readonly List<MetaDataBuildProblem> _problems = [];
+        public IReadOnlyList<MetaDataBuildProblem> Problems => _problems;
 
         // A broken effect would log again on every rebuild (every click in the tag list); once is enough.
         private static readonly HashSet<string> s_loggedVfxMessages = [];
@@ -135,6 +140,7 @@ namespace Editors.AnimationMeta.SuperView.Visualisation
             var output = new List<IMetaDataInstance>();
             (_previous, _kept) = (_kept, _previous);
             _kept.Clear();
+            _problems.Clear();
 
             // Apply persistent meta data, if no disable is given.
             var usePersistent = metaData == null || metaData.GetItemsOfType<DisablePersistant_v10>().Count == 0;
@@ -171,31 +177,52 @@ namespace Editors.AnimationMeta.SuperView.Visualisation
             output.AddRange(file.Attributes.OfType<ParsedMetadataAttribute>().Where(x => x.Name == "PROP")
                 .Select(x => Keep(x, selectedAttribute, root, skeleton, rootPlayer, () => CreateStaticProp(x, root, skeleton, selectedAttribute, rootPlayer))).Where(x => x != null));
 
-            output.AddRange(file.GetItemsOfType<ImpactPosition_v10>().Select(meteDataItem => CreateStaticLocator(meteDataItem, root, () => meteDataItem.Position, "ImpactPos", selectedAttribute)));
+            output.AddRange(file.GetItemsOfType<ImpactPosition_v10>().Select(meteDataItem => Guard(meteDataItem, root, () => CreateStaticLocator(meteDataItem, root, () => meteDataItem.Position, "ImpactPos", selectedAttribute))).Where(x => x != null));
 
-            output.AddRange(file.GetItemsOfType<TargetPos_10>().Select(meteDataItem => CreateStaticLocator(meteDataItem, root, () => meteDataItem.Position, "TargetPos", selectedAttribute)));
+            output.AddRange(file.GetItemsOfType<TargetPos_10>().Select(meteDataItem => Guard(meteDataItem, root, () => CreateStaticLocator(meteDataItem, root, () => meteDataItem.Position, "TargetPos", selectedAttribute))).Where(x => x != null));
 
-            output.AddRange(file.GetItemsOfType<FirePos_v10>().Select(meteDataItem => CreateStaticLocator(meteDataItem, root, () => meteDataItem.Position, "FirePos", selectedAttribute)));
+            output.AddRange(file.GetItemsOfType<FirePos_v10>().Select(meteDataItem => Guard(meteDataItem, root, () => CreateStaticLocator(meteDataItem, root, () => meteDataItem.Position, "FirePos", selectedAttribute))).Where(x => x != null));
 
-            output.AddRange(file.GetItemsOfType<SplashAttack_v10>().Select(meteDataItem => CreateSplashAttack(meteDataItem, root, $"SplashAttack_{Math.Round(meteDataItem.EndTime, 2)}", 0.1f, selectedAttribute)));
+            output.AddRange(file.GetItemsOfType<SplashAttack_v10>().Select(meteDataItem => Guard(meteDataItem, root, () => CreateSplashAttack(meteDataItem, root, $"SplashAttack_{Math.Round(meteDataItem.EndTime, 2)}", 0.1f, selectedAttribute))).Where(x => x != null));
 
             // BLOOD, CAMERA_SHAKE_POS, CREW_LOCATION, SOUND_TRIGGER, SOUND_BUILDING and TRANSFORM: a marker at the tag's
             // position, on its bone where the tag names one.
             output.AddRange(file.Attributes.OfType<ParsedMetadataAttribute>()
                 .Select(x => SpatialMetaDataCatalog.TryCreate(x, out var binding) && binding.UsesGenericMarker && binding.Kind != SpatialMetaDataKind.Prop ? binding : null)
                 .Where(x => x != null)
-                .Select(x => CreateSpatialMarker(x!, root, skeleton, selectedAttribute)));
+                .Select(x => Guard(x!.Source, root, () => CreateSpatialMarker(x!, root, skeleton, selectedAttribute))).Where(x => x != null));
 
             if (includeEffects)
-                output.AddRange(file.GetItemsOfType<IEffectMeta>().Where(x => FilterOf(x) == 0 || FilterOf(x) == vfxFilter).Select(x => Keep((ParsedMetadataAttribute)x, selectedAttribute, root, skeleton, rootPlayer, () => CreateEffect(x, root, skeleton, selectedAttribute, rootPlayer, persistent))));
+                output.AddRange(file.GetItemsOfType<IEffectMeta>().Where(x => FilterOf(x) == 0 || FilterOf(x) == vfxFilter).Select(x => Keep((ParsedMetadataAttribute)x, selectedAttribute, root, skeleton, rootPlayer, () => CreateEffect(x, root, skeleton, selectedAttribute, rootPlayer, persistent))).Where(x => x != null));
 
             foreach (var meteDataItem in file.GetItemsOfType<DockEquipment>())
-                CreateEquipmentDock(meteDataItem, fragment, skeleton, rootPlayer);
+                Guard(meteDataItem, null, () => { CreateEquipmentDock(meteDataItem, fragment, skeleton, rootPlayer); return (object?)null; });
 
             foreach (var meteDataItem in file.GetItemsOfType<Transform_v10>())
                 CreateTransform(meteDataItem, rootPlayer);
 
             return output;
+        }
+
+        void Problem(ParsedMetadataAttribute tag, string reasonKey, string detail = "") => _problems.Add(new MetaDataBuildProblem(tag, reasonKey, detail));
+
+        // One tag that will not draw is a problem on that tag, and what it had added to the scene is taken out again; the
+        // rest of the scene is still built.
+        T? Guard<T>(ParsedMetadataAttribute tag, SceneNode? root, Func<T?> build) where T : class
+        {
+            var before = root?.Children.Count ?? 0;
+            try
+            {
+                return build();
+            }
+            catch (Exception e)
+            {
+                while (root != null && root.Children.Count > before)
+                    root.RemoveObject(root.Children[^1]);
+                LogOnce($"{tag.DisplayName}: {e.Message}");
+                Problem(tag, "SuperView.Problems.PreviewFailed", e.Message);
+                return null;
+            }
         }
 
         private void CreateTransform(Transform_v10 transform, AnimationPlayer rootPlayer)
@@ -206,17 +233,19 @@ namespace Editors.AnimationMeta.SuperView.Visualisation
 
         private void CreateEquipmentDock(DockEquipment metaData, IAnimationBinGenericFormat fragment, ISkeletonProvider skeleton, AnimationPlayer rootPlayer)
         {
+            if (skeleton.Skeleton == null)
+                return;
             if (fragment == null)
             {
-                _logger.Here().Error($"Unable to create docking, as animation is missing - select an animation");
+                Problem(metaData, "SuperView.Problems.NoAnimationBin");
                 return;
             }
- 
+
             var animPath = fragment.Entries.FirstOrDefault(x => x.SlotName == metaData.AnimationSlotName)?.AnimationFile ??
                            fragment.Entries.FirstOrDefault(x => x.SlotName == metaData.AnimationSlotName + "_2")?.AnimationFile;
             if (animPath == null)
             {
-                _logger.Here().Error($"Unable to create docking, as {metaData.AnimationSlotName} animation is missing");
+                Problem(metaData, "SuperView.Problems.MissingDockSlot", metaData.AnimationSlotName);
                 return;
             }
 
@@ -230,14 +259,16 @@ namespace Editors.AnimationMeta.SuperView.Visualisation
 
             if (finalBoneIndex == -1)
             {
-                var boneNames = string.Join(", ", metaData.SkeletonNameAlternatives);
-                _logger.Here().Error($"Unable to create docking, as {boneNames} bone is missing");
+                Problem(metaData, "SuperView.Problems.MissingDockBone", string.Join(", ", metaData.SkeletonNameAlternatives));
                 return;
             }
 
             var pf = _packFileService.FindFile(animPath);
-            if(pf == null)
-                throw new Exception($"Unable to find animation for docking. Searched for {animPath} and failed to find it in the pack file service. This is required to visualise the docked equipment.");
+            if (pf == null)
+            {
+                Problem(metaData, "SuperView.Problems.MissingAnimation", animPath);
+                return;
+            }
 
             var animFile = AnimationFile.Create(pf);
             var clip = new AnimationClip(animFile, skeleton.Skeleton);
@@ -266,22 +297,31 @@ namespace Editors.AnimationMeta.SuperView.Visualisation
 
             var meshPath = _packFileService.FindFile(modelName);
             if (meshPath == null)
+            {
+                Problem(tag, "SuperView.Problems.MissingModel", modelName);
                 return null;
+            }
 
+            // A prop whose animation or skeleton is missing is still drawn, at the tag, without its own animation.
             var animationPath = string.IsNullOrWhiteSpace(animationName) ? null : _packFileService.FindFile(animationName);
+            if (animationPath == null && !string.IsNullOrWhiteSpace(animationName))
+                Problem(tag, "SuperView.Problems.MissingPropAnimation", animationName);
             var propPlayer = _animationsContainerComponent.RegisterAnimationPlayer(new AnimationPlayer(), propName + Guid.NewGuid());
 
             // Configure the mesh
             var loadedNode = _complexMeshLoader.Load(meshPath, new GroupNode(propName), propPlayer, true, true); 
 
             // Configure animation
-            if (animationPath != null)
+            var skeletonName = animationPath == null ? null : SceneNodeHelper.GetSkeletonName(loadedNode);
+            var skeletonFile = skeletonName == null ? null : _skeletonAnimationLookUpHelper.GetSkeletonFileFromName(skeletonName);
+            if (skeletonName != null && skeletonFile == null)
             {
-                var skeletonName = SceneNodeHelper.GetSkeletonName(loadedNode);
-                var skeletonFile = _skeletonAnimationLookUpHelper.GetSkeletonFileFromName(skeletonName);
-                if (skeletonFile == null)
-                    throw new Exception($"Unable to find skeleton for animated prop. Searched for {skeletonName} and failed to find it in the skeleton animation look up helper. This is required to play the animation of the prop.");
+                Problem(tag, "SuperView.Problems.MissingPropSkeleton", skeletonName);
+                animationPath = null;
+            }
 
+            if (animationPath != null && skeletonFile != null)
+            {
                 var skeleton = new GameSkeleton(skeletonFile, propPlayer);
                 var animFile = AnimationFile.Create(animationPath);
                 var clip = new AnimationClip(animFile, skeleton);
@@ -437,7 +477,10 @@ namespace Editors.AnimationMeta.SuperView.Visualisation
         {
             var resolved = ShowVfx ? Resolve(effect) : null;
             if (resolved is { Found: false })
+            {
                 LogOnce($"EFFECT {effect.VfxName}: {VfxResolver.PathOf(effect.VfxName)} is not in any loaded pack, so only its locator is drawn");
+                Problem((ParsedMetadataAttribute)effect, "SuperView.Problems.MissingEffect", VfxResolver.PathOf(effect.VfxName));
+            }
             foreach (var problem in resolved?.Problems ?? [])
                 LogOnce($"EFFECT {effect.VfxName}: {problem}");
 
@@ -542,14 +585,17 @@ namespace Editors.AnimationMeta.SuperView.Visualisation
             if (_previous.TryGetValue(tag, out var kept) && kept.As == keptAs && root.Children.Contains(kept.Node))
             {
                 _kept[tag] = kept;
+                _problems.AddRange(kept.Problems);
                 return kept.Instance;
             }
 
-            // What a build adds to the scene starts with the node its instance cleans up.
+            // What a build adds to the scene starts with the node its instance cleans up; the problems it finds are kept
+            // with it, as a kept tag is not built again to find them.
             var before = root.Children.Count;
-            var instance = build();
+            var problemsBefore = _problems.Count;
+            var instance = Guard(tag, root, build);
             if (instance != null && root.Children.Count > before)
-                _kept[tag] = new Kept(keptAs, root.Children[before], instance);
+                _kept[tag] = new Kept(keptAs, root.Children[before], instance, [.. _problems.Skip(problemsBefore)]);
             return instance;
         }
 

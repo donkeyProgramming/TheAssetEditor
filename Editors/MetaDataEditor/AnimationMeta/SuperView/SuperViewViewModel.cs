@@ -1,8 +1,9 @@
-﻿using System.Data;
+﻿using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Editors.AnimationMeta.Presentation;
 using Editors.AnimationMeta.SuperView.Editing;
+using Editors.AnimationMeta.SuperView.Problems;
 using Editors.AnimationMeta.SuperView.Timeline;
 using Editors.AnimationMeta.SuperView.Visualisation;
 using Editors.Shared.Core.Common;
@@ -66,6 +67,13 @@ namespace Editors.AnimationMeta.SuperView
         public bool CanRotateSelectedIn3D => _editSession.CanRotate;
         public bool CanUndoEditIn3D => _editSession.CanUndo;
         public bool CanRedoEditIn3D => _editSession.CanRedo;
+
+        // What is wrong in the two META files, for the list under them; picking one opens its tag.
+        public ObservableCollection<MetaDataProblem> Problems { get; } = [];
+        [ObservableProperty] MetaDataProblem? _selectedProblem;
+        public bool HasProblems => Problems.Count > 0;
+        public string ProblemsHeader => string.Format(_localizationManager.Get("SuperView.Problems.Header"), Problems.Count);
+        bool _showingProblems;
 
         public override Type EditorViewModelType => typeof(EditorView);
         public bool HasUnsavedChanges
@@ -234,6 +242,38 @@ namespace Editors.AnimationMeta.SuperView
             VfxFilterIds = filter == 0 || ids.Contains(filter) ? ids : [.. ids.Append(filter).Order()];
             VfxFilterId = filter;
             _showingVfxFilter = false;
+            RebuildProblems();
+        }
+
+        // Filled again only when a line changes, so the one picked stays picked across the rebuild that opening its tag starts.
+        void RebuildProblems()
+        {
+            if (PersistentMetaEditor == null || MetaEditor == null)
+                return;
+            var problems = MetaDataProblem.Create(PersistentMetaEditor.Tags, MetaEditor.Tags, _metaDataFactory.Problems, _localizationManager);
+            if (problems.SequenceEqual(Problems))
+                return;
+
+            _showingProblems = true;
+            var picked = SelectedProblem;
+            Problems.Clear();
+            foreach (var problem in problems)
+                Problems.Add(problem);
+            SelectedProblem = Problems.FirstOrDefault(x => x == picked);
+            _showingProblems = false;
+            OnPropertyChanged(nameof(HasProblems));
+            OnPropertyChanged(nameof(ProblemsHeader));
+        }
+
+        partial void OnSelectedProblemChanged(MetaDataProblem? value)
+        {
+            if (_showingProblems || value == null)
+                return;
+            var start = ParsedMetadataTimeRange.TryCreate(value.Source, out var range) && float.IsFinite(range.StartTime) && !range.IsWholeAnimationRange
+                ? range.StartTime
+                : (float?)null;
+            OpenTag(value.Owner, value.Source, start);
+            FocusMarker(value.Source);
         }
 
         private void OnSceneObjectUpdated(SceneObjectUpdateEvent e)
@@ -286,6 +326,7 @@ namespace Editors.AnimationMeta.SuperView
                 Player.TimelineItems.Add(new MetaDataTimelineItem(item, clipDuration, ownerName, wholeAnimation));
             }
             ShowTimelineSelection();
+            RebuildProblems();
         }
 
         // Highlights the marker of the tag selected on the open tab
@@ -307,14 +348,20 @@ namespace Editors.AnimationMeta.SuperView
         {
             if (clicked is not MetaDataTimelineItem item)
                 return;
+            OpenTag(item.Item.Owner, item.Item.Source, item.Start);
+        }
 
-            var isPersistent = item.Item.Owner == MetaDataDocumentOwner.Persistent;
+        // A tag's tab, the tag selected, and the animation at the given time
+        void OpenTag(MetaDataDocumentOwner owner, ParsedMetadataAttribute source, double? time)
+        {
+            var isPersistent = owner == MetaDataDocumentOwner.Persistent;
             var editor = isPersistent ? PersistentMetaEditor : MetaEditor;
             SelectedTabControllerIndex = isPersistent ? 0 : 1;
-            var tag = editor.Tags.FirstOrDefault(x => ReferenceEquals(x._input, item.Item.Source));
+            var tag = editor.Tags.FirstOrDefault(x => ReferenceEquals(x._input, source));
             if (tag != null)
                 editor.SelectedTag = tag;
-            Player.SetAnimationTime(item.Start);
+            if (time != null)
+                Player.SetAnimationTime(time.Value);
         }
 
         public void Load(AnimationToolInput debugDataToLoad)
@@ -398,17 +445,8 @@ namespace Editors.AnimationMeta.SuperView
             NotifyEditState();
         }
 
-        // A splash attack refuses to draw with its start on its end; mid-drag that step is skipped rather than an error.
-        void RebuildMarkersDuringDrag()
-        {
-            try
-            {
-                RecreateMetaDataInformation();
-            }
-            catch (ConstraintException)
-            {
-            }
-        }
+        // A splash attack whose start is dragged onto its end does not draw; the builder lists that as a problem on the tag.
+        void RebuildMarkersDuringDrag() => RecreateMetaDataInformation();
 
         IReadOnlyList<IMetaDataMarkerPreview> GetMarkers() =>
             _asset?.Data.MetaDataItems.OfType<IMetaDataMarkerPreview>().ToList() ?? [];
