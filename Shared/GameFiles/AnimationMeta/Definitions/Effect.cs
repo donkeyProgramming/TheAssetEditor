@@ -95,6 +95,37 @@ namespace Shared.GameFormats.AnimationMeta.Definitions
         //TODO: exactly same ???
     }
 
+    // EFFECT v6, v8, v9 and v10 are ported from Szy-Cathay/TheAssetEditor-CN, which gives them as the game's own
+    // deserialiser layouts. No sample files for them were checked here.
+    [MetaData("EFFECT", 6)]
+    public class Effect_v6 : DecodedMetaEntryBase_v2, IEffectMeta
+    {
+        [MetaDataTag(4, "Name of the VFX's .xml file in the vfx folder. Leave off the file extension. Note that for this you don't need to add custom vfx to the particles db table and they still require a \"movie\"-type .pack for them to be loaded.")]
+        public string VfxName { get; set; } = "";
+
+        [MetaDataTag(5)]
+        public bool Tracking { get; set; }
+
+        [MetaDataTag(6, "Does the effect crash with the terrain?")]
+        public bool TerrainMutable { get; set; }
+
+        [MetaDataTag(7)]
+        public Vector3 Position { get; set; } = Vector3.Zero;
+
+        [MetaDataTag(8, "", MetaDataTagAttribute.DisplayType.EulerVector)]
+        public Vector4 Orientation { get; set; } = new(0, 0, 0, 1);
+
+        [MetaDataTag(9, "Bone the effect is attached to, use -1 for it to just spawn and not follow animations")]
+        public int NodeIndex { get; set; }
+
+        [MetaDataTag(10, "Scale of the effect")]
+        public float Scale { get; set; } = 1;
+
+        // Part of the inteface - not the metedata file
+        public float EffectStartTime { get => StartTime; set => StartTime = value; }
+        public float EffectEndTime { get => EndTime; set => EndTime = value; }
+    }
+
     [MetaData("EFFECT", 7)]
     public class Effect_v7 : DecodedMetaEntryBase_v2, IEffectMeta
     {
@@ -122,6 +153,44 @@ namespace Shared.GameFormats.AnimationMeta.Definitions
         [MetaDataTag(11, "Scale of the effect")]
         public float Scale { get; set; } = 1;
 
+
+        // Part of the inteface - not the metedata file
+        public float EffectStartTime { get => StartTime; set => StartTime = value; }
+        public float EffectEndTime { get => EndTime; set => EndTime = value; }
+    }
+
+    [MetaData("EFFECT", 8)]
+    public class Effect_v8 : Effect_v7 { }
+
+    [MetaData("EFFECT", 9)]
+    public class Effect_v9 : Effect_v7 { }
+
+    [MetaData("EFFECT", 10)]
+    public class Effect_v10 : DecodedMetaEntryBase, IEffectMeta
+    {
+        [MetaDataTag(5, "Name of the VFX's .xml file in the vfx folder. Leave off the file extension. Note that for this you don't need to add custom vfx to the particles db table and they still require a \"movie\"-type .pack for them to be loaded.")]
+        public string VfxName { get; set; } = "";
+
+        [MetaDataTag(6)]
+        public bool Tracking { get; set; }
+
+        [MetaDataTag(7, "Does the effect crash with the terrain?")]
+        public bool TerrainMutable { get; set; }
+
+        [MetaDataTag(8)]
+        public bool DistanceCulled { get; set; }
+
+        [MetaDataTag(9)]
+        public Vector3 Position { get; set; } = Vector3.Zero;
+
+        [MetaDataTag(10, "", MetaDataTagAttribute.DisplayType.EulerVector)]
+        public Vector4 Orientation { get; set; } = new(0, 0, 0, 1);
+
+        [MetaDataTag(11, "Bone the effect is attached to, use -1 for it to just spawn and not follow animations")]
+        public int NodeIndex { get; set; }
+
+        [MetaDataTag(12, "Scale of the effect")]
+        public float Scale { get; set; } = 1;
 
         // Part of the inteface - not the metedata file
         public float EffectStartTime { get => StartTime; set => StartTime = value; }
