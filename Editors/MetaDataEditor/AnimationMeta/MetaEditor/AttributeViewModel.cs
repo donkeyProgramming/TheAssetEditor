@@ -45,6 +45,17 @@ namespace Editors.AnimationMeta.Presentation
 
         partial void OnValueAsStringChanged(string value) => Validate();
 
+        // Shows the tag's value again after something other than this field changed it (the 3D view in SuperView).
+        // True if what is shown changed.
+        public virtual bool RefreshFromTarget()
+        {
+            var value = _property.GetValue(_target)?.ToString();
+            if (value == null || value == ValueAsString)
+                return false;
+            ValueAsString = value;
+            return true;
+        }
+
         void Validate()
         {
             IsValid = _parser.Encode(ValueAsString, out _) != null;
@@ -123,6 +134,19 @@ namespace Editors.AnimationMeta.Presentation
             IsValid = true;
         }
 
+        public override bool RefreshFromTarget()
+        {
+            var q = new Quaternion((Vector4)_property.GetValue(_target)!);
+            var shown = MathUtil.EulerDegreesToQuaternion(Value.GetAsVector3());
+            if (Math.Abs(Quaternion.Dot(Quaternion.Normalize(shown), Quaternion.Normalize(q))) > 0.999999f)
+                return false;
+
+            Value.DisableCallbacks = true;
+            Value.Set(MathUtil.QuaternionToEulerDegree(q));
+            Value.DisableCallbacks = false;
+            return true;
+        }
+
         private void OnValueChangedCallback(Vector3 vector)
         {
             var vector3 = Value.GetAsVector3();
@@ -148,6 +172,18 @@ namespace Editors.AnimationMeta.Presentation
             Value.Set(value);
             Value.DisableCallbacks = false;
             IsValid = true;
+        }
+
+        public override bool RefreshFromTarget()
+        {
+            var value = (Vector3)_property.GetValue(_target)!;
+            if (Value.GetAsVector3() == value)
+                return false;
+
+            Value.DisableCallbacks = true;
+            Value.Set(value);
+            Value.DisableCallbacks = false;
+            return true;
         }
 
 

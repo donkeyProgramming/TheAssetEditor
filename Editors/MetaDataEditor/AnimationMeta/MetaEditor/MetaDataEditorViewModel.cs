@@ -119,6 +119,22 @@ namespace Editors.AnimationMeta.Presentation
             }
         }
 
+        // After the 3D view moved or turned a tag: its fields show the new values, and, unless the change was
+        // cancelled, its position and orientation count as unsaved edits.
+        public void RefreshAttributeValues(ParsedMetadataAttribute source, bool countAsEdit)
+        {
+            var tag = Tags.FirstOrDefault(x => ReferenceEquals(x._input, source));
+            if (tag == null)
+                return;
+
+            foreach (var variable in tag.Variables)
+            {
+                var changed = variable.RefreshFromTarget();
+                if (countAsEdit && (changed || variable is VectorAttributeViewModel or OrientationAttributeViewModel))
+                    variable.IsModified = true;
+            }
+        }
+
         [RelayCommand] void MoveUpAction() => _uiCommandFactory.Create<MoveEntryCommand>().ExecuteUp(this);
         [RelayCommand] void MoveDownAction() => _uiCommandFactory.Create<MoveEntryCommand>().ExecuteDown(this);
         [RelayCommand] void DeleteAction() => _uiCommandFactory.Create<DeleteEntryCommand>(x => x.Configure(this)).Execute();
