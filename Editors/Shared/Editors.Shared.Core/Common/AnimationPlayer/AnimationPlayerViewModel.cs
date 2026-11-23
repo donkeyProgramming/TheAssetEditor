@@ -118,7 +118,7 @@ namespace Editors.Shared.Core.Common.AnimationPlayer
                 if (item.Player.IsPlaying)
                     Pause(item);
                 else
-                    Play(item);
+                    Resume(item);
             }
         }
 
@@ -213,6 +213,21 @@ namespace Editors.Shared.Core.Common.AnimationPlayer
                     metaItem.Player.Play();
                 }
             }
+        }
+
+        // Plays on from the current frame (scrubbed or stepped to); from the start once the end was reached
+        void Resume(SceneObject asset)
+        {
+            var player = asset.Player;
+            if (player.GetAnimationLengthUs() > 0 && player.GetTimeUs() >= player.GetAnimationLengthUs())
+            {
+                Play(asset);
+                return;
+            }
+
+            player.Play();
+            foreach (var metaItem in asset.MetaDataItems)
+                metaItem.Player?.Play();
         }
 
         void Pause(SceneObject asset)
