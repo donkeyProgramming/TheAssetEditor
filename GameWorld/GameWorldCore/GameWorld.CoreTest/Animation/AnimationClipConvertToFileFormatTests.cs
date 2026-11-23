@@ -71,5 +71,78 @@ namespace GameWorld.Core.Test.Animation
             Assert.That(part.DynamicFrames, Has.Count.EqualTo(3));
             Assert.That(part.TranslationMappings.All(x => x.IsDynamic), Is.True);
         }
+
+        // Ported from Szy-Cathay/TheAssetEditor-CN 2e3120e46: still tracks go in the static frame
+        [Test]
+        public void Version8_StillTracksAreStatic_MovingTracksDynamic()
+        {
+            var file = CreateClip(3, 0.1f).ConvertToFileFormat(CreateTwoBoneSkeleton(), 8, flagVariables: ["flag_a"]);
+            var reloaded = AnimationFile.Create(new ByteChunk(AnimationFile.ConvertToBytes(file)));
+
+            var part = reloaded.AnimationParts.Single();
+            Assert.Multiple(() =>
+            {
+                Assert.That(reloaded.Header.Version, Is.EqualTo(8));
+                Assert.That(reloaded.Header.UnknownValue_v8, Is.EqualTo(6));
+                Assert.That(reloaded.Header.FlagVariables, Is.EqualTo(new[] { "flag_a" }));
+                // root and child both move in translation; both rotations hold still
+                Assert.That(part.TranslationMappings.Select(x => x.FileWriteValue), Is.EqualTo(new[] { 0, 1 }));
+                Assert.That(part.RotationMappings.Select(x => x.FileWriteValue), Is.EqualTo(new[] { 10000, 10001 }));
+                Assert.That(part.DynamicFrames, Has.Count.EqualTo(3));
+                Assert.That(part.DynamicFrames[2].Transforms[1].Y, Is.EqualTo(4));
+            });
+        }
+
+        [Test]
+        public void Version8_SingleFrame_IsStaticOnlyPose()
+        {
+            var file = CreateClip(1, 0).ConvertToFileFormat(CreateTwoBoneSkeleton(), 8);
+            var reloaded = AnimationFile.Create(new ByteChunk(AnimationFile.ConvertToBytes(file)));
+
+            var part = reloaded.AnimationParts.Single();
+            Assert.Multiple(() =>
+            {
+                Assert.That(part.DynamicFrames, Is.Empty);
+                Assert.That(part.StaticFrame!.Transforms, Has.Count.EqualTo(2));
+                Assert.That(reloaded.Header.AnimationTotalPlayTimeInSec, Is.EqualTo(0.1f));
+                Assert.That(part.DeclaredFrameCount, Is.EqualTo(3));
+            });
+        }
+
+        [Test]
+        public void Version8_ClipThatHoldsStill_KeepsOneDynamicTrack()
+        {
+            var clip = CreateClip(3, 0.1f);
+            foreach (var frame in clip.DynamicFrames)
+                frame.Position = [Vector3.Zero, new Vector3(0, 2, 0)];
+
+            var part = clip.ConvertToFileFormat(CreateTwoBoneSkeleton(), 8).AnimationParts.Single();
+
+            Assert.That(part.TranslationMappings[0].IsDynamic, Is.True);
+            Assert.That(part.DynamicFrames, Has.Count.EqualTo(3));
+        }
+
+        [Test]
+        public void Version8_WithSource_KeepsItsNoneTracksAndPacking()
+        {
+            var skeleton = CreateTwoBoneSkeleton();
+            var source = CreateClip(3, 0.1f).ConvertToFileFormat(skeleton, 8, unknownValueV8: 5);
+            // child rotation untouched by the animation: "none", so it plays the skeleton's bind pose
+            source.AnimationParts[0].RotationMappings[1] = new AnimationFile.AnimationBoneMapping(-1);
+            source.AnimationParts[0].RotationMappings[0] = new AnimationFile.AnimationBoneMapping(10000);
+            source.AnimationParts[0].StaticFrame!.Quaternion.RemoveAt(1);
+            source = AnimationFile.Create(new ByteChunk(AnimationFile.ConvertToBytes(source)));
+
+            var clip = new AnimationClip(source, skeleton);
+            var saved = clip.ConvertToFileFormat(skeleton, 8, source: source);
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(saved.Header.UnknownValue_v8, Is.EqualTo(5));
+                Assert.That(saved.AnimationParts[0].RotationMappings[1].HasValue, Is.False);
+                Assert.That(saved.AnimationParts[0].V8Packing, Is.SameAs(source.AnimationParts[0].V8Packing));
+                Assert.That(AnimationFile.ConvertToBytes(saved), Is.EqualTo(AnimationFile.ConvertToBytes(source)));
+            });
+        }
     }
 }

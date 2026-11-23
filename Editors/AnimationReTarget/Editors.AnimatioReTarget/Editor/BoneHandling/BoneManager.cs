@@ -104,9 +104,10 @@ namespace Editors.AnimatioReTarget.Editor.BoneHandling
         void Invalidate()
         {
             Bones.Clear();
-            if (_sourceSkeleton != null)
+            // One settings node per target bone: the remapper and ApplyMapping look them up by target bone index
+            if (_targetSkeleton != null)
             {
-                Bones = SkeletonBoneNodeHelper.Build(_sourceSkeleton.Data);
+                Bones = SkeletonBoneNodeHelper.Build(_targetSkeleton.Data);
             }
             FlatBones = Flatten(Bones).ToList();
             SelectedBone = Bones.FirstOrDefault();

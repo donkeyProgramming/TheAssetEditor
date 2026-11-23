@@ -101,7 +101,7 @@ namespace Editors.AnimatioReTarget.Editor
 
             BoneManager.SetSceneNodes(source.Data, target.Data, generated.Data);
             Rendering.SetSceneNodes(source.Data, target.Data, generated.Data);
-            SaveManager.SetSceneNodes(source.Data, target.Data, generated.Data);
+            SaveManager.SetSceneNodes(source.Data, target.Data, generated.Data, Settings);
         }
 
         private void OnSceneObjectUpdated(SceneObjectUpdateEvent e)

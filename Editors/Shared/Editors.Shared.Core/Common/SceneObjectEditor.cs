@@ -110,8 +110,13 @@ namespace Editors.Shared.Core.Common
             if (assetViewModel.ModelNode != null)
                 assetViewModel.ParentNode.RemoveObject(assetViewModel.ModelNode);
 
+            // Nothing to copy: drop the old mesh rather than leave it pointing at the removed node, and follow the skeleton
             if (other.ModelNode == null)
+            {
+                assetViewModel.ModelNode = null;
+                SetSkeleton(assetViewModel, _packFileService.FindFile(other.SkeletonName.Value));
                 return;
+            }
 
             assetViewModel.ModelNode = SceneNodeHelper.CloneNodeAndChildren(other.ModelNode);
 
@@ -122,6 +127,7 @@ namespace Editors.Shared.Core.Common
             assetViewModel.ParentNode.AddObject(assetViewModel.ModelNode);
             var skeletonFile = _packFileService.FindFile(other.SkeletonName.Value);
             SetSkeleton(assetViewModel, skeletonFile);
+            WireAttachmentResolvers(assetViewModel);   // the clones' weapon slots follow this object's skeleton, not the other's
 
             assetViewModel.ShowMesh.Value = assetViewModel.ShowMesh.Value;
             assetViewModel.ShowSkeleton.Value = assetViewModel.ShowSkeleton.Value;

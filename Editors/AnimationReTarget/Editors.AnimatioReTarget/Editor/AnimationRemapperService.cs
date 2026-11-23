@@ -23,7 +23,17 @@ namespace Editors.AnimatioReTarget.Editor
             var newPlayTime = (float)_settings.AnimationSpeedMult * animationToCopy.PlayTimeInSec;
 
             //animationToCopy.RemoveOptimizations(copyFromSkeleton);
-            var resampledAnimationToCopy = GameWorld.Core.Animation.AnimationEditor.ReSample(copyFromSkeleton, animationToCopy, newFrameCount, newPlayTime);
+            // Resampling to the same frame count changes nothing but adds float drift
+            AnimationClip resampledAnimationToCopy;
+            if (newFrameCount == animationToCopy.DynamicFrames.Count)
+            {
+                resampledAnimationToCopy = animationToCopy.Clone();
+                resampledAnimationToCopy.PlayTimeInSec = newPlayTime;
+            }
+            else
+            {
+                resampledAnimationToCopy = GameWorld.Core.Animation.AnimationEditor.ReSample(copyFromSkeleton, animationToCopy, newFrameCount, newPlayTime);
+            }
             var newAnimation = CreateNewAnimation(copyToSkeleton, resampledAnimationToCopy);
 
             if (copyFromSkeleton.SkeletonName != copyToSkeleton.SkeletonName)
@@ -46,86 +56,106 @@ namespace Editors.AnimatioReTarget.Editor
         }
 
 
+        // Walks the target bones parent first, keeping each bone's animated world as it goes, so a child is always
+        // placed against its parent's new pose (and the frame is not resampled once per bone)
         void TransferAnimationWorld(GameSkeleton copyFromSkeleton, GameSkeleton copyToSkeleton, AnimationClip animationToCopy, AnimationClip newAnimation)
         {
-            var frameCount = animationToCopy.DynamicFrames.Count;
-            for (var frameIndex = 0; frameIndex < frameCount; frameIndex++)
+            var processingOrder = GetParentFirstBoneOrder(copyToSkeleton);
+            for (var frameIndex = 0; frameIndex < animationToCopy.DynamicFrames.Count; frameIndex++)
             {
-                for (var i = 0; i < copyToSkeleton.BoneCount; i++)
+                var sourcePose = AnimationSampler.Sample(frameIndex, 0, copyFromSkeleton, animationToCopy);
+                var targetFrame = newAnimation.DynamicFrames[frameIndex];
+                var targetWorlds = new Matrix[copyToSkeleton.BoneCount];
+                foreach (var index in processingOrder)
                 {
-                    var currentCopyToFrame = AnimationSampler.Sample(frameIndex, 0, copyToSkeleton, newAnimation);
-                    var copyFromFrame = AnimationSampler.Sample(frameIndex, 0, copyFromSkeleton, animationToCopy);
-
-                    var desiredBonePosWorld = currentCopyToFrame.GetSkeletonAnimatedWorld(copyToSkeleton, i);
-
-                    var mappedIndex = BoneHelper_new.GetMappedIndex(_bones, i);
-                    if (mappedIndex != null)
+                    var parent = copyToSkeleton.GetParentBoneIndex(index);
+                    var parentWorld = parent < 0 ? Matrix.Identity : targetWorlds[parent];
+                    var mappedIndex = BoneHelper_new.GetMappedIndex(_bones, index);
+                    if (mappedIndex != null && mappedIndex.Value >= 0 && mappedIndex.Value < copyFromSkeleton.BoneCount)
                     {
-                        var targetBoneIndex = mappedIndex.Value;
-                        desiredBonePosWorld = copyFromFrame.GetSkeletonAnimatedWorld(copyFromSkeleton, targetBoneIndex) * Matrix.CreateScale(1);
+                        var localTransform = sourcePose.GetSkeletonAnimatedWorld(copyFromSkeleton, mappedIndex.Value);
+                        if (parent >= 0)
+                            localTransform *= Matrix.Invert(parentWorld);
+                        localTransform.Decompose(out _, out var rotation, out var position);
+
+                        var settings = BoneHelper_new.GetBoneFromId(_bones, index);
+                        if (settings?.ApplyRotation == true)
+                            targetFrame.Rotation[index] = rotation;
+                        if (settings?.ApplyTranslation == true)
+                            targetFrame.Position[index] = position;
                     }
-
-                    var fromParentBoneIndex = copyToSkeleton.GetParentBoneIndex(i);
-                    if (fromParentBoneIndex != -1)
-                    {
-                        // Convert to local space 
-                        var parentWorld = currentCopyToFrame.GetSkeletonAnimatedWorld(copyToSkeleton, fromParentBoneIndex);
-                        desiredBonePosWorld = desiredBonePosWorld * Matrix.Invert(parentWorld);
-                    }
-
-                    desiredBonePosWorld.Decompose(out var _, out var boneRotation, out var bonePosition);
-
-                    var boneSettings = BoneHelper_new.GetBoneFromId(_bones, i);
-                    if (boneSettings == null)
-                        continue;
-                    if (boneSettings.ApplyRotation == true)
-                        newAnimation.DynamicFrames[frameIndex].Rotation[i] = boneRotation;
-                    if (boneSettings.ApplyTranslation == true)
-                        newAnimation.DynamicFrames[frameIndex].Position[i] = bonePosition;
-
+                    targetWorlds[index] = GetLocalTransform(targetFrame, index) * parentWorld;
                 }
             }
         }
 
+        static List<int> GetParentFirstBoneOrder(GameSkeleton skeleton)
+        {
+            var remaining = Enumerable.Range(0, skeleton.BoneCount).ToHashSet();
+            var result = new List<int>(skeleton.BoneCount);
+            while (remaining.Count > 0)
+            {
+                var ready = remaining
+                    .Where(index => skeleton.GetParentBoneIndex(index) is var parent && (parent < 0 || !remaining.Contains(parent)))
+                    .OrderBy(index => index)
+                    .ToArray();
+                if (ready.Length == 0)
+                {
+                    result.AddRange(remaining.OrderBy(index => index));   // a parent loop; shouldn't happen
+                    break;
+                }
+
+                foreach (var index in ready)
+                {
+                    result.Add(index);
+                    remaining.Remove(index);
+                }
+            }
+            return result;
+        }
+
+        // Scales the translation of bones whose translation is transferred, by target bone length over source bone length
         void ApplyRelativeScale(GameSkeleton copyFromSkeleton, GameSkeleton copyToSkeleton, AnimationClip animationToScale)
         {
-            var frameCount = animationToScale.DynamicFrames.Count;
-            for (var frameIndex = 0; frameIndex < frameCount; frameIndex++)
+            for (var index = 0; index < copyToSkeleton.BoneCount; index++)
             {
-                for (var i = 0; i < copyToSkeleton.BoneCount; i++)
-                {
-                    var boneSettings = BoneHelper_new.GetBoneFromId(_bones, i);
-                    var mappedIndex = BoneHelper_new.GetMappedIndex(_bones, i);
+                var settings = BoneHelper_new.GetBoneFromId(_bones, index);
+                var mappedIndex = BoneHelper_new.GetMappedIndex(_bones, index);
+                if (mappedIndex == null || settings?.ApplyTranslation != true)
+                    continue;
+                var sourceParent = copyFromSkeleton.GetParentBoneIndex(mappedIndex.Value);
+                var targetParent = copyToSkeleton.GetParentBoneIndex(index);
+                if (sourceParent < 0 || targetParent < 0)
+                    continue;
 
-                    if (mappedIndex != null)
-                    {
-                        var targetBoneIndex = mappedIndex.Value;
-                        var copyFromParentIndex = copyFromSkeleton.GetParentBoneIndex(targetBoneIndex);
-                        var copyToParentIndex = copyToSkeleton.GetParentBoneIndex(i);
+                var sourceLength = Vector3.Distance(copyFromSkeleton.GetWorldTransform(mappedIndex.Value).Translation, copyFromSkeleton.GetWorldTransform(sourceParent).Translation);
+                var targetLength = Vector3.Distance(copyToSkeleton.GetWorldTransform(index).Translation, copyToSkeleton.GetWorldTransform(targetParent).Translation);
+                if (sourceLength == 0 || targetLength == 0)
+                    continue;
 
-                        if (copyToParentIndex != -1 && copyFromParentIndex != -1)
-                        {
-                            var toBone0 = copyToSkeleton.GetWorldTransform(i).Translation;
-                            var toBone1 = copyToSkeleton.GetWorldTransform(copyToParentIndex).Translation;
-                            var targetBoneLength = Vector3.Distance(toBone0, toBone1);
-
-                            var fromBone0 = copyFromSkeleton.GetWorldTransform(targetBoneIndex).Translation;
-                            var fromBone1 = copyFromSkeleton.GetWorldTransform(copyFromParentIndex).Translation;
-                            var fromBoneLength = Vector3.Distance(fromBone0, fromBone1);
-
-                            if (fromBoneLength == 0 || targetBoneLength == 0)
-                            {
-                                targetBoneLength = 1;
-                                fromBoneLength = 1;
-                            }
-
-                            var relativeScale = targetBoneLength / fromBoneLength;
-                            animationToScale.DynamicFrames[frameIndex].Position[i] = animationToScale.DynamicFrames[frameIndex].Position[i] * relativeScale;
-                        }
-                    }
-                }
+                var ratio = targetLength / sourceLength;
+                foreach (var frame in animationToScale.DynamicFrames)
+                    frame.Position[index] *= ratio;
             }
         }
+
+        // The animated world of a bone, from the frame's local values
+        static Matrix GetAnimatedWorldTransform(GameSkeleton skeleton, AnimationClip.KeyFrame frame, int boneIndex)
+        {
+            var worldTransform = GetLocalTransform(frame, boneIndex);
+            var parentBoneIndex = skeleton.GetParentBoneIndex(boneIndex);
+            while (parentBoneIndex != -1)
+            {
+                worldTransform *= GetLocalTransform(frame, parentBoneIndex);
+                parentBoneIndex = skeleton.GetParentBoneIndex(parentBoneIndex);
+            }
+            return worldTransform;
+        }
+
+        static Matrix GetLocalTransform(AnimationClip.KeyFrame frame, int boneIndex) =>
+            Matrix.CreateScale(frame.Scale[boneIndex]) *
+            Matrix.CreateFromQuaternion(Quaternion.Normalize(frame.Rotation[boneIndex])) *
+            Matrix.CreateTranslation(frame.Position[boneIndex]);
 
         void SnapBonesToWorld(GameSkeleton copyFromSkeleton, GameSkeleton copyToSkeleton, AnimationClip animationToScale, AnimationClip animationToCopy)
         {
@@ -133,11 +163,10 @@ namespace Editors.AnimatioReTarget.Editor
             for (var frameIndex = 0; frameIndex < frameCount; frameIndex++)
             {
                 var copyFromFrame = AnimationSampler.Sample(frameIndex, 0, copyFromSkeleton, animationToCopy);
+                var targetFrame = animationToScale.DynamicFrames[frameIndex];
 
                 for (var i = 0; i < copyToSkeleton.BoneCount; i++)
                 {
-                    var currentFrame = AnimationSampler.Sample(frameIndex, 0, copyToSkeleton, animationToScale);
-
                     var boneSettings = BoneHelper_new.GetBoneFromId(_bones, i);
                     if (boneSettings == null)
                         continue;
@@ -145,24 +174,22 @@ namespace Editors.AnimatioReTarget.Editor
                         continue;
 
                     var mappedIndex = BoneHelper_new.GetMappedIndex(_bones, i);
-                    if (mappedIndex == null)
+                    if (mappedIndex == null || mappedIndex.Value < 0 || mappedIndex.Value >= copyFromSkeleton.BoneCount)
                         continue;
 
                     var fromParentBoneIndex = copyToSkeleton.GetParentBoneIndex(i);
                     if (fromParentBoneIndex == -1)
                         continue;
 
-                    var targetBoneIndex = mappedIndex.Value;
-                    var desiredBonePosWorld = copyFromFrame.GetSkeletonAnimatedWorld(copyFromSkeleton, targetBoneIndex) * Matrix.CreateScale(1);
-
-                    var parentWorld = currentFrame.GetSkeletonAnimatedWorld(copyToSkeleton, fromParentBoneIndex);
+                    var desiredBonePosWorld = copyFromFrame.GetSkeletonAnimatedWorld(copyFromSkeleton, mappedIndex.Value);
+                    var parentWorld = GetAnimatedWorldTransform(copyToSkeleton, targetFrame, fromParentBoneIndex);
 
                     var bonePositionLocalSpace = desiredBonePosWorld * Matrix.Invert(parentWorld);
                     bonePositionLocalSpace.Decompose(out var _, out var boneRotation, out var bonePosition);
 
                     // Apply the values to the animation
-                    animationToScale.DynamicFrames[frameIndex].Rotation[i] = boneRotation;
-                    animationToScale.DynamicFrames[frameIndex].Position[i] = bonePosition;
+                    targetFrame.Rotation[i] = boneRotation;
+                    targetFrame.Position[i] = bonePosition;
                 }
             }
         }
@@ -172,10 +199,9 @@ namespace Editors.AnimatioReTarget.Editor
             var frameCount = animationToScale.DynamicFrames.Count;
             for (var frameIndex = 0; frameIndex < frameCount; frameIndex++)
             {
+                var targetFrame = animationToScale.DynamicFrames[frameIndex];
                 for (var i = 0; i < copyToSkeleton.BoneCount; i++)
                 {
-                    var currentFrame = AnimationSampler.Sample(frameIndex, 0, copyToSkeleton, animationToScale);
-
                     var fromParentBoneIndex = copyToSkeleton.GetParentBoneIndex(i);
                     if (fromParentBoneIndex == -1)
                         continue;
@@ -184,16 +210,21 @@ namespace Editors.AnimatioReTarget.Editor
                     if (boneSettings == null)
                         continue;
 
-                    var desiredBonePosWorld = MathUtil.CreateRotation(new Vector3((float)boneSettings.RotationOffset.X.Value, (float)boneSettings.RotationOffset.Y.Value, (float)boneSettings.RotationOffset.Z.Value)) *
-                        currentFrame.GetSkeletonAnimatedWorld(copyToSkeleton, i) *
-                        Matrix.CreateTranslation(new Vector3((float)boneSettings.TranslationOffset.X.Value, (float)boneSettings.TranslationOffset.Y.Value, (float)boneSettings.TranslationOffset.Z.Value));
+                    var rotationOffset = new Vector3((float)boneSettings.RotationOffset.X.Value, (float)boneSettings.RotationOffset.Y.Value, (float)boneSettings.RotationOffset.Z.Value);
+                    var translationOffset = new Vector3((float)boneSettings.TranslationOffset.X.Value, (float)boneSettings.TranslationOffset.Y.Value, (float)boneSettings.TranslationOffset.Z.Value);
+                    if (rotationOffset == Vector3.Zero && translationOffset == Vector3.Zero)
+                        continue;
 
-                    var parentWorld = currentFrame.GetSkeletonAnimatedWorld(copyToSkeleton, fromParentBoneIndex);
+                    var desiredBonePosWorld = MathUtil.CreateRotation(rotationOffset) *
+                        GetAnimatedWorldTransform(copyToSkeleton, targetFrame, i) *
+                        Matrix.CreateTranslation(translationOffset);
+
+                    var parentWorld = GetAnimatedWorldTransform(copyToSkeleton, targetFrame, fromParentBoneIndex);
                     var bonePositionLocalSpace = desiredBonePosWorld * Matrix.Invert(parentWorld);
                     bonePositionLocalSpace.Decompose(out var _, out var boneRotation, out var bonePosition);
 
-                    animationToScale.DynamicFrames[frameIndex].Rotation[i] = boneRotation;
-                    animationToScale.DynamicFrames[frameIndex].Position[i] = bonePosition;
+                    targetFrame.Rotation[i] = boneRotation;
+                    targetFrame.Position[i] = bonePosition;
 
                     if (boneSettings.IsLocalOffset)
                     {
@@ -204,12 +235,16 @@ namespace Editors.AnimatioReTarget.Editor
             }
         }
 
+        // A bone with a relative bone (a weapon slot relative to its hand) keeps the source's offset from that bone.
+        // The offset is taken in the hand's own space, so it turns with the target's hand rather than staying fixed in world.
         void FixAttachmentPoints(GameSkeleton copyFromSkeleton, GameSkeleton copyToSkeleton, AnimationClip animationToFix, AnimationClip animationToCopy)
         {
             var frameCount = animationToCopy.DynamicFrames.Count;
 
             for (var frameIndex = 0; frameIndex < frameCount; frameIndex++)
             {
+                var copyFromFrame = AnimationSampler.Sample(frameIndex, 0, copyFromSkeleton, animationToCopy);
+                var targetFrame = animationToFix.DynamicFrames[frameIndex];
                 for (var i = 0; i < copyToSkeleton.BoneCount; i++)
                 {
                     // Does this bone have a thing to fix?
@@ -221,57 +256,36 @@ namespace Editors.AnimatioReTarget.Editor
                     if (boneSettings.SelectedRelativeBone == null || mappedIndex == null)
                         continue;
 
-                    var targetBoneIndex = mappedIndex.Value;
-
-                    var currentCopyToFrame = AnimationSampler.Sample(frameIndex, 0, copyToSkeleton, animationToFix);
-                    var copyFromFrame = AnimationSampler.Sample(frameIndex, 0, copyFromSkeleton, animationToCopy);
-
-
                     // self attach - The attachment point to move | copyToSkeleton -> boneIndex i
-                    // target attach - the attachment point to move to |  copyFromSkeleton -> boneIndex targetBoneIndex
+                    // target attach - the attachment point to move to |  copyFromSkeleton -> boneIndex mappedIndex
                     // self hand - Reference point | copyToSkeleton -> boneIndex SelectedRelativeBone.index
                     // target hand-  reference point | copyFromSkeleton -> boneIndex self hand mapping index
-
-                    var boneIndexAttachmentPointSelf = i;
+                    var fromParentBoneIndex = copyToSkeleton.GetParentBoneIndex(i);
                     var boneIndexHandSelf = boneSettings.SelectedRelativeBone.BoneIndex;
+                    if (fromParentBoneIndex == -1 || boneIndexHandSelf == i || boneIndexHandSelf < 0 || boneIndexHandSelf >= copyToSkeleton.BoneCount ||
+                        mappedIndex.Value < 0 || mappedIndex.Value >= copyFromSkeleton.BoneCount)
+                        continue;
 
+                    var boneIndexHandSource = BoneHelper_new.GetMappedIndex(_bones, boneIndexHandSelf);
+                    if (boneIndexHandSource == null || boneIndexHandSource.Value < 0 || boneIndexHandSource.Value >= copyFromSkeleton.BoneCount)
+                        continue;
 
-                    var boneIndexAttachmentPointSource = mappedIndex.Value;
-                    var mappedIndexRef = BoneHelper_new.GetMappedIndex(_bones, boneIndexHandSelf);
-                    var boneIndexHandSource = mappedIndexRef;
-
-
-                    var self = copyFromFrame.GetSkeletonAnimatedWorld(copyFromSkeleton, boneIndexAttachmentPointSource);
+                    var self = copyFromFrame.GetSkeletonAnimatedWorld(copyFromSkeleton, mappedIndex.Value);
                     var hand = copyFromFrame.GetSkeletonAnimatedWorld(copyFromSkeleton, boneIndexHandSource.Value);
+                    (self * Matrix.Invert(hand)).Decompose(out var _, out var _, out var offsetInHandSpace);
 
-                    self.Decompose(out var _, out var _, out var bone0);
-                    hand.Decompose(out var _, out var _, out var bone1);
-
-                    var diff = bone0 - bone1;
-
-                    var desiredBonePosWorld = currentCopyToFrame.GetSkeletonAnimatedWorld(copyToSkeleton, boneIndexHandSelf);
-
-                    desiredBonePosWorld = /*MathUtil.CreateRotation(new Vector3((float)boneSettings.RotationOffset.X.Value, (float)boneSettings.RotationOffset.Y.Value, (float)boneSettings.RotationOffset.Z.Value)) **/
-                      desiredBonePosWorld *
-                       Matrix.CreateTranslation(diff);
+                    var desiredBonePosWorld = Matrix.CreateTranslation(offsetInHandSpace) * GetAnimatedWorldTransform(copyToSkeleton, targetFrame, boneIndexHandSelf);
 
                     // Reapply offsets
                     desiredBonePosWorld = MathUtil.CreateRotation(new Vector3((float)boneSettings.RotationOffset.X.Value, (float)boneSettings.RotationOffset.Y.Value, (float)boneSettings.RotationOffset.Z.Value)) *
                         desiredBonePosWorld *
                         Matrix.CreateTranslation(new Vector3((float)boneSettings.TranslationOffset.X.Value, (float)boneSettings.TranslationOffset.Y.Value, (float)boneSettings.TranslationOffset.Z.Value));
 
-                    //   desiredBonePosWorld = copyFromFrame.GetSkeletonAnimatedWorld(copyFromSkeleton, targetBoneIndex) * Matrix.CreateScale(1);
-
-
-                    var fromParentBoneIndex = copyToSkeleton.GetParentBoneIndex(i);
-
-                    var parentWorld = currentCopyToFrame.GetSkeletonAnimatedWorld(copyToSkeleton, fromParentBoneIndex);
-
+                    var parentWorld = GetAnimatedWorldTransform(copyToSkeleton, targetFrame, fromParentBoneIndex);
                     var bonePositionLocalSpace = desiredBonePosWorld * Matrix.Invert(parentWorld);
-                    bonePositionLocalSpace.Decompose(out var _, out var boneRotation, out var bonePosition);
+                    bonePositionLocalSpace.Decompose(out var _, out var _, out var bonePosition);
 
-                    //animationToFix.DynamicFrames[frameIndex].Rotation[i] = boneRotation;
-                    animationToFix.DynamicFrames[frameIndex].Position[i] = bonePosition;
+                    targetFrame.Position[i] = bonePosition;
                 }
             }
         }
@@ -314,13 +328,22 @@ namespace Editors.AnimatioReTarget.Editor
                     if (mappedIndex != null)
                     {
                         var boneSettings = BoneHelper_new.GetBoneFromId(_bones, i);
+                        if (boneSettings == null)
+                            continue;
+
                         if (boneSettings.FreezeTranslation)
                             animation.DynamicFrames[frameIndex].Position[i] = Vector3.Zero;
 
                         if (boneSettings.FreezeRotation)
                             animation.DynamicFrames[frameIndex].Rotation[i] = Quaternion.Identity;
                         if (boneSettings.FreezeRotationZ)
-                            animation.DynamicFrames[frameIndex].Rotation[i] = new Quaternion(0, 0, animation.DynamicFrames[0].Rotation[i].Z, animation.DynamicFrames[0].Rotation[i].W);
+                        {
+                            // Keep the swing, hold the twist around Z at the first frame's
+                            var currentRotation = Quaternion.Normalize(animation.DynamicFrames[frameIndex].Rotation[i]);
+                            var currentSwing = currentRotation * Quaternion.Inverse(ExtractTwistAroundZ(currentRotation));
+                            var firstFrameTwist = ExtractTwistAroundZ(animation.DynamicFrames[0].Rotation[i]);
+                            animation.DynamicFrames[frameIndex].Rotation[i] = Quaternion.Normalize(currentSwing * firstFrameTwist);
+                        }
                     }
                     else
                     {
@@ -330,12 +353,20 @@ namespace Editors.AnimatioReTarget.Editor
                             animation.DynamicFrames[frameIndex].Position[i] = Vector3.Zero;
                         }
                     }
-
-
                 }
             }
         }
 
+        // The twist part of a swing/twist decomposition around Z
+        static Quaternion ExtractTwistAroundZ(Quaternion rotation)
+        {
+            var lengthSquared = rotation.Z * rotation.Z + rotation.W * rotation.W;
+            if (lengthSquared <= float.Epsilon)
+                return Quaternion.Identity;
+
+            var inverseLength = 1.0f / MathF.Sqrt(lengthSquared);
+            return new Quaternion(0, 0, rotation.Z * inverseLength, rotation.W * inverseLength);
+        }
 
         AnimationClip CreateNewAnimation(GameSkeleton skeleton, AnimationClip animationToCopy)
         {

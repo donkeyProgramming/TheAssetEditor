@@ -25,6 +25,12 @@ namespace Shared.GameFormats.Animation
         {
             public List<RmvVector3> Transforms { get; set; } = new List<RmvVector3>();
             public List<RmvVector4> Quaternion { get; set; } = new List<RmvVector4>();
+
+            // Version 8 only: the bytes each range-packed channel was read from, by position in Transforms/Quaternion
+            // (null where the channel wasn't ranged). Near an extreme range several bytes decode to the same float,
+            // so the float alone can't say which byte to write back; the writer reuses one while it still decodes to the value.
+            internal List<sbyte[]?>? V8TranslationBytes { get; set; }
+            internal List<sbyte[]?>? V8QuaternionBytes { get; set; }
         }
 
         public class AnimationHeader
@@ -36,7 +42,7 @@ namespace Shared.GameFormats.Animation
             public uint FlagCount { get; set; } = 0;
             public List<string> FlagVariables { get; set; } = new List<string>();
             public float AnimationTotalPlayTimeInSec { get; set; }
-            public uint UnknownValue_v8 { get; set; } = 0;
+            public uint UnknownValue_v8 { get; set; } = 6;   // 6 in every vanilla v8 file
         }
 
         public enum AnimationBoneMappingType
@@ -100,6 +106,14 @@ namespace Shared.GameFormats.Animation
             public List<Frame> DynamicFrames = new List<Frame>();
             public List<AnimationBoneMapping> RotationMappings { get; set; } = new List<AnimationBoneMapping>();
             public List<AnimationBoneMapping> TranslationMappings { get; set; } = new List<AnimationBoneMapping>();
+
+            // The frame-count word of a part with no dynamic frames. Not always 3: CA writes the length the
+            // animation would have had (round(duration * frameRate) + 1). Null for a part built from scratch.
+            public int? DeclaredFrameCount { get; set; }
+
+            // Version 8 only: how the file packed each channel, kept so the part saves back as it was read.
+            // Null for a part that didn't come from a v8 file; the writer then stores everything uncompressed.
+            public AnimationV8OptimizationData? V8Packing { get; set; }
         }
 
         public class AnimationV8OptimizationData
@@ -108,8 +122,10 @@ namespace Shared.GameFormats.Animation
             public sbyte[] TranslationBitRate { get; set; }
             public sbyte[] RotationBitRate { get; set; }
 
-            public (RmvVector3 Min, RmvVector3 Max)[] Range_map_translations { get; set; }
-            public (RmvVector4 Min, RmvVector4 Max)[] Range_map_quaternion { get; set; }
+            // Decoded as Max + (byte / 127) * Min, so Min is the half-width and Max the midpoint.
+            // The table lengths are CA's own choice and can run past the last ranged bone, so keep them whole.
+            public (RmvVector3 Min, RmvVector3 Max)[] Range_map_translations { get; set; } = [];
+            public (RmvVector4 Min, RmvVector4 Max)[] Range_map_quaternion { get; set; } = [];
 
             public AnimationV8OptimizationData(uint boneCount)
             {
@@ -248,9 +264,11 @@ namespace Shared.GameFormats.Animation
             // Animation Data
             var animPosCount = chunk.ReadInt32();
             var animRotCount = chunk.ReadInt32();
-            var frameCount = chunk.ReadInt32();    // Always 3 when there is no data? Why?
+            var frameCount = chunk.ReadInt32();
 
-            if (animPosCount != 0 || animRotCount != 0)
+            if (animPosCount == 0 && animRotCount == 0)
+                animPart.DeclaredFrameCount = frameCount;
+            else
             {
                 for (var i = 0; i < frameCount; i++)
                 {
@@ -328,7 +346,10 @@ namespace Shared.GameFormats.Animation
                 var frame_tracks_quaternions_count = chunk.ReadUInt32();
                 var frame_count = chunk.ReadUInt32();
 
-                if (frame_tracks_tranlations_count != 0 || frame_tracks_quaternions_count != 0)
+                animationPart.V8Packing = optimizationData;
+                if (frame_tracks_tranlations_count == 0 && frame_tracks_quaternions_count == 0)
+                    animationPart.DeclaredFrameCount = (int)frame_count;
+                else
                 {
                     for (var frameIndex = 0; frameIndex < frame_count; frameIndex++)
                     {
@@ -346,7 +367,7 @@ namespace Shared.GameFormats.Animation
 
         static Frame ReadFrameV8(ByteChunk chunk, uint positions, uint rotations, bool isDynamic, AnimationV8OptimizationData optimizationData)
         {
-            var frame = new Frame();
+            var frame = new Frame { V8TranslationBytes = [], V8QuaternionBytes = [] };
             for (var i = 0; i < optimizationData.BoneCount; i++)
             {
                 var bitRate = isDynamic ? optimizationData.TranslationBitRate[i] : -optimizationData.TranslationBitRate[i];
@@ -355,12 +376,14 @@ namespace Shared.GameFormats.Animation
                     case 12:
                         var vector = new RmvVector3(chunk.ReadSingle(), chunk.ReadSingle(), chunk.ReadSingle());
                         frame.Transforms.Add(vector);
+                        frame.V8TranslationBytes.Add(null);
                         break;
 
                     case 3:
                         var d0 = chunk.ReadSBytes(3);
                         var vecto2r = AnimationFileLoadHelpers.Decode_translation_24_888_ranged(d0, optimizationData, i);
                         frame.Transforms.Add(vecto2r);
+                        frame.V8TranslationBytes.Add(d0);
                         break;
 
                     case 0:
@@ -384,12 +407,14 @@ namespace Shared.GameFormats.Animation
 
                         var quaternion = new RmvVector4(quat[0] * maxValue, quat[1] * maxValue, quat[2] * maxValue, quat[3] * maxValue);
                         frame.Quaternion.Add(quaternion);
+                        frame.V8QuaternionBytes.Add(null);
                         break;
 
                     case 4:
                         var d0 = chunk.ReadSBytes(4);
                         var q = AnimationFileLoadHelpers.Decode_quaternion_32_s8888_ranged(d0, optimizationData, i);
                         frame.Quaternion.Add(q);
+                        frame.V8QuaternionBytes.Add(d0);
                         break;
 
                     case 0:
@@ -406,8 +431,8 @@ namespace Shared.GameFormats.Animation
 
         static byte[] ConvertToBytesInvernal(AnimationFile input)
         {
-            if (input.AnimationParts.Count != 1 || input.Header.Version == 8)
-                throw new Exception("Animations with multiple parts or version 8 can not be saved!");
+            if (input.Header.Version != 8 && input.AnimationParts.Count != 1)
+                throw new Exception("Animations before version 8 must contain exactly one part.");
 
             using var memoryStream = new MemoryStream();
             using var writer = new BinaryWriter(memoryStream);
@@ -439,6 +464,12 @@ namespace Shared.GameFormats.Animation
                 for (var i = 0; i < bone.Name.Length; i++)
                     writer.Write(bone.Name[i]);
                 writer.Write(bone.ParentId);
+            }
+
+            if (input.Header.Version == 8)
+            {
+                AnimationFileV8Writer.Write(writer, input);
+                return memoryStream.ToArray();
             }
 
             foreach (var animationPart in input.AnimationParts)
@@ -479,7 +510,7 @@ namespace Shared.GameFormats.Animation
                 {
                     writer.Write(0);   // animPosCount
                     writer.Write(0);   // animRotCount
-                    writer.Write(3);   // Frame count, why 3 when empty?
+                    writer.Write(animationPart.DeclaredFrameCount ?? 3);
                 }
             }
 
@@ -495,7 +526,7 @@ namespace Shared.GameFormats.Animation
         }
 
 
-        static void WriteFrame(BinaryWriter writer, Frame frame)
+        internal static void WriteFrame(BinaryWriter writer, Frame frame)
         {
             for (var i = 0; i < frame.Transforms.Count(); i++)
             {

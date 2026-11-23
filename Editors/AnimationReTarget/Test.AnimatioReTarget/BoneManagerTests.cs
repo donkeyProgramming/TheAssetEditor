@@ -29,10 +29,10 @@ namespace Test.AnimatioReTarget
             ];
 
             var lookUp = new Mock<ISkeletonAnimationLookUpHelper>();
-            lookUp.Setup(x => x.GetSkeletonFileFromName("source")).Returns(skeleton);
+            lookUp.Setup(x => x.GetSkeletonFileFromName("target")).Returns(skeleton);
             _dialogs = new Mock<IStandardDialogs>();
             _manager = new BoneManager(_dialogs.Object, Mock.Of<IAbstractFormFactory<BoneMappingWindow>>(), lookUp.Object);
-            _manager.UpdateSourceSkeleton("source");
+            _manager.UpdateTargetSkeleton("target");   // the settings tree is built from the target skeleton
         }
 
         [Test]

@@ -5,6 +5,7 @@ using GameWorld.Core.SceneNodes;
 using Shared.Core.Commands;
 using Shared.Core.PackFiles.Models;
 using Shared.Core.ToolCreation;
+using Shared.GameFormats.Animation;
 using Test.TestingUtility.Shared;
 using Test.TestingUtility.TestUtility;
 
@@ -37,6 +38,7 @@ namespace Test.AnimatioReTarget
             Step3_ApplyDefaultMapping(runner, editor!);
             Step4_GenerateAnimation(runner, editor!);
             Step5_UpdateAnimationSettingsAndGenerateAnimation(runner, editor!, outputPackFile);
+            Step6_SaveAsVersion8(editor!, outputPackFile);
             // UpdateSouceAndValidate(runner, editor!);
             // UpdateTargetAndValidate(runner, editor!);
             // Close
@@ -80,6 +82,14 @@ namespace Test.AnimatioReTarget
             Assert.That(generated.Data.SkeletonName.Value, Is.EqualTo(@"animations\skeletons\humanoid01e.anim"));
             var meshCount = SceneNodeHelper.GetChildrenOfType<Rmv2MeshNode>(generated.Data.ModelNode);
             Assert.That(meshCount, Is.Not.Zero);
+
+            // A weapon slot on the target survives the copy into generated, attached to generated's own skeleton.
+            // The celestial general has no slot meshes, so give one mesh a slot.
+            SceneNodeHelper.GetChildrenOfType<Rmv2MeshNode>(targetNode.Data.ModelNode).First().AttachmentPointName = "hand_right";
+            sceneObjectEditor.CopyMeshFromOther(generated.Data, targetNode.Data);
+            var slotMesh = SceneNodeHelper.GetChildrenOfType<Rmv2MeshNode>(generated.Data.ModelNode).First();
+            Assert.That(slotMesh.AttachmentPointName, Is.EqualTo("hand_right"));
+            Assert.That(slotMesh.AttachmentBoneResolver, Is.Not.Null);
         }
 
         private void Step2_TryGeneratingAnimation(AssetEditorTestRunner runner, AnimationRetargetEditor editor)
@@ -97,7 +107,7 @@ namespace Test.AnimatioReTarget
             var count1 = SkeletonBoneNodeHelper.CountMappedBones(editor.BoneManager.Bones);
 
             Assert.That(count0, Is.EqualTo(0));
-            Assert.That(count1, Is.EqualTo(57));
+            Assert.That(count1, Is.EqualTo(64));   // humanoid01e bones mapped by name; 57 when the tree was wrongly built from the source
         }
 
         private void Step4_GenerateAnimation(AssetEditorTestRunner runner, AnimationRetargetEditor editor)
@@ -112,7 +122,7 @@ namespace Test.AnimatioReTarget
         {
             Assert.That(outputPackFile.GetFileCount(), Is.EqualTo(0));
 
-            var bone = SkeletonBoneNodeHelper.GetNodeFromName("skirt_back_0", editor.BoneManager.Bones);
+            var bone = SkeletonBoneNodeHelper.GetNodeFromName("skirt_back_left_0", editor.BoneManager.Bones);   // a target (humanoid01e) bone
             bone.TranslationOffset.X.Value = 10;
 
             editor.UpdateAnimation();
@@ -123,6 +133,19 @@ namespace Test.AnimatioReTarget
             Assert.That(outputPackFile.FindFile("animations\\battle\\humanoid01e\\2handed_hammer\\stand\\prefix_hu1_2hh_stand_idle_01.anim"), Is.Not.Null);
         }
 
+        private void Step6_SaveAsVersion8(AnimationRetargetEditor editor, IPackFileContainer outputPackFile)
+        {
+            editor.SaveManager.Settings.AnimationFormat = 8;
+            editor.SaveManager.Settings.SavePrefix = "v8_";
+            editor.SaveManager.SaveAnimation(false);
+
+            var saved = outputPackFile.FindFile("animations\\battle\\humanoid01e\\2handed_hammer\\stand\\v8_hu1_2hh_stand_idle_01.anim");
+            Assert.That(saved, Is.Not.Null);
+            var file = AnimationFile.Create(saved!);
+            Assert.That(file.Header.Version, Is.EqualTo(8));
+            Assert.That(file.Header.UnknownValue_v8, Is.EqualTo(6));
+            Assert.That(file.AnimationParts.Single().DynamicFrames, Is.Not.Empty);
+        }
     }
 }
 

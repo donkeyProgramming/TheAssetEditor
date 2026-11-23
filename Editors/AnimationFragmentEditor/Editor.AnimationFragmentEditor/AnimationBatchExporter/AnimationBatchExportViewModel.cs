@@ -22,7 +22,7 @@ namespace CommonControls.Editors.AnimationBatchExporter
         private readonly ISkeletonAnimationLookUpHelper _skeletonAnimationLookUpHelper;
 
         public ObservableCollection<PackFileListItem> PackfileList { get; set; } = [];
-        public ObservableCollection<uint> PossibleOutputFormats { get; set; } = [5, 6, 7];
+        public ObservableCollection<uint> PossibleOutputFormats { get; set; } = [5, 6, 7, 8];
         public NotifyAttr<uint> SelectedOutputFormat { get; set; } = new NotifyAttr<uint>(7);
 
 
