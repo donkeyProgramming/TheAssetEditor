@@ -166,11 +166,11 @@ namespace Editors.AnimationMeta.SuperView.Visualisation
 
             output.AddRange(file.GetItemsOfType<IAnimatedPropMeta>().Select(x => Keep((ParsedMetadataAttribute)x, selectedAttribute, root, skeleton, rootPlayer, () => CreateAnimatedProp(x, root, skeleton, selectedAttribute, rootPlayer))).Where(x => x != null));
 
-            output.AddRange(file.GetItemsOfType<ImpactPosition_v10>().Select(meteDataItem => CreateStaticLocator(meteDataItem, root, meteDataItem.Position, "ImpactPos", selectedAttribute)));
+            output.AddRange(file.GetItemsOfType<ImpactPosition_v10>().Select(meteDataItem => CreateStaticLocator(meteDataItem, root, () => meteDataItem.Position, "ImpactPos", selectedAttribute)));
 
-            output.AddRange(file.GetItemsOfType<TargetPos_10>().Select(meteDataItem => CreateStaticLocator(meteDataItem, root, meteDataItem.Position, "TargetPos", selectedAttribute)));
+            output.AddRange(file.GetItemsOfType<TargetPos_10>().Select(meteDataItem => CreateStaticLocator(meteDataItem, root, () => meteDataItem.Position, "TargetPos", selectedAttribute)));
 
-            output.AddRange(file.GetItemsOfType<FirePos_v10>().Select(meteDataItem => CreateStaticLocator(meteDataItem, root, meteDataItem.Position, "FirePos", selectedAttribute)));
+            output.AddRange(file.GetItemsOfType<FirePos_v10>().Select(meteDataItem => CreateStaticLocator(meteDataItem, root, () => meteDataItem.Position, "FirePos", selectedAttribute)));
 
             output.AddRange(file.GetItemsOfType<SplashAttack_v10>().Select(meteDataItem => CreateSplashAttack(meteDataItem, root, $"SplashAttack_{Math.Round(meteDataItem.EndTime, 2)}", 0.1f, selectedAttribute)));
 
@@ -296,16 +296,17 @@ namespace Editors.AnimationMeta.SuperView.Visualisation
             return new AnimatedPropInstance(loadedNode, propPlayer);
         }
 
-        private IMetaDataInstance CreateStaticLocator(DecodedMetaEntryBase metaData, SceneNode root, Vector3 position, string displayName, ParsedMetadataAttribute? selectedMetaDataAttribute, float scale = 0.3f)
+        private IMetaDataInstance CreateStaticLocator(DecodedMetaEntryBase metaData, SceneNode root, Func<Vector3> positionOf, string displayName, ParsedMetadataAttribute? selectedMetaDataAttribute, float scale = 0.3f)
         {
             var color = selectedMetaDataAttribute == metaData ? s_selectedColor : s_color;
+            var position = positionOf();
 
             var node = new SimpleDrawableNode(displayName);
             node.AddItem(new WorldTextRenderItem(_resourceLibrary, displayName, position, color));
             node.AddItem(LineHelper.AddCircle(position, scale, color));
             root.AddObject(node);
 
-            return new DrawableMetaInstance(metaData.StartTime, metaData.EndTime, node.Name, node);
+            return new DrawableMetaInstance(metaData, node, () => [new(positionOf(), MetaDataMarkerPoint.Default)]);
         }
 
         private IMetaDataInstance CreateSplashAttack(SplashAttack_v10 splashAttack, SceneNode root, string displayName, float scale, ParsedMetadataAttribute? selectedAttribute)
@@ -368,7 +369,11 @@ namespace Editors.AnimationMeta.SuperView.Visualisation
             
             root.AddObject(node);
 
-            return new DrawableMetaInstance(splashAttack.StartTime, splashAttack.EndTime, node.Name, node);
+            return new DrawableMetaInstance(splashAttack, node, () =>
+            [
+                new(splashAttack.StartPosition, MetaDataMarkerPoint.SplashStart, scale * 2),
+                new(splashAttack.EndPosition, MetaDataMarkerPoint.SplashEnd, scale * 2),
+            ]);
         }
 
         private IMetaDataInstance CreateEffect(IEffectMeta effect, SceneNode root, ISkeletonProvider skeleton, ParsedMetadataAttribute? selectedAttribute, AnimationPlayer rootPlayer, bool persistent)
@@ -383,23 +388,19 @@ namespace Editors.AnimationMeta.SuperView.Visualisation
             var locatorScale = 0.3f;
             var textOffset = locatorScale * 1.5f + 0.01f;
 
-            var rotationQuat = new Quaternion(effect.Orientation);
-            var rotMatrix = Matrix.CreateFromQuaternion(rotationQuat);
+            var rotMatrix = Matrix.CreateFromQuaternion(new Quaternion(effect.Orientation));
 
-            var localX = Vector3.Transform(Vector3.UnitX, rotMatrix);
-            var localY = Vector3.Transform(Vector3.UnitY, rotMatrix);
-            var localZ = Vector3.Transform(Vector3.UnitZ, rotMatrix);
-
+            // Drawn in the tag's own frame: the instance places it from the tag's Position and Orientation on the bone.
             var node = new SimpleDrawableNode("Effect:" + effect.VfxName);
-            node.AddItem(LineHelper.AddLine(effect.Position, effect.Position + localX * locatorScale, Color.Red));
-            node.AddItem(LineHelper.AddLine(effect.Position, effect.Position + localY * locatorScale, Color.Green));
-            node.AddItem(LineHelper.AddLine(effect.Position, effect.Position + localZ * locatorScale, Color.Blue));
+            node.AddItem(LineHelper.AddLine(Vector3.Zero, Vector3.UnitX * locatorScale, Color.Red));
+            node.AddItem(LineHelper.AddLine(Vector3.Zero, Vector3.UnitY * locatorScale, Color.Green));
+            node.AddItem(LineHelper.AddLine(Vector3.Zero, Vector3.UnitZ * locatorScale, Color.Blue));
 
             var label = resolved is { Found: false } ? effect.VfxName + " (not found)" : effect.VfxName;
-            node.AddItem(new WorldTextRenderItem(_resourceLibrary, label, effect.Position, color));
-            node.AddItem(new WorldTextRenderItem(_resourceLibrary, "X", effect.Position + localX * textOffset, Color.Red));
-            node.AddItem(new WorldTextRenderItem(_resourceLibrary, "Y", effect.Position + localY * textOffset, Color.Green));
-            node.AddItem(new WorldTextRenderItem(_resourceLibrary, "Z", effect.Position + localZ * textOffset, Color.Blue));
+            node.AddItem(new WorldTextRenderItem(_resourceLibrary, label, Vector3.Zero, color));
+            node.AddItem(new WorldTextRenderItem(_resourceLibrary, "X", Vector3.UnitX * textOffset, Color.Red));
+            node.AddItem(new WorldTextRenderItem(_resourceLibrary, "Y", Vector3.UnitY * textOffset, Color.Green));
+            node.AddItem(new WorldTextRenderItem(_resourceLibrary, "Z", Vector3.UnitZ * textOffset, Color.Blue));
 
             root.AddObject(node);
 
@@ -414,7 +415,7 @@ namespace Editors.AnimationMeta.SuperView.Visualisation
 
             if (resolved is not { Found: true })
             {
-                var locatorOnly = new VfxEffectInstance(node, boneAt, startTime);
+                var locatorOnly = new VfxEffectInstance(node, boneAt, startTime, effect: effect);
                 locatorOnly.Update(rootPlayer.GetTimeUs() / 1_000_000f);
                 return locatorOnly;
             }
@@ -437,7 +438,7 @@ namespace Editors.AnimationMeta.SuperView.Visualisation
             var particles = root.AddObject(new VfxEffectNode("Vfx:" + effect.VfxName,
                 new ParticleRenderItem(simulator, _vfxTextures, () => _shaders.GetStaticEffect(ShaderTypes.Particle), _vfxMeshes)));
 
-            var instance = new VfxEffectInstance(node, boneAt, startTime, particles, simulator, loop);
+            var instance = new VfxEffectInstance(node, boneAt, startTime, particles, simulator, loop, effect);
             instance.Update(rootPlayer.GetTimeUs() / 1_000_000f);
             return instance;
         }

@@ -63,6 +63,68 @@ namespace Test.AnimationMeta
             _root = new GroupNode("root");
         }
 
+        // The marker the viewport picks is the tag's Position on its bone, and follows the tag before any rebuild,
+        // as a drag in the viewport changes it.
+        [Test]
+        public void EffectMarker_IsTheTagsPositionOnItsBone_AndFollowsTheTag()
+        {
+            var tag = Tag("test_smoke");
+            tag.Position = new Vector3(0, 0, 1);
+            var instance = (VfxEffectInstance)Build(null, Meta(tag)).Single();
+
+            instance.Update(1.5f);
+            // At 1.5 s the bone is at (3, 1, 0).
+            Assert.That(instance.ReferenceWorldTransform.Translation, Is.EqualTo(new Vector3(3, 1, 0)).Using<Vector3>(Vector3Tolerance));
+            Assert.That(instance.HitTargets.Single().Position, Is.EqualTo(new Vector3(3, 1, 1)).Using<Vector3>(Vector3Tolerance));
+
+            tag.Position = new Vector3(0, 0, 2);
+            instance.Update(1.5f);
+            Assert.That(instance.FocusPosition, Is.EqualTo(new Vector3(3, 1, 2)).Using<Vector3>(Vector3Tolerance));
+        }
+
+        // The locator is drawn in the tag's frame, so the axes come out where they did when they were drawn at the tag's
+        // Position along its rotated axes.
+        [Test]
+        public void EffectLocator_DrawsItsAxesAlongTheTagsOrientation()
+        {
+            var tag = Tag("no_such_fx");
+            tag.Position = new Vector3(1, 0, 0);
+            tag.Orientation = Quaternion.CreateFromAxisAngle(Vector3.UnitY, MathHelper.PiOver2).ToVector4();
+            var instance = (VfxEffectInstance)Build(null, Meta(tag)).Single();
+            instance.Update(1.5f);
+
+            var locator = _root.Children.Single();
+            var xAxisEnd = Vector3.Transform(Vector3.UnitX * 0.3f, locator.ModelMatrix);
+            // Rotated 90 degrees about Y, X points down -Z; from (1, 0, 0) on a bone at (3, 1, 0).
+            Assert.That(xAxisEnd, Is.EqualTo(new Vector3(4, 1, -0.3f)).Using<Vector3>(Vector3Tolerance));
+        }
+
+        [Test]
+        public void StaticLocatorMarker_FollowsItsTag()
+        {
+            var fire = new FirePos_v10 { Position = new Vector3(1, 2, 3) };
+            var instance = (IMetaDataMarkerPreview)Build(null, Meta(fire)).Single();
+            Assert.That(instance.HitTargets.Single().Position, Is.EqualTo(new Vector3(1, 2, 3)));
+
+            fire.Position = new Vector3(4, 5, 6);
+            Assert.That(instance.HitTargets.Single(), Is.EqualTo(new MetaDataMarkerHitTarget(new Vector3(4, 5, 6), MetaDataMarkerPoint.Default)));
+        }
+
+        [Test]
+        public void SplashAttackMarker_HasItsStartAndEndAsSeparatePoints()
+        {
+            var splash = new SplashAttack_v10 { StartPosition = new Vector3(0, 1, 0), EndPosition = new Vector3(0, 1, 4), AoeShape = 1, WidthForCorridor = 1 };
+            var instance = (IMetaDataMarkerPreview)Build(null, Meta(splash)).Single();
+
+            Assert.That(instance.HitTargets.Select(x => (x.Point, x.Position)), Is.EqualTo(new[]
+            {
+                (MetaDataMarkerPoint.SplashStart, new Vector3(0, 1, 0)),
+                (MetaDataMarkerPoint.SplashEnd, new Vector3(0, 1, 4)),
+            }));
+        }
+
+        static readonly Func<Vector3, Vector3, bool> Vector3Tolerance = (a, b) => Vector3.Distance(a, b) < 1e-4f;
+
         // The scene object updates its META instances every frame; they take seconds, so an EFFECT reads its bone at
         // the frame shown and not at the frame index read as seconds.
         [Test]

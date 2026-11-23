@@ -3,13 +3,17 @@ using GameWorld.Core.Animation;
 using GameWorld.Core.SceneNodes;
 using GameWorld.Core.Vfx;
 using Microsoft.Xna.Framework;
+using Shared.GameFormats.AnimationMeta.Definitions;
+using Shared.GameFormats.AnimationMeta.Parsing;
 
 namespace Editors.AnimationMeta.SuperView.Visualisation.Instances
 {
     // An EFFECT tag: its locator on the tag's bone, and its particles on the main animation's clock from
     // the tag's Start Time, the way AnimatedPropInstance runs props. A persistent meta's effect (loop > 0, the
     // clip's length) keeps its own clock instead, which runs on across the clip's loops.
-    public class VfxEffectInstance : IMetaDataInstance
+    // The locator is drawn in the tag's own frame and placed from the tag's Position and Orientation on every
+    // update, so it follows a drag in the viewport; the particles keep the place they were built with.
+    public class VfxEffectInstance : IMetaDataInstance, IMetaDataMarkerPreview
     {
         private readonly ILogger _logger = Logging.Create<VfxEffectInstance>();
         private readonly SceneNode _locator;
@@ -17,15 +21,18 @@ namespace Editors.AnimationMeta.SuperView.Visualisation.Instances
         private readonly float _startTime;
         private readonly VfxEffectNode? _particles;
         private readonly float _loop;
+        private readonly IEffectMeta? _effect;
         private float? _last;
         private float _clock;
+        private float _currentTime;
         private bool _hasError;
 
         // Null, so the playback controls leave this alone; Update drives it.
         public AnimationPlayer Player => null;
         public ParticleSimulator? Simulator { get; }
+        public ParsedMetadataAttribute Source => _effect as ParsedMetadataAttribute;
 
-        public VfxEffectInstance(SceneNode locator, Func<float, Matrix> boneAt, float startTime, VfxEffectNode? particles = null, ParticleSimulator? simulator = null, float loop = 0)
+        public VfxEffectInstance(SceneNode locator, Func<float, Matrix> boneAt, float startTime, VfxEffectNode? particles = null, ParticleSimulator? simulator = null, float loop = 0, IEffectMeta? effect = null)
         {
             _locator = locator;
             _boneAt = boneAt;
@@ -33,7 +40,18 @@ namespace Editors.AnimationMeta.SuperView.Visualisation.Instances
             _particles = particles;
             Simulator = simulator;
             _loop = loop;
+            _effect = effect;
         }
+
+        // The tag's position and orientation, in its bone's frame.
+        Matrix Local => _effect == null ? Matrix.Identity : Matrix.CreateFromQuaternion(new Quaternion(_effect.Orientation)) * Matrix.CreateTranslation(_effect.Position);
+
+        public bool IsHitTestVisible => _effect != null && _locator.IsVisible && _locator.Parent != null;
+        public float HitTestRadius => 0.3f;
+        // The bone at the time last shown, inside the node the locator is drawn under.
+        public Matrix ReferenceWorldTransform => _boneAt(_currentTime) * MetaDataPreviewMath.WorldOf(_locator.Parent);
+        public Vector3 FocusPosition => (Local * ReferenceWorldTransform).Translation;
+        public IReadOnlyList<MetaDataMarkerHitTarget> HitTargets => _effect == null ? [] : [new(FocusPosition, MetaDataMarkerPoint.Default)];
 
         public void Update(float currentTime)
         {
@@ -42,7 +60,8 @@ namespace Editors.AnimationMeta.SuperView.Visualisation.Instances
 
             try
             {
-                _locator.ModelMatrix = _boneAt(currentTime);
+                _currentTime = currentTime;
+                _locator.ModelMatrix = Local * _boneAt(currentTime);
                 Simulator?.AdvanceTo(EffectTime(currentTime));
             }
             catch (Exception e)
