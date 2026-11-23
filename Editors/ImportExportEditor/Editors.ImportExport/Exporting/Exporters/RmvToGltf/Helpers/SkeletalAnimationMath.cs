@@ -144,7 +144,7 @@ namespace Editors.ImportExport.Exporting.Exporters.RmvToGltf.Helpers
             for (var boneIndex = 0; boneIndex < _animationFile.Bones.Length; boneIndex++)
             {
                 var translationMatrix = Matrix.CreateTranslation(GlobalSceneTransforms.FlipVector(_animationFile.AnimationParts[0].DynamicFrames[0].Transforms[boneIndex].ToVector3(), doMirror));
-                var rotationMatrix = Matrix.CreateFromQuaternion(GlobalSceneTransforms.FlipQuaternion(_animationFile.AnimationParts[0].DynamicFrames[0].Quaternion[boneIndex].ToQuaternion(), doMirror));
+                var rotationMatrix = Matrix.CreateFromQuaternion(Microsoft.Xna.Framework.Quaternion.Normalize(GlobalSceneTransforms.FlipQuaternion(_animationFile.AnimationParts[0].DynamicFrames[0].Quaternion[boneIndex].ToQuaternion(), doMirror)));
                 var scaleMatrix = Matrix.CreateScale(1, 1, 1);
                 var transform = scaleMatrix * rotationMatrix * translationMatrix;
                 _worldTransform[boneIndex] = transform;

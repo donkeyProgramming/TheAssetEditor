@@ -55,7 +55,7 @@ namespace Editors.ImportExport.Exporting.Exporters.RmvToGltf.Helpers
                 for (var frameIndex = 0; frameIndex < animationClip.DynamicFrames.Count; frameIndex++)
                 {
                     translationKeyFrames.Add(secondsPerFrame * (float)frameIndex, VecConv.GetSys(GlobalSceneTransforms.FlipVector(animationClip.DynamicFrames[frameIndex].Position[boneIndex], doMirror)));
-                    rotationKeyFrames.Add(secondsPerFrame * (float)frameIndex, VecConv.GetSys(GlobalSceneTransforms.FlipQuaternion(animationClip.DynamicFrames[frameIndex].Rotation[boneIndex], doMirror)));
+                    rotationKeyFrames.Add(secondsPerFrame * (float)frameIndex, VecConv.GetSys(Microsoft.Xna.Framework.Quaternion.Normalize(GlobalSceneTransforms.FlipQuaternion(animationClip.DynamicFrames[frameIndex].Rotation[boneIndex], doMirror))));
                     scaleKeyFrames.Add(secondsPerFrame * (float)frameIndex, new SysNum.Vector3(1, 1, 1));
                 }
 
