@@ -36,7 +36,7 @@ namespace Editors.ImportExport.Importing.Importers.GltfToRmv.Helper
 
             var weightSum = v.BoneWeight.Sum();
 
-            if (weightSum == float.NaN) 
+            if (float.IsNaN(weightSum)) 
                 throw new Exception("NaN in bone weights");
 
             const float tolerance = 0.05f;

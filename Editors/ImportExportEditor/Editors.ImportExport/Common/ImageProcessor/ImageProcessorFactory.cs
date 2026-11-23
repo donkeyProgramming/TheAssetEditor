@@ -19,8 +19,12 @@ namespace Editors.ImportExport.Common.Interfaces
              {TextureType.Normal, new BlueToOrangeNormalMapProcessor() }
         };
 
-        public static IImageProcessor CreateImageProcessor(TextureType textureType)
+        /// <param name="convertSpecialTexture">False keeps material and normal maps as they are, for images already in the game's layout.</param>
+        public static IImageProcessor CreateImageProcessor(TextureType textureType, bool convertSpecialTexture = true)
         {
+            if (!convertSpecialTexture && (textureType == TextureType.MaterialMap || textureType == TextureType.Normal))
+                return new DefaultImageProcessor();
+
             if (_textureAndGameTypeToTranformer.TryGetValue(textureType, out var imageProcessor))
             {                
                 return imageProcessor;

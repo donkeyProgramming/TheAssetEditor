@@ -7,7 +7,7 @@
         xmlns:loc="clr-namespace:Shared.Ui.Common;assembly=Shared.Ui"
         mc:Ignorable="d"
         Style="{StaticResource CustomWindowStyle}"
-        Title="{loc:Loc ImportWindow.Title}"  Width="800"                
+        Title="{loc:Loc ImportWindow.Title}"  Width="800"
          SizeToContent="Height"
         WindowStartupLocation="CenterScreen"
         ResizeMode="NoResize">
@@ -24,37 +24,48 @@
             <RowDefinition Height="25"/>
             <RowDefinition Height="25"/>
             <RowDefinition Height="25"/>
-            <RowDefinition Height="auto"/>  
-            <RowDefinition Height="25"/>            
-            <RowDefinition Height="25"/>            
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="25"/>
         </Grid.RowDefinitions>
 
         <TextBlock Grid.Row="0" Grid.Column="0" Text="{loc:Loc ImportWindow.SelectedFile}" HorizontalAlignment="Left"/>
         <TextBlock Grid.Row="0" Grid.Column="1" Text=": "/>
         <TextBox Grid.Row="0" Grid.Column="2" Text="{Binding SystemPath}" HorizontalContentAlignment="Left" IsReadOnly="True"/>
-        <!--<Button Grid.Row="0" Grid.Column="2" Content="Browse" Command="{Binding BrowsePathCommandCommand}" Grid.ColumnSpan="2" Margin="517,0,0,0"/>-->
 
         <TextBlock Grid.Row="1" Grid.Column="0" Text="{loc:Loc ImportWindow.CreateImportProject}" HorizontalAlignment="Left"/>
         <TextBlock Grid.Row="1" Grid.Column="1" Text=": "/>
-        <CheckBox Grid.Row="1" Grid.Column="2" HorizontalAlignment="Left" IsChecked="{Binding CreateImportProject, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
+        <CheckBox Grid.Row="1" Grid.Column="2" HorizontalAlignment="Left" IsChecked="{Binding CreateImportProject, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                  IsEnabled="{Binding IsOperationActive, Converter={StaticResource InvBoolConverter}}"/>
 
         <TextBlock Grid.Row="2" Grid.Column="0" HorizontalAlignment="Left" Text="{loc:Loc ImportWindow.AvailableImporters}"/>
         <TextBlock Grid.Row="2" Grid.Column="1" Text=": "/>
         <ComboBox Grid.Row="2" Grid.Column="2"  HorizontalContentAlignment="Left"
             ItemsSource="{Binding PossibleImporters, UpdateSourceTrigger=PropertyChanged}"
-            SelectedValue="{Binding SelectedImporter, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" 
+            SelectedValue="{Binding SelectedImporter, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+            IsEnabled="{Binding IsOperationActive, Converter={StaticResource InvBoolConverter}}"
             DisplayMemberPath = "DisplayName"/>
 
         <Expander Grid.Row="3" Grid.Column="1" Grid.ColumnSpan="3" Header="{loc:Loc ImportWindow.ImporterSettings}" IsExpanded="True"  HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
             <Border BorderBrush="Gray" BorderThickness="2" Margin="2">
                 <ContentControl BorderThickness="2"
-                          Content="{Binding SelectedImporter, UpdateSourceTrigger=PropertyChanged}"       
+                          IsEnabled="{Binding IsOperationActive, Converter={StaticResource InvBoolConverter}}"
+                          Content="{Binding SelectedImporter, UpdateSourceTrigger=PropertyChanged}"
                           ContentTemplateSelector="{StaticResource ViewTemplateDataSelector}"/>
             </Border>
         </Expander>
 
-        <Button Grid.Row="5" Grid.ColumnSpan="4" Content="{loc:Loc ImportWindow.ImportButton}" Click="ImportButton_Click"/>
+        <StackPanel Grid.Row="4" Grid.ColumnSpan="4" Margin="2,6,2,4"
+                    Visibility="{Binding IsOperationActive, Converter={StaticResource BoolToCollapsedConverter}}">
+            <TextBlock Text="{Binding ProgressStatus}" TextTrimming="CharacterEllipsis"/>
+            <TextBlock Text="{Binding ProgressDetail}" TextTrimming="CharacterEllipsis" Margin="0,2,0,2" Opacity="0.8"/>
+            <DockPanel>
+                <Button DockPanel.Dock="Right" Width="80" Margin="4,0,0,0" Content="{loc:Loc ImportWindow.CancelButton}" Command="{Binding CancelImportCommand}"/>
+                <ProgressBar Height="18" Minimum="0" Maximum="{Binding ProgressMaximum}" Value="{Binding ProgressValue}" IsIndeterminate="{Binding IsProgressIndeterminate}"/>
+            </DockPanel>
+        </StackPanel>
 
-
+        <Button Grid.Row="5" Grid.ColumnSpan="4" Content="{loc:Loc ImportWindow.ImportButton}" Click="ImportButton_Click"
+                IsEnabled="{Binding IsOperationActive, Converter={StaticResource InvBoolConverter}}"/>
     </Grid>
 </Window>

@@ -14,10 +14,7 @@ namespace Editors.ImportExport.Importing.Importers.PngToDds.Helpers.ImageProcess
     {
         public ScratchImage Transform(ScratchImage scratchImage)
         {          
-            if (!(scratchImage.GetMetadata().Format == DXGI_FORMAT.B8G8R8A8_UNORM || scratchImage.GetMetadata().Format == DXGI_FORMAT.B8G8R8A8_UNORM_SRGB))
-            {
-                throw new Exception($"Error: image format is {scratchImage.GetMetadata().Format}  should be uncompressed RGBA8 (BC_B8G8R8A8_UNORM)");
-            }
+            PixelLayout.Get(scratchImage);
 
             var outScratchImage = scratchImage.CreateImageCopy(0, false, CP_FLAGS.NONE);
 

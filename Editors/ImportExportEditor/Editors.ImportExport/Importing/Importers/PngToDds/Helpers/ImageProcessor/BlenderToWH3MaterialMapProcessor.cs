@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using DirectXTexNet;
 using Editors.ImportExport.Common.Interfaces;
+using Editors.ImportExport.Importing.Importers.PngToDds.Helpers.ImageProcessor;
 
 namespace Editors.ImportExport.Common.Interfaces
 {
@@ -13,10 +14,7 @@ namespace Editors.ImportExport.Common.Interfaces
     {
         public ScratchImage Transform(ScratchImage scratchImage)
         {
-            if (!(scratchImage.GetMetadata().Format == DXGI_FORMAT.B8G8R8A8_UNORM || scratchImage.GetMetadata().Format == DXGI_FORMAT.B8G8R8A8_UNORM_SRGB))
-            {
-                throw new Exception($"Error: image format is {scratchImage.GetMetadata().Format}  should be uncompressed RGBA8 (BC_B8G8R8A8_UNORM)");
-            }
+            var layout = PixelLayout.Get(scratchImage);
             
             var copyScratchImage = scratchImage.CreateImageCopy(0, false, CP_FLAGS.NONE);
             var srcImage = copyScratchImage.GetImage(0, 0, 0);
@@ -25,13 +23,12 @@ namespace Editors.ImportExport.Common.Interfaces
 
             for (int index = 0; index < srcImage.SlicePitch; index += 4)
             {
-                var r = rgbaBytes[index + 2];
-                var g = rgbaBytes[index + 1];
-                var b = rgbaBytes[index + 0];
-                                
-                rgbaBytes[index + 0] = r;
-                rgbaBytes[index + 1] = g;
-                rgbaBytes[index + 2] = b;
+                // Swap red and blue: Blender's metallic (blue) goes to the game's red channel.
+                var r = rgbaBytes[index + layout.RedOffset];
+                var b = rgbaBytes[index + layout.BlueOffset];
+
+                rgbaBytes[index + layout.RedOffset] = b;
+                rgbaBytes[index + layout.BlueOffset] = r;
                 rgbaBytes[index + 3] = 255;
                 
             }

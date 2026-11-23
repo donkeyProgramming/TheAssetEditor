@@ -3,6 +3,14 @@ using Shared.Core.Settings;
 
 namespace Editors.ImportExport.Importing.Importers.GltfToRmv
 {
+    public enum GltfSourceForwardDirection
+    {
+        PositiveZ,
+        PositiveX,
+        NegativeX,
+        NegativeZ,
+    }
+
     public record GltfImporterSettings
     (
         string InputGltfFile,
@@ -15,6 +23,11 @@ namespace Editors.ImportExport.Importing.Importers.GltfToRmv
         bool ConvertNormalTextureFromBlueToOrangeType,
         bool ImportAnimations,
         float AnimationKeysPerSecond,
-        bool MirrorMesh
+        bool AutoDetectAnimationKeysPerSecond = true,
+        string? NewSkeletonName = null,
+        bool AutoScaleHumanoid = true,
+        GltfSourceForwardDirection SourceForwardDirection =
+            GltfSourceForwardDirection.PositiveZ,
+        bool OverwriteExisting = false
     );
 }

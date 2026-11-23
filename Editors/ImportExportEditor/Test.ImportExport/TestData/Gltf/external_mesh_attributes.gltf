@@ -1,0 +1,85 @@
+{
+  "asset": {
+    "version": "2.0",
+    "generator": "AssetEditor.CN procedural test fixture",
+    "extras": {
+      "license": "CC0-1.0"
+    }
+  },
+  "scene": 0,
+  "scenes": [
+    {
+      "name": "default",
+      "nodes": [0, 9]
+    }
+  ],
+  "nodes": [
+    { "name": "armature", "children": [1] },
+    { "name": "bone_0", "children": [2] },
+    { "name": "bone_1", "children": [3] },
+    { "name": "bone_2", "children": [4] },
+    { "name": "bone_3", "children": [5] },
+    { "name": "bone_4", "children": [6] },
+    { "name": "bone_5", "children": [7] },
+    { "name": "bone_6", "children": [8] },
+    { "name": "bone_7" },
+    { "name": "mesh_node", "mesh": 0, "skin": 0 }
+  ],
+  "skins": [
+    {
+      "name": "ExternalArmature",
+      "joints": [1, 2, 3, 4, 5, 6, 7, 8],
+      "skeleton": 1,
+      "inverseBindMatrices": 8
+    }
+  ],
+  "meshes": [
+    {
+      "name": "external_mesh",
+      "primitives": [
+        {
+          "attributes": {
+            "POSITION": 0,
+            "JOINTS_0": 1,
+            "WEIGHTS_0": 2,
+            "JOINTS_1": 3,
+            "WEIGHTS_1": 4,
+            "COLOR_0": 5
+          },
+          "mode": 5,
+          "targets": [
+            { "POSITION": 7 }
+          ]
+        }
+      ]
+    }
+  ],
+  "buffers": [
+    {
+      "byteLength": 784,
+      "uri": "data:application/octet-stream;base64,AAAAAAAAAAAAAAAAAACAPwAAAAAAAAAAAAAAAAAAgD8AAAAAAAABAAIAAwAAAAEAAgADAAAAAQACAAMAzcxMPZqZmT7NzMw9AACAPs3MTD2amZk+zczMPQAAgD7NzEw9mpmZPs3MzD0AAIA+BAAFAAYABwAEAAUABgAHAAQABQAGAAcAmpkZPs3MzD3NzEw9AAAAAJqZGT7NzMw9zcxMPQAAAACamRk+zczMPc3MTD0AAAAAAACAPwAAgD8AAIA/AACAPwAAgD8AAIA/AACAPwAAgD8AAIA/AACAPwAAgD8AAIA/AAAAAAAAAADNzMw9AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABAAIAAAAAAIA/AAAAAAAAAAAAAAAAAAAAAAAAgD8AAAAAAAAAAAAAAAAAAAAAAACAPwAAAAAAAAAAAAAAAAAAAAAAAIA/AACAPwAAAAAAAAAAAAAAAAAAAAAAAIA/AAAAAAAAAAAAAAAAAAAAAAAAgD8AAAAAAAAAAAAAAAAAAAAAAACAPwAAgD8AAAAAAAAAAAAAAAAAAAAAAACAPwAAAAAAAAAAAAAAAAAAAAAAAIA/AAAAAAAAAAAAAAAAAAAAAAAAgD8AAIA/AAAAAAAAAAAAAAAAAAAAAAAAgD8AAAAAAAAAAAAAAAAAAAAAAACAPwAAAAAAAAAAAAAAAAAAAAAAAIA/AACAPwAAAAAAAAAAAAAAAAAAAAAAAIA/AAAAAAAAAAAAAAAAAAAAAAAAgD8AAAAAAAAAAAAAAAAAAAAAAACAPwAAgD8AAAAAAAAAAAAAAAAAAAAAAACAPwAAAAAAAAAAAAAAAAAAAAAAAIA/AAAAAAAAAAAAAAAAAAAAAAAAgD8AAIA/AAAAAAAAAAAAAAAAAAAAAAAAgD8AAAAAAAAAAAAAAAAAAAAAAACAPwAAAAAAAAAAAAAAAAAAAAAAAIA/AACAPwAAAAAAAAAAAAAAAAAAAAAAAIA/AAAAAAAAAAAAAAAAAAAAAAAAgD8AAAAAAAAAAAAAAAAAAAAAAACAPw=="
+    }
+  ],
+  "bufferViews": [
+    { "buffer": 0, "byteOffset": 0, "byteLength": 36, "target": 34962 },
+    { "buffer": 0, "byteOffset": 36, "byteLength": 24, "target": 34962 },
+    { "buffer": 0, "byteOffset": 60, "byteLength": 48, "target": 34962 },
+    { "buffer": 0, "byteOffset": 108, "byteLength": 24, "target": 34962 },
+    { "buffer": 0, "byteOffset": 132, "byteLength": 48, "target": 34962 },
+    { "buffer": 0, "byteOffset": 180, "byteLength": 48, "target": 34962 },
+    { "buffer": 0, "byteOffset": 228, "byteLength": 36, "target": 34962 },
+    { "buffer": 0, "byteOffset": 264, "byteLength": 6, "target": 34963 },
+    { "buffer": 0, "byteOffset": 272, "byteLength": 512 }
+  ],
+  "accessors": [
+    { "bufferView": 0, "componentType": 5126, "count": 3, "type": "VEC3", "min": [0, 0, 0], "max": [1, 1, 0] },
+    { "bufferView": 1, "componentType": 5123, "count": 3, "type": "VEC4" },
+    { "bufferView": 2, "componentType": 5126, "count": 3, "type": "VEC4" },
+    { "bufferView": 3, "componentType": 5123, "count": 3, "type": "VEC4" },
+    { "bufferView": 4, "componentType": 5126, "count": 3, "type": "VEC4" },
+    { "bufferView": 5, "componentType": 5126, "count": 3, "type": "VEC4" },
+    { "bufferView": 7, "componentType": 5123, "count": 3, "type": "SCALAR", "min": [0], "max": [2] },
+    { "bufferView": 6, "componentType": 5126, "count": 3, "type": "VEC3" },
+    { "bufferView": 8, "componentType": 5126, "count": 8, "type": "MAT4" }
+  ]
+}

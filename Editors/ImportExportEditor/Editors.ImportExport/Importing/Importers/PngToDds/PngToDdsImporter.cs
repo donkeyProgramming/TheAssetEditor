@@ -1,37 +1,55 @@
-﻿using DirectXTexNet;
+﻿using System.IO;
+using System.Runtime.InteropServices;
+using DirectXTexNet;
+using Editors.ImportExport.Common.Interfaces;
 using Editors.ImportExport.Importing.Importers.PngToDds.Helpers;
 using Shared.Core.PackFiles.Models;
+using Shared.Core.PackFiles.Models.FileSources;
 using Shared.Core.Settings;
 using Shared.GameFormats.RigidModel.Types;
-using Editors.ImportExport.Common.Interfaces;
-using Shared.Core.PackFiles.Models.FileSources;
 
 namespace Editors.ImportExport.Importing.Importers.PngToDds
 {
-
     public class PngToDdsImporter
     {
-        static public PackFile Import(string inputPath, TextureType textureType, GameTypeEnum gameType, string outFileName)
+        public static PackFile Import(string inputPath, TextureType textureType, GameTypeEnum gameType, string outFileName, bool convertSpecialTexture = true, float alphaThreshold = 0.5f)
         {
-            ScratchImage scratchImagePng = TexHelper.Instance.LoadFromWICFile(inputPath, WIC_FLAGS.DEFAULT_SRGB);
+            using var scratchImagePng = TexHelper.Instance.LoadFromWICFile(inputPath, WIC_FLAGS.DEFAULT_SRGB);
+            return Import(scratchImagePng, textureType, gameType, outFileName, convertSpecialTexture, alphaThreshold);
+        }
 
-            bool isUncompressed = scratchImagePng.GetMetadata().Format == DXGI_FORMAT.B8G8R8A8_UNORM || scratchImagePng.GetMetadata().Format == DXGI_FORMAT.B8G8R8A8_UNORM_SRGB;
+        /// <summary>
+        /// For images that don't exist as files on disk, such as textures embedded in a .glb.
+        /// </summary>
+        public static PackFile Import(Stream inputStream, TextureType textureType, GameTypeEnum gameType, string outFileName, bool convertSpecialTexture = true, float alphaThreshold = 0.5f)
+        {
+            using var memoryStream = new MemoryStream();
+            inputStream.CopyTo(memoryStream);
+            var imageBytes = memoryStream.ToArray();
+            var imageHandle = GCHandle.Alloc(imageBytes, GCHandleType.Pinned);
+            try
+            {
+                using var scratchImagePng = TexHelper.Instance.LoadFromWICMemory(imageHandle.AddrOfPinnedObject(), imageBytes.LongLength, WIC_FLAGS.DEFAULT_SRGB);
+                return Import(scratchImagePng, textureType, gameType, outFileName, convertSpecialTexture, alphaThreshold);
+            }
+            finally
+            {
+                imageHandle.Free();
+            }
+        }
 
-            var processedImage = ImageProcessorFactory.CreateImageProcessor(textureType).Transform(scratchImagePng);
-            // process image based on texture type
-
-            var imageWithMips = processedImage.GenerateMipMaps(TEX_FILTER_FLAGS.DEFAULT, 0);
+        private static PackFile Import(ScratchImage scratchImagePng, TextureType textureType, GameTypeEnum gameType, string outFileName, bool convertSpecialTexture, float alphaThreshold)
+        {
+            using var processedImage = ImageProcessorFactory.CreateImageProcessor(textureType, convertSpecialTexture).Transform(scratchImagePng);
+            using var imageWithMips = processedImage.GenerateMipMaps(TEX_FILTER_FLAGS.DEFAULT, 0);
             var ddsFormat = DDSFormatHelper.GetDDSFormat(gameType, textureType);
-            var ddsImage = imageWithMips.Compress(ddsFormat, TEX_COMPRESS_FLAGS.DEFAULT, 0.5f);
+            using var ddsImage = imageWithMips.Compress(ddsFormat, TEX_COMPRESS_FLAGS.DEFAULT, alphaThreshold);
 
-            var ddsMemStream = ddsImage.SaveToDDSMemory(DDS_FLAGS.NONE);
-
-            byte[] ddsBytes = new byte[ddsMemStream.Length];
+            using var ddsMemStream = ddsImage.SaveToDDSMemory(DDS_FLAGS.NONE);
+            var ddsBytes = new byte[ddsMemStream.Length];
             ddsMemStream.Read(ddsBytes, 0, ddsBytes.Length);
 
-            var ddsPackFile = new PackFile(outFileName, new MemorySource(ddsBytes));
-
-            return ddsPackFile;
+            return new PackFile(outFileName, new MemorySource(ddsBytes));
         }
     }
 }

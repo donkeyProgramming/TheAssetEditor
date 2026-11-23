@@ -63,7 +63,7 @@ namespace Editors.ImportExport.Exporting.Exporters.RmvToGltf.Helpers
 
                 parentIdToGltfNode[boneIndex].
                     WithLocalTranslation(VecConv.GetSys(GlobalSceneTransforms.FlipVector(frame.Transforms[boneIndex].ToVector3(), doMirror))).
-                    WithLocalRotation(VecConv.GetSys(GlobalSceneTransforms.FlipQuaternion(frame.Quaternion[boneIndex].ToQuaternion(), doMirror))).
+                    WithLocalRotation(VecConv.GetSys(Microsoft.Xna.Framework.Quaternion.Normalize(GlobalSceneTransforms.FlipQuaternion(frame.Quaternion[boneIndex].ToQuaternion(), doMirror)))).
                     WithLocalScale(new System.Numerics.Vector3(1, 1, 1));
 
                 var invBindPoseMatrix4x4 = VecConv.GetSys(invMatrices[boneIndex]);

@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Editors.ImportExport.Misc;
+﻿using Editors.ImportExport.Misc;
 using Shared.Core.PackFiles.Models;
 using Shared.Core.Settings;
 
@@ -12,9 +8,19 @@ namespace Editors.ImportExport.Importing.Presentation
     {
         public string DisplayName { get; }
         string OutputExtension { get; }
-        string[] InputExtensions { get; } // ADDed THIS!
-        public void Execute(PackFile exportSource, string outputPath, IPackFileContainer packFileContainer, GameTypeEnum gameType);
-        public ImportSupportEnum CanImportFile(PackFile file);
+        string[] InputExtensions { get; }
+        bool SupportsCancellation => false;
 
+        /// <summary>
+        /// Called once the input file is known, so the importer can fill in defaults from it.
+        /// </summary>
+        void Initialize(PackFile inputFile) { }
+
+        /// <summary>
+        /// Runs on a background thread. Progress and cancellation are optional for importers that don't support them.
+        /// </summary>
+        ImportResult Execute(PackFile importSource, string outputPath, IPackFileContainer packFileContainer, GameTypeEnum gameType, IProgress<ImportProgress>? progress, CancellationToken cancellationToken);
+
+        public ImportSupportEnum CanImportFile(PackFile file);
     }
 }

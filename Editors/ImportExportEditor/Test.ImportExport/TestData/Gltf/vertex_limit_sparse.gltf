@@ -1,0 +1,63 @@
+{
+  "asset": {
+    "version": "2.0",
+    "generator": "AssetEditor.CN procedural test fixture",
+    "extras": {
+      "license": "CC0-1.0"
+    }
+  },
+  "scene": 0,
+  "scenes": [
+    {
+      "name": "default",
+      "nodes": [0]
+    }
+  ],
+  "nodes": [
+    { "name": "sparse_over_limit", "mesh": 0 }
+  ],
+  "meshes": [
+    {
+      "name": "sparse_over_limit_mesh",
+      "primitives": [
+        {
+          "attributes": {
+            "POSITION": 0
+          },
+          "indices": 1,
+          "mode": 4
+        }
+      ]
+    }
+  ],
+  "buffers": [
+    {
+      "byteLength": 6,
+      "uri": "data:application/octet-stream;base64,AAABAAIA"
+    }
+  ],
+  "bufferViews": [
+    {
+      "buffer": 0,
+      "byteOffset": 0,
+      "byteLength": 6
+    }
+  ],
+  "accessors": [
+    {
+      "componentType": 5126,
+      "count": 65537,
+      "type": "VEC3",
+      "min": [0, 0, 0],
+      "max": [0, 0, 0]
+    },
+    {
+      "bufferView": 0,
+      "componentType": 5123,
+      "count": 3,
+      "type": "SCALAR",
+      "min": [0],
+      "max": [2]
+    }
+  ]
+}
