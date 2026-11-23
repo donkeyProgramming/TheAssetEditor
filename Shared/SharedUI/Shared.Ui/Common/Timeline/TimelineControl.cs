@@ -318,7 +318,8 @@ namespace Shared.Ui.Common.Timeline
 
             if (placement.IsInstant)
             {
-                var x = axis.TimeToX(item.Start);
+                // Kept inside the control so a tick at the very start or end isn't half clipped.
+                var x = Math.Clamp(axis.TimeToX(item.Start), InstantWidth / 2, Math.Max(InstantWidth / 2, axis.Width - InstantWidth / 2));
                 var rect = new Rect(x - InstantWidth / 2, top + 1, InstantWidth, RowHeight - 2);
                 dc.DrawRectangle(brush, pen, rect);
             }
