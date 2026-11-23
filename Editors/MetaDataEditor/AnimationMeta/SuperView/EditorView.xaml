@@ -91,11 +91,35 @@
         <TabControl DockPanel.Dock="Top" SelectedIndex="{Binding SelectedTabControllerIndex, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">
             <TabItem Header="{loc:Loc MetadataEditor.Tabs.Persistent}">
                 <DockPanel>
+                    <!-- The slot names a META file that is not in any loaded pack, or names none -->
+                    <Border DockPanel.Dock="Top" Margin="4" Padding="6" BorderThickness="1" BorderBrush="{DynamicResource ToolBarHorizontalBorder}"
+                            Visibility="{Binding CanCreatePersistentMetaFile, Converter={StaticResource ProblemsVisibility}}">
+                        <StackPanel>
+                            <TextBlock Text="{loc:Loc SuperView.MissingMeta.NotInPacks}" TextWrapping="Wrap"/>
+                            <TextBox Text="{Binding PersistentMetaFilePath, Mode=OneWay}" IsReadOnly="True" BorderThickness="0" Background="Transparent" TextWrapping="Wrap" Margin="0,2,0,6"/>
+                            <Button Content="{loc:Loc SuperView.MissingMeta.Create}" ToolTip="{loc:Loc SuperView.MissingMeta.CreateTooltip}"
+                                    Click="{s:MethodBinding CreatePersistentMetaFile}" HorizontalAlignment="Left" Padding="8,3"/>
+                        </StackPanel>
+                    </Border>
+                    <TextBlock DockPanel.Dock="Top" Margin="6" TextWrapping="Wrap" Text="{loc:Loc SuperView.MissingMeta.NotNamedPersistent}"
+                               Visibility="{Binding IsPersistentMetaFileNotNamed, Converter={StaticResource ProblemsVisibility}}"/>
                     <view:MainEditorView DataContext="{Binding PersistentMetaEditor}" DockPanel.Dock="Top"/>
                 </DockPanel>
             </TabItem>
             <TabItem Header="{loc:Loc MetadataEditor.Tabs.Animation}">
                 <DockPanel>
+                    <!-- The slot names a META file that is not in any loaded pack, or names none -->
+                    <Border DockPanel.Dock="Top" Margin="4" Padding="6" BorderThickness="1" BorderBrush="{DynamicResource ToolBarHorizontalBorder}"
+                            Visibility="{Binding CanCreateAnimationMetaFile, Converter={StaticResource ProblemsVisibility}}">
+                        <StackPanel>
+                            <TextBlock Text="{loc:Loc SuperView.MissingMeta.NotInPacks}" TextWrapping="Wrap"/>
+                            <TextBox Text="{Binding AnimationMetaFilePath, Mode=OneWay}" IsReadOnly="True" BorderThickness="0" Background="Transparent" TextWrapping="Wrap" Margin="0,2,0,6"/>
+                            <Button Content="{loc:Loc SuperView.MissingMeta.Create}" ToolTip="{loc:Loc SuperView.MissingMeta.CreateTooltip}"
+                                    Click="{s:MethodBinding CreateAnimationMetaFile}" HorizontalAlignment="Left" Padding="8,3"/>
+                        </StackPanel>
+                    </Border>
+                    <TextBlock DockPanel.Dock="Top" Margin="6" TextWrapping="Wrap" Text="{loc:Loc SuperView.MissingMeta.NotNamedAnimation}"
+                               Visibility="{Binding IsAnimationMetaFileNotNamed, Converter={StaticResource ProblemsVisibility}}"/>
                     <view:MainEditorView DataContext="{Binding MetaEditor}" DockPanel.Dock="Top"/>
                 </DockPanel>
             </TabItem>

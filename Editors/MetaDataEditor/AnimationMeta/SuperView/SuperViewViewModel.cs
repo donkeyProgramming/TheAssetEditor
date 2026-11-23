@@ -15,6 +15,7 @@ using Shared.Core.Events.Scoped;
 using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Events;
 using Shared.Core.PackFiles.Models;
+using Shared.Core.PackFiles.Utility;
 using Shared.Core.Services;
 using Shared.Core.ToolCreation;
 using Shared.GameFormats.AnimationMeta.Definitions;
@@ -38,13 +39,12 @@ namespace Editors.AnimationMeta.SuperView
         private readonly CombatMetaDataEditSession _editSession;
         private readonly CombatMetaDataGizmoComponent _gizmo;
         private readonly MetaDataMarkerPickerComponent _markerPicker;
+        private readonly IFileSaveService _fileSaveService;
 
         // Which of a splash attack's points the gizmo is on: the one picked in the viewport, the start when picked in the list.
         CombatMetaDataPoint _splashPoint = CombatMetaDataPoint.SplashStart;
         bool _selectingMarker;
 
-        [ObservableProperty] string _persistentMetaFilePath = "";
-        [ObservableProperty] string _metaFilePath = "";
         [ObservableProperty] MetaDataEditorViewModel _persistentMetaEditor;
         [ObservableProperty] MetaDataEditorViewModel _metaEditor;
         [ObservableProperty] int _selectedTabControllerIndex = 0;
@@ -75,6 +75,15 @@ namespace Editors.AnimationMeta.SuperView
         public string ProblemsHeader => string.Format(_localizationManager.Get("SuperView.Problems.Header"), Problems.Count);
         bool _showingProblems;
 
+        // The META files the selected slot names. One that is named but not in any loaded pack can be created empty; one
+        // that is not named has nothing to show.
+        public string AnimationMetaFilePath => _asset?.FragAndSlotSelection.MetaDataName ?? "";
+        public string PersistentMetaFilePath => _asset?.FragAndSlotSelection.MetaDataPersistName ?? "";
+        public bool CanCreateAnimationMetaFile => MetaEditor?.CurrentFile == null && !string.IsNullOrWhiteSpace(AnimationMetaFilePath);
+        public bool CanCreatePersistentMetaFile => PersistentMetaEditor?.CurrentFile == null && !string.IsNullOrWhiteSpace(PersistentMetaFilePath);
+        public bool IsAnimationMetaFileNotNamed => MetaEditor?.CurrentFile == null && string.IsNullOrWhiteSpace(AnimationMetaFilePath);
+        public bool IsPersistentMetaFileNotNamed => PersistentMetaEditor?.CurrentFile == null && string.IsNullOrWhiteSpace(PersistentMetaFilePath);
+
         public override Type EditorViewModelType => typeof(EditorView);
         public bool HasUnsavedChanges
         { 
@@ -102,7 +111,8 @@ namespace Editors.AnimationMeta.SuperView
             LocalizationManager localizationManager,
             CombatMetaDataEditSession editSession,
             CombatMetaDataGizmoComponent gizmo,
-            MetaDataMarkerPickerComponent markerPicker)
+            MetaDataMarkerPickerComponent markerPicker,
+            IFileSaveService fileSaveService)
             : base(editorHostParameters)
         {
             DisplayName = "Super view";
@@ -117,6 +127,7 @@ namespace Editors.AnimationMeta.SuperView
             _editSession = editSession;
             _gizmo = gizmo;
             _markerPicker = markerPicker;
+            _fileSaveService = fileSaveService;
 
             // Added to this editor's world only: registered as game components, they would join every editor's.
             GameWorld!.AddComponent(_gizmo);
@@ -215,6 +226,7 @@ namespace Editors.AnimationMeta.SuperView
             Player.TimelineItemClicked += OnTimelineItemClicked;
 
             _asset = assetViewModel;
+            _asset.FragAndSlotSelection.PropertyChanged += OnSlotSelectionChanged;
             OnSceneObjectUpdated(new SceneObjectUpdateEvent(_asset.Data, false, false, false, true));
         }
 
@@ -290,6 +302,42 @@ namespace Editors.AnimationMeta.SuperView
             RecreateMetaDataInformation();
             RebuildTimeline();
             UpdateEditTarget();
+            NotifyMetaFileState();
+        }
+
+        void OnSlotSelectionChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName is nameof(BinAnimationViewModel.MetaDataName) or nameof(BinAnimationViewModel.MetaDataPersistName))
+                NotifyMetaFileState();
+        }
+
+        void NotifyMetaFileState()
+        {
+            OnPropertyChanged(nameof(AnimationMetaFilePath));
+            OnPropertyChanged(nameof(PersistentMetaFilePath));
+            OnPropertyChanged(nameof(CanCreateAnimationMetaFile));
+            OnPropertyChanged(nameof(CanCreatePersistentMetaFile));
+            OnPropertyChanged(nameof(IsAnimationMetaFileNotNamed));
+            OnPropertyChanged(nameof(IsPersistentMetaFileNotNamed));
+        }
+
+        public void CreateAnimationMetaFile()
+        {
+            if (CanCreateAnimationMetaFile && CreateEmptyMetaFile(AnimationMetaFilePath) is { } file)
+                _sceneObjectBuilder.SetMetaFile(_asset.Data, file, _asset.Data.PersistMetaData);
+        }
+
+        public void CreatePersistentMetaFile()
+        {
+            if (CanCreatePersistentMetaFile && CreateEmptyMetaFile(PersistentMetaFilePath) is { } file)
+                _sceneObjectBuilder.SetMetaFile(_asset.Data, _asset.Data.MetaData, file);
+        }
+
+        // An empty version 2 META, the version WH3's files use, at the path the slot names, in the editable pack.
+        PackFile? CreateEmptyMetaFile(string path)
+        {
+            var bytes = _metaDataFileParser.GenerateBytes(2, new ParsedMetadataFile { Version = 2 });
+            return _fileSaveService.Save(path, bytes, false);
         }
 
         void OnAnimationChanged(GameWorld.Core.Animation.AnimationClip? clip) => RebuildTimeline();
@@ -503,6 +551,7 @@ namespace Editors.AnimationMeta.SuperView
             PersistentMetaEditor.Tags.CollectionChanged -= OnTagsChanged;
             MetaEditor.Tags.CollectionChanged -= OnTagsChanged;
             _asset.Data.AnimationChanged -= OnAnimationChanged;
+            _asset.FragAndSlotSelection.PropertyChanged -= OnSlotSelectionChanged;
             _globalEventHub.UnRegister(this);
             base.Close();
         }
