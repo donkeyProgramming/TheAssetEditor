@@ -8,35 +8,68 @@
         mc:Ignorable="d"
          Style="{StaticResource CustomWindowStyle}"
         Title="{loc:Loc AnimationReTarget.Save.Title}" Height="450" Width="800">
-    
+
     <Window.Resources>
         <System:Double x:Key="labelWidth">140</System:Double>
     </Window.Resources>
 
 
     <StackPanel>
-        <DockPanel >
-            <Label Content="{loc:Loc AnimationReTarget.Save.SavePrefix}" Width ="{StaticResource labelWidth}" DockPanel.Dock="Left"/>
-            <Label Content=":" DockPanel.Dock="Left"/>
-            <ComboBox Margin="2" DockPanel.Dock="Right" Width="60" 
-                      ItemsSource="{Binding PossibleAnimationFormats, UpdateSourceTrigger=PropertyChanged}" 
-                      SelectedItem="{Binding AnimationFormat, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
-            <Label Content="{loc:Loc AnimationReTarget.Save.Format}" DockPanel.Dock="Right"/>
-            <TextBox Text="{Binding SavePrefix, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" VerticalAlignment="Center" DockPanel.Dock="Left"/>
-        </DockPanel>
+        <StackPanel x:Name="OptionsPanel">
+            <DockPanel >
+                <Label Content="{loc:Loc AnimationReTarget.Save.SavePrefix}" Width ="{StaticResource labelWidth}" DockPanel.Dock="Left"/>
+                <Label Content=":" DockPanel.Dock="Left"/>
+                <ComboBox Margin="2" DockPanel.Dock="Right" Width="60"
+                          ItemsSource="{Binding PossibleAnimationFormats, UpdateSourceTrigger=PropertyChanged}"
+                          SelectedItem="{Binding AnimationFormat, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
+                <Label Content="{loc:Loc AnimationReTarget.Save.Format}" DockPanel.Dock="Right"/>
+                <TextBox Text="{Binding SavePrefix, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" VerticalAlignment="Center" DockPanel.Dock="Left"/>
+            </DockPanel>
 
-        <DockPanel IsEnabled="False">
-            <Label Content="{loc:Loc AnimationReTarget.Save.UseGeneratedSkeleton}" Width ="{StaticResource labelWidth}"/>
-            <Label Content=":"/>
-            <CheckBox VerticalContentAlignment="Center" IsChecked="{Binding UseScaledSkeletonName, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
-            <TextBox Text="{Binding ScaledSkeletonName, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" VerticalAlignment="Center"/>
-        </DockPanel>
+            <DockPanel IsEnabled="False">
+                <Label Content="{loc:Loc AnimationReTarget.Save.UseGeneratedSkeleton}" Width ="{StaticResource labelWidth}"/>
+                <Label Content=":"/>
+                <CheckBox VerticalContentAlignment="Center" IsChecked="{Binding UseScaledSkeletonName, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
+                <TextBox Text="{Binding ScaledSkeletonName, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" VerticalAlignment="Center"/>
+            </DockPanel>
+
+            <DockPanel>
+                <Button x:Name="SaveButton" Click="SaveButtonClick" Content="{loc:Loc AnimationReTarget.Save.Save}"/>
+            </DockPanel>
+
+            <GroupBox Header="{loc:Loc AnimationReTarget.Batch.Title}" Margin="0,8,0,0">
+                <StackPanel>
+                    <TextBlock Text="{loc:Loc AnimationReTarget.Batch.Description}" TextWrapping="Wrap" Margin="2,2,2,6"/>
+
+                    <RadioButton GroupName="BatchPath" Margin="2" Content="{loc:Loc AnimationReTarget.Batch.Path.Source}"
+                                 IsChecked="{Binding BatchUseSourcePath, Mode=TwoWay}"/>
+                    <RadioButton GroupName="BatchPath" Margin="2" Content="{loc:Loc AnimationReTarget.Batch.Path.SelectedFolder}"
+                                 IsChecked="{Binding BatchUseSelectedFolder, Mode=TwoWay}"/>
+
+                    <DockPanel Margin="20,2,2,2" IsEnabled="{Binding BatchUseSelectedFolder}"
+                               ToolTip="{loc:Loc AnimationReTarget.Batch.Path.SelectedFolderTooltip}">
+                        <Button DockPanel.Dock="Right" Width="80" Margin="4,0,0,0" Click="BrowseButtonClick" Content="{loc:Loc AnimationReTarget.Batch.Browse}"/>
+                        <TextBox IsReadOnly="True" VerticalAlignment="Center" Text="{Binding BatchTargetFolder}"/>
+                    </DockPanel>
+
+                    <CheckBox Margin="2,6,2,2" Content="{loc:Loc AnimationReTarget.Batch.OverwriteExisting}"
+                              IsChecked="{Binding BatchOverwriteExisting, Mode=TwoWay}"/>
+
+                    <Button Margin="2,6,2,2" Click="BatchButtonClick" Content="{loc:Loc AnimationReTarget.Batch.Start}"/>
+                </StackPanel>
+            </GroupBox>
+        </StackPanel>
+
+        <StackPanel x:Name="ProgressPanel" Visibility="Collapsed" Margin="2,8,2,2">
+            <TextBlock x:Name="ProgressText" TextTrimming="CharacterEllipsis" Margin="0,0,0,2"/>
+            <DockPanel>
+                <Button x:Name="CancelBatchButton" DockPanel.Dock="Right" Width="80" Margin="4,0,0,0" Click="CancelBatchButtonClick" Content="{loc:Loc AnimationReTarget.Batch.Cancel}"/>
+                <ProgressBar x:Name="BatchProgressBar" Height="18" Minimum="0"/>
+            </DockPanel>
+        </StackPanel>
 
         <DockPanel>
-            <Button Click="SaveButtonClick" Content="{loc:Loc AnimationReTarget.Save.Save}"/>
-        </DockPanel>
-        <DockPanel>
-            <Button Click="CloseButtonClick" Content="{loc:Loc AnimationReTarget.Save.Close}"/>
+            <Button x:Name="CloseButton" Click="CloseButtonClick" Content="{loc:Loc AnimationReTarget.Save.Close}"/>
         </DockPanel>
     </StackPanel>
 

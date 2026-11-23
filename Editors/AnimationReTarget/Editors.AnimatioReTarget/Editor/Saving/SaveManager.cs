@@ -2,7 +2,9 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Editors.AnimatioReTarget.Editor.BoneHandling;
+using Editors.AnimatioReTarget.Editor.Settings;
 using Editors.Shared.Core.Common;
+using GameWorld.Core.Animation;
 using GameWorld.Core.Services;
 using Shared.Core.Misc;
 using Shared.Core.PackFiles;
@@ -12,44 +14,47 @@ using Shared.GameFormats.Animation;
 
 namespace Editors.AnimatioReTarget.Editor.Saving
 {
-
-
     public partial class SaveManager : ObservableObject
     {
-        //private readonly ILogger _logger = Logging.Create<SaveViewModel>();
-
+        private readonly BoneManager _boneManager;
         private readonly ISkeletonAnimationLookUpHelper _skeletonAnimationLookUpHelper;
         private readonly IPackFileService _pfs;
         private readonly IFileSaveService _saveService;
         private readonly IStandardDialogs _standardDialogs;
+        private readonly LocalizationManager _loc;
         private readonly IAbstractFormFactory<SaveWindow> _settingsWindowFactory;
         [ObservableProperty] SaveSettings _settings;
 
         SceneObject _generated;
         SceneObject _source;
         SceneObject _target;
+        AnimationGenerationSettings _generationSettings;
 
         public SaveManager(BoneManager boneManager,
-            ISkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper, 
+            ISkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper,
             IPackFileService pfs,
             SaveSettings saveSettings,
             IFileSaveService saveService,
             IStandardDialogs standardDialogs,
+            LocalizationManager localizationManager,
             IAbstractFormFactory<SaveWindow> settingsWindowFactory)
         {
+            _boneManager = boneManager;
             _skeletonAnimationLookUpHelper = skeletonAnimationLookUpHelper;
             _pfs = pfs;
             _saveService = saveService;
             _standardDialogs = standardDialogs;
+            _loc = localizationManager;
             _settingsWindowFactory = settingsWindowFactory;
             _settings = saveSettings;
         }
 
-        public void SetSceneNodes(SceneObject source, SceneObject target, SceneObject generated)
+        public void SetSceneNodes(SceneObject source, SceneObject target, SceneObject generated, AnimationGenerationSettings generationSettings)
         {
             _generated = generated;
             _source = source;
             _target = target;
+            _generationSettings = generationSettings;
         }
 
         public void SaveAnimation(bool prompOnConflict = true)
@@ -61,37 +66,38 @@ namespace Editors.AnimatioReTarget.Editor.Saving
             }
 
             var animationName = _source.AnimationName.Value;
-            var clip = _generated.AnimationClip;
-           
-            var animFile = Settings.AnimationFormat == 8
-                ? ConvertToVersionEight(clip, animationName)
-                : clip.ConvertToFileFormat(_generated.Skeleton);
+            var sourceFile = Settings.AnimationFormat == 8 ? _pfs.FindFile(animationName) : null;
+            var sourceHeader = sourceFile == null ? null : AnimationFile.Create(sourceFile).Header;   // the header alone can run past what GetAnimationHeader peeks
+            var animFile = ToOutputFile(_generated.AnimationClip, _generated.Skeleton, sourceHeader);
 
-             var orgSkeleton = _source.Skeleton.SkeletonName;
-             var newSkeleton = _target.Skeleton.SkeletonName;
-             var newPath = animationName.Replace(orgSkeleton, newSkeleton);
+            _saveService.Save(BuildSourcePathOutput(animationName), AnimationFile.ConvertToBytes(animFile), prompOnConflict);
+        }
 
-            if (Settings.AnimationFormat is not 7 and not 8)
+        // The retargeted clip is on another skeleton, so only the source's header values carry over to v8 (flags,
+        // unknown_v8), never its packing
+        AnimationFile ToOutputFile(AnimationClip clip, GameSkeleton skeleton, AnimationFile.AnimationHeader? sourceHeader)
+        {
+            if (Settings.AnimationFormat == 8)
             {
-                var skeleton = _skeletonAnimationLookUpHelper.GetSkeletonFileFromName(animFile.Header.SkeletonName);
-                animFile.ConvertToVersion(Settings.AnimationFormat, skeleton, _pfs);
+                var unknownValueV8 = sourceHeader?.Version == 8 ? sourceHeader.UnknownValue_v8 : (uint?)null;
+                return clip.ConvertToFileFormat(skeleton, 8, unknownValueV8, sourceHeader?.FlagVariables);
             }
 
-            var currentFileName = Path.GetFileName(newPath);
-            newPath = newPath.Replace(currentFileName, Settings.SavePrefix + currentFileName);
-            newPath = SaveUtility.EnsureEnding(newPath, ".anim");
-
-            _saveService.Save(newPath, AnimationFile.ConvertToBytes(animFile), prompOnConflict);
-
+            var animFile = clip.ConvertToFileFormat(skeleton);
+            if (Settings.AnimationFormat != 7)
+            {
+                var skeletonFile = _skeletonAnimationLookUpHelper.GetSkeletonFileFromName(animFile.Header.SkeletonName);
+                animFile.ConvertToVersion(Settings.AnimationFormat, skeletonFile, _pfs);
+            }
+            return animFile;
         }
-        // The retargeted clip is on another skeleton, so only the source's header values carry over (flags, unknown_v8),
-        // never its packing
-        AnimationFile ConvertToVersionEight(GameWorld.Core.Animation.AnimationClip clip, string sourcePath)
+
+        string BuildSourcePathOutput(string sourcePath)
         {
-            var sourceFile = _pfs.FindFile(sourcePath);
-            var header = sourceFile == null ? null : AnimationFile.Create(sourceFile).Header;   // the header alone can run past what GetAnimationHeader peeks
-            var unknownValueV8 = header?.Version == 8 ? header.UnknownValue_v8 : (uint?)null;
-            return clip.ConvertToFileFormat(_generated.Skeleton, 8, unknownValueV8, header?.FlagVariables);
+            var outputPath = sourcePath.Replace(_source.Skeleton.SkeletonName, _target.Skeleton.SkeletonName);
+            var currentFileName = Path.GetFileName(outputPath);
+            outputPath = outputPath.Replace(currentFileName, Settings.SavePrefix + currentFileName);
+            return SaveUtility.EnsureEnding(outputPath, ".anim");
         }
 
         [RelayCommand] void ShowSaveSettings()
@@ -101,109 +107,182 @@ namespace Editors.AnimatioReTarget.Editor.Saving
             window.ShowDialog();
         }
 
-        /*
-        public void OpenBatchProcessDialog()
+        // Batch retarget. Ported from Szy-Cathay/TheAssetEditor-CN 08d0ed5dc, writing to the editable pack instead
+        // of the fork's folder project
+
+        public bool CanBatchRetarget(out string errorMessage)
         {
-            if (!CanUpdateAnimation(false))
-                return;
+            if (_source?.Skeleton == null || _target?.Skeleton == null)
+                errorMessage = _loc.Get("AnimationReTarget.Batch.Error.SkeletonsRequired");
+            else if (!float.IsFinite(_generationSettings.AnimationSpeedMult) || _generationSettings.AnimationSpeedMult <= 0)
+                errorMessage = _loc.Get("AnimationReTarget.Batch.Error.InvalidSpeed");
+            else if (!_boneManager.FlatBones.Any(x => x.HasMapping && x.MappedIndex >= 0))
+                errorMessage = _loc.Get("AnimationReTarget.Batch.Error.MappingRequired");
+            else if (_pfs.GetEditablePack() == null)
+                errorMessage = _loc.Get("AnimationReTarget.Batch.Error.EditablePackRequired");
+            else
+                errorMessage = string.Empty;
 
-            // Find all animations for skeleton
-            var copyFromAnims = _skeletonAnimationLookUpHelper.GetAnimationsForSkeleton(_copyFrom.Skeleton.SkeletonName);
+            return errorMessage.Length == 0;
+        }
 
-            var items = copyFromAnims.Select(x => new SelectionListViewModel<SkeletonAnimationLookUpHelper.AnimationReference>.Item()
+        /// <summary>The source skeleton's animations, without the skeleton files under animations\skeletons\.</summary>
+        public IReadOnlyList<AnimationReference> GetBatchCandidates()
+        {
+            if (_source?.Skeleton == null)
+                return [];
+
+            return _skeletonAnimationLookUpHelper
+                .GetAnimationsForSkeleton(_source.Skeleton.SkeletonName)
+                .Where(x => !IsSkeletonAnimationPath(x.AnimationFile))
+                .OrderBy(x => x.AnimationFile, StringComparer.OrdinalIgnoreCase)
+                .ThenBy(x => x.Container?.Name, StringComparer.OrdinalIgnoreCase)
+                .ToList();
+        }
+
+        public static bool IsTechAnimation(AnimationReference animation) =>
+            GetPathSegments(animation.AnimationFile).Contains("tech", StringComparer.OrdinalIgnoreCase);
+
+        public static bool IsSkeletonAnimationPath(string path)
+        {
+            if (!path.EndsWith(".anim", StringComparison.OrdinalIgnoreCase))
+                return false;
+
+            var segments = GetPathSegments(path);
+            for (var i = 0; i < segments.Length - 1; i++)
             {
-                IsChecked = new NotifyAttr<bool>(!(x.AnimationFile.Contains("tech", StringComparison.InvariantCultureIgnoreCase) || x.AnimationFile.Contains("skeletons", StringComparison.InvariantCultureIgnoreCase))),
-                DisplayName = x.AnimationFile,
-                ItemValue = x
-            }).ToList();
+                if (segments[i].Equals("animations", StringComparison.OrdinalIgnoreCase) &&
+                    segments[i + 1].Equals("skeletons", StringComparison.OrdinalIgnoreCase))
+                    return true;
+            }
+            return false;
+        }
 
-            var window = SelectionListWindow.ShowDialog("Select animations:", items);
-            if (window.Result)
+        static string[] GetPathSegments(string path) => path.Replace('/', '\\').Split('\\', StringSplitOptions.RemoveEmptyEntries);
+
+        public Task<BatchAnimationRetargetResult> ExecuteBatchAsync(BatchAnimationRetargetRequest request, IProgress<BatchProgress>? progress, CancellationToken cancellationToken)
+        {
+            // Checked before the background task starts, so a bad setup throws to the caller and writes nothing
+            if (!CanBatchRetarget(out var validationError))
+                throw new InvalidOperationException(validationError);
+            if (request.PathMode == BatchRetargetPathMode.SelectedFolder && string.IsNullOrWhiteSpace(request.TargetFolder))
+                throw new InvalidOperationException(_loc.Get("AnimationReTarget.Batch.Error.TargetFolderRequired"));
+
+            // The bone settings are read on the background task, so the window keeps them disabled until it ends
+            return Task.Run(() => ExecuteBatch(request, progress, cancellationToken));
+        }
+
+        BatchAnimationRetargetResult ExecuteBatch(BatchAnimationRetargetRequest request, IProgress<BatchProgress>? progress, CancellationToken cancellationToken)
+        {
+            var outputPack = _pfs.GetEditablePack()!;
+
+            // Plan every output path first. A path that collides with an earlier item, or that already exists when
+            // not overwriting, is skipped
+            var planned = request.Animations.Select(x => PlanItem(request, x)).ToList();
+            var seenOutputs = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            var skipped = new HashSet<int>();
+            for (var i = 0; i < planned.Count; i++)
             {
-                using (var waitCursor = new WaitCursor())
+                var outputPath = planned[i].OutputPath;
+                if (outputPath == null)
+                    continue;
+
+                if (!seenOutputs.Add(outputPath) || (!request.OverwriteExisting && _pfs.FindFile(outputPath, outputPack) != null))
+                    skipped.Add(i);
+            }
+
+            var results = new List<BatchAnimationRetargetItemResult>(planned.Count);
+            for (var i = 0; i < planned.Count; i++)
+            {
+                var item = planned[i];
+                var sourcePath = item.Animation.AnimationFile;
+
+                if (cancellationToken.IsCancellationRequested)
                 {
-                    var index = 1;
-                    var numItemsToProcess = items.Count(x => x.IsChecked.Value);
-                    if (numItemsToProcess > 50)
+                    results.AddRange(planned.Skip(i).Select(x => new BatchAnimationRetargetItemResult(x.Animation.AnimationFile, x.OutputPath, BatchAnimationRetargetItemStatus.NotProcessed)));
+                    break;
+                }
+
+                if (item.ErrorMessage != null)
+                {
+                    results.Add(new(sourcePath, null, BatchAnimationRetargetItemStatus.Failed, item.ErrorMessage));
+                }
+                else if (skipped.Contains(i))
+                {
+                    results.Add(new(sourcePath, item.OutputPath, BatchAnimationRetargetItemStatus.Skipped));
+                }
+                else
+                {
+                    try
                     {
-                        var confirm = MessageBox.Show("about to process 50 or more items! continue milord?", "sire...", MessageBoxButton.YesNo);
-                        if (confirm != MessageBoxResult.Yes) return;
+                        var content = RetargetAnimation(item.Animation);
+                        RunOnUiThread(() => _saveService.Save(item.OutputPath!, content, false));
+                        results.Add(new(sourcePath, item.OutputPath, BatchAnimationRetargetItemStatus.Success));
                     }
-                    foreach (var item in items)
+                    catch (Exception e)
                     {
-                        if (item.IsChecked.Value)
-                        {
-                            var file = _pfs.FindFile(item.ItemValue.AnimationFile, item.ItemValue.Container);
-                            var animFile = AnimationFile.Create(file.DataSource.ReadDataAsChunk());
-                            var clip = new AnimationClip(animFile, _copyFrom.Skeleton);
-
-                            _logger.Here().Information($"Processing animation {index} / {numItemsToProcess} - {item.DisplayName}");
-
-                            var updatedClip = UpdateAnimation(clip, null);
-                            SaveAnimation(updatedClip, item.ItemValue.AnimationFile, false);
-                            index++;
-                        }
-
+                        results.Add(new(sourcePath, item.OutputPath, BatchAnimationRetargetItemStatus.Failed, e.Message));
                     }
                 }
+
+                progress?.Report(new BatchProgress(i + 1, planned.Count, sourcePath));
             }
+
+            return new BatchAnimationRetargetResult(results);
         }
 
-        public void UpdateAnimation()
+        record BatchPlanItem(AnimationReference Animation, string? OutputPath, string? ErrorMessage);
+
+        BatchPlanItem PlanItem(BatchAnimationRetargetRequest request, AnimationReference animation)
         {
-            if (CanUpdateAnimation(true))
+            try
             {
-                var newAnimationClip = UpdateAnimation(_copyFrom.AnimationClip, _copyTo.AnimationClip);
-                _assetViewModelBuilder.SetAnimationClip(Generated, newAnimationClip, new SkeletonAnimationLookUpHelper.AnimationReference("Generated animation", null));
-                _player.SelectedMainAnimation = _player.PlayerItems.First(x => x.Asset == Generated);
+                return new BatchPlanItem(animation, BuildBatchOutputPath(request, animation.AnimationFile), null);
+            }
+            catch (Exception e)
+            {
+                return new BatchPlanItem(animation, null, e.Message);
             }
         }
 
-        AnimationClip UpdateAnimation(AnimationClip animationToCopy, AnimationClip originalAnimation)
+        string BuildBatchOutputPath(BatchAnimationRetargetRequest request, string sourcePath)
         {
-            var service = new AnimationRemapperService(AnimationSettings, _remappingInformation, Bones);
-            var newClip = service.ReMapAnimation(_copyFrom.Skeleton, _copyTo.Skeleton, animationToCopy);
-            return newClip;
+            if (request.PathMode == BatchRetargetPathMode.SourcePath)
+                return BuildSourcePathOutput(sourcePath);
+
+            // Only the folder that holds the .anim is kept, so stand\idle.anim lands in <chosen>\stand\idle.anim
+            var containingFolder = Path.GetFileName(Path.GetDirectoryName(sourcePath));
+            if (string.IsNullOrWhiteSpace(containingFolder))
+                throw new InvalidDataException(string.Format(_loc.Get("AnimationReTarget.Batch.Error.SourceFolderRequired"), sourcePath));
+
+            var fileName = Settings.SavePrefix + Path.GetFileName(sourcePath);
+            var targetFolder = request.TargetFolder!.Replace('/', '\\').Trim('\\');
+            return SaveUtility.EnsureEnding(Path.Combine(targetFolder, containingFolder, fileName), ".anim");
         }
 
-        bool CanUpdateAnimation(bool requireAnimation)
+        byte[] RetargetAnimation(AnimationReference animation)
         {
-            if (_remappingInformation == null)
-            {
-                MessageBox.Show("No mapping created?", "Error", MessageBoxButton.OK);
-                return false;
-            }
+            var packFile = _pfs.FindFile(animation.AnimationFile, animation.Container)
+                ?? throw new FileNotFoundException(string.Format(_loc.Get("AnimationReTarget.Batch.Error.AnimationNotFound"), animation.AnimationFile));
 
-            if (_copyTo.Skeleton == null || _copyFrom.Skeleton == null)
-            {
-                MessageBox.Show("Missing a skeleton?", "Error", MessageBoxButton.OK);
-                return false;
-            }
+            var sourceFile = AnimationFile.Create(packFile);
+            var sourceClip = new AnimationClip(sourceFile, _source.Skeleton);
+            var remapper = new AnimationRemapperService(_generationSettings, _boneManager.Bones);
+            var remappedClip = remapper.ReMapAnimation(_source.Skeleton, _target.Skeleton, sourceClip);
 
-            if (_copyFrom.AnimationClip == null && requireAnimation)
-            {
-                MessageBox.Show("No animation to copy selected", "Error", MessageBoxButton.OK);
-                return false;
-            }
-
-            return true;
+            var outputFile = ToOutputFile(remappedClip, _target.Skeleton, sourceFile.Header);
+            return AnimationFile.ConvertToBytes(outputFile);
         }
 
-        public void SaveAnimationAction()
+        // Adding to the pack raises events the pack tree handles, so writes go through the UI thread. Tests have no
+        // Application and write directly
+        static void RunOnUiThread(Action action)
         {
-            if (Generated.AnimationClip == null || Generated.Skeleton == null || _copyFrom.Skeleton == null)
-            {
-                MessageBox.Show("Can not save, as no animation has been generated. Press the Apply button first", "Error", MessageBoxButton.OK);
-                return;
-            }
-
-            SaveAnimation(Generated.AnimationClip, _copyFrom.AnimationName.Value.AnimationFile);
+            var dispatcher = System.Windows.Application.Current?.Dispatcher;
+            if (dispatcher == null || dispatcher.CheckAccess())
+                action();
+            else
+                dispatcher.Invoke(action);
         }
-
-
-        */
-
     }
-
-
 }
