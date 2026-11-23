@@ -19,7 +19,7 @@ namespace Editors.CscEditor.Services
     /// </summary>
     public class CscElementSceneNode : GroupNode, IDrawableItem
     {
-        public CscElement Element { get; }
+        public CscElement Element { get; internal set; }
         readonly CscPlaybackContext _context;
 
         /// <summary>The element's fully-composed world transform for the current frame.</summary>

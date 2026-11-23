@@ -231,6 +231,53 @@ namespace Editors.CscEditor.Data
             return scene;
         }
 
+        /// <summary>Checks the attach tree before it is written: no duplicate ids, every element
+        /// reachable exactly once from <see cref="RootElements"/>, parent links consistent and no
+        /// cycles. Throws <see cref="InvalidDataException"/> otherwise.</summary>
+        internal void ValidateForWrite()
+        {
+            var ids = new HashSet<int>();
+            foreach (var element in AllElementsIncludingNested())
+            {
+                if (!ids.Add(element.Id))
+                    throw new InvalidDataException($"The scene contains duplicate element id {element.Id}.");
+            }
+
+            var mainElements = Elements.ToHashSet();
+            var seen = new HashSet<CscElement>();
+            foreach (var root in RootElements)
+            {
+                if (!mainElements.Contains(root) || root.IsNested || root.Parent != null || !seen.Add(root))
+                    throw new InvalidDataException($"Element {root.Id} has an invalid root attachment.");
+            }
+
+            foreach (var parent in Elements)
+            {
+                foreach (var child in parent.Children.Where(c => !c.IsNested))
+                {
+                    if (!mainElements.Contains(child))
+                        throw new InvalidDataException($"Attach child {child.Id} is not part of the scene.");
+                    if (!ReferenceEquals(child.Parent, parent))
+                        throw new InvalidDataException($"Attach child {child.Id} has an inconsistent parent.");
+                    if (!seen.Add(child))
+                        throw new InvalidDataException($"Attach child {child.Id} appears more than once.");
+                }
+            }
+
+            foreach (var element in Elements)
+            {
+                if (!seen.Contains(element))
+                    throw new InvalidDataException($"Element {element.Id} is missing from the attach hierarchy.");
+
+                var chain = new HashSet<CscElement>();
+                for (var current = element; current != null; current = current.Parent)
+                {
+                    if (!chain.Add(current))
+                        throw new InvalidDataException($"Attach hierarchy contains a cycle at element {current.Id}.");
+                }
+            }
+        }
+
         void LoadTail(List<EsfNode> rootFields, int tailStartIndex)
         {
             TailFields = rootFields.Skip(tailStartIndex).ToList();
@@ -433,8 +480,9 @@ namespace Editors.CscEditor.Data
             }
 
             // The v6/v7/v100 shape: header(6) + Group(3) pos + Group(3) rot + Group(1) scale
-            // + Group(1) weight + Coord3d + Coord3d + trailing extras. Anything else (legacy v5)
-            // is preserved verbatim and read-only.
+            // + Group(1) weight + Coord3d + Coord3d + trailing extras. v5 stores a fixed transform
+            // instead (see CscElement.IsStaticTransform); anything else is preserved verbatim
+            // and read-only.
             var groups = CurveDetector.DetectGroups(fields);
             var contiguous = groups.Count == 4 && groups[0].StartIndex == 6;
             if (contiguous)
@@ -474,7 +522,38 @@ namespace Editors.CscEditor.Data
             }
 
             if (!contiguous)
-                element.IsLegacyRaw = true;
+            {
+                // v5 transforms are decoded for every kind, so legacy scenes display in place,
+                // but only cameras become editable: their CAMERA_ELEMENT v1/v2 records are the
+                // only v5 type records the writer rebuilds. Other v5 elements stay verbatim.
+                var isStatic = TryDecodeStaticTransform(element, fields);
+                element.IsLegacyRaw = !isStatic || element.Kind != CscElementKind.Camera;
+            }
+        }
+
+        static bool TryDecodeStaticTransform(CscElement element, List<EsfNode> fields)
+        {
+            if (element.ElementVersion != 5 || element.ElementRecord?.Groups is not { Count: 1 } || fields.Count != 17 ||
+                fields[6].Value is not Coord3d position || fields[12].Value is not Coord3d basePosition ||
+                new[] { 7, 8, 9, 10, 11, 13, 14, 15, 16 }.Any(i => fields[i].Kind != EsfNodeKind.F32))
+                return false;
+
+            var rotation = new Quaternion((float)fields[7].Value!, (float)fields[8].Value!, (float)fields[9].Value!, (float)fields[10].Value!);
+            var baseRotation = new Quaternion((float)fields[13].Value!, (float)fields[14].Value!, (float)fields[15].Value!, (float)fields[16].Value!);
+            if (!float.IsFinite(rotation.LengthSquared()) || rotation.LengthSquared() < 1e-8f ||
+                !float.IsFinite(baseRotation.LengthSquared()) || baseRotation.LengthSquared() < 1e-8f)
+                return false;
+
+            element.IsStaticTransform = true;
+            element.Position = CscChannelGroup.CreateStatic(position.X, position.Y, position.Z);
+            element.StaticRotation = rotation;
+            element.StaticRotationEuler = CscElement.ToEulerXyz(Matrix.CreateFromQuaternion(rotation));
+            element.Rotation = CscChannelGroup.CreateStatic(element.StaticRotationEuler.X, element.StaticRotationEuler.Y, element.StaticRotationEuler.Z);
+            element.Scale = CscChannelGroup.CreateStatic((float)fields[11].Value!);
+            element.BasePosition = new Vector3(basePosition.X, basePosition.Y, basePosition.Z);
+            element.StaticBaseRotation = baseRotation;
+            element.BaseRotation = element.StaticBaseRotationEuler = CscElement.ToEulerXyz(Matrix.CreateFromQuaternion(baseRotation));
+            return true;
         }
 
         static void DecodePeriodRecord(CscElement element, EsfNode record)
@@ -503,6 +582,22 @@ namespace Editors.CscEditor.Data
         static void DecodeTypeRecord(CscElement element, EsfNode record)
         {
             var fields = record.Children.ToList();
+
+            // CAMERA_ELEMENT v1 = [fov], v2 = [fov, near, far, Bool, F32, F32, F32]. Vanilla v2
+            // values are 30, 0.5, 20000, False, 1, 1, 0.2; the last three are kept verbatim.
+            if (element.Kind == CscElementKind.Camera && record.Groups is { Count: 1 } && fields.Count > 0 && fields[0].Value is float fov &&
+                (record.Version == 1 && fields.Count == 1 ||
+                 record.Version == 2 && fields.Count == 7 && fields[1].Kind == EsfNodeKind.F32 && fields[2].Kind == EsfNodeKind.F32 && fields[3].Kind == EsfNodeKind.Bool))
+            {
+                element.StaticCameraFov = new CscChannel { Header = fov };
+                if (record.Version == 2)
+                {
+                    element.StaticCameraNear = new CscChannel { Header = (float)fields[1].Value! };
+                    element.StaticCameraFar = new CscChannel { Header = (float)fields[2].Value! };
+                    element.CameraUnknownFlagNode = fields[3];
+                    element.CameraUnknownFlag = fields[3].Value is true;
+                }
+            }
 
             if (element.Kind == CscElementKind.AnimationNodeTransform)
             {
@@ -625,8 +720,19 @@ namespace Editors.CscEditor.Data
         // Structural edits
         // ---------------------------------------------------------------------
 
+        /// <summary>Structure edits restate the COMPOSITE_SCENE manifest on save. When that
+        /// manifest could not be parsed it is written back verbatim, so an added, removed or
+        /// moved element would leave it describing the wrong tree.</summary>
+        void EnsureStructureEditable()
+        {
+            if (!ManifestParsed)
+                throw new InvalidOperationException(
+                    "Scene structure cannot be edited because the COMPOSITE_SCENE manifest could not be parsed.");
+        }
+
         public void AddElement(CscElement element, CscElement? parent = null)
         {
+            EnsureStructureEditable();
             element.Scene = this;
             Elements.Add(element);
             if (parent != null)
@@ -645,6 +751,7 @@ namespace Editors.CscEditor.Data
             if (element.IsNested || element.IsExternal)
                 return; // nested/external elements are not part of this scene's editable data
 
+            EnsureStructureEditable();
             foreach (var child in element.Children.Where(c => !c.IsNested).ToList())
                 RemoveElementSubtree(child);
 
@@ -671,6 +778,8 @@ namespace Editors.CscEditor.Data
                 return false; // nested elements are bound to their carrier record
             if (element.IsExternal || (newParent?.IsExternal ?? false))
                 return false; // root-ref sub-scene elements are display-only
+
+            EnsureStructureEditable();
             if (newParent == element || (newParent != null && newParent.IsInSubtreeOf(element)))
                 return false;
 

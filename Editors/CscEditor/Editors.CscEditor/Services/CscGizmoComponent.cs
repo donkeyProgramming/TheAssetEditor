@@ -32,9 +32,18 @@ namespace Editors.CscEditor.Services
         readonly TargetAdapter _adapter = new();
         CscElement? _element;
         bool _enabled;
+        bool _dragActive;
+        bool _ignoreUntilRelease;
 
         /// <summary>Raised after a drag changed element data (mark dirty, refresh details).</summary>
         public event Action? ElementModified;
+
+        /// <summary>Raised when a drag starts and when it ends (or is interrupted), so the whole
+        /// drag becomes one undo step.</summary>
+        public event Action? DragStarted;
+        public event Action? DragCompleted;
+
+        internal bool IsDragActive => _dragActive;
 
         public CscGizmoComponent(
             ArcBallCamera camera,
@@ -79,10 +88,15 @@ namespace Editors.CscEditor.Services
             _enabled = true;
         }
 
-        public void Disable() => _enabled = false;
+        public void Disable()
+        {
+            InterruptDrag();
+            _enabled = false;
+        }
 
         public void SetTarget(CscElement? element)
         {
+            InterruptDrag();
             _element = element != null && !element.IsLegacyRaw ? element : null;
             _gizmo?.ResetDeltas();
         }
@@ -91,6 +105,11 @@ namespace Editors.CscEditor.Services
 
         public override void Update(GameTime gameTime)
         {
+            if (_ignoreUntilRelease && _mouse.State().LeftButton == ButtonState.Released)
+                _ignoreUntilRelease = false;
+            if (_dragActive && _mouse.MouseOwner != this)
+                InterruptDrag(); // another component took the mouse mid-drag
+
             if (!IsActive)
                 return;
 
@@ -124,16 +143,40 @@ namespace Editors.CscEditor.Services
 
         void OnDragStart()
         {
+            if (_ignoreUntilRelease || _dragActive)
+                return;
+
             _mouse.MouseOwner = this;
+            _dragActive = true;
+            DragStarted?.Invoke();
         }
 
-        void OnDragEnd()
+        void OnDragEnd() => CompleteDrag();
+
+        void CompleteDrag()
         {
+            if (!_dragActive)
+                return;
+
+            _dragActive = false;
             if (_mouse.MouseOwner == this)
             {
                 _mouse.MouseOwner = null;
                 _mouse.ClearStates();
             }
+            DragCompleted?.Invoke();
+        }
+
+        /// <summary>Ends a drag whose target changed (or that lost the mouse) before the button
+        /// came up. What the drag already did is kept as its own step; the rest of the held
+        /// drag is ignored so it can't move the next target.</summary>
+        void InterruptDrag()
+        {
+            if (!_dragActive)
+                return;
+
+            _ignoreUntilRelease = true;
+            CompleteDrag();
         }
 
         /// <summary>
@@ -152,7 +195,7 @@ namespace Editors.CscEditor.Services
 
         void OnTranslate(ITransformable transformable, TransformationEventArgs e)
         {
-            if (!IsActive)
+            if (!IsActive || _ignoreUntilRelease)
                 return;
 
             var worldDelta = (Vector3)e.Value!;
@@ -172,11 +215,11 @@ namespace Editors.CscEditor.Services
 
         void OnRotate(ITransformable transformable, TransformationEventArgs e)
         {
-            if (!IsActive)
+            if (!IsActive || _ignoreUntilRelease)
                 return;
 
             var deltaMatrix = (Matrix)e.Value!;
-            var euler = ToEulerXyz(deltaMatrix);
+            var euler = CscElement.ToEulerXyz(deltaMatrix);
 
             var channels = _element!.Rotation?.Channels;
             if (channels == null || channels.Count < 3)
@@ -190,7 +233,7 @@ namespace Editors.CscEditor.Services
 
         void OnScale(ITransformable transformable, TransformationEventArgs e)
         {
-            if (!IsActive)
+            if (!IsActive || _ignoreUntilRelease)
                 return;
 
             var value = (Vector3)e.Value!;
@@ -207,30 +250,9 @@ namespace Editors.CscEditor.Services
             ElementModified?.Invoke();
         }
 
-        /// <summary>
-        /// Extracts (x, y, z) Euler angles from a rotation matrix under the Rx*Ry*Rz row-vector
-        /// composition this editor uses for CSC rotations. Exact for that convention; drag deltas
-        /// are tiny per-event, so accumulation stays stable.
-        /// </summary>
-        internal static Vector3 ToEulerXyz(Matrix m)
-        {
-            var y = MathF.Asin(Math.Clamp(-m.M13, -1f, 1f));
-            float x, z;
-            if (MathF.Abs(m.M13) < 0.9999f)
-            {
-                x = MathF.Atan2(m.M23, m.M33);
-                z = MathF.Atan2(m.M12, m.M11);
-            }
-            else
-            {
-                x = MathF.Atan2(-m.M32, m.M22);
-                z = 0;
-            }
-            return new Vector3(x, y, z);
-        }
-
         public void Dispose()
         {
+            InterruptDrag();
             _gizmo?.Dispose();
         }
 

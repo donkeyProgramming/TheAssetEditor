@@ -40,6 +40,8 @@ namespace Editors.CscEditor.ViewModels
         readonly CscPlaybackContext _context;
         readonly ArcBallCamera _camera;
         readonly SelectionManager _selectionManager;
+        readonly CscEditHistory _editHistory;
+        bool _applyingSnapshot;
 
         public IWpfGame Scene { get; }
         public CscScene? SceneData { get; private set; }
@@ -47,12 +49,21 @@ namespace Editors.CscEditor.ViewModels
         public string DisplayName { get; set; } = "CSC Editor";
         public PackFile CurrentFile { get; private set; } = null!;
 
-        bool _hasUnsavedChanges;
         public bool HasUnsavedChanges
         {
-            get => _hasUnsavedChanges;
-            set => SetAndNotify(ref _hasUnsavedChanges, value);
+            get => SceneData != null && _editHistory.HasUnsavedChanges;
+            set
+            {
+                if (!value && SceneData != null)
+                {
+                    _editHistory.MarkSaved();
+                    NotifyHistoryState();
+                }
+            }
         }
+
+        public bool CanUndo => _editHistory.CanUndo;
+        public bool CanRedo => _editHistory.CanRedo;
 
         public ObservableCollection<CscElementViewModel> RootElements { get; } = [];
 
@@ -78,6 +89,7 @@ namespace Editors.CscEditor.ViewModels
                 RebuildCurveSeries();
                 NotifyPropertyChanged(nameof(HasSelection));
                 NotifyPropertyChanged(nameof(IsElementSelected));
+                NotifyPropertyChanged(nameof(CurveStructureLocked));
             }
         }
 
@@ -138,9 +150,10 @@ namespace Editors.CscEditor.ViewModels
         public bool IsPlaying => _context.IsPlaying;
         public bool ManifestEditable => SceneData?.ManifestParsed ?? false;
 
-        /// <summary>True when keyframes must not be added/removed (the file's COMPOSITE_SCENE
-        /// manifest could not be parsed, so keyframe counts cannot be restated on save).</summary>
-        public bool CurveStructureLocked => !ManifestEditable;
+        /// <summary>True when keyframes must not be added/removed: the file's COMPOSITE_SCENE
+        /// manifest could not be parsed (so keyframe counts cannot be restated on save), or the
+        /// selected element is an ELEMENT v5 whose transform can't hold keys.</summary>
+        public bool CurveStructureLocked => !ManifestEditable || SelectedElement?.Element.IsStaticTransform == true;
 
         // ---- Curve editor ----
         public ObservableCollection<CurveSeries> CurveSeriesList { get; } = [];
@@ -154,6 +167,8 @@ namespace Editors.CscEditor.ViewModels
 
         // ---- Commands ----
         public ICommand SaveCommand { get; }
+        public ICommand UndoCommand { get; }
+        public ICommand RedoCommand { get; }
         public ICommand PlayPauseCommand { get; }
         public ICommand StopCommand { get; }
         public ICommand GizmoTranslateCommand { get; }
@@ -201,6 +216,7 @@ namespace Editors.CscEditor.ViewModels
             _context = playbackContext;
             _camera = camera;
             _selectionManager = selectionManager;
+            _editHistory = new CscEditHistory(CaptureSceneSnapshot, CaptureSelection, ApplySceneSnapshot);
             Scene = gameWorld;
             SceneRootItems = [new CscSceneRootViewModel(RootElements, "Root", OnSceneRootModified)];
 
@@ -210,11 +226,15 @@ namespace Editors.CscEditor.ViewModels
             componentInserter.Execute();
 
             _gizmo.ElementModified += OnGizmoModifiedElement;
+            _gizmo.DragStarted += OnEditGestureStarted;
+            _gizmo.DragCompleted += OnEditGestureCompleted;
             _animation.PortholeFrameUpdated += OnPortholeFrameUpdated;
             _eventHub.Register<SelectionChangedEvent>(this, OnScene3dSelectionChanged);
             _context.PropertyChanged += OnPlaybackContextChanged;
 
             SaveCommand = new RelayCommand(() => Save());
+            UndoCommand = new RelayCommand(() => Undo());
+            RedoCommand = new RelayCommand(() => Redo());
             PlayPauseCommand = new RelayCommand(() => _context.IsPlaying = !_context.IsPlaying);
             StopCommand = new RelayCommand(() =>
             {
@@ -293,12 +313,15 @@ namespace Editors.CscEditor.ViewModels
 
         public void LoadFile(PackFile file)
         {
-            CurrentFile = file;
-            DisplayName = file.Name;
-
             try
             {
-                SceneData = CscScene.Load(file.DataSource.ReadData());
+                // Parse first: a file that fails to load must not take over the open scene's
+                // save destination.
+                var bytes = file.DataSource.ReadData();
+                var scene = CscScene.Load(bytes);
+                CurrentFile = file;
+                DisplayName = file.Name;
+                SceneData = scene;
                 _context.Duration = SceneData.Duration;
                 _context.CurrentTime = 0;
                 _context.IsPlaying = false;
@@ -311,15 +334,13 @@ namespace Editors.CscEditor.ViewModels
                 _animation.SetScene(SceneData);
                 _animation.ApplyFrame();
 
-                var warning = SceneData.ManifestParsed
-                    ? ""
-                    : " (manifest not editable - keyframe add/remove disabled)";
-                StatusText = $"{SceneData.Elements.Count} elements, ROOT v{SceneData.RootVersion}, " +
-                             $"duration {SceneData.Duration:0.##}s{warning}";
+                UpdateSceneStatus();
                 NotifyPropertyChanged(nameof(Duration));
                 SceneRootItems[0].Duration = Duration;
                 NotifyPropertyChanged(nameof(ManifestEditable));
                 NotifyPropertyChanged(nameof(CurveStructureLocked));
+                _editHistory.InitializeLoadedDocument(bytes);
+                NotifyHistoryState();
             }
             catch (Exception e)
             {
@@ -341,7 +362,8 @@ namespace Editors.CscEditor.ViewModels
                 if (result != null)
                 {
                     CurrentFile = result;
-                    HasUnsavedChanges = false;
+                    _editHistory.MarkSaved();
+                    NotifyHistoryState();
                     StatusText = $"Saved {result.Name}";
                     return true;
                 }
@@ -353,6 +375,175 @@ namespace Editors.CscEditor.ViewModels
                 _dialogs.ShowExceptionWindow(e, "Failed to save the CSC scene. The file on disk is unchanged.");
                 return false;
             }
+        }
+
+        // ---------------------------------------------------------------------
+        // Undo / redo
+        // ---------------------------------------------------------------------
+
+        public bool Undo() => RunHistoryAction(_editHistory.Undo, "undo");
+
+        public bool Redo() => RunHistoryAction(_editHistory.Redo, "redo");
+
+        bool RunHistoryAction(Func<bool> action, string name)
+        {
+            try
+            {
+                return action();
+            }
+            catch (Exception e)
+            {
+                _logger.Error(e, "CSC editor: {Action} failed", name);
+                _dialogs.ShowExceptionWindow(e, $"The CSC editor could not {name} the last change.");
+                return false;
+            }
+            finally
+            {
+                NotifyHistoryState();
+            }
+        }
+
+        byte[] CaptureSceneSnapshot() => SceneData == null ? [] : CscSceneWriter.Write(SceneData);
+
+        CscSelectionSnapshot CaptureSelection()
+        {
+            if (SelectedSceneRoot != null)
+                return CscSelectionSnapshot.Root;
+            if (SelectedElement != null)
+                return CscSelectionSnapshot.Element(SelectedElement.Element.Id);
+            return CscSelectionSnapshot.None;
+        }
+
+        /// <summary>Replaces the open scene with an undo/redo snapshot and rebuilds the tree and
+        /// 3D scene from it, keeping the playback time and restoring the snapshot's selection.</summary>
+        void ApplySceneSnapshot(byte[] snapshot, CscSelectionSnapshot selection)
+        {
+            _applyingSnapshot = true;
+            try
+            {
+                ApplySceneSnapshotCore(snapshot, selection);
+            }
+            finally
+            {
+                _applyingSnapshot = false;
+            }
+        }
+
+        void ApplySceneSnapshotCore(byte[] snapshot, CscSelectionSnapshot selection)
+        {
+            var currentTime = _context.CurrentTime;
+            SelectedElement = null;
+            SelectedSceneRoot = null;
+            SceneRootItems[0].IsSelected = false;
+
+            SceneData = CscScene.Load(snapshot);
+            _context.Duration = SceneData.Duration;
+            _context.CurrentTime = Math.Clamp(currentTime, 0, Math.Max(0, _context.Duration));
+            SceneRootItems[0].SetScene(SceneData);
+
+            _sceneBuilder.Rebind(SceneData);
+            RebuildElementTree();
+            _animation.SetScene(SceneData);
+
+            if (selection.IsSceneRoot)
+            {
+                SceneRootItems[0].IsSelected = true;
+            }
+            else if (selection.ElementId is { } elementId &&
+                     SceneData.FindElement(elementId) is { } element &&
+                     FindViewModel(element) is { } elementViewModel)
+            {
+                elementViewModel.IsSelected = true; // two-way TreeViewItem binding routes back to SelectedElement
+                SelectedElement = elementViewModel;
+                ExpandTo(elementViewModel);
+            }
+
+            _animation.ApplyFrame();
+            UpdateSceneStatus();
+            NotifyPropertyChanged(nameof(Duration));
+            SceneRootItems[0].Duration = Duration;
+            NotifyPropertyChanged(nameof(ManifestEditable));
+            NotifyPropertyChanged(nameof(CurveStructureLocked));
+            RedrawCurves?.Invoke();
+        }
+
+        /// <summary>Records the change just made as one undo step (or folds it into the active
+        /// gesture). A scene that can't be written is still marked changed, without a step.</summary>
+        void RecordEdit()
+        {
+            if (_applyingSnapshot)
+                return;
+            try
+            {
+                _editHistory.RecordChange();
+            }
+            catch (Exception e)
+            {
+                OnRecordFailed(e);
+            }
+            NotifyHistoryState();
+        }
+
+        void BeginEditGesture()
+        {
+            _editHistory.BeginGesture();
+            NotifyHistoryState();
+        }
+
+        void EndEditGesture()
+        {
+            try
+            {
+                _editHistory.EndGesture();
+            }
+            catch (Exception e)
+            {
+                OnRecordFailed(e);
+            }
+            NotifyHistoryState();
+        }
+
+        /// <summary>Runs a multi-part edit (e.g. a structural change) as one undo step.</summary>
+        void RunAsOneStep(Action change)
+        {
+            var ownsGesture = !_editHistory.IsGestureActive;
+            if (ownsGesture)
+                BeginEditGesture();
+            try
+            {
+                change();
+            }
+            finally
+            {
+                if (ownsGesture)
+                    EndEditGesture();
+            }
+        }
+
+        void OnRecordFailed(Exception e)
+        {
+            _logger.Warning(e, "CSC editor: could not snapshot the scene for undo");
+            _editHistory.MarkUnrecordedChange();
+            StatusText = $"This change can't be undone: the scene could not be written ({e.Message})";
+        }
+
+        void NotifyHistoryState()
+        {
+            NotifyPropertyChanged(nameof(CanUndo));
+            NotifyPropertyChanged(nameof(CanRedo));
+            NotifyPropertyChanged(nameof(HasUnsavedChanges));
+        }
+
+        void UpdateSceneStatus()
+        {
+            if (SceneData == null)
+                return;
+
+            var warning = SceneData.ManifestParsed
+                ? ""
+                : " (manifest not editable - adding/removing elements and keyframes disabled)";
+            StatusText = $"{SceneData.Elements.Count} elements, ROOT v{SceneData.RootVersion}, " +
+                         $"duration {SceneData.Duration:0.##}s{warning}";
         }
 
         // ---------------------------------------------------------------------
@@ -409,7 +600,6 @@ namespace Editors.CscEditor.ViewModels
 
         void OnElementModified(CscElementViewModel vm, ElementChange change)
         {
-            HasUnsavedChanges = true;
             if (change == ElementChange.Asset && SceneData != null)
             {
                 _sceneBuilder.RefreshContent(vm.Element);
@@ -420,6 +610,7 @@ namespace Editors.CscEditor.ViewModels
                     RebuildElementTree();
             }
             _animation.ApplyFrame();
+            RecordEdit();
         }
 
         /// <summary>Called when the Root node's own ROOT header fields (duration, focus point,
@@ -427,22 +618,20 @@ namespace Editors.CscEditor.ViewModels
         /// value, same as LoadFile.</summary>
         void OnSceneRootModified()
         {
-            HasUnsavedChanges = true;
             if (SceneData == null)
                 return;
 
             _context.Duration = SceneData.Duration;
-            var warning = SceneData.ManifestParsed ? "" : " (manifest not editable - keyframe add/remove disabled)";
-            StatusText = $"{SceneData.Elements.Count} elements, ROOT v{SceneData.RootVersion}, " +
-                         $"duration {SceneData.Duration:0.##}s{warning}";
+            UpdateSceneStatus();
+            RecordEdit();
         }
 
         void OnGizmoModifiedElement()
         {
-            HasUnsavedChanges = true;
             _animation.ApplyFrame();
             SelectedElement?.RefreshFromDomain();
             RedrawCurves?.Invoke();
+            RecordEdit();
         }
 
         void OnScene3dSelectionChanged(SelectionChangedEvent selectionEvent)
@@ -492,13 +681,17 @@ namespace Editors.CscEditor.ViewModels
         /// <summary>Called by the curve editor when keyframes changed through it.</summary>
         public void OnCurvesModified()
         {
-            HasUnsavedChanges = true;
             _animation.ApplyFrame();
             SelectedElement?.RefreshFromDomain();
+            RecordEdit();
         }
 
         /// <summary>Called by the view when a splice/node-transform bone id field is edited.</summary>
-        public void OnAuxFieldModified() => HasUnsavedChanges = true;
+        public void OnAuxFieldModified() => RecordEdit();
+
+        /// <summary>A curve or gizmo drag started/ended: everything in between is one undo step.</summary>
+        public void OnEditGestureStarted() => BeginEditGesture();
+        public void OnEditGestureCompleted() => EndEditGesture();
 
         /// <summary>Hook the view uses to repaint the curve control after out-of-band data changes.</summary>
         public Action? RedrawCurves { get; set; }
@@ -509,8 +702,8 @@ namespace Editors.CscEditor.ViewModels
             SelectedCurveSeries = null;
 
             var element = SelectedElement?.Element;
-            if (element == null)
-                return;
+            if (element == null || element.IsStaticTransform)
+                return; // v5: no channel data to show, its fixed values are in the details panel
 
             void Add(string name, System.Windows.Media.Color colour, CscChannel channel) =>
                 CurveSeriesList.Add(new CurveSeries { Name = name, Colour = colour, Channel = channel });
@@ -614,7 +807,7 @@ namespace Editors.CscEditor.ViewModels
 
         void AddElement(CscElementKind kind, string assetPath = "")
         {
-            if (SceneData == null)
+            if (SceneData == null || !EnsureStructureEditable())
                 return;
 
             // New elements go into ROOT's attach tree, so a nested selection falls back to its
@@ -629,36 +822,39 @@ namespace Editors.CscEditor.ViewModels
             while (parent is { IsNested: true })
                 parent = parent.Parent;
 
-            var element = CscElementFactory.Create(SceneData, kind, assetPath);
-            SceneData.AddElement(element, parent);
-
-            // Added before building the tree node so a new root-ref's sub-scene (loaded inside
-            // AddElement) is already in SubScenes for BuildTreeNode to pick up.
-            _sceneBuilder.AddElement(element);
-
-            var vm = BuildTreeNode(element);
-            var parentVm = parent != null ? FindViewModel(parent) : null;
-            if (parentVm != null)
+            var scene = SceneData;
+            var element = CscElementFactory.Create(scene, kind, assetPath);
+            RunAsOneStep(() =>
             {
-                parentVm.Children.Add(vm);
-                parentVm.IsExpanded = true;
-            }
-            else
-            {
-                RootElements.Add(vm);
-            }
+                scene.AddElement(element, parent);
 
-            _sceneBuilder.RefreshAnimationBindings(SceneData);
-            _animation.ApplyFrame();
-            HasUnsavedChanges = true;
-            vm.IsSelected = true;
+                // Added before building the tree node so a new root-ref's sub-scene (loaded inside
+                // AddElement) is already in SubScenes for BuildTreeNode to pick up.
+                _sceneBuilder.AddElement(element);
+
+                var vm = BuildTreeNode(element);
+                var parentVm = parent != null ? FindViewModel(parent) : null;
+                if (parentVm != null)
+                {
+                    parentVm.Children.Add(vm);
+                    parentVm.IsExpanded = true;
+                }
+                else
+                {
+                    RootElements.Add(vm);
+                }
+
+                _sceneBuilder.RefreshAnimationBindings(scene);
+                _animation.ApplyFrame();
+                vm.IsSelected = true;
+            });
             StatusText = $"Added {kind} element [{element.Id}]" + (parent != null ? $" under [{parent.Id}]" : "");
         }
 
         void DeleteSelected()
         {
             var vm = SelectedElement;
-            if (vm == null || SceneData == null)
+            if (vm == null || SceneData == null || !EnsureStructureEditable())
                 return;
 
             if (vm.Element.IsNested)
@@ -688,12 +884,13 @@ namespace Editors.CscEditor.ViewModels
                     RemoveNodes(child);
                 _sceneBuilder.RemoveElement(element.Id);
             }
-            RemoveNodes(vm.Element);
-
-            SceneData.RemoveElementSubtree(vm.Element);
-            RemoveVm(RootElements, vm);
-            SelectedElement = null;
-            HasUnsavedChanges = true;
+            RunAsOneStep(() =>
+            {
+                RemoveNodes(vm.Element);
+                SceneData.RemoveElementSubtree(vm.Element);
+                RemoveVm(RootElements, vm);
+                SelectedElement = null;
+            });
         }
 
         static int CountDescendants(CscElement element) =>
@@ -712,7 +909,7 @@ namespace Editors.CscEditor.ViewModels
         /// <summary>Reparents via tree drag-drop or the Detach command. Null parent = top level.</summary>
         public void ReparentElement(CscElementViewModel? childVm, CscElementViewModel? newParentVm)
         {
-            if (childVm == null || SceneData == null || childVm == newParentVm)
+            if (childVm == null || SceneData == null || childVm == newParentVm || !EnsureStructureEditable())
                 return;
 
             if (!SceneData.Reparent(childVm.Element, newParentVm?.Element))
@@ -739,10 +936,19 @@ namespace Editors.CscEditor.ViewModels
             childVm.RefreshFromDomain();
             _sceneBuilder.RefreshAnimationBindings(SceneData);
             _animation.ApplyFrame();
-            HasUnsavedChanges = true;
+            RecordEdit();
             StatusText = newParentVm != null
                 ? $"[{childVm.Element.Id}] attached to [{newParentVm.Element.Id}]"
                 : $"[{childVm.Element.Id}] detached (top level)";
+        }
+
+        bool EnsureStructureEditable()
+        {
+            if (ManifestEditable)
+                return true;
+
+            StatusText = "The manifest could not be parsed, so elements can't be added, deleted or moved in this scene";
+            return false;
         }
 
         void FocusSelected()
@@ -769,6 +975,8 @@ namespace Editors.CscEditor.ViewModels
         {
             _eventHub?.UnRegister(this);
             _gizmo.ElementModified -= OnGizmoModifiedElement;
+            _gizmo.DragStarted -= OnEditGestureStarted;
+            _gizmo.DragCompleted -= OnEditGestureCompleted;
             _animation.PortholeFrameUpdated -= OnPortholeFrameUpdated;
             _context.PropertyChanged -= OnPlaybackContextChanged;
             _animation.ClearLookThrough();

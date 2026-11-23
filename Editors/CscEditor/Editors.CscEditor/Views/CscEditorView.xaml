@@ -10,8 +10,15 @@
              mc:Ignorable="d"
              d:DesignHeight="800" d:DesignWidth="1200">
 
+    <UserControl.InputBindings>
+        <KeyBinding Modifiers="Ctrl" Key="Z" Command="{Binding UndoCommand}"/>
+        <KeyBinding Modifiers="Ctrl" Key="Y" Command="{Binding RedoCommand}"/>
+        <KeyBinding Modifiers="Ctrl+Shift" Key="Z" Command="{Binding RedoCommand}"/>
+    </UserControl.InputBindings>
+
     <UserControl.Resources>
         <BooleanToVisibilityConverter x:Key="BoolToVisRoot"/>
+        <views:CscFloatConverter x:Key="CscFloat"/>
     </UserControl.Resources>
 
     <Grid>
@@ -25,9 +32,14 @@
         <!-- Toolbar -->
         <ToolBar Grid.Row="0">
             <Button Content="{loc:Loc CscEditor.Save}" Command="{Binding SaveCommand}" Padding="8,3"/>
+            <Button Content="{loc:Loc CscEditor.Undo}" Click="Undo_Click" IsEnabled="{Binding CanUndo}" Padding="8,3"
+                    ToolTip="{loc:Loc CscEditor.UndoTooltip}"/>
+            <Button Content="{loc:Loc CscEditor.Redo}" Click="Redo_Click" IsEnabled="{Binding CanRedo}" Padding="8,3"
+                    ToolTip="{loc:Loc CscEditor.RedoTooltip}"/>
             <Separator/>
             <Menu Background="Transparent" VerticalAlignment="Center">
                 <MenuItem Header="{loc:Loc CscEditor.Add}" Padding="8,3"
+                          IsEnabled="{Binding ManifestEditable}"
                           Background="{DynamicResource Popup.Static.Background}"
                           Foreground="{DynamicResource Popup.Static.Foreground}">
                     <MenuItem.Resources>
@@ -245,8 +257,8 @@
                             <!-- Timing -->
                             <TextBlock FontWeight="Bold" Text="{loc:Loc CscEditor.Timing}" Margin="2,8,2,0"/>
                             <UniformGrid Columns="4">
-                                <TextBlock Text="{loc:Loc CscEditor.Begin}"/><TextBox Text="{Binding Begin}"/>
-                                <TextBlock Text="{loc:Loc CscEditor.End}"/><TextBox Text="{Binding End}"/>
+                                <TextBlock Text="{loc:Loc CscEditor.Begin}"/><TextBox Text="{Binding Begin, Converter={StaticResource CscFloat}}"/>
+                                <TextBlock Text="{loc:Loc CscEditor.End}"/><TextBox Text="{Binding End, Converter={StaticResource CscFloat}}"/>
                             </UniformGrid>
                             <UniformGrid Columns="2">
                                 <ComboBox Margin="2" SelectedValue="{Binding TimingMode}" SelectedValuePath="Content">
@@ -277,33 +289,33 @@
                                     <CheckBox VerticalAlignment="Center" IsChecked="{Binding PeriodFlag}"/>
                                     <TextBlock Grid.Column="1" Text="{loc:Loc CscEditor.Flag}" VerticalAlignment="Center" Margin="2,0,8,0"/>
                                     <TextBlock Grid.Column="2" Text="{loc:Loc CscEditor.Speed}"/>
-                                    <TextBox Grid.Column="3" Text="{Binding PeriodSpeedMultiplier, StringFormat=0.###}"/>
+                                    <TextBox Grid.Column="3" Text="{Binding PeriodSpeedMultiplier, Converter={StaticResource CscFloat}, StringFormat=0.###}"/>
                                     <TextBlock Grid.Column="4" Text="{loc:Loc CscEditor.OffsetS}" Margin="8,0,2,0"/>
-                                    <TextBox Grid.Column="5" Text="{Binding PeriodTimeOffset, StringFormat=0.###}"/>
+                                    <TextBox Grid.Column="5" Text="{Binding PeriodTimeOffset, Converter={StaticResource CscFloat}, StringFormat=0.###}"/>
                                 </Grid>
                             </StackPanel>
 
                             <!-- Transform -->
                             <TextBlock FontWeight="Bold" Text="{loc:Loc CscEditor.TransformChannels}" Margin="2,8,2,0"/>
                             <UniformGrid Columns="6">
-                                <TextBlock Text="{loc:Loc CscEditor.PosX}"/><TextBox Text="{Binding PositionX, StringFormat=0.###}"/>
-                                <TextBlock Text="Y"/><TextBox Text="{Binding PositionY, StringFormat=0.###}"/>
-                                <TextBlock Text="Z"/><TextBox Text="{Binding PositionZ, StringFormat=0.###}"/>
-                                <TextBlock Text="{loc:Loc CscEditor.RotX}"/><TextBox Text="{Binding RotationXDegrees, StringFormat=0.##}"/>
-                                <TextBlock Text="Y°"/><TextBox Text="{Binding RotationYDegrees, StringFormat=0.##}"/>
-                                <TextBlock Text="Z°"/><TextBox Text="{Binding RotationZDegrees, StringFormat=0.##}"/>
-                                <TextBlock Text="{loc:Loc CscEditor.Scale}"/><TextBox Text="{Binding ScaleValue, StringFormat=0.###}"/>
-                                <TextBlock Text="{loc:Loc CscEditor.Weight}"/><TextBox Text="{Binding WeightValue, StringFormat=0.###}"/>
+                                <TextBlock Text="{loc:Loc CscEditor.PosX}"/><TextBox Text="{Binding PositionX, Converter={StaticResource CscFloat}, StringFormat=0.###}"/>
+                                <TextBlock Text="Y"/><TextBox Text="{Binding PositionY, Converter={StaticResource CscFloat}, StringFormat=0.###}"/>
+                                <TextBlock Text="Z"/><TextBox Text="{Binding PositionZ, Converter={StaticResource CscFloat}, StringFormat=0.###}"/>
+                                <TextBlock Text="{loc:Loc CscEditor.RotX}"/><TextBox Text="{Binding RotationXDegrees, Converter={StaticResource CscFloat}, StringFormat=0.##}"/>
+                                <TextBlock Text="Y°"/><TextBox Text="{Binding RotationYDegrees, Converter={StaticResource CscFloat}, StringFormat=0.##}"/>
+                                <TextBlock Text="Z°"/><TextBox Text="{Binding RotationZDegrees, Converter={StaticResource CscFloat}, StringFormat=0.##}"/>
+                                <TextBlock Text="{loc:Loc CscEditor.Scale}"/><TextBox Text="{Binding ScaleValue, Converter={StaticResource CscFloat}, StringFormat=0.###}"/>
+                                <TextBlock Text="{loc:Loc CscEditor.Weight}" Visibility="{Binding HasWeight, Converter={StaticResource BoolToVis}}"/><TextBox Visibility="{Binding HasWeight, Converter={StaticResource BoolToVis}}" Text="{Binding WeightValue, Converter={StaticResource CscFloat}, StringFormat=0.###}"/>
                             </UniformGrid>
 
                             <TextBlock FontWeight="Bold" Text="{loc:Loc CscEditor.BasePlacement}" Margin="2,8,2,0"/>
                             <UniformGrid Columns="6">
-                                <TextBlock Text="{loc:Loc CscEditor.PosX}"/><TextBox Text="{Binding BasePositionX, StringFormat=0.###}"/>
-                                <TextBlock Text="Y"/><TextBox Text="{Binding BasePositionY, StringFormat=0.###}"/>
-                                <TextBlock Text="Z"/><TextBox Text="{Binding BasePositionZ, StringFormat=0.###}"/>
-                                <TextBlock Text="{loc:Loc CscEditor.RotX}"/><TextBox Text="{Binding BaseRotationXDegrees, StringFormat=0.##}"/>
-                                <TextBlock Text="Y°"/><TextBox Text="{Binding BaseRotationYDegrees, StringFormat=0.##}"/>
-                                <TextBlock Text="Z°"/><TextBox Text="{Binding BaseRotationZDegrees, StringFormat=0.##}"/>
+                                <TextBlock Text="{loc:Loc CscEditor.PosX}"/><TextBox Text="{Binding BasePositionX, Converter={StaticResource CscFloat}, StringFormat=0.###}"/>
+                                <TextBlock Text="Y"/><TextBox Text="{Binding BasePositionY, Converter={StaticResource CscFloat}, StringFormat=0.###}"/>
+                                <TextBlock Text="Z"/><TextBox Text="{Binding BasePositionZ, Converter={StaticResource CscFloat}, StringFormat=0.###}"/>
+                                <TextBlock Text="{loc:Loc CscEditor.RotX}"/><TextBox Text="{Binding BaseRotationXDegrees, Converter={StaticResource CscFloat}, StringFormat=0.##}"/>
+                                <TextBlock Text="Y°"/><TextBox Text="{Binding BaseRotationYDegrees, Converter={StaticResource CscFloat}, StringFormat=0.##}"/>
+                                <TextBlock Text="Z°"/><TextBox Text="{Binding BaseRotationZDegrees, Converter={StaticResource CscFloat}, StringFormat=0.##}"/>
                             </UniformGrid>
 
                             <!-- ELEMENT's trailing Bool (v7/v100 only) - meaning unconfirmed, but
@@ -372,15 +384,15 @@
                             <StackPanel Visibility="{Binding IsLight, Converter={StaticResource BoolToVis}, FallbackValue=Collapsed}">
                                 <TextBlock FontWeight="Bold" Text="{loc:Loc CscEditor.Light}" Margin="2,8,2,0"/>
                                 <UniformGrid Columns="6">
-                                    <TextBlock Text="R"/><TextBox Text="{Binding LightColourR, StringFormat=0.###}"/>
-                                    <TextBlock Text="G"/><TextBox Text="{Binding LightColourG, StringFormat=0.###}"/>
-                                    <TextBlock Text="B"/><TextBox Text="{Binding LightColourB, StringFormat=0.###}"/>
-                                    <TextBlock Text="{loc:Loc CscEditor.Intensity}"/><TextBox Text="{Binding LightIntensity, StringFormat=0.###}"/>
-                                    <TextBlock Text="{loc:Loc CscEditor.RangeLen}"/><TextBox Text="{Binding LightRange, StringFormat=0.###}"/>
+                                    <TextBlock Text="R"/><TextBox Text="{Binding LightColourR, Converter={StaticResource CscFloat}, StringFormat=0.###}"/>
+                                    <TextBlock Text="G"/><TextBox Text="{Binding LightColourG, Converter={StaticResource CscFloat}, StringFormat=0.###}"/>
+                                    <TextBlock Text="B"/><TextBox Text="{Binding LightColourB, Converter={StaticResource CscFloat}, StringFormat=0.###}"/>
+                                    <TextBlock Text="{loc:Loc CscEditor.Intensity}"/><TextBox Text="{Binding LightIntensity, Converter={StaticResource CscFloat}, StringFormat=0.###}"/>
+                                    <TextBlock Text="{loc:Loc CscEditor.RangeLen}"/><TextBox Text="{Binding LightRange, Converter={StaticResource CscFloat}, StringFormat=0.###}"/>
                                 </UniformGrid>
                                 <UniformGrid Columns="4" Visibility="{Binding IsSpotLight, Converter={StaticResource BoolToVis}, FallbackValue=Collapsed}">
-                                    <TextBlock Text="{loc:Loc CscEditor.Inner}"/><TextBox Text="{Binding SpotInnerAngleDegrees, StringFormat=0.##}"/>
-                                    <TextBlock Text="{loc:Loc CscEditor.Outer}"/><TextBox Text="{Binding SpotOuterAngleDegrees, StringFormat=0.##}"/>
+                                    <TextBlock Text="{loc:Loc CscEditor.Inner}"/><TextBox Text="{Binding SpotInnerAngleDegrees, Converter={StaticResource CscFloat}, StringFormat=0.##}"/>
+                                    <TextBlock Text="{loc:Loc CscEditor.Outer}"/><TextBox Text="{Binding SpotOuterAngleDegrees, Converter={StaticResource CscFloat}, StringFormat=0.##}"/>
                                 </UniformGrid>
                             </StackPanel>
 
@@ -388,10 +400,10 @@
                             <StackPanel Visibility="{Binding IsCamera, Converter={StaticResource BoolToVis}, FallbackValue=Collapsed}">
                                 <TextBlock FontWeight="Bold" Text="{loc:Loc CscEditor.Camera}" Margin="2,8,2,0"/>
                                 <UniformGrid Columns="6">
-                                    <TextBlock Text="{loc:Loc CscEditor.FOV}"/><TextBox Text="{Binding CameraFov, StringFormat=0.##}"/>
-                                    <TextBlock Text="{loc:Loc CscEditor.Roll}"/><TextBox Text="{Binding CameraRollDegrees, StringFormat=0.##}"/>
-                                    <TextBlock Text="{loc:Loc CscEditor.Near}"/><TextBox Text="{Binding CameraNear, StringFormat=0.###}"/>
-                                    <TextBlock Text="{loc:Loc CscEditor.Far}"/><TextBox Text="{Binding CameraFar, StringFormat=0.###}"/>
+                                    <TextBlock Text="{loc:Loc CscEditor.FOV}" Visibility="{Binding HasCameraFov, Converter={StaticResource BoolToVis}}"/><TextBox Visibility="{Binding HasCameraFov, Converter={StaticResource BoolToVis}}" Text="{Binding CameraFov, Converter={StaticResource CscFloat}, StringFormat=0.##}"/>
+                                    <TextBlock Text="{loc:Loc CscEditor.Roll}" Visibility="{Binding HasCameraRoll, Converter={StaticResource BoolToVis}}"/><TextBox Visibility="{Binding HasCameraRoll, Converter={StaticResource BoolToVis}}" Text="{Binding CameraRollDegrees, Converter={StaticResource CscFloat}, StringFormat=0.##}"/>
+                                    <TextBlock Text="{loc:Loc CscEditor.Near}" Visibility="{Binding HasCameraNear, Converter={StaticResource BoolToVis}}"/><TextBox Visibility="{Binding HasCameraNear, Converter={StaticResource BoolToVis}}" Text="{Binding CameraNear, Converter={StaticResource CscFloat}, StringFormat=0.###}"/>
+                                    <TextBlock Text="{loc:Loc CscEditor.Far}" Visibility="{Binding HasCameraFar, Converter={StaticResource BoolToVis}}"/><TextBox Visibility="{Binding HasCameraFar, Converter={StaticResource BoolToVis}}" Text="{Binding CameraFar, Converter={StaticResource CscFloat}, StringFormat=0.###}"/>
                                 </UniformGrid>
 
                                 <!-- CAMERA_ELEMENT carries an extra Bool between the roll and near
@@ -475,14 +487,14 @@
                                     <ColumnDefinition Width="*"/>
                                 </Grid.ColumnDefinitions>
                                 <TextBlock Text="{loc:Loc CscEditor.DurationS}"/>
-                                <TextBox Grid.Column="1" Text="{Binding SceneDuration, StringFormat=0.###}"/>
+                                <TextBox Grid.Column="1" Text="{Binding SceneDuration, Converter={StaticResource CscFloat}, ConverterParameter=NonNegative, StringFormat=0.###}"/>
                             </Grid>
 
                             <TextBlock FontWeight="Bold" Text="{loc:Loc CscEditor.FocusPoint}" Margin="2,8,2,0"/>
                             <UniformGrid Columns="6">
-                                <TextBlock Text="X"/><TextBox Text="{Binding FocusPointX, StringFormat=0.###}"/>
-                                <TextBlock Text="Y"/><TextBox Text="{Binding FocusPointY, StringFormat=0.###}"/>
-                                <TextBlock Text="Z"/><TextBox Text="{Binding FocusPointZ, StringFormat=0.###}"/>
+                                <TextBlock Text="X"/><TextBox Text="{Binding FocusPointX, Converter={StaticResource CscFloat}, StringFormat=0.###}"/>
+                                <TextBlock Text="Y"/><TextBox Text="{Binding FocusPointY, Converter={StaticResource CscFloat}, StringFormat=0.###}"/>
+                                <TextBlock Text="Z"/><TextBox Text="{Binding FocusPointZ, Converter={StaticResource CscFloat}, StringFormat=0.###}"/>
                             </UniformGrid>
 
                             <Grid Margin="0,8,0,0">
@@ -491,7 +503,7 @@
                                     <ColumnDefinition Width="*"/>
                                 </Grid.ColumnDefinitions>
                                 <TextBlock Text="{loc:Loc CscEditor.RadiusDistance}"/>
-                                <TextBox Grid.Column="1" Text="{Binding Radius, StringFormat=0.###}"/>
+                                <TextBox Grid.Column="1" Text="{Binding Radius, Converter={StaticResource CscFloat}, StringFormat=0.###}"/>
                             </Grid>
 
                             <Grid Visibility="{Binding HasWeatherPath, Converter={StaticResource PanelBoolToVis}, FallbackValue=Collapsed}" Margin="0,8,0,0">

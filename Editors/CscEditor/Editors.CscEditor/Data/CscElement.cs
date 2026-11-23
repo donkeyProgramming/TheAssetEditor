@@ -45,11 +45,35 @@ namespace Editors.CscEditor.Data
         public string AnchorMode { get; set; } = "free";         // terrain anchoring mode
         public byte ElementVersion { get; set; } = 100;
 
-        // ---- ELEMENT keyframable channel groups (null on legacy v5 records) ----
+        // ---- ELEMENT channel groups. On ELEMENT v5 (see IsStaticTransform) Position, Rotation
+        // and Scale are static stand-ins for the record's fixed transform and Weight is null. ----
         public CscChannelGroup? Position { get; set; }
         public CscChannelGroup? Rotation { get; set; }
         public CscChannelGroup? Scale { get; set; }
         public CscChannelGroup? Weight { get; set; }
+
+        /// <summary>
+        /// ELEMENT v5 has no channel groups. It stores one fixed transform: Coord3d position,
+        /// quaternion (x, y, z, w), F32 scale, then the base placement as Coord3d + quaternion.
+        /// Every v5 ELEMENT in vanilla WH3 (4,056 of them) uses this 17-field layout, and all
+        /// 8,112 quaternions are unit length with w last. Position/Rotation/Scale hold it as
+        /// static channels so the details panel and gizmo work unchanged; they can't take keys.
+        /// </summary>
+        public bool IsStaticTransform { get; internal set; }
+
+        // The stored quaternions are kept as read, so a save that didn't touch the rotation
+        // writes back the exact original values instead of a round trip through Euler angles.
+        internal Quaternion StaticRotation { get; set; } = Quaternion.Identity;
+        internal Quaternion StaticBaseRotation { get; set; } = Quaternion.Identity;
+        internal Vector3 StaticRotationEuler { get; set; }
+        internal Vector3 StaticBaseRotationEuler { get; set; }
+
+        /// <summary>CAMERA_ELEMENT v1/v2 (only seen with ELEMENT v5) store plain floats instead of
+        /// channel groups: v1 is just the FOV, v2 is FOV, near, far, the unknown Bool and three
+        /// more floats. Held as static channels for the same reason as the transform.</summary>
+        internal CscChannel? StaticCameraFov { get; set; }
+        internal CscChannel? StaticCameraNear { get; set; }
+        internal CscChannel? StaticCameraFar { get; set; }
 
         // ---- ELEMENT trailing placement transform (in-game confirmed) ----
         public Vector3 BasePosition { get; set; }
@@ -262,9 +286,33 @@ namespace Editors.CscEditor.Data
             var rot = EvaluateRotation(channelTime);
             var scale = EvaluateScale(channelTime);
 
-            var channelMatrix = Matrix.CreateScale(scale) * EulerMatrix(rot) * Matrix.CreateTranslation(pos);
-            var baseMatrix = EulerMatrix(BaseRotation) * Matrix.CreateTranslation(BasePosition);
+            var channelRotation = IsStaticTransform ? Matrix.CreateFromQuaternion(CurrentStaticRotation()) : EulerMatrix(rot);
+            var baseRotation = IsStaticTransform ? Matrix.CreateFromQuaternion(CurrentStaticBaseRotation()) : EulerMatrix(BaseRotation);
+            var channelMatrix = Matrix.CreateScale(scale) * channelRotation * Matrix.CreateTranslation(pos);
+            var baseMatrix = baseRotation * Matrix.CreateTranslation(BasePosition);
             return baseMatrix * channelMatrix;
+        }
+
+        /// <summary>The v5 rotation as a quaternion: the stored one while the Euler stand-in is
+        /// unchanged, otherwise rebuilt from the edited Euler angles.</summary>
+        internal Quaternion CurrentStaticRotation() => EvaluateRotation(0) == StaticRotationEuler
+            ? StaticRotation
+            : Quaternion.CreateFromRotationMatrix(EulerMatrix(EvaluateRotation(0)));
+
+        internal Quaternion CurrentStaticBaseRotation() => BaseRotation == StaticBaseRotationEuler
+            ? StaticBaseRotation
+            : Quaternion.CreateFromRotationMatrix(EulerMatrix(BaseRotation));
+
+        /// <summary>
+        /// Extracts (x, y, z) Euler angles from a rotation matrix under the Rx*Ry*Rz row-vector
+        /// composition this editor uses for CSC rotations (<see cref="EulerMatrix"/>).
+        /// </summary>
+        internal static Vector3 ToEulerXyz(Matrix m)
+        {
+            var y = MathF.Asin(Math.Clamp(-m.M13, -1f, 1f));
+            return MathF.Abs(m.M13) < 0.9999f
+                ? new Vector3(MathF.Atan2(m.M23, m.M33), y, MathF.Atan2(m.M12, m.M11))
+                : new Vector3(MathF.Atan2(-m.M32, m.M22), y, 0);
         }
 
         public static Matrix EulerMatrix(Vector3 euler) =>
@@ -342,10 +390,10 @@ namespace Editors.CscEditor.Data
         /// <summary>The real near/far render clip planes (not depth-of-field - camera_focal_depth,
         /// group index 4, is always some default value in every file checked and isn't used for
         /// anything; see CameraGroupNames for the full group list).</summary>
-        public CscChannel? CameraFov => Kind == CscElementKind.Camera ? TypeChannel(CameraGroupIndex("fov")) : null;
+        public CscChannel? CameraFov => Kind == CscElementKind.Camera ? StaticCameraFov ?? TypeChannel(CameraGroupIndex("fov")) : null;
         public CscChannel? CameraRoll => Kind == CscElementKind.Camera ? TypeChannel(CameraGroupIndex("roll")) : null;
-        public CscChannel? CameraNear => Kind == CscElementKind.Camera ? TypeChannel(CameraGroupIndex("near")) : null;
-        public CscChannel? CameraFar => Kind == CscElementKind.Camera ? TypeChannel(CameraGroupIndex("far")) : null;
+        public CscChannel? CameraNear => Kind == CscElementKind.Camera ? StaticCameraNear ?? TypeChannel(CameraGroupIndex("near")) : null;
+        public CscChannel? CameraFar => Kind == CscElementKind.Camera ? StaticCameraFar ?? TypeChannel(CameraGroupIndex("far")) : null;
 
         /// <summary>Identity of the original Bool node sitting between the roll and near groups of
         /// every CAMERA_ELEMENT (any version) - not part of the Group/Channel/Curve grammar (see
@@ -402,8 +450,11 @@ namespace Editors.CscEditor.Data
             return counts;
         }
 
+        /// <summary>The ELEMENT record's channel groups as the file stores them. None for v5's
+        /// static transform, whose stand-in groups aren't channel data.</summary>
         public IEnumerable<CscChannelGroup> ElementGroups()
         {
+            if (IsStaticTransform) yield break;
             if (Position != null) yield return Position;
             if (Rotation != null) yield return Rotation;
             if (Scale != null) yield return Scale;

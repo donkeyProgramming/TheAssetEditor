@@ -74,6 +74,11 @@ namespace Editors.CscEditor.ViewModels
         public bool IsPointLight => Element.Kind == CscElementKind.PointLight;
         public bool IsSpotLight => Element.Kind == CscElementKind.SpotLight;
         public bool IsCamera => Element.Kind == CscElementKind.Camera;
+        public bool HasWeight => Element.Weight != null;          // ELEMENT v5 has no weight
+        public bool HasCameraFov => Element.CameraFov != null;
+        public bool HasCameraRoll => Element.CameraRoll != null;  // CAMERA_ELEMENT v1/v2 have no roll
+        public bool HasCameraNear => Element.CameraNear != null;
+        public bool HasCameraFar => Element.CameraFar != null;
         public bool HasAttachParent => Element.Parent != null;
 
         // ---- Composite Scene (RootRef): the referenced .csc's own ROOT header info, shown

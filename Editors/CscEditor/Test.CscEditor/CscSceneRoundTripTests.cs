@@ -133,50 +133,70 @@ namespace Test.CscEditor
         // COMPOSITE_SCENE manifest handling
         // -----------------------------------------------------------------
 
-        /// <summary>One locator element plus a wrapped COMPOSITE_SCENE manifest (unnamed form) for it.</summary>
-        static byte[] BuildSceneWithManifestBytes()
+        /// <summary>Locator elements plus a wrapped COMPOSITE_SCENE manifest (unnamed form).</summary>
+        internal static byte[] BuildSceneWithManifestBytes(
+            int elementCount = 1,
+            bool corruptGroupCount = false,
+            string entryName = "Test Entry",
+            bool entryFlag = false,
+            int reservedValue = 0)
         {
             var scratch = CscScene.Load(BuildEmptySceneBytes());
-            var element = CscElementFactory.Create(scratch, CscElementKind.Locator);
+            for (var i = 0; i < elementCount; i++)
+                scratch.AddElement(CscElementFactory.Create(scratch, CscElementKind.Locator));
 
             var fields = new List<EsfNode>(scratch.HeaderFields)
             {
-                EsfNode.Leaf(EsfNodeKind.U32, 1u, optimized: true),
-                EsfNode.Leaf(EsfNodeKind.Ascii, element.GroupLabel),
+                EsfNode.Leaf(EsfNodeKind.U32, (uint)elementCount, optimized: true),
             };
-            fields.AddRange(element.Records);
+            foreach (var element in scratch.Elements)
+            {
+                fields.Add(EsfNode.Leaf(EsfNodeKind.Ascii, element.GroupLabel));
+                fields.AddRange(element.Records);
+            }
+
             fields.Add(EsfNode.Leaf(EsfNodeKind.U32, 1u, optimized: true));                       // attach group count
             fields.Add(EsfNode.Leaf(EsfNodeKind.U32, unchecked((uint)-1), optimized: true));     // parent -1
-            fields.Add(EsfNode.Leaf(EsfNodeKind.U32, 1u, optimized: true));                      // child count
-            fields.Add(EsfNode.Leaf(EsfNodeKind.U32, (uint)element.Id, optimized: true));
-            fields.Add(EsfNode.NewRecord("ATTACH_TO_PARAMETERS", 0, EsfRecordFlags.IsRecordNode,
-                [[EsfNode.Leaf(EsfNodeKind.U32, unchecked((uint)-1), optimized: true)]]));
+            fields.Add(EsfNode.Leaf(EsfNodeKind.U32, (uint)elementCount, optimized: true));      // child count
+            foreach (var element in scratch.Elements)
+            {
+                fields.Add(EsfNode.Leaf(EsfNodeKind.U32, (uint)element.Id, optimized: true));
+                fields.Add(EsfNode.NewRecord("ATTACH_TO_PARAMETERS", 0, EsfRecordFlags.IsRecordNode,
+                    [[EsfNode.Leaf(EsfNodeKind.U32, unchecked((uint)-1), optimized: true)]]));
+            }
 
-            // Manifest: 1 unnamed group with 4 channels (position 3, orientation 3, scale 1,
-            // weight 1 sub-components), all zero keyframes; 1 entry; empty footer unit.
+            // Each locator has one unnamed group with 4 channels (position 3, orientation 3,
+            // scale 1, weight 1 sub-components), all zero keyframes.
             var manifest = new List<EsfNode>
             {
-                EsfNode.Leaf(EsfNodeKind.I32, 1, optimized: true),   // group count
-                EsfNode.Leaf(EsfNodeKind.U32, 0u, optimized: true),  // marker: unnamed
-                EsfNode.Leaf(EsfNodeKind.I32, 4, optimized: true),   // channel count
+                EsfNode.Leaf(
+                    EsfNodeKind.I32,
+                    corruptGroupCount ? elementCount + 1 : elementCount,
+                    optimized: true),
             };
-            foreach (var subCount in new[] { 3, 3, 1, 1 })
+            foreach (var element in scratch.Elements)
             {
-                manifest.Add(EsfNode.Leaf(EsfNodeKind.I32, subCount, optimized: true));
-                for (var i = 0; i < subCount; i++)
+                manifest.Add(EsfNode.Leaf(EsfNodeKind.U32, 0u, optimized: true));  // marker: unnamed
+                manifest.Add(EsfNode.Leaf(EsfNodeKind.I32, 4, optimized: true));   // channel count
+                foreach (var subCount in new[] { 3, 3, 1, 1 })
                 {
-                    manifest.Add(EsfNode.Leaf(EsfNodeKind.Bool, false, optimized: true));
-                    manifest.Add(EsfNode.Leaf(EsfNodeKind.I32, 0, optimized: true)); // keyframe count
+                    manifest.Add(EsfNode.Leaf(EsfNodeKind.I32, subCount, optimized: true));
+                    for (var i = 0; i < subCount; i++)
+                    {
+                        manifest.Add(EsfNode.Leaf(EsfNodeKind.Bool, false, optimized: true));
+                        manifest.Add(EsfNode.Leaf(EsfNodeKind.I32, 0, optimized: true)); // keyframe count
+                    }
                 }
             }
             manifest.Add(EsfNode.Leaf(EsfNodeKind.I32, 1, optimized: true));         // entry count
-            manifest.Add(EsfNode.Leaf(EsfNodeKind.Ascii, "Test Entry"));
-            manifest.Add(EsfNode.Leaf(EsfNodeKind.Bool, false, optimized: true));
+            manifest.Add(EsfNode.Leaf(EsfNodeKind.Ascii, entryName));
+            manifest.Add(EsfNode.Leaf(EsfNodeKind.Bool, entryFlag, optimized: true));
             manifest.Add(EsfNode.Leaf(EsfNodeKind.I32, 0, optimized: true));
+            manifest.Add(EsfNode.Leaf(EsfNodeKind.I32, reservedValue, optimized: true));
             manifest.Add(EsfNode.Leaf(EsfNodeKind.I32, 0, optimized: true));
-            manifest.Add(EsfNode.Leaf(EsfNodeKind.I32, 0, optimized: true));
-            manifest.Add(EsfNode.Leaf(EsfNodeKind.I32, 1, optimized: true));         // element id count
-            manifest.Add(EsfNode.Leaf(EsfNodeKind.I32, element.Id, optimized: true));
+            manifest.Add(EsfNode.Leaf(EsfNodeKind.I32, elementCount, optimized: true));
+            foreach (var element in scratch.Elements)
+                manifest.Add(EsfNode.Leaf(EsfNodeKind.I32, element.Id, optimized: true));
             manifest.Add(EsfNode.Leaf(EsfNodeKind.I32, 0, optimized: true));         // footer unit: no children
 
             fields.Add(EsfNode.NewRecord("COMPOSITE_SCENE", 0, EsfRecordFlags.IsRecordNode, [manifest]));
@@ -193,6 +213,7 @@ namespace Test.CscEditor
             EsfWriter.Write(doc, stream);
             return stream.ToArray();
         }
+
 
         [Test]
         public void Manifest_keyframe_counts_are_updated_when_curves_change()
@@ -243,6 +264,68 @@ namespace Test.CscEditor
             // Footer adjacency: the parent's entry should now list the child's entry index.
             // (Verified indirectly: the reloaded manifest parsed cleanly, which requires the
             // footer to be exactly entryCount units.)
+        }
+
+        [Test]
+        public void Writer_rejects_duplicate_ids_before_serializing()
+        {
+            var scene = CscScene.Load(BuildEmptySceneBytes());
+            var first = CscElementFactory.Create(scene, CscElementKind.Locator);
+            scene.AddElement(first);
+            var second = CscElementFactory.Create(scene, CscElementKind.Locator);
+            second.Id = first.Id;
+            scene.AddElement(second);
+
+            Assert.Throws<InvalidDataException>(() => CscSceneWriter.Write(scene));
+        }
+
+        [Test]
+        public void Writer_rejects_an_attach_cycle_before_serializing()
+        {
+            var scene = CscScene.Load(BuildEmptySceneBytes());
+            var a = CscElementFactory.Create(scene, CscElementKind.Locator);
+            scene.AddElement(a);
+            var b = CscElementFactory.Create(scene, CscElementKind.Locator);
+            scene.AddElement(b, a);
+
+            // Corrupt the tree behind Reparent's own cycle check.
+            a.Parent = b;
+            b.Children.Add(a);
+            scene.RootElements.Remove(a);
+
+            Assert.Throws<InvalidDataException>(() => CscSceneWriter.Write(scene));
+        }
+
+        [Test]
+        public void Writer_rejects_an_element_missing_from_the_attach_tree()
+        {
+            var scene = CscScene.Load(BuildEmptySceneBytes());
+            var orphan = CscElementFactory.Create(scene, CscElementKind.Locator);
+            scene.AddElement(orphan);
+            scene.RootElements.Remove(orphan);
+
+            Assert.Throws<InvalidDataException>(() => CscSceneWriter.Write(scene));
+        }
+
+        [TestCase("add")]
+        [TestCase("delete")]
+        [TestCase("reparent")]
+        public void Structural_edits_are_rejected_when_the_manifest_cannot_be_parsed(string operation)
+        {
+            var scene = CscScene.Load(BuildSceneWithManifestBytes(elementCount: 2, corruptGroupCount: true));
+            Assert.That(scene.ManifestParsed, Is.False);
+
+            TestDelegate edit = operation switch
+            {
+                "add" => () => scene.AddElement(CscElementFactory.Create(scene, CscElementKind.Locator)),
+                "delete" => () => scene.RemoveElementSubtree(scene.Elements[0]),
+                "reparent" => () => scene.Reparent(scene.Elements[1], scene.Elements[0]),
+                _ => throw new ArgumentOutOfRangeException(nameof(operation)),
+            };
+
+            Assert.Throws<InvalidOperationException>(edit);
+            Assert.That(scene.Elements, Has.Count.EqualTo(2));
+            Assert.That(scene.RootElements, Has.Count.EqualTo(2));
         }
     }
 }

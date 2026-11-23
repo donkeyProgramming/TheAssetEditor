@@ -134,6 +134,12 @@ namespace Editors.CscEditor.Views
         /// <summary>Raised whenever curve data was changed through this control.</summary>
         public event Action? CurvesModified;
 
+        /// <summary>Raised when a key/handle drag, a key add or a key delete starts and when it
+        /// ends, so the whole interaction becomes one undo step.</summary>
+        public event Action? EditGestureStarted;
+        public event Action? EditGestureCompleted;
+        bool _editGestureActive;
+
         CscKeyframe? _dragKey;
         CurveSeries? _dragSeries;
         bool _draggingTime;
@@ -566,6 +572,7 @@ namespace Editors.CscEditor.Views
 
             if (!IsReadOnlyStructure && HitTestHandle(position) is { } isOut)
             {
+                StartEditGesture();
                 _draggingHandleOut = isOut;
                 _draggingHandleIn = !isOut;
                 MarkHandleSegmentAsBezier(isOut);
@@ -576,6 +583,7 @@ namespace Editors.CscEditor.Views
 
             if (HitTestKey(position) is { } hit)
             {
+                StartEditGesture();
                 _dragSeries = hit.Series;
                 _dragKey = hit.Key;
                 SelectedSeries = hit.Series;
@@ -661,7 +669,17 @@ namespace Editors.CscEditor.Views
             InvalidateVisual();
         }
 
-        protected override void OnMouseLeftButtonUp(MouseButtonEventArgs e)
+        protected override void OnMouseLeftButtonUp(MouseButtonEventArgs e) => EndPointerInteraction();
+
+        /// <summary>Capture can also be lost without a button-up (focus moves to another window,
+        /// a dialog opens), which must still end the drag's undo step.</summary>
+        protected override void OnLostMouseCapture(MouseEventArgs e)
+        {
+            EndPointerInteraction();
+            base.OnLostMouseCapture(e);
+        }
+
+        void EndPointerInteraction()
         {
             _dragKey = null;
             _dragSeries = null;
@@ -670,6 +688,23 @@ namespace Editors.CscEditor.Views
             _draggingHandleIn = false;
             if (IsMouseCaptured)
                 ReleaseMouseCapture();
+            CompleteEditGesture();
+        }
+
+        void StartEditGesture()
+        {
+            if (_editGestureActive)
+                return;
+            _editGestureActive = true;
+            EditGestureStarted?.Invoke();
+        }
+
+        void CompleteEditGesture()
+        {
+            if (!_editGestureActive)
+                return;
+            _editGestureActive = false;
+            EditGestureCompleted?.Invoke();
         }
 
         protected override void OnMouseRightButtonDown(MouseButtonEventArgs e)
@@ -679,6 +714,7 @@ namespace Editors.CscEditor.Views
 
             if (HitTestKey(e.GetPosition(this)) is { } hit)
             {
+                StartEditGesture();
                 hit.Series.Channel.Keyframes.Remove(hit.Key);
                 if (_selectedKey == hit.Key)
                 {
@@ -687,6 +723,7 @@ namespace Editors.CscEditor.Views
                 }
                 CurvesModified?.Invoke();
                 InvalidateVisual();
+                CompleteEditGesture();
                 e.Handled = true;
             }
         }
@@ -700,6 +737,7 @@ namespace Editors.CscEditor.Views
             if (series == null)
                 return;
 
+            StartEditGesture();
             var range = ValueRange();
             var time = (float)XToTime(position.X);
             var value = position.Y <= RulerHeight
@@ -712,6 +750,7 @@ namespace Editors.CscEditor.Views
             _selectedKeySeries = series;
             CurvesModified?.Invoke();
             InvalidateVisual();
+            CompleteEditGesture();
         }
     }
 }
