@@ -71,6 +71,31 @@ namespace Test.CscEditor
             Assert.That(output.ToArray(), Is.EqualTo(EmptyCscBytes));
         }
 
+        // Ported from Szy-Cathay/TheAssetEditor-CN: the reader swallows an optional trailing 0x9C after a
+        // type-26 value (Three Kingdoms "Eight Princes"), so it has to stay in the value to be written back
+        [Test]
+        public void Unknown26_with_trailing_0x9C_round_trips()
+        {
+            byte[] value = [0x01, 0x10, 0x20, 0x30, 0x40, 0x50, 0x60, 0x70, 0x9C];
+            var doc = new EsfDocument
+            {
+                Signature = EsfSignature.Caab,
+                Root = EsfNode.NewRecord("ROOT", 1, EsfRecordFlags.IsRecordNode,
+                    [[EsfNode.Leaf(EsfNodeKind.Unknown26, value), EsfNode.Leaf(EsfNodeKind.U32, 5u)]]),
+            };
+
+            using var first = new MemoryStream();
+            EsfWriter.Write(doc, first);
+            var reread = EsfReader.Read(new MemoryStream(first.ToArray()));
+            using var second = new MemoryStream();
+            EsfWriter.Write(reread, second);
+
+            var fields = reread.Root.Groups![0];
+            Assert.That(fields[0].Value, Is.EqualTo(value));
+            Assert.That(fields[1].Value, Is.EqualTo(5u));
+            Assert.That(second.ToArray(), Is.EqualTo(first.ToArray()));
+        }
+
         [Test]
         public void Rejects_files_with_an_unrecognized_signature()
         {

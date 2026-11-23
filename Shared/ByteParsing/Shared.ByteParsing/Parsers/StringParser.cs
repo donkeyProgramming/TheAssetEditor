@@ -140,8 +140,10 @@ namespace Shared.ByteParsing.Parsers
 
 
 
-            var byteLength = BitConverter.GetBytes((short)value.Length);
+            // Same rule as the reader: UTF-16 stores a character count, UTF-8 a byte count
             var byteStr = StringEncoding.GetBytes(value);
+            var length = StringEncoding == Encoding.Unicode ? value.Length : byteStr.Length;
+            var byteLength = BitConverter.GetBytes((short)length);
 
             var stringWithCountAtFront = byteLength.Concat(byteStr).ToArray();
 

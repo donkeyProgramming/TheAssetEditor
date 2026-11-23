@@ -194,6 +194,16 @@ namespace Shared.GameFormats.AnimationMeta.Parsing
 
         public byte[]? Serialize(ParsedMetadataAttribute entry, out string? errorMessage)
         {
+            // A tag nothing could decode is written back as the raw bytes it was read with
+            if (entry is ParsedUnknownMetadataAttribute unknown)
+            {
+                if (unknown.Data == null)
+                    throw new InvalidDataException($"Unknown metadata tag {entry.Name}_{entry.Version} has no raw data to write back");
+
+                errorMessage = null;
+                return unknown.Data.ToArray();
+            }
+
             var classLayout = GetClassLayoutsForMetaDataAttribute(entry);
             if (classLayout == null)
             {

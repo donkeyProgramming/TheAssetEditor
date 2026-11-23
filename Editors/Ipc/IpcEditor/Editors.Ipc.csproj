@@ -11,6 +11,10 @@
     <ProjectReference Include="..\..\Kitbashing\KitbasherEditor\Editors.KitbasherEditor.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <InternalsVisibleTo Include="Test.Ipc" />
+  </ItemGroup>
+
 
 
 </Project>

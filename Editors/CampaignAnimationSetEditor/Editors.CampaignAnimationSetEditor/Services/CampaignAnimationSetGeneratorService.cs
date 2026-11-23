@@ -350,7 +350,7 @@ namespace Editors.CampaignAnimationSetEditor.Services
         byte[]? FreezeToBytes(AnimationFile animationFile, GameSkeleton skeleton, int rootBoneIndex)
         {
             var clip = new AnimationClip(animationFile, skeleton);
-            if (!_freezeRootBoneCommand.Execute(clip, rootBoneIndex, "animroot", out var frozenClip) || frozenClip == null)
+            if (!_freezeRootBoneCommand.Execute(clip, rootBoneIndex, "animroot", out var frozenClip, skeleton) || frozenClip == null)
                 return null;
 
             return AnimationFile.ConvertToBytes(frozenClip.ConvertToFileFormat(skeleton));
