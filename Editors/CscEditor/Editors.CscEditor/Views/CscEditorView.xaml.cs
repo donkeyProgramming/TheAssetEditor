@@ -17,6 +17,8 @@ namespace Editors.CscEditor.Views
         {
             InitializeComponent();
             CurveEditor.CurvesModified += () => ViewModel?.OnCurvesModified();
+            CurveEditor.EditGestureStarted += () => ViewModel?.OnEditGestureStarted();
+            CurveEditor.EditGestureCompleted += () => ViewModel?.OnEditGestureCompleted();
             DataContextChanged += (_, _) =>
             {
                 if (ViewModel != null)

@@ -224,6 +224,8 @@ namespace Editors.CscEditor.ViewModels
             componentInserter.Execute();
 
             _gizmo.ElementModified += OnGizmoModifiedElement;
+            _gizmo.DragStarted += OnEditGestureStarted;
+            _gizmo.DragCompleted += OnEditGestureCompleted;
             _animation.PortholeFrameUpdated += OnPortholeFrameUpdated;
             _eventHub.Register<SelectionChangedEvent>(this, OnScene3dSelectionChanged);
             _context.PropertyChanged += OnPlaybackContextChanged;
@@ -685,6 +687,10 @@ namespace Editors.CscEditor.ViewModels
         /// <summary>Called by the view when a splice/node-transform bone id field is edited.</summary>
         public void OnAuxFieldModified() => RecordEdit();
 
+        /// <summary>A curve or gizmo drag started/ended: everything in between is one undo step.</summary>
+        public void OnEditGestureStarted() => BeginEditGesture();
+        public void OnEditGestureCompleted() => EndEditGesture();
+
         /// <summary>Hook the view uses to repaint the curve control after out-of-band data changes.</summary>
         public Action? RedrawCurves { get; set; }
 
@@ -967,6 +973,8 @@ namespace Editors.CscEditor.ViewModels
         {
             _eventHub?.UnRegister(this);
             _gizmo.ElementModified -= OnGizmoModifiedElement;
+            _gizmo.DragStarted -= OnEditGestureStarted;
+            _gizmo.DragCompleted -= OnEditGestureCompleted;
             _animation.PortholeFrameUpdated -= OnPortholeFrameUpdated;
             _context.PropertyChanged -= OnPlaybackContextChanged;
             _animation.ClearLookThrough();
