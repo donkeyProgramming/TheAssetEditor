@@ -10,40 +10,56 @@
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <DockPanel>
-        <Button Margin="5" Content="{loc:Loc MetadataEditor.Buttons.Refresh}" Click="{s:MethodBinding RefreshAction}" DockPanel.Dock="Top"/>
-        <CheckBox Margin="5" Content="{loc:Loc SuperView.ShowVfx}" IsChecked="{Binding ShowVfx, UpdateSourceTrigger=PropertyChanged}" DockPanel.Dock="Top"/>
-        <DockPanel Margin="5,0,5,5" DockPanel.Dock="Top" ToolTip="{loc:Loc SuperView.VfxFilter.Tooltip}">
-            <TextBlock Text="{loc:Loc SuperView.VfxFilter}" VerticalAlignment="Center" Margin="0,0,5,0"/>
-            <ComboBox ItemsSource="{Binding VfxFilterIds}" SelectedItem="{Binding VfxFilterId}"/>
-        </DockPanel>
+        <!-- One toolbar for the view and the 3D tools. It wraps by group rather than hiding what does not fit in the
+             overflow menu, since the side panel is often narrower than the row. -->
+        <Border Margin="5" DockPanel.Dock="Top" Padding="2,1,1,1" BorderThickness="1"
+                Background="{DynamicResource ToolBarHorizontalBackground}" BorderBrush="{DynamicResource ToolBarHorizontalBorder}">
+            <WrapPanel>
+                <WrapPanel.Resources>
+                    <Style TargetType="Button" BasedOn="{StaticResource {x:Static ToolBar.ButtonStyleKey}}"/>
+                    <Style TargetType="CheckBox" BasedOn="{StaticResource {x:Static ToolBar.CheckBoxStyleKey}}"/>
+                    <Style TargetType="ComboBox" BasedOn="{StaticResource {x:Static ToolBar.ComboBoxStyleKey}}"/>
+                    <Style TargetType="Separator" BasedOn="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}"/>
+                    <!-- A disabled tool's icon fades; the theme leaves an image button looking the same either way. -->
+                    <Style TargetType="Image">
+                        <Style.Triggers>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter Property="Opacity" Value="0.35"/>
+                            </Trigger>
+                        </Style.Triggers>
+                    </Style>
+                </WrapPanel.Resources>
 
-        <!-- Editing the selected tag in the 3D view -->
-        <ToolBar Margin="5,0,5,5" DockPanel.Dock="Top" ToolBarTray.IsLocked="True">
-            <ToolBar.Resources>
-                <!-- A disabled tool's icon fades; the theme leaves an image button looking the same either way. -->
-                <Style TargetType="Image">
-                    <Style.Triggers>
-                        <Trigger Property="IsEnabled" Value="False">
-                            <Setter Property="Opacity" Value="0.35"/>
-                        </Trigger>
-                    </Style.Triggers>
-                </Style>
-            </ToolBar.Resources>
-            <RadioButton GroupName="MetaEditTool" Style="{StaticResource {x:Type ToggleButton}}" IsChecked="{Binding IsSelectTool, Mode=TwoWay}" Padding="6,3" ToolTip="{loc:Loc SuperView.Edit3D.Select}">
-                <Image Width="20" Height="20" Source="{Binding Source={x:Static resources:IconLibrary.Gizmo_CursorIcon}}"/>
-            </RadioButton>
-            <RadioButton GroupName="MetaEditTool" Style="{StaticResource {x:Type ToggleButton}}" IsChecked="{Binding IsMoveTool, Mode=TwoWay}" Padding="6,3" ToolTip="{loc:Loc SuperView.Edit3D.Move}">
-                <Image Width="20" Height="20" Source="{Binding Source={x:Static resources:IconLibrary.Gizmo_MoveIcon}}"/>
-            </RadioButton>
-            <RadioButton GroupName="MetaEditTool" Style="{StaticResource {x:Type ToggleButton}}" IsChecked="{Binding IsRotateTool, Mode=TwoWay}" IsEnabled="{Binding CanRotateSelectedIn3D}" Padding="6,3" ToolTip="{loc:Loc SuperView.Edit3D.Rotate}" ToolTipService.ShowOnDisabled="True">
-                <Image Width="20" Height="20" Source="{Binding Source={x:Static resources:IconLibrary.Gizmo_RotateIcon}}"/>
-            </RadioButton>
-            <Separator/>
-            <Button Content="{loc:Loc SuperView.Edit3D.Undo}" Command="{Binding UndoEditIn3DCommand}" Padding="8,3" ToolTip="{loc:Loc SuperView.Edit3D.UndoTooltip}" ToolTipService.ShowOnDisabled="True"/>
-            <Button Content="{loc:Loc SuperView.Edit3D.Redo}" Command="{Binding RedoEditIn3DCommand}" Padding="8,3" ToolTip="{loc:Loc SuperView.Edit3D.RedoTooltip}" ToolTipService.ShowOnDisabled="True"/>
-            <Separator/>
-            <Button Content="{loc:Loc SuperView.Edit3D.Focus}" Command="{Binding FocusSelectedTagCommand}" Padding="8,3" ToolTip="{loc:Loc SuperView.Edit3D.FocusTooltip}" ToolTipService.ShowOnDisabled="True"/>
-        </ToolBar>
+                <StackPanel Orientation="Horizontal">
+                    <Button Content="{loc:Loc MetadataEditor.Buttons.Refresh}" Click="{s:MethodBinding RefreshAction}" Padding="8,3"/>
+                    <Separator/>
+                    <CheckBox Content="{loc:Loc SuperView.ShowVfx}" IsChecked="{Binding ShowVfx, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Center" Margin="4,0"/>
+                    <StackPanel Orientation="Horizontal" ToolTip="{loc:Loc SuperView.VfxFilter.Tooltip}" Margin="4,0">
+                        <TextBlock Text="{loc:Loc SuperView.VfxFilter}" VerticalAlignment="Center" Margin="0,0,5,0"/>
+                        <ComboBox ItemsSource="{Binding VfxFilterIds}" SelectedItem="{Binding VfxFilterId}" MinWidth="50"/>
+                    </StackPanel>
+                    <Separator/>
+                </StackPanel>
+
+                <!-- Editing the selected tag in the 3D view -->
+                <StackPanel Orientation="Horizontal">
+                    <RadioButton GroupName="MetaEditTool" Style="{StaticResource {x:Type ToggleButton}}" IsChecked="{Binding IsSelectTool, Mode=TwoWay}" Padding="6,3" ToolTip="{loc:Loc SuperView.Edit3D.Select}">
+                        <Image Width="20" Height="20" Source="{Binding Source={x:Static resources:IconLibrary.Gizmo_CursorIcon}}"/>
+                    </RadioButton>
+                    <RadioButton GroupName="MetaEditTool" Style="{StaticResource {x:Type ToggleButton}}" IsChecked="{Binding IsMoveTool, Mode=TwoWay}" Padding="6,3" ToolTip="{loc:Loc SuperView.Edit3D.Move}">
+                        <Image Width="20" Height="20" Source="{Binding Source={x:Static resources:IconLibrary.Gizmo_MoveIcon}}"/>
+                    </RadioButton>
+                    <RadioButton GroupName="MetaEditTool" Style="{StaticResource {x:Type ToggleButton}}" IsChecked="{Binding IsRotateTool, Mode=TwoWay}" IsEnabled="{Binding CanRotateSelectedIn3D}" Padding="6,3" ToolTip="{loc:Loc SuperView.Edit3D.Rotate}" ToolTipService.ShowOnDisabled="True">
+                        <Image Width="20" Height="20" Source="{Binding Source={x:Static resources:IconLibrary.Gizmo_RotateIcon}}"/>
+                    </RadioButton>
+                    <Separator/>
+                    <Button Content="{loc:Loc SuperView.Edit3D.Undo}" Command="{Binding UndoEditIn3DCommand}" Padding="8,3" ToolTip="{loc:Loc SuperView.Edit3D.UndoTooltip}" ToolTipService.ShowOnDisabled="True"/>
+                    <Button Content="{loc:Loc SuperView.Edit3D.Redo}" Command="{Binding RedoEditIn3DCommand}" Padding="8,3" ToolTip="{loc:Loc SuperView.Edit3D.RedoTooltip}" ToolTipService.ShowOnDisabled="True"/>
+                    <Separator/>
+                    <Button Content="{loc:Loc SuperView.Edit3D.Focus}" Command="{Binding FocusSelectedTagCommand}" Padding="8,3" ToolTip="{loc:Loc SuperView.Edit3D.FocusTooltip}" ToolTipService.ShowOnDisabled="True"/>
+                </StackPanel>
+            </WrapPanel>
+        </Border>
 
         <TabControl DockPanel.Dock="Top" SelectedIndex="{Binding SelectedTabControllerIndex, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">
             <TabItem Header="{loc:Loc MetadataEditor.Tabs.Persistent}">
