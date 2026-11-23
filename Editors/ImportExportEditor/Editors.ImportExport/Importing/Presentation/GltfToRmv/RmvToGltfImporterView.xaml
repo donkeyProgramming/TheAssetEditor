@@ -25,6 +25,7 @@
             <RowDefinition Height="25"/>
             <RowDefinition Height="25"/>
             <RowDefinition Height="25"/>
+            <RowDefinition Height="25"/>
         </Grid.RowDefinitions>
 
         <TextBlock Grid.Row="0" Grid.Column="0" VerticalAlignment="Center" Text="{loc:Loc RmvToGltfImporter.NewSkeletonName}"/>
@@ -93,5 +94,11 @@
                  IsEnabled="{Binding CanEditAnimationKeysPerSecond}"
                  Text="{Binding AnimationKeysPerSecond, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                  ToolTip="{loc:Loc RmvToGltfImporter.Tooltips.KeySamplesPerSecond}"/>
+
+        <TextBlock Grid.Row="10" Grid.Column="0" VerticalAlignment="Center" Text="{loc:Loc RmvToGltfImporter.OverwriteExisting}"/>
+        <TextBlock Grid.Row="10" Grid.Column="1" VerticalAlignment="Center" Text=" : "/>
+        <CheckBox Grid.Row="10" Grid.Column="2" HorizontalAlignment="Left" VerticalAlignment="Center"
+                  IsChecked="{Binding OverwriteExisting, Mode=TwoWay}"
+                  ToolTip="{loc:Loc RmvToGltfImporter.Tooltips.OverwriteExisting}"/>
     </Grid>
 </UserControl>

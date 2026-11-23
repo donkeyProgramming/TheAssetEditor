@@ -30,6 +30,7 @@ namespace Editors.ImportImport.Importing.Presentation.RmvToGltf
         [ObservableProperty, NotifyPropertyChangedFor(nameof(CanEditAnimationKeysPerSecond))] bool _autoDetectAnimationKeysPerSecond = true;
         [ObservableProperty] float _animationKeysPerSecond = 20.0f;
         [ObservableProperty] string _newSkeletonName = "";
+        [ObservableProperty] bool _overwriteExisting = false;
 
         public bool CanEditAnimationKeysPerSecond => ImportAnimations && !AutoDetectAnimationKeysPerSecond;
 
@@ -70,7 +71,8 @@ namespace Editors.ImportImport.Importing.Presentation.RmvToGltf
                 AutoDetectAnimationKeysPerSecond: AutoDetectAnimationKeysPerSecond,
                 NewSkeletonName: NewSkeletonName,
                 AutoScaleHumanoid: AutoScaleHumanoid,
-                SourceForwardDirection: SourceForwardDirection);
+                SourceForwardDirection: SourceForwardDirection,
+                OverwriteExisting: OverwriteExisting);
 
             return _importer.Import(settings, progress, cancellationToken);
         }

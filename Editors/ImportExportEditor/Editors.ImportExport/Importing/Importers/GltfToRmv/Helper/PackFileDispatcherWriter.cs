@@ -5,8 +5,8 @@ using Shared.Core.PackFiles.Models;
 namespace Editors.ImportExport.Importing.Importers.GltfToRmv.Helper;
 
 /// <summary>
-/// Writes all import outputs in one call, on the UI thread, and only when none of the
-/// target paths exist yet. Returns the conflicting paths when it writes nothing.
+/// Writes all import outputs in one call, on the UI thread. Unless overwriting, it writes only
+/// when none of the target paths exist yet, and returns the conflicting paths when it writes nothing.
 /// </summary>
 internal static class PackFileDispatcherWriter
 {
@@ -14,11 +14,12 @@ internal static class PackFileDispatcherWriter
         IPackFileService packFileService,
         IPackFileContainer container,
         List<NewPackFileEntry> files,
-        IReadOnlyList<string> targetPaths)
+        IReadOnlyList<string> targetPaths,
+        bool overwriteExisting = false)
     {
         IReadOnlyList<string> AddFiles()
         {
-            var conflicts = targetPaths
+            var conflicts = overwriteExisting ? [] : targetPaths
                 .Where(container.ContainsFile)
                 .Distinct(StringComparer.OrdinalIgnoreCase)
                 .OrderBy(path => path, StringComparer.OrdinalIgnoreCase)

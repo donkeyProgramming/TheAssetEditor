@@ -27,6 +27,7 @@ namespace Editors.ImportExport.Importing.Importers.GltfToRmv
         string? NewSkeletonName = null,
         bool AutoScaleHumanoid = true,
         GltfSourceForwardDirection SourceForwardDirection =
-            GltfSourceForwardDirection.PositiveZ
+            GltfSourceForwardDirection.PositiveZ,
+        bool OverwriteExisting = false
     );
 }

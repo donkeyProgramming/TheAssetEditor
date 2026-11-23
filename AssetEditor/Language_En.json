@@ -586,6 +586,8 @@
   "RmvToGltfImporter.Tooltips.ImportAnimations": "Import every animation in the glTF; each one becomes its own .anim file.",
   "RmvToGltfImporter.Tooltips.AutoDetectAnimationFrameRate": "Use the frame rate of the glTF's evenly spaced keys, so animations Blender baked at the scene rate aren't resampled again. Falls back to the value below when it can't be detected.",
   "RmvToGltfImporter.Tooltips.KeySamplesPerSecond": "Key frames sampled per second of animation. Must be greater than 0.",
+  "RmvToGltfImporter.OverwriteExisting": "Overwrite existing files",
+  "RmvToGltfImporter.Tooltips.OverwriteExisting": "Replace files the import writes that already exist in the pack. When off, the import stops and writes nothing if any of them exist.",
 
   "ExportWindow.Title": "Export",
   "ExportWindow.SystemPath": "System Path",

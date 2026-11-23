@@ -586,6 +586,8 @@
   "RmvToGltfImporter.Tooltips.ImportAnimations": "导入 glTF 中的全部动画，每段动画生成一个 TW ANIM 文件。",
   "RmvToGltfImporter.Tooltips.AutoDetectAnimationFrameRate": "优先使用 glTF 中均匀关键帧的实际帧率，避免 Blender 按场景帧率烘焙后再次重采样；无法可靠识别时使用下方手动值。",
   "RmvToGltfImporter.Tooltips.KeySamplesPerSecond": "动画每秒采样的关键帧数，必须大于 0。",
+  "RmvToGltfImporter.OverwriteExisting": "覆盖已有文件",
+  "RmvToGltfImporter.Tooltips.OverwriteExisting": "替换 Pack 中已存在的同名导入文件。关闭时，只要有任一文件已存在，导入就会停止且不写入任何文件。",
 
   "ExportWindow.Title": "导出",
   "ExportWindow.SystemPath": "系统路径",

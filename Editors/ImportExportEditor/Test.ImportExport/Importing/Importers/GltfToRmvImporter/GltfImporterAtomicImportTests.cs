@@ -1,4 +1,4 @@
-using System.Drawing;
+﻿using System.Drawing;
 using System.Drawing.Imaging;
 using System.Numerics;
 using Editors.ImportExport.Importing;
@@ -607,7 +607,8 @@ public class GltfImporterAtomicImportTests
             Assert.Multiple(() =>
             {
                 Assert.That(result.Succeeded, Is.False);
-                Assert.That(result.Errors, Has.Count.EqualTo(conflictPaths.Length));
+                Assert.That(result.Errors, Has.Count.EqualTo(conflictPaths.Length + 1));
+                Assert.That(result.Errors[^1], Does.Contain("Overwrite existing files"));
                 foreach (var conflictPath in conflictPaths)
                     Assert.That(result.Errors, Has.Some.Contains(conflictPath));
                 Assert.That(destination.FileList, Has.Count.EqualTo(existingFiles.Count));
@@ -624,6 +625,38 @@ public class GltfImporterAtomicImportTests
         {
             File.Delete(glbPath);
             File.Delete(imagePath);
+        }
+    }
+
+    [Test]
+    public void Import_ModelTargetExistsWithOverwrite_ReplacesFile()
+    {
+        var glbPath = CreateStaticGlb();
+        try
+        {
+            var packFileService = PackFileSerivceTestHelper.Create(TestData.InputPack);
+            var destination = PackFileContainer.CreatePackFile("test");
+            var targetPath = $@"models\{Path.GetFileNameWithoutExtension(glbPath)}.rigid_model_v2".ToLowerInvariant();
+            destination.FileList[targetPath] = new PackFile(Path.GetFileName(targetPath), new MemorySource([1, 2, 3]));
+            var importer = new GltfImporter(packFileService, Mock.Of<ISkeletonAnimationLookUpHelper>(), new RmvMaterialBuilder());
+
+            var result = importer.Import(new GltfImporterSettings(
+                glbPath, "models", destination, GameTypeEnum.Warhammer3,
+                true, false, false, false, false, 20,
+                OverwriteExisting: true));
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(result.Succeeded, Is.True, string.Join(Environment.NewLine, result.Errors));
+                Assert.That(result.OutputPaths, Is.EqualTo(new[] { targetPath }));
+                Assert.That(destination.FileList, Has.Count.EqualTo(1));
+                var model = ModelFactory.Create().Load(destination.FileList[targetPath].DataSource.ReadData());
+                Assert.That(model.ModelList[0], Is.Not.Empty);
+            });
+        }
+        finally
+        {
+            File.Delete(glbPath);
         }
     }
 

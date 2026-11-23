@@ -130,9 +130,13 @@ namespace Editors.ImportExport.Importing.Importers.GltfToRmv
             {
                 cancellationToken.ThrowIfCancellationRequested();
                 progress?.Report(new ImportProgress("Writing to the pack...", $"{validation.Files.Count:N0} files"));
-                var conflicts = PackFileDispatcherWriter.AddFilesToPackIfNoConflicts(_packFileService, settings.DestinationPackFileContainer, validation.Files, validation.Paths);
+                var conflicts = PackFileDispatcherWriter.AddFilesToPackIfNoConflicts(_packFileService, settings.DestinationPackFileContainer, validation.Files, validation.Paths, settings.OverwriteExisting);
                 if (conflicts.Count != 0)
-                    return ImportResult.Failure(conflicts.Select(path => $"The pack already contains {path}").ToList());
+                {
+                    var errors = conflicts.Select(path => $"The pack already contains {path}").ToList();
+                    errors.Add("Nothing was written. Tick \"Overwrite existing files\" to replace them.");
+                    return ImportResult.Failure(errors);
+                }
             }
 
             progress?.Report(new ImportProgress("Import finished", $"{validation.Files.Count:N0} files", validation.Files.Count, validation.Files.Count));
