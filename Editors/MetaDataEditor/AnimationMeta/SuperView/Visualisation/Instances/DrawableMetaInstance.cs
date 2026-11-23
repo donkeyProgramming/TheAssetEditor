@@ -2,24 +2,36 @@
 using GameWorld.Core.Animation;
 using GameWorld.Core.SceneNodes;
 using GameWorld.Core.Utility;
+using Microsoft.Xna.Framework;
+using Shared.GameFormats.AnimationMeta.Parsing;
 
 namespace Editors.AnimationMeta.SuperView.Visualisation.Instances
 {
-    public class DrawableMetaInstance : IMetaDataInstance
+    // A tag drawn as lines and labels: IMPACT_POS, TARGET_POS, FIRE_POS and SPLASH_ATTACK, drawn where their values put
+    // them, and the markers for BLOOD, CREW_LOCATION and the like, drawn in the tag's own frame and placed from its values
+    // on every update. Its points are read from the tag each time they are asked for, so they follow an edit before the
+    // drawing is rebuilt.
+    public class DrawableMetaInstance : IMetaDataInstance, IMetaDataMarkerPreview
     {
         private readonly ILogger _logger = Logging.Create<MetaDataBuilder>();
         private bool _hasError = false;
 
         private readonly SceneNode _node;
-        private readonly string _description;
+        private readonly Func<IReadOnlyList<MetaDataMarkerHitTarget>> _localPoints;
+        private readonly Func<Matrix>? _localTransform;
         public AnimationPlayer Player => null;
+        public ParsedMetadataAttribute Source { get; }
 
         private SkeletonBoneAnimationResolver? _animationResolver;
 
-        public DrawableMetaInstance(float startTime, float endTime, string description, SceneNode node)
+        public DrawableMetaInstance(ParsedMetadataAttribute source, SceneNode node, Func<IReadOnlyList<MetaDataMarkerHitTarget>> localPoints, Func<Matrix>? localTransform = null)
         {
-            _description = description;
+            Source = source;
             _node = node;
+            _localPoints = localPoints;
+            _localTransform = localTransform;
+            if (_localTransform != null)
+                _node.ModelMatrix = _localTransform();
         }
 
         public void FollowBone(ISkeletonProvider skeleton, int boneIndex)
@@ -28,6 +40,24 @@ namespace Editors.AnimationMeta.SuperView.Visualisation.Instances
                 _animationResolver = new SkeletonBoneAnimationResolver(skeleton, boneIndex);
         }
 
+        public bool IsHitTestVisible => _node.IsVisible && _node.Parent != null;
+        public float HitTestRadius => 0.3f;
+        public bool FollowsTagLive => _localTransform != null;
+
+        // The bone it follows, if any, inside the node it is drawn under.
+        public Matrix ReferenceWorldTransform => (_animationResolver?.GetWorldTransform() ?? Matrix.Identity) * MetaDataPreviewMath.WorldOf(_node.Parent);
+
+        public IReadOnlyList<MetaDataMarkerHitTarget> HitTargets
+        {
+            get
+            {
+                var reference = ReferenceWorldTransform;
+                return _localPoints().Select(x => x with { Position = Vector3.Transform(x.Position, reference) }).ToArray();
+            }
+        }
+
+        public Vector3 FocusPosition => HitTargets.FirstOrDefault().Position;
+
         public void Update(float currentTime)
         {
             if (_hasError)
@@ -35,7 +65,9 @@ namespace Editors.AnimationMeta.SuperView.Visualisation.Instances
 
             try
             {
-                if (_animationResolver != null)
+                if (_localTransform != null)
+                    _node.ModelMatrix = _localTransform() * (_animationResolver?.GetWorldTransform() ?? Matrix.Identity);
+                else if (_animationResolver != null)
                     _node.ModelMatrix = _animationResolver.GetWorldTransform();
             }
             catch (Exception e)

@@ -1,5 +1,8 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
+﻿using System.Data;
+using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using Editors.AnimationMeta.Presentation;
+using Editors.AnimationMeta.SuperView.Editing;
 using Editors.AnimationMeta.SuperView.Timeline;
 using Editors.AnimationMeta.SuperView.Visualisation;
 using Editors.Shared.Core.Common;
@@ -13,6 +16,7 @@ using Shared.Core.PackFiles.Events;
 using Shared.Core.PackFiles.Models;
 using Shared.Core.Services;
 using Shared.Core.ToolCreation;
+using Shared.GameFormats.AnimationMeta.Definitions;
 using Shared.GameFormats.AnimationMeta.Parsing;
 using Shared.Ui.Common.Timeline;
 
@@ -30,6 +34,13 @@ namespace Editors.AnimationMeta.SuperView
         private readonly IGlobalEventHub _globalEventHub;
         private readonly IUiCommandFactory _uiCommandFactory;
         private readonly LocalizationManager _localizationManager;
+        private readonly CombatMetaDataEditSession _editSession;
+        private readonly CombatMetaDataGizmoComponent _gizmo;
+        private readonly MetaDataMarkerPickerComponent _markerPicker;
+
+        // Which of a splash attack's points the gizmo is on: the one picked in the viewport, the start when picked in the list.
+        CombatMetaDataPoint _splashPoint = CombatMetaDataPoint.SplashStart;
+        bool _selectingMarker;
 
         [ObservableProperty] string _persistentMetaFilePath = "";
         [ObservableProperty] string _metaFilePath = "";
@@ -43,6 +54,19 @@ namespace Editors.AnimationMeta.SuperView
         [ObservableProperty] List<int> _vfxFilterIds = [];
         [ObservableProperty] int? _vfxFilterId;
         bool _showingVfxFilter;
+
+        // The 3D view's tool: select only (no gizmo), move, or rotate the selected tag.
+        [ObservableProperty]
+        [NotifyPropertyChangedFor(nameof(IsSelectTool), nameof(IsMoveTool), nameof(IsRotateTool))]
+        MetaDataEditTool _editTool = MetaDataEditTool.Select;
+        public bool IsSelectTool { get => EditTool == MetaDataEditTool.Select; set { if (value) EditTool = MetaDataEditTool.Select; } }
+        public bool IsMoveTool { get => EditTool == MetaDataEditTool.Move; set { if (value) EditTool = MetaDataEditTool.Move; } }
+        public bool IsRotateTool { get => EditTool == MetaDataEditTool.Rotate; set { if (value) EditTool = MetaDataEditTool.Rotate; } }
+        public bool CanEditSelectedIn3D => _editSession.CurrentSource != null;
+        public bool CanRotateSelectedIn3D => _editSession.CanRotate;
+        public bool CanUndoEditIn3D => _editSession.CanUndo;
+        public bool CanRedoEditIn3D => _editSession.CanRedo;
+
         public override Type EditorViewModelType => typeof(EditorView);
         public bool HasUnsavedChanges
         { 
@@ -67,7 +91,10 @@ namespace Editors.AnimationMeta.SuperView
             IEditorHostParameters editorHostParameters,
             MetaDataFileParser metaDataFileParser,
             IMetaDataBuilder metaDataFactory,
-            LocalizationManager localizationManager)
+            LocalizationManager localizationManager,
+            CombatMetaDataEditSession editSession,
+            CombatMetaDataGizmoComponent gizmo,
+            MetaDataMarkerPickerComponent markerPicker)
             : base(editorHostParameters)
         {
             DisplayName = "Super view";
@@ -79,6 +106,17 @@ namespace Editors.AnimationMeta.SuperView
             _metaDataFileParser = metaDataFileParser;
             _metaDataFactory = metaDataFactory;
             _localizationManager = localizationManager;
+            _editSession = editSession;
+            _gizmo = gizmo;
+            _markerPicker = markerPicker;
+
+            // Added to this editor's world only: registered as game components, they would join every editor's.
+            GameWorld!.AddComponent(_gizmo);
+            GameWorld.AddComponent(_markerPicker);
+            _markerPicker.Connect(GetMarkers, SelectMarker, FocusMarker, ClearMarkerSelection);
+            _editSession.ValueChanged += OnEditValueChanged;
+            _editSession.HistoryChanged += NotifyEditState;
+
             Initialize();
             eventHub.Register<ScopedFileSavedEvent>(this, OnFileSaved);
             eventHub.Register<SceneObjectUpdateEvent>(this, OnSceneObjectUpdated);
@@ -108,6 +146,9 @@ namespace Editors.AnimationMeta.SuperView
         {
             RecreateMetaDataInformation();
             ShowTimelineSelection();
+            if (!_selectingMarker)
+                _splashPoint = CombatMetaDataPoint.SplashStart;
+            UpdateEditTarget();
         }
 
         void OnMetaDataAttributeChanged(MetaDataAttributeChangedEvent @event)
@@ -118,7 +159,11 @@ namespace Editors.AnimationMeta.SuperView
 
         void OnMetaDataChanged(SceneObject sceneObject) => RecreateMetaDataInformation();
 
-        partial void OnSelectedTabControllerIndexChanged(int value) => ShowTimelineSelection();
+        partial void OnSelectedTabControllerIndexChanged(int value)
+        {
+            ShowTimelineSelection();
+            UpdateEditTarget();
+        }
 
         partial void OnShowVfxChanged(bool value)
         {
@@ -193,15 +238,30 @@ namespace Editors.AnimationMeta.SuperView
 
         private void OnSceneObjectUpdated(SceneObjectUpdateEvent e)
         {
+            var (persistent, animation) = (PersistentMetaEditor.ParsedFile, MetaEditor.ParsedFile);
             PersistentMetaEditor.LoadFile(e.Owner.PersistMetaData);
             MetaEditor.LoadFile(e.Owner.MetaData);
+            // A file read again has new tags: the 3D edits' undo steps point at the old ones.
+            if (PersistentMetaEditor.ParsedFile != persistent)
+                _editSession.ResetDocument(PersistentMetaEditor);
+            if (MetaEditor.ParsedFile != animation)
+                _editSession.ResetDocument(MetaEditor);
 
             RecreateMetaDataInformation();
             RebuildTimeline();
+            UpdateEditTarget();
         }
 
         void OnAnimationChanged(GameWorld.Core.Animation.AnimationClip? clip) => RebuildTimeline();
-        void OnTagsChanged(object? sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e) => RebuildTimeline();
+        void OnTagsChanged(object? sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        {
+            // Tags added, deleted, moved or pasted: the document's 3D undo steps may point at tags no longer in it.
+            if (ReferenceEquals(sender, PersistentMetaEditor.Tags))
+                _editSession.ResetDocument(PersistentMetaEditor);
+            else if (ReferenceEquals(sender, MetaEditor.Tags))
+                _editSession.ResetDocument(MetaEditor);
+            RebuildTimeline();
+        }
 
         // One marker per timed tag in both META files, on the animation player's scrub bar.
         void RebuildTimeline()
@@ -275,8 +335,131 @@ namespace Editors.AnimationMeta.SuperView
 
         public void RefreshAction() => _asset.Data.TriggerMeshChanged();
 
+        MetaDataEditorViewModel CurrentEditor => SelectedTabControllerIndex == 0 ? PersistentMetaEditor : MetaEditor;
+
+        ISpatialMetaDataPreview? FindPreview(ParsedMetadataAttribute? source) =>
+            source == null ? null : _asset?.Data.MetaDataItems.OfType<ISpatialMetaDataPreview>().FirstOrDefault(x => ReferenceEquals(x.Source, source));
+
+        // The gizmo goes on the tag selected on the open tab, when the tag is drawn in the scene and has a point to move.
+        void UpdateEditTarget()
+        {
+            if (_editSession == null || PersistentMetaEditor == null || MetaEditor == null)
+                return;
+
+            _gizmo.EndDrag();
+            var editor = CurrentEditor;
+            var source = editor.SelectedAttribute;
+            var point = source is SplashAttack_v3 or SplashAttack_v10 ? _splashPoint : CombatMetaDataPoint.Position;
+            // Looked up on every call: a rebuild replaces the instance that draws the tag.
+            if (FindPreview(source) == null || !_editSession.SetTarget(editor, source!, point, () => FindPreview(source)?.ReferenceWorldTransform ?? Matrix.Identity))
+                _editSession.ClearTarget(editor);
+
+            if (EditTool == MetaDataEditTool.Rotate && !_editSession.CanRotate)
+                EditTool = MetaDataEditTool.Move;
+            UpdateGizmo();
+            NotifyEditState();
+        }
+
+        partial void OnEditToolChanged(MetaDataEditTool value) => UpdateGizmo();
+
+        void UpdateGizmo()
+        {
+            _gizmo.TransformMode = EditTool == MetaDataEditTool.Rotate ? CombatMetaDataTransformMode.Rotate : CombatMetaDataTransformMode.Translate;
+            _gizmo.IsEnabled = EditTool != MetaDataEditTool.Select && _editSession.CurrentSource != null;
+        }
+
+        void NotifyEditState()
+        {
+            OnPropertyChanged(nameof(CanEditSelectedIn3D));
+            OnPropertyChanged(nameof(CanRotateSelectedIn3D));
+            OnPropertyChanged(nameof(CanUndoEditIn3D));
+            OnPropertyChanged(nameof(CanRedoEditIn3D));
+            UndoEditIn3DCommand.NotifyCanExecuteChanged();
+            RedoEditIn3DCommand.NotifyCanExecuteChanged();
+            FocusSelectedTagCommand.NotifyCanExecuteChanged();
+        }
+
+        void OnEditValueChanged(CombatMetaDataEditChange change)
+        {
+            var editor = change.Owner as MetaDataEditorViewModel;
+            if (change.Kind == CombatMetaDataEditChangeKind.Preview)
+            {
+                // Effects, props and most markers follow their tag on the next frame and are rebuilt when the drag ends
+                // (an effect's particles, a prop's model). IMPACT_POS, TARGET_POS, FIRE_POS and SPLASH_ATTACK are drawn
+                // where their values put them, and cheap to redraw.
+                if (FindPreview(change.Source) is not { FollowsTagLive: true })
+                    RebuildMarkersDuringDrag();
+                editor?.RefreshAttributeValues(change.Source, countAsEdit: false);
+                return;
+            }
+
+            editor?.RefreshAttributeValues(change.Source, countAsEdit: change.Kind != CombatMetaDataEditChangeKind.Cancelled);
+            RecreateMetaDataInformation();
+            NotifyEditState();
+        }
+
+        // A splash attack refuses to draw with its start on its end; mid-drag that step is skipped rather than an error.
+        void RebuildMarkersDuringDrag()
+        {
+            try
+            {
+                RecreateMetaDataInformation();
+            }
+            catch (ConstraintException)
+            {
+            }
+        }
+
+        IReadOnlyList<IMetaDataMarkerPreview> GetMarkers() =>
+            _asset?.Data.MetaDataItems.OfType<IMetaDataMarkerPreview>().ToList() ?? [];
+
+        // A marker clicked in the viewport: its tag's tab, the tag selected, and the gizmo on the point clicked.
+        void SelectMarker(ParsedMetadataAttribute source, MetaDataMarkerPoint point)
+        {
+            var isPersistent = PersistentMetaEditor.Tags.Any(x => ReferenceEquals(x._input, source));
+            var editor = isPersistent ? PersistentMetaEditor : MetaEditor;
+            var tag = editor.Tags.FirstOrDefault(x => ReferenceEquals(x._input, source));
+            if (tag == null)
+                return;
+
+            _splashPoint = point == MetaDataMarkerPoint.SplashEnd ? CombatMetaDataPoint.SplashEnd : CombatMetaDataPoint.SplashStart;
+            _selectingMarker = true;
+            try
+            {
+                SelectedTabControllerIndex = isPersistent ? 0 : 1;
+                if (editor.SelectedTag == tag)
+                    UpdateEditTarget(); // the other end of the same splash attack
+                else
+                    editor.SelectedTag = tag;
+            }
+            finally
+            {
+                _selectingMarker = false;
+            }
+        }
+
+        void FocusMarker(ParsedMetadataAttribute source)
+        {
+            if (FindPreview(source) is { } preview)
+                FocusService.LookAt(preview.FocusPosition);
+        }
+
+        void ClearMarkerSelection() => CurrentEditor.SelectedTag = null;
+
+        [RelayCommand(CanExecute = nameof(CanUndoEditIn3D))] void UndoEditIn3D() => _editSession.Undo();
+        [RelayCommand(CanExecute = nameof(CanRedoEditIn3D))] void RedoEditIn3D() => _editSession.Redo();
+
+        bool CanFocusSelectedTag() => FindPreview(CurrentEditor?.SelectedAttribute) != null;
+        [RelayCommand(CanExecute = nameof(CanFocusSelectedTag))] void FocusSelectedTag() => FocusMarker(CurrentEditor.SelectedAttribute!);
+
         public override void Close()
         {
+            _markerPicker.Disconnect();
+            _gizmo.EndDrag();
+            _editSession.ValueChanged -= OnEditValueChanged;
+            _editSession.HistoryChanged -= NotifyEditState;
+            GameWorld?.RemoveComponent(_markerPicker);
+            GameWorld?.RemoveComponent(_gizmo);
             _eventHub?.UnRegister(this);
             Player.TimelineItemClicked -= OnTimelineItemClicked;
             PersistentMetaEditor.Tags.CollectionChanged -= OnTagsChanged;
@@ -292,5 +475,12 @@ namespace Editors.AnimationMeta.SuperView
             var res1 = MetaEditor.Save();
             return res0 && res1;
         }
+    }
+
+    public enum MetaDataEditTool
+    {
+        Select,
+        Move,
+        Rotate,
     }
 }
