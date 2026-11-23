@@ -19,6 +19,13 @@ namespace Editors.Shared.Core.Common.AnimationPlayer
         public NotifyAttr<bool> IsEnabled { get; set; } = new();
         public NotifyAttr<bool> LoopAnimation { get; set; } = new(true);
 
+        /// <summary>The main animation's time, for the scrub bar. Setting it pauses every asset on the nearest frame.</summary>
+        public double ScrubTime
+        {
+            get => SelectedAnimationCurrentTime.Value;
+            set => SetAnimationTime(value);
+        }
+
         public NotifyAttr<Visibility> PlayerControlsVisibility { get; private set; } = new(Visibility.Collapsed);
 
         public ObservableCollection<AssetPlayerItem> PlayerItems { get; private set; } = new ObservableCollection<AssetPlayerItem>();
@@ -38,6 +45,7 @@ namespace Editors.Shared.Core.Common.AnimationPlayer
                 oldAnimation.Asset.Player.OnFrameChanged -= OnAnimationFrameChanged;
 
             SelectedAnimationFrameCount.Value = mainAnimation.MaxFrames.Value;
+            SelectedAnimationMaxTime.Value = LengthInSeconds(mainAnimation.Asset);
             mainAnimation.Asset.Player.OnFrameChanged += OnAnimationFrameChanged;
         }
 
@@ -96,7 +104,12 @@ namespace Editors.Shared.Core.Common.AnimationPlayer
             playerItem.AnimationName.Value = asset.AnimationName.Value;
             playerItem.SlotName.Value = asset.Description;
             playerItem.MaxFrames.Value = asset.Player.FrameCount();
+            if (playerItem == SelectedMainAnimation)
+                SelectedAnimationMaxTime.Value = LengthInSeconds(asset);
         }
+
+        static float LengthInSeconds(SceneObject asset) => (float)asset.Player.GetAnimationLengthUs() / 1_000_000;
+
 
         public void ToggleAnimationPausePlay()
         {
@@ -128,6 +141,17 @@ namespace Editors.Shared.Core.Common.AnimationPlayer
                 _assetList.ForEach(x => PrivFrame(x));
         }
 
+        public void SetAnimationTime(double timeInSeconds)
+        {
+            var main = SelectedMainAnimation?.Asset.Player;
+            if (main == null || main.FrameCount() == 0 || main.AnimationClip.MicrosecondsPerFrame <= 0)
+                return;
+
+            var frame = (int)Math.Round(timeInSeconds * 1_000_000 / main.AnimationClip.MicrosecondsPerFrame);
+            frame = Math.Clamp(frame, 0, main.FrameCount() - 1);
+            _assetList.ForEach(x => SetFrame(x, frame));
+        }
+
         public void SetAnimationFirstFrame() => _assetList.ForEach(x => SetFrame(x, 0));
 
         public void SetAnimationLastFrame()
@@ -143,6 +167,7 @@ namespace Editors.Shared.Core.Common.AnimationPlayer
             SelectedAnimationCurrentTime.Value = (float)SelectedMainAnimation.Asset.Player.GetTimeUs() / 1_000_000;
             SelectedAnimationMaxTime.Value = (float)SelectedMainAnimation.Asset.Player.GetAnimationLengthUs() / 1_000_000;
             SelectedAnimationFps.Value = SelectedMainAnimation.Asset.Player.GetFps();
+            NotifyPropertyChanged(nameof(ScrubTime));
 
             // Playback reached the end. Stepping onto the last frame lands on its start, so it doesn't count
             var player = SelectedMainAnimation.Asset.Player;
