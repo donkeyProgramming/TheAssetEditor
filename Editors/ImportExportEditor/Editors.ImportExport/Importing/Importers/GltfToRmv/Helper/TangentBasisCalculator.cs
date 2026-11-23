@@ -30,8 +30,12 @@ namespace Editors.ImportExport.Importing.Importers.GltfToRmv.Helper
                 var deltaUV1 = v1.Uv - v0.Uv;
                 var deltaUV2 = v2.Uv - v0.Uv;
 
+                var determinant = deltaUV1.X * deltaUV2.Y - deltaUV2.X * deltaUV1.Y;
+                if (Math.Abs(determinant) <= 0.000001f)
+                    continue;
+
                 // Calculate the tangent and bitangent
-                float f = 1.0f / (deltaUV1.X * deltaUV2.Y - deltaUV2.X * deltaUV1.Y);
+                float f = 1.0f / determinant;
 
                 var tangent = new Vector3(
                     f * (deltaUV2.Y * edge1.X - deltaUV1.Y * edge2.X),
@@ -55,13 +59,34 @@ namespace Editors.ImportExport.Importing.Importers.GltfToRmv.Helper
                 v2.BiNormal += bitangent;
             }
             
-            // normalize the "averaged" vectors
+            // Normalize the averaged vectors and provide a stable basis for
+            // triangles whose UVs do not define a tangent direction.
             foreach (var vertex in rmv2Mesh.VertexList)
-            { 
-               // TODO: orthogonalize the tangents and bitangents?
-                vertex.Tangent = Vector3.Normalize(vertex.Tangent);
-                vertex.BiNormal = Vector3.Normalize(vertex.BiNormal);
+            {
+                var normal = NormalizeOrDefault(vertex.Normal, Vector3.UnitZ);
+                var tangentFallbackAxis = Math.Abs(normal.Z) < 0.999f
+                    ? Vector3.UnitZ
+                    : Vector3.UnitY;
+                var tangentFallback = Vector3.Cross(tangentFallbackAxis, normal);
+
+                vertex.Tangent = NormalizeOrDefault(vertex.Tangent, tangentFallback);
+                vertex.BiNormal = NormalizeOrDefault(
+                    vertex.BiNormal,
+                    Vector3.Cross(normal, vertex.Tangent));
             }
         }
+
+        private static Vector3 NormalizeOrDefault(Vector3 value, Vector3 fallback)
+        {
+            if (IsFinite(value) && value.LengthSquared() > 0.000000000001f)
+                return Vector3.Normalize(value);
+
+            return Vector3.Normalize(fallback);
+        }
+
+        private static bool IsFinite(Vector3 value) =>
+            float.IsFinite(value.X) &&
+            float.IsFinite(value.Y) &&
+            float.IsFinite(value.Z);
     }
 }

@@ -36,46 +36,24 @@ namespace Editors.ImportExport.Exporting.Exporters.RmvToGltf.Helpers
     }
     public class GltfAnimationTrackSampler
     {
-        static public Vector3 SampleTranslation(ModelRoot model, string boneName, float time)
+        // Used by the glTF importer. Samples one animation clip; a bone with no node in the
+        // file keeps the fallback (bind) value, and a node with no channel keeps its rest transform.
+        public static Vector3 SampleTranslation(ModelRoot model, Animation animation, string boneName, float time, Vector3 fallback)
         {
-            // Access the first animation
-            var animation = model.LogicalAnimations[0];
-
-            // Access the first node
-            var node = model.LogicalNodes.FirstOrDefault(n => n.Name.ToLower() == boneName.ToLower());
-
+            var node = model.LogicalNodes.FirstOrDefault(candidate => string.Equals(candidate.Name, boneName, StringComparison.OrdinalIgnoreCase));
             if (node == null)
-            {
-                throw new Exception("Error, Unexpected, Node not found");
-            }
+                return fallback;
 
-            // Get the translation sampler for the node
-            var translationSampler = animation.FindTranslationChannel(node).GetTranslationSampler().CreateCurveSampler();            
-
-            var translationVector = translationSampler.GetPoint(time);
-
-            return GlobalSceneTransforms.FlipVector(translationVector, true);
+            return GlobalSceneTransforms.FlipVector(node.GetLocalTransform(animation, time).Translation, true);
         }
 
-        static public Quaternion SampleQuaternion(ModelRoot model, string boneName, float time)
+        public static Quaternion SampleQuaternion(ModelRoot model, Animation animation, string boneName, float time, Quaternion fallback)
         {
-            // Access the first animation
-            var animation = model.LogicalAnimations[0];
-
-            // Access the first nodef
-            var node = model.LogicalNodes.FirstOrDefault(n => n.Name.ToLower() == boneName.ToLower());
-
+            var node = model.LogicalNodes.FirstOrDefault(candidate => string.Equals(candidate.Name, boneName, StringComparison.OrdinalIgnoreCase));
             if (node == null)
-            {
-                throw new Exception("Error, Unexpected, Node not found");
-            }
+                return fallback;
 
-            // Get the translation sampler for the node 
-            var quaternionSampler = animation.FindRotationChannel(node).GetRotationSampler().CreateCurveSampler();
-
-            var outQuaternion = quaternionSampler.GetPoint(time);
-
-            return GlobalSceneTransforms.FlipQuaternion(outQuaternion, true);
+            return GlobalSceneTransforms.FlipQuaternion(node.GetLocalTransform(animation, time).Rotation, true);
         }
 
     }

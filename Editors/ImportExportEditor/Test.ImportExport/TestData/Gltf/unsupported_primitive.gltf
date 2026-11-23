@@ -1,0 +1,41 @@
+{
+  "asset": {
+    "version": "2.0",
+    "generator": "AssetEditor.CN procedural test fixture",
+    "extras": {
+      "license": "CC0-1.0"
+    }
+  },
+  "scene": 0,
+  "scenes": [
+    {
+      "name": "default",
+      "nodes": [0]
+    }
+  ],
+  "nodes": [
+    { "name": "unsupported_points", "mesh": 0 }
+  ],
+  "meshes": [
+    {
+      "name": "unsupported_points_mesh",
+      "primitives": [
+        {
+          "attributes": {
+            "POSITION": 0
+          },
+          "mode": 0
+        }
+      ]
+    }
+  ],
+  "accessors": [
+    {
+      "componentType": 5126,
+      "count": 1,
+      "type": "VEC3",
+      "min": [0, 0, 0],
+      "max": [0, 0, 0]
+    }
+  ]
+}

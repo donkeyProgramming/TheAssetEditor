@@ -1,0 +1,42 @@
+{
+  "asset": {
+    "version": "2.0",
+    "generator": "AssetEditor.CN procedural test fixture",
+    "extras": {
+      "license": "CC0-1.0"
+    }
+  },
+  "scene": 0,
+  "scenes": [
+    {
+      "name": "default",
+      "nodes": [0, 1]
+    }
+  ],
+  "nodes": [
+    { "name": "first_instance", "mesh": 0 },
+    { "name": "second_instance", "mesh": 0 }
+  ],
+  "meshes": [
+    {
+      "name": "oversized_mesh",
+      "primitives": [
+        {
+          "attributes": {
+            "POSITION": 0
+          },
+          "mode": 4
+        }
+      ]
+    }
+  ],
+  "accessors": [
+    {
+      "componentType": 5126,
+      "count": 65538,
+      "type": "VEC3",
+      "min": [0, 0, 0],
+      "max": [0, 0, 0]
+    }
+  ]
+}
