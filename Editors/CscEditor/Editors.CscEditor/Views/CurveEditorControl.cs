@@ -72,6 +72,18 @@ namespace Editors.CscEditor.Views
             nameof(ElementTimingMode), typeof(string), typeof(CurveEditorControl),
             new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.AffectsRender));
 
+        static readonly DependencyPropertyKey ViewStartPropertyKey = DependencyProperty.RegisterReadOnly(
+            nameof(ViewStart), typeof(double), typeof(CurveEditorControl), new PropertyMetadata(0.0));
+        public static readonly DependencyProperty ViewStartProperty = ViewStartPropertyKey.DependencyProperty;
+
+        static readonly DependencyPropertyKey ViewEndPropertyKey = DependencyProperty.RegisterReadOnly(
+            nameof(ViewEnd), typeof(double), typeof(CurveEditorControl), new PropertyMetadata(1.0));
+        public static readonly DependencyProperty ViewEndProperty = ViewEndPropertyKey.DependencyProperty;
+
+        /// <summary>The time span last drawn (see <see cref="TimeRange"/>), so a control above can line up with it.</summary>
+        public double ViewStart => (double)GetValue(ViewStartProperty);
+        public double ViewEnd => (double)GetValue(ViewEndProperty);
+
         public ObservableCollection<CurveSeries>? SeriesSource
         {
             get => (ObservableCollection<CurveSeries>?)GetValue(SeriesSourceProperty);
@@ -266,6 +278,10 @@ namespace Editors.CscEditor.Views
 
             var range = ValueRange();
             var timeRange = TimeRange();
+            if (ViewStart != timeRange.Min)
+                SetValue(ViewStartPropertyKey, timeRange.Min);
+            if (ViewEnd != timeRange.Max)
+                SetValue(ViewEndPropertyKey, timeRange.Max);
             DrawGrid(dc, range, timeRange);
             DrawOutOfBoundsShading(dc, timeRange);
             DrawAliveWindowShading(dc);

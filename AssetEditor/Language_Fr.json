@@ -1174,6 +1174,7 @@
     "CampaignAnimationSetEditor.SaveCampaignBinAs.Save":  "Save",
     "CampaignAnimationSetEditor.SaveCampaignBinAs.Cancel":  "Cancel",
     "CampaignAnimationSetEditor.TypeColumnTooltip":  "Which status this animation was originally authored for. Rows often show a different value than the status they live under - a row inside status_battle commonly shows Type=status_normal, meaning it reuses status_normal's authored animation. Vanilla files only ever use \"global\" or \"status_normal\" here.",
+    "CscEditor.Timeline.Elements":  "Elements",
     "CscEditor.Save":  "Save",
     "CscEditor.Undo":  "Undo",
     "CscEditor.Redo":  "Redo",

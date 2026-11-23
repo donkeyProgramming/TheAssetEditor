@@ -1,6 +1,7 @@
 <UserControl x:Class="Editors.CscEditor.Views.CscEditorView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:loc="clr-namespace:Shared.Ui.Common;assembly=Shared.Ui"
+             xmlns:timeline="clr-namespace:Shared.Ui.Common.Timeline;assembly=Shared.Ui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -525,6 +526,7 @@
         <Grid Grid.Row="2">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
                 <RowDefinition Height="170"/>
             </Grid.RowDefinitions>
 
@@ -555,7 +557,19 @@
                 <Run Text="{Binding CurrentTime, StringFormat=0.00, Mode=OneWay}"/><Run Text=" / "/><Run Text="{Binding Duration, StringFormat=0.00, Mode=OneWay}"/><Run Text=" s"/>
             </TextBlock>
 
-            <ListBox Grid.Row="1" Grid.Column="0" ItemsSource="{Binding CurveSeriesList}"
+            <!-- One bar per element's active window, on the curve editor's own time axis. -->
+            <TextBlock Grid.Row="1" Grid.Column="0" Text="{loc:Loc CscEditor.Timeline.Elements}" VerticalAlignment="Top" Margin="6,0,4,2" Foreground="#FF999999"/>
+            <timeline:TimelineControl Grid.Row="1" Grid.Column="1" Margin="0,0,12,2"
+                                      ShowRuler="False" RowHeight="9" MaxVisibleRows="6"
+                                      ItemsSource="{Binding ElementTimelineItems}"
+                                      SelectedItem="{Binding SelectedElementTimelineItem, Mode=TwoWay}"
+                                      ItemClickCommand="{Binding ElementTimelineClickCommand}"
+                                      CurrentTime="{Binding CurrentTime, Mode=TwoWay}"
+                                      Duration="{Binding Duration, Mode=OneWay}"
+                                      ViewStart="{Binding ViewStart, ElementName=CurveEditor}"
+                                      ViewEnd="{Binding ViewEnd, ElementName=CurveEditor}"/>
+
+            <ListBox Grid.Row="2" Grid.Column="0" ItemsSource="{Binding CurveSeriesList}"
                      SelectedItem="{Binding SelectedCurveSeries, Mode=TwoWay}">
                 <ListBox.ItemTemplate>
                     <DataTemplate>
@@ -568,7 +582,7 @@
                 </ListBox.ItemTemplate>
             </ListBox>
 
-            <views:CurveEditorControl Grid.Row="1" Grid.Column="1" x:Name="CurveEditor" Margin="0,0,12,0"
+            <views:CurveEditorControl Grid.Row="2" Grid.Column="1" x:Name="CurveEditor" Margin="0,0,12,0"
                                       SeriesSource="{Binding CurveSeriesList}"
                                       SelectedSeries="{Binding SelectedCurveSeries, Mode=TwoWay}"
                                       CurrentTime="{Binding CurrentTime, Mode=TwoWay}"

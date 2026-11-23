@@ -23,6 +23,7 @@ using Shared.Core.PackFiles.Models;
 using Shared.Core.PackFiles.Utility;
 using Shared.Core.Services;
 using Shared.Core.ToolCreation;
+using Shared.Ui.Common.Timeline;
 using Shared.CoreLog;
 
 namespace Editors.CscEditor.ViewModels
@@ -84,6 +85,7 @@ namespace Editors.CscEditor.ViewModels
                     NotifyPropertyChanged(nameof(IsSceneRootSelected));
                 }
                 SetAndNotify(ref _selectedElement, value);
+                SelectedElementTimelineItem = ElementTimelineItems.FirstOrDefault(x => x.Element == value);
                 _context.SelectedElementId = value?.Element.Id ?? -1;
                 _gizmo.SetTarget(value?.Element is { IsExternal: true } ? null : value?.Element);
                 RebuildCurveSeries();
@@ -165,6 +167,25 @@ namespace Editors.CscEditor.ViewModels
             set => SetAndNotify(ref _selectedCurveSeries, value);
         }
 
+        // ---- Element rows above the curve editor ----
+        ObservableCollection<CscElementTimelineItem> _elementTimelineItems = [];
+        /// <summary>Every element of this scene (not a referenced one's) in tree order. Replaced whole
+        /// when elements are added, removed or moved, so the timeline re-reads it once.</summary>
+        public ObservableCollection<CscElementTimelineItem> ElementTimelineItems
+        {
+            get => _elementTimelineItems;
+            private set => SetAndNotify(ref _elementTimelineItems, value);
+        }
+
+        CscElementTimelineItem? _selectedElementTimelineItem;
+        public CscElementTimelineItem? SelectedElementTimelineItem
+        {
+            get => _selectedElementTimelineItem;
+            set => SetAndNotify(ref _selectedElementTimelineItem, value);
+        }
+
+        public ICommand ElementTimelineClickCommand { get; }
+
         // ---- Commands ----
         public ICommand SaveCommand { get; }
         public ICommand UndoCommand { get; }
@@ -235,6 +256,14 @@ namespace Editors.CscEditor.ViewModels
             SaveCommand = new RelayCommand(() => Save());
             UndoCommand = new RelayCommand(() => Undo());
             RedoCommand = new RelayCommand(() => Redo());
+            ElementTimelineClickCommand = new RelayCommand<ITimelineItem>(item =>
+            {
+                if (item is not CscElementTimelineItem { Element: var elementViewModel } || elementViewModel == SelectedElement)
+                    return;
+                elementViewModel.IsSelected = true; // two-way TreeViewItem binding routes back to SelectedElement
+                SelectedElement = elementViewModel;
+                ExpandTo(elementViewModel);
+            });
             PlayPauseCommand = new RelayCommand(() => _context.IsPlaying = !_context.IsPlaying);
             StopCommand = new RelayCommand(() =>
             {
@@ -482,6 +511,7 @@ namespace Editors.CscEditor.ViewModels
                 OnRecordFailed(e);
             }
             NotifyHistoryState();
+            RefreshElementTimeline();
         }
 
         void BeginEditGesture()
@@ -501,6 +531,7 @@ namespace Editors.CscEditor.ViewModels
                 OnRecordFailed(e);
             }
             NotifyHistoryState();
+            RefreshElementTimeline();
         }
 
         /// <summary>Runs a multi-part edit (e.g. a structural change) as one undo step.</summary>
@@ -558,6 +589,33 @@ namespace Editors.CscEditor.ViewModels
 
             foreach (var root in SceneData.RootElements)
                 RootElements.Add(BuildTreeNode(root));
+            RefreshElementTimeline();
+        }
+
+        /// <summary>Brings the element rows in line with the tree: a new list when elements were
+        /// added, removed or moved, otherwise each row re-reads its element's times.</summary>
+        void RefreshElementTimeline()
+        {
+            var elements = new List<CscElementViewModel>();
+            void Walk(IEnumerable<CscElementViewModel> items)
+            {
+                foreach (var item in items.Where(x => !x.Element.IsExternal))
+                {
+                    elements.Add(item);
+                    Walk(item.Children);
+                }
+            }
+            Walk(RootElements);
+
+            if (elements.SequenceEqual(ElementTimelineItems.Select(x => x.Element)))
+            {
+                foreach (var item in ElementTimelineItems)
+                    item.Refresh();
+                return;
+            }
+
+            ElementTimelineItems = new ObservableCollection<CscElementTimelineItem>(elements.Select(x => new CscElementTimelineItem(x, () => Duration)));
+            SelectedElementTimelineItem = ElementTimelineItems.FirstOrDefault(x => x.Element == SelectedElement);
         }
 
         /// <summary>Builds a tree node for <paramref name="element"/> and its children, resolving a

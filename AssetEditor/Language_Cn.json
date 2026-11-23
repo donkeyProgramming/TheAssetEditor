@@ -1244,6 +1244,7 @@
   "CampaignAnimationSetEditor.SaveCampaignBinAs.Cancel": "取消",
   "CampaignAnimationSetEditor.TypeColumnTooltip": "该动画最初是为哪个状态制作的。行中显示的值常与其所在的状态不同 - 例如 status_battle 中的一行常显示 Type=status_normal，表示它复用了 status_normal 的动画。原版文件此处只使用 \"global\" 或 \"status_normal\"。",
 
+  "CscEditor.Timeline.Elements": "元素",
   "CscEditor.Save": "保存",
   "CscEditor.Undo": "撤销",
   "CscEditor.Redo": "重做",
