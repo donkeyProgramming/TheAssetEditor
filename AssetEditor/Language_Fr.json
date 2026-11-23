@@ -521,6 +521,7 @@
     "SuperView.ShowVfx":  "Afficher les VFX",
     "SuperView.VfxFilter":  "Filtre VFX :",
     "SuperView.VfxFilter.Tooltip":  "Le vfx_filter_id de l'unité dans battle_entities. Une balise d'effet dont l'id n'est ni 0 ni celui-ci n'est pas jouée sur elle : une unité et son régiment de renom partagent souvent un même méta, avec les id 1 et 2.",
+    "SuperView.Timeline.WholeAnimation":  "Whole animation",
     "MetadataEditor.Buttons.New":  "New",
     "MetadataEditor.Buttons.Delete":  "Delete",
     "MetadataEditor.Buttons.Up":  "Up",
