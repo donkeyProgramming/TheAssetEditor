@@ -10,6 +10,12 @@
              mc:Ignorable="d"
              d:DesignHeight="800" d:DesignWidth="1200">
 
+    <UserControl.InputBindings>
+        <KeyBinding Modifiers="Ctrl" Key="Z" Command="{Binding UndoCommand}"/>
+        <KeyBinding Modifiers="Ctrl" Key="Y" Command="{Binding RedoCommand}"/>
+        <KeyBinding Modifiers="Ctrl+Shift" Key="Z" Command="{Binding RedoCommand}"/>
+    </UserControl.InputBindings>
+
     <UserControl.Resources>
         <BooleanToVisibilityConverter x:Key="BoolToVisRoot"/>
         <views:CscFloatConverter x:Key="CscFloat"/>
@@ -26,6 +32,10 @@
         <!-- Toolbar -->
         <ToolBar Grid.Row="0">
             <Button Content="{loc:Loc CscEditor.Save}" Command="{Binding SaveCommand}" Padding="8,3"/>
+            <Button Content="{loc:Loc CscEditor.Undo}" Click="Undo_Click" IsEnabled="{Binding CanUndo}" Padding="8,3"
+                    ToolTip="{loc:Loc CscEditor.UndoTooltip}"/>
+            <Button Content="{loc:Loc CscEditor.Redo}" Click="Redo_Click" IsEnabled="{Binding CanRedo}" Padding="8,3"
+                    ToolTip="{loc:Loc CscEditor.RedoTooltip}"/>
             <Separator/>
             <Menu Background="Transparent" VerticalAlignment="Center">
                 <MenuItem Header="{loc:Loc CscEditor.Add}" Padding="8,3"

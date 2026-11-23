@@ -39,6 +39,27 @@ namespace Editors.CscEditor.Views
 
         void AuxField_LostFocus(object sender, RoutedEventArgs e) => ViewModel?.OnAuxFieldModified();
 
+        // Toolbar buttons don't take focus, so a field being typed in hasn't written its value
+        // yet. Commit it first so it becomes its own step instead of being lost or landing on
+        // the undone scene.
+        void Undo_Click(object sender, RoutedEventArgs e)
+        {
+            CommitFocusedTextBox();
+            ViewModel?.Undo();
+        }
+
+        void Redo_Click(object sender, RoutedEventArgs e)
+        {
+            CommitFocusedTextBox();
+            ViewModel?.Redo();
+        }
+
+        static void CommitFocusedTextBox()
+        {
+            if (Keyboard.FocusedElement is TextBox textBox)
+                textBox.GetBindingExpression(TextBox.TextProperty)?.UpdateSource();
+        }
+
         // ---------------------------------------------------------------------
         // Tree drag-drop re-parenting
         // ---------------------------------------------------------------------
