@@ -1,6 +1,7 @@
 using Editors.AnimationMeta.SuperView.Visualisation;
 using GameWorld.Core.Components;
 using GameWorld.Core.Components.Input;
+using GameWorld.Core.Components.Navigation;
 using GameWorld.Core.Components.Rendering;
 using GameWorld.Core.Rendering;
 using Microsoft.Xna.Framework;
@@ -171,8 +172,8 @@ namespace Editors.AnimationMeta.SuperView.Editing
 
     /// <summary>
     /// Hover, click and double-click on SuperView's META markers. It runs before the stock SelectionComponent and holds
-    /// the mouse from a press to its release, so the click is not also a mesh selection. A press on a gizmo handle, a
-    /// gizmo drag and Alt (the camera) are left alone.
+    /// the mouse from a press to its release, so the click is not also a mesh selection. A press on a gizmo handle or on
+    /// the corner navigation gizmo, a gizmo drag and Alt (the camera) are left alone.
     /// </summary>
     public sealed class MetaDataMarkerPickerComponent : BaseComponent, IDisposable
     {
@@ -183,6 +184,7 @@ namespace Editors.AnimationMeta.SuperView.Editing
         readonly IKeyboardComponent _keyboard;
         readonly RenderEngineComponent _renderEngine;
         readonly CombatMetaDataGizmoComponent _gizmo;
+        readonly ViewportGizmo _navigationGizmo;
         readonly MetaDataMarkerPointerInteraction _interaction = new();
 
         Func<IReadOnlyList<IMetaDataMarkerPreview>>? _candidateProvider;
@@ -191,13 +193,14 @@ namespace Editors.AnimationMeta.SuperView.Editing
         Action? _clearSelection;
         MetaDataMarkerHit? _hovered;
 
-        public MetaDataMarkerPickerComponent(ArcBallCamera camera, IMouseComponent mouse, IKeyboardComponent keyboard, RenderEngineComponent renderEngine, CombatMetaDataGizmoComponent gizmo)
+        public MetaDataMarkerPickerComponent(ArcBallCamera camera, IMouseComponent mouse, IKeyboardComponent keyboard, RenderEngineComponent renderEngine, CombatMetaDataGizmoComponent gizmo, ViewportGizmo navigationGizmo)
         {
             _camera = camera;
             _mouse = mouse;
             _keyboard = keyboard;
             _renderEngine = renderEngine;
             _gizmo = gizmo;
+            _navigationGizmo = navigationGizmo;
             // Before SelectionComponent, which takes the mouse on any press it sees first.
             UpdateOrder = (int)ComponentUpdateOrderEnum.Gizmo;
         }
@@ -233,8 +236,10 @@ namespace Editors.AnimationMeta.SuperView.Editing
                 return;
 
             var owner = _mouse.MouseOwner;
-            var isBlocked = _gizmo.IsDragActive || _gizmo.IsHandleHovered || _keyboard.IsKeyDown(Keys.LeftAlt) || (owner != null && owner != this);
             var position = _mouse.Position();
+            // ViewportSelector updates in the same slot, in either order: the navigation gizmo's press is left to it.
+            var isBlocked = _gizmo.IsDragActive || _gizmo.IsHandleHovered || _keyboard.IsKeyDown(Keys.LeftAlt) || (owner != null && owner != this) ||
+                (owner == null && _navigationGizmo.HitTestAxis(position) != NavigationAxis.None);
             var candidates = _candidateProvider().Select((preview, index) => new MetaDataMarkerPickCandidate(preview, index));
             var hit = isBlocked ? null : MetaDataMarkerHitTester.Pick(_camera.CreateCameraRay(position), candidates, _camera.CurrentProjectionType == ProjectionType.Perspective);
             _hovered = hit;
