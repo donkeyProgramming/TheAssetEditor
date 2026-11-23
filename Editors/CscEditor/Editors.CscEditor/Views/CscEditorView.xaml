@@ -28,6 +28,7 @@
             <Separator/>
             <Menu Background="Transparent" VerticalAlignment="Center">
                 <MenuItem Header="{loc:Loc CscEditor.Add}" Padding="8,3"
+                          IsEnabled="{Binding ManifestEditable}"
                           Background="{DynamicResource Popup.Static.Background}"
                           Foreground="{DynamicResource Popup.Static.Foreground}">
                     <MenuItem.Resources>

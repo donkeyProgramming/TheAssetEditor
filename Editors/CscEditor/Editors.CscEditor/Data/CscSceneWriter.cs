@@ -17,6 +17,9 @@ namespace Editors.CscEditor.Data
     {
         public static byte[] Write(CscScene scene)
         {
+            ArgumentNullException.ThrowIfNull(scene);
+            scene.ValidateForWrite();
+
             var rootFields = new List<EsfNode>(scene.HeaderFields);
 
             // Element groups, in scene order.
@@ -74,12 +77,35 @@ namespace Editors.CscEditor.Data
 
         static void SelfCheck(CscScene scene, byte[] bytes)
         {
-            using var checkStream = new MemoryStream(bytes);
-            var reread = EsfReader.Read(checkStream);
-            var structure = RootStructureDetector.Detect(reread.Root.Groups![0], reread.Root.Version);
-            if (structure == null || structure.ElementGroups.Count != scene.Elements.Count)
+            CscScene reread;
+            try
+            {
+                reread = CscScene.Load(bytes);
+            }
+            catch (Exception ex)
+            {
                 throw new InvalidOperationException(
-                    "Save self-check failed: the written file does not re-detect as a valid scene structure. The file was NOT saved.");
+                    "Save self-check failed: the written file does not reload as a valid scene. The file was NOT saved.", ex);
+            }
+
+            var expectedById = scene.Elements.ToDictionary(e => e.Id);
+            var actualById = reread.Elements.ToDictionary(e => e.Id);
+            if (!expectedById.Keys.Order().SequenceEqual(actualById.Keys.Order()))
+                throw new InvalidOperationException(
+                    "Save self-check failed: the element id set changed during serialization. The file was NOT saved.");
+
+            foreach (var (id, expected) in expectedById)
+            {
+                var actual = actualById[id];
+                if (actual.Parent?.Id != expected.Parent?.Id ||
+                    actual.AttachBoneIndex != expected.AttachBoneIndex ||
+                    actual.Kind != expected.Kind ||
+                    actual.AssetPath != expected.AssetPath)
+                {
+                    throw new InvalidOperationException(
+                        $"Save self-check failed: element {id} changed during serialization. The file was NOT saved.");
+                }
+            }
         }
 
         // ---------------------------------------------------------------------

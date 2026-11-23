@@ -231,6 +231,53 @@ namespace Editors.CscEditor.Data
             return scene;
         }
 
+        /// <summary>Checks the attach tree before it is written: no duplicate ids, every element
+        /// reachable exactly once from <see cref="RootElements"/>, parent links consistent and no
+        /// cycles. Throws <see cref="InvalidDataException"/> otherwise.</summary>
+        internal void ValidateForWrite()
+        {
+            var ids = new HashSet<int>();
+            foreach (var element in AllElementsIncludingNested())
+            {
+                if (!ids.Add(element.Id))
+                    throw new InvalidDataException($"The scene contains duplicate element id {element.Id}.");
+            }
+
+            var mainElements = Elements.ToHashSet();
+            var seen = new HashSet<CscElement>();
+            foreach (var root in RootElements)
+            {
+                if (!mainElements.Contains(root) || root.IsNested || root.Parent != null || !seen.Add(root))
+                    throw new InvalidDataException($"Element {root.Id} has an invalid root attachment.");
+            }
+
+            foreach (var parent in Elements)
+            {
+                foreach (var child in parent.Children.Where(c => !c.IsNested))
+                {
+                    if (!mainElements.Contains(child))
+                        throw new InvalidDataException($"Attach child {child.Id} is not part of the scene.");
+                    if (!ReferenceEquals(child.Parent, parent))
+                        throw new InvalidDataException($"Attach child {child.Id} has an inconsistent parent.");
+                    if (!seen.Add(child))
+                        throw new InvalidDataException($"Attach child {child.Id} appears more than once.");
+                }
+            }
+
+            foreach (var element in Elements)
+            {
+                if (!seen.Contains(element))
+                    throw new InvalidDataException($"Element {element.Id} is missing from the attach hierarchy.");
+
+                var chain = new HashSet<CscElement>();
+                for (var current = element; current != null; current = current.Parent)
+                {
+                    if (!chain.Add(current))
+                        throw new InvalidDataException($"Attach hierarchy contains a cycle at element {current.Id}.");
+                }
+            }
+        }
+
         void LoadTail(List<EsfNode> rootFields, int tailStartIndex)
         {
             TailFields = rootFields.Skip(tailStartIndex).ToList();
@@ -625,8 +672,19 @@ namespace Editors.CscEditor.Data
         // Structural edits
         // ---------------------------------------------------------------------
 
+        /// <summary>Structure edits restate the COMPOSITE_SCENE manifest on save. When that
+        /// manifest could not be parsed it is written back verbatim, so an added, removed or
+        /// moved element would leave it describing the wrong tree.</summary>
+        void EnsureStructureEditable()
+        {
+            if (!ManifestParsed)
+                throw new InvalidOperationException(
+                    "Scene structure cannot be edited because the COMPOSITE_SCENE manifest could not be parsed.");
+        }
+
         public void AddElement(CscElement element, CscElement? parent = null)
         {
+            EnsureStructureEditable();
             element.Scene = this;
             Elements.Add(element);
             if (parent != null)
@@ -645,6 +703,7 @@ namespace Editors.CscEditor.Data
             if (element.IsNested || element.IsExternal)
                 return; // nested/external elements are not part of this scene's editable data
 
+            EnsureStructureEditable();
             foreach (var child in element.Children.Where(c => !c.IsNested).ToList())
                 RemoveElementSubtree(child);
 
@@ -671,6 +730,8 @@ namespace Editors.CscEditor.Data
                 return false; // nested elements are bound to their carrier record
             if (element.IsExternal || (newParent?.IsExternal ?? false))
                 return false; // root-ref sub-scene elements are display-only
+
+            EnsureStructureEditable();
             if (newParent == element || (newParent != null && newParent.IsInSubtreeOf(element)))
                 return false;
 

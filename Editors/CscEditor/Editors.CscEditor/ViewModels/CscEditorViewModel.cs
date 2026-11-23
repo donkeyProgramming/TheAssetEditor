@@ -293,12 +293,14 @@ namespace Editors.CscEditor.ViewModels
 
         public void LoadFile(PackFile file)
         {
-            CurrentFile = file;
-            DisplayName = file.Name;
-
             try
             {
-                SceneData = CscScene.Load(file.DataSource.ReadData());
+                // Parse first: a file that fails to load must not take over the open scene's
+                // save destination.
+                var scene = CscScene.Load(file.DataSource.ReadData());
+                CurrentFile = file;
+                DisplayName = file.Name;
+                SceneData = scene;
                 _context.Duration = SceneData.Duration;
                 _context.CurrentTime = 0;
                 _context.IsPlaying = false;
@@ -313,7 +315,7 @@ namespace Editors.CscEditor.ViewModels
 
                 var warning = SceneData.ManifestParsed
                     ? ""
-                    : " (manifest not editable - keyframe add/remove disabled)";
+                    : " (manifest not editable - adding/removing elements and keyframes disabled)";
                 StatusText = $"{SceneData.Elements.Count} elements, ROOT v{SceneData.RootVersion}, " +
                              $"duration {SceneData.Duration:0.##}s{warning}";
                 NotifyPropertyChanged(nameof(Duration));
@@ -432,7 +434,7 @@ namespace Editors.CscEditor.ViewModels
                 return;
 
             _context.Duration = SceneData.Duration;
-            var warning = SceneData.ManifestParsed ? "" : " (manifest not editable - keyframe add/remove disabled)";
+            var warning = SceneData.ManifestParsed ? "" : " (manifest not editable - adding/removing elements and keyframes disabled)";
             StatusText = $"{SceneData.Elements.Count} elements, ROOT v{SceneData.RootVersion}, " +
                          $"duration {SceneData.Duration:0.##}s{warning}";
         }
@@ -614,7 +616,7 @@ namespace Editors.CscEditor.ViewModels
 
         void AddElement(CscElementKind kind, string assetPath = "")
         {
-            if (SceneData == null)
+            if (SceneData == null || !EnsureStructureEditable())
                 return;
 
             // New elements go into ROOT's attach tree, so a nested selection falls back to its
@@ -658,7 +660,7 @@ namespace Editors.CscEditor.ViewModels
         void DeleteSelected()
         {
             var vm = SelectedElement;
-            if (vm == null || SceneData == null)
+            if (vm == null || SceneData == null || !EnsureStructureEditable())
                 return;
 
             if (vm.Element.IsNested)
@@ -712,7 +714,7 @@ namespace Editors.CscEditor.ViewModels
         /// <summary>Reparents via tree drag-drop or the Detach command. Null parent = top level.</summary>
         public void ReparentElement(CscElementViewModel? childVm, CscElementViewModel? newParentVm)
         {
-            if (childVm == null || SceneData == null || childVm == newParentVm)
+            if (childVm == null || SceneData == null || childVm == newParentVm || !EnsureStructureEditable())
                 return;
 
             if (!SceneData.Reparent(childVm.Element, newParentVm?.Element))
@@ -743,6 +745,15 @@ namespace Editors.CscEditor.ViewModels
             StatusText = newParentVm != null
                 ? $"[{childVm.Element.Id}] attached to [{newParentVm.Element.Id}]"
                 : $"[{childVm.Element.Id}] detached (top level)";
+        }
+
+        bool EnsureStructureEditable()
+        {
+            if (ManifestEditable)
+                return true;
+
+            StatusText = "The manifest could not be parsed, so elements can't be added, deleted or moved in this scene";
+            return false;
         }
 
         void FocusSelected()
