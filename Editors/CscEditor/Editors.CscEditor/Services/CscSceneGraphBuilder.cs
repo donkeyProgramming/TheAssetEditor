@@ -82,9 +82,11 @@ namespace Editors.CscEditor.Services
         public Dictionary<int, CscModelContent> ModelContents { get; } = [];
         public List<CscSubScene> SubScenes { get; } = [];
 
-        /// <summary>Ids handed to elements of referenced sub-scenes; far above anything a real
-        /// scene uses so they can share the node/content dictionaries without colliding.</summary>
-        int _nextExternalId = 1_000_000;
+        /// <summary>Ids handed to elements of referenced sub-scenes, so they can share the
+        /// node/content dictionaries with the host scene. They count down from int.MaxValue and
+        /// skip every id the host scene uses, so no host id can be overwritten.</summary>
+        int _nextExternalId = int.MaxValue;
+        readonly HashSet<int> _usedElementIds = [];
         readonly HashSet<string> _subSceneLoadStack = new(StringComparer.OrdinalIgnoreCase);
 
         public CscSceneGraphBuilder(
@@ -106,6 +108,9 @@ namespace Editors.CscEditor.Services
         public void Build(CscScene scene)
         {
             Clear();
+            foreach (var element in scene.AllElementsIncludingNested())
+                _usedElementIds.Add(element.Id);
+
             _sceneRoot = _sceneManager.RootNode.AddObject(new GroupNode("CSC_Scene") { IsEditable = false });
             foreach (var element in scene.AllElementsIncludingNested())
                 AddElement(element);
@@ -125,7 +130,8 @@ namespace Editors.CscEditor.Services
             ElementNodes.Clear();
             ModelContents.Clear();
             SubScenes.Clear();
-            _nextExternalId = 1_000_000;
+            _usedElementIds.Clear();
+            _nextExternalId = int.MaxValue;
         }
 
         public void AddElement(CscElement element)
@@ -133,6 +139,7 @@ namespace Editors.CscEditor.Services
             if (_sceneRoot == null)
                 return;
 
+            _usedElementIds.Add(element.Id);
             var node = _sceneRoot.AddObject(new CscElementSceneNode(element, _context));
             ElementNodes[element.Id] = node;
             AddContent(node, element);
@@ -560,7 +567,7 @@ namespace Editors.CscEditor.Services
                 var sub = new CscSubScene { Host = host, Scene = scene };
                 foreach (var element in scene.AllElementsIncludingNested())
                 {
-                    element.Id = _nextExternalId++;
+                    element.Id = AllocateExternalId(_usedElementIds, ref _nextExternalId);
                     element.IsExternal = true;
                     sub.ElementIds.Add(element.Id);
                 }
@@ -579,6 +586,22 @@ namespace Editors.CscEditor.Services
             {
                 _subSceneLoadStack.Remove(pathKey);
             }
+        }
+
+        internal static int AllocateExternalId(HashSet<int> usedIds, ref int nextCandidate)
+        {
+            while (usedIds.Contains(nextCandidate))
+            {
+                if (nextCandidate == int.MinValue)
+                    throw new InvalidOperationException("No free CSC element ids remain.");
+                nextCandidate--;
+            }
+
+            var allocated = nextCandidate;
+            usedIds.Add(allocated);
+            if (nextCandidate != int.MinValue)
+                nextCandidate--;
+            return allocated;
         }
     }
 }
