@@ -38,8 +38,17 @@ namespace Shared.GameFormats.AnimationMeta.Definitions
 
         // Part of the inteface - not the metedata file
         public bool Tracking { get; set; } = false;
-        public float EffectStartTime { get => 0; set; }
-        public float EffectEndTime { get => 0; set; }
+        // EFFECT v1 keeps its times as float32 bits in the two base ints. Ported from Szy-Cathay/TheAssetEditor-CN.
+        public float EffectStartTime
+        {
+            get => BitConverter.Int32BitsToSingle(UnknownIntBase_v0);
+            set => UnknownIntBase_v0 = BitConverter.SingleToInt32Bits(value);
+        }
+        public float EffectEndTime
+        {
+            get => BitConverter.Int32BitsToSingle(UnknownIntBase_v1);
+            set => UnknownIntBase_v1 = BitConverter.SingleToInt32Bits(value);
+        }
 
     }
 
@@ -63,8 +72,8 @@ namespace Shared.GameFormats.AnimationMeta.Definitions
 
         // Part of the inteface - not the metedata file
         public bool Tracking { get; set; } = false;
-        public float EffectStartTime { get => 0; set; }
-        public float EffectEndTime { get => 0; set; }
+        public float EffectStartTime { get => StartTime; set => StartTime = value; }
+        public float EffectEndTime { get => EndTime; set => EndTime = value; }
     }
 
     [MetaData("EFFECT", 3)]
@@ -115,8 +124,8 @@ namespace Shared.GameFormats.AnimationMeta.Definitions
 
 
         // Part of the inteface - not the metedata file
-        public float EffectStartTime { get => StartTime; set; }
-        public float EffectEndTime { get => EndTime; set; }
+        public float EffectStartTime { get => StartTime; set => StartTime = value; }
+        public float EffectEndTime { get => EndTime; set => EndTime = value; }
     }
 
     [MetaData("EFFECT", 11)]
@@ -151,8 +160,8 @@ namespace Shared.GameFormats.AnimationMeta.Definitions
 
 
         // Part of the inteface - not the metedata file
-        public float EffectStartTime { get => StartTime; set; }
-        public float EffectEndTime { get => EndTime; set; }
+        public float EffectStartTime { get => StartTime; set => StartTime = value; }
+        public float EffectEndTime { get => EndTime; set => EndTime = value; }
     }
 
     [MetaData("EFFECT", 12)]
@@ -191,8 +200,8 @@ namespace Shared.GameFormats.AnimationMeta.Definitions
 
 
         // Part of the inteface - not the metedata file
-        public float EffectStartTime { get => StartTime; set; }
-        public float EffectEndTime { get => EndTime; set; }
+        public float EffectStartTime { get => StartTime; set => StartTime = value; }
+        public float EffectEndTime { get => EndTime; set => EndTime = value; }
     }
 
 
