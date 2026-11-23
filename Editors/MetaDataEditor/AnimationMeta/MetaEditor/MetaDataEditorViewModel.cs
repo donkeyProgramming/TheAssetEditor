@@ -22,10 +22,15 @@ namespace Editors.AnimationMeta.Presentation
         [ObservableProperty] ObservableCollection<MetaDataEntry> _tags = [];
         [ObservableProperty] int _metaDataFileVersion;
 
+        // Tags added, deleted, moved or pasted since the file was loaded or saved; edited values are tracked by each field.
+        bool _hasStructuralChanges;
+
         public bool HasUnsavedChanges
         {
             get 
             {
+                if (_hasStructuralChanges)
+                    return true;
                 foreach (var tag in Tags)
                 {
                     foreach(var variable in tag.Variables)
@@ -40,10 +45,14 @@ namespace Editors.AnimationMeta.Presentation
             }
             set 
             {
-                foreach (var tag in Tags)
+                _hasStructuralChanges = value;
+                if (value == false)
                 {
-                    foreach (var variable in tag.Variables)
-                        variable.IsModified = false;
+                    foreach (var tag in Tags)
+                    {
+                        foreach (var variable in tag.Variables)
+                            variable.IsModified = false;
+                    }
                 }
             }
 
@@ -93,11 +102,15 @@ namespace Editors.AnimationMeta.Presentation
                 MetaDataFileVersion = ParsedFile.Version;
             }
 
+            Tags.Clear();
             UpdateView();
+            _hasStructuralChanges = false;
         }
 
         public void UpdateView()
         {
+            if (ParsedFile != null && !Tags.Select(x => (object)x._input).SequenceEqual(ParsedFile.Attributes))
+                _hasStructuralChanges = true;
             Tags.Clear();
             if (ParsedFile == null)
                 return;

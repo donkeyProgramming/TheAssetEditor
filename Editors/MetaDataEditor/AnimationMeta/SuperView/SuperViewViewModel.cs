@@ -507,12 +507,17 @@ namespace Editors.AnimationMeta.SuperView
             base.Close();
         }
 
+        // Only a file with changes is written: the persistent META is shared by every animation of the unit, and saving it
+        // untouched would put a copy of the vanilla file in the mod pack. A slot with no META file has nothing to save.
         public bool Save()
         {
-            var res0 = PersistentMetaEditor.Save();
-            var res1 = MetaEditor.Save();
+            var res0 = SaveIfChanged(PersistentMetaEditor);
+            var res1 = SaveIfChanged(MetaEditor);
             return res0 && res1;
         }
+
+        static bool SaveIfChanged(MetaDataEditorViewModel editor) =>
+            editor.CurrentFile == null || editor.ParsedFile == null || !editor.HasUnsavedChanges || editor.Save();
     }
 
     public enum MetaDataEditTool
