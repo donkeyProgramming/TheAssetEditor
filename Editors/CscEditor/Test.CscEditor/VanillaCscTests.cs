@@ -1,4 +1,5 @@
 using Editors.CscEditor.Data;
+using Editors.CscEditor.ViewModels;
 using Shared.Core.PackFiles.Models;
 using Shared.Core.PackFiles.Utility;
 using Test.TestingUtility.Shared;
@@ -55,6 +56,35 @@ namespace Test.CscEditor
             Assert.That(files, Has.Count.GreaterThan(2000));
             Assert.That(rootVersions.ContainsKey(6), "patch 6.x+ scenes use ROOT v6");
             Assert.That(failures, Is.Empty, string.Join("\n", failures.Take(20)));
+        }
+
+        [Test]
+        public void EveryLegacyCamera_PositionAndFovEdits_SurviveSaveAndReload()
+        {
+            var checkedCameras = 0;
+            foreach (var (path, bytes) in Files())
+            {
+                var scene = CscScene.Load(bytes);
+                foreach (var camera in scene.AllElementsIncludingNested().Where(e => e.Kind == CscElementKind.Camera && e.ElementVersion == 5).ToList())
+                {
+                    var viewModel = new CscElementViewModel(camera, (_, _) => { });
+                    Assert.That(viewModel.IsEditable, Is.True, path);
+                    var previousFov = camera.CameraFov!.StaticValue;
+                    var previousPosition = camera.EvaluatePosition(0);
+                    viewModel.PositionX += 0.25f;
+                    viewModel.CameraFov += 1;
+
+                    var saved = CscScene.Load(CscSceneWriter.Write(scene)).FindElement(camera.Id)!;
+                    Assert.Multiple(() =>
+                    {
+                        Assert.That(saved.EvaluatePosition(0).X, Is.EqualTo(previousPosition.X + 0.25f), path);
+                        Assert.That(saved.CameraFov!.StaticValue, Is.EqualTo(previousFov + 1), path);
+                        Assert.That(saved.TypeRecord!.Version, Is.EqualTo(camera.TypeRecord!.Version), path);
+                    });
+                    checkedCameras++;
+                }
+            }
+            Assert.That(checkedCameras, Is.EqualTo(37), "vanilla WH3 has 37 ELEMENT v5 cameras");
         }
     }
 }

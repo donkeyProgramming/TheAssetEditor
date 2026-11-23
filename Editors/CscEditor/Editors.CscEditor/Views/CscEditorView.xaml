@@ -305,7 +305,7 @@
                                 <TextBlock Text="Y°"/><TextBox Text="{Binding RotationYDegrees, Converter={StaticResource CscFloat}, StringFormat=0.##}"/>
                                 <TextBlock Text="Z°"/><TextBox Text="{Binding RotationZDegrees, Converter={StaticResource CscFloat}, StringFormat=0.##}"/>
                                 <TextBlock Text="{loc:Loc CscEditor.Scale}"/><TextBox Text="{Binding ScaleValue, Converter={StaticResource CscFloat}, StringFormat=0.###}"/>
-                                <TextBlock Text="{loc:Loc CscEditor.Weight}"/><TextBox Text="{Binding WeightValue, Converter={StaticResource CscFloat}, StringFormat=0.###}"/>
+                                <TextBlock Text="{loc:Loc CscEditor.Weight}" Visibility="{Binding HasWeight, Converter={StaticResource BoolToVis}}"/><TextBox Visibility="{Binding HasWeight, Converter={StaticResource BoolToVis}}" Text="{Binding WeightValue, Converter={StaticResource CscFloat}, StringFormat=0.###}"/>
                             </UniformGrid>
 
                             <TextBlock FontWeight="Bold" Text="{loc:Loc CscEditor.BasePlacement}" Margin="2,8,2,0"/>
@@ -400,10 +400,10 @@
                             <StackPanel Visibility="{Binding IsCamera, Converter={StaticResource BoolToVis}, FallbackValue=Collapsed}">
                                 <TextBlock FontWeight="Bold" Text="{loc:Loc CscEditor.Camera}" Margin="2,8,2,0"/>
                                 <UniformGrid Columns="6">
-                                    <TextBlock Text="{loc:Loc CscEditor.FOV}"/><TextBox Text="{Binding CameraFov, Converter={StaticResource CscFloat}, StringFormat=0.##}"/>
-                                    <TextBlock Text="{loc:Loc CscEditor.Roll}"/><TextBox Text="{Binding CameraRollDegrees, Converter={StaticResource CscFloat}, StringFormat=0.##}"/>
-                                    <TextBlock Text="{loc:Loc CscEditor.Near}"/><TextBox Text="{Binding CameraNear, Converter={StaticResource CscFloat}, StringFormat=0.###}"/>
-                                    <TextBlock Text="{loc:Loc CscEditor.Far}"/><TextBox Text="{Binding CameraFar, Converter={StaticResource CscFloat}, StringFormat=0.###}"/>
+                                    <TextBlock Text="{loc:Loc CscEditor.FOV}" Visibility="{Binding HasCameraFov, Converter={StaticResource BoolToVis}}"/><TextBox Visibility="{Binding HasCameraFov, Converter={StaticResource BoolToVis}}" Text="{Binding CameraFov, Converter={StaticResource CscFloat}, StringFormat=0.##}"/>
+                                    <TextBlock Text="{loc:Loc CscEditor.Roll}" Visibility="{Binding HasCameraRoll, Converter={StaticResource BoolToVis}}"/><TextBox Visibility="{Binding HasCameraRoll, Converter={StaticResource BoolToVis}}" Text="{Binding CameraRollDegrees, Converter={StaticResource CscFloat}, StringFormat=0.##}"/>
+                                    <TextBlock Text="{loc:Loc CscEditor.Near}" Visibility="{Binding HasCameraNear, Converter={StaticResource BoolToVis}}"/><TextBox Visibility="{Binding HasCameraNear, Converter={StaticResource BoolToVis}}" Text="{Binding CameraNear, Converter={StaticResource CscFloat}, StringFormat=0.###}"/>
+                                    <TextBlock Text="{loc:Loc CscEditor.Far}" Visibility="{Binding HasCameraFar, Converter={StaticResource BoolToVis}}"/><TextBox Visibility="{Binding HasCameraFar, Converter={StaticResource BoolToVis}}" Text="{Binding CameraFar, Converter={StaticResource CscFloat}, StringFormat=0.###}"/>
                                 </UniformGrid>
 
                                 <!-- CAMERA_ELEMENT carries an extra Bool between the roll and near

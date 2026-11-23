@@ -89,6 +89,7 @@ namespace Editors.CscEditor.ViewModels
                 RebuildCurveSeries();
                 NotifyPropertyChanged(nameof(HasSelection));
                 NotifyPropertyChanged(nameof(IsElementSelected));
+                NotifyPropertyChanged(nameof(CurveStructureLocked));
             }
         }
 
@@ -149,9 +150,10 @@ namespace Editors.CscEditor.ViewModels
         public bool IsPlaying => _context.IsPlaying;
         public bool ManifestEditable => SceneData?.ManifestParsed ?? false;
 
-        /// <summary>True when keyframes must not be added/removed (the file's COMPOSITE_SCENE
-        /// manifest could not be parsed, so keyframe counts cannot be restated on save).</summary>
-        public bool CurveStructureLocked => !ManifestEditable;
+        /// <summary>True when keyframes must not be added/removed: the file's COMPOSITE_SCENE
+        /// manifest could not be parsed (so keyframe counts cannot be restated on save), or the
+        /// selected element is an ELEMENT v5 whose transform can't hold keys.</summary>
+        public bool CurveStructureLocked => !ManifestEditable || SelectedElement?.Element.IsStaticTransform == true;
 
         // ---- Curve editor ----
         public ObservableCollection<CurveSeries> CurveSeriesList { get; } = [];
@@ -700,8 +702,8 @@ namespace Editors.CscEditor.ViewModels
             SelectedCurveSeries = null;
 
             var element = SelectedElement?.Element;
-            if (element == null)
-                return;
+            if (element == null || element.IsStaticTransform)
+                return; // v5: no channel data to show, its fixed values are in the details panel
 
             void Add(string name, System.Windows.Media.Color colour, CscChannel channel) =>
                 CurveSeriesList.Add(new CurveSeries { Name = name, Colour = colour, Channel = channel });

@@ -480,8 +480,9 @@ namespace Editors.CscEditor.Data
             }
 
             // The v6/v7/v100 shape: header(6) + Group(3) pos + Group(3) rot + Group(1) scale
-            // + Group(1) weight + Coord3d + Coord3d + trailing extras. Anything else (legacy v5)
-            // is preserved verbatim and read-only.
+            // + Group(1) weight + Coord3d + Coord3d + trailing extras. v5 stores a fixed transform
+            // instead (see CscElement.IsStaticTransform); anything else is preserved verbatim
+            // and read-only.
             var groups = CurveDetector.DetectGroups(fields);
             var contiguous = groups.Count == 4 && groups[0].StartIndex == 6;
             if (contiguous)
@@ -521,7 +522,38 @@ namespace Editors.CscEditor.Data
             }
 
             if (!contiguous)
-                element.IsLegacyRaw = true;
+            {
+                // v5 transforms are decoded for every kind, so legacy scenes display in place,
+                // but only cameras become editable: their CAMERA_ELEMENT v1/v2 records are the
+                // only v5 type records the writer rebuilds. Other v5 elements stay verbatim.
+                var isStatic = TryDecodeStaticTransform(element, fields);
+                element.IsLegacyRaw = !isStatic || element.Kind != CscElementKind.Camera;
+            }
+        }
+
+        static bool TryDecodeStaticTransform(CscElement element, List<EsfNode> fields)
+        {
+            if (element.ElementVersion != 5 || element.ElementRecord?.Groups is not { Count: 1 } || fields.Count != 17 ||
+                fields[6].Value is not Coord3d position || fields[12].Value is not Coord3d basePosition ||
+                new[] { 7, 8, 9, 10, 11, 13, 14, 15, 16 }.Any(i => fields[i].Kind != EsfNodeKind.F32))
+                return false;
+
+            var rotation = new Quaternion((float)fields[7].Value!, (float)fields[8].Value!, (float)fields[9].Value!, (float)fields[10].Value!);
+            var baseRotation = new Quaternion((float)fields[13].Value!, (float)fields[14].Value!, (float)fields[15].Value!, (float)fields[16].Value!);
+            if (!float.IsFinite(rotation.LengthSquared()) || rotation.LengthSquared() < 1e-8f ||
+                !float.IsFinite(baseRotation.LengthSquared()) || baseRotation.LengthSquared() < 1e-8f)
+                return false;
+
+            element.IsStaticTransform = true;
+            element.Position = CscChannelGroup.CreateStatic(position.X, position.Y, position.Z);
+            element.StaticRotation = rotation;
+            element.StaticRotationEuler = CscElement.ToEulerXyz(Matrix.CreateFromQuaternion(rotation));
+            element.Rotation = CscChannelGroup.CreateStatic(element.StaticRotationEuler.X, element.StaticRotationEuler.Y, element.StaticRotationEuler.Z);
+            element.Scale = CscChannelGroup.CreateStatic((float)fields[11].Value!);
+            element.BasePosition = new Vector3(basePosition.X, basePosition.Y, basePosition.Z);
+            element.StaticBaseRotation = baseRotation;
+            element.BaseRotation = element.StaticBaseRotationEuler = CscElement.ToEulerXyz(Matrix.CreateFromQuaternion(baseRotation));
+            return true;
         }
 
         static void DecodePeriodRecord(CscElement element, EsfNode record)
@@ -550,6 +582,22 @@ namespace Editors.CscEditor.Data
         static void DecodeTypeRecord(CscElement element, EsfNode record)
         {
             var fields = record.Children.ToList();
+
+            // CAMERA_ELEMENT v1 = [fov], v2 = [fov, near, far, Bool, F32, F32, F32]. Vanilla v2
+            // values are 30, 0.5, 20000, False, 1, 1, 0.2; the last three are kept verbatim.
+            if (element.Kind == CscElementKind.Camera && record.Groups is { Count: 1 } && fields.Count > 0 && fields[0].Value is float fov &&
+                (record.Version == 1 && fields.Count == 1 ||
+                 record.Version == 2 && fields.Count == 7 && fields[1].Kind == EsfNodeKind.F32 && fields[2].Kind == EsfNodeKind.F32 && fields[3].Kind == EsfNodeKind.Bool))
+            {
+                element.StaticCameraFov = new CscChannel { Header = fov };
+                if (record.Version == 2)
+                {
+                    element.StaticCameraNear = new CscChannel { Header = (float)fields[1].Value! };
+                    element.StaticCameraFar = new CscChannel { Header = (float)fields[2].Value! };
+                    element.CameraUnknownFlagNode = fields[3];
+                    element.CameraUnknownFlag = fields[3].Value is true;
+                }
+            }
 
             if (element.Kind == CscElementKind.AnimationNodeTransform)
             {

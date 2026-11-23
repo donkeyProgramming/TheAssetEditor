@@ -219,7 +219,7 @@ namespace Editors.CscEditor.Services
                 return;
 
             var deltaMatrix = (Matrix)e.Value!;
-            var euler = ToEulerXyz(deltaMatrix);
+            var euler = CscElement.ToEulerXyz(deltaMatrix);
 
             var channels = _element!.Rotation?.Channels;
             if (channels == null || channels.Count < 3)
@@ -248,28 +248,6 @@ namespace Editors.CscEditor.Services
 
             channels[0].ScaleAll(factor);
             ElementModified?.Invoke();
-        }
-
-        /// <summary>
-        /// Extracts (x, y, z) Euler angles from a rotation matrix under the Rx*Ry*Rz row-vector
-        /// composition this editor uses for CSC rotations. Exact for that convention; drag deltas
-        /// are tiny per-event, so accumulation stays stable.
-        /// </summary>
-        internal static Vector3 ToEulerXyz(Matrix m)
-        {
-            var y = MathF.Asin(Math.Clamp(-m.M13, -1f, 1f));
-            float x, z;
-            if (MathF.Abs(m.M13) < 0.9999f)
-            {
-                x = MathF.Atan2(m.M23, m.M33);
-                z = MathF.Atan2(m.M12, m.M11);
-            }
-            else
-            {
-                x = MathF.Atan2(-m.M32, m.M22);
-                z = 0;
-            }
-            return new Vector3(x, y, z);
         }
 
         public void Dispose()

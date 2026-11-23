@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Microsoft.Xna.Framework;
 using Shared.GameFormats.Csc;
 using Shared.GameFormats.Esf;
 
@@ -144,6 +145,9 @@ namespace Editors.CscEditor.Data
 
         static EsfNode RebuildElementRecord(CscElement element, EsfNode record)
         {
+            if (element.IsStaticTransform)
+                return RebuildStaticElementRecord(element, record);
+
             if (!HasSingleGroup(record) || element.Position == null || element.Rotation == null ||
                 element.Scale == null || element.Weight == null)
                 return record;
@@ -192,12 +196,70 @@ namespace Editors.CscEditor.Data
             return RebuildRecord(record, fields);
         }
 
+        /// <summary>ELEMENT v5: the fixed 17-field transform (see CscElement.IsStaticTransform).</summary>
+        static EsfNode RebuildStaticElementRecord(CscElement element, EsfNode record)
+        {
+            if (new[] { element.Position, element.Rotation, element.Scale }.Any(g => g?.Channels.Any(c => c.Keyframes.Count != 0) == true))
+                throw new InvalidDataException($"Element {element.Id}: ELEMENT v5 stores a fixed transform and can't hold keyframes.");
+
+            var fields = record.Children.ToList();
+            var position = element.EvaluatePosition(0);
+            var rotation = element.CurrentStaticRotation();
+            var baseRotation = element.CurrentStaticBaseRotation();
+            float[] rotationComponents = [rotation.X, rotation.Y, rotation.Z, rotation.W];
+            float[] baseRotationComponents = [baseRotation.X, baseRotation.Y, baseRotation.Z, baseRotation.W];
+
+            fields[0] = Keep(fields[0], (uint)element.Id, () => EsfNode.Leaf(EsfNodeKind.U32, (uint)element.Id, fields[0].Optimized));
+            fields[1] = Keep(fields[1], element.HeaderString, () => EsfNode.Leaf(EsfNodeKind.Ascii, element.HeaderString));
+            fields[2] = StaticFloat(fields[2], element.Begin);
+            fields[3] = StaticFloat(fields[3], element.End);
+            fields[4] = Keep(fields[4], element.TimingMode, () => EsfNode.Leaf(EsfNodeKind.Ascii, element.TimingMode));
+            fields[5] = Keep(fields[5], element.AnchorMode, () => EsfNode.Leaf(EsfNodeKind.Ascii, element.AnchorMode));
+            fields[6] = StaticCoord(fields[6], position);
+            for (var i = 0; i < 4; i++)
+                fields[7 + i] = StaticFloat(fields[7 + i], rotationComponents[i]);
+            fields[11] = StaticFloat(fields[11], element.EvaluateScale(0));
+            fields[12] = StaticCoord(fields[12], element.BasePosition);
+            for (var i = 0; i < 4; i++)
+                fields[13 + i] = StaticFloat(fields[13 + i], baseRotationComponents[i]);
+            return RebuildRecord(record, fields);
+        }
+
+        /// <summary>Keeps the original node (and so its optimized/compact encoding) when the value
+        /// didn't change, so an untouched v5 record writes back byte-identical.</summary>
+        static EsfNode StaticFloat(EsfNode original, float value) =>
+            original.Value is float old && old.Equals(value) ? original : EsfNode.Leaf(EsfNodeKind.F32, value);
+
+        static EsfNode StaticCoord(EsfNode original, Vector3 value) =>
+            original.Value is Coord3d old && old.X.Equals(value.X) && old.Y.Equals(value.Y) && old.Z.Equals(value.Z)
+                ? original
+                : EsfNode.Leaf(EsfNodeKind.Coord3d, new Coord3d(value.X, value.Y, value.Z));
+
+        static EsfNode Keep(EsfNode original, object value, Func<EsfNode> rebuild) =>
+            Equals(original.Value, value) ? original : rebuild();
+
         static EsfNode RebuildTypeRecord(CscElement element, EsfNode record)
         {
             if (!HasSingleGroup(record))
                 return record;
 
             var originalFields = record.Groups![0];
+            if (element.StaticCameraFov != null)
+            {
+                if (new[] { element.StaticCameraFov, element.StaticCameraNear, element.StaticCameraFar }.Any(c => c?.Keyframes.Count > 0))
+                    throw new InvalidDataException($"Element {element.Id}: CAMERA_ELEMENT v{record.Version} stores fixed values and can't hold keyframes.");
+
+                var staticFields = originalFields.ToList();
+                staticFields[0] = StaticFloat(staticFields[0], element.StaticCameraFov.StaticValue);
+                if (element.StaticCameraNear != null && element.StaticCameraFar != null)
+                {
+                    staticFields[1] = StaticFloat(staticFields[1], element.StaticCameraNear.StaticValue);
+                    staticFields[2] = StaticFloat(staticFields[2], element.StaticCameraFar.StaticValue);
+                    if (staticFields[3].Value is not bool flag || flag != element.CameraUnknownFlag)
+                        staticFields[3] = EsfNode.Leaf(EsfNodeKind.Bool, element.CameraUnknownFlag);
+                }
+                return RebuildRecord(record, staticFields);
+            }
             var fields = new List<EsfNode>(originalFields.Count);
 
             // Channel-group runs are re-detected on the original fields and spliced with the
