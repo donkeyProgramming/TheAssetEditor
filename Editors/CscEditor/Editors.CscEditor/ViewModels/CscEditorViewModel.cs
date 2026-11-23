@@ -441,7 +441,7 @@ namespace Editors.CscEditor.ViewModels
             _context.CurrentTime = Math.Clamp(currentTime, 0, Math.Max(0, _context.Duration));
             SceneRootItems[0].SetScene(SceneData);
 
-            _sceneBuilder.Build(SceneData);
+            _sceneBuilder.Rebind(SceneData);
             RebuildElementTree();
             _animation.SetScene(SceneData);
 
