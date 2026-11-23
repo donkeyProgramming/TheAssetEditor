@@ -12,10 +12,11 @@ namespace Editors.AnimationMeta.SuperView.Visualisation.Rules
         readonly int _boneId;
 
         bool _hasError = false;
-        Vector3 _offsetPos;
-        Quaternion _offsetRot;
+        // Read on every frame, so the prop follows its tag while the tag is being dragged.
+        readonly Func<Vector3> _offsetPos;
+        readonly Func<Quaternion> _offsetRot;
 
-        public CopyRootTransform(ISkeletonProvider skeleton, int boneId, Vector3 offsetPos, Quaternion offsetRot)
+        public CopyRootTransform(ISkeletonProvider skeleton, int boneId, Func<Vector3> offsetPos, Func<Quaternion> offsetRot)
         {
             _skeletonProvider = skeleton;
             _boneId = boneId;
@@ -31,7 +32,7 @@ namespace Editors.AnimationMeta.SuperView.Visualisation.Rules
             try
             {
                 var transform = _skeletonProvider.Skeleton.GetAnimatedWorldTranform(_boneId);
-                var m = Matrix.CreateFromQuaternion(_offsetRot) * Matrix.CreateTranslation(_offsetPos) * transform;
+                var m = Matrix.CreateFromQuaternion(_offsetRot()) * Matrix.CreateTranslation(_offsetPos()) * transform;
                 frame.BoneTransforms[0].WorldTransform = m;
             }
             catch (Exception e)

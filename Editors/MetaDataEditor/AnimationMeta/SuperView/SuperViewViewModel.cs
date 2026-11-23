@@ -384,9 +384,10 @@ namespace Editors.AnimationMeta.SuperView
             var editor = change.Owner as MetaDataEditorViewModel;
             if (change.Kind == CombatMetaDataEditChangeKind.Preview)
             {
-                // An effect's locator follows its tag on the next frame, and its particles are rebuilt when the drag ends.
-                // The line markers are cheap to redraw.
-                if (change.Source is not IEffectMeta)
+                // Effects, props and most markers follow their tag on the next frame and are rebuilt when the drag ends
+                // (an effect's particles, a prop's model). IMPACT_POS, TARGET_POS, FIRE_POS and SPLASH_ATTACK are drawn
+                // where their values put them, and cheap to redraw.
+                if (FindPreview(change.Source) is not { FollowsTagLive: true })
                     RebuildMarkersDuringDrag();
                 editor?.RefreshAttributeValues(change.Source, countAsEdit: false);
                 return;

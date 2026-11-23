@@ -1,4 +1,4 @@
-using GameWorld.Core.SceneNodes;
+﻿using GameWorld.Core.SceneNodes;
 using Microsoft.Xna.Framework;
 using Shared.GameFormats.AnimationMeta.Parsing;
 
@@ -25,6 +25,8 @@ namespace Editors.AnimationMeta.SuperView.Visualisation
         ParsedMetadataAttribute Source { get; }
         Vector3 FocusPosition { get; }
         Matrix ReferenceWorldTransform { get; }
+        // Placed from the tag's values on every update, so a drag needs no rebuild until it ends.
+        bool FollowsTagLive { get; }
     }
 
     // A tag whose marker the viewport can hover and click.

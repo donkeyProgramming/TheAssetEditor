@@ -123,6 +123,37 @@ namespace Test.AnimationMeta
             }));
         }
 
+        // BLOOD tracking its bone: a marker at its Position on the bone, which follows the tag before any rebuild.
+        [Test]
+        public void TrackedBloodMarker_IsOnItsBone_AndFollowsTheTag()
+        {
+            var blood = new Blood_v11 { Tracking = true, NodeIndex = 1, Position = new Vector3(0, 0, 1), Orientation = new Vector4(0, 0, 0, 1) };
+            _player.Refresh();
+            var instance = (IMetaDataMarkerPreview)Build(null, Meta(blood)).Single();
+            ((IMetaDataInstance)instance).Update(0);
+
+            // The fx bone is at (0, 1, 0) on the first frame.
+            Assert.That(instance.ReferenceWorldTransform.Translation, Is.EqualTo(new Vector3(0, 1, 0)).Using<Vector3>(Vector3Tolerance));
+            Assert.That(instance.HitTargets.Single().Position, Is.EqualTo(new Vector3(0, 1, 1)).Using<Vector3>(Vector3Tolerance));
+            Assert.That(instance.FollowsTagLive, Is.True);
+
+            blood.Position = new Vector3(0, 0, 2);
+            ((IMetaDataInstance)instance).Update(0);
+            Assert.That(instance.FocusPosition, Is.EqualTo(new Vector3(0, 1, 2)).Using<Vector3>(Vector3Tolerance));
+            Assert.That(_root.Children.Single().ModelMatrix.Translation, Is.EqualTo(new Vector3(0, 1, 2)).Using<Vector3>(Vector3Tolerance));
+        }
+
+        // CREW_LOCATION names no bone: its marker is at its Position from the model's root.
+        [Test]
+        public void CrewLocationMarker_IsFromTheRoot()
+        {
+            var crew = new CrewLocation_v10 { Position = new Vector3(1, 2, 3), Orientation = new Vector4(0, 0, 0, 1) };
+            var instance = (IMetaDataMarkerPreview)Build(null, Meta(crew)).Single();
+
+            Assert.That(instance.ReferenceWorldTransform, Is.EqualTo(Matrix.Identity));
+            Assert.That(instance.HitTargets.Single().Position, Is.EqualTo(new Vector3(1, 2, 3)));
+        }
+
         static readonly Func<Vector3, Vector3, bool> Vector3Tolerance = (a, b) => Vector3.Distance(a, b) < 1e-4f;
 
         // The scene object updates its META instances every frame; they take seconds, so an EFFECT reads its bone at

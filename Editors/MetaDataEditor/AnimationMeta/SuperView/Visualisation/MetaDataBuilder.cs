@@ -1,5 +1,6 @@
 ﻿using System.Data;
 using System.Reflection;
+using Editors.AnimationMeta.SuperView.Editing;
 using Editors.AnimationMeta.SuperView.Visualisation.Instances;
 using Editors.AnimationMeta.SuperView.Visualisation.Rules;
 using Editors.Shared.Core.Common;
@@ -166,6 +167,10 @@ namespace Editors.AnimationMeta.SuperView.Visualisation
 
             output.AddRange(file.GetItemsOfType<IAnimatedPropMeta>().Select(x => Keep((ParsedMetadataAttribute)x, selectedAttribute, root, skeleton, rootPlayer, () => CreateAnimatedProp(x, root, skeleton, selectedAttribute, rootPlayer))).Where(x => x != null));
 
+            // PROP: a model on a bone, drawn the way ANIMATED_PROP is.
+            output.AddRange(file.Attributes.OfType<ParsedMetadataAttribute>().Where(x => x.Name == "PROP")
+                .Select(x => Keep(x, selectedAttribute, root, skeleton, rootPlayer, () => CreateStaticProp(x, root, skeleton, selectedAttribute, rootPlayer))).Where(x => x != null));
+
             output.AddRange(file.GetItemsOfType<ImpactPosition_v10>().Select(meteDataItem => CreateStaticLocator(meteDataItem, root, () => meteDataItem.Position, "ImpactPos", selectedAttribute)));
 
             output.AddRange(file.GetItemsOfType<TargetPos_10>().Select(meteDataItem => CreateStaticLocator(meteDataItem, root, () => meteDataItem.Position, "TargetPos", selectedAttribute)));
@@ -173,6 +178,13 @@ namespace Editors.AnimationMeta.SuperView.Visualisation
             output.AddRange(file.GetItemsOfType<FirePos_v10>().Select(meteDataItem => CreateStaticLocator(meteDataItem, root, () => meteDataItem.Position, "FirePos", selectedAttribute)));
 
             output.AddRange(file.GetItemsOfType<SplashAttack_v10>().Select(meteDataItem => CreateSplashAttack(meteDataItem, root, $"SplashAttack_{Math.Round(meteDataItem.EndTime, 2)}", 0.1f, selectedAttribute)));
+
+            // BLOOD, CAMERA_SHAKE_POS, CREW_LOCATION, SOUND_TRIGGER, SOUND_BUILDING and TRANSFORM: a marker at the tag's
+            // position, on its bone where the tag names one.
+            output.AddRange(file.Attributes.OfType<ParsedMetadataAttribute>()
+                .Select(x => SpatialMetaDataCatalog.TryCreate(x, out var binding) && binding.UsesGenericMarker && binding.Kind != SpatialMetaDataKind.Prop ? binding : null)
+                .Where(x => x != null)
+                .Select(x => CreateSpatialMarker(x!, root, skeleton, selectedAttribute)));
 
             if (includeEffects)
                 output.AddRange(file.GetItemsOfType<IEffectMeta>().Where(x => FilterOf(x) == 0 || FilterOf(x) == vfxFilter).Select(x => Keep((ParsedMetadataAttribute)x, selectedAttribute, root, skeleton, rootPlayer, () => CreateEffect(x, root, skeleton, selectedAttribute, rootPlayer, persistent))));
@@ -234,17 +246,29 @@ namespace Editors.AnimationMeta.SuperView.Visualisation
             rootPlayer.AnimationRules.Add(rule);
         }
 
-        private IMetaDataInstance CreateAnimatedProp(IAnimatedPropMeta animatedPropMeta, SceneNode root, ISkeletonProvider rootSkeleton, ParsedMetadataAttribute? selectedMetaDataAttribute, AnimationPlayer rootPlayer)
-        {
-            var propName = "Animated_prop";
-            var color = selectedMetaDataAttribute == animatedPropMeta ? s_selectedColor : s_color;
+        private IMetaDataInstance? CreateAnimatedProp(IAnimatedPropMeta animatedPropMeta, SceneNode root, ISkeletonProvider rootSkeleton, ParsedMetadataAttribute? selectedMetaDataAttribute, AnimationPlayer rootPlayer) =>
+            CreateProp((ParsedMetadataAttribute)animatedPropMeta, "Animated_prop", animatedPropMeta.ModelName, animatedPropMeta.AnimationName, animatedPropMeta.Scale, root, rootSkeleton, selectedMetaDataAttribute, rootPlayer);
 
-            var meshPath = _packFileService.FindFile(animatedPropMeta.ModelName);
+        // PROP v2 to v15 name their model and animation alike; Scale is on v13 and later.
+        private IMetaDataInstance? CreateStaticProp(ParsedMetadataAttribute prop, SceneNode root, ISkeletonProvider rootSkeleton, ParsedMetadataAttribute? selectedMetaDataAttribute, AnimationPlayer rootPlayer)
+        {
+            string? Text(string name) => prop.GetType().GetProperty(name)?.GetValue(prop) as string;
+            var scale = prop.GetType().GetProperty("Scale")?.GetValue(prop) is float value ? value : 1;
+            return CreateProp(prop, "Prop", Text("ModelName") ?? "", Text("AnimationName") ?? "", scale, root, rootSkeleton, selectedMetaDataAttribute, rootPlayer);
+        }
+
+        private IMetaDataInstance? CreateProp(ParsedMetadataAttribute tag, string propName, string modelName, string animationName, float scale, SceneNode root, ISkeletonProvider rootSkeleton, ParsedMetadataAttribute? selectedMetaDataAttribute, AnimationPlayer rootPlayer)
+        {
+            var color = selectedMetaDataAttribute == tag ? s_selectedColor : s_color;
+            // Where the prop sits: its bone, and its position and orientation on it, read from the tag as it is edited.
+            if (!SpatialMetaDataCatalog.TryCreate(tag, out var binding))
+                return null;
+
+            var meshPath = _packFileService.FindFile(modelName);
             if (meshPath == null)
                 return null;
-                //throw new Exception($"Unable to find model for animated prop. Searched for {animatedPropMeta.ModelName} and failed to find it in the pack file service. This is required to visualise the animated prop.");
 
-            var animationPath = _packFileService.FindFile(animatedPropMeta.AnimationName);
+            var animationPath = string.IsNullOrWhiteSpace(animationName) ? null : _packFileService.FindFile(animationName);
             var propPlayer = _animationsContainerComponent.RegisterAnimationPlayer(new AnimationPlayer(), propName + Guid.NewGuid());
 
             // Configure the mesh
@@ -267,7 +291,7 @@ namespace Editors.AnimationMeta.SuperView.Visualisation
                 var skeletonSceneNode = new SkeletonNode(skeleton)
                 {
                     NodeColour = color,
-                    ScaleMult = animatedPropMeta.Scale
+                    ScaleMult = scale
                 };
                 loadedNode.AddObject(skeletonSceneNode);
             }
@@ -279,13 +303,18 @@ namespace Editors.AnimationMeta.SuperView.Visualisation
                     selectableNode.IsSelectable = false;
 
                 if (node is SceneNode sceneNode)
-                    sceneNode.ScaleMult = animatedPropMeta.Scale;
+                    sceneNode.ScaleMult = scale;
             });
-            loadedNode.ScaleMult = animatedPropMeta.Scale;
+            loadedNode.ScaleMult = scale;
 
-            // Add the animation rules
-            var animationRule = new CopyRootTransform(rootSkeleton, animatedPropMeta.BoneId, animatedPropMeta.Position, new Quaternion(animatedPropMeta.Orientation));
-            propPlayer.AnimationRules.Add(animationRule);
+            // A prop with its own animation has its root bone put on the tag's bone by the player's rule; one without
+            // has no frames for a rule to act on, so the instance places its node.
+            var placedByAnimation = animationPath != null;
+            if (placedByAnimation)
+            {
+                var animationRule = new CopyRootTransform(rootSkeleton, binding.BoneIndex ?? -1, () => binding.Position, () => binding.Orientation ?? Quaternion.Identity);
+                propPlayer.AnimationRules.Add(animationRule);
+            }
             if(rootPlayer.IsPlaying)
                 propPlayer.Play();
             propPlayer.Refresh();
@@ -293,7 +322,9 @@ namespace Editors.AnimationMeta.SuperView.Visualisation
             // Add to scene
             root.AddObject(loadedNode);
 
-            return new AnimatedPropInstance(loadedNode, propPlayer);
+            var instance = new AnimatedPropInstance(loadedNode, propPlayer, binding, rootSkeleton, placedByAnimation);
+            instance.Update(rootPlayer.GetTimeUs() / 1_000_000f);
+            return instance;
         }
 
         private IMetaDataInstance CreateStaticLocator(DecodedMetaEntryBase metaData, SceneNode root, Func<Vector3> positionOf, string displayName, ParsedMetadataAttribute? selectedMetaDataAttribute, float scale = 0.3f)
@@ -307,6 +338,32 @@ namespace Editors.AnimationMeta.SuperView.Visualisation
             root.AddObject(node);
 
             return new DrawableMetaInstance(metaData, node, () => [new(positionOf(), MetaDataMarkerPoint.Default)]);
+        }
+
+        // A tag's name and a cross at its position; one that can turn also gets its X, Y and Z axes. Drawn in the tag's
+        // frame, and placed from its values on its bone on every update.
+        private IMetaDataInstance CreateSpatialMarker(SpatialMetaDataBinding binding, SceneNode root, ISkeletonProvider skeleton, ParsedMetadataAttribute? selectedAttribute)
+        {
+            const float Scale = 0.2f;
+            var color = selectedAttribute == binding.Source ? s_selectedColor : s_color;
+            var node = new SimpleDrawableNode(binding.Source.DisplayName);
+            node.AddItem(new WorldTextRenderItem(_resourceLibrary, binding.Source.DisplayName, Vector3.Zero, color));
+            node.AddItem(LineHelper.AddLocator(Vector3.Zero, Scale, color));
+            if (binding.CanRotate)
+            {
+                node.AddItem(LineHelper.AddLine(Vector3.Zero, Vector3.UnitX * Scale, Color.Red));
+                node.AddItem(LineHelper.AddLine(Vector3.Zero, Vector3.UnitY * Scale, Color.Green));
+                node.AddItem(LineHelper.AddLine(Vector3.Zero, Vector3.UnitZ * Scale, Color.Blue));
+            }
+            root.AddObject(node);
+
+            Matrix Local() => Matrix.CreateFromQuaternion(binding.Orientation ?? Quaternion.Identity) * Matrix.CreateTranslation(binding.Position);
+            var instance = new DrawableMetaInstance(binding.Source, node, () => [new(binding.Position, MetaDataMarkerPoint.Default)], Local);
+            var bone = binding.BoneIndex ?? -1;
+            if (binding.AttachToBone && bone >= 0 && bone < (skeleton.Skeleton?.BoneCount ?? 0))
+                instance.FollowBone(skeleton, bone);
+            instance.Update(0);
+            return instance;
         }
 
         private IMetaDataInstance CreateSplashAttack(SplashAttack_v10 splashAttack, SceneNode root, string displayName, float scale, ParsedMetadataAttribute? selectedAttribute)

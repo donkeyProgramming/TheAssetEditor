@@ -48,6 +48,7 @@ namespace Editors.AnimationMeta.SuperView.Visualisation.Instances
 
         public bool IsHitTestVisible => _effect != null && _locator.IsVisible && _locator.Parent != null;
         public float HitTestRadius => 0.3f;
+        public bool FollowsTagLive => true;
         // The bone at the time last shown, inside the node the locator is drawn under.
         public Matrix ReferenceWorldTransform => _boneAt(_currentTime) * MetaDataPreviewMath.WorldOf(_locator.Parent);
         public Vector3 FocusPosition => (Local * ReferenceWorldTransform).Translation;

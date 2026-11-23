@@ -301,6 +301,7 @@ public sealed class MetaDataMarkerPickingTests
         public Matrix ReferenceWorldTransform => Matrix.Identity;
         public bool IsHitTestVisible { get; }
         public float HitTestRadius => 0.3f;
+        public bool FollowsTagLive => false;
         public IReadOnlyList<MetaDataMarkerHitTarget> HitTargets { get; }
 
         public TestMarkerPreview(
