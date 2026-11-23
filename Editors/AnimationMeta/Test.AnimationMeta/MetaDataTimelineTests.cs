@@ -42,9 +42,48 @@ namespace Test.AnimationMeta
             Assert.That(item.TimeRange!.Value.StartTime, Is.EqualTo(0.5f));
         }
 
+        // EFFECT v1 keeps its times as float32 bits in its two base ints (the fork's reading), and re-saves unchanged.
+        // Ported from Szy-Cathay/TheAssetEditor-CN EffectVersionOneTimeTests.
+        [TestCase(.25f, 1.75f)]
+        [TestCase(-.5f, 2.25f)]
+        [TestCase(0f, 0f)]
+        public void EffectV1_ReadsItsTimesFromTheBaseInts(float start, float end)
+        {
+            var bytes = new List<byte>();
+            bytes.AddRange(BitConverter.GetBytes(1));
+            bytes.AddRange(BitConverter.GetBytes(start));
+            bytes.AddRange(BitConverter.GetBytes(end));
+            bytes.AddRange(Shared.ByteParsing.ByteParsers.String.WriteCaString("diagnostic_effect"));
+            bytes.AddRange(Shared.ByteParsing.ByteParsers.String.WriteCaString("true"));
+            foreach (var value in new[] { 1f, 2f, 3f, 0f, 0f, 0f, 1f })
+                bytes.AddRange(BitConverter.GetBytes(value));
+            bytes.AddRange(BitConverter.GetBytes(-1));
+            var payload = bytes.ToArray();
+
+            var parser = new MetaDataFileParser(new MetaDataDatabase());
+            var effect = (Effect_v1)parser.DeSerialize(new ParsedUnknownMetadataAttribute { Name = "EFFECT", Version = 1, Data = payload }, out var error)!;
+
+            Assert.That(error, Is.Null);
+            Assert.That(effect.EffectStartTime, Is.EqualTo(start));
+            Assert.That(effect.EffectEndTime, Is.EqualTo(end));
+            Assert.That(ParsedMetadataTimeRange.TryCreate(effect, out var range), Is.True);
+            Assert.That((range.StartTime, range.EndTime), Is.EqualTo((start, end)));
+            Assert.That(parser.Serialize(effect, out _), Is.EqualTo(payload));
+        }
+
         [Test]
-        public void EffectV1_HasNoTimes() =>
-            Assert.That(Classify(new Effect_v1 { Name = "EFFECT", Version = 1 }).TimeRange, Is.Null);
+        public void EffectV2_UsesItsStartTime() =>
+            Assert.That(new Effect_v3 { StartTime = 0.4f, EndTime = 0.9f }.EffectStartTime, Is.EqualTo(0.4f));
+
+        [TestCase("CAMERA_SHAKE_SCALE")]
+        [TestCase("IMPACT_POS")]
+        [TestCase("TARGET_POS")]
+        public void ZeroRange_OnTagsAddedToTheFork_IsWholeAnimation(string tag) =>
+            Assert.That(ParsedMetadataTimeRange.WholeAnimationZeroRangeTags, Does.Contain(tag));
+
+        [Test]
+        public void ZeroRange_ImpactPos_IsWholeAnimation() =>
+            Assert.That(Classify(new ImpactPosition_v10 { Name = "IMPACT_POS", Version = 10 }).MarkerKind, Is.EqualTo(MetaDataTimelineMarkerKind.WholeAnimation));
 
         // Vanilla authors hundreds of tags a few milliseconds before 0; they still show.
         [Test]

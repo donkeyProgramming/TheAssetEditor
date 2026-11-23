@@ -1,3 +1,5 @@
+using Shared.GameFormats.AnimationMeta.Definitions;
+
 namespace Shared.GameFormats.AnimationMeta.Parsing
 {
     public enum ParsedMetadataZeroRangeBehavior
@@ -17,17 +19,18 @@ namespace Shared.GameFormats.AnimationMeta.Parsing
 
         // Every one of these appears at 0/0 in vanilla WH3 .meta files, mostly so (2026-11-23 scan of 68,625 files).
         // The meaning (whole animation rather than an instant at 0) is the fork's reading, and matches how the
-        // SuperView preview treats DOCK_EQPT_* (active from Start to the end of the clip).
+        // SuperView preview treats DOCK_EQPT_* (active from Start to the end of the clip). CAMERA_SHAKE_SCALE,
+        // IMPACT_POS and TARGET_POS are added here: the fork left them out, but they are mostly 0/0 in vanilla too.
         public static readonly IReadOnlySet<string> WholeAnimationZeroRangeTags = new HashSet<string>
         {
             "ALLOWED_DELTA_SCALE", "ALPHA", "ANIMATED_PROP", "BEARING", "BLEND_OVERRIDE", "BOUNDING_VOLUME_OVERRIDE",
-            "CANNOT_DISMEMBER", "CREW_LOCATION", "DISABLE_FACIAL", "DISABLE_HEAD_TRACKING", "DISABLE_MODEL",
+            "CAMERA_SHAKE_SCALE", "CANNOT_DISMEMBER", "CREW_LOCATION", "DISABLE_FACIAL", "DISABLE_HEAD_TRACKING", "DISABLE_MODEL",
             "DISABLE_PERSISTENT", "DISABLE_PERSISTENT_ID", "DISABLE_PERSISTENT_VFX", "DISTANCE", "DOCK_EQPT_BACK",
             "DOCK_EQPT_LHAND", "DOCK_EQPT_LHAND_2", "DOCK_EQPT_LWAIST", "DOCK_EQPT_RHAND", "DOCK_EQPT_RHAND_2",
-            "DOCK_EQPT_RWAIST", "FACE_POSE", "FULL_BODY", "IGNORE_FOOT_SLIDING", "IMPACT_SPEED", "LHAND_POSE",
+            "DOCK_EQPT_RWAIST", "FACE_POSE", "FULL_BODY", "IGNORE_FOOT_SLIDING", "IMPACT_POS", "IMPACT_SPEED", "LHAND_POSE",
             "MAX_TARGET_SIZE", "MIN_TARGET_SIZE", "NOT_BUILDING", "PARENT_CONSTRAINT", "POSITION", "PROP", "RESCALE",
             "RHAND_POSE", "RIDER_IDLE_SPEED_SCALE", "SC_HEIGHT", "SC_RADIUS", "SC_RATIO", "SHADER_PARAMETER", "SPLICE",
-            "SPLICE_OVERRIDE", "TRANSFORM", "USE_BASE_METADATA", "WEAPON_HIP", "WEAPON_LHAND", "WEAPON_ON",
+            "SPLICE_OVERRIDE", "TARGET_POS", "TRANSFORM", "USE_BASE_METADATA", "WEAPON_HIP", "WEAPON_LHAND", "WEAPON_ON",
             "WEAPON_RHAND", "WOUNDED_POSE",
         };
 
@@ -37,12 +40,13 @@ namespace Shared.GameFormats.AnimationMeta.Parsing
 
         public bool IsInstant => !IsWholeAnimationRange && Math.Abs(EndTime - StartTime) <= BoundaryToleranceSeconds;
 
-        /// <summary>False for tags without times. That includes EFFECT v1: the fork reads its two unknown ints as float
-        /// times, but WH3 has no v1 effects to check that against, so here it stays untimed.</summary>
         public static bool TryCreate(ParsedMetadataAttribute attribute, out ParsedMetadataTimeRange timeRange)
         {
             switch (attribute)
             {
+                case Effect_v1 effect:
+                    timeRange = new(effect.EffectStartTime, effect.EffectEndTime, ParsedMetadataZeroRangeBehavior.Instant);
+                    return true;
                 case DecodedMetaEntryBase_v2 version2:
                     timeRange = new(version2.StartTime, version2.EndTime, GetZeroRangeBehavior(attribute));
                     return true;
