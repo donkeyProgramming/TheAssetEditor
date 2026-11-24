@@ -100,10 +100,17 @@ namespace GameWorld.Core.WpfWindow
         public bool IsFixedTimeStep => false;
 
         /// <summary>
-        /// Gets or sets the target time between two updates. Defaults to 60fps.
-        /// WPF is limiting its rendering to 60 FPS max, therefore setting a target value higher than 60 fps (lower than TimeSpan.FromSeconds(1 / 60.0)) will have no effect.
+        /// Gets or sets the minimum time between two updates. Defaults to zero: draw on every WPF frame.
+        /// WPF raises CompositionTarget.Rendering once per display refresh, not at a fixed 60 FPS, and a
+        /// skipped frame's time is not carried over, so a cap that does not divide the refresh period
+        /// drops whole frames - 16 ms on a 75 Hz display drew every other frame, 37 FPS.
         /// </summary>
-        public TimeSpan TargetElapsedTime { get; set; } = TimeSpan.FromTicks(160000); // 60 fps
+        public TimeSpan TargetElapsedTime { get; set; } = DefaultTargetElapsedTime;
+
+        internal static readonly TimeSpan DefaultTargetElapsedTime = TimeSpan.Zero;
+
+        internal static bool IsFrameDue(TimeSpan lastRenderingTime, TimeSpan renderingTime, TimeSpan targetElapsedTime)
+            => renderingTime - lastRenderingTime >= targetElapsedTime;
 
         /// <summary>
         /// Gets a value indicating whether the controls runs in the context of a designer (e.g.
@@ -554,7 +561,7 @@ namespace GameWorld.Core.WpfWindow
 
                 var deltaTicks = renderingEventArgs.RenderingTime.Ticks - _lastRenderingTime.Ticks;
                 // accumulate until time is greater than target time between frames
-                if (deltaTicks >= TargetElapsedTime.Ticks)
+                if (IsFrameDue(_lastRenderingTime, renderingEventArgs.RenderingTime, TargetElapsedTime))
                 {
                     // enough time has passed to draw a single frame
                     // draw into cache
