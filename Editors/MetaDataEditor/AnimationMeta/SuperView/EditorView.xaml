@@ -64,6 +64,36 @@
             </WrapPanel>
         </Border>
 
+        <!-- What the game supplies while the unit plays, for the preview only -->
+        <Expander DockPanel.Dock="Top" Margin="5,0,5,4" IsExpanded="False" Header="{loc:Loc SuperView.EffectPreview.Header}"
+                  ToolTip="{loc:Loc SuperView.EffectPreview.Tooltip}">
+            <Grid Margin="4">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+                <CheckBox Grid.ColumnSpan="4" Content="{loc:Loc SuperView.EffectPreview.DistanceCulled}" ToolTip="{loc:Loc SuperView.EffectPreview.DistanceCulledTooltip}"
+                          IsChecked="{Binding HideDistanceCulledEffects}" Margin="0,0,0,4"/>
+
+                <TextBlock Grid.Row="1" Text="{loc:Loc SuperView.EffectPreview.Aura}" ToolTip="{loc:Loc SuperView.EffectPreview.AuraTooltip}" VerticalAlignment="Center" Margin="0,0,6,0"/>
+                <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding AuraVfx}" ToolTip="{loc:Loc SuperView.EffectPreview.AuraTooltip}" Margin="0,1"/>
+                <Button Grid.Row="1" Grid.Column="2" Content="..." Command="{Binding BrowseAuraVfxCommand}" ToolTip="{loc:Loc SuperView.EffectPreview.Browse}" Padding="6,1" Margin="4,1,0,1"/>
+                <Button Grid.Row="1" Grid.Column="3" Content="{loc:Loc SuperView.EffectPreview.Clear}" Command="{Binding ClearAuraVfxCommand}" Padding="6,1" Margin="4,1,0,1"/>
+
+                <TextBlock Grid.Row="2" Text="{loc:Loc SuperView.EffectPreview.Weapon}" ToolTip="{loc:Loc SuperView.EffectPreview.WeaponTooltip}" VerticalAlignment="Center" Margin="0,0,6,0"/>
+                <TextBox Grid.Row="2" Grid.Column="1" Text="{Binding WeaponVfx}" ToolTip="{loc:Loc SuperView.EffectPreview.WeaponTooltip}" Margin="0,1"/>
+                <Button Grid.Row="2" Grid.Column="2" Content="..." Command="{Binding BrowseWeaponVfxCommand}" ToolTip="{loc:Loc SuperView.EffectPreview.Browse}" Padding="6,1" Margin="4,1,0,1"/>
+                <Button Grid.Row="2" Grid.Column="3" Content="{loc:Loc SuperView.EffectPreview.Clear}" Command="{Binding ClearWeaponVfxCommand}" Padding="6,1" Margin="4,1,0,1"/>
+            </Grid>
+        </Expander>
+
         <!-- What is wrong in the two META files; shown only when something is. Clicking a line opens its tag. -->
         <Expander DockPanel.Dock="Bottom" Margin="5,2,5,5" IsExpanded="True" Header="{Binding ProblemsHeader}"
                   ToolTip="{loc:Loc SuperView.Problems.Tooltip}"

@@ -40,6 +40,7 @@ namespace Editors.AnimationMeta.SuperView
         private readonly CombatMetaDataGizmoComponent _gizmo;
         private readonly MetaDataMarkerPickerComponent _markerPicker;
         private readonly IFileSaveService _fileSaveService;
+        private readonly IStandardDialogs _standardDialogs;
 
         // Which of a splash attack's points the gizmo is on: the one picked in the viewport, the start when picked in the list.
         CombatMetaDataPoint _splashPoint = CombatMetaDataPoint.SplashStart;
@@ -55,6 +56,13 @@ namespace Editors.AnimationMeta.SuperView
         [ObservableProperty] List<int> _vfxFilterIds = [];
         [ObservableProperty] int? _vfxFilterId;
         bool _showingVfxFilter;
+
+        // What the game supplies while the unit plays, for the preview only; none of it is written into the META. As a unit far
+        // from the camera, EFFECT tags marked Distance Culled are not drawn. The aura and weapon vfx stand in for an ability's,
+        // at EFFECT tags of type ability_aura (1) and ability_weapon (2); empty, those tags play the vfx they name.
+        [ObservableProperty] bool _hideDistanceCulledEffects;
+        [ObservableProperty] string _auraVfx = "";
+        [ObservableProperty] string _weaponVfx = "";
 
         // The 3D view's tool: select only (no gizmo), move, or rotate the selected tag.
         [ObservableProperty]
@@ -112,7 +120,8 @@ namespace Editors.AnimationMeta.SuperView
             CombatMetaDataEditSession editSession,
             CombatMetaDataGizmoComponent gizmo,
             MetaDataMarkerPickerComponent markerPicker,
-            IFileSaveService fileSaveService)
+            IFileSaveService fileSaveService,
+            IStandardDialogs standardDialogs)
             : base(editorHostParameters)
         {
             DisplayName = "Super view";
@@ -128,6 +137,7 @@ namespace Editors.AnimationMeta.SuperView
             _gizmo = gizmo;
             _markerPicker = markerPicker;
             _fileSaveService = fileSaveService;
+            _standardDialogs = standardDialogs;
 
             // Added to this editor's world only: registered as game components, they would join every editor's.
             GameWorld!.AddComponent(_gizmo);
@@ -188,6 +198,40 @@ namespace Editors.AnimationMeta.SuperView
         {
             _metaDataFactory.ShowVfx = value;
             RecreateMetaDataInformation();
+        }
+
+        partial void OnHideDistanceCulledEffectsChanged(bool value)
+        {
+            _metaDataFactory.HideDistanceCulled = value;
+            RecreateMetaDataInformation();
+        }
+
+        partial void OnAuraVfxChanged(string value)
+        {
+            _metaDataFactory.AuraVfx = string.IsNullOrWhiteSpace(value) ? null : value.Trim();
+            RecreateMetaDataInformation();
+        }
+
+        partial void OnWeaponVfxChanged(string value)
+        {
+            _metaDataFactory.WeaponVfx = string.IsNullOrWhiteSpace(value) ? null : value.Trim();
+            RecreateMetaDataInformation();
+        }
+
+        [RelayCommand] void BrowseAuraVfx() => AuraVfx = BrowseVfx() ?? AuraVfx;
+        [RelayCommand] void BrowseWeaponVfx() => WeaponVfx = BrowseVfx() ?? WeaponVfx;
+        [RelayCommand] void ClearAuraVfx() => AuraVfx = "";
+        [RelayCommand] void ClearWeaponVfx() => WeaponVfx = "";
+
+        // A vfx file picked from the packs, named as an EFFECT tag names it: its path under vfx/.
+        string? BrowseVfx()
+        {
+            static bool UnderVfx(string path) => path.StartsWith("vfx\\", StringComparison.OrdinalIgnoreCase) || path.StartsWith("vfx/", StringComparison.OrdinalIgnoreCase);
+            var result = _standardDialogs.DisplayBrowseDialog([".xml"], path => UnderVfx(path.TrimStart('\\', '/')));
+            if (!result.Result || result.File == null)
+                return null;
+            var path = _packFileService.GetFullPath(result.File).TrimStart('\\', '/');
+            return UnderVfx(path) ? path[4..] : path;
         }
 
         partial void OnVfxFilterIdChanged(int? value)
