@@ -28,8 +28,17 @@ namespace Editors.AnimationMeta.SuperView.Visualisation
         bool ShowVfx { get; set; }
         // The battle entity's vfx_filter_id: an EFFECT tag whose id is neither 0 nor this is not drawn. Unset, the lowest id the metas carry.
         int? VfxFilterId { get; set; }
+        // As a unit seen from far away: EFFECT tags marked Distance Culled are not drawn.
+        bool HideDistanceCulled { get; set; }
+        // A spell's wind-up vfx (special_ability_displays wind_up_aura_vfx / wind_up_weapon_vfx), which the game plays at the
+        // placeholder EFFECT tags of type ability_aura (1) and ability_weapon (2) in cast animations, named as under vfx/.
+        // Unset, those tags draw the vfx they name.
+        string? AuraVfx { get; set; }
+        string? WeaponVfx { get; set; }
         /// <summary>Lets go of what was loaded from these pack paths, so the next Create reads them again.</summary>
         void Forget(IEnumerable<string> paths);
+        /// <summary>What the last Create could not draw, tag by tag.</summary>
+        IReadOnlyList<MetaDataBuildProblem> Problems { get; }
         List<IMetaDataInstance> Create(ParsedMetadataFile? persistent, ParsedMetadataFile? metaData, ParsedMetadataAttribute? selectedMetaDataAttribute, SceneNode root, ISkeletonProvider skeleton, AnimationPlayer rootPlayer, IAnimationBinGenericFormat fragment);
     }
 
@@ -55,8 +64,8 @@ namespace Editors.AnimationMeta.SuperView.Visualisation
         // A slider in the meta panel rebuilds on every step, and building every effect and prop again still took 220 ms of
         // each on that Taurus. One whose tag values, colour, vfx toggle, clip and skeleton are as they were, and which is still
         // in the scene, is kept as built; the caller cleans up only what Create no longer returns.
-        record KeptAs(string Values, bool Picked, bool ShowVfx, AnimationClip? Clip, GameSkeleton? Skeleton);
-        record Kept(KeptAs As, ISceneNode Node, IMetaDataInstance Instance);
+        record KeptAs(string Values, bool Picked, bool ShowVfx, string? AuraVfx, string? WeaponVfx, AnimationClip? Clip, GameSkeleton? Skeleton);
+        record Kept(KeptAs As, ISceneNode Node, IMetaDataInstance Instance, MetaDataBuildProblem[] Problems);
         Dictionary<ParsedMetadataAttribute, Kept> _kept = new(ReferenceEqualityComparer.Instance);
         Dictionary<ParsedMetadataAttribute, Kept> _previous = new(ReferenceEqualityComparer.Instance);
         static readonly Dictionary<Type, PropertyInfo[]> s_tagValues = [];
@@ -67,6 +76,12 @@ namespace Editors.AnimationMeta.SuperView.Visualisation
 
         public bool ShowVfx { get; set; } = true;
         public int? VfxFilterId { get; set; }
+        public bool HideDistanceCulled { get; set; }
+        public string? AuraVfx { get; set; }
+        public string? WeaponVfx { get; set; }
+
+        readonly List<MetaDataBuildProblem> _problems = [];
+        public IReadOnlyList<MetaDataBuildProblem> Problems => _problems;
 
         // A broken effect would log again on every rebuild (every click in the tag list); once is enough.
         private static readonly HashSet<string> s_loggedVfxMessages = [];
@@ -135,6 +150,7 @@ namespace Editors.AnimationMeta.SuperView.Visualisation
             var output = new List<IMetaDataInstance>();
             (_previous, _kept) = (_kept, _previous);
             _kept.Clear();
+            _problems.Clear();
 
             // Apply persistent meta data, if no disable is given.
             var usePersistent = metaData == null || metaData.GetItemsOfType<DisablePersistant_v10>().Count == 0;
@@ -159,6 +175,23 @@ namespace Editors.AnimationMeta.SuperView.Visualisation
         // EFFECT v11 and v12 carry the id; the older versions have none and play on every entity.
         static int FilterOf(IEffectMeta effect) => effect is DecodedMetaEntryBase tag ? tag.Id : 0;
 
+        // Distance Culled is on EFFECT v7 to v12.
+        static bool IsDistanceCulled(IEffectMeta effect) => effect switch
+        {
+            Effect_v7 v => v.DistanceCulled,
+            Effect_v10 v => v.DistanceCulled,
+            Effect_v11 v => v.DistanceCulled,
+            Effect_v12 v => v.DistanceCulled,
+            _ => false,
+        };
+
+        // The vfx the tag plays: its own, or for a wind-up placeholder (EFFECT v11 and v12, type 1 or 2) the spell vfx set in its place.
+        string VfxNameOf(IEffectMeta effect)
+        {
+            var type = effect switch { Effect_v11 v => v.EffectType, Effect_v12 v => v.EffectType, _ => 0 };
+            return (type == 1 ? AuraVfx : type == 2 ? WeaponVfx : null) ?? effect.VfxName;
+        }
+
         private IEnumerable<IMetaDataInstance> ApplyMetaData(ParsedMetadataFile? file, ParsedMetadataAttribute? selectedAttribute, SceneNode root, ISkeletonProvider skeleton, AnimationPlayer rootPlayer, IAnimationBinGenericFormat fragment, int vfxFilter, bool includeEffects = true, bool persistent = false)
         {
             var output = new List<IMetaDataInstance>();
@@ -171,31 +204,52 @@ namespace Editors.AnimationMeta.SuperView.Visualisation
             output.AddRange(file.Attributes.OfType<ParsedMetadataAttribute>().Where(x => x.Name == "PROP")
                 .Select(x => Keep(x, selectedAttribute, root, skeleton, rootPlayer, () => CreateStaticProp(x, root, skeleton, selectedAttribute, rootPlayer))).Where(x => x != null));
 
-            output.AddRange(file.GetItemsOfType<ImpactPosition_v10>().Select(meteDataItem => CreateStaticLocator(meteDataItem, root, () => meteDataItem.Position, "ImpactPos", selectedAttribute)));
+            output.AddRange(file.GetItemsOfType<ImpactPosition_v10>().Select(meteDataItem => Guard(meteDataItem, root, () => CreateStaticLocator(meteDataItem, root, () => meteDataItem.Position, "ImpactPos", selectedAttribute))).Where(x => x != null));
 
-            output.AddRange(file.GetItemsOfType<TargetPos_10>().Select(meteDataItem => CreateStaticLocator(meteDataItem, root, () => meteDataItem.Position, "TargetPos", selectedAttribute)));
+            output.AddRange(file.GetItemsOfType<TargetPos_10>().Select(meteDataItem => Guard(meteDataItem, root, () => CreateStaticLocator(meteDataItem, root, () => meteDataItem.Position, "TargetPos", selectedAttribute))).Where(x => x != null));
 
-            output.AddRange(file.GetItemsOfType<FirePos_v10>().Select(meteDataItem => CreateStaticLocator(meteDataItem, root, () => meteDataItem.Position, "FirePos", selectedAttribute)));
+            output.AddRange(file.GetItemsOfType<FirePos_v10>().Select(meteDataItem => Guard(meteDataItem, root, () => CreateStaticLocator(meteDataItem, root, () => meteDataItem.Position, "FirePos", selectedAttribute))).Where(x => x != null));
 
-            output.AddRange(file.GetItemsOfType<SplashAttack_v10>().Select(meteDataItem => CreateSplashAttack(meteDataItem, root, $"SplashAttack_{Math.Round(meteDataItem.EndTime, 2)}", 0.1f, selectedAttribute)));
+            output.AddRange(file.GetItemsOfType<SplashAttack_v10>().Select(meteDataItem => Guard(meteDataItem, root, () => CreateSplashAttack(meteDataItem, root, $"SplashAttack_{Math.Round(meteDataItem.EndTime, 2)}", 0.1f, selectedAttribute))).Where(x => x != null));
 
             // BLOOD, CAMERA_SHAKE_POS, CREW_LOCATION, SOUND_TRIGGER, SOUND_BUILDING and TRANSFORM: a marker at the tag's
             // position, on its bone where the tag names one.
             output.AddRange(file.Attributes.OfType<ParsedMetadataAttribute>()
                 .Select(x => SpatialMetaDataCatalog.TryCreate(x, out var binding) && binding.UsesGenericMarker && binding.Kind != SpatialMetaDataKind.Prop ? binding : null)
                 .Where(x => x != null)
-                .Select(x => CreateSpatialMarker(x!, root, skeleton, selectedAttribute)));
+                .Select(x => Guard(x!.Source, root, () => CreateSpatialMarker(x!, root, skeleton, selectedAttribute))).Where(x => x != null));
 
             if (includeEffects)
-                output.AddRange(file.GetItemsOfType<IEffectMeta>().Where(x => FilterOf(x) == 0 || FilterOf(x) == vfxFilter).Select(x => Keep((ParsedMetadataAttribute)x, selectedAttribute, root, skeleton, rootPlayer, () => CreateEffect(x, root, skeleton, selectedAttribute, rootPlayer, persistent))));
+                output.AddRange(file.GetItemsOfType<IEffectMeta>().Where(x => FilterOf(x) == 0 || FilterOf(x) == vfxFilter).Where(x => !(HideDistanceCulled && IsDistanceCulled(x))).Select(x => Keep((ParsedMetadataAttribute)x, selectedAttribute, root, skeleton, rootPlayer, () => CreateEffect(x, root, skeleton, selectedAttribute, rootPlayer, persistent))).Where(x => x != null));
 
             foreach (var meteDataItem in file.GetItemsOfType<DockEquipment>())
-                CreateEquipmentDock(meteDataItem, fragment, skeleton, rootPlayer);
+                Guard(meteDataItem, null, () => { CreateEquipmentDock(meteDataItem, fragment, skeleton, rootPlayer); return (object?)null; });
 
             foreach (var meteDataItem in file.GetItemsOfType<Transform_v10>())
                 CreateTransform(meteDataItem, rootPlayer);
 
             return output;
+        }
+
+        void Problem(ParsedMetadataAttribute tag, string reasonKey, string detail = "") => _problems.Add(new MetaDataBuildProblem(tag, reasonKey, detail));
+
+        // One tag that will not draw is a problem on that tag, and what it had added to the scene is taken out again; the
+        // rest of the scene is still built.
+        T? Guard<T>(ParsedMetadataAttribute tag, SceneNode? root, Func<T?> build) where T : class
+        {
+            var before = root?.Children.Count ?? 0;
+            try
+            {
+                return build();
+            }
+            catch (Exception e)
+            {
+                while (root != null && root.Children.Count > before)
+                    root.RemoveObject(root.Children[^1]);
+                LogOnce($"{tag.DisplayName}: {e.Message}");
+                Problem(tag, "SuperView.Problems.PreviewFailed", e.Message);
+                return null;
+            }
         }
 
         private void CreateTransform(Transform_v10 transform, AnimationPlayer rootPlayer)
@@ -206,17 +260,19 @@ namespace Editors.AnimationMeta.SuperView.Visualisation
 
         private void CreateEquipmentDock(DockEquipment metaData, IAnimationBinGenericFormat fragment, ISkeletonProvider skeleton, AnimationPlayer rootPlayer)
         {
+            if (skeleton.Skeleton == null)
+                return;
             if (fragment == null)
             {
-                _logger.Here().Error($"Unable to create docking, as animation is missing - select an animation");
+                Problem(metaData, "SuperView.Problems.NoAnimationBin");
                 return;
             }
- 
+
             var animPath = fragment.Entries.FirstOrDefault(x => x.SlotName == metaData.AnimationSlotName)?.AnimationFile ??
                            fragment.Entries.FirstOrDefault(x => x.SlotName == metaData.AnimationSlotName + "_2")?.AnimationFile;
             if (animPath == null)
             {
-                _logger.Here().Error($"Unable to create docking, as {metaData.AnimationSlotName} animation is missing");
+                Problem(metaData, "SuperView.Problems.MissingDockSlot", metaData.AnimationSlotName);
                 return;
             }
 
@@ -230,14 +286,16 @@ namespace Editors.AnimationMeta.SuperView.Visualisation
 
             if (finalBoneIndex == -1)
             {
-                var boneNames = string.Join(", ", metaData.SkeletonNameAlternatives);
-                _logger.Here().Error($"Unable to create docking, as {boneNames} bone is missing");
+                Problem(metaData, "SuperView.Problems.MissingDockBone", string.Join(", ", metaData.SkeletonNameAlternatives));
                 return;
             }
 
             var pf = _packFileService.FindFile(animPath);
-            if(pf == null)
-                throw new Exception($"Unable to find animation for docking. Searched for {animPath} and failed to find it in the pack file service. This is required to visualise the docked equipment.");
+            if (pf == null)
+            {
+                Problem(metaData, "SuperView.Problems.MissingAnimation", animPath);
+                return;
+            }
 
             var animFile = AnimationFile.Create(pf);
             var clip = new AnimationClip(animFile, skeleton.Skeleton);
@@ -266,22 +324,31 @@ namespace Editors.AnimationMeta.SuperView.Visualisation
 
             var meshPath = _packFileService.FindFile(modelName);
             if (meshPath == null)
+            {
+                Problem(tag, "SuperView.Problems.MissingModel", modelName);
                 return null;
+            }
 
+            // A prop whose animation or skeleton is missing is still drawn, at the tag, without its own animation.
             var animationPath = string.IsNullOrWhiteSpace(animationName) ? null : _packFileService.FindFile(animationName);
+            if (animationPath == null && !string.IsNullOrWhiteSpace(animationName))
+                Problem(tag, "SuperView.Problems.MissingPropAnimation", animationName);
             var propPlayer = _animationsContainerComponent.RegisterAnimationPlayer(new AnimationPlayer(), propName + Guid.NewGuid());
 
             // Configure the mesh
             var loadedNode = _complexMeshLoader.Load(meshPath, new GroupNode(propName), propPlayer, true, true); 
 
             // Configure animation
-            if (animationPath != null)
+            var skeletonName = animationPath == null ? null : SceneNodeHelper.GetSkeletonName(loadedNode);
+            var skeletonFile = skeletonName == null ? null : _skeletonAnimationLookUpHelper.GetSkeletonFileFromName(skeletonName);
+            if (skeletonName != null && skeletonFile == null)
             {
-                var skeletonName = SceneNodeHelper.GetSkeletonName(loadedNode);
-                var skeletonFile = _skeletonAnimationLookUpHelper.GetSkeletonFileFromName(skeletonName);
-                if (skeletonFile == null)
-                    throw new Exception($"Unable to find skeleton for animated prop. Searched for {skeletonName} and failed to find it in the skeleton animation look up helper. This is required to play the animation of the prop.");
+                Problem(tag, "SuperView.Problems.MissingPropSkeleton", skeletonName);
+                animationPath = null;
+            }
 
+            if (animationPath != null && skeletonFile != null)
+            {
                 var skeleton = new GameSkeleton(skeletonFile, propPlayer);
                 var animFile = AnimationFile.Create(animationPath);
                 var clip = new AnimationClip(animFile, skeleton);
@@ -435,11 +502,15 @@ namespace Editors.AnimationMeta.SuperView.Visualisation
 
         private IMetaDataInstance CreateEffect(IEffectMeta effect, SceneNode root, ISkeletonProvider skeleton, ParsedMetadataAttribute? selectedAttribute, AnimationPlayer rootPlayer, bool persistent)
         {
-            var resolved = ShowVfx ? Resolve(effect) : null;
+            var vfxName = VfxNameOf(effect);
+            var resolved = ShowVfx ? Resolve(effect, vfxName) : null;
             if (resolved is { Found: false })
-                LogOnce($"EFFECT {effect.VfxName}: {VfxResolver.PathOf(effect.VfxName)} is not in any loaded pack, so only its locator is drawn");
+            {
+                LogOnce($"EFFECT {vfxName}: {VfxResolver.PathOf(vfxName)} is not in any loaded pack, so only its locator is drawn");
+                Problem((ParsedMetadataAttribute)effect, "SuperView.Problems.MissingEffect", VfxResolver.PathOf(vfxName));
+            }
             foreach (var problem in resolved?.Problems ?? [])
-                LogOnce($"EFFECT {effect.VfxName}: {problem}");
+                LogOnce($"EFFECT {vfxName}: {problem}");
 
             var color = selectedAttribute == effect ? s_selectedColor : s_color;
             var locatorScale = 0.3f;
@@ -448,12 +519,12 @@ namespace Editors.AnimationMeta.SuperView.Visualisation
             var rotMatrix = Matrix.CreateFromQuaternion(new Quaternion(effect.Orientation));
 
             // Drawn in the tag's own frame: the instance places it from the tag's Position and Orientation on the bone.
-            var node = new SimpleDrawableNode("Effect:" + effect.VfxName);
+            var node = new SimpleDrawableNode("Effect:" + vfxName);
             node.AddItem(LineHelper.AddLine(Vector3.Zero, Vector3.UnitX * locatorScale, Color.Red));
             node.AddItem(LineHelper.AddLine(Vector3.Zero, Vector3.UnitY * locatorScale, Color.Green));
             node.AddItem(LineHelper.AddLine(Vector3.Zero, Vector3.UnitZ * locatorScale, Color.Blue));
 
-            var label = resolved is { Found: false } ? effect.VfxName + " (not found)" : effect.VfxName;
+            var label = resolved is { Found: false } ? vfxName + " (not found)" : vfxName;
             node.AddItem(new WorldTextRenderItem(_resourceLibrary, label, Vector3.Zero, color));
             node.AddItem(new WorldTextRenderItem(_resourceLibrary, "X", Vector3.UnitX * textOffset, Color.Red));
             node.AddItem(new WorldTextRenderItem(_resourceLibrary, "Y", Vector3.UnitY * textOffset, Color.Green));
@@ -481,7 +552,7 @@ namespace Editors.AnimationMeta.SuperView.Visualisation
             foreach (var emitter in settings)
             {
                 foreach (var gap in emitter.Skipped)
-                    LogOnce($"EFFECT {effect.VfxName}, emitter {emitter.Name}: {gap}");
+                    LogOnce($"EFFECT {vfxName}, emitter {emitter.Name}: {gap}");
             }
 
             var offset = Matrix.CreateScale(ScaleOf(effect)) * rotMatrix * Matrix.CreateTranslation(effect.Position);
@@ -491,8 +562,8 @@ namespace Editors.AnimationMeta.SuperView.Visualisation
             var loop = persistent ? rootPlayer.AnimationClip?.PlayTimeInSec ?? 0 : 0;
             float MainTime(float effectTime) => loop > 0 ? ((effectTime + startTime) % loop + loop) % loop : effectTime + startTime;
             var simulator = new ParticleSimulator(settings, StableSeed(effect), t => offset * boneAt(MainTime(t)), spawnEnd,
-                message => LogOnce($"EFFECT {effect.VfxName}, {message}"));
-            var particles = root.AddObject(new VfxEffectNode("Vfx:" + effect.VfxName,
+                message => LogOnce($"EFFECT {vfxName}, {message}"));
+            var particles = root.AddObject(new VfxEffectNode("Vfx:" + vfxName,
                 new ParticleRenderItem(simulator, _vfxTextures, () => _shaders.GetStaticEffect(ShaderTypes.Particle), _vfxMeshes)));
 
             var instance = new VfxEffectInstance(node, boneAt, startTime, particles, simulator, loop, effect);
@@ -538,26 +609,29 @@ namespace Editors.AnimationMeta.SuperView.Visualisation
             var type = tag.GetType();
             if (!s_tagValues.TryGetValue(type, out var values))
                 s_tagValues[type] = values = type.GetProperties().Where(x => x.GetCustomAttribute<MetaDataTagAttribute>() != null).ToArray();
-            var keptAs = new KeptAs(string.Join("\u001f", values.Select(x => x.GetValue(tag))), tag == picked, ShowVfx, rootPlayer.AnimationClip, skeleton.Skeleton);
+            var keptAs = new KeptAs(string.Join("\u001f", values.Select(x => x.GetValue(tag))), tag == picked, ShowVfx, AuraVfx, WeaponVfx, rootPlayer.AnimationClip, skeleton.Skeleton);
             if (_previous.TryGetValue(tag, out var kept) && kept.As == keptAs && root.Children.Contains(kept.Node))
             {
                 _kept[tag] = kept;
+                _problems.AddRange(kept.Problems);
                 return kept.Instance;
             }
 
-            // What a build adds to the scene starts with the node its instance cleans up.
+            // What a build adds to the scene starts with the node its instance cleans up; the problems it finds are kept
+            // with it, as a kept tag is not built again to find them.
             var before = root.Children.Count;
-            var instance = build();
+            var problemsBefore = _problems.Count;
+            var instance = Guard(tag, root, build);
             if (instance != null && root.Children.Count > before)
-                _kept[tag] = new Kept(keptAs, root.Children[before], instance);
+                _kept[tag] = new Kept(keptAs, root.Children[before], instance, [.. _problems.Skip(problemsBefore)]);
             return instance;
         }
 
-        VfxResolveResult Resolve(IEffectMeta effect)
+        VfxResolveResult Resolve(IEffectMeta effect, string vfxName)
         {
-            var key = (effect.VfxName, StableSeed(effect));
+            var key = (vfxName, StableSeed(effect));
             if (!_resolved.TryGetValue(key, out var resolved))
-                _resolved[key] = resolved = new VfxResolver(_packFileService).Resolve(effect.VfxName, new Random(key.Item2));
+                _resolved[key] = resolved = new VfxResolver(_packFileService).Resolve(vfxName, new Random(key.Item2));
             return resolved;
         }
 

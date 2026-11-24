@@ -1,4 +1,4 @@
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Text;
 using System.Text.Json;
@@ -80,6 +80,23 @@ namespace Shared.Core.PackFiles.Models
             }
         }
 
+        // Files and folders in a folder project, relative to it, that AE does not load: they are not in the tree, not watched
+        // and not packed. Defaults to .git, so a project kept in git does not pack its history.
+        public List<string> ExcludedPaths { get => _excludedPaths; set => _excludedPaths = value ?? []; }
+        private List<string> _excludedPaths = [".git"];
+
+        public bool IsExcluded(string relativePath)
+        {
+            var path = PathNormalization.NormalizeFileName(relativePath).Trim('\\');
+            foreach (var excluded in ExcludedPaths)
+            {
+                var entry = PathNormalization.NormalizeFileName(excluded).Trim('\\');
+                if (entry.Length != 0 && (path == entry || path.StartsWith(entry + "\\", StringComparison.Ordinal)))
+                    return true;
+            }
+            return false;
+        }
+
         public void Save()
         {
             if (!SerializeToDisk)
@@ -98,7 +115,8 @@ namespace Shared.Core.PackFiles.Models
                 SaveLocationPath = SaveLocationPath,
                 EnablePackFileCorruptionDetection = EnablePackFileCorruptionDetection,
                 GameVersion = GameVersion,
-                IgnoredFilesWhenSerializing = new ObservableCollection<string>(NormalizeIgnoredFiles(IgnoredFilesWhenSerializing))
+                IgnoredFilesWhenSerializing = new ObservableCollection<string>(NormalizeIgnoredFiles(IgnoredFilesWhenSerializing)),
+                ExcludedPaths = [.. ExcludedPaths]
             };
 
             var json = JsonSerializer.Serialize(settingsToSerialize, JsonOptions);
@@ -111,6 +129,7 @@ namespace Shared.Core.PackFiles.Models
             EnablePackFileCorruptionDetection = settings.EnablePackFileCorruptionDetection;
             GameVersion = settings.GameVersion;
             IgnoredFilesWhenSerializing = new ObservableCollection<string>(NormalizeIgnoredFiles(settings.IgnoredFilesWhenSerializing));
+            ExcludedPaths = [.. settings.ExcludedPaths ?? []];
         }
 
         public static PackFileSettings? Load(string path, IFileSystemAccess fileSystemAccess)

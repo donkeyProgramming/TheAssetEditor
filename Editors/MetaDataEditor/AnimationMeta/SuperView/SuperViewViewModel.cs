@@ -1,8 +1,9 @@
-﻿using System.Data;
+﻿using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Editors.AnimationMeta.Presentation;
 using Editors.AnimationMeta.SuperView.Editing;
+using Editors.AnimationMeta.SuperView.Problems;
 using Editors.AnimationMeta.SuperView.Timeline;
 using Editors.AnimationMeta.SuperView.Visualisation;
 using Editors.Shared.Core.Common;
@@ -14,6 +15,7 @@ using Shared.Core.Events.Scoped;
 using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Events;
 using Shared.Core.PackFiles.Models;
+using Shared.Core.PackFiles.Utility;
 using Shared.Core.Services;
 using Shared.Core.ToolCreation;
 using Shared.GameFormats.AnimationMeta.Definitions;
@@ -37,13 +39,13 @@ namespace Editors.AnimationMeta.SuperView
         private readonly CombatMetaDataEditSession _editSession;
         private readonly CombatMetaDataGizmoComponent _gizmo;
         private readonly MetaDataMarkerPickerComponent _markerPicker;
+        private readonly IFileSaveService _fileSaveService;
+        private readonly IStandardDialogs _standardDialogs;
 
         // Which of a splash attack's points the gizmo is on: the one picked in the viewport, the start when picked in the list.
         CombatMetaDataPoint _splashPoint = CombatMetaDataPoint.SplashStart;
         bool _selectingMarker;
 
-        [ObservableProperty] string _persistentMetaFilePath = "";
-        [ObservableProperty] string _metaFilePath = "";
         [ObservableProperty] MetaDataEditorViewModel _persistentMetaEditor;
         [ObservableProperty] MetaDataEditorViewModel _metaEditor;
         [ObservableProperty] int _selectedTabControllerIndex = 0;
@@ -54,6 +56,15 @@ namespace Editors.AnimationMeta.SuperView
         [ObservableProperty] List<int> _vfxFilterIds = [];
         [ObservableProperty] int? _vfxFilterId;
         bool _showingVfxFilter;
+
+        // What the game supplies while the unit plays, for the preview only; none of it is written into the META. As a unit far
+        // from the camera, EFFECT tags marked Distance Culled are not drawn. The aura and weapon vfx are a spell's wind-up
+        // (special_ability_displays wind_up_aura_vfx / wind_up_weapon_vfx: on the caster's body, and in the hand or staff), which
+        // the game plays at the placeholder EFFECT tags of type ability_aura (1) and ability_weapon (2) in cast animations; empty,
+        // those tags play the vfx they name.
+        [ObservableProperty] bool _hideDistanceCulledEffects;
+        [ObservableProperty] string _auraVfx = "";
+        [ObservableProperty] string _weaponVfx = "";
 
         // The 3D view's tool: select only (no gizmo), move, or rotate the selected tag.
         [ObservableProperty]
@@ -66,6 +77,22 @@ namespace Editors.AnimationMeta.SuperView
         public bool CanRotateSelectedIn3D => _editSession.CanRotate;
         public bool CanUndoEditIn3D => _editSession.CanUndo;
         public bool CanRedoEditIn3D => _editSession.CanRedo;
+
+        // What is wrong in the two META files, for the list under them; picking one opens its tag.
+        public ObservableCollection<MetaDataProblem> Problems { get; } = [];
+        [ObservableProperty] MetaDataProblem? _selectedProblem;
+        public bool HasProblems => Problems.Count > 0;
+        public string ProblemsHeader => string.Format(_localizationManager.Get("SuperView.Problems.Header"), Problems.Count);
+        bool _showingProblems;
+
+        // The META files the selected slot names. One that is named but not in any loaded pack can be created empty; one
+        // that is not named has nothing to show.
+        public string AnimationMetaFilePath => _asset?.FragAndSlotSelection.MetaDataName ?? "";
+        public string PersistentMetaFilePath => _asset?.FragAndSlotSelection.MetaDataPersistName ?? "";
+        public bool CanCreateAnimationMetaFile => MetaEditor?.CurrentFile == null && !string.IsNullOrWhiteSpace(AnimationMetaFilePath);
+        public bool CanCreatePersistentMetaFile => PersistentMetaEditor?.CurrentFile == null && !string.IsNullOrWhiteSpace(PersistentMetaFilePath);
+        public bool IsAnimationMetaFileNotNamed => MetaEditor?.CurrentFile == null && string.IsNullOrWhiteSpace(AnimationMetaFilePath);
+        public bool IsPersistentMetaFileNotNamed => PersistentMetaEditor?.CurrentFile == null && string.IsNullOrWhiteSpace(PersistentMetaFilePath);
 
         public override Type EditorViewModelType => typeof(EditorView);
         public bool HasUnsavedChanges
@@ -94,7 +121,9 @@ namespace Editors.AnimationMeta.SuperView
             LocalizationManager localizationManager,
             CombatMetaDataEditSession editSession,
             CombatMetaDataGizmoComponent gizmo,
-            MetaDataMarkerPickerComponent markerPicker)
+            MetaDataMarkerPickerComponent markerPicker,
+            IFileSaveService fileSaveService,
+            IStandardDialogs standardDialogs)
             : base(editorHostParameters)
         {
             DisplayName = "Super view";
@@ -109,6 +138,8 @@ namespace Editors.AnimationMeta.SuperView
             _editSession = editSession;
             _gizmo = gizmo;
             _markerPicker = markerPicker;
+            _fileSaveService = fileSaveService;
+            _standardDialogs = standardDialogs;
 
             // Added to this editor's world only: registered as game components, they would join every editor's.
             GameWorld!.AddComponent(_gizmo);
@@ -171,6 +202,40 @@ namespace Editors.AnimationMeta.SuperView
             RecreateMetaDataInformation();
         }
 
+        partial void OnHideDistanceCulledEffectsChanged(bool value)
+        {
+            _metaDataFactory.HideDistanceCulled = value;
+            RecreateMetaDataInformation();
+        }
+
+        partial void OnAuraVfxChanged(string value)
+        {
+            _metaDataFactory.AuraVfx = string.IsNullOrWhiteSpace(value) ? null : value.Trim();
+            RecreateMetaDataInformation();
+        }
+
+        partial void OnWeaponVfxChanged(string value)
+        {
+            _metaDataFactory.WeaponVfx = string.IsNullOrWhiteSpace(value) ? null : value.Trim();
+            RecreateMetaDataInformation();
+        }
+
+        [RelayCommand] void BrowseAuraVfx() => AuraVfx = BrowseVfx() ?? AuraVfx;
+        [RelayCommand] void BrowseWeaponVfx() => WeaponVfx = BrowseVfx() ?? WeaponVfx;
+        [RelayCommand] void ClearAuraVfx() => AuraVfx = "";
+        [RelayCommand] void ClearWeaponVfx() => WeaponVfx = "";
+
+        // A vfx file picked from the packs, named as an EFFECT tag names it: its path under vfx/.
+        string? BrowseVfx()
+        {
+            static bool UnderVfx(string path) => path.StartsWith("vfx\\", StringComparison.OrdinalIgnoreCase) || path.StartsWith("vfx/", StringComparison.OrdinalIgnoreCase);
+            var result = _standardDialogs.DisplayBrowseDialog([".xml"], path => UnderVfx(path.TrimStart('\\', '/')));
+            if (!result.Result || result.File == null)
+                return null;
+            var path = _packFileService.GetFullPath(result.File).TrimStart('\\', '/');
+            return UnderVfx(path) ? path[4..] : path;
+        }
+
         partial void OnVfxFilterIdChanged(int? value)
         {
             if (_showingVfxFilter || value == null || value == _metaDataFactory.VfxFilterId)
@@ -207,6 +272,7 @@ namespace Editors.AnimationMeta.SuperView
             Player.TimelineItemClicked += OnTimelineItemClicked;
 
             _asset = assetViewModel;
+            _asset.FragAndSlotSelection.PropertyChanged += OnSlotSelectionChanged;
             OnSceneObjectUpdated(new SceneObjectUpdateEvent(_asset.Data, false, false, false, true));
         }
 
@@ -234,6 +300,38 @@ namespace Editors.AnimationMeta.SuperView
             VfxFilterIds = filter == 0 || ids.Contains(filter) ? ids : [.. ids.Append(filter).Order()];
             VfxFilterId = filter;
             _showingVfxFilter = false;
+            RebuildProblems();
+        }
+
+        // Filled again only when a line changes, so the one picked stays picked across the rebuild that opening its tag starts.
+        void RebuildProblems()
+        {
+            if (PersistentMetaEditor == null || MetaEditor == null)
+                return;
+            var problems = MetaDataProblem.Create(PersistentMetaEditor.Tags, MetaEditor.Tags, _metaDataFactory.Problems, _localizationManager);
+            if (problems.SequenceEqual(Problems))
+                return;
+
+            _showingProblems = true;
+            var picked = SelectedProblem;
+            Problems.Clear();
+            foreach (var problem in problems)
+                Problems.Add(problem);
+            SelectedProblem = Problems.FirstOrDefault(x => x == picked);
+            _showingProblems = false;
+            OnPropertyChanged(nameof(HasProblems));
+            OnPropertyChanged(nameof(ProblemsHeader));
+        }
+
+        partial void OnSelectedProblemChanged(MetaDataProblem? value)
+        {
+            if (_showingProblems || value == null)
+                return;
+            var start = ParsedMetadataTimeRange.TryCreate(value.Source, out var range) && float.IsFinite(range.StartTime) && !range.IsWholeAnimationRange
+                ? range.StartTime
+                : (float?)null;
+            OpenTag(value.Owner, value.Source, start);
+            FocusMarker(value.Source);
         }
 
         private void OnSceneObjectUpdated(SceneObjectUpdateEvent e)
@@ -250,6 +348,42 @@ namespace Editors.AnimationMeta.SuperView
             RecreateMetaDataInformation();
             RebuildTimeline();
             UpdateEditTarget();
+            NotifyMetaFileState();
+        }
+
+        void OnSlotSelectionChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName is nameof(BinAnimationViewModel.MetaDataName) or nameof(BinAnimationViewModel.MetaDataPersistName))
+                NotifyMetaFileState();
+        }
+
+        void NotifyMetaFileState()
+        {
+            OnPropertyChanged(nameof(AnimationMetaFilePath));
+            OnPropertyChanged(nameof(PersistentMetaFilePath));
+            OnPropertyChanged(nameof(CanCreateAnimationMetaFile));
+            OnPropertyChanged(nameof(CanCreatePersistentMetaFile));
+            OnPropertyChanged(nameof(IsAnimationMetaFileNotNamed));
+            OnPropertyChanged(nameof(IsPersistentMetaFileNotNamed));
+        }
+
+        public void CreateAnimationMetaFile()
+        {
+            if (CanCreateAnimationMetaFile && CreateEmptyMetaFile(AnimationMetaFilePath) is { } file)
+                _sceneObjectBuilder.SetMetaFile(_asset.Data, file, _asset.Data.PersistMetaData);
+        }
+
+        public void CreatePersistentMetaFile()
+        {
+            if (CanCreatePersistentMetaFile && CreateEmptyMetaFile(PersistentMetaFilePath) is { } file)
+                _sceneObjectBuilder.SetMetaFile(_asset.Data, _asset.Data.MetaData, file);
+        }
+
+        // An empty version 2 META, the version WH3's files use, at the path the slot names, in the editable pack.
+        PackFile? CreateEmptyMetaFile(string path)
+        {
+            var bytes = _metaDataFileParser.GenerateBytes(2, new ParsedMetadataFile { Version = 2 });
+            return _fileSaveService.Save(path, bytes, false);
         }
 
         void OnAnimationChanged(GameWorld.Core.Animation.AnimationClip? clip) => RebuildTimeline();
@@ -286,6 +420,7 @@ namespace Editors.AnimationMeta.SuperView
                 Player.TimelineItems.Add(new MetaDataTimelineItem(item, clipDuration, ownerName, wholeAnimation));
             }
             ShowTimelineSelection();
+            RebuildProblems();
         }
 
         // Highlights the marker of the tag selected on the open tab
@@ -307,14 +442,20 @@ namespace Editors.AnimationMeta.SuperView
         {
             if (clicked is not MetaDataTimelineItem item)
                 return;
+            OpenTag(item.Item.Owner, item.Item.Source, item.Start);
+        }
 
-            var isPersistent = item.Item.Owner == MetaDataDocumentOwner.Persistent;
+        // A tag's tab, the tag selected, and the animation at the given time
+        void OpenTag(MetaDataDocumentOwner owner, ParsedMetadataAttribute source, double? time)
+        {
+            var isPersistent = owner == MetaDataDocumentOwner.Persistent;
             var editor = isPersistent ? PersistentMetaEditor : MetaEditor;
             SelectedTabControllerIndex = isPersistent ? 0 : 1;
-            var tag = editor.Tags.FirstOrDefault(x => ReferenceEquals(x._input, item.Item.Source));
+            var tag = editor.Tags.FirstOrDefault(x => ReferenceEquals(x._input, source));
             if (tag != null)
                 editor.SelectedTag = tag;
-            Player.SetAnimationTime(item.Start);
+            if (time != null)
+                Player.SetAnimationTime(time.Value);
         }
 
         public void Load(AnimationToolInput debugDataToLoad)
@@ -398,17 +539,8 @@ namespace Editors.AnimationMeta.SuperView
             NotifyEditState();
         }
 
-        // A splash attack refuses to draw with its start on its end; mid-drag that step is skipped rather than an error.
-        void RebuildMarkersDuringDrag()
-        {
-            try
-            {
-                RecreateMetaDataInformation();
-            }
-            catch (ConstraintException)
-            {
-            }
-        }
+        // A splash attack whose start is dragged onto its end does not draw; the builder lists that as a problem on the tag.
+        void RebuildMarkersDuringDrag() => RecreateMetaDataInformation();
 
         IReadOnlyList<IMetaDataMarkerPreview> GetMarkers() =>
             _asset?.Data.MetaDataItems.OfType<IMetaDataMarkerPreview>().ToList() ?? [];
@@ -465,16 +597,22 @@ namespace Editors.AnimationMeta.SuperView
             PersistentMetaEditor.Tags.CollectionChanged -= OnTagsChanged;
             MetaEditor.Tags.CollectionChanged -= OnTagsChanged;
             _asset.Data.AnimationChanged -= OnAnimationChanged;
+            _asset.FragAndSlotSelection.PropertyChanged -= OnSlotSelectionChanged;
             _globalEventHub.UnRegister(this);
             base.Close();
         }
 
+        // Only a file with changes is written: the persistent META is shared by every animation of the unit, and saving it
+        // untouched would put a copy of the vanilla file in the mod pack. A slot with no META file has nothing to save.
         public bool Save()
         {
-            var res0 = PersistentMetaEditor.Save();
-            var res1 = MetaEditor.Save();
+            var res0 = SaveIfChanged(PersistentMetaEditor);
+            var res1 = SaveIfChanged(MetaEditor);
             return res0 && res1;
         }
+
+        static bool SaveIfChanged(MetaDataEditorViewModel editor) =>
+            editor.CurrentFile == null || editor.ParsedFile == null || !editor.HasUnsavedChanges || editor.Save();
     }
 
     public enum MetaDataEditTool

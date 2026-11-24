@@ -58,7 +58,12 @@ namespace Editors.AnimationMeta.Presentation
 
         void Validate()
         {
+            var wasValid = IsValid;
             IsValid = _parser.Encode(ValueAsString, out _) != null;
+            // A value that cannot be saved changes nothing in the tag, and nor may putting the old value back, but SuperView
+            // lists the field as a problem while it is invalid.
+            if (wasValid != IsValid)
+                _eventHub.Publish(new MetaDataAttributeChangedEvent());
             if (IsValid)
             {
                 switch (_parser.Type)
