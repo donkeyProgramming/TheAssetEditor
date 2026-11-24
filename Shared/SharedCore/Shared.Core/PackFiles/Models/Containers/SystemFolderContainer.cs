@@ -64,7 +64,7 @@ namespace Shared.Core.PackFiles.Models.Containers
             {
                 var relativePath = Path.GetRelativePath(SystemFilePath!, absolutePath);
                 var normalizedPath = PathNormalization.NormalizeFileName(relativePath);
-                if (IsProjectSettingsFilePath(normalizedPath))
+                if (IsProjectSettingsFilePath(normalizedPath) || PackFileSettings.IsExcluded(normalizedPath))
                     continue;
 
                 var fileName = Path.GetFileName(absolutePath);
@@ -616,6 +616,9 @@ namespace Shared.Core.PackFiles.Models.Containers
 
         private void HandleExternalCreated(string absolutePath, List<PackFile> addedFiles)
         {
+            if (PackFileSettings.IsExcluded(Path.GetRelativePath(SystemFilePath!, absolutePath)))
+                return;
+
             // If this is a directory, scan and add all files within it
             if (Directory.Exists(absolutePath) && !File.Exists(absolutePath))
             {
