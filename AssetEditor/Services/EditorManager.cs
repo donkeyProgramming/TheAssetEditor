@@ -22,6 +22,10 @@ namespace AssetEditor.Services
         public ObservableCollection<IEditorInterface> CurrentEditorsList { get; set; } = [];
         [ObservableProperty] private int _selectedEditorIndex = -1;
 
+        // Asked before a pack with open files is closed; true closes it. A singleton cannot take the scoped
+        // IStandardDialogs, so tests answer through this instead.
+        public Func<string, bool> AskToCloseOpenFiles { get; set; } = message => MessageBox.Show(message, "", MessageBoxButton.YesNo) == MessageBoxResult.Yes;
+
         public EditorManager(IGlobalEventHub eventHub, IPackFileService packFileService, IEditorDatabase editorDatabase)
         {
             _packFileService = packFileService;
@@ -158,12 +162,11 @@ namespace AssetEditor.Services
                     openFiles.Add(CurrentEditorsList[i]);
             }
 
-            if (openFiles.Any())
+            // Answering No keeps the pack and its editors open
+            if (openFiles.Any() && !AskToCloseOpenFiles($"Closing pack file '{container.Name}' with open files ({openFiles.First().DisplayName}), are you sure?"))
             {
-                if (MessageBox.Show($"Closing pack file '{container.Name}' with open files ({openFiles.First().DisplayName}), are you sure?", "", MessageBoxButton.YesNo) == MessageBoxResult.No)
-                {
-                    e.AllowClose = false;
-                }
+                e.AllowClose = false;
+                return;
             }
 
             foreach (var editor in openFiles)
