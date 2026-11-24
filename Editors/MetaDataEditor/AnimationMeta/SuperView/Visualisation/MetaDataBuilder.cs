@@ -30,7 +30,8 @@ namespace Editors.AnimationMeta.SuperView.Visualisation
         int? VfxFilterId { get; set; }
         // As a unit seen from far away: EFFECT tags marked Distance Culled are not drawn.
         bool HideDistanceCulled { get; set; }
-        // The vfx an ability would play at EFFECT tags of type ability_aura (1) and ability_weapon (2), named as under vfx/.
+        // A spell's wind-up vfx (special_ability_displays wind_up_aura_vfx / wind_up_weapon_vfx), which the game plays at the
+        // placeholder EFFECT tags of type ability_aura (1) and ability_weapon (2) in cast animations, named as under vfx/.
         // Unset, those tags draw the vfx they name.
         string? AuraVfx { get; set; }
         string? WeaponVfx { get; set; }
@@ -184,7 +185,7 @@ namespace Editors.AnimationMeta.SuperView.Visualisation
             _ => false,
         };
 
-        // The vfx the tag plays: its own, or for an ability aura or weapon tag (EFFECT v11 and v12) the one set in its place.
+        // The vfx the tag plays: its own, or for a wind-up placeholder (EFFECT v11 and v12, type 1 or 2) the spell vfx set in its place.
         string VfxNameOf(IEffectMeta effect)
         {
             var type = effect switch { Effect_v11 v => v.EffectType, Effect_v12 v => v.EffectType, _ => 0 };

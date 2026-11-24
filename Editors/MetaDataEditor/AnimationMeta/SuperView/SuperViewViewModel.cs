@@ -58,8 +58,10 @@ namespace Editors.AnimationMeta.SuperView
         bool _showingVfxFilter;
 
         // What the game supplies while the unit plays, for the preview only; none of it is written into the META. As a unit far
-        // from the camera, EFFECT tags marked Distance Culled are not drawn. The aura and weapon vfx stand in for an ability's,
-        // at EFFECT tags of type ability_aura (1) and ability_weapon (2); empty, those tags play the vfx they name.
+        // from the camera, EFFECT tags marked Distance Culled are not drawn. The aura and weapon vfx are a spell's wind-up
+        // (special_ability_displays wind_up_aura_vfx / wind_up_weapon_vfx: on the caster's body, and in the hand or staff), which
+        // the game plays at the placeholder EFFECT tags of type ability_aura (1) and ability_weapon (2) in cast animations; empty,
+        // those tags play the vfx they name.
         [ObservableProperty] bool _hideDistanceCulledEffects;
         [ObservableProperty] string _auraVfx = "";
         [ObservableProperty] string _weaponVfx = "";
