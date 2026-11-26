@@ -2,6 +2,7 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Editors.AnimationMeta.Presentation;
+using Editors.Audio.Shared.Storage;
 using Editors.AnimationMeta.SuperView.Editing;
 using Editors.AnimationMeta.SuperView.Problems;
 using Editors.AnimationMeta.SuperView.Timeline;
@@ -123,7 +124,8 @@ namespace Editors.AnimationMeta.SuperView
             CombatMetaDataGizmoComponent gizmo,
             MetaDataMarkerPickerComponent markerPicker,
             IFileSaveService fileSaveService,
-            IStandardDialogs standardDialogs)
+            IStandardDialogs standardDialogs,
+            IAudioRepository audioRepository)
             : base(editorHostParameters)
         {
             DisplayName = "Super view";
@@ -155,6 +157,7 @@ namespace Editors.AnimationMeta.SuperView
             eventHub.Register<SelecteMetaDataAttributeChangedEvent>(this, OnSelectedMetaDataAttributeChanged);
             globalEventHub.Register<PackFileContainerFilesAddedEvent>(this, x => OnPackFilesChanged(x.Container, x.AddedFiles));
             globalEventHub.Register<PackFileContainerFilesUpdatedEvent>(this, x => OnPackFilesChanged(x.Container, x.ChangedFiles));
+            InitSound(audioRepository);
         }
 
         // A vfx file, a texture, or a model, material or animation a rigid particle may draw changed in a pack (the VFX editor
@@ -186,6 +189,7 @@ namespace Editors.AnimationMeta.SuperView
         {
             RecreateMetaDataInformation();
             RebuildTimeline();
+            RebuildSoundsSoon();
         }
 
         void OnMetaDataChanged(SceneObject sceneObject) => RecreateMetaDataInformation();
@@ -345,10 +349,13 @@ namespace Editors.AnimationMeta.SuperView
             if (MetaEditor.ParsedFile != animation)
                 _editSession.ResetDocument(MetaEditor);
 
+            LoadSoundMetas(e.Owner);
+
             RecreateMetaDataInformation();
             RebuildTimeline();
             UpdateEditTarget();
             NotifyMetaFileState();
+            RebuildSounds();
         }
 
         void OnSlotSelectionChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
@@ -395,6 +402,7 @@ namespace Editors.AnimationMeta.SuperView
             else if (ReferenceEquals(sender, MetaEditor.Tags))
                 _editSession.ResetDocument(MetaEditor);
             RebuildTimeline();
+            RebuildSoundsSoon();
         }
 
         // One marker per timed tag in both META files, on the animation player's scrub bar.
@@ -586,6 +594,7 @@ namespace Editors.AnimationMeta.SuperView
 
         public override void Close()
         {
+            CloseSound();
             _markerPicker.Disconnect();
             _gizmo.EndDrag();
             _editSession.ValueChanged -= OnEditValueChanged;

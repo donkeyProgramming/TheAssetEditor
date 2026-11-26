@@ -92,6 +92,7 @@ namespace Editors.Shared.Core.Common
                 var skeletonName = SceneNodeHelper.GetSkeletonName(loadedNode);
                 var fullSkeletonName = $"animations\\skeletons\\{skeletonName}.anim";
                 var skeletonFile = _packFileService.FindFile(fullSkeletonName);
+                sceneObject.SoundMetaData = sceneObject.PersistSoundMetaData = null;
                 SetMetaFile(sceneObject, null, null);
                 SetSkeleton(sceneObject, skeletonFile, false);
             }

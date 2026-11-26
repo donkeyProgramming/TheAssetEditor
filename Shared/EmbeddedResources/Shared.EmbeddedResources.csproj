@@ -15,6 +15,7 @@
     <None Remove="Resources\AnimationSlots\Warhammer3AnimationSlots_dlc23.txt" />
     <None Remove="Resources\AnimationSlots\Warhammer3AnimationSlots_dlc24.txt" />
     <None Remove="Resources\AnimationSlots\Warhammer3AnimationSlots_patch9.txt" />
+    <None Remove="Resources\Db\schema_wh3_extract.txt" />
     <None Remove="Resources\Icons\audio_file.png" />
     <None Remove="Resources\Icons\Copy.png" />
     <None Remove="Resources\Icons\Cut.png" />
@@ -120,6 +121,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
     <EmbeddedResource Include="Resources\AnimationSlots\Warhammer3AnimationSlots_patch9.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\Db\schema_wh3_extract.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
     <EmbeddedResource Include="Resources\Icons\audio_file.png" />

@@ -10,6 +10,7 @@
       <ProjectReference Include="..\..\..\Shared\SharedCore\Shared.Core\Shared.Core.csproj" />
       <ProjectReference Include="..\..\..\Shared\SharedUI\Shared.Ui\Shared.Ui.csproj" />
       <ProjectReference Include="..\..\Shared\Editors.Shared.Core\Editors.Shared.Core.csproj" />
+      <ProjectReference Include="..\..\Audio\Editors.Audio.csproj" />
     </ItemGroup>
 
 </Project>

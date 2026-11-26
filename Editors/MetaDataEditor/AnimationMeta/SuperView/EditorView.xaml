@@ -118,6 +118,27 @@
             </ListBox>
         </Expander>
 
+        <StackPanel Margin="5,0,5,5" DockPanel.Dock="Top">
+            <CheckBox Content="{loc:Loc SuperView.Sound}" IsChecked="{Binding SoundOn, UpdateSourceTrigger=PropertyChanged}" AutomationProperties.AutomationId="SoundOn"/>
+            <ItemsControl ItemsSource="{Binding SoundStatus}" Margin="0,2,0,0" AutomationProperties.AutomationId="SoundStatus">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <TextBlock Text="{Binding}" TextWrapping="Wrap"/>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+            <ItemsControl ItemsSource="{Binding SoundSwitchPickers}">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <DockPanel Margin="0,2,0,0">
+                            <TextBlock Text="{Binding GroupName}" VerticalAlignment="Center" Margin="0,0,5,0"/>
+                            <ComboBox ItemsSource="{Binding Options}" SelectedItem="{Binding Selected}" AutomationProperties.AutomationId="SoundSwitch"/>
+                        </DockPanel>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </StackPanel>
+
         <TabControl DockPanel.Dock="Top" SelectedIndex="{Binding SelectedTabControllerIndex, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">
             <TabItem Header="{loc:Loc MetadataEditor.Tabs.Persistent}">
                 <DockPanel>

@@ -25,6 +25,8 @@ namespace Editors.Shared.Core.Common.ReferenceModel
         [ObservableProperty] FilterCollection<AnimationBinEntryGenericFormat> _fragmentSlotList;
         [ObservableProperty] string? _metaDataName;
         [ObservableProperty] string? _metaDataPersistName;
+        [ObservableProperty] string? _soundMetaName;
+        [ObservableProperty] string? _soundMetaPersistName;
         [ObservableProperty] string? _animationFileName;
 
         bool _isSettingAnimationFile;
@@ -138,6 +140,8 @@ namespace Editors.Shared.Core.Common.ReferenceModel
 
             var fullPath = _pfs.GetFullPath(file);
             _sceneObjectEditor.SetAnimation(_sceneObject, file, fullPath);
+            SoundMetaName = null;
+            _sceneObject.SoundMetaData = null;
             _sceneObjectEditor.SetMetaFile(_sceneObject, null, _sceneObject.PersistMetaData);
 
             MetaDataName = null;
@@ -165,22 +169,31 @@ namespace Editors.Shared.Core.Common.ReferenceModel
             if (string.IsNullOrWhiteSpace(value?.MetaFile) == false)
                 meta = _pfs.FindFile(value.MetaFile);
 
+            AnimationBinEntryGenericFormat? persistRow = null;
             var persist = FragmentSlotList.PossibleValues.FirstOrDefault(x => x.SlotName == "PERSISTENT_METADATA_ALIVE");
             if (persist != null && string.IsNullOrWhiteSpace(persist.MetaFile) == false)
             {
                 persistMeta = _pfs.FindFile(persist.MetaFile);
                 persistFullpath = persist.MetaFile;
+                persistRow = persist;
             }
 
             if (persistMeta == null)
             {
                 var persistFlying = FragmentSlotList.PossibleValues.FirstOrDefault(x => x.SlotName == "PERSISTENT_METADATA_FLYING");
                 if (persistFlying != null && string.IsNullOrWhiteSpace(persistFlying.MetaFile) == false)
-                { 
+                {
                     persistMeta = _pfs.FindFile(persistFlying.MetaFile);
                     persistFullpath = persistFlying.MetaFile;
+                    persistRow = persistFlying;
                 }
             }
+
+            // Before SetMetaFile, whose one scene update carries them.
+            SoundMetaName = value?.SoundFile;
+            SoundMetaPersistName = persistRow?.SoundFile;
+            _sceneObject.SoundMetaData = string.IsNullOrWhiteSpace(SoundMetaName) ? null : _pfs.FindFile(SoundMetaName);
+            _sceneObject.PersistSoundMetaData = string.IsNullOrWhiteSpace(SoundMetaPersistName) ? null : _pfs.FindFile(SoundMetaPersistName);
 
             _sceneObjectEditor.SetAnimation(_sceneObject, animationReference?.AnimationFile);
             _sceneObjectEditor.SetMetaFile(_sceneObject, meta, persistMeta);

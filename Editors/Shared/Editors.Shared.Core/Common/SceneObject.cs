@@ -39,6 +39,8 @@ namespace Editors.Shared.Core.Common
         public AnimationClip AnimationClip { get; set; }
         public PackFile? MetaData { get; set; }
         public PackFile? PersistMetaData { get; set; }
+        public PackFile? SoundMetaData { get; set; }
+        public PackFile? PersistSoundMetaData { get; set; }
         public Matrix Offset { get; set; } = Matrix.Identity;
         public string Id { get; private set; }
 

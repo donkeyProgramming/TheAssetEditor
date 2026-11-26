@@ -556,6 +556,7 @@
   "SuperView.Edit3D.Focus": "聚焦",
   "SuperView.Edit3D.FocusTooltip": "将相机对准所选标签。双击其标记效果相同",
   "SuperView.Problems.Header": "问题（{0}）",
+  "SuperView.Sound": "声音",
   "SuperView.Problems.Tooltip": "两个 META 文件中的问题。单击可打开对应标签。红色问题会阻止保存",
   "SuperView.Problems.InvalidField": "字段“{0}”的值无效，无法保存文件",
   "SuperView.Problems.NonFiniteTime": "开始或结束时间不是有限数值",

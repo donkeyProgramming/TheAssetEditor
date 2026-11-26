@@ -24,6 +24,7 @@
   <ItemGroup>
     <Compile Include="AudioCacheTests.cs" />
     <Compile Include="AudioExplorerTests.cs" />
+    <Compile Include="SoundTriggerTests.cs" />
     <Compile Include="WemVorbisEncoderTests.cs" />
     <Compile Include="MusicAudioProjectServiceTests.cs" />
     <Compile Include="AmsFragmentMergeTests.cs" />

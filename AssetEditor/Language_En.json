@@ -556,6 +556,7 @@
   "SuperView.Edit3D.Focus": "Focus",
   "SuperView.Edit3D.FocusTooltip": "Centre the camera on the selected tag. Double-clicking its marker does the same",
   "SuperView.Problems.Header": "Problems ({0})",
+  "SuperView.Sound": "Sound",
   "SuperView.Problems.Tooltip": "What is wrong in the two META files. Click one to open its tag. Red ones stop the file from saving",
   "SuperView.Problems.InvalidField": "{0} does not hold a valid value, so the file cannot be saved",
   "SuperView.Problems.NonFiniteTime": "Its start or end time is not a number",

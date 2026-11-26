@@ -645,5 +645,94 @@ namespace Test.Audio
             writer.Write((uint)payload.Length);
             output.Write(payload);
         }
+
+        private sealed class HeldCacheHelper(AudioCache cache) : IAudioCacheHelper
+        {
+            public ManualResetEventSlim? Hold { get; set; }
+            public ManualResetEventSlim Entered { get; } = new();
+
+            public string ComputeFingerprint(List<IPackFileContainer> containers, string cacheKind) => cacheKind;
+            public string GetCacheFilePath(string label, string fingerprint) => fingerprint;
+            public AudioCache TryLoadFromCache(string cacheFilePath, string fingerprint) => throw new NotSupportedException();
+            public AudioCache SaveAndLoadCache(AudioCacheSource source) => throw new NotSupportedException();
+
+            public AudioCache LoadOrBuildCache(AudioCacheSource source)
+            {
+                Entered.Set();
+                Hold?.Wait(TimeSpan.FromSeconds(30));
+                return cache;
+            }
+        }
+
+        const string HeldBnkPath = @"audio\wwise\held.bnk";
+        const uint HeldEventId = 555;
+
+        private (AudioRepository Repository, HeldCacheHelper Helper, AudioCache Cache) HeldRepository(Func<ManualResetEventSlim?> holdReads, ManualResetEventSlim readEntered)
+        {
+            var bnk = PackFile.CreateFromBytes("held.bnk", CreateBnk(HeldEventId, 1, 0));
+            var container = CreateContainer(true, [(HeldBnkPath, bnk)]);
+            var dbOptions = CreateTestDbOptions();
+            SaveCache("game files", [container.Object], dbOptions);
+            var cache = AudioCache.CreateFromFingerPrint(dbOptions, "game files");
+
+            var packFileService = new Mock<IPackFileService>();
+            packFileService.Setup(x => x.GetAllPackfileContainers()).Returns([container.Object]);
+            packFileService.Setup(x => x.FindFile(HeldBnkPath, It.IsAny<IPackFileContainer?>())).Returns(() =>
+            {
+                if (holdReads() is { } hold)
+                {
+                    readEntered.Set();
+                    hold.Wait(TimeSpan.FromSeconds(30));
+                }
+                return bnk;
+            });
+            var settings = new ApplicationSettingsService(GameTypeEnum.Warhammer3);
+            var helper = new HeldCacheHelper(cache);
+            var repository = new AudioRepository(settings, packFileService.Object, helper, new BnkLoader(packFileService.Object), new Mock<IEventHub>().Object);
+            return (repository, helper, cache);
+        }
+
+        [Test]
+        public void Repository_ALookupWaitsForOneInProgress()
+        {
+            ManualResetEventSlim? holdReads = null;
+            using var readEntered = new ManualResetEventSlim();
+            using var hold = new ManualResetEventSlim();
+            var (repository, _, _) = HeldRepository(() => holdReads, readEntered);
+            using (repository)
+            {
+                repository.Load([]);
+                holdReads = hold;
+
+                var first = Task.Run(() => repository.GetHircs(HeldEventId));
+                Assert.That(readEntered.Wait(TimeSpan.FromSeconds(10)), Is.True, "the first lookup is reading the bank");
+                holdReads = null;
+                var second = Task.Run(() => repository.GetHircs(HeldEventId + 1));
+                var secondWaited = !second.Wait(TimeSpan.FromMilliseconds(300));
+                hold.Set();
+
+                Assert.That(secondWaited, Is.True, "the second lookup waited");
+                Assert.That(first.Wait(TimeSpan.FromSeconds(10)) && second.Wait(TimeSpan.FromSeconds(10)), Is.True);
+                Assert.That(first.Result, Has.Count.EqualTo(1));
+            }
+        }
+
+        [Test]
+        public void Repository_DisposedDuringALoad_LetsGoOfWhatTheLoadOpens()
+        {
+            using var readEntered = new ManualResetEventSlim();
+            using var hold = new ManualResetEventSlim();
+            var (repository, helper, cache) = HeldRepository(() => null, readEntered);
+            helper.Hold = hold;
+
+            var load = Task.Run(() => repository.Load([]));
+            Assert.That(helper.Entered.Wait(TimeSpan.FromSeconds(10)), Is.True, "the load is reading the cache");
+            Assert.That(Task.Run(repository.Dispose).Wait(TimeSpan.FromSeconds(5)), Is.True, "Dispose does not wait for the load");
+            hold.Set();
+            Assert.That(load.Wait(TimeSpan.FromSeconds(10)), Is.True, "the load ended");
+
+            Assert.Throws<ObjectDisposedException>(() => cache.GetBnks(), "the cache the load opened was disposed");
+            Assert.That(repository.GetHircs(HeldEventId), Is.Empty);
+        }
     }
 }

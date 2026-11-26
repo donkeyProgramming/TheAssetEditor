@@ -39,6 +39,9 @@ namespace Editors.Shared.Core.Common.AnimationPlayer
         public event Action<ITimelineItem>? TimelineItemClicked;
         public ICommand TimelineItemClickCommand { get; }
 
+        /// <summary>Raised before Loop's jump back to frame 0, a paused frame set listeners can't otherwise tell from a scrub.</summary>
+        public event Action? Looping;
+
         public NotifyAttr<Visibility> PlayerControlsVisibility { get; private set; } = new(Visibility.Collapsed);
 
         public ObservableCollection<AssetPlayerItem> PlayerItems { get; private set; } = new ObservableCollection<AssetPlayerItem>();
@@ -193,6 +196,7 @@ namespace Editors.Shared.Core.Common.AnimationPlayer
             {
                 if (LoopAnimation.Value)
                 {
+                    Looping?.Invoke();
                     SetAnimationFirstFrame();
                     ToggleAnimationPausePlay();
                 }

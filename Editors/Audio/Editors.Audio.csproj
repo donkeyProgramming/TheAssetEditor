@@ -8,12 +8,14 @@
 
 	<ItemGroup>
 	  <InternalsVisibleTo Include="Test.Audio" />
+	  <InternalsVisibleTo Include="Test.AnimationMeta" />
 	</ItemGroup>
 
 	<ItemGroup>
 	  <None Remove="C:\Users\george\.nuget\packages\naudio.vorbis\1.5.0\contentFiles\any\netstandard2.0\README.md" />
 	  <Compile Remove="AudioCacheTests.cs" />
 	  <Compile Remove="AudioExplorerTests.cs" />
+	  <Compile Remove="SoundTriggerTests.cs" />
 	  <Compile Remove="WemVorbisEncoderTests.cs" />
 	  <Compile Remove="MusicAudioProjectServiceTests.cs" />
 	  <Compile Remove="AmsFragmentMergeTests.cs" />
